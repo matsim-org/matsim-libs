@@ -51,11 +51,11 @@ public class Building {
 		}
 	}
 	
-	public boolean isSingleFamilyBuilding() {
+	public boolean isVilla() {
 		return singleFamilyBuilding;
 	}
 	
-	public boolean isMultiFamilyBuilding() {
+	public boolean isApartmentBuilding() {
 		return multiFamilyBuilding;
 	}
 	

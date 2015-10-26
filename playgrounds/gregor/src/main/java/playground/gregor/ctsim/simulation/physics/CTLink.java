@@ -9,6 +9,7 @@ import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.Wait2LinkEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.vehicles.Vehicle;
@@ -22,9 +23,17 @@ import java.util.*;
 public class CTLink implements CTNetworkEntity {
 
 
-	static final double WIDTH = 1;
+	public static final double WIDTH = 5;
 	private static final Logger log = Logger.getLogger(CTLink.class);
 	private static final double EPSILON = 0.00001;
+	private static double LENGTH;
+	private static int WIDTH_WRN_CNT = 0;
+	private static int LENGTH_WRN_CNT = 0;
+
+	static {
+		LENGTH = 3 * Math.sqrt(3) / 2 * WIDTH;
+	}
+
 	private final CTNetwork network;
 	private final CTNode dsNode;
 	private final CTNode usNode;
@@ -60,13 +69,37 @@ public class CTLink implements CTNetworkEntity {
 		dx /= projLength;
 		dy /= projLength;
 		double length = this.dsLink.getLength();
+		if (length < LENGTH) {
+			if (LENGTH_WRN_CNT++ < 10) {
+				log.warn("Length of link: " + this.dsLink.getId() + " is too small. Increasing it from: " + length + " to: " + LENGTH);
+				if (LENGTH_WRN_CNT == 10) {
+					log.warn(Gbl.FUTURE_SUPPRESSED);
+				}
+			}
+			length = LENGTH;
+		}
+
+
+
 		if (Math.abs(dy) < EPSILON) { //fixes a numerical issue
 			dy = 0;
 		}
 
-		debugBound(dx, dy);
 
-		double width = Math.max(this.dsLink.getCapacity() / 1.33, 2);
+		double width = this.dsLink.getCapacity() / 1.33;
+		if (width < WIDTH) {
+			if (WIDTH_WRN_CNT++ < 10) {
+				log.warn("Width of link: " + this.dsLink.getId() + " is too small. Increasing it from: " + width + " to: " + WIDTH);
+				if (WIDTH_WRN_CNT == 10) {
+					log.warn(Gbl.FUTURE_SUPPRESSED);
+				}
+			}
+			width = WIDTH;
+		}
+
+
+
+
 
 
 		Coordinate[] bounds = new Coordinate[5];
@@ -79,11 +112,12 @@ public class CTLink implements CTNetworkEntity {
 		bounds[3] = new Coordinate(this.dsLink.getFromNode().getCoord().getX() + dy * width / 2,
 				this.dsLink.getFromNode().getCoord().getY() - dx * width / 2);
 		bounds[4] = bounds[0];
+		debugBound(bounds);
 		GeometryFactory geofac = new GeometryFactory();
 		LinearRing lr = geofac.createLinearRing(bounds);
 
 		Polygon p = (Polygon) geofac.createPolygon(lr, null).buffer(0.1);
-		List<ProtoCell> cells = computeProtoCells(dx, dy);
+		List<ProtoCell> cells = computeProtoCells(dx, dy, width, length);
 
 		Geometry fromBnd = geofac.createLineString(new Coordinate[]{bounds[3], bounds[4]}).buffer(0.1);
 		Geometry toBnd = geofac.createLineString(new Coordinate[]{bounds[1], bounds[2]}).buffer(0.1);
@@ -91,8 +125,9 @@ public class CTLink implements CTNetworkEntity {
 		Map<ProtoCell, CTCell> cellsMap = new HashMap<>();
 		Map<ProtoCell, Geometry> geoMap = new HashMap<>();
 		for (ProtoCell pt : cells) {
-			CTCell c = new CTLinkCell(pt.x, pt.y, this.network, this, WIDTH);
-			c.setArea(1.5 * Math.sqrt(3) * WIDTH * WIDTH);
+			double area = (1.5 * Math.sqrt(3) * (WIDTH / 2) * (WIDTH / 2));
+			CTCell c = new CTLinkCell(pt.x, pt.y, this.network, this, WIDTH / 2, area);
+
 
 			cellsMap.put(pt, c);
 			Coordinate[] coords = new Coordinate[pt.edges.size() * 2];
@@ -170,14 +205,14 @@ public class CTLink implements CTNetworkEntity {
 
 
 		//create pseudo cells
-		this.dsJumpOn = new CTLinkCell(Double.NaN, Double.NaN, this.network, this, width / WIDTH);
+		this.dsJumpOn = new CTLinkCell(Double.NaN, Double.NaN, this.network, this, width, width * width);
 		double dir = Math.PI / 2.;
 		for (CTCell ctCell : dsJumpOns) {
 			CTCellFace face = new CTCellFace(Double.NaN, Double.NaN, Double.NaN, Double.NaN, ctCell, dir);
 			this.dsJumpOn.addFace(face);
 			ctCell.addNeighbor(this.dsJumpOn);
 		}
-		this.usJumpOn = new CTLinkCell(0, 0, this.network, this, width / WIDTH);
+		this.usJumpOn = new CTLinkCell(0, 0, this.network, this, width, width * width);
 		dir = -Math.PI / 2.;
 		for (CTCell ctCell : usJumpOns) {
 			CTCellFace face = new CTCellFace(Double.NaN, Double.NaN, Double.NaN, Double.NaN, ctCell, dir);
@@ -221,11 +256,11 @@ public class CTLink implements CTNetworkEntity {
 		return alpha;
 	}
 
-	private List<ProtoCell> computeProtoCells(double dx, double dy) {
+	private List<ProtoCell> computeProtoCells(double dx, double dy, double width, double length) {
 		List<ProtoCell> cells = new ArrayList<>();
 
-		double w = this.dsLink.getCapacity() / 1.33 + WIDTH * 2;
-		double l = this.dsLink.getLength() + WIDTH * Math.sqrt(3) / 2;
+		double w = width + WIDTH - WIDTH / 20;
+		double l = length + WIDTH * Math.sqrt(3) / 2;
 
 
 		Voronoi v = new Voronoi(0.0001);
@@ -244,8 +279,9 @@ public class CTLink implements CTNetworkEntity {
 			even = !even;
 			int idx = 0;
 			for (; xIncr < w; xIncr += WIDTH * 1.5) {
-				double y = this.dsLink.getFromNode().getCoord().getY() + dx * w / 2 - dx * WIDTH * Math.sqrt(3) / 8 + dy * yIncr - dx * xIncr;
 				double x = this.dsLink.getFromNode().getCoord().getX() - dy * w / 2 + dy * WIDTH * Math.sqrt(3) / 8 + dx * yIncr + dy * xIncr;
+				double y = this.dsLink.getFromNode().getCoord().getY() + dx * w / 2 - dx * WIDTH * Math.sqrt(3) / 8 + dy * yIncr - dx * xIncr;
+
 				//				double x = x0 + xIncr*ldx;
 				yl.add(y);
 				xl.add(x);
@@ -262,7 +298,7 @@ public class CTLink implements CTNetworkEntity {
 			ya[i] = yl.get(i);
 		}
 
-		double length = this.dsLink.getLength();
+
 		double y0 = this.dsLink.getFromNode().getCoord().getY() + dx * w / 2;
 		double x0 = this.dsLink.getFromNode().getCoord().getX() - dy * w / 2;
 		double y2 = this.dsLink.getFromNode().getCoord().getY() - dx * w / 2;
@@ -286,6 +322,11 @@ public class CTLink implements CTNetworkEntity {
 		maxY = maxY > y3 ? maxY : y3;
 		List<GraphEdge> edges = v.generateVoronoi(xa, ya, minX - WIDTH, maxX + WIDTH, minY - WIDTH, maxY + WIDTH);
 		for (GraphEdge ge : edges) {
+			debugGe(ge);
+//			double aa = ge.x1-ge.x2;
+//			double bb = ge.y1-ge.y2;
+//			double cc = Math.sqrt(aa*aa+bb*bb);
+//			log.info(cc);
 
 			ProtoCell c0 = cells.get(ge.site1);
 			c0.edges.add(ge);
@@ -311,7 +352,7 @@ public class CTLink implements CTNetworkEntity {
 		em.processEvent(le);
 	}
 
-	private void debugBound(double dx, double dy) {
+	private void debugBound(Coordinate[] bounds) {
 		if (!CTRunner.DEBUG) {
 			return;
 		}
@@ -321,37 +362,37 @@ public class CTLink implements CTNetworkEntity {
 
 		{
 			LineSegment s = new LineSegment();
-			s.x0 = this.dsLink.getFromNode().getCoord().getX() - dy * this.dsLink.getCapacity() / 2.66;
-			s.x1 = this.dsLink.getFromNode().getCoord().getX() + dx * length - dy * this.dsLink.getCapacity() / 2.66;
-			s.y0 = this.dsLink.getFromNode().getCoord().getY() + dx * this.dsLink.getCapacity() / 2.66;
-			s.y1 = this.dsLink.getFromNode().getCoord().getY() + dy * length + dx * this.dsLink.getCapacity() / 2.66;
+			s.x0 = bounds[0].x;
+			s.y0 = bounds[0].y;
+			s.x1 = bounds[1].x;
+			s.y1 = bounds[1].y;
 			LineEvent le = new LineEvent(0, s, true, 0, 0, 0, 255, 0);
 			em.processEvent(le);
 		}
 		{
 			LineSegment s = new LineSegment();
-			s.x0 = this.dsLink.getFromNode().getCoord().getX() - dy * this.dsLink.getCapacity() / 2.66;
-			s.x1 = this.dsLink.getFromNode().getCoord().getX() + dy * this.dsLink.getCapacity() / 2.66;
-			s.y0 = this.dsLink.getFromNode().getCoord().getY() + dx * this.dsLink.getCapacity() / 2.66;
-			s.y1 = this.dsLink.getFromNode().getCoord().getY() - dx * this.dsLink.getCapacity() / 2.66;
+			s.x0 = bounds[1].x;
+			s.y0 = bounds[1].y;
+			s.x1 = bounds[2].x;
+			s.y1 = bounds[2].y;
 			LineEvent le = new LineEvent(0, s, true, 0, 0, 0, 255, 0);
 			em.processEvent(le);
 		}
 		{
 			LineSegment s = new LineSegment();
-			s.x0 = this.dsLink.getFromNode().getCoord().getX() + dy * this.dsLink.getCapacity() / 2.66;
-			s.x1 = this.dsLink.getFromNode().getCoord().getX() + dx * length + dy * this.dsLink.getCapacity() / 2.66;
-			s.y0 = this.dsLink.getFromNode().getCoord().getY() - dx * this.dsLink.getCapacity() / 2.66;
-			s.y1 = this.dsLink.getFromNode().getCoord().getY() + dy * length - dx * this.dsLink.getCapacity() / 2.66;
+			s.x0 = bounds[2].x;
+			s.y0 = bounds[2].y;
+			s.x1 = bounds[3].x;
+			s.y1 = bounds[3].y;
 			LineEvent le = new LineEvent(0, s, true, 0, 0, 0, 255, 0);
 			em.processEvent(le);
 		}
 		{
 			LineSegment s = new LineSegment();
-			s.x0 = this.dsLink.getFromNode().getCoord().getX() + dx * length - dy * this.dsLink.getCapacity() / 2.66;
-			s.x1 = this.dsLink.getFromNode().getCoord().getX() + dx * length + dy * this.dsLink.getCapacity() / 2.66;
-			s.y0 = this.dsLink.getFromNode().getCoord().getY() + dy * length + dx * this.dsLink.getCapacity() / 2.66;
-			s.y1 = this.dsLink.getFromNode().getCoord().getY() + dy * length - dx * this.dsLink.getCapacity() / 2.66;
+			s.x0 = bounds[3].x;
+			s.y0 = bounds[3].y;
+			s.x1 = bounds[0].x;
+			s.y1 = bounds[0].y;
 			LineEvent le = new LineEvent(0, s, true, 0, 0, 0, 255, 0);
 			em.processEvent(le);
 		}

@@ -64,7 +64,7 @@ import org.matsim.facilities.Facility;
  * @author dgrether
  * 
  */
-public class InvertedNetworkRoutingModule implements RoutingModule {
+class InvertedNetworkRoutingModule implements RoutingModule {
 
 	private final String mode;
 	private final PopulationFactory populationFactory;

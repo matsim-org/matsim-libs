@@ -25,9 +25,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.multimodal.router.DefaultDelegateFactory;
 import org.matsim.contrib.multimodal.router.MultimodalTripRouterFactory;
 import org.matsim.contrib.multimodal.router.TransitTripRouterFactory;
-import org.matsim.core.router.RoutingContext;
 import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.FastDijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
@@ -36,19 +34,19 @@ import org.matsim.pt.router.TransitRouter;
 
 import java.util.Map;
 
-public class EvacuationTripRouterFactory implements TripRouterFactory {
+public class EvacuationTripRouterFactory implements javax.inject.Provider<TripRouter> {
 
-	private final TripRouterFactory delegateFactory;
+	private final javax.inject.Provider<TripRouter> delegateFactory;
 	
 	public EvacuationTripRouterFactory(Scenario scenario, Map<String, TravelTime> multiModalTravelTimes,
 			TravelDisutilityFactory travelDisutilityFactory, LeastCostPathCalculatorFactory leastCostPathCalculatorFactory,
 									   Provider<TransitRouter> transitRouterFactory) {
-		
-		TripRouterFactory defaultDelegateFactory = new DefaultDelegateFactory(scenario, leastCostPathCalculatorFactory);
-		TripRouterFactory multiModalTripRouterFactory = new MultimodalTripRouterFactory(scenario, multiModalTravelTimes, 
+
+		javax.inject.Provider<TripRouter> defaultDelegateFactory = new DefaultDelegateFactory(scenario, leastCostPathCalculatorFactory);
+		javax.inject.Provider<TripRouter> multiModalTripRouterFactory = new MultimodalTripRouterFactory(scenario, multiModalTravelTimes,
 				travelDisutilityFactory, defaultDelegateFactory, new FastDijkstraFactory());
-		
-		TripRouterFactory transitTripRouterFactory = new TransitTripRouterFactory(scenario, multiModalTripRouterFactory, 
+
+		javax.inject.Provider<TripRouter> transitTripRouterFactory = new TransitTripRouterFactory(scenario, multiModalTripRouterFactory,
 				transitRouterFactory);
 		
 		this.delegateFactory = transitTripRouterFactory;
@@ -57,7 +55,7 @@ public class EvacuationTripRouterFactory implements TripRouterFactory {
 	@Override
 	public TripRouter instantiateAndConfigureTripRouter(RoutingContext routingContext) {
 
-		TripRouter instance = this.delegateFactory.instantiateAndConfigureTripRouter(routingContext);
+		TripRouter instance = this.delegateFactory.get();
 		return instance;
 	}
 

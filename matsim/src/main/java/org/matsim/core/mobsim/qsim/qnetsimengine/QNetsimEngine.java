@@ -218,10 +218,10 @@ public class QNetsimEngine implements MobsimEngine {
 		final SnapshotStyle snapshotStyle = scenario.getConfig().qsim().getSnapshotStyle();
 		switch( snapshotStyle ) {
 		case queue:
-			return new QueueAgentSnapshotInfoBuilder(scenario, this.network.getAgentSnapshotInfoFactory());
-		case equiDist:
 		case withHoles:
 			// the difference is not in the spacing, thus cannot be differentiated by using different classes.  kai, sep'14
+			return new QueueAgentSnapshotInfoBuilder(scenario, this.network.getAgentSnapshotInfoFactory());
+		case equiDist:
 			return new EquiDistAgentSnapshotInfoBuilder(scenario, this.network.getAgentSnapshotInfoFactory());
 		default:
 			log.warn("The snapshotStyle \"" + snapshotStyle + "\" is not supported. Using equiDist");
@@ -267,7 +267,7 @@ public class QNetsimEngine implements MobsimEngine {
 		if ( !this.usingThreadpool ) {
 			this.startBarrier.arriveAndAwaitAdvance();
 		} else {
-			pool.shutdown(); 
+			pool.shutdown();
 		}
 
 		/* Reset vehicles on ALL links. We cannot iterate only over the active links
@@ -467,7 +467,9 @@ public class QNetsimEngine implements MobsimEngine {
 			// The number of runners should be larger than the number of threads, yes,
 			// but see MATSIM-404 - Simulation result still depends on the number of runners.
 //			numOfRunners *= 10 ;
-			this.pool = Executors.newFixedThreadPool( this.numOfThreads ) ;
+			this.pool = Executors.newFixedThreadPool(
+					this.numOfThreads,
+					new NamedThreadFactory()) ;
 		}
 
 		// setup threads
@@ -542,4 +544,12 @@ public class QNetsimEngine implements MobsimEngine {
 		this.linksToActivateInitially.clear();
 	}
 
+	private static class NamedThreadFactory implements ThreadFactory {
+		private int count = 0;
+
+		@Override
+		public Thread newThread(Runnable r) {
+			return new Thread( r , "QNetsimEngine_PooledThread_"+count );
+		}
+	}
 }

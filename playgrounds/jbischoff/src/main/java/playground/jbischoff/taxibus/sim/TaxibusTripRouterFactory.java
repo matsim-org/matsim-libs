@@ -20,16 +20,15 @@
 package playground.jbischoff.taxibus.sim;
 
 import org.matsim.core.controler.Controler;
-import org.matsim.core.router.DefaultTripRouterFactoryImpl;
-import org.matsim.core.router.RoutingContext;
-import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.*;
+
+import javax.inject.Provider;
 
 /**
  * @author jbischoff
  *
  */
-public class TaxibusTripRouterFactory implements TripRouterFactory {
+public class TaxibusTripRouterFactory implements Provider<TripRouter> {
 
 	private Controler controler; 
 	
@@ -38,11 +37,10 @@ public class TaxibusTripRouterFactory implements TripRouterFactory {
 	}
 	
 	@Override
-	public TripRouter instantiateAndConfigureTripRouter(
-			RoutingContext routingContext) {
-        final TripRouterFactory delegate = DefaultTripRouterFactoryImpl.createRichTripRouterFactoryImpl(controler.getScenario());
+	public TripRouter get() {
+		final Provider<TripRouter> delegate = TripRouterFactoryBuilderWithDefaults.createDefaultTripRouterFactoryImpl(controler.getScenario());
 
-        TripRouter tr = delegate.instantiateAndConfigureTripRouter(routingContext);
+        TripRouter tr = delegate.get();
         tr.setRoutingModule("taxibus", new TaxibusServiceRoutingModule(controler));
 		return tr;
 	}

@@ -1,20 +1,13 @@
 package roadclassification;
 
 
-import floetteroed.opdyts.DecisionVariable;
-import org.matsim.api.core.v01.Id;
+import java.util.List;
+
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.core.utils.io.OsmNetworkReader;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
+import floetteroed.opdyts.DecisionVariable;
 
 class RoadClassificationDecisionVariable implements DecisionVariable {
 

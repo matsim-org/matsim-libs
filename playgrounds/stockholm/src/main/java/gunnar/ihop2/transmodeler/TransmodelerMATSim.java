@@ -145,7 +145,7 @@ public class TransmodelerMATSim {
 				"... program parameters look OK so far.");
 
 		/*
-		 * PRETEND TO SIMULATION
+		 * PRETEND TO RUN SIMULATION
 		 */
 
 		Logger.getLogger(MATSimDummy.class.getName()).info(
@@ -158,7 +158,7 @@ public class TransmodelerMATSim {
 					new File(transmodelerFolderName));
 			exitVal = proc.waitFor();
 			if (exitVal != 0) {
-				fatal("Regent terminated with exit code " + exitVal + ".");
+				fatal("Transmodeler terminated with exit code " + exitVal + ".");
 			}
 		} catch (Exception e) {
 			fatal(e);

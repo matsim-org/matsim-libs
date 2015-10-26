@@ -12,11 +12,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.router.DefaultTripRouterFactoryImpl;
-import org.matsim.core.router.MainModeIdentifier;
-import org.matsim.core.router.RoutingContext;
-import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.*;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.balac.allcsmodestest.config.AllCSModesConfigGroup;
@@ -32,6 +28,8 @@ import playground.balac.taxiservice.config.TaxiserviceConfigGroup;
 import playground.balac.taxiservice.router.TaxiserviceRoutingModule;
 import playground.balac.twowaycarsharingredisigned.config.TwoWayCSConfigGroup;
 import playground.balac.twowaycarsharingredisigned.router.TwoWayCSRoutingModule;
+
+import javax.inject.Provider;
 
 public class CarsharingWithTaxiControler extends Controler{
 
@@ -100,16 +98,16 @@ public class CarsharingWithTaxiControler extends Controler{
         });
 
 		controler.setTripRouterFactory(
-            new TripRouterFactory() {
+            new javax.inject.Provider<org.matsim.core.router.TripRouter>() {
                 @Override
-                public TripRouter instantiateAndConfigureTripRouter(RoutingContext routingContext) {
+                public TripRouter get() {
                     // this factory initializes a TripRouter with default modules,
                     // taking into account what is asked for in the config
 
                     // This allows us to just add our module and go.
-                    final TripRouterFactory delegate = DefaultTripRouterFactoryImpl.createRichTripRouterFactoryImpl(controler.getScenario());
+                    final Provider<TripRouter> delegate = TripRouterFactoryBuilderWithDefaults.createDefaultTripRouterFactoryImpl(controler.getScenario());
 
-                    final TripRouter router = delegate.instantiateAndConfigureTripRouter(routingContext);
+                    final TripRouter router = delegate.get();
 
                     // add our module to the instance
                     router.setRoutingModule(

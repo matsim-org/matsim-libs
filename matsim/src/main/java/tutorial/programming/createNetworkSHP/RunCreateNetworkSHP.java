@@ -71,7 +71,7 @@ public class RunCreateNetworkSHP {
 					new Object [] {link.getId().toString(), link.getFromNode().getId().toString(),link.getToNode().getId().toString(), link.getLength(), ((LinkImpl)link).getType(), link.getCapacity(), link.getFreespeed()}, null);
 			features.add(ft);
 		}   
-		ShapeFileWriter.writeGeometries(features, "network_links.shp");
+		ShapeFileWriter.writeGeometries(features, "output/network_links.shp");
 
 		features = new ArrayList<SimpleFeature>();
 		PointFeatureFactory nodeFactory = new PointFeatureFactory.Builder().
@@ -84,6 +84,6 @@ public class RunCreateNetworkSHP {
 			SimpleFeature ft = nodeFactory.createPoint(node.getCoord(), new Object[] {node.getId().toString()}, null);
 			features.add(ft);
 		}
-		ShapeFileWriter.writeGeometries(features, "network_nodes.shp");
+		ShapeFileWriter.writeGeometries(features, "output/network_nodes.shp");
 	}
 }

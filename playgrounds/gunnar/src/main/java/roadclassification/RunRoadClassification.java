@@ -26,12 +26,10 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.*;
 
-import floetteroed.opdyts.DecisionVariable;
 import floetteroed.opdyts.DecisionVariableRandomizer;
 import floetteroed.opdyts.ObjectBasedObjectiveFunction;
 import floetteroed.opdyts.convergencecriteria.ObjectiveFunctionChangeConvergenceCriterion;
 import floetteroed.opdyts.searchalgorithms.RandomSearch;
-import floetteroed.opdyts.searchalgorithms.TrajectorySamplingSelfTuner;
 
 import opdytsintegration.MATSimSimulator;
 import org.matsim.api.core.v01.Scenario;
@@ -101,14 +99,16 @@ public class RunRoadClassification {
 			}
 		};
 
-		final TrajectorySamplingSelfTuner selfTuner = new TrajectorySamplingSelfTuner(
-				0.0, 0.0, 0.0, 0.95, 1.0);
+//		final TrajectorySamplingSelfTuner selfTuner = new TrajectorySamplingSelfTuner(
+//				0.0, 0.0, 0.0, 0.95, 1.0);
 		final int minimumAverageIterations = 5;
 
 		final ObjectiveFunctionChangeConvergenceCriterion convergenceCriterion = new ObjectiveFunctionChangeConvergenceCriterion(
 				1e-1, 1e-1, minimumAverageIterations);
 
-		RandomSearch randomSearch = new RandomSearch(new MATSimSimulator(stateFactory, scenario), randomizer, convergenceCriterion, selfTuner, maxIterations, maxTransitions, populationSize,
+		RandomSearch<RoadClassificationDecisionVariable> randomSearch = new RandomSearch<>(new MATSimSimulator<RoadClassificationDecisionVariable>(stateFactory, scenario), randomizer, convergenceCriterion, 
+				// selfTuner, 
+				maxIterations, maxTransitions, populationSize,
 				MatsimRandom.getRandom(), interpolate, keepBestSolution, objectiveFunction, maxMemoryLength);
 		randomSearch.run();
 

@@ -1,6 +1,7 @@
 package playground.dhosse.gap.scenario.population.personGroups;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -21,6 +22,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.facilities.ActivityFacility;
@@ -34,6 +37,7 @@ import playground.dhosse.gap.scenario.mid.MiDPersonGroupTemplates;
 import playground.dhosse.gap.scenario.mid.MiDTravelChain;
 import playground.dhosse.gap.scenario.mid.MiDTravelChain.MiDTravelStage;
 import playground.dhosse.gap.scenario.population.EgapPopulationUtils;
+import playground.dhosse.gap.scenario.population.LegModeCreator;
 import playground.dhosse.gap.scenario.population.PlanCreationUtils;
 import playground.dhosse.gap.scenario.population.PlansCreatorV2;
 import playground.dhosse.gap.scenario.population.io.CommuterDataElement;
@@ -41,6 +45,7 @@ import playground.dhosse.utils.EgapHashGenerator;
 
 import com.vividsolutions.jts.geom.Geometry;
 
+@Deprecated
 public class CreateDemand {
 	
 	private static String lastMunId = "";
@@ -476,7 +481,7 @@ public class CreateDemand {
 					if(prevActType.equals(Global.ActType.home.name())){
 
 						currentAct = factory.createActivityFromCoord(homeAct.getType(), homeCoord);
-//						((ActivityImpl)currentAct).setLinkId(NetworkUtils.getNearestLink(scenario.getNetwork(), homeCoord).getId());
+						((ActivityImpl)currentAct).setLinkId(NetworkUtils.getNearestLink(scenario.getNetwork(), homeCoord).getId());
 						
 					} else{
 						
@@ -491,7 +496,7 @@ public class CreateDemand {
 							
 						}
 						currentAct = factory.createActivityFromCoord(Global.ActType.other.name(), coord);
-//						((ActivityImpl)currentAct).setLinkId(NetworkUtils.getNearestLink(scenario.getNetwork(), coord).getId());
+						((ActivityImpl)currentAct).setLinkId(NetworkUtils.getNearestLink(scenario.getNetwork(), coord).getId());
 						
 					}
 					
@@ -514,9 +519,9 @@ public class CreateDemand {
 				Leg leg = factory.createLeg(legMode);
 				leg.setDepartureTime(departure + timeShift);
 				
-				double d = stage.getDistance();//PlanCreationUtils.getTravelDistanceForMode(legMode);
-				if(d * 1000 > NinetyPctDistances.get(legMode)){
-					d = NinetyPctDistances.get(legMode);
+				double d = stage.getDistance()/1.3;//PlanCreationUtils.getTravelDistanceForMode(legMode);
+				if(d * 1000 > NinetyPctDistances.get(legMode)/1.3){
+					d = NinetyPctDistances.get(legMode)/1.3;
 				}
 				
 				Coord c = null;
@@ -527,37 +532,66 @@ public class CreateDemand {
 					
 				} else{
 					
-					String toId = null;
-					
-					String pattern = getActPattern(prevActType, nextActType);
-					if(legMode.equals(TransportMode.walk)){
-						toId = lastMunId;
-					} else{
-						toId = distributeTrip(nextActType, odMatrices.get(pattern), d);
-					}
-					Coord coord2 = MGC.point2Coord(GAPScenarioBuilder.getMunId2Geometry().get(toId).getCentroid());
-					
-					if(toId.length() <= 4 || toId.contains("AT")){
-						coord2 = Global.ct.transform(coord2);
-					} else{
-						coord2 = Global.gk4ToUTM32N.transform(coord2);
-					}
-					
-					Geometry g = GAPScenarioBuilder.getMunId2Geometry().get(toId);
-					
-					if(legMode.equals(TransportMode.walk)){
-						c = PlanCreationUtils.createNewRandomCoord(currentAct.getCoord(), d);
-					} else{
-						c = Global.gk4ToUTM32N.transform(PlanCreationUtils.shoot(g));
-					}
-					
-					d = CoordUtils.calcDistance(currentAct.getCoord(), c);
+						ArrayList<ActivityFacility> facilitiesInRange = null;
 						
-					lastMunId = toId;
-					
-					Coord coord = checkQuadTreesForFacilityCoords(nextActType, c);
-					if(coord != null){
-						c = coord;
+						if(nextActType.equals(Global.ActType.education.name())){
+							
+							facilitiesInRange = (ArrayList<ActivityFacility>) GAPScenarioBuilder.getEducationQT().getDisk(currentAct.getCoord().getX(), currentAct.getCoord().getY(), d);
+							
+						} else if(nextActType.equals(Global.ActType.leisure.name())){
+							
+							facilitiesInRange = (ArrayList<ActivityFacility>) GAPScenarioBuilder.getLeisureQT().getDisk(currentAct.getCoord().getX(), currentAct.getCoord().getY(), d);
+							
+						} else if(nextActType.equals(Global.ActType.shop.name())){
+							
+							facilitiesInRange = (ArrayList<ActivityFacility>) GAPScenarioBuilder.getShopQT().getDisk(currentAct.getCoord().getX(), currentAct.getCoord().getY(), d);
+							
+						} else if(nextActType.equals(Global.ActType.work.name())){
+							
+							facilitiesInRange = (ArrayList<ActivityFacility>) GAPScenarioBuilder.getWorkLocations().getDisk(currentAct.getCoord().getX(), currentAct.getCoord().getY(), d);
+							
+						} else{
+							
+							facilitiesInRange = (ArrayList<ActivityFacility>) GAPScenarioBuilder.getOtherQT().getDisk(currentAct.getCoord().getX(), currentAct.getCoord().getY(), d);
+							
+						}
+						
+						if(facilitiesInRange.size() > 0){
+							
+							int randomIndex = Global.random.nextInt(facilitiesInRange.size());
+							
+							c = facilitiesInRange.get(randomIndex).getCoord();
+							
+						} else{
+							
+							String toId = null;
+							
+							String pattern = getActPattern(prevActType, nextActType);
+							if(legMode.equals(TransportMode.walk)){
+								toId = lastMunId;
+							} else{
+								toId = distributeTrip(nextActType, odMatrices.get(pattern), d);
+							}
+							Coord coord2 = MGC.point2Coord(GAPScenarioBuilder.getMunId2Geometry().get(toId).getCentroid());
+							
+							if(toId.length() <= 4 || toId.contains("AT")){
+								coord2 = Global.ct.transform(coord2);
+							} else{
+								coord2 = Global.gk4ToUTM32N.transform(coord2);
+							}
+							
+							Geometry g = GAPScenarioBuilder.getMunId2Geometry().get(toId);
+							
+//							if(legMode.equals(TransportMode.walk)){
+//								c = PlanCreationUtils.createNewRandomCoord(currentAct.getCoord(), d);
+//							} else{
+								c = Global.gk4ToUTM32N.transform(PlanCreationUtils.shoot(g));
+//							}
+//							
+//							d = CoordUtils.calcDistance(currentAct.getCoord(), c);
+								
+							lastMunId = toId;
+							
 					}
 					
 				}
@@ -609,6 +643,12 @@ public class CreateDemand {
 			population.addPerson(person);
 			
 		}
+		
+	}
+	
+	private static boolean isPrimaryActType(String actType){
+		
+		return(actType.equals(Global.ActType.work.name()) || actType.equals(Global.ActType.work.name()) || actType.equals(Global.ActType.education.name()));
 		
 	}
 	
@@ -1496,11 +1536,6 @@ public class CreateDemand {
 					
 				}
 				
-			} else{
-				
-//				GAPScenarioBuilder.getSubpopulationAttributes().putAttribute(person.getId().toString(), Global.USER_GROUP, "null");
-//				GAPScenarioBuilder.getSubpopulationAttributes().putAttribute(person.getId().toString(), Global.CARSHARING, "null");
-				
 			}
 			
 			String pHash = EgapHashGenerator.generatePersonHash(age, sex, carAvail, hasLicense, isEmployed);
@@ -1538,12 +1573,6 @@ public class CreateDemand {
 			} else{
 				homeCoord = Global.gk4ToUTM32N.transform(PlanCreationUtils.shoot(GAPScenarioBuilder.getMunId2Geometry().get(munId)));
 			}
-			
-//			if(workId.length() <= 4 || workId.contains("AT")){
-//				workCoord = Global.ct.transform(PlanCreationUtils.shoot(GAPScenarioBuilder.getMunId2Geometry().get(workId)));
-//			} else{
-//				workCoord = Global.gk4ToUTM32N.transform(PlanCreationUtils.shoot(GAPScenarioBuilder.getMunId2Geometry().get(workId)));
-//			}
 			
 			double aw = 0.;
 			Set<ActivityFacility> facilitiesWithinMunicipality = new HashSet<>();
@@ -1630,7 +1659,7 @@ public class CreateDemand {
 				Leg leg = factory.createLeg(legMode);
 				leg.setDepartureTime(departure + timeShift);
 				
-				double d = stage.getDistance();//PlanCreationUtils.getTravelDistanceForMode(legMode);
+				double d = PlanCreationUtils.getTravelDistanceForMode(legMode);
 				if(d * 1000 > NinetyPctDistances.get(legMode)){
 					d = NinetyPctDistances.get(legMode);
 				}
@@ -1647,64 +1676,67 @@ public class CreateDemand {
 					
 				} else{
 					
-					String toId = null;
-					
-					String pattern = getActPattern(prevActType, nextActType);
-					if(legMode.equals(TransportMode.walk)){
-						toId = lastMunId;
-					} else{
-						toId = distributeTrip(nextActType, odMatrices.get(pattern), d);
-					}
-					Coord coord2 = MGC.point2Coord(GAPScenarioBuilder.getMunId2Geometry().get(toId).getCentroid());
-					
-					if(toId.length() <= 4 || toId.contains("AT")){
-						coord2 = Global.ct.transform(coord2);
-					} else{
-						coord2 = Global.gk4ToUTM32N.transform(coord2);
-					}
-					
-					Coord temp = Global.UTM32NtoGK4.transform(coord2);
-					Geometry g = GAPScenarioBuilder.getBuiltAreaQT().getClosest(temp.getX(), temp.getY());
-					
-					if(legMode.equals(TransportMode.walk)){
-							c = PlanCreationUtils.createNewRandomCoord(currentAct.getCoord(), d);
-					} else{
-						c = Global.gk4ToUTM32N.transform(PlanCreationUtils.shoot(g));
-					}
-					
-					Coord coord = checkQuadTreesForFacilityCoords(nextActType, c);
-					if(coord != null){
-						c = coord;
-					}
-					
-					if(nextActType.equals(Global.ActType.work.name())){
+						ArrayList<ActivityFacility> facilitiesInRange = null;
 						
-						aw = 0.;
-						facilitiesWithinMunicipality = new HashSet<>();
-						for(ActivityFacility facility : facilities.values()){
-							if(GAPScenarioBuilder.getMunId2Geometry().get(toId).contains(MGC.coord2Point(Global.UTM32NtoGK4.transform(facility.getCoord())))){
-								facilitiesWithinMunicipality.add(facility);
-								for(ActivityOption ao : facility.getActivityOptions().values()){
-									aw += ao.getCapacity();
-									break;
-								}
-							}
-						}
-						
-						random = Global.random.nextDouble() * aw;
-						w = 0;
-						for(ActivityFacility facility : facilitiesWithinMunicipality){
+						if(nextActType.equals(Global.ActType.education.name())){
 							
-							w += facility.getActivityOptions().get(Global.ActType.work.name()).getCapacity();
-							if(random >= w){
-								workCoord = facility.getCoord();
-							}
+							facilitiesInRange = (ArrayList<ActivityFacility>) GAPScenarioBuilder.getEducationQT().getDisk(currentAct.getCoord().getX(), currentAct.getCoord().getY(), d/1.3);
+							
+						} else if(nextActType.equals(Global.ActType.leisure.name())){
+							
+							facilitiesInRange = (ArrayList<ActivityFacility>) GAPScenarioBuilder.getLeisureQT().getDisk(currentAct.getCoord().getX(), currentAct.getCoord().getY(), d/1.3);
+							
+						} else if(nextActType.equals(Global.ActType.shop.name())){
+							
+							facilitiesInRange = (ArrayList<ActivityFacility>) GAPScenarioBuilder.getShopQT().getDisk(currentAct.getCoord().getX(), currentAct.getCoord().getY(), d/1.3);
+							
+						} else if(nextActType.equalsIgnoreCase(Global.ActType.work.name())){
+							
+							facilitiesInRange = (ArrayList<ActivityFacility>) GAPScenarioBuilder.getWorkLocations().getDisk(currentAct.getCoord().getX(), currentAct.getCoord().getY(), d/1.3);
+							
+						} else {
+							
+							facilitiesInRange = (ArrayList<ActivityFacility>) GAPScenarioBuilder.getOtherQT().getDisk(currentAct.getCoord().getX(), currentAct.getCoord().getY(), d/1.3);
 							
 						}
 						
-					}
-					
-					lastMunId = toId;
+						if(facilitiesInRange.size() > 0){
+							
+							int randomIndex = Global.random.nextInt(facilitiesInRange.size());
+							
+							c = facilitiesInRange.get(randomIndex).getCoord();
+							
+						} else{
+							
+							String toId = null;
+							
+							String pattern = getActPattern(prevActType, nextActType);
+							if(legMode.equals(TransportMode.walk)){
+								toId = lastMunId;
+							} else{
+								toId = distributeTrip(nextActType, odMatrices.get(pattern), d);
+							}
+							Coord coord2 = MGC.point2Coord(GAPScenarioBuilder.getMunId2Geometry().get(toId).getCentroid());
+							
+							if(toId.length() <= 4 || toId.contains("AT")){
+								coord2 = Global.ct.transform(coord2);
+							} else{
+								coord2 = Global.gk4ToUTM32N.transform(coord2);
+							}
+							
+							Geometry g = GAPScenarioBuilder.getMunId2Geometry().get(toId);
+							
+//							if(legMode.equals(TransportMode.walk)){
+//								c = PlanCreationUtils.createNewRandomCoord(currentAct.getCoord(), d);
+//							} else{
+								c = Global.gk4ToUTM32N.transform(PlanCreationUtils.shoot(g));
+//							}
+							
+//							d = CoordUtils.calcDistance(currentAct.getCoord(), c);
+								
+							lastMunId = toId;
+							
+						}
 					
 				}
 				

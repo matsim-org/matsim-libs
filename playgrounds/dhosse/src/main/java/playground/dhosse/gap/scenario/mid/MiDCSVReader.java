@@ -78,6 +78,7 @@ public class MiDCSVReader {
 						legs = null;
 						times = null;
 						pHash = null;
+						distance = null;
 						
 					}
 					
@@ -155,92 +156,12 @@ public class MiDCSVReader {
 			
 			reader.close();
 			
-			
+				
 		} catch (IOException e) {
 		
 			e.printStackTrace();
 		
 		}
-		
-	}
-	
-	public Map<String, List<MiDData>> read(String file){
-		
-		Map<String, MiDData> midData = new HashMap<String, MiDData>();
-		
-		BufferedReader reader = IOUtils.getBufferedReader(file);
-		
-		try {
-			
-			String line = reader.readLine();
-			
-			while((line = reader.readLine()) != null){
-				
-				String[] parts = line.split("\t");
-				
-				String id = parts[idxPersonId];
-				
-				if(!this.persons.containsKey(id)){
-					
-					this.persons.put(id, new MiDSurveyPerson(id, parts[idxSex], parts[idxAge], parts[idxCarAvailability], parts[idxLicense], parts[idxEmployment]));
-					
-				}
-				
-				this.persons.get(id).addPlanElement(parts[idxMode], parts[idxPurpose], parts[idxDistance], parts[idxStart], parts[idxEnd]);
-				
-//				if(!midData.containsKey(parts[idxPersonId])){
-//					
-//					MiDData data = new MiDData(parts[idxPersonId], parts[idxSex], parts[idxMode], parts[idxAge], parts[idxCarAvailability], parts[idxLicense], parts[idxEmployment]);
-//					
-//					midData.put(data.personId, data);
-//					
-//				} 
-//				
-//				midData.get(parts[idxPersonId]).addWaypoint(new MiDWaypoint(parts[idxMode], parts[idxPurpose], parts[idxDistance], parts[idxDuration], parts[idxStart], parts[idxEnd]));
-					
-			}
-			
-			reader.close();
-			
-		} catch (IOException e) {
-	
-			e.printStackTrace();
-			
-		}
-		
-		return this.classify(midData);
-		
-//		this.persons = new HashMap<>();
-//		
-//		BufferedReader reader = IOUtils.getBufferedReader(file);
-//		
-//		try {
-//			
-//			String line = reader.readLine();
-//			
-//			while((line = reader.readLine()) != null){
-//				
-//				String[] parts = line.split("\t");
-//				
-//				String personId = parts[0];
-//				
-//				if(!this.persons.containsKey(personId)){
-//					
-//					this.persons.put(personId, new MiDSurveyPerson(personId, parts[idxSex], parts[idxAge], parts[idxCarAvailability], parts[idxLicense], parts[idxEmployment]));
-//					
-//				}
-//				
-//				this.persons.get(personId).addPlanElement(parts[idxMode], parts[idxPurpose], parts[idxDistance].replace(",", "."), parts[idxStart], parts[idxEnd]);
-//				
-//			}
-//			
-//			reader.close();
-//			
-//		} catch (IOException e) {
-//			
-//			e.printStackTrace();
-//			
-//		}
 		
 	}
 	
@@ -248,28 +169,6 @@ public class MiDCSVReader {
 		return this.persons;
 	}
 	
-	
-	private Map<String,List<MiDData>> classify(Map<String, MiDData> midData){
-		
-		Map<String, List<MiDData>> midDatas = new HashMap<>();
-		
-		for(Entry<String, MiDData> entry : midData.entrySet()){
-			
-			String hash = entry.getValue().generateHash();
-			
-			if(!midDatas.containsKey(hash)){
-				
-				midDatas.put(hash, new ArrayList<MiDData>());
-				
-			}
-			
-			midDatas.get(hash).add(entry.getValue());
-			
-		}
-		
-		return midDatas;
-		
-	}
 	
 	public static class MiDData{
 		

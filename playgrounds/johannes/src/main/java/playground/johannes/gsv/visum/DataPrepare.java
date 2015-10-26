@@ -19,11 +19,6 @@
 
 package playground.johannes.gsv.visum;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
@@ -37,19 +32,21 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.router.PlanRouter;
-import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.config.TransitConfigGroup;
-import org.matsim.pt.transitSchedule.TransitScheduleWriterV1;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
 import org.matsim.pt.utils.CreatePseudoNetwork;
-import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.visum.VisumNetwork;
 import org.matsim.visum.VisumNetworkReader;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class DataPrepare {
 
@@ -219,10 +216,8 @@ X;Dritte GV;OV;1.000
 		PlanRouter router =
 			new PlanRouter(
 					new TripRouterFactoryBuilderWithDefaults().build(
-						scenario ).instantiateAndConfigureTripRouter(
-							new RoutingContextImpl(
-								timeCostCalculator,
-								timeCostCalculator ) ) );
+						scenario ).get(
+					) );
 		log.info("start pt-router");
 		for ( Person p : pop.getPersons().values() ) {
 			router.run( p );

@@ -19,14 +19,13 @@
 
 package playground.johannes.gsv.matrices.io;
 
-import java.util.List;
-
 import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrix;
 import org.matsim.visum.VisumMatrixReader;
-
 import playground.johannes.gsv.zones.KeyMatrix;
 import playground.johannes.gsv.zones.io.KeyMatrixXMLWriter;
+
+import java.util.List;
 
 /**
  * @author johannes

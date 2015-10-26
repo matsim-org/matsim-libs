@@ -26,10 +26,13 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.withinday.mobsim.WithinDayEngine;
 import org.matsim.withinday.mobsim.WithinDayQSimFactory;
+import org.matsim.withinday.trafficmonitoring.TravelTimeCollector;
 
 public class WithinDayModule extends AbstractModule {
     @Override
     public void install() {
+        binder().bind(TravelTimeCollector.class);
+        bindNetworkTravelTime().to(TravelTimeCollector.class);
         binder().bind(WithinDayEngine.class);
         bind(Mobsim.class).toProvider(WithinDayQSimFactory.class);
     }

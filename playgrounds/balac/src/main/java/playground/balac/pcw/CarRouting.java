@@ -23,7 +23,6 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.PlanRouter;
-import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
@@ -113,10 +112,8 @@ public void run(final String[] args) throws IOException {
 		plans.addAlgorithm(
 				new PlanRouter(
 				new TripRouterFactoryBuilderWithDefaults().build(
-						sc ).instantiateAndConfigureTripRouter(
-								new RoutingContextImpl(
-										travelCostCalculator,
-										travelTimeCalculator.getLinkTravelTimes() ) ) ) );
+						sc ).get(
+				) ) );
 
 		// add algorithm to write out the plans
 		plans.addAlgorithm(plansWriter);

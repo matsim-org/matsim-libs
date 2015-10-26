@@ -1,3 +1,24 @@
+/*
+ *  *********************************************************************** *
+ *  * project: org.matsim.*
+ *  * DefaultControlerModules.java
+ *  *                                                                         *
+ *  * *********************************************************************** *
+ *  *                                                                         *
+ *  * copyright       : (C) 2014 by the members listed in the COPYING, *
+ *  *                   LICENSE and WARRANTY file.                            *
+ *  * email           : info at matsim dot org                                *
+ *  *                                                                         *
+ *  * *********************************************************************** *
+ *  *                                                                         *
+ *  *   This program is free software; you can redistribute it and/or modify  *
+ *  *   it under the terms of the GNU General Public License as published by  *
+ *  *   the Free Software Foundation; either version 2 of the License, or     *
+ *  *   (at your option) any later version.                                   *
+ *  *   See also COPYING, LICENSE and WARRANTY file                           *
+ *  *                                                                         *
+ *  * ***********************************************************************
+ */
 package scenarios.braess.run;
 
 import java.io.File;
@@ -15,7 +36,7 @@ import org.matsim.contrib.signals.data.SignalsScenarioLoader;
 import org.matsim.contrib.signals.data.signalcontrol.v20.SignalControlWriter20;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupsWriter20;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsWriter20;
-import org.matsim.contrib.signals.router.InvertedNetworkTripRouterFactoryModule;
+import org.matsim.contrib.signals.router.InvertedNetworkRoutingModuleModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
@@ -41,7 +62,7 @@ import playground.vsp.congestion.handlers.CongestionHandlerImplV4;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV8;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV9;
 import playground.vsp.congestion.handlers.TollHandler;
-import playground.vsp.congestion.routing.RandomizedTollTimeDistanceTravelDisutilityFactory;
+import playground.vsp.congestion.routing.CongestionTollTimeDistanceTravelDisutilityFactory;
 import scenarios.analysis.TtListenerToBindAndWriteAnalysis;
 import scenarios.braess.analysis.TtAnalyzeBraess;
 import scenarios.braess.createInput.TtCreateBraessNetworkAndLanes;
@@ -50,7 +71,6 @@ import scenarios.braess.createInput.TtCreateBraessPopulation;
 import scenarios.braess.createInput.TtCreateBraessPopulation.InitRoutes;
 import scenarios.braess.createInput.TtCreateBraessSignals;
 import scenarios.braess.createInput.TtCreateBraessSignals.SignalControlType;
-import utils.TtPaths;
 
 /**
  * Class to run a simulation of the braess scenario with or without signals. 
@@ -133,7 +153,7 @@ public class RunBraessSimulation {
 		
 		// add the module for link to link routing if enabled
 		if (config.controler().isLinkToLinkRoutingEnabled()){
-			controler.addOverridingModule(new InvertedNetworkTripRouterFactoryModule());
+			controler.addOverridingModule(new InvertedNetworkRoutingModuleModule());
 		}
 		
 		if (!PRICING_TYPE.equals(PricingType.NONE)){
@@ -146,8 +166,8 @@ public class RunBraessSimulation {
 			for (int i = 0; i < strategies.length; i++) {
 				if (strategies[i].getStrategyName().equals(DefaultStrategy.ReRoute.toString())){
 					if (strategies[i].getWeight() > 0.0){ // ReRoute is used
-						final RandomizedTollTimeDistanceTravelDisutilityFactory factory = 
-								new RandomizedTollTimeDistanceTravelDisutilityFactory(
+						final CongestionTollTimeDistanceTravelDisutilityFactory factory = 
+								new CongestionTollTimeDistanceTravelDisutilityFactory(
 								new TravelTimeAndDistanceBasedTravelDisutilityFactory(),
 								tollHandler
 							) ;

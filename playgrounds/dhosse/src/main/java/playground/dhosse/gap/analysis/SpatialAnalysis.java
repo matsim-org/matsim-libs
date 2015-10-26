@@ -79,6 +79,7 @@ public class SpatialAnalysis {
 		builder.addAttribute("capacity", Double.class);
 		builder.addAttribute("freespeed", Double.class);
 		builder.addAttribute("nLanes", Double.class);
+		builder.addAttribute("modes", String.class);
 		PolylineFeatureFactory factory = builder.create();
 		
 		List<SimpleFeature> features = new ArrayList<>();
@@ -91,6 +92,11 @@ public class SpatialAnalysis {
 			atts.put("capacity", link.getCapacity());
 			atts.put("freespeed", link.getFreespeed());
 			atts.put("nLanes", link.getNumberOfLanes());
+			StringBuffer sb = new StringBuffer();
+			for(String s : link.getAllowedModes()){
+				sb.append(s + ",");
+			}
+			atts.put("modes", sb.toString());
 			
 			features.add(factory.createPolyline(new Coordinate[]{MGC.coord2Coordinate(link.getFromNode().getCoord()),
 					MGC.coord2Coordinate(link.getToNode().getCoord())}, atts, link.getId().toString()));

@@ -19,11 +19,11 @@
 
 package playground.johannes.gsv.matrices.misc;
 
-import java.io.IOException;
-
-import playground.johannes.gsv.zones.io.VisumOMatrixReader;
 import playground.johannes.gsv.zones.KeyMatrix;
 import playground.johannes.gsv.zones.MatrixOperations;
+import playground.johannes.gsv.zones.io.VisumOMatrixReader;
+
+import java.io.IOException;
 
 /**
  * @author johannes

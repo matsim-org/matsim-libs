@@ -97,16 +97,16 @@ public static void main(final String[] args) throws IOException {
 		}
 		
 		controler.setTripRouterFactory(
-				new TripRouterFactory() {
+				new javax.inject.Provider<org.matsim.core.router.TripRouter>() {
 					@Override
-					public TripRouter instantiateAndConfigureTripRouter(RoutingContext routingContext) {
+					public TripRouter get() {
 						// this factory initializes a TripRouter with default modules,
 						// taking into account what is asked for in the config
 					
 						// This allows us to just add our module and go.
-						final TripRouterFactory delegate = DefaultTripRouterFactoryImpl.createRichTripRouterFactoryImpl(controler.getScenario());
+						final javax.inject.Provider<TripRouter> delegate = TripRouterFactoryBuilderWithDefaults.createDefaultTripRouterFactoryImpl(controler.getScenario());
 
-						final TripRouter router = delegate.instantiateAndConfigureTripRouter(routingContext);
+						final TripRouter router = delegate.get();
 						
 						// add our module to the instance
 						router.setRoutingModule(

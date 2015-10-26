@@ -22,7 +22,7 @@ public static void main(String[] args) {
  * standing capacity and passenger car equivalents of the vehicle types based on the sample size. This is done to balance out the effect of setting storage capacity 
  * factor and flow capacity factor (in the Config file) on the PT links.
 */
-        String path = "H:\\Matsim\\Stockholm Scenario\\teleportation\\input\\config.xml";
+        String path = "/home/saleem/input/config.xml";
         Config config = ConfigUtils.loadConfig(path);
 		double samplesize = config.qsim().getStorageCapFactor();
 //        double samplesize = 0.1;
@@ -40,18 +40,19 @@ public static void main(String[] args) {
 			cap.setStandingRoom((int)Math.ceil(cap.getStandingRoom()*samplesize));
 			vt.setCapacity(cap);
 			vt.setPcuEquivalents(vt.getPcuEquivalents()*samplesize);
+			System.out.println("Sample Size is: " + samplesize);
 		}
 		TransitSchedule schedule = scenario.getTransitSchedule();
 		//network.getLinks().clear();
 		//network.getNodes().clear();
 		new CreatePseudoNetwork(schedule, network, "tr_").createNetwork();
-		Iterator iter = network.getLinks().values().iterator();
-		while(iter.hasNext()){
-			Link link = (Link)iter.next();
-			if(link.getId().toString().startsWith("tr")){
-//				link.setCapacity(link.getCapacity()/config.qsim().getFlowCapFactor());
-			}
-		}
+//		Iterator iter = network.getLinks().values().iterator();
+//		while(iter.hasNext()){
+//			Link link = (Link)iter.next();
+//			if(link.getId().toString().startsWith("tr")){
+////				link.setCapacity(link.getCapacity()/config.qsim().getFlowCapFactor());
+//			}
+//		}
 //		NetworkWriter networkWriter =  new NetworkWriter(network);
 //		networkWriter.write("H:\\Matsim\\Stockholm Scenario\\teleportation\\input\\PseudoNetwork.xml");
 //		TransitScheduleWriter tw = new TransitScheduleWriter(schedule);

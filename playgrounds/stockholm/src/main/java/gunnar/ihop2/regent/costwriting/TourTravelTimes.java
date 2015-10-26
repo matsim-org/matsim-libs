@@ -9,7 +9,6 @@ import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Random;
 import java.util.logging.Logger;
 
 import org.matsim.api.core.v01.Scenario;
@@ -17,17 +16,13 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.events.EventsUtils;
-import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.matrices.Matrices;
 import org.matsim.matrices.MatricesWriter;
 import org.matsim.matrices.Matrix;
+import org.matsim.matrices.MatsimMatricesReader;
 
 import saleem.stockholmscenario.utils.StockholmTransformationFactory;
 import floetteroed.utilities.math.Histogram;
@@ -173,8 +168,15 @@ public class TourTravelTimes {
 		 * FIRST CREATE TRAVEL TIME MATRICES
 		 */
 
+		/*
+		 * TODO:
+		 */
+
 		final String configFileName = "./input/matsim-config.xml";
 		final Config config = ConfigUtils.loadConfig(configFileName);
+		config.getModule("plans").addParam("inputPlansFile",
+				"./../10percentCarNetworkPlain/1000.plans.xml.gz");
+
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		final String zonesShapeFileName = "./input/sverige_TZ_EPSG3857.shp";
@@ -183,38 +185,50 @@ public class TourTravelTimes {
 		zonalSystem.addNetwork(scenario.getNetwork(),
 				StockholmTransformationFactory.WGS84_SWEREF99);
 
-		final String eventsFileName = "./matsim-output/ITERS/it.0/0.events.xml.gz";
+		// final String eventsFileName =
+		// "./matsim-output/ITERS/it.0/0.events.xml.gz";
 		final String regentMatrixFileName = "./exchange/regent-tts.xml";
 
 		final int startTime_s = 5 * 3600 + 1800;
 		final int binSize_s = 3600;
-		final int binCnt = 2;
-		final int sampleCnt = 2;
+		// final int binCnt = 2;
+		// final int sampleCnt = 2;
 
-		final int ttCalcTimeBinSize = 15 * 60;
-		final int ttCalcEndTime = 24 * 3600 - 1; // one sec before midnight
-		final TravelTimeCalculator ttcalc = new TravelTimeCalculator(
-				scenario.getNetwork(), ttCalcTimeBinSize, ttCalcEndTime,
-				scenario.getConfig().travelTimeCalculator());
-		Logger.getLogger(TourTravelTimes.class.getName()).info(
-				"number of time bins in matsim tt calc: "
-						+ ttcalc.getNumSlots());
-		Logger.getLogger(TourTravelTimes.class.getName()).info(
-				"time bin size in matsim tt calc: " + ttcalc.getTimeSlice()
-						+ " seconds");
-		final EventsManager events = EventsUtils.createEventsManager();
-		events.addHandler(ttcalc);
-		final MatsimEventsReader reader = new MatsimEventsReader(events);
-		reader.readFile(eventsFileName);
-		final TravelTime linkTTs = ttcalc.getLinkTravelTimes();
+		// final int ttCalcTimeBinSize = 15 * 60;
+		// final int ttCalcEndTime = 24 * 3600 - 1; // one sec before midnight
+		// final TravelTimeCalculator ttcalc = new TravelTimeCalculator(
+		// scenario.getNetwork(), ttCalcTimeBinSize, ttCalcEndTime,
+		// scenario.getConfig().travelTimeCalculator());
+		// Logger.getLogger(TourTravelTimes.class.getName()).info(
+		// "number of time bins in matsim tt calc: "
+		// + ttcalc.getNumSlots());
+		// Logger.getLogger(TourTravelTimes.class.getName()).info(
+		// "time bin size in matsim tt calc: " + ttcalc.getTimeSlice()
+		// + " seconds");
+		// final EventsManager events = EventsUtils.createEventsManager();
+		// events.addHandler(ttcalc);
+		// final MatsimEventsReader reader = new MatsimEventsReader(events);
+		// reader.readFile(eventsFileName);
+		// final TravelTime linkTTs = ttcalc.getLinkTravelTimes();
 
+		// load matrices from file!
+
+		// final TravelTimeMatrices travelTimeMatrices = new TravelTimeMatrices(
+		// scenario.getNetwork(), linkTTs, null, zonalSystem,
+		// new Random(), startTime_s, binSize_s, binCnt, sampleCnt);
+
+		final Matrices ttMatrices = new Matrices();
+		final MatsimMatricesReader matricesReader = new MatsimMatricesReader(
+				ttMatrices, null);
+		matricesReader
+				.readFile("./../10percentCarNetworkPlain/travelTimeMatrices.xml");
 		final TravelTimeMatrices travelTimeMatrices = new TravelTimeMatrices(
-				scenario.getNetwork(), linkTTs, null, zonalSystem,
-				new Random(), startTime_s, binSize_s, binCnt, sampleCnt);
+				ttMatrices, startTime_s, binSize_s);
 
 		final TourTravelTimes tsa = new TourTravelTimes(scenario,
 				travelTimeMatrices);
-		tsa.writeTourTravelTimesToFile(regentMatrixFileName);
+		tsa.writeHistogramsToFile("./../10percentCarNetworkPlain/departureTimeHistograms.xml");
+		tsa.writeTourTravelTimesToFile("./../10percentCarNetworkPlain/tourTravelTimeMatrices.xml");
 
 		System.out.println("... DONE");
 	}

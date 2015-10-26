@@ -20,13 +20,21 @@
 package playground.johannes.gsv.popsim;
 
 import org.apache.log4j.Logger;
+import org.matsim.contrib.common.util.XORShiftRandom;
 import playground.johannes.gsv.synPop.analysis.AnalyzerTaskComposite;
+import playground.johannes.gsv.synPop.analysis.LegGeoDistanceTask;
 import playground.johannes.gsv.synPop.analysis.ProxyAnalyzer;
-import playground.johannes.synpop.data.io.XMLHandler;
+import playground.johannes.gsv.synPop.mid.PersonCloner;
+import playground.johannes.gsv.synPop.mid.Route2GeoDistance;
 import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.data.PlainFactory;
+import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.data.io.XMLHandler;
+import playground.johannes.synpop.processing.TaskRunner;
 
 import java.io.IOException;
+import java.util.Collection;
+import java.util.Random;
 import java.util.Set;
 
 /**
@@ -42,9 +50,9 @@ public class Analyzer {
 	 */
 	public static void main(String[] args) throws IOException {
 	
-		String output = "/home/johannes/gsv/germany-scenario/mid2008/analysis/pop/";
+		String output = "/home/johannes/gsv/matrix2014/mid-fusion/";
 
-		String personFile = "/home/johannes/gsv/germany-scenario/mid2008/pop/pop.xml";
+		String personFile = "/home/johannes/gsv/germany-scenario/mid2008/pop/mid2008.merged.xml";
 		
 		XMLHandler parser = new XMLHandler(new PlainFactory());
 		parser.setValidating(false);
@@ -54,14 +62,19 @@ public class Analyzer {
 		Set<? extends Person> persons = parser.getPersons();
 		
 		
-//		logger.info("Cloning persons...");
-//		Random random = new XORShiftRandom();
-//		persons = PersonCloner.weightedClones(persons, 200000, random);
+		logger.info("Cloning persons...");
+		Random random = new XORShiftRandom();
+		persons = PersonCloner.weightedClones((Collection<PlainPerson>) persons, 200000, random);
 //		new ApplySampleProbas(82000000).apply(persons);
-//		logger.info(String.format("Generated %s persons.", persons.size()));
-	
+		logger.info(String.format("Generated %s persons.", persons.size()));
+
+		TaskRunner.run(new Route2GeoDistance(new Simulator.Route2GeoDistFunction()), persons);
+
 		AnalyzerTaskComposite task = new AnalyzerTaskComposite();
-		task.addTask(new AgeIncomeCorrelation());
+//		task.setOutputDirectory(output);
+//		task.addTask(new AgeIncomeCorrelation());
+//		task.addTask(new ActTypeDistanceTask());
+		task.addTask(new LegGeoDistanceTask("car"));
 		task.setOutputDirectory(output);
 		
 		ProxyAnalyzer.analyze(persons, task);

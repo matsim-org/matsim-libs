@@ -22,13 +22,13 @@ package playground.johannes.studies.coopsim;
 import gnu.trove.TDoubleDoubleHashMap;
 import org.apache.commons.math.FunctionEvaluationException;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.matsim.contrib.common.stats.Correlations;
 import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
 import org.matsim.contrib.common.stats.Histogram;
 import org.matsim.contrib.common.stats.StatsWriter;
 import org.matsim.contrib.common.util.ProgressLogger;
-import playground.johannes.socialnetworks.statistics.Correlations;
-import playground.johannes.socialnetworks.statistics.GaussDistribution;
-import playground.johannes.socialnetworks.statistics.LogNormalDistribution;
+import org.matsim.contrib.socnetgen.sna.math.GaussDistribution;
+import org.matsim.contrib.socnetgen.sna.math.LogNormalDistribution;
 
 import java.io.IOException;
 import java.util.Random;

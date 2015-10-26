@@ -19,18 +19,11 @@
 
 package playground.johannes.gsv.gis;
 
-import java.awt.Color;
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.geotools.referencing.CRS;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.common.gis.CRSUtils;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.io.ColorUtils;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
@@ -38,11 +31,17 @@ import org.wololo.geojson.Feature;
 import org.wololo.geojson.FeatureCollection;
 import org.wololo.geojson.LineString;
 import org.wololo.jts2geojson.GeoJSONWriter;
-
 import playground.johannes.gsv.sim.LinkOccupancyCalculator;
 import playground.johannes.gsv.sim.cadyts.ODCalibrator;
-import playground.johannes.sna.gis.CRSUtils;
-import playground.johannes.sna.graph.spatial.io.ColorUtils;
+
+import java.awt.*;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author johannes

@@ -19,12 +19,11 @@
 
 package playground.johannes.gsv.zones.io;
 
-import java.util.Stack;
-
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
-
 import playground.johannes.gsv.zones.KeyMatrix;
+
+import java.util.Stack;
 
 /**
  * @author johannes

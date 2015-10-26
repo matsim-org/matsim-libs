@@ -96,7 +96,7 @@ public class RunConfigurableBikeSharingSimulation {
 		final Controler controler = new Controler( sc );
 
 		final RoutingData ptRouting = createRoutingData( sc, thinnedNetworkGroup );
-		controler.setTripRouterFactory(
+		controler.addOverridingModule(
 				BikeSharingScenarioUtils.createTripRouterFactoryAndConfigureRouteFactories(
 					controler.getTravelDisutilityFactory(),
 					controler.getScenario(),

@@ -19,41 +19,29 @@
 
 package playground.johannes.gsv.synPop.osm;
 
+import com.vividsolutions.jts.geom.Point;
 import gnu.trove.TObjectIntHashMap;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
 import org.geotools.referencing.CRS;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.common.gis.CRSUtils;
+import org.matsim.contrib.common.util.XORShiftRandom;
+import org.matsim.contrib.socnetgen.sna.gis.Zone;
+import org.matsim.contrib.socnetgen.sna.gis.ZoneLayer;
+import org.matsim.contrib.socnetgen.sna.gis.io.ZoneLayerSHP;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.facilities.ActivityFacilities;
-import org.matsim.facilities.ActivityFacility;
-import org.matsim.facilities.ActivityOption;
-import org.matsim.facilities.FacilitiesReaderMatsimV1;
-import org.matsim.facilities.FacilitiesWriter;
+import org.matsim.facilities.*;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.MathTransform;
-
-import playground.johannes.coopsim.util.MatsimCoordUtils;
+import playground.johannes.coopsim.utils.MatsimCoordUtils;
 import playground.johannes.gsv.synPop.gis.KreisOsmCompare;
-import playground.johannes.sna.gis.CRSUtils;
-import playground.johannes.sna.gis.Zone;
-import playground.johannes.sna.gis.ZoneLayer;
-import playground.johannes.socialnetworks.gis.io.ZoneLayerSHP;
-import playground.johannes.socialnetworks.utils.XORShiftRandom;
 
-import com.vividsolutions.jts.geom.Point;
+import java.io.IOException;
+import java.util.*;
 
 /**
  * @author johannes

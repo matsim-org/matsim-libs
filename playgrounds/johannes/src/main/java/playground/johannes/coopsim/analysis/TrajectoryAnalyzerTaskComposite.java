@@ -19,21 +19,16 @@
  * *********************************************************************** */
 package playground.johannes.coopsim.analysis;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.apache.log4j.Logger;
+import org.matsim.contrib.socnetgen.sna.util.MultiThreading;
+import playground.johannes.coopsim.pysical.Trajectory;
+
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.apache.log4j.Logger;
-
-import playground.johannes.coopsim.pysical.Trajectory;
-import playground.johannes.sna.util.MultiThreading;
 
 /**
  * @author illenberger

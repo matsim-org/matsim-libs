@@ -19,35 +19,20 @@
 
 package playground.johannes.gsv.visum;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.pt.transitSchedule.api.Departure;
-import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitRouteStop;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.VehicleCapacity;
-import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.Vehicles;
-import org.matsim.vehicles.VehiclesFactory;
+import org.matsim.pt.transitSchedule.api.*;
+import org.matsim.vehicles.*;
 import org.matsim.visum.VisumNetwork;
 import org.matsim.visum.VisumNetwork.VehicleCombination;
 import org.matsim.visum.VisumNetwork.VehicleUnit;
-
 import playground.johannes.gsv.analysis.TransitLineAttributes;
+
+import java.util.*;
 
 public class Visum2TransitSchedule {
 

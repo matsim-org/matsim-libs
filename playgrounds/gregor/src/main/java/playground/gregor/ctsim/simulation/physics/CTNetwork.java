@@ -1,5 +1,6 @@
 package playground.gregor.ctsim.simulation.physics;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -10,14 +11,13 @@ import playground.gregor.ctsim.simulation.CTEvent;
 import playground.gregor.ctsim.simulation.CTEventsPaulPriorityQueue;
 import playground.gregor.sim2d_v4.events.XYVxVyEventImpl;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class CTNetwork {
 
+	private static final Logger log = Logger.getLogger(CTNetwork.class);
 
 	private final CTEventsPaulPriorityQueue events = new CTEventsPaulPriorityQueue();
 	private final CTNetsimEngine engine;
@@ -35,16 +35,18 @@ public class CTNetwork {
 	}
 
 	private void init() {
-		List<Worker> workers = new ArrayList<>();
-		List<Thread> threads = new ArrayList<>();
-		for (int i = 0; i < this.cores; i++) {
-			Worker w = new Worker();
-			workers.add(w);
-			Thread t = new Thread(w);
-			t.start();
-			threads.add(t);
-		}
+//		log.info("initializing network; using " + this.cores + " threads.");
+//		List<Worker> workers = new ArrayList<>();
+//		List<Thread> threads = new ArrayList<>();
+//		for (int i = 0; i < this.cores; i++) {
+//			Worker w = new Worker();
+//			workers.add(w);
+//			Thread t = new Thread(w);
+//			t.start();
+//			threads.add(t);
+//		}
 
+		log.info("creating and initializing links and nodes");
 		for (Node n : this.network.getNodes().values()) {
 			double mxCap = 0;
 			for (Link l : n.getInLinks().values()) {
@@ -61,6 +63,7 @@ public class CTNetwork {
 			CTNode ct = new CTNode(n.getId(), n, this, mxCap / 1.33);
 			this.nodes.put(n.getId(), ct);
 		}
+
 		int cnt = 0;
 		for (Link l : this.network.getLinks().values()) {
 			if (links.get(l.getId()) != null) {
@@ -68,32 +71,38 @@ public class CTNetwork {
 			}
 			Link rev = getRevLink(l);
 			CTLink ct = new CTLink(l, rev, em, this, this.nodes.get(l.getFromNode().getId()), this.nodes.get(l.getToNode().getId()));
-			workers.get(cnt++ % this.cores).add(ct);
+//			workers.get(cnt++ % this.cores).add(ct);
+			ct.init();
 			links.put(l.getId(), ct);
 			if (rev != null) {
 				links.put(rev.getId(), ct);
 			}
 
 		}
+
 		for (CTNode ctNode : this.nodes.values()) {
-			workers.get(cnt++ % this.cores).add(ctNode);
+			ctNode.init();
+//			workers.get(cnt++ % this.cores).add(ctNode);
 
 		}
-		for (Worker w : workers) {
-			w.add(new CTNetworkEntity() {
-				@Override
-				public void init() {
-				}
-			});
-		}
-		for (Thread t : threads) {
-			try {
-				t.join();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-
-		}
+//		for (Worker w : workers) {
+//			w.add(new CTNetworkEntity() {
+//				@Override
+//				public void init() {
+//				}
+//			});
+//		}
+//		for (Thread t : threads) {
+//			try {
+//				t.join();
+//			} catch (InterruptedException e) {
+//				e.printStackTrace();
+//			}
+//
+//		}
+//		log.info("verifying network");
+//		checkNetwork();
+//		log.info("done.");
 	}
 
 	private Link getRevLink(Link l) {
@@ -103,6 +112,25 @@ public class CTNetwork {
 			}
 		}
 		return null;
+	}
+
+	private void checkNetwork() {
+		for (CTNode n : this.nodes.values()) {
+			for (CTCellFace face : n.getCTCell().getFaces()) {
+				if (face.nb == null) {
+					throw new RuntimeException("node cell face is null!");
+				}
+			}
+		}
+		for (CTLink l : this.links.values()) {
+			for (CTCell c : l.getCells()) {
+				for (CTCellFace face : c.getFaces()) {
+					if (face.nb == null) {
+						throw new RuntimeException("link cell face is null!");
+					}
+				}
+			}
+		}
 	}
 
 	public CTNetsimEngine getEngine() {
@@ -120,9 +148,7 @@ public class CTNetwork {
 
 		while (this.events.peek() != null && events.peek().getExecTime() < time + 1) {
 			CTEvent e = events.poll();
-			if (e.getExecTime() < time) {
-				throw new RuntimeException("event time (" + e.getExecTime() + ") smaller sim time (" + time + ")!");
-			}
+
 			if (e.isInvalid()) {
 				continue;
 			}
@@ -145,13 +171,13 @@ public class CTNetwork {
 
 	private void drawCell(CTCell cell, double time, double dx, double dy) {
 		for (CTPed ped : cell.getPeds()) {
-			double oX = (5 - (ped.hashCode() % 10)) / 10.;
-			double oY = (5 - ((23 * ped.hashCode()) % 10)) / 10.;
+			double oX = (5 - (ped.hashCode() % 10)) / (20. / CTLink.WIDTH);
+			double oY = (5 - ((23 * ped.hashCode()) % 10)) / (20. / CTLink.WIDTH);
 
 			double x = cell.getX() + oX / 2.;
 			double y = cell.getY() + oY / 2.;
 
-			XYVxVyEventImpl e = new XYVxVyEventImpl(Id.createPersonId(ped.hashCode()), x, y, dx * ped.getDesiredDir(), dy * ped.getDesiredDir(), time);
+			XYVxVyEventImpl e = new XYVxVyEventImpl(ped.getDriver().getId(), x, y, dx * ped.getDesiredDir(), dy * ped.getDesiredDir(), time);
 			this.em.processEvent(e);
 		}
 	}
@@ -162,7 +188,7 @@ public class CTNetwork {
 
 	public void run() {
 		double time = 0;
-		while (events.peek() != null && events.peek().getExecTime() < 3600) {
+		while (events.peek() != null && events.peek().getExecTime() < 3600 * 240) {
 
 			CTEvent e = events.poll();
 			if (CTRunner.DEBUG && e.getExecTime() > time + 1) {

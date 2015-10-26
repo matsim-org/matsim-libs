@@ -20,9 +20,9 @@
 package playground.johannes.gsv.qlik;
 
 import playground.johannes.gsv.matrices.episodes2matrix.SetZones;
-import playground.johannes.synpop.data.io.XMLHandler;
 import playground.johannes.gsv.zones.KeyMatrix;
 import playground.johannes.synpop.data.*;
+import playground.johannes.synpop.data.io.XMLHandler;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;

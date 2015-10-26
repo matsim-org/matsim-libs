@@ -165,7 +165,7 @@ public class WithinDayParkingControlerListener implements StartupListener, Repla
 				new TripRouterFactoryBuilderWithDefaults().createDefaultLeastCostPathCalculatorFactory(event.getControler().getScenario());
 		
 		// This is a workaround since the controler does not return its TripRouterFactory
-		TripRouterFactory tripRouterFactoryWrapper = new TripRouterFactoryWrapper(event.getControler().getScenario(), 
+		javax.inject.Provider<TripRouter> tripRouterFactoryWrapper = new TripRouterFactoryWrapper(event.getControler().getScenario(),
 				event.getControler().getTripRouterProvider(), leastCostPathCalculatorFactory);
 		
 		// we can use the TripRouterFactory that has been initialized by the MultiModalControlerListener
@@ -319,7 +319,7 @@ public class WithinDayParkingControlerListener implements StartupListener, Repla
 		return parkingTypes;
 	}
 	
-	private static class TripRouterFactoryWrapper implements TripRouterFactory {
+	private static class TripRouterFactoryWrapper implements javax.inject.Provider<TripRouter> {
 
 		private final Provider<TripRouter> internalFactory;
 		private final LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;

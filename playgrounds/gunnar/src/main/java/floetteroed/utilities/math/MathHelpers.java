@@ -21,6 +21,7 @@ package floetteroed.utilities.math;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Random;
@@ -132,6 +133,11 @@ public class MathHelpers {
 		return result;
 	}
 
+	public static double draw(final double lower, final double upper,
+			final Random rnd) {
+		return lower + rnd.nextDouble() * (upper - lower);
+	}
+
 	public static double[] override(final double[] dest, final double[] source,
 			final boolean overrideWithZeros) {
 		if (source == null) {
@@ -202,6 +208,22 @@ public class MathHelpers {
 	}
 
 	// TODO NEW
+	public static <E> E draw(final Map<E, Double> event2weight,
+			final double weightSum, final Random rnd) {
+		final double x = weightSum * rnd.nextDouble();
+		double cumulativeWeight = 0;
+		final Iterator<Map.Entry<E, Double>> it = event2weight.entrySet()
+				.iterator();
+		E result = null;
+		do {
+			Map.Entry<E, Double> next = it.next();
+			result = next.getKey();
+			cumulativeWeight += next.getValue();
+		} while (cumulativeWeight < x && it.hasNext());
+		return result;
+	}
+
+	// TODO NEW
 	// the order of the bounds does not matter
 	public static double projectOnInterval(final double value,
 			final double bound1, final double bound2) {
@@ -216,6 +238,30 @@ public class MathHelpers {
 			result.mult(i, y.get(i));
 		}
 		return result;
+	}
+
+	public static void main(String[] test) {
+
+		Map<String, Double> m = new LinkedHashMap<>();
+		m.put("A", 1.0);
+		m.put("B", 2.0);
+		m.put("C", 0.0);
+
+		double aFreq = 0;
+		double bFreq = 0;
+		double cFreq = 0;
+		for (int i = 0; i < 1000; i++) {
+			final String draw = draw(m, 3, new Random());
+			if ("A".equals(draw)) {
+				aFreq++;
+			} else if ("B".equals(draw)) {
+				bFreq++;
+			} else if ("C".equals(draw)) {
+				cFreq++;
+			}
+		}
+
+		System.out.println(aFreq + "\t" + bFreq + "\t" + cFreq);
 	}
 
 }

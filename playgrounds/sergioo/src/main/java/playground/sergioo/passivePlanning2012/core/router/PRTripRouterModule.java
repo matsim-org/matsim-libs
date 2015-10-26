@@ -24,8 +24,7 @@ package playground.sergioo.passivePlanning2012.core.router;
 
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.router.LeastCostPathCalculatorModule;
-import org.matsim.contrib.signals.router.LinkToLinkTripRouterFactory;
-import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.TripRouter;
 import org.matsim.pt.router.TransitRouterModule;
 
 import com.google.inject.Singleton;
@@ -35,10 +34,10 @@ public class PRTripRouterModule extends AbstractModule {
     public void install() {
         install(new LeastCostPathCalculatorModule());
         install(new TransitRouterModule());
-        if (getConfig().controler().isLinkToLinkRoutingEnabled()) {
-            bind(TripRouterFactory.class).to(LinkToLinkTripRouterFactory.class).in(Singleton.class);
-        } else {
-            bind(TripRouterFactory.class).to(PRTripRouterFactory.class).in(Singleton.class);
-        }
+//        if (getConfig().controler().isLinkToLinkRoutingEnabled()) {
+//            bind(TripRouterFactory.class).to(LinkToLinkTripRouterFactory.class).in(Singleton.class);
+//        } else {
+            bind(TripRouter.class).toProvider(PRTripRouterFactory.class).in(Singleton.class);
+//        }
     }
 }

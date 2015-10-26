@@ -43,12 +43,12 @@ public class MatrixBasedPtAccessibilityContributionCalculator implements Accessi
 
 
 	@Override
-	public void notifyNewOriginNode(Node fromNode) {
+	public void notifyNewOriginNode(Node fromNode, Double departureTime) {
 		this.fromNode = fromNode;
 	}
 
 	@Override
-	public double computeContributionOfOpportunity(ActivityFacility origin, AggregationObject destination) {
+	public double computeContributionOfOpportunity(ActivityFacility origin, AggregationObject destination, Double departureTime) {
 		if ( ptMatrix==null ) {
             throw new RuntimeException( "pt accessibility does only work when a PtMatrix is provided.  Provide such a matrix, or switch off "
                     + "the pt accessibility computation, or extend the Java code so that it works for this situation.") ;

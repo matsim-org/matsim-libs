@@ -20,13 +20,12 @@
 package playground.johannes.gsv.matrices;
 
 import gnu.trove.TObjectDoubleHashMap;
+import org.matsim.matrices.Matrix;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Map.Entry;
 import java.util.Set;
-
-import org.matsim.matrices.Matrix;
 
 /**
  * @author johannes
