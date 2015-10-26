@@ -68,47 +68,55 @@ import playground.vsp.congestion.events.CongestionEventsReader;
 public class PersonTripAnalysisMain {
 	private static final Logger log = Logger.getLogger(PersonTripAnalysisMain.class);
 
-	private static String networkFile;
-	private static String configFile;
-	private static String outputPath;
-	private static String populationFile;
-
-	private static String eventsFile;
-	
-	private static String noiseEventsFile;
-	private static String congestionEventsFile;
-		
+	private String runDirectory;
+			
 	public static void main(String[] args) {
-		
-		String runDirectory = "/Users/ihab/Documents/workspace/runs-svn/c/output/";
-//		String runDirectory = "/Users/ihab/Desktop/ils4/kaddoura/c/output/";
-		
+			
 		log.info("Searching for run-directory in args at index 0...");
+		String runDirectory;
+		
 		if (args.length > 0) {
 			runDirectory = args[0];
 			log.info("Run-directory found at index 0.");
+			
 		} else {
-			log.info("Could not find run-directory in args. Default directory from ikaddoura has been taken.");
+			
+			String id = "c13";
+			String baiscDirectoryPath = "/Users/ihab/Documents/workspace/runs-svn/c/output/";
+						
+			runDirectory = baiscDirectoryPath + id + "/";
+			log.info("Could not find run-directory in args. Using the directory " + runDirectory);
 		}
 		
-		String id = "c13";
-		
-		networkFile = runDirectory + id + "/output_network.xml.gz";
-		configFile = runDirectory + id + "/output_config.xml.gz";
-		
-		eventsFile = runDirectory + id + "/ITERS/it.100/100.events.xml.gz";
-		outputPath = runDirectory + id + "/ITERS/it.100/detailedAnalysis/";
-		populationFile = runDirectory + id + "/output_plans.xml.gz";
-		
-		noiseEventsFile = runDirectory + id + "/ITERS/it.100/100.events.xml.gz";
-		congestionEventsFile = runDirectory + id + "/ITERS/it.100/100.events.xml.gz";
-			
-		
-		PersonTripAnalysisMain analysis = new PersonTripAnalysisMain();
+		PersonTripAnalysisMain analysis = new PersonTripAnalysisMain(runDirectory);
 		analysis.run();
 	}
+	
+	public PersonTripAnalysisMain(String runDirectory) {
+		
+		if (!runDirectory.endsWith("/")) runDirectory = runDirectory + "/";
+		
+		this.runDirectory = runDirectory;
+	}
 
-	private void run() {
+	public void run() {
+					
+		String networkFile = runDirectory + "output_network.xml.gz";
+		String configFile = runDirectory + "output_config.xml.gz";
+		String populationFile = runDirectory + "output_plans.xml.gz";
+
+		Config config = ConfigUtils.loadConfig(configFile);	
+		config.plans().setInputFile(populationFile);
+		config.network().setInputFile(networkFile);
+		
+		int finalIteration = config.controler().getLastIteration();
+		String eventsFile = runDirectory + "ITERS/it." + finalIteration + "/" + finalIteration + ".events.xml.gz";
+		String outputPath = runDirectory + "ITERS/it." + finalIteration + "/detailedAnalysis/";
+		
+		String noiseEventsFile = runDirectory + "ITERS/it." + finalIteration + "/" + finalIteration + ".events.xml.gz";
+		String congestionEventsFile = runDirectory + "ITERS/it." + finalIteration + "/" + finalIteration + ".events.xml.gz";
+		
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.loadScenario(config);
 		
 		File folder = new File(outputPath);			
 		folder.mkdirs();
@@ -119,12 +127,6 @@ public class PersonTripAnalysisMain {
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
-				
-		Config config = ConfigUtils.loadConfig(configFile);	
-		config.plans().setInputFile(populationFile);
-		config.network().setInputFile(networkFile);
-		
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.loadScenario(config);
 		
 		// standard events analysis
 		
@@ -137,7 +139,7 @@ public class PersonTripAnalysisMain {
 		events.addHandler(basicHandler);
 		events.addHandler(vttsHandler);
 		events.addHandler(congestionHandler);
-//		events.addHandler(noiseHandler);
+		events.addHandler(noiseHandler);
 		
 		log.info("Reading the events file...");
 		MatsimEventsReader reader = new MatsimEventsReader(events);
@@ -175,17 +177,17 @@ public class PersonTripAnalysisMain {
 		
 		// noise events analysis
 	
-//		if (noiseHandler.isCaughtNoiseEvent()) {
-//			log.info("Noise events have already been analyzed based on the standard events file.");
-//		} else {
-//			EventsManager eventsNoise = EventsUtils.createEventsManager();
-//			eventsNoise.addHandler(noiseHandler);
-//					
-//			log.info("Reading noise events file...");
-//			NoiseEventsReader noiseEventReader = new NoiseEventsReader(eventsNoise);		
-//			noiseEventReader.parse(noiseEventsFile);
-//			log.info("Reading noise events file... Done.");	
-//		}	
+		if (noiseHandler.isCaughtNoiseEvent()) {
+			log.info("Noise events have already been analyzed based on the standard events file.");
+		} else {
+			EventsManager eventsNoise = EventsUtils.createEventsManager();
+			eventsNoise.addHandler(noiseHandler);
+					
+			log.info("Reading noise events file...");
+			NoiseEventsReader noiseEventReader = new NoiseEventsReader(eventsNoise);		
+			noiseEventReader.parse(noiseEventsFile);
+			log.info("Reading noise events file... Done.");	
+		}	
 		
 		// print the results
 		

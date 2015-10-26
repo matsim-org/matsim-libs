@@ -11,9 +11,9 @@ public class Labels {
 	public static final String ZONE_ID = "zone_id";
 	public static final String X_COORDINATE = "xcoord";
 	public static final String Y_COORDINATE = "ycoord";
-	public static final String NEARESTNODE_ID = "nearest_node_id";
-	public static final String NEARESTNODE_X_COORD = "x_coord_nn";
-	public static final String NEARESTNODE_Y_COORD = "y_coord_nn";
+//	public static final String NEARESTNODE_ID = "nearest_node_id";
+//	public static final String NEARESTNODE_X_COORD = "x_coord_nn";
+//	public static final String NEARESTNODE_Y_COORD = "y_coord_nn";
 
 	static final String ACCESSIBILITY_CELLSIZE = "Accessibility_cellsize_" ;
 	public static final String FREESPEED_FILENAME= "freeSpeed" + ACCESSIBILITY_CELLSIZE ;

@@ -7,11 +7,13 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.utils.objectattributes.ObjectAttributes;
@@ -24,10 +26,11 @@ public class PersonAnalysis {
 
 	public static void main(String args[]){
 		
-		restrictPlansTo24Hours(Global.matsimInputDir + "Pläne/plansV3.xml.gz", "/home/dhosse/plansV3_cleaned.xml.gz");
-		getPersonsWithActivitiesAfterMidnight("/home/dhosse/plansV3_cleaned.xml.gz", "/home/dhosse/plansOut2.xml");
-//		getPersonsWithNegativeScores("/home/dhosse/run9/output/ITERS/it.10/10.plans.xml.gz");
-//		analyzeModeChoice("/home/danielhosse/run8b/output/ITERS/it.10/10.plans.xml.gz", Global.matsimDir + "OUTPUT/" + Global.runID +"/input/subpopulationAtts.xml");
+		restrictPlansTo24Hours("/home/danielhosse/run10/input/plansV4.xml.gz", "/home/danielhosse/plansV4_9.xml.gz");
+//		getPersonsWithActivitiesAfterMidnight("/home/dhosse/plansV3_cleaned.xml.gz", "/home/dhosse/plansOut2.xml");
+//		getPersonsWithNegativeScores("/home/danielhosse/run10/output/ITERS/it.20/20.plans.xml.gz");
+//		analyzeModeChoice("/home/danielhosse/run10/output/ITERS/it.10/10.plans.xml.gz", Global.matsimDir + "OUTPUT/" + Global.runID +"/input/subpopulationAtts.xml");
+//		createLegModeDistanceDistribution("/home/danielhosse/run10/output/ITERS/it.10/10.plans.xml.gz", "/home/danielhosse/lmdd/");
 		
 	}
 	
@@ -106,17 +109,24 @@ public class PersonAnalysis {
 				
 			}
 			
-			if(plan.getPlanElements().get(plan.getPlanElements().size()-1) instanceof Leg){
-				plan.getPlanElements().remove(plan.getPlanElements().size() - 1);
+			if(plan.getPlanElements().size() >= 3){
+
+				if(plan.getPlanElements().get(plan.getPlanElements().size()-1) instanceof Leg){
+					plan.getPlanElements().remove(plan.getPlanElements().size() - 1);
+				}
+				
+				if(plan.getPlanElements().size() >= 3){
+					currentPerson.addPlan(plan);
+					currentPerson.setSelectedPlan(plan);
+					scOut.getPopulation().addPerson(currentPerson);
+				}
+				
 			}
-			
-			currentPerson.addPlan(plan);
-			currentPerson.setSelectedPlan(plan);
-			scOut.getPopulation().addPerson(currentPerson);
 			
 		}
 		
 		new PopulationWriter(scOut.getPopulation()).write(outputPlans);
+		System.out.println(scOut.getPopulation().getPersons().size() + " of " + scenario.getPopulation().getPersons().size() + " have been processed...");
 		
 	}
 	
@@ -158,12 +168,32 @@ public class PersonAnalysis {
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		new MatsimPopulationReader(scenario).readFile(plansFile);
+
+		Population filtered = filterPopulation(scenario.getPopulation());
+		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		((ScenarioImpl)sc).setPopulation(filtered);
 		
 		LegModeDistanceDistribution lmdd = new LegModeDistanceDistribution();
-		lmdd.init(scenario);
+		lmdd.init(sc);
 		lmdd.preProcessData();
 		lmdd.postProcessData();
 		lmdd.writeResults(outputFolder);
+		
+	}
+	
+	private static Population filterPopulation(Population in){
+		
+		Population out = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation();
+		
+		for(Person person : in.getPersons().values()){
+			
+			if(person.getId().toString().startsWith("09180")){
+				out.addPerson(person);
+			}
+			
+		}
+		
+		return out;
 		
 	}
 	
@@ -184,18 +214,22 @@ public class PersonAnalysis {
 				
 				cnt++;
 				
-				if(score < -500){
+//				if(score < -500){
 					
-					System.out.println(person.getId() + "\t" + score);
+//					System.out.println(person.getId() + "\t" + score);
 					sc2.getPopulation().addPerson(person);
 					
-				}
+//				}
 				
-			}
+			} //else {
+//				
+//				sc2.getPopulation().addPerson(person);
+//				
+//			}
 			
 		}
 		
-		new PopulationWriter(sc2.getPopulation()).write("/home/dhosse/Dokumente/personsWithNegativeScores.xml");
+		new PopulationWriter(sc2.getPopulation()).write("/home/danielhosse/Dokumente/filteredPopulation.xml.gz");
 		
 		System.out.println(cnt + " persons with negative scores...");
 		
@@ -214,7 +248,7 @@ public class PersonAnalysis {
 		
 		for(Person person : scenario.getPopulation().getPersons().values()){
 			
-			String userGroup = (String)subpopAtts.getAttribute(person.getId().toString(), "usrGroup");
+			String userGroup = (String)subpopAtts.getAttribute(person.getId().toString(), Global.USER_GROUP);
 			
 			for(PlanElement pe : person.getSelectedPlan().getPlanElements()){
 				
@@ -227,6 +261,17 @@ public class PersonAnalysis {
 						if(leg.getMode().equals(TransportMode.car)){
 							nNonCarUsersUsingCar++;
 							break;
+						}
+						
+					} else{
+						
+						if(userGroup.equals(Global.LICENSE)){
+							
+							if(leg.getMode().equals(TransportMode.car)){
+								nNonCarUsersUsingCar++;
+								break;
+							}
+							
 						}
 						
 					}

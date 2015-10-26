@@ -190,16 +190,16 @@ public class SnapshotGenerator implements PersonDepartureEventHandler, PersonArr
 
 	private Collection<AgentSnapshotInfo> getVehiclePositions(final double time) {
 		Collection<AgentSnapshotInfo> positions = new ArrayList<AgentSnapshotInfo>();
-		if ("queue".equals(this.snapshotStyle)) {
+		if (this.snapshotStyle == SnapshotStyle.queue) {
 			for (EventLink link : this.linkList) {
 				link.getVehiclePositionsQueue(positions, time, this.snapshotInfoFactory);
 			}
-		} else if ("equiDist".equals(this.snapshotStyle)) {
+		} else if (this.snapshotStyle == SnapshotStyle.equiDist) {
 			for (EventLink link : this.linkList) {
 				link.getVehiclePositionsEquil(positions, time, this.snapshotInfoFactory);
 			}
 		} else {
-			log.warn("The snapshotStyle \"" + this.snapshotStyle + "\" is not supported.");
+			throw new RuntimeException("The snapshotStyle \"" + this.snapshotStyle + "\" is not supported.");
 		}
 		return positions;
 	}

@@ -41,9 +41,7 @@ import org.matsim.core.controler.ControlerDefaults;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.PlanRouter;
-import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
@@ -58,6 +56,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
 import org.matsim.testcases.MatsimTestUtils;
+
+import javax.inject.Provider;
 
 /**
  * Tests the correct working of {@link TravelDisutilityIncludingToll} by using it
@@ -377,12 +377,12 @@ public class TollTravelCostCalculatorTest {
 		final TripRouterFactoryBuilderWithDefaults builder =
 				new TripRouterFactoryBuilderWithDefaults();
 		builder.setLeastCostPathCalculatorFactory( routerFactory );
-		final TripRouterFactory factory = builder.build( scenario );
+		builder.setTravelDisutility(travelDisutility);
+		builder.setTravelTime(travelTime);
+		final Provider<TripRouter> factory = builder.build( scenario );
 		final TripRouter tripRouter =
-				factory.instantiateAndConfigureTripRouter(
-						new RoutingContextImpl(
-								travelDisutility,
-								travelTime ) );
+				factory.get(
+				);
 		final PersonAlgorithm router = new PlanRouter( tripRouter );
 
 		for ( Person p : scenario.getPopulation().getPersons().values() ) {

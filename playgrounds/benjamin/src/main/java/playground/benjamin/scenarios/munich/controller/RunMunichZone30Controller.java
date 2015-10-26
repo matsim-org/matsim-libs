@@ -50,8 +50,7 @@ import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.replanning.selectors.WorstPlanForRemovalSelector;
 import org.matsim.core.router.PlanRouter;
-import org.matsim.core.router.RoutingContextImpl;
-import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
 import org.matsim.core.router.util.TravelDisutility;
@@ -65,6 +64,8 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.vis.otfvis.OTFFileWriter;
 import org.matsim.vis.snapshotwriters.SnapshotWriter;
 import org.matsim.vis.snapshotwriters.SnapshotWriterManager;
+
+import javax.inject.Provider;
 
 /**
  * @author benjamin after nagel
@@ -207,14 +208,12 @@ public class RunMunichZone30Controller extends AbstractController {
 		//
 		//// return it:
 		//return plansCalcRoute;
-		final TripRouterFactory fact =
+		final Provider<TripRouter> fact =
 			new TripRouterFactoryBuilderWithDefaults().build(
-					scenario );
+					scenario);
 		return new PlanRouter(
-				fact.instantiateAndConfigureTripRouter(
-					new RoutingContextImpl(
-						travelDisutility,
-						travelTime.getLinkTravelTimes() ) ) );
+				fact.get(
+				) );
 	}
 	
 	@Override

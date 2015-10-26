@@ -19,14 +19,11 @@
 
 package playground.johannes.gsv.sim.cadyts;
 
-import static java.lang.Math.max;
-import static java.lang.Math.sqrt;
-
-import java.util.Map;
-
+import cadyts.calibrators.analytical.AnalyticalCalibrator;
+import cadyts.measurements.SingleLinkMeasurement;
+import cadyts.measurements.SingleLinkMeasurement.TYPE;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
 import org.matsim.contrib.cadyts.general.LookUpItemFromId;
 import org.matsim.core.config.Config;
@@ -34,11 +31,12 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
-
-import cadyts.calibrators.analytical.AnalyticalCalibrator;
-import cadyts.measurements.SingleLinkMeasurement;
-import cadyts.measurements.SingleLinkMeasurement.TYPE;
 import playground.johannes.gsv.sim.Simulator;
+
+import java.util.Map;
+
+import static java.lang.Math.max;
+import static java.lang.Math.sqrt;
 
 /**
  * @author nagel

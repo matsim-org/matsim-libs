@@ -47,9 +47,18 @@ public class TtAnalyzeBraessRouteDistributionAndTTTest {
 	/**
 	 * Test method for {@link scenarios.braess.analysis.TtAnalyzeBraess#calculateAvgRouteTTsByDepartureTime()}
 	 * with 2 agents driving different routes and again with 5 agents driving the same route
+	 * 
+	 * @author Gabriel Thunig
 	 */
 	@Test
 	public void testCalculateAvgRouteTTsByDepartureTime() {
+		
+		/* --------------- scenario 1 : two agents driving different routes --------------- */
+		TtAnalyzeBraess handler = testAvgRouteScenario(2, TtCreateBraessPopulation.InitRoutes.ONLY_OUTER, 99999);
+		
+		int[] routeUsers = handler.getRouteUsers();
+		int[] expectedRouteUsers = {1, 0, 1};
+		Assert.assertArrayEquals(expectedRouteUsers, routeUsers);
 		
 		/*
 		 * expectedTravelTime sums up like this:
@@ -60,18 +69,20 @@ public class TtAnalyzeBraessRouteDistributionAndTTTest {
 		 * - 1 second in total because its not necessary to transfer an agent on his destination-link
 		 */
 		Double expectedTravelTime = (double) (1+4*(TTPerLink+1)-1);
-		
-		TtAnalyzeBraess handler = testAvgRouteScenario(2, TtCreateBraessPopulation.InitRoutes.ONLY_OUTER, 99999);
-		
-		int[] routeUsers = handler.getRouteUsers();
-		int[] expectedRouteUsers = {1, 0, 1};
-		Assert.assertArrayEquals(expectedRouteUsers, routeUsers);
-		
-		Assert.assertEquals("iteration 0: TT stimmt nicht", expectedTravelTime, 
+		Assert.assertEquals("Unexpected travel time on the upper route: ", expectedTravelTime, 
 				handler.calculateAvgRouteTTsByDepartureTime().get(28800.0)[0], MatsimTestUtils.EPSILON);
-		Assert.assertTrue(Double.isNaN(handler.calculateAvgRouteTTsByDepartureTime().get(28800.0)[1]));
-		Assert.assertEquals("iteration 0: TT stimmt nicht", expectedTravelTime, 
+		Assert.assertTrue("Unexpected travel time on the middle route: ", 
+				Double.isNaN(handler.calculateAvgRouteTTsByDepartureTime().get(28800.0)[1]));
+		Assert.assertEquals("Unexpected travel time on the lower route: ", expectedTravelTime, 
 				handler.calculateAvgRouteTTsByDepartureTime().get(28800.0)[2], MatsimTestUtils.EPSILON);
+		
+		
+		/* --------------- scenario 2 : five agents driving same route --------------- */
+		handler = testAvgRouteScenario(5, TtCreateBraessPopulation.InitRoutes.ONLY_MIDDLE, 3600);
+		
+		routeUsers = handler.getRouteUsers();
+		int[] expectedRouteUsers2 = {0, 5, 0};
+		Assert.assertArrayEquals(expectedRouteUsers2, routeUsers);
 		
 		/*
 		 * expectedTravelTime sums up like this:
@@ -91,21 +102,17 @@ public class TtAnalyzeBraessRouteDistributionAndTTTest {
 		 * 
 		 */
 		expectedTravelTime = (double) (1+5*(TTPerLink+1)-1 + 2);
-		
-		handler = testAvgRouteScenario(5, TtCreateBraessPopulation.InitRoutes.ONLY_MIDDLE, 3600);
-		
-		routeUsers = handler.getRouteUsers();
-		int[] expectedRouteUsers2 = {0, 5, 0};
-		Assert.assertArrayEquals(expectedRouteUsers2, routeUsers);
-		
-		Assert.assertTrue(Double.isNaN(handler.calculateAvgRouteTTsByDepartureTime().get(28800.0)[0]));
-		Assert.assertEquals("iteration 0: TT stimmt nicht", expectedTravelTime, 
+		Assert.assertTrue("Unexpected travel time on the upper route: ", 
+				Double.isNaN(handler.calculateAvgRouteTTsByDepartureTime().get(28800.0)[0]));
+		Assert.assertEquals("Unexpected travel time on the middle route: ", expectedTravelTime, 
 				handler.calculateAvgRouteTTsByDepartureTime().get(28800.0)[1], MatsimTestUtils.EPSILON);
-		Assert.assertTrue(Double.isNaN(handler.calculateAvgRouteTTsByDepartureTime().get(28800.0)[2]));
+		Assert.assertTrue("Unexpected travel time on the lower route: ", 
+				Double.isNaN(handler.calculateAvgRouteTTsByDepartureTime().get(28800.0)[2]));
 	}
 	
 	/**
-	 * Scenario where every person starts at the same time so there is only on resulting array(one double per route choice)
+	 * Scenario where every person starts at the same time. 
+	 * So there is only on resulting array with average travel times (with one double per route)
 	 * 
 	 * @param personCount number of persons
 	 * @param initRoutes specifies which routes to use
@@ -153,6 +160,8 @@ public class TtAnalyzeBraessRouteDistributionAndTTTest {
 	
 	/**
 	 * Test method for {@link scenarios.braess.analysis.TtAnalyzeBraess#getTotalTT()}.
+	 * 
+	 * @author Tilmann Schlenther
 	 */	
 	@Test
 	public void testGetTotalTT() {

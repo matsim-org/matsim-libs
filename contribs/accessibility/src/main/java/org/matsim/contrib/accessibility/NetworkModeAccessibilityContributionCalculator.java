@@ -36,7 +36,7 @@ public class NetworkModeAccessibilityContributionCalculator implements Accessibi
 	private final Scenario scenario;
 	private final TravelTime ttc;
 
-	private final double departureTime;
+//	private final double departureTime;
 	private final double betaWalkTT;
 	private final double betaWalkTD;
 	private final double walkSpeedMeterPerHour;
@@ -50,12 +50,12 @@ public class NetworkModeAccessibilityContributionCalculator implements Accessibi
 			final Scenario scenario){
 		this.scenario = scenario;
 
-		AccessibilityConfigGroup moduleAPCM =
-				ConfigUtils.addOrGetModule(
-						scenario.getConfig(),
-						AccessibilityConfigGroup.GROUP_NAME,
-						AccessibilityConfigGroup.class);
-		this.departureTime = moduleAPCM.getTimeOfDay();
+//		AccessibilityConfigGroup moduleAPCM =
+//				ConfigUtils.addOrGetModule(
+//						scenario.getConfig(),
+//						AccessibilityConfigGroup.GROUP_NAME,
+//						AccessibilityConfigGroup.class);
+//		this.departureTime = moduleAPCM.getTimeOfDay();
 
 		final PlanCalcScoreConfigGroup planCalcScoreConfigGroup = scenario.getConfig().planCalcScore();
 		this.scheme = (RoadPricingScheme) scenario.getScenarioElement( RoadPricingScheme.ELEMENT_NAME );
@@ -89,13 +89,13 @@ public class NetworkModeAccessibilityContributionCalculator implements Accessibi
 
 
 	@Override
-	public void notifyNewOriginNode(Node fromNode) {
+	public void notifyNewOriginNode(Node fromNode, Double departureTime) {
 		this.fromNode = fromNode;
 		this.lcpt.calculateExtended(scenario.getNetwork(), fromNode, departureTime);
 	}
 
 	@Override
-	public double computeContributionOfOpportunity(ActivityFacility origin, AggregationObject destination) {
+	public double computeContributionOfOpportunity(ActivityFacility origin, AggregationObject destination, Double departureTime) {
 		// get the nearest link:
 		Link nearestLink = ((NetworkImpl)scenario.getNetwork()).getNearestLinkExactly(origin.getCoord());
 

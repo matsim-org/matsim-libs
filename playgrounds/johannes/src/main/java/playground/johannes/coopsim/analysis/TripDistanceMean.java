@@ -20,20 +20,18 @@
 package playground.johannes.coopsim.analysis;
 
 import gnu.trove.TObjectDoubleHashMap;
-
-import java.util.Set;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.contrib.common.gis.DistanceCalculator;
+import org.matsim.contrib.common.gis.OrthodromicDistanceCalculator;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
-
 import playground.johannes.coopsim.pysical.Trajectory;
-import playground.johannes.coopsim.util.MatsimCoordUtils;
-import playground.johannes.socialnetworks.gis.DistanceCalculator;
-import playground.johannes.socialnetworks.gis.OrthodromicDistanceCalculator;
+import playground.johannes.coopsim.utils.MatsimCoordUtils;
+
+import java.util.Set;
 
 /**
  * @author illenberger

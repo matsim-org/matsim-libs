@@ -22,10 +22,7 @@ package playground.gregor.ctsim.simulation.physics;
 import org.matsim.core.gbl.MatsimRandom;
 import playground.gregor.ctsim.simulation.CTEvent;
 
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
  * Created by laemmel on 12/10/15.
@@ -37,9 +34,11 @@ public class CTLinkCell extends CTCell {
 	private final LinkedList<CTPed> usList = new LinkedList<>();
 
 	private final Map<Double, Double> cosLookup = new TreeMap<>();
+	private double usProp;
+	private double dsProp;
 
-	public CTLinkCell(double x, double y, CTNetwork net, CTNetworkEntity parent, double width) {
-		super(x, y, net, parent, width);
+	public CTLinkCell(double x, double y, CTNetwork net, CTNetworkEntity parent, double width, double area) {
+		super(x, y, net, parent, width, area);
 	}
 
 	@Override
@@ -54,23 +53,32 @@ public class CTLinkCell extends CTCell {
 		double minJumpTime = Double.POSITIVE_INFINITY;
 		CTPed nextJumper = null;
 		if (dsList.size() > 0) {
-			double rate = chooseNextCellAndReturnJumpRate(dsList.peek());
+			double j = chooseNextCellAndReturnJ(dsList.peek());
+			if (!Double.isNaN(j)) {
+//				double j = getJ(dsList.peek().getTentativeNextCell());
+				double rnd = -Math.log(1 - MatsimRandom.getRandom().nextDouble());
+				double meanJumpTime = 1. / (this.getDirectionalProportion(dsList.peek()) * j);
+				double nxtJumpTime = meanJumpTime * rnd;
 
-			double rnd = -Math.log(1 - MatsimRandom.getRandom().nextDouble());
-			double jumpTime = now + rnd / rate;
-			if (jumpTime < minJumpTime) {
-				minJumpTime = jumpTime;
-				nextJumper = dsList.peek();
+				if (nxtJumpTime < minJumpTime) {
+					minJumpTime = nxtJumpTime;
+					nextJumper = dsList.peek();
+				}
 			}
 		}
-		if (usList.size() > 0) {
-			double rate = chooseNextCellAndReturnJumpRate(usList.peek());
 
-			double rnd = -Math.log(1 - MatsimRandom.getRandom().nextDouble());
-			double jumpTime = now + rnd / rate;
-			if (jumpTime < minJumpTime) {
-				minJumpTime = jumpTime;
-				nextJumper = usList.peek();
+
+		if (usList.size() > 0) {
+			double j = chooseNextCellAndReturnJ(usList.peek());
+			if (!Double.isNaN(j)) {
+//				double j = getJ(usList.peek().getTentativeNextCell());
+				double rnd = -Math.log(1 - MatsimRandom.getRandom().nextDouble());
+				double meanJumpTime = 1. / (this.getDirectionalProportion(usList.peek()) * j);
+				double nxtJumpTime = meanJumpTime * rnd;
+				if (nxtJumpTime < minJumpTime) {
+					minJumpTime = nxtJumpTime;
+					nextJumper = usList.peek();
+				}
 			}
 		}
 
@@ -79,7 +87,13 @@ public class CTLinkCell extends CTCell {
 		}
 		this.next = nextJumper;
 
-		this.nextCellJumpTime = minJumpTime;
+//		double j = getJ(nextJumper.getTentativeNextCell());///(Math.sqrt(3)/2);
+//		double rnd = -Math.log(1 - MatsimRandom.getRandom().nextDouble());
+//		double meanJumpTime = 1. / j;
+////		log.info(meanJumpTime);
+//		double nextJumpTime = now + rnd * meanJumpTime;
+
+		this.nextCellJumpTime = now + minJumpTime;
 		CTEvent e = new CTEvent(this, nextCellJumpTime);
 		this.currentEvent = e;
 		this.net.addEvent(e);
@@ -113,6 +127,11 @@ public class CTLinkCell extends CTCell {
 		}
 		this.n--;
 		this.setRho(this.n / getAlpha());
+
+		updateProps();
+
+		List<CTCellFace> f = this.getFaces();
+		Collections.shuffle(f);
 	}
 
 	public boolean jumpOnPed(CTPed ctPed, double time) {
@@ -129,6 +148,7 @@ public class CTLinkCell extends CTCell {
 		}
 		this.n++;
 		this.setRho(this.n / getAlpha());
+		updateProps();
 
 
 		return true;
@@ -139,6 +159,35 @@ public class CTLinkCell extends CTCell {
 		HashSet<CTPed> ret = new HashSet<>(this.dsList);
 		ret.addAll(this.usList);
 		return ret;
+	}
+
+	@Override
+	double getDirectionalProportion(CTPed ped) {
+		if (this.n == 0) {
+			return 1;
+		}
+		if (ped.getDesiredDir() == Math.PI / 2.) {
+			return this.dsProp;
+		}
+		else {
+			if (ped.getDesiredDir() == -Math.PI / 2.) {
+				return this.usProp;
+			}
+			else {
+				throw new RuntimeException("unsupported direction");
+			}
+		}
+	}
+
+	private void updateProps() {
+		this.usProp = (double) this.usList.size() / (double) this.n;
+		if (Double.isNaN(this.usProp)) {
+			this.usProp = 0;
+		}
+		this.dsProp = (double) this.dsList.size() / (double) this.n;
+		if (Double.isNaN(this.dsProp)) {
+			this.dsProp = 0;
+		}
 	}
 
 }

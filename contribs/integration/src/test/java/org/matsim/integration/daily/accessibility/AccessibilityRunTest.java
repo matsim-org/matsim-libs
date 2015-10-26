@@ -26,6 +26,7 @@ import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspDefaultsCheckingLevel;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.replanning.DefaultPlanStrategiesModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -68,14 +69,17 @@ public class AccessibilityRunTest {
 		Integer range = 9;
 		int symbolSize = 1010;
 		int populationThreshold = (int) (200 / (1000/cellSize * 1000/cellSize));
+		
+		// ---
 
-		//		Config config = ConfigUtils.createConfig( new AccessibilityConfigGroup() ) ;
 		Config config = ConfigUtils.createConfig( new AccessibilityConfigGroup(), new MatrixBasedPtRouterConfigGroup()) ;
 
 		config.network().setInputFile(networkFile);
 		config.facilities().setInputFile(facilitiesFile);
 
 		config.controler().setLastIteration(0);
+		config.controler().setOverwriteFileSetting( OverwriteFileSetting.overwriteExistingFiles );
+		config.controler().setOutputDirectory( utils.getOutputDirectory());
 
 		config.vspExperimental().setVspDefaultsCheckingLevel( VspDefaultsCheckingLevel.abort );
 
@@ -91,6 +95,8 @@ public class AccessibilityRunTest {
 			stratSets.setWeight(1.);
 			config.strategy().addStrategySettings(stratSets);
 		}
+		
+		// ---
 
 		Scenario scenario = ScenarioUtils.loadScenario( config ) ;
 		PlansCalcRouteConfigGroup plansCalcRoute = config.plansCalcRoute();
@@ -176,7 +182,7 @@ public class AccessibilityRunTest {
 		}
 
 
-		// extends of the network are (as they can looked up by using the bounding box):
+		// extent of the network are (as they can looked up by using the bounding box):
 		// minX = 111083.9441831379, maxX = 171098.03695045778, minY = -3715412.097693177,	maxY = -3668275.43481496
 		// choose map view a bit bigger
 		double[] mapViewExtent = {100000,-3720000,180000,-3675000};
@@ -185,8 +191,10 @@ public class AccessibilityRunTest {
 		//		PtMatrix ptMatrix = PtMatrix.createPtMatrix(plansCalcRoute, boundingBox, mbpcg);
 
 		Map<String, ActivityFacilities> activityFacilitiesMap = new HashMap<String, ActivityFacilities>();
+		
+		// ---
+		
 		Controler controler = new Controler(scenario) ;
-		controler.getConfig().controler().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles ) ;
 
 		log.warn( "found activity types: " + activityTypes );
 		// yyyy there is some problem with activity types: in some algorithms, only the first letter is interpreted, in some
@@ -199,7 +207,6 @@ public class AccessibilityRunTest {
 				continue ;
 			}
 
-			config.controler().setOutputDirectory( utils.getOutputDirectory());
 			ActivityFacilities opportunities = FacilitiesUtils.createActivityFacilities() ;
 			for ( ActivityFacility fac : scenario.getActivityFacilities().getFacilities().values()  ) {
 				for ( ActivityOption option : fac.getActivityOptions().values() ) {
@@ -227,6 +234,8 @@ public class AccessibilityRunTest {
 			controler.addControlerListener(listener);
 		}
 
+		// ---
+		
 		controler.run();
 
 		String workingDirectory =  config.controler().getOutputDirectory();

@@ -76,6 +76,10 @@ public class SamplingStage<U extends DecisionVariable> {
 
 	// -------------------- CONTENT ACCESS --------------------
 
+	public double getAlphaSquareNorm() {
+		return this.alphas.innerProd(this.alphas);
+	}
+	
 	public double getAlphaNorm() {
 		return this.alphas.euclNorm();
 	}

@@ -21,23 +21,24 @@
 package playground.christoph.evacuation.withinday.replanning.replanners.old;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.router.RoutingContext;
-import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.TripRouter;
 import org.matsim.withinday.mobsim.WithinDayEngine;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;
 
 import playground.christoph.evacuation.analysis.CoordAnalyzer;
 
+import javax.inject.Provider;
+
 public class CurrentLegInitialReplannerFactory extends WithinDayDuringLegReplannerFactory {
 
 	private final Scenario scenario;
 	private final CoordAnalyzer coordAnalyzer;
-	private final TripRouterFactory tripRouterFactory;
+	private final Provider<TripRouter> tripRouterFactory;
 	private final RoutingContext routingContext;
 	
 	public CurrentLegInitialReplannerFactory(Scenario scenario, WithinDayEngine withinDayEngine,
-			CoordAnalyzer coordAnalyzer, TripRouterFactory tripRouterFactory, RoutingContext routingContext) {
+			CoordAnalyzer coordAnalyzer, Provider<TripRouter> tripRouterFactory, RoutingContext routingContext) {
 		super(withinDayEngine);
 		this.scenario = scenario;
 		this.coordAnalyzer = coordAnalyzer;
@@ -49,7 +50,7 @@ public class CurrentLegInitialReplannerFactory extends WithinDayDuringLegReplann
 	public WithinDayDuringLegReplanner createReplanner() {
 		WithinDayDuringLegReplanner replanner = new CurrentLegInitialReplanner(super.getId(), 
 				scenario, this.getWithinDayEngine().getActivityRescheduler(), coordAnalyzer,
-				this.tripRouterFactory.instantiateAndConfigureTripRouter(this.routingContext));
+				this.tripRouterFactory.get());
 		return replanner;
 	}
 }

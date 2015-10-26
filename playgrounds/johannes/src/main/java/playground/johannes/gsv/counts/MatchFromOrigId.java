@@ -19,10 +19,6 @@
 
 package playground.johannes.gsv.counts;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -31,11 +27,11 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.counts.Count;
-import org.matsim.counts.Counts;
-import org.matsim.counts.CountsReaderMatsimV1;
-import org.matsim.counts.CountsWriter;
-import org.matsim.counts.Volume;
+import org.matsim.counts.*;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * @author johannes

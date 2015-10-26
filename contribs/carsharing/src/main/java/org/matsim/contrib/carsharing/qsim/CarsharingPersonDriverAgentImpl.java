@@ -574,14 +574,15 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 			owVehId = null;
 		}
 		else if (currentLeg.getMode().equals("twowaycarsharing") 
-				//				&& plan.getPlanElements().get(currentPlanElementIndex + 1) instanceof Leg
+				
 				&& this.basicAgentDelegate.getNextPlanElement() instanceof Leg
 				) {
 
-			//this.pickupStations.remove(this.pickupStations.size() - 1);
-			this.vehicleIdLocation.remove(currentLeg.getRoute().getStartLinkId());
-			this.carSharingVehicles.getTwoWayVehicles().addVehicle(scenario.getNetwork().getLinks().get(this.getDestinationLinkId()), twVehId);
-			twVehId = null;
+			if (((Leg)this.basicAgentDelegate.getNextPlanElement()).getMode().equals("walk_rb")) {
+				this.vehicleIdLocation.remove(currentLeg.getRoute().getStartLinkId());
+				this.carSharingVehicles.getTwoWayVehicles().addVehicle(scenario.getNetwork().getLinks().get(this.getDestinationLinkId()), twVehId);
+				twVehId = null;
+		}
 		}
 		else if (currentLeg.getMode().equals("twowaycarsharing")) {
 			this.vehicleIdLocation.remove(currentLeg.getRoute().getStartLinkId());

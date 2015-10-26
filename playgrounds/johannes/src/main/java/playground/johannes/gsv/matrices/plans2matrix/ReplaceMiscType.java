@@ -21,8 +21,8 @@ package playground.johannes.gsv.matrices.plans2matrix;
 
 import gnu.trove.TObjectIntHashMap;
 import gnu.trove.TObjectIntIterator;
+import org.matsim.contrib.common.util.XORShiftRandom;
 import playground.johannes.coopsim.mental.choice.ChoiceSet;
-import playground.johannes.socialnetworks.utils.XORShiftRandom;
 import playground.johannes.synpop.data.*;
 import playground.johannes.synpop.processing.PersonsTask;
 

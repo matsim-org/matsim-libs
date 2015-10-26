@@ -22,37 +22,30 @@
  */
 package playground.johannes.gsv.demand;
 
-import java.io.IOException;
-import java.util.Random;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.contrib.common.gis.CRSUtils;
+import org.matsim.contrib.common.util.XORShiftRandom;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigReader;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
-
-import playground.johannes.gsv.demand.loader.PersonAgeWrapper;
-import playground.johannes.gsv.demand.loader.PersonCarAvailabilityLoader;
-import playground.johannes.gsv.demand.loader.PersonEmployedLoader;
-import playground.johannes.gsv.demand.loader.PersonGenderWrapper;
-import playground.johannes.gsv.demand.loader.PersonStopDistributionLoader;
-import playground.johannes.gsv.demand.loader.PlanDepartureTimeLoader;
-import playground.johannes.gsv.demand.loader.PlanPrimaryActivityLoader2;
+import playground.johannes.gsv.demand.loader.*;
 import playground.johannes.gsv.demand.tasks.PlanModeCarPT;
 import playground.johannes.gsv.demand.tasks.PlanNetworkConnect;
 import playground.johannes.gsv.demand.tasks.PlanRouteLegs;
 import playground.johannes.gsv.demand.tasks.PlanTransformCoord;
-import playground.johannes.sna.gis.CRSUtils;
-import playground.johannes.socialnetworks.utils.XORShiftRandom;
+
+import java.io.IOException;
+import java.util.Random;
 
 /**
  * @author johannes

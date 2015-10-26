@@ -13,12 +13,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.router.DefaultTripRouterFactoryImpl;
-import org.matsim.core.router.MainModeIdentifier;
-import org.matsim.core.router.RoutingContext;
-import org.matsim.core.router.RoutingContextImpl;
-import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.*;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
@@ -70,24 +65,20 @@ public class CSJustMembersControler {
 		final TravelTimeCalculator travelTimeCalculator = Events2TTCalculator.getTravelTimeCalculator(sc, args[1]);
 
 		controler.setTripRouterFactory(
-                new TripRouterFactory() {
+                new javax.inject.Provider<org.matsim.core.router.TripRouter>() {
                     @Override
-                    public TripRouter instantiateAndConfigureTripRouter(RoutingContext routingContext) {
+                    public TripRouter get() {
                         // this factory initializes a TripRouter with default modules,
                         // taking into account what is asked for in the config
-
+                        TripRouterFactoryBuilderWithDefaults builder = new TripRouterFactoryBuilderWithDefaults();
+                        builder.setTravelTime(travelTimeCalculator.getLinkTravelTimes());
                         // This allows us to just add our module and go.
-                        final TripRouterFactory delegate = DefaultTripRouterFactoryImpl.createRichTripRouterFactoryImpl(controler.getScenario());
-
+                        final javax.inject.Provider<org.matsim.core.router.TripRouter> delegate = builder.build(controler.getScenario());
                         TravelDisutilityFactory travelCostCalculatorFactory = new TravelTimeAndDistanceBasedTravelDisutilityFactory();
                         TravelDisutility travelCostCalculator = travelCostCalculatorFactory.createTravelDisutility(travelTimeCalculator.getLinkTravelTimes(), controler.getConfig().planCalcScore());
+                        builder.setTravelDisutility(travelCostCalculator);
 
-                        RoutingContext rContext = new RoutingContextImpl(
-                                travelCostCalculator,
-                                travelTimeCalculator.getLinkTravelTimes() );
-
-
-                        final TripRouter router = delegate.instantiateAndConfigureTripRouter(rContext);
+                        final TripRouter router = delegate.get();
 
                         // add our module to the instance
                         router.setRoutingModule(

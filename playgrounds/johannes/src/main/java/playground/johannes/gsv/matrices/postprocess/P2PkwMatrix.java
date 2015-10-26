@@ -19,13 +19,13 @@
 
 package playground.johannes.gsv.matrices.postprocess;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import playground.johannes.gsv.zones.KeyMatrix;
 import playground.johannes.gsv.zones.MatrixOperations;
 import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
 import playground.johannes.gsv.zones.io.KeyMatrixXMLWriter;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author johannes

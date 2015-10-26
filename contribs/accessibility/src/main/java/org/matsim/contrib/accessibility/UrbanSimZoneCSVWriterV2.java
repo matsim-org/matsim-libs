@@ -6,8 +6,7 @@ import java.io.IOException;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.network.Node;
-import org.matsim.contrib.accessibility.interfaces.ZoneDataExchangeInterface;
+import org.matsim.contrib.accessibility.interfaces.FacilityDataExchangeInterface;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.facilities.ActivityFacility;
 
@@ -19,7 +18,7 @@ import org.matsim.facilities.ActivityFacility;
  * @author thomas
  *
  */
-public final class UrbanSimZoneCSVWriterV2 implements ZoneDataExchangeInterface {
+public final class UrbanSimZoneCSVWriterV2 implements FacilityDataExchangeInterface {
 	
 	private static final Logger log 	= Logger.getLogger(UrbanSimZoneCSVWriterV2.class);
 	private BufferedWriter zoneWriter = null;
@@ -56,11 +55,10 @@ public final class UrbanSimZoneCSVWriterV2 implements ZoneDataExchangeInterface 
 	
 	/**
 	 * writing the accessibility measures into csv file
-	 * 
 	 * @param startZone
 	 */
 	@Override
-	public void setZoneAccessibilities( ActivityFacility startZone, Node from, Map<Modes4Accessibility,Double> accessibilities ) {
+	public void setFacilityAccessibilities( ActivityFacility startZone, Double timeOfDay, Map<Modes4Accessibility,Double> accessibilities ) {
 		// (this is what, I think, writes the urbansim data, and should thus better not be touched. kai, feb'14)
 
 		try{

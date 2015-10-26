@@ -9,6 +9,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.DriverAgent;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -58,7 +59,7 @@ public class Debugger2 {
 		}
 
 		CTNetwork net = new CTNetwork(sc.getNetwork(), em, null);
-
+		double coeff = 0.05;
 		int nrPeds = 0;
 		{
 			CTLink link = net.getLinks().get(Id.createLinkId("0"));
@@ -68,11 +69,12 @@ public class Debugger2 {
 			links.add(Id.createLinkId(2));
 			links.add(Id.createLinkId(3));
 			for (CTCell cell : link.getCells()) {
+
 				int n = cell.getN();
-				int rnd = n / 2;//(int) (MatsimRandom.getRandom().nextInt(n) * 1);
+				int rnd = (int) (n * coeff * MatsimRandom.getRandom().nextDouble());///4;//n/3;//(int) (MatsimRandom.getRandom().nextInt(n)*.5);
 				for (int i = 0; i < rnd; i++) {
-					nrPeds++;
-					DriverAgent walker = new SimpleCTNetworkWalker(links);
+
+					DriverAgent walker = new SimpleCTNetworkWalker(links, Id.createPersonId("r" + nrPeds++));
 
 					CTPed ped = new CTPed(cell, walker);
 					cell.jumpOnPed(ped, 0);
@@ -81,27 +83,164 @@ public class Debugger2 {
 			}
 
 		}
-//		{
-//			CTLink link = net.getLinks().get(Id.createLinkId("7"));
-//			List<Id<Link>> links = new ArrayList<>();
-//			links.add(Id.createLinkId(7));
-//			links.add(Id.createLinkId(6));
-//			links.add(Id.createLinkId(5));
-//			links.add(Id.createLinkId(4));
-//			for (CTCell cell : link.getCells()) {
-//				int n = cell.getN();
-//				int rnd = (int) (MatsimRandom.getRandom().nextInt(n) * 0.1);
-//				for (int i = 0; i < rnd; i++) {
-//					nrPeds++;
-//					DriverAgent walker = new SimpleCTNetworkWalker(links);
-//
-//					CTPed ped = new CTPed(cell, walker);
-//					cell.jumpOnPed(ped, 0);
-//				}
-//				cell.updateIntendedCellJumpTimeAndChooseNextJumper(0);
-//			}
-//
-//		}
+		{
+			CTLink link = net.getLinks().get(Id.createLinkId("1"));
+			List<Id<Link>> links = new ArrayList<>();
+
+			links.add(Id.createLinkId(1));
+			links.add(Id.createLinkId(2));
+			links.add(Id.createLinkId(3));
+			links.add(Id.createLinkId(0));
+			for (CTCell cell : link.getCells()) {
+
+				int n = cell.getN();
+				int rnd = (int) (n * coeff * MatsimRandom.getRandom().nextDouble());///4;//n/3;//(int) (MatsimRandom.getRandom().nextInt(n)*.5);
+				for (int i = 0; i < rnd; i++) {
+
+					DriverAgent walker = new SimpleCTNetworkWalker(links, Id.createPersonId("r" + nrPeds++));
+
+					CTPed ped = new CTPed(cell, walker);
+					cell.jumpOnPed(ped, 0);
+				}
+				cell.updateIntendedCellJumpTimeAndChooseNextJumper(0);
+			}
+
+		}
+		{
+			CTLink link = net.getLinks().get(Id.createLinkId("2"));
+			List<Id<Link>> links = new ArrayList<>();
+
+
+			links.add(Id.createLinkId(2));
+			links.add(Id.createLinkId(3));
+			links.add(Id.createLinkId(0));
+			links.add(Id.createLinkId(1));
+			for (CTCell cell : link.getCells()) {
+
+				int n = cell.getN();
+				int rnd = (int) (n * coeff * MatsimRandom.getRandom().nextDouble());///4;//n/3;//(int) (MatsimRandom.getRandom().nextInt(n)*.5);
+				for (int i = 0; i < rnd; i++) {
+
+					DriverAgent walker = new SimpleCTNetworkWalker(links, Id.createPersonId("r" + nrPeds++));
+
+					CTPed ped = new CTPed(cell, walker);
+					cell.jumpOnPed(ped, 0);
+				}
+				cell.updateIntendedCellJumpTimeAndChooseNextJumper(0);
+			}
+
+		}
+		{
+			CTLink link = net.getLinks().get(Id.createLinkId("3"));
+			List<Id<Link>> links = new ArrayList<>();
+
+
+			links.add(Id.createLinkId(3));
+			links.add(Id.createLinkId(0));
+			links.add(Id.createLinkId(1));
+			links.add(Id.createLinkId(2));
+			for (CTCell cell : link.getCells()) {
+
+				int n = cell.getN();
+				int rnd = (int) (n * coeff * MatsimRandom.getRandom().nextDouble());///4;//n/3;//(int) (MatsimRandom.getRandom().nextInt(n)*.5);
+				for (int i = 0; i < rnd; i++) {
+
+					DriverAgent walker = new SimpleCTNetworkWalker(links, Id.createPersonId("r" + nrPeds++));
+
+					CTPed ped = new CTPed(cell, walker);
+					cell.jumpOnPed(ped, 0);
+				}
+				cell.updateIntendedCellJumpTimeAndChooseNextJumper(0);
+			}
+
+		}
+		{
+			CTLink link = net.getLinks().get(Id.createLinkId("4"));
+			List<Id<Link>> links = new ArrayList<>();
+
+
+			links.add(Id.createLinkId(4));
+			links.add(Id.createLinkId(7));
+			links.add(Id.createLinkId(6));
+			links.add(Id.createLinkId(5));
+			for (CTCell cell : link.getCells()) {
+				int n = cell.getN();
+				int rnd = (int) (n * coeff * MatsimRandom.getRandom().nextDouble());///4;//n/3;//(int) (MatsimRandom.getRandom().nextInt(n)*.5);
+				for (int i = 0; i < rnd; i++) {
+
+					DriverAgent walker = new SimpleCTNetworkWalker(links, Id.createPersonId("b" + nrPeds++));
+
+					CTPed ped = new CTPed(cell, walker);
+					cell.jumpOnPed(ped, 0);
+				}
+				cell.updateIntendedCellJumpTimeAndChooseNextJumper(0);
+			}
+
+		}
+		{
+			CTLink link = net.getLinks().get(Id.createLinkId("5"));
+			List<Id<Link>> links = new ArrayList<>();
+
+			links.add(Id.createLinkId(5));
+			links.add(Id.createLinkId(4));
+			links.add(Id.createLinkId(7));
+			links.add(Id.createLinkId(6));
+			for (CTCell cell : link.getCells()) {
+				int n = cell.getN();
+				int rnd = (int) (n * coeff * MatsimRandom.getRandom().nextDouble());///4;//n/3;//(int) (MatsimRandom.getRandom().nextInt(n)*.5);
+				for (int i = 0; i < rnd; i++) {
+
+					DriverAgent walker = new SimpleCTNetworkWalker(links, Id.createPersonId("b" + nrPeds++));
+
+					CTPed ped = new CTPed(cell, walker);
+					cell.jumpOnPed(ped, 0);
+				}
+				cell.updateIntendedCellJumpTimeAndChooseNextJumper(0);
+			}
+
+		}
+		{
+			CTLink link = net.getLinks().get(Id.createLinkId("6"));
+			List<Id<Link>> links = new ArrayList<>();
+			links.add(Id.createLinkId(6));
+			links.add(Id.createLinkId(5));
+			links.add(Id.createLinkId(4));
+			links.add(Id.createLinkId(7));
+			for (CTCell cell : link.getCells()) {
+				int n = cell.getN();
+				int rnd = (int) (n * coeff * MatsimRandom.getRandom().nextDouble());///4;//n/3;//(int) (MatsimRandom.getRandom().nextInt(n)*.5);
+				for (int i = 0; i < rnd; i++) {
+
+					DriverAgent walker = new SimpleCTNetworkWalker(links, Id.createPersonId("b" + nrPeds++));
+
+					CTPed ped = new CTPed(cell, walker);
+					cell.jumpOnPed(ped, 0);
+				}
+				cell.updateIntendedCellJumpTimeAndChooseNextJumper(0);
+			}
+
+		}
+		{
+			CTLink link = net.getLinks().get(Id.createLinkId("7"));
+			List<Id<Link>> links = new ArrayList<>();
+			links.add(Id.createLinkId(7));
+			links.add(Id.createLinkId(6));
+			links.add(Id.createLinkId(5));
+			links.add(Id.createLinkId(4));
+			for (CTCell cell : link.getCells()) {
+				int n = cell.getN();
+				int rnd = (int) (n * coeff * MatsimRandom.getRandom().nextDouble());///4;//n/3;//(int) (MatsimRandom.getRandom().nextInt(n)*.5);
+				for (int i = 0; i < rnd; i++) {
+
+					DriverAgent walker = new SimpleCTNetworkWalker(links, Id.createPersonId("b" + nrPeds++));
+
+					CTPed ped = new CTPed(cell, walker);
+					cell.jumpOnPed(ped, 0);
+				}
+				cell.updateIntendedCellJumpTimeAndChooseNextJumper(0);
+			}
+
+		}
 		System.out.println(nrPeds);
 		long start = System.nanoTime();
 		net.run();
@@ -123,8 +262,8 @@ public class Debugger2 {
 		Network net = sc.getNetwork();
 		NetworkFactory fac = net.getFactory();
 
-		double length = 30;
-		double width = 6;
+		double length = 60;
+		double width = 20;
 
 		int id = 0;
 		Node n0 = fac.createNode(Id.createNodeId(id++), CoordUtils.createCoord(0, 0));

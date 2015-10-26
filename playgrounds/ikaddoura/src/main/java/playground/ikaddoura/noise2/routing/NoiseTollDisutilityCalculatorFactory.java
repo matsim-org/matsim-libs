@@ -40,6 +40,7 @@ public class NoiseTollDisutilityCalculatorFactory implements TravelDisutilityFac
 
 	private NoiseContext noiseContext;
 
+	@Deprecated
 	public NoiseTollDisutilityCalculatorFactory(NoiseContext noiseContext) {
 		this.noiseContext = noiseContext;
 	}

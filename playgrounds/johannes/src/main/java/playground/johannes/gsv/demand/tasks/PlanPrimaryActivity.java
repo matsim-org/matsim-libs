@@ -33,20 +33,20 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.contrib.common.gis.CRSUtils;
+import org.matsim.contrib.common.gis.OrthodromicDistanceCalculator;
 import org.matsim.contrib.common.util.ProgressLogger;
+import org.matsim.contrib.common.util.XORShiftRandom;
+import org.matsim.contrib.socnetgen.sna.gis.Zone;
+import org.matsim.contrib.socnetgen.sna.gis.ZoneLayer;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 import playground.johannes.coopsim.mental.choice.ChoiceSet;
-import playground.johannes.coopsim.util.MatsimCoordUtils;
+import playground.johannes.coopsim.utils.MatsimCoordUtils;
 import playground.johannes.gsv.demand.PopulationTask;
-import playground.johannes.sna.gis.CRSUtils;
-import playground.johannes.sna.gis.Zone;
-import playground.johannes.sna.gis.ZoneLayer;
-import playground.johannes.socialnetworks.gis.OrthodromicDistanceCalculator;
-import playground.johannes.socialnetworks.utils.XORShiftRandom;
 
 import java.util.*;
 

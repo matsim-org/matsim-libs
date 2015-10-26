@@ -1,5 +1,11 @@
 package gunnar.ihop2.regent.demandreading;
 
+import static gunnar.ihop2.regent.demandreading.RegentPopulationReader.CAR_ATTRIBUTEVALUE;
+import static gunnar.ihop2.regent.demandreading.RegentPopulationReader.OTHERTOURMODE_ATTRIBUTE;
+import static gunnar.ihop2.regent.demandreading.RegentPopulationReader.OTHERZONE_ATTRIBUTE;
+import static gunnar.ihop2.regent.demandreading.RegentPopulationReader.WORKTOURMODE_ATTRIBUTE;
+import static gunnar.ihop2.regent.demandreading.RegentPopulationReader.WORKZONE_ATTRIBUTE;
+
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -37,6 +43,11 @@ public class DemandAnalyzer {
 		final Set worktourmodes = new LinkedHashSet();
 		final Set othertourmodes = new LinkedHashSet();
 
+		int workTourCnt = 0;
+		int workTourByCarCnt = 0;
+		int otherTourCnt = 0;
+		int otherTourByCarCnt = 0;
+
 		for (String personId : ObjectAttributeUtils2
 				.allObjectKeys(personAttributes)) {
 			birthyears.add(personAttributes.getAttribute(personId,
@@ -57,6 +68,25 @@ public class DemandAnalyzer {
 					RegentPopulationReader.WORKTOURMODE_ATTRIBUTE));
 			othertourmodes.add(personAttributes.getAttribute(personId,
 					RegentPopulationReader.OTHERTOURMODE_ATTRIBUTE));
+
+			if (personAttributes.getAttribute(personId, WORKZONE_ATTRIBUTE) != null
+					&& !"0".equals(personAttributes.getAttribute(personId,
+							WORKZONE_ATTRIBUTE))) {
+				workTourCnt++;
+				if (CAR_ATTRIBUTEVALUE.equals(personAttributes.getAttribute(
+						personId, WORKTOURMODE_ATTRIBUTE))) {
+					workTourByCarCnt++;
+				}
+			}
+			if (personAttributes.getAttribute(personId, OTHERZONE_ATTRIBUTE) != null
+					&& !"0".equals(personAttributes.getAttribute(personId,
+							OTHERZONE_ATTRIBUTE))) {
+				otherTourCnt++;
+				if (CAR_ATTRIBUTEVALUE.equals(personAttributes.getAttribute(
+						personId, OTHERTOURMODE_ATTRIBUTE))) {
+					otherTourByCarCnt++;
+				}
+			}
 		}
 
 		System.out.println(birthyears.size() + " distinct birthyears");
@@ -68,14 +98,21 @@ public class DemandAnalyzer {
 		System.out.println(otherzones.size() + " distinct otherzones");
 		System.out.println("worktourmodes: " + worktourmodes);
 		System.out.println("othertourmodes: " + othertourmodes);
-		System.out.println(homezones);
+		System.out.println("homezones  = " + homezones);
+		System.out.println("workzones  = " + workzones);
+		System.out.println("otherzones = " + otherzones);
+		System.out.println("total number of work tours by car: "
+				+ workTourByCarCnt);
+		System.out.println("total number of other tours by car: "
+				+ otherTourByCarCnt);
+		System.out.println("total number of work tours: " + workTourCnt);
+		System.out.println("total number of other tours: " + otherTourCnt);
 
 	}
 
 	public static void main(String[] args) {
 
-		// run("./data/synthetic_population/150615_trips.xml");
-		run("./data/synthetic_population/150911_trips.xml");
+		run("./test/regentmatsim/exchange/151023_trips.xml");
 
 	}
 

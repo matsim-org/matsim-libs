@@ -24,14 +24,14 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
 import org.apache.log4j.Logger;
 import org.geotools.geometry.jts.JTSFactoryFinder;
-import playground.johannes.synpop.data.*;
-import playground.johannes.synpop.processing.TaskRunner;
-import playground.johannes.synpop.processing.EpisodeTask;
+import org.matsim.contrib.common.gis.DistanceCalculator;
+import org.matsim.contrib.common.gis.OrthodromicDistanceCalculator;
 import playground.johannes.gsv.synPop.invermo.InvermoKeys;
+import playground.johannes.synpop.data.*;
 import playground.johannes.synpop.data.io.XMLHandler;
 import playground.johannes.synpop.data.io.XMLWriter;
-import playground.johannes.socialnetworks.gis.DistanceCalculator;
-import playground.johannes.socialnetworks.gis.OrthodromicDistanceCalculator;
+import playground.johannes.synpop.processing.EpisodeTask;
+import playground.johannes.synpop.processing.TaskRunner;
 
 import java.util.Set;
 

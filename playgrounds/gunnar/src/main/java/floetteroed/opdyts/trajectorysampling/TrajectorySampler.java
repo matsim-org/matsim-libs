@@ -46,7 +46,7 @@ public interface TrajectorySampler<U extends DecisionVariable> {
 	public U getCurrentDecisionVariable();
 
 	public int getTotalTransitionCnt();
-	
+
 	public Map<U, Double> getDecisionVariable2finalObjectiveFunctionValue();
 
 	/**
@@ -66,5 +66,13 @@ public interface TrajectorySampler<U extends DecisionVariable> {
 	 *            the newly reached simulator state
 	 */
 	public void afterIteration(SimulatorState newState);
+
+	// public Map<U, Integer> getDecisionVariable2evaluationCnt();
+
+	// public double getInitialObjectiveFunctionValue();
+
+	// public double getInitialEquilibriumGap();
+
+	// public double getInitialUniformityGap();
 
 }

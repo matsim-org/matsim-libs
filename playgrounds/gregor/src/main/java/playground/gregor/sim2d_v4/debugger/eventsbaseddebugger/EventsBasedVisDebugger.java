@@ -20,59 +20,44 @@
 
 package playground.gregor.sim2d_v4.debugger.eventsbaseddebugger;
 
-import java.awt.BorderLayout;
-import java.awt.Font;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.OverlayLayout;
-
 import org.gicentre.utils.move.ZoomPan;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.utils.misc.Time;
-
 import processing.core.PApplet;
 import processing.core.PImage;
 import processing.core.PVector;
 
+import javax.swing.*;
+import java.awt.*;
+import java.util.*;
+import java.util.List;
+
 public class EventsBasedVisDebugger extends PApplet {
 
 	private final JFrame fr;
-
-	private List<Object> elements = Collections
-			.synchronizedList(new ArrayList<Object>());
-	private List<Text> elementsText = Collections
-			.synchronizedList(new ArrayList<Text>());
 	private final List<Text> elementsTextStatic = Collections
 			.synchronizedList(new ArrayList<Text>());
 	private final List<Object> newElements = new ArrayList<Object>();
 	private final List<Text> newElementsText = new ArrayList<Text>();
 	private final List<Object> elementsStatic = Collections
 			.synchronizedList(new ArrayList<Object>());
-
 	private final List<VisDebuggerAdditionalDrawer> additionalDrawers = Collections
 			.synchronizedList(new ArrayList<VisDebuggerAdditionalDrawer>());
-
+	// ZoomPan zoomer;
+	private final TileMap tileMap;
+	private final FrameSaver fs;
 	double offsetX = -1113948;
 	double offsetY = -7041222;
 
 	ZoomPan zoomer;
-	// ZoomPan zoomer;
-	private final TileMap tileMap;
-
-	private Control keyControl;
-
 	double time;
-
 	int dummy = 0;
-
-	private final FrameSaver fs;
+	private List<Object> elements = Collections
+			.synchronizedList(new ArrayList<Object>());
+	private List<Text> elementsText = Collections
+			.synchronizedList(new ArrayList<Text>());
+	private Control keyControl;
 	// private final FrameSaver fs = null;
 	private String it;
 
@@ -150,7 +135,7 @@ public class EventsBasedVisDebugger extends PApplet {
 		if (this.keyControl != null && this.keyControl.isScreenshotRequested()
 				&& this.keyControl.isOneObjectWaitingAtScreenshotBarrier()) {
 			beginRecord(PDF,
-					"/Users/laemmel/tmp/processing/" + "sim2d_screenshot_at_"
+					"/Users/laemmel/Desktop/" + "sim2d_screenshot_at_"
 							+ this.time + "_" + System.currentTimeMillis()
 							+ ".pdf");
 			recording = true;
@@ -454,6 +439,15 @@ public class EventsBasedVisDebugger extends PApplet {
 
 	}
 
+	private void addElement(Object o) {
+		if (o instanceof Text) {
+			this.newElementsText.add((Text) o);
+		}
+		else {
+			this.newElements.add(o);
+		}
+	}
+
 	/* package */void addCircle(double x, double y, float rr, int r, int g,
 			int b, int a, int minScale, boolean fill) {
 		Circle c = new Circle();
@@ -467,22 +461,6 @@ public class EventsBasedVisDebugger extends PApplet {
 		c.minScale = minScale;
 		c.fill = fill;
 		addElement(c);
-	}
-
-	/* package */void addLineStatic(double x0, double y0, double x1, double y1,
-			int r, int g, int b, int a, int minScale) {
-		Line l = new Line();
-		l.x0 = (float) (x0 + this.offsetX);
-		l.x1 = (float) (x1 + this.offsetX);
-		l.y0 = (float) -(y0 + this.offsetY);
-		l.y1 = (float) -(y1 + this.offsetY);
-		l.r = r;
-		l.g = g;
-		l.b = b;
-		l.a = a;
-		l.minScale = minScale;
-		addElementStatic(l);
-
 	}
 
 	/* package */void addCircleStatic(double x, double y, float rr, int r,
@@ -499,20 +477,15 @@ public class EventsBasedVisDebugger extends PApplet {
 		addElementStatic(c);
 	}
 
-	/* package */void addLine(double x0, double y0, double x1, double y1,
-			int r, int g, int b, int a, int minScale) {
-		Line l = new Line();
-		l.x0 = (float) (x0 + this.offsetX);
-		l.x1 = (float) (x1 + this.offsetX);
-		l.y0 = (float) -(y0 + this.offsetY);
-		l.y1 = (float) -(y1 + this.offsetY);
-		l.r = r;
-		l.g = g;
-		l.b = b;
-		l.a = a;
-		l.minScale = minScale;
-		addElement(l);
-
+	private void addElementStatic(Object o) {
+		synchronized (this.elementsStatic) {
+			if (o instanceof Text) {
+				this.elementsTextStatic.add((Text) o);
+			}
+			else {
+				this.elementsStatic.add(o);
+			}
+		}
 	}
 
 	/* package */void addTextStatic(double x, double y, String string,
@@ -587,22 +560,138 @@ public class EventsBasedVisDebugger extends PApplet {
 		addElementStatic(p);
 	}
 
-	private void addElement(Object o) {
-		if (o instanceof Text) {
-			this.newElementsText.add((Text) o);
-		} else {
-			this.newElements.add(o);
+	/* package */void update(double time) {
+		if (this.fs != null && this.fs.incrSkipped()) {
+			this.fs.await();
+		}
+		this.time = time;
+		synchronized (this.elements) {
+			// this.elements.clear();
+			this.elements = Collections.synchronizedList(new ArrayList<Object>(
+					this.newElements));
+
+			this.newElements.clear();
+		}
+		synchronized (this.elementsText) {
+			this.elementsText = Collections
+					.synchronizedList(new ArrayList<Text>(this.newElementsText));
+			this.newElementsText.clear();
 		}
 	}
 
-	private void addElementStatic(Object o) {
-		synchronized (this.elementsStatic) {
-			if (o instanceof Text) {
-				this.elementsTextStatic.add((Text) o);
+	public void addDashedLineStatic(double x, double y, double x2, double y2,
+									int r, int g, int b, int a, int minScale, double dash, double gap) {
+		double dx = x2 - x;
+		double dy = y2 - y;
+		double l = Math.sqrt(dx * dx + dy * dy);
+		dx /= l;
+		dy /= l;
+		double tl = 0;
+
+		double tx = x;
+		double ty = y;
+		while (tl < l) {
+			if (tl + dash > l) {
+				addLineStatic(tx, ty, x2, y2, r, g, b, a, minScale);
 			} else {
-				this.elementsStatic.add(o);
+				addLineStatic(tx, ty, tx + dx * dash, ty + dy * dash, r, g, b,
+						a, minScale);
+			}
+			tx += dx * (dash + gap);
+			ty += dy * (dash + gap);
+			tl += dash + gap;
+		}
+
+		// TODO Auto-generated method stub
+
+	}
+
+	/* package */void addLineStatic(double x0, double y0, double x1, double y1,
+									int r, int g, int b, int a, int minScale) {
+		Line l = new Line();
+		l.x0 = (float) (x0 + this.offsetX);
+		l.x1 = (float) (x1 + this.offsetX);
+		l.y0 = (float) -(y0 + this.offsetY);
+		l.y1 = (float) -(y1 + this.offsetY);
+		l.r = r;
+		l.g = g;
+		l.b = b;
+		l.a = a;
+		l.minScale = minScale;
+		addElementStatic(l);
+
+	}
+
+	public void addDashedLine(double x, double y, double x2, double y2, int r,
+							  int g, int b, int a, int minScale, double dash, double gap) {
+		double dx = x2 - x;
+		double dy = y2 - y;
+		double l = Math.sqrt(dx * dx + dy * dy);
+		dx /= l;
+		dy /= l;
+		double tl = 0;
+
+		double tx = x;
+		double ty = y;
+		while (tl < l) {
+			if (tl + dash > l) {
+				addLine(tx, ty, x2, y2, r, g, b, a, minScale);
+			}
+			else {
+				addLine(tx, ty, tx + dx * dash, ty + dy * dash, r, g, b, a,
+						minScale);
+			}
+			tx += dx * (dash + gap);
+			ty += dy * (dash + gap);
+			tl += dash + gap;
+		}
+
+		// TODO Auto-generated method stub
+
+	}
+
+	/* package */void addLine(double x0, double y0, double x1, double y1,
+							  int r, int g, int b, int a, int minScale) {
+		Line l = new Line();
+		l.x0 = (float) (x0 + this.offsetX);
+		l.x1 = (float) (x1 + this.offsetX);
+		l.y0 = (float) -(y0 + this.offsetY);
+		l.y1 = (float) -(y1 + this.offsetY);
+		l.r = r;
+		l.g = g;
+		l.b = b;
+		l.a = a;
+		l.minScale = minScale;
+		addElement(l);
+
+	}
+
+	void addAdditionalDrawer(VisDebuggerAdditionalDrawer drawer) {
+		synchronized (this.additionalDrawers) {
+			this.additionalDrawers.add(drawer);
+		}
+	}
+
+	public void addKeyControl(Control keyControl) {
+		this.addKeyListener(keyControl);
+		this.addMouseWheelListener(keyControl);
+		this.keyControl = keyControl;
+		this.keyControl.addTileMap(this.tileMap);
+	}
+
+	public void reset(int it) {
+		if (it < 10) {
+			this.it = "it.00" + it + "_";
+		}
+		else {
+			if (it < 100) {
+				this.it = "it.0" + it + "_";
+			}
+			else {
+				this.it = "it." + it + "_";
 			}
 		}
+
 	}
 
 	private static class Triangle {
@@ -639,103 +728,6 @@ public class EventsBasedVisDebugger extends PApplet {
 		String text = "";
 		int r = 0, g = 0, b = 0, a = 255;
 		int minScale = 0;
-	}
-
-	/* package */void update(double time) {
-		if (this.fs != null && this.fs.incrSkipped()) {
-			this.fs.await();
-		}
-		this.time = time;
-		synchronized (this.elements) {
-			// this.elements.clear();
-			this.elements = Collections.synchronizedList(new ArrayList<Object>(
-					this.newElements));
-
-			this.newElements.clear();
-		}
-		synchronized (this.elementsText) {
-			this.elementsText = Collections
-					.synchronizedList(new ArrayList<Text>(this.newElementsText));
-			this.newElementsText.clear();
-		}
-	}
-
-	public void addDashedLineStatic(double x, double y, double x2, double y2,
-			int r, int g, int b, int a, int minScale, double dash, double gap) {
-		double dx = x2 - x;
-		double dy = y2 - y;
-		double l = Math.sqrt(dx * dx + dy * dy);
-		dx /= l;
-		dy /= l;
-		double tl = 0;
-
-		double tx = x;
-		double ty = y;
-		while (tl < l) {
-			if (tl + dash > l) {
-				addLineStatic(tx, ty, x2, y2, r, g, b, a, minScale);
-			} else {
-				addLineStatic(tx, ty, tx + dx * dash, ty + dy * dash, r, g, b,
-						a, minScale);
-			}
-			tx += dx * (dash + gap);
-			ty += dy * (dash + gap);
-			tl += dash + gap;
-		}
-
-		// TODO Auto-generated method stub
-
-	}
-
-	public void addDashedLine(double x, double y, double x2, double y2, int r,
-			int g, int b, int a, int minScale, double dash, double gap) {
-		double dx = x2 - x;
-		double dy = y2 - y;
-		double l = Math.sqrt(dx * dx + dy * dy);
-		dx /= l;
-		dy /= l;
-		double tl = 0;
-
-		double tx = x;
-		double ty = y;
-		while (tl < l) {
-			if (tl + dash > l) {
-				addLine(tx, ty, x2, y2, r, g, b, a, minScale);
-			} else {
-				addLine(tx, ty, tx + dx * dash, ty + dy * dash, r, g, b, a,
-						minScale);
-			}
-			tx += dx * (dash + gap);
-			ty += dy * (dash + gap);
-			tl += dash + gap;
-		}
-
-		// TODO Auto-generated method stub
-
-	}
-
-	void addAdditionalDrawer(VisDebuggerAdditionalDrawer drawer) {
-		synchronized (this.additionalDrawers) {
-			this.additionalDrawers.add(drawer);
-		}
-	}
-
-	public void addKeyControl(Control keyControl) {
-		this.addKeyListener(keyControl);
-		this.addMouseWheelListener(keyControl);
-		this.keyControl = keyControl;
-		this.keyControl.addTileMap(this.tileMap);
-	}
-
-	public void reset(int it) {
-		if (it < 10) {
-			this.it = "it.00" + it + "_";
-		} else if (it < 100) {
-			this.it = "it.0" + it + "_";
-		} else {
-			this.it = "it." + it + "_";
-		}
-
 	}
 
 }

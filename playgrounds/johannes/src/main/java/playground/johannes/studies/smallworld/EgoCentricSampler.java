@@ -19,22 +19,16 @@
  * *********************************************************************** */
 package playground.johannes.studies.smallworld;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import org.matsim.contrib.socnetgen.sna.graph.Edge;
+import org.matsim.contrib.socnetgen.sna.graph.Graph;
+import org.matsim.contrib.socnetgen.sna.graph.Vertex;
+import org.matsim.contrib.socnetgen.sna.snowball.SampledGraphProjection;
+import org.matsim.contrib.socnetgen.sna.snowball.SampledGraphProjectionBuilder;
+import org.matsim.contrib.socnetgen.sna.snowball.SampledVertexDecorator;
+import org.matsim.contrib.socnetgen.sna.snowball.sim.Sampler;
+import org.matsim.contrib.socnetgen.sna.snowball.sim.SamplerListener;
 
-import playground.johannes.sna.graph.Edge;
-import playground.johannes.sna.graph.Graph;
-import playground.johannes.sna.graph.Vertex;
-import playground.johannes.sna.snowball.SampledGraphProjection;
-import playground.johannes.sna.snowball.SampledGraphProjectionBuilder;
-import playground.johannes.sna.snowball.SampledVertexDecorator;
-import playground.johannes.sna.snowball.sim.Sampler;
-import playground.johannes.sna.snowball.sim.SamplerListener;
+import java.util.*;
 
 /**
  * @author illenberger

@@ -39,7 +39,6 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.router.PlanRouter;
-import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -158,10 +157,8 @@ public class DataPrepare {
 		PlanRouter router =
 			new PlanRouter(
 					new TripRouterFactoryBuilderWithDefaults().build(
-						scenario ).instantiateAndConfigureTripRouter(
-							new RoutingContextImpl(
-								timeCostCalculator,
-								timeCostCalculator ) ) );
+						scenario ).get(
+					) );
 		log.info("start pt-router");
 		for ( Person p : pop.getPersons().values() ) {
 			router.run( p );

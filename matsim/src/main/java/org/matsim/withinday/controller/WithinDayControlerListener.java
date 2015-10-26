@@ -31,7 +31,6 @@ import org.matsim.core.mobsim.framework.listeners.FixedOrderSimulationListener;
 import org.matsim.core.router.*;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.pt.router.TransitRouter;
@@ -80,7 +79,7 @@ public class WithinDayControlerListener implements StartupListener {
 	private Provider<TransitRouter> transitRouterFactory;
 
 	private WithinDayEngine withinDayEngine;
-	private TripRouterFactory withinDayTripRouterFactory;
+	private Provider<TripRouter> withinDayTripRouterFactory;
 	private final FixedOrderSimulationListener fosl = new FixedOrderSimulationListener();
 	private final Map<String, TravelTime> multiModalTravelTimes = new HashMap<String, TravelTime>();
 
@@ -179,25 +178,15 @@ public class WithinDayControlerListener implements StartupListener {
 		return this.mobsimDataProvider;
 	}
 	
-	public void setWithinDayTripRouterFactory(TripRouterFactory tripRouterFactory) {
+	public void setWithinDayTripRouterFactory(Provider<TripRouter> tripRouterFactory) {
 		if (locked) throw new RuntimeException(this.getClass().toString() + " configuration has already been locked!");
 		this.withinDayTripRouterFactory = tripRouterFactory;
 	}
 
-	public TripRouterFactory getWithinDayTripRouterFactory() {
+	public Provider<TripRouter> getWithinDayTripRouterFactory() {
 		return this.withinDayTripRouterFactory;
 	}
-	
-	/**
-	 * Uses travel times from the travel time collector for car trips.
-	 */
-	public TripRouter getTripRouterInstance() {
-		TravelDisutility travelDisutility = this.travelDisutilityFactory.createTravelDisutility(this.getTravelTimeCollector(), 
-				this.scenario.getConfig().planCalcScore());
-		RoutingContext routingContext = new RoutingContextImpl(travelDisutility, this.getTravelTimeCollector());
-		return this.withinDayTripRouterFactory.instantiateAndConfigureTripRouter(routingContext);
-	}
-	
+
 	public FixedOrderSimulationListener getFixedOrderSimulationListener() {
 		return this.fosl;
 	}
@@ -228,7 +217,8 @@ public class WithinDayControlerListener implements StartupListener {
 		this.initWithinDayEngine(this.numReplanningThreads);
 		this.createAndInitEarliestLinkExitTimeProvider();
 		this.createAndInitMobsimDataProvider();
-		this.createAndInitTravelTimeCollector();
+		this.travelTimeCollector = controler.getInjector().getInstance(TravelTimeCollector.class);
+		this.initTravelTimeCollector();
 		this.createAndInitActivityReplanningMap();
 		this.createAndInitLinkReplanningMap();
 		
@@ -250,11 +240,7 @@ public class WithinDayControlerListener implements StartupListener {
 				this.transitRouterFactory = controler.getTransitRouterFactory();
 			} else log.info("TransitRouterFactory has already been set - it is NOT overwritten!");			
 		}
-		
-		if (this.withinDayTripRouterFactory == null) {
-			this.initWithinDayTripRouterFactory();
-		} else log.info("WithinDayTripRouterFactory has already been set - it is NOT re-initialized!");
-		
+
 		// disable possibility to set factories
 		this.locked = true;
 	}
@@ -274,21 +260,11 @@ public class WithinDayControlerListener implements StartupListener {
 		withinDayEngine.initializeReplanningModules(numOfThreads);
 	}
 
-	private void initWithinDayTripRouterFactory() {
-		TripRouterFactoryBuilderWithDefaults tripRouterFactoryBuilder = new TripRouterFactoryBuilderWithDefaults();
-		this.withinDayTripRouterFactory = tripRouterFactoryBuilder.build(this.scenario);
-	}	
-	
-	private void createAndInitTravelTimeCollector() {
-		this.createAndInitTravelTimeCollector(this.travelTimeCollectorModes);
-	}
-
-	private void createAndInitTravelTimeCollector(Set<String> analyzedModes) {
-		travelTimeCollector = new TravelTimeCollector(this.scenario, analyzedModes);
+	private void initTravelTimeCollector() {
 		fosl.addSimulationListener(travelTimeCollector);
 		this.eventsManager.addHandler(travelTimeCollector);
 	}
-		
+
 	private void createAndInitEarliestLinkExitTimeProvider() {
 		if (this.multiModalTravelTimes.size() == 0) {
 			this.earliestLinkExitTimeProvider = new EarliestLinkExitTimeProvider(this.scenario);

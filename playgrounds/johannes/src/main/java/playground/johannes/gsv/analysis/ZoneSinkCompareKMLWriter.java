@@ -22,17 +22,16 @@
  */
 package playground.johannes.gsv.analysis;
 
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.api.core.v01.population.Activity;
-
+import org.matsim.contrib.socnetgen.sna.gis.Zone;
+import org.matsim.contrib.socnetgen.sna.gis.ZoneLayer;
 import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTask;
 import playground.johannes.coopsim.pysical.Trajectory;
-import playground.johannes.coopsim.util.MatsimCoordUtils;
-import playground.johannes.sna.gis.Zone;
-import playground.johannes.sna.gis.ZoneLayer;
+import playground.johannes.coopsim.utils.MatsimCoordUtils;
+
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author johannes

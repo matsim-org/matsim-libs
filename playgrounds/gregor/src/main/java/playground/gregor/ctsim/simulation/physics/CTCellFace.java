@@ -16,6 +16,11 @@ public class CTCellFace {
 		this.y0 = y0;
 		this.nb = neighbor;
 		this.h_i = h_i;
+
 	}
-	
+
+	@Override
+	public String toString() {
+		return "dir: " + h_i + " nb_occ:" + nb.getRho() * nb.getAlpha();
+	}
 }
