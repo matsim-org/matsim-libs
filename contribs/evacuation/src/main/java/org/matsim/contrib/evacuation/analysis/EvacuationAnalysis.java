@@ -38,6 +38,7 @@ import org.matsim.contrib.evacuation.view.renderer.GridRenderer;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.handler.Vehicle2DriverEventHandler;
 
 import javax.swing.*;
 import java.awt.*;
@@ -227,7 +228,9 @@ public class EvacuationAnalysis extends AbstractModule {
         EventsManager e = EventsUtils.createEventsManager();
         EventsReaderXMLv1 reader = new EventsReaderXMLv1(e);
         this.readerThread = new Thread(new EventReaderThread(reader, eventFile.toString()), "readerthread");
-        this.eventHandler = new EventHandler(useCellCount, eventFile.getName(), this.controller.getScenario(), this.gridSize, this.readerThread);
+        Vehicle2DriverEventHandler vehicle2Driver = new Vehicle2DriverEventHandler();
+        e.addHandler(vehicle2Driver);
+        this.eventHandler = new EventHandler(useCellCount, eventFile.getName(), this.controller.getScenario(), this.gridSize, this.readerThread, vehicle2Driver);
         e.addHandler(this.eventHandler);
         this.readerThread.run();
 

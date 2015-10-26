@@ -52,12 +52,13 @@ import org.matsim.contrib.evacuation.analysis.control.vis.UtilizationVisualizer;
 import org.matsim.contrib.evacuation.analysis.data.Cell;
 import org.matsim.contrib.evacuation.analysis.data.ColorationMode;
 import org.matsim.contrib.evacuation.analysis.data.EventData;
+import org.matsim.core.events.handler.Vehicle2DriverEventHandler;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.QuadTree.Rect;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
 
-public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandler, PersonArrivalEventHandler, PersonDepartureEventHandler, Wait2LinkEventHandler, VehicleLeavesTrafficEventHandler, Runnable {
+public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandler, PersonArrivalEventHandler, PersonDepartureEventHandler, Runnable {
 
 	private HashMap<Integer, int[]> networkLinks = null;
 
@@ -97,10 +98,10 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 	
 	private boolean useCellCount = true;
 	private double sampleSize = 0.1;
-	
-	private final Map<Id<Vehicle>, Id<Person>> driverAgents = new HashMap<>();
 
-	public EventHandler(boolean useCellCount, String eventFilename, Scenario sc, double cellSize, Thread readerThread) {
+	private Vehicle2DriverEventHandler vehicle2Driver;
+
+	public EventHandler(boolean useCellCount, String eventFilename, Scenario sc, double cellSize, Thread readerThread, Vehicle2DriverEventHandler vehicle2Driver) {
 		this.useCellCount = useCellCount;
 		
 		this.sampleSize = Double.valueOf(sc.getConfig().getModule("evacuation").getValue("sampleSize"));
@@ -114,6 +115,8 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 		this.network = sc.getNetwork();
 		this.arrivalTimes = new ArrayList<Tuple<Double, Integer>>();
 		init();
+		
+		this.vehicle2Driver = vehicle2Driver;
 	}
 
 	public void setK(int k) {
@@ -268,7 +271,7 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		Id<Person> personId = driverAgents.get(event.getVehicleId());
+		Id<Person> personId = vehicle2Driver.getDriverOfVehicle(event.getVehicleId());
 		
 		if (personId.toString().contains("veh"))
 			return;
@@ -309,7 +312,7 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 
 		// get link id
 		Id<Link> linkId = event.getLinkId();
-		Id<Person> personId = driverAgents.get(event.getVehicleId());
+		Id<Person> personId = vehicle2Driver.getDriverOfVehicle(event.getVehicleId());
 
 		// get cell from person id
 		Link link = this.network.getLinks().get(linkId);
@@ -417,16 +420,6 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 	public void setTransparency(float cellTransparency) {
 		this.cellTransparency = cellTransparency;
 
-	}
-
-	@Override
-	public void handleEvent(Wait2LinkEvent event) {
-		driverAgents.put(event.getVehicleId(), event.getPersonId());
-	}
-
-	@Override
-	public void handleEvent(VehicleLeavesTrafficEvent event) {
-		driverAgents.remove(event.getVehicleId());
 	}
 
 }
