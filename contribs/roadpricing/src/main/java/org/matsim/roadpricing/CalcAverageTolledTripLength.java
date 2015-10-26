@@ -20,6 +20,10 @@
 
 package org.matsim.roadpricing;
 
+import java.util.TreeMap;
+
+import javax.inject.Inject;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
@@ -28,10 +32,9 @@ import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.events.handler.Vehicle2DriverEventHandler;
 import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
-
-import javax.inject.Inject;
-import java.util.TreeMap;
 
 /**
  * Calculates the distance of a trip which occurred on tolled links.
@@ -48,22 +51,27 @@ public class CalcAverageTolledTripLength implements LinkEnterEventHandler, Perso
 	private int cntTrips = 0;
 	private RoadPricingScheme scheme = null;
 	private Network network = null;
-	private TreeMap<Id, Double> agentDistance = null;
+	private TreeMap<Id<Person>, Double> agentDistance = null;
+
+	private Vehicle2DriverEventHandler vehicle2DriverEventHandler;
 	
 	private static Double zero = 0.0;
 
     @Inject
-	public CalcAverageTolledTripLength(final Network network, final RoadPricingScheme scheme) {
+	public CalcAverageTolledTripLength(final Network network, final RoadPricingScheme scheme, final Vehicle2DriverEventHandler vehicle2DriverEventHandler) {
 		this.scheme = scheme;
 		this.network = network;
 		this.agentDistance = new TreeMap<>();
+		this.vehicle2DriverEventHandler = vehicle2DriverEventHandler;
 	}
 
 	@Override
 	public void handleEvent(final LinkEnterEvent event) {
 		
+		Id<Person> driverId = vehicle2DriverEventHandler.getDriverOfVehicle(event.getVehicleId());
+		
 		// getting the (monetary? generalized?) cost of the link
-		Cost cost = this.scheme.getLinkCostInfo(event.getLinkId(), event.getTime(), event.getDriverId(), event.getVehicleId() );
+		Cost cost = this.scheme.getLinkCostInfo(event.getLinkId(), event.getTime(), driverId, event.getVehicleId() );
 		
 		if (cost != null) {
 			// i.e. if there is a toll on the link
@@ -72,7 +80,7 @@ public class CalcAverageTolledTripLength implements LinkEnterEventHandler, Perso
 			if (link != null) {
 				
 				// get some distance that has been accumulated (how?) up to this point:
-				Double length = this.agentDistance.get(event.getDriverId());
+				Double length = this.agentDistance.get(driverId);
 				
 				// if nothing has been accumlated so far, initialize this at zero:
 				if (length == null) {
@@ -83,7 +91,7 @@ public class CalcAverageTolledTripLength implements LinkEnterEventHandler, Perso
 				length = length + link.getLength();
 				
 				// put the result again in the "memory":
-				this.agentDistance.put(event.getDriverId(), length);
+				this.agentDistance.put(driverId, length);
 			}
 		}
 	}

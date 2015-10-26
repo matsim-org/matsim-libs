@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Injector;
+import org.matsim.core.events.handler.Vehicle2DriverEventHandler;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.TripRouterModule;
@@ -138,7 +139,10 @@ public class PlansCalcRouteWithTollOrNotTest {
 						addControlerListenerBinding().to(RoadPricingControlerListener.class);
 
 						// add the events handler to calculate the tolls paid by agents
-						bind(CalcPaidToll.class).in(Singleton.class);
+						bind(Vehicle2DriverEventHandler.class).in(Singleton.class);
+				        addEventHandlerBinding().to(Vehicle2DriverEventHandler.class);
+				        
+				        bind(CalcPaidToll.class).in(Singleton.class);
 						addEventHandlerBinding().to(CalcPaidToll.class);
 
 						bind(CalcAverageTolledTripLength.class).in(Singleton.class);

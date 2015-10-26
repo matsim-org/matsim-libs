@@ -29,6 +29,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.ControlerDefaults;
 import org.matsim.core.controler.ControlerDefaultsModule;
+import org.matsim.core.events.handler.Vehicle2DriverEventHandler;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 
 import javax.inject.Inject;
@@ -56,7 +57,7 @@ public class ControlerDefaultsWithRoadPricingModule extends AbstractModule {
         } else {
             bind(RoadPricingScheme.class).toProvider(RoadPricingSchemeProvider.class).in(Singleton.class);
         }
-
+        
         bind(PlansCalcRouteWithTollOrNot.class);
         addPlanStrategyBinding("ReRouteAreaToll").toProvider(ReRouteAreaToll.class);
 
@@ -71,6 +72,9 @@ public class ControlerDefaultsWithRoadPricingModule extends AbstractModule {
         addControlerListenerBinding().to(RoadPricingControlerListener.class);
 
         // add the events handler to calculate the tolls paid by agents
+        bind(Vehicle2DriverEventHandler.class).in(Singleton.class);
+        addEventHandlerBinding().to(Vehicle2DriverEventHandler.class);
+        
         bind(CalcPaidToll.class).in(Singleton.class);
         addEventHandlerBinding().to(CalcPaidToll.class);
 
