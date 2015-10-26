@@ -9,7 +9,6 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import playground.michalm.taxi.data.TaxiRequest;
 import playground.michalm.taxi.optimizer.*;
 import playground.michalm.taxi.optimizer.mip.MIPProblem.MIPSolution;
-import playground.michalm.taxi.vehreqpath.VehicleRequestPath;
 
 
 class MIPSolutionScheduler
@@ -78,7 +77,6 @@ class MIPSolutionScheduler
         VrpPathWithTravelData path = VrpPaths.calcAndCreatePath(earliestDeparture.link,
                 req.getFromLink(), earliestDeparture.time, router, optimConfig.travelTime, optimConfig.travelDisutility);
 
-        VehicleRequestPath vrPath = new VehicleRequestPath(currentVeh, req, path);
-        optimConfig.scheduler.scheduleRequest(vrPath);
+        optimConfig.scheduler.scheduleRequest(currentVeh, req, path);
     }
 }

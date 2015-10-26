@@ -23,17 +23,17 @@ import java.util.Queue;
 
 import playground.michalm.taxi.data.TaxiRequest;
 import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration;
-import playground.michalm.taxi.vehreqpath.*;
+import playground.michalm.taxi.vehreqpath.VehicleRequestFinder;
 
 
 public class FifoSchedulingProblem
 {
     private final TaxiOptimizerConfiguration optimConfig;
-    private final VehicleRequestPathFinder vrpFinder;
+    private final VehicleRequestFinder vrpFinder;
 
 
     public FifoSchedulingProblem(TaxiOptimizerConfiguration optimConfig,
-            VehicleRequestPathFinder vrpFinder)
+            VehicleRequestFinder vrpFinder)
     {
         this.optimConfig = optimConfig;
         this.vrpFinder = vrpFinder;
@@ -45,14 +45,14 @@ public class FifoSchedulingProblem
         while (!unplannedRequests.isEmpty()) {
             TaxiRequest req = unplannedRequests.peek();
 
-            VehicleRequestPath best = vrpFinder.findBestVehicleForRequest(req,
+            VehicleRequestFinder.Dispatch best = vrpFinder.findBestVehicleForRequest(req,
                     optimConfig.context.getVrpData().getVehicles().values());
 
             if (best == null) {//TODO won't work with req filtering; use VehicleData to find out when to exit???
                 return;
             }
 
-            optimConfig.scheduler.scheduleRequest(best);
+            optimConfig.scheduler.scheduleRequest(best.vehicle, best.request, best.path);
             unplannedRequests.poll();
         }
     }

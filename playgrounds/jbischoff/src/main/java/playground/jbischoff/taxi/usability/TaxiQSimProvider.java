@@ -53,7 +53,7 @@ import playground.michalm.taxi.optimizer.filter.FilterFactory;
 import playground.michalm.taxi.optimizer.rules.RuleBasedTaxiOptimizer;
 import playground.michalm.taxi.scheduler.TaxiScheduler;
 import playground.michalm.taxi.scheduler.TaxiSchedulerParams;
-import playground.michalm.taxi.vehreqpath.VehicleRequestPathFinder;
+import playground.michalm.taxi.vehreqpath.VehicleRequestFinder;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;

@@ -9,33 +9,53 @@ import org.matsim.contrib.dvrp.path.*;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.core.router.*;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
+import org.matsim.core.router.util.PreProcessDijkstra;
 
 import playground.michalm.taxi.data.TaxiRequest;
 import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration;
 import playground.michalm.taxi.scheduler.TaxiScheduler;
 
 
-public class VehicleRequestPathFinder
+public class VehicleRequestFinder
 {
+    public static class Dispatch
+    {
+        public final Vehicle vehicle;
+        public final TaxiRequest request;
+        public final VrpPathWithTravelData path;
+
+
+        public Dispatch(Vehicle vehicle, TaxiRequest request, VrpPathWithTravelData path)
+        {
+            this.vehicle = vehicle;
+            this.request = request;
+            this.path = path;
+        }
+    }
+
+
     private final TaxiOptimizerConfiguration optimConfig;
     private final MultiNodeDijkstra router;
     private final TaxiScheduler scheduler;
 
 
-    public VehicleRequestPathFinder(TaxiOptimizerConfiguration optimConfig)
+    public VehicleRequestFinder(TaxiOptimizerConfiguration optimConfig)
     {
         this.optimConfig = optimConfig;
         this.scheduler = optimConfig.scheduler;
 
-        router = new MultiNodeDijkstra(optimConfig.context.getScenario().getNetwork(),
-                optimConfig.travelDisutility, optimConfig.travelTime, false);
+        Network network = optimConfig.context.getScenario().getNetwork();
+        PreProcessDijkstra preProcessDijkstra = new PreProcessDijkstra();
+        preProcessDijkstra.run(network);
+
+        router = new MultiNodeDijkstra(network, optimConfig.travelDisutility,
+                optimConfig.travelTime, preProcessDijkstra, false);
     }
 
 
     //for immediate requests only
     //minimize TW
-    public VehicleRequestPath findBestVehicleForRequest(TaxiRequest req,
-            Iterable<? extends Vehicle> vehicles)
+    public Dispatch findBestVehicleForRequest(TaxiRequest req, Iterable<? extends Vehicle> vehicles)
     {
         double currTime = optimConfig.context.getTime();
         Link toLink = req.getFromLink();
@@ -46,11 +66,19 @@ public class VehicleRequestPathFinder
         for (Vehicle veh : vehicles) {
             LinkTimePair departure = scheduler.getImmediateDiversionOrEarliestIdleness(veh);
             if (departure != null) {
-                Node vehNode = departure.link == toLink ? //
-                        toNode : //hack: we are basically there (on the same link), so let's pretend vehNode == toNode
-                        departure.link.getToNode();
 
+                Node vehNode;
                 double delay = departure.time - currTime;
+                if (departure.link == toLink) {
+                    //hack: we are basically there (on the same link), so let's pretend vehNode == toNode
+                    vehNode = toNode;
+                }
+                else {
+                    vehNode = departure.link.getToNode();
+
+                    //simplified, but works for taxis, since pickup trips are short (about 5 mins)
+                    delay += 1 + toLink.getFreespeed(departure.time);
+                }
 
                 InitialNode existingInitialNode = initialNodes.get(vehNode.getId());
                 if (existingInitialNode == null || existingInitialNode.initialCost > delay) {
@@ -67,8 +95,7 @@ public class VehicleRequestPathFinder
 
         ImaginaryNode fromNodes = router.createImaginaryNode(initialNodes.values());
 
-        //calc path for currTime+1 (we need 1 second to move over the node)
-        Path path = router.calcLeastCostPath(fromNodes, toNode, currTime + 1, null, null);
+        Path path = router.calcLeastCostPath(fromNodes, toNode, currTime, null, null);
         //the calculated path contains real nodes (no imaginary/initial nodes),
         //the time and cost are of real travel (between the first and last real node)
         //(no initial times/costs for imaginary<->initial are included)
@@ -78,33 +105,39 @@ public class VehicleRequestPathFinder
 
         VrpPathWithTravelData vrpPath = VrpPaths.createPath(bestDeparture.link, toLink,
                 bestDeparture.time, path, optimConfig.travelTime, optimConfig.travelDisutility);
-        return new VehicleRequestPath(bestVehicle, req, vrpPath);
+        return new Dispatch(bestVehicle, req, vrpPath);
     }
 
 
     //for immediate requests only
     //minimize TP
-    public VehicleRequestPath findBestRequestForVehicle(Vehicle veh,
-            Iterable<TaxiRequest> unplannedRequests)
+    public Dispatch findBestRequestForVehicle(Vehicle veh, Iterable<TaxiRequest> unplannedRequests)
     {
         LinkTimePair departure = scheduler.getImmediateDiversionOrEarliestIdleness(veh);
-        Link fromLink = departure.link;
-        Node fromNode = fromLink.getToNode();
+        Node fromNode = departure.link.getToNode();
 
         Map<Id<Node>, TaxiRequest> initialRequests = new HashMap<>();
         Map<Id<Node>, InitialNode> initialNodes = new HashMap<>();
         for (TaxiRequest req : unplannedRequests) {
             Link reqLink = req.getFromLink();
 
-            Node reqNode = fromLink == reqLink ? //
-                    fromNode : //hack: we are basically there (on the same link), so let's pretend reqNode == fromNode
-                    reqLink.getFromNode();
+            if (departure.link == reqLink) {
+                VrpPathWithTravelData vrpPath = VrpPaths.createPath(departure.link, reqLink,
+                        departure.time, null, optimConfig.travelTime, optimConfig.travelDisutility);
+                return new Dispatch(veh, req, vrpPath);
+            }
 
-            InitialNode existingInitialNode = initialNodes.get(reqNode.getId());
-            if (existingInitialNode == null) {//works most fair if unplannedRequests are sorted by T0 (ascending)
-                InitialNode newInitialNode = new InitialNode(reqNode, 0, 0);
-                initialNodes.put(reqNode.getId(), newInitialNode);
-                initialRequests.put(reqNode.getId(), req);
+            Id<Node> reqNodeId = reqLink.getFromNode().getId();
+
+            if (!initialNodes.containsKey(reqNodeId)) {
+                //simplified, but works for taxis, since pickup trips are short (about 5 mins)
+                double delayAtLastLink = reqLink.getFreespeed(departure.time);
+
+                //works most fair (FIFO) if unplannedRequests are sorted by T0 (ascending)
+                InitialNode newInitialNode = new InitialNode(reqLink.getFromNode(), delayAtLastLink,
+                        delayAtLastLink);
+                initialNodes.put(reqNodeId, newInitialNode);
+                initialRequests.put(reqNodeId, req);
             }
         }
 
@@ -121,6 +154,6 @@ public class VehicleRequestPathFinder
         VrpPathWithTravelData vrpPath = VrpPaths.createPath(departure.link,
                 bestRequest.getFromLink(), departure.time, path, optimConfig.travelTime,
                 optimConfig.travelDisutility);
-        return new VehicleRequestPath(veh, bestRequest, vrpPath);
+        return new Dispatch(veh, bestRequest, vrpPath);
     }
 }

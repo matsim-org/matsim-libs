@@ -15,7 +15,7 @@ import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration;
 import playground.michalm.taxi.schedule.TaxiTask;
 import playground.michalm.taxi.schedule.TaxiTask.TaxiTaskType;
 import playground.michalm.taxi.scheduler.TaxiScheduler;
-import playground.michalm.taxi.vehreqpath.*;
+import playground.michalm.taxi.vehreqpath.VehicleRequestFinder;
 
 
 public class NPersonsVehicleRequestPathFinder
@@ -40,11 +40,11 @@ public class NPersonsVehicleRequestPathFinder
     }
 
 
-    public VehicleRequestPath findBestVehicleForRequest(TaxiRequest req,
+    public VehicleRequestFinder.Dispatch findBestVehicleForRequest(TaxiRequest req,
             Iterable<? extends Vehicle> vehicles)
     {
 
-        VehicleRequestPath bestVrp = null;
+        VehicleRequestFinder.Dispatch bestVrp = null;
         double bestCost = Double.MAX_VALUE;
 
         for (Vehicle veh : vehicles) {
@@ -55,7 +55,7 @@ public class NPersonsVehicleRequestPathFinder
                 continue;
             }
 
-            VehicleRequestPath vrp = new VehicleRequestPath(veh, req, path);
+            VehicleRequestFinder.Dispatch vrp = new VehicleRequestFinder.Dispatch(veh, req, path);
             double cost = VehicleRequestPaths.TW_COST.getCost(vrp);
 
             if (cost < bestCost) {
@@ -69,10 +69,10 @@ public class NPersonsVehicleRequestPathFinder
     }
 
 
-    public VehicleRequestPath findBestRequestForVehicle(Vehicle veh,
+    public VehicleRequestFinder.Dispatch findBestRequestForVehicle(Vehicle veh,
             Iterable<TaxiRequest> unplannedRequests)
     {
-        VehicleRequestPath bestVrp = null;
+        VehicleRequestFinder.Dispatch bestVrp = null;
         double bestCost = Double.MAX_VALUE;
 
         for (TaxiRequest req : unplannedRequests) {
@@ -82,7 +82,7 @@ public class NPersonsVehicleRequestPathFinder
                 continue;
             }
 
-            VehicleRequestPath vrp = new VehicleRequestPath(veh, req, path);
+            VehicleRequestFinder.Dispatch vrp = new VehicleRequestFinder.Dispatch(veh, req, path);
             double cost = VehicleRequestPaths.TP_COST.getCost(vrp);
 
             if (cost < bestCost) {

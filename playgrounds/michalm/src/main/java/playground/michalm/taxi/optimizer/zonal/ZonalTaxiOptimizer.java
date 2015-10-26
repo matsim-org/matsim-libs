@@ -30,7 +30,7 @@ import playground.michalm.taxi.data.TaxiRequest;
 import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration;
 import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration.Goal;
 import playground.michalm.taxi.optimizer.rules.RuleBasedTaxiOptimizer;
-import playground.michalm.taxi.vehreqpath.VehicleRequestPath;
+import playground.michalm.taxi.vehreqpath.VehicleRequestFinder;
 import playground.michalm.zone.*;
 
 
@@ -118,11 +118,11 @@ public class ZonalTaxiOptimizer
             }
 
             Iterable<Vehicle> filteredVehs = Collections.singleton(idleVehsInZone.peek());
-            VehicleRequestPath best = vrpFinder.findBestVehicleForRequest(req,
-                    filteredVehs);
+            VehicleRequestFinder.Dispatch best = vrpFinder
+                    .findBestVehicleForRequest(req, filteredVehs);
 
             if (best != null) {
-                optimConfig.scheduler.scheduleRequest(best);
+                optimConfig.scheduler.scheduleRequest(best.vehicle, best.request, best.path);
                 reqIter.remove();
                 idleVehsInZone.remove(best.vehicle);
             }

@@ -21,143 +21,177 @@ package playground.michalm.taxi.optimizer.assignment;
 
 import java.util.*;
 
-import org.apache.commons.math3.stat.descriptive.rank.Max;
-import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.*;
 import org.matsim.contrib.dvrp.path.*;
-import org.matsim.contrib.dvrp.router.DijkstraWithThinPath;
-import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.contrib.util.DistanceUtils;
+import org.matsim.core.router.*;
+import org.matsim.core.router.util.LeastCostPathCalculator.Path;
+import org.matsim.core.router.util.PreProcessDijkstra;
 
 import playground.michalm.taxi.data.TaxiRequest;
 import playground.michalm.taxi.optimizer.*;
-import playground.michalm.taxi.vehreqpath.VehicleRequestPath;
 
 
 public class AssignmentProblem
 {
-    private final double NULL_PATH_COST = 48 * 60 * 60; //2 days
+    private static final double NULL_PATH_COST = 48 * 60 * 60; //2 days
 
     private final TaxiOptimizerConfiguration optimConfig;
-    private final LeastCostPathCalculator router;
+    private final MultiNodeDijkstra router;
 
-    private SortedSet<TaxiRequest> unplannedRequests;
+    private final double maxDistance2 = 5_000 * 5_0000; //5 km
+    private final double planningHorizon = 1800; //30 min
+
     private VehicleData vData;
     private AssignmentRequestData rData;
+
 
     public AssignmentProblem(TaxiOptimizerConfiguration optimConfig)
     {
         this.optimConfig = optimConfig;
-        router = new DijkstraWithThinPath(optimConfig.context.getScenario().getNetwork(),
-                optimConfig.travelDisutility, optimConfig.travelTime);
+
+        Network network = optimConfig.context.getScenario().getNetwork();
+        PreProcessDijkstra preProcessDijkstra = new PreProcessDijkstra();
+        preProcessDijkstra.run(network);
+
+        router = new MultiNodeDijkstra(network, optimConfig.travelDisutility,
+                optimConfig.travelTime, preProcessDijkstra, true);
     }
 
 
     public void scheduleUnplannedRequests(SortedSet<TaxiRequest> unplannedRequests)
     {
-        this.unplannedRequests = unplannedRequests;
-
-        if (!initDataAndCheckIfSchedulingRequired()) {
-            return;
+        if (initDataAndCheckIfSchedulingRequired(unplannedRequests)) {
+            RequestPathData[][] pathDataMatrix = createPathDataMatrix();
+            double[][] costMatrix = createCostMatrix(pathDataMatrix);
+            int[] assignments = new HungarianAlgorithm(costMatrix).execute();
+            scheduleRequests(assignments, pathDataMatrix, unplannedRequests);
         }
-
-        List<VrpPathWithTravelData[]> pathsByReq = createVrpPaths();
-        double[][] reqToVehCostMatrix = createReqToVehCostMatrix(pathsByReq);
-        int[] reqToVehAssignments = new HungarianAlgorithm(reqToVehCostMatrix).execute();
-
-        scheduleRequests(reqToVehAssignments, pathsByReq);
     }
 
 
-    private boolean initDataAndCheckIfSchedulingRequired()
+    private boolean initDataAndCheckIfSchedulingRequired(SortedSet<TaxiRequest> unplannedRequests)
     {
-        rData = new AssignmentRequestData(optimConfig, unplannedRequests);
+        rData = new AssignmentRequestData(optimConfig, unplannedRequests, planningHorizon);
         if (rData.dimension == 0) {
             return false;
         }
 
-        vData = new VehicleData(optimConfig);
+        vData = new VehicleData(optimConfig, planningHorizon);
         return vData.dimension > 0;
     }
 
 
-    private List<VrpPathWithTravelData[]> createVrpPaths()
+    private static class RequestPathData
     {
-        List<VrpPathWithTravelData[]> paths = new ArrayList<>(rData.urgentReqCount);
-
-        //if only imm reqs then rMin = rData.urgentReqCount = rData.dimension
-        //if both imm+adv then rMin should be urgentReqCount + soonUrgentReqCount
-
-        int rMin = rData.urgentReqCount;//include also "soonUrgentReqCount" if "adv" reqs
-        if (rMin < vData.dimension) {
-            rMin = Math.min(rData.dimension, vData.dimension);
-        }
-
-        Max maxArrivalTimeForRMinRequests = new Max();//heuristics
-
-        for (int r = 0; r < rMin; r++) {
-            TaxiRequest req = rData.requests[r];
-            VrpPathWithTravelData[] reqPaths = createVrpPathsForRequest(req);
-            paths.add(reqPaths);
-
-            for (VrpPathWithTravelData path : reqPaths) {
-                if (path != null) {
-                    maxArrivalTimeForRMinRequests.increment(path.getArrivalTime());
-                }
-            }
-        }
-
-        for (int r = rMin; r < rData.dimension; r++) {
-            TaxiRequest req = rData.requests[r];
-            if (req.getT0() > maxArrivalTimeForRMinRequests.getResult()) {
-                break;
-            }
-
-            paths.add(createVrpPathsForRequest(req));
-        }
-
-        return paths;
+        private Node reqNode;//destination
+        private double delay;//at the first and last links
+        private Path path;//shortest path
     }
 
 
-    private VrpPathWithTravelData[] createVrpPathsForRequest(TaxiRequest req)
+    private RequestPathData[][] createPathDataMatrix()
     {
-        VrpPathWithTravelData[] reqPaths = new VrpPathWithTravelData[vData.dimension];
-
-        for (int v = 0; v < vData.dimension; v++) {
-            VehicleData.Entry departure = getVehicleDataEntry(v);
-            reqPaths[v] = VrpPaths.calcAndCreatePath(departure.link, req.getFromLink(),
-                    departure.time, router, optimConfig.travelTime, optimConfig.travelDisutility);
+        RequestPathData[][] pathDataMatrix = new RequestPathData[vData.entries.size()][];
+        for (int v = 0; v < pathDataMatrix.length; v++) {
+            pathDataMatrix[v] = calcPathsForVehicle(vData.entries.get(v));
         }
-
-        return reqPaths;
+        return pathDataMatrix;
     }
 
 
-    private double[][] createReqToVehCostMatrix(List<VrpPathWithTravelData[]> pathsByReq)
+    private RequestPathData[] calcPathsForVehicle(VehicleData.Entry departure)
     {
-        boolean reduceTP = doReduceTP();
-        double[][] reqToVehCostMatrix = new double[pathsByReq.size()][vData.dimension];
+        Node fromNode = departure.link.getToNode();
 
-        for (int r = 0; r < reqToVehCostMatrix.length; r++) {
-            TaxiRequest req = rData.requests[r];
-            VrpPathWithTravelData[] reqPaths = pathsByReq.get(r);
+        Map<Id<Node>, InitialNode> initialNodes = new HashMap<>();
+        Map<Id<Node>, Path> pathsToEndNodes = new HashMap<>();
+        RequestPathData[] pathDataArray = new RequestPathData[rData.dimension];
 
-            for (int v = 0; v < vData.dimension; v++) {
-                VrpPathWithTravelData path = reqPaths[v];
+        for (int r = 0; r < rData.dimension; r++) {
+            RequestPathData pathData = pathDataArray[r] = new RequestPathData();
+            TaxiRequest req = rData.requests.get(r);
+            Link reqLink = req.getFromLink();
 
-                if (path == null) {
-                    reqToVehCostMatrix[r][v] = NULL_PATH_COST;
+            if (departure.link == reqLink) {
+                //hack: we are basically there (on the same link), so let's pretend reqNode == fromNode
+                pathData.reqNode = departure.link.getToNode();
+                pathData.delay = 0;
+            }
+            else {
+                pathData.reqNode = reqLink.getFromNode();
+                double distance2 = DistanceUtils.calculateSquaredDistance(fromNode,
+                        pathData.reqNode);
+
+                if (distance2 <= maxDistance2) {
+                    //simplified, but works for taxis, since pickup trips are short (about 5 mins)
+                    pathData.delay = 1 + reqLink.getFreespeed(departure.time);
                 }
                 else {
-                    double pickupBeginTime = Math.max(req.getT0(), path.getArrivalTime());
-
-                    reqToVehCostMatrix[r][v] = reduceTP ? //
-                            pickupBeginTime - getVehicleDataEntry(v).time : //T_P
-                            pickupBeginTime;//T_W
+                    pathData.delay = NULL_PATH_COST;
+                    continue;//skip this request/node
                 }
+            }
+
+            if (!initialNodes.containsKey(pathData.reqNode.getId())) {
+                InitialNode newInitialNode = new InitialNode(pathData.reqNode, 0, 0);
+                initialNodes.put(pathData.reqNode.getId(), newInitialNode);
             }
         }
 
-        return reqToVehCostMatrix;
+        if (initialNodes.isEmpty()) {
+            throw new IllegalStateException("Unsupported; may be caused by too small maxDistance");
+        }
+
+        ImaginaryNode toNodes = router.createImaginaryNode(initialNodes.values());
+
+        Path path = router.calcLeastCostPath(fromNode, toNodes, departure.time, null, null);
+        Node toNode = path.nodes.get(path.nodes.size() - 1);
+        pathsToEndNodes.put(toNode.getId(), path);
+
+        //get paths for all remaining endNodes 
+        for (InitialNode i : initialNodes.values()) {
+            Node endNode = i.node;
+            if (endNode.getId() != toNode.getId()) {
+                path = router.constructPath(fromNode, endNode, departure.time);
+                pathsToEndNodes.put(endNode.getId(), path);
+            }
+        }
+
+        for (int r = 0; r < rData.dimension; r++) {
+            RequestPathData pathData = pathDataArray[r];
+            if (pathData.delay != NULL_PATH_COST) {
+                pathData.path = pathsToEndNodes.get(pathData.reqNode.getId());
+            }
+        }
+
+        return pathDataArray;
+    }
+
+
+    private double[][] createCostMatrix(RequestPathData[][] pathDataMatrix)
+    {
+        boolean reduceTP = doReduceTP();
+        double[][] costMatrix = new double[vData.dimension][rData.dimension];
+
+        for (int v = 0; v < vData.dimension; v++) {
+            VehicleData.Entry departure = vData.entries.get(v);
+
+            for (int r = 0; r < rData.dimension; r++) {
+                RequestPathData pathData = pathDataMatrix[v][r];
+
+                double travelTime = pathData.delay == NULL_PATH_COST ? //
+                        NULL_PATH_COST : // no path (too far away)
+                        pathData.delay + pathData.path.travelTime;
+
+                costMatrix[v][r] = reduceTP ? //
+                        travelTime : // T_P
+                        Math.max(departure.time + travelTime - rData.requests.get(r).getT0(), 0); //T_W
+            }
+        }
+
+        return costMatrix;
     }
 
 
@@ -179,29 +213,27 @@ public class AssignmentProblem
     }
 
 
-    private void scheduleRequests(int[] reqToVehAssignments,
-            List<VrpPathWithTravelData[]> pathsByReq)
+    private void scheduleRequests(int[] assignments, RequestPathData[][] pathDataMatrix,
+            SortedSet<TaxiRequest> unplannedRequests)
     {
-        for (int r = 0; r < reqToVehAssignments.length; r++) {
-            int v = reqToVehAssignments[r];
+        for (int v = 0; v < assignments.length; v++) {
+            int r = assignments[v];
 
-            if (v == -1 || //no vehicle assigned
-                    v >= vData.dimension) {// non-existing vehicle assigned
+            if (r == -1 || //no request assigned
+                    r >= rData.dimension) {// non-existing (dummy) request assigned
                 continue;
             }
 
-            VrpPathWithTravelData path = pathsByReq.get(r)[v];
+            VehicleData.Entry departure = vData.entries.get(v);
+            TaxiRequest req = rData.requests.get(r);
+            RequestPathData pathData = pathDataMatrix[v][r];
 
-            Vehicle veh = getVehicleDataEntry(v).vehicle;
-            TaxiRequest req = rData.requests[r];
-            optimConfig.scheduler.scheduleRequest(new VehicleRequestPath(veh, req, path));
+            VrpPathWithTravelData vrpPath = VrpPaths.createPath(departure.link, req.getFromLink(),
+                    departure.time, pathData.path, optimConfig.travelTime,
+                    optimConfig.travelDisutility);
+
+            optimConfig.scheduler.scheduleRequest(departure.vehicle, req, vrpPath);
             unplannedRequests.remove(req);
         }
-    }
-
-
-    private VehicleData.Entry getVehicleDataEntry(int idx)
-    {
-        return vData.entries.get(idx);
     }
 }

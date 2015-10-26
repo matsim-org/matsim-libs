@@ -18,7 +18,7 @@ public class NPersonsProblem {
 	private final TaxiOptimizerConfiguration optimConfig;
     private static Logger log = Logger.getLogger(NPersonsProblem.class);
     private final LeastCostPathCalculator router;
-    private final VehicleRequestPathFinder vrpFinder;
+    private final VehicleRequestFinder vrpFinder;
 
 
     public NPersonsProblem(TaxiOptimizerConfiguration optimConfig)
@@ -27,7 +27,7 @@ public class NPersonsProblem {
         router = new Dijkstra(optimConfig.context.getScenario().getNetwork(),
                 optimConfig.travelDisutility, optimConfig.travelTime);
         
-        vrpFinder = new VehicleRequestPathFinder(optimConfig);
+        vrpFinder = new VehicleRequestFinder(optimConfig);
     }
 
 
@@ -51,10 +51,10 @@ public class NPersonsProblem {
         	if(optimConfig.context.getVrpData().getVehicles().size()>0&&optimConfig.context.getTime() > 32000){
         		System.out.print("");
         	}
-        	List<VehicleRequestPath> requests = new ArrayList<VehicleRequestPath>();
+        	List<VehicleRequestFinder.Dispatch> requests = new ArrayList<VehicleRequestFinder.Dispatch>();
             TaxiRequest req = unplannedRequests.peek();
 
-            VehicleRequestPath best = vrpFinder.findBestVehicleForRequest(req,
+            VehicleRequestFinder.Dispatch best = vrpFinder.findBestVehicleForRequest(req,
                     optimConfig.context.getVrpData().getVehicles().values());
 
             if (best == null) {

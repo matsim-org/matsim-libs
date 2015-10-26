@@ -17,7 +17,7 @@ import playground.michalm.taxi.data.TaxiRequest.TaxiRequestStatus;
 import playground.michalm.taxi.schedule.*;
 import playground.michalm.taxi.scheduler.TaxiScheduler;
 import playground.michalm.taxi.scheduler.TaxiSchedulerParams;
-import playground.michalm.taxi.vehreqpath.VehicleRequestPath;
+import playground.michalm.taxi.vehreqpath.*;
 
 public class PrtScheduler extends TaxiScheduler {
 
@@ -29,7 +29,7 @@ public class PrtScheduler extends TaxiScheduler {
 		this.params = params;
 	}
 	
-	public void scheduleRequests(VehicleRequestPath best, List<VehicleRequestPath> requests) {
+	public void scheduleRequests(VehicleRequestFinder.Dispatch best, List<VehicleRequestFinder.Dispatch> requests) {
 		
 		if (best.request.getStatus() != TaxiRequestStatus.UNPLANNED) {
           throw new IllegalStateException();
@@ -69,7 +69,7 @@ public class PrtScheduler extends TaxiScheduler {
       
       List<TaxiRequest> req = new ArrayList<TaxiRequest>();
       
-      for(VehicleRequestPath p : requests){
+      for(VehicleRequestFinder.Dispatch p : requests){
     	  req.add(p.request);
       }
 
@@ -86,15 +86,15 @@ public class PrtScheduler extends TaxiScheduler {
 		
 	}
 	
-	private void appendRequestToExistingScheduleTasks(VehicleRequestPath best,
-			List<VehicleRequestPath> requests) {
+	private void appendRequestToExistingScheduleTasks(VehicleRequestFinder.Dispatch best,
+			List<VehicleRequestFinder.Dispatch> requests) {
 		
 		Schedule<TaxiTask> sched = TaxiSchedules.asTaxiSchedule(best.vehicle.getSchedule());
 		
 		for(TaxiTask task : sched.getTasks()){
 			
 			if(task instanceof NPersonsPickupStayTask){
-				for(VehicleRequestPath vrp : requests){
+				for(VehicleRequestFinder.Dispatch vrp : requests){
 					if(vrp.path.getDepartureTime() < task.getBeginTime() && !task.getStatus().equals(TaskStatus.PERFORMED)){
 						((NPersonsPickupStayTask)task).appendRequest(vrp.request, this.params.pickupDuration);
 					}

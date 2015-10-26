@@ -26,7 +26,7 @@ import playground.michalm.taxi.data.TaxiRequest;
 import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration;
 import playground.michalm.taxi.schedule.*;
 import playground.michalm.taxi.scheduler.TaxiScheduler;
-import playground.michalm.taxi.vehreqpath.VehicleRequestPath;
+import playground.michalm.taxi.vehreqpath.*;
 
 public class PrtOptimizer implements VrpOptimizerWithOnlineTracking, MobsimBeforeSimStepListener {
 
@@ -129,11 +129,11 @@ public class PrtOptimizer implements VrpOptimizerWithOnlineTracking, MobsimBefor
 
             Iterable<Vehicle> filteredVehs = idleVehicleFinder.filterVehiclesForRequest(idleVehicles,
                     req);
-            VehicleRequestPath best = vrpFinder.findBestVehicleForRequest(req,
+            VehicleRequestFinder.Dispatch best = vrpFinder.findBestVehicleForRequest(req,
                     filteredVehs);
 
             if (best != null) {
-                this.scheduler.scheduleRequest(best);
+                this.scheduler.scheduleRequest(best.vehicle, best.request, best.path);
                 reqIter.remove();
                 idleVehicles.remove(best.vehicle);
             }

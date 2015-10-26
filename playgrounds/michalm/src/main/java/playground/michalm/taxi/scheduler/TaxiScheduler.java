@@ -36,7 +36,6 @@ import playground.michalm.taxi.data.TaxiRequest;
 import playground.michalm.taxi.data.TaxiRequest.TaxiRequestStatus;
 import playground.michalm.taxi.schedule.*;
 import playground.michalm.taxi.schedule.TaxiTask.TaxiTaskType;
-import playground.michalm.taxi.vehreqpath.VehicleRequestPath;
 
 
 public class TaxiScheduler
@@ -186,28 +185,27 @@ public class TaxiScheduler
 
     //=========================================================================================
 
-    public void scheduleRequest(VehicleRequestPath best)
+    public void scheduleRequest(Vehicle vehicle, TaxiRequest request, VrpPathWithTravelData vrpPath)
     {
-        if (best.request.getStatus() != TaxiRequestStatus.UNPLANNED) {
+        if (request.getStatus() != TaxiRequestStatus.UNPLANNED) {
             throw new IllegalStateException();
         }
 
-        Schedule<TaxiTask> bestSched = TaxiSchedules.asTaxiSchedule(best.vehicle.getSchedule());
+        Schedule<TaxiTask> bestSched = TaxiSchedules.asTaxiSchedule(vehicle.getSchedule());
         TaxiTask lastTask = Schedules.getLastTask(bestSched);
 
         if (lastTask.getTaxiTaskType() == TaxiTaskType.DRIVE_EMPTY) {
-            divertDriveToRequest((TaxiDriveTask)lastTask, best);
+            divertDriveToRequest((TaxiDriveTask)lastTask, vrpPath);
         }
         else if (lastTask.getTaxiTaskType() == TaxiTaskType.STAY) {
-            scheduleDriveToRequest((TaxiStayTask)lastTask, best);
+            scheduleDriveToRequest((TaxiStayTask)lastTask, vrpPath);
         }
         else {
             throw new IllegalStateException();
         }
 
-        double t3 = Math.max(best.path.getArrivalTime(), best.request.getT0())
-                + params.pickupDuration;
-        bestSched.addTask(new TaxiPickupTask(best.path.getArrivalTime(), t3, best.request));
+        double t3 = Math.max(vrpPath.getArrivalTime(), request.getT0()) + params.pickupDuration;
+        bestSched.addTask(new TaxiPickupTask(vrpPath.getArrivalTime(), t3, request));
 
         if (params.destinationKnown) {
             appendDriveAndDropoffAfterPickup(bestSched);
@@ -216,33 +214,33 @@ public class TaxiScheduler
     }
 
 
-    private void divertDriveToRequest(TaxiDriveTask lastTask, VehicleRequestPath best)
+    private void divertDriveToRequest(TaxiDriveTask lastTask, VrpPathWithTravelData vrpPath)
     {
         if (!params.vehicleDiversion) {
             throw new IllegalStateException();
         }
 
-        ((OnlineDriveTaskTracker)lastTask.getTaskTracker()).divertPath(best.path);
+        ((OnlineDriveTaskTracker)lastTask.getTaskTracker()).divertPath(vrpPath);
     }
 
 
-    private void scheduleDriveToRequest(TaxiStayTask lastTask, VehicleRequestPath best)
+    private void scheduleDriveToRequest(TaxiStayTask lastTask, VrpPathWithTravelData vrpPath)
     {
         Schedule<TaxiTask> bestSched = TaxiSchedules.asTaxiSchedule(lastTask.getSchedule());
 
         switch (lastTask.getStatus()) {
             case PLANNED:
-                if (lastTask.getBeginTime() == best.path.getDepartureTime()) { // waiting for 0 seconds!!!
+                if (lastTask.getBeginTime() == vrpPath.getDepartureTime()) { // waiting for 0 seconds!!!
                     bestSched.removeLastTask();// remove WaitTask
                 }
                 else {
                     // actually this WAIT task will not be performed
-                    lastTask.setEndTime(best.path.getDepartureTime());// shortening the WAIT task
+                    lastTask.setEndTime(vrpPath.getDepartureTime());// shortening the WAIT task
                 }
                 break;
 
             case STARTED:
-                lastTask.setEndTime(best.path.getDepartureTime());// shortening the WAIT task
+                lastTask.setEndTime(vrpPath.getDepartureTime());// shortening the WAIT task
                 break;
 
             case PERFORMED:
@@ -250,8 +248,8 @@ public class TaxiScheduler
                 throw new IllegalStateException();
         }
 
-        if (best.path.getLinkCount() > 1) {
-            bestSched.addTask(new TaxiDriveTask(best.path));
+        if (vrpPath.getLinkCount() > 1) {
+            bestSched.addTask(new TaxiDriveTask(vrpPath));
         }
     }
 

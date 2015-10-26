@@ -19,9 +19,7 @@
 
 package playground.michalm.taxi.optimizer.assignment;
 
-import java.util.SortedSet;
-
-import org.matsim.contrib.dvrp.data.Requests;
+import java.util.*;
 
 import playground.michalm.taxi.data.TaxiRequest;
 import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration;
@@ -29,19 +27,29 @@ import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration;
 
 class AssignmentRequestData
 {
-    final TaxiRequest[] requests;
+    final List<TaxiRequest> requests = new ArrayList<>();
     final int urgentReqCount;
     final int dimension;
 
 
     AssignmentRequestData(TaxiOptimizerConfiguration optimConfig,
-            SortedSet<TaxiRequest> unplannedRequests)
+            SortedSet<TaxiRequest> unplannedRequests, double planningHorizon)
     {
-        dimension = unplannedRequests.size();//TODO - consider only awaiting and "soon-awaiting" reqs!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        double currTime = optimConfig.context.getTime();
+        double maxT0 = currTime + planningHorizon;
+        int urgentReqCounter = 0;
 
-        urgentReqCount = Requests.countRequests(unplannedRequests,
-                new Requests.IsUrgentPredicate(optimConfig.context.getTime()));
+        for (TaxiRequest r : unplannedRequests) {
+            double t0 = r.getT0();
+            if (t0 <= maxT0) {
+                requests.add(r);
+                if (t0 < currTime) {
+                    urgentReqCounter++;
+                }
+            }
+        }
 
-        requests = unplannedRequests.toArray(new TaxiRequest[dimension]);
+        urgentReqCount = urgentReqCounter;
+        dimension = unplannedRequests.size();
     }
 }

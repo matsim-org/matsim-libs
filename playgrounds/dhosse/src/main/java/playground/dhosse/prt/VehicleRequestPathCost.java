@@ -19,9 +19,10 @@
 
 package playground.dhosse.prt;
 
-import playground.michalm.taxi.vehreqpath.VehicleRequestPath;
+import playground.michalm.taxi.vehreqpath.VehicleRequestFinder;
+
 
 public interface VehicleRequestPathCost
 {
-    double getCost(VehicleRequestPath vrp);
+    double getCost(VehicleRequestFinder.Dispatch vrp);
 }

@@ -25,18 +25,18 @@ import org.matsim.contrib.dvrp.data.Requests;
 
 import playground.michalm.taxi.data.TaxiRequest;
 import playground.michalm.taxi.optimizer.*;
-import playground.michalm.taxi.vehreqpath.VehicleRequestPathFinder;
+import playground.michalm.taxi.vehreqpath.VehicleRequestFinder;
 
 
 public class FifoTaxiOptimizer
     extends AbstractTaxiOptimizer
 {
-    private final VehicleRequestPathFinder vrpFinder;
+    private final VehicleRequestFinder vrpFinder;
 
     public FifoTaxiOptimizer(TaxiOptimizerConfiguration optimConfig)
     {
         super(optimConfig, new PriorityQueue<TaxiRequest>(100, Requests.T0_COMPARATOR), true);
-        vrpFinder = new VehicleRequestPathFinder(optimConfig);
+        vrpFinder = new VehicleRequestFinder(optimConfig);
     }
 
 
