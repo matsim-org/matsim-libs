@@ -68,20 +68,27 @@ public class IntervalHandler implements ActivityStartEventHandler, ActivityEndEv
 			if(recognisedPersons.contains(event.getPersonId())){	
 				// time interval of activity
 				double prevDuration = duration.get(currentTimeBin)[xCell][yCell];
-
-				if (prevDuration>timeBinSize) {
-					prevDuration = prevDuration - timeWithinCurrentInterval;
-					duration.get(currentTimeBin)[xCell][yCell] = prevDuration;
-				}
+				
+				double updatedDuration = prevDuration - timeBinSize + timeWithinCurrentInterval;
+				duration.get(currentTimeBin)[xCell][yCell] = updatedDuration;
+				
+//				if (prevDuration>timeBinSize) { // this looks completely illogical because prevDuration is sum of actDurations in that time bin for all persons amit Oct'15
+//					prevDuration = prevDuration - timeWithinCurrentInterval;
+//					duration.get(currentTimeBin)[xCell][yCell] = prevDuration;
+//				}
 				currentTimeBin += timeBinSize;
 
 				// later time intervals
 				while(currentTimeBin <= simulationEndTime){
+					
 					double prevDurationL = duration.get(currentTimeBin)[xCell][yCell];
-					if (prevDurationL>timeBinSize) {
-						prevDurationL = prevDurationL - timeBinSize;
-						duration.get(currentTimeBin)[xCell][yCell] = prevDurationL;
-					}
+					duration.get(currentTimeBin)[xCell][yCell] = prevDurationL - timeBinSize;
+					
+//					if (prevDurationL>timeBinSize) {
+//						prevDurationL = prevDurationL - timeBinSize;
+//						duration.get(currentTimeBin)[xCell][yCell] = prevDurationL;
+//					}
+					
 					currentTimeBin += timeBinSize;
 				}
 			}else{ // person not yet recognised
@@ -93,7 +100,7 @@ public class IntervalHandler implements ActivityStartEventHandler, ActivityEndEv
 					tb += timeBinSize;
 				}
 				// time bin of event
-				duration.get(currentTimeBin)[xCell][yCell]+=timeWithinCurrentInterval;
+				duration.get(currentTimeBin)[xCell][yCell] += timeWithinCurrentInterval;
 			}
 		}
 	}
