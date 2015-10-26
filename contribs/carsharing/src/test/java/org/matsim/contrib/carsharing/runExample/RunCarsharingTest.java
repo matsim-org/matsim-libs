@@ -187,16 +187,16 @@ public class RunCarsharingTest {
 					}
 				} else if ( iteration==10 ) {
 					if ( TransportMode.car.equals(legMode) ) {
-						Assert.assertEquals(10, nOfModeLegs );
+						Assert.assertEquals(4, nOfModeLegs );
 					} else if ( "freefloating".equals(legMode) ) {
 						Assert.assertEquals( 1, nOfModeLegs ) ;
 					} else if ( "onewaycarsharing".equals(legMode) ) {
 						Assert.assertEquals( 1, nOfModeLegs ) ;
 					} else if ( "twowaycarsharing".equals(legMode) ) {
-						Assert.assertEquals( 4, nOfModeLegs ) ;
+						Assert.assertEquals( 6, nOfModeLegs ) ;
 					}
 					else if ( "walk_rb".equals(legMode) ) {
-						Assert.assertEquals( 4, nOfModeLegs ) ; 
+						Assert.assertEquals( 6, nOfModeLegs ) ; 
 					}
 				}
 			}
