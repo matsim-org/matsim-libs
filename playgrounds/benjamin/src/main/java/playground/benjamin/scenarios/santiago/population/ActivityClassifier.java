@@ -38,19 +38,20 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.misc.Time;
 
 /**
  * @author amit
  */
-public class AddingActivitiesInPlans {
+public class ActivityClassifier {
 
-	public AddingActivitiesInPlans(Scenario scenario) {
+	public ActivityClassifier(Scenario scenario) {
 		this.sc = scenario;
 		actType2TypDur = new TreeMap<String, Double>();
 		log.info("Typical durations calculated by this class are rounded down to full hours.");
 	}
 
-	public static final Logger log = Logger.getLogger(AddingActivitiesInPlans.class.getSimpleName());
+	public static final Logger log = Logger.getLogger(ActivityClassifier.class.getSimpleName());
 	private Scenario sc ;
 	private int zeroDurCount =0;
 	private SortedMap<String, Double> actType2TypDur;
@@ -184,18 +185,27 @@ public class AddingActivitiesInPlans {
 						Coord cord = currentAct.getCoord();
 						double dur = currentAct.getEndTime() - currentAct.getStartTime();
 
-						Tuple<Double, Double> durAndTimeShift = durationConsistencyCheck(dur);
-
-						typDur = Math.max(Math.floor(durAndTimeShift.getFirst()/3600), 0.5) * 3600;
-
-						actType = currentAct.getType().substring(0, 4).concat(typDur/3600+"H");
-						Activity a1 = popFactory.createActivityFromCoord(actType, cord);
-						a1.setStartTime(currentAct.getStartTime()+ timeShift); // previous time shift
-
-						timeShift += durAndTimeShift.getSecond();
-
-						a1.setEndTime(currentAct.getEndTime() + timeShift); 
-						planOut.addActivity(a1);
+						boolean isPtInteractionActivity = true;
+						if(!currentAct.getType().equals("pt interaction")) isPtInteractionActivity = false;
+						
+						if(isPtInteractionActivity){
+							planOut.addActivity(currentAct);
+							actType = currentAct.getType();
+							typDur = Time.UNDEFINED_TIME;
+						} else {
+							Tuple<Double, Double> durAndTimeShift = durationConsistencyCheck(dur);
+							
+							typDur = Math.max(Math.floor(durAndTimeShift.getFirst()/3600), 0.5) * 3600;
+							
+							actType = currentAct.getType().substring(0, 4).concat(typDur/3600+"H");
+							Activity a1 = popFactory.createActivityFromCoord(actType, cord);
+							a1.setStartTime(currentAct.getStartTime()+ timeShift); // previous time shift
+							
+							timeShift += durAndTimeShift.getSecond();
+							
+							a1.setEndTime(currentAct.getEndTime() + timeShift); 
+							planOut.addActivity(a1);
+						}
 					}
 					actType2TypDur.put(actType, typDur);
 				} 
@@ -207,12 +217,10 @@ public class AddingActivitiesInPlans {
 	}
 
 	private Tuple<Double, Double> durationConsistencyCheck (double duration){
-
 		double timeShift = 0.;
 		double dur = 0;
 
 		if( Double.isNaN(duration) ) {
-			// activity type "pt interaction" falls under this category and thus, name is modified.
 			throw new RuntimeException("Start and end time are not defined. Don't know how to calculate duration in absence of them. Aborting ...");
 		}
 		else if(duration == 0) {
@@ -227,8 +235,9 @@ public class AddingActivitiesInPlans {
 			throw new RuntimeException("Duration is negative. Setting it to minimum dur of 1800");
 			//			timeShift = - duration + 1800;
 			//			duration = 1800;
-		} else dur = duration;
-
+		} else {
+			dur = duration;
+		}
 		return new Tuple<Double, Double>(dur, timeShift);
 	}
 
@@ -239,6 +248,8 @@ public class AddingActivitiesInPlans {
 	void writePlans( String outplans){
 		new PopulationWriter(scOut.getPopulation()).write(outplans);
 		log.info("File is written to "+outplans);
-		log.warn("Total number of skipped persons are "+skippedPersons+". Because last activity starts after mid night.");
+		if(skippedPersons > 0){
+			log.warn("Because their last activity starts after midnight, " + skippedPersons + " persons were skipped.");
+		}
 	}
 }

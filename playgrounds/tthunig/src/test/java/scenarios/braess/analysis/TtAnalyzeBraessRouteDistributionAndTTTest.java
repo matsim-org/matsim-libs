@@ -24,7 +24,7 @@ import org.matsim.testcases.MatsimTestUtils;
 import scenarios.braess.createInput.TtCreateBraessPopulation;
 
 /**
- * This class tests the functionality of the getTotalTT method in the class
+ * This class tests the functionality of the class
  * TtAnalyzeBraessRouteDistributionAndTT. The network used is the basic Braess
  * scenario with unlimited capacity, the number of persons traveling through the
  * scenario and the travel time per link can be varied.

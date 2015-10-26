@@ -3,7 +3,6 @@ package playground.balac.iduceddemand.strategies;
 import java.util.List;
 import java.util.Random;
 
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.router.StageActivityTypes;
@@ -40,13 +39,11 @@ public class ChooseRandomActivities implements PlanAlgorithm {
 			while (index1 == index2)
 				index2 = 1 + this.rng.nextInt(countActivities - 2);
 			
-			swap(plan, t.get(index1), t.get(index2));			
-			
+			swap(plan, t.get(index1), t.get(index2));
 		}
-		
 	}
 	
-	public void swap(Plan plan, Activity activity1, Activity activity2) {
+	private void swap(Plan plan, Activity activity1, Activity activity2) {
 		
 		int index1 = plan.getPlanElements().indexOf(activity1);
 		

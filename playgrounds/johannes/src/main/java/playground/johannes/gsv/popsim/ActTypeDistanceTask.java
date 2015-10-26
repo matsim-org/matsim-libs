@@ -43,7 +43,7 @@ public class ActTypeDistanceTask extends AnalyzerTask {
 
     @Override
     public void analyze(Collection<? extends Person> persons, Map<String, DescriptiveStatistics> results) {
-        Map<String, ActTypePredicate> actTypePredicates = Predicates.actTypePredicates(persons);
+        Map<String, Predicate<Segment>> actTypePredicates = Predicates.actTypePredicates(persons);
         ModePredicate modePredicate = new ModePredicate(CommonValues.LEG_MODE_CAR);
         LegDoubleCollector distColletor = new LegDoubleCollector(CommonKeys.LEG_GEO_DISTANCE);
 
@@ -56,7 +56,7 @@ public class ActTypeDistanceTask extends AnalyzerTask {
                 writer.write(String.valueOf(key));
             }
             writer.newLine();
-        for(Map.Entry<String, ActTypePredicate> entry : actTypePredicates.entrySet()) {
+        for(Map.Entry<String, Predicate<Segment>> entry : actTypePredicates.entrySet()) {
             LegPurposePredicate purposePredicate = new LegPurposePredicate(entry.getValue());
             PredicateAndComposite<Segment> pred = new PredicateAndComposite<>();
             pred.addComponent(modePredicate);

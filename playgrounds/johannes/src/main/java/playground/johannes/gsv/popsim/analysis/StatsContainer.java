@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,       *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,24 +16,28 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
-package playground.johannes.gsv.popsim;
-
-import playground.johannes.synpop.data.Segment;
+package playground.johannes.gsv.popsim.analysis;
 
 /**
- * @author johannes
+ * @author jillenberger
  */
-public class LegPurposePredicate implements Predicate<Segment> {
+public class StatsContainer {
 
-    private final Predicate<Segment> actTypePredicate;
+    private final String name;
 
-    public LegPurposePredicate(Predicate<Segment> actTypePredicate) {
-        this.actTypePredicate = actTypePredicate;
-    }
+    private Double mean;
 
-    @Override
-    public boolean test(Segment segment) {
-        return actTypePredicate.test(segment.next());
+    private Double median;
+
+    private Double min;
+
+    private Double max;
+
+    private Double N;
+
+    private Double variance;
+
+    public StatsContainer(String name) {
+        this.name = name;
     }
 }
