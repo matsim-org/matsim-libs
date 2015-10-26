@@ -33,7 +33,7 @@ import java.util.Set;
 
 import floetteroed.opdyts.DecisionVariable;
 import floetteroed.opdyts.DecisionVariableRandomizer;
-import floetteroed.opdyts.ObjectBasedObjectiveFunction;
+import floetteroed.opdyts.ObjectiveFunction;
 import floetteroed.opdyts.SimulatorState;
 import floetteroed.opdyts.convergencecriteria.ConvergenceCriterion;
 import floetteroed.opdyts.trajectorysampling.ParallelTrajectorySampler;
@@ -70,7 +70,7 @@ public class RandomSearch<U extends DecisionVariable> {
 
 	private final boolean keepBestSolution;
 
-	private final ObjectBasedObjectiveFunction objectBasedObjectiveFunction;
+	private final ObjectiveFunction objectBasedObjectiveFunction;
 
 	// private final VectorBasedObjectiveFunction vectorBasedObjectiveFunction;
 
@@ -120,14 +120,15 @@ public class RandomSearch<U extends DecisionVariable> {
 	// this.maxMemoryLength = maxMemoryLength;
 	// }
 
-	public RandomSearch(final Simulator<U> simulator,
+	public RandomSearch(
+			final Simulator<U> simulator,
 			final DecisionVariableRandomizer<U> randomizer,
 			final ConvergenceCriterion convergenceCriterion,
 			// final TrajectorySamplingSelfTuner selfTuner,
 			final int maxIterations, final int maxTransitions,
 			final int populationSize, final Random rnd,
 			final boolean interpolate, final boolean keepBestSolution,
-			final ObjectBasedObjectiveFunction objectBasedObjectiveFunction,
+			final ObjectiveFunction objectBasedObjectiveFunction,
 			final int maxMemoryLength) {
 		this.simulator = simulator;
 		this.randomizer = randomizer;
@@ -279,9 +280,11 @@ public class RandomSearch<U extends DecisionVariable> {
 
 				newInitialState = this.simulator.run(sampler, newInitialState);
 				newBestDecisionVariable = sampler
-						.getConvergedDecisionVariables().iterator().next();
+						.getDecisionVariable2finalObjectiveFunctionValue()
+						.keySet().iterator().next();
 				newBestObjectiveFunctionValue = sampler
-						.getFinalObjectiveFunctionValue(newBestDecisionVariable);
+						.getDecisionVariable2finalObjectiveFunctionValue().get(
+								newBestDecisionVariable);
 				transitionsPerIteration = sampler.getTotalTransitionCnt();
 
 				// this.selfTuner.registerSamplingStageSequence(

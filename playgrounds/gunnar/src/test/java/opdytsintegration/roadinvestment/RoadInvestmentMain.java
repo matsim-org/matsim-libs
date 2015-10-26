@@ -18,7 +18,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 import floetteroed.opdyts.DecisionVariable;
 import floetteroed.opdyts.DecisionVariableRandomizer;
-import floetteroed.opdyts.ObjectBasedObjectiveFunction;
+import floetteroed.opdyts.ObjectiveFunction;
 import floetteroed.opdyts.convergencecriteria.ObjectiveFunctionChangeConvergenceCriterion;
 import floetteroed.opdyts.searchalgorithms.RandomSearch;
 import floetteroed.opdyts.searchalgorithms.Simulator;
@@ -32,7 +32,7 @@ import floetteroed.opdyts.trajectorysampling.SingleTrajectorySampler;
 class RoadInvestmentMain {
 
 	static Map.Entry<DecisionVariable, Double> evaluateSingleDecisionVariable(
-			ObjectBasedObjectiveFunction objectiveFunction, Simulator system,
+			ObjectiveFunction objectiveFunction, Simulator system,
 			Scenario scenario, final double betaPay, final double betaAlloc) {
 
 		final Map<Link, Double> link2freespeed = Collections

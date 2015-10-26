@@ -43,7 +43,7 @@ public interface DecisionVariableRandomizer<U extends DecisionVariable> {
 	public U newRandomDecisionVariable();
 
 	/**
-	 * @return a random variation of <code>decisionVariable</code>
+	 * @return a random variation of decisionVariable
 	 */
 	public U newRandomVariation(final U decisionVariable);
 

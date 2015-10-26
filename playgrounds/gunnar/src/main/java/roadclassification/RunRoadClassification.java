@@ -27,7 +27,7 @@ import java.io.FileNotFoundException;
 import java.util.*;
 
 import floetteroed.opdyts.DecisionVariableRandomizer;
-import floetteroed.opdyts.ObjectBasedObjectiveFunction;
+import floetteroed.opdyts.ObjectiveFunction;
 import floetteroed.opdyts.convergencecriteria.ObjectiveFunctionChangeConvergenceCriterion;
 import floetteroed.opdyts.searchalgorithms.RandomSearch;
 
@@ -70,7 +70,7 @@ public class RunRoadClassification {
 		final ObjectAttributes linkAttributes = (ObjectAttributes) scenario.getScenarioElement("linkAttributes");
 		Counts counts = (Counts) scenario.getScenarioElement(Counts.ELEMENT_NAME);
 		final RoadClassificationStateFactory stateFactory = new RoadClassificationStateFactory(scenario);
-		final ObjectBasedObjectiveFunction objectiveFunction = new RoadClassificationObjectiveFunction(
+		final ObjectiveFunction objectiveFunction = new RoadClassificationObjectiveFunction(
 				counts);
 		final List<LinkSettings> almostRealLinkSettings = new ArrayList<>();
 		almostRealLinkSettings.add(new LinkSettings(14.0, 2000.0, 2.0));

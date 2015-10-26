@@ -28,7 +28,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import floetteroed.opdyts.DecisionVariable;
-import floetteroed.opdyts.ObjectBasedObjectiveFunction;
+import floetteroed.opdyts.ObjectiveFunction;
 import floetteroed.opdyts.SimulatorState;
 import floetteroed.opdyts.convergencecriteria.ConvergenceCriterion;
 
@@ -44,7 +44,7 @@ public class SingleTrajectorySampler<U extends DecisionVariable> implements
 
 	private final U decisionVariable;
 
-	private final ObjectBasedObjectiveFunction objectBasedObjectiveFunction;
+	private final ObjectiveFunction objectBasedObjectiveFunction;
 
 	// private final VectorBasedObjectiveFunction vectorBasedObjectiveFunction;
 
@@ -57,7 +57,7 @@ public class SingleTrajectorySampler<U extends DecisionVariable> implements
 	// -------------------- CONSTRUCTION --------------------
 
 	public SingleTrajectorySampler(final U decisionVariable,
-			final ObjectBasedObjectiveFunction objectBasedObjectiveFunction,
+			final ObjectiveFunction objectBasedObjectiveFunction,
 			final ConvergenceCriterion convergenceCriterion) {
 		this.decisionVariable = decisionVariable;
 		this.objectBasedObjectiveFunction = objectBasedObjectiveFunction;
@@ -107,17 +107,11 @@ public class SingleTrajectorySampler<U extends DecisionVariable> implements
 			if (this.transitionSequence == null) {
 				this.transitionSequence = new TransitionSequence<U>(
 						this.fromState, this.decisionVariable, newState,
-						this.objectBasedObjectiveFunction
-				// ,
-				// this.vectorBasedObjectiveFunction
-				);
+						this.objectBasedObjectiveFunction.value(newState));
 			} else {
 				this.transitionSequence.addTransition(this.fromState,
 						this.decisionVariable, newState,
-						this.objectBasedObjectiveFunction
-				// ,
-				// this.vectorBasedObjectiveFunction
-						);
+						this.objectBasedObjectiveFunction.value(newState));
 			}
 			this.convergenceCriterion.evaluate(this.transitionSequence);
 		}

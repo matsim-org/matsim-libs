@@ -24,7 +24,7 @@
  */
 package vind;
 
-import floetteroed.opdyts.ObjectBasedObjectiveFunction;
+import floetteroed.opdyts.ObjectiveFunction;
 import floetteroed.opdyts.SimulatorState;
 
 /**
@@ -34,7 +34,7 @@ import floetteroed.opdyts.SimulatorState;
  */
 @Deprecated
 public class VectorToObjectBasedObjectiveFunctionWrapper implements
-		ObjectBasedObjectiveFunction {
+		ObjectiveFunction {
 
 	private final VectorBasedObjectiveFunction objectiveFunction;
 
