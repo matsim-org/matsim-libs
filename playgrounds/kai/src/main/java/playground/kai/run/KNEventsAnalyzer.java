@@ -29,6 +29,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.core.events.handler.Vehicle2DriverEventHandler;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.roadpricing.RoadPricingConfigGroup;
 
@@ -94,8 +95,12 @@ public class KNEventsAnalyzer {
 		
 		EventsManager events = new EventsManagerImpl() ;
 		
+		Vehicle2DriverEventHandler vehicle2Driver = new Vehicle2DriverEventHandler();
+		events.addHandler(vehicle2Driver);
+		
 		final KNAnalysisEventsHandler.Builder builder = new KNAnalysisEventsHandler.Builder(scenario) ;
 		builder.setOtherTollLinkFile( otherLinksFilename );
+		builder.setVehicle2DriverEventHandler(vehicle2Driver);
 		final KNAnalysisEventsHandler calcLegTimes = builder.build();
 		
 		events.addHandler( calcLegTimes );

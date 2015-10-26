@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.events.handler.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.events.handler.Vehicle2DriverEventHandler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
@@ -86,6 +87,8 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler {
 	
 	private Set<Id<Link>> otherTolledLinkIds = new HashSet<Id<Link>>() ;
 
+	private Vehicle2DriverEventHandler vehicle2DriverEventHandler;
+
 	// general trip counter.  Would, in theory, not necessary to do this per StatType, but I find it too brittle 
 	// to avoid under- or over-counting with respect to loops.
 	//	private final Map<StatType,Integer> legCount = new TreeMap<StatType,Integer>() ;
@@ -93,18 +96,22 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler {
 	public static class Builder {
 		private final Scenario scenario ;
 		private String otherTollLinkFile = null ;
+		private Vehicle2DriverEventHandler vehicle2DriverEventHandler = null;
 		public void setOtherTollLinkFile(String otherTollLinkFile) {
 			this.otherTollLinkFile = otherTollLinkFile;
+		}
+		public void setVehicle2DriverEventHandler(Vehicle2DriverEventHandler vehicle2DriverEventHandler){
+			this.vehicle2DriverEventHandler = vehicle2DriverEventHandler;
 		}
 		public Builder( final Scenario sc ) {
 			scenario = sc ;
 		}
 		public KNAnalysisEventsHandler build() {
-			return new KNAnalysisEventsHandler( scenario, otherTollLinkFile ) ;
+			return new KNAnalysisEventsHandler( scenario, otherTollLinkFile, vehicle2DriverEventHandler ) ;
 		}
 	}
 	
-	private KNAnalysisEventsHandler( final Scenario scenario, final String otherTollLinkFile ) {
+	private KNAnalysisEventsHandler( final Scenario scenario, final String otherTollLinkFile, final Vehicle2DriverEventHandler vehicle2DriverEventHandler ) {
 		this( scenario ) ;
 		if ( otherTollLinkFile != null && !otherTollLinkFile.equals("") ) {
 			RoadPricingSchemeImpl scheme = new RoadPricingSchemeImpl();
@@ -116,6 +123,7 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler {
 			}
 			this.otherTolledLinkIds = scheme.getTolledLinkIds() ;
 		}
+		this.vehicle2DriverEventHandler = vehicle2DriverEventHandler;
 	}
 
 	public KNAnalysisEventsHandler(final Scenario scenario) {
@@ -541,8 +549,6 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler {
 
 	private Map<Id<Vehicle>,Double> vehicleGantryCounts = new HashMap<Id<Vehicle>,Double>() ;
 
-	private Map<Id<Vehicle>, Set<Id<Person>>> personsInsideVehicle = new HashMap<>();
-
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
 		vehicleEnterTimes.put( event.getVehicleId(), event.getTime() ) ;
@@ -557,10 +563,7 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler {
 		}
 		
 		if ( this.otherTolledLinkIds.contains( event.getLinkId() ) ) {
-			// handle all persons inside the vehicle
-			for (Id<Person> personInsideVehicle : personsInsideVehicle.get(event.getVehicleId())){
-				add( personInsideVehicle, 1., CERTAIN_LINKS_CNT );
-			}
+			add( vehicle2DriverEventHandler.getDriverOfVehicle(event.getVehicleId()), 1., CERTAIN_LINKS_CNT );
 		}
 		
 	}
@@ -586,10 +589,7 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler {
 
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
-		if (!personsInsideVehicle.containsKey(event.getVehicleId())){
-			personsInsideVehicle.put(event.getVehicleId(), new HashSet<Id<Person>>());
-		}
-		personsInsideVehicle.get(event.getVehicleId()).add(event.getPersonId());
+		// do we need to do anything here?
 	}
 
 	private static int wrnCnt = 0 ;
@@ -605,8 +605,6 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler {
 				Logger.getLogger(this.getClass()).warn( Gbl.ONLYONCE ) ;
 			}
 		}
-		
-		personsInsideVehicle.get(event.getVehicleId()).remove(event.getPersonId());
 	}
 
 }
