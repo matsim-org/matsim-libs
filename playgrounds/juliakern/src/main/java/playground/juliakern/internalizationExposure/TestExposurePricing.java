@@ -58,9 +58,9 @@ import java.util.Set;
  */
 public class TestExposurePricing {
 	
-	static String inputPath = "../../detailedEval/emissions/testScenario/input/";
+	static String inputPath = "../../../../repos/shared-svn/projects/detailedEval/emissions/testScenario/input/";
 	
-	static String emissionInputPath = "../../detailedEval/emissions/hbefaForMatsim/";
+	static String emissionInputPath = "../../../../repos/shared-svn/projects/detailedEval/emissions/hbefaForMatsim/";
 	static String roadTypeMappingFile = emissionInputPath + "roadTypeMapping.txt";
 	static String emissionVehicleFile = inputPath + "emissionVehicles_1pct.xml.gz";
 	
