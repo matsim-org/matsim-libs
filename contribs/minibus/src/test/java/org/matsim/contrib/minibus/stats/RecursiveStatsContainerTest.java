@@ -23,7 +23,7 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.contrib.minibus.stats.RecursiveStatsContainer;
-import org.matsim.core.utils.misc.MatsimTestUtils;
+import org.matsim.testcases.MatsimTestUtils;
 
 
 public class RecursiveStatsContainerTest {

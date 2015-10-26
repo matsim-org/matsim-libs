@@ -17,7 +17,7 @@ import org.matsim.contrib.freight.carrier.CarrierVehicleTypeLoader;
 import org.matsim.contrib.freight.carrier.CarrierVehicleTypeReader;
 import org.matsim.contrib.freight.carrier.CarrierVehicleTypes;
 import org.matsim.contrib.freight.carrier.Carriers;
-import org.matsim.core.utils.misc.MatsimTestUtils;
+import org.matsim.testcases.MatsimTestUtils;
 
 import playground.kturner.freightKt.UccCarrierCreator;
 

@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.events.WarmEmissionEvent;
 import org.matsim.contrib.emissions.types.WarmPollutant;
-import org.matsim.core.utils.misc.MatsimTestUtils;
+import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 
 public class TestEmissionsPerLinkWarmEventHandler {

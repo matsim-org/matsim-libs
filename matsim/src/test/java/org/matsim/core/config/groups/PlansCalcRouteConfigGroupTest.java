@@ -33,7 +33,7 @@ import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.ConfigReader;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
-import org.matsim.core.utils.misc.MatsimTestUtils;
+import org.matsim.testcases.MatsimTestUtils;
 
 public class PlansCalcRouteConfigGroupTest {
 

@@ -7,7 +7,7 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.core.utils.gis.ShapeFileReader;
-import org.matsim.core.utils.misc.MatsimTestUtils;
+import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * @author mrieser / senozon

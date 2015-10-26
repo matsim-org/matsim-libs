@@ -59,10 +59,10 @@ import org.matsim.core.router.TripStructureUtils.Subtour;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.misc.MatsimTestUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.MatsimFacilitiesReader;
+import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * @author mrieser, michaz

@@ -44,9 +44,9 @@ import org.matsim.core.scenario.ScenarioElementsModule;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
-import org.matsim.core.utils.misc.MatsimTestUtils;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
+import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * Tests {@link PlansCalcRouteWithTollOrNot} as isolated as possible.

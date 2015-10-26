@@ -39,6 +39,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * @author nagel

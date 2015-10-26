@@ -35,10 +35,10 @@ import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.misc.MatsimTestUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.pt.utils.CreateVehiclesForSchedule;
+import org.matsim.testcases.MatsimTestUtils;
 
 import java.util.ArrayList;
 import java.util.List;

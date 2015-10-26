@@ -29,10 +29,10 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.minibus.PConfigGroup;
 import org.matsim.contrib.minibus.routeProvider.PScenarioHelper;
-import org.matsim.core.utils.misc.MatsimTestUtils;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.testcases.MatsimTestUtils;
 
 
 public class CreateStopsForAllCarLinksTest {

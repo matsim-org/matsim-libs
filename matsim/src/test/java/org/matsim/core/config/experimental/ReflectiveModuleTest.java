@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.*;
 import org.matsim.core.config.ReflectiveConfigGroup.InconsistentModuleException;
-import org.matsim.core.utils.misc.MatsimTestUtils;
+import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * @author thibautd

@@ -3,7 +3,7 @@ package playground.wrashid.lib.tools.txtConfig;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.core.utils.misc.MatsimTestUtils;
+import org.matsim.testcases.MatsimTestUtils;
 
 public class TxtConfigTest {
 

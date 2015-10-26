@@ -29,8 +29,8 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.utils.misc.MatsimTestUtils;
 import org.matsim.pt.PtConstants;
+import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * Tests the behaviour of TransitActRemoverCorrectTravelTime on a simple PlanImpl

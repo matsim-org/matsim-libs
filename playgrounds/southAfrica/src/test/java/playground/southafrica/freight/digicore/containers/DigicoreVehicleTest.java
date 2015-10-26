@@ -23,7 +23,7 @@ package playground.southafrica.freight.digicore.containers;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.core.utils.misc.MatsimTestUtils;
+import org.matsim.testcases.MatsimTestUtils;
 
 
 public class DigicoreVehicleTest{

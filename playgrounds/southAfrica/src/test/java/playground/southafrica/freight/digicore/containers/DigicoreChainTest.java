@@ -29,8 +29,8 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.utils.misc.MatsimTestUtils;
 import org.matsim.facilities.ActivityFacility;
+import org.matsim.testcases.MatsimTestUtils;
 
 public class DigicoreChainTest{
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();

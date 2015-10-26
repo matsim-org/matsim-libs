@@ -29,11 +29,11 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.misc.MatsimTestUtils;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * @author mrieser / senozon

@@ -7,8 +7,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
-import org.matsim.core.utils.misc.MatsimTestUtils;
-
+import org.matsim.testcases.MatsimTestUtils;
 import playground.thibautd.maxess.prepareforbiogeme.tripbased.PrismicConversionConfigGroup;
 import playground.thibautd.maxess.prepareforbiogeme.tripbased.RunPrismicTripChoiceSetConversion;
 import sun.security.provider.MD5;

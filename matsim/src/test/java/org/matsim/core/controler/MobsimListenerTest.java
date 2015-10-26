@@ -27,7 +27,7 @@ import org.junit.Test;
 import org.matsim.core.config.Config;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
-import org.matsim.core.utils.misc.MatsimTestUtils;
+import org.matsim.testcases.MatsimTestUtils;
 
 import javax.inject.Singleton;
 

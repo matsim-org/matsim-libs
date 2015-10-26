@@ -25,7 +25,7 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.core.utils.misc.MatsimTestUtils;
+import org.matsim.testcases.MatsimTestUtils;
 
 import playground.southafrica.utilities.grid.GeneralGrid.GridType;
 

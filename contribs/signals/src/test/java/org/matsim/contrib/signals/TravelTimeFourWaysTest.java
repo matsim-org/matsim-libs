@@ -39,8 +39,8 @@ import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.CRCChecksum;
-import org.matsim.core.utils.misc.MatsimTestUtils;
 import org.matsim.lanes.data.v11.LaneDefinitonsV11ToV20Converter;
+import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
 
 /**

@@ -29,7 +29,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.core.utils.misc.MatsimTestUtils;
+import org.matsim.testcases.MatsimTestUtils;
 import org.xml.sax.SAXException;
 
 /**

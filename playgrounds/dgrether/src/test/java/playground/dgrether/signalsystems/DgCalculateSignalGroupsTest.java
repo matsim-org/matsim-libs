@@ -53,7 +53,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.misc.MatsimTestUtils;
 import org.matsim.lanes.data.v11.LaneData11;
 import org.matsim.lanes.data.v11.LaneDefinitions11;
 import org.matsim.lanes.data.v11.LaneDefinitions11Impl;
@@ -63,6 +62,7 @@ import org.matsim.lanes.data.v11.LaneDefinitonsV11ToV20Converter;
 import org.matsim.lanes.data.v11.LanesToLinkAssignment11;
 import org.matsim.lanes.data.v20.Lane;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
+import org.matsim.testcases.MatsimTestUtils;
 import org.xml.sax.SAXException;
 
 import playground.dgrether.signalsystems.data.preprocessing.DgCalculateSignalGroups;

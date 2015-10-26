@@ -22,7 +22,7 @@ import junit.framework.Assert;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.core.utils.misc.MatsimTestUtils;
+import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * @author nagel

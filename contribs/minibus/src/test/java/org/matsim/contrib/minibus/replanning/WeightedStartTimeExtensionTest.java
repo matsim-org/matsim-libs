@@ -36,8 +36,8 @@ import org.matsim.contrib.minibus.operator.PPlan;
 import org.matsim.contrib.minibus.operator.TimeProvider;
 import org.matsim.contrib.minibus.replanning.WeightedStartTimeExtension;
 import org.matsim.contrib.minibus.routeProvider.PScenarioHelper;
-import org.matsim.core.utils.misc.MatsimTestUtils;
 import org.matsim.facilities.ActivityFacility;
+import org.matsim.testcases.MatsimTestUtils;
 
 
 public class WeightedStartTimeExtensionTest {

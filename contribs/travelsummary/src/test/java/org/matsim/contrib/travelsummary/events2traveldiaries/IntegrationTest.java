@@ -21,7 +21,7 @@ package org.matsim.contrib.travelsummary.events2traveldiaries;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.contrib.travelsummary.events2traveldiaries.RunEventsToTravelDiaries;
-import org.matsim.core.utils.misc.MatsimTestUtils;
+import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * @author nagel

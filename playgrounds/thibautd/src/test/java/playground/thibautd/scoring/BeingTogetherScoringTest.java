@@ -37,12 +37,12 @@ import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityOption;
 import org.matsim.facilities.OpeningTimeImpl;
+import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 
 import org.matsim.contrib.socnetsim.framework.scoring.BeingTogetherScoring;
 import org.matsim.contrib.socnetsim.framework.scoring.BeingTogetherScoring.AcceptAllFilter;
 import org.matsim.contrib.socnetsim.framework.scoring.BeingTogetherScoring.RejectAllFilter;
-import org.matsim.core.utils.misc.MatsimTestUtils;
 
 /**
  * @author thibautd

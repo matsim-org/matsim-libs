@@ -44,8 +44,8 @@ import org.matsim.core.config.groups.ScenarioConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.misc.MatsimTestUtils;
 import org.matsim.facilities.ActivityFacility;
+import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 
 /**

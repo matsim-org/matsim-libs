@@ -29,11 +29,11 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.population.routes.ModeRouteFactory;
-import org.matsim.core.utils.misc.MatsimTestUtils;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
+import org.matsim.testcases.MatsimTestUtils;
 import org.xml.sax.SAXException;
 
 /**

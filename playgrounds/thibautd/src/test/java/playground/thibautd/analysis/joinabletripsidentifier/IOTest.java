@@ -27,7 +27,7 @@ import java.util.Map;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.utils.misc.MatsimTestUtils;
+import org.matsim.testcases.MatsimTestUtils;
 
 import playground.thibautd.analysis.joinabletripsidentifier.JoinableTrips.TripRecord;
 

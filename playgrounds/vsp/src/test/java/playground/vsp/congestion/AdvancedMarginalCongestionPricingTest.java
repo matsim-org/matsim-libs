@@ -44,7 +44,7 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
-import org.matsim.core.utils.misc.MatsimTestUtils;
+import org.matsim.testcases.MatsimTestUtils;
 
 import playground.vsp.congestion.controler.AdvancedMarginalCongestionPricingContolerListener;
 import playground.vsp.congestion.events.CongestionEvent;

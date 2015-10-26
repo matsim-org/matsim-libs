@@ -40,7 +40,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.DefaultPlanStrategiesModule.DefaultSelector;
 import org.matsim.core.replanning.DefaultPlanStrategiesModule.DefaultStrategy;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.misc.MatsimTestUtils;
+import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 
 

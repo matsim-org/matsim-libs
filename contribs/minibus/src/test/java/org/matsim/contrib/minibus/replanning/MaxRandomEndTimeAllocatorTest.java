@@ -26,7 +26,7 @@ import org.matsim.contrib.minibus.operator.Operator;
 import org.matsim.contrib.minibus.operator.PPlan;
 import org.matsim.contrib.minibus.replanning.MaxRandomEndTimeAllocator;
 import org.matsim.contrib.minibus.routeProvider.PScenarioHelper;
-import org.matsim.core.utils.misc.MatsimTestUtils;
+import org.matsim.testcases.MatsimTestUtils;
 
 import java.util.ArrayList;
 

@@ -20,8 +20,8 @@ import org.matsim.core.router.costcalculators.TravelDisutilityModule;
 import org.matsim.core.scenario.ScenarioElementsModule;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionModule;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorModule;
-import org.matsim.core.utils.misc.MatsimTestUtils;
 import org.matsim.counts.Counts;
+import org.matsim.testcases.MatsimTestUtils;
 
 public class CDREquilTest {
 

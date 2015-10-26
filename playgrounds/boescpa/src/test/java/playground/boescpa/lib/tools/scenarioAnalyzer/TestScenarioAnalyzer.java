@@ -30,8 +30,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.misc.MatsimTestUtils;
-
+import org.matsim.testcases.MatsimTestUtils;
 import playground.boescpa.lib.tools.scenarioAnalyzer.eventHandlers.*;
 
 /**
