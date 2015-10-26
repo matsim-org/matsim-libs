@@ -36,7 +36,7 @@ import org.matsim.contrib.signals.router.InvertedNetworkRoutingModuleModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.core.utils.misc.MatsimTestUtils;
 
 /**
  * @author dgrether

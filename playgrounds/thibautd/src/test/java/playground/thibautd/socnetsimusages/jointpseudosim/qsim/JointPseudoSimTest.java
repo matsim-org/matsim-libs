@@ -44,7 +44,8 @@ import org.matsim.core.router.TripRouterModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityModule;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorModule;
-import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.core.utils.misc.MatsimTestUtils;
+
 import playground.thibautd.mobsim.CompareEventsUtils;
 import playground.thibautd.scripts.scenariohandling.CreateGridNetworkWithDimensions;
 import org.matsim.contrib.socnetsim.jointtrips.population.DriverRoute;

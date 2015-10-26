@@ -42,7 +42,7 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.core.utils.misc.MatsimTestUtils;
 
 import playground.vsp.congestion.analysis.CongestionAnalysisEventHandler;
 import playground.vsp.congestion.events.CongestionEventsReader;

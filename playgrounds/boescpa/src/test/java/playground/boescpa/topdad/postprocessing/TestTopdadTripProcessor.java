@@ -31,7 +31,8 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.core.utils.misc.MatsimTestUtils;
+
 import playground.boescpa.lib.tools.tripCreation.TripHandler;
 import playground.boescpa.lib.tools.tripCreation.TripProcessor;
 import playground.boescpa.lib.tools.tripCreation.spatialCuttings.NoCutting;

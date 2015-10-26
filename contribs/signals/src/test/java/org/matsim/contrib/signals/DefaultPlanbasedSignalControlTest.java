@@ -34,7 +34,7 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.contrib.signals.model.SignalGroup;
 import org.matsim.core.mobsim.qsim.qnetsimengine.SignalGroupState;
-import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.core.utils.misc.MatsimTestUtils;
 
 
 /**

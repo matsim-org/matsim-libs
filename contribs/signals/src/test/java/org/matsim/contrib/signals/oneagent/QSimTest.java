@@ -39,12 +39,12 @@ import org.matsim.contrib.signals.events.SignalGroupStateChangedEventHandler;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
+import org.matsim.core.utils.misc.MatsimTestUtils;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupSettingsData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalPlanData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalSystemControllerData;
 import org.matsim.contrib.signals.model.SignalSystemsManager;
-import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * Simple test case for the Controler and or QSim and the default signal system implementation.

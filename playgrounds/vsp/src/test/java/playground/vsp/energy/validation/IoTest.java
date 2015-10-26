@@ -38,7 +38,7 @@ import junit.framework.Assert;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.core.utils.misc.MatsimTestUtils;
 
 import playground.vsp.energy.validation.ObjectFactory;
 import playground.vsp.energy.validation.PoiInfo;

@@ -36,12 +36,12 @@ import org.matsim.contrib.minibus.routeProvider.RandomStopProvider;
 import org.matsim.contrib.minibus.routeProvider.SimpleCircleScheduleProvider;
 import org.matsim.contrib.minibus.schedule.CreateStopsForAllCarLinks;
 import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.utils.misc.MatsimTestUtils;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-import org.matsim.testcases.MatsimTestUtils;
 
 public class ComplexCircleScheduleProviderTest {
 	

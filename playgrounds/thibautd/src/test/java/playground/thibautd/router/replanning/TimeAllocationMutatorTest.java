@@ -40,11 +40,11 @@ import org.matsim.core.router.MainModeIdentifierImpl;
 import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Counter;
+import org.matsim.core.utils.misc.MatsimTestUtils;
 import org.matsim.population.algorithms.PlanMutateTimeAllocation;
 import org.matsim.population.algorithms.TripPlanMutateTimeAllocation;
 import org.matsim.population.algorithms.TripsToLegsAlgorithm;
 import org.matsim.pt.PtConstants;
-import org.matsim.testcases.MatsimTestUtils;
 
 
 /**

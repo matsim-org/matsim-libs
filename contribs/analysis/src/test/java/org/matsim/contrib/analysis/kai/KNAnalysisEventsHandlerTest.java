@@ -48,8 +48,8 @@ import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.CRCChecksum;
+import org.matsim.core.utils.misc.MatsimTestUtils;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.testcases.MatsimTestUtils;
 
 public class KNAnalysisEventsHandlerTest {
 

@@ -30,11 +30,10 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.utils.misc.MatsimTestUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.ActivityFacility;
-import org.matsim.testcases.MatsimTestUtils;
-
 import org.matsim.contrib.socnetsim.framework.population.SocialNetworkImpl;
 
 /**

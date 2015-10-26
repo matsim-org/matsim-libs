@@ -22,7 +22,7 @@ package playground.southafrica.freight.digicore.algorithms.concaveHull;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.core.utils.misc.MatsimTestUtils;
 
 import playground.southafrica.freight.digicore.algorithms.concaveHull.ConcaveHull;
 

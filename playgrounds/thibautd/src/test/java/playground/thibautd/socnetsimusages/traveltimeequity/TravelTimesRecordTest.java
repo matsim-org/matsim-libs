@@ -26,8 +26,8 @@ import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.router.StageActivityTypesImpl;
+import org.matsim.core.utils.misc.MatsimTestUtils;
 import org.matsim.facilities.ActivityFacility;
-import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * @author thibautd

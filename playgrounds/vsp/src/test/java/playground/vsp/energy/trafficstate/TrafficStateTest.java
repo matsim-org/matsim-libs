@@ -23,7 +23,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.core.utils.misc.MatsimTestUtils;
 
 import java.io.File;
 

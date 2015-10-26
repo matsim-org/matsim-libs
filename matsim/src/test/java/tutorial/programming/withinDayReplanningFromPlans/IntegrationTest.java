@@ -23,7 +23,7 @@ import java.io.File;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.core.utils.misc.MatsimTestUtils;
 
 /**
  * @author nagel

@@ -10,8 +10,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.utils.misc.MatsimTestUtils;
 import org.matsim.facilities.ActivityFacility;
-import org.matsim.testcases.MatsimTestUtils;
 
 import playground.southafrica.freight.digicore.algorithms.complexNetwork.DigicoreNetworkBuilder;
 import playground.southafrica.freight.digicore.containers.DigicoreActivity;

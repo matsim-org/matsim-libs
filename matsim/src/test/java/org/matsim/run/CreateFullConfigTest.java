@@ -25,8 +25,8 @@ import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.testcases.MatsimTestUtils;
-import org.matsim.testcases.MatsimTestUtils.ExitTrappedException;
+import org.matsim.core.utils.misc.MatsimTestUtils;
+import org.matsim.core.utils.misc.MatsimTestUtils.ExitTrappedException;
 
 /**
  * @author mrieser / Senozon AG

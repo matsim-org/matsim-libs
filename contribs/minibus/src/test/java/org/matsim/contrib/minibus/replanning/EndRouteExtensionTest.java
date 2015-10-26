@@ -27,7 +27,7 @@ import org.matsim.contrib.minibus.operator.Operator;
 import org.matsim.contrib.minibus.operator.PPlan;
 import org.matsim.contrib.minibus.replanning.EndRouteExtension;
 import org.matsim.contrib.minibus.routeProvider.PScenarioHelper;
-import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.core.utils.misc.MatsimTestUtils;
 
 import java.io.File;
 import java.util.ArrayList;

@@ -23,7 +23,7 @@ package playground.southafrica.utilities;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.core.utils.misc.MatsimTestUtils;
 
 import playground.southafrica.utilities.SouthAfricaInflationCorrector;
 

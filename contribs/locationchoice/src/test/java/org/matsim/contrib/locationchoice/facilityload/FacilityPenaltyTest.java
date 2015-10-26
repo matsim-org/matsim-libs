@@ -7,7 +7,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.contrib.locationchoice.facilityload.FacilityPenalty;
-import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.core.utils.misc.MatsimTestUtils;
 
 public class FacilityPenaltyTest {
 

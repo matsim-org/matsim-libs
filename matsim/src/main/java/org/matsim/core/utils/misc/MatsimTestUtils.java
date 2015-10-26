@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.testcases;
+package org.matsim.core.utils.misc;
 
 import java.io.File;
 import java.lang.reflect.Method;

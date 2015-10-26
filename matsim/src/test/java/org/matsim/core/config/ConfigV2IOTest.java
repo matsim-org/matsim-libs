@@ -28,9 +28,9 @@ import org.junit.Test;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
+import org.matsim.core.utils.misc.MatsimTestUtils;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigReaderMatsimV2;
-import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * @author thibautd

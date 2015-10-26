@@ -31,8 +31,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.minibus.PConfigGroup;
 import org.matsim.contrib.minibus.PConstants;
 import org.matsim.contrib.minibus.operator.TimeProvider;
+import org.matsim.core.utils.misc.MatsimTestUtils;
 import org.matsim.facilities.ActivityFacility;
-import org.matsim.testcases.MatsimTestUtils;
 
 
 public class TimeProviderTest {
