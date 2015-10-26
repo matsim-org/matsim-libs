@@ -105,7 +105,7 @@ public class CarSharingVehicles {
 			    			newvehIDs);
 			    	
 					ffStations.remove(oldStation);
-			    	stationToLinkMap.replace(l, newStation);
+			    	stationToLinkMap.put(l, newStation);
 			    	ffStations.add(newStation);
 					
 		    	}
@@ -163,7 +163,7 @@ public class CarSharingVehicles {
 			    			newvehIDs, oldStation.getNumberOfAvailableParkingSpaces() + Integer.parseInt(arr[7]));
 			    	
 					owStations.remove(oldStation);
-			    	stationToLinkMap.replace(l, newStation);
+			    	stationToLinkMap.put(l, newStation);
 			    	owStations.add(newStation);
 					
 		    	}
@@ -218,7 +218,7 @@ public class CarSharingVehicles {
 			    			newvehIDs);
 			    	
 			    	twStations.remove(oldStation);
-			    	stationToLinkMap.replace(l, newStation);
+			    	stationToLinkMap.put(l, newStation);
 			    	twStations.add(newStation);
 					
 		    	}
