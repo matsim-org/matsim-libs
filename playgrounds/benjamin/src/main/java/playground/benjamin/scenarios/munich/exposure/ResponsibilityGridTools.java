@@ -3,6 +3,7 @@ package playground.benjamin.scenarios.munich.exposure;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -42,7 +43,7 @@ public class ResponsibilityGridTools {
 		return 0.0;
 	}
  
-	public void resetAndcaluculateRelativeDurationFactors(HashMap<Double, Double[][]> duration) {
+	public void resetAndcaluculateRelativeDurationFactors(SortedMap<Double, Double[][]> duration) {
 		
 		timebin2link2factor = new HashMap<Double, Map<Id<Link>, Double>>();
 		
