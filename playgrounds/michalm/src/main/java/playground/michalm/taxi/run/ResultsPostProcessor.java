@@ -268,15 +268,31 @@ public class ResultsPostProcessor
         new ResultsPostProcessor(//
                 //"0.2", //
                 //"0.4", //
-//                "0.6", //
-//                "0.8", //
-//                "1.0", //
-//                "1.2", //
-//                "1.4", //
-//                "1.6", //
-//                "1.8", //
-//                "2.0"//
+                "0.6", //
+                "0.8", //
+                "1.0", //
+                "1.2", //
+                "1.4", //
+                "1.6", //
+                "1.8", //
+                "2.0",//
                 "0.45_DSE"//
+        ).process(dir, subDirPrefix, "stats");
+    }
+
+
+    public static void processAudiAV()
+    {
+        String dir = "d:/PP-rad/audi_av/audi_av_10pct_2015_10/";
+        String subDirPrefix = "taxi_vehicles_";
+
+        new ResultsPostProcessor(//
+                "10000", //
+                "13000", //
+                "16000", //
+                "19000", //
+                "22000", //
+                "25000" //
         ).process(dir, subDirPrefix, "stats");
     }
 
@@ -286,6 +302,7 @@ public class ResultsPostProcessor
         //processMielec();
         //processBerlin();
         //processBarcelonaVariableDemand();
-        processBarcelonaVariableSupply();
+        //processBarcelonaVariableSupply();
+        processAudiAV();
     }
 }
