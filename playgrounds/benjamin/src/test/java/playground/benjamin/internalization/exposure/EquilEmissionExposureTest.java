@@ -126,13 +126,15 @@ public class EquilEmissionExposureTest {
 		return Arrays.asList(considerCO2);
 	}
 
-	//	@Test
+	@Test
 	public void emissionTollTest () {
 
-		Scenario sc = createConfig();
-		createNetwork(sc);
-		createActiveAgents(sc);
-		createPassiveAgents(sc);
+		EquilTestSetUp equilTestSetUp = new EquilTestSetUp();
+
+		Scenario sc = equilTestSetUp.createConfig();
+		equilTestSetUp.createNetwork(sc);
+		equilTestSetUp.createActiveAgents(sc);
+		equilTestSetUp.createPassiveAgents(sc);
 
 		emissionSettings(sc);
 
@@ -256,10 +258,10 @@ public class EquilEmissionExposureTest {
 			if(personMoneyEventHandler.link39LeaveTime == Double.POSITIVE_INFINITY) {
 				throw new RuntimeException("Active agent does not pass through link 39.");
 			}
-			
+
 			for (PersonMoneyEvent e : personMoneyEventHandler.events){
 				if (e.getTime() == personMoneyEventHandler.link39LeaveTime) {
-//					TODO fix this test. Current value shows -0.18909
+					//					TODO fix this test. Current value shows -0.18909
 					Assert.assertEquals( "Exposure toll on link 39 from Manual calculation does not match from money event.", df.format( -0.19278 ), df.format( e.getAmount() ) );
 				}
 			}
@@ -270,6 +272,7 @@ public class EquilEmissionExposureTest {
 
 	@Test
 	public void exposureInternalizationTest () {
+
 		Controler controler = exposureInternalizationSettings();
 		Scenario sc = controler.getScenario();
 		addReplanningStrategy(sc);
@@ -287,10 +290,12 @@ public class EquilEmissionExposureTest {
 	}
 
 	private Controler exposureInternalizationSettings () {
-		Scenario sc = createConfig();
-		createNetwork(sc);
-		createActiveAgents(sc);
-		createPassiveAgents(sc);
+		EquilTestSetUp equilTestSetUp = new EquilTestSetUp();
+
+		Scenario sc = equilTestSetUp.createConfig();
+		equilTestSetUp.createNetwork(sc);
+		equilTestSetUp.createActiveAgents(sc);
+		equilTestSetUp.createPassiveAgents(sc);
 
 		emissionSettings(sc);
 
@@ -351,7 +356,61 @@ public class EquilEmissionExposureTest {
 		config.addModule(ecg);
 	}
 
-	private Scenario createConfig(){
+	private void addReplanningStrategy(Scenario sc) {
+		StrategyConfigGroup scg = sc.getConfig().strategy();
+		StrategySettings strategySettingsR = new StrategySettings(Id.create("2", StrategySettings.class));
+		strategySettingsR.setStrategyName("ReRoute");
+		strategySettingsR.setWeight(1000);
+		strategySettingsR.setDisableAfter(10);
+		scg.addStrategySettings(strategySettingsR);
+	}
+
+	private class MyPersonMoneyEventHandler implements PersonMoneyEventHandler, LinkLeaveEventHandler  {
+
+		List<PersonMoneyEvent> events = new ArrayList<PersonMoneyEvent>();
+		double link39LeaveTime = Double.POSITIVE_INFINITY;
+
+		@Override
+		public void reset(int iteration) {
+			events.clear();
+		}
+
+		@Override
+		public void handleEvent(PersonMoneyEvent event) {
+			events.add(event);
+		}
+
+		@Override
+		public void handleEvent(LinkLeaveEvent event) {
+			if(event.getLinkId().toString().equals("39")) link39LeaveTime = event.getTime();
+		}
+	}
+
+	private class MyEmissionEventHandler implements WarmEmissionEventHandler, ColdEmissionEventHandler {
+
+		List<WarmEmissionEvent> warmEvents = new ArrayList<WarmEmissionEvent>();
+		List<ColdEmissionEvent> coldEvents = new ArrayList<ColdEmissionEvent>();
+
+		@Override
+		public void reset(int iteration) {
+			warmEvents.clear();
+			coldEvents.clear();
+		}
+
+		@Override
+		public void handleEvent(ColdEmissionEvent event) {
+			coldEvents.add(event);
+		}
+
+		@Override
+		public void handleEvent(WarmEmissionEvent event) {
+			warmEvents.add(event);
+		}
+	}
+}
+class EquilTestSetUp {
+	
+	Scenario createConfig(){
 		Config config = ConfigUtils.createConfig();
 
 		config.strategy().setMaxAgentPlanMemorySize(11);
@@ -405,20 +464,10 @@ public class EquilEmissionExposureTest {
 		return ScenarioUtils.loadScenario(config);
 	}
 
-	private void addReplanningStrategy(Scenario sc) {
-		StrategyConfigGroup scg = sc.getConfig().strategy();
-		StrategySettings strategySettingsR = new StrategySettings(Id.create("2", StrategySettings.class));
-		strategySettingsR.setStrategyName("ReRoute");
-		strategySettingsR.setWeight(1000);
-		strategySettingsR.setDisableAfter(10);
-		scg.addStrategySettings(strategySettingsR);
-	}
-
-
 	/**
 	 * Exposure to these agents will result in toll for active agent.
 	 */
-	private void createPassiveAgents(Scenario scenario) {
+	void createPassiveAgents(Scenario scenario) {
 		PopulationFactoryImpl pFactory = (PopulationFactoryImpl) scenario.getPopulation().getFactory();
 		// passive agents' home coordinates are around node 9 (12500, 7500)
 		for(Integer i=0; i<5; i++){ // x
@@ -451,7 +500,7 @@ public class EquilEmissionExposureTest {
 	/**
 	 * This agent is traveling and thus will be charged for exposure/emission toll.
 	 */
-	private void createActiveAgents(Scenario scenario) {
+	void createActiveAgents(Scenario scenario) {
 		PopulationFactory pFactory = scenario.getPopulation().getFactory();
 		Person person = pFactory.createPerson(Id.create("567417.1#12424", Person.class));
 		Plan plan = pFactory.createPlan();
@@ -485,7 +534,7 @@ public class EquilEmissionExposureTest {
 	/**
 	 * Simplified form of Equil network.
 	 */
-	private void createNetwork(Scenario scenario) {
+	void createNetwork(Scenario scenario) {
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 
 		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new Coord(1.0, 10000.0));
@@ -525,49 +574,6 @@ public class EquilEmissionExposureTest {
 				Node nodeB = network.createAndAddNode(Id.create("node_"+idpart+"B", Node.class), new Coord(xCoord, yCoord + 1.));
 				network.createAndAddLink(Id.create("link_p"+idpart, Link.class), nodeA, nodeB, 10, 30.0, 3600, 1);
 			}
-		}
-	}
-
-	private class MyPersonMoneyEventHandler implements PersonMoneyEventHandler, LinkLeaveEventHandler  {
-
-		List<PersonMoneyEvent> events = new ArrayList<PersonMoneyEvent>();
-		double link39LeaveTime = Double.POSITIVE_INFINITY;
-
-		@Override
-		public void reset(int iteration) {
-			events.clear();
-		}
-
-		@Override
-		public void handleEvent(PersonMoneyEvent event) {
-			events.add(event);
-		}
-
-		@Override
-		public void handleEvent(LinkLeaveEvent event) {
-			if(event.getLinkId().toString().equals("39")) link39LeaveTime = event.getTime();
-		}
-	}
-
-	private class MyEmissionEventHandler implements WarmEmissionEventHandler, ColdEmissionEventHandler {
-
-		List<WarmEmissionEvent> warmEvents = new ArrayList<WarmEmissionEvent>();
-		List<ColdEmissionEvent> coldEvents = new ArrayList<ColdEmissionEvent>();
-
-		@Override
-		public void reset(int iteration) {
-			warmEvents.clear();
-			coldEvents.clear();
-		}
-
-		@Override
-		public void handleEvent(ColdEmissionEvent event) {
-			coldEvents.add(event);
-		}
-
-		@Override
-		public void handleEvent(WarmEmissionEvent event) {
-			warmEvents.add(event);
 		}
 	}
 }
