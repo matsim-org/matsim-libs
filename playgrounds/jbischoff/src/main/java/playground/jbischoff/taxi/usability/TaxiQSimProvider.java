@@ -19,44 +19,30 @@
  * *********************************************************************** */
 package playground.jbischoff.taxi.usability;
 
-import java.util.List;
-
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.dvrp.MatsimVrpContext;
-import org.matsim.contrib.dvrp.MatsimVrpContextImpl;
-import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.dvrp.data.VehicleImpl;
+import org.matsim.contrib.dvrp.*;
+import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.extensions.taxi.TaxiUtils;
 import org.matsim.contrib.dvrp.passenger.PassengerEngine;
-import org.matsim.contrib.dvrp.path.*;
-import org.matsim.contrib.dvrp.router.*;
+import org.matsim.contrib.dvrp.router.DistanceAsTravelDisutility;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils;
-import org.matsim.contrib.dvrp.util.TimeDiscretizer;
 import org.matsim.contrib.dvrp.vrpagent.VrpLegs;
 import org.matsim.contrib.dvrp.vrpagent.VrpLegs.LegCreator;
 import org.matsim.contrib.dynagent.run.DynAgentLauncherUtils;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.router.Dijkstra;
-import org.matsim.core.router.util.LeastCostPathCalculator;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.router.util.*;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 
-import playground.michalm.taxi.TaxiActionCreator;
-import playground.michalm.taxi.TaxiRequestCreator;
+import com.google.inject.*;
+
+import playground.michalm.taxi.*;
 import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration;
 import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration.Goal;
-import playground.michalm.taxi.optimizer.filter.DefaultFilterFactory;
-import playground.michalm.taxi.optimizer.filter.FilterFactory;
+import playground.michalm.taxi.optimizer.filter.*;
 import playground.michalm.taxi.optimizer.rules.RuleBasedTaxiOptimizer;
-import playground.michalm.taxi.scheduler.TaxiScheduler;
-import playground.michalm.taxi.scheduler.TaxiSchedulerParams;
-import playground.michalm.taxi.vehreqpath.VehicleRequestFinder;
-
-import com.google.inject.Inject;
-import com.google.inject.Provider;
+import playground.michalm.taxi.scheduler.*;
 
 /**
  * @author jbischoff

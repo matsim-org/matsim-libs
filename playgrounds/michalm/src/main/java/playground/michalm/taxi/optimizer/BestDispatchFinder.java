@@ -1,4 +1,4 @@
-package playground.michalm.taxi.vehreqpath;
+package playground.michalm.taxi.optimizer;
 
 import java.util.*;
 
@@ -12,11 +12,10 @@ import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.PreProcessDijkstra;
 
 import playground.michalm.taxi.data.TaxiRequest;
-import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration;
 import playground.michalm.taxi.scheduler.TaxiScheduler;
 
 
-public class VehicleRequestFinder
+public class BestDispatchFinder
 {
     public static class Dispatch
     {
@@ -39,7 +38,7 @@ public class VehicleRequestFinder
     private final TaxiScheduler scheduler;
 
 
-    public VehicleRequestFinder(TaxiOptimizerConfiguration optimConfig)
+    public BestDispatchFinder(TaxiOptimizerConfiguration optimConfig)
     {
         this.optimConfig = optimConfig;
         this.scheduler = optimConfig.scheduler;

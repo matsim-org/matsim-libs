@@ -1,12 +1,12 @@
 package playground.dhosse.prt;
 
-import playground.michalm.taxi.vehreqpath.VehicleRequestFinder;
+import playground.michalm.taxi.optimizer.BestDispatchFinder;
 
 public class VehicleRequestPaths
 {
     public static final VehicleRequestPathCost TW_COST = new VehicleRequestPathCost() {
         @Override
-        public double getCost(VehicleRequestFinder.Dispatch vrp)
+        public double getCost(BestDispatchFinder.Dispatch vrp)
         {
             return VehicleRequestPaths.getPickupBeginTime(vrp) - vrp.request.getT0();
         }
@@ -14,14 +14,14 @@ public class VehicleRequestPaths
 
     public static final VehicleRequestPathCost TP_COST = new VehicleRequestPathCost() {
         @Override
-        public double getCost(VehicleRequestFinder.Dispatch vrp)
+        public double getCost(BestDispatchFinder.Dispatch vrp)
         {
             return VehicleRequestPaths.getPickupBeginTime(vrp) - vrp.path.getDepartureTime();
         }
     };
     
     
-    public static double getPickupBeginTime(VehicleRequestFinder.Dispatch vrp)
+    public static double getPickupBeginTime(BestDispatchFinder.Dispatch vrp)
     {
         return Math.max(vrp.request.getT0(), vrp.path.getArrivalTime());
     }

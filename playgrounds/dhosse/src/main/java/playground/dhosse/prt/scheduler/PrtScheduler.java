@@ -1,12 +1,11 @@
 package playground.dhosse.prt.scheduler;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.MatsimVrpContext;
 import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.dvrp.path.*;
+import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.schedule.Task.TaskStatus;
@@ -14,10 +13,9 @@ import org.matsim.core.router.util.*;
 
 import playground.michalm.taxi.data.TaxiRequest;
 import playground.michalm.taxi.data.TaxiRequest.TaxiRequestStatus;
+import playground.michalm.taxi.optimizer.BestDispatchFinder;
 import playground.michalm.taxi.schedule.*;
-import playground.michalm.taxi.scheduler.TaxiScheduler;
-import playground.michalm.taxi.scheduler.TaxiSchedulerParams;
-import playground.michalm.taxi.vehreqpath.*;
+import playground.michalm.taxi.scheduler.*;
 
 public class PrtScheduler extends TaxiScheduler {
 
@@ -29,7 +27,7 @@ public class PrtScheduler extends TaxiScheduler {
 		this.params = params;
 	}
 	
-	public void scheduleRequests(VehicleRequestFinder.Dispatch best, List<VehicleRequestFinder.Dispatch> requests) {
+	public void scheduleRequests(BestDispatchFinder.Dispatch best, List<BestDispatchFinder.Dispatch> requests) {
 		
 		if (best.request.getStatus() != TaxiRequestStatus.UNPLANNED) {
           throw new IllegalStateException();
@@ -69,7 +67,7 @@ public class PrtScheduler extends TaxiScheduler {
       
       List<TaxiRequest> req = new ArrayList<TaxiRequest>();
       
-      for(VehicleRequestFinder.Dispatch p : requests){
+      for(BestDispatchFinder.Dispatch p : requests){
     	  req.add(p.request);
       }
 
@@ -86,15 +84,15 @@ public class PrtScheduler extends TaxiScheduler {
 		
 	}
 	
-	private void appendRequestToExistingScheduleTasks(VehicleRequestFinder.Dispatch best,
-			List<VehicleRequestFinder.Dispatch> requests) {
+	private void appendRequestToExistingScheduleTasks(BestDispatchFinder.Dispatch best,
+			List<BestDispatchFinder.Dispatch> requests) {
 		
 		Schedule<TaxiTask> sched = TaxiSchedules.asTaxiSchedule(best.vehicle.getSchedule());
 		
 		for(TaxiTask task : sched.getTasks()){
 			
 			if(task instanceof NPersonsPickupStayTask){
-				for(VehicleRequestFinder.Dispatch vrp : requests){
+				for(BestDispatchFinder.Dispatch vrp : requests){
 					if(vrp.path.getDepartureTime() < task.getBeginTime() && !task.getStatus().equals(TaskStatus.PERFORMED)){
 						((NPersonsPickupStayTask)task).appendRequest(vrp.request, this.params.pickupDuration);
 					}

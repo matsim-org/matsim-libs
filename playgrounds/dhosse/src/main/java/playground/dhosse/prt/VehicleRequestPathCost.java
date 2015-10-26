@@ -19,10 +19,10 @@
 
 package playground.dhosse.prt;
 
-import playground.michalm.taxi.vehreqpath.VehicleRequestFinder;
+import playground.michalm.taxi.optimizer.BestDispatchFinder;
 
 
 public interface VehicleRequestPathCost
 {
-    double getCost(VehicleRequestFinder.Dispatch vrp);
+    double getCost(BestDispatchFinder.Dispatch vrp);
 }

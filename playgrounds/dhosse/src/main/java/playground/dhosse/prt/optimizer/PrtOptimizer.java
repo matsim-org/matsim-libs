@@ -1,32 +1,20 @@
 package playground.dhosse.prt.optimizer;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
 
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.MatsimVrpContext;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizerWithOnlineTracking;
-import org.matsim.contrib.dvrp.path.*;
-import org.matsim.contrib.dvrp.schedule.DriveTask;
-import org.matsim.contrib.dvrp.schedule.Schedule;
-import org.matsim.contrib.dvrp.schedule.Schedules;
-import org.matsim.contrib.dvrp.schedule.Task;
-import org.matsim.contrib.dvrp.schedule.Task.TaskStatus;
+import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 
-import playground.dhosse.prt.VehicleRequestPaths;
 import playground.dhosse.prt.request.NPersonsVehicleRequestPathFinder;
 import playground.jbischoff.taxi.optimizer.rank.IdleRankVehicleFinder;
 import playground.michalm.taxi.data.TaxiRequest;
-import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration;
+import playground.michalm.taxi.optimizer.*;
 import playground.michalm.taxi.schedule.*;
 import playground.michalm.taxi.scheduler.TaxiScheduler;
-import playground.michalm.taxi.vehreqpath.*;
 
 public class PrtOptimizer implements VrpOptimizerWithOnlineTracking, MobsimBeforeSimStepListener {
 
@@ -129,7 +117,7 @@ public class PrtOptimizer implements VrpOptimizerWithOnlineTracking, MobsimBefor
 
             Iterable<Vehicle> filteredVehs = idleVehicleFinder.filterVehiclesForRequest(idleVehicles,
                     req);
-            VehicleRequestFinder.Dispatch best = vrpFinder.findBestVehicleForRequest(req,
+            BestDispatchFinder.Dispatch best = vrpFinder.findBestVehicleForRequest(req,
                     filteredVehs);
 
             if (best != null) {

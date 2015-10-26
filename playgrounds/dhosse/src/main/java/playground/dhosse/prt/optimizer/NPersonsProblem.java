@@ -10,15 +10,14 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 
 import playground.dhosse.prt.scheduler.PrtScheduler;
 import playground.michalm.taxi.data.TaxiRequest;
-import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration;
-import playground.michalm.taxi.vehreqpath.*;
+import playground.michalm.taxi.optimizer.*;
 
 public class NPersonsProblem {
 	
 	private final TaxiOptimizerConfiguration optimConfig;
     private static Logger log = Logger.getLogger(NPersonsProblem.class);
     private final LeastCostPathCalculator router;
-    private final VehicleRequestFinder vrpFinder;
+    private final BestDispatchFinder vrpFinder;
 
 
     public NPersonsProblem(TaxiOptimizerConfiguration optimConfig)
@@ -27,7 +26,7 @@ public class NPersonsProblem {
         router = new Dijkstra(optimConfig.context.getScenario().getNetwork(),
                 optimConfig.travelDisutility, optimConfig.travelTime);
         
-        vrpFinder = new VehicleRequestFinder(optimConfig);
+        vrpFinder = new BestDispatchFinder(optimConfig);
     }
 
 
@@ -51,10 +50,10 @@ public class NPersonsProblem {
         	if(optimConfig.context.getVrpData().getVehicles().size()>0&&optimConfig.context.getTime() > 32000){
         		System.out.print("");
         	}
-        	List<VehicleRequestFinder.Dispatch> requests = new ArrayList<VehicleRequestFinder.Dispatch>();
+        	List<BestDispatchFinder.Dispatch> requests = new ArrayList<BestDispatchFinder.Dispatch>();
             TaxiRequest req = unplannedRequests.peek();
 
-            VehicleRequestFinder.Dispatch best = vrpFinder.findBestVehicleForRequest(req,
+            BestDispatchFinder.Dispatch best = vrpFinder.findBestVehicleForRequest(req,
                     optimConfig.context.getVrpData().getVehicles().values());
 
             if (best == null) {

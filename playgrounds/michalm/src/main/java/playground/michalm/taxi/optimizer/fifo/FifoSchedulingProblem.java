@@ -22,21 +22,20 @@ package playground.michalm.taxi.optimizer.fifo;
 import java.util.Queue;
 
 import playground.michalm.taxi.data.TaxiRequest;
-import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration;
-import playground.michalm.taxi.vehreqpath.VehicleRequestFinder;
+import playground.michalm.taxi.optimizer.*;
 
 
 public class FifoSchedulingProblem
 {
     private final TaxiOptimizerConfiguration optimConfig;
-    private final VehicleRequestFinder vrpFinder;
+    private final BestDispatchFinder dispatchFinder;
 
 
     public FifoSchedulingProblem(TaxiOptimizerConfiguration optimConfig,
-            VehicleRequestFinder vrpFinder)
+            BestDispatchFinder vrpFinder)
     {
         this.optimConfig = optimConfig;
-        this.vrpFinder = vrpFinder;
+        this.dispatchFinder = vrpFinder;
     }
 
 
@@ -45,7 +44,7 @@ public class FifoSchedulingProblem
         while (!unplannedRequests.isEmpty()) {
             TaxiRequest req = unplannedRequests.peek();
 
-            VehicleRequestFinder.Dispatch best = vrpFinder.findBestVehicleForRequest(req,
+            BestDispatchFinder.Dispatch best = dispatchFinder.findBestVehicleForRequest(req,
                     optimConfig.context.getVrpData().getVehicles().values());
 
             if (best == null) {//TODO won't work with req filtering; use VehicleData to find out when to exit???
