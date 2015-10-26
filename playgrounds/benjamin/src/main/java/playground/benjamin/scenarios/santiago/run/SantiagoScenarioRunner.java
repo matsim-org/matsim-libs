@@ -42,10 +42,10 @@ import playground.benjamin.scenarios.santiago.SantiagoScenarioConstants;
 
 public class SantiagoScenarioRunner {
 
-	private static String inputPath = "../../../runs-svn/santiago/run20/input/";
-	private static boolean doModeChoice = false;
-//	private static String inputPath = "../../../runs-svn/santiago/run30/input/";
-//	private static boolean doModeChoice = true;
+//	private static String inputPath = "../../../runs-svn/santiago/run20/input/";
+//	private static boolean doModeChoice = false;
+	private static String inputPath = "../../../runs-svn/santiago/run30/input/";
+	private static boolean doModeChoice = true;
 	
 	public static void main(String args[]){
 		
