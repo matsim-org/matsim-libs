@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.benjamin.internalization;
+package playground.benjamin.internalization.exposure;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -78,6 +78,10 @@ import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
+import playground.benjamin.internalization.EmissionCostFactors;
+import playground.benjamin.internalization.EmissionCostModule;
+import playground.benjamin.internalization.EmissionTravelDisutilityCalculatorFactory;
+import playground.benjamin.internalization.InternalizeEmissionsControlerListener;
 import playground.benjamin.scenarios.munich.exposure.EmissionResponsibilityCostModule;
 import playground.benjamin.scenarios.munich.exposure.EmissionResponsibilityTravelDisutilityCalculatorFactory;
 import playground.benjamin.scenarios.munich.exposure.GridTools;

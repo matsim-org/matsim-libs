@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin.internalization;
+package playground.benjamin.internalization.flatEmission;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -51,6 +51,10 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
+
+import playground.benjamin.internalization.EmissionCostModule;
+import playground.benjamin.internalization.EmissionTravelDisutilityCalculatorFactory;
+import playground.benjamin.internalization.InternalizeEmissionsControlerListener;
 
 import java.util.HashSet;
 import java.util.Set;
