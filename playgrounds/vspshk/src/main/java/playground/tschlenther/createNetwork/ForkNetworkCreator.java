@@ -1,7 +1,7 @@
 /**
  * 
  */
-package playground.tschlenther.Link2Link;
+package playground.tschlenther.createNetwork;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -14,6 +14,8 @@ import org.matsim.lanes.data.v20.Lane;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.lanes.data.v20.LaneDefinitionsFactory20;
 import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
+
+import playground.tschlenther.Link2Link.Link2LinkTestSignalsCreator;
 
 /**
  * @author Tilmann Schlenther
@@ -32,7 +34,7 @@ import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
  *							  (5)
  *
  */
-public class Link2LinkTestNetworkCreator {
+public class ForkNetworkCreator {
 
 	
 	private static Id<Link> LINK_ID1 = Id.create("Link1", Link.class);
@@ -47,7 +49,7 @@ public class Link2LinkTestNetworkCreator {
 	private boolean UseSignals = false;
 	private boolean UseLanes = false;
 	
-	public Link2LinkTestNetworkCreator(Scenario scenario, boolean lanes, boolean signals){
+	public ForkNetworkCreator(Scenario scenario, boolean lanes, boolean signals){
 		this.scenario = scenario;
 		this.UseSignals = signals;
 		this.UseLanes = lanes;
