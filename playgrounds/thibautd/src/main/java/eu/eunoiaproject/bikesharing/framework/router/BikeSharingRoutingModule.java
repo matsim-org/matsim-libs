@@ -21,11 +21,14 @@ package eu.eunoiaproject.bikesharing.framework.router;
 
 import com.google.inject.Inject;
 import eu.eunoiaproject.bikesharing.framework.BikeSharingConstants;
+import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingConfigGroup;
 import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingFacilities;
 import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingFacility;
 import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingRoute;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.*;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.RoutingModule;
@@ -63,12 +66,23 @@ public class BikeSharingRoutingModule implements RoutingModule {
 
 	@Inject
 	public BikeSharingRoutingModule(
-			final Random random,
-			final BikeSharingFacilities bikeSharingFacilities,
-			final double searchRadius,
+			final Scenario scenario,
 			@Named( TransportMode.walk )
 			final RoutingModule walkRouting,
 			@Named( TransportMode.bike )
+			final RoutingModule bikeRouting) {
+		this(MatsimRandom.getLocalInstance(),
+				(BikeSharingFacilities) scenario.getScenarioElement( BikeSharingFacilities.ELEMENT_NAME ),
+				((BikeSharingConfigGroup) scenario.getConfig().getModule( BikeSharingConfigGroup.GROUP_NAME )).getSearchRadius(),
+				walkRouting,
+				bikeRouting );
+	}
+
+	public BikeSharingRoutingModule(
+			final Random random,
+			final BikeSharingFacilities bikeSharingFacilities,
+			final double searchRadius,
+			final RoutingModule walkRouting,
 			final RoutingModule bikeRouting) {
 		this.random = random;
 		this.bikeSharingFacilities = bikeSharingFacilities;
