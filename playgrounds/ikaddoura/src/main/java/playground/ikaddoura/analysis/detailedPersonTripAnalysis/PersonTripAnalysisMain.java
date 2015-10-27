@@ -81,8 +81,8 @@ public class PersonTripAnalysisMain {
 			
 		} else {
 			
-			String id = "c13";
-			String baiscDirectoryPath = "/Users/ihab/Documents/workspace/runs-svn/c/output/";
+			String id = "cn1";
+			String baiscDirectoryPath = "/Users/ihab/Documents/workspace/runs-svn/cn2/output/";
 						
 			runDirectory = baiscDirectoryPath + id + "/";
 			log.info("Could not find run-directory in args. Using the directory " + runDirectory);
@@ -113,7 +113,8 @@ public class PersonTripAnalysisMain {
 		String eventsFile = runDirectory + "ITERS/it." + finalIteration + "/" + finalIteration + ".events.xml.gz";
 		String outputPath = runDirectory + "ITERS/it." + finalIteration + "/detailedAnalysis/";
 		
-		String noiseEventsFile = runDirectory + "ITERS/it." + finalIteration + "/" + finalIteration + ".events.xml.gz";
+//		String noiseEventsFile = runDirectory + "ITERS/it." + finalIteration + "/" + finalIteration + ".events.xml.gz";
+		String noiseEventsFile = runDirectory + "/noiseAnalysis/analysis_it.100/100.events_NoiseImmission_Offline.xml.gz";
 		String congestionEventsFile = runDirectory + "ITERS/it." + finalIteration + "/" + finalIteration + ".events.xml.gz";
 		
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.loadScenario(config);
