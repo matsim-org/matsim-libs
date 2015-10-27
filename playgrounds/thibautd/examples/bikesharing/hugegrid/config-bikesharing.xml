@@ -6,7 +6,7 @@
 -->
 	<!ENTITY inbase "examples/bikesharing/hugegrid/" >
 	<!ENTITY outputName "hugegrid-bikesharing" >
-	<!ENTITY plans "&inbase;/plans-initwalk.xml.gz" >
+	<!ENTITY plans "&inbase;/plans-initwalk.xml" >
 	<!ENTITY bikesharingfacilities "&inbase;/sparse-bike-sharing-facilities.xml" >
 	<!ENTITY niters "100" >
 	<!ENTITY considercar "true" >
@@ -60,6 +60,7 @@
 
 		<!-- iterationNumber % writePlansInterval == 0 defines (hopefully) in which iterations plans are written to a file. `0' disables plans writing completely.  Some plans in early iterations are always written -->
 		<param name="writePlansInterval" value="10" />
+
 	</module>
 
 <!-- ====================================================================== -->
@@ -74,6 +75,7 @@
 		<param name="coordinateSystem" value="Atlantis" />
 		<param name="numberOfThreads" value="10" />
 		<param name="randomSeed" value="4711" />
+
 	</module>
 
 <!-- ====================================================================== -->
@@ -153,10 +155,10 @@
 		<param name="marginalUtlOfDistanceWalk" value="0.0" />
 
 		<!-- [unit_of_money/m] conversion of car distance into money -->
-		<param name="monetaryDistanceCostRateCar" value="0.0" />
+		<param name="monetaryDistanceRateCar" value="0.0" />
 
 		<!-- [unit_of_money/m] conversion of pt distance into money -->
-		<param name="monetaryDistanceCostRatePt" value="0.0" />
+		<param name="monetaryDistanceRatePt" value="0.0" />
 
 		<!-- [utils/hr] marginal utility of doing an activity.  normally positive.  also the opportunity cost of time if agent is doing nothing. -->
 		<param name="performing" value="6.0" />
@@ -184,9 +186,13 @@
 
 	<module name="plans" >
 		<!--
-		<param name="inputPlansFile" value="testcases/matings/3-10-bothPopulation.xml.gz" />
+		<param name="inputPlansFile" value="testcases/matings/3-10-bothPopulation.xml" />
 		-->
 		<param name="inputPlansFile" value="&plans;" />
+
+
+		<!-- String: minOfDurationAndEndTime tryEndTimeThenDuration endTimeOnly. Anything besides minOfDurationAndEndTime will internally use a different (simpler) version of the TimeAllocationMutator. -->
+		<param name="activityDurationInterpretation" value="tryEndTimeThenDuration" />
 	</module>
 
 <!-- ====================================================================== -->
@@ -215,12 +221,5 @@
 		<param name="ModuleDisableAfterIteration_4" value="1950" />
 
 	</module>
-
-	<module name="vspExperimental" >
-
-		<!-- String: minOfDurationAndEndTime tryEndTimeThenDuration endTimeOnly. Anything besides minOfDurationAndEndTime will internally use a different (simpler) version of the TimeAllocationMutator. -->
-		<param name="activityDurationInterpretation" value="tryEndTimeThenDuration" />
-	</module>
-
 
 </config>
