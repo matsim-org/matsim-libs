@@ -124,7 +124,12 @@ public class TestExposurePricing {
 	public void noPricingTest () {
 		logger.info("isConsideringCO2Costs = "+ this.isConsideringCO2Costs);
 		logger.info("Number of time bins are "+ this.noOfTimeBins);
-		Controler controler = minimalControlerSetting();
+		Scenario sc = minimalControlerSetting();
+
+		String outputDirectory = helper.getOutputDirectory() + "/" + (isConsideringCO2Costs ? "considerCO2Costs" : "notConsiderCO2Costs") + "_"+this.noOfTimeBins+"_timeBins/";
+		sc.getConfig().controler().setOutputDirectory(outputDirectory);
+
+		Controler controler = new Controler(sc);
 
 		/* 
 		 *******************************************************************************************
@@ -143,15 +148,19 @@ public class TestExposurePricing {
 	}
 
 	@Test
-	public void pricingExposureTest() {
+	public void pricingExposure_ReRouteTest() {
 		logger.info("isConsideringCO2Costs = "+ this.isConsideringCO2Costs);
 		logger.info("Number of time bins are "+ this.noOfTimeBins);
 
-		Controler controler = minimalControlerSetting();
-		Scenario sc = controler.getScenario();
+		Scenario sc = minimalControlerSetting();
+
+		String outputDirectory = helper.getOutputDirectory() + "/" + (isConsideringCO2Costs ? "considerCO2Costs" : "notConsiderCO2Costs") + "_"+this.noOfTimeBins+"_timeBins/";
+		sc.getConfig().controler().setOutputDirectory(outputDirectory);
+
 		sc.getConfig().controler().setLastIteration(1);
 		addReRoutingStrategy(sc);
 
+		Controler controler = new Controler(sc);
 		/* 
 		 *******************************************************************************************
 		 * Now price for exposure and check the route which should be longer i.e. route with link 38.
@@ -195,42 +204,95 @@ public class TestExposurePricing {
 		LinkNetworkRouteImpl route = (LinkNetworkRouteImpl) ( (Leg) selectedPlan.getPlanElements().get(1) ).getRoute() ;
 		// Agent should take longer route to avoid exposure toll
 		Assert.assertTrue("Wrong route is selected. Agent should have used route with link 38 (longer) instead.", route.getLinkIds().contains(Id.create("38", Link.class)));
+	}
+	
+	@Test
+	public void pricingExposure_TollTest() {
+		logger.info("isConsideringCO2Costs = "+ this.isConsideringCO2Costs);
+		logger.info("Number of time bins are "+ this.noOfTimeBins);
 
-		if (noOfTimeBins != 1) return; //TODO : yet to get the manual calculation for numberOfTimeBins = 24.
+		Scenario sc = minimalControlerSetting();
 
-		/*
-		 * Manual calculation:
-		 * 20 passive agents and 1 active agent will be exposed due to emission of 1 active agent on the link 39.
-		 * All passive agent perform home activity for 86399 whereas active agent perform 6*3600+86400-51148 (=56852) home activity 
-		 * and 51000-22107 (=28893) work activity. 	Total cells = 32*20 = 640.
-		 * Emission costs (only warm emission since cold emission exists only upto 2 km on departure link) on link 39 = 0.027613043 
-		 * without considering co2 costs (see EquilEmissionTest.class)
-		 * cell of Link 39 = 13,14; Thus only cells with 9 < x < 17 and 10 < y < 18 matters to get the dispersion weight.
-		 * 15,13; 15,12; 15,11; 14,13; 14,12; 14,11; 13,13; 13,12; 13,11; 12,13; 12,12; 12,11; 11,13; 11,12; 11,11; 
-		 * noOfCells with zero distance (13,14;) = 0; noOfCells with 1 distance (13,13;) = 1;
-		 * noOfCells with 2 distance (13,12; 12,13; 14,13 ) = 3; noOfCells with 3 distance (13,11; 12,12; 11,13; 14,12; 15,13) = 5;
-		 * avg Exposed duration = (20*86399+(56852+28893))/640 = 2833.945313; 
-		 * Thus total relevant duration = (0.132+3*0.029+5*0.002)*86398 = 19785.142
-		 * Thus total toll in iteration 1 on link 39 = 19785.142 * 0.027613043 / 2699.9375 = 0.19278
+		String outputDirectory = helper.getOutputDirectory() + "/" + (isConsideringCO2Costs ? "considerCO2Costs" : "notConsiderCO2Costs") + "_"+this.noOfTimeBins+"_timeBins/";
+		sc.getConfig().controler().setOutputDirectory(outputDirectory);
+
+		sc.getConfig().controler().setLastIteration(1);
+
+		Controler controler = new Controler(sc);
+		/* 
+		 *******************************************************************************************
+		 * Now price for exposure but without re-routing and 
+		 * check the route which should be shorter i.e. route with link 39.
+		 ********************************************************************************************
 		 */
 
-		if (! isConsideringCO2Costs ) {
-			if(personMoneyEventHandler.link39LeaveTime == Double.POSITIVE_INFINITY) {
-				throw new RuntimeException("Active agent does not pass through link 39.");
-			}
+		EmissionModule emissionModule = new EmissionModule(sc);
+		emissionModule.setEmissionEfficiencyFactor( 1.0 );
+		emissionModule.createLookupTables();
+		emissionModule.createEmissionHandler();
 
-			for (PersonMoneyEvent e : personMoneyEventHandler.events){
-				if (e.getTime() == personMoneyEventHandler.link39LeaveTime) {
-					//					TODO fix this test. Current value shows -0.18909
-					Assert.assertEquals( "Exposure toll on link 39 from Manual calculation does not match from money event.", df.format( -0.19278 ), df.format( e.getAmount() ) );
-				}
+		GridTools gt = new GridTools(sc.getNetwork().getLinks(), xMin, xMax, yMin, yMax);
+		Map<Id<Link>, Integer> links2xCells = gt.mapLinks2Xcells(noOfXCells);
+		Map<Id<Link>, Integer> links2yCells = gt.mapLinks2Ycells(noOfYCells);
+
+		Double timeBinSize = new Double (controler.getScenario().getConfig().qsim().getEndTime() / this.noOfTimeBins );
+
+		ResponsibilityGridTools rgt = new ResponsibilityGridTools(timeBinSize, noOfTimeBins, links2xCells, links2yCells, noOfXCells, noOfYCells);
+		EmissionResponsibilityCostModule emissionCostModule = new EmissionResponsibilityCostModule( 1.0, isConsideringCO2Costs, rgt, links2xCells, links2yCells);
+		final EmissionResponsibilityTravelDisutilityCalculatorFactory emfac = new EmissionResponsibilityTravelDisutilityCalculatorFactory(emissionModule, emissionCostModule);
+
+		controler.addOverridingModule(new AbstractModule() {
+
+			@Override
+			public void install() {
+				bindCarTravelDisutilityFactory().toInstance(emfac);
 			}
+		});
+
+		controler.addControlerListener(new InternalizeEmissionResponsibilityControlerListener(emissionModule, emissionCostModule, rgt, links2xCells, links2yCells));
+
+		MyPersonMoneyEventHandler personMoneyEventHandler = new MyPersonMoneyEventHandler();
+		controler.getEvents().addHandler(personMoneyEventHandler);
+
+		controler.run();
+
+		if (noOfTimeBins == 24) {
+			return; //TODO : yet to get the manual calculation for numberOfTimeBins = 24.
 		} else {
-			// TODO: this is completly wrong. Include flat CO2 costs not distributive costs.
+			/*
+			 * Manual calculation:
+			 * 20 passive agents and 1 active agent will be exposed due to emission of 1 active agent on the link 39.
+			 * All passive agent perform home activity for 86399 whereas active agent perform 6*3600+86400-51148 (=56852) home activity 
+			 * and 51000-22107 (=28893) work activity. 	Total cells = 32*20 = 640.
+			 * Emission costs (only warm emission since cold emission exists only upto 2 km on departure link) on link 39 = 0.027613043 
+			 * without considering co2 costs (see EquilEmissionTest.class)
+			 * cell of Link 39 = 13,14; Thus only cells with 9 < x < 17 and 10 < y < 18 matters to get the dispersion weight.
+			 * 15,13; 15,12; 15,11; 14,13; 14,12; 14,11; 13,13; 13,12; 13,11; 12,13; 12,12; 12,11; 11,13; 11,12; 11,11; 
+			 * noOfCells with zero distance (13,14;) = 0; noOfCells with 1 distance (13,13;) = 1;
+			 * noOfCells with 2 distance (13,12; 12,13; 14,13 ) = 3; noOfCells with 3 distance (13,11; 12,12; 11,13; 14,12; 15,13) = 5;
+			 * avg Exposed duration = (20*86399+(56852+28893))/640 = 2833.945313; 
+			 * Thus total relevant duration = (0.132+3*0.029+5*0.002)*86398 = 19785.142
+			 * Thus total toll in iteration 1 on link 39 = 19785.142 * 0.027613043 / 2699.9375 = 0.19278
+			 */
+
+			if (! isConsideringCO2Costs ) {
+				if(personMoneyEventHandler.link39LeaveTime == Double.POSITIVE_INFINITY) {
+					throw new RuntimeException("Active agent does not pass through link 39.");
+				}
+
+				for (PersonMoneyEvent e : personMoneyEventHandler.events){
+					if (e.getTime() == personMoneyEventHandler.link39LeaveTime) {
+						//					TODO fix this test. Current value shows -0.18909
+						Assert.assertEquals( "Exposure toll on link 39 from Manual calculation does not match from money event.", df.format( -0.19278 ), df.format( e.getAmount() ) );
+					}
+				}
+			} else {
+				// TODO: this is completely wrong. Include flat CO2 costs not distributive costs.
+			}
 		}
 	}
 
-	private Controler minimalControlerSetting() {
+	private Scenario minimalControlerSetting() {
 		EquilTestSetUp equilTestSetUp = new EquilTestSetUp();
 		Scenario sc = equilTestSetUp.createConfig();
 		// TODO : I have used link speed as 100/3.6 m/s instead of 100 m/s thus check the difference in the result
@@ -253,11 +315,7 @@ public class TestExposurePricing {
 		config.addModule(ecg);
 
 		config.controler().setLastIteration(0);
-
-		Controler controler = new Controler(sc);
-		String outputDirectory = helper.getOutputDirectory() + "/exposureToll/" + (isConsideringCO2Costs ? "considerCO2Costs/" : "notConsiderCO2Costs/");
-		sc.getConfig().controler().setOutputDirectory(outputDirectory);
-		return controler;
+		return sc;
 	}
 
 	private void addReRoutingStrategy(Scenario sc) {
