@@ -28,10 +28,7 @@ import playground.johannes.synpop.data.io.PopulationIO;
 import playground.johannes.synpop.processing.SetActivityTypeTask;
 import playground.johannes.synpop.processing.TaskRunner;
 import playground.johannes.synpop.processing.ValidateNoPlans;
-import playground.johannes.synpop.source.mid2008.processing.AdjustJourneyWeight;
-import playground.johannes.synpop.source.mid2008.processing.ReturnEpisodeTask;
-import playground.johannes.synpop.source.mid2008.processing.SetFirstActivityTypeTask;
-import playground.johannes.synpop.source.mid2008.processing.VacationsTypeTask;
+import playground.johannes.synpop.source.mid2008.processing.*;
 
 import java.util.Collection;
 import java.util.Set;
@@ -47,6 +44,7 @@ public class JourneysValidator {
         Factory factory = new PlainFactory();
         Set<? extends Person> persons = PopulationIO.loadFromXML(args[0], factory);
 
+        TaskRunner.validateEpisodes(new ValidateDomestic(), persons);
         TaskRunner.validatePersons(new ValidateNoPlans(), persons);
 
         logger.info("Setting activity types...");
