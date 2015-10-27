@@ -49,7 +49,7 @@ import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
- * @author amit
+ * @author julia, benjamin, amit
  */
 
 public class EquilTestSetUp {
@@ -64,7 +64,7 @@ public class EquilTestSetUp {
 		ccg.setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 		ccg.setCreateGraphs(false);		
 		ccg.setFirstIteration(0);
-		ccg.setLastIteration(20);
+		ccg.setLastIteration(0);
 		ccg.setWriteEventsInterval(1);
 		ccg.setMobsim("qsim");
 
