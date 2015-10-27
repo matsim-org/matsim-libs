@@ -113,7 +113,7 @@ public class BikeSharingRoutingModule implements RoutingModule {
 							toFacility,
 							departureTime,
 							person));
-			return null;
+			return trip;
 		}
 
 		final List<PlanElement> trip = new ArrayList< >( 5 );
