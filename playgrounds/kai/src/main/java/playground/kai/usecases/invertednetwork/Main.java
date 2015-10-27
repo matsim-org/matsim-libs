@@ -18,7 +18,14 @@
  * *********************************************************************** */
 package playground.kai.usecases.invertednetwork;
 
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.scenario.ScenarioUtils;
 
 /**
  * @author nagel
@@ -30,13 +37,28 @@ public class Main {
 	}
 
 	public static void main(String[] args) {
-		Controler ctrl = new Controler(args) ;
+		Config config ;
+		if ( args!=null && args.length >=1 ) {
+			config = ConfigUtils.loadConfig( args[0] ) ;
+		} else {
+			config = ConfigUtils.createConfig() ;
+		}
 		
-		ctrl.setTripRouterFactory(new InvertedNetworkForCarsRouterFactoryImpl(ctrl.getScenario(), ctrl.getTravelDisutilityFactory()));
+		final Scenario scenario = ScenarioUtils.loadScenario(config) ;
 		
+		Controler ctrl = new Controler( scenario ) ;
+		
+		final TravelDisutilityFactory tdf = ctrl.getTravelDisutilityFactory() ;
+		// (should probably use inject syntax in routing module. kai, oct'15)
+		
+		ctrl.addOverridingModule(new AbstractModule(){
+			@Override
+			public void install() {
+				this.addRoutingModuleBinding(TransportMode.car).toInstance(new InvertedRoutingModule(scenario,tdf) ) ; 
+			}
+		});
 		
 		ctrl.run();
-		
 	}
 
 }
