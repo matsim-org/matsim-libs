@@ -95,7 +95,7 @@ public class RunZurichScenario {
 		// We use a specific scoring function, that uses individual preferences
 		// for activity durations.
 		controler.setScoringFunctionFactory(
-			new MATSim2010ScoringFunctionFactory(
+			new SharedMobilityScoringFunctionFactory(
 					controler.getScenario(),
 					new StageActivityTypesImpl(
 						PtConstants.TRANSIT_ACTIVITY_TYPE ) ) ); 	
@@ -105,6 +105,7 @@ public class RunZurichScenario {
 		
 		controler.run();
 	}
+	
 
 	private static void connectFacilitiesWithNetwork(Controler controler) {
         ActivityFacilities facilities = controler.getScenario().getActivityFacilities();
@@ -156,8 +157,8 @@ public class RunZurichScenario {
 		controler.addOverridingModule(CarsharingUtils.createModule());
 
 		//setting up the scoring function factory, inside different scoring functions are set-up
-		controler.setScoringFunctionFactory( new CarsharingScoringFunctionFactory( sc ) );
-
+		//controler.setScoringFunctionFactory( new CarsharingScoringFunctionFactory( sc ) );
+		
 		final CarsharingConfigGroup csConfig = (CarsharingConfigGroup) sc.getConfig().getModule(CarsharingConfigGroup.GROUP_NAME);
 		controler.addControlerListener(new CarsharingListener(controler,
 				csConfig.getStatsWriterFrequency() ) ) ;
