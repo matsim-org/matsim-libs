@@ -39,7 +39,7 @@ public class AssignmentProblem
     private final TaxiOptimizerConfiguration optimConfig;
     private final MultiNodeDijkstra router;
 
-    private final double maxDistance2 = 5_000 * 5_0000; //5 km TODO
+    private final double maxDistance2 = 5_000. * 5_0000.; //5 km TODO
     private final double planningHorizon = 1800; //30 min TODO
 
     private VehicleData vData;
@@ -177,10 +177,20 @@ public class AssignmentProblem
                 double travelTime = pathData.delay == NULL_PATH_COST ? //
                         NULL_PATH_COST : // no path (too far away)
                         pathData.delay + pathData.path.travelTime;
+                
+                double pickupBeginTime = Math.max(rData.requests.get(r).getT0(), departure.time + travelTime);
 
                 costMatrix[v][r] = reduceTP ? //
-                        travelTime : // T_P
-                        Math.max(departure.time + travelTime - rData.requests.get(r).getT0(), 0); //T_W
+                        pickupBeginTime - departure.time : // T_P
+                        
+                        //TODO the following two variants behave different for undersupply
+                        //(i.e. with dummy vehicles)
+                        
+                        //more fairness, lower throughput
+//                        Math.max(departure.time + travelTime - rData.requests.get(r).getT0(), 0); // T_W
+                            
+						//less fairness, higher throughput
+                            pickupBeginTime;// T_W
             }
         }
 
