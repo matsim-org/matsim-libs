@@ -107,7 +107,7 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 		this.controler.addControlerListener(startupListener);
 		this.controler.run();
 		logger.info("Person is driving on route " + handler.actualRoadSelected + "; expected route: " + expectedRoad);
-		assertTrue("Person was expected to be routed through link "+ expectedRoad +", but was " + handler.getActualRoadSelected(), handler.expectedRoadSelected() == true);
+		assertTrue("Person was expected to be routed through link "+ expectedRoad +", but was " + handler.getActualRoadSelected(), handler.expectedRoadSelected() );
 	}
 
 	public void testTimeRouting() {
@@ -143,7 +143,7 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 		this.controler.addControlerListener(startupListener);
 		this.controler.run();
 		logger.info("Person is driving on route " + handler.actualRoadSelected + "; expected route: " + expectedRoad);
-		assertTrue("Person was expected to be routed through link "+ expectedRoad +", but was " + handler.getActualRoadSelected(), handler.expectedRoadSelected() == true);
+		assertTrue("Person was expected to be routed through link "+ expectedRoad +", but was " + handler.getActualRoadSelected(), handler.expectedRoadSelected() );
 	}
 
 	public void testTimeDistanceRouting() {
@@ -179,7 +179,7 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 		this.controler.addControlerListener(startupListener);
 		this.controler.run();
 		logger.info("Person is driving on route " + handler.actualRoadSelected + "; expected route: " + expectedRoad);
-		assertTrue("Person was expected to be routed through link "+ expectedRoad +", but was " + handler.getActualRoadSelected(), handler.expectedRoadSelected() == true);
+		assertTrue("Person was expected to be routed through link "+ expectedRoad +", but was " + handler.getActualRoadSelected(), handler.expectedRoadSelected() );
 	}
 
 	public void testTimeDistanceEmissionRouting() {
@@ -223,7 +223,7 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 		this.controler.addControlerListener(startupListener);
 		this.controler.run();
 		logger.info("Person is driving on route " + handler.actualRoadSelected + "; expected route: " + expectedRoad);
-		assertTrue("Person was expected to be routed through link " + expectedRoad + ", but was " + handler.getActualRoadSelected(), handler.expectedRoadSelected() == true);
+		assertTrue("Person was expected to be routed through link " + expectedRoad + ", but was " + handler.getActualRoadSelected(), handler.expectedRoadSelected() );
 	}
 
 	private void installEmissionInternalizationListener() {
@@ -298,9 +298,9 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 		// define emission tool input files	
 		EmissionsConfigGroup ecg = new EmissionsConfigGroup() ;
 		controler.getConfig().addModule(ecg);
-		ecg.setEmissionRoadTypeMappingFile(this.getClassInputDirectory() + "roadTypeMapping.txt");
-		ecg.setAverageWarmEmissionFactorsFile(this.getClassInputDirectory() + "EFA_HOT_vehcat_2005average.txt");
-		ecg.setAverageColdEmissionFactorsFile(this.getClassInputDirectory() + "EFA_ColdStart_vehcat_2005average.txt");
+		ecg.setEmissionRoadTypeMappingFile("../../../../repos/shared-svn/projects/detailedEval/emissions/hbefaForMatsim/"+ "roadTypeMapping.txt");
+		ecg.setAverageWarmEmissionFactorsFile("../../../../repos/shared-svn/projects/detailedEval/emissions/hbefaForMatsim/" + "EFA_HOT_vehcat_2005average.txt");
+		ecg.setAverageColdEmissionFactorsFile("../../../../repos/shared-svn/projects/detailedEval/emissions/hbefaForMatsim/" + "EFA_ColdStart_vehcat_2005average.txt");
 
 		// TODO: the following does not work yet. Need to force controler to always write events in the last iteration.
 		VspExperimentalConfigGroup vcg = controler.getConfig().vspExperimental() ;
