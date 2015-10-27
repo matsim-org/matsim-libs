@@ -33,9 +33,7 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
-import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonMoneyEventHandler;
 import org.matsim.contrib.emissions.EmissionModule;
 import org.matsim.contrib.emissions.events.ColdEmissionEvent;
@@ -48,8 +46,6 @@ import org.matsim.contrib.emissions.types.WarmPollutant;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.StrategyConfigGroup;
-import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.EventsUtils;
@@ -63,7 +59,6 @@ import playground.benjamin.internalization.InternalizeEmissionsControlerListener
 
 /**
  * @author amit
- *
  */
 
 @RunWith(Parameterized.class)
@@ -202,7 +197,6 @@ public class EquilEmissionTest {
 		}
 	}
 	
-
 	private void emissionSettings(Scenario scenario){
 
 		Config config = scenario.getConfig();
@@ -220,19 +214,9 @@ public class EquilEmissionTest {
 		config.addModule(ecg);
 	}
 
-	private void addReRoutingStrategy(Scenario sc) {
-		StrategyConfigGroup scg = sc.getConfig().strategy();
-		StrategySettings strategySettingsR = new StrategySettings(Id.create("2", StrategySettings.class));
-		strategySettingsR.setStrategyName("ReRoute");
-		strategySettingsR.setWeight(1000);
-		strategySettingsR.setDisableAfter(10);
-		scg.addStrategySettings(strategySettingsR);
-	}
-
-	private class MyPersonMoneyEventHandler implements PersonMoneyEventHandler, LinkLeaveEventHandler  {
+	private class MyPersonMoneyEventHandler implements PersonMoneyEventHandler  {
 
 		List<PersonMoneyEvent> events = new ArrayList<PersonMoneyEvent>();
-		double link39LeaveTime = Double.POSITIVE_INFINITY;
 
 		@Override
 		public void reset(int iteration) {
@@ -242,11 +226,6 @@ public class EquilEmissionTest {
 		@Override
 		public void handleEvent(PersonMoneyEvent event) {
 			events.add(event);
-		}
-
-		@Override
-		public void handleEvent(LinkLeaveEvent event) {
-			if(event.getLinkId().toString().equals("39")) link39LeaveTime = event.getTime();
 		}
 	}
 
