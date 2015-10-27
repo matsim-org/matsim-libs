@@ -32,6 +32,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
+import playground.benjamin.internalization.EquilTestSetUp;
 import playground.benjamin.scenarios.munich.exposure.GridTools;
 import playground.benjamin.scenarios.munich.exposure.IntervalHandler;
 
@@ -40,7 +41,7 @@ import playground.benjamin.scenarios.munich.exposure.IntervalHandler;
  */
 
 public class IntervalHandlerTest {
-	
+
 	@Test
 	public void activityDurationForActiveAgentTest ( ) {
 		EquilTestSetUp equilTestSetUp = new EquilTestSetUp();
@@ -49,7 +50,7 @@ public class IntervalHandlerTest {
 		equilTestSetUp.createActiveAgents(sc);
 
 		EventsManager events = EventsUtils.createEventsManager();
-		
+
 		Double xMin = 0.0;
 		Double xMax = 20000.0;
 		Double yMin = 0.0;
@@ -66,22 +67,22 @@ public class IntervalHandlerTest {
 		Map<Id<Link>, Integer> links2yCells = gt.mapLinks2Ycells(noOfYCells);
 		IntervalHandler intHandler = new IntervalHandler( timeBinSize, sc.getConfig().qsim().getEndTime(), 32, 20, links2xCells, links2yCells);
 		events.addHandler(intHandler);
-		
+
 		Controler controler = new Controler(sc);
 		controler.getEvents().addHandler(intHandler);
 		controler.run();
-		
+
 		/*
 		 *  The route of active agent consists of 12-23-38-84-45 links (home to work) and then 45-56-67-71 (work to home)
 		 *  Thus total travel time = (1+73+181+180+72) + (1+37+37+37+36) = 655 // QSim returns 180 sec on link 84 (dont know why)
 		 *  This should return total activity duration = 24*3600 - 655 = 85745
 		 */
-		
+
 		double sumOfDurationsInAllTimebins = 0.;
 		SortedMap<Double, Double[][]> timeBin2Durations = intHandler.getDuration();
 		for ( double timeBin : timeBin2Durations.keySet()) {
 			Double [] [] durations = timeBin2Durations.get(timeBin);
-			
+
 			for (int ii = 0; ii <durations.length; ii++){
 				for (int jj = 0; jj<durations[0].length;jj++){
 					sumOfDurationsInAllTimebins += durations[ii][jj];
@@ -90,7 +91,7 @@ public class IntervalHandlerTest {
 		}
 		Assert.assertEquals("Total activity duration is wrong.", 85745, sumOfDurationsInAllTimebins, MatsimTestUtils.EPSILON );
 	}
-	
+
 	@Test
 	public void activityDurationForActiveAndPassiveAgentTest ( ) {
 		EquilTestSetUp equilTestSetUp = new EquilTestSetUp();
@@ -100,7 +101,7 @@ public class IntervalHandlerTest {
 		equilTestSetUp.createPassiveAgents(sc);
 
 		EventsManager events = EventsUtils.createEventsManager();
-		
+
 		Double xMin = 0.0;
 		Double xMax = 20000.0;
 		Double yMin = 0.0;
@@ -117,21 +118,21 @@ public class IntervalHandlerTest {
 		Map<Id<Link>, Integer> links2yCells = gt.mapLinks2Ycells(noOfYCells);
 		IntervalHandler intHandler = new IntervalHandler( timeBinSize, sc.getConfig().qsim().getEndTime(), 32, 20, links2xCells, links2yCells);
 		events.addHandler(intHandler);
-		
+
 		Controler controler = new Controler(sc);
 		controler.getEvents().addHandler(intHandler);
 		controler.run();
-		
+
 		/*
 		 *  85745 sec from above. 
 		 *  Additionally, all 20 agents work 86399 sec. Thus total activity duration for all agents = 86399*20+85745 = 1813725
 		 */
-		
+
 		double sumOfDurationsInAllTimebins = 0.;
 		SortedMap<Double, Double[][]> timeBin2Durations = intHandler.getDuration();
 		for ( double timeBin : timeBin2Durations.keySet()) {
 			Double [] [] durations = timeBin2Durations.get(timeBin);
-			
+
 			for (int ii = 0; ii <durations.length; ii++){
 				for (int jj = 0; jj<durations[0].length;jj++){
 					sumOfDurationsInAllTimebins += durations[ii][jj];
@@ -143,4 +144,3 @@ public class IntervalHandlerTest {
 }
 
 
-	

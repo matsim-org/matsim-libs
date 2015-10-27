@@ -19,401 +19,281 @@
  * *********************************************************************** */
 package playground.benjamin.internalization.exposure;
 
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
+import org.junit.Assert;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.PersonMoneyEvent;
+import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonMoneyEventHandler;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.emissions.EmissionModule;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
-import org.matsim.contrib.otfvis.OTFVisModule;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.ControlerConfigGroup;
-import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.config.groups.StrategyConfigGroup;
-import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
-import org.matsim.vis.otfvis.OTFFileWriterFactory;
-import playground.benjamin.scenarios.munich.exposure.*;
+import org.matsim.testcases.MatsimTestUtils;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import playground.benjamin.internalization.EquilTestSetUp;
+import playground.benjamin.scenarios.munich.exposure.EmissionResponsibilityCostModule;
+import playground.benjamin.scenarios.munich.exposure.EmissionResponsibilityTravelDisutilityCalculatorFactory;
+import playground.benjamin.scenarios.munich.exposure.GridTools;
+import playground.benjamin.scenarios.munich.exposure.InternalizeEmissionResponsibilityControlerListener;
+import playground.benjamin.scenarios.munich.exposure.ResponsibilityGridTools;
 
 
 /**
- * @author julia after benjamin
+ * @author julia, benjamin, amit
  *
  */
+@RunWith(Parameterized.class)
 public class TestExposurePricing {
+
+	private String inputPath = "../../../../repos/shared-svn/projects/detailedEval/emissions/testScenario/input/";
+
+	private String emissionInputPath = "../../../../repos/shared-svn/projects/detailedEval/emissions/hbefaForMatsim/";
+	private String roadTypeMappingFile = emissionInputPath + "roadTypeMapping.txt";
+	private String emissionVehicleFile = inputPath + "emissionVehicles_1pct.xml.gz";
+
+	private String averageFleetWarmEmissionFactorsFile = emissionInputPath + "EFA_HOT_vehcat_2005average.txt";
+	private String averageFleetColdEmissionFactorsFile = emissionInputPath + "EFA_ColdStart_vehcat_2005average.txt";
+
+	private boolean isUsingDetailedEmissionCalculation = true;
+	private String detailedWarmEmissionFactorsFile = emissionInputPath + "EFA_HOT_SubSegm_2005detailed.txt";
+	private String detailedColdEmissionFactorsFile = emissionInputPath + "EFA_ColdStart_SubSegm_2005detailed.txt";
+
+	private Logger logger = Logger.getLogger(TestExposurePricing.class);
+
+	private Double xMin = 0.0;
+
+	private Double xMax = 20000.;
+
+	private Double yMin = 0.0;
+
+	private Double yMax = 12500.;
+
+	private Integer noOfXCells = 32;
+
+	private Integer noOfYCells = 20;
+
+	private int numberOfIterations = 21;
+
+	@Rule
+	public MatsimTestUtils helper = new MatsimTestUtils(); 
 	
-	static String inputPath = "../../../../repos/shared-svn/projects/detailedEval/emissions/testScenario/input/";
+	private DecimalFormat df = new DecimalFormat("#.###");
 	
-	static String emissionInputPath = "../../../../repos/shared-svn/projects/detailedEval/emissions/hbefaForMatsim/";
-	static String roadTypeMappingFile = emissionInputPath + "roadTypeMapping.txt";
-	static String emissionVehicleFile = inputPath + "emissionVehicles_1pct.xml.gz";
-	
-	static String averageFleetWarmEmissionFactorsFile = emissionInputPath + "EFA_HOT_vehcat_2005average.txt";
-	static String averageFleetColdEmissionFactorsFile = emissionInputPath + "EFA_ColdStart_vehcat_2005average.txt";
-	
-	static boolean isUsingDetailedEmissionCalculation = true;
-	static String detailedWarmEmissionFactorsFile = emissionInputPath + "EFA_HOT_SubSegm_2005detailed.txt";
-	static String detailedColdEmissionFactorsFile = emissionInputPath + "EFA_ColdStart_SubSegm_2005detailed.txt";
-	
-//	static String outputPath = "../../detailedEval/emissions/testScenario/output/";
-	static String outputPath = "output/testEmissionPricing/";
+	private boolean isConsideringCO2Costs;
 
-	private static Logger logger;
+	private int noOfTimeBins;
 
-	private static Double xMin = 0.0;
+	public TestExposurePricing(boolean isConsideringCO2Costs, int noOfTimeBins) {
+		this.isConsideringCO2Costs = isConsideringCO2Costs;
+		this.noOfTimeBins = noOfTimeBins;
+	}
 
-	private static Double xMax = 20000.;
+	@Parameters
+	public static Collection<Object[]> considerCO2 () {
+		Object[][] object = new Object [][] { 
+				{true, 24},
+				{false, 24},
+				{true, 1},
+				{false, 1}
+				};
+		return Arrays.asList(object);
+	}
 
-	private static Double yMin = 0.0;
+	@Test
+	public void priceExposure() {
+		EquilTestSetUp equilTestSetUp = new EquilTestSetUp();
+		Scenario sc = equilTestSetUp.createConfig();
+		// TODO : I have used link speed as 100/3.6 m/s instead of 100 m/s thus check the difference in the result
+		equilTestSetUp.createNetwork(sc);
+		equilTestSetUp.createActiveAgents(sc);
+		equilTestSetUp.createPassiveAgents(sc);
 
-	private static Double yMax = 12500.;
+		Config config = sc.getConfig();
+		EmissionsConfigGroup ecg = new EmissionsConfigGroup() ;
+		ecg.setEmissionRoadTypeMappingFile(roadTypeMappingFile);
+		ecg.setEmissionVehicleFile(emissionVehicleFile);
 
-	private static Map<Id<Link>, Integer> links2xCells;
+		ecg.setAverageWarmEmissionFactorsFile(averageFleetWarmEmissionFactorsFile);
+		ecg.setAverageColdEmissionFactorsFile(averageFleetColdEmissionFactorsFile);
 
-	private static Integer noOfXCells = 32;
+		ecg.setUsingDetailedEmissionCalculation(isUsingDetailedEmissionCalculation);
+		ecg.setDetailedWarmEmissionFactorsFile(detailedWarmEmissionFactorsFile);
+		ecg.setDetailedColdEmissionFactorsFile(detailedColdEmissionFactorsFile);
 
-	private static Map<Id<Link>, Integer> links2yCells;
+		config.addModule(ecg);
 
-	private static Integer noOfYCells = 20;
+		config.controler().setLastIteration(numberOfIterations);
 
-	private static ResponsibilityGridTools rgt;
+		Controler controler = new Controler(sc);
+		String outputDirectory = helper.getOutputDirectory() + "/exposureToll/" + (isConsideringCO2Costs ? "considerCO2Costs/" : "notConsiderCO2Costs/");
+		sc.getConfig().controler().setOutputDirectory(outputDirectory);
 
-	private static Double timeBinSize = 3600.;
-
-	private static int noOfTimeBins = 24;
-	
-	private static int numberOfIterations = 21;
-	
-	public static void main(String[] args) {
-		
-		logger = Logger.getLogger(TestExposurePricing.class);
-		
-		Config config = new Config();
-		config.addCoreModules();
-		config.setParam("strategy", "maxAgentPlanMemorySize", "2");
-		Controler controler = new Controler(config);
-		config.setParam("controler", "writeEventsInterval", "1");
-		
-		
-	// controler settings	
-		controler.getConfig().controler().setOverwriteFileSetting(
-				true ?
-						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
-		controler.getConfig().controler().setCreateGraphs(false);
-
-        // controlerConfigGroup
-		ControlerConfigGroup ccg = controler.getConfig().controler();
-		ccg.setOutputDirectory(outputPath);
-		ccg.setFirstIteration(0);
-		ccg.setLastIteration(numberOfIterations);
-		ccg.setMobsim("qsim");
-		Set set = new HashSet();
-		set.add(EventsFileFormat.xml);
-		ccg.setEventsFileFormats(set);
-//		ccg.setRunId("321");
-		
-	// qsimConfigGroup
-		QSimConfigGroup qcg = controler.getConfig().qsim();
-		qcg.setStartTime(0 * 3600.);
-		qcg.setEndTime(24 * 3600.);
-		qcg.setFlowCapFactor(0.1);
-		qcg.setStorageCapFactor(0.3);
-//		qcg.setFlowCapFactor(0.01);
-//		qcg.setStorageCapFactor(0.03);
-		qcg.setNumberOfThreads(1);
-		qcg.setRemoveStuckVehicles(false);
-		qcg.setStuckTime(10.0);
-		
-	// planCalcScoreConfigGroup
-		PlanCalcScoreConfigGroup pcs = controler.getConfig().planCalcScore();
-		Set<String> activities = new HashSet<String>();
-		activities.add("unknown");
-		activities.add("work");
-		activities.add("pickup");
-		activities.add("with adult");
-		activities.add("other");
-		activities.add("pvWork");
-		activities.add("pvHome");
-		activities.add("gvHome");
-		activities.add("education");
-		activities.add("business");
-		activities.add("shopping");
-		activities.add("private");
-		activities.add("leisure");
-		activities.add("sports");
-		activities.add("home");
-		activities.add("friends");
-		
-		for(String activity : activities){
-			ActivityParams params = new ActivityParams(activity);
-			if(activity.equals("home")){
-				params.setTypicalDuration(6*3600);
-			}else{
-				if(activity.equals("work")){
-					params.setTypicalDuration(9*3600);
-				}else{
-					params.setTypicalDuration(8 * 3600);
-				}
-			}
-			pcs.addActivityParams(params);
-		}
-		
-		pcs.setMarginalUtilityOfMoney(0.0789942);
-		pcs.getModes().get(TransportMode.car).setMarginalUtilityOfTraveling(0.0);
-		pcs.getModes().get(TransportMode.car).setMonetaryDistanceRate(new Double("-3.0E-4"));
-		pcs.setLateArrival_utils_hr(0.0);
-		pcs.setPerforming_utils_hr(0.96);
-		
-		logger.info("mrg util of money " + pcs.getMarginalUtilityOfMoney() + " = 0.0789942?");
-
-		
-
-	// strategy
-//		StrategyConfigGroup scg = controler.getConfig().strategy();
-//		StrategySettings strategySettings = new StrategySettings(Id.create("1"));
-//		strategySettings.setModuleName("BestScore");
-//		strategySettings.setProbability(0.01);
-//		scg.addStrategySettings(strategySettings);
-//		StrategySettings strategySettingsR = new StrategySettings(Id.create("2"));
-//		strategySettingsR.setModuleName("ReRoute");
-//		strategySettingsR.setProbability(1.0);
-//		strategySettingsR.setDisableAfter(10);
-//		scg.addStrategySettings(strategySettingsR);
-		
-		StrategyConfigGroup scg = controler.getConfig().strategy();
-
-		StrategySettings strategySettingsR = new StrategySettings(Id.create("1", StrategySettings.class));
-		strategySettingsR.setStrategyName("ReRoute");
-		strategySettingsR.setWeight(0.999);
-		strategySettingsR.setDisableAfter(10);
-		scg.addStrategySettings(strategySettingsR);
-		
-		StrategySettings strategySettings = new StrategySettings(Id.create("2", StrategySettings.class));
-		strategySettings.setStrategyName("ChangeExpBeta");
-		strategySettings.setWeight(0.001);
-		scg.addStrategySettings(strategySettings);
-		
-	// network
-		Scenario scenario = controler.getScenario();
-		createNetwork(scenario);
-		
-	// plans
-		createActiveAgents(scenario);
-		createPassiveAgents(scenario);
-		
-	// define emission tool input files	
-        EmissionsConfigGroup ecg = new EmissionsConfigGroup() ;
-        controler.getConfig().addModule(ecg);
-        ecg.setEmissionRoadTypeMappingFile(roadTypeMappingFile);
-        ecg.setEmissionVehicleFile(emissionVehicleFile);
-        
-        ecg.setAverageWarmEmissionFactorsFile(averageFleetWarmEmissionFactorsFile);
-        ecg.setAverageColdEmissionFactorsFile(averageFleetColdEmissionFactorsFile);
-        
-        ecg.setUsingDetailedEmissionCalculation(isUsingDetailedEmissionCalculation);
-        ecg.setDetailedWarmEmissionFactorsFile(detailedWarmEmissionFactorsFile);
-        ecg.setDetailedColdEmissionFactorsFile(detailedColdEmissionFactorsFile);
-		
-	// TODO: the following does not work yet. Need to force controler to always write events in the last iteration.
-//		VspExperimentalConfigGroup vcg = controler.getConfig().vspExperimental() ;
-//		vcg.setWritingOutputEvents(false) ;
-//		
-//		EmissionControlerListener ecl = new EmissionControlerListener(controler);
-//		controler.addControlerListener(ecl);
-//		controler.setScoringFunctionFactory(new ResponsibilityScoringFunctionFactory(config, controler.getNetwork(), ecl));
-		//controler.setTravelDisutilityFactory(new ResDisFactory(ecl, ecl.emissionModule, new EmissionCostModule(1.0)));
-		
-		EmissionModule emissionModule = new EmissionModule(scenario);
-		emissionModule.setEmissionEfficiencyFactor(1.0);
+		EmissionModule emissionModule = new EmissionModule(sc);
+		emissionModule.setEmissionEfficiencyFactor( 1.0 );
 		emissionModule.createLookupTables();
 		emissionModule.createEmissionHandler();
 
-		GridTools gt = new GridTools(scenario.getNetwork().getLinks(), xMin, xMax, yMin, yMax);
-		links2xCells = gt.mapLinks2Xcells(noOfXCells);
-		links2yCells = gt.mapLinks2Ycells(noOfYCells);
+		GridTools gt = new GridTools(sc.getNetwork().getLinks(), xMin, xMax, yMin, yMax);
+		Map<Id<Link>, Integer> links2xCells = gt.mapLinks2Xcells(noOfXCells);
+		Map<Id<Link>, Integer> links2yCells = gt.mapLinks2Ycells(noOfYCells);
+
+		Double timeBinSize = new Double (controler.getScenario().getConfig().qsim().getEndTime() / this.noOfTimeBins );
 		
-		rgt = new ResponsibilityGridTools(timeBinSize, noOfTimeBins, links2xCells, links2yCells, noOfXCells, noOfYCells);
-		EmissionResponsibilityCostModule emissionCostModule = new EmissionResponsibilityCostModule(1.0,	false, rgt, links2xCells, links2yCells);
+		ResponsibilityGridTools rgt = new ResponsibilityGridTools(timeBinSize, noOfTimeBins, links2xCells, links2yCells, noOfXCells, noOfYCells);
+		EmissionResponsibilityCostModule emissionCostModule = new EmissionResponsibilityCostModule( 1.0, isConsideringCO2Costs, rgt, links2xCells, links2yCells);
 		final EmissionResponsibilityTravelDisutilityCalculatorFactory emfac = new EmissionResponsibilityTravelDisutilityCalculatorFactory(emissionModule, emissionCostModule);
+
 		controler.addOverridingModule(new AbstractModule() {
+
 			@Override
 			public void install() {
 				bindCarTravelDisutilityFactory().toInstance(emfac);
 			}
 		});
+
 		controler.addControlerListener(new InternalizeEmissionResponsibilityControlerListener(emissionModule, emissionCostModule, rgt, links2xCells, links2yCells));
-		controler.getConfig().controler().setOverwriteFileSetting(
-				OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
-		controler.addOverridingModule(new OTFVisModule());
+
+		//		EmissionControlerListener ecl = new EmissionControlerListener(controler);
+		//		controler.addControlerListener(ecl);
+		//		controler.setScoringFunctionFactory(new ResponsibilityScoringFunctionFactory(config, controler.getNetwork(), ecl));
+		//controler.setTravelDisutilityFactory(new ResDisFactory(ecl, ecl.emissionModule, new EmissionCostModule(1.0)));
+		
+		MyPersonMoneyEventHandler personMoneyEventHandler = new MyPersonMoneyEventHandler();
+		controler.getEvents().addHandler(personMoneyEventHandler);
 		
 		controler.run();
-		
-		Person activeAgent = scenario.getPopulation().getPersons().get(Id.create("567417.1#12424", Person.class));
-		Double scoreOfSelectedPlan;
+		// checks
+		Person activeAgent = sc.getPopulation().getPersons().get(Id.create("567417.1#12424", Person.class));
 		Plan selectedPlan = activeAgent.getSelectedPlan();
-		
+
+		// check with the first leg
+		LinkNetworkRouteImpl route = (LinkNetworkRouteImpl) ( (Leg) selectedPlan.getPlanElements().get(1) ).getRoute() ;
+		// Agent should take longer route to avoid exposure toll
+		Assert.assertTrue("Wrong route is selected. Agent should have used route with link 38 (longer) instead.", route.getLinkIds().contains(Id.create("38", Link.class)));
+		//TODO : not sure if exposure toll forces active agent to avoid route with link 29 after 0th iteration.
+
+		// I don't think, following is necessary. amit Oct'15
+		Double scoreOfSelectedPlan;
+
 		// check selected plan 
 		scoreOfSelectedPlan = selectedPlan.getScore();
 		for(PlanElement pe: selectedPlan.getPlanElements()){
+			if(pe instanceof Leg){
+				Leg leg = (Leg)pe;
+				LinkNetworkRouteImpl lnri = (LinkNetworkRouteImpl) leg.getRoute();
+				if(lnri.getLinkIds().contains(Id.create("39", Link.class))){
+					logger.info("Selected route should not use link 39."); //System.out.println("39 contained");
+				}else{
+					if(lnri.getLinkIds().contains(Id.create("38", Link.class))){
+						logger.info("Selected route avoids node 9 as it is supposed to. " +
+								"It's score is " + selectedPlan.getScore());
+					}
+				}
+			}
+		}
+
+		// check not selected plans - score should be worse if link 39 is used
+
+		for(Plan p: activeAgent.getPlans()){			
+			for(PlanElement pe: p.getPlanElements()){
 				if(pe instanceof Leg){
 					Leg leg = (Leg)pe;
 					LinkNetworkRouteImpl lnri = (LinkNetworkRouteImpl) leg.getRoute();
 					if(lnri.getLinkIds().contains(Id.create("39", Link.class))){
-						logger.info("Selected route should not use link 39."); //System.out.println("39 contained");
-					}else{
-						if(lnri.getLinkIds().contains(Id.create("38", Link.class))){
-							logger.info("Selected route avoids node 9 as it is supposed to. " +
-									"It's score is " + selectedPlan.getScore());
-						}
+						logger.info("This plan uses node 9 and has score " + p.getScore()+ ". Selected = " + p.isSelected());
+					}
+					if(lnri.getLinkIds().contains(Id.create("38", Link.class))){
+						logger.info("This plan uses node 8 and has score " + p.getScore() + ". Selected = " + p.isSelected());
 					}
 				}
+			}
+
 		}
-		
-		// check not selected plans - score should be worse if link 39 is used
-		
-		for(Plan p: activeAgent.getPlans()){			
-				for(PlanElement pe: p.getPlanElements()){
-					if(pe instanceof Leg){
-						Leg leg = (Leg)pe;
-						LinkNetworkRouteImpl lnri = (LinkNetworkRouteImpl) leg.getRoute();
-						if(lnri.getLinkIds().contains(Id.create("39", Link.class))){
-							logger.info("This plan uses node 9 and has score " + p.getScore()+ ". Selected = " + p.isSelected());
-						}
-						if(lnri.getLinkIds().contains(Id.create("38", Link.class))){
-							logger.info("This plan uses node 8 and has score " + p.getScore() + ". Selected = " + p.isSelected());
-						}
-					}
-				}
-			
-		}
-		
-		
+
 		// check links
-//		for(Id linkId: scenario.getNetwork().getLinks().keySet()){
-//			logger.info("link id " + linkId.toString() + " cell " + links2xCells.get(linkId) + " , " + links2yCells.get(linkId));
-//		}
-//		logger.info("epsilon"+epsilon);
-	}
-	
-	private static void createNetwork(Scenario scenario) {
-		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
+		//		for(Id linkId: scenario.getNetwork().getLinks().keySet()){
+		//			logger.info("link id " + linkId.toString() + " cell " + links2xCells.get(linkId) + " , " + links2yCells.get(linkId));
+		//		}
+		//		logger.info("epsilon"+epsilon);
 
-		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new Coord(1.0, 10000.0));
-		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new Coord(2500.0, 10000.0));
-		Node node3 = network.createAndAddNode(Id.create("3", Node.class), new Coord(4500.0, 10000.0));
-		Node node4 = network.createAndAddNode(Id.create("4", Node.class), new Coord(17500.0, 10000.0));
-		Node node5 = network.createAndAddNode(Id.create("5", Node.class), new Coord(19999.0, 10000.0));
-		Node node6 = network.createAndAddNode(Id.create("6", Node.class), new Coord(19999.0, 1500.0));
-		Node node7 = network.createAndAddNode(Id.create("7", Node.class), new Coord(1.0, 1500.0));
-		Node node8 = network.createAndAddNode(Id.create("8", Node.class), new Coord(12500.0, 12499.0));
-		Node node9 = network.createAndAddNode(Id.create("9", Node.class), new Coord(12500.0, 7500.0));
-
-
-		network.createAndAddLink(Id.create("12", Link.class), node1, node2, 1000, 60.00, 3600, 1, null, "22");
-		network.createAndAddLink(Id.create("23", Link.class), node2, node3, 2000, 60.00, 3600, 1, null, "22");
-		network.createAndAddLink(Id.create("45", Link.class), node4, node5, 2000, 60.00, 3600, 1, null, "22");
-		network.createAndAddLink(Id.create("56", Link.class), node5, node6, 1000, 60.00, 3600, 1, null, "22");
-		network.createAndAddLink(Id.create("67", Link.class), node6, node7, 1000, 60.00, 3600, 1, null, "22");
-		network.createAndAddLink(Id.create("71", Link.class), node7, node1, 1000, 60.00, 3600, 1, null, "22");
 		
-		// two similar path from node 3 to node 4 - north: route via node 8, south: route via node 9
-		network.createAndAddLink(Id.create("38", Link.class), node3, node8, 5000, 60.00, 3600, 1, null, "22");
-		network.createAndAddLink(Id.create("39", Link.class), node3, node9, 5000, 60.00, 3600, 1, null, "22");
-		network.createAndAddLink(Id.create("84", Link.class), node8, node4, 5000, 60.00, 3600, 1, null, "22");
-		network.createAndAddLink(Id.create("94", Link.class), node9, node4, 4999, 60.00, 3600, 1, null, "22");
+		//**************************************************************//
 		
+		if (noOfTimeBins != 1) return; //TODO : yet to get the manual calculation for this.
 		
-		for(Integer i=0; i<5; i++){ // x
-			for(Integer j=0; j<4; j++){
-				String idpart = i.toString()+j.toString();
+		/*
+		 * Manual calculation
+		 * 20 passive agents and 1 active agent will be exposed due to emission of 1 active agent on the link 39.
+		 * All passive agent perform home activity for 86399 whereas active agent perform 6*3600+86400-51148 (=56852) home activity 
+		 * and 51000-22107 (=28893) work activity. 	Total cells = 32*20 = 640.
+		 * Emission costs (only warm emission since cold emission exists only upto 2 km on departure link) on link 39 = 0.027613043 
+		 * without considering co2 costs (see previous emissionTollTest().)
+		 * cell of Link 39 = 13,14; Thus only cells with 9 < x < 17 and 10 < y < 18 matters to get the dispersion weight.
+		 * 15,13; 15,12; 15,11; 14,13; 14,12; 14,11; 13,13; 13,12; 13,11; 12,13; 12,12; 12,11; 11,13; 11,12; 11,11; 
+		 * noOfCells with zero distance (13,14;) =0; noOfCells with 1 distance (13,13;) =1;
+		 * noOfCells with 2 distance (13,12; 12,13; 14,13 ) =3; noOfCells with 3 distance (13,11; 12,12; 11,13; 14,12; 15,13) =5;
+		 * avg Exposed duration = (20*86399+(56852+28893))/640 = 2833.945313; 
+		 * Thus total relavant duration = (0.132+3*0.029+5*0.002)*86398 = 19785.142
+		 * Thus total toll in iteration 1 on link 39 = 19785.142 * 0.027613043 / 2699.9375 = 0.19278
+		 */
 
-				double xCoord = 6563. + (i+1)*625;
-				double yCoord = 7188. + (j-1)*625;
-				
-				// add a link for each person
-				Node nodeA = network.createAndAddNode(Id.create("node_"+idpart+"A", Node.class), new Coord(xCoord, yCoord));
-				Node nodeB = network.createAndAddNode(Id.create("node_"+idpart+"B", Node.class), new Coord(xCoord, yCoord + 1.));
-				network.createAndAddLink(Id.create("link_p"+idpart, Link.class), nodeA, nodeB, 10, 30.0, 3600, 1);
+		if (! isConsideringCO2Costs ) {
 
+			if(personMoneyEventHandler.link39LeaveTime == Double.POSITIVE_INFINITY) {
+				throw new RuntimeException("Active agent does not pass through link 39.");
 			}
-		}
-	}
-	
-	private static void createPassiveAgents(Scenario scenario) {
-		PopulationFactoryImpl pFactory = (PopulationFactoryImpl) scenario.getPopulation().getFactory();
-		// passive agents' home coordinates are around node 9 (12500, 7500)
-		for(Integer i=0; i<5; i++){ // x
-			for(Integer j=0; j<4; j++){
-				
-				String idpart = i.toString()+j.toString();
-				
-				Person person = pFactory.createPerson(Id.create("passive_"+idpart, Person.class)); //new PersonImpl (Id.create(i));
 
-				double xCoord = 6563. + (i+1)*625;
-				double yCoord = 7188. + (j-1)*625;
-				Plan plan = pFactory.createPlan(); //person.createAndAddPlan(true);
-
-				Coord coord = new Coord(xCoord, yCoord);
-				Activity home = pFactory.createActivityFromCoord("home", coord );
-				home.setEndTime(1.0);
-				Leg leg = pFactory.createLeg(TransportMode.walk);
-				Coord coord2 = new Coord(xCoord, yCoord + 1.);
-				Activity home2 = pFactory.createActivityFromCoord("home", coord2);
-
-				plan.addActivity(home);
-				plan.addLeg(leg);
-				plan.addActivity(home2);
-				person.addPlan(plan);
-				scenario.getPopulation().addPerson(person);
+			for (PersonMoneyEvent e : personMoneyEventHandler.events){
+				if (e.getTime() == personMoneyEventHandler.link39LeaveTime) {
+					//					TODO fix this test. Current value shows -0.18909
+					Assert.assertEquals( "Exposure toll on link 39 from Manual calculation does not match from money event.", df.format( -0.19278 ), df.format( e.getAmount() ) );
+				}
 			}
+		} else {
+			// TODO: this is completly wrong. Include flat CO2 costs not distributive costs.
 		}
+		//**************************************************************//		
 	}
-	
-	private static void createActiveAgents(Scenario scenario) {
-		PopulationFactory pFactory = scenario.getPopulation().getFactory();
-		Person person = pFactory.createPerson(Id.create("567417.1#12424", Person.class));
-		Plan plan = pFactory.createPlan();
+	class MyPersonMoneyEventHandler implements PersonMoneyEventHandler, LinkLeaveEventHandler  {
 
-		Coord homeCoords = new Coord(1.0, 10000.0);
-		Activity home = pFactory.createActivityFromCoord("home", homeCoords);
-		//Activity home = pFactory.createActivityFromLinkId("home", scenario.createId("12"));
-		home.setEndTime(6 * 3600);
-		plan.addActivity(home);
+		List<PersonMoneyEvent> events = new ArrayList<PersonMoneyEvent>();
+		double link39LeaveTime = Double.POSITIVE_INFINITY;
 
-		Leg leg1 = pFactory.createLeg(TransportMode.car);
-		plan.addLeg(leg1);
+		@Override
+		public void reset(int iteration) {
+			events.clear();
+		}
 
-		Coord workCoords = new Coord(19999.0, 10000.0);
-		Activity work = pFactory.createActivityFromCoord("work" , workCoords);
-//		Activity work = pFactory.createActivityFromLinkId("work", scenario.createId("45"));
-		work.setEndTime(home.getEndTime() + 600 + 8 * 3600);
-		plan.addActivity(work);
+		@Override
+		public void handleEvent(PersonMoneyEvent event) {
+			events.add(event);
+		}
 
-		Leg leg2 = pFactory.createLeg(TransportMode.car);
-		plan.addLeg(leg2);
-
-		home = pFactory.createActivityFromCoord("home", homeCoords);
-//		home = pFactory.createActivityFromLinkId("home", scenario.createId("12"));
-		plan.addActivity(home);
-
-		person.addPlan(plan);
-		scenario.getPopulation().addPerson(person);
+		@Override
+		public void handleEvent(LinkLeaveEvent event) {
+			if(event.getLinkId().toString().equals("39")) link39LeaveTime = event.getTime();
+		}
 	}
 }
