@@ -138,7 +138,7 @@ public class CongestionPricingControler {
 				}); 
 				
 			} else if (router.equals("VTTSspecific")) {
-				// TODO: Wrong!
+
 				final VTTSTimeDistanceTravelDisutilityFactory factory = new VTTSTimeDistanceTravelDisutilityFactory(vttsHandler);
 				factory.setSigma(sigma);
 				
