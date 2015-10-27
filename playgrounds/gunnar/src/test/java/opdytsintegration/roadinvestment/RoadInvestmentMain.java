@@ -1,8 +1,10 @@
 package opdytsintegration.roadinvestment;
 
 import java.io.FileNotFoundException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -151,9 +153,10 @@ class RoadInvestmentMain {
 			}
 
 			@Override
-			public RoadInvestmentDecisionVariable newRandomVariation(
+			public List<RoadInvestmentDecisionVariable> newRandomVariations(
 					RoadInvestmentDecisionVariable decisionVariable) {
-				return new RoadInvestmentDecisionVariable(Math.max(
+				return Arrays.asList(
+						new RoadInvestmentDecisionVariable(Math.max(
 						0,
 						Math.min(1, decisionVariable.betaPay() + 0.1
 								* MatsimRandom.getRandom().nextGaussian())),
@@ -163,7 +166,17 @@ class RoadInvestmentMain {
 										+ 0.1
 										* MatsimRandom.getRandom()
 												.nextGaussian())),
-						link2freespeed, link2capacity);
+						link2freespeed, link2capacity), 						new RoadInvestmentDecisionVariable(Math.max(
+								0,
+								Math.min(1, decisionVariable.betaPay() + 0.1
+										* MatsimRandom.getRandom().nextGaussian())),
+								Math.max(
+										0,
+										Math.min(1, decisionVariable.betaAlloc()
+												+ 0.1
+												* MatsimRandom.getRandom()
+														.nextGaussian())),
+								link2freespeed, link2capacity));
 			}
 		};
 		int maxMemoryLength = Integer.MAX_VALUE;

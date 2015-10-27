@@ -251,8 +251,10 @@ public class RandomSearch<U extends DecisionVariable> {
 				candidates.add(bestDecisionVariable);
 			}
 			while (candidates.size() < this.populationSize) {
-				candidates.add(this.randomizer
-						.newRandomVariation(bestDecisionVariable));
+				candidates.addAll(this.randomizer
+						.newRandomVariations(bestDecisionVariable));
+				// candidates.add(this.randomizer
+				// .newRandomVariation(bestDecisionVariable));
 			}
 
 			int transitionsPerIteration = 0;

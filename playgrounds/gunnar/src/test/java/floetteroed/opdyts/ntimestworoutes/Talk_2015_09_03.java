@@ -84,7 +84,7 @@ class Talk_2015_09_03 {
 		final int maxTransitions = transitionBinCnt * transitionBinSize;
 
 		final int replications = 1;
-		final boolean keepBestSolution = true;
+		final boolean keepBestSolution = false;
 		final int maxDeltaBin = 3;
 		final double replanningProbability = 0.10;
 

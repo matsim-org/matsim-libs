@@ -24,14 +24,13 @@ package roadclassification;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.*;
-
-import floetteroed.opdyts.DecisionVariableRandomizer;
-import floetteroed.opdyts.ObjectiveFunction;
-import floetteroed.opdyts.convergencecriteria.ObjectiveFunctionChangeConvergenceCriterion;
-import floetteroed.opdyts.searchalgorithms.RandomSearch;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import opdytsintegration.MATSimSimulator;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -43,6 +42,11 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.counts.Counts;
 import org.matsim.counts.CountsReaderMatsimV1;
 import org.matsim.utils.objectattributes.ObjectAttributes;
+
+import floetteroed.opdyts.DecisionVariableRandomizer;
+import floetteroed.opdyts.ObjectiveFunction;
+import floetteroed.opdyts.convergencecriteria.ObjectiveFunctionChangeConvergenceCriterion;
+import floetteroed.opdyts.searchalgorithms.RandomSearch;
 
 public class RunRoadClassification {
 
@@ -94,8 +98,12 @@ public class RunRoadClassification {
 			}
 
 			@Override
-			public RoadClassificationDecisionVariable newRandomVariation(RoadClassificationDecisionVariable decisionVariable) {
-				return newRandomDecisionVariable();
+			public List<RoadClassificationDecisionVariable> newRandomVariations(RoadClassificationDecisionVariable decisionVariable) {
+				/*
+				 * TODO: The algorithm performs best if this function returns 
+				 * two symmetric variations of the decision variable.
+				 */
+				return Arrays.asList(newRandomDecisionVariable(), newRandomDecisionVariable());
 			}
 		};
 
