@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.benjamin.internalization.exposure;
+package playground.benjamin.internalization.flatEmission;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
