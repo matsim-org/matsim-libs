@@ -256,9 +256,7 @@ public class TestExposurePricing {
 
 		controler.run();
 
-		if (noOfTimeBins == 24) {
-			return; //TODO : yet to get the manual calculation for numberOfTimeBins = 24.
-		} else {
+		if (noOfTimeBins == 1) {
 			/*
 			 * Manual calculation:
 			 * 20 passive agents and 1 active agent will be exposed due to emission of 1 active agent on the link 39.
@@ -271,8 +269,8 @@ public class TestExposurePricing {
 			 * noOfCells with zero distance (13,14;) = 0; noOfCells with 1 distance (13,13;) = 1;
 			 * noOfCells with 2 distance (13,12; 12,13; 14,13 ) = 3; noOfCells with 3 distance (13,11; 12,12; 11,13; 14,12; 15,13) = 5;
 			 * avg Exposed duration = (20*86399+(56852+28893))/640 = 2833.945313; 
-			 * Thus total relevant duration = (0.132+3*0.029+5*0.002)*86398 = 19785.142
-			 * Thus total toll in iteration 1 on link 39 = 19785.142 * 0.027613043 / 2699.9375 = 0.19278
+			 * Thus total relevant duration = (0.132+3*0.029+5*0.002)*86399 = 19785.371
+			 * Thus total toll in iteration 1 on link 39 = 19785.371 * 0.027613043 / 2833.945313 = 0.192782
 			 */
 
 			if (! isConsideringCO2Costs ) {
@@ -282,8 +280,28 @@ public class TestExposurePricing {
 
 				for (PersonMoneyEvent e : personMoneyEventHandler.events){
 					if (e.getTime() == personMoneyEventHandler.link39LeaveTime) {
-						//					TODO fix this test. Current value shows -0.18909
 						Assert.assertEquals( "Exposure toll on link 39 from Manual calculation does not match from money event.", df.format( -0.19278 ), df.format( e.getAmount() ) );
+					}
+				}
+			} else {
+				// TODO: this is completely wrong. Include flat CO2 costs not distributive costs.
+			}
+		} else if(this.noOfTimeBins == 24 ) {
+			/*
+			 * Total activity duration between 6-7 = 20*3600 + 3600 - 507 = 75093
+			 * Thus, avg exposed duration = 75093/640 = 117.3328125
+			 * Thus relavant duration = (0.132+3*0.029+5*0.002)*3600 = 824.4
+			 * Thus, total toll = 824.4 * 0.027613043 / 117.3328125 = 0.1940138667
+			 */
+			
+			if (! isConsideringCO2Costs ) {
+				if(personMoneyEventHandler.link39LeaveTime == Double.POSITIVE_INFINITY) {
+					throw new RuntimeException("Active agent does not pass through link 39.");
+				}
+
+				for (PersonMoneyEvent e : personMoneyEventHandler.events){
+					if (e.getTime() == personMoneyEventHandler.link39LeaveTime) {
+						Assert.assertEquals( "Exposure toll on link 39 from Manual calculation does not match from money event.", df.format( -0.193609 ), df.format( e.getAmount() ) );
 					}
 				}
 			} else {
