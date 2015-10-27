@@ -57,6 +57,7 @@ class TaxiLauncher
     private TravelTime travelTime;
     private TravelDisutility travelDisutility;
 
+
     TaxiLauncher(TaxiLauncherParams params)
     {
         this.params = params;
@@ -97,8 +98,8 @@ class TaxiLauncher
             travelTime = travelTimeCalculator.getLinkTravelTimes();
         }
 
-        travelDisutility = VrpLauncherUtils
-                .initTravelDisutility(params.algorithmConfig.tdisSource, travelTime);
+        travelDisutility = VrpLauncherUtils.initTravelDisutility(params.algorithmConfig.tdisSource,
+                travelTime);
     }
 
 
@@ -163,7 +164,8 @@ class TaxiLauncher
     {
         TaxiSchedulerParams schedulerParams = new TaxiSchedulerParams(params.destinationKnown,
                 params.vehicleDiversion, params.pickupDuration, params.dropoffDuration);
-        TaxiScheduler scheduler = new TaxiScheduler(context, schedulerParams, travelTime, travelDisutility);
+        TaxiScheduler scheduler = new TaxiScheduler(context, schedulerParams, travelTime,
+                travelDisutility);
         FilterFactory filterFactory = new DefaultFilterFactory(scheduler,
                 params.nearestRequestsLimit, params.nearestVehiclesLimit);
 

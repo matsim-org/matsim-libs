@@ -23,10 +23,12 @@ import java.io.*;
 import java.util.EnumSet;
 
 import org.matsim.contrib.dvrp.data.VrpData;
-import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelTimeSource;
-import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.contrib.dvrp.run.VrpLauncherUtils;
+import org.matsim.contrib.dvrp.run.VrpLauncherUtils.*;
+import org.matsim.contrib.dvrp.util.TimeDiscretizer;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 
 import playground.michalm.taxi.util.stats.TaxiStatsCalculator;
 import playground.michalm.taxi.util.stats.TaxiStatsCalculator.TaxiStats;
@@ -65,8 +67,9 @@ class MultiRunTaxiLauncher
     public void beforeQSim(QSim qSim)
     {
         if (warmup) {
-            EventsManager events = qSim.getEventsManager();
-            events.addHandler(travelTimeCalculator);
+            travelTimeCalculator = TravelTimeCalculator.create(scenario.getNetwork(),
+                    scenario.getConfig().travelTimeCalculator());
+            qSim.getEventsManager().addHandler(travelTimeCalculator);
         }
     }
 
@@ -110,8 +113,8 @@ class MultiRunTaxiLauncher
             long t0 = System.currentTimeMillis();
             MatsimRandom.reset(RANDOM_SEEDS[i]);
             simulateIteration();
-            TaxiStats evaluation = new TaxiStatsCalculator(context.getVrpData().getVehicles().values())
-                    .getStats();
+            TaxiStats evaluation = new TaxiStatsCalculator(
+                    context.getVrpData().getVehicles().values()).getStats();
             long t1 = System.currentTimeMillis();
             multipleRunStats.updateStats(evaluation, t1 - t0);
         }

@@ -9,7 +9,6 @@ import org.matsim.contrib.dvrp.path.*;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.core.router.*;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
-import org.matsim.core.router.util.PreProcessDijkstra;
 
 import playground.michalm.taxi.data.TaxiRequest;
 import playground.michalm.taxi.scheduler.TaxiScheduler;
@@ -43,12 +42,8 @@ public class BestDispatchFinder
         this.optimConfig = optimConfig;
         this.scheduler = optimConfig.scheduler;
 
-        Network network = optimConfig.context.getScenario().getNetwork();
-        PreProcessDijkstra preProcessDijkstra = new PreProcessDijkstra();
-        preProcessDijkstra.run(network);
-
-        router = new MultiNodeDijkstra(network, optimConfig.travelDisutility,
-                optimConfig.travelTime, preProcessDijkstra, false);
+        router = new MultiNodeDijkstra(optimConfig.context.getScenario().getNetwork(),
+                optimConfig.travelDisutility, optimConfig.travelTime, false);
     }
 
 

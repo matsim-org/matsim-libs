@@ -22,6 +22,7 @@ package playground.michalm.taxi.optimizer.assignment;
 import java.util.*;
 
 import org.matsim.contrib.dvrp.data.Requests;
+import org.matsim.core.router.MultiNodeDijkstra;
 
 import playground.michalm.taxi.data.TaxiRequest;
 import playground.michalm.taxi.optimizer.*;
@@ -30,15 +31,21 @@ import playground.michalm.taxi.optimizer.*;
 public class AssignmentTaxiOptimizer
     extends AbstractTaxiOptimizer
 {
+    private final MultiNodeDijkstra router;
+
+
     public AssignmentTaxiOptimizer(TaxiOptimizerConfiguration optimConfig)
     {
         super(optimConfig, new TreeSet<TaxiRequest>(Requests.ABSOLUTE_COMPARATOR), true);
+
+        router = new MultiNodeDijkstra(optimConfig.context.getScenario().getNetwork(),
+                optimConfig.travelDisutility, optimConfig.travelTime, true);
     }
 
 
     protected void scheduleUnplannedRequests()
     {
-        new AssignmentProblem(optimConfig)
+        new AssignmentProblem(optimConfig, router)
                 .scheduleUnplannedRequests((SortedSet<TaxiRequest>)unplannedRequests);
     }
 }

@@ -27,7 +27,6 @@ import org.matsim.contrib.dvrp.path.*;
 import org.matsim.contrib.util.DistanceUtils;
 import org.matsim.core.router.*;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
-import org.matsim.core.router.util.PreProcessDijkstra;
 
 import playground.michalm.taxi.data.TaxiRequest;
 import playground.michalm.taxi.optimizer.*;
@@ -40,23 +39,17 @@ public class AssignmentProblem
     private final TaxiOptimizerConfiguration optimConfig;
     private final MultiNodeDijkstra router;
 
-    private final double maxDistance2 = 5_000 * 5_0000; //5 km
-    private final double planningHorizon = 1800; //30 min
+    private final double maxDistance2 = 5_000 * 5_0000; //5 km TODO
+    private final double planningHorizon = 1800; //30 min TODO
 
     private VehicleData vData;
     private AssignmentRequestData rData;
 
 
-    public AssignmentProblem(TaxiOptimizerConfiguration optimConfig)
+    public AssignmentProblem(TaxiOptimizerConfiguration optimConfig, MultiNodeDijkstra router)
     {
         this.optimConfig = optimConfig;
-
-        Network network = optimConfig.context.getScenario().getNetwork();
-        PreProcessDijkstra preProcessDijkstra = new PreProcessDijkstra();
-        preProcessDijkstra.run(network);
-
-        router = new MultiNodeDijkstra(network, optimConfig.travelDisutility,
-                optimConfig.travelTime, preProcessDijkstra, true);
+        this.router = router;
     }
 
 
