@@ -28,10 +28,14 @@ import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
+import org.matsim.api.core.v01.events.Wait2LinkEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
+import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
@@ -52,7 +56,8 @@ import org.matsim.vehicles.Vehicles;
  * @author benjamin
  *
  */
-public class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEventHandler, PersonArrivalEventHandler, PersonDepartureEventHandler {
+public class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEventHandler, PersonArrivalEventHandler, PersonDepartureEventHandler, 
+Wait2LinkEventHandler, VehicleLeavesTrafficEventHandler {
 	private static final Logger logger = Logger.getLogger(WarmEmissionHandler.class);
 
 	private final Network network;
@@ -67,7 +72,7 @@ public class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEven
 	private final Map<Id<Person>, Tuple<Id<Link>, Double>> agentarrival = new HashMap<>();
 	private final Map<Id<Person>, Tuple<Id<Link>, Double>> agentdeparture = new HashMap<>();
 
-    private final Vehicle2DriverEventHandler vehicle2DriverEventHandler;
+    private Vehicle2DriverEventHandler delegate;
     
 	public WarmEmissionHandler(
 			Vehicles emissionVehicles,
@@ -78,9 +83,6 @@ public class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEven
 		this.emissionVehicles = emissionVehicles;
 		this.network = network;
 		this.warmEmissionAnalysisModule = new WarmEmissionAnalysisModule(parameterObject, emissionEventsManager, emissionEfficiencyFactor);	
-		
-        this.vehicle2DriverEventHandler = new Vehicle2DriverEventHandler();
-        emissionEventsManager.addHandler(vehicle2DriverEventHandler);
 	}
 	
 	@Override
@@ -93,6 +95,8 @@ public class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEven
 		agentdeparture.clear();
 		
 		warmEmissionAnalysisModule.reset();
+		
+		delegate.reset(iteration);
 	}
 
 	@Override
@@ -116,13 +120,13 @@ public class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEven
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
 		Tuple<Id<Link>, Double> linkId2Time = new Tuple<Id<Link>, Double>(event.getLinkId(), event.getTime());
-		this.linkenter.put(vehicle2DriverEventHandler.getDriverOfVehicle(event.getVehicleId()), linkId2Time);
+		this.linkenter.put(delegate.getDriverOfVehicle(event.getVehicleId()), linkId2Time);
 	}
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
 		linkLeaveCnt++;
-		Id<Person> personId= vehicle2DriverEventHandler.getDriverOfVehicle(event.getVehicleId());
+		Id<Person> personId= delegate.getDriverOfVehicle(event.getVehicleId());
 		Id<Link> linkId = event.getLinkId();
 		Double leaveTime = event.getTime();
 		LinkImpl link = (LinkImpl) this.network.getLinks().get(linkId);
@@ -205,5 +209,15 @@ public class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEven
 
 	public WarmEmissionAnalysisModule getWarmEmissionAnalysisModule(){
 		return warmEmissionAnalysisModule;
+	}
+
+	@Override
+	public void handleEvent(VehicleLeavesTrafficEvent event) {
+		delegate.handleEvent(event);
+	}
+
+	@Override
+	public void handleEvent(Wait2LinkEvent event) {
+		delegate.handleEvent(event);
 	}
 }

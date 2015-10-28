@@ -28,9 +28,13 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
+import org.matsim.api.core.v01.events.Wait2LinkEvent;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
+import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
@@ -46,7 +50,7 @@ import org.matsim.vehicles.Vehicles;
 /**
  * @author benjamin
  */
-public class ColdEmissionHandler implements LinkLeaveEventHandler, PersonArrivalEventHandler, PersonDepartureEventHandler {
+public class ColdEmissionHandler implements LinkLeaveEventHandler, PersonArrivalEventHandler, PersonDepartureEventHandler, Wait2LinkEventHandler, VehicleLeavesTrafficEventHandler {
 
     private final Vehicles emissionVehicles;
     private final Network network;
@@ -57,7 +61,7 @@ public class ColdEmissionHandler implements LinkLeaveEventHandler, PersonArrival
     private final Map<Id<Person>, Double> personId2parkingDuration = new TreeMap<>();
     private final Map<Id<Person>, Id<Link>> personId2coldEmissionEventLinkId = new TreeMap<>();
     
-    private final Vehicle2DriverEventHandler vehicle2DriverEventHandler;
+    private Vehicle2DriverEventHandler delegate;
     
     public ColdEmissionHandler(
             Vehicles emissionVehicles,
@@ -68,9 +72,6 @@ public class ColdEmissionHandler implements LinkLeaveEventHandler, PersonArrival
         this.emissionVehicles = emissionVehicles;
         this.network = network;
         this.coldEmissionAnalysisModule = new ColdEmissionAnalysisModule(parameterObject2, emissionEventsManager, emissionEfficiencyFactor);
-        
-        this.vehicle2DriverEventHandler = new Vehicle2DriverEventHandler();
-        emissionEventsManager.addHandler(vehicle2DriverEventHandler);
     }
 
     @Override
@@ -80,6 +81,7 @@ public class ColdEmissionHandler implements LinkLeaveEventHandler, PersonArrival
         personId2parkingDuration.clear();
         personId2coldEmissionEventLinkId.clear();
         coldEmissionAnalysisModule.reset();
+        delegate.reset(iteration);
     }
 
     @Override
@@ -91,7 +93,7 @@ public class ColdEmissionHandler implements LinkLeaveEventHandler, PersonArrival
 		 * PersonArrival Events to determine engine start and stop time. 
 		 * Theresa Oct'2015
 		 */
-		Id<Person> personId = vehicle2DriverEventHandler.getDriverOfVehicle(event.getVehicleId());
+		Id<Person> personId = delegate.getDriverOfVehicle(event.getVehicleId());
         Id<Link> linkId = event.getLinkId();
         Link link = this.network.getLinks().get(linkId);
         double linkLength = link.getLength();
@@ -169,5 +171,15 @@ public class ColdEmissionHandler implements LinkLeaveEventHandler, PersonArrival
 	    VehicleType vehicleType = vehicle.getType();
 	    vehicleInformation = vehicleType.getId().toString();
 	    return vehicleInformation;
+	}
+
+	@Override
+	public void handleEvent(VehicleLeavesTrafficEvent event) {
+		delegate.handleEvent(event);
+	}
+
+	@Override
+	public void handleEvent(Wait2LinkEvent event) {
+		delegate.handleEvent(event);
 	}
 }
