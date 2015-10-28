@@ -230,12 +230,6 @@ public class ParallelPopulationReaderMatsimV4 extends PopulationReaderMatsimV4 {
 		}
 
 		@Override
-		public Object removeScenarioElement(String name) {
-			return this.delegate.removeScenarioElement(name);
-		}
-
-
-		@Override
 		public Object getScenarioElement(String name) {
 			return this.delegate.getScenarioElement(name);
 		}

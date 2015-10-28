@@ -47,10 +47,6 @@ public class ScenarioSocialNetwork implements Scenario {
 		delegate.addScenarioElement(name, o);
 	}
 	@Override
-	public Object removeScenarioElement(String name) {
-		return delegate.removeScenarioElement(name);
-	}
-	@Override
 	public Object getScenarioElement(String name) {
 		return delegate.getScenarioElement(name);
 	}

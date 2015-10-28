@@ -82,11 +82,6 @@ public class PseudoScenario implements Scenario {
 	}
 
 	@Override
-	public Object removeScenarioElement(final String name) {
-		return this.scenario.removeScenarioElement(name);
-	}
-
-	@Override
 	public Vehicles getTransitVehicles() {
 		// TODO Auto-generated method stub
 		throw new RuntimeException("not implemented") ;

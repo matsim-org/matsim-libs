@@ -159,7 +159,7 @@ public final class ScenarioImpl implements Scenario {
 		}
 	}
 
-	@Override
+//	@Override
 	public final Object removeScenarioElement(final String name) {
 		testForLocked();
 		return elements.remove( name );

@@ -373,11 +373,6 @@ public class CreateSelectedPlansTables {
 		}
 
 		@Override
-		public Object removeScenarioElement(String name) {
-			return scenario.removeScenarioElement(name);
-		}
-
-		@Override
 		public Object getScenarioElement(String name) {
 			return scenario.getScenarioElement(name);
 		}

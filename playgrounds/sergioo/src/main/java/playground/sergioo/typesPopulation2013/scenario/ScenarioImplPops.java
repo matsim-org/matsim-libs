@@ -67,10 +67,6 @@ public class ScenarioImplPops implements Scenario {
 		delegate.addScenarioElement(name, o);
 	}
 
-	@Override
-	public Object removeScenarioElement(String name) {
-		return delegate.removeScenarioElement(name);
-	}
 
 	@Override
 	public Object getScenarioElement(String name) {

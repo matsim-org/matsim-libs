@@ -67,15 +67,6 @@ public interface Scenario {
 	void addScenarioElement(String name, Object o);
 
 	/**
-	 * Removes the object from the scenario, such it can no
-	 * longer be retrieved using {@link #getScenarioElement(String)}.
-	 *
-	 * @param name the name of the element
-	 * @return the object which was associated with this name, or null if there was none
-	 */
-	Object removeScenarioElement(String name);
-
-	/**
 	 *
 	 * @param name the name of the element to get
 	 * @return the object associated with that name, or null if none is associated
