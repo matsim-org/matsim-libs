@@ -37,15 +37,15 @@ import playground.benjamin.internalization.EmissionCostFactors;
 public class EmissionResponsibilityCostModule {
 	private static final Logger logger = Logger.getLogger(EmissionResponsibilityCostModule.class);
 	
-	private final double emissionCostFactor;
+	private final double emissionCostMultiplicationFactor;
 	private boolean considerCO2Costs = false;
 	
 	private ResponsibilityGridTools responsibilityGridTools;
 
 	
-	public EmissionResponsibilityCostModule(double emissionCostFactor, boolean considerCO2Costs, ResponsibilityGridTools rgt, Map<Id<Link>, Integer> links2xCells, Map<Id<Link>, Integer> links2yCells) {
-		this.emissionCostFactor = emissionCostFactor;
-		logger.info("Emission costs from Maibach et al. (2008) are multiplied by a factor of " + this.emissionCostFactor);
+	public EmissionResponsibilityCostModule(double emissionCostMultiplicationFactor, boolean considerCO2Costs, ResponsibilityGridTools rgt, Map<Id<Link>, Integer> links2xCells, Map<Id<Link>, Integer> links2yCells) {
+		this.emissionCostMultiplicationFactor = emissionCostMultiplicationFactor;
+		logger.info("Emission costs from Maibach et al. (2008) are multiplied by a factor of " + this.emissionCostMultiplicationFactor);
 		
 		if(considerCO2Costs){
 			this.considerCO2Costs = true;
@@ -58,9 +58,9 @@ public class EmissionResponsibilityCostModule {
 		
 	}
 	
-	public EmissionResponsibilityCostModule(double emissionCostFactor, ResponsibilityGridTools rgt, Map<Id<Link>, Integer> links2xCells, Map<Id<Link>, Integer> links2yCells) {
-		this.emissionCostFactor = emissionCostFactor;
-		logger.info("Emission costs from Maibach et al. (2008) are multiplied by a factor of " + this.emissionCostFactor);
+	public EmissionResponsibilityCostModule(double emissionCostMultiplicationFactor, ResponsibilityGridTools rgt, Map<Id<Link>, Integer> links2xCells, Map<Id<Link>, Integer> links2yCells) {
+		this.emissionCostMultiplicationFactor = emissionCostMultiplicationFactor;
+		logger.info("Emission costs from Maibach et al. (2008) are multiplied by a factor of " + this.emissionCostMultiplicationFactor);
 		logger.info("CO2 emission costs will NOT be calculated... ");
 		this.responsibilityGridTools = rgt;
 	}
@@ -84,7 +84,7 @@ public class EmissionResponsibilityCostModule {
 //		logger.info("relative density" + relativeDensity 
 //				+ " on link " + linkId.toString() 
 //				+ "resulting costs " + (this.emissionCostFactor*warmEmissionCosts*relativeDensity));
-		return this.emissionCostFactor * warmEmissionCosts * relativeDensity;
+		return this.emissionCostMultiplicationFactor * warmEmissionCosts * relativeDensity;
 	}
 	
 	public double calculateColdEmissionCosts(Map<ColdPollutant, Double> coldEmissions, Id<Link> linkId, double time) {
@@ -102,7 +102,7 @@ public class EmissionResponsibilityCostModule {
 		Double relativeDensity = responsibilityGridTools.getFactorForLink(linkId, time);
 		//following log statment increases size of the logFile thus commented. amit, Oct'15
 //		logger.info("cold emission costs " + coldEmissionCosts);
-		return this.emissionCostFactor * coldEmissionCosts * relativeDensity;
+		return this.emissionCostMultiplicationFactor * coldEmissionCosts * relativeDensity;
 	}
 
 }
