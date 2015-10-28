@@ -124,7 +124,6 @@ public class BasicPersonTripAnalysisTest {
 	 * 	1.Person: 2 different trips with different vehicles
 	 * current status: Fail; because vehicle id is assumed to be always the same as person id
 	 */
-	@Ignore //TODO
 	@Test
 	@Ignore // TODO
 	public void testVariousVehiclesPerPerson() {
