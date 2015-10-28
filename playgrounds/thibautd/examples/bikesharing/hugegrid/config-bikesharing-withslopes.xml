@@ -33,6 +33,10 @@
 		<param name="searchRadius" value="5000" />
 	</module>
 
+	<module name="multimodal">
+		<param name="inputSlopeInformationFile" value="&inbase;/slopes.xml" />
+	</module>
+
 <!-- ====================================================================== -->
 
 	<module name="qsim" >
@@ -81,7 +85,7 @@
 <!-- ====================================================================== -->
 
 	<module name="network" >
-		<param name="inputNetworkFile" value="&inbase;/network.xml" />
+		<param name="inputNetworkFile" value="&inbase;/network-multimodal.xml" />
 	</module>
 
 <!-- ====================================================================== -->

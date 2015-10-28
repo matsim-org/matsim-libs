@@ -19,15 +19,7 @@
  * *********************************************************************** */
 package playground.thibautd.router.multimodal;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-
 import com.google.inject.Inject;
-import com.google.inject.name.Named;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -40,22 +32,22 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.router.RoutingModule;
-import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.util.FastAStarLandmarksFactory;
-import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.router.util.*;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
-import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.CollectionUtils;
+import org.matsim.core.utils.collections.MapUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
-
-import org.matsim.core.utils.collections.MapUtils;
 import playground.thibautd.utils.SoftCache;
 
 import javax.inject.Provider;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * @author thibautd
@@ -63,11 +55,12 @@ import javax.inject.Provider;
 public class AccessEgressMultimodalTripRouterModule extends AbstractModule {
 	private final Scenario scenario;
 	private final Map<String, TravelTime> multimodalTravelTimes;
-	private final Map<String, TravelDisutilityFactory> disutilityFactories = new HashMap< >();
 
 	private final Map<String, Network> multimodalSubNetworks = new HashMap<String, Network>();
 	private final Map<String, LeastCostPathCalculatorFactory> multimodalFactories = new HashMap<String, LeastCostPathCalculatorFactory>();
 	private final ConcurrentMap<String, SoftCache<Tuple<Node, Node>, Path>> caches = new ConcurrentHashMap<String, SoftCache<Tuple<Node, Node>, Path>>();
+	private final Map<String, TravelDisutilityFactory> disutilityFactories = new HashMap<>();
+
 
 	public AccessEgressMultimodalTripRouterModule(
 			final Scenario scenario,
@@ -88,16 +81,21 @@ public class AccessEgressMultimodalTripRouterModule extends AbstractModule {
 							new AccessEgressNetworkBasedTeleportationRoutingModuleProvider(
 									mode,
 									network));
-			//addTravelTimeBinding( mode ).toInstance( multimodalTravelTimes.get( mode ) );
-			//addTravelDisutilityFactoryBinding(mode).toInstance(travelDisutilityFactory);
+			addTravelTimeBinding(mode).toInstance(multimodalTravelTimes.get(mode));
+			if (disutilityFactories.containsKey(mode)) {
+				addTravelDisutilityFactoryBinding(mode).toInstance(disutilityFactories.get(mode));
+			} else {
+				addTravelDisutilityFactoryBinding(mode).to(carTravelDisutilityFactoryKey());
+			}
 		}
 	}
 
 	private class AccessEgressNetworkBasedTeleportationRoutingModuleProvider implements Provider<RoutingModule> {
 		private final String mode;
 		private final Network network;
+
 		@Inject
-		private TravelDisutilityFactory travelDisutilityFactory;
+		private Map<String, TravelDisutilityFactory> travelDisutilityFactories = null;
 
 		private AccessEgressNetworkBasedTeleportationRoutingModuleProvider(String mode, Network network) {
 			this.mode = mode;
@@ -120,9 +118,7 @@ public class AccessEgressMultimodalTripRouterModule extends AbstractModule {
 			 */
 
 			final TravelDisutility travelDisutility =
-							(disutilityFactories.containsKey( mode ) ?
-							 	disutilityFactories.get( mode ) :
-								travelDisutilityFactory ).createTravelDisutility(
+							 	travelDisutilityFactories.get( mode ).createTravelDisutility(
 										travelTime,
 										scenario.getConfig().planCalcScore());
 			final TravelDisutility nonPersonnalizableDisutility =
