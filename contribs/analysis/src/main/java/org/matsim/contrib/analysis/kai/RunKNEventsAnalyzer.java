@@ -91,7 +91,6 @@ public class RunKNEventsAnalyzer {
 		
 		final KNAnalysisEventsHandler.Builder builder = new KNAnalysisEventsHandler.Builder(scenario) ;
 		builder.setOtherTollLinkFile( otherLinksFilename );
-		builder.setVehicle2DriverEventHandler(vehicle2Driver);
 		final KNAnalysisEventsHandler calcLegTimes = builder.build();
 		
 		events.addHandler( calcLegTimes );

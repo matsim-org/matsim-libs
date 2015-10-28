@@ -55,7 +55,7 @@ public class KNAnalysisEventsHandler implements
 PersonDepartureEventHandler, PersonArrivalEventHandler, 
 PersonMoneyEventHandler, 
 LinkLeaveEventHandler, LinkEnterEventHandler, 
-PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler {
+PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler, Wait2LinkEventHandler, VehicleLeavesTrafficEventHandler {
 
 	private final static Logger log = Logger.getLogger(KNAnalysisEventsHandler.class);
 
@@ -87,7 +87,7 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler {
 	
 	private Set<Id<Link>> otherTolledLinkIds = new HashSet<Id<Link>>() ;
 
-	private Vehicle2DriverEventHandler vehicle2DriverEventHandler;
+	private Vehicle2DriverEventHandler delegate;
 
 	// general trip counter.  Would, in theory, not necessary to do this per StatType, but I find it too brittle 
 	// to avoid under- or over-counting with respect to loops.
@@ -96,22 +96,18 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler {
 	public static class Builder {
 		private final Scenario scenario ;
 		private String otherTollLinkFile = null ;
-		private Vehicle2DriverEventHandler vehicle2DriverEventHandler = null;
 		public void setOtherTollLinkFile(String otherTollLinkFile) {
 			this.otherTollLinkFile = otherTollLinkFile;
-		}
-		public void setVehicle2DriverEventHandler(Vehicle2DriverEventHandler vehicle2DriverEventHandler){
-			this.vehicle2DriverEventHandler = vehicle2DriverEventHandler;
 		}
 		public Builder( final Scenario sc ) {
 			scenario = sc ;
 		}
 		public KNAnalysisEventsHandler build() {
-			return new KNAnalysisEventsHandler( scenario, otherTollLinkFile, vehicle2DriverEventHandler ) ;
+			return new KNAnalysisEventsHandler( scenario, otherTollLinkFile ) ;
 		}
 	}
 	
-	private KNAnalysisEventsHandler( final Scenario scenario, final String otherTollLinkFile, final Vehicle2DriverEventHandler vehicle2DriverEventHandler ) {
+	private KNAnalysisEventsHandler( final Scenario scenario, final String otherTollLinkFile ) {
 		this( scenario ) ;
 		if ( otherTollLinkFile != null && !otherTollLinkFile.equals("") ) {
 			RoadPricingSchemeImpl scheme = new RoadPricingSchemeImpl();
@@ -123,7 +119,6 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler {
 			}
 			this.otherTolledLinkIds = scheme.getTolledLinkIds() ;
 		}
-		this.vehicle2DriverEventHandler = vehicle2DriverEventHandler;
 	}
 
 	public KNAnalysisEventsHandler(final Scenario scenario) {
@@ -563,7 +558,7 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler {
 		}
 		
 		if ( this.otherTolledLinkIds.contains( event.getLinkId() ) ) {
-			add( vehicle2DriverEventHandler.getDriverOfVehicle(event.getVehicleId()), 1., CERTAIN_LINKS_CNT );
+			add( delegate.getDriverOfVehicle(event.getVehicleId()), 1., CERTAIN_LINKS_CNT );
 		}
 		
 	}
@@ -605,6 +600,16 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler {
 				Logger.getLogger(this.getClass()).warn( Gbl.ONLYONCE ) ;
 			}
 		}
+	}
+
+	@Override
+	public void handleEvent(VehicleLeavesTrafficEvent event) {
+		delegate.handleEvent(event);
+	}
+
+	@Override
+	public void handleEvent(Wait2LinkEvent event) {
+		delegate.handleEvent(event);
 	}
 
 }
