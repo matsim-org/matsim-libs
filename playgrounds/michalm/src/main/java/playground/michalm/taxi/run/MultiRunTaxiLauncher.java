@@ -23,9 +23,7 @@ import java.io.*;
 import java.util.EnumSet;
 
 import org.matsim.contrib.dvrp.data.VrpData;
-import org.matsim.contrib.dvrp.run.VrpLauncherUtils;
-import org.matsim.contrib.dvrp.run.VrpLauncherUtils.*;
-import org.matsim.contrib.dvrp.util.TimeDiscretizer;
+import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelTimeSource;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
@@ -127,13 +125,11 @@ class MultiRunTaxiLauncher
     }
 
 
-    void runConfigSet(EnumSet<AlgorithmConfig> configs, int runs)
+    void runConfig(AlgorithmConfig config, int runs)
     {
-        for (AlgorithmConfig cfg : configs) {
-            params.algorithmConfig = cfg;
-            params.validate();
-            run(runs);
-        }
+        params.algorithmConfig = config;
+        params.validate();
+        run(runs);
     }
 
 
@@ -156,8 +152,10 @@ class MultiRunTaxiLauncher
         MultiRunTaxiLauncher multiLauncher = new MultiRunTaxiLauncher(params);
         multiLauncher.initOutputFiles("");
 
-        for (EnumSet<AlgorithmConfig> cs : configSets) {
-            multiLauncher.runConfigSet(cs, runs);
+        for (EnumSet<AlgorithmConfig> cfgSet : configSets) {
+            for (AlgorithmConfig cfg : cfgSet) {
+                multiLauncher.runConfig(cfg, runs);
+            }
         }
 
         multiLauncher.closeOutputFiles();

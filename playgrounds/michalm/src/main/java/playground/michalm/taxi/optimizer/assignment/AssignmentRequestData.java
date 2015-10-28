@@ -21,6 +21,9 @@ package playground.michalm.taxi.optimizer.assignment;
 
 import java.util.*;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.dvrp.data.Request;
+
 import playground.michalm.taxi.data.TaxiRequest;
 import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration;
 
@@ -28,6 +31,7 @@ import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration;
 class AssignmentRequestData
 {
     final List<TaxiRequest> requests = new ArrayList<>();
+    final Map<Id<Request>, Integer> reqIdx = new HashMap<>();
     final int urgentReqCount;
     final int dimension;
 
@@ -38,11 +42,14 @@ class AssignmentRequestData
         double currTime = optimConfig.context.getTime();
         double maxT0 = currTime + planningHorizon;
         int urgentReqCounter = 0;
+        int idx = 0;
 
-        for (TaxiRequest r : unplannedRequests) {
-            double t0 = r.getT0();
+        for (TaxiRequest req : unplannedRequests) {
+            double t0 = req.getT0();
             if (t0 <= maxT0) {
-                requests.add(r);
+                requests.add(req);
+                reqIdx.put(req.getId(), idx++);
+
                 if (t0 < currTime) {
                     urgentReqCounter++;
                 }

@@ -24,12 +24,12 @@ import java.util.*;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.*;
 import org.matsim.contrib.dvrp.path.*;
-import org.matsim.contrib.util.DistanceUtils;
 import org.matsim.core.router.*;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 
 import playground.michalm.taxi.data.TaxiRequest;
 import playground.michalm.taxi.optimizer.*;
+import playground.michalm.taxi.optimizer.filter.RequestFilter;
 
 
 public class AssignmentProblem
@@ -38,8 +38,8 @@ public class AssignmentProblem
 
     private final TaxiOptimizerConfiguration optimConfig;
     private final MultiNodeDijkstra router;
+    private final RequestFilter requestFilter;
 
-    private final double maxDistance2 = 5_000. * 5_0000.; //5 km TODO
     private final double planningHorizon = 1800; //30 min TODO
 
     private VehicleData vData;
@@ -50,6 +50,7 @@ public class AssignmentProblem
     {
         this.optimConfig = optimConfig;
         this.router = router;
+        this.requestFilter = optimConfig.filterFactory.createRequestFilter();
     }
 
 
@@ -99,12 +100,15 @@ public class AssignmentProblem
         Node fromNode = departure.link.getToNode();
 
         Map<Id<Node>, InitialNode> initialNodes = new HashMap<>();
-        Map<Id<Node>, Path> pathsToEndNodes = new HashMap<>();
+        Map<Id<Node>, Path> pathsToReqNodes = new HashMap<>();
         RequestPathData[] pathDataArray = new RequestPathData[rData.dimension];
 
-        for (int r = 0; r < rData.dimension; r++) {
+        Iterable<TaxiRequest> filteredReqs = requestFilter.filterRequestsForVehicle(rData.requests,
+                departure.vehicle);
+
+        for (TaxiRequest req : filteredReqs) {
+            int r = rData.reqIdx.get(req.getId());
             RequestPathData pathData = pathDataArray[r] = new RequestPathData();
-            TaxiRequest req = rData.requests.get(r);
             Link reqLink = req.getFromLink();
 
             if (departure.link == reqLink) {
@@ -114,17 +118,8 @@ public class AssignmentProblem
             }
             else {
                 pathData.reqNode = reqLink.getFromNode();
-                double distance2 = DistanceUtils.calculateSquaredDistance(fromNode,
-                        pathData.reqNode);
-
-                if (distance2 <= maxDistance2) {
-                    //simplified, but works for taxis, since pickup trips are short (about 5 mins)
-                    pathData.delay = 1 + reqLink.getFreespeed(departure.time);
-                }
-                else {
-                    pathData.delay = NULL_PATH_COST;
-                    continue;//skip this request/node
-                }
+                //simplified, but works for taxis, since pickup trips are short (about 5 mins)
+                pathData.delay = 1 + reqLink.getFreespeed(departure.time);
             }
 
             if (!initialNodes.containsKey(pathData.reqNode.getId())) {
@@ -133,30 +128,24 @@ public class AssignmentProblem
             }
         }
 
-        if (initialNodes.isEmpty()) {
-            throw new IllegalStateException("Unsupported; may be caused by too small maxDistance");
-        }
-
         ImaginaryNode toNodes = router.createImaginaryNode(initialNodes.values());
-
         Path path = router.calcLeastCostPath(fromNode, toNodes, departure.time, null, null);
-        Node toNode = path.nodes.get(path.nodes.size() - 1);
-        pathsToEndNodes.put(toNode.getId(), path);
+        Node bestReqNode = path.nodes.get(path.nodes.size() - 1);
+        pathsToReqNodes.put(bestReqNode.getId(), path);
 
         //get paths for all remaining endNodes 
         for (InitialNode i : initialNodes.values()) {
-            Node endNode = i.node;
-            if (endNode.getId() != toNode.getId()) {
-                path = router.constructPath(fromNode, endNode, departure.time);
-                pathsToEndNodes.put(endNode.getId(), path);
+            Node reqNode = i.node;
+            if (reqNode.getId() != bestReqNode.getId()) {
+                path = router.constructPath(fromNode, reqNode, departure.time);
+                pathsToReqNodes.put(reqNode.getId(), path);
             }
         }
 
-        for (int r = 0; r < rData.dimension; r++) {
+        for (TaxiRequest req : filteredReqs) {
+            int r = rData.reqIdx.get(req.getId());
             RequestPathData pathData = pathDataArray[r];
-            if (pathData.delay != NULL_PATH_COST) {
-                pathData.path = pathsToEndNodes.get(pathData.reqNode.getId());
-            }
+            pathData.path = pathsToReqNodes.get(pathData.reqNode.getId());
         }
 
         return pathDataArray;
@@ -174,23 +163,24 @@ public class AssignmentProblem
             for (int r = 0; r < rData.dimension; r++) {
                 RequestPathData pathData = pathDataMatrix[v][r];
 
-                double travelTime = pathData.delay == NULL_PATH_COST ? //
+                double travelTime = pathData == null ? //
                         NULL_PATH_COST : // no path (too far away)
                         pathData.delay + pathData.path.travelTime;
-                
-                double pickupBeginTime = Math.max(rData.requests.get(r).getT0(), departure.time + travelTime);
+
+                double pickupBeginTime = Math.max(rData.requests.get(r).getT0(),
+                        departure.time + travelTime);
 
                 costMatrix[v][r] = reduceTP ? //
                         pickupBeginTime - departure.time : // T_P
-                        
-                        //TODO the following two variants behave different for undersupply
-                        //(i.e. with dummy vehicles)
-                        
-                        //more fairness, lower throughput
-//                        Math.max(departure.time + travelTime - rData.requests.get(r).getT0(), 0); // T_W
-                            
-						//less fairness, higher throughput
-                            pickupBeginTime;// T_W
+
+                //TODO the following two variants, (A) and (B), behave different
+                //when undersupply happens (i.e. with dummy vehicles)
+
+                //(A) more fairness, lower throughput
+                //Math.max(departure.time + travelTime - rData.requests.get(r).getT0(), 0); // T_W
+
+                //(B)less fairness, higher throughput
+                pickupBeginTime;// T_W
             }
         }
 
