@@ -311,6 +311,8 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler, Wait2LinkEvent
 
 	@Override
 	public void reset(final int iteration) {
+		delegate.reset(iteration);
+		
 		this.agentDepartures.clear();
 		this.agentLegs.clear();
 
