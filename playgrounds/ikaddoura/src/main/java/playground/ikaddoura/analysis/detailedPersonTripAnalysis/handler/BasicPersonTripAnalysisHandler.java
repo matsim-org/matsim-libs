@@ -326,7 +326,7 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 		log.info("### Person is stucking. ###");
 		log.info(event.toString());
 		
-		if (this.scenario.getConfig().qsim().isRemoveStuckVehicles() || event.getTime() == 30 * 3600.) { // scenario end time
+		if (this.scenario.getConfig().qsim().isRemoveStuckVehicles() || event.getTime() == this.scenario.getConfig().qsim().getEndTime()) { // scenario end time
 			
 			log.warn("A person is stucking... This may affect the travel time calculation.");
 			
@@ -343,7 +343,7 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 			}
 									
 			double traveltime = 0.;
-			if (event.getTime() == 30 * 3600.) {
+			if (event.getTime() == this.scenario.getConfig().qsim().getEndTime()) {
 				log.warn("The stuck event is thrown at the end of the simulation. Computing the travel time for this trip as follows: simulation end time - trip departure time");
 				traveltime = event.getTime() - this.personId2tripNumber2departureTime.get(event.getPersonId()).get(currentTripNumber);
 			} else {
