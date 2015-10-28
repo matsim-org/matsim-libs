@@ -23,6 +23,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
+import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -37,6 +38,18 @@ public class TestRegressionConfigurableExample {
 		final Config conf = utils.loadConfig( "examples/bikesharing/hugegrid/config-bikesharing.xml" );
 		conf.controler().setOutputDirectory( utils.getOutputDirectory()+"/output/" );
 		conf.controler().setLastIteration( 2 );
+		String confFile = utils.getOutputDirectory()+"/config.xml";
+		new ConfigWriter( conf ).write( confFile );
+		RunConfigurableBikeSharingSimulation.main( confFile );
+	}
+
+	@Test
+	public void testRunDoesNotFailFastAStar() {
+		// this allows to change output folder
+		final Config conf = utils.loadConfig( "examples/bikesharing/hugegrid/config-bikesharing.xml" );
+		conf.controler().setOutputDirectory(utils.getOutputDirectory() + "/output/");
+		conf.controler().setLastIteration( 2 );
+		conf.controler().setRoutingAlgorithmType( RoutingAlgorithmType.FastAStarLandmarks );
 		String confFile = utils.getOutputDirectory()+"/config.xml";
 		new ConfigWriter( conf ).write( confFile );
 		RunConfigurableBikeSharingSimulation.main( confFile );
