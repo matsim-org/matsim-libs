@@ -232,8 +232,7 @@ public class AssignmentProblem
             RequestPathData pathData = pathDataMatrix[v][r];
 
             VrpPathWithTravelData vrpPath = VrpPaths.createPath(departure.link, req.getFromLink(),
-                    departure.time, pathData.path, optimConfig.travelTime,
-                    optimConfig.travelDisutility);
+                    departure.time, pathData.path, optimConfig.travelTime);
 
             optimConfig.scheduler.scheduleRequest(departure.vehicle, req, vrpPath);
             unplannedRequests.remove(req);

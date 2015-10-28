@@ -43,7 +43,6 @@ public class OneTaxiOptimizer
     private final MatsimVrpContext context;
 
     private final TravelTime travelTime;
-    private final TravelDisutility travelDisutility;
     private final LeastCostPathCalculator router;
 
     private final Vehicle vehicle;//we have only one vehicle
@@ -58,8 +57,8 @@ public class OneTaxiOptimizer
         this.context = context;
 
         travelTime = new FreeSpeedTravelTime();
-        travelDisutility = new TimeAsTravelDisutility(travelTime);
-        router = new Dijkstra(context.getScenario().getNetwork(), travelDisutility, travelTime);
+        router = new Dijkstra(context.getScenario().getNetwork(),
+                new TimeAsTravelDisutility(travelTime), travelTime);
 
         vehicle = context.getVrpData().getVehicles().values().iterator().next();
         schedule = (Schedule<AbstractTask>)vehicle.getSchedule();
@@ -96,7 +95,7 @@ public class OneTaxiOptimizer
                 Schedules.getLastTask(schedule).getEndTime();
 
         VrpPathWithTravelData p1 = VrpPaths.calcAndCreatePath(lastTask.getLink(), fromLink, t0,
-                router, travelTime, travelDisutility);
+                router, travelTime);
         schedule.addTask(new DriveTaskImpl(p1));
 
         double t1 = p1.getArrivalTime();
@@ -104,7 +103,7 @@ public class OneTaxiOptimizer
         schedule.addTask(new OneTaxiServeTask(t1, t2, fromLink, "pickup", req));
 
         VrpPathWithTravelData p2 = VrpPaths.calcAndCreatePath(fromLink, toLink, t2, router,
-                travelTime, travelDisutility);
+                travelTime);
         schedule.addTask(new DriveTaskImpl(p2));
 
         double t3 = p2.getArrivalTime();

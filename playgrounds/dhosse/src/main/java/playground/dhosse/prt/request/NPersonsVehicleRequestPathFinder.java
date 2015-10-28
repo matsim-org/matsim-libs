@@ -132,7 +132,7 @@ public class NPersonsVehicleRequestPathFinder
 
         return departure == null ? null
                 : VrpPaths.calcAndCreatePath(departure.link, req.getFromLink(), departure.time,
-                        router, optimConfig.travelTime, optimConfig.travelDisutility);
+                        router, optimConfig.travelTime);
 
     }
 

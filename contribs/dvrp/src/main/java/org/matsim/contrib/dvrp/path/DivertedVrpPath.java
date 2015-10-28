@@ -17,12 +17,11 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.router;
+package org.matsim.contrib.dvrp.path;
 
 import java.util.Iterator;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.path.VrpPath;
 
 import com.google.common.collect.Iterators;
 

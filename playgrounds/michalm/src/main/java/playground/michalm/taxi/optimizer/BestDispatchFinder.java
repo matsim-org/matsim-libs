@@ -98,7 +98,7 @@ public class BestDispatchFinder
         LinkTimePair bestDeparture = scheduler.getImmediateDiversionOrEarliestIdleness(bestVehicle);
 
         VrpPathWithTravelData vrpPath = VrpPaths.createPath(bestDeparture.link, toLink,
-                bestDeparture.time, path, optimConfig.travelTime, optimConfig.travelDisutility);
+                bestDeparture.time, path, optimConfig.travelTime);
         return new Dispatch(bestVehicle, req, vrpPath);
     }
 
@@ -117,7 +117,7 @@ public class BestDispatchFinder
 
             if (departure.link == reqLink) {
                 VrpPathWithTravelData vrpPath = VrpPaths.createPath(departure.link, reqLink,
-                        departure.time, null, optimConfig.travelTime, optimConfig.travelDisutility);
+                        departure.time, null, optimConfig.travelTime);
                 return new Dispatch(veh, req, vrpPath);
             }
 
@@ -146,8 +146,7 @@ public class BestDispatchFinder
         Node toNode = path.nodes.get(path.nodes.size() - 1);
         TaxiRequest bestRequest = initialRequests.get(toNode.getId());
         VrpPathWithTravelData vrpPath = VrpPaths.createPath(departure.link,
-                bestRequest.getFromLink(), departure.time, path, optimConfig.travelTime,
-                optimConfig.travelDisutility);
+                bestRequest.getFromLink(), departure.time, path, optimConfig.travelTime);
         return new Dispatch(veh, bestRequest, vrpPath);
     }
 }

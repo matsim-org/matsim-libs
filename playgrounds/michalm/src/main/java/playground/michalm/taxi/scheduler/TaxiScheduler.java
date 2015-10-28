@@ -44,7 +44,6 @@ public class TaxiScheduler
     protected final TaxiSchedulerParams params;
 
     private final TravelTime travelTime;
-    private final TravelDisutility travelDisutility;
     private final LeastCostPathCalculator router;
 
 
@@ -54,7 +53,6 @@ public class TaxiScheduler
         this.context = context;
         this.params = params;
         this.travelTime = travelTime;
-        this.travelDisutility = travelDisutility;
 
         router = new DijkstraWithThinPath(context.getScenario().getNetwork(), travelDisutility,
                 travelTime);
@@ -282,7 +280,7 @@ public class TaxiScheduler
 
         OnlineDriveTaskTracker tracker = (OnlineDriveTaskTracker)driveTask.getTaskTracker();
         LinkTimePair stopPoint = tracker.getDiversionPoint();
-        tracker.divertPath(new VrpPathWithTravelDataImpl(stopPoint.time, 0, 0,
+        tracker.divertPath(new VrpPathWithTravelDataImpl(stopPoint.time, 0,
                 new Link[] { stopPoint.link }, new double[] { 0 }));
 
         appendStayTask(schedule);
@@ -335,8 +333,7 @@ public class TaxiScheduler
 
     protected VrpPathWithTravelData calcPath(Link fromLink, Link toLink, double departureTime)
     {
-        return VrpPaths.calcAndCreatePath(fromLink, toLink, departureTime, router, travelTime,
-                travelDisutility);
+        return VrpPaths.calcAndCreatePath(fromLink, toLink, departureTime, router, travelTime);
     }
 
 

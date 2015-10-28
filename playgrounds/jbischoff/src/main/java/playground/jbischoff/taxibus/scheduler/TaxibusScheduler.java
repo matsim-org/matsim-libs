@@ -322,11 +322,16 @@ public class TaxibusScheduler
             VrpPathWithTravelData path, Set<TaxibusRequest> onBoard, double lastEndtime)
     {
 
-        VrpPathWithTravelData updatedPath = new VrpPathWithTravelDataImpl(lastEndtime,
-                path.getTravelTime(), path.getTravelCost(), path.getLinks(), path.getLinkTTs());
-        bestSched.addTask(new TaxibusDriveWithPassengerTask(onBoard, updatedPath));
-
-        return updatedPath.getArrivalTime();
+//        VrpPathWithTravelData updatedPath = new VrpPathWithTravelDataImpl(lastEndtime,
+//                path.getTravelTime(), path.getTravelCost(), path.getLinks(), path.getLinkTTs());
+        
+        TaxibusDriveWithPassengerTask task = new TaxibusDriveWithPassengerTask(onBoard, path);
+        task.setBeginTime(lastEndtime);
+        double endTime = lastEndtime + path.getTravelTime();
+        task.setEndTime(endTime);
+        bestSched.addTask(task);
+        
+        return endTime;
     }
 
 

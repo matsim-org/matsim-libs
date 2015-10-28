@@ -30,8 +30,7 @@ public class VrpPaths
      * ASSUMPTION: A vehicle enters and exits links at their ends (link.getToNode())
      */
     public static VrpPathWithTravelData calcAndCreatePath(Link fromLink, Link toLink,
-            double departureTime, LeastCostPathCalculator router, TravelTime travelTime,
-            TravelDisutility travelDisutility)
+            double departureTime, LeastCostPathCalculator router, TravelTime travelTime)
     {
         Path path = null;
         if (fromLink != toLink) {
@@ -40,16 +39,15 @@ public class VrpPaths
                     departureTime + 1, null, null);
         }
 
-        return VrpPaths.createPath(fromLink, toLink, departureTime, path, travelTime,
-                travelDisutility);
+        return VrpPaths.createPath(fromLink, toLink, departureTime, path, travelTime);
     }
 
 
     public static VrpPathWithTravelData createPath(Link fromLink, Link toLink, double departureTime,
-            Path path, TravelTime travelTime, TravelDisutility travelDisutility)
+            Path path, TravelTime travelTime)
     {
         if (fromLink == toLink) {
-            return new VrpPathWithTravelDataImpl(departureTime, 0, 0, new Link[] { fromLink },
+            return new VrpPathWithTravelDataImpl(departureTime, 0, new Link[] { fromLink },
                     new double[] { 0 });
         }
 
@@ -79,11 +77,8 @@ public class VrpPaths
         links[count + 1] = toLink;
         linkTT = toLink.getLength() / toLink.getFreespeed(currentTime);//as long as we cannot divert from the last link this is okay
         linkTTs[count + 1] = linkTT;
-
         double totalTT = 1 + path.travelTime + linkTT;
-        double totalCost = path.travelCost
-                + travelDisutility.getLinkMinimumTravelDisutility(toLink);
 
-        return new VrpPathWithTravelDataImpl(departureTime, totalTT, totalCost, links, linkTTs);
+        return new VrpPathWithTravelDataImpl(departureTime, totalTT, links, linkTTs);
     }
 }

@@ -67,7 +67,7 @@ public class TaxibusVehicleRequestPathFinder
         LinkTimePair departure = scheduler.getImmediateDiversionOrEarliestIdleness(veh);
         return departure == null ? //
                 null : VrpPaths.calcAndCreatePath(departure.link, req.getFromLink(), departure.time,
-                        routerWithCache, optimConfig.travelTime, optimConfig.travelDisutility);
+                        routerWithCache, optimConfig.travelTime);
     }
 
 
@@ -133,15 +133,13 @@ public class TaxibusVehicleRequestPathFinder
         Iterator<TaxibusRequest> iterator = allRequests.iterator();
         VrpPathWithTravelData currentSegment = VrpPaths.calcAndCreatePath(
                 best.path.get(0).getFromLink(), iterator.next().getFromLink(),
-                best.path.get(0).getDepartureTime(), routerWithCache, optimConfig.travelTime,
-                optimConfig.travelDisutility);
+                best.path.get(0).getDepartureTime(), routerWithCache, optimConfig.travelTime);
         segments.add(currentSegment);
         //Pickups
         while (iterator.hasNext()) {
             VrpPathWithTravelData nextSegment = VrpPaths.calcAndCreatePath(
                     currentSegment.getToLink(), iterator.next().getFromLink(),
-                    currentSegment.getArrivalTime(), routerWithCache, optimConfig.travelTime,
-                    optimConfig.travelDisutility);
+                    currentSegment.getArrivalTime(), routerWithCache, optimConfig.travelTime);
             segments.add(nextSegment);
             currentSegment = nextSegment;
         }
@@ -163,14 +161,14 @@ public class TaxibusVehicleRequestPathFinder
             TreeSet<TaxibusRequest> allRequests, VrpPathWithTravelData currentSegment)
     {
 
-        double bestCost = Double.MAX_VALUE;
+        double bestTime = Double.MAX_VALUE;
         Tuple<VrpPathWithTravelData, TaxibusRequest> bestSegment = null;
         for (TaxibusRequest request : allRequests) {
             VrpPathWithTravelData segment = VrpPaths.calcAndCreatePath(currentSegment.getToLink(),
                     request.getToLink(), currentSegment.getDepartureTime(), routerWithCache,
-                    optimConfig.travelTime, optimConfig.travelDisutility);
-            if (segment.getTravelCost() < bestCost) {
-                bestCost = segment.getTravelCost();
+                    optimConfig.travelTime);
+            if (segment.getTravelTime() < bestTime) {
+                bestTime = segment.getTravelTime();
                 bestSegment = new Tuple<>(segment, request);
 
             }

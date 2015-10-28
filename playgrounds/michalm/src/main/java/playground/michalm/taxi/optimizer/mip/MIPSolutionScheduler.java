@@ -75,7 +75,7 @@ class MIPSolutionScheduler
         //   (because tt in MIP are based on the free flow speed estimates, while the actual
         //   times are usually longer hence the vehicle is likely to arrive after w[i])
         VrpPathWithTravelData path = VrpPaths.calcAndCreatePath(earliestDeparture.link,
-                req.getFromLink(), earliestDeparture.time, router, optimConfig.travelTime, optimConfig.travelDisutility);
+                req.getFromLink(), earliestDeparture.time, router, optimConfig.travelTime);
 
         optimConfig.scheduler.scheduleRequest(currentVeh, req, path);
     }
