@@ -95,9 +95,6 @@ public class KNEventsAnalyzer {
 		
 		EventsManager events = new EventsManagerImpl() ;
 		
-		Vehicle2DriverEventHandler vehicle2Driver = new Vehicle2DriverEventHandler();
-		events.addHandler(vehicle2Driver);
-		
 		final KNAnalysisEventsHandler.Builder builder = new KNAnalysisEventsHandler.Builder(scenario) ;
 		builder.setOtherTollLinkFile( otherLinksFilename );
 		final KNAnalysisEventsHandler calcLegTimes = builder.build();

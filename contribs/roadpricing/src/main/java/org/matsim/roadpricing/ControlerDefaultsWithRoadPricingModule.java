@@ -22,19 +22,20 @@
 
 package org.matsim.roadpricing;
 
-import com.google.inject.Singleton;
+import java.util.Arrays;
+
+import javax.inject.Inject;
+import javax.inject.Provider;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.ControlerDefaults;
 import org.matsim.core.controler.ControlerDefaultsModule;
-import org.matsim.core.events.handler.Vehicle2DriverEventHandler;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
-import java.util.Arrays;
+import com.google.inject.Singleton;
 
 public class ControlerDefaultsWithRoadPricingModule extends AbstractModule {
 
@@ -72,9 +73,6 @@ public class ControlerDefaultsWithRoadPricingModule extends AbstractModule {
         addControlerListenerBinding().to(RoadPricingControlerListener.class);
 
         // add the events handler to calculate the tolls paid by agents
-        bind(Vehicle2DriverEventHandler.class).in(Singleton.class);
-        addEventHandlerBinding().to(Vehicle2DriverEventHandler.class);
-        
         bind(CalcPaidToll.class).in(Singleton.class);
         addEventHandlerBinding().to(CalcPaidToll.class);
 

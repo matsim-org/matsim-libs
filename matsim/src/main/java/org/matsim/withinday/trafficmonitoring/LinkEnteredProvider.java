@@ -21,28 +21,25 @@
 package org.matsim.withinday.trafficmonitoring;
 
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
-import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
+import org.matsim.api.core.v01.events.Wait2LinkEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
+import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.events.handler.Vehicle2DriverEventHandler;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
-import org.matsim.vehicles.Vehicle;
 
 /**
  * Returns all agents that have entered a new link in the last time step.
@@ -55,11 +52,12 @@ import org.matsim.vehicles.Vehicle;
  * @author cdobler
  */
 public class LinkEnteredProvider implements LinkEnterEventHandler, PersonArrivalEventHandler, PersonStuckEventHandler,
-		MobsimAfterSimStepListener, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler {
+		MobsimAfterSimStepListener, Wait2LinkEventHandler, VehicleLeavesTrafficEventHandler {
 
 	private Map<Id<Person>, Id<Link>> linkEnteredAgents = new ConcurrentHashMap<>();	// <agentId, linkId>
 	private Map<Id<Person>, Id<Link>> lastTimeStepLinkEnteredAgents = new ConcurrentHashMap<>();	// <agentId, linkId>
-	private Map<Id<Vehicle>, Set<Id<Person>>> personsInsideVehicle = new HashMap<>(); // <vehicleId, List<personIds inside vehicle>>
+	
+	private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
 	
 	public Map<Id<Person>, Id<Link>> getLinkEnteredAgentsInLastTimeStep() {
 		return Collections.unmodifiableMap(this.lastTimeStepLinkEnteredAgents);
@@ -69,14 +67,7 @@ public class LinkEnteredProvider implements LinkEnterEventHandler, PersonArrival
 	public void reset(int iteration) {
 		this.linkEnteredAgents.clear();
 		this.lastTimeStepLinkEnteredAgents.clear();
-	}
-
-	@Override
-	public void handleEvent(PersonEntersVehicleEvent event) {
-		if (!personsInsideVehicle.containsKey(event.getVehicleId())){
-			personsInsideVehicle.put(event.getVehicleId(), new HashSet<Id<Person>>());
-		}
-		personsInsideVehicle.get(event.getVehicleId()).add(event.getPersonId());
+		delegate.reset(iteration);
 	}
 
 	@Override
@@ -95,20 +86,23 @@ public class LinkEnteredProvider implements LinkEnterEventHandler, PersonArrival
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		for (Id<Person> personInsideVehicle : personsInsideVehicle.get(event.getVehicleId())){
-			this.linkEnteredAgents.put(personInsideVehicle, event.getLinkId());
-		}
-	}
-
-	@Override
-	public void handleEvent(PersonLeavesVehicleEvent event) {
-		personsInsideVehicle.get(event.getVehicleId()).remove(event.getPersonId());
+		this.linkEnteredAgents.put(delegate.getDriverOfVehicle(event.getVehicleId()), event.getLinkId());
 	}
 
 	@Override
 	public void notifyMobsimAfterSimStep(MobsimAfterSimStepEvent e) {
 		this.lastTimeStepLinkEnteredAgents = linkEnteredAgents;
 		this.linkEnteredAgents = new ConcurrentHashMap<>();
+	}
+
+	@Override
+	public void handleEvent(VehicleLeavesTrafficEvent event) {
+		delegate.handleEvent(event);
+	}
+
+	@Override
+	public void handleEvent(Wait2LinkEvent event) {
+		delegate.handleEvent(event);
 	}
 
 }

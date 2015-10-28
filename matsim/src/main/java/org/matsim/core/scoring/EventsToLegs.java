@@ -21,10 +21,8 @@ package org.matsim.core.scoring;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -33,15 +31,17 @@ import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
-import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
+import org.matsim.api.core.v01.events.Wait2LinkEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
+import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -50,6 +50,7 @@ import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.handler.TeleportationArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityEventHandler;
+import org.matsim.core.events.handler.Vehicle2DriverEventHandler;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -76,7 +77,9 @@ import org.matsim.vehicles.Vehicle;
  *
  */
 public final class EventsToLegs implements PersonDepartureEventHandler, PersonArrivalEventHandler, LinkLeaveEventHandler, LinkEnterEventHandler, 
-TeleportationArrivalEventHandler, TransitDriverStartsEventHandler, PersonEntersVehicleEventHandler, VehicleArrivesAtFacilityEventHandler, PersonLeavesVehicleEventHandler {
+TeleportationArrivalEventHandler, TransitDriverStartsEventHandler, PersonEntersVehicleEventHandler, VehicleArrivesAtFacilityEventHandler, Wait2LinkEventHandler, VehicleLeavesTrafficEventHandler {
+	
+	private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
 	
 	private class PendingTransitTravel {
 
@@ -116,7 +119,6 @@ TeleportationArrivalEventHandler, TransitDriverStartsEventHandler, PersonEntersV
 	private Map<Id<Person>, PendingTransitTravel> transitTravels = new HashMap<>();
 	private Map<Id<Vehicle>, LineAndRoute> transitVehicle2currentRoute = new HashMap<>();
 	private LegHandler legHandler;
-	private Map<Id<Vehicle>, Set<Id<Person>>> personsInsideVehicle = new HashMap<>();
 	
 	public EventsToLegs(Scenario scenario) {
 		this.scenario = scenario;
@@ -143,11 +145,6 @@ TeleportationArrivalEventHandler, TransitDriverStartsEventHandler, PersonEntersV
 	
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
-		if (!personsInsideVehicle.containsKey(event.getVehicleId())){
-			personsInsideVehicle.put(event.getVehicleId(), new HashSet<Id<Person>>());
-		}
-		personsInsideVehicle.get(event.getVehicleId()).add(event.getPersonId());
-		
 		LineAndRoute lineAndRoute = transitVehicle2currentRoute.get(event.getVehicleId());
 		if (lineAndRoute != null
                 && !event.getPersonId().equals(lineAndRoute.driverId)) { // transit drivers are not considered to travel by transit
@@ -162,11 +159,8 @@ TeleportationArrivalEventHandler, TransitDriverStartsEventHandler, PersonEntersV
 
 	@Override
     public void handleEvent(LinkEnterEvent event) {
-		// add the link to the route of all agents inside the vehicle
-		for (Id<Person> personInsideVehicle : personsInsideVehicle.get(event.getVehicleId())){
-			List<Id<Link>> route = experiencedRoutes.get(personInsideVehicle);
-	        route.add(event.getLinkId());
-		}
+		List<Id<Link>> route = experiencedRoutes.get(delegate.getDriverOfVehicle(event.getVehicleId()));
+	    route.add(event.getLinkId());
     }
 
     @Override
@@ -225,18 +219,25 @@ TeleportationArrivalEventHandler, TransitDriverStartsEventHandler, PersonEntersV
 	}
 
 	@Override
-	public void handleEvent(PersonLeavesVehicleEvent event) {
-		personsInsideVehicle.get(event.getVehicleId()).remove(event.getPersonId());
-	}
-
-	@Override
 	public void reset(int iteration) {
 	    legs.clear();
 	    experiencedRoutes.clear();
+	    
+	    delegate.reset(iteration);
 	}
 
 	public void setLegHandler(LegHandler legHandler) {
 	    this.legHandler = legHandler;
+	}
+
+	@Override
+	public void handleEvent(Wait2LinkEvent event) {
+		delegate.handleEvent(event);
+	}
+
+	@Override
+	public void handleEvent(VehicleLeavesTrafficEvent event) {
+		delegate.handleEvent(event);
 	}
 
 }

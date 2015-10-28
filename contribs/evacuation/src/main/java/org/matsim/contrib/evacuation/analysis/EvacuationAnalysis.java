@@ -228,9 +228,7 @@ public class EvacuationAnalysis extends AbstractModule {
         EventsManager e = EventsUtils.createEventsManager();
         EventsReaderXMLv1 reader = new EventsReaderXMLv1(e);
         this.readerThread = new Thread(new EventReaderThread(reader, eventFile.toString()), "readerthread");
-        Vehicle2DriverEventHandler vehicle2Driver = new Vehicle2DriverEventHandler();
-        e.addHandler(vehicle2Driver);
-        this.eventHandler = new EventHandler(useCellCount, eventFile.getName(), this.controller.getScenario(), this.gridSize, this.readerThread, vehicle2Driver);
+        this.eventHandler = new EventHandler(useCellCount, eventFile.getName(), this.controller.getScenario(), this.gridSize, this.readerThread);
         e.addHandler(this.eventHandler);
         this.readerThread.run();
 

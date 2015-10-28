@@ -20,9 +20,7 @@
 
 package org.matsim.contrib.cadyts.car;
 
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -43,7 +41,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
 import org.matsim.contrib.cadyts.general.PlansTranslator;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.vehicles.Vehicle;
+import org.matsim.core.events.handler.Vehicle2DriverEventHandler;
 
 import cadyts.demand.PlanBuilder;
 
@@ -54,7 +52,7 @@ Wait2LinkEventHandler, VehicleLeavesTrafficEventHandler {
 
 	private final Scenario scenario;
 
-	private final Map<Id<Vehicle>, Id<Person>> driverAgentsOfCars;
+	private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
 	
 	private int iteration = -1;
 
@@ -73,7 +71,6 @@ Wait2LinkEventHandler, VehicleLeavesTrafficEventHandler {
 		for ( String str : abc ) {
 			this.calibratedLinks.add( Id.createLinkId(str) ) ;
 		}
-		this.driverAgentsOfCars = new HashMap<>();
 	}
 
 	private long plansFound = 0;
@@ -98,26 +95,28 @@ Wait2LinkEventHandler, VehicleLeavesTrafficEventHandler {
 		log.warn("found " + this.plansFound + " out of " + (this.plansFound + this.plansNotFound) + " ("
 				+ (100. * this.plansFound / (this.plansFound + this.plansNotFound)) + "%)");
 		log.warn("(above values may both be at zero for a couple of iterations if multiple plans per agent all have no score)");
-
-		this.driverAgentsOfCars.clear();
+		
+		delegate.reset(iteration);
 	}
 
 	@Override
 	public void handleEvent(Wait2LinkEvent event) {
 		if (event.getNetworkMode().equals(TransportMode.car))
-			this.driverAgentsOfCars.put(event.getVehicleId(), event.getPersonId());
+			delegate.handleEvent(event);
 	}
 	
 	@Override
 	public void handleEvent(VehicleLeavesTrafficEvent event) {
-		this.driverAgentsOfCars.remove(event.getVehicleId());
+		delegate.handleEvent(event);
 	}
 	
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
 		
+		Id<Person> driverId = delegate.getDriverOfVehicle(event.getVehicleId());
+		
 		// if it is not a car, ignore the event
-		if (!driverAgentsOfCars.containsKey(event.getVehicleId())) 
+		if (driverId == null) 
 			return;
 		
 		// if only a subset of links is calibrated but the link is not contained, ignore the event
@@ -125,7 +124,7 @@ Wait2LinkEventHandler, VehicleLeavesTrafficEventHandler {
 			return;
 		
 		// get the "Person" behind the id:
-		Person person = this.scenario.getPopulation().getPersons().get(driverAgentsOfCars.get(event.getVehicleId()));
+		Person person = this.scenario.getPopulation().getPersons().get(driverId);
 		
 		// get the selected plan:
 		Plan selectedPlan = person.getSelectedPlan();

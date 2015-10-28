@@ -58,7 +58,8 @@ import org.matsim.core.utils.collections.QuadTree.Rect;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
 
-public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandler, PersonArrivalEventHandler, PersonDepartureEventHandler, Runnable {
+public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandler, PersonArrivalEventHandler, PersonDepartureEventHandler, 
+Runnable, Wait2LinkEventHandler, VehicleLeavesTrafficEventHandler {
 
 	private HashMap<Integer, int[]> networkLinks = null;
 
@@ -99,9 +100,9 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 	private boolean useCellCount = true;
 	private double sampleSize = 0.1;
 
-	private Vehicle2DriverEventHandler vehicle2Driver;
+	private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
 
-	public EventHandler(boolean useCellCount, String eventFilename, Scenario sc, double cellSize, Thread readerThread, Vehicle2DriverEventHandler vehicle2Driver) {
+	public EventHandler(boolean useCellCount, String eventFilename, Scenario sc, double cellSize, Thread readerThread) {
 		this.useCellCount = useCellCount;
 		
 		this.sampleSize = Double.valueOf(sc.getConfig().getModule("evacuation").getValue("sampleSize"));
@@ -115,8 +116,6 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 		this.network = sc.getNetwork();
 		this.arrivalTimes = new ArrayList<Tuple<Double, Integer>>();
 		init();
-		
-		this.vehicle2Driver = vehicle2Driver;
 	}
 
 	public void setK(int k) {
@@ -200,7 +199,7 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 
 	@Override
 	public void reset(int iteration) {
-
+		delegate.reset(iteration);
 	}
 
 	@Override
@@ -271,7 +270,7 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		Id<Person> personId = vehicle2Driver.getDriverOfVehicle(event.getVehicleId());
+		Id<Person> personId = delegate.getDriverOfVehicle(event.getVehicleId());
 		
 		if (personId.toString().contains("veh"))
 			return;
@@ -312,7 +311,7 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 
 		// get link id
 		Id<Link> linkId = event.getLinkId();
-		Id<Person> personId = vehicle2Driver.getDriverOfVehicle(event.getVehicleId());
+		Id<Person> personId = delegate.getDriverOfVehicle(event.getVehicleId());
 
 		// get cell from person id
 		Link link = this.network.getLinks().get(linkId);
@@ -420,6 +419,16 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 	public void setTransparency(float cellTransparency) {
 		this.cellTransparency = cellTransparency;
 
+	}
+
+	@Override
+	public void handleEvent(VehicleLeavesTrafficEvent event) {
+		delegate.handleEvent(event);
+	}
+
+	@Override
+	public void handleEvent(Wait2LinkEvent event) {
+		delegate.handleEvent(event);
 	}
 
 }

@@ -28,8 +28,12 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
+import org.matsim.api.core.v01.events.Wait2LinkEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
+import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
@@ -42,7 +46,7 @@ import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
  *
  * @author mrieser
  */
-public class CalcAverageTolledTripLength implements LinkEnterEventHandler, PersonArrivalEventHandler {
+public class CalcAverageTolledTripLength implements LinkEnterEventHandler, PersonArrivalEventHandler, Wait2LinkEventHandler, VehicleLeavesTrafficEventHandler {
 
 	@SuppressWarnings("unused")
 	private static final Logger log = Logger.getLogger(CalcAverageTolledTripLength.class);
@@ -53,22 +57,21 @@ public class CalcAverageTolledTripLength implements LinkEnterEventHandler, Perso
 	private Network network = null;
 	private TreeMap<Id<Person>, Double> agentDistance = null;
 
-	private Vehicle2DriverEventHandler vehicle2DriverEventHandler;
+	private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
 	
 	private static Double zero = 0.0;
 
     @Inject
-	public CalcAverageTolledTripLength(final Network network, final RoadPricingScheme scheme, final Vehicle2DriverEventHandler vehicle2DriverEventHandler) {
+	public CalcAverageTolledTripLength(final Network network, final RoadPricingScheme scheme) {
 		this.scheme = scheme;
 		this.network = network;
 		this.agentDistance = new TreeMap<>();
-		this.vehicle2DriverEventHandler = vehicle2DriverEventHandler;
 	}
 
 	@Override
 	public void handleEvent(final LinkEnterEvent event) {
 		
-		Id<Person> driverId = vehicle2DriverEventHandler.getDriverOfVehicle(event.getVehicleId());
+		Id<Person> driverId = delegate.getDriverOfVehicle(event.getVehicleId());
 		
 		// getting the (monetary? generalized?) cost of the link
 		Cost cost = this.scheme.getLinkCostInfo(event.getLinkId(), event.getTime(), driverId, event.getVehicleId() );
@@ -119,6 +122,7 @@ public class CalcAverageTolledTripLength implements LinkEnterEventHandler, Perso
 	public void reset(final int iteration) {
 		this.sumLength = 0.0;
 		this.cntTrips = 0;
+		delegate.reset(iteration);
 	}
 
 	public double getAverageTripLength() {
@@ -128,5 +132,15 @@ public class CalcAverageTolledTripLength implements LinkEnterEventHandler, Perso
 //		log.warn("NOTE: The result of this calculation has been changed from 'av over all trips' to 'av over tolled trips'.  kai/benjamin, apr'10") ;
 		// commenting this out.  kai, mar'12
 		return (this.sumLength / this.cntTrips);
+	}
+
+	@Override
+	public void handleEvent(VehicleLeavesTrafficEvent event) {
+		delegate.handleEvent(event);
+	}
+
+	@Override
+	public void handleEvent(Wait2LinkEvent event) {
+		delegate.handleEvent(event);
 	}
 }
