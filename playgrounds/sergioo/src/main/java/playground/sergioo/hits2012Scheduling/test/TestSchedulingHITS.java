@@ -148,7 +148,7 @@ public class TestSchedulingHITS {
 		}
 	}
 	public static void main2(String[] args) throws NumberFormatException, IOException, ParseException {
-		Map<String, Household> households = HitsReader.readHits(args[0]);
+		Map<String, Household> households = HitsReader.readHits(args[0], args[1]);
 		Set<String> actChains = new HashSet<>();
 		Set<String> actChainsNoFlex = new HashSet<>();
 		Set<String> actChainsNoFlexSimple = new HashSet<>();
@@ -214,7 +214,7 @@ public class TestSchedulingHITS {
 		System.out.println(actChainsNoFlexSimple.size());
 	}
 	public static void main0(String[] args) throws NumberFormatException, IOException, ParseException {
-		Map<String, Household> households = HitsReader.readHits(args[0]);
+		Map<String, Household> households = HitsReader.readHits(args[0], args[1]);
 		IncomeEstimation.init();
 		IncomeEstimation.setIncome(households);
 		for(Household household:households.values())
