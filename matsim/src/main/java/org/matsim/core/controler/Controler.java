@@ -144,8 +144,6 @@ public class Controler extends AbstractController {
 
 	private final List<MobsimListener> simulationListeners = new ArrayList<>();
 
-	private boolean dumpDataAtEnd = true; 
-
     public static void main(final String[] args) {
 		if ((args == null) || (args.length == 0)) {
 			System.out.println("No argument given!");
@@ -305,7 +303,7 @@ public class Controler extends AbstractController {
                     }
                 });
 
-		if (this.dumpDataAtEnd) {
+		if (getConfig().controler().getDumpDataAtEnd()) {
 			this.addCoreControlerListener( injector.getInstance( DumpDataAtEnd.class ) );
 		}
 
@@ -559,7 +557,7 @@ public class Controler extends AbstractController {
 	 *            config etc should be dumped to a file.
 	 */
 	public final void setDumpDataAtEnd(final boolean dumpData) {
-		this.dumpDataAtEnd = dumpData;
+		this.getConfig().controler().setDumpDataAtEnd(dumpData);
 	}
 	
 	
