@@ -31,7 +31,6 @@ import org.matsim.core.replanning.DefaultPlanStrategiesModule.DefaultStrategy;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
-import playground.tschlenther.createNetwork.ForkNetworkCreator;
 
 /**
  * 
@@ -142,7 +141,7 @@ public class Link2LinkTestRunner {
 			// add the module for link to link routing if enabled
 			controler.addOverridingModule(new InvertedNetworkRoutingModuleModule());
 		}
-		new ForkNetworkCreator(scenario, runSettings.isUseLanes(), runSettings.isUseSignals()).createNetwork();
+		new Link2LinkTestNetworkCreator(scenario, runSettings.isUseLanes(), runSettings.isUseSignals()).createNetwork();
 		this.createPersons(scenario);
 
 		controler.getEvents().addHandler(handler);

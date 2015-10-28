@@ -15,7 +15,6 @@ import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.lanes.data.v20.LaneDefinitionsFactory20;
 import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
 
-import playground.tschlenther.Link2Link.Link2LinkTestSignalsCreator;
 
 /**
  * @author Tilmann Schlenther
@@ -45,9 +44,9 @@ public class ForkNetworkCreator {
 	private static Id<Link> LINK_ID6 = Id.create("Link6", Link.class);
 	private static Id<Link> LINK_ID7 = Id.create("Link7", Link.class);
 
-	private Scenario scenario;
-	private boolean UseSignals = false;
-	private boolean UseLanes = false;
+	protected Scenario scenario;
+	protected boolean UseSignals = false;
+	protected boolean UseLanes = false;
 	
 	public ForkNetworkCreator(Scenario scenario, boolean lanes, boolean signals){
 		this.scenario = scenario;
@@ -89,10 +88,10 @@ public class ForkNetworkCreator {
 		link2.setFreespeed(201);
 		network.addLink(link2);	
 
-		//use signals
-		if(this.UseSignals){	
-			setSignals();
-		}
+//		//use signals
+//		if(this.UseSignals){	
+//			setSignals();
+//		}
 		
 		//use Lanes
 		if(this.UseLanes){
@@ -169,9 +168,9 @@ public class ForkNetworkCreator {
 		
 	}
 
-	private void setSignals() {
-		Link2LinkTestSignalsCreator signalsCreator = new Link2LinkTestSignalsCreator(this.scenario, this.UseLanes);
-		signalsCreator.createSignals();
-	}
+//	private void setSignals() {
+//		Link2LinkTestSignalsCreator signalsCreator = new Link2LinkTestSignalsCreator(this.scenario, this.UseLanes);
+//		signalsCreator.createSignals();
+//	}
 	
 }
