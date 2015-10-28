@@ -19,7 +19,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.andreas.fggeoinfo.ReadBBIDemand.DemandBox;
@@ -154,7 +154,7 @@ public class BBIextraDemand {
 	}
 
 	private void writePopulation(String filename) {
-        ScenarioImpl sc = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig()));
+        MutableScenario sc = ((MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig()));
         Population pop = PopulationUtils.createPopulation(sc.getConfig(), sc.getNetwork());
 		for (Person person : this.personList) {
 			pop.addPerson(person);

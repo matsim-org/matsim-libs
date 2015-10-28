@@ -57,7 +57,7 @@ import playground.sergioo.weeklySimulation.population.PopulationReaderMatsimV5;
  * <li> Given what we have now, does it make sense to leave this class public?  yy kai, mar'11
  * </ul>
  *
- * @see org.matsim.core.scenario.ScenarioImpl
+ * @see org.matsim.core.scenario.MutableScenario
  *
  * @author dgrether
  */

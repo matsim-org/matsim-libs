@@ -42,7 +42,7 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.replanning.DefaultPlanStrategiesModule;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.data.v20.Lane;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
@@ -75,7 +75,7 @@ import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
  * @author dgrether
  */
 public class InvertedNetworkRoutingTestFixture {
-	public final ScenarioImpl scenario;
+	public final MutableScenario scenario;
 
 	public InvertedNetworkRoutingTestFixture(boolean doCreateModes, boolean doCreateLanes, boolean doCreateSignals) {
 		Config config = ConfigUtils.createConfig();
@@ -100,7 +100,7 @@ public class InvertedNetworkRoutingTestFixture {
 		config.qsim().setUseLanes(doCreateLanes);
 		ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setUseSignalSystems(doCreateSignals);
 
-		this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		this.scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		createNetwork();
 		if (doCreateLanes){
 			config.qsim().setUseLanes(true);

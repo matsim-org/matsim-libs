@@ -14,7 +14,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.*;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
@@ -56,7 +56,7 @@ public class CreatePlansFromTrips {
 	
 	private static final Logger log = Logger.getLogger(CreatePlansFromTrips.class);
 	
-	private ScenarioImpl scenario;
+	private MutableScenario scenario;
 	private ZoneLayer zones = null;
 	private final List<String> tripsFieldNames = Arrays.asList(new String[]
 				{"hhid", //Household ID
@@ -99,7 +99,7 @@ public class CreatePlansFromTrips {
 	// ////////////////////////////////////////////////////////////////////
 	
 	public CreatePlansFromTrips(){
-		this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		this.scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 	}
 	
 	// ////////////////////////////////////////////////////////////////////

@@ -28,7 +28,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.households.Household;
 import org.matsim.households.HouseholdsImpl;
@@ -55,17 +55,17 @@ public class SampleHouseholds {
 		final Config config = ConfigUtils.createConfig();
 		config.scenario().setUseHouseholds( true );
 		final Scenario sc = ScenarioUtils.createScenario( config );
-		new HouseholdsReaderV10( ((ScenarioImpl) sc).getHouseholds() ).parse( inHouseholdFile );
+		new HouseholdsReaderV10( ((MutableScenario) sc).getHouseholds() ).parse( inHouseholdFile );
 		new MatsimPopulationReader( sc ).parse( inPopFile );
 
 		final HouseholdsImpl newHouseholds = new HouseholdsImpl();
-        ScenarioImpl sc1 = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+        MutableScenario sc1 = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
         final Population newPopulation = PopulationUtils.createPopulation(sc1.getConfig(), sc1.getNetwork());
 
 		final Random random = new Random( 8904567 );
 		int countAcceptedHouseholds = 0;
 		int countAcceptedPersons = 0;
-		for ( Household hh : ((ScenarioImpl) sc).getHouseholds().getHouseholds().values() ) {
+		for ( Household hh : ((MutableScenario) sc).getHouseholds().getHouseholds().values() ) {
 			if ( random.nextDouble() > pAccept ) continue;
 
 			countAcceptedHouseholds++;
@@ -76,9 +76,9 @@ public class SampleHouseholds {
 			}
 		}
 
-		log.info( countAcceptedHouseholds+" / "+((ScenarioImpl) sc).getHouseholds().getHouseholds().size()+
+		log.info( countAcceptedHouseholds+" / "+((MutableScenario) sc).getHouseholds().getHouseholds().size()+
 				" households sampled (effective rate "+
-				(((double) countAcceptedHouseholds) / ((ScenarioImpl) sc).getHouseholds().getHouseholds().size()) +" )" );
+				(((double) countAcceptedHouseholds) / ((MutableScenario) sc).getHouseholds().getHouseholds().size()) +" )" );
 		log.info( countAcceptedPersons+" / "+sc.getPopulation().getPersons().size()+
 				" persons sampled (effective rate "+
 				(((double) countAcceptedPersons) / sc.getPopulation().getPersons().size()) );

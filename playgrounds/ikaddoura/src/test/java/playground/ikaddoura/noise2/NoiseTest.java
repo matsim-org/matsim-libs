@@ -53,7 +53,7 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.EventWriterXML;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
@@ -176,7 +176,7 @@ public class NoiseTest {
 		noiseParameters.setUseActualSpeedLevel(false);
 		noiseParameters.setAllowForSpeedsOutsideTheValidRange(true);
 		
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.loadScenario(config);
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.loadScenario(config);
 		
 		String outputFilePath = runDirectory + "analysis_it." + config.controler().getLastIteration() + "/";
 		File file = new File(outputFilePath);
@@ -934,7 +934,7 @@ public class NoiseTest {
 		noiseParameters.setUseActualSpeedLevel(false);
 		noiseParameters.setAllowForSpeedsOutsideTheValidRange(true);
 		
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.loadScenario(config);
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.loadScenario(config);
 		
 		String outputFilePath = runDirectory + "analysis_it." + config.controler().getLastIteration() + "/";
 		File file = new File(outputFilePath);
@@ -1045,7 +1045,7 @@ public class NoiseTest {
 		noiseParameters.setUseActualSpeedLevel(true);
 		noiseParameters.setAllowForSpeedsOutsideTheValidRange(true);
 		
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.loadScenario(config);
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.loadScenario(config);
 		
 		String outputFilePath = runDirectory + "analysis_it." + config.controler().getLastIteration() + "/";
 		File file = new File(outputFilePath);

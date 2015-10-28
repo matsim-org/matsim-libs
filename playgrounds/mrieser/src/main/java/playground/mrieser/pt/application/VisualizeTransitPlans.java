@@ -52,7 +52,7 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -71,13 +71,13 @@ public class VisualizeTransitPlans {
 	private final static String TRANSIT_SCHEDULE_FILE = "../thesis-data/application/transitschedule.oevModellZH.xml";
 	private final static String POPULATION_FILE = "../thesis-data/application/plans.census2000ivtch1pct.dilZh30km.pt-routedOevModell.xml.gz";
 
-	private final ScenarioImpl realScenario;
-	private final ScenarioImpl visScenario;
+	private final MutableScenario realScenario;
+	private final MutableScenario visScenario;
 
 	public VisualizeTransitPlans() {
-		this.realScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		this.realScenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		this.realScenario.getConfig().transit().setUseTransit(true);
-		this.visScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		this.visScenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 	}
 
 	private void loadRealScenario() {

@@ -7,7 +7,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -17,11 +17,11 @@ import org.matsim.facilities.FacilitiesWriter;
 
 public class ExtractFacilities {
 
-	ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+	MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 	FacilitiesReaderMatsimV1 fr = new FacilitiesReaderMatsimV1(scenario);
 	
-	ScenarioImpl scenario_new = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+	MutableScenario scenario_new = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 	final BufferedReader readLink = IOUtils.getBufferedReader("C:/Users/balacm/Desktop/RetailersSummary");
 	String outputPath = "C:/Users/balacm/Desktop/EIRASS_Paper/10pc_input_files/facilities_land_price.xml";

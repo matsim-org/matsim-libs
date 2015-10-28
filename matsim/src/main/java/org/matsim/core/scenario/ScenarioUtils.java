@@ -39,7 +39,7 @@ public class ScenarioUtils {
 		if (config == null) {
 			throw new NullPointerException("config must not be null!");
 		}
-		return new ScenarioImpl(config);
+		return new MutableScenario(config);
 	}
 
 	/**
@@ -62,9 +62,9 @@ public class ScenarioUtils {
 	}
 	
 	public final static class ScenarioBuilder {
-		private ScenarioImpl scenario;
+		private MutableScenario scenario;
 		public ScenarioBuilder( Config config ) {
-			this.scenario = new ScenarioImpl( config ) ;
+			this.scenario = new MutableScenario( config ) ;
 		}
 		public ScenarioBuilder addScenarioElement(String name, Object o) {
 			scenario.addScenarioElement(name, o); 

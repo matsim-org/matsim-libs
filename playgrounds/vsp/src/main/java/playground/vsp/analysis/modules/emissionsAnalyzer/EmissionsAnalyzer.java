@@ -43,7 +43,7 @@ import org.matsim.contrib.emissions.utils.EmissionUtils;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.handler.EventHandler;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 
 import playground.vsp.analysis.modules.AbstractAnalysisModule;
 
@@ -61,7 +61,7 @@ import playground.vsp.analysis.modules.AbstractAnalysisModule;
  */
 public class EmissionsAnalyzer extends AbstractAnalysisModule{
 	private final static Logger log = Logger.getLogger(EmissionsAnalyzer.class);
-	private ScenarioImpl scenario;
+	private MutableScenario scenario;
 	private final String emissionEventsFile;
 	private EmissionUtils emissionUtils;
 	private EmissionsPerPersonWarmEventHandler warmHandler;
@@ -76,7 +76,7 @@ public class EmissionsAnalyzer extends AbstractAnalysisModule{
 		this.emissionEventsFile = emissionsEventsFile;
 	}
 	
-	public void init(ScenarioImpl scenario) {
+	public void init(MutableScenario scenario) {
 		this.scenario = scenario;
 		this.emissionUtils = new EmissionUtils();
 		this.warmHandler = new EmissionsPerPersonWarmEventHandler();

@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.households.Household;
 import org.matsim.households.Households;
@@ -50,7 +50,7 @@ public class BkHouseholdsCreatorTest {
 
 
 	public static void createHHForTestCase() throws FileNotFoundException, IOException {
-    ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+    MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
     Id<Household> hhId1 = Id.create("1", Household.class);
     Id<Household> hhId2 = Id.create("2", Household.class);
     Id<Person> id1 = Id.create("1", Person.class);
@@ -78,7 +78,7 @@ public class BkHouseholdsCreatorTest {
 		String plansFile = outdir + "plans.xml";
 		String networkFile =outdir + "../oneRouteNoModeTest/network.xml";
 
-		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		MatsimNetworkReader netreader = new MatsimNetworkReader(sc);
 		netreader.readFile(networkFile);
 

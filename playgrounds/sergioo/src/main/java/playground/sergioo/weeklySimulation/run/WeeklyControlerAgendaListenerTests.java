@@ -37,7 +37,7 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.router.*;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
 import org.matsim.facilities.ActivityOption;
@@ -125,7 +125,7 @@ public class WeeklyControlerAgendaListenerTests implements StartupListener, Iter
 		HashSet<String> carMode = new HashSet<String>();
 		carMode.add(TransportMode.car);
 		filter.filter(net, carMode);
-		for(ActivityFacility facility:((ScenarioImpl)controler.getScenario()).getActivityFacilities().getFacilities().values())
+		for(ActivityFacility facility:((MutableScenario)controler.getScenario()).getActivityFacilities().getFacilities().values())
 			((ActivityFacilityImpl)facility).setLinkId(((NetworkImpl)net).getNearestLinkExactly(facility.getCoord()).getId());
 		ScenarioWeeklyPR scenario = new ScenarioWeeklyPR(Arrays.asList(new String[]{"shop"}));
 		preparePopulation(controler, scenario);
@@ -135,7 +135,7 @@ public class WeeklyControlerAgendaListenerTests implements StartupListener, Iter
 		
 	}
 	private void prepareFacilities(Controler controler, ScenarioWeeklyPR scenario) {
-		for(ActivityFacility facility:((ScenarioImpl)controler.getScenario()).getActivityFacilities().getFacilities().values()) {
+		for(ActivityFacility facility:((MutableScenario)controler.getScenario()).getActivityFacilities().getFacilities().values()) {
 			for(ActivityOption option:facility.getActivityOptions().values())
 				if(scenario.mainTypes.contains(option.getType()))
 					System.out.println();

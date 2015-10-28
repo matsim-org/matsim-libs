@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.emissions.types.WarmPollutant;
 import org.matsim.contrib.emissions.utils.EmissionUtils;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.analysis.emission.EmissionCostFactors;
@@ -91,7 +91,7 @@ public class EmissionsPerPersonPerUserGroup {
 			
 			String emissionEventFile = this.outputDir+runCase+"/ITERS/it."+this.lastIteration+"/"+this.lastIteration+".emission.events.xml.gz";//"/events.xml";//
 			EmissionsAnalyzer ema = new EmissionsAnalyzer(emissionEventFile);
-			ema.init((ScenarioImpl) this.scenario);
+			ema.init((MutableScenario) this.scenario);
 			ema.preProcessData();
 			ema.postProcessData();
 

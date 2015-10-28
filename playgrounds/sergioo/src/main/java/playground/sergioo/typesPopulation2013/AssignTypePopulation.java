@@ -12,7 +12,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
@@ -69,7 +69,7 @@ public class AssignTypePopulation {
 		scenario.getConfig().transit().setUseTransit(true);
 		(new TransitScheduleReader(scenario)).readFile(args[4]);
 		TransitLine line = scenario.getTransitSchedule().getTransitLines().get(Id.create(args[5], TransitLine.class));
-        ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+        MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
         Population population = PopulationUtils.createPopulation(sc.getConfig(), sc.getNetwork());
 		for(Person person:scenario.getPopulation().getPersons().values())
 			if(isRelatedWithLine(person, line))

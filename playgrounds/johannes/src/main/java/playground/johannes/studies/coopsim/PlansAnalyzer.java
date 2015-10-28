@@ -30,7 +30,7 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import playground.johannes.coopsim.analysis.*;
@@ -51,7 +51,7 @@ public class PlansAnalyzer {
 
 	public static void main(String args[]) throws Throwable {
 		Config config = ConfigUtils.createConfig();
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		
 		MatsimNetworkReader netReader = new MatsimNetworkReader(scenario);
 		netReader.readFile("/Users/jillenberger/Work/shared-svn/studies/schweiz-ivtch/baseCase/network/ivtch.xml");

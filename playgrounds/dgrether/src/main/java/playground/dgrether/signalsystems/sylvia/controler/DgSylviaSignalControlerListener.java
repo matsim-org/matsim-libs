@@ -30,7 +30,7 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.contrib.signals.builder.DefaultSignalModelFactory;
 import org.matsim.contrib.signals.builder.FromDataBuilder;
@@ -69,7 +69,7 @@ public class DgSylviaSignalControlerListener implements SignalsControllerListene
 
 	@Override
 	public void notifyStartup(StartupEvent event) {
-		ScenarioImpl scenario = (ScenarioImpl) event.getControler().getScenario();
+		MutableScenario scenario = (MutableScenario) event.getControler().getScenario();
 		
 		this.sensorManager = new DgSensorManager(event.getControler().getScenario().getNetwork());
 		if ( scenario.getConfig().network().getLaneDefinitionsFile()!=null || scenario.getConfig().qsim().isUseLanes()){

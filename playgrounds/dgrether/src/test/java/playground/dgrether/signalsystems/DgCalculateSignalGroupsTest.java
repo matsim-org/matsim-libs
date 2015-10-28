@@ -51,7 +51,7 @@ import org.matsim.contrib.signals.model.SignalGroup;
 import org.matsim.contrib.signals.model.SignalSystem;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.data.v11.LaneData11;
 import org.matsim.lanes.data.v11.LaneDefinitions11;
@@ -115,7 +115,7 @@ public class DgCalculateSignalGroupsTest {
 		Config config = ConfigUtils.createConfig();
 		config.qsim().setUseLanes(true);
 		ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setUseSignalSystems(true);
-		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(config);
 
 		this.create3WayNetwork(sc);
 		this.createLanesFor3WayNetwork(sc);
@@ -244,7 +244,7 @@ public class DgCalculateSignalGroupsTest {
 		ConfigUtils.addOrGetModule(conf, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalSystemFile(signalSystemsFile);
 
 		//load the network
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.loadScenario(conf);
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.loadScenario(conf);
 		scenario.addScenarioElement(SignalsData.ELEMENT_NAME,
 				new SignalsScenarioLoader(ConfigUtils.addOrGetModule(conf, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class))
 						.loadSignalsData());
@@ -360,7 +360,7 @@ public class DgCalculateSignalGroupsTest {
 	 * Creates lanes for the 3 way network, ids ascending from left to right
 	 * @param sc 
 	 */
-	private void createLanesFor3WayNetwork(ScenarioImpl sc) {
+	private void createLanesFor3WayNetwork(MutableScenario sc) {
 		LaneDefinitions11 lanes = new LaneDefinitions11Impl();
 		
 		LaneDefinitionsFactory11 fac = lanes.getFactory();

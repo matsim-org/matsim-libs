@@ -10,7 +10,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.balac.allcsmodestest.controler.listener.CSEventsHandler;
@@ -24,7 +24,7 @@ public class CSRentalTimesFromEvents {
     EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
     
     public void run(String s, String s1){
-    	ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+    	MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		MatsimNetworkReader networkReader = new MatsimNetworkReader(sc);
 		networkReader.readFile(s1);
     	CSEventsHandler rentalTimes = new CSEventsHandler(sc.getNetwork());

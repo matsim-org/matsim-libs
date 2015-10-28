@@ -65,7 +65,7 @@ import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -327,8 +327,8 @@ public class Controler extends AbstractController {
 	@Override
 	protected final void prepareForSim() {
 
-		if ( scenario  instanceof ScenarioImpl ) {
-			((ScenarioImpl)scenario ).setLocked();
+		if ( scenario  instanceof MutableScenario ) {
+			((MutableScenario)scenario ).setLocked();
 			// see comment in ScenarioImpl. kai, sep'14
 		}
 

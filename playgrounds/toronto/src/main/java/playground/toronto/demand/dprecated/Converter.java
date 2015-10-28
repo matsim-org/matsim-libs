@@ -22,7 +22,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -211,7 +211,7 @@ public class Converter {
 
 		Converter c = new Converter();
 
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		c.setZones((ZoneLayer) new World().createLayer(Id.create("zones", Layer.class)));
 
 		c.setZoneXYs(new HashMap<String, ZoneXY>());
@@ -249,7 +249,7 @@ public class Converter {
 		c.createZones();
 
 		//
-		c.setPop(((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation());
+		c.setPop(((MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation());
 		try {
 			BufferedReader reader = IOUtils.getBufferedReader(oldPlansFilename);
 			PopulationWriter writer = new PopulationWriter(c.pop, null);

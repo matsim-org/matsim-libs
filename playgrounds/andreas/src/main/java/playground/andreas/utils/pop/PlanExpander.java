@@ -28,7 +28,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
@@ -54,7 +54,7 @@ public class PlanExpander {
 
 		Gbl.startMeasurement();
 
-		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		Network net = sc.getNetwork();
 		new MatsimNetworkReader(sc).readFile(networkFile);
@@ -70,7 +70,7 @@ public class PlanExpander {
 		System.out.println("Dublicating plans finished");
 		Gbl.printElapsedTime();
 
-		inPop = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
+		inPop = ((MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
 		popReader = new MatsimPopulationReader(new SharedNetScenario(sc, inPop));
 		popReader.readFile("tmp.xml.gz");
 

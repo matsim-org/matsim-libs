@@ -4,7 +4,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.facilities.ActivityFacility;
 
@@ -18,7 +18,7 @@ public class MembershipUtils {
 		
 	}
 
-	public static final QuadTree<Person> createPersonQuadTree(ScenarioImpl scenario) {
+	public static final QuadTree<Person> createPersonQuadTree(MutableScenario scenario) {
 	    double minx = (1.0D / 0.0D);
 	    double miny = (1.0D / 0.0D);
 	    double maxx = (-1.0D / 0.0D);

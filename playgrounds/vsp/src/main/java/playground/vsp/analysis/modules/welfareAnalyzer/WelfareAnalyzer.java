@@ -28,7 +28,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.events.handler.EventHandler;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 
 import playground.vsp.analysis.modules.AbstractAnalysisModule;
 import playground.vsp.analysis.modules.monetaryTransferPayments.MonetaryPaymentsAnalyzer;
@@ -41,7 +41,7 @@ import playground.vsp.analysis.modules.userBenefits.UserBenefitsAnalyzer;
  */
 public class WelfareAnalyzer extends AbstractAnalysisModule{
 	private final static Logger log = Logger.getLogger(WelfareAnalyzer.class);
-	private ScenarioImpl scenario;
+	private MutableScenario scenario;
 
 	private List<AbstractAnalysisModule> anaModules = new LinkedList<AbstractAnalysisModule>();
 	private MonetaryPaymentsAnalyzer transferAna;
@@ -53,7 +53,7 @@ public class WelfareAnalyzer extends AbstractAnalysisModule{
 		super(WelfareAnalyzer.class.getSimpleName());
 	}
 	
-	public void init(ScenarioImpl scenario) {
+	public void init(MutableScenario scenario) {
 		this.scenario = scenario;
 		
 		// (sub-modules)

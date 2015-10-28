@@ -26,7 +26,7 @@ import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestRespo
 import org.matsim.contrib.locationchoice.bestresponse.DestinationSampler;
 import org.matsim.contrib.locationchoice.bestresponse.scoring.ScaleEpsilon;
 import org.matsim.core.config.Config;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
@@ -36,7 +36,7 @@ import java.util.HashSet;
 
 public class ReadOrComputeMaxDCScore {	
 	private final static Logger log = Logger.getLogger(ReadOrComputeMaxDCScore.class);
-	private ScenarioImpl scenario;	
+	private MutableScenario scenario;	
 	private Config config;	
 	private DestinationChoiceBestResponseContext lcContext;
 	private ObjectAttributes personsMaxDCScoreUnscaled = new ObjectAttributes();	
@@ -44,7 +44,7 @@ public class ReadOrComputeMaxDCScore {
 	private HashSet<String> flexibleTypes;
 	
 	public ReadOrComputeMaxDCScore(DestinationChoiceBestResponseContext lcContext) {
-		this.scenario = (ScenarioImpl) lcContext.getScenario();
+		this.scenario = (MutableScenario) lcContext.getScenario();
 		this.config = this.scenario.getConfig() ;
 		this.scaleEpsilon = lcContext.getScaleEpsilon();
 		this.flexibleTypes = lcContext.getFlexibleTypes();

@@ -54,7 +54,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.data.v11.LaneData11;
 import org.matsim.lanes.data.v11.LaneDefinitions11;
@@ -94,11 +94,11 @@ public class DgFigure9ScenarioGenerator {
 	private int dropping2 = 115;
 	private int cycle = 120;
 	
-	public ScenarioImpl loadScenario(){
+	public MutableScenario loadScenario(){
 		
 		Config config = ConfigUtils.loadConfig(baseDir + "config_signals_coordinated.xml");
 		MatsimRandom.reset(config.global().getRandomSeed());
-		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(config);
 		ScenarioUtils.loadScenario(sc);
 		
 		SignalsScenarioLoader signalsLoader = new SignalsScenarioLoader(ConfigUtils.addOrGetModule(sc.getConfig(), SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class));
@@ -121,7 +121,7 @@ public class DgFigure9ScenarioGenerator {
 		this.writeMatsimNetwork(net, networkOutfile);
 		log.info("network written to " + networkOutfile);
 		//lanes
-		LaneDefinitions20 lanes = createLanes((ScenarioImpl)scenario);
+		LaneDefinitions20 lanes = createLanes((MutableScenario)scenario);
 		LaneDefinitionsWriter20 laneWriter = new LaneDefinitionsWriter20(lanes);
 		laneWriter.write(lanesOutfile);
 		log.info("lanes written to " + lanesOutfile);
@@ -376,7 +376,7 @@ public class DgFigure9ScenarioGenerator {
 		return systems;
 	}
 
-	private LaneDefinitions20 createLanes(ScenarioImpl scenario) {
+	private LaneDefinitions20 createLanes(MutableScenario scenario) {
 		double laneLenght = 50.0;
 		LaneDefinitions11 lanes = new LaneDefinitions11Impl();
 		LaneDefinitionsFactory11 factory = lanes.getFactory();

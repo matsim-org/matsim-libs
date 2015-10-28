@@ -39,7 +39,7 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.vehicles.Vehicle;
@@ -66,7 +66,7 @@ public class TimeOverDist {
 		ConfigReader creader = new ConfigReader(config);
 		creader.readFile("/Users/jillenberger/Work/socialnets/locationChoice/config.xml");
 
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		MatsimNetworkReader netReader = new MatsimNetworkReader(scenario);
 		netReader.readFile(config.getParam("network", "inputNetworkFile"));
 		Network network = scenario.getNetwork();

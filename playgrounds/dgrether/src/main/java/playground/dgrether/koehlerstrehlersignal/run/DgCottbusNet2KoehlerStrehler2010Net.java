@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package playground.dgrether.koehlerstrehlersignal.run;
 
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.contrib.signals.data.SignalsData;
 
@@ -44,7 +44,7 @@ public class DgCottbusNet2KoehlerStrehler2010Net {
 	public static void main(String[] args) {
 		String outputNetwork = DgPaths.REPOS + "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/network_koehler_strehler_format.xml";
 		
-		ScenarioImpl sc = CottbusUtils.loadCottbusScenrio(true);
+		MutableScenario sc = CottbusUtils.loadCottbusScenrio(true);
 		
 		DgIdPool idPool = new DgIdPool();
 		DgIdConverter idConverter = new DgIdConverter(idPool);

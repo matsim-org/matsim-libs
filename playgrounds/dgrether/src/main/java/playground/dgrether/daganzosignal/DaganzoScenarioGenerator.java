@@ -47,7 +47,7 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.data.v11.LaneData11;
 import org.matsim.lanes.data.v11.LaneDefinitions11;
@@ -164,11 +164,11 @@ public class DaganzoScenarioGenerator {
 
 	private String plansInputFile;
 
-	private ScenarioImpl scenario = null;
+	private MutableScenario scenario = null;
 
 
 	public DaganzoScenarioGenerator() {
-		this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		this.scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		init();
 	}
 
@@ -227,7 +227,7 @@ public class DaganzoScenarioGenerator {
 		//set the network input file to the config and load it
 		config.network().setInputFile(NETWORKFILE);
 		
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		
 		new MatsimNetworkReader(scenario).readFile(NETWORKFILE);
 		
@@ -270,7 +270,7 @@ public class DaganzoScenarioGenerator {
 
 
 
-	private void createPlans(ScenarioImpl scenario) {
+	private void createPlans(MutableScenario scenario) {
 		Network network = scenario.getNetwork();
 		Population population = scenario.getPopulation();
 		double firstHomeEndTime =  600.0;
@@ -441,7 +441,7 @@ public class DaganzoScenarioGenerator {
 	}
 
 
-	private LaneDefinitions20 createLanes(ScenarioImpl scenario) {
+	private LaneDefinitions20 createLanes(MutableScenario scenario) {
 		LaneDefinitions11 lanes = new LaneDefinitions11Impl();
 		LaneDefinitionsFactory11 factory = lanes.getFactory();
 		//lanes for link 4

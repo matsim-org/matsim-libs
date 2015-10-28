@@ -30,7 +30,7 @@ import org.geotools.feature.SchemaException;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -66,7 +66,7 @@ public class DgIncomeDistributionAnalysis {
 		String gridFile = DgPaths.RUNBASE + "run" + runNumber2 + "/" + runNumber1 + "vs" + runNumber2+ "grid450x375.shp";
 		String singlePersonsFile = DgPaths.RUNBASE + "run" + runNumber2 + "/" + runNumber1 + "vs" + runNumber2+ "singlePersonsFrom100000.shp";
 		//file io
-		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		DgAnalysisPopulation pop = new DgAnalysisPopulation();
 		DgAnalysisPopulationReader pc = new DgAnalysisPopulationReader();
 		pc.addFilter(new ExcludeZurichTransitFilter());

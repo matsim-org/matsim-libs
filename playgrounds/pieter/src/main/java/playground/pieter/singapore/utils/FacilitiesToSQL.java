@@ -9,7 +9,7 @@ import java.sql.SQLException;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
@@ -29,9 +29,9 @@ import others.sergioo.util.dataBase.NoConnectionException;
 
 public class FacilitiesToSQL {
 	private final DataBaseAdmin dba;
-	private final ScenarioImpl scenario;
+	private final MutableScenario scenario;
 	
-	public FacilitiesToSQL(DataBaseAdmin dba, ScenarioImpl scenario) {
+	public FacilitiesToSQL(DataBaseAdmin dba, MutableScenario scenario) {
 		super();
 		this.dba = dba;
 		this.scenario = scenario;
@@ -339,7 +339,7 @@ public class FacilitiesToSQL {
 	public static void main(String[] args) throws InstantiationException, IllegalAccessException, ClassNotFoundException, IOException, SQLException, NoConnectionException {
 //		DataBaseAdmin dba = new DataBaseAdmin(new File("data/matsim2.properties"));
 		DataBaseAdmin dba = new DataBaseAdmin(new File("data/matsim2postgres.properties"));
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		MatsimFacilitiesReader fcr = new MatsimFacilitiesReader(scenario);
 		fcr.readFile(args[0]);
 		FacilitiesToSQL f2sql = new FacilitiesToSQL(dba, scenario);

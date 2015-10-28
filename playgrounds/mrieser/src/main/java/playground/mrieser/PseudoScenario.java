@@ -23,7 +23,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.households.Households;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
@@ -38,10 +38,10 @@ import org.matsim.vehicles.Vehicles;
  */
 public class PseudoScenario implements Scenario {
 
-	private final ScenarioImpl scenario;
+	private final MutableScenario scenario;
 	private final Population myPopulation;
 
-	public PseudoScenario(final ScenarioImpl scenario, final Population population) {
+	public PseudoScenario(final MutableScenario scenario, final Population population) {
 		this.scenario = scenario;
 		this.myPopulation = population;
 	}

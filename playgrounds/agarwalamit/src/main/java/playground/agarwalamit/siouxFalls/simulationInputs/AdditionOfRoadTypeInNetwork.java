@@ -28,7 +28,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 /**
@@ -41,7 +41,7 @@ public class AdditionOfRoadTypeInNetwork {
 	private static BufferedWriter writer;
 	
 	public static void main(String[] args) {
-		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		final Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile("./input/output_network.xml.gz");
 		writer = IOUtils.getBufferedWriter("./input/baseCase/roadTypeMapping.txt");

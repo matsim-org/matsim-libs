@@ -27,7 +27,7 @@ package playground.artemc.crowding.internalization;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import playground.artemc.crowding.newScoringFunctions.ScoreTracker;
 
 /**
@@ -37,10 +37,10 @@ import playground.artemc.crowding.newScoringFunctions.ScoreTracker;
 
 public class InternalizationPtControlerListener implements StartupListener {
 
-	private final ScenarioImpl scenario;
+	private final MutableScenario scenario;
 	private ScoreTracker scoreTracker;
 
-	public InternalizationPtControlerListener(ScenarioImpl scenario, ScoreTracker scoreTracker){
+	public InternalizationPtControlerListener(MutableScenario scenario, ScoreTracker scoreTracker){
 		this.scenario = scenario;
 		this.scoreTracker = scoreTracker;
 	}

@@ -45,8 +45,8 @@ import org.matsim.vehicles.Vehicles;
  * @author dgrether
  * @author mrieser
  */
-public final class ScenarioImpl implements Scenario {
-	private static final Logger log = Logger.getLogger(ScenarioImpl.class);
+public final class MutableScenario implements Scenario {
+	private static final Logger log = Logger.getLogger(MutableScenario.class);
 
 	private boolean locked = false ;
 
@@ -66,7 +66,7 @@ public final class ScenarioImpl implements Scenario {
 
 	private Vehicles vehicles ;
 
-	ScenarioImpl(Config config) {
+	MutableScenario(Config config) {
 		this.config = config;
 		this.network = NetworkImpl.createNetwork();
 		this.population = PopulationUtils.createPopulation(this.config, this.network);
@@ -99,13 +99,11 @@ public final class ScenarioImpl implements Scenario {
 		return this.config;
 	}
 
-	@Deprecated // please use ScenarioUtils.ScenarioBuilder
 	public final void setNetwork(Network network) {
 		testForLocked();
 		this.network = network;
 	}
 
-	@Deprecated // please use ScenarioUtils.ScenarioBuilder
 	public final void setPopulation(Population population) {
 		testForLocked();
 		this.population = population;
@@ -159,7 +157,6 @@ public final class ScenarioImpl implements Scenario {
 		}
 	}
 
-//	@Override
 	public final Object removeScenarioElement(final String name) {
 		testForLocked();
 		return elements.remove( name );
@@ -177,35 +174,37 @@ public final class ScenarioImpl implements Scenario {
 
 	private void testForLocked() {
 		if ( locked ) {
-			throw new RuntimeException( "ScenarioImpl is locked; too late to do this.  See comments in code.") ;
+			throw new RuntimeException( "Scenario is locked; too late to do this.  See comments in code.") ;
 			/* The decision is roughly as follows:
 			 * - It is ok to set network, population, etc. in the Scenario during initial demand generation.
 			 * - It is NOT ok to do this once the controler is running.
 			 * - But we do not want to make a defensive copy of the whole thing at controler startup.
 			 * - We also want to be able to plug alternative Scenario implementations into the controler.
-			 * - But then the controler only gets the "Scenario" not the "ScenarioImpl", so it does not have to worry about setNetwork and the lik
+			 * - But then the controler only gets the "Scenario" not the "MutableScenario", so it does not have to worry about setNetwork and the like
 			 * since it does not exist in the published interface.
 			 * kai, sep'14
 			 */
 		}
 	}
 
-	// the following are there for ScenarioUtils.ScenarioBuilder.  They are deliberately package-private; please do not change. kai, nov'14
-	final void setActivityFacilities( ActivityFacilities facilities ) {
+	public final void setActivityFacilities( ActivityFacilities facilities ) {
 		testForLocked() ;
 		this.facilities = facilities ;
 	}
-	final void setHouseholds( Households households ) {
+	public final void setHouseholds( Households households ) {
 		testForLocked() ;
 		this.households = households ;
 	}
-	final void setTransitSchedule( TransitSchedule schedule ) {
+	public final void setTransitSchedule( TransitSchedule schedule ) {
+		testForLocked();
 		this.transitSchedule = schedule ;
 	}
-	final void setTransitVehicles( Vehicles vehicles ) {
+	public final void setTransitVehicles( Vehicles vehicles ) {
+		testForLocked();
 		this.transitVehicles = vehicles ;
 	}
-	final void setLanes( LaneDefinitions20 lanes ) {
+	public final void setLanes( LaneDefinitions20 lanes ) {
+		testForLocked();
 		this.lanes = lanes ;
 	}
 

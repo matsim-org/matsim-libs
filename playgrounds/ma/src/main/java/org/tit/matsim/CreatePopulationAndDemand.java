@@ -6,7 +6,7 @@ import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.FacilitiesReaderMatsimV1;
 
@@ -46,7 +46,7 @@ public class CreatePopulationAndDemand {
 		/*
 		 * Read the facilities and store them in the scenario
 		 */
-		new FacilitiesReaderMatsimV1((ScenarioImpl)this.scenario).readFile(this.facilitiesFile);	
+		new FacilitiesReaderMatsimV1((MutableScenario)this.scenario).readFile(this.facilitiesFile);	
 	}
 	
 	private void write() {

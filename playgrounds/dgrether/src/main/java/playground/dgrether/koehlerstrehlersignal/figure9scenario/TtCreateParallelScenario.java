@@ -48,7 +48,7 @@ import org.matsim.contrib.signals.utils.SignalUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.data.v11.LaneData11;
 import org.matsim.lanes.data.v11.LaneDefinitions11;
@@ -125,7 +125,7 @@ public class TtCreateParallelScenario {
 		this.writeMatsimNetwork(net, networkOutfile);
 		log.info("network written to " + networkOutfile);
 		// lanes
-		createLanes((ScenarioImpl) scenario);
+		createLanes((MutableScenario) scenario);
 		LaneDefinitionsWriter20 laneWriter = new LaneDefinitionsWriter20(scenario.getLanes());
 		laneWriter.write(lanesOutfile);
 		log.info("lanes written to " + lanesOutfile);
@@ -559,7 +559,7 @@ public class TtCreateParallelScenario {
 	
 	
 
-	private void createLanes(ScenarioImpl scenario) {
+	private void createLanes(MutableScenario scenario) {
 		double laneLenght = 50.0;
 		LaneDefinitions11 lanes11 = new LaneDefinitions11Impl();
 		LaneDefinitionsFactory11 factory = lanes11.getFactory();

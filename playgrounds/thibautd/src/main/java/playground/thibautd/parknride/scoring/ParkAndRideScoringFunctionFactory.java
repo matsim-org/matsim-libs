@@ -25,7 +25,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.facilities.ActivityFacilities;
@@ -90,7 +90,7 @@ public class ParkAndRideScoringFunctionFactory implements ScoringFunctionFactory
 					new ParkAndRideScoringFunctionFactory(
 						controler.getScoringFunctionFactory(),
 						parkingPenaltyFactory,
-						((ScenarioImpl) controler.getScenario()).getActivityFacilities(),
+						((MutableScenario) controler.getScenario()).getActivityFacilities(),
                             controler.getScenario().getNetwork()) );
 		}
 	}

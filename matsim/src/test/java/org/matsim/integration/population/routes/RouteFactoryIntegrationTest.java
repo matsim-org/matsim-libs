@@ -36,7 +36,7 @@ import org.matsim.core.population.routes.CompressedNetworkRouteFactory;
 import org.matsim.core.population.routes.CompressedNetworkRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -83,7 +83,7 @@ public class RouteFactoryIntegrationTest extends MatsimTestCase {
 
 		// test another setting
 		config.controler().setOutputDirectory(getOutputDirectory() + "/variant1");
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		((PopulationFactoryImpl) scenario.getPopulation().getFactory()).setRouteFactory(NetworkRoute.class, new CompressedNetworkRouteFactory(scenario.getNetwork()));
 		ScenarioUtils.loadScenario(scenario);
 

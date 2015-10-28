@@ -43,7 +43,7 @@ import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerModule;
 import org.matsim.core.router.TripRouterModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityModule;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionModule;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorModule;
@@ -57,7 +57,7 @@ public class ChangeLegModeIntegrationTest extends MatsimTestCase {
 	public void testStrategyManagerConfigLoaderIntegration() {
 		// setup config
 		final Config config = loadConfig(null);
-		final ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		final MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		final StrategySettings strategySettings = new StrategySettings(Id.create("1", StrategySettings.class));
 		strategySettings.setStrategyName("ChangeLegMode");
 		strategySettings.setWeight(1.0);

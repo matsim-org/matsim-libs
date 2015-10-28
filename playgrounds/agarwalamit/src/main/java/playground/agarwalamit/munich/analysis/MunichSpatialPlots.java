@@ -34,7 +34,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.EventHandler;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -132,7 +132,7 @@ public class MunichSpatialPlots {
 		Scenario sc = LoadMyScenarios.loadScenarioFromPlansAndNetwork(inputs.initialCasePlansFile,inputs.initialCaseNetworkFile);
 
 		MyUserBenefitsAnalyzer userBenefitsAnalyzer = new MyUserBenefitsAnalyzer();
-		userBenefitsAnalyzer.init((ScenarioImpl)sc, WelfareMeasure.SELECTED, false);
+		userBenefitsAnalyzer.init((MutableScenario)sc, WelfareMeasure.SELECTED, false);
 		userBenefitsAnalyzer.preProcessData();
 		userBenefitsAnalyzer.postProcessData();
 
@@ -141,7 +141,7 @@ public class MunichSpatialPlots {
 		if(inputs.isComparing){
 			userBenefitsAnalyzer = new MyUserBenefitsAnalyzer();
 			Scenario sc_policy = LoadMyScenarios.loadScenarioFromPlansAndNetwork(inputs.compareToCasePlans,inputs.compareToCaseNetwork);
-			userBenefitsAnalyzer.init((ScenarioImpl)sc_policy, WelfareMeasure.SELECTED, false);
+			userBenefitsAnalyzer.init((MutableScenario)sc_policy, WelfareMeasure.SELECTED, false);
 			userBenefitsAnalyzer.preProcessData();
 			userBenefitsAnalyzer.postProcessData();
 			person_userWElfare_money_policy = userBenefitsAnalyzer.getPersonId2MonetarizedUserWelfare();
@@ -413,7 +413,7 @@ public class MunichSpatialPlots {
 	private Map<Id<Person>, Double> getPersonIdToTollPayments (Scenario sc){
 
 		MonetaryPaymentsAnalyzer paymentsAnalzer = new MonetaryPaymentsAnalyzer();
-		paymentsAnalzer.init((ScenarioImpl)sc);
+		paymentsAnalzer.init((MutableScenario)sc);
 		paymentsAnalzer.preProcessData();
 
 		EventsManager events = EventsUtils.createEventsManager();

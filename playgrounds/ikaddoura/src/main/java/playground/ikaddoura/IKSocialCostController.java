@@ -28,7 +28,7 @@ import org.apache.log4j.Logger;
 import org.matsim.contrib.otfvis.OTFVisModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
 
 import playground.artemc.socialCost.SocialCostController;
@@ -66,7 +66,7 @@ public class IKSocialCostController extends SocialCostController {
 		controler.addControlerListener(initializer);
 		
 		// Additional analysis
-		controler.addControlerListener(new WelfareAnalysisControlerListener((ScenarioImpl) controler.getScenario()));
+		controler.addControlerListener(new WelfareAnalysisControlerListener((MutableScenario) controler.getScenario()));
 
 		controler.getConfig().controler().setOverwriteFileSetting(
 				OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );

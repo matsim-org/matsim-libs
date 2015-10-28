@@ -40,7 +40,7 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.Umlauf;
@@ -229,7 +229,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		TransitRoute tRoute = builder.createTransitRoute(Id.create("L", TransitRoute.class), route, stops, "bus");
 		Departure dep = builder.createDeparture(Id.create("L1.1", Departure.class), 9876.0);
 		TransitStopAgentTracker tracker = new TransitStopAgentTracker(events);
-		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		QSim tqsim = QSimUtils.createDefaultQSim(sc, events);
 		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim) ;
 		tqsim.addMobsimEngine(trEngine);
@@ -302,7 +302,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		TransitRoute tRoute = builder.createTransitRoute(Id.create("L", TransitRoute.class), route, stops, "bus");
 		Departure dep = builder.createDeparture(Id.create("L1.1", Departure.class), 9876.0);
 		TransitStopAgentTracker tracker = new TransitStopAgentTracker(events);
-		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		QSim tqsim = QSimUtils.createDefaultQSim(sc, events);
 		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim) ;
 		tqsim.addMobsimEngine(trEngine) ;
@@ -364,7 +364,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		TransitRoute tRoute = builder.createTransitRoute(Id.create("L", TransitRoute.class), route, stops, "bus");
 		Departure dep = builder.createDeparture(Id.create("L1.1", Departure.class), 9876.0);
 		TransitStopAgentTracker tracker = new TransitStopAgentTracker(events);
-		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		QSim tqsim = QSimUtils.createDefaultQSim(sc, events);
 		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim) ;
 		tqsim.addMobsimEngine(trEngine) ;
@@ -404,7 +404,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		TransitRoute tRoute = builder.createTransitRoute(Id.create("L", TransitRoute.class), route, stops, "bus");
 		Departure dep = builder.createDeparture(Id.create("L1.1", Departure.class), 9876.0);
 		TransitStopAgentTracker tracker = new TransitStopAgentTracker(events);
-		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		QSim tqsim = QSimUtils.createDefaultQSim(sc, events);
 		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim);
 		tqsim.addMobsimEngine(trEngine);
@@ -455,7 +455,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		double departureTime = 9876.0;
 		Departure dep = builder.createDeparture(Id.create("L1.1", Departure.class), departureTime);
 		TransitStopAgentTracker tracker = new TransitStopAgentTracker(events);
-		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		QSim tqsim = QSimUtils.createDefaultQSim(sc, events);
 		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim) ;
 		tqsim.addMobsimEngine(trEngine);
@@ -505,7 +505,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		TransitRoute tRoute = builder.createTransitRoute(Id.create("L", TransitRoute.class), route, stops, "bus");
 		Departure dep = builder.createDeparture(Id.create("L1.1", Departure.class), 9876.0);
 		TransitStopAgentTracker tracker = new TransitStopAgentTracker(events);
-		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		QSim tqsim = QSimUtils.createDefaultQSim(sc, events);
 		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim) ;
 		tqsim.addMobsimEngine(trEngine);

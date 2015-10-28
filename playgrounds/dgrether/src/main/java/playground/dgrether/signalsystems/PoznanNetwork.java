@@ -35,7 +35,7 @@ import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.data.v11.LaneDefinitionsV11ToV20Conversion;
 import org.matsim.lanes.data.v11.*;
@@ -71,7 +71,7 @@ public class PoznanNetwork
 {
     private static Network network;
     private static NetworkFactory netFactory;
-    private static ScenarioImpl scenario;
+    private static MutableScenario scenario;
     private static LaneDefinitions11 lanes;
     private static LaneDefinitionsFactory11 laneFactory;
     private static SignalGroupsDataFactory gf;
@@ -538,7 +538,7 @@ public class PoznanNetwork
     }
 
 
-    private static void createPopulation(ScenarioImpl scenario)
+    private static void createPopulation(MutableScenario scenario)
     {
         Population pop = scenario.getPopulation();
         PopulationFactory pf = pop.getFactory();
@@ -573,7 +573,7 @@ public class PoznanNetwork
         otfconfig.setMapOverlayMode(false);
         config.qsim().setNodeOffset(30);
         ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setUseAmbertimes(true);
-        scenario = (ScenarioImpl)ScenarioUtils.createScenario(config);
+        scenario = (MutableScenario)ScenarioUtils.createScenario(config);
         scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsDataImpl(ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class)));
 
         // create network lanes and signals

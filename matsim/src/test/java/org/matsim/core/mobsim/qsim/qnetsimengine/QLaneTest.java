@@ -30,7 +30,7 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.data.v20.*;
 import org.matsim.testcases.MatsimTestCase;
@@ -61,7 +61,7 @@ public class QLaneTest extends MatsimTestCase {
 		return network;
   }
   
-	private LaneDefinitions20 createOneLane(ScenarioImpl scenario, int numberOfRepresentedLanes) {
+	private LaneDefinitions20 createOneLane(MutableScenario scenario, int numberOfRepresentedLanes) {
 		scenario.getConfig().qsim().setUseLanes(true);
 		LaneDefinitions20 lanes = scenario.getLanes();
 		LaneDefinitionsFactory20 builder = lanes.getFactory();
@@ -84,7 +84,7 @@ public class QLaneTest extends MatsimTestCase {
 		return lanes;
 	}
   
-	private LaneDefinitions20 createLanes(ScenarioImpl scenario) {
+	private LaneDefinitions20 createLanes(MutableScenario scenario) {
 		scenario.getConfig().qsim().setUseLanes(true);
 		LaneDefinitions20 lanes = scenario.getLanes();
 		LaneDefinitionsFactory20 builder = lanes.getFactory();
@@ -126,7 +126,7 @@ public class QLaneTest extends MatsimTestCase {
   
 	public void testCapacityWoLanes() {
 		Config config = ConfigUtils.createConfig();
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		
 		this.initNetwork(scenario.getNetwork());
 
@@ -141,7 +141,7 @@ public class QLaneTest extends MatsimTestCase {
 	public void testCapacityWithOneLaneOneLane() {
 		Config config = ConfigUtils.createConfig();
 		config.qsim().setUseLanes(true);
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		this.initNetwork(scenario.getNetwork());
 		this.createOneLane(scenario, 1);
 
@@ -172,7 +172,7 @@ public class QLaneTest extends MatsimTestCase {
 	public void testCapacityWithOneLaneOneLaneTwoLanes() {
 		Config config = ConfigUtils.createConfig();
 		config.qsim().setUseLanes(true);
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 
 		scenario.getConfig().qsim().setUseLanes(true);
 		this.initNetwork(scenario.getNetwork());
@@ -207,7 +207,7 @@ public class QLaneTest extends MatsimTestCase {
 	public void testCapacityWithLanes() {
 		Config config = ConfigUtils.createConfig();
 		config.qsim().setUseLanes(true);
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		this.initNetwork(scenario.getNetwork());
 		this.createLanes(scenario);
 

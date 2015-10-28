@@ -13,14 +13,14 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.FacilitiesReaderMatsimV1;
 
 public class MembershipMain
 {
-  private final ScenarioImpl scenario = (ScenarioImpl)ScenarioUtils.createScenario(ConfigUtils.createConfig());
+  private final MutableScenario scenario = (MutableScenario)ScenarioUtils.createScenario(ConfigUtils.createConfig());
   private final Population plans = this.scenario.getPopulation();
   private final ActivityFacilitiesImpl facilities = (ActivityFacilitiesImpl) this.scenario.getActivityFacilities();
   private final Network network = this.scenario.getNetwork();

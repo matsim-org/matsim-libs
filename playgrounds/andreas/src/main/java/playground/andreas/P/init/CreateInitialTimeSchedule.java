@@ -37,7 +37,7 @@ import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.TransitScheduleWriterV1;
 import org.matsim.pt.transitSchedule.api.Departure;
@@ -79,7 +79,7 @@ public class CreateInitialTimeSchedule {
 	}
 
 	public CreateInitialTimeSchedule(String networkInFile, double gridDistance, Coord minXY, Coord maxXY, int numberOfAgents) {
-		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		MatsimNetworkReader netReader = new MatsimNetworkReader(sc);
 		netReader.readFile(networkInFile);		
 		this.net = (NetworkImpl) sc.getNetwork();

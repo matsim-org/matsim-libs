@@ -24,7 +24,7 @@ import java.io.IOException;
 import javax.xml.transform.TransformerConfigurationException;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.xml.sax.SAXException;
@@ -51,7 +51,7 @@ public class DgFigure9ToKoehlerStrehler2010ModelConverter {
 	 * @throws TransformerConfigurationException 
 	 */
 	public static void main(String[] args) throws SAXException, TransformerConfigurationException, IOException {
-		ScenarioImpl sc = new DgFigure9ScenarioGenerator().loadScenario();
+		MutableScenario sc = new DgFigure9ScenarioGenerator().loadScenario();
 		DgIdPool idPool = new DgIdPool();
 		DgIdConverter idConverter = new DgIdConverter(idPool);
 

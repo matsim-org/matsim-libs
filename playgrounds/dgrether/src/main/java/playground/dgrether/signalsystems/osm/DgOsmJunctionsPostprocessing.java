@@ -34,7 +34,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.data.v20.Lane;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
@@ -59,7 +59,7 @@ public class DgOsmJunctionsPostprocessing {
 	
 	
 	public void postprocessJunctions(String osmFile, String networkFile, String networkOutFile, String lanesFile, String lanesOutFile) {
-		ScenarioImpl scenario = this.loadScenario(networkFile, lanesFile);
+		MutableScenario scenario = this.loadScenario(networkFile, lanesFile);
 		Network network = scenario.getNetwork();
 		String signalSystemKey = "btuc_signalsystem_id";
 
@@ -229,8 +229,8 @@ public class DgOsmJunctionsPostprocessing {
 
 	
 	
-	private ScenarioImpl loadScenario(String net, String lanesInputFile){
-		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+	private MutableScenario loadScenario(String net, String lanesInputFile){
+		MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
     sc.getConfig().network().setInputFile(net);
     if (lanesInputFile != null){
     	sc.getConfig().qsim().setUseLanes(true);
