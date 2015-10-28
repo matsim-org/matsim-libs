@@ -69,11 +69,11 @@ public class BasicPersonTripAnalysisTest {
 	
 		Assert.assertEquals("Unexpected total payment: ", -80.0, basicHandler.getTotalPayments(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals("Unexpected amount: ", -20.0, 
-				basicHandler.getPersonId2tripNumber2amount().get(Id.create(0, Person.class)).get(1), MatsimTestUtils.EPSILON);
+				basicHandler.getPersonId2tripNumber2payment().get(Id.create(0, Person.class)).get(1), MatsimTestUtils.EPSILON);
 		Assert.assertEquals("Unexpected amount: ", -30.0, 
-				basicHandler.getPersonId2tripNumber2amount().get(Id.create(0, Person.class)).get(2), MatsimTestUtils.EPSILON);
+				basicHandler.getPersonId2tripNumber2payment().get(Id.create(0, Person.class)).get(2), MatsimTestUtils.EPSILON);
 		Assert.assertEquals("Unexpected amount: ", -30.0, 
-				basicHandler.getPersonId2tripNumber2amount().get(Id.create(1, Person.class)).get(1), MatsimTestUtils.EPSILON);
+				basicHandler.getPersonId2tripNumber2payment().get(Id.create(1, Person.class)).get(1), MatsimTestUtils.EPSILON);
 		
 		if (printResults) printResults(basicHandler, scenario);
 	}
@@ -189,7 +189,7 @@ public class BasicPersonTripAnalysisTest {
 			System.out.println("Person Id : " + person.getId());
 			System.out.println("currentTripNumber: " + basicHandler.getPersonId2currentTripNumber().get(person.getId()));
 			System.out.println("distanceEnterValue: " + basicHandler.getPersonId2distanceEnterValue().get(person.getId()));
-			System.out.println("tripNumber2amount: " + basicHandler.getPersonId2tripNumber2amount().get(person.getId()));
+			System.out.println("tripNumber2amount: " + basicHandler.getPersonId2tripNumber2payment().get(person.getId()));
 			System.out.println("tripNumber2arrivalTime: " + basicHandler.getPersonId2tripNumber2arrivalTime().get(person.getId()));
 			System.out.println("tripNumber2departureTime: " + basicHandler.getPersonId2tripNumber2departureTime().get(person.getId()));
 			System.out.println("tripNumber2legMode: " + basicHandler.getPersonId2tripNumber2legMode().get(person.getId()));
