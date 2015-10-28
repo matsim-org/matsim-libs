@@ -7,7 +7,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.households.Households;
-import org.matsim.lanes.data.v20.LaneDefinitions20;
+import org.matsim.lanes.data.v20.Lanes;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.vehicles.Vehicles;
 
@@ -75,7 +75,7 @@ public class SharedNetScenario implements Scenario {
 	}
 
 	@Override
-	public LaneDefinitions20 getLanes() {
+	public Lanes getLanes() {
 		// TODO Auto-generated method stub
 		throw new RuntimeException("not implemented") ;
 	}

@@ -61,7 +61,7 @@ import org.matsim.lanes.data.v11.LaneDefinitionsV11ToV20Conversion;
 import org.matsim.lanes.data.v11.LaneDefinitonsV11ToV20Converter;
 import org.matsim.lanes.data.v11.LanesToLinkAssignment11;
 import org.matsim.lanes.data.v20.Lane;
-import org.matsim.lanes.data.v20.LaneDefinitions20;
+import org.matsim.lanes.data.v20.Lanes;
 import org.matsim.testcases.MatsimTestUtils;
 import org.xml.sax.SAXException;
 
@@ -122,7 +122,7 @@ public class DgCalculateSignalGroupsTest {
 		SignalSystemsData signalSystems = new SignalSystemsDataImpl();
 		this.createManySignalsOn3WayCrossing(signalSystems);
 
-		DgCalculateSignalGroups calcSignalGroups = new DgCalculateSignalGroups(signalSystems, sc.getNetwork(), (LaneDefinitions20) sc.getScenarioElement(LaneDefinitions20.ELEMENT_NAME));
+		DgCalculateSignalGroups calcSignalGroups = new DgCalculateSignalGroups(signalSystems, sc.getNetwork(), (Lanes) sc.getScenarioElement(Lanes.ELEMENT_NAME));
 		SignalGroupsData signalGroups = calcSignalGroups.calculateSignalGroupsData();
 
 		Assert.assertNotNull(signalGroups);
@@ -391,7 +391,7 @@ public class DgCalculateSignalGroupsTest {
 		lane = fac.createLane(Id.create(2, Lane.class));
 		l2l.addLane(lane);
 		lane.addToLinkId(Id.create(32, Link.class));
-		sc.addScenarioElement(LaneDefinitions20.ELEMENT_NAME, LaneDefinitionsV11ToV20Conversion.convertTo20(lanes, sc.getNetwork()));
+		sc.addScenarioElement(Lanes.ELEMENT_NAME, LaneDefinitionsV11ToV20Conversion.convertTo20(lanes, sc.getNetwork()));
 	}
 	
 	/**

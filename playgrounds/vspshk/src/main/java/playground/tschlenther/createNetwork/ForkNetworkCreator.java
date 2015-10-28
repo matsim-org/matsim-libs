@@ -11,7 +11,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.lanes.data.v20.Lane;
-import org.matsim.lanes.data.v20.LaneDefinitions20;
+import org.matsim.lanes.data.v20.Lanes;
 import org.matsim.lanes.data.v20.LaneDefinitionsFactory20;
 import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
 
@@ -133,7 +133,7 @@ public class ForkNetworkCreator {
 
 
 	private void setLanes() {
-		LaneDefinitions20 lanes = scenario.getLanes();
+		Lanes lanes = scenario.getLanes();
 		LaneDefinitionsFactory20 lfactory = lanes.getFactory();
 		Id<Lane> olId = Id.create("2.ol", Lane.class);
 		Id<Lane> secondLaneId = Id.create("2to3", Lane.class);

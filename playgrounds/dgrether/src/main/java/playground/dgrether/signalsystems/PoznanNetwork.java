@@ -40,7 +40,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.data.v11.LaneDefinitionsV11ToV20Conversion;
 import org.matsim.lanes.data.v11.*;
 import org.matsim.lanes.data.v20.Lane;
-import org.matsim.lanes.data.v20.LaneDefinitions20;
+import org.matsim.lanes.data.v20.Lanes;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.ambertimes.v10.AmberTimesData;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemData;
@@ -578,7 +578,7 @@ public class PoznanNetwork
 
         // create network lanes and signals
         createPhysics();
-        LaneDefinitions20 lanes20 = LaneDefinitionsV11ToV20Conversion.convertTo20(
+        Lanes lanes20 = LaneDefinitionsV11ToV20Conversion.convertTo20(
                 lanes, scenario.getNetwork());
         LanesConsistencyChecker lcc = new LanesConsistencyChecker(scenario.getNetwork(), lanes20);
         lcc.checkConsistency();

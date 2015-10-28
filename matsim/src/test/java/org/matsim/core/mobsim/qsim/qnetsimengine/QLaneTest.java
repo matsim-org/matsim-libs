@@ -61,9 +61,9 @@ public class QLaneTest extends MatsimTestCase {
 		return network;
   }
   
-	private LaneDefinitions20 createOneLane(MutableScenario scenario, int numberOfRepresentedLanes) {
+	private Lanes createOneLane(MutableScenario scenario, int numberOfRepresentedLanes) {
 		scenario.getConfig().qsim().setUseLanes(true);
-		LaneDefinitions20 lanes = scenario.getLanes();
+		Lanes lanes = scenario.getLanes();
 		LaneDefinitionsFactory20 builder = lanes.getFactory();
 		//lanes for link 1
 		LanesToLinkAssignment20 lanesForLink1 = builder.createLanesToLinkAssignment(Id.create(1, Link.class));
@@ -84,9 +84,9 @@ public class QLaneTest extends MatsimTestCase {
 		return lanes;
 	}
   
-	private LaneDefinitions20 createLanes(MutableScenario scenario) {
+	private Lanes createLanes(MutableScenario scenario) {
 		scenario.getConfig().qsim().setUseLanes(true);
-		LaneDefinitions20 lanes = scenario.getLanes();
+		Lanes lanes = scenario.getLanes();
 		LaneDefinitionsFactory20 builder = lanes.getFactory();
 		//lanes for link 1
 		LanesToLinkAssignment20 lanesForLink1 = builder.createLanesToLinkAssignment(Id.create(1, Link.class));

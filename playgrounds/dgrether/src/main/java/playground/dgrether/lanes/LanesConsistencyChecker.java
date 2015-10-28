@@ -35,7 +35,7 @@ import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.data.v20.LaneDefinitionsReader;
 import org.matsim.lanes.data.v20.Lane;
-import org.matsim.lanes.data.v20.LaneDefinitions20;
+import org.matsim.lanes.data.v20.Lanes;
 import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
 
 
@@ -47,10 +47,10 @@ public class LanesConsistencyChecker {
   
 	private static final Logger log = Logger.getLogger(LanesConsistencyChecker.class);
 	private Network network;
-	private LaneDefinitions20 lanes;
+	private Lanes lanes;
 	private boolean removeMalformed = false;
 	
-	public LanesConsistencyChecker(Network net, LaneDefinitions20 laneDefs) {
+	public LanesConsistencyChecker(Network net, Lanes laneDefs) {
 		this.network = net;
 		this.lanes = laneDefs;
 	}
@@ -167,7 +167,7 @@ public class LanesConsistencyChecker {
 		LaneDefinitionsReader laneReader = new LaneDefinitionsReader(scenario);
 	  laneReader.readFile(lanesFile);
 	  
-	  LanesConsistencyChecker lcc = new LanesConsistencyChecker(net, (LaneDefinitions20) scenario.getScenarioElement(LaneDefinitions20.ELEMENT_NAME));
+	  LanesConsistencyChecker lcc = new LanesConsistencyChecker(net, (Lanes) scenario.getScenarioElement(Lanes.ELEMENT_NAME));
 		lcc.setRemoveMalformed(false);
 		lcc.checkConsistency();
 		

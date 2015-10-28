@@ -6,7 +6,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.households.Households;
-import org.matsim.lanes.data.v20.LaneDefinitions20;
+import org.matsim.lanes.data.v20.Lanes;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.vehicles.Vehicles;
 
@@ -94,7 +94,7 @@ public class ScenarioUtils {
 			scenario.setActivityFacilities(facilities);
 			return this ;
 		}
-		public ScenarioBuilder setLanes( LaneDefinitions20 lanes ) {
+		public ScenarioBuilder setLanes( Lanes lanes ) {
 			scenario.setLanes(lanes);
 			return this ;
 		}

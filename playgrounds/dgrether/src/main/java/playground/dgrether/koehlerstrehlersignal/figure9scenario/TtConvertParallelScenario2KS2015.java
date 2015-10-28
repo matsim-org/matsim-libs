@@ -25,7 +25,7 @@ import javax.xml.transform.TransformerConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.scenario.MutableScenario;
-import org.matsim.lanes.data.v20.LaneDefinitions20;
+import org.matsim.lanes.data.v20.Lanes;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.xml.sax.SAXException;
 
@@ -63,7 +63,7 @@ public class TtConvertParallelScenario2KS2015 {
 		log.warn("Check times of demand!");
 		DgKSNetwork net = converter.convertNetworkLanesAndSignals(
 				sc.getNetwork(),
-				(LaneDefinitions20) sc.getScenarioElement(LaneDefinitions20.ELEMENT_NAME), 
+				(Lanes) sc.getScenarioElement(Lanes.ELEMENT_NAME), 
 				(SignalsData) sc.getScenarioElement(SignalsData.ELEMENT_NAME), 0.0, 3600.0);
 		
 		M2KS2010SimpleDemandConverter demandConverter = new M2KS2010SimpleDemandConverter();

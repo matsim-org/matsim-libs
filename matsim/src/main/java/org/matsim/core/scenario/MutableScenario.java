@@ -33,7 +33,7 @@ import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.households.Households;
 import org.matsim.households.HouseholdsImpl;
-import org.matsim.lanes.data.v20.LaneDefinitions20;
+import org.matsim.lanes.data.v20.Lanes;
 import org.matsim.lanes.data.v20.LaneDefinitions20Impl;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
@@ -60,7 +60,7 @@ public final class MutableScenario implements Scenario {
 
 	//non-mandatory attributes
 	private TransitSchedule transitSchedule = null;
-	private LaneDefinitions20 lanes = null;
+	private Lanes lanes = null;
 	private Households households;
 	private Vehicles transitVehicles;
 
@@ -124,7 +124,7 @@ public final class MutableScenario implements Scenario {
 	}
 
 	@Override
-	public LaneDefinitions20 getLanes() {
+	public Lanes getLanes() {
 		return this.lanes;
 	}
 
@@ -203,7 +203,7 @@ public final class MutableScenario implements Scenario {
 		testForLocked();
 		this.transitVehicles = vehicles ;
 	}
-	public final void setLanes( LaneDefinitions20 lanes ) {
+	public final void setLanes( Lanes lanes ) {
 		testForLocked();
 		this.lanes = lanes ;
 	}

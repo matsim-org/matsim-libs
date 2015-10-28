@@ -34,7 +34,7 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.data.v20.LaneDefinitionsReader;
-import org.matsim.lanes.data.v20.LaneDefinitions20;
+import org.matsim.lanes.data.v20.Lanes;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.SignalsScenarioLoader;
 
@@ -53,7 +53,7 @@ public class RunResultsLoader {
 	private OutputDirectoryHierarchy outputDir;
 	private Network network;
 	private Population population;
-	private LaneDefinitions20 lanes;
+	private Lanes lanes;
 	private SignalsData signals;
 	
 	public RunResultsLoader(String path, String runId) {
@@ -118,7 +118,7 @@ public class RunResultsLoader {
 	}
 	
 	//untested
-	public LaneDefinitions20 getLanes() {
+	public Lanes getLanes() {
 		if (this.lanes == null){
 			String lf = this.outputDir.getOutputFilename(Controler.FILENAME_LANES);
 			this.lanes = this.loadLanes(lf);
@@ -126,13 +126,13 @@ public class RunResultsLoader {
 		return this.lanes;
 	}
 	
-	private LaneDefinitions20 loadLanes(String path) {
+	private Lanes loadLanes(String path) {
 		Config c = ConfigUtils.createConfig();
 		c.qsim().setUseLanes(true);
 		Scenario sc = ScenarioUtils.createScenario(c);
 		LaneDefinitionsReader reader = new LaneDefinitionsReader(sc);
 		reader.readFile(path);
-		return (LaneDefinitions20) sc.getScenarioElement(LaneDefinitions20.ELEMENT_NAME);
+		return (Lanes) sc.getScenarioElement(Lanes.ELEMENT_NAME);
 	}
 	
 	public SignalsData getSignals() {

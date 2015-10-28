@@ -63,7 +63,7 @@ import org.matsim.lanes.data.v11.LaneDefinitionsFactory11;
 import org.matsim.lanes.data.v11.LaneDefinitionsV11ToV20Conversion;
 import org.matsim.lanes.data.v11.LanesToLinkAssignment11;
 import org.matsim.lanes.data.v20.Lane;
-import org.matsim.lanes.data.v20.LaneDefinitions20;
+import org.matsim.lanes.data.v20.Lanes;
 import org.matsim.lanes.data.v20.LaneDefinitionsWriter20;
 
 import playground.dgrether.DgPaths;
@@ -121,7 +121,7 @@ public class DgFigure9ScenarioGenerator {
 		this.writeMatsimNetwork(net, networkOutfile);
 		log.info("network written to " + networkOutfile);
 		//lanes
-		LaneDefinitions20 lanes = createLanes((MutableScenario)scenario);
+		Lanes lanes = createLanes((MutableScenario)scenario);
 		LaneDefinitionsWriter20 laneWriter = new LaneDefinitionsWriter20(lanes);
 		laneWriter.write(lanesOutfile);
 		log.info("lanes written to " + lanesOutfile);
@@ -376,7 +376,7 @@ public class DgFigure9ScenarioGenerator {
 		return systems;
 	}
 
-	private LaneDefinitions20 createLanes(MutableScenario scenario) {
+	private Lanes createLanes(MutableScenario scenario) {
 		double laneLenght = 50.0;
 		LaneDefinitions11 lanes = new LaneDefinitions11Impl();
 		LaneDefinitionsFactory11 factory = lanes.getFactory();
@@ -407,7 +407,7 @@ public class DgFigure9ScenarioGenerator {
 		link65lane2.setStartsAtMeterFromLinkEnd(laneLenght);
 		
 		//convert to 2.0 format and return
-		LaneDefinitions20 lanesv2 = LaneDefinitionsV11ToV20Conversion.convertTo20(lanes, scenario.getNetwork());
+		Lanes lanesv2 = LaneDefinitionsV11ToV20Conversion.convertTo20(lanes, scenario.getNetwork());
 		return lanesv2;
 	}
 
