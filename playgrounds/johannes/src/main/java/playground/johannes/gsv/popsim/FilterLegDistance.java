@@ -17,22 +17,30 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.synpop.source.mid2008.processing;
+package playground.johannes.gsv.popsim;
 
 import playground.johannes.synpop.data.CommonKeys;
-import playground.johannes.synpop.data.Person;
-import playground.johannes.synpop.processing.PersonTask;
+import playground.johannes.synpop.data.CommonValues;
+import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.data.Segment;
+import playground.johannes.synpop.processing.EpisodeTask;
 
 /**
  * @author johannes
  */
-public class AdjustJourneyWeight implements PersonTask {
+public class FilterLegDistance implements EpisodeTask {
 
     @Override
-    public void apply(Person person) {
-        double weight = Double.parseDouble(person.getAttribute(CommonKeys.PERSON_WEIGHT));
-        weight = weight / 90.0; // 3 month time frame
-//        weight = weight / 365.0;
-        person.setAttribute(CommonKeys.PERSON_WEIGHT, String.valueOf(weight));
+    public void apply(Episode episode) {
+        for(Segment leg : episode.getLegs()) {
+            String value = leg.getAttribute(CommonKeys.LEG_ROUTE_DISTANCE);
+            if(value != null) {
+                double d = Double.parseDouble(value);
+                if(d > 400000) {
+                    episode.setAttribute(CommonKeys.DELETE, CommonValues.TRUE);
+                    break;
+                }
+            }
+        }
     }
 }

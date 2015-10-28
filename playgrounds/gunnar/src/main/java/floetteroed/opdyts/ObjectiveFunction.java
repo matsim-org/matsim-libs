@@ -32,7 +32,7 @@ package floetteroed.opdyts;
  * @author Gunnar Flötteröd
  *
  */
-public interface ObjectBasedObjectiveFunction {
+public interface ObjectiveFunction {
 
 	public double value(final SimulatorState state);
 

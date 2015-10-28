@@ -27,6 +27,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import com.google.inject.Inject;
+import com.google.inject.name.Named;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -61,7 +62,6 @@ import javax.inject.Provider;
  */
 public class AccessEgressMultimodalTripRouterModule extends AbstractModule {
 	private final Scenario scenario;
-	private final TravelDisutilityFactory travelDisutilityFactory;
 	private final Map<String, TravelTime> multimodalTravelTimes;
 	private final Map<String, TravelDisutilityFactory> disutilityFactories = new HashMap< >();
 
@@ -71,11 +71,9 @@ public class AccessEgressMultimodalTripRouterModule extends AbstractModule {
 
 	public AccessEgressMultimodalTripRouterModule(
 			final Scenario scenario,
-			final Map<String, TravelTime> multimodalTravelTimes,
-			final TravelDisutilityFactory travelDisutilityFactory) {
+			final Map<String, TravelTime> multimodalTravelTimes ) {
 		this.scenario = scenario;
 		this.multimodalTravelTimes = multimodalTravelTimes;
-		this.travelDisutilityFactory = travelDisutilityFactory;
 	}
 	
 	@Override
@@ -85,17 +83,21 @@ public class AccessEgressMultimodalTripRouterModule extends AbstractModule {
         final MultiModalConfigGroup multiModalConfigGroup = (MultiModalConfigGroup) scenario.getConfig().getModule(MultiModalConfigGroup.GROUP_NAME);
         final Set<String> simulatedModes = CollectionUtils.stringToSet(multiModalConfigGroup.getSimulatedModes());
 		for (String mode : simulatedModes) {
-			addRoutingModuleBinding( mode )
+			addRoutingModuleBinding(mode)
 					.toProvider(
 							new AccessEgressNetworkBasedTeleportationRoutingModuleProvider(
-								mode,
-								network ) );
+									mode,
+									network));
+			//addTravelTimeBinding( mode ).toInstance( multimodalTravelTimes.get( mode ) );
+			//addTravelDisutilityFactoryBinding(mode).toInstance(travelDisutilityFactory);
 		}
 	}
 
 	private class AccessEgressNetworkBasedTeleportationRoutingModuleProvider implements Provider<RoutingModule> {
 		private final String mode;
 		private final Network network;
+		@Inject
+		private TravelDisutilityFactory travelDisutilityFactory;
 
 		private AccessEgressNetworkBasedTeleportationRoutingModuleProvider(String mode, Network network) {
 			this.mode = mode;

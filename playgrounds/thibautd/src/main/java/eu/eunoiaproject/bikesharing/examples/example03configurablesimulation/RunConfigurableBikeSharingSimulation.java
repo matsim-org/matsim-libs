@@ -62,7 +62,7 @@ public class RunConfigurableBikeSharingSimulation {
 	private static final Logger log =
 		Logger.getLogger(RunConfigurableBikeSharingSimulation.class);
 
-	public static void main(final String[] args) {
+	public static void main(final String... args) {
 		final String configFile = args[ 0 ];
 
 		OutputDirectoryLogging.catchLogEntries();
@@ -98,7 +98,6 @@ public class RunConfigurableBikeSharingSimulation {
 		final RoutingData ptRouting = createRoutingData( sc, thinnedNetworkGroup );
 		controler.addOverridingModule(
 				BikeSharingScenarioUtils.createTripRouterFactoryAndConfigureRouteFactories(
-					controler.getTravelDisutilityFactory(),
 					controler.getScenario(),
 					null,
 					ptRouting,

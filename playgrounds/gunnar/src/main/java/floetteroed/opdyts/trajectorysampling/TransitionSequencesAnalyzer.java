@@ -161,6 +161,11 @@ public class TransitionSequencesAnalyzer<U extends DecisionVariable> {
 
 	// -------------------- OPTIMIZATION --------------------
 
+	public SamplingStage<U> newOptimalSamplingStage() {
+		final Vector alphas = this.optimalAlphas();
+		return new SamplingStage<>(alphas, this);
+	}
+
 	public Vector optimalAlphas() {
 		if (this.transitions.size() == 1) {
 			return new Vector(1.0);

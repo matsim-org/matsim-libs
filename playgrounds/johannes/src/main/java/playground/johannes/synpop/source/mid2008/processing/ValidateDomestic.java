@@ -20,19 +20,24 @@
 package playground.johannes.synpop.source.mid2008.processing;
 
 import playground.johannes.synpop.data.CommonKeys;
-import playground.johannes.synpop.data.Person;
-import playground.johannes.synpop.processing.PersonTask;
+import playground.johannes.synpop.data.CommonValues;
+import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.data.Segment;
+import playground.johannes.synpop.processing.EpisodeTask;
+import playground.johannes.synpop.source.mid2008.MiDKeys;
+import playground.johannes.synpop.source.mid2008.MiDValues;
 
 /**
  * @author johannes
  */
-public class AdjustJourneyWeight implements PersonTask {
+public class ValidateDomestic implements EpisodeTask {
 
     @Override
-    public void apply(Person person) {
-        double weight = Double.parseDouble(person.getAttribute(CommonKeys.PERSON_WEIGHT));
-        weight = weight / 90.0; // 3 month time frame
-//        weight = weight / 365.0;
-        person.setAttribute(CommonKeys.PERSON_WEIGHT, String.valueOf(weight));
+    public void apply(Episode episode) {
+        for(Segment leg : episode.getLegs()) {
+            if(!MiDValues.DOMESTIC.equalsIgnoreCase(leg.getAttribute(MiDKeys.LEG_DESTINATION))) {
+                episode.setAttribute(CommonKeys.DELETE, CommonValues.TRUE);
+            }
+        }
     }
 }

@@ -29,7 +29,7 @@ public class FilesGenerator {
 	 * @throws ParseException
 	 */
 	public static void main(String[] args) throws NumberFormatException, IOException, ParseException {
-		Map<String, Household> households = HitsReader.readHits(args[0]);
+		Map<String, Household> households = HitsReader.readHits(args[0], args[1]);
 		PrintWriter writer = new PrintWriter(new File("./data/cepas/activitiesHits.txt"));
 		PrintWriter writer2 = new PrintWriter(new File("./data/cepas/ptActivitiesHits.txt"));
 		writeHeaderW(writer);

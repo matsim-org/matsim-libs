@@ -12,7 +12,7 @@ import java.util.Random;
 
 import vind.VectorToObjectBasedObjectiveFunctionWrapper;
 import floetteroed.opdyts.DecisionVariableRandomizer;
-import floetteroed.opdyts.ObjectBasedObjectiveFunction;
+import floetteroed.opdyts.ObjectiveFunction;
 import floetteroed.opdyts.convergencecriteria.ConvergenceCriterion;
 import floetteroed.opdyts.convergencecriteria.ObjectiveFunctionChangeConvergenceCriterion;
 import floetteroed.opdyts.searchalgorithms.RandomSearch;
@@ -84,7 +84,7 @@ class Talk_2015_09_03 {
 		final int maxTransitions = transitionBinCnt * transitionBinSize;
 
 		final int replications = 1;
-		final boolean keepBestSolution = true;
+		final boolean keepBestSolution = false;
 		final int maxDeltaBin = 3;
 		final double replanningProbability = 0.10;
 
@@ -168,7 +168,7 @@ class Talk_2015_09_03 {
 					// final ObjectiveFunction objectiveFunction = new
 					// NTimesTwoRoutesObjectiveFunction_exact(
 					// externalities, capacity);
-					final ObjectBasedObjectiveFunction objectiveFunction = new VectorToObjectBasedObjectiveFunctionWrapper(
+					final ObjectiveFunction objectiveFunction = new VectorToObjectBasedObjectiveFunctionWrapper(
 							new NTimesTwoRoutesObjectiveFunction(externalities));
 
 					final ConvergenceCriterion convergenceCriterion = new ObjectiveFunctionChangeConvergenceCriterion(

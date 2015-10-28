@@ -56,6 +56,7 @@ import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDi
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.data.v20.LaneDefinitionsWriter20;
 
+import playground.artemc.socialCost.SocialCostController.Initializer;
 import playground.vsp.congestion.controler.MarginalCongestionPricingContolerListener;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV4;
@@ -93,14 +94,14 @@ public class RunBraessSimulation {
 	private static final Double INIT_PLAN_SCORE = 110.;
 
 	/// defines which kind of signals should be used
-	private static final SignalControlType SIGNAL_TYPE = SignalControlType.SIGNAL4_ONE_SECOND_Z;
+	private static final SignalControlType SIGNAL_TYPE = SignalControlType.NONE;
 	// defines which kind of lanes should be used
 	private static final LaneType LANE_TYPE = LaneType.NONE;
 	
 	// defines which kind of pricing should be used
-	private static final PricingType PRICING_TYPE = PricingType.NONE;
+	private static final PricingType PRICING_TYPE = PricingType.V9;
 	public enum PricingType{
-		NONE, V3, V4, V8, V9
+		NONE, V3, V4, V8, V9, FLOWBASED
 	}
 
 	// choose a sigma for the randomized router
@@ -155,8 +156,9 @@ public class RunBraessSimulation {
 		if (config.controler().isLinkToLinkRoutingEnabled()){
 			controler.addOverridingModule(new InvertedNetworkRoutingModuleModule());
 		}
-		
-		if (!PRICING_TYPE.equals(PricingType.NONE)){
+
+		if (!PRICING_TYPE.equals(PricingType.NONE) && !PRICING_TYPE.equals(PricingType.FLOWBASED)){
+//		if (!PRICING_TYPE.equals(PricingType.NONE)){
 			// add tolling
 			TollHandler tollHandler = new TollHandler(scenario);
 			
@@ -180,7 +182,7 @@ public class RunBraessSimulation {
 						});
 					}
 				}
-			}			
+			}		
 			
 			// choose the correct congestion handler and add it
 			EventHandler congestionHandler = null;
@@ -207,6 +209,11 @@ public class RunBraessSimulation {
 			controler.addControlerListener(
 					new MarginalCongestionPricingContolerListener(controler.getScenario(), 
 							tollHandler, congestionHandler));
+		
+		} else if (PRICING_TYPE.equals(PricingType.FLOWBASED)) {
+			Initializer initializer = new Initializer();
+			controler.addControlerListener(initializer);		
+		
 		} else {
 			// adapt sigma for randomized routing
 			final RandomizingTimeDistanceTravelDisutility.Builder builder = 

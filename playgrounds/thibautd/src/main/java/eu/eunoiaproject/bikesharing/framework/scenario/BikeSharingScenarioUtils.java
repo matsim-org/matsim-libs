@@ -147,7 +147,7 @@ public class BikeSharingScenarioUtils {
 	}
 
 	public static AbstractModule createTripRouterFactoryAndConfigureRouteFactories(
-			final TravelDisutilityFactory disutilityFactory,
+			//final TravelDisutilityFactory disutilityFactory,
 			final Scenario scenario,
 			final LinkSlopeScorer scorer,
 			final RoutingData routingData,
@@ -173,7 +173,7 @@ public class BikeSharingScenarioUtils {
 					scenario.getConfig(),
 					linkSlopes );
 
-		final BikeSharingTripRouterModule bsFact =
+		final BikeSharingTripRouterModule bikeSharingTripRouterModule =
 				routingData == null ?
 					new BikeSharingTripRouterModule(
 						scenario,
@@ -182,34 +182,33 @@ public class BikeSharingScenarioUtils {
 						routingData,
 						scenario,
 						scorer );
-		bsFact.setRoutePtUsingSchedule( forceScheduleRouting );
+		bikeSharingTripRouterModule.setRoutePtUsingSchedule(forceScheduleRouting);
 
 
-		final AccessEgressMultimodalTripRouterModule fact =
+		final AccessEgressMultimodalTripRouterModule accessEgressMultimodalTripRouterModule =
 			new AccessEgressMultimodalTripRouterModule(
 				scenario,
-				multiModalTravelTimeFactory.createTravelTimes(),
-				disutilityFactory );
+				multiModalTravelTimeFactory.createTravelTimes() );
 
 		if ( scorer != null ) {
-			fact.setDisutilityFactoryForMode(
+			accessEgressMultimodalTripRouterModule.setDisutilityFactoryForMode(
 					TransportMode.bike,
 					createSlopeAwareDisutilityFactory(
-						scorer,
-						TransportMode.bike ) );
+							scorer,
+							TransportMode.bike));
 
-			fact.setDisutilityFactoryForMode(
+			accessEgressMultimodalTripRouterModule.setDisutilityFactoryForMode(
 					BikeSharingConstants.MODE,
 					createSlopeAwareDisutilityFactory(
-						scorer,
-						BikeSharingConstants.MODE ) );
+							scorer,
+							BikeSharingConstants.MODE));
 		}
 
 		return new AbstractModule() {
 			@Override
 			public void install() {
-				install( bsFact );
-				install( fact );
+				install( bikeSharingTripRouterModule );
+				install( accessEgressMultimodalTripRouterModule );
 			}
 		};
 	}
