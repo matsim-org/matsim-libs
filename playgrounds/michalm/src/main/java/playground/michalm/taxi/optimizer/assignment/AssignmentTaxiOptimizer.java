@@ -22,7 +22,9 @@ package playground.michalm.taxi.optimizer.assignment;
 import java.util.*;
 
 import org.matsim.contrib.dvrp.data.Requests;
-import org.matsim.core.router.MultiNodeDijkstra;
+import org.matsim.contrib.locationchoice.router.*;
+import org.matsim.core.router.*;
+import org.matsim.core.router.util.RoutingNetwork;
 
 import playground.michalm.taxi.data.TaxiRequest;
 import playground.michalm.taxi.optimizer.*;
@@ -33,6 +35,8 @@ public class AssignmentTaxiOptimizer
 {
     private final MultiNodeDijkstra router;
 
+    private final BackwardFastMultiNodeDijkstra backwardRouter;
+
 
     public AssignmentTaxiOptimizer(TaxiOptimizerConfiguration optimConfig)
     {
@@ -40,12 +44,19 @@ public class AssignmentTaxiOptimizer
 
         router = new MultiNodeDijkstra(optimConfig.context.getScenario().getNetwork(),
                 optimConfig.travelDisutility, optimConfig.travelTime, true);
+
+        FastRouterDelegateFactory fastRouterFactory = new ArrayFastRouterDelegateFactory();
+        RoutingNetwork routingNetwork = new InverseArrayRoutingNetworkFactory(null)
+                .createRoutingNetwork(optimConfig.context.getScenario().getNetwork());
+        backwardRouter = new BackwardFastMultiNodeDijkstra(routingNetwork,
+                optimConfig.travelDisutility, optimConfig.travelTime, null, fastRouterFactory,
+                true);
     }
 
 
     protected void scheduleUnplannedRequests()
     {
-        new AssignmentProblem(optimConfig, router)
+        new AssignmentProblem(optimConfig, router, backwardRouter)
                 .scheduleUnplannedRequests((SortedSet<TaxiRequest>)unplannedRequests);
     }
 }

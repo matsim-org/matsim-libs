@@ -35,14 +35,16 @@ public class VehicleData
 {
     public static class Entry
     {
+        public final int idx;
         public final Vehicle vehicle;
         public final Link link;
         public final double time;
         public final boolean idle;
 
 
-        public Entry(Vehicle vehicle, LinkTimePair linkTimePair, boolean idle)
+        public Entry(int idx, Vehicle vehicle, LinkTimePair linkTimePair, boolean idle)
         {
+            this.idx = idx;
             this.vehicle = vehicle;
             this.link = linkTimePair.link;
             this.time = linkTimePair.time;
@@ -54,12 +56,12 @@ public class VehicleData
     public final List<Entry> entries = new ArrayList<>();
     public final int idleCount;
     public final int dimension;
-    public final List<Vehicle> vehicles = Lists.transform(entries, new Function<Entry, Vehicle>() {
-        public Vehicle apply(Entry e)
-        {
-            return e.vehicle;
-        }
-    });
+//    public final List<Vehicle> vehicles = Lists.transform(entries, new Function<Entry, Vehicle>() {
+//        public Vehicle apply(Entry e)
+//        {
+//            return e.vehicle;
+//        }
+//    });
 
 
     public VehicleData(TaxiOptimizerConfiguration optimConfig)
@@ -75,6 +77,7 @@ public class VehicleData
         double maxDepartureTime = currTime + planningHorizon;
         TaxiScheduler scheduler = optimConfig.scheduler;
 
+        int idx = 0;
         int idleCounter = 0;
         for (Vehicle v : optimConfig.context.getVrpData().getVehicles().values()) {
             LinkTimePair departure = scheduler.getImmediateDiversionOrEarliestIdleness(v);
@@ -83,7 +86,7 @@ public class VehicleData
                 boolean idle = departure.time == currTime //(small optimization to avoid unnecessary calls to Scheduler.isIdle())
                         && scheduler.isIdle(v);
 
-                entries.add(new Entry(v, departure, idle));
+                entries.add(new Entry(idx++, v, departure, idle));
 
                 if (idle) {
                     idleCounter++;

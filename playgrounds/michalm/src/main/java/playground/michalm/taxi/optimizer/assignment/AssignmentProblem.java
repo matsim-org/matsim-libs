@@ -24,8 +24,8 @@ import java.util.*;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.*;
-import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.path.*;
+import org.matsim.contrib.locationchoice.router.BackwardFastMultiNodeDijkstra;
 import org.matsim.core.router.*;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 
@@ -40,8 +40,11 @@ public class AssignmentProblem
 
     private final TaxiOptimizerConfiguration optimConfig;
     private final MultiNodeDijkstra router;
+
+    private final BackwardFastMultiNodeDijkstra backwardRouter;
+
     private final RequestFilter requestFilter;
-    private final VehicleFilter vehicleFilter;
+    private final KStraightLineNearestVehicleDepartureFilter vehicleFilter;
 
     private final double planningHorizon = 1800; //30 min TODO
 
@@ -49,12 +52,15 @@ public class AssignmentProblem
     private AssignmentRequestData rData;
 
 
-    public AssignmentProblem(TaxiOptimizerConfiguration optimConfig, MultiNodeDijkstra router)
+    public AssignmentProblem(TaxiOptimizerConfiguration optimConfig, MultiNodeDijkstra router,
+            BackwardFastMultiNodeDijkstra backwardRouter)
     {
         this.optimConfig = optimConfig;
         this.router = router;
         this.requestFilter = optimConfig.filterFactory.createRequestFilter();
-        this.vehicleFilter = optimConfig.filterFactory.createVehicleFilter();
+        this.vehicleFilter = new KStraightLineNearestVehicleDepartureFilter(20);
+
+        this.backwardRouter = backwardRouter;
     }
 
 
@@ -83,7 +89,7 @@ public class AssignmentProblem
 
     private static class RequestPathData
     {
-        private Node reqNode;//destination
+        private Node node;//destination
         private double delay;//at the first and last links
         private Path path;//shortest path
     }
@@ -94,8 +100,13 @@ public class AssignmentProblem
         RequestPathData[][] pathDataMatrix = (RequestPathData[][])Array
                 .newInstance(RequestPathData.class, vData.dimension, rData.dimension);
 
-        calcPathsForVehicles(pathDataMatrix);
-        
+        if (rData.dimension > vData.dimension) {
+            calcPathsForVehicles(pathDataMatrix);
+        }
+        else {
+            calcPathsForRequests(pathDataMatrix);
+        }
+
         return pathDataMatrix;
     }
 
@@ -119,18 +130,18 @@ public class AssignmentProblem
 
                 if (departure.link == reqLink) {
                     //hack: we are basically there (on the same link), so let's pretend reqNode == fromNode
-                    pathData.reqNode = departure.link.getToNode();
+                    pathData.node = fromNode;
                     pathData.delay = 0;
                 }
                 else {
-                    pathData.reqNode = reqLink.getFromNode();
+                    pathData.node = reqLink.getFromNode();
                     //simplified, but works for taxis, since pickup trips are short (about 5 mins)
                     pathData.delay = 1 + reqLink.getFreespeed(departure.time);
                 }
 
-                if (!reqInitialNodes.containsKey(pathData.reqNode.getId())) {
-                    InitialNode newInitialNode = new InitialNode(pathData.reqNode, 0, 0);
-                    reqInitialNodes.put(pathData.reqNode.getId(), newInitialNode);
+                if (!reqInitialNodes.containsKey(pathData.node.getId())) {
+                    InitialNode newInitialNode = new InitialNode(pathData.node, 0, 0);
+                    reqInitialNodes.put(pathData.node.getId(), newInitialNode);
                 }
             }
 
@@ -151,30 +162,74 @@ public class AssignmentProblem
             for (TaxiRequest req : filteredReqs) {
                 int r = rData.reqIdx.get(req.getId());
                 RequestPathData pathData = pathDataMatrix[v][r];
-                pathData.path = pathsToReqNodes.get(pathData.reqNode.getId());
+                pathData.path = pathsToReqNodes.get(pathData.node.getId());
             }
         }
     }
 
 
-    
+    //TODO does not support adv reqs
     private void calcPathsForRequests(RequestPathData[][] pathDataMatrix)
     {
+        double currTime = optimConfig.context.getTime();
+
         for (int r = 0; r < rData.dimension; r++) {
             TaxiRequest req = rData.requests.get(r);
             Link toLink = req.getFromLink();
             Node toNode = toLink.getFromNode();
 
             Map<Id<Node>, InitialNode> vehInitialNodes = new HashMap<>();
-            Map<Id<Node>, Path> pathsToReqNodes = new HashMap<>();
+            Map<Id<Node>, Path> pathsFromVehNodes = new HashMap<>();
 
-            Iterable<Vehicle> filteredVehs = vehicleFilter
-                    .filterVehiclesForRequest(vData.vehicles, req);
+            Iterable<VehicleData.Entry> filteredVehs = vehicleFilter
+                    .filterVehiclesForRequest(vData.entries, req);
 
+            for (VehicleData.Entry departure : filteredVehs) {
+                int v = departure.idx;
+                RequestPathData pathData = pathDataMatrix[v][r] = new RequestPathData();
+
+                double delay = departure.time - currTime;
+                if (departure.link == toLink) {
+                    //hack: we are basically there (on the same link), so let's pretend vehNode == toNode
+                    pathData.node = toNode;
+                    pathData.delay = 0;
+                }
+                else {
+                    pathData.node = departure.link.getToNode();
+                    //simplified, but works for taxis, since pickup trips are short (about 5 mins)
+                    pathData.delay = 1 + toLink.getFreespeed(departure.time);
+                }
+
+                if (!vehInitialNodes.containsKey(pathData.node.getId())) {
+                    InitialNode newInitialNode = new InitialNode(pathData.node, 0, 0);
+                    vehInitialNodes.put(pathData.node.getId(), newInitialNode);
+                }
+            }
+
+            ImaginaryNode fromNodes = backwardRouter.createImaginaryNode(vehInitialNodes.values());
+            Path path = backwardRouter.calcLeastCostPath(toNode, fromNodes, currTime, null,
+                    null);
+            Node bestVehNode = path.nodes.get(path.nodes.size() - 1);
+            pathsFromVehNodes.put(bestVehNode.getId(), path);
+
+            //get paths for all remaining endNodes 
+            for (InitialNode i : vehInitialNodes.values()) {
+                Node vehNode = i.node;
+                if (vehNode.getId() != bestVehNode.getId()) {
+                    path = backwardRouter.constructPath(toNode, vehNode, currTime);
+                    pathsFromVehNodes.put(vehNode.getId(), path);
+                }
+            }
+
+            for (VehicleData.Entry departure : filteredVehs) {
+                int v = departure.idx;
+                RequestPathData pathData = pathDataMatrix[v][r];
+                pathData.path = pathsFromVehNodes.get(pathData.node.getId());
+            }
         }
     }
 
-    
+
     private double[][] createCostMatrix(RequestPathData[][] pathDataMatrix)
     {
         boolean reduceTP = doReduceTP();
