@@ -126,6 +126,7 @@ public class BasicPersonTripAnalysisTest {
 	 */
 	@Ignore //TODO
 	@Test
+	@Ignore // TODO
 	public void testVariousVehiclesPerPerson() {
 		
 		String eventsFile = utils.getInputDirectory() + "testVariousVehiclesPerPersonEvents.xml";
@@ -139,6 +140,7 @@ public class BasicPersonTripAnalysisTest {
 	public Scenario createScenario(int personNumber) {
 
 		Config config = ConfigUtils.createConfig();
+		config.qsim().setEndTime(30 * 3600.);
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		
 		// create Population
