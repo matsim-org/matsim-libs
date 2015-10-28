@@ -18,18 +18,24 @@ public class MATSimSimulator<U extends DecisionVariable> implements Simulator<U>
     private final MATSimStateFactory stateFactory;
     private final Scenario scenario;
 
+	private int nextControlerRun = 0;
+
     public MATSimSimulator(// Set<? extends DecisionVariable> decisionVariables, 
     		MATSimStateFactory stateFactory, Scenario scenario) {
         // this.decisionVariables = decisionVariables;
         this.stateFactory = stateFactory;
         this.scenario = scenario;
+		String outputDirectory = this.scenario.getConfig().controler().getOutputDirectory();
+		this.scenario.getConfig().controler().setOutputDirectory(outputDirectory + "_0");
     }
 
     @Override
 	public SimulatorState run(TrajectorySampler<U> evaluator) {
 //				evaluator.addStatistic("./mylog.txt", new InterpolatedObjectiveFunctionValue());
 //				evaluator.addStatistic("./mylog.txt", new AlphaStatistic(decisionVariables));
-
+		String outputDirectory = this.scenario.getConfig().controler().getOutputDirectory();
+		outputDirectory = outputDirectory.substring(0, outputDirectory.lastIndexOf("_")) + "_" + nextControlerRun;
+		this.scenario.getConfig().controler().setOutputDirectory(outputDirectory);
 		final MATSimDecisionVariableSetEvaluator predictor
 				= new MATSimDecisionVariableSetEvaluator(evaluator, 
 						// decisionVariables, 
@@ -54,7 +60,7 @@ public class MATSimSimulator<U extends DecisionVariable> implements Simulator<U>
 			}
 		});
 		controler.run();
-
+		nextControlerRun++;
 		return predictor.getFinalState();
 	}
 
