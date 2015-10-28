@@ -220,9 +220,10 @@ public class AssignmentProblem
             VehicleData.Entry departure = vData.entries.get(v);
             TaxiRequest req = rData.requests.get(r);
             RequestPathData pathData = pathDataMatrix[v][r];
-
-            VrpPathWithTravelData vrpPath = VrpPaths.createPath(departure.link, req.getFromLink(),
-                    departure.time, pathData.path, optimConfig.travelTime);
+            
+            VrpPathWithTravelData vrpPath = pathData == null ? //
+                    VrpPaths.calcAndCreatePath(departure.link, req.getFromLink(),departure.time, router, optimConfig.travelTime):
+                    VrpPaths.createPath(departure.link, req.getFromLink(),departure.time, pathData.path, optimConfig.travelTime);
 
             optimConfig.scheduler.scheduleRequest(departure.vehicle, req, vrpPath);
             unplannedRequests.remove(req);
