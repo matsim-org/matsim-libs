@@ -25,9 +25,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Lists;
-
 import playground.michalm.taxi.scheduler.TaxiScheduler;
 
 
@@ -56,12 +53,6 @@ public class VehicleData
     public final List<Entry> entries = new ArrayList<>();
     public final int idleCount;
     public final int dimension;
-//    public final List<Vehicle> vehicles = Lists.transform(entries, new Function<Entry, Vehicle>() {
-//        public Vehicle apply(Entry e)
-//        {
-//            return e.vehicle;
-//        }
-//    });
 
 
     public VehicleData(TaxiOptimizerConfiguration optimConfig)
