@@ -138,7 +138,7 @@ public final class RandomizingTimeDistanceTravelDisutility implements TravelDisu
 		this.marginalCostOfDistance = marginalCostOfDistance_m;
 		this.normalization = normalization;
 		this.sigma = sigma;
-		this.random = MatsimRandom.getLocalInstance();
+		this.random = sigma != 0 ? MatsimRandom.getLocalInstance() : null;
 	}
 
 	@Override
