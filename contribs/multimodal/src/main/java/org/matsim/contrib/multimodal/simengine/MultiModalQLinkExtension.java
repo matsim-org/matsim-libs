@@ -81,7 +81,7 @@ class MultiModalQLinkExtension {
 
 		this.addAgent(mobsimAgent, now);
 
-		this.simEngine.getEventsManager().processEvent(new LinkEnterEvent(now, mobsimAgent.getId(), link.getId(), Id.create(mobsimAgent.getId(), Vehicle.class)));
+		this.simEngine.getEventsManager().processEvent(new LinkEnterEvent(now, Id.create(mobsimAgent.getId(), Vehicle.class), link.getId()));
 	}
 
 	private void addAgent(MobsimAgent mobsimAgent, double now) {
@@ -196,7 +196,7 @@ class MultiModalQLinkExtension {
 	public MobsimAgent getNextWaitingAgent(double now) {
 		MobsimAgent personAgent = waitingToLeaveAgents.poll();
 		if (personAgent != null) {
-			this.simEngine.getEventsManager().processEvent(new LinkLeaveEvent(now, personAgent.getId(), link.getId(), Id.create(personAgent.getId(), Vehicle.class)));
+			this.simEngine.getEventsManager().processEvent(new LinkLeaveEvent(now, Id.create(personAgent.getId(), Vehicle.class), link.getId()));
 		}
 		return personAgent;
 	}

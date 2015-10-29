@@ -31,9 +31,13 @@ import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
+import org.matsim.api.core.v01.events.Wait2LinkEvent;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
+import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
@@ -44,6 +48,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.handler.BasicEventHandler;
+import org.matsim.core.events.handler.Vehicle2DriverEventHandler;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -145,13 +150,15 @@ public class MultiModalPTCombinationTest {
 
 	
 	private static class LinkModeChecker implements BasicEventHandler, LinkLeaveEventHandler, PersonDepartureEventHandler,
-			PersonArrivalEventHandler {
+			PersonArrivalEventHandler, Wait2LinkEventHandler, VehicleLeavesTrafficEventHandler {
 
 		private final Network network;
 		private final Map<Id<Person>, String> modes = new HashMap<>();
 		private final Map<Id<Person>, Double> departures = new HashMap<>();
 		final Map<String, Integer> leftCountPerMode = new HashMap<>();
 		final Map<String, Double> travelTimesPerMode = new HashMap<>();
+		
+		private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
 		
 		public LinkModeChecker(Network network) {
 			this.network = network;
@@ -169,7 +176,8 @@ public class MultiModalPTCombinationTest {
 		
 		@Override
 		public void reset(int iteration) {
-			// nothing to do here
+			delegate.reset(iteration);
+			// nothing else to do here
 		}
 		
 		@Override
@@ -181,15 +189,16 @@ public class MultiModalPTCombinationTest {
 		@Override
 		public void handleEvent(LinkLeaveEvent event) {
 			Link link = this.network.getLinks().get(event.getLinkId());
+			Id<Person> driverId = delegate.getDriverOfVehicle(event.getVehicleId());
 			
-			if (!link.getAllowedModes().contains(this.modes.get(event.getDriverId()))) {
-				log.error("Found mode " + this.modes.get(event.getDriverId()) + " on link " + link.getId());
+			if (!link.getAllowedModes().contains(this.modes.get(driverId))) {
+				log.error("Found mode " + this.modes.get(driverId) + " on link " + link.getId());
 			}
 			
 			// assume that the agent is allowed to travel on the link
-			Assert.assertEquals(true, link.getAllowedModes().contains(this.modes.get(event.getDriverId())));
+			Assert.assertEquals(true, link.getAllowedModes().contains(this.modes.get(driverId)));
 			
-			String mode = this.modes.get(event.getDriverId());
+			String mode = this.modes.get(driverId);
 			int count = this.leftCountPerMode.get(mode);
 			this.leftCountPerMode.put(mode, count + 1);
 		}
@@ -206,6 +215,16 @@ public class MultiModalPTCombinationTest {
 		@Override
 		public void handleEvent(Event event) {
 			log.info(event.toString());
+		}
+
+		@Override
+		public void handleEvent(VehicleLeavesTrafficEvent event) {
+			delegate.handleEvent(event);
+		}
+
+		@Override
+		public void handleEvent(Wait2LinkEvent event) {
+			delegate.handleEvent(event);
 		}
 	}
 }
