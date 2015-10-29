@@ -224,7 +224,7 @@ public class ResultsPostProcessor
 
     public static void processBerlin()
     {
-        String dir = "d:/PP-rad/berlin/Berlin_2014_11/";
+        String dir = "d:/PP-rad/berlin/Only_Berlin_2015_08/";
         String subDirPrefix = "demand_";
 
         new ResultsPostProcessor(//
@@ -233,6 +233,7 @@ public class ResultsPostProcessor
                 "2.0", //
                 "2.5", //
                 "3.0", //
+                //"3.3" //
                 "3.5", //
                 "4.0", //
                 "4.5", //
@@ -284,8 +285,8 @@ public class ResultsPostProcessor
     public static void main(String[] args)
     {
         //processMielec();
-        //processBerlin();
+        processBerlin();
         //processBarcelonaVariableDemand();
-        processBarcelonaVariableSupply();
+        //processBarcelonaVariableSupply();
     }
 }

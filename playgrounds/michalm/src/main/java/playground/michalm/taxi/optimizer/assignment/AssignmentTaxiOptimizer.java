@@ -23,6 +23,7 @@ import java.util.*;
 
 import org.matsim.contrib.dvrp.data.Requests;
 import org.matsim.contrib.locationchoice.router.*;
+import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.router.*;
 import org.matsim.core.router.util.RoutingNetwork;
 
@@ -53,6 +54,14 @@ public class AssignmentTaxiOptimizer
                 true);
     }
 
+    
+    @Override
+    public void notifyMobsimBeforeSimStep(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent e)
+    {
+        if (e.getSimulationTime() % 10 == 0) {
+            super.notifyMobsimBeforeSimStep(e);
+        }
+    }
 
     protected void scheduleUnplannedRequests()
     {

@@ -63,7 +63,7 @@ public class Requests
 
     public static final boolean isUrgent(Request request, double now)
     {
-        return request.getT0() < now;
+        return request.getT0() <= now;
     }
 
 

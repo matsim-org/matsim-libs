@@ -49,8 +49,10 @@ class AssignmentRequestData
             if (t0 <= maxT0) {
                 requests.add(req);
                 reqIdx.put(req.getId(), idx++);
-
-                if (t0 < currTime) {
+                
+                //'<=' or '<' does not make difference
+                //(re-optimization is run before activity ends are handled)
+                if (t0 <= currTime) {
                     urgentReqCounter++;
                 }
             }

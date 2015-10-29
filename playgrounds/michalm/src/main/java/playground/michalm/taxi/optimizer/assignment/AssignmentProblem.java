@@ -29,9 +29,12 @@ import org.matsim.contrib.locationchoice.router.BackwardFastMultiNodeDijkstra;
 import org.matsim.core.router.*;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 
+import com.google.common.collect.Iterables;
+
 import playground.michalm.taxi.data.TaxiRequest;
 import playground.michalm.taxi.optimizer.*;
 import playground.michalm.taxi.optimizer.filter.*;
+import playground.michalm.taxi.scheduler.TaxiSchedulerUtils;
 
 
 public class AssignmentProblem
@@ -46,7 +49,14 @@ public class AssignmentProblem
     private final RequestFilter requestFilter;
     private final KStraightLineNearestVehicleDepartureFilter vehicleFilter;
 
-    private final double planningHorizon = 1800; //30 min TODO
+    //1800: default
+    //666: avg. drive with passenger is around 10 min, all dropoffs are 1 min
+    //300: avg. pickup drive is around 5 min
+    //420: avg. pickup drive is around 5 min, all pickups are 2 min
+    private final double vehPlanningHorizonOversupply = 120;//seconds
+
+    //10: frequency of re-optimization 
+    private final double vehPlanningHorizonUndersupply = 30;//seconds
 
     private VehicleData vData;
     private AssignmentRequestData rData;
@@ -77,12 +87,22 @@ public class AssignmentProblem
 
     private boolean initDataAndCheckIfSchedulingRequired(SortedSet<TaxiRequest> unplannedRequests)
     {
-        rData = new AssignmentRequestData(optimConfig, unplannedRequests, planningHorizon);
+        rData = new AssignmentRequestData(optimConfig, unplannedRequests, 0);//only immediate reqs
         if (rData.dimension == 0) {
             return false;
         }
 
-        vData = new VehicleData(optimConfig, planningHorizon);
+        int idleVehs = Iterables
+                .size(Iterables.filter(optimConfig.context.getVrpData().getVehicles().values(),
+                        TaxiSchedulerUtils.createIsIdle(optimConfig.scheduler)));
+        
+        if (idleVehs < rData.urgentReqCount) {
+            vData = new VehicleData(optimConfig, vehPlanningHorizonUndersupply);
+        }
+        else {
+            vData = new VehicleData(optimConfig, vehPlanningHorizonOversupply);
+        }
+
         return vData.dimension > 0;
     }
 
@@ -95,6 +115,10 @@ public class AssignmentProblem
     }
 
 
+    static int calcPathsForVehiclesCount = 0;
+    static int calcPathsForRequestsCount = 0;
+
+
     private RequestPathData[][] createPathDataMatrix()
     {
         RequestPathData[][] pathDataMatrix = (RequestPathData[][])Array
@@ -102,9 +126,18 @@ public class AssignmentProblem
 
         if (rData.dimension > vData.dimension) {
             calcPathsForVehicles(pathDataMatrix);
+            calcPathsForVehiclesCount++;
         }
         else {
             calcPathsForRequests(pathDataMatrix);
+            calcPathsForRequestsCount++;
+        }
+
+        if ( (calcPathsForRequestsCount + calcPathsForVehiclesCount) % 100 == 0) {
+            System.err.println("PathsForRequests = " + calcPathsForRequestsCount
+                    + " PathsForVehicles = " + calcPathsForVehiclesCount);
+            System.err.println("reqs = " + rData.dimension + " vehs = " + vData.dimension
+                    + " idleVehs = " + vData.idleCount);
         }
 
         return pathDataMatrix;
@@ -188,7 +221,6 @@ public class AssignmentProblem
                 int v = departure.idx;
                 RequestPathData pathData = pathDataMatrix[v][r] = new RequestPathData();
 
-                double delay = departure.time - currTime;
                 if (departure.link == toLink) {
                     //hack: we are basically there (on the same link), so let's pretend vehNode == toNode
                     pathData.node = toNode;
@@ -207,8 +239,7 @@ public class AssignmentProblem
             }
 
             ImaginaryNode fromNodes = backwardRouter.createImaginaryNode(vehInitialNodes.values());
-            Path path = backwardRouter.calcLeastCostPath(toNode, fromNodes, currTime, null,
-                    null);
+            Path path = backwardRouter.calcLeastCostPath(toNode, fromNodes, currTime, null, null);
             Node bestVehNode = path.nodes.get(path.nodes.size() - 1);
             pathsFromVehNodes.put(bestVehNode.getId(), path);
 
