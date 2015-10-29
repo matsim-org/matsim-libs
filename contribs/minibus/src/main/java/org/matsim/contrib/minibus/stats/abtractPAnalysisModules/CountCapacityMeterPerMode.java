@@ -23,9 +23,14 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
+import org.matsim.api.core.v01.events.Wait2LinkEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
+import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.events.handler.Vehicle2DriverEventHandler;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.Vehicles;
 
@@ -38,7 +43,7 @@ import java.util.HashMap;
  * @author aneumann
  *
  */
-final class CountCapacityMeterPerMode extends AbstractPAnalyisModule implements TransitDriverStartsEventHandler, LinkEnterEventHandler{
+final class CountCapacityMeterPerMode extends AbstractPAnalyisModule implements TransitDriverStartsEventHandler, LinkEnterEventHandler, Wait2LinkEventHandler, VehicleLeavesTrafficEventHandler{
 	
 	private final static Logger log = Logger.getLogger(CountCapacityMeterPerMode.class);
 	
@@ -47,6 +52,8 @@ final class CountCapacityMeterPerMode extends AbstractPAnalyisModule implements 
 	
 	private HashMap<Id<Vehicle>, String> vehId2ptModeMap;
 	private HashMap<String, Double> ptMode2CountMap;
+	
+	private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
 
 	
 	public CountCapacityMeterPerMode(Network network){
@@ -83,6 +90,7 @@ final class CountCapacityMeterPerMode extends AbstractPAnalyisModule implements 
 		super.reset(iteration);
 		this.vehId2ptModeMap = new HashMap<>();
 		this.ptMode2CountMap = new HashMap<>();
+		delegate.reset(iteration);
 	}
 
 	@Override
@@ -107,7 +115,7 @@ final class CountCapacityMeterPerMode extends AbstractPAnalyisModule implements 
 		}
 		
 		double capacity;
-		if(super.ptDriverIds.contains(event.getDriverId())){
+		if(super.ptDriverIds.contains(delegate.getDriverOfVehicle(event.getVehicleId()))){
 			capacity = this.vehId2VehicleCapacity.get(event.getVehicleId());
 		}else{
 			// it's a car, which will not appear in the vehicles-list, called in updateVehicles \dr
@@ -121,5 +129,15 @@ final class CountCapacityMeterPerMode extends AbstractPAnalyisModule implements 
 	
 	public HashMap<String, Double> getResults(){
 		return this.ptMode2CountMap;
+	}
+
+	@Override
+	public void handleEvent(VehicleLeavesTrafficEvent event) {
+		delegate.handleEvent(event);
+	}
+
+	@Override
+	public void handleEvent(Wait2LinkEvent event) {
+		delegate.handleEvent(event);
 	}
 }
