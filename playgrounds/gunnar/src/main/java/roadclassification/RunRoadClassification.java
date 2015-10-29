@@ -92,7 +92,7 @@ public class RunRoadClassification {
 		boolean interpolate = false;
 		int maxIterations = 100;
 		int maxTransitions = 100;
-		int populationSize = 10;
+		int populationSize = 2;
 		DecisionVariableRandomizer<RoadClassificationDecisionVariable> randomizer = new DecisionVariableRandomizer<RoadClassificationDecisionVariable>() {
 			@Override
 			public RoadClassificationDecisionVariable newRandomDecisionVariable() {
@@ -111,6 +111,7 @@ public class RunRoadClassification {
 				int bubbleIndex = MatsimRandom.getRandom().nextInt(decisionVariable.getLinkSettingses().size()-2)+1;
 				RoadClassificationDecisionVariable var1 = new RoadClassificationDecisionVariable(scenario.getNetwork(), linkAttributes, shiftUp(bubbleIndex, decisionVariable.getLinkSettingses()));
 				RoadClassificationDecisionVariable var2 = new RoadClassificationDecisionVariable(scenario.getNetwork(), linkAttributes, shiftDown(bubbleIndex, decisionVariable.getLinkSettingses()));
+//				var2 = new RoadClassificationDecisionVariable(scenario.getNetwork(), linkAttributes, almostRealLinkSettings);
 				return Arrays.asList(var1, var2);
 			}
 		};
@@ -155,16 +156,18 @@ public class RunRoadClassification {
 	}
 
 	private static List<LinkSettings> shiftDown(int bubbleIndex, List<LinkSettings> linkSettingses) {
+		int targetIndex = MatsimRandom.getRandom().nextInt(linkSettingses.size()-bubbleIndex)+bubbleIndex;
 		ArrayList<LinkSettings> result = new ArrayList<>(linkSettingses);
 		LinkSettings element = result.remove(bubbleIndex);
-		result.add(bubbleIndex+1, element);
+		result.add(targetIndex, element);
 		return result;
 	}
 
 	private static List<LinkSettings> shiftUp(int bubbleIndex, List<LinkSettings> linkSettingses) {
+		int targetIndex = MatsimRandom.getRandom().nextInt(bubbleIndex+1);
 		ArrayList<LinkSettings> result = new ArrayList<>(linkSettingses);
 		LinkSettings element = result.remove(bubbleIndex);
-		result.add(bubbleIndex-1, element);
+		result.add(targetIndex, element);
 		return result;
 	}
 
