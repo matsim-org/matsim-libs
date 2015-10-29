@@ -59,7 +59,7 @@ public class MultiModalModule extends AbstractModule {
             if (mode.equals(TransportMode.walk)) {
                 Provider<TravelTime> factory = new WalkTravelTimeFactory(plansCalcRouteConfigGroup, linkSlopes);
                 addTravelTimeBinding(mode).toProvider(factory);
-                addTravelDisutilityFactoryBinding(mode).to(RandomizingTimeDistanceTravelDisutility.Builder.class).asEagerSingleton();
+                addTravelDisutilityFactoryBinding(mode).toInstance( new RandomizingTimeDistanceTravelDisutility.Builder( mode ) );
                 addRoutingModuleBinding(mode).toProvider(new TripRouterFactoryModule.NetworkRoutingModuleProvider(mode));
             } else if (mode.equals(TransportMode.transit_walk)) {
                 Provider<TravelTime> factory = new TransitWalkTravelTimeFactory(plansCalcRouteConfigGroup, linkSlopes);
@@ -69,7 +69,7 @@ public class MultiModalModule extends AbstractModule {
             } else if (mode.equals(TransportMode.bike)) {
                 Provider<TravelTime> factory = new BikeTravelTimeFactory(plansCalcRouteConfigGroup, linkSlopes);
                 addTravelTimeBinding(mode).toProvider(factory);
-                addTravelDisutilityFactoryBinding(mode).to(RandomizingTimeDistanceTravelDisutility.Builder.class).asEagerSingleton();
+                addTravelDisutilityFactoryBinding(mode).toInstance( new RandomizingTimeDistanceTravelDisutility.Builder( mode ) );
                 addRoutingModuleBinding(mode).toProvider(new TripRouterFactoryModule.NetworkRoutingModuleProvider(mode));
             } else {
                 Provider<TravelTime> factory = additionalTravelTimeFactories.get(mode);
@@ -84,7 +84,7 @@ public class MultiModalModule extends AbstractModule {
                             " for mode " + mode + ".");
                 }
                 addTravelTimeBinding(mode).toProvider(factory);
-                addTravelDisutilityFactoryBinding(mode).to(RandomizingTimeDistanceTravelDisutility.Builder.class).asEagerSingleton();
+                addTravelDisutilityFactoryBinding(mode).toInstance(new RandomizingTimeDistanceTravelDisutility.Builder( mode ));
                 addRoutingModuleBinding(mode).toProvider(new TripRouterFactoryModule.NetworkRoutingModuleProvider(mode));
             }
         }

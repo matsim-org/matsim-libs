@@ -121,7 +121,7 @@ public class PassengerRunner {
 	}
 	
 	private static TripRouter createTripRouterInstance(Scenario scenario, Provider<TripRouter> tripRouterFactory) {
-		TravelDisutilityFactory travelDisutilityFactory = new Builder();
+		TravelDisutilityFactory travelDisutilityFactory = new Builder( TransportMode.car );
 		TravelTime travelTime = new FreeSpeedTravelTime();
 		TravelDisutility travelDisutility = travelDisutilityFactory.createTravelDisutility(travelTime, scenario.getConfig().planCalcScore());
 		RoutingContext routingContext = new RoutingContextImpl(travelDisutility, travelTime);
@@ -140,7 +140,7 @@ public class PassengerRunner {
 		Provider<TransitRouter> transitRouterFactory = null;
 		if (scenario.getConfig().transit().isUseTransit()) transitRouterFactory = builder.createDefaultTransitRouter(scenario);
 
-		TravelDisutilityFactory travelDisutilityFactory = new Builder();
+		TravelDisutilityFactory travelDisutilityFactory = new Builder( TransportMode.car );
 		Provider<TripRouter> defaultDelegateFactory = new DefaultDelegateFactory(scenario, leastCostPathCalculatorFactory);
 		Provider<TripRouter> multiModalTripRouterFactory = new MultimodalTripRouterFactory(scenario, multiModalTravelTimes,
 				travelDisutilityFactory, defaultDelegateFactory, new FastDijkstraFactory());

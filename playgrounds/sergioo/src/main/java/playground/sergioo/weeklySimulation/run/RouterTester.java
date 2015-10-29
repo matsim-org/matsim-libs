@@ -2,6 +2,7 @@ package playground.sergioo.weeklySimulation.run;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -27,7 +28,7 @@ public class RouterTester {
 		EventsManager eventsManager = EventsUtils.createEventsManager(scenario.getConfig());
 		eventsManager.addHandler(travelTimeCalculator);
 		(new MatsimEventsReader(eventsManager)).readFile(args[2]);
-		TravelDisutility disutilityFunction = (new Builder()).createTravelDisutility(travelTimeCalculator.getLinkTravelTimes(), scenario.getConfig().planCalcScore());
+		TravelDisutility disutilityFunction = (new Builder( TransportMode.car )).createTravelDisutility(travelTimeCalculator.getLinkTravelTimes(), scenario.getConfig().planCalcScore());
 		PreProcessDijkstra preProcessDijkstra = new PreProcessDijkstra();
 		preProcessDijkstra.run(scenario.getNetwork());
 		Dijkstra dijkstra = new Dijkstra(scenario.getNetwork(), disutilityFunction, travelTimeCalculator.getLinkTravelTimes());

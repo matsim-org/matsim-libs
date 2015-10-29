@@ -237,7 +237,7 @@ public class GeneticAlgorithmMode {
 		if(!args[5].equals("NO"))
 			new MatsimEventsReader(events).readFile(args[5]);
 		routerManager = new RouterManager(scenario.getConfig().global().getNumberOfThreads(), scenario, travelTimeCalculator.getLinkTravelTimes(), waitTimeCalculator.getWaitTimes(), stopStopTimeCalculator.getStopStopTimes());
-		final TravelDisutilityFactory factory = new Builder();
+		final TravelDisutilityFactory factory = new Builder( TransportMode.car );
 		final TravelDisutility disutility = factory.createTravelDisutility(travelTimeCalculator.getLinkTravelTimes(), scenario.getConfig().planCalcScore());
 		final Provider<TransitRouter> transitRouterFactory = new TransitRouterWSImplFactory(scenario, waitTimeCalculator.getWaitTimes(), stopStopTimeCalculator.getStopStopTimes());
 		ReplanningContext context = new ReplanningContext() {

@@ -27,6 +27,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.otfvis.OTFVisModule;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
@@ -130,7 +131,7 @@ public class CNTest {
 		TollHandler tollHandler = new TollHandler(controler.getScenario());
 
 		final CongestionTollTimeDistanceTravelDisutilityFactory factory = new CongestionTollTimeDistanceTravelDisutilityFactory(
-				new Builder(),
+				new Builder( TransportMode.car ),
 				tollHandler
 			) ;
 		factory.setSigma(3.);

@@ -145,7 +145,7 @@ public class CreateBackgroundPopulation {
 		int numOrigins = startLinkIds.length;
 		
 		TravelTime travelTime = new FreeSpeedTravelTime();
-		TravelDisutility travelDisutility = new Builder().createTravelDisutility(travelTime,
+		TravelDisutility travelDisutility = new Builder( TransportMode.car ).createTravelDisutility(travelTime,
 				config.planCalcScore());
 		HighwayTravelDisutility highwayTravelDisutility = new HighwayTravelDisutility(travelDisutility);
 		

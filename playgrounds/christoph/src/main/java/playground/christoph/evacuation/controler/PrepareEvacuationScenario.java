@@ -81,7 +81,7 @@ import javax.inject.Provider;
  */
 public class PrepareEvacuationScenario {
 	
-	private final TravelDisutilityFactory travelDisutilityFactory = new Builder();
+	private final TravelDisutilityFactory travelDisutilityFactory = new Builder( TransportMode.car );
 	private final TravelTime travelTime = new FreeSpeedTravelTime();
 	
 	public void prepareScenario(Scenario scenario) {

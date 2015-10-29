@@ -60,7 +60,7 @@ public class InvertertedNetworkLegRouterTest {
 	public void testInvertedNetworkLegRouter() {
 		Fixture f = new Fixture();
 		LinkToLinkTravelTimeStub tt = new LinkToLinkTravelTimeStub();
-		TravelDisutilityFactory tc = new Builder();
+		TravelDisutilityFactory tc = new Builder( TransportMode.car );
 		LeastCostPathCalculatorFactory lcpFactory = new DijkstraFactory();
 
 		Person person = PersonImpl.createPerson(Id.create(1, Person.class));

@@ -34,6 +34,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -94,7 +95,7 @@ public class MyZoneToZoneRouter {
 	public void prepareTravelTimeData(final String eventsFilename){
 		log.info("Processing the events file for zone-to-zone travel time calculation");
 		TravelTimeCalculator travelTimeCalculator = TravelTimeCalculator.create(scenario.getNetwork(), scenario.getConfig().travelTimeCalculator());
-		TravelDisutilityFactory tccf = new Builder();
+		TravelDisutilityFactory tccf = new Builder( TransportMode.car );
 		TravelDisutility travelCost = tccf.createTravelDisutility(travelTimeCalculator.getLinkTravelTimes(), scenario.getConfig().planCalcScore());
 		
 		EventsManager em = EventsUtils.createEventsManager();

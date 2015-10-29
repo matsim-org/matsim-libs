@@ -183,7 +183,7 @@ public class HITSAnalyserPostgresqlSummary {
 
 		// now for car
 
-		TravelDisutility travelDisutility = new Builder()
+		TravelDisutility travelDisutility = new Builder( TransportMode.car )
 				.createTravelDisutility(travelTimeCalculator.getLinkTravelTimes(), scenario.getConfig().planCalcScore());
 		carCongestedDijkstra = new Dijkstra(scenario.getNetwork(), travelDisutility,
 				travelTimeCalculator.getLinkTravelTimes());

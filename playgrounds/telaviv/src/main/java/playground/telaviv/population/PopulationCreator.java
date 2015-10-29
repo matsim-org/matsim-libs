@@ -212,7 +212,7 @@ public class PopulationCreator {
 		TimeAllocationMutator timeAllocationMutator = new TimeAllocationMutator(config, timeMutationRange, true);
 		
 		final TravelTime travelTime = new FreeSpeedTravelTime();
-		TravelDisutilityFactory travelDisutilityFactory = new Builder();
+		TravelDisutilityFactory travelDisutilityFactory = new Builder( TransportMode.car );
 		final TravelDisutility travelDisutility = travelDisutilityFactory.createTravelDisutility(travelTime, scenario.getConfig().planCalcScore());
 		final ScoringFunctionFactory scoringFunctionFactory = new CharyparNagelOpenTimesScoringFunctionFactory( scenario );
 		final Provider<TripRouter> tripRouterFactory = TripRouterFactoryBuilderWithDefaults.createTripRouterProvider(scenario, new DijkstraFactory(), null);

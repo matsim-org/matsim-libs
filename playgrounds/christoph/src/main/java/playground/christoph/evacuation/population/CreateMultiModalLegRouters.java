@@ -124,7 +124,7 @@ public class CreateMultiModalLegRouters {
 		TravelTime travelTime;
 		TravelDisutility travelDisutility;
 		LeastCostPathCalculator routeAlgo;
-		TravelDisutilityFactory travlDisutilityFactory = new Builder();
+		TravelDisutilityFactory travlDisutilityFactory = new Builder( TransportMode.car );
 		TransportModeNetworkFilter networkFilter = new TransportModeNetworkFilter(network);
 		for (String mode : modesToReroute) {
 			

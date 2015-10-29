@@ -23,6 +23,7 @@ package org.matsim.contrib.locationchoice;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.router.*;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
@@ -78,7 +79,7 @@ public class BestReplyLocationChoicePlanStrategyTest {
 		
 		public ReplanningContextImpl(Scenario scenario) {
 			this.travelTime = new FreeSpeedTravelTime();
-			this.travelDisutility = new RandomizingTimeDistanceTravelDisutility.Builder().createTravelDisutility(this.travelTime, scenario.getConfig().planCalcScore());
+			this.travelDisutility = new RandomizingTimeDistanceTravelDisutility.Builder( TransportMode.car ).createTravelDisutility(this.travelTime, scenario.getConfig().planCalcScore());
 			this.scoringFunctionFactory = new CharyparNagelScoringFunctionFactory( scenario );
 			this.tripRouterFactory = new TripRouterFactoryBuilderWithDefaults().build(scenario);
 		}

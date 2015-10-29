@@ -8,6 +8,7 @@ import java.util.Iterator;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
@@ -107,7 +108,7 @@ public void run(final String[] args) throws IOException {
 		// add algorithm to estimate travel cost
 		// and which performs routing based on that
 		TravelTimeCalculator travelTimeCalculator = Events2TTCalculator.getTravelTimeCalculator(sc, eventsFile);
-	TravelDisutilityFactory travelCostCalculatorFactory = new Builder();
+	TravelDisutilityFactory travelCostCalculatorFactory = new Builder( TransportMode.car );
 		TravelDisutility travelCostCalculator = travelCostCalculatorFactory.createTravelDisutility(travelTimeCalculator.getLinkTravelTimes(), this.config.planCalcScore());
 		plans.addAlgorithm(
 				new PlanRouter(

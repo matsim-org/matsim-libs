@@ -27,6 +27,7 @@ package playground.ikaddoura;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.otfvis.OTFVisModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -129,7 +130,7 @@ public class CongestionPricingControler {
 
 			if (router.equals("standard")) {
 
-				final Builder factory = new Builder();
+				final Builder factory = new Builder( TransportMode.car );
 				factory.setSigma(sigma);
 				controler.addOverridingModule(new AbstractModule(){
 					@Override
@@ -163,7 +164,7 @@ public class CongestionPricingControler {
 			
 			if (router.equals("standard")) {
 
-				final CongestionTollTimeDistanceTravelDisutilityFactory factory = new CongestionTollTimeDistanceTravelDisutilityFactory(new Builder(), tollHandler);
+				final CongestionTollTimeDistanceTravelDisutilityFactory factory = new CongestionTollTimeDistanceTravelDisutilityFactory(new Builder( TransportMode.car ), tollHandler);
 				factory.setSigma(sigma);
 				
 				controler.addOverridingModule(new AbstractModule() {

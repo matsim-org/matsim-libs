@@ -3,6 +3,7 @@ package playground.wrashid.diverse.erath;
 import java.util.Iterator;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -107,7 +108,7 @@ public class LoadedNetworkRouter {
 		// add algorithm to estimate travel cost
 		// and which performs routing based on that
 		TravelTimeCalculator travelTimeCalculator= Events2TTCalculator.getTravelTimeCalculator(scenario, eventsFile);
-		TravelDisutilityFactory travelCostCalculatorFactory = new Builder();
+		TravelDisutilityFactory travelCostCalculatorFactory = new Builder( TransportMode.car );
 		TravelDisutility travelCostCalculator = travelCostCalculatorFactory.createTravelDisutility(travelTimeCalculator.getLinkTravelTimes(), this.config.planCalcScore());
 		plans.addAlgorithm(
 				new PlanRouter(

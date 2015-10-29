@@ -133,7 +133,8 @@ public class PlansCalcRouteWithTollOrNotTest {
 						addTravelTimeBinding(TransportMode.car).to(FreeSpeedTravelTime.class);
 						bind(PlansCalcRouteWithTollOrNot.class);
 						install(new ScenarioElementsModule());
-						addTravelDisutilityFactoryBinding(TransportMode.car).to(RandomizingTimeDistanceTravelDisutility.Builder.class);
+						addTravelDisutilityFactoryBinding(TransportMode.car).toInstance(
+								new RandomizingTimeDistanceTravelDisutility.Builder( TransportMode.car ) );
 						install(new TripRouterModule());
 						addControlerListenerBinding().to(RoadPricingControlerListener.class);
 

@@ -73,7 +73,7 @@ public class PrepareEvacuationScenarioListener {
 
 	private static final Logger log = Logger.getLogger(PrepareEvacuationScenarioListener.class);
 	
-	private final TravelDisutilityFactory travelDisutilityFactory = new Builder();
+	private final TravelDisutilityFactory travelDisutilityFactory = new Builder( TransportMode.car );
 	private final TravelTime travelTime = new FreeSpeedTravelTime();
 	
 	private TransitRouterNetwork transitRouterNetwork;

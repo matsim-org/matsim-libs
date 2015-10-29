@@ -122,7 +122,7 @@ public class PSeudoQSimCompareEventsTest {
 	private TripRouter createTripRouter(TravelTimeCalculator travelTime, Scenario scenario) {
 		final TripRouterFactoryBuilderWithDefaults builder = new TripRouterFactoryBuilderWithDefaults();
 		builder.setTravelDisutility(
-				new RandomizingTimeDistanceTravelDisutility.Builder().createTravelDisutility(
+				new RandomizingTimeDistanceTravelDisutility.Builder( TransportMode.car ).createTravelDisutility(
 						travelTime.getLinkTravelTimes() ,
 						scenario.getConfig().planCalcScore() ));
 		builder.setTravelTime( travelTime.getLinkTravelTimes() );

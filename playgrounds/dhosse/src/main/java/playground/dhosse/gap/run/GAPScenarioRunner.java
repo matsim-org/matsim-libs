@@ -287,13 +287,13 @@ public class GAPScenarioRunner {
 					if(mode.equals(TransportMode.bike)){
 						
 						addTravelTimeBinding(mode).toProvider(new BikeTravelTimeFactory(controler.getConfig().plansCalcRoute()));
-						addTravelDisutilityFactoryBinding(mode).to(RandomizingTimeDistanceTravelDisutility.Builder.class).asEagerSingleton();
+						addTravelDisutilityFactoryBinding(mode).toInstance( new RandomizingTimeDistanceTravelDisutility.Builder( mode ) );
 						addRoutingModuleBinding(mode).toProvider(new TripRouterFactoryModule.NetworkRoutingModuleProvider(mode));
 						
 					} else if(mode.equals(TransportMode.walk)){
 						
 						addTravelTimeBinding(mode).toProvider(new WalkTravelTimeFactory(controler.getConfig().plansCalcRoute()));
-						addTravelDisutilityFactoryBinding(mode).to(RandomizingTimeDistanceTravelDisutility.Builder.class).asEagerSingleton();
+						addTravelDisutilityFactoryBinding(mode).toInstance( new RandomizingTimeDistanceTravelDisutility.Builder( mode ) );
 						addRoutingModuleBinding(mode).toProvider(new TripRouterFactoryModule.NetworkRoutingModuleProvider(mode));
 						
 					}

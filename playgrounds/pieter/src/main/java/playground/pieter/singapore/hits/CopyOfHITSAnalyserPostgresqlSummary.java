@@ -186,7 +186,7 @@ public class CopyOfHITSAnalyserPostgresqlSummary {
 			eventsManager.addHandler(travelTimeCalculator);
 			(new MatsimEventsReader(eventsManager)).readFile(carEventsFileName);
 		}
-		TravelDisutility travelDisutility = new Builder()
+		TravelDisutility travelDisutility = new Builder( TransportMode.car )
 				.createTravelDisutility(travelTimeCalculator.getLinkTravelTimes(), scenario.getConfig().planCalcScore());
 		carCongestedDijkstra = new Dijkstra(scenario.getNetwork(), travelDisutility,
 				travelTimeCalculator.getLinkTravelTimes());

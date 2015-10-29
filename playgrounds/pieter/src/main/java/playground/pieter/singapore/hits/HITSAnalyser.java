@@ -179,7 +179,7 @@ public class HITSAnalyser {
 		}
 
 		// now for car
-		TravelDisutility travelDisutility = new Builder()
+		TravelDisutility travelDisutility = new Builder( TransportMode.car )
 				.createTravelDisutility(travelTimeCalculator
 						.getLinkTravelTimes(), scenario.getConfig()
 						.planCalcScore());

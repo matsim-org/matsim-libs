@@ -65,10 +65,6 @@ public final class RandomizingTimeDistanceTravelDisutility implements TravelDisu
 		private final String mode;
 		private double sigma = 0. ;
 
-		public Builder() {
-			this( TransportMode.car );
-		}
-
 		public Builder( final String mode ) {
 			this.mode = mode;
 		}

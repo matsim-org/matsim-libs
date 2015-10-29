@@ -19,6 +19,7 @@
 package tutorial.programming.randomizingRouter;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
@@ -46,7 +47,7 @@ public class RunRandomizingRouterExample {
 
 		Controler controler = new Controler( scenario ) ;
 
-		final Builder factory = new Builder();
+		final Builder factory = new Builder( TransportMode.car );
 		factory.setSigma(3.) ; 	// this sets the routing randomness (currently between time and money only, so be careful
 								// that you have a monetary term in the standard disutility, e.g. a distance cost)
 		

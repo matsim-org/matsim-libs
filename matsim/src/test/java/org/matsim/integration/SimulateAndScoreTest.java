@@ -180,7 +180,7 @@ public class SimulateAndScoreTest extends MatsimTestCase {
 					@Override
 					public void install() {
 						bind(Scenario.class).toInstance(scenario);
-						addTravelDisutilityFactoryBinding("car").toInstance(new Builder());
+						addTravelDisutilityFactoryBinding("car").toInstance(new Builder( TransportMode.car ));
 					}
 				}));
 			}
