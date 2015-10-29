@@ -31,7 +31,9 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
 
+import java.util.Collections;
 import java.util.Random;
+import java.util.Set;
 
 /**
  * A simple cost calculator which only respects time and distance to calculate generalized costs
@@ -60,29 +62,33 @@ public final class RandomizingTimeDistanceTravelDisutility implements TravelDisu
 
 	// === start Builder ===
 	public static class Builder implements TravelDisutilityFactory{
+		private final String mode;
 		private double sigma = 0. ;
 
-		public Builder() {}
+		public Builder() {
+			this( TransportMode.car );
+		}
+
+		public Builder( final String mode ) {
+			this.mode = mode;
+		}
 
 		@Override
-		public RandomizingTimeDistanceTravelDisutility createTravelDisutility(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
+		public RandomizingTimeDistanceTravelDisutility createTravelDisutility(
+				final TravelTime timeCalculator,
+				final PlanCalcScoreConfigGroup cnScoringGroup) {
+			logWarningsIfNecessary( cnScoringGroup );
+
 			/* Usually, the travel-utility should be negative (it's a disutility) but the cost should be positive. Thus negate the utility.*/
-			double marginalCostOfTime_s = (-cnScoringGroup.getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() / 3600.0) + (cnScoringGroup.getPerforming_utils_hr() / 3600.0);
+			final ModeParams params = cnScoringGroup.getModes().get( mode ) ;
+			final double marginalCostOfTime_s = (-params.getMarginalUtilityOfTraveling() / 3600.0) + (cnScoringGroup.getPerforming_utils_hr() / 3600.0);
 
-			double marginalCostOfDistance_m = -cnScoringGroup.getModes().get(TransportMode.car).getMonetaryDistanceRate() * cnScoringGroup.getMarginalUtilityOfMoney() ;
+			final double marginalCostOfDistance_m = -params.getMonetaryDistanceRate() * cnScoringGroup.getMarginalUtilityOfMoney() ;
 
-			ModeParams params = cnScoringGroup.getModes().get( TransportMode.car ) ;
 			if ( params.getMarginalUtilityOfDistance() !=  0.0 ) {
 				throw new RuntimeException( "marginal utility of distance not honored for travel disutility; aborting ... (should be easy to implement)") ;
 			}
 
-			if ( wrnCnt < 1 ) {
-				wrnCnt++ ;
-				if ( cnScoringGroup.getModes().get(TransportMode.car).getMonetaryDistanceRate() > 0. ) {
-					Logger.getLogger(this.getClass()).warn("Monetary distance cost rate needs to be NEGATIVE to produce the normal " +
-					"behavior; just found positive.  Continuing anyway.  This behavior may be changed in the future.") ;
-				}
-			}
 
 			double normalization = 1;
 			if ( sigma != 0. ) {
@@ -99,6 +105,23 @@ public final class RandomizingTimeDistanceTravelDisutility implements TravelDisu
 					marginalCostOfDistance_m,
 					normalization,
 					sigma);
+		}
+
+		private void logWarningsIfNecessary(final PlanCalcScoreConfigGroup cnScoringGroup) {
+			if ( wrnCnt < 1 ) {
+				wrnCnt++ ;
+				if ( cnScoringGroup.getModes().get( mode ).getMonetaryDistanceRate() > 0. ) {
+					log.warn("Monetary distance cost rate needs to be NEGATIVE to produce the normal " +
+							"behavior; just found positive.  Continuing anyway.  This behavior may be changed in the future.") ;
+				}
+
+				final Set<String> monoSubpopKeyset = Collections.singleton( null );
+				if ( !cnScoringGroup.getScoringParametersPerSubpopulation().keySet().equals( monoSubpopKeyset ) ) {
+					log.warn( "Scoring parameters are defined for different subpopulations." +
+							" The routing disutility will only consider the ones of the default subpopulation.");
+					log.warn( "This warning can safely be ignored if disutility of traveling only depends on travel time.");
+				}
+			}
 		}
 
 		public Builder setSigma( double val ) {
@@ -146,7 +169,9 @@ public final class RandomizingTimeDistanceTravelDisutility implements TravelDisu
 				 * </ul>
 				 * Should be tested. kai, jan'14 */
 			}
-			person.getCustomAttributes().put("logNormalRnd", logNormalRnd ) ; // do not use custom attributes in core??  but what would be a better solution here?? kai, mar'15
+			// do not use custom attributes in core??  but what would be a better solution here?? kai, mar'15
+			// Is this actually used anywhere? As far as I can see, this is at least no used in this class... td, Oct'15
+			person.getCustomAttributes().put("logNormalRnd", logNormalRnd ) ;
 		} else {
 			logNormalRnd = 1. ;
 		}
