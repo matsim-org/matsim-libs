@@ -565,6 +565,7 @@ public class DestinationChoiceConfigGroup extends ConfigGroup {
 		this.addParameterToMap(map, INTERNAL_PLAN_DATA_STRUCTURE);
 		this.addParameterToMap(map, USE_CONFIG_PARAMS_FOR_SCORING);
 		this.addParameterToMap(map, USE_INDIVIDUAL_SCORING_PARAMETERS);
+		this.addParameterToMap(map, RE_USE_TEMPORARY_PLANS);
 		return map;
 	}
 
