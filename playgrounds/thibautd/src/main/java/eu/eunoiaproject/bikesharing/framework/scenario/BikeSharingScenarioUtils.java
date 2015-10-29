@@ -218,18 +218,7 @@ public class BikeSharingScenarioUtils {
 			final String mode ) {
 		return new SlopeAwareTravelDisutilityFactory(
 				scorer,
-				new TravelDisutilityFactory() {
-					@Override
-					public TravelDisutility createTravelDisutility(
-							final TravelTime timeCalculator,
-							final PlanCalcScoreConfigGroup cnScoringGroup ) {
-						final ModeParams pars = cnScoringGroup.getModes().get( mode );
-						return new RandomizingTimeDistanceTravelDisutility(
-									timeCalculator,
-									(-pars.getMarginalUtilityOfTraveling() / 3600.) + (cnScoringGroup.getPerforming_utils_hr() / 3600.0),
-									-pars.getMarginalUtilityOfDistance()  );
-					}
-				} );
+				new RandomizingTimeDistanceTravelDisutility.Builder( mode ) ) ;
 	}
 }
 
