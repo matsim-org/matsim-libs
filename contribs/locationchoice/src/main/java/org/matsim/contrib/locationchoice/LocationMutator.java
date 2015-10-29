@@ -35,7 +35,7 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 
 public abstract class LocationMutator implements PlanAlgorithm {
 
-	protected TreeMap<String, QuadTree<ActivityFacility>> quadTreesOfType;
+	protected TreeMap<String, ? extends QuadTree<ActivityFacility>> quadTreesOfType;
 
 	// avoid costly call of .toArray() within handlePlan() (System.arraycopy()!)
 	protected TreeMap<String, ActivityFacilityImpl []> facilitiesOfType;
@@ -58,7 +58,7 @@ public abstract class LocationMutator implements PlanAlgorithm {
 		this.initLocal(scenario.getNetwork());
 	}
 
-	public LocationMutator(Scenario scenario, TreeMap<String, QuadTree<ActivityFacility>> quad_trees,
+	public LocationMutator(Scenario scenario, TreeMap<String, ? extends QuadTree<ActivityFacility>> quad_trees,
 			TreeMap<String, ActivityFacilityImpl []> facilities_of_type, Random random) {
 		this.dccg = (DestinationChoiceConfigGroup) scenario.getConfig().getModule(DestinationChoiceConfigGroup.GROUP_NAME);
 		this.defineFlexibleActivities = new ActivitiesHandler(this.dccg);
