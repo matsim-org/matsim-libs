@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.config.ConfigUtils;
@@ -63,7 +63,7 @@ public class RouterTester {
 	private final static Logger log = Logger.getLogger(RouterTester.class);
 
 	public static void main(String[] args) {
-		ScenarioImpl s = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario s = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		s.getConfig().transit().setUseTransit(true);
 		s.getConfig().scenario().setUseVehicles(true);
 

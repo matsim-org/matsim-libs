@@ -35,7 +35,7 @@ import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.lanes.LanesUtils;
 import org.matsim.lanes.data.v20.Lane;
-import org.matsim.lanes.data.v20.LaneDefinitions20;
+import org.matsim.lanes.data.v20.Lanes;
 import org.matsim.lanes.data.v20.LaneDefinitionsFactory20;
 import org.matsim.lanes.data.v20.LaneDefinitionsWriter20;
 import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
@@ -268,7 +268,7 @@ public final class TtCreateBraessNetworkAndLanes {
 	 */
 	private void createTrivialLanes() {
 		
-		LaneDefinitions20 laneDef20 = this.scenario.getLanes();
+		Lanes laneDef20 = this.scenario.getLanes();
 		LaneDefinitionsFactory20 fac = laneDef20.getFactory();
 		
 		for (Link link: scenario.getNetwork().getLinks().values()){
@@ -295,7 +295,7 @@ public final class TtCreateBraessNetworkAndLanes {
 	 */
 	private void createRealisticLanes() {
 		
-		LaneDefinitions20 laneDef20 = this.scenario.getLanes();
+		Lanes laneDef20 = this.scenario.getLanes();
 		LaneDefinitionsFactory20 fac = laneDef20.getFactory();
 
 		// create link assignment of link 1_2

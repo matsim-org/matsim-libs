@@ -35,7 +35,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
@@ -74,7 +74,7 @@ public class DestinationChoice extends AbstractMultithreadedModule {
 		((NetworkImpl) this.scenario.getNetwork()).connect();
 
 		this.actTypeConverter = this.defineFlexibleActivities.getConverter();
-		this.initTrees(((ScenarioImpl) this.scenario).getActivityFacilities(), (DestinationChoiceConfigGroup) this.scenario.getConfig().getModule("locationchoice"));
+		this.initTrees(((MutableScenario) this.scenario).getActivityFacilities(), (DestinationChoiceConfigGroup) this.scenario.getConfig().getModule("locationchoice"));
 	}
 
 	/**

@@ -20,7 +20,7 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
@@ -48,7 +48,7 @@ public class StopFacilityGenerator {
 	private Double initialStopOffset = 10.0;	
 	private Double sideOffset = 5.0;
 	private Set<String> allowedModes = new HashSet<String>();
-	private ScenarioImpl sc;	
+	private MutableScenario sc;	
 
 	private HashMap<Id, List<Id>> removedLinks =  new HashMap<Id, List<Id>>(); 
 	private HashMap<Id, Id> linksWithStops =  new HashMap<Id, Id>(); 
@@ -194,7 +194,7 @@ public class StopFacilityGenerator {
 	}
 
 	public StopFacilityGenerator(String network, Integer distanceBetweenStops){
-		this.sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		this.sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		prepareConfig();
 		new MatsimNetworkReader(sc).readFile(network);
 		this.network = (NetworkImpl) sc.getNetwork();

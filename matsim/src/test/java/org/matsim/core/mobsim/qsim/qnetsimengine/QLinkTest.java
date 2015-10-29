@@ -49,7 +49,7 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.utils.EventsCollector;
@@ -249,7 +249,7 @@ public class QLinkTest extends MatsimTestCase {
 	 */
 	public void testBuffer() {
 		Config conf = super.loadConfig(null);
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(conf);
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(conf);
 		
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 		network.setCapacityPeriod(1.0);
@@ -316,7 +316,7 @@ public class QLinkTest extends MatsimTestCase {
 	}
 
 
-	private static Person createPerson(Id<Person> personId, ScenarioImpl scenario, Link link1, Link link2) {
+	private static Person createPerson(Id<Person> personId, MutableScenario scenario, Link link1, Link link2) {
 		Person p = PersonImpl.createPerson(personId);
 		PlanImpl plan = PersonUtils.createAndAddPlan(p, true);
 		plan.createAndAddActivity("h", link1.getId());
@@ -456,7 +456,7 @@ public class QLinkTest extends MatsimTestCase {
 	 * @author mrieser
 	 */
 	private static final class Fixture {
-		/*package*/ final ScenarioImpl scenario;
+		/*package*/ final MutableScenario scenario;
 		/*package*/ final Link link1;
 		/*package*/ final Link link2;
 		/*package*/ final QNetwork queueNetwork;
@@ -466,7 +466,7 @@ public class QLinkTest extends MatsimTestCase {
 		/*package*/ final QSim sim;
 
 		/*package*/ Fixture() {
-			this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+			this.scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 			this.scenario.getConfig().qsim().setStuckTime(100);
 			this.scenario.getConfig().qsim().setRemoveStuckVehicles(true);
 			NetworkImpl network = (NetworkImpl) this.scenario.getNetwork();

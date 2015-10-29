@@ -33,7 +33,7 @@ import org.matsim.core.config.groups.*;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PersonUtils;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.households.*;
@@ -76,7 +76,7 @@ public class GenerateScenarioForDetours {
 				outputPopulation,
 				outputHouseholds );
 
-		final ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario( config );
+		final MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario( config );
 		createNetwork( sc.getNetwork() );
 		createPopulation( sc.getPopulation() , sc.getHouseholds() );
 

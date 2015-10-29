@@ -20,7 +20,7 @@ package org.matsim.contrib.minibus.hook;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import java.util.Set;
@@ -39,7 +39,7 @@ interface PersonReRouteStuckFactory {
 	 * @param agentsStuck
 	 * @return
 	 */
-	public AbstractPersonReRouteStuck getReRouteStuck(PlanAlgorithm router, ScenarioImpl scenario, Set<Id<Person>> agentsStuck) ;
+	public AbstractPersonReRouteStuck getReRouteStuck(PlanAlgorithm router, MutableScenario scenario, Set<Id<Person>> agentsStuck) ;
 
 }
 

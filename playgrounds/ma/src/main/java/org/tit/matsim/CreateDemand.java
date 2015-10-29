@@ -26,7 +26,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.facilities.ActivityFacility;
@@ -343,7 +343,7 @@ public class CreateDemand {
 		}
 		else {
 			facQuadTree = this.builFacQuadTree(
-				activityType, ((ScenarioImpl)scenario).getActivityFacilities().getFacilitiesForActivityType(activityType));	
+				activityType, ((MutableScenario)scenario).getActivityFacilities().getFacilitiesForActivityType(activityType));	
 		}
 		return facQuadTree;
 	}

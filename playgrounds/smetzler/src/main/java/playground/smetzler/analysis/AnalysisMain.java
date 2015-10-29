@@ -31,7 +31,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
 
@@ -55,7 +55,7 @@ public class AnalysisMain {
 	private void run() {
 	
 		Config config = ConfigUtils.loadConfig(configFile);
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.loadScenario(config);
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.loadScenario(config);
 		EventsManager events = EventsUtils.createEventsManager();
 		
 		CongestionEventHandler congestionHandler = new CongestionEventHandler(scenario.getNetwork());

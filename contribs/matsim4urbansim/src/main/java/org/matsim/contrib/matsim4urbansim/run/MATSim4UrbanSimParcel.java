@@ -66,7 +66,7 @@ import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacilitiesImpl;
@@ -210,7 +210,7 @@ class MATSim4UrbanSimParcel{
 		log.info("### DONE with demand generation from urbansim ###");
 
 		// set population in scenario
-		((ScenarioImpl) scenario).setPopulation(newPopulation);
+		((MutableScenario) scenario).setPopulation(newPopulation);
 
 		// running mobsim and assigned controller listener
 		runControler(zones, parcels, opportunities);

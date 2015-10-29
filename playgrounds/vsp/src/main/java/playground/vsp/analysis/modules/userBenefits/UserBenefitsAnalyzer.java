@@ -36,7 +36,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.events.handler.EventHandler;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 
 import playground.vsp.analysis.modules.AbstractAnalysisModule;
 
@@ -49,7 +49,7 @@ import playground.vsp.analysis.modules.AbstractAnalysisModule;
  */
 public class UserBenefitsAnalyzer extends AbstractAnalysisModule{
 	private final static Logger log = Logger.getLogger(UserBenefitsAnalyzer.class);
-	private ScenarioImpl scenario;
+	private MutableScenario scenario;
 	private UserBenefitsCalculator userWelfareCalculator;
 	
 	private double allUsersLogSum;
@@ -60,7 +60,7 @@ public class UserBenefitsAnalyzer extends AbstractAnalysisModule{
 		super(UserBenefitsAnalyzer.class.getSimpleName());
 	}
 	
-	public void init(ScenarioImpl scenario) {
+	public void init(MutableScenario scenario) {
 		this.scenario = scenario;
 		
 		this.userWelfareCalculator = new UserBenefitsCalculator(this.scenario.getConfig(), WelfareMeasure.LOGSUM, false);

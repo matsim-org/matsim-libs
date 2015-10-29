@@ -6,7 +6,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.routes.RouteUtils;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -24,14 +24,14 @@ public class GtfsTest extends MatsimTestCase {
 	public void testGtfsStandardConversion(){
         Config config = ConfigUtils.createConfig();
         config.transit().setUseTransit(true);
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		GtfsConverter gtfs = new GtfsConverter(getPackageInputDirectory(), scenario, new IdentityTransformation());
 		// The WE-Trip is added on July 11th 2011, so calendar.txt and calendar_dates.txt can be checked
 		gtfs.setDate(20110711);
 		gtfs.convert();
 		
 		// The Conversion is done, now read the checked scenario
-		ScenarioImpl checkedScenario = (ScenarioImpl)(ScenarioUtils.createScenario(config));
+		MutableScenario checkedScenario = (MutableScenario)(ScenarioUtils.createScenario(config));
 		new MatsimNetworkReader(checkedScenario).readFile(this.getPackageInputDirectory()+ "/checked/network.xml");
 		new VehicleReaderV1(checkedScenario.getTransitVehicles()).readFile(this.getPackageInputDirectory()+ "/checked/transitVehicles.xml");
 		new TransitScheduleReader(checkedScenario).readFile(this.getPackageInputDirectory()+ "/checked/transitSchedule.xml");
@@ -42,7 +42,7 @@ public class GtfsTest extends MatsimTestCase {
 	public void testGtfsShapedConversion(){
         Config config = ConfigUtils.createConfig();
         config.transit().setUseTransit(true);
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		GtfsConverter gtfs = new GtfsConverter(getPackageInputDirectory(), scenario, new IdentityTransformation());
 		// The WE-Trip is added on July 11th 2011, so calendar.txt and calendar_dates.txt can be checked
 		gtfs.setDate(20110711);
@@ -50,7 +50,7 @@ public class GtfsTest extends MatsimTestCase {
 		gtfs.convert();
 		
 		// The Conversion is done, now read the checked scenario
-		ScenarioImpl checkedScenario = (ScenarioImpl)(ScenarioUtils.createScenario(config));
+		MutableScenario checkedScenario = (MutableScenario)(ScenarioUtils.createScenario(config));
 		new MatsimNetworkReader(checkedScenario).readFile(this.getPackageInputDirectory()+ "/checked/network_shaped.xml");
 		new VehicleReaderV1(checkedScenario.getTransitVehicles()).readFile(this.getPackageInputDirectory()+ "/checked/transitVehicles.xml");
 		new TransitScheduleReader(checkedScenario).readFile(this.getPackageInputDirectory()+ "/checked/transitSchedule_shaped.xml");
@@ -58,13 +58,13 @@ public class GtfsTest extends MatsimTestCase {
 		this.compareResults(checkedScenario, scenario);	
 	}
 	
-	private void compareResults(ScenarioImpl expected, ScenarioImpl actual){
+	private void compareResults(MutableScenario expected, MutableScenario actual){
 		this.compareNetworks(expected, actual);
 		this.compareTransitVehicles(expected, actual);
 		this.compareTransitSchedules(expected, actual);
 	}
 
-	private void compareTransitSchedules(ScenarioImpl sc1, ScenarioImpl sc2) {
+	private void compareTransitSchedules(MutableScenario sc1, MutableScenario sc2) {
 		TransitSchedule ts1 = sc1.getTransitSchedule();
 		TransitSchedule ts2 = sc2.getTransitSchedule();
 		assertEquals(ts1.getFacilities().size(),ts2.getFacilities().size());
@@ -92,14 +92,14 @@ public class GtfsTest extends MatsimTestCase {
 		}
 	}
 
-	private void compareTransitVehicles(ScenarioImpl sc1, ScenarioImpl sc2) {
+	private void compareTransitVehicles(MutableScenario sc1, MutableScenario sc2) {
 		Vehicles v1 = sc1.getTransitVehicles();
 		Vehicles v2 = sc2.getTransitVehicles();
 		assertEquals(v1.getVehicles().size(),v2.getVehicles().size());
 		assertEquals(v1.getVehicleTypes().size(),v2.getVehicleTypes().size());
 	}
 
-	private void compareNetworks(ScenarioImpl sc1, ScenarioImpl sc2) {
+	private void compareNetworks(MutableScenario sc1, MutableScenario sc2) {
 		Network n1 = sc1.getNetwork();
 		Network n2 = sc2.getNetwork();
 		assertEquals(n1.getLinks().size(), n2.getLinks().size());

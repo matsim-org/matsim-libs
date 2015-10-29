@@ -35,7 +35,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.testcases.MatsimTestUtils;
 
 import playground.vsp.congestion.events.CongestionEvent;
@@ -60,7 +60,7 @@ public class MarginalCongestionHandlerV3Test {
 		Controler controler = new Controler(configFile);
 		
 		EventsManager events = controler.getEvents();
-		events.addHandler(new CongestionHandlerImplV3(events, (ScenarioImpl) controler.getScenario()));
+		events.addHandler(new CongestionHandlerImplV3(events, (MutableScenario) controler.getScenario()));
 				
 		final List<CongestionEvent> congestionEvents = new ArrayList<CongestionEvent>();
 		

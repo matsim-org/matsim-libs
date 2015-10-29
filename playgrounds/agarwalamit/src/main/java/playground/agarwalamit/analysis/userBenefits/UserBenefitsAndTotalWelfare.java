@@ -31,7 +31,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.EventHandler;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.utils.LoadMyScenarios;
@@ -46,7 +46,7 @@ public class UserBenefitsAndTotalWelfare {
 	public static final Logger logger = Logger.getLogger(UserBenefitsAndTotalWelfare.class);
 	private String outputDir;
 	private final WelfareMeasure welfareMeasure = WelfareMeasure.SELECTED;
-	private ScenarioImpl sc;
+	private MutableScenario sc;
 	
 	public UserBenefitsAndTotalWelfare(String outputDir) {
 		this.outputDir = outputDir;
@@ -92,7 +92,7 @@ public class UserBenefitsAndTotalWelfare {
 		String configFile = runPath+"/output_config.xml";
 		String plansFile = outputDir+runCase+"/output_plans.xml.gz";
 		Scenario scenario = LoadMyScenarios.loadScenarioFromPlansAndConfig(plansFile, configFile);
-		sc = (ScenarioImpl) scenario;
+		sc = (MutableScenario) scenario;
 	}
 
 	public double getAllUserBenefits(String runCase, WelfareMeasure welfareMeasure){
@@ -114,7 +114,7 @@ public class UserBenefitsAndTotalWelfare {
 		double excludedToll =0;
 
 		MonetaryPaymentsAnalyzer paymentsAnalyzer = new MonetaryPaymentsAnalyzer();
-		paymentsAnalyzer.init((ScenarioImpl) sc);
+		paymentsAnalyzer.init((MutableScenario) sc);
 		paymentsAnalyzer.preProcessData();
 
 		EventsManager events = EventsUtils.createEventsManager();

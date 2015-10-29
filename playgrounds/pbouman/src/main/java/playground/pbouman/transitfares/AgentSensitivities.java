@@ -6,7 +6,7 @@ import java.util.regex.Pattern;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.config.ConfigGroup;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 
 public class AgentSensitivities
 {	
@@ -17,9 +17,9 @@ public class AgentSensitivities
 	public double minimum = 1;
 	private LinkedList<SensitivityPattern> patterns;
 	
-	private ScenarioImpl scenario;
+	private MutableScenario scenario;
 
-	public AgentSensitivities(ScenarioImpl si)
+	public AgentSensitivities(MutableScenario si)
 	{
 		scenario = si;
 		compilePatterns();

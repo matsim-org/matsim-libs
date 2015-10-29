@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.run.NetworkCleaner;
@@ -52,7 +52,7 @@ import org.matsim.utils.gis.matsim2esri.network.PolygonFeatureGenerator;
  */
 public class cleanGautengNetwork {
 	private Logger log;
-	private ScenarioImpl sc;	
+	private MutableScenario sc;	
 	private String inputNetwork;
 	private String outputNetwork;
 	private String outputShapefile;
@@ -124,7 +124,7 @@ public class cleanGautengNetwork {
 	 */
 	private void updateLaneDefinitions(String networkToRead, String networkToWrite){
 		this.log.info("Updating lane definitions...");
-		sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		NetworkReaderMatsimV1 nwr = new NetworkReaderMatsimV1(sc);
 		nwr.parse(networkToRead);
 
@@ -184,7 +184,7 @@ public class cleanGautengNetwork {
 	 */
 	private void readNetwork(String networkToRead){
 		this.log.info("Reading cleaned network from " + networkToRead);
-		sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		
 		new NetworkReaderMatsimV1(sc).parse(networkToRead);
 		this.log.info("Network read successfully.");

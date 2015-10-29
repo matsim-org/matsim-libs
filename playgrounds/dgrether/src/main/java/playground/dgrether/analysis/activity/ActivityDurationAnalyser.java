@@ -32,7 +32,7 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.roadpricing.RoadPricingScheme;
@@ -78,7 +78,7 @@ public class ActivityDurationAnalyser {
 	public ActivityDurationAnalyser() {
 		this.config = ConfigUtils.loadConfig(configfile);
 
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(this.config);
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(this.config);
 		//reading network
 //		NetworkLayer net = scenario.getNetwork();
 		MatsimNetworkReader reader = new MatsimNetworkReader(scenario);

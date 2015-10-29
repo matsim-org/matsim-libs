@@ -20,6 +20,12 @@
 
 package org.matsim.contrib.locationchoice.timegeography;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
+import java.util.TreeMap;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -30,24 +36,23 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.contrib.locationchoice.LocationMutator;
 import org.matsim.contrib.locationchoice.utils.ActivitiesHandler;
-import org.matsim.contrib.locationchoice.utils.QuadTreeRing;
+import org.matsim.contrib.locationchoice.utils.PlanUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
+import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
-
-import java.util.*;
 
 public class SingleActLocationMutator extends LocationMutator {
 
 	protected int unsuccessfullLC = 0;
 	private final ActivitiesHandler defineFlexibleActivities;
 
-	public SingleActLocationMutator(final Scenario scenario, TreeMap<String, QuadTreeRing<ActivityFacility>> quad_trees, 
+	public SingleActLocationMutator(final Scenario scenario, TreeMap<String, QuadTree<ActivityFacility>> quad_trees, 
 			TreeMap<String, ActivityFacilityImpl []> facilities_of_type,
 			Random random) {
 
@@ -101,7 +106,7 @@ public class SingleActLocationMutator extends LocationMutator {
 			this.unsuccessfullLC++;
 			return;
 		}
-		super.resetRoutes(plan);
+		PlanUtils.resetRoutes(plan);
 	}
 
 	private List<Activity> getFlexibleActivities(final Plan plan) {

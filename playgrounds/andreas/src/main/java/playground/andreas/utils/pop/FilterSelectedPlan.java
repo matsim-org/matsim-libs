@@ -25,7 +25,7 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.config.ConfigUtils;
 
@@ -49,7 +49,7 @@ public class FilterSelectedPlan {
 		String inPlansFile = args[1];//"F:/server/run771/output/it.1000/1000.plans.xml.gz";
 		String outPlansFile = args[2];//"F:/server/run771/output/it.1000/1000.plans_selected.xml.gz";
 
-		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		
 		log.info("Reading network from " + networkFile);
 		new MatsimNetworkReader(sc).readFile(networkFile);

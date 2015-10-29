@@ -19,7 +19,7 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
@@ -90,7 +90,7 @@ public class EventsToTravelDiaries implements
 
     public static void runEventsProcessing(Properties properties) {
         boolean isTransit = false;
-        ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils
+        MutableScenario scenario = (MutableScenario) ScenarioUtils
                 .createScenario(ConfigUtils.loadConfig(properties.get("configFile").toString()));
         scenario.getConfig().transit().setUseTransit(true);
         if (!properties.get("transitScheduleFile").toString().equals("")) {

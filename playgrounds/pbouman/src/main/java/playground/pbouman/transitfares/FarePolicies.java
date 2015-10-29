@@ -4,7 +4,7 @@ import java.util.LinkedList;
 import java.util.Map;
 
 import org.matsim.core.config.ConfigGroup;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 
 public class FarePolicies
 {
@@ -13,14 +13,14 @@ public class FarePolicies
 
 	private LinkedList<DiscountInterval> discountIntervals;
 	private LinkedList<PricingPolicy> pricingPolicies;
-	private ScenarioImpl scenario;
+	private MutableScenario scenario;
 	private double transferGracePeriod;
 
 	public static final double DEFAULT_FIXED_PRICE = 0.001;
 	public static final double DEFAULT_UNIT_PRICE = 0.001;
 
 	
-	public FarePolicies(ScenarioImpl s)
+	public FarePolicies(MutableScenario s)
 	{
 		scenario = s;
 		parsePolicies();

@@ -84,7 +84,7 @@ import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestCase;
@@ -99,7 +99,7 @@ public class QSimTest {
 
 	private final static Logger log = Logger.getLogger(QSimTest.class);
 
-	private QSim createQSim(ScenarioImpl scenario, EventsManager events) {
+	private QSim createQSim(MutableScenario scenario, EventsManager events) {
 		QSim qSim1 = new QSim(scenario, events);
 		ActivityEngine activityEngine = new ActivityEngine(events, qSim1.getAgentCounter());
 		qSim1.addMobsimEngine(activityEngine);
@@ -1234,7 +1234,7 @@ public class QSimTest {
 
 	@Test
 	public void testStartAndEndTime() {
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Config config = scenario.getConfig();
 
 		// build simple network with 1 link
@@ -1294,7 +1294,7 @@ public class QSimTest {
 	 */
 	@Test
 	public void testCleanupSim_EarlyEnd() {
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Config config = scenario.getConfig();
 
 		double simEndTime = 8.0*3600;

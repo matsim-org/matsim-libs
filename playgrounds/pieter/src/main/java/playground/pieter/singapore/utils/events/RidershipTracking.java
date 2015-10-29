@@ -36,7 +36,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -57,7 +57,7 @@ import java.util.*;
 public class RidershipTracking implements Runnable {
 
     private RidershipHandler ridershipHandler;
-    private ScenarioImpl scenario;
+    private MutableScenario scenario;
     private String eventsFile;
     private final double maxSpeed = 80 / 3.6;
     private String path;
@@ -67,7 +67,7 @@ public class RidershipTracking implements Runnable {
     private CSVWriter ridershipWriter;
 
     private RidershipTracking( String loResNetwork, String loResSchedule, String loResEvents, String path, String suffix) {
-        scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+        scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
         scenario.getConfig().transit().setUseTransit(true);
         new MatsimNetworkReader(scenario).readFile(loResNetwork);
         new TransitScheduleReader(scenario).readFile(loResSchedule);
@@ -83,7 +83,7 @@ public class RidershipTracking implements Runnable {
         vehicletrackers = new HashMap<>();
         this.path=path;
         this.suffix=suffix;
-        this.scenario = (ScenarioImpl) scenario;
+        this.scenario = (MutableScenario) scenario;
         try {
             initWriter();
         } catch (InstantiationException e) {

@@ -21,6 +21,7 @@ package org.matsim.contrib.locationchoice.bestresponse.preprocess;
 
 import java.util.TreeMap;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
@@ -31,7 +32,6 @@ import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestRespo
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext.ActivityFacilityWithIndex;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationSampler;
 import org.matsim.contrib.locationchoice.bestresponse.scoring.DestinationScoring;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -42,6 +42,7 @@ public class ComputeMaxDCScorePlanAlgo implements PlanAlgorithm {
 	private DestinationSampler sampler;
 	private DestinationChoiceBestResponseContext lcContext;
 	private final Id<Link> dummyLinkId = Id.createLinkId(1);
+	private final DummyActivity dummyActivity = new DummyActivity(this.dummyLinkId); 
 	
 	public ComputeMaxDCScorePlanAlgo(String type, TreeMap<Id<ActivityFacility>, ActivityFacilityWithIndex> typedFacilities,
 			DestinationScoring scorer, DestinationSampler sampler, DestinationChoiceBestResponseContext lcContext) {		
@@ -51,7 +52,7 @@ public class ComputeMaxDCScorePlanAlgo implements PlanAlgorithm {
 		this.sampler = sampler;
 		this.lcContext = lcContext;
 	}
-		
+	
 	@Override
 	public void run(Plan plan) {
 		Person p = plan.getPerson();
@@ -73,11 +74,14 @@ public class ComputeMaxDCScorePlanAlgo implements PlanAlgorithm {
 						int facilityIndex = f.getArrayIndex();
 						if (!this.sampler.sample(facilityIndex, personIndex)) continue;
 						
-						ActivityImpl act = new ActivityImpl(type, this.dummyLinkId);
-						act.setFacilityId(f.getId());
+//						ActivityImpl act = new ActivityImpl(type, this.dummyLinkId);
+//						act.setFacilityId(f.getId());
+						this.dummyActivity.setType(type);
+						this.dummyActivity.setFacilityId(f.getId());
 						
 						double epsilonScaleFactor = 1.0; // no scaling back needed here anymore
-						double dcScore = scorer.getDestinationScore(act, epsilonScaleFactor, activityIndex, p.getId());
+//						double dcScore = scorer.getDestinationScore(act, epsilonScaleFactor, activityIndex, p.getId());
+						double dcScore = scorer.getDestinationScore(this.dummyActivity, epsilonScaleFactor, activityIndex, p.getId());
 										
 						if (dcScore > maxDCScore) {
 							maxDCScore = dcScore;
@@ -87,5 +91,59 @@ public class ComputeMaxDCScorePlanAlgo implements PlanAlgorithm {
 			}
 		}
 		p.getCustomAttributes().put(this.type, maxDCScore);	
+	}
+	
+	/*
+	 * Creating new ActivityImpl objects over and over again in the run(...) method is very expensive compared to the
+	 * other stuff performed in that method (seems that "type.intern()", which is called in the constructor, is the problem). 
+	 * The object is passed over to scorer.getDestinationScore(...) where only its type and facilityId are required. 
+	 * Therefore, we create a DummyActivity object and re-use the existing string object from the input activity.
+	 * 
+	 * Tested this with a sample of 6.9k agents and 2.3m facilities and found a computation time reduction of 30%.
+	 * 
+	 * cdobler, oct'15
+	 */
+	private static final class DummyActivity implements Activity {
+
+		private String type = null;
+		private Id<ActivityFacility> facilityId = null;
+		private final Id<Link> linkId;
+		
+		public DummyActivity(Id<Link> linkId) { this.linkId = linkId; }
+		
+		@Override
+		public double getEndTime() { return 0; }
+
+		@Override
+		public void setEndTime(double seconds) { }
+
+		@Override
+		public String getType() { return this.type; }
+
+		@Override
+		public void setType(String type) { this.type = type; }
+
+		@Override
+		public Coord getCoord() { return null; }
+
+		@Override
+		public double getStartTime() { return 0; }
+
+		@Override
+		public void setStartTime(double seconds) { }
+
+		@Override
+		public double getMaximumDuration() { return 0; }
+
+		@Override
+		public void setMaximumDuration(double seconds) { }
+
+		@Override
+		public Id<Link> getLinkId() { return this.linkId; }
+
+		@Override
+		public Id<ActivityFacility> getFacilityId() { return this.facilityId; }
+		
+		public void setFacilityId(Id<ActivityFacility> facilityId) { this.facilityId = facilityId; }	
 	}
 }

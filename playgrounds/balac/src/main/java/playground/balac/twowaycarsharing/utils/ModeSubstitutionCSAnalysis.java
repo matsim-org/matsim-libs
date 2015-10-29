@@ -13,20 +13,20 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationReader;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
 public class ModeSubstitutionCSAnalysis {
 
 	
 	public void run(String[] args) {
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		PopulationReader populationReader = new MatsimPopulationReader(scenario);
 		MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario);
 		networkReader.readFile(args[1]);
 		populationReader.readFile(args[0]);	
 		
-		ScenarioImpl scenario2 = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario scenario2 = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		PopulationReader populationReader2 = new MatsimPopulationReader(scenario2);
 		MatsimNetworkReader networkReader2 = new MatsimNetworkReader(scenario2);
 		networkReader2.readFile(args[1]);
@@ -129,7 +129,7 @@ public class ModeSubstitutionCSAnalysis {
     	
 	}
 	
-	public Leg findMode(Id id, int j, ScenarioImpl scenario) {
+	public Leg findMode(Id id, int j, MutableScenario scenario) {
 		
 		Person p = scenario.getPopulation().getPersons().get(id);
 		int i = 0;
