@@ -34,6 +34,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.scenario.ScenarioImpl;
 
@@ -55,7 +56,7 @@ public class CarDistanceAnalyzer extends AbstractAnalysisModule{
 	private PtDriverIdAnalyzer ptDriverIdAnalyzer;
 	
 	private CarDistanceEventHandler carDistanceEventHandler;
-	private Map<Id, Double> personId2carDistance;
+	private Map<Id<Person>, Double> personId2carDistance;
 	private int carTrips;
 	private double avgCarDistancePerCarUser_km;
 	private double avgCarDistancePerTrip_km;
@@ -115,7 +116,7 @@ public class CarDistanceAnalyzer extends AbstractAnalysisModule{
 		this.personId2carDistance = this.carDistanceEventHandler.getPersonId2CarDistance();
 		this.carTrips = this.carDistanceEventHandler.getCarTrips();
 		
-		for(Id personId : this.personId2carDistance.keySet()){
+		for(Id<Person> personId : this.personId2carDistance.keySet()){
 			totalCarDistance_km += this.personId2carDistance.get(personId) / 1000.;
 			numberOfPersons++;
 		}
@@ -140,7 +141,7 @@ public class CarDistanceAnalyzer extends AbstractAnalysisModule{
 			bw.write("person id \t total car distance [km]");
 			bw.newLine();
 			
-			for(Id personId : this.personId2carDistance.keySet()){
+			for(Id<Person> personId : this.personId2carDistance.keySet()){
 				Double individualCarDistance_km = this.personId2carDistance.get(personId) / 1000.;
 				bw.write(personId.toString() + "\t");
 				bw.write(individualCarDistance_km.toString());

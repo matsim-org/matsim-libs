@@ -34,11 +34,16 @@ import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
+import org.matsim.api.core.v01.events.Wait2LinkEvent;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
+import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.events.handler.Vehicle2DriverEventHandler;
 
 import playground.vsp.analysis.modules.ptDriverPrefix.PtDriverIdAnalyzer;
 
@@ -46,7 +51,7 @@ import playground.vsp.analysis.modules.ptDriverPrefix.PtDriverIdAnalyzer;
  * @author ikaddoura
  *
  */
-public class TransitEventHandler implements TransitDriverStartsEventHandler, LinkLeaveEventHandler, PersonDepartureEventHandler, PersonArrivalEventHandler {
+public class TransitEventHandler implements TransitDriverStartsEventHandler, LinkLeaveEventHandler, PersonDepartureEventHandler, PersonArrivalEventHandler, Wait2LinkEventHandler, VehicleLeavesTrafficEventHandler {
 	private final static Logger log = Logger.getLogger(PtOperatorAnalyzer.class);
 	private List<Id> vehicleIDs = new ArrayList<Id>();
 	private Network network;
@@ -55,6 +60,8 @@ public class TransitEventHandler implements TransitDriverStartsEventHandler, Lin
 	
 	private Map<Id, Double> personID2firstDepartureTime = new HashMap<Id, Double>();
 	private Map<Id, Double> personID2lastArrivalTime = new HashMap<Id, Double>();
+	
+	private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
 	
 	public TransitEventHandler(Network network, PtDriverIdAnalyzer ptDriverIdAnalyzer) {
 		this.network = network;
@@ -67,6 +74,7 @@ public class TransitEventHandler implements TransitDriverStartsEventHandler, Lin
 		this.personID2firstDepartureTime.clear();
 		this.personID2lastArrivalTime.clear();
 		this.vehicleKm = 0.0;
+		delegate.reset(iteration);
 	}
 
 	@Override
@@ -82,7 +90,7 @@ public class TransitEventHandler implements TransitDriverStartsEventHandler, Lin
 	
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		Id personId = event.getDriverId();
+		Id personId = delegate.getDriverOfVehicle(event.getVehicleId());
 		if (this.ptDriverIdAnalyzer.isPtDriver(personId)){
 			System.out.println(network.toString()); 
 			try {
@@ -149,6 +157,16 @@ public class TransitEventHandler implements TransitDriverStartsEventHandler, Lin
 			vehicleSeconds = vehicleSeconds + ((this.personID2lastArrivalTime.get(id) - this.personID2firstDepartureTime.get(id)));
 		}
 		return vehicleSeconds / 3600.0;
+	}
+
+	@Override
+	public void handleEvent(VehicleLeavesTrafficEvent event) {
+		delegate.handleEvent(event);
+	}
+
+	@Override
+	public void handleEvent(Wait2LinkEvent event) {
+		delegate.handleEvent(event);
 	}
 	
 }

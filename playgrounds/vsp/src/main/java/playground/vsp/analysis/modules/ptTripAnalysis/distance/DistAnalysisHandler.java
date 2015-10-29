@@ -35,6 +35,8 @@ import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
+import org.matsim.api.core.v01.events.Wait2LinkEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
@@ -42,8 +44,11 @@ import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
+import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.events.handler.Vehicle2DriverEventHandler;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.vehicles.Vehicle;
 
@@ -58,7 +63,8 @@ import playground.vsp.analysis.modules.ptTripAnalysis.AnalysisTripSetStorage;
  */
 public class DistAnalysisHandler implements LinkEnterEventHandler, TransitDriverStartsEventHandler,
 												PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler,
-												PersonArrivalEventHandler, PersonDepartureEventHandler, PersonStuckEventHandler{
+												PersonArrivalEventHandler, PersonDepartureEventHandler, PersonStuckEventHandler, 
+												Wait2LinkEventHandler, VehicleLeavesTrafficEventHandler{
 	
 	private static final Logger log = Logger
 			.getLogger(DistAnalysisHandler.class);
@@ -71,6 +77,8 @@ public class DistAnalysisHandler implements LinkEnterEventHandler, TransitDriver
 	private Map<String, AnalysisTripSetStorage> tripSets;
 	
 	private Map<Id<Link>, Link> links;
+	
+	private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
 	
 	public DistAnalysisHandler(){
 		this.persons = new HashMap<>();
@@ -98,6 +106,7 @@ public class DistAnalysisHandler implements LinkEnterEventHandler, TransitDriver
 
 	@Override
 	public void reset(int iteration) {
+		delegate.reset(iteration);
 	}
 	
 	@Override
@@ -138,7 +147,7 @@ public class DistAnalysisHandler implements LinkEnterEventHandler, TransitDriver
 		}
 	}
 	
-	private void addTrip2TripStorageAndRemoveFromPerson(Id id){
+	private void addTrip2TripStorageAndRemoveFromPerson(Id<Person> id){
 		AbstractAnalysisTrip t = this.persons.get(id).removeFinishedTrip();
 		for(AnalysisTripSetStorage s: this.tripSets.values()){
 			s.addTrip(t);
@@ -165,10 +174,11 @@ public class DistAnalysisHandler implements LinkEnterEventHandler, TransitDriver
 	@Override
 	public void handleEvent(LinkEnterEvent e) {
 		//agents and drivers can process a LinkEnterEvent 
-		if(this.persons.containsKey(e.getDriverId())){
-			this.persons.get(e.getDriverId()).processLinkEnterEvent(this.links.get(e.getLinkId()).getLength());
-		}else if(this.drivers.containsKey(e.getDriverId())){
-			this.drivers.get(e.getDriverId()).processLinkEnterEvent(this.links.get(e.getLinkId()).getLength());
+		Id<Person> driverId = delegate.getDriverOfVehicle(e.getVehicleId());
+		if(this.persons.containsKey(driverId)){
+			this.persons.get(driverId).processLinkEnterEvent(this.links.get(e.getLinkId()).getLength());
+		}else if(this.drivers.containsKey(driverId)){
+			this.drivers.get(driverId).processLinkEnterEvent(this.links.get(e.getLinkId()).getLength());
 		}
 	}
 	
@@ -198,5 +208,15 @@ public class DistAnalysisHandler implements LinkEnterEventHandler, TransitDriver
 	
 	public List<Id<Person>> getStuckAgents(){
 		return this.stuckAgents;
+	}
+
+	@Override
+	public void handleEvent(VehicleLeavesTrafficEvent event) {
+		delegate.handleEvent(event);
+	}
+
+	@Override
+	public void handleEvent(Wait2LinkEvent event) {
+		delegate.handleEvent(event);
 	}
 }

@@ -38,10 +38,12 @@ import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.Wait2LinkEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.events.handler.Vehicle2DriverEventHandler;
 import org.matsim.vehicles.Vehicle;
 
 import playground.vsp.congestion.AgentOnLinkInfo;
@@ -69,7 +71,7 @@ public class CongestionHandlerBaseImpl implements CongestionHandler {
 	private double delayNotInternalized_roundingErrors = 0.;
 	private double totalInternalizedDelay = 0.;
 
-	private Map<Id<Vehicle>, Id<Person>> vehicleId2personId = new HashMap<>() ;
+	private Vehicle2DriverEventHandler Veh2DriverDelegate = new Vehicle2DriverEventHandler();
 
 	CongestionHandlerBaseImpl(EventsManager events, Scenario scenario) {
 		this.scenario = scenario;
@@ -105,6 +107,8 @@ public class CongestionHandlerBaseImpl implements CongestionHandler {
 		this.totalDelay = 0.;
 		this.delayNotInternalized_roundingErrors = 0.;
 		this.totalInternalizedDelay = 0.;
+		
+		Veh2DriverDelegate.reset(iteration);
 	}
 
 	@Override
@@ -121,7 +125,7 @@ public class CongestionHandlerBaseImpl implements CongestionHandler {
 
 	@Override
 	public final void handleEvent( Wait2LinkEvent event ) {
-		this.vehicleId2personId.put( event.getVehicleId(), event.getPersonId() ) ;
+		Veh2DriverDelegate.handleEvent(event);
 	}
 
 	@Override
@@ -142,9 +146,10 @@ public class CongestionHandlerBaseImpl implements CongestionHandler {
 		} else { // car! 
 			LinkCongestionInfo linkInfo = CongestionUtils.getOrCreateLinkInfo( event.getLinkId(), linkId2congestionInfo, scenario ) ;
 
-			AgentOnLinkInfo agentInfo = new AgentOnLinkInfo.Builder().setAgentId( event.getDriverId() ).setLinkId( event.getLinkId() )
+			Id<Person> driverId = Veh2DriverDelegate.getDriverOfVehicle(event.getVehicleId());
+			AgentOnLinkInfo agentInfo = new AgentOnLinkInfo.Builder().setAgentId( driverId ).setLinkId( event.getLinkId() )
 					.setEnterTime( event.getTime() ).setFreeSpeedLeaveTime( event.getTime()+linkInfo.getFreeTravelTime()+1. ).build();
-			linkInfo.getAgentsOnLink().put( event.getDriverId(), agentInfo ) ;
+			linkInfo.getAgentsOnLink().put( driverId, agentInfo ) ;
 		}
 	}
 
@@ -164,7 +169,7 @@ public class CongestionHandlerBaseImpl implements CongestionHandler {
 		// coming here ...
 		
 		
-		Id<Person> personId = this.getVehicleId2personId().get( event.getVehicleId() ) ;
+		Id<Person> personId = Veh2DriverDelegate.getDriverOfVehicle( event.getVehicleId() ) ;
 
 		LinkCongestionInfo linkInfo = CongestionUtils.getOrCreateLinkInfo(event.getLinkId(), this.getLinkId2congestionInfo(), scenario);
 
@@ -307,8 +312,8 @@ public class CongestionHandlerBaseImpl implements CongestionHandler {
 		return ptVehicleIDs;
 	}
 
-	public Map<Id<Vehicle>, Id<Person>> getVehicleId2personId() {
-		return vehicleId2personId;
+	public Vehicle2DriverEventHandler getVehicle2DriverEventHandler() {
+		return Veh2DriverDelegate;
 	}
 
 	@Override
@@ -324,6 +329,11 @@ public class CongestionHandlerBaseImpl implements CongestionHandler {
 	@Override
 	public void writeCongestionStats(String fileName) {
 		throw new RuntimeException("not implemented") ;
+	}
+
+	@Override
+	public void handleEvent(VehicleLeavesTrafficEvent event) {
+		Veh2DriverDelegate.handleEvent(event);
 	}
 
 

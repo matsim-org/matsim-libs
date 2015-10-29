@@ -33,16 +33,22 @@ import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
+import org.matsim.api.core.v01.events.Wait2LinkEvent;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
+import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ScenarioConfigGroup;
+import org.matsim.core.events.handler.Vehicle2DriverEventHandler;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -59,7 +65,7 @@ public final class SimpleTripAnalyzer extends AbstractPersonAlgorithm
 								implements LinkLeaveEventHandler,
 										PersonArrivalEventHandler,
 										PersonDepartureEventHandler, 
-										PersonStuckEventHandler {
+										PersonStuckEventHandler, Wait2LinkEventHandler, VehicleLeavesTrafficEventHandler {
 
 	@SuppressWarnings("unused")
 	private static final Logger log = Logger
@@ -68,6 +74,8 @@ public final class SimpleTripAnalyzer extends AbstractPersonAlgorithm
 	private Network net;
 	private Set<Id<Person>> pIds;
 	private Map<String, Double> distFactors;
+	
+	private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
 	
 	public  SimpleTripAnalyzer(Config c, Network net, Set<Id<Person>> pIds) throws RuntimeException{
 		if(c.transit().isUseTransit() ){
@@ -82,6 +90,7 @@ public final class SimpleTripAnalyzer extends AbstractPersonAlgorithm
 	@Override
 	public void reset(int iteration) {
 		traveller = new HashMap<>();
+		delegate.reset(iteration);
 	}
 
 	@Override
@@ -104,7 +113,7 @@ public final class SimpleTripAnalyzer extends AbstractPersonAlgorithm
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		Traveller t = this.traveller.get(event.getDriverId());
+		Traveller t = this.traveller.get(delegate.getDriverOfVehicle(event.getVehicleId()));
 		if(t == null){
 			return;
 		}
@@ -130,6 +139,16 @@ public final class SimpleTripAnalyzer extends AbstractPersonAlgorithm
 		t.setStuck();
 	}
 	
+	@Override
+	public void handleEvent(Wait2LinkEvent event) {
+		delegate.handleEvent(event);
+	}
+
+	@Override
+	public void handleEvent(VehicleLeavesTrafficEvent event) {
+		delegate.handleEvent(event);
+	}
+
 	@Override
 	public void run(Person person) {
 		Traveller t = this.traveller.get(person.getId());
@@ -163,7 +182,7 @@ public final class SimpleTripAnalyzer extends AbstractPersonAlgorithm
 	 * @param linkId
 	 * @return
 	 */
-	private double calcLinkDistance(Id linkId) {
+	private double calcLinkDistance(Id<Link> linkId) {
 		return this.net.getLinks().get(linkId).getLength();
 	}
 

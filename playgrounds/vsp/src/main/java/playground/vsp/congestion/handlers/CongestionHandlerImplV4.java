@@ -42,6 +42,7 @@ import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.Wait2LinkEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
@@ -128,8 +129,9 @@ public final class CongestionHandlerImplV4 implements  CongestionHandler {
 	public final void handleEvent(LinkEnterEvent event) {
 		delegate.handleEvent(event);
 
-		int linkNr = this.personId2linkNr.get( event.getDriverId() ) ;
-		this.personId2linkNr.put( event.getDriverId(), linkNr + 1 ) ;
+		Id<Person> driverId = delegate.getVehicle2DriverEventHandler().getDriverOfVehicle(event.getVehicleId());
+		int linkNr = this.personId2linkNr.get( driverId ) ;
+		this.personId2linkNr.put( driverId, linkNr + 1 ) ;
 
 	}
 
@@ -146,7 +148,7 @@ public final class CongestionHandlerImplV4 implements  CongestionHandler {
 			log.warn("Public transport mode. Mixed traffic is not tested.");
 
 		} else { // car!
-			Id<Person> personId = this.delegate.getVehicleId2personId().get( event.getVehicleId() ) ;
+			Id<Person> personId = this.delegate.getVehicle2DriverEventHandler().getDriverOfVehicle( event.getVehicleId() ) ;
 
 			LinkCongestionInfo linkInfo = CongestionUtils.getOrCreateLinkInfo(event.getLinkId(), delegate.getLinkId2congestionInfo(), scenario);
 
@@ -169,7 +171,7 @@ public final class CongestionHandlerImplV4 implements  CongestionHandler {
 			//			linkInfo.getPersonId2linkEnterTime().remove( personId ) ;
 			// fails tests, dunno why. kai, sep'15
 
-			linkInfo.getAgentsOnLink().remove( event.getDriverId() ) ;
+			linkInfo.getAgentsOnLink().remove( personId ) ;
 		}
 	}
 
@@ -186,7 +188,7 @@ public final class CongestionHandlerImplV4 implements  CongestionHandler {
 			// (flow queue contains only those agents where time headway approx 1/cap. So we get here only if we are spillback delayed, 
 			// and our own bottleneck is not active)
 
-			Id<Person> driverId = this.delegate.getVehicleId2personId().get( event.getVehicleId() ) ;
+			Id<Person> driverId = this.delegate.getVehicle2DriverEventHandler().getDriverOfVehicle( event.getVehicleId() ) ;
 			Id<Link> spillBackCausingLink = getDownstreamLinkInRoute(driverId);
 
 			memorizeSpillBackCausingLinkForCurrentLink(event.getLinkId(), spillBackCausingLink);
@@ -201,7 +203,8 @@ public final class CongestionHandlerImplV4 implements  CongestionHandler {
 			// for combined delay due to flow and storage capacities on the same link, the spill back causing link it not captured 
 			// because flowQueue is not empty any more with new (updateFlowQueue in delegate, 16-sep-15) logic. amit sep'15
 			if(this.linkId2SpillBackCausingLinks.get(event.getLinkId()) == null){
-				memorizeSpillBackCausingLinkForCurrentLink(event.getLinkId(), getDownstreamLinkInRoute(this.delegate.getVehicleId2personId().get(event.getVehicleId())));
+				Id<Person> driverId = this.delegate.getVehicle2DriverEventHandler().getDriverOfVehicle( event.getVehicleId() ) ;
+				memorizeSpillBackCausingLinkForCurrentLink(event.getLinkId(), getDownstreamLinkInRoute(driverId));
 			}
 
 			// !! calling the following method is the big difference to V3 !!!
@@ -252,7 +255,7 @@ public final class CongestionHandlerImplV4 implements  CongestionHandler {
 	}
 
 	private double processSpillbackDelays(double remainingDelay, LinkLeaveEvent event, Id<Link> spillbackCausingLink, DelayInfo affectedAgentDelayInfo){
-		Id<Person> affectedPersonId = event.getDriverId();
+		Id<Person> affectedPersonId = delegate.getVehicle2DriverEventHandler().getDriverOfVehicle(event.getVehicleId());
 
 		// first charge for agents present on the link or in other words agents entered on the link
 		LinkCongestionInfo spillbackLinkCongestionInfo = this.delegate.getLinkId2congestionInfo().get(spillbackCausingLink);
@@ -319,5 +322,10 @@ public final class CongestionHandlerImplV4 implements  CongestionHandler {
 			e.printStackTrace();
 		}
 		log.info("Congestion statistics written to " + file);	
+	}
+
+	@Override
+	public void handleEvent(VehicleLeavesTrafficEvent event) {
+		delegate.handleEvent(event);
 	}
 }

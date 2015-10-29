@@ -23,6 +23,7 @@ import java.util.LinkedList;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.population.Person;
 
 import playground.vsp.analysis.modules.ptTripAnalysis.AbstractAnalysisTrip;
 
@@ -33,9 +34,9 @@ import playground.vsp.analysis.modules.ptTripAnalysis.AbstractAnalysisTrip;
 public class DistAnalysisAgent {
 	
 	private LinkedList<AbstractAnalysisTrip> trips;
-	private Id id;
+	private Id<Person> id;
 	
-	public DistAnalysisAgent(LinkedList<AbstractAnalysisTrip> linkedList, Id id){
+	public DistAnalysisAgent(LinkedList<AbstractAnalysisTrip> linkedList, Id<Person> id){
 		this.trips = linkedList;
 		this.id = id;
 	}
@@ -58,7 +59,7 @@ public class DistAnalysisAgent {
 		((DistAnalysisTrip) this.trips.getFirst()).passedLinkInPt(length);
 	}
 
-	public Id getId(){
+	public Id<Person> getId(){
 		return this.id;
 	}
 	

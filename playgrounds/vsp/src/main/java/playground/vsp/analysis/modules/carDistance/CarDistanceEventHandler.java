@@ -25,13 +25,20 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
-import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
+import org.matsim.api.core.v01.events.Wait2LinkEvent;
+import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
-import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
+import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.events.handler.Vehicle2DriverEventHandler;
 
 import playground.vsp.analysis.modules.ptDriverPrefix.PtDriverIdAnalyzer;
 
@@ -39,45 +46,49 @@ import playground.vsp.analysis.modules.ptDriverPrefix.PtDriverIdAnalyzer;
  * @author ikaddoura, benjamin
  *
  */
-public class CarDistanceEventHandler implements LinkLeaveEventHandler, PersonDepartureEventHandler, PersonArrivalEventHandler{
+public class CarDistanceEventHandler implements LinkLeaveEventHandler, PersonDepartureEventHandler, PersonArrivalEventHandler, Wait2LinkEventHandler, VehicleLeavesTrafficEventHandler{
 	private final static Logger logger = Logger.getLogger(CarDistanceEventHandler.class);
 
-	private Map<Id, Double> personId2CarDistance;
+	private Map<Id<Person>, Double> personId2CarDistance;
 	private int carTrips;
 	private final Network network;
 	private PtDriverIdAnalyzer ptDriverIdAnalyzer;
 	
 	// the following is not neccessary any more...see below
-	private Map<Id, Id> personId2departureLinkId;
-	private Map<Id, Double> depArrOnSameLinkCnt;
+	private Map<Id<Person>, Id<Link>> personId2departureLinkId;
+	private Map<Id<Person>, Double> depArrOnSameLinkCnt;
+	
+	private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
 	
 	public CarDistanceEventHandler(Network network, PtDriverIdAnalyzer ptDriverPrefixAnalyzer) {
-		this.personId2CarDistance = new HashMap<Id, Double>();
+		this.personId2CarDistance = new HashMap<>();
 		this.carTrips = 0;
 		this.network = network;
 		this.ptDriverIdAnalyzer = ptDriverPrefixAnalyzer;
 		
 		// the following is not neccessary any more...see below
-		this.personId2departureLinkId = new HashMap<Id, Id>();
-		this.depArrOnSameLinkCnt = new HashMap<Id, Double>();
+		this.personId2departureLinkId = new HashMap<>();
+		this.depArrOnSameLinkCnt = new HashMap<>();
 	}
 
 	@Override
 	public void reset(int iteration) {
-		this.personId2CarDistance = new HashMap<Id, Double>();
+		delegate.reset(iteration);
+		
+		this.personId2CarDistance = new HashMap<>();
 		this.carTrips = 0;
 		logger.info("resetting personId2CarDistance to " + this.personId2CarDistance + " ...");
 		logger.info("resetting carTrips to " + this.carTrips + " ...");
 		
 		// the following is not neccessary any more...see below
-		this.personId2departureLinkId = new HashMap<Id, Id>();
-		this.depArrOnSameLinkCnt = new HashMap<Id, Double>();
+		this.personId2departureLinkId = new HashMap<>();
+		this.depArrOnSameLinkCnt = new HashMap<>();
 	}
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		Id personId = event.getDriverId();
-		Id linkId = event.getLinkId();
+		Id<Person> personId = delegate.getDriverOfVehicle(event.getVehicleId());
+		Id<Link> linkId = event.getLinkId();
 		Double linkLength_m = this.network.getLinks().get(linkId).getLength();
 		if (this.ptDriverIdAnalyzer.isPtDriver(personId)){
 			// pt vehicle!
@@ -102,7 +113,7 @@ public class CarDistanceEventHandler implements LinkLeaveEventHandler, PersonDep
 		} else {
 			// calculating the number of trips...
 			if(event.getLegMode().equals(TransportMode.car)){
-				Id personId = event.getPersonId();
+				Id<Person> personId = event.getPersonId();
 				int carTripsSoFar = carTrips;
 				int carTripsAfter = carTripsSoFar + 1;
 				carTrips = carTripsAfter;
@@ -122,8 +133,8 @@ public class CarDistanceEventHandler implements LinkLeaveEventHandler, PersonDep
 	// the following is not neccessary any more...see above
 	@Override
 	public void handleEvent(PersonArrivalEvent event) {
-		Id personId = event.getPersonId();
-		Id linkId = event.getLinkId();
+		Id<Person> personId = event.getPersonId();
+		Id<Link> linkId = event.getLinkId();
 
 		if (this.ptDriverIdAnalyzer.isPtDriver(personId)){
 			// ptDriver!
@@ -131,7 +142,7 @@ public class CarDistanceEventHandler implements LinkLeaveEventHandler, PersonDep
 			if(personId2departureLinkId.get(personId) == null){
 				logger.warn("Person " + personId + " is arriving on link " + linkId + " without having departed anywhere before...");
 			} else {
-				Id departureLinkId = personId2departureLinkId.get(personId);
+				Id<Link> departureLinkId = personId2departureLinkId.get(personId);
 				if(event.getLegMode().equals(TransportMode.car)){
 					if(departureLinkId.equals(linkId)){
 						if(depArrOnSameLinkCnt.get(personId) == null){
@@ -148,15 +159,25 @@ public class CarDistanceEventHandler implements LinkLeaveEventHandler, PersonDep
 	}
 
 	// the following is not neccessary any more...see above
-	protected Map<Id, Double> getDepArrOnSameLinkCnt() {
+	protected Map<Id<Person>, Double> getDepArrOnSameLinkCnt() {
 		return depArrOnSameLinkCnt;
 	}
 
-	protected Map<Id, Double> getPersonId2CarDistance() {
+	protected Map<Id<Person>, Double> getPersonId2CarDistance() {
 		return this.personId2CarDistance;
 	}
 	
 	protected int getCarTrips() {
 		return this.carTrips;
+	}
+
+	@Override
+	public void handleEvent(VehicleLeavesTrafficEvent event) {
+		delegate.handleEvent(event);
+	}
+
+	@Override
+	public void handleEvent(Wait2LinkEvent event) {
+		delegate.handleEvent(event);
 	}
 }

@@ -48,15 +48,7 @@ public class PersonEventFilter implements EventFilter {
 	
 	@Override
 	public boolean doProcessEvent(Event event) {
-		if (event instanceof LinkEnterEvent) {
-			LinkEnterEvent e = (LinkEnterEvent) event;
-			Id<Person> personId = e.getDriverId();
-			this.personIds.contains(personId);
-		} else if (event instanceof LinkLeaveEvent) {
-			LinkLeaveEvent e = (LinkLeaveEvent) event;
-			Id<Person> personId = e.getDriverId();
-			this.personIds.contains(personId);
-		} else if (event instanceof Wait2LinkEvent) {
+		if (event instanceof Wait2LinkEvent) {
 			Wait2LinkEvent e = (Wait2LinkEvent) event;
 			Id<Person> personId = e.getPersonId();
 			this.personIds.contains(personId);
@@ -80,6 +72,16 @@ public class PersonEventFilter implements EventFilter {
 			PersonStuckEvent e = (PersonStuckEvent) event;
 			Id<Person> personId = e.getPersonId();
 			this.personIds.contains(personId);
+		/* the following was here until we removed the person from link enter and leave events.
+		   seems that it works without... Theresa oct'2015 */
+//		} else if (event instanceof LinkEnterEvent) {
+//			LinkEnterEvent e = (LinkEnterEvent) event;
+//			Id<Person> personId = e.getDriverId();
+//			this.personIds.contains(personId);
+//		} else if (event instanceof LinkLeaveEvent) {
+//			LinkLeaveEvent e = (LinkLeaveEvent) event;
+//			Id<Person> personId = e.getDriverId();
+//			this.personIds.contains(personId);
 		} else {
 			return false;
 		}
