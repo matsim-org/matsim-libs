@@ -37,6 +37,8 @@ import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
+import org.matsim.api.core.v01.events.Wait2LinkEvent;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
@@ -135,7 +137,11 @@ public class EventsToScore implements BasicEventHandler {
 			eventsToLegs.handleEvent( (VehicleArrivesAtFacilityEvent) event ) ;
 		} else if ( event instanceof TransitDriverStartsEvent ) {
 			eventsToLegs.handleEvent( (TransitDriverStartsEvent) event ) ;
-		} 
+		} else if ( event instanceof Wait2LinkEvent ) {
+			eventsToLegs.handleEvent((Wait2LinkEvent) event ) ; 
+		} else if ( event instanceof VehicleLeavesTrafficEvent ) {
+			eventsToLegs.handleEvent((VehicleLeavesTrafficEvent) event ) ; 
+		}
 
 		// this is for the stuff that is directly based on events.
 		// note that this passes on _all_ person events, even those already passed above.
