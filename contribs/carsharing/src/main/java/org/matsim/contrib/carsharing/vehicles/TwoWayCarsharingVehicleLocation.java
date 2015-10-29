@@ -75,24 +75,23 @@ public class TwoWayCarsharingVehicleLocation {
 					vehicleLocationQuadTree.remove(link.getCoord().getX(), link.getCoord().getY(), station);
 					vehicleLocationQuadTree.put(link.getCoord().getX(), link.getCoord().getY(), stationNew);
 					
+					return;
+					
 				}
-				else {
-					
-					log.warn("There were no stations found on the given link, so the car was parked at newly created station. This should never happen! Continuing anyway, but the results should not be trusted...");
-					ArrayList<String> vehIDs = new ArrayList<String>();
-					
-					vehIDs.add(id);
-					
-					TwoWayCarsharingStation stationNew = new TwoWayCarsharingStation(link, 1, vehIDs);		
-					
-					vehicleLocationQuadTree.put(link.getCoord().getX(), link.getCoord().getY(), stationNew);
-				}
-			}		
+			}
 			
+					
+			log.warn("There were no stations found on the given link, so the car was parked at newly created station. This should never happen! Continuing anyway, but the results should not be trusted...");
+			ArrayList<String> vehIDs = new ArrayList<String>();
+			
+			vehIDs.add(id);
+			
+			TwoWayCarsharingStation stationNew = new TwoWayCarsharingStation(link, 1, vehIDs);		
+			
+			vehicleLocationQuadTree.put(link.getCoord().getX(), link.getCoord().getY(), stationNew);
+	
 			
 		}
-		
-		
 	}
 	
 	public void removeVehicle(TwoWayCarsharingStation station, String id) {
