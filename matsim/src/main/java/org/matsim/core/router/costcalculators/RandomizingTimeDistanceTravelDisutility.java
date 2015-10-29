@@ -48,12 +48,12 @@ public final class RandomizingTimeDistanceTravelDisutility implements TravelDisu
 	private final double marginalCostOfDistance;
 	
 	private final double normalization ;
-	private double sigma ;
+	private final double sigma ;
 
-	private Random random;
+	private final Random random;
 
+	// "cache" of the random value
 	private double logNormalRnd;
-
 	private Person prevPerson;
 	
 	private static int wrnCnt = 0 ;
@@ -66,7 +66,39 @@ public final class RandomizingTimeDistanceTravelDisutility implements TravelDisu
 
 		@Override
 		public RandomizingTimeDistanceTravelDisutility createTravelDisutility(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
-                return new RandomizingTimeDistanceTravelDisutility(timeCalculator, cnScoringGroup, this.sigma )  ;
+			/* Usually, the travel-utility should be negative (it's a disutility) but the cost should be positive. Thus negate the utility.*/
+			double marginalCostOfTime_s = (-cnScoringGroup.getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() / 3600.0) + (cnScoringGroup.getPerforming_utils_hr() / 3600.0);
+
+			double marginalCostOfDistance_m = -cnScoringGroup.getModes().get(TransportMode.car).getMonetaryDistanceRate() * cnScoringGroup.getMarginalUtilityOfMoney() ;
+
+			ModeParams params = cnScoringGroup.getModes().get( TransportMode.car ) ;
+			if ( params.getMarginalUtilityOfDistance() !=  0.0 ) {
+				throw new RuntimeException( "marginal utility of distance not honored for travel disutility; aborting ... (should be easy to implement)") ;
+			}
+
+			if ( wrnCnt < 1 ) {
+				wrnCnt++ ;
+				if ( cnScoringGroup.getModes().get(TransportMode.car).getMonetaryDistanceRate() > 0. ) {
+					Logger.getLogger(this.getClass()).warn("Monetary distance cost rate needs to be NEGATIVE to produce the normal " +
+					"behavior; just found positive.  Continuing anyway.  This behavior may be changed in the future.") ;
+				}
+			}
+
+			double normalization = 1;
+			if ( sigma != 0. ) {
+				normalization = 1. / Math.exp(this.sigma * this.sigma / 2);
+				if (normalisationWrnCnt < 10) {
+					normalisationWrnCnt++;
+					log.info(" sigma: " + this.sigma + "; resulting normalization: " + normalization);
+				}
+			}
+
+			return new RandomizingTimeDistanceTravelDisutility(
+					timeCalculator,
+					marginalCostOfTime_s,
+					marginalCostOfDistance_m,
+					normalization,
+					sigma);
 		}
 
 		public Builder setSigma( double val ) {
@@ -76,51 +108,18 @@ public final class RandomizingTimeDistanceTravelDisutility implements TravelDisu
 	}  
 	// === end Builder ===
 
-	RandomizingTimeDistanceTravelDisutility(final TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup, double sigma ) {
-		this.timeCalculator = timeCalculator;
-
-		/* Usually, the travel-utility should be negative (it's a disutility) but the cost should be positive. Thus negate the utility.*/
-		this.marginalCostOfTime = (-cnScoringGroup.getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() / 3600.0) + (cnScoringGroup.getPerforming_utils_hr() / 3600.0);
-
-		this.marginalCostOfDistance = -cnScoringGroup.getModes().get(TransportMode.car).getMonetaryDistanceRate() * cnScoringGroup.getMarginalUtilityOfMoney() ;
-		
-		ModeParams params = cnScoringGroup.getModes().get( TransportMode.car ) ;
-		if ( params.getMarginalUtilityOfDistance() !=  0.0 ) {
-			throw new RuntimeException( "marginal utility of distance not honored for travel disutility; aborting ... (should be easy to implement)") ;
-		}
-				
-		if ( wrnCnt < 1 ) {
-			wrnCnt++ ;
-			if ( cnScoringGroup.getModes().get(TransportMode.car).getMonetaryDistanceRate() > 0. ) {
-				Logger.getLogger(this.getClass()).warn("Monetary distance cost rate needs to be NEGATIVE to produce the normal " +
-				"behavior; just found positive.  Continuing anyway.  This behavior may be changed in the future.") ;
-			}
-		}
-		
-		this.sigma = sigma ;
-		if ( sigma != 0. ) {
-			this.random = MatsimRandom.getLocalInstance() ;
-			this.normalization = 1./Math.exp( this.sigma*this.sigma/2 );
-			if ( normalisationWrnCnt < 10 ) {
-				normalisationWrnCnt++ ;
-				log.info(" sigma: " + this.sigma + "; resulting normalization: " + normalization ) ;
-			}
-		} else {
-			this.normalization = 1. ;
-		}
-
-	}
-
-
-	public RandomizingTimeDistanceTravelDisutility(
+	private RandomizingTimeDistanceTravelDisutility(
 			final TravelTime timeCalculator,
 			final double marginalCostOfTime_s,
-			final double marginalCostOfDistance_m ) {
+			final double marginalCostOfDistance_m,
+			final double normalization,
+			final double sigma) {
 		this.timeCalculator = timeCalculator;
 		this.marginalCostOfTime = marginalCostOfTime_s;
 		this.marginalCostOfDistance = marginalCostOfDistance_m;
-		
-		throw new RuntimeException("currently disabled; tlk to kai if I forget to repair this.  mar'15") ;
+		this.normalization = normalization;
+		this.sigma = sigma;
+		this.random = MatsimRandom.getLocalInstance();
 	}
 
 	@Override
