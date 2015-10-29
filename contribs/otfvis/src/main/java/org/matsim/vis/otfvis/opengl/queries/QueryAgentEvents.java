@@ -48,6 +48,7 @@ import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.vehicles.Vehicle;
 import org.matsim.vis.otfvis.SimulationViewForQueries;
 import org.matsim.vis.otfvis.interfaces.OTFQuery;
 import org.matsim.vis.otfvis.interfaces.OTFQueryResult;
@@ -90,6 +91,8 @@ public class QueryAgentEvents extends AbstractQuery implements PersonDepartureEv
 	}
 
 	private Id<Person> agentId = null;
+
+	private Id<Vehicle> agentsVehId = null;
 	
 	private EventsManager eventsManager = null;
 	
@@ -149,6 +152,9 @@ public class QueryAgentEvents extends AbstractQuery implements PersonDepartureEv
 	public void handleEvent(PersonEntersVehicleEvent event) {
 		if(event.getPersonId().equals(this.agentId)){
 			queue.add(event);
+			
+			// remember the agents vehicle
+			agentsVehId = event.getVehicleId();
 		}
 	}
 
@@ -161,14 +167,14 @@ public class QueryAgentEvents extends AbstractQuery implements PersonDepartureEv
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		if(event.getDriverId().equals(this.agentId)){
+		if(event.getVehicleId().equals(this.agentsVehId)){
 			queue.add(event);
 		}
 	}
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		if(event.getDriverId().equals(this.agentId)){
+		if(event.getVehicleId().equals(this.agentsVehId)){
 			queue.add(event);
 		}
 	}
