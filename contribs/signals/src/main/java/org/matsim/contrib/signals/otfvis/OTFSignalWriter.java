@@ -29,7 +29,7 @@ import org.matsim.contrib.signals.events.SignalGroupStateChangedEvent;
 import org.matsim.core.config.Config;
 import org.matsim.core.utils.misc.ByteBufferUtils;
 import org.matsim.lanes.data.v20.Lane;
-import org.matsim.lanes.data.v20.LaneDefinitions20;
+import org.matsim.lanes.data.v20.Lanes;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupsData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalData;
@@ -49,7 +49,7 @@ public class OTFSignalWriter extends OTFLaneWriter {
 	private transient SignalGroupsData signalGroups;
 	private transient SignalSystemsData signalSystems;
 
-	public OTFSignalWriter(VisNetwork visNetwork, LaneDefinitions20 lanes, Config config, SignalSystemsData signalSystemsData, SignalGroupsData signalGroupsData, SignalGroupStateChangeTracker signalTracker) {
+	public OTFSignalWriter(VisNetwork visNetwork, Lanes lanes, Config config, SignalSystemsData signalSystemsData, SignalGroupsData signalGroupsData, SignalGroupStateChangeTracker signalTracker) {
 		super(visNetwork, lanes, config);
 		this.signalTracker = signalTracker;
 		this.signalSystems = signalSystemsData;

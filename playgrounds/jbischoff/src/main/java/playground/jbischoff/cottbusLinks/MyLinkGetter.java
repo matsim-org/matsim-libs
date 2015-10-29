@@ -40,7 +40,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
@@ -60,7 +60,7 @@ public class MyLinkGetter {
 	
 	
 	DijkstraFactory df = new DijkstraFactory();
-	ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+	MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 	String netfile = "Z:\\WinHome\\Docs\\cottbus\\cottbus_feb_fix\\Cottbus-pt\\network_pt.xml";
 	log.info("loading network from " + netfile);

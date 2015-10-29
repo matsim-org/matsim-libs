@@ -10,10 +10,13 @@ import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 
+import com.google.inject.Inject;
+
 
 public class RandomActivitiesSwaperStrategy implements PlanStrategy{
 	private final PlanStrategy planStrategyDelegate;
-		
+	
+	@Inject
 	public  RandomActivitiesSwaperStrategy(final Scenario scenario) {
 			
 	    PlanStrategyImpl.Builder builder = new PlanStrategyImpl.Builder(new RandomPlanSelector<Plan, Person>() );

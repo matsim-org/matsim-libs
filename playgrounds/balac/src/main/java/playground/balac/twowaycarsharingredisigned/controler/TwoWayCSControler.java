@@ -15,6 +15,8 @@ import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.router.*;
 import org.matsim.core.scenario.ScenarioUtils;
 
+import playground.balac.freefloating.router.FreeFloatingRoutingModule;
+import playground.balac.onewaycarsharingredisgned.router.OneWayCarsharingRDRoutingModule;
 import playground.balac.twowaycarsharingredisigned.config.TwoWayCSConfigGroup;
 import playground.balac.twowaycarsharingredisigned.qsim.TwoWayCSQsimFactory;
 import playground.balac.twowaycarsharingredisigned.router.TwoWayCSRoutingModule;
@@ -64,49 +66,37 @@ public class TwoWayCSControler extends Controler{
             }
         });
 
-		controler.setTripRouterFactory(
-            new javax.inject.Provider<org.matsim.core.router.TripRouter>() {
-                @Override
-                public TripRouter get() {
-                    // this factory initializes a TripRouter with default modules,
-                    // taking into account what is asked for in the config
+		  controler.addOverridingModule(new AbstractModule() {
 
-                    // This allows us to just add our module and go.
-                    final javax.inject.Provider<TripRouter> delegate = TripRouterFactoryBuilderWithDefaults.createDefaultTripRouterFactoryImpl(controler.getScenario());
+				@Override
+				public void install() {
 
-                    final TripRouter router = delegate.get();
+					addRoutingModuleBinding("twowaycarsharing").toInstance(new TwoWayCSRoutingModule());
 
-                    // add our module to the instance
-                    router.setRoutingModule(
-                        "twowaycarsharing",
-                        new TwoWayCSRoutingModule());
+					bind(MainModeIdentifier.class).toInstance(new MainModeIdentifier() {
 
-                    // we still need to provide a way to identify our trips
-                    // as being twowaycarsharing trips.
-                    // This is for instance used at re-routing.
-                    final MainModeIdentifier defaultModeIdentifier =
-                        router.getMainModeIdentifier();
-                    router.setMainModeIdentifier(
-                            new MainModeIdentifier() {
-                                @Override
-                                public String identifyMainMode(
-                                        final List<? extends PlanElement> tripElements) {
-                                    for ( PlanElement pe : tripElements ) {
-                                        if ( pe instanceof Leg && ((Leg) pe).getMode().equals( "twowaycarsharing" ) ) {
-                                            return "twowaycarsharing";
-                                        }
-                                    }
-                                    // if the trip doesn't contain a onewaycarsharing leg,
-                                    // fall back to the default identification method.
-                                    return defaultModeIdentifier.identifyMainMode( tripElements );
-                                }
-                            });
+	                    final MainModeIdentifier defaultModeIdentifier = new MainModeIdentifierImpl();
+						
+						@Override
+						public String identifyMainMode(List<? extends PlanElement> tripElements) {
 
-                    return router;
-                }
-
-
-            });
+							for ( PlanElement pe : tripElements ) {
+	                            if ( pe instanceof Leg && ((Leg) pe).getMode().equals( "twowaycarsharing" ) ) {
+	                                return "twowaycarsharing";
+	                            }
+	                           
+	                        }
+	                        // if the trip doesn't contain a carsharing leg,
+	                        // fall back to the default identification method.
+	                        return defaultModeIdentifier.identifyMainMode( tripElements );
+						
+						}				
+						
+					});		
+					
+				}
+				
+			});
 
 		controler.init(config, sc.getNetwork());
 

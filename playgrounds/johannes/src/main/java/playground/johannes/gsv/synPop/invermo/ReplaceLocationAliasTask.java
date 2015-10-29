@@ -19,10 +19,10 @@
 
 package playground.johannes.gsv.synPop.invermo;
 
-import playground.johannes.synpop.processing.PersonTask;
 import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.Episode;
 import playground.johannes.synpop.data.Person;
+import playground.johannes.synpop.processing.PersonTask;
 
 /**
  * @author johannes

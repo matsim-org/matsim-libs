@@ -17,7 +17,7 @@ import org.matsim.contrib.parking.lib.obj.list.Lists;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 
 
 public class VehiclePopulationAssignment {
@@ -31,7 +31,7 @@ public class VehiclePopulationAssignment {
 		
 		HashMap<Id, VehicleTypeLAV> agentVehicleMapping=null;
 		
-		ScenarioImpl scenario = (ScenarioImpl) GeneralLib.readScenario(plansFileName, networkFileName, facilitiesFileName);
+		MutableScenario scenario = (MutableScenario) GeneralLib.readScenario(plansFileName, networkFileName, facilitiesFileName);
 		agentVehicleMapping = getAgentVehicleMapping(eventsFileName, scenario, FleetCompositionReader.getFleetCompositionFileNameForTest());
 	
 		for (Id personId:agentVehicleMapping.keySet()){
@@ -40,7 +40,7 @@ public class VehiclePopulationAssignment {
 	}
 
 
-	public static HashMap<Id, VehicleTypeLAV> getAgentVehicleMapping(final String eventsFileName, ScenarioImpl scenario, String fleetCompositionFileName) {
+	public static HashMap<Id, VehicleTypeLAV> getAgentVehicleMapping(final String eventsFileName, MutableScenario scenario, String fleetCompositionFileName) {
 		HashMap<Id, VehicleTypeLAV> agentVehicleMapping;
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		TotalLengthOfAllCarLegsInDay totalLengthOfAllCarLegsInDay = new TotalLengthOfAllCarLegsInDay(scenario.getNetwork());

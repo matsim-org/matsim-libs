@@ -39,7 +39,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.core.utils.misc.Time;
@@ -59,7 +59,7 @@ public class CalcLegTimesTest extends MatsimTestCase {
 		super.setUp();
 		super.loadConfig(null);
 
-		ScenarioImpl s = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario s = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		this.population = s.getPopulation();
 		Person person = PersonImpl.createPerson(DEFAULT_PERSON_ID);
 		this.population.addPerson(person);

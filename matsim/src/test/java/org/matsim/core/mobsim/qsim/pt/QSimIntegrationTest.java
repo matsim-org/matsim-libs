@@ -48,7 +48,7 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.testcases.utils.SelectiveEventsCollector;
@@ -406,14 +406,14 @@ public class QSimIntegrationTest {
 
 
 	private static class Fixture {
-		public final ScenarioImpl scenario;
+		public final MutableScenario scenario;
 		public Fixture() throws SAXException, ParserConfigurationException, IOException {
 			// setup: config
 			final Config config = ConfigUtils.createConfig();
 			config.transit().setUseTransit(true);	
 			config.qsim().setEndTime(8.0*3600);
 
-			this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+			this.scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 
 			// setup: network
 			Network network = this.scenario.getNetwork();

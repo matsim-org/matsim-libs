@@ -30,7 +30,7 @@ import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.opengis.feature.simple.SimpleFeature;
 
 import playground.andreas.aas.modules.AbstractAnalyisModule;
@@ -48,14 +48,14 @@ public class AasRunner {
 	private final String baseFolder;
 	private final String iterationOutputDir;
 	private final String eventsFile;
-	private final ScenarioImpl scenario;
+	private final MutableScenario scenario;
 	private final Collection<SimpleFeature> shapeFile;
 	
 	private final List<AbstractAnalyisModule> anaModules = new LinkedList<AbstractAnalyisModule>();
 
 	
 
-	public AasRunner(ScenarioImpl scenario, String baseFolder, String iterationOutputDir, String eventsFile, Collection<SimpleFeature> shapeFile) {
+	public AasRunner(MutableScenario scenario, String baseFolder, String iterationOutputDir, String eventsFile, Collection<SimpleFeature> shapeFile) {
 		this.baseFolder = baseFolder;
 		this.iterationOutputDir = iterationOutputDir;
 		this.eventsFile = eventsFile;

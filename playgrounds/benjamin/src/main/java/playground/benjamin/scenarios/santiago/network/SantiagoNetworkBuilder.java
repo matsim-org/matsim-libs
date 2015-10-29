@@ -54,7 +54,6 @@ import org.opengis.feature.simple.SimpleFeature;
 import com.vividsolutions.jts.geom.Coordinate;
 
 import playground.benjamin.scenarios.santiago.SantiagoScenarioConstants;
-import playground.benjamin.scenarios.santiago.population.SantiagoScenarioBuilder;
 import playground.benjamin.utils.MergeNetworks;
 
 public class SantiagoNetworkBuilder {
@@ -63,9 +62,9 @@ public class SantiagoNetworkBuilder {
 //	final boolean prepareForModeChoice = false;
 	final boolean prepareForModeChoice = true;
 	
-	private final String svnWorkingDir = "../../../shared-svn/studies/countries/cl/"; 	//Path: KT (SVN-checkout)
+	private final String svnWorkingDir = "../../../shared-svn/studies/countries/cl/";
 	private final String workingDirInputFiles = svnWorkingDir + "Kai_und_Daniel/inputFromElsewhere/";
-	private final String outputDir = svnWorkingDir + "Kai_und_Daniel/inputForMATSim/network/";		//outputDir of this class -> input for Matsim (KT)
+	private final String outputDir = svnWorkingDir + "Kai_und_Daniel/inputForMATSim/network/";
 
 	private final String transitNetworkFile = svnWorkingDir + "Kai_und_Daniel/inputForMATSim/transit/transitnetwork.xml.gz";
 	
@@ -118,8 +117,8 @@ public class SantiagoNetworkBuilder {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario).readFile(transitNetworkFile);
 		// TODO: hack in order to avoid pt jamming on the routing network
-		for(Link ll : scenario.getNetwork().getLinks().values()){
-			ll.setCapacity(200 * ll.getCapacity());
+		for(Link ptLink : scenario.getNetwork().getLinks().values()){
+			ptLink.setCapacity(200 * ptLink.getCapacity());
 		}
 		new MergeNetworks().merge(network, TransportMode.pt, scenario.getNetwork());
 	}

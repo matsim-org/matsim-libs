@@ -24,8 +24,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.facilities.ActivityFacility;
-import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.Attributable;
+import playground.johannes.synpop.data.CommonKeys;
 
 /**
  * @author johannes

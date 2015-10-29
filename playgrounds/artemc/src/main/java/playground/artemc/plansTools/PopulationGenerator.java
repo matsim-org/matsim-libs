@@ -15,7 +15,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
@@ -59,7 +59,7 @@ public class PopulationGenerator {
 		log.info("Shape file contains "+fts.size()+" zones!");
 	
 		
-		Population population = ((ScenarioImpl)scenario).getPopulation();
+		Population population = ((MutableScenario)scenario).getPopulation();
 		PopulationFactory populationFactory = population.getFactory();
 		
 		Random rnd = MatsimRandom.getRandom();

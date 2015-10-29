@@ -23,15 +23,14 @@
 package playground.johannes.gsv.demand.loader;
 
 import gnu.trove.TIntDoubleHashMap;
+import playground.johannes.gsv.demand.AbstractTaskWrapper;
+import playground.johannes.gsv.demand.LoaderUtils;
+import playground.johannes.gsv.demand.tasks.PersonCarAvailability;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Random;
-
-import playground.johannes.gsv.demand.AbstractTaskWrapper;
-import playground.johannes.gsv.demand.LoaderUtils;
-import playground.johannes.gsv.demand.tasks.PersonCarAvailability;
 
 /**
  * @author johannes

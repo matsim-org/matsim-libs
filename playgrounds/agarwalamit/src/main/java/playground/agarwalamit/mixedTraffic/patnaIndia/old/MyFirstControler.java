@@ -14,7 +14,7 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup.LinkDynamics;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
@@ -95,7 +95,7 @@ public class MyFirstControler {
         controler.getConfig().controler().setCreateGraphs(true);
 		controler.addOverridingModule(new OTFVisModule());
 
-		controler.addControlerListener(new WelfareAnalysisControlerListener((ScenarioImpl)controler.getScenario()));
+		controler.addControlerListener(new WelfareAnalysisControlerListener((MutableScenario)controler.getScenario()));
 		controler.setDumpDataAtEnd(true);
 		controler.run();
 	}

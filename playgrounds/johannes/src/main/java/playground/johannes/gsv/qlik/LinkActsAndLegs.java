@@ -19,7 +19,7 @@
 
 package playground.johannes.gsv.qlik;
 
-import playground.johannes.socialnetworks.utils.XORShiftRandom;
+import org.matsim.contrib.common.util.XORShiftRandom;
 import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.Episode;
 import playground.johannes.synpop.data.PlainFactory;

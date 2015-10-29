@@ -25,7 +25,7 @@ import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.contrib.common.stats.StatsWriter;
 import playground.johannes.coopsim.pysical.Trajectory;
-import playground.johannes.mz2005.io.ActivityType;
+import playground.johannes.studies.mz2005.io.ActivityType;
 
 import java.io.IOException;
 import java.util.Map;

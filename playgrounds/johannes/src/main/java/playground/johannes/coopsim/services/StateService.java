@@ -19,19 +19,18 @@
  * *********************************************************************** */
 package playground.johannes.coopsim.services;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.matsim.api.core.v01.population.Plan;
-
+import org.matsim.contrib.socnetgen.sna.graph.social.SocialVertex;
 import playground.johannes.coopsim.mental.choice.ActivityGroupSelector;
 import playground.johannes.coopsim.mental.choice.ChoiceSelector;
 import playground.johannes.coopsim.mental.planmod.Choice2ModAdaptor;
 import playground.johannes.coopsim.mental.planmod.PlanModEngine;
 import playground.johannes.coopsim.mental.planmod.SingleThreadedModEngine;
-import playground.johannes.socialnetworks.graph.social.SocialVertex;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author illenberger

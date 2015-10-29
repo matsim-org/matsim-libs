@@ -27,7 +27,7 @@ import javax.management.loading.PrivateClassLoader;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.facilities.ActivityFacility;
 
 import playground.wrashid.lib.obj.TwoHashMapsConcatenated;
@@ -52,7 +52,7 @@ public class ParkingInfrastructureZH extends ParkingInfrastructure{
 			this.parkings.put(parking.getId(), parking);
 			if (!parking.getType().equalsIgnoreCase("public")){
 				PrivateParking privateParking=(PrivateParking) parking;
-				ActivityFacility activityFacility = ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().get(parking.getId());
+				ActivityFacility activityFacility = ((MutableScenario) scenario).getActivityFacilities().getFacilities().get(parking.getId());
 				nonFullPublicParkingFacilities.remove(parking.getCoord().getX(), parking.getCoord().getY(), activityFacility);
 			
 				privateParkingFacilityIdMapping.put(privateParking.getActInfo().getFacilityId(), privateParking.getActInfo().getActType(), parking.getId());
@@ -67,7 +67,7 @@ public class ParkingInfrastructureZH extends ParkingInfrastructure{
 	public ActivityFacility getFreePrivateParking(Id actFacilityId, String actType){
 		Id parkingFacilityId = privateParkingFacilityIdMapping.get(actFacilityId, actType);
 		
-		ActivityFacility parkingFacility = ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().get(parkingFacilityId);
+		ActivityFacility parkingFacility = ((MutableScenario) scenario).getActivityFacilities().getFacilities().get(parkingFacilityId);
 	
 		if (parkingFacility==null){
 			return null;

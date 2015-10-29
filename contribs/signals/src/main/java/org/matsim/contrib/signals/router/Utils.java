@@ -37,7 +37,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.algorithms.NetworkExpandNode.TurnInfo;
 import org.matsim.core.router.util.NetworkTurnInfoBuilder;
 import org.matsim.lanes.data.v20.Lane;
-import org.matsim.lanes.data.v20.LaneDefinitions20;
+import org.matsim.lanes.data.v20.Lanes;
 import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
 
 /**
@@ -47,7 +47,7 @@ import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
 class Utils {
 	private Utils(){} // do not instantiate
 
-	static Map<Id<Link>, List<TurnInfo>> createTurnInfos(LaneDefinitions20 laneDefs) {
+	static Map<Id<Link>, List<TurnInfo>> createTurnInfos(Lanes laneDefs) {
 		Map<Id<Link>, List<TurnInfo>> inLinkIdTurnInfoMap = new HashMap<>();
 		Set<Id<Link>> toLinkIds = new HashSet<>();
 		for (LanesToLinkAssignment20 l2l : laneDefs.getLanesToLinkAssignments().values()) {
@@ -78,7 +78,7 @@ class Utils {
 		netTurnInfoBuilder.createAndAddTurnInfo(TransportMode.car, allowedInLinkTurnInfoMap, sc.getNetwork() );
 	
 		if ( sc.getConfig().network().getLaneDefinitionsFile()!=null || sc.getConfig().qsim().isUseLanes()) {
-			LaneDefinitions20 ld = sc.getLanes();
+			Lanes ld = sc.getLanes();
 			Map<Id<Link>, List<TurnInfo>> lanesTurnInfoMap = createTurnInfos(ld);
 			netTurnInfoBuilder.mergeTurnInfoMaps(allowedInLinkTurnInfoMap, lanesTurnInfoMap);
 		}

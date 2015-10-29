@@ -19,9 +19,9 @@
 
 package playground.johannes.gsv.synPop.invermo;
 
-import java.util.Map;
-
 import playground.johannes.synpop.data.PlainElement;
+
+import java.util.Map;
 
 /**
  * @author johannes

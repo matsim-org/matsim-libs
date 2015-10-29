@@ -5,7 +5,7 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
 
@@ -18,7 +18,7 @@ public class FlagTurnLinks {
 		String networkInfile = args[0];
 		String networkOutfile = args[1];
 		
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(networkInfile);
 		

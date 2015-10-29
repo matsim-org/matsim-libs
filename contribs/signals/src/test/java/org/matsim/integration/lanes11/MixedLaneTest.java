@@ -44,7 +44,7 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.lanes.data.v20.Lane;
-import org.matsim.lanes.data.v20.LaneDefinitions20;
+import org.matsim.lanes.data.v20.Lanes;
 import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
@@ -81,7 +81,7 @@ public class MixedLaneTest {
 	 */
 	@Test
 	public void testFixture(){
-		LaneDefinitions20 lanes = this.fixture.sc.getLanes();
+		Lanes lanes = this.fixture.sc.getLanes();
 		Assert.assertNotNull(lanes);
 		Assert.assertNotNull(lanes.getLanesToLinkAssignments());
 		LanesToLinkAssignment20 lanesLink1 = lanes.getLanesToLinkAssignments().get(fixture.id1);
@@ -132,7 +132,7 @@ public class MixedLaneTest {
 		if (reduceCap){
 			fixture.sc.getConfig().qsim().setStartTime(3500.0);
 			fixture.sc.getConfig().qsim().setEndTime(7200.0);
-			LaneDefinitions20 lanes = fixture.sc.getLanes();
+			Lanes lanes = fixture.sc.getLanes();
 			Lane lane1 = lanes.getLanesToLinkAssignments().get(fixture.id1).getLanes().get(fixture.laneId1);
 			lane1.setCapacityVehiclesPerHour(1800.0);
 			Lane lane1ol = lanes.getLanesToLinkAssignments().get(fixture.id1).getLanes().get(fixture.link1FirstLaneId);
@@ -197,7 +197,7 @@ public class MixedLaneTest {
 		
 		if (reduceCap){
 			// reduce capacity on lane 1
-			LaneDefinitions20 lanes = fixture.sc.getLanes();
+			Lanes lanes = fixture.sc.getLanes();
 			Lane lane1 = lanes.getLanesToLinkAssignments().
 					get(fixture.id1).getLanes().get(fixture.laneId1);
 			lane1.setCapacityVehiclesPerHour(1800.0);

@@ -19,21 +19,20 @@
  * *********************************************************************** */
 package playground.johannes.coopsim.services;
 
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.contrib.common.collections.CollectionUtils;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.router.util.TravelTime;
+import playground.johannes.coopsim.pysical.Trajectory;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.events.EventsManagerImpl;
-import org.matsim.core.router.util.TravelTime;
-
-import playground.johannes.coopsim.pysical.Trajectory;
-import playground.johannes.socialnetworks.utils.CollectionUtils;
 
 /**
  * @author illenberger

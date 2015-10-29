@@ -31,7 +31,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.ikaddoura.analysis.shapes.IKGISAnalyzer;
@@ -97,7 +97,7 @@ public class CongestionCostAnalysis {
 		Config config = ConfigUtils.loadConfig(runDirectory + "output_config.xml.gz");
 		config.network().setInputFile(runDirectory + "output_network.xml.gz");
 		config.plans().setInputFile(runDirectory + "output_plans.xml.gz");
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.loadScenario(config);
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.loadScenario(config);
 		log.info("Loading scenario... Done.");
 		
 		String outputDirectory = runDirectory + "analysis_it." + config.controler().getLastIteration() + "/";

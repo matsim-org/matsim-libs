@@ -63,11 +63,10 @@ public class MultiModalModule extends AbstractModule {
                 addTravelDisutilityFactoryBinding(mode).to(TravelTimeAndDistanceBasedTravelDisutilityFactory.class).asEagerSingleton();
                 addRoutingModuleBinding(mode).toProvider(new TripRouterFactoryModule.NetworkRoutingModuleProvider(mode));
             } else if (mode.equals(TransportMode.transit_walk)) {
-                // Transit walk is by default an alias to walk
-//                Provider<TravelTime> factory = new TransitWalkTravelTimeFactory(plansCalcRouteConfigGroup, linkSlopes);
-//                addTravelTimeBinding(mode).toProvider(factory);
-//                addTravelDisutilityFactoryBinding(mode).to(TravelTimeAndDistanceBasedTravelDisutilityFactory.class).asEagerSingleton();
-//                addRoutingModuleBinding(mode).toProvider(new TripRouterFactoryModule.NetworkRoutingModuleProvider(mode));
+                Provider<TravelTime> factory = new TransitWalkTravelTimeFactory(plansCalcRouteConfigGroup, linkSlopes);
+                addTravelTimeBinding(mode).toProvider(factory);
+                addTravelDisutilityFactoryBinding(mode).to(TravelTimeAndDistanceBasedTravelDisutilityFactory.class).asEagerSingleton();
+                addRoutingModuleBinding(mode).toProvider(new TripRouterFactoryModule.NetworkRoutingModuleProvider(mode));
             } else if (mode.equals(TransportMode.bike)) {
                 Provider<TravelTime> factory = new BikeTravelTimeFactory(plansCalcRouteConfigGroup, linkSlopes);
                 addTravelTimeBinding(mode).toProvider(factory);

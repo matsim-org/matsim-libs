@@ -1,12 +1,12 @@
 package gunnar.ihop2.regent.costwriting;
 
-import static floetteroed.utilities.Units.MIN_PER_S;
-import static floetteroed.utilities.math.MathHelpers.drawWithoutReplacement;
 import static org.matsim.matrices.MatrixUtils.add;
 import static org.matsim.matrices.MatrixUtils.divHadamard;
 import static org.matsim.matrices.MatrixUtils.inc;
 import static org.matsim.matrices.MatrixUtils.newAnonymousMatrix;
 import floetteroed.utilities.Time;
+import floetteroed.utilities.Units;
+import floetteroed.utilities.math.MathHelpers;
 import gunnar.ihop2.integration.MATSimDummy;
 import gunnar.ihop2.regent.demandreading.ZonalSystem;
 import gunnar.ihop2.regent.demandreading.Zone;
@@ -136,7 +136,7 @@ public class TravelTimeMatrices {
 			// go through all origin zones
 			for (String fromZoneID : relevantAndFeasibleZoneIDs) {
 				// go through a sample of nodes in the origin zone
-				for (Node fromNode : drawWithoutReplacement(sampleCnt,
+				for (Node fromNode : MathHelpers.drawWithoutReplacement(sampleCnt,
 						zonalSystem.getNodes(fromZoneID), rnd)) {
 					final LeastCostPathTree lcpt = new LeastCostPathTree(
 							linkTTs, new OnlyTimeDependentTravelDisutility(
@@ -145,11 +145,11 @@ public class TravelTimeMatrices {
 					// go through all destination zones
 					for (String toZoneID : relevantAndFeasibleZoneIDs) {
 						// go through a sample of nodes in the destination zone
-						for (Node toNode : drawWithoutReplacement(sampleCnt,
+						for (Node toNode : MathHelpers.drawWithoutReplacement(sampleCnt,
 								zonalSystem.getNodes(toZoneID), rnd)) {
 							add(ttMatrix_min, fromZoneID, toZoneID, lcpt
 									.getTree().get(toNode.getId()).getCost()
-									* MIN_PER_S);
+									* Units.MIN_PER_S);
 							inc(cntMatrix, fromZoneID, toZoneID);
 						}
 					}
@@ -184,7 +184,7 @@ public class TravelTimeMatrices {
 
 		System.out.println("STARTED ...");
 
-		final String networkFileName = "./data_ZZZ/run/network-plain.xml";
+		final String networkFileName = "./test/regentmatsim/input/network-plain.xml";
 		final Config config = ConfigUtils.createConfig();
 		config.setParam("network", "inputNetworkFile", networkFileName);
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -192,20 +192,18 @@ public class TravelTimeMatrices {
 		int timeBinSize = 15 * 60;
 		int endTime = 12 * 3600;
 
-		final String zonesShapeFileName = "./data_ZZZ/shapes/sverige_TZ_EPSG3857.shp";
+		final String zonesShapeFileName = "./test/regentmatsim/input/sverige_TZ_EPSG3857.shp";
 		final ZonalSystem zonalSystem = new ZonalSystem(zonesShapeFileName,
 				StockholmTransformationFactory.WGS84_EPSG3857);
 		zonalSystem.addNetwork(scenario.getNetwork(),
 				StockholmTransformationFactory.WGS84_SWEREF99);
 
-		// final String eventsFileName =
-		// "./data_ZZZ/run/output/ITERS/it.0/0.events.xml.gz";
-		final String eventsFileName = "./test/10percentCarNetworkPlain/1000.events.xml.gz";
+		final String eventsFileName = "./test/it.580/580.events.xml.gz";
 
-		final int startTime_s = 5 * 3600;
-		final int binSize_s = 3600;
-		final int binCnt = 15;
-		final int sampleCnt = 1;
+		final int startTime_s = 18 * 3600;
+		final int binSize_s = 1800;
+		final int binCnt = 8;
+		final int sampleCnt = 5;
 
 		final TravelTimeCalculator ttcalc = new TravelTimeCalculator(
 				scenario.getNetwork(), timeBinSize, endTime, scenario
@@ -219,8 +217,8 @@ public class TravelTimeMatrices {
 		final TravelTimeMatrices travelTimeMatrices = new TravelTimeMatrices(
 				scenario.getNetwork(), linkTTs, null, zonalSystem,
 				new Random(), startTime_s, binSize_s, binCnt, sampleCnt);
-//		travelTimeMatrices
-//				.writeToFile("./test/10percentCarNetworkPlain/travelTimeMatrices.xml");
+		travelTimeMatrices
+				.writeToFile("./test/travelTimeMatrices_18-22.xml");
 
 		System.out.println("... DONE");
 	}

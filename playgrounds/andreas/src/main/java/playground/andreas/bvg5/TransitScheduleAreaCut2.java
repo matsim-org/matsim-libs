@@ -36,7 +36,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -130,7 +130,7 @@ public class TransitScheduleAreaCut2 {
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		sc.getConfig().transit().setUseTransit(true);
 		this.newSchedule = sc.getTransitSchedule();
-		this.newVehicles = ((ScenarioImpl) sc).getTransitVehicles();
+		this.newVehicles = ((MutableScenario) sc).getTransitVehicles();
 		TransitScheduleFactory factory = this.newSchedule.getFactory();
 		
 		//copy the vehicles
@@ -419,7 +419,7 @@ public class TransitScheduleAreaCut2 {
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		sc.getConfig().transit().setUseTransit(true);
 		new TransitScheduleReader(sc).readFile(dir + "remainingSchedule.xml.gz");
-		new VehicleReaderV1(((ScenarioImpl) sc).getTransitVehicles() ).readFile(dir + "transitVehicles100.final.xml.gz");
+		new VehicleReaderV1(((MutableScenario) sc).getTransitVehicles() ).readFile(dir + "transitVehicles100.final.xml.gz");
 		
 		BVGLines2PtModes lines2mode = new BVGLines2PtModes();
 		lines2mode.setPtModesForEachLine(sc.getTransitSchedule(), "p");
@@ -428,7 +428,7 @@ public class TransitScheduleAreaCut2 {
 		}};
 		
 		DaShapeWriter.writeTransitLines2Shape(dir + "oldSchedule.shp", sc.getTransitSchedule(), null, TransitSchedule2Shape.getAttributesForLines(sc.getTransitSchedule(), "p"), TransformationFactory.WGS84_UTM33N);
-		TransitScheduleAreaCut2 areacut = new TransitScheduleAreaCut2(sc.getTransitSchedule(), dir + "scenarioArea.shp", lines2mode, modes2Cut, ((ScenarioImpl)sc).getTransitVehicles());
+		TransitScheduleAreaCut2 areacut = new TransitScheduleAreaCut2(sc.getTransitSchedule(), dir + "scenarioArea.shp", lines2mode, modes2Cut, ((MutableScenario)sc).getTransitVehicles());
 		areacut.run(dir);
 		DaShapeWriter.writeTransitLines2Shape(dir + "cuttedSchedule.shp", areacut.getNewSchedule(), null, TransitSchedule2Shape.getAttributesForLines(areacut.getNewSchedule(), "p"), TransformationFactory.WGS84_UTM33N);
 

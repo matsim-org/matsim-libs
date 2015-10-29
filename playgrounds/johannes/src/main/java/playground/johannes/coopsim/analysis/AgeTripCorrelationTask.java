@@ -20,11 +20,11 @@
 package playground.johannes.coopsim.analysis;
 
 import gnu.trove.TObjectDoubleHashMap;
+import org.matsim.contrib.socnetgen.sna.graph.Vertex;
+import org.matsim.contrib.socnetgen.sna.graph.social.SocialGraph;
+import org.matsim.contrib.socnetgen.sna.graph.social.SocialVertex;
+import org.matsim.contrib.socnetgen.sna.graph.social.analysis.Age;
 import playground.johannes.coopsim.pysical.VisitorTracker;
-import playground.johannes.sna.graph.Vertex;
-import playground.johannes.socialnetworks.graph.social.SocialGraph;
-import playground.johannes.socialnetworks.graph.social.SocialVertex;
-import playground.johannes.socialnetworks.graph.social.analysis.Age;
 
 /**
  * @author illenberger

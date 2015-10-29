@@ -33,7 +33,7 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.api.*;
@@ -48,7 +48,7 @@ public class TransitControlerIntegrationTest extends MatsimTestCase {
 	public void testTransitRouteCopy() {
 		Config config = super.loadConfig(null);
 		config.transit().setUseTransit(true);
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 
 		Id<Node> nodeId1 = Id.create("1", Node.class);
 		Id<Node> nodeId2 = Id.create("2", Node.class);

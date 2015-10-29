@@ -140,7 +140,6 @@ public class Create24HourPlans {
 						}
 						
 					} else{
-					
 						if(!act.getType().equals("pt interaction")){
 							
 							double duration = act.getEndTime() - act.getStartTime();
@@ -159,27 +158,16 @@ public class Create24HourPlans {
 							actOut.setEndTime(act.getEndTime());
 							planElements.add(actOut);
 							actType2TypMinDuration.put(actType, new Tuple<Double, Double>(typDur, minDur));
-							
 						}
-						
 					}
-					
 				} else{
-					
 					planElements.add(pe);
-					
 				}
-				
 				cnt++;
-				
 			}
-			
 			for(Entry<String, Tuple<Double,Double>> entry : actType2TypMinDuration.entrySet()){
 				System.out.println(entry.getKey() + "\t" + entry.getValue().getFirst() + "\t" + entry.getValue().getSecond());
 			}
-			
 		}
-		
 	}
-	
 }

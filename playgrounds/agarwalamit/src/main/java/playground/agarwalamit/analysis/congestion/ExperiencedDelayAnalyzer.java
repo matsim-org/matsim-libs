@@ -32,7 +32,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.EventHandler;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 
 import playground.vsp.analysis.modules.AbstractAnalysisModule;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
@@ -112,7 +112,7 @@ public class ExperiencedDelayAnalyzer extends AbstractAnalysisModule {
 	
 	public void checkTotalDelayUsingAlternativeMethod(){
 		EventsManager em = EventsUtils.createEventsManager();
-		CongestionHandlerImplV3 implV3 = new CongestionHandlerImplV3(em, (ScenarioImpl) this.scenario);
+		CongestionHandlerImplV3 implV3 = new CongestionHandlerImplV3(em, (MutableScenario) this.scenario);
 		MatsimEventsReader eventsReader = new MatsimEventsReader(em);
 		em.addHandler(implV3);
 		eventsReader.readFile(this.eventsFile);

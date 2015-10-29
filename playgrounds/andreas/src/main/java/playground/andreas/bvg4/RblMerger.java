@@ -19,7 +19,7 @@ import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
@@ -39,7 +39,7 @@ public class RblMerger {
 	
 	private static final Logger log = Logger.getLogger(RblMerger.class);
 
-	private ScenarioImpl scenario;
+	private MutableScenario scenario;
 
 	public static void main(String[] args) {
 		String networkFilename ="D:/berlin_bvg3/bvg_3_bln_inputdata/rev554B-bvg00-0.1sample/network/network.final.xml.gz";
@@ -164,7 +164,7 @@ public class RblMerger {
 		config.transit().setUseTransit(true);
 		config.network().setInputFile(networkFile);
 		config.transit().setTransitScheduleFile(transitScheduleInFile);
-		this.scenario = (ScenarioImpl) ScenarioUtils.loadScenario(config);;
+		this.scenario = (MutableScenario) ScenarioUtils.loadScenario(config);;
 	}
 
 	private void addNewStops(String newStopsFilename) {

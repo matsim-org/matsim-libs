@@ -31,7 +31,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.routes.GenericRouteImpl;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.PtConstants;
 
@@ -184,7 +184,7 @@ final class ActivityLocationsParatransitUser implements IterationEndsListener {
 		
 		Gbl.startMeasurement();
 		
-		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		
 		String networkFile = "f:/p_runs/txl/network.final.xml.gz";
 		String inPlansFile = "f:/p_runs/txl/run71/it.380/run71.380.plans.xml.gz";

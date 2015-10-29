@@ -19,9 +19,9 @@
 
 package playground.johannes.gsv.qlik;
 
+import org.matsim.contrib.common.gis.DistanceCalculator;
+import org.matsim.contrib.common.gis.WGS84DistanceCalculator;
 import playground.johannes.gsv.zones.KeyMatrix;
-import playground.johannes.socialnetworks.gis.DistanceCalculator;
-import playground.johannes.socialnetworks.gis.WGS84DistanceCalculator;
 import playground.johannes.synpop.gis.Zone;
 import playground.johannes.synpop.gis.ZoneCollection;
 import playground.johannes.synpop.gis.ZoneGeoJsonIO;

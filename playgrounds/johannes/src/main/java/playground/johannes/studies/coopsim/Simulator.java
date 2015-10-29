@@ -28,7 +28,16 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.contrib.common.gis.CartesianDistanceCalculator;
 import org.matsim.contrib.common.util.LoggerUtils;
+import org.matsim.contrib.common.util.XORShiftRandom;
+import org.matsim.contrib.socnetgen.sna.graph.social.SocialGraph;
+import org.matsim.contrib.socnetgen.sna.graph.social.SocialVertex;
+import org.matsim.contrib.socnetgen.sna.math.GaussDistribution;
+import org.matsim.contrib.socnetgen.sna.math.LinearDistribution;
+import org.matsim.contrib.socnetgen.sna.math.LogNormalDistribution;
+import org.matsim.contrib.socnetgen.sna.math.PowerLawDistribution;
+import org.matsim.contrib.socnetgen.sna.util.MultiThreading;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReader;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
@@ -40,7 +49,7 @@ import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scenario.ScenarioUtils.ScenarioBuilder;
 import org.matsim.facilities.ActivityFacilities;
@@ -56,17 +65,8 @@ import playground.johannes.coopsim.mental.choice.*;
 import playground.johannes.coopsim.mental.planmod.*;
 import playground.johannes.coopsim.mental.planmod.concurrent.ConcurrentPlanModEngine;
 import playground.johannes.coopsim.pysical.PhysicalEngine;
-import playground.johannes.sna.util.MultiThreading;
-import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
-import playground.johannes.socialnetworks.graph.social.SocialGraph;
-import playground.johannes.socialnetworks.graph.social.SocialVertex;
-import playground.johannes.socialnetworks.statistics.GaussDistribution;
-import playground.johannes.socialnetworks.statistics.LinearDistribution;
-import playground.johannes.socialnetworks.statistics.LogNormalDistribution;
-import playground.johannes.socialnetworks.statistics.PowerLawDistribution;
-import playground.johannes.socialnetworks.survey.ivt2009.graph.io.SocialSparseGraphMLReader;
-import playground.johannes.socialnetworks.utils.XORShiftRandom;
-import playground.johannes.utils.NetworkLegRouter;
+import playground.johannes.coopsim.utils.NetworkLegRouter;
+import playground.johannes.studies.sbsurvey.io.SocialSparseGraphMLReader;
 
 import java.io.File;
 import java.io.IOException;
@@ -225,7 +225,7 @@ public class Simulator {
 	}
 
 	private static void loadData(Config config) {
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		
 		logger.info("Loading network data...");
 		LoggerUtils.setVerbose(false);

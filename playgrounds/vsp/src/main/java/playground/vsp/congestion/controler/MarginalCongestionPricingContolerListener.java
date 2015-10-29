@@ -32,7 +32,7 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.events.handler.EventHandler;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 
 import playground.vsp.congestion.handlers.MarginalCongestionPricingHandler;
 import playground.vsp.congestion.handlers.TollHandler;
@@ -45,7 +45,7 @@ import playground.vsp.congestion.handlers.TollHandler;
 public class MarginalCongestionPricingContolerListener implements StartupListener, IterationEndsListener {
 	private final Logger log = Logger.getLogger(MarginalCongestionPricingContolerListener.class);
 
-	private final ScenarioImpl scenario;
+	private final MutableScenario scenario;
 	private TollHandler tollHandler;
 	private EventHandler congestionHandler;
 	private MarginalCongestionPricingHandler pricingHandler;
@@ -57,7 +57,7 @@ public class MarginalCongestionPricingContolerListener implements StartupListene
 	 * @param handler must be one of the implementation for congestion pricing 
 	 */
 	public MarginalCongestionPricingContolerListener(Scenario scenario, TollHandler tollHandler, EventHandler congestionHandler){
-		this.scenario = (ScenarioImpl) scenario;
+		this.scenario = (MutableScenario) scenario;
 		this.tollHandler = tollHandler;
 		this.congestionHandler = congestionHandler;
 	}

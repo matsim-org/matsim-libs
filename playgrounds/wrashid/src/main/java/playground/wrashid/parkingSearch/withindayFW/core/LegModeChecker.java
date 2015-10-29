@@ -37,7 +37,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -209,8 +209,8 @@ public class LegModeChecker extends AbstractPersonAlgorithm implements PlanAlgor
 				Activity previousActivity = (Activity) plan.getPlanElements().get(i - 1);
 				Activity nextActivity = (Activity) plan.getPlanElements().get(i + 1);
 				
-				Coord previousCoord = ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().get(previousActivity.getFacilityId()).getCoord();
-				Coord nextCoord = ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().get(nextActivity.getFacilityId()).getCoord();
+				Coord previousCoord = ((MutableScenario) scenario).getActivityFacilities().getFacilities().get(previousActivity.getFacilityId()).getCoord();
+				Coord nextCoord = ((MutableScenario) scenario).getActivityFacilities().getFacilities().get(nextActivity.getFacilityId()).getCoord();
 				
 				/*
 				 * Check the distance to the car. 

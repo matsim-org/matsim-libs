@@ -33,7 +33,7 @@ import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.utils.charts.XYLineChart;
 import playground.vsp.analysis.modules.monetaryTransferPayments.MoneyEventHandler;
 import playground.vsp.analysis.modules.userBenefits.WelfareMeasure;
@@ -56,7 +56,7 @@ import java.util.TreeMap;
 public class AnalysisControlerListener implements StartupListener, IterationEndsListener {
 	private static final Logger log = Logger.getLogger(AnalysisControlerListener.class);
 
-	private final ScenarioImpl scenario;
+	private final MutableScenario scenario;
 	private MoneyEventHandler moneyHandler = new MoneyEventHandler();
 	private TripAnalysisHandler tripAnalysisHandler;
 	private ScheduleDelayCostHandler  scheduleDelayCostHandler;
@@ -102,7 +102,7 @@ public class AnalysisControlerListener implements StartupListener, IterationEnds
 	private HashMap<String, ArrayList<Id<Person>>> person2mode = new HashMap<String, ArrayList<Id<Person>>>();
 
 
-	public AnalysisControlerListener(ScenarioImpl scenario){
+	public AnalysisControlerListener(MutableScenario scenario){
 		this.scenario = scenario;
 		this.tripAnalysisHandler = new TripAnalysisHandler(scenario);
 		this.scheduleDelayCostHandler = new ScheduleDelayCostHandler();

@@ -38,12 +38,12 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.*;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.households.Households;
-import org.matsim.lanes.data.v20.LaneDefinitions20;
+import org.matsim.lanes.data.v20.Lanes;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.vehicles.Vehicles;
 
@@ -65,7 +65,7 @@ public class CreateSelectedPlansTables {
 
 	// true if there are two plans to evaluate (compare)
 	private boolean twoPlans;
-	private ScenarioImpl scenario;
+	private MutableScenario scenario;
 //	private NetworkLayer network;
 
 	private final double [] sumPlanTraveltime={0.0, 0.0};
@@ -110,7 +110,7 @@ public class CreateSelectedPlansTables {
 	}
 
 	private void init(final String networkPath) {
-		this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		this.scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		this.plans0= ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation();
 		this.plans1= ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation();
@@ -373,11 +373,6 @@ public class CreateSelectedPlansTables {
 		}
 
 		@Override
-		public Object removeScenarioElement(String name) {
-			return scenario.removeScenarioElement(name);
-		}
-
-		@Override
 		public Object getScenarioElement(String name) {
 			return scenario.getScenarioElement(name);
 		}
@@ -393,7 +388,7 @@ public class CreateSelectedPlansTables {
 		}
 
 		@Override
-		public LaneDefinitions20 getLanes() {
+		public Lanes getLanes() {
 			return scenario.getLanes();
 		}
 

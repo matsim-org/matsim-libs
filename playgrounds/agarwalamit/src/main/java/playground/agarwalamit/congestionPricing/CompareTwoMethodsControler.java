@@ -24,7 +24,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 
 import playground.ikaddoura.analysis.welfare.WelfareAnalysisControlerListener;
 import playground.vsp.congestion.controler.MarginalCongestionPricingContolerListener;
@@ -80,7 +80,7 @@ public class CompareTwoMethodsControler {
 					bindCarTravelDisutilityFactory().toInstance(tollDisutilityCalculatorFactory);
 				}
 			});
-			controler.addControlerListener(new MarginalCongestionPricingContolerListener((ScenarioImpl) controler.getScenario(), tollHandler, new CongestionHandlerImplV3(controler.getEvents(), (ScenarioImpl) controler.getScenario())));
+			controler.addControlerListener(new MarginalCongestionPricingContolerListener((MutableScenario) controler.getScenario(), tollHandler, new CongestionHandlerImplV3(controler.getEvents(), (MutableScenario) controler.getScenario())));
 		}
 		
 		if(newMethod) {
@@ -101,7 +101,7 @@ public class CompareTwoMethodsControler {
 		controler.getConfig().controler().setCreateGraphs(true);
         controler.setDumpDataAtEnd(true);
 		controler.addOverridingModule(new OTFVisModule());
-		controler.addControlerListener(new WelfareAnalysisControlerListener((ScenarioImpl) controler.getScenario()));
+		controler.addControlerListener(new WelfareAnalysisControlerListener((MutableScenario) controler.getScenario()));
 		
 		controler.run();	
 

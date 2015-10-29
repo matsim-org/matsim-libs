@@ -21,11 +21,10 @@ package playground.johannes.coopsim.analysis;
 
 import gnu.trove.TObjectDoubleHashMap;
 import gnu.trove.TObjectDoubleIterator;
-
-import java.util.Set;
-
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.api.core.v01.population.Person;
+
+import java.util.Set;
 
 
 /**

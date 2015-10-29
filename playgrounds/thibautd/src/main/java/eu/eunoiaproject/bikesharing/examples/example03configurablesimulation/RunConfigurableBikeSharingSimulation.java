@@ -36,7 +36,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.ControlerDefaults;
 import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
@@ -62,7 +62,7 @@ public class RunConfigurableBikeSharingSimulation {
 	private static final Logger log =
 		Logger.getLogger(RunConfigurableBikeSharingSimulation.class);
 
-	public static void main(final String[] args) {
+	public static void main(final String... args) {
 		final String configFile = args[ 0 ];
 
 		OutputDirectoryLogging.catchLogEntries();
@@ -98,7 +98,6 @@ public class RunConfigurableBikeSharingSimulation {
 		final RoutingData ptRouting = createRoutingData( sc, thinnedNetworkGroup );
 		controler.addOverridingModule(
 				BikeSharingScenarioUtils.createTripRouterFactoryAndConfigureRouteFactories(
-					controler.getTravelDisutilityFactory(),
 					controler.getScenario(),
 					null,
 					ptRouting,

@@ -37,7 +37,7 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Time;
@@ -107,7 +107,7 @@ public class PopulationReaderMatsimPops extends MatsimXmlParser implements Popul
 	public PopulationReaderMatsimPops(final Scenario scenario, boolean overwrite) {
 		this.scenario = scenario;
 		if(overwrite)
-            ((ScenarioImpl)scenario).setPopulation(PopulationUtils.createPopulation(((ScenarioImpl) scenario).getConfig(), ((ScenarioImpl) scenario).getNetwork()));
+            ((MutableScenario)scenario).setPopulation(PopulationUtils.createPopulation(((MutableScenario) scenario).getConfig(), ((MutableScenario) scenario).getNetwork()));
 		this.plans = scenario.getPopulation();
 	}
 	

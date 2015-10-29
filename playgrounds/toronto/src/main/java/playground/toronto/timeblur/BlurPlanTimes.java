@@ -26,7 +26,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
 
@@ -38,7 +38,7 @@ public class BlurPlanTimes {
 		System.out.println("  inputNetworkFile: "+inputNetworkFile);
 		System.out.println("  outputPlansFile:  "+outputPlansFile);
 		System.out.println("  mutationRange:    "+mutationRange);
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(inputNetworkFile);
 		PopulationImpl population = (PopulationImpl) scenario.getPopulation();
@@ -60,7 +60,7 @@ public class BlurPlanTimes {
 		System.out.println("  inputNetworkFile: "+inputNetworkFile);
 		System.out.println("  outputPlansFile:  "+outputPlansFile);
 		System.out.println("  binSize:          "+binSize);
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(inputNetworkFile);
 		PopulationImpl population = (PopulationImpl) scenario.getPopulation();
@@ -83,7 +83,7 @@ public class BlurPlanTimes {
 		System.out.println("  outputPlansFile:  "+outputPlansFile);
 		System.out.println("  mutationRange:    "+mutationRange);
 		System.out.println("  binSize:          "+binSize);
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(inputNetworkFile);
 		PopulationImpl population = (PopulationImpl) scenario.getPopulation();

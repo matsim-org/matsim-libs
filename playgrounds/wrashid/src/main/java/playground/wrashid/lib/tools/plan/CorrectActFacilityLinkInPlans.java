@@ -11,7 +11,7 @@ import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.Matrix;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.facilities.ActivityFacility;
 
 public class CorrectActFacilityLinkInPlans {
@@ -37,7 +37,7 @@ public class CorrectActFacilityLinkInPlans {
 					Id.create(matrix.getString(i, 1), Link.class));
 		}
 
-		ScenarioImpl scenario = (ScenarioImpl) GeneralLib.readScenario(
+		MutableScenario scenario = (MutableScenario) GeneralLib.readScenario(
 				inputPlansFile, inputNetworkFile);
 
 		for (Person p : scenario.getPopulation().getPersons().values()) {

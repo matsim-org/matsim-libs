@@ -20,10 +20,10 @@
 package playground.johannes.gsv.synPop.data;
 
 import org.apache.log4j.Logger;
+import org.matsim.contrib.socnetgen.sna.gis.Zone;
+import org.matsim.contrib.socnetgen.sna.gis.ZoneLayer;
 import org.matsim.facilities.ActivityFacility;
-import playground.johannes.coopsim.util.MatsimCoordUtils;
-import playground.johannes.sna.gis.Zone;
-import playground.johannes.sna.gis.ZoneLayer;
+import playground.johannes.coopsim.utils.MatsimCoordUtils;
 import playground.johannes.synpop.gis.DataPool;
 import playground.johannes.synpop.gis.FacilityData;
 import playground.johannes.synpop.gis.FacilityDataLoader;

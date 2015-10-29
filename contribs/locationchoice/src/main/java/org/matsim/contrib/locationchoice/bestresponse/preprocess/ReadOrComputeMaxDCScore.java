@@ -37,11 +37,11 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 public class ReadOrComputeMaxDCScore {	
 	
 	private final static Logger log = Logger.getLogger(ReadOrComputeMaxDCScore.class);
-	
+
 	public static String maxEpsFile = "personsMaxDCScoreUnscaled.xml";
-	
-	private Scenario scenario;	
-	private Config config;	
+
+	private Config config;
+	private Scenario scenario; 
 	private DestinationChoiceConfigGroup dccg;
 	private DestinationChoiceBestResponseContext lcContext;
 	private ObjectAttributes personsMaxDCScoreUnscaled = new ObjectAttributes();	
