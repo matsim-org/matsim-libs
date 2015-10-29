@@ -22,7 +22,9 @@ package org.matsim.contrib.locationchoice.bestresponse.scoring;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
+import org.matsim.core.config.Config;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
@@ -32,44 +34,67 @@ import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
 public class DCScoringFunctionFactory implements ScoringFunctionFactory {
-	private DestinationChoiceBestResponseContext lcContext;
-	private Scenario scenario;
+	
 	private final static Logger log = Logger.getLogger(DCScoringFunctionFactory.class);
+	
+	private final Scenario scenario;
+	private final DestinationChoiceBestResponseContext lcContext;
+	
+	private boolean usingConfigParamsForScoring = true;
+	private boolean usingIndividualScoringParameters = true;
+	private CharyparNagelScoringParameters nonPersonalizedScoringParameters = null;
 
     public DCScoringFunctionFactory(Scenario scenario, DestinationChoiceBestResponseContext lcContext) {
 		this.scenario = scenario;
 		this.lcContext = lcContext;
 		log.info("creating DCScoringFunctionFactory");
+		
+		// configure ScoringFunction according to config
+		DestinationChoiceConfigGroup dccg = (DestinationChoiceConfigGroup) scenario.getConfig().getModule(DestinationChoiceConfigGroup.GROUP_NAME);
+		if (dccg != null) {
+			this.setUsingConfigParamsForScoring(dccg.getUseConfigParamsForScoring());
+			this.setUsingIndividualScoringParameters(dccg.getUseIndividualScoringParameters());
+		} else log.warn("No DestinationChoiceConfigGroup was found in the config - cannot configure DCScoringFunctionFactory according to it!");
 	}
 	
-	private boolean usingConfigParamsForScoring = true ;
-	public void setUsingConfigParamsForScoring( boolean val ) {
-		usingConfigParamsForScoring = val ;
+	public void setUsingConfigParamsForScoring(boolean val) {
+		this.usingConfigParamsForScoring = val;
 	}
 
+	public void setUsingIndividualScoringParameters(boolean val) {
+		this.usingIndividualScoringParameters = val;
+		if (!this.usingIndividualScoringParameters) {
+			Config config = this.scenario.getConfig();
+			String subPopulationAttributeName = null;
+			this.nonPersonalizedScoringParameters = CharyparNagelScoringParameters.getBuilder(config.planCalcScore(), 
+					config.planCalcScore().getScoringParameters(subPopulationAttributeName), config.scenario()).create();
+		}
+	}
+	
 	@Override
-	public ScoringFunction createNewScoringFunction(Person person) {		
+	public ScoringFunction createNewScoringFunction(Person person) {
+		
 		SumScoringFunction scoringFunctionAccumulator = new SumScoringFunction();
 		
-		SumScoringFunction.BasicScoring scoringFunction ;
-		if ( usingConfigParamsForScoring ) {
-			scoringFunction = new DCActivityWOFacilitiesScoringFunction( person, this.lcContext);
-			scoringFunctionAccumulator.addScoringFunction(new CharyparNagelActivityScoring( this.lcContext.getParams() ) ) ;
+		SumScoringFunction.BasicScoring scoringFunction;
+		if (this.usingConfigParamsForScoring) {
+			scoringFunction = new DCActivityWOFacilitiesScoringFunction(person, this.lcContext);
+			scoringFunctionAccumulator.addScoringFunction(new CharyparNagelActivityScoring(this.lcContext.getParams()));
 			// forgetting the previous line (which we did at some point) is not picked up by any test within the locationchoice contrib. kai, oct'14
 		} else {
 			scoringFunction = new DCActivityScoringFunction(person.getSelectedPlan(), this.lcContext);
 		}
 		scoringFunctionAccumulator.addScoringFunction(scoringFunction);
-		scoringFunctionAccumulator.addScoringFunction(
-				new CharyparNagelLegScoring(
-						CharyparNagelScoringParameters.getBuilder(
-								scenario,
-								person.getId() ).create(), scenario.getNetwork()));
-		scoringFunctionAccumulator.addScoringFunction(
-				new CharyparNagelAgentStuckScoring(
-						CharyparNagelScoringParameters.getBuilder(
-								scenario,
-								person.getId() ).create()));
+		
+		if (this.usingIndividualScoringParameters) {
+			CharyparNagelScoringParameters scoringParameters = CharyparNagelScoringParameters.getBuilder(this.scenario, person.getId()).create();
+			scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(scoringParameters, this.scenario.getNetwork()));
+			scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(scoringParameters));
+		} else {
+			scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(this.nonPersonalizedScoringParameters, this.scenario.getNetwork()));
+			scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(this.nonPersonalizedScoringParameters));
+		}
+		
 		return scoringFunctionAccumulator;
 	}
 }

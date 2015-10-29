@@ -19,6 +19,10 @@
 
 package org.matsim.contrib.locationchoice;
 
+import java.util.List;
+import java.util.TreeMap;
+import java.util.Vector;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup.Algotype;
@@ -27,20 +31,16 @@ import org.matsim.contrib.locationchoice.timegeography.RecursiveLocationMutator;
 import org.matsim.contrib.locationchoice.timegeography.SingleActLocationMutator;
 import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
 import org.matsim.contrib.locationchoice.utils.ActivitiesHandler;
-import org.matsim.contrib.locationchoice.utils.QuadTreeRing;
 import org.matsim.contrib.locationchoice.utils.TreesBuilder;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
+import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
-
-import java.util.List;
-import java.util.TreeMap;
-import java.util.Vector;
 
 public class DestinationChoice extends AbstractMultithreadedModule {
 
@@ -50,7 +50,7 @@ public class DestinationChoice extends AbstractMultithreadedModule {
 	private ActivitiesHandler defineFlexibleActivities;
 	private ActTypeConverter actTypeConverter;
 
-	protected TreeMap<String, QuadTreeRing<ActivityFacility>> quadTreesOfType = new TreeMap<String, QuadTreeRing<ActivityFacility>>();
+	protected TreeMap<String, QuadTree<ActivityFacility>> quadTreesOfType = new TreeMap<String, QuadTree<ActivityFacility>>();
 
 	protected TreeMap<String, ActivityFacilityImpl []> facilitiesOfType = new TreeMap<String, ActivityFacilityImpl []>();
 	private final Scenario scenario;
