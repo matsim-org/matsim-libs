@@ -105,13 +105,13 @@ public class TwoWayCarsharingVehicleLocation {
 			}
 			
 			if (!newvehIDs.remove(id))
-				throw new NullPointerException("Removing the vehicle did not wok");
+				throw new NullPointerException("Removing the vehicle did not work");
 
 			TwoWayCarsharingStation fNew = new TwoWayCarsharingStation(station.getLink(), station.getNumberOfVehicles() - 1, newvehIDs);	
 			
 						
 			if (!vehicleLocationQuadTree.remove(station.getLink().getCoord().getX(), station.getLink().getCoord().getY(), station)) 
-				throw new NullPointerException("Removing the station did not wok");
+				throw new NullPointerException("Removing the station did not work");
 			vehicleLocationQuadTree.put(station.getLink().getCoord().getX(), station.getLink().getCoord().getY(), fNew);
 			
 		
