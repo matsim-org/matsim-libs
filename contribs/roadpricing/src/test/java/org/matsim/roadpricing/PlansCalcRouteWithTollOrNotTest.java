@@ -37,9 +37,7 @@ import org.matsim.core.controler.Injector;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.TripRouterModule;
-import org.matsim.core.router.costcalculators.TravelDisutilityModule;
-import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
-import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
 import org.matsim.core.scenario.ScenarioElementsModule;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -135,7 +133,7 @@ public class PlansCalcRouteWithTollOrNotTest {
 						addTravelTimeBinding(TransportMode.car).to(FreeSpeedTravelTime.class);
 						bind(PlansCalcRouteWithTollOrNot.class);
 						install(new ScenarioElementsModule());
-						addTravelDisutilityFactoryBinding(TransportMode.car).to(TravelTimeAndDistanceBasedTravelDisutilityFactory.class);
+						addTravelDisutilityFactoryBinding(TransportMode.car).to(RandomizingTimeDistanceTravelDisutility.Builder.class);
 						install(new TripRouterModule());
 						addControlerListenerBinding().to(RoadPricingControlerListener.class);
 

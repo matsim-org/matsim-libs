@@ -40,8 +40,8 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.*;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility.Builder;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
 import org.matsim.core.router.util.FastDijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
@@ -121,7 +121,7 @@ public class PassengerRunner {
 	}
 	
 	private static TripRouter createTripRouterInstance(Scenario scenario, Provider<TripRouter> tripRouterFactory) {
-		TravelDisutilityFactory travelDisutilityFactory = new TravelTimeAndDistanceBasedTravelDisutilityFactory();
+		TravelDisutilityFactory travelDisutilityFactory = new Builder();
 		TravelTime travelTime = new FreeSpeedTravelTime();
 		TravelDisutility travelDisutility = travelDisutilityFactory.createTravelDisutility(travelTime, scenario.getConfig().planCalcScore());
 		RoutingContext routingContext = new RoutingContextImpl(travelDisutility, travelTime);
@@ -139,8 +139,8 @@ public class PassengerRunner {
 		LeastCostPathCalculatorFactory leastCostPathCalculatorFactory = builder.createDefaultLeastCostPathCalculatorFactory(scenario);
 		Provider<TransitRouter> transitRouterFactory = null;
 		if (scenario.getConfig().transit().isUseTransit()) transitRouterFactory = builder.createDefaultTransitRouter(scenario);
-		
-		TravelDisutilityFactory travelDisutilityFactory = new TravelTimeAndDistanceBasedTravelDisutilityFactory();
+
+		TravelDisutilityFactory travelDisutilityFactory = new Builder();
 		Provider<TripRouter> defaultDelegateFactory = new DefaultDelegateFactory(scenario, leastCostPathCalculatorFactory);
 		Provider<TripRouter> multiModalTripRouterFactory = new MultimodalTripRouterFactory(scenario, multiModalTravelTimes,
 				travelDisutilityFactory, defaultDelegateFactory, new FastDijkstraFactory());

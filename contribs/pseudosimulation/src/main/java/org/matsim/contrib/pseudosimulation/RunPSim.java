@@ -51,7 +51,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.*;
 import org.matsim.core.controler.listener.*;
-import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility.Builder;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.charts.XYLineChart;
@@ -219,8 +219,8 @@ public class RunPSim {
             });
         } else {
             //randomized routing for car and transit
-            final TravelTimeAndDistanceBasedTravelDisutilityFactory disutilityFactory =
-                    new TravelTimeAndDistanceBasedTravelDisutilityFactory();
+            final Builder disutilityFactory =
+                    new Builder();
             matsimControler.addOverridingModule(new AbstractModule() {
                 @Override
                 public void install() {

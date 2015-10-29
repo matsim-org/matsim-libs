@@ -31,8 +31,8 @@ import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility.Builder;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
 import org.matsim.core.router.old.LegRouter;
 import org.matsim.core.router.old.NetworkLegRouter;
 import org.matsim.core.router.util.*;
@@ -124,7 +124,7 @@ public class CreateMultiModalLegRouters {
 		TravelTime travelTime;
 		TravelDisutility travelDisutility;
 		LeastCostPathCalculator routeAlgo;
-		TravelDisutilityFactory travlDisutilityFactory = new TravelTimeAndDistanceBasedTravelDisutilityFactory();
+		TravelDisutilityFactory travlDisutilityFactory = new Builder();
 		TransportModeNetworkFilter networkFilter = new TransportModeNetworkFilter(network);
 		for (String mode : modesToReroute) {
 			

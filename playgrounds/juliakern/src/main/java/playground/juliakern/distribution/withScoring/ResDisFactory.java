@@ -21,15 +21,12 @@ package playground.juliakern.distribution.withScoring;
 
 import org.matsim.contrib.emissions.*;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility.Builder;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
 import playground.benjamin.internalization.EmissionCostModule;
-import playground.juliakern.distribution.withScoring.EmissionControlerListener;
-import playground.juliakern.distribution.withScoring.ResDisCalculator;
-
 
 
 public class ResDisFactory implements TravelDisutilityFactory {
@@ -41,7 +38,7 @@ public class ResDisFactory implements TravelDisutilityFactory {
 
 	
 	public ResDisFactory(EmissionControlerListener ecl, EmissionModule emissionModule, EmissionCostModule emissionCostModule){
-		this.tdf  = new TravelTimeAndDistanceBasedTravelDisutilityFactory();
+		this.tdf  = new Builder();
 		this.ecl = ecl;
 		this.emissionModule = emissionModule;
 		this.emissionCostModule = emissionCostModule;

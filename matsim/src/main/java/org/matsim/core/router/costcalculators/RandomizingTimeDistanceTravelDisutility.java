@@ -61,14 +61,17 @@ public final class RandomizingTimeDistanceTravelDisutility implements TravelDisu
 	// === start Builder ===
 	public static class Builder implements TravelDisutilityFactory{
 		private double sigma = 0. ;
-		public Builder() {
-		}
+
+		public Builder() {}
+
 		@Override
 		public RandomizingTimeDistanceTravelDisutility createTravelDisutility(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
                 return new RandomizingTimeDistanceTravelDisutility(timeCalculator, cnScoringGroup, this.sigma )  ;
 		}
-		public void setSigma( double val ) {
+
+		public Builder setSigma( double val ) {
 			this.sigma = val ;
+			return this;
 		}
 	}  
 	// === end Builder ===

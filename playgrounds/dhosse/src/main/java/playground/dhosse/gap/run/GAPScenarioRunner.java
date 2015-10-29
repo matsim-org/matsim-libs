@@ -1,11 +1,5 @@
 package playground.dhosse.gap.run;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -29,16 +23,10 @@ import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestRespo
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceInitializer;
 import org.matsim.contrib.locationchoice.bestresponse.scoring.DCScoringFunctionFactory;
 import org.matsim.contrib.locationchoice.facilityload.FacilitiesLoadCalculator;
-import org.matsim.contrib.multimodal.ControlerDefaultsWithMultiModalModule;
 import org.matsim.contrib.multimodal.MultiModalControlerListener;
-import org.matsim.contrib.multimodal.MultiModalModule;
-import org.matsim.contrib.multimodal.MultimodalQSimFactory;
 import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.contrib.multimodal.router.util.BikeTravelTimeFactory;
-import org.matsim.contrib.multimodal.router.util.MultiModalTravelTimeFactory;
-import org.matsim.contrib.multimodal.router.util.WalkTravelTime;
 import org.matsim.contrib.multimodal.router.util.WalkTravelTimeFactory;
-import org.matsim.contrib.multimodal.tools.PrepareMultiModalScenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
@@ -47,7 +35,6 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.algorithms.NetworkCleaner;
-import org.matsim.core.population.PersonUtils;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl.Builder;
 import org.matsim.core.replanning.modules.ReRoute;
@@ -56,31 +43,25 @@ import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.MainModeIdentifierImpl;
 import org.matsim.core.router.TripRouterFactoryModule;
-import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
-import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
-import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
-import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
-import org.matsim.core.scoring.functions.SubpopulationCharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.*;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.population.algorithms.XY2Links;
 import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
 import org.matsim.roadpricing.RoadPricingConfigGroup;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
-import org.matsim.vehicles.Vehicle;
-
-import com.google.inject.Binder;
-
 import playground.dhosse.gap.Global;
 import playground.dhosse.gap.analysis.SpatialAnalysis;
+
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * 
@@ -306,13 +287,13 @@ public class GAPScenarioRunner {
 					if(mode.equals(TransportMode.bike)){
 						
 						addTravelTimeBinding(mode).toProvider(new BikeTravelTimeFactory(controler.getConfig().plansCalcRoute()));
-						addTravelDisutilityFactoryBinding(mode).to(TravelTimeAndDistanceBasedTravelDisutilityFactory.class).asEagerSingleton();
+						addTravelDisutilityFactoryBinding(mode).to(RandomizingTimeDistanceTravelDisutility.Builder.class).asEagerSingleton();
 						addRoutingModuleBinding(mode).toProvider(new TripRouterFactoryModule.NetworkRoutingModuleProvider(mode));
 						
 					} else if(mode.equals(TransportMode.walk)){
 						
 						addTravelTimeBinding(mode).toProvider(new WalkTravelTimeFactory(controler.getConfig().plansCalcRoute()));
-						addTravelDisutilityFactoryBinding(mode).to(TravelTimeAndDistanceBasedTravelDisutilityFactory.class).asEagerSingleton();
+						addTravelDisutilityFactoryBinding(mode).to(RandomizingTimeDistanceTravelDisutility.Builder.class).asEagerSingleton();
 						addRoutingModuleBinding(mode).toProvider(new TripRouterFactoryModule.NetworkRoutingModuleProvider(mode));
 						
 					}
@@ -321,7 +302,7 @@ public class GAPScenarioRunner {
 				
 				addControlerListenerBinding().to(MultiModalControlerListener.class);
 //				bindMobsim().toProvider(MultimodalQSimFactory.class);
-			
+
 			}
 			
 		});
