@@ -39,6 +39,7 @@ import org.matsim.contrib.multimodal.router.util.LinkSlopesReader;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Injector;
 import org.matsim.core.events.EventsUtils;
@@ -69,7 +70,8 @@ public class MultiModalTripRouterTest {
 		config.plansCalcRoute().addParam("teleportedModeSpeed_ride", "15.0");
 		config.plansCalcRoute().addParam("teleportedModeSpeed_undefined", "13.88888888888889");
 		config.plansCalcRoute().addParam("teleportedModeSpeed_walk", "1.34");
-		
+
+		config.planCalcScore().addModeParams( new PlanCalcScoreConfigGroup.ModeParams( TransportMode.ride ) );
 		final Scenario scenario = ScenarioUtils.createScenario(config);
 		
 		createNetwork(scenario);
@@ -157,6 +159,7 @@ public class MultiModalTripRouterTest {
 	}
 	
 	private void checkMode(Scenario scenario, String transportMode, PlanRouter planRouter) {
+		// XXX transportMode parameter is NOT USED, hence this test is NOT DOING WHAT IT SHOULD! td oct 15
 		Person person = createPerson(scenario);
 		planRouter.run(person);
 		checkRoute((Leg) person.getSelectedPlan().getPlanElements().get(1), scenario.getNetwork());
