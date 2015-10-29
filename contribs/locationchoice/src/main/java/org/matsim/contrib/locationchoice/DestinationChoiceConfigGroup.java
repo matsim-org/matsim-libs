@@ -20,6 +20,7 @@
 
 package org.matsim.contrib.locationchoice;
 
+import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
@@ -28,8 +29,11 @@ import org.matsim.core.config.ConfigGroup;
 public class DestinationChoiceConfigGroup extends ConfigGroup {
 
 	public static enum Algotype { random, bestResponse, localSearchRecursive, localSearchSingleAct };
+	public static enum EpsilonDistributionTypes { gumbel, gaussian };
+	public static enum InternalPlanDataStructure { planImpl, lcPlan };
 	
 	public static final String GROUP_NAME = "locationchoice";
+	
 	private static final String RESTR_FCN_FACTOR = "restraintFcnFactor";
 	private static final String RESTR_FCN_EXP = "restraintFcnExp";
 	private static final String SCALEFACTOR = "scaleFactor";
@@ -65,6 +69,11 @@ public class DestinationChoiceConfigGroup extends ConfigGroup {
 	
 	private static final String DESTINATIONSAMPLE_PCT = "destinationSamplePercent";
 
+	private static final String INTERNAL_PLAN_DATA_STRUCTURE = "internalPlanDataStructure";
+	private static final String USE_CONFIG_PARAMS_FOR_SCORING = "useConfigParamsForScoring";
+	private static final String USE_INDIVIDUAL_SCORING_PARAMETERS = "useIndividualScoringParameters";
+	private static final String RE_USE_TEMPORARY_PLANS = "reUseTemporaryPlans";
+	
 	//default values
 	private static final double defaultScaleFactor = 1.0;
 	private static final double defaultRecursionTravelSpeedChange = 0.1;
@@ -76,6 +85,11 @@ public class DestinationChoiceConfigGroup extends ConfigGroup {
 	private static final int defaultProbChoiceSetSize = 5;
 	private static final double defaultAnalysisBoundary = 200000;
 	private static final double defaultAnalysisBinSize = 20000;
+	private static final EpsilonDistributionTypes defaultEpsilonDistribution = EpsilonDistributionTypes.gumbel;
+	private static final InternalPlanDataStructure defaultInternalPlanDataStructure = InternalPlanDataStructure.planImpl;
+	private static final boolean defaultUseConfigParamsForScoring = true;
+	private static final boolean defaultUseIndividualScoringParameters = true;
+	private static final boolean defaultReUseTemporaryPlans = false;
 	
 	private double restraintFcnFactor = 0.0;
 	private double restraintFcnExp = 0.0;
@@ -94,7 +108,7 @@ public class DestinationChoiceConfigGroup extends ConfigGroup {
 	private String planSelector = "SelectExpBeta";
 	
 	private long randomSeed = 221177;
-	private String epsilonDistribution = "gumbel";
+	private EpsilonDistributionTypes epsilonDistribution = EpsilonDistributionTypes.gumbel;
 	private String epsilonScaleFactors = null;
 	private int probChoiceSetSize = 5;	
 	private String pkValuesFile = null;
@@ -108,16 +122,40 @@ public class DestinationChoiceConfigGroup extends ConfigGroup {
 	private double analysisBinSize = 20000;
 //	private String idExclusion = Integer.toString(Integer.MAX_VALUE);
 	private Long idExclusion = null;
-	
 	private double destinationSamplePercent = 100.0;
+	
+	/* experimental stuff */
+	private InternalPlanDataStructure internalPlanDataStructure = defaultInternalPlanDataStructure;
+	private boolean useConfigParamsForScoring = defaultUseConfigParamsForScoring;
+	private boolean useIndividualScoringParameters = defaultUseIndividualScoringParameters;
+	private boolean reUseTemporaryPlans = defaultReUseTemporaryPlans;
 
 	private final static Logger log = Logger.getLogger(DestinationChoiceConfigGroup.class);
-
 
 	public DestinationChoiceConfigGroup() {
 		super(GROUP_NAME);
 	}
+	
+	@Override
+	public final Map<String, String> getComments() {
+		Map<String,String> map = super.getComments();
 
+		map.put(INTERNAL_PLAN_DATA_STRUCTURE, "During the location choice process, many alternative locations are evaluated. "
+				+ "For each of them, a temporary plan is created. By default, MATSim regular plan objects are used ('planImpl'). "
+				+ "However, using them results in a certain overhead and more objects to be cleared by the garbage collector. "
+				+ "Instead, an alternative data structure can be used ('lcPlan') - this is still experimental, so use the default ('planImpl') "
+				+ "unless you know what you are doing!  ");
+		map.put(USE_CONFIG_PARAMS_FOR_SCORING, "Default is 'true'. Parameter was already present in the DCScoringFunction.");
+		map.put(USE_INDIVIDUAL_SCORING_PARAMETERS, "MATSim supports individual scoring parameters for sub-populations or even single agents. "
+				+ "If you use global parameters, this can be set to 'false' (default is 'true').");
+		map.put(RE_USE_TEMPORARY_PLANS, "Default is 'false'. During the location choice process, many potential locations are evaluated. "
+				+ "For each of them, a copy of the person's current plan is created, which results in a huge workload for the workload for "
+				+ "the garbage collector as well as the memory bus. When this option is set to 'true', only one copy of the plan is created "
+				+ "and re-used for each checked location. Note that this is still experimental! cdobler oct'15");
+		
+		return map;
+	}
+	
 	@Override
 	public String getValue(final String key) {
 		if (RESTR_FCN_FACTOR.equals(key)) {
@@ -166,7 +204,7 @@ public class DestinationChoiceConfigGroup extends ConfigGroup {
 			return String.valueOf(getRandomSeed());
 		}
 		if (EPSDISTR.equals(key)) {
-			return getEpsilonDistribution();
+			return getEpsilonDistribution().toString();
 		}
 		if (SCALE_EPS.equals(key)) {
 			return getEpsilonScaleFactors();
@@ -203,6 +241,18 @@ public class DestinationChoiceConfigGroup extends ConfigGroup {
 		}
 		if (DESTINATIONSAMPLE_PCT.equals(key)) {
 			return String.valueOf(getDestinationSamplePercent());
+		}
+		if (INTERNAL_PLAN_DATA_STRUCTURE.equals(key)) {
+			return String.valueOf(getInternalPlanDataStructure().toString());
+		}
+		if (USE_CONFIG_PARAMS_FOR_SCORING.equals(key)) {
+			return String.valueOf(getUseConfigParamsForScoring());
+		}
+		if (USE_INDIVIDUAL_SCORING_PARAMETERS.equals(key)) {
+			return String.valueOf(getUseIndividualScoringParameters());
+		}
+		if (RE_USE_TEMPORARY_PLANS.equals(key)) {
+			return String.valueOf(getReUseTemporaryPlans());
 		}
 		throw new IllegalArgumentException(key);
 	}
@@ -329,11 +379,13 @@ public class DestinationChoiceConfigGroup extends ConfigGroup {
 				this.setRandomSeed(longValue);
 			}
 		} else if (EPSDISTR.equals(key)) {
-			if (!(value.equals("gumbel") || value.equals("gaussian"))) {
-				log.warn("set a distribution for the random error terms. Set to default value 'gumbel' now");
-			}
-			else {
-				setEpsilonDistribution(value);
+			if (value.equalsIgnoreCase(EpsilonDistributionTypes.gumbel.toString())) {
+				this.setEpsilonDistribution(EpsilonDistributionTypes.gumbel);
+			} else if (value.equalsIgnoreCase(EpsilonDistributionTypes.gaussian.toString())) {
+				this.setEpsilonDistribution(EpsilonDistributionTypes.gaussian);
+			} else {
+				log.warn("set a distribution for the random error terms. Set to default value '" + defaultEpsilonDistribution.toString() + "' now");
+				this.setEpsilonDistribution(defaultEpsilonDistribution);
 			}
 		} else if (SCALE_EPS.equals(key)) {
 			if (value.length() == 0) {
@@ -456,12 +508,29 @@ public class DestinationChoiceConfigGroup extends ConfigGroup {
 			if (value.length() > 0) {
 				this.setDestinationSamplePercent(Double.parseDouble(value));
 			}
-		} else
-		{
+		} else if (INTERNAL_PLAN_DATA_STRUCTURE.equals(key)) {
+			if (value.equalsIgnoreCase(InternalPlanDataStructure.planImpl.toString())) {
+				this.setInternalPlanDataStructure(InternalPlanDataStructure.planImpl);
+			} else if (value.equalsIgnoreCase(InternalPlanDataStructure.lcPlan.toString())) {
+				this.setInternalPlanDataStructure(InternalPlanDataStructure.lcPlan);
+			} else {
+				log.warn("unknown parameter for internal plan structure was found. Set to default value '" + defaultInternalPlanDataStructure.toString() + "' now");
+				this.setInternalPlanDataStructure(defaultInternalPlanDataStructure);
+			}
+		} else if (USE_CONFIG_PARAMS_FOR_SCORING.equals(key)) {
+			boolean booleanValue = Boolean.parseBoolean(value);
+			this.setUseConfigParamsForScoring(booleanValue);
+		} else if (USE_INDIVIDUAL_SCORING_PARAMETERS.equals(key)) {
+			boolean booleanValue = Boolean.parseBoolean(value);
+			this.setUseIndividualScoringParameters(booleanValue);
+		} else if (RE_USE_TEMPORARY_PLANS.equals(key)) {
+			boolean booleanValue = Boolean.parseBoolean(value);
+			this.setReUseTemporaryPlans(booleanValue);
+		} else {
 			throw new IllegalArgumentException(key);
 		}
 	}
-		
+	
 	@Override
 	public final TreeMap<String, String> getParams() {
 		TreeMap<String, String> map = new TreeMap<String, String>();
@@ -493,6 +562,10 @@ public class DestinationChoiceConfigGroup extends ConfigGroup {
 		this.addParameterToMap(map, ANALYSIS_BINSIZE);
 		this.addParameterToMap(map, IDEXCLUSION);
 		this.addParameterToMap(map, DESTINATIONSAMPLE_PCT);
+		this.addParameterToMap(map, INTERNAL_PLAN_DATA_STRUCTURE);
+		this.addParameterToMap(map, USE_CONFIG_PARAMS_FOR_SCORING);
+		this.addParameterToMap(map, USE_INDIVIDUAL_SCORING_PARAMETERS);
+		this.addParameterToMap(map, RE_USE_TEMPORARY_PLANS);
 		return map;
 	}
 
@@ -598,12 +671,22 @@ public class DestinationChoiceConfigGroup extends ConfigGroup {
 	public void setRandomSeed(long randomSeed) {
 		this.randomSeed = randomSeed;
 	}
-	public String getEpsilonDistribution() {
+	public EpsilonDistributionTypes getEpsilonDistribution() {
 		return this.epsilonDistribution;
 	}
+	@Deprecated
 	public void setEpsilonDistribution(String epsilonDistribution) {
+		if (epsilonDistribution.equalsIgnoreCase(EpsilonDistributionTypes.gumbel.toString())) {			
+			this.epsilonDistribution = EpsilonDistributionTypes.gumbel;
+		} else if (epsilonDistribution.equalsIgnoreCase(EpsilonDistributionTypes.gaussian.toString())) {			
+			this.epsilonDistribution = EpsilonDistributionTypes.gaussian;
+		} else throw new RuntimeException("Unknown epsilon distribution type: " + epsilonDistribution + ". Aborting!");
+	}
+	
+	public void setEpsilonDistribution(EpsilonDistributionTypes epsilonDistribution) {
 		this.epsilonDistribution = epsilonDistribution;
 	}
+	
 	public String getEpsilonScaleFactors() {
 		return this.epsilonScaleFactors;
 	}
@@ -667,5 +750,37 @@ public class DestinationChoiceConfigGroup extends ConfigGroup {
 	}
 	public void setDestinationSamplePercent(double destinationSamplePercent) {
 		this.destinationSamplePercent = destinationSamplePercent;
-	}	
+	}
+	
+	public InternalPlanDataStructure getInternalPlanDataStructure() {
+		return this.internalPlanDataStructure;
+	}
+	
+	public void setInternalPlanDataStructure(InternalPlanDataStructure internalPlanDataStructure) {
+		this.internalPlanDataStructure = internalPlanDataStructure;
+	}
+	
+	public boolean getUseConfigParamsForScoring() {
+		return this.useConfigParamsForScoring;
+	}
+	
+	public void setUseConfigParamsForScoring(boolean useConfigParamsForScoring) {
+		this.useConfigParamsForScoring = useConfigParamsForScoring;
+	}
+	
+	public boolean getUseIndividualScoringParameters() {
+		return this.useIndividualScoringParameters;
+	}
+	
+	public void setUseIndividualScoringParameters(boolean useIndividualScoringParameters) {
+		this.useIndividualScoringParameters = useIndividualScoringParameters;
+	}
+	
+	public boolean getReUseTemporaryPlans() {
+		return this.reUseTemporaryPlans;
+	}
+	
+	public void setReUseTemporaryPlans(boolean reUseTemporaryPlans) {
+		this.reUseTemporaryPlans = reUseTemporaryPlans;
+	}
 }

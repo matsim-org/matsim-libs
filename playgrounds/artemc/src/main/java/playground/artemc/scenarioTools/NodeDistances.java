@@ -9,19 +9,19 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkReaderMatsimV1;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
 public class NodeDistances {
 	
-	private ScenarioImpl scenario;
+	private MutableScenario scenario;
 	private Network network;
 	public Double[][] distances;
 	
 	
 	public NodeDistances(String networkPath){
 	
-		scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new NetworkReaderMatsimV1(scenario).parse(networkPath); 
 		network = scenario.getNetwork();
 		Map<Id<Node>, ? extends Node> nodes = network.getNodes();

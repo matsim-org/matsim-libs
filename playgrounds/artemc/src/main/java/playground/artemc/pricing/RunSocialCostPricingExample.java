@@ -27,7 +27,7 @@ import org.matsim.core.controler.ControlerDefaultsModule;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.roadpricing.RoadPricingConfigGroup;
 import playground.artemc.analysis.AnalysisControlerListener;
@@ -81,9 +81,9 @@ public final class RunSocialCostPricingExample {
 		controler.setScoringFunctionFactory(new CharyparNagelScoringFunctionForAnalysisFactory(controler.getConfig().planCalcScore(), controler.getScenario().getNetwork()));
 //		controler.addControlerListener(new SimpleAnnealer());
 		// Additional analysis
-		AnalysisControlerListener analysisControlerListener = new AnalysisControlerListener((ScenarioImpl) controler.getScenario());
+		AnalysisControlerListener analysisControlerListener = new AnalysisControlerListener((MutableScenario) controler.getScenario());
 		controler.addControlerListener(analysisControlerListener);
-		controler.addControlerListener(new DisaggregatedScoreAnalyzer((ScenarioImpl) controler.getScenario(),analysisControlerListener.getTripAnalysisHandler()));
+		controler.addControlerListener(new DisaggregatedScoreAnalyzer((MutableScenario) controler.getScenario(),analysisControlerListener.getTripAnalysisHandler()));
 
 		controler.getConfig().controler().setOverwriteFileSetting(
 				true ?

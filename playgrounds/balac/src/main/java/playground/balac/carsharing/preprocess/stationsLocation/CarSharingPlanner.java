@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 
 import playground.balac.carsharing.preprocess.membership.MembershipMain;
 import playground.balac.carsharing.preprocess.membership.SupplySideModel;
@@ -19,13 +19,13 @@ public class CarSharingPlanner
   private LocationStrategy locationStrategy;
   private CarSharingStations csStations;
   private SupplySideModel model;
-  private ScenarioImpl scenario;
+  private MutableScenario scenario;
   //private CarSharingStationsSummaryWriter cSSSWriter = new CarSharingStationsSummaryWriter("C:/Users/balacm/Desktop/CarSharing/CS_StationsSummary.txt");
 
   private CarSharingStationsSummaryWriter cSSSWriter = new CarSharingStationsSummaryWriter("/Network/Servers/kosrae.ethz.ch/Volumes/ivt-home/balacm/MATSim/input/CarsharingStationLocations/CS_StationsSummary_13_new.txt");
   private static final Logger log = Logger.getLogger(MembershipMain.class);
 
-  public CarSharingPlanner(ScenarioImpl scenario, SupplySideModel model, CarSharingStations csStations) {
+  public CarSharingPlanner(MutableScenario scenario, SupplySideModel model, CarSharingStations csStations) {
     this.scenario = scenario;
     this.model = model;
     this.csStations = csStations;

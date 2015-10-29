@@ -33,7 +33,7 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.FacilitiesReaderMatsimV1;
@@ -53,7 +53,7 @@ public class GenerateDemand {
 
 	private static void generateDemand(Config config) {
 
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 
 		System.out.println("Reading network...");
 		Network networkLayer = scenario.getNetwork();

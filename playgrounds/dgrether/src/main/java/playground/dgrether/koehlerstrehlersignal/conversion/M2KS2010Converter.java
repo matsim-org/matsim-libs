@@ -27,7 +27,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.lanes.data.v20.LaneDefinitions20;
+import org.matsim.lanes.data.v20.Lanes;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -67,7 +67,7 @@ public class M2KS2010Converter {
 
 	private Network network;
 
-	private LaneDefinitions20 lanes;
+	private Lanes lanes;
 
 	private SignalsData signals;
 
@@ -78,7 +78,7 @@ public class M2KS2010Converter {
 	private DgSignalsBoundingBox signalsBoundingBox;
 
 	
-	public M2KS2010Converter(Network network, LaneDefinitions20 lanes,
+	public M2KS2010Converter(Network network, Lanes lanes,
 			SignalsData signals, double signalsBoundingBoxOffset, CoordinateReferenceSystem crs) {
 		this.network = network;
 		this.lanes = lanes;

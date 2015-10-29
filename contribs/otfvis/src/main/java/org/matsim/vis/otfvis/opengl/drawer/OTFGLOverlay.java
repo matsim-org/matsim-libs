@@ -13,7 +13,7 @@ import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 
 import javax.imageio.ImageIO;
-import com.jogamp.opengl.GL2;
+import javax.media.opengl.GL2;
 
 import org.matsim.core.gbl.MatsimResource;
 

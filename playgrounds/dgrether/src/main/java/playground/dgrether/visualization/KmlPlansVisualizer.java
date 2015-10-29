@@ -32,7 +32,7 @@ import org.matsim.contrib.analysis.filters.population.RouteLinkFilter;
 import org.matsim.contrib.analysis.filters.population.SelectedPlanFilter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReader;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -68,14 +68,14 @@ public class KmlPlansVisualizer {
 
 	private List<Tuple<String, String>> linkTuples;
 
-	private ScenarioImpl scenario;
+	private MutableScenario scenario;
 
 
 	public KmlPlansVisualizer(final String config, final List<Tuple<String, String>> linkTuples) {
 		Config conf = new Config();
 		ConfigReader reader = new ConfigReader(conf);
 		reader.readFile(config);
-		scenario = (ScenarioImpl) ScenarioUtils.loadScenario(conf);
+		scenario = (MutableScenario) ScenarioUtils.loadScenario(conf);
 		this.linkTuples = linkTuples;
 	}
 

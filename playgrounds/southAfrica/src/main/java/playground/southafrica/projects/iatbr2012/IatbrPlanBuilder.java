@@ -39,7 +39,7 @@ import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.facilities.ActivityFacilitiesImpl;
@@ -82,7 +82,7 @@ public class IatbrPlanBuilder {
 		Config config = ConfigUtils.createConfig();
 		config.addCoreModules();
 		ConfigUtils.loadConfig(config, configFile);		
-		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(config);
 		activityFacilities = new ActivityFacilitiesImpl();
 		activityFacilities.setName("Facilities for Nelson Mandela Bay Metropolitan");
 		
@@ -101,7 +101,7 @@ public class IatbrPlanBuilder {
 		or.parse(sacscAttributeFile);
 		
 		/* Read the general amenities file. */
-		ScenarioImpl scAmenities = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario scAmenities = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		MatsimFacilitiesReader mfr = new MatsimFacilitiesReader(scAmenities);
 		mfr.parse(amenityFile);
 		processAmenities(scAmenities);
@@ -335,7 +335,7 @@ public class IatbrPlanBuilder {
 	}
 	
 	
-	private static void processSacscQT(ScenarioImpl sc){
+	private static void processSacscQT(MutableScenario sc){
 		sacscQT = new QuadTree<ActivityFacilityImpl>(spot5QT.getMinEasting(), spot5QT.getMinNorthing(), spot5QT.getMaxEasting(), spot5QT.getMaxNorthing());
 		leisureQT = new QuadTree<ActivityFacilityImpl>(spot5QT.getMinEasting(), spot5QT.getMinNorthing(), spot5QT.getMaxEasting(), spot5QT.getMaxNorthing());
 		shoppingQT = new QuadTree<ActivityFacilityImpl>(spot5QT.getMinEasting(), spot5QT.getMinNorthing(), spot5QT.getMaxEasting(), spot5QT.getMaxNorthing());
@@ -355,7 +355,7 @@ public class IatbrPlanBuilder {
 	}
 
 
-	private static void processAmenities(ScenarioImpl sc){
+	private static void processAmenities(MutableScenario sc){
 		amenityQT = new QuadTree<ActivityFacilityImpl>(spot5QT.getMinEasting(), spot5QT.getMinNorthing(), spot5QT.getMaxEasting(), spot5QT.getMaxNorthing());
 		educationQT = new QuadTree<ActivityFacilityImpl>(spot5QT.getMinEasting(), spot5QT.getMinNorthing(), spot5QT.getMaxEasting(), spot5QT.getMaxNorthing());
 		int droppedCounter = 0;

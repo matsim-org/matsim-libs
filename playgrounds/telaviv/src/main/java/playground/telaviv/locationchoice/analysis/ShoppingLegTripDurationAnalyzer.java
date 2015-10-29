@@ -49,7 +49,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.telaviv.locationchoice.LocationChoicePlanModule;
@@ -82,7 +82,7 @@ public class ShoppingLegTripDurationAnalyzer implements PersonDepartureEventHand
 	private List<Leg> fromLegsUndefined;
 	
 	public static void main(String[] args) {
-		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		
 		// load network
 		new MatsimNetworkReader(scenario).readFile(networkFile);

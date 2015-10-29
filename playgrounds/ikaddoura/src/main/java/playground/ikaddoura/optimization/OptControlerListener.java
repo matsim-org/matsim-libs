@@ -27,7 +27,7 @@ package playground.ikaddoura.optimization;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 
 import playground.ikaddoura.internalizationPt.CapacityDelayHandler;
 import playground.ikaddoura.internalizationPt.MarginalCostPricingPtHandler;
@@ -45,7 +45,7 @@ import playground.vsp.congestion.handlers.MarginalCongestionPricingHandler;
 public class OptControlerListener implements StartupListener {
 
 	private final double fare;
-	private final ScenarioImpl scenario;
+	private final MutableScenario scenario;
 	private final boolean calculate_inVehicleTimeDelayEffects;
 	private final boolean calculate_waitingTimeDelayEffects;
 	private final boolean marginalCostPricingPt;
@@ -54,7 +54,7 @@ public class OptControlerListener implements StartupListener {
 	private final boolean calculate_capacityDelayEffects;
 
 	public OptControlerListener(double fare,
-			ScenarioImpl scenario,
+			MutableScenario scenario,
 			boolean calculate_inVehicleTimeDelayEffects,
 			boolean calculate_waitingTimeDelayEffects, 
 			boolean calculate_capacityDelayEffects,

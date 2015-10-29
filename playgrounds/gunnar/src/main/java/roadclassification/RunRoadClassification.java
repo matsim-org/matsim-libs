@@ -29,8 +29,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import floetteroed.opdyts.DecisionVariable;
 import opdytsintegration.MATSimSimulator;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -49,6 +51,8 @@ import floetteroed.opdyts.convergencecriteria.ObjectiveFunctionChangeConvergence
 import floetteroed.opdyts.searchalgorithms.RandomSearch;
 
 public class RunRoadClassification {
+
+	static Logger log = Logger.getLogger(RunRoadClassification.class);
 
 	static void justRun() {
 
@@ -86,9 +90,9 @@ public class RunRoadClassification {
 		int maxMemoryLength = 100;
 		boolean keepBestSolution = true;
 		boolean interpolate = false;
-		int maxIterations = 1;
+		int maxIterations = 100;
 		int maxTransitions = 100;
-		int populationSize = 100;
+		int populationSize = 2;
 		DecisionVariableRandomizer<RoadClassificationDecisionVariable> randomizer = new DecisionVariableRandomizer<RoadClassificationDecisionVariable>() {
 			@Override
 			public RoadClassificationDecisionVariable newRandomDecisionVariable() {
@@ -100,10 +104,15 @@ public class RunRoadClassification {
 			@Override
 			public List<RoadClassificationDecisionVariable> newRandomVariations(RoadClassificationDecisionVariable decisionVariable) {
 				/*
-				 * TODO: The algorithm performs best if this function returns 
+				 * The algorithm performs best if this function returns
 				 * two symmetric variations of the decision variable.
 				 */
-				return Arrays.asList(newRandomDecisionVariable(), newRandomDecisionVariable());
+				// random index, but not the first or last element:
+				int bubbleIndex = MatsimRandom.getRandom().nextInt(decisionVariable.getLinkSettingses().size()-2)+1;
+				RoadClassificationDecisionVariable var1 = new RoadClassificationDecisionVariable(scenario.getNetwork(), linkAttributes, shiftUp(bubbleIndex, decisionVariable.getLinkSettingses()));
+				RoadClassificationDecisionVariable var2 = new RoadClassificationDecisionVariable(scenario.getNetwork(), linkAttributes, shiftDown(bubbleIndex, decisionVariable.getLinkSettingses()));
+//				var2 = new RoadClassificationDecisionVariable(scenario.getNetwork(), linkAttributes, almostRealLinkSettings);
+				return Arrays.asList(var1, var2);
 			}
 		};
 
@@ -118,8 +127,15 @@ public class RunRoadClassification {
 				// selfTuner, 
 				maxIterations, maxTransitions, populationSize,
 				MatsimRandom.getRandom(), interpolate, keepBestSolution, objectiveFunction, maxMemoryLength);
+		randomSearch.setLogFileName(scenario.getConfig().controler().getOutputDirectory() + "optimization.log");
 		randomSearch.run();
-
+		for (DecisionVariable decisionVariable : randomSearch.getBestDecisionVariablesView()) {
+			log.info("--DecisionVariable follows--");
+			RoadClassificationDecisionVariable rcdv = (RoadClassificationDecisionVariable) decisionVariable;
+			for (LinkSettings linkSettings : rcdv.getLinkSettingses()) {
+				log.info(String.format("%d %d %d\n", (int) linkSettings.getCapacity(), (int) linkSettings.getFreespeed(), (int) linkSettings.getNofLanes()));
+			}
+		}
 
 		// AND RUN THE ENTIRE THING
 
@@ -137,6 +153,22 @@ public class RunRoadClassification {
 //		controler.run();
 
 		System.out.println("... DONE.");
+	}
+
+	private static List<LinkSettings> shiftDown(int bubbleIndex, List<LinkSettings> linkSettingses) {
+		int targetIndex = MatsimRandom.getRandom().nextInt(linkSettingses.size()-bubbleIndex)+bubbleIndex;
+		ArrayList<LinkSettings> result = new ArrayList<>(linkSettingses);
+		LinkSettings element = result.remove(bubbleIndex);
+		result.add(targetIndex, element);
+		return result;
+	}
+
+	private static List<LinkSettings> shiftUp(int bubbleIndex, List<LinkSettings> linkSettingses) {
+		int targetIndex = MatsimRandom.getRandom().nextInt(bubbleIndex+1);
+		ArrayList<LinkSettings> result = new ArrayList<>(linkSettingses);
+		LinkSettings element = result.remove(bubbleIndex);
+		result.add(targetIndex, element);
+		return result;
 	}
 
 	public static void main(String[] args) throws FileNotFoundException {

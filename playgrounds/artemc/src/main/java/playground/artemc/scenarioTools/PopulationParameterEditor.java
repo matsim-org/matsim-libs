@@ -5,7 +5,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReaderMatsimV5;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
@@ -24,7 +24,7 @@ public class PopulationParameterEditor {
 		String personAttributePath = args[1];
 		String editedPersonAttributePath = args[2];
 
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		PopulationImpl population = (PopulationImpl) scenario.getPopulation();
 

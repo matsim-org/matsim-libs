@@ -26,7 +26,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.router.*;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
@@ -44,7 +44,7 @@ public class DemoPeter {
 
 		TransitRouterConfig routerConfig = new TransitRouterConfig(config.planCalcScore(), config.plansCalcRoute(), config.transitRouter(), config.vspExperimental());
 		routerConfig.setSearchRadius(2000);
-		final MyTransitRouterFactory transitRouterFactory = new MyTransitRouterFactory(((ScenarioImpl) scenario).getTransitSchedule(), routerConfig);
+		final MyTransitRouterFactory transitRouterFactory = new MyTransitRouterFactory(((MutableScenario) scenario).getTransitSchedule(), routerConfig);
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {

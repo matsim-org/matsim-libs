@@ -48,7 +48,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.router.TransitRouterConfig;
@@ -116,7 +116,7 @@ public class EventsToPlanElementsSingapore implements TransitDriverStartsEventHa
 	public static void main(String[] args) throws IOException,
 			InstantiationException, IllegalAccessException,
 			ClassNotFoundException, SQLException, NoConnectionException {
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils
+		MutableScenario scenario = (MutableScenario) ScenarioUtils
 				.createScenario(ConfigUtils.loadConfig(args[3]));
 		scenario.getConfig().transit().setUseTransit(true);
 		new TransitScheduleReader(scenario).readFile(args[0]);

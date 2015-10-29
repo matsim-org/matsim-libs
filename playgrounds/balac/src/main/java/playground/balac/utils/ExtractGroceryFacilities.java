@@ -3,7 +3,7 @@ package playground.balac.utils;
 import java.io.IOException;
 
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.FacilitiesReaderMatsimV1;
@@ -11,11 +11,11 @@ import org.matsim.facilities.FacilitiesWriter;
 
 public class ExtractGroceryFacilities {
 
-	ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+	MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 	FacilitiesReaderMatsimV1 fr = new FacilitiesReaderMatsimV1(scenario);
 	
-	ScenarioImpl scenario_new = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+	MutableScenario scenario_new = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 	String outputPath = "C:/Users/balacm/Desktop/EIRASS_Paper/10pc_input_files/facilities_groceryshops_6.0_reloc.xml";
 		

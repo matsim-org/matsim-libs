@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.integration.timevariantnetworks;
+package org.matsim.core.network;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;

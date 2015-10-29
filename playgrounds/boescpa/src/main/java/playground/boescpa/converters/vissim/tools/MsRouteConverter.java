@@ -44,7 +44,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.IOUtils;
@@ -142,7 +142,7 @@ public class MsRouteConverter extends AbstractRouteConverter {
 		private final Network network;
 		private GeographicEventAnalyzer(String path2MATSimNetwork, String path2VissimZoneShp) {
 			// read network
-			ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+			MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 			MatsimNetworkReader NetworkReader = new MatsimNetworkReader(scenario);
 			NetworkReader.readFile(path2MATSimNetwork);
 			this.network = scenario.getNetwork();

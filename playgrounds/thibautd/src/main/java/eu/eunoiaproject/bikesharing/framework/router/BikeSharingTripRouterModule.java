@@ -49,7 +49,6 @@ public class BikeSharingTripRouterModule extends AbstractModule {
 	
 	private boolean routePtUsingSchedule = false;
 
-	private final Provider<TripRouter> delegate;
 	private final Scenario scenario;
 	private final LinkSlopeScorer slopeScorer;
 
@@ -57,43 +56,21 @@ public class BikeSharingTripRouterModule extends AbstractModule {
 
 	public BikeSharingTripRouterModule(
 			final TransitMultiModalAccessRoutingModule.RoutingData routingData,
-			final Provider<TripRouter> delegate,
 			final Scenario scenario,
 			final LinkSlopeScorer slopeScorer) {
-		this.delegate = delegate;
 		this.scenario = scenario;
 		this.data = routingData;
 		this.slopeScorer = slopeScorer;
 	}
 
 	public BikeSharingTripRouterModule(
-			final Provider<TripRouter> delegate,
 			final Scenario scenario,
 			final LinkSlopeScorer slopeScorer) {
 		this( scenario.getConfig().transit().isUseTransit() ?
 					new TransitMultiModalAccessRoutingModule.RoutingData( scenario ) :
 					null,
-			delegate,
 			scenario,
 			slopeScorer );
-	}
-
-	public BikeSharingTripRouterModule(
-			final TransitMultiModalAccessRoutingModule.RoutingData routingData,
-			final Scenario scenario,
-			final LinkSlopeScorer slopeScorer) {
-		this( routingData,
-				TripRouterFactoryBuilderWithDefaults.createDefaultTripRouterFactoryImpl(scenario),
-				scenario,
-				slopeScorer );
-	}
-
-	public BikeSharingTripRouterModule(
-			final Scenario scenario,
-			final LinkSlopeScorer slopeScorer) {
-		this(TripRouterFactoryBuilderWithDefaults.createDefaultTripRouterFactoryImpl(scenario),
-				scenario,
-				slopeScorer );
 	}
 
 	@Override

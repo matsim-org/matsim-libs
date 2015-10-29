@@ -38,7 +38,7 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.network.algorithms.NetworkWriteAsTable;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
 public class TeleatlasIvtcheuMerger {
@@ -173,11 +173,11 @@ public class TeleatlasIvtcheuMerger {
 		String il2deletefile = args[3].trim();
 		String outNetFile = args[4].trim();
 
-		ScenarioImpl taScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario taScenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		NetworkImpl networkTeleatlas = (NetworkImpl) taScenario.getNetwork();
 		new MatsimNetworkReader(taScenario).readFile(teleatlasfile);
 
-		ScenarioImpl ivtcheuScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario ivtcheuScenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		NetworkImpl networkIvtcheu = (NetworkImpl) ivtcheuScenario.getNetwork();
 		new MatsimNetworkReader(ivtcheuScenario).readFile(ivtcheufile);
 

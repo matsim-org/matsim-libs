@@ -48,7 +48,7 @@ import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.lanes.data.v20.LaneDefinitions20;
+import org.matsim.lanes.data.v20.Lanes;
 import org.matsim.vehicles.Vehicle;
 
 import javax.inject.Inject;

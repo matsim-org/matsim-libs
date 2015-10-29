@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.dgrether.DgPaths;
@@ -53,12 +53,12 @@ public class CMCFPlanSplitter {
 	 * @param args
 	 */
 	public static void main(final String[] args) {
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network net = scenario.getNetwork();
 		MatsimIo.loadNetwork(DgPaths.IVTCHNET, scenario);
 //		Plans plansCmcf = MatsimIo.loadPlans(cmcfPlansFile);
 		Population plans = MatsimIo.loadPlans(plansFile, net);
-		Population plansOne = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
+		Population plansOne = ((MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
 		for (Person p : plans.getPersons().values()) {
 			Plan pl = p.getSelectedPlan();
 		  int i = 0;

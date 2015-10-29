@@ -36,7 +36,7 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.dgrether.DgPaths;
@@ -62,7 +62,7 @@ public class Daganzo2012ScenarioGenerator {
 //			+ "plans_short_route_selected.xml";
 	private static final int agents = 5000;
 
-	private ScenarioImpl scenario = null;
+	private MutableScenario scenario = null;
 
 	private Config config;
 	
@@ -71,7 +71,7 @@ public class Daganzo2012ScenarioGenerator {
 	public void createScenario() {
 		this.config = ConfigUtils.createConfig();
 		config.network().setInputFile(NETWORK_INPUTFILE);
-		this.scenario = (ScenarioImpl) ScenarioUtils.loadScenario(config);
+		this.scenario = (MutableScenario) ScenarioUtils.loadScenario(config);
 
 		this.createPlans(this.scenario);
 		PopulationWriter popWriter = new PopulationWriter(this.scenario.getPopulation(), this.scenario.getNetwork());
@@ -84,7 +84,7 @@ public class Daganzo2012ScenarioGenerator {
 	}
 
 
-	private void createPlans(ScenarioImpl scenario) {
+	private void createPlans(MutableScenario scenario) {
 		Network network = scenario.getNetwork();
 		Population population = scenario.getPopulation();
 		double firstHomeEndTime =  120.0;

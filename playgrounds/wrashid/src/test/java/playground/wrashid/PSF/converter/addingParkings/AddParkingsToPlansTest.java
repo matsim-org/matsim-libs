@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -35,7 +35,7 @@ public class AddParkingsToPlansTest extends MatsimTestCase {
 		String basePathOfTestData=getPackageInputDirectory();
 		String networkFile = "test/scenarios/berlin/network.xml.gz";
 		
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(super.loadConfig(null));
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(super.loadConfig(null));
 		new MatsimNetworkReader(scenario).readFile(networkFile);
 		new MatsimPopulationReader(scenario).readFile(basePathOfTestData + "plans5.xml");
 		

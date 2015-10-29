@@ -37,7 +37,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.algorithms.NetworkWriteAsTable;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.IOUtils;
@@ -92,7 +92,7 @@ public class UCSBTransitScheduleCreator {
 
 		Network network = scenario.getNetwork();
 		
-		Vehicles vehicles = ((ScenarioImpl)scenario).getTransitVehicles();
+		Vehicles vehicles = ((MutableScenario)scenario).getTransitVehicles();
 		VehicleType defaultVehicleType = vehicles.getFactory().createVehicleType(Id.create(1, VehicleType.class));
 		vehicles.addVehicleType(defaultVehicleType);
 		defaultVehicleType.setDescription("generic default");
@@ -494,6 +494,6 @@ public class UCSBTransitScheduleCreator {
 		new NetworkWriter(scenario.getNetwork()).write(outBase+"network.xml.gz");
 		new NetworkWriteAsTable(outBase).run(scenario.getNetwork());
 		new TransitScheduleWriter(scenario.getTransitSchedule()).writeFile(outBase+"transitSchedule.xml.gz");
-		new VehicleWriterV1(((ScenarioImpl)scenario).getTransitVehicles()).writeFile(outBase+"transitVehicles.xml.gz");
+		new VehicleWriterV1(((MutableScenario)scenario).getTransitVehicles()).writeFile(outBase+"transitVehicles.xml.gz");
 	}
 }

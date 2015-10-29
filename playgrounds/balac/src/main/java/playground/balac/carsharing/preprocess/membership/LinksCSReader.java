@@ -16,7 +16,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.facilities.ActivityFacility;
 
@@ -36,13 +36,13 @@ public class LinksCSReader
   //protected TreeMap<Id, LinkImpl> freeLinks = new TreeMap();
   protected ArrayList<LinkImpl> freeLinks = new ArrayList<LinkImpl>();
   private ArrayList<LinkImpl> currentLinks = new ArrayList<LinkImpl>();
-  private ScenarioImpl scenario;
+  private MutableScenario scenario;
   private CarSharingStations carSharingStations;
   private QuadTree<Person> personQuadTree;
 
   private static final Logger log = Logger.getLogger(LinksRetailerReader.class);
 
-  public LinksCSReader(ScenarioImpl scenario, CarSharingStations csStations)
+  public LinksCSReader(MutableScenario scenario, CarSharingStations csStations)
   {
     this.scenario = scenario;
     this.carSharingStations = csStations;

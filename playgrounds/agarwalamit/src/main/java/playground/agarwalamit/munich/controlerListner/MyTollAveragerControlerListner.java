@@ -35,7 +35,7 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.vsp.analysis.modules.monetaryTransferPayments.MoneyEventHandler;
@@ -54,7 +54,7 @@ public class MyTollAveragerControlerListner implements StartupListener, Iteratio
 
 	private Map<Id<Person>, Double> pId2Tolls= new HashMap<>();
 	private Map<Id<Person>, Double> pId2NowTolls= new HashMap<>();
-	private ScenarioImpl scenario;
+	private MutableScenario scenario;
 	private BufferedWriter writer;
 	private Controler controler;
 	private int counter;
@@ -64,7 +64,7 @@ public class MyTollAveragerControlerListner implements StartupListener, Iteratio
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		this.controler = event.getControler();
-		this.scenario = (ScenarioImpl) controler.getScenario();
+		this.scenario = (MutableScenario) controler.getScenario();
 
 		int firstIt = this.scenario.getConfig().controler().getFirstIteration();
 		int lastIt = this.scenario.getConfig().controler().getLastIteration();

@@ -41,7 +41,7 @@ import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -68,12 +68,12 @@ import playground.pbouman.agentproperties.AgentProperties;
 
 public class SingleLineScenario
 {
-	public static ScenarioImpl buildScenario()
+	public static MutableScenario buildScenario()
 	{
 		return buildScenario(300);
 	}
 	
-	public static ScenarioImpl buildScenario(int numAgents)
+	public static MutableScenario buildScenario(int numAgents)
 	{
 		Config config = ConfigUtils.createConfig();
 		config.transit().setUseTransit(true);
@@ -82,7 +82,7 @@ public class SingleLineScenario
 		HashSet<String> transitModes = new HashSet<String>();
 		transitModes.add("pt");
 		config.transit().setTransitModes(transitModes);
-		ScenarioImpl scen = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		MutableScenario scen = (MutableScenario) ScenarioUtils.createScenario(config);
 		
 		/* ************** *
 		 * Create Network *

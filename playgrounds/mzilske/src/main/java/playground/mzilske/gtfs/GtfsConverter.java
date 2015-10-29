@@ -26,7 +26,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -51,7 +51,7 @@ public class GtfsConverter {
 
 	private CoordinateTransformation transform;
 
-	private ScenarioImpl scenario;
+	private MutableScenario scenario;
 	private Map<String,Integer> vehicleIdsAndTypes = new HashMap<String,Integer>();
 	private Map<Id<TransitLine>,Integer> lineToVehicleType = new HashMap<>();
 	private Map<Id<Trip>,Id<TransitRoute>> matsimRouteIdToGtfsTripIdAssignments = new HashMap<>();
@@ -80,7 +80,7 @@ public class GtfsConverter {
 	public GtfsConverter(String filepath, Scenario scenario, CoordinateTransformation transform) {
 		this.filepath = filepath;
 		this.transform = transform;
-		this.scenario = (ScenarioImpl) scenario;
+		this.scenario = (MutableScenario) scenario;
 	}
 
 	public void setDate(long date) {

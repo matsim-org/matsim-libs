@@ -42,7 +42,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
@@ -124,7 +124,7 @@ public class MyCommercialDemandGeneratorOld {
 
 		for(int sampleNumber = 1; sampleNumber <= numberOfSamples; sampleNumber++){
 			// Initiate the population builder
-			ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+			MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 			Population population = sc.getPopulation();
 			PopulationFactory pb = population.getFactory();
 

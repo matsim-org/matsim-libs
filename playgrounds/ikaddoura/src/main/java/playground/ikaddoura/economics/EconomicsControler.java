@@ -39,7 +39,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.ikaddoura.analysis.welfare.WelfareAnalysisControlerListener;
@@ -105,7 +105,7 @@ public class EconomicsControler {
 		config.controler().setOutputDirectory(path + "output_StandardRunUserSpecificPricing/");
 		config.plans().setInputFile(path + "input/population_" + maxDemand + ".xml");
 
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		
 		new MatsimNetworkReader(scenario).readFile(scenario.getConfig().network().getInputFile());
 		new MatsimPopulationReader(scenario).readFile(scenario.getConfig().plans().getInputFile());
@@ -125,7 +125,7 @@ public class EconomicsControler {
 				bindCarTravelDisutilityFactory().toInstance(tollDisutilityCalculatorFactory);
 			}
 		});
-		controler.addControlerListener(new MarginalCongestionPricingContolerListener( controler.getScenario(), tollHandler, new CongestionHandlerImplV3(controler.getEvents(), (ScenarioImpl) controler.getScenario())  ));
+		controler.addControlerListener(new MarginalCongestionPricingContolerListener( controler.getScenario(), tollHandler, new CongestionHandlerImplV3(controler.getEvents(), (MutableScenario) controler.getScenario())  ));
 
 		controler.getConfig().controler().setOverwriteFileSetting(
 				OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
@@ -151,7 +151,7 @@ public class EconomicsControler {
 		config.controler().setOutputDirectory(path + "output_StandardRunFlatPricing_" + flatToll + "/");
 		config.plans().setInputFile(path + "input/population_" + maxDemand + ".xml");
 
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		
 		new MatsimNetworkReader(scenario).readFile(scenario.getConfig().network().getInputFile());
 		new MatsimPopulationReader(scenario).readFile(scenario.getConfig().plans().getInputFile());
@@ -187,7 +187,7 @@ public class EconomicsControler {
 		config.controler().setOutputDirectory(path + "output_StandardRunNoPricing/");
 		config.plans().setInputFile(path + "input/population_" + maxDemand + ".xml");
 
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		
 		new MatsimNetworkReader(scenario).readFile(scenario.getConfig().network().getInputFile());
 		new MatsimPopulationReader(scenario).readFile(scenario.getConfig().plans().getInputFile());
@@ -221,7 +221,7 @@ public class EconomicsControler {
 			config.controler().setOutputDirectory(path + "output_DemandAsFunctionOfCost_" + cost + "/");
 			config.plans().setInputFile(path + "input/population_" + maxDemand + ".xml");
 			
-			ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+			MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 			
 			new MatsimNetworkReader(scenario).readFile(scenario.getConfig().network().getInputFile());
 			new MatsimPopulationReader(scenario).readFile(scenario.getConfig().plans().getInputFile());
@@ -280,7 +280,7 @@ public class EconomicsControler {
 			Population population = PopulationUtils.createPopulation(config);
 			population = generatePopulation(population, demand);
 			
-			ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+			MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 			new MatsimNetworkReader(scenario).readFile(scenario.getConfig().network().getInputFile());
 			scenario.setPopulation(population);
 			
@@ -291,7 +291,7 @@ public class EconomicsControler {
 			
 			Controler controler = new Controler(scenario);
 
-			CostFunctionsControlerListener economicsControlerListener = new CostFunctionsControlerListener((ScenarioImpl) controler.getScenario());
+			CostFunctionsControlerListener economicsControlerListener = new CostFunctionsControlerListener((MutableScenario) controler.getScenario());
 
 			controler.getConfig().controler().setOverwriteFileSetting(
 					OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);

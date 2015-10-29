@@ -99,7 +99,7 @@ public class MultiModalPTCombinationTest {
 		// set default walk speed; according to Weidmann 1.34 [m/s]
 		double defaultWalkSpeed = 1.34;
 		config.plansCalcRoute().setTeleportedModeSpeed(TransportMode.walk, defaultWalkSpeed);
-//		config.plansCalcRoute().setTeleportedModeSpeed(TransportMode.transit_walk, defaultWalkSpeed);
+		config.plansCalcRoute().setTeleportedModeSpeed(TransportMode.transit_walk, defaultWalkSpeed);
 		final PlansCalcRouteConfigGroup.ModeRoutingParams pt = new PlansCalcRouteConfigGroup.ModeRoutingParams( TransportMode.pt );
 		pt.setTeleportedModeFreespeedFactor( 2.0 );
 		config.plansCalcRoute().addParameterSet( pt );

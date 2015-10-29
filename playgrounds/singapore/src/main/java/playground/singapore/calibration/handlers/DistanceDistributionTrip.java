@@ -26,7 +26,7 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.PtConstants;
@@ -170,7 +170,7 @@ public class DistanceDistributionTrip {
 	 * @throws java.io.IOException
 	 */
 	public static void main(String[] args) throws IOException {
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario.getConfig().transit().setUseTransit(true);
 		new MatsimNetworkReader(scenario).parse(args[0]);
 		new TransitScheduleReader(scenario).readFile(args[1]);

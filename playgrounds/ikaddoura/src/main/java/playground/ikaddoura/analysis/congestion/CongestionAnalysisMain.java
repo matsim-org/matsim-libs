@@ -30,7 +30,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.vsp.congestion.events.CongestionEventsReader;
@@ -62,7 +62,7 @@ public class CongestionAnalysisMain {
 		config.plans().setInputFile(populationFile);
 		config.network().setInputFile(networkFile);
 		
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.loadScenario(config);
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.loadScenario(config);
 		EventsManager events = EventsUtils.createEventsManager();
 						
 		MarginalCongestionAnalyzer handler1 = new MarginalCongestionAnalyzer();

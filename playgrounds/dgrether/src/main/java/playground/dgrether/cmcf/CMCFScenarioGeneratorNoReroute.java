@@ -42,7 +42,7 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.dgrether.DgPaths;
@@ -165,7 +165,7 @@ public class CMCFScenarioGeneratorNoReroute {
 			configOut = config1Out;
 		}
 
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		this.config = scenario.getConfig();
 
 		this.network = scenario.getNetwork();
@@ -173,7 +173,7 @@ public class CMCFScenarioGeneratorNoReroute {
 	}
 
 	private void createPlans() throws Exception {
-		this.plans = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
+		this.plans = ((MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
 		int firstHomeEndTime = 0;// 6 * 3600;
 		int homeEndTime = firstHomeEndTime;
 		Link l1 = this.network.getLinks().get(Id.create(1, Link.class));

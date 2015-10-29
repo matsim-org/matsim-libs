@@ -39,7 +39,7 @@
 		<param name="flowCapacityFactor" value="10000000" />
 		<param name="storageCapacityFactor" value="1000000" />
 		<param name="mainMode" value="car,simulatedCarDriver" />
-		<param name="endTime" value="300:00:00" />
+		<param name="endTime" value="30:00:00" />
 		<param name="vehicleBehavior" value="wait" />
 	</module>
 

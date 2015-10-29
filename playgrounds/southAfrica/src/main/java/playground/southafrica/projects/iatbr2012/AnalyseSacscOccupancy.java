@@ -34,7 +34,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.facilities.ActivityFacilityImpl;
@@ -58,7 +58,7 @@ public class AnalyseSacscOccupancy {
 		Map<Id, Integer> leisureMapComparison = new HashMap<Id, Integer>();
 
 		/* Read the GLA facility attributes. */
-		ScenarioImpl general = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario general = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		FacilitiesReaderMatsimV1 fr = new FacilitiesReaderMatsimV1(general);
 		fr.parse(args[0]);
 		for(Id id : general.getActivityFacilities().getFacilities().keySet()){

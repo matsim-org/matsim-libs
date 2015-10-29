@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.households.Household;
 
@@ -43,7 +43,7 @@ public class UnsynchronizeHouseholdMembers {
 		final Config config = JointScenarioUtils.loadConfig( configFile );
 		final Scenario scenario = JointScenarioUtils.loadScenario( config );
 
-		for ( Household hh : ((ScenarioImpl) scenario).getHouseholds().getHouseholds().values() ) {
+		for ( Household hh : ((MutableScenario) scenario).getHouseholds().getHouseholds().values() ) {
 			final int nMorning = hh.getMemberIds().size() / 2;
 			int i=0;
 			for ( Id member : hh.getMemberIds() ) {
