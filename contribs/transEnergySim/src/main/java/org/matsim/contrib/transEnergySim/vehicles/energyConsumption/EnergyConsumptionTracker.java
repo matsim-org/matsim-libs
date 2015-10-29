@@ -27,10 +27,14 @@ import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
+import org.matsim.api.core.v01.events.Wait2LinkEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
+import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.parking.lib.GeneralLib;
@@ -39,6 +43,7 @@ import org.matsim.contrib.transEnergySim.analysis.energyConsumption.EnergyConsum
 import org.matsim.contrib.transEnergySim.analysis.energyConsumption.EnergyConsumptionOutputLog;
 import org.matsim.contrib.transEnergySim.vehicles.api.AbstractVehicleWithBattery;
 import org.matsim.contrib.transEnergySim.vehicles.api.Vehicle;
+import org.matsim.core.events.handler.Vehicle2DriverEventHandler;
 
 /**
  * This module tracks the energy consumption of vehicles based on event
@@ -60,7 +65,7 @@ import org.matsim.contrib.transEnergySim.vehicles.api.Vehicle;
  */
 
 public class EnergyConsumptionTracker implements LinkEnterEventHandler, LinkLeaveEventHandler, PersonDepartureEventHandler,
-		PersonArrivalEventHandler {
+		PersonArrivalEventHandler, Wait2LinkEventHandler, VehicleLeavesTrafficEventHandler {
 
 	private EnergyConsumptionOutputLog log;
 
@@ -72,6 +77,8 @@ public class EnergyConsumptionTracker implements LinkEnterEventHandler, LinkLeav
 	private final Network network;
 
 	private boolean loggingEnabled;
+	
+	private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
 
 	public EnergyConsumptionTracker(HashMap<Id<Vehicle>, Vehicle> vehicles, Network network) {
 		this.vehicles = vehicles;
@@ -89,6 +96,8 @@ public class EnergyConsumptionTracker implements LinkEnterEventHandler, LinkLeav
 		for (Vehicle vehicle : vehicles.values()) {
 			vehicle.reset();
 		}
+		
+		delegate.reset(iteration);
 	}
 
 	@Override
@@ -112,7 +121,7 @@ public class EnergyConsumptionTracker implements LinkEnterEventHandler, LinkLeav
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		handleEnergyConsumption(Id.create(event.getDriverId(), Vehicle.class), event.getLinkId(), event.getTime());
+		handleEnergyConsumption(Id.create(delegate.getDriverOfVehicle(event.getVehicleId()), Vehicle.class), event.getLinkId(), event.getTime());
 	}
 
 	private void handleEnergyConsumption(Id<Vehicle> vehicleId, Id<Link> linkId, double linkLeaveTime) {
@@ -163,7 +172,7 @@ public class EnergyConsumptionTracker implements LinkEnterEventHandler, LinkLeav
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		Id<Vehicle> vehicleId = Id.create(event.getDriverId(), Vehicle.class);
+		Id<Vehicle> vehicleId = Id.create(delegate.getDriverOfVehicle(event.getVehicleId()), Vehicle.class);
 		linkEnterTime.put(vehicleId, event.getTime());
 	}
 
@@ -181,6 +190,16 @@ public class EnergyConsumptionTracker implements LinkEnterEventHandler, LinkLeav
 
 	public void disableLogging() {
 		loggingEnabled = false;
+	}
+
+	@Override
+	public void handleEvent(VehicleLeavesTrafficEvent event) {
+		delegate.handleEvent(event);		
+	}
+
+	@Override
+	public void handleEvent(Wait2LinkEvent event) {
+		delegate.handleEvent(event);
 	}
 
 }

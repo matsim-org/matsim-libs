@@ -25,10 +25,14 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
+import org.matsim.api.core.v01.events.Wait2LinkEvent;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
+import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
@@ -45,6 +49,7 @@ import org.matsim.contrib.transEnergySim.vehicles.api.Vehicle;
 import org.matsim.contrib.transEnergySim.vehicles.api.AbstractVehicleWithBattery;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.events.handler.Vehicle2DriverEventHandler;
 
 /**
  * This class should work both with jdeqsim and mobsim.
@@ -53,7 +58,7 @@ import org.matsim.core.controler.listener.StartupListener;
  * 
  */
 public class InductiveStreetCharger implements PersonDepartureEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler,
-		PersonArrivalEventHandler, StartupListener {
+		PersonArrivalEventHandler, StartupListener, Wait2LinkEventHandler, VehicleLeavesTrafficEventHandler {
 
 	private DoubleValueHashMap<Id<Link>> chargableStreets;
 	private ChargingOutputLog log;
@@ -65,6 +70,8 @@ public class InductiveStreetCharger implements PersonDepartureEventHandler, Link
 
 	private Double samePowerAtAllLinks;
 	private boolean loggingEnabled;
+	
+	private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
 
 	public InductiveStreetCharger(HashMap<Id<Vehicle>, Vehicle> vehicles, Network network, AddHandlerAtStartupControler controller) {
 		this.setVehicles(vehicles);
@@ -81,6 +88,7 @@ public class InductiveStreetCharger implements PersonDepartureEventHandler, Link
 		linkEnterTime = new DoubleValueHashMap<Id<Vehicle>>();
 		previousLinkEntered = new HashMap<Id, Id>();
 		setLog(new InductiveChargingAtRoadOutputLog());
+		delegate.reset(iteration);
 	}
 
 	@Override
@@ -113,7 +121,7 @@ public class InductiveStreetCharger implements PersonDepartureEventHandler, Link
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-	    Id<Vehicle> vehicleId = Id.create(event.getDriverId(),Vehicle.class);
+	    Id<Vehicle> vehicleId = Id.create(delegate.getDriverOfVehicle(event.getVehicleId()),Vehicle.class);
 		if (ignoreAgent(vehicleId, event.getLinkId())) {
 			return;
 		}
@@ -168,11 +176,11 @@ public class InductiveStreetCharger implements PersonDepartureEventHandler, Link
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		if (ignoreAgent(Id.create(event.getDriverId(), Vehicle.class), event.getLinkId())) {
+		if (ignoreAgent(Id.create(delegate.getDriverOfVehicle(event.getVehicleId()), Vehicle.class), event.getLinkId())) {
 			return;
 		}
 
-		linkEnterTime.put(Id.create(event.getDriverId(), Vehicle.class), event.getTime());
+		linkEnterTime.put(Id.create(delegate.getDriverOfVehicle(event.getVehicleId()), Vehicle.class), event.getTime());
 	}
 
 	public ChargingOutputLog getLog() {
@@ -216,6 +224,16 @@ public class InductiveStreetCharger implements PersonDepartureEventHandler, Link
 
 	public void disableLogging() {
 		loggingEnabled = false;
+	}
+
+	@Override
+	public void handleEvent(VehicleLeavesTrafficEvent event) {
+		delegate.handleEvent(event);
+	}
+
+	@Override
+	public void handleEvent(Wait2LinkEvent event) {
+		delegate.handleEvent(event);
 	}
 
 }
