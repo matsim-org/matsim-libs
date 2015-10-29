@@ -41,6 +41,8 @@ public class Visualiser {
 	public void makeMVI(Carriers carriers, String outfile, double snapshotInterval){
 		OTFFileWriter otfFileWriter = new OTFFileWriter(scenario, outfile);
 		
+		EventsManager events = EventsUtils.createEventsManager();
+
 		CarrierAgentTracker carrierAgentTracker = new CarrierAgentTracker(carriers, scenario.getNetwork(), new CarrierScoringFunctionFactory() {
 			
 			@Override
@@ -49,8 +51,6 @@ public class Visualiser {
 			}
 			
 		});
-
-		EventsManager events = EventsUtils.createEventsManager();
 
 		CarrierConfig carrierConfig = new CarrierConfig();
 		carrierConfig.setPhysicallyEnforceTimeWindowBeginnings(true);
@@ -70,6 +70,8 @@ public class Visualiser {
 	}
 	
 	private void sim(Carriers carriers) {
+		EventsManager events = EventsUtils.createEventsManager();
+
 		CarrierAgentTracker carrierAgentTracker = new CarrierAgentTracker(carriers, scenario.getNetwork(), new CarrierScoringFunctionFactory() {
 			
 			@Override
@@ -78,8 +80,6 @@ public class Visualiser {
 			}
 			
 		});
-
-		EventsManager events = EventsUtils.createEventsManager();
 
 		CarrierConfig carrierConfig = new CarrierConfig();
 		carrierConfig.setPhysicallyEnforceTimeWindowBeginnings(true);
