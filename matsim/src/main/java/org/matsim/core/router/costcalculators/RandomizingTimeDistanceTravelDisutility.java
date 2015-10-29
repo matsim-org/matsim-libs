@@ -77,6 +77,9 @@ public final class RandomizingTimeDistanceTravelDisutility implements TravelDisu
 
 			/* Usually, the travel-utility should be negative (it's a disutility) but the cost should be positive. Thus negate the utility.*/
 			final ModeParams params = cnScoringGroup.getModes().get( mode ) ;
+			if ( params == null ) {
+				throw new NullPointerException( mode+" is not part of the valid mode parameters "+cnScoringGroup.getModes().keySet() );
+			}
 			final double marginalCostOfTime_s = (-params.getMarginalUtilityOfTraveling() / 3600.0) + (cnScoringGroup.getPerforming_utils_hr() / 3600.0);
 
 			final double marginalCostOfDistance_m = -params.getMonetaryDistanceRate() * cnScoringGroup.getMarginalUtilityOfMoney() ;
