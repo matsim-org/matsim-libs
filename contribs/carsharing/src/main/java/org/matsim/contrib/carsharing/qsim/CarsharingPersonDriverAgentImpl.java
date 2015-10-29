@@ -461,7 +461,6 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 			}
 			this.pickupStations.add(pickUpStation);
 			this.twcsVehicleIDs.add(pickUpStation.getIDs().get(0));
-			
 			GenericRouteImpl routeEnd = new GenericRouteImpl(route.getStartLinkId(),
 					pickUpStation.getLink().getId());
 
@@ -589,9 +588,10 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 
 			if (((Leg)this.basicAgentDelegate.getNextPlanElement()).getMode().equals("walk_rb")) {
 				this.vehicleIdLocation.remove(currentLeg.getRoute().getStartLinkId());
-				this.carSharingVehicles.getTwoWayVehicles().addVehicle(scenario.getNetwork().getLinks().get(this.getDestinationLinkId()), twVehId);
-				twVehId = null;
-		}
+				this.carSharingVehicles.getTwoWayVehicles().addVehicle(scenario.getNetwork().getLinks().get(this.getDestinationLinkId()), 
+						twcsVehicleIDs.get(twcsVehicleIDs.size() - 1));
+				this.twcsVehicleIDs.remove(twcsVehicleIDs.size() - 1);
+			}
 		}
 		else if (currentLeg.getMode().equals("twowaycarsharing")) {
 			this.vehicleIdLocation.remove(currentLeg.getRoute().getStartLinkId());
