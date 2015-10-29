@@ -36,7 +36,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility.Builder;
-import org.matsim.core.scenario.ScenarioImpl;
 
 import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripAnalysisMain;
 import playground.ikaddoura.analysis.vtts.VTTSHandler;
