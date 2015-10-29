@@ -19,41 +19,46 @@
 
 package org.matsim.contrib.locationchoice.bestresponse.preprocess;
 
+import java.util.HashSet;
+
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationSampler;
 import org.matsim.contrib.locationchoice.bestresponse.scoring.ScaleEpsilon;
 import org.matsim.core.config.Config;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
-import java.util.HashSet;
-
 public class ReadOrComputeMaxDCScore {	
+	
 	private final static Logger log = Logger.getLogger(ReadOrComputeMaxDCScore.class);
-	private ScenarioImpl scenario;	
+	
+	public static String maxEpsFile = "personsMaxDCScoreUnscaled.xml";
+	
+	private Scenario scenario;	
 	private Config config;	
+	private DestinationChoiceConfigGroup dccg;
 	private DestinationChoiceBestResponseContext lcContext;
 	private ObjectAttributes personsMaxDCScoreUnscaled = new ObjectAttributes();	
 	private ScaleEpsilon scaleEpsilon;	
 	private HashSet<String> flexibleTypes;
 	
 	public ReadOrComputeMaxDCScore(DestinationChoiceBestResponseContext lcContext) {
-		this.scenario = (ScenarioImpl) lcContext.getScenario();
-		this.config = this.scenario.getConfig() ;
+		this.scenario = lcContext.getScenario();
+		this.config = this.scenario.getConfig();
+		this.dccg = (DestinationChoiceConfigGroup) scenario.getConfig().getModule(DestinationChoiceConfigGroup.GROUP_NAME);
 		this.scaleEpsilon = lcContext.getScaleEpsilon();
 		this.flexibleTypes = lcContext.getFlexibleTypes();
 		this.lcContext = lcContext;
 	}
 
     public void readOrCreateMaxDCScore(Config config, boolean arekValsRead) {
-    	DestinationChoiceConfigGroup dccg = (DestinationChoiceConfigGroup) scenario.getConfig().getModule(DestinationChoiceConfigGroup.GROUP_NAME);
-  		String maxEpsValuesFileName = dccg.getMaxEpsFile();
+  		String maxEpsValuesFileName = this.dccg.getMaxEpsFile();
 		if (maxEpsValuesFileName != null && arekValsRead) {
 			ObjectAttributesXmlReader maxEpsReader = new ObjectAttributesXmlReader(this.personsMaxDCScoreUnscaled);
 			try {
@@ -72,10 +77,10 @@ public class ReadOrComputeMaxDCScore {
 		}
 	}
 	
-	private void computeMaxDCScore() {			
+	private void computeMaxDCScore() {
 		DestinationSampler sampler = new DestinationSampler(this.lcContext.getPersonsKValuesArray(), 
 				this.lcContext.getFacilitiesKValuesArray(), 
-				(DestinationChoiceConfigGroup) this.config.getModule("locationchoice"));
+				this.dccg);
 				
 		log.info("Computing max epsilon ... for " + this.scenario.getPopulation().getPersons().size() + " persons");
 		for (String actType : this.scaleEpsilon.getFlexibleTypes()) {
@@ -99,7 +104,7 @@ public class ReadOrComputeMaxDCScore {
 			}	
 		}
 		ObjectAttributesXmlWriter attributesWriter = new ObjectAttributesXmlWriter(this.personsMaxDCScoreUnscaled);
-		attributesWriter.writeFile(this.config.controler().getOutputDirectory() + "personsMaxDCScoreUnscaled.xml");
+		attributesWriter.writeFile(this.config.controler().getOutputDirectory() + maxEpsFile);
 	}
 	
 	public ObjectAttributes getPersonsMaxEpsUnscaled() {
