@@ -19,19 +19,24 @@
  *  *                                                                         *
  *  * ***********************************************************************
  */
-package playground.vsp.congestion;
+package scenarios.braess;
 
+import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.events.EventsUtils;
+import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.replanning.DefaultPlanStrategiesModule.DefaultSelector;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
@@ -39,16 +44,47 @@ import org.matsim.testcases.MatsimTestUtils;
 import playground.vsp.congestion.controler.MarginalCongestionPricingContolerListener;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV4;
 import playground.vsp.congestion.handlers.TollHandler;
+import scenarios.analysis.TtAbstractAnalysisTool;
+import scenarios.braess.analysis.TtAnalyzeBraess;
 
 /**
+ * Test to fix the route distribution and travel times in Braess's scenario.
+ * If it fails something has changed to previous MATSim behavior.
+ * 
+ * Currently, congestion version V4 throws a runtime exception and is therefore set to ignore (see comment below).
+ * 
  * @author tthunig
- * @author ikaddoura
+ *
  */
-public class BraessCongestionPricingTest {
-
+public class FixBraessBehaviorTest{
+	
 	@Rule
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
+	
+	@Test
+	public void testBraessWoPricing() {
+		Config config = defineConfig();
+		Scenario scenario = ScenarioUtils.loadScenario(config);
 
+		EventsManager events = EventsUtils.createEventsManager();
+		TtAbstractAnalysisTool handler = new TtAnalyzeBraess();
+		events.addHandler(handler);
+
+		QSim qsim = QSimUtils.createDefaultQSim(scenario, events);
+		qsim.run();
+
+		// Controler controler = new Controler(scenario);
+		// controler.run();
+
+		// test route distribution
+		int agentsOnMiddleRoute = handler.getRouteUsers()[1];
+		Assert.assertEquals("The number of agents on the middle route has changed to previous MATSim behavior.", 1978, agentsOnMiddleRoute, MatsimTestUtils.EPSILON);
+		double totalTT = handler.getTotalTT();
+		Assert.assertEquals("The total travel time has changed to previous MATSim behavior.", 3949870, totalTT, MatsimTestUtils.EPSILON);
+	}
+	
+	// TODO test other congestion versions too (v3, v8, v9)
+	
 	/* V4 throws a runtime exception: 
 	 * "time=28915.0; 13.799999999999999 sec delay is not internalized. Aborting..."
 	 * Amit, please fix this and remove the @Ignore. 
@@ -74,6 +110,8 @@ public class BraessCongestionPricingTest {
 
 		// run the simulation
 		controler.run();
+		
+		// TODO test whether total travel time, route distribution ... has changed compared to previous MATSim behavior.
 	}
 
 	private Config defineConfig() {
@@ -126,5 +164,5 @@ public class BraessCongestionPricingTest {
 
 		return config;
 	}
-
+	
 }
