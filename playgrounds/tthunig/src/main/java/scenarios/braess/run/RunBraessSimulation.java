@@ -52,7 +52,7 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.replanning.DefaultPlanStrategiesModule.DefaultSelector;
 import org.matsim.core.replanning.DefaultPlanStrategiesModule.DefaultStrategy;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
-import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility.Builder;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.data.v20.LaneDefinitionsWriter20;
 
@@ -168,9 +168,9 @@ public class RunBraessSimulation {
 			for (int i = 0; i < strategies.length; i++) {
 				if (strategies[i].getStrategyName().equals(DefaultStrategy.ReRoute.toString())){
 					if (strategies[i].getWeight() > 0.0){ // ReRoute is used
-						final CongestionTollTimeDistanceTravelDisutilityFactory factory = 
+						final CongestionTollTimeDistanceTravelDisutilityFactory factory =
 								new CongestionTollTimeDistanceTravelDisutilityFactory(
-								new TravelTimeAndDistanceBasedTravelDisutilityFactory(),
+										new Builder( TransportMode.car ),
 								tollHandler
 							) ;
 						factory.setSigma(SIGMA);
@@ -217,7 +217,7 @@ public class RunBraessSimulation {
 		} else {
 			// adapt sigma for randomized routing
 			final RandomizingTimeDistanceTravelDisutility.Builder builder = 
-					new RandomizingTimeDistanceTravelDisutility.Builder();
+					new RandomizingTimeDistanceTravelDisutility.Builder( TransportMode.car );
 			builder.setSigma(SIGMA);
 			controler.addOverridingModule(new AbstractModule() {
 				@Override

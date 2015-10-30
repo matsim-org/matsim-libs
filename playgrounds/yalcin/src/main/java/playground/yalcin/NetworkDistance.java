@@ -127,7 +127,7 @@ public class NetworkDistance {
 
 		// create the router algorithm
 		TravelTime travelTime = new FreespeedTravelTimeAndDisutility(config.planCalcScore());
-		TravelDisutility linkCosts = new RandomizingTimeDistanceTravelDisutility.Builder().createTravelDisutility(travelTime, config.planCalcScore());
+		TravelDisutility linkCosts = new RandomizingTimeDistanceTravelDisutility.Builder( TransportMode.car ).createTravelDisutility(travelTime, config.planCalcScore());
 		Dijkstra router = new Dijkstra(network, linkCosts, travelTime);
 
 		// we need to transform the coordinate from wgs84 to gk4 for calculating distances

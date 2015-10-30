@@ -24,7 +24,7 @@ public class CSMembershipAllocator {
 		PopulationReader populationReader = new MatsimPopulationReader(scenario);
 		MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario);
 		networkReader.readFile(args[1]);
-		populationReader.readFile(args[1]);
+		populationReader.readFile(args[2]);
 		
 		int size = scenario.getPopulation().getPersons().values().size();
 		Object[] arr = scenario.getPopulation().getPersons().values().toArray();
@@ -62,7 +62,7 @@ public class CSMembershipAllocator {
 //		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).writeFileV4("./plans_with_CS_membership_" + args[3] + ".xml.gz");		
 		
 		ObjectAttributesXmlWriter betaWriter = new ObjectAttributesXmlWriter(bla);
-		betaWriter.writeFile("C:/Users/beckerh/Desktop/NFP/population_with_CS.xml.gz");
+		betaWriter.writeFile(args[3]);
 		
 
 	}

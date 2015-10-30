@@ -11,11 +11,15 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.minibus.genericUtils.RecursiveStatsContainer;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
@@ -25,22 +29,30 @@ import org.matsim.core.utils.gis.PointFeatureFactory.Builder;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.utils.objectattributes.ObjectAttributes;
+import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.opengis.feature.simple.SimpleFeature;
 
 import playground.dhosse.gap.Global;
 
 public class CsAnalysis {
 	
-	private static final String it = "90";
+	private static final String it = "100";
+	
+	private static final Logger log = Logger.getLogger(CsAnalysis.class);
 	
 	public static void main(String args[]){
+		
+		OutputDirectoryLogging.initLogging(new OutputDirectoryHierarchy("/home/dhosse/base/", OverwriteFileSetting.overwriteExistingFiles));
 		
 //		SpatialAnalysis.writePopulationToShape(Global.runInputDir + "output_plans.xml.gz", "/home/danielhosse/population.shp");
 
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario).readFile(Global.runInputDir + "merged-networkV2_20150929.xml");
+		ObjectAttributes attributes = new ObjectAttributes();
+		new ObjectAttributesXmlReader(attributes).parse("/home/dhosse/run11/input/subpopulationAtts.xml");
 		
-		BufferedReader reader = IOUtils.getBufferedReader("/home/danielhosse/run11/output/ITERS/it." + it + "/" + it + ".OW_CS");
+		BufferedReader reader = IOUtils.getBufferedReader("/home/dhosse/run11/output_reducedCosts/ITERS/it." + it + "/" + it + ".OW_CS");
 		Set<String> userIds = new HashSet<>();
 		
 		RecursiveStatsContainer durationStats = new RecursiveStatsContainer();
@@ -117,15 +129,15 @@ public class CsAnalysis {
 			
 		}
 		
-		BufferedWriter writer = IOUtils.getBufferedWriter("/home/danielhosse/userIds.csv");
+		BufferedWriter writer = IOUtils.getBufferedWriter("/home/dhosse/userIds_rC.csv");
 		
 		try {
 			
-			writer.write("personId");
+			writer.write("personId,userGroup");
 			
 			for(String id : userIds){
 				writer.newLine();
-				writer.write(id);
+				writer.write(id + "," + attributes.getAttribute(id, Global.USER_GROUP));
 			}
 			writer.flush();
 			writer.close();
@@ -167,7 +179,9 @@ public class CsAnalysis {
 			
 		}
 		
-		ShapeFileWriter.writeGeometries(features, "/home/danielhosse/passengerInteractions.shp");
+		ShapeFileWriter.writeGeometries(features, "/home/dhosse/passengerInteractions_rC.shp");
+		
+		OutputDirectoryLogging.closeOutputDirLogging();
 		
 	}
 	

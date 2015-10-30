@@ -75,24 +75,23 @@ public class TwoWayCarsharingVehicleLocation {
 					vehicleLocationQuadTree.remove(link.getCoord().getX(), link.getCoord().getY(), station);
 					vehicleLocationQuadTree.put(link.getCoord().getX(), link.getCoord().getY(), stationNew);
 					
+					return;
+					
 				}
-				else {
-					
-					log.warn("There were no stations found on the given link, so the car was parked at newly created station. This should never happen! Continuing anyway, but the results should not be trusted...");
-					ArrayList<String> vehIDs = new ArrayList<String>();
-					
-					vehIDs.add(id);
-					
-					TwoWayCarsharingStation stationNew = new TwoWayCarsharingStation(link, 1, vehIDs);		
-					
-					vehicleLocationQuadTree.put(link.getCoord().getX(), link.getCoord().getY(), stationNew);
-				}
-			}		
+			}
 			
+					
+			log.warn("There were no stations found on the given link, so the car was parked at newly created station. This should never happen! Continuing anyway, but the results should not be trusted...");
+			ArrayList<String> vehIDs = new ArrayList<String>();
+			
+			vehIDs.add(id);
+			
+			TwoWayCarsharingStation stationNew = new TwoWayCarsharingStation(link, 1, vehIDs);		
+			
+			vehicleLocationQuadTree.put(link.getCoord().getX(), link.getCoord().getY(), stationNew);
+	
 			
 		}
-		
-		
 	}
 	
 	public void removeVehicle(TwoWayCarsharingStation station, String id) {
@@ -105,13 +104,13 @@ public class TwoWayCarsharingVehicleLocation {
 			}
 			
 			if (!newvehIDs.remove(id))
-				throw new NullPointerException("Removing the vehicle did not wok");
+				throw new NullPointerException("Removing the vehicle did not work");
 
 			TwoWayCarsharingStation fNew = new TwoWayCarsharingStation(station.getLink(), station.getNumberOfVehicles() - 1, newvehIDs);	
 			
 						
 			if (!vehicleLocationQuadTree.remove(station.getLink().getCoord().getX(), station.getLink().getCoord().getY(), station)) 
-				throw new NullPointerException("Removing the station did not wok");
+				throw new NullPointerException("Removing the station did not work");
 			vehicleLocationQuadTree.put(station.getLink().getCoord().getX(), station.getLink().getCoord().getY(), fNew);
 			
 		

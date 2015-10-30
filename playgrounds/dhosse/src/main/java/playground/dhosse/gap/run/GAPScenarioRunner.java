@@ -3,7 +3,6 @@ package playground.dhosse.gap.run;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
@@ -29,16 +28,10 @@ import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestRespo
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceInitializer;
 import org.matsim.contrib.locationchoice.bestresponse.scoring.DCScoringFunctionFactory;
 import org.matsim.contrib.locationchoice.facilityload.FacilitiesLoadCalculator;
-import org.matsim.contrib.multimodal.ControlerDefaultsWithMultiModalModule;
 import org.matsim.contrib.multimodal.MultiModalControlerListener;
-import org.matsim.contrib.multimodal.MultiModalModule;
-import org.matsim.contrib.multimodal.MultimodalQSimFactory;
 import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.contrib.multimodal.router.util.BikeTravelTimeFactory;
-import org.matsim.contrib.multimodal.router.util.MultiModalTravelTimeFactory;
-import org.matsim.contrib.multimodal.router.util.WalkTravelTime;
 import org.matsim.contrib.multimodal.router.util.WalkTravelTimeFactory;
-import org.matsim.contrib.multimodal.tools.PrepareMultiModalScenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
@@ -47,7 +40,6 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.algorithms.NetworkCleaner;
-import org.matsim.core.population.PersonUtils;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl.Builder;
 import org.matsim.core.replanning.modules.ReRoute;
@@ -56,9 +48,7 @@ import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.MainModeIdentifierImpl;
 import org.matsim.core.router.TripRouterFactoryModule;
-import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -75,9 +65,6 @@ import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
 import org.matsim.roadpricing.RoadPricingConfigGroup;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
-import org.matsim.vehicles.Vehicle;
-
-import com.google.inject.Binder;
 
 import playground.dhosse.gap.Global;
 import playground.dhosse.gap.analysis.SpatialAnalysis;
@@ -96,22 +83,29 @@ public class GAPScenarioRunner {
 	private static final int lastIteration = 100;
 	
 	//configure innovative strategies you want to use
-	private static final boolean addModeChoice = true;
+	private static final boolean addModeChoice = false;
 	private static final boolean addTimeChoice = false;
 	
 	private static final boolean addLocationChoice = false;
 
 	//carsharing
-	private static final boolean carsharing = true;
+	private static final boolean carsharing = false;
 	
 	//cadyts
-	private static final boolean runCadyts = false;
+	private static final boolean runCadyts = true;
 	
 	//multimodal
-	private static final boolean multimodal = true;
+	private static final boolean multimodal = false;
 	
 	//roadpricing
-	private static final boolean roadpricing = true;
+	private static final boolean roadpricing = false;
+	
+	//use this to determine the cost structure for carsharing
+	//non-reduced costs: time fee and distance fee
+	//reduced costs: only time fee
+	private static final boolean reducedCosts = false;
+	
+	private static final String sc = "base";
 	
 	/**
 	 * 
@@ -119,6 +113,8 @@ public class GAPScenarioRunner {
 	 */
 	public static void main(String args[]){
 		
+//		SpatialAnalysis.writePopulationToShape("/home/dhosse/Dokumente/01_eGAP/plansV4.xml.gz", "/home/dhosse/activityLocations.shp");
+//		SpatialAnalysis.createODPairsForCsUsers("/home/dhosse/Dokumente/01_eGAP/plansV4.xml.gz", "", Global.matsimOutputDir + "output_network.xml.gz", "/home/dhosse/odPairs.shp");
 		run();
 //		runAnalysis();
 		
@@ -131,25 +127,12 @@ public class GAPScenarioRunner {
 		
 		//create a new config and a new scenario and load it
 		final Config config = ConfigUtils.createConfig();
-		ConfigUtils.loadConfig(config, simInputPath + "config.xml");
+		ConfigUtils.loadConfig(config, "/home/dhosse/run11/input/config.xml");
 		
 		config.controler().setLastIteration(lastIteration);
-		Scenario scenario = ScenarioUtils.loadScenario(config);
+		config.controler().setOutputDirectory("/home/dhosse/run11/outputVersuchWenigerZSt");
 		
-		if(multimodal){
-			
-//			MultiModalConfigGroup mm = new MultiModalConfigGroup();
-//			mm.setCreateMultiModalNetwork(true);
-//			mm.setCutoffValueForNonCarModes(50/3.6);
-//			mm.setDropNonCarRoutes(true);
-//			mm.setMultiModalSimulationEnabled(true);
-//			mm.setNumberOfThreads(4);
-//			mm.setSimulatedModes("bike");
-//			config.addModule(mm);
-//			
-//			PrepareMultiModalScenario.run(scenario);
-			
-		}
+		Scenario scenario = ScenarioUtils.loadScenario(config);
 		
 //		create a second scenario containing only the cleaned (road) network
 //		in order to map agents on car links
@@ -248,7 +231,7 @@ public class GAPScenarioRunner {
 	private static void addRoadpricing(final Controler controler){
 		
 		RoadPricingConfigGroup rp = new RoadPricingConfigGroup();
-		rp.setTollLinksFile("/home/danielhosse/roadpricing.xml");
+		rp.setTollLinksFile("/home/dhosse/roadpricing.xml");
 		rp.setRoutingRandomness(3.);
 		controler.getConfig().addModule(rp);
 		
@@ -259,6 +242,8 @@ public class GAPScenarioRunner {
 	private static void addCadyts(final Controler controler){
 		
 		// create the cadyts context and add it to the control(l)er:
+//		Counts<Link> counts = new Counts<>();
+//		new CountsReaderMatsimV1(counts).parse("/home/dhosse/run11/input/counts.xml");
 		final CadytsContext cContext = new CadytsContext(controler.getConfig());
 		controler.addControlerListener(cContext);
 
@@ -306,13 +291,13 @@ public class GAPScenarioRunner {
 					if(mode.equals(TransportMode.bike)){
 						
 						addTravelTimeBinding(mode).toProvider(new BikeTravelTimeFactory(controler.getConfig().plansCalcRoute()));
-						addTravelDisutilityFactoryBinding(mode).to(TravelTimeAndDistanceBasedTravelDisutilityFactory.class).asEagerSingleton();
+						addTravelDisutilityFactoryBinding(mode).toInstance(new RandomizingTimeDistanceTravelDisutility.Builder(mode));
 						addRoutingModuleBinding(mode).toProvider(new TripRouterFactoryModule.NetworkRoutingModuleProvider(mode));
 						
 					} else if(mode.equals(TransportMode.walk)){
 						
 						addTravelTimeBinding(mode).toProvider(new WalkTravelTimeFactory(controler.getConfig().plansCalcRoute()));
-						addTravelDisutilityFactoryBinding(mode).to(TravelTimeAndDistanceBasedTravelDisutilityFactory.class).asEagerSingleton();
+						addTravelDisutilityFactoryBinding(mode).toInstance(new RandomizingTimeDistanceTravelDisutility.Builder(mode));
 						addRoutingModuleBinding(mode).toProvider(new TripRouterFactoryModule.NetworkRoutingModuleProvider(mode));
 						
 					}
@@ -636,16 +621,19 @@ public class GAPScenarioRunner {
 		
 		OneWayCarsharingConfigGroup ow = new OneWayCarsharingConfigGroup();
 		ow.setConstantOneWayCarsharing("-0.0");
-		ow.setDistanceFeeOneWayCarsharing("-0.00026");
-		ow.setRentalPriceTimeOneWayCarsharing("-0.000625");
-//		ow.setDistanceFeeOneWayCarsharing("-0.0");
-//		ow.setRentalPriceTimeOneWayCarsharing("0.004833333");
+		if(!reducedCosts){
+			ow.setDistanceFeeOneWayCarsharing("-0.00026");
+			ow.setRentalPriceTimeOneWayCarsharing("-0.000625");
+		} else{
+			ow.setDistanceFeeOneWayCarsharing("-0.0");
+			ow.setRentalPriceTimeOneWayCarsharing("0.004833333");
+		}
 		ow.setsearchDistance("2000");
 		ow.setTimeFeeOneWayCarsharing("-0.0");
 		ow.setTimeParkingFeeOneWayCarsharing("-0.0");
 		ow.setUtilityOfTravelling("-6");
 		ow.setUseOneWayCarsharing(true);
-		ow.setvehiclelocations(simInputPath + "stations.txt");
+		ow.setvehiclelocations("/home/dhosse/run11/input/stations.txt");
 		controler.getConfig().addModule(ow);
 		
 		TwoWayCarsharingConfigGroup tw = new TwoWayCarsharingConfigGroup();
@@ -715,7 +703,7 @@ public class GAPScenarioRunner {
 	private static void runAnalysis() {
 	
 //		PersonAnalysis.createLegModeDistanceDistribution(Global.matsimInputDir + "Pläne/plansV3.xml.gz", "/home/danielhosse/Dokumente/lmdd/");
-		SpatialAnalysis.writePopulationToShape("/home/danielhosse/Dokumente/01_eGAP/plansV4.xml.gz", "/home/danielhosse/Dokumente/01_eGAP/popV4.shp");
+		SpatialAnalysis.writePopulationToShape("/home/dhosse/Dokumente/01_eGAP/plansV4.xml.gz", "/home/dhosse/Dokumente/01_eGAP/popV4.shp");
 	
 	}
 	
