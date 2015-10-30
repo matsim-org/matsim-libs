@@ -99,7 +99,7 @@ public class RunBraessSimulation {
 	private static final LaneType LANE_TYPE = LaneType.NONE;
 	
 	// defines which kind of pricing should be used
-	private static final PricingType PRICING_TYPE = PricingType.V9;
+	private static final PricingType PRICING_TYPE = PricingType.V3;
 	public enum PricingType{
 		NONE, V3, V4, V8, V9, FLOWBASED
 	}
@@ -108,7 +108,7 @@ public class RunBraessSimulation {
 	// (higher sigma cause more randomness. use 0.0 for no randomness.)
 	private static final double SIGMA = 0.0;	
 		
-	private static final boolean WRITE_INITIAL_FILES = true;
+	private static final boolean WRITE_INITIAL_FILES = false;
 	
 	private static String OUTPUT_BASE_DIR = "../../../runs-svn/braess/withoutLanes_signalsVsTolls/";
 	
@@ -158,7 +158,6 @@ public class RunBraessSimulation {
 		}
 
 		if (!PRICING_TYPE.equals(PricingType.NONE) && !PRICING_TYPE.equals(PricingType.FLOWBASED)){
-//		if (!PRICING_TYPE.equals(PricingType.NONE)){
 			// add tolling
 			TollHandler tollHandler = new TollHandler(scenario);
 			
@@ -211,10 +210,11 @@ public class RunBraessSimulation {
 							tollHandler, congestionHandler));
 		
 		} else if (PRICING_TYPE.equals(PricingType.FLOWBASED)) {
+			
 			Initializer initializer = new Initializer();
 			controler.addControlerListener(initializer);		
-		
-		} else {
+		} else { // no pricing
+			
 			// adapt sigma for randomized routing
 			final RandomizingTimeDistanceTravelDisutility.Builder builder = 
 					new RandomizingTimeDistanceTravelDisutility.Builder( TransportMode.car );
