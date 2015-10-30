@@ -11,6 +11,7 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.utils.objectattributes.ObjectAttributes;
+import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
 import java.util.Random;
@@ -66,10 +67,13 @@ public class PrefsCreator {
 
     public static void main(final String[] args) {
         final String pathToInputPopulation = args[0];
-        final String pathToOutputPrefs = args[1];
+        final String pathToInputPrefs = args[1];
+        final String pathToOutputPrefs = args[2];
+
+        ObjectAttributes prefs = getObjectAttributes(pathToInputPrefs);
 
         Population population = getPopulation(pathToInputPopulation);
-        ObjectAttributes prefs = createPrefsBasedOnPlans(population);
+        createPrefsBasedOnPlans(population, prefs);
 
         ObjectAttributesXmlWriter attributesXmlWriterWriter = new ObjectAttributesXmlWriter(prefs);
         attributesXmlWriterWriter.writeFile(pathToOutputPrefs);
@@ -77,10 +81,15 @@ public class PrefsCreator {
 
     protected static ObjectAttributes createPrefsBasedOnPlans(final Population population) {
         ObjectAttributes prefs = new ObjectAttributes();
+        createPrefsBasedOnPlans(population, prefs);
+        return prefs;
+    }
+
+    protected static void createPrefsBasedOnPlans(final Population population, final ObjectAttributes prefs) {
         Counter counter = new Counter(" person # ");
         ActivityAnalyzer activityAnalyzer = new ActivityAnalyzer();
         String actChain;
-        double actDuration;
+        double actStartTime, actEndTime, actDuration;
         double h, rh, w, rw, e, l, s, k, o;
 
         for (Person p : population.getPersons().values()) {
@@ -96,7 +105,9 @@ public class PrefsCreator {
                     if (pe instanceof ActivityImpl) {
                         ActivityImpl act = (ActivityImpl) pe;
                         actChain = actChain.concat(actCharacteristics.valueOf(act.getType().toUpperCase()).getAbbr());
-                        actDuration = act.getEndTime() - act.getStartTime();
+                        actStartTime = (act.getStartTime() > 0) ? act.getStartTime() : 0;
+                        actEndTime = (act.getEndTime() > 0) ? act.getEndTime() : 30*3600;
+                        actDuration = actEndTime - actStartTime;
                         switch (act.getType()) {
                             case "home": h = (h < 0) ? actDuration : h + actDuration; break;
                             case "remote_home": rh = (rh < 0) ? actDuration : rh + actDuration; break;
@@ -128,8 +139,7 @@ public class PrefsCreator {
         }
 
         counter.printCounter();
-        activityAnalyzer.printActChainAnalysis();
-        return prefs;
+        //activityAnalyzer.printActChainAnalysis();
     }
 
     /**
@@ -336,6 +346,13 @@ public class PrefsCreator {
             //log.info("person p " +p.getId().toString()+ " has working duration: " +typicalWorkDuration/3600);
         }
         return timeBudget;
+    }
+
+    protected static ObjectAttributes getObjectAttributes(String pathToInputPrefs) {
+        ObjectAttributes prefs = new ObjectAttributes();
+        ObjectAttributesXmlReader reader = new ObjectAttributesXmlReader(prefs);
+        reader.parse(pathToInputPrefs);
+        return prefs;
     }
 
     private static Population getPopulation(final String pathToPopFile) {
