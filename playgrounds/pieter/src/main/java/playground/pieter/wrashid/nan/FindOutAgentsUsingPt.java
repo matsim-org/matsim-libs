@@ -51,8 +51,8 @@ public class FindOutAgentsUsingPt implements ActivityStartEventHandler, LinkEnte
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		if (usingPt.containsKey(event.getPersonId())){
-			System.out.println(event.getPersonId());
+		if (usingPt.containsKey(event.getDriverId())){
+			System.out.println(event.getDriverId());
 		}
 		
 	}

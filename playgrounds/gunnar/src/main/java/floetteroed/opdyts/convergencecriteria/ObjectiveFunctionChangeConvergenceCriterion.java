@@ -21,7 +21,7 @@
  *
  * contact: gunnar.floetteroed@abe.kth.se
  *
- */ 
+ */
 package floetteroed.opdyts.convergencecriteria;
 
 import static java.lang.Math.abs;
@@ -37,13 +37,13 @@ public class ObjectiveFunctionChangeConvergenceCriterion implements
 		ConvergenceCriterion {
 
 	// -------------------- CONSTANTS --------------------
-	
+
 	private final double absoluteChange;
 
 	private final double relativeChange;
 
 	private final int minAverageIterations;
-	
+
 	// -------------------- MEMBERS --------------------
 
 	private Double finalObjectiveFunctionValue = null;
@@ -59,7 +59,7 @@ public class ObjectiveFunctionChangeConvergenceCriterion implements
 	// --------------- IMPLEMENTATION OF ConvergenceCriterion ---------------
 
 	@Override
-	public void evaluate(final TransitionSequence transitionSequence) {
+	public void evaluate(final TransitionSequence<?> transitionSequence) {
 		if (transitionSequence.size() < 2 * this.minAverageIterations) {
 			this.finalObjectiveFunctionValue = null;
 		} else {
@@ -100,5 +100,5 @@ public class ObjectiveFunctionChangeConvergenceCriterion implements
 	public void reset() {
 		this.finalObjectiveFunctionValue = null;
 	}
-	
+
 }

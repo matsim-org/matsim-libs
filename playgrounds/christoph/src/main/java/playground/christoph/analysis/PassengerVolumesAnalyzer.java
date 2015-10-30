@@ -79,7 +79,7 @@ public class PassengerVolumesAnalyzer extends VolumesAnalyzer implements
 	@Override
 	public void handleEvent(final LinkLeaveEvent event) {
 		super.handleEvent(event);
-		boolean isCarTrip = this.enRouteDrivers.contains(event.getPersonId());
+		boolean isCarTrip = this.enRouteDrivers.contains(event.getDriverId());
 		if (isCarTrip) {
 			Id linkId = event.getLinkId();
 			Integer agentsInVehicle = agentsInVehicles.get(event.getVehicleId());

@@ -46,12 +46,9 @@ import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.PlanRouter;
-import org.matsim.core.router.RoutingContext;
-import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
@@ -64,6 +61,8 @@ import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
 import org.matsim.population.algorithms.PersonPrepareForSim;
 import org.matsim.population.algorithms.PlanAlgorithm;
+
+import javax.inject.Provider;
 
 /**
  * Prepare initial plans for within-day initial routes creation. There, routes are
@@ -128,11 +127,11 @@ public class PrepareInitialRoutes {
 	private void prepareForSim(final Scenario scenario, Set<String> dummyModes) {
 		
 		Config config = scenario.getConfig();
-		
-		TripRouterFactory defaultTripRouterFactory = new TripRouterFactoryBuilderWithDefaults().build(scenario);
+
+		Provider<TripRouter> defaultTripRouterFactory = new TripRouterFactoryBuilderWithDefaults().build(scenario);
 		PopulationFactory populationFactory = scenario.getPopulation().getFactory();
 		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory();
-		TripRouterFactory tripRouterFactory = new WithinDayInitialRoutesTripRouterFactory(defaultTripRouterFactory, dummyModes,
+		Provider<TripRouter> tripRouterFactory = new WithinDayInitialRoutesTripRouterFactory(defaultTripRouterFactory, dummyModes,
 				populationFactory, routeFactory, scenario.getNetwork());
 				
 		TravelTime travelTime = new FreeSpeedTravelTime();
@@ -152,15 +151,15 @@ public class PrepareInitialRoutes {
 		});
 	}
 	
-	private static class WithinDayInitialRoutesTripRouterFactory implements TripRouterFactory {
+	private static class WithinDayInitialRoutesTripRouterFactory implements Provider<TripRouter> {
 
-		private final TripRouterFactory tripRouterFactory;
+		private final Provider<TripRouter> tripRouterFactory;
 		private final Set<String> dummyModes;
 		private final PopulationFactory populationFactory;
 		private final ModeRouteFactory routeFactory;
 		private final Network network;
 		
-		public WithinDayInitialRoutesTripRouterFactory(TripRouterFactory tripRouterFactory, Set<String> dummyModes, 
+		public WithinDayInitialRoutesTripRouterFactory(Provider<TripRouter> tripRouterFactory, Set<String> dummyModes,
 				PopulationFactory populationFactory, ModeRouteFactory routeFactory, Network network) {
 			this.tripRouterFactory = tripRouterFactory;
 			this.dummyModes = dummyModes;
@@ -171,7 +170,7 @@ public class PrepareInitialRoutes {
 		
 		@Override
 		public TripRouter instantiateAndConfigureTripRouter(RoutingContext routingContext) {
-			TripRouter tripRouter = tripRouterFactory.instantiateAndConfigureTripRouter(routingContext);
+			TripRouter tripRouter = tripRouterFactory.get();
 
 			// replace routing modules for dummy modes
 			for (String mode : dummyModes) {
@@ -247,17 +246,17 @@ public class PrepareInitialRoutes {
 	
 	private static class PlanRouterProvider {
 
-		private final TripRouterFactory tripRouterFactory;
+		private final Provider<TripRouter> tripRouterFactory;
 		private final RoutingContext routingContext;
 		
-		public PlanRouterProvider(TripRouterFactory tripRouterFactory, RoutingContext routingContext) {
+		public PlanRouterProvider(Provider<TripRouter> tripRouterFactory, RoutingContext routingContext) {
 			this.tripRouterFactory = tripRouterFactory;
 			this.routingContext = routingContext;
 			
 		}
 		
 		public PlanAlgorithm getPlanAlgorithm() {
-			return new PlanRouter(this.tripRouterFactory.instantiateAndConfigureTripRouter(routingContext));
+			return new PlanRouter(this.tripRouterFactory.get());
 		}
 	}
 }

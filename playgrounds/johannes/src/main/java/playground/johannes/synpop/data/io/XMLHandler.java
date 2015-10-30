@@ -22,7 +22,10 @@ package playground.johannes.synpop.data.io;
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
-import playground.johannes.synpop.data.*;
+import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.data.Factory;
+import playground.johannes.synpop.data.Person;
+import playground.johannes.synpop.data.Segment;
 
 import java.util.*;
 

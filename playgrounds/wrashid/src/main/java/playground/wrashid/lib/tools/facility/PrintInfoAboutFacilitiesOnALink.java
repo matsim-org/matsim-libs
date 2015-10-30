@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
@@ -43,7 +43,7 @@ public class PrintInfoAboutFacilitiesOnALink {
 		Id<Link> idOfLinkForWhichFacilitiesShouldBePrinted=Id.create("17560001856956FT", Link.class);
 		
 		
-		ScenarioImpl scenario = (ScenarioImpl) GeneralLib.readScenario(plansFile, networkFile, facilititiesPath);
+		MutableScenario scenario = (MutableScenario) GeneralLib.readScenario(plansFile, networkFile, facilititiesPath);
 
 		NetworkImpl network=(NetworkImpl) scenario.getNetwork();
 		ActivityFacilities facilities=scenario.getActivityFacilities();

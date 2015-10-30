@@ -3,6 +3,8 @@ package gunnar.ihop2.regent.demandreading;
 import static java.lang.Math.max;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -32,7 +34,7 @@ import com.vividsolutions.jts.io.WKTReader;
  * @author Gunnar Flötteröd, based on Patryk Larek
  *
  */
-public class ZonalSystem {
+public class ZonalSystem implements Iterable<Zone> {
 
 	// -------------------- MEMBERS --------------------
 
@@ -41,6 +43,7 @@ public class ZonalSystem {
 	private final Map<String, Zone> id2zone = new LinkedHashMap<String, Zone>();
 
 	private Map<Node, Zone> node2zone = null;
+
 	private Map<Zone, Set<Node>> zone2nodes = null;
 
 	// -------------------- CONSTRUCTION --------------------
@@ -156,41 +159,61 @@ public class ZonalSystem {
 		}
 	}
 
-	// <<<<< TODO NEW <<<<<
+	// TODO NEW
+	public Set<Node> getNodes(final Zone zone) {
+		Set<Node> result = this.zone2nodes.get(zone);
+		if (result == null) {
+			result = new LinkedHashSet<>();
+		}
+		return result;
+	}
+
+	// TODO NEW
+	public Set<Node> getNodes(final String zoneId) {
+		if (this.id2zone.containsKey(zoneId)) {
+			return (this.getNodes(this.id2zone.get(zoneId)));
+		} else {
+			return new LinkedHashSet<>();
+		}
+	}
 
 	// -------------------- CONTENT ACCESS --------------------
+
+	public Map<String, Zone> getId2zoneView() {
+		return Collections.unmodifiableMap(this.id2zone);
+	}
 
 	public Zone getZone(final String id) {
 		return this.id2zone.get(id);
 	}
 
-	public Map<String, Zone> getZonesInsideBoundary(
-			final String zonesBoundaryShapeFileName) {
-
-		final Collection<SimpleFeature> features = ShapeFileReader
-				.getAllFeatures(zonesBoundaryShapeFileName);
-		if (features.size() != 1) {
-			throw new RuntimeException("not exactly one feature in shape file");
-		}
-
-		final SimpleFeature feature = features.iterator().next();
-		final WKTReader wktreader = new WKTReader();
-		final Geometry limitingPolygon;
-		try {
-			limitingPolygon = wktreader.read(feature.getAttribute("the_geom")
-					.toString());
-		} catch (ParseException e) {
-			throw new RuntimeException(e);
-		}
-
-		final Map<String, Zone> result = new LinkedHashMap<String, Zone>();
-		for (Map.Entry<String, Zone> id2zoneEntry : this.id2zone.entrySet()) {
-			if (limitingPolygon.covers(id2zoneEntry.getValue().getGeometry())) {
-				result.put(id2zoneEntry.getKey(), id2zoneEntry.getValue());
-			}
-		}
-		return result;
-	}
+	// public Map<String, Zone> getZonesInsideBoundary(
+	// final String zonesBoundaryShapeFileName) {
+	//
+	// final Collection<SimpleFeature> features = ShapeFileReader
+	// .getAllFeatures(zonesBoundaryShapeFileName);
+	// if (features.size() != 1) {
+	// throw new RuntimeException("not exactly one feature in shape file");
+	// }
+	//
+	// final SimpleFeature feature = features.iterator().next();
+	// final WKTReader wktreader = new WKTReader();
+	// final Geometry limitingPolygon;
+	// try {
+	// limitingPolygon = wktreader.read(feature.getAttribute("the_geom")
+	// .toString());
+	// } catch (ParseException e) {
+	// throw new RuntimeException(e);
+	// }
+	//
+	// final Map<String, Zone> result = new LinkedHashMap<String, Zone>();
+	// for (Map.Entry<String, Zone> id2zoneEntry : this.id2zone.entrySet()) {
+	// if (limitingPolygon.covers(id2zoneEntry.getValue().getGeometry())) {
+	// result.put(id2zoneEntry.getKey(), id2zoneEntry.getValue());
+	// }
+	// }
+	// return result;
+	// }
 
 	// -------------------- MAIN-FUNCTION, ONLY FOR TESTING --------------------
 
@@ -216,5 +239,11 @@ public class ZonalSystem {
 		}
 
 		System.out.println("... DONE");
+	}
+
+	// TODO NEW
+	@Override
+	public Iterator<Zone> iterator() {
+		return this.id2zone.values().iterator();
 	}
 }

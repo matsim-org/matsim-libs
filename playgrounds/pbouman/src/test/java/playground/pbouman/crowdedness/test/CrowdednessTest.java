@@ -45,7 +45,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 import org.matsim.pt.transitSchedule.api.Departure;
@@ -90,7 +90,7 @@ public class CrowdednessTest
 	@Test
 	public final void testCrowdednessEvents()
 	{
-		final ScenarioImpl scen = generateScenario();
+		final MutableScenario scen = generateScenario();
 		scen.getConfig().controler().setLastIteration(0);
 				
 		Controler c = new Controler(scen) ;
@@ -190,7 +190,7 @@ public class CrowdednessTest
 	}
 
 	
-	private ScenarioImpl generateScenario()
+	private MutableScenario generateScenario()
 	{
 		Config config = ConfigUtils.createConfig();
 		config.transit().setUseTransit(true);
@@ -202,7 +202,7 @@ public class CrowdednessTest
 		HashSet<String> transitModes = new HashSet<String>();
 		transitModes.add("pt");
 		config.transit().setTransitModes(transitModes);
-		ScenarioImpl scen = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		MutableScenario scen = (MutableScenario) ScenarioUtils.createScenario(config);
 
 		
 		/* ******** *

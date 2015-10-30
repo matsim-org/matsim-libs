@@ -450,7 +450,7 @@ public class FreeFloatingParkingPersonDriverAgentImpl implements MobsimDriverAge
 	private void initializeFreeFloatingEndWalkLeg(Leg leg, double now) {
 		
 		this.state = MobsimAgent.State.LEG;
-		this.parkingModule.makeFFVehicleAvailable(Id.create("FF_"+ (vehID), Vehicle.class), parkingSpot.getParking());
+		this.parkingModule.makeFFVehicleAvailable(Id.create((vehID), Vehicle.class), parkingSpot.getParking());
 		Route route = leg.getRoute();
 		
 		double distance = 0.0; // this will be acquired from the parking module

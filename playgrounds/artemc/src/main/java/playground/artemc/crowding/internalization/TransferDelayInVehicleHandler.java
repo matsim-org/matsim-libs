@@ -37,7 +37,7 @@ import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityEventHandler;
 import org.matsim.core.api.experimental.events.handler.VehicleDepartsAtFacilityEventHandler;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.vehicles.Vehicle;
 
 import java.util.ArrayList;
@@ -80,7 +80,7 @@ public class TransferDelayInVehicleHandler implements PersonEntersVehicleEventHa
 	private final double doorOpeningTime = 1.0;
 	private final double doorClosingTime = 1.0;
 	
-	private final ScenarioImpl scenario;
+	private final MutableScenario scenario;
 	private final EventsManager events;
 	private final List<Id<Person>> ptDriverIDs = new ArrayList<>();
 	private final List<Id<Vehicle>> ptVehicleIDs = new ArrayList<>();
@@ -92,7 +92,7 @@ public class TransferDelayInVehicleHandler implements PersonEntersVehicleEventHa
 	private final Map<Id<Vehicle>, List<Id<Person>>> vehId2agentsBoardingAtThisStop = new HashMap<>();
 	private final Map<Id<Vehicle>, List<Id<Person>>> vehId2agentsAlightingAtThisStop = new HashMap<>();
 	
-	public TransferDelayInVehicleHandler(EventsManager events, ScenarioImpl scenario) {
+	public TransferDelayInVehicleHandler(EventsManager events, MutableScenario scenario) {
 		this.events = events;
 		this.scenario = scenario;
 	}
@@ -138,7 +138,7 @@ public class TransferDelayInVehicleHandler implements PersonEntersVehicleEventHa
 			//double delay = this.scenario.getTransitVehicles().getVehicles().get(event.getVehicleId()).getType().getAccessTime();
 
 			//int delayedPassengers_inVeh = calcDelayedPassengersInVeh(event.getVehicleId());
-			//TransferDelayInVehicleEvent delayInVehicleEvent = new TransferDelayInVehicleEvent(event.getPersonId(), event.getVehicleId(), event.getTime(), delayedPassengers_inVeh, delay);
+			//TransferDelayInVehicleEvent delayInVehicleEvent = new TransferDelayInVehicleEvent(event.getDriverId(), event.getVehicleId(), event.getTime(), delayedPassengers_inVeh, delay);
 			//this.events.processEvent(delayInVehicleEvent);
 			
 			// update number of passengers in vehicle after calculating the external effect
@@ -175,7 +175,7 @@ public class TransferDelayInVehicleHandler implements PersonEntersVehicleEventHa
 			//int delayedPassengers_inVeh = calcDelayedPassengersInVeh(event.getVehicleId());
 			
 			// throw delay event
-			//TransferDelayInVehicleEvent delayInVehicleEvent = new TransferDelayInVehicleEvent(event.getPersonId(), event.getVehicleId(), event.getTime(), delayedPassengers_inVeh, delay);
+			//TransferDelayInVehicleEvent delayInVehicleEvent = new TransferDelayInVehicleEvent(event.getDriverId(), event.getVehicleId(), event.getTime(), delayedPassengers_inVeh, delay);
 			//this.events.processEvent(delayInVehicleEvent);
 		}
 	}

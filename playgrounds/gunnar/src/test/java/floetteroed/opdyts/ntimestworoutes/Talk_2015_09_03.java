@@ -1,17 +1,21 @@
 package floetteroed.opdyts.ntimestworoutes;
 
+import static java.lang.Math.max;
+import static java.lang.Math.min;
+
 import java.io.FileNotFoundException;
+import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import vind.VectorToObjectBasedObjectiveFunctionWrapper;
 import floetteroed.opdyts.DecisionVariableRandomizer;
-import floetteroed.opdyts.VectorBasedObjectiveFunction;
+import floetteroed.opdyts.ObjectiveFunction;
 import floetteroed.opdyts.convergencecriteria.ConvergenceCriterion;
 import floetteroed.opdyts.convergencecriteria.ObjectiveFunctionChangeConvergenceCriterion;
 import floetteroed.opdyts.searchalgorithms.RandomSearch;
-import floetteroed.opdyts.searchalgorithms.TrajectorySamplingSelfTuner;
 import floetteroed.utilities.latex.PSTricksDiagramWriter;
 import floetteroed.utilities.math.Discretizer;
 import floetteroed.utilities.math.MathHelpers;
@@ -25,10 +29,10 @@ import floetteroed.utilities.math.Vector;
 class Talk_2015_09_03 {
 
 	private static Vector minMaxExternalities(final double maxExternality,
-			final int linkCnt) {
+			final int linkCnt, final int nth) {
 		final Vector externalities = new Vector(linkCnt);
 		for (int i = 0; i < linkCnt; i++) {
-			final double externality = (i % 2 == 0) ? maxExternality : 0.0;
+			final double externality = (i % nth == 0) ? maxExternality : 0.0;
 			externalities.set(i, externality);
 			System.out.println("externality on link " + i + " is "
 					+ externality);
@@ -71,21 +75,27 @@ class Talk_2015_09_03 {
 		final Random rnd = new Random();
 		final double demand = 500;
 		final double capacity = 1000;
-		final int linkCnt = 40;
+		final int linkCnt = 400;
+		final int tollCnt = 200;
 
 		final int maxIterations = Integer.MAX_VALUE;
 		final int transitionBinCnt = 200;
 		final int transitionBinSize = 100;
 		final int maxTransitions = transitionBinCnt * transitionBinSize;
 
-		final int replications = 3;
-		final boolean keepBestSolution = true;
+		final int replications = 1;
+		final boolean keepBestSolution = false;
 		final int maxDeltaBin = 3;
-		final double replanningProbability = 0.1;
+		final double replanningProbability = 0.10;
 
-		for (Integer populationSize : new Integer[] { 2 }) { // 2, 4, 8, 16,
-																// 32, 64, 128,
-																// 256}) {
+		final double maxExternality = 3.0;
+		// final Vector externalities = randomExternalities(maxExternality,
+		// linkCnt, new Random(4711));
+		final Vector externalities = minMaxExternalities(maxExternality,
+				linkCnt, 2);
+
+		for (Integer populationSize : new Integer[] { 2, 4, 8, 16, 32, 64, 128,
+				256 }) {
 
 			final List<List<Double>> naiveTransitionList = new ArrayList<List<Double>>();
 			final List<List<Double>> naiveObjectiveFunctionValueList = new ArrayList<List<Double>>();
@@ -95,11 +105,8 @@ class Talk_2015_09_03 {
 			final List<List<Double>> equilibriumWeightList = new ArrayList<List<Double>>();
 			final List<List<Double>> uniformityWeightList = new ArrayList<List<Double>>();
 
-			final double maxExternality = 3.0;
-			final Vector externalities = minMaxExternalities(maxExternality,
-					linkCnt);
-			// final Vector externalities = randomExternalities(
-			// maxExternality, linkCnt, rnd);
+			// final Vector externalities = minMaxExternalities(maxExternality,
+			// linkCnt, nth);
 
 			for (Boolean interpolate : new Boolean[] { false, true }) {
 
@@ -139,7 +146,7 @@ class Talk_2015_09_03 {
 						replanners.add(replanner);
 					}
 
-					final NTimesTwoRoutesSimulator system = new NTimesTwoRoutesSimulator(
+					final NTimesTwoRoutesSimulator<NTimesTwoRoutesDecisionVariableMixedDiscrCont> system = new NTimesTwoRoutesSimulator<>(
 							replanners, capacity);
 
 					// final DecisionVariableRandomizer randomization = new
@@ -149,26 +156,29 @@ class Talk_2015_09_03 {
 					// final DecisionVariableRandomizer randomization = new
 					// ContinuousTollRandomizer(
 					// system, linkCnt, 0.1, 1.0, rnd);
-					final DecisionVariableRandomizer randomization = new ContinuousDiscreteTollRandomizer(
-							system, linkCnt, linkCnt / 2, 0.1, 1.0, rnd);
+					final DecisionVariableRandomizer<NTimesTwoRoutesDecisionVariableMixedDiscrCont> randomization = new ContinuousDiscreteTollRandomizer(
+							system, linkCnt, tollCnt, 0.1, 1.0, rnd);
 
 					// final TrajectorySamplingSelfTuner selfTuner = new
 					// TrajectorySamplingSelfTuner();
-					final TrajectorySamplingSelfTuner selfTuner = new TrajectorySamplingSelfTuner(
-							0.0, 0.0, 0.0, 0.95, 1.0);
+					// final TrajectorySamplingSelfTuner selfTuner = new
+					// TrajectorySamplingSelfTuner(
+					// 0.0, 0.0, 0.0, 0.95, 1.0);
 
 					// final ObjectiveFunction objectiveFunction = new
 					// NTimesTwoRoutesObjectiveFunction_exact(
 					// externalities, capacity);
-					final VectorBasedObjectiveFunction objectiveFunction = new NTimesTwoRoutesObjectiveFunction(
-							externalities);
+					final ObjectiveFunction objectiveFunction = new VectorToObjectBasedObjectiveFunctionWrapper(
+							new NTimesTwoRoutesObjectiveFunction(externalities));
 
 					final ConvergenceCriterion convergenceCriterion = new ObjectiveFunctionChangeConvergenceCriterion(
 							1e-4, 1e-4, simulate ? 10 : 10);
 
 					final int maxMemoryLength = Integer.MAX_VALUE; // TODO NEW
-					final RandomSearch search = new RandomSearch(system,
-							randomization, convergenceCriterion, selfTuner,
+					final RandomSearch<NTimesTwoRoutesDecisionVariableMixedDiscrCont> search = new RandomSearch<>(
+							system, randomization,
+							convergenceCriterion,
+							// selfTuner,
 							maxIterations, maxTransitions, populationSize, rnd,
 							interpolate, keepBestSolution, objectiveFunction,
 							maxMemoryLength);
@@ -242,15 +252,30 @@ class Talk_2015_09_03 {
 
 			// >>>>> DIAGRAM >>>>>
 
+			// identify dimensions
+
+			double min = Double.POSITIVE_INFINITY;
+			double max = Double.NEGATIVE_INFINITY;
+			for (int r = 0; r < replications; r++) {
+				for (int i = 0; i < transitionList.get(r).size(); i++) {
+					min = min(min,
+							objectiveFunctionValueList.get(r).get(i) / 1000);
+					max = max(max,
+							objectiveFunctionValueList.get(r).get(i) / 1000);
+				}
+				for (int i = 0; i < naiveTransitionList.get(r).size(); i++) {
+					min = min(min, naiveObjectiveFunctionValueList.get(r)
+							.get(i) / 1000);
+					max = max(max, naiveObjectiveFunctionValueList.get(r)
+							.get(i) / 1000);
+				}
+			}
+
+			// write out file
+
 			final PSTricksDiagramWriter writer = new PSTricksDiagramWriter(8, 5);
 			writer.setLabelX("transitions [$10^3$]");
 			writer.setLabelY("Q [$10^3$]");
-			writer.setYMin(20.0);
-			writer.setYMax(50.0);
-			writer.setYDelta(5.0);
-			writer.setXMin(0.0);
-			writer.setXMax(25.0);
-			writer.setXDelta(5.0);
 
 			for (int r = 0; r < replications; r++) {
 				final String selectId = "select"
@@ -273,7 +298,11 @@ class Talk_2015_09_03 {
 			}
 			writer.addCommand("\\rput[rt](8,5){\\textcolor{blue}{naive}, \\textcolor{red}{select}}");
 
-			writer.printAll(System.out);
+			// FileOutputStream toFileStream = new FileOutputStream("file");
+			// PrintStream toFilePrintStream = new PrintStream("./test.txt");
+
+			writer.printAll(new PrintStream("./output/opdyts/pop-"
+					+ populationSize + ".txt"));
 
 			// <<<<< DIAGRAM <<<<<
 

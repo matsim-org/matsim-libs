@@ -20,9 +20,7 @@
 
 package playground.johannes.gsv.sim.cadyts;
 
-import java.util.HashSet;
-import java.util.Set;
-
+import cadyts.demand.PlanBuilder;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -38,7 +36,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.cadyts.general.PlansTranslator;
 
-import cadyts.demand.PlanBuilder;
+import java.util.HashSet;
+import java.util.Set;
 
 public class PlanToPlanStepBasedOnEvents implements PlansTranslator<Link>, LinkLeaveEventHandler, 
 		PersonDepartureEventHandler, PersonArrivalEventHandler {
@@ -111,13 +110,13 @@ public class PlanToPlanStepBasedOnEvents implements PlansTranslator<Link>, LinkL
 	public void handleEvent(LinkLeaveEvent event) {
 		
 		// if it is not a driver, ignore the event
-		if (!driverAgents.contains(event.getPersonId())) return;
+		if (!driverAgents.contains(event.getDriverId())) return;
 		
 		// if only a subset of links is calibrated but the link is not contained, ignore the event
 		if (calibratedLinks != null && !calibratedLinks.contains(event.getLinkId())) return;
 		
 		// get the "Person" behind the id:
-		Person person = this.scenario.getPopulation().getPersons().get(event.getPersonId());
+		Person person = this.scenario.getPopulation().getPersons().get(event.getDriverId());
 		
 		// get the selected plan:
 		Plan selectedPlan = person.getSelectedPlan();

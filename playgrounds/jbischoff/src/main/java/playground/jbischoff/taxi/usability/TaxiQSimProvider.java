@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package playground.jbischoff.taxi.usability;
 
-import java.util.List;
+import java.util.Map;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.MatsimVrpContext;
@@ -79,11 +79,13 @@ public class TaxiQSimProvider implements Provider<QSim> {
 //
 //	}
 	@Inject
-	TaxiQSimProvider(Config config, MatsimVrpContext context , EventsManager events) {
+	TaxiQSimProvider(Config config, MatsimVrpContext context , EventsManager events, Map<String,TravelTime> travelTimes) {
 		this.tcg = (TaxiConfigGroup) config.getModule("taxiConfig");
 		this.context = (MatsimVrpContextImpl) context;
 		this.events=events;
 		this.travelTime = new FreeSpeedTravelTime();
+		this.travelTime = travelTimes.get("car");
+
 		
 	}
 

@@ -39,7 +39,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.BoardingDeniedEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.handler.BoardingDeniedEventHandler;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.vehicles.Vehicle;
 
 /**
@@ -52,7 +52,7 @@ public class CapacityDelayHandler implements BoardingDeniedEventHandler, PersonE
 	
 	private final static Logger log = Logger.getLogger(CapacityDelayHandler.class);
 	
-	private final ScenarioImpl scenario;
+	private final MutableScenario scenario;
 	private final EventsManager events;
 	
 	private final Map<Id<Person>, List<Id<Person>>> affectedAgent2causingAgents = new HashMap<>();
@@ -68,7 +68,7 @@ public class CapacityDelayHandler implements BoardingDeniedEventHandler, PersonE
 //	private final CausingAgentsMethod causingAgentsMethod = CausingAgentsMethod.lastAgentEnteringThePublicVehicle;
 
 	
-	public CapacityDelayHandler(EventsManager events, ScenarioImpl scenario) {
+	public CapacityDelayHandler(EventsManager events, MutableScenario scenario) {
 		this.events = events;
 		this.scenario = scenario;
 		
@@ -168,7 +168,7 @@ public class CapacityDelayHandler implements BoardingDeniedEventHandler, PersonE
 			throw new RuntimeException("Unknown method for the identfication of the causing agent(s). Aborting...");
 		}
 		
-//		System.out.println("Affected agent: " + event.getPersonId());
+//		System.out.println("Affected agent: " + event.getDriverId());
 //		System.out.println("Causing agents: " + causingAgents.toString());
 
 		this.affectedAgent2boardingDeniedTime.put(event.getPersonId(), event.getTime());

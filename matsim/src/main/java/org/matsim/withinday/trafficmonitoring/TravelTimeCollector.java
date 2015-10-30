@@ -46,6 +46,7 @@ import org.matsim.core.utils.misc.Counter;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
 
+import javax.inject.Inject;
 import java.util.*;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.ConcurrentHashMap;
@@ -97,7 +98,12 @@ public class TravelTimeCollector implements TravelTime,
 	
 	private int resetCnt = 0 ;
 	boolean problem = true ;
-	
+
+	@Inject
+	TravelTimeCollector(Scenario scenario) {
+		this(scenario, null);
+	}
+
 	public TravelTimeCollector(Scenario scenario, Set<String> analyzedModes) {
 		/*
 		 * The parallelization should scale almost linear, therefore we do use
@@ -189,9 +195,9 @@ public class TravelTimeCollector implements TravelTime,
 		 * If only some modes are analyzed, we check whether the agent
 		 * performs a trip with one of those modes. if not, we skip the event.
 		 */
-		if (filterModes && agentsToFilter.contains(event.getPersonId())) return;
+		if (filterModes && agentsToFilter.contains(event.getDriverId())) return;
 		
-		Id<Person> personId = event.getPersonId();
+		Id<Person> personId = event.getDriverId();
 		double time = event.getTime();
 
 		TripBin tripBin = new TripBin();
@@ -203,7 +209,7 @@ public class TravelTimeCollector implements TravelTime,
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
 		Id<Link> linkId = event.getLinkId();
-		Id<Person> personId = event.getPersonId();
+		Id<Person> personId = event.getDriverId();
 		double time = event.getTime();
 
 		TripBin tripBin = this.regularActiveTrips.remove(personId);

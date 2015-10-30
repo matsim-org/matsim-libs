@@ -72,7 +72,7 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler {
 	enum StatType { durations, durationsOtherBins, beelineDistances, legDistances, scores, payments } ;
 
 	// container that contains the statistics containers:
-	private final DatabinsMap<StatType,String> statsContainer = new DatabinsMap<>() ;
+	private final Map<StatType,Databins<String>> statsContainer = new TreeMap<>() ;
 
 	// container that contains the sum (to write averages):
 	private final Map<StatType,DataMap<String>> sumsContainer = new TreeMap<>() ;
@@ -141,28 +141,34 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler {
 			switch ( type ) {
 			case beelineDistances: {
 				double[] dataBoundariesTmp = {0., 100., 200., 500., 1000., 2000., 5000., 10000., 20000., 50000., 100000.} ;
-				this.statsContainer.putDataBoundaries(type, dataBoundariesTmp );
+				Databins<String> databins = new Databins<>( type.name(), dataBoundariesTmp ) ;
+				this.statsContainer.put( type, databins) ;
 				break; }
 			case durations: {
 				double[] dataBoundariesTmp = {0., 300., 600., 900., 1200., 1500., 1800., 2100., 2400., 2700., 3000., 3300., 3600., 
 						3900., 4200., 4500., 4800., 5100., 5400., 5700., 6000., 6300., 6600., 6900., 7200.} ;
-				this.statsContainer.putDataBoundaries( type, dataBoundariesTmp ) ;
+				Databins<String> databins = new Databins<>( type.name(), dataBoundariesTmp ) ;
+				this.statsContainer.put( type, databins) ;
 				break; }
 			case durationsOtherBins: {
 				double[] dataBoundariesTmp = {0., 300., 900., 1800., 2700., 3600.} ;
-				this.statsContainer.putDataBoundaries( type, dataBoundariesTmp ) ;
+				Databins<String> databins = new Databins<>( type.name(), dataBoundariesTmp ) ;
+				this.statsContainer.put( type, databins) ;
 				break; }
 			case legDistances: {
 				double[] dataBoundariesTmp = {0., 1000, 3000, 10000, 30000, 10000, 300000, 1000.*1000. } ;
-				this.statsContainer.putDataBoundaries( type, dataBoundariesTmp ) ;
+				Databins<String> databins = new Databins<>( type.name(), dataBoundariesTmp ) ;
+				this.statsContainer.put( type, databins) ;
 				break; }
 			case scores:{
 				double[] dataBoundariesTmp = {Double.NEGATIVE_INFINITY} ; // yy ??
-				this.statsContainer.putDataBoundaries( type, dataBoundariesTmp ) ;
+				Databins<String> databins = new Databins<>( type.name(), dataBoundariesTmp ) ;
+				this.statsContainer.put( type, databins) ;
 				break; }
 			case payments:{
 				double[] dataBoundariesTmp = {Double.NEGATIVE_INFINITY } ; // yy ??
-				this.statsContainer.putDataBoundaries( type, dataBoundariesTmp ) ;
+				Databins<String> databins = new Databins<>( type.name(), dataBoundariesTmp ) ;
+				this.statsContainer.put( type, databins) ;
 				break; }
 			default:
 				throw new RuntimeException("statistics container for type "+type.toString()+" not initialized.") ;
@@ -291,8 +297,8 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler {
 		for ( String legType : legTypes ) {
 
 			// ... finally add the "item" to the correct bin in the container:
-			int idx = this.statsContainer.getIndex(statType, item) ;
-			this.statsContainer.inc( statType, legType, idx ) ;
+			int idx = this.statsContainer.get(statType).getIndex(item) ;
+			this.statsContainer.get(statType).inc( legType, idx ) ;
 
 			// also add it to the sums container:
 			this.sumsContainer.get(statType).addValue( legType, item ) ;
@@ -306,7 +312,7 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler {
 		this.agentLegs.clear();
 
 		for ( StatType type : StatType.values() ) {
-			this.statsContainer.reset() ;
+			this.statsContainer.get(type).clear() ;
 			if ( this.sumsContainer.get(type)==null ) {
 				this.sumsContainer.put( type, new DataMap<String>() ) ;
 			}
@@ -483,7 +489,7 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler {
 					first = false;
 					out.write(statType.toString());
 					for (int i = 0; i < counts.length; i++) {
-						out.write("\t" + this.statsContainer.getDataBoundaries(statType)[i] + "+" ) ;
+						out.write("\t" + this.statsContainer.get(statType).getDataBoundaries()[i] + "+" ) ;
 					}
 					out.write("\t|\t average \t|\t cnt \t | \t sum\n");
 				}
@@ -549,7 +555,7 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler {
 		}
 		
 		if ( this.otherTolledLinkIds.contains( event.getLinkId() ) ) {
-			add( event.getPersonId(), 1., CERTAIN_LINKS_CNT );
+			add( event.getDriverId(), 1., CERTAIN_LINKS_CNT );
 		}
 		
 	}

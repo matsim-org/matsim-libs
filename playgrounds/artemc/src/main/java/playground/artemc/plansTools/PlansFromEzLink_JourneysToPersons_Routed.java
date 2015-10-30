@@ -23,7 +23,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkReaderMatsimV1;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -276,7 +276,7 @@ public class PlansFromEzLink_JourneysToPersons_Routed extends MatsimXmlWriter{
 					accessFacility = null;
 					egressFacility = null;
 
-					lines = ((ScenarioImpl) scenario).getTransitSchedule().getTransitLines();
+					lines = ((MutableScenario) scenario).getTransitSchedule().getTransitLines();
 					//System.out.println(journeyID+","+srvc_Number+","+boardingStop+","+alightingStop);
 					for(TransitLine currentLine:lines.values()){
 						if(currentLine.getId().toString().equals(srvc_Number)){
@@ -288,10 +288,10 @@ public class PlansFromEzLink_JourneysToPersons_Routed extends MatsimXmlWriter{
 
 					if(line!=null){
 						//Check for stops
-						routes = ((ScenarioImpl) scenario).getTransitSchedule().getTransitLines().get(line.getId()).getRoutes().keySet();
+						routes = ((MutableScenario) scenario).getTransitSchedule().getTransitLines().get(line.getId()).getRoutes().keySet();
 						routesMap.clear();
 						for(Id<TransitRoute> routeID:routes){	
-							routesMap.put(routeID, ((ScenarioImpl) scenario).getTransitSchedule().getTransitLines().get(line.getId()).getRoutes().get(routeID).getDepartures().size());
+							routesMap.put(routeID, ((MutableScenario) scenario).getTransitSchedule().getTransitLines().get(line.getId()).getRoutes().get(routeID).getDepartures().size());
 							//System.out.println("RouteID: "+routeID.toString()+"  Dep.:"+((ScenarioImpl) scenario).getTransitSchedule().getTransitLines().get(line.getId()).getRoutes().get(routeID).getDepartures().size());
 						}
 
@@ -300,7 +300,7 @@ public class PlansFromEzLink_JourneysToPersons_Routed extends MatsimXmlWriter{
 						for(Entry<Id<TransitRoute>, Integer> routeKey:entriesSortedByValues(routesMap)){
 							Id<TransitRoute> routeID = routeKey.getKey();
 							//System.out.println("   RouteID: "+routeID.toString()+"  Dep.:"+((ScenarioImpl) scenario).getTransitSchedule().getTransitLines().get(line.getId()).getRoutes().get(routeID).getDepartures().size());
-							List<TransitRouteStop> currentRouteStops = ((ScenarioImpl) scenario).getTransitSchedule().getTransitLines().get(line.getId()).getRoutes().get(routeID).getStops();						
+							List<TransitRouteStop> currentRouteStops = ((MutableScenario) scenario).getTransitSchedule().getTransitLines().get(line.getId()).getRoutes().get(routeID).getStops();						
 							for(TransitRouteStop currentStop:currentRouteStops){	
 								//System.out.println(currentStop.getStopFacility().getId().toString()+"|"+BoardingStop+","+AlightingStop);
 								if(currentStop.getStopFacility().getId().toString().equals(boardingStop)){
@@ -312,7 +312,7 @@ public class PlansFromEzLink_JourneysToPersons_Routed extends MatsimXmlWriter{
 								}			
 							}
 							if(accessFacility!=null && egressFacility!=null){
-								route = ((ScenarioImpl) scenario).getTransitSchedule().getTransitLines().get(line.getId()).getRoutes().get(routeID);
+								route = ((MutableScenario) scenario).getTransitSchedule().getTransitLines().get(line.getId()).getRoutes().get(routeID);
 								//System.out.println("Route found!");
 								break;			
 							}
@@ -365,7 +365,7 @@ public class PlansFromEzLink_JourneysToPersons_Routed extends MatsimXmlWriter{
 						routedStages++;		
 
 						//Generate the arrival time at the stop
-						headway = scheduleHeadwayFinder.findHeadway(startTime, line, route, accessFacility, ((ScenarioImpl) scenario).getTransitSchedule());
+						headway = scheduleHeadwayFinder.findHeadway(startTime, line, route, accessFacility, ((MutableScenario) scenario).getTransitSchedule());
 						//If headway couldn't be determined, use fixed interval
 						if(TimeTools.timeStringToSeconds(headway).intValue()>0){
 							arrivalOffset = generator.nextInt((int) Math.round(TimeTools.timeStringToSeconds(headway)*2.5))+1; 

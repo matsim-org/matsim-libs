@@ -63,7 +63,7 @@ public class CalcAverageTolledTripLength implements LinkEnterEventHandler, Perso
 	public void handleEvent(final LinkEnterEvent event) {
 		
 		// getting the (monetary? generalized?) cost of the link
-		Cost cost = this.scheme.getLinkCostInfo(event.getLinkId(), event.getTime(), event.getPersonId(), event.getVehicleId() );
+		Cost cost = this.scheme.getLinkCostInfo(event.getLinkId(), event.getTime(), event.getDriverId(), event.getVehicleId() );
 		
 		if (cost != null) {
 			// i.e. if there is a toll on the link
@@ -72,7 +72,7 @@ public class CalcAverageTolledTripLength implements LinkEnterEventHandler, Perso
 			if (link != null) {
 				
 				// get some distance that has been accumulated (how?) up to this point:
-				Double length = this.agentDistance.get(event.getPersonId());
+				Double length = this.agentDistance.get(event.getDriverId());
 				
 				// if nothing has been accumlated so far, initialize this at zero:
 				if (length == null) {
@@ -83,7 +83,7 @@ public class CalcAverageTolledTripLength implements LinkEnterEventHandler, Perso
 				length = length + link.getLength();
 				
 				// put the result again in the "memory":
-				this.agentDistance.put(event.getPersonId(), length);
+				this.agentDistance.put(event.getDriverId(), length);
 			}
 		}
 	}

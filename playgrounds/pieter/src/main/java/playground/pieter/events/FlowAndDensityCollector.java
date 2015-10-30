@@ -191,7 +191,7 @@ class FlowAndDensityCollector implements LinkLeaveEventHandler, LinkEnterEventHa
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		lastEnteredLink.put(event.getPersonId(), event.getLinkId());
+		lastEnteredLink.put(event.getDriverId(), event.getLinkId());
 		enterLink(event.getLinkId(), event.getTime());
 	}
 

@@ -42,7 +42,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.gis.ShapeFileReader;
@@ -90,7 +90,7 @@ public abstract class DgPrognose2025DemandFilter {
 		//read shape file
 		this.featuesInShape = ShapeFileReader.getAllFeatures(filterShapeFileName);
 		//read scenario
-		this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		this.scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		MatsimNetworkReader netReader	= new MatsimNetworkReader(scenario);
 		netReader.readFile(networkFilename);
 		this.net = scenario.getNetwork();
@@ -135,7 +135,7 @@ public abstract class DgPrognose2025DemandFilter {
 		log.info("start to create demand...");
 		this.readData(networkFilename, populationFilename, filterShapeFileName);
 		log.info("data loaded...");
-		Scenario newScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario newScenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Population newPop = newScenario.getPopulation();
 		
 		for (Person person : this.pop.getPersons().values()){

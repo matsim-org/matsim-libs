@@ -165,10 +165,10 @@ public class DistAnalysisHandler implements LinkEnterEventHandler, TransitDriver
 	@Override
 	public void handleEvent(LinkEnterEvent e) {
 		//agents and drivers can process a LinkEnterEvent 
-		if(this.persons.containsKey(e.getPersonId())){
-			this.persons.get(e.getPersonId()).processLinkEnterEvent(this.links.get(e.getLinkId()).getLength());
-		}else if(this.drivers.containsKey(e.getPersonId())){
-			this.drivers.get(e.getPersonId()).processLinkEnterEvent(this.links.get(e.getLinkId()).getLength());
+		if(this.persons.containsKey(e.getDriverId())){
+			this.persons.get(e.getDriverId()).processLinkEnterEvent(this.links.get(e.getLinkId()).getLength());
+		}else if(this.drivers.containsKey(e.getDriverId())){
+			this.drivers.get(e.getDriverId()).processLinkEnterEvent(this.links.get(e.getLinkId()).getLength());
 		}
 	}
 	

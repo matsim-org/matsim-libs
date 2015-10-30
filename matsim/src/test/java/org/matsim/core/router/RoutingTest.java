@@ -25,10 +25,14 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.Injector;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.AStarEuclideanFactory;
 import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.DijkstraFactory;
@@ -42,6 +46,10 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.testcases.MatsimTestCase;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 
 public class RoutingTest extends MatsimTestCase {
 
@@ -181,23 +189,35 @@ public class RoutingTest extends MatsimTestCase {
 			final Scenario scenario) {
 		log.info("### calcRoute with router " + provider.getName());
 
-		FreespeedTravelTimeAndDisutility calculator =
-			new FreespeedTravelTimeAndDisutility(
-					scenario.getConfig().planCalcScore() );
 
-		final TripRouterFactoryBuilderWithDefaults builder =
-			new TripRouterFactoryBuilderWithDefaults();
-		builder.setLeastCostPathCalculatorFactory(
-				provider.getFactory(
-					scenario.getNetwork(),
-					calculator,
-					calculator ) );
-		final TripRouterFactory factory = builder.build( scenario );
-		final TripRouter tripRouter =
-			factory.instantiateAndConfigureTripRouter(
-					new RoutingContextImpl(
-						calculator,
-						calculator ) );
+		final FreespeedTravelTimeAndDisutility calculator =
+				new FreespeedTravelTimeAndDisutility(
+						scenario.getConfig().planCalcScore() );
+		final LeastCostPathCalculatorFactory factory1 = provider.getFactory(
+				scenario.getNetwork(),
+				calculator,
+				calculator);
+		Injector injector = Injector.createInjector(scenario.getConfig(), new AbstractModule() {
+			@Override
+			public void install() {
+				install(AbstractModule.override(Arrays.asList(new TripRouterModule()), new AbstractModule() {
+					@Override
+					public void install() {
+						bind(Scenario.class).toInstance(scenario);
+						addTravelTimeBinding("car").toInstance(calculator);
+						addTravelDisutilityFactoryBinding("car").toInstance(new TravelDisutilityFactory() {
+							@Override
+							public TravelDisutility createTravelDisutility(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
+								return calculator;
+							}
+						});
+						bindLeastCostPathCalculatorFactory().toInstance(factory1);
+					}
+				}));
+			}
+		});
+
+		final TripRouter tripRouter = injector.getInstance(TripRouter.class);
 		final PersonAlgorithm router = new PlanRouter( tripRouter );
 		
 		for ( Person p : scenario.getPopulation().getPersons().values() ) {

@@ -21,17 +21,15 @@ package playground.johannes.coopsim.analysis;
 
 import gnu.trove.TObjectDoubleHashMap;
 import gnu.trove.TObjectDoubleIterator;
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.contrib.common.stats.StatsWriter;
+import playground.johannes.coopsim.pysical.Trajectory;
+import playground.johannes.studies.mz2005.io.ActivityType;
 
 import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
-
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.matsim.api.core.v01.population.Activity;
-
-import playground.johannes.coopsim.pysical.Trajectory;
-import playground.johannes.mz2005.io.ActivityType;
-import playground.johannes.sna.util.TXTWriter;
 
 /**
  * @author illenberger
@@ -90,9 +88,9 @@ public class TripPurposeShareTask extends TrajectoryAnalyzerTask {
 		
 		
 		try {
-			TXTWriter.writeMap(hist, "type", "n", String.format("%1$s/tripPurpose.txt", getOutputDirectory()));
-			TXTWriter.writeMap(histWOHome, "type", "p", String.format("%1$s/tripPurposeShare.nohome.txt", getOutputDirectory()));
-			TXTWriter.writeMap(histWHome, "type", "p", String.format("%1$s/tripPurposeShare.txt", getOutputDirectory()));
+			StatsWriter.writeLabeledHistogram(hist, "type", "n", String.format("%1$s/tripPurpose.txt", getOutputDirectory()));
+			StatsWriter.writeLabeledHistogram(histWOHome, "type", "p", String.format("%1$s/tripPurposeShare.nohome.txt", getOutputDirectory()));
+			StatsWriter.writeLabeledHistogram(histWHome, "type", "p", String.format("%1$s/tripPurposeShare.txt", getOutputDirectory()));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

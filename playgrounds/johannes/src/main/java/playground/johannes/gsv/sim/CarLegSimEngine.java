@@ -19,9 +19,6 @@
 
 package playground.johannes.gsv.sim;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
@@ -33,6 +30,9 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.util.TravelTime;
+
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * @author johannes

@@ -22,16 +22,14 @@ package playground.johannes.coopsim.analysis;
 import gnu.trove.TObjectDoubleHashMap;
 import gnu.trove.TObjectIntHashMap;
 import gnu.trove.TObjectIntIterator;
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.contrib.common.stats.StatsWriter;
+import playground.johannes.coopsim.pysical.Trajectory;
 
 import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
-
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.matsim.api.core.v01.population.Activity;
-
-import playground.johannes.coopsim.pysical.Trajectory;
-import playground.johannes.sna.util.TXTWriter;
 
 /**
  * @author illenberger
@@ -72,8 +70,8 @@ public class ActTypeShareTask extends TrajectoryAnalyzerTask {
 		
 		
 		try {
-			TXTWriter.writeMap(histWOHome, "type", "p", String.format("%1$s/actTypeShare.nohome.txt", getOutputDirectory()));
-			TXTWriter.writeMap(histWHome, "type", "p", String.format("%1$s/actTypeShare.txt", getOutputDirectory()));
+			StatsWriter.writeLabeledHistogram(histWOHome, "type", "p", String.format("%1$s/actTypeShare.nohome.txt", getOutputDirectory()));
+			StatsWriter.writeLabeledHistogram(histWHome, "type", "p", String.format("%1$s/actTypeShare.txt", getOutputDirectory()));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

@@ -8,7 +8,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
 public class NetworkCapacityMultiplier {
@@ -24,7 +24,7 @@ public class NetworkCapacityMultiplier {
 		BufferedWriter writer = new BufferedWriter(new FileWriter(
 				"../roadpricingSingapore/scenarios/siouxFalls/networkCapacityChanges.csv"));
 
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new NetworkReaderMatsimV1(scenario).parse(networkPath);
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 

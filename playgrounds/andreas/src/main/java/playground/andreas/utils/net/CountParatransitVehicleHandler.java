@@ -24,7 +24,7 @@ public class CountParatransitVehicleHandler implements LinkEnterEventHandler{
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		if(event.getPersonId().toString().startsWith(this.paratransitVehCode)){
+		if(event.getDriverId().toString().startsWith(this.paratransitVehCode)){
 			if(this.linkId2CountsTable.get(event.getLinkId()) == null){
 				this.linkId2CountsTable.put(event.getLinkId(), new Integer(0));
 			}

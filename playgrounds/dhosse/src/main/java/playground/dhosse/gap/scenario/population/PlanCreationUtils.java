@@ -2,10 +2,14 @@ package playground.dhosse.gap.scenario.population;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.shape.random.RandomPointsBuilder;
 
 import playground.dhosse.gap.Global;
 
@@ -23,6 +27,54 @@ public class PlanCreationUtils {
 	  	    point = MGC.xy2Point(x, y);
 			
 		}while(!geometry.contains(point));
+		
+		return MGC.point2Coord(point);
+		
+	}
+	
+	public static Coord shoot2(Geometry geometry){
+		
+		Point point = null;
+		double x, y;
+		
+//		do{
+			
+			x = geometry.getEnvelopeInternal().getMinX() + Global.random.nextDouble() * (geometry.getEnvelopeInternal().getMaxX() - geometry.getEnvelopeInternal().getMinX());
+	  	    y = geometry.getEnvelopeInternal().getMinY() + Global.random.nextDouble() * (geometry.getEnvelopeInternal().getMaxY() - geometry.getEnvelopeInternal().getMinY());
+	  	    point = MGC.xy2Point(x, y);
+			
+//		}while(!geometry.contains(point));
+		
+		return MGC.point2Coord(point);
+		
+	}
+	
+	public static Coord shoot(Geometry geometry, Coord other, double distance){
+		
+		Point point = null;
+		double x, y, d;
+		
+		int i = -1;
+		boolean inside = false;
+		
+		do{
+			
+			i++;
+			x = geometry.getEnvelopeInternal().getMinX() + Global.random.nextDouble() * (geometry.getEnvelopeInternal().getMaxX() - geometry.getEnvelopeInternal().getMinX());
+	  	    y = geometry.getEnvelopeInternal().getMinY() + Global.random.nextDouble() * (geometry.getEnvelopeInternal().getMaxY() - geometry.getEnvelopeInternal().getMinY());
+	  	    point = MGC.xy2Point(x, y);
+	  	    
+//	  	    RandomPointsBuilder rpb = new RandomPointsBuilder();
+//	  	    Envelope envelope = new Envelope(new Coordinate(MGC.coord2Coordinate(other)), MGC.coord2Coordinate(new Coord(x, y)));
+//	  	    rpb.setExtent(envelope);
+//	  	    rpb.setNumPoints(100);
+//	  	    Geometry g = rpb.getGeometry();
+	  	    
+	  	    d = CoordUtils.calcDistance(Global.gk4ToUTM32N.transform(new Coord(x, y)), other);
+			
+	  	    inside = geometry.contains(point);
+	  	    
+		}while((!inside || d > distance) && i < 100);
 		
 		return MGC.point2Coord(point);
 		

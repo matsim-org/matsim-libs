@@ -17,7 +17,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
 public class NetworkSplitter {
@@ -38,7 +38,7 @@ public class NetworkSplitter {
 		List<Id> editedLinks = new ArrayList<Id>();
 		HashMap<String, ArrayList<String>> linkMap = new HashMap<String, ArrayList<String>>();
 
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		BufferedWriter linkMapWrtiter = new BufferedWriter(new FileWriter(linkMapPath));
 

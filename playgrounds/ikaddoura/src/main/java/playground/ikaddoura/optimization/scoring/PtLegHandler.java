@@ -66,7 +66,7 @@
 //	
 //	@Override
 //	public void handleEvent(PersonEntersVehicleEvent event) {
-//		Id personId = event.getPersonId();
+//		Id personId = event.getDriverId();
 //		Id vehId = event.getVehicleId();
 //		
 //		if (!ptDriverIDs.contains(personId) && ptVehicleIDs.contains(vehId)){
@@ -91,7 +91,7 @@
 //
 //	@Override
 //	public void handleEvent(AgentDepartureEvent event) {
-//		Id personId = event.getPersonId();
+//		Id personId = event.getDriverId();
 //		
 //		if (event.getLegMode().toString().equals("pt")){
 //			personId2AgentDepartureTime.put(personId, event.getTime());
@@ -103,7 +103,7 @@
 //
 //	@Override
 //	public void handleEvent(AgentArrivalEvent event) {
-//		Id personId = event.getPersonId();
+//		Id personId = event.getDriverId();
 //		
 //		if (event.getLegMode().toString().equals("pt")){
 //
@@ -128,7 +128,7 @@
 //	@Override
 //	public void handleEvent(ActivityEndEvent event) {
 //		if (event.getActType().toString().equals(PtConstants.TRANSIT_ACTIVITY_TYPE)){
-//			this.personId2IsEgress.put(event.getPersonId(), true);
+//			this.personId2IsEgress.put(event.getDriverId(), true);
 //		}
 //	}
 //	

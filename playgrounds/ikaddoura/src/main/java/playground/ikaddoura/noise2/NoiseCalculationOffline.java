@@ -38,6 +38,7 @@ import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.ikaddoura.noise2.data.GridParameters;
+import playground.ikaddoura.noise2.data.NoiseAllocationApproach;
 import playground.ikaddoura.noise2.data.NoiseContext;
 import playground.ikaddoura.noise2.handler.LinkSpeedCalculation;
 import playground.ikaddoura.noise2.handler.NoiseTimeTracker;
@@ -80,9 +81,9 @@ public class NoiseCalculationOffline {
 			
 		} else {
 			
-			runDirectory = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalization_noise_averageVSmarginal/output/baseCase/";
-			outputDirectory = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalization_noise_averageVSmarginal/output/baseCase/noise_analysis_1_TempelhoferFeld_freeSpeed_inRange/";
-			receiverPointGap = 10.;
+			runDirectory = "/Users/ihab/Documents/workspace/runs-svn/cn2/output/cn1/";
+			outputDirectory = "/Users/ihab/Documents/workspace/runs-svn/cn2/output/cn1/noiseAnalysis/";
+			receiverPointGap = 100.;
 			lastIteration = 100;
 		}
 		
@@ -116,11 +117,11 @@ public class NoiseCalculationOffline {
 //		double xMax = 4594202.;
 //		double yMax = 5821736.;
 		
-		// Berlin Coordinates: Area around the Tempelhofer Feld 4591900,5813265 : 4600279,5818768
-		double xMin = 4591900.;
-		double yMin = 5813265.;
-		double xMax = 4600279.;
-		double yMax = 5818768.;
+//		// Berlin Coordinates: Area around the Tempelhofer Feld 4591900,5813265 : 4600279,5818768
+//		double xMin = 4591900.;
+//		double yMin = 5813265.;
+//		double xMax = 4600279.;
+//		double yMax = 5818768.;
 				
       // Berlin Coordinates: Area of Berlin
 //		double xMin = 4573258.;
@@ -134,36 +135,36 @@ public class NoiseCalculationOffline {
 //		double xMax = 4598267.52;
 //		double yMax = 5820953.98;	
 		
-		gridParameters.setReceiverPointsGridMinX(xMin);
-		gridParameters.setReceiverPointsGridMinY(yMin);
-		gridParameters.setReceiverPointsGridMaxX(xMax);
-		gridParameters.setReceiverPointsGridMaxY(yMax);
+//		gridParameters.setReceiverPointsGridMinX(xMin);
+//		gridParameters.setReceiverPointsGridMinY(yMin);
+//		gridParameters.setReceiverPointsGridMaxX(xMax);
+//		gridParameters.setReceiverPointsGridMaxY(yMax);
 		
 //		 Berlin Activity Types
-//		String[] consideredActivitiesForDamages = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
+		String[] consideredActivitiesForDamages = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
 //		String[] consideredActivitiesForDamages = {"home"};
 //		String[] consideredActivitiesForDamages = {"work"};
 //		String[] consideredActivitiesForDamages = {"educ_primary", "educ_secondary", "educ_higher", "kiga"};
 //		String[] consideredActivitiesForDamages = {"leisure"};
 //		String[] consideredActivitiesForDamages = {"home", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
-//		gridParameters.setConsideredActivitiesForSpatialFunctionality(consideredActivitiesForDamages);
+		gridParameters.setConsideredActivitiesForSpatialFunctionality(consideredActivitiesForDamages);
 		
-//		String[] consideredActivitiesForReceiverPointGrid = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
+		String[] consideredActivitiesForReceiverPointGrid = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
 //		String[] consideredActivitiesForReceiverPointGrid = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga", "leisure"};
-//		gridParameters.setConsideredActivitiesForReceiverPointGrid(consideredActivitiesForReceiverPointGrid);
+		gridParameters.setConsideredActivitiesForReceiverPointGrid(consideredActivitiesForReceiverPointGrid);
 		
 		// ################################
 		
 		NoiseParameters noiseParameters = new NoiseParameters();
-		noiseParameters.setUseActualSpeedLevel(false);
+		noiseParameters.setUseActualSpeedLevel(true);
 		noiseParameters.setAllowForSpeedsOutsideTheValidRange(false);
 		noiseParameters.setScaleFactor(10.);
-		noiseParameters.setComputePopulationUnits(false);
-		noiseParameters.setComputeNoiseDamages(false);
+		noiseParameters.setComputePopulationUnits(true);
+		noiseParameters.setComputeNoiseDamages(true);
 		noiseParameters.setInternalizeNoiseDamages(false);
-		noiseParameters.setComputeCausingAgents(false);
-		noiseParameters.setThrowNoiseEventsAffected(false);
-		noiseParameters.setThrowNoiseEventsCaused(false);
+		noiseParameters.setComputeCausingAgents(true);
+		noiseParameters.setThrowNoiseEventsAffected(true);
+		noiseParameters.setThrowNoiseEventsCaused(true);
 		
 		Set<String> hgvIdPrefixes = new HashSet<String>();
 		hgvIdPrefixes.add("lkw");
@@ -218,6 +219,8 @@ public class NoiseCalculationOffline {
 		tunnelLinkIDs.add(Id.create("73496", Link.class));
 		tunnelLinkIDs.add(Id.create("73497", Link.class));
 		noiseParameters.setTunnelLinkIDs(tunnelLinkIDs);
+		
+		noiseParameters.setNoiseAllocationApproach(NoiseAllocationApproach.MarginalCost);
 				
 		log.info("Loading scenario...");
 		Scenario scenario = ScenarioUtils.loadScenario(config);

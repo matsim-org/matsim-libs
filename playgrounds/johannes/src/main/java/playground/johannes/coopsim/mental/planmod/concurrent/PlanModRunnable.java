@@ -19,12 +19,11 @@
  * *********************************************************************** */
 package playground.johannes.coopsim.mental.planmod.concurrent;
 
-import java.util.Map;
-
 import org.matsim.api.core.v01.population.Plan;
-
 import playground.johannes.coopsim.mental.planmod.Choice2ModAdaptor;
 import playground.johannes.coopsim.mental.planmod.PlanModifier;
+
+import java.util.Map;
 
 /**
  * @author illenberger

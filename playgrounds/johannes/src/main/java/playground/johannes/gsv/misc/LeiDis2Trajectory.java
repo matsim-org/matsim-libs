@@ -19,30 +19,15 @@
 
 package playground.johannes.gsv.misc;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
-
-import org.opengis.feature.simple.SimpleFeature;
-
-import playground.johannes.socialnetworks.gis.WGS84DistanceCalculator;
-import playground.johannes.socialnetworks.gis.io.FeatureSHP;
-
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
+import org.matsim.contrib.common.gis.EsriShapeIO;
+import org.matsim.contrib.common.gis.WGS84DistanceCalculator;
+import org.opengis.feature.simple.SimpleFeature;
+
+import java.io.*;
+import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * @author johannes
@@ -297,7 +282,7 @@ public class LeiDis2Trajectory {
 	
 	public static <T> Map<String, Point> loadCoordinates(String file) throws IOException {
 		Map<String, Point> coords = new LinkedHashMap<>();
-		Set<SimpleFeature> features = FeatureSHP.readFeatures(file);
+		Set<SimpleFeature> features = EsriShapeIO.readFeatures(file);
 		for(SimpleFeature feature : features) {
 			String code = (String) feature.getAttribute("CODE");
 			Point p = ((Geometry)feature.getDefaultGeometry()).getCentroid();

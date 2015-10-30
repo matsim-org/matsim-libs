@@ -107,7 +107,7 @@ final class CountCapacityMeterPerMode extends AbstractPAnalyisModule implements 
 		}
 		
 		double capacity;
-		if(super.ptDriverIds.contains(event.getPersonId())){
+		if(super.ptDriverIds.contains(event.getDriverId())){
 			capacity = this.vehId2VehicleCapacity.get(event.getVehicleId());
 		}else{
 			// it's a car, which will not appear in the vehicles-list, called in updateVehicles \dr

@@ -13,7 +13,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
 
@@ -21,7 +21,7 @@ public class TravelTimeOnLinks {
 	
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario);
 		networkReader.readFile("C:/Users/balacm/Desktop/network.xml");
         String eventsFile = "C:/Users/balacm/Desktop/FreeSpeedFactor1.110.events.xml.gz";
@@ -59,7 +59,7 @@ EventHandler eventHandler = new EventHandler(scenario);
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
 		// TODO Auto-generated method stub
-		map.put(event.getPersonId(), event);
+		map.put(event.getDriverId(), event);
 		
 	}
 
@@ -68,8 +68,8 @@ EventHandler eventHandler = new EventHandler(scenario);
 		// TODO Auto-generated method stub
 		double freespeed = scenario.getNetwork().getLinks().get(event.getLinkId()).getFreespeed();
 		double length = scenario.getNetwork().getLinks().get(event.getLinkId()).getLength();
-		if(map.get(event.getPersonId())!= null) {
-			double travelTime = event.getTime() - map.get(event.getPersonId()).getTime();
+		if(map.get(event.getDriverId())!= null) {
+			double travelTime = event.getTime() - map.get(event.getDriverId()).getTime();
 			double effectiveSpeed = length/travelTime;
 			if (freespeed < 13.88) {
 				speed1 += effectiveSpeed;

@@ -79,7 +79,7 @@ public class DensityVsFractionOfStoppedVehiclesHandler implements PersonDepartur
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		Id<Person> personId = event.getPersonId();
+		Id<Person> personId = event.getDriverId();
 		if(event.getLinkId().equals(this.linkId)){
 			double nowPCU = MixedTrafficVehiclesUtils.getPCU(this.personId2LegMode.get(personId));
 			this.localDensity -= nowPCU;
@@ -103,7 +103,7 @@ public class DensityVsFractionOfStoppedVehiclesHandler implements PersonDepartur
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		Id<Person> personId = event.getPersonId();
+		Id<Person> personId = event.getDriverId();
 
 		if(event.getLinkId().equals(this.linkId)){
 			this.personId2LinkEnterTime.put(personId, event.getTime());

@@ -6,7 +6,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.households.Households;
-import org.matsim.lanes.data.v20.LaneDefinitions20;
+import org.matsim.lanes.data.v20.Lanes;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.vehicles.Vehicles;
 
@@ -39,7 +39,7 @@ public class ScenarioUtils {
 		if (config == null) {
 			throw new NullPointerException("config must not be null!");
 		}
-		return new ScenarioImpl(config);
+		return new MutableScenario(config);
 	}
 
 	/**
@@ -62,49 +62,39 @@ public class ScenarioUtils {
 	}
 	
 	public final static class ScenarioBuilder {
-		private ScenarioImpl scenario;
+		private MutableScenario scenario;
 		public ScenarioBuilder( Config config ) {
-			this.scenario = new ScenarioImpl( config ) ;
+			this.scenario = new MutableScenario( config ) ;
 		}
 		public ScenarioBuilder addScenarioElement(String name, Object o) {
 			scenario.addScenarioElement(name, o); 
 			return this ;
 		}
-		// households:
-
 		public ScenarioBuilder setHouseholds( Households households ) {
 			scenario.setHouseholds(households);
 			return this ;
 		}
-		// transit schedule:
-
 		public ScenarioBuilder setTransitSchedule( TransitSchedule schedule ) {
 			scenario.setTransitSchedule(schedule);
 			return this ;
 		}
-		// vehicles:
-
 		public ScenarioBuilder setVehicles( Vehicles vehicles ) {
 			scenario.setTransitVehicles(vehicles);
 			return this;
 		}
-		// network (always there):
 		public ScenarioBuilder setNetwork( Network network ) {
 			scenario.setNetwork(network);
 			return this ;
 		}
-		// population (always there):
 		public ScenarioBuilder setPopulation( Population population ) {
 			scenario.setPopulation(population);
 			return this ;
 		}
-		// facilities (always there, although that does not make a lot of sense):
 		public ScenarioBuilder setActivityFacilities( ActivityFacilities facilities ) {
 			scenario.setActivityFacilities(facilities);
 			return this ;
 		}
-		// lanes:
-		public ScenarioBuilder setLanes( LaneDefinitions20 lanes ) {
+		public ScenarioBuilder setLanes( Lanes lanes ) {
 			scenario.setLanes(lanes);
 			return this ;
 		}

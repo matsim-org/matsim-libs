@@ -30,7 +30,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.NetworkCleaner;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
@@ -319,7 +319,7 @@ public class NetworkInspector {//TODO pfade ändern
 		// tnicolai: ich habe die GridUtils auskommentiert, da es sonst nicht mehr kompiliert.
 
 		SpatialGrid freeSpeedGrid = new SpatialGrid(bbox.getXMin(),bbox.getYMin(),bbox.getXMax(),bbox.getYMax(), 50, Double.NaN);
-		ScenarioImpl sc = (ScenarioImpl) NetworkInspector.scenario;
+		MutableScenario sc = (MutableScenario) NetworkInspector.scenario;
 		
 		new AccessibilityCalcV2(measuringPoints, freeSpeedGrid, sc, this.outputFolder).runAccessibilityComputation();
 		

@@ -340,7 +340,7 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		getDriver(event.getPersonId()).handleEvent(event);
+		getDriver(event.getDriverId()).handleEvent(event);
 	}
 
 

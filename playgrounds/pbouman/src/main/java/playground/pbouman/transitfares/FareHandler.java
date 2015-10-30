@@ -22,7 +22,7 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.events.handler.EventHandler;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 
 import playground.pbouman.transitfares.FarePolicies.DiscountInterval;
 
@@ -44,7 +44,7 @@ public class FareHandler implements
 	
 //	private LinkedList<DiscountInterval> discountIntervals;
 //	private LinkedList<PricingPolicy> pricingPolicies;
-	private ScenarioImpl scenario;
+	private MutableScenario scenario;
 //	private double transferGracePeriod;
 
 	private HashMap<Id, Id> driverToVehicle;
@@ -69,7 +69,7 @@ public class FareHandler implements
 	
 	public FareHandler(Scenario s, String oFile)
 	{
-		scenario = (ScenarioImpl) s;
+		scenario = (MutableScenario) s;
 		reset(0);
 		output = oFile;
 	}
@@ -163,10 +163,10 @@ public class FareHandler implements
 	{
 		// Add the length of the link to the distances of all passengers in the vehicle
 		// the driver is 
-		if (driverToVehicle.get(event.getPersonId()) != null)
+		if (driverToVehicle.get(event.getDriverId()) != null)
 		{
 			Link link = scenario.getNetwork().getLinks().get(event.getLinkId());
-			Id vehicle = driverToVehicle.get(event.getPersonId());
+			Id vehicle = driverToVehicle.get(event.getDriverId());
 			for (Id p : vehicleToPassengers.get(vehicle))
 			{
 				if (agentCurrentDistance.containsKey(p))
@@ -210,7 +210,7 @@ public class FareHandler implements
 	public void notifyStartup(StartupEvent event)
 	{
 		event.getControler().getEvents().addHandler(this);
-		ScenarioImpl scenario = (ScenarioImpl) event.getControler().getScenario();
+		MutableScenario scenario = (MutableScenario) event.getControler().getScenario();
 		policies = new FarePolicies(scenario);
 		scenario.addScenarioElement(FarePolicies.ELEMENT_NAME, policies);
 	}

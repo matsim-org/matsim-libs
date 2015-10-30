@@ -26,7 +26,7 @@ import org.matsim.contrib.locationchoice.Initializer;
 import org.matsim.contrib.locationchoice.timegeography.RecursiveLocationMutator;
 import org.matsim.contrib.locationchoice.timegeography.SubChain;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.testcases.MatsimTestCase;
 
 import java.util.List;
@@ -34,12 +34,12 @@ import java.util.Random;
 
 public class LocationMutatorwChoiceSetTest  extends MatsimTestCase {
 
-	private ScenarioImpl scenario;
+	private MutableScenario scenario;
 
 	private RecursiveLocationMutator initialize() {
 		Initializer initializer = new Initializer();
 		initializer.init(this);
-		scenario = (ScenarioImpl) initializer.getControler().getScenario();
+		scenario = (MutableScenario) initializer.getControler().getScenario();
 		return new RecursiveLocationMutator(scenario, initializer.getControler().getTripRouterProvider().get(), new Random(4711));
 	}
 

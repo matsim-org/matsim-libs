@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
 public class AnalyseEquil {
@@ -36,7 +36,7 @@ public class AnalyseEquil {
 	public static void main(String[] args) {
 		File f = new File("src/main/java/playground/jjoubert/TemporaryCode/equilNetwork.xml");
 		log.info("Network: " + f.getAbsolutePath());
-		Scenario s = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario s = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		MatsimNetworkReader nr = new MatsimNetworkReader(s);
 		nr.readFile(f.getAbsolutePath());
 		double minX = Double.POSITIVE_INFINITY;

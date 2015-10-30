@@ -9,7 +9,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -74,7 +74,7 @@ public class OSM2MATSimNetworkV2 {
 		// into the scenario
 		new NetworkCleaner().run(OUTFILE, OUTFILE.split(".xml")[0]
 				+ "_clean.xml.gz");
-		Scenario scenario = (ScenarioImpl) ScenarioUtils
+		Scenario scenario = (MutableScenario) ScenarioUtils
 				.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario).readFile(OUTFILE.split(".xml")[0]
 				+ "_clean.xml.gz");

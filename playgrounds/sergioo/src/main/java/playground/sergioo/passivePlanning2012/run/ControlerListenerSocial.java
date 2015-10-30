@@ -36,7 +36,7 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
@@ -73,7 +73,7 @@ public class ControlerListenerSocial implements StartupListener, IterationStarts
 		HashSet<String> modes = new HashSet<String>();
 		modes.add(TransportMode.car);
 		filter.filter(net, modes);
-		for(ActivityFacility facility:((ScenarioImpl)event.getControler().getScenario()).getActivityFacilities().getFacilities().values())
+		for(ActivityFacility facility:((MutableScenario)event.getControler().getScenario()).getActivityFacilities().getFacilities().values())
 			((ActivityFacilityImpl)facility).setLinkId(net.getNearestLinkExactly(facility.getCoord()).getId());
         Map<Id<Person>, ? extends Person> persons = event.getControler().getScenario().getPopulation().getPersons();
 		Collection<Person> toBeAdded = new ArrayList<Person>();
@@ -112,7 +112,7 @@ public class ControlerListenerSocial implements StartupListener, IterationStarts
 						bindMobsim().toProvider(new Provider<Mobsim>() {
 							@Override
 							public Mobsim get() {
-								return new PassivePlanningSocialFactory(passivePlannerManager, new PersonHouseholdMapping(((ScenarioImpl) event.getControler().getScenario()).getHouseholds()), event.getControler().getTripRouterProvider().get()).createMobsim(event.getControler().getScenario(), event.getControler().getEvents());
+								return new PassivePlanningSocialFactory(passivePlannerManager, new PersonHouseholdMapping(((MutableScenario) event.getControler().getScenario()).getHouseholds()), event.getControler().getTripRouterProvider().get()).createMobsim(event.getControler().getScenario(), event.getControler().getEvents());
 							}
 						});
 					}

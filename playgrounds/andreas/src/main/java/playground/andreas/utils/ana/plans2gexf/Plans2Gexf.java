@@ -44,7 +44,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.MatsimJaxbXmlWriter;
@@ -95,7 +95,7 @@ public class Plans2Gexf extends MatsimJaxbXmlWriter{
 		
 		Gbl.startMeasurement();
 	
-		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 	
 		String networkFile = "f:/p_runs/txl/network.final.xml.gz";
 		String inPlansFile = "f:/p_runs/txl/run25/it.380/run25.380.plans.xml.gz";

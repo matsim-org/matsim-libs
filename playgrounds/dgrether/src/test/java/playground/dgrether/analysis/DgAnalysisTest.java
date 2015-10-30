@@ -22,7 +22,7 @@ package playground.dgrether.analysis;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -50,7 +50,7 @@ public class DgAnalysisTest extends MatsimTestCase {
 		String netFilename = "test/scenarios/equil/network.xml";
 		String plansFilename = "test/scenarios/equil/plans100.xml";
 		String runId = "testRun23";
-		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Config config = sc.getConfig();
 		config.network().setInputFile(netFilename);
 		config.plans().setInputFile(plansFilename);

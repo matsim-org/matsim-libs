@@ -19,7 +19,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
@@ -63,7 +63,7 @@ public class QuickPlanAnalysisPt {
 	private static double[] relevantBinInterval1_2h = new double[]{0.0, 2d  *60.0}; // relevant interval graphical output
 	private static double[] relevantBinInterval2_24h = new double[]{0.0, 3d  *60.0}; // relevant interval graphical output
 	private final static String SEPARATOR = "===";
-	private ScenarioImpl scenario;
+	private MutableScenario scenario;
 	private Population pop;
 	private TransitScheduleFactory transitFactory = null;
 	private ArrayList<Double> headways = new ArrayList<Double>();
@@ -176,7 +176,7 @@ public class QuickPlanAnalysisPt {
 		log.info("inizialize ... ");
 		
 		
-    	this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+    	this.scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		
 		new MatsimNetworkReader(scenario).readFile(NETWORKFILE);
 		

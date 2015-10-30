@@ -19,7 +19,7 @@
 
 package playground.johannes.synpop.sim;
 
-import playground.johannes.sna.math.Discretizer;
+import org.matsim.contrib.common.stats.Discretizer;
 import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.sim.data.CachedElement;
 import playground.johannes.synpop.sim.data.CachedPerson;
@@ -135,7 +135,8 @@ public class UnivariatFrequency implements Hamiltonian, AttributeChangeListener 
                 return Math.abs(simVal - refVal) / refVal;
             } else {
                 if (simVal == 0) return 0;
-                else return 1;
+                else return simVal/scaleFactor; //TODO: this should be invariant from the sample size of sim values.
+                // Not sure if scaleFactor is the appropriate normalization...
             }
         }
     }

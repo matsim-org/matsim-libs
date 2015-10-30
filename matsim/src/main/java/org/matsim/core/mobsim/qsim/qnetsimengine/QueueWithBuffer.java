@@ -517,10 +517,12 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	public final boolean isActive() {
 		if(fastCapacityUpdate){
 		return /*(this.remainingflowCap < 0.0) // still accumulating, thus active
-				|| */(!this.vehQueue.isEmpty()) || (!this.isNotOfferingVehicle()) ;
+				|| */(!this.vehQueue.isEmpty()) || (!this.isNotOfferingVehicle()) || ( !this.holes.isEmpty() ) ;
 		} else {
 			return (this.flowcap_accumulate.getValue() < 1.0) // still accumulating, thus active
-					|| (!this.vehQueue.isEmpty()) || (!this.isNotOfferingVehicle()) ;
+					|| (!this.vehQueue.isEmpty()) // vehicles are on link, thus active 
+					|| (!this.isNotOfferingVehicle()) // buffer is not empty, thus active
+					|| ( !this.holes.isEmpty() ); // need to process arrival of holes
 		}
 	}
 
@@ -545,9 +547,10 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		}
 		// (continue only if HOLES)
 
-		if ( !storageOk ) {
-			return false ;
-		}
+//		if ( !storageOk ) { 
+//			// this is not necessary and only next statement is sufficient.
+//			return false ;
+//		}
 		// at this point, storage is ok, so start checking holes:
 		if ( remainingHolesStorageCapacity <=0 ) { // no holes available at all; in theory, this should not happen since covered by !storageOk
 			//						log.warn( " !hasSpace since no holes available ") ;
@@ -669,6 +672,9 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		}
 		buffer.clear();
 		usedBufferStorageCapacity = 0;
+		
+		holes.clear();
+		this.remainingHolesStorageCapacity = this.storageCapacity;
 	}
 
 	@Override

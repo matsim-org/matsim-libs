@@ -93,9 +93,9 @@ public class RouteTTObserver implements PersonDepartureEventHandler, PersonArriv
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
 		if(event.getLinkId().toString().equals("4")) {
-			route1.add(event.getPersonId());
+			route1.add(event.getDriverId());
 		} else if(event.getLinkId().toString().equals("5")) {
-			route2.add(event.getPersonId());
+			route2.add(event.getDriverId());
 		}
 	}
 

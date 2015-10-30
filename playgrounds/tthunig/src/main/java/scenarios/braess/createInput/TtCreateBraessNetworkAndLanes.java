@@ -1,5 +1,23 @@
-/**
- * 
+/*
+ *  *********************************************************************** *
+ *  * project: org.matsim.*
+ *  * DefaultControlerModules.java
+ *  *                                                                         *
+ *  * *********************************************************************** *
+ *  *                                                                         *
+ *  * copyright       : (C) 2014 by the members listed in the COPYING, *
+ *  *                   LICENSE and WARRANTY file.                            *
+ *  * email           : info at matsim dot org                                *
+ *  *                                                                         *
+ *  * *********************************************************************** *
+ *  *                                                                         *
+ *  *   This program is free software; you can redistribute it and/or modify  *
+ *  *   it under the terms of the GNU General Public License as published by  *
+ *  *   the Free Software Foundation; either version 2 of the License, or     *
+ *  *   (at your option) any later version.                                   *
+ *  *   See also COPYING, LICENSE and WARRANTY file                           *
+ *  *                                                                         *
+ *  * ***********************************************************************
  */
 package scenarios.braess.createInput;
 
@@ -17,7 +35,7 @@ import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.lanes.LanesUtils;
 import org.matsim.lanes.data.v20.Lane;
-import org.matsim.lanes.data.v20.LaneDefinitions20;
+import org.matsim.lanes.data.v20.Lanes;
 import org.matsim.lanes.data.v20.LaneDefinitionsFactory20;
 import org.matsim.lanes.data.v20.LaneDefinitionsWriter20;
 import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
@@ -116,29 +134,28 @@ public final class TtCreateBraessNetworkAndLanes {
 		NetworkFactory fac = net.getFactory();
 
 		// create nodes
-		double x = -200;
 		net.addNode(fac.createNode(Id.createNodeId(0),
-				new Coord(x, (double) 200)));
+				new Coord(-200, 200)));
 		net.addNode(fac.createNode(Id.createNodeId(1),
-				new Coord((double) 0, (double) 200)));
+				new Coord(0, 200)));
 		net.addNode(fac.createNode(Id.createNodeId(2),
-				new Coord((double) 200, (double) 200)));
+				new Coord(200, 200)));
 		net.addNode(fac.createNode(Id.createNodeId(3),
-				new Coord((double) 400, (double) 400)));
+				new Coord(400, 400)));
 		net.addNode(fac.createNode(Id.createNodeId(4),
-				new Coord((double) 400, (double) 0)));
+				new Coord(400, 0)));
 		net.addNode(fac.createNode(Id.createNodeId(5),
-				new Coord((double) 600, (double) 200)));
+				new Coord(600, 200)));
 		net.addNode(fac.createNode(Id.createNodeId(6),
-				new Coord((double) 800, (double) 200)));
+				new Coord(800, 200)));
 		
 		if (simulateInflowCap){
 			net.addNode(fac.createNode(Id.createNodeId(23),
-					new Coord((double) 250, (double) 250)));
+					new Coord(250, 250)));
 			net.addNode(fac.createNode(Id.createNodeId(24),
-					new Coord((double) 250, (double) 150)));
+					new Coord(250, 150)));
 			net.addNode(fac.createNode(Id.createNodeId(45),
-					new Coord((double) 450, (double) 50)));
+					new Coord(450, 50)));
 		}
 		
 		// create links
@@ -251,7 +268,7 @@ public final class TtCreateBraessNetworkAndLanes {
 	 */
 	private void createTrivialLanes() {
 		
-		LaneDefinitions20 laneDef20 = this.scenario.getLanes();
+		Lanes laneDef20 = this.scenario.getLanes();
 		LaneDefinitionsFactory20 fac = laneDef20.getFactory();
 		
 		for (Link link: scenario.getNetwork().getLinks().values()){
@@ -278,7 +295,7 @@ public final class TtCreateBraessNetworkAndLanes {
 	 */
 	private void createRealisticLanes() {
 		
-		LaneDefinitions20 laneDef20 = this.scenario.getLanes();
+		Lanes laneDef20 = this.scenario.getLanes();
 		LaneDefinitionsFactory20 fac = laneDef20.getFactory();
 
 		// create link assignment of link 1_2

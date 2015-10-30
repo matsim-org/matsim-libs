@@ -22,6 +22,21 @@
  */
 package playground.johannes.gsv.demand;
 
+import com.vividsolutions.jts.geom.Geometry;
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.contrib.common.gis.CRSUtils;
+import org.matsim.contrib.common.gis.EsriShapeIO;
+import org.matsim.contrib.socnetgen.sna.gis.Zone;
+import org.matsim.contrib.socnetgen.sna.gis.ZoneLayer;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.PopulationWriter;
+import org.opengis.feature.simple.SimpleFeature;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -29,23 +44,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.PopulationWriter;
-import org.opengis.feature.simple.SimpleFeature;
-
-import playground.johannes.sna.gis.CRSUtils;
-import playground.johannes.sna.gis.Zone;
-import playground.johannes.sna.gis.ZoneLayer;
-import playground.johannes.socialnetworks.gis.io.FeatureSHP;
-
-import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * @author johannes
@@ -59,7 +57,7 @@ public class PopulationGenerator {
 		/*
 		 * Read shape file with NUTS3 zones.
 		 */
-		Set<SimpleFeature> features = FeatureSHP.readFeatures("/home/johannes/gsv/netz2030/data/raw/Zonierung_Kreise_WGS84_Stand2008Attr_WGS84_region.shp");
+		Set<SimpleFeature> features = EsriShapeIO.readFeatures("/home/johannes/gsv/netz2030/data/raw/Zonierung_Kreise_WGS84_Stand2008Attr_WGS84_region.shp");
 		
 		Map<String, String> nuts2gsvMapping = readColumn("/home/johannes/gsv/netz2030/data/raw/inhabitants.csv", 1, 0);
 		/*

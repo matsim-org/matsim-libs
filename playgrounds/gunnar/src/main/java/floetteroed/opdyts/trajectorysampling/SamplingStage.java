@@ -21,11 +21,13 @@
  *
  * contact: gunnar.floetteroed@abe.kth.se
  *
- */ 
+ */
 package floetteroed.opdyts.trajectorysampling;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 
 import floetteroed.opdyts.DecisionVariable;
 import floetteroed.utilities.math.MathHelpers;
@@ -36,7 +38,7 @@ import floetteroed.utilities.math.Vector;
  * @author Gunnar Flötteröd
  *
  */
-public class SamplingStage {
+public class SamplingStage<U extends DecisionVariable> {
 
 	// -------------------- MEMBERS --------------------
 
@@ -52,12 +54,12 @@ public class SamplingStage {
 
 	private final double surrogateObjectiveFunctionValue;
 
-	private final Map<DecisionVariable, Double> decisionVariable2alphaSum;
+	private final Map<U, Double> decisionVariable2alphaSum;
 
 	// -------------------- CONSTRUCTION --------------------
 
 	public SamplingStage(final Vector alphas,
-			final TransitionSequencesAnalyzer evaluator) {
+			final TransitionSequencesAnalyzer<U> evaluator) {
 
 		this.alphas = alphas.copy();
 		this.equilibriumGapWeight = evaluator.getEquilibriumGapWeight();
@@ -74,6 +76,10 @@ public class SamplingStage {
 
 	// -------------------- CONTENT ACCESS --------------------
 
+	public double getAlphaSquareNorm() {
+		return this.alphas.innerProd(this.alphas);
+	}
+	
 	public double getAlphaNorm() {
 		return this.alphas.euclNorm();
 	}
@@ -102,8 +108,13 @@ public class SamplingStage {
 		return this.decisionVariable2alphaSum.get(decisionVariable);
 	}
 
-	DecisionVariable drawDecisionVariable(final Random rnd) {
-		return MathHelpers.draw(this.decisionVariable2alphaSum, rnd);
+	// TODO NEW; replace by view on the entire map
+	public Set<U> getDecisionVariables() {
+		return Collections.unmodifiableSet(this.decisionVariable2alphaSum
+				.keySet());
 	}
 
+	U drawDecisionVariable(final Random rnd) {
+		return MathHelpers.draw(this.decisionVariable2alphaSum, rnd);
+	}
 }

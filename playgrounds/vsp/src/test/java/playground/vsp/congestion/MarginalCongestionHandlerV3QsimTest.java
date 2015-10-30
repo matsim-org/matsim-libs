@@ -56,7 +56,7 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import playground.vsp.congestion.controler.MarginalCongestionPricingContolerListener;
@@ -128,7 +128,7 @@ public class MarginalCongestionHandlerV3QsimTest {
 			}	
 		});
 		
-		events.addHandler(new CongestionHandlerImplV3(events, (ScenarioImpl) sc));
+		events.addHandler(new CongestionHandlerImplV3(events, (MutableScenario) sc));
 				
 		QSim sim = createQSim(sc, events);
 		sim.run();
@@ -172,7 +172,7 @@ public class MarginalCongestionHandlerV3QsimTest {
 			}
 		});
 
-		events.addHandler(new CongestionHandlerImplV9(events, (ScenarioImpl) sc));
+		events.addHandler(new CongestionHandlerImplV9(events, (MutableScenario) sc));
 
 		QSim sim = createQSim(sc, events);
 		sim.run();
@@ -216,7 +216,7 @@ public class MarginalCongestionHandlerV3QsimTest {
 			}
 		});
 
-		events.addHandler(new CongestionHandlerImplV8(events, (ScenarioImpl) sc));
+		events.addHandler(new CongestionHandlerImplV8(events, (MutableScenario) sc));
 
 		QSim sim = createQSim(sc, events);
 		sim.run();
@@ -266,7 +266,7 @@ public class MarginalCongestionHandlerV3QsimTest {
 			}	
 		});
 		
-		events.addHandler(new CongestionHandlerImplV3(events, (ScenarioImpl) sc));
+		events.addHandler(new CongestionHandlerImplV3(events, (MutableScenario) sc));
 				
 		QSim sim = createQSim(sc, events);
 		sim.run();
@@ -305,7 +305,7 @@ public class MarginalCongestionHandlerV3QsimTest {
 				bindCarTravelDisutilityFactory().toInstance(tollDisutilityCalculatorFactory);
 			}
 		});
-		controler.addControlerListener(new MarginalCongestionPricingContolerListener(controler.getScenario(), tollHandler, new CongestionHandlerImplV3(controler.getEvents(), (ScenarioImpl) controler.getScenario())) );
+		controler.addControlerListener(new MarginalCongestionPricingContolerListener(controler.getScenario(), tollHandler, new CongestionHandlerImplV3(controler.getEvents(), (MutableScenario) controler.getScenario())) );
 	
 		final String timeBin1 = "08:00-08:15";
 		final String timeBin2 = "08:15-08:30";
@@ -446,7 +446,7 @@ public class MarginalCongestionHandlerV3QsimTest {
 			}	
 		});
 		
-		events.addHandler(new CongestionHandlerImplV3(events, (ScenarioImpl) sc));
+		events.addHandler(new CongestionHandlerImplV3(events, (MutableScenario) sc));
 				
 		QSim sim = createQSim(sc, events);
 		sim.run();
@@ -504,7 +504,7 @@ public class MarginalCongestionHandlerV3QsimTest {
 			}	
 		});
 		
-		events.addHandler(new CongestionHandlerImplV3(events, (ScenarioImpl) sc));
+		events.addHandler(new CongestionHandlerImplV3(events, (MutableScenario) sc));
 				
 		QSim sim = createQSim(sc, events);
 		sim.run();
@@ -564,7 +564,7 @@ public class MarginalCongestionHandlerV3QsimTest {
 			}	
 		});
 		
-		events.addHandler(new CongestionHandlerImplV3(events, (ScenarioImpl) sc));
+		events.addHandler(new CongestionHandlerImplV3(events, (MutableScenario) sc));
 				
 		QSim sim = createQSim(sc, events);
 		sim.run();
@@ -633,7 +633,7 @@ public class MarginalCongestionHandlerV3QsimTest {
 			}	
 		});
 		
-		events.addHandler(new CongestionHandlerImplV3(events, (ScenarioImpl) sc));
+		events.addHandler(new CongestionHandlerImplV3(events, (MutableScenario) sc));
 		
 		QSim sim = createQSim(sc, events);
 		sim.run();

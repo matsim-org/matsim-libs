@@ -20,13 +20,13 @@
 package playground.johannes.gsv.qlik;
 
 import org.apache.log4j.Logger;
+import org.matsim.contrib.common.util.ProgressLogger;
 import playground.johannes.synpop.data.CommonKeys;
-import playground.johannes.synpop.data.io.XMLHandler;
-import playground.johannes.synpop.data.io.XMLWriter;
-import playground.johannes.sna.util.ProgressLogger;
 import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.data.PlainFactory;
 import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.data.io.XMLHandler;
+import playground.johannes.synpop.data.io.XMLWriter;
 
 import java.util.Collection;
 import java.util.HashMap;

@@ -36,7 +36,6 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.router.PlanRouter;
-import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
@@ -105,10 +104,8 @@ public class LegModeCheckerTest extends MatsimTestCase {
 		PlanAlgorithm plansCalcRoute =
 				new PlanRouter(
 						new TripRouterFactoryBuilderWithDefaults().build(
-								sc ).instantiateAndConfigureTripRouter(
-										new RoutingContextImpl(
-												travelCosts,
-												travelTimes ) ) );
+								sc ).get(
+						) );
 
 		/*
 		 * Create LegModeChecker to check and adapt leg modes

@@ -2,16 +2,14 @@ package roadclassification;
 
 import java.util.Map;
 
-
-import floetteroed.opdyts.ObjectBasedObjectiveFunction;
-import floetteroed.opdyts.SimulatorState;
-import floetteroed.opdyts.VectorBasedObjectiveFunction;
-import floetteroed.utilities.math.Vector;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.Volume;
+
+import floetteroed.opdyts.ObjectiveFunction;
+import floetteroed.opdyts.SimulatorState;
 
 /**
  * 
@@ -19,7 +17,7 @@ import org.matsim.counts.Volume;
  *
  */
 class RoadClassificationObjectiveFunction implements
-		ObjectBasedObjectiveFunction {
+		ObjectiveFunction {
 
 	// -------------------- MEMBERS --------------------
 
@@ -44,8 +42,10 @@ class RoadClassificationObjectiveFunction implements
 			for (Map.Entry<Integer, Volume> hour2measuredVolume : linkId2measuredVolumes
 					.getValue().getVolumes().entrySet()) {
 				final int h = hour2measuredVolume.getKey();
-				final double measuredVolume = hour2measuredVolume.getValue()
-						.getValue();
+				if (simulatedVolumes == null || h > simulatedVolumes.length - 1){
+					continue;
+				}
+				final double measuredVolume = hour2measuredVolume.getValue().getValue();
 				final double residual = measuredVolume - simulatedVolumes[h];
 				result += residual * residual;
 			}

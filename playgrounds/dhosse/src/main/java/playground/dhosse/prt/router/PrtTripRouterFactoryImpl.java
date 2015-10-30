@@ -29,7 +29,9 @@ import org.matsim.core.router.util.TravelTime;
 import playground.dhosse.prt.data.PrtData;
 import playground.dhosse.prt.passenger.PrtRequestCreator;
 
-public class PrtTripRouterFactoryImpl implements TripRouterFactory {
+import javax.inject.Provider;
+
+public class PrtTripRouterFactoryImpl implements Provider<TripRouter> {
 	
 	private final MatsimVrpContext context;
 	private final TravelTime travelTime;
@@ -46,7 +48,7 @@ public class PrtTripRouterFactoryImpl implements TripRouterFactory {
 	}
 
 	@Override
-	public TripRouter instantiateAndConfigureTripRouter(RoutingContext routingContext) {
+	public TripRouter get() {
 		
 		Network network = this.context.getScenario().getNetwork();
 		LeastCostPathCalculatorFactory leastCostPathAlgorithmFactory = createDefaultLeastCostPathCalculatorFactory(this.context.getScenario());
@@ -62,8 +64,8 @@ public class PrtTripRouterFactoryImpl implements TripRouterFactory {
 		LeastCostPathCalculator routeAlgo =
 				leastCostPathAlgorithmFactory.createPathCalculator(
 	                    network,
-	                    routingContext.getTravelDisutility(),
-	                    routingContext.getTravelTime());
+						travelDisutility,
+						travelTime);
 		
 		FreespeedTravelTimeAndDisutility ptTimeCostCalc =
 				new FreespeedTravelTimeAndDisutility(-1.0, 0.0, 0.0);

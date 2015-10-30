@@ -77,7 +77,7 @@ public class VTTSspecificRouterTest {
 		final String configFile1 = testUtils.getPackageInputDirectory() + "vttsSpecificRouter/configVTTS.xml";
 		final Controler controler = new Controler(configFile1);
 		final VTTSHandler vttsHandler = new VTTSHandler(controler.getScenario());
-		final VTTSTravelTimeAndDistanceBasedTravelDisutilityFactory factory = new VTTSTravelTimeAndDistanceBasedTravelDisutilityFactory(vttsHandler) ;
+		final VTTSTimeDistanceTravelDisutilityFactory factory = new VTTSTimeDistanceTravelDisutilityFactory(vttsHandler) ;
 		factory.setSigma(0.); // no randomness
 		
 		controler.addOverridingModule(new AbstractModule(){
@@ -238,7 +238,7 @@ public class VTTSspecificRouterTest {
 		final String configFile = testUtils.getPackageInputDirectory() + "vttsSpecificRouter/configVTTS_noDistanceCost.xml";
 		final Controler controler = new Controler(configFile);
 		final VTTSHandler vttsHandler = new VTTSHandler(controler.getScenario());
-		final VTTSTravelTimeAndDistanceBasedTravelDisutilityFactory factory = new VTTSTravelTimeAndDistanceBasedTravelDisutilityFactory(vttsHandler) ;
+		final VTTSTimeDistanceTravelDisutilityFactory factory = new VTTSTimeDistanceTravelDisutilityFactory(vttsHandler) ;
 		factory.setSigma(0.); // no randomness
 		
 		controler.addOverridingModule(new AbstractModule(){
@@ -399,7 +399,7 @@ public class VTTSspecificRouterTest {
 		final String configFile1 = testUtils.getPackageInputDirectory() + "vttsSpecificRouter/configVTTS_noDistanceCost_largePopulation_1.xml";
 		final Controler controler1 = new Controler(configFile1);
 		final VTTSHandler vttsHandler1 = new VTTSHandler(controler1.getScenario());
-		final VTTSTravelTimeAndDistanceBasedTravelDisutilityFactory factory1 = new VTTSTravelTimeAndDistanceBasedTravelDisutilityFactory(vttsHandler1) ;
+		final VTTSTimeDistanceTravelDisutilityFactory factory1 = new VTTSTimeDistanceTravelDisutilityFactory(vttsHandler1) ;
 		factory1.setSigma(0.); // no randomness
 		
 		controler1.addOverridingModule(new AbstractModule(){
@@ -454,7 +454,7 @@ public class VTTSspecificRouterTest {
 		final String configFile1 = testUtils.getPackageInputDirectory() + "vttsSpecificRouter/configVTTS_withDistanceCost_largePopulation_1.xml";
 		final Controler controler1 = new Controler(configFile1);
 		final VTTSHandler vttsHandler1 = new VTTSHandler(controler1.getScenario());
-		final VTTSTravelTimeAndDistanceBasedTravelDisutilityFactory factory1 = new VTTSTravelTimeAndDistanceBasedTravelDisutilityFactory(vttsHandler1) ;
+		final VTTSTimeDistanceTravelDisutilityFactory factory1 = new VTTSTimeDistanceTravelDisutilityFactory(vttsHandler1) ;
 		factory1.setSigma(0.); // no randomness
 		
 		controler1.addOverridingModule(new AbstractModule(){
@@ -494,6 +494,88 @@ public class VTTSspecificRouterTest {
 		}
 		System.out.println(scoreSum1 + " / " + scoreSum2);
 		Assert.assertTrue(scoreSum1 - scoreSum2 > 1.0);
+	}
+	
+	/**
+	 * 
+	 * Setting sigma to 3.0, the rest is the same as in test1.
+	 * 
+	 * There are two agents. One agent is more pressed for time than the other one which results in different VTTS.
+	 * There are two routes. One expensive but fast route. One cheap but slow route.
+	 * 
+	 * Accounting for the different VTTS results in a different outcome than assuming the default VTTS (as it is the case in the default router).	 * 
+	 */
+	@Test
+	public final void test7(){
+		
+		// starts the VTTS-specific router
+		
+		final String configFile = testUtils.getPackageInputDirectory() + "vttsSpecificRouter/configVTTS.xml";
+		final Controler controler = new Controler(configFile);
+		final VTTSHandler vttsHandler = new VTTSHandler(controler.getScenario());
+		final VTTSTimeDistanceTravelDisutilityFactory factory = new VTTSTimeDistanceTravelDisutilityFactory(vttsHandler) ;
+		factory.setSigma(3.0); // no randomness
+		
+		controler.addOverridingModule(new AbstractModule(){
+			@Override
+			public void install() {
+				this.bindCarTravelDisutilityFactory().toInstance( factory );
+			}
+		}); 		
+		
+		final Map<Id<Vehicle>, Set<Id<Link>>> vehicleId2linkIds = new HashMap<>();
+
+		controler.addControlerListener(new VTTScomputation(vttsHandler));
+		
+		controler.addControlerListener( new StartupListener() {
+
+			@Override
+			public void notifyStartup(StartupEvent event) {
+				event.getControler().getEvents().addHandler(new LinkLeaveEventHandler() {
+					
+					@Override
+					public void reset(int iteration) {
+						vehicleId2linkIds.clear();
+					}
+					
+					@Override
+					public void handleEvent(LinkLeaveEvent event) {
+						if (vehicleId2linkIds.containsKey(event.getVehicleId())) {
+							vehicleId2linkIds.get(event.getVehicleId()).add(event.getLinkId());
+						} else {
+							Set<Id<Link>> linkIds = new HashSet<Id<Link>>();
+							linkIds.add(event.getLinkId());
+							vehicleId2linkIds.put(event.getVehicleId(), linkIds);
+						}
+					}
+				});		
+			}		
+		});
+		
+		
+		controler.addOverridingModule(new OTFVisModule());
+		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+		controler.run();
+		
+		
+		Id<Link> longDistanceShortTimeLinkId = Id.createLinkId("link_1_2");
+		
+		for (Id<Vehicle> id : vehicleId2linkIds.keySet()) {
+
+			if (id.toString().contains("highVTTS")) {
+				
+				// the high VTTS person should use the fast but expensive route
+				Assert.assertEquals(true, vehicleId2linkIds.get(id).contains(longDistanceShortTimeLinkId));
+				
+			}
+			
+			if (id.toString().contains("lowVTTS")) {
+
+				// without randomness, the low VTTS person should use the slow but cheap route
+				// with randomness, the low VTTS person may also use the fast but expensive route...
+				Assert.assertEquals(true, vehicleId2linkIds.get(id).contains(longDistanceShortTimeLinkId));
+			}
+		}		
 	}
 	
 }

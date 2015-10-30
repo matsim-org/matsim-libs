@@ -216,14 +216,14 @@ LinkEnterEventHandler, LinkLeaveEventHandler {
 		/*
 		 * Return, if the Agent is on a Leg which does not create congestion.
 		 */
-		if (!activeAgents.contains(event.getPersonId())) return;
+		if (!activeAgents.contains(event.getDriverId())) return;
 
 		LinkTrip linkTrip = new LinkTrip();
-		linkTrip.person_id = event.getPersonId();
+		linkTrip.person_id = event.getDriverId();
 		linkTrip.link_id = event.getLinkId();
 		linkTrip.enterTime = event.getTime();
 
-		activeTrips.put(event.getPersonId(), linkTrip);
+		activeTrips.put(event.getDriverId(), linkTrip);
 
 		if(vehicleObserver.getVehicleOccupancy().containsKey(event.getVehicleId())){
 			if(!linkPassengers.containsKey(event.getLinkId()))
@@ -237,7 +237,7 @@ LinkEnterEventHandler, LinkLeaveEventHandler {
 		/*
 		 * Analysis
 		 */
-		LegTrip legTrip = activeLegs.get(event.getPersonId());
+		LegTrip legTrip = activeLegs.get(event.getDriverId());
 		if (legTrip == null) {
 			log.error("LegTrip was not found!");
 			return;
@@ -250,9 +250,9 @@ LinkEnterEventHandler, LinkLeaveEventHandler {
 		/*
 		 * Return, if the Agent is on a Leg which does not create congestion.
 		 */
-		if (!activeAgents.contains(event.getPersonId())) return;
+		if (!activeAgents.contains(event.getDriverId())) return;
 
-		LinkTrip linkTrip = activeTrips.get(event.getPersonId());
+		LinkTrip linkTrip = activeTrips.get(event.getDriverId());
 
 		if (linkTrip == null) {
 			log.error("LinkTrip was not found!");

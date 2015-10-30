@@ -1,11 +1,12 @@
 package floetteroed.opdyts.ntimestworoutes;
 
+import static java.util.Collections.unmodifiableList;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-import floetteroed.opdyts.DecisionVariable;
 import floetteroed.opdyts.DecisionVariableRandomizer;
 
 /**
@@ -13,8 +14,9 @@ import floetteroed.opdyts.DecisionVariableRandomizer;
  * @author Gunnar Flötteröd
  *
  */
-public class ContinuousDiscreteTollRandomizer implements
-		DecisionVariableRandomizer {
+public class ContinuousDiscreteTollRandomizer
+		implements
+		DecisionVariableRandomizer<NTimesTwoRoutesDecisionVariableMixedDiscrCont> {
 
 	// -------------------- CONSTANTS --------------------
 
@@ -68,19 +70,17 @@ public class ContinuousDiscreteTollRandomizer implements
 				this.simulator, this.roadCnt, tollIndices, tollValues);
 	}
 
-	@Override
-	public NTimesTwoRoutesDecisionVariableMixedDiscrCont newRandomVariation(
-			final DecisionVariable parent) {
-
-		final NTimesTwoRoutesDecisionVariableMixedDiscrCont myParent = (NTimesTwoRoutesDecisionVariableMixedDiscrCont) parent;
+	private NTimesTwoRoutesDecisionVariableMixedDiscrCont newVariation(
+			final NTimesTwoRoutesDecisionVariableMixedDiscrCont parent,
+			final List<Double> randomNumbers, final double sign) {
 
 		// randomize all toll values; the may become negative
 		final List<Integer> newTollIndices = new ArrayList<Integer>();
 		final List<Double> newTollValues = new ArrayList<Double>();
-		for (int i = 0; i < myParent.getTollValues().size(); i++) {
-			newTollIndices.add(myParent.getTollIndices().get(i));
-			newTollValues.add(Math.min(this.maxToll, myParent.getTollValues()
-					.get(i) + this.sigmaToll * this.rnd.nextGaussian()));
+		for (int i = 0; i < parent.getTollValues().size(); i++) {
+			newTollIndices.add(parent.getTollIndices().get(i));
+			newTollValues.add(Math.min(this.maxToll, parent.getTollValues()
+					.get(i) + this.sigmaToll * sign * randomNumbers.get(i)));
 		}
 
 		// remove and memorize all negativeTolls
@@ -112,5 +112,22 @@ public class ContinuousDiscreteTollRandomizer implements
 
 		return new NTimesTwoRoutesDecisionVariableMixedDiscrCont(
 				this.simulator, this.roadCnt, newTollIndices, newTollValues);
+	}
+
+	@Override
+	public List<NTimesTwoRoutesDecisionVariableMixedDiscrCont> newRandomVariations(
+			final NTimesTwoRoutesDecisionVariableMixedDiscrCont parent) {
+		final List<Double> randomNumbers = new ArrayList<>(parent
+				.getTollValues().size());
+		for (int i = 0; i < parent.getTollValues().size(); i++) {
+			randomNumbers.add(this.rnd.nextGaussian());
+		}
+		final List<NTimesTwoRoutesDecisionVariableMixedDiscrCont> result = new ArrayList<>(
+				2);
+		result.add(this.newVariation(parent, unmodifiableList(randomNumbers),
+				+1.0));
+		result.add(this.newVariation(parent, unmodifiableList(randomNumbers),
+				-1.0));
+		return result;
 	}
 }

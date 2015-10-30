@@ -51,65 +51,55 @@ import floetteroed.utilities.math.Vector;
  * @author Gunnar Flötteröd
  *
  */
-public class TransitionSequencesAnalyzer {
+public class TransitionSequencesAnalyzer<U extends DecisionVariable> {
 
 	// -------------------- CONSTANTS --------------------
 
-	private final List<Transition> transitions;
+	private final List<Transition<U>> transitions;
 
-	private final SurrogateObjectiveFunction surrogateObjectiveFunction;
+	private final SurrogateObjectiveFunction<U> surrogateObjectiveFunction;
 
 	private final int maxIterations = 10 * 1000; // TODO make configurable
 
 	// -------------------- CONSTRUCTION --------------------
 
-	TransitionSequencesAnalyzer(
-			final List<Transition> transitions,
-			final double equilibriumGapWeight,
-			final double uniformityWeight,
-			// final floetteroed.opdyts.ObjectBasedObjectiveFunction
-			// objectBasedObjectiveFunction,
-			final floetteroed.opdyts.VectorBasedObjectiveFunction vectorBasedObjectiveFunction,
-			final double initialGradientNorm) {
+	TransitionSequencesAnalyzer(final List<Transition<U>> transitions,
+			final double equilibriumGapWeight, final double uniformityWeight
+	// ,
+	// final floetteroed.opdyts.VectorBasedObjectiveFunction
+	// vectorBasedObjectiveFunction,
+	// final double initialGradientNorm
+	) {
 		if ((transitions == null) || (transitions.size() == 0)) {
 			throw new IllegalArgumentException(
 					"there must be at least one transition");
 		}
 		this.transitions = transitions;
-		this.surrogateObjectiveFunction = new SurrogateObjectiveFunction(
-				// objectBasedObjectiveFunction,
-				vectorBasedObjectiveFunction, transitions,
-				equilibriumGapWeight, uniformityWeight, initialGradientNorm);
+		this.surrogateObjectiveFunction = new SurrogateObjectiveFunction<>(
+		// null,
+				transitions, equilibriumGapWeight, uniformityWeight
+		// , 0.0
+		);
 	}
-
-	// public TransitionSequencesAnalyzer(
-	// final TransitionSequence transitionSequence,
-	// final double equilibriumGapWeight,
-	// final double uniformityWeight,
-	// final floetteroed.opdyts.VectorBasedObjectiveFunction objectiveFunction,
-	// final double initialGradientNorm) {
-	// this(transitionSequence.getTransitions(), equilibriumGapWeight,
-	// uniformityWeight, objectiveFunction, initialGradientNorm);
-	// }
 
 	TransitionSequencesAnalyzer(
-			final Map<DecisionVariable, TransitionSequence> decisionVariable2transitionSequence,
-			final double equilibriumWeight,
-			final double uniformityWeight,
-			// final floetteroed.opdyts.ObjectBasedObjectiveFunction
-			// objectBasedObjectiveFunction,
-			final floetteroed.opdyts.VectorBasedObjectiveFunction vectorBasedObjectiveFunction,
-			final double initialGradientNorm) {
+			final Map<U, TransitionSequence<U>> decisionVariable2transitionSequence,
+			final double equilibriumWeight, final double uniformityWeight
+	// ,
+	// final floetteroed.opdyts.VectorBasedObjectiveFunction
+	// vectorBasedObjectiveFunction,
+	// final double initialGradientNorm
+	) {
 		this(map2list(decisionVariable2transitionSequence), equilibriumWeight,
-				uniformityWeight,
-				// objectBasedObjectiveFunction,
-				vectorBasedObjectiveFunction, initialGradientNorm);
+				uniformityWeight
+		// , null, 0.0
+		);
 	}
 
-	static List<Transition> map2list(
-			final Map<DecisionVariable, TransitionSequence> decisionVariable2transitionSequence) {
-		final List<Transition> result = new ArrayList<Transition>();
-		for (TransitionSequence transitionSequence : decisionVariable2transitionSequence
+	static <V extends DecisionVariable> List<Transition<V>> map2list(
+			final Map<V, TransitionSequence<V>> decisionVariable2transitionSequence) {
+		final List<Transition<V>> result = new ArrayList<Transition<V>>();
+		for (TransitionSequence<V> transitionSequence : decisionVariable2transitionSequence
 				.values()) {
 			result.addAll(transitionSequence.getTransitions());
 		}
@@ -126,34 +116,6 @@ public class TransitionSequencesAnalyzer {
 		return this.surrogateObjectiveFunction.getUniformityWeight();
 	}
 
-	// public double getInitialGradientNorm() {
-	// return this.surrogateObjectiveFunction.getInitialGradientNorm();
-	// }
-
-	// Set<DecisionVariable> allDecisionVariables() {
-	// final Set<DecisionVariable> result = new
-	// LinkedHashSet<DecisionVariable>();
-	// for (Transition transition : this.transitions) {
-	// result.add(transition.getDecisionVariable());
-	// }
-	// return result;
-	// }
-
-	// List<Transition> singletonTransitions(
-	// final DecisionVariable decisionVariable) {
-	// final List<Transition> result = new ArrayList<Transition>();
-	// for (Transition transition : this.transitions) {
-	// if (transition.getDecisionVariable().equals(decisionVariable)) {
-	// result.add(transition);
-	// }
-	// }
-	// return result;
-	// }
-
-	// floetteroed.opdyts.VectorBasedObjectiveFunction getObjectiveFunction() {
-	// return this.surrogateObjectiveFunction.originalObjectiveFunction();
-	// }
-
 	// -------------------- GENERAL STATISTICS --------------------
 
 	public double originalObjectiveFunctionValue(final Vector alphas) {
@@ -169,11 +131,10 @@ public class TransitionSequencesAnalyzer {
 		return this.surrogateObjectiveFunction.value(alphas);
 	}
 
-	public Map<DecisionVariable, Double> decisionVariable2alphaSum(
-			final Vector alphas) {
-		final Map<DecisionVariable, Double> result = new LinkedHashMap<DecisionVariable, Double>();
+	public Map<U, Double> decisionVariable2alphaSum(final Vector alphas) {
+		final Map<U, Double> result = new LinkedHashMap<U, Double>();
 		for (int i = 0; i < alphas.size(); i++) {
-			final DecisionVariable decisionVariable = this.transitions.get(i)
+			final U decisionVariable = this.transitions.get(i)
 					.getDecisionVariable();
 			final Double sum = result.get(decisionVariable);
 			result.put(decisionVariable, sum == null ? alphas.get(i) : sum
@@ -199,6 +160,11 @@ public class TransitionSequencesAnalyzer {
 	// }
 
 	// -------------------- OPTIMIZATION --------------------
+
+	public SamplingStage<U> newOptimalSamplingStage() {
+		final Vector alphas = this.optimalAlphas();
+		return new SamplingStage<>(alphas, this);
+	}
 
 	public Vector optimalAlphas() {
 		if (this.transitions.size() == 1) {
@@ -293,10 +259,6 @@ public class TransitionSequencesAnalyzer {
 		}
 	}
 
-	// private Vector dSurrogateObjectiveFunction_dAlphas(final Vector alphas) {
-	// return this.surrogateObjectiveFunction.gradient(alphas);
-	// }
-
 	private class MyGradient implements MultivariateVectorFunction {
 		@Override
 		public double[] value(double[] point) {
@@ -322,8 +284,10 @@ public class TransitionSequencesAnalyzer {
 	}
 }
 
-// -------------------- OPTIMIZATION --------------------
-
+// ######################################################################
+// ######################################################################
+// ######################################################################
+//
 // public Vector newInititialAlphas(
 // final Map<DecisionVariable, Double> oldDecisionVariable2alpha,
 // final Map<DecisionVariable, Integer> oldDecisionVariable2alphaCnt) {

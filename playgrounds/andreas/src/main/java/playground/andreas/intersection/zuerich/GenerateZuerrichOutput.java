@@ -16,7 +16,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.data.v11.LaneDefinitions11;
 import org.matsim.lanes.data.v11.LaneDefinitionsV11ToV20Conversion;
-import org.matsim.lanes.data.v20.LaneDefinitions20;
+import org.matsim.lanes.data.v20.Lanes;
 import org.matsim.lanes.data.v20.LaneDefinitionsWriter20;
 import playground.andreas.intersection.zuerich.lanes.LanesConsistencyChecker;
 
@@ -67,7 +67,7 @@ public class GenerateZuerrichOutput {
 		SignalsScenarioWriter writer = new SignalsScenarioWriter();
 
 		
-		LaneDefinitions20 lanes20 = null;
+		Lanes lanes20 = null;
 		//lane generation
 		if (generateLanes){
 			//knotennummer -> (vonspur 1->n nachspur)

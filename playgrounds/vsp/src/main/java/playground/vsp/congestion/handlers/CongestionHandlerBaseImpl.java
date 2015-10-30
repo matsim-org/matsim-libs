@@ -142,9 +142,9 @@ public class CongestionHandlerBaseImpl implements CongestionHandler {
 		} else { // car! 
 			LinkCongestionInfo linkInfo = CongestionUtils.getOrCreateLinkInfo( event.getLinkId(), linkId2congestionInfo, scenario ) ;
 
-			AgentOnLinkInfo agentInfo = new AgentOnLinkInfo.Builder().setAgentId( event.getPersonId() ).setLinkId( event.getLinkId() )
+			AgentOnLinkInfo agentInfo = new AgentOnLinkInfo.Builder().setAgentId( event.getDriverId() ).setLinkId( event.getLinkId() )
 					.setEnterTime( event.getTime() ).setFreeSpeedLeaveTime( event.getTime()+linkInfo.getFreeTravelTime()+1. ).build();
-			linkInfo.getAgentsOnLink().put( event.getPersonId(), agentInfo ) ;
+			linkInfo.getAgentsOnLink().put( event.getDriverId(), agentInfo ) ;
 		}
 	}
 

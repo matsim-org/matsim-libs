@@ -20,18 +20,21 @@
 
 package org.matsim.population.algorithms;
 
+import java.util.HashSet;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.*;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
-
-import java.util.HashSet;
 
 /**
  * Performs several checks that persons are ready for a mobility simulation.
@@ -53,6 +56,21 @@ public class PersonPrepareForSim extends AbstractPersonAlgorithm {
 
 	private static final Logger log = Logger.getLogger(PersonPrepareForSim.class);
 
+	/*
+	 * To be used by the controller which creates multiple instances of this class which would
+	 * create multiple copies of a car-only-network. Instead, we can create that network once in
+	 * the Controller and re-use it for each new instance. cdobler, sep'15
+	 */
+	public PersonPrepareForSim(final PlanAlgorithm router, final Scenario scenario, final Network carOnlyNetwork) {
+		super();
+		this.router = router;
+		this.network = scenario.getNetwork();
+		if (NetworkUtils.isMultimodal(carOnlyNetwork)) {
+			throw new RuntimeException("Expected carOnlyNetwork not to be multi-modal. Aborting!");
+		}
+		this.xy2links = new XY2Links(carOnlyNetwork, scenario.getActivityFacilities());
+	}
+	
 	public PersonPrepareForSim(final PlanAlgorithm router, final Scenario scenario) {
 		super();
 		this.router = router;
@@ -61,7 +79,7 @@ public class PersonPrepareForSim extends AbstractPersonAlgorithm {
 		if (NetworkUtils.isMultimodal(network)) {
 			log.info("Network seems to be multimodal. XY2Links will only use car links.");
 			TransportModeNetworkFilter filter = new TransportModeNetworkFilter(network);
-			net = NetworkImpl.createNetwork();
+			net = NetworkUtils.createNetwork();
 			HashSet<String> modes = new HashSet<String>();
 			modes.add(TransportMode.car);
 			filter.filter(net, modes);

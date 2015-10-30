@@ -31,10 +31,9 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.PlanRouter;
-import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.FacilitiesReaderMatsimV1;
@@ -54,7 +53,7 @@ public class GenerateDemand {
 
 	private static void generateDemand(Config config) {
 
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 
 		System.out.println("Reading network...");
 		Network networkLayer = scenario.getNetwork();
@@ -81,10 +80,8 @@ public class GenerateDemand {
 		plans.addAlgorithm(
 				new PlanRouter(
 						new TripRouterFactoryBuilderWithDefaults().build(
-								scenario ).instantiateAndConfigureTripRouter(
-										new RoutingContextImpl(
-												timeCostCalc,
-												timeCostCalc ) ) ) );
+								scenario ).get(
+						) ) );
 		System.out.println("Setting up person modules...done.");
 
 		System.out.println("Reading, processing and writing plans...");

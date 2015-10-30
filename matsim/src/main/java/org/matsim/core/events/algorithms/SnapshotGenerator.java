@@ -110,13 +110,13 @@ public class SnapshotGenerator implements PersonDepartureEventHandler, PersonArr
 	@Override
 	public void handleEvent(final LinkEnterEvent event) {
 		testForSnapshot(event.getTime());
-		this.eventLinks.get(event.getLinkId()).enter(getEventAgent(event.getPersonId(), event.getTime()));
+		this.eventLinks.get(event.getLinkId()).enter(getEventAgent(event.getDriverId(), event.getTime()));
 	}
 
 	@Override
 	public void handleEvent(final LinkLeaveEvent event) {
 		testForSnapshot(event.getTime());
-		this.eventLinks.get(event.getLinkId()).leave(getEventAgent(event.getPersonId(), event.getTime()));
+		this.eventLinks.get(event.getLinkId()).leave(getEventAgent(event.getDriverId(), event.getTime()));
 	}
 
 	@Override
@@ -190,16 +190,16 @@ public class SnapshotGenerator implements PersonDepartureEventHandler, PersonArr
 
 	private Collection<AgentSnapshotInfo> getVehiclePositions(final double time) {
 		Collection<AgentSnapshotInfo> positions = new ArrayList<AgentSnapshotInfo>();
-		if ("queue".equals(this.snapshotStyle)) {
+		if (this.snapshotStyle == SnapshotStyle.queue) {
 			for (EventLink link : this.linkList) {
 				link.getVehiclePositionsQueue(positions, time, this.snapshotInfoFactory);
 			}
-		} else if ("equiDist".equals(this.snapshotStyle)) {
+		} else if (this.snapshotStyle == SnapshotStyle.equiDist) {
 			for (EventLink link : this.linkList) {
 				link.getVehiclePositionsEquil(positions, time, this.snapshotInfoFactory);
 			}
 		} else {
-			log.warn("The snapshotStyle \"" + this.snapshotStyle + "\" is not supported.");
+			throw new RuntimeException("The snapshotStyle \"" + this.snapshotStyle + "\" is not supported.");
 		}
 		return positions;
 	}

@@ -54,9 +54,7 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.ModeRouteFactory;
-import org.matsim.core.router.RoutingContext;
-import org.matsim.core.router.RoutingContextImpl;
-import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityFactory;
@@ -749,8 +747,8 @@ public class EvacuationControler extends WithinDayController implements
 		
 		TripRouterFactoryBuilderWithDefaults builder = new TripRouterFactoryBuilderWithDefaults();
 		builder.setLeastCostPathCalculatorFactory(factory);
-		TripRouterFactory delegateFactory = builder.build(this.getScenario());
-		TripRouterFactory tripRouterFactory = new MultimodalTripRouterFactory(this.getScenario(), travelTimes, penaltyCostFactory);
+		javax.inject.Provider<TripRouter> delegateFactory = builder.build(this.getScenario());
+		javax.inject.Provider<TripRouter> tripRouterFactory = new MultimodalTripRouterFactory(this.getScenario(), travelTimes, penaltyCostFactory);
 		
 //		throw new RuntimeException("We have to find a way to set a custom LeastCostPathCalculatorFactory in the TripRouterFactory!");
 //		commented out the subsequent code...
@@ -788,7 +786,7 @@ public class EvacuationControler extends WithinDayController implements
 		this.pickupAgentsReplannerFactory.addIdentifier(this.agentsToPickupIdentifier);
 		this.getWithinDayEngine().addTimedDuringLegReplannerFactory(this.pickupAgentsReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
 		
-		this.duringLegRerouteReplannerFactory = new CurrentLegReplannerFactory(this.getScenario(), this.getWithinDayEngine(), tripRouterFactory, routingContext);
+		this.duringLegRerouteReplannerFactory = new CurrentLegReplannerFactory(this.getScenario(), this.getWithinDayEngine(), tripRouterFactory);
 		this.duringLegRerouteReplannerFactory.addIdentifier(this.duringLegRerouteIdentifier);
 		this.getWithinDayEngine().addTimedDuringLegReplannerFactory(this.duringLegRerouteReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
 		

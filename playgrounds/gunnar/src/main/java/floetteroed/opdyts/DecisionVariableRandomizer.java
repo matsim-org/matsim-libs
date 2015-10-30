@@ -21,28 +21,33 @@
  *
  * contact: gunnar.floetteroed@abe.kth.se
  *
- */ 
+ */
 package floetteroed.opdyts;
+
+import java.util.Collection;
 
 /**
  * Creates random decision variables that are used as "innovations" in an
  * iterative, stochastic optimization process.
  * 
+ * @param U
+ *            the decision variable type
+ * 
  * @author Gunnar Flötteröd
  *
  */
-public interface DecisionVariableRandomizer {
+public interface DecisionVariableRandomizer<U extends DecisionVariable> {
 
 	/**
 	 * @return a completely random decision variable (uniform to the extent
 	 *         possible)
 	 */
-	public DecisionVariable newRandomDecisionVariable();
+	public U newRandomDecisionVariable();
 
 	/**
-	 * @return a random variation of <code>decisionVariable</code>
+	 * @return two random variations of decisionVariable; these are symmetric
+	 *         ("positive and negative") to the extent possible
 	 */
-	public DecisionVariable newRandomVariation(
-			final DecisionVariable decisionVariable);
+	public Collection<U> newRandomVariations(final U decisionVariable);
 
 }

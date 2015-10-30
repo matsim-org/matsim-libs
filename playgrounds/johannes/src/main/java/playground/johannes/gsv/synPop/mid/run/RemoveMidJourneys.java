@@ -19,13 +19,13 @@
 
 package playground.johannes.gsv.synPop.mid.run;
 
+import org.matsim.contrib.common.util.XORShiftRandom;
 import playground.johannes.synpop.data.CommonKeys;
-import playground.johannes.synpop.data.io.XMLHandler;
-import playground.johannes.synpop.data.io.XMLWriter;
-import playground.johannes.socialnetworks.utils.XORShiftRandom;
 import playground.johannes.synpop.data.Episode;
 import playground.johannes.synpop.data.PlainFactory;
 import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.data.io.XMLHandler;
+import playground.johannes.synpop.data.io.XMLWriter;
 import playground.johannes.synpop.source.mid2008.MiDValues;
 
 import java.util.HashSet;

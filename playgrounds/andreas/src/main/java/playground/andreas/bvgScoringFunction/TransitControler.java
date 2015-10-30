@@ -7,7 +7,7 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.PtConstants;
 
@@ -25,7 +25,7 @@ public class TransitControler extends Controler {
 		throw new RuntimeException( Gbl.RUN_MOB_SIM_NO_LONGER_POSSIBLE ) ;
 	}
 	
-	public TransitControler(ScenarioImpl scenario) {
+	public TransitControler(MutableScenario scenario) {
 		super(scenario);
 		// TODO Auto-generated constructor stub
 		throw new RuntimeException( Gbl.RUN_MOB_SIM_NO_LONGER_POSSIBLE ) ;
@@ -97,7 +97,7 @@ public class TransitControler extends Controler {
 		config.planCalcScore().addActivityParams(transitActivityParams);
 		
 		// reading the scenario (based on the config):
-		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.loadScenario(config);
+		MutableScenario sc = (MutableScenario) ScenarioUtils.loadScenario(config);
 		
 		TransitControler tc = new TransitControler(sc);
         tc.setScoringFunctionFactory(new BvgScoringFunctionFactory(sc,  new BvgScoringFunctionConfigGroup(config)));

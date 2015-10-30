@@ -37,7 +37,7 @@ public class LinkEnterEventTest extends MatsimTestCase {
 				Id.create("abcd", Link.class), Id.create("veh", Vehicle.class));
 		final LinkEnterEvent event2 = XmlEventsTester.testWriteReadXml(getOutputDirectory() + "events.xml", event1);
 		assertEquals(event1.getTime(), event2.getTime(), EPSILON);
-		assertEquals(event1.getPersonId(), event2.getPersonId());
+		assertEquals(event1.getDriverId(), event2.getDriverId());
 		assertEquals(event1.getLinkId(), event2.getLinkId());
 		assertEquals(event1.getVehicleId(), event2.getVehicleId());
 	}

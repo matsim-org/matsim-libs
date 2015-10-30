@@ -41,4 +41,6 @@ public interface MiDValues {
     String DECEMBER = "dec";
     String MID_JOUNREYS = "midjourneys";
     String MID_TRIPS = "midtrips";
+    String ABROAD = "abroad";
+    String DOMESTIC = "domestic";
 }

@@ -35,18 +35,18 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.*;
+import org.matsim.contrib.common.gis.CartesianDistanceCalculator;
+import org.matsim.contrib.common.gis.DistanceCalculator;
+import org.matsim.contrib.common.util.ProgressLogger;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.utils.objectattributes.ObjectAttributes;
-import playground.johannes.coopsim.util.MatsimCoordUtils;
+import playground.johannes.coopsim.utils.MatsimCoordUtils;
 import playground.johannes.gsv.zones.KeyMatrix;
 import playground.johannes.gsv.zones.MatrixOperations;
-import playground.johannes.sna.util.ProgressLogger;
-import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
-import playground.johannes.socialnetworks.gis.DistanceCalculator;
 import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.gis.Zone;
 import playground.johannes.synpop.gis.ZoneCollection;
@@ -202,7 +202,7 @@ public class ODCalibrator implements PersonDepartureEventHandler, PersonArrivalE
 				Activity from = (Activity) plan.getPlanElements().get(idx - 1);
 				Activity to = (Activity) plan.getPlanElements().get(idx + 1);
 				
-//				Node startNode = person2Node.remove(event.getPersonId());
+//				Node startNode = person2Node.remove(event.getDriverId());
 //				Node endNode = network.getLinks().get(event.getLinkId()).getToNode();
 
 //				Node vStart = real2virtual.get(startNode);
@@ -241,7 +241,7 @@ public class ODCalibrator implements PersonDepartureEventHandler, PersonArrivalE
 		
 //		if (event.getLegMode().equalsIgnoreCase("car")) {
 //			Node startNode = network.getLinks().get(event.getLinkId()).getFromNode();
-//			person2Node.put(event.getPersonId(), startNode);
+//			person2Node.put(event.getDriverId(), startNode);
 //		}
 	}
 	

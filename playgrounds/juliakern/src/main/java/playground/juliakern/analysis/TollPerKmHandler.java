@@ -69,9 +69,9 @@ public class TollPerKmHandler implements PersonMoneyEventHandler,
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		Id personId = event.getPersonId();
+		Id personId = event.getDriverId();
 //		Id personId = event.getVehicleId();
-		// TODO event.getVehicleId() vs event.getPersonId()
+		// TODO event.getVehicleId() vs event.getDriverId()
 		if(!(personId2linkLeaveEvents.containsKey(personId))){
 			personId2linkLeaveEvents.put(personId, new ArrayList<LinkLeaveEvent>());
 		}
@@ -83,7 +83,7 @@ public class TollPerKmHandler implements PersonMoneyEventHandler,
 	@Override
 	public void handleEvent(PersonMoneyEvent event) {
 		Id personId = event.getPersonId();
-		// TODO event.getVehicleId() vs event.getPersonId()
+		// TODO event.getVehicleId() vs event.getDriverId()
 		if(!(personId2personMoneyEvent.containsKey(personId))){
 			personId2personMoneyEvent.put(personId, new HashSet<PersonMoneyEvent>());
 		}

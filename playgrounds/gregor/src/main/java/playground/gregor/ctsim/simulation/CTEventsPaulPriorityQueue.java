@@ -35,11 +35,12 @@ import java.util.PriorityQueue;
  */
 public class CTEventsPaulPriorityQueue {
 
+
     private static final Logger log = Logger
             .getLogger(CTEventsPaulPriorityQueue.class);
     private final PriorityQueue<CTEvent> pQ = new PriorityQueue<>();
     private final Map<Integer, LinkedList<CTEvent>> largeQ = new HashMap<>();
-    private double dT = 0.0001;
+    private double dT = 0.1;
     private double tLast = 0;
 
     public void add(final CTEvent e) {
@@ -69,6 +70,30 @@ public class CTEventsPaulPriorityQueue {
 
     }
 
+    private void maintain() {
+        int currentIdx = (int) (tLast / dT);
+        currentIdx++;
+        while (pQ.peek() == null && largeQ.size() > 0) {
+            LinkedList<CTEvent> next = largeQ.remove(currentIdx);
+            if (next != null) {
+                this.tLast = next.getFirst().getExecTime();
+                for (CTEvent e : next) {
+                    if (!e.isInvalid()) {
+                        pQ.add(e);
+                    }
+                }
+//                pQ.addAll(next);
+                if (pQ.size() > 0) {
+                    break;
+                }
+            }
+            currentIdx++;
+        }
+
+
+//        log.info("PQ size: " + this.pQ.size());
+    }
+
     public CTEvent poll() {
         CTEvent poll = pQ.poll();
         if (poll != null) {
@@ -78,20 +103,6 @@ public class CTEventsPaulPriorityQueue {
         maintain();
         poll = pQ.poll();
         return poll;
-    }
-
-    private void maintain() {
-        int currentIdx = (int) (tLast / dT);
-        currentIdx++;
-        while (pQ.peek() == null && largeQ.size() > 0) {
-            LinkedList<CTEvent> next = largeQ.remove(currentIdx);
-            if (next != null) {
-                this.tLast = next.getFirst().getExecTime();
-                pQ.addAll(next);
-                break;
-            }
-            currentIdx++;
-        }
     }
 
 }

@@ -18,7 +18,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -39,7 +39,7 @@ public class CalculateAngleTest {
 	@Test 
 	public void testGetLeftLane() {
 		Config conf = utils.loadConfig(utils.getClassInputDirectory() + "config.xml");
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(conf);
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(conf);
 		new MatsimNetworkReader(scenario).readFile(conf.network().getInputFile());
 
 		Assert.assertEquals("Has to be 'null', since there is no other way back but Link 11.",

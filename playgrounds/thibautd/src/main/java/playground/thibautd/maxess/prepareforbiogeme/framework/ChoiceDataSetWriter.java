@@ -48,7 +48,6 @@ public class ChoiceDataSetWriter<T> implements AutoCloseable {
 
 	private void writeLine(final Collection<?> v) {
 		try {
-			counter.incCounter();
 			int i=0;
 			for ( Object o : v ) {
 				writer.write( o+(i++ < v.size() ? "\t" : "") );
@@ -66,6 +65,7 @@ public class ChoiceDataSetWriter<T> implements AutoCloseable {
 			header = fields.keySet();
 			writeLine(header);
 		}
+		counter.incCounter();
 		writeLine( fields.values() );
 	}
 

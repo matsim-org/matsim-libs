@@ -38,7 +38,7 @@ import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.api.experimental.events.handler.AgentWaitingForPtEventHandler;
 import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityEventHandler;
 import org.matsim.core.api.experimental.events.handler.VehicleDepartsAtFacilityEventHandler;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.vehicles.Vehicle;
 
 import java.util.*;
@@ -76,7 +76,7 @@ public class TransferDelayWaitingHandler implements PersonEntersVehicleEventHand
 	private final double doorClosingTime = 1.0;
 	private final Map<Id<Vehicle>, List<Id<Person>>> vehId2agentsTransferingAtThisStop = new HashMap<>();
 	
-	private final ScenarioImpl scenario;
+	private final MutableScenario scenario;
 	private final EventsManager events;
 	private final List<Id<Person>> ptDriverIDs = new ArrayList<>();
 	private final List<Id<Vehicle>> ptVehicleIDs = new ArrayList<>();
@@ -89,7 +89,7 @@ public class TransferDelayWaitingHandler implements PersonEntersVehicleEventHand
 	private final Map<Id<Vehicle>, Double> vehicleId2delay = new HashMap<>();
 	private final Map<Id<Vehicle>, Boolean> vehicleId2isFirstTransfer = new HashMap<>();
 
-	public TransferDelayWaitingHandler(EventsManager events, ScenarioImpl scenario) {
+	public TransferDelayWaitingHandler(EventsManager events, MutableScenario scenario) {
 		this.events = events;
 		this.scenario = scenario;
 	}
@@ -138,12 +138,12 @@ public class TransferDelayWaitingHandler implements PersonEntersVehicleEventHand
 			}
 			
 			
-//			double waitingTime = event.getTime() - this.personId2startWaitingForPt.get(event.getPersonId()) - 1.0; // TODO!
+//			double waitingTime = event.getTime() - this.personId2startWaitingForPt.get(event.getDriverId()) - 1.0; // TODO!
 			
 			double waitingTime = event.getTime() - this.personId2startWaitingForPt.get(event.getPersonId());
 			double vehicleDelay = this.vehicleId2delay.get(event.getVehicleId());
 			
-//			System.out.println("++++ AgentId: " + event.getPersonId());
+//			System.out.println("++++ AgentId: " + event.getDriverId());
 //			System.out.println("WaitingTime: " + waitingTime);
 //			System.out.println("VehicleDelay: " + vehicleDelay);
 			
@@ -157,7 +157,7 @@ public class TransferDelayWaitingHandler implements PersonEntersVehicleEventHand
 				// calculate the affectedAgentUnits
 				affectedAgentUnits = waitingTime / vehicleDelay;
 				
-//				System.out.println("++++ AgentId: " + event.getPersonId());
+//				System.out.println("++++ AgentId: " + event.getDriverId());
 //				System.out.println("WaitingTime: " + waitingTime);
 //				System.out.println("VehicleDelay: " + vehicleDelay);
 //				System.out.println("affectedAgentUnits: " + affectedAgentUnits);

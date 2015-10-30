@@ -25,7 +25,7 @@ import org.junit.Test;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.testcases.MatsimTestUtils;
 
 public class TransitIntegrationTest {
@@ -43,7 +43,7 @@ public class TransitIntegrationTest {
 		controler.getConfig().controler().setCreateGraphs(false);
         controler.run();
 
-		ScenarioImpl s = (ScenarioImpl) controler.getScenario();
+		MutableScenario s = (MutableScenario) controler.getScenario();
 		Assert.assertNotNull(s.getTransitSchedule());
 		Assert.assertEquals(4, s.getTransitSchedule().getFacilities().size());
 		Assert.assertEquals(1, s.getTransitSchedule().getTransitLines().size());

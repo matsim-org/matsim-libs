@@ -55,7 +55,7 @@
 //	void calculateCongestion(LinkLeaveEvent event, DelayInfo delayInfo) {
 //		
 //		LinkCongestionInfo linkInfo = this.getLinkId2congestionInfo().get(event.getLinkId());
-//		double delay = event.getTime() - linkInfo.getPersonId2freeSpeedLeaveTime().get(event.getPersonId());
+//		double delay = event.getTime() - linkInfo.getPersonId2freeSpeedLeaveTime().get(event.getDriverId());
 //		
 //		if(delay==0) return;
 //		
@@ -72,7 +72,7 @@
 //			 * Map containing freeSpeedLeaveTime is cleared beforehand.
 //			 */
 //			
-//			causingLink = getDownstreamLinkInRoute(event.getPersonId());
+//			causingLink = getDownstreamLinkInRoute(event.getDriverId());
 //			// last entered person on this causing link is causing agent.
 //			List<Id<Person>> personsEnteredOnCausingLink = new ArrayList<Id<Person>>(this.getLinkId2congestionInfo().get(causingLink).getPersonId2linkEnterTime().keySet());
 //			causingAgent = personsEnteredOnCausingLink.get(personsEnteredOnCausingLink.size()-1); 
@@ -82,7 +82,7 @@
 //					this.addToDelayNotInternalized_roundingErrors(delay);
 //					return;
 //				}else {
-//					throw new RuntimeException("Delay for person "+event.getPersonId()+" is "+ delay+" sec. But causing agent could not be located. This happened during event "+event.toString()+" Aborting...");
+//					throw new RuntimeException("Delay for person "+event.getDriverId()+" is "+ delay+" sec. But causing agent could not be located. This happened during event "+event.toString()+" Aborting...");
 //				}
 //			}
 //			
@@ -90,12 +90,12 @@
 //			
 //		} else {
 //			causingLink = event.getLinkId();
-//			causingAgent = linkInfo.getLastLeaveEvent().getPersonId() ;
+//			causingAgent = linkInfo.getLastLeaveEvent().getDriverId() ;
 //			congestionType = "flowCapacity";
 //		}
 //		
 //		CongestionEvent congestionEvent = new CongestionEvent(event.getTime(), congestionType, causingAgent, 
-//				event.getPersonId(), delay, causingLink, this.getLinkId2congestionInfo().get(causingLink).getPersonId2linkEnterTime().get(causingAgent));
+//				event.getDriverId(), delay, causingLink, this.getLinkId2congestionInfo().get(causingLink).getPersonId2linkEnterTime().get(causingAgent));
 //		this.getEventsManager().processEvent(congestionEvent);
 //		this.addToTotalInternalizedDelay(delay);
 //		
@@ -110,7 +110,7 @@
 //		
 //		// first check if agent will be delayed because of flowCapacity
 //		double freeSpeedLeaveTimeOfLastLeftAgent = linkInfo.getPersonId2freeSpeedLeaveTime().get(linkInfo.getLastLeaveEvent());
-//		double freeSpeedLeaveTimeOfNowAgent = linkInfo.getPersonId2freeSpeedLeaveTime().get(event.getPersonId());
+//		double freeSpeedLeaveTimeOfNowAgent = linkInfo.getPersonId2freeSpeedLeaveTime().get(event.getDriverId());
 //		
 //		double timeHeadway = freeSpeedLeaveTimeOfNowAgent -  freeSpeedLeaveTimeOfLastLeftAgent;
 //		double minTimeHeadway = linkInfo.getMarginalDelayPerLeavingVehicle_sec();

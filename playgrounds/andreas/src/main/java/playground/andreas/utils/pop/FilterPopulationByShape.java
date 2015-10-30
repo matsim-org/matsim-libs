@@ -139,7 +139,7 @@ public class FilterPopulationByShape implements LinkEnterEventHandler, PersonEnt
 		
 		if (this.vehId2AgentIdsMap.get(event.getVehicleId()) == null) {
 			// it's a private car
-			this.agentsToKeep.add(event.getPersonId());
+			this.agentsToKeep.add(event.getDriverId());
 		} else {
 			// it's a public transport
 			this.agentsToKeep.addAll(this.vehId2AgentIdsMap.get(event.getVehicleId()));

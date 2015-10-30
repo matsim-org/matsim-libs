@@ -38,7 +38,7 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.NetworkCalcTopoType;
 import org.matsim.lanes.data.v20.Lane;
-import org.matsim.lanes.data.v20.LaneDefinitions20;
+import org.matsim.lanes.data.v20.Lanes;
 import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalData;
@@ -89,7 +89,7 @@ public class NetworkLanesSignalsSimplifier {
 		return id;
 	}
 	
-	public void simplifyNetworkLanesAndSignals(final Network network, LaneDefinitions20 lanes,
+	public void simplifyNetworkLanesAndSignals(final Network network, Lanes lanes,
 			SignalsData signalsData) {
 				
 		if (this.nodeTopoToMerge.size() == 0) {

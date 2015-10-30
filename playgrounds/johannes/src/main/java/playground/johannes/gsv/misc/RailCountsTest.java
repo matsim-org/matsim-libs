@@ -28,7 +28,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
-
 import playground.johannes.gsv.analysis.RailCounts;
 import playground.johannes.gsv.analysis.TransitLineAttributes;
 

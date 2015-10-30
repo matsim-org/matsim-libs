@@ -98,8 +98,8 @@ public class TelAvivRunner {
 		controler.addControlerListener(new DestinationChoiceInitializer(dcContext));
 		
 		DestinationChoiceConfigGroup lcConfigGroup = (DestinationChoiceConfigGroup) config.getModule("locationchoice");
-		double restraintFcnExp = Double.parseDouble(lcConfigGroup.getRestraintFcnExp());
-		double restraintFcnFactor = Double.parseDouble(lcConfigGroup.getRestraintFcnFactor());
+		double restraintFcnExp = lcConfigGroup.getRestraintFcnExp();
+		double restraintFcnFactor = lcConfigGroup.getRestraintFcnFactor();
 		if (restraintFcnExp > 0.0 && restraintFcnFactor > 0.0) {		
 			controler.addControlerListener(new FacilitiesLoadCalculator(dcContext.getFacilityPenalties()));
 		}

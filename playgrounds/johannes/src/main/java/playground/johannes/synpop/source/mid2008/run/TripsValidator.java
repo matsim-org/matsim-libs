@@ -20,7 +20,8 @@
 package playground.johannes.synpop.source.mid2008.run;
 
 import org.apache.log4j.Logger;
-import playground.johannes.coopsim.LoggerUtils;
+import org.matsim.contrib.common.util.LoggerUtils;
+import playground.johannes.gsv.popsim.FilterLegDistance;
 import playground.johannes.synpop.data.Episode;
 import playground.johannes.synpop.data.Factory;
 import playground.johannes.synpop.data.Person;
@@ -45,6 +46,8 @@ public class TripsValidator {
     public static final void main(String args[]) {
         Factory factory = new PlainFactory();
         Set<? extends Person> persons = PopulationIO.loadFromXML(args[0], factory);
+
+        TaskRunner.validateEpisodes(new FilterLegDistance(), persons);
 
         TaskRunner.run(new SortLegsTask(MiDKeys.LEG_INDEX, new SortLegsTask.IntComparator()), persons);
         TaskRunner.validateEpisodes(new ValidateMissingLegTimes(), persons);

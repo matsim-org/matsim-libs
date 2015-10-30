@@ -52,7 +52,7 @@ import org.matsim.vehicles.VehicleReaderV1;
  * <li> Given what we have now, does it make sense to leave this class public?  yy kai, mar'11
  * </ul>
  *
- * @see org.matsim.core.scenario.ScenarioImpl
+ * @see org.matsim.core.scenario.MutableScenario
  *
  * @author dgrether
  */
@@ -76,15 +76,15 @@ public class ScenarioLoaderImpl {
 
 	private final Config config;
 
-	private final ScenarioImpl scenario;
+	private final MutableScenario scenario;
 
 	private ScenarioLoaderImpl(Config config) {
 		this.config = config;
-		this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(this.config);
+		this.scenario = (MutableScenario) ScenarioUtils.createScenario(this.config);
 	}
 
 	private ScenarioLoaderImpl(Scenario scenario) {
-		this.scenario = (ScenarioImpl) scenario;
+		this.scenario = (MutableScenario) scenario;
 		this.config = this.scenario.getConfig();
 	}
 

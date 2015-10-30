@@ -22,6 +22,7 @@ import playground.balac.freefloating.config.FreeFloatingConfigGroup;
 import playground.balac.freefloating.controler.listener.FFListener;
 import playground.balac.freefloating.qsimParkingModule.FreeFloatingQsimFactory;
 import playground.balac.freefloating.routerparkingmodule.FreeFloatingRoutingModule;
+import playground.ivt.analysis.scoretracking.ScoreTrackingModule;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -40,7 +41,6 @@ public static void main(final String[] args) throws IOException {
 		
 		final Controler controler = new Controler( sc );
 					
-		final ParkingModuleWithFFCarSharingZH parkingModule;
 		
 		final FreeFloatingConfigGroup configGroupff = (FreeFloatingConfigGroup)
 				sc.getConfig().getModule( FreeFloatingConfigGroup.GROUP_NAME );
@@ -76,16 +76,20 @@ public static void main(final String[] args) throws IOException {
 				      sc.getNetwork(), sc);
 		    controler.setScoringFunctionFactory(ffScoringFunctionFactory); */
 
-		    parkingModule = new ParkingModuleWithFFCarSharingZH(controler, freefloatingCars);
+		    controler.addOverridingModule( new ScoreTrackingModule() );
+		  
+		    final ParkingModuleWithFFCarSharingZH parkingModule = new ParkingModuleWithFFCarSharingZH(controler, freefloatingCars);
+		    controler.addOverridingModule(
+		    		new AbstractModule() {
 
-			controler.addOverridingModule(new AbstractModule() {
-				@Override
-				public void install() {
-					bindMobsim().toProvider(new Provider<Mobsim>() {
 						@Override
-						public Mobsim get() {
-							return new FreeFloatingQsimFactory(sc, controler,
-									parkingModule, freefloatingCars).createMobsim(controler.getScenario(), controler.getEvents());
+						public void install() {
+		
+							bindMobsim().toProvider(new Provider<Mobsim>() {
+								@Override
+								public Mobsim get() {
+									return new FreeFloatingQsimFactory(sc, controler,
+											parkingModule, freefloatingCars).createMobsim(controler.getScenario(), controler.getEvents());
 						}
 					});
 				}
@@ -93,16 +97,16 @@ public static void main(final String[] args) throws IOException {
 		}
 		
 		controler.setTripRouterFactory(
-				new TripRouterFactory() {
+				new javax.inject.Provider<org.matsim.core.router.TripRouter>() {
 					@Override
-					public TripRouter instantiateAndConfigureTripRouter(RoutingContext routingContext) {
+					public TripRouter get() {
 						// this factory initializes a TripRouter with default modules,
 						// taking into account what is asked for in the config
 					
 						// This allows us to just add our module and go.
-						final TripRouterFactory delegate = DefaultTripRouterFactoryImpl.createRichTripRouterFactoryImpl(controler.getScenario());
+						final javax.inject.Provider<TripRouter> delegate = TripRouterFactoryBuilderWithDefaults.createDefaultTripRouterFactoryImpl(controler.getScenario());
 
-						final TripRouter router = delegate.instantiateAndConfigureTripRouter(routingContext);
+						final TripRouter router = delegate.get();
 						
 						// add our module to the instance
 						router.setRoutingModule(

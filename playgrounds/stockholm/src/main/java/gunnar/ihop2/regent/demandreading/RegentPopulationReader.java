@@ -1,8 +1,5 @@
 package gunnar.ihop2.regent.demandreading;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import org.matsim.utils.objectattributes.ObjectAttributeUtils2;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
@@ -29,9 +26,9 @@ public class RegentPopulationReader {
 
 	public static final String OTHERTOURMODE_ATTRIBUTE = "othertourmode";
 
-	public static final String CAR_ATTRIBUTEVALUE = "car";
+	public static final String CAR_ATTRIBUTEVALUE = "Car";
 
-	public static final String PT_ATTRIBUTEVALUE = "pt";
+	public static final String PT_ATTRIBUTEVALUE = "PublicTransport";
 
 	// MEMBERS
 
@@ -39,7 +36,7 @@ public class RegentPopulationReader {
 
 	// final Map<String, RegentPerson> id2person;
 
-	final Map<String, Zone> id2usedZone;
+	// final Map<String, Zone> id2usedZone;
 
 	// CONSTRUCTION
 
@@ -59,7 +56,7 @@ public class RegentPopulationReader {
 		// final Set<String> workTourModes = new LinkedHashSet<String>();
 
 		// this.id2person = new LinkedHashMap<String, RegentPerson>();
-		this.id2usedZone = new LinkedHashMap<String, Zone>();
+		// this.id2usedZone = new LinkedHashMap<String, Zone>();
 		for (String personId : ObjectAttributeUtils2
 				.allObjectKeys(personAttributes)) {
 
@@ -92,8 +89,9 @@ public class RegentPopulationReader {
 			// }
 
 			// this.id2person.put(personId, person);
-			this.id2usedZone.put(homeZone, zonalSystem.getZone(homeZone));
-			this.id2usedZone.put(workZone, zonalSystem.getZone(workZone));
+
+			// this.id2usedZone.put(homeZone, zonalSystem.getZone(homeZone));
+			// this.id2usedZone.put(workZone, zonalSystem.getZone(workZone));
 		}
 
 		// System.out.println("COMPLETE PERSONS: " + complete);

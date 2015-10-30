@@ -50,10 +50,10 @@ public class CordonOutflowCollector implements PersonArrivalEventHandler,
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
 		if (linksInsideCordon.contains(event.getLinkId())) {
-			agentsInCordon.add(event.getPersonId());
+			agentsInCordon.add(event.getDriverId());
 		} else {
-			if (agentsInCordon.contains(event.getPersonId())) {
-				agentsInCordon.remove(event.getPersonId());
+			if (agentsInCordon.contains(event.getDriverId())) {
+				agentsInCordon.remove(event.getDriverId());
 				increaseBinCount(event.getTime());
 			}
 		}

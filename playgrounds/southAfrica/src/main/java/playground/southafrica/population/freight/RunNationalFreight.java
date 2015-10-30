@@ -49,7 +49,7 @@ import org.matsim.core.replanning.PlanStrategyImpl.Builder;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.replanning.selectors.GenericPlanSelector;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
@@ -172,7 +172,7 @@ public class RunNationalFreight {
 		LOG.warn("Done adding 'commercial' modes. This must be fixed in ConvertOsmToMatsim");
 		
 		/* Set the population as "subpopulation", and create a vehicle for each. */
-		Vehicles vehicles = ((ScenarioImpl)sc).getVehicles();
+		Vehicles vehicles = ((MutableScenario)sc).getVehicles();
 		VehicleType truckType = new VehicleTypeImpl(Id.create("commercial", VehicleType.class));
 		truckType.setMaximumVelocity(100./3.6);
 		truckType.setLength(18.);
@@ -203,7 +203,7 @@ public class RunNationalFreight {
 			@Override
 			public void install() {
 				addPlanStrategyBinding("newPlan").toProvider(newPlanStrategyFactory);
-				addTravelTimeBinding("commercial").to(carTravelTimeKey());
+				addTravelTimeBinding("commercial").to(networkTravelTime());
 				addTravelDisutilityFactoryBinding("commercial").to(carTravelDisutilityFactoryKey());
 			}
 		});

@@ -19,14 +19,13 @@
 
 package playground.johannes.coopsim.analysis;
 
+import org.matsim.api.core.v01.population.Leg;
+import playground.johannes.coopsim.pysical.Trajectory;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-
-import org.matsim.api.core.v01.population.Leg;
-
-import playground.johannes.coopsim.pysical.Trajectory;
 
 /**
  * @author johannes

@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.emissions.types.WarmPollutant;
 import org.matsim.contrib.emissions.utils.EmissionUtils;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.analysis.emission.EmissionCostFactors;
@@ -61,8 +61,8 @@ public class EmissionsPerPersonPerUserGroup {
 	}
 
 	public static void main(String[] args) {
-		String outputDir = "../../../repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run10/policies/backcasting/";
-		String [] runCases =  {"5ei","10ei","15ei","20ei","25ei"};
+		String outputDir = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/otherRuns/output/1pct/run10/policies/backcasting/exposure/";
+		String [] runCases =  {"ExI","5ExI","10ExI","15ExI","20ExI","25ExI"};
 		
 		EmissionsPerPersonPerUserGroup eppa = new EmissionsPerPersonPerUserGroup(outputDir);
 		eppa.run(runCases);
@@ -91,7 +91,7 @@ public class EmissionsPerPersonPerUserGroup {
 			
 			String emissionEventFile = this.outputDir+runCase+"/ITERS/it."+this.lastIteration+"/"+this.lastIteration+".emission.events.xml.gz";//"/events.xml";//
 			EmissionsAnalyzer ema = new EmissionsAnalyzer(emissionEventFile);
-			ema.init((ScenarioImpl) this.scenario);
+			ema.init((MutableScenario) this.scenario);
 			ema.preProcessData();
 			ema.postProcessData();
 

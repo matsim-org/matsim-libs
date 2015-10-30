@@ -153,7 +153,7 @@ public class ActivityIntervalTracker_NonParallelizableHandler implements Activit
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		Id personId = event.getPersonId();
+		Id personId = event.getDriverId();
 
 		
 
@@ -168,9 +168,9 @@ public class ActivityIntervalTracker_NonParallelizableHandler implements Activit
 			} else if (isChargingPossible(activityStartEvent)) {
 				chargeVehicle(personId, departureTime);
 			}
-			stillBeforeFristEnterLinkEvent.put(event.getPersonId(), false);
+			stillBeforeFristEnterLinkEvent.put(event.getDriverId(), false);
 
-			mostRecentLegMode.put(event.getPersonId(), "car");
+			mostRecentLegMode.put(event.getDriverId(), "car");
 		}
 	}
 

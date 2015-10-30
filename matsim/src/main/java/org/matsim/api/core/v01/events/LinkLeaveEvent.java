@@ -27,14 +27,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.vehicles.Vehicle;
 
-/**
- * Design considerations: <ul>
- * <li> This class deliberately does <i>not</i> implement HasPersonId.  One reason is that it does not really
- * belong at this level (since it is the vehicle that enters/leaves links); another reason is that this would
- * make an "instanceof HasPersonId" considerably more expensive. kai/dg, dec'12
- * </ul> 
- *
- */
 public class LinkLeaveEvent extends Event {
 
 	public static final String EVENT_TYPE = "left link";
@@ -42,13 +34,13 @@ public class LinkLeaveEvent extends Event {
 	public static final String ATTRIBUTE_LINK = "link";
 	public static final String ATTRIBUTE_VEHICLE = "vehicle";
 	
-	private final Id<Person> personId;
+	private final Id<Person> driverId;
 	private final Id<Link> linkId;
 	private final Id<Vehicle> vehicleId;
 
-	public LinkLeaveEvent(final double time, final Id<Person> agentId, final Id<Link> linkId, Id<Vehicle> vehicleId) {
+	public LinkLeaveEvent(final double time, final Id<Person> driverId, final Id<Link> linkId, Id<Vehicle> vehicleId) {
 		super(time);
-		this.personId = agentId;
+		this.driverId = driverId;
 		this.linkId = linkId;
 		this.vehicleId = vehicleId;
 	}
@@ -58,9 +50,8 @@ public class LinkLeaveEvent extends Event {
 		return EVENT_TYPE;
 	}
 
-	@Deprecated
-	public Id<Person> getPersonId() {
-		return this.personId;
+	public Id<Person> getDriverId() {
+		return this.driverId;
 	}
 
 	public Id<Link> getLinkId() {
@@ -74,7 +65,7 @@ public class LinkLeaveEvent extends Event {
 	@Override
 	public Map<String, String> getAttributes() {
 		Map<String, String> attr = super.getAttributes();
-		attr.put(ATTRIBUTE_PERSON, this.personId.toString());
+		attr.put(ATTRIBUTE_PERSON, this.driverId.toString());
 		attr.put(ATTRIBUTE_LINK, this.linkId.toString());
 		if (this.vehicleId != null) {
 			attr.put(ATTRIBUTE_VEHICLE, this.vehicleId.toString());
