@@ -1,4 +1,4 @@
-package playground.dhosse.gap.scenario.population;
+package playground.dhosse.gap.scenario.population.utils;
 
 import java.util.HashMap;
 import java.util.Map;

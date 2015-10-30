@@ -14,8 +14,8 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 
 import playground.dhosse.gap.Global;
-import playground.dhosse.gap.scenario.population.EgapPopulationUtils;
-import playground.dhosse.gap.scenario.population.EgapPopulationUtilsV2;
+import playground.dhosse.gap.scenario.population.utils.EgapPopulationUtils;
+import playground.dhosse.gap.scenario.population.utils.EgapPopulationUtilsV2;
 import playground.dhosse.utils.EgapHashGenerator;
 
 public class MiDCSVReader {

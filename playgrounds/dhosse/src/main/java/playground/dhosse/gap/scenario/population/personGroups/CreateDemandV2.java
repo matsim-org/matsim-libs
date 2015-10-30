@@ -34,11 +34,11 @@ import playground.dhosse.gap.scenario.GAPScenarioBuilder;
 import playground.dhosse.gap.scenario.mid.MiDPersonGroupTemplates;
 import playground.dhosse.gap.scenario.mid.MiDTravelChain;
 import playground.dhosse.gap.scenario.mid.MiDTravelChain.MiDTravelStage;
-import playground.dhosse.gap.scenario.population.EgapPopulationUtils;
-import playground.dhosse.gap.scenario.population.LegModeCreator;
-import playground.dhosse.gap.scenario.population.PlanCreationUtils;
 import playground.dhosse.gap.scenario.population.PlansCreatorV2;
 import playground.dhosse.gap.scenario.population.io.CommuterDataElement;
+import playground.dhosse.gap.scenario.population.utils.EgapPopulationUtils;
+import playground.dhosse.gap.scenario.population.utils.LegModeCreator;
+import playground.dhosse.gap.scenario.population.utils.PlanCreationUtils;
 import playground.dhosse.utils.EgapHashGenerator;
 
 public class CreateDemandV2 {
@@ -391,7 +391,7 @@ public class CreateDemandV2 {
 				
 			}
 			
-			double timeShift = PlansCreatorV2.createRandomTimeShift(2);
+			double timeShift = PlansCreatorV2.createRandomTimeShift(1);
 			
 			Person person = factory.createPerson(Id.createPersonId(munId + "_" + EgapHashGenerator.generateAgeGroupHash(a0, aX) + "_" + i));
 			Plan plan = factory.createPlan();
@@ -496,7 +496,11 @@ public class CreateDemandV2 {
 				
 				currentAct.setEndTime(currentTime + timeShift);
 				if(currentAct.getEndTime() - currentAct.getStartTime() < 1800){
-					currentAct.setEndTime(currentAct.getStartTime() + 1800);
+					if(currentAct.getStartTime() == 0){
+						currentAct.setEndTime(currentAct.getStartTime() + Global.random.nextInt(3601));
+					} else{
+						currentAct.setEndTime(currentAct.getStartTime() + 1800);
+					}
 				}
 				currentTime = currentAct.getEndTime();
 				
@@ -513,10 +517,10 @@ public class CreateDemandV2 {
 				Leg leg = factory.createLeg(legMode);
 				leg.setDepartureTime(currentTime);
 				
-				double d = 1000*stage.getDistance()/1.3;//PlanCreationUtils.getTravelDistanceForMode(legMode);
-				if(d > NinetyPctDistances.get(legMode)/1.3){
-					d = NinetyPctDistances.get(legMode)/1.3;
-				}
+				double d = 1000*stage.getDistance();//PlanCreationUtils.getTravelDistanceForMode(legMode);
+//				if(d > NinetyPctDistances.get(legMode)/1.3){
+//					d = NinetyPctDistances.get(legMode)/1.3;
+//				}
 				
 				Coord c = null;
 				
@@ -535,6 +539,8 @@ public class CreateDemandV2 {
 					toId = munId;
 					
 				} else{
+					
+//					c = getActivityLocation(toId, nextActType);
 					
 					List<ActivityFacility> facilities = new ArrayList<>();
 					List<ActivityFacility> facilitiesInRange = new ArrayList<>();
@@ -586,6 +592,8 @@ public class CreateDemandV2 {
 						c = facilitiesInRange.get(randomIndex).getCoord();
 						
 					} else{
+					
+//					if(c == null){
 						
 						if(nextActType.equals(Global.ActType.education.name())){
 							
@@ -608,7 +616,7 @@ public class CreateDemandV2 {
 							c = GAPScenarioBuilder.getOtherQT().getClosest(currentAct.getCoord().getX(), currentAct.getCoord().getY()).getCoord();
 							
 						}
-							
+						
 					}
 					
 				}
@@ -1071,7 +1079,7 @@ public class CreateDemandV2 {
 				
 			}
 			
-			double timeShift = PlansCreatorV2.createRandomTimeShift(2);
+			double timeShift = PlansCreatorV2.createRandomTimeShift(1);
 			
 			Person person = factory.createPerson(Id.createPersonId(munId + "_" + workId + "_" + EgapHashGenerator.generateAgeGroupHash(a0, aX) + "_" + i));
 			Plan plan = factory.createPlan();
@@ -1185,8 +1193,12 @@ public class CreateDemandV2 {
 				
 				currentAct.setEndTime(departure + timeShift);
 				if(currentAct.getEndTime() - currentAct.getStartTime() < 1800){
-					currentAct.setEndTime(currentAct.getStartTime() + 1800);
-				}
+					if(currentAct.getStartTime() == 0){
+						currentAct.setEndTime(currentAct.getStartTime() + Global.random.nextInt(3601));
+					} else{
+						currentAct.setEndTime(currentAct.getStartTime() + 1800);
+					}
+				}	
 				currentTime = currentAct.getEndTime();
 				
 				if(currentAct.getEndTime() > 24*3600 || currentAct.getEndTime() < currentAct.getStartTime()){
@@ -1202,10 +1214,10 @@ public class CreateDemandV2 {
 				Leg leg = factory.createLeg(legMode);
 				leg.setDepartureTime(currentTime);
 				
-				double d = 1000 * stage.getDistance()/1.3;
-				if(d > NinetyPctDistances.get(legMode)/1.3){
-					d = NinetyPctDistances.get(legMode)/1.3;
-				}
+				double d = 1000 * stage.getDistance();
+//				if(d > NinetyPctDistances.get(legMode)/1.3){
+//					d = NinetyPctDistances.get(legMode)/1.3;
+//				}
 				
 				Coord c = null;
 				
@@ -1231,7 +1243,10 @@ public class CreateDemandV2 {
 					c = workCoord;
 					toId = workId;
 					
-				} else{
+				}
+				else{
+					
+//					c = getActivityLocation(toId, nextActType);
 					
 					List<ActivityFacility> facilities = new ArrayList<>();
 					List<ActivityFacility> facilitiesInRange = new ArrayList<>();
@@ -1281,6 +1296,8 @@ public class CreateDemandV2 {
 						c = facilitiesInRange.get(randomIndex).getCoord();
 						
 					} else{
+					
+//					if(c == null){
 						
 						if(nextActType.equals(Global.ActType.education.name())){
 							
@@ -1304,10 +1321,6 @@ public class CreateDemandV2 {
 							
 						}
 						
-//						Geometry g = GAPScenarioBuilder.getMunId2Geometry().get(toId);
-//						
-//						c = Global.gk4ToUTM32N.transform(PlanCreationUtils.shoot(g));
-							
 					}
 					
 				}
@@ -1393,31 +1406,6 @@ public class CreateDemandV2 {
 		
 	}
 	
-	private static Coord checkQuadTreesForFacilityCoords(String nextActType, Coord coord){
-		
-		Coord c = null;
-		
-		if(nextActType.equals(Global.ActType.leisure.name())){
-			
-			c = GAPScenarioBuilder.getLeisureQT().getClosest(coord.getX(), coord.getY()).getCoord();
-			
-		} else if(nextActType.equals(Global.ActType.shop.name())){
-			
-			c = GAPScenarioBuilder.getShopQT().getClosest(coord.getX(), coord.getY()).getCoord();
-			
-		} else if(nextActType.equals(Global.ActType.education.name())){
-			
-			c = GAPScenarioBuilder.getEducationQT().getClosest(coord.getX(), coord.getY()).getCoord();
-			
-		}
-//		else if(nextActType.equals(Global.ActType.work.name())){
-//			c = GAPScenarioBuilder.getWorkLocations().get(coord.getX(), coord.getY()).getCoord();
-//		}
-		
-		return c;
-		
-	}
-
 	public static Map<String,Double> getNinetyPctDistances() {
 		return NinetyPctDistances;
 	}
@@ -1464,6 +1452,67 @@ public class CreateDemandV2 {
 		
 		//if the above shouldn't work, return a random facility coord
 		return workFacilities.get(Global.random.nextInt(workFacilities.size())).getCoord();
+		
+	}
+	
+	private static Coord getActivityLocation(String munId, String actType){
+		
+		List<ActivityFacility> facilities = null;
+		
+		if(actType.equals(Global.ActType.education.name())){
+			
+			facilities = GAPScenarioBuilder.getMunId2EducationFacilities().get(munId);
+			
+		} else if(actType.equals(Global.ActType.leisure.name())){
+			
+			facilities = GAPScenarioBuilder.getMunId2LeisureFacilities().get(munId);
+			
+		} else if(actType.equals(Global.ActType.other.name())){
+			
+			facilities = GAPScenarioBuilder.getMunId2OtherFacilities().get(munId);
+			
+		} else if(actType.equals(Global.ActType.shop.name())){
+			
+			facilities = GAPScenarioBuilder.getMunId2ShopFacilities().get(munId);
+			
+		} else if(actType.equals(Global.ActType.work.name())){
+			
+			return chooseWorkLocation(munId);
+			
+		}
+		
+		if(facilities == null){
+			
+			Coord coord = PlanCreationUtils.shoot(GAPScenarioBuilder.getMunId2Geometry().get(munId));
+			return Global.gk4ToUTM32N.transform(PlanCreationUtils.shoot(GAPScenarioBuilder.getBuiltAreaQT().getClosest(coord.getX(), coord.getY())));
+			
+		}
+		
+		double accumulatedWeight = 0.;
+		double random = Global.random.nextDouble();
+		double weight = 0.;
+		
+		for(ActivityFacility facility : facilities){
+			
+			accumulatedWeight += facility.getActivityOptions().get(actType).getCapacity();
+			
+		}
+		
+		random *= accumulatedWeight;
+		
+		for(ActivityFacility facility : facilities){
+			
+			weight += facility.getActivityOptions().get(actType).getCapacity();
+			
+			if(weight <= random){
+				
+				return facility.getCoord();
+				
+			}
+			
+		}
+		
+		return null;
 		
 	}
 	

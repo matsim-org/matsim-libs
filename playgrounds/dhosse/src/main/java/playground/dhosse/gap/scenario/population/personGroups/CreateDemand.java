@@ -36,11 +36,11 @@ import playground.dhosse.gap.scenario.GAPScenarioBuilder;
 import playground.dhosse.gap.scenario.mid.MiDPersonGroupTemplates;
 import playground.dhosse.gap.scenario.mid.MiDTravelChain;
 import playground.dhosse.gap.scenario.mid.MiDTravelChain.MiDTravelStage;
-import playground.dhosse.gap.scenario.population.EgapPopulationUtils;
-import playground.dhosse.gap.scenario.population.LegModeCreator;
-import playground.dhosse.gap.scenario.population.PlanCreationUtils;
 import playground.dhosse.gap.scenario.population.PlansCreatorV2;
 import playground.dhosse.gap.scenario.population.io.CommuterDataElement;
+import playground.dhosse.gap.scenario.population.utils.EgapPopulationUtils;
+import playground.dhosse.gap.scenario.population.utils.LegModeCreator;
+import playground.dhosse.gap.scenario.population.utils.PlanCreationUtils;
 import playground.dhosse.utils.EgapHashGenerator;
 
 import com.vividsolutions.jts.geom.Geometry;
