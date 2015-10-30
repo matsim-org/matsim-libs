@@ -313,14 +313,16 @@ public class ChoiceSet {
 		Plan planTmp = null;
 
 		// In case we try to re-use a single copy of the plan: create the copy here and re-use it within the loop.
-		if (this.reUsePlans) planTmp = PlanUtils.createCopy(plan);			
+		if (this.reUsePlans) planTmp = PlanUtils.createCopy(plan);
 				
 		for (Id<ActivityFacility> destinationId : this.destinations) {
 			// tentatively set
 			ActivityFacility facility = facilities.getFacilities().get(destinationId);
-//			((ActivityImpl)act).setFacilityId(destinationId);
-//			((ActivityImpl)act).setCoord(facility.getCoord());
-//			((ActivityImpl)act).setLinkId(this.nearestLinks.get(destinationId));
+			
+			// As far as I can see, activity location is updated in the plan. Then the routes from and to that activity 
+			// are calculated. The resulting travel times are written to the temporary plan. If this is true, it should 
+			// not be necessary to update the activity location in the copied plan? I am not sure about this, therefore 
+			// keep the update in the "if(this.ReUsePlans)" block. cdobler oct'15
 			PlanUtils.setFacilityId(act, destinationId);
 			PlanUtils.setCoord(act, facility.getCoord());
 			PlanUtils.setLinkId(act, this.nearestLinks.get(destinationId));
@@ -328,8 +330,15 @@ public class ChoiceSet {
 //			PlanImpl planTmp = new PlanImpl();
 //			planTmp.copyFrom(plan);
 			
+			if (this.reUsePlans) {
+				// we have to update the copied plan
+				Activity actTmp = (Activity) planTmp.getPlanElements().get(actlegIndex);
+				PlanUtils.setFacilityId(actTmp, destinationId);
+				PlanUtils.setCoord(actTmp, facility.getCoord());
+				PlanUtils.setLinkId(actTmp, this.nearestLinks.get(destinationId));
+			}
 			// If we don't re-use a single copy of the plan, create a new one.
-			if (!reUsePlans) planTmp = PlanUtils.createCopy(plan);
+			else planTmp = PlanUtils.createCopy(plan);
 			
 			final double score =
 					this.adaptAndScoreTimes(
