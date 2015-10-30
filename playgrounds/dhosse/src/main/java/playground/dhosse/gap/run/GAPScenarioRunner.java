@@ -32,6 +32,7 @@ import org.matsim.contrib.multimodal.MultiModalControlerListener;
 import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.contrib.multimodal.router.util.BikeTravelTimeFactory;
 import org.matsim.contrib.multimodal.router.util.WalkTravelTimeFactory;
+import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
@@ -48,6 +49,7 @@ import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.MainModeIdentifierImpl;
 import org.matsim.core.router.TripRouterFactoryModule;
+import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
@@ -59,12 +61,15 @@ import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
 import org.matsim.core.scoring.functions.SubpopulationCharyparNagelScoringParameters;
+import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.population.algorithms.XY2Links;
 import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
 import org.matsim.roadpricing.RoadPricingConfigGroup;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
+
+import com.google.inject.Binder;
 
 import playground.dhosse.gap.Global;
 import playground.dhosse.gap.analysis.SpatialAnalysis;
@@ -80,19 +85,19 @@ public class GAPScenarioRunner {
 	public static final String simInputPath = Global.runInputDir;
 	
 	//number of iterations
-	private static final int lastIteration = 100;
+	private static final int lastIteration = 10;
 	
 	//configure innovative strategies you want to use
-	private static final boolean addModeChoice = false;
+	private static final boolean addModeChoice = true;
 	private static final boolean addTimeChoice = false;
 	
 	private static final boolean addLocationChoice = false;
 
 	//carsharing
-	private static final boolean carsharing = false;
+	private static final boolean carsharing = true;
 	
 	//cadyts
-	private static final boolean runCadyts = true;
+	private static final boolean runCadyts = false;
 	
 	//multimodal
 	private static final boolean multimodal = false;
@@ -103,7 +108,7 @@ public class GAPScenarioRunner {
 	//use this to determine the cost structure for carsharing
 	//non-reduced costs: time fee and distance fee
 	//reduced costs: only time fee
-	private static final boolean reducedCosts = false;
+	private static final boolean reducedCosts = true;
 	
 	private static final String sc = "base";
 	
@@ -113,9 +118,17 @@ public class GAPScenarioRunner {
 	 */
 	public static void main(String args[]){
 		
-//		SpatialAnalysis.writePopulationToShape("/home/dhosse/Dokumente/01_eGAP/plansV4.xml.gz", "/home/dhosse/activityLocations.shp");
+//		OTFVis.convert(new String[]{
+//				"",
+//				"/home/danielhosse/run11/output2/ITERS/it.10/10.events.xml.gz", //events file
+//				"/home/danielhosse/run11/input/networkMultimodal.xml.gz", //network file
+//				"/home/danielhosse/run11/Iteration10.mvi", //mvi file
+//				"120" //time step size (optional)
+//		});
+//		OTFVis.playMVI("/home/danielhosse/run11/Iteration10.mvi");
+		SpatialAnalysis.writePopulationToShape("/home/danielhosse/Dokumente/01_eGAP/plansV6.xml.gz", "/home/danielhosse/activityLocations.shp");
 //		SpatialAnalysis.createODPairsForCsUsers("/home/dhosse/Dokumente/01_eGAP/plansV4.xml.gz", "", Global.matsimOutputDir + "output_network.xml.gz", "/home/dhosse/odPairs.shp");
-		run();
+//		run();
 //		runAnalysis();
 		
 	}
@@ -127,10 +140,10 @@ public class GAPScenarioRunner {
 		
 		//create a new config and a new scenario and load it
 		final Config config = ConfigUtils.createConfig();
-		ConfigUtils.loadConfig(config, "/home/dhosse/run11/input/config.xml");
+		ConfigUtils.loadConfig(config, "/home/danielhosse/run11/input/config.xml");
 		
 		config.controler().setLastIteration(lastIteration);
-		config.controler().setOutputDirectory("/home/dhosse/run11/outputVersuchWenigerZSt");
+		config.controler().setOutputDirectory("/home/danielhosse/run11/output2rc/");
 		
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		
@@ -151,7 +164,7 @@ public class GAPScenarioRunner {
 		XY2Links xy2links = new XY2Links(scenario2);
 		
 		ObjectAttributes atts = new ObjectAttributes();
-		new ObjectAttributesXmlReader(atts).parse(Global.runInputDir + "demographicAtts.xml");
+		new ObjectAttributesXmlReader(atts).parse("/home/danielhosse/Dokumente/01_eGAP/demographicAtts.xml");
 		
 		for(Person person : scenario.getPopulation().getPersons().values()){
 			xy2links.run(person);
@@ -219,6 +232,17 @@ public class GAPScenarioRunner {
 		}
 		
 		//END
+		
+		controler.addOverridingModule(new AbstractModule() {
+			
+			@Override
+			public void install() {
+				addTravelTimeBinding(TransportMode.ride).toInstance(new FreespeedTravelTimeAndDisutility(controler.getConfig().planCalcScore()));
+				addTravelDisutilityFactoryBinding(TransportMode.ride).toInstance(new RandomizingTimeDistanceTravelDisutility.Builder(TransportMode.ride));
+				addRoutingModuleBinding(TransportMode.ride).toProvider(new TripRouterFactoryModule.NetworkRoutingModuleProvider(TransportMode.ride));
+				
+			}
+		});
 		
 		//finally, add controler listeners and event handlers
 		controler.getEvents().addHandler(new ZugspitzbahnFareHandler(controler));
@@ -633,7 +657,7 @@ public class GAPScenarioRunner {
 		ow.setTimeParkingFeeOneWayCarsharing("-0.0");
 		ow.setUtilityOfTravelling("-6");
 		ow.setUseOneWayCarsharing(true);
-		ow.setvehiclelocations("/home/dhosse/run11/input/stations.txt");
+		ow.setvehiclelocations("/home/danielhosse/run11/input/stations.txt");
 		controler.getConfig().addModule(ow);
 		
 		TwoWayCarsharingConfigGroup tw = new TwoWayCarsharingConfigGroup();
