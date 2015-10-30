@@ -214,49 +214,6 @@ public class CreateCommutersFromElsewhere {
 			
 		}
 		
-//		if(toId.length() < 8 && !toId.contains("A")){
-//			
-//			if(toId.startsWith("09180")){
-//				
-//				chooseWorkLocation(toId);
-//				workCoord = GAPScenarioBuilder.getWorkLocations().get(workCoord.getX(), workCoord.getY()).getCoord();
-//				double aw = 0.;
-//				Set<ActivityFacility> facilitiesWithinMunicipality = new HashSet<>();
-//				for(ActivityFacility facility : facilities.values()){
-//					if(GAPScenarioBuilder.getMunId2Geometry().get(toId).contains(MGC.coord2Point(Global.UTM32NtoGK4.transform(facility.getCoord())))){
-//						facilitiesWithinMunicipality.add(facility);
-//						for(ActivityOption ao : facility.getActivityOptions().values()){
-//							aw += ao.getCapacity();
-//							break;
-//						}
-//					}
-//				}
-//				
-//				double random = Global.random.nextDouble() * aw;
-//				double w = 0;
-//				for(ActivityFacility facility : facilitiesWithinMunicipality){
-//					
-//					w += facility.getActivityOptions().get(Global.ActType.work.name()).getCapacity();
-//					if(random >= w){
-//						workCoord = facility.getCoord();
-//					}
-//					
-//				}
-//			}
-//			else{
-//				Coord c = Global.UTM32NtoGK4.transform(workCoord);
-//				Geometry nearestToWork = GAPScenarioBuilder.getBuiltAreaQT().getClosest(c.getX(), c.getY());
-//				workCoord = Global.gk4ToUTM32N.transform(PlanCreationUtils.shoot(nearestToWork));
-//			}
-//			
-//		}
-		
-//		if(workCoord == null){
-//			Coord c = Global.UTM32NtoGK4.transform(workCoord);
-//			Geometry nearestToWork = GAPScenarioBuilder.getBuiltAreaQT().getClosest(c.getX(), c.getY());
-//			workCoord = Global.gk4ToUTM32N.transform(PlanCreationUtils.shoot(nearestToWork));
-//		}
-		
 		Activity actHome = factory.createActivityFromCoord(Global.ActType.home.name(), homeCoord);
 		actHome.setStartTime(0.);
 		Link fromLink = NetworkUtils.getNearestLink(scenario.getNetwork(), homeCoord);
@@ -273,7 +230,7 @@ public class CreateCommutersFromElsewhere {
 		do{
 
 			homeEndTime = 9 * 3600 + PlanCreationUtils.createRandomTimeShift(3);
-			mean2 = 18 * 3600 + PlanCreationUtils.createRandomTimeShift(2);
+			mean2 = 17.5 * 3600 + PlanCreationUtils.createRandomTimeShift(2);
 			
 		}while(homeEndTime <= 0 || (mean2 - homeEndTime - ttime) < 0 || (mean2 + ttime) > 24*3600);
 		

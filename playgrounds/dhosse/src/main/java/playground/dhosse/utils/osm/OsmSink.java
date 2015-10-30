@@ -66,6 +66,9 @@ public class OsmSink implements Sink{
 			if(tourism != null){
 				matsimType = getActivityType(tourism);
 			}
+			
+			double capacity = 1;
+			
 			if(matsimType != null){
 				
 				String name = tags.get("name");
@@ -77,6 +80,7 @@ public class OsmSink implements Sink{
 					name.replace("ü", "ue");
 					
 				}
+				
 				Coord coord = OsmCoordUtils.getCoord(entity, this.ct, this.nodeMap, this.wayMap, this.relationMap);
 				Id<ActivityFacility> id = Id.create(entity.getId(), ActivityFacility.class);
 				ActivityFacility af;
@@ -90,6 +94,7 @@ public class OsmSink implements Sink{
 				
 				ActivityOption ao = aff.createActivityOption(matsimType);
 				if(!af.getActivityOptions().containsKey(ao.getType())){
+					ao.setCapacity(capacity);
 					af.addActivityOption(ao);
 				}
 				

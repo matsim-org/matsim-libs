@@ -20,6 +20,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.collections.QuadTree;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.IOUtils;
@@ -303,6 +304,12 @@ public class FacilitiesCreator {
 				
 				if(g.contains(MGC.coord2Point(Global.UTM32NtoGK4.transform(facility.getCoord())))){
 					
+					double d = 1/CoordUtils.calcDistance(MGC.point2Coord(g.getCentroid()), facility.getCoord());
+					for(ActivityOption ao : facility.getActivityOptions().values()){
+						if(ao.getType().equals(Global.ActType.work)) continue;
+						ao.setCapacity(ao.getCapacity() * d);
+					}
+					
 					if(facility.getActivityOptions().containsKey(Global.ActType.education.name())){
 						
 						if(!GAPScenarioBuilder.getMunId2EducationFacilities().containsKey(geometry2MunId.get(g))){
@@ -393,7 +400,7 @@ public class FacilitiesCreator {
 					
 					if(!facility.getActivityOptions().containsKey(ao)){
 						ActivityOption activityOption = scenario.getActivityFacilities().getFactory().createActivityOption(ao);
-						activityOption.setCapacity(Double.parseDouble(parts[idxWorkCapacity]));
+						activityOption.setCapacity(1);
 						facility.addActivityOption(activityOption);
 					}
 					
