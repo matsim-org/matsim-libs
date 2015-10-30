@@ -27,6 +27,43 @@ public class PrefsCreator {
     private final static Logger log = Logger.getLogger(PrefsCreator.class);
     private final static Random random = new Random(37835409);
 
+    private enum actCharacteristics {
+        HOME, REMOTE_HOME, WORK, REMOTE_WORK, EDUCATION, LEISURE, SHOP, ESCORT_KIDS, ESCORT_OTHER;
+
+        public double getMinDur() {
+            double minDurInMins = 0;
+            // default 30min, only for obviously possibly shorter activities the min duration is different
+            switch (this) {
+                case HOME: minDurInMins = 30; break;
+                case REMOTE_HOME: minDurInMins = 30; break;
+                case WORK: minDurInMins = 30; break;
+                case REMOTE_WORK: minDurInMins = 15; break;
+                case EDUCATION: minDurInMins = 30; break;
+                case LEISURE: minDurInMins = 15; break;
+                case SHOP: minDurInMins = 5; break;
+                case ESCORT_KIDS: minDurInMins = 1; break;
+                case ESCORT_OTHER: minDurInMins = 1; break;
+            }
+            // return the value in seconds
+            return minDurInMins * 60;
+        }
+
+        public String getAbbr() {
+            switch (this) {
+                case HOME: return "-h-";
+                case REMOTE_HOME: return "-rh-";
+                case WORK: return "-w-";
+                case REMOTE_WORK: return "-rw-";
+                case EDUCATION: return "-e-";
+                case LEISURE: return "-l-";
+                case SHOP: return "-s-";
+                case ESCORT_KIDS: return "-k-";
+                case ESCORT_OTHER: return "-o-";
+                default: return "";
+            }
+        }
+    }
+
     public static void main(final String[] args) {
         final String pathToInputPopulation = args[0];
         final String pathToOutputPrefs = args[1];
@@ -42,17 +79,72 @@ public class PrefsCreator {
         ObjectAttributes prefs = new ObjectAttributes();
         Counter counter = new Counter(" person # ");
         ActivityAnalyzer activityAnalyzer = new ActivityAnalyzer();
+        String actChain;
+        double actDuration;
+        double h, rh, w, rw, e, l, s, k, o;
 
         for (Person p : population.getPersons().values()) {
             counter.incCounter();
+            String personID = p.getId().toString();
 
-            // todo-boescpa: create prefs...
-
+            if (p.getSelectedPlan() != null) {
+                // reset person
+                actChain = "";
+                h = -1; rh = -1; w = -1; rw = -1; e = -1; l = -1; s = -1; k = -1; o = -1;
+                // get number of activities and actChain
+                for (PlanElement pe : p.getSelectedPlan().getPlanElements()) {
+                    if (pe instanceof ActivityImpl) {
+                        ActivityImpl act = (ActivityImpl) pe;
+                        actChain = actChain.concat(actCharacteristics.valueOf(act.getType().toUpperCase()).getAbbr());
+                        actDuration = act.getEndTime() - act.getStartTime();
+                        switch (act.getType()) {
+                            case "home": h = (h < 0) ? actDuration : h + actDuration; break;
+                            case "remote_home": rh = (rh < 0) ? actDuration : rh + actDuration; break;
+                            case "work": w = (w < 0) ? actDuration : w + actDuration; break;
+                            case "remote_work": rw = (rw < 0) ? actDuration : rw + actDuration; break;
+                            case "education": e = (e < 0) ? actDuration : e + actDuration; break;
+                            case "leisure": l = (l < 0) ? actDuration : l + actDuration; break;
+                            case "shop": s = (s < 0) ? actDuration : s + actDuration; break;
+                            case "escort_kids": k = (k < 0) ? actDuration : k + actDuration; break;
+                            case "escort_other": o = (o < 0) ? actDuration : o + actDuration; break;
+                            default: log.error("For act type " + act.getType() + " of person " + personID + " no information available.");
+                        }
+                    }
+                    activityAnalyzer.addActChain(actChain);
+                }
+                // assign durations
+                if (h > -1) setDurations(prefs, "home", h, personID);
+                if (rh > -1) setDurations(prefs, "remote_home", rh, personID);
+                if (w > -1) setDurations(prefs, "work", w, personID);
+                if (rw > -1) setDurations(prefs, "remote_work", rw, personID);
+                if (e > -1) setDurations(prefs, "education", e, personID);
+                if (l > -1) setDurations(prefs, "leisure", l, personID);
+                if (s > -1) setDurations(prefs, "shop", s, personID);
+                if (k > -1) setDurations(prefs, "escort_kids", k, personID);
+                if (o > -1) setDurations(prefs, "escort_other", o, personID);
+            } else {
+                log.warn("Person " + personID + " has no plan defined.");
+            }
         }
 
         counter.printCounter();
         activityAnalyzer.printActChainAnalysis();
         return prefs;
+    }
+
+    /**
+     * Sets the preferences for the given activity.
+     *  MinDuration according to Enum minDuration.
+     *  TypicalDuration to the provided value or, if provided value < minDuration, to minDuration.
+     */
+    private static void setDurations(ObjectAttributes prefs, String activity, double typicalDuration, String personId) {
+        double minDuration = actCharacteristics.valueOf(activity.toUpperCase()).getMinDur();
+        double typicalDurationCorrected = (typicalDuration > minDuration) ? typicalDuration : minDuration;
+
+        prefs.putAttribute(personId, "typicalDuration_" + activity, typicalDurationCorrected);
+        prefs.putAttribute(personId, "minimalDuration_" + activity, minDuration);
+        prefs.putAttribute(personId, "earliestEndTime_" + activity, 0.0 * 3600.0);
+        prefs.putAttribute(personId, "latestStartTime_" + activity, 24.0 * 3600.0);
     }
 
     protected static ObjectAttributes createRandomPrefs(final Population population) {
@@ -65,7 +157,7 @@ public class PrefsCreator {
         int nrOfActs, nrWorkActs;
         double timeBudget;
         String actChain;
-        boolean education, shopping, leisure;
+        boolean education, shop, leisure;
 
         for (Person p : population.getPersons().values()) {
             counter.incCounter();
@@ -77,7 +169,7 @@ public class PrefsCreator {
                 timeBudget = 24*3600.0;
                 actChain = "";
                 education = false;
-                shopping = false;
+                shop = false;
                 leisure = false;
                 // get number of activities and actChain
                 for (PlanElement pe : p.getSelectedPlan().getPlanElements()) {
@@ -92,8 +184,8 @@ public class PrefsCreator {
                             case "education":
                                 education = true;
                                 break;
-                            case "shopping":
-                                shopping = true;
+                            case "shop":
+                                shop = true;
                                 break;
                             case "leisure":
                                 leisure = true;
@@ -104,8 +196,8 @@ public class PrefsCreator {
                 }
                 // assign durations
                 timeBudget = getRandomWorkDurations(prefs, nrOfActs, nrWorkActs, timeBudget, p);
-                timeBudget = getRandomEducationDurations(prefs, nrOfActs, timeBudget, education, shopping, leisure, p);
-                timeBudget = getRandomSecondaryActivityDurations(prefs, timeBudget, shopping, leisure, p);
+                timeBudget = getRandomEducationDurations(prefs, nrOfActs, timeBudget, education, shop, leisure, p);
+                timeBudget = getRandomSecondaryActivityDurations(prefs, timeBudget, shop, leisure, p);
                 setTimeBudgetAsHomeDuration(prefs, timeBudget, p);
             } else {
                 log.warn("person " +p.getId().toString()+ " has no plan defined");
@@ -129,9 +221,9 @@ public class PrefsCreator {
         //log.info("person p " +p.getId().toString()+ " has home duration: " +typicalHomeDuration/3600);
     }
 
-    private static double getRandomSecondaryActivityDurations(ObjectAttributes prefs, double timeBudget, boolean shopping, boolean leisure, Person p) {
+    private static double getRandomSecondaryActivityDurations(ObjectAttributes prefs, double timeBudget, boolean shop, boolean leisure, Person p) {
         // draw a duration for secondary activities
-        if (shopping || leisure) {
+        if (shop || leisure) {
             // agent should be home at least for 5-7 hours
             double maxSecActDur = timeBudget-(5*3600.0+random.nextInt(2));
             double typicalShoppingDuration;
@@ -139,15 +231,15 @@ public class PrefsCreator {
 
             // if both act types are reported:
             // both between 0.5 and available time budget
-            if (shopping && leisure) {
+            if (shop && leisure) {
                 // agent should be home at least for 5-7 hours
                 typicalShoppingDuration = 1800.0 + random.nextInt((int) (maxSecActDur-3600.0));
                 typicalLeisureDuration = maxSecActDur - typicalShoppingDuration;
 
-                prefs.putAttribute(p.getId().toString(), "typicalDuration_shopping", typicalShoppingDuration);
-                prefs.putAttribute(p.getId().toString(), "minimalDuration_shopping", 0.5 * 3600.0);
-                prefs.putAttribute(p.getId().toString(), "earliestEndTime_shopping", 0.0 * 3600.0);
-                prefs.putAttribute(p.getId().toString(), "latestStartTime_shopping", 24.0 * 3600.0);
+                prefs.putAttribute(p.getId().toString(), "typicalDuration_shop", typicalShoppingDuration);
+                prefs.putAttribute(p.getId().toString(), "minimalDuration_shop", 0.5 * 3600.0);
+                prefs.putAttribute(p.getId().toString(), "earliestEndTime_shop", 0.0 * 3600.0);
+                prefs.putAttribute(p.getId().toString(), "latestStartTime_shop", 24.0 * 3600.0);
 
                 prefs.putAttribute(p.getId().toString(), "typicalDuration_leisure", typicalLeisureDuration);
                 prefs.putAttribute(p.getId().toString(), "minimalDuration_leisure", 0.5 * 3600.0);
@@ -157,20 +249,20 @@ public class PrefsCreator {
                 timeBudget -= typicalLeisureDuration;
                 timeBudget -= typicalShoppingDuration;
                 //log.info("person p " +p.getId().toString()+ " has leisure duration: " +typicalLeisureDuration/3600);
-                //log.info("person p " +p.getId().toString()+ " has shopping duration: " +typicalShoppingDuration/3600);
+                //log.info("person p " +p.getId().toString()+ " has shop duration: " +typicalShoppingDuration/3600);
             }
-            else if (shopping && !leisure) {
+            else if (shop && !leisure) {
                 typicalShoppingDuration = 1800 + random.nextInt((int) ((maxSecActDur-1800.0)));
 
-                prefs.putAttribute(p.getId().toString(), "typicalDuration_shopping", typicalShoppingDuration);
-                prefs.putAttribute(p.getId().toString(), "minimalDuration_shopping", 0.5 * 3600.0);
-                prefs.putAttribute(p.getId().toString(), "earliestEndTime_shopping", 0.0 * 3600.0);
-                prefs.putAttribute(p.getId().toString(), "latestStartTime_shopping", 24.0 * 3600.0);
+                prefs.putAttribute(p.getId().toString(), "typicalDuration_shop", typicalShoppingDuration);
+                prefs.putAttribute(p.getId().toString(), "minimalDuration_shop", 0.5 * 3600.0);
+                prefs.putAttribute(p.getId().toString(), "earliestEndTime_shop", 0.0 * 3600.0);
+                prefs.putAttribute(p.getId().toString(), "latestStartTime_shop", 24.0 * 3600.0);
 
                 timeBudget -= typicalShoppingDuration;
-                //log.info("person p " +p.getId().toString()+ " has shopping duration: " +typicalShoppingDuration/3600);
+                //log.info("person p " +p.getId().toString()+ " has shop duration: " +typicalShoppingDuration/3600);
             }
-            else if (!shopping && leisure) {
+            else if (!shop && leisure) {
                 typicalLeisureDuration = 1800 + random.nextInt((int) ((maxSecActDur-1800.0)));
 
                 prefs.putAttribute(p.getId().toString(), "typicalDuration_leisure", typicalLeisureDuration);
@@ -185,13 +277,13 @@ public class PrefsCreator {
         return timeBudget;
     }
 
-    private static double getRandomEducationDurations(ObjectAttributes prefs, int nrOfActs, double timeBudget, boolean education, boolean shopping, boolean leisure, Person p) {
+    private static double getRandomEducationDurations(ObjectAttributes prefs, int nrOfActs, double timeBudget, boolean education, boolean shop, boolean leisure, Person p) {
         // draw a duration for education activities
         if (education) {
             double typicalEducationDuration;
             // less than 4 acts or only one other secondary activity type:
             // 7-9h
-            if (nrOfActs < 4 || (leisure && !shopping) || (!leisure && shopping)) {
+            if (nrOfActs < 4 || (leisure && !shop) || (!leisure && shop)) {
                 typicalEducationDuration = 25200 + random.nextInt(1)*3600.0 + random.nextDouble()*3600.0;
             }
             // else:
