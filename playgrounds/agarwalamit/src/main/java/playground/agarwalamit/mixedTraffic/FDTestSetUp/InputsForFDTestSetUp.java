@@ -92,6 +92,7 @@ public class InputsForFDTestSetUp {
 			config.setParam("seepage", "isSeepageAllowed", "true");
 			config.setParam("seepage", "seepMode","bike");
 			config.setParam("seepage", "isSeepModeStorageFree", "false");
+			config.setParam("seepage", "isRestrictingNumberOfSeepMode", "true");
 		}
 		
 		config.vspExperimental().setVspDefaultsCheckingLevel( VspDefaultsCheckingLevel.abort );
