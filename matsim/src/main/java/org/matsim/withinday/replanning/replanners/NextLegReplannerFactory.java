@@ -21,31 +21,30 @@
 package org.matsim.withinday.replanning.replanners;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.router.RoutingContext;
-import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.TripRouter;
 import org.matsim.withinday.mobsim.WithinDayEngine;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplannerFactory;
 
+import javax.inject.Provider;
+
 public class NextLegReplannerFactory extends WithinDayDuringActivityReplannerFactory {
 
 	private final Scenario scenario;
-	private final TripRouterFactory tripRouterFactory;
-	private final RoutingContext routingContext;
-	
+	private final Provider<TripRouter> tripRouterFactory;
+
 	public NextLegReplannerFactory(Scenario scenario, WithinDayEngine withinDayEngine,
-			TripRouterFactory tripRouterFactory, RoutingContext routingContext) {
+								   Provider<TripRouter> tripRouterFactory) {
 		super(withinDayEngine);
 		this.scenario = scenario;
 		this.tripRouterFactory = tripRouterFactory;
-		this.routingContext = routingContext;
 	}
 
 	@Override
 	public WithinDayDuringActivityReplanner createReplanner() {
 		WithinDayDuringActivityReplanner replanner = new NextLegReplanner(super.getId(), scenario, 
 				this.getWithinDayEngine().getActivityRescheduler(),
-				this.tripRouterFactory.instantiateAndConfigureTripRouter(routingContext));
+				this.tripRouterFactory.get());
 		return replanner;
 	}
 

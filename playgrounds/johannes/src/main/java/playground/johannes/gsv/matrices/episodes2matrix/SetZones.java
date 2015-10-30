@@ -21,16 +21,16 @@ package playground.johannes.gsv.matrices.episodes2matrix;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.common.gis.CRSUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.opengis.referencing.operation.MathTransform;
-import playground.johannes.synpop.processing.EpisodeTask;
 import playground.johannes.synpop.data.CommonKeys;
-import playground.johannes.gsv.zones.Zone;
-import playground.johannes.gsv.zones.ZoneCollection;
-import playground.johannes.sna.gis.CRSUtils;
 import playground.johannes.synpop.data.Episode;
 import playground.johannes.synpop.data.Segment;
+import playground.johannes.synpop.gis.Zone;
+import playground.johannes.synpop.gis.ZoneCollection;
+import playground.johannes.synpop.processing.EpisodeTask;
 
 /**
  * @author johannes

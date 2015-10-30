@@ -20,6 +20,12 @@
 
 package org.matsim.contrib.locationchoice.timegeography;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Random;
+import java.util.TreeMap;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -27,17 +33,16 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.locationchoice.LocationMutator;
-import org.matsim.contrib.locationchoice.utils.QuadTreeRing;
+import org.matsim.contrib.locationchoice.router.PlanRouterAdapter;
+import org.matsim.contrib.locationchoice.utils.PlanUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.router.TripRouter;
-import org.matsim.contrib.locationchoice.router.PlanRouterAdapter;
+import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
-
-import java.util.*;
 
 public class RecursiveLocationMutator extends LocationMutator {
 
@@ -49,20 +54,20 @@ public class RecursiveLocationMutator extends LocationMutator {
 	private TripRouter router;
 
 	public RecursiveLocationMutator(final Scenario scenario, TripRouter router,
-			TreeMap<String, QuadTreeRing<ActivityFacility>> quad_trees,
+			TreeMap<String, QuadTree<ActivityFacility>> quad_trees,
 			TreeMap<String, ActivityFacilityImpl []> facilities_of_type, Random random) {
 		super(scenario, quad_trees, facilities_of_type, random);
-		this.recursionTravelSpeedChange = Double.parseDouble(scenario.getConfig().findParam("locationchoice", "recursionTravelSpeedChange"));
-		this.maxRecursions = Integer.parseInt(scenario.getConfig().findParam("locationchoice", "maxRecursions"));
-		this.recursionTravelSpeed = Double.parseDouble(scenario.getConfig().findParam("locationchoice", "travelSpeed_car"));
+		this.recursionTravelSpeedChange = this.dccg.getRecursionTravelSpeedChange();
+		this.maxRecursions = this.dccg.getMaxRecursions();
+		this.recursionTravelSpeed = this.dccg.getTravelSpeed_car();
 		this.router = router;
 	}
 
 	public RecursiveLocationMutator(final Scenario scenario, TripRouter router, Random random) {
 		super(scenario, random);
-		this.recursionTravelSpeedChange = Double.parseDouble(scenario.getConfig().findParam("locationchoice", "recursionTravelSpeedChange"));
-		this.maxRecursions = Integer.parseInt(scenario.getConfig().findParam("locationchoice", "maxRecursions"));
-		this.recursionTravelSpeed = Double.parseDouble(scenario.getConfig().findParam("locationchoice", "travelSpeed_car"));
+		this.recursionTravelSpeedChange = this.dccg.getRecursionTravelSpeedChange();
+		this.maxRecursions = this.dccg.getMaxRecursions();
+		this.recursionTravelSpeed = this.dccg.getTravelSpeed_car();
 		this.router = router;
 	}
 
@@ -70,7 +75,7 @@ public class RecursiveLocationMutator extends LocationMutator {
 	public void run(final Plan plan){
 		List<SubChain> subChains = this.calcActChains(plan);
 		this.handleSubChains(plan, subChains);
-		super.resetRoutes(plan);
+		PlanUtils.resetRoutes(plan);
 	}
 
 	protected TripRouter getTripRouter() {
@@ -219,7 +224,7 @@ public class RecursiveLocationMutator extends LocationMutator {
 		double midPointX = (coordStart.getX()+coordEnd.getX())/2.0;
 		double midPointY = (coordStart.getY()+coordEnd.getY())/2.0;
 		return (ArrayList<ActivityFacility>) this.quadTreesOfType.get(this.defineFlexibleActivities.getConverter().convertType(type)).
-				get(midPointX, midPointY, radius);
+				getDisk(midPointX, midPointY, radius);
 	}
 
 	// for test cases:

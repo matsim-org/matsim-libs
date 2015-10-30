@@ -21,14 +21,12 @@ package playground.johannes.coopsim.analysis;
 
 import gnu.trove.TObjectDoubleHashMap;
 import gnu.trove.TObjectDoubleIterator;
+import org.apache.commons.collections.BidiMap;
+import org.matsim.api.core.v01.population.Person;
+import playground.johannes.coopsim.pysical.Trajectory;
 
 import java.util.HashSet;
 import java.util.Set;
-
-import org.apache.commons.collections.BidiMap;
-import org.matsim.api.core.v01.population.Person;
-
-import playground.johannes.coopsim.pysical.Trajectory;
 
 
 /**

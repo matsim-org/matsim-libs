@@ -6,7 +6,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.VehicleWriterV1;
 
@@ -26,7 +26,7 @@ public class PControler extends Controler {
 
 	private boolean useOTFVis = false;
 	
-	public PControler(ScenarioImpl scenario) {
+	public PControler(MutableScenario scenario) {
 		super(scenario);
 		// TODO Auto-generated constructor stub
 		
@@ -115,7 +115,7 @@ public class PControler extends Controler {
 			}
 			
 			// reading the scenario (based on the config):
-			ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.loadScenario(config);
+			MutableScenario sc = (MutableScenario) ScenarioUtils.loadScenario(config);
 			
 			PControler tc = new PControler(sc);
 

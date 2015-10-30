@@ -606,5 +606,10 @@ public class Vector implements Serializable {
 	public static Vector concat(final Vector... elements) {		
 		return concat(Arrays.asList(elements));
 	}
+	
+	// TODO NEW
+	public double mean() {
+		return this.sum() / this.size();
+	}
 
 }

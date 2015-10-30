@@ -78,7 +78,7 @@ public class LinkEnteredProvider implements LinkEnterEventHandler, PersonArrival
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		this.linkEnteredAgents.put(event.getPersonId(), event.getLinkId());
+		this.linkEnteredAgents.put(event.getDriverId(), event.getLinkId());
 	}
 
 	@Override

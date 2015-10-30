@@ -18,7 +18,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonUtils;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.ActivityFacility;
@@ -32,7 +32,7 @@ public class MembershipAssigner
   implements SupplySideModel
 {
   private static final Logger log = Logger.getLogger(MembershipAssigner.class);
-  private ScenarioImpl scenario;
+  private MutableScenario scenario;
   private Map<Id<ActivityFacility>, ? extends ActivityFacility> facilities;
   private TreeMap<Integer, Coord> solutionDecoder = new TreeMap<Integer, Coord>();
   private CarSharingStations carStations;
@@ -48,13 +48,13 @@ public class MembershipAssigner
   protected ArrayList<Integer> initialSolution = new ArrayList<Integer>();
   private ArrayList<LinkImpl> availableLinks = new ArrayList< LinkImpl>();
 
-  public MembershipAssigner(ScenarioImpl scenario) {
+  public MembershipAssigner(MutableScenario scenario) {
 	  this.scenario = scenario;
 	  this.facilities = scenario.getActivityFacilities().getFacilities();
 	  init();
   }
 
-  public MembershipAssigner(ScenarioImpl scenario, FacilitiesPortfolio carStations, SupplySideModel model) throws IOException
+  public MembershipAssigner(MutableScenario scenario, FacilitiesPortfolio carStations, SupplySideModel model) throws IOException
   {
 	  this.facilities = scenario.getActivityFacilities().getFacilities();
 	  this.scenario = scenario;
@@ -267,7 +267,7 @@ public class MembershipAssigner
       }
     }
 
-    int density = this.personsQuadTree.get(c.getX(), c.getY(), 0.05D).size();
+    int density = this.personsQuadTree.getDisk(c.getX(), c.getY(), 0.05D).size();
    // log.info("density " + density);
     return density;
   }

@@ -19,19 +19,14 @@
 
 package playground.johannes.gsv.gis;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.vividsolutions.jts.geom.Point;
 import org.geotools.referencing.CRS;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.common.gis.CRSUtils;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.io.ColorUtils;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.Volume;
@@ -40,14 +35,17 @@ import org.opengis.referencing.operation.MathTransform;
 import org.wololo.geojson.Feature;
 import org.wololo.geojson.FeatureCollection;
 import org.wololo.jts2geojson.GeoJSONWriter;
-
-import playground.johannes.coopsim.util.MatsimCoordUtils;
+import playground.johannes.coopsim.utils.MatsimCoordUtils;
 import playground.johannes.gsv.sim.LinkOccupancyCalculator;
 import playground.johannes.gsv.sim.cadyts.ODCalibrator;
-import playground.johannes.sna.gis.CRSUtils;
-import playground.johannes.sna.graph.spatial.io.ColorUtils;
 
-import com.vividsolutions.jts.geom.Point;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author johannes
@@ -55,7 +53,7 @@ import com.vividsolutions.jts.geom.Point;
  */
 public class CountsCompare2GeoJSON {
 
-	public static void write(LinkOccupancyCalculator simCounts, Counts obsCounts, double factor, Network network, String outDir) {
+	public static void write(LinkOccupancyCalculator simCounts, Counts<Link> obsCounts, double factor, Network network, String outDir) {
 		MathTransform transform = null;
 		try {
 			transform = CRS.findMathTransform(CRSUtils.getCRS(31467), CRSUtils.getCRS(4326));
@@ -67,7 +65,7 @@ public class CountsCompare2GeoJSON {
 		List<Feature> simFeatures = new ArrayList<>(obsCounts.getCounts().size());
 		List<Feature> obsFeatures = new ArrayList<>(obsCounts.getCounts().size());
 
-		for (Count count : obsCounts.getCounts().values()) {
+		for (Count<Link> count : obsCounts.getCounts().values()) {
 			Id<Link> linkId = count.getLocId();
 			if (!linkId.toString().startsWith(ODCalibrator.VIRTUAL_ID_PREFIX)) {
 				Link link = network.getLinks().get(linkId);

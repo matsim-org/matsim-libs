@@ -32,6 +32,7 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.listener.ControlerListener;
 
+import javax.inject.Singleton;
 import java.util.Collections;
 
 /**
@@ -44,18 +45,20 @@ public class SocnetsimDefaultAnalysisModule extends AbstractModule {
 		final Identifier groupIdentifier = new Identifier();
 		binder().requestInjection( groupIdentifier );
 
-		this.addControlerListenerBinding().toProvider( 
+		this.addControlerListenerBinding().toProvider(
 				new Provider<ControlerListener>() {
-					@Inject OutputDirectoryHierarchy controlerIO;
-					@Inject Scenario scenario;
+					@Inject
+					OutputDirectoryHierarchy controlerIO;
+					@Inject
+					Scenario scenario;
 
 					@Override
 					public ControlerListener get() {
 						return new FilteredScoreStats(
-									((GroupReplanningConfigGroup) scenario.getConfig().getModule( GroupReplanningConfigGroup.GROUP_NAME )).getGraphWriteInterval(),
-									controlerIO,
-									scenario,
-									groupIdentifier);
+								((GroupReplanningConfigGroup) scenario.getConfig().getModule(GroupReplanningConfigGroup.GROUP_NAME)).getGraphWriteInterval(),
+								controlerIO,
+								scenario,
+								groupIdentifier);
 					}
 				});
 
@@ -75,23 +78,28 @@ public class SocnetsimDefaultAnalysisModule extends AbstractModule {
 					}
 				});
 
-		this.addControlerListenerBinding().toProvider( 
+		this.addControlerListenerBinding().toProvider(
 				new Provider<ControlerListener>() {
-					@Inject OutputDirectoryHierarchy controlerIO;
-					@Inject Scenario scenario;
+					@Inject
+					OutputDirectoryHierarchy controlerIO;
+					@Inject
+					Scenario scenario;
 
 					@Override
 					public ControlerListener get() {
 
 						return new JointTripsStats(
-									((GroupReplanningConfigGroup) scenario.getConfig().getModule( GroupReplanningConfigGroup.GROUP_NAME )).getGraphWriteInterval(),
-									controlerIO,
-									scenario,
-									groupIdentifier);
+								((GroupReplanningConfigGroup) scenario.getConfig().getModule(GroupReplanningConfigGroup.GROUP_NAME)).getGraphWriteInterval(),
+								controlerIO,
+								scenario,
+								groupIdentifier);
 					}
 				});
 
 
+		bind( CourtesyHistogram.class ).in( Singleton.class );
+		this.addEventHandlerBinding().to( CourtesyHistogram.class );
+		this.addControlerListenerBinding().to(CourtesyHistogramListener.class);
 	}
 
 	private static class Identifier implements AbstractPlanAnalyzerPerGroup.GroupIdentifier {

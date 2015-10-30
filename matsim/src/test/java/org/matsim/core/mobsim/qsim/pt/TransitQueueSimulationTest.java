@@ -50,7 +50,7 @@ import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.PtConstants;
@@ -85,7 +85,7 @@ public class TransitQueueSimulationTest {
         config.transit().setUseTransit(true);
         config.qsim().setEndTime(8.0*3600);
         
-        ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+        MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 
         // setup: network
         Network network = scenario.getNetwork();
@@ -214,7 +214,7 @@ public class TransitQueueSimulationTest {
         final Config config = ConfigUtils.createConfig();
         config.transit().setUseTransit(true);
 
-        ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+        MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
         
         // setup: network
         Network network = scenario.getNetwork();
@@ -292,7 +292,7 @@ public class TransitQueueSimulationTest {
         final Config config = ConfigUtils.createConfig();
         config.transit().setUseTransit(true);
         
-        ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+        MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
    
         // setup: network
         Network network = scenario.getNetwork();
@@ -360,7 +360,7 @@ public class TransitQueueSimulationTest {
         config.transit().setUseTransit(true);
         config.qsim().setEndTime(8.0*3600);
         
-        ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+        MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 
         // setup: network
         Network network = scenario.getNetwork();
@@ -519,7 +519,7 @@ public class TransitQueueSimulationTest {
         private final Departure departure;
         private final QSim qSim;
 
-        private TestHandleStopSimulation(final ScenarioImpl scenario, final EventsManager events, final TransitLine line, final TransitRoute route, final Departure departure) {
+        private TestHandleStopSimulation(final MutableScenario scenario, final EventsManager events, final TransitLine line, final TransitRoute route, final Departure departure) {
             this.line = line;
             this.route = route;
             this.departure = departure;
@@ -567,7 +567,7 @@ public class TransitQueueSimulationTest {
 
         }
 
-        protected static TestHandleStopSimulation createTestHandleStopSimulation(final ScenarioImpl scenario, final EventsManager events,
+        protected static TestHandleStopSimulation createTestHandleStopSimulation(final MutableScenario scenario, final EventsManager events,
                                                                                  final TransitLine line, final TransitRoute route, final Departure departure) {
             return new TestHandleStopSimulation(scenario, events, line, route, departure);
         }
@@ -621,7 +621,7 @@ public class TransitQueueSimulationTest {
         final Config config = ConfigUtils.createConfig();
         config.transit().setUseTransit(true);
 
-        ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+        MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
       
         // build simple network with 2 links
         NetworkImpl network = (NetworkImpl) scenario.getNetwork();
@@ -711,7 +711,7 @@ public class TransitQueueSimulationTest {
         final Config config = ConfigUtils.createConfig();
         config.transit().setUseTransit(true);
 
-        ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+        MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
      
         // build simple network with 2 links
         NetworkImpl network = (NetworkImpl) scenario.getNetwork();
@@ -805,7 +805,7 @@ public class TransitQueueSimulationTest {
         }
 
 
-        assertEquals(29, allEvents.size());
+        assertEquals(30, allEvents.size());
 
         int idx = -1;
         assertTrue(allEvents.get(++idx) instanceof ActivityEndEvent);
@@ -837,6 +837,7 @@ public class TransitQueueSimulationTest {
         assertEquals(PtConstants.TRANSIT_ACTIVITY_TYPE, ((ActivityEndEvent) allEvents.get(idx)).getActType());
         assertTrue(allEvents.get(++idx) instanceof PersonDepartureEvent); // walk
         assertTrue(allEvents.get(++idx) instanceof VehicleDepartsAtFacilityEvent);
+        assertTrue(allEvents.get(++idx) instanceof VehicleLeavesTrafficEvent); // pt-driver
         assertTrue(allEvents.get(++idx) instanceof PersonLeavesVehicleEvent); // pt-driver
         assertTrue(allEvents.get(++idx) instanceof PersonArrivalEvent); // pt-driver
         assertTrue(allEvents.get(++idx) instanceof TeleportationArrivalEvent);

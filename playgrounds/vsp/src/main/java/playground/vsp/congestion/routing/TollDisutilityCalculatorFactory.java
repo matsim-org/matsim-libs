@@ -40,6 +40,7 @@ public class TollDisutilityCalculatorFactory implements TravelDisutilityFactory 
 
 	private TollHandler tollHandler;
 
+	@Deprecated
 	public TollDisutilityCalculatorFactory(TollHandler tollHandler) {
 		this.tollHandler = tollHandler;
 	}

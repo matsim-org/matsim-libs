@@ -19,7 +19,7 @@ import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import playground.artemc.analysis.AnalysisControlerListener;
@@ -118,7 +118,7 @@ public class ChoiceGenerationControler implements BeforeMobsimListener {
 		controler.setScoringFunctionFactory(customScoringFunctionFactory);
 
 		// Additional analysis
-		AnalysisControlerListener analysisControlerListener = new AnalysisControlerListener((ScenarioImpl) controler.getScenario());
+		AnalysisControlerListener analysisControlerListener = new AnalysisControlerListener((MutableScenario) controler.getScenario());
 		controler.addControlerListener(analysisControlerListener);
 
 		//Money payment analysis
@@ -154,7 +154,7 @@ public class ChoiceGenerationControler implements BeforeMobsimListener {
 			}
 		});
 		controler.addControlerListener(this);
-        controler.run();
+        //controler.run();
     }
 
 	public void run() {

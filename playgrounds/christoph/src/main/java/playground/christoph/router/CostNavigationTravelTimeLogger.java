@@ -106,7 +106,7 @@ public class CostNavigationTravelTimeLogger implements LinkEnterEventHandler, Li
 	
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		Id personId = event.getPersonId();
+		Id personId = event.getDriverId();
 		Id linkId = event.getLinkId();
 		double time = event.getTime();
 
@@ -116,7 +116,7 @@ public class CostNavigationTravelTimeLogger implements LinkEnterEventHandler, Li
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		Id personId = event.getPersonId();
+		Id personId = event.getDriverId();
 //		Id linkId = event.getLinkId();
 		double time = event.getTime();
 		

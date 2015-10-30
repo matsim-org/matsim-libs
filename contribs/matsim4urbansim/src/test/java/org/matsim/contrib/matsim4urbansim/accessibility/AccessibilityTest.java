@@ -9,7 +9,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkWriter;
-import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.accessibility.GridBasedAccessibilityControlerListenerV3;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
@@ -17,7 +16,7 @@ import org.matsim.contrib.accessibility.ZoneBasedAccessibilityControlerListenerV
 import org.matsim.contrib.accessibility.gis.GridUtils;
 import org.matsim.contrib.accessibility.gis.SpatialGrid;
 import org.matsim.contrib.accessibility.interfaces.SpatialGridDataExchangeInterface;
-import org.matsim.contrib.accessibility.interfaces.ZoneDataExchangeInterface;
+import org.matsim.contrib.accessibility.interfaces.FacilityDataExchangeInterface;
 import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
 import org.matsim.contrib.matrixbasedptrouter.utils.CreateTestNetwork;
 import org.matsim.contrib.matrixbasedptrouter.utils.CreateTestPopulation;
@@ -28,7 +27,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.ActivityFacility;
@@ -36,7 +35,7 @@ import org.matsim.testcases.MatsimTestUtils;
 
 import java.util.Map;
 
-public class AccessibilityTest implements SpatialGridDataExchangeInterface, ZoneDataExchangeInterface {
+public class AccessibilityTest implements SpatialGridDataExchangeInterface, FacilityDataExchangeInterface {
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
 	private double resolution = 100.;
@@ -89,7 +88,7 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Zone
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		//add the generated test population to the scenario
-		((ScenarioImpl)scenario).setPopulation(population);
+		((MutableScenario)scenario).setPopulation(population);
 
 		//create a new controler for the simulation
 		Controler ctrl = new Controler(scenario);
@@ -172,7 +171,7 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Zone
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		//add the generated test population to the scenario
-		((ScenarioImpl)scenario).setPopulation(population);
+		((MutableScenario)scenario).setPopulation(population);
 
 		//create a new controler for the simulation
 		Controler ctrl = new Controler(scenario);
@@ -256,7 +255,7 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Zone
 	}
 
 	@Override
-	public void setZoneAccessibilities(ActivityFacility measurePoint, Node fromNode, Map<Modes4Accessibility, Double> accessibilities1) {
+	public void setFacilityAccessibilities(ActivityFacility measurePoint, Double timeOfDay, Map<Modes4Accessibility, Double> accessibilities1) {
 
 		//store the accessibilities of the zone in the list for home or work accessibilities
 		if(measurePoint.getCoord().equals(new Coord((double) 100, (double) 0))){

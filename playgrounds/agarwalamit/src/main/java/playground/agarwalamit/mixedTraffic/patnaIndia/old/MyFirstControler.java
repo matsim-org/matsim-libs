@@ -3,7 +3,6 @@ package playground.agarwalamit.mixedTraffic.patnaIndia.old;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.google.inject.Provider;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Leg;
@@ -12,12 +11,10 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.otfvis.OTFVisModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.config.groups.QSimConfigGroup.LinkDynamics;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.mobsim.qsim.qnetsimengine.SeepageMobsimfactory;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
@@ -40,6 +37,8 @@ public class MyFirstControler {
 		Scenario sc = ScenarioUtils.loadScenario(config);
 
 		sc.getConfig().qsim().setUseDefaultVehicles(false);
+		
+		sc.getConfig().qsim().setLinkDynamics(LinkDynamics.PassingQ.toString());
 
 		Map<String, VehicleType> modesType = new HashMap<String, VehicleType>(); 
 		VehicleType car = VehicleUtils.getFactory().createVehicleType(Id.create("car",VehicleType.class));
@@ -96,21 +95,7 @@ public class MyFirstControler {
         controler.getConfig().controler().setCreateGraphs(true);
 		controler.addOverridingModule(new OTFVisModule());
 
-		if(seepage){
-			controler.addOverridingModule(new AbstractModule() {
-				@Override
-				public void install() {
-					bindMobsim().toProvider(new Provider<Mobsim>() {
-						@Override
-						public Mobsim get() {
-							return new SeepageMobsimfactory().createMobsim(controler.getScenario(), controler.getEvents());
-						}
-					});
-				}
-			});
-		}
-		
-		controler.addControlerListener(new WelfareAnalysisControlerListener((ScenarioImpl)controler.getScenario()));
+		controler.addControlerListener(new WelfareAnalysisControlerListener((MutableScenario)controler.getScenario()));
 		controler.setDumpDataAtEnd(true);
 		controler.run();
 	}

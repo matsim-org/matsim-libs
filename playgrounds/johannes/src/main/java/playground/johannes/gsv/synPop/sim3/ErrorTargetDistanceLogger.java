@@ -20,9 +20,9 @@
 package playground.johannes.gsv.synPop.sim3;
 
 import gnu.trove.TDoubleDoubleHashMap;
-import playground.johannes.sna.math.FixedSampleSizeDiscretizer;
-import playground.johannes.sna.util.TXTWriter;
-import playground.johannes.socialnetworks.statistics.Correlations;
+import org.matsim.contrib.common.stats.Correlations;
+import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
+import org.matsim.contrib.common.stats.StatsWriter;
 import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.Person;
@@ -74,7 +74,7 @@ public class ErrorTargetDistanceLogger implements SamplerListener {
 			
 			TDoubleDoubleHashMap hist = Correlations.mean(dist, err, FixedSampleSizeDiscretizer.create(dist, 100, 100));
 			try {
-				TXTWriter.writeMap(hist, "distance", "error", String.format("%s/%s.errorDistance.txt", outdir, iterNow));
+				StatsWriter.writeHistogram(hist, "distance", "error", String.format("%s/%s.errorDistance.txt", outdir, iterNow));
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

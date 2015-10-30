@@ -1,51 +1,46 @@
 package roadclassification;
 
-import optdyts.DecisionVariable;
 
-import org.matsim.api.core.v01.Id;
+import java.util.List;
+
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.core.utils.io.OsmNetworkReader;
+import org.matsim.utils.objectattributes.ObjectAttributes;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
+import floetteroed.opdyts.DecisionVariable;
 
 class RoadClassificationDecisionVariable implements DecisionVariable {
 
-	private Network network;
+	static Logger log = Logger.getLogger(RoadClassificationDecisionVariable.class);
 
-	public RoadClassificationDecisionVariable(final Network network) {
-		this.network = network;
+
+	public List<LinkSettings> getLinkSettingses() {
+		return linkSettingses;
 	}
 
-	/**
-	 * This is where concrete implementations configure the osmNetworkReader.
-	 *
-	 */
-	void doSetHighwayDefaults(OsmNetworkReader osmNetworkReader) {
+	private final List<LinkSettings> linkSettingses;
+	private final ObjectAttributes linkAttributes;
+	private Network network;
 
+	public RoadClassificationDecisionVariable(final Network network, ObjectAttributes linkAttributes, List<LinkSettings> linkSettingses) {
+		this.network = network;
+		this.linkAttributes = linkAttributes;
+		this.linkSettingses = linkSettingses;
 	}
 
 	@Override
 	public final void implementInSimulation() {
-		
-//		for (Id<Link> linkId : new ArrayList<>(network.getLinks().keySet())) {
-//			network.removeLink(linkId);
-//		}
-//		for (Id<Node> nodeId : new ArrayList<>(network.getNodes().keySet())) {
-//			network.removeNode(nodeId);
-//		}
-//		OsmNetworkReader osmNetworkReader = new OsmNetworkReader(network, DownloadExampleData.COORDINATE_TRANSFORMATION);
-//		doSetHighwayDefaults(osmNetworkReader);
-//		try (InputStream is = new FileInputStream(DownloadExampleData.SIOUX_FALLS)) {
-//			osmNetworkReader.parse(is);
-//		} catch (IOException e) {
-//			throw new RuntimeException(e);
-//		}
+		log.info("--DecisionVariable follows--");
+		for (LinkSettings linkSettings : getLinkSettingses()) {
+			log.info(String.format("%d %d %d\n", (int) linkSettings.getCapacity(), (int) linkSettings.getFreespeed(), (int) linkSettings.getNofLanes()));
+		}
+		for (Link link : network.getLinks().values()) {
+			LinkSettings roadCategory = linkSettingses.get((int) linkAttributes.getAttribute(link.getId().toString(), "roadCategory"));
+			link.setFreespeed(roadCategory.getFreespeed());
+			link.setCapacity(roadCategory.getCapacity());
+			link.setNumberOfLanes(roadCategory.getNofLanes());
+		}
 	}
 
 }

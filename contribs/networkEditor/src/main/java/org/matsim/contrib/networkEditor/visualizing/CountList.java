@@ -25,6 +25,7 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.AbstractTableModel;
 
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.counts.Count;
 import org.matsim.counts.Volume;
 
@@ -261,11 +262,11 @@ class CountTableModel extends AbstractTableModel {
     Object table[][];
     boolean editable[][];
     String columnName[];
-    Count counts;
+    Count<Link> counts;
     public CountTableModel(){
         init(0);
     }
-    public CountTableModel(Count counts) {
+    public CountTableModel(Count<Link> counts) {
         this.counts = counts;
         init(counts.getVolumes().size());
         int i=0;

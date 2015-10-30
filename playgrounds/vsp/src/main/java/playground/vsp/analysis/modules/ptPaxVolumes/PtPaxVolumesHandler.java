@@ -34,6 +34,7 @@ import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.Volume;
@@ -70,11 +71,11 @@ public class PtPaxVolumesHandler implements LinkEnterEventHandler,
 
 	public double getPaxCountForLinkId(Id linkId){
 		// check if we have a count for the link
-		Counts counts = this.linkId2LineCounts.get(linkId);
+		Counts<Link> counts = this.linkId2LineCounts.get(linkId);
 		if(counts == null) return 0;
 		int count = 0;
 		// sum up all count-values
-		for(Count c: counts.getCounts().values()){
+		for(Count<Link> c: counts.getCounts().values()){
 			for(Volume v: c.getVolumes().values()){
 				count += v.getValue();
 			}
@@ -84,7 +85,7 @@ public class PtPaxVolumesHandler implements LinkEnterEventHandler,
 	
 	public double getPaxCountForLinkId(Id linkId, int interval){
 		// check if we have a count for the link
-		Counts counts = this.linkId2LineCounts.get(linkId);
+		Counts<Link> counts = this.linkId2LineCounts.get(linkId);
 		if(counts == null) return 0;
 		int count = 0;
 		// sum up all count-values
@@ -101,7 +102,7 @@ public class PtPaxVolumesHandler implements LinkEnterEventHandler,
 		Counts counts = this.linkId2LineCounts.get(linkId);
 		if(counts == null) return 0;
 		// check if ther is a count for the line
-		Count c = counts.getCount(lineId);
+		Count<Link> c = counts.getCount(lineId);
 		if(c == null) return 0;
 		// sum up all volumes
 		int count = 0;

@@ -94,11 +94,11 @@ public class ReactiveGuidance extends AbstractGuidance implements Guidance {
 	@Override
 	public void handleEvent(LinkEnterEvent e) {
 		if (e.getLinkId().equals(id2)) { 
-			this.personIdLinkEnterEventMap.put(e.getPersonId(), e);
+			this.personIdLinkEnterEventMap.put(e.getDriverId(), e);
 			this.vehOn1++;
 		}
 		else if (e.getLinkId().equals(id3)){
-			this.personIdLinkEnterEventMap.put(e.getPersonId(), e);
+			this.personIdLinkEnterEventMap.put(e.getDriverId(), e);
 			this.vehOn2++;
 		}
 	}
@@ -107,12 +107,12 @@ public class ReactiveGuidance extends AbstractGuidance implements Guidance {
 	public void handleEvent(LinkLeaveEvent e) {
 		LinkEnterEvent enterEvent = null;
 		if (e.getLinkId().equals(id4)){
-			enterEvent = this.personIdLinkEnterEventMap.remove(e.getPersonId());
+			enterEvent = this.personIdLinkEnterEventMap.remove(e.getDriverId());
 			this.currentTravelTimesRoute1.add(e.getTime() - enterEvent.getTime());
 			this.vehOn1--;
 		}
 		else if (e.getLinkId().equals(id5)){
-			enterEvent = this.personIdLinkEnterEventMap.remove(e.getPersonId());
+			enterEvent = this.personIdLinkEnterEventMap.remove(e.getDriverId());
 			this.currentTravelTimesRoute2.add(e.getTime() - enterEvent.getTime());
 			this.vehOn2--;
 		}

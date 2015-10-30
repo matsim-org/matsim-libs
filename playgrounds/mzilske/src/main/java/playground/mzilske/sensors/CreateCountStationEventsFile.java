@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
@@ -40,7 +41,7 @@ public class CreateCountStationEventsFile {
 
     public static void main(String[] args) {
         Scenario scenario = BerlinRunCongested.getScenario();
-        final Counts counts = new Counts();
+        final Counts<Link> counts = new Counts();
         MatsimCountsReader counts_parser = new MatsimCountsReader(counts);
         counts_parser.readFile(scenario.getConfig().counts().getCountsFileName());
         for (Id countId : counts.getCounts().keySet()) {

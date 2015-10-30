@@ -18,7 +18,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -31,7 +31,7 @@ public class DistanceTimeCS {
 	
 	public void run(String[] args){
 		final BufferedWriter outLink = IOUtils.getBufferedWriter(args[2]);
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario);
 		networkReader.readFile(args[0]);
 		
@@ -46,13 +46,13 @@ public class DistanceTimeCS {
 
 		HashMap<Id, Double> startTimes = new HashMap<Id, Double>();
 		HashMap<Id, Double> distance = new HashMap<Id, Double>();
-		ScenarioImpl scenario;
+		MutableScenario scenario;
 		
 		final BufferedWriter outLink;
 		
 		double d = 0.0;
 		int i = 0;
-		RentalTimes(ScenarioImpl scenario, BufferedWriter outLink) {
+		RentalTimes(MutableScenario scenario, BufferedWriter outLink) {
 			this.scenario = scenario;
 			this.outLink = outLink;
 		}
@@ -127,12 +127,12 @@ public class DistanceTimeCS {
 		public void handleEvent(LinkEnterEvent event) {
 			// TODO Auto-generated method stub
 			
-			if (startTimes.containsKey(event.getPersonId())) {
+			if (startTimes.containsKey(event.getDriverId())) {
 				
-				double d = distance.get(event.getPersonId());
+				double d = distance.get(event.getDriverId());
 				
 				d += scenario.getNetwork().getLinks().get(event.getLinkId()).getLength();
-				distance.put(event.getPersonId(), d);
+				distance.put(event.getDriverId(), d);
 			}
 			
 		}

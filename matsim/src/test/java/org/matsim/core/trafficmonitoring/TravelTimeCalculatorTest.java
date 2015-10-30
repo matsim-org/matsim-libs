@@ -27,9 +27,8 @@ import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import junit.framework.Assert;
-
 import org.apache.log4j.Logger;
+import org.junit.Assert;
 import org.junit.Ignore;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -38,8 +37,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
-import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
+import org.matsim.api.core.v01.events.Wait2LinkEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -54,13 +52,10 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.pt.transitSchedule.api.Departure;
-import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.utils.EventsCollector;
@@ -76,7 +71,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 
 	public final void testTravelTimeCalculator_Array_Optimistic() throws IOException {
 		String compareFile;
-		ScenarioImpl scenario;
+		MutableScenario scenario;
 		AbstractTravelTimeAggregator aggregator;
 
 		int endTime = 30*3600;
@@ -85,7 +80,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 
 		// by default: averaging travel times
 		compareFile = getClassInputDirectory() + "link10_ttimes.txt";
-		scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		aggregator = new OptimisticTravelTimeAggregator(numSlots, binSize);
 		assertEquals(AveragingTravelTimeGetter.class, aggregator.getTravelTimeGetter().getClass());
 		doTravelTimeCalculatorTest(scenario, new TravelTimeDataArrayFactory(scenario.getNetwork(), numSlots),
@@ -94,7 +89,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 
 	public final void testTravelTimeCalculator_Array_Optimistic_LinearInterpolation() throws IOException {
 		String compareFile;
-		ScenarioImpl scenario;
+		MutableScenario scenario;
 		AbstractTravelTimeAggregator aggregator;
 
 		int endTime = 30*3600;
@@ -103,7 +98,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 
 		// use linear interpolation
 		compareFile = getClassInputDirectory() + "link10_ttimes_linearinterpolation.txt";
-		scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		aggregator = new OptimisticTravelTimeAggregator(numSlots, binSize);
 		aggregator.connectTravelTimeGetter(new LinearInterpolatingTravelTimeGetter(numSlots, binSize));
 		doTravelTimeCalculatorTest(scenario, new TravelTimeDataArrayFactory(scenario.getNetwork(), numSlots),
@@ -112,7 +107,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 
 	public final void testTravelTimeCalculator_HashMap_Optimistic() throws IOException {
 		String compareFile;
-		ScenarioImpl scenario;
+		MutableScenario scenario;
 		AbstractTravelTimeAggregator aggregator;
 
 		int endTime = 30*3600;
@@ -121,7 +116,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 
 		// by default: averaging travel times
 		compareFile = getClassInputDirectory() + "link10_ttimes.txt";
-		scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		aggregator = new OptimisticTravelTimeAggregator(numSlots, binSize);
 		assertEquals(AveragingTravelTimeGetter.class, aggregator.getTravelTimeGetter().getClass());
 		doTravelTimeCalculatorTest(scenario, new TravelTimeDataHashMapFactory(scenario.getNetwork()),
@@ -130,7 +125,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 
 	public final void testTravelTimeCalculator_HashMap_Optimistic_LinearInterpolation() throws IOException {
 		String compareFile;
-		ScenarioImpl scenario;
+		MutableScenario scenario;
 		AbstractTravelTimeAggregator aggregator;
 
 		int endTime = 30*3600;
@@ -139,7 +134,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 
 		// use linear interpolation
 		compareFile = getClassInputDirectory() + "link10_ttimes_linearinterpolation.txt";
-		scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		aggregator = new OptimisticTravelTimeAggregator(numSlots, binSize);
 		aggregator.connectTravelTimeGetter(new LinearInterpolatingTravelTimeGetter(numSlots, binSize));
 		doTravelTimeCalculatorTest(scenario, new TravelTimeDataHashMapFactory(scenario.getNetwork()),
@@ -148,7 +143,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 
 	public final void testTravelTimeCalculator_HashMap_Pessimistic() throws IOException {
 		String compareFile;
-		ScenarioImpl scenario;
+		MutableScenario scenario;
 		AbstractTravelTimeAggregator aggregator;
 
 		int endTime = 12*3600;
@@ -157,7 +152,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 
 		// by default: averaging travel times
 		compareFile = getClassInputDirectory() + "link10_ttimes_pessimistic.txt";
-		scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		aggregator = new PessimisticTravelTimeAggregator(binSize, numSlots);
 		assertEquals(AveragingTravelTimeGetter.class, aggregator.getTravelTimeGetter().getClass());
 		doTravelTimeCalculatorTest(scenario, new TravelTimeDataHashMapFactory(scenario.getNetwork()),
@@ -166,7 +161,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 
 	public final void testTravelTimeCalculator_HashMap_Pessimistic_LinearInterpolation() throws IOException {
 		String compareFile;
-		ScenarioImpl scenario;
+		MutableScenario scenario;
 		AbstractTravelTimeAggregator aggregator;
 
 		int endTime = 12*3600;
@@ -175,14 +170,14 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 
 		// use linear interpolation
 		compareFile = getClassInputDirectory() + "link10_ttimes_pessimistic_linearinterpolation.txt";
-		scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		aggregator = new PessimisticTravelTimeAggregator(binSize, numSlots);
 		aggregator.connectTravelTimeGetter(new LinearInterpolatingTravelTimeGetter(numSlots, binSize));
 		doTravelTimeCalculatorTest(scenario, new TravelTimeDataHashMapFactory(scenario.getNetwork()),
 				aggregator, binSize, compareFile, false);
 	}
 
-	private final void doTravelTimeCalculatorTest(final ScenarioImpl scenario, final TravelTimeDataFactory ttDataFactory,
+	private final void doTravelTimeCalculatorTest(final MutableScenario scenario, final TravelTimeDataFactory ttDataFactory,
 			final AbstractTravelTimeAggregator aggregator, final int timeBinSize,
 			final String compareFile, final boolean generateNewData) throws IOException {
 		String networkFile = getClassInputDirectory() + "link10_network.xml";
@@ -257,7 +252,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 	 * @author mrieser
 	 */
 	public void testLongTravelTimeInEmptySlot() {
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 		network.setCapacityPeriod(3600.0);
@@ -268,25 +263,26 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		int timeBinSize = 15*60;
 		TravelTimeCalculator ttcalc = new TravelTimeCalculator(network, timeBinSize, 12*3600, scenario.getConfig().travelTimeCalculator());
 
-		Person person = PersonImpl.createPerson(Id.create("1", Person.class));
-
+		Id<Person> agId = Id.create(1510, Person.class);
+		Id<Vehicle> vehId = Id.create(1980, Vehicle.class);
+		
 		// generate some events that suggest a really long travel time
 		double linkEnterTime1 = 7.0 * 3600 + 10;
 		double linkTravelTime1 = 50.0 * 60; // 50minutes!
 		double linkEnterTime2 = 7.75 * 3600 + 10;
 		double linkTravelTime2 = 10.0 * 60; // 10minutes!
 
-		ttcalc.handleEvent(new LinkEnterEvent(linkEnterTime1, person.getId(), link1.getId(), null));
-		ttcalc.handleEvent(new LinkLeaveEvent(linkEnterTime1 + linkTravelTime1, person.getId(), link1.getId(), null));
-		ttcalc.handleEvent(new LinkEnterEvent(linkEnterTime2, person.getId(), link1.getId(), null));
-		ttcalc.handleEvent(new LinkLeaveEvent(linkEnterTime2 + linkTravelTime2, person.getId(), link1.getId(), null));
+		ttcalc.handleEvent(new LinkEnterEvent(linkEnterTime1, agId, link1.getId(), vehId));
+		ttcalc.handleEvent(new LinkLeaveEvent(linkEnterTime1 + linkTravelTime1, agId, link1.getId(), vehId));
+		ttcalc.handleEvent(new LinkEnterEvent(linkEnterTime2, agId, link1.getId(), vehId));
+		ttcalc.handleEvent(new LinkLeaveEvent(linkEnterTime2 + linkTravelTime2, agId, link1.getId(), vehId));
 
-		assertEquals(50 * 60, ttcalc.getLinkTravelTimes().getLinkTravelTime(link1, 7.0 * 3600 + 5 * 60, person, null), EPSILON); // linkTravelTime1
-		assertEquals(35 * 60, ttcalc.getLinkTravelTimes().getLinkTravelTime(link1, 7.0 * 3600 + 5 * 60 + 1*timeBinSize, person, null), EPSILON);  // linkTravelTime1 - 1*timeBinSize
-		assertEquals(20 * 60, ttcalc.getLinkTravelTimes().getLinkTravelTime(link1, 7.0 * 3600 + 5 * 60 + 2*timeBinSize, person, null), EPSILON);  // linkTravelTime1 - 2*timeBinSize
-		assertEquals(10 * 60, ttcalc.getLinkTravelTimes().getLinkTravelTime(link1, 7.0 * 3600 + 5 * 60 + 3*timeBinSize, person, null), EPSILON);  // linkTravelTime2 > linkTravelTime1 - 3*timeBinSize !
-		assertEquals(10     , ttcalc.getLinkTravelTimes().getLinkTravelTime(link1, 7.0 * 3600 + 5 * 60 + 4*timeBinSize, person, null), EPSILON);  // freespeedTravelTime > linkTravelTime2 - 1*timeBinSize
-		assertEquals(10     , ttcalc.getLinkTravelTimes().getLinkTravelTime(link1, 7.0 * 3600 + 5 * 60 + 5*timeBinSize, person, null), EPSILON);  // freespeedTravelTime > linkTravelTime2 - 2*timeBinSize
+		assertEquals(50 * 60, ttcalc.getLinkTravelTimes().getLinkTravelTime(link1, 7.0 * 3600 + 5 * 60, null, null), EPSILON); // linkTravelTime1
+		assertEquals(35 * 60, ttcalc.getLinkTravelTimes().getLinkTravelTime(link1, 7.0 * 3600 + 5 * 60 + 1*timeBinSize, null, null), EPSILON);  // linkTravelTime1 - 1*timeBinSize
+		assertEquals(20 * 60, ttcalc.getLinkTravelTimes().getLinkTravelTime(link1, 7.0 * 3600 + 5 * 60 + 2*timeBinSize, null, null), EPSILON);  // linkTravelTime1 - 2*timeBinSize
+		assertEquals(10 * 60, ttcalc.getLinkTravelTimes().getLinkTravelTime(link1, 7.0 * 3600 + 5 * 60 + 3*timeBinSize, null, null), EPSILON);  // linkTravelTime2 > linkTravelTime1 - 3*timeBinSize !
+		assertEquals(10     , ttcalc.getLinkTravelTimes().getLinkTravelTime(link1, 7.0 * 3600 + 5 * 60 + 4*timeBinSize, null, null), EPSILON);  // freespeedTravelTime > linkTravelTime2 - 1*timeBinSize
+		assertEquals(10     , ttcalc.getLinkTravelTimes().getLinkTravelTime(link1, 7.0 * 3600 + 5 * 60 + 5*timeBinSize, null, null), EPSILON);  // freespeedTravelTime > linkTravelTime2 - 2*timeBinSize
 	}
 
 	/**
@@ -318,9 +314,9 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 
 		TravelTimeCalculator ttCalc = new TravelTimeCalculator(network, config.travelTimeCalculator());
 		events.addHandler(ttCalc);
-
+				
 		new MatsimEventsReader(events).readFile(eventsFilename);
-
+		
 		Link link10 = network.getLinks().get(Id.create("10", Link.class));
 
 		assertEquals("wrong link travel time at 06:00.", 110.0, ttCalc.getLinkTravelTimes().getLinkTravelTime(link10, 6.0 * 3600, null, null), EPSILON);
@@ -331,7 +327,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 	 * @author mrieser / senozon
 	 */
 	public void testGetLinkTravelTime_ignorePtVehiclesAtStop() {
-		Network network = NetworkImpl.createNetwork();
+		Network network = NetworkUtils.createNetwork();
 		TravelTimeCalculatorConfigGroup config = new TravelTimeCalculatorConfigGroup();
 		config.setTraveltimeBinSize(900);
 		TravelTimeCalculator ttc = new TravelTimeCalculator(network, config);
@@ -343,16 +339,16 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		Link link1 = network.getFactory().createLink(Id.create(1, Link.class), n1, n2);
 		network.addLink(link1);
 
-		Id<Person> agId1 = Id.create(1510, Person.class);
-		Id<Person> agId2 = Id.create("pt2011", Person.class);
-		Id<Vehicle> vehId = Id.create(1980, Vehicle.class);
+		Id<Person> ivAgId = Id.create("ivPerson", Person.class);
+		Id<Person> ptAgId = Id.create("ptPerson", Person.class);
+		Id<Vehicle> ptVehId = Id.create("ptVeh", Vehicle.class);
+		Id<Vehicle> ivVehId = Id.create("ivVeh", Vehicle.class);
 
-		ttc.handleEvent(new LinkEnterEvent(100, agId1, link1.getId(), null));
-		ttc.handleEvent(new TransitDriverStartsEvent(140, agId2, vehId, Id.create("line1", TransitLine.class), Id.create("route1", TransitRoute.class), Id.create("dep1", Departure.class)));
-		ttc.handleEvent(new LinkEnterEvent(150, agId2, link1.getId(), null));
-		ttc.handleEvent(new LinkLeaveEvent(200, agId1, link1.getId(), null));
-		ttc.handleEvent(new VehicleArrivesAtFacilityEvent(240, vehId, Id.create("stop", TransitStopFacility.class), 0));
-		ttc.handleEvent(new LinkLeaveEvent(350, agId2, link1.getId(), null));
+		ttc.handleEvent(new LinkEnterEvent(100, ivAgId, link1.getId(), ivVehId));
+		ttc.handleEvent(new LinkEnterEvent(150, ptAgId, link1.getId(), ptVehId));
+		ttc.handleEvent(new LinkLeaveEvent(200, ivAgId, link1.getId(), ivVehId));
+		ttc.handleEvent(new VehicleArrivesAtFacilityEvent(240, ptVehId, Id.create("stop", TransitStopFacility.class), 0));
+		ttc.handleEvent(new LinkLeaveEvent(350, ptAgId, link1.getId(), ptVehId));
 
 		Assert.assertEquals("The time of transit vehicles at stop should not be counted", 100.0, ttc.getLinkTravelTimes().getLinkTravelTime(link1, 200, null, null), 1e-8);
 	}
@@ -361,7 +357,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 	 * @author mrieser / senozon
 	 */
 	public void testGetLinkTravelTime_usePtVehiclesWithoutStop() {
-		Network network = NetworkImpl.createNetwork();
+		Network network = NetworkUtils.createNetwork();
 		TravelTimeCalculatorConfigGroup config = new TravelTimeCalculatorConfigGroup();
 		config.setTraveltimeBinSize(900);
 		TravelTimeCalculator ttc = new TravelTimeCalculator(network, config);
@@ -373,15 +369,15 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		Link link1 = network.getFactory().createLink(Id.create(1, Link.class), n1, n2);
 		network.addLink(link1);
 
-		Id<Person> agId1 = Id.create(1510, Person.class);
-		Id<Person> agId2 = Id.create("pt2011", Person.class);
-		Id<Vehicle> vehId = Id.create(1980, Vehicle.class);
-
-		ttc.handleEvent(new LinkEnterEvent(100, agId1, link1.getId(), null));
-		ttc.handleEvent(new TransitDriverStartsEvent(140, agId2, vehId, Id.create("line1", TransitLine.class), Id.create("route1", TransitRoute.class), Id.create("dep1", Departure.class)));
-		ttc.handleEvent(new LinkEnterEvent(150, agId2, link1.getId(), null));
-		ttc.handleEvent(new LinkLeaveEvent(200, agId1, link1.getId(), null));
-		ttc.handleEvent(new LinkLeaveEvent(300, agId2, link1.getId(), null));
+		Id<Person> ivAgId = Id.create("ivPerson", Person.class);
+		Id<Person> ptAgId = Id.create("ptPerson", Person.class);
+		Id<Vehicle> ptVehId = Id.create("ptVeh", Vehicle.class);
+		Id<Vehicle> ivVehId = Id.create("ivVeh", Vehicle.class);
+		
+		ttc.handleEvent(new LinkEnterEvent(100, ivAgId, link1.getId(), ivVehId));
+		ttc.handleEvent(new LinkEnterEvent(150, ptAgId, link1.getId(), ptVehId));
+		ttc.handleEvent(new LinkLeaveEvent(200, ivAgId, link1.getId(), ivVehId));
+		ttc.handleEvent(new LinkLeaveEvent(300, ptAgId, link1.getId(), ptVehId));
 
 		Assert.assertEquals("The time of transit vehicles at stop should not be counted", 125.0, ttc.getLinkTravelTimes().getLinkTravelTime(link1, 200, null, null), 1e-8);
 
@@ -393,7 +389,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 	 * @author cdobler
 	 */
 	public void testGetLinkTravelTime_NoAnalyzedModes() {
-		Network network = NetworkImpl.createNetwork();
+		Network network = NetworkUtils.createNetwork();
 		TravelTimeCalculatorConfigGroup config = new TravelTimeCalculatorConfigGroup();
 		config.setTraveltimeBinSize(900);
 		config.setAnalyzedModes("");
@@ -402,18 +398,24 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 
 		Node n1 = network.getFactory().createNode(Id.create(1, Node.class), new Coord(0, 0));
 		Node n2 = network.getFactory().createNode(Id.create(2, Node.class), new Coord(1000, 0));
+		Node n3 = network.getFactory().createNode(Id.create(3, Node.class), new Coord(2000, 0));
 		network.addNode(n1);
 		network.addNode(n2);
+		network.addNode(n3);
 		Link link1 = network.getFactory().createLink(Id.create(1, Link.class), n1, n2);
+		Link link2 = network.getFactory().createLink(Id.create(2, Link.class), n2, n3);
 		network.addLink(link1);
+		network.addLink(link2);
 
 		Id<Person> agId1 = Id.create(1510, Person.class);
-		
-		ttc.handleEvent(new PersonDepartureEvent(100, agId1, link1.getId(), TransportMode.car));
-		ttc.handleEvent(new LinkEnterEvent(100, agId1, link1.getId(), null));
-		ttc.handleEvent(new LinkLeaveEvent(200, agId1, link1.getId(), null));
+		Id<Vehicle> vehId = Id.create(1980, Vehicle.class);
 
-		Assert.assertEquals("No transport mode has been registered to be analyzed, therefore no vehicle/agent should be counted", 1.0, ttc.getLinkTravelTimes().getLinkTravelTime(link1, 200, null, null), 1e-8);
+		ttc.handleEvent(new Wait2LinkEvent(100, agId1, link1.getId(), vehId, TransportMode.car, 1.0));
+		ttc.handleEvent(new LinkLeaveEvent(200, agId1, link1.getId(), vehId));
+		ttc.handleEvent(new LinkEnterEvent(200, agId1, link2.getId(), vehId));
+		ttc.handleEvent(new LinkLeaveEvent(300, agId1, link2.getId(), vehId));
+
+		Assert.assertEquals("No transport mode has been registered to be analyzed, therefore no vehicle/agent should be counted", 1.0, ttc.getLinkTravelTimes().getLinkTravelTime(link2, 300, null, null), 1e-8);
 	}
 	
 	/**
@@ -422,31 +424,39 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 	 * @author cdobler
 	 */
 	public void testGetLinkTravelTime_CarAnalyzedModes() {
-		Network network = NetworkImpl.createNetwork();
+		Network network = NetworkUtils.createNetwork();
 		TravelTimeCalculatorConfigGroup config = new TravelTimeCalculatorConfigGroup();
 		config.setTraveltimeBinSize(900);
-		config.setAnalyzedModes("car");
+		config.setAnalyzedModes(TransportMode.car);
 		config.setFilterModes(true);
 		TravelTimeCalculator ttc = new TravelTimeCalculator(network, config);
 
 		Node n1 = network.getFactory().createNode(Id.create(1, Node.class), new Coord(0, 0));
 		Node n2 = network.getFactory().createNode(Id.create(2, Node.class), new Coord(1000, 0));
+		Node n3 = network.getFactory().createNode(Id.create(3, Node.class), new Coord(2000, 0));
 		network.addNode(n1);
 		network.addNode(n2);
+		network.addNode(n3);
 		Link link1 = network.getFactory().createLink(Id.create(1, Link.class), n1, n2);
+		Link link2 = network.getFactory().createLink(Id.create(2, Link.class), n2, n3);
 		network.addLink(link1);
+		network.addLink(link2);
 
 		Id<Person> agId1 = Id.create(1510, Person.class);
 		Id<Person> agId2 = Id.create(1511, Person.class);
-		
-		ttc.handleEvent(new PersonDepartureEvent(100, agId1, link1.getId(), TransportMode.car));
-		ttc.handleEvent(new LinkEnterEvent(100, agId1, link1.getId(), null));
-		ttc.handleEvent(new PersonDepartureEvent(110, agId2, link1.getId(), TransportMode.walk));
-		ttc.handleEvent(new LinkEnterEvent(110, agId2, link1.getId(), null));
-		ttc.handleEvent(new LinkLeaveEvent(200, agId1, link1.getId(), null));
-		ttc.handleEvent(new LinkLeaveEvent(410, agId2, link1.getId(), null));
+		Id<Vehicle> vehId1 = Id.create(1980, Vehicle.class);
+		Id<Vehicle> vehId2 = Id.create(1981, Vehicle.class);
 
-		Assert.assertEquals("Only transport mode has been registered to be analyzed, therefore no walk agent should be counted", 100.0, ttc.getLinkTravelTimes().getLinkTravelTime(link1, 200, null, null), 1e-8);
+		ttc.handleEvent(new Wait2LinkEvent(90, agId1, link1.getId(), vehId1, TransportMode.car, 1.0));
+		ttc.handleEvent(new Wait2LinkEvent(100, agId2, link1.getId(), vehId2, TransportMode.walk, 1.0));
+		ttc.handleEvent(new LinkLeaveEvent(100, agId1, link1.getId(), vehId1));
+		ttc.handleEvent(new LinkEnterEvent(100, agId1, link2.getId(), vehId1));
+		ttc.handleEvent(new LinkLeaveEvent(110, agId2, link1.getId(), vehId2));
+		ttc.handleEvent(new LinkEnterEvent(110, agId2, link2.getId(), vehId2));
+		ttc.handleEvent(new LinkLeaveEvent(200, agId1, link2.getId(), vehId1));
+		ttc.handleEvent(new LinkLeaveEvent(410, agId2, link2.getId(), vehId2));
+
+		Assert.assertEquals("Only transport mode has been registered to be analyzed, therefore no walk agent should be counted", 100.0, ttc.getLinkTravelTimes().getLinkTravelTime(link2, 200, null, null), 1e-8);
 	}
 	
 	/**
@@ -455,7 +465,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 	 * @author cdobler
 	 */
 	public void testGetLinkTravelTime_NoFilterModes() {
-		Network network = NetworkImpl.createNetwork();
+		Network network = NetworkUtils.createNetwork();
 		TravelTimeCalculatorConfigGroup config = new TravelTimeCalculatorConfigGroup();
 		config.setTraveltimeBinSize(900);
 		config.setAnalyzedModes("");
@@ -464,22 +474,30 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 
 		Node n1 = network.getFactory().createNode(Id.create(1, Node.class), new Coord(0, 0));
 		Node n2 = network.getFactory().createNode(Id.create(2, Node.class), new Coord(1000, 0));
+		Node n3 = network.getFactory().createNode(Id.create(3, Node.class), new Coord(2000, 0));
 		network.addNode(n1);
 		network.addNode(n2);
+		network.addNode(n3);
 		Link link1 = network.getFactory().createLink(Id.create(1, Link.class), n1, n2);
+		Link link2 = network.getFactory().createLink(Id.create(2, Link.class), n2, n3);
 		network.addLink(link1);
+		network.addLink(link2);
 
 		Id<Person> agId1 = Id.create(1510, Person.class);
 		Id<Person> agId2 = Id.create(1511, Person.class);
-		
-		ttc.handleEvent(new PersonDepartureEvent(100, agId1, link1.getId(), TransportMode.car));
-		ttc.handleEvent(new LinkEnterEvent(100, agId1, link1.getId(), null));
-		ttc.handleEvent(new PersonDepartureEvent(110, agId2, link1.getId(), TransportMode.walk));
-		ttc.handleEvent(new LinkEnterEvent(110, agId2, link1.getId(), null));
-		ttc.handleEvent(new LinkLeaveEvent(200, agId1, link1.getId(), null));
-		ttc.handleEvent(new LinkLeaveEvent(410, agId2, link1.getId(), null));
+		Id<Vehicle> vehId1 = Id.create(1980, Vehicle.class);
+		Id<Vehicle> vehId2 = Id.create(1981, Vehicle.class);
 
-		Assert.assertEquals("Filtering analyzed transport modes is disabled, therefore count all modes", 200.0, ttc.getLinkTravelTimes().getLinkTravelTime(link1, 200, null, null), 1e-8);
+		ttc.handleEvent(new Wait2LinkEvent(90, agId1, link1.getId(), vehId1, TransportMode.car, 1.0));
+		ttc.handleEvent(new Wait2LinkEvent(100, agId2, link1.getId(), vehId2, TransportMode.walk, 1.0));
+		ttc.handleEvent(new LinkLeaveEvent(100, agId1, link1.getId(), vehId1));
+		ttc.handleEvent(new LinkEnterEvent(100, agId1, link2.getId(), vehId1));
+		ttc.handleEvent(new LinkLeaveEvent(110, agId2, link1.getId(), vehId2));
+		ttc.handleEvent(new LinkEnterEvent(110, agId2, link2.getId(), vehId2));
+		ttc.handleEvent(new LinkLeaveEvent(200, agId1, link2.getId(), vehId1));
+		ttc.handleEvent(new LinkLeaveEvent(410, agId2, link2.getId(), vehId2));
+
+		Assert.assertEquals("Filtering analyzed transport modes is disabled, therefore count all modes", 200.0, ttc.getLinkTravelTimes().getLinkTravelTime(link2, 200, null, null), 1e-8);
 	}
 	
 	/**
@@ -488,7 +506,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 	 * @author cdobler
 	 */
 	public void testGetLinkTravelTime_FilterDefaultModes() {
-		Network network = NetworkImpl.createNetwork();
+		Network network = NetworkUtils.createNetwork();
 		TravelTimeCalculatorConfigGroup config = new TravelTimeCalculatorConfigGroup();
 		config.setTraveltimeBinSize(900);
 		config.setFilterModes(true);
@@ -496,22 +514,31 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 
 		Node n1 = network.getFactory().createNode(Id.create(1, Node.class), new Coord(0, 0));
 		Node n2 = network.getFactory().createNode(Id.create(2, Node.class), new Coord(1000, 0));
+		Node n3 = network.getFactory().createNode(Id.create(3, Node.class), new Coord(2000, 0));
 		network.addNode(n1);
 		network.addNode(n2);
+		network.addNode(n3);
 		Link link1 = network.getFactory().createLink(Id.create(1, Link.class), n1, n2);
+		Link link2 = network.getFactory().createLink(Id.create(2, Link.class), n2, n3);
 		network.addLink(link1);
+		network.addLink(link2);
 
 		Id<Person> agId1 = Id.create(1510, Person.class);
 		Id<Person> agId2 = Id.create(1511, Person.class);
-		
-		ttc.handleEvent(new PersonDepartureEvent(100, agId1, link1.getId(), TransportMode.car));
-		ttc.handleEvent(new LinkEnterEvent(100, agId1, link1.getId(), null));
-		ttc.handleEvent(new PersonDepartureEvent(110, agId2, link1.getId(), TransportMode.walk));
-		ttc.handleEvent(new LinkEnterEvent(110, agId2, link1.getId(), null));
-		ttc.handleEvent(new LinkLeaveEvent(200, agId1, link1.getId(), null));
-		ttc.handleEvent(new LinkLeaveEvent(410, agId2, link1.getId(), null));
+		Id<Vehicle> vehId1 = Id.create(1980, Vehicle.class);
+		Id<Vehicle> vehId2 = Id.create(1981, Vehicle.class);
 
-		Assert.assertEquals("Filtering analyzed transport modes is enabled, but no modes set. Therefore, use default (=car)", 100.0, ttc.getLinkTravelTimes().getLinkTravelTime(link1, 200, null, null), 1e-8);
+		ttc.handleEvent(new Wait2LinkEvent(90, agId1, link1.getId(), vehId1, TransportMode.car, 1.0));
+		ttc.handleEvent(new Wait2LinkEvent(100, agId2, link1.getId(), vehId2, TransportMode.walk, 1.0));
+		ttc.handleEvent(new LinkLeaveEvent(100, agId1, link1.getId(), vehId1));
+		ttc.handleEvent(new LinkEnterEvent(100, agId1, link2.getId(), vehId1));
+		ttc.handleEvent(new LinkLeaveEvent(110, agId2, link1.getId(), vehId2));
+		ttc.handleEvent(new LinkEnterEvent(110, agId2, link2.getId(), vehId2));
+		ttc.handleEvent(new LinkLeaveEvent(200, agId1, link2.getId(), vehId1));
+		ttc.handleEvent(new LinkLeaveEvent(410, agId2, link2.getId(), vehId2));
+
+		Assert.assertEquals("Filtering analyzed transport modes is enabled, but no modes set. Therefore, use default (=car)", 100.0, 
+				ttc.getLinkTravelTimes().getLinkTravelTime(link2, 200, null, null), 1e-8);
 	}
 	
 	/**
@@ -538,9 +565,12 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		int timeBinSize = 5*60;
 		TravelTimeCalculator ttcalc = new TravelTimeCalculator(network, timeBinSize, 12*3600, scenario.getConfig().travelTimeCalculator());
 
-		Person person1 = PersonImpl.createPerson(Id.create(1, Person.class));
-		Person person2 = PersonImpl.createPerson(Id.create(2, Person.class));
-		Person person3 = PersonImpl.createPerson(Id.create(3, Person.class));
+		Id<Person> agId1 = Id.create(1, Person.class);
+		Id<Person> agId2 = Id.create(2, Person.class);
+		Id<Person> agId3 = Id.create(3, Person.class);
+		Id<Vehicle> vehId1 = Id.create(1, Vehicle.class);
+		Id<Vehicle> vehId2 = Id.create(2, Vehicle.class);
+		Id<Vehicle> vehId3 = Id.create(3, Vehicle.class);
 
 		// generate some events that suggest a really long travel time
 		double linkEnterTime1 = 7.0 * 3600;
@@ -548,18 +578,17 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		double linkEnterTime2 = 7.0 * 3600;
 		double linkTravelTime2 = 10.0 * 60; // 10minutes!
 		double linkEnterTime3 = 7.0 * 3600 + 6.0 * 60;
-		double linkTravelTime3 = 14.0 * 60;
+		double linkTravelTime3 = 14.0 * 60; // 14minutes!
 
-		ttcalc.handleEvent(new LinkEnterEvent(linkEnterTime1, person1.getId(), link1.getId(), Id.create(person1.getId().toString(), Vehicle.class)));
-		ttcalc.handleEvent(new LinkLeaveEvent(linkEnterTime1 + linkTravelTime1, person1.getId(), link1.getId(), Id.create(person1.getId().toString(), Vehicle.class)));
-		ttcalc.handleEvent(new LinkEnterEvent(linkEnterTime2, person2.getId(), link1.getId(), Id.create(person2.getId().toString(), Vehicle.class)));
-		ttcalc.handleEvent(new LinkLeaveEvent(linkEnterTime2 + linkTravelTime2, person2.getId(), link1.getId(), Id.create(person2.getId().toString(), Vehicle.class)));
-		ttcalc.handleEvent(new LinkEnterEvent(linkEnterTime3, person3.getId(), link1.getId(), Id.create(person3.getId().toString(), Vehicle.class)));
-		ttcalc.handleEvent(new LinkLeaveEvent(linkEnterTime3 + linkTravelTime3, person3.getId(), link1.getId(), Id.create(person3.getId().toString(), Vehicle.class)));
+		ttcalc.handleEvent(new LinkEnterEvent(linkEnterTime1, agId1, link1.getId(), vehId1));
+		ttcalc.handleEvent(new LinkEnterEvent(linkEnterTime2, agId2, link1.getId(), vehId2));
+		ttcalc.handleEvent(new LinkLeaveEvent(linkEnterTime1 + linkTravelTime1, agId1, link1.getId(), vehId1));
+		ttcalc.handleEvent(new LinkEnterEvent(linkEnterTime3, agId3, link1.getId(), vehId3));
+		ttcalc.handleEvent(new LinkLeaveEvent(linkEnterTime2 + linkTravelTime2, agId2, link1.getId(), vehId2));
+		ttcalc.handleEvent(new LinkLeaveEvent(linkEnterTime3 + linkTravelTime3, agId3, link1.getId(), vehId3));
 
-		
-		assertEquals(6.5 * 60, ttcalc.getLinkTravelTime(link1.getId(), linkEnterTime1));
-		assertEquals(14.0 * 60, ttcalc.getLinkTravelTime(link1.getId(), linkEnterTime3));
-		assertEquals(19.0 * 60, ttcalc.getLinkTravelTime(link1.getId(), 7.0 * 3600.0 + 11.0 * 60));
+		assertEquals(6.5 * 60, ttcalc.getLinkTravelTimes().getLinkTravelTime(link1, linkEnterTime1, null, null));
+		assertEquals(14.0 * 60, ttcalc.getLinkTravelTimes().getLinkTravelTime(link1, linkEnterTime3, null, null));
+		assertEquals(19.0 * 60, ttcalc.getLinkTravelTimes().getLinkTravelTime(link1, 7.0 * 3600.0 + 11.0 * 60, null, null));
 	}
 }

@@ -2,8 +2,9 @@ package org.matsim.contrib.accessibility;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.accessibility.interfaces.ZoneDataExchangeInterface;
+import org.matsim.contrib.accessibility.interfaces.FacilityDataExchangeInterface;
 import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
@@ -80,7 +81,7 @@ public final class ZoneBasedAccessibilityControlerListenerV3 implements Shutdown
 		// files is given by the UrbanSim convention importing a csv file into a identically named 
 		// data set table. THIS PRODUCES URBANSIM INPUT
 		urbanSimZoneCSVWriterV2 = new UrbanSimZoneCSVWriterV2(matsim4opusTempDirectory);
-		delegate.addZoneDataExchangeListener(urbanSimZoneCSVWriterV2);
+		delegate.addFacilityDataExchangeListener(urbanSimZoneCSVWriterV2);
 
 		delegate.initAccessibilityParameters(scenario.getConfig());
 
@@ -123,7 +124,15 @@ public final class ZoneBasedAccessibilityControlerListenerV3 implements Shutdown
 		try{
 			log.info("Computing and writing zone based accessibility measures ..." );
 			log.info(delegate.getMeasuringPoints().getFacilities().values().size() + " measurement points are now processing ...");
-			delegate.computeAccessibilities(controler.getScenario());
+			
+			AccessibilityConfigGroup moduleAPCM =
+					ConfigUtils.addOrGetModule(
+							controler.getScenario().getConfig(),
+							AccessibilityConfigGroup.GROUP_NAME,
+							AccessibilityConfigGroup.class);
+
+			
+			delegate.computeAccessibilities(controler.getScenario(), moduleAPCM.getTimeOfDay() );
 			
 			// finalizing/closing csv file containing accessibility measures
 			String matsimOutputDirectory = event.getControler().getScenario().getConfig().controler().getOutputDirectory();
@@ -137,8 +146,8 @@ public final class ZoneBasedAccessibilityControlerListenerV3 implements Shutdown
 		delegate.setComputingAccessibilityForMode(mode, val);
 	}
 
-	public void addZoneDataExchangeListener(ZoneDataExchangeInterface l) {
-		delegate.addZoneDataExchangeListener(l);
+	public void addZoneDataExchangeListener(FacilityDataExchangeInterface l) {
+		delegate.addFacilityDataExchangeListener(l);
 	}
 
 }

@@ -23,33 +23,25 @@ import gnu.trove.TDoubleArrayList;
 import gnu.trove.TDoubleDoubleHashMap;
 import gnu.trove.TDoubleObjectHashMap;
 import gnu.trove.TObjectDoubleHashMap;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
-
+import org.matsim.contrib.common.gis.CartesianDistanceCalculator;
+import org.matsim.contrib.common.stats.Correlations;
+import org.matsim.contrib.common.stats.Discretizer;
+import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
+import org.matsim.contrib.common.stats.StatsWriter;
+import org.matsim.contrib.socnetgen.sna.gis.GravityCostFunction;
+import org.matsim.contrib.socnetgen.sna.graph.Vertex;
+import org.matsim.contrib.socnetgen.sna.graph.social.SocialGraph;
+import org.matsim.contrib.socnetgen.sna.graph.social.SocialVertex;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.analysis.Accessibility;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.analysis.GridAccessibility;
 import playground.johannes.coopsim.pysical.Trajectory;
 import playground.johannes.coopsim.pysical.VisitorTracker;
-import playground.johannes.mz2005.io.ActivityType;
-import playground.johannes.sna.graph.Vertex;
-import playground.johannes.sna.math.Discretizer;
-import playground.johannes.sna.math.FixedSampleSizeDiscretizer;
-import playground.johannes.sna.util.TXTWriter;
-import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
-import playground.johannes.socialnetworks.gis.GravityCostFunction;
-import playground.johannes.socialnetworks.graph.social.SocialGraph;
-import playground.johannes.socialnetworks.graph.social.SocialVertex;
-import playground.johannes.socialnetworks.graph.spatial.analysis.Accessibility;
-import playground.johannes.socialnetworks.graph.spatial.analysis.GridAccessibility;
-import playground.johannes.socialnetworks.statistics.Correlations;
+
+import java.io.IOException;
+import java.util.*;
 
 /**
  * @author illenberger
@@ -115,8 +107,8 @@ public class VisitorsAccessibilityTask extends TrajectoryAnalyzerTask {
 			TDoubleObjectHashMap<DescriptiveStatistics> stats = Correlations.statistics(accessVals.toNativeArray(),
 					visitorVals.toNativeArray(), discretizer);
 			try {
-				TXTWriter.writeMap(correl, "A", "n", String.format("%1$s/visitors_A.%2$s.txt", getOutputDirectory(), purpose));
-				TXTWriter.writeStatistics(stats, "access",
+				StatsWriter.writeHistogram(correl, "A", "n", String.format("%1$s/visitors_A.%2$s.txt", getOutputDirectory(), purpose));
+				StatsWriter.writeStatistics(stats, "access",
 						String.format("%1$s/visitors_A.stats.%2$s.txt", getOutputDirectory(), purpose));
 			} catch (IOException e) {
 				e.printStackTrace();

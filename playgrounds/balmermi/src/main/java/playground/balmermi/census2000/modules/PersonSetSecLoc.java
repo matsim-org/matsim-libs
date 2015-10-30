@@ -228,7 +228,7 @@ public class PersonSetSecLoc extends AbstractPersonAlgorithm implements PlanAlgo
 	}
 
 	private final ActivityFacilityImpl getFacility(Coord coord, double radius, String act_type) {
-		Collection<ActivityFacilityImpl> fs = this.getFacilities(act_type).get(coord.getX(),coord.getY(),radius);
+		Collection<ActivityFacilityImpl> fs = this.getFacilities(act_type).getDisk(coord.getX(), coord.getY(), radius);
 		if (fs.isEmpty()) {
 			if (radius > 200000) { throw new RuntimeException("radius>200'000 meters and still no facility found!"); }
 			return this.getFacility(coord,2.0*radius,act_type);
@@ -237,8 +237,8 @@ public class PersonSetSecLoc extends AbstractPersonAlgorithm implements PlanAlgo
 	}
 
 	private final ActivityFacilityImpl getFacility(Coord coord1, Coord coord2, double radius, String act_type) {
-		Collection<ActivityFacilityImpl> fs = this.getFacilities(act_type).get(coord1.getX(),coord1.getY(),radius);
-		fs.addAll(this.getFacilities(act_type).get(coord2.getX(),coord2.getY(),radius));
+		Collection<ActivityFacilityImpl> fs = this.getFacilities(act_type).getDisk(coord1.getX(), coord1.getY(), radius);
+		fs.addAll(this.getFacilities(act_type).getDisk(coord2.getX(), coord2.getY(), radius));
 		if (fs.isEmpty()) {
 			if (radius > 200000) { throw new RuntimeException("radius>200'000 meters and still no facility found!"); }
 			return this.getFacility(coord1,coord2,2.0*radius,act_type);

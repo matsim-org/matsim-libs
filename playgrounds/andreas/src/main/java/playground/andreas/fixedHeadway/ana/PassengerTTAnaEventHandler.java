@@ -79,7 +79,7 @@ public class PassengerTTAnaEventHandler implements PTEventHandler, PersonDepartu
 				this.enteredMap.remove(event.getPersonId());
 				
 				if(this.debug.containsKey(event.getPersonId())){
-//					log.warn("Agent " + event.getPersonId() + " counted twice");
+//					log.warn("Agent " + event.getDriverId() + " counted twice");
 					this.numberOfAdditionalTripsPerformed++;
 				} else {
 					this.debug.put(event.getPersonId(), "");

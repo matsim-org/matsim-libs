@@ -19,14 +19,14 @@
  * *********************************************************************** */
 package playground.johannes.studies.mz2005;
 
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
-
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.Point;
 import org.geotools.referencing.CRS;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.common.gis.CRSUtils;
+import org.matsim.contrib.common.gis.EsriShapeIO;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -34,13 +34,11 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.FactoryException;
+import playground.johannes.coopsim.utils.MatsimCoordUtils;
 
-import playground.johannes.coopsim.util.MatsimCoordUtils;
-import playground.johannes.sna.gis.CRSUtils;
-import playground.johannes.socialnetworks.gis.io.FeatureSHP;
-
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.Point;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author illenberger
@@ -60,7 +58,7 @@ public class ZrhFilter {
 		MatsimPopulationReader reader = new MatsimPopulationReader(scenario);
 		reader.readFile("/Users/jillenberger/Work/socialnets/data/schweiz/mz2005/rawdata/09-12-2011/plans.xml");
 
-		Set<SimpleFeature> features = FeatureSHP.readFeatures("/Users/jillenberger/Work/socialnets/data/schweiz/complete/zones/Kanton.shp");
+		Set<SimpleFeature> features = EsriShapeIO.readFeatures("/Users/jillenberger/Work/socialnets/data/schweiz/complete/zones/Kanton.shp");
 		Geometry geometry = (Geometry) features.iterator().next().getDefaultGeometry();
 		
 		Set<Person> remove = new HashSet<Person>();

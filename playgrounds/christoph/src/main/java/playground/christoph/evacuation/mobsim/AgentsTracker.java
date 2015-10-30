@@ -70,13 +70,13 @@ public class AgentsTracker implements PersonDepartureEventHandler, PersonArrival
 	
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		AgentPosition agentPosition = agentPositions.get(event.getPersonId());
+		AgentPosition agentPosition = agentPositions.get(event.getDriverId());
 		agentPosition.entersLink(event.getLinkId());
 	}
 	
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		AgentPosition agentPosition = agentPositions.get(event.getPersonId());
+		AgentPosition agentPosition = agentPositions.get(event.getDriverId());
 		agentPosition.leavesLink();
 	}
 	

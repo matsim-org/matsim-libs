@@ -4,10 +4,10 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.households.Households;
-import org.matsim.lanes.data.v20.LaneDefinitions20;
+import org.matsim.lanes.data.v20.Lanes;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.vehicles.Vehicles;
 
@@ -19,10 +19,10 @@ import org.matsim.vehicles.Vehicles;
  */
 public class SharedNetScenario implements Scenario {
 
-	private final ScenarioImpl scenario;
+	private final MutableScenario scenario;
 	private Population myPopulation;
 
-	public SharedNetScenario(final ScenarioImpl scenario, final Population population) {
+	public SharedNetScenario(final MutableScenario scenario, final Population population) {
 		this.scenario = scenario;
 		this.myPopulation = population;
 	}
@@ -63,11 +63,6 @@ public class SharedNetScenario implements Scenario {
 	}
 
 	@Override
-	public Object removeScenarioElement(String name) {
-		return this.scenario.removeScenarioElement( name );
-	}
-
-	@Override
 	public Vehicles getTransitVehicles() {
 		// TODO Auto-generated method stub
 		throw new RuntimeException("not implemented") ;
@@ -80,7 +75,7 @@ public class SharedNetScenario implements Scenario {
 	}
 
 	@Override
-	public LaneDefinitions20 getLanes() {
+	public Lanes getLanes() {
 		// TODO Auto-generated method stub
 		throw new RuntimeException("not implemented") ;
 	}

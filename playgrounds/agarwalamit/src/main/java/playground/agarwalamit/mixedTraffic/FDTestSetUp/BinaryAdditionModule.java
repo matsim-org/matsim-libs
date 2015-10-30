@@ -37,7 +37,7 @@ public class BinaryAdditionModule {
 				add1To(point, index-1);
 			}
 		} else {
-			GenerateFundamentalDiagramData.log.info("Already tried too many combinations!!!");
+			GenerateFundamentalDiagramData.LOG.info("Already tried too many combinations!!!");
 			return;
 		}
 	}

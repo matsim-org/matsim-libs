@@ -256,7 +256,7 @@ public class FRAdaptZHScenario {
 //						else {
 							((ActivityImpl)pe).setFacilityId(
 									trees.get(act.getType().substring(0, 1)).
-									get(act.getCoord().getX(), act.getCoord().getY()).
+											getClosest(act.getCoord().getX(), act.getCoord().getY()).
 									getId());					
 //						}
 //					}

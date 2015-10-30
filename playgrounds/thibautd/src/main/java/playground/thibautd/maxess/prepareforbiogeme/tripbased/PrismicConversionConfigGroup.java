@@ -35,6 +35,7 @@ public class PrismicConversionConfigGroup extends ReflectiveConfigGroup {
 	// TODO search reasonable defauls
 	private double budget_m = 20000;
 	private int choiceSetSize = 150;
+	private int nThreads = 4;
 
 	private String outputPath = null;
 
@@ -106,5 +107,15 @@ public class PrismicConversionConfigGroup extends ReflectiveConfigGroup {
 	@StringSetter( "activityType" )
 	public void setActivityType(final String type) {
 		this.type = type;
+	}
+
+	@StringGetter( "nThreads" )
+	public int getNumberOfThreads() {
+		return nThreads;
+	}
+
+	@StringSetter( "nThreads" )
+	public void setNumberOfThreads(int nThreads) {
+		this.nThreads = nThreads;
 	}
 }

@@ -41,20 +41,18 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.IOUtils;
 import org.opengis.feature.simple.SimpleFeature;
 
-import playground.christoph.evacuation.analysis.CoordAnalyzer;
-import playground.christoph.evacuation.withinday.replanning.utils.SHPFileUtil;
-
 import com.vividsolutions.jts.geom.Geometry;
+import playground.boescpa.lib.tools.coordUtils.CoordAnalyzer;
+import playground.boescpa.lib.tools.shpUtils.SHPFileUtil;
 
 /**
  * Provides a matsim-events specific implementation of RouteConverter.
@@ -87,11 +85,11 @@ public class MsRouteConverter extends AbstractRouteConverter {
 			@Override
 			public void handleEvent(LinkLeaveEvent event) {
 				if (geographicEventAnalyzer.eventInArea(event)) {
-					Trip currentTrip = currentTrips.get(event.getPersonId());
+					Trip currentTrip = currentTrips.get(event.getDriverId());
 					if (currentTrip == null) {
-						Id<Trip> tripId = Id.create(event.getPersonId().toString() + "_" + String.valueOf(event.getTime()), Trip.class);
+						Id<Trip> tripId = Id.create(event.getDriverId().toString() + "_" + String.valueOf(event.getTime()), Trip.class);
 						currentTrip = new Trip(tripId, event.getTime());
-						currentTrips.put(event.getPersonId(),currentTrip);
+						currentTrips.put(event.getDriverId(),currentTrip);
 					}
 					currentTrip.links.add(event.getLinkId());
 					currentTrip.endTime = event.getTime();
@@ -119,10 +117,6 @@ public class MsRouteConverter extends AbstractRouteConverter {
 			EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
 			reader.parse(path2EventsFile);
 		}
-		else if (path2EventsFile.endsWith(".txt.gz")) {	// if events-File is in the older txt-format
-			EventsReaderTXTv1 reader = new EventsReaderTXTv1(events);
-			reader.readFile(path2EventsFile);
-		}
 		else {
 			throw new IllegalArgumentException("Given events-file not of known format.");
 		}
@@ -148,7 +142,7 @@ public class MsRouteConverter extends AbstractRouteConverter {
 		private final Network network;
 		private GeographicEventAnalyzer(String path2MATSimNetwork, String path2VissimZoneShp) {
 			// read network
-			ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+			MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 			MatsimNetworkReader NetworkReader = new MatsimNetworkReader(scenario);
 			NetworkReader.readFile(path2MATSimNetwork);
 			this.network = scenario.getNetwork();

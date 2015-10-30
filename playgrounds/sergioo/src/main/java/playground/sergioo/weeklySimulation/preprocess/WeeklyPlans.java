@@ -7,8 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.math.MathException;
-import org.apache.commons.math.distribution.NormalDistributionImpl;
+import org.apache.commons.math3.distribution.NormalDistribution;
+import org.apache.commons.math3.exception.NotStrictlyPositiveException;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -114,8 +114,8 @@ public class WeeklyPlans {
 		boolean carAvailable = !PersonUtils.getCarAvail(plan.getPerson()).equals("never") && PersonUtils.hasLicense(plan.getPerson());
 		double totalDurations = 9*3600;
 		try {
-			totalDurations = new NormalDistributionImpl(9*3600, 2*3600).inverseCumulativeProbability(Math.random());
-		} catch (MathException e) {
+			totalDurations = new NormalDistribution(9*3600, 2*3600).inverseCumulativeProbability(Math.random());
+		} catch (NotStrictlyPositiveException e) {
 			e.printStackTrace();
 		}
 		((ActivityImpl)plan.getPlanElements().get(plan.getPlanElements().size()-1)).setEndTime(dayPos*Time.MIDNIGHT+totalDurations);
@@ -130,8 +130,8 @@ public class WeeklyPlans {
 			String type = !prevActivityType.equals("home") && Math.random()<PROB_HOME?"home":getRandomActivityType(config.findParam("locationchoice", "flexible_types").split(","));
 			double duration;
 			try {
-				duration = new NormalDistributionImpl(config.planCalcScore().getActivityParams(type).getTypicalDuration(), config.planCalcScore().getActivityParams(type).getMinimalDuration()/2).inverseCumulativeProbability(Math.random());
-			} catch (MathException e) {
+				duration = new NormalDistribution(config.planCalcScore().getActivityParams(type).getTypicalDuration(), config.planCalcScore().getActivityParams(type).getMinimalDuration()/2).inverseCumulativeProbability(Math.random());
+			} catch (NotStrictlyPositiveException e) {
 				e.printStackTrace();
 				return;
 			}

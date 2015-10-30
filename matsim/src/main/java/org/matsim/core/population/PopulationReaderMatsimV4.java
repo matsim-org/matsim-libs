@@ -34,6 +34,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.utils.io.MatsimXmlParser;
@@ -321,9 +322,12 @@ import org.xml.sax.Attributes;
 	}
 
 	private void startRoute(final Attributes atts) {
-		Class<? extends Route> routeType = NetworkRoute.class;
+		Class<? extends Route> routeType = GenericRouteImpl.class;
 		if ("pt".equals(this.currleg.getMode())) {
 			routeType = ExperimentalTransitRoute.class;
+		}
+		if ("car".equals(this.currleg.getMode())) {
+			routeType = NetworkRoute.class;
 		}
 		this.currRoute = ((PopulationFactoryImpl) this.plans.getFactory()).createRoute(routeType, null, null);
 		this.currleg.setRoute(this.currRoute);

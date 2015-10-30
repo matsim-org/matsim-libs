@@ -22,6 +22,7 @@ package tutorial.programming.example13MultiStageTripRouting;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.inject.Provider;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -48,7 +49,9 @@ public class MyRoutingModule implements RoutingModule {
 	public static final String STAGE = "teleportationInteraction";
 	public static final String TELEPORTATION_LEG_MODE = "teleportationLeg";
 
-	private final TripRouter routingDelegate;
+	public static final String TELEPORTATION_MAIN_MODE = "myTeleportationMainMode";
+
+	private final Provider<RoutingModule> routingDelegate;
 	private final PopulationFactory populationFactory;
 	private final ModeRouteFactory modeRouteFactory;
 	private final Facility station;
@@ -66,7 +69,7 @@ public class MyRoutingModule implements RoutingModule {
 			// of the TripRouter done later in the initialization process (delegation).
 			// Using TripRouter may also lead to infinite loops, if two  modes
 			// calling each other (though I cannot think in any actual mode with this risk).
-			final TripRouter routingDelegate,
+			final Provider<RoutingModule> routingDelegate,
 			final PopulationFactory populationFactory,
 			final Facility station) {
 		this.routingDelegate = routingDelegate;
@@ -85,12 +88,12 @@ public class MyRoutingModule implements RoutingModule {
 
 		// route the access trip
 		trip.addAll(
-				routingDelegate.calcRoute(
-					TransportMode.pt,
-					fromFacility,
-					station,
-					departureTime,
-					person ) );
+				routingDelegate.get().calcRoute(
+//						TransportMode.pt,
+						fromFacility,
+						station,
+						departureTime,
+						person) );
 
 		// create a dummy activity at the teleportation origin
 		final Activity interaction =
@@ -122,7 +125,7 @@ public class MyRoutingModule implements RoutingModule {
 
 		// trips for this mode contain the ones we create, plus the ones of the
 		// pt router we use.
-		stageTypes.addActivityTypes( routingDelegate.getRoutingModule( TransportMode.pt ).getStageActivityTypes() );
+		stageTypes.addActivityTypes( routingDelegate.get().getStageActivityTypes() );
 		stageTypes.addActivityTypes( new StageActivityTypesImpl( STAGE ) );
 
 		return stageTypes;

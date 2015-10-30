@@ -19,27 +19,20 @@
 
 package playground.johannes.gsv.synPop.osm;
 
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.Point;
 import gnu.trove.TObjectDoubleHashMap;
+import org.apache.log4j.Logger;
+import org.matsim.contrib.common.gis.EsriShapeIO;
+import org.matsim.contrib.socnetgen.sna.gis.Zone;
+import org.matsim.contrib.socnetgen.sna.gis.ZoneLayer;
+import org.opengis.feature.simple.SimpleFeature;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
-import org.apache.log4j.Logger;
-import org.opengis.feature.simple.SimpleFeature;
-
-import playground.johannes.sna.gis.Zone;
-import playground.johannes.sna.gis.ZoneLayer;
-import playground.johannes.socialnetworks.gis.io.FeatureSHP;
-
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.Point;
 
 /**
  * @author johannes
@@ -54,7 +47,7 @@ public class PLZ8Compare {
 	 */
 	public static void main(String[] args) throws IOException {
 		logger.info("Reading zones...");
-		Set<SimpleFeature> features = FeatureSHP.readFeatures("/home/johannes/gsv/Marktzellen_2011/Grenzen+Sachdaten/PLZ8_10w_XXL_region.shp");
+		Set<SimpleFeature> features = EsriShapeIO.readFeatures("/home/johannes/gsv/Marktzellen_2011/Grenzen+Sachdaten/PLZ8_10w_XXL_region.shp");
 		logger.info("Reading attributes...");
 		Map<String, Integer> values = readAttributes("/home/johannes/gsv/Marktzellen_2011/Mitarbeiter_Einkauf.csv");
 		

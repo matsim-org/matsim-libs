@@ -24,8 +24,9 @@ public interface AccessibilityContributionCalculator {
 	 *
 	 * @param fromNode the Node on the network to which will be associated the next
 	 *                 examined opportunities.
+	 * @param departureTime TODO
 	 */
-	void notifyNewOriginNode( Node fromNode );
+	void notifyNewOriginNode( Node fromNode, Double departureTime );
 
 	/**
 	 * estimates the contribution of a given opportunity to the accessibility metric,
@@ -35,7 +36,8 @@ public interface AccessibilityContributionCalculator {
 	 *
 	 * @param origin the origin point
 	 * @param destination the opportunities at the destination
+	 * @param departureTime TODO
 	 * @return the utility of the OD pair, to be included in the logsum
 	 */
-	double computeContributionOfOpportunity(ActivityFacility origin, AggregationObject destination);
+	double computeContributionOfOpportunity(ActivityFacility origin, AggregationObject destination, Double departureTime);
 }

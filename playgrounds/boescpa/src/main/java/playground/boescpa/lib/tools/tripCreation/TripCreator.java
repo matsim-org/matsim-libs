@@ -23,11 +23,10 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
@@ -60,7 +59,7 @@ public class TripCreator {
 
 		EventsManager events = EventsUtils.createEventsManager();
 		
-		ScenarioImpl  scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario  scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		scenario.getConfig().transit().setUseTransit(true);
 		
@@ -78,10 +77,6 @@ public class TripCreator {
 		if (eventsFile.endsWith(".xml.gz")) { // if events-File is in the newer xml-format
 			EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
 			reader.parse(eventsFile);
-		}
-		else if (eventsFile.endsWith(".txt.gz")) {	// if events-File is in the older txt-format
-			EventsReaderTXTv1 reader = new EventsReaderTXTv1(events);
-			reader.readFile(eventsFile);
 		}
 		else {
 			throw new IllegalArgumentException("Given events-file not of known format.");

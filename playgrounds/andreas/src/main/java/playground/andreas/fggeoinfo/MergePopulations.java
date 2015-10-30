@@ -27,7 +27,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.andreas.utils.pop.NewPopulation;
@@ -72,8 +72,8 @@ public class MergePopulations extends NewPopulation {
 	}
 	
 	public static void mergePopulations(String network, String plansFileOne, String plansFileTwo, String plansOutFile){
-		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		ScenarioImpl scA = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario scA = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		
 		Network net = sc.getNetwork();
 		new MatsimNetworkReader(sc).readFile(network);

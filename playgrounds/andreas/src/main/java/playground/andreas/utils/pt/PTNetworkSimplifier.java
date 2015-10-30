@@ -42,7 +42,7 @@ import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCalcTopoType;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -380,7 +380,7 @@ public class PTNetworkSimplifier {
 		log.info("Reading " + this.netInFile);
 		new MatsimNetworkReader(scenario).readFile(this.netInFile);
 
-		ScenarioImpl osmScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario osmScenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Config osmConfig = osmScenario.getConfig();
 		osmConfig.transit().setUseTransit(true);
 		osmConfig.network().setInputFile(this.netInFile);

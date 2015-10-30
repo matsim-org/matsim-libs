@@ -57,7 +57,7 @@ public class PersonId2DelayAtStopHandler implements PersonDepartureEventHandler,
 			if(event.getLegMode() == TransportMode.pt){
 
 				if(this.id2DelayAtStopMap.get(event.getPersonId()) == null){
-//					this.log.debug("Adding new AgentDelayAtStopContainer for agent " + event.getPersonId() + " to map.");
+//					this.log.debug("Adding new AgentDelayAtStopContainer for agent " + event.getDriverId() + " to map.");
 					this.id2DelayAtStopMap.put(event.getPersonId(), new PersonId2DelayAtStopData(event.getPersonId()));
 				}
 

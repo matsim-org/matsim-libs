@@ -2,13 +2,14 @@ package roadclassification;
 
 import java.util.Map;
 
-import optdyts.ObjectiveFunction;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.Volume;
+
+import floetteroed.opdyts.ObjectiveFunction;
+import floetteroed.opdyts.SimulatorState;
 
 /**
  * 
@@ -16,11 +17,11 @@ import org.matsim.counts.Volume;
  *
  */
 class RoadClassificationObjectiveFunction implements
-		ObjectiveFunction<RoadClassificationState> {
+		ObjectiveFunction {
 
 	// -------------------- MEMBERS --------------------
 
-	private final Counts counts;
+	private final Counts<Link> counts;
 
 	// -------------------- CONSTRUCTION --------------------
 
@@ -31,17 +32,20 @@ class RoadClassificationObjectiveFunction implements
 	// --------------- IMPLEMENTATION of ObjectiveFunction ---------------
 
 	@Override
-	public double evaluateState(final RoadClassificationState state) {
+	public double value(SimulatorState state) {
+		RoadClassificationState roadClassificationState = (RoadClassificationState) state;
 		double result = 0.0;
-		for (Map.Entry<Id<Link>, Count> linkId2measuredVolumes : this.counts
+		for (Map.Entry<Id<Link>, Count<Link>> linkId2measuredVolumes : this.counts
 				.getCounts().entrySet()) {
-			final int[] simulatedVolumes = state.getLinkId2simulatedVolumes()
+			final int[] simulatedVolumes = roadClassificationState.getLinkId2simulatedVolumes()
 					.get(linkId2measuredVolumes.getKey());
 			for (Map.Entry<Integer, Volume> hour2measuredVolume : linkId2measuredVolumes
 					.getValue().getVolumes().entrySet()) {
 				final int h = hour2measuredVolume.getKey();
-				final double measuredVolume = hour2measuredVolume.getValue()
-						.getValue();
+				if (simulatedVolumes == null || h > simulatedVolumes.length - 1){
+					continue;
+				}
+				final double measuredVolume = hour2measuredVolume.getValue().getValue();
 				final double residual = measuredVolume - simulatedVolumes[h];
 				result += residual * residual;
 			}

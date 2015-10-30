@@ -6,7 +6,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -25,10 +25,10 @@ public class SimpleHafasOsmMerger {
 
 	private final String transitScheduleOutFile = "e:/_out/ts/outSchedule.xml";
 
-	private ScenarioImpl hafasScenario;
+	private MutableScenario hafasScenario;
 	private Config hafasConfig;
 
-	private ScenarioImpl osmScenario;
+	private MutableScenario osmScenario;
 	private Config osmConfig;
 
 	/**
@@ -78,13 +78,13 @@ public class SimpleHafasOsmMerger {
 
 	private void readTransitSchedules() {
 
-		this.hafasScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		this.hafasScenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		this.hafasConfig = this.hafasScenario.getConfig();
 		this.hafasConfig.transit().setUseTransit(true);
 		this.hafasConfig.network().setInputFile(this.osmNetworkFile);
 		ScenarioUtils.loadScenario(this.hafasScenario);
 
-		this.osmScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		this.osmScenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		this.osmConfig = this.osmScenario.getConfig();
 		this.osmConfig.transit().setUseTransit(true);
 		this.osmConfig.network().setInputFile(this.osmNetworkFile);

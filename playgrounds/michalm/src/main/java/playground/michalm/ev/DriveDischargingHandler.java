@@ -25,24 +25,24 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.events.handler.*;
 import org.matsim.api.core.v01.network.*;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.vehicles.Vehicle;
 
 
 public class DriveDischargingHandler
-    implements LinkEnterEventHandler, LinkLeaveEventHandler, PersonArrivalEventHandler
+    implements LinkEnterEventHandler, LinkLeaveEventHandler, VehicleLeavesTrafficEventHandler
 {
     private final Network network;
     private final TravelTime travelTime;
 
-    private final Map<Id<Person>, ? extends ElectricVehicle> driverToVehicle;
-    private final Map<Id<Person>, Double> linkEnterTimes = new HashMap<>();
+    private final Map<Id<Vehicle>, ? extends ElectricVehicle> vehicleToEV;
+    private final Map<Id<Vehicle>, Double> linkEnterTimes = new HashMap<>();
 
 
-    public DriveDischargingHandler(Map<Id<Person>, ? extends ElectricVehicle> driverToVehicle,
+    public DriveDischargingHandler(Map<Id<Vehicle>, ? extends ElectricVehicle> vehicleToEV,
             Network network, TravelTime travelTime)
     {
-        this.driverToVehicle = driverToVehicle;
+        this.vehicleToEV = vehicleToEV;
         this.network = network;
         this.travelTime = travelTime;
     }
@@ -51,8 +51,8 @@ public class DriveDischargingHandler
     @Override
     public void handleEvent(LinkEnterEvent event)
     {
-        if (driverToVehicle.containsKey(event.getPersonId())) {// handle only our EVs
-            linkEnterTimes.put(event.getPersonId(), event.getTime());
+        if (vehicleToEV.containsKey(event.getVehicleId())) {// handle only our EVs
+            linkEnterTimes.put(event.getVehicleId(), event.getTime());
         }
     }
 
@@ -60,33 +60,33 @@ public class DriveDischargingHandler
     @Override
     public void handleEvent(LinkLeaveEvent event)
     {
-        dischargeVehicle(event.getPersonId(), event.getLinkId(), event);
+        dischargeVehicle(event.getVehicleId(), event.getLinkId(), event.getTime());
     }
 
 
     @Override
-    public void handleEvent(PersonArrivalEvent event)
+    public void handleEvent(VehicleLeavesTrafficEvent event)
     {
-        dischargeVehicle(event.getPersonId(), event.getLinkId(), event);
+        dischargeVehicle(event.getVehicleId(), event.getLinkId(), Double.NaN);
     }
 
 
-    private void dischargeVehicle(Id<Person> driverId, Id<Link> linkId, Event event)
+    private void dischargeVehicle(Id<Vehicle> vehicleId, Id<Link> linkId, double linkLeaveTime)
     {
-        Double linkEnterTime = linkEnterTimes.get(driverId);
+        Double linkEnterTime = linkEnterTimes.get(vehicleId);
         if (linkEnterTime != null) {
-            ElectricVehicle ev = driverToVehicle.get(driverId);
+            ElectricVehicle ev = vehicleToEV.get(vehicleId);
             Link link = network.getLinks().get(linkId);
 
-            boolean arrival = event instanceof PersonArrivalEvent;
-            double tt = arrival ? //
+            boolean vehLeftTraffic = linkLeaveTime == Double.NaN;
+            double tt = vehLeftTraffic ? // 
                     travelTime.getLinkTravelTime(link, linkEnterTime, null, null)
-                    : event.getTime() - linkEnterTime;
+                    : linkLeaveTime - linkEnterTime;
 
             ev.getDriveEnergyConsumption().useEnergy(link, tt);
 
-            if (arrival) {
-                linkEnterTimes.remove(driverId);
+            if (vehLeftTraffic) {
+                linkEnterTimes.remove(vehicleId);
             }
         }
     }

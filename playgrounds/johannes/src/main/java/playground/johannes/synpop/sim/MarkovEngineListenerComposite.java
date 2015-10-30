@@ -19,7 +19,7 @@
 
 package playground.johannes.synpop.sim;
 
-import playground.johannes.sna.util.Composite;
+import org.matsim.contrib.common.collections.Composite;
 import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.sim.data.CachedPerson;
 

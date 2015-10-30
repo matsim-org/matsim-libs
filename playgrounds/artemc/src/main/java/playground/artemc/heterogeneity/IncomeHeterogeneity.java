@@ -21,5 +21,6 @@ public interface IncomeHeterogeneity {
 
 	public static final String TYPE_PROPORTIONAL = "proportional";
 	public static final String TYPE_ALPHA = "alpha";
+	public static final String TYPE_ALPHA_RATIO = "alpha_ratio";
 	public static final String TYPE_GAMMA = "gamma";
 }

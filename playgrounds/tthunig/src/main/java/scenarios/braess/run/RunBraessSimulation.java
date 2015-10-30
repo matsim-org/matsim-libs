@@ -1,3 +1,24 @@
+/*
+ *  *********************************************************************** *
+ *  * project: org.matsim.*
+ *  * DefaultControlerModules.java
+ *  *                                                                         *
+ *  * *********************************************************************** *
+ *  *                                                                         *
+ *  * copyright       : (C) 2014 by the members listed in the COPYING, *
+ *  *                   LICENSE and WARRANTY file.                            *
+ *  * email           : info at matsim dot org                                *
+ *  *                                                                         *
+ *  * *********************************************************************** *
+ *  *                                                                         *
+ *  *   This program is free software; you can redistribute it and/or modify  *
+ *  *   it under the terms of the GNU General Public License as published by  *
+ *  *   the Free Software Foundation; either version 2 of the License, or     *
+ *  *   (at your option) any later version.                                   *
+ *  *   See also COPYING, LICENSE and WARRANTY file                           *
+ *  *                                                                         *
+ *  * ***********************************************************************
+ */
 package scenarios.braess.run;
 
 import java.io.File;
@@ -15,7 +36,7 @@ import org.matsim.contrib.signals.data.SignalsScenarioLoader;
 import org.matsim.contrib.signals.data.signalcontrol.v20.SignalControlWriter20;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupsWriter20;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsWriter20;
-import org.matsim.contrib.signals.router.InvertedNetworkTripRouterFactoryModule;
+import org.matsim.contrib.signals.router.InvertedNetworkRoutingModuleModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
@@ -25,23 +46,30 @@ import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup.TravelTimeC
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.replanning.DefaultPlanStrategiesModule.DefaultSelector;
 import org.matsim.core.replanning.DefaultPlanStrategiesModule.DefaultStrategy;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility.Builder;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.data.v20.LaneDefinitionsWriter20;
 
-import playground.dgrether.DgPaths;
+import playground.artemc.socialCost.SocialCostController.Initializer;
 import playground.vsp.congestion.controler.MarginalCongestionPricingContolerListener;
+import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
+import playground.vsp.congestion.handlers.CongestionHandlerImplV4;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV8;
+import playground.vsp.congestion.handlers.CongestionHandlerImplV9;
 import playground.vsp.congestion.handlers.TollHandler;
-import scenarios.analysis.TtControlerListener;
+import playground.vsp.congestion.routing.CongestionTollTimeDistanceTravelDisutilityFactory;
+import scenarios.analysis.TtListenerToBindAndWriteAnalysis;
 import scenarios.braess.analysis.TtAnalyzeBraess;
 import scenarios.braess.createInput.TtCreateBraessNetworkAndLanes;
 import scenarios.braess.createInput.TtCreateBraessNetworkAndLanes.LaneType;
 import scenarios.braess.createInput.TtCreateBraessPopulation;
+import scenarios.braess.createInput.TtCreateBraessPopulation.InitRoutes;
 import scenarios.braess.createInput.TtCreateBraessSignals;
 import scenarios.braess.createInput.TtCreateBraessSignals.SignalControlType;
 
@@ -58,45 +86,49 @@ public class RunBraessSimulation {
 			.getLogger(RunBraessSimulation.class);
 
 	/* population parameter */
-	// If false, agents are initialized without any routes. If true, with all
-	// three possible routes.
-	private final boolean INIT_WITH_ALL_ROUTES = true;
+	
+	private static final int NUMBER_OF_PERSONS = 2000;
+	
+	private static final InitRoutes INIT_ROUTES_TYPE = InitRoutes.ALL;
 	// initial score for all initial plans
-	private final Double INIT_PLAN_SCORE = 110.;
+	private static final Double INIT_PLAN_SCORE = 110.;
 
 	/// defines which kind of signals should be used
 	private static final SignalControlType SIGNAL_TYPE = SignalControlType.NONE;
-	
-	// defines which kind of lanes should be used: NONE, TRIVIAL or REALISTIC
+	// defines which kind of lanes should be used
 	private static final LaneType LANE_TYPE = LaneType.NONE;
 	
-	private static final boolean PRICING = true;
+	// defines which kind of pricing should be used
+	private static final PricingType PRICING_TYPE = PricingType.V3;
+	public enum PricingType{
+		NONE, V3, V4, V8, V9, FLOWBASED
+	}
 
 	// choose a sigma for the randomized router
 	// (higher sigma cause more randomness. use 0.0 for no randomness.)
-	private final double SIGMA = 0.0;	
+	private static final double SIGMA = 0.0;	
 		
-	private static final boolean WRITE_INITIAL_FILES = true;
+	private static final boolean WRITE_INITIAL_FILES = false;
 	
-	private static String OUTPUT_BASE_DIR = DgPaths.RUNSSVN + "braess/withoutLanes_signalsVsTolls/";
-//	private static String OUTPUT_BASE_DIR = "/Users/nagel/kairuns/braess/output";
+	private static String OUTPUT_BASE_DIR = "../../../runs-svn/braess/withoutLanes_signalsVsTolls/";
 	
-	/**
-	 * prepare, run and analyze the Braess simulation
-	 */
-	private void prepareRunAndAnalyze() {
-		log.info("Starts running the simulation.");
-		
-		// prepare config and scenario		
+	public static void main(String[] args) {
 		Config config = defineConfig();
+		Scenario scenario = prepareScenario(config);
+		Controler controler = prepareController(scenario);
+	
+		controler.run();
+	}
+
+	private static Scenario prepareScenario(Config config) {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		createNetwork(scenario);
 		createPopulation(scenario);
 		createRunNameAndOutputDir(scenario);
-
+	
+		// add missing scenario elements
 		SignalSystemsConfigGroup signalsConfigGroup = ConfigUtils.addOrGetModule(config,
 				SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
-		
 		if (signalsConfigGroup.isUseSignalSystems()) {
 			scenario.addScenarioElement(SignalsData.ELEMENT_NAME,
 					new SignalsScenarioLoader(signalsConfigGroup).loadSignalsData());
@@ -106,44 +138,86 @@ public class RunBraessSimulation {
 		if (WRITE_INITIAL_FILES) 
 			writeInitFiles(scenario);
 		
-		// prepare the controller
+		return scenario;
+	}
+
+	private static Controler prepareController(Scenario scenario) {
+		Config config = scenario.getConfig();
 		Controler controler = new Controler(scenario);
 
 		// add the signals module if signal systems are used
+		SignalSystemsConfigGroup signalsConfigGroup = ConfigUtils.addOrGetModule(config,
+				SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
 		if (signalsConfigGroup.isUseSignalSystems()) {
 			controler.addOverridingModule(new SignalsModule());
 		}
 		
 		// add the module for link to link routing if enabled
 		if (config.controler().isLinkToLinkRoutingEnabled()){
-			controler.addOverridingModule(new InvertedNetworkTripRouterFactoryModule());
+			controler.addOverridingModule(new InvertedNetworkRoutingModuleModule());
 		}
-		
-		if (PRICING){
+
+		if (!PRICING_TYPE.equals(PricingType.NONE) && !PRICING_TYPE.equals(PricingType.FLOWBASED)){
 			// add tolling
 			TollHandler tollHandler = new TollHandler(scenario);
 			
-//			final RandomizedTollTimeDistanceTravelDisutilityFactory factory = 
-//					new RandomizedTollTimeDistanceTravelDisutilityFactory(
-//					new TravelTimeAndDistanceBasedTravelDisutilityFactory(),
-//					tollHandler
-//				) ;
-//			factory.setSigma(SIGMA);
-//			controler.addOverridingModule(new AbstractModule(){
-//				@Override
-//				public void install() {
-//					this.bindTravelDisutilityFactory().toInstance( factory );
-//				}
-//			});
+			// add correct TravelDisutilityFactory for tolls if ReRoute is used
+			StrategySettings[] strategies = config.strategy().getStrategySettings()
+					.toArray(new StrategySettings[0]);
+			for (int i = 0; i < strategies.length; i++) {
+				if (strategies[i].getStrategyName().equals(DefaultStrategy.ReRoute.toString())){
+					if (strategies[i].getWeight() > 0.0){ // ReRoute is used
+						final CongestionTollTimeDistanceTravelDisutilityFactory factory =
+								new CongestionTollTimeDistanceTravelDisutilityFactory(
+										new Builder( TransportMode.car ),
+								tollHandler
+							) ;
+						factory.setSigma(SIGMA);
+						controler.addOverridingModule(new AbstractModule(){
+							@Override
+							public void install() {
+								this.bindCarTravelDisutilityFactory().toInstance( factory );
+							}
+						});
+					}
+				}
+			}		
 			
+			// choose the correct congestion handler and add it
+			EventHandler congestionHandler = null;
+			switch (PRICING_TYPE){
+			case V3:
+				congestionHandler = new CongestionHandlerImplV3(controler.getEvents(), 
+						controler.getScenario());
+				break;
+			case V4:
+				congestionHandler = new CongestionHandlerImplV4(controler.getEvents(), 
+						controler.getScenario());
+				break;
+			case V8:
+				congestionHandler = new CongestionHandlerImplV8(controler.getEvents(), 
+						controler.getScenario());
+				break;
+			case V9:
+				congestionHandler = new CongestionHandlerImplV9(controler.getEvents(), 
+						controler.getScenario());
+				break;
+			default:
+				break;
+			}
 			controler.addControlerListener(
 					new MarginalCongestionPricingContolerListener(controler.getScenario(), 
-							tollHandler, new CongestionHandlerImplV8(controler.getEvents(), 
-									controler.getScenario())));
-		} else {
+							tollHandler, congestionHandler));
+		
+		} else if (PRICING_TYPE.equals(PricingType.FLOWBASED)) {
+			
+			Initializer initializer = new Initializer();
+			controler.addControlerListener(initializer);		
+		} else { // no pricing
+			
 			// adapt sigma for randomized routing
 			final RandomizingTimeDistanceTravelDisutility.Builder builder = 
-					new RandomizingTimeDistanceTravelDisutility.Builder();
+					new RandomizingTimeDistanceTravelDisutility.Builder( TransportMode.car );
 			builder.setSigma(SIGMA);
 			controler.addOverridingModule(new AbstractModule() {
 				@Override
@@ -154,10 +228,9 @@ public class RunBraessSimulation {
 		}
 		
 		// add a controller listener to analyze results
-		controler.addControlerListener(new TtControlerListener(scenario, new TtAnalyzeBraess()));
-
-		// run the simulation
-		controler.run();
+		controler.addControlerListener(new TtListenerToBindAndWriteAnalysis(scenario, new TtAnalyzeBraess()));
+		
+		return controler;
 	}
 
 	private static Config defineConfig() {
@@ -229,7 +302,7 @@ public class RunBraessSimulation {
 		}
 
 		// choose maximal number of plans per agent. 0 means unlimited
-		config.strategy().setMaxAgentPlanMemorySize( 3 );
+		config.strategy().setMaxAgentPlanMemorySize( 0 );
 		
 		config.qsim().setStuckTime(3600 * 10.);
 		
@@ -270,29 +343,29 @@ public class RunBraessSimulation {
 		netCreator.setUseBTUProperties( false );
 		netCreator.setSimulateInflowCap( true );
 		netCreator.setMiddleLinkExists( true );
-		netCreator.setLaneType( LANE_TYPE );
+		netCreator.setLaneType(LANE_TYPE);
+		netCreator.setNumberOfPersons(NUMBER_OF_PERSONS);
 		netCreator.createNetworkAndLanes();
 	}
 
-	private void createPopulation(Scenario scenario) {
+	private static void createPopulation(Scenario scenario) {
 		
 		TtCreateBraessPopulation popCreator = 
 				new TtCreateBraessPopulation(scenario.getPopulation(), scenario.getNetwork());
-		popCreator.setNumberOfPersons( 3600 );
+		popCreator.setNumberOfPersons(NUMBER_OF_PERSONS);
 		
-		popCreator.createPersons(INIT_WITH_ALL_ROUTES ? TtCreateBraessPopulation.InitRoutes.ALL
-				: TtCreateBraessPopulation.InitRoutes.NONE, INIT_PLAN_SCORE);
+		popCreator.createPersons(INIT_ROUTES_TYPE, INIT_PLAN_SCORE);
 	}
 
-	private void createSignals(Scenario scenario) {
+	private static void createSignals(Scenario scenario) {
 
 		TtCreateBraessSignals signalsCreator = new TtCreateBraessSignals(scenario);
-		signalsCreator.setLaneType( LANE_TYPE );
-		signalsCreator.setSignalType( SIGNAL_TYPE );
+		signalsCreator.setLaneType(LANE_TYPE);
+		signalsCreator.setSignalType(SIGNAL_TYPE);
 		signalsCreator.createSignals();
 	}
 
-	private void createRunNameAndOutputDir(Scenario scenario) {
+	private static void createRunNameAndOutputDir(Scenario scenario) {
 
 		Config config = scenario.getConfig();
 		
@@ -309,8 +382,8 @@ public class RunBraessSimulation {
 		String runName = date;
 
 		runName += "_" + scenario.getPopulation().getPersons().size() + "p";
-		if (INIT_WITH_ALL_ROUTES){
-			runName += "_initAllRoutes-sel1+3";
+		if (!INIT_ROUTES_TYPE.equals(InitRoutes.NONE)){
+			runName += "_" + INIT_ROUTES_TYPE + "-sel1+3";
 			if (INIT_PLAN_SCORE != null)
 				runName += "-score" + INIT_PLAN_SCORE;
 		}
@@ -387,8 +460,8 @@ public class RunBraessSimulation {
 			runName += "_" + SIGNAL_TYPE;
 		}
 		
-		if (PRICING){
-			runName += "_princingV8";
+		if (!PRICING_TYPE.equals(PricingType.NONE)){
+			runName += "_" + PRICING_TYPE.toString();
 		}
 		
 		if (config.strategy().getMaxAgentPlanMemorySize() != 0)
@@ -402,7 +475,7 @@ public class RunBraessSimulation {
 		log.info("The output will be written to " + outputDir);
 	}
 
-	private void writeInitFiles(Scenario scenario) {
+	private static void writeInitFiles(Scenario scenario) {
 		String outputDir = scenario.getConfig().controler().getOutputDirectory() + "initialFiles/";
 		// create directory
 		new File(outputDir).mkdirs();
@@ -425,9 +498,5 @@ public class RunBraessSimulation {
 		
 		// write config
 		new ConfigWriter(scenario.getConfig()).write(outputDir + "config.xml");
-	}
-
-	public static void main(String[] args) {
-		new RunBraessSimulation().prepareRunAndAnalyze();
 	}
 }

@@ -39,7 +39,7 @@ import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.FacilitiesWriter;
 import org.matsim.households.Households;
 import org.matsim.households.HouseholdsWriterV10;
-import org.matsim.lanes.data.v20.LaneDefinitions20;
+import org.matsim.lanes.data.v20.Lanes;
 import org.matsim.lanes.data.v20.LaneDefinitionsWriter20;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
@@ -113,7 +113,7 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 			}
 		} catch ( Exception ee ) {}
 		try {
-			final LaneDefinitions20 lanes = scenarioData.getLanes();
+			final Lanes lanes = scenarioData.getLanes();
 			if ( lanes != null ) { 
 				new LaneDefinitionsWriter20(lanes).write(controlerIO.getOutputFilename(Controler.FILENAME_LANES));
 			}

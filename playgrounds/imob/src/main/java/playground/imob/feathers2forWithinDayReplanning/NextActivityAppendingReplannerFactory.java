@@ -19,11 +19,12 @@
 package playground.imob.feathers2forWithinDayReplanning;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.router.RoutingContext;
-import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.TripRouter;
 import org.matsim.withinday.mobsim.WithinDayEngine;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplannerFactory;
+
+import javax.inject.Provider;
 
 /**
  * @author nagel
@@ -31,22 +32,20 @@ import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActi
  */
 final class NextActivityAppendingReplannerFactory extends WithinDayDuringActivityReplannerFactory {
 	private final Scenario scenario;
-	private final TripRouterFactory tripRouterFactory;
-	private final RoutingContext routingContext;
-	
-	 NextActivityAppendingReplannerFactory(Scenario scenario, WithinDayEngine withinDayEngine,
-			TripRouterFactory tripRouterFactory, RoutingContext routingContext) {
+	private final Provider<TripRouter> tripRouterFactory;
+
+	NextActivityAppendingReplannerFactory(Scenario scenario, WithinDayEngine withinDayEngine,
+										  Provider<TripRouter> tripRouterFactory) {
 		super(withinDayEngine);
 		this.scenario = scenario;
 		this.tripRouterFactory = tripRouterFactory;
-		this.routingContext = routingContext;
 	}
 
 	@Override
 	public WithinDayDuringActivityReplanner createReplanner() {
 		WithinDayDuringActivityReplanner replanner = new NextActivityAppendingReplanner(super.getId(), scenario, 
 				this.getWithinDayEngine().getActivityRescheduler(),
-				this.tripRouterFactory.instantiateAndConfigureTripRouter(routingContext));
+				this.tripRouterFactory.get());
 		return replanner;
 	}
 

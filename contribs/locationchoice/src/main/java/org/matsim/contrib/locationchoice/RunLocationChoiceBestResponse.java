@@ -44,8 +44,8 @@ public class RunLocationChoiceBestResponse {
         DestinationChoiceBestResponseContext dcContext = new DestinationChoiceBestResponseContext(scenario);
         dcContext.init();
         DCScoringFunctionFactory dcScoringFunctionFactory = new DCScoringFunctionFactory(scenario, dcContext);
-        if (scenario.getConfig().findParam("locationchoice", "prefsFile").equals("null") &&
-                !scenario.getConfig().facilities().getInputFile().equals("null")) {
+        DestinationChoiceConfigGroup dccg = (DestinationChoiceConfigGroup) dcContext.getScenario().getConfig().getModule(DestinationChoiceConfigGroup.GROUP_NAME);
+        if (dccg.getPrefsFile() == null && !scenario.getConfig().facilities().getInputFile().equals("null")) {
             dcScoringFunctionFactory.setUsingConfigParamsForScoring(false);
         } else {
             dcScoringFunctionFactory.setUsingConfigParamsForScoring(true);
@@ -53,8 +53,7 @@ public class RunLocationChoiceBestResponse {
 
         Controler controler = new Controler(scenario);
         controler.addControlerListener(new DestinationChoiceInitializer(dcContext));
-        if (Double.parseDouble(scenario.getConfig().findParam("locationchoice", "restraintFcnExp")) > 0.0 &&
-                Double.parseDouble(scenario.getConfig().findParam("locationchoice", "restraintFcnFactor")) > 0.0) {
+        if (dccg.getRestraintFcnExp() > 0.0 && dccg.getRestraintFcnFactor() > 0.0) {
             controler.addControlerListener(new FacilitiesLoadCalculator(dcContext.getFacilityPenalties()));
         }
         controler.setScoringFunctionFactory(dcScoringFunctionFactory);

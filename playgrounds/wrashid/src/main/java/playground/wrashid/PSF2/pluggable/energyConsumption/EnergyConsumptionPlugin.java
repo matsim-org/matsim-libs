@@ -109,9 +109,9 @@ public class EnergyConsumptionPlugin implements LinkEnterEventHandler, LinkLeave
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		logLinkEnteranceTime(event.getPersonId(), event.getTime());
+		logLinkEnteranceTime(event.getDriverId(), event.getTime());
 		
-		lastLinkEntered.put(event.getPersonId(), event.getLinkId());
+		lastLinkEntered.put(event.getDriverId(), event.getLinkId());
 	}
 
 	@Override
@@ -126,7 +126,7 @@ public class EnergyConsumptionPlugin implements LinkEnterEventHandler, LinkLeave
 	
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		updateEnergyConsumptionOfLeg(event.getPersonId(),event.getTime(),event.getLinkId());
+		updateEnergyConsumptionOfLeg(event.getDriverId(),event.getTime(),event.getLinkId());
 	}
 	
 	@Override

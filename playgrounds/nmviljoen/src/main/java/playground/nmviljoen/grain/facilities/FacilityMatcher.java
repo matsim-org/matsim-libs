@@ -244,11 +244,11 @@ public class FacilityMatcher {
 					log.debug(String.format("    %s: (%.4f; %.4f)", sa[idField], cWgs.getX(), cWgs.getY()));
 				}
 				
-				Collection<ActivityFacility> within0050 = qt.get(cAlbers.getX(), cAlbers.getY(), 50.0);
-				Collection<ActivityFacility> within0100 = qt.get(cAlbers.getX(), cAlbers.getY(), 100.0);
-				Collection<ActivityFacility> within0250 = qt.get(cAlbers.getX(), cAlbers.getY(), 250.0);
-				Collection<ActivityFacility> within0500 = qt.get(cAlbers.getX(), cAlbers.getY(), 500.0);
-				Collection<ActivityFacility> within1000 = qt.get(cAlbers.getX(), cAlbers.getY(), 1000.0);
+				Collection<ActivityFacility> within0050 = qt.getDisk(cAlbers.getX(), cAlbers.getY(), 50.0);
+				Collection<ActivityFacility> within0100 = qt.getDisk(cAlbers.getX(), cAlbers.getY(), 100.0);
+				Collection<ActivityFacility> within0250 = qt.getDisk(cAlbers.getX(), cAlbers.getY(), 250.0);
+				Collection<ActivityFacility> within0500 = qt.getDisk(cAlbers.getX(), cAlbers.getY(), 500.0);
+				Collection<ActivityFacility> within1000 = qt.getDisk(cAlbers.getX(), cAlbers.getY(), 1000.0);
 				
 				/* Update statistics. */
 				numberWithin0050 += Math.min(1, within0050.size());
@@ -326,7 +326,7 @@ public class FacilityMatcher {
 				}
 				Coord cAlbers = ctWgsToAlbers.transform(cWgs);
 				
-				Collection<ActivityFacility> withinRange = qt.get(cAlbers.getX(), cAlbers.getY(), rangeThreshold);
+				Collection<ActivityFacility> withinRange = qt.getDisk(cAlbers.getX(), cAlbers.getY(), rangeThreshold);
 				Iterator<ActivityFacility> iterator = withinRange.iterator();
 				List<String> outputStrings = new ArrayList<String>();
 				while(iterator.hasNext()){

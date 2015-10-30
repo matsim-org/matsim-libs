@@ -30,10 +30,10 @@ import javax.inject.Provider;
 /**
  * @author thibautd
  */
-public class ScheduleBasedTripRouterFactory implements TripRouterFactory {
+public class ScheduleBasedTripRouterFactory implements Provider<TripRouter> {
 	final Scenario scenario;
 	final Provider<TransitRouter> transitRouterFactory;
-	final TripRouterFactory defaultFactory;
+	final Provider<TripRouter> defaultFactory;
 
 	public ScheduleBasedTripRouterFactory(
 			final Scenario scenario) {
@@ -59,9 +59,8 @@ public class ScheduleBasedTripRouterFactory implements TripRouterFactory {
 	}
 
 	@Override
-	public TripRouter instantiateAndConfigureTripRouter(
-			final RoutingContext routingContext) {
-		final TripRouter tripRouter = defaultFactory.instantiateAndConfigureTripRouter( routingContext );
+	public TripRouter get() {
+		final TripRouter tripRouter = defaultFactory.get();
 
 		final TransitRouterWrapper routingModule =
 			 new TransitRouterWrapper(

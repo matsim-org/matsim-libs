@@ -178,8 +178,8 @@ public class MyAdjancencyMatrixBuilder {
 
 	private List<Cluster> testValidLink(Point p1, Point p2) {
 		List<Cluster> result = null;
-		Collection<ClusterPoint> c1List = clusteredPoints.get(p1.getX(), p1.getY(), 0.0);
-		Collection<ClusterPoint> c2List = clusteredPoints.get(p2.getX(), p2.getY(), 0.0);
+		Collection<ClusterPoint> c1List = clusteredPoints.getDisk(p1.getX(), p1.getY(), 0.0);
+		Collection<ClusterPoint> c2List = clusteredPoints.getDisk(p2.getX(), p2.getY(), 0.0);
 		Cluster c1 = null;
 		Cluster c2 = null;
 		if(c1List.size() > 0){

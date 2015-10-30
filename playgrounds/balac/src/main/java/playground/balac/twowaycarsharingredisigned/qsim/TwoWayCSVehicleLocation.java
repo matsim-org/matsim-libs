@@ -83,10 +83,10 @@ public class TwoWayCSVehicleLocation {
 	    
 	    
 	    for(TwoWayCSStation f: stations) {  
-	    	if (vehicleLocationQuadTree.get(f.getLink().getCoord().getX(), f.getLink().getCoord().getY()) != null
-	    			&& vehicleLocationQuadTree.get(f.getLink().getCoord().getX(), f.getLink().getCoord().getY()).getLink().getId().toString().equals(f.getLink().getId().toString())) {
+	    	if (vehicleLocationQuadTree.getClosest(f.getLink().getCoord().getX(), f.getLink().getCoord().getY()) != null
+	    			&& vehicleLocationQuadTree.getClosest(f.getLink().getCoord().getX(), f.getLink().getCoord().getY()).getLink().getId().toString().equals(f.getLink().getId().toString())) {
 	    		log.warn("Two carsharing stations were mapped to the same link" + f.getLink().getId().toString() +", consider merging these two stations before the simulation.");
-	    		log.warn("These stations are on the coordinates: " + vehicleLocationQuadTree.get(f.getLink().getCoord().getX(), f.getLink().getCoord().getY()).getCoord().toString() + " and " + f.getCoord().toString());
+	    		log.warn("These stations are on the coordinates: " + vehicleLocationQuadTree.getClosest(f.getLink().getCoord().getX(), f.getLink().getCoord().getY()).getCoord().toString() + " and " + f.getCoord().toString());
 	    	}
 
 	    	vehicleLocationQuadTree.put(f.getLink().getCoord().getX(), f.getLink().getCoord().getY(), f);
@@ -102,7 +102,7 @@ public class TwoWayCSVehicleLocation {
 	
 	public void addVehicle(Link link, String id) {
 		
-		TwoWayCSStation f = vehicleLocationQuadTree.get(link.getCoord().getX(), link.getCoord().getY());
+		TwoWayCSStation f = vehicleLocationQuadTree.getClosest(link.getCoord().getX(), link.getCoord().getY());
 		
 		if (f == null || !f.getLink().getId().toString().equals(link.getId().toString())) {
 			

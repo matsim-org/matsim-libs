@@ -577,7 +577,7 @@ final private static Logger log = Logger.getLogger(EnterpriseFacilitiesCreator.c
 				}
 				activityOption.setCapacity(activityOption.getCapacity() + shop_retail_gt2500sqmCapacity);
 
-				Id nearestShopId = shop_retail_gt2500sqmCapacityQuadTree.get(facility.getCoord().getX(), facility.getCoord().getY());
+				Id nearestShopId = shop_retail_gt2500sqmCapacityQuadTree.getClosest(facility.getCoord().getX(), facility.getCoord().getY());
 				ActivityFacility nearestShopFacility = existingFacilities.getFacilities().get(nearestShopId);
 				
 				ActivityOptionImpl nearestShopActivityOption = (ActivityOptionImpl) nearestShopFacility.getActivityOptions().get("shop");
@@ -591,7 +591,7 @@ final private static Logger log = Logger.getLogger(EnterpriseFacilitiesCreator.c
 				}
 				activityOption.setCapacity(activityOption.getCapacity() + shop_retail_get1000sqmCapacity);
 				
-				Id nearestShopId = shop_retail_get1000sqmCapacityMapQuadTree.get(facility.getCoord().getX(), facility.getCoord().getY());
+				Id nearestShopId = shop_retail_get1000sqmCapacityMapQuadTree.getClosest(facility.getCoord().getX(), facility.getCoord().getY());
 				ActivityFacility nearestShopFacility = existingFacilities.getFacilities().get(nearestShopId);
 				
 				ActivityOptionImpl nearestShopActivityOption = (ActivityOptionImpl) nearestShopFacility.getActivityOptions().get("shop");
@@ -605,7 +605,7 @@ final private static Logger log = Logger.getLogger(EnterpriseFacilitiesCreator.c
 				}
 				activityOption.setCapacity(activityOption.getCapacity() + shop_retail_get400sqmCapacity);
 				
-				Id nearestShopId = shop_retail_get400sqmCapacityMapQuadTree.get(facility.getCoord().getX(), facility.getCoord().getY());
+				Id nearestShopId = shop_retail_get400sqmCapacityMapQuadTree.getClosest(facility.getCoord().getX(), facility.getCoord().getY());
 				ActivityFacility nearestShopFacility = existingFacilities.getFacilities().get(nearestShopId);
 				
 				ActivityOptionImpl nearestShopActivityOption = (ActivityOptionImpl) nearestShopFacility.getActivityOptions().get("shop");
@@ -619,7 +619,7 @@ final private static Logger log = Logger.getLogger(EnterpriseFacilitiesCreator.c
 				}
 				activityOption.setCapacity(activityOption.getCapacity() + shop_retail_get100sqmCapacity);
 				
-				Id nearestShopId = shop_retail_get100sqmCapacityMapQuadTree.get(facility.getCoord().getX(), facility.getCoord().getY());
+				Id nearestShopId = shop_retail_get100sqmCapacityMapQuadTree.getClosest(facility.getCoord().getX(), facility.getCoord().getY());
 				ActivityFacility nearestShopFacility = existingFacilities.getFacilities().get(nearestShopId);
 				
 				ActivityOptionImpl nearestShopActivityOption = (ActivityOptionImpl) nearestShopFacility.getActivityOptions().get("shop");
@@ -633,7 +633,7 @@ final private static Logger log = Logger.getLogger(EnterpriseFacilitiesCreator.c
 				}
 				activityOption.setCapacity(activityOption.getCapacity() + shop_retail_lt100sqmCapacity);
 				
-				Id nearestShopId = shop_retail_lt100sqmCapacityMapQuadTree.get(facility.getCoord().getX(), facility.getCoord().getY());
+				Id nearestShopId = shop_retail_lt100sqmCapacityMapQuadTree.getClosest(facility.getCoord().getX(), facility.getCoord().getY());
 				ActivityFacility nearestShopFacility = existingFacilities.getFacilities().get(nearestShopId);
 				
 				ActivityOptionImpl nearestShopActivityOption = (ActivityOptionImpl) nearestShopFacility.getActivityOptions().get("shop");
@@ -647,7 +647,7 @@ final private static Logger log = Logger.getLogger(EnterpriseFacilitiesCreator.c
 				}
 				activityOption.setCapacity(activityOption.getCapacity() + shop_otherCapacity);
 				
-				Id nearestShopId = shop_otherCapacityMapQuadTree.get(facility.getCoord().getX(), facility.getCoord().getY());
+				Id nearestShopId = shop_otherCapacityMapQuadTree.getClosest(facility.getCoord().getX(), facility.getCoord().getY());
 				ActivityFacility nearestShopFacility = existingFacilities.getFacilities().get(nearestShopId);
 				
 				ActivityOptionImpl nearestShopActivityOption = (ActivityOptionImpl) nearestShopFacility.getActivityOptions().get("shop");

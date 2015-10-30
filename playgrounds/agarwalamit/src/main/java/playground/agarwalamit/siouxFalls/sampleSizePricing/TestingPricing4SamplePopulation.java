@@ -32,7 +32,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -116,9 +116,9 @@ public class TestingPricing4SamplePopulation {
 //			controler.addControlerListener(new EmissionControlerListner());
 			Scenario scenario = ScenarioUtils.loadScenario(config);
 			//			controler.run();
-			double delaysCosts = getDelaysFromEventsDefaultHandler(outputDir,(ScenarioImpl) scenario );
+			double delaysCosts = getDelaysFromEventsDefaultHandler(outputDir,(MutableScenario) scenario );
 			//			double[] delaysCosts = getDelaysFromEvents(outputDir,(ScenarioImpl) controler.getScenario());
-			double emissionsCosts = getTotalEmissionsCostsFromEmissionsEvents(outputDir, (ScenarioImpl) scenario);
+			double emissionsCosts = getTotalEmissionsCostsFromEmissionsEvents(outputDir, (MutableScenario) scenario);
 
 			flowCap2NoOfPersons.put(d, scenario.getPopulation().getPersons().size());
 			int carCounter =0;
@@ -156,7 +156,7 @@ public class TestingPricing4SamplePopulation {
 	}
 	private static double getTotalEmissionsCostsFromEmissionsEvents(String outputDir, Scenario scenario){
 		EmissionsAnalyzer analyzer	= new EmissionsAnalyzer(outputDir+"ITERS/it.500/500.emission.events.xml.gz");
-		analyzer.init((ScenarioImpl) scenario);
+		analyzer.init((MutableScenario) scenario);
 		analyzer.preProcessData();
 		analyzer.postProcessData();
 		SortedMap<String, Double> totalEmissions = analyzer.getTotalEmissions();
@@ -186,7 +186,7 @@ public class TestingPricing4SamplePopulation {
 	//		return flowAndStorageDelays;
 	//	}
 
-	private static double getDelaysFromEventsDefaultHandler(String outputDir, ScenarioImpl sc){
+	private static double getDelaysFromEventsDefaultHandler(String outputDir, MutableScenario sc){
 		EventsManager eventManager = EventsUtils.createEventsManager();
 		CongestionHandlerImplV3 congestionHandlerImplV3= new CongestionHandlerImplV3(eventManager, sc);
 

@@ -19,10 +19,6 @@
 
 package playground.johannes.gsv.counts;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -31,11 +27,11 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.counts.Count;
-import org.matsim.counts.Counts;
-import org.matsim.counts.CountsReaderMatsimV1;
-import org.matsim.counts.CountsWriter;
-import org.matsim.counts.Volume;
+import org.matsim.counts.*;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * @author johannes
@@ -48,7 +44,7 @@ public class MatchFromOrigId {
 	 */
 	public static void main(String[] args) {
 
-		Counts counts = new Counts();
+		Counts<Link> counts = new Counts();
 		CountsReaderMatsimV1 cReader = new CountsReaderMatsimV1(counts);
 		cReader.parse("/home/johannes/sge/prj/osm/run/678/output/counts.2013.osm20140909.xml");
 
@@ -75,12 +71,12 @@ public class MatchFromOrigId {
 
 		System.out.println(String.format("Number of original counts: %s", counts.getCounts().size()));
 		
-		for (Count count : counts.getCounts().values()) {
+		for (Count<Link> count : counts.getCounts().values()) {
 			Link link = mapping.get(count.getLocId().toString());
 			if (link == null) {
 				System.err.println(String.format("Cannot find link with id %s.", count.getLocId().toString()));
 			} else {
-				Count newCount = newCounts.createAndAddCount(link.getId(), count.getCsId());
+				Count<Link> newCount = newCounts.createAndAddCount(link.getId(), count.getCsId());
 				if (newCount == null) {
 					System.err.println(String.format("There is already a count station on link %s.", link.getId().toString()));
 				} else {

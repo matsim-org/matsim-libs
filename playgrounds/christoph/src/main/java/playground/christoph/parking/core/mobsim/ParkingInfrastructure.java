@@ -424,11 +424,11 @@ public class ParkingInfrastructure {
 	}
 	
 	public ActivityFacility getClosestFreeParkingFacility(Coord coord, String parkingType) {
-		return this.availableParkingFacilities.get(parkingType).get(coord.getX(), coord.getY());
+		return this.availableParkingFacilities.get(parkingType).getClosest(coord.getX(), coord.getY());
 	}
 
 	public ActivityFacility getClosestParkingFacility(Coord coord) {
-		return this.allParkingFacilities.get(coord.getX(), coord.getY());
+		return this.allParkingFacilities.getClosest(coord.getX(), coord.getY());
 	}
 
 	public ParkingCostCalculator getParkingCostCalculator() {
@@ -437,7 +437,7 @@ public class ParkingInfrastructure {
 
 	public Collection<ActivityFacility> getAllFreeParkingWithinDistance(double distance, Coord coord, String parkingType) {
 
-		Collection<ActivityFacility> parkings = this.availableParkingFacilities.get(parkingType).get(coord.getX(), coord.getY(), distance);
+		Collection<ActivityFacility> parkings = this.availableParkingFacilities.get(parkingType).getDisk(coord.getX(), coord.getY(), distance);
 
 		return parkings;
 	}

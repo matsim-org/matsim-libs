@@ -19,6 +19,7 @@
 
 package playground.johannes.gsv.counts;
 
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.CountsReaderMatsimV1;
@@ -33,11 +34,11 @@ public class CountsCompare {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		Counts countsOld = new Counts();
+		Counts<Link> countsOld = new Counts();
 		CountsReaderMatsimV1 reader = new CountsReaderMatsimV1(countsOld);
 		reader.parse("/home/johannes/gsv/counts/counts.2009.net20140909.5.24h.xml");
 		
-		Counts countsNew = new Counts();
+		Counts<Link> countsNew = new Counts();
 		reader = new CountsReaderMatsimV1(countsNew);
 		reader.parse("/home/johannes/gsv/counts/counts.2013.net20140909.5.24h.xml");
 

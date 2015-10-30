@@ -1,22 +1,16 @@
 package playground.tschlenther.lanes;
 
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
-import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.Wait2LinkEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
-import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.LaneEnterEvent;
 import org.matsim.core.api.experimental.events.LaneLeaveEvent;
@@ -49,11 +43,11 @@ class LaneTestEventHandler implements LaneEnterEventHandler,
 	
 	/*@Override
 	public void handleEvent(PersonDepartureEvent event) {
-		if(this.departureTimes.containsKey(event.getPersonId())){
+		if(this.departureTimes.containsKey(event.getDriverId())){
 			throw new IllegalStateException(
 					"A person has a second departure event");
 		}
-		this.departureTimes.put(event.getPersonId(), event.getTime());
+		this.departureTimes.put(event.getDriverId(), event.getTime());
 	}
 	*/
 
@@ -218,7 +212,7 @@ class LaneTestEventHandler implements LaneEnterEventHandler,
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
 		if(event.getLinkId().equals(Id.createLinkId("L3"))){
-			this.L3EnterTimes.put(event.getPersonId(),event.getTime());
+			this.L3EnterTimes.put(event.getDriverId(),event.getTime());
 		}
 	}
 		

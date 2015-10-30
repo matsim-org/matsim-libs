@@ -21,8 +21,7 @@ package playground.johannes.studies.coopsim;
 
 import org.apache.commons.math.FunctionEvaluationException;
 import org.apache.commons.math.analysis.UnivariateRealFunction;
-
-import playground.johannes.sna.util.Composite;
+import org.matsim.contrib.common.collections.Composite;
 
 /**
  * @author illenberger

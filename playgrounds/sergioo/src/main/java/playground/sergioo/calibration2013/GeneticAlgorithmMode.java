@@ -21,9 +21,9 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterProviderImpl;
+import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility.Builder;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
@@ -237,7 +237,7 @@ public class GeneticAlgorithmMode {
 		if(!args[5].equals("NO"))
 			new MatsimEventsReader(events).readFile(args[5]);
 		routerManager = new RouterManager(scenario.getConfig().global().getNumberOfThreads(), scenario, travelTimeCalculator.getLinkTravelTimes(), waitTimeCalculator.getWaitTimes(), stopStopTimeCalculator.getStopStopTimes());
-		final TravelDisutilityFactory factory = new TravelTimeAndDistanceBasedTravelDisutilityFactory();
+		final TravelDisutilityFactory factory = new Builder( TransportMode.car );
 		final TravelDisutility disutility = factory.createTravelDisutility(travelTimeCalculator.getLinkTravelTimes(), scenario.getConfig().planCalcScore());
 		final Provider<TransitRouter> transitRouterFactory = new TransitRouterWSImplFactory(scenario, waitTimeCalculator.getWaitTimes(), stopStopTimeCalculator.getStopStopTimes());
 		ReplanningContext context = new ReplanningContext() {
@@ -259,7 +259,7 @@ public class GeneticAlgorithmMode {
 			}
 			@Override
 			public TripRouter getTripRouter() {
-				return new TripRouterProviderImpl(scenario, factory, travelTimeCalculator.getLinkTravelTimes(), new DijkstraFactory(), transitRouterFactory).get();
+				return TripRouterFactoryBuilderWithDefaults.createTripRouterProvider(scenario, new DijkstraFactory(), transitRouterFactory).get();
 			}
 		};
 		ReRoute module = new ReRoute(scenario);

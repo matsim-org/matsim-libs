@@ -22,17 +22,16 @@
  */
 package playground.johannes.gsv.sim;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.pt.transitSchedule.api.TransitLine;
-
 import playground.johannes.gsv.analysis.RailCounts;
 import playground.johannes.gsv.analysis.TransitLineAttributes;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author johannes
@@ -77,7 +76,7 @@ public class RailCountsCollector implements TransitBoardEventHandler,
 	 */
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		TransitLine line = currentLines.get(event.getPersonId());
+		TransitLine line = currentLines.get(event.getDriverId());
 		if(line != null) {
 			railCounts.addCounts(event.getLinkId(), line.getId(), 1);
 		}

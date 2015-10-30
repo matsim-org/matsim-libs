@@ -362,7 +362,7 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 			this.net.getEventsManager().processEvent(
 					new Wait2LinkEvent((int) time, ((CAVehicle) a).getDriver()
 							.getId(), this.usl.getId(), ((CAVehicle) a)
-							.getVehicleId()));
+							.getVehicleId(), ((CAVehicle) a).getDriver().getMode(), 1.0));
 		}
 		checkPostConditionForAgentOnUpStreamAdvance(desiredPos + 1, a, time,
 				lane);
@@ -382,7 +382,7 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 			this.net.getEventsManager().processEvent(
 					new Wait2LinkEvent((int) time, ((CAVehicle) a).getDriver()
 							.getId(), this.dsl.getId(), ((CAVehicle) a)
-							.getVehicleId()));
+							.getVehicleId(), ((CAVehicle) a).getDriver().getMode(), 1.0));
 		}
 		checkPostConditionForAgentOnDownStreamAdvance(desiredPos - 1, a, time,
 				lane);

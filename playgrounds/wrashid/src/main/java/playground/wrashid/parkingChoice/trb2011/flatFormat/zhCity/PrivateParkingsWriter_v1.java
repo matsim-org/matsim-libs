@@ -9,7 +9,6 @@ import java.util.LinkedList;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
-import org.matsim.contrib.parking.lib.obj.TwoKeyHashMapWithDouble;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.facilities.ActivityFacilityImpl;
@@ -120,10 +119,10 @@ public class PrivateParkingsWriter_v1 extends MatsimXmlWriter {
 		
 		for (Coord coord:clusteredParkingCapacities.keySet()){
 			Collection<ActivityFacilityImpl> actFacilities = new LinkedList<ActivityFacilityImpl>();
-			actFacilities.addAll(facilitiesQuadTree.get(coord.getX(), coord.getY(), maxFacilityDistanceInMeters));
+			actFacilities.addAll(facilitiesQuadTree.getDisk(coord.getX(), coord.getY(), maxFacilityDistanceInMeters));
 			
 			if (actFacilities.size()==0){
-				actFacilities.add(facilitiesQuadTree.get(coord.getX(), coord.getY()));
+				actFacilities.add(facilitiesQuadTree.getClosest(coord.getX(), coord.getY()));
 			}
 			
 			double totalCapacityOfFacilitiesAttachedToCluster=0;

@@ -9,7 +9,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
@@ -30,10 +30,10 @@ import org.matsim.vehicles.VehiclesFactory;
 
 public class TransitScheduleModifier {
 
-	private ScenarioImpl sc;	
+	private MutableScenario sc;	
 	private NetworkImpl network;
 	private TransitSchedule transitSchedule;
-	public ScenarioImpl getSc() {
+	public MutableScenario getSc() {
 		return sc;
 	}
 
@@ -66,8 +66,8 @@ public class TransitScheduleModifier {
 	private void changeHeadway(String newServiceInterval) {
 		
 		double arrival = Time.parseTime("00:00:00");
-		double startTime = Time.parseTime("24:00:00");
-		double endTime = Time.parseTime("00:00:00");
+		double startTime = Time.parseTime("06:00:00");
+		double endTime = Time.parseTime("23:00:00");
 		double frequency = Time.parseTime(newServiceInterval);
 
 
@@ -104,7 +104,7 @@ public class TransitScheduleModifier {
 	}
 
 	public TransitScheduleModifier(String networkFile, String transitScheduleFile, String vehicleFile){
-		this.sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		this.sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Config config = this.sc.getConfig();
 		config.transit().setUseTransit(true);
 		config.scenario().setUseVehicles(true);

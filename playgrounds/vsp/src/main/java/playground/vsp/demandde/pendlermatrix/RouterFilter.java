@@ -34,7 +34,7 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilitiesFactory;
 import org.matsim.facilities.ActivityFacility;
@@ -68,7 +68,7 @@ public class RouterFilter implements TripFlowSink {
 		Node quellNode = ((NetworkImpl) network).getNearestNode(quelle.getCoord());
 		Node zielNode = ((NetworkImpl) network).getNearestNode(ziel.getCoord());
 		Path path = dijkstra.calcLeastCostPath(quellNode, zielNode, 0.0, null, null);
-		ActivityFacilitiesFactory factory = ((ScenarioImpl)sc).getActivityFacilities().getFactory() ;
+		ActivityFacilitiesFactory factory = ((MutableScenario)sc).getActivityFacilities().getFactory() ;
 		if (isInteresting(path)) {
 //			Facility newQuelle = new Zone(quelle.getId(), quelle.workplaces, quelle.workingPopulation, entryCoord);
 			ActivityFacility newQuelle = factory.createActivityFacility(quelle.getId(), quelle.getCoord() ) ;

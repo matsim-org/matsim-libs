@@ -40,8 +40,6 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.router.RoutingContext;
-import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.scoring.functions.OnlyTravelTimeDependentScoringFunctionFactory;
 import org.matsim.core.utils.misc.Time;
@@ -123,7 +121,7 @@ public class DemoRunner implements MobsimInitializedListener, StartupListener,
 		ActivityReplanningMap activityReplanningMap = this.withinDayControlerListener.getActivityReplanningMap();
 		this.duringActivityIdentifier = new ActivityEndIdentifierFactory(activityReplanningMap).createIdentifier();
 		this.duringActivityReplannerFactory = new NextLegReplannerFactory(this.scenario, this.withinDayControlerListener.getWithinDayEngine(),
-				this.withinDayControlerListener.getWithinDayTripRouterFactory(), routingContext);
+				this.withinDayControlerListener.getWithinDayTripRouterFactory());
 		this.duringActivityReplannerFactory.addIdentifier(this.duringActivityIdentifier);
 		this.withinDayControlerListener.getWithinDayEngine().addDuringActivityReplannerFactory(this.duringActivityReplannerFactory);
 		
@@ -131,7 +129,7 @@ public class DemoRunner implements MobsimInitializedListener, StartupListener,
 		MobsimDataProvider mobsimDataProvider = this.withinDayControlerListener.getMobsimDataProvider();
 		this.duringLegIdentifier = new LeaveLinkIdentifierFactory(linkReplanningMap, mobsimDataProvider).createIdentifier();
 		this.duringLegReplannerFactory = new CurrentLegReplannerFactory(this.scenario, this.withinDayControlerListener.getWithinDayEngine(),
-				this.withinDayControlerListener.getWithinDayTripRouterFactory(), routingContext);
+				this.withinDayControlerListener.getWithinDayTripRouterFactory());
 		this.duringLegReplannerFactory.addIdentifier(this.duringLegIdentifier);
 		this.withinDayControlerListener.getWithinDayEngine().addDuringLegReplannerFactory(this.duringLegReplannerFactory);
 	}

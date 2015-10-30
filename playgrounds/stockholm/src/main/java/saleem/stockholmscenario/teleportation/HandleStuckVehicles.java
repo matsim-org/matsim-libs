@@ -7,7 +7,7 @@ import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 public class HandleStuckVehicles implements PersonStuckEventHandler, TransitDriverStartsEventHandler{
 	int count = 0;int countveh=0;
 	String persons="Stuck Persons Are: ";
-	String vehicles="Stuck Vehicles Are: ";
+	String vehicles="Vehicles Are: ";
 	@Override
 	public void reset(int iteration) {
 		// TODO Auto-generated method stub
@@ -20,11 +20,19 @@ public class HandleStuckVehicles implements PersonStuckEventHandler, TransitDriv
 		persons+= event.getPersonId() + ", ";
 		
 	}
+	void initiate(){
+		count = 0;
+		countveh=0;
+		persons="Stuck Persons Are: ";
+		vehicles="Vehicles Are: ";
+	}
 	public void printStuckPersonsAndVehicles(){
 		System.out.println(persons);
 		System.out.println("Total Stuck Persons Are: "+ count);
-		System.out.println(vehicles);
+		//System.out.println(vehicles);
 		System.out.println("Total Vehicles Are: "+ countveh);
+		initiate();
+		
 	}
 
 	@Override

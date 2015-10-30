@@ -20,10 +20,9 @@
 package playground.johannes.coopsim.eval;
 
 import org.apache.log4j.Logger;
-
+import org.matsim.contrib.common.collections.Composite;
 import playground.johannes.coopsim.Profiler;
 import playground.johannes.coopsim.pysical.Trajectory;
-import playground.johannes.sna.util.Composite;
 
 /**
  * @author illenberger

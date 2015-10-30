@@ -60,7 +60,6 @@ import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.Facility;
@@ -283,7 +282,7 @@ public class AgentsInMunicipalityEventsHandler implements LinkEnterEventHandler,
 		
 		boolean isInside = coordAnalyzer.isLinkAffected(link);
 		
-		if (isInside) insideAgents.remove(event.getPersonId());
+		if (isInside) insideAgents.remove(event.getDriverId());
 	}
 
 	@Override
@@ -295,7 +294,7 @@ public class AgentsInMunicipalityEventsHandler implements LinkEnterEventHandler,
 		
 		boolean isInside = coordAnalyzer.isLinkAffected(link);
 		
-		if (isInside) insideAgents.add(event.getPersonId());
+		if (isInside) insideAgents.add(event.getDriverId());
 	}
 	
 	@Override

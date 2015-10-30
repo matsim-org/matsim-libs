@@ -112,7 +112,7 @@ public class EnergyConsumptionTracker implements LinkEnterEventHandler, LinkLeav
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		handleEnergyConsumption(Id.create(event.getPersonId(), Vehicle.class), event.getLinkId(), event.getTime());
+		handleEnergyConsumption(Id.create(event.getDriverId(), Vehicle.class), event.getLinkId(), event.getTime());
 	}
 
 	private void handleEnergyConsumption(Id<Vehicle> vehicleId, Id<Link> linkId, double linkLeaveTime) {
@@ -163,7 +163,7 @@ public class EnergyConsumptionTracker implements LinkEnterEventHandler, LinkLeav
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		Id<Vehicle> vehicleId = Id.create(event.getPersonId(), Vehicle.class);
+		Id<Vehicle> vehicleId = Id.create(event.getDriverId(), Vehicle.class);
 		linkEnterTime.put(vehicleId, event.getTime());
 	}
 

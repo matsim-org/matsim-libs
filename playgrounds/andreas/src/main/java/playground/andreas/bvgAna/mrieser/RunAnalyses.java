@@ -56,7 +56,7 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
@@ -201,7 +201,7 @@ public class RunAnalyses {
 
 	public void createRemainSeatedStats() {
 		StopId2RemainSeatedDataMap remainSeated = new StopId2RemainSeatedDataMap();
-		TransitSchedule ts = ((ScenarioImpl) this.scenario).getTransitSchedule();
+		TransitSchedule ts = ((MutableScenario) this.scenario).getTransitSchedule();
 
 		EventsManager em = EventsUtils.createEventsManager();
 		em.addHandler(remainSeated);
@@ -375,7 +375,7 @@ public class RunAnalyses {
 				}
 			}
 		}
-		TransitSchedule ts = ((ScenarioImpl) this.scenario).getTransitSchedule();
+		TransitSchedule ts = ((MutableScenario) this.scenario).getTransitSchedule();
 		System.out.println("stopId\tstopX\tstopY\tstopName\t#affectPrs");
 		Set<Id> handledStops = new HashSet<Id>();
 		for (TransitStopFacility stop : ts.getFacilities().values()) {
@@ -394,7 +394,7 @@ public class RunAnalyses {
 	}
 
 	public void createCatchmentAreaStats(Set<Id<Person>> agentIds, Id<TransitLine> lineId, Id<TransitRoute>[] routeIds) {
-		TransitSchedule ts = ((ScenarioImpl) this.scenario).getTransitSchedule();
+		TransitSchedule ts = ((MutableScenario) this.scenario).getTransitSchedule();
 		Set<Id<TransitStopFacility>> stopIds = new HashSet<>();
 		Set<Id<Vehicle>> vehicleIds = new HashSet<>();
 		TransitLine line = ts.getTransitLines().get(lineId);
@@ -418,7 +418,7 @@ public class RunAnalyses {
 //		Set<Id> agentIds = new HashSet<Id>(1000);
 //		for (List<PersonEntersVehicleEvent> events : enterLeave.getStopId2PersonEnterEventMap().values()) {
 //			for (PersonEntersVehicleEvent event : events) {
-//				agentIds.add(event.getPersonId());
+//				agentIds.add(event.getDriverId());
 //			}
 //		}
 

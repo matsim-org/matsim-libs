@@ -20,12 +20,10 @@
 package playground.johannes.coopsim.analysis;
 
 import gnu.trove.TObjectDoubleHashMap;
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import playground.johannes.coopsim.pysical.Trajectory;
 
 import java.util.Set;
-
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-
-import playground.johannes.coopsim.pysical.Trajectory;
 
 
 /**

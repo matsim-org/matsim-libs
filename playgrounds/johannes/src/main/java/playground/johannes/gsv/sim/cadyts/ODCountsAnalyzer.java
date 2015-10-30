@@ -19,10 +19,7 @@
 
 package playground.johannes.gsv.sim.cadyts;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-
+import cadyts.measurements.SingleLinkMeasurement.TYPE;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
@@ -32,7 +29,9 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 
-import cadyts.measurements.SingleLinkMeasurement.TYPE;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 
 /**
  * @author johannes
@@ -42,7 +41,7 @@ public class ODCountsAnalyzer implements AfterMobsimListener {
 
 	private static final Logger logger = Logger.getLogger(ODCountsAnalyzer.class);
 
-	private final Counts counts;
+	private final Counts<Link> counts;
 
 	private final SimResultsAdaptor simResults;
 

@@ -19,6 +19,11 @@
 
 package org.matsim.contrib.locationchoice;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.TreeMap;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -29,7 +34,6 @@ import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestRespo
 import org.matsim.contrib.locationchoice.bestresponse.DestinationSampler;
 import org.matsim.contrib.locationchoice.router.BackwardFastMultiNodeDijkstra;
 import org.matsim.contrib.locationchoice.router.BackwardsFastMultiNodeDijkstraFactory;
-import org.matsim.contrib.locationchoice.utils.QuadTreeRing;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
@@ -40,6 +44,7 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.util.FastMultiNodeDijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.scoring.ScoringFunctionFactory;
+import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
@@ -47,18 +52,14 @@ import org.matsim.facilities.ActivityFacilityImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.TreeMap;
-
 public class BestReplyDestinationChoice extends AbstractMultithreadedModule {
 
     private static final Logger log = Logger.getLogger(BestReplyDestinationChoice.class);
 
+    private DestinationChoiceConfigGroup dccg;
 	private ObjectAttributes personsMaxEpsUnscaled;
 	private DestinationSampler sampler;
-	protected TreeMap<String, QuadTreeRing<ActivityFacilityWithIndex>> quadTreesOfType = new TreeMap<String, QuadTreeRing<ActivityFacilityWithIndex>>();
+	protected TreeMap<String, QuadTree<ActivityFacilityWithIndex>> quadTreesOfType = new TreeMap<String, QuadTree<ActivityFacilityWithIndex>>();
 	protected TreeMap<String, ActivityFacilityImpl []> facilitiesOfType = new TreeMap<String, ActivityFacilityImpl []>();
 	private final Scenario scenario;
 	private DestinationChoiceBestResponseContext lcContext;
@@ -71,7 +72,9 @@ public class BestReplyDestinationChoice extends AbstractMultithreadedModule {
 
 	public BestReplyDestinationChoice(DestinationChoiceBestResponseContext lcContext, ObjectAttributes personsMaxDCScoreUnscaled) {
 		super(lcContext.getScenario().getConfig().global());
-		if ( !DestinationChoiceConfigGroup.Algotype.bestResponse.equals(((DestinationChoiceConfigGroup)lcContext.getScenario().getConfig().getModule("locationchoice")).getAlgorithm())) {
+		
+		this.dccg = (DestinationChoiceConfigGroup) lcContext.getScenario().getConfig().getModule(DestinationChoiceConfigGroup.GROUP_NAME);
+		if (!DestinationChoiceConfigGroup.Algotype.bestResponse.equals(this.dccg.getAlgorithm())) {
 			throw new RuntimeException("wrong class for selected location choice algorithm type; aborting ...") ;
 		}
 		this.lcContext = lcContext;
@@ -84,7 +87,7 @@ public class BestReplyDestinationChoice extends AbstractMultithreadedModule {
 		// instead of just the nearest link we probably should check whether the facility is attached to a link? cdobler, oct'14
 		this.nearestLinks = new HashMap<>();
 		for (ActivityFacility facility : this.scenario.getActivityFacilities().getFacilities().values()) {
-			this.nearestLinks.put(facility.getId(), NetworkUtils.getNearestLink(((NetworkImpl) this.scenario.getNetwork()), facility.getCoord()).getId());
+			this.nearestLinks.put(facility.getId(), NetworkUtils.getNearestLink((this.scenario.getNetwork()), facility.getCoord()).getId());
 		}
 		
 		initLocal();
@@ -93,11 +96,11 @@ public class BestReplyDestinationChoice extends AbstractMultithreadedModule {
 	private void initLocal() {
 		this.flexibleTypes = this.lcContext.getFlexibleTypes();		
 		((NetworkImpl) this.scenario.getNetwork()).connect();
-		this.initTrees(this.scenario.getActivityFacilities(), (DestinationChoiceConfigGroup) this.scenario.getConfig().getModule("locationchoice"));
+		this.initTrees(this.scenario.getActivityFacilities(), this.dccg);
 		this.sampler = new DestinationSampler(
 				this.lcContext.getPersonsKValuesArray(), 
 				this.lcContext.getFacilitiesKValuesArray(), 
-				(DestinationChoiceConfigGroup) this.scenario.getConfig().getModule("locationchoice"));
+				this.dccg);
 	}
 
 	/**
@@ -107,7 +110,7 @@ public class BestReplyDestinationChoice extends AbstractMultithreadedModule {
 		log.info("Doing location choice for activities: " + this.flexibleTypes.toString());
 		
 		for (String flexibleType : this.flexibleTypes) {
-			Tuple<QuadTreeRing<ActivityFacilityWithIndex>, ActivityFacilityImpl[]> tuple = this.lcContext.getQuadTreeAndFacilities(flexibleType);
+			Tuple<QuadTree<ActivityFacilityWithIndex>, ActivityFacilityImpl[]> tuple = this.lcContext.getQuadTreeAndFacilities(flexibleType);
 			this.quadTreesOfType.put(flexibleType, tuple.getFirst());
 			this.facilitiesOfType.put(flexibleType, tuple.getSecond());
 		}

@@ -97,6 +97,8 @@ public class FreeFloatingParkingPersonDriverAgentImpl implements MobsimDriverAge
 	
 	double walkSpeed = 0.0;
 	
+	ParkingLinkInfo parkingSpot;
+	
 	// ============================================================================================================================
 	// c'tor
 
@@ -395,7 +397,7 @@ public class FreeFloatingParkingPersonDriverAgentImpl implements MobsimDriverAge
 		Route route = leg.getRoute();
 
 		//create route for the car part of the freefloating trip
-		ParkingLinkInfo parkingSpot = parkingModule.parkFreeFloatingVehicle(Id.create(vehID, Vehicle.class),
+		parkingSpot = parkingModule.parkFreeFloatingVehicle(Id.create(vehID, Vehicle.class),
 				this.scenario.getNetwork().getLinks().get(route.getEndLinkId()).getCoord(),
 				this.person.getId(), now);
 		
@@ -448,6 +450,7 @@ public class FreeFloatingParkingPersonDriverAgentImpl implements MobsimDriverAge
 	private void initializeFreeFloatingEndWalkLeg(Leg leg, double now) {
 		
 		this.state = MobsimAgent.State.LEG;
+		this.parkingModule.makeFFVehicleAvailable(Id.create((vehID), Vehicle.class), parkingSpot.getParking());
 		Route route = leg.getRoute();
 		
 		double distance = 0.0; // this will be acquired from the parking module

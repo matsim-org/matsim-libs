@@ -27,9 +27,11 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.common.collect.Sets;
 import org.apache.log4j.Logger;
 import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.controler.corelisteners.DumpDataAtEnd;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.StringUtils;
 
@@ -53,6 +55,8 @@ public final class ControlerConfigGroup extends ReflectiveConfigGroup {
 	private static final String WRITE_EVENTS_INTERVAL = "writeEventsInterval";
 	private static final String WRITE_PLANS_INTERVAL = "writePlansInterval";
 	private static final String OVERWRITE_FILE = "overwriteFiles";
+	public static final String CREATE_GRAPHS = "createGraphs";
+	final String DUMP_DATA_AT_END = "dumpDataAtEnd";
 
 	/*package*/ static final String MOBSIM = "mobsim";
 	public enum MobsimType {qsim, JDEQSim}
@@ -77,6 +81,7 @@ public final class ControlerConfigGroup extends ReflectiveConfigGroup {
 	private String mobsim = MobsimType.qsim.toString();
 	private int writeSnapshotsInterval = 1;
 	private boolean createGraphs = true;
+	private boolean dumpDataAtEnd = true;
 	private OverwriteFileSetting overwriteFileSetting = OverwriteFileSetting.failIfDirectoryExists;
 
 	public ControlerConfigGroup() {
@@ -98,7 +103,10 @@ public final class ControlerConfigGroup extends ReflectiveConfigGroup {
 		map.put(LINKTOLINK_ROUTING_ENABLED, "Default=false; "); // TODO: add description
 		map.put(FIRST_ITERATION, "Default=0; "); // TODO: add description
 		map.put(LAST_ITERATION, "Default=1000; "); // TODO: add description
-		
+		map.put(CREATE_GRAPHS, "Sets whether graphs showing some analyses should automatically be generated during the simulation." +
+				" The generation of graphs usually takes a small amount of time that does not have any weight in big simulations," +
+				" but add a significant overhead in smaller runs or in test cases where the graphical output is not even requested." );
+
 		StringBuilder mobsimTypes = new StringBuilder();
 		for ( MobsimType mtype : MobsimType.values() ) {
 			mobsimTypes.append(mtype.toString());
@@ -111,6 +119,7 @@ public final class ControlerConfigGroup extends ReflectiveConfigGroup {
 		map.put(SNAPSHOT_FORMAT, "Comma-separated list of visualizer output file formats. `transims', `googleearth', and `otfvis'.");
 		map.put(WRITE_SNAPSHOTS_INTERVAL, "iterationNumber % " + WRITE_SNAPSHOTS_INTERVAL + " == 0 defines in which iterations snapshots are written " +
 				"to a file. `0' disables snapshots writing completely");
+		map.put(DUMP_DATA_AT_END, "true if at the end of a run, plans, network, config etc should be dumped to a file");
 		return map;
 	}
 
@@ -285,6 +294,7 @@ public final class ControlerConfigGroup extends ReflectiveConfigGroup {
 		this.writeSnapshotsInterval = writeSnapshotsInterval;
 	}
 
+	@StringGetter( CREATE_GRAPHS )
 	public boolean isCreateGraphs() {
 		return createGraphs;
 	}
@@ -299,6 +309,7 @@ public final class ControlerConfigGroup extends ReflectiveConfigGroup {
      * @param createGraphs
      *            true if graphs showing analyses' output should be generated.
      */
+	@StringSetter( CREATE_GRAPHS )
 	public void setCreateGraphs(boolean createGraphs) {
 		this.createGraphs = createGraphs;
 	}
@@ -317,4 +328,15 @@ public final class ControlerConfigGroup extends ReflectiveConfigGroup {
 		}
 		this.overwriteFileSetting = overwriteFileSetting;
 	}
+
+	@StringGetter(DUMP_DATA_AT_END)
+	public boolean getDumpDataAtEnd() {
+		return dumpDataAtEnd;
+	}
+
+	@StringSetter(DUMP_DATA_AT_END)
+	public void setDumpDataAtEnd(boolean dumpDataAtEnd) {
+		this.dumpDataAtEnd = dumpDataAtEnd;
+	}
+
 }

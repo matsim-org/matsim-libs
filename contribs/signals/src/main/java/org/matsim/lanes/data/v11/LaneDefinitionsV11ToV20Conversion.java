@@ -26,7 +26,7 @@ import org.matsim.core.api.internal.MatsimComparator;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.lanes.LanesUtils;
 import org.matsim.lanes.data.v20.Lane;
-import org.matsim.lanes.data.v20.LaneDefinitions20;
+import org.matsim.lanes.data.v20.Lanes;
 import org.matsim.lanes.data.v20.LaneDefinitions20Impl;
 import org.matsim.lanes.data.v20.LaneDefinitionsFactory20;
 
@@ -59,7 +59,7 @@ public abstract class LaneDefinitionsV11ToV20Conversion {
 	
 //	private static final Logger log = Logger.getLogger(LaneDefinitionsV11ToV20Conversion.class);
 
-	public static void convertTo20(LaneDefinitions11 in, LaneDefinitions20 out, Network network) {
+	public static void convertTo20(LaneDefinitions11 in, Lanes out, Network network) {
 		LaneDefinitionsFactory20 lanedefs20fac = out.getFactory();
 		org.matsim.lanes.data.v20.LanesToLinkAssignment20 l2lnew;
 		Lane lanev20;
@@ -162,8 +162,8 @@ public abstract class LaneDefinitionsV11ToV20Conversion {
 		}
 	}
 
-	public static LaneDefinitions20 convertTo20(LaneDefinitions11 lanedefs11, Network network) {
-		LaneDefinitions20 lanedefs20 = new LaneDefinitions20Impl();
+	public static Lanes convertTo20(LaneDefinitions11 lanedefs11, Network network) {
+		Lanes lanedefs20 = new LaneDefinitions20Impl();
 		convertTo20(lanedefs11, lanedefs20, network);
 		return lanedefs20;
 	}

@@ -20,10 +20,13 @@
 
 package org.matsim.core.controler;
 
-import com.google.inject.Key;
-import com.google.inject.Provider;
-import com.google.inject.TypeLiteral;
-import com.google.inject.name.Names;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.log4j.Layout;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
@@ -33,13 +36,19 @@ import org.matsim.analysis.ScoreStats;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.consistency.ConfigConsistencyCheckerImpl;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.SimulationConfigGroup;
-import org.matsim.core.controler.corelisteners.*;
+import org.matsim.core.controler.corelisteners.ControlerDefaultCoreListenersModule;
+import org.matsim.core.controler.corelisteners.DumpDataAtEnd;
+import org.matsim.core.controler.corelisteners.EventsHandling;
+import org.matsim.core.controler.corelisteners.PlansDumping;
+import org.matsim.core.controler.corelisteners.PlansReplanning;
+import org.matsim.core.controler.corelisteners.PlansScoring;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.handler.EventHandler;
@@ -47,15 +56,16 @@ import org.matsim.core.mobsim.external.ExternalMobsim;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.ObservableMobsim;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -66,7 +76,10 @@ import org.matsim.pt.router.TransitRouter;
 import org.matsim.vis.snapshotwriters.SnapshotWriter;
 import org.matsim.vis.snapshotwriters.SnapshotWriterManager;
 
-import java.util.*;
+import com.google.inject.Key;
+import com.google.inject.Provider;
+import com.google.inject.TypeLiteral;
+import com.google.inject.name.Names;
 
 /**
  * The Controler is responsible for complete simulation runs, including the
@@ -130,8 +143,6 @@ public class Controler extends AbstractController {
     private AbstractModule overrides = AbstractModule.emptyModule();
 
 	private final List<MobsimListener> simulationListeners = new ArrayList<>();
-
-	private boolean dumpDataAtEnd = true; 
 
     public static void main(final String[] args) {
 		if ((args == null) || (args.length == 0)) {
@@ -265,6 +276,7 @@ public class Controler extends AbstractController {
 		 * are added to the list.
 		 */
 
+		this.injectorCreated = true;
         this.injector = Injector.createInjector(
                 config,
                 new AbstractModule() {
@@ -290,9 +302,8 @@ public class Controler extends AbstractController {
                         });
                     }
                 });
-        this.injectorCreated = true;
 
-		if (this.dumpDataAtEnd) {
+		if (getConfig().controler().getDumpDataAtEnd()) {
 			this.addCoreControlerListener( injector.getInstance( DumpDataAtEnd.class ) );
 		}
 
@@ -316,20 +327,33 @@ public class Controler extends AbstractController {
 	@Override
 	protected final void prepareForSim() {
 
-		if ( scenario  instanceof ScenarioImpl ) {
-			((ScenarioImpl)scenario ).setLocked();
+		if ( scenario  instanceof MutableScenario ) {
+			((MutableScenario)scenario ).setLocked();
 			// see comment in ScenarioImpl. kai, sep'14
 		}
 
+		/*
+		 * Create single-mode network here and hand it over to PersonPrepareForSim. Otherwise, each instance would create its
+		 * own single-mode network. However, this assumes that the main mode is car - which PersonPrepareForSim also does. Should
+		 * be probably adapted in a way that other main modes are possible as well. cdobler, oct'15.
+		 */
+		final Network net;
+		if (NetworkUtils.isMultimodal(this.scenario.getNetwork())) {
+			log.info("Network seems to be multimodal. Create car-only network which is handed over to PersonPrepareForSim.");
+			TransportModeNetworkFilter filter = new TransportModeNetworkFilter(this.scenario.getNetwork());
+			net = NetworkUtils.createNetwork();
+			HashSet<String> modes = new HashSet<String>();
+			modes.add(TransportMode.car);
+			filter.filter(net, modes);
+		} else net = this.scenario.getNetwork();
+		
 		// make sure all routes are calculated.
         ParallelPersonAlgorithmRunner.run(getScenario().getPopulation(), this.config.global().getNumberOfThreads(),
 				new ParallelPersonAlgorithmRunner.PersonAlgorithmProvider() {
 			@Override
 			public AbstractPersonAlgorithm getPersonAlgorithm() {
-				return new PersonPrepareForSim(new PlanRouter(
-				getTripRouterProvider().get(),
-				getScenario().getActivityFacilities()
-				), Controler.this.scenario );
+				return new PersonPrepareForSim(new PlanRouter(getTripRouterProvider().get(), getScenario().getActivityFacilities()), 
+						Controler.this.scenario, net);
 			}
 		});
 	}
@@ -510,11 +534,11 @@ public class Controler extends AbstractController {
      * implement your own complex travel mode.
      * See {@link org.matsim.core.router.TripRouter} for more information and pointers to examples.
      */
-	public final void setTripRouterFactory(final TripRouterFactory factory) {
+	public final void setTripRouterFactory(final javax.inject.Provider<TripRouter> factory) {
         this.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
-				bind(TripRouterFactory.class).toInstance(factory);
+				bind(TripRouter.class).toProvider(factory);
 			}
         });
 	}
@@ -533,7 +557,7 @@ public class Controler extends AbstractController {
 	 *            config etc should be dumped to a file.
 	 */
 	public final void setDumpDataAtEnd(final boolean dumpData) {
-		this.dumpDataAtEnd = dumpData;
+		this.getConfig().controler().setDumpDataAtEnd(dumpData);
 	}
 	
 	

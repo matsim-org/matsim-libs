@@ -29,7 +29,7 @@ class MielecMultiThreadMultiRunTaxiLauncher
     //20 d:\michalm\2014_02\mielec-2-peaks-new-10-25\params.in
     //d:\PP-rad\taxi\mielec-2-peaks\2014_02\
     private static final String PATH = "d:\\michalm\\2014_02\\mielec-2-peaks-new-";
-    private static final String FILE = "\\params.in";
+    private static final String FILE = "params.in";
 
     //reverse order of iteration (--> start with bigger tasks)
     private static final int[] DEMANDS = { 40, 35, 30, 25, 20, 15, 10 };
@@ -49,8 +49,9 @@ class MielecMultiThreadMultiRunTaxiLauncher
 
         for (int d : DEMANDS) {
             for (int s : SUPPLIES) {
-                String paramFile = PATH + d + "-" + s + FILE;
-                final TaxiLauncherParams params = TaxiLauncherParams.readParams(paramFile);
+                String dir = PATH + d + "-" + s + "\\";
+                String paramFile = dir + FILE;
+                final TaxiLauncherParams params = TaxiLauncherParams.readParams(paramFile, dir, dir);
 
                 service.execute(new Runnable() {
                     public void run()

@@ -32,7 +32,7 @@ import org.matsim.core.replanning.PlanStrategyImpl.Builder;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.modules.SubtourModeChoice;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.ikaddoura.analysis.welfare.WelfareAnalysisControlerListener;
@@ -94,7 +94,7 @@ class PricingControler {
 					bindCarTravelDisutilityFactory().toInstance(fact);
 				}
 			});
-			controler.addControlerListener(new MarginalCongestionPricingContolerListener(sc, tollHandler, new CongestionHandlerImplV3(controler.getEvents(), (ScenarioImpl) sc)));
+			controler.addControlerListener(new MarginalCongestionPricingContolerListener(sc, tollHandler, new CongestionHandlerImplV3(controler.getEvents(), (MutableScenario) sc)));
 			Logger.getLogger(PricingControler.class).info("Using congestion pricing implementation version 3.");
 		}
 		break;

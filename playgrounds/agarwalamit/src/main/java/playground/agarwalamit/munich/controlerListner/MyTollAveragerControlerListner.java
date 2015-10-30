@@ -19,10 +19,9 @@
 package playground.agarwalamit.munich.controlerListner;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -36,11 +35,9 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.benjamin.scenarios.munich.analysis.filter.PersonFilter;
-import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 import playground.vsp.analysis.modules.monetaryTransferPayments.MoneyEventHandler;
 
 /**
@@ -57,7 +54,7 @@ public class MyTollAveragerControlerListner implements StartupListener, Iteratio
 
 	private Map<Id<Person>, Double> pId2Tolls= new HashMap<>();
 	private Map<Id<Person>, Double> pId2NowTolls= new HashMap<>();
-	private ScenarioImpl scenario;
+	private MutableScenario scenario;
 	private BufferedWriter writer;
 	private Controler controler;
 	private int counter;
@@ -67,7 +64,7 @@ public class MyTollAveragerControlerListner implements StartupListener, Iteratio
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		this.controler = event.getControler();
-		this.scenario = (ScenarioImpl) controler.getScenario();
+		this.scenario = (MutableScenario) controler.getScenario();
 
 		int firstIt = this.scenario.getConfig().controler().getFirstIteration();
 		int lastIt = this.scenario.getConfig().controler().getLastIteration();
@@ -78,7 +75,10 @@ public class MyTollAveragerControlerListner implements StartupListener, Iteratio
 			pId2Tolls.put(personId, 0.0);
 		}
 
-		String outputFile = controler.getControlerIO().getOutputPath()+"/analysis/simpleAverageToll.txt";
+		String outputDir = controler.getControlerIO().getOutputPath()+"/analysis/";
+		if ( ! new File(outputDir).exists() ) new File(outputDir).mkdirs();
+		
+		String outputFile = outputDir+"/simpleAverageToll.txt";
 		this.writer =IOUtils.getBufferedWriter(outputFile);
 		try {
 			this.writer.write("personId \t  averageToll \n");
@@ -119,39 +119,6 @@ public class MyTollAveragerControlerListner implements StartupListener, Iteratio
 				this.writer.write(personId+"\t"+
 						toll/counter+"\n");
 			}
-			writer.close();
-		} catch (Exception e) {
-			throw new RuntimeException("Data is not written in file. Reason: "
-					+ e);
-		}
-		SortedMap<UserGroup, Double> userGrpToToll = new TreeMap<UserGroup, Double>();
-		PersonFilter pf = new PersonFilter();
-		double totalToll =0;
-
-		for(UserGroup ug : UserGroup.values()){
-			userGrpToToll.put(ug, 0.);
-		}
-
-		for(UserGroup ug : UserGroup.values()){
-			for(Id<Person> pId : pId2Tolls.keySet()){
-				if(pf.isPersonIdFromUserGroup(pId, ug)){
-					double tollSoFar = userGrpToToll.get(ug);
-					userGrpToToll.put(ug, tollSoFar+pId2Tolls.get(pId)/counter);
-					totalToll = totalToll+pId2Tolls.get(pId);
-				}
-			}
-		}
-
-		String outputFile = controler.getControlerIO().getOutputPath()+"/analysis/avgTollData.txt";
-		writer = IOUtils.getBufferedWriter(outputFile);
-
-		try {
-			writer.write("UserGroup \t toll \n");
-
-			for(UserGroup ug : userGrpToToll.keySet()){
-				writer.write(ug+"\t"+userGrpToToll.get(ug)+"\n");
-			}
-			writer.write("total toll \t"+totalToll+"\n");
 			writer.close();
 		} catch (Exception e) {
 			throw new RuntimeException("Data is not written in file. Reason: "

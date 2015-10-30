@@ -34,7 +34,7 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.EventsToScore;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
@@ -189,7 +189,7 @@ public class CalcPaidTollTest extends MatsimTestCase {
 	}
 
 	private Population runTollSimulation(final String tollFile, final String tollType, final Config config) {
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario( config );
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario( config );
 		Fixture.createNetwork1(scenario);
 //        ConfigUtils.addOrGetModule(scenario.getConfig(), RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).setUseRoadpricing(true);
         RoadPricingSchemeImpl scheme = new RoadPricingSchemeImpl();

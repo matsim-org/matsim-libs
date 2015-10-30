@@ -2,6 +2,7 @@ package org.matsim.contrib.carsharing.vehicles;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 
 import org.jfree.util.Log;
 import org.matsim.api.core.v01.Scenario;
@@ -44,9 +45,41 @@ public class FreeFloatingVehiclesLocation {
 	
 	public void addVehicle(Link link, String id) {
 		
-		FreeFloatingStation f = vehicleLocationQuadTree.get(link.getCoord().getX(), link.getCoord().getY());
+		Collection<FreeFloatingStation> stations = vehicleLocationQuadTree.getDisk(link.getCoord().getX(), link.getCoord().getY(), 0.0);
 		
-		if (f == null || !f.getLink().getId().toString().equals(link.getId().toString())) {
+		if (stations.isEmpty()) {
+			ArrayList<String> vehIDs = new ArrayList<String>();
+			
+			vehIDs.add(id);
+			
+			FreeFloatingStation fNew = new FreeFloatingStation(link, 1, vehIDs);		
+			
+			vehicleLocationQuadTree.put(link.getCoord().getX(), link.getCoord().getY(), fNew);
+			
+		}
+		else {
+			
+			for(FreeFloatingStation ffStation: stations) {
+				
+				if (ffStation.getLink().getId().toString().equals(link.getId().toString())) {
+					
+					ArrayList<String> vehIDs = ffStation.getIDs();
+					ArrayList<String> newvehIDs = new ArrayList<String>();
+					for (String s : vehIDs) {
+						newvehIDs.add(s);
+					}
+					newvehIDs.add(id);
+					FreeFloatingStation fNew = new FreeFloatingStation(link, ffStation.getNumberOfVehicles() + 1, newvehIDs);		
+					
+					vehicleLocationQuadTree.remove(link.getCoord().getX(), link.getCoord().getY(), ffStation);
+					
+					vehicleLocationQuadTree.put(link.getCoord().getX(), link.getCoord().getY(), fNew);
+					
+					return;
+					
+				}
+				
+			}
 			
 			ArrayList<String> vehIDs = new ArrayList<String>();
 			
@@ -58,25 +91,14 @@ public class FreeFloatingVehiclesLocation {
 			
 			
 		}
-		else {
-			ArrayList<String> vehIDs = f.getIDs();
-			ArrayList<String> newvehIDs = new ArrayList<String>();
-			for (String s : vehIDs) {
-				newvehIDs.add(s);
-			}
-			newvehIDs.add(id);
-			FreeFloatingStation fNew = new FreeFloatingStation(link, f.getNumberOfVehicles() + 1, newvehIDs);		
-			vehicleLocationQuadTree.remove(link.getCoord().getX(), link.getCoord().getY(), f);
-			vehicleLocationQuadTree.put(link.getCoord().getX(), link.getCoord().getY(), fNew);
-			
-		}
+		
 		
 		
 	}
 	
 	public void removeVehicle(Link link, String id) {
 		
-		FreeFloatingStation f = vehicleLocationQuadTree.get(link.getCoord().getX(), link.getCoord().getY());
+		FreeFloatingStation f = vehicleLocationQuadTree.getClosest(link.getCoord().getX(), link.getCoord().getY());
 		
 		if ( f.getLink().getId().toString().equals(link.getId().toString())) {
 			

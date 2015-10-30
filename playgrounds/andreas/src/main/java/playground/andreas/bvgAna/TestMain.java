@@ -31,7 +31,7 @@ import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
@@ -83,7 +83,7 @@ public class TestMain {
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		EventsReaderXMLv1 reader = new EventsReaderXMLv1(eventsManager);
 
-		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		sc.getConfig().transit().setUseTransit(true);
 
 		new MatsimNetworkReader(sc).readFile(netFile);

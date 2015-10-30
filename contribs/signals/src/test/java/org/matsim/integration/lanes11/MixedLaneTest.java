@@ -19,16 +19,22 @@
  * *********************************************************************** */
 package org.matsim.integration.lanes11;
 
-import junit.framework.Assert;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.Wait2LinkEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LaneEnterEvent;
 import org.matsim.core.api.experimental.events.LaneLeaveEvent;
@@ -38,9 +44,10 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.lanes.data.v20.Lane;
-import org.matsim.lanes.data.v20.LaneDefinitions20;
+import org.matsim.lanes.data.v20.Lanes;
 import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
 import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * 
@@ -74,7 +81,7 @@ public class MixedLaneTest {
 	 */
 	@Test
 	public void testFixture(){
-		LaneDefinitions20 lanes = this.fixture.sc.getLanes();
+		Lanes lanes = this.fixture.sc.getLanes();
 		Assert.assertNotNull(lanes);
 		Assert.assertNotNull(lanes.getLanesToLinkAssignments());
 		LanesToLinkAssignment20 lanesLink1 = lanes.getLanesToLinkAssignments().get(fixture.id1);
@@ -82,16 +89,16 @@ public class MixedLaneTest {
 		Assert.assertEquals(2, lanesLink1.getLanes().size());
 		Lane lane1ol = lanesLink1.getLanes().get(fixture.link1FirstLaneId);
 		Assert.assertNotNull(lane1ol);
-		Assert.assertEquals(100.1, lane1ol.getStartsAtMeterFromLinkEnd());
-		Assert.assertEquals(7200.0, lane1ol.getCapacityVehiclesPerHour());
-		Assert.assertEquals(2.0 , lane1ol.getNumberOfRepresentedLanes() );
+		Assert.assertEquals(100.1, lane1ol.getStartsAtMeterFromLinkEnd(), testUtils.EPSILON);
+		Assert.assertEquals(7200.0, lane1ol.getCapacityVehiclesPerHour(), testUtils.EPSILON);
+		Assert.assertEquals(2.0 , lane1ol.getNumberOfRepresentedLanes(), testUtils.EPSILON);
 		Assert.assertEquals(fixture.laneId1 , lane1ol.getToLaneIds().get(0));
 		Assert.assertNull(lane1ol.getToLinkIds());
 		Lane lane1 = lanesLink1.getLanes().get(fixture.laneId1);
 		Assert.assertNotNull(lane1);
-		Assert.assertEquals(50.0, lane1.getStartsAtMeterFromLinkEnd());
-		Assert.assertEquals(7200.0, lane1.getCapacityVehiclesPerHour());
-		Assert.assertEquals(2.0 , lane1.getNumberOfRepresentedLanes() );
+		Assert.assertEquals(50.0, lane1.getStartsAtMeterFromLinkEnd(), testUtils.EPSILON);
+		Assert.assertEquals(7200.0, lane1.getCapacityVehiclesPerHour(), testUtils.EPSILON);
+		Assert.assertEquals(2.0 , lane1.getNumberOfRepresentedLanes() , testUtils.EPSILON);
 		Assert.assertEquals(2 , lane1.getToLinkIds().size());
 		Assert.assertNull(lane1.getToLaneIds());
 	}
@@ -125,7 +132,7 @@ public class MixedLaneTest {
 		if (reduceCap){
 			fixture.sc.getConfig().qsim().setStartTime(3500.0);
 			fixture.sc.getConfig().qsim().setEndTime(7200.0);
-			LaneDefinitions20 lanes = fixture.sc.getLanes();
+			Lanes lanes = fixture.sc.getLanes();
 			Lane lane1 = lanes.getLanesToLinkAssignments().get(fixture.id1).getLanes().get(fixture.laneId1);
 			lane1.setCapacityVehiclesPerHour(1800.0);
 			Lane lane1ol = lanes.getLanesToLinkAssignments().get(fixture.id1).getLanes().get(fixture.link1FirstLaneId);
@@ -139,23 +146,23 @@ public class MixedLaneTest {
 		qsim.run();
 		Assert.assertNotNull(handler.lastAgentDepartureEvent);
 		Assert.assertEquals(3600.0, 
-				handler.lastAgentDepartureEvent.getTime());
+				handler.lastAgentDepartureEvent.getTime(), testUtils.EPSILON);
 	
 		Assert.assertNull(handler.lastLink1EnterEvent);
 	
 		Assert.assertNull(handler.lastLane1olEnterEvent);
 		Assert.assertEquals(3600.0 + firstLinkOrLaneTT, 
-				handler.lastLane1olLeaveEvent.getTime());
+				handler.lastLane1olLeaveEvent.getTime(), testUtils.EPSILON);
 		Assert.assertEquals(3600.0 + firstLinkOrLaneTT, 
-				handler.lastLane1EnterEvent.getTime());
+				handler.lastLane1EnterEvent.getTime(), testUtils.EPSILON);
 		Assert.assertEquals(3600.0 + firstLinkOrLaneTT + laneTTlane1, 
-				handler.lastLane1LeaveEvent.getTime());
+				handler.lastLane1LeaveEvent.getTime(), testUtils.EPSILON);
 		
 		Assert.assertNotNull(handler.lastLink2EnterEvent);
 		Assert.assertEquals(this.fixture.pid1, 
-				handler.lastLink2EnterEvent.getPersonId());
+				handler.vehId2DriverId.get(handler.lastLink2EnterEvent.getVehicleId()));
 		Assert.assertEquals(3600.0 + firstLinkOrLaneTT + laneTTlane1, 
-				handler.lastLink2EnterEvent.getTime());
+				handler.lastLink2EnterEvent.getTime(), testUtils.EPSILON);
 	
 		Assert.assertNull(handler.lastLink3EnterEvent);
 	}
@@ -190,7 +197,7 @@ public class MixedLaneTest {
 		
 		if (reduceCap){
 			// reduce capacity on lane 1
-			LaneDefinitions20 lanes = fixture.sc.getLanes();
+			Lanes lanes = fixture.sc.getLanes();
 			Lane lane1 = lanes.getLanesToLinkAssignments().
 					get(fixture.id1).getLanes().get(fixture.laneId1);
 			lane1.setCapacityVehiclesPerHour(1800.0);
@@ -209,30 +216,30 @@ public class MixedLaneTest {
 		qsim.run();
 		
 		Assert.assertNotNull(handler.lastAgentDepartureEvent);
-		Assert.assertEquals(3600.0, handler.lastAgentDepartureEvent.getTime());
+		Assert.assertEquals(3600.0, handler.lastAgentDepartureEvent.getTime(), testUtils.EPSILON);
 	
 		Assert.assertNotNull(handler.lastLink1EnterEvent);
 		Assert.assertEquals(3600.0 + firstLinkOrLaneTT, 
-				handler.lastLink1EnterEvent.getTime());
+				handler.lastLink1EnterEvent.getTime(), testUtils.EPSILON);
 		
 		Assert.assertEquals(3600.0 + firstLinkOrLaneTT, 
-				handler.lastLane1olEnterEvent.getTime());
+				handler.lastLane1olEnterEvent.getTime(), testUtils.EPSILON);
 		Assert.assertEquals(3600.0 + firstLinkOrLaneTT + laneTTlane1ol, 
-				handler.lastLane1olLeaveEvent.getTime());
+				handler.lastLane1olLeaveEvent.getTime(), testUtils.EPSILON);
 		Assert.assertEquals(3600.0 + firstLinkOrLaneTT + laneTTlane1ol, 
-				handler.lastLane1EnterEvent.getTime());
+				handler.lastLane1EnterEvent.getTime(), testUtils.EPSILON);
 		Assert.assertEquals(3600.0 + firstLinkOrLaneTT + laneTTlane1ol + laneTTlane1 + delayOfAgent2, 
-				handler.lastLane1LeaveEvent.getTime());
+				handler.lastLane1LeaveEvent.getTime(), testUtils.EPSILON);
 	
 		Assert.assertNotNull(handler.lastLink2EnterEvent);
-		Assert.assertEquals(this.fixture.pid1, handler.lastLink2EnterEvent.getPersonId());
+		Assert.assertEquals(this.fixture.pid1, handler.vehId2DriverId.get(handler.lastLink2EnterEvent.getVehicleId()));
 		Assert.assertEquals(3600.0 + firstLinkOrLaneTT + laneTTlane1ol + laneTTlane1 + delayOfAgent2, 
-				handler.lastLink2EnterEvent.getTime());
+				handler.lastLink2EnterEvent.getTime(), testUtils.EPSILON);
 	
 		Assert.assertNotNull(handler.lastLink3EnterEvent);
-		Assert.assertEquals(this.fixture.pid2, handler.lastLink3EnterEvent.getPersonId());
+		Assert.assertEquals(this.fixture.pid2, handler.vehId2DriverId.get(handler.lastLink3EnterEvent.getVehicleId()));
 		Assert.assertEquals(3600.0 + firstLinkOrLaneTT + laneTTlane1ol + laneTTlane1 + delayOfAgent1, 
-				handler.lastLink3EnterEvent.getTime());		
+				handler.lastLink3EnterEvent.getTime(), testUtils.EPSILON);		
 	}
 
 
@@ -258,29 +265,29 @@ public class MixedLaneTest {
 		qsim.run();
 		
 		Assert.assertNotNull(handler.lastAgentDepartureEvent);
-		Assert.assertEquals(3600.0, handler.lastAgentDepartureEvent.getTime());
+		Assert.assertEquals(3600.0, handler.lastAgentDepartureEvent.getTime(), testUtils.EPSILON);
 	
 		Assert.assertNotNull(handler.lastLink1EnterEvent);
 		Assert.assertEquals(3600.0 + firstLinkOrLaneTT, 
-				handler.lastLink1EnterEvent.getTime());
+				handler.lastLink1EnterEvent.getTime(), testUtils.EPSILON);
 		
 		Assert.assertNotNull(handler.lastLink2EnterEvent);
 		Assert.assertEquals(fixture.pid1, 
-				handler.lastLink2EnterEvent.getPersonId());
+				handler.vehId2DriverId.get(handler.lastLink2EnterEvent.getVehicleId()));
 		Assert.assertEquals(3600.0 + firstLinkOrLaneTT + linkTTWithoutLanes, 
-				handler.lastLink2EnterEvent.getTime());
+				handler.lastLink2EnterEvent.getTime(), testUtils.EPSILON);
 	
 		Assert.assertNotNull(handler.lastLink3EnterEvent);
 		Assert.assertEquals(fixture.pid2, 
-				handler.lastLink3EnterEvent.getPersonId());
+				handler.vehId2DriverId.get(handler.lastLink3EnterEvent.getVehicleId()));
 		Assert.assertEquals(3600.0 + firstLinkOrLaneTT + linkTTWithoutLanes, 
-				handler.lastLink3EnterEvent.getTime());
+				handler.lastLink3EnterEvent.getTime(), testUtils.EPSILON);
 	}
 
 
 
 	private static class MixedLanesEventsHandler implements LaneEnterEventHandler, LinkEnterEventHandler, 
-		LaneLeaveEventHandler, PersonDepartureEventHandler {
+		LaneLeaveEventHandler, PersonDepartureEventHandler, Wait2LinkEventHandler {
 
 		LaneEnterEvent lastLane1olEnterEvent = null;
 		LaneLeaveEvent lastLane1olLeaveEvent = null;
@@ -290,6 +297,8 @@ public class MixedLaneTest {
 		LinkEnterEvent lastLink3EnterEvent = null;
 		LinkEnterEvent lastLink1EnterEvent = null;
 		PersonDepartureEvent lastAgentDepartureEvent = null;
+		
+		Map<Id<Vehicle>, Id<Person>> vehId2DriverId = new HashMap<>();
 		
 		private MixedLaneTestFixture fixture;
 
@@ -340,6 +349,11 @@ public class MixedLaneTest {
 			else if (this.fixture.link1FirstLaneId.equals((event.getLaneId()))){
 				lastLane1olLeaveEvent = event;
 			}
+		}
+
+		@Override
+		public void handleEvent(Wait2LinkEvent event) {
+			vehId2DriverId.put(event.getVehicleId(), event.getPersonId());
 		}
 
 

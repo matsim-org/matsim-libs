@@ -29,7 +29,7 @@ import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
@@ -45,7 +45,7 @@ public class EquilTest extends MatsimTestCase {
 		String referenceFileName = getInputDirectory() + "events.xml.gz";
 		String eventsFileName = getOutputDirectory() + "events.xml.gz";
 
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(c);
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(c);
 
 		new MatsimNetworkReader(scenario).readFile(netFileName);
 

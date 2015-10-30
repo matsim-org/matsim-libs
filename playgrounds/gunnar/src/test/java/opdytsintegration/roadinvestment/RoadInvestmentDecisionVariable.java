@@ -2,8 +2,8 @@ package opdytsintegration.roadinvestment;
 
 import java.util.Map;
 
-import optdyts.DecisionVariable;
 
+import floetteroed.opdyts.DecisionVariable;
 import org.matsim.api.core.v01.network.Link;
 
 /**

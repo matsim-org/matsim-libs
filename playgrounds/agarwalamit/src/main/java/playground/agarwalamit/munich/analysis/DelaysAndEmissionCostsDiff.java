@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.emissions.utils.EmissionUtils;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.analysis.congestion.ExperiencedDelayAnalyzer;
@@ -168,7 +168,7 @@ public class DelaysAndEmissionCostsDiff {
 
 	private Map<Id<Person>, Double> getEmissionsPerPerson(String emissionsEventsFile, Scenario sc){
 		EmissionsAnalyzer ema = new EmissionsAnalyzer(emissionsEventsFile);
-		ema.init((ScenarioImpl)sc);
+		ema.init((MutableScenario)sc);
 		ema.preProcessData();
 		ema.postProcessData();
 		EmissionUtils emu = new EmissionUtils();

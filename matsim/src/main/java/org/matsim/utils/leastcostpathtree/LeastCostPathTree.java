@@ -21,6 +21,7 @@
 package org.matsim.utils.leastcostpathtree;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -31,7 +32,7 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.misc.Time;
@@ -201,12 +202,12 @@ public class LeastCostPathTree {
 	// ////////////////////////////////////////////////////////////////////
 
 	public static void main(String[] args) {
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile("../../input/network.xml");
 
 		TravelTimeCalculator ttc = new TravelTimeCalculator(network, 60, 30 * 3600, scenario.getConfig().travelTimeCalculator());
-		LeastCostPathTree st = new LeastCostPathTree(ttc.getLinkTravelTimes(), new RandomizingTimeDistanceTravelDisutility.Builder().createTravelDisutility(ttc.getLinkTravelTimes(), scenario.getConfig()
+		LeastCostPathTree st = new LeastCostPathTree(ttc.getLinkTravelTimes(), new RandomizingTimeDistanceTravelDisutility.Builder( TransportMode.car ).createTravelDisutility(ttc.getLinkTravelTimes(), scenario.getConfig()
 				.planCalcScore()));
 		Node origin = network.getNodes().get(Id.create(1, Node.class));
 		st.calculate(network, origin, 8*3600);

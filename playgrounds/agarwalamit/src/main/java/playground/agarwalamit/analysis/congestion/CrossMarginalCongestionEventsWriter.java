@@ -27,7 +27,7 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.events.handler.EventHandler;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 
 import playground.agarwalamit.utils.LoadMyScenarios;
 import playground.vsp.congestion.events.CongestionEvent;
@@ -68,7 +68,7 @@ public class CrossMarginalCongestionEventsWriter {
 		EventHandler eh = null;
 
 		switch (congestionImpl){
-		case "implV3" : eh = new CongestionHandlerImplV3(manager, (ScenarioImpl) this.sc); break;
+		case "implV3" : eh = new CongestionHandlerImplV3(manager, (MutableScenario) this.sc); break;
 		case "implV4" : eh = new CongestionHandlerImplV4(manager, sc); break;
 //		case "implV6" : eh = new CongestionHandlerImplV6(manager, sc); break;
 		default : throw new RuntimeException(congestionImpl+ "is not supported. Available implementations are implV3, implV4, implV6. Aborting ...");
@@ -90,7 +90,7 @@ public class CrossMarginalCongestionEventsWriter {
 			}
 		});
 
-		MarginalCongestionPricingHandler moneyEventHandler = new MarginalCongestionPricingHandler(manager,  (ScenarioImpl)this.sc);
+		MarginalCongestionPricingHandler moneyEventHandler = new MarginalCongestionPricingHandler(manager,  (MutableScenario)this.sc);
 		manager.addHandler(moneyEventHandler);
 
 		reader.readFile(this.inputEventsFile);

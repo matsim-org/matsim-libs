@@ -296,8 +296,8 @@ public class ZoneCompleteness {
 					Coordinate coordinate = new Coordinate(x,y);
 					Point point = gf.createPoint(coordinate);
 
-					Id closestPolygonId = qt.get(x, y).getFirst();
-					Polygon closestPolygon = qt.get(x, y).getSecond();
+					Id closestPolygonId = qt.getClosest(x, y).getFirst();
+					Polygon closestPolygon = qt.getClosest(x, y).getSecond();
 
 					/* Check if activity is in closest polygon. */
 					if(closestPolygon.covers(point)){

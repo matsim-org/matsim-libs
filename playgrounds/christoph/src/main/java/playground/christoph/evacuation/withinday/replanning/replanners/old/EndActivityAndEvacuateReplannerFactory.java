@@ -21,23 +21,24 @@
 package playground.christoph.evacuation.withinday.replanning.replanners.old;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.router.RoutingContext;
-import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.TripRouter;
 import org.matsim.withinday.mobsim.WithinDayEngine;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplannerFactory;
 
 import playground.christoph.evacuation.trafficmonitoring.SwissPTTravelTimeCalculator;
 
+import javax.inject.Provider;
+
 public class EndActivityAndEvacuateReplannerFactory extends WithinDayDuringActivityReplannerFactory {
 
 	private final Scenario scenario;
 	private final SwissPTTravelTimeCalculator ptTravelTime;
-	private final TripRouterFactory tripRouterFactory;
+	private final Provider<TripRouter> tripRouterFactory;
 	private final RoutingContext routingContext;
 	
 	public EndActivityAndEvacuateReplannerFactory(Scenario scenario, WithinDayEngine withinDayEngine,
-			SwissPTTravelTimeCalculator ptTravelTime, TripRouterFactory tripRouterFactory, RoutingContext routingContext) {
+			SwissPTTravelTimeCalculator ptTravelTime, Provider<TripRouter> tripRouterFactory, RoutingContext routingContext) {
 		super(withinDayEngine);
 		this.scenario = scenario;
 		this.ptTravelTime = ptTravelTime;
@@ -49,7 +50,7 @@ public class EndActivityAndEvacuateReplannerFactory extends WithinDayDuringActiv
 	public WithinDayDuringActivityReplanner createReplanner() {
 		WithinDayDuringActivityReplanner replanner = new EndActivityAndEvacuateReplanner(super.getId(), 
 				this.scenario, this.getWithinDayEngine().getActivityRescheduler(), ptTravelTime,
-				this.tripRouterFactory.instantiateAndConfigureTripRouter(this.routingContext));
+				this.tripRouterFactory.get());
 		return replanner;
 	}
 

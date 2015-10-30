@@ -55,7 +55,7 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.replanning.PlanStrategy;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -83,7 +83,7 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 
 		((DestinationChoiceConfigGroup)config.getModule("locationchoice")).setAlgorithm(Algotype.bestResponse);
 		((DestinationChoiceConfigGroup)config.getModule("locationchoice")).setEpsilonScaleFactors("100.0");
-		((DestinationChoiceConfigGroup)config.getModule("locationchoice")).setRandomSeed("4711");
+		((DestinationChoiceConfigGroup)config.getModule("locationchoice")).setRandomSeed(4711);
 
 		// SCENARIO:
 		final Scenario scenario = ScenarioUtils.createScenario(config);
@@ -167,7 +167,7 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 
 
 		// scenario:
-		final ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		final MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 
 		final double scale = 100000. ;
 		final double speed = 1. ;
@@ -287,7 +287,7 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 	public void testLocationChoice() {
 		final Config config = localCreateConfig();
 
-		final ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		final MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 
 		// setup network
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();

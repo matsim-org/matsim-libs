@@ -19,25 +19,23 @@
 
 package playground.johannes.gsv.matrices.analysis;
 
+import com.vividsolutions.jts.geom.Point;
 import gnu.trove.TDoubleDoubleHashMap;
+import org.matsim.contrib.common.gis.CartesianDistanceCalculator;
+import org.matsim.contrib.common.gis.DistanceCalculator;
+import org.matsim.contrib.common.stats.DescriptivePiStatistics;
+import org.matsim.contrib.common.stats.Histogram;
+import org.matsim.contrib.common.stats.LinearDiscretizer;
+import org.matsim.contrib.common.stats.StatsWriter;
+import playground.johannes.gsv.zones.KeyMatrix;
+import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
+import playground.johannes.synpop.gis.Zone;
+import playground.johannes.synpop.gis.ZoneCollection;
+import playground.johannes.synpop.gis.ZoneGeoJsonIO;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-
-import playground.johannes.gsv.zones.KeyMatrix;
-import playground.johannes.gsv.zones.Zone;
-import playground.johannes.gsv.zones.ZoneCollection;
-import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
-import playground.johannes.gsv.zones.io.Zone2GeoJSON;
-import playground.johannes.sna.math.DescriptivePiStatistics;
-import playground.johannes.sna.math.Histogram;
-import playground.johannes.sna.math.LinearDiscretizer;
-import playground.johannes.sna.util.TXTWriter;
-import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
-import playground.johannes.socialnetworks.gis.DistanceCalculator;
-
-import com.vividsolutions.jts.geom.Point;
 
 /**
  * @author johannes
@@ -57,7 +55,7 @@ public class SingleZoneDistances {
 
 		ZoneCollection zones = new ZoneCollection();
 		String data = new String(Files.readAllBytes(Paths.get("/home/johannes/gsv/gis/nuts/de.nuts3.gk3.geojson")));
-		zones.addAll(Zone2GeoJSON.parseFeatureCollection(data));
+		zones.addAll(ZoneGeoJsonIO.parseFeatureCollection(data));
 		zones.setPrimaryKey("gsvId");
 		data = null;
 
@@ -81,7 +79,7 @@ public class SingleZoneDistances {
 		}
 
 		TDoubleDoubleHashMap hist = Histogram.createHistogram(stats, new LinearDiscretizer(20000), true);
-		TXTWriter.writeMap(hist, "dist", "p", "/home/johannes/gsv/matrices/analysis/berlin.dist.txt");
+		StatsWriter.writeHistogram(hist, "dist", "p", "/home/johannes/gsv/matrices/analysis/berlin.dist.txt");
 	}
 
 }

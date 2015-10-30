@@ -20,7 +20,7 @@
 package playground.johannes.synpop.data;
 
 import gnu.trove.TObjectDoubleHashMap;
-import playground.johannes.sna.util.ProgressLogger;
+import org.matsim.contrib.common.util.ProgressLogger;
 
 import java.util.*;
 
@@ -98,11 +98,17 @@ public class PersonUtils {
         return clone;
     }
 
-    public static Episode deepCopy(Episode episode, Factory factory) {
+    public static Episode shallowCopy(Episode episode, Factory factory) {
         Episode clone = factory.newEpisode();
         for(String key : episode.keys()) {
             clone.setAttribute(key, episode.getAttribute(key));
         }
+
+        return clone;
+    }
+
+    public static Episode deepCopy(Episode episode, Factory factory) {
+        Episode clone = shallowCopy(episode, factory);
 
         for(Segment act : episode.getActivities()) {
             Segment actClone = shallowCopy(act, factory);

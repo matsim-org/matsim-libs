@@ -16,7 +16,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.population.algorithms.PersonAlgorithm;
 
@@ -24,8 +24,8 @@ public class FilterStuckPopulation {
 	
 	
 	public static void main(String[] args) {
-		ScenarioImpl filtersc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		final ScenarioImpl targetsc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario filtersc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		final MutableScenario targetsc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		
 		String networkFileName = "../../run951/951.output_network.xml.gz";
 		new MatsimNetworkReader(targetsc).readFile(networkFileName);

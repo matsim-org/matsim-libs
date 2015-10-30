@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.signals.router.InvertedNetworkTripRouterFactoryModule;
+import org.matsim.contrib.signals.router.InvertedNetworkRoutingModuleModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -71,7 +71,7 @@ public class LanesIntegrationTest {
 		config.controler().setWriteEventsInterval(100);
 		config.controler().setWritePlansInterval(100);
 		Controler controler = new Controler(config);
-		controler.addOverridingModule(new InvertedNetworkTripRouterFactoryModule());
+		controler.addOverridingModule(new InvertedNetworkRoutingModuleModule());
         controler.getConfig().controler().setCreateGraphs(false);
         TestListener listener = new TestListener();
 		controler.addControlerListener(listener);

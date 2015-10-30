@@ -491,12 +491,12 @@ public class Osm2TransitSimplified {
 					NetworkRoute route = null;
 					ModeRouteFactory routeFactory = new ModeRouteFactory();
 					if (sortedLinks.size() > 1) {
-						route = (NetworkRoute) routeFactory.createRoute(TransportMode.car, sortedLinks.get(0), sortedLinks.get(sortedLinks.size() - 1));
+						route = routeFactory.createRoute(NetworkRoute.class, sortedLinks.get(0), sortedLinks.get(sortedLinks.size() - 1));
 						route.setLinkIds(sortedLinks.get(0),	sortedLinks.subList(1, sortedLinks.size() - 1), sortedLinks.get(sortedLinks.size() - 1));
 					}
 					else if (sortedLinks.size() == 1) {
 						log.warn("relation " + relation.id+ " contains only 1 link!");
-						route = (NetworkRoute) routeFactory.createRoute(TransportMode.car, sortedLinks.get(0), sortedLinks.get(0));
+						route = routeFactory.createRoute(NetworkRoute.class, sortedLinks.get(0), sortedLinks.get(0));
 					} else {
 						log.warn("relation " + relation.id + " contains no links!");
 					}

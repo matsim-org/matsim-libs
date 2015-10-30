@@ -25,6 +25,7 @@ import org.apache.log4j.Logger;
 import org.matsim.analysis.CalcLegTimes;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -50,8 +51,7 @@ import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.replanning.selectors.WorstPlanForRemovalSelector;
 import org.matsim.core.router.PlanRouter;
-import org.matsim.core.router.RoutingContextImpl;
-import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
 import org.matsim.core.router.util.TravelDisutility;
@@ -65,6 +65,8 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.vis.otfvis.OTFFileWriter;
 import org.matsim.vis.snapshotwriters.SnapshotWriter;
 import org.matsim.vis.snapshotwriters.SnapshotWriterManager;
+
+import javax.inject.Provider;
 
 /**
  * @author benjamin after nagel
@@ -181,7 +183,7 @@ public class RunMunichZone30Controller extends AbstractController {
 
 
 		// travel disutility (generalized cost)
-		final TravelDisutility travelDisutility = new RandomizingTimeDistanceTravelDisutility.Builder().createTravelDisutility(this.travelTime.getLinkTravelTimes(), this.config.planCalcScore());
+		final TravelDisutility travelDisutility = new RandomizingTimeDistanceTravelDisutility.Builder( TransportMode.car ).createTravelDisutility(this.travelTime.getLinkTravelTimes(), this.config.planCalcScore());
 		//
 		//final FreespeedTravelTimeAndDisutility ptTimeCostCalc = new FreespeedTravelTimeAndDisutility(-1.0, 0.0, 0.0);
 
@@ -207,14 +209,12 @@ public class RunMunichZone30Controller extends AbstractController {
 		//
 		//// return it:
 		//return plansCalcRoute;
-		final TripRouterFactory fact =
+		final Provider<TripRouter> fact =
 			new TripRouterFactoryBuilderWithDefaults().build(
-					scenario );
+					scenario);
 		return new PlanRouter(
-				fact.instantiateAndConfigureTripRouter(
-					new RoutingContextImpl(
-						travelDisutility,
-						travelTime.getLinkTravelTimes() ) ) );
+				fact.get(
+				) );
 	}
 	
 	@Override

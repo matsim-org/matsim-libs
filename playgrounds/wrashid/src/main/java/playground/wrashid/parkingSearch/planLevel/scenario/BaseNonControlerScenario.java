@@ -4,7 +4,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.facilities.MatsimFacilitiesReader;
 
 public class BaseNonControlerScenario {
@@ -14,7 +14,7 @@ public class BaseNonControlerScenario {
 	 * @param sc
 	 * @return
 	 */
-	public static Network loadNetwork(ScenarioImpl sc) {
+	public static Network loadNetwork(MutableScenario sc) {
 		String facilitiesPath = "test/input/playground/wrashid/parkingSearch/planLevel/chessFacilities.xml";
 		String networkFile = "test/input/playground/wrashid/parkingSearch/planLevel/network.xml";
 		String inputPlansFile = "test/input/playground/wrashid/parkingSearch/planLevel/chessPlans2.xml";

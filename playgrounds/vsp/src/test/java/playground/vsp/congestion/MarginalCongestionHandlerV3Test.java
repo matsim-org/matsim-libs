@@ -35,7 +35,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.testcases.MatsimTestUtils;
 
 import playground.vsp.congestion.events.CongestionEvent;
@@ -60,7 +60,7 @@ public class MarginalCongestionHandlerV3Test {
 		Controler controler = new Controler(configFile);
 		
 		EventsManager events = controler.getEvents();
-		events.addHandler(new CongestionHandlerImplV3(events, (ScenarioImpl) controler.getScenario()));
+		events.addHandler(new CongestionHandlerImplV3(events, (MutableScenario) controler.getScenario()));
 				
 		final List<CongestionEvent> congestionEvents = new ArrayList<CongestionEvent>();
 		
@@ -119,6 +119,11 @@ public class MarginalCongestionHandlerV3Test {
 		for (Id<Person> personId : persons) {
 			System.out.println("Person: " + personId + " // total caused delay: " + personId2causedDelay.get(personId) + " // total affected delay: " + personId2affectedDelay.get(personId));		
 		}
+		
+		double outflowRate = 3.; // 1200 veh / h --> 1 veh every 3 sec
+		double inflowRate = 1.; // 1 veh every 1 sec
+		int demand = 20;
+		Assert.assertEquals("wrong total delay", (outflowRate - inflowRate) * (demand * demand - demand) / 2, totalDelay, MatsimTestUtils.EPSILON);
 		
 		// assert
 		Assert.assertEquals("wrong values for testAgent7", 38.0, personId2causedDelay.get(Id.create("testAgent7", Person.class)), MatsimTestUtils.EPSILON);

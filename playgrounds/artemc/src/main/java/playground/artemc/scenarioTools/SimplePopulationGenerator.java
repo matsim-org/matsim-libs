@@ -17,7 +17,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.*;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
@@ -45,7 +45,7 @@ public class SimplePopulationGenerator {
 
 		String outputPath = args[0];
 		SimplePopulationGenerator simplePopulationGenerator = new SimplePopulationGenerator();
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		PopulationImpl population = (PopulationImpl) scenario.getPopulation();
 		PopulationFactory pf = population.getFactory();
@@ -101,11 +101,11 @@ public class SimplePopulationGenerator {
 			ActivityImpl actWork = (ActivityImpl) pf.createActivityFromCoord("work", workLocation);
 			ActivityImpl actHome2 = (ActivityImpl) pf.createActivityFromCoord("home", homeLocation);
 			LegImpl leg = (LegImpl) pf.createLeg("pt");
-			actHome.setEndTime(3600.00*8.00 + generator.nextGaussian()*1800);
+			actHome.setEndTime(3600.00*8.30 + generator.nextGaussian()*1800);
 			plan.addActivity(actHome);
 			plan.addLeg(leg);
 			actWork.setStartTime(actHome.getEndTime()+1800.0);
-			actWork.setEndTime(3600.00*17.5 + generator.nextGaussian()*1800);
+			actWork.setEndTime(3600.00*18.5 + generator.nextGaussian()*1800);
 			plan.addActivity(actWork);
 			plan.addLeg(leg);
 			plan.addActivity(actHome2);

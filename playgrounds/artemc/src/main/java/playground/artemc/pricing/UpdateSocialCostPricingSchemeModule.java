@@ -40,7 +40,12 @@ public class UpdateSocialCostPricingSchemeModule extends AbstractModule {
 		RoadPricingSchemeImpl roadPricingScheme;
 		SocialCostCalculator scc;
 
+		/*Time bin size for calculation of social cost and toll setting. Should be the same as for the router.*/
 		private final int timeslice = 5 * 60;
+
+		/*Smoothing factor of toll changes: New toll = OldToll * (1-blendFactor) + NewToll * blendFactor
+		* blendFactor = 1.0 leads to no smoothing at all, but given a small network and high demand can lead to unstable behaviour.
+		  blendFactor = 0.1 seems to be a good compromise between convergence speed and stability.  */
 		private final double blendFactor = 0.1;
 
 		@Inject

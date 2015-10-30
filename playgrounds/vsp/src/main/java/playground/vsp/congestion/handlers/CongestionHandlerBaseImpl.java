@@ -142,9 +142,9 @@ public class CongestionHandlerBaseImpl implements CongestionHandler {
 		} else { // car! 
 			LinkCongestionInfo linkInfo = CongestionUtils.getOrCreateLinkInfo( event.getLinkId(), linkId2congestionInfo, scenario ) ;
 
-			AgentOnLinkInfo agentInfo = new AgentOnLinkInfo.Builder().setAgentId( event.getPersonId() ).setLinkId( event.getLinkId() )
+			AgentOnLinkInfo agentInfo = new AgentOnLinkInfo.Builder().setAgentId( event.getDriverId() ).setLinkId( event.getLinkId() )
 					.setEnterTime( event.getTime() ).setFreeSpeedLeaveTime( event.getTime()+linkInfo.getFreeTravelTime()+1. ).build();
-			linkInfo.getAgentsOnLink().put( event.getPersonId(), agentInfo ) ;
+			linkInfo.getAgentsOnLink().put( event.getDriverId(), agentInfo ) ;
 		}
 	}
 
@@ -194,6 +194,12 @@ public class CongestionHandlerBaseImpl implements CongestionHandler {
 	}
 
 	public final static void updateFlowAndDelayQueues(double time, DelayInfo delayInfo, LinkCongestionInfo linkInfo) {
+		
+		double delay = time - delayInfo.freeSpeedLeaveTime;
+
+		if ( delay < 1.0 ) { 
+			linkInfo.getFlowQueue().clear(); 
+		}
 		
 		if (linkInfo.getFlowQueue().isEmpty() ) {
 			// queue is already empty; nothing to do

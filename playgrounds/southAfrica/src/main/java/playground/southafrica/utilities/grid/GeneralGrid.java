@@ -180,7 +180,7 @@ public class GeneralGrid{
 	public boolean isInGrid(Point p){
 		boolean result = false;
 		
-		Point closest = this.qt.get(p.getX(), p.getY());
+		Point closest = this.qt.getClosest(p.getX(), p.getY());
 		Geometry closestCell = this.getCellGeometry(closest);
 		if(closestCell.covers(p)){
 			result = true;
@@ -237,7 +237,7 @@ public class GeneralGrid{
 		try{
 			bw.write("Long,Lat,X,Y,Width");
 			bw.newLine();
-			Collection<Point> list = qt.get(qt.getMinEasting(), qt.getMinNorthing(), qt.getMaxEasting(), qt.getMaxNorthing(), new ArrayList<Point>());
+			Collection<Point> list = qt.getRectangle(qt.getMinEasting(), qt.getMinNorthing(), qt.getMaxEasting(), qt.getMaxNorthing(), new ArrayList<Point>());
 			for(Point p : list){
 				Coord original = new Coord(new Double(p.getX()), new Double(p.getY()));
 				Coord wgs84 = null;

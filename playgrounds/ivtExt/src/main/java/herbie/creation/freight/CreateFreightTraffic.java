@@ -46,7 +46,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.*;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.io.IOUtils;
@@ -81,7 +81,7 @@ public class CreateFreightTraffic {
 	
 	private QuadTree<ActivityFacility> facilityTree;
 	private Statistics stats = new Statistics();
-	private ScenarioImpl scenario;
+	private MutableScenario scenario;
 	
 	private String crossBorderPlansFilePath;
 	
@@ -114,7 +114,7 @@ public class CreateFreightTraffic {
 		this.roundingLimit = Double.parseDouble(config.findParam("freight", "roundingLimit"));
 		this.crossBorderPlansFilePath = config.findParam("freight", "crossBorderPlansFile");
 		
-		this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		this.scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(this.scenario).readFile(this.networkfilePath);
 		new FacilitiesReaderMatsimV1(this.scenario).readFile(this.facilitiesfilePath);
 		
@@ -351,7 +351,7 @@ public class CreateFreightTraffic {
 	 */
 	private ActivityFacility getRandomFacilityFromZone(Zone zone) {
 		Collection<ActivityFacility> candidates = 
-			this.facilityTree.get(zone.getCentroidCoord().getX(), zone.getCentroidCoord().getY(), this.radius);
+			this.facilityTree.getDisk(zone.getCentroidCoord().getX(), zone.getCentroidCoord().getY(), this.radius);
 		
 		Collections.shuffle((List<?>) candidates);
 		ActivityFacility facility = candidates.iterator().next();
@@ -378,7 +378,7 @@ public class CreateFreightTraffic {
 	private void extendCrossBorderFacilitiesWithWorkActivity() {
 		log.info("Update Cross Boarder Facilites with the correct activities ...");
 		
-		ScenarioImpl sTmp = (ScenarioImpl) ScenarioUtils.createScenario(
+		MutableScenario sTmp = (MutableScenario) ScenarioUtils.createScenario(
 				ConfigUtils.createConfig());
 		new MatsimNetworkReader(sTmp).readFile(networkfilePath);
 		MatsimPopulationReader populationReader = new MatsimPopulationReader(sTmp);

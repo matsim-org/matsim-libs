@@ -23,20 +23,20 @@ import org.apache.log4j.Logger;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.common.gis.CRSUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.MathTransform;
+import playground.johannes.synpop.data.PlainFactory;
+import playground.johannes.synpop.data.PlainPerson;
 import playground.johannes.synpop.data.io.XMLHandler;
 import playground.johannes.synpop.data.io.XMLWriter;
-import playground.johannes.synpop.data.PlainFactory;
+import playground.johannes.synpop.gis.ZoneCollection;
+import playground.johannes.synpop.gis.ZoneGeoJsonIO;
 import playground.johannes.synpop.processing.TaskRunner;
-import playground.johannes.gsv.zones.ZoneCollection;
-import playground.johannes.gsv.zones.io.Zone2GeoJSON;
-import playground.johannes.sna.gis.CRSUtils;
-import playground.johannes.synpop.data.PlainPerson;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -67,7 +67,7 @@ public class Facilities2Zones {
         logger.info("Loading zones...");
         ZoneCollection zones = new ZoneCollection();
         String data = new String(Files.readAllBytes(Paths.get(zonesIn)));
-        zones.addAll(Zone2GeoJSON.parseFeatureCollection(data));
+        zones.addAll(ZoneGeoJsonIO.parseFeatureCollection(data));
         zones.setPrimaryKey(zoneIdKey);
 
         logger.info("Loading persons...");

@@ -19,40 +19,26 @@
 
 package playground.gregor.casim.run;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-
 import com.google.inject.Provider;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
-import org.matsim.core.router.util.*;
 import org.matsim.core.scenario.ScenarioUtils;
-
 import playground.gregor.casim.proto.CALinkInfos.CALinInfos;
 import playground.gregor.casim.simulation.CAMobsimFactory;
 import playground.gregor.casim.simulation.physics.AbstractCANetwork;
 import playground.gregor.casim.simulation.physics.CASingleLaneNetworkFactory;
-import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.Branding;
-import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.EventBasedVisDebuggerEngine;
-import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.InfoBox;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.QSimDensityDrawer;
-import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
-import playground.gregor.sim2d_v4.scenario.Sim2DConfigUtils;
-import playground.gregor.sim2d_v4.scenario.Sim2DScenario;
-import playground.gregor.sim2d_v4.scenario.Sim2DScenarioUtils;
-import playground.gregor.vis.CASimVisRequestHandler;
-import playground.gregor.vis.VisRequestHandler;
-import playground.gregor.vis.VisServer;
+import playground.gregor.sim2d_v4.scenario.TransportMode;
+
+import java.io.FileInputStream;
+import java.io.IOException;
 
 public class CARunner implements IterationStartsListener {
 
@@ -92,17 +78,17 @@ public class CARunner implements IterationStartsListener {
 		// c.qsim().setEndTime(41*60);//+30*60);
 
 		final Controler controller = new Controler(sc);
-		
-		
 
-		controller.getConfig().controler().setOverwriteFileSetting(
-				true ?
-						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
-		LeastCostPathCalculatorFactory cost = createDefaultLeastCostPathCalculatorFactory(sc);
-		CATripRouterFactory tripRouter = new CATripRouterFactory(sc, cost);
 
-		controller.setTripRouterFactory(tripRouter);
+		controller.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+
+
+		controller.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				addRoutingModuleBinding(TransportMode.walkca).toProvider(CARoutingModule.class);
+			}
+		});
 
 		final CAMobsimFactory factory = new CAMobsimFactory();
 		if (args[1].equals("false")) {
@@ -126,11 +112,7 @@ public class CARunner implements IterationStartsListener {
 			
 			@Override
 			public void notifyIterationStarts(IterationStartsEvent event) {
-				if ((event.getIteration()) % 100 == 0 && (event.getIteration()) > 0) {
-					AbstractCANetwork.EMIT_VIS_EVENTS = true;
-				} else {
-					AbstractCANetwork.EMIT_VIS_EVENTS = false;
-				}
+				AbstractCANetwork.EMIT_VIS_EVENTS = (event.getIteration()) % 100 == 0 && (event.getIteration()) > 0;
 				
 			}
 		});
@@ -143,35 +125,6 @@ public class CARunner implements IterationStartsListener {
 		controller.run();
 	}
 
-	private static LeastCostPathCalculatorFactory createDefaultLeastCostPathCalculatorFactory(
-			Scenario scenario) {
-		Config config = scenario.getConfig();
-		if (config.controler().getRoutingAlgorithmType()
-				.equals(ControlerConfigGroup.RoutingAlgorithmType.Dijkstra)) {
-			return new DijkstraFactory();
-		} else if (config
-				.controler()
-				.getRoutingAlgorithmType()
-				.equals(ControlerConfigGroup.RoutingAlgorithmType.AStarLandmarks)) {
-			return new AStarLandmarksFactory(
-					scenario.getNetwork(),
-					new FreespeedTravelTimeAndDisutility(config.planCalcScore()),
-					config.global().getNumberOfThreads());
-		} else if (config.controler().getRoutingAlgorithmType()
-				.equals(ControlerConfigGroup.RoutingAlgorithmType.FastDijkstra)) {
-			return new FastDijkstraFactory();
-		} else if (config
-				.controler()
-				.getRoutingAlgorithmType()
-				.equals(ControlerConfigGroup.RoutingAlgorithmType.FastAStarLandmarks)) {
-			return new FastAStarLandmarksFactory(
-					scenario.getNetwork(),
-					new FreespeedTravelTimeAndDisutility(config.planCalcScore()));
-		} else {
-			throw new IllegalStateException(
-					"Enumeration Type RoutingAlgorithmType was extended without adaptation of Controler!");
-		}
-	}
 
 	protected static void printUsage() {
 		System.out.println();

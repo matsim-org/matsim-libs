@@ -19,6 +19,7 @@
 
 package org.matsim.core.mobsim.jdeqsim;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 
@@ -45,7 +46,8 @@ public class LeaveRoadMessage extends EventMessage {
 		Road road = (Road) this.getReceivingUnit();
 		Event event = null;
 
-		event = new LinkLeaveEvent(this.getMessageArrivalTime(), vehicle.getOwnerPerson().getId(), road.getLink().getId(), null);
+		event = new LinkLeaveEvent(this.getMessageArrivalTime(), vehicle.getOwnerPerson().getId(), road.getLink().getId(), 
+				Id.create(vehicle.getOwnerPerson().getId(), org.matsim.vehicles.Vehicle.class));
 
 		SimulationParameters.getProcessEventThread().processEvent(event);
 	}

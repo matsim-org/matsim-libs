@@ -67,7 +67,7 @@ public class OutFlowInfoAccumulatorWithPt implements LinkLeaveEventHandler,
 	public void handleEvent(LinkLeaveEvent event) {
 		
 		// ignore non-car travelers
-		if (!this.carAgents.contains(event.getPersonId())) return;
+		if (!this.carAgents.contains(event.getDriverId())) return;
 		
 		// call from NetworkReadExample
 		linkLeave(event.getLinkId(), event.getTime());

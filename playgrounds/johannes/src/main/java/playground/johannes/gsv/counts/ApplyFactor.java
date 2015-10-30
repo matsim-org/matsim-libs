@@ -19,6 +19,7 @@
 
 package playground.johannes.gsv.counts;
 
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.CountsReaderMatsimV1;
@@ -34,11 +35,11 @@ public class ApplyFactor {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		Counts counts = new Counts();
+		Counts<Link> counts = new Counts();
 		CountsReaderMatsimV1 reader = new CountsReaderMatsimV1(counts);
 		reader.parse("/home/johannes/gsv/counts/counts.2013.net20140909.5.xml");
 
-		Counts newCounts = new Counts();
+		Counts<Link> newCounts = new Counts();
 		newCounts.setDescription(counts.getDescription());
 		newCounts.setName(counts.getName());
 		newCounts.setYear(counts.getYear());

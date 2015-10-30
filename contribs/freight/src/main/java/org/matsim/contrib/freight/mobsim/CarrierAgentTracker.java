@@ -138,7 +138,7 @@ public class CarrierAgentTracker implements ActivityStartEventHandler, ActivityE
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		CarrierAgent carrierAgent = getCarrierAgent(event.getPersonId());
+		CarrierAgent carrierAgent = getCarrierAgent(event.getDriverId());
 		if(carrierAgent == null) return;
 		carrierAgent.handleEvent(event);
 	}

@@ -21,7 +21,7 @@ package playground.johannes.gsv.synPop.analysis;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
-import playground.johannes.sna.math.LinearDiscretizer;
+import org.matsim.contrib.common.stats.LinearDiscretizer;
 import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.Episode;
@@ -119,8 +119,8 @@ public class LegDistanceTask extends AnalyzerTask {
 
 			if (outputDirectoryNotNull()) {
 				try {
-					writeHistograms(stats, key, 1000, 50);
-					writeHistograms(stats, new LinearDiscretizer(25000), key, false);
+					writeHistograms(stats, key, 100, 50);
+					writeHistograms(stats, new LinearDiscretizer(50000), key, false);
 				} catch (IOException e) {
 					e.printStackTrace();
 				}

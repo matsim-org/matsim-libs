@@ -36,7 +36,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.ikaddoura.analysis.detailedPersonTripAnalysis.handler.BasicPersonTripAnalysisHandler;
@@ -68,41 +68,56 @@ import playground.vsp.congestion.events.CongestionEventsReader;
 public class PersonTripAnalysisMain {
 	private static final Logger log = Logger.getLogger(PersonTripAnalysisMain.class);
 
-	private static String networkFile;
-	private static String configFile;
-	private static String outputPath;
-	private static String populationFile;
-
-	private static String eventsFile;
-	
-	private static String noiseEventsFile;
-	private static String congestionEventsFile;
-		
+	private String runDirectory;
+			
 	public static void main(String[] args) {
+			
+		log.info("Searching for run-directory in args at index 0...");
+		String runDirectory;
 		
 		if (args.length > 0) {
-			throw new RuntimeException("Aborting...");
+			runDirectory = args[0];
+			log.info("Run-directory found at index 0.");
 			
-		} else {			
+		} else {
 			
-			String id = "c9";
-			
-			networkFile = "/Users/ihab/Documents/workspace/runs-svn/c/output/" + id + "/output_network.xml.gz";
-			configFile = "/Users/ihab/Documents/workspace/runs-svn/c/output/" + id + "/output_config.xml";
-			
-			eventsFile = "/Users/ihab/Documents/workspace/runs-svn/c/output/" + id + "/ITERS/it.100/100.events.xml.gz";
-			outputPath = "/Users/ihab/Documents/workspace/runs-svn/c/output/" + id + "/ITERS/it.100/detailedAnalysis/";
-			populationFile = "/Users/ihab/Documents/workspace/runs-svn/c/output/" + id + "/output_plans.xml.gz";
-			
-			noiseEventsFile = "/Users/ihab/Documents/workspace/runs-svn/c/output/" + id + "/ITERS/it.100/100.events.xml.gz";
-			congestionEventsFile = "/Users/ihab/Documents/workspace/runs-svn/c/output/" + id + "/ITERS/it.100/100.events.xml.gz";
+			String id = "cn1";
+			String baiscDirectoryPath = "/Users/ihab/Documents/workspace/runs-svn/cn2/output/";
+						
+			runDirectory = baiscDirectoryPath + id + "/";
+			log.info("Could not find run-directory in args. Using the directory " + runDirectory);
 		}
 		
-		PersonTripAnalysisMain analysis = new PersonTripAnalysisMain();
+		PersonTripAnalysisMain analysis = new PersonTripAnalysisMain(runDirectory);
 		analysis.run();
 	}
+	
+	public PersonTripAnalysisMain(String runDirectory) {
+		
+		if (!runDirectory.endsWith("/")) runDirectory = runDirectory + "/";
+		
+		this.runDirectory = runDirectory;
+	}
 
-	private void run() {
+	public void run() {
+					
+		String networkFile = runDirectory + "output_network.xml.gz";
+		String configFile = runDirectory + "output_config.xml.gz";
+		String populationFile = runDirectory + "output_plans.xml.gz";
+
+		Config config = ConfigUtils.loadConfig(configFile);	
+		config.plans().setInputFile(populationFile);
+		config.network().setInputFile(networkFile);
+		
+		int finalIteration = config.controler().getLastIteration();
+		String eventsFile = runDirectory + "ITERS/it." + finalIteration + "/" + finalIteration + ".events.xml.gz";
+		String outputPath = runDirectory + "ITERS/it." + finalIteration + "/detailedAnalysis/";
+		
+//		String noiseEventsFile = runDirectory + "ITERS/it." + finalIteration + "/" + finalIteration + ".events.xml.gz";
+		String noiseEventsFile = runDirectory + "/noiseAnalysis/analysis_it.100/100.events_NoiseImmission_Offline.xml.gz";
+		String congestionEventsFile = runDirectory + "ITERS/it." + finalIteration + "/" + finalIteration + ".events.xml.gz";
+		
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.loadScenario(config);
 		
 		File folder = new File(outputPath);			
 		folder.mkdirs();
@@ -113,12 +128,6 @@ public class PersonTripAnalysisMain {
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
-				
-		Config config = ConfigUtils.loadConfig(configFile);	
-		config.plans().setInputFile(populationFile);
-		config.network().setInputFile(networkFile);
-		
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.loadScenario(config);
 		
 		// standard events analysis
 		
@@ -131,7 +140,7 @@ public class PersonTripAnalysisMain {
 		events.addHandler(basicHandler);
 		events.addHandler(vttsHandler);
 		events.addHandler(congestionHandler);
-//		events.addHandler(noiseHandler);
+		events.addHandler(noiseHandler);
 		
 		log.info("Reading the events file...");
 		MatsimEventsReader reader = new MatsimEventsReader(events);
@@ -169,17 +178,17 @@ public class PersonTripAnalysisMain {
 		
 		// noise events analysis
 	
-//		if (noiseHandler.isCaughtNoiseEvent()) {
-//			log.info("Noise events have already been analyzed based on the standard events file.");
-//		} else {
-//			EventsManager eventsNoise = EventsUtils.createEventsManager();
-//			eventsNoise.addHandler(noiseHandler);
-//					
-//			log.info("Reading noise events file...");
-//			NoiseEventsReader noiseEventReader = new NoiseEventsReader(eventsNoise);		
-//			noiseEventReader.parse(noiseEventsFile);
-//			log.info("Reading noise events file... Done.");	
-//		}	
+		if (noiseHandler.isCaughtNoiseEvent()) {
+			log.info("Noise events have already been analyzed based on the standard events file.");
+		} else {
+			EventsManager eventsNoise = EventsUtils.createEventsManager();
+			eventsNoise.addHandler(noiseHandler);
+					
+			log.info("Reading noise events file...");
+			NoiseEventsReader noiseEventReader = new NoiseEventsReader(eventsNoise);		
+			noiseEventReader.parse(noiseEventsFile);
+			log.info("Reading noise events file... Done.");	
+		}	
 		
 		// print the results
 		
@@ -195,10 +204,10 @@ public class PersonTripAnalysisMain {
 		analysis.printPersonInformation(outputPath, null, personId2userBenefit, basicHandler, vttsHandler, congestionHandler, noiseHandler);	
 		log.info("Print person information... Done.");
 		
-		SortedMap<Double, List<Double>> departureTime2tolls = analysis.getParameter2Values(TransportMode.car, basicHandler, basicHandler.getPersonId2tripNumber2departureTime(), basicHandler.getPersonId2tripNumber2amount(), 3600., 30 * 3600.);
+		SortedMap<Double, List<Double>> departureTime2tolls = analysis.getParameter2Values(TransportMode.car, basicHandler, basicHandler.getPersonId2tripNumber2departureTime(), basicHandler.getPersonId2tripNumber2payment(), 3600., 30 * 3600.);
 		analysis.printAvgValuePerParameter(outputPath + "tollsPerDepartureTime_car.csv", departureTime2tolls);
 		
-		SortedMap<Double, List<Double>> tripDistance2tolls = analysis.getParameter2Values(TransportMode.car, basicHandler, basicHandler.getPersonId2tripNumber2tripDistance(), basicHandler.getPersonId2tripNumber2amount(), 2000., 40 * 1000.);
+		SortedMap<Double, List<Double>> tripDistance2tolls = analysis.getParameter2Values(TransportMode.car, basicHandler, basicHandler.getPersonId2tripNumber2tripDistance(), basicHandler.getPersonId2tripNumber2payment(), 2000., 40 * 1000.);
 		analysis.printAvgValuePerParameter(outputPath + "tollsPerTripDistance_car.csv", tripDistance2tolls);
 		
 		analysis.printAggregatedResults(outputPath, TransportMode.car, personId2userBenefit, basicHandler, vttsHandler, congestionHandler, noiseHandler);

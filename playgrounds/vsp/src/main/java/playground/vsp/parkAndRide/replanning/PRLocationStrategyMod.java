@@ -36,7 +36,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.replanning.ReplanningContext;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 
 import playground.vsp.parkAndRide.PRConstants;
 import playground.vsp.parkAndRide.PRFacility;
@@ -50,7 +50,7 @@ import playground.vsp.parkAndRide.PRFacility;
 public class PRLocationStrategyMod implements PlanStrategyModule {
 	private static final Logger log = Logger.getLogger(PRLocationStrategyMod.class);
 
-	private ScenarioImpl sc;
+	private MutableScenario sc;
 	private Network net;
 	private Map<Id<PRFacility>, PRFacility> id2prFacility = new HashMap<>();
 	private int nrOfPrFacilitiesForReplanning = 0; // 0 means all P+R-Facilities are used for replanning
@@ -65,7 +65,7 @@ public class PRLocationStrategyMod implements PlanStrategyModule {
 	 * @param typicalDuration 
 	 */
 	public PRLocationStrategyMod(Controler controler, Map<Id<PRFacility>, PRFacility> id2prFacility, double gravity, double typicalDuration) {
-		this.sc = (ScenarioImpl) controler.getScenario();
+		this.sc = (MutableScenario) controler.getScenario();
 		this.net = this.sc.getNetwork();
 		this.id2prFacility = id2prFacility;
 		this.gravity = gravity;

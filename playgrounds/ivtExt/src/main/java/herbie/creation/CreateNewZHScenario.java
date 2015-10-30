@@ -32,7 +32,7 @@ import org.matsim.core.config.ConfigReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.*;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.facilities.ActivityFacility;
@@ -49,7 +49,7 @@ import java.util.Vector;
 
 public class CreateNewZHScenario {
 	private final static Logger log = Logger.getLogger(CreateNewZHScenario.class);
-	private ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+	private MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 	private String outputFolder;
 	private String networkfilePath;
 	private String facilitiesfilePath;
@@ -123,7 +123,7 @@ public class CreateNewZHScenario {
 	// read cross-border plans and add them to the scenario
 	// the cross border facilities are already integrated in the facilities
 	private void addSpecialPlans2Population(String plansFilePath, String type) {
-		ScenarioImpl sTmp = (ScenarioImpl) ScenarioUtils.createScenario(
+		MutableScenario sTmp = (MutableScenario) ScenarioUtils.createScenario(
 				ConfigUtils.createConfig());
 		
 		new MatsimNetworkReader(sTmp).readFile(networkfilePath);
@@ -187,7 +187,7 @@ public class CreateNewZHScenario {
 						QuadTree<ActivityFacility> facQuadTree = trees.get(act.getType());
 						
 						// get closest facility.
-						ActivityFacility facility = facQuadTree.get(act.getCoord().getX(), act.getCoord().getY());
+						ActivityFacility facility = facQuadTree.getClosest(act.getCoord().getX(), act.getCoord().getY());
 						act.setFacilityId(facility.getId());
 					}
 				}

@@ -30,7 +30,6 @@ import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
-
 import playground.johannes.gsv.sim.cadyts.CadytsContext;
 
 /**

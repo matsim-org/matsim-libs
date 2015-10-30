@@ -22,9 +22,17 @@
  */
 package playground.southafrica.population.freight;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.inject.Provider;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
@@ -35,21 +43,23 @@ import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.replanning.DefaultPlanStrategiesModule;
 import org.matsim.core.replanning.PlanStrategy;
-import org.matsim.core.replanning.PlanStrategyImpl;
+import org.matsim.core.replanning.PlanStrategyImpl.Builder;
 import org.matsim.core.replanning.ReplanningContext;
-import org.matsim.core.replanning.selectors.RandomPlanSelector;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
+import org.matsim.core.replanning.selectors.GenericPlanSelector;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.vehicles.*;
+import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleTypeImpl;
+import org.matsim.vehicles.VehicleUtils;
+import org.matsim.vehicles.Vehicles;
+
 import playground.southafrica.projects.complexNetworks.pathDependence.DigicorePathDependentNetworkReader_v1;
 import playground.southafrica.projects.complexNetworks.pathDependence.PathDependentNetwork;
 import playground.southafrica.utilities.Header;
-
-import javax.inject.Provider;
-import java.util.Arrays;
 
 /**
  * @author jwjoubert
@@ -107,9 +117,12 @@ public class RunNationalFreight {
 		
 		config.plans().setActivityDurationInterpretation(PlansConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration );
 		
-		String[] modes ={"commercial"};
+		/* Set up the commercial mode by setting it as a network mode, and 
+		 * FIXME adding its routing parameters. */
+		String[] modes ={"car","commercial"};
 		config.qsim().setMainModes( Arrays.asList(modes) );
 		config.plansCalcRoute().setNetworkModes(Arrays.asList(modes));
+		
 		
 			/* PlanCalcScore */
 		ActivityParams major = new ActivityParams("major");
@@ -146,10 +159,20 @@ public class RunNationalFreight {
 		
 		/* Scenario stuff */
 		Scenario sc = ScenarioUtils.loadScenario(config);
-		config.scenario().setUseVehicles(true);
+		
+		/* Ensure that 'commercial' is an available mode for each link. */
+		/* FIXME This must ultimately be fixed/addressed in 
+		 * playground.southafrica.utilities.network.ConvertOsmToMatsim !! */
+		LOG.warn("Ensuring all links take 'commercial' as mode...");
+		Collection<String> modesCollection = Arrays.asList(modes);
+		Set<String> modesSet = new HashSet<>(modesCollection);
+		for(Link link : sc.getNetwork().getLinks().values()){
+			link.setAllowedModes(modesSet);
+		}
+		LOG.warn("Done adding 'commercial' modes. This must be fixed in ConvertOsmToMatsim");
 		
 		/* Set the population as "subpopulation", and create a vehicle for each. */
-		Vehicles vehicles = ((ScenarioImpl)sc).getVehicles();
+		Vehicles vehicles = ((MutableScenario)sc).getVehicles();
 		VehicleType truckType = new VehicleTypeImpl(Id.create("commercial", VehicleType.class));
 		truckType.setMaximumVelocity(100./3.6);
 		truckType.setLength(18.);
@@ -164,26 +187,24 @@ public class RunNationalFreight {
 			vehicles.addVehicle(truck);
 		}
 		
-		/* Run the controler */
-		Controler controler = new Controler(sc);
-		controler.getConfig().controler().setOverwriteFileSetting(
-				true ?
-						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
-
+		/* Run the controler. */
 		final Provider<PlanStrategy> newPlanStrategyFactory = new javax.inject.Provider<PlanStrategy>() {
 			@Override
 			public PlanStrategy get() {
-				PlanStrategyImpl strategy = new PlanStrategyImpl( new RandomPlanSelector<Plan, Person>() );
-				strategy.addStrategyModule(new NewDigicorePlanStrategyModule());
-				return strategy;
+				GenericPlanSelector<Plan, Person> planSelector = new ExpBetaPlanSelector<>(1.0);
+				Builder builder = new Builder(planSelector );
+				builder.addStrategyModule(new NewDigicorePlanStrategyModule());
+				return builder.build();
 			}
 		};
-
+		
+		Controler controler = new Controler(sc);
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				addPlanStrategyBinding("newPlan").toProvider(newPlanStrategyFactory);
+				addTravelTimeBinding("commercial").to(networkTravelTime());
+				addTravelDisutilityFactoryBinding("commercial").to(carTravelDisutilityFactoryKey());
 			}
 		});
 

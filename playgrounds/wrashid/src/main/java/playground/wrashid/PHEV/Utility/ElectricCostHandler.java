@@ -102,7 +102,7 @@ public class ElectricCostHandler implements LinkLeaveEventHandler,
         Link link = controler2.getScenario().getNetwork().getLinks().get(event.getLinkId());
 //		if (controler == null) {
 //			event.setLink(controler2.getNetwork().getLink(event.getLinkId().toString()));
-////			event.setPerson(controler2.getPopulation().getPersons().get(new IdImpl(event.getPersonId().toString())));
+////			event.setPerson(controler2.getPopulation().getPersons().get(new IdImpl(event.getDriverId().toString())));
 //		}
 
 		// change properties of roads
@@ -112,27 +112,27 @@ public class ElectricCostHandler implements LinkLeaveEventHandler,
 		// event.link.setFreespeed(7.5);
 		// }
 
-		if (event.getPersonId().toString().equalsIgnoreCase(observedVehicleId)) {
+		if (event.getDriverId().toString().equalsIgnoreCase(observedVehicleId)) {
 			System.out.println();
 		}
 
 		// initialize the energyLevel at the beginning to full energy
-		if (!energyLevel.containsKey(event.getPersonId().toString())) {
-			initEnergyLevel(event.getPersonId());
+		if (!energyLevel.containsKey(event.getDriverId().toString())) {
+			initEnergyLevel(event.getDriverId());
 		}
 
 		// updated consumed energy for link
-		EnergyApplicatonSpecificState state = energyLevel.get(event.getPersonId().toString());
+		EnergyApplicatonSpecificState state = energyLevel.get(event.getDriverId().toString());
 		// System.out.print(state.energyLevel);
 		state.energyLevel -= getEnergyConsumption(link);
 		// System.out.print(" => " + state.energyLevel);
 
 		// if energy level is below zero: give huge penalty to agent
 		if (state.energyLevel <= 0) {
-			events.processEvent(new PersonMoneyEvent(event.getTime(), event.getPersonId(),
+			events.processEvent(new PersonMoneyEvent(event.getTime(), event.getDriverId(),
 					penaltyForRunningOutOfElectricEnergy));
 		}
-		recordSOCOfVehicle(event.getPersonId(), event.getTime());
+		recordSOCOfVehicle(event.getDriverId(), event.getTime());
 	}
 
 	private double getEnergyConsumption(Link link) {
@@ -175,7 +175,7 @@ public class ElectricCostHandler implements LinkLeaveEventHandler,
 		// controller
 //		if (controler == null) {
 //			event.setLink(controler2.getNetwork().getLinks().get(event.getLinkId()));
-//			event.setPerson(controler2.getPopulation().getPersons().get(new IdImpl(event.getPersonId().toString())));
+//			event.setPerson(controler2.getPopulation().getPersons().get(new IdImpl(event.getDriverId().toString())));
 //		}
 
 		// initialize the energyLevel at the beginning to full energy
@@ -194,7 +194,7 @@ public class ElectricCostHandler implements LinkLeaveEventHandler,
 		// controller
 //		if (controler == null) {
 //			event.setLink(controler2.getNetwork().getLinks().get(event.getLinkId()));
-//			event.setPerson(controler2.getPopulation().getPersons().get(new IdImpl(event.getPersonId().toString())));
+//			event.setPerson(controler2.getPopulation().getPersons().get(new IdImpl(event.getDriverId().toString())));
 //		}
 
 		// initialize the energyLevel at the beginning to full energy
@@ -300,10 +300,10 @@ public class ElectricCostHandler implements LinkLeaveEventHandler,
 
 	public void handleEvent(LinkEnterEvent event) {
 		// initialize the energyLevel at the beginning to full energy
-		if (!energyLevel.containsKey(event.getPersonId().toString())) {
-			initEnergyLevel(event.getPersonId());
+		if (!energyLevel.containsKey(event.getDriverId().toString())) {
+			initEnergyLevel(event.getDriverId());
 		}
-		recordSOCOfVehicle(event.getPersonId(), event.getTime());
+		recordSOCOfVehicle(event.getDriverId(), event.getTime());
 
 		// printSomeSOCStatus(event.time);
 	}

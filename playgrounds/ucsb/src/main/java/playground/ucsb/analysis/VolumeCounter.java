@@ -35,7 +35,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.IOUtils;
 
 
@@ -71,7 +70,7 @@ public class VolumeCounter implements LinkLeaveEventHandler {
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
 		List<Integer> vols = linkVolumes.get(event.getLinkId());
-		if (vols == null) { throw new RuntimeException("at LinkLeaveEvent [t"+event.getTime()+";p"+event.getPersonId()+";l"+event.getLinkId()+";v"+event.getVehicleId()+"]: link id not part of the network."); }
+		if (vols == null) { throw new RuntimeException("at LinkLeaveEvent [t"+event.getTime()+";p"+event.getDriverId()+";l"+event.getLinkId()+";v"+event.getVehicleId()+"]: link id not part of the network."); }
 		int hour = (int)(event.getTime()/3600.0);
 		if (hour < 24) { vols.set(hour,vols.get(hour)+1); }
 		else { vols.set(24,vols.get(24)+1); }

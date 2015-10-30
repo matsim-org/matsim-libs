@@ -61,12 +61,15 @@ public class PlanToPlanStepBasedOnEvents implements PlansTranslator<Link>, LinkL
 	private static final String STR_PLANSTEPFACTORY = "planStepFactory";
 	private static final String STR_ITERATION = "iteration";
 
-	private final Set<Id<Link>> calibratedLinks;
+	private final Set<Id<Link>> calibratedLinks = new HashSet<>() ;
 
 	@Inject
 	PlanToPlanStepBasedOnEvents(final Scenario scenario) {
 		this.scenario = scenario;
-		this.calibratedLinks = ConfigUtils.addOrGetModule(scenario.getConfig(), CadytsConfigGroup.GROUP_NAME, CadytsConfigGroup.class).getCalibratedItems();
+		Set<String> abc = ConfigUtils.addOrGetModule(scenario.getConfig(), CadytsConfigGroup.GROUP_NAME, CadytsConfigGroup.class).getCalibratedItems();
+		for ( String str : abc ) {
+			this.calibratedLinks.add( Id.createLinkId(str) ) ;
+		}
 		this.driverAgents = new HashSet<>();
 	}
 
@@ -110,13 +113,13 @@ public class PlanToPlanStepBasedOnEvents implements PlansTranslator<Link>, LinkL
 	public void handleEvent(LinkLeaveEvent event) {
 		
 		// if it is not a driver, ignore the event
-		if (!driverAgents.contains(event.getPersonId())) return;
+		if (!driverAgents.contains(event.getDriverId())) return;
 		
 		// if only a subset of links is calibrated but the link is not contained, ignore the event
 		if (!calibratedLinks.contains(event.getLinkId())) return;
 		
 		// get the "Person" behind the id:
-		Person person = this.scenario.getPopulation().getPersons().get(event.getPersonId());
+		Person person = this.scenario.getPopulation().getPersons().get(event.getDriverId());
 		
 		// get the selected plan:
 		Plan selectedPlan = person.getSelectedPlan();

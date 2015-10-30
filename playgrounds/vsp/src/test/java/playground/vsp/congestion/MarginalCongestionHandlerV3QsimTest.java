@@ -56,13 +56,15 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import playground.vsp.congestion.controler.MarginalCongestionPricingContolerListener;
 import playground.vsp.congestion.events.CongestionEvent;
 import playground.vsp.congestion.handlers.CongestionEventHandler;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
+import playground.vsp.congestion.handlers.CongestionHandlerImplV8;
+import playground.vsp.congestion.handlers.CongestionHandlerImplV9;
 import playground.vsp.congestion.handlers.TollHandler;
 import playground.vsp.congestion.routing.TollDisutilityCalculatorFactory;
 
@@ -126,7 +128,7 @@ public class MarginalCongestionHandlerV3QsimTest {
 			}	
 		});
 		
-		events.addHandler(new CongestionHandlerImplV3(events, (ScenarioImpl) sc));
+		events.addHandler(new CongestionHandlerImplV3(events, (MutableScenario) sc));
 				
 		QSim sim = createQSim(sc, events);
 		sim.run();
@@ -145,6 +147,89 @@ public class MarginalCongestionHandlerV3QsimTest {
 			
 		}
 		
+	}
+	
+	// the flow capacity on link 3 (1car / 10 seconds) is activated by the first agent,
+	// then the storage capacity on link 3 (only one car) is reached, too
+	// finally, one car on the link before is delayed
+	@Test
+	public final void testFlowAndStorageCongestion_3agents_V9() {
+
+		Scenario sc = loadScenario1();
+		setPopulation1(sc);
+
+		final List<CongestionEvent> congestionEvents = new ArrayList<CongestionEvent>();
+
+		events.addHandler(new CongestionEventHandler() {
+
+			@Override
+			public void reset(int iteration) {
+			}
+
+			@Override
+			public void handleEvent(CongestionEvent event) {
+				congestionEvents.add(event);
+			}
+		});
+
+		events.addHandler(new CongestionHandlerImplV9(events, (MutableScenario) sc));
+
+		QSim sim = createQSim(sc, events);
+		sim.run();
+
+		double totalDelay = 0.;
+		
+		for (CongestionEvent event : congestionEvents) {
+
+			System.out.println(event.toString());
+			totalDelay += event.getDelay();
+		}
+		Assert.assertEquals("wrong total delay.", 50.0, totalDelay, MatsimTestUtils.EPSILON);
+
+	}
+	
+	/**
+	 * the flow capacity on link 3 (1car / 10 seconds) is activated by the first agent,
+	 * then the storage capacity on link 3 (only one car) is reached, too
+	 * finally, one car on the link before is delayed
+	 * 
+	 * V8 is the same as V9 but without charging for spill-back delays
+	 * 
+	 */
+	@Test
+	public final void testFlowAndStorageCongestion_3agents_V8() {
+
+		Scenario sc = loadScenario1();
+		setPopulation1(sc);
+
+		final List<CongestionEvent> congestionEvents = new ArrayList<CongestionEvent>();
+
+		events.addHandler(new CongestionEventHandler() {
+
+			@Override
+			public void reset(int iteration) {
+			}
+
+			@Override
+			public void handleEvent(CongestionEvent event) {
+				congestionEvents.add(event);
+			}
+		});
+
+		events.addHandler(new CongestionHandlerImplV8(events, (MutableScenario) sc));
+
+		QSim sim = createQSim(sc, events);
+		sim.run();
+
+		double totalDelay = 0.;
+		
+		for (CongestionEvent event : congestionEvents) {
+
+			System.out.println(event.toString());
+			totalDelay += event.getDelay();
+		}
+		Assert.assertEquals("wrong total delay.", 30.0, totalDelay, MatsimTestUtils.EPSILON);
+
 	}
 	
 	// three agents moving along the links (unlimited storage capacity)
@@ -181,7 +266,7 @@ public class MarginalCongestionHandlerV3QsimTest {
 			}	
 		});
 		
-		events.addHandler(new CongestionHandlerImplV3(events, (ScenarioImpl) sc));
+		events.addHandler(new CongestionHandlerImplV3(events, (MutableScenario) sc));
 				
 		QSim sim = createQSim(sc, events);
 		sim.run();
@@ -220,7 +305,7 @@ public class MarginalCongestionHandlerV3QsimTest {
 				bindCarTravelDisutilityFactory().toInstance(tollDisutilityCalculatorFactory);
 			}
 		});
-		controler.addControlerListener(new MarginalCongestionPricingContolerListener(controler.getScenario(), tollHandler, new CongestionHandlerImplV3(controler.getEvents(), (ScenarioImpl) controler.getScenario())) );
+		controler.addControlerListener(new MarginalCongestionPricingContolerListener(controler.getScenario(), tollHandler, new CongestionHandlerImplV3(controler.getEvents(), (MutableScenario) controler.getScenario())) );
 	
 		final String timeBin1 = "08:00-08:15";
 		final String timeBin2 = "08:15-08:30";
@@ -361,7 +446,7 @@ public class MarginalCongestionHandlerV3QsimTest {
 			}	
 		});
 		
-		events.addHandler(new CongestionHandlerImplV3(events, (ScenarioImpl) sc));
+		events.addHandler(new CongestionHandlerImplV3(events, (MutableScenario) sc));
 				
 		QSim sim = createQSim(sc, events);
 		sim.run();
@@ -419,7 +504,7 @@ public class MarginalCongestionHandlerV3QsimTest {
 			}	
 		});
 		
-		events.addHandler(new CongestionHandlerImplV3(events, (ScenarioImpl) sc));
+		events.addHandler(new CongestionHandlerImplV3(events, (MutableScenario) sc));
 				
 		QSim sim = createQSim(sc, events);
 		sim.run();
@@ -479,7 +564,7 @@ public class MarginalCongestionHandlerV3QsimTest {
 			}	
 		});
 		
-		events.addHandler(new CongestionHandlerImplV3(events, (ScenarioImpl) sc));
+		events.addHandler(new CongestionHandlerImplV3(events, (MutableScenario) sc));
 				
 		QSim sim = createQSim(sc, events);
 		sim.run();
@@ -548,7 +633,7 @@ public class MarginalCongestionHandlerV3QsimTest {
 			}	
 		});
 		
-		events.addHandler(new CongestionHandlerImplV3(events, (ScenarioImpl) sc));
+		events.addHandler(new CongestionHandlerImplV3(events, (MutableScenario) sc));
 		
 		QSim sim = createQSim(sc, events);
 		sim.run();

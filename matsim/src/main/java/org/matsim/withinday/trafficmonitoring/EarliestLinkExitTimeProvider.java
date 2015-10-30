@@ -126,15 +126,15 @@ public class EarliestLinkExitTimeProvider implements LinkEnterEventHandler, Link
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
 
-		String transportMode = this.transportModeProvider.getTransportMode(event.getPersonId());
+		String transportMode = this.transportModeProvider.getTransportMode(event.getDriverId());
 		double now = event.getTime();
 		Link link = this.scenario.getNetwork().getLinks().get(event.getLinkId());
-		Person person = this.scenario.getPopulation().getPersons().get(event.getPersonId());
+		Person person = this.scenario.getPopulation().getPersons().get(event.getDriverId());
 
 		double earliestExitTime = Time.UNDEFINED_TIME;
 		if (this.multiModalTravelTimes != null) {
 			if (transportMode == null) {
-				throw new RuntimeException("Agent " + event.getPersonId().toString() + " is currently not performing a leg. Aborting!");
+				throw new RuntimeException("Agent " + event.getDriverId().toString() + " is currently not performing a leg. Aborting!");
 			} else {
 				TravelTime travelTime = this.multiModalTravelTimes.get(transportMode);
 				if (travelTime == null) {
@@ -147,12 +147,12 @@ public class EarliestLinkExitTimeProvider implements LinkEnterEventHandler, Link
 			earliestExitTime = Math.floor(now + this.freeSpeedTravelTime.getLinkTravelTime(link, now, person, null));
 		}
 
-		this.handleAddEarliestLinkExitTime(event.getPersonId(), earliestExitTime);
+		this.handleAddEarliestLinkExitTime(event.getDriverId(), earliestExitTime);
 	}
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		this.removeEarliestLinkExitTimesAtTime(event.getPersonId());
+		this.removeEarliestLinkExitTimesAtTime(event.getDriverId());
 	}
 	
 	@Override

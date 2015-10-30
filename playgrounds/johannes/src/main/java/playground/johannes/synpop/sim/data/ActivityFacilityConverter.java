@@ -20,7 +20,7 @@ package playground.johannes.synpop.sim.data;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.facilities.ActivityFacility;
-import playground.johannes.gsv.synPop.data.FacilityData;
+import playground.johannes.synpop.gis.FacilityData;
 
 /**
  * @author jillenberger

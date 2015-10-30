@@ -21,6 +21,7 @@ package playground.thibautd.socnetsimusages.run;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.events.Event;
 import org.matsim.contrib.socnetsim.framework.SocialNetworkConfigGroup;
 import org.matsim.contrib.socnetsim.framework.controller.JointDecisionProcessModule;
 import org.matsim.contrib.socnetsim.framework.controller.SocialNetworkModule;
@@ -41,14 +42,19 @@ import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryLogging;
+import org.matsim.core.events.handler.BasicEventHandler;
+import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
+import playground.ivt.analysis.IvtAnalysisModule;
+import playground.ivt.analysis.tripstats.TripStatisticsModule;
 import playground.ivt.matsim2030.Matsim2030Utils;
 import playground.ivt.matsim2030.generation.ScenarioMergingConfigGroup;
 import playground.thibautd.initialdemandgeneration.transformation.SocialNetworkedPopulationDilutionUtils;
 import playground.thibautd.socnetsimusages.traveltimeequity.EquityConfigGroup;
 import playground.thibautd.socnetsimusages.traveltimeequity.EquityStrategiesModule;
 import playground.thibautd.socnetsimusages.traveltimeequity.KtiScoringWithEquityModule;
+import playground.thibautd.utils.PrintThreadInfoAtEndModule;
 
 /**
  * @author thibautd
@@ -90,6 +96,8 @@ public class RunSocialScenarioWithEquity {
 						install(new JointTripsModule());
 						install(new SocialNetworkModule());
 						install(new EquityStrategiesModule());
+						install(new IvtAnalysisModule() );
+						install( new PrintThreadInfoAtEndModule() );
 					}
 				});
 		controller.addOverridingModule(
@@ -104,13 +112,14 @@ public class RunSocialScenarioWithEquity {
 		new WorldConnectLocations( config ).connectFacilitiesWithLinks(
 				scenario.getActivityFacilities(),
 				(NetworkImpl) scenario.getNetwork() );
+
 		controller.run();
 	}
 
 	private static Scenario loadScenario(final Config config) {
 		final Scenario scenario = JointScenarioUtils.loadScenario(config);
 		RunUtils.enrichScenario(scenario);
-		scenario.getConfig().controler().setCreateGraphs( false ); // cannot set that from config file...
+		//scenario.getConfig().controler().setCreateGraphs( false ); // cannot set that from config file...
 
 		final SocialNetworkConfigGroup snConf = (SocialNetworkConfigGroup)
 				config.getModule( SocialNetworkConfigGroup.GROUP_NAME );

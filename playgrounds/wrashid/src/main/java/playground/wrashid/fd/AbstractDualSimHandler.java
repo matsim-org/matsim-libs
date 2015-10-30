@@ -1,6 +1,5 @@
 package playground.wrashid.fd;
 
-import java.util.HashMap;
 import java.util.HashSet;
 
 import org.matsim.api.core.v01.Id;
@@ -39,13 +38,13 @@ public abstract class AbstractDualSimHandler implements LinkLeaveEventHandler,
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
 		if (isLinkPartOfStudyArea(event.getLinkId())) {
-			if (agentsTravellingOnLinks.contains(event.getPersonId())) {
-				processLeaveLink(event.getLinkId(), event.getPersonId(),
-						linkEnterTime.get(event.getLinkId(), event.getPersonId()), event.getTime());
+			if (agentsTravellingOnLinks.contains(event.getDriverId())) {
+				processLeaveLink(event.getLinkId(), event.getDriverId(),
+						linkEnterTime.get(event.getLinkId(), event.getDriverId()), event.getTime());
 			}
 		}
-		agentsTravellingOnLinks.remove(event.getPersonId());
-		linkEnterTime.removeValue(event.getLinkId(), event.getPersonId());
+		agentsTravellingOnLinks.remove(event.getDriverId());
+		linkEnterTime.removeValue(event.getLinkId(), event.getDriverId());
 	}
 
 	@Override
@@ -64,8 +63,8 @@ public abstract class AbstractDualSimHandler implements LinkLeaveEventHandler,
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		agentsTravellingOnLinks.add(event.getPersonId());
-		linkEnterTime.put(event.getLinkId(), event.getPersonId(),
+		agentsTravellingOnLinks.add(event.getDriverId());
+		linkEnterTime.put(event.getLinkId(), event.getDriverId(),
 				event.getTime());
 	}
 

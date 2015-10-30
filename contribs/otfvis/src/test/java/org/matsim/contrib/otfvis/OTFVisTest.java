@@ -23,6 +23,9 @@
  */
 package org.matsim.contrib.otfvis;
 
+import java.io.File;
+import java.util.Arrays;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.core.config.Config;
@@ -31,9 +34,7 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-
-import java.io.File;
-import java.util.Arrays;
+import org.matsim.testcases.MatsimTestCase;
 
 /**
  * Simple test case to ensure the converting from eventsfile to .mvi-file
@@ -42,7 +43,7 @@ import java.util.Arrays;
  * @author yu
  * 
  */
-public class OTFVisTest  {
+public class OTFVisTest extends MatsimTestCase {
 
 	@Test
 	public void testConvert() {
@@ -71,14 +72,17 @@ public class OTFVisTest  {
 
 		final Controler controler = new Controler(config);
 		controler.addOverridingModule(new OTFVisModule());
-		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		controler.getConfig().controler().setCreateGraphs(false);
         controler.setDumpDataAtEnd(false);
 		controler.run();
 
-		Assert.assertTrue(new File(controler.getControlerIO().getIterationFilename(0, "otfvis.mvi")).exists());
-		Assert.assertTrue(new File(controler.getControlerIO().getIterationFilename(1, "otfvis.mvi")).exists());
-		Assert.assertTrue(new File(controler.getControlerIO().getIterationFilename(2, "otfvis.mvi")).exists());
+		assertTrue(new File(controler.getControlerIO().getIterationFilename(0, "otfvis.mvi")).exists());
+		assertTrue(new File(controler.getControlerIO().getIterationFilename(1, "otfvis.mvi")).exists());
+		assertTrue(new File(controler.getControlerIO().getIterationFilename(2, "otfvis.mvi")).exists());
 	}
 
 }

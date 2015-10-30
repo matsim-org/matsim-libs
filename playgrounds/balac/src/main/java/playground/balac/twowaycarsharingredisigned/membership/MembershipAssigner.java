@@ -19,7 +19,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationReader;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.ActivityFacility;
@@ -92,7 +92,7 @@ public class MembershipAssigner {
 
 	    }
 		
-	    Collection<TwoWayCSStation> nearbyStations = this.stations.getQuadTree().get(c.getX(), c.getY() , 5000.0D);
+	    Collection<TwoWayCSStation> nearbyStations = this.stations.getQuadTree().getDisk(c.getX(), c.getY(), 5000.0D);
 	    for (TwoWayCSStation station : nearbyStations) {
 	      access += station.getNumberOfVehicles() * Math.exp(-2.0D * 
 	    		  CoordUtils.calcDistance(this.scenario.getNetwork().getLinks().get(station.getLink().getId()).getCoord(), c) / 1000.0D);
@@ -134,7 +134,7 @@ public class MembershipAssigner {
 
 		    }
 			
-		    Collection<TwoWayCSStation> nearbyStations = this.stations.getQuadTree().get(c.getX(), c.getY() , 5000.0D);
+		    Collection<TwoWayCSStation> nearbyStations = this.stations.getQuadTree().getDisk(c.getX(), c.getY(), 5000.0D);
 		    for (TwoWayCSStation station : nearbyStations) {
 		      access += station.getNumberOfVehicles() * Math.exp(-2.0D * 
 		    		  CoordUtils.calcDistance(this.scenario.getNetwork().getLinks().get(station.getLink().getId()).getCoord(), c) / 1000.0D);
@@ -234,7 +234,7 @@ public class MembershipAssigner {
 		// TODO Auto-generated method stub
 		Logger.getLogger( "org.matsim.core.population.PopulationReaderMatsimV4" ).setLevel(Level.OFF);
 
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		PopulationReader populationReader = new MatsimPopulationReader(scenario);
 		MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario);
 		FacilitiesReaderMatsimV1 facilitiesReader  = new FacilitiesReaderMatsimV1(scenario);

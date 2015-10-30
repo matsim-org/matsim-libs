@@ -71,7 +71,7 @@ public class CountsFileGenerator {
 		MatsimNetworkReader matsimNetworkReader = new MatsimNetworkReader(scenario);
 		matsimNetworkReader.readFile("./data/networks/singapore1.xml");
 		Network network = scenario.getNetwork();
-		Map<String,Counts> allCounts = new HashMap<String, Counts>();
+		Map<String,Counts<Link>> allCounts = new HashMap<>();
 		for(String mode:MODES)
 			allCounts.put(mode, new Counts());
 		BufferedReader readerLinks = new BufferedReader(new FileReader(new File("./data/counts/CountLinks.txt")));

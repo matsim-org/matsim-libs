@@ -19,21 +19,15 @@
 
 package playground.johannes.gsv.matrices.analysis;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.Point;
 import org.geotools.geometry.jts.JTSFactoryFinder;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.matsim.contrib.common.gis.CRSUtils;
+import org.matsim.contrib.common.gis.WGS84DistanceCalculator;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.MathTransform;
 import org.wololo.geojson.Feature;
@@ -41,21 +35,19 @@ import org.wololo.geojson.GeoJSON;
 import org.wololo.geojson.GeoJSONFactory;
 import org.wololo.geojson.Geometry;
 import org.wololo.jts2geojson.GeoJSONWriter;
-
 import playground.johannes.gsv.sim.cadyts.ODUtils;
 import playground.johannes.gsv.zones.KeyMatrix;
 import playground.johannes.gsv.zones.MatrixOperations;
-import playground.johannes.gsv.zones.Zone;
-import playground.johannes.gsv.zones.ZoneCollection;
 import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
-import playground.johannes.gsv.zones.io.Zone2GeoJSON;
-import playground.johannes.sna.gis.CRSUtils;
-import playground.johannes.socialnetworks.gis.WGS84DistanceCalculator;
+import playground.johannes.synpop.gis.Zone;
+import playground.johannes.synpop.gis.ZoneCollection;
+import playground.johannes.synpop.gis.ZoneGeoJsonIO;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.Point;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.util.*;
 
 /**
  * @author johannes
@@ -93,7 +85,7 @@ public class RelationsDiffPlot {
 		 */
 		ZoneCollection zones = new ZoneCollection();
 		String data = new String(Files.readAllBytes(Paths.get("/home/johannes/gsv/gis/nuts/de.nuts3.json")));
-		zones.addAll(Zone2GeoJSON.parseFeatureCollection(data));
+		zones.addAll(ZoneGeoJsonIO.parseFeatureCollection(data));
 		zones.setPrimaryKey("gsvId");
 		data = null;
 		
@@ -108,7 +100,7 @@ public class RelationsDiffPlot {
 		/*
 		 * compare
 		 */
-		Collection<Zone> studyZones = urbanZones(zones.zoneSet());
+		Collection<Zone> studyZones = urbanZones(zones.getZones());
 		data = writeGeoJSON(zones, studyZones, simulation, itp, tomtom);
 		Files.write(Paths.get("/home/johannes/gsv/matrices/analysis/relations/matrixdiff."+runId+".json"), data.getBytes(), StandardOpenOption.CREATE);
 		/*
@@ -139,7 +131,7 @@ public class RelationsDiffPlot {
 		/*
 		 * write zone polygons
 		 */
-		//builder.append(Zone2GeoJSON.toJson(zones.zoneSet()));
+		//builder.append(Zone2GeoJSON.toJson(zones.getZones()));
 		/*
 		 * create a line string for each relation
 		 */

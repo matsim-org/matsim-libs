@@ -19,14 +19,6 @@
 
 package playground.johannes.gsv.synPop.osm;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -41,6 +33,8 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
+
+import java.util.*;
 
 /**
  * @author johannes
@@ -74,7 +68,7 @@ public class IntersectionSimplifier implements NetworkRunnable {
 			double maxy = node.getCoord().getY() + radius;
 			
 			Set<Node> intersectionNodes = new HashSet<Node>(20);
-			quadTree.get(minx, miny, maxx, maxy, intersectionNodes);
+			quadTree.getRectangle(minx, miny, maxx, maxy, intersectionNodes);
 			
 			if(intersectionNodes.size() > 1) {
 			Set<Node> sourceNodes = new HashSet<Node>();

@@ -19,26 +19,24 @@
 
 package playground.johannes.gsv.matrices.analysis;
 
+import com.vividsolutions.jts.geom.Point;
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.apache.log4j.Logger;
+import org.matsim.contrib.common.gis.CartesianDistanceCalculator;
+import org.matsim.contrib.common.gis.DistanceCalculator;
+import org.matsim.contrib.common.stats.Discretizer;
+import org.matsim.contrib.common.stats.LinearDiscretizer;
+import playground.johannes.gsv.zones.KeyMatrix;
+import playground.johannes.gsv.zones.MatrixOperations;
+import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
+import playground.johannes.synpop.gis.Zone;
+import playground.johannes.synpop.gis.ZoneCollection;
+import playground.johannes.synpop.gis.ZoneGeoJsonIO;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Set;
-
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.apache.log4j.Logger;
-
-import com.vividsolutions.jts.geom.Point;
-
-import playground.johannes.gsv.zones.KeyMatrix;
-import playground.johannes.gsv.zones.MatrixOperations;
-import playground.johannes.gsv.zones.Zone;
-import playground.johannes.gsv.zones.ZoneCollection;
-import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
-import playground.johannes.gsv.zones.io.Zone2GeoJSON;
-import playground.johannes.sna.math.Discretizer;
-import playground.johannes.sna.math.LinearDiscretizer;
-import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
-import playground.johannes.socialnetworks.gis.DistanceCalculator;
 
 /**
  * @author johannes
@@ -58,7 +56,7 @@ public class NUTSCompare {
 		
 		ZoneCollection zones = new ZoneCollection();
 		String data = new String(Files.readAllBytes(Paths.get("/home/johannes/gsv/gis/nuts/de.nuts3.gk3.geojson")));
-		zones.addAll(Zone2GeoJSON.parseFeatureCollection(data));
+		zones.addAll(ZoneGeoJsonIO.parseFeatureCollection(data));
 		data = null;
 		zones.setPrimaryKey("gsvId");
 		
@@ -208,7 +206,7 @@ public class NUTSCompare {
 
 	private static void addInhabCats(ZoneCollection zones) {
 		Discretizer disc = new LinearDiscretizer(250000);
-		for(Zone zone : zones.zoneSet()) {
+		for(Zone zone : zones.getZones()) {
 			double val = Double.parseDouble(zone.getAttribute("inhabitants"));
 			val = disc.index(val);
 			val = Math.min(5, val);

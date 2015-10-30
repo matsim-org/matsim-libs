@@ -56,7 +56,7 @@ public final class NetworkImpl implements Network {
 		return new NetworkImpl();
 	}
 
-	private double capperiod = 3600.0 ;
+	private double capacityPeriod = 3600.0 ;
 
 	private final Map<Id<Node>, Node> nodes = new LinkedHashMap<>();
 
@@ -211,7 +211,7 @@ public final class NetworkImpl implements Network {
 	 * @param capPeriod the capacity-period in seconds
 	 */
 	public void setCapacityPeriod(final double capPeriod) {
-		this.capperiod = (int) capPeriod;
+		this.capacityPeriod = (int) capPeriod;
 	}
 
 	public void setEffectiveCellSize(final double effectiveCellSize) {
@@ -260,18 +260,18 @@ public final class NetworkImpl implements Network {
 	 */
 	public void addNetworkChangeEvent(final NetworkChangeEvent event) {
 		this.networkChangeEvents.add(event);
-        for (Link link : event.getLinks()) {
-            if (link instanceof TimeVariantLinkImpl) {
-                ((TimeVariantLinkImpl)link).applyEvent(event);
-            } else {
-                throw new IllegalArgumentException("Link " + link.getId().toString() + " is not TimeVariant.");
-            }
-        }
+		for (Link link : event.getLinks()) {
+			if (link instanceof TimeVariantLinkImpl) {
+				((TimeVariantLinkImpl)link).applyEvent(event);
+			} else {
+				throw new IllegalArgumentException("Link " + link.getId().toString() + " is not TimeVariant.");
+			}
+		}
 	}
 
 	@Override
 	public double getCapacityPeriod() {
-		return this.capperiod;
+		return this.capacityPeriod;
 	}
 
 	public double getEffectiveCellSize() {
@@ -303,7 +303,7 @@ public final class NetworkImpl implements Network {
 	 */
 	public Node getNearestNode(final Coord coord) {
 		if (this.nodeQuadTree == null) { buildQuadTree(); }
-		return this.nodeQuadTree.get(coord.getX(), coord.getY());
+		return this.nodeQuadTree.getClosest(coord.getX(), coord.getY());
 	}
 
 	/**
@@ -315,7 +315,7 @@ public final class NetworkImpl implements Network {
 	 */
 	public Collection<Node> getNearestNodes(final Coord coord, final double distance) {
 		if (this.nodeQuadTree == null) { buildQuadTree(); }
-		return this.nodeQuadTree.get(coord.getX(), coord.getY(), distance);
+		return this.nodeQuadTree.getDisk(coord.getX(), coord.getY(), distance);
 	}
 
 
@@ -335,7 +335,7 @@ public final class NetworkImpl implements Network {
 	@Override
 	public String toString() {
 		return super.toString() +
-				"[capperiod=" + this.capperiod + "]" +
+				"[capperiod=" + this.capacityPeriod + "]" +
 				"[nof_nodes=" + this.nodes.size() + "]";
 	}
 
@@ -365,6 +365,8 @@ public final class NetworkImpl implements Network {
 		miny -= 1.0;
 		maxx += 1.0;
 		maxy += 1.0;
+		// yy the above four lines are problematic if the coordinate values are much smaller than one. kai, oct'15
+		
 		log.info("building QuadTree for nodes: xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
 		QuadTree<Node> quadTree = new QuadTree<>(minx, miny, maxx, maxy);
 		for (Node n : this.nodes.values()) {
@@ -396,6 +398,8 @@ public final class NetworkImpl implements Network {
 		miny -= 1.0;
 		maxx += 1.0;
 		maxy += 1.0;
+		// yy the above four lines are problematic if the coordinate values are much smaller than one. kai, oct'15
+		
 		log.info("building LinkQuadTree for nodes: xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
 		LinkQuadTree qt = new LinkQuadTree(minx, miny, maxx, maxy);
 		for (Link l : this.links.values()) {
@@ -410,7 +414,7 @@ public final class NetworkImpl implements Network {
 		return Collections.unmodifiableMap(links);
 	}
 
-	public void setFactory(final NetworkFactoryImpl networkFactory) {
+	 void setFactory(final NetworkFactoryImpl networkFactory) {
 		this.factory = networkFactory;
 	}
 

@@ -41,7 +41,7 @@ import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.core.events.handler.EventHandler;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.utils.misc.Time;
 
 import playground.vsp.analysis.modules.AbstractAnalysisModule;
@@ -57,7 +57,7 @@ import playground.vsp.analysis.modules.ptDriverPrefix.PtDriverIdAnalyzer;
  */
 public class EnterLeaveVehicle2ActivityAnalyzer extends AbstractAnalysisModule{
 	private final static Logger log = Logger.getLogger(EnterLeaveVehicle2ActivityAnalyzer.class);
-	private ScenarioImpl scenario;
+	private MutableScenario scenario;
 	
 	private List<AbstractAnalysisModule> anaModules = new LinkedList<AbstractAnalysisModule>();
 	private PtDriverIdAnalyzer ptDriverIdAnalyzer;
@@ -70,7 +70,7 @@ public class EnterLeaveVehicle2ActivityAnalyzer extends AbstractAnalysisModule{
 		super(EnterLeaveVehicle2ActivityAnalyzer.class.getSimpleName());
 	}
 	
-	public void init(ScenarioImpl scenario) {
+	public void init(MutableScenario scenario) {
 		this.scenario = scenario;
 		
 		// (sub-)module
@@ -124,7 +124,7 @@ public class EnterLeaveVehicle2ActivityAnalyzer extends AbstractAnalysisModule{
 
 //		for (PersonEntersVehicleEvent enterEvent : this.enterVehicleEvent2ActivityEndEvent.keySet()){
 //			ActivityEndEvent actend = this.enterVehicleEvent2ActivityEndEvent.get(enterEvent);
-//			log.info(enterEvent.getPersonId() + " enters vehicle " + enterEvent.getVehicleId() + " (Time:" + enterEvent.getTime() + ") after " + actend.getPersonId() + " ends activity " + actend.getActType() + " (Time: "+ actend.getTime()+")");
+//			log.info(enterEvent.getDriverId() + " enters vehicle " + enterEvent.getVehicleId() + " (Time:" + enterEvent.getTime() + ") after " + actend.getDriverId() + " ends activity " + actend.getActType() + " (Time: "+ actend.getTime()+")");
 //		}
 				
 	}

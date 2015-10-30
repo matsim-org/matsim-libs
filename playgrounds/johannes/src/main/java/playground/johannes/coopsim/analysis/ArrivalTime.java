@@ -20,12 +20,10 @@
 package playground.johannes.coopsim.analysis;
 
 import gnu.trove.TObjectDoubleHashMap;
+import org.matsim.api.core.v01.population.Activity;
+import playground.johannes.coopsim.pysical.Trajectory;
 
 import java.util.Set;
-
-import org.matsim.api.core.v01.population.Activity;
-
-import playground.johannes.coopsim.pysical.Trajectory;
 
 /**
  * @author illenberger

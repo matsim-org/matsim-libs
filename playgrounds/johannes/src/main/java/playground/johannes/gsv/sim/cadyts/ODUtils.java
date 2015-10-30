@@ -19,17 +19,15 @@
 
 package playground.johannes.gsv.sim.cadyts;
 
-import java.util.Set;
-
-import org.apache.log4j.Logger;
-
-import playground.johannes.gsv.zones.KeyMatrix;
-import playground.johannes.gsv.zones.Zone;
-import playground.johannes.gsv.zones.ZoneCollection;
-import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
-import playground.johannes.socialnetworks.gis.DistanceCalculator;
-
 import com.vividsolutions.jts.geom.Point;
+import org.apache.log4j.Logger;
+import org.matsim.contrib.common.gis.CartesianDistanceCalculator;
+import org.matsim.contrib.common.gis.DistanceCalculator;
+import playground.johannes.gsv.zones.KeyMatrix;
+import playground.johannes.synpop.gis.Zone;
+import playground.johannes.synpop.gis.ZoneCollection;
+
+import java.util.Set;
 
 /**
  * @author johannes

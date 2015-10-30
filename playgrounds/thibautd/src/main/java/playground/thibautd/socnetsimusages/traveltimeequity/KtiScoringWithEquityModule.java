@@ -23,6 +23,7 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.pt.PtConstants;
+import playground.ivt.analysis.scoretracking.ScoreTrackingModule;
 import playground.thibautd.socnetsimusages.scoring.KtiScoringFunctionFactoryWithJointModesAndEquity;
 
 /**
@@ -31,6 +32,8 @@ import playground.thibautd.socnetsimusages.scoring.KtiScoringFunctionFactoryWith
 public class KtiScoringWithEquityModule extends AbstractModule {
 	@Override
 	public void install() {
+		install( new ScoreTrackingModule() );
+
 		binder().bind( TravelTimesRecord.class ).toInstance(
 				new TravelTimesRecord(
 						new StageActivityTypesImpl(

@@ -8,7 +8,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -18,7 +18,7 @@ public class RoadPricingScheme {
 	
 	public static boolean outside(Node n, Coord coord) {
 		
-		if (CoordUtils.calcDistance(n.getCoord(), coord) > 4000)
+		if (CoordUtils.calcDistance(n.getCoord(), coord) > 8000)
 		
 			return true;
 		else 
@@ -29,7 +29,7 @@ public class RoadPricingScheme {
 		
 		
 		
-		if (CoordUtils.calcDistance(n.getCoord(), coord) < 4000)
+		if (CoordUtils.calcDistance(n.getCoord(), coord) < 8000)
 			
 			return true;
 		else 
@@ -39,12 +39,12 @@ public class RoadPricingScheme {
 	public static void main(String[] args) throws IOException {
 		// TODO Auto-generated method stub
 		
-		final BufferedWriter outLink = IOUtils.getBufferedWriter("C:/Users/balacm/Desktop/" + "RoadPricingLinks.txt");
+		final BufferedWriter outLink = IOUtils.getBufferedWriter("C:/Users/balacm/Desktop/" + "RoadPricingLinks_8km.txt");
 		
 		double centerX = 683217.0; 
 		double centerY = 247300.0;
 		Coord coord = new Coord(centerX, centerY);
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario);
 		networkReader.readFile(args[0]);
 		

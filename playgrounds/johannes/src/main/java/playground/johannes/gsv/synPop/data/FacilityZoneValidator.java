@@ -19,16 +19,18 @@
 
 package playground.johannes.gsv.synPop.data;
 
+import org.apache.log4j.Logger;
+import org.matsim.contrib.socnetgen.sna.gis.Zone;
+import org.matsim.contrib.socnetgen.sna.gis.ZoneLayer;
+import org.matsim.facilities.ActivityFacility;
+import playground.johannes.coopsim.utils.MatsimCoordUtils;
+import playground.johannes.synpop.gis.DataPool;
+import playground.johannes.synpop.gis.FacilityData;
+import playground.johannes.synpop.gis.FacilityDataLoader;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import org.apache.log4j.Logger;
-import org.matsim.facilities.ActivityFacility;
-
-import playground.johannes.coopsim.util.MatsimCoordUtils;
-import playground.johannes.sna.gis.Zone;
-import playground.johannes.sna.gis.ZoneLayer;
 
 /**
  * @author johannes

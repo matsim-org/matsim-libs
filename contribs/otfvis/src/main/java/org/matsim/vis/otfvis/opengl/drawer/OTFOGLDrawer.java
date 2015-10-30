@@ -20,12 +20,8 @@
 
 package org.matsim.vis.otfvis.opengl.drawer;
 
-import com.jogamp.opengl.*;
-import com.jogamp.opengl.awt.GLCanvas;
-import com.jogamp.opengl.awt.GLJPanel;
-import com.jogamp.opengl.glu.GLU;
-import com.jogamp.opengl.util.awt.AWTGLReadBufferUtil;
 import com.jogamp.opengl.util.awt.ImageUtil;
+import com.jogamp.opengl.util.awt.Screenshot;
 import com.jogamp.opengl.util.awt.TextRenderer;
 import com.jogamp.opengl.util.texture.Texture;
 import com.jogamp.opengl.util.texture.TextureCoords;
@@ -49,6 +45,10 @@ import org.matsim.vis.otfvis.interfaces.OTFQueryHandler;
 import org.matsim.vis.otfvis.opengl.gl.InfoText;
 import org.matsim.vis.otfvis.opengl.gl.Point3f;
 
+import javax.media.opengl.*;
+import javax.media.opengl.awt.GLCanvas;
+import javax.media.opengl.awt.GLJPanel;
+import javax.media.opengl.glu.GLU;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -424,19 +424,18 @@ public class OTFOGLDrawer implements GLEventListener {
 			String nr = String.format("%07d", this.now);
 			try {
 				if (this.now % screenshotInterval == 0 && this.now <= timeOfLastScreenshot) {
-					AWTGLReadBufferUtil glReadBufferUtil = new AWTGLReadBufferUtil(gl.getGLProfile(), true);
-					glReadBufferUtil.readPixels(gl, false);
-					glReadBufferUtil.write(new File("movie" + this + " Frame" + nr + ".jpg"));
+					Screenshot.writeToFile(new File("movie"+ this +" Frame" + nr + ".jpg"), drawable.getWidth(), drawable.getHeight());
 				}
 			} catch (GLException e) {
 				e.printStackTrace();
 			} catch (IllegalArgumentException e) {
 				// could happen for folded displays on split screen... ignore
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
 		}
 		if (this.current == null) {
-			AWTGLReadBufferUtil glReadBufferUtil = new AWTGLReadBufferUtil(gl.getGLProfile(), true);
-			this.current = glReadBufferUtil.readPixelsToBufferedImage(gl, false);
+			this.current = Screenshot.readToBufferedImage(drawable.getWidth(), drawable.getHeight());
 		}
 		gl.glDisable(GL.GL_BLEND);
 	}
@@ -484,12 +483,12 @@ public class OTFOGLDrawer implements GLEventListener {
 		}
 
 		// Calculate text location and color
-		int x = drawable.getSurfaceWidth() - this.statusWidth - 5;
-		int y = drawable.getSurfaceHeight() - 30;
+		int x = drawable.getWidth() - this.statusWidth - 5;
+		int y = drawable.getHeight() - 30;
 
 		// Render the text
 		this.textRenderer.setColor(Color.DARK_GRAY);
-		this.textRenderer.beginRendering(drawable.getSurfaceWidth(), drawable.getSurfaceHeight());
+		this.textRenderer.beginRendering(drawable.getWidth(), drawable.getHeight());
 		this.textRenderer.draw(status, x, y);
 		this.textRenderer.endRendering();
 	}
@@ -626,8 +625,8 @@ public class OTFOGLDrawer implements GLEventListener {
 			float minEasting = (float)clientQ.getMinEasting();
 			float minNorthing = (float)clientQ.getMinNorthing();
 			float maxNorthing = (float)clientQ.getMaxNorthing();
-			double aspectRatio = (double) drawable.getSurfaceWidth() / (double) drawable.getSurfaceHeight();
-			double pixelRatio = (double) drawable.getSurfaceHeight() / (double) (maxNorthing-minNorthing);
+			double aspectRatio = (double) drawable.getWidth() / (double) drawable.getHeight();
+			double pixelRatio = (double) drawable.getHeight() / (double) (maxNorthing-minNorthing);
 			this.scale = 1.0f / (float) pixelRatio;
 			this.viewBounds =  new QuadTree.Rect(minEasting, minNorthing, minEasting + (maxNorthing - minNorthing) * aspectRatio, maxNorthing);
 			setZoomToNearestInteger();

@@ -19,10 +19,7 @@
 
 package playground.johannes.gsv.matrices.episodes2matrix;
 
-import playground.johannes.gsv.matrices.plans2matrix.Predicate;
-import playground.johannes.sna.util.Composite;
-import playground.johannes.synpop.data.Attributable;
-import playground.johannes.synpop.data.PlainPerson;
+import org.matsim.contrib.common.collections.Composite;
 import playground.johannes.synpop.data.Segment;
 
 /**

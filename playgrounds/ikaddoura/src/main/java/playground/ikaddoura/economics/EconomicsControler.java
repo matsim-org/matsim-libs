@@ -39,7 +39,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.ikaddoura.analysis.welfare.WelfareAnalysisControlerListener;
@@ -68,9 +68,10 @@ public class EconomicsControler {
 	private static final Logger log = Logger.getLogger(EconomicsControler.class);
 	private static final String path = "/Users/ihab/Documents/workspace/runs-svn/economics/";
 	
-	private final int minDemand = 0;
-	private final int maxDemand = 10;
-	private final int incrementDemand = 1;
+	private final int minDemand = 100;
+	private final int maxDemand = 7200;
+	private final int incrementDemand = 100;
+	private final double timeBin = 3600;
 	
 	private final double minCost = 1000.;
 	private final double maxCost = 2500.;
@@ -84,7 +85,9 @@ public class EconomicsControler {
 	public static void main(String[] args) throws IOException {
 				
 		EconomicsControler main = new EconomicsControler();
+		
 		main.generateCostAsFunctionOfDemand(); // cost as function of demand (fixed demand)
+
 //		main.generateDemandAsFunctionOfCost(); // demand as function of cost (fixed cost)
 //		main.standardRunNoPricing(); // standard MATSim run: demand as function of cost; cost as function of demand
 //		main.standardRunFlatPricing(); // standard MATSim run: demand as function of cost; cost as function of demand
@@ -102,7 +105,7 @@ public class EconomicsControler {
 		config.controler().setOutputDirectory(path + "output_StandardRunUserSpecificPricing/");
 		config.plans().setInputFile(path + "input/population_" + maxDemand + ".xml");
 
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		
 		new MatsimNetworkReader(scenario).readFile(scenario.getConfig().network().getInputFile());
 		new MatsimPopulationReader(scenario).readFile(scenario.getConfig().plans().getInputFile());
@@ -122,7 +125,7 @@ public class EconomicsControler {
 				bindCarTravelDisutilityFactory().toInstance(tollDisutilityCalculatorFactory);
 			}
 		});
-		controler.addControlerListener(new MarginalCongestionPricingContolerListener( controler.getScenario(), tollHandler, new CongestionHandlerImplV3(controler.getEvents(), (ScenarioImpl) controler.getScenario())  ));
+		controler.addControlerListener(new MarginalCongestionPricingContolerListener( controler.getScenario(), tollHandler, new CongestionHandlerImplV3(controler.getEvents(), (MutableScenario) controler.getScenario())  ));
 
 		controler.getConfig().controler().setOverwriteFileSetting(
 				OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
@@ -148,7 +151,7 @@ public class EconomicsControler {
 		config.controler().setOutputDirectory(path + "output_StandardRunFlatPricing_" + flatToll + "/");
 		config.plans().setInputFile(path + "input/population_" + maxDemand + ".xml");
 
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		
 		new MatsimNetworkReader(scenario).readFile(scenario.getConfig().network().getInputFile());
 		new MatsimPopulationReader(scenario).readFile(scenario.getConfig().plans().getInputFile());
@@ -184,7 +187,7 @@ public class EconomicsControler {
 		config.controler().setOutputDirectory(path + "output_StandardRunNoPricing/");
 		config.plans().setInputFile(path + "input/population_" + maxDemand + ".xml");
 
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		
 		new MatsimNetworkReader(scenario).readFile(scenario.getConfig().network().getInputFile());
 		new MatsimPopulationReader(scenario).readFile(scenario.getConfig().plans().getInputFile());
@@ -201,11 +204,6 @@ public class EconomicsControler {
 		controler.run();
 	}
 
-	
-	// variiere die Flusskapazität von sehr hoch bis super viel Stau
-	// lass die Nachfrage reagieren
-	// lese Auto-Nachfrage ab (x)
-	// berechne mit diesem x und der Flusskapazität die Auto-Kosten (AC)
 	private void generateDemandAsFunctionOfCost() {
 		
 		String csvFile = path + "/economics_DemandAsFunctionOfCost.csv";
@@ -223,7 +221,7 @@ public class EconomicsControler {
 			config.controler().setOutputDirectory(path + "output_DemandAsFunctionOfCost_" + cost + "/");
 			config.plans().setInputFile(path + "input/population_" + maxDemand + ".xml");
 			
-			ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+			MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 			
 			new MatsimNetworkReader(scenario).readFile(scenario.getConfig().network().getInputFile());
 			new MatsimPopulationReader(scenario).readFile(scenario.getConfig().plans().getInputFile());
@@ -282,7 +280,7 @@ public class EconomicsControler {
 			Population population = PopulationUtils.createPopulation(config);
 			population = generatePopulation(population, demand);
 			
-			ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+			MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 			new MatsimNetworkReader(scenario).readFile(scenario.getConfig().network().getInputFile());
 			scenario.setPopulation(population);
 			
@@ -293,7 +291,7 @@ public class EconomicsControler {
 			
 			Controler controler = new Controler(scenario);
 
-			CostFunctionsControlerListener economicsControlerListener = new CostFunctionsControlerListener((ScenarioImpl) controler.getScenario());
+			CostFunctionsControlerListener economicsControlerListener = new CostFunctionsControlerListener((MutableScenario) controler.getScenario());
 
 			controler.getConfig().controler().setOverwriteFileSetting(
 					OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
@@ -339,17 +337,33 @@ public class EconomicsControler {
 	}
 	
 	private Population generatePopulation(Population population, int demand) {
+			
+		// distribute the demand equally in the time bin.
+		double linkEnterGap = 0.;
+		
+		if (demand <= 0) {
+			throw new RuntimeException("Demand must be larger than 0. Aborting...");
+		}
+		
+		if (demand == 1) {
+			// no gap to calculate
+		} else {
+			linkEnterGap = this.timeBin / (demand - 1);
+		}
+		
+		double linkEnterTimeThisAgent = 0.;
 		
 		for (int personNr = 0; personNr < demand; personNr++) {
 			
 			Coord homeLocation = getHomeCoord();
-			Coord workLocation = new Coord(15000., 0.);
+			Coord workLocation = new Coord(15000., 0.);		
 			
 			Person person = population.getFactory().createPerson(Id.create("person_" + personNr, Person.class));
 			Plan plan = population.getFactory().createPlan();
 
 			Activity activity0 = population.getFactory().createActivityFromCoord("h", homeLocation);
-			activity0.setEndTime(0.);
+			
+			activity0.setEndTime(linkEnterTimeThisAgent);
 			plan.addActivity(activity0);
 						
 			plan.addLeg(population.getFactory().createLeg(TransportMode.car));
@@ -359,6 +373,8 @@ public class EconomicsControler {
 			
 			person.addPlan(plan);
 			population.addPerson(person);
+			
+			linkEnterTimeThisAgent += linkEnterGap;
 		}
 		
 		return population;

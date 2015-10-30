@@ -540,16 +540,16 @@ public class GtiActivityRelocator {
 		Collection<ActivityFacility> facilitiesToRank = null;
 		if(qt.values().size() > number){
 		 /* Start the search radius with the distance to the closest facility. */
-			ActivityFacility closestFacility = qt.get(c.getX(), c.getY());
+			ActivityFacility closestFacility = qt.getClosest(c.getX(), c.getY());
 			
 			double radius = CoordUtils.calcDistance(c, closestFacility.getCoord() );
-			Collection<ActivityFacility> facilities = qt.get(c.getX(), c.getY(), radius);
+			Collection<ActivityFacility> facilities = qt.getDisk(c.getX(), c.getY(), radius);
 			while(facilities.size() < number){
 				/* Double the radius. If the radius happens to be zero (0), 
 				 * then you stand the chance of running into an infinite loop.
 				 * Hence, add a minimum of 1m to move on. */
 				radius += Math.max(radius, 1.0);
-				facilities = qt.get(c.getX(), c.getY(), radius);
+				facilities = qt.getDisk(c.getX(), c.getY(), radius);
 			}
 			facilitiesToRank = facilities;
 		} else{

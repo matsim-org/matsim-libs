@@ -80,11 +80,11 @@ public class WarmEmissionHandler implements LinkEnterEventHandler,LinkLeaveEvent
 	}
 
 	public void handleEvent(LinkEnterEvent event) {
-		this.linkenter.put(event.getPersonId(), event.getTime());
+		this.linkenter.put(event.getDriverId(), event.getTime());
 	}
 
 	public void handleEvent(LinkLeaveEvent event) {
-		Id personId= event.getPersonId();
+		Id personId= event.getDriverId();
 		Id linkId = event.getLinkId();
 		Double leaveTime = event.getTime();
 		LinkImpl link = (LinkImpl) this.network.getLinks().get(linkId);
@@ -102,7 +102,7 @@ public class WarmEmissionHandler implements LinkEnterEventHandler,LinkLeaveEvent
 		Double enterTime = 0.0;
 		Double travelTime = 0.0;
 
-		if(this.linkenter.containsKey(event.getPersonId())){
+		if(this.linkenter.containsKey(event.getDriverId())){
 			enterTime = this.linkenter.get(personId);
 			if (this.agentarrival.containsKey(personId)){
 				double arrivalTime = this.agentarrival.get(personId);		

@@ -1,6 +1,6 @@
 package playground.sergioo.visualizer2D2012;
 
-import org.apache.commons.math.geometry.Vector3D;
+import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 
 public class Camera3DOrtho extends Camera2D implements Camera3D {
 	

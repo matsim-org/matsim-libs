@@ -20,11 +20,11 @@
 package playground.johannes.gsv.synPop.invermo;
 
 import com.google.code.geocoder.model.LatLng;
-import playground.johannes.synpop.processing.PersonTask;
-import playground.johannes.socialnetworks.survey.ivt2009.util.GoogleGeoCoder;
+import playground.johannes.studies.sbsurvey.util.GoogleGeoCoder;
 import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.Episode;
 import playground.johannes.synpop.data.Person;
+import playground.johannes.synpop.processing.PersonTask;
 
 import java.io.*;
 import java.util.HashMap;

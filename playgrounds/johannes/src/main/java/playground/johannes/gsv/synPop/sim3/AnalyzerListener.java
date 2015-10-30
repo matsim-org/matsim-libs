@@ -22,9 +22,9 @@ package playground.johannes.gsv.synPop.sim3;
 import playground.johannes.gsv.synPop.analysis.AnalyzerTask;
 import playground.johannes.gsv.synPop.analysis.LegGeoDistanceTask;
 import playground.johannes.gsv.synPop.analysis.ProxyAnalyzer;
-import playground.johannes.gsv.synPop.data.DataPool;
 import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.gis.DataPool;
 
 import java.io.File;
 import java.io.IOException;

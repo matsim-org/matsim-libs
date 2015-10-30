@@ -18,44 +18,40 @@
  * *********************************************************************** */
 package playground.johannes.gsv.synPop.mid;
 
-import playground.johannes.synpop.data.CommonKeys;
-import playground.johannes.synpop.processing.EpisodeTask;
+import org.apache.commons.math.FunctionEvaluationException;
+import org.apache.commons.math.analysis.UnivariateRealFunction;
 import playground.johannes.synpop.data.Attributable;
+import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.processing.EpisodeTask;
 
 /**
  * @author jillenberger
  */
 public class Route2GeoDistance implements EpisodeTask {
 
-    private double min = 0.5;
+    private UnivariateRealFunction function;
 
-    private double A = 4;
-
-    private double alpha = -0.5;
-
-    public Route2GeoDistance(double A, double alpha, double min) {
-        this.A = A;
-        this.alpha = alpha;
-        this.min = min;
+    public Route2GeoDistance(UnivariateRealFunction function) {
+        this.function = function;
     }
 
     @Override
-    public void apply(Episode plan) {
-        for(Attributable leg : plan.getLegs()) {
+    public void apply(Episode episode) {
+        for(Attributable leg : episode.getLegs()) {
             String routeDist = leg.getAttribute(CommonKeys.LEG_ROUTE_DISTANCE);
             if(routeDist != null) {
                 double rDist = Double.parseDouble(routeDist);
-                rDist = rDist / 1000.0;
 
-                double factor = 1 - A * Math.pow(rDist, alpha);
-                factor = Math.max(min, factor);
-
-                double gDist = rDist * factor * 1000.0;
+                double gDist = 0;
+                try {
+                    gDist = function.value(rDist);
+                } catch (FunctionEvaluationException e) {
+                    e.printStackTrace();
+                }
 
                 leg.setAttribute(CommonKeys.LEG_GEO_DISTANCE, String.valueOf(gDist));
             }
         }
-
     }
 }

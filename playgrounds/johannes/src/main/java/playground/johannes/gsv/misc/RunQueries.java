@@ -19,8 +19,6 @@
 
 package playground.johannes.gsv.misc;
 
-import java.io.IOException;
-
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
 import org.basex.core.cmd.XQuery;
@@ -30,6 +28,8 @@ import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
 import org.basex.query.iter.Iter;
 import org.basex.query.value.item.Item;
+
+import java.io.IOException;
 
 /**
  * This example demonstrates three variants how XQuery expressions can be

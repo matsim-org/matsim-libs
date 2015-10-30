@@ -24,6 +24,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
@@ -31,7 +32,7 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.filter.NetworkFilterManager;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -53,7 +54,7 @@ public class TtSimSimTrafficAnalyser {
 	private static final Logger log = Logger.getLogger(TtSimSimTrafficAnalyser.class);
 	
 	private Network loadNetwork(String networkFile){
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		
 		new MatsimNetworkReader(scenario).readFile(networkFile);
 		return scenario.getNetwork();
@@ -88,10 +89,10 @@ public class TtSimSimTrafficAnalyser {
 		Network filteredNetwork = this.applyNetworkFilter(network, networkSrs);
 		
 		SimSimAnalysis countsAnalysis = new SimSimAnalysis();
-		Map<Id, List<CountSimComparison>> countSimLinkLeaveCompMap = countsAnalysis.createCountSimComparisonByLinkId(filteredNetwork, vaCounts, vaSim);
+		Map<Id<Link>, List<CountSimComparison>> countSimLinkLeaveCompMap = countsAnalysis.createCountSimComparisonByLinkId(filteredNetwork, vaCounts, vaSim);
 		
-		Map<Id, Double> delayPerLink1 = calculateDelay(network, eventsFileCounts).getDelayPerLink();
-		Map<Id, Double> delayPerLink2 = calculateDelay(network, eventsFileSim).getDelayPerLink();
+		Map<Id<Link>, Double> delayPerLink1 = calculateDelay(network, eventsFileCounts).getDelayPerLink();
+		Map<Id<Link>, Double> delayPerLink2 = calculateDelay(network, eventsFileSim).getDelayPerLink();
 		
 		new SimSimMorningShapefileWriter(filteredNetwork, networkSrs).writeShape(outfile + ".shp", countSimLinkLeaveCompMap, delayPerLink1, delayPerLink2);
 	}

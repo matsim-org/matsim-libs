@@ -105,10 +105,10 @@ public class GainsAnalysis implements LinkLeaveEventHandler{
 			if (this.strategy == Strategy.sp) {
 				AgentInfo ai = new AgentInfo();
 				ai.spTime = event.getTime();
-				ai.id = event.getPersonId();
+				ai.id = event.getDriverId();
 				this.infos.put(ai.id, ai);
 			} else {
-				AgentInfo ai = this.infos.get(event.getPersonId());
+				AgentInfo ai = this.infos.get(event.getDriverId());
 				if (ai == null) {
 					return;
 				}
@@ -116,7 +116,7 @@ public class GainsAnalysis implements LinkLeaveEventHandler{
 					ai.neTime = event.getTime();
 				} else if (this.strategy == Strategy.so) {
 					if (ai.neTime == -1){// || ai.neTime < event.getTime()) {
-						this.infos.remove(event.getPersonId());
+						this.infos.remove(event.getDriverId());
 						return;
 					}
 					ai.soTime = event.getTime();

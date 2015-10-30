@@ -49,11 +49,10 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterProviderImpl;
-import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
+import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.facilities.ActivityFacilities;
@@ -131,7 +130,7 @@ public class InsertParkingActivitiesTest extends MatsimTestCase {
 
 		TravelTime travelTime = TravelTimeCalculator.create(sc.getNetwork(), sc.getConfig().travelTimeCalculator()).getLinkTravelTimes() ;
 		
-		TripRouter tripRouter = new TripRouterProviderImpl(sc, new TravelTimeAndDistanceBasedTravelDisutilityFactory(), travelTime, new DijkstraFactory(), null).get();
+		TripRouter tripRouter = TripRouterFactoryBuilderWithDefaults.createTripRouterProvider(sc, new DijkstraFactory(), null).get();
 		
 		// initialize routes
 		new PersonPrepareForSim(new PlanRouter(tripRouter), sc).run(sc.getPopulation());
@@ -143,7 +142,7 @@ public class InsertParkingActivitiesTest extends MatsimTestCase {
 		parkingTypes.put("streetParking", streetParking);
 		parkingTypes.put("garageParking", garageParking);
 		
-		for (ActivityFacility facility : ((ScenarioImpl) sc).getActivityFacilities().getFacilities().values()) {
+		for (ActivityFacility facility : ((MutableScenario) sc).getActivityFacilities().getFacilities().values()) {
 			// if the facility offers a parking activity
 			if (facility.getActivityOptions().containsKey("parking")) {
 				if (MatsimRandom.getRandom().nextBoolean()){

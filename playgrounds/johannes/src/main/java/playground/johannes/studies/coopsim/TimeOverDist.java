@@ -19,17 +19,17 @@
  * *********************************************************************** */
 package playground.johannes.studies.coopsim;
 
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.Point;
 import gnu.trove.TDoubleDoubleHashMap;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.common.gis.CartesianDistanceCalculator;
+import org.matsim.contrib.common.gis.DistanceCalculator;
+import org.matsim.contrib.common.gis.EsriShapeIO;
+import org.matsim.contrib.common.stats.StatsWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReader;
 import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup;
@@ -39,19 +39,16 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.vehicles.Vehicle;
+import playground.johannes.coopsim.utils.MatsimCoordUtils;
 
-import playground.johannes.coopsim.util.MatsimCoordUtils;
-import playground.johannes.sna.util.TXTWriter;
-import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
-import playground.johannes.socialnetworks.gis.DistanceCalculator;
-import playground.johannes.socialnetworks.gis.io.FeatureSHP;
-
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.Point;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 /**
  * @author illenberger
@@ -69,7 +66,7 @@ public class TimeOverDist {
 		ConfigReader creader = new ConfigReader(config);
 		creader.readFile("/Users/jillenberger/Work/socialnets/locationChoice/config.xml");
 
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		MatsimNetworkReader netReader = new MatsimNetworkReader(scenario);
 		netReader.readFile(config.getParam("network", "inputNetworkFile"));
 		Network network = scenario.getNetwork();
@@ -105,7 +102,7 @@ public class TimeOverDist {
 		// travelTime);
 		AStarLandmarksFactory factory = new AStarLandmarksFactory(network, travelMinCost);
 		LeastCostPathCalculator router = factory.createPathCalculator(network, travelCost, travelTime);
-		Geometry g = (Geometry) FeatureSHP.readFeatures("/Users/jillenberger/Work/socialnets/data/schweiz/complete/zones/G1L08.shp").iterator().next().getDefaultGeometry();
+		Geometry g = (Geometry) EsriShapeIO.readFeatures("/Users/jillenberger/Work/socialnets/data/schweiz/complete/zones/G1L08.shp").iterator().next().getDefaultGeometry();
 
 		TDoubleDoubleHashMap hist = new TDoubleDoubleHashMap();
 		DistanceCalculator calc = new CartesianDistanceCalculator();
@@ -136,7 +133,7 @@ public class TimeOverDist {
 				System.out.println("Calulated " + i + " routes.");
 		}
 
-		TXTWriter.writeMap(hist, "d", "t", "/Users/jillenberger/Work/socialnets/locationChoice/analysis/tt-vs-d.5.txt");
+		StatsWriter.writeHistogram(hist, "d", "t", "/Users/jillenberger/Work/socialnets/locationChoice/analysis/tt-vs-d.5.txt");
 	}
 
 }

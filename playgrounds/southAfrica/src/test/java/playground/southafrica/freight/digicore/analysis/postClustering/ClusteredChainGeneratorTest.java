@@ -30,7 +30,7 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.facilities.ActivityFacilities;
@@ -75,7 +75,7 @@ public class ClusteredChainGeneratorTest{
 		Assert.assertTrue("Facility file does not exist.", facilityFile.exists());
 		
 		/* Check facilities. */
-		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		FacilitiesReaderMatsimV1 fr = new FacilitiesReaderMatsimV1(sc);
 		fr.parse(utils.getClassInputDirectory() + "facilities.xml");
 		ActivityFacilities afs = sc.getActivityFacilities();
@@ -125,10 +125,10 @@ public class ClusteredChainGeneratorTest{
 			Assert.fail("Should not catch an IOException.");
 		}
 		
-		Assert.assertEquals("Wrong number of facilities in QT.", 3, qt.get(3, 3, 10).size());
-		Assert.assertEquals("Wrong facility", Id.create("f1", Facility.class), qt.get(0, 6).getId());
-		Assert.assertEquals("Wrong facility", Id.create("f2", Facility.class), qt.get(6, 0).getId());
-		Assert.assertEquals("Wrong facility", Id.create("f3", Facility.class), qt.get(5, 6).getId());
+		Assert.assertEquals("Wrong number of facilities in QT.", 3, qt.getDisk(3, 3, 10).size());
+		Assert.assertEquals("Wrong facility", Id.create("f1", Facility.class), qt.getClosest(0, 6).getId());
+		Assert.assertEquals("Wrong facility", Id.create("f2", Facility.class), qt.getClosest(6, 0).getId());
+		Assert.assertEquals("Wrong facility", Id.create("f3", Facility.class), qt.getClosest(5, 6).getId());
 	}
 	
 	@Test

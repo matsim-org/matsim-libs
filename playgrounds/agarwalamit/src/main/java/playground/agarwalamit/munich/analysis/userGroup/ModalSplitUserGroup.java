@@ -44,8 +44,8 @@ public class ModalSplitUserGroup {
 
 	public static void main(String[] args) {
 		
-		String outputDir = "../../../repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run10/policies/";/*"./output/run2/";*/
-		String [] runCases = {"bau","ei","ci","eci","10ei"};
+		String outputDir = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/otherRuns/output/1pct/run10/policies/backcasting/exposure/";
+		String [] runCases =  {"ExI","5ExI","10ExI","15ExI","20ExI","25ExI"};
 		
 		for(String runCase :runCases){
 			ModalSplitUserGroup msUG = new ModalSplitUserGroup();

@@ -185,7 +185,7 @@ public class SampleEvents {
 
 		@Override
 	public void handleEvent(LinkEnterEvent event) {
-			Id personId = event.getPersonId();
+			Id personId = event.getDriverId();
 
 			if (ignorePersonsSet.contains(personId)) {
 				return;
@@ -200,7 +200,7 @@ public class SampleEvents {
 
 		@Override
 	public void handleEvent(LinkLeaveEvent event) {
-			Id personId = event.getPersonId();
+			Id personId = event.getDriverId();
 
 			if (ignorePersonsSet.contains(personId)) {
 				return;

@@ -22,6 +22,11 @@
  */
 package playground.johannes.gsv.demand;
 
+import com.vividsolutions.jts.geom.Geometry;
+import org.matsim.contrib.common.gis.EsriShapeIO;
+import org.matsim.contrib.socnetgen.sna.gis.Zone;
+import org.opengis.feature.simple.SimpleFeature;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -29,13 +34,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
-
-import org.opengis.feature.simple.SimpleFeature;
-
-import playground.johannes.sna.gis.Zone;
-import playground.johannes.socialnetworks.gis.io.FeatureSHP;
-
-import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * @author johannes
@@ -65,7 +63,7 @@ public class NutsLevel3Zones {
 		if(zonesFile == null && idMappingsFile == null)
 			throw new RuntimeException("File names not set.");
 		
-		Set<SimpleFeature> features = FeatureSHP.readFeatures(zonesFile);
+		Set<SimpleFeature> features = EsriShapeIO.readFeatures(zonesFile);
 		Map<String, SimpleFeature> featureMap = new HashMap<String, SimpleFeature>(features.size());
 		for(SimpleFeature fearure : features) {
 			String code = (String)fearure.getAttribute("NUTS3_CODE");

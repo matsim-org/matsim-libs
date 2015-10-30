@@ -34,7 +34,7 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import java.util.LinkedList;
@@ -59,7 +59,7 @@ public class PlansGeneratorControler extends Controler {
 	private Population generate4wPersons(){
 
 		int numberOfPlans = 1;
-		Population pop = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
+		Population pop = ((MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
 		log.info("  generating plans... ");
 
 		for (int i = 0; i < 314; i++) {
@@ -123,7 +123,7 @@ public class PlansGeneratorControler extends Controler {
 		final int agentsPerDest = 1;
 		int numberOfPlans = 1;
 
-		Population pop = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
+		Population pop = ((MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
 		log.info("  generating plans... ");
 
 		LinkedList <Link> fromLinks = new LinkedList<Link>();

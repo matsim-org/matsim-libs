@@ -67,7 +67,7 @@ public class NetBlackboard extends javax.swing.JPanel {
 	/**
 	 * The counts for validation
 	 */
-	protected Counts counts;
+	protected Counts<Link> counts;
 	/**
 	 * The bounding box of the network
 	 */
@@ -197,7 +197,7 @@ public class NetBlackboard extends javax.swing.JPanel {
 	 * Initialize the counts variable
 	 */
 	public void initCounts() {
-		counts = new Counts();
+		counts = new Counts<Link>();
 		Calendar cal = Calendar.getInstance();
 		counts.setYear(cal.get(Calendar.YEAR));
 		if(net != null)
@@ -694,8 +694,8 @@ public class NetBlackboard extends javax.swing.JPanel {
 	 * @return Count the CS created. If this CS already exists (at the given
 	 *         lik) a null value is returned.
 	 */
-	public Count addCountingStation(Link link, String stationName) {
-		Count c = counts.createAndAddCount(link.getId(), stationName);
+	public Count<Link> addCountingStation(Link link, String stationName) {
+		Count<Link> c = counts.createAndAddCount(link.getId(), stationName);
 		return c;
 	}
 
@@ -704,7 +704,7 @@ public class NetBlackboard extends javax.swing.JPanel {
 	 * @param link
 	 * @return A Count object. Null if there is no such CS
 	 */
-	public Count getCountingStation(Link link) {
+	public Count<Link> getCountingStation(Link link) {
 		return counts.getCount(link.getId());
 	}
 
@@ -718,7 +718,7 @@ public class NetBlackboard extends javax.swing.JPanel {
 	public boolean addCount(Link link, int h, double volumen) {
 		if(h < 1 || h > 24)
 			return false;
-		Count c = counts.getCount(link.getId());
+		Count<Link> c = counts.getCount(link.getId());
 		if(c == null)
 			return false;
 		if(c.getVolume(h)==null) {
@@ -736,7 +736,7 @@ public class NetBlackboard extends javax.swing.JPanel {
 	 * @return true if the count exists and it was succesfully modified
 	 */
 	public boolean editCount(Link link, int h, double volumen) {
-		Count c = counts.getCount(link.getId());
+		Count<Link> c = counts.getCount(link.getId());
 		if(c == null)
 			return false;
 		if(c.getVolume(h)==null)
@@ -753,7 +753,7 @@ public class NetBlackboard extends javax.swing.JPanel {
 	 *         no such hour in the Counting Station.
 	 */
 	public boolean deleteCount(Link link, int h) {
-		Count c = counts.getCount(link.getId());
+		Count<Link> c = counts.getCount(link.getId());
 		if(c == null)
 			return false;
 		if(c.getVolume(h) == null)

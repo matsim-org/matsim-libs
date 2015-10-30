@@ -34,6 +34,7 @@ import playground.dhosse.gap.scenario.mid.MiDPersonGroupTemplates;
 import playground.dhosse.gap.scenario.mid.MiDSurveyPerson;
 import playground.dhosse.gap.scenario.population.io.CommuterDataElement;
 import playground.dhosse.gap.scenario.population.io.CommuterFileReader;
+import playground.dhosse.gap.scenario.population.utils.EgapPopulationUtils;
 import playground.dhosse.utils.EgapHashGenerator;
 
 public class PlansCreator {
@@ -96,7 +97,7 @@ public class PlansCreator {
 	private static void createPersonsWithDemographicData(Scenario scenario, Map<String, CommuterDataElement> relations){
 		
 		MiDCSVReader reader = new MiDCSVReader();
-		reader.read(Global.matsimInputDir + "MID_Daten_mit_Wegeketten/travelsurvey_m.csv");
+//		reader.read(Global.matsimInputDir + "MID_Daten_mit_Wegeketten/travelsurvey_m.csv");
 		Map<String, MiDSurveyPerson> persons = reader.getPersons();
 		
 		MiDPersonGroupTemplates templates = new MiDPersonGroupTemplates();
@@ -307,7 +308,7 @@ public class PlansCreator {
 						
 						if(hasLicense){
 							
-							GAPScenarioBuilder.getSubpopulationAttributes().putAttribute(person.getId().toString(), Global.CARSHARING, Global.CAR_OPTION);
+							GAPScenarioBuilder.getSubpopulationAttributes().putAttribute(person.getId().toString(), Global.USER_GROUP, Global.LICENSE_OWNER);
 							
 							if(carAvail){
 								
@@ -374,7 +375,7 @@ public class PlansCreator {
 		if(fromId.length() < 8 && !fromId.contains("A")){
 			
 			Coord c = Global.UTM32NtoGK4.transform(homeCoord);
-			Geometry nearestToHome = GAPScenarioBuilder.getBuiltAreaQT().get(c.getX(), c.getY());
+			Geometry nearestToHome = GAPScenarioBuilder.getBuiltAreaQT().getClosest(c.getX(), c.getY());
 			homeCoord = Global.gk4ToUTM32N.transform(shoot(nearestToHome));
 			
 		}
@@ -382,10 +383,10 @@ public class PlansCreator {
 		if(toId.length() < 8 && !toId.contains("A")){
 			
 			Coord c = Global.UTM32NtoGK4.transform(workCoord);
-			Geometry nearestToWork = GAPScenarioBuilder.getBuiltAreaQT().get(c.getX(), c.getY());
+			Geometry nearestToWork = GAPScenarioBuilder.getBuiltAreaQT().getClosest(c.getX(), c.getY());
 			workCoord = Global.gk4ToUTM32N.transform(shoot(nearestToWork));
 			if(toId.startsWith("09180")){
-				workCoord = GAPScenarioBuilder.getWorkLocations().get(workCoord.getX(), workCoord.getY()).getCoord();
+				workCoord = GAPScenarioBuilder.getWorkLocations().getClosest(workCoord.getX(), workCoord.getY()).getCoord();
 			}
 			
 		}
@@ -500,7 +501,7 @@ public class PlansCreator {
 					
 						if(hasLicense){
 							
-							GAPScenarioBuilder.getSubpopulationAttributes().putAttribute(person.getId().toString(), Global.CARSHARING, Global.CAR_OPTION);
+							GAPScenarioBuilder.getSubpopulationAttributes().putAttribute(person.getId().toString(), Global.USER_GROUP, Global.LICENSE_OWNER);
 							
 							if(carAvail){
 								
@@ -563,7 +564,7 @@ public class PlansCreator {
 					if(fromId.length() < 8 && !fromId.contains("A")){
 						
 						Coord c = Global.UTM32NtoGK4.transform(homeCoord);
-						Geometry nearestToHome = GAPScenarioBuilder.getBuiltAreaQT().get(c.getX(), c.getY());
+						Geometry nearestToHome = GAPScenarioBuilder.getBuiltAreaQT().getClosest(c.getX(), c.getY());
 						homeCoord = Global.gk4ToUTM32N.transform(shoot(nearestToHome));
 						
 					}
@@ -571,10 +572,10 @@ public class PlansCreator {
 					if(toId.length() < 8 && !toId.contains("A")){
 						
 						Coord c = Global.UTM32NtoGK4.transform(workCoord);
-						Geometry nearestToWork = GAPScenarioBuilder.getBuiltAreaQT().get(c.getX(), c.getY());
+						Geometry nearestToWork = GAPScenarioBuilder.getBuiltAreaQT().getClosest(c.getX(), c.getY());
 						workCoord = Global.gk4ToUTM32N.transform(shoot(nearestToWork));
 						if(toId.startsWith("09180")){
-							workCoord = GAPScenarioBuilder.getWorkLocations().get(workCoord.getX(), workCoord.getY()).getCoord();
+							workCoord = GAPScenarioBuilder.getWorkLocations().getClosest(workCoord.getX(), workCoord.getY()).getCoord();
 						}
 						
 					}
@@ -657,7 +658,7 @@ public class PlansCreator {
 								c = new Coord(lastAct.getCoord().getX() + x, lastAct.getCoord().getY() + y);
 								
 								c = Global.UTM32NtoGK4.transform(c);
-								Geometry nearest = GAPScenarioBuilder.getBuiltAreaQT().get(c.getX(), c.getY());
+								Geometry nearest = GAPScenarioBuilder.getBuiltAreaQT().getClosest(c.getX(), c.getY());
 								c = Global.gk4ToUTM32N.transform(shoot(nearest));
 								
 							} else if(type.equals(Global.ActType.work.name())){
@@ -681,15 +682,15 @@ public class PlansCreator {
 									
 									if(type.equals(Global.ActType.education.name())){
 										
-										facility = GAPScenarioBuilder.getEducationQT().get(lastAct.getCoord().getX() + x, lastAct.getCoord().getY() + y);
+										facility = GAPScenarioBuilder.getEducationQT().getClosest(lastAct.getCoord().getX() + x, lastAct.getCoord().getY() + y);
 										
 									} else if(type.equals(Global.ActType.shop.name())){
 										
-										facility = GAPScenarioBuilder.getShopQT().get(lastAct.getCoord().getX() + x, lastAct.getCoord().getY() + y);
+										facility = GAPScenarioBuilder.getShopQT().getClosest(lastAct.getCoord().getX() + x, lastAct.getCoord().getY() + y);
 										
 									} else if(type.equals(Global.ActType.leisure.name())){
 										
-										facility = GAPScenarioBuilder.getLeisureQT().get(lastAct.getCoord().getX() + x, lastAct.getCoord().getY() + y);
+										facility = GAPScenarioBuilder.getLeisureQT().getClosest(lastAct.getCoord().getX() + x, lastAct.getCoord().getY() + y);
 										
 									}
 									
@@ -807,7 +808,7 @@ public class PlansCreator {
 				
 				if(hasLicense){
 					
-					GAPScenarioBuilder.getSubpopulationAttributes().putAttribute(person.getId().toString(), Global.CARSHARING, Global.CAR_OPTION);
+					GAPScenarioBuilder.getSubpopulationAttributes().putAttribute(person.getId().toString(), Global.USER_GROUP, Global.LICENSE_OWNER);
 					
 					if(carAvail){
 						
@@ -922,12 +923,12 @@ public class PlansCreator {
 								
 								if(type.equals(Global.ActType.work.name())){
 									
-									c = GAPScenarioBuilder.getWorkLocations().get(c.getX(), c.getY()).getCoord();
+									c = GAPScenarioBuilder.getWorkLocations().getClosest(c.getX(), c.getY()).getCoord();
 									
 								} else{
 									
 									c = Global.UTM32NtoGK4.transform(c);
-									Geometry nearest = GAPScenarioBuilder.getBuiltAreaQT().get(c.getX(), c.getY());
+									Geometry nearest = GAPScenarioBuilder.getBuiltAreaQT().getClosest(c.getX(), c.getY());
 									c = Global.gk4ToUTM32N.transform(shoot(nearest));
 									
 								}
@@ -948,15 +949,15 @@ public class PlansCreator {
 									
 									if(type.equals(Global.ActType.education.name())){
 										
-										facility = GAPScenarioBuilder.getEducationQT().get(lastAct.getCoord().getX() + x, lastAct.getCoord().getY() + y);
+										facility = GAPScenarioBuilder.getEducationQT().getClosest(lastAct.getCoord().getX() + x, lastAct.getCoord().getY() + y);
 										
 									} else if(type.equals(Global.ActType.shop.name())){
 										
-										facility = GAPScenarioBuilder.getShopQT().get(lastAct.getCoord().getX() + x, lastAct.getCoord().getY() + y);
+										facility = GAPScenarioBuilder.getShopQT().getClosest(lastAct.getCoord().getX() + x, lastAct.getCoord().getY() + y);
 										
 									} else if(type.equals(Global.ActType.leisure.name())){
 										
-										facility = GAPScenarioBuilder.getLeisureQT().get(lastAct.getCoord().getX() + x, lastAct.getCoord().getY() + y);
+										facility = GAPScenarioBuilder.getLeisureQT().getClosest(lastAct.getCoord().getX() + x, lastAct.getCoord().getY() + y);
 										
 									}
 									

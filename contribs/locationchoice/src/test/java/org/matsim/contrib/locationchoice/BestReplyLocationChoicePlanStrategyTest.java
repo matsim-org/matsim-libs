@@ -23,6 +23,7 @@ package org.matsim.contrib.locationchoice;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.router.*;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
@@ -32,6 +33,8 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.testcases.MatsimTestUtils;
+
+import javax.inject.Provider;
 
 public class BestReplyLocationChoicePlanStrategyTest {
 	
@@ -72,11 +75,11 @@ public class BestReplyLocationChoicePlanStrategyTest {
 		private final TravelTime travelTime;
 		private final TravelDisutility travelDisutility;
 		private final ScoringFunctionFactory scoringFunctionFactory;
-		private final TripRouterFactory tripRouterFactory;
+		private final Provider<TripRouter> tripRouterFactory;
 		
 		public ReplanningContextImpl(Scenario scenario) {
 			this.travelTime = new FreeSpeedTravelTime();
-			this.travelDisutility = new RandomizingTimeDistanceTravelDisutility.Builder().createTravelDisutility(this.travelTime, scenario.getConfig().planCalcScore());
+			this.travelDisutility = new RandomizingTimeDistanceTravelDisutility.Builder( TransportMode.car ).createTravelDisutility(this.travelTime, scenario.getConfig().planCalcScore());
 			this.scoringFunctionFactory = new CharyparNagelScoringFunctionFactory( scenario );
 			this.tripRouterFactory = new TripRouterFactoryBuilderWithDefaults().build(scenario);
 		}
@@ -103,7 +106,7 @@ public class BestReplyLocationChoicePlanStrategyTest {
 
 		@Override
 		public TripRouter getTripRouter() {
-			return this.tripRouterFactory.instantiateAndConfigureTripRouter(new RoutingContextImpl(travelDisutility, travelTime));
+			return this.tripRouterFactory.get();
 		}
 	}
 }

@@ -102,7 +102,7 @@ public class PersonSetHomeLoc extends AbstractPersonAlgorithm implements PlanAlg
 	public void run(Person person) {
 		Integer p_id = Integer.valueOf(person.getId().toString());
 		Coord coord = persons.getPerson(p_id).getHousehold().getCoord();
-		ActivityFacility f = this.homeFacQuadTree.get(coord.getX(),coord.getY());
+		ActivityFacility f = this.homeFacQuadTree.getClosest(coord.getX(), coord.getY());
 		Plan plan = person.getSelectedPlan();
 		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof ActivityImpl) {

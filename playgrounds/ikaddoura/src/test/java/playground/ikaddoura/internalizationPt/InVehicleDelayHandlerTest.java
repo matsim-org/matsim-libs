@@ -38,7 +38,7 @@ import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.MatsimTestUtils;
@@ -71,7 +71,7 @@ public class InVehicleDelayHandlerTest extends MatsimTestCase {
 		System.out.println("############################################################################################################");
 		
 		Config config = ConfigUtils.createConfig();
-		ScenarioImpl scenario = (ScenarioImpl)(ScenarioUtils.createScenario(config));
+		MutableScenario scenario = (MutableScenario)(ScenarioUtils.createScenario(config));
 		EventsManager events = EventsUtils.createEventsManager();
 		config.transit().setUseTransit(true);
 		new VehicleReaderV1(scenario.getTransitVehicles()).readFile(this.getClassInputDirectory() + "vehicles.xml");
@@ -217,7 +217,7 @@ public class InVehicleDelayHandlerTest extends MatsimTestCase {
 			System.out.println("############################################################################################################");
 			
 			Config config = ConfigUtils.createConfig();;
-			ScenarioImpl scenario = (ScenarioImpl)(ScenarioUtils.createScenario(config));
+			MutableScenario scenario = (MutableScenario)(ScenarioUtils.createScenario(config));
 			EventsManager events = EventsUtils.createEventsManager();
 			config.transit().setUseTransit(true);
 			new VehicleReaderV1(scenario.getTransitVehicles()).readFile(this.getClassInputDirectory() + "vehicles.xml");

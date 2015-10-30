@@ -19,9 +19,9 @@
  * *********************************************************************** */
 package playground.johannes.coopsim.mental.planmod.concurrent;
 
-import java.util.concurrent.ThreadFactory;
-
 import playground.johannes.coopsim.mental.planmod.Choice2ModAdaptorFactory;
+
+import java.util.concurrent.ThreadFactory;
 
 /**
  * @author illenberger

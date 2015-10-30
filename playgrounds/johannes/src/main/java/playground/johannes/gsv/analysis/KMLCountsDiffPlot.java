@@ -24,38 +24,28 @@ package playground.johannes.gsv.analysis;
 
 import gnu.trove.TDoubleObjectHashMap;
 import gnu.trove.TObjectDoubleHashMap;
-
-import java.awt.Color;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
-import net.opengis.kml._2.DocumentType;
-import net.opengis.kml._2.FolderType;
-import net.opengis.kml._2.KmlType;
-import net.opengis.kml._2.LineStringType;
-import net.opengis.kml._2.LineStyleType;
-import net.opengis.kml._2.ObjectFactory;
-import net.opengis.kml._2.PlacemarkType;
-import net.opengis.kml._2.StyleType;
-
+import net.opengis.kml._2.*;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.contrib.common.gis.CRSUtils;
+import org.matsim.contrib.common.stats.LinearDiscretizer;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.io.Colorizable;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.io.NumericAttributeColorizer;
 import org.matsim.vis.kml.KMZWriter;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 
-import playground.johannes.sna.gis.CRSUtils;
-import playground.johannes.sna.graph.spatial.io.Colorizable;
-import playground.johannes.sna.math.LinearDiscretizer;
-import playground.johannes.socialnetworks.graph.spatial.io.NumericAttributeColorizer;
+import java.awt.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author johannes
@@ -268,7 +258,7 @@ public class KMLCountsDiffPlot {
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see playground.johannes.socialnetworks.graph.spatial.io.
+		 * @see org.matsim.contrib.socnetgen.socialnetworks.graph.spatial.io.
 		 * NumericAttributeColorizer#getValue(java.lang.Object)
 		 */
 		@Override

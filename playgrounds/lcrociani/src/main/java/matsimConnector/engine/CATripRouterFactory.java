@@ -7,9 +7,7 @@ import matsimConnector.utility.Constants;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControlerConfigGroup;
-import org.matsim.core.router.RoutingContext;
 import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.DefaultRoutingModules;
 import org.matsim.core.router.old.NetworkLegRouter;
@@ -22,7 +20,9 @@ import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 
 import pedCA.output.Log;
 
-public class CATripRouterFactory implements TripRouterFactory{
+import javax.inject.Provider;
+
+public class CATripRouterFactory implements Provider<TripRouter>{
 	private Scenario scenario;
 	private LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
 

@@ -45,7 +45,7 @@ import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.core.population.*;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestCase;
@@ -64,7 +64,7 @@ public class QSimIntegrationTest extends MatsimTestCase {
 	public void testFreespeed() {
 		Config config = loadConfig(null);
 		config.network().setTimeVariantNetwork(true);
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 
 		NetworkImpl network = createNetwork(scenario);
 		Link link1 = network.getLinks().get(Id.create("1", Link.class));
@@ -109,7 +109,7 @@ public class QSimIntegrationTest extends MatsimTestCase {
 
 		Config config = loadConfig(null);
 		config.network().setTimeVariantNetwork(true);
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 
 		NetworkImpl network = createNetwork(scenario);
 		Link link1 = network.getLinks().get(Id.create("1", Link.class));
@@ -177,7 +177,7 @@ public class QSimIntegrationTest extends MatsimTestCase {
 		config.qsim().setStartTime(0.0);
 		final double simEndTime = 7200.0;
 		config.qsim().setEndTime(simEndTime);
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 
 		NetworkImpl network = createNetwork(scenario);
 		final Id<Link> id1 = Id.create("1", Link.class);
@@ -251,7 +251,7 @@ public class QSimIntegrationTest extends MatsimTestCase {
 	 * @return a network.
 	 * @author illenberger
 	 */
-	private NetworkImpl createNetwork(ScenarioImpl scenario) {
+	private NetworkImpl createNetwork(MutableScenario scenario) {
 		// create a network
 		NetworkFactoryImpl nf = (NetworkFactoryImpl) scenario.getNetwork().getFactory();
 		nf.setLinkFactory(new TimeVariantLinkFactory());
@@ -330,9 +330,9 @@ public class QSimIntegrationTest extends MatsimTestCase {
 			if (!event.getLinkId().equals(this.linkId)) {
 				return;
 			}
-			if (event.getPersonId().equals(this.person1.getId())) {
+			if (event.getDriverId().equals(this.person1.getId())) {
 				this.person1enterTime = event.getTime();
-			} else if (event.getPersonId().equals(this.person2.getId())) {
+			} else if (event.getDriverId().equals(this.person2.getId())) {
 				this.person2enterTime = event.getTime();
 			}
 		}
@@ -342,9 +342,9 @@ public class QSimIntegrationTest extends MatsimTestCase {
 			if (!event.getLinkId().equals(this.linkId)) {
 				return;
 			}
-			if (event.getPersonId().equals(this.person1.getId())) {
+			if (event.getDriverId().equals(this.person1.getId())) {
 				this.person1leaveTime = event.getTime();
-			} else if (event.getPersonId().equals(this.person2.getId())) {
+			} else if (event.getDriverId().equals(this.person2.getId())) {
 				this.person2leaveTime = event.getTime();
 			}
 		}

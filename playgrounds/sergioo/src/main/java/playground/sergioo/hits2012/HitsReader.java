@@ -2,12 +2,7 @@ package playground.sergioo.hits2012;
 
 /*import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;*/
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.ObjectInputStream;
+import java.io.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
@@ -21,6 +16,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Coord;
 
+import org.matsim.core.utils.io.IOUtils;
 import playground.sergioo.hits2012.Person.Day;
 import playground.sergioo.hits2012.Person.IncomeInterval;
 import playground.sergioo.hits2012.Trip.Purpose;
@@ -40,7 +36,7 @@ public class HitsReader {
 	private final static Map<String, String> purposesMap = new HashMap<String, String>();
 	
 	public static void main(String[] args) throws IOException, ParseException {
-		Map<String, Household> households = readHits(args[0]);
+		Map<String, Household> households = readHits(args[0], args[1]);
 		System.out.println("Households: "+households.size());
 		int numPersons = 0;
 		for(Household household:households.values())
@@ -89,7 +85,7 @@ public class HitsReader {
 		printWriter.close();
 	}*/
 	
-	private static void init() {
+	private static void init(String locationsFile) {
 		placeTypesMap.put("Place of worship", Trip.PlaceType.TEMPLE.text);
 		placeTypesMap.put("Government related buildings", Trip.PlaceType.GOVERMENT.text);
 		placeTypesMap.put("Petrol station", Trip.PlaceType.PETROL.text);
@@ -133,21 +129,25 @@ public class HitsReader {
 		purposesMap.put("Professional Driver", Trip.Purpose.DRIVE.text);
 		purposesMap.put("Religious related matters", Trip.Purpose.RELIGION.text);
 		try {
-			ObjectInputStream ois = new ObjectInputStream(new FileInputStream(Location.SINGAPORE_COORDS_FILE));
-			Location.SINGAPORE_COORDS_MAP = (Map<String, Coord>) ois.readObject();
-			ois.close();
+			BufferedReader reader = IOUtils.getBufferedReader(locationsFile);
+			Location.SINGAPORE_COORDS_MAP = new HashMap<>();
+			String line = reader.readLine();
+			while(line != null){
+				String[] split = line.split(",");
+				Location.SINGAPORE_COORDS_MAP.put(split[0], new Coord(Double.parseDouble(split[1]),Double.parseDouble(split[2])));
+				line = reader.readLine();
+			}
+			reader.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
 		}
 	}
-	public static Map<String, Household> readHits(String fileName) throws IOException, NumberFormatException, ParseException {
-		init();
+	public static Map<String, Household> readHits(String hitsDataFile, String locationsFile) throws IOException, NumberFormatException, ParseException {
+		init(locationsFile);
 		Map<String, Household> households = new HashMap<String, Household>();
-		BufferedReader reader = new BufferedReader(new FileReader(fileName));
+		BufferedReader reader = new BufferedReader(new FileReader(hitsDataFile));
 		reader.readLine();
 		String line = reader.readLine();
 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MMM-yy");

@@ -19,33 +19,29 @@
  * *********************************************************************** */
 package playground.johannes.coopsim;
 
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.contrib.common.util.LoggerUtils;
+import org.matsim.contrib.socnetgen.sna.graph.social.SocialGraph;
+import org.matsim.contrib.socnetgen.sna.graph.social.SocialVertex;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.events.EventsUtils;
+import org.matsim.core.utils.collections.Tuple;
+import playground.johannes.coopsim.analysis.TrajectoryAnalyzer;
+import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTask;
+import playground.johannes.coopsim.eval.*;
+import playground.johannes.coopsim.mental.MentalEngine;
+import playground.johannes.coopsim.pysical.PhysicalEngine;
+import playground.johannes.coopsim.pysical.Trajectory;
+import playground.johannes.coopsim.pysical.TrajectoryEventsBuilder;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.events.EventsUtils;
-import org.matsim.core.utils.collections.Tuple;
-
-import playground.johannes.coopsim.analysis.TrajectoryAnalyzer;
-import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTask;
-import playground.johannes.coopsim.eval.ActivityEvaluator;
-import playground.johannes.coopsim.eval.ActivityTypeEvaluator;
-import playground.johannes.coopsim.eval.EvalEngine;
-import playground.johannes.coopsim.eval.JointActivityEvaluator2;
-import playground.johannes.coopsim.eval.LegEvaluator;
-import playground.johannes.coopsim.mental.MentalEngine;
-import playground.johannes.coopsim.pysical.PhysicalEngine;
-import playground.johannes.coopsim.pysical.Trajectory;
-import playground.johannes.coopsim.pysical.TrajectoryEventsBuilder;
-import playground.johannes.socialnetworks.graph.social.SocialGraph;
-import playground.johannes.socialnetworks.graph.social.SocialVertex;
 
 /**
  * @author illenberger

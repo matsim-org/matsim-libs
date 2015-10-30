@@ -54,9 +54,7 @@ import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
-import org.matsim.core.router.RoutingContext;
-import org.matsim.core.router.RoutingContextImpl;
-import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
@@ -782,7 +780,7 @@ public final class MarathonRunner implements StartupListener,
 		TravelDisutilityFactory costFactory = new OnlyTimeDependentTravelDisutilityFactory();
 		TravelDisutilityFactory penaltyCostFactory = new PenaltyTravelCostFactory(costFactory, coordAnalyzer);
 
-		TripRouterFactory tripRouterFactory = new MultimodalTripRouterFactory(this.scenario, travelTimes, penaltyCostFactory);
+		Provider<TripRouter> tripRouterFactory = new MultimodalTripRouterFactory(this.scenario, travelTimes, penaltyCostFactory);
 		this.withinDayControlerListener.setWithinDayTripRouterFactory(tripRouterFactory);
 
 		TravelDisutility travelDisutility = penaltyCostFactory.createTravelDisutility(this.withinDayControlerListener.getTravelTimeCollector(), 

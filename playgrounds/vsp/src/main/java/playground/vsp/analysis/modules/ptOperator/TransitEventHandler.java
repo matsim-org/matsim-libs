@@ -82,7 +82,7 @@ public class TransitEventHandler implements TransitDriverStartsEventHandler, Lin
 	
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		Id personId = event.getPersonId();
+		Id personId = event.getDriverId();
 		if (this.ptDriverIdAnalyzer.isPtDriver(personId)){
 			System.out.println(network.toString()); 
 			try {

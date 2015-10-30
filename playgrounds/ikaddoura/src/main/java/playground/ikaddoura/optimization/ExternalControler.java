@@ -37,7 +37,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.TransitScheduleWriterV1;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -234,7 +234,7 @@ class ExternalControler {
 	
 	private void runInternalIteration(int iterationCounter, int demand, double headway, int capacity, double fare) throws IOException {
 
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.loadConfig(configFile));
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.loadConfig(configFile));
 
 		String directoryIt = outputPath + "/extITERS/" + iterationCounter;
 

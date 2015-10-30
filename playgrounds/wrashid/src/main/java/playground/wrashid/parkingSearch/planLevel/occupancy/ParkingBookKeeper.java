@@ -83,7 +83,7 @@ public class ParkingBookKeeper implements ActivityStartEventHandler, ActivityEnd
 	public void performScoring() {
 		
 		// controler.getEvents().processEvent(new AgentMoneyEventImpl(3600.0,
-		// event.getPersonId(), 3.4));
+		// event.getDriverId(), 3.4));
 		
 		// code snipet for adding scores:
 		// events.processEvent(new AgentMoneyEvent(3600.0, person, 3.4));

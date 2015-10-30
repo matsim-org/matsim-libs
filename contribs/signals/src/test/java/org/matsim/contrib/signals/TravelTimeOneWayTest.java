@@ -22,9 +22,8 @@ package org.matsim.contrib.signals;
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.Assert;
-
 import org.apache.log4j.Logger;
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -52,7 +51,7 @@ import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.data.v11.LaneDefinitonsV11ToV20Converter;
 import org.matsim.testcases.MatsimTestUtils;
@@ -102,7 +101,7 @@ public class TravelTimeOneWayTest {
 		signalsConfig.setSignalControlFile(signalControlFile);
 		signalsConfig.setAmberTimesFile(amberTimesFile);
 		
-		ScenarioImpl data = (ScenarioImpl) ScenarioUtils.loadScenario(conf);
+		MutableScenario data = (MutableScenario) ScenarioUtils.loadScenario(conf);
 		data.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsScenarioLoader(signalsConfig).loadSignalsData());
 		return data;
 	}
@@ -114,7 +113,7 @@ public class TravelTimeOneWayTest {
 		return engine;
 	}
 
-	private void runTrafficLightIntersection2arms_w_TrafficLight_0_60(ScenarioImpl scenario){
+	private void runTrafficLightIntersection2arms_w_TrafficLight_0_60(MutableScenario scenario){
 		EventsManager events = EventsUtils.createEventsManager();
 		
 		final List<Event> eventslist = new ArrayList<Event>();
@@ -149,8 +148,8 @@ public class TravelTimeOneWayTest {
 //		signalPlan.setOffset( 3 );
 //		signalSetting.setOnset( 0 );
 		
-//		for (int dropping = 10; dropping <= circulationTime; dropping++) {
-		for (int dropping = 50; dropping <= circulationTime; dropping++) {
+		for (int dropping = 10; dropping <= circulationTime; dropping++) {
+//		for (int dropping = 50; dropping <= circulationTime; dropping++) {
 			eventHandler.reset(1);
 
 			signalSetting.setDropping(dropping);
@@ -168,15 +167,15 @@ public class TravelTimeOneWayTest {
 			log.debug("circulationTime: " + circulationTime);
 			log.debug("dropping  : " + dropping);
 
-//			if (WRITE_EVENTS) {
-//				EventWriterXML eventWriter = new EventWriterXML(
-//						testUtils.getOutputDirectory() + "events_" + dropping
-//								+ "_before.xml");
-//				for (Event e : eventslist) {
-//					eventWriter.handleEvent(e);
-//				}
-//				eventWriter.closeFile();
-//			}
+			if (WRITE_EVENTS) {
+				EventWriterXML eventWriter = new EventWriterXML(
+						testUtils.getOutputDirectory() + "events_" + dropping
+								+ "_before.xml");
+				for (Event e : eventslist) {
+					eventWriter.handleEvent(e);
+				}
+				eventWriter.closeFile();
+			}
 			
 			Assert.assertEquals((dropping * linkCapacity / circulationTime),
 					eventHandler.beginningOfLink2.numberOfVehPassedDuringTimeToMeasure, 1.0);
@@ -193,10 +192,10 @@ public class TravelTimeOneWayTest {
 	 */
 	@Test
 	public void testTrafficLightIntersection2arms_w_TrafficLight_0_60() {
-		ScenarioImpl scenario = (ScenarioImpl) this.loadScenario(false);
+		MutableScenario scenario = (MutableScenario) this.loadScenario(false);
 		this.runTrafficLightIntersection2arms_w_TrafficLight_0_60(scenario);
 		
-		scenario = (ScenarioImpl) this.loadScenario(true);
+		scenario = (MutableScenario) this.loadScenario(true);
 		this.runTrafficLightIntersection2arms_w_TrafficLight_0_60(scenario);
 	}
 

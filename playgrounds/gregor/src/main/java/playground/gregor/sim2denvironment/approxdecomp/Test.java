@@ -179,8 +179,8 @@ public class Test {
 				Coordinate c1 = dec.p.getExteriorRing().getCoordinates()[idx1];
 				Set<PolygonInfo> s0 = new HashSet<PolygonInfo>();
 				Set<PolygonInfo> s1 = new HashSet<PolygonInfo>();
-				quad.get(c0.x, c0.y, c0.x, c0.y, s0);
-				quad.get(c1.x, c1.y, c1.x, c1.y, s1);
+				quad.getRectangle(c0.x, c0.y, c0.x, c0.y, s0);
+				quad.getRectangle(c1.x, c1.y, c1.x, c1.y, s1);
 				for (PolygonInfo pi : s0) {
 					if (pi == dec || !s1.contains(pi)) {
 						continue;

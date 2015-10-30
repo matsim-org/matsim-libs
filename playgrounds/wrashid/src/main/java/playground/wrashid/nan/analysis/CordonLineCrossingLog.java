@@ -16,7 +16,7 @@ import org.matsim.contrib.parking.lib.obj.list.Lists;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 
 
 public class CordonLineCrossingLog {
@@ -28,7 +28,7 @@ public class CordonLineCrossingLog {
 		String facilititiesPath=basePath + "output_facilities.xml.gz";
 		String eventsFileName = basePath + "ITERS/it.50/50.events.txt.gz";
 		
-		ScenarioImpl scenario = (ScenarioImpl) GeneralLib.readScenario(plansFile, networkFile, facilititiesPath);
+		MutableScenario scenario = (MutableScenario) GeneralLib.readScenario(plansFile, networkFile, facilititiesPath);
 		
 		EventsManager eventsManager = (EventsManager) EventsUtils.createEventsManager();
 
@@ -45,14 +45,14 @@ public class CordonLineCrossingLog {
 	private static class CordonVolumeCounter implements LinkEnterEventHandler, PersonDepartureEventHandler {
 
 		IntegerValueHashMap<Id> currentLegIndex=new IntegerValueHashMap<Id>(-1);
-		private ScenarioImpl scenarioImpl;
+		private MutableScenario scenarioImpl;
 		public LinkedList<Double> cordonLeavingTimes=new LinkedList<Double>();
 		public LinkedList<Double> cordonEnteringTimes=new LinkedList<Double>();
 		HashMap<Id, Integer> lastLegIndexRegisteredForCrossing=new HashMap<Id, Integer>();
 		HashMap<Id, Coord> previousLinkCoordinate=new HashMap<Id, Coord>();
 		
 
-		public CordonVolumeCounter(ScenarioImpl scenario) {
+		public CordonVolumeCounter(MutableScenario scenario) {
 			this.scenarioImpl = scenario;
 		}
 
@@ -64,7 +64,7 @@ public class CordonLineCrossingLog {
 
 		@Override
 		public void handleEvent(LinkEnterEvent event) {
-			Id personId = event.getPersonId();
+			Id personId = event.getDriverId();
 			Coord prevLink=previousLinkCoordinate.get(personId);
 			Coord curLink=getLinkCoordinate(event.getLinkId());
 			

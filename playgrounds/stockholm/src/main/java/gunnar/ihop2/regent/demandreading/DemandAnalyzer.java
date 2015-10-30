@@ -1,5 +1,11 @@
 package gunnar.ihop2.regent.demandreading;
 
+import static gunnar.ihop2.regent.demandreading.RegentPopulationReader.CAR_ATTRIBUTEVALUE;
+import static gunnar.ihop2.regent.demandreading.RegentPopulationReader.OTHERTOURMODE_ATTRIBUTE;
+import static gunnar.ihop2.regent.demandreading.RegentPopulationReader.OTHERZONE_ATTRIBUTE;
+import static gunnar.ihop2.regent.demandreading.RegentPopulationReader.WORKTOURMODE_ATTRIBUTE;
+import static gunnar.ihop2.regent.demandreading.RegentPopulationReader.WORKZONE_ATTRIBUTE;
+
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -12,7 +18,7 @@ public class DemandAnalyzer {
 	public DemandAnalyzer() {
 	}
 
-	static void run(final String demandFile) {
+	public static void run(final String demandFile) {
 
 		final ObjectAttributes personAttributes = new ObjectAttributes();
 		(new ObjectAttributesXmlReader(personAttributes)).parse(demandFile);
@@ -27,36 +33,60 @@ public class DemandAnalyzer {
 				+ ObjectAttributeUtils2.allAttributeKeys(personAttributes));
 		System.out.println();
 
-		final Set<String> birthyears = new LinkedHashSet<String>();
-		final Set<String> sexes = new LinkedHashSet<String>();
-		final Set<String> incomes = new LinkedHashSet<String>();
-		final Set<String> housingtypes = new LinkedHashSet<String>();
-		final Set<String> homezones = new LinkedHashSet<String>();
-		final Set<String> workzones = new LinkedHashSet<String>();
-		final Set<String> otherzones = new LinkedHashSet<String>();
-		final Set<String> worktourmodes = new LinkedHashSet<String>();
-		final Set<String> othertourmodes = new LinkedHashSet<String>();
+		final Set birthyears = new LinkedHashSet();
+		final Set sexes = new LinkedHashSet();
+		final Set incomes = new LinkedHashSet();
+		final Set housingtypes = new LinkedHashSet();
+		final Set homezones = new LinkedHashSet();
+		final Set workzones = new LinkedHashSet();
+		final Set otherzones = new LinkedHashSet();
+		final Set worktourmodes = new LinkedHashSet();
+		final Set othertourmodes = new LinkedHashSet();
+
+		int workTourCnt = 0;
+		int workTourByCarCnt = 0;
+		int otherTourCnt = 0;
+		int otherTourByCarCnt = 0;
 
 		for (String personId : ObjectAttributeUtils2
 				.allObjectKeys(personAttributes)) {
-			birthyears.add((String) personAttributes.getAttribute(personId,
+			birthyears.add(personAttributes.getAttribute(personId,
 					RegentPopulationReader.BIRTHYEAR_ATTRIBUTE));
-			sexes.add((String) personAttributes.getAttribute(personId,
+			sexes.add(personAttributes.getAttribute(personId,
 					RegentPopulationReader.SEX_ATTRIBUTE));
-			incomes.add((String) personAttributes.getAttribute(personId,
+			incomes.add(personAttributes.getAttribute(personId,
 					RegentPopulationReader.INCOME_ATTRIBUTE));
-			housingtypes.add((String) personAttributes.getAttribute(personId,
+			housingtypes.add(personAttributes.getAttribute(personId,
 					RegentPopulationReader.HOUSINGTYPE_ATTRIBUTE));
-			homezones.add((String) personAttributes.getAttribute(personId,
+			homezones.add(personAttributes.getAttribute(personId,
 					RegentPopulationReader.HOMEZONE_ATTRIBUTE));
-			workzones.add((String) personAttributes.getAttribute(personId,
+			workzones.add(personAttributes.getAttribute(personId,
 					RegentPopulationReader.WORKZONE_ATTRIBUTE));
-			otherzones.add((String) personAttributes.getAttribute(personId,
+			otherzones.add(personAttributes.getAttribute(personId,
 					RegentPopulationReader.OTHERZONE_ATTRIBUTE));
-			worktourmodes.add((String) personAttributes.getAttribute(personId,
+			worktourmodes.add(personAttributes.getAttribute(personId,
 					RegentPopulationReader.WORKTOURMODE_ATTRIBUTE));
-			othertourmodes.add((String) personAttributes.getAttribute(personId,
+			othertourmodes.add(personAttributes.getAttribute(personId,
 					RegentPopulationReader.OTHERTOURMODE_ATTRIBUTE));
+
+			if (personAttributes.getAttribute(personId, WORKZONE_ATTRIBUTE) != null
+					&& !"0".equals(personAttributes.getAttribute(personId,
+							WORKZONE_ATTRIBUTE))) {
+				workTourCnt++;
+				if (CAR_ATTRIBUTEVALUE.equals(personAttributes.getAttribute(
+						personId, WORKTOURMODE_ATTRIBUTE))) {
+					workTourByCarCnt++;
+				}
+			}
+			if (personAttributes.getAttribute(personId, OTHERZONE_ATTRIBUTE) != null
+					&& !"0".equals(personAttributes.getAttribute(personId,
+							OTHERZONE_ATTRIBUTE))) {
+				otherTourCnt++;
+				if (CAR_ATTRIBUTEVALUE.equals(personAttributes.getAttribute(
+						personId, OTHERTOURMODE_ATTRIBUTE))) {
+					otherTourByCarCnt++;
+				}
+			}
 		}
 
 		System.out.println(birthyears.size() + " distinct birthyears");
@@ -68,13 +98,21 @@ public class DemandAnalyzer {
 		System.out.println(otherzones.size() + " distinct otherzones");
 		System.out.println("worktourmodes: " + worktourmodes);
 		System.out.println("othertourmodes: " + othertourmodes);
-		System.out.println(homezones);
+		System.out.println("homezones  = " + homezones);
+		System.out.println("workzones  = " + workzones);
+		System.out.println("otherzones = " + otherzones);
+		System.out.println("total number of work tours by car: "
+				+ workTourByCarCnt);
+		System.out.println("total number of other tours by car: "
+				+ otherTourByCarCnt);
+		System.out.println("total number of work tours: " + workTourCnt);
+		System.out.println("total number of other tours: " + otherTourCnt);
 
 	}
 
 	public static void main(String[] args) {
 
-		run("./data/synthetic_population/trips.xml");
+		run("./test/regentmatsim/exchange/trips.xml");
 
 	}
 

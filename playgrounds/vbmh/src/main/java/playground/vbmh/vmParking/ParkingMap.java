@@ -112,7 +112,7 @@ public class ParkingMap {
 
 	
 	public Collection<Parking> getPublicParkings(double x, double y, double radius){
-		return publicParktTree.get(x, y, radius);
+		return publicParktTree.getDisk(x, y, radius);
 	}
 
 	public Parking getParkingById(int id){
