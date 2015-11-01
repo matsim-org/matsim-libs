@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,       *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,26 +16,25 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.johannes.gsv.popsim.analysis;
 
-package playground.johannes.gsv.popsim;
-
-import playground.johannes.gsv.popsim.analysis.Predicate;
-import playground.johannes.synpop.data.CommonKeys;
-import playground.johannes.synpop.data.Segment;
+import playground.johannes.synpop.data.Attributable;
 
 /**
- * @author johannes
+ * @author jillenberger
  */
-public class ActTypePredicate implements Predicate<Segment> {
+public class NumericAttributeProvider<A extends Attributable> implements ValueProvider<Double, A> {
 
-    private final String type;
+    private final String key;
 
-    public ActTypePredicate(String type) {
-        this.type = type;
+    public NumericAttributeProvider(String key) {
+        this.key = key;
     }
 
     @Override
-    public boolean test(Segment segment) {
-        return type.equalsIgnoreCase(segment.getAttribute(CommonKeys.ACTIVITY_TYPE));
+    public Double get(A object) {
+        String value = object.getAttribute(key);
+        if (value != null) return new Double(value);
+        else return null;
     }
 }

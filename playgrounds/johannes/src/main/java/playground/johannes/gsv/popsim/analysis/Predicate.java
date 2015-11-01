@@ -17,26 +17,12 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.popsim;
-
-import playground.johannes.synpop.data.Segment;
+package playground.johannes.gsv.popsim.analysis;
 
 /**
  * @author johannes
  */
-public class LegDoubleCollector extends LegCollector {
+public interface Predicate<T> {
 
-    private final String attKey;
-
-    public LegDoubleCollector(String attKey) {
-        this.attKey = attKey;
-    }
-
-    @Override
-    protected Double value(Segment leg) {
-        String str = leg.getAttribute(attKey);
-        if(str != null) {
-            return new Double(str);
-        } else return null;
-    }
+    boolean test(T t);
 }

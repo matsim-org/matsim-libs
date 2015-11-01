@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,       *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,26 +16,38 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.johannes.gsv.popsim.analysis;
 
-package playground.johannes.gsv.popsim;
-
-import playground.johannes.gsv.popsim.analysis.Predicate;
 import playground.johannes.synpop.data.CommonKeys;
+import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.data.Segment;
 
+import java.util.Collection;
+import java.util.Map;
+
 /**
- * @author johannes
+ * @author jillenberger
  */
-public class ActTypePredicate implements Predicate<Segment> {
+public class GeoDistanceBuilder {
 
-    private final String type;
+    private Map<String, Predicate<Segment>> predicates;
 
-    public ActTypePredicate(String type) {
-        this.type = type;
-    }
+    AnalyzerTask<Collection<? extends Person>> build() {
 
-    @Override
-    public boolean test(Segment segment) {
-        return type.equalsIgnoreCase(segment.getAttribute(CommonKeys.ACTIVITY_TYPE));
+        AnalyzerTaskComposite<Collection<? extends Person>> composite = new AnalyzerTaskComposite<>();
+
+        for(Map.Entry<String, Predicate<Segment>> entry : predicates.entrySet()) {
+            ValueProvider<Double, Segment> getter = new NumericAttributeProvider(CommonKeys.LEG_GEO_DISTANCE);
+            LegCollector<Double> collector = new LegCollector<>(getter);
+            collector.setPredicate(entry.getValue());
+
+            String name = String.format("%s.%s", CommonKeys.LEG_GEO_DISTANCE, entry.getKey());
+            NumericAnalyzer analyzer = new NumericAnalyzer(collector, name);
+
+            composite.addComponent(analyzer);
+
+        }
+
+        return composite;
     }
 }

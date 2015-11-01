@@ -18,30 +18,18 @@
  * *********************************************************************** */
 package playground.johannes.gsv.popsim.analysis;
 
-import playground.johannes.gsv.popsim.Predicate;
-import playground.johannes.gsv.popsim.Predicates;
-import playground.johannes.synpop.data.Person;
-import playground.johannes.synpop.data.Segment;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-
 /**
  * @author jillenberger
  */
-public class LegAttributeAnalyzer extends AbstractAnalyzerTask<Collection<? extends Person>> {
+public class FileIOContext {
 
-    private final String attKey;
+    private String path;
 
-    public LegAttributeAnalyzer(String attKey) {
-        this.attKey = attKey;
+    public String getPath() {
+        return path;
     }
 
-    @Override
-    public void analyze(Collection<? extends Person> persons, List<StatsContainer> containers) {
-        Map<String, Predicate<Segment>> predicates = Predicates.legPredicates(persons);
-
-
+    public void setPath(String path) {
+        this.path = path;
     }
 }

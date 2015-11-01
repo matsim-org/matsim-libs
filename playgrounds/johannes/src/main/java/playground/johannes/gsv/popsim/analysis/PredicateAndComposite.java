@@ -17,24 +17,24 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.popsim;
+package playground.johannes.gsv.popsim.analysis;
 
-import playground.johannes.synpop.data.CommonKeys;
-import playground.johannes.synpop.data.Segment;
+import org.matsim.contrib.common.collections.Composite;
+import playground.johannes.synpop.data.Attributable;
 
 /**
  * @author johannes
  */
-public class ModePredicate implements Predicate<Segment> {
-
-    private final String mode;
-
-    public ModePredicate(String mode) {
-        this.mode = mode;
-    }
+public class PredicateAndComposite<T extends Attributable> extends Composite<Predicate<T>> implements Predicate<T> {
 
     @Override
-    public boolean test(Segment segment) {
-        return mode.equalsIgnoreCase(segment.getAttribute(CommonKeys.LEG_MODE));
+    public boolean test(T attributable) {
+        for(Predicate<T> p : components) {
+            if(!p.test(attributable)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

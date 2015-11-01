@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,       *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,26 +16,21 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.johannes.gsv.popsim.analysis;
 
-package playground.johannes.gsv.popsim;
+import org.matsim.contrib.common.collections.Composite;
 
-import playground.johannes.gsv.popsim.analysis.Predicate;
-import playground.johannes.synpop.data.CommonKeys;
-import playground.johannes.synpop.data.Segment;
+import java.util.List;
 
 /**
- * @author johannes
+ * @author jillenberger
  */
-public class ActTypePredicate implements Predicate<Segment> {
-
-    private final String type;
-
-    public ActTypePredicate(String type) {
-        this.type = type;
-    }
+public class AnalyzerTaskComposite<T> extends Composite<AnalyzerTask<T>> implements AnalyzerTask<T> {
 
     @Override
-    public boolean test(Segment segment) {
-        return type.equalsIgnoreCase(segment.getAttribute(CommonKeys.ACTIVITY_TYPE));
+    public void analyze(T object, List<StatsContainer> containers) {
+        for(AnalyzerTask<T> task : components) {
+            task.analyze(object, containers);
+        }
     }
 }
