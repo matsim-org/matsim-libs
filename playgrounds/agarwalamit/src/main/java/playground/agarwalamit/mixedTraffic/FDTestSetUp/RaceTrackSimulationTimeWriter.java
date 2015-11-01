@@ -29,7 +29,7 @@ import org.matsim.core.gbl.MatsimRandom;
 
 public class RaceTrackSimulationTimeWriter {
 
-	private final int [] randomNumbers = {4711/*, 6835, 1847, 4144, 4628, 2632, 5982, 3218, 5736, 7573,4389, 1344*/} ;
+	private final int [] randomNumbers = {4711, 6835, 1847, 4144, 4628, 2632, 5982, 3218, 5736, 7573,4389, 1344} ;
 	private final String outputFolder = "../../../../repos/shared-svn/projects/mixedTraffic/triangularNetwork/run312";
 
 	public static void main(String[] args) {
@@ -132,7 +132,7 @@ public class RaceTrackSimulationTimeWriter {
 			generateFDData.run();
 			double endTime = System.currentTimeMillis();
 
-			if(i>0 ) { // avoid two initial runs
+			if(i>1 ) { // avoid two initial runs
 				simulationTime = simulationTime.concat( String.valueOf(endTime - startTime) + "\t");
 			}
 		}
