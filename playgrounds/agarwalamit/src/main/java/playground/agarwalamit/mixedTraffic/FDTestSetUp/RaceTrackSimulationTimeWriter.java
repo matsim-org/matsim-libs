@@ -30,16 +30,24 @@ import org.matsim.core.gbl.MatsimRandom;
 public class RaceTrackSimulationTimeWriter {
 
 	private final int [] randomNumbers = {4711, 6835, 1847, 4144, 4628, 2632, 5982, 3218, 5736, 7573,4389, 1344} ;
-	private final String outputFolder = "../../../../repos/shared-svn/projects/mixedTraffic/triangularNetwork/run312";
-
+	private static String outputFolder = "./output/";
+	
 	public static void main(String[] args) {
+		
+		boolean isUsingCluster = false;
+		if (args.length != 0) isUsingCluster = true;
 
-
+		if ( isUsingCluster ) {
+			outputFolder = args[0];
+		} else {
+			outputFolder = "../../../../repos/shared-svn/projects/mixedTraffic/triangularNetwork/run312";
+		}
+		
 		RaceTrackSimulationTimeWriter rtstw = new RaceTrackSimulationTimeWriter();
 
 		PrintStream writer;
 		try {
-			writer = new PrintStream(rtstw.outputFolder+"/simTime.txt");
+			writer = new PrintStream(outputFolder+"/simTime.txt");
 			writer.print("scenario \t simTime \n");
 		} catch (Exception e) {
 			throw new RuntimeException("Data is not written. Reason : "+e);
