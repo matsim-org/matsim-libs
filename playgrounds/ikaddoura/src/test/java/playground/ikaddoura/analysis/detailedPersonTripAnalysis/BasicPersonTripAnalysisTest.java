@@ -100,7 +100,6 @@ public class BasicPersonTripAnalysisTest {
 	 *  2.Person: 1 trips
 	 *  3.Person: activity "home" ends and activity "work" starts on the same link
 	 */
-	@Ignore //TODO
 	@Test
 	public void testVariousTripCounts() {
 		
@@ -133,10 +132,10 @@ public class BasicPersonTripAnalysisTest {
 		Assert.assertEquals("Unexpected tripDistance on trip 1 from Person 2: ", 0.0, 
 				basicHandler.getPersonId2tripNumber2tripDistance().get(Id.create(2, Person.class)).get(1), MatsimTestUtils.EPSILON);
 		
-//		Assert.assertEquals("Unexpected departureTime on trip 1 from Person 2: ", 30500.0, 
-//				basicHandler.getPersonId2tripNumber2departureTime().get(Id.create(2, Person.class)).get(1), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Unexpected departureTime on trip 1 from Person 2: ", 30500.0, 
+				basicHandler.getPersonId2tripNumber2departureTime().get(Id.create(2, Person.class)).get(1), MatsimTestUtils.EPSILON);
 //		TODO Why isn't this null? There is no PersonDepartureEvent. Is it Possible to have an Activity on the same link(like home-office)?
-		Assert.assertNull(basicHandler.getPersonId2tripNumber2departureTime().get(Id.create(2, Person.class)));
+//		Assert.assertNull(basicHandler.getPersonId2tripNumber2departureTime().get(Id.create(2, Person.class)));
 		Assert.assertNull(basicHandler.getPersonId2tripNumber2arrivalTime().get(Id.create(2, Person.class)));
 		
 		if (printResults) printResults(basicHandler, scenario);
