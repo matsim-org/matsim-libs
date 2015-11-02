@@ -437,11 +437,7 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 				legWalkEnd.setRoute(routeEnd);
 				trip.add( legWalkEnd );
 				
-				this.pickupStations.remove(this.pickupStations.size() - 1);
-				
-				
 			}
-			
 			
 		}
 		
@@ -680,8 +676,10 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 
 			if (((Leg)this.basicAgentDelegate.getNextPlanElement()).getMode().equals("walk_rb")) {
 				this.vehicleIdLocation.remove(currentLeg.getRoute().getStartLinkId());
-				this.carSharingVehicles.getTwoWayVehicles().addVehicle(scenario.getNetwork().getLinks().get(this.getDestinationLinkId()), 
+				this.carSharingVehicles.getTwoWayVehicles().addVehicle(this.pickupStations.get(this.pickupStations.size() - 1), 
 						twcsVehicleIDs.get(twcsVehicleIDs.size() - 1));
+				this.pickupStations.remove(this.pickupStations.size() - 1);
+
 				this.twcsVehicleIDs.remove(twcsVehicleIDs.size() - 1);
 			}
 		}
