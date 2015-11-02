@@ -72,8 +72,17 @@ public class TwoWayCarsharingVehicleLocation {
 					}
 					newvehIDs.add(0, id);
 					TwoWayCarsharingStation stationNew = new TwoWayCarsharingStation(link, station.getNumberOfVehicles() + 1, newvehIDs);		
-					vehicleLocationQuadTree.remove(link.getCoord().getX(), link.getCoord().getY(), station);
-					vehicleLocationQuadTree.put(link.getCoord().getX(), link.getCoord().getY(), stationNew);
+					if(!vehicleLocationQuadTree.remove(link.getCoord().getX(), link.getCoord().getY(), station)) {
+						
+						throw new NullPointerException("Removing the station on link id " + link.getId() + " did not work.");
+
+						
+					}
+					if(!vehicleLocationQuadTree.put(link.getCoord().getX(), link.getCoord().getY(), stationNew)) {
+						
+						throw new NullPointerException("Adding the station on link id " + link.getId() + " did not work.");
+
+					}
 					
 					return;
 					
@@ -110,7 +119,7 @@ public class TwoWayCarsharingVehicleLocation {
 			
 						
 			if (!vehicleLocationQuadTree.remove(station.getLink().getCoord().getX(), station.getLink().getCoord().getY(), station)) 
-				throw new NullPointerException("Removing the station did not work");
+				throw new NullPointerException("Removing the station on link id " + station.getLink().getId() + " did not work.");
 			vehicleLocationQuadTree.put(station.getLink().getCoord().getX(), station.getLink().getCoord().getY(), fNew);
 			
 		

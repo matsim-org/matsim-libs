@@ -446,7 +446,7 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 		}
 		
 		else {			
-			Log.info("person does not have a tw car: " + basicAgentDelegate.getPerson().getId());
+			//Log.info("person does not have a tw car: " + basicAgentDelegate.getPerson().getId());
 
 			final Leg legWalkEnd = new LegImpl( "walk_rb" );
 			//TODO: get end link from the station
