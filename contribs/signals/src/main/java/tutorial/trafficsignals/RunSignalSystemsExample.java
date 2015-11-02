@@ -81,8 +81,7 @@ public class RunSignalSystemsExample {
 		
 		//do it, do it, do it, now
 		c.getConfig().controler().setOverwriteFileSetting(
-				OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
-						OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+				OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		c.run();
 	}
 
