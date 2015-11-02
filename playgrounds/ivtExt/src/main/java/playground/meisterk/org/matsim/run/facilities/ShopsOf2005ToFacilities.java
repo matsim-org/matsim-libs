@@ -61,7 +61,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimResource;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
 import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03;
@@ -1449,7 +1449,7 @@ public class ShopsOf2005ToFacilities {
 
 	private static void shopsToTXT(Config config) {
 
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		ActivityFacilities shopsOf2005 = scenario.getActivityFacilities();
 		shopsOf2005.setName("shopsOf2005");
 		ArrayList<String> txtLines = new ArrayList<String>();
@@ -1606,7 +1606,7 @@ public class ShopsOf2005ToFacilities {
 
 		ActivityFacilities facilities = null;
 		for (int dataSetIndex : new int[]{SHOPS_OF_2005/*, SHOPS_FROM_ENTERPRISE_CENSUS*/}) {
-			ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+			MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 			facilities = scenario.getActivityFacilities();
 			facilities.setName(shopsNames.get(Integer.valueOf(dataSetIndex)));
 
@@ -1709,7 +1709,7 @@ public class ShopsOf2005ToFacilities {
 
 	private static void applyOpentimesToEnterpriseCensus(Config config) {
 
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		ActivityFacilities facilities_input = scenario.getActivityFacilities();
 		facilities_input.setName("Switzerland based on Enterprise census 2000.");
 

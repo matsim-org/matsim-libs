@@ -29,7 +29,7 @@ import org.apache.log4j.Logger;
 import org.matsim.contrib.otfvis.OTFVisModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
 
 /**
@@ -61,7 +61,7 @@ public class InternalizationPtControler {
 		Controler controler = new Controler(configFile);
 		controler.getConfig().controler().setOverwriteFileSetting(
 				OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
-		controler.addControlerListener(new InternalizationPtControlerListener( (ScenarioImpl) controler.getScenario()));
+		controler.addControlerListener(new InternalizationPtControlerListener( (MutableScenario) controler.getScenario()));
 		controler.addOverridingModule(new OTFVisModule());
 		controler.run();
 		

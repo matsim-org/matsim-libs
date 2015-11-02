@@ -11,7 +11,7 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.FacilitiesWriter;
@@ -107,7 +107,7 @@ public class Matsim4Urbansim {
 			oldPop=null ;
 		}
 
-		Population newPop = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
+		Population newPop = ((MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
 		// read urbansim persons.  Generates hwh acts as side effect
 		readFromUrbansim.readPersons( oldPop, newPop, facilities, network, samplingRate ) ;
 		oldPop=null ;
@@ -117,7 +117,7 @@ public class Matsim4Urbansim {
 
 		log.info("### DONE with demand generation from urbansim ###") ;
 
-		((ScenarioImpl) scenario).setPopulation(newPop);
+		((MutableScenario) scenario).setPopulation(newPop);
 		Controler controler = new Controler(scenario) ;
 		controler.getConfig().controler().setOverwriteFileSetting(
 				true ?

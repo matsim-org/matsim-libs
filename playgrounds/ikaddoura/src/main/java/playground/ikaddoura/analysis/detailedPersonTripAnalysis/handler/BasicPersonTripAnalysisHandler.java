@@ -77,7 +77,7 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 	private Map<Id<Person>,Map<Integer,Double>> personId2tripNumber2arrivalTime = new HashMap<>();
 	private Map<Id<Person>,Map<Integer,Double>> personId2tripNumber2travelTime = new HashMap<>();
 	private Map<Id<Person>,Map<Integer,Double>> personId2tripNumber2tripDistance = new HashMap<>();
-	private Map<Id<Person>,Map<Integer,Double>> personId2tripNumber2amount = new HashMap<>();
+	private Map<Id<Person>,Map<Integer,Double>> personId2tripNumber2payment = new HashMap<>();
 	private Map<Id<Person>,Map<Integer,Boolean>> personId2tripNumber2stuckAbort = new HashMap<>();
 	
 	private Map<Id<Person>, Double> personId2totalpayments = new HashMap <Id<Person>, Double>();
@@ -95,7 +95,7 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 		personId2tripNumber2arrivalTime.clear();
 		personId2tripNumber2tripDistance.clear();
 		personId2tripNumber2travelTime.clear();
-		personId2tripNumber2amount.clear();
+		personId2tripNumber2payment.clear();
 		personId2tripNumber2stuckAbort.clear();
 		personId2tripNumber2legMode.clear();
 		driverId2totalDistance.clear();
@@ -113,11 +113,11 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 		
 		int tripNumber = this.personId2currentTripNumber.get(event.getPersonId());
 				
-		double amountBefore = personId2tripNumber2amount.get(event.getPersonId()).get(tripNumber);
-		double updatedAmount = amountBefore + (-1. * event.getAmount());
-		Map<Integer,Double> tripNumber2amount = personId2tripNumber2amount.get(event.getPersonId());
-		tripNumber2amount.put(tripNumber, updatedAmount);
-		personId2tripNumber2amount.put(event.getPersonId(), tripNumber2amount);
+		double paymentBefore = personId2tripNumber2payment.get(event.getPersonId()).get(tripNumber);
+		double updatedPayment = paymentBefore + (-1. * event.getAmount());
+		Map<Integer,Double> tripNumber2payment = personId2tripNumber2payment.get(event.getPersonId());
+		tripNumber2payment.put(tripNumber, updatedPayment);
+		personId2tripNumber2payment.put(event.getPersonId(), tripNumber2payment);
 		
 		// person
 		
@@ -175,9 +175,9 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 				tripNumber2tripDistance.put(personId2currentTripNumber.get(event.getPersonId()), 0.0);
 				personId2tripNumber2tripDistance.put(event.getPersonId(), tripNumber2tripDistance);
 					
-				Map<Integer,Double> tripNumber2amount = personId2tripNumber2amount.get(event.getPersonId());
+				Map<Integer,Double> tripNumber2amount = personId2tripNumber2payment.get(event.getPersonId());
 				tripNumber2amount.put(personId2currentTripNumber.get(event.getPersonId()), 0.0);
-				personId2tripNumber2amount.put(event.getPersonId(), tripNumber2amount);
+				personId2tripNumber2payment.put(event.getPersonId(), tripNumber2amount);
 		
 			} else {
 				// the following trip is the person's first trip
@@ -193,7 +193,7 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 				
 				Map<Integer,Double> tripNumber2amount = new HashMap<Integer, Double>();
 				tripNumber2amount.put(1, 0.0);
-				personId2tripNumber2amount.put(event.getPersonId(), tripNumber2amount);
+				personId2tripNumber2payment.put(event.getPersonId(), tripNumber2amount);
 			}
 		}	
 	}
@@ -326,7 +326,7 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 		log.info("### Person is stucking. ###");
 		log.info(event.toString());
 		
-		if (this.scenario.getConfig().qsim().isRemoveStuckVehicles() || event.getTime() == 30 * 3600.) { // scenario end time
+		if (this.scenario.getConfig().qsim().isRemoveStuckVehicles() || event.getTime() == this.scenario.getConfig().qsim().getEndTime()) { // scenario end time
 			
 			log.warn("A person is stucking... This may affect the travel time calculation.");
 			
@@ -343,7 +343,7 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 			}
 									
 			double traveltime = 0.;
-			if (event.getTime() == 30 * 3600.) {
+			if (event.getTime() == this.scenario.getConfig().qsim().getEndTime()) {
 				log.warn("The stuck event is thrown at the end of the simulation. Computing the travel time for this trip as follows: simulation end time - trip departure time");
 				traveltime = event.getTime() - this.personId2tripNumber2departureTime.get(event.getPersonId()).get(currentTripNumber);
 			} else {
@@ -405,7 +405,7 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 	}
 
 	int n = 0;
-	public Map<Id<Person>, Map<Integer, Double>> getPersonId2tripNumber2amount() {
+	public Map<Id<Person>, Map<Integer, Double>> getPersonId2tripNumber2payment() {
 		
 		if (n == 0) {
 			log.warn("No guarantee that monetary payments are ascribed to the right trip (money events, i.e. tolls, may be charged after the person has started the next trip).");
@@ -413,7 +413,7 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 		}
 		n++;
 
-		return personId2tripNumber2amount;
+		return personId2tripNumber2payment;
 	}
 
 	public double getTotalPayments() {

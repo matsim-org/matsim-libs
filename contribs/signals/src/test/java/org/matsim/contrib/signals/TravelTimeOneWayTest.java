@@ -51,7 +51,7 @@ import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.data.v11.LaneDefinitonsV11ToV20Converter;
 import org.matsim.testcases.MatsimTestUtils;
@@ -101,7 +101,7 @@ public class TravelTimeOneWayTest {
 		signalsConfig.setSignalControlFile(signalControlFile);
 		signalsConfig.setAmberTimesFile(amberTimesFile);
 		
-		ScenarioImpl data = (ScenarioImpl) ScenarioUtils.loadScenario(conf);
+		MutableScenario data = (MutableScenario) ScenarioUtils.loadScenario(conf);
 		data.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsScenarioLoader(signalsConfig).loadSignalsData());
 		return data;
 	}
@@ -113,7 +113,7 @@ public class TravelTimeOneWayTest {
 		return engine;
 	}
 
-	private void runTrafficLightIntersection2arms_w_TrafficLight_0_60(ScenarioImpl scenario){
+	private void runTrafficLightIntersection2arms_w_TrafficLight_0_60(MutableScenario scenario){
 		EventsManager events = EventsUtils.createEventsManager();
 		
 		final List<Event> eventslist = new ArrayList<Event>();
@@ -192,10 +192,10 @@ public class TravelTimeOneWayTest {
 	 */
 	@Test
 	public void testTrafficLightIntersection2arms_w_TrafficLight_0_60() {
-		ScenarioImpl scenario = (ScenarioImpl) this.loadScenario(false);
+		MutableScenario scenario = (MutableScenario) this.loadScenario(false);
 		this.runTrafficLightIntersection2arms_w_TrafficLight_0_60(scenario);
 		
-		scenario = (ScenarioImpl) this.loadScenario(true);
+		scenario = (MutableScenario) this.loadScenario(true);
 		this.runTrafficLightIntersection2arms_w_TrafficLight_0_60(scenario);
 	}
 

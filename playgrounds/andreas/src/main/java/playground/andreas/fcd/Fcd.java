@@ -34,7 +34,7 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkTransform;
 import org.matsim.core.population.*;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -75,7 +75,7 @@ public class Fcd {
 	}
 	
 	public static Set<String> readFcdReturningLinkIdsUsed(String fcdNetInFile, String fcdEventsInFile, String outDir, String matsimNetwork, double minDistanceBetweenTwoActs){
-		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		NetworkReaderMatsimV1 reader = new NetworkReaderMatsimV1(sc);
 		reader.parse(matsimNetwork);
 		
@@ -98,7 +98,7 @@ public class Fcd {
 		String matsimNetwork = "D:\\Berlin\\DLR_FCD\\20110207_Analysis\\counts_network.xml";
 		String linksUsed = "D:\\Berlin\\DLR_FCD\\20110207_Analysis\\linksUsed.txt";
 		
-		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		NetworkReaderMatsimV1 reader = new NetworkReaderMatsimV1(sc);
 		reader.parse(matsimNetwork);
 		
@@ -128,7 +128,7 @@ public class Fcd {
 	private void writeSimplePlansFromEvents(String plansOutFile) {
 		log.info("Creating plans from fcd events...");
 		int numberOfPlans = 1;
-        ScenarioImpl sc = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig()));
+        MutableScenario sc = ((MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig()));
         Population pop = PopulationUtils.createPopulation(sc.getConfig(), sc.getNetwork());
 		
 		FcdEvent lastEvent = null;
@@ -166,7 +166,7 @@ public class Fcd {
 		
 		log.info("...done");
 		
-		PopulationWriter writer = new PopulationWriter(pop, ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getNetwork());
+		PopulationWriter writer = new PopulationWriter(pop, ((MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getNetwork());
 		writer.write(plansOutFile);
 		log.info(pop.getPersons().size() + " plans written to " + plansOutFile);
 	}
@@ -174,7 +174,7 @@ public class Fcd {
 	private void writeComplexPlansFromEvents(String plansOutFile, NetworkImpl net) {
 		log.info("Creating plans from fcd events...");
 		int numberOfPlans = 1;
-        ScenarioImpl sc = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig()));
+        MutableScenario sc = ((MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig()));
         Population pop = PopulationUtils.createPopulation(sc.getConfig(), sc.getNetwork());
 		
 		FcdEvent lastEvent = null;
@@ -237,7 +237,7 @@ public class Fcd {
 		
 		log.info("...done");
 		
-		PopulationWriter writer = new PopulationWriter(pop, ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getNetwork());
+		PopulationWriter writer = new PopulationWriter(pop, ((MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getNetwork());
 		writer.write(plansOutFile);
 		log.info(pop.getPersons().size() + " plans written to " + plansOutFile);
 	}

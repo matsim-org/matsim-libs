@@ -4,9 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import floetteroed.utilities.math.Histogram;
 import floetteroed.utilities.math.MathHelpers;
 
 /**
+ * TODO Synchronized everything to be on the safe side.
  *
  * @author Gunnar Flötteröd
  * 
@@ -16,17 +18,17 @@ public class MatrixUtils {
 	private MatrixUtils() {
 	}
 
-	public static Matrix newAnonymousMatrix() {
+	public static synchronized Matrix newAnonymousMatrix() {
 		return (new Matrices()).createMatrix("", "");
 	}
 
-	public static double get(final Matrix matrix, final String rowId,
+	public static synchronized double get(final Matrix matrix, final String rowId,
 			final String columnId) {
 		final Entry entry = matrix.getEntry(rowId, columnId);
 		return (entry != null ? entry.getValue() : 0.0);
 	}
 
-	public static void set(final Matrix matrix, final String rowId,
+	public static synchronized void set(final Matrix matrix, final String rowId,
 			final String columnId, final double value) {
 		final Entry entry = matrix.getEntry(rowId, columnId);
 		if (entry != null) {
@@ -36,17 +38,17 @@ public class MatrixUtils {
 		}
 	}
 
-	public static void add(final Matrix matrix, final String rowId,
+	public static synchronized void add(final Matrix matrix, final String rowId,
 			final String columnId, final double addend) {
 		set(matrix, rowId, columnId, get(matrix, rowId, columnId) + addend);
 	}
 
-	public static void inc(final Matrix matrix, final String rowId,
+	public static synchronized void inc(final Matrix matrix, final String rowId,
 			final String columnId) {
 		set(matrix, rowId, columnId, get(matrix, rowId, columnId) + 1.0);
 	}
 
-	public static void mult(final Matrix matrix, final double factor) {
+	public static synchronized void mult(final Matrix matrix, final double factor) {
 		for (List<Entry> row : matrix.getFromLocations().values()) {
 			for (Entry entry : row) {
 				entry.setValue(factor * entry.getValue());
@@ -54,7 +56,7 @@ public class MatrixUtils {
 		}
 	}
 
-	public static void add(final Matrix changedMatrix,
+	public static synchronized void add(final Matrix changedMatrix,
 			final Matrix addedMatrix, final double factor) {
 		for (Map.Entry<String, ArrayList<Entry>> addedRow : addedMatrix
 				.getFromLocations().entrySet()) {
@@ -67,7 +69,7 @@ public class MatrixUtils {
 		}
 	}
 
-	public static void divHadamard(final Matrix changedMatrix,
+	public static synchronized void divHadamard(final Matrix changedMatrix,
 			final Matrix factorMatrix) {
 		for (Map.Entry<String, ArrayList<Entry>> changedRow : changedMatrix
 				.getFromLocations().entrySet()) {
@@ -80,14 +82,14 @@ public class MatrixUtils {
 		}
 	}
 
-	public static void round(final Matrix matrix, final int digits) {
+	public static synchronized void round(final Matrix matrix, final int digits) {
 		for (ArrayList<Entry> row : matrix.getFromLocations().values()) {
 			for (Entry entry : row) {
 				entry.setValue(MathHelpers.round(entry.getValue(), digits));
 			}
 		}
 	}
-
+	
 	public static void main(String[] args) {
 
 		Matrix m1 = (new Matrices()).createMatrix("1", "");

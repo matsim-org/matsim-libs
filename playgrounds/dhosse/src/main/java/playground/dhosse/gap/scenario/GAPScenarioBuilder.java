@@ -16,6 +16,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.TypicalDurationScoreComputation;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkUtils;
@@ -103,7 +104,7 @@ public class GAPScenarioBuilder {
 	public static void main(String args[]){
 
 		//initialize everything
-		MatsimRandom.reset(4711);
+		MatsimRandom.reset(4711); //TODO run tryouts w/ some seeds
 		
 		log.info("Creating scenario for Garmisch-Partenkirchen...");
 		
@@ -117,7 +118,7 @@ public class GAPScenarioBuilder {
 //		//create network from osm data
 //		NetworkCreator.createAndAddNetwork(scenario, Global.networkDataDir + "survey-network.osm");
 //		new NetworkWriter(scenario.getNetwork()).write(Global.matsimInputDir + "Netzwerk/merged-networkV2.xml.gz");
-//		SpatialAnalysis.writeNetworkToShape(Global.matsimInputDir + "Netzwerk/merged-networkV2.xml.gz", "/home/dhosse/Dokumente/net.shp");
+//		SpatialAnalysis.writeNetworkToShape(Global.matsimInputDir + "Netzwerk/merged-networkV2.xml.gz", "/home/danielhosse/Dokumente/net.shp");
 		
 		new MatsimNetworkReader(scenario).readFile(Global.runInputDir + "merged-networkV2_20150929.xml");
 		new NetworkCleaner().run(scenario.getNetwork());
@@ -144,59 +145,6 @@ public class GAPScenarioBuilder {
 		
 		initQuadTrees(scenario);
 		
-//		CommuterFileReader cdr = readCommuterRelations(Global.matsimInputDir + "Argentur_für_Arbeit/Garmisch_Einpendler.csv", Global.matsimInputDir + "Argentur_für_Arbeit/Garmisch_Auspendler.csv");
-//		
-//		Map<String, Matrix> matrices = GAPMatrices.run();
-//		
-//		for(Entry<String, Municipality> fromEntry : Municipalities.getMunicipalities().entrySet()){
-//			
-//			ArrayList<org.matsim.matrices.Entry> entries = matrices.get("WB").getFromLocEntries(fromEntry.getKey());
-//			
-//			for(org.matsim.matrices.Entry mEntry : entries){
-//				
-//				DemandCreator.createPupils(scenario, fromEntry.getKey(), mEntry.getToLocation(), mEntry.getValue());
-//				
-//			}
-//			
-//			int nCommuters = 0;
-//			List<String> keysToRemove = new ArrayList<>();
-//			
-//			for(String relation : cdr.getCommuterRelations().keySet()){
-//				
-//				String[] relationParts = relation.split("_");
-//				
-//				if(relationParts[0].startsWith(fromEntry.getKey())){
-//	
-//					if(relationParts[1].startsWith("09180")){
-//						
-//						DemandCreator.createCommuters(scenario, fromEntry.getKey(), relationParts[1], cdr.getCommuterRelation(relation).getCommuters());
-//						
-//						nCommuters += cdr.getCommuterRelations().get(relation).getCommuters();
-//						keysToRemove.add(relation);
-//						
-//					}
-//					
-//				}
-//				
-//			}
-//			
-//			for(String s : keysToRemove){
-//				
-//				cdr.getCommuterRelations().remove(s);
-//				
-//			}
-//			
-//			DemandCreator.createInhabitants(scenario, fromEntry.getKey(), fromEntry.getValue().getnAdults() - nCommuters);
-//			
-//			DemandCreator.createPensioners(scenario, fromEntry.getKey(), fromEntry.getValue().nPensioners);
-//			
-//		}
-//		
-//		CreateCommutersFromElsewhere.run(scenario, cdr.getCommuterRelations().values());
-//		
-//		new PopulationWriter(scenario.getPopulation()).write("/home/dhosse/plans.xml.gz");
-//		SpatialAnalysis.writePopulationToShape("/home/dhosse/plans.xml.gz", "/home/dhosse/plans.shp");
-		
 		PlansCreatorV2.createPlans(scenario, Global.matsimInputDir + "Argentur_für_Arbeit/Garmisch_Einpendler.csv", Global.matsimInputDir + "Argentur_für_Arbeit/Garmisch_Auspendler.csv", GAPMatrices.run());
 		new PopulationWriter(scenario.getPopulation()).write(Global.matsimInputDir + "Pläne/plansV2.xml.gz");
 		
@@ -216,6 +164,7 @@ public class GAPScenarioBuilder {
 			params.setEarliestEndTime(Time.UNDEFINED_TIME);
 			params.setLatestStartTime(Time.UNDEFINED_TIME);
 			params.setOpeningTime(Time.UNDEFINED_TIME);
+			params.setTypicalDurationScoreComputation(TypicalDurationScoreComputation.relative);
 			config.planCalcScore().addActivityParams(params);
 			
 		}
@@ -223,17 +172,15 @@ public class GAPScenarioBuilder {
 		ConfigCreator.configureQSimAndCountsConfigGroups(config);
 		
 		//write population to file
-		new PopulationWriter(aaip.getOutPopulation()).write("/home/danielhosse/Dokumente/01_eGAP/plansV4.xml.gz");
-		
-//		SpatialAnalysis.writePopulationToShape(Global.matsimInputDir + "Pläne/plansV4.xml.gz", "/home/danielhosse/plansV4.shp");
+		new PopulationWriter(aaip.getOutPopulation()).write("/home/danielhosse/Dokumente/01_eGAP/plansV6.xml.gz");
 		
 		//write config file
 		new ConfigWriter(config).write(Global.matsimInputDir + "configV2.xml");
 		
 		log.info("Dumping agent attributes...");
 		//write object attributes to file
-		new ObjectAttributesXmlWriter(subpopulationAttributes).writeFile(Global.matsimInputDir + "Pläne/subpopulationAtts.xml");
-		new ObjectAttributesXmlWriter(demographicAttributes).writeFile(Global.matsimInputDir + "Pläne/demographicAtts.xml");
+		new ObjectAttributesXmlWriter(subpopulationAttributes).writeFile("/home/danielhosse/Dokumente/01_eGAP/subpopulationAtts.xml");
+		new ObjectAttributesXmlWriter(demographicAttributes).writeFile("/home/danielhosse/Dokumente/01_eGAP/demographicAtts.xml");
 		
 		log.info("Done!");
 		
@@ -308,8 +255,8 @@ public class GAPScenarioBuilder {
 		
 		setBuiltAreaQT(new QuadTree<Geometry>(4070000, 5190000, 4730000, 6106925));
 		
-		Collection<SimpleFeature> builtAreas = new ShapeFileReader().readFileAndInitialize("/home/danielhosse/stage2.shp");
-//		Collection<SimpleFeature> builtAreas = new ShapeFileReader().readFileAndInitialize(Global.adminBordersDir + "Gebietsstand_2007/gemeinden_2007_bebaut.shp");
+//		Collection<SimpleFeature> builtAreas = new ShapeFileReader().readFileAndInitialize("/home/danielhosse/stage2.shp");
+		Collection<SimpleFeature> builtAreas = new ShapeFileReader().readFileAndInitialize(Global.adminBordersDir + "Gebietsstand_2007/gemeinden_2007_bebaut.shp");
 		
 		log.info("Processing built areas...");
 		

@@ -73,7 +73,7 @@ public class HamiltonianLogger implements MarkovEngineListener {
         if (iter.get() % logInterval == 0) {
             long iterNow = iter.get();
             double hVal = h.evaluate(population);
-            logger.info(String.format("%s [%s]: %s", h.getClass().getSimpleName(), iterNow, hVal));
+            logger.info(String.format("%s [%.0E]: %s", h.getClass().getSimpleName(), (double)iterNow, hVal));
 
             if (writer != null) {
                 try {

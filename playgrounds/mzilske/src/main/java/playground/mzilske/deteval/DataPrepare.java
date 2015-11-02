@@ -36,7 +36,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.visum.VisumNetwork;
@@ -70,12 +70,12 @@ public class DataPrepare {
 	// OUTPUT FILES
 	private static String OutNetworkFile = OutPath + "network-86-85-87-84.xml";
 
-	private final ScenarioImpl scenario;
+	private final MutableScenario scenario;
 	private final Config config;
 	private VisumNetwork visumNetwork;
 
 	public DataPrepare() {
-		this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		this.scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		this.config = this.scenario.getConfig();
 	}
 

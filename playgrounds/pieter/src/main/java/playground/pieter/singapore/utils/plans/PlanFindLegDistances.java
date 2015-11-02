@@ -24,14 +24,14 @@ import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.vehicles.Vehicle;
 
 import others.sergioo.util.dataBase.*;
 
 class PlanFindLegDistances {
-	private final ScenarioImpl scenario;
+	private final MutableScenario scenario;
 	private final Map<Id<ActivityFacility>, ? extends ActivityFacility> facilities;
 	private final NetworkImpl network;
 	private final ModeRouteFactory routeFactory;
@@ -40,7 +40,7 @@ class PlanFindLegDistances {
 
 	public PlanFindLegDistances(Scenario scenario, DataBaseAdmin dba) {
 		super();
-		this.scenario = (ScenarioImpl) scenario;
+		this.scenario = (MutableScenario) scenario;
 		this.network = (NetworkImpl) scenario.getNetwork();
 		this.facilities = this.scenario.getActivityFacilities().getFacilities();
 		TravelDisutility travelMinCost = new TravelDisutility() {

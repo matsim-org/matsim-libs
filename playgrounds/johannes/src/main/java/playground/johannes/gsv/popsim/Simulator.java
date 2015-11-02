@@ -19,7 +19,6 @@
 
 package playground.johannes.gsv.popsim;
 
-import gnu.trove.TDoubleArrayList;
 import org.apache.commons.math.FunctionEvaluationException;
 import org.apache.commons.math.analysis.UnivariateRealFunction;
 import org.apache.log4j.Logger;
@@ -29,6 +28,8 @@ import org.matsim.contrib.common.stats.LinearDiscretizer;
 import org.matsim.contrib.common.util.XORShiftRandom;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import playground.johannes.gsv.popsim.analysis.NumericAttributeProvider;
+import playground.johannes.gsv.popsim.analysis.LegCollector;
 import playground.johannes.gsv.synPop.analysis.AnalyzerTaskComposite;
 import playground.johannes.gsv.synPop.analysis.LegGeoDistanceTask;
 import playground.johannes.gsv.synPop.analysis.ProxyAnalyzer;
@@ -55,183 +56,182 @@ import java.util.*;
 
 /**
  * @author johannes
- *
  */
 public class Simulator {
 
-	private static final Logger logger = Logger.getLogger(Simulator.class);
+    private static final Logger logger = Logger.getLogger(Simulator.class);
 
-	private static final String MODULE_NAME = "synPopSim";
-	/**
-	 * @param args
-	 * @throws IOException
-	 */
-	public static void main(String[] args) throws IOException {
-		Config config = new Config();
-		ConfigUtils.loadConfig(config, args[0]);
+    private static final String MODULE_NAME = "synPopSim";
 
-		logger.info("Loading persons...");
-		Set<PlainPerson> refPersons = (Set<PlainPerson>) PopulationIO.loadFromXML(config.findParam(MODULE_NAME,
-				"popInputFile"), new PlainFactory());
-		logger.info(String.format("Loaded %s persons.", refPersons.size()));
+    /**
+     * @param args
+     * @throws IOException
+     */
+    public static void main(String[] args) throws IOException {
+        final Config config = new Config();
+        ConfigUtils.loadConfig(config, args[0]);
 
-		Random random = new XORShiftRandom(Long.parseLong(config.getParam("global", "randomSeed")));
+        logger.info("Loading persons...");
+        Set<PlainPerson> refPersons = (Set<PlainPerson>) PopulationIO.loadFromXML(config.findParam(MODULE_NAME,
+                "popInputFile"), new PlainFactory());
+        logger.info(String.format("Loaded %s persons.", refPersons.size()));
 
-		TaskRunner.run(new ReplaceActTypes(), refPersons);
-		new GuessMissingActTypes(random).apply(refPersons);
-		TaskRunner.run(new Route2GeoDistance(new Route2GeoDistFunction()), refPersons);
-
-		logger.info("Cloning persons...");
-		Set<PlainPerson> simPersons = (Set<PlainPerson>) PersonUtils.weightedCopy(refPersons, new PlainFactory(), 100000, random);
-		logger.info(String.format("Generated %s persons.", simPersons.size()));
-
-		logger.info("Loading data...");
-		DataPool dataPool = new DataPool();
-		dataPool.register(new FacilityDataLoader(config.getParam(MODULE_NAME, "facilities"), random), FacilityDataLoader.KEY);
-//		dataPool.register(new LandUseDataLoader(config.getModule(MODULE_NAME)), LandUseDataLoader.KEY);
-		dataPool.register(new ZoneDataLoader(config.getModule(MODULE_NAME)), ZoneDataLoader.KEY);
-		logger.info("Done.");
-
-//		logger.info("Validation data...");
-//		FacilityZoneValidator.validate(dataPool, ActivityTypes.HOME, 3);
-//		FacilityZoneValidator.validate(dataPool, ActivityTypes.HOME, 1);
-//		logger.info("Done.");
-
-		logger.info("Setting up sampler...");
-		/*
-		 * Distribute population according to zone values.
+        Random random = new XORShiftRandom(Long.parseLong(config.getParam("global", "randomSeed")));
+        /*
+		Prepare population for simulation.
 		 */
-		new SetHomeFacilities(dataPool, "modena", random).apply(simPersons);
+        logger.info("Preparing reference simulaion...");
+        TaskRunner.run(new ReplaceActTypes(), refPersons);
+        new GuessMissingActTypes(random).apply(refPersons);
+        TaskRunner.run(new Route2GeoDistance(new Route2GeoDistFunction()), refPersons);
 		/*
-		 * Assign random activity facilities.
+		Setting up data loaders.
 		 */
-		TaskRunner.run(new SetActivityFacilities((FacilityData) dataPool.get(FacilityDataLoader.KEY)), simPersons);
-		TaskRunner.run(new LegAttributeRemover(CommonKeys.LEG_GEO_DISTANCE), simPersons);
-		TaskRunner.run(new CalculateGeoDistance((FacilityData) dataPool.get(FacilityDataLoader.KEY)), simPersons);
+        logger.info("Registering data loaders...");
+        DataPool dataPool = new DataPool();
+        dataPool.register(new FacilityDataLoader(config.getParam(MODULE_NAME, "facilities"), random), FacilityDataLoader.KEY);
+        dataPool.register(new ZoneDataLoader(config.getModule(MODULE_NAME)), ZoneDataLoader.KEY);
+		/*
+		Setup the simulation population.
+		 */
+        logger.info("Cloning persons...");
+        int size = (int) Double.parseDouble(config.getParam(MODULE_NAME, "populationSize"));
+        Set<PlainPerson> simPersons = (Set<PlainPerson>) PersonUtils.weightedCopy(refPersons, new PlainFactory(), size,
+                random);
+        logger.info(String.format("Generated %s persons.", simPersons.size()));
+        logger.info("Assigning home locations...");
+        new SetHomeFacilities(dataPool, "modena", random).apply(simPersons);
+        logger.info("Assigning random activity locations...");
+        TaskRunner.run(new SetActivityFacilities((FacilityData) dataPool.get(FacilityDataLoader.KEY)), simPersons);
+        logger.info("Recalculate geo distances...");
+        TaskRunner.run(new LegAttributeRemover(CommonKeys.LEG_GEO_DISTANCE), simPersons);
+        TaskRunner.run(new CalculateGeoDistance((FacilityData) dataPool.get(FacilityDataLoader.KEY)), simPersons);
+		/*
+		Setup analyzer and analyze reference population
+		 */
+        final String output = config.getParam(MODULE_NAME, "output");
+        final AnalyzerTaskComposite task = new AnalyzerTaskComposite();
+        task.addTask(new LegGeoDistanceTask(CommonValues.LEG_MODE_CAR));
+        task.addTask(new GeoDistLau2ClassTask());
+        logger.info("Analyzing reference population...");
+        ProxyAnalyzer.analyze(refPersons, task, String.format("%s/ref/", output));
+		/*
+		Setup hamiltonian
+		 */
+        final HamiltonianComposite hamiltonian = new HamiltonianComposite();
+		/*
+		Setup distance distribution hamiltonian.
+		 */
+        UnivariatFrequency distDistrTerm = buildDistDistrTerm(refPersons, simPersons);
+        hamiltonian.addComponent(distDistrTerm, Double.parseDouble(config.getParam(MODULE_NAME, "theta_distDistr")));
+		/*
+		Setup mean distance LAU2 hamiltonian.
+		 */
+        BivariatMean meanDistLau2Term = buildMeanDistLau2Term(refPersons, simPersons);
+        hamiltonian.addComponent(meanDistLau2Term, Double.parseDouble(config.getParam(MODULE_NAME, "theta_distLau2")));
+		/*
+		Setup listeners for changes on geo distance.
+		 */
+        AttributeChangeListenerComposite geoDistListeners = new AttributeChangeListenerComposite();
+        geoDistListeners.addComponent(distDistrTerm);
+        geoDistListeners.addComponent(meanDistLau2Term);
+		/*
+		Setup the facility mutator.
+		 */
+        FacilityMutatorBuilder mutatorBuilder = new FacilityMutatorBuilder(dataPool, random);
+        mutatorBuilder.addToBlacklist(ActivityTypes.HOME);
+        mutatorBuilder.setListener(new GeoDistanceUpdater(geoDistListeners));
+        Mutator<? extends Attributable> mutator = mutatorBuilder.build();
+		/*
+		Setup the sampler.
+		 */
+        MarkovEngine sampler = new MarkovEngine(simPersons, hamiltonian, mutator, random);
 
-		final String output = config.getParam(MODULE_NAME, "output");
+        MarkovEngineListenerComposite engineListeners = new MarkovEngineListenerComposite();
 
-		final AnalyzerTaskComposite task = new AnalyzerTaskComposite();
-		task.addTask(new LegGeoDistanceTask(CommonValues.LEG_MODE_CAR));
-		task.addTask(new GeoDistLau2ClassTask());
+        engineListeners.addComponent(new MarkovEngineListener() {
+            AnalyzerListener l = new AnalyzerListener(task, String.format("%s/sim/", output), (long) Double.parseDouble
+                    (config.getParam(MODULE_NAME, "dumpInterval")));
 
-		ProxyAnalyzer.analyze(refPersons, task, String.format("%s/ref/", output));
+            @Override
+            public void afterStep(Collection<CachedPerson> population, Collection<? extends Attributable> mutations, boolean accepted) {
+                l.afterStep(population, null, accepted);
+            }
+        });
 
-		final HamiltonianComposite hamiltonians = new HamiltonianComposite();
+        engineListeners.addComponent(new MarkovEngineListener() {
+            HamiltonianLogger l = new HamiltonianLogger(hamiltonian, (int) Double.parseDouble(config.getParam
+                    (MODULE_NAME,
+                            "logInterval")));
 
-		MutatorComposite<? extends Attributable> mutators = new MutatorComposite<>(random);
+            @Override
+            public void afterStep(Collection<CachedPerson> population, Collection<? extends Attributable> mutations, boolean accepted) {
+                l.afterStep(population, null, accepted);
+            }
+        });
 
-        UnivariatFrequency distance = buildDistanceHamiltonian(refPersons, simPersons);
-        hamiltonians.addComponent(distance, 1e6);
+        sampler.setListener(engineListeners);
 
-		BivariatMean distanceLau2Class = buildDistanceLau2Hamiltonian(refPersons, simPersons);
-		hamiltonians.addComponent(distanceLau2Class, 2.0);
+        sampler.run((long) Double.parseDouble(config.getParam(MODULE_NAME, "iterations")));
+    }
 
-        FacilityMutatorBuilder fBuilder = new FacilityMutatorBuilder(dataPool, random);
-        fBuilder.addToBlacklist(ActivityTypes.HOME);
+    private static UnivariatFrequency buildDistDistrTerm(Set<PlainPerson> refPersons, Set<PlainPerson>
+            simPersons) {
+        Set<Attributable> refLegs = getLegs(refPersons);
+        Set<Attributable> simLegs = getLegs(simPersons);
 
-        AttributeChangeListenerComposite listeners = new AttributeChangeListenerComposite();
-		AttributeChangeListenerComposite distListeners = new AttributeChangeListenerComposite();
-		distListeners.addComponent(distance);
-		distListeners.addComponent(distanceLau2Class);
-        listeners.addComponent(new GeoDistanceUpdater(distListeners));
-        fBuilder.setListener(listeners);
-        mutators.addMutator(fBuilder.build());
+        List<Double> values = new LegCollector(new NumericAttributeProvider(CommonKeys.LEG_GEO_DISTANCE)).collect(refPersons);
+        double[] nativeValues = CollectionUtils.toNativeArray(values);
+        Discretizer disc = FixedSampleSizeDiscretizer.create(nativeValues, 50, 100);
 
-		MarkovEngine sampler = new MarkovEngine(simPersons, hamiltonians, mutators, random);
+        UnivariatFrequency f = new UnivariatFrequency(refLegs, simLegs, CommonKeys.LEG_GEO_DISTANCE, disc);
 
-		MarkovEngineListenerComposite listener = new MarkovEngineListenerComposite();
+        return f;
+    }
 
-		listener.addComponent(new MarkovEngineListener() {
+    private static Set<Attributable> getLegs(Set<? extends Person> persons) {
+        Set<Attributable> legs = new HashSet<>();
+        for (Person p : persons) {
+            Episode e = p.getEpisodes().get(0);
+            legs.addAll(e.getLegs());
+        }
 
-			AnalyzerListener l = new AnalyzerListener(task, String.format("%s/sim/", output), 10000000);
+        return legs;
+    }
 
-			@Override
-			public void afterStep(Collection<CachedPerson> population, Collection<? extends Attributable> mutations, boolean accepted) {
-				l.afterStep(population, null, accepted);
-			}
-		});
-		listener.addComponent(new MarkovEngineListener() {
-			HamiltonianLogger l = new HamiltonianLogger(hamiltonians, 100000);
-			@Override
-			public void afterStep(Collection<CachedPerson> population, Collection<? extends Attributable> mutations, boolean accepted) {
-				l.afterStep(population, null, accepted);
-			}
-		});
+    private static BivariatMean buildMeanDistLau2Term(Set<PlainPerson> refPersons, Set<PlainPerson> simPersons) {
+        copyLau2ClassAttribute(refPersons);
+        copyLau2ClassAttribute(simPersons);
 
-		sampler.setListener(listener);
+        Set<Attributable> refLegs = getLegs(refPersons);
+        Set<Attributable> simLegs = getLegs(simPersons);
 
-		sampler.run(100000001);
-	}
+        Converters.register(MiDKeys.PERSON_LAU2_CLASS, DoubleConverter.getInstance());
+        BivariatMean bm = new BivariatMean(refLegs, simLegs, MiDKeys.PERSON_LAU2_CLASS, CommonKeys.LEG_GEO_DISTANCE,
+                new LinearDiscretizer(1.0));
 
-	private static double[] personValues(Set<? extends Person> persons, String attrKey) {
-		TDoubleArrayList values = new TDoubleArrayList(persons.size());
-		for(Person person : persons) {
-			String strVal = person.getAttribute(attrKey);
-			if(strVal != null) {
-				values.add(Double.parseDouble(strVal));
-			}
-		}
+        return bm;
+    }
 
-		return values.toNativeArray();
-	}
+    private static void copyLau2ClassAttribute(Set<PlainPerson> persons) {
+        for (Person p : persons) {
+            String lau2Class = p.getAttribute(MiDKeys.PERSON_LAU2_CLASS);
+            for (Episode e : p.getEpisodes()) {
+                for (Segment leg : e.getLegs()) {
+                    leg.setAttribute(MiDKeys.PERSON_LAU2_CLASS, lau2Class);
+                }
+            }
+        }
+    }
 
-	private static UnivariatFrequency buildDistanceHamiltonian(Set<PlainPerson> refPersons, Set<PlainPerson>
-			simPersons) {
-		Set<Attributable> refLegs = getLegs(refPersons);
-		Set<Attributable> simLegs = getLegs(simPersons);
+    public static class Route2GeoDistFunction implements UnivariateRealFunction {
 
-		List<Double> values = new LegDoubleCollector(CommonKeys.LEG_GEO_DISTANCE).collect(refPersons);
-		double[] nativeValues = CollectionUtils.toNativeArray(values);
-		Discretizer disc = FixedSampleSizeDiscretizer.create(nativeValues, 50, 100);
-
-		UnivariatFrequency f = new UnivariatFrequency(refLegs, simLegs, CommonKeys.LEG_GEO_DISTANCE, disc);
-
-		return f;
-	}
-
-	private static Set<Attributable> getLegs(Set<? extends Person> persons) {
-		Set<Attributable> legs = new HashSet<>();
-		for(Person p : persons) {
-			Episode e = p.getEpisodes().get(0);
-			legs.addAll(e.getLegs());
-		}
-
-		return legs;
-	}
-
-	private static BivariatMean buildDistanceLau2Hamiltonian(Set<PlainPerson> refPersons, Set<PlainPerson> simPersons) {
-		copyLau2ClassAttribute(refPersons);
-		copyLau2ClassAttribute(simPersons);
-
-		Set<Attributable> refLegs = getLegs(refPersons);
-		Set<Attributable> simLegs = getLegs(simPersons);
-
-		Converters.register(MiDKeys.PERSON_LAU2_CLASS, DoubleConverter.getInstance());
-		BivariatMean bm = new BivariatMean(refLegs, simLegs, MiDKeys.PERSON_LAU2_CLASS, CommonKeys.LEG_GEO_DISTANCE,
-				new LinearDiscretizer(1.0));
-
-		return bm;
-	}
-
-	private static void copyLau2ClassAttribute(Set<PlainPerson> persons) {
-		for(Person p : persons) {
-			String lau2Class = p.getAttribute(MiDKeys.PERSON_LAU2_CLASS);
-			for(Episode e : p.getEpisodes()) {
-				for(Segment leg : e.getLegs()) {
-					leg.setAttribute(MiDKeys.PERSON_LAU2_CLASS, lau2Class);
-				}
-			}
-		}
-	}
-	public static class Route2GeoDistFunction implements UnivariateRealFunction {
-
-		@Override
-		public double value(double x) throws FunctionEvaluationException {
-			double routDist = x/1000.0;
-			double factor = 0.77 - Math.exp(-0.17 * Math.max(20, routDist) - 1.48);
-			return routDist * factor * 1000;
-		}
-	}
+        @Override
+        public double value(double x) throws FunctionEvaluationException {
+            double routDist = x / 1000.0;
+            double factor = 0.77 - Math.exp(-0.17 * Math.max(20, routDist) - 1.48);
+            return routDist * factor * 1000;
+        }
+    }
 
 }

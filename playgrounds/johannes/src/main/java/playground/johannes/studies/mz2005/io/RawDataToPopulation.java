@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.*;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import playground.johannes.studies.mz2005.validate.ActLegSequence;
 import playground.johannes.studies.mz2005.validate.PlanValidator;
@@ -72,7 +72,7 @@ public class RawDataToPopulation {
 		/*
 		 * generate population
 		 */
-        ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+        MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
         Population pop = PopulationUtils.createPopulation(sc.getConfig(), sc.getNetwork());
 		TripComparator comparator = new TripComparator();
 		for (PersonDataContainer pContainer : persons.values()) {

@@ -147,7 +147,7 @@ public class BikeSharingScenarioUtils {
 	}
 
 	public static AbstractModule createTripRouterFactoryAndConfigureRouteFactories(
-			final TravelDisutilityFactory disutilityFactory,
+			//final TravelDisutilityFactory disutilityFactory,
 			final Scenario scenario,
 			final LinkSlopeScorer scorer,
 			final RoutingData routingData,
@@ -173,7 +173,7 @@ public class BikeSharingScenarioUtils {
 					scenario.getConfig(),
 					linkSlopes );
 
-		final BikeSharingTripRouterModule bsFact =
+		final BikeSharingTripRouterModule bikeSharingTripRouterModule =
 				routingData == null ?
 					new BikeSharingTripRouterModule(
 						scenario,
@@ -182,34 +182,33 @@ public class BikeSharingScenarioUtils {
 						routingData,
 						scenario,
 						scorer );
-		bsFact.setRoutePtUsingSchedule( forceScheduleRouting );
+		bikeSharingTripRouterModule.setRoutePtUsingSchedule(forceScheduleRouting);
 
 
-		final AccessEgressMultimodalTripRouterModule fact =
+		final AccessEgressMultimodalTripRouterModule accessEgressMultimodalTripRouterModule =
 			new AccessEgressMultimodalTripRouterModule(
 				scenario,
-				multiModalTravelTimeFactory.createTravelTimes(),
-				disutilityFactory );
+				multiModalTravelTimeFactory.createTravelTimes() );
 
 		if ( scorer != null ) {
-			fact.setDisutilityFactoryForMode(
+			accessEgressMultimodalTripRouterModule.setDisutilityFactoryForMode(
 					TransportMode.bike,
 					createSlopeAwareDisutilityFactory(
-						scorer,
-						TransportMode.bike ) );
+							scorer,
+							TransportMode.bike));
 
-			fact.setDisutilityFactoryForMode(
+			accessEgressMultimodalTripRouterModule.setDisutilityFactoryForMode(
 					BikeSharingConstants.MODE,
 					createSlopeAwareDisutilityFactory(
-						scorer,
-						BikeSharingConstants.MODE ) );
+							scorer,
+							BikeSharingConstants.MODE));
 		}
 
 		return new AbstractModule() {
 			@Override
 			public void install() {
-				install( bsFact );
-				install( fact );
+				install( bikeSharingTripRouterModule );
+				install( accessEgressMultimodalTripRouterModule );
 			}
 		};
 	}
@@ -219,18 +218,7 @@ public class BikeSharingScenarioUtils {
 			final String mode ) {
 		return new SlopeAwareTravelDisutilityFactory(
 				scorer,
-				new TravelDisutilityFactory() {
-					@Override
-					public TravelDisutility createTravelDisutility(
-							final TravelTime timeCalculator,
-							final PlanCalcScoreConfigGroup cnScoringGroup ) {
-						final ModeParams pars = cnScoringGroup.getModes().get( mode );
-						return new RandomizingTimeDistanceTravelDisutility(
-									timeCalculator,
-									(-pars.getMarginalUtilityOfTraveling() / 3600.) + (cnScoringGroup.getPerforming_utils_hr() / 3600.0),
-									-pars.getMarginalUtilityOfDistance()  );
-					}
-				} );
+				new RandomizingTimeDistanceTravelDisutility.Builder( mode ) ) ;
 	}
 }
 

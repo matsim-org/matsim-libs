@@ -6,9 +6,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+
+import javax.management.RuntimeErrorException;
 
 import org.apache.log4j.Logger;
 import org.jfree.util.Log;
@@ -17,6 +20,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.collections.QuadTree;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.IOUtils;
@@ -274,20 +278,20 @@ public class FacilitiesCreator {
 		keys.add("amenity");
 		keys.add("shop");
 		keys.add("leisure");
+		
+		Collection<SimpleFeature> features = ShapeFileReader.getAllFeatures(Global.adminBordersDir + "/Gebietsstand_2007/gemeinden_2007.shp");
+		geometry2MunId = new HashMap<>();
+		for(SimpleFeature feature : features){
+			Geometry g = (Geometry)feature.getDefaultGeometry();
+			Long id = (Long)feature.getAttribute("GEM_KENNZ");
+			geometry2MunId.put(g, "0"+Long.toString(id));
+		}
 
 		OsmObjectsToFacilitiesParser reader = new OsmObjectsToFacilitiesParser(Global.dataDir + "/Netzwerk/garmisch-latest.osm", Global.ct, osmToMatsimTypeMap, keys);
 		reader.parse();
 //		reader.writeFacilities(Global.matsimInputDir + "facilities/facilities.xml");
 //		reader.writeFacilityAttributes(Global.matsimInputDir + "facilities/facilityAttribues.xml");
 		reader.writeFacilityCoordinates(Global.matsimInputDir + "facilities.csv");
-		
-		Collection<SimpleFeature> features = ShapeFileReader.getAllFeatures(Global.adminBordersDir + "/Gebietsstand_2007/gemeinden_2007_bebaut.shp");
-		geometry2MunId = new HashMap<>();
-		for(SimpleFeature feature : features){
-			Geometry g = (Geometry)feature.getDefaultGeometry();
-			Long id = (Long)feature.getAttribute("GEM_KENNZ");
-			geometry2MunId.put(g, Long.toString(id));
-		}
 		
 		log.info("Assigning activity facilities to municipalities...");
 		for(ActivityFacility facility : reader.getFacilities().getFacilities().values()){
@@ -299,6 +303,12 @@ public class FacilitiesCreator {
 				boolean added = false;
 				
 				if(g.contains(MGC.coord2Point(Global.UTM32NtoGK4.transform(facility.getCoord())))){
+					
+					double d = 1/CoordUtils.calcDistance(MGC.point2Coord(g.getCentroid()), facility.getCoord());
+					for(ActivityOption ao : facility.getActivityOptions().values()){
+						if(ao.getType().equals(Global.ActType.work)) continue;
+						ao.setCapacity(ao.getCapacity() * d);
+					}
 					
 					if(facility.getActivityOptions().containsKey(Global.ActType.education.name())){
 						
@@ -390,7 +400,7 @@ public class FacilitiesCreator {
 					
 					if(!facility.getActivityOptions().containsKey(ao)){
 						ActivityOption activityOption = scenario.getActivityFacilities().getFactory().createActivityOption(ao);
-						activityOption.setCapacity(Double.parseDouble(parts[idxWorkCapacity]) * 2);
+						activityOption.setCapacity(1);
 						facility.addActivityOption(activityOption);
 					}
 					
@@ -413,11 +423,20 @@ public class FacilitiesCreator {
 						GAPScenarioBuilder.getMunId2WorkLocation().put(munId, new ArrayList<ActivityFacility>());
 					}
 					GAPScenarioBuilder.getMunId2WorkLocation().get(munId).add(facility);
+					
+//					for(String s : facility.getActivityOptions().keySet()){
+//						
+//						Map<String, List<ActivityFacility>> facilities = getFacilitiesForActType(s);
+//						if(facilities != null){
+//							if(!facilities.containsKey(munId)){
+//								facilities.put(munId, new ArrayList<ActivityFacility>());
+//							}
+//							facilities.get(munId).add(facility);
+//						}
+//						
+//					}
+					
 				}
-				
-//				scenario.getActivityFacilities().addActivityFacility(facility);
-				
-//				GAPScenarioBuilder.getWorkLocations().put(facility.getCoord().getX(), facility.getCoord().getY(), facility);
 				
 				counter++;
 				
@@ -430,6 +449,50 @@ public class FacilitiesCreator {
 		}
 		
 		Log.info("Done reading workplaces.");
+		
+	}
+	
+	private static Map<String, List<ActivityFacility>> getFacilitiesForActType(String type){
+		
+		if(type.equals(Global.ActType.education.name())){
+			
+			return GAPScenarioBuilder.getMunId2EducationFacilities();
+			
+		} else if(type.equals(Global.ActType.leisure.name())){
+			
+			return GAPScenarioBuilder.getMunId2LeisureFacilities();
+			
+		} else if(type.equals(Global.ActType.other.name())){
+			
+			return GAPScenarioBuilder.getMunId2OtherFacilities();
+			
+		} else if(type.equals(Global.ActType.shop.name())){
+			
+			return GAPScenarioBuilder.getMunId2ShopFacilities();
+			
+		} else if(type.equals(Global.ActType.work.name())){
+			
+			return GAPScenarioBuilder.getMunId2WorkLocation();
+			
+		} else {
+			
+			return null;
+			
+		}
+		
+	}
+	
+	public static String getMunIdContainingCoord(Coord c){
+		
+		Coord gk4 = Global.UTM32NtoGK4.transform(c);
+		
+		for(Geometry g : geometry2MunId.keySet()){
+			if(g.contains(MGC.coord2Point(gk4))){
+				return geometry2MunId.get(g);
+			}
+		}
+		
+		return null;
 		
 	}
 

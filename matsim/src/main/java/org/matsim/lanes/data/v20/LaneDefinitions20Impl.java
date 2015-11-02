@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.network.Link;
 /**
  * @author dgrether
  */
-public class LaneDefinitions20Impl implements LaneDefinitions20 {
+public class LaneDefinitions20Impl implements Lanes {
 
 	private SortedMap<Id<Link>, LanesToLinkAssignment20> lanesToLinkAssignments =  new TreeMap<>();
 

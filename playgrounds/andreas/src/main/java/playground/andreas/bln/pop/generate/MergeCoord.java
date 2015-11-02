@@ -40,7 +40,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 
@@ -180,7 +180,7 @@ public class MergeCoord {
 		int changed = 0;
 		int tripNonWalking = 0;
 
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		log.info("Start reading file " + plansFilename);
 		new MatsimNetworkReader(scenario).readFile(networkFilename);
 
@@ -258,7 +258,7 @@ public class MergeCoord {
 		int unchanged = 0;
 		int changed = 0;
 
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		log.info("Start reading file " + plansFilename);
 		new MatsimNetworkReader(scenario).readFile(networkFilename);
 

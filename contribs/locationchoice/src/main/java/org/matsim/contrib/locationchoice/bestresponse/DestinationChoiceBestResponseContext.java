@@ -40,7 +40,6 @@ import org.matsim.contrib.locationchoice.bestresponse.scoring.ScaleEpsilon;
 import org.matsim.contrib.locationchoice.facilityload.FacilityPenalty;
 import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
 import org.matsim.contrib.locationchoice.utils.ActivitiesHandler;
-import org.matsim.contrib.locationchoice.utils.QuadTreeRing;
 import org.matsim.contrib.locationchoice.utils.TreesBuilder;
 import org.matsim.core.api.internal.MatsimFactory;
 import org.matsim.core.api.internal.MatsimToplevelContainer;
@@ -48,6 +47,7 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.router.priorityqueue.HasIndex;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.core.utils.collections.CollectionUtils;
+import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.facilities.ActivityFacility;
@@ -93,7 +93,7 @@ public class DestinationChoiceBestResponseContext implements MatsimToplevelConta
 	 * introduction the feature.
 	 */
 	private boolean cacheQuadTrees = false;
-	private Map<String, QuadTreeRing<ActivityFacilityWithIndex>> quadTreesOfType = new HashMap<String, QuadTreeRing<ActivityFacilityWithIndex>>();
+	private Map<String, QuadTree<ActivityFacilityWithIndex>> quadTreesOfType = new HashMap<String, QuadTree<ActivityFacilityWithIndex>>();
 	private TreeMap<String, ActivityFacilityImpl []> facilitiesOfType = new TreeMap<String, ActivityFacilityImpl []>();
 	
 	public DestinationChoiceBestResponseContext(Scenario scenario) {
@@ -203,21 +203,21 @@ public class DestinationChoiceBestResponseContext implements MatsimToplevelConta
 		}
 	}
 	
-	public Tuple<QuadTreeRing<ActivityFacilityWithIndex>, ActivityFacilityImpl[]> getQuadTreeAndFacilities(String activityType) {
+	public Tuple<QuadTree<ActivityFacilityWithIndex>, ActivityFacilityImpl[]> getQuadTreeAndFacilities(String activityType) {
 		if (this.cacheQuadTrees) {
-			QuadTreeRing<ActivityFacilityWithIndex> quadTree = this.quadTreesOfType.get(activityType);
+			QuadTree<ActivityFacilityWithIndex> quadTree = this.quadTreesOfType.get(activityType);
 			ActivityFacilityImpl[] facilities = this.facilitiesOfType.get(activityType);
 			if (quadTree == null || facilities == null) {				
-				Tuple<QuadTreeRing<ActivityFacilityWithIndex>, ActivityFacilityImpl[]> tuple = getTuple(activityType);
+				Tuple<QuadTree<ActivityFacilityWithIndex>, ActivityFacilityImpl[]> tuple = getTuple(activityType);
 				this.quadTreesOfType.put(activityType, tuple.getFirst());
 				this.facilitiesOfType.put(activityType, tuple.getSecond());
 				
 				return tuple;
-			} else return new Tuple<QuadTreeRing<ActivityFacilityWithIndex>, ActivityFacilityImpl[]>(quadTree, facilities);
+			} else return new Tuple<QuadTree<ActivityFacilityWithIndex>, ActivityFacilityImpl[]>(quadTree, facilities);
 		} else return getTuple(activityType);
 	}
 	
-	private Tuple<QuadTreeRing<ActivityFacilityWithIndex>, ActivityFacilityImpl[]> getTuple(String activityType) {
+	private Tuple<QuadTree<ActivityFacilityWithIndex>, ActivityFacilityImpl[]> getTuple(String activityType) {
 
 		TreesBuilder treesBuilder = new TreesBuilder(CollectionUtils.stringToSet(activityType), this.scenario.getNetwork(), (DestinationChoiceConfigGroup) this.scenario.getConfig().getModule("locationchoice"));
 		treesBuilder.setActTypeConverter(this.getConverter());
@@ -230,21 +230,21 @@ public class DestinationChoiceBestResponseContext implements MatsimToplevelConta
 		 * ActivityFacility objects are replaced by ActivityFacilityWithIndex objects.
 		 * TODO: let the TreeBuilder use ActivityFacilityWithIndex objects directly?
 		 */
-		QuadTreeRing<ActivityFacilityWithIndex> quadTree = null;
+		QuadTree<ActivityFacilityWithIndex> quadTree = null;
 		
-		QuadTreeRing<ActivityFacility> qt = treesBuilder.getQuadTreesOfType().get(activityType);
+		QuadTree<ActivityFacility> qt = treesBuilder.getQuadTreesOfType().get(activityType);
 		if (qt != null) {
 			double minX = qt.getMinEasting();
 			double maxX = qt.getMaxEasting();
 			double minY = qt.getMinNorthing();
 			double maxY = qt.getMaxNorthing();
-			quadTree = new QuadTreeRing<ActivityFacilityWithIndex>(minX, minY, maxX, maxY);
+			quadTree = new QuadTree<ActivityFacilityWithIndex>(minX, minY, maxX, maxY);
 			for (ActivityFacility activityFacility : qt.values()) {
 				quadTree.put(activityFacility.getCoord().getX(), activityFacility.getCoord().getY(), this.faciliesWithIndexMap.get(activityFacility.getId()));
 			}			
 		}
 		
-		return new Tuple<QuadTreeRing<ActivityFacilityWithIndex>, ActivityFacilityImpl[]>(quadTree, facilities);
+		return new Tuple<QuadTree<ActivityFacilityWithIndex>, ActivityFacilityImpl[]>(quadTree, facilities);
 	}
 	
 	public Scenario getScenario() {

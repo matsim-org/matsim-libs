@@ -29,7 +29,7 @@ import playground.dhosse.utils.osm.OsmCoordUtils;
 
 public class CsSink  implements Sink{
 	
-	private static final String HEADER = "Ort\tStandort\tPLZ\tStao-Nr.\tKanton\tGeoX\tGeoY\tNorth\tEast\tFahrzeuge";
+	private static final String HEADER = "Ort\tStandort\tPLZ\tStao-Nr.\tKanton\tGeoX\tGeoY\tNorth\tEast\tFahrzeuge\tParkplätze";
 	
 	private Set<String> keys;
 	private Map<String, String> typeMap = new HashMap<String, String>();
@@ -100,7 +100,7 @@ public class CsSink  implements Sink{
 //		process(this.wayMap);
 //		process(this.relationMap);
 		
-		BufferedWriter writer = IOUtils.getBufferedWriter("/home/danielhosse/csStationsAtParkingSpaces.txt");
+		BufferedWriter writer = IOUtils.getBufferedWriter("/home/dhosse/csStationsAtParkingSpaces.txt");
 		
 		try {
 			
@@ -109,7 +109,7 @@ public class CsSink  implements Sink{
 			for(Entry<String, OneWayCarsharingStation> cs : this.csStations.entrySet()){
 				
 				writer.newLine();
-				writer.write(cs.getKey() + "\tFOO\t" + cs.getValue().getLink().getCoord().getX() + "\t" + cs.getValue().getLink().getCoord().getY() + "\t0\t0\t" + cs.getValue().getNumberOfVehicles());
+				writer.write(cs.getKey() + "\tFOO\t" + cs.getValue().getLink().getCoord().getX() + "\t" + cs.getValue().getLink().getCoord().getY() + "\t0\t0\t" + cs.getValue().getNumberOfVehicles() + "\t" + cs.getValue().getNumberOfAvailableParkingSpaces());
 				
 			}
 			

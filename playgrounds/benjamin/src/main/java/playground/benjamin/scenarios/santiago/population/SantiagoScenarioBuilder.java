@@ -91,23 +91,23 @@ import playground.benjamin.scenarios.santiago.SantiagoScenarioConstants.Subpopul
 public class SantiagoScenarioBuilder {
 	private static final Logger log = Logger.getLogger(SantiagoScenarioBuilder.class);
 
-	final String svnWorkingDir = "../../../shared-svn/studies/countries/cl/"; 	//Path: KT (SVN-checkout)
+	final String svnWorkingDir = "../../../shared-svn/studies/countries/cl/";
 	final String workingDirInputFiles = svnWorkingDir + "Kai_und_Daniel/inputFromElsewhere/";
 	final String boundariesInputDir = workingDirInputFiles + "exported_boundaries/";
 	final String databaseFilesDir = workingDirInputFiles + "exportedFilesFromDatabase/";
 	final String visualizationsDir = workingDirInputFiles + "Visualisierungen/";
-	final String outputDir = svnWorkingDir + "Kai_und_Daniel/inputForMATSim/";		//outputDir of this class -> input for Matsim (KT)
+	final String outputDir = svnWorkingDir + "Kai_und_Daniel/inputForMATSim/";
 	
 	final String transitFilesDir = svnWorkingDir + "santiago_pt_demand_matrix/pt_stops_schedule_2013/";
 	final String gtfsFilesDir = svnWorkingDir + "santiago_pt_demand_matrix/gtfs_201306/";
 	
-	final String popA0eAX = "A0equalAX";			//Population with first Activity = last Activity
-	final String popA0neAX = "A0NoNequalAX";		//Population with first Activity != last Activity
+	final String popA0eAX = "A0equalAX";		//Population with first Activity = last Activity
+	final String popA0neAX = "A0NoNequalAX";	//Population with first Activity != last Activity
 	
-	final String pathForMatsim = "../../../runs-svn/santiago/run20/";
-	final boolean prepareForModeChoice = false;
-//	final String pathForMatsim = "../../../runs-svn/santiago/run30/";
-//	final boolean prepareForModeChoice = true;
+//	final String pathForMatsim = "../../../runs-svn/santiago/run20/";
+//	final boolean prepareForModeChoice = false;
+	final String pathForMatsim = "../../../runs-svn/santiago/run30/";
+	final boolean prepareForModeChoice = true;
 	
 	/**
 	 * Creates an initial population for the santiago scenario, executing the following steps:
@@ -150,7 +150,7 @@ public class SantiagoScenarioBuilder {
 		//TODO: check if really needed with "relative score computation" and cutting only A0neAX to midnight (see below)
 		removePersons(scenarioFromEOD.getPopulation());
 		
-		//TODO: rather first sort A0eAX and A0neAX, and then cut to midnight only for the latter...
+		//TODO: rather first sort A0eAX and A0neAX, and then cut to midnight only for the latter...use Amits code below instead?
 		Map<String, Population> populationMap = getPlansBeforeMidnight(scenarioFromEOD.getPopulation());
 		new PopulationWriter(populationMap.get(popA0eAX)).write(outputDir + "plans/plans_cropped_A0eAx_coords_beforeMidnight.xml.gz");
 		log.info("persons with a0 equal to aX: " + populationMap.get(popA0eAX).getPersons().size());
@@ -165,27 +165,13 @@ public class SantiagoScenarioBuilder {
 		
 		randomizeEndTimes(populationTmp);
 		
-		//TODO: what is happening here? Change with Amit.
-		AddingActivitiesInPlans aap = new AddingActivitiesInPlans(scenarioTmp);
-		aap.run();
-		aap.writePlans(outputDir + "plans/plans_cropped_randomized_shifted.xml.gz");
-		//TODO: what is happening here? Change with Amit.
-		//now "pt interaction" activities has neither maxduration nor start/end time -> Error when running (KT, 25.08.2015)
-		Population populationOut = aap.getOutPop();
-//		for (Person p : populationOut.getPersons().values()){
-//			for (PlanElement pe : p.getSelectedPlan().getPlanElements()){
-//				if (pe instanceof Activity){
-//				 Activity act = (Activity) pe;
-//				  if ((act.getEndTime() == Time.UNDEFINED_TIME ) && (act.getStartTime()  == Time.UNDEFINED_TIME) && act.getType() =="pt iNaNH"){
-//					  act.setMaximumDuration(0.);
-//				  }
-//				}
-//			}
-//		}
-		
 		//finish population
-		addFreightPop(populationOut);
-		new PopulationWriter(populationOut).write(outputDir + "plans/plans_final.xml.gz");
+		ActivityClassifier aap = new ActivityClassifier(scenarioTmp);
+		aap.run();
+
+		addFreightPop(aap.getOutPop());
+		
+		new PopulationWriter(aap.getOutPop()).write(outputDir + "plans/plans_final.xml.gz");
 				
 		//finish config
 		SortedMap<String, Double> acts = aap.getActivityType2TypicalDuration();
@@ -208,8 +194,10 @@ public class SantiagoScenarioBuilder {
 			params.setLatestStartTime(Time.UNDEFINED_TIME);
 			params.setOpeningTime(Time.UNDEFINED_TIME);
 			params.setTypicalDurationScoreComputation(TypicalDurationScoreComputation.relative);
-			if (act.equals("pt iNaNH")){ //do not score pt transit activity
+			if (act.equals("pt interaction")){ //do not score pt transit activity
 				params.setScoringThisActivityAtAll(false);
+				// TODO: this is stupid but enforced
+				params.setClosingTime(0);
 			}
 			config.planCalcScore().addActivityParams(params);
 		}

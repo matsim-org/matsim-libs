@@ -31,7 +31,7 @@ import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.router.PlanRouter;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
 import org.matsim.pt.transitSchedule.TransitScheduleWriterV1;
@@ -107,7 +107,7 @@ final class PControlerListener implements IterationStartsListener, StartupListen
 						return stuckFactory.getReRouteStuck(new PlanRouter(
 						controler.getTripRouterProvider().get(),
 						controler.getScenario().getActivityFacilities()
-						), ((ScenarioImpl)controler.getScenario()), agentsStuckHandler.getAgentsStuck());
+						), ((MutableScenario)controler.getScenario()), agentsStuckHandler.getAgentsStuck());
 					}
 				});
 			}

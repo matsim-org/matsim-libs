@@ -32,7 +32,7 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -109,9 +109,9 @@ public class AnalysisRunner {
 				true);
 		
 		new TransitScheduleReader(sc).readFile(dir.getIterationFilename(iteration, "transitSchedule.xml.gz"));
-		new VehicleReaderV1(((ScenarioImpl) sc).getTransitVehicles()).readFile(dir.getIterationFilename(iteration, "vehicles.xml.gz"));
+		new VehicleReaderV1(((MutableScenario) sc).getTransitVehicles()).readFile(dir.getIterationFilename(iteration, "vehicles.xml.gz"));
 		new MatsimNetworkReader(sc).readFile(dir.getOutputFilename(Controler.FILENAME_NETWORK));
-		new MatsimFacilitiesReader((ScenarioImpl) sc).readFile(dir.getOutputFilename("output_facilities.xml.gz"));
+		new MatsimFacilitiesReader((MutableScenario) sc).readFile(dir.getOutputFilename("output_facilities.xml.gz"));
 		new MatsimPopulationReader(sc).readFile(dir.getIterationFilename(iteration, "plans.xml.gz"));
 		
 		BVGLines2PtModes bvgLines2PtModes = new BVGLines2PtModes();
@@ -158,14 +158,14 @@ public class AnalysisRunner {
 		analyzer.addAnalysisModule(transitSchedule2Shp);
 		
 		// still beta
-		PtCircuityAnalyzer circuityAnalyzer = new PtCircuityAnalyzer(sc, ((ScenarioImpl) sc).getTransitVehicles());
+		PtCircuityAnalyzer circuityAnalyzer = new PtCircuityAnalyzer(sc, ((MutableScenario) sc).getTransitVehicles());
 		analyzer.addAnalysisModule(circuityAnalyzer);
 		
-		PtRoutes2PaxAnalysis ptRoutes2PaxAnalysis = new PtRoutes2PaxAnalysis(sc.getTransitSchedule().getTransitLines(), ((ScenarioImpl) sc).getTransitVehicles(), 3600.0, 24);
+		PtRoutes2PaxAnalysis ptRoutes2PaxAnalysis = new PtRoutes2PaxAnalysis(sc.getTransitSchedule().getTransitLines(), ((MutableScenario) sc).getTransitVehicles(), 3600.0, 24);
 		analyzer.addAnalysisModule(ptRoutes2PaxAnalysis);
 		
 		// still beta
-		PtLines2PaxAnalysis ptLines2PaxAnalysis = new PtLines2PaxAnalysis(sc.getTransitSchedule().getTransitLines(), ((ScenarioImpl) sc).getTransitVehicles(), 3600.0, 24);
+		PtLines2PaxAnalysis ptLines2PaxAnalysis = new PtLines2PaxAnalysis(sc.getTransitSchedule().getTransitLines(), ((MutableScenario) sc).getTransitVehicles(), 3600.0, 24);
 		analyzer.addAnalysisModule(ptLines2PaxAnalysis);
 		
 		// still beta

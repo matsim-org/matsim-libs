@@ -23,6 +23,7 @@ import gnu.trove.TDoubleDoubleHashMap;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.common.stats.Histogram;
 import org.matsim.contrib.common.stats.LinearDiscretizer;
+import playground.johannes.gsv.popsim.analysis.*;
 import playground.johannes.gsv.synPop.analysis.AnalyzerTask;
 import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.CommonValues;
@@ -45,7 +46,7 @@ public class ActTypeDistanceTask extends AnalyzerTask {
     public void analyze(Collection<? extends Person> persons, Map<String, DescriptiveStatistics> results) {
         Map<String, Predicate<Segment>> actTypePredicates = Predicates.actTypePredicates(persons);
         ModePredicate modePredicate = new ModePredicate(CommonValues.LEG_MODE_CAR);
-        LegDoubleCollector distColletor = new LegDoubleCollector(CommonKeys.LEG_GEO_DISTANCE);
+        LegCollector distColletor = new LegCollector(new NumericAttributeProvider(CommonKeys.LEG_GEO_DISTANCE));
 
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter(getOutputDirectory() + "/acttypedist.txt"));
@@ -62,7 +63,7 @@ public class ActTypeDistanceTask extends AnalyzerTask {
             pred.addComponent(modePredicate);
             pred.addComponent(purposePredicate);
 
-            distColletor.setLegPredicate(pred);
+            distColletor.setPredicate(pred);
 
             List<Double> dists = distColletor.collect(persons);
             double[] distArray = CollectionUtils.toNativeArray(dists);

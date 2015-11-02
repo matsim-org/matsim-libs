@@ -19,10 +19,16 @@
 
 package playground.johannes.synpop.source.mid2008.run;
 
+import org.apache.log4j.Logger;
+import playground.johannes.gsv.synPop.ConvertRide2Car;
+import playground.johannes.gsv.synPop.DeleteModes;
+import playground.johannes.gsv.synPop.DeleteNoLegs;
+import playground.johannes.gsv.synPop.analysis.DeleteShortLongTrips;
 import playground.johannes.synpop.data.Factory;
 import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.data.PlainFactory;
 import playground.johannes.synpop.data.io.PopulationIO;
+import playground.johannes.synpop.processing.TaskRunner;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -32,15 +38,37 @@ import java.util.Set;
  */
 public class MergePopulations {
 
+    private static final Logger logger = Logger.getLogger(MergePopulations.class);
+
     public static void main(String args[]) {
         Factory factory = new PlainFactory();
         Set<? extends Person> tripPersons = PopulationIO.loadFromXML(args[0], factory);
         Set<? extends Person> journeyPersons = PopulationIO.loadFromXML(args[1], factory);
 
-        Set<Person> mergedPersons = new HashSet<>();
-        mergedPersons.addAll(tripPersons);
-        mergedPersons.addAll(journeyPersons);
+        Set<Person> persons = new HashSet<>();
+        persons.addAll(tripPersons);
+        persons.addAll(journeyPersons);
 
-        PopulationIO.writeToXML(args[2], mergedPersons);
+        logger.info("Converting ride legs to car legs...");
+        TaskRunner.run(new ConvertRide2Car(), persons);
+
+//        logger.info("Converting activities to misc type...");
+//        TaskRunner.run(new Convert2MiscType(), persons);
+
+        logger.info("Removing non mobile persons...");
+        TaskRunner.validatePersons(new DeleteNoLegs(), persons);
+        logger.info(String.format("Persons after filter: %s", persons.size()));
+//        writer.write(outDir + "pop.mob.xml", persons);
+
+        logger.info("Removing non car persons...");
+        TaskRunner.validatePersons(new DeleteModes("car"), persons);
+        logger.info(String.format("Persons after filter: %s", persons.size()));
+//        writer.write(outDir + "pop.car.xml", persons);
+
+        logger.info("Removing legs with less than 3 KM...");
+        TaskRunner.run(new DeleteShortLongTrips(3000, true), persons);
+        TaskRunner.validatePersons(new DeleteNoLegs(), persons);
+        logger.info(String.format("Persons after filter: %s", persons.size()));
+        PopulationIO.writeToXML(args[2], persons);
     }
 }

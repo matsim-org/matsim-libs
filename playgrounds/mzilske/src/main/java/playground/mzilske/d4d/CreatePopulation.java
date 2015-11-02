@@ -34,7 +34,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
@@ -63,7 +63,7 @@ public class CreatePopulation {
 
 	private Random rnd = new Random();
 
-	private ScenarioImpl scenario;
+	private MutableScenario scenario;
 
 
 	private Coord min = D4DConsts.ct.transform(new Coord(minLong, minLat));
@@ -94,7 +94,7 @@ public class CreatePopulation {
 
 	public Map<Id, List<Sighting>> readNetworkAndSightings(Config config)
 			throws FileNotFoundException {
-		scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		readNetwork();
 		readPosts();
 

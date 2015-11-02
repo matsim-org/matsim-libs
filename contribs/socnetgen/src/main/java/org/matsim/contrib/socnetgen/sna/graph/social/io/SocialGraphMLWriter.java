@@ -28,7 +28,7 @@ import org.matsim.contrib.socnetgen.sna.graph.social.SocialVertex;
 import org.matsim.contrib.socnetgen.sna.graph.spatial.io.SpatialGraphMLWriter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 
@@ -100,7 +100,7 @@ public class SocialGraphMLWriter extends SpatialGraphMLWriter {
 	}
 
 	private void writePlansFile(SocialGraph graph, String filename) {
-        ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+        MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
         Population pop = PopulationUtils.createPopulation(sc.getConfig(), sc.getNetwork());
 		for(SocialVertex vertex : graph.getVertices()) {
 			pop.addPerson(vertex.getPerson().getPerson());

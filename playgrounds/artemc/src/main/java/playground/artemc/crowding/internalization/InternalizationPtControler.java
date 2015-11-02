@@ -28,7 +28,7 @@ import org.apache.log4j.Logger;
 import org.matsim.contrib.otfvis.OTFVisModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 
 import java.io.IOException;
 

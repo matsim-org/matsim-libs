@@ -22,7 +22,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.matrices.Matrices;
 import org.matsim.matrices.MatricesWriter;
 import org.matsim.matrices.Matrix;
-import org.matsim.matrices.MatsimMatricesReader;
 
 import saleem.stockholmscenario.utils.StockholmTransformationFactory;
 import floetteroed.utilities.math.Histogram;
@@ -54,7 +53,9 @@ public class TourTravelTimes {
 			final TravelTimeMatrices travelTimeMatrices) {
 		this.travelTimeMatrices = travelTimeMatrices;
 		this.extractHistograms(scenario);
-		this.computeTourTravelTimes();
+		if (travelTimeMatrices != null) {
+			this.computeTourTravelTimes();
+		}
 	}
 
 	// ------------------ INTERNALS ------------------
@@ -63,9 +64,10 @@ public class TourTravelTimes {
 		Histogram histogram = this.actType2dptTimeHist.get(actType);
 		if (histogram == null) {
 			histogram = Histogram.newHistogramWithUniformBins(
-					this.travelTimeMatrices.getStartTime_s(),
-					this.travelTimeMatrices.getBinSize_s(),
-					this.travelTimeMatrices.getBinCnt());
+					0, 3600, 24);
+//					this.travelTimeMatrices.getStartTime_s(),
+//					this.travelTimeMatrices.getBinSize_s(),
+//					this.travelTimeMatrices.getBinCnt());
 			this.actType2dptTimeHist.put(actType, histogram);
 		}
 		histogram.add(dptTime_s);
@@ -175,7 +177,7 @@ public class TourTravelTimes {
 		final String configFileName = "./input/matsim-config.xml";
 		final Config config = ConfigUtils.loadConfig(configFileName);
 		config.getModule("plans").addParam("inputPlansFile",
-				"./../10percentCarNetworkPlain/1000.plans.xml.gz");
+				"matsim-output/ITERS/it.100/100.plans.xml.gz");
 
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
 
@@ -187,11 +189,11 @@ public class TourTravelTimes {
 
 		// final String eventsFileName =
 		// "./matsim-output/ITERS/it.0/0.events.xml.gz";
-		final String regentMatrixFileName = "./exchange/regent-tts.xml";
-
-		final int startTime_s = 5 * 3600 + 1800;
-		final int binSize_s = 3600;
-		// final int binCnt = 2;
+//		final String regentMatrixFileName = "./exchange/regent-tts.xml";
+//
+//		final int startTime_s = 0;
+//		final int binSize_s = 3600;
+//		final int binCnt = 24;
 		// final int sampleCnt = 2;
 
 		// final int ttCalcTimeBinSize = 15 * 60;
@@ -217,18 +219,19 @@ public class TourTravelTimes {
 		// scenario.getNetwork(), linkTTs, null, zonalSystem,
 		// new Random(), startTime_s, binSize_s, binCnt, sampleCnt);
 
-		final Matrices ttMatrices = new Matrices();
-		final MatsimMatricesReader matricesReader = new MatsimMatricesReader(
-				ttMatrices, null);
-		matricesReader
-				.readFile("./../10percentCarNetworkPlain/travelTimeMatrices.xml");
-		final TravelTimeMatrices travelTimeMatrices = new TravelTimeMatrices(
-				ttMatrices, startTime_s, binSize_s);
+		// final Matrices ttMatrices = new Matrices();
+		// final MatsimMatricesReader matricesReader = new MatsimMatricesReader(
+		// ttMatrices, null);
+		// matricesReader
+		// .readFile("./../10percentCarNetworkPlain/travelTimeMatrices.xml");
+		// final TravelTimeMatrices travelTimeMatrices = new TravelTimeMatrices(
+		// ttMatrices, startTime_s, binSize_s);
+		final TravelTimeMatrices travelTimeMatrices = null;
 
 		final TourTravelTimes tsa = new TourTravelTimes(scenario,
 				travelTimeMatrices);
-		tsa.writeHistogramsToFile("./../10percentCarNetworkPlain/departureTimeHistograms.xml");
-		tsa.writeTourTravelTimesToFile("./../10percentCarNetworkPlain/tourTravelTimeMatrices.xml");
+		tsa.writeHistogramsToFile("departureTimeHistograms.txt");
+		// tsa.writeTourTravelTimesToFile("./../10percentCarNetworkPlain/tourTravelTimeMatrices.xml");
 
 		System.out.println("... DONE");
 	}

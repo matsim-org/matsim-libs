@@ -52,7 +52,7 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.facilities.ActivityFacilities;
@@ -142,7 +142,7 @@ public class InsertParkingActivitiesTest extends MatsimTestCase {
 		parkingTypes.put("streetParking", streetParking);
 		parkingTypes.put("garageParking", garageParking);
 		
-		for (ActivityFacility facility : ((ScenarioImpl) sc).getActivityFacilities().getFacilities().values()) {
+		for (ActivityFacility facility : ((MutableScenario) sc).getActivityFacilities().getFacilities().values()) {
 			// if the facility offers a parking activity
 			if (facility.getActivityOptions().containsKey("parking")) {
 				if (MatsimRandom.getRandom().nextBoolean()){

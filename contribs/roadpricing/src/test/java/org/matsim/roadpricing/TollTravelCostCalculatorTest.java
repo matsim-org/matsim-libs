@@ -51,7 +51,7 @@ import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.PreProcessLandmarks;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
@@ -75,7 +75,7 @@ public class TollTravelCostCalculatorTest {
         RoadPricingConfigGroup rpConfig = ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class);
 		
 		Scenario scenario = ScenarioUtils.createScenario(config) ;
-		Fixture.createNetwork2((ScenarioImpl)scenario);
+		Fixture.createNetwork2((MutableScenario)scenario);
 		Network net = scenario.getNetwork() ;
 		
 		RoadPricingSchemeImpl scheme = new RoadPricingSchemeImpl();
@@ -123,7 +123,7 @@ public class TollTravelCostCalculatorTest {
 	@Test
 	public void testDistanceTollRouter() {
 		Config config = utils.loadConfig(null);
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Fixture.createNetwork2(scenario);
 		Network network = scenario.getNetwork();
 		// a basic toll where only the morning hours are tolled
@@ -203,7 +203,7 @@ public class TollTravelCostCalculatorTest {
 	@Test
 	public void testLinkTollRouter() {
 		Config config = utils.loadConfig(null);
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Fixture.createNetwork2(scenario);
 		Network network = scenario.getNetwork();
 		// a basic toll where only the morning hours are tolled
@@ -280,7 +280,7 @@ public class TollTravelCostCalculatorTest {
 	@Test
 	public void testCordonTollRouter() {
 		Config config = utils.loadConfig(null);
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Fixture.createNetwork2(scenario);
 		Network network = scenario.getNetwork();
 		// a basic toll where only the morning hours are tolled

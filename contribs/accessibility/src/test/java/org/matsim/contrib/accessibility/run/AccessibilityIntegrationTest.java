@@ -46,7 +46,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
@@ -140,7 +140,7 @@ public class AccessibilityIntegrationTest {
 		controlerCG.setLastIteration( 10);
 		controlerCG.setOutputDirectory(utils.getOutputDirectory());
 		
-		final ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario( config);
+		final MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario( config);
 		ScenarioUtils.loadScenario(sc);
 
 		// creating test opportunities (facilities)
@@ -215,7 +215,7 @@ public class AccessibilityIntegrationTest {
 		controlerCG.setLastIteration( 10);
 		controlerCG.setOutputDirectory(utils.getOutputDirectory());
 		
-		final ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario( config);
+		final MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario( config);
 		ScenarioUtils.loadScenario(sc);
 		
 
@@ -302,7 +302,7 @@ public class AccessibilityIntegrationTest {
 		controlerCG.setLastIteration( 10);
 		controlerCG.setOutputDirectory(utils.getOutputDirectory());
 		
-		final ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario( config);
+		final MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario( config);
 		ScenarioUtils.loadScenario(sc);
 		
 

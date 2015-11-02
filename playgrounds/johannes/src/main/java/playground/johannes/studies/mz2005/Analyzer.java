@@ -31,7 +31,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.MatsimFacilitiesReader;
@@ -75,9 +75,9 @@ public class Analyzer {
 		
 		EscortData escortData = EscortData.read("/Users/jillenberger/Work/socialnets/data/schweiz/mz2005/rawdata/07-09-2011/escort.sun.txt", scenario.getPopulation());
 		
-		MatsimFacilitiesReader facReader = new MatsimFacilitiesReader((ScenarioImpl) scenario);
+		MatsimFacilitiesReader facReader = new MatsimFacilitiesReader((MutableScenario) scenario);
 		facReader.readFile("/Users/jillenberger/Work/shared-svn/studies/schweiz-ivtch/baseCase/facilities/facilities.cg.xml");
-		ActivityFacilities facilities = ((ScenarioImpl) scenario).getActivityFacilities();
+		ActivityFacilities facilities = ((MutableScenario) scenario).getActivityFacilities();
 		
 		FacilityFromActivity.createActivities(scenario.getPopulation(), facilities);
 		

@@ -112,7 +112,7 @@ public class DemandAnalyzer {
 
 	public static void main(String[] args) {
 
-		run("./test/regentmatsim/exchange/151023_trips.xml");
+		run("./test/regentmatsim/exchange/trips.xml");
 
 	}
 

@@ -22,7 +22,8 @@ public class LocationChoicePlanStrategy implements PlanStrategy {
 			throw new RuntimeException("best response location choice not supported as part of LocationChoicePlanStrategy. " +
 					"Use BestReplyLocationChoicePlanStrategy instead, but be aware that as of now some Java coding is necessary to do that. kai, feb'13") ;
 		}
-		String planSelector = scenario.getConfig().findParam("locationchoice", "planSelector");
+		DestinationChoiceConfigGroup dccg = (DestinationChoiceConfigGroup) scenario.getConfig().getModule(DestinationChoiceConfigGroup.GROUP_NAME);
+		String planSelector = dccg.getPlanSelector();
 		if (planSelector.equals("BestScore")) {
 			delegate = new PlanStrategyImpl(new BestPlanSelector());
 		} else if (planSelector.equals("ChangeExpBeta")) {

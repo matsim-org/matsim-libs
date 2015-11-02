@@ -31,7 +31,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
-import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility.Builder;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.PreProcessDijkstra;
 import org.matsim.core.router.util.TravelDisutility;
@@ -148,7 +148,7 @@ public class TestSchedulingHITS {
 		}
 	}
 	public static void main2(String[] args) throws NumberFormatException, IOException, ParseException {
-		Map<String, Household> households = HitsReader.readHits(args[0]);
+		Map<String, Household> households = HitsReader.readHits(args[0], args[1]);
 		Set<String> actChains = new HashSet<>();
 		Set<String> actChainsNoFlex = new HashSet<>();
 		Set<String> actChainsNoFlexSimple = new HashSet<>();
@@ -214,7 +214,7 @@ public class TestSchedulingHITS {
 		System.out.println(actChainsNoFlexSimple.size());
 	}
 	public static void main0(String[] args) throws NumberFormatException, IOException, ParseException {
-		Map<String, Household> households = HitsReader.readHits(args[0]);
+		Map<String, Household> households = HitsReader.readHits(args[0], args[1]);
 		IncomeEstimation.init();
 		IncomeEstimation.setIncome(households);
 		for(Household household:households.values())
@@ -413,7 +413,7 @@ public class TestSchedulingHITS {
 		eventsManager.addHandler(waitTimeCalculator);
 		eventsManager.addHandler(stopStopTimeCalculator);
 		new EventsReaderXMLv1(eventsManager).parse("C:/Users/sergioo/workspace2/playgrounds/sergioo/input/events/150.events.xml.gz");*/
-		TravelDisutility disutilityFunction = (new TravelTimeAndDistanceBasedTravelDisutilityFactory()).createTravelDisutility(travelTimeCalculator.getLinkTravelTimes(), scenario.getConfig().planCalcScore());
+		TravelDisutility disutilityFunction = (new Builder( TransportMode.car )).createTravelDisutility(travelTimeCalculator.getLinkTravelTimes(), scenario.getConfig().planCalcScore());
 		TransitRouterWSImplFactory factory = new TransitRouterWSImplFactory(scenario, waitTimeCalculator.getWaitTimes(), stopStopTimeCalculator.getStopStopTimes());
 		TransitRouter transitRouter = factory.get();
 		PreProcessDijkstra preProcessDijkstra = new PreProcessDijkstra();

@@ -75,7 +75,7 @@ public class StuckAgentTest {
 
 		MultiModalConfigGroup multiModalConfigGroup = new MultiModalConfigGroup();
         multiModalConfigGroup.setMultiModalSimulationEnabled(true);
-		multiModalConfigGroup.setSimulatedModes("walk,bike,unknown");
+		multiModalConfigGroup.setSimulatedModes("walk,bike,other");
 		config.addModule(multiModalConfigGroup);
 
 		ActivityParams homeParams = new ActivityParams("home");
@@ -92,7 +92,7 @@ public class StuckAgentTest {
 		
 		// set unkown mode speed
 		double unknownModeSpeed = 2.0;
-		config.plansCalcRoute().setTeleportedModeSpeed("unknown", unknownModeSpeed);
+		config.plansCalcRoute().setTeleportedModeSpeed("other", unknownModeSpeed);
 
         config.travelTimeCalculator().setFilterModes(true);
 

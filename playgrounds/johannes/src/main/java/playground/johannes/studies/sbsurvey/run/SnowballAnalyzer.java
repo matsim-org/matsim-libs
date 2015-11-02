@@ -44,7 +44,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReader;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.opengis.feature.simple.SimpleFeature;
 import playground.johannes.studies.sbsurvey.analysis.ApplySeedsFilter;
@@ -88,7 +88,7 @@ public class SnowballAnalyzer {
 		try {
 		graph = GraphReaderFacade.read(config.getParam(MODULE_NAME, "graphfile"));
 		
-		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		MatsimNetworkReader netReader = new MatsimNetworkReader(scenario);
 //		netReader.readFile(config.getParam(MODULE_NAME, "networkfile"));
 	

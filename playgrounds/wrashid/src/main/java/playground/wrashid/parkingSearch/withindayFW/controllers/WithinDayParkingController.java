@@ -26,7 +26,7 @@ import org.matsim.core.controler.events.ReplanningEvent;
 import org.matsim.core.controler.listener.ReplanningListener;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
 import playground.wrashid.parkingSearch.withinday.WithinDayController;
@@ -211,7 +211,7 @@ public abstract class WithinDayParkingController extends WithinDayController imp
 		parkingTypes.put("streetParking", streetParking);
 		parkingTypes.put("garageParking", garageParking);
 		
-		for (ActivityFacility facility : ((ScenarioImpl) controler.getScenario()).getActivityFacilities()
+		for (ActivityFacility facility : ((MutableScenario) controler.getScenario()).getActivityFacilities()
 				.getFacilities().values()) {
 
 			// if the facility offers a parking activity

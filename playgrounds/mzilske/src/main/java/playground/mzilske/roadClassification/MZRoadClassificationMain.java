@@ -18,18 +18,18 @@ import roadclassification.RunRoadClassification;
 public class MZRoadClassificationMain {
 
     final static String BERLIN_PATH = "/Users/michaelzilske/shared-svn/studies/countries/de/berlin/";
-    final static String sightingsDir = "/Users/michaelzilske/git/java8-matsim-playground/output/berlin/uncongested3/alternatives/random-heavy-users/sightings";
+    final static String sightingsDir = "/Users/michaelzilske/git/java8-matsim-playground/output/berlin/congested3/alternatives/only-heavy-users/sightings";
 
     public static void main(String[] args) {
         Config config = new Config();
         config.addCoreModules();
         new ConfigReader(config).parse(BerlinRunUncongested3.class.getResourceAsStream("2kW.15.xml"));
         config.plans().setInputFile(BERLIN_PATH + "plans/baseplan_car_only.xml.gz");
+        config.controler().setWritePlansInterval(0);
+        config.controler().setDumpDataAtEnd(false);
         config.network().setInputFile(BERLIN_PATH + "counts/iv_counts/network.xml.gz");
-        config.controler().setOutputDirectory("output/road-classification");
+        config.controler().setOutputDirectory("output/road-classification/run");
         config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
-        config.qsim().setFlowCapFactor(100);
-        config.qsim().setStorageCapFactor(100);
         config.qsim().setRemoveStuckVehicles(false);
         config.planCalcScore().setWriteExperiencedPlans(true);
 

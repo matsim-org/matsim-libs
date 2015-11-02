@@ -419,7 +419,7 @@ public class Transmodeler2MATSimNetwork {
 
 	public static void main(String[] args) throws IOException {
 
-		final String inputPath = "./data/transmodeler/";
+		final String inputPath = "./data_ZZZ/transmodeler/";
 		final String nodesFile = inputPath + "Nodes.csv";
 		final String segmentsFile = inputPath + "Segments.csv";
 		final String lanesFile = inputPath + "Lanes.csv";
@@ -428,7 +428,7 @@ public class Transmodeler2MATSimNetwork {
 
 		final boolean scaleUpIntersectionLinks = false;
 
-		final String outputPath = "./data/run/";
+		final String outputPath = "./data_ZZZ/run/";
 		final String matsimPlainFile = outputPath + "network-plain.xml";
 		final String matsimExpandedFile = outputPath + "network-expanded.xml";
 		final String linkAttributesFile = outputPath + "link-attributes.xml";

@@ -8,7 +8,7 @@ import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.Volume;
 
-import floetteroed.opdyts.ObjectBasedObjectiveFunction;
+import floetteroed.opdyts.ObjectiveFunction;
 import floetteroed.opdyts.SimulatorState;
 
 /**
@@ -17,7 +17,7 @@ import floetteroed.opdyts.SimulatorState;
  *
  */
 class RoadClassificationObjectiveFunction implements
-		ObjectBasedObjectiveFunction {
+		ObjectiveFunction {
 
 	// -------------------- MEMBERS --------------------
 

@@ -52,7 +52,9 @@ public class Analyzer {
 	
 		String output = "/home/johannes/gsv/matrix2014/mid-fusion/";
 
-		String personFile = "/home/johannes/gsv/germany-scenario/mid2008/pop/mid2008.merged.xml";
+//		String personFile = "/home/johannes/gsv/germany-scenario/mid2008/pop/mid2008.merged.xml";
+		String personFile = "/home/johannes/gsv/germany-scenario/mid2008/pop/mid2008.midjourneys.validated.xml";
+//		String personFile = "/home/johannes/gsv/germany-scenario/mid2008/pop/mid2008.midtrips.validated.xml";
 		
 		XMLHandler parser = new XMLHandler(new PlainFactory());
 		parser.setValidating(false);
@@ -64,7 +66,7 @@ public class Analyzer {
 		
 		logger.info("Cloning persons...");
 		Random random = new XORShiftRandom();
-		persons = PersonCloner.weightedClones((Collection<PlainPerson>) persons, 200000, random);
+		persons = PersonCloner.weightedClones((Collection<PlainPerson>) persons, 1000000, random);
 //		new ApplySampleProbas(82000000).apply(persons);
 		logger.info(String.format("Generated %s persons.", persons.size()));
 
@@ -73,7 +75,7 @@ public class Analyzer {
 		AnalyzerTaskComposite task = new AnalyzerTaskComposite();
 //		task.setOutputDirectory(output);
 //		task.addTask(new AgeIncomeCorrelation());
-//		task.addTask(new ActTypeDistanceTask());
+		task.addTask(new ActTypeDistanceTask());
 		task.addTask(new LegGeoDistanceTask("car"));
 		task.setOutputDirectory(output);
 		

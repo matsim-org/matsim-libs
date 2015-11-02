@@ -40,7 +40,7 @@ import org.matsim.contrib.analysis.kai.KNAnalysisEventsHandler;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.facilities.ActivityFacilities;
@@ -92,7 +92,7 @@ public class KNPopCompare {
 			Scenario scenario1 = ScenarioUtils.loadScenario( config ) ;
 			pop1 = scenario1.getPopulation() ;
 			//			network = scenario1.getNetwork() ;
-			ff = ((ScenarioImpl)scenario1).getActivityFacilities().getFactory() ;
+			ff = ((MutableScenario)scenario1).getActivityFacilities().getFactory() ;
 		}
 
 		Population pop2 ;

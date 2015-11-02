@@ -33,7 +33,7 @@ import java.util.List;
  */
 public abstract class AbstractAnalyzerTask<T> implements AnalyzerTask<T> {
 
-    protected String output;
+    protected FileIOContext ioContext;
 
     private List<Discretizer> discretizers;
 
@@ -41,8 +41,8 @@ public abstract class AbstractAnalyzerTask<T> implements AnalyzerTask<T> {
 
     private List<Boolean> discretizerFlags;
 
-    public void setOutput(String output) {
-        this.output = output;
+    public void setIoContext(FileIOContext ioContext) {
+        this.ioContext = ioContext;
     }
 
     public void addDiscretizer(Discretizer discretizer, String type, boolean reweight) {
@@ -64,7 +64,7 @@ public abstract class AbstractAnalyzerTask<T> implements AnalyzerTask<T> {
     }
 
     protected void writeHistograms(double[] values, double[] weights, String name) {
-        if (output != null && discretizers != null) {
+        if (ioContext != null && discretizers != null) {
             for (int i = 0; i < discretizers.size(); i++) {
                 Discretizer discretizer = discretizers.get(i);
                 String type = discretizerTypes.get(i);
@@ -72,10 +72,10 @@ public abstract class AbstractAnalyzerTask<T> implements AnalyzerTask<T> {
 
                 try {
                     TDoubleDoubleHashMap hist = Histogram.createHistogram(values, weights, discretizer, reweight);
-                    StatsWriter.writeHistogram(hist, name, "frequency", String.format("%s/%s.%s.txt", output, name, type));
+                    StatsWriter.writeHistogram(hist, name, "frequency", String.format("%s/%s.%s.txt", ioContext.getPath(), name, type));
 
                     hist = Histogram.normalize(hist);
-                    StatsWriter.writeHistogram(hist, name, "probability", String.format("%s/%s.%s.norm.txt", output, name, type));
+                    StatsWriter.writeHistogram(hist, name, "probability", String.format("%s/%s.%s.norm.txt", ioContext.getPath(), name, type));
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

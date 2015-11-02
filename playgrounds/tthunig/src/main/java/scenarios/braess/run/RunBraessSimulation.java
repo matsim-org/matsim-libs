@@ -52,10 +52,11 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.replanning.DefaultPlanStrategiesModule.DefaultSelector;
 import org.matsim.core.replanning.DefaultPlanStrategiesModule.DefaultStrategy;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
-import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility.Builder;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.data.v20.LaneDefinitionsWriter20;
 
+import playground.artemc.socialCost.SocialCostController.Initializer;
 import playground.vsp.congestion.controler.MarginalCongestionPricingContolerListener;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV4;
@@ -93,21 +94,21 @@ public class RunBraessSimulation {
 	private static final Double INIT_PLAN_SCORE = 110.;
 
 	/// defines which kind of signals should be used
-	private static final SignalControlType SIGNAL_TYPE = SignalControlType.SIGNAL4_ONE_SECOND_Z;
+	private static final SignalControlType SIGNAL_TYPE = SignalControlType.NONE;
 	// defines which kind of lanes should be used
 	private static final LaneType LANE_TYPE = LaneType.NONE;
 	
 	// defines which kind of pricing should be used
-	private static final PricingType PRICING_TYPE = PricingType.NONE;
+	private static final PricingType PRICING_TYPE = PricingType.V3;
 	public enum PricingType{
-		NONE, V3, V4, V8, V9
+		NONE, V3, V4, V8, V9, FLOWBASED
 	}
 
 	// choose a sigma for the randomized router
 	// (higher sigma cause more randomness. use 0.0 for no randomness.)
 	private static final double SIGMA = 0.0;	
 		
-	private static final boolean WRITE_INITIAL_FILES = true;
+	private static final boolean WRITE_INITIAL_FILES = false;
 	
 	private static String OUTPUT_BASE_DIR = "../../../runs-svn/braess/withoutLanes_signalsVsTolls/";
 	
@@ -155,8 +156,8 @@ public class RunBraessSimulation {
 		if (config.controler().isLinkToLinkRoutingEnabled()){
 			controler.addOverridingModule(new InvertedNetworkRoutingModuleModule());
 		}
-		
-		if (!PRICING_TYPE.equals(PricingType.NONE)){
+
+		if (!PRICING_TYPE.equals(PricingType.NONE) && !PRICING_TYPE.equals(PricingType.FLOWBASED)){
 			// add tolling
 			TollHandler tollHandler = new TollHandler(scenario);
 			
@@ -166,9 +167,9 @@ public class RunBraessSimulation {
 			for (int i = 0; i < strategies.length; i++) {
 				if (strategies[i].getStrategyName().equals(DefaultStrategy.ReRoute.toString())){
 					if (strategies[i].getWeight() > 0.0){ // ReRoute is used
-						final CongestionTollTimeDistanceTravelDisutilityFactory factory = 
+						final CongestionTollTimeDistanceTravelDisutilityFactory factory =
 								new CongestionTollTimeDistanceTravelDisutilityFactory(
-								new TravelTimeAndDistanceBasedTravelDisutilityFactory(),
+										new Builder( TransportMode.car ),
 								tollHandler
 							) ;
 						factory.setSigma(SIGMA);
@@ -180,7 +181,7 @@ public class RunBraessSimulation {
 						});
 					}
 				}
-			}			
+			}		
 			
 			// choose the correct congestion handler and add it
 			EventHandler congestionHandler = null;
@@ -207,10 +208,16 @@ public class RunBraessSimulation {
 			controler.addControlerListener(
 					new MarginalCongestionPricingContolerListener(controler.getScenario(), 
 							tollHandler, congestionHandler));
-		} else {
+		
+		} else if (PRICING_TYPE.equals(PricingType.FLOWBASED)) {
+			
+			Initializer initializer = new Initializer();
+			controler.addControlerListener(initializer);		
+		} else { // no pricing
+			
 			// adapt sigma for randomized routing
 			final RandomizingTimeDistanceTravelDisutility.Builder builder = 
-					new RandomizingTimeDistanceTravelDisutility.Builder();
+					new RandomizingTimeDistanceTravelDisutility.Builder( TransportMode.car );
 			builder.setSigma(SIGMA);
 			controler.addOverridingModule(new AbstractModule() {
 				@Override

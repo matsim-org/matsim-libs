@@ -14,7 +14,7 @@ import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 
 import playground.wrashid.lib.tools.events.FilterAgents;
 import playground.wrashid.lib.tools.network.obj.ComplexRectangularSelectionArea;
@@ -54,7 +54,7 @@ public class FilterEventsForCommunity {
 			System.out.println(personId);
 		}
 		
-		GeneralLib.writePersons(persons, "C:/eTmp/plansForZernez2010.xml.gz", network,(ScenarioImpl) scenario);
+		GeneralLib.writePersons(persons, "C:/eTmp/plansForZernez2010.xml.gz", network,(MutableScenario) scenario);
 	}
 
 	private static ComplexRectangularSelectionArea defineAreaOfInterest() {

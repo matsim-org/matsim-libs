@@ -130,7 +130,6 @@ public class RunZurichBikeSharingSimulation {
 
 		controler.addOverridingModule(
 				BikeSharingScenarioUtils.createTripRouterFactoryAndConfigureRouteFactories(
-					controler.getTravelDisutilityFactory(),
 					controler.getScenario(),
 					slopeScorer,
 					createRoutingData( sc ),

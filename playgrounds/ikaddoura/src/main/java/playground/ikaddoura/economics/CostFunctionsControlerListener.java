@@ -27,7 +27,7 @@ package playground.ikaddoura.economics;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 
 import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
 
@@ -38,10 +38,10 @@ import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
 
 public class CostFunctionsControlerListener implements StartupListener {
 
-	private final ScenarioImpl scenario;
+	private final MutableScenario scenario;
 	private CongestionHandlerImplV3 congestionHandler;
 
-	public CostFunctionsControlerListener(ScenarioImpl scenario){
+	public CostFunctionsControlerListener(MutableScenario scenario){
 		this.scenario = scenario;
 	}
 	

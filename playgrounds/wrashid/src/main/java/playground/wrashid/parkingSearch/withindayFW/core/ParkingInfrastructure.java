@@ -36,7 +36,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.obj.IntegerValueHashMap;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
@@ -76,14 +76,14 @@ public class ParkingInfrastructure  {
 	//	facilityToLinkMapping = new HashMap<Id, Id>(); 
 		parkingFacilitiesOnLinkMapping = new HashMap<Id, List<Id>>();
 		
-		new WorldConnectLocations(scenario.getConfig()).connectFacilitiesWithLinks(((ScenarioImpl) scenario).getActivityFacilities(), (NetworkImpl) scenario.getNetwork());
+		new WorldConnectLocations(scenario.getConfig()).connectFacilitiesWithLinks(((MutableScenario) scenario).getActivityFacilities(), (NetworkImpl) scenario.getNetwork());
 		
 		// Create a quadtree containing all parking facilities
 		double minx = Double.POSITIVE_INFINITY;
 		double miny = Double.POSITIVE_INFINITY;
 		double maxx = Double.NEGATIVE_INFINITY;
 		double maxy = Double.NEGATIVE_INFINITY;
-		for (ActivityFacility facility : ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().values()) {
+		for (ActivityFacility facility : ((MutableScenario) scenario).getActivityFacilities().getFacilities().values()) {
 			if (facility.getCoord().getX() < minx) { minx = facility.getCoord().getX(); }
 			if (facility.getCoord().getY() < miny) { miny = facility.getCoord().getY(); }
 			if (facility.getCoord().getX() > maxx) { maxx = facility.getCoord().getX(); }
@@ -95,7 +95,7 @@ public class ParkingInfrastructure  {
 		maxy += 1.0;
 		
 		nonFullPublicParkingFacilities = new QuadTree<ActivityFacility>(minx, miny, maxx, maxy);
-		for (ActivityFacility facility : ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().values()) {
+		for (ActivityFacility facility : ((MutableScenario) scenario).getActivityFacilities().getFacilities().values()) {
 			
 			// if the facility offers a parking activity
 			if (facility.getActivityOptions().containsKey("parking")) {
@@ -183,7 +183,7 @@ public class ParkingInfrastructure  {
 	}
 
 	private void markFacilityAsFull(Id facilityId) {
-		ActivityFacility activityFacility = ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().get(facilityId);
+		ActivityFacility activityFacility = ((MutableScenario) scenario).getActivityFacilities().getFacilities().get(facilityId);
 		nonFullPublicParkingFacilities.remove(activityFacility.getCoord().getX(), activityFacility.getCoord().getY(), activityFacility);
 		fullPublicParkingFacilities.add(activityFacility);
 	}
@@ -197,7 +197,7 @@ public class ParkingInfrastructure  {
 	}
 	
 	private void markFacilityAsNonFull(Id facilityId) {
-		ActivityFacility activityFacility = ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().get(facilityId);
+		ActivityFacility activityFacility = ((MutableScenario) scenario).getActivityFacilities().getFacilities().get(facilityId);
 		nonFullPublicParkingFacilities.put(activityFacility.getCoord().getX(), activityFacility.getCoord().getY(), activityFacility);
 		fullPublicParkingFacilities.remove(activityFacility);
 	}
@@ -243,7 +243,7 @@ public class ParkingInfrastructure  {
 		
 		resetParkingFacilitiesQuadTree(tmpList);
 		
-		return ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().get(parkingFacility.getId());
+		return ((MutableScenario) scenario).getActivityFacilities().getFacilities().get(parkingFacility.getId());
 	}
 	
 	public Id getClosestFreeParkingFacilityNotOnLink(Coord coord, Id linkId){
