@@ -22,10 +22,9 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.matrices.Matrices;
 import org.matsim.matrices.MatricesWriter;
 import org.matsim.matrices.Matrix;
+import org.matsim.matrices.MatsimMatricesReader;
 
-import saleem.stockholmscenario.utils.StockholmTransformationFactory;
 import floetteroed.utilities.math.Histogram;
-import gunnar.ihop2.regent.demandreading.ZonalSystem;
 
 /**
  * 
@@ -64,10 +63,9 @@ public class TourTravelTimes {
 		Histogram histogram = this.actType2dptTimeHist.get(actType);
 		if (histogram == null) {
 			histogram = Histogram.newHistogramWithUniformBins(
-					0, 3600, 24);
-//					this.travelTimeMatrices.getStartTime_s(),
-//					this.travelTimeMatrices.getBinSize_s(),
-//					this.travelTimeMatrices.getBinCnt());
+					this.travelTimeMatrices.getStartTime_s(),
+					this.travelTimeMatrices.getBinSize_s(),
+					this.travelTimeMatrices.getBinCnt());
 			this.actType2dptTimeHist.put(actType, histogram);
 		}
 		histogram.add(dptTime_s);
@@ -166,34 +164,26 @@ public class TourTravelTimes {
 
 		System.out.println("STARTED ...");
 
-		/*
-		 * FIRST CREATE TRAVEL TIME MATRICES
-		 */
-
-		/*
-		 * TODO:
-		 */
-
-		final String configFileName = "./input/matsim-config.xml";
-		final Config config = ConfigUtils.loadConfig(configFileName);
-		config.getModule("plans").addParam("inputPlansFile",
-				"matsim-output/ITERS/it.100/100.plans.xml.gz");
-
-		final Scenario scenario = ScenarioUtils.loadScenario(config);
-
-		final String zonesShapeFileName = "./input/sverige_TZ_EPSG3857.shp";
-		final ZonalSystem zonalSystem = new ZonalSystem(zonesShapeFileName,
-				StockholmTransformationFactory.WGS84_EPSG3857);
-		zonalSystem.addNetwork(scenario.getNetwork(),
-				StockholmTransformationFactory.WGS84_SWEREF99);
+		// final String configFileName = "./input/matsim-config.xml";
+		// final Config config = ConfigUtils.loadConfig(configFileName);
+		// config.getModule("plans").addParam("inputPlansFile",
+		// "matsim-output/ITERS/it.100/100.plans.xml.gz");
+		//
+		// final Scenario scenario = ScenarioUtils.loadScenario(config);
+		//
+		// final String zonesShapeFileName = "./input/sverige_TZ_EPSG3857.shp";
+		// final ZonalSystem zonalSystem = new ZonalSystem(zonesShapeFileName,
+		// StockholmTransformationFactory.WGS84_EPSG3857);
+		// zonalSystem.addNetwork(scenario.getNetwork(),
+		// StockholmTransformationFactory.WGS84_SWEREF99);
 
 		// final String eventsFileName =
 		// "./matsim-output/ITERS/it.0/0.events.xml.gz";
-//		final String regentMatrixFileName = "./exchange/regent-tts.xml";
-//
-//		final int startTime_s = 0;
-//		final int binSize_s = 3600;
-//		final int binCnt = 24;
+		// final String regentMatrixFileName = "./exchange/regent-tts.xml";
+		//
+		// final int startTime_s = 0;
+		// final int binSize_s = 3600;
+		// final int binCnt = 24;
 		// final int sampleCnt = 2;
 
 		// final int ttCalcTimeBinSize = 15 * 60;
@@ -215,23 +205,22 @@ public class TourTravelTimes {
 
 		// load matrices from file!
 
-		// final TravelTimeMatrices travelTimeMatrices = new TravelTimeMatrices(
-		// scenario.getNetwork(), linkTTs, null, zonalSystem,
-		// new Random(), startTime_s, binSize_s, binCnt, sampleCnt);
+		final String configFileName = "./input/matsim-config.xml";
+		final Config config = ConfigUtils.loadConfig(configFileName);
+		final Scenario scenario = ScenarioUtils.loadScenario(config);
 
-		// final Matrices ttMatrices = new Matrices();
-		// final MatsimMatricesReader matricesReader = new MatsimMatricesReader(
-		// ttMatrices, null);
-		// matricesReader
-		// .readFile("./../10percentCarNetworkPlain/travelTimeMatrices.xml");
-		// final TravelTimeMatrices travelTimeMatrices = new TravelTimeMatrices(
-		// ttMatrices, startTime_s, binSize_s);
-		final TravelTimeMatrices travelTimeMatrices = null;
+		final Matrices ttMatrices = new Matrices();
+		final MatsimMatricesReader matricesReader = new MatsimMatricesReader(
+				ttMatrices, null);
+		matricesReader.readFile("./traveltimes.xml");
+
+		final TravelTimeMatrices travelTimeMatrices = new TravelTimeMatrices(
+				ttMatrices, 6 * 3600, 3600);
 
 		final TourTravelTimes tsa = new TourTravelTimes(scenario,
 				travelTimeMatrices);
-		tsa.writeHistogramsToFile("departureTimeHistograms.txt");
-		// tsa.writeTourTravelTimesToFile("./../10percentCarNetworkPlain/tourTravelTimeMatrices.xml");
+		tsa.writeTourTravelTimesToFile("./tourtts.xml");
+		tsa.writeHistogramsToFile("./departuretime-hist.txt");
 
 		System.out.println("... DONE");
 	}

@@ -455,7 +455,6 @@ public class MATSimDummy {
 			final TravelTimeMatrices travelTimeMatrices = new TravelTimeMatrices(
 					controler.getScenario().getNetwork(),
 					controler.getLinkTravelTimes(),
-					// new LinkedHashSet<>(zoneIDs),
 					zonalSystem, rnd, analysisStartTime_s, analysisBinSize_s,
 					analysisBinCnt, nodeSampleSize);
 

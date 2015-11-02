@@ -69,10 +69,10 @@ public class EmmeTravelTimes implements TabularFileHandler {
 
 		System.out.println("STARTED");
 		
-		final String work = "./test/original/EMME_traveltimes_WORK_mf8.txt";
+		final String work = "./test/referencedata/EMME_traveltimes_OTHER_mf9.txt";
 		final EmmeTravelTimes emmeTT = new EmmeTravelTimes();
 		emmeTT.read(work);
-		emmeTT.write("./test/original/EMME_traveltimes_WORK_mf8.xml");
+		emmeTT.write("./test/referencedata/EMME_traveltimes_OTHER_mf9.xml");
 
 		System.out.println("DONE");
 	}

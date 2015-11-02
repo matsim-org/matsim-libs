@@ -29,20 +29,30 @@ public class CompareTTMatrices {
 		{
 			final Matrices m1 = new Matrices();
 			final MatsimMatricesReader r1 = new MatsimMatricesReader(m1, null);
-			r1.readFile("./test/travelTimeMatrices_18-22.xml");
-			xMatrix = m1.getMatrix("TT_18:15:00");
+			// r1.readFile("./test/matsim-testrun/tourtts.xml");
+			// xMatrix = m1.getMatrix("WORK");
+			// xMatrix = m1.getMatrix("OTHER");
+			r1.readFile("./test/matsim-testrun/traveltimes.xml");
+			xMatrix = m1.getMatrix("TT_07:30:00");
+			MatrixUtils.mult(xMatrix, 2.0); // we want tours, not trips
 		}
 
 		final Matrix yMatrix;
 		{
 			final Matrices m1 = new Matrices();
 			final MatsimMatricesReader r1 = new MatsimMatricesReader(m1, null);
-			r1.readFile("./test/travelTimeMatrices_1800-1830_parallel.xml");
-			yMatrix = m1.getMatrix("TT_18:15:00");
+			// r1.readFile("./test/referencedata/EMME_traveltimes_WORK_mf8.xml");
+			r1.readFile("./test/referencedata/EMME_traveltimes_OTHER_mf9.xml");
+//			r1.readFile("./test/matsim-testrun/freeflow-traveltimes.xml");
+			yMatrix = m1.getMatrices().values().iterator().next();
+//			MatrixUtils.mult(yMatrix, 2.0); // we want tours, not trips
 		}
 
 		final double frac = 0.01;
-		final PrintWriter writer = new PrintWriter("./test/scatter-par.txt");
+		// final PrintWriter writer = new
+		// PrintWriter("./test/matsim-testrun/matsim-vs-emme_WORK_0-01.txt");
+		final PrintWriter writer = new PrintWriter(
+				"./test/matsim-testrun/matsim-vs-EMME_7-8-vs-OTHER.txt");
 
 		for (List<Entry> row1 : new FractionalIterable<ArrayList<Entry>>(
 				xMatrix.getFromLocations().values(), Math.sqrt(frac))) {
