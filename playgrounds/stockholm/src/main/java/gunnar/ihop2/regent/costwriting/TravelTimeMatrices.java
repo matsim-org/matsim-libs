@@ -1,22 +1,23 @@
 package gunnar.ihop2.regent.costwriting;
 
-import static org.matsim.matrices.MatrixUtils.add;
+import static floetteroed.utilities.math.MathHelpers.drawWithoutReplacement;
 import static org.matsim.matrices.MatrixUtils.divHadamard;
-import static org.matsim.matrices.MatrixUtils.inc;
 import static org.matsim.matrices.MatrixUtils.newAnonymousMatrix;
 import floetteroed.utilities.Time;
-import floetteroed.utilities.Units;
-import floetteroed.utilities.math.MathHelpers;
 import gunnar.ihop2.integration.MATSimDummy;
 import gunnar.ihop2.regent.demandreading.ZonalSystem;
 import gunnar.ihop2.regent.demandreading.Zone;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 import org.matsim.api.core.v01.Scenario;
@@ -27,14 +28,12 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.matrices.Matrices;
 import org.matsim.matrices.MatricesWriter;
 import org.matsim.matrices.Matrix;
-import org.matsim.utils.leastcostpathtree.LeastCostPathTree;
 
 import saleem.stockholmscenario.utils.StockholmTransformationFactory;
 
@@ -69,12 +68,10 @@ public class TravelTimeMatrices {
 			this.ttMatrixList_min.add(matrix);
 			System.out.println(matrix.getId());
 		}
-		// TODO CONTINUE HERE
 	}
 
 	public TravelTimeMatrices(final Network network,
 			final TravelTime linkTTs,
-			// final Set<String> relevantZoneIDs,
 			final ZonalSystem zonalSystem, final Random rnd,
 			final int startTime_s, final int binSize_s, final int binCnt,
 			final int sampleCnt) {
@@ -86,35 +83,14 @@ public class TravelTimeMatrices {
 		 * Identify all zones that are relevant and contain at least one node.
 		 */
 
-		final Set<String> relevantAndFeasibleZoneIDs = new LinkedHashSet<>();
-		// if (relevantZoneIDs == null) {
-		// if no relevant zone IDs were defined then identify them self
-		// Logger.getLogger(MATSimDummy.class.getName()).warning(
-		// "no relevant zone ids given, using all zones in "
-		// + "zonal system that contain at least one node");
+		final Map<Zone, Set<Node>> zone2sampledNodes = new LinkedHashMap<>();
 		for (Zone zone : zonalSystem) {
-			if (zonalSystem.getNodes(zone).size() > 0) {
-				relevantAndFeasibleZoneIDs.add(zone.getId());
+			final Set<Node> nodes = drawWithoutReplacement(sampleCnt,
+					zonalSystem.getNodes(zone), rnd);
+			if ((nodes != null) && (nodes.size() > 0)) {
+				zone2sampledNodes.put(zone, nodes);
 			}
 		}
-		// } else {
-		// // make sure that all relevant zones exist and contain nodes
-		// for (String zoneId : relevantZoneIDs) {
-		// final Zone zone = zonalSystem.getZone(zoneId);
-		// if (zone == null) {
-		// Logger.getLogger(MATSimDummy.class.getName()).warning(
-		// "zonal system does not contain zone id " + zoneId);
-		// } else {
-		// if (zonalSystem.getNodes(zone).size() > 0) {
-		// relevantAndFeasibleZoneIDs.add(zoneId);
-		// } else {
-		// Logger.getLogger(MATSimDummy.class.getName()).warning(
-		// "zone with id " + zoneId
-		// + " does not contain any nodes");
-		// }
-		// }
-		// }
-		// }
 
 		/*
 		 * Create one travel time matrix per time bin.
@@ -139,28 +115,31 @@ public class TravelTimeMatrices {
 			this.ttMatrixList_min.add(ttMatrix_min);
 			final Matrix cntMatrix = newAnonymousMatrix();
 
+			final int threadCnt = Runtime.getRuntime().availableProcessors();
+			Logger.getLogger(MATSimDummy.class.getName()).info(
+					"Running " + threadCnt + " threads.");
+			final ExecutorService threadPool = Executors
+					.newFixedThreadPool(threadCnt);
+
 			// go through all origin zones
-			for (String fromZoneID : relevantAndFeasibleZoneIDs) {
-				// go through a sample of nodes in the origin zone
-				for (Node fromNode : MathHelpers.drawWithoutReplacement(
-						sampleCnt, zonalSystem.getNodes(fromZoneID), rnd)) {
-					final LeastCostPathTree lcpt = new LeastCostPathTree(
-							linkTTs, new OnlyTimeDependentTravelDisutility(
-									linkTTs));
-					lcpt.calculate(network, fromNode, time_s);
-					// go through all destination zones
-					for (String toZoneID : relevantAndFeasibleZoneIDs) {
-						// go through a sample of nodes in the destination zone
-						for (Node toNode : MathHelpers.drawWithoutReplacement(
-								sampleCnt, zonalSystem.getNodes(toZoneID), rnd)) {
-							add(ttMatrix_min, fromZoneID, toZoneID, lcpt
-									.getTree().get(toNode.getId()).getCost()
-									* Units.MIN_PER_S);
-							inc(cntMatrix, fromZoneID, toZoneID);
-						}
-					}
+			for (Zone fromZone : zone2sampledNodes.keySet()) {
+				// go through a sample of origin nodes
+				for (Node fromNode : zone2sampledNodes.get(fromZone)) {
+					final LeastCostMatrixUpdater matrixUpdater = new LeastCostMatrixUpdater(
+							linkTTs, network, fromNode, time_s,
+							zone2sampledNodes, ttMatrix_min, cntMatrix,
+							fromZone.getId());
+					threadPool.execute(matrixUpdater);
 				}
 			}
+
+			threadPool.shutdown();
+			try {
+				threadPool.awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS);
+			} catch (InterruptedException e) {
+				throw new RuntimeException();
+			}
+
 			divHadamard(ttMatrix_min, cntMatrix);
 		}
 	}
@@ -225,7 +204,7 @@ public class TravelTimeMatrices {
 
 		final int startTime_s = 18 * 3600;
 		final int binSize_s = 1800;
-		final int binCnt = 8;
+		final int binCnt = 1;
 		final int sampleCnt = 5;
 
 		final TravelTimeCalculator ttcalc = new TravelTimeCalculator(
@@ -242,7 +221,8 @@ public class TravelTimeMatrices {
 				// null,
 				zonalSystem, new Random(), startTime_s, binSize_s, binCnt,
 				sampleCnt);
-		travelTimeMatrices.writeToFile("./test/travelTimeMatrices_18-22.xml");
+		travelTimeMatrices
+				.writeToFile("./test/travelTimeMatrices_1800-1830_parallel.xml");
 
 		System.out.println("... DONE");
 	}
