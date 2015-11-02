@@ -17,24 +17,41 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.popsim;
+package playground.johannes.gsv.popsim.analysis;
 
-import org.matsim.contrib.common.collections.Composite;
-import playground.johannes.synpop.data.Attributable;
+import org.matsim.api.core.v01.Id;
+import org.matsim.facilities.ActivityFacilities;
+import org.matsim.facilities.ActivityFacility;
+import playground.johannes.synpop.data.CommonKeys;
+import playground.johannes.synpop.data.Segment;
 
 /**
  * @author johannes
  */
-public class PredicateAndComposite<T extends Attributable> extends Composite<Predicate<T>> implements Predicate<T> {
+public class LegBeelineDistance implements ValueProvider<Double, Segment> {
+
+    private final ActivityFacilities facilities;
+
+    public LegBeelineDistance(ActivityFacilities facilities) {
+        this.facilities = facilities;
+    }
 
     @Override
-    public boolean test(T attributable) {
-        for(Predicate<T> p : components) {
-            if(!p.test(attributable)) {
-                return false;
-            }
-        }
+    public Double get(Segment leg) {
+        Segment prev = leg.previous();
+        Segment next = leg.next();
 
-        return true;
+        String prevFacId = prev.getAttribute(CommonKeys.ACTIVITY_FACILITY);
+        String nextFacId = next.getAttribute(CommonKeys.ACTIVITY_FACILITY);
+
+        ActivityFacility prevFac = facilities.getFacilities().get(Id.create(prevFacId, ActivityFacility.class));
+        ActivityFacility nextFac = facilities.getFacilities().get(Id.create(nextFacId, ActivityFacility.class));
+
+        if(prevFac != null && nextFac != null) {
+            double dx = prevFac.getCoord().getX() - nextFac.getCoord().getX();
+            double dy = prevFac.getCoord().getY() - nextFac.getCoord().getY();
+
+            return Math.sqrt(dx * dx + dy *dy);
+        } else return null;
     }
 }

@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,       *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,24 +16,34 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.johannes.gsv.popsim.analysis;
 
-package playground.johannes.gsv.popsim;
+import playground.johannes.gsv.popsim.CollectionUtils;
+import playground.johannes.synpop.data.Person;
 
-import playground.johannes.synpop.data.Segment;
+import java.util.Collection;
+import java.util.List;
 
 /**
- * @author johannes
+ * @author jillenberger
  */
-public class LegPurposePredicate implements Predicate<Segment> {
+public class NumericAnalyzer extends AbstractAnalyzerTask<Collection<? extends Person>> {
 
-    private final Predicate<Segment> actTypePredicate;
+    private Collector<Double> collector;
 
-    public LegPurposePredicate(Predicate<Segment> actTypePredicate) {
-        this.actTypePredicate = actTypePredicate;
+    private String dimension;
+
+    public NumericAnalyzer(Collector<Double> collector, String dimension) {
+        this.collector = collector;
+        this.dimension = dimension;
     }
 
     @Override
-    public boolean test(Segment segment) {
-        return actTypePredicate.test(segment.next());
+    public void analyze(Collection<? extends Person> persons, List<StatsContainer> containers) {
+        List<Double> values = collector.collect(persons);
+        double[] doubleValues = CollectionUtils.toNativeArray(values);
+
+        containers.add(new StatsContainer(dimension, doubleValues));
+        writeHistograms(doubleValues, dimension);
     }
 }

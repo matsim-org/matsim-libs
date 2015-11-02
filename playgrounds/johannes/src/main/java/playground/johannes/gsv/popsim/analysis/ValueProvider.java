@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,       *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,13 +16,14 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.johannes.gsv.popsim.analysis;
 
-package playground.johannes.gsv.popsim;
+import playground.johannes.synpop.data.Attributable;
 
 /**
- * @author johannes
+ * @author jillenberger
  */
-public interface Predicate<T> {
+public interface ValueProvider<T, A extends Attributable> {
 
-    boolean test(T t);
+    T get(A attributable);
 }

@@ -22,6 +22,8 @@
 
 package org.matsim.contrib.multimodal;
 
+import com.google.inject.Key;
+import com.google.inject.name.Names;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -33,6 +35,7 @@ import org.matsim.contrib.multimodal.router.util.UnknownTravelTimeFactory;
 import org.matsim.contrib.multimodal.router.util.WalkTravelTimeFactory;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.TripRouterFactoryModule;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
 import org.matsim.core.router.util.TravelTime;
@@ -63,10 +66,10 @@ public class MultiModalModule extends AbstractModule {
                 addTravelDisutilityFactoryBinding(mode).toInstance( new RandomizingTimeDistanceTravelDisutility.Builder( mode ) );
                 addRoutingModuleBinding(mode).toProvider(new TripRouterFactoryModule.NetworkRoutingModuleProvider(mode));
             } else if (mode.equals(TransportMode.transit_walk)) {
-                Provider<TravelTime> factory = new TransitWalkTravelTimeFactory(plansCalcRouteConfigGroup, linkSlopes);
-                addTravelTimeBinding(mode).toProvider(factory);
-                addTravelDisutilityFactoryBinding(mode).toInstance( new RandomizingTimeDistanceTravelDisutility.Builder( mode ) );
-                addRoutingModuleBinding(mode).toProvider(new TripRouterFactoryModule.NetworkRoutingModuleProvider(mode));
+//                Provider<TravelTime> factory = new TransitWalkTravelTimeFactory(plansCalcRouteConfigGroup, linkSlopes);
+//                addTravelTimeBinding(mode).toProvider(factory);
+//                addTravelDisutilityFactoryBinding(mode).toInstance( new RandomizingTimeDistanceTravelDisutility.Builder( mode ) );
+                addRoutingModuleBinding(mode).to(Key.get(RoutingModule.class, Names.named(TransportMode.walk)));
             } else if (mode.equals(TransportMode.bike)) {
                 Provider<TravelTime> factory = new BikeTravelTimeFactory(plansCalcRouteConfigGroup, linkSlopes);
                 addTravelTimeBinding(mode).toProvider(factory);

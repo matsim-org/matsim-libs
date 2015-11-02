@@ -18,6 +18,10 @@
  * *********************************************************************** */
 package playground.johannes.gsv.popsim.analysis;
 
+import org.apache.commons.math.stat.StatUtils;
+
+import java.util.List;
+
 /**
  * @author jillenberger
  */
@@ -33,11 +37,21 @@ public class StatsContainer {
 
     private Double max;
 
-    private Double N;
+    private Integer N;
 
     private Double variance;
 
     public StatsContainer(String name) {
         this.name = name;
+    }
+
+    public StatsContainer(String name, double[] values) {
+        this(name);
+        mean = StatUtils.mean(values);
+        median = StatUtils.percentile(values, 50);
+        min = StatUtils.min(values);
+        max = StatUtils.max(values);
+        N = values.length;
+        variance = StatUtils.variance(values);
     }
 }

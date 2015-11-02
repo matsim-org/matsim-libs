@@ -17,25 +17,19 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.popsim;
+package playground.johannes.gsv.popsim.analysis;
 
-import playground.johannes.gsv.popsim.analysis.Predicate;
-import playground.johannes.synpop.data.CommonKeys;
-import playground.johannes.synpop.data.Segment;
+import playground.johannes.synpop.data.Attributable;
+import playground.johannes.synpop.data.Person;
+
+import java.util.Collection;
+import java.util.List;
 
 /**
  * @author johannes
  */
-public class ActTypePredicate implements Predicate<Segment> {
+public interface Collector<T> {
 
-    private final String type;
+    List<T> collect(Collection<? extends Person> persons);
 
-    public ActTypePredicate(String type) {
-        this.type = type;
-    }
-
-    @Override
-    public boolean test(Segment segment) {
-        return type.equalsIgnoreCase(segment.getAttribute(CommonKeys.ACTIVITY_TYPE));
-    }
 }

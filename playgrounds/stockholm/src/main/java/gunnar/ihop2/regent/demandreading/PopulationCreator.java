@@ -16,13 +16,16 @@ import static saleem.stockholmscenario.utils.StockholmTransformationFactory.getC
 
 import java.io.FileNotFoundException;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -34,6 +37,8 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.population.algorithms.XY2Links;
+import org.matsim.utils.objectattributes.ObjectAttributeUtils2;
+import org.matsim.utils.objectattributes.ObjectAttributes;
 
 import saleem.stockholmscenario.utils.StockholmTransformationFactory;
 import floetteroed.utilities.math.MathHelpers;
@@ -72,6 +77,14 @@ public class PopulationCreator {
 
 	// -------------------- CONSTRUCTION --------------------
 
+	/*
+	 * TODO When adding the link attributes, the zonal system is not affected,
+	 * meaning that zones may keep pointers at nodes that have been removed. The
+	 * difference is probably not so large but still this is inconsistent.
+	 * 
+	 * Better pass on the link attributes (file name) into this constructor and
+	 * first reduce the network and only then add it to the zonal system.
+	 */
 	public PopulationCreator(final String networkFileName,
 			final String zoneShapeFileName, final String zonalCoordinateSystem,
 			final String populationFileName) {
@@ -97,21 +110,23 @@ public class PopulationCreator {
 		this.populationSampleFactor = populationSampleFactor;
 	}
 
-	// TODO This is needed once Transmodeler does the network loading!
-	// public void setLinkAttributes(final ObjectAttributes linkAttributes) {
-	// final Set<String> tmLinkIds = new LinkedHashSet<String>(
-	// ObjectAttributeUtils2.allObjectKeys(linkAttributes));
-	// final Set<Id<Link>> removeTheseLinkIds = new LinkedHashSet<Id<Link>>();
-	// for (Id<Link> candidateId : this.scenario.getNetwork().getLinks()
-	// .keySet()) {
-	// if (!tmLinkIds.contains(candidateId.toString())) {
-	// removeTheseLinkIds.add(candidateId);
-	// }
-	// }
-	// for (Id<Link> linkId : removeTheseLinkIds) {
-	// this.scenario.getNetwork().removeLink(linkId);
-	// }
-	// }
+	public void removeExpandedLinks(final ObjectAttributes linkAttributes) {
+		final Set<String> tmLinkIds = new LinkedHashSet<String>(
+				ObjectAttributeUtils2.allObjectKeys(linkAttributes));
+		final Set<Id<Link>> removeTheseLinkIds = new LinkedHashSet<Id<Link>>();
+		for (Id<Link> candidateId : this.scenario.getNetwork().getLinks()
+				.keySet()) {
+			if (!tmLinkIds.contains(candidateId.toString())) {
+				removeTheseLinkIds.add(candidateId);
+			}
+		}
+		Logger.getLogger(this.getClass().getName()).info(
+				"Excluding " + removeTheseLinkIds.size()
+						+ " expanded links from being activity locations.");
+		for (Id<Link> linkId : removeTheseLinkIds) {
+			this.scenario.getNetwork().removeLink(linkId);
+		}
+	}
 
 	// -------------------- INTERNALS --------------------
 
@@ -246,7 +261,7 @@ public class PopulationCreator {
 					+ workDuration_s;
 			final String workTourMode = regent2matsim.get(this.attr(personId,
 					WORKTOURMODE_ATTRIBUTE));
-			// TODO Work may be done at home! 
+			// TODO Work may be done at home!
 			this.addTour(plan, WORK, workCoord, workTourMode, workEndTime_s);
 
 		} else if ((workCoord == null) && (otherCoord != null)) {
@@ -278,7 +293,7 @@ public class PopulationCreator {
 					+ workDuration_s;
 			final String workTourMode = regent2matsim.get(this.attr(personId,
 					WORKTOURMODE_ATTRIBUTE));
-			// TODO Work may be done at home! 
+			// TODO Work may be done at home!
 			this.addTour(plan, WORK, workCoord, workTourMode, workEndTime_s);
 
 			final double intermediateHomeEndTime_s = workEndTime_s

@@ -17,25 +17,24 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.popsim;
+package playground.johannes.gsv.popsim.analysis;
 
-import playground.johannes.gsv.popsim.analysis.Predicate;
 import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.Segment;
 
 /**
  * @author johannes
  */
-public class ActTypePredicate implements Predicate<Segment> {
+public class ModePredicate implements Predicate<Segment> {
 
-    private final String type;
+    private final String mode;
 
-    public ActTypePredicate(String type) {
-        this.type = type;
+    public ModePredicate(String mode) {
+        this.mode = mode;
     }
 
     @Override
     public boolean test(Segment segment) {
-        return type.equalsIgnoreCase(segment.getAttribute(CommonKeys.ACTIVITY_TYPE));
+        return mode.equalsIgnoreCase(segment.getAttribute(CommonKeys.LEG_MODE));
     }
 }

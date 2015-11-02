@@ -17,17 +17,23 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.popsim;
+package playground.johannes.gsv.popsim.analysis;
 
-import playground.johannes.synpop.data.Person;
-
-import java.util.Collection;
-import java.util.List;
+import playground.johannes.synpop.data.Segment;
 
 /**
  * @author johannes
  */
-public interface Collector {
+public class LegPurposePredicate implements Predicate<Segment> {
 
-    List<Double> collect(Collection<? extends Person> persons);
+    private final Predicate<Segment> actTypePredicate;
+
+    public LegPurposePredicate(Predicate<Segment> actTypePredicate) {
+        this.actTypePredicate = actTypePredicate;
+    }
+
+    @Override
+    public boolean test(Segment segment) {
+        return actTypePredicate.test(segment.next());
+    }
 }

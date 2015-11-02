@@ -1,38 +1,28 @@
 package gunnar.ihop2.integration;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
 import java.util.Random;
 import java.util.logging.FileHandler;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.population.PopulationWriter;
-import org.matsim.utils.objectattributes.ObjectAttributes;
-import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
-
-import saleem.stockholmscenario.utils.StockholmTransformationFactory;
 import cadyts.utilities.misc.StreamFlushHandler;
 import floetteroed.utilities.SimpleLogFormatter;
 import floetteroed.utilities.Time;
 import floetteroed.utilities.config.Config;
 import floetteroed.utilities.config.ConfigReader;
-import gunnar.ihop2.regent.costwriting.TourTravelTimes;
-import gunnar.ihop2.regent.costwriting.TravelTimeMatrices;
-import gunnar.ihop2.regent.demandreading.PopulationCreator;
-import gunnar.ihop2.regent.demandreading.ZonalSystem;
-import gunnar.ihop2.scaper.ScaperPopulationCreator;
+import gunnar.ihop2.utils.StringAsIntegerComparator;
 
 /**
  * 
  * @author Gunnar Flötteröd
  *
  */
-public class MATSimDummy {
+public class RunScaper {
 
 	public static final String IHOP2_ELEMENT = "ihop2";
 
@@ -64,7 +54,7 @@ public class MATSimDummy {
 
 	public static final String ITERATIONS_ELEMENT = "iterations";
 
-	// public static final String ZONE_ELEMENT = "zone";
+	public static final String ZONE_ELEMENT = "zone";
 
 	public static final String RANDOMSEED_ELEMENT = "randomseed";
 
@@ -77,14 +67,13 @@ public class MATSimDummy {
 	public static final String NODESAMPLE_SIZE_ELEMENT = "nodesamplesize";
 
 	public static void fatal(final String msg) {
-		Logger.getLogger(MATSimDummy.class.getName()).severe(
+		Logger.getLogger(RunScaper.class.getName()).severe(
 				"FATAL ERROR: " + msg);
 		System.exit(-1);
 	}
 
 	public static void fatal(final Exception e) {
-		Logger.getLogger(MATSimDummy.class.getName()).severe(
-				"FATAL ERROR: " + e);
+		Logger.getLogger(RunScaper.class.getName()).severe("FATAL ERROR: " + e);
 		e.printStackTrace();
 		System.exit(-1);
 	}
@@ -92,7 +81,7 @@ public class MATSimDummy {
 	private static void checkNonNull(final String fileName,
 			final String definition) {
 		if (fileName == null) {
-			Logger.getLogger(MATSimDummy.class.getName()).severe(
+			Logger.getLogger(RunScaper.class.getName()).severe(
 					definition + " is null.");
 		}
 	}
@@ -100,7 +89,7 @@ public class MATSimDummy {
 	private static void checkFileExistence(final String fileName,
 			final String definition) {
 		if (!(new File(fileName)).exists()) {
-			Logger.getLogger(MATSimDummy.class.getName()).severe(
+			Logger.getLogger(RunScaper.class.getName()).severe(
 					definition + " \"" + fileName + "\" could not be found.");
 		}
 	}
@@ -145,7 +134,7 @@ public class MATSimDummy {
 		 * -------------------- CONFIGURE --------------------
 		 */
 
-		Logger.getLogger(MATSimDummy.class.getName()).info(
+		Logger.getLogger(RunScaper.class.getName()).info(
 				"Checking program parameters ... ");
 
 		final String configFileName = args[0];
@@ -159,21 +148,21 @@ public class MATSimDummy {
 				MATSIMCONFIG_FILENAME_ELEMENT);
 		checkNonNull(matsimConfigFileName, "matsimconfig file name");
 		checkFileExistence(matsimConfigFileName, "matsimconfig file");
-		Logger.getLogger(MATSimDummy.class.getName()).info(
+		Logger.getLogger(RunScaper.class.getName()).info(
 				MATSIMCONFIG_FILENAME_ELEMENT + " = " + matsimConfigFileName);
 
 		final String zoneShapeFileName = config.get(IHOP2_ELEMENT,
 				ZONESHAPE_FILENAME_ELEMENT);
 		checkNonNull(zoneShapeFileName, "zone shapefile name");
 		checkFileExistence(zoneShapeFileName, "zone shapefile");
-		Logger.getLogger(MATSimDummy.class.getName()).info(
+		Logger.getLogger(RunScaper.class.getName()).info(
 				ZONESHAPE_FILENAME_ELEMENT + " = " + zoneShapeFileName);
 
 		final String buildingShapeFileName = config.get(IHOP2_ELEMENT,
 				BUILDINGSHAPE_FILENAME_ELEMENT);
 		checkNonNull(buildingShapeFileName, "building shapefile name");
 		checkFileExistence(buildingShapeFileName, "building shapefile");
-		Logger.getLogger(MATSimDummy.class.getName()).info(
+		Logger.getLogger(RunScaper.class.getName()).info(
 				BUILDINGSHAPE_FILENAME_ELEMENT + " = " + buildingShapeFileName);
 
 		double regentPopulationSample;
@@ -185,7 +174,7 @@ public class MATSimDummy {
 			fatal("Could not read ihop2 configuration element "
 					+ REGENTPOPULATIONSAMPLE_ELEMENT);
 		}
-		Logger.getLogger(MATSimDummy.class.getName())
+		Logger.getLogger(RunScaper.class.getName())
 				.info(REGENTPOPULATIONSAMPLE_ELEMENT + " = "
 						+ regentPopulationSample);
 
@@ -198,7 +187,7 @@ public class MATSimDummy {
 			fatal("Could not read ihop2 configuration element "
 					+ MATSIMPOPULATIONSUBSAMPLE_ELEMENT);
 		}
-		Logger.getLogger(MATSimDummy.class.getName()).info(
+		Logger.getLogger(RunScaper.class.getName()).info(
 				MATSIMPOPULATIONSUBSAMPLE_ELEMENT + " = "
 						+ matsimPopulationSubSample);
 
@@ -206,7 +195,7 @@ public class MATSimDummy {
 				POPULATION_ATTRIBUTE_FILENAME_ELEMENT);
 		checkNonNull(populationFileName, "population file name");
 		checkFileExistence(populationFileName, "population file");
-		Logger.getLogger(MATSimDummy.class.getName()).info(
+		Logger.getLogger(RunScaper.class.getName()).info(
 				POPULATION_ATTRIBUTE_FILENAME_ELEMENT + " = "
 						+ populationFileName);
 
@@ -214,7 +203,7 @@ public class MATSimDummy {
 				LINKATTRIBUTE_FILENAME_ELEMENT);
 		checkNonNull(linkAttributeFileName, "linkattribute file name");
 		checkFileExistence(linkAttributeFileName, "linkattribute file");
-		Logger.getLogger(MATSimDummy.class.getName()).info(
+		Logger.getLogger(RunScaper.class.getName()).info(
 				LINKATTRIBUTE_FILENAME_ELEMENT + " = " + linkAttributeFileName);
 
 		final String demandModelName = config.get(IHOP2_ELEMENT,
@@ -225,13 +214,13 @@ public class MATSimDummy {
 		} catch (IllegalArgumentException e) {
 			fatal("Demand model \"" + demandModelName + "\" is unknown.");
 		}
-		Logger.getLogger(MATSimDummy.class.getName()).info(
+		Logger.getLogger(RunScaper.class.getName()).info(
 				DEMANDMODEL_ELEMENT + " = " + demandModel);
 
 		final String traveltimesFileName = config.get(IHOP2_ELEMENT,
 				TRAVELTIME_MATRIX_FILENAME_ELEMENT);
 		checkNonNull(traveltimesFileName, "traveltimes file name");
-		Logger.getLogger(MATSimDummy.class.getName()).info(
+		Logger.getLogger(RunScaper.class.getName()).info(
 				TRAVELTIME_MATRIX_FILENAME_ELEMENT + " = "
 						+ traveltimesFileName);
 
@@ -239,13 +228,13 @@ public class MATSimDummy {
 				REGENT_FOLDER_ELEMENT);
 		checkNonNull(regentFolder, "regent folder file name");
 		checkFileExistence(regentFolder, "regent folder");
-		Logger.getLogger(MATSimDummy.class.getName()).info(
+		Logger.getLogger(RunScaper.class.getName()).info(
 				REGENT_FOLDER_ELEMENT + " = " + regentFolder);
 
 		final String regentCommand = config.get(IHOP2_ELEMENT,
 				REGENT_COMMAND_ELEMENT);
 		checkNonNull(regentCommand, "regent command");
-		Logger.getLogger(MATSimDummy.class.getName()).info(
+		Logger.getLogger(RunScaper.class.getName()).info(
 				REGENT_COMMAND_ELEMENT + " = " + regentCommand);
 
 		Integer maxIterations = null;
@@ -255,20 +244,20 @@ public class MATSimDummy {
 		} catch (NumberFormatException e) {
 			fatal("could not read the " + ITERATIONS_ELEMENT + " XML element.");
 		}
-		Logger.getLogger(MATSimDummy.class.getName()).info(
+		Logger.getLogger(RunScaper.class.getName()).info(
 				ITERATIONS_ELEMENT + " = " + maxIterations);
 
-		// final List<String> zoneIDs = config
-		// .getList(IHOP2_ELEMENT, ZONE_ELEMENT);
-		// if (zoneIDs == null) {
-		// fatal("could not read the " + ZONE_ELEMENT + " XML element.");
-		// System.exit(-1);
-		// } else if (zoneIDs.size() == 0) {
-		// fatal("there are no zones defined in the xml file.");
-		// }
-		// Collections.sort(zoneIDs, new StringAsIntegerComparator());
-		// Logger.getLogger(MATSimDummy.class.getName()).info(
-		// "Number of relevant zones: " + zoneIDs.size());
+		final List<String> zoneIDs = config
+				.getList(IHOP2_ELEMENT, ZONE_ELEMENT);
+		if (zoneIDs == null) {
+			fatal("could not read the " + ZONE_ELEMENT + " XML element.");
+			System.exit(-1);
+		} else if (zoneIDs.size() == 0) {
+			fatal("there are no zones defined in the xml file.");
+		}
+		Collections.sort(zoneIDs, new StringAsIntegerComparator());
+		Logger.getLogger(RunScaper.class.getName()).info(
+				"Number of relevant zones: " + zoneIDs.size());
 
 		final String randomSeedStr = config.get(IHOP2_ELEMENT,
 				RANDOMSEED_ELEMENT);
@@ -283,11 +272,11 @@ public class MATSimDummy {
 						+ " XML element.");
 			}
 		} else {
-			Logger.getLogger(MATSimDummy.class.getName()).info(
+			Logger.getLogger(RunScaper.class.getName()).info(
 					"no random seed specified");
 			rnd = new Random();
 		}
-		Logger.getLogger(MATSimDummy.class.getName()).info(
+		Logger.getLogger(RunScaper.class.getName()).info(
 				RANDOMSEED_ELEMENT + " = " + randomSeedStr);
 
 		Integer analysisStartTime_s = null;
@@ -298,7 +287,7 @@ public class MATSimDummy {
 			fatal("could not read the " + ANALYSIS_STARTTIME_ELEMENT
 					+ " XML element.");
 		}
-		Logger.getLogger(MATSimDummy.class.getName()).info(
+		Logger.getLogger(RunScaper.class.getName()).info(
 				ANALYSIS_STARTTIME_ELEMENT + " = " + analysisStartTime_s);
 
 		Integer analysisBinSize_s = null;
@@ -309,7 +298,7 @@ public class MATSimDummy {
 			fatal("could not read the " + ANALYSIS_BINSIZE_ELEMENT
 					+ " XML element.");
 		}
-		Logger.getLogger(MATSimDummy.class.getName()).info(
+		Logger.getLogger(RunScaper.class.getName()).info(
 				ANALYSIS_BINSIZE_ELEMENT + " = " + analysisBinSize_s);
 
 		Integer analysisBinCnt = null;
@@ -320,7 +309,7 @@ public class MATSimDummy {
 			fatal("could not read the " + ANALYSIS_BINCOUNT_ELEMENT
 					+ " XML element.");
 		}
-		Logger.getLogger(MATSimDummy.class.getName()).info(
+		Logger.getLogger(RunScaper.class.getName()).info(
 				ANALYSIS_BINCOUNT_ELEMENT + " = " + analysisBinCnt);
 
 		Integer nodeSampleSize = null;
@@ -331,10 +320,10 @@ public class MATSimDummy {
 			fatal("could not read the " + NODESAMPLE_SIZE_ELEMENT
 					+ " XML element.");
 		}
-		Logger.getLogger(MATSimDummy.class.getName()).info(
+		Logger.getLogger(RunScaper.class.getName()).info(
 				NODESAMPLE_SIZE_ELEMENT + " = " + nodeSampleSize);
 
-		Logger.getLogger(MATSimDummy.class.getName()).info(
+		Logger.getLogger(RunScaper.class.getName()).info(
 				"... program parameters appear OK so far.");
 
 		/*
@@ -345,170 +334,163 @@ public class MATSimDummy {
 		 * ==================== OUTER ITERATIONS ====================
 		 */
 
-		for (int iteration = 1; iteration <= maxIterations; iteration++) {
+		// for (int iteration = 1; iteration <= maxIterations; iteration++) {
+		//
+		// Logger.getLogger(RunScaper.class.getName()).info(
+		// "---------- STARTING ITERATION " + iteration + " OF "
+		// + maxIterations + " ----------");
+		//
+		// /*
+		// * -------------------- LOAD CONFIGURATION --------------------
+		// */
+		//
+		// Logger.getLogger(RunScaper.class.getName()).info(
+		// "Loading matsim configuration file: "
+		// + matsimConfigFileName + " ... ");
+		// final org.matsim.core.config.Config matsimConfig = ConfigUtils
+		// .loadConfig(matsimConfigFileName);
+		// final String matsimNetworkFileName = matsimConfig.getModule(
+		// "network").getValue("inputNetworkFile");
+		// final String initialPlansFileName = matsimConfig.getModule("plans")
+		// .getValue("inputPlansFile");
+		//
+		// /*
+		// * -------------------- CREATE POPULATION --------------------
+		// */
+		// Logger.getLogger(RunScaper.class.getName()).info(
+		// "Creating MATSim population ... ");
+		//
+		// if (DEMANDMODEL.regent.equals(demandModel)) {
+		// final PopulationCreator populationCreator = new PopulationCreator(
+		// matsimNetworkFileName, zoneShapeFileName,
+		// StockholmTransformationFactory.WGS84_EPSG3857,
+		// populationFileName);
+		// populationCreator.setBuildingsFileName(buildingShapeFileName);
+		// populationCreator
+		// .setPopulationSampleFactor(matsimPopulationSubSample);
+		// final ObjectAttributes linkAttributes = new ObjectAttributes();
+		// final ObjectAttributesXmlReader reader = new
+		// ObjectAttributesXmlReader(
+		// linkAttributes);
+		// reader.parse(linkAttributeFileName);
+		// Logger.getLogger(RunScaper.class.getName()).warning(
+		// "Removing all expanded links. This *should* have no "
+		// + "effect if a non-expanded network is used.");
+		// populationCreator.removeExpandedLinks(linkAttributes);
+		// try {
+		// populationCreator.run(initialPlansFileName);
+		// } catch (FileNotFoundException e1) {
+		// throw new RuntimeException(e1);
+		// }
+		// } else if (DEMANDMODEL.scaper.equals(demandModel)) {
+		//
+		// final ScaperPopulationCreator reader = new ScaperPopulationCreator(
+		// matsimNetworkFileName, zoneShapeFileName,
+		// StockholmTransformationFactory.WGS84_EPSG3857,
+		// populationFileName);
+		// PopulationWriter popwriter = new PopulationWriter(
+		// reader.scenario.getPopulation(), null);
+		// popwriter.write(initialPlansFileName);
+		//
+		// }
+		//
+		// Logger.getLogger(RunScaper.class.getName()).info(
+		// "... succeeded to create population.");
+		//
+		// /*
+		// * -------------------- RUN MATSIM --------------------
+		// */
+		//
+		// Logger.getLogger(RunScaper.class.getName()).info(
+		// "Running MATSim ...");
+		//
+		// Controler controler = new Controler(matsimConfig);
+		//
+		// matsimConfig.getModule("qsim").addParam(
+		// "flowCapacityFactor",
+		// Double.toString(regentPopulationSample
+		// * matsimPopulationSubSample));
+		// matsimConfig.getModule("qsim").addParam(
+		// "storageCapacityFactor",
+		// Double.toString(regentPopulationSample
+		// * matsimPopulationSubSample));
+		// matsimConfig.planCalcScore().setWriteExperiencedPlans(true);
+		// matsimConfig.getModule("controler").addParam("overwriteFiles",
+		// "deleteDirectoryIfExists");
+		//
+		// controler.run();
+		//
+		// Logger.getLogger(RunScaper.class.getName()).info(
+		// "... MATSim run completed.");
+		//
+		// /*
+		// * -------------------- WRITE TRAVELTIME MATRIX --------------------
+		// */
+		//
+		// Logger.getLogger(RunScaper.class.getName()).info(
+		// "Computing time-dependent travel times ...");
+		//
+		// // TODO this was already created in the population generation
+		// final ZonalSystem zonalSystem = new ZonalSystem(zoneShapeFileName,
+		// StockholmTransformationFactory.WGS84_EPSG3857);
+		// zonalSystem.addNetwork(controler.getScenario().getNetwork(),
+		// StockholmTransformationFactory.WGS84_SWEREF99);
+		//
+		// final TravelTimeMatrices travelTimeMatrices = new TravelTimeMatrices(
+		// controler.getScenario().getNetwork(),
+		// controler.getLinkTravelTimes(),
+		// new LinkedHashSet<>(zoneIDs), zonalSystem, rnd,
+		// analysisStartTime_s, analysisBinSize_s, analysisBinCnt,
+		// nodeSampleSize);
+		//
+		// if (DEMANDMODEL.regent.equals(demandModel)) {
+		//
+		// Logger.getLogger(RunScaper.class.getName()).info(
+		// "Computing tour travel times ...");
+		//
+		// // TODO make sure the population uses the experienced travel
+		// // times.
+		// final TourTravelTimes tourTravelTimes = new TourTravelTimes(
+		// controler.getScenario(), travelTimeMatrices);
+		// tourTravelTimes.writeTourTravelTimesToFile(traveltimesFileName);
+		// tourTravelTimes
+		// .writeHistogramsToFile("./departure-time-histograms.txt");
+		//
+		// } else if (DEMANDMODEL.scaper.equals(demandModel)) {
+		//
+		// travelTimeMatrices.writeToScaperFiles(traveltimesFileName);
+		//
+		// }
+		//
+		// Logger.getLogger(RunScaper.class.getName()).info(
+		// "... succeeded to write traveltime matrices to file: "
+		// + traveltimesFileName);
+		//
+		// /*
+		// * -------------------- RUN REGENT --------------------
+		// */
 
-			Logger.getLogger(MATSimDummy.class.getName()).info(
-					"---------- STARTING ITERATION " + iteration + " OF "
-							+ maxIterations + " ----------");
+		Logger.getLogger(RunScaper.class.getName()).info(
+				"Running demand model: " + regentCommand + " ...");
 
-			/*
-			 * -------------------- LOAD CONFIGURATION --------------------
-			 */
-
-			Logger.getLogger(MATSimDummy.class.getName()).info(
-					"Loading matsim configuration file: "
-							+ matsimConfigFileName + " ... ");
-			final org.matsim.core.config.Config matsimConfig = ConfigUtils
-					.loadConfig(matsimConfigFileName);
-			final String matsimNetworkFileName = matsimConfig.getModule(
-					"network").getValue("inputNetworkFile");
-			final String initialPlansFileName = matsimConfig.getModule("plans")
-					.getValue("inputPlansFile");
-
-			/*
-			 * -------------------- CREATE POPULATION --------------------
-			 */
-			Logger.getLogger(MATSimDummy.class.getName()).info(
-					"Creating MATSim population ... ");
-
-			if (DEMANDMODEL.regent.equals(demandModel)) {
-
-				final PopulationCreator populationCreator = new PopulationCreator(
-						matsimNetworkFileName, zoneShapeFileName,
-						StockholmTransformationFactory.WGS84_EPSG3857,
-						populationFileName);
-				populationCreator.setBuildingsFileName(buildingShapeFileName);
-				populationCreator
-						.setPopulationSampleFactor(matsimPopulationSubSample);
-				final ObjectAttributes linkAttributes = new ObjectAttributes();
-				final ObjectAttributesXmlReader reader = new ObjectAttributesXmlReader(
-						linkAttributes);
-				reader.parse(linkAttributeFileName);
-				Logger.getLogger(MATSimDummy.class.getName()).warning(
-						"Removing all expanded links. This *should* have no "
-								+ "effect if a non-expanded network is used.");
-				populationCreator.removeExpandedLinks(linkAttributes);
-				try {
-					populationCreator.run(initialPlansFileName);
-				} catch (FileNotFoundException e1) {
-					throw new RuntimeException(e1);
-				}
-
-			} else if (DEMANDMODEL.scaper.equals(demandModel)) {
-
-				final ScaperPopulationCreator reader = new ScaperPopulationCreator(
-						matsimNetworkFileName, zoneShapeFileName,
-						StockholmTransformationFactory.WGS84_EPSG3857,
-						populationFileName);
-				PopulationWriter popwriter = new PopulationWriter(
-						reader.scenario.getPopulation(), null);
-				popwriter.write(initialPlansFileName);
-
+		final Process proc;
+		final int exitVal;
+		try {
+			proc = Runtime.getRuntime().exec(regentCommand, null,
+					new File(regentFolder));
+			exitVal = proc.waitFor();
+			if (exitVal != 0) {
+				fatal("Scaper terminated with exit code " + exitVal + ".");
 			}
-
-			Logger.getLogger(MATSimDummy.class.getName()).info(
-					"... succeeded to create population.");
-
-			/*
-			 * -------------------- RUN MATSIM --------------------
-			 */
-
-			Logger.getLogger(MATSimDummy.class.getName()).info(
-					"Running MATSim ...");
-
-			final Controler controler = new Controler(matsimConfig);
-
-			matsimConfig.getModule("qsim").addParam(
-					"flowCapacityFactor",
-					Double.toString(regentPopulationSample
-							* matsimPopulationSubSample));
-			matsimConfig.getModule("qsim").addParam(
-					"storageCapacityFactor",
-					Double.toString(regentPopulationSample
-							* matsimPopulationSubSample));
-			matsimConfig.planCalcScore().setWriteExperiencedPlans(true);
-			matsimConfig.getModule("controler").addParam("overwriteFiles",
-					"deleteDirectoryIfExists");
-
-			// TODO NEW
-			matsimConfig.getModule("controler").addParam("outputDirectory",
-					"./matsim-output." + iteration + "/");
-
-			controler.run();
-
-			Logger.getLogger(MATSimDummy.class.getName()).info(
-					"... MATSim run completed.");
-
-			/*
-			 * -------------------- WRITE TRAVELTIME MATRIX --------------------
-			 */
-
-			Logger.getLogger(MATSimDummy.class.getName()).info(
-					"Computing time-dependent travel times ...");
-
-			// TODO this was already created in the population generation
-			final ZonalSystem zonalSystem = new ZonalSystem(zoneShapeFileName,
-					StockholmTransformationFactory.WGS84_EPSG3857);
-			zonalSystem.addNetwork(controler.getScenario().getNetwork(),
-					StockholmTransformationFactory.WGS84_SWEREF99);
-
-			final TravelTimeMatrices travelTimeMatrices = new TravelTimeMatrices(
-					controler.getScenario().getNetwork(),
-					controler.getLinkTravelTimes(),
-					// new LinkedHashSet<>(zoneIDs),
-					zonalSystem, rnd, analysisStartTime_s, analysisBinSize_s,
-					analysisBinCnt, nodeSampleSize);
-
-			if (DEMANDMODEL.regent.equals(demandModel)) {
-
-				Logger.getLogger(MATSimDummy.class.getName()).info(
-						"Computing tour travel times ...");
-
-				// TODO make sure the population uses the experienced travel
-				// times.
-				final TourTravelTimes tourTravelTimes = new TourTravelTimes(
-						controler.getScenario(), travelTimeMatrices);
-				tourTravelTimes.writeTourTravelTimesToFile(traveltimesFileName);
-				// TODO new, writing a new file per (outer) iteration
-				tourTravelTimes
-						.writeHistogramsToFile("./departure-time-histograms."
-								+ iteration + ".txt");
-
-			} else if (DEMANDMODEL.scaper.equals(demandModel)) {
-
-				travelTimeMatrices.writeToScaperFiles(traveltimesFileName);
-
-			}
-
-			Logger.getLogger(MATSimDummy.class.getName()).info(
-					"... succeeded to write traveltime matrices to file: "
-							+ traveltimesFileName);
-
-			/*
-			 * -------------------- RUN REGENT --------------------
-			 */
-
-			Logger.getLogger(MATSimDummy.class.getName()).info(
-					"Running demand model: " + regentCommand + " ...");
-
-			final Process proc;
-			final int exitVal;
-			try {
-				proc = Runtime.getRuntime().exec(regentCommand, null,
-						new File(regentFolder));
-				exitVal = proc.waitFor();
-				if (exitVal != 0) {
-					fatal("Regent terminated with exit code " + exitVal + ".");
-				}
-			} catch (Exception e) {
-				fatal(e);
-			}
-
-			Logger.getLogger(MATSimDummy.class.getName()).info(
-					"... succeeded to run Regent");
+		} catch (Exception e) {
+			fatal(e);
 		}
 
-		Logger.getLogger(MATSimDummy.class.getName()).info("DONE");
+		Logger.getLogger(RunScaper.class.getName()).info(
+				"... succeeded to run Scaper");
+		// }
+
+		Logger.getLogger(RunScaper.class.getName()).info("DONE");
 		System.out.println("... DONE");
 	}
 }

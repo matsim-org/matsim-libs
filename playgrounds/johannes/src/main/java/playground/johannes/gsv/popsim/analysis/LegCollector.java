@@ -17,41 +17,49 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.popsim;
+package playground.johannes.gsv.popsim.analysis;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.facilities.ActivityFacilities;
-import org.matsim.facilities.ActivityFacility;
-import playground.johannes.synpop.data.CommonKeys;
+import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.data.Segment;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * @author johannes
  */
-public class LegBeelineDistance extends LegCollector {
+public class LegCollector<T> implements Collector<T> {
 
-    private final ActivityFacilities facilities;
+    private Predicate<Segment> predicate;
 
-    public LegBeelineDistance(ActivityFacilities facilities) {
-        this.facilities = facilities;
+    private ValueProvider<T, Segment> provider;
+
+    public LegCollector(ValueProvider<T, Segment> provider) {
+        this.provider = provider;
     }
 
     @Override
-    protected Double value(Segment leg) {
-        Segment prev = leg.previous();
-        Segment next = leg.next();
+    public List<T> collect(Collection<? extends Person> persons) {
+        ArrayList<T> values = new ArrayList<>(persons.size() * 10);
 
-        String prevFacId = prev.getAttribute(CommonKeys.ACTIVITY_FACILITY);
-        String nextFacId = next.getAttribute(CommonKeys.ACTIVITY_FACILITY);
+        for (Person p : persons) {
+            for (Episode e : p.getEpisodes()) {
+                for (Segment leg : e.getLegs()) {
+                    if (predicate == null || predicate.test(leg)) {
+                        values.add(provider.get(leg));
+                    }
+                }
+            }
+        }
 
-        ActivityFacility prevFac = facilities.getFacilities().get(Id.create(prevFacId, ActivityFacility.class));
-        ActivityFacility nextFac = facilities.getFacilities().get(Id.create(nextFacId, ActivityFacility.class));
+        values.trimToSize();
 
-        if(prevFac != null && nextFac != null) {
-            double dx = prevFac.getCoord().getX() - nextFac.getCoord().getX();
-            double dy = prevFac.getCoord().getY() - nextFac.getCoord().getY();
+        return values;
+    }
 
-            return Math.sqrt(dx * dx + dy *dy);
-        } else return null;
+    public void setPredicate(Predicate<Segment> predicate) {
+        this.predicate = predicate;
     }
 }

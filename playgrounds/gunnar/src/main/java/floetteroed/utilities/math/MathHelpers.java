@@ -106,7 +106,7 @@ public class MathHelpers {
 	}
 
 	// TODO NEW
-	public static <T> Set<T> drawWithoutReplacement(int n,
+	public static synchronized <T> Set<T> drawWithoutReplacement(int n,
 			final Collection<T> collection, final Random rnd) {
 		final Set<T> result = new LinkedHashSet<T>();
 		while ((result.size() < n) && (result.size() < collection.size())) {
