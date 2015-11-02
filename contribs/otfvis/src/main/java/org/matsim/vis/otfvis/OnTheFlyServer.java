@@ -178,14 +178,6 @@ public class OnTheFlyServer extends PlayPauseSimulation implements OTFLiveServer
 	}
 
 	@Override
-	public int getLocalTime() {
-		return (int) ((QSim)this.visMobsim).getSimTimer().getTimeOfDay() ;
-		// I changed something here with the extraction of the play/pause functionality, and since the result did not work, I put the above line
-		// in as a fix.  It could not work for playback ... but then
-		// I think that this class is only used for live simulation, and cannnot be used for playback. kai, mar'15
-	}
-
-	@Override
 	public boolean isLive() {
 		return true;
 	}
