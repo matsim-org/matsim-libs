@@ -21,7 +21,9 @@
 package org.matsim.contrib.otfvis;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
@@ -29,6 +31,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimFactory;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
@@ -51,7 +54,7 @@ import org.matsim.signalsystems.mobsim.SignalEngine;
 import org.matsim.signalsystems.otfvis.io.OTFSignalWriter;
 import org.matsim.signalsystems.otfvis.io.SignalGroupStateChangeTracker;
 import org.matsim.vis.otfvis.*;
-import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
+import org.matsim.vis.snapshotwriters.*;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
@@ -59,7 +62,7 @@ import javax.swing.filechooser.FileFilter;
 import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.Locale;
+import java.util.*;
 
 /**
  * A generic starter for the OnTheFly Visualizer that supports
@@ -239,10 +242,71 @@ public class OTFVis {
 
 	public static void playNetwork(final String filename) {
 		Config config = ConfigUtils.createConfig();
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		final ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 		new MatsimNetworkReader(scenario).readFile(filename);
 		EventsManager events = EventsUtils.createEventsManager();
 		OnTheFlyServer server = OnTheFlyServer.createInstance(scenario, events);
+		final Map<Id<Link>, VisLink> visLinks = new HashMap<>();
+		for (final Id<Link> linkId : scenario.getNetwork().getLinks().keySet()) {
+			visLinks.put(linkId, new VisLink() {
+				@Override
+				public Link getLink() {
+					return scenario.getNetwork().getLinks().get(linkId);
+				}
+
+				@Override
+				public Collection<? extends VisVehicle> getAllVehicles() {
+					return Collections.emptyList();
+				}
+
+				@Override
+				public VisData getVisData() {
+					return new VisData() {
+						@Override
+						public Collection<AgentSnapshotInfo> addAgentSnapshotInfo(Collection<AgentSnapshotInfo> positions) {
+							return Collections.emptyList();
+						}
+					};
+				}
+			});
+		}
+		server.setSimulation(new VisMobsim() {
+			@Override
+			public VisNetwork getVisNetwork() {
+				return new VisNetwork() {
+					@Override
+					public Map<Id<Link>, ? extends VisLink> getVisLinks() {
+						return visLinks;
+					}
+
+					@Override
+					public Network getNetwork() {
+						return scenario.getNetwork();
+					}
+
+					@Override
+					public AgentSnapshotInfoFactory getAgentSnapshotInfoFactory() {
+						return null;
+					}
+				};
+			}
+
+			@Override
+			public Collection<MobsimAgent> getAgents() {
+				return Collections.emptyList();
+			}
+
+			@Override
+			public VisData getNonNetworkAgentSnapshots() {
+				return new VisData() {
+					@Override
+					public Collection<AgentSnapshotInfo> addAgentSnapshotInfo(Collection<AgentSnapshotInfo> positions) {
+						return Collections.emptyList();
+					}
+				};
+			}
+		});
+
 		OTFClientLive.run(config, server);
 	}
 
