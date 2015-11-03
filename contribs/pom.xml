@@ -82,7 +82,6 @@
 
 	<modules>
 		<module>cadytsIntegration</module>
-		<module>evacuation</module>
 		<module>gtfs2matsimtransitschedule</module>
 		<module>freight</module>
 		<module>grips</module>
