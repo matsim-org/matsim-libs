@@ -89,7 +89,7 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 				break;
 			case uniform:
 //				problem = true ;
-				log.log( lvl,  "found `typicalDurationScoreComputation == uniform'; vsp should try out `relative' and report. ") ;
+				log.log( lvl,  "found `typicalDurationScoreComputation == uniform' for activity type " + params.getActivityType() + "; vsp should try out `relative' and report. ") ;
 				break;
 			default:
 				throw new RuntimeException("unexpected setting; aborting ... ") ;
