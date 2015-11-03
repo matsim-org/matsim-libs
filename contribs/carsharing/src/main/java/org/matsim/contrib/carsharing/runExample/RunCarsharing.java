@@ -23,7 +23,7 @@ public class RunCarsharing {
 		final Config config = ConfigUtils.loadConfig(args[0]);
 		
 		if(Integer.parseInt(config.getModule("qsim").getValue("numberOfThreads")) > 1)
-			Logger.getLogger( "org.matsim.core.controler" ).error("Carsharing contrib is unstable for parallel qsim!! If the error occures please use 1 as the number of threads.");
+			Logger.getLogger( "org.matsim.core.controler" ).warn("Carsharing contrib is not stable for parallel qsim!! If the error occures please use 1 as the number of threads.");
 		
 		CarsharingUtils.addConfigModules(config);
 
