@@ -1,6 +1,7 @@
 /bin
 /target
 /output
+/out
 /in
 /input
 .DS_Store
