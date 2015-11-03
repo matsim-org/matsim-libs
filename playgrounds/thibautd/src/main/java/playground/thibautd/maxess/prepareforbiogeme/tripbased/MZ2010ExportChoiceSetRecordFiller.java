@@ -24,12 +24,14 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.socnetsim.utils.CollectionUtils;
 import org.matsim.core.utils.collections.MapUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import playground.thibautd.maxess.prepareforbiogeme.framework.ChoiceDataSetWriter;
 import playground.thibautd.maxess.prepareforbiogeme.framework.ChoiceSet;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -57,22 +59,22 @@ public class MZ2010ExportChoiceSetRecordFiller  implements ChoiceDataSetWriter.C
 
 		// This is awful, but BIOGEME does not understand anything else than numbers...
 		values.put("P_ID", getId( cs ) );
-		put("P_AGE", getAge( cs.getDecisionMaker() ), values);
-		put("P_GENDER", getGender( cs.getDecisionMaker() ), values);
+		put( "P_AGE", getAge( cs.getDecisionMaker() ), values );
+		put( "P_GENDER", getGender( cs.getDecisionMaker() ), values );
 
-		put("P_CARAVAIL", getCarAvailability(cs.getDecisionMaker()), values);
-		put("P_BIKEAVAIL", getBikeAvailability( cs.getDecisionMaker() ), values);
+		put( "P_CARAVAIL", getCarAvailability( cs.getDecisionMaker() ), values );
+		put( "P_BIKEAVAIL", getBikeAvailability( cs.getDecisionMaker() ), values );
 		// motorcycle would also be possible
 
-		put("P_GA_FIRST", getGAFirst(cs.getDecisionMaker()), values);
-		put("P_GA_SECOND", getGASecond( cs.getDecisionMaker() ), values);
-		put("P_HALBTAX", getHalbtax( cs.getDecisionMaker() ), values);
-		put("P_STRECKENABO", getStreckenAbo( cs.getDecisionMaker() ), values);
-		put("P_LOCALABO", getLocalAbo( cs.getDecisionMaker() ), values);
+		put( "P_GA_FIRST", getGAFirst( cs.getDecisionMaker() ), values );
+		put( "P_GA_SECOND", getGASecond( cs.getDecisionMaker() ), values );
+		put( "P_HALBTAX", getHalbtax( cs.getDecisionMaker() ), values );
+		put( "P_STRECKENABO", getStreckenAbo( cs.getDecisionMaker() ), values );
+		put( "P_LOCALABO", getLocalAbo( cs.getDecisionMaker() ), values );
 
-		put("P_DAYOFWEEK", getDayOfWeek(cs.getDecisionMaker()), values);
-		put("P_LICENSE", getLicense( cs.getDecisionMaker() ), values);
-		put("P_EMPLOYMENT", getEmployment( cs.getDecisionMaker() ), values);
+		put( "P_DAYOFWEEK", getDayOfWeek( cs.getDecisionMaker() ), values );
+		put( "P_LICENSE", getLicense( cs.getDecisionMaker() ), values );
+		put( "P_EMPLOYMENT", getEmployment( cs.getDecisionMaker() ), values );
 
 		values.put("C_CHOICE", getChoice(cs));
 
@@ -413,14 +415,14 @@ public class MZ2010ExportChoiceSetRecordFiller  implements ChoiceDataSetWriter.C
 		return tt;
 	}
 
-	private static class Codebook {
-		private Map<String,Codepage> pages = new HashMap<>();
+	public static class Codebook {
+		private Map<String,Codepage> pages = new LinkedHashMap<>();
 
 		private Codepage currentPage = null;
 		private String meaning = null;
 		private Number coding = null;
 
-		public void openPage( final String name ) {
+		private void openPage( final String name ) {
 			currentPage = pages.get( name );
 
 			if ( currentPage == null ) {
@@ -429,24 +431,29 @@ public class MZ2010ExportChoiceSetRecordFiller  implements ChoiceDataSetWriter.C
 			}
 		}
 
-		public void writeMeaning( final String meaning ) {
+		private void writeMeaning( final String meaning ) {
 			this.meaning = meaning;
 		}
 
-		public void writeCoding( final Number coding ) {
+		private void writeCoding( final Number coding ) {
 			this.coding = coding;
 		}
 
-		public void closePage() {
+		private void closePage() {
 			currentPage.add( meaning , coding );
 			currentPage = null;
 			meaning = null;
 			coding = null;
 		}
+
+		public Map<String, Codepage> getPages() {
+			return Collections.unmodifiableMap( pages );
+		}
 	}
 
-	private static class Codepage {
+	public static class Codepage {
 		private final String variableName;
+
 		private final Map<Number, String> codingToMeaning = new LinkedHashMap<>(  );
 		private final Map<Number, Integer> codingToCount = new LinkedHashMap<>(  );
 
@@ -454,9 +461,22 @@ public class MZ2010ExportChoiceSetRecordFiller  implements ChoiceDataSetWriter.C
 			this.variableName = variableName;
 		}
 
-		public void add( final String meaning , final Number coding ) {
+		private void add( final String meaning , final Number coding ) {
 			codingToMeaning.put( coding , meaning );
 			MapUtils.addToInteger( coding , codingToCount , 0 , 1 );
 		}
+
+		public String getVariableName() {
+			return variableName;
+		}
+
+		public Map<Number, String> getCodingToMeaning() {
+			return Collections.unmodifiableMap( codingToMeaning );
+		}
+
+		public Map<Number, Integer> getCodingToCount() {
+			return Collections.unmodifiableMap( codingToCount );
+		}
+
 	}
 }
