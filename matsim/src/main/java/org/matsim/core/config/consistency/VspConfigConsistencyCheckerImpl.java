@@ -33,6 +33,7 @@ import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspDefaultsCheckingLevel;
+import org.matsim.core.replanning.DefaultPlanStrategiesModule.DefaultStrategy;
 import org.matsim.pt.PtConstants;
 
 /**
@@ -151,24 +152,34 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 			log.log( lvl, "did not find xml as one of the events file formats. vsp default is using xml events.");
 		}
 		
-		// added before nov'12
-		if ( config.timeAllocationMutator().getMutationRange() < 7200 ) {
-			problem = true ;
-			System.out.flush() ;
-			log.log( lvl, "timeAllocationMutator mutationRange < 7200; vsp default is 7200.  This means you have to add the following lines to your config file: ") ;
-			log.log( lvl, "<module name=\"TimeAllocationMutator\">");
-			log.log( lvl, "	<param name=\"mutationRange\" value=\"7200.0\" />");
-			log.log( lvl, "</module>");
+		// added nov'15
+		boolean usingTimeMutator = false ;
+		for ( StrategySettings it : config.strategy().getStrategySettings() ) {
+			if ( DefaultStrategy.TimeAllocationMutator.name().equals( it.getName() ) ) {
+				usingTimeMutator = true ;
+				break ;
+			}
 		}
-		// added jan'14
-		if ( config.timeAllocationMutator().isAffectingDuration() ) {
-//			problem = true ;
-			System.out.flush() ;
-			log.log( lvl, "timeAllocationMutator is affecting duration; vsp default is to not do that.  This will be more strictly" +
-					" enforced in the future. This means you have to add the following lines to your config file: ") ;
-			log.log( lvl, "<module name=\"TimeAllocationMutator\">");
-			log.log( lvl, "	<param name=\"affectingDuration\" value=\"false\" />");
-			log.log( lvl, "</module>");
+		if ( usingTimeMutator ) {
+			// added before nov'12
+			if ( config.timeAllocationMutator().getMutationRange() < 7200 ) {
+				problem = true ;
+				System.out.flush() ;
+				log.log( lvl, "timeAllocationMutator mutationRange < 7200; vsp default is 7200.  This means you have to add the following lines to your config file: ") ;
+				log.log( lvl, "<module name=\"TimeAllocationMutator\">");
+				log.log( lvl, "	<param name=\"mutationRange\" value=\"7200.0\" />");
+				log.log( lvl, "</module>");
+			}
+			// added jan'14
+			if ( config.timeAllocationMutator().isAffectingDuration() ) {
+				//			problem = true ;
+				System.out.flush() ;
+				log.log( lvl, "timeAllocationMutator is affecting duration; vsp default is to not do that.  This will be more strictly" +
+						" enforced in the future. This means you have to add the following lines to your config file: ") ;
+				log.log( lvl, "<module name=\"TimeAllocationMutator\">");
+				log.log( lvl, "	<param name=\"affectingDuration\" value=\"false\" />");
+				log.log( lvl, "</module>");
+			}
 		}
 		
 		// added before nov'12
