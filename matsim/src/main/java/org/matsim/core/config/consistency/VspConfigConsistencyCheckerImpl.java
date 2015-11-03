@@ -33,6 +33,7 @@ import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspDefaultsCheckingLevel;
+import org.matsim.pt.PtConstants;
 
 /**
  * @author nagel
@@ -84,6 +85,10 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 		
 		// added apr'15:
 		for ( ActivityParams params : config.planCalcScore().getActivityParams() ) {
+			if ( PtConstants.TRANSIT_ACTIVITY_TYPE.equals( params.getActivityType() ) ) {
+				// they have typicalDurationScoreComputation==relative, but are not scored anyways. benjamin/kai, nov'15
+				continue ;
+			}
 			switch( params.getTypicalDurationScoreComputation() ) {
 			case relative:
 				break;
