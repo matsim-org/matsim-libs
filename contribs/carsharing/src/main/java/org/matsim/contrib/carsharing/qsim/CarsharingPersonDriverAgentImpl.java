@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.jfree.util.Log;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -63,7 +63,7 @@ import org.matsim.vehicles.Vehicle;
 
 public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassengerAgent, HasPerson, PlanAgent, PTPassengerAgent {
 
-	//private static final Logger log = Logger.getLogger(PersonDriverAgentImpl.class);
+	private static final Logger log = Logger.getLogger(CarsharingPersonDriverAgentImpl.class);
 
 	private Link startLinkFF;
 
@@ -337,11 +337,11 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 		
 		final List<PlanElement> trip = new ArrayList<PlanElement>();
 		if (hasCSVehicleAtLink(route.getStartLinkId())) {
-			Log.info("person has available tw car :" + basicAgentDelegate.getPerson().getId());
+			log.info("person has available tw car :" + basicAgentDelegate.getPerson().getId());
 			
 			if (willUseTheVehicleLater(route.getEndLinkId())) {
 				
-				Log.info("person will use the car later:" + basicAgentDelegate.getPerson().getId());
+				log.info("person will use the car later:" + basicAgentDelegate.getPerson().getId());
 
 				double travelTime = 0.0;
 				List<Id<Link>> ids = new ArrayList<Id<Link>>();
@@ -384,7 +384,7 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 			}
 			
 			else {
-				Log.info("person will not use the car later:" + basicAgentDelegate.getPerson().getId());
+				log.info("person will not use the car later:" + basicAgentDelegate.getPerson().getId());
 
 				double travelTime = 0.0;
 				List<Id<Link>> ids = new ArrayList<Id<Link>>();
@@ -437,11 +437,7 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 				legWalkEnd.setRoute(routeEnd);
 				trip.add( legWalkEnd );
 				
-				this.pickupStations.remove(this.pickupStations.size() - 1);
-				
-				
 			}
-			
 			
 		}
 		
@@ -449,7 +445,7 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 			
 			if (willUseTheVehicleLater(route.getEndLinkId())) {
 			
-				Log.info("Person with an id: "   + basicAgentDelegate.getPerson().getId()
+				log.info("Person with an id: "   + basicAgentDelegate.getPerson().getId()
 						+ " does not have a tw car.");
 	
 				final Leg legWalkEnd = new LegImpl( "walk_rb" );
@@ -510,7 +506,7 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 						this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(route.getEndLinkId()).getId());
 				routeCar.setTravelTime( travelTime);
 	
-				Log.info("Rented twowaycarsharing car has an id: " + pickUpStation.getIDs().get(0));
+				log.info("Rented twowaycarsharing car has an id: " + pickUpStation.getIDs().get(0));
 				Id<Vehicle> vehId = Id.create("TW_" + (pickUpStation.getIDs().get(0)), Vehicle.class);
 				this.carSharingVehicles.getTwoWayVehicles().removeVehicle(pickUpStation, pickUpStation.getIDs().get(0));
 	
@@ -521,7 +517,7 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 			
 			else {
 				
-				Log.info("Two way carsharing trip is assigned to a leg between the same locations!");
+				log.info("Two way carsharing trip is assigned to a leg between the same locations!");
 				
 				final Leg legWalkStart = new LegImpl( "walk_rb" );
 				
@@ -581,7 +577,7 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 						this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(route.getEndLinkId()).getId());
 				routeCar.setTravelTime( travelTime);
 	
-				Log.info("Rented twowaycarsharing car has an id: " + pickUpStation.getIDs().get(0));
+				log.info("Rented twowaycarsharing car has an id: " + pickUpStation.getIDs().get(0));
 				Id<Vehicle> vehId = Id.create("TW_" + (pickUpStation.getIDs().get(0)), Vehicle.class);
 				this.carSharingVehicles.getTwoWayVehicles().removeVehicle(pickUpStation, pickUpStation.getIDs().get(0));
 	
@@ -680,8 +676,10 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 
 			if (((Leg)this.basicAgentDelegate.getNextPlanElement()).getMode().equals("walk_rb")) {
 				this.vehicleIdLocation.remove(currentLeg.getRoute().getStartLinkId());
-				this.carSharingVehicles.getTwoWayVehicles().addVehicle(scenario.getNetwork().getLinks().get(this.getDestinationLinkId()), 
+				this.carSharingVehicles.getTwoWayVehicles().addVehicle(this.pickupStations.get(this.pickupStations.size() - 1), 
 						twcsVehicleIDs.get(twcsVehicleIDs.size() - 1));
+				this.pickupStations.remove(this.pickupStations.size() - 1);
+
 				this.twcsVehicleIDs.remove(twcsVehicleIDs.size() - 1);
 			}
 		}
