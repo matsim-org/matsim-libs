@@ -70,8 +70,7 @@ public class TravelTimeMatrices {
 		}
 	}
 
-	public TravelTimeMatrices(final Network network,
-			final TravelTime linkTTs,
+	public TravelTimeMatrices(final Network network, final TravelTime linkTTs,
 			final ZonalSystem zonalSystem, final Random rnd,
 			final int startTime_s, final int binSize_s, final int binCnt,
 			final int sampleCnt) {
@@ -214,11 +213,9 @@ public class TravelTimeMatrices {
 		final TravelTime linkTTs = ttcalc.getLinkTravelTimes();
 
 		final TravelTimeMatrices travelTimeMatrices = new TravelTimeMatrices(
-				scenario.getNetwork(), linkTTs,
-				zonalSystem, new Random(), startTime_s, binSize_s, binCnt,
-				sampleCnt);
-		travelTimeMatrices
-				.writeToFile("./test/matsim-testrun/traveltimes.xml");
+				scenario.getNetwork(), linkTTs, zonalSystem, new Random(),
+				startTime_s, binSize_s, binCnt, sampleCnt);
+		travelTimeMatrices.writeToFile("./test/matsim-testrun/traveltimes.xml");
 
 		System.out.println("... DONE");
 	}
