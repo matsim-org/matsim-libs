@@ -1,9 +1,10 @@
 language: java
 script:
     - cd ${TRAVIS_BUILD_DIR}/matsim && mvn test -B -Dmaven.test.redirectTestOutputToFile
-#    - cd ${TRAVIS_BUILD_DIR}/contribs && mvn test -B -Dmaven.test.redirectTestOutputToFile
+    - cd ${TRAVIS_BUILD_DIR}/contribs && mvn test -o -B -Dmaven.test.redirectTestOutputToFile
 # I think that this does not work outside of the matsim main directory because somehow
 # maven was not yet sufficiently set up at that point in time. kai, nov'15
+$ Now trying this with "-o" (offline mode). kai, nov'15
 env:
   global:
     - MAVEN_OPTS="-XX:MaxPermSize=1g -Xmx4g"
