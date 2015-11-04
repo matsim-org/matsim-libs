@@ -39,9 +39,9 @@ public class RunExample {
 			leisureFacilitiesQuadTree.put(af.getCoord(), af);
 		}
 		
-		QuadTree<ActivityFacility> shoping = shopFacilitiesQuadTree.getQuadTree();		
+		final QuadTree<ActivityFacility> shoping = shopFacilitiesQuadTree.getQuadTree();		
 		
-		QuadTree<ActivityFacility> leisure = leisureFacilitiesQuadTree.getQuadTree();		
+		final QuadTree<ActivityFacility> leisure = leisureFacilitiesQuadTree.getQuadTree();		
 
 		controler.addOverridingModule(new AbstractModule() {
 
