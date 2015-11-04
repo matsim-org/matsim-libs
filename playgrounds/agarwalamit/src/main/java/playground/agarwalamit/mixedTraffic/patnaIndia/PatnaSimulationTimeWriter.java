@@ -34,9 +34,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
-import org.matsim.core.config.groups.QSimConfigGroup.LinkDynamics;
-import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
-import org.matsim.core.config.groups.QSimConfigGroup.VehiclesSource;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -81,7 +79,7 @@ public class PatnaSimulationTimeWriter {
 
 		{
 			//fifo without holes
-			String data2Write = pstw.runAndReturnSimulationTime(LinkDynamics.FIFO, TrafficDynamics.queue, inputFilesDir);
+			String data2Write = pstw.runAndReturnSimulationTime(QSimConfigGroup.LinkDynamics.FIFO, QSimConfigGroup.TrafficDynamics.queue, inputFilesDir);
 			try {
 				writer.print("fifo_withoutHoles"+"\t"+data2Write);
 				writer.println();
@@ -92,7 +90,7 @@ public class PatnaSimulationTimeWriter {
 
 		{
 			//fifo with holes
-			String data2Write = pstw.runAndReturnSimulationTime(LinkDynamics.FIFO, TrafficDynamics.withHoles, inputFilesDir);
+			String data2Write = pstw.runAndReturnSimulationTime(QSimConfigGroup.LinkDynamics.FIFO, QSimConfigGroup.TrafficDynamics.withHoles, inputFilesDir);
 			try {
 				writer.print("fifo_withHoles"+"\t"+data2Write);
 				writer.println();
@@ -103,7 +101,7 @@ public class PatnaSimulationTimeWriter {
 		
 		{
 			//passing without holes
-			String data2Write = pstw.runAndReturnSimulationTime(LinkDynamics.PassingQ, TrafficDynamics.queue, inputFilesDir);
+			String data2Write = pstw.runAndReturnSimulationTime(QSimConfigGroup.LinkDynamics.PassingQ, QSimConfigGroup.TrafficDynamics.queue, inputFilesDir);
 			try {
 				writer.print("passing_withoutHoles"+"\t"+data2Write);
 				writer.println();
@@ -114,7 +112,7 @@ public class PatnaSimulationTimeWriter {
 		
 		{
 			//passing with holes
-			String data2Write = pstw.runAndReturnSimulationTime(LinkDynamics.PassingQ, TrafficDynamics.withHoles, inputFilesDir);
+			String data2Write = pstw.runAndReturnSimulationTime(QSimConfigGroup.LinkDynamics.PassingQ, QSimConfigGroup.TrafficDynamics.withHoles, inputFilesDir);
 			try {
 				writer.print("passing_withHoles"+"\t"+data2Write);
 				writer.println();
@@ -125,7 +123,7 @@ public class PatnaSimulationTimeWriter {
 		
 		{
 			//seepage without holes
-			String data2Write = pstw.runAndReturnSimulationTime(LinkDynamics.SeepageQ, TrafficDynamics.queue, inputFilesDir);
+			String data2Write = pstw.runAndReturnSimulationTime(QSimConfigGroup.LinkDynamics.SeepageQ, QSimConfigGroup.TrafficDynamics.queue, inputFilesDir);
 			try {
 				writer.print("seepage_withoutHoles"+"\t"+data2Write);
 				writer.println();
@@ -136,7 +134,7 @@ public class PatnaSimulationTimeWriter {
 		
 		{
 			//seepage with holes
-			String data2Write = pstw.runAndReturnSimulationTime(LinkDynamics.SeepageQ, TrafficDynamics.withHoles, inputFilesDir);
+			String data2Write = pstw.runAndReturnSimulationTime(QSimConfigGroup.LinkDynamics.SeepageQ, QSimConfigGroup.TrafficDynamics.withHoles, inputFilesDir);
 			try {
 				writer.print("seepage_withHoles"+"\t"+data2Write);
 				writer.println();
@@ -147,7 +145,7 @@ public class PatnaSimulationTimeWriter {
 		}
 	}
 	
-	private String runAndReturnSimulationTime (LinkDynamics ld, TrafficDynamics td, String inputFilesDir) {
+	private String runAndReturnSimulationTime (QSimConfigGroup.LinkDynamics ld, QSimConfigGroup.TrafficDynamics td, String inputFilesDir) {
 		
 		Config config = createBasicConfigSettings();
 		
@@ -158,14 +156,14 @@ public class PatnaSimulationTimeWriter {
 		config.qsim().setLinkDynamics(ld.toString());
 		config.qsim().setTrafficDynamics(td);
 		
-		if(ld.equals(LinkDynamics.SeepageQ)) {
+		if(ld.equals(QSimConfigGroup.LinkDynamics.SeepageQ)) {
 			config.setParam("seepage", "seepMode","bike");
 			config.setParam("seepage", "isSeepModeStorageFree", "false");
 			config.setParam("seepage", "isRestrictingNumberOfSeepMode", "true");
 		}
 		
 		config.controler().setCreateGraphs(false);
-		config.qsim().setVehiclesSource(VehiclesSource.fromVehiclesData);
+		config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.fromVehiclesData);
 		Scenario sc = ScenarioUtils.createScenario(config);
 		
 		Map<String, VehicleType> modesType = new HashMap<String, VehicleType>(); 
