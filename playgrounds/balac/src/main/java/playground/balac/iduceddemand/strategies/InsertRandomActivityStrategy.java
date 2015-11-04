@@ -9,14 +9,24 @@ import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
+import org.matsim.core.utils.collections.QuadTree;
+import org.matsim.facilities.ActivityFacility;
+
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
 
 public class InsertRandomActivityStrategy implements PlanStrategy {
 	private final PlanStrategy planStrategyDelegate;
 
-	public  InsertRandomActivityStrategy(final Scenario scenario) {
+		
+	@Inject
+	public  InsertRandomActivityStrategy(final Scenario scenario, 
+			@Named("shopQuadTree") QuadTree shopFacilityQuadTree,
+			@Named("leisureQuadTree") QuadTree leisureFacilityQuadTree) {
 		
 	    PlanStrategyImpl.Builder builder = new PlanStrategyImpl.Builder(new RandomPlanSelector<Plan, Person>() );
-	    InsertRandomActivity ira = new InsertRandomActivity(scenario);
+	    InsertRandomActivity ira = new InsertRandomActivity(scenario, shopFacilityQuadTree,
+	    		leisureFacilityQuadTree);
 	    
 		builder.addStrategyModule(ira);
 		builder.addStrategyModule(new ReRoute(scenario));

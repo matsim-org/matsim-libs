@@ -9,12 +9,12 @@ import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
-public class ChooseRandomActivities implements PlanAlgorithm {
+public class ChooseRandomActivitiesToSwap implements PlanAlgorithm {
 
 	private final Random rng;
 	private final StageActivityTypes stageActivityTypes;
 
-	public ChooseRandomActivities(Random localInstance,
+	public ChooseRandomActivitiesToSwap(Random localInstance,
 			StageActivityTypes stageActivityTypes) {
 
 		this.rng = localInstance;
