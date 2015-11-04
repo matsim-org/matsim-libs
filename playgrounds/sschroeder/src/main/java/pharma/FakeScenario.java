@@ -1,6 +1,7 @@
 package pharma;
 
 import jsprit.core.algorithm.VehicleRoutingAlgorithm;
+import jsprit.core.algorithm.box.Jsprit;
 import jsprit.core.algorithm.box.SchrimpfFactory;
 import jsprit.core.problem.VehicleRoutingProblem;
 import jsprit.core.problem.solution.VehicleRoutingProblemSolution;
@@ -95,7 +96,7 @@ public class FakeScenario {
         vrpBuilder.setRoutingCost(netbasedTransportcosts);
         VehicleRoutingProblem vrp = vrpBuilder.build();
 
-        VehicleRoutingAlgorithm vra = new SchrimpfFactory().createAlgorithm(vrp);
+        VehicleRoutingAlgorithm vra = Jsprit.createAlgorithm(vrp);
         VehicleRoutingProblemSolution solution = Solutions.bestOf(vra.searchSolutions());
 
         CarrierPlan plan = MatsimJspritFactory.createPlan(c, solution);
@@ -118,8 +119,8 @@ public class FakeScenario {
     }
 
     private static CarrierVehicleType createType() {
-        CarrierVehicleType.Builder typeBuilder = CarrierVehicleType.Builder.newInstance(Id.create("small", VehicleType.class));
-        typeBuilder.setCapacity(20);
+        CarrierVehicleType.Builder typeBuilder = CarrierVehicleType.Builder.newInstance(Id.create("light", VehicleType.class));
+        typeBuilder.setCapacity(5);
         typeBuilder.setFixCost(80.0);
         typeBuilder.setCostPerDistanceUnit(0.00047);
         typeBuilder.setCostPerTimeUnit(0.008);
