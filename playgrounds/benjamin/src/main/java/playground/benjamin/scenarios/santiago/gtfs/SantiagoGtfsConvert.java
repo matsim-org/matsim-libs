@@ -91,6 +91,9 @@ public class SantiagoGtfsConvert {
 		
 		new TransitScheduleWriter(ts).writeFile(outputPath + "/transitschedule.xml.gz");
 		new VehicleWriterV1(scenario.getTransitVehicles()).writeFile(outputPath + "/transitvehicles.xml.gz");
+//		TransitScheduleSimplifier.mergeEqualRouteProfiles(ts, outputPath + "/transitschedule_simplified.xml.gz");
+		TransitScheduleSimplifier.mergeEqualProfilesOfAllRoutes(ts, outputPath + "/transitschedule_simplified.xml.gz");
+//		TransitScheduleSimplifier.mergeTouchingRoutes(scenario, outputPath + "/transitschedule_simplified.xml.gz");
 	}
 
 	private static void createDir(File file) {
