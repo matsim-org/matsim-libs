@@ -83,7 +83,7 @@ public class ScaleMatrices {
 
                 double factor = getFactor(file.getName(), upscaleFactors, dayFactors);
 
-                MatrixOperations.symetrize(m);
+//                MatrixOperations.symetrize(m);
 
                 MatrixOperations.applyFactor(m, SCALE_FACTOR);
                 MatrixOperations.applyDiagonalFactor(m, DIAGONAL_FACTOR);

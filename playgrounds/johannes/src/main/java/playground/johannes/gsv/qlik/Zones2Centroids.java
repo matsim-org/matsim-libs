@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.gis;
+package playground.johannes.gsv.qlik;
 
 import com.vividsolutions.jts.geom.Point;
 import playground.johannes.synpop.gis.Zone;
@@ -33,24 +33,44 @@ import java.io.IOException;
  */
 public class Zones2Centroids {
 
-    public static void main(String args[]) throws IOException {
-        ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON("/home/johannes/gsv/gis/modena/geojson/zones.geojson", "NO");
+    private final static String SEPARATOR = ";";
 
-        BufferedWriter writer = new BufferedWriter(new FileWriter("/mnt/cifs/B-drive/U_Benutzer/JohannesIllenberger/qlik/centroids.csv"));
-        writer.write("id,name,lng,lat");
+    public static void main(String args[]) throws IOException {
+        ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON("/home/johannes/gsv/gis/nuts/world/nuts3-psmobility.geojson", "NO");
+
+        BufferedWriter writer = new BufferedWriter(new FileWriter
+                ("/mnt/cifs/B-drive/C_Vertrieb/2014_03_01_Nachfragematrizen_PV/07_Qlik/nuts3.csv"));
+        writer.write("id;lng;lat;nuts3_name;nuts3_code;nuts2_name;nuts2_code;nuts1_name;nuts1_code;nuts0_name;" +
+                        "nuts0_code");
         writer.newLine();
+
         for(Zone zone : zones.getZones()) {
             Point c = zone.getGeometry().getCentroid();
             String id = zone.getAttribute("NO");
-            String name = zone.getAttribute("NAME");
 
             writer.write(id);
-            writer.write(",");
-            writer.write(name);
-            writer.write(",");
+            writer.write(SEPARATOR);
             writer.write(String.valueOf(c.getX()));
-            writer.write(",");
+            writer.write(SEPARATOR);
             writer.write(String.valueOf(c.getY()));
+
+            writer.write(SEPARATOR);
+            writer.write(zone.getAttribute("NUTS3_NAME"));
+            writer.write(SEPARATOR);
+            writer.write(zone.getAttribute("NUTS3_CODE"));
+            writer.write(SEPARATOR);
+            writer.write(zone.getAttribute("NUTS2_NAME"));
+            writer.write(SEPARATOR);
+            writer.write(zone.getAttribute("NUTS2_CODE"));
+            writer.write(SEPARATOR);
+            writer.write(zone.getAttribute("NUTS1_NAME"));
+            writer.write(SEPARATOR);
+            writer.write(zone.getAttribute("NUTS1_CODE"));
+            writer.write(SEPARATOR);
+            writer.write(zone.getAttribute("NUTS0_NAME"));
+            writer.write(SEPARATOR);
+            writer.write(zone.getAttribute("NUTS0_CODE"));
+
             writer.newLine();
         }
 

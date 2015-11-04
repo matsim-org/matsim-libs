@@ -45,8 +45,10 @@ public class ReplaceMiscType implements PersonsTask {
 			for(Episode plan : person.getEpisodes()) {
 				for(Attributable act : plan.getActivities()) {
 					String type = act.getAttribute(CommonKeys.ACTIVITY_TYPE);
-					if(!ActivityTypes.HOME.equalsIgnoreCase(type) && !ActivityTypes.MISC.equalsIgnoreCase(type)) {
-						typeCounts.adjustOrPutValue(type, 1, 1);
+					if(type != null) {
+						if (!ActivityTypes.HOME.equalsIgnoreCase(type) && !ActivityTypes.MISC.equalsIgnoreCase(type)) {
+							typeCounts.adjustOrPutValue(type, 1, 1);
+						}
 					}
 				}
 			}

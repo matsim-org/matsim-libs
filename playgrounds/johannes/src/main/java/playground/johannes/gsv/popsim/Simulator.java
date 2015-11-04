@@ -28,8 +28,8 @@ import org.matsim.contrib.common.stats.LinearDiscretizer;
 import org.matsim.contrib.common.util.XORShiftRandom;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import playground.johannes.gsv.popsim.analysis.NumericAttributeProvider;
 import playground.johannes.gsv.popsim.analysis.LegCollector;
+import playground.johannes.gsv.popsim.analysis.NumericAttributeProvider;
 import playground.johannes.gsv.synPop.analysis.AnalyzerTaskComposite;
 import playground.johannes.gsv.synPop.analysis.LegGeoDistanceTask;
 import playground.johannes.gsv.synPop.analysis.ProxyAnalyzer;
@@ -80,7 +80,7 @@ public class Simulator {
         /*
 		Prepare population for simulation.
 		 */
-        logger.info("Preparing reference simulaion...");
+        logger.info("Preparing reference simulation...");
         TaskRunner.run(new ReplaceActTypes(), refPersons);
         new GuessMissingActTypes(random).apply(refPersons);
         TaskRunner.run(new Route2GeoDistance(new Route2GeoDistFunction()), refPersons);
