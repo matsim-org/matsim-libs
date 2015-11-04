@@ -14,18 +14,15 @@ import org.matsim.core.utils.collections.QuadTree;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
-public class InsertRandomActivityStrategy implements PlanStrategy {
+public class RemoveRandomActivityStrategy implements PlanStrategy {
 	private final PlanStrategy planStrategyDelegate;
 
 		
 	@Inject
-	public  InsertRandomActivityStrategy(final Scenario scenario, 
-			@Named("shopQuadTree") QuadTree shopFacilityQuadTree,
-			@Named("leisureQuadTree") QuadTree leisureFacilityQuadTree) {
+	public  RemoveRandomActivityStrategy(final Scenario scenario) {
 		
 	    PlanStrategyImpl.Builder builder = new PlanStrategyImpl.Builder(new RandomPlanSelector<Plan, Person>() );
-	    InsertRandomActivity ira = new InsertRandomActivity(scenario, shopFacilityQuadTree,
-	    		leisureFacilityQuadTree);
+	    RemoveRandomActivity ira = new RemoveRandomActivity(scenario);
 	    
 		builder.addStrategyModule(ira);
 		builder.addStrategyModule(new ReRoute(scenario));

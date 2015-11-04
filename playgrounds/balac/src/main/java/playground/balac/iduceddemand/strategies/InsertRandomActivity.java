@@ -5,7 +5,6 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.facilities.ActivityFacility;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 public class InsertRandomActivity extends AbstractMultithreadedModule {
