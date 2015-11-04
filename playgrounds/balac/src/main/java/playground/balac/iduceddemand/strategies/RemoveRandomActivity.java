@@ -6,18 +6,21 @@ import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.TripRouter;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
+public class RemoveRandomActivity  extends AbstractMultithreadedModule {
+	private Scenario scenario;
 
-public class RandomActivitySwaper extends AbstractMultithreadedModule {
-
-	public RandomActivitySwaper(final Scenario scenario) {
-		super(scenario.getConfig().global().getNumberOfThreads());		
+	public RemoveRandomActivity(Scenario scenario) {
+		super(scenario.getConfig().global().getNumberOfThreads());
+		this.scenario = scenario;
 	}
 
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
 		final TripRouter tripRouter = getReplanningContext().getTripRouter();
-		ChooseRandomActivitiesToSwap algo = new ChooseRandomActivitiesToSwap(MatsimRandom.getLocalInstance(), tripRouter.getStageActivityTypes());
+		ChooseActivityToRemove algo = new ChooseActivityToRemove(MatsimRandom.getLocalInstance(), tripRouter.getStageActivityTypes(),
+				this.scenario);
 
 		return algo;
 	}
+
 }
