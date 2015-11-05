@@ -131,7 +131,7 @@ public class TaxiScheduler
                         //otherwise: IllegalStateException -- the schedule should end with STAY (or PICKUP if unfinished)
 
                     default:
-                        throw new IllegalStateException();
+                        throw new IllegalStateException("Type of the last task is wrong: " + lastTask.getTaxiTaskType());
                 }
 
             case COMPLETED:

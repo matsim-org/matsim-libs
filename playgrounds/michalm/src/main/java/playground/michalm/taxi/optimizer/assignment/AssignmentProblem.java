@@ -68,7 +68,7 @@ public class AssignmentProblem
         this.optimConfig = optimConfig;
         this.router = router;
         this.requestFilter = optimConfig.filterFactory.createRequestFilter();
-        this.vehicleFilter = new KStraightLineNearestVehicleDepartureFilter(20);
+        this.vehicleFilter = new KStraightLineNearestVehicleDepartureFilter(40);
 
         this.backwardRouter = backwardRouter;
     }
