@@ -30,7 +30,7 @@ public class RotatingCircle extends PApplet {
 	private int ii =0 ;
 
 	public static void main( String[] args ) {
-		PApplet.main( new String[] { "--present", "testProcessing.MyPApplet"}  );
+		PApplet.main( new String[] { "--present", "playground.kai.usecases.processing.RotatingCircle"}  );
 	}
 
 	@Override
