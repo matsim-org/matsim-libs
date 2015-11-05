@@ -23,7 +23,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Queue;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -142,7 +145,10 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	private static int spaceCapWarningCount = 0;
 	static boolean HOLES = false ; // can be set from elsewhere in package, but not from outside.  kai, nov'10
 	static boolean VIS_HOLES = false ;
-	private double hole_speed = 15.0;
+	static double hole_speed = 15.0;
+	// yyyy probably should neither be non-private nor static.  kai/amit, nov'15
+	
+	
 	/**
 	 * LaneEvents should only be fired if there is more than one QueueLane on a QueueLink
 	 * because the LaneEvents are identical with LinkEnter/LeaveEvents otherwise.
@@ -834,14 +840,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 
 			double now = network.simEngine.getMobsim().getSimTimer().getTimeOfDay();
 
-			// vehicles:
-			if ( !buffer.isEmpty() || !vehQueue.isEmpty() ) {
-				// vehicle positions are computed in snapshotInfoBuilder as a service:
-				snapshotInfoBuilder.positionVehiclesAlongLine(positions, now, getAllVehicles(), length, storageCapacity
-						+ bufferStorageCapacity, ((LinkImpl) link).getEuklideanDistance(), link.getFromNode().getCoord(), link
-						.getToNode().getCoord(), inverseFlowCapacityPerTimeStep, link.getFreespeed(now), NetworkUtils
-						.getNumberOfLanesAsInt(now, link));
-			}
+			TreeMap<Hole, Double> holePositions = new TreeMap<>() ;
 			if ( VIS_HOLES ) {
 				// holes:
 				if ( !holes.isEmpty() ) {
@@ -849,21 +848,49 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 					double freespeedTraveltime = length / (hole_speed*1000./3600.);
 					double lastDistanceFromFromNode = Double.NaN;
 					for (Hole hole : holes) {
-						lastDistanceFromFromNode = createAndAddHolePositionAndReturnDistance(positions, snapshotInfoBuilder, now,
-								lastDistanceFromFromNode, link, spacing, freespeedTraveltime, hole);
+						lastDistanceFromFromNode = createHolePositionAndReturnDistance(snapshotInfoBuilder, now, lastDistanceFromFromNode,
+								spacing, freespeedTraveltime, hole);
+						if ( VIS_HOLES ) {
+							addHolePosition( positions, snapshotInfoBuilder, lastDistanceFromFromNode, hole ) ;
+						}
+						holePositions.put( hole, lastDistanceFromFromNode ) ;
 					}
 				}
+			}
+
+			// vehicles:
+			if ( !buffer.isEmpty() || !vehQueue.isEmpty() ) {
+				// vehicle positions are computed in snapshotInfoBuilder as a service:
+				snapshotInfoBuilder.positionVehiclesAlongLine(
+						positions, 
+						now, 
+						getAllVehicles(), 
+						holePositions, 
+						length, 
+						storageCapacity + bufferStorageCapacity, 
+						((LinkImpl) link).getEuklideanDistance(), 
+						link.getFromNode().getCoord(), 
+						link.getToNode().getCoord(), 
+						inverseFlowCapacityPerTimeStep, 
+						link.getFreespeed(now), NetworkUtils.getNumberOfLanesAsInt(now, link)
+						);
 			}
 			return positions ;
 		}
 
-		private double createAndAddHolePositionAndReturnDistance(final Collection<AgentSnapshotInfo> positions,
-				AbstractAgentSnapshotInfoBuilder snapshotInfoBuilder, double now, double lastDistanceFromFromNode, Link link,
-				double spacing, double freespeedTraveltime, Hole veh)
+		private double createHolePositionAndReturnDistance(AbstractAgentSnapshotInfoBuilder snapshotInfoBuilder,
+				double now, double lastDistanceFromFromNode, double spacing, double freespeedTraveltime,
+				Hole veh)
 		{
 			double remainingTravelTime = veh.getEarliestLinkExitTime() - now ;
 			double distanceFromFromNode = snapshotInfoBuilder.calculateDistanceOnVectorFromFromNode2(QueueWithBuffer.this.length, spacing,
 					lastDistanceFromFromNode, now, freespeedTraveltime, remainingTravelTime);
+			return distanceFromFromNode;
+		}
+		
+		private void addHolePosition(final Collection<AgentSnapshotInfo> positions,
+				AbstractAgentSnapshotInfoBuilder snapshotInfoBuilder, double distanceFromFromNode, Hole veh)
+		{
 			Integer lane = 10 ;
 			double speedValue = 1. ;
 			if (this.upstreamCoord != null){
@@ -875,8 +902,10 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 						QueueWithBuffer.this.length, ((LinkImpl)link).getEuklideanDistance() , veh, 
 						distanceFromFromNode, lane, speedValue);
 			}
-			return distanceFromFromNode;
 		}
+		
+		
+		
 		void setVisInfo(Coord upstreamCoord, Coord downstreamCoord, double euklideanDistance) {
 			this.upstreamCoord = upstreamCoord;
 			this.downsteamCoord = downstreamCoord;
