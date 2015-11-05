@@ -41,8 +41,8 @@ class CreatePopulation {
 
 	// --------------------------------------------------------------------------
 	
-	public void run(Scenario scenario) {
-		this.scenario = scenario;
+	public void run(Scenario scenario1) {
+		this.scenario = scenario1;
 		this.init();
 		this.populationCreation();
 	}
@@ -51,8 +51,8 @@ class CreatePopulation {
 		/*
 		 * Build quad trees for assigning home and work locations
 		 */
-		this.homeFacilitiesTree = this.createActivitiesTree("home", this.scenario); 
-		this.workFacilitiesTree = this.createActivitiesTree("work", this.scenario); 
+		this.homeFacilitiesTree = CreatePopulation.createActivitiesTree("home", this.scenario); 
+		this.workFacilitiesTree = CreatePopulation.createActivitiesTree("work", this.scenario); 
 		
 		this.readMunicipalities();
 	}
@@ -68,12 +68,13 @@ class CreatePopulation {
 		 * Read the census file
 		 * Create the persons and add the socio-demographics
 		 */
-		try {
-			BufferedReader bufferedReader = new BufferedReader(new FileReader(this.censusFile));
+		try 
+			( BufferedReader bufferedReader = new BufferedReader(new FileReader(CreatePopulation.censusFile)) )
+			{
 			String line = bufferedReader.readLine(); //skip header
 			
 			int index_personId = 4;
-//			int index_age = 6;
+			int index_age = 6;
 			int index_workLocation = 8;
 			int index_xHomeCoord = 10;
 			int index_yHomeCoord = 11;
@@ -86,14 +87,12 @@ class CreatePopulation {
 				 */
 				Person person = populationFactory.createPerson(Id.create(parts[index_personId], Person.class));
 
-//				PersonUtils.setAge(person, Integer.parseInt(parts[index_age]));
-				// deprecated, use population.getPersonAttributes() if you want additional person attributes. kai, nov'15
+				person.getCustomAttributes().put(PersonUtils.AGE, Integer.parseInt(parts[index_age]));
 				
 				boolean employed = true;
-				if (parts[index_workLocation].equals("-1")) employed = false; 
-//				PersonUtils.setEmployed(person, employed);
-				// deprecated, use population.getPersonAttributes() if you want additional person attributes. kai, nov'15
-				
+				if (parts[index_workLocation].equals("-1")) employed = false;
+				final Boolean employed1 = employed; 
+				person.getCustomAttributes().put(PersonUtils.EMPLOYED, employed1);
 				
 				population.addPerson(person);
 
@@ -129,7 +128,7 @@ class CreatePopulation {
 	
 	private void readMunicipalities() {
 		try {
-			BufferedReader bufferedReader = new BufferedReader(new FileReader(this.municipalitiesFile));
+			BufferedReader bufferedReader = new BufferedReader(new FileReader(CreatePopulation.municipalitiesFile));
 			String line = bufferedReader.readLine(); //skip header
 					
 			while ((line = bufferedReader.readLine()) != null) {
