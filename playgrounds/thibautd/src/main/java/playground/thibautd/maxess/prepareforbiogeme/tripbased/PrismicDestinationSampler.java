@@ -90,5 +90,4 @@ public class PrismicDestinationSampler implements DestinationSampler {
 		return prism instanceof List ? (List<ActivityFacility>) prism : new ArrayList<>( prism );
 	}
 
-
 }

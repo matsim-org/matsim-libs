@@ -48,7 +48,9 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
+import java.text.DateFormat;
 import java.util.Collections;
+import java.util.Date;
 
 /**
  * @author thibautd
@@ -68,7 +70,7 @@ public class RunMzTripChoiceSetConversion {
 		filter.filter(carNetwork, Collections.singleton( "car" ));
 		new WorldConnectLocations( config ).connectFacilitiesWithLinks(sc.getActivityFacilities(), (NetworkImpl) carNetwork);
 
-		new XY2Links( sc ).run(sc.getPopulation());
+		new XY2Links( carNetwork , sc.getActivityFacilities() ).run(sc.getPopulation());
 
 		//Logger.getLogger(SoftCache.class).setLevel(Level.TRACE );
 		try {
@@ -127,11 +129,32 @@ public class RunMzTripChoiceSetConversion {
 							group.getOutputPath() + "/data.dat");
 
 			try ( final BufferedWriter writer = IOUtils.getBufferedWriter( group.getOutputPath() +"/codebook.md"  ) ) {
+				MoreIOUtils.writeLines(
+						writer,
+						"Information",
+						"===========",
+						"This is metadata to dataset generated with:",
+						"",
+						"`"+RunMzTripChoiceSetConversion.class.getName()+"`",
+						"",
+						"Date: " + DateFormat.getDateInstance(
+								DateFormat.FULL ).format(
+										new Date() ),
+						"",
+						"",
+						"Conversion to pdf: use [pandoc](http://pandoc.org/README.html)",
+						"",
+						"Command: `pandoc Codebook.md -o Codebook.pdf`",
+						"",
+						"Codebook",
+						"========"
+						);
+
 				for ( MZ2010ExportChoiceSetRecordFiller.Codepage page : filler.getCodebook().getPages().values() ) {
 					writer.write( page.getVariableName() );
 					writer.newLine();
 
-					for ( int i=0; i < page.getVariableName().length(); i++ ) writer.write( "=" );
+					for ( int i=0; i < page.getVariableName().length(); i++ ) writer.write( "-" );
 					writer.newLine();
 					writer.newLine();
 

@@ -38,6 +38,9 @@ public class Trip {
 			final ActivityFacility origin,
 			final List<? extends PlanElement> trip,
 			final ActivityFacility destination ) {
+		if ( origin == null || destination == null ) {
+			throw new IllegalArgumentException( "null facility in OD "+origin+" - "+destination );
+		}
 		this.origin = origin;
 		this.destination = destination;
 		this.trip = trip;

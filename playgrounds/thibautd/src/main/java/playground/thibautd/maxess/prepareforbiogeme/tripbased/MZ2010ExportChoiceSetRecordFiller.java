@@ -35,6 +35,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * @author thibautd
@@ -454,8 +455,8 @@ public class MZ2010ExportChoiceSetRecordFiller  implements ChoiceDataSetWriter.C
 	public static class Codepage {
 		private final String variableName;
 
-		private final Map<Number, String> codingToMeaning = new LinkedHashMap<>(  );
-		private final Map<Number, Integer> codingToCount = new LinkedHashMap<>(  );
+		private final Map<Number, String> codingToMeaning = new TreeMap<>(  );
+		private final Map<Number, Integer> codingToCount = new TreeMap<>(  );
 
 		private Codepage( String variableName ) {
 			this.variableName = variableName;
