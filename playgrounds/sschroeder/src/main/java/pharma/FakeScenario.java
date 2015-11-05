@@ -1,25 +1,19 @@
 package pharma;
 
-import jsprit.analysis.toolbox.Plotter;
-import jsprit.core.algorithm.VehicleRoutingAlgorithm;
-import jsprit.core.algorithm.box.Jsprit;
-import jsprit.core.algorithm.box.SchrimpfFactory;
-import jsprit.core.problem.VehicleRoutingProblem;
-import jsprit.core.problem.solution.VehicleRoutingProblemSolution;
-import jsprit.core.util.Solutions;
+//import jsprit.core.algorithm.box.SchrimpfFactory;
+//import jsprit.core.problem.VehicleRoutingProblem;
+//import jsprit.core.problem.solution.VehicleRoutingProblemSolution;
+//import jsprit.core.util.Solutions;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Person;
+
 import org.matsim.contrib.freight.carrier.*;
-import org.matsim.contrib.freight.jsprit.MatsimJspritFactory;
-import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
-import org.matsim.contrib.freight.jsprit.NetworkRouter;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkReaderMatsimV1;
-import org.matsim.core.router.util.TravelTime;
+
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.*;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
@@ -93,21 +87,22 @@ public class FakeScenario {
     }
 
     private static CarrierPlan createPlan(Carrier c, Network network) {
-        VehicleRoutingProblem.Builder vrpBuilder = MatsimJspritFactory.createRoutingProblemBuilder(c, network);
-        NetworkBasedTransportCosts.Builder tpCostsBuilder = NetworkBasedTransportCosts.Builder.newInstance(network, c.getCarrierCapabilities().getVehicleTypes());
-
-        NetworkBasedTransportCosts netbasedTransportcosts = tpCostsBuilder.build();
-        vrpBuilder.setRoutingCost(netbasedTransportcosts);
-        VehicleRoutingProblem vrp = vrpBuilder.build();
-
-        VehicleRoutingAlgorithm vra = new SchrimpfFactory().createAlgorithm(vrp);
-        VehicleRoutingProblemSolution solution = Solutions.bestOf(vra.searchSolutions());
-
-        new Plotter(vrp,solution).plot("out/exampleSolution.png","pharma");
-
-        CarrierPlan plan = MatsimJspritFactory.createPlan(c, solution);
-        NetworkRouter.routePlan(plan, netbasedTransportcosts);
-        return plan;
+//        VehicleRoutingProblem.Builder vrpBuilder = MatsimJspritFactory.createRoutingProblemBuilder(c, network);
+//        NetworkBasedTransportCosts.Builder tpCostsBuilder = NetworkBasedTransportCosts.Builder.newInstance(network, c.getCarrierCapabilities().getVehicleTypes());
+//
+//        NetworkBasedTransportCosts netbasedTransportcosts = tpCostsBuilder.build();
+//        vrpBuilder.setRoutingCost(netbasedTransportcosts);
+//        VehicleRoutingProblem vrp = vrpBuilder.build();
+//
+//        VehicleRoutingAlgorithm vra = new SchrimpfFactory().createAlgorithm(vrp);
+//        VehicleRoutingProblemSolution solution = Solutions.bestOf(vra.searchSolutions());
+//
+//        new Plotter(vrp,solution).plot("out/exampleSolution.png","pharma");
+//
+//        CarrierPlan plan = MatsimJspritFactory.createPlan(c, solution);
+//        NetworkRouter.routePlan(plan, netbasedTransportcosts);
+//        return plan;
+        return null;
     }
 
     private static ActivityFacility drawFacility(TreeMap<Id<ActivityFacility>, ActivityFacility> pickups, Random random) {

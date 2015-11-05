@@ -82,6 +82,11 @@ public class Converter<T,C extends ChoiceSituation<T>> {
 			for (Person p : chains.getPersons().values() ) {
 				counter.incCounter();
 				final Person pf = p;
+				if ( pf.getPlans().isEmpty() ) {
+					log.warn( "Person "+pf+" has no plans! Ignoring it..." );
+					continue;
+				}
+
 				executor.execute(
 						new Runnable() {
 							@Override
@@ -96,6 +101,7 @@ public class Converter<T,C extends ChoiceSituation<T>> {
 									// Bypass an anoying feature of the Executor, that creates new threads if a thread
 									// crashes. We want to stop fast if something occurs.
 									executor.shutdownNow();
+									runnable.doRun = false;
 									throw t;
 								}
 							}

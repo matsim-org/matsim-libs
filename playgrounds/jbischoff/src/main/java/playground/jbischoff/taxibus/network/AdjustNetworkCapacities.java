@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * RunEmissionToolOffline.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,40 +16,46 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.jbischoff.teach.routing;
 
+package playground.jbischoff.taxibus.network;
+
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.config.Config;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.opensaml.ws.security.ServletRequestX509CredentialAdapter;
 
 /**
- * @author jbischoff
- *	Example input data can be found in the MATSim tutorial 2015, 
- *	https://isis.tu-berlin.de/course/view.php?id=5682
+ * @author  jbischoff
  *
  */
-public class MyRoutingMain {
+public class AdjustNetworkCapacities {
 	public static void main(String[] args) {
-		Config config = ConfigUtils.loadConfig("input/routerconfig.xml");
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-		Controler controler = new Controler(scenario);
 		
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-			bindLeastCostPathCalculatorFactory().to(MatsimClassLeastCostPathCalculatorFactory.class);	
-			}
+	Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+	String basedir = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/input/";
+	new MatsimNetworkReader(scenario).readFile(basedir+"networkpt.xml");
+	for (Link link : scenario.getNetwork().getLinks().values()){
+		if (link.getId().toString().startsWith("pt")) continue;
+		if (decideToAdjust(link.getCoord())){
+			link.setCapacity(link.getCapacity()*2);
+			if (link.getCapacity()<2000) link.setCapacity(2000);
 		}
 		
-				
-		);
-		
-	controler.run();
 	}
+	new NetworkWriter(scenario.getNetwork()).write(basedir+"networkptc.xml");
 	
+	}
+
+
+	static boolean decideToAdjust(Coord coord){
+		if (coord.getX()<593084) return true;
+		else if (coord.getX()>629810) return true;
+		else if (coord.getY()<5785583) return true;
+		else if (coord.getY()>5823277) return true;
+		else return false;
+	} 
 }
