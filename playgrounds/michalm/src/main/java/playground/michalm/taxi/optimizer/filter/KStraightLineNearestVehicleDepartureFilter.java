@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,25 +17,38 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.vehreqpath;
+package playground.michalm.taxi.optimizer.filter;
 
-import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.util.DistanceUtils;
 
 import playground.michalm.taxi.data.TaxiRequest;
+import playground.michalm.taxi.optimizer.VehicleData;
+import playground.michalm.util.PartialSort;
 
 
-public class VehicleRequestPath
+public class KStraightLineNearestVehicleDepartureFilter
 {
-    public final Vehicle vehicle;
-    public final TaxiRequest request;
-    public final VrpPathWithTravelData path;
+    private final int k;
 
 
-    public VehicleRequestPath(Vehicle vehicle, TaxiRequest request, VrpPathWithTravelData path)
+    public KStraightLineNearestVehicleDepartureFilter(int k)
     {
-        this.vehicle = vehicle;
-        this.request = request;
-        this.path = path;
+        this.k = k;
+    }
+
+
+    public Iterable<VehicleData.Entry> filterVehiclesForRequest(
+            Iterable<VehicleData.Entry> vehicles, TaxiRequest request)
+    {
+        Link toLink = request.getFromLink();
+        PartialSort<VehicleData.Entry> nearestVehicleSort = new PartialSort<VehicleData.Entry>(k);
+
+        for (VehicleData.Entry veh : vehicles) {
+            double squaredDistance = DistanceUtils.calculateSquaredDistance(veh.link, toLink);
+            nearestVehicleSort.add(veh, squaredDistance);
+        }
+
+        return nearestVehicleSort.retriveKSmallestElements();
     }
 }

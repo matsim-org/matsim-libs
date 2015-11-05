@@ -61,6 +61,8 @@ public class TaxibusPassengerEngine extends PassengerEngine {
 		        if (request == null) {
 		        	return false;
 		        	//we don't want immediate requests for Taxibus
+		        	
+		        	//shouldn't we throw here some exception? michal, nov'15
 		        }
 		        else {
 		            PassengerPickupActivity awaitingPickup = awaitingPickupStorage
