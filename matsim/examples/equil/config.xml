@@ -12,7 +12,7 @@
 	</module>
 
 	<module name="plans">
-		<param name="inputPlansFile" value="examples/equil/plans2000.xml.gz" />
+		<param name="inputPlansFile" value="examples/equil/plans100.xml" />
 	</module>
 
 	<module name="controler">
