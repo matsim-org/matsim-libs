@@ -35,6 +35,7 @@ import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
+
 import javax.inject.Inject;
 
 public class BestReplyLocationChoicePlanStrategy implements PlanStrategy {
@@ -59,12 +60,13 @@ public class BestReplyLocationChoicePlanStrategy implements PlanStrategy {
 		 * such that they are already available at the time of constructing this object. ah feb'13
 		 */
 		DestinationChoiceBestResponseContext lcContext = (DestinationChoiceBestResponseContext) scenario.getScenarioElement(DestinationChoiceBestResponseContext.ELEMENT_NAME);
+		Config config = lcContext.getScenario().getConfig();
+		DestinationChoiceConfigGroup dccg = (DestinationChoiceConfigGroup) config.getModule(DestinationChoiceConfigGroup.GROUP_NAME);
 		MaxDCScoreWrapper maxDcScoreWrapper = (MaxDCScoreWrapper)scenario.getScenarioElement(MaxDCScoreWrapper.ELEMENT_NAME);
-		if ( !DestinationChoiceConfigGroup.Algotype.bestResponse.equals(((DestinationChoiceConfigGroup)lcContext.getScenario().getConfig().getModule("locationchoice")).getAlgorithm())) {
+		if ( !DestinationChoiceConfigGroup.Algotype.bestResponse.equals(dccg.getAlgorithm())) {
 			throw new RuntimeException("wrong class for selected location choice algorithm type; aborting ...") ;
 		}		
-		Config config = lcContext.getScenario().getConfig() ;
-		String planSelector = config.findParam("locationchoice", "planSelector");
+		String planSelector = dccg.getPlanSelector();
 		if (planSelector.equals("BestScore")) {
 			delegate = new PlanStrategyImpl(new BestPlanSelector<Plan, Person>());
 		} else if (planSelector.equals("ChangeExpBeta")) {

@@ -55,7 +55,7 @@ public class RouteDistancePerUserGroup {
 	}
 
 	private Logger logger = Logger.getLogger(RouteDistancePerUserGroup.class);
-	private  String outputDir = "../../../repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run10/policies/eci/";/*"./output/run2/";*/
+	private  String outputDir = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/otherRuns/output/1pct/run10/policies/backcasting/exposure/25ExI/";
 	private  String networkFile =outputDir+ "/output_network.xml.gz";//"/network.xml";
 	private  String plansFile =outputDir+ "/output_plans.xml.gz";//"/network.xml";
 	private String configFile = outputDir+"/output_config.xml";

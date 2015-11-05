@@ -30,7 +30,7 @@
 //import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 //import org.matsim.core.population.routes.ModeRouteFactory;
 //import org.matsim.core.router.IntermodalLeastCostPathCalculator;
-//import playground.johannes.utils.NetworkLegRouter;
+//import playground.johannes.coopsim.utils.NetworkLegRouter;
 //import org.matsim.core.router.old.PlansCalcRoute;
 //import org.matsim.core.router.util.LeastCostPathCalculator;
 //import org.matsim.core.router.util.TravelDisutility;

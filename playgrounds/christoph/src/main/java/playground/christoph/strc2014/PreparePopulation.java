@@ -34,10 +34,7 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.PlanRouter;
-import org.matsim.core.router.RoutingContext;
-import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
@@ -49,6 +46,8 @@ import org.matsim.facilities.algorithms.WorldConnectLocations;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.christoph.parking.core.utils.LegModeChecker;
+
+import javax.inject.Provider;
 
 /**
  * Prepares the population for the parking simulation. It ensures that:
@@ -122,9 +121,9 @@ public class PreparePopulation {
 	private static PlanAlgorithm getPlanRouter(Scenario scenario) {
 //		LeastCostPathCalculatorFactory leastCostPathCalculatorFactory = 
 //		new TripRouterFactoryBuilderWithDefaults().createDefaultLeastCostPathCalculatorFactory(scenario);
-		
-		TripRouterFactory tripRouterFactory;
-		TripRouterFactory defaultTripRouterFactory = new TripRouterFactoryBuilderWithDefaults().build(scenario);
+
+		Provider<TripRouter> tripRouterFactory;
+		Provider<TripRouter> defaultTripRouterFactory = new TripRouterFactoryBuilderWithDefaults().build(scenario);
 //		TripRouterFactory multiModalTripRouterFactory = new MultimodalTripRouterFactory(scenario, multiModalTravelTimes, 
 //		controler.getTravelDisutilityFactory(), defaultTripRouterFactory, leastCostPathCalculatorFactory);
 		tripRouterFactory = defaultTripRouterFactory;
@@ -135,7 +134,7 @@ public class PreparePopulation {
 		TravelDisutilityFactory travelDisutilityFactory = ControlerDefaults.createDefaultTravelDisutilityFactory(scenario);
 		TravelDisutility travelDisutility = travelDisutilityFactory.createTravelDisutility(travelTime, scenario.getConfig().planCalcScore());
 		RoutingContext routingContext = new RoutingContextImpl(travelDisutility, travelTime);
-		TripRouter tripRouter = tripRouterFactory.instantiateAndConfigureTripRouter(routingContext);
+		TripRouter tripRouter = tripRouterFactory.get();
 		
 		return new PlanRouter(tripRouter);
 	}

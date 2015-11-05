@@ -27,10 +27,9 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.router.PlanRouter;
-import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacilityImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -53,17 +52,15 @@ public class PersonAssignToNetwork extends AbstractPersonAlgorithm implements Pl
 
 	public PersonAssignToNetwork(final Scenario scenario) {
 		log.info("    init " + this.getClass().getName() + " module...");
-		this.facilities = ((ScenarioImpl) scenario).getActivityFacilities();
+		this.facilities = ((MutableScenario) scenario).getActivityFacilities();
 		FreespeedTravelTimeAndDisutility timeCostCalc =
 				new FreespeedTravelTimeAndDisutility(
 						scenario.getConfig().planCalcScore());
 		this.router =
 				new PlanRouter(
 				new TripRouterFactoryBuilderWithDefaults().build(
-						scenario ).instantiateAndConfigureTripRouter(
-								new RoutingContextImpl(
-										timeCostCalc,
-										timeCostCalc ) ) );
+						scenario ).get(
+				) );
 		log.info("    done.");
 	}
 

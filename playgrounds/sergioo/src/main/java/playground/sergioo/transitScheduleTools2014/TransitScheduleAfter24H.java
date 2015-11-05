@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.utils.misc.Time;
@@ -50,7 +50,7 @@ public class TransitScheduleAfter24H {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario.getConfig().transit().setUseTransit(true);
 		new TransitScheduleReader(scenario).readFile(args[1]);
-		new TransitScheduleWriter(TransitScheduleAfter24H.addHours(((ScenarioImpl)scenario).getTransitSchedule(),numHours)).writeFile(args[2]);
+		new TransitScheduleWriter(TransitScheduleAfter24H.addHours(((MutableScenario)scenario).getTransitSchedule(),numHours)).writeFile(args[2]);
 	}
 
 }

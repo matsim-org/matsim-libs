@@ -78,7 +78,7 @@ class KNTaxiLauncher
         params.taxisFile = params.inputDir + "taxis-25.xml";
         params.ranksFile = params.inputDir + "taxi_ranks-0.xml";
 
-        params.eventsFile = params.inputDir + "../mielec-2-peaks-new/output/ITERS/it.20/20.events.xml.gz";
+//        params.eventsFile = params.inputDir + "../mielec-2-peaks-new/output/ITERS/it.20/20.events.xml.gz";
         params.changeEventsFile = null;
 
         params.algorithmConfig = AlgorithmConfig.FIFO_RES_TW_FF;

@@ -37,7 +37,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.data.v11.*;
 import org.matsim.lanes.data.v20.Lane;
@@ -177,7 +177,7 @@ public class RunCreateTrafficSignalScenarioWithLanesExample {
 				Id.create("4", SignalGroup.class), this.onset2, this.dropping2));
 	}
 
-	private void createLanes(ScenarioImpl scenario) {
+	private void createLanes(MutableScenario scenario) {
 		double laneLenght = 150.0;
 		LaneDefinitions11 lanes = new LaneDefinitions11Impl();
 		LaneDefinitionsFactory11 factory = lanes.getFactory();
@@ -230,7 +230,7 @@ public class RunCreateTrafficSignalScenarioWithLanesExample {
 				new SignalsScenarioLoader(ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class))
 						.loadSignalsData());
 
-		this.createLanes((ScenarioImpl) scenario);
+		this.createLanes((MutableScenario) scenario);
 
 		SignalsData signalsData = (SignalsData) scenario
 				.getScenarioElement(SignalsData.ELEMENT_NAME);

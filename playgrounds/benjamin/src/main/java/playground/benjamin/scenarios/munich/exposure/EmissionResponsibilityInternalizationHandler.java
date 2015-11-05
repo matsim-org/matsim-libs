@@ -74,7 +74,6 @@ public class EmissionResponsibilityInternalizationHandler implements WarmEmissio
 	private void calculateWarmEmissionCostsAndThrowEvent(WarmEmissionEvent event) {
 		Id personId = event.getVehicleId();
 		double time = event.getTime();
-		System.out.println("person id" + personId.toString());
 		double warmEmissionCosts = emissionResponsibilityCostModule.calculateWarmEmissionCosts(event.getWarmEmissions(), event.getLinkId(), time);
 		double amount2Pay = - warmEmissionCosts;
 		

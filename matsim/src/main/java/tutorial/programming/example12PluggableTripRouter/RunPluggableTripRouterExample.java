@@ -21,8 +21,8 @@ package tutorial.programming.example12PluggableTripRouter;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.router.TripRouterFactory;
 
 public class RunPluggableTripRouterExample {
 
@@ -37,11 +37,21 @@ public class RunPluggableTripRouterExample {
 		
 		final Controler controler = new Controler(config);
 		
-		MySimulationObserver observer = new MySimulationObserver();
-		controler.getEvents().addHandler(observer) ; 
-		
-		TripRouterFactory factory = new MyTripRouterFactory(observer) ; 
-		controler.setTripRouterFactory(factory) ;
+		final MySimulationObserver observer = new MySimulationObserver();
+		controler.getEvents().addHandler(observer);
+		// My observer is an EventHandler. I can ask it what it thinks the world currently looks like,
+		// based on the last observed iteration, and pass that into my routing module to make decisions.
+		//
+		// Do not plug a routing module itself into the EventsManager! Trip routers are short lived,
+		// they are recreated as needed (per iteration, per thread...), and factory methods
+		// such as this should normally not have visible side effects (such as plugging something
+		// into the EventsManager).
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				addRoutingModuleBinding("car").toInstance(new MyRoutingModule(observer.getIterationData()));
+			}
+		});
 
 		controler.run();
 

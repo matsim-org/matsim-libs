@@ -66,10 +66,13 @@ public class CTPed {
 
 
 	public CTCell getNextCellAndJump(double time) {
-		this.currentCell.jumpOffPed(this, time);
-		this.currentCell = tentativeNextCell;
-		this.currentCell.jumpOnPed(this, time);
-		this.tentativeNextCell = null;
+		if (this.tentativeNextCell.jumpOnPed(this, time)) {
+			this.currentCell.jumpOffPed(this, time);
+			this.currentCell = tentativeNextCell;
+
+			this.tentativeNextCell = null;
+
+		}
 		return this.currentCell;
 	}
 
@@ -84,10 +87,11 @@ public class CTPed {
 	public void notifyMoveOverNode() {
 		CTNetworkEntity p = tentativeNextCell.getParent();
 		if (p instanceof CTLink) {
+			//TODO this.dir already set! 
 			CTLink ctLink = (CTLink) p;
 			Link us = ctLink.getUsLink();
 			Link ds = ctLink.getDsLink();
-			if (us.getId() == driver.chooseNextLinkId()) {
+			if (us != null && us.getId() == driver.chooseNextLinkId()) {
 				this.dir = -Math.PI / 2.;
 				driver.notifyMoveOverNode(driver.chooseNextLinkId());
 				return;
@@ -109,5 +113,14 @@ public class CTPed {
 	public Id<Link> getNextLinkId() {
 		return this.driver.chooseNextLinkId();
 
+	}
+
+	@Override
+	public String toString() {
+		return "id: " + driver.getId().toString();
+	}
+
+	public void setDir(double dir) {
+		this.dir = dir;
 	}
 }

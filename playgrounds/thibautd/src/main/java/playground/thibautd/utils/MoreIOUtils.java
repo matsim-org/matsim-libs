@@ -39,6 +39,7 @@ import org.matsim.core.utils.io.UncheckedIOException;
  * @author thibautd
  */
 public class MoreIOUtils {
+	private static final Logger log = Logger.getLogger( MoreIOUtils.class );
 	private static final String LOGFILE = "MyLogFile.log";
 	private static final String WARNLOGFILE = "MyWarnLogFile.log";
 
@@ -49,6 +50,7 @@ public class MoreIOUtils {
 	public static File checkDirectory(final String outputDir) {
 		final File f = new File( outputDir +"/" );
 
+		log.info( "Check if directory "+outputDir+" is empty or does not exist" );
 		if ( f.exists() && f.list().length != 0 ) {
 			throw new IllegalStateException( "directory "+outputDir+" exists and is not empty!" );
 		}
@@ -59,6 +61,7 @@ public class MoreIOUtils {
 	public static File createDirectory(final String outputDir) {
 		final File f = checkDirectory( outputDir );
 
+		log.info( "creating directory "+outputDir+" if necessary" );
 		if (!f.exists() && !f.mkdirs()) {
 			throw new UncheckedIOException( "could not create directory "+outputDir );
 		}

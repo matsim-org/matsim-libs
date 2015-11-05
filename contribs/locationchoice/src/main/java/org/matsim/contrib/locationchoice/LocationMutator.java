@@ -25,12 +25,9 @@ import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.locationchoice.utils.ActivitiesHandler;
-import org.matsim.contrib.locationchoice.utils.QuadTreeRing;
 import org.matsim.contrib.locationchoice.utils.TreesBuilder;
+import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
@@ -38,7 +35,7 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 
 public abstract class LocationMutator implements PlanAlgorithm {
 
-	protected TreeMap<String, QuadTreeRing<ActivityFacility>> quadTreesOfType;
+	protected TreeMap<String, ? extends QuadTree<ActivityFacility>> quadTreesOfType;
 
 	// avoid costly call of .toArray() within handlePlan() (System.arraycopy()!)
 	protected TreeMap<String, ActivityFacilityImpl []> facilitiesOfType;
@@ -54,14 +51,14 @@ public abstract class LocationMutator implements PlanAlgorithm {
 	public LocationMutator(final Scenario scenario, Random random) {
 		this.dccg = (DestinationChoiceConfigGroup) scenario.getConfig().getModule(DestinationChoiceConfigGroup.GROUP_NAME);
 		this.defineFlexibleActivities = new ActivitiesHandler(this.dccg);
-		this.quadTreesOfType = new TreeMap<String, QuadTreeRing<ActivityFacility>>();
+		this.quadTreesOfType = new TreeMap<String, QuadTree<ActivityFacility>>();
 		this.facilitiesOfType = new TreeMap<String, ActivityFacilityImpl []>();
 		this.scenario = scenario;
 		this.random = random;
 		this.initLocal(scenario.getNetwork());
 	}
 
-	public LocationMutator(Scenario scenario, TreeMap<String, QuadTreeRing<ActivityFacility>> quad_trees,
+	public LocationMutator(Scenario scenario, TreeMap<String, ? extends QuadTree<ActivityFacility>> quad_trees,
 			TreeMap<String, ActivityFacilityImpl []> facilities_of_type, Random random) {
 		this.dccg = (DestinationChoiceConfigGroup) scenario.getConfig().getModule(DestinationChoiceConfigGroup.GROUP_NAME);
 		this.defineFlexibleActivities = new ActivitiesHandler(this.dccg);
@@ -86,29 +83,10 @@ public abstract class LocationMutator implements PlanAlgorithm {
 	 * Initialize the quadtrees of all available activity types
 	 */
 	private void initTrees(ActivityFacilities facilities) {
-		TreesBuilder treesBuilder = new TreesBuilder(this.scenario.getNetwork(), (DestinationChoiceConfigGroup) this.scenario.getConfig().getModule("locationchoice"));
+		TreesBuilder treesBuilder = new TreesBuilder(this.scenario.getNetwork(), (DestinationChoiceConfigGroup) this.scenario.getConfig().getModule(DestinationChoiceConfigGroup.GROUP_NAME));
 		treesBuilder.createTrees(facilities);
 		this.facilitiesOfType = treesBuilder.getFacilitiesOfType();
 		this.quadTreesOfType = treesBuilder.getQuadTreesOfType();
 	}
 
-//	public abstract void run(final Plan plan);
-
-//	@Override
-//	public final void run(final Plan plan) {
-//		handlePlan(plan);
-//	}
-	
-// I removed this indirection run(plan) --> handlePlan(plan), since it would just pretend to follow the syntax of PlanStrategyModule
-// (which uses handlePlan) while in fact it was a PlanAlgorithm (which uses run). kai, jan'13
-
-	protected void resetRoutes(final Plan plan) {
-		// loop over all <leg>s, remove route-information
-		// routing is done after location choice
-		for (PlanElement pe : plan.getPlanElements()) {
-			if (pe instanceof Leg) {
-				((Leg) pe).setRoute(null);
-			}
-		}
-	}
 }

@@ -30,7 +30,7 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 
 
@@ -52,7 +52,7 @@ public class TrafficStateControlerListener implements StartupListener, Iteration
 
 	
 	public void notifyIterationStarts(IterationStartsEvent event) {
-		ScenarioImpl scenario = (ScenarioImpl) event.getControler().getScenario();
+		MutableScenario scenario = (MutableScenario) event.getControler().getScenario();
 		EventsManager events = event.getControler().getEvents();
 		this.volumes = new VolumesAnalyzer(3600, 24 * 3600 - 1, scenario.getNetwork());
 		events.addHandler(this.volumes);

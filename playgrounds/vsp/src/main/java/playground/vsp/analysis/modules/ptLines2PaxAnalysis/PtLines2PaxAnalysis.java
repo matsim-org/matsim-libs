@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.handler.EventHandler;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.counts.Count;
@@ -157,8 +157,8 @@ public class PtLines2PaxAnalysis extends AbstractAnalysisModule {
 		sc.getConfig().transit().setUseTransit(true);
 		new TransitScheduleReader(sc).readFile(dir + "tut_10min_0.0.transitSchedule.xml.gz");
 //		new TransitScheduleReader(sc).readFile(dir + "tut_10min_0.0.transitSchedule_1.xml");	//for testing
-		new VehicleReaderV1(((ScenarioImpl) sc).getTransitVehicles()).readFile(dir + "tut_10min_0.0.vehicles.xml.gz");
-		PtLines2PaxAnalysis ptLinesPax = new PtLines2PaxAnalysis(sc.getTransitSchedule().getTransitLines(), ((ScenarioImpl) sc).getTransitVehicles(), 3600, 24);
+		new VehicleReaderV1(((MutableScenario) sc).getTransitVehicles()).readFile(dir + "tut_10min_0.0.vehicles.xml.gz");
+		PtLines2PaxAnalysis ptLinesPax = new PtLines2PaxAnalysis(sc.getTransitSchedule().getTransitLines(), ((MutableScenario) sc).getTransitVehicles(), 3600, 24);
 		analyzer.addAnalysisModule(ptLinesPax);
 		analyzer.run();
 	}

@@ -3,16 +3,20 @@ package playground.dhosse.gap.scenario;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.SortedMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.TypicalDurationScoreComputation;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkUtils;
@@ -24,6 +28,8 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.counts.Counts;
+import org.matsim.counts.CountsWriter;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.FacilitiesWriter;
 import org.matsim.utils.objectattributes.ObjectAttributes;
@@ -32,21 +38,23 @@ import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Geometry;
 
-import playground.agarwalamit.munich.inputs.AddingActivitiesInPlans;
+import playground.agarwalamit.munich.inputs.ActivityClassifier;
 import playground.dhosse.gap.GAPMatrices;
 import playground.dhosse.gap.Global;
+import playground.dhosse.gap.analysis.SpatialAnalysis;
 import playground.dhosse.gap.scenario.config.ConfigCreator;
+import playground.dhosse.gap.scenario.counts.CountsCreator;
 import playground.dhosse.gap.scenario.facilities.FacilitiesCreator;
 import playground.dhosse.gap.scenario.population.Municipalities;
-import playground.dhosse.gap.scenario.population.PlansCreator;
 import playground.dhosse.gap.scenario.population.PlansCreatorV2;
+import playground.dhosse.gap.scenario.population.io.CommuterFileReader;
 
 /**
  * 
  * This class creates a scenario for
  * Garmisch-Partenkirchen, Bavaria, Germany.
  * 
- * @author danielhosse
+ * @author dhosse
  *
  */
 
@@ -58,10 +66,35 @@ public class GAPScenarioBuilder {
 	
 	private static QuadTree<Geometry> builtAreaQT;
 	
+	private static Map<String, List<ActivityFacility>> munId2WorkLocation = new HashMap<String, List<ActivityFacility>>();
 	private static QuadTree<ActivityFacility> workLocations;
 	private static QuadTree<ActivityFacility> educationQT;
 	private static QuadTree<ActivityFacility> shopQT;
 	private static QuadTree<ActivityFacility> leisureQT;
+	private static QuadTree<ActivityFacility> otherQT;
+
+	private static Map<String, List<ActivityFacility>> munId2EducationFacilities = new HashMap<>();
+	private static Map<String, List<ActivityFacility>> munId2ShopFacilities = new HashMap<>();
+	private static Map<String, List<ActivityFacility>> munId2LeisureFacilities = new HashMap<>();
+	private static Map<String, List<ActivityFacility>> munId2OtherFacilities = new HashMap<>();
+	
+	public static Map<String, List<ActivityFacility>> getMunId2EducationFacilities() {
+		return munId2EducationFacilities;
+	}
+
+	public static Map<String, List<ActivityFacility>> getMunId2ShopFacilities() {
+		return munId2ShopFacilities;
+	}
+
+	public static Map<String, List<ActivityFacility>> getMunId2LeisureFacilities() {
+		return munId2LeisureFacilities;
+	}
+
+	public static Map<String, List<ActivityFacility>> getMunId2OtherFacilities() {
+		return munId2OtherFacilities;
+	}
+
+	private static Scenario scenario;
 	
 	//this attributes object stores subpopulation attributes
 	private static ObjectAttributes subpopulationAttributes = new ObjectAttributes();
@@ -69,9 +102,9 @@ public class GAPScenarioBuilder {
 	private static ObjectAttributes demographicAttributes = new ObjectAttributes();
 	
 	public static void main(String args[]){
-		
+
 		//initialize everything
-		MatsimRandom.reset(4711);
+		MatsimRandom.reset(4711); //TODO run tryouts w/ some seeds
 		
 		log.info("Creating scenario for Garmisch-Partenkirchen...");
 		
@@ -80,7 +113,7 @@ public class GAPScenarioBuilder {
 		
 		log.info("Config created and modified...");
 		
-		Scenario scenario = ScenarioUtils.createScenario(config);
+		scenario = ScenarioUtils.createScenario(config);
 		
 //		//create network from osm data
 //		NetworkCreator.createAndAddNetwork(scenario, Global.networkDataDir + "survey-network.osm");
@@ -94,10 +127,10 @@ public class GAPScenarioBuilder {
 //		TransitCreator.createTransit(scenario);
 		
 //		//create counting stations
-//		Counts counts = CountsCreator.createCountingStations(scenario.getNetwork());
-//		new CountsWriter(counts).write(Global.matsimInputDir + "Counts/counts.xml.gz");
-//		SpatialAnalysis.writeCountsToShape(Global.matsimInputDir + "Counts/counts.xml.gz", "/home/danielhosse/Dokumente/counts.shp");
-//		
+		Counts<Link> counts = CountsCreator.createCountingStations(scenario.getNetwork());
+		new CountsWriter(counts).write(Global.matsimInputDir + "Counts/counts.xml.gz");
+		SpatialAnalysis.writeCountsToShape(Global.matsimInputDir + "Counts/counts.xml.gz", "/home/danielhosse/Dokumente/counts.shp");
+		
 		//init administrative boundaries
 		initMunicipalities(scenario);
 		
@@ -115,26 +148,23 @@ public class GAPScenarioBuilder {
 		PlansCreatorV2.createPlans(scenario, Global.matsimInputDir + "Argentur_für_Arbeit/Garmisch_Einpendler.csv", Global.matsimInputDir + "Argentur_für_Arbeit/Garmisch_Auspendler.csv", GAPMatrices.run());
 		new PopulationWriter(scenario.getPopulation()).write(Global.matsimInputDir + "Pläne/plansV2.xml.gz");
 		
-		//create plans
-//		PlansCreator.createPlans(scenario, Global.matsimInputDir + "Argentur_für_Arbeit/Garmisch_Einpendler.csv", Global.matsimInputDir + "Argentur_für_Arbeit/Garmisch_Auspendler.csv");
-//		Global.setN(PlansCreator.getInhabitantsCounter());
-		
 		//create activity parameters for all types of activities
-		AddingActivitiesInPlans aaip = new AddingActivitiesInPlans(scenario);
+		ActivityClassifier aaip = new ActivityClassifier(scenario);
 		aaip.run();
 		
-		SortedMap<String, Tuple<Double, Double>> acts = aaip.getActivityType2TypicalAndMinimalDuration();
+		SortedMap<String, Double> acts = aaip.getActivityType2TypicalDuration();
 		
 		for(String act : acts.keySet()){
 			
 			ActivityParams params = new ActivityParams();
 			params.setActivityType(act);
-			params.setTypicalDuration(acts.get(act).getFirst());
-			params.setMinimalDuration(acts.get(act).getSecond());
+			params.setTypicalDuration(acts.get(act));
+			params.setMinimalDuration(acts.get(act)/2);
 			params.setClosingTime(Time.UNDEFINED_TIME);
 			params.setEarliestEndTime(Time.UNDEFINED_TIME);
 			params.setLatestStartTime(Time.UNDEFINED_TIME);
 			params.setOpeningTime(Time.UNDEFINED_TIME);
+			params.setTypicalDurationScoreComputation(TypicalDurationScoreComputation.relative);
 			config.planCalcScore().addActivityParams(params);
 			
 		}
@@ -142,15 +172,15 @@ public class GAPScenarioBuilder {
 		ConfigCreator.configureQSimAndCountsConfigGroups(config);
 		
 		//write population to file
-		new PopulationWriter(aaip.getOutPop()).write(Global.matsimInputDir + "Pläne/plansV3.xml.gz");
+		new PopulationWriter(aaip.getOutPopulation()).write("/home/danielhosse/Dokumente/01_eGAP/plansV6.xml.gz");
 		
 		//write config file
 		new ConfigWriter(config).write(Global.matsimInputDir + "configV2.xml");
 		
 		log.info("Dumping agent attributes...");
 		//write object attributes to file
-		new ObjectAttributesXmlWriter(subpopulationAttributes).writeFile(Global.matsimInputDir + "Pläne/subpopulationAtts.xml");
-		new ObjectAttributesXmlWriter(demographicAttributes).writeFile(Global.matsimInputDir + "Pläne/demographicAtts.xml");
+		new ObjectAttributesXmlWriter(subpopulationAttributes).writeFile("/home/danielhosse/Dokumente/01_eGAP/subpopulationAtts.xml");
+		new ObjectAttributesXmlWriter(demographicAttributes).writeFile("/home/danielhosse/Dokumente/01_eGAP/demographicAtts.xml");
 		
 		log.info("Done!");
 		
@@ -168,16 +198,25 @@ public class GAPScenarioBuilder {
 		for(ActivityFacility af : scenario.getActivityFacilities().getFacilitiesForActivityType(Global.ActType.education.name()).values()){
 			getEducationQT().put(af.getCoord().getX(), af.getCoord().getY(), af);
 		}
+		System.out.println(educationQT.size());
 		log.info("...shop");
 		setShopQT(new QuadTree<ActivityFacility>(bbox[0], bbox[1], bbox[2], bbox[3]));
 		for(ActivityFacility af : scenario.getActivityFacilities().getFacilitiesForActivityType(Global.ActType.shop.name()).values()){
 			getShopQT().put(af.getCoord().getX(), af.getCoord().getY(), af);
 		}
+		System.out.println(shopQT.size());
 		log.info("...leisure");
 		setLeisureQT(new QuadTree<ActivityFacility>(bbox[0], bbox[1], bbox[2], bbox[3]));
 		for(ActivityFacility af : scenario.getActivityFacilities().getFacilitiesForActivityType(Global.ActType.leisure.name()).values()){
 			getLeisureQT().put(af.getCoord().getX(), af.getCoord().getY(), af);
 		}
+		System.out.println(leisureQT.size());
+		log.info("...other");
+		setOtherQT(new QuadTree<ActivityFacility>(bbox[0], bbox[1], bbox[2], bbox[3]));
+		for(ActivityFacility af : scenario.getActivityFacilities().getFacilitiesForActivityType(Global.ActType.other.name()).values()){
+			getOtherQT().put(af.getCoord().getX(), af.getCoord().getY(), af);
+		}
+		System.out.println(otherQT.size());
 		
 		log.info("...Done.");
 		
@@ -216,6 +255,7 @@ public class GAPScenarioBuilder {
 		
 		setBuiltAreaQT(new QuadTree<Geometry>(4070000, 5190000, 4730000, 6106925));
 		
+//		Collection<SimpleFeature> builtAreas = new ShapeFileReader().readFileAndInitialize("/home/danielhosse/stage2.shp");
 		Collection<SimpleFeature> builtAreas = new ShapeFileReader().readFileAndInitialize(Global.adminBordersDir + "Gebietsstand_2007/gemeinden_2007_bebaut.shp");
 		
 		log.info("Processing built areas...");
@@ -388,4 +428,54 @@ public class GAPScenarioBuilder {
 		}
 	};
 	
+	private static CommuterFileReader readCommuterRelations(String commuterFilename, String reverseCommuterFilename){
+		
+		CommuterFileReader cdr = new CommuterFileReader();
+		
+		cdr.addFilter("09180"); //GaPa (Kreis)
+		cdr.addFilter("09180113"); //Bad Bayersoien
+		cdr.addFilter("09180112"); //Bad Kohlgrub
+		cdr.addFilter("09180114"); //Eschenlohe
+		cdr.addFilter("09180115"); //Ettal
+		cdr.addFilter("09180116"); //Farchant
+		cdr.addFilter("09180117"); //Garmisch-Partenkirchen
+		cdr.addFilter("09180118"); //Grainau
+		cdr.addFilter("09180119"); //Großweil
+		cdr.addFilter("09180122"); //Krün
+		cdr.addFilter("09180123"); //Mittenwald
+		cdr.addFilter("09180124"); //Murnau a Staffelsee
+		cdr.addFilter("09180125"); //Oberammergau
+		cdr.addFilter("09180126"); //Oberau
+		cdr.addFilter("09180127"); //Ohlstadt
+		cdr.addFilter("09180128"); //Riegsee
+		cdr.addFilter("09180129"); //Saulgrub
+		cdr.addFilter("09180131"); //Schwaigen
+		cdr.addFilter("09180132"); //Seehausen a Staffelsee
+		cdr.addFilter("09180134"); //Uffind a Staffelsee
+		cdr.addFilter("09180135"); //Unterammergau
+		cdr.addFilter("09180136"); //Wallgau
+		
+		cdr.read(reverseCommuterFilename, true);
+		cdr.read(commuterFilename, false);
+		
+		return cdr;
+		
+	}
+
+	public static Map<String, List<ActivityFacility>> getMunId2WorkLocation() {
+		return munId2WorkLocation;
+	}
+
+	public static Scenario getScenario() {
+		return scenario;
+	}
+
+	public static QuadTree<ActivityFacility> getOtherQT() {
+		return otherQT;
+	}
+
+	public static void setOtherQT(QuadTree<ActivityFacility> otherQT) {
+		GAPScenarioBuilder.otherQT = otherQT;
+	}
+
 }

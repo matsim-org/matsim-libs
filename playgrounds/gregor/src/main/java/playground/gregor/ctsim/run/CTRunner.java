@@ -24,18 +24,15 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
-import org.matsim.core.router.util.*;
 import org.matsim.core.scenario.ScenarioUtils;
+import playground.gregor.ctsim.router.CTRoutingModule;
 import playground.gregor.ctsim.simulation.CTMobsimFactory;
-import playground.gregor.ctsim.simulation.CTTripRouterFactory;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.EventBasedVisDebuggerEngine;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.InfoBox;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.QSimDensityDrawer;
@@ -45,6 +42,8 @@ import playground.gregor.sim2d_v4.scenario.Sim2DScenario;
 import playground.gregor.sim2d_v4.scenario.Sim2DScenarioUtils;
 
 public class CTRunner implements IterationStartsListener {
+
+	public static boolean DEBUG = false;
 
 	private Controler controller;
 	private QSimDensityDrawer qSimDrawer;
@@ -57,12 +56,13 @@ public class CTRunner implements IterationStartsListener {
 		String qsimConf = args[0];
 
 		boolean vis = Boolean.parseBoolean(args[1]);
+		DEBUG = vis;
 
 		Config c = ConfigUtils.loadConfig(qsimConf);
 
 		c.controler().setWriteEventsInterval(1);
 		c.controler().setMobsim("ctsim");
-		Scenario sc = ScenarioUtils.loadScenario(c);
+		final Scenario sc = ScenarioUtils.loadScenario(c);
 
 		final Controler controller = new Controler(sc);
 		if (vis) {
@@ -86,17 +86,20 @@ public class CTRunner implements IterationStartsListener {
 
 
 
-		controller.getConfig().controler().setOverwriteFileSetting(
-				true ?
-						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists);
-		LeastCostPathCalculatorFactory cost = createDefaultLeastCostPathCalculatorFactory(sc);
-		CTTripRouterFactory tripRouter = new CTTripRouterFactory(sc, cost);
+		controller.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 
-		controller.setTripRouterFactory(tripRouter);
+
+		controller.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				addRoutingModuleBinding("walkct").toProvider(CTRoutingModule.class);
+			}
+		});
+
 
 
 		final CTMobsimFactory factory = new CTMobsimFactory();
+
 
 		controller.addOverridingModule(new AbstractModule() {
 			@Override
@@ -112,62 +115,9 @@ public class CTRunner implements IterationStartsListener {
 			}
 		});
 
-//		controller.addControlerListener(new IterationStartsListener() {
-//
-//			@Override
-//			public void notifyIterationStarts(IterationStartsEvent event) {
-//				AbstractCANetwork.EMIT_VIS_EVENTS = (event.getIteration()) % 100 == 0 && (event.getIteration()) > 0;
-//
-//			}
-//		});
-
-		// DefaultTripRouterFactoryImpl fac = builder.build(sc);
-		// DefaultTripRouterFactoryImpl fac = new
-		// DefaultTripRouterFactoryImpl(sc, null, null);
-
-		// controller.setTripRouterFactory(fac);
 		controller.run();
 	}
 
-	private static LeastCostPathCalculatorFactory createDefaultLeastCostPathCalculatorFactory(
-			Scenario scenario) {
-		Config config = scenario.getConfig();
-		if (config.controler().getRoutingAlgorithmType()
-				.equals(ControlerConfigGroup.RoutingAlgorithmType.Dijkstra)) {
-			return new DijkstraFactory();
-		}
-		else {
-			if (config
-					.controler()
-					.getRoutingAlgorithmType()
-					.equals(ControlerConfigGroup.RoutingAlgorithmType.AStarLandmarks)) {
-				return new AStarLandmarksFactory(
-						scenario.getNetwork(),
-						new FreespeedTravelTimeAndDisutility(config.planCalcScore()),
-						config.global().getNumberOfThreads());
-			}
-			else {
-				if (config.controler().getRoutingAlgorithmType()
-						.equals(ControlerConfigGroup.RoutingAlgorithmType.FastDijkstra)) {
-					return new FastDijkstraFactory();
-				}
-				else {
-					if (config
-							.controler()
-							.getRoutingAlgorithmType()
-							.equals(ControlerConfigGroup.RoutingAlgorithmType.FastAStarLandmarks)) {
-						return new FastAStarLandmarksFactory(
-								scenario.getNetwork(),
-								new FreespeedTravelTimeAndDisutility(config.planCalcScore()));
-					}
-					else {
-						throw new IllegalStateException(
-								"Enumeration Type RoutingAlgorithmType was extended without adaptation of Controler!");
-					}
-				}
-			}
-		}
-	}
 
 	protected static void printUsage() {
 		System.out.println();

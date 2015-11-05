@@ -18,6 +18,7 @@
  * *********************************************************************** */
 package playground.thibautd.maxess.prepareforbiogeme.framework;
 
+import org.apache.log4j.Logger;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Counter;
@@ -32,6 +33,7 @@ import java.util.Map;
  * @author thibautd
  */
 public class ChoiceDataSetWriter<T> implements AutoCloseable {
+	private static final Logger log = Logger.getLogger( ChoiceDataSetWriter.class );
 	private final BufferedWriter writer;
 	private final ChoiceSetRecordFiller<T> recordFiller;
 
@@ -42,13 +44,13 @@ public class ChoiceDataSetWriter<T> implements AutoCloseable {
 	public ChoiceDataSetWriter(
 			final ChoiceSetRecordFiller<T> recordFiller,
 			final String filename ) {
+		log.info( "Create dataset writer for file "+filename );
 		this.recordFiller = recordFiller;
 		this.writer = IOUtils.getBufferedWriter( filename );
 	}
 
 	private void writeLine(final Collection<?> v) {
 		try {
-			counter.incCounter();
 			int i=0;
 			for ( Object o : v ) {
 				writer.write( o+(i++ < v.size() ? "\t" : "") );
@@ -66,11 +68,13 @@ public class ChoiceDataSetWriter<T> implements AutoCloseable {
 			header = fields.keySet();
 			writeLine(header);
 		}
+		counter.incCounter();
 		writeLine( fields.values() );
 	}
 
 	@Override
 	public void close() throws IOException {
+		log.info( "Close data set writer" );
 		counter.printCounter();
 		writer.close();
 	}

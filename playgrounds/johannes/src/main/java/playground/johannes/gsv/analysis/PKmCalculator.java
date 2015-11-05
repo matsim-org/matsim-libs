@@ -24,12 +24,6 @@ package playground.johannes.gsv.analysis;
 
 import gnu.trove.TObjectDoubleHashMap;
 import gnu.trove.TObjectIntHashMap;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -37,11 +31,15 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-
 import playground.johannes.gsv.sim.TransitAlightEvent;
 import playground.johannes.gsv.sim.TransitAlightEventHandler;
 import playground.johannes.gsv.sim.TransitBoardEvent;
 import playground.johannes.gsv.sim.TransitBoardEventHandler;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author johannes

@@ -8,7 +8,7 @@ public class PlainRunner {
 
 	public static void main(String[] args) {
 
-		String configFileName = "./data/run/config.xml";
+		String configFileName = "./input/matsim-config.xml";
 		Config config = ConfigUtils.loadConfig(configFileName);
 		Controler controler = new Controler(config);
 

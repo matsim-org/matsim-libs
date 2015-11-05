@@ -35,7 +35,7 @@ import org.matsim.contrib.minibus.stats.abtractPAnalysisModules.BVGLines2PtModes
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -68,7 +68,7 @@ public class ScenarioGenerator {
 
 	private static final Logger log = Logger.getLogger(ScenarioGenerator.class);
 	
-	private ScenarioImpl baseScenario;
+	private MutableScenario baseScenario;
 	private String outputDir;
 
 
@@ -81,7 +81,7 @@ public class ScenarioGenerator {
 		
 		Config config = ConfigUtils.createConfig();
 		config.transit().setUseTransit(true);
-		this.baseScenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		this.baseScenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		new MatsimNetworkReader(this.baseScenario).readFile(netFile);
 		new TransitScheduleReaderV1(this.baseScenario).readFile(scheduleFile);
 		new VehicleReaderV1(this.baseScenario.getTransitVehicles()).readFile(vehiclesFile);

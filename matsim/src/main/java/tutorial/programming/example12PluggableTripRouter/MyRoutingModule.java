@@ -47,7 +47,7 @@ public class MyRoutingModule implements RoutingModule {
 	@Override
 	public List<? extends PlanElement> calcRoute(Facility fromFacility,
 			Facility toFacility, double departureTime, Person person) {
-		// calculate a route based on iteartionData
+		// calculate a route based on iterationData
 		System.out.println(iterationData);
 		return Collections.emptyList();
 	}

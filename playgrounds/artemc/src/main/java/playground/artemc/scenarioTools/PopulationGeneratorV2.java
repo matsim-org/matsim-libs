@@ -10,7 +10,7 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.*;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.FacilitiesReaderMatsimV1;
@@ -37,7 +37,7 @@ public class PopulationGeneratorV2 {
 		String populationPath = args[2];
 		String incomeFilePath = args[3];
 		
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new FacilitiesReaderMatsimV1(scenario).readFile(facilitiesPath);
 		
 		PopulationImpl population = (PopulationImpl) scenario.getPopulation();

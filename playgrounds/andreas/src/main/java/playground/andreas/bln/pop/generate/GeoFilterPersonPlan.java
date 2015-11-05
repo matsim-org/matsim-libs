@@ -33,7 +33,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.andreas.bln.pop.SharedNetScenario;
@@ -106,7 +106,7 @@ public class GeoFilterPersonPlan extends NewPopulation {
 	public static void main(final String[] args) {
 		Gbl.startMeasurement();
 
-		ScenarioImpl bigNetScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario bigNetScenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		String bigNetworkFile = "./bb_cl.xml.gz";
 		String targetNetworkFile = "./hundekopf_cl.xml.gz";
@@ -116,15 +116,15 @@ public class GeoFilterPersonPlan extends NewPopulation {
 
 		new MatsimNetworkReader(bigNetScenario).readFile(bigNetworkFile);
 
-		Scenario targetScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario targetScenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network targetNet = targetScenario.getNetwork();
 		new MatsimNetworkReader(targetScenario).readFile(targetNetworkFile);
 
-		Population inPop = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
+		Population inPop = ((MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
 		PopulationReader popReader = new MatsimPopulationReader(new SharedNetScenario(bigNetScenario, inPop));
 		popReader.readFile(inPlansFile);
 
-		Population origPop = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
+		Population origPop = ((MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
 		PopulationReader origPopReader = new MatsimPopulationReader(new SharedNetScenario(bigNetScenario, origPop));
 		origPopReader.readFile(origPlansFile);
 

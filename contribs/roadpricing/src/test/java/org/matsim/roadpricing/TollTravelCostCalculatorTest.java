@@ -41,9 +41,7 @@ import org.matsim.core.controler.ControlerDefaults;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.PlanRouter;
-import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
@@ -53,11 +51,13 @@ import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.PreProcessLandmarks;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
 import org.matsim.testcases.MatsimTestUtils;
+
+import javax.inject.Provider;
 
 /**
  * Tests the correct working of {@link TravelDisutilityIncludingToll} by using it
@@ -75,7 +75,7 @@ public class TollTravelCostCalculatorTest {
         RoadPricingConfigGroup rpConfig = ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class);
 		
 		Scenario scenario = ScenarioUtils.createScenario(config) ;
-		Fixture.createNetwork2((ScenarioImpl)scenario);
+		Fixture.createNetwork2((MutableScenario)scenario);
 		Network net = scenario.getNetwork() ;
 		
 		RoadPricingSchemeImpl scheme = new RoadPricingSchemeImpl();
@@ -123,7 +123,7 @@ public class TollTravelCostCalculatorTest {
 	@Test
 	public void testDistanceTollRouter() {
 		Config config = utils.loadConfig(null);
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Fixture.createNetwork2(scenario);
 		Network network = scenario.getNetwork();
 		// a basic toll where only the morning hours are tolled
@@ -203,7 +203,7 @@ public class TollTravelCostCalculatorTest {
 	@Test
 	public void testLinkTollRouter() {
 		Config config = utils.loadConfig(null);
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Fixture.createNetwork2(scenario);
 		Network network = scenario.getNetwork();
 		// a basic toll where only the morning hours are tolled
@@ -280,7 +280,7 @@ public class TollTravelCostCalculatorTest {
 	@Test
 	public void testCordonTollRouter() {
 		Config config = utils.loadConfig(null);
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Fixture.createNetwork2(scenario);
 		Network network = scenario.getNetwork();
 		// a basic toll where only the morning hours are tolled
@@ -377,12 +377,12 @@ public class TollTravelCostCalculatorTest {
 		final TripRouterFactoryBuilderWithDefaults builder =
 				new TripRouterFactoryBuilderWithDefaults();
 		builder.setLeastCostPathCalculatorFactory( routerFactory );
-		final TripRouterFactory factory = builder.build( scenario );
+		builder.setTravelDisutility(travelDisutility);
+		builder.setTravelTime(travelTime);
+		final Provider<TripRouter> factory = builder.build( scenario );
 		final TripRouter tripRouter =
-				factory.instantiateAndConfigureTripRouter(
-						new RoutingContextImpl(
-								travelDisutility,
-								travelTime ) );
+				factory.get(
+				);
 		final PersonAlgorithm router = new PlanRouter( tripRouter );
 
 		for ( Person p : scenario.getPopulation().getPersons().values() ) {

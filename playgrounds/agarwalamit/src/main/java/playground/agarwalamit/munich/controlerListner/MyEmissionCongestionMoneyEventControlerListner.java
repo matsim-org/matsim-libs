@@ -31,7 +31,7 @@ import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.analysis.congestion.ExperiencedDelayHandler;
@@ -55,7 +55,7 @@ public class MyEmissionCongestionMoneyEventControlerListner implements StartupLi
 	private Map<Id<Person>, Double> pId2WarmEmissionsCosts= new HashMap<>();
 	private Map<Id<Person>, Double> pId2CongestionCosts= new HashMap<>();
 	private Map<Id<Person>, Double> pId2Tolls= new HashMap<>();
-	private ScenarioImpl scenario;
+	private MutableScenario scenario;
 	private EmissionCostModule emissionCostModule;
 
 	private MoneyEventHandler moneyHandler;
@@ -66,7 +66,7 @@ public class MyEmissionCongestionMoneyEventControlerListner implements StartupLi
 
 	@Override
 	public void notifyStartup(StartupEvent event) {
-		this.scenario = (ScenarioImpl) event.getControler().getScenario();
+		this.scenario = (MutableScenario) event.getControler().getScenario();
 		this.vtts_car = (this.scenario.getConfig().planCalcScore().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() - this.scenario.getConfig().planCalcScore().getPerforming_utils_hr()) / this.scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney();
 
 		this.emissCostHandler = new EmissionCostsCollector(emissionCostModule);

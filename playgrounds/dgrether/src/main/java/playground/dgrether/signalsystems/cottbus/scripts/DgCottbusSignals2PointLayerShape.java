@@ -28,7 +28,7 @@ import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
@@ -54,7 +54,7 @@ import com.vividsolutions.jts.geom.MultiPoint;
 public class DgCottbusSignals2PointLayerShape {
 
 	public static void main(String[] args) throws Exception {
-		ScenarioImpl sc = CottbusUtils.loadCottbusScenrio(true);
+		MutableScenario sc = CottbusUtils.loadCottbusScenrio(true);
 		Map<Id<SignalSystem>, Set<Id<Node>>> systemId2NodeIdsMap = DgSignalsUtils.calculateSignalizedNodesPerSystem(((SignalsData) sc.getScenarioElement(SignalsData.ELEMENT_NAME)).getSignalSystemsData(), sc.getNetwork());
 		String srsId = TransformationFactory.WGS84_UTM33N;
 		CoordinateReferenceSystem networkSrs = MGC.getCRS(srsId);

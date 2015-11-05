@@ -47,7 +47,7 @@ import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.ActivityFacility;
 // events werden während sim step geschmissen, aftermobsimstep kommt nachher.
@@ -135,7 +135,7 @@ public class ParkingAgentsTracker implements LinkEnterEventHandler, PersonArriva
 			 * activity.
 			 */
 			Activity nextNonParkingActivity = (Activity) executedPlan.getPlanElements().get(planElementIndex + 3);
-			ActivityFacility facility = ((ScenarioImpl) scenario).getActivityFacilities().getFacilities()
+			ActivityFacility facility = ((MutableScenario) scenario).getActivityFacilities().getFacilities()
 					.get(nextNonParkingActivity.getFacilityId());
 			nextActivityFacilityMap.put(event.getPersonId(), facility);
 

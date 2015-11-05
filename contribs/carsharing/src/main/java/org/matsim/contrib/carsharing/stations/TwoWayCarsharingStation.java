@@ -34,4 +34,13 @@ public class TwoWayCarsharingStation {
 		return vehicleIDs;
 	}
 	
+	public void removeCar() {
+		this.numberOfVehicles--;
+	}
+	
+	public void addCar(){
+		
+		this.numberOfVehicles++;
+	}
+	
 }

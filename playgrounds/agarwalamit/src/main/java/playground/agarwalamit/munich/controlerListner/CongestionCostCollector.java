@@ -25,7 +25,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 
 import playground.vsp.congestion.events.CongestionEvent;
 import playground.vsp.congestion.handlers.CongestionEventHandler;
@@ -37,12 +37,12 @@ import playground.vsp.congestion.handlers.CongestionEventHandler;
 public class CongestionCostCollector implements CongestionEventHandler {
 	private final static Logger log = Logger.getLogger(CongestionCostCollector.class);
 
-	private final ScenarioImpl scenario;
+	private final MutableScenario scenario;
 	private final double vtts_car;
 	private double amountSum = 0.;
 	private Map<Id<Person>, Double> causingPerson2Cost = new HashMap<>();
 
-	public CongestionCostCollector(ScenarioImpl scenario) {
+	public CongestionCostCollector(MutableScenario scenario) {
 		this.scenario = scenario;
 		this.vtts_car = (this.scenario.getConfig().planCalcScore().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() - this.scenario.getConfig().planCalcScore().getPerforming_utils_hr()) / this.scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney();
 

@@ -20,6 +20,10 @@
 
 package org.matsim.contrib.multimodal.pt;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -36,16 +40,21 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.pt.transitSchedule.api.*;
-import org.matsim.vehicles.*;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import org.matsim.pt.transitSchedule.api.Departure;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleCapacity;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.Vehicles;
+import org.matsim.vehicles.VehiclesFactory;
 
 /**
  * Network:
@@ -74,7 +83,7 @@ import java.util.List;
  */
 /*package*/ class Fixture {
 
-	/*package*/ final ScenarioImpl scenario;
+	/*package*/ final Scenario scenario;
 	/*package*/ private final Config config;
 	/*package*/ private final Network network;
 	/*package*/ private final TransitScheduleFactory builder;
@@ -88,7 +97,7 @@ import java.util.List;
 		this.config = ConfigUtils.createConfig();	
 		this.config.transit().setUseTransit(true);
 
-		this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		this.scenario = ScenarioUtils.createScenario(config);
 		this.network = this.scenario.getNetwork();
 		this.schedule = this.scenario.getTransitSchedule();
 		this.builder = this.schedule.getFactory();

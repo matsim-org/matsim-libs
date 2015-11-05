@@ -20,6 +20,7 @@
 
 package org.matsim.integration.replanning;
 
+import com.google.inject.name.Names;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -40,19 +41,13 @@ import org.matsim.core.population.*;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerModule;
-import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterProviderImpl;
-import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityFactory;
-import org.matsim.core.router.util.DijkstraFactory;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.router.TripRouterModule;
+import org.matsim.core.router.costcalculators.TravelDisutilityModule;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
+import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionModule;
+import org.matsim.core.trafficmonitoring.TravelTimeCalculatorModule;
 import org.matsim.testcases.MatsimTestCase;
-
-import java.util.Arrays;
 
 /**
  * @author mrieser
@@ -62,7 +57,7 @@ public class ChangeLegModeIntegrationTest extends MatsimTestCase {
 	public void testStrategyManagerConfigLoaderIntegration() {
 		// setup config
 		final Config config = loadConfig(null);
-		final ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		final MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		final StrategySettings strategySettings = new StrategySettings(Id.create("1", StrategySettings.class));
 		strategySettings.setStrategyName("ChangeLegMode");
 		strategySettings.setWeight(1.0);
@@ -90,42 +85,14 @@ public class ChangeLegModeIntegrationTest extends MatsimTestCase {
         Injector injector = Injector.createInjector(config, new AbstractModule() {
             @Override
             public void install() {
+				bind(Integer.class).annotatedWith(Names.named("iteration")).toInstance(0);
                 bind(Scenario.class).toInstance(scenario);
                 bind(EventsManager.class).toInstance(EventsUtils.createEventsManager());
-                install(AbstractModule.override(Arrays.asList(new StrategyManagerModule()), new AbstractModule() {
-
-                    @Override
-                    public void install() {
-                        bind(ReplanningContext.class).toInstance(new ReplanningContext() {
-
-                            @Override
-                            public TravelDisutility getTravelDisutility() {
-                                return null;
-                            }
-
-                            @Override
-                            public TravelTime getTravelTime() {
-                                return null;
-                            }
-
-                            @Override
-                            public ScoringFunctionFactory getScoringFunctionFactory() {
-                                return null;
-                            }
-
-                            @Override
-                            public int getIteration() {
-                                return 0;
-                            }
-
-                            @Override
-                            public TripRouter getTripRouter() {
-                                return new TripRouterProviderImpl(scenario, new OnlyTimeDependentTravelDisutilityFactory(), new FreeSpeedTravelTime(), new DijkstraFactory(), null).get();
-                            }
-
-                        });
-                    }
-                }));
+                install(new StrategyManagerModule());
+				install(new CharyparNagelScoringFunctionModule());
+                install(new TripRouterModule());
+				install(new TravelTimeCalculatorModule());
+				install(new TravelDisutilityModule());
             }
         });
 		final StrategyManager manager = injector.getInstance(StrategyManager.class);

@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package playground.thibautd.mobsim.pseudoqsimengine;
 
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -37,12 +36,12 @@ import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.PlanRouter;
-import org.matsim.core.router.RoutingContextImpl;
+import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.pt.transitSchedule.api.*;
@@ -110,11 +109,7 @@ public class PSeudoQSimCompareEventsTest {
 		CompareEventsUtils.testEventsSimilarToQsim(
 				scenario,
 				new PlanRouter(
-					new TripRouterFactoryBuilderWithDefaults().build(
-						scenario ).instantiateAndConfigureTripRouter(
-							new RoutingContextImpl(
-									new RandomizingTimeDistanceTravelDisutility.Builder().createTravelDisutility(travelTime.getLinkTravelTimes(), scenario.getConfig().planCalcScore()),
-								travelTime.getLinkTravelTimes() ) ) ),
+						createTripRouter( travelTime , scenario ) ),
 				new QSimFactory(),
 				DUMP_EVENTS ? utils.getOutputDirectory()+"/qSimEvent.xml" : null,
 				new QSimWithPseudoEngineFactory(
@@ -124,6 +119,15 @@ public class PSeudoQSimCompareEventsTest {
 				false );
 	}
 
+	private TripRouter createTripRouter(TravelTimeCalculator travelTime, Scenario scenario) {
+		final TripRouterFactoryBuilderWithDefaults builder = new TripRouterFactoryBuilderWithDefaults();
+		builder.setTravelDisutility(
+				new RandomizingTimeDistanceTravelDisutility.Builder( TransportMode.car ).createTravelDisutility(
+						travelTime.getLinkTravelTimes() ,
+						scenario.getConfig().planCalcScore() ));
+		builder.setTravelTime( travelTime.getLinkTravelTimes() );
+		return builder.build( scenario ).get();
+	}
 
 
 	private Scenario createTestScenario(final boolean useTransit) {
@@ -225,10 +229,10 @@ public class PSeudoQSimCompareEventsTest {
 	}
 
 	private void createSchedule(final Scenario sc) {
-		final TransitSchedule schedule = ((ScenarioImpl) sc).getTransitSchedule();
+		final TransitSchedule schedule = ((MutableScenario) sc).getTransitSchedule();
 		final TransitScheduleFactory factory = schedule.getFactory();
 
-		final Vehicles vehicles = ((ScenarioImpl) sc).getTransitVehicles();
+		final Vehicles vehicles = ((MutableScenario) sc).getTransitVehicles();
 
 		final VehicleType vehicleType =
 			vehicles.getFactory().createVehicleType(

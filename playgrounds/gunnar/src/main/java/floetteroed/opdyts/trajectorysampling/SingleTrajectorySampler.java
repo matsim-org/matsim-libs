@@ -28,9 +28,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import floetteroed.opdyts.DecisionVariable;
-import floetteroed.opdyts.ObjectBasedObjectiveFunction;
+import floetteroed.opdyts.ObjectiveFunction;
 import floetteroed.opdyts.SimulatorState;
-import floetteroed.opdyts.VectorBasedObjectiveFunction;
 import floetteroed.opdyts.convergencecriteria.ConvergenceCriterion;
 
 /**
@@ -45,9 +44,9 @@ public class SingleTrajectorySampler<U extends DecisionVariable> implements
 
 	private final U decisionVariable;
 
-	private final ObjectBasedObjectiveFunction objectBasedObjectiveFunction;
+	private final ObjectiveFunction objectBasedObjectiveFunction;
 
-	private final VectorBasedObjectiveFunction vectorBasedObjectiveFunction;
+	// private final VectorBasedObjectiveFunction vectorBasedObjectiveFunction;
 
 	private final ConvergenceCriterion convergenceCriterion;
 
@@ -58,22 +57,22 @@ public class SingleTrajectorySampler<U extends DecisionVariable> implements
 	// -------------------- CONSTRUCTION --------------------
 
 	public SingleTrajectorySampler(final U decisionVariable,
-			final ObjectBasedObjectiveFunction objectBasedObjectiveFunction,
+			final ObjectiveFunction objectBasedObjectiveFunction,
 			final ConvergenceCriterion convergenceCriterion) {
 		this.decisionVariable = decisionVariable;
 		this.objectBasedObjectiveFunction = objectBasedObjectiveFunction;
-		this.vectorBasedObjectiveFunction = null;
+		// this.vectorBasedObjectiveFunction = null;
 		this.convergenceCriterion = convergenceCriterion;
 	}
 
-	public SingleTrajectorySampler(final U decisionVariable,
-			final VectorBasedObjectiveFunction vectorBasedObjectiveFunction,
-			final ConvergenceCriterion convergenceCriterion) {
-		this.decisionVariable = decisionVariable;
-		this.objectBasedObjectiveFunction = null;
-		this.vectorBasedObjectiveFunction = vectorBasedObjectiveFunction;
-		this.convergenceCriterion = convergenceCriterion;
-	}
+	// public SingleTrajectorySampler(final U decisionVariable,
+	// final VectorBasedObjectiveFunction vectorBasedObjectiveFunction,
+	// final ConvergenceCriterion convergenceCriterion) {
+	// this.decisionVariable = decisionVariable;
+	// this.objectBasedObjectiveFunction = null;
+	// this.vectorBasedObjectiveFunction = vectorBasedObjectiveFunction;
+	// this.convergenceCriterion = convergenceCriterion;
+	// }
 
 	// --------------- IMPLEMENTATION OF TrajectorySampler ---------------
 
@@ -106,15 +105,13 @@ public class SingleTrajectorySampler<U extends DecisionVariable> implements
 	public void afterIteration(SimulatorState newState) {
 		if (this.fromState != null) {
 			if (this.transitionSequence == null) {
-				this.transitionSequence = new TransitionSequence(
+				this.transitionSequence = new TransitionSequence<U>(
 						this.fromState, this.decisionVariable, newState,
-						this.objectBasedObjectiveFunction,
-						this.vectorBasedObjectiveFunction);
+						this.objectBasedObjectiveFunction.value(newState));
 			} else {
 				this.transitionSequence.addTransition(this.fromState,
 						this.decisionVariable, newState,
-						this.objectBasedObjectiveFunction,
-						this.vectorBasedObjectiveFunction);
+						this.objectBasedObjectiveFunction.value(newState));
 			}
 			this.convergenceCriterion.evaluate(this.transitionSequence);
 		}
@@ -129,4 +126,24 @@ public class SingleTrajectorySampler<U extends DecisionVariable> implements
 			return 0;
 		}
 	}
+
+	// @Override
+	// public Map<U, Integer> getDecisionVariable2evaluationCnt() {
+	// return null; // TODO not ideal
+	// }
+	//
+	// @Override
+	// public double getInitialEquilibriumGap() {
+	// return 0.0; // TODO not ideal
+	// }
+	//
+	// @Override
+	// public double getInitialObjectiveFunctionValue() {
+	// return 0.0; // TODO not ideal
+	// }
+	//
+	// @Override
+	// public double getInitialUniformityGap() {
+	// return 0.0; // TODO not ideal
+	// }
 }

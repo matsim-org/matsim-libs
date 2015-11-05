@@ -40,8 +40,8 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.*;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility.Builder;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
 import org.matsim.core.router.util.FastDijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
@@ -120,15 +120,15 @@ public class PassengerRunner {
 		legModeChecker.printStatistics();	
 	}
 	
-	private static TripRouter createTripRouterInstance(Scenario scenario, TripRouterFactory tripRouterFactory) {
-		TravelDisutilityFactory travelDisutilityFactory = new TravelTimeAndDistanceBasedTravelDisutilityFactory();
+	private static TripRouter createTripRouterInstance(Scenario scenario, Provider<TripRouter> tripRouterFactory) {
+		TravelDisutilityFactory travelDisutilityFactory = new Builder( TransportMode.car );
 		TravelTime travelTime = new FreeSpeedTravelTime();
 		TravelDisutility travelDisutility = travelDisutilityFactory.createTravelDisutility(travelTime, scenario.getConfig().planCalcScore());
 		RoutingContext routingContext = new RoutingContextImpl(travelDisutility, travelTime);
-		return tripRouterFactory.instantiateAndConfigureTripRouter(routingContext);
+		return tripRouterFactory.get();
 	}
 	
-	private static TripRouterFactory createTripRouterFactory(Scenario scenario) {
+	private static Provider<TripRouter> createTripRouterFactory(Scenario scenario) {
 		
 		MultiModalConfigGroup multiModalConfigGroup = (MultiModalConfigGroup) scenario.getConfig().getModule(MultiModalConfigGroup.GROUP_NAME);		
 		Map<Id<Link>, Double> linkSlopes = new LinkSlopesReader().getLinkSlopes(multiModalConfigGroup, scenario.getNetwork());
@@ -139,12 +139,12 @@ public class PassengerRunner {
 		LeastCostPathCalculatorFactory leastCostPathCalculatorFactory = builder.createDefaultLeastCostPathCalculatorFactory(scenario);
 		Provider<TransitRouter> transitRouterFactory = null;
 		if (scenario.getConfig().transit().isUseTransit()) transitRouterFactory = builder.createDefaultTransitRouter(scenario);
-		
-		TravelDisutilityFactory travelDisutilityFactory = new TravelTimeAndDistanceBasedTravelDisutilityFactory();
-		TripRouterFactory defaultDelegateFactory = new DefaultDelegateFactory(scenario, leastCostPathCalculatorFactory);
-		TripRouterFactory multiModalTripRouterFactory = new MultimodalTripRouterFactory(scenario, multiModalTravelTimes, 
+
+		TravelDisutilityFactory travelDisutilityFactory = new Builder( TransportMode.car );
+		Provider<TripRouter> defaultDelegateFactory = new DefaultDelegateFactory(scenario, leastCostPathCalculatorFactory);
+		Provider<TripRouter> multiModalTripRouterFactory = new MultimodalTripRouterFactory(scenario, multiModalTravelTimes,
 				travelDisutilityFactory, defaultDelegateFactory, new FastDijkstraFactory());
-		TripRouterFactory transitTripRouterFactory = new TransitTripRouterFactory(scenario, multiModalTripRouterFactory, 
+		Provider<TripRouter> transitTripRouterFactory = new TransitTripRouterFactory(scenario, multiModalTripRouterFactory,
 				transitRouterFactory);
 		
 		return transitTripRouterFactory;

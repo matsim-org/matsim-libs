@@ -1,14 +1,10 @@
 package opdytsintegration;
 
-import floetteroed.opdyts.DecisionVariable;
-
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.scoring.ScoringFunction;
-import org.matsim.core.scoring.ScoringFunctionFactory;
 
+import floetteroed.opdyts.DecisionVariable;
 import floetteroed.opdyts.SimulatorState;
 import floetteroed.opdyts.searchalgorithms.Simulator;
 import floetteroed.opdyts.trajectorysampling.TrajectorySampler;
@@ -16,24 +12,30 @@ import floetteroed.opdyts.trajectorysampling.TrajectorySampler;
 /**
  * Created by michaelzilske on 08/10/15.
  */
-public class MATSimSimulator implements Simulator {
+public class MATSimSimulator<U extends DecisionVariable> implements Simulator<U> {
 
 	// private final Set<? extends DecisionVariable> decisionVariables;
     private final MATSimStateFactory stateFactory;
     private final Scenario scenario;
+
+	private int nextControlerRun = 0;
 
     public MATSimSimulator(// Set<? extends DecisionVariable> decisionVariables, 
     		MATSimStateFactory stateFactory, Scenario scenario) {
         // this.decisionVariables = decisionVariables;
         this.stateFactory = stateFactory;
         this.scenario = scenario;
+		String outputDirectory = this.scenario.getConfig().controler().getOutputDirectory();
+		this.scenario.getConfig().controler().setOutputDirectory(outputDirectory + "_0");
     }
 
     @Override
-	public SimulatorState run(TrajectorySampler evaluator) {
+	public SimulatorState run(TrajectorySampler<U> evaluator) {
 //				evaluator.addStatistic("./mylog.txt", new InterpolatedObjectiveFunctionValue());
 //				evaluator.addStatistic("./mylog.txt", new AlphaStatistic(decisionVariables));
-
+		String outputDirectory = this.scenario.getConfig().controler().getOutputDirectory();
+		outputDirectory = outputDirectory.substring(0, outputDirectory.lastIndexOf("_")) + "_" + nextControlerRun;
+		this.scenario.getConfig().controler().setOutputDirectory(outputDirectory);
 		final MATSimDecisionVariableSetEvaluator predictor
 				= new MATSimDecisionVariableSetEvaluator(evaluator, 
 						// decisionVariables, 
@@ -58,12 +60,12 @@ public class MATSimSimulator implements Simulator {
 			}
 		});
 		controler.run();
-
+		nextControlerRun++;
 		return predictor.getFinalState();
 	}
 
     @Override
-	public SimulatorState run(TrajectorySampler evaluator, SimulatorState initialState) {
+	public SimulatorState run(TrajectorySampler<U> evaluator, SimulatorState initialState) {
 		if (initialState != null) {
 			((MATSimState) initialState).setPopulation(scenario.getPopulation());
 			initialState.implementInSimulation();

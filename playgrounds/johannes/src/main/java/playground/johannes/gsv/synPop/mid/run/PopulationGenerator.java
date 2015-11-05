@@ -30,7 +30,9 @@ import playground.johannes.synpop.data.io.XMLWriter;
 import playground.johannes.synpop.processing.*;
 import playground.johannes.synpop.source.mid2008.generator.*;
 import playground.johannes.synpop.source.mid2008.processing.ResolveRoundTripsTask;
+import playground.johannes.synpop.source.mid2008.processing.ReturnEpisodeTask;
 import playground.johannes.synpop.source.mid2008.processing.SetFirstActivityTypeTask;
+import playground.johannes.synpop.source.mid2008.processing.VacationsTypeTask;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -137,12 +139,12 @@ public class PopulationGenerator {
 		composite.addComponent(new InsertActivitiesTask(new PlainFactory()));
 		composite.addComponent(new SetActivityTypeTask());
 		composite.addComponent(new SetFirstActivityTypeTask());
-		composite.addComponent(new InfereVacationsType());
+		composite.addComponent(new VacationsTypeTask());
 		TaskRunner.run(new ConstrainedPlanTask("datasource", "midjourneys", composite), persons);
 		
 		TaskRunner.run(new DeletePlansDestination(), persons);
 		
-		TaskRunner.run(new AddReturnPlan(), persons);
+		TaskRunner.run(new ReturnEpisodeTask(), persons);
 		
 		JourneyPlans2PersonTask plans2persons = new JourneyPlans2PersonTask(); 
 		TaskRunner.run(plans2persons, persons);

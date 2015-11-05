@@ -22,32 +22,30 @@ package org.matsim.withinday.replanning.replanners;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.router.PlanRouter;
-import org.matsim.core.router.RoutingContext;
-import org.matsim.core.router.TripRouterFactory;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.router.TripRouter;
 import org.matsim.withinday.mobsim.WithinDayEngine;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayInitialReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayInitialReplannerFactory;
 
+import javax.inject.Provider;
+
 public class InitialReplannerFactory extends WithinDayInitialReplannerFactory {
 
 	private final Scenario scenario;
-	private final TripRouterFactory tripRouterFactory;
-	private final RoutingContext routingContext;
-	
+	private final Provider<TripRouter> tripRouterFactory;
+
 	public InitialReplannerFactory(Scenario scenario, WithinDayEngine withinDayEngine,
-			TripRouterFactory tripRouterFactory, RoutingContext routingContext) {
+								   Provider<TripRouter> tripRouterFactory) {
 		super(withinDayEngine);
 		this.scenario = scenario;
 		this.tripRouterFactory = tripRouterFactory;
-		this.routingContext = routingContext;
 	}
 
 	@Override
 	public WithinDayInitialReplanner createReplanner() {
 		WithinDayInitialReplanner replanner = new InitialReplanner(super.getId(), scenario, 
 				this.getWithinDayEngine().getActivityRescheduler(),
-				new PlanRouter(this.tripRouterFactory.instantiateAndConfigureTripRouter(routingContext), 
+				new PlanRouter(this.tripRouterFactory.get(),
 						this.scenario.getActivityFacilities()));
 		return replanner;
 	}

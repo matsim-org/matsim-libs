@@ -1,3 +1,24 @@
+/*
+ *  *********************************************************************** *
+ *  * project: org.matsim.*
+ *  * DefaultControlerModules.java
+ *  *                                                                         *
+ *  * *********************************************************************** *
+ *  *                                                                         *
+ *  * copyright       : (C) 2014 by the members listed in the COPYING, *
+ *  *                   LICENSE and WARRANTY file.                            *
+ *  * email           : info at matsim dot org                                *
+ *  *                                                                         *
+ *  * *********************************************************************** *
+ *  *                                                                         *
+ *  *   This program is free software; you can redistribute it and/or modify  *
+ *  *   it under the terms of the GNU General Public License as published by  *
+ *  *   the Free Software Foundation; either version 2 of the License, or     *
+ *  *   (at your option) any later version.                                   *
+ *  *   See also COPYING, LICENSE and WARRANTY file                           *
+ *  *                                                                         *
+ *  * ***********************************************************************
+ */
 package scenarios.braess.run;
 
 import java.io.File;
@@ -15,7 +36,7 @@ import org.matsim.contrib.signals.data.SignalsScenarioLoader;
 import org.matsim.contrib.signals.data.signalcontrol.v20.SignalControlWriter20;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupsWriter20;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsWriter20;
-import org.matsim.contrib.signals.router.InvertedNetworkTripRouterFactoryModule;
+import org.matsim.contrib.signals.router.InvertedNetworkRoutingModuleModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
@@ -31,17 +52,18 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.replanning.DefaultPlanStrategiesModule.DefaultSelector;
 import org.matsim.core.replanning.DefaultPlanStrategiesModule.DefaultStrategy;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
-import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility.Builder;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.data.v20.LaneDefinitionsWriter20;
 
+import playground.artemc.socialCost.SocialCostController.Initializer;
 import playground.vsp.congestion.controler.MarginalCongestionPricingContolerListener;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV4;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV8;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV9;
 import playground.vsp.congestion.handlers.TollHandler;
-import playground.vsp.congestion.routing.RandomizedTollTimeDistanceTravelDisutilityFactory;
+import playground.vsp.congestion.routing.CongestionTollTimeDistanceTravelDisutilityFactory;
 import scenarios.analysis.TtListenerToBindAndWriteAnalysis;
 import scenarios.braess.analysis.TtAnalyzeBraess;
 import scenarios.braess.createInput.TtCreateBraessNetworkAndLanes;
@@ -50,7 +72,6 @@ import scenarios.braess.createInput.TtCreateBraessPopulation;
 import scenarios.braess.createInput.TtCreateBraessPopulation.InitRoutes;
 import scenarios.braess.createInput.TtCreateBraessSignals;
 import scenarios.braess.createInput.TtCreateBraessSignals.SignalControlType;
-import utils.TtPaths;
 
 /**
  * Class to run a simulation of the braess scenario with or without signals. 
@@ -78,19 +99,18 @@ public class RunBraessSimulation {
 	private static final LaneType LANE_TYPE = LaneType.NONE;
 	
 	// defines which kind of pricing should be used
-	private static final PricingType PRICING_TYPE = PricingType.V8;
+	private static final PricingType PRICING_TYPE = PricingType.V3;
 	public enum PricingType{
-		NONE, V3, V4, V8, V9
+		NONE, V3, V4, V8, V9, FLOWBASED
 	}
 
 	// choose a sigma for the randomized router
 	// (higher sigma cause more randomness. use 0.0 for no randomness.)
 	private static final double SIGMA = 0.0;	
 		
-	private static final boolean WRITE_INITIAL_FILES = true;
+	private static final boolean WRITE_INITIAL_FILES = false;
 	
-	private static String OUTPUT_BASE_DIR = TtPaths.RUNSSVN + "braess/withoutLanes_signalsVsTolls/";
-//	private static String OUTPUT_BASE_DIR = "/Users/nagel/kairuns/braess/output";
+	private static String OUTPUT_BASE_DIR = "../../../runs-svn/braess/withoutLanes_signalsVsTolls/";
 	
 	public static void main(String[] args) {
 		Config config = defineConfig();
@@ -134,10 +154,10 @@ public class RunBraessSimulation {
 		
 		// add the module for link to link routing if enabled
 		if (config.controler().isLinkToLinkRoutingEnabled()){
-			controler.addOverridingModule(new InvertedNetworkTripRouterFactoryModule());
+			controler.addOverridingModule(new InvertedNetworkRoutingModuleModule());
 		}
-		
-		if (!PRICING_TYPE.equals(PricingType.NONE)){
+
+		if (!PRICING_TYPE.equals(PricingType.NONE) && !PRICING_TYPE.equals(PricingType.FLOWBASED)){
 			// add tolling
 			TollHandler tollHandler = new TollHandler(scenario);
 			
@@ -147,9 +167,9 @@ public class RunBraessSimulation {
 			for (int i = 0; i < strategies.length; i++) {
 				if (strategies[i].getStrategyName().equals(DefaultStrategy.ReRoute.toString())){
 					if (strategies[i].getWeight() > 0.0){ // ReRoute is used
-						final RandomizedTollTimeDistanceTravelDisutilityFactory factory = 
-								new RandomizedTollTimeDistanceTravelDisutilityFactory(
-								new TravelTimeAndDistanceBasedTravelDisutilityFactory(),
+						final CongestionTollTimeDistanceTravelDisutilityFactory factory =
+								new CongestionTollTimeDistanceTravelDisutilityFactory(
+										new Builder( TransportMode.car ),
 								tollHandler
 							) ;
 						factory.setSigma(SIGMA);
@@ -161,7 +181,7 @@ public class RunBraessSimulation {
 						});
 					}
 				}
-			}			
+			}		
 			
 			// choose the correct congestion handler and add it
 			EventHandler congestionHandler = null;
@@ -188,10 +208,16 @@ public class RunBraessSimulation {
 			controler.addControlerListener(
 					new MarginalCongestionPricingContolerListener(controler.getScenario(), 
 							tollHandler, congestionHandler));
-		} else {
+		
+		} else if (PRICING_TYPE.equals(PricingType.FLOWBASED)) {
+			
+			Initializer initializer = new Initializer();
+			controler.addControlerListener(initializer);		
+		} else { // no pricing
+			
 			// adapt sigma for randomized routing
 			final RandomizingTimeDistanceTravelDisutility.Builder builder = 
-					new RandomizingTimeDistanceTravelDisutility.Builder();
+					new RandomizingTimeDistanceTravelDisutility.Builder( TransportMode.car );
 			builder.setSigma(SIGMA);
 			controler.addOverridingModule(new AbstractModule() {
 				@Override
@@ -276,7 +302,7 @@ public class RunBraessSimulation {
 		}
 
 		// choose maximal number of plans per agent. 0 means unlimited
-		config.strategy().setMaxAgentPlanMemorySize( 3 );
+		config.strategy().setMaxAgentPlanMemorySize( 0 );
 		
 		config.qsim().setStuckTime(3600 * 10.);
 		

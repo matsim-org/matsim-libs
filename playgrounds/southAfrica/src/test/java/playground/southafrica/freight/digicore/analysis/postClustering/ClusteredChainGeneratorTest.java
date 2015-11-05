@@ -30,7 +30,7 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.facilities.ActivityFacilities;
@@ -75,7 +75,7 @@ public class ClusteredChainGeneratorTest{
 		Assert.assertTrue("Facility file does not exist.", facilityFile.exists());
 		
 		/* Check facilities. */
-		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		FacilitiesReaderMatsimV1 fr = new FacilitiesReaderMatsimV1(sc);
 		fr.parse(utils.getClassInputDirectory() + "facilities.xml");
 		ActivityFacilities afs = sc.getActivityFacilities();

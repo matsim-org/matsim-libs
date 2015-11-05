@@ -25,7 +25,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
 public class LinkDemandAnalysisMain {
@@ -51,7 +51,7 @@ public class LinkDemandAnalysisMain {
 	
 		Config config = ConfigUtils.createConfig();
 		config.network().setInputFile(netFile);
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.loadScenario(config);
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.loadScenario(config);
 		EventsManager events = EventsUtils.createEventsManager();
 				
 		LinkDemandEventHandler handler = new LinkDemandEventHandler(scenario.getNetwork());

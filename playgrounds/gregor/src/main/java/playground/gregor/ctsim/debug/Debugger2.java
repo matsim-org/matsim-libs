@@ -13,6 +13,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.DriverAgent;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
+import playground.gregor.ctsim.run.CTRunner;
 import playground.gregor.ctsim.simulation.physics.*;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.EventBasedVisDebuggerEngine;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.InfoBox;
@@ -29,6 +30,7 @@ public class Debugger2 {
 
 	public static void main(String[] args) {
 
+		CTRunner.DEBUG = true;
 
 		Config c = ConfigUtils.createConfig();
 
@@ -36,25 +38,28 @@ public class Debugger2 {
 		Scenario sc = ScenarioUtils.createScenario(c);
 
 		createNetwork(sc);
-
-		Sim2DConfig conf2d = Sim2DConfigUtils.createConfig();
-		Sim2DScenario sc2d = Sim2DScenarioUtils.createSim2dScenario(conf2d);
-
-
-		sc.addScenarioElement(Sim2DScenario.ELEMENT_NAME, sc2d);
-		EventBasedVisDebuggerEngine dbg = new EventBasedVisDebuggerEngine(sc);
-		InfoBox iBox = new InfoBox(dbg, sc);
-		dbg.addAdditionalDrawer(iBox);
-		//		dbg.addAdditionalDrawer(new Branding());
-		QSimDensityDrawer qDbg = new QSimDensityDrawer(sc);
-		dbg.addAdditionalDrawer(qDbg);
-
 		EventsManagerImpl em = new EventsManagerImpl();
-		em.addHandler(qDbg);
-		em.addHandler(dbg);
+
+		if (CTRunner.DEBUG) {
+			Sim2DConfig conf2d = Sim2DConfigUtils.createConfig();
+			Sim2DScenario sc2d = Sim2DScenarioUtils.createSim2dScenario(conf2d);
+
+
+			sc.addScenarioElement(Sim2DScenario.ELEMENT_NAME, sc2d);
+			EventBasedVisDebuggerEngine dbg = new EventBasedVisDebuggerEngine(sc);
+			InfoBox iBox = new InfoBox(dbg, sc);
+			dbg.addAdditionalDrawer(iBox);
+			//		dbg.addAdditionalDrawer(new Branding());
+			QSimDensityDrawer qDbg = new QSimDensityDrawer(sc);
+			dbg.addAdditionalDrawer(qDbg);
+
+
+			em.addHandler(qDbg);
+			em.addHandler(dbg);
+		}
 
 		CTNetwork net = new CTNetwork(sc.getNetwork(), em, null);
-
+		double coeff = 0.05;
 		int nrPeds = 0;
 		{
 			CTLink link = net.getLinks().get(Id.createLinkId("0"));
@@ -64,11 +69,149 @@ public class Debugger2 {
 			links.add(Id.createLinkId(2));
 			links.add(Id.createLinkId(3));
 			for (CTCell cell : link.getCells()) {
+
 				int n = cell.getN();
-				int rnd = (int) (MatsimRandom.getRandom().nextInt(n) * 0.1);
+				int rnd = (int) (n * coeff * MatsimRandom.getRandom().nextDouble());///4;//n/3;//(int) (MatsimRandom.getRandom().nextInt(n)*.5);
 				for (int i = 0; i < rnd; i++) {
-					nrPeds++;
-					DriverAgent walker = new SimpleCTNetworkWalker(links);
+
+					DriverAgent walker = new SimpleCTNetworkWalker(links, Id.createPersonId("r" + nrPeds++));
+
+					CTPed ped = new CTPed(cell, walker);
+					cell.jumpOnPed(ped, 0);
+				}
+				cell.updateIntendedCellJumpTimeAndChooseNextJumper(0);
+			}
+
+		}
+		{
+			CTLink link = net.getLinks().get(Id.createLinkId("1"));
+			List<Id<Link>> links = new ArrayList<>();
+
+			links.add(Id.createLinkId(1));
+			links.add(Id.createLinkId(2));
+			links.add(Id.createLinkId(3));
+			links.add(Id.createLinkId(0));
+			for (CTCell cell : link.getCells()) {
+
+				int n = cell.getN();
+				int rnd = (int) (n * coeff * MatsimRandom.getRandom().nextDouble());///4;//n/3;//(int) (MatsimRandom.getRandom().nextInt(n)*.5);
+				for (int i = 0; i < rnd; i++) {
+
+					DriverAgent walker = new SimpleCTNetworkWalker(links, Id.createPersonId("r" + nrPeds++));
+
+					CTPed ped = new CTPed(cell, walker);
+					cell.jumpOnPed(ped, 0);
+				}
+				cell.updateIntendedCellJumpTimeAndChooseNextJumper(0);
+			}
+
+		}
+		{
+			CTLink link = net.getLinks().get(Id.createLinkId("2"));
+			List<Id<Link>> links = new ArrayList<>();
+
+
+			links.add(Id.createLinkId(2));
+			links.add(Id.createLinkId(3));
+			links.add(Id.createLinkId(0));
+			links.add(Id.createLinkId(1));
+			for (CTCell cell : link.getCells()) {
+
+				int n = cell.getN();
+				int rnd = (int) (n * coeff * MatsimRandom.getRandom().nextDouble());///4;//n/3;//(int) (MatsimRandom.getRandom().nextInt(n)*.5);
+				for (int i = 0; i < rnd; i++) {
+
+					DriverAgent walker = new SimpleCTNetworkWalker(links, Id.createPersonId("r" + nrPeds++));
+
+					CTPed ped = new CTPed(cell, walker);
+					cell.jumpOnPed(ped, 0);
+				}
+				cell.updateIntendedCellJumpTimeAndChooseNextJumper(0);
+			}
+
+		}
+		{
+			CTLink link = net.getLinks().get(Id.createLinkId("3"));
+			List<Id<Link>> links = new ArrayList<>();
+
+
+			links.add(Id.createLinkId(3));
+			links.add(Id.createLinkId(0));
+			links.add(Id.createLinkId(1));
+			links.add(Id.createLinkId(2));
+			for (CTCell cell : link.getCells()) {
+
+				int n = cell.getN();
+				int rnd = (int) (n * coeff * MatsimRandom.getRandom().nextDouble());///4;//n/3;//(int) (MatsimRandom.getRandom().nextInt(n)*.5);
+				for (int i = 0; i < rnd; i++) {
+
+					DriverAgent walker = new SimpleCTNetworkWalker(links, Id.createPersonId("r" + nrPeds++));
+
+					CTPed ped = new CTPed(cell, walker);
+					cell.jumpOnPed(ped, 0);
+				}
+				cell.updateIntendedCellJumpTimeAndChooseNextJumper(0);
+			}
+
+		}
+		{
+			CTLink link = net.getLinks().get(Id.createLinkId("4"));
+			List<Id<Link>> links = new ArrayList<>();
+
+
+			links.add(Id.createLinkId(4));
+			links.add(Id.createLinkId(7));
+			links.add(Id.createLinkId(6));
+			links.add(Id.createLinkId(5));
+			for (CTCell cell : link.getCells()) {
+				int n = cell.getN();
+				int rnd = (int) (n * coeff * MatsimRandom.getRandom().nextDouble());///4;//n/3;//(int) (MatsimRandom.getRandom().nextInt(n)*.5);
+				for (int i = 0; i < rnd; i++) {
+
+					DriverAgent walker = new SimpleCTNetworkWalker(links, Id.createPersonId("b" + nrPeds++));
+
+					CTPed ped = new CTPed(cell, walker);
+					cell.jumpOnPed(ped, 0);
+				}
+				cell.updateIntendedCellJumpTimeAndChooseNextJumper(0);
+			}
+
+		}
+		{
+			CTLink link = net.getLinks().get(Id.createLinkId("5"));
+			List<Id<Link>> links = new ArrayList<>();
+
+			links.add(Id.createLinkId(5));
+			links.add(Id.createLinkId(4));
+			links.add(Id.createLinkId(7));
+			links.add(Id.createLinkId(6));
+			for (CTCell cell : link.getCells()) {
+				int n = cell.getN();
+				int rnd = (int) (n * coeff * MatsimRandom.getRandom().nextDouble());///4;//n/3;//(int) (MatsimRandom.getRandom().nextInt(n)*.5);
+				for (int i = 0; i < rnd; i++) {
+
+					DriverAgent walker = new SimpleCTNetworkWalker(links, Id.createPersonId("b" + nrPeds++));
+
+					CTPed ped = new CTPed(cell, walker);
+					cell.jumpOnPed(ped, 0);
+				}
+				cell.updateIntendedCellJumpTimeAndChooseNextJumper(0);
+			}
+
+		}
+		{
+			CTLink link = net.getLinks().get(Id.createLinkId("6"));
+			List<Id<Link>> links = new ArrayList<>();
+			links.add(Id.createLinkId(6));
+			links.add(Id.createLinkId(5));
+			links.add(Id.createLinkId(4));
+			links.add(Id.createLinkId(7));
+			for (CTCell cell : link.getCells()) {
+				int n = cell.getN();
+				int rnd = (int) (n * coeff * MatsimRandom.getRandom().nextDouble());///4;//n/3;//(int) (MatsimRandom.getRandom().nextInt(n)*.5);
+				for (int i = 0; i < rnd; i++) {
+
+					DriverAgent walker = new SimpleCTNetworkWalker(links, Id.createPersonId("b" + nrPeds++));
 
 					CTPed ped = new CTPed(cell, walker);
 					cell.jumpOnPed(ped, 0);
@@ -86,10 +229,10 @@ public class Debugger2 {
 			links.add(Id.createLinkId(4));
 			for (CTCell cell : link.getCells()) {
 				int n = cell.getN();
-				int rnd = (int) (MatsimRandom.getRandom().nextInt(n) * 0.1);
+				int rnd = (int) (n * coeff * MatsimRandom.getRandom().nextDouble());///4;//n/3;//(int) (MatsimRandom.getRandom().nextInt(n)*.5);
 				for (int i = 0; i < rnd; i++) {
-					nrPeds++;
-					DriverAgent walker = new SimpleCTNetworkWalker(links);
+
+					DriverAgent walker = new SimpleCTNetworkWalker(links, Id.createPersonId("b" + nrPeds++));
 
 					CTPed ped = new CTPed(cell, walker);
 					cell.jumpOnPed(ped, 0);
@@ -99,8 +242,10 @@ public class Debugger2 {
 
 		}
 		System.out.println(nrPeds);
+		long start = System.nanoTime();
 		net.run();
-		System.out.println("done.");
+		long stop = System.nanoTime();
+		System.out.println("sim took:" + ((stop - start) / 1000. / 1000.) + " ms");
 //		LineSegment ls = new LineSegment();
 //		ls.x0 = 0;
 //		ls.x1 = 0;
@@ -109,12 +254,6 @@ public class Debugger2 {
 //		LineEvent le = new LineEvent(0,ls,true,0,128,128,255,0);
 //		em.processEvent(le);
 
-		try {
-			Thread.sleep(10000000);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 
 
 	}
@@ -123,8 +262,8 @@ public class Debugger2 {
 		Network net = sc.getNetwork();
 		NetworkFactory fac = net.getFactory();
 
-		double length = 30;
-		double width = 6;
+		double length = 60;
+		double width = 20;
 
 		int id = 0;
 		Node n0 = fac.createNode(Id.createNodeId(id++), CoordUtils.createCoord(0, 0));

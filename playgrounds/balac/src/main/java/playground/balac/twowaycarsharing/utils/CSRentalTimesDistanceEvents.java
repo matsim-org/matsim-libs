@@ -7,7 +7,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
 
@@ -19,7 +19,7 @@ public class CSRentalTimesDistanceEvents {
 	
 	public void run(String[] args){
 		
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario);
 		networkReader.readFile(args[0]);
 		
@@ -40,12 +40,12 @@ public class CSRentalTimesDistanceEvents {
 
 		int[] rentalTimes = new int[24];
 	
-		ScenarioImpl scenario;
+		MutableScenario scenario;
 		double distanceff = 0.0;
 		double distancerb = 0.0;
 		int countff = 0;
 		int countrb = 0;
-		RentalTimes(ScenarioImpl scenario) {
+		RentalTimes(MutableScenario scenario) {
 			this.scenario = scenario;
 		}
 		

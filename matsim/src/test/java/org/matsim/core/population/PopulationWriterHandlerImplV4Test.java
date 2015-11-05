@@ -33,7 +33,7 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.routes.GenericRouteImpl;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scenario.ScenarioUtils.ScenarioBuilder;
 import org.matsim.testcases.MatsimTestCase;
@@ -41,7 +41,7 @@ import org.matsim.testcases.MatsimTestCase;
 public class PopulationWriterHandlerImplV4Test extends MatsimTestCase {
 
 	public void testWriteGenericRoute() {
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(super.loadConfig(null));
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(super.loadConfig(null));
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile("test/scenarios/equil/network.xml");
 		Link link1 = network.getLinks().get(Id.create(1, Link.class));

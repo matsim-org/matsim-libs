@@ -284,11 +284,28 @@ public class ResultsPostProcessor
     }
 
 
+    public static void processAudiAV()
+    {
+        String dir = "d:/PP-rad/audi_av/audi_av_10pct_2015_10/";
+        String subDirPrefix = "taxi_vehicles_";
+
+        new ResultsPostProcessor(//
+                "10000", //
+                "13000", //
+                "16000", //
+                "19000", //
+                "22000", //
+                "25000" //
+        ).process(dir, subDirPrefix, "stats");
+    }
+
+
     public static void main(String[] args)
     {
         //processMielec();
         processBerlin();
         //processBarcelonaVariableDemand();
         //processBarcelonaVariableSupply();
+        //processAudiAV();
     }
 }

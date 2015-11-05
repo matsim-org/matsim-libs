@@ -39,7 +39,7 @@ public class MyMainModeIdentifier implements MainModeIdentifier {
 	public String identifyMainMode(List<? extends PlanElement> tripElements) {
 		for ( PlanElement pe : tripElements ) {
 			if ( pe instanceof Leg && ((Leg) pe).getMode().equals( MyRoutingModule.TELEPORTATION_LEG_MODE ) ) {
-				return MyTripRouterFactory.TELEPORTATION_MAIN_MODE;
+				return MyRoutingModule.TELEPORTATION_MAIN_MODE;
 			}
 		}
 		// if the trip doesn't contain a teleportation leg,

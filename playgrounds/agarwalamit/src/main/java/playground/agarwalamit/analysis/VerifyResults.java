@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.analysis.emission.EmissionCostFactors;
@@ -78,7 +78,7 @@ public class VerifyResults {
 
 	private static void calculateEmissionCosts(String emissionsEventsFile, Scenario scenario, String runNr){
 		EmissionsAnalyzer analyzer	= new EmissionsAnalyzer(emissionsEventsFile);
-		analyzer.init((ScenarioImpl) scenario);
+		analyzer.init((MutableScenario) scenario);
 		analyzer.preProcessData();
 		analyzer.postProcessData();
 		SortedMap<String, Double> totalEmissions = analyzer.getTotalEmissions();
@@ -106,7 +106,7 @@ public class VerifyResults {
 
 	public static void calculateDelaysCosts(String eventsFile,Scenario scenario, String runNr){
 		EventsManager em = EventsUtils.createEventsManager();
-		CongestionHandlerImplV3 congestionHandler = new CongestionHandlerImplV3(em, (ScenarioImpl) scenario);
+		CongestionHandlerImplV3 congestionHandler = new CongestionHandlerImplV3(em, (MutableScenario) scenario);
 		MatsimEventsReader eventsReader = new MatsimEventsReader(em);
 		em.addHandler(congestionHandler);
 		eventsReader.readFile(eventsFile);

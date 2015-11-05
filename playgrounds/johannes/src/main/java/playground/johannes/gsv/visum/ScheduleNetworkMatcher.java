@@ -22,9 +22,6 @@
  */
 package playground.johannes.gsv.visum;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -38,14 +35,13 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
-import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
+import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.visum.VisumNetwork;
 import org.matsim.visum.VisumNetwork.LineRouteItem;
 import org.matsim.visum.VisumNetworkReader;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author johannes

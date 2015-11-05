@@ -42,6 +42,7 @@ import org.matsim.withinday.replanning.identifiers.tools.LinkReplanningMap;
 import org.matsim.withinday.trafficmonitoring.EarliestLinkExitTimeProvider;
 import org.matsim.withinday.trafficmonitoring.TravelTimeCollector;
 
+import javax.inject.Provider;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
@@ -73,7 +74,7 @@ public abstract class WithinDayController extends Controler implements StartupLi
 
 	private boolean withinDayEngineInitialized = false;
 	private WithinDayEngine withinDayEngine;
-	private TripRouterFactory withinDayTripRouterFactory;
+	private Provider<TripRouter> withinDayTripRouterFactory;
 	private FixedOrderSimulationListener fosl = new FixedOrderSimulationListener();
 
 	public WithinDayController(String[] args) {
@@ -205,24 +206,14 @@ public abstract class WithinDayController extends Controler implements StartupLi
 		return this.withinDayEngine;
 	}
 	
-	public void setWithinDayTripRouterFactory(TripRouterFactory tripRouterFactory) {
+	public void setWithinDayTripRouterFactory(Provider<TripRouter> tripRouterFactory) {
 		this.withinDayTripRouterFactory = tripRouterFactory;
 	}
 
-	public TripRouterFactory getWithinDayTripRouterFactory() {
+	public Provider<TripRouter> getWithinDayTripRouterFactory() {
 		return this.withinDayTripRouterFactory;
 	}
-	
-	/**
-	 * Uses travel times from the travel time collector for car trips.
-	 */
-	public TripRouter getWithinDayTripRouterInstance() {
-		TravelDisutility travelDisutility = this.getTravelDisutilityFactory().createTravelDisutility(this.getTravelTimeCollector(), 
-				this.getScenario().getConfig().planCalcScore());
-		RoutingContext routingContext = new RoutingContextImpl(travelDisutility, this.getTravelTimeCollector());
-		return this.withinDayTripRouterFactory.instantiateAndConfigureTripRouter(routingContext);
-	}
-	
+
 	public FixedOrderSimulationListener getFixedOrderSimulationListener() {
 		return this.fosl;
 	}

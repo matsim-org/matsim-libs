@@ -19,9 +19,9 @@
 
 package playground.johannes.gsv.qlik;
 
+import org.matsim.contrib.common.gis.CartesianDistanceCalculator;
+import org.matsim.contrib.common.gis.DistanceCalculator;
 import playground.johannes.gsv.zones.KeyMatrix;
-import playground.johannes.socialnetworks.gis.DistanceCalculator;
-import playground.johannes.socialnetworks.gis.WGS84DistanceCalculator;
 import playground.johannes.synpop.gis.Zone;
 import playground.johannes.synpop.gis.ZoneCollection;
 import playground.johannes.synpop.gis.ZoneGeoJsonIO;
@@ -35,7 +35,7 @@ public class GenerateODAttributes {
 
     public static final void main(String args[]) throws IOException {
         ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON(args[1], "NO");
-        DistanceCalculator dCalc = WGS84DistanceCalculator.getInstance();
+        DistanceCalculator dCalc = CartesianDistanceCalculator.getInstance();//WGS84DistanceCalculator.getInstance();
 
         KeyMatrix idMatrix = new KeyMatrix();
         KeyMatrix distMatrix = new KeyMatrix();
@@ -46,13 +46,13 @@ public class GenerateODAttributes {
         writer.write("from;to;id;distance");
         writer.newLine();
 
-        BufferedWriter writer2 = new BufferedWriter(new FileWriter(args[3]));
+//        BufferedWriter writer2 = new BufferedWriter(new FileWriter(args[3]));
 
         BufferedReader reader = new BufferedReader(new FileReader(args[0]));
         String line = reader.readLine();
-        writer2.write(line);
-        writer2.write(";\"odId\";\"distance\"");
-        writer2.newLine();
+//        writer2.write(line);
+//        writer2.write(";\"odId\";\"distance\"");
+//        writer2.newLine();
 
 //        double d = 0.0;
 
@@ -90,9 +90,9 @@ public class GenerateODAttributes {
                 writer.newLine();
             }
 
-            writer2.write(line);
-            writer2.write(String.format(";%s;%s", id.intValue(), d.intValue()));
-            writer2.newLine();
+//            writer2.write(line);
+//            writer2.write(String.format(";%s;%s", id.intValue(), d.intValue()));
+//            writer2.newLine();
         }
     }
 }

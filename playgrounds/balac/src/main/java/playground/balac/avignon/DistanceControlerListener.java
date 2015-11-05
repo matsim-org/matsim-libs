@@ -14,7 +14,7 @@ import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.facilities.ActivityFacility;
 
@@ -42,7 +42,7 @@ public class DistanceControlerListener implements StartupListener, IterationEnds
 		numberInside = 0;
 		numberOutside = 0;
 		Controler controler = event.getControler();
-		Scenario scenario = (ScenarioImpl) controler.getScenario();
+		Scenario scenario = (MutableScenario) controler.getScenario();
 		Population plans = scenario.getPopulation();
 		//if (Integer.toString(event.getIteration()) == scenario.getConfig().getParam("controler", "lastIteration"))
 		for(Person p: plans.getPersons().values()) {

@@ -22,13 +22,13 @@
  */
 package playground.johannes.gsv.demand.loader;
 
-import java.io.IOException;
-import java.util.Random;
-
+import org.matsim.contrib.socnetgen.sna.gis.ZoneLayer;
 import playground.johannes.gsv.demand.AbstractTaskWrapper;
 import playground.johannes.gsv.demand.LoaderUtils;
 import playground.johannes.gsv.demand.tasks.PersonEqualZoneDistribution;
-import playground.johannes.sna.gis.ZoneLayer;
+
+import java.io.IOException;
+import java.util.Random;
 
 
 /**

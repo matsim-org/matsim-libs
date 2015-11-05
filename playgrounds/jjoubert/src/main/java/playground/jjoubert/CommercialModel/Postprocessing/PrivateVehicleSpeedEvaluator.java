@@ -37,7 +37,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.jjoubert.CommercialModel.Listeners.MyPrivateVehicleSpeedAnalyser;
@@ -88,7 +88,7 @@ public class PrivateVehicleSpeedEvaluator {
 		MyGapReader mgr = new MyGapReader(province, shapefile);
 
 		String networkFile = root + "Commercial/Input/network" + province + ".xml";
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network nl = scenario.getNetwork();
 		MatsimNetworkReader nr = new MatsimNetworkReader(scenario);
 		nr.readFile(networkFile);

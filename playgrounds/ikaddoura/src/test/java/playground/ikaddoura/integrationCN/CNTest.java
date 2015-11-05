@@ -26,6 +26,8 @@ import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.otfvis.OTFVisModule;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
@@ -35,8 +37,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility.Builder;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -46,7 +47,7 @@ import playground.ikaddoura.analysis.linkDemand.LinkDemandEventHandler;
 import playground.vsp.congestion.controler.MarginalCongestionPricingContolerListener;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
 import playground.vsp.congestion.handlers.TollHandler;
-import playground.vsp.congestion.routing.RandomizedTollTimeDistanceTravelDisutilityFactory;
+import playground.vsp.congestion.routing.CongestionTollTimeDistanceTravelDisutilityFactory;
 
 /**
  * @author ikaddoura
@@ -65,22 +66,22 @@ public class CNTest {
 		// baseCase
 		String configFile1 = testUtils.getPackageInputDirectory() + "CNTest/config1.xml";
 		CNControler cnControler1 = new CNControler();
-		cnControler1.run(configFile1, false, false);
+		cnControler1.run(null, configFile1, false, false, 0.);
 	
 		// c
 		String configFile2 = testUtils.getPackageInputDirectory() + "CNTest/config2.xml";
 		CNControler cnControler2 = new CNControler();
-		cnControler2.run(configFile2, true, false);
+		cnControler2.run(null, configFile2, true, false, 0.);
 			
 		// n
 		String configFile3 = testUtils.getPackageInputDirectory() + "CNTest/config3.xml";
 		CNControler cnControler3 = new CNControler();
-		cnControler3.run(configFile3, false, true);
+		cnControler3.run(null, configFile3, false, true, 0.);
 		
 		// cn
 		String configFile4 = testUtils.getPackageInputDirectory() + "CNTest/config4.xml";
 		CNControler cnControler4 = new CNControler();
-		cnControler4.run(configFile4, true, true);
+		cnControler4.run(null, configFile4, true, true, 0.);
 		
 		// analyze output events file
 		LinkDemandEventHandler handler1 = analyzeEvents(configFile1); // base case
@@ -117,17 +118,20 @@ public class CNTest {
 
 	}
 	
+	/*
+	 * Just starts a randomized router.
+	 * 
+	 */
 	@Ignore
 	@Test
 	public final void test2(){
 		
-		// just starts the randomized router
 		String configFile1 = testUtils.getPackageInputDirectory() + "CNTest/config1.xml";
 		Controler controler = new Controler(configFile1);
 		TollHandler tollHandler = new TollHandler(controler.getScenario());
 
-		final RandomizedTollTimeDistanceTravelDisutilityFactory factory = new RandomizedTollTimeDistanceTravelDisutilityFactory(
-				new TravelTimeAndDistanceBasedTravelDisutilityFactory(),
+		final CongestionTollTimeDistanceTravelDisutilityFactory factory = new CongestionTollTimeDistanceTravelDisutilityFactory(
+				new Builder( TransportMode.car ),
 				tollHandler
 			) ;
 		factory.setSigma(3.);
@@ -139,7 +143,7 @@ public class CNTest {
 			}
 		}); 		
 		
-		controler.addControlerListener(new MarginalCongestionPricingContolerListener(controler.getScenario(), tollHandler, new CongestionHandlerImplV3(controler.getEvents(), (ScenarioImpl) controler.getScenario())));
+		controler.addControlerListener(new MarginalCongestionPricingContolerListener(controler.getScenario(), tollHandler, new CongestionHandlerImplV3(controler.getEvents(), controler.getScenario())));
 		controler.addOverridingModule(new OTFVisModule());
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		controler.run();
@@ -173,14 +177,14 @@ public class CNTest {
 	private LinkDemandEventHandler analyzeEvents(String configFile) {
 
 		Config config = ConfigUtils.loadConfig(configFile);
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.loadScenario(config);
+		Scenario scenario = ScenarioUtils.loadScenario(config);
 		
-		EventsManager events1 = EventsUtils.createEventsManager();
+		EventsManager eventsManager = EventsUtils.createEventsManager();
 				
 		LinkDemandEventHandler handler = new LinkDemandEventHandler(scenario.getNetwork());
-		events1.addHandler(handler);
+		eventsManager.addHandler(handler);
 		
-		MatsimEventsReader reader = new MatsimEventsReader(events1);
+		MatsimEventsReader reader = new MatsimEventsReader(eventsManager);
 		reader.readFile(scenario.getConfig().controler().getOutputDirectory() + "/ITERS/it.10/10.events.xml.gz");
 		
 		return handler;

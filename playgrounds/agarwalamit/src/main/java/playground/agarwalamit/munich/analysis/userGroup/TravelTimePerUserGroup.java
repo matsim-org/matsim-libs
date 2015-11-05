@@ -64,7 +64,7 @@ public class TravelTimePerUserGroup extends AbstractAnalysisModule {
 	private int lastIteration;
 	private Logger logger = Logger.getLogger(TravelTimePerUserGroup.class);
 	private Map<String, Map<Id<Person>, List<Double>>> mode2PersonId2TravelTimes;
-	private String outputDir = "../../../repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run10/policies/eci/";/*"./output/run2/";*/
+	private String outputDir = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/otherRuns/output/1pct/run10/policies/backcasting/exposure/25ExI/";
 	private String populationFile =outputDir+ "/output_plans.xml.gz";//"/network.xml";
 	private String networkFile =outputDir+ "/output_network.xml.gz";//"/network.xml";
 	private String configFile = outputDir+"/output_config.xml";//"/config.xml";//

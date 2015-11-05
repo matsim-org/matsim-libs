@@ -50,7 +50,7 @@ import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
 import org.matsim.roadpricing.RoadPricingConfigGroup;
@@ -308,7 +308,7 @@ public class GautengControler_subpopulations {
 		sc.getVehicles().addVehicleType(vehicle_C);
 
 		/* Create a vehicle per person. */
-		Vehicles vehicles = ((ScenarioImpl) sc).getVehicles();
+		Vehicles vehicles = ((MutableScenario) sc).getVehicles();
 		for (Person p : sc.getPopulation().getPersons().values()) {
 			String vehicleType = (String) sc.getPopulation()
 					.getPersonAttributes()

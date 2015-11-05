@@ -1,11 +1,10 @@
 package org.matsim.contrib.freight.jsprit;
 
-import jsprit.analysis.toolbox.SolutionPrinter;
-import jsprit.analysis.toolbox.SolutionPrinter.Print;
 import jsprit.core.algorithm.VehicleRoutingAlgorithm;
 import jsprit.core.algorithm.box.SchrimpfFactory;
 import jsprit.core.problem.VehicleRoutingProblem;
 import jsprit.core.problem.solution.VehicleRoutingProblemSolution;
+import jsprit.core.reporting.SolutionPrinter;
 import jsprit.core.util.Solutions;
 
 import org.junit.Rule;
@@ -81,7 +80,7 @@ public class TestIntegration {
 
 			carrier.setSelectedPlan(newPlan) ;
 
-			SolutionPrinter.print(problem, solution, Print.VERBOSE);
+			SolutionPrinter.print(problem, solution, SolutionPrinter.Print.VERBOSE);
 
 
 
