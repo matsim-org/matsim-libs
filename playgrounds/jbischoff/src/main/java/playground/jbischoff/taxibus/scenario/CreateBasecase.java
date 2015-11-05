@@ -66,18 +66,24 @@ import org.matsim.core.utils.collections.CollectionUtils;
 public class CreateBasecase {
 
 	public static void main(String[] args) {
-		
+		boolean useCadyts = false;
 		final Config config;
-		if (args[0]!=null){
+		if (args.length>0){
 			config = ConfigUtils.loadConfig(args[0] );
+			if (args[1]=="true") useCadyts=true;
 		}
 		else
-		{config = prepareConfig();}
+		{
+			
+			config = prepareConfig(useCadyts);}
+		
+		
+		
 		final CadytsContext cContext = new CadytsContext(config);
 
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
 		final	Controler controler = new Controler(scenario);
-		
+		if (useCadyts){
 		// create the cadyts context and add it to the control(l)er:
 
 				controler.addControlerListener(cContext);
@@ -103,17 +109,19 @@ public class CreateBasecase {
 						return scoringFunctionAccumulator;
 					}
 				}) ;
+				
+		}
 		controler.run();
 		
 	}
-static Config prepareConfig(){
+static Config prepareConfig(boolean useCadyts){
 	String basedir = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/input/";
 //	String basedir = "/net/ils4/jbischoff/input/";
-	double scale = 1.00;
+	double scale = 0.01;
 	
 	final Config config = ConfigUtils.createConfig();
 	ControlerConfigGroup ccg = config.controler();
-	ccg.setRunId("vw018.100pct");
+	ccg.setRunId("vw024.1pct");
 	ccg.setOutputDirectory(basedir+"output/"+ccg.getRunId()+"/");
 	ccg.setFirstIteration(0);
 	int lastIteration = 150;
@@ -129,18 +137,17 @@ static Config prepareConfig(){
 	qsc.setUsingFastCapacityUpdate(true);
 	qsc.setTrafficDynamics(TrafficDynamics.withHoles);
 	qsc.setNumberOfThreads(6);
-//	qsc.setStorageCapFactor(0.05);
+	qsc.setStorageCapFactor(0.05);
 	qsc.setFlowCapFactor(scale);
 	qsc.setEndTime(30*3600);
 	
 	config.parallelEventHandling().setNumberOfThreads(6);
 	
-	config.network().setInputFile(basedir + "networkpt.xml");
+	config.network().setInputFile(basedir + "networkptc.xml");
 	
 	
-	config.plans().setInputFile(basedir+"initial_plans1.0.xml.gz");
-//	config.plans().setInputFile(basedir+"vw012.100pct.200.plans.xml");
-	config.plans().setInputPersonAttributeFile(basedir+"initial_plans_oA1.0.xml.gz");
+	config.plans().setInputFile(basedir+"initial_plans0.01.xml.gz");
+	config.plans().setInputPersonAttributeFile(basedir+"initial_plans_oA0.01.xml.gz");
 	
 	config.plans().setRemovingUnneccessaryPlanAttributes(true);
 	
@@ -155,11 +162,14 @@ static Config prepareConfig(){
 	counts.setAnalyzedModes("car");
 	counts.setCountsFileName(basedir+"counts.xml");
 	counts.setCountsScaleFactor(1.0/scale);
+	
+	if (useCadyts){
 	CadytsConfigGroup cadyts = (CadytsConfigGroup) config.getModule("cadytsCar");
 	cadyts.setStartTime(6*3600);
 	cadyts.setEndTime(21*3600+1);
 	cadyts.setTimeBinSize(3600);
 	cadyts.addParam("calibratedLinks","65601,48358,62489,71335,44441,53098" );
+	}
 	
 	StrategyConfigGroup scg = config.strategy();
 	scg.setMaxAgentPlanMemorySize(5);
