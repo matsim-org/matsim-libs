@@ -31,7 +31,7 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.vehicles.VehicleReaderV1;
 
@@ -51,7 +51,7 @@ public class InternalControler {
 	private final boolean calculate_carCongestionEffects;
 	private final boolean calculate_capacityDelayEffects;
 	
-	private final ScenarioImpl scenario;
+	private final MutableScenario scenario;
 	private final double fare;
 	
 	private final double MARGINAL_UTILITY_OF_MONEY = 0.062;
@@ -76,7 +76,7 @@ public class InternalControler {
 	private final double STUCK_SCORE = -100;
 
 	public InternalControler(
-			ScenarioImpl scenario,
+			MutableScenario scenario,
 			double fare,
 			boolean calculate_inVehicleTimeDelayEffects,
 			boolean calculate_waitingTimeDelayEffects,

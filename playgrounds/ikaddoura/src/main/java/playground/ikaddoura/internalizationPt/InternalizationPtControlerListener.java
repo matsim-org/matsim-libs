@@ -29,7 +29,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.events.StartupEvent;
 
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 
 /**
  * @author Ihab
@@ -38,9 +38,9 @@ import org.matsim.core.scenario.ScenarioImpl;
 
 public class InternalizationPtControlerListener implements StartupListener {
 
-	private final ScenarioImpl scenario;
+	private final MutableScenario scenario;
 
-	public InternalizationPtControlerListener(ScenarioImpl scenario){
+	public InternalizationPtControlerListener(MutableScenario scenario){
 		this.scenario = scenario;
 	}
 	

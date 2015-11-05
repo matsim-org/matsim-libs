@@ -44,7 +44,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
@@ -63,7 +63,7 @@ public class PopulationReaderMatsimV4Test {
 	 */
 	@Test
 	public void testReadRoute() throws SAXException, ParserConfigurationException, IOException {
-		final ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		final MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		final Network network = scenario.getNetwork();
 		final Population population = scenario.getPopulation();
 		new MatsimNetworkReader(scenario).parse("test/scenarios/equil/network.xml");
@@ -156,7 +156,7 @@ public class PopulationReaderMatsimV4Test {
 	 */
 	@Test
 	public void testReadRouteWithoutActivityLinks() {
-		final ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		final MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		final Population population = scenario.getPopulation();
 
 		PopulationReaderMatsimV4 parser = new PopulationReaderMatsimV4(scenario);
@@ -190,7 +190,7 @@ public class PopulationReaderMatsimV4Test {
 	 */
 	@Test
 	public void testReadActivity() {
-		final ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		final MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		final NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new Coord(0, 0));
 		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new Coord(0, 1000));
@@ -221,7 +221,7 @@ public class PopulationReaderMatsimV4Test {
 	
 	@Test
 	public void testReadingRoutesWithoutType() {
-		final ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		final MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		PopulationReaderMatsimV4 reader = new PopulationReaderMatsimV4(scenario);
 		final Population population = scenario.getPopulation();
 
@@ -276,7 +276,7 @@ public class PopulationReaderMatsimV4Test {
 
 	@Test
 	public void testRepeatingLegs() {
-		final ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		final MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		PopulationReaderMatsimV4 reader = new PopulationReaderMatsimV4(scenario);
 		final Population population = scenario.getPopulation();
 
@@ -306,7 +306,7 @@ public class PopulationReaderMatsimV4Test {
 
 	@Test
 	public void testRepeatingActs() {
-		final ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		final MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		PopulationReaderMatsimV4 reader = new PopulationReaderMatsimV4(scenario);
 		final Population population = scenario.getPopulation();
 

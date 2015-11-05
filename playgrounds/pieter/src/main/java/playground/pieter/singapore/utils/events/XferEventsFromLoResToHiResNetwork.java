@@ -48,7 +48,7 @@ import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.mobsim.qsim.pt.TransitVehicle;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.transitSchedule.TransitRouteImpl;
@@ -172,8 +172,8 @@ public class XferEventsFromLoResToHiResNetwork{
 		}
 	}
 
-	private final ScenarioImpl loRes;
-	private final ScenarioImpl hiRes;
+	private final MutableScenario loRes;
+	private final MutableScenario hiRes;
 	
 	private final File outpath;
 	private final Map<String, LinkedList<Event>> vehicleLinkEvents;
@@ -184,8 +184,8 @@ public class XferEventsFromLoResToHiResNetwork{
 
 	private XferEventsFromLoResToHiResNetwork(String loResNetwork, String hiResNetwork, String loResSchedule,
                                               String hiResSchedule, String loResEvents) {
-		loRes = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		hiRes = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		loRes = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		hiRes = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		loRes.getConfig().transit().setUseTransit(true);
 		hiRes.getConfig().transit().setUseTransit(true);
 		new MatsimNetworkReader(loRes).readFile(loResNetwork);

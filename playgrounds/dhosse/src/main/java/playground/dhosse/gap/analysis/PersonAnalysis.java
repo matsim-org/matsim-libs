@@ -13,7 +13,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.utils.objectattributes.ObjectAttributes;
@@ -26,7 +26,7 @@ public class PersonAnalysis {
 
 	public static void main(String args[]){
 		
-		restrictPlansTo24Hours("/home/danielhosse/run10/input/plansV4.xml.gz", "/home/danielhosse/plansV4_9.xml.gz");
+		restrictPlansTo24Hours("/home/dhosse/Dokumente/01_eGAP/plansV4.xml.gz", "/home/dhosse/Dokumente/01_eGAP/plansV4_cleaned.xml.gz");
 //		getPersonsWithActivitiesAfterMidnight("/home/dhosse/plansV3_cleaned.xml.gz", "/home/dhosse/plansOut2.xml");
 //		getPersonsWithNegativeScores("/home/danielhosse/run10/output/ITERS/it.20/20.plans.xml.gz");
 //		analyzeModeChoice("/home/danielhosse/run10/output/ITERS/it.10/10.plans.xml.gz", Global.matsimDir + "OUTPUT/" + Global.runID +"/input/subpopulationAtts.xml");
@@ -171,7 +171,7 @@ public class PersonAnalysis {
 
 		Population filtered = filterPopulation(scenario.getPopulation());
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		((ScenarioImpl)sc).setPopulation(filtered);
+		((MutableScenario)sc).setPopulation(filtered);
 		
 		LegModeDistanceDistribution lmdd = new LegModeDistanceDistribution();
 		lmdd.init(sc);

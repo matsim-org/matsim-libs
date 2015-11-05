@@ -19,7 +19,7 @@ import org.matsim.core.api.experimental.events.handler.VehicleDepartsAtFacilityE
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
@@ -117,9 +117,9 @@ public class EventsToTransitSchedule implements TransitDriverStartsEventHandler,
 		scenario.getConfig().transit().setUseTransit(true);
 		scenario.getConfig().scenario().setUseVehicles(true);
 		new TransitScheduleReader(scenario).readFile(args[0]);
-		new VehicleReaderV1(((ScenarioImpl)scenario).getTransitVehicles()).readFile(args[1]);
+		new VehicleReaderV1(((MutableScenario)scenario).getTransitVehicles()).readFile(args[1]);
 		EventsManager events = new EventsManagerImpl();
-		EventsToTransitSchedule eventsToTransitSchedule = new EventsToTransitSchedule(scenario.getTransitSchedule(), ((ScenarioImpl)scenario).getTransitVehicles());
+		EventsToTransitSchedule eventsToTransitSchedule = new EventsToTransitSchedule(scenario.getTransitSchedule(), ((MutableScenario)scenario).getTransitVehicles());
 		events.addHandler(eventsToTransitSchedule);
 		new MatsimEventsReader(events).readFile(args[2]);
 		System.out.println(eventsToTransitSchedule.startDrivers.size());

@@ -26,7 +26,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.facilities.ActivityFacility;
 
@@ -43,7 +43,7 @@ public class BuildTrees {
 		}
 		else {
 			facQuadTree = this.builFacQuadTree(
-				activityType, ((ScenarioImpl)scenario).getActivityFacilities().getFacilitiesForActivityType(activityType));	
+				activityType, ((MutableScenario)scenario).getActivityFacilities().getFacilitiesForActivityType(activityType));	
 		}
 		return facQuadTree;
 	}
@@ -52,7 +52,7 @@ public class BuildTrees {
 		Map<Id<ActivityFacility>, ActivityFacility> facilities_of_type = new TreeMap<Id<ActivityFacility>, ActivityFacility>();
 			
 		for (String activityType : activityTypes) {
-			facilities_of_type.putAll(((ScenarioImpl)scenario).getActivityFacilities().getFacilitiesForActivityType(activityType));
+			facilities_of_type.putAll(((MutableScenario)scenario).getActivityFacilities().getFacilitiesForActivityType(activityType));
 		}
 		return this.builFacQuadTree(mainType, facilities_of_type);
 	}

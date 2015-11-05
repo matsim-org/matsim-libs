@@ -20,8 +20,8 @@
 package playground.vsp.congestion.routing;
 
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility.Builder;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
@@ -35,10 +35,10 @@ import playground.vsp.congestion.handlers.TollHandler;
 public final class CongestionTollTimeDistanceTravelDisutilityFactory implements TravelDisutilityFactory {
 
 	private double sigma = 0. ;
-	private TravelTimeAndDistanceBasedTravelDisutilityFactory timeDistanceTravelDisutilityFactory;
+	private Builder timeDistanceTravelDisutilityFactory;
 	private final TollHandler tollHandler;
 
-	public CongestionTollTimeDistanceTravelDisutilityFactory(TravelTimeAndDistanceBasedTravelDisutilityFactory timeDistanceTravelDisutilityFactory, TollHandler tollHandler) {
+	public CongestionTollTimeDistanceTravelDisutilityFactory(Builder timeDistanceTravelDisutilityFactory, TollHandler tollHandler) {
 		this.tollHandler = tollHandler;
 		this.timeDistanceTravelDisutilityFactory = timeDistanceTravelDisutilityFactory;
 	}

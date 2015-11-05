@@ -41,7 +41,7 @@ import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import playground.wrashid.lib.obj.TwoHashMapsConcatenated;
 import playground.wrashid.parkingChoice.infrastructure.ActInfo;
 import playground.wrashid.parkingChoice.infrastructure.PrivateParking;
@@ -111,7 +111,7 @@ public class MainPPSimZurich30km {
 		}
 
 		ParkingPersonalBetas parkingPersonalBetas = new ParkingPersonalBetas(scenario,
-				HouseHoldIncomeZH.getHouseHoldIncomeCantonZH((ScenarioImpl) scenario));
+				HouseHoldIncomeZH.getHouseHoldIncomeCantonZH((MutableScenario) scenario));
 
 		parkingPersonalBetas.externalWalkFactor = ZHScenarioGlobal.loadDoubleParam("ParkingPersonalBetas.externalWalkFactor");
 		parkingPersonalBetas.externalSearchFactor = ZHScenarioGlobal.loadDoubleParam("ParkingPersonalBetas.externalSearchFactor");

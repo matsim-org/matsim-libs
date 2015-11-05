@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 
 
 /**
@@ -41,11 +41,11 @@ public class PricingHandler implements PersonDepartureEventHandler {
 	private final static Logger log = Logger.getLogger(PricingHandler.class);
 
 	private final EventsManager events;
-	private final ScenarioImpl scenario;
+	private final MutableScenario scenario;
 	private final double vtts_car;
 	private double toll;
 
-	public PricingHandler(EventsManager eventsManager, ScenarioImpl scenario, double toll) {
+	public PricingHandler(EventsManager eventsManager, MutableScenario scenario, double toll) {
 		this.events = eventsManager;
 		this.scenario = scenario;
 		this.vtts_car = (this.scenario.getConfig().planCalcScore().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() - this.scenario.getConfig().planCalcScore().getPerforming_utils_hr()) / this.scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney();

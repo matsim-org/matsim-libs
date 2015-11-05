@@ -27,7 +27,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.ActivityFacility;
@@ -88,7 +88,7 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Faci
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		//add the generated test population to the scenario
-		((ScenarioImpl)scenario).setPopulation(population);
+		((MutableScenario)scenario).setPopulation(population);
 
 		//create a new controler for the simulation
 		Controler ctrl = new Controler(scenario);
@@ -171,7 +171,7 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Faci
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		//add the generated test population to the scenario
-		((ScenarioImpl)scenario).setPopulation(population);
+		((MutableScenario)scenario).setPopulation(population);
 
 		//create a new controler for the simulation
 		Controler ctrl = new Controler(scenario);

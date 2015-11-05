@@ -15,7 +15,7 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 
@@ -84,7 +84,7 @@ public class CrowdingM4CorridorControler {
 		controler.addControlerListener(scoreListener);
 		
 		// Kaddoura's externalities
-		controler.addControlerListener(new InternalizationPtControlerListener( (ScenarioImpl) controler.getScenario(), scoreTracker));
+		controler.addControlerListener(new InternalizationPtControlerListener( (MutableScenario) controler.getScenario(), scoreTracker));
 		
 		// L. Sun's Dwell Time
 		//controler.setMobsimFactory(new QSimFactory());

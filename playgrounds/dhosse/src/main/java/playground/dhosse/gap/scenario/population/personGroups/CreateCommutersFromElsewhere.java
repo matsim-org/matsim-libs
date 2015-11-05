@@ -34,9 +34,9 @@ import org.matsim.facilities.ActivityOption;
 import playground.dhosse.gap.Global;
 import playground.dhosse.gap.scenario.GAPScenarioBuilder;
 import playground.dhosse.gap.scenario.mid.MiDPersonGroupData;
-import playground.dhosse.gap.scenario.population.EgapPopulationUtils;
-import playground.dhosse.gap.scenario.population.PlanCreationUtils;
 import playground.dhosse.gap.scenario.population.io.CommuterDataElement;
+import playground.dhosse.gap.scenario.population.utils.EgapPopulationUtils;
+import playground.dhosse.gap.scenario.population.utils.PlanCreationUtils;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -194,7 +194,7 @@ public class CreateCommutersFromElsewhere {
 			workCoord = Global.ct.transform(PlanCreationUtils.shoot(to));
 		}
 		
-		if(!fromId.contains("A") && fromId.startsWith("09180")){
+		if(!fromId.contains("A")){
 			
 			Coord c = Global.UTM32NtoGK4.transform(homeCoord);
 			Geometry nearestToHome = GAPScenarioBuilder.getBuiltAreaQT().getClosest(c.getX(), c.getY());
@@ -202,56 +202,17 @@ public class CreateCommutersFromElsewhere {
 			
 		}
 		
-		if(!toId.contains("A") && toId.startsWith("09180")){
+		if(!toId.contains("A")){
 			
-			Coord c = Global.UTM32NtoGK4.transform(workCoord);
-			Geometry nearest = GAPScenarioBuilder.getBuiltAreaQT().getClosest(c.getX(), c.getY());
-			workCoord = Global.gk4ToUTM32N.transform(PlanCreationUtils.shoot(nearest));
+			if(toId.startsWith("09180")){
+				workCoord = chooseWorkLocation(toId);
+			} else {
+				Coord c = Global.UTM32NtoGK4.transform(workCoord);
+				Geometry nearest = GAPScenarioBuilder.getBuiltAreaQT().getClosest(c.getX(), c.getY());
+				workCoord = Global.gk4ToUTM32N.transform(PlanCreationUtils.shoot(nearest));
+			}
 			
 		}
-		
-//		if(toId.length() < 8 && !toId.contains("A")){
-//			
-//			if(toId.startsWith("09180")){
-//				
-//				chooseWorkLocation(toId);
-//				workCoord = GAPScenarioBuilder.getWorkLocations().get(workCoord.getX(), workCoord.getY()).getCoord();
-//				double aw = 0.;
-//				Set<ActivityFacility> facilitiesWithinMunicipality = new HashSet<>();
-//				for(ActivityFacility facility : facilities.values()){
-//					if(GAPScenarioBuilder.getMunId2Geometry().get(toId).contains(MGC.coord2Point(Global.UTM32NtoGK4.transform(facility.getCoord())))){
-//						facilitiesWithinMunicipality.add(facility);
-//						for(ActivityOption ao : facility.getActivityOptions().values()){
-//							aw += ao.getCapacity();
-//							break;
-//						}
-//					}
-//				}
-//				
-//				double random = Global.random.nextDouble() * aw;
-//				double w = 0;
-//				for(ActivityFacility facility : facilitiesWithinMunicipality){
-//					
-//					w += facility.getActivityOptions().get(Global.ActType.work.name()).getCapacity();
-//					if(random >= w){
-//						workCoord = facility.getCoord();
-//					}
-//					
-//				}
-//			}
-//			else{
-//				Coord c = Global.UTM32NtoGK4.transform(workCoord);
-//				Geometry nearestToWork = GAPScenarioBuilder.getBuiltAreaQT().getClosest(c.getX(), c.getY());
-//				workCoord = Global.gk4ToUTM32N.transform(PlanCreationUtils.shoot(nearestToWork));
-//			}
-//			
-//		}
-		
-//		if(workCoord == null){
-//			Coord c = Global.UTM32NtoGK4.transform(workCoord);
-//			Geometry nearestToWork = GAPScenarioBuilder.getBuiltAreaQT().getClosest(c.getX(), c.getY());
-//			workCoord = Global.gk4ToUTM32N.transform(PlanCreationUtils.shoot(nearestToWork));
-//		}
 		
 		Activity actHome = factory.createActivityFromCoord(Global.ActType.home.name(), homeCoord);
 		actHome.setStartTime(0.);
@@ -264,13 +225,14 @@ public class CreateCommutersFromElsewhere {
 		
 		double ttime = dijkstra.calcLeastCostPath(fromLink.getToNode(), toLink.getToNode(), 0., person, null).travelTime;
 		
-		double mean2 = 8 * 3600 + PlanCreationUtils.createRandomTimeShift(1.5);
+		double mean2 = 0;
 		
 		do{
 
-			homeEndTime = 8 * 3600 + PlanCreationUtils.createRandomTimeShift(1.5);
+			homeEndTime = 9 * 3600 + PlanCreationUtils.createRandomTimeShift(3);
+			mean2 = 17.5 * 3600 + PlanCreationUtils.createRandomTimeShift(2);
 			
-		}while(homeEndTime - ttime <= 0 || (homeEndTime + mean2 + 2 * ttime) > 24*3600);
+		}while(homeEndTime <= 0 || (mean2 - homeEndTime - ttime) < 0 || (mean2 + ttime) > 24*3600);
 		
 		actHome.setEndTime(homeEndTime);
 		((ActivityImpl)actHome).setLinkId(fromLink.getId());
@@ -281,7 +243,7 @@ public class CreateCommutersFromElsewhere {
 		//create other activity and set the end time nine hours after the first activity's end time
 		Activity actWork = factory.createActivityFromCoord(Global.ActType.work.name(), workCoord);
 		actWork.setStartTime(actHome.getEndTime() + ttime);
-		actWork.setEndTime(actWork.getStartTime() + mean2);
+		actWork.setEndTime(mean2);
 		((ActivityImpl)actWork).setLinkId(toLink.getId());
 		plan.addActivity(actWork);
 		

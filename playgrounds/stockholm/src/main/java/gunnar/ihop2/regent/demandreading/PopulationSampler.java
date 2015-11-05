@@ -16,7 +16,7 @@ public class PopulationSampler {
 
 		System.out.println("STARTED ...");
 
-		final String prefix = "./test/regentmatsim/exchange/151023_trips";
+		final String prefix = "./test/regentmatsim/exchange/trips";
 		final String fromFile = prefix + ".xml";
 		final double fraction = 0.01;
 		final String toFile = prefix + "_" + +fraction + ".xml";

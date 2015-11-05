@@ -53,10 +53,13 @@ public class JourneysValidator {
         TaskRunner.run(new SetFirstActivityTypeTask(), persons);
         logger.info("Setting vacations type...");
         TaskRunner.run(new VacationsTypeTask(), persons);
+
+        logger.info("Adjusting weights...");
+//        new ReweightJourneys().apply(persons);
+        TaskRunner.run(new AdjustJourneyWeight(), persons);
+
         logger.info("Adding return episodes...");
         TaskRunner.run(new ReturnEpisodeTask(), persons);
-        logger.info("Adjusting weights...");
-        TaskRunner.run(new AdjustJourneyWeight(), persons);
 
         logger.info("Writing validated population...");
         PopulationIO.writeToXML(args[1], persons);

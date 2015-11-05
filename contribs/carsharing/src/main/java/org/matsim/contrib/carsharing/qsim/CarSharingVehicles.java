@@ -34,7 +34,7 @@ public class CarSharingVehicles {
 	
 	public CarSharingVehicles(Scenario scenario) throws IOException {
 		this.scenario = scenario;
-		readVehicleLocations();
+		//readVehicleLocations();
 	}
 	
 	public FreeFloatingVehiclesLocation getFreeFLoatingVehicles() {

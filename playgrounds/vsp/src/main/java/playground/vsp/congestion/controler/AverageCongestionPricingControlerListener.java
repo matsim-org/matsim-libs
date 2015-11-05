@@ -33,7 +33,7 @@ import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 
 import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
 import playground.vsp.congestion.handlers.TollHandler;
@@ -46,11 +46,11 @@ import playground.vsp.congestion.handlers.TollHandler;
 public class AverageCongestionPricingControlerListener implements StartupListener, AfterMobsimListener {
 	private static final Logger log = Logger.getLogger(AverageCongestionPricingControlerListener.class);
 
-	private final ScenarioImpl scenario;
+	private final MutableScenario scenario;
 	private TollHandler tollHandler;
 	private CongestionHandlerImplV3 congestionHandler;
 	
-	public AverageCongestionPricingControlerListener(ScenarioImpl scenario, TollHandler tollHandler){
+	public AverageCongestionPricingControlerListener(MutableScenario scenario, TollHandler tollHandler){
 		this.scenario = scenario;
 		this.tollHandler = tollHandler;
 	}

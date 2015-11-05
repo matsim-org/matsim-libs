@@ -40,7 +40,7 @@ import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisut
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -66,7 +66,7 @@ public class NetworkDistance {
 	private final static String networkKmzFilename = "../mystudies/yalcin/berlin_wipnet.kmz";
 
 	public static void exportNetwork() {
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(networkFilename);
 
@@ -101,7 +101,7 @@ public class NetworkDistance {
 	}
 
 	public static void convertNetwork() {
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(networkFilename);
 
@@ -111,7 +111,7 @@ public class NetworkDistance {
 	}
 
 	public static void findDistances() {
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(wgs84NetworkFilename);
 
@@ -127,7 +127,7 @@ public class NetworkDistance {
 
 		// create the router algorithm
 		TravelTime travelTime = new FreespeedTravelTimeAndDisutility(config.planCalcScore());
-		TravelDisutility linkCosts = new RandomizingTimeDistanceTravelDisutility.Builder().createTravelDisutility(travelTime, config.planCalcScore());
+		TravelDisutility linkCosts = new RandomizingTimeDistanceTravelDisutility.Builder( TransportMode.car ).createTravelDisutility(travelTime, config.planCalcScore());
 		Dijkstra router = new Dijkstra(network, linkCosts, travelTime);
 
 		// we need to transform the coordinate from wgs84 to gk4 for calculating distances

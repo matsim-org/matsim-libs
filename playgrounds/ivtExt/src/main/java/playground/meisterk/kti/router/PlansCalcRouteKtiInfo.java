@@ -25,7 +25,7 @@ import java.io.IOException;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.matrices.Matrices;
 import org.matsim.matrices.Matrix;
@@ -56,7 +56,7 @@ public class PlansCalcRouteKtiInfo {
 		}
 
 		// municipality layer from world file
-		ScenarioImpl localScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario localScenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		this.localWorld = new World();
 		new MatsimWorldReader(localScenario, localWorld).parse(ktiConfigGroup.getWorldInputFilename());
 

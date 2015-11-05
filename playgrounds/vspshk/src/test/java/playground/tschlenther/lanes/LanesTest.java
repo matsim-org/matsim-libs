@@ -28,7 +28,7 @@ import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.data.v20.Lane;
-import org.matsim.lanes.data.v20.LaneDefinitions20;
+import org.matsim.lanes.data.v20.Lanes;
 import org.matsim.lanes.data.v20.LaneDefinitionsFactory20;
 import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
 import org.matsim.testcases.MatsimTestUtils;
@@ -136,7 +136,7 @@ public class LanesTest {
 		network.addLink(link4);
 		
 		//create Lanes
-		LaneDefinitions20 lanes = scenario.getLanes();
+		Lanes lanes = scenario.getLanes();
 		LaneDefinitionsFactory20 lb = lanes.getFactory();
 		Id<Lane> ol = Id.create("2.ol", Lane.class);
 		Id<Lane> topLane = Id.create("2.1", Lane.class);

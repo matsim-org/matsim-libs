@@ -46,7 +46,7 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.DijkstraFactory;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.pt.Umlauf;
@@ -93,13 +93,13 @@ public class DataPrepare {
 	private static String OutRoutedPlanFile = "../berlin-bvg09/pt/alles_mit_umlaeufen/test/plan.routedOevModell.BVB344.moreLegPlan_Agent.xml";
 
 
-	private final ScenarioImpl scenario;
+	private final MutableScenario scenario;
 	private final Config config;
 
 	private NetworkImpl pseudoNetwork;
 
 	public DataPrepare() {
-		this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		this.scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		this.config = this.scenario.getConfig();
 	}
 
@@ -146,9 +146,9 @@ public class DataPrepare {
 	}
 
 	protected void mergeNetworks() {
-		ScenarioImpl transitScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario transitScenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network transitNetwork = transitScenario.getNetwork();
-		ScenarioImpl streetScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario streetScenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network streetNetwork = streetScenario.getNetwork();
 		new MatsimNetworkReader(transitScenario).parse(IntermediateTransitNetworkFile);
 		new MatsimNetworkReader(streetScenario).parse(InNetworkFile);
@@ -198,7 +198,7 @@ public class DataPrepare {
 		Network routerNet = router.getTransitRouterNetwork();
 
 		log.info("create vis network");
-		ScenarioImpl visScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario visScenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network visNet = visScenario.getNetwork();
 
 		for (Node node : routerNet.getNodes().values()) {

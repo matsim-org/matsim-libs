@@ -20,7 +20,7 @@
 package playground.pbouman.transitfares;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.pt.router.*;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import playground.pbouman.agentproperties.AgentProperties;
@@ -30,7 +30,7 @@ import java.util.Map;
 
 public class TransitFareRouterFactoryImpl implements Provider<TransitRouter> {
 
-	private final ScenarioImpl scenario;
+	private final MutableScenario scenario;
 	
 	private final TransitSchedule schedule;
 	private final TransitRouterConfig config;
@@ -38,7 +38,7 @@ public class TransitFareRouterFactoryImpl implements Provider<TransitRouter> {
 	private final Map<String,AgentProperties> agentProperties;
 	
 	public TransitFareRouterFactoryImpl(final Scenario scenario, final TransitRouterConfig config, final Map<String,AgentProperties> ap) {
-		this.scenario = (ScenarioImpl) scenario;
+		this.scenario = (MutableScenario) scenario;
 		this.schedule = scenario.getTransitSchedule();
 		this.config = config;
 		this.routerNetwork = TransitRouterNetwork.createFromSchedule(this.schedule, this.config.getBeelineWalkConnectionDistance());
@@ -46,7 +46,7 @@ public class TransitFareRouterFactoryImpl implements Provider<TransitRouter> {
 	}
 	
 	public TransitFareRouterFactoryImpl(final Scenario scenario, final TransitRouterConfig config) {
-		this.scenario = (ScenarioImpl) scenario;
+		this.scenario = (MutableScenario) scenario;
 		this.schedule = scenario.getTransitSchedule();
 		this.config = config;
 		this.routerNetwork = TransitRouterNetwork.createFromSchedule(this.schedule, this.config.getBeelineWalkConnectionDistance());

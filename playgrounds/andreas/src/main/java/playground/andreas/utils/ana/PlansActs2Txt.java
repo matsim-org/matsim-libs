@@ -35,7 +35,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.MatsimJaxbXmlWriter;
@@ -57,7 +57,7 @@ public class PlansActs2Txt extends MatsimJaxbXmlWriter{
 
 	public static void main(String[] args) {
 		Gbl.startMeasurement();
-		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 	
 		String networkFile = "f:/p/output/corr_t_2/corr_t_2.output_network.xml.gz";
 		String inPlansFile = "f:/p/output/corr_t_2/ITERS/it.0/corr_t_2.0.plans.xml.gz";

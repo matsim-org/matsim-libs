@@ -44,7 +44,7 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.router.PreparedTransitSchedule;
 import org.matsim.pt.router.TransitRouter;
@@ -298,7 +298,7 @@ public class WagonSimRouterNetworkTravelDistutilityAndTravelTimeTest extends Mat
 	 */
 	@SuppressWarnings("deprecation")
 	private void createTransitVehicles(Scenario sc) {
-		Vehicles veh = ((ScenarioImpl) sc).getTransitVehicles();
+		Vehicles veh = ((MutableScenario) sc).getTransitVehicles();
 		VehiclesFactory factory = veh.getFactory();
 		
 		VehicleCapacity vc = factory.createVehicleCapacity();
@@ -329,7 +329,7 @@ public class WagonSimRouterNetworkTravelDistutilityAndTravelTimeTest extends Mat
 	 */
 	private ObjectAttributes createVehicleLinkSpeedAttributes(Scenario sc) {
 		ObjectAttributes oa = new ObjectAttributes();
-		for(Id<Vehicle> v: ((ScenarioImpl)sc).getTransitVehicles().getVehicles().keySet()){
+		for(Id<Vehicle> v: ((MutableScenario)sc).getTransitVehicles().getVehicles().keySet()){
 			for(Id<Link> l: sc.getNetwork().getLinks().keySet()){
 				oa.putAttribute(v.toString(), l.toString(), 10000.);
 			}

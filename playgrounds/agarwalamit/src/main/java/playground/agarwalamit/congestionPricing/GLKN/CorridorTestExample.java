@@ -27,7 +27,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.congestionPricing.testExamples.handlers.CorridorNetworkAndPlans;
@@ -69,7 +69,7 @@ class CorridorTestExample {
 
 		EventsManager events = EventsUtils.createEventsManager();
 
-		CongestionHandlerImplV3 v3 = new CongestionHandlerImplV3(events, (ScenarioImpl)sc);
+		CongestionHandlerImplV3 v3 = new CongestionHandlerImplV3(events, (MutableScenario)sc);
 		CongestionHandlerImplV4 v4 = new CongestionHandlerImplV4(events, sc);
 //		CongestionHandlerImplV6 v6 = new CongestionHandlerImplV6(events, sc);
 //		CongestionHandlerImplV7 v7_gl = new CongestionHandlerImplV7(events, sc, CongestionImpls.GL);

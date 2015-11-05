@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -83,12 +85,7 @@ public class TransmodelerTripWriter {
 		final PrintWriter pathWriter = new PrintWriter(pathFileName);
 		pathWriter.println("1"); // path table version number
 
-		final TabularFileWriter tripWriter = new TabularFileWriter();
-		tripWriter.setNoDataValue("");
-		tripWriter.setSeparator(",");
-		tripWriter.addKeys(ID, OriID, DesID, OriType, DesType, Class, OriLink,
-				Path, EndLink, DepTime);
-		tripWriter.open(tripFileName);
+		final SortedSet<TransmodelerTrip> sortedTrips = new TreeSet<>();
 
 		for (Map.Entry<Id<Person>, ? extends Person> id2personEntry : this.population
 				.getPersons().entrySet()) {
@@ -153,7 +150,8 @@ public class TransmodelerTripWriter {
 								 */
 								Integer pathId = linkIds2pathId.get(linkIds);
 								if (pathId == null) {
-									pathId = linkIds2pathId.size();
+									// TODO new added one here because that's what TM wants
+									pathId = 1 + linkIds2pathId.size();
 									linkIds2pathId.put(linkIds, pathId);
 
 									pathWriter.print(pathId);
@@ -172,43 +170,32 @@ public class TransmodelerTripWriter {
 									pathWriter.println("}");
 								}
 
-								// Write out the trip.
+								// Memorize the trip.
 
-								tripWriter.setValue(ID, ++tripCnt);
-								tripWriter.setValue(OriID, fromNodeTmId);
-								tripWriter.setValue(DesID, toNodeTmId);
-								tripWriter.setValue(OriType, Node);
-								tripWriter.setValue(DesType, Node);
-								tripWriter.setValue(Class, PC1);
-								tripWriter.setValue(
-										OriLink,
-										(String) this.linkAttributes
+								final String fromLink = (String) this.linkAttributes
+										.getAttribute(
+												linkIds.get(0).toString(),
+												TMLINKDIRPREFIX_ATTR)
+										+ (String) this.linkAttributes
 												.getAttribute(linkIds.get(0)
 														.toString(),
-														TMLINKDIRPREFIX_ATTR)
-												+ (String) this.linkAttributes
-														.getAttribute(linkIds
-																.get(0)
-																.toString(),
-																TMPATHID_ATTR));
-								tripWriter.setValue(Path, pathId);
-								tripWriter
-										.setValue(
-												EndLink,
-												(String) this.linkAttributes.getAttribute(
+														TMPATHID_ATTR);
+								final String toLink = (String) this.linkAttributes
+										.getAttribute(
+												linkIds.get(linkIds.size() - 1)
+														.toString(),
+												TMLINKDIRPREFIX_ATTR)
+										+ (String) this.linkAttributes
+												.getAttribute(
 														linkIds.get(
 																linkIds.size() - 1)
 																.toString(),
-														TMLINKDIRPREFIX_ATTR)
-														+ (String) this.linkAttributes
-																.getAttribute(
-																		linkIds.get(
-																				linkIds.size() - 1)
-																				.toString(),
-																		TMPATHID_ATTR));
-								tripWriter.setValue(DepTime,
-										leg.getDepartureTime());
-								tripWriter.writeValues();
+														TMPATHID_ATTR);
+								sortedTrips
+										.add(new TransmodelerTrip(++tripCnt,
+												fromNodeTmId, toNodeTmId,
+												fromLink, pathId, toLink, leg
+														.getDepartureTime()));
 							}
 						}
 					}
@@ -219,6 +206,25 @@ public class TransmodelerTripWriter {
 		pathWriter.flush();
 		pathWriter.close();
 
+		final TabularFileWriter tripWriter = new TabularFileWriter();
+		tripWriter.setNoDataValue("");
+		tripWriter.setSeparator(",");
+		tripWriter.addKeys(ID, OriID, DesID, OriType, DesType, Class, OriLink,
+				Path, EndLink, DepTime);
+		tripWriter.open(tripFileName);
+		for (TransmodelerTrip trip : sortedTrips) {
+			tripWriter.setValue(ID, trip.id);
+			tripWriter.setValue(OriID, trip.fromNodeId);
+			tripWriter.setValue(DesID, trip.toNodeId);
+			tripWriter.setValue(OriType, Node);
+			tripWriter.setValue(DesType, Node);
+			tripWriter.setValue(Class, PC1);
+			tripWriter.setValue(OriLink, trip.fromLinkId);
+			tripWriter.setValue(Path, trip.pathId);
+			tripWriter.setValue(EndLink, trip.toLinkId);
+			tripWriter.setValue(DepTime, trip.dptTime_s);
+			tripWriter.writeValues();
+		}
 		tripWriter.close();
 	}
 
@@ -228,12 +234,14 @@ public class TransmodelerTripWriter {
 
 		System.out.println("STARTED ...");
 
-//		final String networkFileName = "./data_ZZZ/run/network-plain.xml";
-//		final String plansFileName = "./data_ZZZ/run/output/ITERS/it.0/0.plans.xml.gz";
-//		final String linkAttributesFileName = "./data_ZZZ/run/link-attributes.xml";
-//
-//		final String pathFileName = "./data_ZZZ/run/paths.csv";
-//		final String tripFileName = "./data_ZZZ/run/trips.csv";
+		// final String networkFileName = "./data_ZZZ/run/network-plain.xml";
+		// final String plansFileName =
+		// "./data_ZZZ/run/output/ITERS/it.0/0.plans.xml.gz";
+		// final String linkAttributesFileName =
+		// "./data_ZZZ/run/link-attributes.xml";
+		//
+		// final String pathFileName = "./data_ZZZ/run/paths.csv";
+		// final String tripFileName = "./data_ZZZ/run/trips.csv";
 
 		final String networkFileName = "./test/regentmatsim/input/network-expanded.xml";
 		final String plansFileName = "./test/regentmatsim/matsim-output/ITERS/it.0/0.plans.xml.gz";

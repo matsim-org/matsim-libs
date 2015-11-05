@@ -17,7 +17,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 
@@ -379,7 +379,7 @@ public class EventsToTravelSummaryRelationalTablesGUI extends JFrame {
 
 	void runEventsProcessing() {
 		boolean isTransit = false;
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils
+		MutableScenario scenario = (MutableScenario) ScenarioUtils
 				.createScenario(ConfigUtils.loadConfig(configFileComponent
 						.getText()));
 		scenario.getConfig().transit().setUseTransit(true);

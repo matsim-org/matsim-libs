@@ -15,7 +15,7 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 
@@ -77,7 +77,7 @@ public class NoCrowdingCorridorControler {
 		controler.addControlerListener(shutdownHandler);
 
 	    // Kaddoura's externalities
-		controler.addControlerListener(new InternalizationPtControlerListener((ScenarioImpl) controler.getScenario(), scoreTracker));
+		controler.addControlerListener(new InternalizationPtControlerListener((MutableScenario) controler.getScenario(), scoreTracker));
 
 	    //controler.setOverwriteFiles(true);
 		//controler.setMobsimFactory(new QSimFactory());

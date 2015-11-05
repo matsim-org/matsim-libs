@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.lanes.data.v20.Lane;
-import org.matsim.lanes.data.v20.LaneDefinitions20;
+import org.matsim.lanes.data.v20.Lanes;
 import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalData;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemData;
@@ -118,7 +118,7 @@ public class DgRoederGershensonController implements SignalController {
 	}
 
 	
-	public void initSignalGroupMetadata(Network net, LaneDefinitions20 lanedefs){
+	public void initSignalGroupMetadata(Network net, Lanes lanedefs){
 		this.signalGroupIdMetadataMap = new HashMap<Id, SignalGroupMetadata>();
 		SignalSystemData systemData = this.system.getSignalSystemsManager().getSignalsData().getSignalSystemsData().getSignalSystemData().get(this.system.getId());
 		

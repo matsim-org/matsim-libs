@@ -29,8 +29,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import floetteroed.opdyts.DecisionVariable;
 import opdytsintegration.MATSimSimulator;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -49,6 +51,8 @@ import floetteroed.opdyts.convergencecriteria.ObjectiveFunctionChangeConvergence
 import floetteroed.opdyts.searchalgorithms.RandomSearch;
 
 public class RunRoadClassification {
+
+	static Logger log = Logger.getLogger(RunRoadClassification.class);
 
 	static void justRun() {
 
@@ -77,33 +81,47 @@ public class RunRoadClassification {
 		final ObjectiveFunction objectiveFunction = new RoadClassificationObjectiveFunction(
 				counts);
 		final List<LinkSettings> almostRealLinkSettings = new ArrayList<>();
-		almostRealLinkSettings.add(new LinkSettings(14.0, 2000.0, 2.0));
-		almostRealLinkSettings.add(new LinkSettings(14.0, 900.0, 1.0));
-		almostRealLinkSettings.add(new LinkSettings(28.0, 6000.0, 3.0));
-		almostRealLinkSettings.add(new LinkSettings(16.0, 3000.0, 2.0));
-		almostRealLinkSettings.add(new LinkSettings(25.0, 4000.0, 2.5));
+		almostRealLinkSettings.add(addNoise(new LinkSettings(14.0, 2000.0, 2.0)));
+		almostRealLinkSettings.add(addNoise(new LinkSettings(14.0, 900.0, 1.0)));
+		almostRealLinkSettings.add(addNoise(new LinkSettings(28.0, 6000.0, 3.0)));
+		almostRealLinkSettings.add(addNoise(new LinkSettings(16.0, 3000.0, 2.0)));
+		almostRealLinkSettings.add(addNoise(new LinkSettings(25.0, 4000.0, 2.5)));
 
 		int maxMemoryLength = 100;
-		boolean keepBestSolution = true;
+		boolean keepBestSolution = false;
 		boolean interpolate = false;
-		int maxIterations = 1;
-		int maxTransitions = 100;
-		int populationSize = 100;
+		int maxIterations = 100;
+		int maxTransitions = 1000;
+		int populationSize = 5;
 		DecisionVariableRandomizer<RoadClassificationDecisionVariable> randomizer = new DecisionVariableRandomizer<RoadClassificationDecisionVariable>() {
 			@Override
 			public RoadClassificationDecisionVariable newRandomDecisionVariable() {
 				ArrayList<LinkSettings> linkSettingses = new ArrayList<>(almostRealLinkSettings);
-				Collections.shuffle(linkSettingses);
 				return new RoadClassificationDecisionVariable(scenario.getNetwork(), linkAttributes, linkSettingses);
 			}
 
 			@Override
 			public List<RoadClassificationDecisionVariable> newRandomVariations(RoadClassificationDecisionVariable decisionVariable) {
 				/*
-				 * TODO: The algorithm performs best if this function returns 
+				 * The algorithm performs best if this function returns
 				 * two symmetric variations of the decision variable.
 				 */
-				return Arrays.asList(newRandomDecisionVariable(), newRandomDecisionVariable());
+				RoadClassificationDecisionVariable var1 = new RoadClassificationDecisionVariable(scenario.getNetwork(), linkAttributes, new ArrayList<>(decisionVariable.getLinkSettingses()));
+				RoadClassificationDecisionVariable var2 = new RoadClassificationDecisionVariable(scenario.getNetwork(), linkAttributes, new ArrayList<>(decisionVariable.getLinkSettingses()));
+				for (int i=0; i<decisionVariable.getLinkSettingses().size();i++) {
+					if (MatsimRandom.getRandom().nextDouble() < 2.0/decisionVariable.getLinkSettingses().size()) {
+						double offset = MatsimRandom.getRandom().nextGaussian() * 100.0;
+						var1.getLinkSettingses()
+								.set(i, new LinkSettings(var1.getLinkSettingses().get(i).getFreespeed(),
+										Math.max(var1.getLinkSettingses().get(i).getCapacity() + offset,0.0),
+										var1.getLinkSettingses().get(i).getNofLanes()));
+						var2.getLinkSettingses()
+								.set(i, new LinkSettings(var2.getLinkSettingses().get(i).getFreespeed(),
+										Math.max(var2.getLinkSettingses().get(i).getCapacity() - offset,0.0),
+												var2.getLinkSettingses().get(i).getNofLanes()));
+					}
+				}
+				return Arrays.asList(var1, var2);
 			}
 		};
 
@@ -118,8 +136,15 @@ public class RunRoadClassification {
 				// selfTuner, 
 				maxIterations, maxTransitions, populationSize,
 				MatsimRandom.getRandom(), interpolate, keepBestSolution, objectiveFunction, maxMemoryLength);
+		randomSearch.setLogFileName(scenario.getConfig().controler().getOutputDirectory() + "optimization.log");
 		randomSearch.run();
-
+		for (DecisionVariable decisionVariable : randomSearch.getBestDecisionVariablesView()) {
+			log.info("--DecisionVariable follows--");
+			RoadClassificationDecisionVariable rcdv = (RoadClassificationDecisionVariable) decisionVariable;
+			for (LinkSettings linkSettings : rcdv.getLinkSettingses()) {
+				log.info(String.format("%d %d %d\n", (int) linkSettings.getCapacity(), (int) linkSettings.getFreespeed(), (int) linkSettings.getNofLanes()));
+			}
+		}
 
 		// AND RUN THE ENTIRE THING
 
@@ -137,6 +162,27 @@ public class RunRoadClassification {
 //		controler.run();
 
 		System.out.println("... DONE.");
+	}
+
+	private static LinkSettings addNoise(LinkSettings linkSettings) {
+		double noise = linkSettings.getCapacity() * MatsimRandom.getRandom().nextGaussian();
+		return new LinkSettings(linkSettings.getFreespeed(), linkSettings.getCapacity() + noise, linkSettings.getNofLanes());
+	}
+
+	private static List<LinkSettings> shiftDown(int bubbleIndex, List<LinkSettings> linkSettingses) {
+		int targetIndex = MatsimRandom.getRandom().nextInt(linkSettingses.size()-bubbleIndex)+bubbleIndex;
+		ArrayList<LinkSettings> result = new ArrayList<>(linkSettingses);
+		LinkSettings element = result.remove(bubbleIndex);
+		result.add(targetIndex, element);
+		return result;
+	}
+
+	private static List<LinkSettings> shiftUp(int bubbleIndex, List<LinkSettings> linkSettingses) {
+		int targetIndex = MatsimRandom.getRandom().nextInt(bubbleIndex+1);
+		ArrayList<LinkSettings> result = new ArrayList<>(linkSettingses);
+		LinkSettings element = result.remove(bubbleIndex);
+		result.add(targetIndex, element);
+		return result;
 	}
 
 	public static void main(String[] args) throws FileNotFoundException {

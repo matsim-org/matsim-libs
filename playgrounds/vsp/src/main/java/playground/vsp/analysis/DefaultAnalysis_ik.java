@@ -31,7 +31,7 @@ import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.utils.io.UncheckedIOException;
 
 import playground.vsp.analysis.modules.AbstractAnalysisModule;
@@ -49,11 +49,11 @@ public class DefaultAnalysis_ik {
 	
 	private final String outputDir;
 	private final String eventsFile;
-	private final ScenarioImpl scenario;
+	private final MutableScenario scenario;
 	
 	private final List<AbstractAnalysisModule> anaModules = new LinkedList<AbstractAnalysisModule>();
 
-	public DefaultAnalysis_ik(ScenarioImpl scenario, String iterationOutputDir, String eventsFile) {
+	public DefaultAnalysis_ik(MutableScenario scenario, String iterationOutputDir, String eventsFile) {
 		this.outputDir = iterationOutputDir + "defaultAnalysis" + "/";
 		this.eventsFile = eventsFile;
 		this.scenario = scenario;

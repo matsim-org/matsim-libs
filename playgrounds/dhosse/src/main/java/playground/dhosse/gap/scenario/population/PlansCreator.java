@@ -34,6 +34,7 @@ import playground.dhosse.gap.scenario.mid.MiDPersonGroupTemplates;
 import playground.dhosse.gap.scenario.mid.MiDSurveyPerson;
 import playground.dhosse.gap.scenario.population.io.CommuterDataElement;
 import playground.dhosse.gap.scenario.population.io.CommuterFileReader;
+import playground.dhosse.gap.scenario.population.utils.EgapPopulationUtils;
 import playground.dhosse.utils.EgapHashGenerator;
 
 public class PlansCreator {

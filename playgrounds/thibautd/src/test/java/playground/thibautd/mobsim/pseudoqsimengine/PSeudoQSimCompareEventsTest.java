@@ -41,7 +41,7 @@ import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.pt.transitSchedule.api.*;
@@ -122,7 +122,7 @@ public class PSeudoQSimCompareEventsTest {
 	private TripRouter createTripRouter(TravelTimeCalculator travelTime, Scenario scenario) {
 		final TripRouterFactoryBuilderWithDefaults builder = new TripRouterFactoryBuilderWithDefaults();
 		builder.setTravelDisutility(
-				new RandomizingTimeDistanceTravelDisutility.Builder().createTravelDisutility(
+				new RandomizingTimeDistanceTravelDisutility.Builder( TransportMode.car ).createTravelDisutility(
 						travelTime.getLinkTravelTimes() ,
 						scenario.getConfig().planCalcScore() ));
 		builder.setTravelTime( travelTime.getLinkTravelTimes() );
@@ -229,10 +229,10 @@ public class PSeudoQSimCompareEventsTest {
 	}
 
 	private void createSchedule(final Scenario sc) {
-		final TransitSchedule schedule = ((ScenarioImpl) sc).getTransitSchedule();
+		final TransitSchedule schedule = ((MutableScenario) sc).getTransitSchedule();
 		final TransitScheduleFactory factory = schedule.getFactory();
 
-		final Vehicles vehicles = ((ScenarioImpl) sc).getTransitVehicles();
+		final Vehicles vehicles = ((MutableScenario) sc).getTransitVehicles();
 
 		final VehicleType vehicleType =
 			vehicles.getFactory().createVehicleType(
