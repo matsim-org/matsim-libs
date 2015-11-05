@@ -43,7 +43,7 @@ import org.matsim.api.core.v01.events.Wait2LinkEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.events.handler.Vehicle2DriverEventHandler;
+import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.vehicles.Vehicle;
 
 import playground.vsp.congestion.AgentOnLinkInfo;

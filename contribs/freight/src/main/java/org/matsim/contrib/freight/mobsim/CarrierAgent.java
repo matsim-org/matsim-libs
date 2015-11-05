@@ -35,7 +35,7 @@ import org.matsim.contrib.freight.carrier.Tour.Pickup;
 import org.matsim.contrib.freight.carrier.Tour.TourActivity;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
 import org.matsim.contrib.freight.scoring.FreightActivity;
-import org.matsim.core.events.handler.Vehicle2DriverEventHandler;
+import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;

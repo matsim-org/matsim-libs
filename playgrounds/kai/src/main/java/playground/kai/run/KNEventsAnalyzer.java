@@ -29,7 +29,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.events.handler.Vehicle2DriverEventHandler;
+import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.roadpricing.RoadPricingConfigGroup;
 

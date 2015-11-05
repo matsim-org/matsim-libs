@@ -52,7 +52,7 @@ import org.matsim.contrib.evacuation.analysis.control.vis.UtilizationVisualizer;
 import org.matsim.contrib.evacuation.analysis.data.Cell;
 import org.matsim.contrib.evacuation.analysis.data.ColorationMode;
 import org.matsim.contrib.evacuation.analysis.data.EventData;
-import org.matsim.core.events.handler.Vehicle2DriverEventHandler;
+import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.QuadTree.Rect;
 import org.matsim.core.utils.collections.Tuple;

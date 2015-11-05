@@ -49,7 +49,7 @@ import org.matsim.contrib.transEnergySim.vehicles.api.Vehicle;
 import org.matsim.contrib.transEnergySim.vehicles.api.AbstractVehicleWithBattery;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.events.handler.Vehicle2DriverEventHandler;
+import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 
 /**
  * This class should work both with jdeqsim and mobsim.

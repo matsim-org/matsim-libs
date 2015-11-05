@@ -33,7 +33,7 @@ import org.matsim.contrib.freight.mobsim.CarrierAgent.CarrierDriverAgent;
 import org.matsim.contrib.freight.scoring.CarrierScoringFunctionFactory;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.events.handler.Vehicle2DriverEventHandler;
+import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.core.scoring.ScoringFunction;
 
 /**

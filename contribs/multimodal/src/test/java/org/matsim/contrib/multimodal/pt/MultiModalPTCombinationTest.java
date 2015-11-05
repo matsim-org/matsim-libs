@@ -47,8 +47,8 @@ import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.core.events.handler.BasicEventHandler;
-import org.matsim.core.events.handler.Vehicle2DriverEventHandler;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.testcases.MatsimTestUtils;
 

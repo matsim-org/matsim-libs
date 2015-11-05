@@ -19,7 +19,7 @@
  *  *                                                                         *
  *  * ***********************************************************************
  */
-package org.matsim.core.events.handler;
+package org.matsim.core.events.algorithms;
 
 import java.util.HashMap;
 import java.util.Map;

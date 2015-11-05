@@ -41,7 +41,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
 import org.matsim.contrib.cadyts.general.PlansTranslator;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.events.handler.Vehicle2DriverEventHandler;
+import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 
 import cadyts.demand.PlanBuilder;
 

@@ -43,7 +43,7 @@ import org.matsim.contrib.transEnergySim.analysis.energyConsumption.EnergyConsum
 import org.matsim.contrib.transEnergySim.analysis.energyConsumption.EnergyConsumptionOutputLog;
 import org.matsim.contrib.transEnergySim.vehicles.api.AbstractVehicleWithBattery;
 import org.matsim.contrib.transEnergySim.vehicles.api.Vehicle;
-import org.matsim.core.events.handler.Vehicle2DriverEventHandler;
+import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 
 /**
  * This module tracks the energy consumption of vehicles based on event
