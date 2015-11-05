@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -84,9 +85,7 @@ public class SantiagoScenarioRunner {
 		setBasicStrategiesForSubpopulations(controler);
 		
 		// adding subtour mode choice strategies for car and non-car users
-		if(doModeChoice){
-			setModeChoiceForSubpopulations(controler);
-		}
+		if(doModeChoice) setModeChoiceForSubpopulations(controler);
 		
 		// mapping agents' activities to links on the road network to avoid being stuck on the transit network
 		mapActivities2properLinks(scenario);
@@ -95,12 +94,7 @@ public class SantiagoScenarioRunner {
 	}
 
 	private static void mapActivities2properLinks(Scenario scenario) {
-		TransportModeNetworkFilter filter = new TransportModeNetworkFilter(scenario.getNetwork());
-		Set<String> modes = new HashSet<String>();
-		modes.add(TransportMode.car);
-		Network subNetwork = NetworkUtils.createNetwork();
-		filter.filter(subNetwork, modes);
-		
+		Network subNetwork = getNetworkWithProperLinksOnly(scenario.getNetwork());
 		for(Person person : scenario.getPopulation().getPersons().values()){
 			for (Plan plan : person.getPlans()) {
 				for (PlanElement planElement : plan.getPlanElements()) {
@@ -110,7 +104,6 @@ public class SantiagoScenarioRunner {
 						if(!(linkId == null)){
 							throw new RuntimeException("Link Id " + linkId + " already defined for this activity. Aborting... ");
 						} else {
-							//TODO: this could be extended so that activities do not take place on urban highways or so...
 							linkId = NetworkUtils.getNearestLink(subNetwork, act.getCoord()).getId();
 							act.setLinkId(linkId);
 						}
@@ -118,6 +111,27 @@ public class SantiagoScenarioRunner {
 				}
 			}
 		}
+	}
+
+	private static Network getNetworkWithProperLinksOnly(Network network) {
+		Network subNetwork;
+		TransportModeNetworkFilter filter = new TransportModeNetworkFilter(network);
+		Set<String> modes = new HashSet<String>();
+		modes.add(TransportMode.car);
+		subNetwork = NetworkUtils.createNetwork();
+		filter.filter(subNetwork, modes); //remove non-car links
+
+		for(Node n: new HashSet<Node>(subNetwork.getNodes().values())){
+			for(Link l: NetworkUtils.getIncidentLinks(n).values()){
+				if(l.getFreespeed() > (16.666666667)){
+					subNetwork.removeLink(l.getId()); //remove links with freespeed > 60kmh
+				}
+			}
+			if(n.getInLinks().size() == 0 && n.getOutLinks().size() == 0){
+				subNetwork.removeNode(n.getId()); //remove nodes without connection to links
+			}
+		}
+		return subNetwork;
 	}
 
 	private static void setNetworkModeRouting(Controler controler) {

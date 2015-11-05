@@ -597,7 +597,9 @@ public class SantiagoScenarioBuilder {
 		transit.setTransitScheduleFile(pathForMatsim + "input/transitschedule_simplified.xml");
 		transit.setVehiclesFile(pathForMatsim + "input/transitvehicles.xml");
 		transit.setUseTransit(true);
-		transitRouter.setExtensionRadius(500);
+//		transitRouter.setMaxBeelineWalkConnectionDistance(500.);
+//		transitRouter.setSearchRadius(200.);
+//		transitRouter.setExtensionRadius(1000.);
 	}
 
 	private void setControlerParameters(ControlerConfigGroup cc){
