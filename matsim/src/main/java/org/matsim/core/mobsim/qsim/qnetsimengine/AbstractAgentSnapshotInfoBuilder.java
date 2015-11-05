@@ -163,7 +163,7 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 	}
 
 	public final void positionVehiclesAlongLine(Collection<AgentSnapshotInfo> positions,
-			double now, Collection<MobsimVehicle> vehs, TreeMap<Hole,Double> holePositions, double curvedLength, 
+			double now, Collection<MobsimVehicle> vehs, TreeMap<Double,Hole> holePositions, double curvedLength, 
 			double storageCapacity, double euklideanDistance, Coord upstreamCoord, Coord downstreamCoord, 
 			double inverseFlowCapPerTS, double freeSpeed, int numberOfLanesAsInt)
 	{
@@ -172,7 +172,8 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 
 		double lastDistanceFromFromNode = Double.NaN;
 
-		Iterator<Entry<Hole, Double>> iterator = holePositions.descendingMap().entrySet().iterator() ;
+//		Iterator<Entry<Double, Hole>> iterator = holePositions.descendingMap().entrySet().iterator() ;
+		Iterator<Entry<Double, Hole>> iterator = holePositions.entrySet().iterator() ;
 
 
 		for ( MobsimVehicle mveh : vehs ) {
@@ -192,9 +193,9 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 
 			if ( QueueWithBuffer.HOLES ) {
 				while ( iterator.hasNext() ) {
-					Entry<Hole, Double> entry = iterator.next();
-					double holePositionFromFromNode = entry.getValue() ;
-					double size = entry.getKey().getSizeInEquivalents() ;
+					Entry<Double, Hole> entry = iterator.next();
+					double size = entry.getValue().getSizeInEquivalents() ;
+					double holePositionFromFromNode = entry.getKey() ;
 					if ( holePositionFromFromNode > lastDistanceFromFromNode ) {  // +7.5?  -7.5?  +7.5*size?  -7.5*size?
 						lastDistanceFromFromNode -= size * 7.5 ; // where is the magic number coming from?  cellSize??
 					} else {

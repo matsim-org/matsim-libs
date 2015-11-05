@@ -840,7 +840,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 
 			double now = network.simEngine.getMobsim().getSimTimer().getTimeOfDay();
 
-			TreeMap<Hole, Double> holePositions = new TreeMap<>() ;
+			TreeMap<Double, Hole> holePositions = new TreeMap<>() ;
 			if ( VIS_HOLES ) {
 				// holes:
 				if ( !holes.isEmpty() ) {
@@ -853,7 +853,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 						if ( VIS_HOLES ) {
 							addHolePosition( positions, snapshotInfoBuilder, lastDistanceFromFromNode, hole ) ;
 						}
-						holePositions.put( hole, lastDistanceFromFromNode ) ;
+						holePositions.put( lastDistanceFromFromNode, hole ) ;
 					}
 				}
 			}
