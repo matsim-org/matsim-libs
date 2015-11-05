@@ -280,16 +280,15 @@ public class AssignmentProblem
                         departure.time + travelTime);
 
                 costMatrix[v][r] = reduceTP ? //
+                        //this will work different than (B) at oversupply -> will reduce T_P and fairness
                         pickupBeginTime - departure.time : // T_P
 
-                //TODO the following two variants, (A) and (B), behave different
-                //when undersupply happens (i.e. with dummy vehicles)
+                		//(A) more fairness, lower throughput
+                		//this will work different than than (B) at undersupply -> will reduce unfairness and throughput 
+                		//pickupBeginTime - rData.requests.get(r).getT0(); // all T_W
 
-                //(A) more fairness, lower throughput
-                //Math.max(departure.time + travelTime - rData.requests.get(r).getT0(), 0); // T_W
-
-                //(B)less fairness, higher throughput
-                pickupBeginTime;// T_W
+                		//(B)less fairness, higher throughput
+                		pickupBeginTime;// remaining T_W (probably win-win situation)
             }
         }
 
