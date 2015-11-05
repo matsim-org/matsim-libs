@@ -40,7 +40,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.misc.Time;
@@ -84,7 +83,7 @@ import org.matsim.vehicles.VehiclesFactory;
  */
 /*package*/ class Fixture {
 
-	/*package*/ final MutableScenario scenario;
+	/*package*/ final Scenario scenario;
 	/*package*/ private final Config config;
 	/*package*/ private final Network network;
 	/*package*/ private final TransitScheduleFactory builder;
@@ -98,7 +97,7 @@ import org.matsim.vehicles.VehiclesFactory;
 		this.config = ConfigUtils.createConfig();	
 		this.config.transit().setUseTransit(true);
 
-		this.scenario = (MutableScenario) ScenarioUtils.createScenario(config);
+		this.scenario = ScenarioUtils.createScenario(config);
 		this.network = this.scenario.getNetwork();
 		this.schedule = this.scenario.getTransitSchedule();
 		this.builder = this.schedule.getFactory();

@@ -34,6 +34,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.VspExperimentalConfigGroup;
+import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspDefaultsCheckingLevel;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkFactoryImpl;
@@ -53,6 +55,7 @@ import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
+import floetteroed.utilities.networks.containerloaders.MATSimNetworkContainerLoader;
 import playground.benjamin.scenarios.santiago.SantiagoScenarioConstants;
 import playground.benjamin.utils.MergeNetworks;
 
@@ -88,39 +91,37 @@ public class SantiagoNetworkBuilder {
 		onr.setHierarchyLayer(boundingBox1[3], boundingBox1[0], boundingBox1[1], boundingBox1[2], 4);
 		onr.setHierarchyLayer(boundingBox2[3], boundingBox2[0], boundingBox2[1], boundingBox2[2], 5);
 		onr.setHierarchyLayer(boundingBox3[3], boundingBox3[0], boundingBox3[1], boundingBox3[2], 5);
-		
 		onr.parse(workingDirInputFiles+"networkOSM/santiago_tertiary.osm");
-		
-		createConnectionLinks(network);
-		removeSomeStreets(network);
-		changeNumberOfLanes(network);
-		
 		new NetworkCleaner().run(network);
+		
+		addSomeLinks(network);
+		removeSomeLinks(network);
+		changeNumberOfLanes(network);
 		
 		createRoadTypeMappingForHBEFA(network);
 		changeFreespeedInSecondaryNetwork(network);
-		
 		addNetworkModes(network);
 		
 		if(prepareForModeChoice) mergeWithTransitNetwork(network);
 		
 		new NetworkWriter(network).write(outputDir + "network_merged_cl.xml.gz");
 		
-		convertNet2Shape(network, crs, outputDir+"networkShp/"); 
-		calcMinMaxCoord(network);
-		
+		convertNet2Shape(network, crs, outputDir + "networkShp/"); 
+		printBoundingBox(network);
 		log.info("Finished network creation.");
-		
 	}
 
 	private void mergeWithTransitNetwork(NetworkImpl network) {
-		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenario).readFile(transitNetworkFile);
-		// TODO: hack in order to avoid pt jamming on the routing network
-		for(Link ptLink : scenario.getNetwork().getLinks().values()){
+		Scenario ptScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		ptScenario.getConfig().vspExperimental().setVspDefaultsCheckingLevel(VspDefaultsCheckingLevel.ignore);
+		new MatsimNetworkReader(ptScenario).readFile(transitNetworkFile);
+//		new NetworkCleaner().run(ptScenario.getNetwork());
+		// Hack in order to avoid pt jamming on the routing network
+		for(Link ptLink : ptScenario.getNetwork().getLinks().values()){
 			ptLink.setCapacity(200 * ptLink.getCapacity());
+			// TODO: how to adjust storage capacity??
 		}
-		new MergeNetworks().merge(network, TransportMode.pt, scenario.getNetwork());
+		new MergeNetworks().merge(network, TransportMode.pt, ptScenario.getNetwork());
 	}
 
 	private void changeNumberOfLanes(NetworkImpl network) {
@@ -211,13 +212,13 @@ public class SantiagoNetworkBuilder {
 		network.getLinks().get(Id.createLinkId("19485")).setNumberOfLanes(newNLanes);
 	}
 
-	private void removeSomeStreets(NetworkImpl network) {
+	private void removeSomeLinks(NetworkImpl network) {
 		//remove small streets in the south-west of the network
 		network.removeLink(Id.createLinkId("4978"));
 		network.removeLink(Id.createLinkId("9402"));
 	}
 
-	private void createConnectionLinks(NetworkImpl network) {
+	private void addSomeLinks(NetworkImpl network) {
 		//create connection links (according to e-mail from kt 2015-07-27)
 		NetworkFactoryImpl netFactory = (NetworkFactoryImpl) network.getFactory();
 		Node node = netFactory.createNode(Id.createNodeId("n_add_01"), new Coord((double) 345165, (double) 6304696));
@@ -399,7 +400,7 @@ public class SantiagoNetworkBuilder {
 		ShapeFileWriter.writeGeometries(features, outputDir + "network_merged_cl_Nodes.shp");
 	}
 	
-	private void calcMinMaxCoord(Network network) {
+	private void printBoundingBox(Network network) {
 		double[] box = NetworkUtils.getBoundingBox(network.getNodes().values());
 		log.info("Network bounding box:");
 		log.info("minX "+ box[0]);

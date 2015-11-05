@@ -169,6 +169,7 @@ public class SantiagoScenarioBuilder {
 		ActivityClassifier aap = new ActivityClassifier(scenarioTmp);
 		aap.run();
 
+		//add here so the end times will not be randomized
 		addFreightPop(aap.getOutPop());
 		
 		new PopulationWriter(aap.getOutPop()).write(outputDir + "plans/plans_final.xml.gz");
@@ -187,25 +188,27 @@ public class SantiagoScenarioBuilder {
 			ActivityParams params = new ActivityParams();
 			params.setActivityType(act);
 			params.setTypicalDuration(acts.get(act));
-//			minimum duration is now specified by typical duration
+			// Minimum duration is now specified by typical duration.
 //			params.setMinimalDuration(acts.get(act).getSecond());
 			params.setClosingTime(Time.UNDEFINED_TIME);
 			params.setEarliestEndTime(Time.UNDEFINED_TIME);
 			params.setLatestStartTime(Time.UNDEFINED_TIME);
 			params.setOpeningTime(Time.UNDEFINED_TIME);
 			params.setTypicalDurationScoreComputation(TypicalDurationScoreComputation.relative);
-			if (act.equals("pt interaction")){ //do not score pt transit activity
+			// TODO: overwriting this is not recommended but enforced for closing time
+			if (act.equals("pt interaction")){
 				params.setScoringThisActivityAtAll(false);
-				// TODO: this is stupid but enforced
 				params.setClosingTime(0);
 			}
 			config.planCalcScore().addActivityParams(params);
 		}
 	}
 
+	/**
+	 * Freight traffic will only be added to population if file exists. Otherwise do nothing.
+	 * @param populationOut
+	 */
 	private void addFreightPop(Population populationOut) {
-		//freight traffic will only be added to population, if file exists. Otherwise do nothing.
-		//Added at this position, so the end times will not be randomized. (KT 2015-09-16)
 		File freightPlansFile = new File(outputDir + "plans/freight_plans.xml.gz");
 		if (!freightPlansFile.exists()){
 			log.warn("Freight population file not found under " + freightPlansFile + "; no freight population added.");
@@ -590,7 +593,8 @@ public class SantiagoScenarioBuilder {
 		transitModes.add(SantiagoScenarioConstants.Modes.metro.toString());
 		transitModes.add(SantiagoScenarioConstants.Modes.train.toString());
 		transit.setTransitModes(transitModes);
-		transit.setTransitScheduleFile(pathForMatsim + "input/transitschedule.xml");
+//		transit.setTransitScheduleFile(pathForMatsim + "input/transitschedule.xml");
+		transit.setTransitScheduleFile(pathForMatsim + "input/transitschedule_simplified.xml");
 		transit.setVehiclesFile(pathForMatsim + "input/transitvehicles.xml");
 		transit.setUseTransit(true);
 		transitRouter.setExtensionRadius(500);
@@ -653,6 +657,7 @@ public class SantiagoScenarioBuilder {
 	
 	private void setPlanCalcScoreParameters(PlanCalcScoreConfigGroup pcs){
 		pcs.setBrainExpBeta(1);
+		pcs.setPathSizeLogitBeta(0.0);
 //		pcs.setEarlyDeparture_utils_hr(-0.0);
 		pcs.setFractionOfIterationsToStartScoreMSA(0.8);
 //		pcs.setLateArrival_utils_hr(-18.0);

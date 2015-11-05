@@ -20,6 +20,7 @@
 package playground.johannes.synpop.source.mid2008.run;
 
 import org.apache.log4j.Logger;
+import playground.johannes.gsv.popsim.InputeDaysTask;
 import playground.johannes.gsv.synPop.ConvertRide2Car;
 import playground.johannes.gsv.synPop.DeleteModes;
 import playground.johannes.gsv.synPop.DeleteNoLegs;
@@ -51,7 +52,7 @@ public class MergePopulations {
 
         logger.info("Converting ride legs to car legs...");
         TaskRunner.run(new ConvertRide2Car(), persons);
-
+        TaskRunner.run(new InputeDaysTask(persons), persons);
 //        logger.info("Converting activities to misc type...");
 //        TaskRunner.run(new Convert2MiscType(), persons);
 
@@ -64,6 +65,7 @@ public class MergePopulations {
         TaskRunner.validatePersons(new DeleteModes("car"), persons);
         logger.info(String.format("Persons after filter: %s", persons.size()));
 //        writer.write(outDir + "pop.car.xml", persons);
+
 
         logger.info("Removing legs with less than 3 KM...");
         TaskRunner.run(new DeleteShortLongTrips(3000, true), persons);

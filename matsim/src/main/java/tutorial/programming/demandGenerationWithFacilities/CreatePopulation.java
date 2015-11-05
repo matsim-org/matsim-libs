@@ -73,7 +73,7 @@ class CreatePopulation {
 			String line = bufferedReader.readLine(); //skip header
 			
 			int index_personId = 4;
-			int index_age = 6;
+//			int index_age = 6;
 			int index_workLocation = 8;
 			int index_xHomeCoord = 10;
 			int index_yHomeCoord = 11;
@@ -85,11 +85,16 @@ class CreatePopulation {
 				 * Create a person and add it to the population
 				 */
 				Person person = populationFactory.createPerson(Id.create(parts[index_personId], Person.class));
-				PersonUtils.setAge(person, Integer.parseInt(parts[index_age]));
+
+//				PersonUtils.setAge(person, Integer.parseInt(parts[index_age]));
+				// deprecated, use population.getPersonAttributes() if you want additional person attributes. kai, nov'15
 				
 				boolean employed = true;
 				if (parts[index_workLocation].equals("-1")) employed = false; 
-				PersonUtils.setEmployed(person, employed);
+//				PersonUtils.setEmployed(person, employed);
+				// deprecated, use population.getPersonAttributes() if you want additional person attributes. kai, nov'15
+				
+				
 				population.addPerson(person);
 
 				/* 

@@ -38,7 +38,7 @@ public class CarrierScoringFunctionFactoryImpl implements CarrierScoringFunction
      * @author stefan
      *
      */
-    static class DriversActivityScoring implements SumScoringFunction.BasicScoring, SumScoringFunction.ActivityScoring {
+    public static class DriversActivityScoring implements SumScoringFunction.BasicScoring, SumScoringFunction.ActivityScoring {
 
         private static Logger log = Logger.getLogger(DriversActivityScoring.class);
 
@@ -117,7 +117,7 @@ public class CarrierScoringFunctionFactoryImpl implements CarrierScoringFunction
 
     }
 
-    static class VehicleEmploymentScoring implements SumScoringFunction.BasicScoring {
+    public static class VehicleEmploymentScoring implements SumScoringFunction.BasicScoring {
 
         private Carrier carrier;
 
@@ -172,7 +172,7 @@ public class CarrierScoringFunctionFactoryImpl implements CarrierScoringFunction
      * @author stefan
      *
      */
-    static class DriversLegScoring implements SumScoringFunction.BasicScoring, SumScoringFunction.LegScoring {
+    public static class DriversLegScoring implements SumScoringFunction.BasicScoring, SumScoringFunction.LegScoring {
 
         private double score = 0.0;
 
@@ -256,7 +256,7 @@ public class CarrierScoringFunctionFactoryImpl implements CarrierScoringFunction
     }
 
 
-    static class TollScoring implements SumScoringFunction.BasicScoring, SumScoringFunction.ArbitraryEventScoring {
+    public static class TollScoring implements SumScoringFunction.BasicScoring, SumScoringFunction.ArbitraryEventScoring {
 
         private double score = 0.;
 

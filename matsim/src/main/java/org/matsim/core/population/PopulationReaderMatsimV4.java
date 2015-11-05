@@ -179,7 +179,8 @@ import org.xml.sax.Attributes;
 
 	private void startPerson(final Attributes atts) {
 		String ageString = atts.getValue("age");
-		int age = Integer.MIN_VALUE;
+//		int age = Integer.MIN_VALUE;
+		Integer age = null ;
 		if (ageString != null) age = Integer.parseInt(ageString);
 		this.currperson = PersonImpl.createPerson(Id.create(atts.getValue("id"), Person.class));
 		PersonUtils.setSex(this.currperson, atts.getValue("sex"));
