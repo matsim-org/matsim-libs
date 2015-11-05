@@ -36,6 +36,7 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.gbl.MatsimRandom;
@@ -53,8 +54,8 @@ import playground.agarwalamit.mixedTraffic.MixedTrafficVehiclesUtils;
 public class PatnaSimulationTimeWriter {
 	
 	private final int [] randomNumbers = {4711, 6835, 1847, 4144, 4628, 2632, 5982, 3218, 5736, 7573,4389, 1344} ;
-	private static String outputFolder = "../../../../repos//runs-svn/patnaIndia/run107/output/";
-	private static String inputFilesDir = "../../../../repos//runs-svn/patnaIndia/run107/input/";
+	private static String outputFolder =  "../../../../repos/runs-svn/patnaIndia/run107/";
+	private static String inputFilesDir = "../../../../repos/runs-svn/patnaIndia/inputs/";
 	
 	public static void main(String[] args) {
 		
@@ -146,12 +147,18 @@ public class PatnaSimulationTimeWriter {
 	}
 	
 	private String runAndReturnSimulationTime (QSimConfigGroup.LinkDynamics ld, QSimConfigGroup.TrafficDynamics td, String inputFilesDir) {
-		
+		Collection <String> mainModes = Arrays.asList("car","motorbike","bike");
 		Config config = createBasicConfigSettings();
+		String outPlans = inputFilesDir + "/SelectedPlans_new.xml.gz";
 		
-		config.plans().setInputFile(inputFilesDir+"/SelectedPlansOnly.xml");
+		BackwardCompatibilityForRouteType bcrt = new BackwardCompatibilityForRouteType(inputFilesDir+"/SelectedPlansOnly.xml", mainModes);
+		bcrt.startProcessing();
+		bcrt.writePopOut(outPlans);
+		
+		config.plans().setInputFile(outPlans);
+		
 		config.network().setInputFile(inputFilesDir+"/network.xml");
-		config.counts().setCountsFileName(inputFilesDir+"/counts/countsCarMotorbikeBike.xml");
+		config.counts().setCountsFileName(inputFilesDir+"counts/countsCarMotorbikeBike.xml");
 		
 		config.qsim().setLinkDynamics(ld.toString());
 		config.qsim().setTrafficDynamics(td);
@@ -164,7 +171,7 @@ public class PatnaSimulationTimeWriter {
 		
 		config.controler().setCreateGraphs(false);
 		config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.fromVehiclesData);
-		Scenario sc = ScenarioUtils.createScenario(config);
+		Scenario sc = ScenarioUtils.loadScenario(config);
 		
 		Map<String, VehicleType> modesType = new HashMap<String, VehicleType>(); 
 		VehicleType car = VehicleUtils.getFactory().createVehicleType(Id.create("car",VehicleType.class));
@@ -185,6 +192,18 @@ public class PatnaSimulationTimeWriter {
 		modesType.put("bike", bike);
 		sc.getVehicles().addVehicleType(bike);
 		
+		VehicleType walk = VehicleUtils.getFactory().createVehicleType(Id.create("walk",VehicleType.class));
+		walk.setMaximumVelocity(MixedTrafficVehiclesUtils.getSpeed("walk"));
+		//		walk.setPcuEquivalents(0.10);  			
+		modesType.put("walk",walk);
+		sc.getVehicles().addVehicleType(walk);
+
+		VehicleType pt = VehicleUtils.getFactory().createVehicleType(Id.create("pt",VehicleType.class));
+		pt.setMaximumVelocity(MixedTrafficVehiclesUtils.getSpeed("pt"));
+		//		pt.setPcuEquivalents(5);  			
+		modesType.put("pt",pt);
+		sc.getVehicles().addVehicleType(pt);
+		
 		for(Person p:sc.getPopulation().getPersons().values()){
 			Id<Vehicle> vehicleId = Id.create(p.getId(),Vehicle.class);
 			String travelMode = null;
@@ -201,6 +220,17 @@ public class PatnaSimulationTimeWriter {
 		final Controler controler = new Controler(sc);
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		controler.setDumpDataAtEnd(false);
+		
+		controler.addOverridingModule(new AbstractModule() {
+			// I do not know, why I need these.
+			@Override
+			public void install() {
+			addTravelTimeBinding("bike").to(networkTravelTime());
+			addTravelDisutilityFactoryBinding("bike").to(carTravelDisutilityFactoryKey());
+			addTravelTimeBinding("motorbike").to(networkTravelTime());
+			addTravelDisutilityFactoryBinding("motorbike").to(carTravelDisutilityFactoryKey());
+			}
+		});
 
 		String simulationTime = "";
 		for (int i = 0; i<randomNumbers.length;i++) {
@@ -270,7 +300,6 @@ public class PatnaSimulationTimeWriter {
 		ActivityParams homeAct = new ActivityParams("home");
 		homeAct.setTypicalDuration(12*3600);
 		config.planCalcScore().addActivityParams(homeAct);
-
 
 		config.planCalcScore().setMarginalUtlOfWaiting_utils_hr(0);// changed to 0 from (-2) earlier
 		config.planCalcScore().setPerforming_utils_hr(6.0);
