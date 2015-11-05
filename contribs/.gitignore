@@ -1,5 +1,16 @@
+# Eclipse
 .classpath
 .project
+
+# Netbeans
+nbactions.xml
+
+# IntelliJ
+*.ipr
+*.iws
+*.iml
+.idea/
+
 */test/output
 bin
 .settings
@@ -10,4 +21,6 @@ matsim4urbansim/.gitignore
 matsim4urbansim/test/.gitignore
 .gitignore
 .gitignore
+
+
 

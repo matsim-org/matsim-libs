@@ -19,15 +19,16 @@
 
 package playground.johannes.gsv.popsim;
 
+import gnu.trove.TObjectIntHashMap;
+import gnu.trove.TObjectIntIterator;
+import org.matsim.contrib.common.util.XORShiftRandom;
 import playground.johannes.coopsim.mental.choice.ChoiceSet;
-import playground.johannes.gsv.zones.KeyMatrix;
-import playground.johannes.synpop.data.CommonKeys;
-import playground.johannes.synpop.data.Episode;
-import playground.johannes.synpop.data.Person;
-import playground.johannes.synpop.data.Segment;
+import playground.johannes.synpop.data.*;
 import playground.johannes.synpop.processing.PersonTask;
+import playground.johannes.synpop.source.mid2008.MiDValues;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -39,20 +40,54 @@ public class InputeDaysTask implements PersonTask {
 
 
     public InputeDaysTask(Collection<? extends Person> persons) {
-        KeyMatrix matrix = new KeyMatrix();
+        Map<String, TObjectIntHashMap<String>> matrix = new HashMap<>();
 
         for(Person person : persons) {
             String day = person.getAttribute(CommonKeys.DAY);
             if(day != null) {
                 for(Episode episode : person.getEpisodes()) {
                     for(Segment leg : episode.getLegs()) {
-                        String purpose = leg.getAttribute(CommonKeys.LEG_PURPOSE);
-                        if(purpose != null) {
-                            matrix.add(day, purpose, 1.0);
+                        String mode = leg.getAttribute(CommonKeys.LEG_MODE);
+//                        if(CommonValues.LEG_MODE_CAR.equalsIgnoreCase(mode)) {
+                            String purpose = leg.getAttribute(CommonKeys.LEG_PURPOSE);
+                            if (purpose != null) {
+                                TObjectIntHashMap<String> days = matrix.get(purpose);
+                                if (days == null) {
+                                    days = new TObjectIntHashMap<>();
+                                    matrix.put(purpose, days);
+                                }
+                                days.adjustOrPutValue(day, 1, 1);
+//                            }
                         }
                     }
                 }
             }
+        }
+
+        matrix.put(ActivityTypes.VACATIONS_LONG, matrix.get(ActivityTypes.VACATIONS_SHORT));
+
+        map = new HashMap<>();
+
+        for(Map.Entry<String, TObjectIntHashMap<String>> entry : matrix.entrySet()) {
+            System.out.print(entry.getKey());
+            System.out.print(": ");
+
+            ChoiceSet<String> choiceSet = new ChoiceSet<>(new XORShiftRandom());
+
+            TObjectIntHashMap<String> days = entry.getValue();
+            TObjectIntIterator<String> it = days.iterator();
+            for(int i = 0; i < days.size(); i++) {
+                it.advance();
+                choiceSet.addChoice(it.key(), it.value());
+
+                System.out.print(it.key());
+                System.out.print("=");
+                System.out.print(String.valueOf(it.value()));
+                System.out.print(" ");
+            }
+            System.out.println();
+
+            map.put(entry.getKey(), choiceSet);
         }
 
 
@@ -60,6 +95,17 @@ public class InputeDaysTask implements PersonTask {
 
     @Override
     public void apply(Person person) {
+        String day = person.getAttribute(CommonKeys.DAY);
+        if(day == null) {
+            Episode episode = person.getEpisodes().get(0);
+            if(MiDValues.MID_JOUNREYS.equalsIgnoreCase(episode.getAttribute(CommonKeys.DATA_SOURCE))) {
+                Segment leg = episode.getLegs().get(0);
+                String purpose = leg.getAttribute(CommonKeys.LEG_PURPOSE);
 
+                day = map.get(purpose).randomWeightedChoice();
+
+                person.setAttribute(CommonKeys.DAY, day);
+            }
+        }
     }
 }

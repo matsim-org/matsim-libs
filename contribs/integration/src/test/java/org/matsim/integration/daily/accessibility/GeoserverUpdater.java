@@ -110,6 +110,9 @@ class GeoserverUpdater implements SpatialGridDataExchangeInterface {
 			throw new RuntimeException(e);
 		}
 		log.info("ending setAndProcessSpatialGrids.");
+		
+		// re-publish layer using the REST api (of geoserver; the above is the postgis db) if we want to automatically recompute the 
+		// bounding box.  mz & kai, nov'15
 	}
 
 }

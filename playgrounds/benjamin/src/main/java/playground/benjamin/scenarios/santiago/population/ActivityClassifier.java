@@ -183,16 +183,14 @@ public class ActivityClassifier {
 
 						Activity currentAct = (Activity) pe;
 						Coord cord = currentAct.getCoord();
-						double dur = currentAct.getEndTime() - currentAct.getStartTime();
 
-						boolean isPtInteractionActivity = true;
-						if(!currentAct.getType().equals("pt interaction")) isPtInteractionActivity = false;
-						
-						if(isPtInteractionActivity){
+						if(currentAct.getType().equals("pt interaction")){
 							planOut.addActivity(currentAct);
+//							continue;
 							actType = currentAct.getType();
 							typDur = Time.UNDEFINED_TIME;
 						} else {
+							double dur = currentAct.getEndTime() - currentAct.getStartTime();
 							Tuple<Double, Double> durAndTimeShift = durationConsistencyCheck(dur);
 							
 							typDur = Math.max(Math.floor(durAndTimeShift.getFirst()/3600), 0.5) * 3600;
