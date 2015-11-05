@@ -42,6 +42,7 @@ import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 
 import playground.jbischoff.taxibus.TaxibusActionCreator;
 import playground.jbischoff.taxibus.optimizer.DefaultTaxibusOptimizer;
@@ -113,23 +114,12 @@ public class TaxibusQSimProvider implements Provider<QSim> {
 		TaxibusSchedulerParams params = new TaxibusSchedulerParams(tbcg.getPickupDuration(), tbcg.getDropoffDuration());
 		
 		resetSchedules(context.getVrpData().getVehicles().values());
-		
-		LeastCostPathCalculator router = new Dijkstra(context.getScenario()
-				.getNetwork(), travelDisutility, travelTime);
 
-		LeastCostPathCalculatorWithCache routerWithCache = new DefaultLeastCostPathCalculatorWithCache(
-				router, new TimeDiscretizer(31 * 4, 15 * 60, false));
- 
-		VrpPathCalculator calculator = new VrpPathCalculatorImpl(
-				routerWithCache, new VrpPathFactoryImpl(travelTime, travelDisutility));
-		TaxibusScheduler scheduler = new TaxibusScheduler(context, calculator, params);
-		TaxibusVehicleRequestPathFinder vrpFinder = new TaxibusVehicleRequestPathFinder(
-				calculator, scheduler);
-
+		TaxibusScheduler scheduler = new TaxibusScheduler(context, params);
 		TaxibusFilterFactory filterFactory = new DefaultTaxibusFilterFactory(scheduler, tbcg.getNearestRequestsLimit(), tbcg.getNearestVehiclesLimit());
 
 		TaxibusOptimizerConfiguration optimConfig = new TaxibusOptimizerConfiguration(
-				context, calculator, scheduler, vrpFinder, filterFactory,
+				context, travelTime, travelDisutility, scheduler, filterFactory,
 				Goal.MIN_WAIT_TIME, tbcg.getOutputDir());
 		optimizer = new DefaultTaxibusOptimizer(optimConfig,  false);
 

@@ -2,7 +2,6 @@ package gunnar.ihop2.regent.costwriting;
 
 import static gunnar.ihop2.regent.demandreading.PopulationCreator.HOME;
 import static org.matsim.matrices.MatrixUtils.add;
-import static org.matsim.matrices.MatrixUtils.mult;
 import static org.matsim.matrices.MatrixUtils.round;
 
 import java.io.FileNotFoundException;
@@ -22,10 +21,10 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.matrices.Matrices;
 import org.matsim.matrices.MatricesWriter;
 import org.matsim.matrices.Matrix;
+import org.matsim.matrices.MatrixUtils;
+import org.matsim.matrices.MatsimMatricesReader;
 
-import saleem.stockholmscenario.utils.StockholmTransformationFactory;
 import floetteroed.utilities.math.Histogram;
-import gunnar.ihop2.regent.demandreading.ZonalSystem;
 
 /**
  * 
@@ -43,7 +42,9 @@ public class TourTravelTimes {
 
 	final TravelTimeMatrices travelTimeMatrices;
 
-	private final Map<String, Histogram> actType2dptTimeHist = new LinkedHashMap<>();
+	private final Map<String, Histogram> actType2dptTimeHistTourStart = new LinkedHashMap<>();
+
+	private final Map<String, Histogram> actType2dptTimeHistTourEnd = new LinkedHashMap<>();
 
 	private final Matrices tourTTMatrices = new Matrices();
 
@@ -60,17 +61,30 @@ public class TourTravelTimes {
 
 	// ------------------ INTERNALS ------------------
 
-	private void addDepartureTime(final String actType, final double dptTime_s) {
-		Histogram histogram = this.actType2dptTimeHist.get(actType);
+	private void addDepartureTime(
+			final Map<String, Histogram> actType2dptTimeHist,
+			final String actType, final double dptTime_s) {
+		Histogram histogram = actType2dptTimeHist.get(actType);
 		if (histogram == null) {
 			histogram = Histogram.newHistogramWithUniformBins(
-					0, 3600, 24);
-//					this.travelTimeMatrices.getStartTime_s(),
-//					this.travelTimeMatrices.getBinSize_s(),
-//					this.travelTimeMatrices.getBinCnt());
-			this.actType2dptTimeHist.put(actType, histogram);
+					this.travelTimeMatrices.getStartTime_s(),
+					this.travelTimeMatrices.getBinSize_s(),
+					this.travelTimeMatrices.getBinCnt());
+			actType2dptTimeHist.put(actType, histogram);
 		}
 		histogram.add(dptTime_s);
+	}
+
+	private void addDepartureTimeTourStart(final String actType,
+			final double dptTime_s) {
+		this.addDepartureTime(this.actType2dptTimeHistTourStart, actType,
+				dptTime_s);
+	}
+
+	private void addDepartureTimeTourEnd(final String actType,
+			final double dptTime_s) {
+		this.addDepartureTime(this.actType2dptTimeHistTourEnd, actType,
+				dptTime_s);
 	}
 
 	private void extractHistograms(final Scenario scenario) {
@@ -87,11 +101,11 @@ public class TourTravelTimes {
 						final Activity currentAct = (Activity) planElement;
 						if (!HOME.equals(currentAct.getType())) {
 							// Prev. trip was from home to activity location.
-							this.addDepartureTime(currentAct.getType(),
-									prevDptTime_s);
+							this.addDepartureTimeTourStart(
+									currentAct.getType(), prevDptTime_s);
 						} else if (prevAct != null) {
 							// Prev. trip was from activity location to home.
-							this.addDepartureTime(prevAct.getType(),
+							this.addDepartureTimeTourEnd(prevAct.getType(),
 									prevDptTime_s);
 						}
 						prevAct = currentAct;
@@ -103,30 +117,75 @@ public class TourTravelTimes {
 	}
 
 	private void computeTourTravelTimes() {
-		for (String actType : this.actType2dptTimeHist.keySet()) {
+
+		for (String actType : this.actType2dptTimeHistTourStart.keySet()) {
+
+			/*
+			 * Identify the total share of trips contained in the analysis
+			 * period.
+			 */
+
+			double freqSumTourStart = 0.0;
+			double freqSumTourEnd = 0.0;
+			for (int ttMatrixBin = 0; ttMatrixBin < this.travelTimeMatrices
+					.getBinCnt(); ttMatrixBin++) {
+				freqSumTourStart += this.actType2dptTimeHistTourStart.get(
+						actType).freq(ttMatrixBin + 1);
+				freqSumTourEnd += this.actType2dptTimeHistTourEnd.get(actType)
+						.freq(ttMatrixBin + 1);
+			}
+			Logger.getLogger(this.getClass().getName()).info(
+					(freqSumTourStart * 100.0)
+							+ " percent of the population traveled to "
+							+ actType + " during the analyzed time window");
+			Logger.getLogger(this.getClass().getName()).info(
+					(freqSumTourEnd * 100.0)
+							+ " percent of the population traveled back from "
+							+ actType + " during the analyzed time window");
+
+			/*
+			 * Now compute the tour travel times as a weighted sum of trip
+			 * travel times.
+			 */
+
 			Logger.getLogger(this.getClass().getName()).info(
 					"Computing " + actType + " tour travel times.");
 			final Matrix tourTT_min = this.tourTTMatrices.createMatrix(
 					actType.toUpperCase(), "tour travel times [min]");
-			double freqSum = 0.0;
 			for (int ttMatrixBin = 0; ttMatrixBin < this.travelTimeMatrices
 					.getBinCnt(); ttMatrixBin++) {
-				final double freq = this.actType2dptTimeHist.get(actType).freq(
-						ttMatrixBin + 1);
+				// contribution of trips to the activity
 				add(tourTT_min,
 						this.travelTimeMatrices.ttMatrixList_min
-								.get(ttMatrixBin), freq);
-				freqSum += freq;
+								.get(ttMatrixBin),
+						this.actType2dptTimeHistTourStart.get(actType).freq(
+								ttMatrixBin + 1)
+								/ freqSumTourStart);
+				// contribution of trips back from the activity
+				add(tourTT_min,
+						this.travelTimeMatrices.ttMatrixList_min
+								.get(ttMatrixBin),
+						this.actType2dptTimeHistTourEnd.get(actType).freq(
+								ttMatrixBin + 1)
+								/ freqSumTourEnd);
 			}
+
+			/*
+			 * Dividing tour travel times by half, for compatibility with
+			 * Regent's way of processing that data.
+			 */
+
 			Logger.getLogger(this.getClass().getName()).info(
-					(freqSum * 100.0) + " percent of the population traveled "
-							+ "during the analyzed time window");
-			if (freqSum < 1e-3) {
-				Logger.getLogger(this.getClass().getName()).warning(
-						"less than one permill of the population traveled "
-								+ "during the analyzed time window");
-			}
-			mult(tourTT_min, 1.0 / freqSum);
+					"Dividing *tour* travel time matrix for " + actType
+							+ " by two in order to obtain "
+							+ "*trip* travel times, as required by Regent.");
+			MatrixUtils.mult(tourTT_min, 0.5);
+
+			/*
+			 * Finally, round this down to two digits in order to obtain
+			 * somewhat manageable file sizes.
+			 */
+
 			round(tourTT_min, 2);
 		}
 	}
@@ -143,7 +202,7 @@ public class TourTravelTimes {
 			final PrintWriter writer = new PrintWriter(histogramFileName);
 			writer.println("Departure time histograms per activity type.");
 			writer.println();
-			for (Map.Entry<String, Histogram> act2histEntry : this.actType2dptTimeHist
+			for (Map.Entry<String, Histogram> act2histEntry : this.actType2dptTimeHistTourStart
 					.entrySet()) {
 				writer.println(act2histEntry.getKey());
 				writer.println();
@@ -166,34 +225,26 @@ public class TourTravelTimes {
 
 		System.out.println("STARTED ...");
 
-		/*
-		 * FIRST CREATE TRAVEL TIME MATRICES
-		 */
-
-		/*
-		 * TODO:
-		 */
-
-		final String configFileName = "./input/matsim-config.xml";
-		final Config config = ConfigUtils.loadConfig(configFileName);
-		config.getModule("plans").addParam("inputPlansFile",
-				"matsim-output/ITERS/it.100/100.plans.xml.gz");
-
-		final Scenario scenario = ScenarioUtils.loadScenario(config);
-
-		final String zonesShapeFileName = "./input/sverige_TZ_EPSG3857.shp";
-		final ZonalSystem zonalSystem = new ZonalSystem(zonesShapeFileName,
-				StockholmTransformationFactory.WGS84_EPSG3857);
-		zonalSystem.addNetwork(scenario.getNetwork(),
-				StockholmTransformationFactory.WGS84_SWEREF99);
+		// final String configFileName = "./input/matsim-config.xml";
+		// final Config config = ConfigUtils.loadConfig(configFileName);
+		// config.getModule("plans").addParam("inputPlansFile",
+		// "matsim-output/ITERS/it.100/100.plans.xml.gz");
+		//
+		// final Scenario scenario = ScenarioUtils.loadScenario(config);
+		//
+		// final String zonesShapeFileName = "./input/sverige_TZ_EPSG3857.shp";
+		// final ZonalSystem zonalSystem = new ZonalSystem(zonesShapeFileName,
+		// StockholmTransformationFactory.WGS84_EPSG3857);
+		// zonalSystem.addNetwork(scenario.getNetwork(),
+		// StockholmTransformationFactory.WGS84_SWEREF99);
 
 		// final String eventsFileName =
 		// "./matsim-output/ITERS/it.0/0.events.xml.gz";
-//		final String regentMatrixFileName = "./exchange/regent-tts.xml";
-//
-//		final int startTime_s = 0;
-//		final int binSize_s = 3600;
-//		final int binCnt = 24;
+		// final String regentMatrixFileName = "./exchange/regent-tts.xml";
+		//
+		// final int startTime_s = 0;
+		// final int binSize_s = 3600;
+		// final int binCnt = 24;
 		// final int sampleCnt = 2;
 
 		// final int ttCalcTimeBinSize = 15 * 60;
@@ -215,23 +266,22 @@ public class TourTravelTimes {
 
 		// load matrices from file!
 
-		// final TravelTimeMatrices travelTimeMatrices = new TravelTimeMatrices(
-		// scenario.getNetwork(), linkTTs, null, zonalSystem,
-		// new Random(), startTime_s, binSize_s, binCnt, sampleCnt);
+		final String configFileName = "./input/matsim-config.xml";
+		final Config config = ConfigUtils.loadConfig(configFileName);
+		final Scenario scenario = ScenarioUtils.loadScenario(config);
 
-		// final Matrices ttMatrices = new Matrices();
-		// final MatsimMatricesReader matricesReader = new MatsimMatricesReader(
-		// ttMatrices, null);
-		// matricesReader
-		// .readFile("./../10percentCarNetworkPlain/travelTimeMatrices.xml");
-		// final TravelTimeMatrices travelTimeMatrices = new TravelTimeMatrices(
-		// ttMatrices, startTime_s, binSize_s);
-		final TravelTimeMatrices travelTimeMatrices = null;
+		final Matrices ttMatrices = new Matrices();
+		final MatsimMatricesReader matricesReader = new MatsimMatricesReader(
+				ttMatrices, null);
+		matricesReader.readFile("./traveltimes.xml");
+
+		final TravelTimeMatrices travelTimeMatrices = new TravelTimeMatrices(
+				ttMatrices, 6 * 3600, 3600);
 
 		final TourTravelTimes tsa = new TourTravelTimes(scenario,
 				travelTimeMatrices);
-		tsa.writeHistogramsToFile("departureTimeHistograms.txt");
-		// tsa.writeTourTravelTimesToFile("./../10percentCarNetworkPlain/tourTravelTimeMatrices.xml");
+		tsa.writeTourTravelTimesToFile("./tourtts.xml");
+		tsa.writeHistogramsToFile("./departuretime-hist.txt");
 
 		System.out.println("... DONE");
 	}

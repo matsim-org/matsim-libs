@@ -40,6 +40,7 @@ import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisut
 import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripAnalysisMain;
 import playground.ikaddoura.analysis.vtts.VTTSHandler;
 import playground.ikaddoura.analysis.vtts.VTTScomputation;
+import playground.ikaddoura.analysis.welfare.WelfareAnalysisControlerListener;
 import playground.ikaddoura.router.VTTSCongestionTollTimeDistanceTravelDisutilityFactory;
 import playground.ikaddoura.router.VTTSTimeDistanceTravelDisutilityFactory;
 import playground.vsp.congestion.controler.AdvancedMarginalCongestionPricingContolerListener;
@@ -223,6 +224,8 @@ public class CongestionPricingControler {
 			}
 
 		}
+		
+		controler.addControlerListener(new WelfareAnalysisControlerListener(controler.getScenario()));
 		
 		controler.addOverridingModule(new OTFVisModule());
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);

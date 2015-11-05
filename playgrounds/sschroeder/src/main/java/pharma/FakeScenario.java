@@ -1,21 +1,19 @@
 package pharma;
 
-import jsprit.core.algorithm.VehicleRoutingAlgorithm;
-import jsprit.core.algorithm.box.SchrimpfFactory;
-import jsprit.core.problem.VehicleRoutingProblem;
-import jsprit.core.problem.solution.VehicleRoutingProblemSolution;
-import jsprit.core.util.Solutions;
+//import jsprit.core.algorithm.box.SchrimpfFactory;
+//import jsprit.core.problem.VehicleRoutingProblem;
+//import jsprit.core.problem.solution.VehicleRoutingProblemSolution;
+//import jsprit.core.util.Solutions;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+
 import org.matsim.contrib.freight.carrier.*;
-import org.matsim.contrib.freight.jsprit.MatsimJspritFactory;
-import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
-import org.matsim.contrib.freight.jsprit.NetworkRouter;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkReaderMatsimV1;
+
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.*;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
@@ -75,7 +73,7 @@ public class FakeScenario {
 
         createPlans(carriers,scenario.getNetwork());
 
-        new CarrierPlanXmlWriterV2(carriers).write("output/carriers.xml");
+        new CarrierPlanXmlWriterV2(carriers).write("in/carriers.xml");
         new FacilitiesWriter(customers).write("out/customers.xml");
 
 //        carrier.
@@ -89,18 +87,22 @@ public class FakeScenario {
     }
 
     private static CarrierPlan createPlan(Carrier c, Network network) {
-        VehicleRoutingProblem.Builder vrpBuilder = MatsimJspritFactory.createRoutingProblemBuilder(c, network);
-        NetworkBasedTransportCosts.Builder tpcostsBuilder = NetworkBasedTransportCosts.Builder.newInstance(network, c.getCarrierCapabilities().getVehicleTypes());
-        NetworkBasedTransportCosts netbasedTransportcosts = tpcostsBuilder.build();
-        vrpBuilder.setRoutingCost(netbasedTransportcosts);
-        VehicleRoutingProblem vrp = vrpBuilder.build();
-
-        VehicleRoutingAlgorithm vra = new SchrimpfFactory().createAlgorithm(vrp);
-        VehicleRoutingProblemSolution solution = Solutions.bestOf(vra.searchSolutions());
-
-        CarrierPlan plan = MatsimJspritFactory.createPlan(c, solution);
-        NetworkRouter.routePlan(plan, netbasedTransportcosts);
-        return plan;
+//        VehicleRoutingProblem.Builder vrpBuilder = MatsimJspritFactory.createRoutingProblemBuilder(c, network);
+//        NetworkBasedTransportCosts.Builder tpCostsBuilder = NetworkBasedTransportCosts.Builder.newInstance(network, c.getCarrierCapabilities().getVehicleTypes());
+//
+//        NetworkBasedTransportCosts netbasedTransportcosts = tpCostsBuilder.build();
+//        vrpBuilder.setRoutingCost(netbasedTransportcosts);
+//        VehicleRoutingProblem vrp = vrpBuilder.build();
+//
+//        VehicleRoutingAlgorithm vra = new SchrimpfFactory().createAlgorithm(vrp);
+//        VehicleRoutingProblemSolution solution = Solutions.bestOf(vra.searchSolutions());
+//
+//        new Plotter(vrp,solution).plot("out/exampleSolution.png","pharma");
+//
+//        CarrierPlan plan = MatsimJspritFactory.createPlan(c, solution);
+//        NetworkRouter.routePlan(plan, netbasedTransportcosts);
+//        return plan;
+        return null;
     }
 
     private static ActivityFacility drawFacility(TreeMap<Id<ActivityFacility>, ActivityFacility> pickups, Random random) {
@@ -118,11 +120,12 @@ public class FakeScenario {
     }
 
     private static CarrierVehicleType createType() {
-        CarrierVehicleType.Builder typeBuilder = CarrierVehicleType.Builder.newInstance(Id.create("small", VehicleType.class));
-        typeBuilder.setCapacity(20);
+        CarrierVehicleType.Builder typeBuilder = CarrierVehicleType.Builder.newInstance(Id.create("light", VehicleType.class));
+        typeBuilder.setCapacity(5);
         typeBuilder.setFixCost(80.0);
         typeBuilder.setCostPerDistanceUnit(0.00047);
         typeBuilder.setCostPerTimeUnit(0.008);
+        typeBuilder.setMaxVelocity(5.5);
         return typeBuilder.build();
     }
 }

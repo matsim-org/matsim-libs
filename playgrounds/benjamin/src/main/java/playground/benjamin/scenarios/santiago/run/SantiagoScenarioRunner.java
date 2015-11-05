@@ -19,16 +19,26 @@
 
 package playground.benjamin.scenarios.santiago.run;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.replanning.DefaultPlanStrategiesModule;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl.Builder;
@@ -38,7 +48,6 @@ import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.benjamin.scenarios.santiago.SantiagoScenarioConstants;
-
 
 public class SantiagoScenarioRunner {
 
@@ -59,11 +68,10 @@ public class SantiagoScenarioRunner {
 //		
 //		OTFVis.playMVI(outputPath + "visualisation.mvi");
 		
-		Config config = ConfigUtils.createConfig();
-		ConfigUtils.loadConfig(config, inputPath + "config_final.xml");
+		Config config = ConfigUtils.loadConfig(inputPath + "config_final.xml");
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		Controler controler = new Controler(scenario);
 		
 		// adding ride and taxi as network modes requires some router; here, the same values as for car are used
@@ -79,7 +87,37 @@ public class SantiagoScenarioRunner {
 		if(doModeChoice){
 			setModeChoiceForSubpopulations(controler);
 		}
+		
+		// mapping agents' activities to links on the road network to avoid being stuck on the transit network
+		mapActivities2properLinks(scenario);
+		
 		controler.run();
+	}
+
+	private static void mapActivities2properLinks(Scenario scenario) {
+		TransportModeNetworkFilter filter = new TransportModeNetworkFilter(scenario.getNetwork());
+		Set<String> modes = new HashSet<String>();
+		modes.add(TransportMode.car);
+		Network subNetwork = NetworkUtils.createNetwork();
+		filter.filter(subNetwork, modes);
+		
+		for(Person person : scenario.getPopulation().getPersons().values()){
+			for (Plan plan : person.getPlans()) {
+				for (PlanElement planElement : plan.getPlanElements()) {
+					if (planElement instanceof ActivityImpl) {
+						ActivityImpl act = (ActivityImpl) planElement;
+						Id<Link> linkId = act.getLinkId();
+						if(!(linkId == null)){
+							throw new RuntimeException("Link Id " + linkId + " already defined for this activity. Aborting... ");
+						} else {
+							//TODO: this could be extended so that activities do not take place on urban highways or so...
+							linkId = NetworkUtils.getNearestLink(subNetwork, act.getCoord()).getId();
+							act.setLinkId(linkId);
+						}
+					}
+				}
+			}
+		}
 	}
 
 	private static void setNetworkModeRouting(Controler controler) {
@@ -109,7 +147,6 @@ public class SantiagoScenarioRunner {
 
 	private static void setChangeExp(String subpopName, Controler controler) {
 		StrategySettings changeExpSettings = new StrategySettings();
-		// TODO: why can the name be identical?
 		changeExpSettings.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta.toString());
 		changeExpSettings.setSubpopulation(subpopName);
 		changeExpSettings.setWeight(0.7);
@@ -118,12 +155,10 @@ public class SantiagoScenarioRunner {
 
 	private static void setReroute(String subpopName, Controler controler) {
 		StrategySettings reRouteSettings = new StrategySettings();
-		// TODO: why can the name be identical?
 		reRouteSettings.setStrategyName(DefaultPlanStrategiesModule.DefaultStrategy.ReRoute.toString());
 		reRouteSettings.setSubpopulation(subpopName);
 		reRouteSettings.setWeight(0.15);
 		controler.getConfig().strategy().addStrategySettings(reRouteSettings);
-		
 	}
 
 	private static void setModeChoiceForSubpopulations(final Controler controler) {

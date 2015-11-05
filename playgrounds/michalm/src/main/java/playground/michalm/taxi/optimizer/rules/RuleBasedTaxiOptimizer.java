@@ -28,14 +28,15 @@ import playground.michalm.taxi.optimizer.*;
 import playground.michalm.taxi.optimizer.filter.*;
 import playground.michalm.taxi.schedule.TaxiTask;
 import playground.michalm.taxi.schedule.TaxiTask.TaxiTaskType;
-import playground.michalm.taxi.vehreqpath.*;
 
 
 public class RuleBasedTaxiOptimizer
     extends AbstractTaxiOptimizer
 {
+    protected final BestDispatchFinder dispatchFinder;
     private final VehicleFilter vehicleFilter;
     private final RequestFilter requestFilter;
+
     private Set<Vehicle> idleVehicles;
 
 
@@ -47,8 +48,10 @@ public class RuleBasedTaxiOptimizer
             throw new RuntimeException("Diversion is not supported by RuleBasedTaxiOptimizer");
         }
 
-        this.vehicleFilter = optimConfig.filterFactory.createVehicleFilter();
-        this.requestFilter = optimConfig.filterFactory.createRequestFilter();
+        dispatchFinder = new BestDispatchFinder(optimConfig);
+
+        vehicleFilter = optimConfig.filterFactory.createVehicleFilter();
+        requestFilter = optimConfig.filterFactory.createRequestFilter();
     }
 
 
@@ -107,11 +110,11 @@ public class RuleBasedTaxiOptimizer
 
             Iterable<Vehicle> filteredVehs = vehicleFilter.filterVehiclesForRequest(idleVehicles,
                     req);
-            VehicleRequestPath best = optimConfig.vrpFinder.findBestVehicleForRequest(req,
-                    filteredVehs, VehicleRequestPaths.TW_COST);
+            BestDispatchFinder.Dispatch best = dispatchFinder
+                    .findBestVehicleForRequest(req, filteredVehs);
 
             if (best != null) {
-                optimConfig.scheduler.scheduleRequest(best);
+                optimConfig.scheduler.scheduleRequest(best.vehicle, best.request, best.path);
                 reqIter.remove();
                 idleVehicles.remove(best.vehicle);
             }
@@ -128,11 +131,11 @@ public class RuleBasedTaxiOptimizer
 
             Iterable<TaxiRequest> filteredReqs = requestFilter
                     .filterRequestsForVehicle(unplannedRequests, veh);
-            VehicleRequestPath best = optimConfig.vrpFinder.findBestRequestForVehicle(veh,
-                    filteredReqs, VehicleRequestPaths.TP_COST);
+            BestDispatchFinder.Dispatch best = dispatchFinder
+                    .findBestRequestForVehicle(veh, filteredReqs);
 
             if (best != null) {
-                optimConfig.scheduler.scheduleRequest(best);
+                optimConfig.scheduler.scheduleRequest(best.vehicle, best.request, best.path);
                 unplannedRequests.remove(best.request);
             }
         }

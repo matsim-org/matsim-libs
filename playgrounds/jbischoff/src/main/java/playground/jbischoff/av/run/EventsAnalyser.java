@@ -19,7 +19,9 @@
 
 package playground.jbischoff.av.run;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
@@ -42,9 +44,15 @@ public class EventsAnalyser {
 		EventsManager events = EventsUtils.createEventsManager();
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario).readFile(pre+"networkc.xml.gz");
+		
 		TravelDistanceTimeEvaluator tdtc = new TravelDistanceTimeEvaluator(scenario.getNetwork(), 24*3600);
 		TaxiCustomerWaitTimeAnalyser twc = new TaxiCustomerWaitTimeAnalyser(scenario, Double.MAX_VALUE);
 		events.addHandler(twc);
+		for (int i = 0; i<25000;i++){
+			String v = "rt"+i;
+			Id<Vehicle> m = Id.create(v,Vehicle.class);
+			tdtc.addAgent(m);
+		}
 		events.addHandler(tdtc);
 		MatsimEventsReader reader = new MatsimEventsReader(events);
 		reader.readFile(inputFile);
