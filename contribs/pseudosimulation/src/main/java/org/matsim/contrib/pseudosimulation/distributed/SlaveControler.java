@@ -4,6 +4,7 @@ import org.apache.commons.cli.*;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -33,8 +34,8 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.mobsim.DefaultMobsimModule;
 import org.matsim.core.replanning.StrategyManagerModule;
 import org.matsim.core.router.TripRouterModule;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility.Builder;
 import org.matsim.core.router.costcalculators.TravelDisutilityModule;
-import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioElementsModule;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -231,8 +232,8 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
                 if (IntelligentRouters)
                     install(new TravelDisutilityModule());
                 else{
-                    final TravelTimeAndDistanceBasedTravelDisutilityFactory disutilityFactory =
-                            new TravelTimeAndDistanceBasedTravelDisutilityFactory();
+                    final Builder disutilityFactory =
+                            new Builder( TransportMode.car );
                     matsimControler.addOverridingModule(new AbstractModule() {
                         @Override
                         public void install() {
@@ -271,8 +272,8 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
                 }
             });
         } else {
-                    final TravelTimeAndDistanceBasedTravelDisutilityFactory disutilityFactory =
-                            new TravelTimeAndDistanceBasedTravelDisutilityFactory();
+            final Builder disutilityFactory =
+                    new Builder( TransportMode.car );
             matsimControler.addOverridingModule(new AbstractModule() {
                 @Override
                 public void install() {

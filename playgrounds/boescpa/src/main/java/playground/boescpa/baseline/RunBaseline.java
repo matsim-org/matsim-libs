@@ -3,6 +3,7 @@ package playground.boescpa.baseline;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceInitializer;
 import org.matsim.core.config.Config;
@@ -17,6 +18,7 @@ import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
 import org.matsim.pt.PtConstants;
+import playground.ivt.kticompatibility.KtiLikeScoringConfigGroup;
 import playground.ivt.matsim2030.scoring.MATSim2010ScoringFunctionFactory;
 
 import java.io.File;
@@ -43,9 +45,9 @@ public class RunBaseline {
         Logger.getLogger( org.matsim.core.router.MultiNodeDijkstra.class ).setLevel( Level.ERROR ); // this is location choice
         Logger.getLogger( org.matsim.pt.router.MultiNodeDijkstra.class ).setLevel( Level.ERROR );
 
-        // Make sure the config contains the config groups KtiLikeScoringConfigGroup() and DestinationChoiceConfigGroup().
-        // If in doubt use the config created by playground/boescpa/baseline/ConfigCreator.java.
-        final Config config = ConfigUtils.loadConfig(configFile);
+        // It is suggested to use the config created by playground/boescpa/baseline/ConfigCreator.java.
+        final Config config = ConfigUtils.loadConfig(configFile,
+                new KtiLikeScoringConfigGroup(), new DestinationChoiceConfigGroup());
 
         // This is currently needed for location choice: initializing
         // the location choice writes K-values files to the output directory, which:

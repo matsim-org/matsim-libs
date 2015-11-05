@@ -149,8 +149,8 @@ public class DestinationChoiceConfigGroup extends ConfigGroup {
 		map.put(USE_INDIVIDUAL_SCORING_PARAMETERS, "MATSim supports individual scoring parameters for sub-populations or even single agents. "
 				+ "If you use global parameters, this can be set to 'false' (default is 'true').");
 		map.put(RE_USE_TEMPORARY_PLANS, "Default is 'false'. During the location choice process, many potential locations are evaluated. "
-				+ "For each of them, a copy of the person's current plan is created, which results in a huge workload for the workload for "
-				+ "the garbage collector as well as the memory bus. When this option is set to 'true', only one copy of the plan is created "
+				+ "For each of them, a copy of the person's current plan is created, which results in a huge workload for the "
+				+ "garbage collector as well as the memory bus. When this option is set to 'true', only one copy of the plan is created "
 				+ "and re-used for each checked location. Note that this is still experimental! cdobler oct'15");
 		
 		return map;

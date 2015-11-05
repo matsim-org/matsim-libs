@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,       *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,25 +16,14 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.johannes.gsv.popsim.analysis;
 
-package playground.johannes.gsv.popsim;
-
-import playground.johannes.synpop.data.CommonKeys;
-import playground.johannes.synpop.data.Segment;
+import playground.johannes.synpop.data.Attributable;
 
 /**
- * @author johannes
+ * @author jillenberger
  */
-public class ModePredicate implements Predicate<Segment> {
+public interface ValueProvider<T, A extends Attributable> {
 
-    private final String mode;
-
-    public ModePredicate(String mode) {
-        this.mode = mode;
-    }
-
-    @Override
-    public boolean test(Segment segment) {
-        return mode.equalsIgnoreCase(segment.getAttribute(CommonKeys.LEG_MODE));
-    }
+    T get(A attributable);
 }

@@ -52,7 +52,7 @@ public class SingleActLocationMutator extends LocationMutator {
 	protected int unsuccessfullLC = 0;
 	private final ActivitiesHandler defineFlexibleActivities;
 
-	public SingleActLocationMutator(final Scenario scenario, TreeMap<String, QuadTree<ActivityFacility>> quad_trees, 
+	public SingleActLocationMutator(final Scenario scenario, TreeMap<String, ? extends QuadTree<ActivityFacility>> quad_trees, 
 			TreeMap<String, ActivityFacilityImpl []> facilities_of_type,
 			Random random) {
 

@@ -1,4 +1,4 @@
-package playground.dhosse.gap.scenario.population;
+package playground.dhosse.gap.scenario.population.utils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -32,16 +32,13 @@ public class LegModeCreator {
 
 		Map<String, Double> modeShares = getModeShare(age, sex);
 		
-		distance *= 1.3;
 		
 		Map<String, Double> weightsMap = new TreeMap<>();
 		double accumulatedWeight = 0.;
 		
 		double pBike = Math.exp(-distance/meanDistanceBike)/meanDistanceBike;
-//		if(distance <= DemandCreator.getNinetyPctDistances().get(TransportMode.bike)){
-			weightsMap.put(TransportMode.bike, pBike * modeShares.get(TransportMode.bike));
-			accumulatedWeight += pBike * modeShares.get(TransportMode.bike);
-//		}
+		weightsMap.put(TransportMode.bike, pBike * modeShares.get(TransportMode.bike));
+		accumulatedWeight += pBike * modeShares.get(TransportMode.bike);
 		
 		if(carAvail){
 			if(hasLicense){
@@ -60,10 +57,8 @@ public class LegModeCreator {
 		accumulatedWeight += pPt * modeShares.get(TransportMode.pt);
 		
 		double pWalk = Math.exp(-distance/meanDistanceWalk)/meanDistanceWalk;
-//		if(distance <= DemandCreator.getNinetyPctDistances().get(TransportMode.walk)){
-			weightsMap.put(TransportMode.walk, pWalk * modeShares.get(TransportMode.walk));
-			accumulatedWeight += pWalk * modeShares.get(TransportMode.walk);
-//		}
+		weightsMap.put(TransportMode.walk, pWalk * modeShares.get(TransportMode.walk));
+		accumulatedWeight += pWalk * modeShares.get(TransportMode.walk);
 		
 		double random = Global.random.nextDouble() * accumulatedWeight;
 		

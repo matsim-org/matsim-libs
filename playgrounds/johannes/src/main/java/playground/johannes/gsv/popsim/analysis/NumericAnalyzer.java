@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DefaultTravelCostCalculatorFactoryImpl
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,       *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,29 +16,34 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.core.router.costcalculators;
+package playground.johannes.gsv.popsim.analysis;
 
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
+import playground.johannes.gsv.popsim.CollectionUtils;
+import playground.johannes.synpop.data.Person;
 
+import java.util.Collection;
+import java.util.List;
 
 /**
- * @author dgrether
- *
+ * @author jillenberger
  */
-public final class TravelTimeAndDistanceBasedTravelDisutilityFactory implements TravelDisutilityFactory {
+public class NumericAnalyzer extends AbstractAnalyzerTask<Collection<? extends Person>> {
 
-	private double sigma = 0. ;
+    private Collector<Double> collector;
 
-	@Override
-	public final TravelDisutility createTravelDisutility(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
-		return new RandomizingTimeDistanceTravelDisutility(timeCalculator, cnScoringGroup, this.sigma);
-	}
-	
-	public final TravelTimeAndDistanceBasedTravelDisutilityFactory setSigma( double val ) {
-		this.sigma = val ;
-		return this ;
-	}
+    private String dimension;
 
+    public NumericAnalyzer(Collector<Double> collector, String dimension) {
+        this.collector = collector;
+        this.dimension = dimension;
+    }
+
+    @Override
+    public void analyze(Collection<? extends Person> persons, List<StatsContainer> containers) {
+        List<Double> values = collector.collect(persons);
+        double[] doubleValues = CollectionUtils.toNativeArray(values);
+
+        containers.add(new StatsContainer(dimension, doubleValues));
+        writeHistograms(doubleValues, dimension);
+    }
 }

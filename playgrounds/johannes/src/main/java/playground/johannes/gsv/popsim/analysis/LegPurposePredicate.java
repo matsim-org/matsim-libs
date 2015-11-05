@@ -17,41 +17,23 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.popsim;
+package playground.johannes.gsv.popsim.analysis;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.facilities.ActivityFacilities;
-import org.matsim.facilities.ActivityFacility;
-import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.Segment;
 
 /**
  * @author johannes
  */
-public class LegBeelineDistance extends LegCollector {
+public class LegPurposePredicate implements Predicate<Segment> {
 
-    private final ActivityFacilities facilities;
+    private final Predicate<Segment> actTypePredicate;
 
-    public LegBeelineDistance(ActivityFacilities facilities) {
-        this.facilities = facilities;
+    public LegPurposePredicate(Predicate<Segment> actTypePredicate) {
+        this.actTypePredicate = actTypePredicate;
     }
 
     @Override
-    protected Double value(Segment leg) {
-        Segment prev = leg.previous();
-        Segment next = leg.next();
-
-        String prevFacId = prev.getAttribute(CommonKeys.ACTIVITY_FACILITY);
-        String nextFacId = next.getAttribute(CommonKeys.ACTIVITY_FACILITY);
-
-        ActivityFacility prevFac = facilities.getFacilities().get(Id.create(prevFacId, ActivityFacility.class));
-        ActivityFacility nextFac = facilities.getFacilities().get(Id.create(nextFacId, ActivityFacility.class));
-
-        if(prevFac != null && nextFac != null) {
-            double dx = prevFac.getCoord().getX() - nextFac.getCoord().getX();
-            double dy = prevFac.getCoord().getY() - nextFac.getCoord().getY();
-
-            return Math.sqrt(dx * dx + dy *dy);
-        } else return null;
+    public boolean test(Segment segment) {
+        return actTypePredicate.test(segment.next());
     }
 }

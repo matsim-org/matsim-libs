@@ -61,7 +61,7 @@ public class ParkCSVehicles implements AgentSource {
 		for (FreeFloatingStation ffstation: ffvehiclesLocationqt.getQuadTree().values()) {
 			
 			for (String id:ffstation.getIDs()) {
-				log.info("Parked freefloating car with id: " + id);
+				//log.info("Parked freefloating car with id: " + id);
 
 				qsim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(Id.create("FF_"+(id), Vehicle.class), modeVehicleTypes.get("freefloating")), ffstation.getLink().getId());
 				counterFF++;

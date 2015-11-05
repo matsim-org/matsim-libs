@@ -38,7 +38,7 @@ public class CreateRoadpricingScheme {
 		
 		double amountPerMeter = 0.000038;
 		
-		Collection<SimpleFeature> features = ShapeFileReader.getAllFeatures("/home/danielhosse/Downloads/austria/AUT_adm/AUT_adm0.shp");
+		Collection<SimpleFeature> features = ShapeFileReader.getAllFeatures("/home/dhosse/Downloads/austria/AUT_adm/AUT_adm0.shp");
 		Geometry boundary = null;
 		
 		for(SimpleFeature feature : features){
@@ -60,7 +60,7 @@ public class CreateRoadpricingScheme {
 			
 		}
 		
-		new RoadPricingWriterXMLv1(rsp).writeFile("/home/danielhosse/roadpricing.xml");
+		new RoadPricingWriterXMLv1(rsp).writeFile("/home/dhosse/roadpricing.xml");
 		
 	}
 	

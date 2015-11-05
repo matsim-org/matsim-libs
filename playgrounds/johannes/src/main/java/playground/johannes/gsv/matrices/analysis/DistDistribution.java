@@ -49,7 +49,7 @@ public class DistDistribution {
 	public static void main(String[] args) throws IOException {
 		KeyMatrixXMLReader reader = new KeyMatrixXMLReader();
 		reader.setValidating(false);
-		reader.parse("/home/johannes/gsv/miv-matrix/refmatrices/bmbv2010.xml");
+		reader.parse("/home/johannes/gsv/miv-matrix/refmatrices/tomtom.de.xml");
 		KeyMatrix m = reader.getMatrix();
 
 		ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON("/home/johannes/gsv/gis/nuts/ger/geojson/psmobility.geojson", "NO");
@@ -77,7 +77,7 @@ public class DistDistribution {
 
 		TDoubleDoubleHashMap hist = Histogram.createHistogram(stats, new LinearDiscretizer(50000), true);
 		Histogram.normalize(hist);
-		StatsWriter.writeHistogram(hist, "d", "p", "/home/johannes/gsv/matrix2014/mid-fusion/bmbv.dist.txt");
+		StatsWriter.writeHistogram(hist, "d", "p", "/home/johannes/gsv/matrix2014/mid-fusion/tomtom.dist.txt");
 	}
 
 }

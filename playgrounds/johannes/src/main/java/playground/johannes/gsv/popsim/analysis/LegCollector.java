@@ -17,12 +17,49 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.popsim;
+package playground.johannes.gsv.popsim.analysis;
+
+import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.data.Person;
+import playground.johannes.synpop.data.Segment;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * @author johannes
  */
-public interface Predicate<T> {
+public class LegCollector<T> implements Collector<T> {
 
-    boolean test(T t);
+    private Predicate<Segment> predicate;
+
+    private ValueProvider<T, Segment> provider;
+
+    public LegCollector(ValueProvider<T, Segment> provider) {
+        this.provider = provider;
+    }
+
+    @Override
+    public List<T> collect(Collection<? extends Person> persons) {
+        ArrayList<T> values = new ArrayList<>(persons.size() * 10);
+
+        for (Person p : persons) {
+            for (Episode e : p.getEpisodes()) {
+                for (Segment leg : e.getLegs()) {
+                    if (predicate == null || predicate.test(leg)) {
+                        values.add(provider.get(leg));
+                    }
+                }
+            }
+        }
+
+        values.trimToSize();
+
+        return values;
+    }
+
+    public void setPredicate(Predicate<Segment> predicate) {
+        this.predicate = predicate;
+    }
 }

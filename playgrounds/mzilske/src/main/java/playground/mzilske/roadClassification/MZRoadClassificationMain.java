@@ -28,7 +28,7 @@ public class MZRoadClassificationMain {
         config.controler().setWritePlansInterval(0);
         config.controler().setDumpDataAtEnd(false);
         config.network().setInputFile(BERLIN_PATH + "counts/iv_counts/network.xml.gz");
-        config.controler().setOutputDirectory("output/road-classification/run");
+        config.controler().setOutputDirectory("output/road-classification-new/run");
         config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
         config.qsim().setRemoveStuckVehicles(false);
         config.planCalcScore().setWriteExperiencedPlans(true);

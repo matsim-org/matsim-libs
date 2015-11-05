@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,       *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,32 +16,50 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.gsv.popsim.analysis;
 
-import playground.johannes.gsv.popsim.Predicate;
-import playground.johannes.gsv.popsim.Predicates;
+package playground.johannes.gsv.popsim;
+
+import playground.johannes.coopsim.mental.choice.ChoiceSet;
+import playground.johannes.gsv.zones.KeyMatrix;
+import playground.johannes.synpop.data.CommonKeys;
+import playground.johannes.synpop.data.Episode;
 import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.data.Segment;
+import playground.johannes.synpop.processing.PersonTask;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
 /**
- * @author jillenberger
+ * @author johannes
  */
-public class LegAttributeAnalyzer extends AbstractAnalyzerTask<Collection<? extends Person>> {
+public class InputeDaysTask implements PersonTask {
 
-    private final String attKey;
+    private Map<String, ChoiceSet<String>> map;
 
-    public LegAttributeAnalyzer(String attKey) {
-        this.attKey = attKey;
+
+    public InputeDaysTask(Collection<? extends Person> persons) {
+        KeyMatrix matrix = new KeyMatrix();
+
+        for(Person person : persons) {
+            String day = person.getAttribute(CommonKeys.DAY);
+            if(day != null) {
+                for(Episode episode : person.getEpisodes()) {
+                    for(Segment leg : episode.getLegs()) {
+                        String purpose = leg.getAttribute(CommonKeys.LEG_PURPOSE);
+                        if(purpose != null) {
+                            matrix.add(day, purpose, 1.0);
+                        }
+                    }
+                }
+            }
+        }
+
+
     }
 
     @Override
-    public void analyze(Collection<? extends Person> persons, List<StatsContainer> containers) {
-        Map<String, Predicate<Segment>> predicates = Predicates.legPredicates(persons);
-
+    public void apply(Person person) {
 
     }
 }

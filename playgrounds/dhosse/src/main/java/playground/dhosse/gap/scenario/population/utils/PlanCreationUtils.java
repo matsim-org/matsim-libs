@@ -1,4 +1,4 @@
-package playground.dhosse.gap.scenario.population;
+package playground.dhosse.gap.scenario.population.utils;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.TransportMode;

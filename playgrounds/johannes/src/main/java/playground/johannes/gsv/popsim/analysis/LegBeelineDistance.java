@@ -17,17 +17,41 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.popsim;
+package playground.johannes.gsv.popsim.analysis;
 
-import playground.johannes.synpop.data.Person;
-
-import java.util.Collection;
-import java.util.List;
+import org.matsim.api.core.v01.Id;
+import org.matsim.facilities.ActivityFacilities;
+import org.matsim.facilities.ActivityFacility;
+import playground.johannes.synpop.data.CommonKeys;
+import playground.johannes.synpop.data.Segment;
 
 /**
  * @author johannes
  */
-public interface Collector {
+public class LegBeelineDistance implements ValueProvider<Double, Segment> {
 
-    List<Double> collect(Collection<? extends Person> persons);
+    private final ActivityFacilities facilities;
+
+    public LegBeelineDistance(ActivityFacilities facilities) {
+        this.facilities = facilities;
+    }
+
+    @Override
+    public Double get(Segment leg) {
+        Segment prev = leg.previous();
+        Segment next = leg.next();
+
+        String prevFacId = prev.getAttribute(CommonKeys.ACTIVITY_FACILITY);
+        String nextFacId = next.getAttribute(CommonKeys.ACTIVITY_FACILITY);
+
+        ActivityFacility prevFac = facilities.getFacilities().get(Id.create(prevFacId, ActivityFacility.class));
+        ActivityFacility nextFac = facilities.getFacilities().get(Id.create(nextFacId, ActivityFacility.class));
+
+        if(prevFac != null && nextFac != null) {
+            double dx = prevFac.getCoord().getX() - nextFac.getCoord().getX();
+            double dy = prevFac.getCoord().getY() - nextFac.getCoord().getY();
+
+            return Math.sqrt(dx * dx + dy *dy);
+        } else return null;
+    }
 }

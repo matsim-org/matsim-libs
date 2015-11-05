@@ -27,14 +27,15 @@ package playground.ikaddoura;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.otfvis.OTFVisModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
 import org.matsim.core.scenario.MutableScenario;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility.Builder;
 
 import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripAnalysisMain;
 import playground.ikaddoura.analysis.vtts.VTTSHandler;
@@ -128,7 +129,7 @@ public class CongestionPricingControler {
 
 			if (router.equals("standard")) {
 
-				final TravelTimeAndDistanceBasedTravelDisutilityFactory factory = new TravelTimeAndDistanceBasedTravelDisutilityFactory();
+				final Builder factory = new Builder( TransportMode.car );
 				factory.setSigma(sigma);
 				controler.addOverridingModule(new AbstractModule(){
 					@Override
@@ -161,8 +162,8 @@ public class CongestionPricingControler {
 			final VTTSHandler vttsHandler = new VTTSHandler(controler.getScenario());
 			
 			if (router.equals("standard")) {
-				
-				final CongestionTollTimeDistanceTravelDisutilityFactory factory = new CongestionTollTimeDistanceTravelDisutilityFactory(new TravelTimeAndDistanceBasedTravelDisutilityFactory(), tollHandler);
+
+				final CongestionTollTimeDistanceTravelDisutilityFactory factory = new CongestionTollTimeDistanceTravelDisutilityFactory(new Builder( TransportMode.car ), tollHandler);
 				factory.setSigma(sigma);
 				
 				controler.addOverridingModule(new AbstractModule() {

@@ -17,23 +17,24 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.popsim;
+package playground.johannes.gsv.popsim.analysis;
 
-import playground.johannes.synpop.data.Segment;
+import org.matsim.contrib.common.collections.Composite;
+import playground.johannes.synpop.data.Attributable;
 
 /**
  * @author johannes
  */
-public class LegPurposePredicate implements Predicate<Segment> {
-
-    private final Predicate<Segment> actTypePredicate;
-
-    public LegPurposePredicate(Predicate<Segment> actTypePredicate) {
-        this.actTypePredicate = actTypePredicate;
-    }
+public class PredicateAndComposite<T extends Attributable> extends Composite<Predicate<T>> implements Predicate<T> {
 
     @Override
-    public boolean test(Segment segment) {
-        return actTypePredicate.test(segment.next());
+    public boolean test(T attributable) {
+        for(Predicate<T> p : components) {
+            if(!p.test(attributable)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

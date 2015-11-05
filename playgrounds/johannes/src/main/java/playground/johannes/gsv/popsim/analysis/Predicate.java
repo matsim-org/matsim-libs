@@ -17,24 +17,12 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.popsim;
-
-import org.matsim.contrib.common.collections.Composite;
-import playground.johannes.synpop.data.Attributable;
+package playground.johannes.gsv.popsim.analysis;
 
 /**
  * @author johannes
  */
-public class PredicateAndComposite<T extends Attributable> extends Composite<Predicate<T>> implements Predicate<T> {
+public interface Predicate<T> {
 
-    @Override
-    public boolean test(T attributable) {
-        for(Predicate<T> p : components) {
-            if(!p.test(attributable)) {
-                return false;
-            }
-        }
-
-        return true;
-    }
+    boolean test(T t);
 }

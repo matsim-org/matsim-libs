@@ -23,6 +23,7 @@ package playground.johannes.gsv.matrices.misc;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -191,7 +192,7 @@ public class SpanningTree {
 		new MatsimNetworkReader(scenario).readFile("../../input/network.xml");
 
 		TravelTime ttc = new TravelTimeCalculator(network,60,30*3600, scenario.getConfig().travelTimeCalculator()).getLinkTravelTimes();
-		SpanningTree st = new SpanningTree(ttc, new RandomizingTimeDistanceTravelDisutility.Builder().createTravelDisutility(ttc, scenario.getConfig().planCalcScore()));
+		SpanningTree st = new SpanningTree(ttc, new RandomizingTimeDistanceTravelDisutility.Builder( TransportMode.car ).createTravelDisutility(ttc, scenario.getConfig().planCalcScore()));
 		Node origin = network.getNodes().get(Id.create(1, Node.class));
 		st.setOrigin(origin);
 		st.setDepartureTime(8*3600);

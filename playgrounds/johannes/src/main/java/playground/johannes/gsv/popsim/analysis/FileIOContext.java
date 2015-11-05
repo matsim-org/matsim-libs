@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,       *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,27 +16,20 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
-package playground.johannes.gsv.popsim;
-
-import playground.johannes.synpop.data.Segment;
+package playground.johannes.gsv.popsim.analysis;
 
 /**
- * @author johannes
+ * @author jillenberger
  */
-public class LegDoubleCollector extends LegCollector {
+public class FileIOContext {
 
-    private final String attKey;
+    private String path;
 
-    public LegDoubleCollector(String attKey) {
-        this.attKey = attKey;
+    public String getPath() {
+        return path;
     }
 
-    @Override
-    protected Double value(Segment leg) {
-        String str = leg.getAttribute(attKey);
-        if(str != null) {
-            return new Double(str);
-        } else return null;
+    public void setPath(String path) {
+        this.path = path;
     }
 }

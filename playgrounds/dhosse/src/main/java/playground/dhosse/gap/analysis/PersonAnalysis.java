@@ -26,7 +26,7 @@ public class PersonAnalysis {
 
 	public static void main(String args[]){
 		
-		restrictPlansTo24Hours("/home/danielhosse/run10/input/plansV4.xml.gz", "/home/danielhosse/plansV4_9.xml.gz");
+		restrictPlansTo24Hours("/home/dhosse/Dokumente/01_eGAP/plansV4.xml.gz", "/home/dhosse/Dokumente/01_eGAP/plansV4_cleaned.xml.gz");
 //		getPersonsWithActivitiesAfterMidnight("/home/dhosse/plansV3_cleaned.xml.gz", "/home/dhosse/plansOut2.xml");
 //		getPersonsWithNegativeScores("/home/danielhosse/run10/output/ITERS/it.20/20.plans.xml.gz");
 //		analyzeModeChoice("/home/danielhosse/run10/output/ITERS/it.10/10.plans.xml.gz", Global.matsimDir + "OUTPUT/" + Global.runID +"/input/subpopulationAtts.xml");

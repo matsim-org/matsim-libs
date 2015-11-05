@@ -45,7 +45,7 @@ public class RandomLocationMutator extends LocationMutator {
 		super(scenario, random);
 	}
 
-	public RandomLocationMutator(final Scenario scenario, TreeMap<String, QuadTree<ActivityFacility>> quad_trees,
+	public RandomLocationMutator(final Scenario scenario, TreeMap<String, ? extends QuadTree<ActivityFacility>> quad_trees,
 			TreeMap<String, ActivityFacilityImpl []> facilities_of_type, Random random) {
 		super(scenario, quad_trees, facilities_of_type, random);
 	}

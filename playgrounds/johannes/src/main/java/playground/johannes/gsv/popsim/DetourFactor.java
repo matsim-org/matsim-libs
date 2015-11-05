@@ -23,6 +23,9 @@ import gnu.trove.TDoubleArrayList;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.common.stats.StatsWriter;
 import org.matsim.facilities.ActivityFacilities;
+import playground.johannes.gsv.popsim.analysis.NumericAttributeProvider;
+import playground.johannes.gsv.popsim.analysis.LegBeelineDistance;
+import playground.johannes.gsv.popsim.analysis.LegCollector;
 import playground.johannes.gsv.synPop.analysis.AnalyzerTask;
 import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.Person;
@@ -45,17 +48,17 @@ public class DetourFactor extends AnalyzerTask {
 
     @Override
     public void analyze(Collection<? extends Person> persons, Map<String, DescriptiveStatistics> results) {
-        List<Double> routeDistances = new LegDoubleCollector(CommonKeys.LEG_ROUTE_DISTANCE).collect(persons);
-        List<Double> beelineDistances = new LegBeelineDistance(facilities).collect(persons);
+        List<Double> routeDistances = new LegCollector(new NumericAttributeProvider(CommonKeys.LEG_ROUTE_DISTANCE)).collect(persons);
+        List<Double> beelineDistances = new LegCollector(new LegBeelineDistance(facilities)).collect(persons);
 
-        if(routeDistances.size() != beelineDistances.size()) {
+        if (routeDistances.size() != beelineDistances.size()) {
 
         } else {
             TDoubleArrayList xvalues = new TDoubleArrayList(routeDistances.size());
             TDoubleArrayList yvalues = new TDoubleArrayList(routeDistances.size());
 
-            for(int i = 0; i < routeDistances.size(); i++) {
-                if(routeDistances.get(i) != null && beelineDistances.get(i) != null) {
+            for (int i = 0; i < routeDistances.size(); i++) {
+                if (routeDistances.get(i) != null && beelineDistances.get(i) != null) {
                     xvalues.add(routeDistances.get(i));
                     yvalues.add(beelineDistances.get(i));
                 }
