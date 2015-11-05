@@ -105,7 +105,7 @@ public class TripRouterFactoryModule extends AbstractModule {
         Map<String, TravelTime> travelTimes;
 
         @Inject
-        Map<String, TravelDisutilityFactory> travelDisutility;
+        Map<String, TravelDisutilityFactory> travelDisutilityFactory;
 
         @Inject
         SingleModeNetworksCache singleModeNetworksCache;
@@ -142,7 +142,7 @@ public class TripRouterFactoryModule extends AbstractModule {
             LeastCostPathCalculator routeAlgo =
                     leastCostPathCalculatorFactory.createPathCalculator(
                             filteredNetwork,
-                            travelDisutility.get(mode).createTravelDisutility(travelTimes.get(mode), scenario.getConfig().planCalcScore()),
+                            travelDisutilityFactory.get(mode).createTravelDisutility(travelTimes.get(mode), scenario.getConfig().planCalcScore()),
                             travelTimes.get(mode));
 
             return DefaultRoutingModules.createNetworkRouter(mode, scenario.getPopulation().getFactory(),

@@ -70,8 +70,7 @@ public class TravelTimeMatrices {
 		}
 	}
 
-	public TravelTimeMatrices(final Network network,
-			final TravelTime linkTTs,
+	public TravelTimeMatrices(final Network network, final TravelTime linkTTs,
 			final ZonalSystem zonalSystem, final Random rnd,
 			final int startTime_s, final int binSize_s, final int binCnt,
 			final int sampleCnt) {
@@ -186,13 +185,10 @@ public class TravelTimeMatrices {
 
 		System.out.println("STARTED ...");
 
-		final String networkFileName = "./test/regentmatsim/input/network-plain.xml";
+		final String networkFileName = "./test/matsim-testrun/input/network-plain.xml";
 		final Config config = ConfigUtils.createConfig();
 		config.setParam("network", "inputNetworkFile", networkFileName);
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
-
-		int timeBinSize = 15 * 60;
-		int endTime = 12 * 3600;
 
 		final String zonesShapeFileName = "./test/regentmatsim/input/sverige_TZ_EPSG3857.shp";
 		final ZonalSystem zonalSystem = new ZonalSystem(zonesShapeFileName,
@@ -200,15 +196,15 @@ public class TravelTimeMatrices {
 		zonalSystem.addNetwork(scenario.getNetwork(),
 				StockholmTransformationFactory.WGS84_SWEREF99);
 
-		final String eventsFileName = "./test/it.580/580.events.xml.gz";
+		final String eventsFileName = "./test/matsim-testrun/matsim-output/ITERS/it.0/0.events.xml.gz";
 
-		final int startTime_s = 18 * 3600;
-		final int binSize_s = 1800;
-		final int binCnt = 1;
-		final int sampleCnt = 5;
+		final int startTime_s = 6 * 3600;
+		final int binSize_s = 3600;
+		final int binCnt = 16;
+		final int sampleCnt = 1;
 
 		final TravelTimeCalculator ttcalc = new TravelTimeCalculator(
-				scenario.getNetwork(), timeBinSize, endTime, scenario
+				scenario.getNetwork(), 15 * 60, 24 * 3600 - 1, scenario
 						.getConfig().travelTimeCalculator());
 		final EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(ttcalc);
@@ -217,12 +213,9 @@ public class TravelTimeMatrices {
 		final TravelTime linkTTs = ttcalc.getLinkTravelTimes();
 
 		final TravelTimeMatrices travelTimeMatrices = new TravelTimeMatrices(
-				scenario.getNetwork(), linkTTs,
-				// null,
-				zonalSystem, new Random(), startTime_s, binSize_s, binCnt,
-				sampleCnt);
-		travelTimeMatrices
-				.writeToFile("./test/travelTimeMatrices_1800-1830_parallel.xml");
+				scenario.getNetwork(), linkTTs, zonalSystem, new Random(),
+				startTime_s, binSize_s, binCnt, sampleCnt);
+		travelTimeMatrices.writeToFile("./test/matsim-testrun/traveltimes.xml");
 
 		System.out.println("... DONE");
 	}

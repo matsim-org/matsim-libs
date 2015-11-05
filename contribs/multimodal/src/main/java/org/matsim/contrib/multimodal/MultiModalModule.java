@@ -80,7 +80,7 @@ public class MultiModalModule extends AbstractModule {
                 if (factory == null) {
                     log.warn("Mode " + mode + " is not supported! " +
                             "Use a constructor where you provide the travel time objects. " +
-                            "Using a UnknownTravelTime calculator based on constant speed." +
+                            "Using an UnknownTravelTime calculator based on constant speed." +
                             "Agent specific attributes are not taken into account!");
                     factory = new UnknownTravelTimeFactory(mode, plansCalcRouteConfigGroup);
                 } else {

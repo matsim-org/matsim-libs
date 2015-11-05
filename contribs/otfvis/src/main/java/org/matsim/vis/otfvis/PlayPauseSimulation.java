@@ -20,6 +20,7 @@ package org.matsim.vis.otfvis;
 
 import java.util.concurrent.Semaphore;
 
+import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.vis.otfvis.interfaces.PlayPauseSimulationI;
 
 /**
@@ -147,8 +148,8 @@ public class PlayPauseSimulation implements PlayPauseSimulationI {
 		this.stepToTime = stepToTime;
 	}
 
-	void setLocalTime(int localTime) {
-		this.localTime = localTime;
+	public int getLocalTime() {
+		return localTime;
 	}
 
 	Semaphore getAccessToQNetwork() {
