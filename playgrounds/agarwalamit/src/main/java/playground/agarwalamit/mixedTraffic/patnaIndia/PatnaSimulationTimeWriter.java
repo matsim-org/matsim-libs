@@ -52,127 +52,120 @@ import playground.agarwalamit.mixedTraffic.MixedTrafficVehiclesUtils;
  */
 
 public class PatnaSimulationTimeWriter {
-	
-	private final int [] randomNumbers = {4711, 6835, 1847, 4144, 4628, 2632, 5982, 3218, 5736, 7573,4389, 1344} ;
+
+	private final int [] randomNumbers = {4711, 6835, 1847, /*4144, 4628, 2632, 5982, 3218, 5736, 7573,4389, 1344*/} ;
 	private static String outputFolder =  "../../../../repos/runs-svn/patnaIndia/run107/";
 	private static String inputFilesDir = "../../../../repos/runs-svn/patnaIndia/inputs/";
-	
+	private static PrintStream writer;
+
 	public static void main(String[] args) {
-		
+
 		boolean isUsingCluster = false;
-		
+
 		if (args.length != 0) isUsingCluster = true;
 
 		if ( isUsingCluster ) {
 			outputFolder = args[0];
 			inputFilesDir = args[1];
 		}
-		
+
 		PatnaSimulationTimeWriter pstw = new PatnaSimulationTimeWriter();
 
-		PrintStream writer;
 		try {
 			writer = new PrintStream(outputFolder+"/simTime.txt");
-			writer.print("scenario \t simTime \n");
 		} catch (Exception e) {
 			throw new RuntimeException("Data is not written. Reason : "+e);
 		}
 
+		writer.print("scenario \t simTime \n");
+
 		{
 			//fifo without holes
-			String data2Write = pstw.runAndReturnSimulationTime(QSimConfigGroup.LinkDynamics.FIFO, QSimConfigGroup.TrafficDynamics.queue, inputFilesDir);
-			try {
-				writer.print("fifo_withoutHoles"+"\t"+data2Write);
-				writer.println();
-			} catch (Exception e) {
-				throw new RuntimeException("Data is not written. Reason : "+e);
-			}
+			writer.print("fifo_withoutHoles"+"\t");
+			pstw.runAndReturnSimulationTime(QSimConfigGroup.LinkDynamics.FIFO, QSimConfigGroup.TrafficDynamics.queue);
 		}
 
 		{
 			//fifo with holes
-			String data2Write = pstw.runAndReturnSimulationTime(QSimConfigGroup.LinkDynamics.FIFO, QSimConfigGroup.TrafficDynamics.withHoles, inputFilesDir);
-			try {
-				writer.print("fifo_withHoles"+"\t"+data2Write);
-				writer.println();
-			} catch (Exception e) {
-				throw new RuntimeException("Data is not written. Reason : "+e);
-			}
+			writer.print("fifo_withHoles"+"\t");
+			pstw.runAndReturnSimulationTime(QSimConfigGroup.LinkDynamics.FIFO, QSimConfigGroup.TrafficDynamics.withHoles);
 		}
-		
+
 		{
 			//passing without holes
-			String data2Write = pstw.runAndReturnSimulationTime(QSimConfigGroup.LinkDynamics.PassingQ, QSimConfigGroup.TrafficDynamics.queue, inputFilesDir);
-			try {
-				writer.print("passing_withoutHoles"+"\t"+data2Write);
-				writer.println();
-			} catch (Exception e) {
-				throw new RuntimeException("Data is not written. Reason : "+e);
-			}
+			writer.print("passing_withoutHoles"+"\t");
+			pstw.runAndReturnSimulationTime(QSimConfigGroup.LinkDynamics.PassingQ, QSimConfigGroup.TrafficDynamics.queue);
 		}
-		
+
 		{
 			//passing with holes
-			String data2Write = pstw.runAndReturnSimulationTime(QSimConfigGroup.LinkDynamics.PassingQ, QSimConfigGroup.TrafficDynamics.withHoles, inputFilesDir);
-			try {
-				writer.print("passing_withHoles"+"\t"+data2Write);
-				writer.println();
-			} catch (Exception e) {
-				throw new RuntimeException("Data is not written. Reason : "+e);
-			}
+			writer.print("passing_withHoles"+"\t");
+			pstw.runAndReturnSimulationTime(QSimConfigGroup.LinkDynamics.PassingQ, QSimConfigGroup.TrafficDynamics.withHoles);
 		}
-		
+
 		{
 			//seepage without holes
-			String data2Write = pstw.runAndReturnSimulationTime(QSimConfigGroup.LinkDynamics.SeepageQ, QSimConfigGroup.TrafficDynamics.queue, inputFilesDir);
-			try {
-				writer.print("seepage_withoutHoles"+"\t"+data2Write);
-				writer.println();
-			} catch (Exception e) {
-				throw new RuntimeException("Data is not written. Reason : "+e);
-			}
+			writer.print("seepage_withoutHoles"+"\t");
+			pstw.runAndReturnSimulationTime(QSimConfigGroup.LinkDynamics.SeepageQ, QSimConfigGroup.TrafficDynamics.queue);
 		}
-		
+
 		{
 			//seepage with holes
-			String data2Write = pstw.runAndReturnSimulationTime(QSimConfigGroup.LinkDynamics.SeepageQ, QSimConfigGroup.TrafficDynamics.withHoles, inputFilesDir);
+			writer.print("seepage_withHoles"+"\t");
+			pstw.runAndReturnSimulationTime(QSimConfigGroup.LinkDynamics.SeepageQ, QSimConfigGroup.TrafficDynamics.withHoles);
+
 			try {
-				writer.print("seepage_withHoles"+"\t"+data2Write);
-				writer.println();
 				writer.close();
 			} catch (Exception e) {
 				throw new RuntimeException("Data is not written. Reason : "+e);
 			}
 		}
 	}
-	
-	private String runAndReturnSimulationTime (QSimConfigGroup.LinkDynamics ld, QSimConfigGroup.TrafficDynamics td, String inputFilesDir) {
+
+	private void runAndReturnSimulationTime (QSimConfigGroup.LinkDynamics ld, QSimConfigGroup.TrafficDynamics td) {
+
+		for (int i = 0; i<randomNumbers.length;i++) {
+			int randomSeed = randomNumbers[i];
+			MatsimRandom.reset(randomSeed);
+			double startTime = System.currentTimeMillis();
+
+			String runSpecificOutputDir = outputFolder + "/output_"+ld+"_"+td+"_"+i+"/";
+			runControler(ld, td, runSpecificOutputDir);
+			double endTime = System.currentTimeMillis();
+
+			if(i>1 ) { // avoid two initial runs
+				writer.print(String.valueOf(endTime - startTime) + "\t");
+			}
+		}
+	}
+
+	private void runControler (QSimConfigGroup.LinkDynamics ld, QSimConfigGroup.TrafficDynamics td, String runSpecificOutputDir) {
 		Collection <String> mainModes = Arrays.asList("car","motorbike","bike");
 		Config config = createBasicConfigSettings();
 		String outPlans = inputFilesDir + "/SelectedPlans_new.xml.gz";
-		
+
 		BackwardCompatibilityForRouteType bcrt = new BackwardCompatibilityForRouteType(inputFilesDir+"/SelectedPlansOnly.xml", mainModes);
 		bcrt.startProcessing();
 		bcrt.writePopOut(outPlans);
-		
+
 		config.plans().setInputFile(outPlans);
-		
+
 		config.network().setInputFile(inputFilesDir+"/network.xml");
 		config.counts().setCountsFileName(inputFilesDir+"counts/countsCarMotorbikeBike.xml");
-		
+
 		config.qsim().setLinkDynamics(ld.toString());
 		config.qsim().setTrafficDynamics(td);
-		
+
 		if(ld.equals(QSimConfigGroup.LinkDynamics.SeepageQ)) {
 			config.setParam("seepage", "seepMode","bike");
 			config.setParam("seepage", "isSeepModeStorageFree", "false");
 			config.setParam("seepage", "isRestrictingNumberOfSeepMode", "true");
 		}
-		
+
 		config.controler().setCreateGraphs(false);
 		config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.fromVehiclesData);
 		Scenario sc = ScenarioUtils.loadScenario(config);
-		
+
 		Map<String, VehicleType> modesType = new HashMap<String, VehicleType>(); 
 		VehicleType car = VehicleUtils.getFactory().createVehicleType(Id.create("car",VehicleType.class));
 		car.setMaximumVelocity(MixedTrafficVehiclesUtils.getSpeed("car"));
@@ -191,7 +184,7 @@ public class PatnaSimulationTimeWriter {
 		bike.setPcuEquivalents(0.25);
 		modesType.put("bike", bike);
 		sc.getVehicles().addVehicleType(bike);
-		
+
 		VehicleType walk = VehicleUtils.getFactory().createVehicleType(Id.create("walk",VehicleType.class));
 		walk.setMaximumVelocity(MixedTrafficVehiclesUtils.getSpeed("walk"));
 		//		walk.setPcuEquivalents(0.10);  			
@@ -203,7 +196,7 @@ public class PatnaSimulationTimeWriter {
 		//		pt.setPcuEquivalents(5);  			
 		modesType.put("pt",pt);
 		sc.getVehicles().addVehicleType(pt);
-		
+
 		for(Person p:sc.getPopulation().getPersons().values()){
 			Id<Vehicle> vehicleId = Id.create(p.getId(),Vehicle.class);
 			String travelMode = null;
@@ -216,65 +209,51 @@ public class PatnaSimulationTimeWriter {
 			Vehicle vehicle = VehicleUtils.getFactory().createVehicle(vehicleId,modesType.get(travelMode));
 			sc.getVehicles().addVehicle(vehicle);
 		}
-		
+
 		final Controler controler = new Controler(sc);
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		controler.setDumpDataAtEnd(false);
-		
+
 		controler.addOverridingModule(new AbstractModule() {
-			// I do not know, why I need these.
+			// following must be added in order to get travel time and travel disutility in the router for modes other than car
 			@Override
 			public void install() {
-			addTravelTimeBinding("bike").to(networkTravelTime());
-			addTravelDisutilityFactoryBinding("bike").to(carTravelDisutilityFactoryKey());
-			addTravelTimeBinding("motorbike").to(networkTravelTime());
-			addTravelDisutilityFactoryBinding("motorbike").to(carTravelDisutilityFactoryKey());
+				addTravelTimeBinding("bike").to(networkTravelTime());
+				addTravelDisutilityFactoryBinding("bike").to(carTravelDisutilityFactoryKey());
+				addTravelTimeBinding("motorbike").to(networkTravelTime());
+				addTravelDisutilityFactoryBinding("motorbike").to(carTravelDisutilityFactoryKey());
 			}
 		});
-
-		String simulationTime = "";
-		for (int i = 0; i<randomNumbers.length;i++) {
-			int randomSeed = randomNumbers[i];
-			MatsimRandom.reset(randomSeed);
-			double startTime = System.currentTimeMillis();
-			controler.getScenario().getConfig().controler().setOutputDirectory(outputFolder + "/output_"+ld+"_"+td+"_"+randomSeed+"/");
-			controler.run();
-			double endTime = System.currentTimeMillis();
-
-			if(i>1 ) { // avoid two initial runs
-				simulationTime = simulationTime.concat( String.valueOf(endTime - startTime) + "\t");
-			}
-		}
-		return simulationTime;
+		controler.getScenario().getConfig().controler().setOutputDirectory(runSpecificOutputDir);
+		controler.run();
 	}
-	
+
 	private Config createBasicConfigSettings(){
 		Collection <String> mainModes = Arrays.asList("car","motorbike","bike");
 
 		Config config = ConfigUtils.createConfig();
-		
-		config.counts().setWriteCountsInterval(100);
+
+		config.counts().setWriteCountsInterval(0);
 		config.counts().setCountsScaleFactor(94.52); 
 
 		config.controler().setFirstIteration(0);
-		config.controler().setLastIteration(200);
+		config.controler().setLastIteration(1);
 		//disable writing of the following data
 		config.controler().setWriteEventsInterval(0);
 		config.controler().setWritePlansInterval(0);
-		config.controler().setWriteSnapshotsInterval(0);	
 
 		config.qsim().setFlowCapFactor(0.011);		//1.06% sample
 		config.qsim().setStorageCapFactor(0.033);
 		config.qsim().setEndTime(36*3600);
 		config.qsim().setMainModes(mainModes);
-		
+
 
 		config.setParam("TimeAllocationMutator", "mutationAffectsDuration", "false");
 		config.setParam("TimeAllocationMutator", "mutationRange", "7200.0");
 
 		StrategySettings expChangeBeta = new StrategySettings(Id.create("1",StrategySettings.class));
 		expChangeBeta.setStrategyName("ChangeExpBeta");
-		expChangeBeta.setWeight(0.9);
+		expChangeBeta.setWeight(0.85);
 
 		StrategySettings reRoute = new StrategySettings(Id.create("2",StrategySettings.class));
 		reRoute.setStrategyName("ReRoute");
@@ -290,10 +269,8 @@ public class PatnaSimulationTimeWriter {
 
 		config.strategy().setFractionOfIterationsToDisableInnovation(0.8);
 
-		//vsp default
 		config.plans().setRemovingUnneccessaryPlanAttributes(true);
 		config.vspExperimental().addParam("vspDefaultsCheckingLevel", "abort");
-		//vsp default
 
 		ActivityParams workAct = new ActivityParams("work");
 		workAct.setTypicalDuration(8*3600);
@@ -303,42 +280,42 @@ public class PatnaSimulationTimeWriter {
 		homeAct.setTypicalDuration(12*3600);
 		config.planCalcScore().addActivityParams(homeAct);
 
-		config.planCalcScore().setMarginalUtlOfWaiting_utils_hr(0);// changed to 0 from (-2) earlier
+		config.planCalcScore().setMarginalUtlOfWaiting_utils_hr(0);
 		config.planCalcScore().setPerforming_utils_hr(6.0);
-		
+
 		ModeParams car = new ModeParams("car");
 		car.setConstant(-3.30);
 		car.setMarginalUtilityOfTraveling(0.0);
 		config.planCalcScore().addModeParams(car);
-		
+
 		ModeParams bike = new ModeParams("bike");
 		bike.setConstant(0.0);
 		bike.setMarginalUtilityOfTraveling(0.0);
 		config.planCalcScore().addModeParams(bike);
-		
+
 		ModeParams motorbike = new ModeParams("motorbike");
 		motorbike.setConstant(-2.20);
 		motorbike.setMarginalUtilityOfTraveling(0.0);
 		config.planCalcScore().addModeParams(motorbike);
-		
+
 		ModeParams pt = new ModeParams("pt");
 		pt.setConstant(-3.40);
 		pt.setMarginalUtilityOfTraveling(0.0);
 		config.planCalcScore().addModeParams(pt);
-		
+
 		ModeParams walk = new ModeParams("walk");
 		walk.setConstant(0.0);
 		walk.setMarginalUtilityOfTraveling(0.0);
 		config.planCalcScore().addModeParams(walk);
-		
+
 		config.plansCalcRoute().setNetworkModes(mainModes);
-		
+
 		{
 			ModeRoutingParams mrp = new ModeRoutingParams("walk");
 			mrp.setTeleportedModeSpeed(4./3.6);
 			config.plansCalcRoute().addModeRoutingParams(mrp);
 		}
-		
+
 		{
 			ModeRoutingParams mrp = new ModeRoutingParams("pt");
 			mrp.setTeleportedModeSpeed(20./3.6);
