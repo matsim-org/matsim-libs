@@ -53,7 +53,7 @@ import playground.agarwalamit.mixedTraffic.MixedTrafficVehiclesUtils;
 
 public class PatnaSimulationTimeWriter {
 
-	private final int [] randomNumbers = {4711, 6835, 1847, /*4144, 4628, 2632, 5982, 3218, 5736, 7573,4389, 1344*/} ;
+	private final int [] randomNumbers = {4711, 6835, 1847, 4144, 4628, 2632, 5982, 3218, 5736, 7573,4389, 1344} ;
 	private static String outputFolder =  "../../../../repos/runs-svn/patnaIndia/run107/";
 	private static String inputFilesDir = "../../../../repos/runs-svn/patnaIndia/inputs/";
 	private static PrintStream writer;
