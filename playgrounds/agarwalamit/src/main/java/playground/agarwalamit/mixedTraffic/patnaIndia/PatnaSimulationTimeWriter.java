@@ -234,8 +234,10 @@ public class PatnaSimulationTimeWriter {
 
 		String simulationTime = "";
 		for (int i = 0; i<randomNumbers.length;i++) {
-			MatsimRandom.reset(randomNumbers[i]);
+			int randomSeed = randomNumbers[i];
+			MatsimRandom.reset(randomSeed);
 			double startTime = System.currentTimeMillis();
+			controler.getScenario().getConfig().controler().setOutputDirectory(outputFolder + "/output_"+ld+"_"+td+"_"+randomSeed+"/");
 			controler.run();
 			double endTime = System.currentTimeMillis();
 
