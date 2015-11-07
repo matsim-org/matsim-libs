@@ -22,6 +22,7 @@ matsim4urbansim/test/.gitignore
 .gitignore
 #
 #contrib/signals
+signals/output
 signals/**/output
 signals/**/*.aux
 signals/**/*.log
