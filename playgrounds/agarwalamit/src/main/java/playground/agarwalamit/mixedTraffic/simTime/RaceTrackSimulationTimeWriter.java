@@ -37,16 +37,16 @@ public class RaceTrackSimulationTimeWriter {
 	private final int [] randomNumbers = {4711, 6835, 1847, 4144, 4628, 2632, 5982, 3218, 5736, 7573,4389, 1344} ;
 	private static String outputFolder = "../../../../repos/shared-svn/projects/mixedTraffic/triangularNetwork/run312/carBike/computationalEfficiency/";
 	private static PrintStream writer;
-	
+
 	public static void main(String[] args) {
-		
+
 		boolean isUsingCluster = false;
 		if (args.length != 0) isUsingCluster = true;
 
 		if ( isUsingCluster ) {
 			outputFolder = args[0];
 		} 
-		
+
 		RaceTrackSimulationTimeWriter rtstw = new RaceTrackSimulationTimeWriter();
 
 		try {
@@ -55,13 +55,13 @@ public class RaceTrackSimulationTimeWriter {
 			throw new RuntimeException("Data is not written. Reason : "+e);
 		}
 
-		writer.print("scenario \t simTime \n");
+		writer.print("scenario \t simTimeInSec \n");
 
-		for ( TrafficDynamics td : TrafficDynamics.values()){
-			for (LinkDynamics ld : LinkDynamics.values() ) {
-				writer.println(td+"_"+ld+"\t");
+		for (LinkDynamics ld : LinkDynamics.values() ) {
+			for ( TrafficDynamics td : TrafficDynamics.values()){
+				writer.print(ld+"_"+td+"\t");
 				rtstw.processAndWriteSimulationTime(ld, td);
-				writer.println();	
+				writer.println();
 			}
 		}
 		try {
@@ -72,7 +72,7 @@ public class RaceTrackSimulationTimeWriter {
 	}
 
 	private void processAndWriteSimulationTime ( QSimConfigGroup.LinkDynamics ld, QSimConfigGroup.TrafficDynamics td ){
-		
+
 		GenerateFundamentalDiagramData generateFDData = new GenerateFundamentalDiagramData();
 		generateFDData.setRunDirectory(outputFolder+"/output_simTime/");
 		generateFDData.setTravelModes(new String [] {"car","bike"});
@@ -80,9 +80,8 @@ public class RaceTrackSimulationTimeWriter {
 		generateFDData.setIsDumpingInputFiles(false);
 		generateFDData.setIsWritingEventsFileForEachIteration(false);
 
-		generateFDData.setLinkDynamics(ld);;
-		generateFDData.setTrafficDynamics(td);; 
-		generateFDData.setReduceDataPointsByFactor(100);
+		generateFDData.setLinkDynamics(ld);
+		generateFDData.setTrafficDynamics(td);
 
 		for (int i = 0; i<randomNumbers.length;i++) {
 			MatsimRandom.reset(randomNumbers[i]);
@@ -91,7 +90,7 @@ public class RaceTrackSimulationTimeWriter {
 			double endTime = System.currentTimeMillis();
 
 			if(i>1 ) { // avoid two initial runs
-				writer.print( String.valueOf(endTime - startTime) + "\t");
+				writer.print( String.valueOf( (endTime - startTime)/1000 ) + "\t");
 			}
 		}
 	}

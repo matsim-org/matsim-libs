@@ -80,16 +80,16 @@ public class PatnaSimulationTimeWriter {
 			throw new RuntimeException("Data is not written. Reason : "+e);
 		}
 
-		writer.print("scenario \t simTime \n");
+		writer.print("scenario \t simTimeInSec \n");
 
-		for ( TrafficDynamics td : TrafficDynamics.values()){
-			for (LinkDynamics ld : LinkDynamics.values() ) {
-				writer.println(td+"_"+ld+"\t");
+		for (LinkDynamics ld : LinkDynamics.values() ) {
+			for ( TrafficDynamics td : TrafficDynamics.values()){
+				writer.print(ld+"_"+td+"\t");
 				pstw.processAndWriteSimulationTime(ld, td);
 				writer.println();	
 			}
 		}
-		
+
 		try {
 			writer.close();
 		} catch (Exception e) {
@@ -108,7 +108,7 @@ public class PatnaSimulationTimeWriter {
 			double endTime = System.currentTimeMillis();
 
 			if(i>1 ) { // avoid two initial runs
-				writer.print(String.valueOf(endTime - startTime) + "\t");
+				writer.print(String.valueOf( (endTime - startTime)/1000 ) + "\t");
 			}
 		}
 	}
