@@ -33,9 +33,9 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup.LinkDynamics;
 import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
+import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspDefaultsCheckingLevel;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -57,10 +57,10 @@ public class InputsForFDTestSetUp {
 	private final double END_TIME = 24*3600;
 	private final double FREESPEED = 60.;	//in km/h, maximum authorized velocity on the track
 	private final double STUCK_TIME = 10;
-	
+
 	private Scenario scenario;
 	private  Map<Id<VehicleType>, TravelModesFlowDynamicsUpdator> vehicle2TravelModesData;
-	
+
 	void run(){
 		this.outputFolder= GenerateFundamentalDiagramData.RUN_DIR;
 		setUpConfig();
@@ -77,30 +77,28 @@ public class InputsForFDTestSetUp {
 		config.qsim().setMainModes(Arrays.asList(GenerateFundamentalDiagramData.TRAVELMODES));
 		config.qsim().setStuckTime(STUCK_TIME);//allows to overcome maximal density regime
 		config.qsim().setEndTime(END_TIME);
+
+		config.qsim().setLinkDynamics(GenerateFundamentalDiagramData.linkDynamics.toString());
+
+		config.qsim().setTrafficDynamics(GenerateFundamentalDiagramData.trafficDynamics);
 		
-		if(GenerateFundamentalDiagramData.PASSING_ALLOWED){
-			config.qsim().setLinkDynamics(LinkDynamics.PassingQ.toString());
-		}
-		
-		if(GenerateFundamentalDiagramData.WITH_HOLES){
-			config.qsim().setTrafficDynamics(QSimConfigGroup.TrafficDynamics.withHoles);
+		if(GenerateFundamentalDiagramData.trafficDynamics.equals(TrafficDynamics.withHoles)) {
 			config.qsim().setSnapshotStyle(SnapshotStyle.withHoles); // to see holes in OTFVis
 			config.setParam("WITH_HOLE", "HOLE_SPEED", GenerateFundamentalDiagramData.HOLE_SPEED);
 		}
 		
-		if(GenerateFundamentalDiagramData.SEEPAGE_ALLOWED){
-			config.setParam("seepage", "isSeepageAllowed", "true");
+		if(GenerateFundamentalDiagramData.linkDynamics.equals(LinkDynamics.SeepageQ)){
 			config.setParam("seepage", "seepMode","bike");
 			config.setParam("seepage", "isSeepModeStorageFree", "false");
 			config.setParam("seepage", "isRestrictingNumberOfSeepMode", "true");
 		}
-		
+
 		config.vspExperimental().setVspDefaultsCheckingLevel( VspDefaultsCheckingLevel.abort );
 		scenario = ScenarioUtils.createScenario(config);
-		
+
 		if(GenerateFundamentalDiagramData.isDumpingInputFiles) new ConfigWriter(config).write(outputFolder+"/config.xml");
 	}
-	
+
 	/**
 	 * It will generate a triangular network. 
 	 * Each link is subdivided in number of sub division factor.
@@ -150,7 +148,7 @@ public class InputsForFDTestSetUp {
 		network.addNode(endNode);
 
 		Set<String> allowedModes = new HashSet<>(Arrays.asList(GenerateFundamentalDiagramData.TRAVELMODES));
-		
+
 		// triangle links
 		for (int i = 0; i<3*SUBDIVISION_FACTOR; i++){
 			Id<Node> idFrom = Id.createNodeId(i);
@@ -168,10 +166,10 @@ public class InputsForFDTestSetUp {
 			link.setLength(LINK_LENGTH);
 			link.setNumberOfLanes(NO_OF_LANES);
 			link.setAllowedModes(allowedModes);
-			
+
 			network.addLink(link);
 		}
-		
+
 		//additional startLink and endLink for home and work activities
 		Id<Link> startLinkId = Id.createLinkId("home");
 		Link startLink = scenario.getNetwork().getFactory().createLink( startLinkId, startNode, scenario.getNetwork().getNodes().get(Id.createNodeId(0)));
@@ -181,7 +179,7 @@ public class InputsForFDTestSetUp {
 		startLink.setNumberOfLanes(1.);
 		startLink.setAllowedModes(allowedModes);
 		network.addLink(startLink);
-		
+
 		Id<Link> endLinkId = Id.createLinkId("work");
 		Link endLink = scenario.getNetwork().getFactory().createLink(endLinkId, scenario.getNetwork().getNodes().get(Id.createNodeId(SUBDIVISION_FACTOR)), endNode);
 		endLink.setCapacity(100*LINK_CAPACITY);
@@ -205,11 +203,11 @@ public class InputsForFDTestSetUp {
 			vehicle2TravelModesData.put(modeId, modeData);
 		}
 	}
-	
+
 	Scenario getScenario(){
 		return scenario;
 	}
-	
+
 	Map<Id<VehicleType>, TravelModesFlowDynamicsUpdator> getTravelMode2FlowDynamicsData(){
 		return vehicle2TravelModesData;
 	}

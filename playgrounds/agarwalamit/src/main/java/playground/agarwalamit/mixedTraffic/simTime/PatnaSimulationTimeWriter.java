@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.mixedTraffic.patnaIndia;
+package playground.agarwalamit.mixedTraffic.simTime;
 
 import java.io.PrintStream;
 import java.util.Arrays;
@@ -35,6 +35,8 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.config.groups.QSimConfigGroup.LinkDynamics;
+import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -46,6 +48,7 @@ import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
 import playground.agarwalamit.mixedTraffic.MixedTrafficVehiclesUtils;
+import playground.agarwalamit.mixedTraffic.patnaIndia.BackwardCompatibilityForRouteType;
 
 /**
  * @author amit
@@ -79,51 +82,22 @@ public class PatnaSimulationTimeWriter {
 
 		writer.print("scenario \t simTime \n");
 
-		{
-			//fifo without holes
-			writer.print("fifo_withoutHoles"+"\t");
-			pstw.runAndReturnSimulationTime(QSimConfigGroup.LinkDynamics.FIFO, QSimConfigGroup.TrafficDynamics.queue);
-		}
-
-		{
-			//fifo with holes
-			writer.print("fifo_withHoles"+"\t");
-			pstw.runAndReturnSimulationTime(QSimConfigGroup.LinkDynamics.FIFO, QSimConfigGroup.TrafficDynamics.withHoles);
-		}
-
-		{
-			//passing without holes
-			writer.print("passing_withoutHoles"+"\t");
-			pstw.runAndReturnSimulationTime(QSimConfigGroup.LinkDynamics.PassingQ, QSimConfigGroup.TrafficDynamics.queue);
-		}
-
-		{
-			//passing with holes
-			writer.print("passing_withHoles"+"\t");
-			pstw.runAndReturnSimulationTime(QSimConfigGroup.LinkDynamics.PassingQ, QSimConfigGroup.TrafficDynamics.withHoles);
-		}
-
-		{
-			//seepage without holes
-			writer.print("seepage_withoutHoles"+"\t");
-			pstw.runAndReturnSimulationTime(QSimConfigGroup.LinkDynamics.SeepageQ, QSimConfigGroup.TrafficDynamics.queue);
-		}
-
-		{
-			//seepage with holes
-			writer.print("seepage_withHoles"+"\t");
-			pstw.runAndReturnSimulationTime(QSimConfigGroup.LinkDynamics.SeepageQ, QSimConfigGroup.TrafficDynamics.withHoles);
-
-			try {
-				writer.close();
-			} catch (Exception e) {
-				throw new RuntimeException("Data is not written. Reason : "+e);
+		for ( TrafficDynamics td : TrafficDynamics.values()){
+			for (LinkDynamics ld : LinkDynamics.values() ) {
+				writer.println(td+"_"+ld+"\t");
+				pstw.processAndWriteSimulationTime(ld, td);
+				writer.println();	
 			}
+		}
+		
+		try {
+			writer.close();
+		} catch (Exception e) {
+			throw new RuntimeException("Data is not written. Reason : "+e);
 		}
 	}
 
-	private void runAndReturnSimulationTime (QSimConfigGroup.LinkDynamics ld, QSimConfigGroup.TrafficDynamics td) {
-
+	private void processAndWriteSimulationTime (QSimConfigGroup.LinkDynamics ld, QSimConfigGroup.TrafficDynamics td) {
 		for (int i = 0; i<randomNumbers.length;i++) {
 			int randomSeed = randomNumbers[i];
 			MatsimRandom.reset(randomSeed);

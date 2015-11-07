@@ -41,6 +41,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.QSimConfigGroup.LinkDynamics;
+import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.mobsim.framework.AgentSource;
@@ -76,9 +78,8 @@ public class GenerateFundamentalDiagramData {
 	
 	static String[] TRAVELMODES;	
 	
-	static boolean PASSING_ALLOWED = false;
-	static boolean SEEPAGE_ALLOWED = false;
-	static boolean WITH_HOLES = false;
+	static LinkDynamics linkDynamics = LinkDynamics.FIFO;
+	static TrafficDynamics trafficDynamics = TrafficDynamics.queue;
 	static String HOLE_SPEED = "15";
 
 	private Double[] modalSplitInPCU;
@@ -118,9 +119,8 @@ public class GenerateFundamentalDiagramData {
 			args[0] = my_dir + outFolder ;
 			args[1] = "car,bike"; // travel (main) modes
 			args[2] = "1.0,1.0"; // modal split in pcu
-			args[3] = "false"; // isPassingAllowed
-			args[4] = "false"; // isSeepageAllowed
-			args[5] = "true"; // isUsingHoles
+			args[3] = LinkDynamics.FIFO.toString(); // isPassingAllowed
+			args[5] = TrafficDynamics.withHoles.toString(); // isUsingHoles
 			args[6] = "1"; // reduce number of data points by this factor
 			args[7] = "false"; // is plotting modal split distribution
 		}
@@ -130,11 +130,10 @@ public class GenerateFundamentalDiagramData {
 		generateFDData.setRunDirectory(args[0]);
 		generateFDData.setTravelModes(args[1].split(","));
 		generateFDData.setModalSplit(args[2].split(",")); //in pcu
-		generateFDData.setIsPassingAllowed(Boolean.valueOf(args[3]));
-		generateFDData.setIsSeepageAllowed(Boolean.valueOf(args[4]));
-		generateFDData.setIsUsingHoles(Boolean.valueOf(args[5])); 
-		generateFDData.setReduceDataPointsByFactor(Integer.valueOf(args[6]));
-		generateFDData.setIsPlottingDistribution(Boolean.valueOf(args[7]));
+		generateFDData.setTrafficDynamics(TrafficDynamics.valueOf( args[3]) );
+		generateFDData.setLinkDynamics(LinkDynamics.valueOf( args[4]) );
+		generateFDData.setReduceDataPointsByFactor(Integer.valueOf(args[5]));
+		generateFDData.setIsPlottingDistribution(Boolean.valueOf(args[6]));
 		
 		generateFDData.setIsDumpingInputFiles(true);
 		generateFDData.setIsUsingLiveOTFVis(false);
@@ -152,9 +151,9 @@ public class GenerateFundamentalDiagramData {
 			throw new RuntimeException("Modal split for each travel mode is necessray parameter, it is not defined correctly. Check your static variable!!! \n Aborting ...");
 		}
 
-		if(PASSING_ALLOWED) LOG.info("=======Passing is allowed.========");
-		if(SEEPAGE_ALLOWED) LOG.info("=======Seepage is allowed.========");
-		if(WITH_HOLES) LOG.info("======= Using double ended queue.=======");
+		if(linkDynamics.equals(LinkDynamics.PassingQ)) LOG.info("=======Passing is allowed.========");
+		else if(linkDynamics.equals(LinkDynamics.SeepageQ))  LOG.info("=======Seepage is allowed.========");
+		if(trafficDynamics.equals(TrafficDynamics.withHoles)) LOG.info("======= Using double ended queue.=======");
 
 		if(isDumpingInputFiles && RUN_DIR==null) throw new RuntimeException("Config, nework and plan file can not be written without a directory location.");
 		if(RUN_DIR==null) throw new RuntimeException("Location to write data for FD is not set. Aborting...");
@@ -194,15 +193,15 @@ public class GenerateFundamentalDiagramData {
 	public void setRunDirectory(String runDir) {
 		RUN_DIR = runDir;
 	}
-
-	public void setIsPassingAllowed(boolean isPassingAllowed) {
-		PASSING_ALLOWED = isPassingAllowed;
+	
+	public void setLinkDynamics(LinkDynamics linkDynamic) {
+		linkDynamics = linkDynamic;
 	}
 
-	public void setIsSeepageAllowed(boolean isSeepageAllowed) {
-		SEEPAGE_ALLOWED = isSeepageAllowed;
+	public void setTrafficDynamics(TrafficDynamics trafficDynamic){
+		trafficDynamics = trafficDynamic;
 	}
-
+	
 	public void setIsDumpingInputFiles(boolean writeInputFiles) {
 		isDumpingInputFiles = writeInputFiles;
 	}
@@ -220,10 +219,6 @@ public class GenerateFundamentalDiagramData {
 
 	public void setReduceDataPointsByFactor(int reduceDataPointsByFactor) {
 		this.reduceDataPointsByFactor = reduceDataPointsByFactor;
-	}
-
-	public void setIsUsingHoles(boolean isUsingHole) {
-		WITH_HOLES = isUsingHole;
 	}
 
 	public void setIsPlottingDistribution(boolean isPlottingDistribution) {
