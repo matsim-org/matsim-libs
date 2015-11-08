@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Composite.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,       *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,38 +16,25 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.common.collections;
+package playground.johannes.gsv.popsim.analysis;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 /**
- * Abstract base class for composite object structures.
- * 
- * @author illenberger
- * 
+ * @author jillenberger
  */
-public abstract class Composite<T> {
+public class Executor {
 
-	protected final List<T> components = new ArrayList<T>();
+    private static java.util.concurrent.ExecutorService service;
 
-	/**
-	 * Adds a component to the composite.
-	 * 
-	 * @param component
-	 *            a component.
-	 */
-	public void addComponent(T component) {
-		components.add(component);
-	}
+    private static void init() {
+        if (service == null) {
+            service = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+        }
+    }
 
-	/**
-	 * Removes a component from the composite.
-	 * 
-	 * @param component
-	 *            a component.
-	 */
-	public void removeComponent(T component) {
-		components.remove(component);
-	}
+    public static Future<?> submit(Runnable task) {
+        return service.submit(task);
+    }
 }

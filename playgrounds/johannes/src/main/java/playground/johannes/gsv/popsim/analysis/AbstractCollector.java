@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Composite.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,       *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,38 +16,29 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.common.collections;
+package playground.johannes.gsv.popsim.analysis;
 
-import java.util.ArrayList;
-import java.util.List;
+import playground.johannes.synpop.data.Attributable;
 
 /**
- * Abstract base class for composite object structures.
- * 
- * @author illenberger
- * 
+ * @author jillenberger
  */
-public abstract class Composite<T> {
+public abstract class AbstractCollector<T, A extends Attributable> implements Collector<T> {
 
-	protected final List<T> components = new ArrayList<T>();
+    protected Predicate<A> predicate;
 
-	/**
-	 * Adds a component to the composite.
-	 * 
-	 * @param component
-	 *            a component.
-	 */
-	public void addComponent(T component) {
-		components.add(component);
-	}
+    protected final ValueProvider<T, A> provider;
 
-	/**
-	 * Removes a component from the composite.
-	 * 
-	 * @param component
-	 *            a component.
-	 */
-	public void removeComponent(T component) {
-		components.remove(component);
-	}
+    public AbstractCollector(ValueProvider<T, A> provider) {
+        this.provider = provider;
+    }
+
+    public void setPredicate(Predicate<A> predicate) {
+        this.predicate = predicate;
+    }
+
+    public Predicate<A> getPredicate() {
+        return predicate;
+    }
+
 }

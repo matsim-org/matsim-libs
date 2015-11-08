@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Composite.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,       *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,38 +16,45 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.common.collections;
+package playground.johannes.gsv.popsim.analysis;
+
+import org.matsim.contrib.common.collections.Composite;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 /**
- * Abstract base class for composite object structures.
- * 
- * @author illenberger
- * 
+ * @author jillenberger
  */
-public abstract class Composite<T> {
+public class ConcurrentAnalyzerTask<T> extends Composite<AnalyzerTask<T>> implements AnalyzerTask<T> {
 
-	protected final List<T> components = new ArrayList<T>();
+    @Override
+    public void analyze(final T object, final List<StatsContainer> containers) {
+        final List<StatsContainer> concurrentContainers = new CopyOnWriteArrayList<>();
+        List<Future<?>> futures = new ArrayList<>(components.size());
 
-	/**
-	 * Adds a component to the composite.
-	 * 
-	 * @param component
-	 *            a component.
-	 */
-	public void addComponent(T component) {
-		components.add(component);
-	}
+        for (final AnalyzerTask<T> task : components) {
+            futures.add(Executor.submit(new Runnable() {
+                @Override
+                public void run() {
+                    task.analyze(object, concurrentContainers);
+                }
+            }));
+        }
 
-	/**
-	 * Removes a component from the composite.
-	 * 
-	 * @param component
-	 *            a component.
-	 */
-	public void removeComponent(T component) {
-		components.remove(component);
-	}
+        for(Future<?> future : futures) {
+            try {
+                future.get();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            }
+        }
+
+        containers.addAll(concurrentContainers);
+    }
 }

@@ -19,53 +19,43 @@
 
 package playground.johannes.gsv.popsim;
 
-import playground.johannes.gsv.synPop.analysis.AnalyzerTask;
-import playground.johannes.gsv.synPop.analysis.ProxyAnalyzer;
-import playground.johannes.gsv.synPop.sim3.SamplerListener;
-import playground.johannes.synpop.data.Person;
-import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.gsv.popsim.analysis.AnalyzerTask;
+import playground.johannes.gsv.popsim.analysis.AnalyzerTaskRunner;
+import playground.johannes.gsv.popsim.analysis.FileIOContext;
+import playground.johannes.synpop.data.Attributable;
+import playground.johannes.synpop.sim.MarkovEngineListener;
+import playground.johannes.synpop.sim.data.CachedPerson;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * @author johannes
- * 
  */
-public class AnalyzerListener implements SamplerListener {
+public class AnalyzerListener implements MarkovEngineListener {
 
-	private final AnalyzerTask pTask;
+    private final AnalyzerTask task;
 
-	private final String rootDir;
+    private final long interval;
 
-	private final long interval;
+    private final AtomicLong iters = new AtomicLong();
 
-	private final AtomicLong iters = new AtomicLong();
+    private final FileIOContext ioContext;
 
-	public AnalyzerListener(AnalyzerTask task, String rootDir, long interval) {
-		this.rootDir = rootDir;
-		this.interval = interval;
-		this.pTask = task;
-		ProxyAnalyzer.setAppend(true);
+    public AnalyzerListener(AnalyzerTask task, FileIOContext ioContext, long interval) {
+        this.ioContext = ioContext;
+        this.interval = interval;
+        this.task = task;
 
-	}
+    }
 
-	@Override
-	public void afterStep(Collection<? extends Person> population, Collection<? extends Person> mutations, boolean accepted) {
+    @Override
+    public void afterStep(Collection<CachedPerson> population, Collection<? extends Attributable> mutations, boolean accepted) {
+        if (iters.get() % interval == 0) {
+            ioContext.append(String.format("%E", (double)iters.get()));
+            AnalyzerTaskRunner.run(population, task, ioContext);
 
-		if (iters.get() % interval == 0) {
-			String output = String.format("%s/%s", rootDir, String.valueOf(iters));
-			File file = new File(output);
-			file.mkdirs();
-			try {
-				ProxyAnalyzer.analyze((Collection<PlainPerson>)population, pTask, file.getAbsolutePath());
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		iters.incrementAndGet();
-	}
-
+        }
+        iters.incrementAndGet();
+    }
 }

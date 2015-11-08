@@ -18,18 +18,31 @@
  * *********************************************************************** */
 package playground.johannes.gsv.popsim.analysis;
 
+import java.io.File;
+
 /**
  * @author jillenberger
  */
 public class FileIOContext {
 
-    private String path;
+    private final String root;
+
+    private String fullPath;
+
+    public FileIOContext(String root) {
+        this.root = root;
+        this.fullPath = root;
+        new File(fullPath).mkdirs();
+    }
 
     public String getPath() {
-        return path;
+        return fullPath;
     }
 
-    public void setPath(String path) {
-        this.path = path;
+    public void append(String path) {
+        this.fullPath = String.format("%s/%s", root, path);
+        new File(path).mkdirs();
     }
+
+
 }
