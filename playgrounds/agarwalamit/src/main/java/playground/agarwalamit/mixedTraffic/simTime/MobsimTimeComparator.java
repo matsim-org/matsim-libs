@@ -72,11 +72,12 @@ public class MobsimTimeComparator {
 	public void startProcessing(){
 		for (LinkDynamics ld : LinkDynamics.values() ) {
 			for ( TrafficDynamics td : TrafficDynamics.values()){
+				String queueModel = ld+"_"+td;
+				writeString(queueModel+"\t");
 				for(int i=2;i<12;i++){
-					String queueModel = ld+"_"+td;
 					String stopwatchFile = respectiveFileDirectory + "/output_"+queueModel+"_"+i+"/stopwatch.txt";
 					double mobsimTime = readAndReturnMobsimTime(stopwatchFile);
-					writeString(queueModel+"\t"+mobsimTime+"\t");
+					writeString(mobsimTime+"\t");
 				}
 				writeString("\n");
 			}
