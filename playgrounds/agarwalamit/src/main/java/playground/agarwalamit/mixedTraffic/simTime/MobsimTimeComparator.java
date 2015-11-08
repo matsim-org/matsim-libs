@@ -77,7 +77,7 @@ public class MobsimTimeComparator {
 				for(int i=2;i<12;i++){
 					String stopwatchFile = respectiveFileDirectory + "/output_"+queueModel+"_"+i+"/stopwatch.txt";
 					double mobsimTime = readAndReturnMobsimTime(stopwatchFile);
-					writeString(queueModel+"\t"+mobsimTime+"\t");
+					writeString(mobsimTime+"\t");
 				}
 				writeString("\n");
 			}
