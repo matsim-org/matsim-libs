@@ -45,7 +45,7 @@ public class MobsimTimeComparator {
 	}
 
 	public void openFile(){
-		writer = IOUtils.getBufferedWriter(respectiveFileDirectory+"mobsimTime");
+		writer = IOUtils.getBufferedWriter(respectiveFileDirectory+"/mobsimTime.txt");
 		try {
 			writeString("scenario \t mobsimTimeInSec \n");
 		} catch (Exception e) {
@@ -73,9 +73,10 @@ public class MobsimTimeComparator {
 		for (LinkDynamics ld : LinkDynamics.values() ) {
 			for ( TrafficDynamics td : TrafficDynamics.values()){
 				for(int i=2;i<12;i++){
-					String stopwatchFile = respectiveFileDirectory + "/output"+ld+"_"+td+"_"+i+"/stopwatch.txt";
+					String queueModel = ld+"_"+td;
+					String stopwatchFile = respectiveFileDirectory + "/output_"+queueModel+"_"+i+"/stopwatch.txt";
 					double mobsimTime = readAndReturnMobsimTime(stopwatchFile);
-					writeString(mobsimTime+"\t");
+					writeString(queueModel+"\t"+mobsimTime+"\t");
 				}
 				writeString("\n");
 			}
@@ -97,14 +98,19 @@ public class MobsimTimeComparator {
 				String [] parts = line.split("\t");
 				String mobsimStartTime = parts[8];
 				String mobsimEndTime = parts[9];
-				double mobsimTime = Time.parseTime(mobsimEndTime) - Time.parseTime(mobsimStartTime);
+				double mobsimTime = getMobsimTime(mobsimStartTime, mobsimEndTime);
 				totalMobsimTime += mobsimTime;
-				System.out.println(mobsimTime);
 				line = reader.readLine();
 			} while(line!=null);
 		} catch (Exception e) {
 			throw new RuntimeException("File not found. Reason "+ e);
 		}
 		return totalMobsimTime;
+	}
+
+	private double getMobsimTime(String mobsimStartTime, String mobsimEndTime) {
+		double simTime = Time.parseTime(mobsimEndTime) - Time.parseTime(mobsimStartTime);
+		if (simTime < 0) simTime = simTime + 24. * 3600.;
+		return simTime;
 	}
 }
