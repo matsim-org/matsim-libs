@@ -2,7 +2,6 @@ package tutorial.programming.example07ControlerListener;
 
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 
 
 
@@ -19,9 +18,6 @@ public class RunControlerListenerExample {
 		//add an instance of this class as ControlerListener
 //		controler.addControlerListener(new MyControlerListener());
 		//call run() to start the simulation
-		
-		controler.getScenario().getConfig().controler().setLastIteration(0);
-		controler.getScenario().getConfig().controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
