@@ -20,13 +20,19 @@
 
 package org.matsim.core.events.handler;
 
-
 /**
- * Design thoughts:<ul>
- * <li> This is deliberately without an handleEvent( Event ev ) so that derived interfaces and ultimately classes are not
- * forced to implement a handler that deals with <i>all</i> events.  kai, with input from dominik, nov'11
+ * Examples:<ul>
+ * <li>{@link tutorial.programming.example06EventsHandling.RunEventsHandlingExample}
+ * <li>{@link tutorial.programming.example06EventsHandling.RunEventsHandlingWithControlerExample} 
+ * <li>{@link tutorial.programming.example21tutorialTUBclass.events.RunEventsHandlingExample}
  * </ul>
  *
+ * <br/>
+ * Design thoughts:<ul>
+ * <li> This is deliberately without a handleEvent( Event ev ) so that derived interfaces and ultimately classes are not
+ * forced to implement a handler that deals with <i>all</i> events.  kai, with input from dominik, nov'11
+ * </ul>
+ * 
  */
 public interface EventHandler {
 	/** Gives the event handler the possibility to clean up its internal state. 
