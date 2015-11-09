@@ -18,31 +18,30 @@ public class RunMobsimListenerExample {
 	public static void main(String[] args) {
 		Config config = ConfigUtils.createConfig();
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-        config.controler().setLastIteration(1);
-        Controler controler = new Controler(config);
-        controler.addOverridingModule(new AbstractModule() {
-            @Override
-            public void install() {
-            	// has to be an eagerSingleton because if not for every mobsim an own listener will
-            	// be created so one listener will never listen to multiple  mobsims
-                addMobsimListenerBinding().to(CountingMobsimListener.class).asEagerSingleton();;
-            }
-        });
-        controler.run();
+		config.controler().setLastIteration(1);
+		Controler controler = new Controler(config);
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				// as an eager singleton, it will be instantiated only once, so if used again the simulation will fail:
+				addMobsimListenerBinding().to(CountingMobsimListener.class).asEagerSingleton();;
+			}
+		});
+		controler.run();
 	}
-	
-    private static class CountingMobsimListener implements MobsimInitializedListener {
 
-        int count = 0;
+	private static class CountingMobsimListener implements MobsimInitializedListener {
 
-        @Override
-        public void notifyMobsimInitialized(MobsimInitializedEvent e) {
-            count++;
-            if (count > 1) {
-                throw new RuntimeException("This mobsim listener ran more than once.");
-            }
-        }
+		int count = 0;
 
-    }
-	
+		@Override
+		public void notifyMobsimInitialized(MobsimInitializedEvent e) {
+			count++;
+			if (count > 1) {
+				throw new RuntimeException("This mobsim listener ran more than once.");
+			}
+		}
+
+	}
+
 }
