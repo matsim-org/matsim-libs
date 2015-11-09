@@ -454,10 +454,9 @@ public class MATSimDummy {
 
 			final TravelTimeMatrices travelTimeMatrices = new TravelTimeMatrices(
 					controler.getScenario().getNetwork(),
-					controler.getLinkTravelTimes(),
-					// new LinkedHashSet<>(zoneIDs),
-					zonalSystem, rnd, analysisStartTime_s, analysisBinSize_s,
-					analysisBinCnt, nodeSampleSize);
+					controler.getLinkTravelTimes(), zonalSystem, rnd,
+					analysisStartTime_s, analysisBinSize_s, analysisBinCnt,
+					nodeSampleSize);
 
 			if (DEMANDMODEL.regent.equals(demandModel)) {
 
@@ -508,7 +507,17 @@ public class MATSimDummy {
 					"... succeeded to run Regent");
 		}
 
+		Logger.getLogger(MATSimDummy.class.getName()).info(
+				"Completed simulation.");
+
+		/*
+		 * Create summary data.
+		 */
+
+		Logger.getLogger(MATSimDummy.class.getName()).info(
+				"Creating folder with summary data.");
+		SummaryCreator.run(maxIterations);
+
 		Logger.getLogger(MATSimDummy.class.getName()).info("DONE");
-		System.out.println("... DONE");
 	}
 }

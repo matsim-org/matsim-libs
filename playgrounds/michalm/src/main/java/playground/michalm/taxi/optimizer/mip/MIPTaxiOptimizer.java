@@ -36,7 +36,7 @@ import playground.michalm.taxi.schedule.TaxiTask.TaxiTaskType;
 public class MIPTaxiOptimizer
     extends AbstractTaxiOptimizer
 {
-    private final PathTreeBasedTravelTimeCalculator pathTravelTimeCalc;
+    private final PathTreeBasedTravelTimeCalculator pathTreeTravelTimeCalc;
 
     private boolean wasLastPlanningHorizonFull = false;//in order to run optimization for the first request
     private boolean hasPickedUpReqsRecently = false;
@@ -55,7 +55,7 @@ public class MIPTaxiOptimizer
         TravelTime travelTime = new FreeSpeedTravelTime();
         TravelDisutility travelDisutility = new TimeAsTravelDisutility(travelTime);
 
-        pathTravelTimeCalc = new PathTreeBasedTravelTimeCalculator(
+        pathTreeTravelTimeCalc = new PathTreeBasedTravelTimeCalculator(
                 new DijkstraWithDijkstraTreeCache(optimConfig.context.getScenario().getNetwork(),
                         travelDisutility, travelTime, TimeDiscretizer.CYCLIC_24_HOURS));
     }
@@ -75,7 +75,7 @@ public class MIPTaxiOptimizer
             return;
         }
 
-        MIPProblem mipProblem = new MIPProblem(optimConfig, pathTravelTimeCalc);
+        MIPProblem mipProblem = new MIPProblem(optimConfig, pathTreeTravelTimeCalc);
         mipProblem.scheduleUnplannedRequests((SortedSet<TaxiRequest>)unplannedRequests);
 
         optimCounter++;

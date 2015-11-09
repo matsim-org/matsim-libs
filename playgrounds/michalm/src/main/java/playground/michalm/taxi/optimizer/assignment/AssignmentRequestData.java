@@ -19,9 +19,10 @@
 
 package playground.michalm.taxi.optimizer.assignment;
 
-import java.util.SortedSet;
+import java.util.*;
 
-import org.matsim.contrib.dvrp.data.Requests;
+import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.dvrp.data.Request;
 
 import playground.michalm.taxi.data.TaxiRequest;
 import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration;
@@ -29,19 +30,35 @@ import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration;
 
 class AssignmentRequestData
 {
-    final TaxiRequest[] requests;
+    final List<TaxiRequest> requests = new ArrayList<>();
+    final Map<Id<Request>, Integer> reqIdx = new HashMap<>();
     final int urgentReqCount;
     final int dimension;
 
 
     AssignmentRequestData(TaxiOptimizerConfiguration optimConfig,
-            SortedSet<TaxiRequest> unplannedRequests)
+            SortedSet<TaxiRequest> unplannedRequests, double planningHorizon)
     {
-        dimension = unplannedRequests.size();//TODO - consider only awaiting and "soon-awaiting" reqs!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        double currTime = optimConfig.context.getTime();
+        double maxT0 = currTime + planningHorizon;
+        int urgentReqCounter = 0;
+        int idx = 0;
 
-        urgentReqCount = Requests.countRequests(unplannedRequests,
-                new Requests.IsUrgentPredicate(optimConfig.context.getTime()));
+        for (TaxiRequest req : unplannedRequests) {
+            double t0 = req.getT0();
+            if (t0 <= maxT0) {
+                requests.add(req);
+                reqIdx.put(req.getId(), idx++);
+                
+                //'<=' or '<' does not make difference
+                //(re-optimization is run before activity ends are handled)
+                if (t0 <= currTime) {
+                    urgentReqCounter++;
+                }
+            }
+        }
 
-        requests = unplannedRequests.toArray(new TaxiRequest[dimension]);
+        urgentReqCount = urgentReqCounter;
+        dimension = unplannedRequests.size();
     }
 }

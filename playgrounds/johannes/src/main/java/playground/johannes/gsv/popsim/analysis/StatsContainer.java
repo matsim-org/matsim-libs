@@ -54,4 +54,32 @@ public class StatsContainer {
         N = values.length;
         variance = StatUtils.variance(values);
     }
+
+    public String getName() {
+        return name;
+    }
+
+    public Double getMean() {
+        return mean;
+    }
+
+    public Double getMedian() {
+        return median;
+    }
+
+    public Double getMin() {
+        return min;
+    }
+
+    public Double getMax() {
+        return max;
+    }
+
+    public Integer getN() {
+        return N;
+    }
+
+    public Double getVariance() {
+        return variance;
+    }
 }

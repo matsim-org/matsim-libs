@@ -11,8 +11,8 @@ public class PersonUtils {
 	private final static String SEX_ATTRIBUTE="sex";
 	private final static String HAS_LICENSE= "hasLicense";
 	private static final String CAR_AVAIL = "carAvail";
-	private static final String EMPLOYED = "employed";
-	private static final String AGE = "age";
+	public static final String EMPLOYED = "employed";
+	public static final String AGE = "age";
 	private static final String TRAVELCARDS = "travelcards";
 	private final static Logger log = Logger.getLogger(PersonImpl.class);
 

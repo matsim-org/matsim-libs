@@ -28,8 +28,7 @@ import org.matsim.contrib.common.stats.LinearDiscretizer;
 import org.matsim.contrib.common.util.XORShiftRandom;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import playground.johannes.gsv.popsim.analysis.NumericAttributeProvider;
-import playground.johannes.gsv.popsim.analysis.LegCollector;
+import playground.johannes.gsv.popsim.analysis.*;
 import playground.johannes.gsv.synPop.analysis.AnalyzerTaskComposite;
 import playground.johannes.gsv.synPop.analysis.LegGeoDistanceTask;
 import playground.johannes.gsv.synPop.analysis.ProxyAnalyzer;
@@ -80,7 +79,7 @@ public class Simulator {
         /*
 		Prepare population for simulation.
 		 */
-        logger.info("Preparing reference simulaion...");
+        logger.info("Preparing reference simulation...");
         TaskRunner.run(new ReplaceActTypes(), refPersons);
         new GuessMissingActTypes(random).apply(refPersons);
         TaskRunner.run(new Route2GeoDistance(new Route2GeoDistFunction()), refPersons);
@@ -110,11 +109,13 @@ public class Simulator {
 		Setup analyzer and analyze reference population
 		 */
         final String output = config.getParam(MODULE_NAME, "output");
-        final AnalyzerTaskComposite task = new AnalyzerTaskComposite();
-        task.addTask(new LegGeoDistanceTask(CommonValues.LEG_MODE_CAR));
-        task.addTask(new GeoDistLau2ClassTask());
+        FileIOContext ioContext = new FileIOContext(output);
+        final ConcurrentAnalyzerTask<Collection<? extends Person>> task = new ConcurrentAnalyzerTask<>();
+        task.addComponent(new GeoDistanceBuilder(ioContext).build());
+        task.addComponent(new GeoDistLau2ClassTask(ioContext));
         logger.info("Analyzing reference population...");
-        ProxyAnalyzer.analyze(refPersons, task, String.format("%s/ref/", output));
+        ioContext.append("ref");
+        AnalyzerTaskRunner.run(refPersons, task, ioContext);
 		/*
 		Setup hamiltonian
 		 */
@@ -149,15 +150,17 @@ public class Simulator {
 
         MarkovEngineListenerComposite engineListeners = new MarkovEngineListenerComposite();
 
-        engineListeners.addComponent(new MarkovEngineListener() {
-            AnalyzerListener l = new AnalyzerListener(task, String.format("%s/sim/", output), (long) Double.parseDouble
-                    (config.getParam(MODULE_NAME, "dumpInterval")));
+        long dumpInterval = (long) Double.parseDouble(config.getParam(MODULE_NAME, "dumpInterval"));
+        engineListeners.addComponent(new AnalyzerListener(task, ioContext, dumpInterval));
 
-            @Override
-            public void afterStep(Collection<CachedPerson> population, Collection<? extends Attributable> mutations, boolean accepted) {
-                l.afterStep(population, null, accepted);
-            }
-        });
+//        engineListeners.addComponent(new MarkovEngineListener() {
+//            AnalyzerListener l = new AnalyzerListener(task, String.format("%s/sim/", output), ));
+//
+//            @Override
+//            public void afterStep(Collection<CachedPerson> population, Collection<? extends Attributable> mutations, boolean accepted) {
+//                l.afterStep(population, null, accepted);
+//            }
+//        });
 
         engineListeners.addComponent(new MarkovEngineListener() {
             HamiltonianLogger l = new HamiltonianLogger(hamiltonian, (int) Double.parseDouble(config.getParam

@@ -1,20 +1,21 @@
 package org.matsim.contrib.util;
 
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.*;
 
 
 public class DistanceUtils
 {
-    public static double calculateDistance(Link fromLink, Link toLink)
+    public static double calculateDistance(BasicLocation<?> fromLocation,
+            BasicLocation<?> toLocation)
     {
-        return calculateDistance(fromLink.getCoord(), toLink.getCoord());
+        return calculateDistance(fromLocation.getCoord(), toLocation.getCoord());
     }
 
 
-    public static double calculateSquaredDistance(Link fromLink, Link toLink)
+    public static double calculateSquaredDistance(BasicLocation<?> fromLocation,
+            BasicLocation<?> toLocation)
     {
-        return calculateSquaredDistance(fromLink.getCoord(), toLink.getCoord());
+        return calculateSquaredDistance(fromLocation.getCoord(), toLocation.getCoord());
     }
 
 

@@ -32,22 +32,41 @@ public class GeoDistanceBuilder {
 
     private Map<String, Predicate<Segment>> predicates;
 
-    AnalyzerTask<Collection<? extends Person>> build() {
+    private final FileIOContext ioContext;
 
-        AnalyzerTaskComposite<Collection<? extends Person>> composite = new AnalyzerTaskComposite<>();
+    public GeoDistanceBuilder(FileIOContext ioContext) {
+        this.ioContext = ioContext;
+    }
 
-        for(Map.Entry<String, Predicate<Segment>> entry : predicates.entrySet()) {
-            ValueProvider<Double, Segment> getter = new NumericAttributeProvider(CommonKeys.LEG_GEO_DISTANCE);
-            LegCollector<Double> collector = new LegCollector<>(getter);
-            collector.setPredicate(entry.getValue());
+    public AnalyzerTask<Collection<? extends Person>> build() {
+        AnalyzerTask<Collection<? extends Person>> task;
 
-            String name = String.format("%s.%s", CommonKeys.LEG_GEO_DISTANCE, entry.getKey());
-            NumericAnalyzer analyzer = new NumericAnalyzer(collector, name);
+        if (predicates == null || predicates.isEmpty()) {
+            task = buildWithPredicate(null, null);
+        } else {
+            ConcurrentAnalyzerTask<Collection<? extends Person>> composite = new ConcurrentAnalyzerTask<>();
 
-            composite.addComponent(analyzer);
+            for (Map.Entry<String, Predicate<Segment>> entry : predicates.entrySet()) {
+                composite.addComponent(buildWithPredicate(entry.getValue(), entry.getKey()));
+            }
 
+            task = composite;
         }
 
-        return composite;
+        return task;
+    }
+
+    private AnalyzerTask buildWithPredicate(Predicate<Segment> predicate, String predicateName) {
+        ValueProvider<Double, Segment> getter = new NumericAttributeProvider(CommonKeys.LEG_GEO_DISTANCE);
+
+        LegCollector<Double> collector = new LegCollector<>(getter);
+        if (predicate != null)
+            collector.setPredicate(predicate);
+
+        String name = CommonKeys.LEG_GEO_DISTANCE;
+        if (predicateName != null)
+            name = String.format("%s.%s", CommonKeys.LEG_GEO_DISTANCE, predicateName);
+
+        return new NumericAnalyzer(collector, name, ioContext);
     }
 }

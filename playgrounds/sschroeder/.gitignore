@@ -1,13 +1,10 @@
 /bin
 /target
 /output
+/out
 /in
 /input
 .DS_Store
-*~
-vrp-app-old.log
-vrp-app.log
-*log.gz
 
 # Netbeans
 nbactions.xml

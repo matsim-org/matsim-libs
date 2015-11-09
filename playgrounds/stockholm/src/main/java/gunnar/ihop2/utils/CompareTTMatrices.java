@@ -8,7 +8,6 @@ import java.util.List;
 import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrices;
 import org.matsim.matrices.Matrix;
-import org.matsim.matrices.MatrixUtils;
 import org.matsim.matrices.MatsimMatricesReader;
 
 /**
@@ -25,24 +24,40 @@ public class CompareTTMatrices {
 
 		System.out.println("STARTED ...");
 
+		final String type = "OTHER";
 		final Matrix xMatrix;
 		{
 			final Matrices m1 = new Matrices();
 			final MatsimMatricesReader r1 = new MatsimMatricesReader(m1, null);
-			r1.readFile("./test/travelTimeMatrices_18-22.xml");
-			xMatrix = m1.getMatrix("TT_18:15:00");
+			r1.readFile("./test/matsim-testrun/tourtts.xml");
+			xMatrix = m1.getMatrix(type);
+			// r1.readFile("./test/matsim-testrun/traveltimes.xml");
+			// xMatrix = m1.getMatrix("TT_07:30:00");
+			// MatrixUtils.mult(xMatrix, 2.0); // we want tours, not trips
 		}
 
 		final Matrix yMatrix;
 		{
 			final Matrices m1 = new Matrices();
 			final MatsimMatricesReader r1 = new MatsimMatricesReader(m1, null);
-			r1.readFile("./test/travelTimeMatrices_1800-1830_parallel.xml");
-			yMatrix = m1.getMatrix("TT_18:15:00");
+			r1.readFile("./test/matsim-testrun/WRONG/tourtts.xml");
+			yMatrix = m1.getMatrix(type);			
+//			final Matrices m1 = new Matrices();
+//			final MatsimMatricesReader r1 = new MatsimMatricesReader(m1, null);
+//			r1.readFile("./test/referencedata/EMME_traveltimes_" + type
+//					+ "_mf8.xml");
+//			// r1.readFile("./test/referencedata/EMME_traveltimes_" + type +
+//			// "_mf9.xml");
+//			// r1.readFile("./test/matsim-testrun/freeflow-traveltimes.xml");
+//			yMatrix = m1.getMatrices().values().iterator().next();
+//			// MatrixUtils.mult(yMatrix, 2.0); // we want tours, not trips
 		}
 
-		final double frac = 0.01;
-		final PrintWriter writer = new PrintWriter("./test/scatter-par.txt");
+		final double frac = 0.1;
+		// final PrintWriter writer = new
+		// PrintWriter("./test/matsim-testrun/matsim-vs-emme_WORK_0-01.txt");
+		final PrintWriter writer = new PrintWriter(
+				"./test/matsim-testrun/right-vs-wrong_" + type + ".txt");
 
 		for (List<Entry> row1 : new FractionalIterable<ArrayList<Entry>>(
 				xMatrix.getFromLocations().values(), Math.sqrt(frac))) {
