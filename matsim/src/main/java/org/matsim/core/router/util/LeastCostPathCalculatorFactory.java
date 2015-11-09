@@ -24,7 +24,11 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.internal.MatsimFactory;
 
 public interface LeastCostPathCalculatorFactory extends MatsimFactory {
-
+	
+	/**
+	 * Creational method, since Network may not be exactly the scenario's network
+	 */
+	
 	public LeastCostPathCalculator createPathCalculator(final Network network, final TravelDisutility travelCosts, final TravelTime travelTimes);
 
 }
