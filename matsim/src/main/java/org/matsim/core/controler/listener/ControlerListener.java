@@ -27,9 +27,11 @@ import org.matsim.core.api.internal.MatsimExtensionPoint;
 /**
  * This is an empty marker interface which must be implemented by all Interfaces
  * providing methods to listen for ControlerEvents.
- * <br>
- * An example of how this can be used can be found at {@link 
- * tutorial.programming.example07ControlerListener.RunControlerListenerExample}.
+ * <br/>
+ * <br/>
+ * Example(s):<ul>
+ * <li> {@link tutorial.programming.example07ControlerListener.RunControlerListenerExample}
+ * </ul>
  *
  * @author dgrether
  */
