@@ -7,11 +7,10 @@ import floetteroed.utilities.Time;
 import gunnar.ihop2.integration.MATSimDummy;
 import gunnar.ihop2.regent.demandreading.ZonalSystem;
 import gunnar.ihop2.regent.demandreading.Zone;
+import gunnar.ihop2.utils.LexicographicallyOrderedPositiveNumberStrings;
 
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
@@ -52,8 +51,7 @@ public class TravelTimeMatrices {
 
 	private final Matrices matrices;
 
-	// TODO encapsulate
-	public final List<Matrix> ttMatrixList_min;
+	private final LexicographicallyOrderedPositiveNumberStrings numberStrings;
 
 	// -------------------- CONSTRUCTION --------------------
 
@@ -62,12 +60,8 @@ public class TravelTimeMatrices {
 		this.matrices = matrices;
 		this.startTime_s = startTime_s;
 		this.binSize_s = binSize_s;
-		this.ttMatrixList_min = new ArrayList<Matrix>(this.matrices
-				.getMatrices().size());
-		for (Matrix matrix : this.matrices.getMatrices().values()) {
-			this.ttMatrixList_min.add(matrix);
-			System.out.println(matrix.getId());
-		}
+		this.numberStrings = new LexicographicallyOrderedPositiveNumberStrings(
+				matrices.getMatrices().size() - 1);
 	}
 
 	public TravelTimeMatrices(final Network network, final TravelTime linkTTs,
@@ -77,6 +71,8 @@ public class TravelTimeMatrices {
 
 		this.startTime_s = startTime_s;
 		this.binSize_s = binSize_s;
+		this.numberStrings = new LexicographicallyOrderedPositiveNumberStrings(
+				binCnt - 1);
 
 		/*
 		 * Identify all zones that are relevant and contain at least one node.
@@ -95,23 +91,26 @@ public class TravelTimeMatrices {
 		 * Create one travel time matrix per time bin.
 		 */
 
+		Logger.getLogger(MATSimDummy.class.getName()).info(
+				"Using " + sampleCnt + " random node(s) per zone.");
+
 		this.matrices = new Matrices();
-		this.ttMatrixList_min = new ArrayList<Matrix>(binCnt);
 
 		for (int bin = 0; bin < binCnt; bin++) {
 
-			final int time_s = startTime_s + bin * binSize_s + binSize_s / 2;
-			final String timeString = Time.strFromSec(time_s, ':');
+			final String timeIntervalString = "["
+					+ Time.strFromSec(startTime_s + bin * binSize_s, ':') + ","
+					+ Time.strFromSec(startTime_s + (bin + 1) * binSize_s, ':')
+					+ ")";
 
 			Logger.getLogger(MATSimDummy.class.getName()).info(
-					"Computing travel time matrix for departure time "
-							+ timeString + ".");
-			Logger.getLogger(MATSimDummy.class.getName()).info(
-					"Using " + sampleCnt + " random node(s) per zone.");
+					"Computing travel time matrix for time interval "
+							+ timeIntervalString + ".");
 
-			final Matrix ttMatrix_min = this.matrices.createMatrix("TT_"
-					+ timeString, "travel time in minutes");
-			this.ttMatrixList_min.add(ttMatrix_min);
+			final Matrix ttMatrix_min = this.matrices.createMatrix(
+					this.numberStrings.toString(bin),
+					"travel time in minutes when starting in the middle of time interval "
+							+ timeIntervalString);
 			final Matrix cntMatrix = newAnonymousMatrix();
 
 			final int threadCnt = Runtime.getRuntime().availableProcessors();
@@ -125,7 +124,8 @@ public class TravelTimeMatrices {
 				// go through a sample of origin nodes
 				for (Node fromNode : zone2sampledNodes.get(fromZone)) {
 					final LeastCostMatrixUpdater matrixUpdater = new LeastCostMatrixUpdater(
-							linkTTs, network, fromNode, time_s,
+							linkTTs, network, fromNode, startTime_s + bin
+									* binSize_s + binSize_s / 2,
 							zone2sampledNodes, ttMatrix_min, cntMatrix,
 							fromZone.getId());
 					threadPool.execute(matrixUpdater);
@@ -152,7 +152,11 @@ public class TravelTimeMatrices {
 	}
 
 	public int getBinCnt() {
-		return this.ttMatrixList_min.size();
+		return this.matrices.getMatrices().size();
+	}
+
+	public Matrix getMatrix_min(final int bin) {
+		return this.matrices.getMatrix(this.numberStrings.toString(bin));
 	}
 
 	public void writeToFile(final String fileName) {
@@ -163,19 +167,18 @@ public class TravelTimeMatrices {
 	}
 
 	public void writeToScaperFiles(final String prefix) {
-		for (int i = 0; i < this.ttMatrixList_min.size(); i++) {
 
-			final Matrix matrix = this.ttMatrixList_min.get(i);
+		for (int bin = 0; bin < this.getBinCnt(); bin++) {
+			final String binString = this.numberStrings.toString(bin);
+
+			final Matrix matrix = this.matrices.getMatrix(binString);
 			final Matrices dummyMatrices = new Matrices();
 			dummyMatrices.getMatrices().put(matrix.getId(), matrix);
 
 			final MatricesWriter writer = new MatricesWriter(this.matrices);
 			writer.setIndentationString("  ");
 			writer.setPrettyPrint(true);
-			writer.write(prefix + "_"
-					+ Time.strFromSec(startTime_s + i * binSize_s, '-') + "_"
-					+ Time.strFromSec(startTime_s + (i + 1) * binSize_s, '-')
-					+ ".xml");
+			writer.write(prefix + this.numberStrings.toString(bin) + ".xml");
 		}
 	}
 

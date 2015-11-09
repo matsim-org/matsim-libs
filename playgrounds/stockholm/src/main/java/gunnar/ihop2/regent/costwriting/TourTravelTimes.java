@@ -156,15 +156,17 @@ public class TourTravelTimes {
 					.getBinCnt(); ttMatrixBin++) {
 				// contribution of trips to the activity
 				add(tourTT_min,
-						this.travelTimeMatrices.ttMatrixList_min
-								.get(ttMatrixBin),
+						this.travelTimeMatrices.getMatrix_min(ttMatrixBin),
+						// this.travelTimeMatrices.ttMatrixList_min
+						// .get(ttMatrixBin),
 						this.actType2dptTimeHistTourStart.get(actType).freq(
 								ttMatrixBin + 1)
 								/ freqSumTourStart);
 				// contribution of trips back from the activity
 				add(tourTT_min,
-						this.travelTimeMatrices.ttMatrixList_min
-								.get(ttMatrixBin),
+						this.travelTimeMatrices.getMatrix_min(ttMatrixBin),
+						// this.travelTimeMatrices.ttMatrixList_min
+						// .get(ttMatrixBin),
 						this.actType2dptTimeHistTourEnd.get(actType).freq(
 								ttMatrixBin + 1)
 								/ freqSumTourEnd);
