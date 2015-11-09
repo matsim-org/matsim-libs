@@ -70,7 +70,8 @@ public class CreateBasecase {
 		final Config config;
 		if (args.length>0){
 			config = ConfigUtils.loadConfig(args[0] );
-			if (args[1]=="true") useCadyts=true;
+			boolean useCadytsConf= Boolean.parseBoolean(args[1]);
+			useCadyts=useCadytsConf;
 		}
 		else
 		{
@@ -78,7 +79,7 @@ public class CreateBasecase {
 			config = prepareConfig(useCadyts);}
 		
 		
-		
+		System.out.println("using cadyts: "+useCadyts);
 		final CadytsContext cContext = new CadytsContext(config);
 
 		final Scenario scenario = ScenarioUtils.loadScenario(config);

@@ -116,7 +116,7 @@ public class WobDistanceAnalyzer {
 		}
 	}
 
-	static String prettyPrintSeconds(double seconds) {
+	public static String prettyPrintSeconds(double seconds) {
 		long s = (long) seconds;
 		return String.format("%d:%02d:%02d", s / 3600, (s % 3600) / 60,
 				(s % 60));

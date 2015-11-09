@@ -17,48 +17,27 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jbischoff.taxibus.network;
+package playground.jbischoff.taxibus.scenario.analysis.quick;
 
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.scenario.ScenarioUtils;
-import org.opensaml.ws.security.ServletRequestX509CredentialAdapter;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.MatsimEventsReader;
 
 /**
  * @author  jbischoff
  *
  */
-public class AdjustNetworkCapacities {
+public class TravelTimeStatistics   {
+
 	public static void main(String[] args) {
-		
-	Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-	String basedir = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/input/";
-	new MatsimNetworkReader(scenario).readFile(basedir+"networkpt.xml");
-	for (Link link : scenario.getNetwork().getLinks().values()){
-		if (link.getId().toString().startsWith("pt")) continue;
-		if (decideToAdjust(link.getCoord())){
-			link.setCapacity(link.getCapacity()*2);
-			if (link.getCapacity()<2000) link.setCapacity(2000);
-		}else 
-		{
-			link.setCapacity(link.getCapacity()*1.1);
-		}
-		
+//		String inputFile = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/input/output/vw026.100pct/ITERS/it.150/vw026.100pct.150.events.xml.gz";
+		String inputFile = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/input/output/vw027.100pct/ITERS/it.180/vw026.100pct.180.events.xml.gz";
+		EventsManager events = EventsUtils.createEventsManager();
+		TTEventHandler tt = new TTEventHandler();
+		events.addHandler(tt);
+		new MatsimEventsReader(events).readFile(inputFile);
+		tt.printOutput();
 	}
-	new NetworkWriter(scenario.getNetwork()).write(basedir+"networkptcc.xml");
 	
-	}
 
-
-	static boolean decideToAdjust(Coord coord){
-		if (coord.getX()<593084) return true;
-		else if (coord.getX()>629810) return true;
-		else if (coord.getY()<5785583) return true;
-		else if (coord.getY()>5817600) return true;
-		else return false;
-	} 
 }
