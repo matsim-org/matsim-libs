@@ -8,6 +8,11 @@ import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 
+/**
+ * This is an minor example for how to bind a MobsimListener in matsim.
+ * @author gthunig
+ *
+ */
 public class RunMobsimListenerExample {
 
 	public static void main(String[] args) {
