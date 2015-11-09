@@ -34,11 +34,10 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.api.internal.MatsimWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
@@ -48,6 +47,7 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
 
 import playground.agarwalamit.mixedTraffic.patnaIndia.PatnaConstants;
+import playground.agarwalamit.mixedTraffic.patnaIndia.PatnaConstants.PatnaActivityTypes;
 /**
  * @author amit
  */
@@ -58,22 +58,22 @@ public class PatnaPlansGenerator {
 	}
 
 	private  final Logger logger = Logger.getLogger(PatnaPlansGenerator.class);
-	private final String zoneFile = PatnaConstants.inputFilesDir+"/Wards.shp";	
+	private final String zoneFile = PatnaConstants.inputFilesDir+"/wardFile/Wards.shp";	
 	private final int ID1 =0;				
 	private final int ID2 = 100000;
 	private final int ID3= 200000;
 	private final Random random = MatsimRandom.getRandom();
 
 	private Scenario scenario;
-
-
 	private String outputDir;
+	private Collection<SimpleFeature> features ;
 
 	public static void main (String []args) {
-		new PatnaPlansGenerator(PatnaConstants.inputFilesDir+"/initial_plans.xml.gz").startProcessingAndWritePlans();
+		new PatnaPlansGenerator(PatnaConstants.inputFilesDir).startProcessingAndWritePlans();
 	}
 
 	public void startProcessingAndWritePlans() {
+		this.features = readZoneFilesAndReturnFeatures();
 
 		String planFile1 = PatnaConstants.inputFilesDir+"/Urban_PlanFile.CSV"; // urban plans for all zones except 27 to 42.
 		String planFile2 = PatnaConstants.inputFilesDir+"/27TO42zones.CSV";// urban plans for zones 27 to 42
@@ -86,17 +86,18 @@ public class PatnaPlansGenerator {
 		filesReader(planFile2, ID2);
 		filesReader(planFile3, ID3);
 
-		MatsimWriter populationwriter = new PopulationWriter(scenario.getPopulation(),scenario.getNetwork()); 
-		populationwriter.write(outputDir+"/initial_plans.xml.gz");
+		new PopulationWriter(scenario.getPopulation()).write(this.outputDir+"/initial_plans.xml.gz");
 		logger.info("Writing Plan file is finished.");
 	}
 
-	private void filesReader (String planFile, int startId) {
-
+	private Collection<SimpleFeature> readZoneFilesAndReturnFeatures() {
 		ShapeFileReader reader = new ShapeFileReader();
-		Collection<SimpleFeature> features = reader.readFileAndInitialize(zoneFile);
+		return reader.readFileAndInitialize(this.zoneFile);
+	}
+	
+	private void filesReader (String planFile, int startId) {
 		Iterator<SimpleFeature> iterator = features.iterator();
-
+		
 		BufferedReader bufferedReader ;
 		String line;
 		try {
@@ -231,37 +232,37 @@ public class PatnaPlansGenerator {
 		case "1" : {//work act starts between 8 to 9:30 and duration is 8 hours
 			homeActEndTime = 8.0*3600. + random.nextInt(91)*60.; 
 			secondActEndTimeLeaveTime = homeActEndTime + 8*3600.; 
-			secondActType = "work";
+			secondActType = PatnaActivityTypes.valueOf("work").toString();
 			break; 
 			}  
 		case "2" : { // educational act starts between between 6:30 to 8:30 hours and duration is assumed about 7 hours
 			homeActEndTime = 6.5*3600. + random.nextInt(121)*60.; 
 			secondActEndTimeLeaveTime = homeActEndTime + 7*3600.;
-			secondActType = "education";
+			secondActType = PatnaActivityTypes.valueOf("educational").toString();
 			break;
 			}  
 		case "3" : {// social duration between 5 to 7 hours
 			homeActEndTime= 10.*3600. ; 
 			secondActEndTimeLeaveTime = homeActEndTime+ 5.*3600. + random.nextInt(121)*60.; 
-			secondActType = "social";
+			secondActType = PatnaActivityTypes.valueOf("social").toString();
 			break;
 			}  
 		case "4" : { // other act duration between 5 to 7 hours
 			homeActEndTime = 8.*3600 ; 
 			secondActEndTimeLeaveTime= homeActEndTime + 5.*3600. + random.nextInt(121)*60.; 
-			secondActType = "other";
+			secondActType = PatnaActivityTypes.valueOf("other").toString();
 			break;
 			} 
 		case "9999" : { // no data
 			homeActEndTime = 8.*3600. + random.nextInt(121)*60.; 
 			secondActEndTimeLeaveTime= homeActEndTime + 7*3600.; 
-			secondActType = "unknown";
+			secondActType = PatnaActivityTypes.valueOf("unknown").toString();
 			break;
 			} 
 		}
 
 
-		Activity homeAct = populationFactory.createActivityFromCoord("home", fromZoneFeatureCoord);
+		Activity homeAct = populationFactory.createActivityFromCoord(PatnaActivityTypes.valueOf("home").toString(), fromZoneFeatureCoord);
 		homeAct.setEndTime(homeActEndTime); 								
 		plan.addActivity(homeAct);
 		plan.addLeg(populationFactory.createLeg(mode));

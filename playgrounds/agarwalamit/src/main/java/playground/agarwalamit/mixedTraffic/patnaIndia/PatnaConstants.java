@@ -28,6 +28,10 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 public final class PatnaConstants {
 	
 	public static CoordinateTransformation COORDINATE_TRANSFORMATION = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84,"EPSG:24345");
+	
 	public static String inputFilesDir = "../../../../repos/shared-svn/projects/patnaIndia/patnaIndiaSim/input/";
-
+	
+	public enum PatnaActivityTypes {
+		home, work, educational, social, other, unknown;
+	}
 }
