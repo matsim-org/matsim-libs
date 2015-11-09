@@ -27,7 +27,7 @@ import java.util.List;
  *
  * @author mrieser
  */
-public class Example {
+public class RunObjectAttributesExample {
 
 	public static void main(String[] args) {
 		// assume we're working with some links, e.g. in a network

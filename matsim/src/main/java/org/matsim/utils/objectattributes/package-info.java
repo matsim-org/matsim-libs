@@ -1,7 +1,7 @@
 /**
  * Supports keeping track of arbitrary attributes for identifiable objects.
  *
- * An example usage can be seen in {@link Example}.
+ * An example usage can be seen in {@link org.matsim.utils.objectattributes.RunObjectAttributesExample}.
  * 
  * <h2>Design thoughts</h2>
  * I think of ObjectAttributes (OA) as a way to provide specific additional data
