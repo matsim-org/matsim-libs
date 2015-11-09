@@ -25,6 +25,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 
 public class RunPluggablePlanStrategyInCodeExample {
 
@@ -42,8 +43,12 @@ public class RunPluggablePlanStrategyInCodeExample {
 		stratSets.setStrategyName("doSomethingSpecial");
 		stratSets.setWeight(0.1);
 		config.strategy().addStrategySettings(stratSets);
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controler().setFirstIteration(0);
+		config.controler().setLastIteration(1);
 		
 		final Controler controler = new Controler(config);
+		
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
