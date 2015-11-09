@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * LeastCostPathCalculatorFactory.java
+ * RunEmissionToolOffline.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,18 +17,28 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package tutorial.programming.example21tutorialTUBclass.events;
+import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.controler.listener.StartupListener;
+/**
+ * @author jbischoff
+ * A basic Controler Listener used in the MATSim class at TU Berlin.
+ */
+public class MatsimClassControlerListener implements StartupListener, IterationEndsListener {
 
-package org.matsim.core.router.util;
+	MyEventHandler myEventHandler;
+	 
+	@Override
+	public void notifyStartup(StartupEvent event) {
+		myEventHandler = new MyEventHandler(); 
+		event.getControler().getEvents().addHandler(myEventHandler);
+	}
 
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.api.internal.MatsimFactory;
-
-public interface LeastCostPathCalculatorFactory extends MatsimFactory {
-	
-	/**
-	 * Creational method, since Network may not be exactly the scenario's network
-	 */
-	
-	public LeastCostPathCalculator createPathCalculator(final Network network, final TravelDisutility travelCosts, final TravelTime travelTimes);
+	@Override
+	public void notifyIterationEnds(IterationEndsEvent event) {
+		myEventHandler.printPersonWithHighestWorkingTime();
+	}
 
 }

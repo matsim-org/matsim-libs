@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * LeastCostPathCalculatorFactory.java
+ * RunEmissionToolOffline.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,18 +17,47 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package tutorial.programming.example21tutorialTUBclass.events;
 
-package org.matsim.core.router.util;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.api.internal.MatsimFactory;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.vehicles.Vehicle;
 
-public interface LeastCostPathCalculatorFactory extends MatsimFactory {
+/**
+ * An event handler to determine if a vehicle has driven over a certain set of links.
+ * 
+ * @author jbischoff
+ */
+public class CityCenterEventEnterHandler implements LinkEnterEventHandler {
+
 	
-	/**
-	 * Creational method, since Network may not be exactly the scenario's network
-	 */
+	List<Id<Vehicle>> agentsInCityCenter = new ArrayList<>();
+	List<Id<Link>> cityCenterLinks = new ArrayList<>();
 	
-	public LeastCostPathCalculator createPathCalculator(final Network network, final TravelDisutility travelCosts, final TravelTime travelTimes);
+	@Override
+	public void reset(int iteration) {
+		this.agentsInCityCenter.clear();
+	}
 
+	@Override
+	public void handleEvent(LinkEnterEvent event) {
+		if (this.cityCenterLinks.contains(event.getLinkId()))
+		{
+		this.agentsInCityCenter.add(event.getVehicleId());
+		}
+	}
+	public void addLinkId(Id<Link> linkId){
+		this.cityCenterLinks.add(linkId);
+	}
+
+	public List<Id<Vehicle>> getVehiclesInCityCenter() {
+		return agentsInCityCenter;
+	}
+
+	
 }

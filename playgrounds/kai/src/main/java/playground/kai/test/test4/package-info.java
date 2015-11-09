@@ -1,6 +1,5 @@
 /* *********************************************************************** *
- * project: org.matsim.*
- * LeastCostPathCalculatorFactory.java
+ * project: org.matsim.*												   *
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,18 +16,8 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
-package org.matsim.core.router.util;
-
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.api.internal.MatsimFactory;
-
-public interface LeastCostPathCalculatorFactory extends MatsimFactory {
-	
-	/**
-	 * Creational method, since Network may not be exactly the scenario's network
-	 */
-	
-	public LeastCostPathCalculator createPathCalculator(final Network network, final TravelDisutility travelCosts, final TravelTime travelTimes);
-
-}
+/**
+ * @author nagel
+ *
+ */
+package playground.kai.test.test4;

@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * LeastCostPathCalculatorFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,17 +17,27 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.router.util;
+package playground.jbischoff.taxibus.scenario.analysis.quick;
 
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.api.internal.MatsimFactory;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.MatsimEventsReader;
 
-public interface LeastCostPathCalculatorFactory extends MatsimFactory {
+/**
+ * @author  jbischoff
+ *
+ */
+public class TravelTimeStatistics   {
+
+	public static void main(String[] args) {
+//		String inputFile = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/input/output/vw026.100pct/ITERS/it.150/vw026.100pct.150.events.xml.gz";
+		String inputFile = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/input/output/vw027.100pct/ITERS/it.180/vw026.100pct.180.events.xml.gz";
+		EventsManager events = EventsUtils.createEventsManager();
+		TTEventHandler tt = new TTEventHandler();
+		events.addHandler(tt);
+		new MatsimEventsReader(events).readFile(inputFile);
+		tt.printOutput();
+	}
 	
-	/**
-	 * Creational method, since Network may not be exactly the scenario's network
-	 */
-	
-	public LeastCostPathCalculator createPathCalculator(final Network network, final TravelDisutility travelCosts, final TravelTime travelTimes);
 
 }

@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * LeastCostPathCalculatorFactory.java
+ * RunEmissionToolOffline.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,18 +17,24 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
-package org.matsim.core.router.util;
+package tutorial.programming.example21tutorialTUBclass.leastCostPath;
 
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.api.internal.MatsimFactory;
+import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 
-public interface LeastCostPathCalculatorFactory extends MatsimFactory {
-	
-	/**
-	 * Creational method, since Network may not be exactly the scenario's network
-	 */
-	
-	public LeastCostPathCalculator createPathCalculator(final Network network, final TravelDisutility travelCosts, final TravelTime travelTimes);
+/**
+ * @author jbischoff
+ *
+ */
+public class MatsimClassLeastCostPathCalculatorFactory implements LeastCostPathCalculatorFactory {
+
+	@Override
+	public LeastCostPathCalculator createPathCalculator(Network network,
+			TravelDisutility travelCosts, TravelTime travelTimes) {
+		return new MatsimClassDijkstra(network,null,null);
+	}
 
 }
