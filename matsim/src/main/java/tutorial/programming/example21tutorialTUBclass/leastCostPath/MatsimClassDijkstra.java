@@ -40,7 +40,7 @@ import org.matsim.vehicles.Vehicle;
 /**
  * @author jbischoff
  *this is a very simple Dijkstra developed in the Matsim class @ TUB
-* 	
+ * 	
 //
  */
 public class MatsimClassDijkstra implements LeastCostPathCalculator {
@@ -52,11 +52,11 @@ public class MatsimClassDijkstra implements LeastCostPathCalculator {
 
 		@Override
 		public int compare(Id<Node> o1, Id<Node> o2) {
-				return costToNode.get(o1).compareTo(costToNode.get(o2));
+			return costToNode.get(o1).compareTo(costToNode.get(o2));
 		}
-		
+
 	});
-			MatsimClassDijkstra(Network network, TravelDisutility travelCosts,
+	MatsimClassDijkstra(Network network, TravelDisutility travelCosts,
 			TravelTime travelTimes) {
 		this.network = network;
 
@@ -65,9 +65,9 @@ public class MatsimClassDijkstra implements LeastCostPathCalculator {
 	@Override
 	public Path calcLeastCostPath(Node fromNode, Node toNode, double starttime,
 			Person person, Vehicle vehicle) {
-		
+
 		initializeNetwork(fromNode.getId());
-		
+
 		while (!queue.isEmpty()) {
 			Id<Node> currentId = queue.poll();
 			if (currentId == toNode.getId()) return createPath(toNode.getId(),fromNode.getId());
@@ -82,7 +82,7 @@ public class MatsimClassDijkstra implements LeastCostPathCalculator {
 				}
 			}
 		}
-		
+
 		return null;
 	}
 
@@ -98,8 +98,8 @@ public class MatsimClassDijkstra implements LeastCostPathCalculator {
 			links.add(0, l);
 			lastNode = newLastNode;
 		}
-		
-		
+
+
 		return new Path(nodes,links,0.0,0.0);
 	}
 
@@ -110,7 +110,7 @@ public class MatsimClassDijkstra implements LeastCostPathCalculator {
 		}
 		this.costToNode.put(startNode, 0.0);
 		this.queue.add(startNode);
-		
+
 	}
 	private void update(Id<Node> nodeToUpdate){
 		this.queue.remove(nodeToUpdate);

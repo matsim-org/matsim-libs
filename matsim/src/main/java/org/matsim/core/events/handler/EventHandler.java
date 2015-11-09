@@ -20,6 +20,8 @@
 
 package org.matsim.core.events.handler;
 
+import org.matsim.core.api.internal.MatsimExtensionPoint;
+
 /**
  * Examples:<ul>
  * <li>{@link tutorial.programming.example06EventsHandling.RunEventsHandlingExample}
@@ -34,7 +36,7 @@ package org.matsim.core.events.handler;
  * </ul>
  * 
  */
-public interface EventHandler {
+public interface EventHandler extends MatsimExtensionPoint {
 	/** Gives the event handler the possibility to clean up its internal state. 
 	 * Within a Controler-Simulation, this is called before the mobsim starts.
 	 *  

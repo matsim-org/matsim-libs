@@ -38,18 +38,18 @@ public class RunLeastCostPathCalculatorExample {
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controler controler = new Controler(scenario);
-		
+
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-			bindLeastCostPathCalculatorFactory().to(MatsimClassLeastCostPathCalculatorFactory.class);	
+				bindLeastCostPathCalculatorFactory().to(MatsimClassLeastCostPathCalculatorFactory.class);	
 			}
 		}
-		
-				
-		);
-		
-	controler.run();
+
+
+				);
+
+		controler.run();
 	}
-	
+
 }

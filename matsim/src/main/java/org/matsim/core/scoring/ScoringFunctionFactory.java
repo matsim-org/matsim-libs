@@ -21,6 +21,7 @@
 package org.matsim.core.scoring;
 
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.api.internal.MatsimExtensionPoint;
 import org.matsim.core.api.internal.MatsimFactory;
 
 /**
@@ -32,7 +33,7 @@ import org.matsim.core.api.internal.MatsimFactory;
  *
  * @author mrieser
  */
-public interface ScoringFunctionFactory extends MatsimFactory {
+public interface ScoringFunctionFactory extends MatsimFactory, MatsimExtensionPoint {
 
 	/**
 	 * Creates a new scoring function for the given plan.
