@@ -14,7 +14,7 @@ public class RunControlerListenerExample {
 		//set a default config for convenience...
 		String [] config = {"examples/tutorial/programming/example7-config.xml"};
 		//Create an instance of the controler and
-		final Controler controler = new Controler(config);
+		Controler controler = new Controler(config);
 		//add an instance of this class as ControlerListener
 //		controler.addControlerListener(new MyControlerListener());
 		//call run() to start the simulation
