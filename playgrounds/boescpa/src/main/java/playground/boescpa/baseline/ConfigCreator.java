@@ -48,8 +48,8 @@ public class ConfigCreator {
         // Set coordinate system
         config.setParam("global", "coordinateSystem", "CH1903_LV03_Plus");
         // Set location choice activities
-        config.setParam("locationchoice", "flexible_types", "remote_home, remote_work, leisure, shop, escort_kids, escort_other");
-        config.setParam("locationchoice", "epsilonScaleFactors", "0.7, 0.3, 0.1, 0.1, 0.1, 0.2");
+        config.setParam("locationchoice", "flexible_types", "remote_work, leisure, shop, escort_kids, escort_other");
+        config.setParam("locationchoice", "epsilonScaleFactors", "0.3, 0.1, 0.1, 0.1, 0.2");
         // Add activity parameters
         //  <-> We have these as agent-specific parameters now...
         /*Map<String, Double> activityDescr = getActivityDescr();

@@ -16,21 +16,13 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.kai.test.test3;
+package playground.kai.test.test4;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
-
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
-import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
@@ -39,43 +31,25 @@ import org.matsim.core.scenario.ScenarioUtils;
  */
 class Main {
 
-	public static class MyMobsimProvider implements Provider<Mobsim> {
-		@Inject Scenario scenario ;
-		@Inject EventsManager eventsManager ;
-		@Inject MyClass2 class2 ;
-		@Inject MyClass3 class3 ;
-		@Override
-		public Mobsim get() {
-			Logger.getLogger(this.getClass()).warn( " class2=" + class2 );
-			Logger.getLogger(this.getClass()).warn( " class3=" + class3 );
-
-			Mobsim qsim = QSimUtils.createDefaultQSim(scenario, eventsManager) ;
-			return qsim ;
-		}
-	}
-
+	/**
+	 * @param args
+	 */
 	public static void main(String[] args) {
 		Config config = ConfigUtils.createConfig() ;
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controler().setLastIteration(0);
 		
-		Scenario scenario = ScenarioUtils.loadScenario( config ) ;
+		Scenario scenario = ScenarioUtils.loadScenario(config) ;
 		
 		Controler controler = new Controler( scenario ) ;
 		
-		controler.addOverridingModule(new AbstractModule(){
+		controler.addOverridingModule( new AbstractModule(){
 			@Override
 			public void install() {
-				this.bind(MyClass2.class ) ;
-				this.bind(MyClass3.class) ;
-				this.bind(MyClass1.class).asEagerSingleton() ;
-				
-				this.bindMobsim().toProvider(MyMobsimProvider.class) ;
+				this.bindMobsim().toProvider( MyMobsimProvider.class ) ;
 			}
-		}); 
-
-		controler.run() ;
+		});
 		
+		
+		controler.run();
 	}
 
 }
