@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -43,28 +44,39 @@ import playground.vsp.analysis.modules.AbstractAnalysisModule;
 
 public class AverageTollAnalyzer extends AbstractAnalysisModule {
 
+	private static final Logger log = Logger.getLogger(AverageTollAnalyzer.class);
+
 	public static void main(String[] args) {
-		String scenario = "implV3";
-		String eventsFile = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/otherRuns/output/1pct/run11/policies_0.05/"+scenario+"/ITERS/it.1500/1500.events.xml.gz";
-		String configFile = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/otherRuns/output/1pct/run11/policies_0.05/"+scenario+"/output_config.xml.gz";
-		String outputFolder = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/otherRuns/output/1pct/run11/policies_0.05/"+scenario+"/analysis/";
-		AverageTollAnalyzer ata = new AverageTollAnalyzer(eventsFile, configFile);
+		String scenario = "eci";
+		String eventsFile = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/iatbr/output/"+scenario+"/ITERS/it.1500/1500.events.xml.gz";
+		String configFile = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/iatbr/output/"+scenario+"/output_config.xml.gz";
+		String outputFolder = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/iatbr/output/"+scenario+"/analysis/";
+		AverageTollAnalyzer ata = new AverageTollAnalyzer(eventsFile, configFile, 30);
 		ata.preProcessData();
 		ata.postProcessData();
-//		ata.writeResults(outputFolder);
-		ata.writeRDataForBoxPlot(outputFolder);
+		//		ata.writeResults(outputFolder);
+		ata.writeRDataForBoxPlot(outputFolder,true);
 	}
 
 	public AverageTollAnalyzer (String eventsFile, String configFile) {
 		super(AverageTollAnalyzer.class.getSimpleName());
 		this.eventsFile = eventsFile;
 		this.configFile = configFile;
+		this.noOfTimeBin = 1;
+	}
+	
+	public AverageTollAnalyzer (String eventsFile, String configFile, int noOfTimeBins) {
+		super(AverageTollAnalyzer.class.getSimpleName());
+		this.eventsFile = eventsFile;
+		this.configFile = configFile;
+		this.noOfTimeBin = noOfTimeBins;
 	}
 
 	private String eventsFile;
 	private String configFile;
 	private TollInfoHandler handler;
 	private double simulationEndTime;
+	private int noOfTimeBin;
 
 	@Override
 	public List<EventHandler> getEventHandler() {
@@ -75,7 +87,7 @@ public class AverageTollAnalyzer extends AbstractAnalysisModule {
 	public void preProcessData() {
 
 		this.simulationEndTime = LoadMyScenarios.getSimulationEndTime(this.configFile);
-		this.handler = new TollInfoHandler(this.simulationEndTime, 1 );
+		this.handler = new TollInfoHandler(this.simulationEndTime, noOfTimeBin);
 
 		EventsManager events = EventsUtils.createEventsManager();
 		MatsimEventsReader reader = new MatsimEventsReader(events);
@@ -104,34 +116,46 @@ public class AverageTollAnalyzer extends AbstractAnalysisModule {
 		}
 	}
 
-	public void writeRDataForBoxPlot(String outputFolder){
+	public void writeRDataForBoxPlot(String outputFolder, boolean isWritingDataForEachTimeInterval){
 		if( ! new File(outputFolder+"/boxPlot/").exists()) new File(outputFolder+"/boxPlot/").mkdirs();
 
 		SortedMap<UserGroup, SortedMap<Double, Map<Id<Person>,Double>>> userGrp2PersonToll = handler.getUserGrp2TimeBin2Person2Toll();
 
 		for(UserGroup ug : userGrp2PersonToll.keySet()){
-			
-			BufferedWriter writer = IOUtils.getBufferedWriter(outputFolder+"/boxPlot/toll_"+ug.toString()+".txt");
-			try {
-				// sum all the values for different time bins
-				
-				Map<Id<Person>,Double> personToll  = new HashMap<Id<Person>, Double>();
-				
-				for (double d : userGrp2PersonToll.get(ug).keySet()){
-					
-					for( Id<Person> person : userGrp2PersonToll.get(ug).get(d).keySet() ) {
-						
-						if(personToll.containsKey(person)) personToll.put(person, personToll.get(person) + userGrp2PersonToll.get(ug).get(d).get(person) );
-						else personToll.put(person, userGrp2PersonToll.get(ug).get(d).get(person) );
-					}
-				}
 
-				for(Id<Person> id : personToll.keySet()){
-					writer.write(personToll.get(id)+"\n");
+			if(! isWritingDataForEachTimeInterval) {
+				log.info("Writing toll/trip for whole day for each user group. This data is likely to be suitable for box plot in R.");
+				BufferedWriter writer = IOUtils.getBufferedWriter(outputFolder+"/boxPlot/toll_"+ug.toString()+".txt");
+				try {
+					// sum all the values for different time bins
+					Map<Id<Person>,Double> personToll  = new HashMap<Id<Person>, Double>();
+					for (double d : userGrp2PersonToll.get(ug).keySet()){
+						for( Id<Person> person : userGrp2PersonToll.get(ug).get(d).keySet() ) {
+							if(personToll.containsKey(person)) personToll.put(person, personToll.get(person) + userGrp2PersonToll.get(ug).get(d).get(person) );
+							else personToll.put(person, userGrp2PersonToll.get(ug).get(d).get(person) );
+						}
+					}
+
+					for(Id<Person> id : personToll.keySet()){
+						writer.write(personToll.get(id)+"\n");
+					}
+					writer.close();
+				} catch (Exception e) {
+					throw new RuntimeException("Data is not written in file. Reason: " + e);
 				}
-				writer.close();
-			} catch (Exception e) {
-				throw new RuntimeException("Data is not written in file. Reason: " + e);
+			} else {
+				log.warn("Writing toll/trip for each time bin and for each user group. Thus, this will write many files for each user group. This data is likely to be suitable for box plot in R. ");
+				try {
+					for (double d : userGrp2PersonToll.get(ug).keySet()){
+						BufferedWriter writer = IOUtils.getBufferedWriter(outputFolder+"/boxPlot/toll_"+ug.toString()+"_"+((int) d/3600 +1)+"h.txt");
+						for( Id<Person> person : userGrp2PersonToll.get(ug).get(d).keySet() ) {
+							writer.write(userGrp2PersonToll.get(ug).get(d).get(person)+"\n");
+						}
+						writer.close();
+					}
+				} catch (Exception e) {
+					throw new RuntimeException("Data is not written in file. Reason: " + e);
+				}
 			}
 		}
 	}

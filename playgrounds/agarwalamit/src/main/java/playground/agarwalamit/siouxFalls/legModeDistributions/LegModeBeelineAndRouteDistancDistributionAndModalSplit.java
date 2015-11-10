@@ -55,6 +55,8 @@ public class LegModeBeelineAndRouteDistancDistributionAndModalSplit {
 	 * It will write legModeShare and beeline distance distribution	from plans
 	 */
 	private void runBeelineDistance(String runNr,String finalPlanFile){
+		log.warn("This does not factor in the beeline distance factor used in the config. "
+				+ "It means, this distance and teleportation distance from events are different.");
 		Scenario sc = LoadMyScenarios.loadScenarioFromPlans(finalPlanFile);
 		LegModeDistanceDistribution	lmdd = new LegModeDistanceDistribution();
 		lmdd.init(sc);
