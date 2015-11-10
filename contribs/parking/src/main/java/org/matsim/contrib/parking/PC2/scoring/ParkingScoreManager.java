@@ -28,9 +28,9 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.multimodal.router.util.WalkTravelTime;
 import org.matsim.contrib.parking.PC2.infrastructure.PC2Parking;
 import org.matsim.contrib.parking.lib.DebugLib;
-import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.utils.geometry.CoordUtils;
 
 public final class ParkingScoreManager {
 
@@ -54,13 +54,14 @@ public final class ParkingScoreManager {
 		double parkingWalkBeta = getParkingBetas().getParkingWalkBeta(person, parkingDurationInSeconds);
 
 		Link link = NetworkUtils.getNearestLink((scenario.getNetwork()), destCoord);
-		double length = link.getLength();
-		double walkTime = walkTravelTime.getLinkTravelTime(link, 0, person, null);
-		double walkSpeed = length / walkTime;
+		
+		double linkLength = link.getLength();		
+		
+		double walkDistance = CoordUtils.calcDistance(destCoord, parking.getCoordinate()) 
+				* scenario.getConfig().plansCalcRoute().getBeelineDistanceFactors().get("walk");;
+		
+		double walkSpeed = linkLength / this.walkTravelTime.getLinkTravelTime(link, 0, person, null);
 
-		// protected double walkSpeed = 3.0 / 3.6; // [m/s]
-
-		double walkDistance = GeneralLib.getDistance(destCoord, parking.getCoordinate());
 		double walkDurationInSeconds = walkDistance / walkSpeed;
 
 		double walkingTimeTotalInMinutes = walkDurationInSeconds / 60;
