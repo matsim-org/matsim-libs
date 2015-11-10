@@ -44,7 +44,7 @@ public class ModalShareGenerator {
 	private final Logger logger = Logger.getLogger(ModalShareGenerator.class);
 	
 	public void getModalShareFromEvents(){
-		// TODO [AA] should get modal share from events as well.
+		// ZZ_TODO should get modal share from events as well.
 		throw new RuntimeException("Not implemented yet.");
 	}
 	

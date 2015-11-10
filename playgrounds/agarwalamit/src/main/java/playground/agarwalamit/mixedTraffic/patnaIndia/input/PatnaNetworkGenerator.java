@@ -137,7 +137,7 @@ public class PatnaNetworkGenerator {
 				//				}
 				//				double freeSpeedInMPS = freeSpeed/3.6;	
 				
-				double freeSpeedInMPS = 60/3.6; //TODO [AA] : WHY UNIFORM SPEED?
+				double freeSpeedInMPS = 60/3.6; //ZZ_TODO : WHY UNIFORM SPEED?
 				
 				double roadWidth = (0.5*Double.parseDouble(widthOfRoad));			
 				int numberoflanes = 0;
