@@ -74,11 +74,12 @@ public final class StrategyConfigGroup extends ConfigGroup {
 			this( Id.create( MatsimRandom.getRandom().nextLong(), StrategySettings.class) );
 		}
 
-		@Deprecated // use ctor( name ). kai/mz, nov'15
+		@Deprecated // use empty constructor. kai/mz, nov'15
 		public StrategySettings(final Id<StrategySettings> id) {
 			super( SET_NAME );
 			this.id = id;
-			this.name = id.toString() ; // safety net, can be overridden by (also deprecated) setStrategyName(...).  kai/mz, nov'15
+//			this.name = id.toString() ; // safety net, can be overridden by (also deprecated) setStrategyName(...).  kai/mz, nov'15
+			// putting the above into the code fails at least one test.  We would vote for removing that test ...
 		}
 		
 		@Override
