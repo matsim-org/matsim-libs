@@ -54,7 +54,7 @@ public class SantiagoScenarioRunner {
 
 //	private static String inputPath = "../../../runs-svn/santiago/run20/input/";
 //	private static boolean doModeChoice = false;
-	private static String inputPath = "../../../runs-svn/santiago/run30/input/";
+	private static String inputPath = "../../../runs-svn/santiago/run31/input/";
 	private static boolean doModeChoice = true;
 	
 	public static void main(String args[]){
@@ -75,11 +75,11 @@ public class SantiagoScenarioRunner {
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		Controler controler = new Controler(scenario);
 		
-		// adding ride and taxi as network modes requires some router; here, the same values as for car are used
+		// adding other network modes than car requires some router; here, the same values as for car are used
 		setNetworkModeRouting(controler);
 		
 		// adding pt fare in a simplified way
-		controler.getEvents().addHandler(new PTFlatFareHandler(controler));
+		if(doModeChoice) controler.getEvents().addHandler(new PTFlatFareHandler(controler));
 		
 		// adding basic strategies for car and non-car users
 		setBasicStrategiesForSubpopulations(controler);
@@ -190,13 +190,15 @@ public class SantiagoScenarioRunner {
 		modeChoiceNonCarAvail.setWeight(0.15);
 		controler.getConfig().strategy().addStrategySettings(modeChoiceNonCarAvail);
 		
-		// adding subtour mode choice strategy module for car and non-car users
+		// adding subtour mode choice strategy module for car users
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				addPlanStrategyBinding(nameMcCarAvail).toProvider(new javax.inject.Provider<PlanStrategy>() {
-					String[] availableModes = {TransportMode.car, TransportMode.bike, TransportMode.walk, TransportMode.pt};
-					String[] chainBasedModes = {TransportMode.car, TransportMode.bike};
+//					String[] availableModes = {TransportMode.car, TransportMode.bike, TransportMode.walk, TransportMode.pt};
+//					String[] chainBasedModes = {TransportMode.car, TransportMode.bike};
+					String[] availableModes = {TransportMode.car, TransportMode.walk, TransportMode.pt};
+					String[] chainBasedModes = {TransportMode.car};
 
 					@Override
 					public PlanStrategy get() {
@@ -208,12 +210,15 @@ public class SantiagoScenarioRunner {
 				});
 			}
 		});
+		// adding subtour mode choice strategy module for non-car users
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				addPlanStrategyBinding(nameMcNonCarAvail).toProvider(new javax.inject.Provider<PlanStrategy>() {
-					String[] availableModes = {TransportMode.bike, TransportMode.walk, TransportMode.pt};
-					String[] chainBasedModes = {TransportMode.bike};
+//					String[] availableModes = {TransportMode.bike, TransportMode.walk, TransportMode.pt};
+//					String[] chainBasedModes = {TransportMode.bike};
+					String[] availableModes = {TransportMode.walk, TransportMode.pt};
+					String[] chainBasedModes = {""};
 
 					@Override
 					public PlanStrategy get() {

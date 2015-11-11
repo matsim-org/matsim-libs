@@ -121,7 +121,7 @@ public class SantiagoNetworkBuilder {
 			ptLink.setCapacity(200 * ptLink.getCapacity());
 			// TODO: how to adjust storage capacity??
 		}
-		new MergeNetworks().merge(network, TransportMode.pt, ptScenario.getNetwork());
+		new MergeNetworks().merge(network, "", ptScenario.getNetwork());
 	}
 
 	private void changeNumberOfLanes(NetworkImpl network) {

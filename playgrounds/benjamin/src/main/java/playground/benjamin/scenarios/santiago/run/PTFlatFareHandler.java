@@ -39,51 +39,33 @@ public class PTFlatFareHandler implements PersonArrivalEventHandler, ActivitySta
 	private final double amount = -600;
 	
 	public PTFlatFareHandler(final Controler controler){
-		
 		this.controler = controler;
-		
 	}
 	
 	@Override
 	public void reset(int iteration) {
-		
 		this.ptUsers.clear();
-
 	}
 
 	@Override
 	public void handleEvent(PersonArrivalEvent event) {
-
 		if(this.isPTMode(event.getLegMode())){
-			
 			this.ptUsers.add(event.getPersonId());
-			
 		}
-		
 	}
 
 	@Override
 	public void handleEvent(ActivityStartEvent event) {
-		
-		
 		if(this.ptUsers.contains(event.getPersonId())){
-				
 			if(!event.getActType().equals("pt interaction")){
-				
 				this.controler.getEvents().processEvent(new PersonMoneyEvent(event.getTime(), event.getPersonId(), this.amount));
 				this.ptUsers.remove(event.getPersonId());
-				
 			}
-			
 		}
-	
 	}
 	
-	private boolean isPTMode(String legMode){
-		
+	private boolean isPTMode(String legMode){	
 		return legMode.equals("feeder bus") || legMode.equals("main bus") || legMode.equals("subway") || legMode.equals("institutional bus")
 				|| legMode.equals("rural bus") || legMode.equals("urban bus") || legMode.equals("train");
-		
 	}
-
 }
