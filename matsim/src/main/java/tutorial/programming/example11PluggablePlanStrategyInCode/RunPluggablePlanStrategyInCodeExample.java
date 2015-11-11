@@ -28,6 +28,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 
 public class RunPluggablePlanStrategyInCodeExample {
+	private static final String STRATEGY_NAME = "doSomethingSpecial";
 
 	public static void main(final String[] args) {
 
@@ -39,9 +40,8 @@ public class RunPluggablePlanStrategyInCodeExample {
 		}
 		
 		//add a strategy to the config
-		int lastStrategyIdx = config.strategy().getStrategySettings().size() ;
-		StrategySettings stratSets = new StrategySettings(Id.create(lastStrategyIdx+1, StrategySettings.class));
-		stratSets.setStrategyName("doSomethingSpecial");
+		StrategySettings stratSets = new StrategySettings();
+		stratSets.setStrategyName(STRATEGY_NAME);
 		stratSets.setWeight(0.1);
 		config.strategy().addStrategySettings(stratSets);
 		
@@ -58,7 +58,7 @@ public class RunPluggablePlanStrategyInCodeExample {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				addPlanStrategyBinding("doSomethingSpecial").toProvider(MyPlanStrategyFactory.class);
+				addPlanStrategyBinding(STRATEGY_NAME).toProvider(MyPlanStrategyFactory.class);
 			}
 		});
 		controler.run();
