@@ -357,12 +357,13 @@ public class PopulationCreator {
 
 		final String zonesShapeFileName = "./data_ZZZ/shapes/sverige_TZ_EPSG3857.shp";
 		final String buildingShapeFileName = "./data_ZZZ/shapes/by_full_EPSG3857_2.shp";
-		final String populationFileName = "./data_ZZZ/synthetic_population/151008_trips.xml";
+		
+		final String populationFileName = "./test/regentmatsim/exchange/trips.xml";
 
-		final String networkFileName = "./data_ZZZ/run/network-plain.xml";
+		final String networkFileName = "./test/matsim-testrun/input/network-plain.xml";
+		final String initialPlansFile = "./test/matsim-testrun/input/initial-plans.xml";
 		// final String linkAttributesFileName =
 		// "./data/run/link-attributes.xml";
-		final String initialPlansFile = "./data_ZZZ/run/initial-plans-FULL.xml";
 
 		// final ObjectAttributes linkAttributes = new ObjectAttributes();
 		// final ObjectAttributesXmlReader reader = new
