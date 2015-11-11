@@ -81,6 +81,8 @@ import com.google.inject.Provider;
 import com.google.inject.TypeLiteral;
 import com.google.inject.name.Names;
 
+import tutorial.programming.example06EventsHandling.MyEventHandler1;
+
 /**
  * The Controler is responsible for complete simulation runs, including the
  * initialization of all required data, running the iterations and the
@@ -460,6 +462,7 @@ public class Controler extends AbstractController {
 	    return scenario;
     }
 
+    @Deprecated // preferably use "@Inject EventsManager events" or "addEventHandlerBinding().toInstance(...) from AbstractModule". kai/mz, nov'15
     public final EventsManager getEvents() {
 	    return events;
     }
