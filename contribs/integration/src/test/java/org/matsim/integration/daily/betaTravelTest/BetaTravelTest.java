@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.integration.always;
+package org.matsim.integration.daily.betaTravelTest;
 
 import java.util.ArrayList;
 import java.util.Collections;
