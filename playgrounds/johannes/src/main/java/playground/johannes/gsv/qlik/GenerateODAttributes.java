@@ -19,12 +19,17 @@
 
 package playground.johannes.gsv.qlik;
 
-import org.matsim.contrib.common.gis.CartesianDistanceCalculator;
+import com.vividsolutions.jts.algorithm.MinimumDiameter;
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import org.geotools.geometry.jts.JTSFactoryFinder;
 import org.matsim.contrib.common.gis.DistanceCalculator;
+import org.matsim.contrib.common.gis.WGS84DistanceCalculator;
 import playground.johannes.gsv.zones.KeyMatrix;
 import playground.johannes.synpop.gis.Zone;
 import playground.johannes.synpop.gis.ZoneCollection;
-import playground.johannes.synpop.gis.ZoneGeoJsonIO;
+import playground.johannes.synpop.gis.ZoneEsriShapeIO;
 
 import java.io.*;
 
@@ -34,21 +39,26 @@ import java.io.*;
 public class GenerateODAttributes {
 
     public static final void main(String args[]) throws IOException {
-        ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON(args[1], "NO");
-        DistanceCalculator dCalc = CartesianDistanceCalculator.getInstance();//WGS84DistanceCalculator.getInstance();
+//        ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON(args[1], "NO");
+        DistanceCalculator dCalc = WGS84DistanceCalculator.getInstance();
+        ZoneCollection zones = ZoneEsriShapeIO.read
+                ("/mnt/cifs/B-drive/C_Vertrieb/2014_03_01_Nachfragematrizen_PV/07_Qlik/nuts3.SHP");
+        zones.setPrimaryKey("NO");
 
         KeyMatrix idMatrix = new KeyMatrix();
         KeyMatrix distMatrix = new KeyMatrix();
 
         int idCounter = 0;
 
-        BufferedWriter writer = new BufferedWriter(new FileWriter(args[2]));
+        BufferedWriter writer = new BufferedWriter(new FileWriter
+                ("/mnt/cifs/B-drive/C_Vertrieb/2014_03_01_Nachfragematrizen_PV/07_Qlik/odAttributes-kreis.csv"));
         writer.write("from;to;id;distance");
         writer.newLine();
 
 //        BufferedWriter writer2 = new BufferedWriter(new FileWriter(args[3]));
 
-        BufferedReader reader = new BufferedReader(new FileReader(args[0]));
+        BufferedReader reader = new BufferedReader(new FileReader
+                ("/mnt/cifs/B-drive/C_Vertrieb/2014_03_01_Nachfragematrizen_PV/07_Qlik/MIV_Flug_Kreis_2013.csv"));
         String line = reader.readLine();
 //        writer2.write(line);
 //        writer2.write(";\"odId\";\"distance\"");
@@ -56,6 +66,9 @@ public class GenerateODAttributes {
 
 //        double d = 0.0;
 
+        GeometryFactory geometryFactory = JTSFactoryFinder.getGeometryFactory();
+
+        int count = 0;
         while((line = reader.readLine()) != null) {
             String tokens[] = line.split(";");
             String i = tokens[0];
@@ -80,7 +93,14 @@ public class GenerateODAttributes {
                 Zone zj = zones.get(j);
 
                 if(zi != null && zj != null) {
-                    d = dCalc.distance(zi.getGeometry().getCentroid(), zj.getGeometry().getCentroid());
+                    if(zi != zj) {
+                        d = dCalc.distance(zi.getGeometry().getCentroid(), zj.getGeometry().getCentroid());
+                    } else {
+                        Geometry geo = zi.getGeometry();
+                        Coordinate c = new MinimumDiameter(geo).getWidthCoordinate();
+                        d = dCalc.distance(geo.getCentroid(), geometryFactory.createPoint(c));
+//                        d = new MinimumDiameter(geo).getLength()/2.0;
+                    }
                     distMatrix.set(i, j, d);
                     writer.write(String.valueOf(d));
                 } else {
@@ -88,6 +108,9 @@ public class GenerateODAttributes {
                 }
 
                 writer.newLine();
+
+                count++;
+                if(count % 10000 == 0) System.out.println(String.format("Parsed %s lines...", count));
             }
 
 //            writer2.write(line);

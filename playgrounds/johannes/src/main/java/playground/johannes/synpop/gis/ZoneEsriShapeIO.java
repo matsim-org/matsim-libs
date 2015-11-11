@@ -34,6 +34,12 @@ import java.util.Set;
  */
 public class ZoneEsriShapeIO {
 
+	public static ZoneCollection read(String filename, String primaryKey) {
+		ZoneCollection zones = read(filename);
+		zones.setPrimaryKey(primaryKey);
+		return zones;
+	}
+
 	public static ZoneCollection read(String filename) {
 		ZoneCollection zones = new ZoneCollection();
 		Set<Zone> zoneSet = new HashSet<>();
