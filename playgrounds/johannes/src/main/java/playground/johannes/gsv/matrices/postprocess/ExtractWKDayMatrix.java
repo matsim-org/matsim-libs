@@ -19,7 +19,8 @@
 
 package playground.johannes.gsv.matrices.postprocess;
 
-import com.sun.istack.internal.logging.Logger;
+
+import org.apache.log4j.Logger;
 import org.matsim.core.utils.io.IOUtils;
 import playground.johannes.gsv.zones.KeyMatrix;
 import playground.johannes.gsv.zones.MatrixOperations;
