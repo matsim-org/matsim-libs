@@ -93,7 +93,7 @@ public class SquareGridSystem
     private Integer[][] calcNeighbourLists()
     {
         if (cellSize < 100) {
-            System.err.println("May not work as expected");
+            throw new RuntimeException("May not work as expected for small zones");
         }
 
         int count = rows * cols;
@@ -105,32 +105,41 @@ public class SquareGridSystem
         }
 
         for (int i = 0; i < count; i++) {
+            final int zBase = i;
+            
+            //store distances in array..............
+            
             Arrays.sort(zonesIdxs, new Comparator<Integer>() {
                 public int compare(Integer z1, Integer z2)
                 {
-                    return calcDistanceBetweenZones(z1, z2);
+                    return calcDistanceBetweenZones(zBase, z1) - calcDistanceBetweenZones(zBase, z2);
                 }
             });
 
             neighbours[i] = zonesIdxs.clone();
         }
-        
+
         return neighbours;
     }
 
 
     private int calcDistanceBetweenZones(int idx1, int idx2)
     {
+        if (idx1 == idx2) {
+            return 0;
+        }
+        
         double row1 = idx1 / cols;
         double col1 = idx1 % cols;
         double row2 = idx2 / cols;
         double col2 = idx2 % cols;
 
-        double rowRandom = (Math.random() - 0.5) * cellSize / 10;
-        double colRandom = (Math.random() - 0.5) * cellSize / 10;
+        //to avoid some systematic error while sorting cells
+//        double rowRandom = (Math.random() - 0.5) * cellSize / 10;
+//        double colRandom = (Math.random() - 0.5) * cellSize / 10;
 
-        double rowDelta = row1 - row2 + rowRandom;
-        double colDelta = col1 - col2 + colRandom;
+        double rowDelta = row1 - row2;// + rowRandom;
+        double colDelta = col1 - col2;// + colRandom;
 
         return (int)Math.sqrt(rowDelta * rowDelta + colDelta * colDelta);
     }
@@ -147,12 +156,12 @@ public class SquareGridSystem
     public int getZoneIdx(Node node)
     {
         Coord coord = node.getCoord();
-        int r = (int) ( (coord.getY() - y0) % cellSize);
-        int c = (int) ( (coord.getX() - x0) % cellSize);
+        int r = (int)Math.round( ( (coord.getY() - y0) / cellSize));
+        int c = (int)Math.round( ( (coord.getX() - x0) / cellSize));
         return r * cols + c;
     }
 
-    
+
     public Iterable<Integer> getZonesIdxByDistance(Node node)
     {
         int zoneIdx = getZoneIdx(node);
