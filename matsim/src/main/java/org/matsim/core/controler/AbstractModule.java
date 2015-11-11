@@ -122,6 +122,9 @@ public abstract class AbstractModule implements Module {
 		return eventHandlerMultibinder.addBinding();
 	}
 
+	/**
+	 * See {@link org.matsim.core.controler.listener.ControlerListener} for information.
+	 */
 	protected final LinkedBindingBuilder<ControlerListener> addControlerListenerBinding() {
 		return controlerListenerMultibinder.addBinding();
 	}
