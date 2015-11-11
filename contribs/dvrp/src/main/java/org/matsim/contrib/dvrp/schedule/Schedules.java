@@ -109,13 +109,17 @@ public class Schedules
 
     public static Task getNextTask(Task task)
     {
-        return (task.getSchedule()).getTasks().get(task.getTaskIdx() + 1);
+        List<? extends Task> tasks = task.getSchedule().getTasks();
+        int taskIdx = task.getTaskIdx();
+        return (taskIdx == tasks.size() - 1) ?  null : tasks.get(taskIdx + 1);
     }
 
 
     public static Task getPreviousTask(Task task)
     {
-        return task.getSchedule().getTasks().get(task.getTaskIdx() - 1);
+        List<? extends Task> tasks = task.getSchedule().getTasks();
+        int taskIdx = task.getTaskIdx();
+        return (taskIdx == 0) ?  null : tasks.get(taskIdx - 1);
     }
 
 
