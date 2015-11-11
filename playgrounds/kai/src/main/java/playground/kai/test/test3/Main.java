@@ -68,7 +68,7 @@ class Main {
 			public void install() {
 				this.bind(MyClass2.class ) ;
 				this.bind(MyClass3.class) ;
-				this.bind(MyClass1.class).asEagerSingleton() ;
+				this.bind(MyClass1.class) ;
 				
 				this.bindMobsim().toProvider(MyMobsimProvider.class) ;
 			}
