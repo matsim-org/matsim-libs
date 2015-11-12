@@ -35,6 +35,7 @@ import org.matsim.contrib.dvrp.util.TimeDiscretizer;
 import org.matsim.contrib.dvrp.vrpagent.VrpLegs;
 import org.matsim.contrib.dvrp.vrpagent.VrpLegs.LegCreator;
 import org.matsim.contrib.dynagent.run.DynAgentLauncherUtils;
+import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -43,6 +44,7 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
+import org.matsim.vis.otfvis.OTFClientLive;
 
 import playground.jbischoff.taxibus.TaxibusActionCreator;
 import playground.jbischoff.taxibus.optimizer.DefaultTaxibusOptimizer;
@@ -103,6 +105,9 @@ public class TaxibusQSimProvider implements Provider<QSim> {
 				passengerEngine, legCreator, tbcg.getPickupDuration());
 		VrpLauncherUtils.initAgentSources(qSim, context, optimizer,
 				actionCreator);
+		if (tbcg.isOtfvis()){
+		OTFClientLive.run(sc.getConfig(), OTFVis.startServerAndRegisterWithQSim(sc.getConfig(), sc, eventsManager, qSim));
+		}
 		return qSim;
 	}
 

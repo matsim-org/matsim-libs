@@ -24,6 +24,7 @@ public class TaxibusConfigGroup extends ConfigGroup {
 	private static final String NEAREST_REQUEST_LIM = "nearestRequestLimit";
 	private static final String NEAREST_VEH_LIM= "nearestVehicleLimit";
 	private static final String GOAL= "optimizerGoal";
+	private static final String OTFVIS= "otfvis";
 	
 	
 	
@@ -45,6 +46,8 @@ public class TaxibusConfigGroup extends ConfigGroup {
 	private boolean vehicleDiversion = false; 
 
 	private String algorithm;
+
+	private boolean otfvis = false;
 
 	public TaxibusConfigGroup() {
 		super(GROUP_NAME);
@@ -79,7 +82,9 @@ public class TaxibusConfigGroup extends ConfigGroup {
 			this.nearestRequestsLimit = Integer.parseInt(value);
 		}else if (NEAREST_VEH_LIM.equals(key)) {
 			this.nearestVehiclesLimit = Integer.parseInt(value);
-		}	 
+		}	 else if (OTFVIS.equals(key)) {
+			this.otfvis = Boolean.parseBoolean(value);
+		}
 		
 		
 		else {
@@ -102,7 +107,7 @@ public class TaxibusConfigGroup extends ConfigGroup {
 		map.put(VEHICLE_DIVERSION, Boolean.toString(vehicleDiversion));
 		map.put(NEAREST_REQUEST_LIM, Integer.toString(nearestRequestsLimit));
 		map.put(NEAREST_VEH_LIM, Integer.toString(nearestVehiclesLimit));
-		
+		map.put(OTFVIS, Boolean.toString(otfvis));
 		return map;
 
 	}
@@ -123,6 +128,7 @@ public class TaxibusConfigGroup extends ConfigGroup {
 			map.put(NEAREST_REQUEST_LIM, "Upper limit for request near a vehicle. Default: off (=0)");
 			map.put(NEAREST_VEH_LIM, "Upper limit for vehicles near a request. Default: off (=0)");
 			map.put(GOAL, "Optimizer goal, one of: MIN_WAIT_TIME, MIN_PICKUP_TIME, DEMAND_SUPPLY_EQUIL, NULL");
+			map.put(OTFVIS, "show simulation in OTFVis");
 			return map;
 	 }
 
@@ -162,6 +168,9 @@ public class TaxibusConfigGroup extends ConfigGroup {
 
 	public boolean isVehicleDiversion() {
 		return vehicleDiversion;
+	}
+	public boolean isOtfvis() {
+		return otfvis;
 	}
 	
 	public int getNearestRequestsLimit() {

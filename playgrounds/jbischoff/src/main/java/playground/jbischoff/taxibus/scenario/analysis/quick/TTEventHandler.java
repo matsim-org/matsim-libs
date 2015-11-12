@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
@@ -44,7 +45,7 @@ public class TTEventHandler implements ActivityStartEventHandler, PersonDepartur
 	Map<Id<Person>, String> lastActivity = new HashMap<>();
 	Map<Id<Person>, Double> lastDeparture = new HashMap<>();
 	
-	Map<String,Double> ttToActivity = new HashMap<>();
+	Map<String,Double> ttToActivity = new TreeMap<>();
 	Map<String,Integer> legsToActivity = new HashMap<>();
 
 	public TTEventHandler() {

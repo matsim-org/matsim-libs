@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.MobsimAgent.State;
 import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
@@ -54,12 +55,14 @@ public class TaxibusPassengerOrderManager implements  ActivityStartEventHandler,
 
 	@Override
 	public void handleEvent(ActivityStartEvent event) {
+		if (event.getActType().startsWith("pt")) return;
 		Id<MobsimAgent> mid = Id.create(event.getPersonId(), MobsimAgent.class);
 		if (qSim.getAgentMap().containsKey(mid))
 		//to filter out drivers without an agent plan
 		{
 		MobsimAgent mobsimAgent = qSim.getAgentMap().get(mid);
 		if (mobsimAgent instanceof PlanAgent){
+			if (mobsimAgent.getState().equals(State.LEG)) return;
 			PlanAgent agent = (PlanAgent) mobsimAgent;
 			Leg leg = (Leg) agent.getNextPlanElement();
 			if (leg!=null ){ 
@@ -67,6 +70,7 @@ public class TaxibusPassengerOrderManager implements  ActivityStartEventHandler,
 //			if (leg.getMode().equals("car")){
 
 				Double departureTime = mobsimAgent.getActivityEndTime();
+				if (departureTime>event.getTime()) departureTime=event.getTime()+60;
 				prebookTaxiBusTrip(mobsimAgent,leg,departureTime);
 			}
 		}

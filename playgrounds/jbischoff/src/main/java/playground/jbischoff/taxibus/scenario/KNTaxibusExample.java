@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * RunEmissionToolOffline.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,8 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
-package playground.jbischoff.av.run;
+package playground.jbischoff.taxibus.scenario;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
@@ -26,43 +26,24 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.jbischoff.taxi.usability.ConfigBasedTaxiLaunchUtils;
-import playground.jbischoff.taxi.usability.TaxiConfigGroup;
+import playground.jbischoff.taxibus.run.configuration.ConfigBasedTaxibusLaunchUtils;
+import playground.jbischoff.taxibus.run.configuration.TaxibusConfigGroup;
 
 /**
- * @author  jbischoff
+ * @author jbischoff
  *
  */
-public class AVLauncher {
+public class KNTaxibusExample {
 
 	public static void main(String[] args) {
-		Config config = ConfigUtils.loadConfig("C:/Users/Joschka/Documents/shared-svn/projects/audi_av/scenario/config.xml");
 		
-		TaxiConfigGroup tcg = new TaxiConfigGroup();
-		tcg.addParam("vehiclesFile", "C:/Users/Joschka/Documents/shared-svn/projects/audi_av/scenario/v10pct/taxi_vehicles_19000.xml.gz");
-		tcg.addParam("ranksFile", "C:/Users/Joschka/Documents/shared-svn/projects/audi_av/scenario/ranks.xml");
-		tcg.addParam("outputDir", config.controler().getOutputDirectory()+"/taxi");
-		tcg.addParam("algorithm", "dummy");
-		tcg.addParam("nearestVehicleLimit", "20");
-		tcg.addParam("nearestRequestLimit", "20");
-		tcg.addParam("pickupDuration", "60");
-		tcg.addParam("dropOffDuration", "60");
-		config.addModule(tcg);
-		config.global().setNumberOfThreads(16);
-		config.qsim().setNumberOfThreads(16);
-		
-		
-		
-		
-		
+		Config config = ConfigUtils.loadConfig("../../../shared-svn/projects/vw_rufbus/scenario/input/example/configVWTB.xml", new TaxibusConfigGroup());
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 	
-		
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		Controler controler = new Controler(scenario);
-		new ConfigBasedTaxiLaunchUtils(controler).initiateTaxis();
+		new ConfigBasedTaxibusLaunchUtils(controler).initiateTaxibusses();
 		controler.run();
 	}
-
 }
