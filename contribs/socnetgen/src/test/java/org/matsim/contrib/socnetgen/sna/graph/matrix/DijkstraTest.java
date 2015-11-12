@@ -19,8 +19,9 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetgen.sna.graph.matrix;
 
-import gnu.trove.TIntArrayList;
+import gnu.trove.list.array.TIntArrayList;
 import junit.framework.TestCase;
+
 import org.matsim.contrib.socnetgen.sna.graph.SparseGraph;
 import org.matsim.contrib.socnetgen.sna.graph.SparseGraphBuilder;
 import org.matsim.contrib.socnetgen.sna.graph.SparseVertex;

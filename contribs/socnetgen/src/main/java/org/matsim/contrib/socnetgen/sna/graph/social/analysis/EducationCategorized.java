@@ -19,12 +19,13 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetgen.sna.graph.social.analysis;
 
-import gnu.trove.TDoubleArrayList;
+import gnu.trove.list.array.TDoubleArrayList;
+
+import java.util.Set;
+
 import org.apache.commons.math.stat.correlation.PearsonsCorrelation;
 import org.matsim.contrib.socnetgen.sna.graph.social.SocialEdge;
 import org.matsim.contrib.socnetgen.sna.graph.social.SocialVertex;
-
-import java.util.Set;
 
 /**
  * @author illenberger
@@ -74,7 +75,7 @@ public class EducationCategorized extends Education {
 				}
 			}
 
-			return new PearsonsCorrelation().correlation(values1.toNativeArray(), values2.toNativeArray());
+			return new PearsonsCorrelation().correlation(values1.toArray(), values2.toArray());
 		}
 	}
 	

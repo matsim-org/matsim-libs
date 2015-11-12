@@ -19,6 +19,10 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetgen.sna.snowball.io;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+
 import org.matsim.contrib.socnetgen.sna.graph.Graph;
 import org.matsim.contrib.socnetgen.sna.graph.Vertex;
 import org.matsim.contrib.socnetgen.sna.graph.io.GraphMLWriter;
@@ -26,10 +30,6 @@ import org.matsim.contrib.socnetgen.sna.snowball.SampledGraphProjection;
 import org.matsim.contrib.socnetgen.sna.snowball.SampledVertex;
 import org.matsim.contrib.socnetgen.sna.snowball.SampledVertexDecorator;
 import org.matsim.core.utils.collections.Tuple;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
 
 
 /**

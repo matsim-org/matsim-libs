@@ -19,17 +19,18 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetgen.sna.snowball.social.analysis;
 
-import gnu.trove.TDoubleDoubleHashMap;
-import gnu.trove.TDoubleObjectHashMap;
-import gnu.trove.TObjectDoubleHashMap;
+import gnu.trove.map.hash.TDoubleDoubleHashMap;
+import gnu.trove.map.hash.TDoubleObjectHashMap;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
+
+import java.util.Set;
+
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.socnetgen.sna.graph.Vertex;
 import org.matsim.contrib.socnetgen.sna.graph.social.SocialVertex;
 import org.matsim.contrib.socnetgen.sna.graph.social.analysis.Age;
 import org.matsim.contrib.socnetgen.sna.snowball.analysis.SnowballPartitions;
 import org.matsim.contrib.socnetgen.sna.snowball.social.SocialSampledVertexDecorator;
-
-import java.util.Set;
 
 /**
  * @author illenberger

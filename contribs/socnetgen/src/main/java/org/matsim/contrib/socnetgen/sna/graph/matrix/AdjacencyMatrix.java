@@ -23,19 +23,20 @@
  */
 package org.matsim.contrib.socnetgen.sna.graph.matrix;
 
-import gnu.trove.TIntArrayList;
-import gnu.trove.TIntIntHashMap;
-import gnu.trove.TObjectIntHashMap;
-import org.matsim.contrib.socnetgen.sna.graph.Edge;
-import org.matsim.contrib.socnetgen.sna.graph.Graph;
-import org.matsim.contrib.socnetgen.sna.graph.GraphBuilder;
-import org.matsim.contrib.socnetgen.sna.graph.Vertex;
-import org.matsim.core.utils.collections.Tuple;
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.hash.TIntIntHashMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import org.matsim.contrib.socnetgen.sna.graph.Edge;
+import org.matsim.contrib.socnetgen.sna.graph.Graph;
+import org.matsim.contrib.socnetgen.sna.graph.GraphBuilder;
+import org.matsim.contrib.socnetgen.sna.graph.Vertex;
+import org.matsim.core.utils.collections.Tuple;
 
 /**
  * Matrix-representation of an undirected and unweighted graph.
