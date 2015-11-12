@@ -58,7 +58,7 @@ public class PeakHourTollHandler implements PersonMoneyEventHandler, PersonDepar
 		}
 	}
 
-	private final List<Double> pkHrs = new ArrayList<>(Arrays.asList(new Double []{7.,8.,16.,17.}));
+	private final List<Double> pkHrs = new ArrayList<>(Arrays.asList(new Double []{8.,9.,16.,17.}));
 	private static final Logger log = Logger.getLogger(PeakHourTollHandler.class);
 
 	private SortedMap<UserGroup, Map<Id<Person>,List<Double>>> userGrpTo_PkHrToll = new TreeMap<>();
