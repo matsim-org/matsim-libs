@@ -45,6 +45,10 @@ public abstract class AbstractAnalyzerTask<T> implements AnalyzerTask<T> {
         this.ioContext = ioContext;
     }
 
+    public void addDiscretizer(Discretizer discretizer, String type) {
+        addDiscretizer(discretizer, type, false);
+    }
+
     public void addDiscretizer(Discretizer discretizer, String type, boolean reweight) {
         if (discretizers == null) {
             discretizers = new LinkedList<>();

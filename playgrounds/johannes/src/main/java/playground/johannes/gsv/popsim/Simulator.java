@@ -29,9 +29,7 @@ import org.matsim.contrib.common.util.XORShiftRandom;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import playground.johannes.gsv.popsim.analysis.*;
-import playground.johannes.gsv.synPop.analysis.AnalyzerTaskComposite;
-import playground.johannes.gsv.synPop.analysis.LegGeoDistanceTask;
-import playground.johannes.gsv.synPop.analysis.ProxyAnalyzer;
+import playground.johannes.gsv.popsim.config.MatrixAnalyzerConfigurator;
 import playground.johannes.gsv.synPop.mid.Route2GeoDistance;
 import playground.johannes.gsv.synPop.sim3.ReplaceActTypes;
 import playground.johannes.synpop.data.*;
@@ -116,6 +114,8 @@ public class Simulator {
         logger.info("Analyzing reference population...");
         ioContext.append("ref");
         AnalyzerTaskRunner.run(refPersons, task, ioContext);
+
+        task.addComponent((AnalyzerTask<Collection<? extends Person>>) new MatrixAnalyzerConfigurator(config.getModule(""), dataPool).load());
 		/*
 		Setup hamiltonian
 		 */
