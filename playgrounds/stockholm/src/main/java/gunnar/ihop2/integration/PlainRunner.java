@@ -15,6 +15,7 @@ public class PlainRunner {
 		String configFileName = "./input/matsim-config.xml";
 		Config config = ConfigUtils.loadConfig(configFileName);
 
+		// TODO Gunnar had to change this, otherwise it infers u-turns that should not be!
 		LaneDefinitonsV11ToV20Converter.main(new String[] {
 				"./input/lanes.xml", "./input/lanes20.xml",
 				"./input/network-plain.xml" });

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.SortedSet;
+import java.util.logging.Logger;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -20,6 +21,7 @@ import org.matsim.lanes.data.v11.LaneData11Impl;
 import org.matsim.lanes.data.v11.LaneDefinitions11;
 import org.matsim.lanes.data.v11.LaneDefinitions11Impl;
 import org.matsim.lanes.data.v11.LaneDefinitionsWriter11;
+import org.matsim.lanes.data.v11.LaneDefinitonsV11ToV20Converter;
 import org.matsim.lanes.data.v11.LanesToLinkAssignment11;
 import org.matsim.lanes.data.v11.LanesToLinkAssignment11Impl;
 import org.matsim.lanes.data.v20.Lane;
@@ -82,15 +84,17 @@ public class Transmodeler2MATSimNetwork {
 
 	private final String tmLaneConnectorsFileName;
 
-	private final boolean scaleUpIntersectionLinks;
+	// private final boolean scaleUpIntersectionLinks;
 
 	private final String matsimPlainNetworkFileName;
 
-	private final String matsimExpandedNetworkFileName;
+	// private final String matsimExpandedNetworkFileName;
 
 	private final String linkAttributesFileName;
 
-	private final String matsimLanesFile;
+	private final String matsimLanesFile11;
+
+	private final String matsimLanesFile20;
 
 	// -------------------- CONSTRUCTION --------------------
 
@@ -98,20 +102,22 @@ public class Transmodeler2MATSimNetwork {
 			final String tmLinksFileName, final String tmSegmentsFileName,
 			final String tmLanesFileName,
 			final String tmLaneConnectorsFileName,
-			final boolean scaleUpIntersectionLinks,
+			// final boolean scaleUpIntersectionLinks,
 			final String matsimPlainNetworkFileName,
-			final String matsimExpandedNetworkFileName,
-			final String linkAttributesFileName, final String matsimLanesFile) {
+			// final String matsimExpandedNetworkFileName,
+			final String linkAttributesFileName,
+			final String matsimLanesFile11, final String matsimLanesFile20) {
 		this.tmNodesFileName = tmNodesFileName;
 		this.tmLinksFileName = tmLinksFileName;
 		this.tmSegmentsFileName = tmSegmentsFileName;
 		this.tmLanesFileName = tmLanesFileName;
 		this.tmLaneConnectorsFileName = tmLaneConnectorsFileName;
-		this.scaleUpIntersectionLinks = scaleUpIntersectionLinks;
+		// this.scaleUpIntersectionLinks = scaleUpIntersectionLinks;
 		this.matsimPlainNetworkFileName = matsimPlainNetworkFileName;
-		this.matsimExpandedNetworkFileName = matsimExpandedNetworkFileName;
+		// this.matsimExpandedNetworkFileName = matsimExpandedNetworkFileName;
 		this.linkAttributesFileName = linkAttributesFileName;
-		this.matsimLanesFile = matsimLanesFile;
+		this.matsimLanesFile11 = matsimLanesFile11;
+		this.matsimLanesFile20 = matsimLanesFile20;
 	}
 
 	// -------------------- IMPLEMENTATION --------------------
@@ -276,11 +282,6 @@ public class Transmodeler2MATSimNetwork {
 		 * moves.
 		 */
 
-		/*
-		 * (2e) Remove links that are dead-ends given the turning move
-		 * restrictions.
-		 */
-
 		final Set<Link> removedLinks = new LinkedHashSet<Link>(matsimNetwork
 				.getLinks().values());
 		removedLinks.removeAll(ConnectedLinks.connectedLinks(matsimNetwork,
@@ -389,7 +390,7 @@ public class Transmodeler2MATSimNetwork {
 						.keySet()) {
 					final Id<Link> outLinkId = Id.create(tmOutLink.getId(),
 							Link.class);
-					if (matsimNetwork.getLinks().containsKey(outLinkId)) {
+					if (node.getOutLinks().containsKey(outLinkId)) {
 						lane.addToLinkId(outLinkId);
 					}
 				}
@@ -400,18 +401,32 @@ public class Transmodeler2MATSimNetwork {
 							matsimInLink.getId());
 					lanesToLink.addLane(lane);
 					laneDefs.addLanesToLinkAssignment(lanesToLink);
+				} else {
+					throw new RuntimeException(
+							"impossible state after preprocessing ...");
 				}
 			}
 		}
 
 		final LaneDefinitionsWriter11 laneWriter = new LaneDefinitionsWriter11(
 				laneDefs);
-		laneWriter.write(this.matsimLanesFile);
+		laneWriter.write(this.matsimLanesFile11);
+
+		Logger.getLogger(this.getClass().getName())
+				.warning(
+						"Using a locally modified instance of "
+								+ LaneDefinitonsV11ToV20Converter.class
+										.getName()
+								+ " in order to avoid the introduction of unwanted u-turns.");
+		LaneDefinitonsV11ToV20Converter.main(new String[] { matsimLanesFile11,
+				matsimLanesFile20, this.matsimPlainNetworkFileName });
 
 		/*
 		 * (3a) Expand networks to allow for turning moves.
 		 */
 
+		// {
+		//
 		// final Map<Id<Node>, Node> originalMATSimNodes = new
 		// LinkedHashMap<>();
 		// originalMATSimNodes.putAll(matsimNetwork.getNodes());
@@ -433,8 +448,10 @@ public class Transmodeler2MATSimNetwork {
 		// tmInLink.downstreamLink2turnLength
 		// .entrySet()) {
 		// final Id<Link> matsimOutLinkId = Id.create(
-		// tmOutLink2turnLength.getKey().getId(), Link.class);
-		// if (matsimNetwork.getLinks().containsKey(matsimOutLinkId)) {
+		// tmOutLink2turnLength.getKey().getId(),
+		// Link.class);
+		// if (matsimNetwork.getLinks().containsKey(
+		// matsimOutLinkId)) {
 		// turns.add(new TurnInfo(matsimId2inLink.getKey(),
 		// matsimOutLinkId));
 		// maxTurnLength = Math.max(maxTurnLength,
@@ -444,10 +461,13 @@ public class Transmodeler2MATSimNetwork {
 		// }
 		// final double radius = 25.0;
 		// final double offset = 5.0;
-		// final NetworkExpandNode exp = new NetworkExpandNode(matsimNetwork,
-		// radius, offset);
+		// final NetworkExpandNode exp = new NetworkExpandNode(
+		// matsimNetwork, radius, offset);
 		// exp.expandNode(matsimId2node.getKey(), turns);
 		// }
+		//
+		// }
+
 		//
 		// System.out.println();
 		// System.out
@@ -534,33 +554,36 @@ public class Transmodeler2MATSimNetwork {
 		// nodesWriter.flush();
 		// nodesWriter.close();
 		// }
+
 	}
 
 	// -------------------- MAIN-FUNCTION --------------------
 
 	public static void main(String[] args) throws IOException {
 
-		final String inputPath = "./data_ZZZ/transmodeler/";
+		final String inputPath = "./ihop2/network-input/";
 		final String nodesFile = inputPath + "Nodes.csv";
 		final String segmentsFile = inputPath + "Segments.csv";
 		final String lanesFile = inputPath + "Lanes.csv";
 		final String laneConnectorsFile = inputPath + "Lane Connectors.csv";
 		final String linksFile = inputPath + "Links.csv";
 
-		final boolean scaleUpIntersectionLinks = false;
+		// final boolean scaleUpIntersectionLinks = false;
 
-		final String outputPath = "./test/matsim-testrun/input/";
-		final String matsimPlainFile = outputPath + "network-plain.xml";
-		final String matsimExpandedFile = outputPath + "network-expanded.xml";
+		final String outputPath = "./ihop2/network-output/";
+		final String matsimPlainFile = outputPath + "network.xml";
+		// final String matsimExpandedFile = outputPath +
+		// "network-expanded.xml";
 		final String linkAttributesFile = outputPath + "link-attributes.xml";
-		final String matsimLanesFile = outputPath + "lanes.xml";
+		final String matsimLanesFile11 = outputPath + "lanes11.xml";
+		final String matsimLanesFile20 = outputPath + "lanes20.xml";
 
 		System.out.println("STARTED ...");
 
 		final Transmodeler2MATSimNetwork tm2MATSim = new Transmodeler2MATSimNetwork(
 				nodesFile, linksFile, segmentsFile, lanesFile,
-				laneConnectorsFile, scaleUpIntersectionLinks, matsimPlainFile,
-				matsimExpandedFile, linkAttributesFile, matsimLanesFile);
+				laneConnectorsFile, matsimPlainFile, linkAttributesFile,
+				matsimLanesFile11, matsimLanesFile20);
 		tm2MATSim.run();
 
 		System.out.println("... DONE");

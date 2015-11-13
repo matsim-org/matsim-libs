@@ -21,7 +21,7 @@ public class ConnectedLinks {
 	private ConnectedLinks() {
 	}
 
-	public static Set<Link> connectedLinks(final Link startLink,
+	private static Set<Link> connectedLinks(final Link startLink,
 			final Network network, final Dir dir,
 			final Map<String, TransmodelerLink> id2tmLink) {
 
@@ -74,11 +74,25 @@ public class ConnectedLinks {
 		return result;
 	}
 
-	public static Set<Link> connectedLinks(final Network network, 
+	public static Set<Link> connectedLinks(final Network network,
 			final Map<String, TransmodelerLink> id2tmLink) {
-		final Link startLink = network.getLinks().values().iterator().next();
-		final Set<Link> result = connectedLinks(startLink, network, Dir.fwd, id2tmLink);
-		result.retainAll(connectedLinks(startLink, network, Dir.bwd, id2tmLink));
+		Set<Link> result = new LinkedHashSet<>();
+		final Set<Link> unexploredLinks = new LinkedHashSet<>(network
+				.getLinks().values());
+		while (unexploredLinks.size() > result.size()) {
+			final Link startLink = unexploredLinks.iterator().next();
+			final Set<Link> candidateResult;
+			{
+				candidateResult = connectedLinks(startLink, network, Dir.fwd,
+						id2tmLink);
+				candidateResult.retainAll(connectedLinks(startLink, network,
+						Dir.bwd, id2tmLink));
+			}
+			unexploredLinks.removeAll(candidateResult);
+			if (candidateResult.size() > result.size()) {
+				result = candidateResult;
+			}
+		}
 		return result;
 	}
 }

@@ -355,13 +355,13 @@ public class PopulationCreator {
 
 		System.out.println("STARTED ...");
 
-		final String zonesShapeFileName = "./data_ZZZ/shapes/sverige_TZ_EPSG3857.shp";
-		final String buildingShapeFileName = "./data_ZZZ/shapes/by_full_EPSG3857_2.shp";
-		
-		final String populationFileName = "./test/regentmatsim/exchange/trips.xml";
+		final String zonesShapeFileName = "./ihop2/demand-input/sverige_TZ_EPSG3857.shp";
+		final String buildingShapeFileName = "./ihop2/demand-input/by_full_EPSG3857_2.shp";
 
-		final String networkFileName = "./test/matsim-testrun/input/network-plain.xml";
-		final String initialPlansFile = "./test/matsim-testrun/input/initial-plans.xml";
+		final String populationFileName = "./ihop2/demand-input/trips.xml";
+
+		final String networkFileName = "./ihop2/network-output/network.xml";
+		final String initialPlansFile = "./ihop2/demand-output/initial-plans.xml";
 		// final String linkAttributesFileName =
 		// "./data/run/link-attributes.xml";
 
