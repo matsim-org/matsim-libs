@@ -81,8 +81,6 @@ import com.google.inject.Provider;
 import com.google.inject.TypeLiteral;
 import com.google.inject.name.Names;
 
-import tutorial.programming.example06EventsHandling.MyEventHandler1;
-
 /**
  * The Controler is responsible for complete simulation runs, including the
  * initialization of all required data, running the iterations and the
