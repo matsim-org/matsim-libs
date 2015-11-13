@@ -48,7 +48,7 @@ import playground.andreas.utils.net.NetworkSimplifier;
  */
 
 public class PatnaNetworkGenerator {       
-	
+
 	public PatnaNetworkGenerator(String outputDir) {
 		this.outputDir = outputDir;
 	}
@@ -86,7 +86,7 @@ public class PatnaNetworkGenerator {
 				String linkId = row[0];
 				String widthOfRoad = row [3];
 				String lengthInKm = row [6];
-				//				String speedInKmph = row[7];
+				String speedInKmph = row[7];
 				String FromNodeId = row[8];							
 				String ToNodeId = row[9];
 				String fromNodeXCoord = row [10];				
@@ -124,21 +124,20 @@ public class PatnaNetworkGenerator {
 				Link link1 = network.getFactory().createLink(Id.create(linkId,Link.class), fromNode, toNode); 
 				Link link2 = network.getFactory().createLink(Id.create(linkId + "10000",Link.class), toNode, fromNode);   
 
-				//				int streamSpeed = Integer.parseInt(speedInKmph);
-				//				double freeSpeed = 0;
-				// type of road is Arterial, sub arterial and collector so speeds are 50. 40 . 40kph respectively.
-				// in given data speed is stream speeds (25, 20 and 15) not free flow speed
-				//				switch (streamSpeed)						
-				//				{ 
-				//				case 25 :	freeSpeed = 50; break;
-				//				case 20 :	freeSpeed = 40; break;
-				//				case 15 : 	freeSpeed = 40; break;
-				//				case 50 :	freeSpeed = 60; break;
-				//				}
-				//				double freeSpeedInMPS = freeSpeed/3.6;	
-				
-				double freeSpeedInMPS = 60/3.6; //ZZ_TODO : WHY UNIFORM SPEED?
-				
+				int streamSpeed = Integer.parseInt(speedInKmph);
+				double freeSpeed = 0;
+//				type of road is Arterial, sub arterial and collector so speeds are 50. 40 . 40kph respectively.
+//				in given data speed is stream speeds (25, 20 and 15) not free flow speed
+				switch (streamSpeed)						
+				{ 
+				case 25 :	freeSpeed = 50; break;
+				case 20 :	freeSpeed = 40; break;
+				case 15 : 	freeSpeed = 40; break;
+				case 50 :	freeSpeed = 60; break;
+				}
+				double freeSpeedInMPS = freeSpeed/3.6;	
+//				double freeSpeedInMPS = 60/3.6; 
+
 				double roadWidth = (0.5*Double.parseDouble(widthOfRoad));			
 				int numberoflanes = 0;
 
@@ -161,10 +160,9 @@ public class PatnaNetworkGenerator {
 				link2.setLength(linkLength);
 				link2.setAllowedModes(allModesAllowed);
 				network.addLink(link2);
-
 			}
 		};
-		
+
 		TabularFileParser tabularFileParser = new TabularFileParser();
 		tabularFileParser.parse(tabularFileParserConfig, tabularFileHandler);  
 		new NetworkCleaner().run(network);
