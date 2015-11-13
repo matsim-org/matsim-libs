@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Queue;
 
 import org.apache.log4j.Logger;
@@ -34,6 +33,7 @@ import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.VehicleAbortsEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.LaneLeaveEvent;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
@@ -142,7 +142,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	private static int spaceCapWarningCount = 0;
 	static boolean HOLES = false ; // can be set from elsewhere in package, but not from outside.  kai, nov'10
 	static boolean VIS_HOLES = false ;
-	static double hole_speed = 15.0;
+	private double hole_speed = 15.0;
 	/**
 	 * LaneEvents should only be fired if there is more than one QueueLane on a QueueLink
 	 * because the LaneEvents are identical with LinkEnter/LeaveEvents otherwise.
@@ -162,7 +162,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	private final VisData visData = new VisDataImpl() ;
 	private final double timeStepSize;
 
-	static boolean fastCapacityUpdate;
+	private boolean fastCapacityUpdate;
 
 	static class Builder {
 		private VehicleQ<QVehicle> vehicleQueue = null ;
@@ -241,7 +241,41 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		this.unscaledFlowCapacity_s = flowCapacity_s ;
 		this.effectiveNumberOfLanes = effectiveNumberOfLanes;
 
-		this.timeStepSize = this.network.simEngine.getMobsim().getScenario().getConfig().qsim().getTimeStepSize();
+		final QSimConfigGroup qsimConfig = this.network.simEngine.getMobsim().getScenario().getConfig().qsim();
+
+		this.timeStepSize = qsimConfig.getTimeStepSize() ;
+		this.fastCapacityUpdate = qsimConfig.isUsingFastCapacityUpdate() ;
+		
+		String isSeeping = this.network.simEngine.getMobsim().getScenario().getConfig().findParam("seepage", "isSeepageAllowed");
+
+		if(isSeeping != null && isSeeping.equals("true")){
+			this.seepageAllowed = true;
+			this.seepMode = this.network.simEngine.getMobsim().getScenario().getConfig().getParam("seepage", "seepMode");
+			this.isSeepModeStorageFree = Boolean.valueOf(this.network.simEngine.getMobsim().getScenario().getConfig().getParam("seepage", "isSeepModeStorageFree"));
+			log.info("Seepage is allowed. Seep mode is "+this.seepMode+".");
+			if(this.isSeepModeStorageFree) log.warn("Seep mode "+seepMode+" do not take storage space thus only considered for flow capacities.");
+		}
+
+		//following are copied part from QNetSimEngine instead of copying the whole class.
+		QSimConfigGroup qsimConfigGroup = qsimConfig;
+		if ( QSimConfigGroup.TrafficDynamics.queue.equals( qsimConfigGroup.getTrafficDynamics() ) ) {
+			QueueWithBuffer.HOLES=false ;
+		} else if ( QSimConfigGroup.TrafficDynamics.withHoles.equals( qsimConfigGroup.getTrafficDynamics() ) ) {
+			QueueWithBuffer.HOLES = true ;
+		} else {
+			throw new RuntimeException("trafficDynamics defined in config that does not exist: "
+					+ qsimConfigGroup.getTrafficDynamics() ) ;
+		}
+		if ( QSimConfigGroup.SnapshotStyle.withHoles.equals( qsimConfigGroup.getSnapshotStyle() ) ) {
+			QueueWithBuffer.VIS_HOLES = true ;
+		}
+
+		if(QueueWithBuffer.HOLES && this.network.simEngine.getMobsim().getScenario().getConfig().getModule("WITH_HOLE")!=null){
+			hole_speed = Double.valueOf(this.network.simEngine.getMobsim().getScenario().getConfig().getParam("WITH_HOLE", "HOLE_SPEED"));
+			if (hole_speed!=15) {
+				log.warn("Hole speed is set to "+hole_speed+". Default hardcoded value is 15.");
+			}
+		}
 
 		freespeedTravelTime = this.length / qLinkImpl.getLink().getFreespeed();
 		if (Double.isNaN(freespeedTravelTime)) {
@@ -250,7 +284,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		this.calculateFlowCapacity();
 		this.calculateStorageCapacity();
 
-		if(fastCapacityUpdate){
+		if(this.fastCapacityUpdate){
 			flowcap_accumulate.setValue(flowCapacityPerTimeStep);
 		} else {
 			flowcap_accumulate.setValue((flowCapacityPerTimeStepFractionalPart == 0.0 ? 0.0 : 1.0) );
@@ -273,7 +307,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		// yy might make sense to just accumulate to "zero" and go into negative when something is used up.
 		// kai/mz/amit, mar'12
 		
-		if(fastCapacityUpdate){
+		if(this.fastCapacityUpdate){
 			updateFlowAccumulation(now);
 			if (flowcap_accumulate.getValue() >= 0.0  ) {
 				flowcap_accumulate.addValue(-veh.getSizeInEquivalents(), now);
@@ -315,7 +349,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	private boolean hasFlowCapacityLeftAndBufferSpace() {
 		final double now = network.simEngine.getMobsim().getSimTimer().getTimeOfDay() ;
 
-		if(fastCapacityUpdate){
+		if(this.fastCapacityUpdate){
 			updateFlowAccumulation(now);
 			return (
 					usedBufferStorageCapacity < bufferStorageCapacity
@@ -350,7 +384,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 
 	@Override
 	public final void updateRemainingFlowCapacity() {
-		if(!fastCapacityUpdate){
+		if(!this.fastCapacityUpdate){
 			remainingflowCap = flowCapacityPerTimeStep;
 			if (thisTimeStepGreen && flowcap_accumulate.getValue() < 1.0 && isNotOfferingVehicle() ) {
 				final double now = network.simEngine.getMobsim().getSimTimer().getTimeOfDay() ;
@@ -458,6 +492,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 			}
 
 			// Check if veh has reached destination:
+//			if ((driver.chooseNextLinkId() == null)) {
 			if ((driver.isWantingToArriveOnCurrentLink())) {
 				letVehicleArrive(now, veh);
 				continue;
@@ -470,7 +505,6 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 
 			addToBuffer(veh, now);
 			removeVehicleFromQueue(now,veh);
-			if(isRestrictingNumberOfSeepMode && seepageAllowed && seepModes.contains( veh.getDriver().getMode() ) ) noOfSeepModeBringFwd++;
 		} // end while
 	}
 
@@ -480,7 +514,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 
 		QVehicle veh = pollFromVehQueue(veh2Remove); 
 
-		if(seepageAllowed && isSeepModeStorageFree && seepModes.contains( veh.getDriver().getMode() ) ){
+		if(seepageAllowed && isSeepModeStorageFree && veh.getVehicle().getType().getId().toString().equals(seepMode) ){
 			// yyyy above line feels quite slow/consuming computer time.  Should be switched off completely when seepage is not used. kai, may'15
 
 		} else {
@@ -515,7 +549,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 
 	@Override
 	public final boolean isActive() {
-		if(fastCapacityUpdate){
+		if(this.fastCapacityUpdate){
 		return /*(this.remainingflowCap < 0.0) // still accumulating, thus active
 				|| */(!this.vehQueue.isEmpty()) || (!this.isNotOfferingVehicle()) || ( !this.holes.isEmpty() ) ;
 		} else {
@@ -686,7 +720,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		// reduce storage capacity by size of vehicle:
 		//	usedStorageCapacity += veh.getSizeInEquivalents();
 
-		if(isSeepModeStorageFree && seepModes.contains( veh.getDriver().getMode() ) ){
+		if(isSeepModeStorageFree && veh.getVehicle().getType().getId().toString().equals(seepMode) ){
 		} else {
 			usedStorageCapacity += veh.getSizeInEquivalents();
 		}
@@ -850,43 +884,45 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		}
 	}
 
-	static boolean seepageAllowed = false;
-	static List<String> seepModes = null; 
-	static boolean isSeepModeStorageFree = false;
+	private boolean seepageAllowed = false;
+	private String seepMode = null; 
+	private boolean isSeepModeStorageFree = false;
 
-	private int maxSeepModeAllowed = 4;
-	private int noOfSeepModeBringFwd = 0;
-	/**
-	 * basically required to get more data points in the congested branch of FD
-	 */
-	static boolean isRestrictingNumberOfSeepMode = false;
-	
 	private QVehicle peekFromVehQueue(){
 		double now = network.simEngine.getMobsim().getSimTimer().getTimeOfDay();
 
-		QVehicle returnVeh = vehQueue.peek();
-
-		if(seepageAllowed){
-
-			if(isRestrictingNumberOfSeepMode && noOfSeepModeBringFwd == maxSeepModeAllowed) {
-				noOfSeepModeBringFwd = 0;
-				return returnVeh;
-			}
-
+		if(!seepageAllowed || vehQueue.size() <= 1){
+			// no seepage or no vehicle or only one vehicle in queue
+			return vehQueue.peek();
+		} else if(vehQueue.peek().getEarliestLinkExitTime()>now ){
+			//if earliestLinkExitTime of front vehicle is not reached returns
+			return vehQueue.peek();
+		} else if(vehQueue.peek().getDriver().getMode().equals(seepMode)) {
+			//driver is present in veh and driving seep mode
+			return vehQueue.peek();
+		} else {
+			QVehicle returnVeh = null;
+			boolean foundSeepMode = false;
 			VehicleQ<QVehicle> newVehQueue = new PassingVehicleQ();
-			newVehQueue.addAll(vehQueue);
-
-			Iterator<QVehicle> it = newVehQueue.iterator();
+			Iterator<QVehicle> it = vehQueue.iterator();
 
 			while(it.hasNext()){
-				QVehicle veh = newVehQueue.poll(); 
-				if( veh.getEarliestLinkExitTime()<=now && seepModes.contains( veh.getDriver().getMode() ) ) {
+				QVehicle veh = vehQueue.poll(); 
+				if(veh.getDriver()==null) {
+				} else if(veh.getEarliestLinkExitTime()<=now && veh.getDriver().getMode().equals(seepMode) && !foundSeepMode) {
 					returnVeh = veh;
-					break;
+					newVehQueue.add(veh);
+					foundSeepMode=true;
+				} else {
+					newVehQueue.add(veh);
 				}
 			}
+			if(!vehQueue.isEmpty()) throw new RuntimeException("This queue should be empty at this point.");
+			vehQueue.addAll(newVehQueue);
+			if(returnVeh==null) return vehQueue.peek();
+			else return returnVeh;
 		}
-		return returnVeh;
+
 	}
 
 	private QVehicle pollFromVehQueue(QVehicle veh2Remove){

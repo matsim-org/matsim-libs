@@ -91,7 +91,7 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup implements Mobs
 	private boolean insertingWaitingVehiclesBeforeDrivingVehicles = false;
 
 	// ---
-	public static enum LinkDynamics { FIFO, PassingQ, SeepageQ }
+	public static enum LinkDynamics { FIFO, PassingQ }
 	private LinkDynamics linkDynamics = LinkDynamics.FIFO ;
 	private static final String LINK_DYNAMICS = "linkDynamics" ;
 
