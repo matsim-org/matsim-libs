@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.munich.analysis;
+package playground.agarwalamit.munich.analysis.modeSwitcher;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,13 +33,11 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.utils.collections.Tuple;
 
-import playground.agarwalamit.analysis.legMode.ModeSwitcherInfoCollector;
 import playground.agarwalamit.analysis.legMode.distributions.LegModeTravelTimeHandler;
 
 /**
  *This will first find mode switchers and then returns trip times in groups. 
  *<p>
- * car2car, car2non-car, non-car2car and non-car2non-car
  * @author amit
  */
 
@@ -47,7 +45,6 @@ public class ModeSwitchersTripTime {
 
 	private Logger log = Logger.getLogger(ModeSwitchersTripTime.class);
 
-	private final String [] modeSwitchTypes = {"car2car","car2nonCar","nonCar2car","nonCar2nonCar"};
 	private ModeSwitcherInfoCollector modeSwitchInfo;
 	
 	public static void main(String[] args) {
@@ -63,7 +60,7 @@ public class ModeSwitchersTripTime {
 	}
 
 	public ModeSwitchersTripTime (){
-		modeSwitchInfo = new ModeSwitcherInfoCollector(modeSwitchTypes);
+		modeSwitchInfo = new ModeSwitcherInfoCollector();
 	}
 
 	public void run (String runCase){
@@ -99,8 +96,8 @@ public class ModeSwitchersTripTime {
 					String lastMode = getTravelMode(last_it_mode.getFirst());
 					
 					String switchTyp = firstMode.concat("2").concat(lastMode);
-					this.modeSwitchInfo.storeTripTimeInfo(pId, switchTyp, new Tuple<Double, Double>(first_it_mode.getSecond(), last_it_mode.getSecond()));
-					
+					ModeSwitcherType modeSwitchType = ModeSwitcherType.valueOf(switchTyp);
+					this.modeSwitchInfo.storeTripTimeInfo(pId, modeSwitchType, new Tuple<Double, Double>(first_it_mode.getSecond(), last_it_mode.getSecond()));
 				} 
 
 			} else if(!person2ModeTravelTimes_last_it.containsKey(pId)) {

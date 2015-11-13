@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.munich.analysis.userGroup;
+package playground.agarwalamit.munich.analysis.userGroup.toll;
 
 import java.io.BufferedWriter;
 import java.io.File;

@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.munich.analysis;
+package playground.agarwalamit.munich.analysis.modeSwitcher;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,7 +34,6 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.utils.collections.Tuple;
 
-import playground.agarwalamit.analysis.legMode.ModeSwitcherInfoCollector;
 import playground.agarwalamit.analysis.legMode.distributions.LegModeRouteDistanceDistributionHandler;
 import playground.agarwalamit.utils.LoadMyScenarios;
 
@@ -50,7 +49,6 @@ public class ModeSwitchersTripDistance {
 
 	private Logger log = Logger.getLogger(ModeSwitchersTripDistance.class);
 
-	private final String [] modeSwitchTypes = {"car2car","car2nonCar","nonCar2car","nonCar2nonCar"};
 	private ModeSwitcherInfoCollector modeSwitchInfo;
 
 	public static void main(String[] args) {
@@ -66,7 +64,7 @@ public class ModeSwitchersTripDistance {
 	}
 
 	public ModeSwitchersTripDistance (){
-		modeSwitchInfo = new ModeSwitcherInfoCollector(modeSwitchTypes);
+		modeSwitchInfo = new ModeSwitcherInfoCollector();
 	}
 
 	private void run (String runCase){
@@ -100,7 +98,8 @@ public class ModeSwitchersTripDistance {
 					String lastMode = getTravelMode(last_it_mode.getFirst());
 
 					String switchTyp = firstMode.concat("2").concat(lastMode);
-					this.modeSwitchInfo.storeTripDistanceInfo(pId, switchTyp, new Tuple<Double, Double>(first_it_mode.getSecond(), last_it_mode.getSecond()));
+					ModeSwitcherType modeSwitchType = ModeSwitcherType.valueOf(switchTyp);
+					this.modeSwitchInfo.storeTripDistanceInfo(pId, modeSwitchType, new Tuple<Double, Double>(first_it_mode.getSecond(), last_it_mode.getSecond()));
 				} 
 
 			} else if(!person2ModeTravelDists_it_last.containsKey(pId)) {

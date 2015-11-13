@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.analysis.legMode;
+package playground.agarwalamit.munich.analysis.modeSwitcher;
 
 import java.io.BufferedWriter;
 import java.util.ArrayList;
@@ -39,10 +39,9 @@ public class ModeSwitcherInfoCollector {
 
 	private Logger log = Logger.getLogger(ModeSwitcherInfoCollector.class);
 	
-	public ModeSwitcherInfoCollector(String[] modeSwitchTypes) {
-		this.modeSwitchTypes = modeSwitchTypes;
+	public ModeSwitcherInfoCollector() {
 		
-		for(String str :modeSwitchTypes){
+		for(ModeSwitcherType str :ModeSwitcherType.values()){
 			this.modeSwitchType2numberOfLegs.put(str, 0);
 			this.modeSwitchType2PersonIds.put(str, new ArrayList<Id<Person>>());
 			this.modeSwitchType2TripDistances.put(str, new Tuple<Double, Double>(0., 0.));
@@ -54,12 +53,12 @@ public class ModeSwitcherInfoCollector {
 
 	private String [] modeSwitchTypes;
 	
-	private SortedMap<String, Tuple<Double, Double>> modeSwitchType2TripDistances = new TreeMap<>();
-	private SortedMap<String, Integer> modeSwitchType2numberOfLegs = new TreeMap<>();
-	private SortedMap<String, List<Id<Person>>> modeSwitchType2PersonIds = new TreeMap<>();
-	private SortedMap<String, Tuple<Double, Double>> modeSwitchType2TripTimes = new TreeMap<>();
+	private SortedMap<ModeSwitcherType, Tuple<Double, Double>> modeSwitchType2TripDistances = new TreeMap<>();
+	private SortedMap<ModeSwitcherType, Integer> modeSwitchType2numberOfLegs = new TreeMap<>();
+	private SortedMap<ModeSwitcherType, List<Id<Person>>> modeSwitchType2PersonIds = new TreeMap<>();
+	private SortedMap<ModeSwitcherType, Tuple<Double, Double>> modeSwitchType2TripTimes = new TreeMap<>();
 	
-	public void storeTripTimeInfo(Id<Person> personId, String modeSwitchTyp, Tuple<Double, Double> travelTimes){
+	public void storeTripTimeInfo(Id<Person> personId, ModeSwitcherType modeSwitchTyp, Tuple<Double, Double> travelTimes){
 
 		this.modeSwitchType2numberOfLegs.put(modeSwitchTyp, this.modeSwitchType2numberOfLegs.get(modeSwitchTyp)+1);
 
@@ -72,7 +71,7 @@ public class ModeSwitcherInfoCollector {
 		this.modeSwitchType2TripTimes.put(modeSwitchTyp, now_first_last_its_tripTimes);
 	}
 	
-	public void storeTripDistanceInfo(Id<Person> personId, String modeSwitchTyp, Tuple<Double, Double> travelDistances){
+	public void storeTripDistanceInfo(Id<Person> personId, ModeSwitcherType modeSwitchTyp, Tuple<Double, Double> travelDistances){
 
 		this.modeSwitchType2numberOfLegs.put(modeSwitchTyp, this.modeSwitchType2numberOfLegs.get(modeSwitchTyp)+1);
 
@@ -133,19 +132,19 @@ public class ModeSwitcherInfoCollector {
 		this.modeSwitchTypes = modeSwitchTypes;
 	}
 	
-	public SortedMap<String, Tuple<Double, Double>> getModeSwitchType2TripDistances() {
+	public SortedMap<ModeSwitcherType, Tuple<Double, Double>> getModeSwitchType2TripDistances() {
 		return modeSwitchType2TripDistances;
 	}
 	
-	public SortedMap<String, Integer> getModeSwitchType2numberOfLegs() {
+	public SortedMap<ModeSwitcherType, Integer> getModeSwitchType2numberOfLegs() {
 		return modeSwitchType2numberOfLegs;
 	}
 	
-	public SortedMap<String, List<Id<Person>>> getModeSwitchType2PersonIds() {
+	public SortedMap<ModeSwitcherType, List<Id<Person>>> getModeSwitchType2PersonIds() {
 		return modeSwitchType2PersonIds;
 	}
 	
-	public SortedMap<String, Tuple<Double, Double>> getModeSwitchType2TripTimes() {
+	public SortedMap<ModeSwitcherType, Tuple<Double, Double>> getModeSwitchType2TripTimes() {
 		return modeSwitchType2TripTimes;
 	}
 }

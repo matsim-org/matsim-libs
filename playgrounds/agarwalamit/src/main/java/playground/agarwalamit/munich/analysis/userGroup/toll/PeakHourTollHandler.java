@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.munich.analysis.userGroup;
+package playground.agarwalamit.munich.analysis.userGroup.toll;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -59,6 +59,7 @@ public class PeakHourTollHandler implements PersonMoneyEventHandler, PersonDepar
 	}
 
 	private final List<Double> pkHrs = new ArrayList<>(Arrays.asList(new Double []{8.,9.,16.,17.}));
+	
 	private static final Logger log = Logger.getLogger(PeakHourTollHandler.class);
 
 	private SortedMap<UserGroup, Map<Id<Person>,List<Double>>> userGrpTo_PkHrToll = new TreeMap<>();
