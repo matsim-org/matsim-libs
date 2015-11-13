@@ -36,7 +36,7 @@ import java.util.Map;
  */
 public class MatrixAnalyzerConfigurator implements DataLoader {
 
-    public static final String ZONE_LAYER_NAME = "nuts3";
+    public static final String ZONE_LAYER_NAME = "zoneLayer";
 
     public static final String PARAM_SET_KEY = "referenceMatrix";
 

@@ -115,7 +115,8 @@ public class Simulator {
         ioContext.append("ref");
         AnalyzerTaskRunner.run(refPersons, task, ioContext);
 
-        task.addComponent((AnalyzerTask<Collection<? extends Person>>) new MatrixAnalyzerConfigurator(config.getModule(""), dataPool).load());
+        task.addComponent((AnalyzerTask<Collection<? extends Person>>) new MatrixAnalyzerConfigurator(config
+                .getModule("matrixAnalyzer"), dataPool).load());
 		/*
 		Setup hamiltonian
 		 */
@@ -176,6 +177,8 @@ public class Simulator {
         sampler.setListener(engineListeners);
 
         sampler.run((long) Double.parseDouble(config.getParam(MODULE_NAME, "iterations")));
+
+        Executor.shutdown();
     }
 
     private static UnivariatFrequency buildDistDistrTerm(Set<PlainPerson> refPersons, Set<PlainPerson>

@@ -81,7 +81,7 @@ public class MatrixBuilder {
         }
 
         if(errors > 0) {
-            logger.warn(String.format("% facilities cannot be located in a zone.", errors));
+            logger.warn(String.format("%s facilities cannot be located in a zone.", errors));
         }
         return m;
     }

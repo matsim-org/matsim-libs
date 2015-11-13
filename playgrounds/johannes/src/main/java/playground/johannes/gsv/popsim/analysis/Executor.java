@@ -38,11 +38,17 @@ public class Executor {
         }
     }
 
+    public static void shutdown() {
+        if(service != null) service.shutdown();
+    }
+
     public static Future<?> submit(Runnable task) {
+        init();
         return service.submit(task);
     }
 
     public static void submitAndWait(List<? extends Runnable> runnables) {
+        init();
         List<Future<?>> futures = new ArrayList<>(runnables.size());
         for(Runnable runnable : runnables) {
             futures.add(service.submit(runnable));

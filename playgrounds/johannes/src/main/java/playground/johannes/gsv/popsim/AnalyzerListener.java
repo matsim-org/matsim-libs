@@ -26,6 +26,7 @@ import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.sim.MarkovEngineListener;
 import playground.johannes.synpop.sim.data.CachedPerson;
 
+import java.text.DecimalFormat;
 import java.util.Collection;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -52,7 +53,9 @@ public class AnalyzerListener implements MarkovEngineListener {
     @Override
     public void afterStep(Collection<CachedPerson> population, Collection<? extends Attributable> mutations, boolean accepted) {
         if (iters.get() % interval == 0) {
-            ioContext.append(String.format("%E", (double)iters.get()));
+            DecimalFormat df = new DecimalFormat("0");
+            df.setMaximumFractionDigits(340);
+            ioContext.append(df.format(iters.get()));
             AnalyzerTaskRunner.run(population, task, ioContext);
 
         }
