@@ -18,6 +18,9 @@
  * *********************************************************************** */
 package playground.agarwalamit.mixedTraffic.patnaIndia;
 
+import java.util.Arrays;
+import java.util.Collection;
+
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
@@ -34,4 +37,7 @@ public final class PatnaConstants {
 	public enum PatnaActivityTypes {
 		home, work, educational, social, other, unknown;
 	}
+	
+	public static final Collection <String> mainModes = Arrays.asList("car","motorbike","bike");
+	public static final Collection <String> allModes = Arrays.asList("car","motorbike","bike","pt","walk");
 }

@@ -20,7 +20,6 @@ package playground.agarwalamit.mixedTraffic.patnaIndia.input;
 
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
@@ -64,12 +63,6 @@ public class PatnaNetworkGenerator {
 		Config config = ConfigUtils.createConfig();                                    
 		final Scenario scenario = ScenarioUtils.createScenario(config);                                       
 		final Network network = scenario.getNetwork();
-		final Set <String> allModesAllowed = new HashSet<String>();
-		/*
-		 *  'bike' is referred as "bicycle" and 
-		 *  therefore "motorbike" is used for referring motorcycles.
-		 */
-		allModesAllowed.addAll(Arrays.asList("car","motorbike","pt", "bike", "walk"));
 
 		String inputFileNetwork    =  PatnaConstants.inputFilesDir+"/networkInputTransCad.csv" ;
 
@@ -151,14 +144,14 @@ public class PatnaNetworkGenerator {
 				link1.setCapacity(capacityOfLink(widthOfRoad));
 				link1.setNumberOfLanes(numberoflanes);
 				link1.setLength(linkLength);
-				link1.setAllowedModes(allModesAllowed);
+				link1.setAllowedModes(new HashSet<>(PatnaConstants.allModes));
 				network.addLink(link1);
 
 				link2.setFreespeed(freeSpeedInMPS);
 				link2.setCapacity(capacityOfLink(widthOfRoad));
 				link2.setNumberOfLanes(numberoflanes);
 				link2.setLength(linkLength);
-				link2.setAllowedModes(allModesAllowed);
+				link2.setAllowedModes(new HashSet<>(PatnaConstants.allModes));
 				network.addLink(link2);
 			}
 		};
@@ -189,7 +182,4 @@ public class PatnaNetworkGenerator {
 		if (linkCapacity < 300) linkCapacity = 300; 
 		return linkCapacity;
 	}
-
-}                                                                                                        
-
-
+}
