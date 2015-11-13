@@ -54,7 +54,7 @@ class KNBerlinControler {
 		config.controler().setOutputDirectory("/Users/nagel/kairuns/a100/output/");
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 
-		config.controler().setFirstIteration(100); // with something like "9" we don't get output events! 
+		config.controler().setFirstIteration(90); // with something like "9" we don't get output events! 
 		config.controler().setLastIteration(100); // with something like "9" we don't get output events! 
 		config.controler().setWriteSnapshotsInterval(100);
 		config.controler().setWritePlansInterval(200);
