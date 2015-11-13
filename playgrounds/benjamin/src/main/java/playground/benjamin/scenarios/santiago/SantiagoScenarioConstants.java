@@ -25,11 +25,12 @@ public final class SantiagoScenarioConstants {
 	public enum Modes{
 							bus,
 							metro,
-							colectivo,
-							school_bus,
-							taxi,
-							motorcycle,
 							train,
+							colectivo,
+							taxi,
+							other,
+//							school_bus,
+//							motorcycle,
 							truck
 						};
 					

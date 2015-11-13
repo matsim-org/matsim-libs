@@ -22,6 +22,7 @@ package playground.benjamin.scenarios.santiago.run;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.jfree.util.Log;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -54,11 +55,10 @@ public class SantiagoScenarioRunner {
 
 //	private static String inputPath = "../../../runs-svn/santiago/run20/input/";
 //	private static boolean doModeChoice = false;
-	private static String inputPath = "../../../runs-svn/santiago/run31/input/";
+	private static String inputPath = "../../../runs-svn/santiago/run32/input/";
 	private static boolean doModeChoice = true;
 	
 	public static void main(String args[]){
-		
 //		OTFVis.convert(new String[]{
 //						"",
 //						outputPath + "modeChoice.output_events.xml.gz",	//events
@@ -66,20 +66,20 @@ public class SantiagoScenarioRunner {
 //						outputPath + "visualisation.mvi", 		//mvi
 //						"60" 									//snapshot period
 //		});
-//		
 //		OTFVis.playMVI(outputPath + "visualisation.mvi");
 		
 		Config config = ConfigUtils.loadConfig(inputPath + "config_final.xml");
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+//		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.failIfDirectoryExists);
 		Controler controler = new Controler(scenario);
 		
 		// adding other network modes than car requires some router; here, the same values as for car are used
 		setNetworkModeRouting(controler);
 		
-		// adding pt fare in a simplified way
-		if(doModeChoice) controler.getEvents().addHandler(new PTFlatFareHandler(controler));
+		// adding pt fare
+		controler.getEvents().addHandler(new PTFareHandler(controler, doModeChoice, scenario.getPopulation()));
 		
 		// adding basic strategies for car and non-car users
 		setBasicStrategiesForSubpopulations(controler);
@@ -144,10 +144,12 @@ public class SantiagoScenarioRunner {
 				addTravelDisutilityFactoryBinding(SantiagoScenarioConstants.Modes.taxi.toString()).to(carTravelDisutilityFactoryKey());
 				addTravelTimeBinding(SantiagoScenarioConstants.Modes.colectivo.toString()).to(networkTravelTime());
 				addTravelDisutilityFactoryBinding(SantiagoScenarioConstants.Modes.colectivo.toString()).to(carTravelDisutilityFactoryKey());
-				addTravelTimeBinding(SantiagoScenarioConstants.Modes.motorcycle.toString()).to(networkTravelTime());
-				addTravelDisutilityFactoryBinding(SantiagoScenarioConstants.Modes.motorcycle.toString()).to(carTravelDisutilityFactoryKey());
-				addTravelTimeBinding(SantiagoScenarioConstants.Modes.school_bus.toString()).to(networkTravelTime());
-				addTravelDisutilityFactoryBinding(SantiagoScenarioConstants.Modes.school_bus.toString()).to(carTravelDisutilityFactoryKey());
+				addTravelTimeBinding(SantiagoScenarioConstants.Modes.other.toString()).to(networkTravelTime());
+				addTravelDisutilityFactoryBinding(SantiagoScenarioConstants.Modes.other.toString()).to(carTravelDisutilityFactoryKey());
+//				addTravelTimeBinding(SantiagoScenarioConstants.Modes.motorcycle.toString()).to(networkTravelTime());
+//				addTravelDisutilityFactoryBinding(SantiagoScenarioConstants.Modes.motorcycle.toString()).to(carTravelDisutilityFactoryKey());
+//				addTravelTimeBinding(SantiagoScenarioConstants.Modes.school_bus.toString()).to(networkTravelTime());
+//				addTravelDisutilityFactoryBinding(SantiagoScenarioConstants.Modes.school_bus.toString()).to(carTravelDisutilityFactoryKey());
 			}
 		});
 	}

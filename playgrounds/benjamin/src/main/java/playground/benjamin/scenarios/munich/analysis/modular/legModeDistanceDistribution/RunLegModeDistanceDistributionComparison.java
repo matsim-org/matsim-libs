@@ -39,14 +39,16 @@ import playground.vsp.analysis.modules.legModeDistanceDistribution.LegModeDistan
 public class RunLegModeDistanceDistributionComparison {
 	private final static Logger logger = Logger.getLogger(RunLegModeDistanceDistributionComparison.class);
 	
-	static String baseFolder1 = "../../runs-svn/detEval/mobilTUM/run20/";
+//	static String baseFolder1 = "../../../runs-svn/detEval/mobilTUM/run20/";
+	static String baseFolder1 = "../../../runs-svn/santiago/run32/output/";
 	static String configFile1 = baseFolder1 + "output_config.xml.gz";
 	static String iteration1 = "0";
 	
 	// ===
 	static String baseFolder2 = baseFolder1;
 	static String configFile2 = configFile1;
-	static String iteration2 = "200";
+//	static String iteration2 = "200";
+	static String iteration2 = "50";
 	
 	static UserGroup userGroup = null;
 //	static UserGroup userGroup = UserGroup.URBAN;
