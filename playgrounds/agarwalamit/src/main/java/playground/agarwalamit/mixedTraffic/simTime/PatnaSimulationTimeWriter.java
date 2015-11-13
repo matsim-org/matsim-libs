@@ -132,8 +132,7 @@ public class PatnaSimulationTimeWriter {
 		config.qsim().setLinkDynamics(ld.toString());
 		config.qsim().setTrafficDynamics(td);
 
-		if(ld.toString().equals("SeepageQ")) {// probably this will not work but following commented line will work after merging seepageInLinkDynamics branch.
-//		if(ld.equals(QSimConfigGroup.LinkDynamics.SeepageQ)) {
+		if(ld.equals(QSimConfigGroup.LinkDynamics.SeepageQ)) {
 			config.setParam("seepage", "seepMode","bike");
 			config.setParam("seepage", "isSeepModeStorageFree", "false");
 			config.setParam("seepage", "isRestrictingNumberOfSeepMode", "true");

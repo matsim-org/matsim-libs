@@ -19,7 +19,7 @@
 
 package playground.michalm.taxi.run;
 
-import java.util.Map;
+import java.util.*;
 
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.population.*;
@@ -55,7 +55,7 @@ class KNTaxiLauncher
             otfConfig.setLinkWidth(2);
         }
 
-        launcher.initTravelTimeAndDisutility();
+        launcher.initVrpPathCalculator();
         launcher.simulateIteration();
     }
 

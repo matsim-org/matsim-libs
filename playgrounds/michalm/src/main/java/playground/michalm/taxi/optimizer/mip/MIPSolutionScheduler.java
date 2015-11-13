@@ -1,14 +1,13 @@
 package playground.michalm.taxi.optimizer.mip;
 
 import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.dvrp.path.*;
-import org.matsim.contrib.dvrp.router.DijkstraWithThinPath;
+import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
-import org.matsim.core.router.util.LeastCostPathCalculator;
 
 import playground.michalm.taxi.data.TaxiRequest;
 import playground.michalm.taxi.optimizer.*;
 import playground.michalm.taxi.optimizer.mip.MIPProblem.MIPSolution;
+import playground.michalm.taxi.vehreqpath.VehicleRequestPath;
 
 
 class MIPSolutionScheduler
@@ -18,8 +17,6 @@ class MIPSolutionScheduler
     private final VehicleData vData;
     private final int m;
     private final int n;
-
-    private LeastCostPathCalculator router;
 
     private MIPSolution solution;
     private Vehicle currentVeh;
@@ -33,9 +30,6 @@ class MIPSolutionScheduler
         this.vData = vData;
         this.m = vData.dimension;
         this.n = rData.dimension;
-        
-        router = new DijkstraWithThinPath(optimConfig.context.getScenario().getNetwork(),
-                optimConfig.travelDisutility, optimConfig.travelTime);
     }
 
 
@@ -74,9 +68,10 @@ class MIPSolutionScheduler
         // - we want to dispatch vehicles as soon as possible
         //   (because tt in MIP are based on the free flow speed estimates, while the actual
         //   times are usually longer hence the vehicle is likely to arrive after w[i])
-        VrpPathWithTravelData path = VrpPaths.calcAndCreatePath(earliestDeparture.link,
-                req.getFromLink(), earliestDeparture.time, router, optimConfig.travelTime);
+        VrpPathWithTravelData path = optimConfig.calculator.calcPath(earliestDeparture.link,
+                req.getFromLink(), earliestDeparture.time);
 
-        optimConfig.scheduler.scheduleRequest(currentVeh, req, path);
+        VehicleRequestPath vrPath = new VehicleRequestPath(currentVeh, req, path);
+        optimConfig.scheduler.scheduleRequest(vrPath);
     }
 }

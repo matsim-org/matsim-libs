@@ -26,12 +26,9 @@ import org.matsim.contrib.dvrp.MatsimVrpContext;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.path.*;
-import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
+import org.matsim.contrib.dvrp.router.*;
 import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
-import org.matsim.core.router.Dijkstra;
-import org.matsim.core.router.util.*;
-import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 
 
 /**
@@ -41,9 +38,7 @@ public class OneTaxiOptimizer
     implements VrpOptimizer
 {
     private final MatsimVrpContext context;
-
-    private final TravelTime travelTime;
-    private final LeastCostPathCalculator router;
+    private final VrpPathCalculator pathCalculator;
 
     private final Vehicle vehicle;//we have only one vehicle
     private final Schedule<AbstractTask> schedule;// the vehicle's schedule
@@ -52,13 +47,10 @@ public class OneTaxiOptimizer
 
 
     @SuppressWarnings("unchecked")
-    public OneTaxiOptimizer(MatsimVrpContext context)
+    public OneTaxiOptimizer(MatsimVrpContext context, VrpPathCalculator calculator)
     {
         this.context = context;
-
-        travelTime = new FreeSpeedTravelTime();
-        router = new Dijkstra(context.getScenario().getNetwork(),
-                new TimeAsTravelDisutility(travelTime), travelTime);
+        this.pathCalculator = calculator;
 
         vehicle = context.getVrpData().getVehicles().values().iterator().next();
         schedule = (Schedule<AbstractTask>)vehicle.getSchedule();
@@ -94,16 +86,14 @@ public class OneTaxiOptimizer
                 Math.max(vehicle.getT0(), currentTime) : //
                 Schedules.getLastTask(schedule).getEndTime();
 
-        VrpPathWithTravelData p1 = VrpPaths.calcAndCreatePath(lastTask.getLink(), fromLink, t0,
-                router, travelTime);
+        VrpPathWithTravelData p1 = pathCalculator.calcPath(lastTask.getLink(), fromLink, t0);
         schedule.addTask(new DriveTaskImpl(p1));
 
         double t1 = p1.getArrivalTime();
         double t2 = t1 + PICKUP_DURATION;// 2 minutes for picking up the passenger
         schedule.addTask(new OneTaxiServeTask(t1, t2, fromLink, "pickup", req));
 
-        VrpPathWithTravelData p2 = VrpPaths.calcAndCreatePath(fromLink, toLink, t2, router,
-                travelTime);
+        VrpPathWithTravelData p2 = pathCalculator.calcPath(fromLink, toLink, t2);
         schedule.addTask(new DriveTaskImpl(p2));
 
         double t3 = p2.getArrivalTime();

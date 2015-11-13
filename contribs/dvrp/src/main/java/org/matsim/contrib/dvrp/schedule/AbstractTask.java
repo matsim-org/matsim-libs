@@ -87,8 +87,8 @@ public abstract class AbstractTask
     @Override
     public void setBeginTime(double beginTime)
     {
-        if (status == TaskStatus.STARTED || status == TaskStatus.PERFORMED) {
-            throw new IllegalStateException("It is too late to change the beginTime");
+        if (status != TaskStatus.PLANNED) { // PERFORMED or STARTED
+            throw new IllegalStateException("Allowed only for PLANNED tasks");
         }
 
         this.beginTime = beginTime;
@@ -98,8 +98,8 @@ public abstract class AbstractTask
     @Override
     public void setEndTime(double endTime)
     {
-        if (status == TaskStatus.PERFORMED) {
-            throw new IllegalStateException("It is too late to change the endTime");
+        if (status != TaskStatus.PLANNED && status != TaskStatus.STARTED) { // PERFORMED
+            throw new IllegalStateException("Allowed only for PLANNED and STARTED tasks");
         }
 
         this.endTime = endTime;

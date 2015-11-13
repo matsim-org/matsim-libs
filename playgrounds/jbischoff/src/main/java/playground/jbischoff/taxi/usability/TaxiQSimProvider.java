@@ -19,33 +19,44 @@
  * *********************************************************************** */
 package playground.jbischoff.taxi.usability;
 
-
 import java.util.Map;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.dvrp.*;
-import org.matsim.contrib.dvrp.data.*;
+import org.matsim.contrib.dvrp.MatsimVrpContext;
+import org.matsim.contrib.dvrp.MatsimVrpContextImpl;
+import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.data.VehicleImpl;
 import org.matsim.contrib.dvrp.extensions.taxi.TaxiUtils;
 import org.matsim.contrib.dvrp.passenger.PassengerEngine;
-import org.matsim.contrib.dvrp.router.DistanceAsTravelDisutility;
+import org.matsim.contrib.dvrp.path.*;
+import org.matsim.contrib.dvrp.router.*;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils;
+import org.matsim.contrib.dvrp.util.TimeDiscretizer;
 import org.matsim.contrib.dvrp.vrpagent.VrpLegs;
 import org.matsim.contrib.dvrp.vrpagent.VrpLegs.LegCreator;
 import org.matsim.contrib.dynagent.run.DynAgentLauncherUtils;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.router.util.*;
+import org.matsim.core.router.Dijkstra;
+import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 
-import com.google.inject.*;
-
-import playground.michalm.taxi.*;
+import playground.michalm.taxi.TaxiActionCreator;
+import playground.michalm.taxi.TaxiRequestCreator;
 import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration;
 import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration.Goal;
-import playground.michalm.taxi.optimizer.filter.*;
+import playground.michalm.taxi.optimizer.filter.DefaultFilterFactory;
+import playground.michalm.taxi.optimizer.filter.FilterFactory;
 import playground.michalm.taxi.optimizer.rules.RuleBasedTaxiOptimizer;
-import playground.michalm.taxi.scheduler.*;
+import playground.michalm.taxi.scheduler.TaxiScheduler;
+import playground.michalm.taxi.scheduler.TaxiSchedulerParams;
+import playground.michalm.taxi.vehreqpath.VehicleRequestPathFinder;
+
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 
 /**
  * @author jbischoff
@@ -72,6 +83,7 @@ public class TaxiQSimProvider implements Provider<QSim> {
 		this.tcg = (TaxiConfigGroup) config.getModule("taxiConfig");
 		this.context = (MatsimVrpContextImpl) context;
 		this.events=events;
+		this.travelTime = new FreeSpeedTravelTime();
 		this.travelTime = travelTimes.get("car");
 
 		
@@ -98,17 +110,28 @@ public class TaxiQSimProvider implements Provider<QSim> {
 		//this initiation takes place upon creating qsim for each iteration
 		TravelDisutility travelDisutility = new DistanceAsTravelDisutility();
 		
+		
 		TaxiSchedulerParams params = new TaxiSchedulerParams(tcg.isDestinationKnown(), tcg.isVehicleDiversion(),
 				tcg.getPickupDuration(), tcg.getDropoffDuration());
 		
 		resetSchedules(context.getVrpData().getVehicles().values());
 		
-		TaxiScheduler scheduler = new TaxiScheduler(context, params, travelTime, travelDisutility);
+		LeastCostPathCalculator router = new Dijkstra(context.getScenario()
+				.getNetwork(), travelDisutility, travelTime);
+
+		LeastCostPathCalculatorWithCache routerWithCache = new DefaultLeastCostPathCalculatorWithCache(
+				router, new TimeDiscretizer(30 * 4, 15 * 60, false));
+
+		VrpPathCalculator calculator = new VrpPathCalculatorImpl(
+				routerWithCache, new VrpPathFactoryImpl(travelTime, travelDisutility));
+		TaxiScheduler scheduler = new TaxiScheduler(context, calculator, params);
+		VehicleRequestPathFinder vrpFinder = new VehicleRequestPathFinder(
+				calculator, scheduler);
 
 		FilterFactory filterFactory = new DefaultFilterFactory(scheduler, tcg.getNearestRequestsLimit(), tcg.getNearestVehiclesLimit());
 
 		TaxiOptimizerConfiguration optimConfig = new TaxiOptimizerConfiguration(
-				context, travelTime, travelDisutility, scheduler, filterFactory,
+				context, calculator, scheduler, vrpFinder, filterFactory,
 				Goal.DEMAND_SUPPLY_EQUIL, tcg.getOutputDir(), null);
 		optimizer = new RuleBasedTaxiOptimizer(optimConfig);
 

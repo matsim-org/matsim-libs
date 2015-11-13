@@ -25,6 +25,8 @@ import org.matsim.api.core.v01.*;
 import org.matsim.contrib.dvrp.*;
 import org.matsim.contrib.dvrp.extensions.taxi.TaxiUtils;
 import org.matsim.contrib.dvrp.passenger.*;
+import org.matsim.contrib.dvrp.path.*;
+import org.matsim.contrib.dvrp.router.*;
 import org.matsim.contrib.dvrp.run.*;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelTimeSource;
 import org.matsim.contrib.dvrp.util.TimeDiscretizer;
@@ -42,6 +44,7 @@ import playground.michalm.taxi.data.TaxiRequest.TaxiRequestStatus;
 import playground.michalm.taxi.optimizer.*;
 import playground.michalm.taxi.optimizer.filter.*;
 import playground.michalm.taxi.scheduler.*;
+import playground.michalm.taxi.vehreqpath.VehicleRequestPathFinder;
 import playground.michalm.zone.*;
 
 
@@ -53,9 +56,10 @@ class TaxiLauncher
     final Map<Id<Zone>, Zone> zones;
 
     TravelTimeCalculator travelTimeCalculator;
+    LeastCostPathCalculatorWithCache routerWithCache;
+    VrpPathCalculator pathCalculator;
 
     private TravelTime travelTime;
-    private TravelDisutility travelDisutility;
 
 
     TaxiLauncher(TaxiLauncherParams params)
@@ -83,8 +87,11 @@ class TaxiLauncher
     }
 
 
-    void initTravelTimeAndDisutility()
+    void initVrpPathCalculator()
     {
+        TimeDiscretizer timeDiscretizer = TaxiLauncherUtils.getTimeDiscretizer(scenario,
+                params.algorithmConfig.ttimeSource, params.algorithmConfig.tdisSource);
+
         if (params.algorithmConfig.ttimeSource == TravelTimeSource.FREE_FLOW_SPEED) {
             //works for TimeVariantLinks
             travelTime = new FreeSpeedTravelTime();
@@ -92,14 +99,27 @@ class TaxiLauncher
         else {// TravelTimeSource.EVENTS
             if (travelTimeCalculator == null) {
                 travelTimeCalculator = VrpLauncherUtils.initTravelTimeCalculatorFromEvents(scenario,
-                        params.eventsFile, TimeDiscretizer.CYCLIC_15_MIN.getTimeInterval());
+                        params.eventsFile, timeDiscretizer.getTimeInterval());
             }
 
             travelTime = travelTimeCalculator.getLinkTravelTimes();
         }
 
-        travelDisutility = VrpLauncherUtils.initTravelDisutility(params.algorithmConfig.tdisSource,
-                travelTime);
+        TravelDisutility travelDisutility = VrpLauncherUtils
+                .initTravelDisutility(params.algorithmConfig.tdisSource, travelTime);
+
+        boolean useTree = !true;//TODO move this switch to TaxiLauncherParams
+        if (useTree) {
+            routerWithCache = new DijkstraWithDijkstraTreeCache(scenario.getNetwork(),
+                    travelDisutility, travelTime, timeDiscretizer);
+        }
+        else {
+            LeastCostPathCalculator router = new DijkstraWithThinPath(scenario.getNetwork(), travelDisutility,
+                    travelTime);
+            routerWithCache = new DefaultLeastCostPathCalculatorWithCache(router, timeDiscretizer);
+        }
+
+        pathCalculator = new VrpPathCalculatorImpl(routerWithCache, new VrpPathFactoryImpl(travelTime, travelDisutility));
     }
 
 
@@ -164,12 +184,13 @@ class TaxiLauncher
     {
         TaxiSchedulerParams schedulerParams = new TaxiSchedulerParams(params.destinationKnown,
                 params.vehicleDiversion, params.pickupDuration, params.dropoffDuration);
-        TaxiScheduler scheduler = new TaxiScheduler(context, schedulerParams, travelTime,
-                travelDisutility);
+        TaxiScheduler scheduler = new TaxiScheduler(context, pathCalculator, schedulerParams);
+        VehicleRequestPathFinder vrpFinder = new VehicleRequestPathFinder(pathCalculator,
+                scheduler);
         FilterFactory filterFactory = new DefaultFilterFactory(scheduler,
                 params.nearestRequestsLimit, params.nearestVehiclesLimit);
 
-        return new TaxiOptimizerConfiguration(context, travelTime, travelDisutility, scheduler,
+        return new TaxiOptimizerConfiguration(context, pathCalculator, scheduler, vrpFinder,
                 filterFactory, params.algorithmConfig.goal, params.outputDir, zones);
     }
 

@@ -25,37 +25,32 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.MatsimVrpContext;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.path.*;
-import org.matsim.contrib.dvrp.router.DijkstraWithThinPath;
+import org.matsim.contrib.dvrp.router.*;
 import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.tracker.*;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
-import org.matsim.core.router.util.*;
 
 import playground.michalm.taxi.data.TaxiRequest;
 import playground.michalm.taxi.data.TaxiRequest.TaxiRequestStatus;
 import playground.michalm.taxi.schedule.*;
 import playground.michalm.taxi.schedule.TaxiTask.TaxiTaskType;
+import playground.michalm.taxi.vehreqpath.VehicleRequestPath;
 
 
 public class TaxiScheduler
 {
-    protected final MatsimVrpContext context;
-    protected final TaxiSchedulerParams params;
-
-    private final TravelTime travelTime;
-    private final LeastCostPathCalculator router;
+    private final MatsimVrpContext context;
+    private final VrpPathCalculator calculator;
+    private final TaxiSchedulerParams params;
 
 
-    public TaxiScheduler(MatsimVrpContext context, TaxiSchedulerParams params,
-            TravelTime travelTime, TravelDisutility travelDisutility)
+    public TaxiScheduler(MatsimVrpContext context, VrpPathCalculator calculator,
+            TaxiSchedulerParams params)
     {
         this.context = context;
+        this.calculator = calculator;
         this.params = params;
-        this.travelTime = travelTime;
-
-        router = new DijkstraWithThinPath(context.getScenario().getNetwork(), travelDisutility,
-                travelTime);
 
         for (Vehicle veh : context.getVrpData().getVehicles().values()) {
             Schedule<TaxiTask> schedule = TaxiSchedules.asTaxiSchedule(veh.getSchedule());
@@ -84,9 +79,6 @@ public class TaxiScheduler
     }
 
 
-    /**
-     * If the returned LinkTimePair is not null, then time is not smaller than the current time
-     */
     public LinkTimePair getImmediateDiversionOrEarliestIdleness(Vehicle veh)
     {
         if (params.vehicleDiversion) {
@@ -100,9 +92,6 @@ public class TaxiScheduler
     }
 
 
-    /**
-     * If the returned LinkTimePair is not null, then time is not smaller than the current time
-     */
     public LinkTimePair getEarliestIdleness(Vehicle veh)
     {
         if (context.getTime() >= veh.getT1()) {// time window T1 exceeded
@@ -128,10 +117,10 @@ public class TaxiScheduler
                         if (!params.destinationKnown) {
                             return null;
                         }
-                        //otherwise: IllegalStateException -- the schedule should end with STAY (or PICKUP if unfinished)
+                        //otherwise: IllegalStateException -- the schedule should and with WAIT
 
                     default:
-                        throw new IllegalStateException("Type of the last task is wrong: " + lastTask.getTaxiTaskType());
+                        throw new IllegalStateException();
                 }
 
             case COMPLETED:
@@ -144,9 +133,6 @@ public class TaxiScheduler
     }
 
 
-    /**
-     * If the returned LinkTimePair is not null, then time is not smaller than the current time
-     */
     public LinkTimePair getImmediateDiversion(Vehicle veh)
     {
         if (!params.vehicleDiversion) {
@@ -183,27 +169,28 @@ public class TaxiScheduler
 
     //=========================================================================================
 
-    public void scheduleRequest(Vehicle vehicle, TaxiRequest request, VrpPathWithTravelData vrpPath)
+    public void scheduleRequest(VehicleRequestPath best)
     {
-        if (request.getStatus() != TaxiRequestStatus.UNPLANNED) {
+        if (best.request.getStatus() != TaxiRequestStatus.UNPLANNED) {
             throw new IllegalStateException();
         }
 
-        Schedule<TaxiTask> bestSched = TaxiSchedules.asTaxiSchedule(vehicle.getSchedule());
+        Schedule<TaxiTask> bestSched = TaxiSchedules.asTaxiSchedule(best.vehicle.getSchedule());
         TaxiTask lastTask = Schedules.getLastTask(bestSched);
 
         if (lastTask.getTaxiTaskType() == TaxiTaskType.DRIVE_EMPTY) {
-            divertDriveToRequest((TaxiDriveTask)lastTask, vrpPath);
+            divertDriveToRequest((TaxiDriveTask)lastTask, best);
         }
         else if (lastTask.getTaxiTaskType() == TaxiTaskType.STAY) {
-            scheduleDriveToRequest((TaxiStayTask)lastTask, vrpPath);
+            scheduleDriveToRequest((TaxiStayTask)lastTask, best);
         }
         else {
             throw new IllegalStateException();
         }
 
-        double t3 = Math.max(vrpPath.getArrivalTime(), request.getT0()) + params.pickupDuration;
-        bestSched.addTask(new TaxiPickupTask(vrpPath.getArrivalTime(), t3, request));
+        double t3 = Math.max(best.path.getArrivalTime(), best.request.getT0())
+                + params.pickupDuration;
+        bestSched.addTask(new TaxiPickupTask(best.path.getArrivalTime(), t3, best.request));
 
         if (params.destinationKnown) {
             appendDriveAndDropoffAfterPickup(bestSched);
@@ -212,33 +199,33 @@ public class TaxiScheduler
     }
 
 
-    private void divertDriveToRequest(TaxiDriveTask lastTask, VrpPathWithTravelData vrpPath)
+    private void divertDriveToRequest(TaxiDriveTask lastTask, VehicleRequestPath best)
     {
         if (!params.vehicleDiversion) {
             throw new IllegalStateException();
         }
 
-        ((OnlineDriveTaskTracker)lastTask.getTaskTracker()).divertPath(vrpPath);
+        ((OnlineDriveTaskTracker)lastTask.getTaskTracker()).divertPath(best.path);
     }
 
 
-    private void scheduleDriveToRequest(TaxiStayTask lastTask, VrpPathWithTravelData vrpPath)
+    private void scheduleDriveToRequest(TaxiStayTask lastTask, VehicleRequestPath best)
     {
         Schedule<TaxiTask> bestSched = TaxiSchedules.asTaxiSchedule(lastTask.getSchedule());
 
         switch (lastTask.getStatus()) {
             case PLANNED:
-                if (lastTask.getBeginTime() == vrpPath.getDepartureTime()) { // waiting for 0 seconds!!!
+                if (lastTask.getBeginTime() == best.path.getDepartureTime()) { // waiting for 0 seconds!!!
                     bestSched.removeLastTask();// remove WaitTask
                 }
                 else {
                     // actually this WAIT task will not be performed
-                    lastTask.setEndTime(vrpPath.getDepartureTime());// shortening the WAIT task
+                    lastTask.setEndTime(best.path.getDepartureTime());// shortening the WAIT task
                 }
                 break;
 
             case STARTED:
-                lastTask.setEndTime(vrpPath.getDepartureTime());// shortening the WAIT task
+                lastTask.setEndTime(best.path.getDepartureTime());// shortening the WAIT task
                 break;
 
             case PERFORMED:
@@ -246,8 +233,8 @@ public class TaxiScheduler
                 throw new IllegalStateException();
         }
 
-        if (vrpPath.getLinkCount() > 1) {
-            bestSched.addTask(new TaxiDriveTask(vrpPath));
+        if (best.path.getLinkCount() > 1) {
+            bestSched.addTask(new TaxiDriveTask(best.path));
         }
     }
 
@@ -280,8 +267,8 @@ public class TaxiScheduler
 
         OnlineDriveTaskTracker tracker = (OnlineDriveTaskTracker)driveTask.getTaskTracker();
         LinkTimePair stopPoint = tracker.getDiversionPoint();
-        tracker.divertPath(new VrpPathWithTravelDataImpl(stopPoint.time, 0,
-                new Link[] { stopPoint.link }, new double[] { 0 }));
+        tracker.divertPath(new VrpPathWithTravelDataImpl(stopPoint.time, 0, 0, new Link[] { stopPoint.link },
+                new double[] { 0 }));
 
         appendStayTask(schedule);
     }
@@ -322,18 +309,12 @@ public class TaxiScheduler
         Link reqToLink = req.getToLink();
         double t3 = pickupStayTask.getEndTime();
 
-        VrpPathWithTravelData path = calcPath(reqFromLink, reqToLink, t3);
+        VrpPathWithTravelData path = calculator.calcPath(reqFromLink, reqToLink, t3);
         schedule.addTask(new TaxiDriveWithPassengerTask(path, req));
 
         double t4 = path.getArrivalTime();
         double t5 = t4 + params.dropoffDuration;
         schedule.addTask(new TaxiDropoffTask(t4, t5, req));
-    }
-
-
-    protected VrpPathWithTravelData calcPath(Link fromLink, Link toLink, double departureTime)
-    {
-        return VrpPaths.calcAndCreatePath(fromLink, toLink, departureTime, router, travelTime);
     }
 
 

@@ -1,32 +1,32 @@
 package playground.dhosse.prt.optimizer;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Queue;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.core.router.Dijkstra;
-import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.utils.misc.Time;
+import org.openstreetmap.osmosis.core.domain.common.TimestampFormat;
 
 import playground.dhosse.prt.scheduler.PrtScheduler;
 import playground.michalm.taxi.data.TaxiRequest;
-import playground.michalm.taxi.optimizer.*;
+import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration;
+import playground.michalm.taxi.vehreqpath.VehicleRequestPath;
+import playground.michalm.taxi.vehreqpath.VehicleRequestPathCost;
 
 public class NPersonsProblem {
 	
 	private final TaxiOptimizerConfiguration optimConfig;
+    private final VehicleRequestPathCost vrpComparator;
     private static Logger log = Logger.getLogger(NPersonsProblem.class);
-    private final LeastCostPathCalculator router;
-    private final BestDispatchFinder vrpFinder;
 
 
     public NPersonsProblem(TaxiOptimizerConfiguration optimConfig)
     {
         this.optimConfig = optimConfig;
-        router = new Dijkstra(optimConfig.context.getScenario().getNetwork(),
-                optimConfig.travelDisutility, optimConfig.travelTime);
-        
-        vrpFinder = new BestDispatchFinder(optimConfig);
+        this.vrpComparator = optimConfig.getVrpCost();
     }
 
 
@@ -50,11 +50,11 @@ public class NPersonsProblem {
         	if(optimConfig.context.getVrpData().getVehicles().size()>0&&optimConfig.context.getTime() > 32000){
         		System.out.print("");
         	}
-        	List<BestDispatchFinder.Dispatch> requests = new ArrayList<BestDispatchFinder.Dispatch>();
+        	List<VehicleRequestPath> requests = new ArrayList<VehicleRequestPath>();
             TaxiRequest req = unplannedRequests.peek();
 
-            BestDispatchFinder.Dispatch best = vrpFinder.findBestVehicleForRequest(req,
-                    optimConfig.context.getVrpData().getVehicles().values());
+            VehicleRequestPath best = optimConfig.vrpFinder.findBestVehicleForRequest(req,
+                    optimConfig.context.getVrpData().getVehicles().values(), vrpComparator);
 
             if (best == null) {
 //            	log.info("No vrp found for request " + req.getId().toString() + " at " + 

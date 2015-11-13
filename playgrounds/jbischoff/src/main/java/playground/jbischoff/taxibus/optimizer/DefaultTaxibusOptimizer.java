@@ -19,103 +19,100 @@
 
 package playground.jbischoff.taxibus.optimizer;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 import org.matsim.contrib.dvrp.data.Vehicle;
 
-import playground.jbischoff.taxibus.optimizer.filter.*;
+import playground.jbischoff.taxibus.optimizer.filter.TaxibusRequestFilter;
+import playground.jbischoff.taxibus.optimizer.filter.TaxibusVehicleFilter;
 import playground.jbischoff.taxibus.passenger.TaxibusRequest;
 import playground.jbischoff.taxibus.passenger.TaxibusRequest.TaxibusRequestStatus;
-import playground.jbischoff.taxibus.vehreqpath.*;
-
+import playground.jbischoff.taxibus.utils.TaxibusUtils;
+import playground.jbischoff.taxibus.vehreqpath.TaxibusVehicleRequestPath;
+import playground.jbischoff.taxibus.vehreqpath.TaxibusVehicleRequestPaths;
 
 /**
- * @author jbischoff
+ * @author  jbischoff
+ *
  */
-public class DefaultTaxibusOptimizer
-    extends AbstractTaxibusOptimizer
-{
-
+public class DefaultTaxibusOptimizer extends AbstractTaxibusOptimizer {
+	
     private Set<Vehicle> idleVehicles;
     private final TaxibusVehicleFilter vehicleFilter;
     private final TaxibusRequestFilter requestFilter;
-    private final TaxibusVehicleRequestPathFinder vrpFinder;
+	
 
-
-    public DefaultTaxibusOptimizer(TaxibusOptimizerConfiguration optimConfig,
-            boolean doUnscheduleAwaitingRequests)
-    {
-        super(optimConfig, doUnscheduleAwaitingRequests);
+	public DefaultTaxibusOptimizer(TaxibusOptimizerConfiguration optimConfig, 
+			boolean doUnscheduleAwaitingRequests) {
+		super(optimConfig,  doUnscheduleAwaitingRequests);
         this.vehicleFilter = optimConfig.filterFactory.createVehicleFilter();
         this.requestFilter = optimConfig.filterFactory.createRequestFilter();
-        vrpFinder = new TaxibusVehicleRequestPathFinder(optimConfig);
-    }
 
+	}
 
-    @Override
-    protected void scheduleUnplannedRequests()
-    {
+	@Override
+	protected void scheduleUnplannedRequests() {
+		
+		initPossibleVehicles();
+		scheduleUnplannedRequestsImpl();
+	}
+	
+	
+	private void initPossibleVehicles(){
+		idleVehicles = new LinkedHashSet<>();
+		for (Vehicle veh : this.optimConfig.context.getVrpData().getVehicles().values()){
+			System.out.println(veh.getSchedule().getStatus());
+			if (optimConfig.scheduler.isIdle(veh))
+			{
+				idleVehicles.add(veh);
+			}
+		}
+	}
+	
+	  private void scheduleUnplannedRequestsImpl()
+	    {
+		  	System.out.println(unplannedRequests);
+	        Iterator<TaxibusRequest> reqIter = unplannedRequests.iterator();
+	        
+	        while (reqIter.hasNext() && !idleVehicles.isEmpty()) {
+	            TaxibusRequest req = reqIter.next();
+	            TaxibusRequestStatus cs = req.getStatus();
+	            if (req.getStatus() != TaxibusRequestStatus.UNPLANNED ){
+	            	reqIter.remove();
+	            	continue;
+	            }
+	            Iterable<Vehicle> filteredVehs = vehicleFilter.filterVehiclesForRequest(idleVehicles,  req);
+	            TaxibusVehicleRequestPath best = optimConfig.vrpFinder.findBestVehicleForRequest(req,
+	            		filteredVehs, TaxibusVehicleRequestPaths.TW_COST);
+	            
+	            if (best != null) {
+	                reqIter.remove();
+	              boolean possibleOtherRequest = true;
+	              Iterable<TaxibusRequest> filteredReqs = requestFilter.filterRequestsForBestRequest(unplannedRequests, best);
+	              do{
 
-        initPossibleVehicles();
-        scheduleUnplannedRequestsImpl();
-    }
-
-
-    private void initPossibleVehicles()
-    {
-        idleVehicles = new LinkedHashSet<>();
-        for (Vehicle veh : this.optimConfig.context.getVrpData().getVehicles().values()) {
-            System.out.println(veh.getSchedule().getStatus());
-            if (optimConfig.scheduler.isIdle(veh)) {
-                idleVehicles.add(veh);
-            }
-        }
-    }
-
-
-    private void scheduleUnplannedRequestsImpl()
-    {
-        System.out.println(unplannedRequests);
-        Iterator<TaxibusRequest> reqIter = unplannedRequests.iterator();
-
-        while (reqIter.hasNext() && !idleVehicles.isEmpty()) {
-            TaxibusRequest req = reqIter.next();
-            TaxibusRequestStatus cs = req.getStatus();
-            if (req.getStatus() != TaxibusRequestStatus.UNPLANNED) {
-                reqIter.remove();
-                continue;
-            }
-            Iterable<Vehicle> filteredVehs = vehicleFilter.filterVehiclesForRequest(idleVehicles,
-                    req);
-            TaxibusVehicleRequestPath best = vrpFinder.findBestVehicleForRequest(req, filteredVehs,
-                    TaxibusVehicleRequestPaths.TW_COST);
-
-            if (best != null) {
-                reqIter.remove();
-                boolean possibleOtherRequest = true;
-                Iterable<TaxibusRequest> filteredReqs = requestFilter
-                        .filterRequestsForBestRequest(unplannedRequests, best);
-                do {
-
-                    TaxibusVehicleRequestPath nextBest = vrpFinder
-                            .findBestAdditionalVehicleForRequestPath(best, filteredReqs);
-                    if (nextBest != null) {
-                        best = nextBest;
-
-                    }
-                    else {
-                        possibleOtherRequest = false;
-                    }
-                }
-                while (possibleOtherRequest);
-                //	              	TaxibusUtils.printRequestPath(best);
-
-                optimConfig.scheduler.scheduleRequest(best);
-
-            }
-
-        }
-
-    }
+	            	  TaxibusVehicleRequestPath nextBest = optimConfig.vrpFinder.findBestAdditionalVehicleForRequestPath(best,filteredReqs);
+	            	  if (nextBest!=null){  
+	            		  best = nextBest;
+	            		  
+	            	  }
+	            	  else{
+	            	  possibleOtherRequest = false;
+	            	  }
+	              }
+	              while (possibleOtherRequest);
+//	              	TaxibusUtils.printRequestPath(best);
+	              
+	                optimConfig.scheduler.scheduleRequest(best);
+	                
+	                
+	            }
+	            
+	        }
+	        
+	    }
+	
 
 }

@@ -67,11 +67,11 @@ public class AdvancedRequestStorage
                 if (req.getFromLink().getId() == fromLinkId //
                         && req.getToLink().getId() == toLinkId) {
                     passengerAdvReqs.poll();
-                    return req;// this is the advance request for this leg
+                    return req;// this is the advance request for the current leg
                 }
                 else if (context.getTime() > req.getT0()) {
                     //TODO we have to somehow handle it (in the future)
-                    //Currently this is not a problem since we do not have cases of not turning up...
+                    //Currently this is not a problem since we do not have such cases...
                     throw new IllegalStateException(
                             "Seems that the agent has skipped a previously submitted request");
                 }

@@ -22,20 +22,20 @@ package playground.michalm.taxi.optimizer.fifo;
 import java.util.Queue;
 
 import playground.michalm.taxi.data.TaxiRequest;
-import playground.michalm.taxi.optimizer.*;
+import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration;
+import playground.michalm.taxi.vehreqpath.*;
 
 
 public class FifoSchedulingProblem
 {
     private final TaxiOptimizerConfiguration optimConfig;
-    private final BestDispatchFinder dispatchFinder;
+    private final VehicleRequestPathCost vrpCost;
 
 
-    public FifoSchedulingProblem(TaxiOptimizerConfiguration optimConfig,
-            BestDispatchFinder vrpFinder)
+    public FifoSchedulingProblem(TaxiOptimizerConfiguration optimConfig)
     {
         this.optimConfig = optimConfig;
-        this.dispatchFinder = vrpFinder;
+        this.vrpCost = optimConfig.getVrpCost();
     }
 
 
@@ -44,14 +44,14 @@ public class FifoSchedulingProblem
         while (!unplannedRequests.isEmpty()) {
             TaxiRequest req = unplannedRequests.peek();
 
-            BestDispatchFinder.Dispatch best = dispatchFinder.findBestVehicleForRequest(req,
-                    optimConfig.context.getVrpData().getVehicles().values());
+            VehicleRequestPath best = optimConfig.vrpFinder.findBestVehicleForRequest(req,
+                    optimConfig.context.getVrpData().getVehicles().values(), vrpCost);
 
             if (best == null) {//TODO won't work with req filtering; use VehicleData to find out when to exit???
                 return;
             }
 
-            optimConfig.scheduler.scheduleRequest(best.vehicle, best.request, best.path);
+            optimConfig.scheduler.scheduleRequest(best);
             unplannedRequests.poll();
         }
     }

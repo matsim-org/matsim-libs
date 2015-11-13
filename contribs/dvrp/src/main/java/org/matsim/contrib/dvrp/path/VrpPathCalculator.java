@@ -17,12 +17,15 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.dhosse.prt;
+package org.matsim.contrib.dvrp.path;
 
-import playground.michalm.taxi.optimizer.BestDispatchFinder;
+import org.matsim.api.core.v01.network.Link;
 
 
-public interface VehicleRequestPathCost
+public interface VrpPathCalculator
 {
-    double getCost(BestDispatchFinder.Dispatch vrp);
+    /**
+     * ASSUMPTION: A vehicle departs and arrives at links' ends (link.getToNode())
+     */
+    VrpPathWithTravelData calcPath(Link fromLink, Link toLink, double departureTime);
 }

@@ -39,7 +39,7 @@ public static double calcPathCost(ArrayList<VrpPathWithTravelData> newPath ){
 	double cost = 0.0;
 	
 	for (VrpPathWithTravelData path : newPath){
-		cost += path.getTravelTime();
+		cost += path.getTravelCost();
 	}
 	
 	return cost;

@@ -1,50 +1,28 @@
 \chapter{Tutorial}
 
-This tutorial is tested since MATSim 0.4.0. This version is written for use with MATSim 0.7.0, but is still under construction. 
+This tutorial is tested with MATSim 0.4.0 or higher.
 
 \section{Introduction}
 
 The MATSim contrib for traffic lights is able to simulate traffic signals microscopically. 
 For fixed-time control a default implementation is provided.  
 No programming is required to simulate fixed-time traffic signal control. 
-Traffic-responsive signal control needs custom implementation but can benefit from the provided infrastructure. 
+Traffic-responsive signal control need custom implementation but may use the provided infrastructure. 
 
 
 
 \subsection{Terminology}
 
-To help you to understand xml formats, configuration, and code better, have a look at the terminology in Fig.~\ref{fig:signals_terminology}. 
-
-\begin{figure}[!h]
-	\centering
-\begin{tabularx}{\linewidth}{p{0.2\linewidth}p{0.3\linewidth}X}
-	\textbf{MATSim term} & \textbf{Real world terms} & \textbf{Description} \\ 
-& &  \\
-signal & traffic light, traffic signal & A physical box standing somewhere on the transport network indicating driving allowed/permitted \\ 
-signal group & a group of traffic lights & Logical group of traffic lights, all lights display same color at the same time \\ 
-signal control & traffic controller & Algorithm or control scheme that determines which colors are displayed by the different Signal Groups, e.g. fixed-time control  \\ 
-signal system & signalized crossing &  Collection of Signal Groups that is controlled by the same Signal Control 
-\end{tabularx}
-	\caption{Terminology}
-	\label{fig:signals_terminology}
-\end{figure}
+To help you to understand xml formats, configuration, and code better, here some translations...
+\begin{tabular}{ll}
+\textbf{Real world terms} & \textbf{MATSim term} \\ 
+Traffic light, traffic signal, i.e. a physical box standing somewhere on the transport network indicating driving allowed/permitted & Signal \\ 
+Logical group of traffic lights, all lights display same color at the same time & Signal Group \\ 
+Algorithm or control scheme that determines which colors are displayed by the different Signal Groups, e.g. fixed-time control & Signal Control \\ 
+Collection of Signal Groups that is controlled by the same Signal Control & Signal System
+\end{tabular}
 
 \subsection{Overview}
-
-The contrib consists of several modules. None of them is required if you are willing to code yourself. 
-The codebase is written under the assumption that the following features are optional:   
-
-\begin{itemize}
-	\item Lanes
-	\item Intergreens
-\end{itemize}
-
-Both are required under certain circumstances, only. 
-See the upcoming MATSim book for further hints. 
-
-\subsubsection{Lanes}
-
-TBD.
 
 \subsubsection{Intergreens}
 
@@ -59,32 +37,13 @@ This information is then used to validate the signal control while the simulatio
 This is especially important if you implement a custom, traffic-responsive signal control strategy.  
 
 
-\section{Usage \& Configuration}
+\section{Configuration}
 \label{sec:signals_configuration}
-
-\subsection{Usage}
-
-\begin{itemize}
-	\item Include the .jar file of the contrib into your java classpath
-	\item Write a java \lstinline$main(..)$ method that loads your config and contains the following lines of code:
-		\begin{lstlisting}
-		Scenario scenario = ScenarioUtils.loadScenario( config ) ;
-		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, 
-				new SignalsScenarioLoader(config.signalSystems()).loadSignalsData());
-
-		Controler c = new Controler( scenario );
-		c.addOverridingModule(new SignalsModule());
-		\end{lstlisting}
-	\item Execute \lstinline$c.run(..)$ somewhere in your \lstinline$main(..)$
-\end{itemize}
-
-
-
-\subsection{Config Options}
 
 If input files for signal systems are already available, simulation of traffic lights can be enabled via MATSim config options:
 
 \begin{itemize}
+	\item Set the parameter \lstinline$useSignalsystems$ to \lstinline$true$ in the config module \lstinline$scenario$
 	\item Set at least three input file names in the config module signalsystems:
 		\begin{itemize}
 			\item parameter name: \lstinline$signalsystems$ value: path to a file in the \lstinline$signalSystems_v2.0.xsd$ file format
@@ -97,13 +56,12 @@ If input files for signal systems are already available, simulation of traffic l
 		\end{itemize}
 \end{itemize}
 
+\section{Input Files -- Examples}
 
+\subsection{Intergreens}
+\lstset{breaklines=true,language=XML}
+\lstinputlisting{../../../../matsim/src/test/resources/test/input/org/matsim/signalsystems/data/intergreens/v10/testIntergreenTimes_v1.0.xml}
 
-
-\section{Further Reading}
-
-A conceptual introduction to this MATSim contribution can be found in \cite{Grether2014PhD}. 
-For case studies in German, see \cite{Bischoff2010BaSylvia,Neumann2008DA,Roeder2010BachelorGershenson}.
 
 \section{Generating Input Data -- Example}
 
@@ -225,12 +183,6 @@ If there is no intergreen data available for your scenario you may use the
 intergreen times of a correct fixed time signal control, i.~e. a signal control
 with realistic intergreen times where no collisions may occur (therefor you may
 look at playground.dgrether.signalsystems.sylvia.data.TtCalculateSimplifiedIntergreens.java).
-
-\section{Input Files -- Examples}
-
-\subsection{Intergreens}
-\lstset{breaklines=true,language=XML}
-\lstinputlisting{../../src/test/resources/test/input/org/matsim/contrib/signals/data/intergreens/v10/testIntergreenTimes_v1.0.xml}
 
 
 \texttt{\nolinebreak  }

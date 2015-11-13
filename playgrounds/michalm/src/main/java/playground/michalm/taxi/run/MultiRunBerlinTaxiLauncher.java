@@ -24,9 +24,5 @@ public class MultiRunBerlinTaxiLauncher
         TaxiLauncherParams params = new TaxiLauncherParams(generalParams);
 
         MultiRunTaxiLauncher.run(runs, params);
-//        MultiRunTaxiLauncher.runAll(runs, params, EnumSet.of(//
-//                RULE_TW_FF, //
-//                RULE_DSE_FF //
-//        ));
     }
 }

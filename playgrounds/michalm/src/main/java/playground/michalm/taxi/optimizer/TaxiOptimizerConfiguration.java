@@ -4,10 +4,11 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.dvrp.MatsimVrpContext;
-import org.matsim.core.router.util.*;
+import org.matsim.contrib.dvrp.path.VrpPathCalculator;
 
 import playground.michalm.taxi.optimizer.filter.FilterFactory;
 import playground.michalm.taxi.scheduler.TaxiScheduler;
+import playground.michalm.taxi.vehreqpath.*;
 import playground.michalm.zone.Zone;
 
 
@@ -15,10 +16,9 @@ public class TaxiOptimizerConfiguration
 {
     public final MatsimVrpContext context;
 
-    public final TravelTime travelTime;
-    public final TravelDisutility travelDisutility;
-
+    public final VrpPathCalculator calculator;
     public final TaxiScheduler scheduler;
+    public final VehicleRequestPathFinder vrpFinder;
     public final FilterFactory filterFactory;
     public final Map<Id<Zone>, Zone> zones;
 
@@ -33,21 +33,39 @@ public class TaxiOptimizerConfiguration
     };
 
 
-    public TaxiOptimizerConfiguration(MatsimVrpContext context, TravelTime travelTime,
-            TravelDisutility travelDisutility, TaxiScheduler scheduler, FilterFactory filterFactory,
-            Goal goal, String workingDirectory, Map<Id<Zone>, Zone> zones)
+    public TaxiOptimizerConfiguration(MatsimVrpContext context, VrpPathCalculator calculator,
+            TaxiScheduler scheduler, VehicleRequestPathFinder vrpFinder,
+            FilterFactory filterFactory, Goal goal, String workingDirectory,
+            Map<Id<Zone>, Zone> zones)
     {
         this.context = context;
 
-        this.travelTime = travelTime;
-        this.travelDisutility = travelDisutility;
-
+        this.calculator = calculator;
         this.scheduler = scheduler;
+        this.vrpFinder = vrpFinder;
         this.filterFactory = filterFactory;
         this.zones = zones;
 
         this.goal = goal;
 
         this.workingDirectory = workingDirectory;
+    }
+
+
+    public VehicleRequestPathCost getVrpCost()
+    {
+        switch (goal) {
+            case MIN_WAIT_TIME:
+                return VehicleRequestPaths.TW_COST;
+
+            case MIN_PICKUP_TIME:
+                return VehicleRequestPaths.TP_COST;
+
+            case NULL:
+                return null;
+
+            default:
+                throw new IllegalStateException();
+        }
     }
 }
