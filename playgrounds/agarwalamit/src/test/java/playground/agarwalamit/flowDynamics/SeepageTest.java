@@ -44,7 +44,6 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup.LinkDynamics;
 import org.matsim.core.config.groups.QSimConfigGroup.VehiclesSource;
 import org.matsim.core.events.EventsUtils;
