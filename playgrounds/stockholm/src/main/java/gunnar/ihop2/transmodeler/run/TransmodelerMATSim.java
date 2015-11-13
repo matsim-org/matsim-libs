@@ -1,5 +1,9 @@
-package gunnar.ihop2.transmodeler;
+package gunnar.ihop2.transmodeler.run;
 
+import static gunnar.ihop2.transmodeler.run.RunMATSimWithTransmodeler.EVENTSFILE;
+import static gunnar.ihop2.transmodeler.run.RunMATSimWithTransmodeler.TRANSMODELERCOMMAND;
+import static gunnar.ihop2.transmodeler.run.RunMATSimWithTransmodeler.TRANSMODELERCONFIG;
+import static gunnar.ihop2.transmodeler.run.RunMATSimWithTransmodeler.TRANSMODELERFOLDER;
 import floetteroed.utilities.SimpleLogFormatter;
 import floetteroed.utilities.config.Config;
 import floetteroed.utilities.config.ConfigReader;
@@ -12,6 +16,13 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.matsim.contrib.signals.router.InvertedNetworkRoutingModuleModule;
+import org.matsim.core.config.ConfigGroup;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.mobsim.framework.Mobsim;
+
 import cadyts.utilities.misc.StreamFlushHandler;
 
 /**
@@ -23,6 +34,12 @@ public class TransmodelerMATSim {
 
 	public static final String IHOP2_ELEMENT = "ihop2";
 
+	public static final String MATSIMCONFIG_FILENAME_ELEMENT = "matsimconfig";
+
+	public static final String LINKATTRIBUTE_FILENAME_ELEMENT = "linkattributefile";
+
+	public static final String LANES_FILENAME_ELEMENT = "lanesfile";
+
 	public static final String PATHS_ELEMENT = "paths";
 
 	public static final String TRIPS_ELEMENT = "trips";
@@ -32,19 +49,6 @@ public class TransmodelerMATSim {
 	public static final String TRANSMODELERFOLDER_ELEMENT = "transmodelerfolder";
 
 	public static final String TRANSMODELERCOMMAND_ELEMENT = "transmodelercommand";
-
-	private static void fatal(final String msg) {
-		Logger.getLogger(TransmodelerMATSim.class.getName()).severe(
-				"FATAL ERROR: " + msg);
-		System.exit(-1);
-	}
-
-	private static void fatal(final Exception e) {
-		Logger.getLogger(TransmodelerMATSim.class.getName()).severe(
-				"FATAL ERROR: " + e);
-		e.printStackTrace();
-		System.exit(-1);
-	}
 
 	private static void checkNonNull(final String fileName,
 			final String definition) {
@@ -111,15 +115,34 @@ public class TransmodelerMATSim {
 		final ConfigReader configReader = new ConfigReader();
 		final Config config = configReader.read(configFileName);
 
+		final String matsimConfigFileName = config.get(IHOP2_ELEMENT,
+				MATSIMCONFIG_FILENAME_ELEMENT);
+		checkNonNull(matsimConfigFileName, "matsimconfig file name");
+		checkFileExistence(matsimConfigFileName, "matsimconfig file");
+		Logger.getLogger(MATSimDummy.class.getName()).info(
+				MATSIMCONFIG_FILENAME_ELEMENT + " = " + matsimConfigFileName);
+
+		final String linkAttributeFileName = config.get(IHOP2_ELEMENT,
+				LINKATTRIBUTE_FILENAME_ELEMENT);
+		checkNonNull(linkAttributeFileName, "linkattribute file name");
+		checkFileExistence(linkAttributeFileName, "linkattribute file");
+		Logger.getLogger(MATSimDummy.class.getName()).info(
+				LINKATTRIBUTE_FILENAME_ELEMENT + " = " + linkAttributeFileName);
+
+		final String lanesFileName = config.get(IHOP2_ELEMENT,
+				LANES_FILENAME_ELEMENT);
+		checkNonNull(lanesFileName, "lanes file name");
+		checkFileExistence(lanesFileName, "lanes file");
+		Logger.getLogger(MATSimDummy.class.getName()).info(
+				LANES_FILENAME_ELEMENT + " = " + lanesFileName);
+
 		final String pathsFileName = config.get(IHOP2_ELEMENT, PATHS_ELEMENT);
 		checkNonNull(pathsFileName, "paths file file name");
-		checkFileExistence(pathsFileName, "paths file");
 		Logger.getLogger(TransmodelerMATSim.class.getName()).info(
 				PATHS_ELEMENT + " = " + pathsFileName);
 
 		final String tripsFileName = config.get(IHOP2_ELEMENT, TRIPS_ELEMENT);
 		checkNonNull(tripsFileName, "trips file file name");
-		checkFileExistence(tripsFileName, "trips file");
 		Logger.getLogger(TransmodelerMATSim.class.getName()).info(
 				TRIPS_ELEMENT + " = " + tripsFileName);
 
@@ -144,28 +167,59 @@ public class TransmodelerMATSim {
 		Logger.getLogger(TransmodelerMATSim.class.getName()).info(
 				"... program parameters look OK so far.");
 
+		final int iteration = 0;
+
 		/*
-		 * PRETEND TO RUN SIMULATION
+		 * -------------------- LOAD CONFIGURATION --------------------
 		 */
 
 		Logger.getLogger(MATSimDummy.class.getName()).info(
-				"Running Transmodeler: " + transmodelerCommand + " ...");
+				"Loading matsim configuration file: " + matsimConfigFileName
+						+ " ... ");
+		final org.matsim.core.config.Config matsimConfig = ConfigUtils
+				.loadConfig(matsimConfigFileName);
+		matsimConfig.getModule("controler").addParam("overwriteFiles",
+				"deleteDirectoryIfExists");
+		matsimConfig.getModule("controler").addParam("outputDirectory",
+				"./matsim-output." + iteration + "/");
+		matsimConfig.network().setLaneDefinitionsFile(lanesFileName);
+		matsimConfig.travelTimeCalculator().setCalculateLinkToLinkTravelTimes(
+				true);
+		matsimConfig.controler().setLinkToLinkRoutingEnabled(true);
 
-		final Process proc;
-		final int exitVal;
-		try {
-			proc = Runtime.getRuntime().exec(transmodelerCommand, null,
-					new File(transmodelerFolderName));
-			exitVal = proc.waitFor();
-			if (exitVal != 0) {
-				fatal("Transmodeler terminated with exit code " + exitVal + ".");
-			}
-		} catch (Exception e) {
-			fatal(e);
-		}
+		final ConfigGroup transmodelerConfigGroup = new ConfigGroup(
+				TRANSMODELERCONFIG);
+		transmodelerConfigGroup.addParam(EVENTSFILE, eventsFileName);
+		transmodelerConfigGroup.addParam(TRANSMODELERFOLDER,
+				transmodelerFolderName);
+		transmodelerConfigGroup.addParam(TRANSMODELERCOMMAND,
+				transmodelerCommand);
+		transmodelerConfigGroup.addParam(LINKATTRIBUTE_FILENAME_ELEMENT,
+				linkAttributeFileName);
+		transmodelerConfigGroup.addParam(PATHS_ELEMENT, pathsFileName);
+		transmodelerConfigGroup.addParam(TRIPS_ELEMENT, tripsFileName);
+		matsimConfig.addModule(transmodelerConfigGroup);
+
+		/*
+		 * -------------------- RUN MATSIM --------------------
+		 */
 
 		Logger.getLogger(MATSimDummy.class.getName()).info(
-				"... succeeded to run Transmodeler.");
+				"Running MATSim/Transmodeler ...");
+
+		final Controler controler = new Controler(matsimConfig);
+		controler.addOverridingModule(new InvertedNetworkRoutingModuleModule());
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				binder().bind(Mobsim.class).to(TransmodelerMobsim.class);
+			}
+		});
+
+		controler.run();
+
+		Logger.getLogger(MATSimDummy.class.getName()).info(
+				"... MATSim/Transmodeler run completed.");
 
 		Logger.getLogger(MATSimDummy.class.getName()).info("DONE");
 	}
