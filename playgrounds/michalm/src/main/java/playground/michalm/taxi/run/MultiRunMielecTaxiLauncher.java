@@ -1,6 +1,6 @@
 package playground.michalm.taxi.run;
 
-import static playground.michalm.taxi.run.AlgorithmConfigs.ZONE_TW_xx;
+import static playground.michalm.taxi.run.AlgorithmConfigs.*;
 
 import java.io.File;
 import java.util.Map;
@@ -26,10 +26,14 @@ public class MultiRunMielecTaxiLauncher
         TaxiLauncherParams params = new TaxiLauncherParams(generalParams);
 
         MultiRunTaxiLauncher.runAll(runs, params, //
-                //RULE_TW_xx, RULE_TP_xx, RULE_DSE_xx,//
-                ZONE_TW_xx//
-        //FIFO_RES_TW_xx, FIFO_RES_TP_xx,//
-        //ASSIGN_TW_xx, ASSIGN_TP_xx, ASSIGN_DSE_xx//
+                RULE_TW_xx,//
+                RULE_TP_xx,//
+                RULE_DSE_xx,//
+                ZONE_TW_xx,//
+                FIFO_RES_TW_xx,//
+                ASSIGN_TW_xx,//
+                ASSIGN_TP_xx,//
+                ASSIGN_DSE_xx//
         );
     }
 }

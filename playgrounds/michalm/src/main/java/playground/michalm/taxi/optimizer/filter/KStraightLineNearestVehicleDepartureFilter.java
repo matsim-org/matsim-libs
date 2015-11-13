@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,45 +17,38 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jbischoff.taxibus.utils;
+package playground.michalm.taxi.optimizer.filter;
 
-import java.util.ArrayList;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.util.DistanceUtils;
 
-import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
-
-import playground.jbischoff.taxibus.passenger.TaxibusRequest;
-import playground.jbischoff.taxibus.vehreqpath.TaxibusVehicleRequestPath;
-
-/**
- * @author  jbischoff
- *
- */
-public class TaxibusUtils {
-    public static final String TAXIBUS_MODE = "taxibus";
+import playground.michalm.taxi.data.TaxiRequest;
+import playground.michalm.taxi.optimizer.VehicleData;
+import playground.michalm.util.PartialSort;
 
 
-
-public static double calcPathCost(ArrayList<VrpPathWithTravelData> newPath ){
-	double cost = 0.0;
-	
-	for (VrpPathWithTravelData path : newPath){
-		cost += path.getTravelTime();
-	}
-	
-	return cost;
-}
+public class KStraightLineNearestVehicleDepartureFilter
+{
+    private final int k;
 
 
+    public KStraightLineNearestVehicleDepartureFilter(int k)
+    {
+        this.k = k;
+    }
 
-public static void printRequestPath(TaxibusVehicleRequestPath best) {
-	System.out.println("RequestPath for vehicle : "+best.vehicle.getId());
-	for (TaxibusRequest r : best.requests){
-	System.out.println(r.toString() + "\tfrom\t"+ r.getFromLink().getId().toString() + "\tto:\t"+ r.getToLink().getId().toString());
-	}
-	for (VrpPathWithTravelData p : best.path){
-		System.out.println("Path from\t" + p.getFromLink().getId().toString()+ "\tto\t"+ p.getToLink().getId().toString());
-		
-	}
-	
-}
+
+    public Iterable<VehicleData.Entry> filterVehiclesForRequest(
+            Iterable<VehicleData.Entry> vehicles, TaxiRequest request)
+    {
+        Link toLink = request.getFromLink();
+        PartialSort<VehicleData.Entry> nearestVehicleSort = new PartialSort<VehicleData.Entry>(k);
+
+        for (VehicleData.Entry veh : vehicles) {
+            double squaredDistance = DistanceUtils.calculateSquaredDistance(veh.link, toLink);
+            nearestVehicleSort.add(veh, squaredDistance);
+        }
+
+        return nearestVehicleSort.retriveKSmallestElements();
+    }
 }

@@ -32,14 +32,16 @@ public class VehicleData
 {
     public static class Entry
     {
+        public final int idx;
         public final Vehicle vehicle;
         public final Link link;
         public final double time;
         public final boolean idle;
 
 
-        public Entry(Vehicle vehicle, LinkTimePair linkTimePair, boolean idle)
+        public Entry(int idx, Vehicle vehicle, LinkTimePair linkTimePair, boolean idle)
         {
+            this.idx = idx;
             this.vehicle = vehicle;
             this.link = linkTimePair.link;
             this.time = linkTimePair.time;
@@ -55,14 +57,27 @@ public class VehicleData
 
     public VehicleData(TaxiOptimizerConfiguration optimConfig)
     {
+        this(optimConfig, 2 * 24 * 3600);//max 48 hours of departure delay (== not a real constraint)
+    }
+
+
+    //skipping vehicles with departure.time > curr_time + maxDepartureDelay
+    public VehicleData(TaxiOptimizerConfiguration optimConfig, double planningHorizon)
+    {
+        double currTime = optimConfig.context.getTime();
+        double maxDepartureTime = currTime + planningHorizon;
         TaxiScheduler scheduler = optimConfig.scheduler;
+
+        int idx = 0;
         int idleCounter = 0;
         for (Vehicle v : optimConfig.context.getVrpData().getVehicles().values()) {
             LinkTimePair departure = scheduler.getImmediateDiversionOrEarliestIdleness(v);
 
-            if (departure != null) {
-                boolean idle = scheduler.isIdle(v);
-                entries.add(new Entry(v, departure, idle));
+            if (departure != null && departure.time <= maxDepartureTime) {
+                boolean idle = departure.time == currTime //(small optimization to avoid unnecessary calls to Scheduler.isIdle())
+                        && scheduler.isIdle(v);
+
+                entries.add(new Entry(idx++, v, departure, idle));
 
                 if (idle) {
                     idleCounter++;

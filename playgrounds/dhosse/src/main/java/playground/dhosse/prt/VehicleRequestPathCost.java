@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,45 +17,12 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jbischoff.taxibus.utils;
+package playground.dhosse.prt;
 
-import java.util.ArrayList;
-
-import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
-
-import playground.jbischoff.taxibus.passenger.TaxibusRequest;
-import playground.jbischoff.taxibus.vehreqpath.TaxibusVehicleRequestPath;
-
-/**
- * @author  jbischoff
- *
- */
-public class TaxibusUtils {
-    public static final String TAXIBUS_MODE = "taxibus";
+import playground.michalm.taxi.optimizer.BestDispatchFinder;
 
 
-
-public static double calcPathCost(ArrayList<VrpPathWithTravelData> newPath ){
-	double cost = 0.0;
-	
-	for (VrpPathWithTravelData path : newPath){
-		cost += path.getTravelTime();
-	}
-	
-	return cost;
-}
-
-
-
-public static void printRequestPath(TaxibusVehicleRequestPath best) {
-	System.out.println("RequestPath for vehicle : "+best.vehicle.getId());
-	for (TaxibusRequest r : best.requests){
-	System.out.println(r.toString() + "\tfrom\t"+ r.getFromLink().getId().toString() + "\tto:\t"+ r.getToLink().getId().toString());
-	}
-	for (VrpPathWithTravelData p : best.path){
-		System.out.println("Path from\t" + p.getFromLink().getId().toString()+ "\tto\t"+ p.getToLink().getId().toString());
-		
-	}
-	
-}
+public interface VehicleRequestPathCost
+{
+    double getCost(BestDispatchFinder.Dispatch vrp);
 }

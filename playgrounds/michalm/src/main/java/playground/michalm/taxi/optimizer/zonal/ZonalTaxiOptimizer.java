@@ -27,10 +27,9 @@ import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.schedule.StayTask;
 
 import playground.michalm.taxi.data.TaxiRequest;
-import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration;
+import playground.michalm.taxi.optimizer.*;
 import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration.Goal;
 import playground.michalm.taxi.optimizer.rules.RuleBasedTaxiOptimizer;
-import playground.michalm.taxi.vehreqpath.*;
 import playground.michalm.zone.*;
 
 
@@ -118,11 +117,11 @@ public class ZonalTaxiOptimizer
             }
 
             Iterable<Vehicle> filteredVehs = Collections.singleton(idleVehsInZone.peek());
-            VehicleRequestPath best = optimConfig.vrpFinder.findBestVehicleForRequest(req,
-                    filteredVehs, VehicleRequestPaths.TW_COST);
+            BestDispatchFinder.Dispatch best = dispatchFinder
+                    .findBestVehicleForRequest(req, filteredVehs);
 
             if (best != null) {
-                optimConfig.scheduler.scheduleRequest(best);
+                optimConfig.scheduler.scheduleRequest(best.vehicle, best.request, best.path);
                 reqIter.remove();
                 idleVehsInZone.remove(best.vehicle);
             }

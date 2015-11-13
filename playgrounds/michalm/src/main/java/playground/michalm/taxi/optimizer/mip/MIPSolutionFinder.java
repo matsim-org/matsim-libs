@@ -60,7 +60,8 @@ class MIPSolutionFinder
         Queue<TaxiRequest> queue = new PriorityQueue<>(n, Requests.T0_COMPARATOR);
         Collections.addAll(queue, rData.requests);
 
-        new FifoSchedulingProblem(optimConfig).scheduleUnplannedRequests(queue);
+        BestDispatchFinder dispatchFinder = new BestDispatchFinder(optimConfig);
+        new FifoSchedulingProblem(optimConfig, dispatchFinder).scheduleUnplannedRequests(queue);
 
         double t_P = optimConfig.scheduler.getParams().pickupDuration;
 
