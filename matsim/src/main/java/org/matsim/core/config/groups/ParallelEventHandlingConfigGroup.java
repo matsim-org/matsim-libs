@@ -34,6 +34,7 @@ public final class ParallelEventHandlingConfigGroup extends ReflectiveConfigGrou
 
 	private final static String NUMBER_OF_THREADS = "numberOfThreads";
 	private Integer numberOfThreads = null;
+	public final static String NUMBER_OF_THREADS_COMMENT = "Number of threads for parallel events handler. 0 or null means the framework decides by itself.";
 
 	private final static String ESTIMATED_NUMBER_OF_EVENTS = "estimatedNumberOfEvents";
 	private Long estimatedNumberOfEvents = null;
@@ -50,16 +51,24 @@ public final class ParallelEventHandlingConfigGroup extends ReflectiveConfigGrou
 	@Override
 	public Map<String, String> getComments() {
 		Map<String, String> comments = super.getComments();
-		comments.put(NUMBER_OF_THREADS, "Number of threads for parallel events handler. 0 or null means the framework decides by itself.");
+		comments.put(NUMBER_OF_THREADS, NUMBER_OF_THREADS_COMMENT);
 		comments.put(ESTIMATED_NUMBER_OF_EVENTS, "Estimated number of events during mobsim run. An optional optimization hint for the framework.");
 		return comments;
 	}
 
+	/**
+	 * {@value #NUMBER_OF_THREADS_COMMENT}
+	 */
 	@StringGetter( NUMBER_OF_THREADS )
 	public Integer getNumberOfThreads() {
 		return numberOfThreads;
 	}
 
+	/**
+	 * {@value #NUMBER_OF_THREADS_COMMENT}
+	 * 
+	 * @param numberOfThreads
+	 */
 	@StringSetter( NUMBER_OF_THREADS )
 	public void setNumberOfThreads(Integer numberOfThreads) {
 		if ( !this.locked ) {

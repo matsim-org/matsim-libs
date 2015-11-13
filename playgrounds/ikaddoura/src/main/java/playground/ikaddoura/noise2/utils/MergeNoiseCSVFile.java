@@ -58,6 +58,11 @@ public final class MergeNoiseCSVFile {
 	private OutputFormat outputFormat = OutputFormat.ihab ;
 
 	private Map<Double, Map<Id<ReceiverPoint>, Double>> time2rp2value = new HashMap<Double, Map<Id<ReceiverPoint>, Double>>();
+	private double threshold = 0. ;
+
+	public final void setThreshold(double threshold) {
+		this.threshold = threshold;
+	}
 
 	public static void main(String[] args) {
 		MergeNoiseCSVFile readNoiseFile = new MergeNoiseCSVFile();
@@ -203,9 +208,12 @@ public final class MergeNoiseCSVFile {
 			case xyt:
 				for (double time = startTime; time <= endTime; time = time + timeBinSize) {
 					for (Id<ReceiverPoint> rp : time2rp2value.get(endTime).keySet()) {
-						bw.write(rp.toString() + ";" + rp2Coord.get(rp).getX() + ";" + rp2Coord.get(rp).getY());
-						bw.write(";" + time + ";" + time2rp2value.get(time).get(rp));
-						bw.newLine();
+						final Double value = time2rp2value.get(time).get(rp);
+						if ( value > threshold ) {
+							bw.write(rp.toString() + ";" + rp2Coord.get(rp).getX() + ";" + rp2Coord.get(rp).getY());
+							bw.write(";" + time + ";" + value);
+							bw.newLine();
+						}
 					}
 				}	
 				break ;

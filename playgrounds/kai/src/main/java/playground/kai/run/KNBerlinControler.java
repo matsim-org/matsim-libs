@@ -52,10 +52,12 @@ class KNBerlinControler {
 		// paths:
 		//		config.network().setInputFile("/Users/nagel/");
 		config.controler().setOutputDirectory("/Users/nagel/kairuns/a100/output/");
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 
-		config.controler().setLastIteration(0); 
-		config.controler().setWriteSnapshotsInterval(0);
-		config.controler().setWritePlansInterval(100);
+		config.controler().setFirstIteration(100); // with something like "9" we don't get output events! 
+		config.controler().setLastIteration(100); // with something like "9" we don't get output events! 
+		config.controler().setWriteSnapshotsInterval(100);
+		config.controler().setWritePlansInterval(200);
 		config.controler().setWriteEventsInterval(100);
 		config.vspExperimental().setWritingOutputEvents(true);
 
@@ -70,6 +72,8 @@ class KNBerlinControler {
 		config.qsim().setStorageCapFactor(0.03);
 		config.qsim().setTrafficDynamics( TrafficDynamics.withHoles );
 		config.qsim().setUsingFastCapacityUpdate(false);
+		config.qsim().setNumberOfThreads(6);
+		
 		//		config.controler().setMobsim(MobsimType.JDEQSim.toString());
 		//		config.setParam(JDEQSimulation.JDEQ_SIM, JDEQSimulation.END_TIME, "36:00:00") ;
 		//		config.setParam(JDEQSimulation.JDEQ_SIM, JDEQSimulation.FLOW_CAPACITY_FACTOR, Double.toString(sampleFactor) ) ;
@@ -154,7 +158,7 @@ class KNBerlinControler {
 		String[] consideredActivitiesForReceiverPointGrid = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
 		gridParameters.setConsideredActivitiesForReceiverPointGrid(consideredActivitiesForReceiverPointGrid);
 
-		gridParameters.setReceiverPointGap(100.);
+		gridParameters.setReceiverPointGap(200.);
 
 		String[] consideredActivitiesForDamages = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
 		gridParameters.setConsideredActivitiesForSpatialFunctionality(consideredActivitiesForDamages);
@@ -263,6 +267,7 @@ class KNBerlinControler {
 			merger.setReceiverPointsFile(receiverPointsFile);
 			merger.setLabel(label);
 			merger.setOutputFormat(OutputFormat.xyt);
+			merger.setThreshold(1.);
 			merger.run();
 		}
 		{
@@ -274,6 +279,7 @@ class KNBerlinControler {
 			merger.setReceiverPointsFile(receiverPointsFile);
 			merger.setLabel(label);
 			merger.setOutputFormat(OutputFormat.xyt);
+			merger.setThreshold(1.);
 			merger.run();
 		}
 
