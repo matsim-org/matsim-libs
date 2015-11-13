@@ -31,6 +31,7 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.utils.io.IOUtils;
 
+import playground.agarwalamit.munich.utils.ExtendedPersonFilter;
 import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 
 /**
@@ -40,6 +41,7 @@ import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 public class PeakHourTollWriter {
 
 	private PeakHourTollHandler pkHrToll;
+	private final ExtendedPersonFilter pf = new ExtendedPersonFilter();
 
 	public static void main(String[] args) {
 		String [] pricingSchemes = new String [] {"ei","ci","eci"};
@@ -90,14 +92,6 @@ public class PeakHourTollWriter {
 			throw new RuntimeException("Data is not written in file. Reason: " + e);
 		}
 	}
-
-	private String geUserGroupMyWay(UserGroup ug){
-		if(ug.equals(UserGroup.URBAN)) return "Urban";
-		else if(ug.equals(UserGroup.COMMUTER)) return "(Rev)commuter";
-		else if(ug.equals(UserGroup.REV_COMMUTER)) return "(Rev)commuter";
-		else if (ug.equals(UserGroup.FREIGHT)) return "Freight";
-		else throw new RuntimeException("User group "+ug+" is not recongnised. Aborting ...");
-	}
 	
 	private void writeRData(String outputFolder, String pricingScheme) {
 		if( ! new File(outputFolder+"/boxPlot/").exists()) new File(outputFolder+"/boxPlot/").mkdirs();
@@ -111,7 +105,7 @@ public class PeakHourTollWriter {
 			for( UserGroup ug : userGrpTo_PkHrToll.keySet() ) {
 				for(Id<Person> p : userGrpTo_PkHrToll.get(ug).keySet()){
 					for(double d: userGrpTo_PkHrToll.get(ug).get(p)){
-						writer.write(pricingScheme.toUpperCase()+"\t"+geUserGroupMyWay(ug)+"\t"+d+"\n");
+						writer.write(pricingScheme.toUpperCase()+"\t"+ pf.geUserGroupMyWay(ug)+"\t"+d+"\n");
 					}
 				}
 			}
@@ -126,7 +120,7 @@ public class PeakHourTollWriter {
 			for( UserGroup ug : userGrpTo_OffPkHrToll.keySet() ) {
 				for(Id<Person> p :userGrpTo_OffPkHrToll.get(ug).keySet()){
 					for(double d: userGrpTo_OffPkHrToll.get(ug).get(p)){
-						writer.write(pricingScheme.toUpperCase()+"\t"+geUserGroupMyWay(ug)+"\t"+d+"\n");
+						writer.write(pricingScheme.toUpperCase()+"\t"+ pf.geUserGroupMyWay(ug)+"\t"+d+"\n");
 					}
 				}
 			}

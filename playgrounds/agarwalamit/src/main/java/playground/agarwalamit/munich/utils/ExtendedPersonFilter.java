@@ -89,4 +89,16 @@ public class ExtendedPersonFilter extends PersonFilter {
 		}
 		return outUG;
 	}
+	
+	/**
+	 * @param ug
+	 * Helpful for writing data to files.
+	 */
+	public String geUserGroupMyWay(UserGroup ug){
+		if(ug.equals(UserGroup.URBAN)) return "Urban";
+		else if(ug.equals(UserGroup.COMMUTER)) return "(Rev)commuter";
+		else if(ug.equals(UserGroup.REV_COMMUTER)) return "(Rev)commuter";
+		else if (ug.equals(UserGroup.FREIGHT)) return "Freight";
+		else throw new RuntimeException("User group "+ug+" is not recongnised. Aborting ...");
+	}
 }
