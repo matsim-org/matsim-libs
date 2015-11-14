@@ -125,7 +125,7 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 			@SuppressWarnings("unchecked")
 			final Counts<Link> counts = (Counts<Link>) scenarioData.getScenarioElement(Counts.ELEMENT_NAME) ;
 			if ( counts != null ) {
-				new CountsWriter(counts).write( Controler.FILENAME_COUNTS );
+				new CountsWriter(counts).write( controlerIO.getOutputFilename( Controler.FILENAME_COUNTS ) );
 			}
 		} catch ( Exception ee ) {}
 		if (!event.isUnexpected() && scenarioData.getConfig().vspExperimental().isWritingOutputEvents()) {
