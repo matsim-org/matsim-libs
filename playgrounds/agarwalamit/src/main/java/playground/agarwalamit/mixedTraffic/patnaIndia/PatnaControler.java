@@ -23,6 +23,7 @@ import org.matsim.core.config.groups.QSimConfigGroup.VehiclesSource;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.vehicles.VehicleWriterV1;
 
 import playground.agarwalamit.mixedTraffic.patnaIndia.input.PatnaConfigGenerator;
@@ -36,7 +37,7 @@ import playground.agarwalamit.utils.plans.BackwardCompatibilityForRouteType;
 public class PatnaControler {
 
 	private static final String inputFilesDir = "../../../../repos/runs-svn/patnaIndia/run108/input/";
-	private static final String outputDir = "../../../../repos/runs-svn/patnaIndia/run108/output/";
+	private static final String outputDir = "../../../../repos/runs-svn/patnaIndia/run108/output/t3/";
 
 	public static void main(String[] args) {
 		PatnaConfigGenerator configGenerator = new PatnaConfigGenerator();
@@ -70,7 +71,8 @@ public class PatnaControler {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				addTravelTimeBinding("bike").to(networkTravelTime());
+//				addTravelTimeBinding("bike").to(networkTravelTime());
+				addTravelTimeBinding("bike").to(FreeSpeedTravelTime.class);
 				addTravelDisutilityFactoryBinding("bike").to(carTravelDisutilityFactoryKey());
 				addTravelTimeBinding("motorbike").to(networkTravelTime());
 				addTravelDisutilityFactoryBinding("motorbike").to(carTravelDisutilityFactoryKey());
