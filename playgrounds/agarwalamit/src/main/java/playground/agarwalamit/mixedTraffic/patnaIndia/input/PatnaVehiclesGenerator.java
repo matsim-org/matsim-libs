@@ -73,7 +73,7 @@ public class PatnaVehiclesGenerator {
 					VehicleType vType = modesType.get(travelMode);
 					Vehicle veh =  VehicleUtils.getFactory().createVehicle(Id.create(p.getId(), Vehicle.class), vType);
 					vehicles.addVehicle(veh);
-					continue;//this is necessary only if a person has same travel mode in all trips.
+					break;//this is necessary only if a person has same travel mode in all trips.
 				}
 			}
 		}
