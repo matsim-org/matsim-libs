@@ -119,7 +119,7 @@ public class PatnaSimulationTimeWriter {
 		String outPlans = inputFilesDir + "/SelectedPlans_new.xml.gz";
 
 		BackwardCompatibilityForRouteType bcrt = new BackwardCompatibilityForRouteType(inputFilesDir+"/SelectedPlansOnly.xml", mainModes);
-		bcrt.startProcessing();
+		bcrt.extractPlansExcludingLinkInfo();
 		bcrt.writePopOut(outPlans);
 
 		config.plans().setInputFile(outPlans);
