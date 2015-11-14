@@ -32,7 +32,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -48,20 +47,17 @@ import playground.andreas.utils.net.NetworkSimplifier;
 
 public class PatnaNetworkGenerator {       
 
-	public PatnaNetworkGenerator(String outputDir) {
-		this.outputDir = outputDir;
-	}
-
 	private static final Logger logger = Logger.getLogger(PatnaNetworkGenerator.class);
-	private String outputDir ;
+	private Scenario scenario;
 
 	public static void main(String[] args) throws IOException  {  
-		new PatnaNetworkGenerator("../../../../repos/runs-svn/patnaIndia/run105/").processDataAndWriteNetwork();
+		PatnaNetworkGenerator png =  new PatnaNetworkGenerator();
+		png.processDataAndWriteNetwork();
+		new NetworkWriter(png.getPatnaNetwork()).write("../../../../repos/runs-svn/patnaIndia/run108/input/network_diff_linkSpeed.xml.gz");
 	}
 
 	public void processDataAndWriteNetwork() {
-		Config config = ConfigUtils.createConfig();                                    
-		final Scenario scenario = ScenarioUtils.createScenario(config);                                       
+		scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());                                       
 		final Network network = scenario.getNetwork();
 
 		String inputFileNetwork    =  PatnaConstants.inputFilesDir+"/networkInputTransCad.csv" ;
@@ -170,9 +166,11 @@ public class PatnaNetworkGenerator {
 
 		simplifier.setNodesToMerge(nodeTypesToMerge);
 		simplifier.run(network);
-
-		new NetworkWriter(network).write(outputDir+"/network.xml.gz");
 	}    
+	
+	public Network getPatnaNetwork() {
+		return scenario.getNetwork();
+	}
 
 	private double capacityOfLink (String roadwidth) {
 		double linkCapacity =0;

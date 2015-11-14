@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.mixedTraffic.patnaIndia;
+package playground.agarwalamit.mixedTraffic.patnaIndia.subPop;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
