@@ -185,7 +185,7 @@ public class ScheduleImpl<T extends AbstractTask>
     @Override
     public T getCurrentTask()
     {
-        failIfNotStarted();
+        failIfNotStarted();//status != ScheduleStatus.STARTED
         return currentTask;
     }
 

@@ -72,9 +72,10 @@ public class UnplannedRequestZonalRegistry
     {
         Iterable<Integer> zonesIdxByDistance = ((SquareGridSystem)zonalSystem).getZonesIdxByDistance(node);
         List<TaxiRequest> nearestReqs = new ArrayList<>();
-        
+
         for (int idx : zonesIdxByDistance) {
             nearestReqs.addAll(requestsInZones[idx].values());
+
             if (nearestReqs.size() >= minCount) {
                 return nearestReqs;
             }

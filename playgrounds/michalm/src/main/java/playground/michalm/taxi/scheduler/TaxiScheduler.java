@@ -384,10 +384,8 @@ public class TaxiScheduler
                 case STAY: {
                     if (i == tasks.size() - 1) {// last task
                         task.setBeginTime(t);
-
-                        if (task.getEndTime() < t) {// may happen if the previous task is delayed
-                            task.setEndTime(t);//do not remove this task!!! A taxi schedule should end with WAIT
-                        }
+                        //even if endTime=beginTime, do not remove this task!!! A taxi schedule should end with WAIT 
+                        task.setEndTime(Math.max(t, schedule.getVehicle().getT1()));
                     }
                     else {
                         // if this is not the last task then some other task (e.g. DRIVE or PICKUP)
