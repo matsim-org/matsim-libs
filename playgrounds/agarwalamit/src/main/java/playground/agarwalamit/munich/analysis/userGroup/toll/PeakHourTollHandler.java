@@ -50,7 +50,9 @@ public class PeakHourTollHandler implements PersonMoneyEventHandler, PersonDepar
 		log.info("A trip starts with departure event and ends with arrival events. "
 				+ "Therefore, toll payments corresponding to any trip starting in the peak hour is considered as peak hour toll.");
 		log.warn("Peak hours are assumed as 07:00-09:00 and 16:00-18:00 by looking on the travel demand for BAU scenario.");
-		for(UserGroup ug : UserGroup.values()) {
+		
+		for(UserGroup userGroup : UserGroup.values()) {
+			String ug = pf.getMyUserGroup(userGroup);
 			this.userGrpTo_PkHrToll.put(ug, new HashMap<Id<Person>,List<Double>>());
 			this.userGrpTo_OffPkHrToll.put(ug, new HashMap<Id<Person>,List<Double>>());
 			this.userGrpTo_PkHrTripCounts.put(ug, new HashMap<Id<Person>,Integer>() );
@@ -59,13 +61,12 @@ public class PeakHourTollHandler implements PersonMoneyEventHandler, PersonDepar
 	}
 
 	private final List<Double> pkHrs = new ArrayList<>(Arrays.asList(new Double []{8.,9.,16.,17.}));
-	
 	private static final Logger log = Logger.getLogger(PeakHourTollHandler.class);
 
-	private SortedMap<UserGroup, Map<Id<Person>,List<Double>>> userGrpTo_PkHrToll = new TreeMap<>();
-	private SortedMap<UserGroup, Map<Id<Person>,Integer>> userGrpTo_PkHrTripCounts = new TreeMap<>();
-	private SortedMap<UserGroup, Map<Id<Person>,List<Double>>> userGrpTo_OffPkHrToll = new TreeMap<>();
-	private SortedMap<UserGroup, Map<Id<Person>,Integer>> userGrpTo_OffPkHrTripCounts = new TreeMap<>();
+	private SortedMap<String, Map<Id<Person>,List<Double>>> userGrpTo_PkHrToll = new TreeMap<>();
+	private SortedMap<String, Map<Id<Person>,Integer>> userGrpTo_PkHrTripCounts = new TreeMap<>();
+	private SortedMap<String, Map<Id<Person>,List<Double>>> userGrpTo_OffPkHrToll = new TreeMap<>();
+	private SortedMap<String, Map<Id<Person>,Integer>> userGrpTo_OffPkHrTripCounts = new TreeMap<>();
 
 	private List<Id<Person>> pkHrsPersons = new ArrayList<>();
 	private final ExtendedPersonFilter pf = new ExtendedPersonFilter();
@@ -83,7 +84,7 @@ public class PeakHourTollHandler implements PersonMoneyEventHandler, PersonDepar
 		if ( ! event.getLegMode().equals(TransportMode.car) ) return ; // excluding non car trips
 		double time = Math.floor( event.getTime()/3600. );
 		Id<Person> personId = event.getPersonId();
-		UserGroup ug = pf.getUserGroupFromPersonId(personId);
+		String ug = pf.getMyUserGroupFromPersonId(personId);
 
 		// remove the person if exists
 		pkHrsPersons.remove(personId);
@@ -105,11 +106,11 @@ public class PeakHourTollHandler implements PersonMoneyEventHandler, PersonDepar
 			}
 		}
 	}
-
+	
 	@Override
 	public void handleEvent(PersonMoneyEvent event) {
 		Id<Person> personId = event.getPersonId();
-		UserGroup ug = pf.getUserGroupFromPersonId(personId);
+		String ug = pf.getMyUserGroupFromPersonId(personId);
 		if( pkHrsPersons.contains(personId) ) {
 			Map<Id<Person>,List<Double>> id2Toll = this.userGrpTo_PkHrToll.get(ug);
 			if(id2Toll.containsKey(personId )) {
@@ -154,7 +155,7 @@ public class PeakHourTollHandler implements PersonMoneyEventHandler, PersonDepar
 	public void handleEvent(PersonArrivalEvent event) {
 		if ( ! event.getLegMode().equals(TransportMode.car) ) return ; // excluding non car trips
 		Id<Person> personId = event.getPersonId();
-		UserGroup ug = pf.getUserGroupFromPersonId(personId);
+		String ug = pf.getMyUserGroupFromPersonId(personId);
 
 		// fill the map if toll in some of the trips is zero.		
 		if (pkHrsPersons.contains(event.getPersonId()) ) { 
@@ -197,41 +198,41 @@ public class PeakHourTollHandler implements PersonMoneyEventHandler, PersonDepar
 		}
 	}
 	
-	public SortedMap<UserGroup, Map<Id<Person>, List<Double>>> getUserGrpTo_PkHrToll() {
+	public SortedMap<String, Map<Id<Person>, List<Double>>> getUserGrpTo_PkHrToll() {
 		return userGrpTo_PkHrToll;
 	}
 
-	public SortedMap<UserGroup, Map<Id<Person>, Integer>> getUserGrpTo_PkHrTripCounts() {
+	public SortedMap<String, Map<Id<Person>, Integer>> getUserGrpTo_PkHrTripCounts() {
 		return userGrpTo_PkHrTripCounts;
 	}
 
-	public SortedMap<UserGroup, Map<Id<Person>, List<Double>>> getUserGrpTo_OffPkHrToll() {
+	public SortedMap<String, Map<Id<Person>, List<Double>>> getUserGrpTo_OffPkHrToll() {
 		return userGrpTo_OffPkHrToll;
 	}
 
-	public SortedMap<UserGroup, Map<Id<Person>, Integer>> getUserGrpTo_OffPkHrTripCounts() {
+	public SortedMap<String, Map<Id<Person>, Integer>> getUserGrpTo_OffPkHrTripCounts() {
 		return userGrpTo_OffPkHrTripCounts;
 	}
 	
-	public SortedMap<UserGroup,Integer> getUserGroupToPeakHourTripCounts() {
+	public SortedMap<String,Integer> getUserGroupToPeakHourTripCounts() {
 		return sumOfTripCounts(this.userGrpTo_PkHrTripCounts);
 	}
 	
-	public SortedMap<UserGroup,Integer> getUserGroupToOffPeakHourTripCounts() {
+	public SortedMap<String,Integer> getUserGroupToOffPeakHourTripCounts() {
 		return sumOfTripCounts(this.userGrpTo_OffPkHrTripCounts);
 	}
 	
-	public SortedMap<UserGroup, Double> getUserGroupToTotalPeakHourToll(){
+	public SortedMap<String, Double> getUserGroupToTotalPeakHourToll(){
 		return sumOfTollPerTrip(this.userGrpTo_PkHrToll);
 	}
 	
-	public SortedMap<UserGroup, Double> getUserGroupToTotalOffPeakHourToll(){
+	public SortedMap<String, Double> getUserGroupToTotalOffPeakHourToll(){
 		return sumOfTollPerTrip(this.userGrpTo_OffPkHrToll);
 	}
 	
-	private SortedMap<UserGroup,Integer> sumOfTripCounts (SortedMap<UserGroup, Map<Id<Person>,Integer>> countMap) {
-		SortedMap<UserGroup,Integer> sumMap = new TreeMap<>();
-		for (UserGroup ug : countMap.keySet() ) {
+	private SortedMap<String,Integer> sumOfTripCounts (SortedMap<String, Map<Id<Person>,Integer>> countMap) {
+		SortedMap<String,Integer> sumMap = new TreeMap<>();
+		for (String ug : countMap.keySet() ) {
 			int tripCountSum = 0;
 			for(Id<Person> p :countMap.get(ug).keySet()){
 				tripCountSum += countMap.get(ug).get(p);
@@ -241,9 +242,9 @@ public class PeakHourTollHandler implements PersonMoneyEventHandler, PersonDepar
 		return sumMap;
 	}
 	
-	private SortedMap<UserGroup, Double> sumOfTollPerTrip(SortedMap<UserGroup, Map<Id<Person>,List<Double>>> tollMap){
-		SortedMap<UserGroup, Double> userGrpToToll = new TreeMap<>();
-		for (UserGroup ug : tollMap.keySet() ) {
+	private SortedMap<String, Double> sumOfTollPerTrip(SortedMap<String, Map<Id<Person>,List<Double>>> tollMap){
+		SortedMap<String, Double> userGrpToToll = new TreeMap<>();
+		for (String ug : tollMap.keySet() ) {
 			double tollSum = 0.;
 			for(Id<Person> p :tollMap.get(ug).keySet()){
 				for(double d:tollMap.get(ug).get(p)){

@@ -91,10 +91,18 @@ public class ExtendedPersonFilter extends PersonFilter {
 	}
 	
 	/**
+	 * @param personId
+	 * @return Urban or (Rev) commuter or Freight from person id.
+	 */
+	public String getMyUserGroupFromPersonId(Id<Person> personId) {
+		return getMyUserGroup(getUserGroupFromPersonId(personId));
+	}
+	
+	/**
 	 * @param ug
 	 * Helpful for writing data to files.
 	 */
-	public String geUserGroupMyWay(UserGroup ug){
+	public String getMyUserGroup(UserGroup ug){
 		if(ug.equals(UserGroup.URBAN)) return "Urban";
 		else if(ug.equals(UserGroup.COMMUTER)) return "(Rev)commuter";
 		else if(ug.equals(UserGroup.REV_COMMUTER)) return "(Rev)commuter";

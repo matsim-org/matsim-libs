@@ -31,9 +31,6 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.agarwalamit.munich.utils.ExtendedPersonFilter;
-import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
-
 /**
  * @author amit
  */
@@ -41,7 +38,6 @@ import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 public class PeakHourTollWriter {
 
 	private PeakHourTollHandler pkHrToll;
-	private final ExtendedPersonFilter pf = new ExtendedPersonFilter();
 
 	public static void main(String[] args) {
 		String [] pricingSchemes = new String [] {"ei","ci","eci"};
@@ -68,25 +64,23 @@ public class PeakHourTollWriter {
 	}
 
 	private void writeTollPerTrip(String outputFolder, String pricingScheme) {
-		SortedMap<UserGroup,Integer> pkHrTripCount = pkHrToll.getUserGroupToPeakHourTripCounts();
-		SortedMap<UserGroup,Double> pkHrTotalToll = pkHrToll.getUserGroupToTotalPeakHourToll();
+		SortedMap<String,Integer> pkHrTripCount = pkHrToll.getUserGroupToPeakHourTripCounts();
+		SortedMap<String,Double> pkHrTotalToll = pkHrToll.getUserGroupToTotalPeakHourToll();
 
-		SortedMap<UserGroup,Integer> offPkHrTripCount = pkHrToll.getUserGroupToOffPeakHourTripCounts();
-		SortedMap<UserGroup,Double> offPkHrTotalToll = pkHrToll.getUserGroupToTotalOffPeakHourToll();
+		SortedMap<String,Integer> offPkHrTripCount = pkHrToll.getUserGroupToOffPeakHourTripCounts();
+		SortedMap<String,Double> offPkHrTotalToll = pkHrToll.getUserGroupToTotalOffPeakHourToll();
 
 
 		BufferedWriter writer = IOUtils.getBufferedWriter(outputFolder+"/averageTollPerTrip_"+pricingScheme+".txt");
 		try {
 			writer.write("PricingScheme \t time \t userGroup \t averageTollPerTrip \n");
-			writer.write(pricingScheme+"\t peakHours \t Urban \t"+pkHrTotalToll.get(UserGroup.URBAN)/pkHrTripCount.get(UserGroup.URBAN) + "\n");
-			writer.write(pricingScheme+"\t peakHours \t (Rev)commuter \t"+ ( pkHrTotalToll.get(UserGroup.COMMUTER) + pkHrTotalToll.get(UserGroup.REV_COMMUTER) ) /
-					( pkHrTripCount.get(UserGroup.COMMUTER) + pkHrTripCount.get(UserGroup.REV_COMMUTER) ) +"\n" );
-			writer.write(pricingScheme+"\t peakHours \t Freight \t"+pkHrTotalToll.get(UserGroup.FREIGHT)/pkHrTripCount.get(UserGroup.FREIGHT) +"\n");
-
-			writer.write(pricingScheme+"\t offPeakHours \t Urban \t"+offPkHrTotalToll.get(UserGroup.URBAN)/offPkHrTripCount.get(UserGroup.URBAN) + "\n");
-			writer.write(pricingScheme+"\t offPeakHours \t (Rev)commuter \t"+ ( offPkHrTotalToll.get(UserGroup.COMMUTER) + offPkHrTotalToll.get(UserGroup.REV_COMMUTER) ) /
-					( offPkHrTripCount.get(UserGroup.COMMUTER) + offPkHrTripCount.get(UserGroup.REV_COMMUTER) ) +"\n" );
-			writer.write(pricingScheme+"\t offPeakHours \t Freight \t"+offPkHrTotalToll.get(UserGroup.FREIGHT)/offPkHrTripCount.get(UserGroup.FREIGHT) +"\n");
+			for( String ug : pkHrTotalToll.keySet() ) {
+				writer.write(pricingScheme+"\t peakHours \t"+ug+"\t"+ (pkHrTotalToll.get(ug)/pkHrTripCount.get(ug))+"\n");
+			}
+			
+			for( String ug : offPkHrTotalToll.keySet() ) {
+				writer.write(pricingScheme+"\t peakHours \t"+ug+"\t"+(offPkHrTotalToll.get(ug)/offPkHrTripCount.get(ug))+"\n");
+			}
 			writer.close();
 		} catch (Exception e) {
 			throw new RuntimeException("Data is not written in file. Reason: " + e);
@@ -96,16 +90,16 @@ public class PeakHourTollWriter {
 	private void writeRData(String outputFolder, String pricingScheme) {
 		if( ! new File(outputFolder+"/boxPlot/").exists()) new File(outputFolder+"/boxPlot/").mkdirs();
 
-		SortedMap<UserGroup, Map<Id<Person>,List<Double>>> userGrpTo_PkHrToll = pkHrToll.getUserGrpTo_PkHrToll();
-		SortedMap<UserGroup, Map<Id<Person>,List<Double>>> userGrpTo_OffPkHrToll = pkHrToll.getUserGrpTo_OffPkHrToll();
+		SortedMap<String, Map<Id<Person>,List<Double>>> userGrpTo_PkHrToll = pkHrToll.getUserGrpTo_PkHrToll();
+		SortedMap<String, Map<Id<Person>,List<Double>>> userGrpTo_OffPkHrToll = pkHrToll.getUserGrpTo_OffPkHrToll();
 		
 		//write peak hour toll/trip
 		BufferedWriter writer = IOUtils.getBufferedWriter(outputFolder+"/boxPlot/toll_"+pricingScheme+"_pkHr"+".txt");
 		try {
-			for( UserGroup ug : userGrpTo_PkHrToll.keySet() ) {
+			for( String ug : userGrpTo_PkHrToll.keySet() ) {
 				for(Id<Person> p : userGrpTo_PkHrToll.get(ug).keySet()){
 					for(double d: userGrpTo_PkHrToll.get(ug).get(p)){
-						writer.write(pricingScheme.toUpperCase()+"\t"+ pf.geUserGroupMyWay(ug)+"\t"+d+"\n");
+						writer.write(pricingScheme.toUpperCase()+"\t"+ ug+"\t"+d+"\n");
 					}
 				}
 			}
@@ -117,10 +111,10 @@ public class PeakHourTollWriter {
 		//write off peak hour toll/trip
 		writer = IOUtils.getBufferedWriter(outputFolder+"/boxPlot/toll_"+pricingScheme+"_offPkHr"+".txt");
 		try {
-			for( UserGroup ug : userGrpTo_OffPkHrToll.keySet() ) {
+			for( String ug : userGrpTo_OffPkHrToll.keySet() ) {
 				for(Id<Person> p :userGrpTo_OffPkHrToll.get(ug).keySet()){
 					for(double d: userGrpTo_OffPkHrToll.get(ug).get(p)){
-						writer.write(pricingScheme.toUpperCase()+"\t"+ pf.geUserGroupMyWay(ug)+"\t"+d+"\n");
+						writer.write(pricingScheme.toUpperCase()+"\t"+ ug +"\t"+d+"\n");
 					}
 				}
 			}
