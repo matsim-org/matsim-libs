@@ -47,10 +47,13 @@ public class TripDistanceHandler
 implements PersonDepartureEventHandler, PersonArrivalEventHandler, LinkLeaveEventHandler {
 
 	public TripDistanceHandler(Network network, double simulationEndTime, int noOfTimeBins) {
+		log.info("A trip starts with departure event and ends with arrival events.");
+		log.warn("Peak hours are assumed as 07:00-10:00 and 15:00-18:00 by looking on the travel demand for BAU scenario.");
 		this.network = network;
 		this.timeBinSize = simulationEndTime / noOfTimeBins;
 	}
 
+	private SortedMap<Id<Person>,Double> personId2TripDepartTimeBin = new TreeMap<>();
 	private SortedMap<Double, Map<Id<Person>,Integer>> timeBin2Person2TripsCount = new TreeMap<>();
 	private SortedMap<Double, Map<Id<Person>,List<Double>>> timeBin2Person2TripsDistance = new TreeMap<>();
 
@@ -63,6 +66,7 @@ implements PersonDepartureEventHandler, PersonArrivalEventHandler, LinkLeaveEven
 	public void reset(int iteration) {
 		this.timeBin2Person2TripsCount.clear();
 		this.timeBin2Person2TripsDistance.clear();
+		this.personId2TripDepartTimeBin.clear();
 	}
 
 	@Override
@@ -71,16 +75,15 @@ implements PersonDepartureEventHandler, PersonArrivalEventHandler, LinkLeaveEven
 		double linkLength = network.getLinks().get(linkId).getLength();
 		Id<Person> driverId = event.getDriverId();
 		
-		double time = Math.max(this.timeBinSize, Math.ceil( event.getTime()/this.timeBinSize) );
-
-		if(timeBin2Person2TripsDistance.containsKey(time)){
-			Map<Id<Person>,List<Double>> person2TripsDists = timeBin2Person2TripsDistance.get(time);
+		double timebin = this.personId2TripDepartTimeBin.get(driverId);
+		
+		if(timeBin2Person2TripsDistance.containsKey(timebin)){
+			Map<Id<Person>,List<Double>> person2TripsDists = timeBin2Person2TripsDistance.get(timebin);
 			if ( person2TripsDists.containsKey(driverId) ) {
 				List<Double> dists = person2TripsDists.get(driverId);
-				int tripNr = timeBin2Person2TripsCount.get(time).get(driverId);
+				int tripNr = timeBin2Person2TripsCount.get(timebin).get(driverId);
 				if (dists.size() == tripNr) { //existing trip
-					double prevCollectedDist = dists.get(tripNr-1);
-					dists.remove(tripNr-1);
+					double prevCollectedDist = dists.remove(tripNr-1);
 					dists.add(tripNr -1, prevCollectedDist + linkLength);
 				} else if(tripNr - dists.size() == 1) { //new trip
 					dists.add(linkLength);
@@ -95,7 +98,7 @@ implements PersonDepartureEventHandler, PersonArrivalEventHandler, LinkLeaveEven
 			dists.add(linkLength);	
 			Map<Id<Person>,List<Double>> person2TripsDists = new HashMap<>();
 			person2TripsDists.put(driverId, dists);
-			timeBin2Person2TripsDistance.put(time, person2TripsDists);
+			timeBin2Person2TripsDistance.put(timebin, person2TripsDists);
 		}
 	}
 
@@ -103,11 +106,11 @@ implements PersonDepartureEventHandler, PersonArrivalEventHandler, LinkLeaveEven
 	public void handleEvent(PersonArrivalEvent event) {
 		if ( ! event.getLegMode().equals(TransportMode.car) ) return ; // excluding non car trips
 
-		double time = Math.max(this.timeBinSize, Math.ceil( event.getTime()/this.timeBinSize) );
-		// following is required because, sometimes agent depart and arrive on the same link, therefore, for such trips, distance =0.
-		
 		Id<Person> personId = event.getPersonId();
-		int totalTrips = timeBin2Person2TripsCount.get(time).get(personId);;
+		double time = this.personId2TripDepartTimeBin.remove(personId);
+
+		// following is required because, sometimes agent depart and arrive on the same link, therefore, for such trips, distance =0.
+		int totalTrips = timeBin2Person2TripsCount.get(time).get(personId);
 		int distancesStored ;
 		if (timeBin2Person2TripsDistance.get(time).containsKey(personId)) {
 			distancesStored = timeBin2Person2TripsDistance.get(time).get(personId).size();
@@ -117,7 +120,9 @@ implements PersonDepartureEventHandler, PersonArrivalEventHandler, LinkLeaveEven
 		else if(totalTrips - distancesStored == 1) {
 			Map<Id<Person>,List<Double>> person2Dists = this.timeBin2Person2TripsDistance.get(time);
 			List<Double> dists ;
-			if ( person2Dists.containsKey(personId)) dists = person2Dists.get(personId);
+			if ( person2Dists.containsKey(personId)) {
+				dists = person2Dists.get(personId);
+			}
 			else dists = new ArrayList<>();
 			dists.add(0.);
 			person2Dists.put(personId, dists);
@@ -135,10 +140,11 @@ implements PersonDepartureEventHandler, PersonArrivalEventHandler, LinkLeaveEven
 			return ;
 		}
 
-		double time = Math.max(this.timeBinSize, Math.ceil( event.getTime()/this.timeBinSize) );
-
+		double time = Math.max(1, Math.ceil( event.getTime()/this.timeBinSize) );
 		Id<Person> personId = event.getPersonId();
-
+		
+		this.personId2TripDepartTimeBin.put(personId, time);
+		
 		if(timeBin2Person2TripsCount.containsKey(time)) {
 			Map<Id<Person>,Integer> personId2TripCount = timeBin2Person2TripsCount.get(time);
 			if(personId2TripCount.containsKey(personId)) { //multiple trips
