@@ -93,17 +93,5 @@ public class SeepageControler {
 	
 	public static void main(String[] args) {
 		new SeepageControler().run();
-//		CreateInputs inputs = new CreateInputs();
-//		inputs.run();
-//		Scenario sc = inputs.getScenario();
-//		
-//		Controler myController = new Controler(sc.getConfig());	
-//		myController.setOverwriteFiles(true) ;
-//		myController.setCreateGraphs(true);
-//		myController.setMobsimFactory(new PatnaQSimFactory()); 
-////		myController.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
-//		myController.setDumpDataAtEnd(true);
-//		myController.run();
-//		myController.setMobsimFactory(new SeepageMobsimfactory());
 	}
 }

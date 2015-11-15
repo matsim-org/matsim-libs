@@ -37,8 +37,9 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
 
+import playground.agarwalamit.analysis.trip.TripDistanceHandler;
 import playground.agarwalamit.munich.utils.ExtendedPersonFilter;
-import playground.agarwalamit.munich.utils.ListUitls;
+import playground.agarwalamit.utils.ListUitls;
 import playground.agarwalamit.utils.LoadMyScenarios;
 import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 

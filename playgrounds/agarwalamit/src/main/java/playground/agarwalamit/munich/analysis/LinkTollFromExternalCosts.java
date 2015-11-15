@@ -146,7 +146,5 @@ public class LinkTollFromExternalCosts {
 			}
 		}
 		return linkEmissionCosts;
-
 	}
-
 }

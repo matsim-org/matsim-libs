@@ -55,6 +55,7 @@ import com.vividsolutions.jts.geom.Point;
  */
 
 public class Patna100PctPopulation {
+//	ZZ_TODO: clean it and compare with PatnaDemandGeneration
 
 	// take the home coord from initial plans (in ward) and then assign these agents to nearest link, see core method of doing this.
 	private final Logger logger = Logger.getLogger(Patna100PctPopulation.class);

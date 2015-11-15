@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.munich.analysis.userGroup.toll;
+package playground.agarwalamit.analysis.trip;
 
 import java.util.ArrayList;
 import java.util.HashMap;

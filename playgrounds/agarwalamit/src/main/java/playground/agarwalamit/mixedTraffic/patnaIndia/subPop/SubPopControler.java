@@ -48,7 +48,6 @@ import java.util.Map;
 
 public class SubPopControler {
 
-
 	public static void main(String[] args) {
 
 //		SubpopulationConfig subPopConfig = new SubpopulationConfig();

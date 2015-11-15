@@ -16,36 +16,10 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.mixedTraffic.seepage.TestSetUp;
-
-import org.apache.log4j.Logger;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.events.EventsUtils;
-import org.matsim.core.events.MatsimEventsReader;
+package playground.agarwalamit.siouxFalls.legModeDistributions;
 
 /**
  * @author amit
  */
-public class Analyzer {
-	public static final Logger log = Logger.getLogger(Analyzer.class);
 
-	public static void main(String[] args) {
-		String outputDir =  "/Users/amit/Documents/repos/shared-svn/projects/mixedTraffic/seepage/xt_1Link/seepage/";
-		String eventsFile = outputDir+"ITERS/it.0/0.events.xml.gz";
-		
-		Analyzer ana = new Analyzer();
-		ana.analyzeFlow(eventsFile);
-	}
-
-	private void analyzeFlow(String eventsFile){
-		EventsManager events = EventsUtils.createEventsManager();
-		AverageLinkFlowHandler linkFlow = new AverageLinkFlowHandler();
-		MatsimEventsReader reader = new MatsimEventsReader(events);
-		events.addHandler(linkFlow);
-		reader.readFile(eventsFile);
-		
-		log.info("Inflow : - "+linkFlow.getInflow().toString());
-		log.info("Outflow : - "+linkFlow.getOutflow().toString());
-		
-	}
-}
+// ZZ_TODO: this package is too old; check classes and clean them because most of the classes/methods also exists in analysis/legMode/distributions/...

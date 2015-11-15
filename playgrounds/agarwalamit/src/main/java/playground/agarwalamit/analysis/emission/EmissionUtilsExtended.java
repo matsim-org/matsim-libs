@@ -51,6 +51,7 @@ public class EmissionUtilsExtended extends EmissionUtils{
 	}
 
 	public  Map<Id<Person>, SortedMap<String, Double>> convertPerPersonWarmEmissions2String (Population pop, Map<Id<Person>, Map<WarmPollutant, Double>> warmEmiss) {
+		//ZZ_TODO: why population is required here
 		Map<Id<Person>, SortedMap<String, Double>> outWarmEmiss = new HashMap<>();
 		for(Person person : pop.getPersons().values()) {
 			Id<Person> personId = person.getId();
@@ -99,7 +100,7 @@ public class EmissionUtilsExtended extends EmissionUtils{
 
 	public  Map<Double, Map<Id<Link>, SortedMap<String, Double>>> convertPerLinkColdEmissions2String (Network net, Map<Double,Map<Id<Link>, Map<ColdPollutant, Double>>> coldEmiss) {
 		Map<Double, Map<Id<Link>, SortedMap<String, Double>>> outColdEmiss = new HashMap<>();
-		
+//		ZZ_TODO: why network is required here
 		for(double t:coldEmiss.keySet()) {
 			Map<Id<Link>, SortedMap<String, Double>>	 tempMap = new HashMap<>();
 			for(Id<Link> id : coldEmiss.get(t).keySet()){

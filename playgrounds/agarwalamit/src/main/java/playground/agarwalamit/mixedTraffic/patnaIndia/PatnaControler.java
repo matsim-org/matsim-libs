@@ -27,7 +27,7 @@ import org.matsim.vehicles.VehicleWriterV1;
 
 import playground.agarwalamit.mixedTraffic.patnaIndia.input.PatnaConfigGenerator;
 import playground.agarwalamit.mixedTraffic.patnaIndia.input.PatnaVehiclesGenerator;
-import playground.agarwalamit.utils.plans.BackwardCompatibilityForRouteType;
+import playground.agarwalamit.utils.plans.BackwardCompatibilityForOldPlansType;
 
 /**
  * @author amit
@@ -45,7 +45,7 @@ public class PatnaControler {
 
 		config.network().setInputFile(inputFilesDir+"/network_diff_linkSpeed.xml.gz");
 
-		BackwardCompatibilityForRouteType bcrt = new BackwardCompatibilityForRouteType(inputFilesDir+"/SelectedPlansOnly.xml", PatnaConstants.mainModes);
+		BackwardCompatibilityForOldPlansType bcrt = new BackwardCompatibilityForOldPlansType(inputFilesDir+"/SelectedPlansOnly.xml", PatnaConstants.mainModes);
 		bcrt.extractPlansExcludingLinkInfo();
 		String plansFile = inputFilesDir+"/selectedPlans_diff_tripPurpose.xml.gz";
 		bcrt.writePopOut(plansFile);

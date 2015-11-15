@@ -138,7 +138,5 @@ public class SiouxFallsControler {
 			controler.addControlerListener(new EmissionControlerListener());
 		}
 		controler.run();	
-
 	}
-
 }

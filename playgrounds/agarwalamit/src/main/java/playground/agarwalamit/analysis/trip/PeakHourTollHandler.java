@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.munich.analysis.userGroup.toll;
+package playground.agarwalamit.analysis.trip;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -45,7 +45,7 @@ import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
  */
 
 public class PeakHourTollHandler implements PersonMoneyEventHandler, PersonDepartureEventHandler, PersonArrivalEventHandler {
-
+//ZZ_TODO : change this handler for timebins and then use analyzer to get peak off-peak data. see TripDistanceHandler and analyzer
 	public PeakHourTollHandler() {
 		log.info("A trip starts with departure event and ends with arrival events. "
 				+ "Therefore, toll payments corresponding to any trip starting in the peak hour is considered as peak hour toll.");

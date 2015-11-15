@@ -48,7 +48,7 @@ import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
 import playground.agarwalamit.mixedTraffic.MixedTrafficVehiclesUtils;
-import playground.agarwalamit.utils.plans.BackwardCompatibilityForRouteType;
+import playground.agarwalamit.utils.plans.BackwardCompatibilityForOldPlansType;
 
 /**
  * @author amit
@@ -118,7 +118,7 @@ public class PatnaSimulationTimeWriter {
 		Config config = createBasicConfigSettings();
 		String outPlans = inputFilesDir + "/SelectedPlans_new.xml.gz";
 
-		BackwardCompatibilityForRouteType bcrt = new BackwardCompatibilityForRouteType(inputFilesDir+"/SelectedPlansOnly.xml", mainModes);
+		BackwardCompatibilityForOldPlansType bcrt = new BackwardCompatibilityForOldPlansType(inputFilesDir+"/SelectedPlansOnly.xml", mainModes);
 		bcrt.extractPlansExcludingLinkInfo();
 		bcrt.writePopOut(outPlans);
 

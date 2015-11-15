@@ -16,26 +16,10 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.munich.speedPCUVariation;
-
-import playground.agarwalamit.analysis.congestion.AbsoluteDelays;
-import playground.agarwalamit.analysis.emission.AbsoluteEmissions;
+package playground.agarwalamit.mixedTraffic.plots;
 
 /**
  * @author amit
  */
 
-public class EquilAnalysis {
-	
-	private String [] runCases =  {"allCar_20","allCar_30","allCar_40","allCar_50","allCar_60","allCar_70","allCar_80","allCar_90","allCar_100"};
-	private String outDir = "./equil/output/";
-	
-	public static void main(String[] args) {
-		new EquilAnalysis().run();
-	}
-	
-	private void run(){
-		new AbsoluteEmissions(outDir).runAndWrite(runCases);
-		new AbsoluteDelays(outDir).runAndWrite(runCases);
-	}
-}
+// ZZ_TODO: this package is too old; check classes and clean them.

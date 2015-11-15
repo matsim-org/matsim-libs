@@ -110,6 +110,4 @@ public class PatnaTravelTimeAnalyzer extends AbstractAnalysisModule {
 					+ e);
 		}
 	}
-
-
 }

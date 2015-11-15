@@ -44,9 +44,9 @@ import playground.agarwalamit.utils.LoadMyScenarios;
  * @author amit
  */
 
-public class BackwardCompatibilityForRouteType {
+public class BackwardCompatibilityForOldPlansType {
 
-	public BackwardCompatibilityForRouteType(String inputPlansFile, Collection<String> mainModes2) {
+	public BackwardCompatibilityForOldPlansType(String inputPlansFile, Collection<String> mainModes2) {
 		this.inputPlans = inputPlansFile;
 		this.mainModes = mainModes2;
 		this.scOut = ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -58,7 +58,7 @@ public class BackwardCompatibilityForRouteType {
 
 	public static void main(String[] args) {
 		Collection <String> mainModes = Arrays.asList("car","motorbike","bike");
-		BackwardCompatibilityForRouteType bcrouteTyp = new BackwardCompatibilityForRouteType("../../../../repos/runs-svn/patnaIndia/inputs/SelectedPlansOnly.xml", mainModes);
+		BackwardCompatibilityForOldPlansType bcrouteTyp = new BackwardCompatibilityForOldPlansType("../../../../repos/runs-svn/patnaIndia/inputs/SelectedPlansOnly.xml", mainModes);
 		bcrouteTyp.extractPlansExcludingLinkInfo();
 		bcrouteTyp.writePopOut("../../../../repos/runs-svn/patnaIndia/inputs/SelectedPlans_new.xml.gz");
 	}

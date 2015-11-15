@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.mixedTraffic.patnaIndia.analysis;
+package playground.agarwalamit.mixedTraffic.patnaIndia.subPop;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
@@ -68,5 +68,4 @@ public class PopulationFilter {
 	public static boolean isPersonFromNonSlum(Person person){
 		return (person.getId().toString().split("_")[1].equals("nonSlum"));
 	}
-
 }

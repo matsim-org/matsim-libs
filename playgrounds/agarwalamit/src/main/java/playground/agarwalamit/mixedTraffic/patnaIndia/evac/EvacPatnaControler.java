@@ -33,7 +33,6 @@ import org.matsim.core.config.groups.QSimConfigGroup.LinkDynamics;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
@@ -44,8 +43,6 @@ import playground.agarwalamit.mixedTraffic.MixedTrafficVehiclesUtils;
 import playground.ikaddoura.analysis.welfare.WelfareAnalysisControlerListener;
 import playground.vsp.congestion.handlers.TollHandler;
 import playground.vsp.congestion.routing.TollDisutilityCalculatorFactory;
-
-import com.google.inject.Provider;
 
 /**
  * @author amit
@@ -152,6 +149,5 @@ public class EvacPatnaControler {
 		
 		controler.addControlerListener(new WelfareAnalysisControlerListener((MutableScenario)controler.getScenario()));
 		controler.run();
-
 	}
 }

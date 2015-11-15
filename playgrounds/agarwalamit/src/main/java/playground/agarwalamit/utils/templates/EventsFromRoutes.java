@@ -143,7 +143,4 @@ public class EventsFromRoutes {
 		public void reset(int iteration) {
 		}
 	}
-
-
-
 }

@@ -16,36 +16,52 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.mixedTraffic.seepage.TestSetUp;
+package playground.agarwalamit.utils;
 
-import org.apache.log4j.Logger;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.events.EventsUtils;
-import org.matsim.core.events.MatsimEventsReader;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 
 /**
  * @author amit
  */
-public class Analyzer {
-	public static final Logger log = Logger.getLogger(Analyzer.class);
 
-	public static void main(String[] args) {
-		String outputDir =  "/Users/amit/Documents/repos/shared-svn/projects/mixedTraffic/seepage/xt_1Link/seepage/";
-		String eventsFile = outputDir+"ITERS/it.0/0.events.xml.gz";
-		
-		Analyzer ana = new Analyzer();
-		ana.analyzeFlow(eventsFile);
+public class MapUtils {
+
+	public static int intSum(Map<?, Integer> intMap){
+		if(intMap==null || intMap.isEmpty()) return 0;
+		int sum =0;
+		for(Integer i :intMap.values()){
+			sum+=i;	
+		}
+		return sum;
 	}
 
-	private void analyzeFlow(String eventsFile){
-		EventsManager events = EventsUtils.createEventsManager();
-		AverageLinkFlowHandler linkFlow = new AverageLinkFlowHandler();
-		MatsimEventsReader reader = new MatsimEventsReader(events);
-		events.addHandler(linkFlow);
-		reader.readFile(eventsFile);
-		
-		log.info("Inflow : - "+linkFlow.getInflow().toString());
-		log.info("Outflow : - "+linkFlow.getOutflow().toString());
-		
+	public static double doubleSum(Map<?, Double> doubleMap){
+		if(doubleMap==null || doubleMap.isEmpty()) return 0;
+		double sum =0;
+		for(Double i :doubleMap.values()){
+			sum+=i;	
+		}
+		return sum;
+	}
+	/**
+	 * @return m1-m2
+	 * <p> if key does not exist in either of map, value for that is assumed as <b>zero.
+	 */
+	public static Map<Id<Person>, Double> subtractMaps(Map<Id<Person>, Double> m1, Map<Id<Person>, Double> m2){
+		Set<Id<Person>> keys = new HashSet<>(m1.keySet());
+		keys.addAll(m2.keySet());
+		Map<Id<Person>, Double> outMap = new HashMap<Id<Person>, Double>();
+		for(Id<Person> id : keys){
+			double v1 = m1.containsKey(id) ? m1.get(id) : 0;
+			double v2 = m2.containsKey(id) ? m2.get(id) : 0;
+			outMap.put(id, v2-v1);
+		}
+		return outMap;
 	}
 }

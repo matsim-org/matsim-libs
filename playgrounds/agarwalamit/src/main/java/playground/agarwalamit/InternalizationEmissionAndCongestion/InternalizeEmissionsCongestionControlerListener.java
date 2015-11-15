@@ -140,5 +140,4 @@ public class InternalizeEmissionsCongestionControlerListener implements StartupL
 	public void setHotspotLinks(Set<Id<Link>> hotspotLinks) {
 		this.hotspotLinks = hotspotLinks;
 	}
-
 }

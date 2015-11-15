@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.mixedTraffic;
+package playground.agarwalamit.mixedTraffic.simTime;
 
 import java.io.BufferedWriter;
 import java.util.ArrayList;
@@ -53,6 +53,7 @@ import org.matsim.vehicles.VehicleUtils;
  */
 
 public class ComputationTimeCalculator {
+//	ZZ_TODO : probably, I do not need this anymore. check and remove it.
 	
 	public ComputationTimeCalculator(String outDir) {
 		this.outDir = outDir;
