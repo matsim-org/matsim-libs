@@ -49,7 +49,7 @@ public class PeakHourTollHandler implements PersonMoneyEventHandler, PersonDepar
 	public PeakHourTollHandler() {
 		log.info("A trip starts with departure event and ends with arrival events. "
 				+ "Therefore, toll payments corresponding to any trip starting in the peak hour is considered as peak hour toll.");
-		log.warn("Peak hours are assumed as 07:00-09:00 and 16:00-18:00 by looking on the travel demand for BAU scenario.");
+		log.warn("Peak hours are assumed as 07:00-10:00 and 15:00-18:00 by looking on the travel demand for BAU scenario.");
 		
 		for(UserGroup userGroup : UserGroup.values()) {
 			String ug = pf.getMyUserGroup(userGroup);
@@ -60,7 +60,7 @@ public class PeakHourTollHandler implements PersonMoneyEventHandler, PersonDepar
 		}
 	}
 
-	private final List<Double> pkHrs = new ArrayList<>(Arrays.asList(new Double []{8.,9.,16.,17.}));
+	private final List<Double> pkHrs = new ArrayList<>(Arrays.asList(new Double []{7., 8., 9., 15., 16.,17.}));
 	private static final Logger log = Logger.getLogger(PeakHourTollHandler.class);
 
 	private SortedMap<String, Map<Id<Person>,List<Double>>> userGrpTo_PkHrToll = new TreeMap<>();
@@ -82,7 +82,7 @@ public class PeakHourTollHandler implements PersonMoneyEventHandler, PersonDepar
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
 		if ( ! event.getLegMode().equals(TransportMode.car) ) return ; // excluding non car trips
-		double time = Math.floor( event.getTime()/3600. );
+		double time = Math.max(1., Math.ceil( event.getTime()/3600.) );
 		Id<Person> personId = event.getPersonId();
 		String ug = pf.getMyUserGroupFromPersonId(personId);
 
@@ -183,8 +183,7 @@ public class PeakHourTollHandler implements PersonMoneyEventHandler, PersonDepar
 			int tolledTrips ;
 			if(this.userGrpTo_OffPkHrToll.get(ug).containsKey(personId)) { // not in the map yet
 				tolledTrips = this.userGrpTo_OffPkHrToll.get(ug).get(personId).size(); 
-			}
-			else tolledTrips = 0;
+			} else tolledTrips = 0;
 			if(totalTrips == tolledTrips) return;
 			else if( totalTrips - tolledTrips == 1) {
 				Map<Id<Person>,List<Double>> id2Toll = this.userGrpTo_OffPkHrToll.get(ug);
