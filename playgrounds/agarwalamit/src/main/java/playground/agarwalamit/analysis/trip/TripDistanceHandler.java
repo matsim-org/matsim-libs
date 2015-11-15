@@ -48,7 +48,6 @@ implements PersonDepartureEventHandler, PersonArrivalEventHandler, LinkLeaveEven
 
 	public TripDistanceHandler(Network network, double simulationEndTime, int noOfTimeBins) {
 		log.info("A trip starts with departure event and ends with arrival events.");
-		log.warn("Peak hours are assumed as 07:00-10:00 and 15:00-18:00 by looking on the travel demand for BAU scenario.");
 		this.network = network;
 		this.timeBinSize = simulationEndTime / noOfTimeBins;
 	}
@@ -112,6 +111,9 @@ implements PersonDepartureEventHandler, PersonArrivalEventHandler, LinkLeaveEven
 		// following is required because, sometimes agent depart and arrive on the same link, therefore, for such trips, distance =0.
 		int totalTrips = timeBin2Person2TripsCount.get(time).get(personId);
 		int distancesStored ;
+		if(personId.toString().equals("gv_5035")){
+			System.out.println("problem.");
+		}
 		if (timeBin2Person2TripsDistance.get(time).containsKey(personId)) {
 			distancesStored = timeBin2Person2TripsDistance.get(time).get(personId).size();
 		} else distancesStored = 0;

@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.munich.analysis.userGroup.toll;
+package playground.agarwalamit.munich.analysis.userGroup.pkHr;
 
 import java.io.BufferedWriter;
 import java.util.ArrayList;
@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
@@ -47,14 +48,15 @@ import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
  * @author amit
  */
 
-public class TripDistanceAnalyzer  {
+public class PeakHourTripDistanceAnalyzer  {
 
-	public TripDistanceAnalyzer(Network network, double simulationEndTime, int noOfTimeBins) {
+	public PeakHourTripDistanceAnalyzer(Network network, double simulationEndTime, int noOfTimeBins) {
+		log.warn("Peak hours are assumed as 07:00-10:00 and 15:00-18:00 by looking on the travel demand for BAU scenario.");
 		this.tripDistHandler = new TripDistanceHandler(network, simulationEndTime, noOfTimeBins);
 	}
 
 	private TripDistanceHandler tripDistHandler;
-	private final List<Double> pkHrs = new ArrayList<>(Arrays.asList(new Double []{7., 8., 9., 15., 16.,17.}));
+	private final List<Double> pkHrs = new ArrayList<>(Arrays.asList(new Double []{8., 9., 10., 16., 17.,18.}));
 	private final ExtendedPersonFilter pf = new ExtendedPersonFilter();
 	private Map<Id<Person>,List<Double>> person2Dists_pkHr = new HashMap<>();
 	private Map<Id<Person>,List<Double>> person2Dists_offPkHr = new HashMap<>();
@@ -62,19 +64,21 @@ public class TripDistanceAnalyzer  {
 	private Map<Id<Person>,Integer> person2TripCounts_offPkHr = new HashMap<>();
 	private SortedMap<String, Tuple<Double,Double>> usrGrp2Dists = new TreeMap<>();
 	private SortedMap<String, Tuple<Integer,Integer>> usrGrp2TripCounts = new TreeMap<>();
+	private static final Logger log = Logger.getLogger(PeakHourTripDistanceAnalyzer.class);
 
 	public static void main(String[] args) {
-		String scenario = "ei";
-		String dir = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/iatbr/output/"+scenario;
-		String eventsFile = dir+"/ITERS/it.1500/1500.events.xml.gz";
-		String networkFile = dir+"/output_network.xml.gz";
-		String configFile = dir+"/output_config.xml.gz";
-		Scenario sc = LoadMyScenarios.loadScenarioFromNetworkAndConfig(networkFile, configFile);
-		
-		TripDistanceAnalyzer tda = new TripDistanceAnalyzer(sc.getNetwork(), sc.getConfig().qsim().getEndTime(), 30);
-		tda.run(eventsFile);
-		tda.writeTripData(dir+"/analysis/");
-		
+		String [] pricingSchemes = new String [] {"ei","ci","eci"};
+		for (String str :pricingSchemes) {
+			String dir = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/iatbr/output/"+str;
+			String eventsFile = dir+"/ITERS/it.1500/1500.events.xml.gz";
+			String networkFile = dir+"/output_network.xml.gz";
+			String configFile = dir+"/output_config.xml.gz";
+			Scenario sc = LoadMyScenarios.loadScenarioFromNetworkAndConfig(networkFile, configFile);
+
+			PeakHourTripDistanceAnalyzer tda = new PeakHourTripDistanceAnalyzer(sc.getNetwork(), sc.getConfig().qsim().getEndTime(), 30);
+			tda.run(eventsFile);
+			tda.writeTripData(dir+"/analysis/");
+		}
 	}
 
 	public void run(String eventsFile) {
@@ -86,43 +90,13 @@ public class TripDistanceAnalyzer  {
 		storeUserGroupData();
 	}
 
-	public Map<Id<Person>,List<Double>> getPersonToTripDistancesInPeakHours() {
-		return this.person2Dists_pkHr;
-	}
-
-	public Map<Id<Person>,List<Double>> getPersonToTripDistancesInOffPeakHours() {
-		return this.person2Dists_offPkHr;
-	}
-
-	public Map<Id<Person>, Integer> getPerson2TripCountsInPeakHours() {
-		return person2TripCounts_pkHr;
-	}
-
-	public Map<Id<Person>, Integer> getPerson2TripCountsInOffPeakHours() {
-		return person2TripCounts_offPkHr;
-	}
-
-	/**
-	 * @return usergroup to trip total trip distance tuple of which first object is for peak hour and second is for off peak hour.
-	 */
-	public SortedMap<String, Tuple<Double,Double>> getUsrGrp2TotalDistance() {
-		return usrGrp2Dists;
-	}
-
-	/**
-	 * @return usergroup to trip count tuple of which first object is for peak hour and second is for off peak hour.
-	 */
-	public SortedMap<String, Tuple<Integer,Integer>> getUsrGrp2TripCounts() {
-		return usrGrp2TripCounts;
-	}
-
 	public void writeTripData(String outputFolder){
 		BufferedWriter writer = IOUtils.getBufferedWriter(outputFolder+"/userGrp_tripDist.txt");
 		try {
 			writer.write("userGroup \t peakHrTotalDistanceInKm \t offPeakHrTotalDistanceInKm \t peakHrTripCount \t offPeakHrTripCount \n");
 			for(String ug:this.usrGrp2Dists.keySet()){
 				writer.write(ug+"\t"+this.usrGrp2Dists.get(ug).getFirst()/1000.+"\t"+this.usrGrp2Dists.get(ug).getSecond()/1000.+"\t"
-			+this.usrGrp2TripCounts.get(ug).getFirst()+"\t"+this.usrGrp2TripCounts.get(ug).getSecond()+"\n");
+						+this.usrGrp2TripCounts.get(ug).getFirst()+"\t"+this.usrGrp2TripCounts.get(ug).getSecond()+"\n");
 			}
 			writer.close();
 		} catch (Exception e) {
@@ -159,7 +133,6 @@ public class TripDistanceAnalyzer  {
 		SortedMap<Double, Map<Id<Person>, Integer>> timebin2person2tripCounts = tripDistHandler.getTimeBin2Person2TripsCount();
 
 		for(double d :timebin2person2tripDists.keySet()) {
-			// iterate through time bins, sum number of trips and total trip dists for each person in pk and off pk hours..
 			for (Id<Person> person : timebin2person2tripDists.get(d).keySet()) {
 				if(pkHrs.contains(d)) {
 					if (person2Dists_pkHr.containsKey(person) ) {
