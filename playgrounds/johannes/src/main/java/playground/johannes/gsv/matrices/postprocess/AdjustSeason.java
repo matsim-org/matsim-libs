@@ -19,7 +19,7 @@
 
 package playground.johannes.gsv.matrices.postprocess;
 
-import gnu.trove.TObjectDoubleHashMap;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.common.util.ProgressLogger;
 import playground.johannes.gsv.popsim.Histogram;

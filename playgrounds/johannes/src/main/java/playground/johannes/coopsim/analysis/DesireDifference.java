@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package playground.johannes.coopsim.analysis;
 
-import gnu.trove.TObjectDoubleHashMap;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
 import org.matsim.api.core.v01.population.Person;
 import playground.johannes.coopsim.mental.ActivityDesires;
 import playground.johannes.coopsim.pysical.Trajectory;

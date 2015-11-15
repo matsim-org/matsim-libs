@@ -20,9 +20,9 @@
 package playground.johannes.synpop.sim;
 
 import com.vividsolutions.jts.geom.Coordinate;
-import gnu.trove.TDoubleFunction;
-import gnu.trove.TObjectDoubleHashMap;
-import gnu.trove.TObjectDoubleIterator;
+import gnu.trove.function.TDoubleFunction;
+import gnu.trove.iterator.TObjectDoubleIterator;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.common.util.ProgressLogger;
 import org.matsim.facilities.ActivityFacility;

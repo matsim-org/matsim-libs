@@ -20,7 +20,7 @@
 package playground.johannes.coopsim.mental.choice;
 
 import com.vividsolutions.jts.geom.Point;
-import gnu.trove.TDoubleDoubleHashMap;
+import gnu.trove.map.hash.TDoubleDoubleHashMap;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.common.gis.CartesianDistanceCalculator;

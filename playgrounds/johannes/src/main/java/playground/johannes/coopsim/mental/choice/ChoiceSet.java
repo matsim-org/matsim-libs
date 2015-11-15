@@ -19,9 +19,9 @@
  * *********************************************************************** */
 package playground.johannes.coopsim.mental.choice;
 
-import gnu.trove.TDoubleArrayList;
-import gnu.trove.TDoubleIntHashMap;
-import gnu.trove.TDoubleIntIterator;
+import gnu.trove.iterator.TDoubleIntIterator;
+import gnu.trove.list.array.TDoubleArrayList;
+import gnu.trove.map.hash.TDoubleIntHashMap;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -67,7 +67,8 @@ public class ChoiceSet<T> {
 		int idx = options.indexOf(choice);
 		if(idx >= 0) {
 			options.remove(idx);
-			double w = weights.remove(idx);
+			double w = weights.get(idx);
+			weights.remove(idx);
 			weightSum -= w;
 			return true;
 		} else {

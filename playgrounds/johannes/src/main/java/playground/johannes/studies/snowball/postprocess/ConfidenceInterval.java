@@ -19,9 +19,9 @@
  * *********************************************************************** */
 package playground.johannes.studies.snowball.postprocess;
 
-import gnu.trove.TDoubleArrayList;
-import gnu.trove.TIntDoubleHashMap;
-import gnu.trove.TIntObjectHashMap;
+import gnu.trove.list.array.TDoubleArrayList;
+import gnu.trove.map.hash.TIntDoubleHashMap;
+import gnu.trove.map.hash.TIntObjectHashMap;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 
 import java.io.*;
@@ -110,7 +110,7 @@ public class ConfidenceInterval {
 			for(Entry<String, TDoubleArrayList> entry : matrix.entrySet()) {
 				DescriptiveStatistics stats = new DescriptiveStatistics();
 				
-				double vals[] = entry.getValue().toNativeArray();
+				double vals[] = entry.getValue().toArray();
 				for(double val : vals) {	
 					if(!Double.isNaN(val)) {
 						double relerr;

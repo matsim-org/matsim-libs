@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package playground.johannes.studies.mz2005.analysis;
 
-import gnu.trove.TObjectDoubleHashMap;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.contrib.common.stats.DummyDiscretizer;

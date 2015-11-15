@@ -19,8 +19,8 @@
  * *********************************************************************** */
 package playground.johannes.studies.sbsurvey.analysis;
 
-import gnu.trove.TObjectDoubleHashMap;
-import gnu.trove.TObjectDoubleIterator;
+import gnu.trove.iterator.TObjectDoubleIterator;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.socnetgen.sna.graph.social.SocialEdge;
 import org.matsim.contrib.socnetgen.sna.graph.social.SocialVertex;

@@ -22,8 +22,8 @@
  */
 package playground.johannes.gsv.demand.loader;
 
-import gnu.trove.TObjectDoubleHashMap;
-import gnu.trove.TObjectDoubleIterator;
+import gnu.trove.iterator.TObjectDoubleIterator;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
 import org.matsim.contrib.socnetgen.sna.gis.ZoneLayer;
 import playground.johannes.gsv.demand.AbstractTaskWrapper;
 import playground.johannes.gsv.demand.LoaderUtils;

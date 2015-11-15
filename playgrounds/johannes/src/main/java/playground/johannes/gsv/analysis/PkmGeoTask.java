@@ -1,7 +1,7 @@
 package playground.johannes.gsv.analysis;
 
-import gnu.trove.TObjectDoubleHashMap;
-import gnu.trove.TObjectDoubleIterator;
+import gnu.trove.iterator.TObjectDoubleIterator;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.facilities.ActivityFacilities;
 import playground.johannes.coopsim.analysis.LegModeCondition;

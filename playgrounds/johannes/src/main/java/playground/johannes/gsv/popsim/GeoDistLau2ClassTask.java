@@ -19,8 +19,8 @@
 
 package playground.johannes.gsv.popsim;
 
-import gnu.trove.TDoubleArrayList;
-import gnu.trove.TDoubleDoubleHashMap;
+import gnu.trove.list.array.TDoubleArrayList;
+import gnu.trove.map.hash.TDoubleDoubleHashMap;
 import org.matsim.contrib.common.stats.Correlations;
 import org.matsim.contrib.common.stats.StatsWriter;
 import playground.johannes.gsv.popsim.analysis.AbstractAnalyzerTask;
@@ -68,8 +68,8 @@ public class GeoDistLau2ClassTask extends AbstractAnalyzerTask<Collection<? exte
         if (ioContext != null) {
             try {
                 String filename = String.format("%s/munic.dist.mean.txt", ioContext.getPath());
-                double[] x = xVals.toNativeArray();
-                double[] y = yVals.toNativeArray();
+                double[] x = xVals.toArray();
+                double[] y = yVals.toArray();
 //                Discretizer disc = FixedSampleSizeDiscretizer.create(x, 50, 100);
                 TDoubleDoubleHashMap corr = Correlations.mean(x, y);
                 StatsWriter.writeHistogram(corr, "munic", "distance", filename);
