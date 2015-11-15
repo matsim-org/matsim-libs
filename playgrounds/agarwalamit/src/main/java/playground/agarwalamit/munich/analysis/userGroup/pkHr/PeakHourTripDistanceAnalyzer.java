@@ -56,7 +56,7 @@ public class PeakHourTripDistanceAnalyzer  {
 	}
 
 	private TripDistanceHandler tripDistHandler;
-	private final List<Double> pkHrs = new ArrayList<>(Arrays.asList(new Double []{8., 9., 10., 16., 17.,18.}));
+	private final List<Double> pkHrs = new ArrayList<>(Arrays.asList(new Double []{}));
 	private final ExtendedPersonFilter pf = new ExtendedPersonFilter();
 	private Map<Id<Person>,List<Double>> person2Dists_pkHr = new HashMap<>();
 	private Map<Id<Person>,List<Double>> person2Dists_offPkHr = new HashMap<>();
@@ -69,15 +69,15 @@ public class PeakHourTripDistanceAnalyzer  {
 	public static void main(String[] args) {
 		String [] pricingSchemes = new String [] {"ei","ci","eci"};
 		for (String str :pricingSchemes) {
-			String dir = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/iatbr/output/"+str;
-			String eventsFile = dir+"/ITERS/it.1500/1500.events.xml.gz";
-			String networkFile = dir+"/output_network.xml.gz";
-			String configFile = dir+"/output_config.xml.gz";
+			String dir = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/iatbr/output/";
+			String eventsFile = dir+str+"/ITERS/it.1500/1500.events.xml.gz";
+			String networkFile = dir+str+"/output_network.xml.gz";
+			String configFile = dir+str+"/output_config.xml.gz";
 			Scenario sc = LoadMyScenarios.loadScenarioFromNetworkAndConfig(networkFile, configFile);
 
 			PeakHourTripDistanceAnalyzer tda = new PeakHourTripDistanceAnalyzer(sc.getNetwork(), sc.getConfig().qsim().getEndTime(), 30);
 			tda.run(eventsFile);
-			tda.writeTripData(dir+"/analysis/");
+			tda.writeTripData(dir+"/analysis/", str);
 		}
 	}
 
@@ -90,12 +90,13 @@ public class PeakHourTripDistanceAnalyzer  {
 		storeUserGroupData();
 	}
 
-	public void writeTripData(String outputFolder){
-		BufferedWriter writer = IOUtils.getBufferedWriter(outputFolder+"/userGrp_tripDist.txt");
+	public void writeTripData(String outputFolder, String pricingScheme){
+		BufferedWriter writer = IOUtils.getBufferedWriter(outputFolder+"/userGrp_tripDist_"+pricingScheme+".txt");
 		try {
-			writer.write("userGroup \t peakHrTotalDistanceInKm \t offPeakHrTotalDistanceInKm \t peakHrTripCount \t offPeakHrTripCount \n");
+			writer.write("userGroup \t peakHrTotalDistanceInKm \t offPeakHrTotalDistanceInKm \t peakHrAvgTripDist \t offPeakHrAvgTripDist \t peakHrTripCount \t offPeakHrTripCount \n");
 			for(String ug:this.usrGrp2Dists.keySet()){
 				writer.write(ug+"\t"+this.usrGrp2Dists.get(ug).getFirst()/1000.+"\t"+this.usrGrp2Dists.get(ug).getSecond()/1000.+"\t"
+						+this.usrGrp2Dists.get(ug).getFirst()/(1000.*this.usrGrp2TripCounts.get(ug).getFirst())+"\t"+this.usrGrp2Dists.get(ug).getSecond()/(1000.*this.usrGrp2TripCounts.get(ug).getSecond())+"\t"
 						+this.usrGrp2TripCounts.get(ug).getFirst()+"\t"+this.usrGrp2TripCounts.get(ug).getSecond()+"\n");
 			}
 			writer.close();

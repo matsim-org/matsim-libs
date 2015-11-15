@@ -57,7 +57,7 @@ public class PeakHourTripTollAnalyzer {
 	private static final Logger log = Logger.getLogger(PeakHourTripTollAnalyzer.class);
 	private TripTollHandler tollHandler ;
 
-	private final List<Double> pkHrs = new ArrayList<>(Arrays.asList(new Double []{8., 9., 10., 16., 17.,18.}));
+	private final List<Double> pkHrs = new ArrayList<>(Arrays.asList(new Double []{8., 9., 10., 16., 17., 18.,})); // => 7-10 and 15-18
 	private final ExtendedPersonFilter pf = new ExtendedPersonFilter();
 	private Map<Id<Person>,List<Double>> person2Tolls_pkHr = new HashMap<>();
 	private Map<Id<Person>,List<Double>> person2Tolls_offPkHr = new HashMap<>();
@@ -123,9 +123,10 @@ public class PeakHourTripTollAnalyzer {
 	public void writeTripData(String outputFolder, String pricingScheme){
 		BufferedWriter writer = IOUtils.getBufferedWriter(outputFolder+"/userGrp_tripToll_"+pricingScheme+".txt");
 		try {
-			writer.write("userGroup \t peakHrTotalTollPerTrip \t offPeakHrTotalTollPerTrip \t peakHrTripCount \t offPeakHrTripCount \n");
+			writer.write("userGroup \t peakHrTotalTollPerTrip \t offPeakHrTotalTollPerTrip \t peakHrAvgTollPerTrip \t offPkHrAvgTollPerTrip \t peakHrTripCount \t offPeakHrTripCount \n");
 			for(String ug:this.usrGrp2Tolls.keySet()){
 				writer.write(ug+"\t"+this.usrGrp2Tolls.get(ug).getFirst()+"\t"+this.usrGrp2Tolls.get(ug).getSecond()+"\t"
+						+( this.usrGrp2Tolls.get(ug).getFirst()/this.usrGrp2TripCounts.get(ug).getFirst() )+"\t"+(this.usrGrp2Tolls.get(ug).getSecond()/this.usrGrp2TripCounts.get(ug).getSecond())+"\t"
 						+this.usrGrp2TripCounts.get(ug).getFirst()+"\t"+this.usrGrp2TripCounts.get(ug).getSecond()+"\n");
 			}
 			writer.close();
