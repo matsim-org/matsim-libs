@@ -82,7 +82,6 @@ public class PeakHourTripTollPerKmAnalyzer {
 			
 			PeakHourTripTollPerKmAnalyzer tda = new PeakHourTripTollPerKmAnalyzer(sc.getNetwork(),sc.getConfig().qsim().getEndTime(), 30);
 			tda.run(eventsFile);
-			tda.writeTripData(dir+"/analysis/", str);
 			tda.writeRBoxPlotData(dir+"/analysis/", str);
 		}
 	}
@@ -100,12 +99,12 @@ public class PeakHourTripTollPerKmAnalyzer {
 	public void writeRBoxPlotData(String outputFolder, String pricingScheme) {
 		if( ! new File(outputFolder+"/boxPlot/").exists()) new File(outputFolder+"/boxPlot/").mkdirs();
 
-		BufferedWriter writer = IOUtils.getBufferedWriter(outputFolder+"/boxPlot/tripTollPerKm_"+pricingScheme+"_pkHr"+".txt");
+		BufferedWriter writer = IOUtils.getBufferedWriter(outputFolder+"/boxPlot/tripTollInEurCtPerKm_"+pricingScheme+"_pkHr"+".txt");
 		try {
 			for(Id<Person> p : person2TollsPerKm_pkHr.keySet()){
 				String ug = pf.getMyUserGroupFromPersonId(p);
 				for(double d: person2TollsPerKm_pkHr.get(p)){
-					writer.write(pricingScheme.toUpperCase()+"\t"+ ug+"\t"+d+"\n");
+					writer.write(pricingScheme.toUpperCase()+"\t"+ ug+"\t"+d*100+"\n");
 				}
 			}
 			writer.close();
@@ -114,31 +113,17 @@ public class PeakHourTripTollPerKmAnalyzer {
 		}
 
 		//write off peak hour toll/trip
-		writer = IOUtils.getBufferedWriter(outputFolder+"/boxPlot/tripTollPerKm_"+pricingScheme+"_offPkHr"+".txt");
+		writer = IOUtils.getBufferedWriter(outputFolder+"/boxPlot/tripTollInEurCtPerKm_"+pricingScheme+"_offPkHr"+".txt");
 		try {
 			for(Id<Person> p : person2TollsPerKm_offPkHr.keySet()){
 				String ug = pf.getMyUserGroupFromPersonId(p);
 				for(double d: person2TollsPerKm_offPkHr.get(p)){
-					writer.write(pricingScheme.toUpperCase()+"\t"+ ug+"\t"+d+"\n");
+					writer.write(pricingScheme.toUpperCase()+"\t"+ ug+"\t"+d*100+"\n");
 				}
 			}
 			writer.close();
 		} catch (Exception e) {
 			throw new RuntimeException("Data is not written in file. Reason: " + e);
-		}
-	}
-
-	public void writeTripData(String outputFolder, String pricingScheme){
-		BufferedWriter writer = IOUtils.getBufferedWriter(outputFolder+"/userGrp_tripTollPerKm_"+pricingScheme+".txt");
-		try {
-			writer.write("userGroup \t peakHrTotalTollPerKm \t offPeakHrTotalTollPerKm \t peakHrTripCount \t offPeakHrTripCount \n");
-			for(String ug:this.usrGrp2TollsPerKm.keySet()){
-				writer.write(ug+"\t"+this.usrGrp2TollsPerKm.get(ug).getFirst()+"\t"+this.usrGrp2TollsPerKm.get(ug).getSecond()+"\t"
-						+this.usrGrp2TripCounts.get(ug).getFirst()+"\t"+this.usrGrp2TripCounts.get(ug).getSecond()+"\n");
-			}
-			writer.close();
-		} catch (Exception e) {
-			throw new RuntimeException("Data is not written. Reason "+e);
 		}
 	}
 
