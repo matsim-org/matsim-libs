@@ -61,9 +61,13 @@ public class Gui extends JFrame {
 	private JTextArea textErrOut;
 	private final String mainClass;
 	
+	private File lastUsedDirectory;
+	
 	private Gui(final String title, final Class<?> mainClass) {
 		setTitle(title);
 		this.mainClass = mainClass.getCanonicalName();
+		
+		this.lastUsedDirectory = new File(".");
 		
 		JLabel lblConfigurationFile = new JLabel("Configuration file:");
 		
@@ -81,9 +85,11 @@ public class Gui extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				JFileChooser chooser = new JFileChooser();
+				chooser.setCurrentDirectory(Gui.this.lastUsedDirectory);
 				int result = chooser.showOpenDialog(null);
 				if (result == JFileChooser.APPROVE_OPTION) {
 					File f = chooser.getSelectedFile();
+					Gui.this.lastUsedDirectory = f.getParentFile();
 					String filename = f.getAbsolutePath();
 					txtConfigfilename.setText(filename);
 					
