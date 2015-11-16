@@ -23,6 +23,7 @@ import org.matsim.core.config.groups.QSimConfigGroup.VehiclesSource;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
 import org.matsim.vehicles.VehicleWriterV1;
 
 import playground.agarwalamit.mixedTraffic.patnaIndia.input.PatnaConfigGenerator;
@@ -67,12 +68,15 @@ public class PatnaControler {
 		final Controler controler = new Controler(config);
 		controler.setDumpDataAtEnd(true);
 
+		final RandomizingTimeDistanceTravelDisutility.Builder builder =  new RandomizingTimeDistanceTravelDisutility.Builder("bike");
+		
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 //				addTravelTimeBinding("bike").to(networkTravelTime());
+//				addTravelDisutilityFactoryBinding("bike").to(carTravelDisutilityFactoryKey());
 				addTravelTimeBinding("bike").to(FreeSpeedTravelTimeForBike.class);
-				addTravelDisutilityFactoryBinding("bike").to(carTravelDisutilityFactoryKey());
+				addTravelDisutilityFactoryBinding("bike").toInstance(builder);
 				addTravelTimeBinding("motorbike").to(networkTravelTime());
 				addTravelDisutilityFactoryBinding("motorbike").to(carTravelDisutilityFactoryKey());
 			}
