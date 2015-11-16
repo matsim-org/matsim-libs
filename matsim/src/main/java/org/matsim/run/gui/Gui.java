@@ -90,21 +90,7 @@ public class Gui extends JFrame {
 				if (result == JFileChooser.APPROVE_OPTION) {
 					File f = chooser.getSelectedFile();
 					Gui.this.lastUsedDirectory = f.getParentFile();
-					String filename = f.getAbsolutePath();
-					txtConfigfilename.setText(filename);
-					
-					Config config = ConfigUtils.createConfig();
-					ConfigUtils.loadConfig(config, filename);
-					
-					File par = f.getParentFile();
-					File outputDir = new File(par, config.controler().getOutputDirectory());
-					try {
-						txtOutput.setText(outputDir.getCanonicalPath());
-					} catch (IOException e1) {
-						txtOutput.setText(outputDir.getAbsolutePath());
-					}
-					
-					btnStartMatsim.setEnabled(true);
+					loadConfigFile(f);
 				}
 			}
 		});
@@ -396,6 +382,24 @@ public class Gui extends JFrame {
 		
 	}
 	
+	public void loadConfigFile(final File configFile) {
+		String configFilename = configFile.getAbsolutePath();
+		txtConfigfilename.setText(configFilename);
+		
+		Config config = ConfigUtils.createConfig();
+		ConfigUtils.loadConfig(config, configFilename);
+		
+		File par = configFile.getParentFile();
+		File outputDir = new File(par, config.controler().getOutputDirectory());
+		try {
+			txtOutput.setText(outputDir.getCanonicalPath());
+		} catch (IOException e1) {
+			txtOutput.setText(outputDir.getAbsolutePath());
+		}
+		
+		btnStartMatsim.setEnabled(true);		
+	}
+	
 	public void stopMATSim() {
 		ExeRunner runner = this.exeRunner;
 		if (runner != null) {
@@ -415,16 +419,23 @@ public class Gui extends JFrame {
 		}
 	}
 	
-	public static void show(final String title, final Class<?> mainClass) {
+	public static Gui show(final String title, final Class<?> mainClass) {
 		System.setProperty("apple.laf.useScreenMenuBar", "true");
 
 		Gui gui = new Gui(title, mainClass);
 		gui.pack();
 		gui.setLocationByPlatform(true);
 		gui.setVisible(true);
+		return gui;
 	}
 	
 	public static void main(String[] args) {
-		Gui.show("MATSim", Controler.class);
+		Gui gui = Gui.show("MATSim", Controler.class);
+		if (args.length > 0) {
+			File configFile = new File(args[0]);
+			if (configFile.exists()) {
+				gui.loadConfigFile(configFile);
+			}
+		}
 	}
 }
