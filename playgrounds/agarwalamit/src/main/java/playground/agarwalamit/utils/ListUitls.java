@@ -18,6 +18,7 @@
  * *********************************************************************** */
 package playground.agarwalamit.utils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -44,5 +45,23 @@ public class ListUitls {
 			sum = sum+i;
 		}
 		return sum;
+	}
+	
+	/**
+	 * @param list1
+	 * @param list2
+	 * @return it will divide all the elements of list1 by the elements of list2.
+	 */
+	public static List<Double> divide(List<Double> list1, List<Double> list2) {
+		List<Double> outList = new ArrayList<>();
+		if(list1 == null || list2 == null ) throw new RuntimeException("Either of the list is null. Aborting ...");
+		else if (list1.size() != list2.size()) throw new RuntimeException("Size of the lists are not equla. Aborting ...");
+		else if (list1.isEmpty() ) return outList;
+		else {
+			for(int ii=0; ii<list1.size(); ii++){
+				outList.add( list1.get(ii)/list2.get(ii) );
+			}
+		}
+		return null;
 	}
 }
