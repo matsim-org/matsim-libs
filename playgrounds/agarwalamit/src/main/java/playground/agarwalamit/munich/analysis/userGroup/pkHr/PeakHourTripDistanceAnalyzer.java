@@ -56,7 +56,7 @@ public class PeakHourTripDistanceAnalyzer  {
 	}
 
 	private TripDistanceHandler tripDistHandler;
-	private final List<Double> pkHrs = new ArrayList<>(Arrays.asList(new Double []{}));
+	private final List<Double> pkHrs = new ArrayList<>(Arrays.asList(new Double []{8., 9., 10., 16., 17., 18.,})); // => 7-10 and 15-18
 	private final ExtendedPersonFilter pf = new ExtendedPersonFilter();
 	private Map<Id<Person>,List<Double>> person2Dists_pkHr = new HashMap<>();
 	private Map<Id<Person>,List<Double>> person2Dists_offPkHr = new HashMap<>();
