@@ -352,8 +352,9 @@ public class SantiagoNetworkBuilder {
 		allowedModes.add(TransportMode.ride);
 		allowedModes.add(SantiagoScenarioConstants.Modes.taxi.toString());
 		allowedModes.add(SantiagoScenarioConstants.Modes.colectivo.toString());
-		allowedModes.add(SantiagoScenarioConstants.Modes.motorcycle.toString());
-		allowedModes.add(SantiagoScenarioConstants.Modes.school_bus.toString());
+		allowedModes.add(SantiagoScenarioConstants.Modes.other.toString());
+//		allowedModes.add(SantiagoScenarioConstants.Modes.motorcycle.toString());
+//		allowedModes.add(SantiagoScenarioConstants.Modes.school_bus.toString());
 		for(Link ll : network.getLinks().values()){
 			ll.setAllowedModes(allowedModes);
 		}

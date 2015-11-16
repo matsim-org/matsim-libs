@@ -22,8 +22,8 @@
  */
 package playground.johannes.gsv.analysis;
 
-import gnu.trove.TDoubleObjectHashMap;
-import gnu.trove.TObjectDoubleHashMap;
+import gnu.trove.map.hash.TDoubleObjectHashMap;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
 import net.opengis.kml._2.*;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
@@ -56,7 +56,7 @@ public class KMLCountsDiffPlot {
 	private final ObjectFactory kmlFactory = new ObjectFactory();
 
 	public void write(VolumesAnalyzer analyzer,
-			TObjectDoubleHashMap<Link> counts, double factor, String file, Network network) {
+					  TObjectDoubleHashMap<Link> counts, double factor, String file, Network network) {
 
 		TObjectDoubleHashMap<Link> values = calcValues(network, analyzer, counts, factor);
 		writeKML(values, file, network);
@@ -151,7 +151,7 @@ public class KMLCountsDiffPlot {
 		Map<Object, StyleType> styleMap = new HashMap<Object, StyleType>();
 		Set<StyleType> styleSet = new HashSet<StyleType>();
 
-		double valueArray[] = values.getValues();
+		double valueArray[] = values.values();
 		for (int i = 0; i < valueArray.length; i++) {
 			valueArray[i] = Math.abs(valueArray[i]);
 		}

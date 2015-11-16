@@ -18,7 +18,10 @@
  * *********************************************************************** */
 package playground.agarwalamit.mixedTraffic;
 
-import com.google.inject.Provider;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -30,7 +33,11 @@ import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -42,8 +49,8 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.TeleportationEngine;
@@ -60,9 +67,7 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import com.google.inject.Provider;
 
 /**
  * @author amit

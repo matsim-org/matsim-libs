@@ -19,9 +19,9 @@
 
 package playground.johannes.synpop.sim;
 
-import gnu.trove.TIntDoubleHashMap;
-import gnu.trove.TIntDoubleIterator;
-import gnu.trove.TIntIntHashMap;
+import gnu.trove.iterator.TIntDoubleIterator;
+import gnu.trove.map.hash.TIntDoubleHashMap;
+import gnu.trove.map.hash.TIntIntHashMap;
 import org.matsim.contrib.common.stats.Discretizer;
 import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.sim.data.CachedElement;

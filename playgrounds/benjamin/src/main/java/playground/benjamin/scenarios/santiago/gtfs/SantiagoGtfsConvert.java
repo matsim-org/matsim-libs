@@ -41,6 +41,8 @@ import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.core.utils.misc.Time;
+import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
@@ -78,6 +80,9 @@ public class SantiagoGtfsConvert {
 //		addPrefixToLinkIds(ts, net);
 		// Routes seem to have problems; thus, deleting them...
 		removeNetworkRoutes(ts);
+		// There are (most likely) wrongly coded departures at midnight; thus, deleting them...
+		// TODO: does not work because of immutable list. Is there a work-around?
+//		removeMidnightDepartures(ts);
 		Network transitNet = NetworkUtils.createNetwork();
 		CreatePseudoNetwork creator = new CreatePseudoNetwork(ts, transitNet, TransportMode.pt);
 		creator.createNetwork();
@@ -93,6 +98,19 @@ public class SantiagoGtfsConvert {
 
 		Vehicles tv = scenario.getTransitVehicles();
 		new VehicleWriterV1(tv).writeFile(outputPath + "/transitvehicles.xml.gz");
+	}
+
+	private static void removeMidnightDepartures(TransitSchedule ts) {
+		for(TransitLine tl : ts.getTransitLines().values()){
+			for(TransitRoute tr : tl.getRoutes().values()){
+				for(Departure dp : tr.getDepartures().values()){
+					Double dpt = dp.getDepartureTime();
+					if(dpt.equals(0.0)){
+						tr.removeDeparture(dp);
+					}
+				}
+			}
+		}
 	}
 
 	private static void removeNetworkRoutes(TransitSchedule ts) {

@@ -535,20 +535,20 @@ public class CSVToPlans {
 			case 3: return SantiagoScenarioConstants.Modes.bus.toString();
 			case 4: return SantiagoScenarioConstants.Modes.metro.toString();
 			case 5: return SantiagoScenarioConstants.Modes.colectivo.toString();
-			case 6: return SantiagoScenarioConstants.Modes.school_bus.toString();
+			case 6: return SantiagoScenarioConstants.Modes.other.toString();
 			case 7: return SantiagoScenarioConstants.Modes.taxi.toString();
 			case 8: return TransportMode.walk;
 			case 9: return TransportMode.bike;
-			case 10: return SantiagoScenarioConstants.Modes.motorcycle.toString();
-			case 11: return TransportMode.other;
-			case 12: return TransportMode.other;
-			case 13: return SantiagoScenarioConstants.Modes.school_bus.toString();
-			case 14: return TransportMode.other;
-			case 15: return TransportMode.other;
+			case 10: return SantiagoScenarioConstants.Modes.other.toString();
+			case 11: return SantiagoScenarioConstants.Modes.other.toString();
+			case 12: return SantiagoScenarioConstants.Modes.other.toString();
+			case 13: return SantiagoScenarioConstants.Modes.other.toString();
+			case 14: return SantiagoScenarioConstants.Modes.other.toString();
+			case 15: return SantiagoScenarioConstants.Modes.other.toString();
 			case 16: return SantiagoScenarioConstants.Modes.train.toString();
 			case 17: return TransportMode.ride;
-			case 18: return TransportMode.ride;
-			default: return TransportMode.other;
+			case 18: return SantiagoScenarioConstants.Modes.other.toString();
+			default: return SantiagoScenarioConstants.Modes.other.toString();
 		}
 	}
 	

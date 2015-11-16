@@ -32,6 +32,7 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.utils.LoadMyScenarios;
+import playground.agarwalamit.utils.MapUtils;
 import playground.benjamin.scenarios.munich.analysis.nectar.EmissionsPerLinkWarmEventHandler;
 
 /**
@@ -78,9 +79,7 @@ public class DemandFromEmissionEvents {
 			for(double time :linkCountMap.keySet()){
 				double hrDemand =0;
 				writer.write(time+"\t");
-				for(Id<Link> id:linkCountMap.get(time).keySet()){
-					hrDemand += linkCountMap.get(time).get(id);
-				}
+				hrDemand = MapUtils.doubleSum(linkCountMap.get(time));
 				writer.write(hrDemand+"\n");
 			}
 			writer.close();

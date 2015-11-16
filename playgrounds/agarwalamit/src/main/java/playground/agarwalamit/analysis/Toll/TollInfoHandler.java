@@ -135,5 +135,3 @@ public class TollInfoHandler implements PersonMoneyEventHandler {
 		return person2Toll;
 	}
 }
-
-

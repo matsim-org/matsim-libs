@@ -28,7 +28,6 @@ import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.mixedTraffic.patnaIndia.analysis.PersonArrivalAnalyzer;
 
-
 /**
  * @author amit
  */
@@ -44,7 +43,6 @@ public class EvacProgress {
 	public static void main(String[] args) {
 		new EvacProgress().runAndWrite();
 	}
-
 
 	public void runAndWrite (){
 
@@ -94,6 +92,5 @@ public class EvacProgress {
 			throw new RuntimeException("Data is not written in file. Reason: "
 					+ e);
 		}
-
 	}
 }

@@ -22,8 +22,8 @@
  */
 package playground.johannes.gsv.analysis;
 
-import gnu.trove.TObjectDoubleHashMap;
-import gnu.trove.TObjectIntHashMap;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;

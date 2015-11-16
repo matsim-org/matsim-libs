@@ -21,8 +21,8 @@ package playground.johannes.gsv.sim.cadyts;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Point;
-import gnu.trove.TDoubleIntHashMap;
-import gnu.trove.TIntArrayList;
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.hash.TDoubleIntHashMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.*;

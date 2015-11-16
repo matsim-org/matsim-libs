@@ -22,7 +22,7 @@
  */
 package playground.johannes.gsv.demand.loader;
 
-import gnu.trove.TObjectDoubleHashMap;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.common.gis.CRSUtils;
 import org.matsim.contrib.socnetgen.sna.gis.ZoneLayer;

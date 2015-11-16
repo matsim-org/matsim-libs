@@ -56,8 +56,4 @@ public class PersonActivityInfo  {
 	public List<Tuple<String, Double>> getActType2EndTimes() {
 		return actType2EndTimes;
 	}
-
-
-	
-
 }

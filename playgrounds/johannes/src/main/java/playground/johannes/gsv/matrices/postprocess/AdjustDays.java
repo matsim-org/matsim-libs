@@ -19,8 +19,8 @@
 
 package playground.johannes.gsv.matrices.postprocess;
 
-import gnu.trove.TObjectDoubleHashMap;
-import gnu.trove.TObjectDoubleIterator;
+import gnu.trove.iterator.TObjectDoubleIterator;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.common.gis.DistanceCalculator;
 import org.matsim.contrib.common.gis.WGS84DistanceCalculator;

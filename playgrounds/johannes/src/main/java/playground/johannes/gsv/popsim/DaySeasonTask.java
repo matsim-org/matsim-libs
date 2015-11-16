@@ -19,8 +19,8 @@
 
 package playground.johannes.gsv.popsim;
 
-import gnu.trove.TObjectDoubleHashMap;
-import gnu.trove.TObjectDoubleIterator;
+import gnu.trove.iterator.TObjectDoubleIterator;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import playground.johannes.gsv.popsim.analysis.AttributeProvider;
 import playground.johannes.gsv.popsim.analysis.Collector;

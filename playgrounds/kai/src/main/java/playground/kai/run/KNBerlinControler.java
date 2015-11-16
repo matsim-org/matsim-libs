@@ -257,6 +257,8 @@ class KNBerlinControler {
 	static void mergeNoiseFiles(String outputFilePath) {
 		final String receiverPointsFile = outputFilePath + "/receiverPoints/receiverPoints.csv" ;
 
+		// yyyy would be even better to load everything into one file: x, y, t, imissions, damages, ...
+		
 		{
 			final String label = "immission" ;
 			final String workingDirectory = outputFilePath + "/immissions/" ;

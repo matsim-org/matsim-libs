@@ -36,6 +36,7 @@ public class BoundingBoxOfNetwork {
 	private double minY;
 	private double maxY;
 
+//	ZZ_TODO : compare this with bounding box of matsim core.
 	public BoundingBoxOfNetwork(String networkFile) {
 		this.networkFile  = networkFile;
 		this.minX=99999990.; 

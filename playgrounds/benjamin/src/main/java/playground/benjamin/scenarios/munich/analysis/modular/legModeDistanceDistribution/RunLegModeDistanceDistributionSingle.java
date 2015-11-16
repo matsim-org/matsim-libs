@@ -32,12 +32,10 @@ public class RunLegModeDistanceDistributionSingle {
 	private final static Logger logger = Logger.getLogger(RunLegModeDistanceDistributionSingle.class);
 	
 //	static String baseFolder = "../../runs-svn/detEval/mobilTUM/run20/";
-//	static String configFile = baseFolder + "output_config.xml.gz";
-//	static String iteration = "0";
-	
-	static String baseFolder = "../../runs-svn/internalizationCar/output/baseCase2a/";
+//	static String baseFolder = "../../runs-svn/internalizationCar/output/baseCase2a/";
+	static String baseFolder = "../../../runs-svn/santiago/run32/output/";
 	static String configFile = baseFolder + "output_config.xml.gz";
-	static String iteration = "500";
+	static String iteration = "0";
 	
 	static UserGroup userGroup = null;
 //	static UserGroup userGroup = UserGroup.URBAN;

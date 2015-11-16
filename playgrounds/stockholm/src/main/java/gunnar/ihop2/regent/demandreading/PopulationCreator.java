@@ -338,8 +338,8 @@ public class PopulationCreator {
 			final Person person = this.newPerson(personId, xy2links,
 					coordinateTransform);
 			if (person != null) {
-				Logger.getLogger(this.getClass().getName()).info(
-						"creating person " + personId);
+				// Logger.getLogger(this.getClass().getName()).info(
+				// "creating person " + personId);
 				this.scenario.getPopulation().addPerson(person);
 			}
 		}

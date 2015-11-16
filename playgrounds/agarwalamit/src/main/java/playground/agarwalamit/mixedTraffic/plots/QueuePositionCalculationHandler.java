@@ -198,16 +198,4 @@ public class QueuePositionCalculationHandler implements LinkLeaveEventHandler, L
 		}
 		this.lastEventTimeStep=currentTimeStep;
 	}
-
-//	private double getCellSize(String travelMode){
-//		double effCellSize =7.5;
-//		if(travelMode.equals("cars") || travelMode.equals("fast")) {
-//			effCellSize= 7.5;
-//		} else if(travelMode.equals("motorbikes") || travelMode.equals("med")) {
-//			effCellSize = 7.5/4;
-//		} else if(travelMode.equals("bicycles") || travelMode.equals("truck") ){
-//			effCellSize= 7.5/4;
-//		}
-//		return effCellSize;
-//	}
 }

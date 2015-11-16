@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package playground.johannes.studies.mz2005.io;
 
-import gnu.trove.TObjectIntHashMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
 import org.apache.log4j.Logger;
 
 import java.io.BufferedReader;

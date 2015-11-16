@@ -19,7 +19,7 @@
 
 package playground.johannes.gsv.synPop.sim3;
 
-import gnu.trove.TDoubleDoubleHashMap;
+import gnu.trove.map.hash.TDoubleDoubleHashMap;
 import org.matsim.contrib.common.stats.Correlations;
 import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
 import org.matsim.contrib.common.stats.StatsWriter;

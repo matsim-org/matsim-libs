@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package playground.johannes.studies.mcmc;
 
-import gnu.trove.TDoubleDoubleHashMap;
+import gnu.trove.map.hash.TDoubleDoubleHashMap;
 import org.matsim.contrib.common.stats.StatsWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReader;

@@ -94,84 +94,75 @@ public class PatnaPlansGenerator {
 		ShapeFileReader reader = new ShapeFileReader();
 		return reader.readFileAndInitialize(this.zoneFile);
 	}
-	
+
 	private void filesReader (String planFile, int startId) {
 		Iterator<SimpleFeature> iterator = features.iterator();
-		
-		BufferedReader bufferedReader ;
+
 		String line;
-		try {
-			bufferedReader = new BufferedReader(new FileReader(planFile));
+		try (BufferedReader bufferedReader = new BufferedReader(new FileReader(planFile)) ) {
 			line = bufferedReader.readLine();
-		} catch (Exception e) {
-			throw new RuntimeException("File is not read. Reason : "+e);
-		}
 
-		while ((line)!= null ) {
+			while ((line)!= null ) {
+				String[] parts = line.split(",");
+				String fromZoneId = parts [5];
+				String toZoneId = parts [6]; 
+				String tripPurpose = parts [7];
 
-			String[] parts = line.split(",");
-			String fromZoneId = parts [5];
-			String toZoneId = parts [6]; 
-			String tripPurpose = parts [7];
+				Coord homeZoneCoordTransform = null ;
+				Coord workZoneCoordTransform = null ;
+				Point p=null, q = null;
 
-			Coord homeZoneCoordTransform = null ;
-			Coord workZoneCoordTransform = null ;
-			Point p=null, q = null;
-			Random random = new Random ();
+				Population population = scenario.getPopulation();
+				PopulationFactory factory = population.getFactory();
 
-			Population population = scenario.getPopulation();
-			PopulationFactory factory = population.getFactory();
+				toZoneId = getCorrectZoneNumber(toZoneId);
 
-			toZoneId = getCorrectZoneNumber(toZoneId);
+				if (! fromZoneId.equals(toZoneId))	{														
+					while (iterator.hasNext()){
+						SimpleFeature feature = iterator.next();
+						int Id = (Integer) feature.getAttribute("ID1");
+						String zoneId  = String.valueOf(Id);
 
-			if (! fromZoneId.equals(toZoneId))	{														
-				while (iterator.hasNext()){
-					SimpleFeature feature = iterator.next();
-					int Id = (Integer) feature.getAttribute("ID1");
-					String zoneId  = String.valueOf(Id);
+						if(fromZoneId.equals(zoneId) ) {
+							p = getRandomPointsFromWard(feature, random);
+							Coord fromZoneCoord = new Coord(p.getX(), p.getY());
+							homeZoneCoordTransform = PatnaConstants.COORDINATE_TRANSFORMATION.transform(fromZoneCoord);
+						}
+						else if (toZoneId.equals(zoneId)){
+							q = getRandomPointsFromWard(feature, random);
+							Coord toZoneCoord = new Coord(q.getX(), q.getY());
+							workZoneCoordTransform= PatnaConstants.COORDINATE_TRANSFORMATION.transform(toZoneCoord);
+						}
+					}
+				} else if (fromZoneId.equals(toZoneId)) {
+					// intraZonal trips
+					while (iterator.hasNext()){
 
-					if(fromZoneId.equals(zoneId) ) {
+						SimpleFeature feature = iterator.next();
+
 						p = getRandomPointsFromWard(feature, random);
 						Coord fromZoneCoord = new Coord(p.getX(), p.getY());
 						homeZoneCoordTransform = PatnaConstants.COORDINATE_TRANSFORMATION.transform(fromZoneCoord);
-					}
-					else if (toZoneId.equals(zoneId)){
+
 						q = getRandomPointsFromWard(feature, random);
 						Coord toZoneCoord = new Coord(q.getX(), q.getY());
 						workZoneCoordTransform= PatnaConstants.COORDINATE_TRANSFORMATION.transform(toZoneCoord);
 					}
 				}
-			} else if (fromZoneId.equals(toZoneId)) {
-				// intraZonal trips
-				while (iterator.hasNext()){
 
-					SimpleFeature feature = iterator.next();
+				Person person = factory.createPerson(Id.create(Integer.toString(startId++),Person.class));
+				population.addPerson(person);
 
-					p = getRandomPointsFromWard(feature, random);
-					Coord fromZoneCoord = new Coord(p.getX(), p.getY());
-					homeZoneCoordTransform = PatnaConstants.COORDINATE_TRANSFORMATION.transform(fromZoneCoord);
+				String travelMode = getTravelMode(parts [8]);
 
-					q = getRandomPointsFromWard(feature, random);
-					Coord toZoneCoord = new Coord(q.getX(), q.getY());
-					workZoneCoordTransform= PatnaConstants.COORDINATE_TRANSFORMATION.transform(toZoneCoord);
-				}
-			}
-			
-			Person person = factory.createPerson(Id.create(Integer.toString(startId++),Person.class));
-			population.addPerson(person);
+				Plan plan = createPlan( workZoneCoordTransform, homeZoneCoordTransform, travelMode, tripPurpose);
+				person.addPlan(plan);
 
-			String travelMode = getTravelMode(parts [8]);
-
-			Plan plan = createPlan( workZoneCoordTransform, homeZoneCoordTransform, travelMode, tripPurpose);
-			person.addPlan(plan);
-
-			try {
 				line = bufferedReader.readLine();
-			} catch (IOException e) {
-				throw new RuntimeException("File is not read. Reason : "+e);
+				iterator = features.iterator();
 			}
-
-			iterator = features.iterator();
+		} catch (IOException e) {
+			throw new RuntimeException("File is not read. Reason : "+e);
 		}
 	}
 
@@ -234,31 +225,31 @@ public class PatnaPlansGenerator {
 			secondActEndTimeLeaveTime = homeActEndTime + 8*3600.; 
 			secondActType = PatnaActivityTypes.valueOf("work").toString();
 			break; 
-			}  
+		}  
 		case "2" : { // educational act starts between between 6:30 to 8:30 hours and duration is assumed about 7 hours
 			homeActEndTime = 6.5*3600. + random.nextInt(121)*60.; 
 			secondActEndTimeLeaveTime = homeActEndTime + 7*3600.;
 			secondActType = PatnaActivityTypes.valueOf("educational").toString();
 			break;
-			}  
+		}  
 		case "3" : {// social duration between 5 to 7 hours
 			homeActEndTime= 10.*3600. ; 
 			secondActEndTimeLeaveTime = homeActEndTime+ 5.*3600. + random.nextInt(121)*60.; 
 			secondActType = PatnaActivityTypes.valueOf("social").toString();
 			break;
-			}  
+		}  
 		case "4" : { // other act duration between 5 to 7 hours
 			homeActEndTime = 8.*3600 ; 
 			secondActEndTimeLeaveTime= homeActEndTime + 5.*3600. + random.nextInt(121)*60.; 
 			secondActType = PatnaActivityTypes.valueOf("other").toString();
 			break;
-			} 
+		} 
 		case "9999" : { // no data
 			homeActEndTime = 8.*3600. + random.nextInt(121)*60.; 
 			secondActEndTimeLeaveTime= homeActEndTime + 7*3600.; 
 			secondActType = PatnaActivityTypes.valueOf("unknown").toString();
 			break;
-			} 
+		} 
 		}
 
 
