@@ -112,7 +112,7 @@ public abstract class DijkstraEngine {
 			}
 		}
 
-		reachable.remove(reachable.indexOf(source));
+		reachable.removeAt(reachable.indexOf(source));
 
 		return reachable;
 	}
