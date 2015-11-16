@@ -43,7 +43,7 @@ public class CongestionTollTimeDistanceTravelDisutility implements TravelDisutil
 	 * 0.0 and 1.0 are valid. 0.0 means the old value will be kept, 1.0 means
 	 * the old value will be totally overwritten.
 	 */
-	private final double blendFactor = 1.0;
+	private final double blendFactor = 0.1;
 	
 	public CongestionTollTimeDistanceTravelDisutility(TravelDisutility randomizedTimeDistanceTravelDisutility,
 			TollHandler tollHandler,
