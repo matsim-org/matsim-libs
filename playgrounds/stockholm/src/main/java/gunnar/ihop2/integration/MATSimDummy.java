@@ -3,6 +3,8 @@ package gunnar.ihop2.integration;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Random;
 import java.util.logging.FileHandler;
 import java.util.logging.Handler;
@@ -12,6 +14,8 @@ import java.util.logging.Logger;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutility;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
@@ -21,8 +25,11 @@ import floetteroed.utilities.SimpleLogFormatter;
 import floetteroed.utilities.Time;
 import floetteroed.utilities.config.Config;
 import floetteroed.utilities.config.ConfigReader;
-import gunnar.ihop2.regent.costwriting.TourTravelTimes;
-import gunnar.ihop2.regent.costwriting.TravelTimeMatrices;
+import gunnar.ihop2.regent.costwriting.HalfTourCostMatrices;
+import gunnar.ihop2.regent.costwriting.LinkTollCostInCrownes;
+import gunnar.ihop2.regent.costwriting.LinkTravelDistanceInKilometers;
+import gunnar.ihop2.regent.costwriting.LinkTravelTimeInMinutes;
+import gunnar.ihop2.regent.costwriting.TripCostMatrices;
 import gunnar.ihop2.regent.demandreading.PopulationCreator;
 import gunnar.ihop2.regent.demandreading.ZonalSystem;
 import gunnar.ihop2.scaper.ScaperPopulationCreator;
@@ -58,6 +65,10 @@ public class MATSimDummy {
 
 	public static final String TRAVELTIME_MATRIX_FILENAME_ELEMENT = "traveltimes";
 
+	public static final String DISTANCE_MATRIX_FILENAME_ELEMENT = "distances";
+
+	public static final String TOLL_MATRIX_FILENAME_ELEMENT = "tolls";
+
 	public static final String REGENT_FOLDER_ELEMENT = "regentfolder";
 
 	public static final String REGENT_COMMAND_ELEMENT = "regentcommand";
@@ -75,6 +86,12 @@ public class MATSimDummy {
 	public static final String ANALYSIS_BINCOUNT_ELEMENT = "analysisbincount";
 
 	public static final String NODESAMPLE_SIZE_ELEMENT = "nodesamplesize";
+
+	public static final String TRAVELTIME_COSTTYPE = "traveltimes";
+
+	public static final String DISTANCE_COSTTYPE = "distance";
+
+	public static final String TOLL_COSTTYPE = "toll";
 
 	public static void fatal(final String msg) {
 		Logger.getLogger(MATSimDummy.class.getName()).severe(
@@ -235,6 +252,18 @@ public class MATSimDummy {
 				TRAVELTIME_MATRIX_FILENAME_ELEMENT + " = "
 						+ traveltimesFileName);
 
+		final String distancesFileName = config.get(IHOP2_ELEMENT,
+				DISTANCE_MATRIX_FILENAME_ELEMENT);
+		checkNonNull(distancesFileName, "distances file name");
+		Logger.getLogger(MATSimDummy.class.getName()).info(
+				DISTANCE_MATRIX_FILENAME_ELEMENT + " = " + distancesFileName);
+
+		final String tollsFileName = config.get(IHOP2_ELEMENT,
+				TOLL_MATRIX_FILENAME_ELEMENT);
+		checkNonNull(tollsFileName, "toll file name");
+		Logger.getLogger(MATSimDummy.class.getName()).info(
+				TOLL_MATRIX_FILENAME_ELEMENT + " = " + tollsFileName);
+
 		final String regentFolder = config.get(IHOP2_ELEMENT,
 				REGENT_FOLDER_ELEMENT);
 		checkNonNull(regentFolder, "regent folder file name");
@@ -257,18 +286,6 @@ public class MATSimDummy {
 		}
 		Logger.getLogger(MATSimDummy.class.getName()).info(
 				ITERATIONS_ELEMENT + " = " + maxIterations);
-
-		// final List<String> zoneIDs = config
-		// .getList(IHOP2_ELEMENT, ZONE_ELEMENT);
-		// if (zoneIDs == null) {
-		// fatal("could not read the " + ZONE_ELEMENT + " XML element.");
-		// System.exit(-1);
-		// } else if (zoneIDs.size() == 0) {
-		// fatal("there are no zones defined in the xml file.");
-		// }
-		// Collections.sort(zoneIDs, new StringAsIntegerComparator());
-		// Logger.getLogger(MATSimDummy.class.getName()).info(
-		// "Number of relevant zones: " + zoneIDs.size());
 
 		final String randomSeedStr = config.get(IHOP2_ELEMENT,
 				RANDOMSEED_ELEMENT);
@@ -418,13 +435,22 @@ public class MATSimDummy {
 
 			final Controler controler = new Controler(matsimConfig);
 
+			final double networkUpscaleFactor = 2.0;
+			Logger.getLogger(MATSimDummy.class.getName())
+					.info("scaling up the network by "
+							+ networkUpscaleFactor
+							+ " to account for link removals during "
+							+ "Transmodeler -> MATSim network conversion");
+
 			matsimConfig.getModule("qsim").addParam(
 					"flowCapacityFactor",
-					Double.toString(regentPopulationSample
+					Double.toString(networkUpscaleFactor
+							* regentPopulationSample
 							* matsimPopulationSubSample));
 			matsimConfig.getModule("qsim").addParam(
 					"storageCapacityFactor",
-					Double.toString(regentPopulationSample
+					Double.toString(networkUpscaleFactor
+							* regentPopulationSample
 							* matsimPopulationSubSample));
 			matsimConfig.planCalcScore().setWriteExperiencedPlans(true);
 			matsimConfig.getModule("controler").addParam("overwriteFiles",
@@ -452,30 +478,49 @@ public class MATSimDummy {
 			zonalSystem.addNetwork(controler.getScenario().getNetwork(),
 					StockholmTransformationFactory.WGS84_SWEREF99);
 
-			final TravelTimeMatrices travelTimeMatrices = new TravelTimeMatrices(
-					controler.getScenario().getNetwork(),
-					controler.getLinkTravelTimes(), zonalSystem, rnd,
+			final Map<String, TravelDisutility> costType2travelDisutility = new LinkedHashMap<>();
+			costType2travelDisutility
+					.put(TRAVELTIME_COSTTYPE, new LinkTravelTimeInMinutes(
+							controler.getLinkTravelTimes()));
+			costType2travelDisutility.put(DISTANCE_COSTTYPE,
+					new LinkTravelDistanceInKilometers());
+			costType2travelDisutility.put(TOLL_COSTTYPE,
+					new LinkTollCostInCrownes());
+
+			final TripCostMatrices tripCostMatrices = new TripCostMatrices(
+					controler.getLinkTravelTimes(),
+					new OnlyTimeDependentTravelDisutility(controler
+							.getLinkTravelTimes()), controler.getScenario()
+							.getNetwork(), zonalSystem,
 					analysisStartTime_s, analysisBinSize_s, analysisBinCnt,
-					nodeSampleSize);
+					rnd, nodeSampleSize, costType2travelDisutility);
+			tripCostMatrices.writeSummaryToFile("./travel-cost-statistics."
+					+ iteration + ".txt");
 
 			if (DEMANDMODEL.regent.equals(demandModel)) {
 
 				Logger.getLogger(MATSimDummy.class.getName()).info(
 						"Computing tour travel times ...");
 
-				// TODO make sure the population uses the experienced travel
-				// times.
-				final TourTravelTimes tourTravelTimes = new TourTravelTimes(
-						controler.getScenario(), travelTimeMatrices);
-				tourTravelTimes.writeTourTravelTimesToFile(traveltimesFileName);
-				// TODO new, writing a new file per (outer) iteration
+				final Map<String, String> costType2tourCostFileName = new LinkedHashMap<>();
+				costType2tourCostFileName.put(TRAVELTIME_COSTTYPE,
+						traveltimesFileName);
+				costType2tourCostFileName.put(DISTANCE_COSTTYPE,
+						distancesFileName);
+				costType2tourCostFileName.put(TOLL_COSTTYPE, tollsFileName);
+
+				// TODO ensure the population uses the experienced travel times.
+				final HalfTourCostMatrices tourTravelTimes = new HalfTourCostMatrices(
+						controler.getScenario(), tripCostMatrices);
+				tourTravelTimes
+						.writeHalfTourTravelTimesToFiles(costType2tourCostFileName);
 				tourTravelTimes
 						.writeHistogramsToFile("./departure-time-histograms."
 								+ iteration + ".txt");
 
 			} else if (DEMANDMODEL.scaper.equals(demandModel)) {
 
-				travelTimeMatrices.writeToScaperFiles(traveltimesFileName);
+				tripCostMatrices.writeToScaperFiles(traveltimesFileName);
 
 			}
 
@@ -516,7 +561,12 @@ public class MATSimDummy {
 
 		Logger.getLogger(MATSimDummy.class.getName()).info(
 				"Creating folder with summary data.");
-		SummaryCreator.run(maxIterations);
+		try {
+			SummaryCreator.run(maxIterations);
+		} catch (Exception e) {
+			Logger.getLogger(MATSimDummy.class.getName()).severe(
+					"failed to write summary data: " + e.getMessage());
+		}
 
 		Logger.getLogger(MATSimDummy.class.getName()).info("DONE");
 	}

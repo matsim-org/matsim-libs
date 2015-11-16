@@ -98,6 +98,14 @@ public class Transmodeler2MATSimNetwork {
 
 	// -------------------- CONSTRUCTION --------------------
 
+	private double totalNetworkArea(final Network network) {
+		double result = 0;
+		for (Link link : network.getLinks().values()) {
+			result += link.getLength() * link.getNumberOfLanes();
+		}
+		return result;
+	}
+
 	public Transmodeler2MATSimNetwork(final String tmNodesFileName,
 			final String tmLinksFileName, final String tmSegmentsFileName,
 			final String tmLanesFileName,
@@ -253,6 +261,8 @@ public class Transmodeler2MATSimNetwork {
 				+ matsimNetwork.getLinks().size());
 		System.out.println("Unknown (and ignored) link types: "
 				+ unknownLinkTypes);
+		System.out.println("Total network area (link lengths times lanes): "
+				+ totalNetworkArea(matsimNetwork));
 		System.out
 				.println("------------------------------------------------------------");
 		System.out.println();
@@ -273,6 +283,8 @@ public class Transmodeler2MATSimNetwork {
 				+ matsimNetwork.getNodes().size());
 		System.out.println("Number of links: "
 				+ matsimNetwork.getLinks().size());
+		System.out.println("Total network area (link lengths times lanes): "
+				+ totalNetworkArea(matsimNetwork));
 		System.out
 				.println("------------------------------------------------------------");
 		System.out.println();
@@ -365,6 +377,8 @@ public class Transmodeler2MATSimNetwork {
 				+ matsimNetwork.getNodes().size());
 		System.out.println("Number of links: "
 				+ matsimNetwork.getLinks().size());
+		System.out.println("Total network area (link lengths times lanes): "
+				+ totalNetworkArea(matsimNetwork));
 		System.out
 				.println("------------------------------------------------------------");
 		System.out.println();
