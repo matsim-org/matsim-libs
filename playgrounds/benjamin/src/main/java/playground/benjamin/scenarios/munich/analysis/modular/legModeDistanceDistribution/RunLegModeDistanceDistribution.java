@@ -56,7 +56,7 @@ public class RunLegModeDistanceDistribution {
 		this.userGroup = userGroup;
 	}
 	
-	void run() {
+	public void run() {
 		Scenario scenario = loadScenario();
 		this.analysis = new DefaultAnalysis(scenario, baseFolder, this.iterationOutputDir, null, null);
 		this.analysis.init(null);
@@ -110,7 +110,7 @@ public class RunLegModeDistanceDistribution {
 		return relevantScenario;
 	}
 
-	protected DefaultAnalysis getAnalysis() {
+	public DefaultAnalysis getAnalysis() {
 		return this.analysis;
 	}
 }

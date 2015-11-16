@@ -52,6 +52,7 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.pt.PtConstants;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 import org.opengis.feature.simple.SimpleFeature;
@@ -394,7 +395,7 @@ public class CSVToPlans {
 						anterior.setEndTime(viaje.getStartTime());
 					} else{
 						anterior = (Activity) planElements.getLast();
-						if(!anterior.getType().equals("pt interaction")){
+						if(!anterior.getType().equals(PtConstants.TRANSIT_ACTIVITY_TYPE)){
 							double endTime = viaje.getStartTime();
 							anterior.setEndTime(endTime);
 						}
@@ -410,7 +411,7 @@ public class CSVToPlans {
 						posterior.setStartTime(startTime);
 						lastActivity = posterior;
 					} else{
-						posterior = popFactory.createActivityFromCoord("pt interaction", destination);
+						posterior = popFactory.createActivityFromCoord(PtConstants.TRANSIT_ACTIVITY_TYPE, destination);
 						posterior.setMaximumDuration(0.);
 					}
 					String legMode = this.getLegMode(Integer.valueOf(etapa.getMode()));

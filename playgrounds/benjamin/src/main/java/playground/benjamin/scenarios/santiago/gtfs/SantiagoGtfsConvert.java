@@ -78,11 +78,14 @@ public class SantiagoGtfsConvert {
 		// Ugly hack to map transit schedule to the network to be merged later on...
 //		Network net = scenario.getNetwork();
 //		addPrefixToLinkIds(ts, net);
+		
 		// Routes seem to have problems; thus, deleting them...
 		removeNetworkRoutes(ts);
+		
 		// There are (most likely) wrongly coded departures at midnight; thus, deleting them...
 		// TODO: does not work because of immutable list. Is there a work-around?
 //		removeMidnightDepartures(ts);
+		
 		Network transitNet = NetworkUtils.createNetwork();
 		CreatePseudoNetwork creator = new CreatePseudoNetwork(ts, transitNet, TransportMode.pt);
 		creator.createNetwork();
