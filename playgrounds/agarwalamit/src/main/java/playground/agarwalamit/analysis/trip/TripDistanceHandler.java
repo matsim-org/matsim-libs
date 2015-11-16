@@ -111,9 +111,6 @@ implements PersonDepartureEventHandler, PersonArrivalEventHandler, LinkLeaveEven
 		// following is required because, sometimes agent depart and arrive on the same link, therefore, for such trips, distance =0.
 		int totalTrips = timeBin2Person2TripsCount.get(time).get(personId);
 		int distancesStored ;
-		if(personId.toString().equals("gv_5035")){
-			System.out.println("problem.");
-		}
 		if (timeBin2Person2TripsDistance.get(time).containsKey(personId)) {
 			distancesStored = timeBin2Person2TripsDistance.get(time).get(personId).size();
 		} else distancesStored = 0;

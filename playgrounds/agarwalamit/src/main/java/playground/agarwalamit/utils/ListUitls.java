@@ -62,6 +62,6 @@ public class ListUitls {
 				outList.add( list1.get(ii)/list2.get(ii) );
 			}
 		}
-		return null;
+		return outList;
 	}
 }
