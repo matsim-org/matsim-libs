@@ -42,7 +42,7 @@ import org.matsim.core.utils.io.IOUtils;
 import playground.agarwalamit.analysis.trip.TripDistanceHandler;
 import playground.agarwalamit.analysis.trip.TripTollHandler;
 import playground.agarwalamit.munich.utils.ExtendedPersonFilter;
-import playground.agarwalamit.utils.ListUitls;
+import playground.agarwalamit.utils.ListUtils;
 import playground.agarwalamit.utils.LoadMyScenarios;
 import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 
@@ -135,7 +135,7 @@ public class PeakHourTripTollPerKmAnalyzer {
 		//first store peak hour data
 		for (Id<Person> personId : this.person2TollsPerKm_pkHr.keySet()) {
 			String ug = pf.getMyUserGroupFromPersonId(personId);
-			double tollInMeter = ListUitls.doubleSum(this.person2TollsPerKm_pkHr.get(personId));
+			double tollInMeter = ListUtils.doubleSum(this.person2TollsPerKm_pkHr.get(personId));
 			double pkTollInKm = usrGrp2TollsPerKm.get(ug).getFirst() + 1000*tollInMeter;
 			int pkTripCount = usrGrp2TripCounts.get(ug).getFirst() + this.person2TripCounts_pkHr.get(personId);
 			usrGrp2TollsPerKm.put(ug, new Tuple<Double, Double>(pkTollInKm, 0.));
@@ -145,7 +145,7 @@ public class PeakHourTripTollPerKmAnalyzer {
 		//now store off-peak hour data
 		for (Id<Person> personId : this.person2TollsPerKm_offPkHr.keySet()) {
 			String ug = pf.getMyUserGroupFromPersonId(personId);
-			double tollInMeter = ListUitls.doubleSum(this.person2TollsPerKm_offPkHr.get(personId));
+			double tollInMeter = ListUtils.doubleSum(this.person2TollsPerKm_offPkHr.get(personId));
 			double offpkToll = usrGrp2TollsPerKm.get(ug).getSecond() + 1000*tollInMeter;
 			int offpkTripCount = usrGrp2TripCounts.get(ug).getSecond() + this.person2TripCounts_offPkHr.get(personId);
 			usrGrp2TollsPerKm.put(ug, new Tuple<Double, Double>(usrGrp2TollsPerKm.get(ug).getFirst(), offpkToll));
@@ -165,7 +165,7 @@ public class PeakHourTripTollPerKmAnalyzer {
 				if(pkHrs.contains(d)) {
 					if (person2TollsPerKm_pkHr.containsKey(person) ) {
 						List<Double> existing_tollsPerMeter = person2TollsPerKm_pkHr.get(person);
-						List<Double> additional_tollsPerMeter = ListUitls.divide(timebin2person2tripTolls.get(d).get(person), timebin2person2tripDists.get(d).get(person));
+						List<Double> additional_tollsPerMeter = ListUtils.divide(timebin2person2tripTolls.get(d).get(person), timebin2person2tripDists.get(d).get(person));
 						existing_tollsPerMeter.addAll(additional_tollsPerMeter);
 						if(! (timebin2person2tripCounts.get(d).get(person)).equals(timebin2person2tripDistCounts.get(d).get(person)) ) {
 							throw new RuntimeException("Trip count should be equal in both lists. Aborting ...");
@@ -174,7 +174,7 @@ public class PeakHourTripTollPerKmAnalyzer {
 					} else {
 						List<Double> tolls =  timebin2person2tripTolls.get(d).get(person);
 						List<Double> dists = timebin2person2tripDists.get(d).get(person);
-						List<Double> tollsPerMeter = ListUitls.divide(tolls, dists); 
+						List<Double> tollsPerMeter = ListUtils.divide(tolls, dists); 
 						person2TollsPerKm_pkHr.put(person, tollsPerMeter);
 						// just a check
 						if(! (timebin2person2tripCounts.get(d).get(person)).equals(timebin2person2tripDistCounts.get(d).get(person)) ) {
@@ -185,7 +185,7 @@ public class PeakHourTripTollPerKmAnalyzer {
 				} else {
 					if (person2TollsPerKm_offPkHr.containsKey(person) ) {
 						List<Double> existing_tollsPerMeter = person2TollsPerKm_offPkHr.get(person);
-						List<Double> additional_tollsPerMeter = ListUitls.divide(timebin2person2tripTolls.get(d).get(person), timebin2person2tripDists.get(d).get(person));
+						List<Double> additional_tollsPerMeter = ListUtils.divide(timebin2person2tripTolls.get(d).get(person), timebin2person2tripDists.get(d).get(person));
 						if(additional_tollsPerMeter==null){
 							System.out.println("problem.");
 						}
@@ -197,7 +197,7 @@ public class PeakHourTripTollPerKmAnalyzer {
 					} else {
 						List<Double> tolls =  timebin2person2tripTolls.get(d).get(person);
 						List<Double> dists = timebin2person2tripDists.get(d).get(person);
-						List<Double> tollsPerMeter = ListUitls.divide(tolls, dists); 
+						List<Double> tollsPerMeter = ListUtils.divide(tolls, dists); 
 						person2TollsPerKm_offPkHr.put(person,  tollsPerMeter);
 						if(! (timebin2person2tripCounts.get(d).get(person)).equals(timebin2person2tripDistCounts.get(d).get(person)) ) {
 							throw new RuntimeException("Trip count should be equal in both lists. Aborting ...");

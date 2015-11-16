@@ -39,7 +39,7 @@ import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.analysis.trip.TripTollHandler;
 import playground.agarwalamit.munich.utils.ExtendedPersonFilter;
-import playground.agarwalamit.utils.ListUitls;
+import playground.agarwalamit.utils.ListUtils;
 import playground.agarwalamit.utils.LoadMyScenarios;
 import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 
@@ -143,7 +143,7 @@ public class PeakHourTripTollAnalyzer {
 		//first store peak hour data
 		for (Id<Person> personId : this.person2Tolls_pkHr.keySet()) {
 			String ug = pf.getMyUserGroupFromPersonId(personId);
-			double pkToll = usrGrp2Tolls.get(ug).getFirst() + ListUitls.doubleSum(this.person2Tolls_pkHr.get(personId));
+			double pkToll = usrGrp2Tolls.get(ug).getFirst() + ListUtils.doubleSum(this.person2Tolls_pkHr.get(personId));
 			int pkTripCount = usrGrp2TripCounts.get(ug).getFirst() + this.person2TripCounts_pkHr.get(personId);
 			usrGrp2Tolls.put(ug, new Tuple<Double, Double>(pkToll, 0.));
 			usrGrp2TripCounts.put(ug, new Tuple<Integer,Integer>(pkTripCount,0) );
@@ -152,7 +152,7 @@ public class PeakHourTripTollAnalyzer {
 		//now store off-peak hour data
 		for (Id<Person> personId : this.person2Tolls_offPkHr.keySet()) {
 			String ug = pf.getMyUserGroupFromPersonId(personId);
-			double offpkToll = usrGrp2Tolls.get(ug).getSecond() + ListUitls.doubleSum(this.person2Tolls_offPkHr.get(personId));
+			double offpkToll = usrGrp2Tolls.get(ug).getSecond() + ListUtils.doubleSum(this.person2Tolls_offPkHr.get(personId));
 			int offpkTripCount = usrGrp2TripCounts.get(ug).getSecond() + this.person2TripCounts_offPkHr.get(personId);
 			usrGrp2Tolls.put(ug, new Tuple<Double, Double>(usrGrp2Tolls.get(ug).getFirst(), offpkToll));
 			usrGrp2TripCounts.put(ug, new Tuple<Integer,Integer>(usrGrp2TripCounts.get(ug).getFirst(),offpkTripCount) );

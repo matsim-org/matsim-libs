@@ -25,7 +25,7 @@ import java.util.List;
  * @author amit
  */
 
-public class ListUitls {
+public class ListUtils {
 
 	public static int intSum(List<Integer> intList){
 		if(intList==null)	return 0;
