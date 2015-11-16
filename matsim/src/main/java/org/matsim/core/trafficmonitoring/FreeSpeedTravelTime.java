@@ -33,8 +33,7 @@ public class FreeSpeedTravelTime implements TravelTime {
 
 	@Override
 	public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
-		double speed = Math.min( vehicle.getType().getMaximumVelocity(), link.getFreespeed(time) );
-		return link.getLength() / speed;
+		return link.getLength() / link.getFreespeed(time);
 	}
 
 }
