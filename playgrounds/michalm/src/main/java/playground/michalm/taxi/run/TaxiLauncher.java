@@ -40,7 +40,6 @@ import playground.michalm.taxi.*;
 import playground.michalm.taxi.data.*;
 import playground.michalm.taxi.data.TaxiRequest.TaxiRequestStatus;
 import playground.michalm.taxi.optimizer.*;
-import playground.michalm.taxi.optimizer.filter.*;
 import playground.michalm.taxi.scheduler.*;
 import playground.michalm.zone.*;
 
@@ -166,11 +165,10 @@ class TaxiLauncher
                 params.vehicleDiversion, params.pickupDuration, params.dropoffDuration);
         TaxiScheduler scheduler = new TaxiScheduler(context, schedulerParams, travelTime,
                 travelDisutility);
-        FilterFactory filterFactory = new DefaultFilterFactory(scheduler,
-                params.nearestRequestsLimit, params.nearestVehiclesLimit);
 
         return new TaxiOptimizerConfiguration(context, travelTime, travelDisutility, scheduler,
-                filterFactory, params.algorithmConfig.goal, params.outputDir, zones);
+                params.nearestRequestsLimit, params.nearestVehiclesLimit,
+                params.algorithmConfig.goal, params.outputDir, zones);
     }
 
 
