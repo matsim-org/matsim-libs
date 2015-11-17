@@ -29,20 +29,19 @@ import org.matsim.contrib.common.stats.LinearDiscretizer;
 import org.matsim.contrib.common.util.ProgressLogger;
 import org.matsim.contrib.common.util.XORShiftRandom;
 import org.matsim.core.utils.io.IOUtils;
+import playground.johannes.gsv.matrices.plans2matrix.ReplaceMiscType;
 import playground.johannes.gsv.popsim.ActTypeDistanceTask;
 import playground.johannes.gsv.popsim.Histogram;
 import playground.johannes.gsv.popsim.Simulator;
 import playground.johannes.gsv.synPop.mid.PersonCloner;
 import playground.johannes.gsv.synPop.mid.Route2GeoDistance;
-import playground.johannes.gsv.synPop.sim3.ReplaceActTypes;
 import playground.johannes.gsv.zones.KeyMatrix;
-import playground.johannes.synpop.data.Person;
-import playground.johannes.synpop.data.PlainFactory;
-import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.data.*;
 import playground.johannes.synpop.data.io.XMLHandler;
 import playground.johannes.synpop.gis.Zone;
 import playground.johannes.synpop.gis.ZoneCollection;
 import playground.johannes.synpop.gis.ZoneGeoJsonIO;
+import playground.johannes.synpop.processing.EpisodeTask;
 import playground.johannes.synpop.processing.TaskRunner;
 
 import java.io.BufferedReader;
@@ -94,6 +93,7 @@ public class AdjustTypes {
         Set<? extends Person> persons = parser.getPersons();
         TaskRunner.run(new Route2GeoDistance(new Simulator.Route2GeoDistFunction()), persons);
         TaskRunner.run(new ReplaceActTypes(), persons);
+        new ReplaceMiscType().apply(persons);
         logger.info("Cloning persons...");
         Random random = new XORShiftRandom();
         persons = PersonCloner.weightedClones((Collection<PlainPerson>) persons, 2000000, random);
@@ -105,11 +105,14 @@ public class AdjustTypes {
         task.analyze(persons, null);
         Map<Double, TObjectDoubleHashMap<String>> distribution = task.getHistrograms();
 
-        List<String> untouched = new ArrayList<>();
+//        List<String> untouched = new ArrayList<>();
 
         String line = reader.readLine();
         writer.write(line);
         writer.newLine();
+
+        String DE = "DE";
+        String NUTS0_CODE = "NUTS0_CODE";
 
         logger.info("Loading file...");
         while ((line = reader.readLine()) != null) {
@@ -128,29 +131,41 @@ public class AdjustTypes {
             Zone zi = zones.get(from);
             Zone zj = zones.get(to);
 
+            boolean skipped = true;
             if (zi != null && zj != null) {
-                calculateDistance(from, to, distances, zones);
+                if (DE.equalsIgnoreCase(zi.getAttribute(NUTS0_CODE)) && DE.equalsIgnoreCase(zj.getAttribute
+                        (NUTS0_CODE))) {
+                    double d = calculateDistance(from, to, distances, zones);
+                    if (d >= 100000) {
 
-                String key = buildKey(from, to, purpose, year, mode, direction, day, season);
-                volumes.put(key, volume);
+                        String key = buildKey(from, to, purpose, year, mode, direction, day, season);
+                        volumes.put(key, volume);
 
-                String weekTypeKey = buildWeekTypeKey(from, to, purpose, year, mode, direction, season);
-                subkeys.add(weekTypeKey);
-                volumesWeekType.adjustOrPutValue(weekTypeKey, volume, volume);
+                        String weekTypeKey = buildWeekTypeKey(from, to, purpose, year, mode, direction, season);
+                        subkeys.add(weekTypeKey);
+                        volumesWeekType.adjustOrPutValue(weekTypeKey, volume, volume);
 
-                String weekKey = buildWeekKey(from, to, year, mode, direction, season);
-                volumesWeek.adjustOrPutValue(weekKey, volume, volume);
+                        String weekKey = buildWeekKey(from, to, year, mode, direction, season);
+                        volumesWeek.adjustOrPutValue(weekKey, volume, volume);
 
-                TObjectDoubleHashMap<String> fallbackDayHist = fallbackDayHists.get(purpose);
-                if (fallbackDayHist == null) {
-                    fallbackDayHist = new TObjectDoubleHashMap<>();
-                    fallbackDayHists.put(purpose, fallbackDayHist);
+                        TObjectDoubleHashMap<String> fallbackDayHist = fallbackDayHists.get(purpose);
+                        if (fallbackDayHist == null) {
+                            fallbackDayHist = new TObjectDoubleHashMap<>();
+                            fallbackDayHists.put(purpose, fallbackDayHist);
+                        }
+                        fallbackDayHist.adjustOrPutValue(day, volume, volume);
+
+                        skipped = false;
+                    }
                 }
-                fallbackDayHist.adjustOrPutValue(day, volume, volume);
-            } else {
-                untouched.add(line);
+            }
+
+            if (skipped) {
+                writer.write(line);
+                writer.newLine();
             }
         }
+
 
         for (TObjectDoubleHashMap<String> hist : fallbackDayHists.values()) {
             Histogram.normalize(hist);
@@ -215,12 +230,6 @@ public class AdjustTypes {
             ProgressLogger.step();
         }
         ProgressLogger.termiante();
-
-        logger.info("Writing untouched lines...");
-        for (String line2 : untouched) {
-            writer.write(line2);
-            writer.newLine();
-        }
 
         writer.close();
         logger.info("Done.");
@@ -346,5 +355,39 @@ public class AdjustTypes {
         builder.append(season);
 
         return builder.toString();
+    }
+
+    private static class ReplaceActTypes implements EpisodeTask {
+
+        private static Map<String, String> typeMapping;
+
+        public Map<String, String> getTypeMapping() {
+            if (typeMapping == null) {
+                typeMapping = new HashMap<>();
+//                typeMapping.put("vacations_short", ActivityTypes.VACATIONS_SHORT);
+//                typeMapping.put("vacations_long", ActivityTypes.VACATIONS_LONG);
+                typeMapping.put("visit", ActivityTypes.LEISURE);
+                typeMapping.put("culture", ActivityTypes.LEISURE);
+                typeMapping.put("gastro", ActivityTypes.LEISURE);
+//                typeMapping.put(ActivityTypes.BUSINESS, ActivityTypes.WORK);
+                typeMapping.put("private", ActivityTypes.MISC);
+                typeMapping.put("pickdrop", ActivityTypes.MISC);
+                typeMapping.put("sport", ActivityTypes.LEISURE);
+//                typeMapping.put("wecommuter", ActivityTypes.WORK);
+            }
+
+            return typeMapping;
+        }
+
+        @Override
+        public void apply(Episode plan) {
+            for (Attributable act : plan.getActivities()) {
+                String type = act.getAttribute(CommonKeys.ACTIVITY_TYPE);
+                String newType = getTypeMapping().get(type);
+                if (newType != null) {
+                    act.setAttribute(CommonKeys.ACTIVITY_TYPE, newType);
+                }
+            }
+        }
     }
 }

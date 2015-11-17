@@ -48,7 +48,7 @@ public class ActTypeDistanceTask extends AnalyzerTask {
 
     @Override
     public void analyze(Collection<? extends Person> persons, Map<String, DescriptiveStatistics> results) {
-        Map<String, Predicate<Segment>> actTypePredicates = Predicates.actTypePredicates(persons);
+        Map<String, Predicate<Segment>> actTypePredicates = Predicates.actTypePredicates(persons, true);
         ModePredicate modePredicate = new ModePredicate(CommonValues.LEG_MODE_CAR);
         LegCollector distColletor = new LegCollector(new NumericAttributeProvider(CommonKeys.LEG_GEO_DISTANCE));
 

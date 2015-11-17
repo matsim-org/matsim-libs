@@ -27,7 +27,9 @@ import playground.johannes.synpop.sim.MarkovEngineListener;
 import playground.johannes.synpop.sim.data.CachedPerson;
 
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.Collection;
+import java.util.Locale;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -43,18 +45,19 @@ public class AnalyzerListener implements MarkovEngineListener {
 
     private final FileIOContext ioContext;
 
+    private final DecimalFormat df;
+
     public AnalyzerListener(AnalyzerTask task, FileIOContext ioContext, long interval) {
         this.ioContext = ioContext;
         this.interval = interval;
         this.task = task;
-
+        df = new DecimalFormat("0E0", new DecimalFormatSymbols(Locale.US));
+        df.setMaximumFractionDigits(340);
     }
 
     @Override
     public void afterStep(Collection<CachedPerson> population, Collection<? extends Attributable> mutations, boolean accepted) {
         if (iters.get() % interval == 0) {
-            DecimalFormat df = new DecimalFormat("0");
-            df.setMaximumFractionDigits(340);
             ioContext.append(df.format(iters.get()));
             AnalyzerTaskRunner.run(population, task, ioContext);
 

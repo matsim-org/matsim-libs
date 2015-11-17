@@ -20,10 +20,7 @@
 package playground.johannes.gsv.popsim.analysis;
 
 import playground.johannes.gsv.popsim.ActTypePredicate;
-import playground.johannes.synpop.data.CommonKeys;
-import playground.johannes.synpop.data.Episode;
-import playground.johannes.synpop.data.Person;
-import playground.johannes.synpop.data.Segment;
+import playground.johannes.synpop.data.*;
 
 import java.util.*;
 
@@ -33,14 +30,24 @@ import java.util.*;
 public class Predicates {
 
     public static Map<String, Predicate<Segment>> actTypePredicates(Collection<? extends Person> persons) {
+        return actTypePredicates(persons, false);
+    }
+
+    public static Map<String, Predicate<Segment>> actTypePredicates(Collection<? extends Person> persons, boolean
+            ignoreHome) {
         Set<String> acttypes = new HashSet<>();
 
         for(Person person : persons) {
             for(Episode episode : person.getEpisodes()) {
                 for(Segment act : episode.getActivities()) {
                     String type = act.getAttribute(CommonKeys.ACTIVITY_TYPE);
-                    if(type != null)
-                        acttypes.add(type);
+                    if(type != null ) {
+                        if(ignoreHome) {
+                            if(!ActivityTypes.HOME.equalsIgnoreCase(type))
+                                acttypes.add(type);
+                        } else
+                            acttypes.add(type);
+                    }
                 }
             }
         }

@@ -24,10 +24,13 @@ import playground.johannes.gsv.popsim.CollectionUtils;
 import playground.johannes.gsv.popsim.MatrixBuilder;
 import playground.johannes.gsv.zones.KeyMatrix;
 import playground.johannes.gsv.zones.MatrixOperations;
+import playground.johannes.gsv.zones.io.KeyMatrixTxtIO;
 import playground.johannes.synpop.data.Person;
+import playground.johannes.synpop.data.Segment;
 import playground.johannes.synpop.gis.FacilityData;
 import playground.johannes.synpop.gis.ZoneCollection;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -43,15 +46,21 @@ public class MatrixAnalyzer extends AbstractAnalyzerTask<Collection<? extends Pe
 
     private MatrixBuilder matrixBuilder;
 
+    private Predicate<Segment> predicate;
+
     public MatrixAnalyzer(FacilityData facilityData, ZoneCollection zones, Map<String, KeyMatrix> refMatrices) {
         matrixBuilder = new MatrixBuilder(facilityData, zones);
         this.refMatrices = refMatrices;
         addDiscretizer(new LinearDiscretizer(0.05), "linear");
     }
 
+    public void setPredicate(Predicate<Segment> predicate) {
+        this.predicate = predicate;
+    }
+
     @Override
     public void analyze(Collection<? extends Person> persons, List<StatsContainer> containers) {
-        KeyMatrix simMatrix = matrixBuilder.build(persons, null);
+        KeyMatrix simMatrix = matrixBuilder.build(persons, predicate);
 
         double simTotal = MatrixOperations.sum(simMatrix);
 
@@ -70,6 +79,14 @@ public class MatrixAnalyzer extends AbstractAnalyzerTask<Collection<? extends Pe
             containers.add(container);
 
             writeHistograms(errors, name);
+
+            if(ioContext != null) {
+                try {
+                    KeyMatrixTxtIO.write(simMatrix, String.format("%s/matrix.txt.gz", ioContext.getPath()));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 }
