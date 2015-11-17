@@ -49,6 +49,13 @@ public class ListUtils {
 		return sum;
 	}
 	
+	public static double doubleMean(List<Double> doubleList){
+		if(doubleList==null || doubleList.isEmpty())	return 0;
+		
+		double sum = ListUtils.doubleSum(doubleList);
+		return sum/doubleList.size();
+	}
+	
 	/**
 	 * @param list1
 	 * @param list2
