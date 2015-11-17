@@ -21,6 +21,8 @@ package playground.agarwalamit.utils;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 /**
  * @author amit
  */
@@ -54,13 +56,41 @@ public class ListUtils {
 	 */
 	public static List<Double> divide(List<Double> list1, List<Double> list2) {
 		List<Double> outList = new ArrayList<>();
-		if(list1 == null || list2 == null ) throw new RuntimeException("Either of the list is null. Aborting ...");
+		if(list1 == null || list2 == null ) throw new RuntimeException("Either of the lists is null. Aborting ...");
 		else if (list1.size() != list2.size()) throw new RuntimeException("Size of the lists are not equla. Aborting ...");
 		else if (list1.isEmpty() ) return outList;
 		else {
 			for(int ii=0; ii<list1.size(); ii++){
 				outList.add( list1.get(ii)/list2.get(ii) );
 			}
+		}
+		return outList;
+	}
+	
+	/**
+	 * @param list1
+	 * @param list2
+	 * @return it will subtract all the elements of list1 by the elements of list2.
+	 */
+	public static List<Double> subtract(List<Double> list1, List<Double> list2) {
+		List<Double> outList = new ArrayList<>();
+		if(list1 == null || list2 == null ) throw new RuntimeException("Either of the lists is null. Aborting ...");
+		else if (list1.isEmpty() && list2.isEmpty() ) return outList;
+		else if (list1.size() != list2.size()) {
+			Logger.getLogger(ListUtils.class).warn("Sizes of the lists are not equal. It will still subtract.");
+			if(list1.size() > list2.size()) {
+				for(int ii = list2.size(); ii < list1.size(); ii++){
+					list2.set(ii, 0.);
+				}
+			} else {
+				for(int ii = list1.size(); ii < list1.size(); ii++){
+					list1.set(ii, 0.);
+				}
+			}
+		}
+		
+		for(int ii=0; ii<list1.size(); ii++){
+			outList.add( list1.get(ii) - list2.get(ii) );
 		}
 		return outList;
 	}
