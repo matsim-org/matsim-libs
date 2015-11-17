@@ -16,33 +16,23 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.utils;
+package playground.agarwalamit.mixedTraffic.patnaIndia;
 
-import java.util.List;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.router.util.TravelTime;
+import org.matsim.vehicles.Vehicle;
+
+import playground.agarwalamit.mixedTraffic.MixedTrafficVehiclesUtils;
 
 /**
  * @author amit
  */
 
-public class ListUitls {
+public class FreeSpeedTravelTimeForBike implements TravelTime {
 
-	public static int intSum(List<Integer> intList){
-		if(intList==null)	return 0;
-
-		int sum = 0;
-		for(Integer i: intList) {
-			sum = sum+i;
+		@Override
+		public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
+			return link.getLength() / Math.min( MixedTrafficVehiclesUtils.getSpeed("bike"), link.getFreespeed(time) );
 		}
-		return sum;
-	}
-	
-	public static double doubleSum(List<Double> doubleList){
-		if(doubleList==null)	return 0;
-
-		double sum = 0;
-		for(Double i: doubleList) {
-			sum = sum+i;
-		}
-		return sum;
-	}
 }

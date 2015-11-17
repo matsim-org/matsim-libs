@@ -88,6 +88,7 @@ public class SantiagoScenarioRunner {
 		if(doModeChoice) setModeChoiceForSubpopulations(controler);
 		
 		// mapping agents' activities to links on the road network to avoid being stuck on the transit network
+		// TODO: this maps many people to the same location, not so nice for visualization; also some other information (access/egress) might be lost.
 		mapActivities2properLinks(scenario);
 		
 		controler.run();

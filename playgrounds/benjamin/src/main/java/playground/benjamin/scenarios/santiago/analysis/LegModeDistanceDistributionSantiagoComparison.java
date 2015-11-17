@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin.scenarios.munich.analysis.modular.legModeDistanceDistribution;
+package playground.benjamin.scenarios.santiago.analysis;
 
 import java.util.List;
 import java.util.Map;
@@ -29,6 +29,7 @@ import org.apache.log4j.Logger;
 import org.matsim.core.gbl.Gbl;
 
 import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
+import playground.benjamin.scenarios.munich.analysis.modular.legModeDistanceDistribution.RunLegModeDistanceDistribution;
 import playground.vsp.analysis.modules.AbstractAnalysisModule;
 import playground.vsp.analysis.modules.legModeDistanceDistribution.LegModeDistanceDistribution;
 
@@ -36,8 +37,8 @@ import playground.vsp.analysis.modules.legModeDistanceDistribution.LegModeDistan
  * @author benjamin
  *
  */
-public class RunLegModeDistanceDistributionComparison {
-	private final static Logger logger = Logger.getLogger(RunLegModeDistanceDistributionComparison.class);
+public class LegModeDistanceDistributionSantiagoComparison {
+	private final static Logger logger = Logger.getLogger(LegModeDistanceDistributionSantiagoComparison.class);
 	
 //	static String baseFolder1 = "../../../runs-svn/detEval/mobilTUM/run20/";
 	static String baseFolder1 = "../../../runs-svn/santiago/run32/output/";
@@ -47,11 +48,10 @@ public class RunLegModeDistanceDistributionComparison {
 	// ===
 	static String baseFolder2 = baseFolder1;
 	static String configFile2 = configFile1;
-//	static String iteration2 = "200";
-	static String iteration2 = "50";
+	static String iteration2 = "100";
 	
+	//TODO: find some good solution here
 	static UserGroup userGroup = null;
-//	static UserGroup userGroup = UserGroup.URBAN;
 	
 	public static void main(String[] args) {
 		Gbl.startMeasurement();

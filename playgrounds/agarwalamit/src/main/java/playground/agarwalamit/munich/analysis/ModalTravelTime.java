@@ -32,7 +32,7 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.analysis.legMode.distributions.LegModeTravelTimeHandler;
-import playground.agarwalamit.utils.ListUitls;
+import playground.agarwalamit.utils.ListUtils;
 
 /**
  * @author amit
@@ -71,7 +71,7 @@ public class ModalTravelTime {
 			int modeLegs = 0;
 			for(Id<Person> p : mode2Person2TripTimes.get(mode).keySet()){
 				modeLegs += mode2Person2TripTimes.get(mode).get(p).size();
-				modeSum = ListUitls.doubleSum(mode2Person2TripTimes.get(mode).get(p));
+				modeSum = ListUtils.doubleSum(mode2Person2TripTimes.get(mode).get(p));
 			}
 			mode2TotalTripTimes.put(mode, modeSum);
 			mode2NoOfLegs.put(mode, modeLegs);

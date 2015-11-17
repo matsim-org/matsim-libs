@@ -28,6 +28,7 @@ import java.util.SortedMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -36,7 +37,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.ikaddoura.analysis.detailedPersonTripAnalysis.handler.BasicPersonTripAnalysisHandler;
@@ -81,8 +81,8 @@ public class PersonTripAnalysisMain {
 			
 		} else {
 			
-			String id = "cn1";
-			String baiscDirectoryPath = "/Users/ihab/Documents/workspace/runs-svn/cn2/output/";
+			String id = "cn4";
+			String baiscDirectoryPath = "../../../runs-svn/cn2/500iterations/output/";
 						
 			runDirectory = baiscDirectoryPath + id + "/";
 			log.info("Could not find run-directory in args. Using the directory " + runDirectory);
@@ -113,11 +113,11 @@ public class PersonTripAnalysisMain {
 		String eventsFile = runDirectory + "ITERS/it." + finalIteration + "/" + finalIteration + ".events.xml.gz";
 		String outputPath = runDirectory + "ITERS/it." + finalIteration + "/detailedAnalysis/";
 		
-//		String noiseEventsFile = runDirectory + "ITERS/it." + finalIteration + "/" + finalIteration + ".events.xml.gz";
-		String noiseEventsFile = runDirectory + "/noiseAnalysis/analysis_it.100/100.events_NoiseImmission_Offline.xml.gz";
+		String noiseEventsFile = runDirectory + "ITERS/it." + finalIteration + "/" + finalIteration + ".events.xml.gz";
+//		String noiseEventsFile = runDirectory + "noiseAnalysis/analysis_it.100/100.events_NoiseImmission_Offline.xml.gz";
 		String congestionEventsFile = runDirectory + "ITERS/it." + finalIteration + "/" + finalIteration + ".events.xml.gz";
 		
-		MutableScenario scenario = (MutableScenario) ScenarioUtils.loadScenario(config);
+		Scenario scenario = ScenarioUtils.loadScenario(config);
 		
 		File folder = new File(outputPath);			
 		folder.mkdirs();

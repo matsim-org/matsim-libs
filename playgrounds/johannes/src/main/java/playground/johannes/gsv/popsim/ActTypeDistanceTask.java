@@ -20,6 +20,7 @@
 package playground.johannes.gsv.popsim;
 
 import gnu.trove.map.hash.TDoubleDoubleHashMap;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.common.stats.Histogram;
 import org.matsim.contrib.common.stats.LinearDiscretizer;
@@ -34,6 +35,7 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -41,6 +43,8 @@ import java.util.Map;
  * @author johannes
  */
 public class ActTypeDistanceTask extends AnalyzerTask {
+
+    private Map<Double, TObjectDoubleHashMap<String>> histograms;
 
     @Override
     public void analyze(Collection<? extends Person> persons, Map<String, DescriptiveStatistics> results) {
@@ -52,36 +56,57 @@ public class ActTypeDistanceTask extends AnalyzerTask {
             BufferedWriter writer = new BufferedWriter(new FileWriter(getOutputDirectory() + "/acttypedist.txt"));
 
             writer.write("type");
-            for(double key = 0; key <= 1000000; key += 100000) {
+            for (double key = 0; key <= 1000000; key += 100000) {
                 writer.write("\t");
                 writer.write(String.valueOf(key));
             }
             writer.newLine();
-        for(Map.Entry<String, Predicate<Segment>> entry : actTypePredicates.entrySet()) {
-            LegPurposePredicate purposePredicate = new LegPurposePredicate(entry.getValue());
-            PredicateAndComposite<Segment> pred = new PredicateAndComposite<>();
-            pred.addComponent(modePredicate);
-            pred.addComponent(purposePredicate);
 
-            distColletor.setPredicate(pred);
+            histograms = new HashMap<>();
 
-            List<Double> dists = distColletor.collect(persons);
-            double[] distArray = CollectionUtils.toNativeArray(dists);
-            TDoubleDoubleHashMap hist = Histogram.createHistogram(distArray, new LinearDiscretizer(100000), false);
+            for (Map.Entry<String, Predicate<Segment>> entry : actTypePredicates.entrySet()) {
+                LegPurposePredicate purposePredicate = new LegPurposePredicate(entry.getValue());
+                PredicateAndComposite<Segment> pred = new PredicateAndComposite<>();
+                pred.addComponent(modePredicate);
+                pred.addComponent(purposePredicate);
 
-            writer.write(entry.getKey());
+                distColletor.setPredicate(pred);
 
-            for(double key = 0; key <= 1000000; key += 100000) {
-                double val = hist.get(key);
-                writer.write("\t");
-                writer.write(String.valueOf(val));
+                List<Double> dists = distColletor.collect(persons);
+                double[] distArray = CollectionUtils.toNativeArray(dists);
+                TDoubleDoubleHashMap hist = Histogram.createHistogram(distArray, new LinearDiscretizer(100000), false);
+
+                String purpose = entry.getKey();
+                writer.write(purpose);
+
+                for (double key = 0; key <= 1000000; key += 100000) {
+                    double val = hist.get(key);
+
+                    TObjectDoubleHashMap<String> purposeHist = histograms.get(key);
+                    if(purposeHist == null) {
+                        purposeHist = new TObjectDoubleHashMap<>();
+                        histograms.put(key, purposeHist);
+                    }
+                    purposeHist.put(purpose, val);
+
+                    writer.write("\t");
+                    writer.write(String.valueOf(val));
+                }
+                writer.newLine();
             }
-            writer.newLine();
-        }
-        writer.close();
+            writer.close();
+
+            for(TObjectDoubleHashMap<String> hist : histograms.values()) {
+                playground.johannes.gsv.popsim.Histogram.normalize(hist);
+            }
+
         } catch (IOException e) {
             e.printStackTrace();
         }
 
+    }
+
+    public Map<Double, TObjectDoubleHashMap<String>> getHistrograms() {
+        return histograms;
     }
 }

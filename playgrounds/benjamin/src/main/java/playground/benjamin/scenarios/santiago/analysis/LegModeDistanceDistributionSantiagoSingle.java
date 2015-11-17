@@ -17,28 +17,33 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin.scenarios.munich.analysis.modular.legModeDistanceDistribution;
+package playground.benjamin.scenarios.santiago.analysis;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
+import playground.benjamin.scenarios.munich.analysis.modular.legModeDistanceDistribution.RunLegModeDistanceDistribution;
+import playground.vsp.analysis.modules.legModeDistanceDistribution.LegModeDistanceDistribution;
 
 /**
  * @author benjamin
  *
  */
-public class RunLegModeDistanceDistributionSingle {
-	private final static Logger logger = Logger.getLogger(RunLegModeDistanceDistributionSingle.class);
+public class LegModeDistanceDistributionSantiagoSingle {
+	private final static Logger logger = Logger.getLogger(LegModeDistanceDistributionSantiagoSingle.class);
 	
-//	static String baseFolder = "../../runs-svn/detEval/mobilTUM/run20/";
-//	static String baseFolder = "../../runs-svn/internalizationCar/output/baseCase2a/";
 	static String baseFolder = "../../../runs-svn/santiago/run32/output/";
 	static String configFile = baseFolder + "output_config.xml.gz";
 	static String iteration = "0";
 	
+	//TODO: find some good solution here
 	static UserGroup userGroup = null;
-//	static UserGroup userGroup = UserGroup.URBAN;
 
 	public static void main(String[] args) {
 		Gbl.startMeasurement();
