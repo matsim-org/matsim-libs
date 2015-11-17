@@ -38,7 +38,7 @@ public class ListUtils {
 		}
 		return sum;
 	}
-	
+
 	public static double doubleSum(List<Double> doubleList){
 		if(doubleList==null)	return 0;
 
@@ -48,14 +48,24 @@ public class ListUtils {
 		}
 		return sum;
 	}
-	
+
 	public static double doubleMean(List<Double> doubleList){
 		if(doubleList==null || doubleList.isEmpty())	return 0;
-		
+
 		double sum = ListUtils.doubleSum(doubleList);
 		return sum/doubleList.size();
 	}
-	
+
+	public static List<Double> scalerProduct(List<Double> doubleList, double scalerFactor){
+		List<Double> outList = new ArrayList<>();
+		if(doubleList==null ) throw new RuntimeException("The list is null. Aborting ...");
+
+		for(double d : doubleList){
+			outList.add(scalerFactor*d);
+		}
+		return outList;
+	}
+
 	/**
 	 * @param list1
 	 * @param list2
@@ -68,12 +78,22 @@ public class ListUtils {
 		else if (list1.isEmpty() ) return outList;
 		else {
 			for(int ii=0; ii<list1.size(); ii++){
-				outList.add( list1.get(ii)/list2.get(ii) );
+				double e =0;
+				if(list1.get(ii) == 0. && list2.get(ii)==0.) e = 0.;
+				else if(list2.get(ii)==0.) {
+					Logger.getLogger(ListUtils.class).warn("Denominator is zero which should result in Inf but setting it zero. If you dont want that, modify the static method.");
+					e=0;
+				}
+				else e = list1.get(ii) / list2.get(ii);
+				if(Double.isNaN(e)) {
+					System.out.println("prob.");
+				}
+				outList.add( e );
 			}
 		}
 		return outList;
 	}
-	
+
 	/**
 	 * @param list1
 	 * @param list2
@@ -95,7 +115,7 @@ public class ListUtils {
 				}
 			}
 		}
-		
+
 		for(int ii=0; ii<list1.size(); ii++){
 			outList.add( list1.get(ii) - list2.get(ii) );
 		}
