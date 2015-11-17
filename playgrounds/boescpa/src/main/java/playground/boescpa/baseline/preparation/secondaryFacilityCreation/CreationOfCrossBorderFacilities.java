@@ -1,4 +1,4 @@
-package playground.boescpa.baseline.preparation;
+package playground.boescpa.baseline.preparation.secondaryFacilityCreation;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;

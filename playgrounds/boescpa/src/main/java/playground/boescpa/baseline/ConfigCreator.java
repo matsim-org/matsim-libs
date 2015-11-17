@@ -4,7 +4,6 @@ import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
 import playground.ivt.kticompatibility.KtiLikeScoringConfigGroup;
@@ -19,9 +18,20 @@ import java.util.Map;
  */
 public class ConfigCreator {
 
-    final static String numberOfThreads = "8";
-    final static String inbaseFiles = "";
-    final static String writeOutInterval = "10";
+    private final static String numberOfThreads = "8";
+    private final static String inbaseFiles = "";
+    private final static String writeOutInterval = "10";
+    private final static String coordinateSystem = "CH1903_LV03_Plus";
+
+    public static final String FACILITIES = "facilities.xml.gz";
+    public static final String HOUSEHOLD_ATTRIBUTES = "household_attributes.xml.gz";
+    public static final String HOUSEHOLDS = "households.xml.gz";
+    public static final String POPULATION = "population.xml.gz";
+    public static final String POPULATION_ATTRIBUTES = "population_attributes.xml.gz";
+    public static final String NETWORK = "mmNetwork.xml.gz";
+    public static final String SCHEDULE = "mmSchedule.xml.gz";
+    public static final String VEHICLES = "mmVehicles.xml.gz";
+    public static final String FACILITIES2LINKS = "facilitiesLinks.f2l";
 
     public static void main(String[] args) {
         int prctScenario = Integer.parseInt(args[1]); // the percentage of the scenario in percent (e.g. 1%-Scenario -> "1")
@@ -46,7 +56,7 @@ public class ConfigCreator {
         config.createModule(WorldConnectLocations.CONFIG_F2L);
         config.setParam(WorldConnectLocations.CONFIG_F2L, WorldConnectLocations.CONFIG_F2L_INPUTF2LFile, "");
         // Set coordinate system
-        config.setParam("global", "coordinateSystem", "CH1903_LV03_Plus");
+        config.setParam("global", "coordinateSystem", coordinateSystem);
         // Set location choice activities
         config.setParam("locationchoice", "flexible_types", "remote_work, leisure, shop, escort_kids, escort_other");
         config.setParam("locationchoice", "epsilonScaleFactors", "0.3, 0.1, 0.1, 0.1, 0.2");
@@ -80,15 +90,16 @@ public class ConfigCreator {
         config.setParam("ptCounts", "countsScaleFactor", Double.toString(100d/prctScenario));
         config.setParam("qsim", "flowCapacityFactor", Double.toString(prctScenario/100d));
         // Add files
-        config.setParam("facilities", "inputFacilitiesFile", inbaseFiles + "facilities.xml.gz");
-        config.setParam("f2l", "inputF2LFile", inbaseFiles + "facilitiesLinks.f2l");
-        config.setParam("households", "inputFile", inbaseFiles + "households.xml.gz");
-        config.setParam("network", "inputNetworkFile", inbaseFiles + "mmNetwork.xml.gz");
-        config.setParam("plans", "inputPersonAttributesFile", inbaseFiles + "population_attributes.xml.gz");
-        config.setParam("plans", "inputPlansFile", inbaseFiles + "population.xml.gz");
-        config.setParam("transit", "transitScheduleFile", inbaseFiles + "mmSchedule.xml.gz");
-        config.setParam("transit", "vehiclesFile", inbaseFiles + "mmVehicles.xml.gz");
-        config.setParam("locationchoice", "prefsFile", inbaseFiles + "population_attributes.xml.gz");
+        config.setParam("facilities", "inputFacilitiesFile", inbaseFiles + FACILITIES);
+        config.setParam("f2l", "inputF2LFile", inbaseFiles + FACILITIES2LINKS);
+        config.setParam("households", "inputFile", inbaseFiles + HOUSEHOLDS);
+        config.setParam("households", "inputHouseholdAttributesFile", inbaseFiles + HOUSEHOLD_ATTRIBUTES);
+        config.setParam("network", "inputNetworkFile", inbaseFiles + NETWORK);
+        config.setParam("plans", "inputPersonAttributesFile", inbaseFiles + POPULATION_ATTRIBUTES);
+        config.setParam("plans", "inputPlansFile", inbaseFiles + POPULATION);
+        config.setParam("transit", "transitScheduleFile", inbaseFiles + SCHEDULE);
+        config.setParam("transit", "vehiclesFile", inbaseFiles + VEHICLES);
+        config.setParam("locationchoice", "prefsFile", inbaseFiles + POPULATION_ATTRIBUTES);
 
         return config;
     }

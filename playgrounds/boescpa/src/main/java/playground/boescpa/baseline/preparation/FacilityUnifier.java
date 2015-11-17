@@ -9,7 +9,7 @@ import org.matsim.facilities.*;
 import java.util.HashMap;
 import java.util.Map;
 
-import static playground.boescpa.baseline.preparation.FacilitiesFromBZ12.testFacilities;
+import static playground.boescpa.baseline.preparation.secondaryFacilityCreation.FacilitiesFromBZ12.testFacilities;
 
 /**
  * Takes two facility files and unites them to one.
