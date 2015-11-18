@@ -52,7 +52,6 @@ import playground.agarwalamit.utils.LoadMyScenarios;
  */
 
 public class Patna100PctPopulation {
-//	ZZ_TODO: clean it and compare with PatnaDemandGeneration
 
 	// take the home coord from initial plans (in ward) and then assign these agents to nearest link, see core method of doing this.
 	private final Logger logger = Logger.getLogger(Patna100PctPopulation.class);
@@ -63,7 +62,6 @@ public class Patna100PctPopulation {
 	
 	private String zoneFile = "../../../repos/runs-svn/patnaIndia/inputs/wardFile/Wards.shp";	
 	private Collection<SimpleFeature> features ;
-	
 	
 	public static void main(String[] args) {
 		new Patna100PctPopulation().run();

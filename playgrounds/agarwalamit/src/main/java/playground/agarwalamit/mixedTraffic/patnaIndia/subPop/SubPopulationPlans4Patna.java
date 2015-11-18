@@ -40,14 +40,13 @@ import org.matsim.core.api.internal.MatsimWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordinateTransformation;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Point;
 
+import playground.agarwalamit.mixedTraffic.patnaIndia.PatnaConstants;
 import playground.agarwalamit.utils.GeometryUtils;
 /**
  * @author amit
@@ -62,7 +61,8 @@ public class SubPopulationPlans4Patna {
 	private static final Logger logger = Logger.getLogger(SubPopulationPlans4Patna.class);
 	private Scenario scenario;
 
-	private final CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84,"EPSG:24345");
+	private Collection<SimpleFeature> features;
+
 	private final String zoneFile = "../../../repos/runs-svn/patnaIndia/inputs/wardFile/Wards.shp";		
 	private final String planFile1 = "../../../repos/runs-svn/patnaIndia/inputs/Urban_PlanFile.CSV";
 	private final String planFile2 = "../../../repos/runs-svn/patnaIndia/inputs/27TO42zones.CSV";
@@ -78,123 +78,124 @@ public class SubPopulationPlans4Patna {
 		writer.writeFile("../../../repos/runs-svn/patnaIndia/inputs/personsAttributesSubPop.xml.gz");
 		logger.info("Writing Plan file is finished.");
 	}
-	
+
 	public void run(){
-		filesReader(planFile1, zoneFile, scenario,"nonSlum");
-		filesReader(planFile2, zoneFile, scenario, "nonSlum");
-		filesReader(planFile3, zoneFile, scenario, "slum");
+
+		this.features = readZoneFilesAndReturnFeatures();
+
+		filesReader(planFile1, "nonSlum");
+		filesReader(planFile2, "nonSlum");
+		filesReader(planFile3, "slum");
+
 	}
-	
-	private void filesReader (String planFile, String zoneFile, Scenario scenario, String subPop) {
-		
+
+	private Collection<SimpleFeature> readZoneFilesAndReturnFeatures() {
 		ShapeFileReader reader = new ShapeFileReader();
-		Collection<SimpleFeature> features = reader.readFileAndInitialize(zoneFile);
+		return reader.readFileAndInitialize(this.zoneFile);
+	}
+
+	private void filesReader (String planFile, String subPop) {
+
 		Iterator<SimpleFeature> iterator = features.iterator();
-		
-		BufferedReader bufferedReader = null;
+
 		String line = null;
-		try {
-			bufferedReader = new BufferedReader(new FileReader(planFile));
+		try (BufferedReader bufferedReader = new BufferedReader(new FileReader(planFile))) {
 			line = bufferedReader.readLine();
-		} catch (IOException e1) {
-			throw new RuntimeException("Line or feature is not read. Reason "+e1);			
-		}
 
-		while ((line)!= null ) {
+			while ((line)!= null ) {
 
-			String[] parts = line.split(",");
-			String fromZoneId = parts [5];
-			String toZoneId = parts [6]; 
-			String tripPurpose = parts [7];
+				String[] parts = line.split(",");
+				String fromZoneId = parts [5];
+				String toZoneId = parts [6]; 
+				String tripPurpose = parts [7];
 
-			Coord homeZoneCoordTransform = null ;
-			Coord workZoneCoordTransform = null ;
-			Point p=null, q = null;
+				Coord homeZoneCoordTransform = null ;
+				Coord workZoneCoordTransform = null ;
+				Point p=null, q = null;
 
-			// for trips terminating in zone 73,74,75 and 76 are replaced by zone 6,1,3 and 3 respectively
-			if (((Integer.parseInt(toZoneId)) > 72)) { 	
-				int id2 = 0 ;
-				switch ((Integer.parseInt(toZoneId))) {
-				case 73 : id2=6;break;
-				case 74 : id2=1;break;
-				case 75 : id2=3;break;
-				case 76 : id2=3;break;
+				// for trips terminating in zone 73,74,75 and 76 are replaced by zone 6,1,3 and 3 respectively
+				if (((Integer.parseInt(toZoneId)) > 72)) { 	
+					int id2 = 0 ;
+					switch ((Integer.parseInt(toZoneId))) {
+					case 73 : id2=6;break;
+					case 74 : id2=1;break;
+					case 75 : id2=3;break;
+					case 76 : id2=3;break;
+					}
+					toZoneId = String.valueOf(id2);
 				}
-				toZoneId = String.valueOf(id2);
-			}
-			if (! fromZoneId.equals(toZoneId))	{														
+				if (! fromZoneId.equals(toZoneId))	{														
 
-				while (iterator.hasNext()){
+					while (iterator.hasNext()){
 
-					SimpleFeature feature = iterator.next();
-					int Id = (Integer) feature.getAttribute("ID1");
-					String zoneId  = String.valueOf(Id);
+						SimpleFeature feature = iterator.next();
+						int Id = (Integer) feature.getAttribute("ID1");
+						String zoneId  = String.valueOf(Id);
 
-					if(fromZoneId.equals(zoneId) ) {
+						if(fromZoneId.equals(zoneId) ) {
+							p = GeometryUtils.getRandomPointsFromWard(feature);
+							Coord fromZoneCoord = new Coord(p.getX(), p.getY());
+							homeZoneCoordTransform = PatnaConstants.COORDINATE_TRANSFORMATION.transform(fromZoneCoord);
+						}
+						else if (toZoneId.equals(zoneId)){
+							q = GeometryUtils.getRandomPointsFromWard(feature);
+							Coord toZoneCoord = new Coord(q.getX(), q.getY());
+							workZoneCoordTransform= PatnaConstants.COORDINATE_TRANSFORMATION.transform(toZoneCoord);
+						}
+					}
+				} 
+				// intraZonal trips
+				else if (fromZoneId.equals(toZoneId)) {
+
+					while (iterator.hasNext()){
+
+						SimpleFeature feature = iterator.next();
+
 						p = GeometryUtils.getRandomPointsFromWard(feature);
 						Coord fromZoneCoord = new Coord(p.getX(), p.getY());
-						homeZoneCoordTransform = ct.transform(fromZoneCoord);
-					}
-					else if (toZoneId.equals(zoneId)){
+						homeZoneCoordTransform = PatnaConstants.COORDINATE_TRANSFORMATION.transform(fromZoneCoord);
+
 						q = GeometryUtils.getRandomPointsFromWard(feature);
 						Coord toZoneCoord = new Coord(q.getX(), q.getY());
-						workZoneCoordTransform= ct.transform(toZoneCoord);
+						workZoneCoordTransform= PatnaConstants.COORDINATE_TRANSFORMATION.transform(toZoneCoord);
 					}
 				}
-			} 
-			// intraZonal trips
-			else if (fromZoneId.equals(toZoneId)) {
 
-				while (iterator.hasNext()){
+				Population population = scenario.getPopulation();
+				PopulationFactory factory = population.getFactory();
 
-					SimpleFeature feature = iterator.next();
-					
-					p = GeometryUtils.getRandomPointsFromWard(feature);
-					Coord fromZoneCoord = new Coord(p.getX(), p.getY());
-					homeZoneCoordTransform = ct.transform(fromZoneCoord);
+				int personId = (scenario.getPopulation().getPersons().size())+1;
+				Person person = factory.createPerson(Id.create(personId+"_"+subPop,Person.class));
+				population.addPerson(person);
+				Plan plan = factory.createPlan();
+				person.addPlan(plan);
 
-					q = GeometryUtils.getRandomPointsFromWard(feature);
-					Coord toZoneCoord = new Coord(q.getX(), q.getY());
-					workZoneCoordTransform= ct.transform(toZoneCoord);
+				//			person.getCustomAttributes().put("incomeGroup", subPop);
+				population.getPersonAttributes().putAttribute(person.getId().toString(), "incomeGroup", subPop);
+
+				String travelMode = parts [8];
+				int modeTravel = Integer.parseInt(travelMode);
+
+				switch (modeTravel) {
+				case 1:	 travelMode = "pt";	break;								// Bus
+				case 2:	 travelMode = "pt";	break;								// Mini Bus
+				case 3:  travelMode = "car";	break;
+				case 4:  travelMode = "motorbike";	break;							// all 2 W motorized 
+				case 5:  travelMode = "pt";	break;								// Motor driven 3W
+				case 6 : travelMode = "bike";	break;						//bicycle
+				case 7 : travelMode = "pt";	break;								// train
+				case 8 : travelMode = "walk";	break;
+				case 9 : travelMode = "bike";	break;						//CycleRickshaw
+				case 9999 : travelMode = randomModeSlum();	break;				// 480 such trips are found in which mode was not available so chosing a random mode 
+				case 999999 : travelMode = randomModeUrban(); break; 			// for zones 27 to 42
 				}
-			}
-			
-			Population population = scenario.getPopulation();
-			PopulationFactory factory = population.getFactory();
-			
-			int personId = (scenario.getPopulation().getPersons().size())+1;
-			Person person = factory.createPerson(Id.create(personId+"_"+subPop,Person.class));
-			population.addPerson(person);
-			Plan plan = factory.createPlan();
-			person.addPlan(plan);
-			
-//			person.getCustomAttributes().put("incomeGroup", subPop);
-			population.getPersonAttributes().putAttribute(person.getId().toString(), "incomeGroup", subPop);
-			
-			String travelMode = parts [8];
-			int modeTravel = Integer.parseInt(travelMode);
-
-			switch (modeTravel) {
-			case 1:	 travelMode = "pt";	break;								// Bus
-			case 2:	 travelMode = "pt";	break;								// Mini Bus
-			case 3:  travelMode = "car";	break;
-			case 4:  travelMode = "motorbike";	break;							// all 2 W motorized 
-			case 5:  travelMode = "pt";	break;								// Motor driven 3W
-			case 6 : travelMode = "bike";	break;						//bicycle
-			case 7 : travelMode = "pt";	break;								// train
-			case 8 : travelMode = "walk";	break;
-			case 9 : travelMode = "bike";	break;						//CycleRickshaw
-			case 9999 : travelMode = randomModeSlum();	break;				// 480 such trips are found in which mode was not available so chosing a random mode 
-			case 999999 : travelMode = randomModeUrban(); break; 			// for zones 27 to 42
-			}
-			createActivities( plan, workZoneCoordTransform, homeZoneCoordTransform, subPop+"_"+travelMode, tripPurpose);
-			//			}
-			try {
+				createActivities( plan, workZoneCoordTransform, homeZoneCoordTransform, subPop+"_"+travelMode, tripPurpose);
+				//			}
 				line = bufferedReader.readLine();
 				iterator = features.iterator();
-			} catch (IOException e) {
-				
 			}
+		} catch (IOException e1) {
+			throw new RuntimeException("Line or feature is not read. Reason "+e1);			
 		}
 	}
 
@@ -208,7 +209,7 @@ public class SubPopulationPlans4Patna {
 		// to get different timing for different trip purpose
 		int tPurpose = Integer.parseInt(tripPurpose);
 		double homeleaveTime=0, workLeaveTime =0;
-		
+
 		switch (tPurpose) {
 
 		case 1 : {homeleaveTime = 8*3600+random2.nextInt(91)*60; workLeaveTime =homeleaveTime+8*3600; break; }  //working hours between 8 to 9:30 and work Duration is 9 hours
