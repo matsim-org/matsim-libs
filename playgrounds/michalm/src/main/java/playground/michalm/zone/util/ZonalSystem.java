@@ -22,10 +22,19 @@ package playground.michalm.zone.util;
 import org.matsim.api.core.v01.network.Node;
 
 
-public interface ZonalSystem
+public interface ZonalSystem<Z extends ZonalSystem.Zone>
 {
+    public interface Zone
+    {
+        int getIdx();
+    }
+
+
+    Z getZone(Node node);
+
+
     int getZoneCount();
 
 
-    int getZoneIdx(Node node);
+    Iterable<Z> getZonesByDistance(Node node);
 }

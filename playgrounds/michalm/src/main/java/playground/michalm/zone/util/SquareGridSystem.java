@@ -19,152 +19,141 @@
 
 package playground.michalm.zone.util;
 
-import java.util.*;
+import java.util.List;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.*;
 
+import playground.michalm.zone.util.SquareGridSystem.SquareZone;
+
 
 public class SquareGridSystem
-    implements ZonalSystem
+    implements ZonalSystem<SquareZone>
 {
-    public static SquareGridSystem createSquareGridSystem(Network network, double cellSize)
+    public static class SquareZone
+        implements ZonalSystem.Zone
     {
-        /////BEGIN: copied from NetworkImpl
-        double minx = Double.POSITIVE_INFINITY;
-        double miny = Double.POSITIVE_INFINITY;
-        double maxx = Double.NEGATIVE_INFINITY;
-        double maxy = Double.NEGATIVE_INFINITY;
-        for (Node n : network.getNodes().values()) {
-            if (n.getCoord().getX() < minx) {
-                minx = n.getCoord().getX();
-            }
-            if (n.getCoord().getY() < miny) {
-                miny = n.getCoord().getY();
-            }
-            if (n.getCoord().getX() > maxx) {
-                maxx = n.getCoord().getX();
-            }
-            if (n.getCoord().getY() > maxy) {
-                maxy = n.getCoord().getY();
-            }
+        private final int idx;
+        private final int row;
+        private final int col;
+
+
+        public SquareZone(int idx, int row, int col)
+        {
+            this.idx = idx;
+            this.row = row;
+            this.col = col;
         }
-        minx -= 1.0;
-        miny -= 1.0;
-        maxx += 1.0;
-        maxy += 1.0;
-        // yy the above four lines are problematic if the coordinate values are much smaller than one. kai, oct'15
-        /////END: copied from NetworkImpl
 
-        return createSquareGridSystem(minx, miny, cellSize, maxx, maxy);
+
+        @Override
+        public int getIdx()
+        {
+            return idx;
+        }
     }
 
 
-    public static SquareGridSystem createSquareGridSystem(double x0, double y0, double cellSize,
-            double x1, double y1)
-    {
-        int cols = (int)Math.ceil( (x1 - x0) / cellSize);
-        int rows = (int)Math.ceil( (y1 - y0) / cellSize);
-        return new SquareGridSystem(x0, y0, cellSize, cols, rows);
-    }
-
-
-    private final double x0;
-    private final double y0;
+    private final Network network;
     private final double cellSize;
+
+    private double minX;
+    private double minY;
+    private double maxX;
+    private double maxY;
+
     private final int cols;
     private final int rows;
 
-    private final Integer[][] neighbours;
+    private final SquareZone[] zones;
+    private final List<SquareZone>[] zonesByDistance;
 
 
-    public SquareGridSystem(double x0, double y0, double cellSize, int cols, int rows)
+    public SquareGridSystem(Network network, double cellSize)
     {
-        this.x0 = x0;
-        this.y0 = y0;
+        this.network = network;
         this.cellSize = cellSize;
-        this.cols = cols;
-        this.rows = rows;
 
-        this.neighbours = calcNeighbourLists();
+        initBounds();
+
+        cols = (int)Math.ceil( (maxX - minX) / cellSize);
+        rows = (int)Math.ceil( (maxY - minY) / cellSize);
+
+        zones = initZones();
+
+        zonesByDistance = ZonalSystems.initZonesByDistance(this, network, zones,
+                new ZonalSystems.DistanceCalculator<SquareZone>() {
+                    public double calcDistance(SquareZone z1, SquareZone z2)
+                    {
+                        return (z1.row - z2.row) * (z1.row - z2.row) + (z1.col - z2.col) * (z1.col - z2.col);
+                    }
+                });
     }
 
 
-    private Integer[][] calcNeighbourLists()
+    //The content is copied from NetworkImpl
+    private void initBounds()
     {
-        if (cellSize < 100) {
-            throw new RuntimeException("May not work as expected for small zones");
+        minX = Double.POSITIVE_INFINITY;
+        minY = Double.POSITIVE_INFINITY;
+        maxX = Double.NEGATIVE_INFINITY;
+        maxY = Double.NEGATIVE_INFINITY;
+        for (Node n : network.getNodes().values()) {
+            if (n.getCoord().getX() < minX) {
+                minX = n.getCoord().getX();
+            }
+            if (n.getCoord().getY() < minY) {
+                minY = n.getCoord().getY();
+            }
+            if (n.getCoord().getX() > maxX) {
+                maxX = n.getCoord().getX();
+            }
+            if (n.getCoord().getY() > maxY) {
+                maxY = n.getCoord().getY();
+            }
         }
-
-        int count = rows * cols;
-        Integer[][] neighbours = new Integer[count][];
-
-        Integer[] zonesIdxs = new Integer[count];
-        for (int i = 0; i < count; i++) {
-            zonesIdxs[i] = i;
-        }
-
-        for (int i = 0; i < count; i++) {
-            final int zBase = i;
-            
-            //store distances in array..............
-            
-            Arrays.sort(zonesIdxs, new Comparator<Integer>() {
-                public int compare(Integer z1, Integer z2)
-                {
-                    return calcDistanceBetweenZones(zBase, z1) - calcDistanceBetweenZones(zBase, z2);
-                }
-            });
-
-            neighbours[i] = zonesIdxs.clone();
-        }
-
-        return neighbours;
+        minX -= 1.0;
+        minY -= 1.0;
+        maxX += 1.0;
+        maxY += 1.0;
+        // yy the above four lines are problematic if the coordinate values are much smaller than one. kai, oct'15
     }
 
 
-    private int calcDistanceBetweenZones(int idx1, int idx2)
+    private SquareZone[] initZones()
     {
-        if (idx1 == idx2) {
-            return 0;
+        SquareZone[] zones = new SquareZone[rows * cols];
+        for (int r = 0; r < rows; r++) {
+            for (int c = 0; c < cols; c++) {
+                int idx = r * cols + c;
+                zones[idx] = new SquareZone(idx, r, c);
+            }
         }
-        
-        double row1 = idx1 / cols;
-        double col1 = idx1 % cols;
-        double row2 = idx2 / cols;
-        double col2 = idx2 % cols;
 
-        //to avoid some systematic error while sorting cells
-//        double rowRandom = (Math.random() - 0.5) * cellSize / 10;
-//        double colRandom = (Math.random() - 0.5) * cellSize / 10;
+        return zones;
+    }
 
-        double rowDelta = row1 - row2;// + rowRandom;
-        double colDelta = col1 - col2;// + colRandom;
 
-        return (int)Math.sqrt(rowDelta * rowDelta + colDelta * colDelta);
+    @Override
+    public SquareZone getZone(Node node)
+    {
+        Coord coord = node.getCoord();
+        int r = (int)Math.round( ( (coord.getY() - minY) / cellSize));
+        int c = (int)Math.round( ( (coord.getX() - minX) / cellSize));
+        return zones[r * cols + c];
     }
 
 
     @Override
     public int getZoneCount()
     {
-        return rows * cols;
+        return zones.length;
     }
 
 
     @Override
-    public int getZoneIdx(Node node)
+    public Iterable<SquareZone> getZonesByDistance(Node node)
     {
-        Coord coord = node.getCoord();
-        int r = (int)Math.round( ( (coord.getY() - y0) / cellSize));
-        int c = (int)Math.round( ( (coord.getX() - x0) / cellSize));
-        return r * cols + c;
-    }
-
-
-    public Iterable<Integer> getZonesIdxByDistance(Node node)
-    {
-        int zoneIdx = getZoneIdx(node);
-        return Arrays.asList(neighbours[zoneIdx]);
+        return zonesByDistance[getZone(node).getIdx()];
     }
 }

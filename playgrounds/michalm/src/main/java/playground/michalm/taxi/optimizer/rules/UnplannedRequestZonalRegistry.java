@@ -22,16 +22,17 @@ package playground.michalm.taxi.optimizer.rules;
 import java.util.*;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.*;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.dvrp.data.Request;
 
 import playground.michalm.taxi.data.TaxiRequest;
-import playground.michalm.zone.util.*;
+import playground.michalm.zone.util.ZonalSystem;
+import playground.michalm.zone.util.ZonalSystem.Zone;
 
 
 public class UnplannedRequestZonalRegistry
 {
-    private final ZonalSystem zonalSystem;
+    private final ZonalSystem<?> zonalSystem;
 
     private final Map<Id<Request>, TaxiRequest>[] requestsInZones;
 
@@ -39,7 +40,7 @@ public class UnplannedRequestZonalRegistry
 
 
     @SuppressWarnings("unchecked")
-    public UnplannedRequestZonalRegistry(ZonalSystem zonalSystem)
+    public UnplannedRequestZonalRegistry(ZonalSystem<?> zonalSystem)
     {
         this.zonalSystem = zonalSystem;
 
@@ -53,8 +54,12 @@ public class UnplannedRequestZonalRegistry
     //after submitted
     public void addRequest(TaxiRequest request)
     {
-        int zoneIdx = getZone(request);
-        requestsInZones[zoneIdx].put(request.getId(), request);
+        int zoneIdx = getZoneIdx(request);
+
+        if (requestsInZones[zoneIdx].put(request.getId(), request) == null) {
+            throw new IllegalStateException(request + " is already in the registry");
+        }
+
         requestCount++;
     }
 
@@ -62,19 +67,23 @@ public class UnplannedRequestZonalRegistry
     //after scheduled
     public void removeRequest(TaxiRequest request)
     {
-        int zoneIdx = getZone(request);
-        requestsInZones[zoneIdx].remove(request.getId());
+        int zoneIdx = getZoneIdx(request);
+
+        if (requestsInZones[zoneIdx].remove(request.getId()) == null) {
+            throw new IllegalStateException(request + " is not in the registry");
+        }
+
         requestCount--;
     }
-    
-    
+
+
     public Iterable<TaxiRequest> findNearestRequests(Node node, int minCount)
     {
-        Iterable<Integer> zonesIdxByDistance = ((SquareGridSystem)zonalSystem).getZonesIdxByDistance(node);
+        Iterable<? extends Zone> zonesByDistance = zonalSystem.getZonesByDistance(node);
         List<TaxiRequest> nearestReqs = new ArrayList<>();
 
-        for (int idx : zonesIdxByDistance) {
-            nearestReqs.addAll(requestsInZones[idx].values());
+        for (Zone z : zonesByDistance) {
+            nearestReqs.addAll(requestsInZones[z.getIdx()].values());
 
             if (nearestReqs.size() >= minCount) {
                 return nearestReqs;
@@ -83,23 +92,11 @@ public class UnplannedRequestZonalRegistry
 
         return nearestReqs;
     }
-    
 
-    private int getZone(TaxiRequest request)
+
+    private int getZoneIdx(TaxiRequest request)
     {
-        return zonalSystem.getZoneIdx(request.getFromLink().getFromNode());
-    }
-
-
-    public Map<Id<Request>, TaxiRequest> getRequestsInZone(Node node)
-    {
-        return requestsInZones[zonalSystem.getZoneIdx(node)];//TODO return immutables?
-    }
-
-
-    public Map<Id<Request>, TaxiRequest> getRequestsInZone(int zoneIdx)
-    {
-        return requestsInZones[zoneIdx];//TODO return immutables?
+        return zonalSystem.getZone(request.getFromLink().getFromNode()).getIdx();
     }
 
 

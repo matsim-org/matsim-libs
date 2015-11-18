@@ -31,13 +31,14 @@ import playground.michalm.taxi.optimizer.*;
 import playground.michalm.taxi.schedule.*;
 import playground.michalm.taxi.schedule.TaxiTask.TaxiTaskType;
 import playground.michalm.zone.util.*;
+import playground.michalm.zone.util.SquareGridSystem.SquareZone;
 
 
 public class RuleBasedTaxiOptimizer
     extends AbstractTaxiOptimizer
 {
     private static final double CELL_SIZE = 1000;//in [m]//TODO
-    private static ZonalSystem zonalSystem;//TODO
+    private static ZonalSystem<SquareZone> zonalSystem;//TODO
 
     protected final BestDispatchFinder dispatchFinder;
 
@@ -57,7 +58,7 @@ public class RuleBasedTaxiOptimizer
         //TODO temp solution
         if (zonalSystem == null) {
             Network network = optimConfig.context.getScenario().getNetwork();
-            zonalSystem = SquareGridSystem.createSquareGridSystem(network, CELL_SIZE);
+            zonalSystem = new SquareGridSystem(network, CELL_SIZE);
         }
         
         idleTaxiRegistry = new IdleTaxiZonalRegistry(zonalSystem, optimConfig.scheduler);

@@ -31,12 +31,13 @@ import com.google.common.collect.Iterables;
 
 import playground.michalm.taxi.schedule.TaxiStayTask;
 import playground.michalm.taxi.scheduler.*;
-import playground.michalm.zone.util.*;
+import playground.michalm.zone.util.ZonalSystem;
+import playground.michalm.zone.util.ZonalSystem.Zone;
 
 
 public class IdleTaxiZonalRegistry
 {
-    private final ZonalSystem zonalSystem;
+    private final ZonalSystem<?> zonalSystem;
 
     private final Map<Id<Vehicle>, Vehicle>[] vehiclesInZones;
     private final Map<Id<Vehicle>, Vehicle> vehicles = new LinkedHashMap<>();
@@ -45,7 +46,7 @@ public class IdleTaxiZonalRegistry
 
 
     @SuppressWarnings("unchecked")
-    public IdleTaxiZonalRegistry(ZonalSystem zonalSystem, TaxiScheduler scheduler)
+    public IdleTaxiZonalRegistry(ZonalSystem<?> zonalSystem, TaxiScheduler scheduler)
     {
         this.zonalSystem = zonalSystem;
 
@@ -61,14 +62,14 @@ public class IdleTaxiZonalRegistry
     public void addVehicle(Vehicle vehicle)
     {
         TaxiStayTask stayTask = (TaxiStayTask)vehicle.getSchedule().getCurrentTask();
-        int zoneIdx = getZone(stayTask);
+        int zoneIdx = getZoneIdx(stayTask);
 
         if (vehiclesInZones[zoneIdx].put(vehicle.getId(), vehicle) != null) {
-            throw new RuntimeException("The vehicle was already there");
+            throw new IllegalStateException(vehicle + " is already in the registry");
         }
 
         if (vehicles.put(vehicle.getId(), vehicle) != null) {
-            throw new RuntimeException("The vehicle was already there");
+            throw new IllegalStateException(vehicle + " is already in the registry");
         }
     }
 
@@ -76,14 +77,14 @@ public class IdleTaxiZonalRegistry
     public void removeVehicle(Vehicle vehicle)
     {
         TaxiStayTask stayTask = (TaxiStayTask)Schedules.getPreviousTask(vehicle.getSchedule());
-        int zoneIdx = getZone(stayTask);
+        int zoneIdx = getZoneIdx(stayTask);
 
         if (vehiclesInZones[zoneIdx].remove(vehicle.getId()) == null) {
-            throw new RuntimeException("The vehicle was not there");
+            throw new IllegalStateException(vehicle + " is not in the registry");
         }
 
         if (vehicles.remove(vehicle.getId()) == null) {
-            throw new RuntimeException("The vehicle was not there");
+            throw new IllegalStateException(vehicle + " is not in the registry");
         }
     }
 
@@ -94,13 +95,13 @@ public class IdleTaxiZonalRegistry
             return getVehicles();
         }
 
-        Iterable<Integer> zonesIdxByDistance = ((SquareGridSystem)zonalSystem)
-                .getZonesIdxByDistance(node);
+        Iterable<? extends Zone> zonesByDistance = zonalSystem.getZonesByDistance(node);
         List<Vehicle> nearestVehs = new ArrayList<>();
 
-        for (int idx : zonesIdxByDistance) {
-            Iterables.addAll(nearestVehs, Iterables.filter(vehiclesInZones[idx].values(), isIdle));
-            
+        for (Zone z : zonesByDistance) {
+            Iterables.addAll(nearestVehs,
+                    Iterables.filter(vehiclesInZones[z.getIdx()].values(), isIdle));
+
             if (nearestVehs.size() >= minCount) {
                 return nearestVehs;
             }
@@ -110,9 +111,9 @@ public class IdleTaxiZonalRegistry
     }
 
 
-    private int getZone(TaxiStayTask stayTask)
+    private int getZoneIdx(TaxiStayTask stayTask)
     {
-        return zonalSystem.getZoneIdx(stayTask.getLink().getToNode());
+        return zonalSystem.getZone(stayTask.getLink().getToNode()).getIdx();
     }
 
 
