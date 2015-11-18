@@ -39,25 +39,24 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
 
-import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
 
 import playground.agarwalamit.mixedTraffic.patnaIndia.PatnaConstants;
 import playground.agarwalamit.mixedTraffic.patnaIndia.PatnaConstants.PatnaActivityTypes;
+import playground.agarwalamit.utils.GeometryUtils;
 /**
  * @author amit
  */
-public class PatnaPlansGenerator {
+public class PatnaUrbanDemandGenerator {
 
-	public PatnaPlansGenerator(String outputDir) {
+	public PatnaUrbanDemandGenerator(String outputDir) {
 		this.outputDir = outputDir;
 	}
 
-	private  final Logger logger = Logger.getLogger(PatnaPlansGenerator.class);
+	private  final Logger logger = Logger.getLogger(PatnaUrbanDemandGenerator.class);
 	private final String zoneFile = PatnaConstants.inputFilesDir+"/wardFile/Wards.shp";	
 	private final int ID1 =0;				
 	private final int ID2 = 100000;
@@ -69,7 +68,7 @@ public class PatnaPlansGenerator {
 	private Collection<SimpleFeature> features ;
 
 	public static void main (String []args) {
-		new PatnaPlansGenerator(PatnaConstants.inputFilesDir).startProcessingAndWritePlans();
+		new PatnaUrbanDemandGenerator(PatnaConstants.inputFilesDir).startProcessingAndWritePlans();
 	}
 
 	public void startProcessingAndWritePlans() {
@@ -124,12 +123,12 @@ public class PatnaPlansGenerator {
 						String zoneId  = String.valueOf(Id);
 
 						if(fromZoneId.equals(zoneId) ) {
-							p = getRandomPointsFromWard(feature, random);
+							p = GeometryUtils.getRandomPointsFromWard(feature);
 							Coord fromZoneCoord = new Coord(p.getX(), p.getY());
 							homeZoneCoordTransform = PatnaConstants.COORDINATE_TRANSFORMATION.transform(fromZoneCoord);
 						}
 						else if (toZoneId.equals(zoneId)){
-							q = getRandomPointsFromWard(feature, random);
+							q = GeometryUtils.getRandomPointsFromWard(feature);
 							Coord toZoneCoord = new Coord(q.getX(), q.getY());
 							workZoneCoordTransform= PatnaConstants.COORDINATE_TRANSFORMATION.transform(toZoneCoord);
 						}
@@ -140,11 +139,11 @@ public class PatnaPlansGenerator {
 
 						SimpleFeature feature = iterator.next();
 
-						p = getRandomPointsFromWard(feature, random);
+						p = GeometryUtils.getRandomPointsFromWard(feature);
 						Coord fromZoneCoord = new Coord(p.getX(), p.getY());
 						homeZoneCoordTransform = PatnaConstants.COORDINATE_TRANSFORMATION.transform(fromZoneCoord);
 
-						q = getRandomPointsFromWard(feature, random);
+						q = GeometryUtils.getRandomPointsFromWard(feature);
 						Coord toZoneCoord = new Coord(q.getX(), q.getY());
 						workZoneCoordTransform= PatnaConstants.COORDINATE_TRANSFORMATION.transform(toZoneCoord);
 					}
@@ -267,18 +266,6 @@ public class PatnaPlansGenerator {
 		plan.addActivity(homeActII);
 		return plan;
 	}
-
-	private  Point getRandomPointsFromWard (SimpleFeature feature, Random random) {
-		Point p = null;
-		double x,y;
-		do {
-			x = feature.getBounds().getMinX()+random.nextDouble()*(feature.getBounds().getMaxX()-feature.getBounds().getMinX());
-			y = feature.getBounds().getMinY()+random.nextDouble()*(feature.getBounds().getMaxY()-feature.getBounds().getMinY());
-			p= MGC.xy2Point(x, y);
-		} while (!((Geometry) feature.getDefaultGeometry()).contains(p));
-		return p;
-	}
-
 
 	private  String randomModeSlum () {
 		// this method is for slum population as 480 plans don't have information about travel mode so one random mode is assigned out of these four modes.

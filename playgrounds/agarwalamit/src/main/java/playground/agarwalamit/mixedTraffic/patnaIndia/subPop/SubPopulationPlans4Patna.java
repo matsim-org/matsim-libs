@@ -41,14 +41,14 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
-import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 import org.opengis.feature.simple.SimpleFeature;
 
-import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
+
+import playground.agarwalamit.utils.GeometryUtils;
 /**
  * @author amit
  */
@@ -131,12 +131,12 @@ public class SubPopulationPlans4Patna {
 					String zoneId  = String.valueOf(Id);
 
 					if(fromZoneId.equals(zoneId) ) {
-						p = getRandomPointsFromWard(feature);
+						p = GeometryUtils.getRandomPointsFromWard(feature);
 						Coord fromZoneCoord = new Coord(p.getX(), p.getY());
 						homeZoneCoordTransform = ct.transform(fromZoneCoord);
 					}
 					else if (toZoneId.equals(zoneId)){
-						q = getRandomPointsFromWard(feature);
+						q = GeometryUtils.getRandomPointsFromWard(feature);
 						Coord toZoneCoord = new Coord(q.getX(), q.getY());
 						workZoneCoordTransform= ct.transform(toZoneCoord);
 					}
@@ -149,11 +149,11 @@ public class SubPopulationPlans4Patna {
 
 					SimpleFeature feature = iterator.next();
 					
-					p = getRandomPointsFromWard(feature);
+					p = GeometryUtils.getRandomPointsFromWard(feature);
 					Coord fromZoneCoord = new Coord(p.getX(), p.getY());
 					homeZoneCoordTransform = ct.transform(fromZoneCoord);
 
-					q = getRandomPointsFromWard(feature);
+					q = GeometryUtils.getRandomPointsFromWard(feature);
 					Coord toZoneCoord = new Coord(q.getX(), q.getY());
 					workZoneCoordTransform= ct.transform(toZoneCoord);
 				}
@@ -233,17 +233,6 @@ public class SubPopulationPlans4Patna {
 		plan.addActivity(homeActII);
 	}
 
-	private Point getRandomPointsFromWard (SimpleFeature feature) {
-		Point p = null;
-		double x,y;
-		Random random = new Random();
-		do {
-			x = feature.getBounds().getMinX()+random.nextDouble()*(feature.getBounds().getMaxX()-feature.getBounds().getMinX());
-			y = feature.getBounds().getMinY()+random.nextDouble()*(feature.getBounds().getMaxY()-feature.getBounds().getMinY());
-			p= MGC.xy2Point(x, y);
-		} while (!((Geometry) feature.getDefaultGeometry()).contains(p));
-		return p;
-	}
 	// this method is for slum population as 480 plans don't have information about travel mode so one random mode is assigned out of these four modes. 
 	private String randomModeSlum () {
 		//		share of each vehicle is given in table 5-13 page 91 in CMP Patna
