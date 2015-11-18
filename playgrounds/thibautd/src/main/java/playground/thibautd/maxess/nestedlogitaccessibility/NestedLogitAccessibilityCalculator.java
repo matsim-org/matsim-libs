@@ -24,11 +24,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.facilities.ActivityFacilities;
-import playground.thibautd.maxess.prepareforbiogeme.tripbased.Trip;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 
 /**
  * @author thibautd
@@ -90,88 +85,4 @@ public class NestedLogitAccessibilityCalculator {
 		return ( model.getMu() / nest.getMu_n() ) * Math.log( sum );
 	}
 
-	public interface ChoiceSetIdentifier {
-		NestedChoiceSet identifyChoiceSet( Person p );
-	}
-
-	/**
-	 * if other use cases, might be transformed to an interface
-	 */
-	public static class NestedChoiceSet {
-		private final Collection<Nest> nests = new ArrayList<>();
-
-		public Collection<Nest> getNests() {
-			return nests;
-		}
-	}
-
-	public static class Nest {
-		private final Id<Nest> name;
-		private final double mu_n;
-		// if need exists, could easily be made generic (with alternatives type as a class parameter)
-		private final List<Alternative> alternatives;
-
-		public Nest( Id<Nest> name, double mu_n, List<Alternative> alternatives ) {
-			this.name = name;
-			this.mu_n = mu_n;
-			this.alternatives = alternatives;
-		}
-
-		public Id<Nest> getNestId() {
-			return name;
-		}
-
-		public List<Alternative> getAlternatives() {
-			return alternatives;
-		}
-
-		public double getMu_n() {
-			return mu_n;
-		}
-	}
-
-	public static class Alternative {
-		private final Id<Nest> nestId;
-		private final Id<Alternative> alternativeId;
-		private final Trip alternative;
-
-		public Alternative( Id<Nest> nestId,
-				Id<Alternative> alternativeId,
-				Trip alternative ) {
-			this.nestId = nestId;
-			this.alternativeId = alternativeId;
-			this.alternative = alternative;
-		}
-	}
-
-	public interface Utility {
-		double calcUtility( Person p , Alternative a );
-	}
-
-	public class NestedLogitModel {
-		private final double mu;
-		private final Utility utility;
-		private final ChoiceSetIdentifier choiceSetIdentifier;
-
-		public NestedLogitModel(
-				final double mu,
-				final Utility utility,
-				final ChoiceSetIdentifier choiceSetIdentifier ) {
-			this.mu = mu;
-			this.utility = utility;
-			this.choiceSetIdentifier = choiceSetIdentifier;
-		}
-
-		public ChoiceSetIdentifier getChoiceSetIdentifier() {
-			return choiceSetIdentifier;
-		}
-
-		public double getMu() {
-			return mu;
-		}
-
-		public Utility getUtility() {
-			return utility;
-		}
-	}
 }
