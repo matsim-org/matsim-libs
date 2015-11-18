@@ -8,7 +8,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.router.StageActivityTypes;
@@ -56,7 +55,9 @@ public class ChooseActivityToInsert implements PlanAlgorithm {
 			
 			int index = this.rng.nextInt(allActTypes.length);
 
-			int actIndex = plan.getPlanElements().indexOf(t.get(this.rng.nextInt(t.size() - 1) + 1));
+			int randomIndex = this.rng.nextInt(t.size() - 1) + 1;
+			
+			int actIndex = plan.getPlanElements().indexOf(t.get(randomIndex));
 			
 			ActivityFacility actFacility;
 			
@@ -69,10 +70,12 @@ public class ChooseActivityToInsert implements PlanAlgorithm {
 				primaryActivity = getPersonHomeLocation(t);					
 				
 				newActivity = new ActivityImpl(allActTypes[index],
-						((NetworkImpl) scenario.getNetwork() ).getNearestLinkExactly(primaryActivity.getCoord() ).getId());
+						primaryActivity.getLinkId());
 				
 				newActivity.setFacilityId(primaryActivity.getFacilityId());
 				newActivity.setCoord(primaryActivity.getCoord());
+				newActivity.setEndTime(  t.get(randomIndex - 1).getEndTime() + 3600.0);
+
 				newActivity.setMaximumDuration(3600);
 				
 			}
@@ -82,11 +85,27 @@ public class ChooseActivityToInsert implements PlanAlgorithm {
 				primaryActivity = getPersonWorkLocation(t);
 				
 				newActivity = new ActivityImpl(allActTypes[index],
-						((NetworkImpl) scenario.getNetwork() ).getNearestLinkExactly(primaryActivity.getCoord() ).getId());
+						primaryActivity.getLinkId());
 				
 				newActivity.setFacilityId(primaryActivity.getFacilityId());
 				newActivity.setCoord(primaryActivity.getCoord());
-				newActivity.setMaximumDuration(3600);
+				newActivity.setEndTime(  t.get(randomIndex - 1).getEndTime() + 3600.0);
+
+			//	newActivity.setMaximumDuration(3600);
+
+			}
+			
+			else if (allActTypes[index].equals("education")) {
+				
+				primaryActivity = getPersonEducationLocation(t);
+				
+				newActivity = new ActivityImpl(allActTypes[index],
+						primaryActivity.getLinkId());
+				
+				newActivity.setFacilityId(primaryActivity.getFacilityId());
+				newActivity.setCoord(primaryActivity.getCoord());
+				newActivity.setEndTime(  t.get(randomIndex - 1).getEndTime() + 3600.0);
+				//newActivity.setMaximumDuration(3600);
 
 			}
 			
@@ -95,12 +114,13 @@ public class ChooseActivityToInsert implements PlanAlgorithm {
 				actFacility = findActivityLocation(allActTypes[index], 
 						((Activity)plan.getPlanElements().get(actIndex)).getCoord());
 				
-				newActivity = new ActivityImpl(allActTypes[index],
-						((NetworkImpl) scenario.getNetwork() ).getNearestLinkExactly(actFacility.getCoord() ).getId());
+				newActivity = new ActivityImpl(allActTypes[index], actFacility.getLinkId());
 				
 				newActivity.setFacilityId(actFacility.getId());
 				newActivity.setCoord(actFacility.getCoord());
-				newActivity.setMaximumDuration(3600);
+				newActivity.setEndTime(  t.get(randomIndex - 1).getEndTime() + 3600.0);
+
+				//newActivity.setMaximumDuration(3600);
 				
 			}
 			
@@ -112,6 +132,16 @@ public class ChooseActivityToInsert implements PlanAlgorithm {
 			else
 				plan.getPlanElements().add(actIndex + 1, new LegImpl( ( (Leg) plan.getPlanElements().get(actIndex - 1) ).getMode() ));			
 		}		
+	}
+
+	private Activity getPersonEducationLocation(List<Activity> allActivities) {
+		for(Activity a : allActivities) 
+			
+			if (a.getType().equals("education"))
+				
+				return a;
+		
+		throw new NullPointerException("The activity type education is not known to the agent!");
 	}
 
 	private Activity getPersonWorkLocation(List<Activity> allActivities) {
@@ -141,11 +171,11 @@ public class ChooseActivityToInsert implements PlanAlgorithm {
 		if (actType.equals("leisure"))
 			return (ActivityFacility)leisureFacilityQuadTree.getClosest(coord.getX(), coord.getY());		
 
-		else if (actType.equals("shop"))
+		else if (actType.equals("shopping"))
 		
 			return (ActivityFacility)shopFacilityQuadTree.getClosest(coord.getX(), coord.getY());		
 		else 
-			throw new NullPointerException("The activity type is not known!");
+			throw new NullPointerException("The activity type: " + actType + " ,is not known!");
 		
 	}
 

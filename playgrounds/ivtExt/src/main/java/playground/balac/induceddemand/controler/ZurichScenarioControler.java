@@ -92,7 +92,7 @@ public class ZurichScenarioControler {
 		
 		final QuadTreeRebuilder<ActivityFacility> shopFacilitiesQuadTree = new QuadTreeRebuilder<ActivityFacility>();
 		
-		for(ActivityFacility af : sc.getActivityFacilities().getFacilitiesForActivityType("shop").values()) {
+		for(ActivityFacility af : sc.getActivityFacilities().getFacilitiesForActivityType("shopping").values()) {
 			
 			shopFacilitiesQuadTree.put(af.getCoord(), af);
 		}

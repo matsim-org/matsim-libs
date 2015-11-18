@@ -33,6 +33,12 @@ public class ChooseActivityToRemove implements PlanAlgorithm {
 		
 		int actIndex = plan.getPlanElements().indexOf(t.get(index));
 		
+		if (( (Activity) plan.getPlanElements().get(actIndex)).getType().equals("home") || 
+				( (Activity) plan.getPlanElements().get(actIndex)).getType().equals("work") ||
+				( (Activity) plan.getPlanElements().get(actIndex)).getType().equals("education")) 
+			return;
+		
+		
 		boolean previous = false;
 		boolean next = false;
 		

@@ -28,10 +28,7 @@ public class ChooseRandomActivitiesToSwap implements PlanAlgorithm {
 		List<Activity> t = TripStructureUtils.getActivities(plan, this.stageActivityTypes);
 		int countActivities = t.size();	
 		if (countActivities > 3) {
-
-			if (countActivities == 0) {
-				return;
-			}
+			
 			int index1 = 1 + this.rng.nextInt(countActivities - 2);			
 			
 			int index2 = 1 + this.rng.nextInt(countActivities - 2);
