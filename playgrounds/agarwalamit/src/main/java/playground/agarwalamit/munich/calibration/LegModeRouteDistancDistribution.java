@@ -20,11 +20,13 @@ package playground.agarwalamit.munich.calibration;
 
 import java.io.File;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 
 import playground.agarwalamit.analysis.legMode.distributions.LegModeRouteDistanceDistributionAnalyzer;
 import playground.agarwalamit.utils.LoadMyScenarios;
 import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
+import playground.vsp.analysis.modules.legModeDistanceDistribution.LegModeDistanceDistribution;
 
 /**
  * @author amit
@@ -33,6 +35,7 @@ public class LegModeRouteDistancDistribution {
 
 	private final static String runDir = "../../../repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run10/policies/";
 	private final static String [] runs = {"bau","ei","ci","eci","10ei"};
+	private static final Logger log = Logger.getLogger(LegModeRouteDistancDistribution.class);
 
 	public static void main(String[] args) {
 		LegModeRouteDistancDistribution ms= new LegModeRouteDistancDistribution();
@@ -47,7 +50,7 @@ public class LegModeRouteDistancDistribution {
 	}
 	
 	/**
-	 * It will write route distance distribution from events	
+	 * It will write route distance distribution from events and take the beeline distance for teleported modes	
 	 */
 	private void runRoutesDistance(String runNr, Scenario sc){
 		UserGroup ug =  UserGroup.URBAN;
@@ -59,5 +62,19 @@ public class LegModeRouteDistancDistribution {
 		lmdfed.postProcessData();
 		new File(runDir+"/analysis/legModeDistributions/").mkdirs();
 		lmdfed.writeResults(runDir+"/analysis/legModeDistributions/"+runNr+"_it."+lastIteration+"_");
+	}
+	
+	/**
+	 * It will write legModeShare and beeline distance distribution	from plans
+	 */
+	private void runBeelineDistance(String runNr,String finalPlanFile){
+		log.warn("This does not factor in the beeline distance factor used in the config. "
+				+ "It means, this distance and teleportation distance from events are different.");
+		Scenario sc = LoadMyScenarios.loadScenarioFromPlans(finalPlanFile);
+		LegModeDistanceDistribution	lmdd = new LegModeDistanceDistribution();
+		lmdd.init(sc);
+		lmdd.preProcessData();
+		lmdd.postProcessData();
+		lmdd.writeResults(runDir+runNr+"/analysis/legModeDistributions/"+runNr+".");
 	}
 }
