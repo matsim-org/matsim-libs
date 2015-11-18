@@ -421,9 +421,11 @@ public class CSVToPlans {
 					//; can be commented - no influence on functionality
 					agentId2carLicenceAttr.put(persona.getId(), " has car: " + persona.hasCar()  + " ,  driving licence: "+  persona.hasDrivingLicence() + " , car or pt user: " + isCarOrPTUser(legMode));
 					
+					// TODO: Check if this is correct!
 					if(persona.hasCar() && persona.hasDrivingLicence() && isCarOrPTUser(legMode)){
 						agentAttributes.putAttribute(person.getId().toString(), this.carUsers, this.carAvail);
-					} 
+					}
+					
 					Leg leg = popFactory.createLeg(legMode);
 					if(anterior != null){
 						if(!planElements.isEmpty()){
@@ -553,7 +555,6 @@ public class CSVToPlans {
 		}
 	}
 	
-	// TODO: Check if this is correct
 	private boolean isCarOrPTUser(String legMode){
 		return legMode.equals(TransportMode.car) || legMode.equals(SantiagoScenarioConstants.Modes.bus.toString()) || legMode.equals(TransportMode.walk);
 	}

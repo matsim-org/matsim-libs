@@ -55,7 +55,7 @@ public class SantiagoScenarioRunner {
 
 //	private static String inputPath = "../../../runs-svn/santiago/run20/input/";
 //	private static boolean doModeChoice = false;
-	private static String inputPath = "../../../runs-svn/santiago/run32/input/";
+	private static String inputPath = "../../../runs-svn/santiago/run33/input/";
 	private static boolean doModeChoice = true;
 	
 	public static void main(String args[]){
@@ -88,7 +88,6 @@ public class SantiagoScenarioRunner {
 		if(doModeChoice) setModeChoiceForSubpopulations(controler);
 		
 		// mapping agents' activities to links on the road network to avoid being stuck on the transit network
-		// TODO: this maps many people to the same location, not so nice for visualization; also some other information (access/egress) might be lost.
 		mapActivities2properLinks(scenario);
 		
 		controler.run();
@@ -147,10 +146,6 @@ public class SantiagoScenarioRunner {
 				addTravelDisutilityFactoryBinding(SantiagoScenarioConstants.Modes.colectivo.toString()).to(carTravelDisutilityFactoryKey());
 				addTravelTimeBinding(SantiagoScenarioConstants.Modes.other.toString()).to(networkTravelTime());
 				addTravelDisutilityFactoryBinding(SantiagoScenarioConstants.Modes.other.toString()).to(carTravelDisutilityFactoryKey());
-//				addTravelTimeBinding(SantiagoScenarioConstants.Modes.motorcycle.toString()).to(networkTravelTime());
-//				addTravelDisutilityFactoryBinding(SantiagoScenarioConstants.Modes.motorcycle.toString()).to(carTravelDisutilityFactoryKey());
-//				addTravelTimeBinding(SantiagoScenarioConstants.Modes.school_bus.toString()).to(networkTravelTime());
-//				addTravelDisutilityFactoryBinding(SantiagoScenarioConstants.Modes.school_bus.toString()).to(carTravelDisutilityFactoryKey());
 			}
 		});
 	}
@@ -193,10 +188,11 @@ public class SantiagoScenarioRunner {
 		modeChoiceNonCarAvail.setWeight(0.15);
 		controler.getConfig().strategy().addStrategySettings(modeChoiceNonCarAvail);
 		
-		// adding subtour mode choice strategy module for car users
+		//TODO: somehow, there are agents for which the chaining does not work (e.g. agent 10002001) 
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
+				Log.info("Adding SubtourModeChoice for agents with a car available...");
 				addPlanStrategyBinding(nameMcCarAvail).toProvider(new javax.inject.Provider<PlanStrategy>() {
 //					String[] availableModes = {TransportMode.car, TransportMode.bike, TransportMode.walk, TransportMode.pt};
 //					String[] chainBasedModes = {TransportMode.car, TransportMode.bike};
@@ -205,6 +201,8 @@ public class SantiagoScenarioRunner {
 
 					@Override
 					public PlanStrategy get() {
+						Log.info("Available modes are " + availableModes);
+						Log.info("Chain-based modes are " + chainBasedModes);
 						final Builder builder = new Builder(new RandomPlanSelector<Plan, Person>());
 						builder.addStrategyModule(new SubtourModeChoice(controler.getConfig().global().getNumberOfThreads(), availableModes, chainBasedModes, false));
 						builder.addStrategyModule(new ReRoute(controler.getScenario()));
@@ -213,10 +211,10 @@ public class SantiagoScenarioRunner {
 				});
 			}
 		});
-		// adding subtour mode choice strategy module for non-car users
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
+				Log.info("Adding SubtourModeChoice for the rest of the agents...");
 				addPlanStrategyBinding(nameMcNonCarAvail).toProvider(new javax.inject.Provider<PlanStrategy>() {
 //					String[] availableModes = {TransportMode.bike, TransportMode.walk, TransportMode.pt};
 //					String[] chainBasedModes = {TransportMode.bike};
@@ -225,6 +223,8 @@ public class SantiagoScenarioRunner {
 
 					@Override
 					public PlanStrategy get() {
+						Log.info("Available modes are " + availableModes);
+						Log.info("Chain-based modes are " + chainBasedModes);
 						final Builder builder = new Builder(new RandomPlanSelector<Plan, Person>());
 						builder.addStrategyModule(new SubtourModeChoice(controler.getConfig().global().getNumberOfThreads(), availableModes, chainBasedModes, false));
 						builder.addStrategyModule(new ReRoute(controler.getScenario()));

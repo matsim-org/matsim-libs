@@ -89,6 +89,19 @@ import org.matsim.pt.config.TransitRouterConfigGroup;
 import playground.benjamin.scenarios.santiago.SantiagoScenarioConstants;
 import playground.benjamin.scenarios.santiago.SantiagoScenarioConstants.SubpopulationName;
 
+/**
+ * Creates an initial population and config for the Greater Santiago Area, executing the following steps:
+ * <ol>
+ * <li>Create population from survey data</li>
+ * <li>Filter population such that we only have plans where all activities end before midnight</li>
+ * <li>Randomize activity end times</li>
+ * <li>Adding activity types according to their reported typical duration to the config</li>
+ * </ol>
+ * 
+ * @author dhosse, kturner, benjamin
+ * 
+ */
+
 public class SantiagoScenarioBuilder {
 	private static final Logger log = Logger.getLogger(SantiagoScenarioBuilder.class);
 	
@@ -104,29 +117,11 @@ public class SantiagoScenarioBuilder {
 	final String workingDirInputFiles = svnWorkingDir + "Kai_und_Daniel/inputFromElsewhere/";
 	final String boundariesInputDir = workingDirInputFiles + "exported_boundaries/";
 	final String databaseFilesDir = workingDirInputFiles + "exportedFilesFromDatabase/";
-	final String visualizationsDir = workingDirInputFiles + "Visualisierungen/";
 	final String outputDir = svnWorkingDir + "Kai_und_Daniel/inputForMATSim/";
-	
-	final String transitFilesDir = svnWorkingDir + "santiago_pt_demand_matrix/pt_stops_schedule_2013/";
-	final String gtfsFilesDir = svnWorkingDir + "santiago_pt_demand_matrix/gtfs_201306/";
 	
 	final String popA0eAX = "A0equalAX";		//Population with first Activity = last Activity
 	final String popA0neAX = "A0NoNequalAX";	//Population with first Activity != last Activity
 	
-	/**
-	 * Creates an initial population for the santiago scenario, executing the following steps:
-	 * <ol>
-	 * <li>Create population from survey data</li>
-	 * <li>Filter population such that we only have plans in which all activities end before midnight</li>
-	 * <li>Randomize activity end times</li>
-	 * <li>Classify activities according to their typical and minimum duration</li>
-	 * </ol>
-	 * 
-	 * Along with the generation of plans, an input config file is created and written.
-	 * Todo-marks show positions for essential config settings, e.g. paths and names of in-/output.  
-	 * 
-	 * @param args
-	 */
 	public static void main(String args[]){
 		SantiagoScenarioBuilder scb = new SantiagoScenarioBuilder();
 		scb.build();
@@ -137,7 +132,7 @@ public class SantiagoScenarioBuilder {
 		if(!output.exists()) createDir(new File(outputDir));
 		
 		Config config = ConfigUtils.createConfig();
-		setUpConfigParameters(config);
+		setConfigParameters(config);
 		
 		CSVToPlans converter = new CSVToPlans(config,
 											  outputDir + "plans/",
@@ -155,42 +150,48 @@ public class SantiagoScenarioBuilder {
 		removePersons(scenarioFromEOD.getPopulation());
 		
 		//TODO: rather first sort A0eAX and A0neAX, and then cut to midnight only for the latter...use Amits code below instead?
-		Map<String, Population> populationMap = getPlansBeforeMidnight(scenarioFromEOD.getPopulation());
-		new PopulationWriter(populationMap.get(popA0eAX)).write(outputDir + "plans/plans_cropped_A0eAx_coords_beforeMidnight.xml.gz");
-		log.info("persons with a0 equal to aX: " + populationMap.get(popA0eAX).getPersons().size());
-		new PopulationWriter(populationMap.get(popA0neAX)).write(outputDir + "plans/plans_cropped_A0neAx_coords_beforeMidnight.xml.gz");
-		log.info("persons with a0 non equal to aX: " + populationMap.get(popA0neAX).getPersons().size());
-		double sampleSizeEOD = populationMap.get(popA0eAX).getPersons().size() + populationMap.get(popA0neAX).getPersons().size(); 
+//		Map<String, Population> populationMap = getPlansBeforeMidnight(scenarioFromEOD.getPopulation());
+//		new PopulationWriter(populationMap.get(popA0eAX)).write(outputDir + "plans/plans_cropped_A0eAx_coords_beforeMidnight.xml.gz");
+//		log.info("persons with a0 equal to aX: " + populationMap.get(popA0eAX).getPersons().size());
+//		new PopulationWriter(populationMap.get(popA0neAX)).write(outputDir + "plans/plans_cropped_A0neAx_coords_beforeMidnight.xml.gz");
+//		log.info("persons with a0 non equal to aX: " + populationMap.get(popA0neAX).getPersons().size());
 		
-		Scenario scenarioTmp = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		Population populationTmp = scenarioTmp.getPopulation();
-		new MatsimPopulationReader(scenarioTmp).readFile(outputDir + "plans/plans_cropped_A0eAx_coords_beforeMidnight.xml.gz");
-		new MatsimPopulationReader(scenarioTmp).readFile(outputDir + "plans/plans_cropped_A0neAx_coords_beforeMidnight.xml.gz");
+//		Scenario scenarioTmp = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+//		Population populationTmp = scenarioTmp.getPopulation();
+//		new MatsimPopulationReader(scenarioTmp).readFile(outputDir + "plans/plans_cropped_A0eAx_coords_beforeMidnight.xml.gz");
+//		new MatsimPopulationReader(scenarioTmp).readFile(outputDir + "plans/plans_cropped_A0neAx_coords_beforeMidnight.xml.gz");
 		
-		randomizeEndTimes(populationTmp);
-		
-		//finish population
-		ActivityClassifier aap = new ActivityClassifier(scenarioTmp);
+		//define meaningful population for scoring and meaningful (= stated) typical durations
+//		ActivityClassifier aap = new ActivityClassifier(scenarioTmp);
+		ActivityClassifier aap = new ActivityClassifier(scenarioFromEOD);
 		aap.run();
+		Population outPop = aap.getOutPop();
+		//calculating sample size here before adding freight
+		final double sampleSizeEOD = outPop.getPersons().size();
+		log.info("population has " + sampleSizeEOD + " persons.");
+		
+		//randomize end times
+//		randomizeEndTimes(populationTmp);
+//		randomizeEndTimes(scenarioFromEOD.getPopulation());
+		randomizeEndTimes(outPop);
 
 		//add here so the end times will not be randomized
 		addFreightPop(aap.getOutPop());
-		
-		new PopulationWriter(aap.getOutPop()).write(outputDir + "plans/plans_final.xml.gz");
+		new PopulationWriter(outPop).write(outputDir + "plans/plans_final.xml.gz");
 				
 		//finish config
-		SortedMap<String, Double> acts = aap.getActivityType2TypicalDuration();
-		setActivityParams(acts, config);
-
-		setCountsParameters(config.counts(), sampleSizeEOD);
-		setQSimParameters(config.qsim(), sampleSizeEOD);
+		setActivityParams(aap.getActivityType2TypicalDuration(), config);
+		final double scaleFactor = SantiagoScenarioConstants.N / sampleSizeEOD;
+		log.info("setting scale factor to " + SantiagoScenarioConstants.N + " / " + sampleSizeEOD + " = " + scaleFactor);
+		setCountsParameters(config.counts(), scaleFactor);
+		setQSimParameters(config.qsim(), scaleFactor);
 		new ConfigWriter(config).write(outputDir + "config_final.xml");
 	}
 
 	private void setActivityParams(SortedMap<String, Double> acts, Config config) {
 		for(String act :acts.keySet()){
 			if(act.equals(PtConstants.TRANSIT_ACTIVITY_TYPE)){
-				//do nothing
+				//should not happen, but in case do nothing
 			} else {
 				ActivityParams params = new ActivityParams();
 				params.setActivityType(act);
@@ -209,6 +210,7 @@ public class SantiagoScenarioBuilder {
 
 	/**
 	 * Freight traffic will only be added to population if file exists. Otherwise do nothing.
+	 * 
 	 * @param populationOut
 	 */
 	private void addFreightPop(Population populationOut) {
@@ -278,7 +280,7 @@ public class SantiagoScenarioBuilder {
 		
 		//for persons with a0 = aX
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		Population pop = sc.getPopulation();
+		Population pop1 = sc.getPopulation();
 		//for persons with a0 != aX
 		Scenario sc2 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Population pop2 = sc2.getPopulation();
@@ -340,14 +342,14 @@ public class SantiagoScenarioBuilder {
 			Activity lastAct = (Activity) selectedPlan.getPlanElements().get(selectedPlan.getPlanElements().size()-1);
 			
 			if(firstAct.getType().equals(lastAct.getType())){
-				pop.addPerson(person);
+				pop1.addPerson(person);
 			} else{
 				pop2.addPerson(person);
 			}
 		}
 		
 		Map<String, Population> populationMap = new HashMap<String, Population>();
-		populationMap.put(popA0eAX, pop);
+		populationMap.put(popA0eAX, pop1);
 		populationMap.put(popA0neAX, pop2);
 		
 		return populationMap;
@@ -491,10 +493,13 @@ public class SantiagoScenarioBuilder {
 		Random random = MatsimRandom.getRandom();
 		for(Person person : population.getPersons().values()){
 			double timeShift = 0.;
-			for(PlanElement pe : person.getSelectedPlan().getPlanElements()){
+			List<PlanElement> pes= person.getSelectedPlan().getPlanElements();
+			for(PlanElement pe : pes){
 				if(pe instanceof Activity){
 					Activity act = (Activity) pe;
+					// TODO: this should not happen any more after using ActivityClassifier?
 					if(act.getStartTime() != Time.UNDEFINED_TIME && act.getEndTime() != Time.UNDEFINED_TIME){
+						// TODO: should also not happen any more.
 						if(act.getEndTime() - act.getStartTime() == 0){
 							timeShift += 1800.;
 						}
@@ -504,40 +509,46 @@ public class SantiagoScenarioBuilder {
 			
 			Activity firstAct = (Activity) person.getSelectedPlan().getPlanElements().get(0);
 			Activity lastAct = (Activity) person.getSelectedPlan().getPlanElements().get(person.getSelectedPlan().getPlanElements().size()-1);
+			String firstActType = firstAct.getType();
+			String lastActType = lastAct.getType();
 			
-			double delta = 0;
-			while(delta == 0){
+			double delta = 0.;
+			while(delta == 0.){
 				delta = createRandomEndTime(random);
-				if(firstAct.getEndTime() + delta < 0){
-					delta = 0;
+				if(firstAct.getEndTime() + delta + timeShift < 0.){ //avoid shifting A0 end time before midnight
+					delta = 0.;
 				}
-				if(lastAct.getStartTime() + delta + timeShift > 24 * 3600){
-					delta = 0;
+				if(!firstActType.equals(lastActType)){ 							    //if A0neAX, ...
+					if(lastAct.getStartTime() + delta + timeShift > Time.MIDNIGHT){ //...avoid shifting start time of AX after midnight
+						delta = 0.;
+					}
+				} else { //if A0eAX, ...
+						 //...allow to shift it after midnight 
 				}
+				// if an activity end time for last activity exists, it should be 24:00:00
+				// in order to avoid zero activity durations, this check is done
+				// TODO: I dont understand this...
 				if(lastAct.getEndTime() != Time.UNDEFINED_TIME){
-					// if an activity end time for last activity exists, it should be 24:00:00
-					// in order to avoid zero activity durations, this check is done
 					if(lastAct.getStartTime() + delta + timeShift >= lastAct.getEndTime()){
-						delta = 0;
+						delta = 0.;
 					}
 				}
 			}
 			
-			for(int i = 0; i < person.getSelectedPlan().getPlanElements().size(); i++){
-				PlanElement pe = person.getSelectedPlan().getPlanElements().get(i);
+			for(int i = 0; i < pes.size(); i++){
+				PlanElement pe = pes.get(i);
 				if(pe instanceof Activity){
 					Activity act = (Activity)pe;
 					if(!act.getType().equals(PtConstants.TRANSIT_ACTIVITY_TYPE)){
-						if(person.getSelectedPlan().getPlanElements().indexOf(act) > 0){
+						if(pes.indexOf(act) > 0){ //set start times for all but the first activity 
 							act.setStartTime(act.getStartTime() + delta);
 						}
-						if(person.getSelectedPlan().getPlanElements().indexOf(act) < person.getSelectedPlan().getPlanElements().size()-1){
+						if(pes.indexOf(act) < pes.size()-1){ //set end times for all but the last activity
 							act.setEndTime(act.getEndTime() + delta);
 						}
+					} else {
+						throw new RuntimeException("Activity from type " + PtConstants.TRANSIT_ACTIVITY_TYPE + " found in initial plans. Aborting...");
 					}
-//					else {
-//						log.warn("This should not happen! ");
-//					}
 				}
 			}
 		}
@@ -551,21 +562,12 @@ public class SantiagoScenarioBuilder {
 		
 		//Box-Muller-Method in order to get a normally distributed variable
 		double normal = Math.cos(2 * Math.PI * r1) * Math.sqrt(-2 * Math.log(r2));
-		double endTime = 20*60 * normal;
+		double endTime = 20 * 60 * normal;
 		
 		return endTime;
 	}
 	
-	/**
-	 * 
-	 * Convenience method for creating a config file along with a new population.
-	 * Any changes in config parameters can be done in the sub-methods.
-	 * The flow capacity and the counts scale factor are set automatically using the given population size of the Santiago Metropolitan area
-	 * (see {@linkplain SantiagoScenarioConstants}) and the size of the MATSim population.
-	 * 
-	 * @param config
-	 */
-	private void setUpConfigParameters(Config config){
+	private void setConfigParameters(Config config){
 		setControlerParameters(config.controler());
 //		setCountsParameters(config.counts());
 		setGlobalParameters(config.global());
@@ -581,7 +583,7 @@ public class SantiagoScenarioBuilder {
 			setTransitParameters(config.transit(), config.transitRouter());
 		}
 		
-		//creation of more than one subpopulation in config not possible yet ->removed Module, creation in SantiagoScenarioRunner (edited by BK) ,KT 2015-09-15.
+		//creation of more than one subpopulation in config not possible yet ->removed Module, creation in SantiagoScenarioRunner
 //		setSubtourModeChoiceParameters(config.subtourModeChoice());
 		config.removeModule("subtourModeChoice");
 		
@@ -623,11 +625,11 @@ public class SantiagoScenarioBuilder {
 		cc.setWriteSnapshotsInterval(0);
 	}
 	
-	private void setCountsParameters(CountsConfigGroup counts, double sampleSizeEOD){
+	private void setCountsParameters(CountsConfigGroup counts, double scaleFactor){
 		// TODO: check what adding taxi, colectivo, and freight changes
 		counts.setAnalyzedModes(TransportMode.car);
 		counts.setAverageCountsOverIterations(5);
-		counts.setCountsScaleFactor(SantiagoScenarioConstants.N / sampleSizeEOD);
+		counts.setCountsScaleFactor(scaleFactor);
 		counts.setDistanceFilter(null);
 		counts.setDistanceFilterCenterNode(null);
 		counts.setFilterModes(false);
@@ -758,20 +760,6 @@ public class SantiagoScenarioBuilder {
 		otherModeParams.setMarginalUtilityOfTraveling(-1.056);
 		otherModeParams.setMonetaryDistanceRate(-0.0);
 		pcs.addModeParams(otherModeParams);
-		
-//		ModeParams motorcycleParams = new ModeParams(SantiagoScenarioConstants.Modes.motorcycle.toString());
-//		motorcycleParams.setConstant(0.0);
-////		motorcycleParams.setMarginalUtilityOfDistance(0.0);
-//		motorcycleParams.setMarginalUtilityOfTraveling(-1.056);
-//		motorcycleParams.setMonetaryDistanceRate(-0.0);
-//		pcs.addModeParams(motorcycleParams);
-//
-//		ModeParams schoolBusParams = new ModeParams(SantiagoScenarioConstants.Modes.school_bus.toString());
-//		schoolBusParams.setConstant(0.0);
-////		schoolBusParams.setMarginalUtilityOfDistance(0.0);
-//		schoolBusParams.setMarginalUtilityOfTraveling(-1.056);
-//		schoolBusParams.setMonetaryDistanceRate(-0.0);
-//		pcs.addModeParams(schoolBusParams);
 	}
 	
 	private void setPlanParameters(PlansConfigGroup plans){
@@ -790,8 +778,6 @@ public class SantiagoScenarioBuilder {
 		networkModes.add(SantiagoScenarioConstants.Modes.taxi.toString());
 		networkModes.add(SantiagoScenarioConstants.Modes.colectivo.toString());
 		networkModes.add(SantiagoScenarioConstants.Modes.other.toString());
-//		networkModes.add(SantiagoScenarioConstants.Modes.motorcycle.toString());
-//		networkModes.add(SantiagoScenarioConstants.Modes.school_bus.toString());
 //		if(prepareForModeChoice) networkModes.add(TransportMode.pt);
 		pcr.setNetworkModes(networkModes);
 		
@@ -835,12 +821,10 @@ public class SantiagoScenarioBuilder {
 		pcr.addModeRoutingParams(bikeParams);
 	}
 	
-	private void setQSimParameters(QSimConfigGroup qsim, double sampleSizeEOD){
-		// TODO: avoiding wrongly coded pt departures at midnight; would be better to get them out of the transitschedule (see comments there). 
-//		qsim.setStartTime(0 * 3600);
-		qsim.setStartTime(2 * 3600);
+	private void setQSimParameters(QSimConfigGroup qsim, double scaleFactor){
+		qsim.setStartTime(0 * 3600);
 		qsim.setEndTime(30 * 3600);
-		double flowCapFactor = (sampleSizeEOD / SantiagoScenarioConstants.N);
+		double flowCapFactor = (1 / scaleFactor);
 		qsim.setFlowCapFactor(flowCapFactor);
 //		qsim.setStorageCapFactor(0.015);
 		qsim.setStorageCapFactor(flowCapFactor * 3.);
