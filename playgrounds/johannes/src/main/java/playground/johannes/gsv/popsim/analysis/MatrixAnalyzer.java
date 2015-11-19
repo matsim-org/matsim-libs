@@ -19,7 +19,9 @@
 
 package playground.johannes.gsv.popsim.analysis;
 
+import gnu.trove.list.array.TDoubleArrayList;
 import org.matsim.contrib.common.stats.LinearDiscretizer;
+import org.matsim.contrib.common.stats.StatsWriter;
 import playground.johannes.gsv.popsim.CollectionUtils;
 import playground.johannes.gsv.popsim.MatrixBuilder;
 import playground.johannes.gsv.zones.KeyMatrix;
@@ -34,6 +36,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author johannes
@@ -65,6 +68,7 @@ public class MatrixAnalyzer extends AbstractAnalyzerTask<Collection<? extends Pe
         double simTotal = MatrixOperations.sum(simMatrix);
 
         for(Map.Entry<String, KeyMatrix> entry : refMatrices.entrySet()) {
+            String matrixName = entry.getKey();
             KeyMatrix refMatrix = entry.getValue();
 
             double refTotal = MatrixOperations.sum(refMatrix);
@@ -74,18 +78,71 @@ public class MatrixAnalyzer extends AbstractAnalyzerTask<Collection<? extends Pe
 
             double[] errors = CollectionUtils.toNativeArray(errMatrix.values());
 
-            String name = String.format("%s.%s.err", KEY, entry.getKey());
+            String name = String.format("%s.%s.err", KEY, matrixName);
             StatsContainer container = new StatsContainer(name, errors);
             containers.add(container);
 
             writeHistograms(errors, name);
+            /*
+            weighted error matrix
+             */
+            TDoubleArrayList errorList = new TDoubleArrayList();
+            TDoubleArrayList weightList = new TDoubleArrayList();
+
+            Set<String> keys = errMatrix.keys();
+            for(String i : keys) {
+                for(String j : keys) {
+                    Double err = errMatrix.get(i, j);
+                    Double vol = refMatrix.get(i, j);
+
+                    if(err != null) {
+                        errorList.add(err);
+                        if(vol == null || vol == 0) vol = Double.MIN_VALUE;
+                        weightList.add(vol);
+                    }
+                }
+            }
+            name = String.format("%s.%s.err.weighted", KEY, matrixName);
+            container = new StatsContainer(name, errorList.toArray(), weightList.toArray());
+            containers.add(container);
 
             if(ioContext != null) {
                 try {
-                    KeyMatrixTxtIO.write(simMatrix, String.format("%s/matrix.txt.gz", ioContext.getPath()));
+                    /*
+                    write scatter plot
+                     */
+                    keys = refMatrix.keys();
+                    keys.addAll(simMatrix.keys());
+
+                    TDoubleArrayList refVals = new TDoubleArrayList();
+                    TDoubleArrayList simVals = new TDoubleArrayList();
+                    for(String i : keys) {
+                        for(String j : keys) {
+                            Double refVol = refMatrix.get(i, j);
+                            if(refVol == null) refVol = 0.0;
+                            Double simVol = simMatrix.get(i, j);
+                            if(simVol == null) simVol = 0.0;
+
+                            if(refVol > 0 && simVol > 0) {
+                                refVals.add(refVol);
+                                simVals.add(simVol);
+                            }
+                        }
+                    }
+
+                    StatsWriter.writeScatterPlot(refVals, simVals, entry.getKey(), "simulation", String.format
+                            ("%s/matrix.scatter.%s.txt", ioContext.getPath(), matrixName));
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+            }
+        }
+
+        if(ioContext != null) {
+            try {
+                KeyMatrixTxtIO.write(simMatrix, String.format("%s/matrix.txt.gz", ioContext.getPath()));
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
     }
