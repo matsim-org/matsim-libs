@@ -134,8 +134,8 @@ public class LegModeDistanceDistribution extends AbstractAnalysisModule{
 	@Override
 	public void writeResults(String outputFolder) {
 		
-		File outputFolderFile = new File(outputFolder);
-		outputFolderFile.mkdirs();
+//		File outputFolderFile = new File(outputFolder);
+//		outputFolderFile.mkdirs();
 		
 		String outFile = outputFolder + "legModeDistanceDistribution.txt";
 		try{

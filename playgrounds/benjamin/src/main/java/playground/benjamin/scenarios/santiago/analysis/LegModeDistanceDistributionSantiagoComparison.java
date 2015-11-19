@@ -50,7 +50,7 @@ public class LegModeDistanceDistributionSantiagoComparison {
 	static String configFile2 = configFile1;
 	static String iteration2 = "100";
 	
-	//TODO: find some good solution here
+	//TODO: adapt this to agentAttributes
 	static UserGroup userGroup = null;
 	
 	public static void main(String[] args) {
@@ -77,7 +77,7 @@ public class LegModeDistanceDistributionSantiagoComparison {
 				((LegModeDistanceDistribution) anaModule).setMode2Share(mode2ShareDifference);
 				anaModule.writeResults(baseFolder1  + "ITERS/it." + iteration1 + 
 						"/defaultAnalysis/" + anaModule.getName() + "/"
-						+ iteration1 + "-" + iteration2 + "_");
+						+ iteration2 + "-" + iteration1 + ".");
 			}	
 		}
 		// end ugly code...

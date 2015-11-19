@@ -42,7 +42,7 @@ public class LegModeDistanceDistributionSantiagoSingle {
 	static String configFile = baseFolder + "output_config.xml.gz";
 	static String iteration = "0";
 	
-	//TODO: find some good solution here
+	//TODO: adapt this to agentAttributes
 	static UserGroup userGroup = null;
 
 	public static void main(String[] args) {

@@ -43,16 +43,19 @@ import org.matsim.vehicles.Vehicles;
 import playground.benjamin.scenarios.santiago.SantiagoScenarioConstants;
 import playground.benjamin.scenarios.santiago.population.SantiagoScenarioBuilder;
 
+/**
+ * Calculates public transport fares for the Santiago scenario.
+ * The full fare scheme is available under http://www.transantiago.cl/tarifas-y-pagos/conoce-las-tarifas.
+ * TODO: Keep track of interchanges so a reduced/no additional fare is charged; see e.g. StageContainer2AgentMoneyEvent
+ * TODO: Integrate different pricing for peak/offPeak interchanges. 
+ * TODO: Integrate studentSeniorFare?
+ * 
+ * @author benjamin
+ * 
+ */
 public class PTFareHandler implements PersonDepartureEventHandler, PersonEntersVehicleEventHandler {
 	private static final Logger log = Logger.getLogger(PersonDepartureEventHandler.class);
 
-	private final Controler controler;
-	
-	/*
-	 * The full fare scheme is available under http://www.transantiago.cl/tarifas-y-pagos/conoce-las-tarifas.
-	 * TODO: Keep track of interchanges so a reduced/no additional fare is charged.
-	 * TODO: Integrate studentSeniorFare?
-	 */
 	private final double peakFare = -720.;
 	private final double intermediateFare = -660.;
 	private final double offPeakFare = -640.;
@@ -71,11 +74,11 @@ public class PTFareHandler implements PersonDepartureEventHandler, PersonEntersV
 	private final double startPeakTimeEvening = 18.0 * 3600;
 	private final double endPeakTimeEvening = (20.0 * 3600) - 1;
 
-	private Set<String> ptModes;
+	private final Controler controler;
 	private boolean doModeChoice;
 	private Vehicles transitVehicles;
 	private Population population;
-	
+	private Set<String> ptModes;
 	
 	public PTFareHandler(final Controler controler, boolean doModeChoice, Population population){
 		this.controler = controler;
@@ -93,7 +96,7 @@ public class PTFareHandler implements PersonDepartureEventHandler, PersonEntersV
 		//nothing to do
 	}
 	
-	//only possible if mode choice is on (i.e. transit vehicles are there)
+	//only if mode choice is ON (i.e. transit vehicles are there)
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
 		if(this.doModeChoice){ //only if mode choice is on (i.e. transit vehicles are there)
@@ -116,9 +119,10 @@ public class PTFareHandler implements PersonDepartureEventHandler, PersonEntersV
 		}
 	}
 	
+	//only if mode choice is OFF (i.e. teleported pt is on)
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
-		if(!this.doModeChoice){ //only if mode choice is off (i.e. teleported pt is on)
+		if(!this.doModeChoice){
 			double time = event.getTime();
 			Id<Person> id = event.getPersonId();
 			String legMode = event.getLegMode();
