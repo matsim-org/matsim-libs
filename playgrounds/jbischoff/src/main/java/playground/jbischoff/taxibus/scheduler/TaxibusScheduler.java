@@ -213,7 +213,7 @@ public class TaxibusScheduler
 
         Schedule<TaxibusTask> bestSched = (Schedule<TaxibusTask>)best.vehicle.getSchedule();
         TaxibusTask lastTask = Schedules.getLastTask(bestSched);
-        log.info("Scheduled Route");
+        log.info("Bus "+best.vehicle.getId() +" Scheduled Route");
         for (VrpPathWithTravelData  path : best.path){
         	log.info(path.getFromLink().getId() + " to " + path.getToLink().getId());
         }

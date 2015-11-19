@@ -54,16 +54,25 @@ public class TaxibusVehicleCreator
 	private String vehiclesFilePrefix = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/input/taxibus_vehicles_";
 	
 	private Scenario scenario ;
+	private int ii = 0;
 	private Random random = MatsimRandom.getRandom();
     private List<Vehicle> vehicles = new ArrayList<>();
 
 	
 	public static void main(String[] args) {
 		TaxibusVehicleCreator tvc = new TaxibusVehicleCreator();
-		for (int i = 100; i<1501 ; i=i+200 ){
-			System.out.println(i);
-			tvc.run(i);
-		}
+		tvc.run(10, Id.createLinkId("vw131"));
+		tvc.run(10, Id.createLinkId("53690"));
+		tvc.run(10, Id.createLinkId("18697"));
+		tvc.run(10, Id.createLinkId("52118"));
+		tvc.run(10, Id.createLinkId("3769"));
+		tvc.run(10, Id.createLinkId("19769"));
+		new VehicleWriter(tvc.vehicles).write(tvc.vehiclesFilePrefix+"l.xml.gz");
+
+//		for (int i = 10; i<150 ; i=i+10 ){
+//			System.out.println(i);
+//			tvc.run(i);
+//		}
 }
 
 	public TaxibusVehicleCreator() {
@@ -82,7 +91,19 @@ public class TaxibusVehicleCreator
         vehicles.add(v);
 
 		}
-		new VehicleWriter(vehicles).write(vehiclesFilePrefix+amount+".xml.gz");
+		new VehicleWriter(vehicles).write(vehiclesFilePrefix+amount+".xml");
+	}
+	
+private void run(int amount, Id<Link> linkId) {
+	    
+		for (int i = 0 ; i< amount; i++){
+	
+		Link link = scenario.getNetwork().getLinks().get(linkId);
+        Vehicle v = new VehicleImpl(Id.create("tb"+ii, Vehicle.class), link, 8, Math.round(1), Math.round(48*3600));
+        ii++;
+        vehicles.add(v);
+
+		}
 	}
 
 	

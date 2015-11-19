@@ -17,10 +17,11 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jbischoff.taxibus.optimizer.filter;
+package playground.jbischoff.taxibus.optimizer.defaultOptimizer.filter;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.contrib.util.DistanceUtils;
 
 import playground.jbischoff.taxibus.passenger.TaxibusRequest;
@@ -50,9 +51,12 @@ public class KStraightLineNearestVehicleFilter
         PartialSort<Vehicle> nearestVehicleSort = new PartialSort<Vehicle>(k);
 
         for (Vehicle veh : vehicles) {
-            Link fromLink = scheduler.getImmediateDiversionOrEarliestIdleness(veh).link;
+        LinkTimePair ltp =   scheduler.getImmediateDiversionOrEarliestIdleness(veh);
+        if (ltp!=null){
+        	Link fromLink = ltp.link;
             double squaredDistance = DistanceUtils.calculateSquaredDistance(fromLink, toLink);
             nearestVehicleSort.add(veh, squaredDistance);
+        }
         }
 
         return nearestVehicleSort.retriveKSmallestElements();

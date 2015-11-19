@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,24 +17,68 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jbischoff.taxibus.optimizer.filter;
+package playground.jbischoff.taxibus.optimizer.fifo.Lines;
 
+import java.util.Collection;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.Vehicle;
 
 import playground.jbischoff.taxibus.passenger.TaxibusRequest;
-import playground.michalm.taxi.data.TaxiRequest;
 
+/**
+ * @author  jbischoff
+ *
+ */
 
-public interface TaxibusVehicleFilter
-{
-    TaxibusVehicleFilter NO_FILTER = new TaxibusVehicleFilter() {
-        public Iterable<Vehicle> filterVehiclesForRequest(Iterable<Vehicle> vehicles,
-                TaxibusRequest request)
-        {
-            return vehicles;
-        }
-    };
+public interface TaxibusLine {
 
+	public Id<TaxibusLine> getId();
 
-    Iterable<Vehicle> filterVehiclesForRequest(Iterable<Vehicle> vehicles, TaxibusRequest request);
+	public Id<TaxibusLine> getReturnRouteId();
+	
+	public void setReturnRouteId(Id<TaxibusLine> id);
+	
+	/**
+	 * @return Lambda currently applicable
+	 */
+	public double getCurrentLambda();
+	
+	
+	
+	/**
+	 * @param time 
+	 * @return Lambda for defined time
+	 */
+	public double getLambda(double time);
+	
+	public double getCurrentOccupationRate();
+	
+	
+	/**
+	 * @return the Link's id where busses are stowed prior to dispatch
+	 */
+	public Id<Link> getHoldingPosition();
+	
+	
+	/**
+	 * @return expected TravelTime for a Single Trip w/o drop offs or pick ups
+	 */
+	public double getSingleTripTravelTime();
+	
+	
+	/**
+	 * @return maximum time spent on collecting passengers after initial dispatch
+	 */
+	public double getCurrentTwMax();
+	
+	public void addVehicleToHold(Vehicle veh);
+	
+	public boolean removeVehicleFromHold(Vehicle veh);
+	
+	public Vehicle getNextEmptyVehicle();
+	
+	public boolean lineServesRequest(TaxibusRequest request);
+	
+	
 }

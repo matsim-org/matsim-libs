@@ -17,39 +17,36 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jbischoff.taxibus.optimizer.filter;
+package playground.jbischoff.taxibus.optimizer.defaultOptimizer.filter;
 
-import playground.jbischoff.taxibus.scheduler.TaxibusScheduler;
+import java.util.Collection;
+import java.util.LinkedHashSet;
+
+import org.matsim.contrib.dvrp.data.Vehicle;
+
+import playground.jbischoff.taxibus.passenger.TaxibusRequest;
+import playground.jbischoff.taxibus.vehreqpath.TaxibusVehicleRequestPath;
 
 
-public class DefaultTaxibusFilterFactory
-    implements TaxibusFilterFactory
+public interface TaxibusRequestFilter
 {
-    private final TaxibusScheduler scheduler;
-    private final int nearestVehiclesLimit;
-    private final int nearestRequestsLimit;
+    TaxibusRequestFilter NO_FILTER = new TaxibusRequestFilter() {
 
-    public DefaultTaxibusFilterFactory(TaxibusScheduler scheduler, int nearestRequestsLimit,
-            int nearestVehiclesLimit)
-    {
-        this.scheduler = scheduler;
-        this.nearestRequestsLimit = nearestRequestsLimit;
-        this.nearestVehiclesLimit = nearestVehiclesLimit;
-    }
+		@Override
+		public Iterable<TaxibusRequest> filterRequestsForVehicle(Iterable<TaxibusRequest> requests, Vehicle vehicle) {
+			return requests;
+		}
+
+		@Override
+		public Iterable<TaxibusRequest> filterRequestsForBestRequest(Iterable<TaxibusRequest> unplannedRequests,
+				TaxibusVehicleRequestPath best) {
+			return unplannedRequests;
+		}
+    };
 
 
-    @Override
-    public TaxibusVehicleFilter createVehicleFilter()
-    {
-        return nearestVehiclesLimit <= 0 ? TaxibusVehicleFilter.NO_FILTER
-                : new KStraightLineNearestVehicleFilter(scheduler, nearestVehiclesLimit);
-    }
-    @Override
-    public TaxibusRequestFilter createRequestFilter()
-    {
-        return nearestRequestsLimit <= 0 ? TaxibusRequestFilter.NO_FILTER
-                : new KStraightLineNearestRequestFilter(scheduler, nearestRequestsLimit);
-    }
+    Iterable<TaxibusRequest> filterRequestsForVehicle(Iterable<TaxibusRequest> requests, Vehicle vehicle);
 
-   
+
+	Iterable<TaxibusRequest> filterRequestsForBestRequest(Iterable<TaxibusRequest> unplannedRequests, TaxibusVehicleRequestPath best);
 }

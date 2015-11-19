@@ -70,25 +70,25 @@ public class KNTaxibusExample {
 		Controler controler = new Controler(scenario);
 		new ConfigBasedTaxibusLaunchUtils(controler).initiateTaxibusses();
 
-		controler.setScoringFunctionFactory(new ScoringFunctionFactory(){
-			@Override
-			public ScoringFunction createNewScoringFunction(Person person) {
-				SumScoringFunction sum = new SumScoringFunction() ;
-
-				// Score activities, legs, payments and being stuck
-				// with the default MATSim scoring based on utility parameters in the config file.
-				final CharyparNagelScoringParameters params =
-						CharyparNagelScoringParameters.getBuilder(
-								scenario,
-								person.getId() ).create();
-				sum.addScoringFunction(new CharyparNagelActivityScoring(params));
-				sum.addScoringFunction(new MyLegScoring(params, scenario.getNetwork()));
-				sum.addScoringFunction(new CharyparNagelMoneyScoring(params));
-				sum.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
-
-				return sum ;
-			}
-		});
+//		controler.setScoringFunctionFactory(new ScoringFunctionFactory(){
+//			@Override
+//			public ScoringFunction createNewScoringFunction(Person person) {
+//				SumScoringFunction sum = new SumScoringFunction() ;
+//
+//				// Score activities, legs, payments and being stuck
+//				// with the default MATSim scoring based on utility parameters in the config file.
+//				final CharyparNagelScoringParameters params =
+//						CharyparNagelScoringParameters.getBuilder(
+//								scenario,
+//								person.getId() ).create();
+//				sum.addScoringFunction(new CharyparNagelActivityScoring(params));
+//				sum.addScoringFunction(new MyLegScoring(params, scenario.getNetwork()));
+//				sum.addScoringFunction(new CharyparNagelMoneyScoring(params));
+//				sum.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
+//
+//				return sum ;
+//			}
+//		});
 
 		controler.run();
 	}

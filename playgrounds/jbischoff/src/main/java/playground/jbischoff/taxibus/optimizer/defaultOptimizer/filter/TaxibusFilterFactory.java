@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jbischoff.taxibus.optimizer.filter;
+package playground.jbischoff.taxibus.optimizer.defaultOptimizer.filter;
 
 public interface TaxibusFilterFactory
 {

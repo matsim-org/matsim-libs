@@ -17,12 +17,16 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jbischoff.taxibus.optimizer;
+package playground.jbischoff.taxibus.optimizer.defaultOptimizer;
 
 import java.util.*;
 
 import org.matsim.contrib.dvrp.data.Vehicle;
 
+import playground.jbischoff.taxibus.optimizer.AbstractTaxibusOptimizer;
+import playground.jbischoff.taxibus.optimizer.TaxibusOptimizerConfiguration;
+import playground.jbischoff.taxibus.optimizer.defaultOptimizer.filter.TaxibusRequestFilter;
+import playground.jbischoff.taxibus.optimizer.defaultOptimizer.filter.TaxibusVehicleFilter;
 import playground.jbischoff.taxibus.optimizer.filter.*;
 import playground.jbischoff.taxibus.passenger.TaxibusRequest;
 import playground.jbischoff.taxibus.passenger.TaxibusRequest.TaxibusRequestStatus;

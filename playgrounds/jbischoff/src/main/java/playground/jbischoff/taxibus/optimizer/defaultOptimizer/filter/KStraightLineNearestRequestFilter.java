@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jbischoff.taxibus.optimizer.filter;
+package playground.jbischoff.taxibus.optimizer.defaultOptimizer.filter;
 
 import java.util.LinkedHashSet;
 import java.util.List;
