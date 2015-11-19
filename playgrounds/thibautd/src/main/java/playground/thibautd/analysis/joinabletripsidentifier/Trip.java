@@ -19,9 +19,6 @@
  * *********************************************************************** */
 package playground.thibautd.analysis.joinabletripsidentifier;
 
-import java.util.Collections;
-import java.util.List;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
@@ -29,6 +26,9 @@ import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.population.Person;
+
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Represents an individual trip, as it appears in the events

@@ -19,12 +19,9 @@
  * *********************************************************************** */
 package playground.thibautd.herbie;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Random;
-import java.util.TreeMap;
-
+import herbie.running.config.HerbieConfigGroup;
+import herbie.running.scoring.HerbieScoringFunctionFactory;
+import herbie.running.scoring.LegScoringFunction;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -67,11 +64,13 @@ import org.matsim.pt.PtConstants;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.testcases.MatsimTestUtils;
-
-import herbie.running.config.HerbieConfigGroup;
-import herbie.running.scoring.HerbieScoringFunctionFactory;
-import herbie.running.scoring.LegScoringFunction;
 import playground.thibautd.socnetsimusages.cliques.herbie.scoring.HerbieJointLegScoringFunction;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Random;
+import java.util.TreeMap;
 
 /**
  * @author thibautd

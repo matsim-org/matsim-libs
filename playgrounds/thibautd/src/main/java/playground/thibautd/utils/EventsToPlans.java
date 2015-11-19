@@ -19,9 +19,6 @@
  * *********************************************************************** */
 package playground.thibautd.utils;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
@@ -40,8 +37,10 @@ import org.matsim.core.scoring.EventsToActivities;
 import org.matsim.core.scoring.EventsToActivities.ActivityHandler;
 import org.matsim.core.scoring.EventsToLegs;
 import org.matsim.core.scoring.EventsToLegs.LegHandler;
-
 import org.matsim.core.utils.collections.MapUtils;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author thibautd

@@ -18,8 +18,6 @@
  * *********************************************************************** */
 package playground.thibautd.maxess.nestedlogitaccessibility;
 
-import org.matsim.api.core.v01.Id;
-
 import java.util.List;
 
 /**

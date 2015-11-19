@@ -21,7 +21,6 @@ package eu.eunoiaproject.bikesharing.framework.examples;
 import eu.eunoiaproject.bikesharing.examples.example03configurablesimulation.RunConfigurableBikeSharingSimulation;
 import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;

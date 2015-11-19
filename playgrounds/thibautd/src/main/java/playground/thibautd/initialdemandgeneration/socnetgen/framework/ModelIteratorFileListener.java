@@ -19,13 +19,12 @@
  * *********************************************************************** */
 package playground.thibautd.initialdemandgeneration.socnetgen.framework;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-
 import org.apache.log4j.Logger;
-
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
+
+import java.io.BufferedWriter;
+import java.io.IOException;
 
 /**
  * @author thibautd

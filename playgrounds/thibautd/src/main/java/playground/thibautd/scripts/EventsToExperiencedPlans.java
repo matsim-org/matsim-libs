@@ -19,9 +19,6 @@
  * *********************************************************************** */
 package playground.thibautd.scripts;
 
-import java.util.Collection;
-import java.util.Iterator;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
@@ -37,8 +34,10 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-
 import playground.thibautd.utils.EventsToPlans;
+
+import java.util.Collection;
+import java.util.Iterator;
 
 /**
  * @author thibautd

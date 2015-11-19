@@ -19,10 +19,6 @@
  * *********************************************************************** */
 package playground.thibautd.utils;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
@@ -32,6 +28,10 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.population.algorithms.PlanAlgorithm;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Algorithm which tries to estimate the distance for legs for which

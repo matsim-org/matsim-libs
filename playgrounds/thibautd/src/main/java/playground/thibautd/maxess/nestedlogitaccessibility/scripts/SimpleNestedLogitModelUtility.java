@@ -18,15 +18,12 @@
  * *********************************************************************** */
 package playground.thibautd.maxess.nestedlogitaccessibility.scripts;
 
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import playground.thibautd.maxess.nestedlogitaccessibility.Alternative;
 import playground.thibautd.maxess.nestedlogitaccessibility.Utility;
-import playground.thibautd.maxess.prepareforbiogeme.tripbased.Trip;
 
 import java.util.List;
 

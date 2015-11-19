@@ -19,27 +19,25 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsimusages.jointpseudosim.replanning;
 
+import com.google.inject.BindingAnnotation;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import org.apache.log4j.Logger;
+import org.matsim.analysis.IterationStopWatch;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.socnetsim.framework.replanning.GroupStrategyManager;
+import org.matsim.contrib.socnetsim.framework.replanning.GroupStrategyRegistry;
+import org.matsim.contrib.socnetsim.framework.replanning.grouping.GroupIdentifier;
+import org.matsim.contrib.socnetsim.usage.replanning.GroupReplanningConfigGroup;
+import org.matsim.core.controler.corelisteners.PlansReplanning;
+import org.matsim.core.controler.events.ReplanningEvent;
+import org.matsim.core.controler.listener.ReplanningListener;
+import playground.thibautd.pseudoqsim.PseudoSimConfigGroup;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-
-import org.apache.log4j.Logger;
-import org.matsim.analysis.IterationStopWatch;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.controler.corelisteners.PlansReplanning;
-import org.matsim.core.controler.events.ReplanningEvent;
-import org.matsim.core.controler.listener.ReplanningListener;
-
-import playground.thibautd.pseudoqsim.PseudoSimConfigGroup;
-import org.matsim.contrib.socnetsim.framework.replanning.GroupStrategyManager;
-import org.matsim.contrib.socnetsim.framework.replanning.GroupStrategyRegistry;
-import org.matsim.contrib.socnetsim.framework.replanning.grouping.GroupIdentifier;
-
-import com.google.inject.BindingAnnotation;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-import org.matsim.contrib.socnetsim.usage.replanning.GroupReplanningConfigGroup;
 
 /**
  * @author thibautd

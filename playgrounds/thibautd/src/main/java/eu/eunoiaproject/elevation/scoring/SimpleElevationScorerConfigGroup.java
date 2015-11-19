@@ -19,11 +19,11 @@
  * *********************************************************************** */
 package eu.eunoiaproject.elevation.scoring;
 
-import java.util.Collections;
-import java.util.Set;
-
 import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.utils.collections.CollectionUtils;
+
+import java.util.Collections;
+import java.util.Set;
 
 /**
  * A config group to configure a {@link SimpleElevationScorer}.

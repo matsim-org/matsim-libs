@@ -19,19 +19,6 @@
  * *********************************************************************** */
 package playground.thibautd.analysis.joinabletripsidentifier;
 
-import java.awt.Color;
-import java.awt.Font;
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.TreeSet;
-
 import org.apache.log4j.Logger;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
@@ -47,13 +34,24 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.utils.charts.ChartUtil;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
-
 import playground.ivt.utils.WrapperChartUtil;
 import playground.thibautd.analysis.joinabletripsidentifier.JoinableTrips.JoinableTrip;
 import playground.thibautd.analysis.joinabletripsidentifier.JoinableTrips.TripRecord;
 import playground.thibautd.utils.charts.BoxAndWhiskersChart;
 import playground.thibautd.utils.charts.TwoCategoriesBoxAndWhiskerChart;
 import playground.thibautd.utils.charts.XYLineHistogramDataset;
+
+import java.awt.*;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 /**
  * Class responsible for creating relevant plots from the data

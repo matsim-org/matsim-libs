@@ -19,14 +19,13 @@
  * *********************************************************************** */
 package playground.thibautd.scripts.scenariohandling;
 
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.contrib.socnetsim.framework.population.SocialNetwork;
+import org.matsim.contrib.socnetsim.framework.population.SocialNetworkImpl;
+import org.matsim.contrib.socnetsim.framework.population.SocialNetworkWriter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonUtils;
@@ -35,12 +34,12 @@ import org.matsim.households.Household;
 import org.matsim.households.Households;
 import org.matsim.households.HouseholdsImpl;
 import org.matsim.households.HouseholdsReaderV10;
-
 import playground.ivt.utils.ArgParser;
 import playground.ivt.utils.ArgParser.Args;
-import org.matsim.contrib.socnetsim.framework.population.SocialNetwork;
-import org.matsim.contrib.socnetsim.framework.population.SocialNetworkImpl;
-import org.matsim.contrib.socnetsim.framework.population.SocialNetworkWriter;
+
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Takes households, and generates a social network, where the children are alters

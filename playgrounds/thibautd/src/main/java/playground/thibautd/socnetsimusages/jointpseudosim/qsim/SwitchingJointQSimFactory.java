@@ -19,22 +19,20 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsimusages.jointpseudosim.qsim;
 
+import com.google.inject.Inject;
+import com.google.inject.Provider;
+import com.google.inject.Singleton;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.socnetsim.jointtrips.qsim.JointQSimFactory;
+import org.matsim.contrib.socnetsim.usage.replanning.GroupReplanningConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.QSim;
-
 import playground.thibautd.pseudoqsim.DeactivableTravelTimeProvider;
 import playground.thibautd.pseudoqsim.PseudoSimConfigGroup;
-import org.matsim.contrib.socnetsim.jointtrips.qsim.JointQSimFactory;
-import org.matsim.contrib.socnetsim.usage.replanning.GroupReplanningConfigGroup;
-
-import com.google.inject.Inject;
-import com.google.inject.Provider;
-import com.google.inject.Singleton;
 
 /**
  * @author thibautd
