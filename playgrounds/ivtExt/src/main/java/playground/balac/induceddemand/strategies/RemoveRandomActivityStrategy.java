@@ -9,10 +9,8 @@ import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
-import org.matsim.core.utils.collections.QuadTree;
 
 import com.google.inject.Inject;
-import com.google.inject.name.Named;
 
 public class RemoveRandomActivityStrategy implements PlanStrategy {
 	private final PlanStrategy planStrategyDelegate;

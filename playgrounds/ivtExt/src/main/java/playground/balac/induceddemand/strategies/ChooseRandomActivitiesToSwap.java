@@ -3,6 +3,7 @@ package playground.balac.induceddemand.strategies;
 import java.util.List;
 import java.util.Random;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.router.StageActivityTypes;
@@ -13,18 +14,22 @@ public class ChooseRandomActivitiesToSwap implements PlanAlgorithm {
 
 	private final Random rng;
 	private final StageActivityTypes stageActivityTypes;
+	private Scenario scenario;
 
-	public ChooseRandomActivitiesToSwap(Random localInstance,
-			StageActivityTypes stageActivityTypes) {
+	public ChooseRandomActivitiesToSwap(Scenario scenario, 
+			Random localInstance, StageActivityTypes stageActivityTypes) {
 
 		this.rng = localInstance;
 		this.stageActivityTypes = stageActivityTypes;
+		this.scenario = scenario;
 
 	}
 
 	@Override
 	public void run(Plan plan) {
 
+		if (!Boolean.parseBoolean(this.scenario.getConfig().getModule("ActivityStrategies").getValue("useSwapActivitiesStrategy"))) 
+			return;
 		List<Activity> t = TripStructureUtils.getActivities(plan, this.stageActivityTypes);
 		int countActivities = t.size();	
 		if (countActivities > 3) {

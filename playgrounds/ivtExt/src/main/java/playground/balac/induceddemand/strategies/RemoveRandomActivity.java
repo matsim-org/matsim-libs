@@ -8,14 +8,19 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 
 public class RemoveRandomActivity  extends AbstractMultithreadedModule {
 
+	private Scenario scenario;
+	
 	public RemoveRandomActivity(Scenario scenario) {
 		super(scenario.getConfig().global().getNumberOfThreads());
+		this.scenario = scenario;
+
 	}
 
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
 		final TripRouter tripRouter = getReplanningContext().getTripRouter();
-		ChooseActivityToRemove algo = new ChooseActivityToRemove(MatsimRandom.getLocalInstance(), tripRouter.getStageActivityTypes());
+		ChooseActivityToRemove algo = new ChooseActivityToRemove(scenario,
+				MatsimRandom.getLocalInstance(), tripRouter.getStageActivityTypes());
 
 		return algo;
 	}

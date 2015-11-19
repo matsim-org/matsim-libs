@@ -40,7 +40,8 @@ public class ChooseActivityToInsert implements PlanAlgorithm {
 
 	@Override
 	public void run(Plan plan) {
-
+		if (!Boolean.parseBoolean(this.scenario.getConfig().getModule("ActivityStrategies").getValue("useInsertActivityStrategy"))) 
+			return;
 		List<Activity> t = TripStructureUtils.getActivities(plan, this.stageActivityTypes);
 		
 		if (t.size() > 10)

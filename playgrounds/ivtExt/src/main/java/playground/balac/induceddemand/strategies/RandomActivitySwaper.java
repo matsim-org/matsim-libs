@@ -9,14 +9,17 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 
 public class RandomActivitySwaper extends AbstractMultithreadedModule {
 
+	private Scenario scenario;
 	public RandomActivitySwaper(final Scenario scenario) {
-		super(scenario.getConfig().global().getNumberOfThreads());		
+		super(scenario.getConfig().global().getNumberOfThreads());	
+		this.scenario = scenario;
 	}
 
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
 		final TripRouter tripRouter = getReplanningContext().getTripRouter();
-		ChooseRandomActivitiesToSwap algo = new ChooseRandomActivitiesToSwap(MatsimRandom.getLocalInstance(), tripRouter.getStageActivityTypes());
+		ChooseRandomActivitiesToSwap algo = new ChooseRandomActivitiesToSwap(scenario,
+				MatsimRandom.getLocalInstance(), tripRouter.getStageActivityTypes());
 
 		return algo;
 	}
