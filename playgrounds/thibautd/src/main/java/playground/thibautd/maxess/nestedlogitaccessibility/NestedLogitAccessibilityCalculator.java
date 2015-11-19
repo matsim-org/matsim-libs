@@ -28,18 +28,18 @@ import org.matsim.facilities.ActivityFacilities;
 /**
  * @author thibautd
  */
-public class NestedLogitAccessibilityCalculator {
+public class NestedLogitAccessibilityCalculator<N extends Enum<N>> {
 	// act as "measuring points", located at the coordinate of the first activity
 	private final Population population;
 	// "universal choice set"
 	private final ActivityFacilities facilities;
 
-	private final NestedLogitModel model;
+	private final NestedLogitModel<N> model;
 
 	public NestedLogitAccessibilityCalculator(
 			final Population population,
 			final ActivityFacilities facilities,
-			final NestedLogitModel model ) {
+			final NestedLogitModel<N> model ) {
 		this.population = population;
 		this.facilities = facilities;
 		this.model = model;
@@ -56,10 +56,10 @@ public class NestedLogitAccessibilityCalculator {
 	}
 
 	private double computeAccessibility( Person p ) {
-		final NestedChoiceSet choiceSet = model.getChoiceSetIdentifier().identifyChoiceSet( p );
+		final NestedChoiceSet<N> choiceSet = model.getChoiceSetIdentifier().identifyChoiceSet( p );
 
 		double sum = 0;
-		for ( Nest nest : choiceSet.getNests() ) {
+		for ( Nest<N> nest : choiceSet.getNests() ) {
 			sum += Math.exp( logSumNestUtilities( p , nest ) );
 			// TODO: prevent overflow!!!
 			if ( sum == Double.POSITIVE_INFINITY ) {
@@ -72,10 +72,10 @@ public class NestedLogitAccessibilityCalculator {
 
 	private double logSumNestUtilities(
 			final Person p,
-			final Nest nest ) {
+			final Nest<N> nest ) {
 		double sum = 0;
 
-		for ( Alternative alternative : nest.getAlternatives() ) {
+		for ( Alternative<N> alternative : nest.getAlternatives() ) {
 			sum += Math.exp( nest.getMu_n() *
 							model.getUtility().calcUtility(
 								p,

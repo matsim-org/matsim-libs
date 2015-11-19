@@ -21,21 +21,23 @@ package playground.thibautd.maxess.nestedlogitaccessibility;
 /**
  * @author thibautd
  */
-public class NestedLogitModel {
+// making it generic and specifying the nests as enum might look (or be) more complicated than it should be,
+// but it allows to make different elements (utility or sampler) for the same nesting structure, and combine them safely.
+public class NestedLogitModel<N extends Enum<N>> {
 	private final double mu;
-	private final Utility utility;
-	private final ChoiceSetIdentifier choiceSetIdentifier;
+	private final Utility<N> utility;
+	private final ChoiceSetIdentifier<N> choiceSetIdentifier;
 
 	public NestedLogitModel(
 			final double mu,
-			final Utility utility,
-			final ChoiceSetIdentifier choiceSetIdentifier ) {
+			final Utility<N> utility,
+			final ChoiceSetIdentifier<N> choiceSetIdentifier ) {
 		this.mu = mu;
 		this.utility = utility;
 		this.choiceSetIdentifier = choiceSetIdentifier;
 	}
 
-	public ChoiceSetIdentifier getChoiceSetIdentifier() {
+	public ChoiceSetIdentifier<N> getChoiceSetIdentifier() {
 		return choiceSetIdentifier;
 	}
 
@@ -43,7 +45,7 @@ public class NestedLogitModel {
 		return mu;
 	}
 
-	public Utility getUtility() {
+	public Utility<N> getUtility() {
 		return utility;
 	}
 }

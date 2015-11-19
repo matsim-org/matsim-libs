@@ -24,16 +24,29 @@ import playground.thibautd.maxess.prepareforbiogeme.tripbased.Trip;
 /**
  * @author thibautd
  */
-public class Alternative {
-	private final Id<Nest> nestId;
+public class Alternative<N extends Enum<N>> {
+	private final N nestId;
 	private final Id<Alternative> alternativeId;
 	private final Trip alternative;
 
-	public Alternative( Id<Nest> nestId,
+	public Alternative( N nestId,
 			Id<Alternative> alternativeId,
 			Trip alternative ) {
 		this.nestId = nestId;
 		this.alternativeId = alternativeId;
 		this.alternative = alternative;
 	}
+
+	public N getNestId() {
+		return nestId;
+	}
+
+	public Trip getAlternative() {
+		return alternative;
+	}
+
+	public Id<Alternative> getAlternativeId() {
+		return alternativeId;
+	}
+
 }

@@ -25,19 +25,19 @@ import java.util.List;
 /**
  * @author thibautd
  */
-public class Nest {
-	private final Id<Nest> name;
+public class Nest<N extends Enum<N>> {
+	private final N name;
 	private final double mu_n;
 	// if need exists, could easily be made generic (with alternatives type as a class parameter)
 	private final List<Alternative> alternatives;
 
-	public Nest( Id<Nest> name, double mu_n, List<Alternative> alternatives ) {
+	public Nest( N name, double mu_n, List<Alternative> alternatives ) {
 		this.name = name;
 		this.mu_n = mu_n;
 		this.alternatives = alternatives;
 	}
 
-	public Id<Nest> getNestId() {
+	public N getNestId() {
 		return name;
 	}
 

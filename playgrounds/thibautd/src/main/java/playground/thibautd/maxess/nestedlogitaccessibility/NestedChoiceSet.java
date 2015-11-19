@@ -24,10 +24,10 @@ import java.util.Collection;
 /**
  * if other use cases, might be transformed to an interface
  */
-public class NestedChoiceSet {
-	private final Collection<Nest> nests = new ArrayList<>();
+public class NestedChoiceSet<N extends Enum<N>> {
+	private final Collection<Nest<N>> nests = new ArrayList<>();
 
-	public Collection<Nest> getNests() {
+	public Collection<Nest<N>> getNests() {
 		return nests;
 	}
 }

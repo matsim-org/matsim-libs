@@ -23,6 +23,6 @@ import org.matsim.api.core.v01.population.Person;
 /**
  * @author thibautd
  */
-public interface ChoiceSetIdentifier {
-	NestedChoiceSet identifyChoiceSet( Person p );
+public interface ChoiceSetIdentifier<N extends Enum<N>> {
+	NestedChoiceSet<N> identifyChoiceSet( Person p );
 }
