@@ -46,6 +46,11 @@ import java.util.Random;
  * @author thibautd
  */
 public class SimpleNestedLogitModelChoiceSetIdentifier implements ChoiceSetIdentifier<ModeNests> {
+	private static final double MU_CAR = 1;
+	private static final double MU_PT = 1;
+	private static final double MU_BIKE = 6.4;
+	private static final double MU_WALK = 1.74;
+
 	private final Random random = MatsimRandom.getLocalInstance();
 	private final int nSamples;
 	private final TripRouter router;
@@ -78,19 +83,19 @@ public class SimpleNestedLogitModelChoiceSetIdentifier implements ChoiceSetIdent
 	public NestedChoiceSet<ModeNests> identifyChoiceSet( final Person person ) {
 		final Nest.Builder<ModeNests> carNestBuilder =
 				new Nest.Builder<ModeNests>()
-						.setMu( 1 )
+						.setMu( MU_CAR )
 						.setName( ModeNests.car );
 		final Nest.Builder<ModeNests> ptNestBuilder =
 				new Nest.Builder<ModeNests>()
-						.setMu( 1 )
+						.setMu( MU_PT )
 						.setName( ModeNests.pt );
 		final Nest.Builder<ModeNests> bikeNestBuilder =
 				new Nest.Builder<ModeNests>()
-						.setMu( 6.42 )
+						.setMu( MU_BIKE )
 						.setName( ModeNests.bike );
 		final Nest.Builder<ModeNests> walkNestBuilder =
 				new Nest.Builder<ModeNests>()
-						.setMu( 1.74 )
+						.setMu( MU_WALK )
 						.setName( ModeNests.walk );
 
 		// Sample and route alternatives

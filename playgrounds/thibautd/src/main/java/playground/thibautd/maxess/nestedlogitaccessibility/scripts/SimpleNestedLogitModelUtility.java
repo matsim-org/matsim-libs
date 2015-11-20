@@ -34,7 +34,7 @@ public class SimpleNestedLogitModelUtility implements Utility<ModeNests> {
 	private static final double ASC_CAR = 0;
 	private static final double BETA_TT_CAR = -0.276;
 
-	private static final double ASC_PT = 0.0639;
+	private static final double ASC_PT = 0.0644;
 	private static final double BETA_TT_PT = -0.508;
 	private static final double BETA_TT_PT_GA = 0.158;
 	private static final double BETA_TT_PT_HT = 0.0653;
