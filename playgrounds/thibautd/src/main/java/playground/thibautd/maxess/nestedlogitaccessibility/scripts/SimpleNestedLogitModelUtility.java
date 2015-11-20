@@ -22,8 +22,8 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.utils.objectattributes.ObjectAttributes;
-import playground.thibautd.maxess.nestedlogitaccessibility.Alternative;
-import playground.thibautd.maxess.nestedlogitaccessibility.Utility;
+import playground.thibautd.maxess.nestedlogitaccessibility.framework.Alternative;
+import playground.thibautd.maxess.nestedlogitaccessibility.framework.Utility;
 
 import java.util.List;
 

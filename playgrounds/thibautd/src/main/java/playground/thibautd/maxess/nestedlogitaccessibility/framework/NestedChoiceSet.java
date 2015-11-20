@@ -16,42 +16,22 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.maxess.nestedlogitaccessibility;
+package playground.thibautd.maxess.nestedlogitaccessibility.framework;
+
+import java.util.Arrays;
+import java.util.Collection;
 
 /**
- * @author thibautd
+ * if other use cases, might be transformed to an interface
  */
-// making it generic and specifying the nests as enum might look (or be) more complicated than it should be,
-// but it allows to make different elements (utility or sampler) for the same nesting structure, and combine them safely.
-public class NestedLogitModel<N extends Enum<N>> {
-	private final double mu;
-	private final Utility<N> utility;
-	private final ChoiceSetIdentifier<N> choiceSetIdentifier;
+public class NestedChoiceSet<N extends Enum<N>> {
+	private final Collection<Nest<N>> nests;
 
-	public NestedLogitModel(
-			final Utility<N> utility,
-			final ChoiceSetIdentifier<N> choiceSetIdentifier ) {
-		this( 1 , utility , choiceSetIdentifier );
+	public NestedChoiceSet( final Nest<N>... nests ) {
+		this.nests = Arrays.asList( nests );
 	}
 
-	public NestedLogitModel(
-			final double mu,
-			final Utility<N> utility,
-			final ChoiceSetIdentifier<N> choiceSetIdentifier ) {
-		this.mu = mu;
-		this.utility = utility;
-		this.choiceSetIdentifier = choiceSetIdentifier;
-	}
-
-	public ChoiceSetIdentifier<N> getChoiceSetIdentifier() {
-		return choiceSetIdentifier;
-	}
-
-	public double getMu() {
-		return mu;
-	}
-
-	public Utility<N> getUtility() {
-		return utility;
+	public Collection<Nest<N>> getNests() {
+		return nests;
 	}
 }

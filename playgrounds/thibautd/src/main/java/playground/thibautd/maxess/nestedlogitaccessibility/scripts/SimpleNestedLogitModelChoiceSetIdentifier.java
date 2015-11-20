@@ -30,10 +30,10 @@ import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
-import playground.thibautd.maxess.nestedlogitaccessibility.Alternative;
-import playground.thibautd.maxess.nestedlogitaccessibility.ChoiceSetIdentifier;
-import playground.thibautd.maxess.nestedlogitaccessibility.Nest;
-import playground.thibautd.maxess.nestedlogitaccessibility.NestedChoiceSet;
+import playground.thibautd.maxess.nestedlogitaccessibility.framework.Alternative;
+import playground.thibautd.maxess.nestedlogitaccessibility.framework.ChoiceSetIdentifier;
+import playground.thibautd.maxess.nestedlogitaccessibility.framework.Nest;
+import playground.thibautd.maxess.nestedlogitaccessibility.framework.NestedChoiceSet;
 import playground.thibautd.maxess.prepareforbiogeme.tripbased.Trip;
 
 import java.util.ArrayList;

@@ -16,13 +16,37 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.maxess.nestedlogitaccessibility;
+package playground.thibautd.maxess.nestedlogitaccessibility.framework;
 
-import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.Id;
+import playground.thibautd.maxess.prepareforbiogeme.tripbased.Trip;
 
 /**
  * @author thibautd
  */
-public interface ChoiceSetIdentifier<N extends Enum<N>> {
-	NestedChoiceSet<N> identifyChoiceSet( Person p );
+public class Alternative<N extends Enum<N>> {
+	private final N nestId;
+	private final Id<Alternative> alternativeId;
+	private final Trip alternative;
+
+	public Alternative( N nestId,
+			Id<Alternative> alternativeId,
+			Trip alternative ) {
+		this.nestId = nestId;
+		this.alternativeId = alternativeId;
+		this.alternative = alternative;
+	}
+
+	public N getNestId() {
+		return nestId;
+	}
+
+	public Trip getAlternative() {
+		return alternative;
+	}
+
+	public Id<Alternative> getAlternativeId() {
+		return alternativeId;
+	}
+
 }
