@@ -7,6 +7,7 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
 import org.matsim.core.config.groups.QSimConfigGroup.LinkDynamics;
+import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 
 import playground.agarwalamit.mixedTraffic.patnaIndia.PatnaConstants;
@@ -34,12 +35,14 @@ public class PatnaConfigGenerator {
 		
 		config.counts().setWriteCountsInterval(0);
 		config.counts().setCountsScaleFactor(94.52);
+		//ZZ_TODO : there is something about multipleModes in counts. I could not see any effect of it.
 		
 		config.qsim().setFlowCapFactor(0.011); //1.06% sample
 		config.qsim().setStorageCapFactor(0.033);
 		config.qsim().setEndTime(36*3600);
 		config.qsim().setLinkDynamics(LinkDynamics.PassingQ.toString());
 		config.qsim().setMainModes(PatnaConstants.mainModes);
+		config.qsim().setSnapshotStyle(SnapshotStyle.queue);
 		
 		config.setParam("TimeAllocationMutator", "mutationAffectsDuration", "false");
 		config.setParam("TimeAllocationMutator", "mutationRange", "7200.0");

@@ -4,21 +4,25 @@ import java.io.*;
 import java.util.*;
 import java.util.Map.Entry;
 
+import org.apache.log4j.Logger;
 import org.jfree.util.Log;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.events.handler.*;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.vehicles.Vehicle;
 
 
 	/**
 	 * @author jbischoff, Tilmann Schlenther
 	 */
-	public class TaxiTravelDistanceTimeHandler implements LinkLeaveEventHandler, PersonEntersVehicleEventHandler,
-    PersonLeavesVehicleEventHandler/*, ActivityStartEventHandler, ActivityEndEventHandler*/
+	public class TaxiOperatorStatsHandler implements LinkLeaveEventHandler, PersonEntersVehicleEventHandler,
+    PersonLeavesVehicleEventHandler, ActivityStartEventHandler, ActivityEndEventHandler
     {
 
+		private final static Logger log = Logger.getLogger(TaxiOperatorStatsHandler.class);
+		
 	    private Map<Id<Vehicle>, Double> taxiTravelDistance;
 	    private Map<Id<Vehicle>, Double> taxiTravelDistancesWithPassenger;
 	    private Network network;
@@ -27,14 +31,13 @@ import org.matsim.vehicles.Vehicle;
 	    private List<Id<Vehicle>> occupiedVehicles;
 	    private Map<Id<Vehicle>, Double> lastDeparture;
 	    private Map<Id<Vehicle>, Double> taxiTravelDuration;
-	    private Map<Id<Vehicle>, Double> startTimes;
-	    private Map<Id<Vehicle>, Double> endTimes;
-	    
+	    private Map<Id<Person>, Double> startTimes;
+	    private Map<Id<Person>, Double> endTimes;
 		private List<String> errors;
 
+		private int numPTrips = 0;
 
-
-	    	public TaxiTravelDistanceTimeHandler(Network network) {
+	    	public TaxiOperatorStatsHandler(Network network) {
 		        this.taxiTravelDistance = new TreeMap<Id<Vehicle>, Double>();
 		        this.taxiTravelDistancesWithPassenger = new HashMap<Id<Vehicle>, Double>();
 		        this.taxiTravelDurationwithPassenger = new HashMap<Id<Vehicle>, Double>();
@@ -43,15 +46,15 @@ import org.matsim.vehicles.Vehicle;
 		        this.taxiTravelDuration = new HashMap<Id<Vehicle>, Double>();
 		        this.occupiedVehicles = new ArrayList<Id<Vehicle>>();
 		        this.network = network;
-		        this.startTimes = new HashMap<Id<Vehicle>, Double>();
-		        this.endTimes = new HashMap<Id<Vehicle>, Double>();
+		        this.startTimes = new HashMap<Id<Person>, Double>();
+		        this.endTimes = new HashMap<Id<Person>, Double>();
 		        
-		        List<String> errors = new ArrayList<String>();
+		        this.errors = new ArrayList<String>();
 	    	}	
 
 
-		public void addTaxi(Id<Vehicle> vehId) {
-    				this.taxiTravelDistance.put(vehId, 0.0);
+		public void registerTaxi(Id<Vehicle> vehId) {
+    		this.taxiTravelDistance.put(vehId, 0.0);
 		}
 
 
@@ -63,25 +66,25 @@ import org.matsim.vehicles.Vehicle;
 
 	    @Override
 	    public void handleEvent(LinkLeaveEvent event){
-	        if (!isMonitoredVehicle(event.getVehicleId()))
+	        Id<Vehicle> vehID = event.getVehicleId();
+	        
+			if (!isMonitoredVehicle(vehID))
 	            return;
-	        double distance = this.taxiTravelDistance.get(event.getVehicleId());
-	        distance = distance + this.network.getLinks().get(event.getLinkId()).getLength();
-	        this.taxiTravelDistance.put(event.getVehicleId(), distance);
-	        if (this.occupiedVehicles.contains(event.getVehicleId())) {
+	        double distance = this.taxiTravelDistance.get(vehID);
+	        distance += this.network.getLinks().get(event.getLinkId()).getLength();
+	        this.taxiTravelDistance.put(vehID, distance);
+	        if (this.occupiedVehicles.contains(vehID)) {
 	            double distanceWithPax = 0.;
-	            if (this.taxiTravelDistancesWithPassenger.containsKey(event.getVehicleId()))
-	                distanceWithPax = this.taxiTravelDistancesWithPassenger.get(event.getVehicleId());
-	            distanceWithPax = distanceWithPax
-	                    + this.network.getLinks().get(event.getLinkId()).getLength();
-	            this.taxiTravelDistancesWithPassenger.put(event.getVehicleId(), distanceWithPax);
-
+	            if (this.taxiTravelDistancesWithPassenger.containsKey(vehID))
+	                distanceWithPax = this.taxiTravelDistancesWithPassenger.get(vehID);
+	            distanceWithPax += this.network.getLinks().get(event.getLinkId()).getLength();
+	            this.taxiTravelDistancesWithPassenger.put(vehID, distanceWithPax);
 	        }
 	    }
 
 
-	    private boolean isMonitoredVehicle(Id agentId){
-	        return (this.taxiTravelDistance.containsKey(agentId));
+	    private boolean isMonitoredVehicle(Id<Vehicle> vehicleID){
+	        return (this.taxiTravelDistance.containsKey(vehicleID));
 	    }
 
 
@@ -107,9 +110,9 @@ import org.matsim.vehicles.Vehicle;
 	        
 	        System.out.println("ERRORS: \n");
 	        for(String e: errors){
-	        	System.out.println(e);
+	        	System.out.println(e);	
 	        }
-
+	        System.out.println("number of errors:" + errors.size());
 	    }
 
 
@@ -137,11 +140,12 @@ import org.matsim.vehicles.Vehicle;
 	                        / tryToGetOrReturnZero(this.taxiTravelDuration, e.getKey());
 	                double startTime = 0.;
 	                double endTime = 0.;
-
-	                if (this.startTimes.containsKey(e.getKey()))
-	                    startTime = this.startTimes.get(e.getKey());
-	                if (this.endTimes.containsKey(e.getKey()))
-	                    endTime = this.endTimes.get(e.getKey());
+	                
+	                Id<Person> correspondingPersonID = Id.createPersonId(e.getKey().toString());
+	                if (this.startTimes.containsKey(correspondingPersonID))
+	                    startTime = this.startTimes.get(correspondingPersonID);
+	                if (this.endTimes.containsKey(correspondingPersonID))
+	                    endTime = this.endTimes.get(correspondingPersonID);
 	                double onlineTime = endTime - startTime;
 	                onlineTimes += onlineTime;
 	                bw.write(e.getKey()
@@ -181,29 +185,37 @@ import org.matsim.vehicles.Vehicle;
 	    }
 
 
-	    private Double tryToGetOrReturnZero(Map<Id<Vehicle>, Double> taxiTravelDistancesWithPassenger2, Id id){
+	    private Double tryToGetOrReturnZero(Map<Id<Vehicle>, Double> map, Id<Vehicle> id){
 	        Double ret = 0.;
-	        if (taxiTravelDistancesWithPassenger2.containsKey(id))
-	            ret = taxiTravelDistancesWithPassenger2.get(id);
+	        if (map.containsKey(id))
+	            ret = map.get(id);
 	        return ret;
 	    }
 
 
 	    @Override
 	    public void handleEvent(PersonLeavesVehicleEvent event){
-	        if (isMonitoredVehicle(event.getPersonId()))
-	            handleTaxiDriverLeavesEvent(event);
-	        if (event.getPersonId().equals(event.getVehicleId()))
-	            return;
-	        double travelTimeWithPax = event.getTime()
-	                - this.lastDepartureWithPassenger.get(event.getVehicleId());
+	    	Id<Vehicle> vehID = event.getVehicleId();
+	    	
+	    	if (isMonitoredVehicle(vehID)){
+	    		if(vehID.equals(event.getPersonId())){
+		            handleTaxiDriverLeavesEvent(event);
+		        	return;
+	    		}
+	    	System.out.println("agent " + event.getPersonId() + " is trying to leave out of vehicle " + vehID);
+	    	System.out.println("corresponding taxi (driver) is driving around : " + this.taxiTravelDistance.containsKey(vehID));
+	        double travelTimeWithPax = event.getTime() - this.lastDepartureWithPassenger.get(vehID);
 	        double totalTravelTimeWithPax = 0.;
-	        if (this.taxiTravelDurationwithPassenger.containsKey(event.getVehicleId()))
-	            totalTravelTimeWithPax = this.taxiTravelDurationwithPassenger.get(event.getVehicleId());
+	        if (this.taxiTravelDurationwithPassenger.containsKey(vehID))
+	            totalTravelTimeWithPax = this.taxiTravelDurationwithPassenger.get(vehID);
 	        totalTravelTimeWithPax = totalTravelTimeWithPax + travelTimeWithPax;
-	        this.taxiTravelDurationwithPassenger.put(event.getVehicleId(), totalTravelTimeWithPax);
-	        this.lastDepartureWithPassenger.remove(event.getVehicleId());
-	        this.occupiedVehicles.remove(event.getVehicleId());
+	        this.taxiTravelDurationwithPassenger.put(vehID, totalTravelTimeWithPax);
+	        this.lastDepartureWithPassenger.remove(vehID);
+	        this.occupiedVehicles.remove(vehID);
+//	        numPTrips ++;
+//	        System.out.println("--number of passenger trips: --" + numPTrips );
+	    
+	    	}
 	    }
 
 
@@ -211,17 +223,21 @@ import org.matsim.vehicles.Vehicle;
 	    public void handleEvent(PersonEntersVehicleEvent event){
 	    	Id<Vehicle> vehID = event.getVehicleId();
 	    	
-	    	if(event.getPersonId().equals(vehID))
+	    	if(event.getPersonId().equals(vehID)){
 	    		taxiDriverEntersVehicle(vehID, event.getTime());
-	    	
-	        if (isMonitoredVehicle(event.getVehicleId())){
+	    		return;
+	    	}
+	        if (isMonitoredVehicle(vehID)){
 	        	if(isOccupied(vehID)){
-	        		Log.error("why is this happening? several passengers in one taxi ?? Drivers changing??");
+	        		log.error("PersonEntersVehicleEvent for an occupied Vehicle. ID: " + vehID  
+	        				/*	+ " why is this happening? several passengers in one taxi ?? Drivers changing?? Driver entering after passenger??"*/);
 	        		this.errors.add("PersonEntersVehicleEvent for an occupied Vehicle. ID: " + vehID);
 	        	}
 	        	else{
-	        		this.lastDepartureWithPassenger.put(event.getVehicleId(), event.getTime());
-	    	        this.occupiedVehicles.add(event.getVehicleId());
+	        		numPTrips ++;
+	        		System.out.println("started " + numPTrips +". trip in vehicle " + vehID);
+	        		this.lastDepartureWithPassenger.put(vehID, event.getTime());
+	    	        this.occupiedVehicles.add(vehID);
 	        	}
 	        }
 	    }
@@ -236,7 +252,6 @@ import org.matsim.vehicles.Vehicle;
 	            totalTravelTime = this.taxiTravelDuration.get(event.getPersonId());
 	        totalTravelTime = totalTravelTime + travelTime;
 	        this.taxiTravelDuration.put(event.getVehicleId(), totalTravelTime);
-
 	        this.lastDeparture.remove(event.getPersonId());
 	    }
 
@@ -247,37 +262,39 @@ import org.matsim.vehicles.Vehicle;
 
 	    private void taxiDriverEntersVehicle(Id<Vehicle> vehID, Double time){
 	    	if(!this.taxiTravelDistance.containsKey(vehID)){
-    			addTaxi(vehID);
+    			registerTaxi(vehID);
     		}
+	    	else{
+	    		String e = "Driver " + vehID + " is entering an already registered vehicle." ;
+	    		log.error(e); 
+	    		this.errors.add(e);
+	    	}
     		this.lastDeparture.put(vehID, time);   
 	    }
 
 
-//	    @Override
-//	    public void handleEvent(ActivityEndEvent event){
-//	        if (event.getActType().startsWith("Before schedule:"))
-//	            handleBeforeSchedule(event);
-//	    }
-//
-//
-//	    private void handleBeforeSchedule(ActivityEndEvent event){
-//	        this.startTimes.put(event.getPersonId(), event.getTime());
-//	    }
-//
-//
-//	    @Override
-//	    public void handleEvent(ActivityStartEvent event){
-//	        if (event.getActType().startsWith("After schedule:"))
-//	            handleAfterSchedule(event);
-//	    }
-//
-//
-//	    private void handleAfterSchedule(ActivityStartEvent event){
-//	        this.endTimes.put(event.getPersonId(), event.getTime());
-//	    }
+	    @Override
+	    public void handleEvent(ActivityEndEvent event){
+	        if (event.getActType().startsWith("Before schedule:"))
+	            handleBeforeSchedule(event);
+	    }
 
 
-		
+	    private void handleBeforeSchedule(ActivityEndEvent event){
+	        this.startTimes.put(event.getPersonId(), event.getTime());
+	    }
+
+
+	    @Override
+	    public void handleEvent(ActivityStartEvent event){
+	        if (event.getActType().startsWith("After schedule:"))
+	            handleAfterSchedule(event);
+	    }
+
+
+	    private void handleAfterSchedule(ActivityStartEvent event){
+	        this.endTimes.put(event.getPersonId(), event.getTime());
+	    }
 
 
 }
