@@ -28,7 +28,7 @@ public class PrefsCreator {
     private final static Logger log = Logger.getLogger(PrefsCreator.class);
     private final static Random random = new Random(37835409);
 
-    private enum actCharacteristics {
+    protected enum actCharacteristics {
         HOME, REMOTE_HOME, WORK, REMOTE_WORK, EDUCATION, LEISURE, SHOP, ESCORT_KIDS, ESCORT_OTHER;
 
         public double getMinDur() {
