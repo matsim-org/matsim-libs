@@ -196,8 +196,10 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 					Entry<Double, Hole> entry = iterator.next();
 					double size = entry.getValue().getSizeInEquivalents() ;
 					double holePositionFromFromNode = entry.getKey() ;
-					if ( holePositionFromFromNode > lastDistanceFromFromNode ) {  // +7.5?  -7.5?  +7.5*size?  -7.5*size?
-						lastDistanceFromFromNode -= size * 7.5 ; // where is the magic number coming from?  cellSize??
+					// since hole position here is from fromNode, subtracting it from (curved) length to get the position from toNode. amit Nov'15
+					if ( curvedLength -  holePositionFromFromNode > lastDistanceFromFromNode ) {  // +7.5?  -7.5?  +7.5*size?  -7.5*size?
+//						lastDistanceFromFromNode +=  7.5 * size ; // why dependent on size when a vehicle take 7.5 m? amit Nov 15
+						lastDistanceFromFromNode +=  7.5  ; // where is the magic number coming from?  cellSize??
 					} else {
 						break ;
 					}
