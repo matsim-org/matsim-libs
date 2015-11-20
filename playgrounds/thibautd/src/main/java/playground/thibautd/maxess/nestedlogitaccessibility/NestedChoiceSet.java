@@ -18,14 +18,18 @@
  * *********************************************************************** */
 package playground.thibautd.maxess.nestedlogitaccessibility;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 
 /**
  * if other use cases, might be transformed to an interface
  */
 public class NestedChoiceSet<N extends Enum<N>> {
-	private final Collection<Nest<N>> nests = new ArrayList<>();
+	private final Collection<Nest<N>> nests;
+
+	public NestedChoiceSet( final Nest<N>... nests ) {
+		this.nests = Arrays.asList( nests );
+	}
 
 	public Collection<Nest<N>> getNests() {
 		return nests;
