@@ -18,12 +18,16 @@
  * *********************************************************************** */
 package playground.thibautd.maxess.nestedlogitaccessibility.scripts;
 
+import gnu.trove.map.TObjectDoubleMap;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import playground.thibautd.maxess.nestedlogitaccessibility.framework.NestedLogitAccessibilityCalculator;
 import playground.thibautd.maxess.nestedlogitaccessibility.framework.NestedLogitModel;
+import playground.thibautd.maxess.nestedlogitaccessibility.writers.BasicPersonAccessibilityWriter;
 import playground.thibautd.maxess.prepareforbiogeme.tripbased.RunMzTripChoiceSetConversion;
 import playground.thibautd.router.TripSoftCache;
 import playground.thibautd.utils.MoreIOUtils;
@@ -61,7 +65,8 @@ public class RunSimpleNestedLogitAccessibility {
 											20 * 1000 ) ) );
 
 			// TODO store and write results
-			calculator.computeAccessibilities();
+			final TObjectDoubleMap<Id<Person>> accessibilities = calculator.computeAccessibilities ();
+			new BasicPersonAccessibilityWriter( scenario , accessibilities ).write( outputDir + "/accessibility_per_person.dat" );
 		}
 		finally {
 			MoreIOUtils.closeOutputDirLogging();
