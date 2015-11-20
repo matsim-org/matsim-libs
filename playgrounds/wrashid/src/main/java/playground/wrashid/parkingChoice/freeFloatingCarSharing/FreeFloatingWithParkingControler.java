@@ -95,50 +95,37 @@ public static void main(final String[] args) throws IOException {
 				}
 			});
 		}
-		
-		controler.setTripRouterFactory(
-				new javax.inject.Provider<org.matsim.core.router.TripRouter>() {
+		controler.addOverridingModule(new AbstractModule() {
+
+			@Override
+			public void install() {
+
+				addRoutingModuleBinding("freefloating").toInstance(new FreeFloatingRoutingModule());
+
+				bind(MainModeIdentifier.class).toInstance(new MainModeIdentifier() {
+
+                    final MainModeIdentifier defaultModeIdentifier = new MainModeIdentifierImpl();
+					
 					@Override
-					public TripRouter get() {
-						// this factory initializes a TripRouter with default modules,
-						// taking into account what is asked for in the config
+					public String identifyMainMode(List<? extends PlanElement> tripElements) {
+
+						for ( PlanElement pe : tripElements ) {
+                            if ( pe instanceof Leg && ((Leg) pe).getMode().equals( "freefloating" ) ) {
+                                return "freefloating";
+                            }
+                        }
+                        // if the trip doesn't contain a carsharing leg,
+                        // fall back to the default identification method.
+                        return defaultModeIdentifier.identifyMainMode( tripElements );
 					
-						// This allows us to just add our module and go.
-						final javax.inject.Provider<TripRouter> delegate = TripRouterFactoryBuilderWithDefaults.createDefaultTripRouterFactoryImpl(controler.getScenario());
-
-						final TripRouter router = delegate.get();
-						
-						// add our module to the instance
-						router.setRoutingModule(
-							"freefloating",
-							new FreeFloatingRoutingModule());
-
-						// we still need to provide a way to identify our trips
-						// as being freefloating trips.
-						// This is for instance used at re-routing.
-						final MainModeIdentifier defaultModeIdentifier =
-								router.getMainModeIdentifier();
-							router.setMainModeIdentifier(
-									new MainModeIdentifier() {
-										@Override
-										public String identifyMainMode(
-												final List<? extends PlanElement> tripElements) {
-											for ( PlanElement pe : tripElements ) {
-												if ( pe instanceof Leg && ((Leg) pe).getMode().equals( "freefloating" ) ) {
-													return "freefloating";
-												}
-											}
-											// if the trip doesn't contain a freefloating leg,
-											// fall back to the default identification method.
-											return defaultModeIdentifier.identifyMainMode( tripElements );
-										}
-									});
-						
-						return router;
-					}
-
+					}				
 					
-				});
+				});		
+				
+			}
+			
+		});
+	
 		
   controler.addControlerListener(new FFListener(controler));
   controler.run();

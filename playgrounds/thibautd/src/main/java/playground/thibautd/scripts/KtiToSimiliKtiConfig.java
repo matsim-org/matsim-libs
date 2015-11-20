@@ -24,7 +24,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-
 import playground.ivt.kticompatibility.KtiLikeScoringConfigGroup;
 import playground.meisterk.kti.config.KtiConfigGroup;
 import playground.thibautd.utils.MyConfigUtils;

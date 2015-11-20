@@ -43,10 +43,13 @@ public class AdjustNetworkCapacities {
 		if (decideToAdjust(link.getCoord())){
 			link.setCapacity(link.getCapacity()*2);
 			if (link.getCapacity()<2000) link.setCapacity(2000);
+		}else 
+		{
+			link.setCapacity(link.getCapacity()*1.1);
 		}
 		
 	}
-	new NetworkWriter(scenario.getNetwork()).write(basedir+"networkptc.xml");
+	new NetworkWriter(scenario.getNetwork()).write(basedir+"networkptcc.xml");
 	
 	}
 
@@ -55,7 +58,7 @@ public class AdjustNetworkCapacities {
 		if (coord.getX()<593084) return true;
 		else if (coord.getX()>629810) return true;
 		else if (coord.getY()<5785583) return true;
-		else if (coord.getY()>5823277) return true;
+		else if (coord.getY()>5817600) return true;
 		else return false;
 	} 
 }

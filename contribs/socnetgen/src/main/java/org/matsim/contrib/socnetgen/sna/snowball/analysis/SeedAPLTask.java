@@ -19,7 +19,13 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetgen.sna.snowball.analysis;
 
-import gnu.trove.TIntArrayList;
+import gnu.trove.list.array.TIntArrayList;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.common.stats.LinearDiscretizer;
 import org.matsim.contrib.socnetgen.sna.graph.Graph;
@@ -28,11 +34,6 @@ import org.matsim.contrib.socnetgen.sna.graph.matrix.AdjacencyMatrix;
 import org.matsim.contrib.socnetgen.sna.graph.matrix.Dijkstra;
 import org.matsim.contrib.socnetgen.sna.snowball.SampledGraph;
 import org.matsim.contrib.socnetgen.sna.snowball.SampledVertex;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 /**
  * @author illenberger

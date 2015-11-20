@@ -5,7 +5,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.*;
 
-import static playground.boescpa.baseline.preparation.FacilitiesFromBZ12.testFacilities;
+import static playground.boescpa.baseline.preparation.secondaryFacilityCreation.FacilitiesFromBZ12.testFacilities;
 
 /**
  * Adds activities to existing facilities.

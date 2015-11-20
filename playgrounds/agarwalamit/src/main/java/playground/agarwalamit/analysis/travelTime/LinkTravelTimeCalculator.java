@@ -56,7 +56,6 @@ public class LinkTravelTimeCalculator extends AbstractAnalysisModule {
 		return null;
 	}
 
-
 	@Override
 	public void preProcessData() {
 		this.ltth = new LinkTravelTimeHandler();
@@ -65,7 +64,6 @@ public class LinkTravelTimeCalculator extends AbstractAnalysisModule {
 		events.addHandler(ltth);
 		reader.readFile(eventsFile);
 	}
-
 
 	@Override
 	public void postProcessData() {
@@ -116,7 +114,7 @@ public class LinkTravelTimeCalculator extends AbstractAnalysisModule {
 			double leaveTime = event.getTime();
 
 			if(! link2PersonEnterTime.containsKey(linkId) || ! link2PersonEnterTime.get(linkId).containsKey(personId) ) return;
-			
+
 			if(link2PersonTravelTime.containsKey(linkId)){
 				Map<Id<Person>,List<Double>> p2tt = link2PersonTravelTime.get(linkId);
 

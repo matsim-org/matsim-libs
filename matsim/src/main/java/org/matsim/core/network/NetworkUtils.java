@@ -475,10 +475,10 @@ public class NetworkUtils {
 	}
 
 	/**
-	 * Calculates the orientation of the outLinks for a given inLink
-	 * beginning from the right if the inLink goes north to south.
-	 * The most 'left' outLink comes last.
-	 * backLink is ignored
+	 * Calculates the orientation of downstream links (MATSim slang is 'outLinks') for a given 
+	 * upstream link (slang inLink)beginning from the right if the inLink goes 
+	 * north to south. The most 'left' outLink comes last. The link back to the 
+	 * inLinks upstream Node (slang fromNode) is ignored. 
 	 *
 	 * @param inLink The inLink given
 	 * @return Collection of outLinks, or an empty collection, if there is only
@@ -487,30 +487,22 @@ public class NetworkUtils {
 	public static TreeMap<Double, Link> getOutLinksSortedByAngle(Link inLink){
 		Coord coordInLink = getVector(inLink);
 		double thetaInLink = Math.atan2(coordInLink.getY(), coordInLink.getX());
-
-		TreeMap<Double, Link> leftLane = new TreeMap<Double, Link>();
+		TreeMap<Double, Link> outLinksByOrientation = new TreeMap<Double, Link>();
 
 		for (Link outLink : inLink.getToNode().getOutLinks().values()) {
-
 			if (!(outLink.getToNode().equals(inLink.getFromNode()))){
-
 				Coord coordOutLink = getVector(outLink);
 				double thetaOutLink = Math.atan2(coordOutLink.getY(), coordOutLink.getX());
-
 				double thetaDiff = thetaOutLink - thetaInLink;
-
 				if (thetaDiff < -Math.PI){
 					thetaDiff += 2 * Math.PI;
 				} else if (thetaDiff > Math.PI){
 					thetaDiff -= 2 * Math.PI;
 				}
-
-				leftLane.put(Double.valueOf(-thetaDiff), outLink);
-
+				outLinksByOrientation.put(Double.valueOf(-thetaDiff), outLink);
 			}
 		}
-
-		return leftLane;
+		return outLinksByOrientation;
 	}
 
 	private static Coord getVector(Link link){

@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package tutorial.trafficsignals;
 
+import java.io.IOException;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.SignalsScenarioLoader;
@@ -42,7 +44,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 public class VisSimpleTrafficSignalScenario {
 
 	
-	private void run() {
+	private void run() throws IOException {
 		String configFile = new RunCreateTrafficSignalScenarioExample().run();
 		Config config = ConfigUtils.loadConfig(configFile);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -53,8 +55,9 @@ public class VisSimpleTrafficSignalScenario {
 	
 	/**
 	 * @param args
+	 * @throws IOException 
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		new VisSimpleTrafficSignalScenario().run();
 	}
 

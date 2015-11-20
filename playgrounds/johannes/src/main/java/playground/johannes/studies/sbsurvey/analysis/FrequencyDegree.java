@@ -19,9 +19,9 @@
  * *********************************************************************** */
 package playground.johannes.studies.sbsurvey.analysis;
 
-import gnu.trove.TDoubleArrayList;
-import gnu.trove.TObjectDoubleHashMap;
-import gnu.trove.TObjectDoubleIterator;
+import gnu.trove.iterator.TObjectDoubleIterator;
+import gnu.trove.list.array.TDoubleArrayList;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.common.stats.Correlations;
 import org.matsim.contrib.socnetgen.sna.graph.Graph;
@@ -61,7 +61,7 @@ public class FrequencyDegree extends ModuleAnalyzerTask<Degree> {
 		}
 		
 		
-			Correlations.writeToFile(Correlations.mean(values1.toNativeArray(), values2.toNativeArray(), 5),
+			Correlations.writeToFile(Correlations.mean(values1.toArray(), values2.toArray(), 5),
 					getOutputDirectory()+"/freq_mean_k.txt", "k", "freq");
 		/*
 		 * freq sum
@@ -78,7 +78,7 @@ public class FrequencyDegree extends ModuleAnalyzerTask<Degree> {
 				values2.add(it.value());
 			}
 					
-			Correlations.writeToFile(Correlations.mean(values1.toNativeArray(), values2.toNativeArray(), 2),
+			Correlations.writeToFile(Correlations.mean(values1.toArray(), values2.toArray(), 2),
 						getOutputDirectory()+"/freq_sum_k.txt", "k", "freq");
 			
 		
@@ -106,7 +106,7 @@ public class FrequencyDegree extends ModuleAnalyzerTask<Degree> {
 			values2.add(it.value());
 		}
 				
-		Correlations.writeToFile(Correlations.mean(values1.toNativeArray(), values2.toNativeArray(), 2),
+		Correlations.writeToFile(Correlations.mean(values1.toArray(), values2.toArray(), 2),
 					getOutputDirectory()+"/sum_freqCost_k.txt", "k", "c_freq");
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block

@@ -19,12 +19,12 @@
  * *********************************************************************** */
 package playground.thibautd.utils;
 
+import org.apache.log4j.Logger;
+
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.SoftReference;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-
-import org.apache.log4j.Logger;
 
 /**
  * A cache that keeps entries as long as the Virtual Maching is happy

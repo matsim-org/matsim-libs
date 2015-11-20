@@ -21,15 +21,20 @@ package playground.johannes.gsv.popsim;
 
 import org.apache.log4j.Logger;
 import org.matsim.contrib.common.util.XORShiftRandom;
-import playground.johannes.gsv.synPop.analysis.AnalyzerTaskComposite;
-import playground.johannes.gsv.synPop.analysis.LegGeoDistanceTask;
-import playground.johannes.gsv.synPop.analysis.ProxyAnalyzer;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import playground.johannes.gsv.popsim.analysis.AnalyzerTaskRunner;
+import playground.johannes.gsv.popsim.analysis.FileIOContext;
+import playground.johannes.gsv.popsim.analysis.PersonLAU2Density;
 import playground.johannes.gsv.synPop.mid.PersonCloner;
 import playground.johannes.gsv.synPop.mid.Route2GeoDistance;
 import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.data.PlainFactory;
 import playground.johannes.synpop.data.PlainPerson;
 import playground.johannes.synpop.data.io.XMLHandler;
+import playground.johannes.synpop.gis.DataPool;
+import playground.johannes.synpop.gis.ZoneData;
+import playground.johannes.synpop.gis.ZoneDataLoader;
 import playground.johannes.synpop.processing.TaskRunner;
 
 import java.io.IOException;
@@ -53,8 +58,8 @@ public class Analyzer {
 		String output = "/home/johannes/gsv/matrix2014/mid-fusion/";
 
 //		String personFile = "/home/johannes/gsv/germany-scenario/mid2008/pop/mid2008.merged.xml";
-		String personFile = "/home/johannes/gsv/germany-scenario/mid2008/pop/mid2008.midjourneys.validated.xml";
-//		String personFile = "/home/johannes/gsv/germany-scenario/mid2008/pop/mid2008.midtrips.validated.xml";
+//		String personFile = "/home/johannes/gsv/germany-scenario/mid2008/pop/mid2008.midjourneys.validated.xml";
+		String personFile = "/home/johannes/gsv/germany-scenario/mid2008/pop/mid2008.midtrips.validated.xml";
 		
 		XMLHandler parser = new XMLHandler(new PlainFactory());
 		parser.setValidating(false);
@@ -66,21 +71,30 @@ public class Analyzer {
 		
 		logger.info("Cloning persons...");
 		Random random = new XORShiftRandom();
-		persons = PersonCloner.weightedClones((Collection<PlainPerson>) persons, 1000000, random);
+		persons = PersonCloner.weightedClones((Collection<PlainPerson>) persons, 100000, random);
 //		new ApplySampleProbas(82000000).apply(persons);
 		logger.info(String.format("Generated %s persons.", persons.size()));
 
 		TaskRunner.run(new Route2GeoDistance(new Simulator.Route2GeoDistFunction()), persons);
 
-		AnalyzerTaskComposite task = new AnalyzerTaskComposite();
+//		AnalyzerTaskComposite task = new AnalyzerTaskComposite();
 //		task.setOutputDirectory(output);
 //		task.addTask(new AgeIncomeCorrelation());
-		task.addTask(new ActTypeDistanceTask());
-		task.addTask(new LegGeoDistanceTask("car"));
-		task.setOutputDirectory(output);
+//		task.addTask(new ActTypeDistanceTask());
+//		task.addTask(new LegGeoDistanceTask("car"));
+//		task.addTask(new DaySeasonTask());
+//		task.setOutputDirectory(output);
 		
-		ProxyAnalyzer.analyze(persons, task);
-
+//		ProxyAnalyzer.analyze(persons, task);
+		final Config config = new Config();
+		ConfigUtils.loadConfig(config, "/home/johannes/gsv/germany-scenario/sim/config/simulator.xml");
+		DataPool dataPool = new DataPool();
+		dataPool.register(new ZoneDataLoader(config.getModule("synPopSim")), ZoneDataLoader.KEY);
+		ZoneData zoneData = (ZoneData) dataPool.get(ZoneDataLoader.KEY);
+		FileIOContext ioContext = new FileIOContext(output);
+		PersonLAU2Density task = new PersonLAU2Density(zoneData.getLayer("lau2"));
+		task.setIoContext(ioContext);
+		AnalyzerTaskRunner.run(persons, task, ioContext);
 	}
 
 }

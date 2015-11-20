@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetgen.sna.graph.matrix;
 
-import gnu.trove.TIntArrayList;
+import gnu.trove.list.array.TIntArrayList;
 
 import java.util.Arrays;
 import java.util.Comparator;
@@ -112,7 +112,7 @@ public abstract class DijkstraEngine {
 			}
 		}
 
-		reachable.remove(reachable.indexOf(source));
+		reachable.removeAt(reachable.indexOf(source));
 
 		return reachable;
 	}

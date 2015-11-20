@@ -175,5 +175,4 @@ public class TravelTimeAnalyzer extends AbstractAnalysisModule {
 			return mode2AvgTime;
 		}
 	}
-
 }

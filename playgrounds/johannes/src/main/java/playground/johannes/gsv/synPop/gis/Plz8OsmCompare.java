@@ -20,9 +20,9 @@
 package playground.johannes.gsv.synPop.gis;
 
 import com.vividsolutions.jts.geom.Point;
-import gnu.trove.TDoubleArrayList;
-import gnu.trove.TDoubleDoubleHashMap;
-import gnu.trove.TObjectIntHashMap;
+import gnu.trove.list.array.TDoubleArrayList;
+import gnu.trove.map.hash.TDoubleDoubleHashMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.matsim.api.core.v01.Coord;
@@ -96,7 +96,7 @@ public class Plz8OsmCompare {
 		
 		System.err.println(String.format("%s zones not found.", zoneNotFound));
 		
-		TDoubleDoubleHashMap stats = Correlations.mean(values1.toNativeArray(), values2.toNativeArray());
+		TDoubleDoubleHashMap stats = Correlations.mean(values1.toArray(), values2.toArray());
 		StatsWriter.writeHistogram(stats, "employees", "facilities", "/home/johannes/gsv/osm/shop-compare.txt");
 //		BufferedWriter writer = new BufferedWriter(new FileWriter("/home/johannes/gsv/osm/shop-compare.txt"));
 //		writer.write("employees\tfacilities");

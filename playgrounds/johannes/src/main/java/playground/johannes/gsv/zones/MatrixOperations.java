@@ -19,7 +19,7 @@
 
 package playground.johannes.gsv.zones;
 
-import gnu.trove.TObjectDoubleHashMap;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
 import org.matsim.contrib.common.util.XORShiftRandom;
 import playground.johannes.synpop.gis.Zone;
 import playground.johannes.synpop.gis.ZoneCollection;

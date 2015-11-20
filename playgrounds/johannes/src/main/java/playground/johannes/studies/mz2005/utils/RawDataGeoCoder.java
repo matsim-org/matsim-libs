@@ -20,7 +20,7 @@
 package playground.johannes.studies.mz2005.utils;
 
 import com.google.code.geocoder.model.LatLng;
-import gnu.trove.TObjectIntHashMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import playground.johannes.studies.sbsurvey.util.GoogleGeoCoder;

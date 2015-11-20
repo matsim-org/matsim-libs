@@ -20,10 +20,10 @@
 package playground.johannes.studies.sbsurvey.analysis;
 
 import com.vividsolutions.jts.geom.Point;
-import gnu.trove.TDoubleDoubleHashMap;
-import gnu.trove.TDoubleObjectHashMap;
-import gnu.trove.TDoubleObjectIterator;
-import gnu.trove.TObjectDoubleHashMap;
+import gnu.trove.iterator.TDoubleObjectIterator;
+import gnu.trove.map.hash.TDoubleDoubleHashMap;
+import gnu.trove.map.hash.TDoubleObjectHashMap;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
 import org.matsim.contrib.common.stats.Histogram;
@@ -61,7 +61,7 @@ public class AcceptanceProbaDegreeTask extends AnalyzerTask {
 	public void analyze(Graph graph, Map<String, DescriptiveStatistics> results) {
 		TObjectDoubleHashMap<Vertex> normValues = ObservedDegree.getInstance().values(graph.getVertices());
 		
-		AttributePartition partitioner = new AttributePartition(FixedSampleSizeDiscretizer.create(normValues.getValues(), 1, 2));
+		AttributePartition partitioner = new AttributePartition(FixedSampleSizeDiscretizer.create(normValues.values(), 1, 2));
 		TDoubleObjectHashMap<?> partitions = partitioner.partition(normValues);
 		TDoubleObjectIterator<?> it = partitions.iterator();
 		

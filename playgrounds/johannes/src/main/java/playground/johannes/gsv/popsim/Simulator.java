@@ -28,11 +28,8 @@ import org.matsim.contrib.common.stats.LinearDiscretizer;
 import org.matsim.contrib.common.util.XORShiftRandom;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import playground.johannes.gsv.popsim.analysis.LegCollector;
-import playground.johannes.gsv.popsim.analysis.NumericAttributeProvider;
-import playground.johannes.gsv.synPop.analysis.AnalyzerTaskComposite;
-import playground.johannes.gsv.synPop.analysis.LegGeoDistanceTask;
-import playground.johannes.gsv.synPop.analysis.ProxyAnalyzer;
+import playground.johannes.gsv.popsim.analysis.*;
+import playground.johannes.gsv.popsim.config.MatrixAnalyzerConfigurator;
 import playground.johannes.gsv.synPop.mid.Route2GeoDistance;
 import playground.johannes.gsv.synPop.sim3.ReplaceActTypes;
 import playground.johannes.synpop.data.*;
@@ -46,7 +43,6 @@ import playground.johannes.synpop.processing.GuessMissingActTypes;
 import playground.johannes.synpop.processing.LegAttributeRemover;
 import playground.johannes.synpop.processing.TaskRunner;
 import playground.johannes.synpop.sim.*;
-import playground.johannes.synpop.sim.data.CachedPerson;
 import playground.johannes.synpop.sim.data.Converters;
 import playground.johannes.synpop.sim.data.DoubleConverter;
 import playground.johannes.synpop.source.mid2008.MiDKeys;
@@ -106,15 +102,36 @@ public class Simulator {
         logger.info("Recalculate geo distances...");
         TaskRunner.run(new LegAttributeRemover(CommonKeys.LEG_GEO_DISTANCE), simPersons);
         TaskRunner.run(new CalculateGeoDistance((FacilityData) dataPool.get(FacilityDataLoader.KEY)), simPersons);
+        logger.info("Resetting LAU2Class attributes...");
+        SetLAU2Attribute lTask = new SetLAU2Attribute(dataPool, "lau2");
+        TaskRunner.run(lTask, simPersons);
+        if(lTask.getErrors() > 0) logger.warn(String.format("Cannot set LAU2Class attribute for %s persons.", lTask.getErrors()));
+
 		/*
 		Setup analyzer and analyze reference population
 		 */
         final String output = config.getParam(MODULE_NAME, "output");
-        final AnalyzerTaskComposite task = new AnalyzerTaskComposite();
-        task.addTask(new LegGeoDistanceTask(CommonValues.LEG_MODE_CAR));
-        task.addTask(new GeoDistLau2ClassTask());
+        FileIOContext ioContext = new FileIOContext(output);
+
+        Map<String, Predicate<Segment>> predicates = new HashMap<>();
+        predicates.put(CommonValues.LEG_MODE_CAR, new ModePredicate(CommonValues.LEG_MODE_CAR));
+
+        final ConcurrentAnalyzerTask<Collection<? extends Person>> task = new ConcurrentAnalyzerTask<>();
+        GeoDistanceBuilder geoDistanceBuilder = new GeoDistanceBuilder(ioContext);
+        geoDistanceBuilder.setPredicates(predicates);
+        geoDistanceBuilder.addDiscretizer(new LinearDiscretizer(50000), "linear");
+        task.addComponent(geoDistanceBuilder.build());
+        task.addComponent(new GeoDistLau2ClassTask(ioContext));
         logger.info("Analyzing reference population...");
-        ProxyAnalyzer.analyze(refPersons, task, String.format("%s/ref/", output));
+        ioContext.append("ref");
+        AnalyzerTaskRunner.run(refPersons, task, ioContext);
+
+        MatrixAnalyzer mAnalyzer = (MatrixAnalyzer) new MatrixAnalyzerConfigurator(config.getModule("matrixAnalyzer"), dataPool).load();
+        mAnalyzer.setIoContext(ioContext);
+        mAnalyzer.setPredicate(new ModePredicate(CommonValues.LEG_MODE_CAR));
+        task.addComponent(mAnalyzer);
+
+        task.addComponent(new PopulationWriter(ioContext));
 		/*
 		Setup hamiltonian
 		 */
@@ -149,30 +166,21 @@ public class Simulator {
 
         MarkovEngineListenerComposite engineListeners = new MarkovEngineListenerComposite();
 
-        engineListeners.addComponent(new MarkovEngineListener() {
-            AnalyzerListener l = new AnalyzerListener(task, String.format("%s/sim/", output), (long) Double.parseDouble
-                    (config.getParam(MODULE_NAME, "dumpInterval")));
+        long dumpInterval = (long) Double.parseDouble(config.getParam(MODULE_NAME, "dumpInterval"));
+        engineListeners.addComponent(new AnalyzerListener(task, ioContext, dumpInterval));
 
-            @Override
-            public void afterStep(Collection<CachedPerson> population, Collection<? extends Attributable> mutations, boolean accepted) {
-                l.afterStep(population, null, accepted);
-            }
-        });
-
-        engineListeners.addComponent(new MarkovEngineListener() {
-            HamiltonianLogger l = new HamiltonianLogger(hamiltonian, (int) Double.parseDouble(config.getParam
-                    (MODULE_NAME,
-                            "logInterval")));
-
-            @Override
-            public void afterStep(Collection<CachedPerson> population, Collection<? extends Attributable> mutations, boolean accepted) {
-                l.afterStep(population, null, accepted);
-            }
-        });
+        long logInterval = (long) Double.parseDouble(config.getParam(MODULE_NAME, "logInterval"));
+        engineListeners.addComponent(new HamiltonianLogger(hamiltonian, logInterval, "SystemTemperature", output));
+        engineListeners.addComponent(new HamiltonianLogger(distDistrTerm, logInterval, "DistanceDistribution",
+                output));
+        engineListeners.addComponent(new HamiltonianLogger(meanDistLau2Term, logInterval, "MeanDistanceLAU2",
+                output));
 
         sampler.setListener(engineListeners);
 
         sampler.run((long) Double.parseDouble(config.getParam(MODULE_NAME, "iterations")));
+
+        Executor.shutdown();
     }
 
     private static UnivariatFrequency buildDistDistrTerm(Set<PlainPerson> refPersons, Set<PlainPerson>

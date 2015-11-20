@@ -19,7 +19,7 @@
 
 package playground.johannes.gsv.matrices.analysis;
 
-import gnu.trove.TDoubleArrayList;
+import gnu.trove.list.array.TDoubleArrayList;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.core.utils.collections.Tuple;
 import playground.johannes.gsv.sim.cadyts.ODUtils;
@@ -174,17 +174,17 @@ public class CalcShares {
 		writeCorrelation(tomtomShares, simShares, "tomtom", "sim", "/home/johannes/gsv/matrices/analysis/marketShares/tomtomSim.txt");
 		writeCorrelation(itpShares, tomtomShares, "itp", "tomtom", "/home/johannes/gsv/matrices/analysis/marketShares/itpTomtom.txt");
 		
-//		double[] samples = railVolumes.toNativeArray();
-//		TDoubleDoubleHashMap hist = Correlations.mean(samples, shareSimDiff.toNativeArray(), FixedSampleSizeDiscretizer.create(samples, 50));
+//		double[] samples = railVolumes.toArray();
+//		TDoubleDoubleHashMap hist = Correlations.mean(samples, shareSimDiff.toArray(), FixedSampleSizeDiscretizer.create(samples, 50));
 //		TXTWriter.writeHistogram(hist, "rail volume", "share diff", "/home/johannes/gsv/matrices/analysis/marketShares/simVolDiff.txt");
 //		
-//		hist = Correlations.mean(samples, shareItpDiff.toNativeArray(), FixedSampleSizeDiscretizer.create(samples, 50));
+//		hist = Correlations.mean(samples, shareItpDiff.toArray(), FixedSampleSizeDiscretizer.create(samples, 50));
 //		TXTWriter.writeHistogram(hist, "rail volume", "share diff", "/home/johannes/gsv/matrices/analysis/marketShares/itpVolDiff.txt");
 //		
-//		hist = Correlations.mean(refShares.toNativeArray(), simShares.toNativeArray());
+//		hist = Correlations.mean(refShares.toArray(), simShares.toArray());
 //		TXTWriter.writeHistogram(hist, "ref share", "sim share", "/home/johannes/gsv/matrices/analysis/marketShares/simShareCorrel.txt");
 //		
-//		hist = Correlations.mean(refShares.toNativeArray(), itpShares.toNativeArray());
+//		hist = Correlations.mean(refShares.toArray(), itpShares.toArray());
 //		TXTWriter.writeHistogram(hist, "ref share", "itp share", "/home/johannes/gsv/matrices/analysis/marketShares/itpShareCorrel.txt");
 	}
 

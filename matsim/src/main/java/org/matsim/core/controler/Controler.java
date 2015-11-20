@@ -103,6 +103,7 @@ public class Controler extends AbstractController {
 	public static final String FILENAME_LANES = "output_lanes.xml.gz";
 	public static final String FILENAME_CONFIG = "output_config.xml.gz";
 	public static final String FILENAME_PERSON_ATTRIBUTES = "output_personAttributes.xml.gz" ; 
+	public static final String FILENAME_COUNTS = "output_counts.xml.gz" ;
 
 	private static final Logger log = Logger.getLogger(Controler.class);
 
@@ -460,6 +461,7 @@ public class Controler extends AbstractController {
 	    return scenario;
     }
 
+    @Deprecated // preferably use "@Inject EventsManager events" or "addEventHandlerBinding().toInstance(...) from AbstractModule". kai/mz, nov'15
     public final EventsManager getEvents() {
 	    return events;
     }

@@ -19,11 +19,6 @@
  * *********************************************************************** */
 package playground.thibautd.hitchiking.replanning;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Random;
-
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
@@ -32,8 +27,12 @@ import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Subtour;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.population.algorithms.PlanAlgorithm;
-
 import playground.thibautd.hitchiking.HitchHikingConstants;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Random;
 
 /**
  * Algorithm which removes a random hitch hiking trip and replaces it by a leg

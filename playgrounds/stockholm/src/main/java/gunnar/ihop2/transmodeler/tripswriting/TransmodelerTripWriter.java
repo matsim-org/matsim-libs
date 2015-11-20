@@ -75,10 +75,6 @@ public class TransmodelerTripWriter {
 	public void writeTrips(final String pathFileName, final String tripFileName)
 			throws FileNotFoundException {
 
-		Logger.getLogger(this.getClass())
-				.warn("Recently added directional information (\"-\") to "
-						+ "origin and destination link has not been tested within Regent.");
-
 		final Map<List<Id<Link>>, Integer> linkIds2pathId = new LinkedHashMap<List<Id<Link>>, Integer>();
 		int tripCnt = 0;
 
@@ -116,9 +112,9 @@ public class TransmodelerTripWriter {
 										.getAttribute(
 												route.getEndLinkId().toString(),
 												Transmodeler2MATSimNetwork.TMFROMNODEID_ATTR);
-								System.out.print("ROUTE fromNode = "
-										+ fromNodeTmId + ", toNode = "
-										+ toNodeTmId);
+								// System.out.print("ROUTE fromNode = "
+								// + fromNodeTmId + ", toNode = "
+								// + toNodeTmId);
 
 								final List<Id<Link>> linkIds = new ArrayList<Id<Link>>(
 										1 + route.getLinkIds().size());
@@ -130,7 +126,7 @@ public class TransmodelerTripWriter {
 										linkIds.add(linkId);
 									}
 								}
-								System.out.println(", links = " + linkIds);
+								// System.out.println(", links = " + linkIds);
 
 								/*
 								 * Avoid double-storing identical paths.
@@ -150,7 +146,8 @@ public class TransmodelerTripWriter {
 								 */
 								Integer pathId = linkIds2pathId.get(linkIds);
 								if (pathId == null) {
-									// TODO new added one here because that's what TM wants
+									// TODO new added one here because that's
+									// what TM wants
 									pathId = 1 + linkIds2pathId.size();
 									linkIds2pathId.put(linkIds, pathId);
 
@@ -243,12 +240,15 @@ public class TransmodelerTripWriter {
 		// final String pathFileName = "./data_ZZZ/run/paths.csv";
 		// final String tripFileName = "./data_ZZZ/run/trips.csv";
 
-		final String networkFileName = "./test/regentmatsim/input/network-expanded.xml";
-		final String plansFileName = "./test/regentmatsim/matsim-output/ITERS/it.0/0.plans.xml.gz";
-		final String linkAttributesFileName = "./test/regentmatsim/input/link-attributes.xml";
+		final String path = "./test/matsim-testrun/";
+		final String networkFileName = path + "input/network-plain.xml";
+		final String plansFileName = path
+				+ "matsim-output/ITERS/it.0/0.plans.xml.gz";
+		final String linkAttributesFileName = path
+				+ "input/link-attributes.xml";
 
-		final String pathFileName = "./test/regentmatsim/exchange/paths.csv";
-		final String tripFileName = "./test/regentmatsim/exchange/trips.csv";
+		final String pathFileName = path + "paths.csv";
+		final String tripFileName = path + "trips.csv";
 
 		final Config config = ConfigUtils.createConfig();
 		config.setParam("network", "inputNetworkFile", networkFileName);

@@ -19,17 +19,18 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetgen.sna.graph.matrix;
 
-import gnu.trove.TIntArrayList;
-import gnu.trove.TIntDoubleHashMap;
-import gnu.trove.TIntDoubleIterator;
-import org.apache.commons.math.stat.StatUtils;
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.apache.log4j.Logger;
-import org.matsim.contrib.socnetgen.sna.util.MultiThreading;
+import gnu.trove.iterator.TIntDoubleIterator;
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.hash.TIntDoubleHashMap;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import org.apache.commons.math.stat.StatUtils;
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.apache.log4j.Logger;
+import org.matsim.contrib.socnetgen.sna.util.MultiThreading;
 
 /**
  * A class to calculate centrality measures on graph represented as an adjacency

@@ -20,7 +20,7 @@
 package playground.johannes.studies.sbsurvey.run;
 
 import com.vividsolutions.jts.geom.Geometry;
-import gnu.trove.TIntArrayList;
+import gnu.trove.list.array.TIntArrayList;
 import org.matsim.contrib.common.gis.EsriShapeIO;
 import org.matsim.contrib.socnetgen.sna.graph.GraphUtils;
 import org.matsim.contrib.socnetgen.sna.graph.io.PajekAttributes;

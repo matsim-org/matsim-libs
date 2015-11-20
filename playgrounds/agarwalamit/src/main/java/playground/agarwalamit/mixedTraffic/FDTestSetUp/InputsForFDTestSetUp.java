@@ -65,7 +65,7 @@ public class InputsForFDTestSetUp {
 		this.outputFolder= GenerateFundamentalDiagramData.RUN_DIR;
 		setUpConfig();
 		createTriangularNetwork();
-		//Initializing modeData objects//TODO [AA]: should be initialized when instancing FundamentalDiagrams, no workaround still found
+		//Initializing modeData objects//ZZ_TODO should be initialized when instancing FundamentalDiagrams, no workaround still found
 		//Need to be currently initialized at this point to initialize output and modified QSim
 		fillTravelModeData();
 	}

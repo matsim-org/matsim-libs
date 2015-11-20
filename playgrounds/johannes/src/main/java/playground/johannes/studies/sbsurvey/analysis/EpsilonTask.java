@@ -20,7 +20,11 @@
 package playground.johannes.studies.sbsurvey.analysis;
 
 import com.vividsolutions.jts.geom.Point;
-import gnu.trove.*;
+import gnu.trove.iterator.TDoubleObjectIterator;
+import gnu.trove.map.hash.TDoubleDoubleHashMap;
+import gnu.trove.map.hash.TDoubleIntHashMap;
+import gnu.trove.map.hash.TDoubleObjectHashMap;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.common.gis.CartesianDistanceCalculator;
 import org.matsim.contrib.common.gis.DistanceCalculator;
@@ -74,7 +78,7 @@ public class EpsilonTask extends AnalyzerTask {
 		/*
 		 * create categories with low and high accessibility
 		 */
-		AttributePartition partitioner = new AttributePartition(FixedSampleSizeDiscretizer.create(accessValues.getValues(), 10, 2));
+		AttributePartition partitioner = new AttributePartition(FixedSampleSizeDiscretizer.create(accessValues.values(), 10, 2));
 		TDoubleObjectHashMap<?> partitions = partitioner.partition(accessValues);
 		TDoubleObjectIterator<?> it = partitions.iterator();
 		/*

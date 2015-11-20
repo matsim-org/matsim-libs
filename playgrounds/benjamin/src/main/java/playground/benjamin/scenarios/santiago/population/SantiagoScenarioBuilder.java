@@ -82,6 +82,7 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.pt.PtConstants;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.config.TransitRouterConfigGroup;
 
@@ -90,6 +91,14 @@ import playground.benjamin.scenarios.santiago.SantiagoScenarioConstants.Subpopul
 
 public class SantiagoScenarioBuilder {
 	private static final Logger log = Logger.getLogger(SantiagoScenarioBuilder.class);
+	
+//	final String pathForMatsim = "../../../runs-svn/santiago/run20/";
+//	final boolean prepareForModeChoice = false;
+	final String pathForMatsim = "../../../runs-svn/santiago/run33/";
+	final boolean prepareForModeChoice = true;
+	
+	final int writeStuffInterval = 50;
+	final int nrOfThreads = 6;
 
 	final String svnWorkingDir = "../../../shared-svn/studies/countries/cl/";
 	final String workingDirInputFiles = svnWorkingDir + "Kai_und_Daniel/inputFromElsewhere/";
@@ -103,11 +112,6 @@ public class SantiagoScenarioBuilder {
 	
 	final String popA0eAX = "A0equalAX";		//Population with first Activity = last Activity
 	final String popA0neAX = "A0NoNequalAX";	//Population with first Activity != last Activity
-	
-//	final String pathForMatsim = "../../../runs-svn/santiago/run20/";
-//	final boolean prepareForModeChoice = false;
-	final String pathForMatsim = "../../../runs-svn/santiago/run30/";
-	final boolean prepareForModeChoice = true;
 	
 	/**
 	 * Creates an initial population for the santiago scenario, executing the following steps:
@@ -185,22 +189,21 @@ public class SantiagoScenarioBuilder {
 
 	private void setActivityParams(SortedMap<String, Double> acts, Config config) {
 		for(String act :acts.keySet()){
-			ActivityParams params = new ActivityParams();
-			params.setActivityType(act);
-			params.setTypicalDuration(acts.get(act));
-			// Minimum duration is now specified by typical duration.
-//			params.setMinimalDuration(acts.get(act).getSecond());
-			params.setClosingTime(Time.UNDEFINED_TIME);
-			params.setEarliestEndTime(Time.UNDEFINED_TIME);
-			params.setLatestStartTime(Time.UNDEFINED_TIME);
-			params.setOpeningTime(Time.UNDEFINED_TIME);
-			params.setTypicalDurationScoreComputation(TypicalDurationScoreComputation.relative);
-			// TODO: overwriting this is not recommended but enforced for closing time
-			if (act.equals("pt interaction")){
-				params.setScoringThisActivityAtAll(false);
-				params.setClosingTime(0);
+			if(act.equals(PtConstants.TRANSIT_ACTIVITY_TYPE)){
+				//do nothing
+			} else {
+				ActivityParams params = new ActivityParams();
+				params.setActivityType(act);
+				params.setTypicalDuration(acts.get(act));
+				// Minimum duration is now specified by typical duration.
+//				params.setMinimalDuration(acts.get(act).getSecond());
+				params.setClosingTime(Time.UNDEFINED_TIME);
+				params.setEarliestEndTime(Time.UNDEFINED_TIME);
+				params.setLatestStartTime(Time.UNDEFINED_TIME);
+				params.setOpeningTime(Time.UNDEFINED_TIME);
+				params.setTypicalDurationScoreComputation(TypicalDurationScoreComputation.relative);
+				config.planCalcScore().addActivityParams(params);
 			}
-			config.planCalcScore().addActivityParams(params);
 		}
 	}
 
@@ -460,7 +463,7 @@ public class SantiagoScenarioBuilder {
 					planOut.getPlanElements().remove(planOut.getPlanElements().size()-1);
 				} else if(pe instanceof Activity){
 					Activity act = (Activity)pe;
-					if(!act.getType().equals("pt interaction")){
+					if(!act.getType().equals(PtConstants.TRANSIT_ACTIVITY_TYPE)){
 						valid = true;
 					} else{
 						planOut.getPlanElements().remove(planOut.getPlanElements().size()-1);
@@ -524,7 +527,7 @@ public class SantiagoScenarioBuilder {
 				PlanElement pe = person.getSelectedPlan().getPlanElements().get(i);
 				if(pe instanceof Activity){
 					Activity act = (Activity)pe;
-					if(!act.getType().equals("pt interaction")){
+					if(!act.getType().equals(PtConstants.TRANSIT_ACTIVITY_TYPE)){
 						if(person.getSelectedPlan().getPlanElements().indexOf(act) > 0){
 							act.setStartTime(act.getStartTime() + delta);
 						}
@@ -579,7 +582,7 @@ public class SantiagoScenarioBuilder {
 		}
 		
 		//creation of more than one subpopulation in config not possible yet ->removed Module, creation in SantiagoScenarioRunner (edited by BK) ,KT 2015-09-15.
-//		setSubtourModeChoiceParameters(config.subtourModeChoice());	//creation for more than one subpopulation not possibple in config, creation in SantiagoScenarioRunner (edited by BK) ,KT 2015-09-15.
+//		setSubtourModeChoiceParameters(config.subtourModeChoice());
 		config.removeModule("subtourModeChoice");
 		
 //		setTimeAllocationMutatorParameters(config.timeAllocationMutator());
@@ -589,15 +592,18 @@ public class SantiagoScenarioBuilder {
 	
 	private void setTransitParameters(TransitConfigGroup transit, TransitRouterConfigGroup transitRouter) {
 		Set<String> transitModes = new HashSet<String>();
+		transitModes.add(TransportMode.pt);
 		transitModes.add(SantiagoScenarioConstants.Modes.bus.toString());
 		transitModes.add(SantiagoScenarioConstants.Modes.metro.toString());
-		transitModes.add(SantiagoScenarioConstants.Modes.train.toString());
+//		transitModes.add(SantiagoScenarioConstants.Modes.train.toString());
 		transit.setTransitModes(transitModes);
 //		transit.setTransitScheduleFile(pathForMatsim + "input/transitschedule.xml");
 		transit.setTransitScheduleFile(pathForMatsim + "input/transitschedule_simplified.xml");
 		transit.setVehiclesFile(pathForMatsim + "input/transitvehicles.xml");
 		transit.setUseTransit(true);
-		transitRouter.setExtensionRadius(500);
+//		transitRouter.setMaxBeelineWalkConnectionDistance(500.);
+//		transitRouter.setSearchRadius(200.);
+		transitRouter.setExtensionRadius(500.);
 	}
 
 	private void setControlerParameters(ControlerConfigGroup cc){
@@ -611,16 +617,14 @@ public class SantiagoScenarioBuilder {
 		cc.setOutputDirectory(pathForMatsim + "output/");
 		cc.setRoutingAlgorithmType(RoutingAlgorithmType.Dijkstra);
 		cc.setRunId(null);	//should not be "", because then all file names start with a dot. --> null or any number. (KT, 2015-08-17) 
-		Set<String> snapshotFormat = new HashSet<String>();
-		snapshotFormat.add("otfvis");
-		cc.setSnapshotFormat(snapshotFormat);
-		cc.setWriteEventsInterval(10);
-		cc.setWritePlansInterval(10);
-		cc.setWriteSnapshotsInterval(10);
+		cc.setWriteEventsInterval(writeStuffInterval);
+		cc.setWritePlansInterval(writeStuffInterval);
+		cc.setSnapshotFormat(CollectionUtils.stringToSet("otfvis"));
+		cc.setWriteSnapshotsInterval(0);
 	}
 	
 	private void setCountsParameters(CountsConfigGroup counts, double sampleSizeEOD){
-		// TODO: check what adding taxi, colectiovo, motorcycle and freight changes
+		// TODO: check what adding taxi, colectivo, and freight changes
 		counts.setAnalyzedModes(TransportMode.car);
 		counts.setAverageCountsOverIterations(5);
 		counts.setCountsScaleFactor(SantiagoScenarioConstants.N / sampleSizeEOD);
@@ -629,18 +633,18 @@ public class SantiagoScenarioBuilder {
 		counts.setFilterModes(false);
 		counts.setCountsFileName(pathForMatsim + "input/counts_merged_VEH_C01.xml");
 		counts.setOutputFormat("all");
-		counts.setWriteCountsInterval(10);
+		counts.setWriteCountsInterval(writeStuffInterval);
 	}
 	
 	private void setGlobalParameters(GlobalConfigGroup global){
 		global.setCoordinateSystem(SantiagoScenarioConstants.toCRS);
-		global.setNumberOfThreads(2);
+		global.setNumberOfThreads(nrOfThreads);
 		global.setRandomSeed(4711);
 	}
 	
 	private void setLinkStatsParameters(LinkStatsConfigGroup ls){
 		ls.setAverageLinkStatsOverIterations(5);
-		ls.setWriteLinkStatsInterval(10);
+		ls.setWriteLinkStatsInterval(writeStuffInterval);
 	}
 	
 	private void setNetworkParameters(NetworkConfigGroup net){
@@ -652,12 +656,12 @@ public class SantiagoScenarioBuilder {
 	
 	private void setParallelEventHandlingParameters(ParallelEventHandlingConfigGroup peh){
 		peh.setEstimatedNumberOfEvents(null);
-		peh.setNumberOfThreads(2);
+		peh.setNumberOfThreads(nrOfThreads);
 	}
 	
 	private void setPlanCalcScoreParameters(PlanCalcScoreConfigGroup pcs){
-		pcs.setBrainExpBeta(1);
-		pcs.setPathSizeLogitBeta(0.0);
+		pcs.setBrainExpBeta(1.0);
+//		pcs.setPathSizeLogitBeta(0.0);
 //		pcs.setEarlyDeparture_utils_hr(-0.0);
 		pcs.setFractionOfIterationsToStartScoreMSA(0.8);
 //		pcs.setLateArrival_utils_hr(-18.0);
@@ -671,87 +675,103 @@ public class SantiagoScenarioBuilder {
 		
 		ModeParams carParams = new ModeParams(TransportMode.car);
 		carParams.setConstant(0.0);
-		carParams.setMarginalUtilityOfDistance(0.0);
+//		carParams.setMarginalUtilityOfDistance(0.0);
 		carParams.setMarginalUtilityOfTraveling(-1.056);
 		carParams.setMonetaryDistanceRate(-0.248);
 		pcs.addModeParams(carParams);
 		
 		ModeParams rideParams = new ModeParams(TransportMode.ride);
 		rideParams.setConstant(0.0);
-		rideParams.setMarginalUtilityOfDistance(0.0);
+//		rideParams.setMarginalUtilityOfDistance(0.0);
 		rideParams.setMarginalUtilityOfTraveling(-1.056);
 		rideParams.setMonetaryDistanceRate(-0.0);
 		pcs.addModeParams(rideParams);
 		
 		ModeParams taxiParams = new ModeParams(SantiagoScenarioConstants.Modes.taxi.toString());
 		taxiParams.setConstant(0.0);
-		taxiParams.setMarginalUtilityOfDistance(0.0);
+//		taxiParams.setMarginalUtilityOfDistance(0.0);
 		taxiParams.setMarginalUtilityOfTraveling(-1.056);
-		taxiParams.setMonetaryDistanceRate(-0.0);
+		taxiParams.setMonetaryDistanceRate(-1.0); //see http://www.numbeo.com/taxi-fare/city_result.jsp?country=Chile&city=Santiago
 		pcs.addModeParams(taxiParams);
 		
 		ModeParams colectivoParams = new ModeParams(SantiagoScenarioConstants.Modes.colectivo.toString());
 		colectivoParams.setConstant(0.0);
-		colectivoParams.setMarginalUtilityOfDistance(0.0);
+//		colectivoParams.setMarginalUtilityOfDistance(0.0);
 		colectivoParams.setMarginalUtilityOfTraveling(-1.056);
 		colectivoParams.setMonetaryDistanceRate(-0.0);
 		pcs.addModeParams(colectivoParams);
 		
-		ModeParams motorcycleParams = new ModeParams(SantiagoScenarioConstants.Modes.motorcycle.toString());
-		motorcycleParams.setConstant(0.0);
-		motorcycleParams.setMarginalUtilityOfDistance(0.0);
-		motorcycleParams.setMarginalUtilityOfTraveling(-1.056);
-		motorcycleParams.setMonetaryDistanceRate(-0.0);
-		pcs.addModeParams(motorcycleParams);
-
-		ModeParams schoolBusParams = new ModeParams(SantiagoScenarioConstants.Modes.school_bus.toString());
-		schoolBusParams.setConstant(0.0);
-		schoolBusParams.setMarginalUtilityOfDistance(0.0);
-		schoolBusParams.setMarginalUtilityOfTraveling(-1.056);
-		schoolBusParams.setMonetaryDistanceRate(-0.0);
-		pcs.addModeParams(schoolBusParams);
-		
-		ModeParams busParams = new ModeParams(SantiagoScenarioConstants.Modes.bus.toString());
-		busParams.setConstant(0.0);
-		busParams.setMarginalUtilityOfDistance(0.0);
-		busParams.setMarginalUtilityOfTraveling(-1.056);
-		busParams.setMonetaryDistanceRate(-0.0);
-		pcs.addModeParams(busParams);
-		
-		ModeParams metroParams = new ModeParams(SantiagoScenarioConstants.Modes.metro.toString());
-		metroParams.setConstant(0.0);
-		metroParams.setMarginalUtilityOfDistance(0.0);
-		metroParams.setMarginalUtilityOfTraveling(-1.056);
-		metroParams.setMonetaryDistanceRate(-0.0);
-		pcs.addModeParams(metroParams);
-		
 		ModeParams trainParams = new ModeParams(SantiagoScenarioConstants.Modes.train.toString());
 		trainParams.setConstant(0.0);
-		trainParams.setMarginalUtilityOfDistance(0.0);
+//		trainParams.setMarginalUtilityOfDistance(0.0);
 		trainParams.setMarginalUtilityOfTraveling(-1.056);
 		trainParams.setMonetaryDistanceRate(-0.0);
 		pcs.addModeParams(trainParams);
 		
+		/*
+		 * begin pt parameter settings
+		 * */
+		if(!prepareForModeChoice){
+			ModeParams busParams = new ModeParams(SantiagoScenarioConstants.Modes.bus.toString());
+			busParams.setConstant(0.0);
+//			busParams.setMarginalUtilityOfDistance(0.0);
+			busParams.setMarginalUtilityOfTraveling(-1.056);
+			busParams.setMonetaryDistanceRate(-0.0);
+			pcs.addModeParams(busParams);
+			
+			ModeParams metroParams = new ModeParams(SantiagoScenarioConstants.Modes.metro.toString());
+			metroParams.setConstant(0.0);
+//			metroParams.setMarginalUtilityOfDistance(0.0);
+			metroParams.setMarginalUtilityOfTraveling(-1.056);
+			metroParams.setMonetaryDistanceRate(-0.0);
+			pcs.addModeParams(metroParams);
+			
+		} else {
+			ModeParams ptParams = new ModeParams(TransportMode.pt);
+			ptParams.setConstant(-1.0);
+//			ptParams.setMarginalUtilityOfDistance(0.0);
+			ptParams.setMarginalUtilityOfTraveling(-1.056);
+			ptParams.setMonetaryDistanceRate(-0.0);
+			pcs.addModeParams(ptParams);
+		}
+		/*
+		 * end pt parameter settings
+		 * */
+		
 		ModeParams walkParams = new ModeParams(TransportMode.walk);
 		walkParams.setConstant(0.0);
-		walkParams.setMarginalUtilityOfDistance(0.0);
+//		walkParams.setMarginalUtilityOfDistance(0.0);
 		walkParams.setMarginalUtilityOfTraveling(-1.056);
 		walkParams.setMonetaryDistanceRate(-0.0);
 		pcs.addModeParams(walkParams);
 		
 		ModeParams bikeParams = new ModeParams(TransportMode.bike);
 		bikeParams.setConstant(0.0);
-		bikeParams.setMarginalUtilityOfDistance(0.0);
+//		bikeParams.setMarginalUtilityOfDistance(0.0);
 		bikeParams.setMarginalUtilityOfTraveling(-1.056);
 		bikeParams.setMonetaryDistanceRate(-0.0);
 		pcs.addModeParams(bikeParams);
 		
 		ModeParams otherModeParams = new ModeParams(TransportMode.other);
 		otherModeParams.setConstant(0.0);
-		otherModeParams.setMarginalUtilityOfDistance(0.0);
+//		otherModeParams.setMarginalUtilityOfDistance(0.0);
 		otherModeParams.setMarginalUtilityOfTraveling(-1.056);
 		otherModeParams.setMonetaryDistanceRate(-0.0);
 		pcs.addModeParams(otherModeParams);
+		
+//		ModeParams motorcycleParams = new ModeParams(SantiagoScenarioConstants.Modes.motorcycle.toString());
+//		motorcycleParams.setConstant(0.0);
+////		motorcycleParams.setMarginalUtilityOfDistance(0.0);
+//		motorcycleParams.setMarginalUtilityOfTraveling(-1.056);
+//		motorcycleParams.setMonetaryDistanceRate(-0.0);
+//		pcs.addModeParams(motorcycleParams);
+//
+//		ModeParams schoolBusParams = new ModeParams(SantiagoScenarioConstants.Modes.school_bus.toString());
+//		schoolBusParams.setConstant(0.0);
+////		schoolBusParams.setMarginalUtilityOfDistance(0.0);
+//		schoolBusParams.setMarginalUtilityOfTraveling(-1.056);
+//		schoolBusParams.setMonetaryDistanceRate(-0.0);
+//		pcs.addModeParams(schoolBusParams);
 	}
 	
 	private void setPlanParameters(PlansConfigGroup plans){
@@ -769,37 +789,11 @@ public class SantiagoScenarioBuilder {
 		networkModes.add(TransportMode.ride);
 		networkModes.add(SantiagoScenarioConstants.Modes.taxi.toString());
 		networkModes.add(SantiagoScenarioConstants.Modes.colectivo.toString());
-		networkModes.add(SantiagoScenarioConstants.Modes.motorcycle.toString());
-		networkModes.add(SantiagoScenarioConstants.Modes.school_bus.toString());
+		networkModes.add(SantiagoScenarioConstants.Modes.other.toString());
+//		networkModes.add(SantiagoScenarioConstants.Modes.motorcycle.toString());
+//		networkModes.add(SantiagoScenarioConstants.Modes.school_bus.toString());
+//		if(prepareForModeChoice) networkModes.add(TransportMode.pt);
 		pcr.setNetworkModes(networkModes);
-		
-	/*
-	 * using the following modes as a network modes using time dependent car travel times
-	 * */
-//		ModeRoutingParams rideParams = new ModeRoutingParams(TransportMode.ride);
-//		rideParams.setBeelineDistanceFactor(1.3);
-//		rideParams.setTeleportedModeSpeed(34 / 3.6);
-//		pcr.addModeRoutingParams(rideParams);
-//		
-//		ModeRoutingParams taxiParams = new ModeRoutingParams(Constants.Modes.taxi.toString());
-//		taxiParams.setBeelineDistanceFactor(1.3);
-//		taxiParams.setTeleportedModeSpeed(34 / 3.6);
-//		pcr.addModeRoutingParams(taxiParams);
-//		
-//		ModeRoutingParams colectivoParams = new ModeRoutingParams(Constants.Modes.colectivo.toString());
-//		colectivoParams.setBeelineDistanceFactor(1.3);
-//		colectivoParams.setTeleportedModeSpeed(30 / 3.6);
-//		pcr.addModeRoutingParams(colectivoParams);
-//		
-//		ModeRoutingParams motorcycleParams = new ModeRoutingParams(Constants.Modes.motorcycle.toString());
-//		motorcycleParams.setBeelineDistanceFactor(1.3);
-//		motorcycleParams.setTeleportedModeSpeed(34 / 3.6);
-//		pcr.addModeRoutingParams(motorcycleParams);
-//
-//		ModeRoutingParams schoolBusParams = new ModeRoutingParams(Constants.Modes.school_bus.toString());
-//		schoolBusParams.setBeelineDistanceFactor(1.3);
-//		schoolBusParams.setTeleportedModeSpeed(25 / 3.6);
-//		pcr.addModeRoutingParams(schoolBusParams);
 		
 	/*
 	 * begin pt parameter settings
@@ -814,34 +808,38 @@ public class SantiagoScenarioBuilder {
 			metroParams.setBeelineDistanceFactor(1.3);
 			metroParams.setTeleportedModeSpeed(32 / 3.6);
 			pcr.addModeRoutingParams(metroParams);
-
-			ModeRoutingParams trainParams = new ModeRoutingParams(SantiagoScenarioConstants.Modes.train.toString());
-			trainParams.setBeelineDistanceFactor(1.3);
-			trainParams.setTeleportedModeSpeed(50 / 3.6);
-			pcr.addModeRoutingParams(trainParams);
+		} else {
+			//TODO: This is by default set to walk parameters; changing this might require defining my own TripRouter...
+//			ModeRoutingParams transitWalkParams = new ModeRoutingParams(TransportMode.transit_walk);
+//			transitWalkParams.setBeelineDistanceFactor(1.3);
+//			transitWalkParams.setTeleportedModeSpeed(3 / 3.6);
+//			pcr.addModeRoutingParams(transitWalkParams);
 		}
 	/*
 	 * end pt parameter settings
 	 * */
 		
+		ModeRoutingParams trainParams = new ModeRoutingParams(SantiagoScenarioConstants.Modes.train.toString());
+		trainParams.setBeelineDistanceFactor(1.3);
+		trainParams.setTeleportedModeSpeed(50 / 3.6);
+		pcr.addModeRoutingParams(trainParams);
+			
 		ModeRoutingParams walkParams = new ModeRoutingParams(TransportMode.walk);
 		walkParams.setBeelineDistanceFactor(1.3);
-		walkParams.setTeleportedModeSpeed(5 / 3.6);
+		walkParams.setTeleportedModeSpeed(4 / 3.6);
 		pcr.addModeRoutingParams(walkParams);
 		
 		ModeRoutingParams bikeParams = new ModeRoutingParams(TransportMode.bike);
 		bikeParams.setBeelineDistanceFactor(1.3);
-		bikeParams.setTeleportedModeSpeed(15 / 3.6);
+		bikeParams.setTeleportedModeSpeed(10 / 3.6);
 		pcr.addModeRoutingParams(bikeParams);
-		
-		ModeRoutingParams otherModeParams = new ModeRoutingParams(TransportMode.other);
-		otherModeParams.setBeelineDistanceFactor(1.3);
-		otherModeParams.setTeleportedModeSpeed(25 / 3.6);
-		pcr.addModeRoutingParams(otherModeParams);
 	}
 	
 	private void setQSimParameters(QSimConfigGroup qsim, double sampleSizeEOD){
-		qsim.setEndTime(Time.UNDEFINED_TIME);
+		// TODO: avoiding wrongly coded pt departures at midnight; would be better to get them out of the transitschedule (see comments there). 
+//		qsim.setStartTime(0 * 3600);
+		qsim.setStartTime(2 * 3600);
+		qsim.setEndTime(30 * 3600);
 		double flowCapFactor = (sampleSizeEOD / SantiagoScenarioConstants.N);
 		qsim.setFlowCapFactor(flowCapFactor);
 //		qsim.setStorageCapFactor(0.015);
@@ -851,15 +849,16 @@ public class SantiagoScenarioBuilder {
 //		qsim.setLinkWidth(30);
 		Set<String> mainModes = new HashSet<String>();
 		mainModes.add(TransportMode.car);
+		// not necessary since pt is not a congested mode
+//		if(prepareForModeChoice) mainModes.add(TransportMode.pt);
 		qsim.setMainModes(mainModes);
 		qsim.setNodeOffset(0.0);
-		qsim.setNumberOfThreads(2);
+		qsim.setNumberOfThreads(nrOfThreads);
 		qsim.setSimStarttimeInterpretation(StarttimeInterpretation.maxOfStarttimeAndEarliestActivityEnd);
 		qsim.setSnapshotStyle(SnapshotStyle.equiDist);
 		qsim.setSnapshotPeriod(0.0);
-		qsim.setStartTime(Time.UNDEFINED_TIME);
-		qsim.setStuckTime(10.0);
-		qsim.setTimeStepSize(1.0);
+//		qsim.setStuckTime(10.0);
+//		qsim.setTimeStepSize(1.0);
 		qsim.setTrafficDynamics(TrafficDynamics.queue);
 		qsim.setUsePersonIdForMissingVehicleId(true);
 		qsim.setUsingFastCapacityUpdate(false);
@@ -871,37 +870,7 @@ public class SantiagoScenarioBuilder {
 		strategy.setFractionOfIterationsToDisableInnovation(0.8);
 		strategy.setMaxAgentPlanMemorySize(5);
 		strategy.setPlanSelectorForRemoval("WorstPlanSelector");
-		
-	//creation for more than one subpopulation moved to SantiagoScenarioRunner for consistency reasons
-//		StrategySettings changeExpBeta = new StrategySettings();
-//		changeExpBeta.setStrategyName("ChangeExpBeta");
-//		changeExpBeta.setWeight(0.7);
-//		strategy.addStrategySettings(changeExpBeta);
-//		
-//		StrategySettings reRoute = new StrategySettings();
-//		reRoute.setStrategyName("ReRoute");
-//		reRoute.setWeight(0.15);
-//		strategy.addStrategySettings(reRoute);
-		
-	//creation for more than one subpopulation not possibple in config, creation in SantiagoScenarioRunner (edited by BK) ,KT 2015-09-15.
-//		StrategySettings subTourModeChoice = new StrategySettings();
-//		subTourModeChoice.setStrategyName("SubtourModeChoice");
-//		subTourModeChoice.setSubpopulation(SubpopulationValues.carAvail);
-//		subTourModeChoice.setWeight(0.15);
-//		strategy.addStrategySettings(subTourModeChoice);
 	}
-	
-	//creation for more than one subpopulation not possibple in config, creation in SantiagoScenarioRunner (edited by BK) ,KT 2015-09-15.
-//	private void setSubtourModeChoiceParameters(SubtourModeChoiceConfigGroup smc){
-//		smc.setChainBasedModes(new String[]{TransportMode.car, TransportMode.bike});
-//		smc.setConsiderCarAvailability(true); // true or false ? (KT 2015-09-18); is not considered anyways (BK 2015-10-19)
-//		smc.setModes(new String[]{TransportMode.car, Constants.Modes.bus.toString(), Constants.Modes.metro.toString(), TransportMode.walk, TransportMode.bike});
-//	}
-	
-//	private void setTimeAllocationMutatorParameters(TimeAllocationMutatorConfigGroup tam){
-//		tam.setAffectingDuration(false);
-//		tam.setMutationRange(7600.);
-//	}
 	
 	private void setTravelTimeCalculatorParameters(TravelTimeCalculatorConfigGroup ttc){
 		ttc.setAnalyzedModes(TransportMode.car);

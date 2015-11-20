@@ -44,7 +44,6 @@ import playground.agarwalamit.utils.LoadMyScenarios;
 
 public class CongestionPricingComperator {
 
-
 	public CongestionPricingComperator(String runScenario) {
 		this.pricingScenario = runScenario;
 		scenario = LoadMyScenarios.loadScenarioFromOutputDir(runDir+pricingScenario+"/");

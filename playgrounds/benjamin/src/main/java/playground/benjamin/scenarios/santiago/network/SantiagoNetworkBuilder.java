@@ -79,7 +79,7 @@ public class SantiagoNetworkBuilder {
 	private void run() {
 		createDir(new File(outputDir));
 
-		String crs = "EPSG:32719";
+		String crs = SantiagoScenarioConstants.toCRS;
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, crs);
 		
 		double[] boundingBox1 = new double[]{-71.3607, -33.8875, -70.4169, -33.0144};
@@ -91,7 +91,7 @@ public class SantiagoNetworkBuilder {
 		onr.setHierarchyLayer(boundingBox1[3], boundingBox1[0], boundingBox1[1], boundingBox1[2], 4);
 		onr.setHierarchyLayer(boundingBox2[3], boundingBox2[0], boundingBox2[1], boundingBox2[2], 5);
 		onr.setHierarchyLayer(boundingBox3[3], boundingBox3[0], boundingBox3[1], boundingBox3[2], 5);
-		onr.parse(workingDirInputFiles+"networkOSM/santiago_tertiary.osm");
+		onr.parse(workingDirInputFiles + "networkOSM/santiago_tertiary.osm");
 		new NetworkCleaner().run(network);
 		
 		addSomeLinks(network);
@@ -117,11 +117,12 @@ public class SantiagoNetworkBuilder {
 		new MatsimNetworkReader(ptScenario).readFile(transitNetworkFile);
 //		new NetworkCleaner().run(ptScenario.getNetwork());
 		// Hack in order to avoid pt jamming on the routing network
+		// TODO: should not be necessary if pt is non-congested mode in qsim?
 		for(Link ptLink : ptScenario.getNetwork().getLinks().values()){
 			ptLink.setCapacity(200 * ptLink.getCapacity());
 			// TODO: how to adjust storage capacity??
 		}
-		new MergeNetworks().merge(network, TransportMode.pt, ptScenario.getNetwork());
+		new MergeNetworks().merge(network, "", ptScenario.getNetwork());
 	}
 
 	private void changeNumberOfLanes(NetworkImpl network) {
@@ -352,8 +353,9 @@ public class SantiagoNetworkBuilder {
 		allowedModes.add(TransportMode.ride);
 		allowedModes.add(SantiagoScenarioConstants.Modes.taxi.toString());
 		allowedModes.add(SantiagoScenarioConstants.Modes.colectivo.toString());
-		allowedModes.add(SantiagoScenarioConstants.Modes.motorcycle.toString());
-		allowedModes.add(SantiagoScenarioConstants.Modes.school_bus.toString());
+		allowedModes.add(SantiagoScenarioConstants.Modes.other.toString());
+//		allowedModes.add(SantiagoScenarioConstants.Modes.motorcycle.toString());
+//		allowedModes.add(SantiagoScenarioConstants.Modes.school_bus.toString());
 		for(Link ll : network.getLinks().values()){
 			ll.setAllowedModes(allowedModes);
 		}

@@ -19,7 +19,8 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetgen.sna.graph.spatial.generators;
 
-import gnu.trove.TIntDoubleHashMap;
+import gnu.trove.map.hash.TIntDoubleHashMap;
+
 import org.apache.log4j.Logger;
 import org.matsim.contrib.common.gis.CartesianDistanceCalculator;
 import org.matsim.contrib.common.gis.DistanceCalculator;

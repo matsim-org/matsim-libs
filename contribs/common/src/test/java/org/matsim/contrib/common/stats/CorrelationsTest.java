@@ -23,7 +23,7 @@
  */
 package org.matsim.contrib.common.stats;
 
-import gnu.trove.TDoubleDoubleHashMap;
+import gnu.trove.map.hash.TDoubleDoubleHashMap;
 import junit.framework.TestCase;
 
 /**

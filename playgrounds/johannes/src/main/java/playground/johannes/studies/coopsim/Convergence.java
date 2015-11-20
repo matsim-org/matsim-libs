@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package playground.johannes.studies.coopsim;
 
-import gnu.trove.TDoubleArrayList;
+import gnu.trove.list.array.TDoubleArrayList;
 import org.apache.commons.math.stat.regression.SimpleRegression;
 
 import java.io.*;

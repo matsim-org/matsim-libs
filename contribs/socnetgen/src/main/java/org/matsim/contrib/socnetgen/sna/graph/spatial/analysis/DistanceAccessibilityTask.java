@@ -19,10 +19,14 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetgen.sna.graph.spatial.analysis;
 
-import com.vividsolutions.jts.geom.Point;
-import gnu.trove.TDoubleArrayList;
-import gnu.trove.TObjectDoubleHashMap;
-import gnu.trove.TObjectDoubleIterator;
+import gnu.trove.iterator.TObjectDoubleIterator;
+import gnu.trove.list.array.TDoubleArrayList;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
+
+import java.io.IOException;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.common.stats.Correlations;
@@ -35,9 +39,7 @@ import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialEdge;
 import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialGraph;
 import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialVertex;
 
-import java.io.IOException;
-import java.util.Map;
-import java.util.Set;
+import com.vividsolutions.jts.geom.Point;
 
 /**
  * @author illenberger
@@ -100,8 +102,8 @@ public class DistanceAccessibilityTask extends ModuleAnalyzerTask<Distance> {
 				}
 			}
 			try{
-				accessValues = accessValues2.toNativeArray();
-				dValues = dValues2.toNativeArray();
+				accessValues = accessValues2.toArray();
+				dValues = dValues2.toArray();
 				Discretizer disc = FixedSampleSizeDiscretizer.create(accessValues, 100);
 				Correlations.writeToFile(Correlations.mean(accessValues, dValues, disc), String.format("%1$s/d_access.txt", getOutputDirectory()), "access", "d");
 			} catch (IOException e) {

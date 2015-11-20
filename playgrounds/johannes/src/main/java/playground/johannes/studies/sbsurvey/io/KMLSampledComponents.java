@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package playground.johannes.studies.sbsurvey.io;
 
-import gnu.trove.TIntIntHashMap;
+import gnu.trove.map.hash.TIntIntHashMap;
 import net.opengis.kml._2.FolderType;
 import org.matsim.contrib.socnetgen.sna.graph.Vertex;
 import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialVertex;

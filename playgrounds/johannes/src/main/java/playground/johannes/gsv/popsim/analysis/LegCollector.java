@@ -30,14 +30,10 @@ import java.util.List;
 /**
  * @author johannes
  */
-public class LegCollector<T> implements Collector<T> {
-
-    private Predicate<Segment> predicate;
-
-    private ValueProvider<T, Segment> provider;
+public class LegCollector<T> extends AbstractCollector<T, Segment> {
 
     public LegCollector(ValueProvider<T, Segment> provider) {
-        this.provider = provider;
+        super(provider);
     }
 
     @Override
@@ -59,7 +55,4 @@ public class LegCollector<T> implements Collector<T> {
         return values;
     }
 
-    public void setPredicate(Predicate<Segment> predicate) {
-        this.predicate = predicate;
-    }
 }

@@ -1,7 +1,7 @@
 /**
  * Supports keeping track of arbitrary attributes for identifiable objects.
  *
- * An example usage can be seen in {@link Example}.
+ * An example usage can be seen in {@link org.matsim.utils.objectattributes.RunObjectAttributesExample}.
  * 
  * <h2>Design thoughts</h2>
  * I think of ObjectAttributes (OA) as a way to provide specific additional data
@@ -20,7 +20,7 @@
  * they should never have the need to just access all attributes and then maybe figure
  * out what they could do with the available attributes, probably even guessing some 
  * interpretation of the attributes based on their names. <strike>For this reason, there is
- * no method available directly in {@link ObjectAttributes} that returns all attributes
+ * no method available directly in {@link org.matsim.utils.objectattributes.ObjectAttributes} that returns all attributes
  * for a specific object. Only getters for single, named attributes are providers.
  * <!-- I don't think that this statement is true any more.  kai, nov'13 --></strike>
  */

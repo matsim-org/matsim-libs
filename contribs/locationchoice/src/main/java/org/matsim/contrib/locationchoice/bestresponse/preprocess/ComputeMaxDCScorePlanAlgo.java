@@ -19,8 +19,6 @@
 
 package org.matsim.contrib.locationchoice.bestresponse.preprocess;
 
-import java.util.TreeMap;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -36,16 +34,17 @@ import org.matsim.facilities.ActivityFacility;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 public class ComputeMaxDCScorePlanAlgo implements PlanAlgorithm {
-	private String type;
-	private TreeMap<Id<ActivityFacility>, ActivityFacilityWithIndex> typedFacilities;
-	private DestinationScoring scorer;
-	private DestinationSampler sampler;
-	private DestinationChoiceBestResponseContext lcContext;
+	
+	private final String type;
+	private final ActivityFacilityWithIndex[] typedFacilities;
+	private final DestinationScoring scorer;
+	private final DestinationSampler sampler;
+	private final DestinationChoiceBestResponseContext lcContext;
 	private final Id<Link> dummyLinkId = Id.createLinkId(1);
 	private final DummyActivity dummyActivity = new DummyActivity(this.dummyLinkId); 
 	
-	public ComputeMaxDCScorePlanAlgo(String type, TreeMap<Id<ActivityFacility>, ActivityFacilityWithIndex> typedFacilities,
-			DestinationScoring scorer, DestinationSampler sampler, DestinationChoiceBestResponseContext lcContext) {		
+	public ComputeMaxDCScorePlanAlgo(final String type, final ActivityFacilityWithIndex[] typedFacilities,
+			final DestinationScoring scorer, final DestinationSampler sampler, final DestinationChoiceBestResponseContext lcContext) {		
 		this.type = type;
 		this.typedFacilities = typedFacilities;
 		this.scorer = scorer;
@@ -69,7 +68,7 @@ public class ComputeMaxDCScorePlanAlgo implements PlanAlgorithm {
 				activityIndex++ ;
 				if (this.lcContext.getConverter().convertType(((Activity) pe).getType()).equals(type)) {
 			
-					for (ActivityFacilityWithIndex f : typedFacilities.values()) {
+					for (ActivityFacilityWithIndex f : this.typedFacilities) {
 						//check if facility is sampled
 						int facilityIndex = f.getArrayIndex();
 						if (!this.sampler.sample(facilityIndex, personIndex)) continue;

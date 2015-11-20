@@ -19,8 +19,11 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetgen.sna.graph.social.analysis;
 
-import gnu.trove.TObjectDoubleHashMap;
-import gnu.trove.TObjectDoubleIterator;
+import gnu.trove.iterator.TObjectDoubleIterator;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
+
+import java.util.Map;
+
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.socnetgen.sna.graph.Graph;
@@ -29,8 +32,6 @@ import org.matsim.contrib.socnetgen.sna.graph.analysis.Degree;
 import org.matsim.contrib.socnetgen.sna.graph.analysis.ModuleAnalyzerTask;
 import org.matsim.contrib.socnetgen.sna.graph.social.SocialVertex;
 import org.matsim.core.population.PersonUtils;
-
-import java.util.Map;
 
 /**
  * @author illenberger

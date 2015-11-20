@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package playground.johannes.studies.coopsim;
 
-import gnu.trove.TObjectDoubleHashMap;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import playground.johannes.coopsim.analysis.AbstractTrajectoryProperty;

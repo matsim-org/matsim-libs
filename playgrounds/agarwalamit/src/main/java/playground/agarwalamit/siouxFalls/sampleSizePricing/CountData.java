@@ -37,6 +37,7 @@ import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.analysis.LinkVolumeHandler;
+import playground.agarwalamit.utils.MapUtils;
 import playground.vsp.analysis.modules.AbstractAnalysisModule;
 
 /**
@@ -139,16 +140,8 @@ public class CountData extends AbstractAnalysisModule {
 
 	private void getDesiredLinkVolumes (){
 		for(Id<Link> id :this.linkId2Vol.keySet()){
-			if(this.linkId2TimeSlot2Vol.containsKey(id)) this.linkId2Vol.put(id, this.countScaleFactor*sumMap(this.linkId2TimeSlot2Vol.get(id)));
+			if(this.linkId2TimeSlot2Vol.containsKey(id)) this.linkId2Vol.put(id, this.countScaleFactor*MapUtils.doubleSum(this.linkId2TimeSlot2Vol.get(id)));
 			else this.linkId2Vol.put(id, 0.0);
 		}
-	}
-
-	private double sumMap(Map<Integer, Double> inputMap){
-		double sum =0;
-		for(Integer i : inputMap.keySet()){
-			sum += inputMap.get(i);
-		}
-		return sum;
 	}
 }

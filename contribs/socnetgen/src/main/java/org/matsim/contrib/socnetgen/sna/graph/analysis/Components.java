@@ -19,14 +19,21 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetgen.sna.graph.analysis;
 
-import gnu.trove.TIntArrayList;
+import gnu.trove.list.array.TIntArrayList;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.socnetgen.sna.graph.Graph;
 import org.matsim.contrib.socnetgen.sna.graph.Vertex;
 import org.matsim.contrib.socnetgen.sna.graph.matrix.AdjacencyMatrix;
 import org.matsim.contrib.socnetgen.sna.graph.matrix.Dijkstra;
-
-import java.util.*;
 
 /**
  * A class that provides functionality to analyze connectivity of graph.

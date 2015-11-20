@@ -21,11 +21,14 @@ package playground.jbischoff.taxibus.passenger;
 
 import java.util.Collection;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.MobsimAgent.State;
 import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
@@ -35,18 +38,17 @@ import org.matsim.core.mobsim.qsim.QSim;
 import playground.jbischoff.taxibus.utils.TaxibusUtils;
 
 /**
- * @author  jbischoff
+ * @author jbischoff
  *
  */
-public class TaxibusPassengerOrderManager implements  ActivityStartEventHandler, MobsimInitializedListener  {
+public class TaxibusPassengerOrderManager implements ActivityStartEventHandler, MobsimInitializedListener {
 	private QSim qSim;
 	private TaxibusPassengerEngine passengerEngine;
-	
+
 	public TaxibusPassengerOrderManager(TaxibusPassengerEngine passengerEngine) {
-	this.passengerEngine = passengerEngine;
+		this.passengerEngine = passengerEngine;
 	}
-	
-	
+
 	@Override
 	public void reset(int iteration) {
 
@@ -54,52 +56,66 @@ public class TaxibusPassengerOrderManager implements  ActivityStartEventHandler,
 
 	@Override
 	public void handleEvent(ActivityStartEvent event) {
+		if (event.getActType().startsWith("pt"))
+			return;
 		Id<MobsimAgent> mid = Id.create(event.getPersonId(), MobsimAgent.class);
 		if (qSim.getAgentMap().containsKey(mid))
-		//to filter out drivers without an agent plan
+		// to filter out drivers without an agent plan
 		{
-		MobsimAgent mobsimAgent = qSim.getAgentMap().get(mid);
-		if (mobsimAgent instanceof PlanAgent){
-			PlanAgent agent = (PlanAgent) mobsimAgent;
-			Leg leg = (Leg) agent.getNextPlanElement();
-			if (leg!=null ){ 
-			if (leg.getMode().equals(TaxibusUtils.TAXIBUS_MODE)){
-//			if (leg.getMode().equals("car")){
+			MobsimAgent mobsimAgent = qSim.getAgentMap().get(mid);
+			if (mobsimAgent instanceof PlanAgent) {
+				if (mobsimAgent.getState().equals(State.LEG))
+					return;
+				PlanAgent agent = (PlanAgent) mobsimAgent;
+				if (agent.getNextPlanElement() != null) {
+					if (agent.getNextPlanElement() instanceof Activity) {
+						Logger.getLogger(getClass()).error(
+								"Agent" + mid.toString() + " started activity: " + event.getActType() + " next act ");
+						return;
+					}
+					if (agent.getNextPlanElement() instanceof Leg) {
+						Leg leg = (Leg) agent.getNextPlanElement();
+						if (leg.getMode().equals(TaxibusUtils.TAXIBUS_MODE)) {
+							// if (leg.getMode().equals("car")){
 
-				Double departureTime = mobsimAgent.getActivityEndTime();
-				prebookTaxiBusTrip(mobsimAgent,leg,departureTime);
-			}
-		}
+							Double departureTime = mobsimAgent.getActivityEndTime();
+							if (departureTime > event.getTime())
+								departureTime = event.getTime() + 60;
+							prebookTaxiBusTrip(mobsimAgent, leg, departureTime);
+						}
+					}
+				}
 			}
 		}
 	}
-	
+
 	@Override
 	public void notifyMobsimInitialized(@SuppressWarnings("rawtypes") MobsimInitializedEvent e) {
 
 		this.qSim = (QSim) e.getQueueSimulation();
-	 Collection<MobsimAgent> agents = qSim.getAgents();
+		Collection<MobsimAgent> agents = qSim.getAgents();
 
-    for (MobsimAgent mobsimAgent : agents) {
-    	if (mobsimAgent instanceof PlanAgent){
-    		PlanAgent agent = (PlanAgent) mobsimAgent;
-			Leg leg = (Leg) agent.getNextPlanElement();
-			if (leg.getMode().equals(TaxibusUtils.TAXIBUS_MODE)){
-//			if (leg.getMode().equals("car")){
-				Double departureTime = mobsimAgent.getActivityEndTime();
-				prebookTaxiBusTrip(mobsimAgent,leg,departureTime);
+		for (MobsimAgent mobsimAgent : agents) {
+			if (mobsimAgent instanceof PlanAgent) {
+				PlanAgent agent = (PlanAgent) mobsimAgent;
+				Leg leg = (Leg) agent.getNextPlanElement();
+				if (leg.getMode().equals(TaxibusUtils.TAXIBUS_MODE)) {
+					// if (leg.getMode().equals("car")){
+					Double departureTime = mobsimAgent.getActivityEndTime();
+					prebookTaxiBusTrip(mobsimAgent, leg, departureTime);
+				}
 			}
 		}
-    }
-}
+	}
+
 	private void prebookTaxiBusTrip(MobsimAgent mobsimAgent, Leg leg, Double departureTime) {
-		 if (departureTime == null){
-         	throw new IllegalStateException("There is no Activity before the leg or the activity has no end time.");
-         } 
-		 System.out.println("taxi trip booked for " + mobsimAgent.getId());
-		 this.passengerEngine.prebookTrip(qSim.getSimTimer().getTimeOfDay(), (MobsimPassengerAgent)mobsimAgent, leg.getRoute().getStartLinkId(),leg.getRoute().getEndLinkId(), departureTime);
-		
-		 
+		if (departureTime == null) {
+			throw new IllegalStateException("There is no Activity before the leg or the activity has no end time.");
+		}
+		System.out.println("taxi trip booked for " + mobsimAgent.getId());
+		this.passengerEngine.prebookTrip(qSim.getSimTimer().getTimeOfDay(), (MobsimPassengerAgent) mobsimAgent,
+				leg.getRoute().getStartLinkId(), leg.getRoute().getEndLinkId(), departureTime);
+
 	}
 
 }

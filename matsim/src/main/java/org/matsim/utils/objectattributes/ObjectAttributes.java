@@ -31,11 +31,14 @@ import org.matsim.core.api.internal.MatsimExtensionPoint;
  * arbitrary objects (identified by String-Ids). Note that this implementation uses
  * large amounts of memory for storing many attributes for many objects, it is not
  * heavily optimized.
- *
+ * <p/>
  * <em>This class is not thread-safe.</em>
- * 
+ * <p/>
  * More information can be found in the package's Javadoc.
- *
+ * <p/>
+ * Example(s):<ul>
+ * <li> {@link }
+ * </ul>
  * @author mrieser
  */
 public class ObjectAttributes implements MatsimExtensionPoint {

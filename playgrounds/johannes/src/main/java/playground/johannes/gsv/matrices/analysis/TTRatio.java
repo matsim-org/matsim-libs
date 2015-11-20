@@ -19,8 +19,8 @@
 
 package playground.johannes.gsv.matrices.analysis;
 
-import gnu.trove.TDoubleArrayList;
-import gnu.trove.TDoubleDoubleHashMap;
+import gnu.trove.list.array.TDoubleArrayList;
+import gnu.trove.map.hash.TDoubleDoubleHashMap;
 import org.matsim.contrib.common.stats.*;
 import org.matsim.core.utils.collections.Tuple;
 import playground.johannes.gsv.zones.KeyMatrix;
@@ -107,9 +107,9 @@ public class TTRatio {
 		
 		ratioWriter.close();
 		
-		Discretizer disc = FixedSampleSizeDiscretizer.create(ratios.toNativeArray(), 50, 200);
-//		TDoubleDoubleHashMap hist = Correlations.mean(ratios.toNativeArray(), shares.toNativeArray(), disc);
-		TDoubleDoubleHashMap hist = Correlations.mean(ratios.toNativeArray(), shares.toNativeArray(), new LinearDiscretizer(0.02));
+		Discretizer disc = FixedSampleSizeDiscretizer.create(ratios.toArray(), 50, 200);
+//		TDoubleDoubleHashMap hist = Correlations.mean(ratios.toArray(), shares.toArray(), disc);
+		TDoubleDoubleHashMap hist = Correlations.mean(ratios.toArray(), shares.toArray(), new LinearDiscretizer(0.02));
 		StatsWriter.writeHistogram(hist, "Ratio", "Share", "/home/johannes/gsv/matrices/analysis/marketShares/ratio.hist.txt");
 	}
 

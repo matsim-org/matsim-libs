@@ -19,9 +19,6 @@
  * *********************************************************************** */
 package playground.thibautd.initialdemandgeneration.socnetgensimulated.framework;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
@@ -38,9 +35,11 @@ import org.apache.commons.math3.optim.nonlinear.scalar.ObjectiveFunction;
 import org.apache.commons.math3.optim.nonlinear.scalar.noderiv.CMAESOptimizer;
 import org.apache.commons.math3.random.MersenneTwister;
 import org.apache.log4j.Logger;
-
-import playground.thibautd.initialdemandgeneration.socnetgen.framework.SnaUtils;
 import org.matsim.contrib.socnetsim.framework.population.SocialNetwork;
+import playground.thibautd.initialdemandgeneration.socnetgen.framework.SnaUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author thibautd

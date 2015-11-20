@@ -38,6 +38,11 @@ public class NumericAnalyzer extends AbstractAnalyzerTask<Collection<? extends P
         this.dimension = dimension;
     }
 
+    public NumericAnalyzer(Collector<Double> collector, String dimension, FileIOContext ioContext) {
+        this(collector, dimension);
+        setIoContext(ioContext);
+    }
+
     @Override
     public void analyze(Collection<? extends Person> persons, List<StatsContainer> containers) {
         List<Double> values = collector.collect(persons);

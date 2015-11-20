@@ -81,10 +81,5 @@ public class UtilityPartsPerPerson {
 			throw new RuntimeException("Data is not written in file. Reason: "
 					+ e);
 		}
-
-
 	}
-
-
-
 }

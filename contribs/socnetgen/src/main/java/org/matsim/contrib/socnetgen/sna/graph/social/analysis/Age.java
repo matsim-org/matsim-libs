@@ -19,10 +19,13 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetgen.sna.graph.social.analysis;
 
-import gnu.trove.TDoubleArrayList;
-import gnu.trove.TDoubleDoubleHashMap;
-import gnu.trove.TDoubleObjectHashMap;
-import gnu.trove.TObjectDoubleHashMap;
+import gnu.trove.list.array.TDoubleArrayList;
+import gnu.trove.map.hash.TDoubleDoubleHashMap;
+import gnu.trove.map.hash.TDoubleObjectHashMap;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
+
+import java.util.Set;
+
 import org.apache.commons.math.stat.correlation.PearsonsCorrelation;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.common.stats.Correlations;
@@ -31,8 +34,6 @@ import org.matsim.contrib.socnetgen.sna.graph.Vertex;
 import org.matsim.contrib.socnetgen.sna.graph.analysis.AbstractVertexProperty;
 import org.matsim.contrib.socnetgen.sna.graph.social.SocialEdge;
 import org.matsim.contrib.socnetgen.sna.graph.social.SocialVertex;
-
-import java.util.Set;
 
 /**
  * @author illenberger
@@ -76,7 +77,7 @@ public class Age extends AbstractVertexProperty {
 			}
 		}
 		
-		return Correlations.mean(values1.toNativeArray(), values2.toNativeArray());
+		return Correlations.mean(values1.toArray(), values2.toArray());
 	}
 	
 	public double correlationCoefficient(Set<? extends SocialEdge> edges) {
@@ -98,7 +99,7 @@ public class Age extends AbstractVertexProperty {
 		if(values1.isEmpty())
 			return Double.NaN;
 		else
-			return new PearsonsCorrelation().correlation(values1.toNativeArray(), values2.toNativeArray());
+			return new PearsonsCorrelation().correlation(values1.toArray(), values2.toArray());
 	}
 	
 	public TDoubleObjectHashMap<DescriptiveStatistics> boxplot(Set<? extends SocialVertex> vertices) {
@@ -118,6 +119,6 @@ public class Age extends AbstractVertexProperty {
 			}
 		}
 		
-		return Correlations.statistics(values1.toNativeArray(), values2.toNativeArray(), new LinearDiscretizer(5.0));
+		return Correlations.statistics(values1.toArray(), values2.toArray(), new LinearDiscretizer(5.0));
 	}
 }

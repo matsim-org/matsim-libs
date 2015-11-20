@@ -25,6 +25,8 @@ package tutorial.programming.example12PluggableTripRouter;
 import java.util.Collections;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.router.EmptyStageActivityTypes;
@@ -39,9 +41,10 @@ import org.matsim.facilities.Facility;
 public class MyRoutingModule implements RoutingModule {
 
 	private Object iterationData;
-
-	public MyRoutingModule(Object iterationData) {
-		this.iterationData = iterationData;
+	
+	@Inject
+	public MyRoutingModule(MySimulationObserver observer) {
+		this.iterationData = observer.getIterationData();
 	}
 
 	@Override

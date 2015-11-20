@@ -19,17 +19,6 @@
  * *********************************************************************** */
 package eu.eunoiaproject.bikesharing.framework.analysis;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.Event;
-import org.matsim.core.events.handler.BasicEventHandler;
-import org.matsim.core.utils.io.UncheckedIOException;
-
 import eu.eunoiaproject.bikesharing.framework.events.AgentStartsWaitingForBikeEvent;
 import eu.eunoiaproject.bikesharing.framework.events.AgentStartsWaitingForFreeBikeSlotEvent;
 import eu.eunoiaproject.bikesharing.framework.events.AgentStopsWaitingForBikeEvent;
@@ -37,6 +26,15 @@ import eu.eunoiaproject.bikesharing.framework.events.AgentStopsWaitingForFreeBik
 import eu.eunoiaproject.bikesharing.framework.events.NewBikeSharingFacilityStateEvent;
 import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingFacilities;
 import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingFacility;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.core.events.handler.BasicEventHandler;
+import org.matsim.core.utils.io.UncheckedIOException;
+
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * An event handler which listens to a stream of events and dumps bike sharing

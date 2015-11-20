@@ -88,7 +88,7 @@ public class LegModeRouteDistanceDistributionHandler implements PersonDepartureE
 	public void handleEvent(LinkLeaveEvent event) {
 		Id<Person> personId = Id.createPersonId(event.getVehicleId().toString());
 		Id<Link> linkId = event.getLinkId();
-		// if a person is in more than two groups, then which one is correct mode ?
+		// [AA] if a person is in more than two groups, then which one is correct mode ?
 		String mode = this.personId2LegModes.get(personId);
 		Map<Id<Person>, Double> person2Dist = mode2PersonId2OneTripdist.get(mode);
 		double distSoFar = person2Dist.get(personId);
@@ -188,7 +188,7 @@ public class LegModeRouteDistanceDistributionHandler implements PersonDepartureE
 	public void handleEvent(TeleportationArrivalEvent event) {
 		Id<Person> personId = event.getPersonId();
 		String mode = this.personId2LegModes.get(personId);
-		// if a person is in more than two groups, then which one is correct mode ?
+		// ZZ_TODO if a person is in more than two groups, then which one is correct mode ?
 		Map<Id<Person>, Double> person2Dist = mode2PersonId2TeleportDist.get(mode);
 		double teleportDist = event.getDistance();
 		person2Dist.put(personId, teleportDist);

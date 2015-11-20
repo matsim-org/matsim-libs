@@ -48,16 +48,17 @@ class MyPlanStrategyModule implements PlanStrategyModule, ActivityEndEventHandle
 
 	@Override
 	public void handlePlan(Plan plan) {
-		log.error("calling handlePlan");
+		log.error("calling handlePlan for person.Id: " + plan.getPerson().getId());
 	}
 
 	@Override
 	public void prepareReplanning(ReplanningContext replanningContext) {
+		log.error("calling prepareReplanning");
 	}
 
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
-		log.error("calling handleEvent for an ActivityEndEvent");
+		//log.error("calling handleEvent for an ActivityEndEvent");
 	}
 
 	@Override

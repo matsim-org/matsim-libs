@@ -19,8 +19,8 @@
  * *********************************************************************** */
 package playground.johannes.coopsim.analysis;
 
-import gnu.trove.TDoubleDoubleHashMap;
-import gnu.trove.TObjectDoubleHashMap;
+import gnu.trove.map.hash.TDoubleDoubleHashMap;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
 import org.apache.commons.collections.bidimap.DualHashBidiMap;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.api.core.v01.population.Activity;
@@ -78,7 +78,7 @@ public class TripDistanceDegreeTask extends TrajectoryAnalyzerTask {
 			TObjectDoubleHashMap<Vertex> yVals = vAdaptor.values(graph.getVertices());
 
 			TDoubleDoubleHashMap correl = VertexPropertyCorrelation.mean(yVals, xVals,
-					FixedSampleSizeDiscretizer.create(xVals.getValues(), 50, 100));
+					FixedSampleSizeDiscretizer.create(xVals.values(), 50, 100));
 			
 			if(purpose == null)
 				purpose = "all";

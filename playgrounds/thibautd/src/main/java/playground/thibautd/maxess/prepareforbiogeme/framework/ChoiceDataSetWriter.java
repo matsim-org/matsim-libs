@@ -26,7 +26,6 @@ import org.matsim.core.utils.misc.Counter;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
 /**

@@ -20,7 +20,7 @@
 package playground.johannes.gsv.synPop.osm;
 
 import com.vividsolutions.jts.geom.Point;
-import gnu.trove.TObjectDoubleHashMap;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;

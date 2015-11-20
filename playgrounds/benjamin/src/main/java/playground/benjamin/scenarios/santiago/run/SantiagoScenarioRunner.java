@@ -22,11 +22,13 @@ package playground.benjamin.scenarios.santiago.run;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.jfree.util.Log;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -53,11 +55,10 @@ public class SantiagoScenarioRunner {
 
 //	private static String inputPath = "../../../runs-svn/santiago/run20/input/";
 //	private static boolean doModeChoice = false;
-	private static String inputPath = "../../../runs-svn/santiago/run30/input/";
+	private static String inputPath = "../../../runs-svn/santiago/run33/input/";
 	private static boolean doModeChoice = true;
 	
 	public static void main(String args[]){
-		
 //		OTFVis.convert(new String[]{
 //						"",
 //						outputPath + "modeChoice.output_events.xml.gz",	//events
@@ -65,28 +66,26 @@ public class SantiagoScenarioRunner {
 //						outputPath + "visualisation.mvi", 		//mvi
 //						"60" 									//snapshot period
 //		});
-//		
 //		OTFVis.playMVI(outputPath + "visualisation.mvi");
 		
 		Config config = ConfigUtils.loadConfig(inputPath + "config_final.xml");
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+//		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.failIfDirectoryExists);
 		Controler controler = new Controler(scenario);
 		
-		// adding ride and taxi as network modes requires some router; here, the same values as for car are used
+		// adding other network modes than car requires some router; here, the same values as for car are used
 		setNetworkModeRouting(controler);
 		
-		// adding pt fare in a simplified way
-		controler.getEvents().addHandler(new PTFlatFareHandler(controler));
+		// adding pt fare
+		controler.getEvents().addHandler(new PTFareHandler(controler, doModeChoice, scenario.getPopulation()));
 		
 		// adding basic strategies for car and non-car users
 		setBasicStrategiesForSubpopulations(controler);
 		
 		// adding subtour mode choice strategies for car and non-car users
-		if(doModeChoice){
-			setModeChoiceForSubpopulations(controler);
-		}
+		if(doModeChoice) setModeChoiceForSubpopulations(controler);
 		
 		// mapping agents' activities to links on the road network to avoid being stuck on the transit network
 		mapActivities2properLinks(scenario);
@@ -95,12 +94,7 @@ public class SantiagoScenarioRunner {
 	}
 
 	private static void mapActivities2properLinks(Scenario scenario) {
-		TransportModeNetworkFilter filter = new TransportModeNetworkFilter(scenario.getNetwork());
-		Set<String> modes = new HashSet<String>();
-		modes.add(TransportMode.car);
-		Network subNetwork = NetworkUtils.createNetwork();
-		filter.filter(subNetwork, modes);
-		
+		Network subNetwork = getNetworkWithProperLinksOnly(scenario.getNetwork());
 		for(Person person : scenario.getPopulation().getPersons().values()){
 			for (Plan plan : person.getPlans()) {
 				for (PlanElement planElement : plan.getPlanElements()) {
@@ -110,7 +104,6 @@ public class SantiagoScenarioRunner {
 						if(!(linkId == null)){
 							throw new RuntimeException("Link Id " + linkId + " already defined for this activity. Aborting... ");
 						} else {
-							//TODO: this could be extended so that activities do not take place on urban highways or so...
 							linkId = NetworkUtils.getNearestLink(subNetwork, act.getCoord()).getId();
 							act.setLinkId(linkId);
 						}
@@ -118,6 +111,27 @@ public class SantiagoScenarioRunner {
 				}
 			}
 		}
+	}
+
+	private static Network getNetworkWithProperLinksOnly(Network network) {
+		Network subNetwork;
+		TransportModeNetworkFilter filter = new TransportModeNetworkFilter(network);
+		Set<String> modes = new HashSet<String>();
+		modes.add(TransportMode.car);
+		subNetwork = NetworkUtils.createNetwork();
+		filter.filter(subNetwork, modes); //remove non-car links
+
+		for(Node n: new HashSet<Node>(subNetwork.getNodes().values())){
+			for(Link l: NetworkUtils.getIncidentLinks(n).values()){
+				if(l.getFreespeed() > (16.666666667)){
+					subNetwork.removeLink(l.getId()); //remove links with freespeed > 60kmh
+				}
+			}
+			if(n.getInLinks().size() == 0 && n.getOutLinks().size() == 0){
+				subNetwork.removeNode(n.getId()); //remove nodes without connection to links
+			}
+		}
+		return subNetwork;
 	}
 
 	private static void setNetworkModeRouting(Controler controler) {
@@ -130,10 +144,8 @@ public class SantiagoScenarioRunner {
 				addTravelDisutilityFactoryBinding(SantiagoScenarioConstants.Modes.taxi.toString()).to(carTravelDisutilityFactoryKey());
 				addTravelTimeBinding(SantiagoScenarioConstants.Modes.colectivo.toString()).to(networkTravelTime());
 				addTravelDisutilityFactoryBinding(SantiagoScenarioConstants.Modes.colectivo.toString()).to(carTravelDisutilityFactoryKey());
-				addTravelTimeBinding(SantiagoScenarioConstants.Modes.motorcycle.toString()).to(networkTravelTime());
-				addTravelDisutilityFactoryBinding(SantiagoScenarioConstants.Modes.motorcycle.toString()).to(carTravelDisutilityFactoryKey());
-				addTravelTimeBinding(SantiagoScenarioConstants.Modes.school_bus.toString()).to(networkTravelTime());
-				addTravelDisutilityFactoryBinding(SantiagoScenarioConstants.Modes.school_bus.toString()).to(carTravelDisutilityFactoryKey());
+				addTravelTimeBinding(SantiagoScenarioConstants.Modes.other.toString()).to(networkTravelTime());
+				addTravelDisutilityFactoryBinding(SantiagoScenarioConstants.Modes.other.toString()).to(carTravelDisutilityFactoryKey());
 			}
 		});
 	}
@@ -176,16 +188,21 @@ public class SantiagoScenarioRunner {
 		modeChoiceNonCarAvail.setWeight(0.15);
 		controler.getConfig().strategy().addStrategySettings(modeChoiceNonCarAvail);
 		
-		// adding subtour mode choice strategy module for car and non-car users
+		//TODO: somehow, there are agents for which the chaining does not work (e.g. agent 10002001) 
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
+				Log.info("Adding SubtourModeChoice for agents with a car available...");
 				addPlanStrategyBinding(nameMcCarAvail).toProvider(new javax.inject.Provider<PlanStrategy>() {
-					String[] availableModes = {TransportMode.car, TransportMode.bike, TransportMode.walk, TransportMode.pt};
-					String[] chainBasedModes = {TransportMode.car, TransportMode.bike};
+//					String[] availableModes = {TransportMode.car, TransportMode.bike, TransportMode.walk, TransportMode.pt};
+//					String[] chainBasedModes = {TransportMode.car, TransportMode.bike};
+					String[] availableModes = {TransportMode.car, TransportMode.walk, TransportMode.pt};
+					String[] chainBasedModes = {TransportMode.car};
 
 					@Override
 					public PlanStrategy get() {
+						Log.info("Available modes are " + availableModes);
+						Log.info("Chain-based modes are " + chainBasedModes);
 						final Builder builder = new Builder(new RandomPlanSelector<Plan, Person>());
 						builder.addStrategyModule(new SubtourModeChoice(controler.getConfig().global().getNumberOfThreads(), availableModes, chainBasedModes, false));
 						builder.addStrategyModule(new ReRoute(controler.getScenario()));
@@ -197,12 +214,17 @@ public class SantiagoScenarioRunner {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
+				Log.info("Adding SubtourModeChoice for the rest of the agents...");
 				addPlanStrategyBinding(nameMcNonCarAvail).toProvider(new javax.inject.Provider<PlanStrategy>() {
-					String[] availableModes = {TransportMode.bike, TransportMode.walk, TransportMode.pt};
-					String[] chainBasedModes = {TransportMode.bike};
+//					String[] availableModes = {TransportMode.bike, TransportMode.walk, TransportMode.pt};
+//					String[] chainBasedModes = {TransportMode.bike};
+					String[] availableModes = {TransportMode.walk, TransportMode.pt};
+					String[] chainBasedModes = {""};
 
 					@Override
 					public PlanStrategy get() {
+						Log.info("Available modes are " + availableModes);
+						Log.info("Chain-based modes are " + chainBasedModes);
 						final Builder builder = new Builder(new RandomPlanSelector<Plan, Person>());
 						builder.addStrategyModule(new SubtourModeChoice(controler.getConfig().global().getNumberOfThreads(), availableModes, chainBasedModes, false));
 						builder.addStrategyModule(new ReRoute(controler.getScenario()));
