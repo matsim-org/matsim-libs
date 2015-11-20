@@ -21,15 +21,18 @@ package playground.thibautd.maxess.nestedlogitaccessibility.scripts;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.socnetsim.utils.QuadTreeRebuilder;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.router.ActivityWrapperFacility;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
+import org.matsim.facilities.ActivityOption;
 import playground.thibautd.maxess.nestedlogitaccessibility.framework.Alternative;
 import playground.thibautd.maxess.nestedlogitaccessibility.framework.ChoiceSetIdentifier;
 import playground.thibautd.maxess.nestedlogitaccessibility.framework.Nest;
@@ -40,6 +43,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 /**
@@ -166,8 +170,41 @@ public class SimpleNestedLogitModelChoiceSetIdentifier implements ChoiceSetIdent
 
 	private ActivityFacility getOrigin( Person p ) {
 		final Activity act = (Activity) p.getSelectedPlan().getPlanElements().get( 0 );
-		// TODO: fake facility in case no ID
-		return allFacilities.getFacilities().get( act.getFacilityId() );
+		final Id<ActivityFacility> facilityId = act.getFacilityId();
+		return facilityId != null ?
+				allFacilities.getFacilities().get( act.getFacilityId() ) :
+				new ActivityFacility() {
+					@Override
+					public Map<String, ActivityOption> getActivityOptions() {
+						throw new UnsupportedOperationException( "This is a dummy facility, only link and coord are available." );
+					}
+
+					@Override
+					public void addActivityOption( ActivityOption option ) {
+						throw new UnsupportedOperationException( "This is a dummy facility, only link and coord are available." );
+
+					}
+
+					@Override
+					public Id<Link> getLinkId() {
+						return act.getLinkId();
+					}
+
+					@Override
+					public Coord getCoord() {
+						return act.getCoord();
+					}
+
+					@Override
+					public Map<String, Object> getCustomAttributes() {
+						throw new UnsupportedOperationException( "This is a dummy facility, only link and coord are available." );
+					}
+
+					@Override
+					public Id<ActivityFacility> getId() {
+						throw new UnsupportedOperationException( "This is a dummy facility, only link and coord are available." );
+					}
+				};
 	}
 
 	private List<ActivityFacility> calcPrism( ActivityFacility p ) {
