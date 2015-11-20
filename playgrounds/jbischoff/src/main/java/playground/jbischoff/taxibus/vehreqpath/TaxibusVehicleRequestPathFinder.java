@@ -57,7 +57,7 @@ public class TaxibusVehicleRequestPathFinder
                 bestCost = cost;
             }
         }
-        bestVrp.path.add(calculateVrpPath(req, bestVrp.path.get(0).getArrivalTime()));
+        if(bestVrp!= null) bestVrp.path.add(calculateVrpPath(req, bestVrp.path.get(0).getArrivalTime()));
         return bestVrp;
     }
 
@@ -164,7 +164,7 @@ public class TaxibusVehicleRequestPathFinder
     }
 
 
-    private Tuple<VrpPathWithTravelData, TaxibusRequest> getNextDropoffSegment(
+    private  Tuple<VrpPathWithTravelData, TaxibusRequest> getNextDropoffSegment(
             TreeSet<TaxibusRequest> allRequests, VrpPathWithTravelData currentSegment)
     {
 

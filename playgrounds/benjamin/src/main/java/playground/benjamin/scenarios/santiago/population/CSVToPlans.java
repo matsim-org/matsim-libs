@@ -52,6 +52,7 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.pt.PtConstants;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 import org.opengis.feature.simple.SimpleFeature;
@@ -70,13 +71,11 @@ public class CSVToPlans {
 	private ObjectAttributes agentAttributes;
 	
 	CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("EPSG:4326", SantiagoScenarioConstants.toCRS);
-	CoordinateTransformation transf = TransformationFactory.getCoordinateTransformation(SantiagoScenarioConstants.toCRS, "EPSG:4326");
 	
 	private Map<String,Persona> personas = new HashMap<>();
 	private Map<String, Integer> hogarId2NVehicles = new HashMap<>();
 	private Map<String, Coord> hogarId2Coord = new HashMap<>();
 	private Map<String,String> comunaName2Id = new HashMap<>();
-	private Map<String,String> agentId2carLicenceAttr = new TreeMap<String,String>();
 	
 	private final Config config;
 	private final String shapefile;
@@ -84,6 +83,8 @@ public class CSVToPlans {
 	
 	private Map<String,Integer> legMode2NumberOfShotLegs = new HashMap<>();
 	private int legCounter = 0;
+	private int carAvailCounter;
+	private int implausibleCarUseCounter = 0;
 	
 	public CSVToPlans(Config config, String outputDirectory, String shapefileName){
 		this.config = config;
@@ -312,16 +313,17 @@ public class CSVToPlans {
 	
 	private void createPersons(){
 		Map<String, Geometry> geometries = createComunaGeometries();
-		
 		this.scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		
 		Population population = this.scenario.getPopulation();
 		PopulationFactoryImpl popFactory = (PopulationFactoryImpl) population.getFactory();
-		
 		this.agentAttributes = new ObjectAttributes();
 		
 		for(Persona persona : this.personas.values()){
 			Person person = popFactory.createPerson(Id.createPersonId(persona.getId()));
+			if(persona.hasCar() && persona.hasDrivingLicence()){
+				agentAttributes.putAttribute(person.getId().toString(), carUsers, carAvail);
+				carAvailCounter++;
+			}
 			Plan plan = popFactory.createPlan();
 			LinkedList<PlanElement> planElements = new LinkedList<PlanElement>();
 			
@@ -394,7 +396,7 @@ public class CSVToPlans {
 						anterior.setEndTime(viaje.getStartTime());
 					} else{
 						anterior = (Activity) planElements.getLast();
-						if(!anterior.getType().equals("pt interaction")){
+						if(!anterior.getType().equals(PtConstants.TRANSIT_ACTIVITY_TYPE)){
 							double endTime = viaje.getStartTime();
 							anterior.setEndTime(endTime);
 						}
@@ -410,19 +412,24 @@ public class CSVToPlans {
 						posterior.setStartTime(startTime);
 						lastActivity = posterior;
 					} else{
-						posterior = popFactory.createActivityFromCoord("pt interaction", destination);
+						posterior = popFactory.createActivityFromCoord(PtConstants.TRANSIT_ACTIVITY_TYPE, destination);
 						posterior.setMaximumDuration(0.);
 					}
 					String legMode = this.getLegMode(Integer.valueOf(etapa.getMode()));
 					
-					//here are persons using a car (leg mode) who have neither a driver licence or a car.... 
-					//write the information for the decision to a map and write this data later to a file
-					//; can be commented - no influence on functionality
-					agentId2carLicenceAttr.put(persona.getId(), " has car: " + persona.hasCar()  + " ,  driving licence: "+  persona.hasDrivingLicence() + " , car or pt user: " + isCarOrPTUser(legMode));
-					
-					if(persona.hasCar() && persona.hasDrivingLicence() && isCarOrPTUser(legMode)){
-						agentAttributes.putAttribute(person.getId().toString(), this.carUsers, this.carAvail);
-					} 
+					if(legMode.equals(TransportMode.car)){
+						// TODO: maybe interpret this as ride?
+						if(!persona.hasCar()){
+//							log.warn("A person is using car despite having one.");
+							implausibleCarUseCounter ++;
+						} else if(!persona.hasDrivingLicence()){
+//							log.warn("A person is using a car despite having a driver's license.");
+							implausibleCarUseCounter ++;
+						} else {
+							// everything fine
+						}
+					}
+
 					Leg leg = popFactory.createLeg(legMode);
 					if(anterior != null){
 						if(!planElements.isEmpty()){
@@ -469,20 +476,8 @@ public class CSVToPlans {
 		for(String mode : this.legMode2NumberOfShotLegs.keySet()){
 			log.info("Shot " + this.legMode2NumberOfShotLegs.get(mode) + " " + mode + " legs.");
 		}
-		
-		//export the information on which the decision carAvail true/false bases to file. ; can be commented - no influence on functionality
-		BufferedWriter writer = IOUtils.getBufferedWriter(this.outputDirectory + "AgentCarAvailAttributes.txt");
-		try {
-			for (String id : agentId2carLicenceAttr.keySet()){
-					writer.write(id + ":" + agentId2carLicenceAttr.get(id));
-					writer.newLine();
-			}
-			writer.flush();
-			writer.close();
-			
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		log.info("There are " + carAvailCounter + " persons in the population with a car available.");
+		log.info("There were " + implausibleCarUseCounter + " legs with implausible car use (person not having a car or a diver's license).");
 	}
 	
 	private Map<String, Geometry> createComunaGeometries() {

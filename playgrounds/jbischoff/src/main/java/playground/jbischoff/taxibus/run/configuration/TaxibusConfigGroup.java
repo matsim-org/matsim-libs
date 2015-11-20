@@ -25,6 +25,12 @@ public class TaxibusConfigGroup extends ConfigGroup {
 	private static final String NEAREST_VEH_LIM= "nearestVehicleLimit";
 	private static final String GOAL= "optimizerGoal";
 	private static final String OTFVIS= "otfvis";
+
+	private static final String LINES= "linesFile";
+	private static final String ZONESSHP = "zonesShape";
+	private static final String ZONESXML= "zonesXML";
+	
+	
 	
 	
 	
@@ -48,6 +54,10 @@ public class TaxibusConfigGroup extends ConfigGroup {
 	private String algorithm;
 
 	private boolean otfvis = false;
+	
+	private String linesFile = null;
+	private String zonesShpFile = null;
+	private String zonesXmlFile = null;
 
 	public TaxibusConfigGroup() {
 		super(GROUP_NAME);
@@ -84,7 +94,14 @@ public class TaxibusConfigGroup extends ConfigGroup {
 			this.nearestVehiclesLimit = Integer.parseInt(value);
 		}	 else if (OTFVIS.equals(key)) {
 			this.otfvis = Boolean.parseBoolean(value);
+		}else if (ZONESSHP.equals(key)) {
+			this.zonesShpFile = value;
+		}else if (ZONESXML.equals(key)) {
+			this.zonesXmlFile = value;
+		}else if (LINES.equals(key)) {
+			this.linesFile = value;
 		}
+		
 		
 		
 		else {
@@ -108,6 +125,9 @@ public class TaxibusConfigGroup extends ConfigGroup {
 		map.put(NEAREST_REQUEST_LIM, Integer.toString(nearestRequestsLimit));
 		map.put(NEAREST_VEH_LIM, Integer.toString(nearestVehiclesLimit));
 		map.put(OTFVIS, Boolean.toString(otfvis));
+		map.put(LINES, linesFile);
+		map.put(ZONESSHP, zonesShpFile);
+		map.put(ZONESXML, zonesXmlFile);
 		return map;
 
 	}
@@ -120,8 +140,7 @@ public class TaxibusConfigGroup extends ConfigGroup {
 			map.put(TAXI_RANKS_FILE, "Taxi rank file; optional if you don't use ranks");
 			map.put(OUTPUT_DIRECTORY, "Output directory for taxi stats");
 			map.put(VEHICLE_CAPACITY, "taxicab vehicle capacity. Default = 4");
-			//todo: implemnt this
-			map.put(ALGORITHM, "Taxicab algorithm: Possible parameters are RuleBased, (...)");
+			map.put(ALGORITHM, "Taxicab algorithm: Possible parameters are default, line, (...)");
 			
 			map.put(DESTINATION_KNOWN,"determines wether the destination known upon ordering a taxi. Works only with some algorithms" );
 			map.put(VEHICLE_DIVERSION, "can taxis be re-assigned en route to customer. Default: false. Works only with some algorithms");
@@ -129,6 +148,10 @@ public class TaxibusConfigGroup extends ConfigGroup {
 			map.put(NEAREST_VEH_LIM, "Upper limit for vehicles near a request. Default: off (=0)");
 			map.put(GOAL, "Optimizer goal, one of: MIN_WAIT_TIME, MIN_PICKUP_TIME, DEMAND_SUPPLY_EQUIL, NULL");
 			map.put(OTFVIS, "show simulation in OTFVis");
+			map.put(ZONESSHP, "Zones shape file, if required by algorithm.");
+			map.put(ZONESXML, "Zones xml file, if required by algorithm.");
+			map.put(LINES, "Lines file, if required by algorithm. Uses zone IDs for reference");
+			
 			return map;
 	 }
 
@@ -178,5 +201,14 @@ public class TaxibusConfigGroup extends ConfigGroup {
 	}
 	public int getNearestVehiclesLimit() {
 		return nearestVehiclesLimit;
+	}
+	public String getLinesFile() {
+		return linesFile;
+	}
+	public String getZonesShpFile() {
+		return zonesShpFile;
+	}
+	public String getZonesXmlFile() {
+		return zonesXmlFile;
 	}
 }

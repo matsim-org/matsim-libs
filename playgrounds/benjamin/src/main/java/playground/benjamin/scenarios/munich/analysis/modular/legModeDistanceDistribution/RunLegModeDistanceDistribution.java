@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package playground.benjamin.scenarios.munich.analysis.modular.legModeDistanceDistribution;
 
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
@@ -32,6 +34,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 import playground.benjamin.scenarios.munich.analysis.filter.PersonFilter;
 import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 import playground.vsp.analysis.DefaultAnalysis;
+import playground.vsp.analysis.modules.AbstractAnalysisModule;
+import playground.vsp.analysis.modules.legModeDistanceDistribution.LegModeDistanceDistribution;
 
 /**
  * @author benjamin
@@ -56,22 +60,26 @@ public class RunLegModeDistanceDistribution {
 		this.userGroup = userGroup;
 	}
 	
-	void run() {
+	public void run() {
+		logger.info("Setting iteration output directory to " + this.iterationOutputDir);
+		this.iterationOutputDir = this.baseFolder  + "ITERS/it." + this.iteration + "/";
 		Scenario scenario = loadScenario();
 		this.analysis = new DefaultAnalysis(scenario, baseFolder, this.iterationOutputDir, null, null);
 		this.analysis.init(null);
 		this.analysis.preProcess();
 		this.analysis.run();
 		this.analysis.postProcess();
-		this.analysis.writeResults();
+		List<AbstractAnalysisModule> anaModules = this.analysis.getAnaModules();
+		for(AbstractAnalysisModule anaModule : anaModules){
+			if(anaModule instanceof LegModeDistanceDistribution){
+				anaModule.writeResults(this.iterationOutputDir + "defaultAnalysis/" + anaModule.getName() + "/" + this.iteration + ".");
+			}
+		}
 	}
 
 	private Scenario loadScenario() {
 		String networkFile;
 		String popFile;
-
-		this.iterationOutputDir = this.baseFolder  + "ITERS/it." + this.iteration + "/";
-		logger.info("Setting iteration output directory to " + this.iterationOutputDir);
 
 		Config config = ConfigUtils.loadConfig(configFile);
 		String runId = config.controler().getRunId();
@@ -110,7 +118,7 @@ public class RunLegModeDistanceDistribution {
 		return relevantScenario;
 	}
 
-	protected DefaultAnalysis getAnalysis() {
+	public DefaultAnalysis getAnalysis() {
 		return this.analysis;
 	}
 }

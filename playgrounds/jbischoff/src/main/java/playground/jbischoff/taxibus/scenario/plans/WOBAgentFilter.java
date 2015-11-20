@@ -19,6 +19,10 @@
 
 package playground.jbischoff.taxibus.scenario.plans;
 
+import java.util.Map;
+
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -27,19 +31,37 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.routes.GenericRouteFactory;
+import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.geotools.MGC;
+
+import playground.andreas.intersection.zuerich.GenerateZuerrichOutput;
+import playground.michalm.zone.Zone;
+import playground.michalm.zone.Zones;
 
 /**
  * @author  jbischoff
  *
  */
 public class WOBAgentFilter {
-public static void main(String[] args) {
+	Map<Id<Zone>,Zone> zones;
+public static void main(String[] args){
+	WOBAgentFilter f = new WOBAgentFilter();
+	f.run();
+}
+
+private void run()
+{
 	Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 	
-	new MatsimPopulationReader(scenario).readFile("C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/input/tb.output_plans.xml.gz");
+	new MatsimPopulationReader(scenario).readFile("../../../shared-svn/projects/vw_rufbus/scenario/input/tb.output_plans.xml.gz");
+	new MatsimNetworkReader(scenario).readFile("../../../shared-svn/projects/vw_rufbus/scenario/input/networkptcc.xml");
+	zones = Zones.readZones("../../../shared-svn/projects/vw_rufbus/scenario/input/zones/wob.xml", "../../../shared-svn/projects/vw_rufbus/scenario/input/zones/wob.shp");
+	
 	Scenario scenario2 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 	Population pop2 = scenario2.getPopulation();
 	int i = 0;
@@ -48,14 +70,40 @@ public static void main(String[] args) {
 			boolean copyPerson = false;
 			i++;
 			if (i%10000 == 0) System.out.println(i);
-			for (Plan plan : p.getPlans()){
+			for (Plan plan : p.getPlans())
+			{
+				Id<Zone> lastActZone = null;
+				Leg lastLeg = null;
 				for (PlanElement pe : plan.getPlanElements()){
-					if (pe instanceof Leg){
-						if (((Leg) pe).getMode().equals("taxibus")){
+					if (pe instanceof Activity){
+						
+						Coord c = scenario.getNetwork().getLinks().get(((Activity) pe).getLinkId()).getCoord();
+						Id<Zone> zoneAct = getZone(c);
+						if (((Activity) pe).getType().startsWith("pt")){
+							zoneAct = null;
+							lastActZone = null;
+						}
+						
+						 if ((zoneAct!=null)&&(lastActZone!=null)){
+							if (zoneAct!=lastActZone){
+							lastLeg.setMode("taxibus");
+							lastLeg.setRoute(new GenericRouteImpl(lastLeg.getRoute().getStartLinkId(),lastLeg.getRoute().getEndLinkId()));
 							copyPerson = true;
+							
+							}
+							}
+							else {
+								lastActZone = zoneAct;
+							}
+							}
+						
+					
+					
+					if (pe instanceof Leg){
+						lastLeg = (Leg) pe;
 						}
 					}
-				} 
+				 
 			}
 			if (copyPerson){
 				pop2.addPerson(p);
@@ -64,6 +112,13 @@ public static void main(String[] args) {
 		
 	}
 	System.out.println(i + " persons found ; "+pop2.getPersons().size()+" persons copied");
-	new PopulationWriter(pop2).write("C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/input/tbonly.output_plans.xml.g");
+	new PopulationWriter(pop2).write("C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/input/tbonly.output_plans.xml.gz");
+}
+
+Id<Zone> getZone(Coord coord){
+	for (Zone z : zones.values()){
+		if (z.getMultiPolygon().contains(MGC.coord2Point(coord))) return z.getId();
+	}
+	return null;
 }
 }

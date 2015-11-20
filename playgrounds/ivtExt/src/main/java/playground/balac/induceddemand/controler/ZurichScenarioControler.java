@@ -27,6 +27,7 @@ import org.matsim.pt.PtConstants;
 
 import com.google.inject.name.Names;
 
+import playground.balac.induceddemand.config.ActivityStrategiesConfigGroup;
 import playground.balac.induceddemand.strategies.InsertRandomActivityStrategy;
 import playground.balac.induceddemand.strategies.RandomActivitiesSwaperStrategy;
 import playground.balac.induceddemand.strategies.RemoveRandomActivityStrategy;
@@ -57,7 +58,8 @@ public class ZurichScenarioControler {
 				configFile,
 				// this adds a new config group, used by the specific scoring function
 				// we use
-				new KtiLikeScoringConfigGroup(), new DestinationChoiceConfigGroup() );
+				new KtiLikeScoringConfigGroup(), new DestinationChoiceConfigGroup(),
+				new ActivityStrategiesConfigGroup());
 		
 		// This is currently needed for location choice: initializing
 		// the location choice writes K-values files to the output directory, which:
@@ -92,7 +94,7 @@ public class ZurichScenarioControler {
 		
 		final QuadTreeRebuilder<ActivityFacility> shopFacilitiesQuadTree = new QuadTreeRebuilder<ActivityFacility>();
 		
-		for(ActivityFacility af : sc.getActivityFacilities().getFacilitiesForActivityType("shop").values()) {
+		for(ActivityFacility af : sc.getActivityFacilities().getFacilitiesForActivityType("shopping").values()) {
 			
 			shopFacilitiesQuadTree.put(af.getCoord(), af);
 		}

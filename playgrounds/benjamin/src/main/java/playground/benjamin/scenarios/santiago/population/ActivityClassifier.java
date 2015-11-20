@@ -39,6 +39,7 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.pt.PtConstants;
 
 /**
  * @author amit
@@ -184,7 +185,7 @@ public class ActivityClassifier {
 						Activity currentAct = (Activity) pe;
 						Coord cord = currentAct.getCoord();
 
-						if(currentAct.getType().equals("pt interaction")){
+						if(currentAct.getType().equals(PtConstants.TRANSIT_ACTIVITY_TYPE)){
 							planOut.addActivity(currentAct);
 //							continue;
 							actType = currentAct.getType();

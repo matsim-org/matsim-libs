@@ -38,8 +38,8 @@ import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 
 public class TollInfoHandler implements PersonMoneyEventHandler {
 
-	private SortedMap<UserGroup, SortedMap<Double,Double> > userGrp2TimeBin2Toll = new TreeMap<>();
-	private SortedMap<UserGroup, SortedMap<Double, Map<Id<Person>,Double> > > userGrp2TimeBin2Person2Toll = new TreeMap<>();
+	private SortedMap<String, SortedMap<Double,Double> > userGrp2TimeBin2Toll = new TreeMap<>();
+	private SortedMap<String, SortedMap<Double, Map<Id<Person>,Double> > > userGrp2TimeBin2Person2Toll = new TreeMap<>();
 
 	private ExtendedPersonFilter pf = new ExtendedPersonFilter();
 	private final int noOfTimeBins;
@@ -61,7 +61,8 @@ public class TollInfoHandler implements PersonMoneyEventHandler {
 	}
 
 	private void initializeMaps(){
-		for (UserGroup ug : UserGroup.values()){
+		for (UserGroup userGroup : UserGroup.values()){
+			String ug =  pf.getMyUserGroup(userGroup);
 			this.userGrp2TimeBin2Toll.put(ug, new TreeMap<Double, Double>() );
 			this.userGrp2TimeBin2Person2Toll.put(ug, new TreeMap<Double, Map<Id<Person>,Double>>() );
 		}
@@ -69,7 +70,7 @@ public class TollInfoHandler implements PersonMoneyEventHandler {
 
 	@Override
 	public void handleEvent(PersonMoneyEvent event) {
-		UserGroup ug = pf.getUserGroupFromPersonId(event.getPersonId());
+		String ug = pf.getMyUserGroupFromPersonId(event.getPersonId());
 
 		Double time = event.getTime(); 
 		if(time ==0.0) time = this.timeBinSize;
@@ -104,14 +105,14 @@ public class TollInfoHandler implements PersonMoneyEventHandler {
 	/**
 	 * @return user group to time bin to to toll value
 	 */
-	public SortedMap<UserGroup,SortedMap<Double,Double>> getUserGroup2TimeBin2Toll() {
+	public SortedMap<String,SortedMap<Double,Double>> getUserGroup2TimeBin2Toll() {
 		return userGrp2TimeBin2Toll;
 	}
 
 	/**
 	 * @return user group to time bin to person id to toll value
 	 */
-	public SortedMap<UserGroup,SortedMap<Double,Map<Id<Person>,Double>>> getUserGrp2TimeBin2Person2Toll() {
+	public SortedMap<String,SortedMap<Double,Map<Id<Person>,Double>>> getUserGrp2TimeBin2Person2Toll() {
 		return userGrp2TimeBin2Person2Toll;
 	}
 
@@ -121,7 +122,7 @@ public class TollInfoHandler implements PersonMoneyEventHandler {
 	public SortedMap<Double,Double> getTimeBin2Toll(){
 		SortedMap<Double, Double> person2Toll = new TreeMap<Double, Double>();
 
-		for (UserGroup ug : UserGroup.values()){
+		for (String ug : userGrp2TimeBin2Toll.keySet() ){
 
 			for (double d :this.userGrp2TimeBin2Toll.get(ug).keySet()){
 

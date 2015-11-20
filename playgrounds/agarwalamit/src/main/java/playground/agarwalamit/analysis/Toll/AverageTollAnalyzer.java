@@ -35,7 +35,6 @@ import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.utils.LoadMyScenarios;
-import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 import playground.vsp.analysis.modules.AbstractAnalysisModule;
 
 /**
@@ -55,7 +54,8 @@ public class AverageTollAnalyzer extends AbstractAnalysisModule {
 		ata.preProcessData();
 		ata.postProcessData();
 		//		ata.writeResults(outputFolder);
-		ata.writeRDataForBoxPlot(outputFolder,true);
+//		ata.writeRDataForBoxPlot(outputFolder,true);
+		ata.writeUserGroupTollValuesOverTime(outputFolder,scenario);
 	}
 
 	public AverageTollAnalyzer (String eventsFile, String configFile) {
@@ -116,12 +116,29 @@ public class AverageTollAnalyzer extends AbstractAnalysisModule {
 		}
 	}
 
+	public void writeUserGroupTollValuesOverTime(String outputFolder, String pricingScheme){
+		SortedMap<String, SortedMap<Double, Map<Id<Person>,Double>>> userGrp2PersonToll = handler.getUserGrp2TimeBin2Person2Toll();
+		
+		BufferedWriter writer = IOUtils.getBufferedWriter(outputFolder+"/timeBin2TollValues_onlyCongestionMoneyEvents_userGroup.txt");
+		try {
+			writer.write("pricingScheme \t userGroup \t timeBin \t toll[EUR] \n");
+			for(String ug : userGrp2PersonToll.keySet()) {
+				for(double d : userGrp2PersonToll.get(ug).keySet()){
+					writer.write(pricingScheme+"\t"+ug+"\t"+d+"\t"+userGrp2PersonToll.get(ug).get(d)+"\n");
+				}
+			}
+			writer.close();
+		} catch (Exception e) {
+			throw new RuntimeException("Data is not written in file. Reason: " + e);
+		}
+	}
+	
 	public void writeRDataForBoxPlot(String outputFolder, boolean isWritingDataForEachTimeInterval){
 		if( ! new File(outputFolder+"/boxPlot/").exists()) new File(outputFolder+"/boxPlot/").mkdirs();
 
-		SortedMap<UserGroup, SortedMap<Double, Map<Id<Person>,Double>>> userGrp2PersonToll = handler.getUserGrp2TimeBin2Person2Toll();
+		SortedMap<String, SortedMap<Double, Map<Id<Person>,Double>>> userGrp2PersonToll = handler.getUserGrp2TimeBin2Person2Toll();
 
-		for(UserGroup ug : userGrp2PersonToll.keySet()){
+		for(String ug : userGrp2PersonToll.keySet()){
 
 			if(! isWritingDataForEachTimeInterval) {
 				log.info("Writing toll/trip for whole day for each user group. This data is likely to be suitable for box plot in R.");

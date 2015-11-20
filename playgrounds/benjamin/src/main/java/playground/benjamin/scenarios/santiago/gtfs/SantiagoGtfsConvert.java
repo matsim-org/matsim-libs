@@ -52,13 +52,14 @@ import org.matsim.pt.utils.CreatePseudoNetwork;
 import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vehicles.Vehicles;
 
+import playground.benjamin.scenarios.santiago.SantiagoScenarioConstants;
 import playground.mzilske.gtfs.GtfsConverter;
 
 public class SantiagoGtfsConvert {
 	private static final Logger log = Logger.getLogger(SantiagoGtfsConvert.class);
 
 	public static void main( String[] args ) {
-		CoordinateTransformation transform  = TransformationFactory.getCoordinateTransformation("EPSG:4326", "EPSG:32719");
+		CoordinateTransformation transform  = TransformationFactory.getCoordinateTransformation("EPSG:4326", SantiagoScenarioConstants.toCRS);
 //		CoordinateTransformation transform0  = new WGS84toCH1903LV03() ;
 		// ---
 		Config config = ConfigUtils.createConfig();
@@ -78,11 +79,13 @@ public class SantiagoGtfsConvert {
 		// Ugly hack to map transit schedule to the network to be merged later on...
 //		Network net = scenario.getNetwork();
 //		addPrefixToLinkIds(ts, net);
+		
 		// Routes seem to have problems; thus, deleting them...
 		removeNetworkRoutes(ts);
+		
 		// There are (most likely) wrongly coded departures at midnight; thus, deleting them...
-		// TODO: does not work because of immutable list. Is there a work-around?
-//		removeMidnightDepartures(ts);
+		removeMidnightDepartures(ts);
+		
 		Network transitNet = NetworkUtils.createNetwork();
 		CreatePseudoNetwork creator = new CreatePseudoNetwork(ts, transitNet, TransportMode.pt);
 		creator.createNetwork();
@@ -103,12 +106,18 @@ public class SantiagoGtfsConvert {
 	private static void removeMidnightDepartures(TransitSchedule ts) {
 		for(TransitLine tl : ts.getTransitLines().values()){
 			for(TransitRoute tr : tl.getRoutes().values()){
-				for(Departure dp : tr.getDepartures().values()){
+				for(Departure dp : new HashSet<Departure>(tr.getDepartures().values())){
 					Double dpt = dp.getDepartureTime();
 					if(dpt.equals(0.0)){
 						tr.removeDeparture(dp);
 					}
-				}
+				} 
+//				for(Departure dp : tr.getDepartures().values()){
+//					Double dpt = dp.getDepartureTime();
+//					if(dpt.equals(0.0)){
+//						tr.removeDeparture(dp);
+//					}
+//				}
 			}
 		}
 	}

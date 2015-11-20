@@ -51,6 +51,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.PtConstants;
 import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.SimulationViewForQueries;
@@ -91,14 +92,14 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 	private SimulationViewForQueries simulationView;
 
 	@Override
-	public void installQuery(SimulationViewForQueries simulationView) {
-		this.simulationView = simulationView;
-		Network net = simulationView.getNetwork();
-		Plan plan = simulationView.getPlans().get(this.agentId);
+	public void installQuery(SimulationViewForQueries simulationView1) {
+		this.simulationView = simulationView1;
+		Network net = simulationView1.getNetwork();
+		Plan plan = simulationView1.getPlans().get(this.agentId);
 		result = new Result();
 		result.agentId = this.agentId.toString();
 		if (plan != null) {
-			simulationView.addTrackedAgent(this.agentId);
+			simulationView1.addTrackedAgent(this.agentId);
 			fillResult(net, plan);
 		} else {
 			log.error("No plan found for id " + this.agentId);
@@ -118,8 +119,14 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 					coord = link.getCoord();
 				}
 				Coord c2 = OTFServerQuadTree.getOTFTransformation().transform(coord);
-				result.acts.add(new MyInfoText((float) c2.getX(),
-						(float) c2.getY(), act.getType()));
+				
+				// there used to be a "cake" diagram, showing which fraction of the activity duration was spent.  That somehow
+				// is gone.  Outputting the activity end time instead.  kai, nov'15
+				String txt = act.getType()+"-"+Time.writeTime(act.getEndTime(), ':');
+				if ( act.getEndTime()== Time.UNDEFINED_TIME ) {
+					txt = act.getType() ;
+				}
+				result.acts.add(new MyInfoText((float) c2.getX(), (float) c2.getY(), txt ) ) ;
 			}
 		}
 
@@ -320,16 +327,16 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 			gl.glDisable(GL2.GL_LINE_SMOOTH);
 		}
 
-		private void unPrepare(GL2 gl) {
+		private static void unPrepare(GL2 gl) {
 			gl.glDisable(GL2.GL_BLEND);
 		}
 
-		private float getLineWidth() {
+		private static float getLineWidth() {
 			return OTFClientControl.getInstance().getOTFVisConfig()
 					.getLinkWidth();
 		}
 
-		private void drawArrowFromAgentToTextLabel(Point2D.Double pos, GL2 gl) {
+		private static void drawArrowFromAgentToTextLabel(Point2D.Double pos, GL2 gl) {
 			gl.glColor4f(0.f, 0.2f, 1.f, 0.5f);// Blue
 			gl.glLineWidth(2);
 			gl.glBegin(GL.GL_LINE_STRIP);
@@ -338,11 +345,11 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 			gl.glEnd();
 		}
 
-		private void drawCircleAroundAgent(Point2D.Double pos, GL2 gl) {
+		private static void drawCircleAroundAgent(Point2D.Double pos, GL2 gl) {
 			DrawingUtils.drawCircle(gl, (float) pos.x, (float) pos.y, 200.f);
 		}
 
-		private Double getAgentPositionFromPointLayer(String agentIdString,
+		private static Double getAgentPositionFromPointLayer(String agentIdString,
 				OGLAgentPointLayer layer) {
 			return layer.getAgentCoords(agentIdString.toCharArray());
 		}
@@ -377,7 +384,7 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 
 	}
 
-	public static class MyInfoText implements Serializable {
+	private class MyInfoText implements Serializable {
 
 		private static final long serialVersionUID = 1L;
 		float east, north;

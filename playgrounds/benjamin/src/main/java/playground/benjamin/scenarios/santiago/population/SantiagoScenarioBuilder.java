@@ -82,6 +82,7 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.pt.PtConstants;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.config.TransitRouterConfigGroup;
 
@@ -188,22 +189,21 @@ public class SantiagoScenarioBuilder {
 
 	private void setActivityParams(SortedMap<String, Double> acts, Config config) {
 		for(String act :acts.keySet()){
-			ActivityParams params = new ActivityParams();
-			params.setActivityType(act);
-			params.setTypicalDuration(acts.get(act));
-			// Minimum duration is now specified by typical duration.
-//			params.setMinimalDuration(acts.get(act).getSecond());
-			params.setClosingTime(Time.UNDEFINED_TIME);
-			params.setEarliestEndTime(Time.UNDEFINED_TIME);
-			params.setLatestStartTime(Time.UNDEFINED_TIME);
-			params.setOpeningTime(Time.UNDEFINED_TIME);
-			params.setTypicalDurationScoreComputation(TypicalDurationScoreComputation.relative);
-			// TODO: overwriting this is not recommended but enforced for closing time
-			if (act.equals("pt interaction")){
-				params.setScoringThisActivityAtAll(false);
-				params.setClosingTime(0);
+			if(act.equals(PtConstants.TRANSIT_ACTIVITY_TYPE)){
+				//do nothing
+			} else {
+				ActivityParams params = new ActivityParams();
+				params.setActivityType(act);
+				params.setTypicalDuration(acts.get(act));
+				// Minimum duration is now specified by typical duration.
+//				params.setMinimalDuration(acts.get(act).getSecond());
+				params.setClosingTime(Time.UNDEFINED_TIME);
+				params.setEarliestEndTime(Time.UNDEFINED_TIME);
+				params.setLatestStartTime(Time.UNDEFINED_TIME);
+				params.setOpeningTime(Time.UNDEFINED_TIME);
+				params.setTypicalDurationScoreComputation(TypicalDurationScoreComputation.relative);
+				config.planCalcScore().addActivityParams(params);
 			}
-			config.planCalcScore().addActivityParams(params);
 		}
 	}
 
@@ -463,7 +463,7 @@ public class SantiagoScenarioBuilder {
 					planOut.getPlanElements().remove(planOut.getPlanElements().size()-1);
 				} else if(pe instanceof Activity){
 					Activity act = (Activity)pe;
-					if(!act.getType().equals("pt interaction")){
+					if(!act.getType().equals(PtConstants.TRANSIT_ACTIVITY_TYPE)){
 						valid = true;
 					} else{
 						planOut.getPlanElements().remove(planOut.getPlanElements().size()-1);
@@ -527,7 +527,7 @@ public class SantiagoScenarioBuilder {
 				PlanElement pe = person.getSelectedPlan().getPlanElements().get(i);
 				if(pe instanceof Activity){
 					Activity act = (Activity)pe;
-					if(!act.getType().equals("pt interaction")){
+					if(!act.getType().equals(PtConstants.TRANSIT_ACTIVITY_TYPE)){
 						if(person.getSelectedPlan().getPlanElements().indexOf(act) > 0){
 							act.setStartTime(act.getStartTime() + delta);
 						}
@@ -624,7 +624,7 @@ public class SantiagoScenarioBuilder {
 	}
 	
 	private void setCountsParameters(CountsConfigGroup counts, double sampleSizeEOD){
-		// TODO: check what adding taxi, colectiovo, motorcycle and freight changes
+		// TODO: check what adding taxi, colectivo, and freight changes
 		counts.setAnalyzedModes(TransportMode.car);
 		counts.setAverageCountsOverIterations(5);
 		counts.setCountsScaleFactor(SantiagoScenarioConstants.N / sampleSizeEOD);
@@ -796,39 +796,6 @@ public class SantiagoScenarioBuilder {
 		pcr.setNetworkModes(networkModes);
 		
 	/*
-	 * using the following modes as a network modes using time dependent car travel times
-	 * */
-//		ModeRoutingParams rideParams = new ModeRoutingParams(TransportMode.ride);
-//		rideParams.setBeelineDistanceFactor(1.3);
-//		rideParams.setTeleportedModeSpeed(34 / 3.6);
-//		pcr.addModeRoutingParams(rideParams);
-//		
-//		ModeRoutingParams taxiParams = new ModeRoutingParams(Constants.Modes.taxi.toString());
-//		taxiParams.setBeelineDistanceFactor(1.3);
-//		taxiParams.setTeleportedModeSpeed(34 / 3.6);
-//		pcr.addModeRoutingParams(taxiParams);
-//		
-//		ModeRoutingParams colectivoParams = new ModeRoutingParams(Constants.Modes.colectivo.toString());
-//		colectivoParams.setBeelineDistanceFactor(1.3);
-//		colectivoParams.setTeleportedModeSpeed(30 / 3.6);
-//		pcr.addModeRoutingParams(colectivoParams);
-//		
-//		ModeRoutingParams motorcycleParams = new ModeRoutingParams(Constants.Modes.motorcycle.toString());
-//		motorcycleParams.setBeelineDistanceFactor(1.3);
-//		motorcycleParams.setTeleportedModeSpeed(34 / 3.6);
-//		pcr.addModeRoutingParams(motorcycleParams);
-//
-//		ModeRoutingParams schoolBusParams = new ModeRoutingParams(Constants.Modes.school_bus.toString());
-//		schoolBusParams.setBeelineDistanceFactor(1.3);
-//		schoolBusParams.setTeleportedModeSpeed(25 / 3.6);
-//		pcr.addModeRoutingParams(schoolBusParams);
-//		
-//		ModeRoutingParams otherModeParams = new ModeRoutingParams(TransportMode.other);
-//		otherModeParams.setBeelineDistanceFactor(1.3);
-//		otherModeParams.setTeleportedModeSpeed(15 / 3.6);
-//		pcr.addModeRoutingParams(otherModeParams);
-		
-	/*
 	 * begin pt parameter settings
 	 * */
 		if(!prepareForModeChoice){
@@ -841,6 +808,12 @@ public class SantiagoScenarioBuilder {
 			metroParams.setBeelineDistanceFactor(1.3);
 			metroParams.setTeleportedModeSpeed(32 / 3.6);
 			pcr.addModeRoutingParams(metroParams);
+		} else {
+			//TODO: This is by default set to walk parameters; changing this might require defining my own TripRouter...
+//			ModeRoutingParams transitWalkParams = new ModeRoutingParams(TransportMode.transit_walk);
+//			transitWalkParams.setBeelineDistanceFactor(1.3);
+//			transitWalkParams.setTeleportedModeSpeed(3 / 3.6);
+//			pcr.addModeRoutingParams(transitWalkParams);
 		}
 	/*
 	 * end pt parameter settings
@@ -853,7 +826,7 @@ public class SantiagoScenarioBuilder {
 			
 		ModeRoutingParams walkParams = new ModeRoutingParams(TransportMode.walk);
 		walkParams.setBeelineDistanceFactor(1.3);
-		walkParams.setTeleportedModeSpeed(5 / 3.6);
+		walkParams.setTeleportedModeSpeed(4 / 3.6);
 		pcr.addModeRoutingParams(walkParams);
 		
 		ModeRoutingParams bikeParams = new ModeRoutingParams(TransportMode.bike);
@@ -863,7 +836,9 @@ public class SantiagoScenarioBuilder {
 	}
 	
 	private void setQSimParameters(QSimConfigGroup qsim, double sampleSizeEOD){
-		qsim.setStartTime(0 * 3600);
+		// TODO: avoiding wrongly coded pt departures at midnight; would be better to get them out of the transitschedule (see comments there). 
+//		qsim.setStartTime(0 * 3600);
+		qsim.setStartTime(2 * 3600);
 		qsim.setEndTime(30 * 3600);
 		double flowCapFactor = (sampleSizeEOD / SantiagoScenarioConstants.N);
 		qsim.setFlowCapFactor(flowCapFactor);

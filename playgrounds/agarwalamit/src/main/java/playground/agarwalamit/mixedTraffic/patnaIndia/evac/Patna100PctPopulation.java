@@ -20,7 +20,6 @@ package playground.agarwalamit.mixedTraffic.patnaIndia.evac;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Random;
@@ -38,41 +37,39 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.utils.geometry.CoordinateTransformation;
-import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.IOUtils;
 import org.opengis.feature.simple.SimpleFeature;
 
-import playground.agarwalamit.utils.LoadMyScenarios;
-
-import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
+
+import playground.agarwalamit.mixedTraffic.patnaIndia.PatnaConstants;
+import playground.agarwalamit.utils.GeometryUtils;
+import playground.agarwalamit.utils.LoadMyScenarios;
 
 /**
  * @author amit
  */
 
 public class Patna100PctPopulation {
-//	ZZ_TODO: clean it and compare with PatnaDemandGeneration
 
 	// take the home coord from initial plans (in ward) and then assign these agents to nearest link, see core method of doing this.
 	private final Logger logger = Logger.getLogger(Patna100PctPopulation.class);
-	private final Collection<String> mainModes = Arrays.asList("car","motorbike","bike");
 	private final Id<Link> safeLinkId = Id.createLinkId("safeLink_Patna");
 
 	private Scenario scenario;
-
-	private CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84,"EPSG:24345");
 	private String outputDir = "../../../repos/runs-svn/patnaIndia/run105/input/";
-
+	
+	private String zoneFile = "../../../repos/runs-svn/patnaIndia/inputs/wardFile/Wards.shp";	
+	private Collection<SimpleFeature> features ;
+	
 	public static void main(String[] args) {
 		new Patna100PctPopulation().run();
 	}
 
 	private void run() {
-		String zoneFile = "../../../repos/runs-svn/patnaIndia/inputs/wardFile/Wards.shp";		
+		this.features = readZoneFilesAndReturnFeatures();
+		
 		String planFile1 = "../../../repos/runs-svn/patnaIndia/inputs/Urban_PlanFile.CSV";
 		String planFile2 = "../../../repos/runs-svn/patnaIndia/inputs/27TO42zones.CSV";
 		String planFile3 = "../../../repos/runs-svn/patnaIndia/inputs/Slum_PlanFile.CSV";	
@@ -85,18 +82,21 @@ public class Patna100PctPopulation {
 
 		scenario = LoadMyScenarios.loadScenarioFromNetwork(netFile);
 
-		readPlansFileAndStoreData(planFile1, zoneFile, ID1);
-		readPlansFileAndStoreData(planFile2, zoneFile, ID2);
-		readPlansFileAndStoreData(planFile3, zoneFile, ID3);
+		readPlansFileAndStoreData(planFile1, ID1);
+		readPlansFileAndStoreData(planFile2, ID2);
+		readPlansFileAndStoreData(planFile3, ID3);
 
 		new PopulationWriter(scenario.getPopulation()).write(outputDir+"/patna_evac_plans_100Pct.xml.gz");
 		logger.info("Writing Plan file is finished.");
 	}
 
-	private void readPlansFileAndStoreData (String planFile, String zoneFile, int startId) 	{
-
+	private Collection<SimpleFeature> readZoneFilesAndReturnFeatures() {
 		ShapeFileReader reader = new ShapeFileReader();
-		Collection<SimpleFeature> features = reader.readFileAndInitialize(zoneFile);
+		return reader.readFileAndInitialize(this.zoneFile);
+	}
+	
+	private void readPlansFileAndStoreData (String planFile, int startId) 	{
+
 		Iterator<SimpleFeature> iterator = features.iterator();
 
 		BufferedReader bufferedReader;
@@ -122,9 +122,9 @@ public class Patna100PctPopulation {
 				String zoneId  = String.valueOf(Id);
 
 				if(fromZoneId.equals(zoneId) ) {
-					p = getRandomPointsFromWard(feature);
+					p = GeometryUtils.getRandomPointsFromWard(feature);
 					Coord fromZoneCoord = new Coord(p.getX(), p.getY());
-					homeZoneCoordTransform = ct.transform(fromZoneCoord);
+					homeZoneCoordTransform = PatnaConstants.COORDINATE_TRANSFORMATION.transform(fromZoneCoord);
 				}
 			}
 
@@ -147,7 +147,7 @@ public class Patna100PctPopulation {
 				case 999999 : travelMode = randomModeUrban(); break; 			// for zones 27 to 42
 				}
 
-				if(mainModes.contains(travelMode)) {
+				if(PatnaConstants.mainModes.contains(travelMode)) {
 					Population pop = scenario.getPopulation();
 					PopulationFactory populationFactory = pop.getFactory();
 
@@ -177,18 +177,6 @@ public class Patna100PctPopulation {
 			}
 			iterator = features.iterator();
 		}
-	}
-
-	private Point getRandomPointsFromWard (SimpleFeature feature) {
-		Random random = new Random(); // matsim random will return same coord.
-		Point p = null;
-		double x,y;
-		do {
-			x = feature.getBounds().getMinX()+random.nextDouble()*(feature.getBounds().getMaxX()-feature.getBounds().getMinX());
-			y = feature.getBounds().getMinY()+random.nextDouble()*(feature.getBounds().getMaxY()-feature.getBounds().getMinY());
-			p= MGC.xy2Point(x, y);
-		} while (!((Geometry) feature.getDefaultGeometry()).contains(p));
-		return p;
 	}
 
 	// this method is for slum population as 480 plans don't have information about travel mode so one random mode is assigned out of these four modes. 
