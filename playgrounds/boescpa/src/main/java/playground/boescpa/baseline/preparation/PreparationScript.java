@@ -116,7 +116,7 @@ public class PreparationScript {
                 pathConfig,
                 Integer.toString(prctScenario)
         };
-        PrefsCreator.main(args);
+        ConfigCreator.main(args);
     }
 
     private static void createPrefsForPopulation() {
