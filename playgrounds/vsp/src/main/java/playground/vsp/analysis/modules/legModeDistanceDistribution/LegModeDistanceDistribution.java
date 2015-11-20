@@ -101,29 +101,48 @@ public class LegModeDistanceDistribution extends AbstractAnalysisModule{
 		log.info("However, there might be some transit walk legs remaining without previous transit activity.");
 		
 		for (Person person : this.scenario.getPopulation().getPersons().values()){
-			for (Plan plan : person.getPlans()){
-				List<PlanElement> planElements = plan.getPlanElements();
-				for (int i = 0, n = planElements.size(); i < n; i++) {
-					PlanElement pe = planElements.get(i);
-					if (pe instanceof Activity) {
-						Activity act = (Activity) pe;
-						if (PtConstants.TRANSIT_ACTIVITY_TYPE.equals(act.getType())) {
-							PlanElement previousPe = planElements.get(i-1);
-							if (previousPe instanceof Leg) {
-								Leg previousLeg = (Leg) previousPe;
-								previousLeg.setMode(TransportMode.pt);
-								previousLeg.setRoute(null);
-							} else {
-								throw new RuntimeException("A transit activity should follow a leg! Aborting...");
-							}
-							((PlanImpl) plan).removeActivity(i); // also removes the following leg
-							n -= 2;
-							i--;
+			Plan selectedPlan = person.getSelectedPlan();
+			List<PlanElement> planElements = selectedPlan.getPlanElements();
+			for (int i = 0, n = planElements.size(); i < n; i++) {
+				PlanElement pe = planElements.get(i);
+				if (pe instanceof Activity) {
+					Activity act = (Activity) pe;
+					if (PtConstants.TRANSIT_ACTIVITY_TYPE.equals(act.getType())) {
+						PlanElement previousPe = planElements.get(i-1);
+						if (previousPe instanceof Leg) {
+							Leg previousLeg = (Leg) previousPe;
+							previousLeg.setMode(TransportMode.pt);
+							previousLeg.setRoute(null);
+						} else {
+							throw new RuntimeException("A transit activity should follow a leg! Aborting...");
 						}
+						((PlanImpl) selectedPlan).removeActivity(i); // also removes the following leg
+						n -= 2;
+						i--;
 					}
 				}
 			}
 		}
+		int transitWalkInterpretation = 0;
+		for (Person person : this.scenario.getPopulation().getPersons().values()){
+			Plan selectedPlan = person.getSelectedPlan();
+			List<PlanElement> planElements = selectedPlan.getPlanElements();
+			for (int i = 0, n = planElements.size(); i < n; i++) {
+				PlanElement pe = planElements.get(i);
+				if (pe instanceof Leg) {
+					String legMode = ((Leg) pe).getMode();
+					if(legMode.equals(TransportMode.transit_walk)){
+						((Leg) pe).setMode(TransportMode.walk);
+						if(transitWalkInterpretation  < 1){
+							log.info("Transit walk leg without previous transit activity detected. It will be interpreted as walk leg.");
+							log.info(Gbl.ONLYONCE);
+						}
+						transitWalkInterpretation ++ ;
+					}
+				}
+			}
+		}
+		log.info(transitWalkInterpretation + " transit walk legs without previous transit activity were interpreted as walk legs.");
 	}
 
 	@Override
@@ -303,7 +322,7 @@ public class LegModeDistanceDistribution extends AbstractAnalysisModule{
 							if(transitWalkCounter < 1){
 								log.info("Transit walk leg detected."
 										+ " If it belongs to a pt leg, it will be removed."
-										+ " If it does not belong to a pt leg, they will be interpreted as walk leg.");
+										+ " If it does not belong to a pt leg, it will be interpreted as walk leg.");
 								log.info(Gbl.ONLYONCE);
 							}
 							transitWalkCounter ++;
