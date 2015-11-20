@@ -207,7 +207,7 @@ public class PseudoQsimEngine implements MobsimEngine, DepartureHandler {
 			//vehicle.setCurrentLink( linkId );
 
 			eventsManager.processEvent(
-					new Wait2LinkEvent(
+					new VehicleEntersTrafficEvent(
 						now,
 						agent.getId(),
 						linkId,

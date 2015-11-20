@@ -20,9 +20,9 @@
 
 package org.matsim.api.core.v01.events.handler;
 
-import org.matsim.api.core.v01.events.Wait2LinkEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.core.events.handler.EventHandler;
 
 public interface Wait2LinkEventHandler extends EventHandler {
-	public void handleEvent (Wait2LinkEvent event);
+	public void handleEvent (VehicleEntersTrafficEvent event);
 }

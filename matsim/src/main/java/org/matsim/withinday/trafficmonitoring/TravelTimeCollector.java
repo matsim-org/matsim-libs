@@ -247,7 +247,7 @@ public class TravelTimeCollector implements TravelTime,
 	}
 
 	@Override
-	public void handleEvent(Wait2LinkEvent event) {
+	public void handleEvent(VehicleEntersTrafficEvent event) {
 		/* 
 		 * If filtering transport modes is enabled and the vehicle
 		 * starts a leg on a non analyzed transport mode, add the vehicle

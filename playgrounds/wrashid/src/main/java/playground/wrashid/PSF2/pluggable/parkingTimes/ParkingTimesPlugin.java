@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.Wait2LinkEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
@@ -142,7 +142,7 @@ public class ParkingTimesPlugin implements Wait2LinkEventHandler, PersonArrivalE
 				&& lastLinkEntered.get(personId).equals(linkId);
 	}
 
-	private void updateDepartureTimeInfo(Wait2LinkEvent event) {
+	private void updateDepartureTimeInfo(VehicleEntersTrafficEvent event) {
 
 		if (parkingTimeIntervals.get(event.getPersonId()).size()==0){
 			System.out.println();
@@ -174,7 +174,7 @@ public class ParkingTimesPlugin implements Wait2LinkEventHandler, PersonArrivalE
 	}
 
 	@Override
-	public void handleEvent(Wait2LinkEvent event) {
+	public void handleEvent(VehicleEntersTrafficEvent event) {
 		if (leavingFirstParking(event.getPersonId())) {
 			initializeParkingTimeIntervalsForPerson(event.getPersonId(), event.getLinkId());
 		}

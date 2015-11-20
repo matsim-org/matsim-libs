@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.VehicleAbortsEvent;
 import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
-import org.matsim.api.core.v01.events.Wait2LinkEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.mobsim.framework.HasPerson;
@@ -107,7 +107,7 @@ class MultiModalQLinkExtension {
 				new PersonEntersVehicleEvent(now, mobsimAgent.getId(), Id.create(mobsimAgent.getId(), Vehicle.class)));
 	
 		this.simEngine.getEventsManager().processEvent(
-				new Wait2LinkEvent(now, mobsimAgent.getId(), link.getId(), Id.create(mobsimAgent.getId(), Vehicle.class), mobsimAgent.getMode(), 1.0));
+				new VehicleEntersTrafficEvent(now, mobsimAgent.getId(), link.getId(), Id.create(mobsimAgent.getId(), Vehicle.class), mobsimAgent.getMode(), 1.0));
 	}
 
 	boolean moveLink(double now) {

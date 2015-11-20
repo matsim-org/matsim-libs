@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
-import org.matsim.api.core.v01.events.Wait2LinkEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -237,7 +237,7 @@ public class AgentEventMessage extends Message {
 				
 
 			} else {
-				event = new Wait2LinkEvent(getMessageArrivalTime(), personId, leg.getRoute().getStartLinkId(), personId, leg.getMode(), 1.0);
+				event = new VehicleEntersTrafficEvent(getMessageArrivalTime(), personId, leg.getRoute().getStartLinkId(), personId, leg.getMode(), 1.0);
 				eventsManager.processEvent(event);
 				setCurrentLinkIndex(-1);
 				Id linkId = curAct.getLinkId();

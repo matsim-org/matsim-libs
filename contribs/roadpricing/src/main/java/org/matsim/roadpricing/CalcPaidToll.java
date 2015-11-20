@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
-import org.matsim.api.core.v01.events.Wait2LinkEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
@@ -99,7 +99,7 @@ public class CalcPaidToll implements LinkEnterEventHandler, Wait2LinkEventHandle
 	}
 
 	@Override
-	public void handleEvent(final Wait2LinkEvent event) {
+	public void handleEvent(final VehicleEntersTrafficEvent event) {
 		delegate.handleEvent(event);
 		
 		Link link = this.network.getLinks().get(event.getLinkId());

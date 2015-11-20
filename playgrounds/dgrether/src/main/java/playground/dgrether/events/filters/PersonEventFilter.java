@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
-import org.matsim.api.core.v01.events.Wait2LinkEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.population.Person;
 
 
@@ -48,8 +48,8 @@ public class PersonEventFilter implements EventFilter {
 	
 	@Override
 	public boolean doProcessEvent(Event event) {
-		if (event instanceof Wait2LinkEvent) {
-			Wait2LinkEvent e = (Wait2LinkEvent) event;
+		if (event instanceof VehicleEntersTrafficEvent) {
+			VehicleEntersTrafficEvent e = (VehicleEntersTrafficEvent) event;
 			Id<Person> personId = e.getPersonId();
 			this.personIds.contains(personId);
 		} else if (event instanceof PersonDepartureEvent) {

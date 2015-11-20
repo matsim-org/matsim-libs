@@ -26,7 +26,7 @@ import java.util.TreeMap;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
-import org.matsim.api.core.v01.events.Wait2LinkEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
 import org.matsim.api.core.v01.network.Link;
@@ -79,7 +79,7 @@ public class SanralCalcPaidToll implements LinkEnterEventHandler, Wait2LinkEvent
 	}
 
 	@Override
-	public void handleEvent(final Wait2LinkEvent event) {
+	public void handleEvent(final VehicleEntersTrafficEvent event) {
 		Link link = this.network.getLinks().get(event.getLinkId());
 		if (handler instanceof DistanceTollBehaviour) {
 			/* we do not handle wait2link-events for these tolls, because the agent

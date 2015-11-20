@@ -239,11 +239,11 @@ public class CompareEventsUtils {
 						((LinkLeaveEvent) storedEvent).getLinkId(),
 						((LinkLeaveEvent) event).getLinkId() );
 			}
-			if ( event instanceof Wait2LinkEvent ) {
+			if ( event instanceof VehicleEntersTrafficEvent ) {
 				Assert.assertEquals(
 						"unexpected wait link id person "+queueId,
-						((Wait2LinkEvent) storedEvent).getLinkId(),
-						((Wait2LinkEvent) event).getLinkId() );
+						((VehicleEntersTrafficEvent) storedEvent).getLinkId(),
+						((VehicleEntersTrafficEvent) event).getLinkId() );
 			}
 
 			// difficult to know what precision to ask...
@@ -282,7 +282,7 @@ public class CompareEventsUtils {
 		}
 
 		@Override
-		public void handleEvent(final Wait2LinkEvent event) {
+		public void handleEvent(final VehicleEntersTrafficEvent event) {
 			if ( ignoreLinkEvents ) return;
 			handleEvent(
 				eventsPerPerson,

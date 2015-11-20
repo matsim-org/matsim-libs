@@ -610,7 +610,7 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler, Wait2LinkEvent
 	}
 
 	@Override
-	public void handleEvent(Wait2LinkEvent event) {
+	public void handleEvent(VehicleEntersTrafficEvent event) {
 		delegate.handleEvent(event);
 	}
 

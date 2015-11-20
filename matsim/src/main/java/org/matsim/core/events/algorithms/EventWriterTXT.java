@@ -34,7 +34,7 @@ import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
-import org.matsim.api.core.v01.events.Wait2LinkEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
@@ -184,8 +184,8 @@ public class EventWriterTXT implements EventWriter, ActivityEndEventHandler, Act
 	}
 
 	@Override
-	public void handleEvent(Wait2LinkEvent event) {
-		writeLine(event.getTime(), event.getPersonId(), event.getLinkId(), 4, Wait2LinkEvent.EVENT_TYPE);
+	public void handleEvent(VehicleEntersTrafficEvent event) {
+		writeLine(event.getTime(), event.getPersonId(), event.getLinkId(), 4, VehicleEntersTrafficEvent.EVENT_TYPE);
 		
 		vehicleToDriverMap.put(event.getVehicleId(), event.getPersonId());
 	}

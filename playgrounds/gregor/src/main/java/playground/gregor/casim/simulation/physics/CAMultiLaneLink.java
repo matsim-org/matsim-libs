@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
-import org.matsim.api.core.v01.events.Wait2LinkEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -360,7 +360,7 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 		a.materialize(desiredPos, -1, lane);
 		if (a instanceof CAVehicle) {
 			this.net.getEventsManager().processEvent(
-					new Wait2LinkEvent((int) time, ((CAVehicle) a).getDriver()
+					new VehicleEntersTrafficEvent((int) time, ((CAVehicle) a).getDriver()
 							.getId(), this.usl.getId(), ((CAVehicle) a)
 							.getVehicleId(), ((CAVehicle) a).getDriver().getMode(), 1.0));
 		}
@@ -380,7 +380,7 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 		a.materialize(desiredPos, 1, lane);
 		if (a instanceof CAVehicle) {
 			this.net.getEventsManager().processEvent(
-					new Wait2LinkEvent((int) time, ((CAVehicle) a).getDriver()
+					new VehicleEntersTrafficEvent((int) time, ((CAVehicle) a).getDriver()
 							.getId(), this.dsl.getId(), ((CAVehicle) a)
 							.getVehicleId(), ((CAVehicle) a).getDriver().getMode(), 1.0));
 		}

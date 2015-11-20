@@ -33,7 +33,7 @@ import java.util.Stack;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
-import org.matsim.api.core.v01.events.Wait2LinkEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.LaneEnterEvent;
 import org.matsim.core.api.experimental.events.LaneLeaveEvent;
@@ -394,7 +394,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 					.getMobsim()
 					.getEventsManager()
 					.processEvent(
-							new Wait2LinkEvent(now, veh.getDriver().getId(),
+							new VehicleEntersTrafficEvent(now, veh.getDriver().getId(),
 									this.getLink().getId(), veh.getId(), veh.getDriver().getMode(), 1.0));
 
 			if (this.transitQLink.addTransitToStopQueue(now, veh, this.getLink().getId())) {

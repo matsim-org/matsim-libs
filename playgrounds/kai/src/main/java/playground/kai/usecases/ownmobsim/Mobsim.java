@@ -10,7 +10,7 @@ import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
-import org.matsim.api.core.v01.events.Wait2LinkEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -45,7 +45,7 @@ public class Mobsim {
 
 		PersonDepartureEvent ade = new PersonDepartureEvent(time, agentId, linkId, legMode) ;
 
-		Wait2LinkEvent aw2le = new Wait2LinkEvent(time, agentId, linkId, null, legMode, 1.0) ;
+		VehicleEntersTrafficEvent aw2le = new VehicleEntersTrafficEvent(time, agentId, linkId, null, legMode, 1.0) ;
 
 		LinkLeaveEvent lle = new LinkLeaveEvent(time, agentId, linkId, null) ;
 

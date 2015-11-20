@@ -35,7 +35,7 @@ import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
-import org.matsim.api.core.v01.events.Wait2LinkEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
@@ -87,7 +87,7 @@ public class XferEventsFromLoResToHiResNetwork{
 		private final EventsManager linkEvents = EventsUtils.createEventsManager();
 		{
 			filteredEvents = new HashSet<>();
-			filteredEvents.add(Wait2LinkEvent.EVENT_TYPE);
+			filteredEvents.add(VehicleEntersTrafficEvent.EVENT_TYPE);
 			filteredEvents.add(LinkEnterEvent.EVENT_TYPE);
 			filteredEvents.add(LinkLeaveEvent.EVENT_TYPE);
 			filteredEvents.add(VehicleArrivesAtFacilityEvent.EVENT_TYPE);
@@ -284,7 +284,7 @@ public class XferEventsFromLoResToHiResNetwork{
 			Iterator<TransitRouteStop> stopIterator = stops.iterator();
 			TransitRouteStop firstStop = stopIterator.next();
 			Id departureLinkId = firstStop.getStopFacility().getLinkId();
-			Event wait2Link = new Wait2LinkEvent(tDSE.getTime() + 0.004, driverId, departureLinkId, vehId, PtConstants.NETWORK_MODE, 1.0);
+			Event wait2Link = new VehicleEntersTrafficEvent(tDSE.getTime() + 0.004, driverId, departureLinkId, vehId, PtConstants.NETWORK_MODE, 1.0);
 			hiResEvents.addLast(wait2Link);
 			Id fromLinkId = departureLinkId;
 			Iterator<Event> eventIterator = loResEvents.iterator();

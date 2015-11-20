@@ -91,7 +91,7 @@ public class LinkOccupancyAnalyzer implements LinkEnterEventHandler, LinkLeaveEv
 	}
 
 	@Override
-	public void handleEvent(Wait2LinkEvent event) {
+	public void handleEvent(VehicleEntersTrafficEvent event) {
 		if(this.links.get(event.getLinkId()) == null){
 			this.links.put(event.getLinkId(), new int[this.maxTime+1]);
 			Arrays.fill(this.links.get(event.getLinkId()), 0);

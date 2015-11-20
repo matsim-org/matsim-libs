@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
-import org.matsim.api.core.v01.events.Wait2LinkEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -86,21 +86,21 @@ public class EventsConverterXML extends MatsimXmlParser{
 			String eventType = atts.getValue("type");
 			
 			switch (eventType){
-			case Wait2LinkEvent.EVENT_TYPE:
-				Id<Person> driverId = Id.createPersonId(atts.getValue(Wait2LinkEvent.ATTRIBUTE_DRIVER));
+			case VehicleEntersTrafficEvent.EVENT_TYPE:
+				Id<Person> driverId = Id.createPersonId(atts.getValue(VehicleEntersTrafficEvent.ATTRIBUTE_DRIVER));
 				Id<Vehicle> vehicleId;
-				if (atts.getValue(Wait2LinkEvent.ATTRIBUTE_VEHICLE) == null || atts.getValue(Wait2LinkEvent.ATTRIBUTE_VEHICLE).equals("null")){
+				if (atts.getValue(VehicleEntersTrafficEvent.ATTRIBUTE_VEHICLE) == null || atts.getValue(VehicleEntersTrafficEvent.ATTRIBUTE_VEHICLE).equals("null")){
 					// use the person id as vehicle id
 					vehicleId = Id.create(driverId, Vehicle.class);
 				} else {
-					vehicleId = Id.create(atts.getValue(Wait2LinkEvent.ATTRIBUTE_VEHICLE), Vehicle.class);
+					vehicleId = Id.create(atts.getValue(VehicleEntersTrafficEvent.ATTRIBUTE_VEHICLE), Vehicle.class);
 				}
 				
 				// remember driver to vehicle relation
 				driverToVeh.put(driverId, vehicleId);				
 				// process event with correct vehicleId
-				this.events.processEvent(new Wait2LinkEvent(time, driverId, Id.createLinkId(atts.getValue(Wait2LinkEvent.ATTRIBUTE_LINK)), 
-						vehicleId, atts.getValue(Wait2LinkEvent.ATTRIBUTE_NETWORKMODE), 1.0));
+				this.events.processEvent(new VehicleEntersTrafficEvent(time, driverId, Id.createLinkId(atts.getValue(VehicleEntersTrafficEvent.ATTRIBUTE_LINK)), 
+						vehicleId, atts.getValue(VehicleEntersTrafficEvent.ATTRIBUTE_NETWORKMODE), 1.0));
 				break;
 			case LinkEnterEvent.EVENT_TYPE:
 				if (atts.getValue(LinkEnterEvent.ATTRIBUTE_VEHICLE) == null || atts.getValue(LinkEnterEvent.ATTRIBUTE_VEHICLE).equals("null")){

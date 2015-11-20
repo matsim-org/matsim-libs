@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
-import org.matsim.api.core.v01.events.Wait2LinkEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Leg;
@@ -70,7 +70,7 @@ public class EventsToLegsTest {
 		Id<Vehicle> vehId = Id.create("veh1", Vehicle.class);
 		eventsToLegs.handleEvent(new PersonDepartureEvent(10.0, agentId, Id.createLinkId("l1"), "car"));
 		eventsToLegs.handleEvent(new PersonEntersVehicleEvent(10.0, agentId, vehId));
-		eventsToLegs.handleEvent(new Wait2LinkEvent(10.0, agentId, Id.createLinkId("l1"), vehId, "car", 1.0));
+		eventsToLegs.handleEvent(new VehicleEntersTrafficEvent(10.0, agentId, Id.createLinkId("l1"), vehId, "car", 1.0));
 		eventsToLegs.handleEvent(new LinkLeaveEvent(10.0, vehId, Id.createLinkId("l1")));
 		eventsToLegs.handleEvent(new LinkEnterEvent(11.0, vehId, Id.createLinkId("l2")));
 		eventsToLegs.handleEvent(new LinkLeaveEvent(15.0, vehId, Id.createLinkId("l2")));

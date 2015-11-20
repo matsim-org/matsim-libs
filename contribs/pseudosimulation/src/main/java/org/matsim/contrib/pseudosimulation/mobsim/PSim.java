@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
-import org.matsim.api.core.v01.events.Wait2LinkEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
@@ -351,7 +351,7 @@ public class PSim implements Mobsim {
             if (route.getStartLinkId() != route.getEndLinkId()) {
                 Id<Link> startLink = route.getStartLinkId();
                 double linkEnterTime = startTime;
-                Wait2LinkEvent wait2Link = new Wait2LinkEvent(linkEnterTime, agentId, startLink, agentId, PtConstants.NETWORK_MODE, 1.0);
+                VehicleEntersTrafficEvent wait2Link = new VehicleEntersTrafficEvent(linkEnterTime, agentId, startLink, agentId, PtConstants.NETWORK_MODE, 1.0);
                 LinkEnterEvent linkEnterEvent = null;
                 LinkLeaveEvent linkLeaveEvent = new LinkLeaveEvent(++linkEnterTime, agentId, startLink);
                 eventQueue.add(wait2Link);
