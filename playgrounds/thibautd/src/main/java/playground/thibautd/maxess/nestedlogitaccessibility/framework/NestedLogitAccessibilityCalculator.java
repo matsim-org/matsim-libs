@@ -18,6 +18,7 @@
  * *********************************************************************** */
 package playground.thibautd.maxess.nestedlogitaccessibility.framework;
 
+import gnu.trove.list.array.TDoubleArrayList;
 import gnu.trove.map.TObjectDoubleMap;
 import gnu.trove.map.hash.TObjectDoubleHashMap;
 import org.apache.log4j.Logger;
@@ -65,31 +66,61 @@ public class NestedLogitAccessibilityCalculator<N extends Enum<N>> {
 	private double computeAccessibility( Person p ) {
 		final NestedChoiceSet<N> choiceSet = model.getChoiceSetIdentifier().identifyChoiceSet( p );
 
-		double sum = 0;
+		final LogSumExpCalculator calculator = new LogSumExpCalculator( choiceSet.getNests().size() );
 		for ( Nest<N> nest : choiceSet.getNests() ) {
-			sum += Math.exp( logSumNestUtilities( p , nest ) );
-			// TODO: prevent overflow!!!
-			if ( sum == Double.POSITIVE_INFINITY ) {
-				throw new RuntimeException( "overflow in exponential" );
-			}
+			calculator.addTerm( logSumNestUtilities( p , nest ) );
 		}
 
-		return Math.log( sum ) / model.getMu();
+		return calculator.computeLogsumExp() / model.getMu();
 	}
 
 	private double logSumNestUtilities(
 			final Person p,
 			final Nest<N> nest ) {
-		double sum = 0;
-
+		final LogSumExpCalculator calculator = new LogSumExpCalculator( nest.getAlternatives().size() );
 		for ( Alternative<N> alternative : nest.getAlternatives() ) {
-			sum += Math.exp( nest.getMu_n() *
+			calculator.addTerm( nest.getMu_n() *
 							model.getUtility().calcUtility(
 								p,
 								alternative ) );
 		}
 
-		return ( model.getMu() / nest.getMu_n() ) * Math.log( sum );
+		return ( model.getMu() / nest.getMu_n() ) * calculator.computeLogsumExp();
+	}
+
+	private static class LogSumExpCalculator {
+		private final TDoubleArrayList terms;
+
+		double min = Double.POSITIVE_INFINITY;
+		double max = Double.NEGATIVE_INFINITY;
+
+		public LogSumExpCalculator( final int size ) {
+			terms = new TDoubleArrayList( size );
+		}
+
+		public void addTerm( final double util ) {
+			terms.add( util );
+			min = Math.min( util , min );
+			max = Math.max( util , max );
+		}
+
+		public double computeLogsumExp() {
+			// under and overflow avoidance
+			// see http://jblevins.org/log/log-sum-exp
+			// Note that this can only avoid underflow OR overflow,
+			// not both at the same time
+
+			// correcting constant: greatest term in absolute value
+			final double c = (-min > max) ? -min : max;
+
+			double sum = 0;
+			for ( double d : terms.toArray() ) {
+				// TODO check if under/overflow anyway
+				sum += Math.exp( d - c );
+			}
+
+			return Math.log( sum ) + c;
+		}
 	}
 
 }
