@@ -82,25 +82,10 @@ public class RunMzTripChoiceSetConversion {
 							new Provider<ChoiceSetSampler<Trip, TripChoiceSituation>>() {
 								// only one global route cache: less memory consumpion, more chances of a hit
 								final TripSoftCache cache = new TripSoftCache(false, TripSoftCache.LocationType.link);
-
 								@Override
 								public ChoiceSetSampler<Trip, TripChoiceSituation> get() {
-									final FreespeedTravelTimeAndDisutility tt = new FreespeedTravelTimeAndDisutility(config.planCalcScore());
-
-									final TripRouterFactoryBuilderWithDefaults b = new TripRouterFactoryBuilderWithDefaults();
-									b.setTravelTime( tt );
-									b.setTravelDisutility( tt );
-									final TripRouter tripRouter = b.build(sc).get();
-
-									tripRouter.setRoutingModule(
-											TransportMode.car,
-											new CachingRoutingModuleWrapper(
-													cache,
-													tripRouter.getRoutingModule(
-															TransportMode.car)));
-
 									return new RoutingChoiceSetSampler(
-											tripRouter,
+											createTripRouter( sc , cache ),
 											group.getModes(),
 											new PrismicDestinationSampler(
 													group.getActivityType(),
@@ -179,5 +164,25 @@ public class RunMzTripChoiceSetConversion {
 		finally {
 			MoreIOUtils.closeOutputDirLogging();
 		}
+	}
+
+	public static TripRouter createTripRouter(
+			final Scenario sc,
+			final TripSoftCache cache ) {
+		final FreespeedTravelTimeAndDisutility tt = new FreespeedTravelTimeAndDisutility(sc.getConfig().planCalcScore());
+
+		final TripRouterFactoryBuilderWithDefaults b = new TripRouterFactoryBuilderWithDefaults();
+		b.setTravelTime( tt );
+		b.setTravelDisutility( tt );
+		final TripRouter tripRouter = b.build(sc).get();
+
+		tripRouter.setRoutingModule(
+				TransportMode.car,
+				new CachingRoutingModuleWrapper(
+						cache,
+						tripRouter.getRoutingModule(
+								TransportMode.car)));
+
+		return tripRouter;
 	}
 }

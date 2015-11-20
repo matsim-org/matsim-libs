@@ -22,6 +22,10 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
+import playground.thibautd.maxess.nestedlogitaccessibility.NestedLogitAccessibilityCalculator;
+import playground.thibautd.maxess.nestedlogitaccessibility.NestedLogitModel;
+import playground.thibautd.maxess.prepareforbiogeme.tripbased.RunMzTripChoiceSetConversion;
+import playground.thibautd.router.TripSoftCache;
 import playground.thibautd.utils.MoreIOUtils;
 
 /**
@@ -37,6 +41,27 @@ public class RunSimpleNestedLogitAccessibility {
 		try {
 			final Config config = ConfigUtils.loadConfig( configFile );
 			final Scenario scenario = ScenarioUtils.loadScenario( config );
+
+			final NestedLogitAccessibilityCalculator<ModeNests> calculator =
+					new NestedLogitAccessibilityCalculator<>(
+							scenario.getPopulation(),
+							scenario.getActivityFacilities(),
+							new NestedLogitModel<>(
+									new SimpleNestedLogitModelUtility(
+											scenario.getPopulation().getPersonAttributes() ),
+									new SimpleNestedLogitModelChoiceSetIdentifier(
+											"leisure",
+											200,
+											RunMzTripChoiceSetConversion.createTripRouter(
+												scenario,
+												new TripSoftCache(
+														false,
+														TripSoftCache.LocationType.link) ),
+											scenario.getActivityFacilities(),
+											20 * 1000 ) ) );
+
+			// TODO store and write results
+			calculator.computeAccessibilities();
 		}
 		finally {
 			MoreIOUtils.closeOutputDirLogging();

@@ -29,6 +29,12 @@ public class NestedLogitModel<N extends Enum<N>> {
 	private final ChoiceSetIdentifier<N> choiceSetIdentifier;
 
 	public NestedLogitModel(
+			final Utility<N> utility,
+			final ChoiceSetIdentifier<N> choiceSetIdentifier ) {
+		this( 1 , utility , choiceSetIdentifier );
+	}
+
+	public NestedLogitModel(
 			final double mu,
 			final Utility<N> utility,
 			final ChoiceSetIdentifier<N> choiceSetIdentifier ) {
