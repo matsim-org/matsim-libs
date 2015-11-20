@@ -43,6 +43,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.events.handler.EventHandler;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -97,6 +98,7 @@ public class LegModeDistanceDistribution extends AbstractAnalysisModule{
 		
 		log.info("Checking if the plans file that will be analyzed is based on a run with simulated public transport.");
 		log.info("Transit activities and belonging transit walk legs will be removed from the plan.");
+		log.info("However, there might be some transit walk legs remaining without previous transit activity.");
 		
 		for (Person person : this.scenario.getPopulation().getPersons().values()){
 			for (Plan plan : person.getPlans()){
@@ -290,11 +292,24 @@ public class LegModeDistanceDistribution extends AbstractAnalysisModule{
 	}
 	
 	private void initializeUsedModes(Population pop) {
+		int transitWalkCounter = 0;
 		for(Person person : pop.getPersons().values()){
 			for(PlanElement pe : person.getSelectedPlan().getPlanElements()){
 				if(pe instanceof Leg){
 					Leg leg = (Leg) pe;
-					this.usedModes.add(leg.getMode());
+					String legMode = leg.getMode();
+					if(!this.usedModes.contains(legMode))
+						if(legMode.equals(TransportMode.transit_walk)){
+							if(transitWalkCounter < 1){
+								log.info("Transit walk leg detected."
+										+ " If it belongs to a pt leg, it will be removed."
+										+ " If it does not belong to a pt leg, they will be interpreted as walk leg.");
+								log.info(Gbl.ONLYONCE);
+							}
+							transitWalkCounter ++;
+						} else {
+							this.usedModes.add(legMode);
+						}
 				}
 			}
 		}
