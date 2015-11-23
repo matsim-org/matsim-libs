@@ -1,5 +1,7 @@
 package gunnar.ihop2.integration;
 
+import static java.lang.Boolean.parseBoolean;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -11,13 +13,18 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutility;
 import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
+import org.matsim.roadpricing.RoadPricingConfigGroup;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
+import org.matsim.vehicles.Vehicle;
 
 import saleem.stockholmscenario.utils.StockholmTransformationFactory;
 import cadyts.utilities.misc.StreamFlushHandler;
@@ -75,8 +82,6 @@ public class MATSimDummy {
 
 	public static final String ITERATIONS_ELEMENT = "iterations";
 
-	// public static final String ZONE_ELEMENT = "zone";
-
 	public static final String RANDOMSEED_ELEMENT = "randomseed";
 
 	public static final String ANALYSIS_STARTTIME_ELEMENT = "analysisstarttime";
@@ -92,6 +97,9 @@ public class MATSimDummy {
 	public static final String DISTANCE_COSTTYPE = "distance";
 
 	public static final String TOLL_COSTTYPE = "toll";
+
+	// TODO NEW
+	public static final String USETOLL_ELEMENT = "usetoll";
 
 	public static void fatal(final String msg) {
 		Logger.getLogger(MATSimDummy.class.getName()).severe(
@@ -351,6 +359,12 @@ public class MATSimDummy {
 		Logger.getLogger(MATSimDummy.class.getName()).info(
 				NODESAMPLE_SIZE_ELEMENT + " = " + nodeSampleSize);
 
+		// TODO NEW
+		final Boolean useToll = parseBoolean(config.get(IHOP2_ELEMENT,
+				USETOLL_ELEMENT));
+		Logger.getLogger(MATSimDummy.class.getName()).info(
+				USETOLL_ELEMENT + " = " + useToll);
+
 		Logger.getLogger(MATSimDummy.class.getName()).info(
 				"... program parameters appear OK so far.");
 
@@ -376,7 +390,8 @@ public class MATSimDummy {
 					"Loading matsim configuration file: "
 							+ matsimConfigFileName + " ... ");
 			final org.matsim.core.config.Config matsimConfig = ConfigUtils
-					.loadConfig(matsimConfigFileName);
+					.loadConfig(matsimConfigFileName,
+							new RoadPricingConfigGroup());
 			final String matsimNetworkFileName = matsimConfig.getModule(
 					"network").getValue("inputNetworkFile");
 			final String initialPlansFileName = matsimConfig.getModule("plans")
@@ -418,7 +433,8 @@ public class MATSimDummy {
 						StockholmTransformationFactory.WGS84_EPSG3857,
 						populationFileName);
 				PopulationWriter popwriter = new PopulationWriter(
-						reader.scenario.getPopulation(), null);
+						reader.scenario.getPopulation(),
+						reader.scenario.getNetwork());
 				popwriter.write(initialPlansFileName);
 
 			}
@@ -436,9 +452,8 @@ public class MATSimDummy {
 			final Controler controler = new Controler(matsimConfig);
 
 			final double networkUpscaleFactor = 2.0;
-			Logger.getLogger(MATSimDummy.class.getName())
-					.info("scaling up the network by "
-							+ networkUpscaleFactor
+			Logger.getLogger(MATSimDummy.class.getName()).info(
+					"scaling up the network by " + networkUpscaleFactor
 							+ " to account for link removals during "
 							+ "Transmodeler -> MATSim network conversion");
 
@@ -456,9 +471,13 @@ public class MATSimDummy {
 			matsimConfig.getModule("controler").addParam("overwriteFiles",
 					"deleteDirectoryIfExists");
 
-			// TODO NEW
 			matsimConfig.getModule("controler").addParam("outputDirectory",
 					"./matsim-output." + iteration + "/");
+
+			if (useToll) {
+				controler
+						.setModules(new ControlerDefaultsWithRoadPricingModule());
+			}
 
 			controler.run();
 
@@ -484,8 +503,27 @@ public class MATSimDummy {
 							controler.getLinkTravelTimes()));
 			costType2travelDisutility.put(DISTANCE_COSTTYPE,
 					new LinkTravelDistanceInKilometers());
-			costType2travelDisutility.put(TOLL_COSTTYPE,
-					new LinkTollCostInCrownes());
+			if (useToll) {
+				costType2travelDisutility.put(
+						TOLL_COSTTYPE,
+						new LinkTollCostInCrownes(matsimConfig.getModule(
+								"roadpricing").getValue("tollLinksFile")));
+			} else {
+				costType2travelDisutility.put(TOLL_COSTTYPE,
+						new TravelDisutility() {
+							@Override
+							public double getLinkTravelDisutility(Link link,
+									double time, Person person, Vehicle vehicle) {
+								return 0;
+							}
+
+							@Override
+							public double getLinkMinimumTravelDisutility(
+									Link link) {
+								return 0;
+							}
+						});
+			}
 
 			final TripCostMatrices tripCostMatrices = new TripCostMatrices(
 					controler.getLinkTravelTimes(),

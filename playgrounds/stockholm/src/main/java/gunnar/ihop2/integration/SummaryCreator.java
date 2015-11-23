@@ -34,6 +34,13 @@ class SummaryCreator {
 				e.printStackTrace();
 			}
 			try {
+				FileUtils.copyFileToDirectory(new File(
+						"./travel-cost-statistics." + iteration + ".txt"),
+						new File("./summary/"));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			try {
 				FileUtils.copyFileToDirectory(
 						new File(fromPath + "logfile.log"), new File(toPath));
 			} catch (IOException e) {

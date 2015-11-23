@@ -1,11 +1,11 @@
 package gunnar.ihop2.transmodeler.run;
 
-import static gunnar.ihop2.transmodeler.run.RunMATSimWithTransmodeler.EVENTSFILE;
-import static gunnar.ihop2.transmodeler.run.RunMATSimWithTransmodeler.TRANSMODELERCOMMAND;
-import static gunnar.ihop2.transmodeler.run.RunMATSimWithTransmodeler.TRANSMODELERCONFIG;
-import static gunnar.ihop2.transmodeler.run.RunMATSimWithTransmodeler.TRANSMODELERFOLDER;
+import static gunnar.ihop2.transmodeler.run.TransmodelerMATSim.EVENTS_ELEMENT;
 import static gunnar.ihop2.transmodeler.run.TransmodelerMATSim.LINKATTRIBUTE_FILENAME_ELEMENT;
 import static gunnar.ihop2.transmodeler.run.TransmodelerMATSim.PATHS_ELEMENT;
+import static gunnar.ihop2.transmodeler.run.TransmodelerMATSim.TRANSMODELERCOMMAND_ELEMENT;
+import static gunnar.ihop2.transmodeler.run.TransmodelerMATSim.TRANSMODELERCONFIG;
+import static gunnar.ihop2.transmodeler.run.TransmodelerMATSim.TRANSMODELERFOLDER_ELEMENT;
 import gunnar.ihop2.transmodeler.tripswriting.TransmodelerTripWriter;
 
 import java.io.File;
@@ -28,7 +28,7 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
  */
 public class TransmodelerMobsim implements Mobsim {
 
-	private final EventsManager eventsConsumer;
+	private final TimeRepairingEventsManager eventsConsumer;
 
 	private final String eventsFile;
 	private final String transmodelerFolder;
@@ -41,13 +41,15 @@ public class TransmodelerMobsim implements Mobsim {
 	@Inject
 	public TransmodelerMobsim(final Scenario scenario,
 			final EventsManager events) {
-		this.eventsConsumer = events;
+		this.eventsConsumer = new TimeRepairingEventsManager(scenario, events);
 		this.eventsFile = scenario.getConfig().getModule(TRANSMODELERCONFIG)
-				.getValue(EVENTSFILE);
+				.getValue(EVENTS_ELEMENT);
 		this.transmodelerFolder = scenario.getConfig()
-				.getModule(TRANSMODELERCONFIG).getValue(TRANSMODELERFOLDER);
+				.getModule(TRANSMODELERCONFIG)
+				.getValue(TRANSMODELERFOLDER_ELEMENT);
 		this.transmodelerCommand = scenario.getConfig()
-				.getModule(TRANSMODELERCONFIG).getValue(TRANSMODELERCOMMAND);
+				.getModule(TRANSMODELERCONFIG)
+				.getValue(TRANSMODELERCOMMAND_ELEMENT);
 		this.linkAttributesFileName = scenario.getConfig()
 				.getModule(TRANSMODELERCONFIG)
 				.getValue(LINKATTRIBUTE_FILENAME_ELEMENT);
@@ -109,10 +111,35 @@ public class TransmodelerMobsim implements Mobsim {
 		/*
 		 * Read Transmodeler events file.
 		 */
+		this.eventsConsumer.unknownPersonsIDs.clear();
+		this.eventsConsumer.unknownLinkIDs.clear();
+		this.eventsConsumer.timeCorrectionStats.clear();
+
 		Logger.getLogger(this.getClass().getName()).info(
 				"Loading file: " + this.eventsFile);
 		final MatsimEventsReader reader = new MatsimEventsReader(
 				this.eventsConsumer);
 		reader.readFile(this.eventsFile);
+
+		Logger.getLogger(this.getClass().getName()).info(
+				"Encountered " + this.eventsConsumer.unknownPersonsIDs.size()
+						+ " unknown agents: "
+						+ this.eventsConsumer.unknownPersonsIDs);
+		Logger.getLogger(this.getClass().getName()).info(
+				"Encountered " + this.eventsConsumer.unknownLinkIDs.size()
+						+ " unknown links: "
+						+ this.eventsConsumer.unknownLinkIDs);
+		Logger.getLogger(this.getClass().getName()).info(
+				"mean(time correction)   = "
+						+ this.eventsConsumer.timeCorrectionStats.getAvg());
+		Logger.getLogger(this.getClass().getName()).info(
+				"stddev(time correction) = "
+						+ this.eventsConsumer.timeCorrectionStats.getStddev());
+		Logger.getLogger(this.getClass().getName()).info(
+				"min(time correction) = "
+						+ this.eventsConsumer.timeCorrectionStats.getMin());
+		Logger.getLogger(this.getClass().getName()).info(
+				"max(time correction) = "
+						+ this.eventsConsumer.timeCorrectionStats.getMax());
 	}
 }
