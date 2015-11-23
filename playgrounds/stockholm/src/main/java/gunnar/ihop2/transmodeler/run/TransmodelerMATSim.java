@@ -1,9 +1,5 @@
 package gunnar.ihop2.transmodeler.run;
 
-import static gunnar.ihop2.transmodeler.run.RunMATSimWithTransmodeler.EVENTSFILE;
-import static gunnar.ihop2.transmodeler.run.RunMATSimWithTransmodeler.TRANSMODELERCOMMAND;
-import static gunnar.ihop2.transmodeler.run.RunMATSimWithTransmodeler.TRANSMODELERCONFIG;
-import static gunnar.ihop2.transmodeler.run.RunMATSimWithTransmodeler.TRANSMODELERFOLDER;
 import floetteroed.utilities.SimpleLogFormatter;
 import floetteroed.utilities.config.Config;
 import floetteroed.utilities.config.ConfigReader;
@@ -50,6 +46,8 @@ public class TransmodelerMATSim {
 
 	public static final String TRANSMODELERCOMMAND_ELEMENT = "transmodelercommand";
 
+	public static final String TRANSMODELERCONFIG = "transmodeler";
+	
 	private static void checkNonNull(final String fileName,
 			final String definition) {
 		if (fileName == null) {
@@ -170,7 +168,7 @@ public class TransmodelerMATSim {
 		final int iteration = 0;
 
 		/*
-		 * -------------------- LOAD CONFIGURATION --------------------
+		 * -------------------- CONFIGURE --------------------
 		 */
 
 		Logger.getLogger(MATSimDummy.class.getName()).info(
@@ -189,10 +187,10 @@ public class TransmodelerMATSim {
 
 		final ConfigGroup transmodelerConfigGroup = new ConfigGroup(
 				TRANSMODELERCONFIG);
-		transmodelerConfigGroup.addParam(EVENTSFILE, eventsFileName);
-		transmodelerConfigGroup.addParam(TRANSMODELERFOLDER,
+		transmodelerConfigGroup.addParam(EVENTS_ELEMENT, eventsFileName);
+		transmodelerConfigGroup.addParam(TRANSMODELERFOLDER_ELEMENT,
 				transmodelerFolderName);
-		transmodelerConfigGroup.addParam(TRANSMODELERCOMMAND,
+		transmodelerConfigGroup.addParam(TRANSMODELERCOMMAND_ELEMENT,
 				transmodelerCommand);
 		transmodelerConfigGroup.addParam(LINKATTRIBUTE_FILENAME_ELEMENT,
 				linkAttributeFileName);

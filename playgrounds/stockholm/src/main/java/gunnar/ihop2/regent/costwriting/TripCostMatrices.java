@@ -254,18 +254,19 @@ public class TripCostMatrices {
 	}
 
 	public void writeToScaperFiles(final String prefix) {
-		// for (int bin = 0; bin < this.getBinCnt(); bin++) {
-		// final String binString = this.numberStrings.toString(bin);
-		//
-		// final Matrix matrix = this.matrices.getMatrix(binString);
-		// final Matrices dummyMatrices = new Matrices();
-		// dummyMatrices.getMatrices().put(matrix.getId(), matrix);
-		//
-		// final MatricesWriter writer = new MatricesWriter(this.matrices);
-		// writer.setIndentationString("  ");
-		// writer.setPrettyPrint(true);
-		// writer.write(prefix + this.numberStrings.toString(bin) + ".xml");
-		// }
+		for (int bin = 0; bin < this.getBinCnt(); bin++) {
+			final String binString = this.numberStrings.toString(bin);
+
+			final Matrix matrix = this.costType2matrices.get(
+					MATSimDummy.TRAVELTIME_COSTTYPE).getMatrix(binString);
+			final Matrices dummyMatrices = new Matrices();
+			dummyMatrices.getMatrices().put(matrix.getId(), matrix);
+
+			final MatricesWriter writer = new MatricesWriter(dummyMatrices);
+			writer.setIndentationString("  ");
+			writer.setPrettyPrint(true);
+			writer.write(prefix + this.numberStrings.toString(bin) + ".xml");
+		}
 	}
 
 	// -------------------- MAIN-FUNCTION, ONLY FOR TESTING --------------------

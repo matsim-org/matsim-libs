@@ -116,7 +116,7 @@ public class PreparationScript {
                 pathConfig,
                 Integer.toString(prctScenario)
         };
-        PrefsCreator.main(args);
+        ConfigCreator.main(args);
     }
 
     private static void createPrefsForPopulation() {
@@ -250,13 +250,13 @@ public class PreparationScript {
             pathFacilities = tempFolder + FACILITIES;
             Files.copy(Paths.get(backupFolder + FACILITIES), Paths.get(pathFacilities));
             pathHouseholds = tempFolder + HOUSEHOLDS;
-            Files.move(Paths.get(backupFolder + HOUSEHOLDS), Paths.get(pathHouseholds));
+            Files.copy(Paths.get(backupFolder + HOUSEHOLDS), Paths.get(pathHouseholds));
             pathHouseholdAttributes = tempFolder + HOUSEHOLD_ATTRIBUTES;
             Files.copy(Paths.get(backupFolder + HOUSEHOLD_ATTRIBUTES), Paths.get(pathHouseholdAttributes));
             pathPopulation = tempFolder + POPULATION;
             Files.copy(Paths.get(backupFolder + POPULATION), Paths.get(pathPopulation));
             pathPopulationAttributes = tempFolder + POPULATION_ATTRIBUTES;
-            Files.move(Paths.get(backupFolder + POPULATION_ATTRIBUTES), Paths.get(pathPopulationAttributes));
+            Files.copy(Paths.get(backupFolder + POPULATION_ATTRIBUTES), Paths.get(pathPopulationAttributes));
 
             return true;
         } catch (NoSuchFileException e) {

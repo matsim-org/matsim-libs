@@ -79,7 +79,7 @@ public class FacilityAdder {
                 if (distanceToCurrentFacility < distanceToSelectedFacility) {
                     distanceToSelectedFacility = distanceToCurrentFacility;
                     selectedFacility = facility;
-                    if (distanceToSelectedFacility < 100) {
+                    if (distanceToSelectedFacility < 1000) {
                         break;
                     }
                 }
