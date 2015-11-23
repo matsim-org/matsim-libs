@@ -58,28 +58,17 @@ public final class PatnaUtils {
 	/**
 	 * @param scenario
 	 * It creates first vehicle types and add them to scenario and then create and add vehicles to the scenario.
-	 * <b> All modes are added to the scenario but PCUs are added only for main modes. 
 	 */
 	public static void createAndAddVehiclesToScenario(final Scenario scenario){
 		final Map<String, VehicleType> modesType = new HashMap<String, VehicleType>(); 
 		
-		for (String mode : PatnaUtils.MAIN_MODES){
+		for (String mode : PatnaUtils.ALL_MODES){
 			VehicleType vehicle = VehicleUtils.getFactory().createVehicleType(Id.create(mode,VehicleType.class));
 			vehicle.setMaximumVelocity(MixedTrafficVehiclesUtils.getSpeed(mode));
 			vehicle.setPcuEquivalents( MixedTrafficVehiclesUtils.getPCU(mode) );
 			modesType.put(mode, vehicle);
 			scenario.getVehicles().addVehicleType(vehicle);
 		}
-
-		VehicleType walk = VehicleUtils.getFactory().createVehicleType(Id.create("walk",VehicleType.class));
-		walk.setMaximumVelocity(MixedTrafficVehiclesUtils.getSpeed("walk"));
-		modesType.put("walk",walk);
-		scenario.getVehicles().addVehicleType(walk);
-
-		VehicleType pt = VehicleUtils.getFactory().createVehicleType(Id.create("pt",VehicleType.class));
-		pt.setMaximumVelocity(MixedTrafficVehiclesUtils.getSpeed("pt"));
-		modesType.put("pt",pt);
-		scenario.getVehicles().addVehicleType(pt);
 
 		for(Person p:scenario.getPopulation().getPersons().values()){
 			Id<Vehicle> vehicleId = Id.create(p.getId(),Vehicle.class);
