@@ -16,36 +16,13 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.maxess.nestedlogitaccessibility;
+package playground.thibautd.maxess.nestedlogitaccessibility.framework;
 
-import org.matsim.api.core.v01.Id;
-
-import java.util.List;
+import org.matsim.api.core.v01.population.Person;
 
 /**
  * @author thibautd
  */
-public class Nest {
-	private final Id<Nest> name;
-	private final double mu_n;
-	// if need exists, could easily be made generic (with alternatives type as a class parameter)
-	private final List<Alternative> alternatives;
-
-	public Nest( Id<Nest> name, double mu_n, List<Alternative> alternatives ) {
-		this.name = name;
-		this.mu_n = mu_n;
-		this.alternatives = alternatives;
-	}
-
-	public Id<Nest> getNestId() {
-		return name;
-	}
-
-	public List<Alternative> getAlternatives() {
-		return alternatives;
-	}
-
-	public double getMu_n() {
-		return mu_n;
-	}
+public interface Utility<N extends Enum<N>> {
+	double calcUtility( Person p, Alternative<N> a );
 }

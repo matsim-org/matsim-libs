@@ -25,17 +25,14 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.socnetsim.framework.population.SocialNetwork;
 import org.matsim.contrib.socnetsim.framework.population.SocialNetworkWriter;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigGroup;
-import org.matsim.core.config.ConfigReader;
-import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.io.UncheckedIOException;
-import playground.thibautd.initialdemandgeneration.socnetgensimulated.framework.*;
+import playground.thibautd.initialdemandgeneration.socnetgensimulated.framework.ConfigModule;
+import playground.thibautd.initialdemandgeneration.socnetgensimulated.framework.FileWriterEvolutionListener;
+import playground.thibautd.initialdemandgeneration.socnetgensimulated.framework.ModelIterator;
+import playground.thibautd.initialdemandgeneration.socnetgensimulated.framework.PreprocessedModelRunnerConfigGroup;
+import playground.thibautd.initialdemandgeneration.socnetgensimulated.framework.SocNetGenFrameworkModule;
+import playground.thibautd.initialdemandgeneration.socnetgensimulated.framework.SocialNetworkGenerationConfigGroup;
 import playground.thibautd.utils.MoreIOUtils;
 import playground.thibautd.utils.SoftCache;
-
-import java.io.BufferedWriter;
-import java.io.IOException;
 
 /**
  * @author thibautd

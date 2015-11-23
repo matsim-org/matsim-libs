@@ -16,13 +16,13 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.maxess.nestedlogitaccessibility;
+package playground.thibautd.maxess.nestedlogitaccessibility.framework;
 
 import org.matsim.api.core.v01.population.Person;
 
 /**
  * @author thibautd
  */
-public interface Utility {
-	double calcUtility( Person p, Alternative a );
+public interface ChoiceSetIdentifier<N extends Enum<N>> {
+	NestedChoiceSet<N> identifyChoiceSet( Person p );
 }

@@ -19,16 +19,14 @@
  * *********************************************************************** */
 package playground.thibautd.geocoding;
 
-import java.io.IOException;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.JSONTokener;
+import org.matsim.core.utils.io.UncheckedIOException;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-
-import org.json.JSONException;
-import org.json.JSONTokener;
-import org.json.JSONObject;
-
-import org.matsim.core.utils.io.UncheckedIOException;
 
 /**
  * @author thibautd

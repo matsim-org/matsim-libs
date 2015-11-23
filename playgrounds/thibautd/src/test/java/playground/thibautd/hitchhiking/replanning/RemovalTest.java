@@ -19,14 +19,6 @@
  * *********************************************************************** */
 package playground.thibautd.hitchhiking.replanning;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -38,11 +30,18 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-
 import playground.thibautd.hitchiking.HitchHikingConstants;
 import playground.thibautd.hitchiking.replanning.HitchHikingInsertionAlgorithm;
 import playground.thibautd.hitchiking.replanning.HitchHikingInsertionRemovalAlgorithm;
 import playground.thibautd.hitchiking.replanning.HitchHikingRemovalAlgorithm;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * @author thibautd

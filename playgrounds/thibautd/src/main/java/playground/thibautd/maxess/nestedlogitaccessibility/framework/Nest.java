@@ -16,34 +16,60 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.maxess.nestedlogitaccessibility;
+package playground.thibautd.maxess.nestedlogitaccessibility.framework;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author thibautd
  */
-public class NestedLogitModel {
-	private final double mu;
-	private final Utility utility;
-	private final ChoiceSetIdentifier choiceSetIdentifier;
+public class Nest<N extends Enum<N>> {
+	private final N name;
+	private final double mu_n;
+	// if need exists, could easily be made generic (with alternatives type as a class parameter)
+	private final List<Alternative<N>> alternatives;
 
-	public NestedLogitModel(
-			final double mu,
-			final Utility utility,
-			final ChoiceSetIdentifier choiceSetIdentifier ) {
-		this.mu = mu;
-		this.utility = utility;
-		this.choiceSetIdentifier = choiceSetIdentifier;
+	public static class Builder<N extends Enum<N>> {
+		private N name = null;
+		private double mu_n = 1;
+		private final List<Alternative<N>> alternatives = new ArrayList<>( );
+
+		public Builder<N> setName( N name ) {
+			this.name = name;
+			return this;
+		}
+
+		public Builder<N> setMu( final double mu ) {
+			this.mu_n = mu;
+			return this;
+		}
+
+		public Builder<N> addAlternative( final Alternative<N> a ) {
+			alternatives.add( a );
+			return this;
+		}
+
+		public Nest<N> build() {
+			return new Nest<N>( name , mu_n , alternatives );
+		}
 	}
 
-	public ChoiceSetIdentifier getChoiceSetIdentifier() {
-		return choiceSetIdentifier;
+	public Nest( N name, double mu_n, List<Alternative<N>> alternatives ) {
+		this.name = name;
+		this.mu_n = mu_n;
+		this.alternatives = alternatives;
 	}
 
-	public double getMu() {
-		return mu;
+	public N getNestId() {
+		return name;
 	}
 
-	public Utility getUtility() {
-		return utility;
+	public List<Alternative<N>> getAlternatives() {
+		return alternatives;
+	}
+
+	public double getMu_n() {
+		return mu_n;
 	}
 }

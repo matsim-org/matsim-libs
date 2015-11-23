@@ -16,24 +16,22 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.maxess.nestedlogitaccessibility;
+package playground.thibautd.maxess.nestedlogitaccessibility.framework;
 
-import org.matsim.api.core.v01.Id;
-import playground.thibautd.maxess.prepareforbiogeme.tripbased.Trip;
+import java.util.Arrays;
+import java.util.Collection;
 
 /**
- * @author thibautd
+ * if other use cases, might be transformed to an interface
  */
-public class Alternative {
-	private final Id<Nest> nestId;
-	private final Id<Alternative> alternativeId;
-	private final Trip alternative;
+public class NestedChoiceSet<N extends Enum<N>> {
+	private final Collection<Nest<N>> nests;
 
-	public Alternative( Id<Nest> nestId,
-			Id<Alternative> alternativeId,
-			Trip alternative ) {
-		this.nestId = nestId;
-		this.alternativeId = alternativeId;
-		this.alternative = alternative;
+	public NestedChoiceSet( final Nest<N>... nests ) {
+		this.nests = Arrays.asList( nests );
+	}
+
+	public Collection<Nest<N>> getNests() {
+		return nests;
 	}
 }

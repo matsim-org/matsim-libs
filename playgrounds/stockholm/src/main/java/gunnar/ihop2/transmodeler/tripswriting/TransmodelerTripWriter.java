@@ -14,10 +14,10 @@ import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -53,6 +53,12 @@ public class TransmodelerTripWriter {
 	private static final String EndLink = "EndLink";
 	private static final String DepTime = "DepTime";
 
+	// >>>>> TODO NEW >>>>>
+	private static final String OriAct = "OriAct";
+	private static final String EndAct = "EndAct";
+	private static final String AgentID = "AgentID";
+	// <<<<< TODO NEW <<<<<
+
 	private static final String Node = "Node";
 	private static final String PC1 = "PC1";
 
@@ -85,15 +91,47 @@ public class TransmodelerTripWriter {
 
 		for (Map.Entry<Id<Person>, ? extends Person> id2personEntry : this.population
 				.getPersons().entrySet()) {
+
 			final Plan plan = id2personEntry.getValue().getSelectedPlan();
 			if (plan != null) {
+
+				// >>>>> TODO NEW >>>>>
+				String previousActType = null;
+				TransmodelerTrip currentTrip = null;
+				// <<<<< TODO NEW <<<<<
+
 				for (PlanElement planElement : plan.getPlanElements()) {
+
+					// >>>>> TODO NEW >>>>>
+					if (planElement instanceof Activity) {
+						final String currentActType = ((Activity) planElement)
+								.getType();
+						if (previousActType != null) {
+							currentTrip.addActivityTypes(previousActType,
+									currentActType);
+							if (!sortedTrips.add(currentTrip)) {
+								throw new RuntimeException("a trip of agent "
+										+ id2personEntry.getKey()
+										+ " was not added");
+							}
+							currentTrip = null;
+						}
+						previousActType = currentActType;
+					} else
+					// <<<<< TODO NEW <<<<<
 					if (planElement instanceof Leg) {
 						final Leg leg = (Leg) planElement;
 						if (car.equals(leg.getMode())) {
 							final NetworkRoute route = (NetworkRoute) leg
 									.getRoute();
-							if (route != null) {
+
+							if (route == null) {
+
+								throw new RuntimeException("Person "
+										+ id2personEntry.getKey()
+										+ " has no route.");
+
+							} else {
 
 								// Include the from-link, exclude the to-link.
 
@@ -188,11 +226,21 @@ public class TransmodelerTripWriter {
 																linkIds.size() - 1)
 																.toString(),
 														TMPATHID_ATTR);
-								sortedTrips
-										.add(new TransmodelerTrip(++tripCnt,
-												fromNodeTmId, toNodeTmId,
-												fromLink, pathId, toLink, leg
-														.getDepartureTime()));
+								// >>>>> TODO NEW >>>>>
+								// sortedTrips.add(new
+								// TransmodelerTrip(++tripCnt,
+								// fromNodeTmId, toNodeTmId, fromLink,
+								// pathId, toLink, leg.getDepartureTime(),
+								// id2personEntry.getKey().toString()));
+								if (currentTrip != null) {
+									throw new RuntimeException(
+											"current trip is not null, this must not happen");
+								}
+								currentTrip = new TransmodelerTrip(++tripCnt,
+										fromNodeTmId, toNodeTmId, fromLink,
+										pathId, toLink, leg.getDepartureTime(),
+										id2personEntry.getKey().toString());
+								// <<<<< TODO NEW <<<<<
 							}
 						}
 					}
@@ -207,7 +255,7 @@ public class TransmodelerTripWriter {
 		tripWriter.setNoDataValue("");
 		tripWriter.setSeparator(",");
 		tripWriter.addKeys(ID, OriID, DesID, OriType, DesType, Class, OriLink,
-				Path, EndLink, DepTime);
+				Path, EndLink, DepTime, OriAct, EndAct, AgentID);
 		tripWriter.open(tripFileName);
 		for (TransmodelerTrip trip : sortedTrips) {
 			tripWriter.setValue(ID, trip.id);
@@ -220,7 +268,12 @@ public class TransmodelerTripWriter {
 			tripWriter.setValue(Path, trip.pathId);
 			tripWriter.setValue(EndLink, trip.toLinkId);
 			tripWriter.setValue(DepTime, trip.dptTime_s);
+			// >>>>> TODO NEW >>>>>
+			tripWriter.setValue(OriAct, trip.oriAct);
+			tripWriter.setValue(EndAct, trip.endAct);
+			tripWriter.setValue(AgentID, trip.agentId);
 			tripWriter.writeValues();
+			// <<<<< TODO NEW <<<<<
 		}
 		tripWriter.close();
 	}
@@ -231,24 +284,13 @@ public class TransmodelerTripWriter {
 
 		System.out.println("STARTED ...");
 
-		// final String networkFileName = "./data_ZZZ/run/network-plain.xml";
-		// final String plansFileName =
-		// "./data_ZZZ/run/output/ITERS/it.0/0.plans.xml.gz";
-		// final String linkAttributesFileName =
-		// "./data_ZZZ/run/link-attributes.xml";
-		//
-		// final String pathFileName = "./data_ZZZ/run/paths.csv";
-		// final String tripFileName = "./data_ZZZ/run/trips.csv";
+		final String networkFileName = "./ihop2/network-output/network.xml";
+		final String linkAttributesFileName = "./ihop2/network-output/link-attributes.xml";
+		final String plansFileName = 
+				"./ihop2/matsim-output/ITERS/it.0/0.plans.xml.gz";
 
-		final String path = "./test/matsim-testrun/";
-		final String networkFileName = path + "input/network-plain.xml";
-		final String plansFileName = path
-				+ "matsim-output/ITERS/it.0/0.plans.xml.gz";
-		final String linkAttributesFileName = path
-				+ "input/link-attributes.xml";
-
-		final String pathFileName = path + "paths.csv";
-		final String tripFileName = path + "trips.csv";
+		final String pathFileName = "./ihop2/transmodeler-matsim/exchange/paths.csv";
+		final String tripFileName = "./ihop2/transmodeler-matsim/exchange/trips.csv";
 
 		final Config config = ConfigUtils.createConfig();
 		config.setParam("network", "inputNetworkFile", networkFileName);

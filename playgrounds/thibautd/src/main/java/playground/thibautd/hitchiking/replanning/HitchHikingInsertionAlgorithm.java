@@ -19,17 +19,16 @@
  * *********************************************************************** */
 package playground.thibautd.hitchiking.replanning;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.population.algorithms.PlanAlgorithm;
-
 import playground.thibautd.hitchiking.HitchHikingConstants;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 /**
  * Parses a plan to get pt and car trips, and chooses one at random to transform

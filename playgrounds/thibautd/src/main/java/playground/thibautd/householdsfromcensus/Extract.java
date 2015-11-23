@@ -19,13 +19,12 @@
  * *********************************************************************** */
 package playground.thibautd.householdsfromcensus;
 
-import java.util.List;
-import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
-
 import org.matsim.contrib.socnetsim.framework.cliques.Clique;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author thibautd

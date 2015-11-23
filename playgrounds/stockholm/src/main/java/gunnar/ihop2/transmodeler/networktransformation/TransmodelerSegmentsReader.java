@@ -1,6 +1,7 @@
 package gunnar.ihop2.transmodeler.networktransformation;
 
 import static gunnar.ihop2.transmodeler.networktransformation.Transmodeler2MATSimNetwork.newUnidirectionalId;
+import static gunnar.ihop2.transmodeler.networktransformation.Transmodeler2MATSimNetwork.newUnidirectionalLinkId;
 import static gunnar.ihop2.transmodeler.networktransformation.Transmodeler2MATSimNetwork.unquote;
 import static java.lang.Double.parseDouble;
 import static java.lang.Integer.parseInt;
@@ -24,6 +25,10 @@ class TransmodelerSegmentsReader extends AbstractTabularFileHandler {
 	private final String idLabel = "ID";
 
 	private final String dirLabel = "Dir";
+
+	private final String abLabel = "AB";
+
+	private final String baLabel = "BA";
 
 	private final String linkLabel = "Link";
 
@@ -64,10 +69,12 @@ class TransmodelerSegmentsReader extends AbstractTabularFileHandler {
 	// -------------------- INTERNALS --------------------
 
 	private void addSegment(final String bidirectionalSegmentId,
-			final String bidirectionalLinkId, final DIR dir, final int lanes,
+			final String bidirectionalLinkId, final DIR dir,
+			final String abDir, final String baDir, final int lanes,
 			final double length, final int position) {
-		final TransmodelerLink link = this.linkId2link.get(newUnidirectionalId(
-				bidirectionalLinkId, dir));
+		final TransmodelerLink link = this.linkId2link
+				.get(newUnidirectionalLinkId(bidirectionalLinkId, dir, abDir,
+						baDir));
 		if (link == null) {
 			this.ignoredSegmentCnt++;
 			System.out.println("ignored segment: " + bidirectionalSegmentId);
@@ -97,17 +104,21 @@ class TransmodelerSegmentsReader extends AbstractTabularFileHandler {
 		final int position = parseInt(row[this.index(this.positionLabel)]);
 		final double length = parseDouble(row[this.index(this.lengthLabel)]);
 		final String dir = row[this.index(this.dirLabel)];
+		final String ab = unquote(row[this.index(this.abLabel)]);
+		final String ba = unquote(row[this.index(this.baLabel)]);
 
 		if ("1".equals(dir) || "0".equals(dir)) {
 			this.addSegment(bidirectionalSegmentId, bidirectionalLinkId,
-					DIR.AB, parseInt(row[this.index(this.lanesAbLabel)]),
-					length, position);
+					DIR.AB, ab, ba,
+					parseInt(row[this.index(this.lanesAbLabel)]), length,
+					position);
 		}
 
 		if ("-1".equals(dir) || "0".equals(dir)) {
 			this.addSegment(bidirectionalSegmentId, bidirectionalLinkId,
-					DIR.BA, parseInt(row[this.index(this.lanesBaLabel)]),
-					length, position);
+					DIR.BA, ab, ba,
+					parseInt(row[this.index(this.lanesBaLabel)]), length,
+					position);
 		}
 	}
 }

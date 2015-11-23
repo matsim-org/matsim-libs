@@ -19,11 +19,11 @@
  * *********************************************************************** */
 package eu.eunoiaproject.bikesharing.framework.scenario;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Default implementation of a bike sharing facility.

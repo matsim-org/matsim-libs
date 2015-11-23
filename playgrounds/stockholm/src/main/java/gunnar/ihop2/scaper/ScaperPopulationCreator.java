@@ -4,6 +4,9 @@ import floetteroed.utilities.Time;
 import gunnar.ihop2.regent.demandreading.ShapeUtils;
 import gunnar.ihop2.regent.demandreading.Zone;
 
+import java.io.File;
+import java.util.logging.Logger;
+
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
@@ -101,20 +104,34 @@ public class ScaperPopulationCreator extends AbstractPopulationCreator {
 
 	public ScaperPopulationCreator(final String networkFileName,
 			final String zoneShapeFileName, final String zonalCoordinateSystem,
-			final String populationFileName) {
-		super(networkFileName, zoneShapeFileName, zonalCoordinateSystem,
-				populationFileName);
-		try {
-			final SAXParserFactory factory = SAXParserFactory.newInstance();
-			factory.setValidating(false);
-			factory.setNamespaceAware(false);
-			final SAXParser parser = factory.newSAXParser();
-			final XMLReader reader = parser.getXMLReader();
-			reader.setContentHandler(this);
-			reader.parse(populationFileName);
-		} catch (Exception e) {
-			throw new RuntimeException(e);
+			final String populationFileNamePrefix) {
+		super(networkFileName, zoneShapeFileName, zonalCoordinateSystem);
+
+		final File populationFolder = new File(populationFileNamePrefix);
+		for (File file : populationFolder.listFiles()) {
+			if (file.getName().startsWith("population")) {
+				final String populationFileName = file.getAbsolutePath();
+				Logger.getLogger(this.getClass().getName()).info(
+						"Loading population file " + populationFileName);
+				try {
+					final SAXParserFactory factory = SAXParserFactory
+							.newInstance();
+					factory.setValidating(false);
+					factory.setNamespaceAware(false);
+					final SAXParser parser = factory.newSAXParser();
+					final XMLReader reader = parser.getXMLReader();
+					reader.setContentHandler(this);
+					reader.parse(populationFileName);
+				} catch (Exception e) {
+					throw new RuntimeException(e);
+				}
+				Logger.getLogger(this.getClass().getName()).info(
+						"Total number of persons loaded: "
+								+ this.scenario.getPopulation().getPersons()
+										.size());
+			}
 		}
+
 	}
 
 	// -------------------- OVERRIDING OF DefaultHandler --------------------
@@ -151,9 +168,8 @@ public class ScaperPopulationCreator extends AbstractPopulationCreator {
 
 			final Zone zone = this.zonalSystem.getZone(attrs
 					.getValue(ZONE_ATTRIBUTE));
-			final Coord coord = this.zone2popCoordTrafo
-					.transform(ShapeUtils.drawPointFromGeometry(zone
-							.getGeometry()));
+			final Coord coord = this.zone2popCoordTrafo.transform(ShapeUtils
+					.drawPointFromGeometry(zone.getGeometry()));
 			final Activity act = this.scenario
 					.getPopulation()
 					.getFactory()
@@ -209,7 +225,6 @@ public class ScaperPopulationCreator extends AbstractPopulationCreator {
 				networkFileName, zonesShapeFileName, "WGS84_EPSG3857",
 				populationFileName);
 
-		
 		PopulationWriter popwriter = new PopulationWriter(
 				reader.scenario.getPopulation(), null);
 		popwriter.write(plansFileName);

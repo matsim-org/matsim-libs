@@ -16,18 +16,11 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.maxess.nestedlogitaccessibility;
-
-import java.util.ArrayList;
-import java.util.Collection;
+package playground.thibautd.maxess.nestedlogitaccessibility.scripts;
 
 /**
- * if other use cases, might be transformed to an interface
+ * @author thibautd
  */
-public class NestedChoiceSet {
-	private final Collection<Nest> nests = new ArrayList<>();
-
-	public Collection<Nest> getNests() {
-		return nests;
-	}
+public enum ModeNests {
+	car, pt, bike, walk;
 }
