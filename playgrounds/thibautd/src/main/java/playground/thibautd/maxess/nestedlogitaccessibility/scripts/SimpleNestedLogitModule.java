@@ -44,8 +44,10 @@ public class SimpleNestedLogitModule extends AbstractModule {
 
 	@Override
 	protected void configure() {
-		bind( new TypeLiteral<Utility<ModeNests>>() {} ).to( SimpleNestedLogitModelUtility.class );
-		bind( new TypeLiteral<ChoiceSetIdentifier<ModeNests>>() {} ).to( SimpleNestedLogitModelChoiceSetIdentifier.class );
+		bind( new TypeLiteral<Utility<ModeNests>>() {} )
+				.to( SimpleNestedLogitModelUtility.class );
+		bind( new TypeLiteral<ChoiceSetIdentifier<ModeNests>>() {} )
+				.to( SimpleNestedLogitModelChoiceSetIdentifier.class );
 	}
 
 	@Provides
