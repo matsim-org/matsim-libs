@@ -39,7 +39,7 @@ import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 
-import playground.agarwalamit.mixedTraffic.patnaIndia.PatnaConstants;
+import playground.agarwalamit.mixedTraffic.patnaIndia.PatnaUtils;
 import playground.andreas.utils.net.NetworkSimplifier;
 /**
  * @author amit
@@ -60,7 +60,7 @@ public class PatnaNetworkGenerator {
 		scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());                                       
 		final Network network = scenario.getNetwork();
 
-		String inputFileNetwork    =  PatnaConstants.inputFilesDir+"/networkInputTransCad.csv" ;
+		String inputFileNetwork    =  PatnaUtils.INPUT_FILES_DIR+"/networkInputTransCad.csv" ;
 
 		TabularFileParserConfig tabularFileParserConfig = new TabularFileParserConfig();       
 		tabularFileParserConfig.setFileName(inputFileNetwork);
@@ -93,7 +93,7 @@ public class PatnaNetworkGenerator {
 					double xcord = ((Double.parseDouble(fromNodeXCoord))/(1000000));				
 					double ycord = ((Double.parseDouble(fromNodeYCoord))/(1000000));
 					Coord createCoord = new Coord(xcord, ycord);
-					fromNode = network.getFactory().createNode(fromNodeId, PatnaConstants.COORDINATE_TRANSFORMATION.transform( createCoord));
+					fromNode = network.getFactory().createNode(fromNodeId, PatnaUtils.COORDINATE_TRANSFORMATION.transform( createCoord));
 					network.addNode(fromNode);
 				}
 
@@ -106,7 +106,7 @@ public class PatnaNetworkGenerator {
 					double xcord = ((Double.parseDouble(toNodeXCoord))/(1000000));
 					double ycord = ((Double.parseDouble(toNodeYCoord))/(1000000));
 					Coord createCoord = new Coord(xcord, ycord);
-					toNode = network.getFactory().createNode(toNodeId, PatnaConstants.COORDINATE_TRANSFORMATION.transform(createCoord) );
+					toNode = network.getFactory().createNode(toNodeId, PatnaUtils.COORDINATE_TRANSFORMATION.transform(createCoord) );
 					network.addNode(toNode);
 				}
 
@@ -140,14 +140,14 @@ public class PatnaNetworkGenerator {
 				link1.setCapacity(capacityOfLink(widthOfRoad));
 				link1.setNumberOfLanes(numberoflanes);
 				link1.setLength(linkLength);
-				link1.setAllowedModes(new HashSet<>(PatnaConstants.allModes));
+				link1.setAllowedModes(new HashSet<>(PatnaUtils.ALL_MODES));
 				network.addLink(link1);
 
 				link2.setFreespeed(freeSpeedInMPS);
 				link2.setCapacity(capacityOfLink(widthOfRoad));
 				link2.setNumberOfLanes(numberoflanes);
 				link2.setLength(linkLength);
-				link2.setAllowedModes(new HashSet<>(PatnaConstants.allModes));
+				link2.setAllowedModes(new HashSet<>(PatnaUtils.ALL_MODES));
 				network.addLink(link2);
 			}
 		};

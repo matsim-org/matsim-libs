@@ -44,8 +44,8 @@ import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Point;
 
-import playground.agarwalamit.mixedTraffic.patnaIndia.PatnaConstants;
-import playground.agarwalamit.mixedTraffic.patnaIndia.PatnaConstants.PatnaActivityTypes;
+import playground.agarwalamit.mixedTraffic.patnaIndia.PatnaUtils;
+import playground.agarwalamit.mixedTraffic.patnaIndia.PatnaUtils.PatnaActivityTypes;
 import playground.agarwalamit.utils.GeometryUtils;
 /**
  * @author amit
@@ -57,7 +57,7 @@ public class PatnaUrbanDemandGenerator {
 	}
 
 	private  final Logger logger = Logger.getLogger(PatnaUrbanDemandGenerator.class);
-	private final String zoneFile = PatnaConstants.inputFilesDir+"/wardFile/Wards.shp";	
+	private final String zoneFile = PatnaUtils.INPUT_FILES_DIR+"/wardFile/Wards.shp";	
 	private final int ID1 =0;				
 	private final int ID2 = 100000;
 	private final int ID3= 200000;
@@ -68,15 +68,15 @@ public class PatnaUrbanDemandGenerator {
 	private Collection<SimpleFeature> features ;
 
 	public static void main (String []args) {
-		new PatnaUrbanDemandGenerator(PatnaConstants.inputFilesDir).startProcessingAndWritePlans();
+		new PatnaUrbanDemandGenerator(PatnaUtils.INPUT_FILES_DIR).startProcessingAndWritePlans();
 	}
 
 	public void startProcessingAndWritePlans() {
 		this.features = readZoneFilesAndReturnFeatures();
 
-		String planFile1 = PatnaConstants.inputFilesDir+"/Urban_PlanFile.CSV"; // urban plans for all zones except 27 to 42.
-		String planFile2 = PatnaConstants.inputFilesDir+"/27TO42zones.CSV";// urban plans for zones 27 to 42
-		String planFile3 = PatnaConstants.inputFilesDir+"/Slum_PlanFile.CSV";	
+		String planFile1 = PatnaUtils.INPUT_FILES_DIR+"/Urban_PlanFile.CSV"; // urban plans for all zones except 27 to 42.
+		String planFile2 = PatnaUtils.INPUT_FILES_DIR+"/27TO42zones.CSV";// urban plans for zones 27 to 42
+		String planFile3 = PatnaUtils.INPUT_FILES_DIR+"/Slum_PlanFile.CSV";	
 
 		Config config = ConfigUtils.createConfig();
 		scenario = ScenarioUtils.createScenario(config);
@@ -125,12 +125,12 @@ public class PatnaUrbanDemandGenerator {
 						if(fromZoneId.equals(zoneId) ) {
 							p = GeometryUtils.getRandomPointsFromWard(feature);
 							Coord fromZoneCoord = new Coord(p.getX(), p.getY());
-							homeZoneCoordTransform = PatnaConstants.COORDINATE_TRANSFORMATION.transform(fromZoneCoord);
+							homeZoneCoordTransform = PatnaUtils.COORDINATE_TRANSFORMATION.transform(fromZoneCoord);
 						}
 						else if (toZoneId.equals(zoneId)){
 							q = GeometryUtils.getRandomPointsFromWard(feature);
 							Coord toZoneCoord = new Coord(q.getX(), q.getY());
-							workZoneCoordTransform= PatnaConstants.COORDINATE_TRANSFORMATION.transform(toZoneCoord);
+							workZoneCoordTransform= PatnaUtils.COORDINATE_TRANSFORMATION.transform(toZoneCoord);
 						}
 					}
 				} else if (fromZoneId.equals(toZoneId)) {
@@ -141,11 +141,11 @@ public class PatnaUrbanDemandGenerator {
 
 						p = GeometryUtils.getRandomPointsFromWard(feature);
 						Coord fromZoneCoord = new Coord(p.getX(), p.getY());
-						homeZoneCoordTransform = PatnaConstants.COORDINATE_TRANSFORMATION.transform(fromZoneCoord);
+						homeZoneCoordTransform = PatnaUtils.COORDINATE_TRANSFORMATION.transform(fromZoneCoord);
 
 						q = GeometryUtils.getRandomPointsFromWard(feature);
 						Coord toZoneCoord = new Coord(q.getX(), q.getY());
-						workZoneCoordTransform= PatnaConstants.COORDINATE_TRANSFORMATION.transform(toZoneCoord);
+						workZoneCoordTransform= PatnaUtils.COORDINATE_TRANSFORMATION.transform(toZoneCoord);
 					}
 				}
 
