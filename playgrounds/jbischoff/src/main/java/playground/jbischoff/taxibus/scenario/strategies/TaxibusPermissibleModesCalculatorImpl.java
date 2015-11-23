@@ -17,72 +17,55 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jbischoff.taxibus.optimizer.fifo.Lines;
+package playground.jbischoff.taxibus.scenario.strategies;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.population.algorithms.PermissibleModesCalculator;
 
-import playground.jbischoff.taxibus.passenger.TaxibusRequest;
+import playground.jbischoff.taxibus.optimizer.fifo.Lines.LineDispatcher;
 
 /**
  * @author  jbischoff
  *
  */
+public class TaxibusPermissibleModesCalculatorImpl implements PermissibleModesCalculator {
 
-public interface TaxibusLine {
+	private final LineDispatcher dispatcher;
+	private List<String> availableModes;
+	
+	public TaxibusPermissibleModesCalculatorImpl(String[] availableModes, LineDispatcher dispatcher) {
+		this.availableModes = Arrays.asList(availableModes);
+		if (!this.availableModes.contains("taxibus")){
+			this.availableModes.remove("taxibus");
+		}
+		this.dispatcher = dispatcher;
+	}
+	
+	@Override
+	public Collection<String> getPermissibleModes(Plan plan) {
+		boolean isServedByTaxibus = true;
+		for (PlanElement pe : plan.getPlanElements()){
+			if (pe instanceof Activity){
+				Activity act = (Activity) pe;
+				if (!dispatcher.coordIsServedByLine(act.getCoord())){
+					isServedByTaxibus = false;
+					break;
+				} 
+			}
+		}
+		List<String> allModes = new ArrayList<>();
+		allModes.addAll(availableModes);
+		if (isServedByTaxibus){
+			allModes.add("taxibus");
+		}
+		return allModes;
+	}
 
-	public Id<TaxibusLine> getId();
-
-	public Id<TaxibusLine> getReturnRouteId();
-	
-	public void setReturnRouteId(Id<TaxibusLine> id);
-	
-	/**
-	 * @return Lambda currently applicable
-	 */
-	public double getCurrentLambda();
-	
-	
-	
-	/**
-	 * @param time 
-	 * @return Lambda for defined time
-	 */
-	public double getLambda(double time);
-	
-	public double getCurrentOccupationRate();
-	
-	
-	/**
-	 * @return the Link's id where busses are stowed prior to dispatch
-	 */
-	public Id<Link> getHoldingPosition();
-	
-	
-	/**
-	 * @return expected TravelTime for a Single Trip w/o drop offs or pick ups
-	 */
-	public double getSingleTripTravelTime();
-	
-	
-	/**
-	 * @return maximum time spent on collecting passengers after initial dispatch
-	 */
-	public double getCurrentTwMax();
-	
-	public void addVehicleToHold(Vehicle veh);
-	
-	public boolean removeVehicleFromHold(Vehicle veh);
-	
-	public Vehicle getNextEmptyVehicle();
-	
-	public boolean lineServesRequest(TaxibusRequest request);
-	
-	public boolean lineCoversCoordinate(Coord coord);
-	
-	
 }

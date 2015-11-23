@@ -17,72 +17,42 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jbischoff.taxibus.optimizer.fifo.Lines;
+package playground.jbischoff.taxibus.scenario.strategies;
 
 import java.util.Collection;
 
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Plan;
 
-import playground.jbischoff.taxibus.passenger.TaxibusRequest;
+import playground.jbischoff.taxibus.optimizer.fifo.Lines.LineDispatcher;
 
 /**
  * @author  jbischoff
  *
  */
+public class TaxibusAndWOBScenarioPermissibleModesCalculator extends TaxibusPermissibleModesCalculatorImpl {
 
-public interface TaxibusLine {
+	private final Scenario scenario;
+	
+	public TaxibusAndWOBScenarioPermissibleModesCalculator(String[] availableModes, LineDispatcher dispatcher, Scenario scenario) {
+		super(availableModes, dispatcher);
+		this.scenario = scenario;
+	}
+	
+	
+	@Override
+	public Collection<String> getPermissibleModes(Plan plan) {
+		Collection<String> permissibleModes = super.getPermissibleModes(plan);
+		String subpop = (String) scenario.getPopulation().getPersonAttributes().getAttribute(plan.getPerson().getId().toString(), "subpopulation");
+		if (subpop.equals("schedulePt")){
+			permissibleModes.remove("tpt");
+			
+		}
+		else if (subpop.equals("teleportPt")){
+			permissibleModes.remove("pt");
+		}
+		
+		return permissibleModes;
+	}
 
-	public Id<TaxibusLine> getId();
-
-	public Id<TaxibusLine> getReturnRouteId();
-	
-	public void setReturnRouteId(Id<TaxibusLine> id);
-	
-	/**
-	 * @return Lambda currently applicable
-	 */
-	public double getCurrentLambda();
-	
-	
-	
-	/**
-	 * @param time 
-	 * @return Lambda for defined time
-	 */
-	public double getLambda(double time);
-	
-	public double getCurrentOccupationRate();
-	
-	
-	/**
-	 * @return the Link's id where busses are stowed prior to dispatch
-	 */
-	public Id<Link> getHoldingPosition();
-	
-	
-	/**
-	 * @return expected TravelTime for a Single Trip w/o drop offs or pick ups
-	 */
-	public double getSingleTripTravelTime();
-	
-	
-	/**
-	 * @return maximum time spent on collecting passengers after initial dispatch
-	 */
-	public double getCurrentTwMax();
-	
-	public void addVehicleToHold(Vehicle veh);
-	
-	public boolean removeVehicleFromHold(Vehicle veh);
-	
-	public Vehicle getNextEmptyVehicle();
-	
-	public boolean lineServesRequest(TaxibusRequest request);
-	
-	public boolean lineCoversCoordinate(Coord coord);
-	
-	
 }

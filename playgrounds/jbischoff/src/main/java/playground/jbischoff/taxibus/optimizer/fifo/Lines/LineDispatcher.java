@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
@@ -94,6 +95,13 @@ public class LineDispatcher implements ActivityStartEventHandler {
 
 			}
 		}
+	}
+	public boolean coordIsServedByLine(Coord coord){
+		for (TaxibusLine line : this.lines.values()){
+			if (line.lineCoversCoordinate(coord)) return true;
+		}
+		
+		return false;
 	}
 
 }
