@@ -54,10 +54,16 @@ public class NestedLogitAccessibilityCalculator<N extends Enum<N>> {
 
 		log.info( "Compute accessibility for "+population.getPersons().size()+" persons" );
 		final Counter counter = new Counter( "Compute accessibility for person # " );
+		final Counter emptyCounter = new Counter( "Ignore empty plan # " );
 		for ( Person p : population.getPersons().values() ) {
 			counter.incCounter();
+			if ( p.getPlans().isEmpty() || p.getSelectedPlan().getPlanElements().isEmpty() ) {
+				emptyCounter.incCounter();
+				continue;
+			}
 			accessibilities.put( p.getId(), computeAccessibility( p ) );
 		}
+		emptyCounter.printCounter();
 		counter.printCounter();
 
 		return accessibilities;
