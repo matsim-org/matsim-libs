@@ -20,8 +20,6 @@
 
 package playground.kai.otfvis;
 
-import com.google.inject.Provider;
-
 import javax.inject.Inject;
 
 import org.matsim.api.core.v01.Scenario;
@@ -29,21 +27,29 @@ import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.contrib.otfvis.OTFVisFileWriterModule;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigReader;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
-import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.mobsim.framework.MobsimFactory;
+import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
+import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.vis.otfvis.OTFClientLive;
-import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 
-public class TransitControler {
+public class TransitControler2 {
+
+	private static class OTFVisMobsimListener implements MobsimInitializedListener{
+		@Inject Scenario scenario ;
+		@Inject EventsManager events ;
+		@Override 
+		public void notifyMobsimInitialized(MobsimInitializedEvent e) {
+			QSim qsim = (QSim) e.getQueueSimulation() ; 
+			OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim( scenario.getConfig(), scenario, events, qsim);
+			OTFClientLive.run(scenario.getConfig(), server);
+		}
+	}
 
 	private static boolean useTransit = true ;
 	private static boolean useOTFVis = true ;
@@ -77,33 +83,35 @@ public class TransitControler {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				bindMobsim().toProvider(new Provider<Mobsim>() {
-					@Inject EventsManager events ;
-					@Inject Scenario scenario ;
-					@Override
-					public Mobsim get() {
-						QSim qSim = QSimUtils.createDefaultQSim(scenario, events);
-
-						if ( TransitControler.useOTFVis ) {
-							// otfvis configuration.  There is more you can do here than via file!
-							final OTFVisConfigGroup otfVisConfig = ConfigUtils.addOrGetModule(qSim.getScenario().getConfig(), OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class);
-							otfVisConfig.setDrawTransitFacilities(false) ; // this DOES work
-							otfVisConfig.setAgentSize((float) 120.);
-							//				otfVisConfig.setShowParking(true) ; // this does not really work
-							//				otfVisConfig.setColoringScheme(OTFVisConfigGroup.ColoringScheme.bvg) ;
-							//				otfVisConfig.setShowTeleportedAgents(true) ;
-
-							OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, qSim);
-							OTFClientLive.run(scenario.getConfig(), server);
-						}
-						//			if(this.useHeadwayControler){
-						//				simulation.getQSimTransitEngine().setAbstractTransitDriverFactory(new FixedHeadwayCycleUmlaufDriverFactory());
-						//				this.events.addHandler(new FixedHeadwayControler(simulation));		
-						//			}
-
-						return qSim ;
-					}
-				});
+				this.addMobsimListenerBinding().to( OTFVisMobsimListener.class ) ;
+				
+//				bindMobsim().toProvider(new Provider<Mobsim>() {
+//					@Inject EventsManager events ;
+//					@Inject Scenario scenario ;
+//					@Override
+//					public Mobsim get() {
+//						QSim qSim = QSimUtils.createDefaultQSim(scenario, events);
+//
+//						if ( TransitControler2.useOTFVis ) {
+//							// otfvis configuration.  There is more you can do here than via file!
+//							final OTFVisConfigGroup otfVisConfig = ConfigUtils.addOrGetModule(qSim.getScenario().getConfig(), OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class);
+//							otfVisConfig.setDrawTransitFacilities(false) ; // this DOES work
+//							otfVisConfig.setAgentSize((float) 120.);
+//							//				otfVisConfig.setShowParking(true) ; // this does not really work
+//							//				otfVisConfig.setColoringScheme(OTFVisConfigGroup.ColoringScheme.bvg) ;
+//							//				otfVisConfig.setShowTeleportedAgents(true) ;
+//
+//							OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, qSim);
+//							OTFClientLive.run(scenario.getConfig(), server);
+//						}
+//						//			if(this.useHeadwayControler){
+//						//				simulation.getQSimTransitEngine().setAbstractTransitDriverFactory(new FixedHeadwayCycleUmlaufDriverFactory());
+//						//				this.events.addHandler(new FixedHeadwayControler(simulation));		
+//						//			}
+//
+//						return qSim ;
+//					}
+//				});
 			}
 		});
 		controler.addOverridingModule(new OTFVisFileWriterModule());
@@ -112,6 +120,4 @@ public class TransitControler {
 		controler.run();
 	}
 
-	static class MyMobsimFactory  {
-	}
 }

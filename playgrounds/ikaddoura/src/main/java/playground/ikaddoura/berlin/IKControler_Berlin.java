@@ -27,7 +27,7 @@ package playground.ikaddoura.berlin;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
-import org.matsim.contrib.otfvis.OTFVisModule;
+import org.matsim.contrib.otfvis.OTFVisFileWriterModule;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -65,7 +65,7 @@ public class IKControler_Berlin {
 		Controler controler = new Controler(configFile);
 		controler.getConfig().controler().setOverwriteFileSetting(
 				OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
-		controler.addOverridingModule(new OTFVisModule());
+		controler.addOverridingModule(new OTFVisFileWriterModule());
 		
 		ActivityParams transitActivityParams = new ActivityParams(PtConstants.TRANSIT_ACTIVITY_TYPE);
 		transitActivityParams.setTypicalDuration(120.0);
