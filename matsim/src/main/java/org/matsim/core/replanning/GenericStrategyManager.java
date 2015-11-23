@@ -51,16 +51,16 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
  */
 public class GenericStrategyManager<T extends BasicPlan, I> implements MatsimManager {
 	private static final Logger log =
-		Logger.getLogger(GenericStrategyManager.class);
+			Logger.getLogger(GenericStrategyManager.class);
 
 
 	static class StrategyWeights<T extends BasicPlan, I> {
-		 final List<GenericPlanStrategy<T, I>> strategies = new ArrayList<>();
-		 final List<GenericPlanStrategy<T, I>> unmodifiableStrategies = Collections.unmodifiableList( strategies );
-		 final List<Double> weights = new ArrayList<>();
-		 final List<Double> unmodifiableWeights = Collections.unmodifiableList(weights);
-		 double totalWeights = 0.0;
-		 final Map<Integer, Map<GenericPlanStrategy<T, I>, Double>> changeRequests = new TreeMap<>();
+		final List<GenericPlanStrategy<T, I>> strategies = new ArrayList<>();
+		final List<GenericPlanStrategy<T, I>> unmodifiableStrategies = Collections.unmodifiableList( strategies );
+		final List<Double> weights = new ArrayList<>();
+		final List<Double> unmodifiableWeights = Collections.unmodifiableList(weights);
+		double totalWeights = 0.0;
+		final Map<Integer, Map<GenericPlanStrategy<T, I>, Double>> changeRequests = new TreeMap<>();
 	}
 
 	private final Map<String, StrategyWeights<T, I>> weightsPerSubpopulation = new HashMap<>();
@@ -166,9 +166,9 @@ public class GenericStrategyManager<T extends BasicPlan, I> implements MatsimMan
 	 */
 	public final void run(
 			final Iterable<? extends HasPlansAndId<T, I>> persons,
-			ObjectAttributes subpopLookup,
-			final int iteration,
-			final ReplanningContext replanningContext ) {
+					ObjectAttributes subpopLookup,
+					final int iteration,
+					final ReplanningContext replanningContext ) {
 		handleChangeRequests(iteration);
 		run(persons, subpopLookup, replanningContext);
 	}
@@ -180,13 +180,13 @@ public class GenericStrategyManager<T extends BasicPlan, I> implements MatsimMan
 	 */
 	final void run(
 			final Iterable<? extends HasPlansAndId<T, I>> persons,
-			ObjectAttributes subPopLookup,
-			final ReplanningContext replanningContext) {
+					ObjectAttributes subPopLookup,
+					final ReplanningContext replanningContext) {
 
 		// initialize all strategies
-        for (GenericPlanStrategy<T, I> strategy : distinctStrategies()) {
-            strategy.init(replanningContext);
-        }
+		for (GenericPlanStrategy<T, I> strategy : distinctStrategies()) {
+			strategy.init(replanningContext);
+		}
 
 		// then go through the population and ...
 		for (HasPlansAndId<T, I> person : persons ) {
@@ -212,22 +212,22 @@ public class GenericStrategyManager<T extends BasicPlan, I> implements MatsimMan
 		}
 
 		// finally make sure all strategies have finished there work
-        for (GenericPlanStrategy<T, I> strategy : distinctStrategies()) {
-            strategy.finish();
-        }
+		for (GenericPlanStrategy<T, I> strategy : distinctStrategies()) {
+			strategy.finish();
+		}
 
 	}
 
-    private Collection<GenericPlanStrategy<T, I>> distinctStrategies() {
-        // Leaving out duplicate strategies in different subpopulations
-        Collection<GenericPlanStrategy<T, I>> strategies = new LinkedHashSet<>();
-        for (StrategyWeights<T, I> weights : weightsPerSubpopulation.values()) {
-            strategies.addAll(weights.strategies);
-        }
-        return strategies;
-    }
+	private Collection<GenericPlanStrategy<T, I>> distinctStrategies() {
+		// Leaving out duplicate strategies in different subpopulations
+		Collection<GenericPlanStrategy<T, I>> strategies = new LinkedHashSet<>();
+		for (StrategyWeights<T, I> weights : weightsPerSubpopulation.values()) {
+			strategies.addAll(weights.strategies);
+		}
+		return strategies;
+	}
 
-    private void removePlans(final HasPlansAndId<T, I> person, final int maxNumberOfPlans) {
+	private void removePlans(final HasPlansAndId<T, I> person, final int maxNumberOfPlans) {
 		while (person.getPlans().size() > maxNumberOfPlans) {
 			T plan = this.removalPlanSelector.selectPlan(person);
 			person.removePlan(plan);
