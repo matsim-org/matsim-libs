@@ -31,7 +31,7 @@ public class MyFirstControler {
 		
 		sc.getConfig().qsim().setLinkDynamics(LinkDynamics.PassingQ.toString());
 
-		PatnaUtils.storeVehicleTypeAndVehicle(sc);
+		PatnaUtils.createAndAddVehiclesToScenario(sc);
 
 		sc.getConfig().qsim().setTrafficDynamics(QSimConfigGroup.TrafficDynamics.withHoles);
 		

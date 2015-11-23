@@ -55,7 +55,12 @@ public final class PatnaUtils {
 	
 	private PatnaUtils(){} 
 	
-	public static void storeVehicleTypeAndVehicle(final Scenario scenario){
+	/**
+	 * @param scenario
+	 * It creates first vehicle types and add them to scenario and then create and add vehicles to the scenario.
+	 * <b> All modes are added to the scenario but PCUs are added only for main modes. 
+	 */
+	public static void createAndAddVehiclesToScenario(final Scenario scenario){
 		final Map<String, VehicleType> modesType = new HashMap<String, VehicleType>(); 
 		
 		for (String mode : PatnaUtils.MAIN_MODES){

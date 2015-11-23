@@ -142,7 +142,7 @@ public class PatnaSimulationTimeWriter {
 		config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.fromVehiclesData);
 		Scenario sc = ScenarioUtils.loadScenario(config);
 
-		PatnaUtils.storeVehicleTypeAndVehicle(sc);
+		PatnaUtils.createAndAddVehiclesToScenario(sc);
 
 		final Controler controler = new Controler(sc);
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
