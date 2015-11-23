@@ -37,7 +37,7 @@ import org.matsim.pt.PtConstants;
 public class CharyparNagelScoringParameters implements MatsimParameters {
 
 	public static class Mode {
-		private Mode(
+		public Mode(
 				double marginalUtilityOfTraveling_s,
 				double marginalUtilityOfDistance_m,
 				double monetaryDistanceCostRate,
