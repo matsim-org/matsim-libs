@@ -34,7 +34,7 @@ public class NoiseAnalysisTest {
 
 	private static final Logger log = Logger.getLogger(CongestionAnalysisTest.class);
 
-	private static final boolean printResults = true;
+	private static final boolean printResults = false;
 	
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 	
