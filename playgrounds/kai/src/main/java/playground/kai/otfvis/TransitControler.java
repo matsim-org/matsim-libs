@@ -27,6 +27,7 @@ import javax.inject.Inject;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.contrib.otfvis.OTFVisFileWriterModule;
+import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -49,7 +50,6 @@ public class TransitControler {
 	private static boolean useOTFVis = true ;
 
 	public static void main(final String[] args) {
-		//		args[0] = "/Users/nagel/kw/rotterdam/config.xml" ;
 		if ( args.length > 1 ) {
 			useOTFVis = Boolean.parseBoolean(args[1]) ;
 		}
@@ -63,7 +63,6 @@ public class TransitControler {
 		}
 
 		config.qsim().setVehicleBehavior( QSimConfigGroup.VehicleBehavior.teleport ) ;
-
 		//		config.otfVis().setShowTeleportedAgents(true) ;
 
 
@@ -74,44 +73,26 @@ public class TransitControler {
 		//		Logger.getLogger("main").warn("warning: using randomized pt router!!!!") ;
 		//		tc.addOverridingModule(new RandomizedTransitRouterModule());
 
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				bindMobsim().toProvider(new Provider<Mobsim>() {
-					@Inject EventsManager events ;
-					@Inject Scenario scenario ;
-					@Override
-					public Mobsim get() {
-						QSim qSim = QSimUtils.createDefaultQSim(scenario, events);
+		if ( useOTFVis ) {
 
-						if ( TransitControler.useOTFVis ) {
-							// otfvis configuration.  There is more you can do here than via file!
-							final OTFVisConfigGroup otfVisConfig = ConfigUtils.addOrGetModule(qSim.getScenario().getConfig(), OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class);
-							otfVisConfig.setDrawTransitFacilities(false) ; // this DOES work
-							otfVisConfig.setAgentSize((float) 120.);
-							//				otfVisConfig.setShowParking(true) ; // this does not really work
-							//				otfVisConfig.setColoringScheme(OTFVisConfigGroup.ColoringScheme.bvg) ;
-							//				otfVisConfig.setShowTeleportedAgents(true) ;
+			OTFVisConfigGroup otfconfig = ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class ) ;
+			// (this should also materialize material from a config.xml--? kai, nov'15)
+			
+			otfconfig.setDrawTransitFacilityIds(false);
+			otfconfig.setDrawTransitFacilities(false);
+			controler.addOverridingModule( new OTFVisLiveModule() );
+		}
 
-							OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, qSim);
-							OTFClientLive.run(scenario.getConfig(), server);
-						}
-						//			if(this.useHeadwayControler){
-						//				simulation.getQSimTransitEngine().setAbstractTransitDriverFactory(new FixedHeadwayCycleUmlaufDriverFactory());
-						//				this.events.addHandler(new FixedHeadwayControler(simulation));		
-						//			}
+		// the following is only possible when constructing the mobsim yourself:
+		//			if(this.useHeadwayControler){
+		//				simulation.getQSimTransitEngine().setAbstractTransitDriverFactory(new FixedHeadwayCycleUmlaufDriverFactory());
+		//				this.events.addHandler(new FixedHeadwayControler(simulation));		
+		//			}
 
-						return qSim ;
-					}
-				});
-			}
-		});
-		controler.addOverridingModule(new OTFVisFileWriterModule());
+//		controler.addOverridingModule(new OTFVisFileWriterModule());
 		//		tc.setCreateGraphs(false);
 
 		controler.run();
 	}
 
-	static class MyMobsimFactory  {
-	}
 }
