@@ -52,7 +52,6 @@ public class NetworkRouteForUncongestedModeTest {
 
 	final static String EQUIL_NETWORK = "../../matsim/examples/equil/network.xml";
 	final static String CONFIG = "../../matsim/examples/tutorial/programming/MultipleSubpopulations/config.xml";
-	static String OUTPUT ;
 
 	/**
 	 * Every link must allow car and ride mode if networkModes are car and ride. 
@@ -61,7 +60,7 @@ public class NetworkRouteForUncongestedModeTest {
 	@Test
 	public void testWithAllowedModesOnLink(){
 
-		OUTPUT = helper.getOutputDirectory();
+		String OUTPUT = helper.getOutputDirectory();
 
 		Scenario sc = createSceanrio();
 		sc.getConfig().controler().setOutputDirectory(OUTPUT);
@@ -110,12 +109,12 @@ public class NetworkRouteForUncongestedModeTest {
 		config.plansCalcRoute().getOrCreateModeRoutingParams("PT").setTeleportedModeSpeed (20/3.6);
 
 		{
-			StrategySettings reRoute = new StrategySettings(ConfigUtils.createAvailableStrategyId(config));
+			StrategySettings reRoute = new StrategySettings();
 			reRoute.setStrategyName(DefaultPlanStrategiesModule.DefaultStrategy.ReRoute.toString());
 			reRoute.setWeight(0.2);
 			config.strategy().addStrategySettings(reRoute);
 
-			StrategySettings changeExpBetaStrategySettings = new StrategySettings(ConfigUtils.createAvailableStrategyId(config));
+			StrategySettings changeExpBetaStrategySettings = new StrategySettings();
 			changeExpBetaStrategySettings.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta.toString());
 			changeExpBetaStrategySettings.setWeight(0.8);
 			config.strategy().addStrategySettings(changeExpBetaStrategySettings);

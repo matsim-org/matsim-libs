@@ -43,7 +43,6 @@ public class Replanning4SubPop {
 	final static String PLANS = "../../matsim/examples/tutorial/programming/MultipleSubpopulations/plans.xml";
 	final static String OBJECT_ATTRIBUTES = "../../matsim/examples/tutorial/programming/MultipleSubpopulations/personAtrributes.xml";
 	final static String CONFIG = "../../matsim/examples/tutorial/programming/MultipleSubpopulations/config.xml";
-	static String OUTPUT ;
 
 	private static final String SUBPOP_ATTRIB_NAME = "subpopulation";
 	private static final String SUBPOP1_NAME = "time";
@@ -52,7 +51,7 @@ public class Replanning4SubPop {
 	@Test
 	public void test(){
 		
-		OUTPUT = helper.getOutputDirectory();
+		String OUTPUT = helper.getOutputDirectory();
 		
 		{
 			Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -76,26 +75,26 @@ public class Replanning4SubPop {
 		{
 			/* Set up the 'time' subpopulation to only consider time allocation 
 			 * as a strategy, 20% of the time, and the balance using ChangeExpBeta. */
-			StrategySettings timeStrategySettings = new StrategySettings(ConfigUtils.createAvailableStrategyId(config));
+			StrategySettings timeStrategySettings = new StrategySettings();
 			timeStrategySettings.setStrategyName(DefaultPlanStrategiesModule.DefaultStrategy.TimeAllocationMutator.toString());
 			timeStrategySettings.setSubpopulation(SUBPOP1_NAME);
 			timeStrategySettings.setWeight(0.2);
 			config.strategy().addStrategySettings(timeStrategySettings);
 			
-			StrategySettings changeExpBetaStrategySettings = new StrategySettings(ConfigUtils.createAvailableStrategyId(config));
+			StrategySettings changeExpBetaStrategySettings = new StrategySettings();
 			changeExpBetaStrategySettings.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta.toString());
 			changeExpBetaStrategySettings.setSubpopulation(SUBPOP1_NAME);
 			changeExpBetaStrategySettings.setWeight(0.8);
 			config.strategy().addStrategySettings(changeExpBetaStrategySettings);
 		}
 		{
-			StrategySettings timeStrategySettings = new StrategySettings(ConfigUtils.createAvailableStrategyId(config));
+			StrategySettings timeStrategySettings = new StrategySettings();
 			timeStrategySettings.setStrategyName(DefaultPlanStrategiesModule.DefaultStrategy.TimeAllocationMutator.toString());
 			timeStrategySettings.setSubpopulation(SUBPOP2_NAME);
 			timeStrategySettings.setWeight(0.2);
 			config.strategy().addStrategySettings(timeStrategySettings);
 
-			StrategySettings changeExpBetaStrategySettings = new StrategySettings(ConfigUtils.createAvailableStrategyId(config));
+			StrategySettings changeExpBetaStrategySettings = new StrategySettings();
 			changeExpBetaStrategySettings.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta.toString());
 			changeExpBetaStrategySettings.setSubpopulation(SUBPOP2_NAME);
 			changeExpBetaStrategySettings.setWeight(0.8);
@@ -103,10 +102,7 @@ public class Replanning4SubPop {
 		}
 		
 		Controler controler = new Controler(config);
-		controler.getConfig().controler().setOverwriteFileSetting(
-				true ?
-						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		controler.run();
 	}
 }

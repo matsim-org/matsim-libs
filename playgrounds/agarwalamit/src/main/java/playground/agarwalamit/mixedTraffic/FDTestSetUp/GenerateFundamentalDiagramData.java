@@ -43,6 +43,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
@@ -517,7 +518,8 @@ public class GenerateFundamentalDiagramData {
 
 				for ( Id<Person> personId : person2Mode.keySet()) {
 					String travelMode = person2Mode.get(personId);
-					double actEndTime = (new Random().nextDouble())*900;
+					double randDouble = MatsimRandom.getRandom().nextDouble();
+					double actEndTime = randDouble*900;
 
 					MobsimAgent agent = new MySimplifiedRoundAndRoundAgent(personId, actEndTime, travelMode);
 					qSim.insertAgentIntoMobsim(agent);
