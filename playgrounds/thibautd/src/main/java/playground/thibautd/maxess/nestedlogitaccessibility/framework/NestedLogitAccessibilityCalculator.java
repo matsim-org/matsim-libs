@@ -26,6 +26,7 @@ import gnu.trove.map.TObjectDoubleMap;
 import gnu.trove.map.hash.TObjectDoubleHashMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.utils.misc.Counter;
@@ -40,7 +41,7 @@ import java.util.List;
 @Singleton
 public class NestedLogitAccessibilityCalculator<N extends Enum<N>> {
 	private static final Logger log = Logger.getLogger( NestedLogitAccessibilityCalculator.class );
-	private static final int N_THREADS = 10;
+	private final int nThreads;
 	// act as "measuring points", located at the coordinate of the first activity
 	private final Population population;
 	// "universal choice set"
@@ -50,11 +51,11 @@ public class NestedLogitAccessibilityCalculator<N extends Enum<N>> {
 
 	@Inject
 	public NestedLogitAccessibilityCalculator(
-			final Population population,
-			final ActivityFacilities facilities,
+			final Scenario scenario,
 			final Provider<NestedLogitModel<N>> model ) {
-		this.population = population;
-		this.facilities = facilities;
+		this.population = scenario.getPopulation();
+		this.facilities = scenario.getActivityFacilities();
+		this.nThreads = scenario.getConfig().global().getNumberOfThreads();
 		this.model = model;
 	}
 
@@ -63,7 +64,7 @@ public class NestedLogitAccessibilityCalculator<N extends Enum<N>> {
 		final ComputationThreadHandler<N> runner =
 				new ComputationThreadHandler<>(
 						model,
-						N_THREADS );
+						nThreads );
 		for ( Person p : population.getPersons().values() ) {
 			runner.addPerson( p );
 		}
