@@ -19,8 +19,6 @@
 package playground.thibautd.maxess.prepareforbiogeme.tripbased;
 
 import com.google.inject.Provider;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
@@ -29,7 +27,9 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
-import org.matsim.core.router.*;
+import org.matsim.core.router.StageActivityTypesImpl;
+import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
@@ -42,7 +42,6 @@ import playground.thibautd.router.CachingRoutingModuleWrapper;
 import playground.thibautd.router.TripSoftCache;
 import playground.thibautd.router.TripSoftCache.LocationType;
 import playground.thibautd.utils.MoreIOUtils;
-import playground.thibautd.utils.SoftCache;
 
 import java.io.File;
 import java.util.Collections;

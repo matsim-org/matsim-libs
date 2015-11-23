@@ -16,13 +16,42 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.maxess.nestedlogitaccessibility;
-
-import org.matsim.api.core.v01.population.Person;
+package playground.thibautd.maxess.nestedlogitaccessibility.framework;
 
 /**
  * @author thibautd
  */
-public interface ChoiceSetIdentifier {
-	NestedChoiceSet identifyChoiceSet( Person p );
+// making it generic and specifying the nests as enum might look (or be) more complicated than it should be,
+// but it allows to make different elements (utility or sampler) for the same nesting structure, and combine them safely.
+public class NestedLogitModel<N extends Enum<N>> {
+	private final double mu;
+	private final Utility<N> utility;
+	private final ChoiceSetIdentifier<N> choiceSetIdentifier;
+
+	public NestedLogitModel(
+			final Utility<N> utility,
+			final ChoiceSetIdentifier<N> choiceSetIdentifier ) {
+		this( 1 , utility , choiceSetIdentifier );
+	}
+
+	public NestedLogitModel(
+			final double mu,
+			final Utility<N> utility,
+			final ChoiceSetIdentifier<N> choiceSetIdentifier ) {
+		this.mu = mu;
+		this.utility = utility;
+		this.choiceSetIdentifier = choiceSetIdentifier;
+	}
+
+	public ChoiceSetIdentifier<N> getChoiceSetIdentifier() {
+		return choiceSetIdentifier;
+	}
+
+	public double getMu() {
+		return mu;
+	}
+
+	public Utility<N> getUtility() {
+		return utility;
+	}
 }

@@ -20,7 +20,6 @@
 package eu.eunoiaproject.bikesharing.framework.analysis;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;

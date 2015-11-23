@@ -24,7 +24,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.socnetsim.utils.CollectionUtils;
 import org.matsim.core.utils.collections.MapUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.utils.objectattributes.ObjectAttributes;
@@ -32,7 +31,6 @@ import playground.thibautd.maxess.prepareforbiogeme.framework.ChoiceDataSetWrite
 import playground.thibautd.maxess.prepareforbiogeme.framework.ChoiceSet;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.TreeMap;

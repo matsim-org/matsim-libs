@@ -19,11 +19,6 @@
  * *********************************************************************** */
 package playground.thibautd.hitchiking.qsim;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -42,10 +37,14 @@ import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.facilities.Facility;
-
 import playground.thibautd.hitchiking.HitchHikingConstants;
 import playground.thibautd.hitchiking.population.HitchHikingDriverRoute;
 import playground.thibautd.hitchiking.qsim.events.PassengerDepartsWithDriverEvent;
+
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Handler for the driver mode.

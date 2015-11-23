@@ -19,9 +19,9 @@
  * *********************************************************************** */
 package eu.eunoiaproject.bikesharing.framework.scenario;
 
-import java.util.Arrays;
-import java.util.Map;
-
+import eu.eunoiaproject.bikesharing.framework.BikeSharingConstants;
+import eu.eunoiaproject.bikesharing.framework.router.BikeSharingTripRouterModule;
+import eu.eunoiaproject.bikesharing.framework.router.TransitMultiModalAccessRoutingModule.RoutingData;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -33,25 +33,24 @@ import org.matsim.contrib.socnetsim.utils.CollectionUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.RouteFactory;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
+import playground.thibautd.router.multimodal.AccessEgressMultimodalTripRouterModule;
+import playground.thibautd.router.multimodal.AccessEgressNetworkBasedTeleportationRoute;
+import playground.thibautd.router.multimodal.AccessEgressNetworkBasedTeleportationRouteFactory;
+import playground.thibautd.router.multimodal.LinkSlopeScorer;
+import playground.thibautd.router.multimodal.SlopeAwareTravelDisutilityFactory;
 
-import eu.eunoiaproject.bikesharing.framework.BikeSharingConstants;
-import eu.eunoiaproject.bikesharing.framework.router.BikeSharingTripRouterModule;
-import eu.eunoiaproject.bikesharing.framework.router.TransitMultiModalAccessRoutingModule.RoutingData;
-import playground.thibautd.router.multimodal.*;
+import java.util.Arrays;
+import java.util.Map;
 
 /**
  * Provides helper methods to load a bike sharing scenario.

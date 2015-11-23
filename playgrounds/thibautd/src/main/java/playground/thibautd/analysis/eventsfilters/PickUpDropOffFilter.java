@@ -19,9 +19,6 @@
  * *********************************************************************** */
 package playground.thibautd.analysis.eventsfilters;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
@@ -30,13 +27,15 @@ import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.events.handler.BasicEventHandler;
 
-import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author thibautd

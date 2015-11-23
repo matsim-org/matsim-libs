@@ -19,11 +19,6 @@
  * *********************************************************************** */
 package playground.thibautd.analysis.spacetimeprismjoinabletrips;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Iterator;
-import java.util.List;
-
 import org.apache.log4j.FileAppender;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -41,8 +36,12 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Counter;
-
 import playground.thibautd.analysis.spacetimeprismjoinabletrips.TripsPrism.PassengerRecord;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * @author thibautd

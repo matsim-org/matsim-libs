@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package playground.thibautd.router.replanning;
 
+import org.matsim.contrib.socnetsim.framework.replanning.modules.BlackListedTimeAllocationMutator;
+import org.matsim.contrib.socnetsim.framework.replanning.modules.BlackListedTimeAllocationMutator.Setting;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.controler.Controler;
@@ -27,9 +29,6 @@ import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripRouter;
 import org.matsim.population.algorithms.PlanAlgorithm;
-
-import org.matsim.contrib.socnetsim.framework.replanning.modules.BlackListedTimeAllocationMutator;
-import org.matsim.contrib.socnetsim.framework.replanning.modules.BlackListedTimeAllocationMutator.Setting;
 
 /**
  * @author thibautd
