@@ -19,6 +19,7 @@
 package playground.thibautd.maxess.nestedlogitaccessibility.framework;
 
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import gnu.trove.list.array.TDoubleArrayList;
 import gnu.trove.map.TObjectDoubleMap;
@@ -30,73 +31,153 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.facilities.ActivityFacilities;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author thibautd
  */
 @Singleton
 public class NestedLogitAccessibilityCalculator<N extends Enum<N>> {
 	private static final Logger log = Logger.getLogger( NestedLogitAccessibilityCalculator.class );
+	private static final int N_THREADS = 10;
 	// act as "measuring points", located at the coordinate of the first activity
 	private final Population population;
 	// "universal choice set"
 	private final ActivityFacilities facilities;
 
-	private final NestedLogitModel<N> model;
+	private final Provider<NestedLogitModel<N>> model;
 
 	@Inject
 	public NestedLogitAccessibilityCalculator(
 			final Population population,
 			final ActivityFacilities facilities,
-			final NestedLogitModel<N> model ) {
+			final Provider<NestedLogitModel<N>> model ) {
 		this.population = population;
 		this.facilities = facilities;
 		this.model = model;
 	}
 
 	public TObjectDoubleMap<Id<Person>> computeAccessibilities() {
-		final TObjectDoubleMap<Id<Person>> accessibilities = new TObjectDoubleHashMap<>( );
-
 		log.info( "Compute accessibility for "+population.getPersons().size()+" persons" );
+		final ComputationThreadHandler<N> runner =
+				new ComputationThreadHandler<>(
+						model,
+						N_THREADS );
+		for ( Person p : population.getPersons().values() ) {
+			runner.addPerson( p );
+		}
+
+		return runner.run();
+	}
+
+	private static class ComputationThreadHandler<N extends Enum<N>> {
+		private List<ComputationRunnable<N>> runnables;
+		private int n = 0;
+
 		final Counter counter = new Counter( "Compute accessibility for person # " );
 		final Counter emptyCounter = new Counter( "Ignore empty plan # " );
-		for ( Person p : population.getPersons().values() ) {
-			counter.incCounter();
-			if ( p.getPlans().isEmpty() || p.getSelectedPlan().getPlanElements().isEmpty() ) {
-				emptyCounter.incCounter();
-				continue;
+
+		public ComputationThreadHandler(
+				final Provider<NestedLogitModel<N>> models,
+				final int nThreads ) {
+			this.runnables = new ArrayList<>( nThreads );
+
+			for ( int i = 0; i < nThreads; i++ ) {
+				runnables.add(
+						new ComputationRunnable<>(
+								models.get(),
+								counter,
+								emptyCounter ) );
 			}
-			accessibilities.put( p.getId(), computeAccessibility( p ) );
-		}
-		emptyCounter.printCounter();
-		counter.printCounter();
-
-		return accessibilities;
-	}
-
-	private double computeAccessibility( Person p ) {
-		final NestedChoiceSet<N> choiceSet = model.getChoiceSetIdentifier().identifyChoiceSet( p );
-
-		final LogSumExpCalculator calculator = new LogSumExpCalculator( choiceSet.getNests().size() );
-		for ( Nest<N> nest : choiceSet.getNests() ) {
-			calculator.addTerm( logSumNestUtilities( p , nest ) );
 		}
 
-		return calculator.computeLogsumExp() / model.getMu();
-	}
-
-	private double logSumNestUtilities(
-			final Person p,
-			final Nest<N> nest ) {
-		final LogSumExpCalculator calculator = new LogSumExpCalculator( nest.getAlternatives().size() );
-		for ( Alternative<N> alternative : nest.getAlternatives() ) {
-			calculator.addTerm( nest.getMu_n() *
-							model.getUtility().calcUtility(
-								p,
-								alternative ) );
+		public void addPerson( final Person p ) {
+			runnables.get( n ).persons.add( p );
+			n++;
+			n %= runnables.size();
 		}
 
-		return ( model.getMu() / nest.getMu_n() ) * calculator.computeLogsumExp();
+		public TObjectDoubleMap<Id<Person>> run() {
+			final List<Thread>  threads = new ArrayList<>( runnables.size() );
+			for ( ComputationRunnable<N> r : runnables ) threads.add( new Thread( r ) );
+
+			for ( Thread t : threads ) t.start();
+			try {
+				for ( Thread t : threads ) t.join();
+			}
+			catch ( InterruptedException e ) {
+				throw new RuntimeException( e );
+			}
+			counter.printCounter();
+			emptyCounter.printCounter();
+
+			final TObjectDoubleMap<Id<Person>> results = new TObjectDoubleHashMap<>(  );
+			for ( ComputationRunnable<N> r : runnables ) {
+				results.putAll( r.result );
+			}
+			return results;
+		}
 	}
+
+	private static class ComputationRunnable<N extends Enum<N>> implements Runnable {
+		private final NestedLogitModel<N> model;
+		private final List<Person> persons = new ArrayList<>(  );
+		private final TObjectDoubleMap<Id<Person>> result = new TObjectDoubleHashMap<>( );
+
+		final Counter personCounter;
+		final Counter emptyCounter;
+
+		private ComputationRunnable(
+				final NestedLogitModel<N> model,
+				final Counter personCounter,
+				final Counter emptyCounter ) {
+			this.model = model;
+			this.personCounter = personCounter;
+			this.emptyCounter = emptyCounter;
+		}
+
+		@Override
+		public void run() {
+			for ( Person p : persons ) {
+				personCounter.incCounter();
+				if ( p.getPlans().isEmpty() || p.getSelectedPlan().getPlanElements().isEmpty() ) {
+					emptyCounter.incCounter();
+					continue;
+				}
+				result.put(
+						p.getId(),
+						computeAccessibility( p ) );
+			}
+		}
+
+		private double computeAccessibility( Person p ) {
+			final NestedChoiceSet<N> choiceSet = model.getChoiceSetIdentifier().identifyChoiceSet( p );
+
+			final LogSumExpCalculator calculator = new LogSumExpCalculator( choiceSet.getNests().size() );
+			for ( Nest<N> nest : choiceSet.getNests() ) {
+				calculator.addTerm( logSumNestUtilities( p , nest ) );
+			}
+
+			return calculator.computeLogsumExp() / model.getMu();
+		}
+
+		private double logSumNestUtilities(
+				final Person p,
+				final Nest<N> nest ) {
+			final LogSumExpCalculator calculator = new LogSumExpCalculator( nest.getAlternatives().size() );
+			for ( Alternative<N> alternative : nest.getAlternatives() ) {
+				calculator.addTerm( nest.getMu_n() *
+								model.getUtility().calcUtility(
+									p,
+									alternative ) );
+			}
+
+			return ( model.getMu() / nest.getMu_n() ) * calculator.computeLogsumExp();
+		}
+
+	}
+
 
 	private static class LogSumExpCalculator {
 		private final TDoubleArrayList terms;
