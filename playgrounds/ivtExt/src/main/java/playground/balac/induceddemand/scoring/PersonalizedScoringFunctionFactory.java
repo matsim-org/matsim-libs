@@ -195,8 +195,8 @@ public class PersonalizedScoringFunctionFactory implements ScoringFunctionFactor
 					(Double) personAttributes
 					.getAttribute(person.getId().toString(), "traveling_car" );
 			
-			//Mode carParam = CharyparNagelScoringParameters.;
-			//builder.withModeParameters(mode, params)
+			builder.withModeParameters("car", new Mode(travelingCarUtility, 0.0, 0.0, 
+					config.getScoringParameters( null ).getOrCreateModeParams("car").getConstant()));
 			
 			
 			// XXX works only if no variation of type of activities between plans
