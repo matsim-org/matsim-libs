@@ -19,7 +19,6 @@
 package playground.thibautd.maxess.nestedlogitaccessibility.framework;
 
 import com.google.inject.AbstractModule;
-import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
 import com.google.inject.util.Types;
 import org.matsim.api.core.v01.Scenario;
@@ -30,6 +29,7 @@ import org.matsim.facilities.ActivityFacilities;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 
 /**
  * Sets the basic elements of the computation.
@@ -46,15 +46,22 @@ public abstract class BaseNestedAccessibilityComputationModule<N extends Enum<N>
 	private final Scenario scenario;
 	private final TypeLiteral<N> type;
 
+	@SuppressWarnings( "unchecked" )
 	public BaseNestedAccessibilityComputationModule(
-			final Scenario scenario,
-			final TypeLiteral<N> type) {
+			final Scenario scenario ) {
 		this.scenario = scenario;
-		this.type = type;
+
+		// see http://gafter.blogspot.ch/2006/12/super-type-tokens.html
+		// As far as I can see, this is safe (the type parameter can only be N)
+		// The website above is from a guy who actually worked on the development of generics
+		// at Sun, so I believe there is no nicest way...
+		final Type superclass = getClass().getGenericSuperclass();
+		final Type typeParameter = ((ParameterizedType) superclass).getActualTypeArguments()[ 0 ];
+		this.type = (TypeLiteral<N>) TypeLiteral.get( typeParameter );
 	}
 
 	@Override
-	protected void configure() {
+	protected final void configure() {
 		// bind scenario elements
 		bind( Scenario.class ).toInstance( scenario );
 		bind( ActivityFacilities.class ).toInstance( scenario.getActivityFacilities() );
@@ -74,8 +81,6 @@ public abstract class BaseNestedAccessibilityComputationModule<N extends Enum<N>
 
 	/**
 	 * hack from http://stackoverflow.com/questions/7385858/guice-module-with-type-parameters
-	 * @param base
-	 * @param <V>
 	 */
 	@SuppressWarnings( "unchecked" )
 	private <V> TypeLiteral<V> newGenericType( Class<?> base ) {

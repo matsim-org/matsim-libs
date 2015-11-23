@@ -50,7 +50,7 @@ public class NestedLogitAccessibilityCalculator<N extends Enum<N>> {
 	private final Provider<NestedLogitModel<N>> model;
 
 	@Inject
-	public NestedLogitAccessibilityCalculator(
+	NestedLogitAccessibilityCalculator(
 			final Scenario scenario,
 			final Provider<NestedLogitModel<N>> model ) {
 		this.population = scenario.getPopulation();
@@ -60,7 +60,7 @@ public class NestedLogitAccessibilityCalculator<N extends Enum<N>> {
 	}
 
 	public TObjectDoubleMap<Id<Person>> computeAccessibilities() {
-		log.info( "Compute accessibility for "+population.getPersons().size()+" persons" );
+		log.info( "Compute accessibility for "+population.getPersons().size()+" persons using "+nThreads+" threads" );
 		final ComputationThreadHandler<N> runner =
 				new ComputationThreadHandler<>(
 						model,

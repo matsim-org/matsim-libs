@@ -36,6 +36,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
 import org.matsim.population.algorithms.XY2Links;
 import playground.thibautd.maxess.nestedlogitaccessibility.framework.BaseNestedAccessibilityComputationModule;
+import playground.thibautd.maxess.nestedlogitaccessibility.framework.InjectionUtils;
 import playground.thibautd.maxess.nestedlogitaccessibility.framework.NestedLogitAccessibilityCalculator;
 import playground.thibautd.maxess.nestedlogitaccessibility.writers.BasicPersonAccessibilityWriter;
 import playground.thibautd.utils.MoreIOUtils;
@@ -66,19 +67,12 @@ public class RunSimpleNestedLogitAccessibility {
 
 			new XY2Links( carNetwork , scenario.getActivityFacilities() ).run( scenario.getPopulation() );
 
-			// TODO: try to simplify API (this TypeLiteral nonsense works but is a bit complicated)
-			// As those are always the same elements that need this thing, it might be possible
-			// (although I failed to find an easy solution)
-			Injector injector = Guice.createInjector(
-					new BaseNestedAccessibilityComputationModule<ModeNests>(
-							scenario,
-							new TypeLiteral<ModeNests>() {}) {},
-					new SimpleNestedLogitModule() );
-
 			final NestedLogitAccessibilityCalculator<ModeNests> calculator =
-					injector.getInstance(
-							new Key<NestedLogitAccessibilityCalculator<ModeNests>>() {
-							} );
+					InjectionUtils.createCalculator(
+							new TypeLiteral<ModeNests>() {},
+							new BaseNestedAccessibilityComputationModule<ModeNests>(
+									scenario ) {},
+							new SimpleNestedLogitModule() );
 
 			// TODO store and write results
 			final TObjectDoubleMap<Id<Person>> accessibilities = calculator.computeAccessibilities ();
