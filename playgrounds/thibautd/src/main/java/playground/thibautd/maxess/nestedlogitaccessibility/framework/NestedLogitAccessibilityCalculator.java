@@ -18,6 +18,8 @@
  * *********************************************************************** */
 package playground.thibautd.maxess.nestedlogitaccessibility.framework;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import gnu.trove.list.array.TDoubleArrayList;
 import gnu.trove.map.TObjectDoubleMap;
 import gnu.trove.map.hash.TObjectDoubleHashMap;
@@ -31,6 +33,7 @@ import org.matsim.facilities.ActivityFacilities;
 /**
  * @author thibautd
  */
+@Singleton
 public class NestedLogitAccessibilityCalculator<N extends Enum<N>> {
 	private static final Logger log = Logger.getLogger( NestedLogitAccessibilityCalculator.class );
 	// act as "measuring points", located at the coordinate of the first activity
@@ -40,6 +43,7 @@ public class NestedLogitAccessibilityCalculator<N extends Enum<N>> {
 
 	private final NestedLogitModel<N> model;
 
+	@Inject
 	public NestedLogitAccessibilityCalculator(
 			final Population population,
 			final ActivityFacilities facilities,
@@ -121,8 +125,11 @@ public class NestedLogitAccessibilityCalculator<N extends Enum<N>> {
 
 			double sum = 0;
 			for ( double d : terms.toArray() ) {
-				// TODO check if under/overflow anyway
 				sum += Math.exp( d - c );
+				// TODO check if underflow (how? compare with 0?)
+				if ( Double.isInfinite( sum ) ) {
+					throw new RuntimeException( "got an overflow for exp "+d+" with correction "+c+"! (resulting in exp("+(d - c)+"))" );
+				}
 			}
 
 			return Math.log( sum ) + c;

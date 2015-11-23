@@ -18,6 +18,8 @@
  * *********************************************************************** */
 package playground.thibautd.maxess.nestedlogitaccessibility.framework;
 
+import com.google.inject.Inject;
+
 /**
  * @author thibautd
  */
@@ -28,6 +30,7 @@ public class NestedLogitModel<N extends Enum<N>> {
 	private final Utility<N> utility;
 	private final ChoiceSetIdentifier<N> choiceSetIdentifier;
 
+	@Inject
 	public NestedLogitModel(
 			final Utility<N> utility,
 			final ChoiceSetIdentifier<N> choiceSetIdentifier ) {
