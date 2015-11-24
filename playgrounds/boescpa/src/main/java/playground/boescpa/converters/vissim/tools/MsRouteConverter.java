@@ -52,7 +52,7 @@ import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Geometry;
 import playground.boescpa.lib.tools.coordUtils.CoordAnalyzer;
-import playground.boescpa.lib.tools.shpUtils.SHPFileUtil;
+import playground.boescpa.lib.tools.SHPFileUtils;
 
 /**
  * Provides a matsim-events specific implementation of RouteConverter.
@@ -149,7 +149,7 @@ public class MsRouteConverter extends AbstractRouteConverter {
 			// read zones
 			Set<SimpleFeature> features = new HashSet<SimpleFeature>();
 			features.addAll(ShapeFileReader.getAllFeatures(path2VissimZoneShp));
-			SHPFileUtil util = new SHPFileUtil();
+			SHPFileUtils util = new SHPFileUtils();
 			Geometry cuttingArea = util.mergeGeometries(features);
 			this.coordAnalyzer = new CoordAnalyzer(cuttingArea);
 		}

@@ -23,7 +23,7 @@ package playground.boescpa.converters.visum;
 
 import org.apache.log4j.Logger;
 import playground.boescpa.converters.visum.obj.VisumTrip;
-import playground.boescpa.lib.tools.tripReader.Trip;
+import playground.boescpa.analysis.trips.tripReader.Trip;
 
 import java.io.IOException;
 import java.util.HashMap;

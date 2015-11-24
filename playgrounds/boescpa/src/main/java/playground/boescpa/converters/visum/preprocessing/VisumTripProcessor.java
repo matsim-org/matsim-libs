@@ -23,9 +23,9 @@ package playground.boescpa.converters.visum.preprocessing;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
-import playground.boescpa.lib.tools.tripCreation.TripHandler;
-import playground.boescpa.lib.tools.tripCreation.TripProcessor;
-import playground.boescpa.lib.tools.tripCreation.spatialCuttings.SpatialCuttingStrategy;
+import playground.boescpa.analysis.trips.tripCreation.TripHandler;
+import playground.boescpa.analysis.trips.tripCreation.TripProcessor;
+import playground.boescpa.analysis.trips.tripCreation.spatialCuttings.SpatialCuttingStrategy;
 
 import java.util.ArrayList;
 import java.util.HashMap;

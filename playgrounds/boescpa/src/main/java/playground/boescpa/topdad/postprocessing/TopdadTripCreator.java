@@ -21,10 +21,10 @@
 
 package playground.boescpa.topdad.postprocessing;
 
-import playground.boescpa.lib.tools.tripCreation.TripCreator;
-import playground.boescpa.lib.tools.tripCreation.TripProcessor;
-import playground.boescpa.lib.tools.tripCreation.spatialCuttings.CircleBellevueCutting;
-import playground.boescpa.lib.tools.tripCreation.spatialCuttings.SpatialCuttingStrategy;
+import playground.boescpa.analysis.trips.tripCreation.TripCreator;
+import playground.boescpa.analysis.trips.tripCreation.TripProcessor;
+import playground.boescpa.analysis.trips.tripCreation.spatialCuttings.CircleBellevueCutting;
+import playground.boescpa.analysis.trips.tripCreation.spatialCuttings.SpatialCuttingStrategy;
 
 /**
  * Creates and evaluates trips for topdad-postprocessing.

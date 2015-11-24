@@ -21,10 +21,10 @@
 
 package playground.boescpa.converters.visum.preprocessing;
 
-import playground.boescpa.lib.tools.tripCreation.TripCreator;
-import playground.boescpa.lib.tools.tripCreation.TripProcessor;
-import playground.boescpa.lib.tools.tripCreation.spatialCuttings.ShpFileCutting;
-import playground.boescpa.lib.tools.tripCreation.spatialCuttings.SpatialCuttingStrategy;
+import playground.boescpa.analysis.trips.tripCreation.TripCreator;
+import playground.boescpa.analysis.trips.tripCreation.TripProcessor;
+import playground.boescpa.analysis.trips.tripCreation.spatialCuttings.ShpFileCutting;
+import playground.boescpa.analysis.trips.tripCreation.spatialCuttings.SpatialCuttingStrategy;
 
 /**
  * Creates and prepares trips for visum-conversion.

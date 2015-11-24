@@ -10,8 +10,7 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.FacilitiesWriter;
 import org.matsim.facilities.MatsimFacilitiesReader;
-import playground.boescpa.baseline.ConfigCreator;
-import playground.boescpa.baseline.F2LCreator;
+import playground.boescpa.lib.tools.fileCreation.F2LCreator;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
