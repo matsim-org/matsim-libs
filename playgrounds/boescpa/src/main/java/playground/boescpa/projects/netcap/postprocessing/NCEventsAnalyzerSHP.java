@@ -21,7 +21,7 @@
 
 package playground.boescpa.projects.netcap.postprocessing;
 
-import playground.boescpa.analysis.EventsAnalyzerSHP;
+import playground.boescpa.analysis.scenarioAnalyzer.RunScenarioAnalyzerSHP;
 
 /**
  * @author boescpa
@@ -29,7 +29,7 @@ import playground.boescpa.analysis.EventsAnalyzerSHP;
 public class NCEventsAnalyzerSHP {
 
 	public static void main(String[] args) {
-        EventsAnalyzerSHP.main(args);
+        RunScenarioAnalyzerSHP.main(args);
 	}
 
 }

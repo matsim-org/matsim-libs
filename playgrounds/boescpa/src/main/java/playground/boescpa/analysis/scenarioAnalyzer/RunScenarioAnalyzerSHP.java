@@ -19,20 +19,21 @@
  * *********************************************************************** *
  */
 
-package playground.boescpa.analysis;
+package playground.boescpa.analysis.scenarioAnalyzer;
 
 import org.matsim.api.core.v01.network.Network;
 import playground.boescpa.analysis.scenarioAnalyzer.ScenarioAnalyzer;
 import playground.boescpa.analysis.scenarioAnalyzer.eventHandlers.*;
+import playground.boescpa.analysis.scenarioAnalyzer.spatialEventCutters.SHPFileCutter;
 import playground.boescpa.lib.tools.NetworkUtils;
 
 /**
- * WHAT IS IT FOR?
- * WHAT DOES IT?
+ * An example how to use the scenario analyzer to
+ *      fully analyze the events within the area specified by the SHP-File.
  *
  * @author boescpa
  */
-public class EventsAnalyzer {
+public class RunScenarioAnalyzerSHP {
 
 	public static void main(String[] args) {
 		Network network = NetworkUtils.readNetwork(args[0]);
@@ -51,7 +52,7 @@ public class EventsAnalyzer {
 			scenarioAnalyzer.analyzeScenario();
 
 			// Return the results:
-			scenarioAnalyzer.createResults(path2EventFile + "_analysisResults.csv", null);
+			scenarioAnalyzer.createResults(path2EventFile + "_analysisResults.csv", new SHPFileCutter(args[2]));
 
 		} catch (Exception e){
 			e.printStackTrace();
