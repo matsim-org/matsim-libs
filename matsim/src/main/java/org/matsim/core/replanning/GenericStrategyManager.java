@@ -49,7 +49,9 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
  * @author rieser (for the original StrategyManager)
  *
  */
-public class GenericStrategyManager<T extends BasicPlan, I> implements MatsimManager {
+public class GenericStrategyManager<T extends BasicPlan, I extends HasPlansAndId<? extends BasicPlan, I>> implements MatsimManager {
+	// the "I extends ... <, I>" is correct, although it feels odd.  kai, nov'15
+	
 	private static final Logger log =
 			Logger.getLogger(GenericStrategyManager.class);
 
