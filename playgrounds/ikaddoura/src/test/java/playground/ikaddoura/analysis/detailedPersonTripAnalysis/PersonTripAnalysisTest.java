@@ -73,7 +73,11 @@ public class PersonTripAnalysisTest {
 		fnc.createNetwork();
 		
 		String eventsFile = "test/input/playground/ikaddoura/analysis/detailedPersonTripAnalysis/PersonTripAnalysisTest/" + "PersonTripAnalysisEvents.xml";
+		File folder = new File(outputPath);			
+		folder.mkdirs();
 		System.out.println(outputPath);
+		
+		
 		
 		// standard events analysis
 	
