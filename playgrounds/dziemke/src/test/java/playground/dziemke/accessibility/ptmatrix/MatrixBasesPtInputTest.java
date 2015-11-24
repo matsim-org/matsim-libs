@@ -19,7 +19,6 @@
 
 package playground.dziemke.accessibility.ptmatrix;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,7 +29,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
@@ -52,11 +50,10 @@ public class MatrixBasesPtInputTest {
 //	public static void main(String[] args) {
 		String transitScheduleFile = "../../matsim/examples/pt-tutorial/transitschedule.xml";
 		String networkFile = "../../matsim/examples/pt-tutorial/multimodalnetwork.xml";
-//		String outputRoot = "";
-//		String outputRoot = testUtils.getOutputDirectory();
-		String outputRoot = "/Users/dominik/test2/";
+		String outputRoot = testUtils.getOutputDirectory();
 		
-		initLogging(outputRoot);
+		// writing logfiles to file not needed on build server
+//		initLogging(outputRoot);
 		
 		double departureTime = 8. * 60 * 60;
 
@@ -82,18 +79,17 @@ public class MatrixBasesPtInputTest {
 		// The locationFacilitiesMap is passed twice: Once for origins and once for destinations.
 		// In other uses the two maps may be different -- thus the duplication here.
 		new ThreadedMatrixCreator(scenario, ptMatrixLocationsMap, ptMatrixLocationsMap, departureTime, outputRoot, " ", 1);
-		
 		// TODO the TreadedMatrixCreator does not work when started from the test
 		// when this same class is titled as the main class instead of as test1 it runs without problems
 	}
 	
 	
-	private static void initLogging(String outputBase) {
-		try	{
-			OutputDirectoryLogging.initLoggingWithOutputDirectory(outputBase);
-		} catch (IOException e)	{
-			log.error("Cannot create logfiles: " + e.getMessage());
-			e.printStackTrace();
-		}
-	}
+//	private static void initLogging(String outputBase) {
+//		try	{
+//			OutputDirectoryLogging.initLoggingWithOutputDirectory(outputBase);
+//		} catch (IOException e)	{
+//			log.error("Cannot create logfiles: " + e.getMessage());
+//			e.printStackTrace();
+//		}
+//	}
 }
