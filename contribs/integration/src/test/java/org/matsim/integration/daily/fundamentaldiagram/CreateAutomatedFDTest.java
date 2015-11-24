@@ -28,7 +28,6 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -62,6 +61,7 @@ import org.matsim.core.config.groups.QSimConfigGroup.LinkDynamics;
 import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspDefaultsCheckingLevel;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
@@ -249,18 +249,18 @@ public class CreateAutomatedFDTest {
 	}
 
 	@Test
-	public void FDs_carTruck(){
+	public void fdsCarTruck(){
 		this.travelModes = new String [] {"car","truck"};
 		run(this.linkDynamics, this.trafficDynamics,false);
 	}
 
 	@Test
-	public void FDs_carBike(){
+	public void fdsCarBike(){
 		run(this.linkDynamics, this.trafficDynamics,false);
 	}
 
 	@Test 
-	public void Fds_carBike_fastCapacityUpdate(){
+	public void fdsCarBikeFastCapacityUpdate(){
 		run(this.linkDynamics,this.trafficDynamics,true);
 	}
 
@@ -273,10 +273,11 @@ public class CreateAutomatedFDTest {
 	private Map<Id<VehicleType>, TravelModesFlowDynamicsUpdator> mode2FlowData;
 	static GlobalFlowDynamicsUpdator globalFlowDynamicsUpdator;
 
-	private final Logger log = Logger.getLogger(CreateAutomatedFDTest.class);
+	private final static Logger LOG = Logger.getLogger(CreateAutomatedFDTest.class);
 
 	private void run(final LinkDynamics linkDynamics, final TrafficDynamics trafficDynamics, final boolean isUsingFastCapacityUpdate) {
 
+		MatsimRandom.reset();
 		scenario = ScenarioUtils.loadScenario(ConfigUtils.createConfig());
 		createNetwork();
 
@@ -370,7 +371,7 @@ public class CreateAutomatedFDTest {
 				public void insertAgentsIntoMobsim() {
 					for ( Id<Person> personId : person2Mode.keySet()) {
 						String travelMode = person2Mode.get(personId);
-						double actEndTime = (new Random().nextDouble())*900;
+						double actEndTime = (MatsimRandom.getRandom().nextDouble())*900;
 
 						MobsimAgent agent = new MySimplifiedRoundAndRoundAgent(personId, actEndTime, travelMode);
 						qSim.insertAgentIntoMobsim(agent);
@@ -648,8 +649,8 @@ public class CreateAutomatedFDTest {
 			double absoluteDeviances = this.lastXFlows900.get(this.lastXFlows900.size()-1) - this.lastXFlows900.get(0);
 			if (Math.abs(absoluteDeviances) < 1){
 				this.flowStability = true;
-				if(modeId==null) log.info("========== Reaching a certain flow stability for global flow.");
-				else log.info("========== Reaching a certain flow stability in mode: "+modeId.toString());
+				if(modeId==null) LOG.info("========== Reaching a certain flow stability for global flow.");
+				else LOG.info("========== Reaching a certain flow stability in mode: "+modeId.toString());
 			} else {
 				this.flowStability = false;
 			}
@@ -718,11 +719,11 @@ public class CreateAutomatedFDTest {
 			//NB: Should not be called upon a modeData without a vehicleType, as this.vehicleType will be null and will throw an exception.
 			this.permanentDensity = this.numberOfAgents / (1000.*3) *1000. * this.vehicleType.getPcuEquivalents();
 			this.permanentAverageVelocity = this.getActualAverageVelocity();
-			log.info("Calculated permanent Speed from "+modeId+"'s lastXSpeeds : "+speedTable+"\nResult is : "+this.permanentAverageVelocity);
+			LOG.info("Calculated permanent Speed from "+modeId+"'s lastXSpeeds : "+speedTable+"\nResult is : "+this.permanentAverageVelocity);
 			//this.permanentFlow = this.getActualFlow();
 			this.permanentFlow = /*this.getActualFlow900();*///Done: Sliding average instead of taking just the last value (seen to be sometimes farther from the average than expected)
 					this.getSlidingAverageLastXFlows900();
-			log.info("Calculated permanent Flow from "+modeId+"'s lastXFlows900 : "+lastXFlows900+"\nResult is :"+this.permanentFlow);	
+			LOG.info("Calculated permanent Flow from "+modeId+"'s lastXFlows900 : "+lastXFlows900+"\nResult is :"+this.permanentFlow);	
 		}
 
 		//Getters/Setters
@@ -866,7 +867,7 @@ public class CreateAutomatedFDTest {
 						if (modesStable){
 							//Checking global stability
 							if ( /*this.globalData.isSpeedStable() &&*/ this.globalFlowData.isFlowStable() ){
-								log.info("========== Global permanent regime is attained");
+								LOG.info("========== Global permanent regime is attained");
 								for (int i=0; i<travelModes.length; i++){
 									this.travelModesFlowData.get(Id.create(travelModes[i],VehicleType.class)).saveDynamicVariables();
 								}
