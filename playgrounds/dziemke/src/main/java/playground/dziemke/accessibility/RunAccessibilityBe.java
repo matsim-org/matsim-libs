@@ -23,6 +23,8 @@ import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityOption;
 import org.matsim.facilities.FacilitiesUtils;
 
+import playground.dziemke.utils.LogToOutputSaver;
+
 public class RunAccessibilityBe {
 	public static final Logger log = Logger.getLogger( RunAccessibilityBe.class ) ;
 	
@@ -45,6 +47,7 @@ public class RunAccessibilityBe {
 //		String travelTimeMatrix = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/pt/be_04/travelTimeMatrix.csv.gz";
 //		String travelDistanceMatrix = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/pt/be_04/travelDistanceMatrix.csv.gz";
 //		String ptStops = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/pt/be_04/stops.csv.gz";
+		LogToOutputSaver.setOutputDirectory(outputDirectory);
 
 		// Parameters
 //		boolean includeDensityLayer = true;

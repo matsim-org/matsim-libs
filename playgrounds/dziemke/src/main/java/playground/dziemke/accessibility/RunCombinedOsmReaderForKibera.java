@@ -38,9 +38,8 @@ import playground.dziemke.utils.LogToOutputSaver;
 /**
  * @author dziemke
  */
-public class RunCombinedOsmReaderForBe {
-	final private static Logger log = Logger.getLogger(RunCombinedOsmReaderForBe.class);
-	//TODO write logger output somewhere
+public class RunCombinedOsmReaderForKibera {
+	final private static Logger log = Logger.getLogger(RunCombinedOsmReaderForKibera.class);
 
 	/**
 	 * Implementing the {@link LandUseBuildingReader} class. 
@@ -59,25 +58,15 @@ public class RunCombinedOsmReaderForBe {
 	 */
 	public static void main(String[] args) {
 		// Input and output
-//		String osmFile = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/osm/schlesische_str/2015-06-24_schlesische_str.osm";
-//		String osmFile = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/osm/kreuzberg/2015-09-13_kreuzberg.osm";
-
-//		String osmFile = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/osm/berlin/2015-09-13_berlin.osm";
-		String osmFile = "/Users/dominik/Accessibility/Data/OSM/2015-10-15_nairobi.osm.xml";
-		
-//		String outputBase = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/osm/schlesische_str/07/";
-//		String outputBase = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/osm/kreuzberg/02/";
-//		String outputBase = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/osm/berlin/09/";
-
-//		String outputBase = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/osm/berlin/combined/01/";
-		String outputBase = "/Users/dominik/Accessibility/Data/nairobi/combined/02/";
-		
+		String osmFile = "../../../../Workspace/data/accessibility/osm/2015-11-05_kibera.osm.xml";
+		String outputBase = "../../../../Workspace/data/accessibility/nairobi/facilities/03/";
 		String facilityFile = outputBase + "facilities.xml";
 		String attributeFile = outputBase + "facilitiy_attributes.xml";
 		
 		// Logging
-		log.info("Parsing land use from OpenStreetMap.");
 		LogToOutputSaver.setOutputDirectory(outputBase);
+		log.info("Parsing land use from OpenStreetMap.");
+		
 		
 		// Parameters
 //		String outputCRS = "EPSG:31468"; // = DHDN GK4, for Berlin
@@ -86,15 +75,6 @@ public class RunCombinedOsmReaderForBe {
 		// building types are either taken from the building itself and, if building does not have a type, taken from
 		// the type of land use of the area which the build belongs to.
 		double buildingTypeFromVicinityRange = 0.;
-		
-		
-//		String osmFile = args[0];
-//		String facilityFile = args[1];
-//		String attributeFile = args[2];
-//		String outputCRS = "WGS84";
-//		if(args.length > 3){
-//			outputCRS = args[3];
-//		}
 		
 
 		CombinedOsmReader combinedOsmReader = new CombinedOsmReader(outputCRS,
@@ -267,8 +247,10 @@ public class RunCombinedOsmReaderForBe {
 		map.put("biergarten", FacilityTypes.LEISURE);
 
 		map.put("cafe", FacilityTypes.LEISURE); // used to be "l"
-
-		map.put("drinking_water", FacilityTypes.IGNORE);
+		
+		// -------------------------------------------------
+		map.put("drinking_water", FacilityTypes.DRINKING_WATER); // activated for Kibera
+		// -------------------------------------------------
 
 		map.put("fast_food", FacilityTypes.LEISURE); // used to be "l"
 		map.put("food_court", FacilityTypes.LEISURE); // used to be "l"
@@ -321,12 +303,18 @@ public class RunCombinedOsmReaderForBe {
 		// "healthcare" section in osm wiki
 		map.put("baby_hatch", FacilityTypes.IGNORE);
 
-		map.put("clinic", FacilityTypes.MEDICAL); // used to be "m"
+		// -------------------------------------------------
+		map.put("clinic", FacilityTypes.CLINIC); // used to be "m" // activated for Kibera
+		// -------------------------------------------------
 		map.put("dentist", FacilityTypes.MEDICAL); // used to be "m"
 		map.put("doctors", FacilityTypes.MEDICAL); // used to be "m"
-		map.put("hospital", FacilityTypes.MEDICAL); // used to be "m"
+		// -------------------------------------------------
+		map.put("hospital", FacilityTypes.HOSPITAL); // used to be "m" // activated for Kibera
+		// -------------------------------------------------
 		map.put("nursing_home", FacilityTypes.MEDICAL); // used to be "m"
-		map.put("pharmacy", FacilityTypes.MEDICAL); // used to be "m"
+		// -------------------------------------------------
+		map.put("pharmacy", FacilityTypes.PHARMACY); // used to be "m" // activated for Kibera
+		// -------------------------------------------------
 
 		map.put("social_facility", FacilityTypes.IGNORE);
 		map.put("veterinary", FacilityTypes.IGNORE);
@@ -353,7 +341,7 @@ public class RunCombinedOsmReaderForBe {
 
 		map.put("theatre", FacilityTypes.LEISURE); // used to be "l"
 
-		// "other" section in osm wiki
+		// FaciiltyTypes.OTHER section in osm wiki
 		map.put("animal_boarding", FacilityTypes.IGNORE);
 		map.put("animal_shelter", FacilityTypes.IGNORE);
 		map.put("bench", FacilityTypes.IGNORE);
@@ -403,7 +391,9 @@ public class RunCombinedOsmReaderForBe {
 		map.put("shelter", FacilityTypes.IGNORE);
 		map.put("shower", FacilityTypes.IGNORE);
 		map.put("telephone", FacilityTypes.IGNORE);
-		map.put("toilets", FacilityTypes.IGNORE);
+		// -------------------------------------------------
+		map.put("toilets", FacilityTypes.TOILETS);
+		// -------------------------------------------------
 
 		map.put("townhall", FacilityTypes.OTHER); // used to be "t"
 
