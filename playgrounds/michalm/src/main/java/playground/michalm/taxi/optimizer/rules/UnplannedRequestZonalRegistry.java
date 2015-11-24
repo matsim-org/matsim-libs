@@ -56,7 +56,7 @@ public class UnplannedRequestZonalRegistry
     {
         int zoneIdx = getZoneIdx(request);
 
-        if (requestsInZones[zoneIdx].put(request.getId(), request) == null) {
+        if (requestsInZones[zoneIdx].put(request.getId(), request) != null) {
             throw new IllegalStateException(request + " is already in the registry");
         }
 

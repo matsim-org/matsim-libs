@@ -54,7 +54,6 @@ public class SinglePassengerPickupActivity
         else {
             //try to predict the end time
             endTime = Math.max(now, request.getT0()) + pickupDuration;
-            throw new RuntimeException("");//just a temp check
         }
     }
 

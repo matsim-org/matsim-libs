@@ -30,7 +30,7 @@ import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelTimeSource;
 import org.matsim.contrib.dvrp.util.TimeDiscretizer;
 import org.matsim.contrib.dvrp.vrpagent.VrpLegs;
 import org.matsim.contrib.dvrp.vrpagent.VrpLegs.LegCreator;
-import org.matsim.contrib.dynagent.run.*;
+import org.matsim.contrib.dynagent.run.DynAgentLauncherUtils;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.router.util.*;
 import org.matsim.core.trafficmonitoring.*;
@@ -123,10 +123,6 @@ class TaxiLauncher
         contextImpl.setMobsimTimer(qSim.getSimTimer());
 
         qSim.addQueueSimulationListeners(optimizer);
-        
-        LazyDynActivityEngine dynActivityEngine = new LazyDynActivityEngine(qSim.getEventsManager(), qSim.getAgentCounter());
-        qSim.addMobsimEngine(dynActivityEngine);
-        qSim.addActivityHandler(dynActivityEngine);
 
         PassengerEngine passengerEngine = VrpLauncherUtils.initPassengerEngine(TaxiUtils.TAXI_MODE,
                 new TaxiRequestCreator(), optimizer, context, qSim);
@@ -144,7 +140,7 @@ class TaxiLauncher
                 VrpLegs.createLegWithOfflineTrackerCreator(qSim.getSimTimer());
 
         TaxiActionCreator actionCreator = new TaxiActionCreator(passengerEngine, legCreator,
-                params.pickupDuration, dynActivityEngine);
+                params.pickupDuration);
 
         VrpLauncherUtils.initAgentSources(qSim, context, optimizer, actionCreator);
 
