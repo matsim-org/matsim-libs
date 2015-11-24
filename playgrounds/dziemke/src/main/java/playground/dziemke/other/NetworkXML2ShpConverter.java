@@ -6,19 +6,22 @@ public class NetworkXML2ShpConverter {
 
 	public static void main(String[] args) {
 
-		String networkFile = "/Users/dominik/Accessibility/Data/Networks/Kenya/2015-10-15_nairobi_paths.xml";
+		String networkFile = "/Users/dominik/Accessibility/Data/Networks/Kenya/2015-11-05_kibera_paths_detailed.xml";
+//		String networkFile = "/Users/dominik/Accessibility/Data/Networks/Kenya/2015-10-15_nairobi_paths.xml";
 //		String networkFile = "../../matsimExamples/countries/za/nmbm/network/NMBM_Network_CleanV7.xml.gz";
 //		String networkFile = "D:/Workspace/container/demand/input/network/bb_5_v_notscaled.xml";
 		
-		String shapeFileLine = "/Users/dominik/Accessibility/Data/Networks/Kenya/2015-10-15_nairobi_paths_line.shp";
+		String shapeFileLine = "/Users/dominik/Accessibility/Data/Networks/Kenya/2015-11-05_kibera_paths_detailed_line.shp";
+//		String shapeFileLine = "/Users/dominik/Accessibility/Data/Networks/Kenya/2015-10-15_nairobi_paths_line.shp";
 //		String shapeFileLine = "../../data/nmbm/network/network_line.shp";
 //		String shapeFileLine = "D:/Workspace/container/demand/input/network/bb_5_v_notscaled_line_DHDN_GK4.shp";
 		
-		String shapeFilePoly = "/Users/dominik/Accessibility/Data/Networks/Kenya/2015-10-15_nairobi_paths_poly.shp";
+		String shapeFilePoly = "/Users/dominik/Accessibility/Data/Networks/Kenya/2015-11-05_kibera_paths_detailed_poly.shp";
+//		String shapeFilePoly = "/Users/dominik/Accessibility/Data/Networks/Kenya/2015-10-15_nairobi_paths_poly.shp";
 //		String shapeFilePoly = "../../data/nmbm/network/network_poly.shp";
 //		String shapeFilePoly = "D:/Workspace/container/demand/input/network/bb_5_v_notscaled_poly_DHDN_GK4.shp";
 		
-		String crs = "EPSG:21037";
+		String crs = "EPSG:21037"; // for Nairobi, Kenya
 //		String crs = TransformationFactory.WGS84_SA_Albers; // for South Africa
 //		String crs = TransformationFactory.DHDN_GK4; // for Berlin
 //		String crs = "PROJCS[\"ETRS89_UTM_Zone_33\",GEOGCS[\"GCS_ETRS89\",DATUM[\"D_ETRS89\",SPHEROID[\"GRS_1980\",6378137.0,298.257222101]],PRIMEM[\"Greenwich\",0.0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"False_Easting\",3500000.0],PARAMETER[\"False_Northing\",0.0],PARAMETER[\"Central_Meridian\",15.0],PARAMETER[\"Scale_Factor\",0.9996],PARAMETER[\"Latitude_Of_Origin\",0.0],UNIT[\"Meter\",1.0]]"
