@@ -34,6 +34,8 @@ import org.matsim.facilities.ActivityFacilities;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * @author thibautd
@@ -78,6 +80,7 @@ public class NestedLogitAccessibilityCalculator<N extends Enum<N>> {
 
 		final Counter counter = new Counter( "Compute accessibility for person # " );
 		final Counter emptyCounter = new Counter( "Ignore empty plan # " );
+		final ComputationStopWatch stopWatch = new ComputationStopWatch();
 
 		public ComputationThreadHandler(
 				final Provider<NestedLogitModel<N>> models,
@@ -88,6 +91,7 @@ public class NestedLogitAccessibilityCalculator<N extends Enum<N>> {
 				runnables.add(
 						new ComputationRunnable<>(
 								models.get(),
+								stopWatch,
 								counter,
 								emptyCounter ) );
 			}
@@ -112,6 +116,7 @@ public class NestedLogitAccessibilityCalculator<N extends Enum<N>> {
 			}
 			counter.printCounter();
 			emptyCounter.printCounter();
+			stopWatch.printStats();
 
 			final TObjectDoubleMap<Id<Person>> results = new TObjectDoubleHashMap<>(  );
 			for ( ComputationRunnable<N> r : runnables ) {
@@ -125,15 +130,17 @@ public class NestedLogitAccessibilityCalculator<N extends Enum<N>> {
 		private final NestedLogitModel<N> model;
 		private final List<Person> persons = new ArrayList<>(  );
 		private final TObjectDoubleMap<Id<Person>> result = new TObjectDoubleHashMap<>( );
+		private final ComputationStopWatch stopWatch;
 
 		final Counter personCounter;
 		final Counter emptyCounter;
 
 		private ComputationRunnable(
 				final NestedLogitModel<N> model,
-				final Counter personCounter,
+				ComputationStopWatch stopWatch, final Counter personCounter,
 				final Counter emptyCounter ) {
 			this.model = model;
+			this.stopWatch = stopWatch;
 			this.personCounter = personCounter;
 			this.emptyCounter = emptyCounter;
 		}
@@ -153,14 +160,19 @@ public class NestedLogitAccessibilityCalculator<N extends Enum<N>> {
 		}
 
 		private double computeAccessibility( Person p ) {
+			stopWatch.startChoice();
 			final NestedChoiceSet<N> choiceSet = model.getChoiceSetIdentifier().identifyChoiceSet( p );
+			stopWatch.endChoice();
 
+			stopWatch.startLogsum();
 			final LogSumExpCalculator calculator = new LogSumExpCalculator( choiceSet.getNests().size() );
 			for ( Nest<N> nest : choiceSet.getNests() ) {
 				calculator.addTerm( logSumNestUtilities( p , nest ) );
 			}
 
-			return calculator.computeLogsumExp() / model.getMu();
+			final double r = calculator.computeLogsumExp() / model.getMu();
+			stopWatch.endLogsum();
+			return r;
 		}
 
 		private double logSumNestUtilities(
@@ -179,6 +191,37 @@ public class NestedLogitAccessibilityCalculator<N extends Enum<N>> {
 
 	}
 
+	private static class ComputationStopWatch {
+		private final AtomicLong choiceTime = new AtomicLong( 0 );
+		private final AtomicLong logsumTime = new AtomicLong( 0 );
+
+		public void startChoice() {
+			// on the choice between currentTimeMillis and nanoTime, see
+			// http://stackoverflow.com/a/1776053
+			// currentTimeMillis is choosen because it does not depend on CPU
+			// (basically, both might be wrong, but should give a reasonnable idea)
+			choiceTime.addAndGet( -System.currentTimeMillis() );
+		}
+
+		public void endChoice() {
+			choiceTime.addAndGet( System.currentTimeMillis() );
+		}
+
+		public void startLogsum() {
+			logsumTime.addAndGet( -System.currentTimeMillis() );
+		}
+
+		public void endLogsum() {
+			logsumTime.addAndGet( System.currentTimeMillis() );
+		}
+
+		public void printStats() {
+			log.info( "Time elapsed in sampling choice sets (in seconds): "+
+							TimeUnit.MILLISECONDS.toSeconds( choiceTime.get() ) );
+			log.info( "Time elapsed in computing logsums (in seconds): "+
+							TimeUnit.MILLISECONDS.toSeconds( logsumTime.get() ) );
+		}
+	}
 
 	private static class LogSumExpCalculator {
 		private final TDoubleArrayList terms;
