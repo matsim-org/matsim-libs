@@ -23,6 +23,7 @@ import org.matsim.contrib.dvrp.passenger.*;
 import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.vrpagent.*;
 import org.matsim.contrib.dynagent.DynAction;
+import org.matsim.contrib.dynagent.run.LazyDynActivityEngine;
 
 import playground.michalm.taxi.schedule.*;
 
@@ -30,17 +31,19 @@ import playground.michalm.taxi.schedule.*;
 public class TaxiActionCreator
     implements VrpAgentLogic.DynActionCreator
 {
+    private final LazyDynActivityEngine lazyDynActivityEngine;
     private final PassengerEngine passengerEngine;
     private final VrpLegs.LegCreator legCreator;
     private final double pickupDuration;
 
 
     public TaxiActionCreator(PassengerEngine passengerEngine, VrpLegs.LegCreator legCreator,
-            double pickupDuration)
+            double pickupDuration, LazyDynActivityEngine lazyDynActivityEngine)
     {
         this.passengerEngine = passengerEngine;
         this.legCreator = legCreator;
         this.pickupDuration = pickupDuration;
+        this.lazyDynActivityEngine = lazyDynActivityEngine;
     }
 
 
@@ -64,7 +67,9 @@ public class TaxiActionCreator
                 return new SinglePassengerDropoffActivity(passengerEngine, dst, dst.getRequest());
 
             case STAY:
-                return new VrpActivity("Stay", (TaxiStayTask)task);
+                final TaxiStayTask tst = (TaxiStayTask)task;
+                tst.setLazyDynActivityEngine(lazyDynActivityEngine);
+                return new VrpActivity("Stay", tst);
 
             default:
                 throw new IllegalStateException();
