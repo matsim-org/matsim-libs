@@ -30,12 +30,12 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 public class PopulationFilter {
 	
-	private enum SubPopulations {slum, nonSlum};
+	private enum PatnaSubPopulations {slum, nonSlum};
 	
-	public static Population getSubPopulation(Population population, String subPopulationType){
+	public static Population getSubPopulation(Population population, PatnaSubPopulations subPopulationType){
 		Population filteredPopulation = null;
-		if(subPopulationType.equals(SubPopulations.slum)) filteredPopulation = getSlumPopulation(population);
-		else if(subPopulationType.equals(SubPopulations.nonSlum)) filteredPopulation = getNonSlumPopulation(population);
+		if(subPopulationType.equals(PatnaSubPopulations.slum)) filteredPopulation = getSlumPopulation(population);
+		else if(subPopulationType.equals(PatnaSubPopulations.nonSlum)) filteredPopulation = getNonSlumPopulation(population);
 		return filteredPopulation;
 	}
 	

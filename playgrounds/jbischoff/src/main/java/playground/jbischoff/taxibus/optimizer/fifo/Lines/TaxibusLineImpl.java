@@ -26,6 +26,7 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Set;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.Vehicle;
@@ -37,7 +38,7 @@ import com.vividsolutions.jts.geom.MultiPolygon;
 import playground.jbischoff.taxibus.passenger.TaxibusRequest;
 
 /**
- * @author  jbischoff
+ * @author jbischoff
  *
  */
 public class TaxibusLineImpl implements TaxibusLine {
@@ -46,28 +47,25 @@ public class TaxibusLineImpl implements TaxibusLine {
 	private final Id<Link> holdingPosition;
 	private final MultiPolygon departureZone;
 	private final MultiPolygon arrivalZone;
-	
+
 	private Id<TaxibusLine> returnLineId;
 
 	private Queue<Vehicle> vehiclesInHold = new LinkedList<>();
-	
+
 	private double currentLambda = 0.;
-	private double currentTwMax = 15*60;
+	private double currentTwMax = 15 * 60;
 	private double currentOccupationRate = 8;
-	
-	private double singleTripTravelTime; 
-	
-		
-	
-	public TaxibusLineImpl(Id<TaxibusLine> lineId,  Id<Link> holdingPosition,
-			MultiPolygon departureZone, MultiPolygon arrivalZone) {
+
+	private double singleTripTravelTime;
+
+	public TaxibusLineImpl(Id<TaxibusLine> lineId, Id<Link> holdingPosition, MultiPolygon departureZone,
+			MultiPolygon arrivalZone) {
 		this.lineId = lineId;
 		this.holdingPosition = holdingPosition;
 		this.departureZone = departureZone;
 		this.arrivalZone = arrivalZone;
 	}
 
-	
 	@Override
 	public Id<TaxibusLine> getId() {
 		return lineId;
@@ -83,7 +81,6 @@ public class TaxibusLineImpl implements TaxibusLine {
 		this.returnLineId = id;
 	}
 
-	
 	@Override
 	public double getCurrentLambda() {
 		return currentLambda;
@@ -91,13 +88,13 @@ public class TaxibusLineImpl implements TaxibusLine {
 
 	@Override
 	public double getLambda(double time) {
-		//todo 
+		// todo
 		return 0;
 	}
 
 	@Override
 	public double getCurrentOccupationRate() {
-		
+
 		return currentOccupationRate;
 	}
 
@@ -116,8 +113,6 @@ public class TaxibusLineImpl implements TaxibusLine {
 		return currentTwMax;
 	}
 
-
-
 	@Override
 	public void addVehicleToHold(Vehicle veh) {
 		this.vehiclesInHold.add(veh);
@@ -135,9 +130,15 @@ public class TaxibusLineImpl implements TaxibusLine {
 
 	@Override
 	public boolean lineServesRequest(TaxibusRequest request) {
-		
-		return (departureZone.contains(MGC.coord2Point(request.getFromLink().getCoord())) && arrivalZone.contains(MGC.coord2Point(request.getToLink().getCoord())));
+
+		return (departureZone.contains(MGC.coord2Point(request.getFromLink().getCoord()))
+				&& arrivalZone.contains(MGC.coord2Point(request.getToLink().getCoord())));
 	}
-	
+
+	@Override
+	public boolean lineCoversCoordinate(Coord coord) {
+		Geometry g = MGC.coord2Point(coord);
+		return (departureZone.contains(g) || arrivalZone.contains(g));
+	}
 
 }

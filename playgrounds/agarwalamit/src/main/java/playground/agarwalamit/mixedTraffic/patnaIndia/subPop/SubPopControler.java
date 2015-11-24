@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.QSimConfigGroup.VehiclesSource;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -56,7 +57,7 @@ public class SubPopControler {
 		Config config = ConfigUtils.loadConfig(args[0]);
 		Scenario sc = ScenarioUtils.loadScenario(config);
 
-		sc.getConfig().qsim().setUseDefaultVehicles(false);
+		sc.getConfig().qsim().setVehiclesSource(VehiclesSource.fromVehiclesData);
 
 		Map<String, VehicleType> modesType = new HashMap<String, VehicleType>(); 
 		VehicleType slum_car = VehicleUtils.getFactory().createVehicleType(Id.create("slum_car",VehicleType.class));
@@ -134,11 +135,7 @@ public class SubPopControler {
 
 		final Controler controler = new Controler(sc);
 		
-//		IOUtils.deleteDirectory(new File(controler.getConfig().controler().getOutputDirectory()));
-		controler.getConfig().controler().setOverwriteFileSetting(
-				true ?
-						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		controler.setDumpDataAtEnd(true);
         controler.getConfig().controler().setCreateGraphs(true);
 

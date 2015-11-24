@@ -51,8 +51,6 @@ public class ModeSwitcherInfoCollector {
 		this.log.warn("DO NOT USE TRIP TIME AND TRIP DISTANCE MAPS SIMULTANEOUSLY.");
 	}
 
-	private String [] modeSwitchTypes;
-	
 	private SortedMap<ModeSwitcherType, Tuple<Double, Double>> modeSwitchType2TripDistances = new TreeMap<>();
 	private SortedMap<ModeSwitcherType, Integer> modeSwitchType2numberOfLegs = new TreeMap<>();
 	private SortedMap<ModeSwitcherType, List<Id<Person>>> modeSwitchType2PersonIds = new TreeMap<>();
@@ -90,7 +88,7 @@ public class ModeSwitcherInfoCollector {
 		try {
 			writer.write("switchType \t numberOfLegs \t totalTripTimesForFirstIterationInHr \t totalTripTimesForLastIterationInHr \n");
 
-			for(String str:this.modeSwitchTypes){
+			for(ModeSwitcherType str:this.modeSwitchType2numberOfLegs.keySet()){
 				writer.write(str+"\t"+this.modeSwitchType2numberOfLegs.get(str)+"\t"
 						+this.modeSwitchType2TripTimes.get(str).getFirst()/3600.+"\t"
 						+this.modeSwitchType2TripTimes.get(str).getSecond()/3600.+"\n");
@@ -110,7 +108,7 @@ public class ModeSwitcherInfoCollector {
 		try {
 			writer.write("switchType \t numberOfLegs \t totalTripDistancesForFirstIterationInKm \t totalTripDistancesForLastIterationInKm \n");
 
-			for(String str:this.modeSwitchTypes){
+			for(ModeSwitcherType str: this.modeSwitchType2numberOfLegs.keySet()){
 				writer.write(str+"\t"+this.modeSwitchType2numberOfLegs.get(str)+"\t"
 						+this.modeSwitchType2TripDistances.get(str).getFirst()/1000.+"\t"
 						+this.modeSwitchType2TripDistances.get(str).getSecond()/1000.+"\n");
@@ -122,14 +120,6 @@ public class ModeSwitcherInfoCollector {
 					"Data is not written in file. Reason: " + e);
 		}
 		this.log.info("Data is written to "+outFile);
-	}
-	
-	public String[] getModeSwitchTypes() {
-		return modeSwitchTypes;
-	}
-	
-	public void setModeSwitchTypes(String[] modeSwitchTypes) {
-		this.modeSwitchTypes = modeSwitchTypes;
 	}
 	
 	public SortedMap<ModeSwitcherType, Tuple<Double, Double>> getModeSwitchType2TripDistances() {

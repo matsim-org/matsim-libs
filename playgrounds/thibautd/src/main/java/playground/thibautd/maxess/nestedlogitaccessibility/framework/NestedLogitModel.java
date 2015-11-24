@@ -18,16 +18,17 @@
  * *********************************************************************** */
 package playground.thibautd.maxess.nestedlogitaccessibility.framework;
 
+import com.google.inject.Inject;
+
 /**
  * @author thibautd
  */
-// making it generic and specifying the nests as enum might look (or be) more complicated than it should be,
-// but it allows to make different elements (utility or sampler) for the same nesting structure, and combine them safely.
-public class NestedLogitModel<N extends Enum<N>> {
+class NestedLogitModel<N extends Enum<N>> {
 	private final double mu;
 	private final Utility<N> utility;
 	private final ChoiceSetIdentifier<N> choiceSetIdentifier;
 
+	@Inject
 	public NestedLogitModel(
 			final Utility<N> utility,
 			final ChoiceSetIdentifier<N> choiceSetIdentifier ) {

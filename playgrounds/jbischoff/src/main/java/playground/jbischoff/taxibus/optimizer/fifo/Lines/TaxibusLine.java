@@ -20,6 +20,8 @@
 package playground.jbischoff.taxibus.optimizer.fifo.Lines;
 
 import java.util.Collection;
+
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.Vehicle;
@@ -79,6 +81,8 @@ public interface TaxibusLine {
 	public Vehicle getNextEmptyVehicle();
 	
 	public boolean lineServesRequest(TaxibusRequest request);
+	
+	public boolean lineCoversCoordinate(Coord coord);
 	
 	
 }

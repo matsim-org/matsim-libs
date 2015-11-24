@@ -11,30 +11,26 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 import playground.ikaddoura.analysis.detailedPersonTripAnalysis.handler.BasicPersonTripAnalysisHandler;
 import playground.ikaddoura.analysis.detailedPersonTripAnalysis.handler.NoiseAnalysisHandler;
-import playground.ikaddoura.noise2.events.NoiseEventsReader;
+import playground.ikaddoura.integrationCN.CNEventsReader;
 import playground.tschlenther.createNetwork.ForkNetworkCreator;
 
 /**
- * @author gthunig
+ * @author gthunig, ikaddoura
  * 
- * This class tests the Analysis which is provided by the
- * NoiseAnalysisHandler. 
- * Therefor several scenarios are created which are declared above their testmethod.
- * Every scenario has its own method.
- * Every scenario has the same network which is declared in its class; 
- * current status: ForkNetworkCreator
+ * This class tests the noise-specific analysis provided by the NoiseAnalysisHandler. 
+ * In each test, a small events file is analyzed, and a scenario is created using the ForkNetworkCreator.
+ * 
  */
 public class NoiseAnalysisTest {
 
 	private static final Logger log = Logger.getLogger(CongestionAnalysisTest.class);
 
-	private static final boolean printResults = true;
+	private static final boolean printResults = false;
 	
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 	
@@ -255,10 +251,15 @@ public class NoiseAnalysisTest {
 		events.addHandler(noiseHandler);
 		
 		log.info("Reading the events file...");
-		MatsimEventsReader reader = new MatsimEventsReader(events);
-		reader.readFile(eventsFile);
-		NoiseEventsReader noiseEventReader = new NoiseEventsReader(events);		
-		noiseEventReader.parse(eventsFile);
+
+		CNEventsReader reader = new CNEventsReader(events);
+		reader.parse(eventsFile);
+
+//		MatsimEventsReader reader = new MatsimEventsReader(events);
+//		reader.readFile(eventsFile);
+//		NoiseEventsReader noiseEventReader = new NoiseEventsReader(events);		
+//		noiseEventReader.parse(eventsFile);
+		
 		log.info("Reading the events file... Done.");
 		
 		return noiseHandler;

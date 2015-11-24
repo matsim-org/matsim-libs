@@ -27,11 +27,12 @@ import org.apache.log4j.Logger;
  * @author amit
  */
 
-public class ListUtils {
+public final class ListUtils {
+	
+	private ListUtils(){}
 
-	public static int intSum(List<Integer> intList){
-		if(intList==null)	return 0;
-
+	public static int intSum(final List<Integer> intList){
+		if(intList==null) throw new NullPointerException("The list is null. Aborting ...");
 		int sum = 0;
 		for(Integer i: intList) {
 			sum = sum+i;
@@ -39,8 +40,8 @@ public class ListUtils {
 		return sum;
 	}
 
-	public static double doubleSum(List<Double> doubleList){
-		if(doubleList==null)	return 0;
+	public static double doubleSum(final List<Double> doubleList){
+		if(doubleList==null) throw new NullPointerException("The list is null. Aborting ...");
 
 		double sum = 0;
 		for(Double i: doubleList) {
@@ -49,17 +50,17 @@ public class ListUtils {
 		return sum;
 	}
 
-	public static double doubleMean(List<Double> doubleList){
-		if(doubleList==null || doubleList.isEmpty())	return 0;
+	public static double doubleMean(final List<Double> doubleList){
+		if(doubleList==null )	throw new NullPointerException("The list is null. Aborting ...");
 
 		double sum = ListUtils.doubleSum(doubleList);
 		return sum/doubleList.size();
 	}
 
-	public static List<Double> scalerProduct(List<Double> doubleList, double scalerFactor){
-		List<Double> outList = new ArrayList<>();
-		if(doubleList==null ) throw new RuntimeException("The list is null. Aborting ...");
+	public static List<Double> scalerProduct(final List<Double> doubleList, final double scalerFactor){
+		if(doubleList==null ) throw new NullPointerException("The list is null. Aborting ...");
 
+		List<Double> outList = new ArrayList<>();
 		for(double d : doubleList){
 			outList.add(scalerFactor*d);
 		}
@@ -71,9 +72,9 @@ public class ListUtils {
 	 * @param list2
 	 * @return it will divide all the elements of list1 by the elements of list2.
 	 */
-	public static List<Double> divide(List<Double> list1, List<Double> list2) {
+	public static List<Double> divide(final List<Double> list1, final List<Double> list2) {
 		List<Double> outList = new ArrayList<>();
-		if(list1 == null || list2 == null ) throw new RuntimeException("Either of the lists is null. Aborting ...");
+		if(list1 == null || list2 == null ) throw new NullPointerException("Either of the lists is null. Aborting ...");
 		else if (list1.size() != list2.size()) throw new RuntimeException("Size of the lists are not equla. Aborting ...");
 		else if (list1.isEmpty() ) return outList;
 		else {
@@ -85,9 +86,6 @@ public class ListUtils {
 					e=0;
 				}
 				else e = list1.get(ii) / list2.get(ii);
-				if(Double.isNaN(e)) {
-					System.out.println("prob.");
-				}
 				outList.add( e );
 			}
 		}
@@ -99,10 +97,10 @@ public class ListUtils {
 	 * @param list2
 	 * @return it will subtract all the elements of list1 by the elements of list2.
 	 */
-	public static List<Double> subtract(List<Double> list1, List<Double> list2) {
+	public static List<Double> subtract(final List<Double> list1, final List<Double> list2) {
 		List<Double> outList = new ArrayList<>();
-		if(list1 == null || list2 == null ) throw new RuntimeException("Either of the lists is null. Aborting ...");
-		else if (list1.isEmpty() && list2.isEmpty() ) return outList;
+		if(list1 == null || list2 == null ) throw new NullPointerException("Either of the lists is null. Aborting ...");
+		else if (list1.isEmpty() && list2.isEmpty() ) ;
 		else if (list1.size() != list2.size()) {
 			Logger.getLogger(ListUtils.class).warn("Sizes of the lists are not equal. It will still subtract.");
 			if(list1.size() > list2.size()) {

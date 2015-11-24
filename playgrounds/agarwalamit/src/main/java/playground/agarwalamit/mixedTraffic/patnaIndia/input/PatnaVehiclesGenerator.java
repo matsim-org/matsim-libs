@@ -32,7 +32,7 @@ import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
 
 import playground.agarwalamit.mixedTraffic.MixedTrafficVehiclesUtils;
-import playground.agarwalamit.mixedTraffic.patnaIndia.PatnaConstants;
+import playground.agarwalamit.mixedTraffic.patnaIndia.PatnaUtils;
 import playground.agarwalamit.utils.LoadMyScenarios;
 
 /**
@@ -40,23 +40,23 @@ import playground.agarwalamit.utils.LoadMyScenarios;
  */
 public class PatnaVehiclesGenerator {
 	
+	private Scenario scenario ;
+	private Vehicles vehicles;
+	
 	/**
 	 * @param plansFile is required to get vehicles for each agent type in population.
 	 */
-	public PatnaVehiclesGenerator(String plansFile) {
+	public PatnaVehiclesGenerator(final String plansFile) {
 		this.scenario = LoadMyScenarios.loadScenarioFromPlans(plansFile);
 	}
 	
-	private Scenario scenario ;
-	private Vehicles vehicles;
-
 	public void createVehicles () {
 
 		vehicles = VehicleUtils.createVehiclesContainer();
 
 		Map<String, VehicleType> modesType = new HashMap<String, VehicleType>();
 		
-		for (String vehicleType :PatnaConstants.allModes) {
+		for (String vehicleType :PatnaUtils.ALL_MODES) {
 			VehicleType veh = VehicleUtils.getFactory().createVehicleType(Id.create(vehicleType,VehicleType.class));
 			veh.setMaximumVelocity( MixedTrafficVehiclesUtils.getSpeed(vehicleType) );
 			veh.setPcuEquivalents( MixedTrafficVehiclesUtils.getPCU(vehicleType) );
@@ -68,7 +68,7 @@ public class PatnaVehiclesGenerator {
 			for(PlanElement pe:p.getSelectedPlan().getPlanElements()) {
 				if(pe instanceof Leg ){
 					String travelMode =  ((Leg) pe).getMode();
-					if( !modesType.containsKey(travelMode) ) throw new RuntimeException("Vehicle Type is not defined. Define"+ travelMode+ "vehicle Type.");	
+					if( ! modesType.containsKey(travelMode) ) throw new RuntimeException("Vehicle Type is not defined. Define"+ travelMode+ "vehicle Type.");	
 
 					VehicleType vType = modesType.get(travelMode);
 					Vehicle veh =  VehicleUtils.getFactory().createVehicle(Id.create(p.getId(), Vehicle.class), vType);

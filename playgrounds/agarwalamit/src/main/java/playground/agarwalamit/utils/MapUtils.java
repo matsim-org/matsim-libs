@@ -30,10 +30,12 @@ import org.matsim.api.core.v01.population.Person;
  * @author amit
  */
 
-public class MapUtils {
+public final class MapUtils {
+	
+	private MapUtils(){}
 
-	public static int intSum(Map<?, Integer> intMap){
-		if(intMap==null || intMap.isEmpty()) return 0;
+	public static int intSum(final Map<?, Integer> intMap){
+		if(intMap==null ) throw new NullPointerException("The map is null. Aborting ...");
 		int sum =0;
 		for(Integer i :intMap.values()){
 			sum+=i;	
@@ -41,8 +43,8 @@ public class MapUtils {
 		return sum;
 	}
 
-	public static double doubleSum(Map<?, Double> doubleMap){
-		if(doubleMap==null || doubleMap.isEmpty()) return 0;
+	public static double doubleSum(final Map<?, Double> doubleMap){
+		if(doubleMap==null ) throw new NullPointerException("The map is null. Aborting ...");
 		double sum =0;
 		for(Double i :doubleMap.values()){
 			sum+=i;	
@@ -53,7 +55,7 @@ public class MapUtils {
 	 * @return m1-m2
 	 * <p> if key does not exist in either of map, value for that is assumed as <b>zero.
 	 */
-	public static Map<Id<Person>, Double> subtractMaps(Map<Id<Person>, Double> m1, Map<Id<Person>, Double> m2){
+	public static Map<Id<Person>, Double> subtractMaps(final Map<Id<Person>, Double> m1, final Map<Id<Person>, Double> m2){
 		Set<Id<Person>> keys = new HashSet<>(m1.keySet());
 		keys.addAll(m2.keySet());
 		Map<Id<Person>, Double> outMap = new HashMap<Id<Person>, Double>();

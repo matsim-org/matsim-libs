@@ -36,33 +36,33 @@ import playground.agarwalamit.utils.plans.BackwardCompatibilityForOldPlansType;
 
 public class PatnaControler {
 
-	private static final String inputFilesDir = "../../../../repos/runs-svn/patnaIndia/run108/input/";
-	private static final String outputDir = "../../../../repos/runs-svn/patnaIndia/run108/output/t3/";
+	private static final String INPUT_FILE_DIR = "../../../../repos/runs-svn/patnaIndia/run108/input/";
+	private static final String OUTPUT_DIR = "../../../../repos/runs-svn/patnaIndia/run108/output/t3/";
 
 	public static void main(String[] args) {
 		PatnaConfigGenerator configGenerator = new PatnaConfigGenerator();
 		configGenerator.createBasicConfigSettings();
 		Config config = configGenerator.getPatnaConfig();
 
-		config.network().setInputFile(inputFilesDir+"/network_diff_linkSpeed.xml.gz");
+		config.network().setInputFile(INPUT_FILE_DIR+"/network_diff_linkSpeed.xml.gz");
 
-		BackwardCompatibilityForOldPlansType bcrt = new BackwardCompatibilityForOldPlansType(inputFilesDir+"/SelectedPlansOnly.xml", PatnaConstants.mainModes);
+		BackwardCompatibilityForOldPlansType bcrt = new BackwardCompatibilityForOldPlansType(INPUT_FILE_DIR+"/SelectedPlansOnly.xml", PatnaUtils.MAIN_MODES);
 		bcrt.extractPlansExcludingLinkInfo();
-		String plansFile = inputFilesDir+"/selectedPlans_diff_tripPurpose.xml.gz";
+		String plansFile = INPUT_FILE_DIR+"/selectedPlans_diff_tripPurpose.xml.gz";
 		bcrt.writePopOut(plansFile);
 
 		config.qsim().setVehiclesSource(VehiclesSource.fromVehiclesData);
 
 		PatnaVehiclesGenerator pvg = new PatnaVehiclesGenerator(plansFile);
 		pvg.createVehicles();
-		String patnaVehicles = inputFilesDir+"/patnaVehicles.xml.gz";
+		String patnaVehicles = INPUT_FILE_DIR+"/patnaVehicles.xml.gz";
 		new VehicleWriterV1(pvg.getPatnaVehicles()).writeFile(patnaVehicles);
 
 		config.plans().setInputFile(plansFile);
-		config.counts().setCountsFileName(inputFilesDir+"/countsCarMotorbikeBike.xml");
+		config.counts().setCountsFileName(INPUT_FILE_DIR+"/countsCarMotorbikeBike.xml");
 		config.vehicles().setVehiclesFile(patnaVehicles);
 
-		config.controler().setOutputDirectory(outputDir);
+		config.controler().setOutputDirectory(OUTPUT_DIR);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 
 		final Controler controler = new Controler(config);

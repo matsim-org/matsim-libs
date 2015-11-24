@@ -1,4 +1,4 @@
-package playground.dziemke.accessibility;
+package playground.dziemke.accessibility.ptmatrix;
 
 import java.io.BufferedWriter;
 import java.io.IOException;

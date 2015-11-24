@@ -46,7 +46,7 @@ public class TripsCounter {
 
 			for(int i=0;i<runCases.length;i++){
 				String eventsFile = dir+runCases[i]+"/ITERS/it.1500/1500.events.xml.gz";
-				String countInfo = cnt.run(eventsFile,writer);
+				String countInfo = cnt.run(eventsFile);
 				writer.write(runCases[i]+"\t"+countInfo+"\n");
 			}
 			writer.close();
@@ -54,11 +54,9 @@ public class TripsCounter {
 			throw new RuntimeException("Data is not written in file. Reason: "
 					+ e);
 		}
-
 	}
 
-
-	private String run(String eventsFile, BufferedWriter writer) {
+	private String run(String eventsFile) {
 
 		EventsManager events = EventsUtils.createEventsManager();
 		MatsimEventsReader reader = new MatsimEventsReader(events);
