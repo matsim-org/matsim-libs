@@ -28,7 +28,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 import org.apache.log4j.FileAppender;
 import org.apache.log4j.Logger;
@@ -71,8 +70,8 @@ public class GenerateFundamentalDiagramData {
 
 	static final Logger LOG = Logger.getLogger(GenerateFundamentalDiagramData.class);
 
-	static String RUN_DIR ;
-	static boolean isDumpingInputFiles = false; // includes config, network
+	private String runDir ;
+	private boolean isDumpingInputFiles = false; // includes config, network
 	private boolean isWritingEventsFileForEachIteration = false;
 	
 	static String[] TRAVELMODES;	
@@ -91,7 +90,7 @@ public class GenerateFundamentalDiagramData {
 	private int flowUnstableWarnCount [] ;
 	private int speedUnstableWarnCount [] ;
 
-	private static InputsForFDTestSetUp inputs;
+	private InputsForFDTestSetUp inputs;
 	private PrintStream writer;
 	private Scenario scenario;
 
@@ -157,8 +156,8 @@ public class GenerateFundamentalDiagramData {
 		if(SEEPAGE_ALLOWED) LOG.info("=======Seepage is allowed.========");
 		if(WITH_HOLES) LOG.info("======= Using double ended queue.=======");
 
-		if(isDumpingInputFiles && RUN_DIR==null) throw new RuntimeException("Config, nework and plan file can not be written without a directory location.");
-		if(RUN_DIR==null) throw new RuntimeException("Location to write data for FD is not set. Aborting...");
+		if(isDumpingInputFiles && runDir==null) throw new RuntimeException("Config, nework and plan file can not be written without a directory location.");
+		if(runDir==null) throw new RuntimeException("Location to write data for FD is not set. Aborting...");
 		
 		if(reduceDataPointsByFactor != 1) {
 			LOG.info("===============");
@@ -179,11 +178,13 @@ public class GenerateFundamentalDiagramData {
 
 		inputs = new InputsForFDTestSetUp();
 		inputs.run();
+		if(isDumpingInputFiles) inputs.dumpInputFiles(runDir);
+		
 		scenario = inputs.getScenario();
 
 		mode2FlowData = inputs.getTravelMode2FlowDynamicsData();
 
-		openFileAndWriteHeader(RUN_DIR+"/data.txt");
+		openFileAndWriteHeader(runDir+"/data.txt");
 
 		if(isPlottingDistribution){
 			parametricRunAccordingToDistribution();	
@@ -193,7 +194,7 @@ public class GenerateFundamentalDiagramData {
 	}
 
 	public void setRunDirectory(String runDir) {
-		RUN_DIR = runDir;
+		this.runDir = runDir;
 	}
 
 	public void setIsPassingAllowed(boolean isPassingAllowed) {
@@ -403,7 +404,7 @@ public class GenerateFundamentalDiagramData {
 		EventWriterXML eventWriter = null;
 		
 		if(isWritingEventsFileForEachIteration){
-			String eventsDir = RUN_DIR+"/events/";
+			String eventsDir = runDir+"/events/";
 			
 			if (! new File(eventsDir).exists() ) new File(eventsDir).mkdir();
 			
@@ -629,7 +630,7 @@ public class GenerateFundamentalDiagramData {
 		layout.setConversionPattern(conversionPattern);
 		FileAppender appender;
 		try {
-			appender = new FileAppender(layout, RUN_DIR+"/logfile.log",false);
+			appender = new FileAppender(layout, runDir+"/logfile.log",false);
 		} catch (IOException e1) {
 			throw new RuntimeException("File not found.");
 		}

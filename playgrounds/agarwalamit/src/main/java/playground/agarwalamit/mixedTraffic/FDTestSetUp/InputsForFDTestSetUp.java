@@ -48,8 +48,6 @@ import playground.agarwalamit.mixedTraffic.MixedTrafficVehiclesUtils;
  * @author amit
  */
 public class InputsForFDTestSetUp {
-	private String outputFolder;
-
 	public static final int SUBDIVISION_FACTOR = 1; //all sides of the triangle will be divided into subdivisionFactor links
 	public static final double LINK_LENGTH = 1000;//in m, length of one the triangle sides.
 	public static final double NO_OF_LANES = 1;
@@ -62,7 +60,6 @@ public class InputsForFDTestSetUp {
 	private  Map<Id<VehicleType>, TravelModesFlowDynamicsUpdator> vehicle2TravelModesData;
 	
 	void run(){
-		this.outputFolder= GenerateFundamentalDiagramData.RUN_DIR;
 		setUpConfig();
 		createTriangularNetwork();
 		//Initializing modeData objects//ZZ_TODO should be initialized when instancing FundamentalDiagrams, no workaround still found
@@ -96,8 +93,6 @@ public class InputsForFDTestSetUp {
 		
 		config.vspExperimental().setVspDefaultsCheckingLevel( VspDefaultsCheckingLevel.abort );
 		scenario = ScenarioUtils.createScenario(config);
-		
-		if(GenerateFundamentalDiagramData.isDumpingInputFiles) new ConfigWriter(config).write(outputFolder+"/config.xml");
 	}
 	
 	/**
@@ -189,8 +184,6 @@ public class InputsForFDTestSetUp {
 		endLink.setNumberOfLanes(1.);
 		endLink.setAllowedModes(allowedModes);
 		network.addLink(endLink);
-
-		if(GenerateFundamentalDiagramData.isDumpingInputFiles) new NetworkWriter(network).write(outputFolder+"/network.xml");
 	}
 
 	private void fillTravelModeData(){
@@ -211,5 +204,10 @@ public class InputsForFDTestSetUp {
 	
 	Map<Id<VehicleType>, TravelModesFlowDynamicsUpdator> getTravelMode2FlowDynamicsData(){
 		return vehicle2TravelModesData;
+	}
+	
+	void dumpInputFiles(String dir){
+		new ConfigWriter(scenario.getConfig()).write(dir+"/config.xml");
+		new NetworkWriter(scenario.getNetwork()).write(dir+"/network.xml");
 	}
 }
