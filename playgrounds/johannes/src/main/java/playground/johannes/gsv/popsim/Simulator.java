@@ -34,10 +34,7 @@ import playground.johannes.gsv.synPop.mid.Route2GeoDistance;
 import playground.johannes.gsv.synPop.sim3.ReplaceActTypes;
 import playground.johannes.synpop.data.*;
 import playground.johannes.synpop.data.io.PopulationIO;
-import playground.johannes.synpop.gis.DataPool;
-import playground.johannes.synpop.gis.FacilityData;
-import playground.johannes.synpop.gis.FacilityDataLoader;
-import playground.johannes.synpop.gis.ZoneDataLoader;
+import playground.johannes.synpop.gis.*;
 import playground.johannes.synpop.processing.CalculateGeoDistance;
 import playground.johannes.synpop.processing.GuessMissingActTypes;
 import playground.johannes.synpop.processing.LegAttributeRemover;
@@ -96,7 +93,15 @@ public class Simulator {
                 random);
         logger.info(String.format("Generated %s persons.", simPersons.size()));
         logger.info("Assigning home locations...");
-        new SetHomeFacilities(dataPool, "modena", random).apply(simPersons);
+        ZoneCollection lau2Zones = ((ZoneData)dataPool.get(ZoneDataLoader.KEY)).getLayer("lau2");
+        ZoneCollection modenaZones = ((ZoneData)dataPool.get(ZoneDataLoader.KEY)).getLayer("modena");
+        ZoneMobilityRate zoneMobilityRate = new ZoneMobilityRate(MiDKeys.PERSON_LAU2_CLASS, lau2Zones, new
+                ModePredicate(CommonValues.LEG_MODE_CAR));
+        zoneMobilityRate.analyze(refPersons, null);
+
+        SetHomeFacilities setHomeFacilities = new SetHomeFacilities(dataPool, "modena", random);
+//        setHomeFacilities.setZoneWeights(zoneMobilityRate.zoneMobilityRate(modenaZones));
+        setHomeFacilities.apply(simPersons);
         logger.info("Assigning random activity locations...");
         TaskRunner.run(new SetActivityFacilities((FacilityData) dataPool.get(FacilityDataLoader.KEY)), simPersons);
         logger.info("Recalculate geo distances...");
@@ -242,4 +247,19 @@ public class Simulator {
         }
     }
 
+//    private static TObjectDoubleHashMap<Zone> assignZoneWeights(ZoneCollection zones, TObjectDoubleHashMap<String>
+//            monilityRates) {
+//        TObjectDoubleHashMap<Zone> rates = new TObjectDoubleHashMap<>();
+//        for(Zone zone : zones.getZones()) {
+////            String inhabitantsVal = zone
+////            String category = zone.getAttribute(categoryKey);
+////            if(category != null) {
+//                double rate = monilityRates.get(category);
+//                rates.put(zone, rate);
+//            }
+//        }
+//
+//        return rates;
+//
+//    }
 }
