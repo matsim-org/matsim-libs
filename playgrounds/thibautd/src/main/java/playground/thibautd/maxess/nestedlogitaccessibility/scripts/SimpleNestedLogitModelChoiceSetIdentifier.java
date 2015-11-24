@@ -38,6 +38,7 @@ import playground.thibautd.maxess.nestedlogitaccessibility.framework.ChoiceSetId
 import playground.thibautd.maxess.nestedlogitaccessibility.framework.Nest;
 import playground.thibautd.maxess.nestedlogitaccessibility.framework.NestedChoiceSet;
 import playground.thibautd.maxess.prepareforbiogeme.tripbased.Trip;
+import playground.thibautd.utils.ConcurrentStopWatch;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -50,6 +51,7 @@ import java.util.Random;
  * @author thibautd
  */
 public class SimpleNestedLogitModelChoiceSetIdentifier implements ChoiceSetIdentifier<ModeNests> {
+	public enum Measurement { carTravelTime, ptTravelTime, bikeTravelTime, walkTravelTime, prismSampling; }
 	private static final double MU_CAR = 1;
 	private static final double MU_PT = 1;
 	private static final double MU_BIKE = 6.4;
@@ -63,12 +65,16 @@ public class SimpleNestedLogitModelChoiceSetIdentifier implements ChoiceSetIdent
 	private final QuadTree<ActivityFacility> relevantFacilities;
 	private final int budget_m;
 
+	private final ConcurrentStopWatch<Measurement> stopWatch;
+
 	public SimpleNestedLogitModelChoiceSetIdentifier(
+			final ConcurrentStopWatch<Measurement> stopWatch,
 			final String type,
 			final int nSamples,
 			final TripRouter router,
 			final ActivityFacilities allFacilities,
 			final int budget_m ) {
+		this.stopWatch = stopWatch;
 		this.nSamples = nSamples;
 		this.router = router;
 		this.allFacilities = allFacilities;
@@ -103,11 +109,15 @@ public class SimpleNestedLogitModelChoiceSetIdentifier implements ChoiceSetIdent
 						.setName( ModeNests.walk );
 
 		// Sample and route alternatives
+		stopWatch.startMeasurement( Measurement.prismSampling );
 		final ActivityFacility origin = getOrigin( person );
 		final List<ActivityFacility> prism = calcPrism( origin );
+		stopWatch.endMeasurement( Measurement.prismSampling );
+
 		for ( int i= 0; i < nSamples; i++ ) {
 			final ActivityFacility f = prism.remove( random.nextInt( prism.size() ) );
 
+			stopWatch.startMeasurement( Measurement.carTravelTime );
 			carNestBuilder.addAlternative(
 							calcAlternative(
 									i,
@@ -115,6 +125,8 @@ public class SimpleNestedLogitModelChoiceSetIdentifier implements ChoiceSetIdent
 									origin,
 									f,
 									person ) );
+			stopWatch.endMeasurement( Measurement.carTravelTime );
+			stopWatch.startMeasurement( Measurement.ptTravelTime );
 			ptNestBuilder.addAlternative(
 							calcAlternative(
 									i,
@@ -122,6 +134,8 @@ public class SimpleNestedLogitModelChoiceSetIdentifier implements ChoiceSetIdent
 									origin,
 									f,
 									person ) );
+			stopWatch.endMeasurement( Measurement.ptTravelTime );
+			stopWatch.startMeasurement( Measurement.bikeTravelTime );
 			bikeNestBuilder.addAlternative(
 							calcAlternative(
 									i,
@@ -129,6 +143,8 @@ public class SimpleNestedLogitModelChoiceSetIdentifier implements ChoiceSetIdent
 									origin,
 									f,
 									person ) );
+			stopWatch.endMeasurement( Measurement.bikeTravelTime );
+			stopWatch.startMeasurement( Measurement.walkTravelTime );
 			walkNestBuilder.addAlternative(
 							calcAlternative(
 									i,
@@ -136,6 +152,7 @@ public class SimpleNestedLogitModelChoiceSetIdentifier implements ChoiceSetIdent
 									origin,
 									f,
 									person ) );
+			stopWatch.endMeasurement( Measurement.walkTravelTime );
 		}
 
 		return new NestedChoiceSet<>(

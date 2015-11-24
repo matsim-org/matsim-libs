@@ -42,6 +42,7 @@ import playground.thibautd.maxess.nestedlogitaccessibility.writers.BasicPersonAc
 import playground.thibautd.utils.MoreIOUtils;
 
 import java.util.Collections;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author thibautd
@@ -67,15 +68,17 @@ public class RunSimpleNestedLogitAccessibility {
 
 			new XY2Links( carNetwork , scenario.getActivityFacilities() ).run( scenario.getPopulation() );
 
+			final SimpleNestedLogitModule module = new SimpleNestedLogitModule();
 			final NestedLogitAccessibilityCalculator<ModeNests> calculator =
 					InjectionUtils.createCalculator(
 							new TypeLiteral<ModeNests>() {},
 							new BaseNestedAccessibilityComputationModule<ModeNests>(
 									scenario ) {},
-							new SimpleNestedLogitModule() );
+							module );
 
 			// TODO store and write results
 			final TObjectDoubleMap<Id<Person>> accessibilities = calculator.computeAccessibilities ();
+			module.stopWatch.printStats( TimeUnit.SECONDS );
 			new BasicPersonAccessibilityWriter( scenario , accessibilities ).write( outputDir + "/accessibility_per_person.dat" );
 		}
 		finally {
