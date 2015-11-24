@@ -27,6 +27,7 @@ import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
 import org.matsim.core.gbl.MatsimRandom;
 
 import playground.agarwalamit.mixedTraffic.FDTestSetUp.GenerateFundamentalDiagramData;
+import playground.agarwalamit.mixedTraffic.FDTestSetUp.InputsForFDTestSetUp;
 
 /**
  * @author amit
@@ -73,15 +74,16 @@ public class RaceTrackSimulationTimeWriter {
 
 	private void processAndWriteSimulationTime ( QSimConfigGroup.LinkDynamics ld, QSimConfigGroup.TrafficDynamics td ){
 
-		GenerateFundamentalDiagramData generateFDData = new GenerateFundamentalDiagramData();
+		InputsForFDTestSetUp inputs = new InputsForFDTestSetUp();
+		inputs.setLinkDynamics(ld);
+		inputs.setTrafficDynamics(td);
+		inputs.setTravelModes(new String [] {"car","bike"});
+		inputs.setModalSplit(new String [] {"1.0","1.0"});
+		
+		GenerateFundamentalDiagramData generateFDData = new GenerateFundamentalDiagramData(inputs);
 		generateFDData.setRunDirectory(outputFolder+"/output_simTime/");
-		generateFDData.setTravelModes(new String [] {"car","bike"});
-		generateFDData.setModalSplit(new String [] {"1.0","1.0"}); //in pcu
 		generateFDData.setIsDumpingInputFiles(false);
 		generateFDData.setIsWritingEventsFileForEachIteration(false);
-
-		generateFDData.setLinkDynamics(ld);
-		generateFDData.setTrafficDynamics(td);
 
 		for (int i = 0; i<randomNumbers.length;i++) {
 			MatsimRandom.reset(randomNumbers[i]);

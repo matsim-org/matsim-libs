@@ -51,15 +51,27 @@ public class InputsForFDTestSetUp {
 	public static final int SUBDIVISION_FACTOR = 1; //all sides of the triangle will be divided into subdivisionFactor links
 	public static final double LINK_LENGTH = 1000;//in m, length of one the triangle sides.
 	public static final double NO_OF_LANES = 1;
+	private static final String HOLE_SPEED = "15";
+	
 	private final double LINK_CAPACITY = 2700; //in PCU/h
 	private final double END_TIME = 24*3600;
 	private final double FREESPEED = 60.;	//in km/h, maximum authorized velocity on the track
 	private final double STUCK_TIME = 10;
-
+	
+	private LinkDynamics linkDynamics = LinkDynamics.FIFO;
+	private TrafficDynamics trafficDynamics = TrafficDynamics.queue;
+	
+	private String [] travelModes;
+	private Double[] modalSplitInPCU;
 	private Scenario scenario;
-	private  Map<Id<VehicleType>, TravelModesFlowDynamicsUpdator> vehicle2TravelModesData;
+	private Map<Id<VehicleType>, TravelModesFlowDynamicsUpdator> vehicle2TravelModesData;
 
 	void run(){
+		
+		if (travelModes.length != modalSplitInPCU.length){
+			throw new RuntimeException("Modal split for each travel mode is necessray parameter, it is not defined correctly. Check your static variable!!! \n Aborting ...");
+		}
+		
 		setUpConfig();
 		createTriangularNetwork();
 		//Initializing modeData objects//ZZ_TODO should be initialized when instancing FundamentalDiagrams, no workaround still found
@@ -71,20 +83,22 @@ public class InputsForFDTestSetUp {
 		GenerateFundamentalDiagramData.LOG.info("==========Creating config ============");
 		Config config = ConfigUtils.createConfig();
 
-		config.qsim().setMainModes(Arrays.asList(GenerateFundamentalDiagramData.TRAVELMODES));
+		config.qsim().setMainModes(Arrays.asList(this.travelModes));
 		config.qsim().setStuckTime(STUCK_TIME);//allows to overcome maximal density regime
 		config.qsim().setEndTime(END_TIME);
 
-		config.qsim().setLinkDynamics(GenerateFundamentalDiagramData.linkDynamics.toString());
-
-		config.qsim().setTrafficDynamics(GenerateFundamentalDiagramData.trafficDynamics);
+		config.qsim().setLinkDynamics(linkDynamics.toString());
+		GenerateFundamentalDiagramData.LOG.info("==========The chosen link dynamics is "+linkDynamics+". =========="); 
+				
+		config.qsim().setTrafficDynamics(trafficDynamics);
+		GenerateFundamentalDiagramData.LOG.info("==========The chosen traffic dynamics is "+trafficDynamics+". ==========");
 		
-		if(GenerateFundamentalDiagramData.trafficDynamics.equals(TrafficDynamics.withHoles)) {
+		if(trafficDynamics.equals(TrafficDynamics.withHoles)) {
 			config.qsim().setSnapshotStyle(SnapshotStyle.withHoles); // to see holes in OTFVis
-			config.setParam("WITH_HOLE", "HOLE_SPEED", GenerateFundamentalDiagramData.HOLE_SPEED);
+			config.setParam("WITH_HOLE", "HOLE_SPEED", HOLE_SPEED);
 		}
 		
-		if(GenerateFundamentalDiagramData.linkDynamics.equals(LinkDynamics.SeepageQ)){
+		if(linkDynamics.equals(LinkDynamics.SeepageQ)){
 			config.setParam("seepage", "seepMode","bike");
 			config.setParam("seepage", "isSeepModeStorageFree", "false");
 			config.setParam("seepage", "isRestrictingNumberOfSeepMode", "true");
@@ -142,7 +156,7 @@ public class InputsForFDTestSetUp {
 		Node endNode = scenario.getNetwork().getFactory().createNode(endNodeId, coord);
 		network.addNode(endNode);
 
-		Set<String> allowedModes = new HashSet<>(Arrays.asList(GenerateFundamentalDiagramData.TRAVELMODES));
+		Set<String> allowedModes = new HashSet<>(Arrays.asList(this.travelModes));
 
 		// triangle links
 		for (int i = 0; i<3*SUBDIVISION_FACTOR; i++){
@@ -187,12 +201,12 @@ public class InputsForFDTestSetUp {
 
 	private void fillTravelModeData(){
 		vehicle2TravelModesData = new HashMap<>();
-		for (int i=0; i < GenerateFundamentalDiagramData.TRAVELMODES.length; i++){
-			Id<VehicleType> modeId = Id.create(GenerateFundamentalDiagramData.TRAVELMODES[i],VehicleType.class);
+		for (int i=0; i < this.travelModes.length; i++){
+			Id<VehicleType> modeId = Id.create(this.travelModes[i],VehicleType.class);
 			VehicleType vehicleType = VehicleUtils.getFactory().createVehicleType(modeId);
-			vehicleType.setPcuEquivalents(MixedTrafficVehiclesUtils.getPCU(GenerateFundamentalDiagramData.TRAVELMODES[i]));
-			vehicleType.setMaximumVelocity(MixedTrafficVehiclesUtils.getSpeed(GenerateFundamentalDiagramData.TRAVELMODES[i]));
-			TravelModesFlowDynamicsUpdator modeData = new TravelModesFlowDynamicsUpdator(vehicleType);
+			vehicleType.setPcuEquivalents(MixedTrafficVehiclesUtils.getPCU(this.travelModes[i]));
+			vehicleType.setMaximumVelocity(MixedTrafficVehiclesUtils.getSpeed(this.travelModes[i]));
+			TravelModesFlowDynamicsUpdator modeData = new TravelModesFlowDynamicsUpdator(vehicleType,this.travelModes.length);
 			vehicle2TravelModesData.put(modeId, modeData);
 		}
 	}
@@ -208,5 +222,32 @@ public class InputsForFDTestSetUp {
 	void dumpInputFiles(String dir){
 		new ConfigWriter(scenario.getConfig()).write(dir+"/config.xml");
 		new NetworkWriter(scenario.getNetwork()).write(dir+"/network.xml");
+	}
+	
+	public void setLinkDynamics(LinkDynamics linkDynamic) {
+		linkDynamics = linkDynamic;
+	}
+
+	public void setTrafficDynamics(TrafficDynamics trafficDynamic){
+		trafficDynamics = trafficDynamic;
+	}
+
+	public String[] getTravelModes() {
+		return travelModes;
+	}
+
+	public void setTravelModes(String[] travelModes) {
+		this.travelModes = travelModes;
+	}
+	
+	public Double[] getModalSplit(){
+		return this.modalSplitInPCU;
+	}
+	
+	public void setModalSplit(String [] modalSplit) {
+		this.modalSplitInPCU = new Double [modalSplit.length];
+		for (int ii = 0; ii <modalSplit.length; ii ++){
+			this.modalSplitInPCU [ii] = Double.valueOf(modalSplit[ii]);
+		}
 	}
 }
