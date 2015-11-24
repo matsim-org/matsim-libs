@@ -34,8 +34,8 @@ import org.matsim.facilities.Facility;
 import org.matsim.facilities.OpeningTimeImpl;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
-public class RunAmenityReaderForBe {
-	final private static Logger LOG = Logger.getLogger(RunAmenityReaderForBe.class);
+public class RunOsmAmenityReaderBerlin {
+	final private static Logger LOG = Logger.getLogger(RunOsmAmenityReaderBerlin.class);
 
 	/**
 	 * Implementing the {@link AmenityReader} class. 

@@ -25,8 +25,8 @@ import org.matsim.facilities.FacilitiesUtils;
 
 import playground.dziemke.utils.LogToOutputSaver;
 
-public class RunAccessibilityKibera {
-	public static final Logger log = Logger.getLogger( RunAccessibilityKibera.class ) ;
+public class AccessibilityComputationKibera {
+	public static final Logger log = Logger.getLogger( AccessibilityComputationKibera.class ) ;
 	
 	private static final double cellSize = 100.;
 

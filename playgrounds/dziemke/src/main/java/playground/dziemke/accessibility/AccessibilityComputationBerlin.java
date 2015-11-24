@@ -25,8 +25,8 @@ import org.matsim.facilities.FacilitiesUtils;
 
 import playground.dziemke.utils.LogToOutputSaver;
 
-public class RunAccessibilityBe {
-	public static final Logger log = Logger.getLogger( RunAccessibilityBe.class ) ;
+public class AccessibilityComputationBerlin {
+	public static final Logger log = Logger.getLogger( AccessibilityComputationBerlin.class ) ;
 	
 //	private static final double cellSize = 1000.;
 //	private static final double cellSize = 200.;

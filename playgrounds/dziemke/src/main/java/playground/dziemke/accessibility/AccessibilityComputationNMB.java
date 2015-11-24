@@ -28,8 +28,8 @@ import org.matsim.facilities.ActivityOption;
 import org.matsim.facilities.FacilitiesUtils;
 
 
-public class RunAccessibilityNMBM {
-	public static final Logger log = Logger.getLogger(RunAccessibilityNMBM.class);
+public class AccessibilityComputationNMB {
+	public static final Logger log = Logger.getLogger(AccessibilityComputationNMB.class);
 	
 	private static final double cellSize = 1000.;
 
@@ -66,29 +66,31 @@ public class RunAccessibilityNMBM {
 		Double lowerBound = 0.5;
 		Double upperBound = 4.;
 		Integer range = 9;
-		int symbolSize = 1000;
+		int symbolSize = 1010;
 		int populationThreshold = (int) (200 / (1000/cellSize * 1000/cellSize));
 
-		// extends of the network are (as they can looked up by using the bounding box):
+		// extent of the network are (as they can looked up by using the bounding box):
 		// minX = 111083.9441831379, maxX = 171098.03695045778, minY = -3715412.097693177,	maxY = -3668275.43481496
 		// choose map view a bit bigger
 		double[] mapViewExtent = {100000,-3720000,180000,-3675000};
 		
 
 		// config and scenario
-		Config config = ConfigUtils.createConfig(new AccessibilityConfigGroup()) ;
+//		Config config = ConfigUtils.createConfig(new AccessibilityConfigGroup());
+		Config config = ConfigUtils.createConfig(new AccessibilityConfigGroup(), new MatrixBasedPtRouterConfigGroup());
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setOutputDirectory(outputDirectory);
 		config.network().setInputFile(networkFile);
 		config.facilities().setInputFile(facilitiesFile);
 		config.controler().setLastIteration(0);
+		
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		
 		
 		// matrix-based pt
-        MatrixBasedPtRouterConfigGroup mbpcg = ConfigUtils.addOrGetModule(
-        		config, MatrixBasedPtRouterConfigGroup.GROUP_NAME, MatrixBasedPtRouterConfigGroup.class);
-//		MatrixBasedPtRouterConfigGroup mbpcg = (MatrixBasedPtRouterConfigGroup) config.getModule( MatrixBasedPtRouterConfigGroup.GROUP_NAME);
+//        MatrixBasedPtRouterConfigGroup mbpcg = ConfigUtils.addOrGetModule(
+//        		config, MatrixBasedPtRouterConfigGroup.GROUP_NAME, MatrixBasedPtRouterConfigGroup.class);
+		MatrixBasedPtRouterConfigGroup mbpcg = (MatrixBasedPtRouterConfigGroup) config.getModule(MatrixBasedPtRouterConfigGroup.GROUP_NAME);
 		mbpcg.setPtStopsInputFile(ptStopsFile);
 		mbpcg.setUsingTravelTimesAndDistances(true);
 		mbpcg.setPtTravelDistancesInputFile(travelDistanceMatrixFile);
@@ -101,7 +103,7 @@ public class RunAccessibilityNMBM {
         // if no travel matrix (distances and times) is provided, the teleported mode speed for pt needs to be set
 //      ModeRoutingParams ptParameters = new ModeRoutingParams(TransportMode.pt);
 //      ptParameters.setTeleportedModeSpeed(50./3.6);
-//      plansCalcRoute.addModeRoutingParams(ptParameters );
+//      plansCalcRoute.addModeRoutingParams(ptParameters);
         
         // by adding ModeRoutingParams (as done above for pt), the other parameters are deleted.
         // the walk and bike parameters are needed, however. This is why they have to be set here again
@@ -168,9 +170,9 @@ public class RunAccessibilityNMBM {
 
 			// grid-based accessibility controller listener
 			GridBasedAccessibilityControlerListenerV3 listener = 
-//					new GridBasedAccessibilityControlerListenerV3(activityFacilitiesMap.get(actType), config, scenario.getNetwork());
-					new GridBasedAccessibilityControlerListenerV3(activityFacilitiesMap.get(actType), ptMatrix, config, scenario.getNetwork());
-				
+					new GridBasedAccessibilityControlerListenerV3(activityFacilitiesMap.get(actType), 
+							ptMatrix, config, scenario.getNetwork());
+			
 			listener.setComputingAccessibilityForMode(Modes4Accessibility.freeSpeed, true);
 			listener.setComputingAccessibilityForMode(Modes4Accessibility.car, true);
 			listener.setComputingAccessibilityForMode(Modes4Accessibility.walk, true);
