@@ -19,6 +19,7 @@
 package playground.agarwalamit.mixedTraffic.patnaIndia.input;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -52,7 +53,7 @@ public class PatnaCountsGenerator {
 		pcg.writeCountsDataToFile(outCountsFile);
 	}
 	
-	private void writeCountsDataToFile(String outCountsFile){
+	private void writeCountsDataToFile(final String outCountsFile){
 		
 		Counts<Link> counts = new Counts<Link>();
 		counts.setYear(2008);
@@ -67,7 +68,7 @@ public class PatnaCountsGenerator {
 		new CountsWriter(counts).write(outCountsFile);
 	}
 	
-	private Map<Tuple<Id<Link>,String>, Map<Integer, Double>> readFileAndReturnCountInfo(String file){
+	private Map<Tuple<Id<Link>,String>, Map<Integer, Double>> readFileAndReturnCountInfo(final String file){
 		
 		try (BufferedReader reader = IOUtils.getBufferedReader(file)) {
 			String line = reader.readLine();
@@ -93,7 +94,7 @@ public class PatnaCountsGenerator {
  				}
  				line = reader.readLine();	
 			}
-		} catch (Exception e) {
+		} catch (IOException e) {
 			throw new RuntimeException("Data is not written. Reason :"+e);
 		}
 		return countStation2time2countInfo;

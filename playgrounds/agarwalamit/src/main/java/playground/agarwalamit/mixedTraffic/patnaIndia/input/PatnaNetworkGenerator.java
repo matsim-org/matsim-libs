@@ -47,28 +47,28 @@ import playground.andreas.utils.net.NetworkSimplifier;
 
 public class PatnaNetworkGenerator {       
 
-	private static final Logger logger = Logger.getLogger(PatnaNetworkGenerator.class);
+	private static final Logger LOG = Logger.getLogger(PatnaNetworkGenerator.class);
 	private Scenario scenario;
 
 	public static void main(String[] args) throws IOException  {  
 		PatnaNetworkGenerator png =  new PatnaNetworkGenerator();
-		png.processDataAndWriteNetwork();
+		png.startProcessingFile();
 		new NetworkWriter(png.getPatnaNetwork()).write("../../../../repos/runs-svn/patnaIndia/run108/input/network_diff_linkSpeed.xml.gz");
 	}
 
-	public void processDataAndWriteNetwork() {
+	public void startProcessingFile() {
 		scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());                                       
 		final Network network = scenario.getNetwork();
 
-		String inputFileNetwork    =  PatnaUtils.INPUT_FILES_DIR+"/networkInputTransCad.csv" ;
+		String inputFileNetwork = PatnaUtils.INPUT_FILES_DIR+"/networkInputTransCad.csv" ;
 
 		TabularFileParserConfig tabularFileParserConfig = new TabularFileParserConfig();       
 		tabularFileParserConfig.setFileName(inputFileNetwork);
 		tabularFileParserConfig.setDelimiterTags(new String[] {","});                               
 		tabularFileParserConfig.setStartTag("linkId");											
 		TabularFileHandler tabularFileHandler = new TabularFileHandler()
-		// ZZ_TODO : increase capacity of roundabout links.
-		{            
+				// ZZ_TODO : increase capacity of roundabout links.
+				{            
 			@ Override
 			public void startRow(String[] row) {
 
@@ -90,8 +90,8 @@ public class PatnaNetworkGenerator {
 					fromNode = network.getNodes().get(fromNodeId);
 				}
 				else {
-					double xcord = ((Double.parseDouble(fromNodeXCoord))/(1000000));				
-					double ycord = ((Double.parseDouble(fromNodeYCoord))/(1000000));
+					double xcord = (Double.parseDouble(fromNodeXCoord))/(1000000);				
+					double ycord = (Double.parseDouble(fromNodeYCoord))/(1000000);
 					Coord createCoord = new Coord(xcord, ycord);
 					fromNode = network.getFactory().createNode(fromNodeId, PatnaUtils.COORDINATE_TRANSFORMATION.transform( createCoord));
 					network.addNode(fromNode);
@@ -103,8 +103,8 @@ public class PatnaNetworkGenerator {
 					toNode = network.getNodes().get(toNodeId);
 				}
 				else {
-					double xcord = ((Double.parseDouble(toNodeXCoord))/(1000000));
-					double ycord = ((Double.parseDouble(toNodeYCoord))/(1000000));
+					double xcord = (Double.parseDouble(toNodeXCoord))/(1000000);
+					double ycord = (Double.parseDouble(toNodeYCoord))/(1000000);
 					Coord createCoord = new Coord(xcord, ycord);
 					toNode = network.getFactory().createNode(toNodeId, PatnaUtils.COORDINATE_TRANSFORMATION.transform(createCoord) );
 					network.addNode(toNode);
@@ -113,21 +113,20 @@ public class PatnaNetworkGenerator {
 				Link link1 = network.getFactory().createLink(Id.create(linkId,Link.class), fromNode, toNode); 
 				Link link2 = network.getFactory().createLink(Id.create(linkId + "10000",Link.class), toNode, fromNode);   
 
-				int streamSpeed = Integer.parseInt(speedInKmph);
 				double freeSpeed = 0;
-//				type of road is Arterial, sub arterial and collector so speeds are 50. 40 . 40kph respectively.
-//				in given data speed is stream speeds (25, 20 and 15) not free flow speed
-				switch (streamSpeed)						
-				{ 
-				case 25 :	freeSpeed = 50; break;
-				case 20 :	freeSpeed = 40; break;
-				case 15 : 	freeSpeed = 40; break;
-				case 50 :	freeSpeed = 60; break;
+				//				type of road is Arterial, sub arterial and collector so speeds are 50. 40 . 40kph respectively.
+				//				in given data speed is stream speeds (25, 20 and 15) not free flow speed
+				switch (speedInKmph){ 
+				case "25" :	freeSpeed = 50; break;
+				case "20" :	freeSpeed = 40; break;
+				case "15" : 	freeSpeed = 40; break;
+				case "50" :	freeSpeed = 60; break;
+				default : throw new RuntimeException("The speed code "+speedInKmph+" is not recognized. Aborting...");
 				}
 				double freeSpeedInMPS = freeSpeed/3.6;	
-//				double freeSpeedInMPS = 60/3.6; 
+				//				double freeSpeedInMPS = 60/3.6; 
 
-				double roadWidth = (0.5*Double.parseDouble(widthOfRoad));			
+				double roadWidth = 0.5*Double.parseDouble(widthOfRoad);			
 				int numberoflanes = 0;
 
 				if ( roadWidth < 4) numberoflanes = 1;								
@@ -150,29 +149,29 @@ public class PatnaNetworkGenerator {
 				link2.setAllowedModes(new HashSet<>(PatnaUtils.ALL_MODES));
 				network.addLink(link2);
 			}
-		};
+				};
 
-		TabularFileParser tabularFileParser = new TabularFileParser();
-		tabularFileParser.parse(tabularFileParserConfig, tabularFileHandler);  
-		new NetworkCleaner().run(network);
+				TabularFileParser tabularFileParser = new TabularFileParser();
+				tabularFileParser.parse(tabularFileParserConfig, tabularFileHandler);  
+				new NetworkCleaner().run(network);
 
-		logger.info("Number of links in the network are"+ network.getLinks().size()+" and number of nodes in the link are"+network.getNodes().size());
+				LOG.info("Number of links in the network are"+ network.getLinks().size()+" and number of nodes in the link are"+network.getNodes().size());
 
-		NetworkSimplifier simplifier = new NetworkSimplifier();
-		Set<Integer> nodeTypesToMerge = new TreeSet<Integer>();
+				NetworkSimplifier simplifier = new NetworkSimplifier();
+				Set<Integer> nodeTypesToMerge = new TreeSet<Integer>();
 
-		nodeTypesToMerge.add(new Integer(4));
-		nodeTypesToMerge.add(new Integer(5));
+				nodeTypesToMerge.add(Integer.valueOf(4));
+				nodeTypesToMerge.add(Integer.valueOf(4));
 
-		simplifier.setNodesToMerge(nodeTypesToMerge);
-		simplifier.run(network);
+				simplifier.setNodesToMerge(nodeTypesToMerge);
+				simplifier.run(network);
 	}    
-	
+
 	public Network getPatnaNetwork() {
 		return scenario.getNetwork();
 	}
 
-	private double capacityOfLink (String roadwidth) {
+	private double capacityOfLink (final String roadwidth) {
 		double linkCapacity =0;
 		double w = Double.parseDouble(roadwidth);
 		double capacityCarrigway = -2184-22.6*Math.pow(w, 2)+857.4*w;  

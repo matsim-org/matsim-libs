@@ -40,16 +40,16 @@ import playground.agarwalamit.utils.LoadMyScenarios;
  */
 public class PatnaVehiclesGenerator {
 	
+	private Scenario scenario ;
+	private Vehicles vehicles;
+	
 	/**
 	 * @param plansFile is required to get vehicles for each agent type in population.
 	 */
-	public PatnaVehiclesGenerator(String plansFile) {
+	public PatnaVehiclesGenerator(final String plansFile) {
 		this.scenario = LoadMyScenarios.loadScenarioFromPlans(plansFile);
 	}
 	
-	private Scenario scenario ;
-	private Vehicles vehicles;
-
 	public void createVehicles () {
 
 		vehicles = VehicleUtils.createVehiclesContainer();
@@ -68,7 +68,7 @@ public class PatnaVehiclesGenerator {
 			for(PlanElement pe:p.getSelectedPlan().getPlanElements()) {
 				if(pe instanceof Leg ){
 					String travelMode =  ((Leg) pe).getMode();
-					if( !modesType.containsKey(travelMode) ) throw new RuntimeException("Vehicle Type is not defined. Define"+ travelMode+ "vehicle Type.");	
+					if( ! modesType.containsKey(travelMode) ) throw new RuntimeException("Vehicle Type is not defined. Define"+ travelMode+ "vehicle Type.");	
 
 					VehicleType vType = modesType.get(travelMode);
 					Vehicle veh =  VehicleUtils.getFactory().createVehicle(Id.create(p.getId(), Vehicle.class), vType);

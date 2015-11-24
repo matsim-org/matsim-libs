@@ -52,20 +52,15 @@ import playground.agarwalamit.utils.GeometryUtils;
  */
 public class PatnaUrbanDemandGenerator {
 
-	public PatnaUrbanDemandGenerator(String outputDir) {
-		this.outputDir = outputDir;
-	}
-
-	private  final Logger logger = Logger.getLogger(PatnaUrbanDemandGenerator.class);
-	private final String zoneFile = PatnaUtils.INPUT_FILES_DIR+"/wardFile/Wards.shp";	
-	private final int ID1 =0;				
-	private final int ID2 = 100000;
-	private final int ID3= 200000;
-	private final Random random = MatsimRandom.getRandom();
+	private static final Logger LOG = Logger.getLogger(PatnaUrbanDemandGenerator.class);
 
 	private Scenario scenario;
-	private String outputDir;
+	private final String outputDir;
 	private Collection<SimpleFeature> features ;
+
+	public PatnaUrbanDemandGenerator(final String outputDir) {
+		this.outputDir = outputDir;
+	}
 
 	public static void main (String []args) {
 		new PatnaUrbanDemandGenerator(PatnaUtils.INPUT_FILES_DIR).startProcessingAndWritePlans();
@@ -81,27 +76,27 @@ public class PatnaUrbanDemandGenerator {
 		Config config = ConfigUtils.createConfig();
 		scenario = ScenarioUtils.createScenario(config);
 
-		filesReader(planFile1, ID1);
-		filesReader(planFile2, ID2);
-		filesReader(planFile3, ID3);
+		filesReader(planFile1, "nonSlum_");
+		filesReader(planFile2, "nonSlum_");
+		filesReader(planFile3, "slum_");
 
 		new PopulationWriter(scenario.getPopulation()).write(this.outputDir+"/initial_plans.xml.gz");
-		logger.info("Writing Plan file is finished.");
+		LOG.info("Writing Plan file is finished.");
 	}
 
 	private Collection<SimpleFeature> readZoneFilesAndReturnFeatures() {
 		ShapeFileReader reader = new ShapeFileReader();
-		return reader.readFileAndInitialize(this.zoneFile);
+		return reader.readFileAndInitialize(PatnaUtils.ZONE_FILE);
 	}
 
-	private void filesReader (String planFile, int startId) {
+	private void filesReader (final String planFile, final String idPrefix) {
 		Iterator<SimpleFeature> iterator = features.iterator();
 
 		String line;
 		try (BufferedReader bufferedReader = new BufferedReader(new FileReader(planFile)) ) {
 			line = bufferedReader.readLine();
 
-			while ((line)!= null ) {
+			while (line != null ) {
 				String[] parts = line.split(",");
 				String fromZoneId = parts [5];
 				String toZoneId = parts [6]; 
@@ -109,31 +104,15 @@ public class PatnaUrbanDemandGenerator {
 
 				Coord homeZoneCoordTransform = null ;
 				Coord workZoneCoordTransform = null ;
-				Point p=null, q = null;
+				Point p=null;
+				Point q = null;
 
 				Population population = scenario.getPopulation();
 				PopulationFactory factory = population.getFactory();
 
 				toZoneId = getCorrectZoneNumber(toZoneId);
 
-				if (! fromZoneId.equals(toZoneId))	{														
-					while (iterator.hasNext()){
-						SimpleFeature feature = iterator.next();
-						int Id = (Integer) feature.getAttribute("ID1");
-						String zoneId  = String.valueOf(Id);
-
-						if(fromZoneId.equals(zoneId) ) {
-							p = GeometryUtils.getRandomPointsFromWard(feature);
-							Coord fromZoneCoord = new Coord(p.getX(), p.getY());
-							homeZoneCoordTransform = PatnaUtils.COORDINATE_TRANSFORMATION.transform(fromZoneCoord);
-						}
-						else if (toZoneId.equals(zoneId)){
-							q = GeometryUtils.getRandomPointsFromWard(feature);
-							Coord toZoneCoord = new Coord(q.getX(), q.getY());
-							workZoneCoordTransform= PatnaUtils.COORDINATE_TRANSFORMATION.transform(toZoneCoord);
-						}
-					}
-				} else if (fromZoneId.equals(toZoneId)) {
+				if (fromZoneId.equals(toZoneId)) {
 					// intraZonal trips
 					while (iterator.hasNext()){
 
@@ -147,9 +126,26 @@ public class PatnaUrbanDemandGenerator {
 						Coord toZoneCoord = new Coord(q.getX(), q.getY());
 						workZoneCoordTransform= PatnaUtils.COORDINATE_TRANSFORMATION.transform(toZoneCoord);
 					}
-				}
+				} else {														
+					while (iterator.hasNext()){
+						SimpleFeature feature = iterator.next();
+						int id = (Integer) feature.getAttribute("ID1");
+						String zoneId  = String.valueOf(id);
 
-				Person person = factory.createPerson(Id.create(Integer.toString(startId++),Person.class));
+						if(fromZoneId.equals(zoneId) ) {
+							p = GeometryUtils.getRandomPointsFromWard(feature);
+							Coord fromZoneCoord = new Coord(p.getX(), p.getY());
+							homeZoneCoordTransform = PatnaUtils.COORDINATE_TRANSFORMATION.transform(fromZoneCoord);
+						}
+						else if (toZoneId.equals(zoneId)){
+							q = GeometryUtils.getRandomPointsFromWard(feature);
+							Coord toZoneCoord = new Coord(q.getX(), q.getY());
+							workZoneCoordTransform= PatnaUtils.COORDINATE_TRANSFORMATION.transform(toZoneCoord);
+						}
+					}
+				}  
+
+				Person person = factory.createPerson(Id.create(idPrefix+population.getPersons().size(),Person.class));
 				population.addPerson(person);
 
 				String travelMode = getTravelMode(parts [8]);
@@ -165,8 +161,8 @@ public class PatnaUrbanDemandGenerator {
 		}
 	}
 
-	private String getTravelMode( String travelModeFromSurvey) {
-		String travelMode = null;
+	private String getTravelMode( final String travelModeFromSurvey) {
+		String travelMode ;
 		switch (travelModeFromSurvey) {
 		case "1":	// Bus
 		case "2":	// Mini Bus
@@ -186,11 +182,12 @@ public class PatnaUrbanDemandGenerator {
 			travelMode = randomModeSlum();	break;				// 480 such trips are found 
 		case "999999" : 
 			travelMode = randomModeUrban(); break; 			// for zones 27 to 42
+		default : throw new RuntimeException("Travel mode input code is not recognized. Aborting ...");
 		}
 		return travelMode;
 	}
 
-	private String getCorrectZoneNumber(String zoneId) {
+	private String getCorrectZoneNumber(final String zoneId) {
 		// for trips terminating in zone 73,74,75 and 76 are replaced by zone 6,1,3 and 3 respectively
 		String outZoneId = "NULL" ;
 		switch(zoneId) {
@@ -206,11 +203,10 @@ public class PatnaUrbanDemandGenerator {
 		return outZoneId;
 	}
 
-	private  Plan createPlan ( Coord toZoneFeatureCoord, Coord fromZoneFeatureCoord, String mode, String tripPurpose) {
-
+	private Plan createPlan (final Coord toZoneFeatureCoord, final Coord fromZoneFeatureCoord, final String mode, final String tripPurpose) {
+		Random random = MatsimRandom.getRandom();
 		Population population = scenario.getPopulation();
 		PopulationFactory populationFactory = population.getFactory();
-
 		Plan plan = populationFactory.createPlan();
 
 		double homeActEndTime=0.; 
@@ -249,6 +245,7 @@ public class PatnaUrbanDemandGenerator {
 			secondActType = PatnaActivityTypes.valueOf("unknown").toString();
 			break;
 		} 
+		default : throw new RuntimeException("Trip purpose input code is not recognized. Aborting ...");
 		}
 
 
@@ -271,7 +268,7 @@ public class PatnaUrbanDemandGenerator {
 		// this method is for slum population as 480 plans don't have information about travel mode so one random mode is assigned out of these four modes.
 		//		share of each vehicle is given in table 5-13 page 91 in CMP Patna
 		//		pt - 15, car -0, 2W - 7, Bicycle -39 and walk 39
-		Random rnd = new Random();
+		Random rnd = MatsimRandom.getRandom();
 		int rndNr = rnd.nextInt(100);
 		String travelMode = null;
 		if (rndNr <= 15)  travelMode = "pt";				
@@ -284,7 +281,7 @@ public class PatnaUrbanDemandGenerator {
 	private  String randomModeUrban () {
 		//		share of each vehicle is given in table 5-13 page 91 in CMP Patna
 		//		pt - 23, car -5, 2W - 25, Bicycle -33 and walk 14
-		Random rnd = new Random();
+		Random rnd = MatsimRandom.getRandom();
 		int rndNr = rnd.nextInt(100);
 		String travelMode = null;
 		if (rndNr <=23 )  travelMode = "pt";										
