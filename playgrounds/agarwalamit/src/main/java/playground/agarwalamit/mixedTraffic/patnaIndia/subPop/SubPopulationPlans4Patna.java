@@ -46,7 +46,7 @@ import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Point;
 
-import playground.agarwalamit.mixedTraffic.patnaIndia.PatnaConstants;
+import playground.agarwalamit.mixedTraffic.patnaIndia.PatnaUtils;
 import playground.agarwalamit.utils.GeometryUtils;
 /**
  * @author amit
@@ -135,12 +135,12 @@ public class SubPopulationPlans4Patna {
 						if(fromZoneId.equals(zoneId) ) {
 							p = GeometryUtils.getRandomPointsFromWard(feature);
 							Coord fromZoneCoord = new Coord(p.getX(), p.getY());
-							homeZoneCoordTransform = PatnaConstants.COORDINATE_TRANSFORMATION.transform(fromZoneCoord);
+							homeZoneCoordTransform = PatnaUtils.COORDINATE_TRANSFORMATION.transform(fromZoneCoord);
 						}
 						else if (toZoneId.equals(zoneId)){
 							q = GeometryUtils.getRandomPointsFromWard(feature);
 							Coord toZoneCoord = new Coord(q.getX(), q.getY());
-							workZoneCoordTransform= PatnaConstants.COORDINATE_TRANSFORMATION.transform(toZoneCoord);
+							workZoneCoordTransform= PatnaUtils.COORDINATE_TRANSFORMATION.transform(toZoneCoord);
 						}
 					}
 				} 
@@ -153,11 +153,11 @@ public class SubPopulationPlans4Patna {
 
 						p = GeometryUtils.getRandomPointsFromWard(feature);
 						Coord fromZoneCoord = new Coord(p.getX(), p.getY());
-						homeZoneCoordTransform = PatnaConstants.COORDINATE_TRANSFORMATION.transform(fromZoneCoord);
+						homeZoneCoordTransform = PatnaUtils.COORDINATE_TRANSFORMATION.transform(fromZoneCoord);
 
 						q = GeometryUtils.getRandomPointsFromWard(feature);
 						Coord toZoneCoord = new Coord(q.getX(), q.getY());
-						workZoneCoordTransform= PatnaConstants.COORDINATE_TRANSFORMATION.transform(toZoneCoord);
+						workZoneCoordTransform= PatnaUtils.COORDINATE_TRANSFORMATION.transform(toZoneCoord);
 					}
 				}
 

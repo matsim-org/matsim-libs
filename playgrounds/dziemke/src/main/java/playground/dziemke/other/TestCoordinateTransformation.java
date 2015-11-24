@@ -6,30 +6,27 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
 public class TestCoordinateTransformation {
 
-	/**
-	 * Use our standard coordinate transformation procedure to convert coordinates from Nelson Mandela Bay from South African Albers to WGS84
-	 * 
-	 * @param args
-	 */
 	public static void main(String[] args) {
-		CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.DHDN_GK4, TransformationFactory.WGS84);
+		// WGS84 = EPSG:4326
+		// Arc 1960 / UTM zone 37S = "EPSG:21037"
+		// WGS 84 / UTM zone 37S = "EPSG:31468"
+//		CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation(
+//				TransformationFactory.DHDN_GK4, TransformationFactory.WGS84);
+		CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation
+//				("EPSG:4326", "EPSG:31468");
+				("EPSG:4326", "EPSG:21037");
 
-		Coord coordinateMoabitDHDN_GK4 = new Coord(4590918.313160132, 5822867.249212103);
-
-		final double y1 = -3714912.098;
-		Coord lowerLeftCoordinateSAALbers = new Coord(111583.944, y1);
-		final double y = -3667912.098;
-		Coord upperRightCoordinateSAALbers = new Coord(171583.944, y);
+		Coord originalCoord1 = new Coord(36.82829619497265, -1.291087691581653); // near Nairobi, Kenya
+//		Coord originalCoord2 = new Coord(171583.944, y);
 		
-		Coord coordinateMoabitWGS84 = transformation.transform(coordinateMoabitDHDN_GK4);
-		
-		Coord lowerLeftCoordinateWGS84 = transformation.transform(lowerLeftCoordinateSAALbers);
-		Coord upperRightCoordinateWGS84 = transformation.transform(upperRightCoordinateSAALbers);
+		Coord convertedCoord1 = transformation.transform(originalCoord1);
+//		Coord convertedCoord2 = transformation.transform(originalCoord2);
 		
 		System.out.println("###########################################################################");
-		System.out.println("coordinateMoabitWGS84: " + coordinateMoabitWGS84);
-		System.out.println("lowerLeftCoordinateWGS84: " + lowerLeftCoordinateWGS84);
-		System.out.println("upperRightCoordinateWGS84: " + upperRightCoordinateWGS84);
+		System.out.println("originalCoord1: " + originalCoord1);
+//		System.out.println("originalCoord2: " + originalCoord2);
+		System.out.println("convertedCoord1: " + convertedCoord1);
+//		System.out.println("convertedCoord2: " + convertedCoord2);
 		System.out.println("###########################################################################");
 	}
 

@@ -27,8 +27,8 @@ import org.apache.log4j.Logger;
 import org.matsim.facilities.Facility;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
-public class RunLandUseReaderForBe {
-	final private static Logger LOG = Logger.getLogger(RunLandUseReaderForBe.class);
+public class RunLandUseReaderBerlin {
+	final private static Logger LOG = Logger.getLogger(RunLandUseReaderBerlin.class);
 
 	/**
 	 * Implementing the {@link LandUseReader} class. 

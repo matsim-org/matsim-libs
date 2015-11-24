@@ -20,8 +20,8 @@ import org.matsim.facilities.ActivityOption;
 import org.matsim.facilities.FacilitiesUtils;
 
 
-public class RunAccessibilityNMBMWorkEquiv {
-	public static final Logger log = Logger.getLogger(RunAccessibilityNMBMWorkEquiv.class);
+public class AccessibilityComputationNMBWorkEquiv {
+	public static final Logger log = Logger.getLogger(AccessibilityComputationNMBWorkEquiv.class);
 	
 	private static final double cellSize = 1000.;
 

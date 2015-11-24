@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,28 +16,43 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.mixedTraffic.patnaIndia;
 
-import java.util.Arrays;
+package playground.jbischoff.taxibus.scenario.strategies;
+
 import java.util.Collection;
 
-import org.matsim.core.utils.geometry.CoordinateTransformation;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Plan;
+
+import playground.jbischoff.taxibus.optimizer.fifo.Lines.LineDispatcher;
 
 /**
- * @author amit
+ * @author  jbischoff
+ *
  */
+public class TaxibusAndWOBScenarioPermissibleModesCalculator extends TaxibusPermissibleModesCalculatorImpl {
 
-public final class PatnaConstants {
+	private final Scenario scenario;
 	
-	public static CoordinateTransformation COORDINATE_TRANSFORMATION = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84,"EPSG:24345");
-	
-	public static String inputFilesDir = "../../../../repos/shared-svn/projects/patnaIndia/inputs/";
-	
-	public enum PatnaActivityTypes {
-		home, work, educational, social, other, unknown;
+	public TaxibusAndWOBScenarioPermissibleModesCalculator(String[] availableModes, LineDispatcher dispatcher, Scenario scenario) {
+		super(availableModes, dispatcher);
+		this.scenario = scenario;
 	}
 	
-	public static final Collection <String> mainModes = Arrays.asList("car","motorbike","bike");
-	public static final Collection <String> allModes = Arrays.asList("car","motorbike","bike","pt","walk");
+	
+	@Override
+	public Collection<String> getPermissibleModes(Plan plan) {
+		Collection<String> permissibleModes = super.getPermissibleModes(plan);
+		String subpop = (String) scenario.getPopulation().getPersonAttributes().getAttribute(plan.getPerson().getId().toString(), "subpopulation");
+		if (subpop.equals("schedulePt")){
+			permissibleModes.remove("tpt");
+			
+		}
+		else if (subpop.equals("teleportPt")){
+			permissibleModes.remove("pt");
+		}
+		
+		return permissibleModes;
+	}
+
 }

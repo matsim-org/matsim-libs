@@ -36,8 +36,8 @@ import playground.dziemke.utils.LogToOutputSaver;
 /**
  * @author dziemke
  */
-public class RunLandUseBuildingReaderForBe {
-	final private static Logger LOG = Logger.getLogger(RunLandUseBuildingReaderForBe.class);
+public class RunLandUseBuildingReaderBerlin {
+	final private static Logger LOG = Logger.getLogger(RunLandUseBuildingReaderBerlin.class);
 	//TODO write logger output somewhere
 
 	/**
