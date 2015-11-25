@@ -63,8 +63,14 @@ public abstract class AbstractTaxiOptimizer
                 unscheduleAwaitingRequests();
             }
 
-            for (Vehicle v : optimConfig.context.getVrpData().getVehicles().values()) {
-                optimConfig.scheduler.updateTimeline(TaxiSchedules.asTaxiSchedule(v.getSchedule()));
+            //TODO (1) use a seperate variable to decide upon updating the timeline??
+            //TODO (2) update timeline only if the algo really wants to reschedule in this time step,
+            //perhaps by checking if there are any unplanned requests??
+            if (doUnscheduleAwaitingRequests) {
+                for (Vehicle v : optimConfig.context.getVrpData().getVehicles().values()) {
+                    optimConfig.scheduler
+                            .updateTimeline(TaxiSchedules.asTaxiSchedule(v.getSchedule()));
+                }
             }
 
             scheduleUnplannedRequests();
