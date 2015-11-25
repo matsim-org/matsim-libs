@@ -25,11 +25,11 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.MatsimVrpContext;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.path.*;
-import org.matsim.contrib.dvrp.router.DijkstraWithThinPath;
 import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.tracker.*;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
+import org.matsim.core.router.*;
 import org.matsim.core.router.util.*;
 
 import playground.michalm.taxi.data.TaxiRequest;
@@ -54,8 +54,16 @@ public class TaxiScheduler
         this.params = params;
         this.travelTime = travelTime;
 
-        router = new DijkstraWithThinPath(context.getScenario().getNetwork(), travelDisutility,
-                travelTime);
+        //TODO FreeSpeedTravelDisutility?
+        PreProcessEuclidean preProcessEuclidean = new PreProcessEuclidean(travelDisutility);
+        preProcessEuclidean.run(context.getScenario().getNetwork());
+        
+        FastRouterDelegateFactory fastRouterFactory = new ArrayFastRouterDelegateFactory();
+        RoutingNetwork routingNetwork = new ArrayRoutingNetworkFactory(preProcessEuclidean)
+                .createRoutingNetwork(context.getScenario().getNetwork());
+
+        router = new FastAStarEuclidean(routingNetwork, preProcessEuclidean, travelDisutility,
+                travelTime, 1.5, fastRouterFactory);
 
         for (Vehicle veh : context.getVrpData().getVehicles().values()) {
             Schedule<TaxiTask> schedule = TaxiSchedules.asTaxiSchedule(veh.getSchedule());
