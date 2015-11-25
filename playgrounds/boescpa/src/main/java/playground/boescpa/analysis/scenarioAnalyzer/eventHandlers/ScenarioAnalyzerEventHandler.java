@@ -22,7 +22,7 @@
 package playground.boescpa.analysis.scenarioAnalyzer.eventHandlers;
 
 import org.matsim.core.events.handler.EventHandler;
-import playground.boescpa.analysis.scenarioAnalyzer.spatialFilters.SpatialEventCutter;
+import playground.boescpa.analysis.spatialCutters.SpatialCutter;
 
 /**
  * Any new analysis to be done as part of the ScenarioAnalyzer-process has to implement this interface.
@@ -34,5 +34,5 @@ public interface ScenarioAnalyzerEventHandler extends EventHandler {
 	 * @param spatialEventCutter
 	 * @return Results of the analysis in form of a (multiline) string.
 	 */
-	public String createResults(SpatialEventCutter spatialEventCutter, int scaleFactor);
+	public String createResults(SpatialCutter spatialEventCutter, int scaleFactor);
 }

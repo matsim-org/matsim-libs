@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import playground.boescpa.analysis.scenarioAnalyzer.ScenarioAnalyzer;
-import playground.boescpa.analysis.scenarioAnalyzer.spatialFilters.SpatialEventCutter;
+import playground.boescpa.analysis.spatialCutters.SpatialCutter;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -95,7 +95,7 @@ public class MFDCreator implements ScenarioAnalyzerEventHandler, LinkLeaveEventH
 	}
 
 	@Override
-	public String createResults(SpatialEventCutter spatialEventCutter, int scaleFactor) {
+	public String createResults(SpatialCutter spatialEventCutter, int scaleFactor) {
 		String timebinString = "time bins" + ScenarioAnalyzer.DEL;
 		String densityString = "densities" + ScenarioAnalyzer.DEL;
 		String flowString = "flows" + ScenarioAnalyzer.DEL;

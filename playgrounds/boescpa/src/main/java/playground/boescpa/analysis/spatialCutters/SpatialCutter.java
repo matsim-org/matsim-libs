@@ -19,49 +19,25 @@
  * *********************************************************************** *
  */
 
-package playground.boescpa.analysis.scenarioAnalyzer.spatialFilters;
+package playground.boescpa.analysis.spatialCutters;
 
-import com.vividsolutions.jts.geom.Geometry;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.utils.gis.ShapeFileReader;
-import org.opengis.feature.simple.SimpleFeature;
-import playground.boescpa.lib.tools.coordUtils.CoordAnalyzer;
-import playground.boescpa.lib.tools.SHPFileUtils;
-
-import java.util.HashSet;
-import java.util.Set;
 
 /**
- * Returns for an area specified in an SHP-File if a link is in the area (true) or not (false).
- *
  * @author boescpa
  */
-public class SHPFileCutter implements SpatialEventCutter {
+public interface SpatialCutter {
 
-	private final String shpFile;
-	private final CoordAnalyzer coordAnalyzer;
+	/**
+	 * Checks if a link is in a given area.
+	 *
+	 * @param link
+	 * @return true if the link is in the area, false if not.
+	 */
+	public boolean spatiallyConsideringLink(Link link);
 
-	public SHPFileCutter(String shpFile) {
-		this.shpFile = shpFile;
-		Set<SimpleFeature> features = new HashSet<>();
-		SHPFileUtils util = new SHPFileUtils();
-		features.addAll(ShapeFileReader.getAllFeatures(shpFile));
-		Geometry area = util.mergeGeometries(features);
-		coordAnalyzer = new CoordAnalyzer(area);
-	}
-
-	public boolean spatiallyConsideringLink(Link link) {
-		return coordAnalyzer.isLinkAffected(link);
-	}
-
-	public boolean spatiallyConsideringCoord(Coord coord) {
-		return coordAnalyzer.isCoordAffected(coord);
-	}
-
-	@Override
-	public String toString() {
-		return "Area: " + shpFile;
-	}
-
+	/**
+	 * @return A description of the considered area.
+	 */
+	public String toString();
 }

@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.events.handler.*;
 import org.matsim.api.core.v01.network.Network;
 import playground.boescpa.analysis.scenarioAnalyzer.ScenarioAnalyzer;
-import playground.boescpa.analysis.scenarioAnalyzer.spatialFilters.SpatialEventCutter;
+import playground.boescpa.analysis.spatialCutters.SpatialCutter;
 import playground.boescpa.analysis.trips.tripCreation.TripHandler;
 
 import java.util.*;
@@ -51,7 +51,7 @@ public class TripActivityCrosscorrelator implements ScenarioAnalyzerEventHandler
 	private List<String> modes = new ArrayList<>();
 	private List<String> activities = new ArrayList<>();
 	private List<List<Integer>> counts = new ArrayList<>(); // outer field: modes, inner field: activities
-	private SpatialEventCutter spatialEventCutter = null;
+	private SpatialCutter spatialEventCutter = null;
 
 	public TripActivityCrosscorrelator(Network network) {
 		this.tripHandler = new TripHandler();
@@ -98,7 +98,7 @@ public class TripActivityCrosscorrelator implements ScenarioAnalyzerEventHandler
 	 * @return A multiline String containing the above listed results.
 	 */
 	@Override
-	public String createResults(SpatialEventCutter spatialEventCutter, int scaleFactor) {
+	public String createResults(SpatialCutter spatialEventCutter, int scaleFactor) {
 		this.scaleFactor = scaleFactor;
 		// reset the analysis
 		this.modes.clear();

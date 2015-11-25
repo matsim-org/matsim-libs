@@ -23,9 +23,9 @@ package playground.boescpa.converters.visum.preprocessing;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
+import playground.boescpa.analysis.spatialCutters.SpatialCutter;
 import playground.boescpa.analysis.trips.tripCreation.TripHandler;
 import playground.boescpa.analysis.trips.tripCreation.TripProcessor;
-import playground.boescpa.analysis.trips.tripCreation.spatialCuttings.SpatialCuttingStrategy;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -40,8 +40,8 @@ public class VisumTripProcessor extends TripProcessor {
 
 	// TODO-boescpa Write tests...
 
-	public VisumTripProcessor(String tripFile, SpatialCuttingStrategy cuttingStrategy) {
-		super(tripFile, cuttingStrategy);
+	public VisumTripProcessor(String tripFile, SpatialCutter spatialCutter) {
+		super(tripFile, spatialCutter);
 	}
 
 	/**

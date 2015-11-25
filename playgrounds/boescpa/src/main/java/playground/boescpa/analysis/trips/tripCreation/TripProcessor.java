@@ -19,20 +19,19 @@
 
 package playground.boescpa.analysis.trips.tripCreation;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.utils.io.IOUtils;
+import playground.boescpa.analysis.spatialCutters.NoCutter;
+import playground.boescpa.analysis.spatialCutters.SpatialCutter;
 
-import playground.boescpa.analysis.trips.tripCreation.spatialCuttings.NoCutting;
-import playground.boescpa.analysis.trips.tripCreation.spatialCuttings.SpatialCuttingStrategy;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
 
 /**
  * Provides static methods to analyse and postprocess the trips created with
@@ -45,16 +44,16 @@ public abstract class TripProcessor {
 	
 	protected static Logger log = Logger.getLogger(TripProcessor.class);
 	private final String outputFile;
-	protected SpatialCuttingStrategy cuttingStrategy;
+	protected SpatialTripCutter spatialCutter;
 
 	public TripProcessor(String outputFile) {
 		this.outputFile = outputFile; // Path to the trip-File produced as output, e.g. "trips2030combined.txt"
-		this.cuttingStrategy = new NoCutting();
+		this.spatialCutter = new SpatialTripCutter(new NoCutter());
 	}
 
-	public TripProcessor(String outputFile, SpatialCuttingStrategy cuttingStrategy)	{
+	public TripProcessor(String outputFile, SpatialCutter spatialCutter)	{
 		this(outputFile);
-		this.cuttingStrategy = cuttingStrategy;
+		this.spatialCutter = new SpatialTripCutter(spatialCutter);
 	}
 
 	/**
@@ -62,14 +61,14 @@ public abstract class TripProcessor {
 	 * before any further processing.
 	 * 
 	 * Currently known implemented strategies:
-	 * 	NoCutting			[DEFAULT] All trips are processed, no spatial cut. ("argument" is not used)
-	 * 	ShpFileCutting		The trips are cut according to a provided shp-file. Needs the shp-file as an extra argument (Path as a String).
-	 * 	CircleBellevueCutting	Only the trips within a circle around Bellevue are processed. Needs the radius of the circle as an extra argument.
+	 * 	NoCutter			[DEFAULT] All trips are processed, no spatial cut. ("argument" is not used)
+	 * 	ShpFileCutter		The trips are cut according to a provided shp-file. Needs the shp-file as an extra argument (Path as a String).
+	 * 	CirclePointCutter	Only the trips within a circle around Bellevue are processed. Needs the radius of the circle as an extra argument.
 	 * 
-	 * @param cuttingStrategy			
+	 * @param spatialCutter
 	 */
-	public void setCuttingStrategy(SpatialCuttingStrategy cuttingStrategy) {
-		this.cuttingStrategy = cuttingStrategy;
+	public void setSpatialCutter(SpatialCutter spatialCutter) {
+		this.spatialCutter = new SpatialTripCutter(spatialCutter);
 	}
 
 	/**
@@ -109,7 +108,7 @@ public abstract class TripProcessor {
 					ArrayList<LinkedList<Id>> pathList = tripHandler.getPath().getValues(personId);
 					
 					for (int i = 0; i < startLinks.size(); i++) {
-						if (!cuttingStrategy.spatiallyConsideringTrip(network, startLinks.get(i), endLinks.get(i))) {
+						if (!spatialCutter.spatiallyConsideringTrip(network, startLinks.get(i), endLinks.get(i))) {
 							continue;
 						}
 						

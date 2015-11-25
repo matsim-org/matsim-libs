@@ -27,7 +27,7 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.utils.io.IOUtils;
 import playground.boescpa.analysis.scenarioAnalyzer.eventHandlers.ScenarioAnalyzerEventHandler;
-import playground.boescpa.analysis.scenarioAnalyzer.spatialFilters.SpatialEventCutter;
+import playground.boescpa.analysis.spatialCutters.SpatialCutter;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -67,7 +67,7 @@ public class ScenarioAnalyzer {
 		reader.readFile(eventsFile);
 	}
 
-	public void createResults(String pathToResultsFile, SpatialEventCutter spatialEventCutter) {
+	public void createResults(String pathToResultsFile, SpatialCutter spatialEventCutter) {
 		String results = getInitialResultsString(spatialEventCutter) + NL;
 
 		// Ask handlers for the results:
@@ -79,7 +79,7 @@ public class ScenarioAnalyzer {
 		writeResultsToFile(pathToResultsFile, results);
 	}
 
-	private String getInitialResultsString(SpatialEventCutter spatialEventCutter) {
+	private String getInitialResultsString(SpatialCutter spatialEventCutter) {
 		return spatialEventCutter.toString() + NL;
 	}
 

@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.events.handler.*;
 import org.matsim.api.core.v01.network.Network;
 import playground.boescpa.analysis.scenarioAnalyzer.ScenarioAnalyzer;
-import playground.boescpa.analysis.scenarioAnalyzer.spatialFilters.SpatialEventCutter;
+import playground.boescpa.analysis.spatialCutters.SpatialCutter;
 import playground.boescpa.analysis.trips.tripCreation.TripHandler;
 import playground.boescpa.analysis.trips.tripCreation.TripProcessor;
 
@@ -58,7 +58,7 @@ public class TripAnalyzer implements ScenarioAnalyzerEventHandler, PersonDepartu
 	private int scaleFactor = 1;
 	private Map<String, ModeResult> modes = new HashMap<>();
 	private Map<String, ActivityResult> activities = new HashMap<>();
-	private SpatialEventCutter spatialEventCutter = null;
+	private SpatialCutter spatialEventCutter = null;
 
 	public TripAnalyzer(Network network) {
 		this.tripHandler = new TripHandler();
@@ -108,7 +108,7 @@ public class TripAnalyzer implements ScenarioAnalyzerEventHandler, PersonDepartu
 	 * @return A multiline String containing the above listed results.
 	 */
 	@Override
-	public String createResults(SpatialEventCutter spatialEventCutter, int scaleFactor) {
+	public String createResults(SpatialCutter spatialEventCutter, int scaleFactor) {
 		this.scaleFactor = scaleFactor;
 		// reset the analysis
 		this.modes.clear();

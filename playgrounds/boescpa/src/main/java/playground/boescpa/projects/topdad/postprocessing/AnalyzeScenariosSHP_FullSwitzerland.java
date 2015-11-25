@@ -28,8 +28,8 @@ import playground.boescpa.analysis.scenarioAnalyzer.eventHandlers.AgentCounter;
 import playground.boescpa.analysis.scenarioAnalyzer.eventHandlers.ScenarioAnalyzerEventHandler;
 import playground.boescpa.analysis.scenarioAnalyzer.eventHandlers.TripActivityCrosscorrelator;
 import playground.boescpa.analysis.scenarioAnalyzer.eventHandlers.TripAnalyzer;
-import playground.boescpa.analysis.scenarioAnalyzer.spatialFilters.SHPFileCutter;
-import playground.boescpa.analysis.scenarioAnalyzer.spatialFilters.SpatialEventCutter;
+import playground.boescpa.analysis.spatialCutters.SHPFileCutter;
+import playground.boescpa.analysis.spatialCutters.SpatialCutter;
 
 /**
  * Analyzes events file from ToPDAd-Simulations...
@@ -52,14 +52,14 @@ public class AnalyzeScenariosSHP_FullSwitzerland {
 		String shpStGallenPath = args[6];
 		String shpLuzernPath = args[7];
 		String shpLuganoPath = args[8];
-		SpatialEventCutter zurichCutter = new SHPFileCutter(shpZurichPath);
-		SpatialEventCutter genevaCutter = new SHPFileCutter(shpGenevaPath);
-		SpatialEventCutter lausanneCutter = new SHPFileCutter(shpLausannePath);
-		SpatialEventCutter bernCutter = new SHPFileCutter(shpBernPath);
-		SpatialEventCutter baselCutter = new SHPFileCutter(shpBaselPath);
-		SpatialEventCutter stGallenCutter = new SHPFileCutter(shpStGallenPath);
-		SpatialEventCutter luzernCutter = new SHPFileCutter(shpLuzernPath);
-		SpatialEventCutter luganoCutter = new SHPFileCutter(shpLuganoPath);
+		SpatialCutter zurichCutter = new SHPFileCutter(shpZurichPath);
+		SpatialCutter genevaCutter = new SHPFileCutter(shpGenevaPath);
+		SpatialCutter lausanneCutter = new SHPFileCutter(shpLausannePath);
+		SpatialCutter bernCutter = new SHPFileCutter(shpBernPath);
+		SpatialCutter baselCutter = new SHPFileCutter(shpBaselPath);
+		SpatialCutter stGallenCutter = new SHPFileCutter(shpStGallenPath);
+		SpatialCutter luzernCutter = new SHPFileCutter(shpLuzernPath);
+		SpatialCutter luganoCutter = new SHPFileCutter(shpLuganoPath);
 
 		for (int i = 9; i < args.length; i++) {
 			try {

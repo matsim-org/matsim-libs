@@ -32,7 +32,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import playground.boescpa.analysis.scenarioAnalyzer.eventHandlers.*;
-import playground.boescpa.analysis.scenarioAnalyzer.spatialFilters.NoCutting;
+import playground.boescpa.analysis.spatialCutters.NoCutter;
 
 /**
  * @author boescpa
@@ -71,6 +71,6 @@ public class TestScenarioAnalyzer {
 	@Test
 	public void testAnalyzer() {
 		// Return the results:
-		scenarioAnalyzer.createResults(utils.getOutputDirectory() + "scenarioAnalyzerResults.txt", new NoCutting());
+		scenarioAnalyzer.createResults(utils.getOutputDirectory() + "scenarioAnalyzerResults.txt", new NoCutter());
 	}
 }

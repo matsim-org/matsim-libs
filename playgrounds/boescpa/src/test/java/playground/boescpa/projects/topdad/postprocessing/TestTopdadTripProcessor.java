@@ -32,10 +32,10 @@ import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
+import playground.boescpa.analysis.spatialCutters.NoCutter;
+import playground.boescpa.analysis.spatialCutters.SpatialCutter;
 import playground.boescpa.analysis.trips.tripCreation.TripHandler;
 import playground.boescpa.analysis.trips.tripCreation.TripProcessor;
-import playground.boescpa.analysis.trips.tripCreation.spatialCuttings.NoCutting;
-import playground.boescpa.analysis.trips.tripCreation.spatialCuttings.SpatialCuttingStrategy;
 
 import java.util.HashMap;
 
@@ -72,9 +72,9 @@ public class TestTopdadTripProcessor {
 		reader.parse(eventsFile);
 		
 		// run postprocessing
-		SpatialCuttingStrategy spatialCuttingStrategy = new NoCutting();
+		SpatialCutter spatialTripCutter = new NoCutter();
 		TripProcessor topdadTripProcessor = new TopdadTripProcessor(this.utils.getOutputDirectory() + "tripResults.txt",
-				this.utils.getOutputDirectory() + "analResults.txt", spatialCuttingStrategy);
+				this.utils.getOutputDirectory() + "analResults.txt", spatialTripCutter);
 		topdadTripProcessor.printTrips(tripHandler, network);
 		HashMap<String, Object> results = topdadTripProcessor.analyzeTrips(tripHandler, network);
 		Double[] car = (Double[]) results.get("car");

@@ -21,10 +21,10 @@
 
 package playground.boescpa.converters.visum.preprocessing;
 
+import playground.boescpa.analysis.spatialCutters.SHPFileCutter;
+import playground.boescpa.analysis.spatialCutters.SpatialCutter;
 import playground.boescpa.analysis.trips.tripCreation.TripCreator;
 import playground.boescpa.analysis.trips.tripCreation.TripProcessor;
-import playground.boescpa.analysis.trips.tripCreation.spatialCuttings.ShpFileCutting;
-import playground.boescpa.analysis.trips.tripCreation.spatialCuttings.SpatialCuttingStrategy;
 
 /**
  * Creates and prepares trips for visum-conversion.
@@ -39,8 +39,8 @@ public class VisumTripCreator {
 		String tripFile = args[2]; // Path to the trip-File produced as output, e.g. "trips2030combined.txt"
 		String shpFile = args[3]; // Path to a shp-File which defines the considered area.
 
-		SpatialCuttingStrategy spatialCuttingStrategy = new ShpFileCutting(shpFile);
-		TripProcessor tripProcessor = new VisumTripProcessor(tripFile, spatialCuttingStrategy);
+		SpatialCutter spatialTripCutter = new SHPFileCutter(shpFile);
+		TripProcessor tripProcessor = new VisumTripProcessor(tripFile, spatialTripCutter);
 		TripCreator tripCreator = new TripCreator(eventsFile, networkFile, tripProcessor);
 		tripCreator.createTrips();
 	}

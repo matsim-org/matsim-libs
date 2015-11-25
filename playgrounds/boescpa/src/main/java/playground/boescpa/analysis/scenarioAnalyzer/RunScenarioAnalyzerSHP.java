@@ -23,7 +23,7 @@ package playground.boescpa.analysis.scenarioAnalyzer;
 
 import org.matsim.api.core.v01.network.Network;
 import playground.boescpa.analysis.scenarioAnalyzer.eventHandlers.*;
-import playground.boescpa.analysis.scenarioAnalyzer.spatialFilters.SHPFileCutter;
+import playground.boescpa.analysis.spatialCutters.SHPFileCutter;
 import playground.boescpa.lib.tools.NetworkUtils;
 
 /**

@@ -1,4 +1,4 @@
-package playground.boescpa.analysis.scenarioAnalyzer.spatialFilters;
+package playground.boescpa.analysis.spatialCutters;
 
 import org.matsim.api.core.v01.network.Link;
 
@@ -7,13 +7,13 @@ import org.matsim.api.core.v01.network.Link;
  *
  * @author boescpa
  */
-public class NoCutting implements SpatialEventCutter {
+public class NoCutter implements SpatialCutter {
     @Override
     public boolean spatiallyConsideringLink(Link link) {
         return true;
     }
 
     public String toString() {
-        return "No spatial event cutter loaded. Use full network.";
+        return "No spatial cutter loaded. Use full network.";
     }
 }

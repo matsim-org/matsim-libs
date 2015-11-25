@@ -26,7 +26,7 @@ import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.network.Network;
 import playground.boescpa.analysis.scenarioAnalyzer.ScenarioAnalyzer;
-import playground.boescpa.analysis.scenarioAnalyzer.spatialFilters.SpatialEventCutter;
+import playground.boescpa.analysis.spatialCutters.SpatialCutter;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -56,7 +56,7 @@ public class AgentCounter implements ScenarioAnalyzerEventHandler, ActivityEndEv
 	}
 
 	@Override
-	public String createResults(SpatialEventCutter spatialEventCutter, int scaleFactor) {
+	public String createResults(SpatialCutter spatialEventCutter, int scaleFactor) {
 		Set<String> agents = new HashSet<>();
 		for (String[] vals : agentsAndLinks) {
 			if (spatialEventCutter.spatiallyConsideringLink(network.getLinks().get(Id.createLinkId(vals[1])))) {

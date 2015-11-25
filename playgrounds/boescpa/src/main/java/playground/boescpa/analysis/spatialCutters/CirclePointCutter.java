@@ -19,47 +19,51 @@
  * *********************************************************************** *
  */
 
-package playground.boescpa.analysis.trips.tripCreation.spatialCuttings;
+package playground.boescpa.analysis.spatialCutters;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.utils.geometry.CoordUtils;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
- * Spatial cutting strategy for trip processing.
- * 
- * Circle Point returns TRUE for all trips with start and/or end link
- * inside the circle around the specified point (xCoord, yCoord) with radius "cuttingRadius".
- * 
- * @author pboesch
+ * Circle Point returns TRUE for all links
+ * inside the circle around the specified point (xCoord, yCoord)
+ * with radius cuttingRadius (FALSE else).
+ *
+ * @author boescpa
  */
-public class CirclePointCutting implements SpatialCuttingStrategy {
+public class CirclePointCutter implements SpatialCutter {
 
 	private final int radius;
 	private final Coord center;
+	private final Map<Id, Boolean> linkCache;
 
-	/**
-	 * @param cuttingRadius [meters]
-	 */
-	public CirclePointCutting(int cuttingRadius, double xCoord, double yCoord) {
-		this.center = new Coord(xCoord, yCoord);
+	public CirclePointCutter(int cuttingRadius, double xCoord, double yCoord) {
 		this.radius = cuttingRadius;
+		this.center = new Coord(xCoord, yCoord);
+		this.linkCache = new HashMap<>();
 	}
 
 	@Override
-	public boolean spatiallyConsideringTrip(Network network, Id startLink, Id endLink) {
-		Link sLink = network.getLinks().get(startLink);
-		Link eLink = network.getLinks().get(endLink); // could be null!
-		
-		if (CoordUtils.calcDistance(sLink.getCoord(), center) <= radius) {
-			return true;
-		} else if (eLink != null && (CoordUtils.calcDistance(eLink.getCoord(), center) <= radius)) {
-			return true;
-		} else {
-			return false;
+	public boolean spatiallyConsideringLink(Link link) {
+		Boolean isConsidered = linkCache.get(link.getId());
+		if (isConsidered == null) {
+			isConsidered = false;
+			if (CoordUtils.calcDistance(link.getCoord(), center) <= radius) {
+				isConsidered = true;
+			}
+			linkCache.put(link.getId(),isConsidered);
 		}
+		return isConsidered;
 	}
 
+	@Override
+	public String toString() {
+		return "Area: Circle around x = " + center.getX() + " and y = " + center.getY()
+				+ " with radius = " + radius;
+	}
 }

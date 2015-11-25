@@ -24,9 +24,9 @@ package playground.boescpa.projects.topdad.postprocessing;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.utils.io.IOUtils;
+import playground.boescpa.analysis.spatialCutters.SpatialCutter;
 import playground.boescpa.analysis.trips.tripCreation.TripHandler;
 import playground.boescpa.analysis.trips.tripCreation.TripProcessor;
-import playground.boescpa.analysis.trips.tripCreation.spatialCuttings.SpatialCuttingStrategy;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -43,8 +43,8 @@ public class TopdadTripProcessor extends TripProcessor {
 
 	private final String valueFile;
 
-	public TopdadTripProcessor(String tripFile, String valueFile, SpatialCuttingStrategy cuttingStrategy) {
-		super(tripFile, cuttingStrategy);
+	public TopdadTripProcessor(String tripFile, String valueFile, SpatialCutter spatialCutter) {
+		super(tripFile, spatialCutter);
 		this.valueFile = valueFile;
 	}
 
@@ -81,7 +81,7 @@ public class TopdadTripProcessor extends TripProcessor {
 				ArrayList<Double> endTimes = tripData.getEndTime().getValues(personId);
 
 				for (int i = 0; i < startLinks.size(); i++) {
-					if (!cuttingStrategy.spatiallyConsideringTrip(network, startLinks.get(i), endLinks.get(i))) {
+					if (!spatialCutter.spatiallyConsideringTrip(network, startLinks.get(i), endLinks.get(i))) {
 						continue;
 					}
 
