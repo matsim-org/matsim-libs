@@ -37,10 +37,10 @@ import org.matsim.core.events.MatsimEventsReader;
 
 public class PersonArrivalAnalyzer {
 
-	private SortedMap<String,SortedMap<Integer, Integer>> timeBinToNumberOfArrivals = new TreeMap<>();
-	private String eventsFile;
+	private final SortedMap<String,SortedMap<Integer, Integer>> timeBinToNumberOfArrivals = new TreeMap<>();
+	private final String eventsFile;
 
-	public PersonArrivalAnalyzer(String eventsFile, String configFile) {
+	public PersonArrivalAnalyzer(final String eventsFile, final String configFile) {
 		this.eventsFile = eventsFile;
 
 		Config config = new Config();
@@ -57,7 +57,6 @@ public class PersonArrivalAnalyzer {
 			}
 			timeBinToNumberOfArrivals.put(mode, bin2Nr);
 		}
-
 	}
 
 	public void run (){
@@ -65,11 +64,9 @@ public class PersonArrivalAnalyzer {
 		MatsimEventsReader reader = new MatsimEventsReader(manager);
 
 		manager.addHandler(new PersonArrivalEventHandler() {
-
 			@Override
 			public void reset(int iteration) {
 			}
-
 			@Override
 			public void handleEvent(PersonArrivalEvent event) {
 				double time = event.getTime();
@@ -78,7 +75,6 @@ public class PersonArrivalAnalyzer {
 
 				SortedMap<Integer, Integer> bin2Count = timeBinToNumberOfArrivals.get(mode);
 				bin2Count.put(timeBin, bin2Count.get(timeBin)+1);
-				
 			}
 		});
 		reader.readFile(eventsFile);
