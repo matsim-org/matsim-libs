@@ -95,12 +95,14 @@ public class Simulator {
         logger.info("Assigning home locations...");
         ZoneCollection lau2Zones = ((ZoneData)dataPool.get(ZoneDataLoader.KEY)).getLayer("lau2");
         ZoneCollection modenaZones = ((ZoneData)dataPool.get(ZoneDataLoader.KEY)).getLayer("modena");
+        new ZoneSetLAU2Class().apply(lau2Zones);
         ZoneMobilityRate zoneMobilityRate = new ZoneMobilityRate(MiDKeys.PERSON_LAU2_CLASS, lau2Zones, new
                 ModePredicate(CommonValues.LEG_MODE_CAR));
         zoneMobilityRate.analyze(refPersons, null);
 
+        new TransferZoneAttribute().apply(lau2Zones, modenaZones, MiDKeys.PERSON_LAU2_CLASS);
         SetHomeFacilities setHomeFacilities = new SetHomeFacilities(dataPool, "modena", random);
-//        setHomeFacilities.setZoneWeights(zoneMobilityRate.zoneMobilityRate(modenaZones));
+        setHomeFacilities.setZoneWeights(zoneMobilityRate.getMobilityRatePerZone(modenaZones));
         setHomeFacilities.apply(simPersons);
         logger.info("Assigning random activity locations...");
         TaskRunner.run(new SetActivityFacilities((FacilityData) dataPool.get(FacilityDataLoader.KEY)), simPersons);
@@ -127,6 +129,8 @@ public class Simulator {
         geoDistanceBuilder.addDiscretizer(new LinearDiscretizer(50000), "linear");
         task.addComponent(geoDistanceBuilder.build());
         task.addComponent(new GeoDistLau2ClassTask(ioContext));
+        zoneMobilityRate.setIoContext(ioContext);
+        task.addComponent(zoneMobilityRate);
         logger.info("Analyzing reference population...");
         ioContext.append("ref");
         AnalyzerTaskRunner.run(refPersons, task, ioContext);
