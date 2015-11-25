@@ -109,12 +109,11 @@ public class QueuePositionCalculationHandler implements LinkLeaveEventHandler, L
 		builder.setLegMode(this.personId2LegMode.get(personId));
 		builder.setLinkId(linkId);
 		LeavingPersonInfo leavingPersonInfo = builder.build();
-		container.getPerson2LeavingPersonInfo().put(personId, builder.build());
+		container.getPerson2LeavingPersonInfo().put(personId, leavingPersonInfo);
 		
 		this.person2LinkEnterLeaveTimeData.add(container.getPersonInfoChecker(personId));
 		updateVehicleOnLinkAndFillToQueue(event.getTime());
 		container.getAgentsOnLink().remove(personId);
-		
 
 		if(container.getAgentsInQueue().contains(personId)) {
 			this.personLinkEnterLeaveTimeQueuePositionData.add(container.getPersonInfoChecker(personId));
@@ -124,7 +123,6 @@ public class QueuePositionCalculationHandler implements LinkLeaveEventHandler, L
 			double newAvailableSpace = availableSpaceSoFar + MixedTrafficVehiclesUtils.getCellSize(leavingPersonInfo.getLegMode());
 			container.updateRemainingLinkSpace(newAvailableSpace);
 		}
-		container.getPerson2LeavingPersonInfo().remove(personId);
 	}
 
 	private void updateVehicleOnLinkAndFillToQueue(final double currentTimeStep) {
@@ -136,7 +134,7 @@ public class QueuePositionCalculationHandler implements LinkLeaveEventHandler, L
 					PersonPositionChecker checker = container.getPersonInfoChecker(personId);
 					checker.updateAvailableLinkSpace(container.getRemainingLinkSpace());
 					checker.checkIfVehicleWillGoInQ(time);
-					if(checker.addVehicleInQueue()){
+					if(checker.isAddingVehicleInQueue()){
 						Queue<Id<Person>> queue = container.getAgentsInQueue();
 						if(! queue.contains(personId)) {
 							queue.offer(personId);
