@@ -27,7 +27,6 @@ import playground.johannes.synpop.data.*;
 import playground.johannes.synpop.gis.*;
 import playground.johannes.synpop.processing.PersonTask;
 import playground.johannes.synpop.source.mid2008.MiDKeys;
-import playground.johannes.synpop.source.mid2008.generator.PersonMunicipalityClassHandler;
 
 /**
  * @author johannes
@@ -74,8 +73,9 @@ public class SetLAU2Attribute implements PersonTask {
                 String val = zone.getAttribute(ZoneData.POPULATION_KEY);
                 if(val != null) {
                     double inhabs = Double.parseDouble(val);
-                    int lau2class = PersonMunicipalityClassHandler.getCategory((int)inhabs);
-                    person.setAttribute(MiDKeys.PERSON_LAU2_CLASS, String.valueOf(lau2class));
+//                    int lau2class = PersonMunicipalityClassHandler.getCategory((int)inhabs);
+                    String lau2Class = ZoneSetLAU2Class.inhabitants2Class(inhabs);
+                    person.setAttribute(MiDKeys.PERSON_LAU2_CLASS, lau2Class);
                 }
             }
         } else errors++;

@@ -145,7 +145,7 @@ public class PatnaUrbanDemandGenerator {
 					}
 				}  
 
-				Person person = factory.createPerson(Id.create(idPrefix+population.getPersons().size(),Person.class));
+				Person person = factory.createPerson(Id.createPersonId(idPrefix+population.getPersons().size()));
 				population.addPerson(person);
 
 				String travelMode = getTravelMode(parts [8]);

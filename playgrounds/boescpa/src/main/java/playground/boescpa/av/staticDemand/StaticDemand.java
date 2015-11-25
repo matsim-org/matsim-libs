@@ -24,7 +24,7 @@ package playground.boescpa.av.staticDemand;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.gbl.MatsimRandom;
-import playground.boescpa.lib.tools.tripReader.Trip;
+import playground.boescpa.analysis.trips.tripReader.Trip;
 
 import java.util.*;
 

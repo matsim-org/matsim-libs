@@ -110,12 +110,14 @@ public class PatnaConfigGenerator {
 		{
 			ModeRoutingParams mrp = new ModeRoutingParams("walk");
 			mrp.setTeleportedModeSpeed(4./3.6);
+			mrp.setBeelineDistanceFactor(1.1);
 			config.plansCalcRoute().addModeRoutingParams(mrp);
 		}
 
 		{
 			ModeRoutingParams mrp = new ModeRoutingParams("pt");
 			mrp.setTeleportedModeSpeed(20./3.6);
+			mrp.setBeelineDistanceFactor(1.5);
 			config.plansCalcRoute().addModeRoutingParams(mrp);
 		}
 	}

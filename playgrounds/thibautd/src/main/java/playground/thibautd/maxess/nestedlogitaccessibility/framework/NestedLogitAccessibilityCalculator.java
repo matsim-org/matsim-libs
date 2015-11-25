@@ -31,9 +31,11 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.facilities.ActivityFacilities;
+import playground.thibautd.utils.ConcurrentStopWatch;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author thibautd
@@ -78,6 +80,9 @@ public class NestedLogitAccessibilityCalculator<N extends Enum<N>> {
 
 		final Counter counter = new Counter( "Compute accessibility for person # " );
 		final Counter emptyCounter = new Counter( "Ignore empty plan # " );
+		final ConcurrentStopWatch<ComputationRunnable.Measurement> stopWatch =
+				new ConcurrentStopWatch<>(
+						ComputationRunnable.Measurement.class );
 
 		public ComputationThreadHandler(
 				final Provider<NestedLogitModel<N>> models,
@@ -88,6 +93,7 @@ public class NestedLogitAccessibilityCalculator<N extends Enum<N>> {
 				runnables.add(
 						new ComputationRunnable<>(
 								models.get(),
+								stopWatch,
 								counter,
 								emptyCounter ) );
 			}
@@ -112,6 +118,7 @@ public class NestedLogitAccessibilityCalculator<N extends Enum<N>> {
 			}
 			counter.printCounter();
 			emptyCounter.printCounter();
+			stopWatch.printStats( TimeUnit.SECONDS );
 
 			final TObjectDoubleMap<Id<Person>> results = new TObjectDoubleHashMap<>(  );
 			for ( ComputationRunnable<N> r : runnables ) {
@@ -122,18 +129,22 @@ public class NestedLogitAccessibilityCalculator<N extends Enum<N>> {
 	}
 
 	private static class ComputationRunnable<N extends Enum<N>> implements Runnable {
+		enum Measurement { choiceSampling, logsumComputation;}
 		private final NestedLogitModel<N> model;
 		private final List<Person> persons = new ArrayList<>(  );
 		private final TObjectDoubleMap<Id<Person>> result = new TObjectDoubleHashMap<>( );
+		private final ConcurrentStopWatch<Measurement> stopWatch;
 
 		final Counter personCounter;
 		final Counter emptyCounter;
 
 		private ComputationRunnable(
 				final NestedLogitModel<N> model,
+				final ConcurrentStopWatch<Measurement> stopWatch,
 				final Counter personCounter,
 				final Counter emptyCounter ) {
 			this.model = model;
+			this.stopWatch = stopWatch;
 			this.personCounter = personCounter;
 			this.emptyCounter = emptyCounter;
 		}
@@ -153,14 +164,19 @@ public class NestedLogitAccessibilityCalculator<N extends Enum<N>> {
 		}
 
 		private double computeAccessibility( Person p ) {
+			stopWatch.startMeasurement( Measurement.choiceSampling );
 			final NestedChoiceSet<N> choiceSet = model.getChoiceSetIdentifier().identifyChoiceSet( p );
+			stopWatch.endMeasurement( Measurement.choiceSampling );
 
+			stopWatch.startMeasurement( Measurement.logsumComputation );
 			final LogSumExpCalculator calculator = new LogSumExpCalculator( choiceSet.getNests().size() );
 			for ( Nest<N> nest : choiceSet.getNests() ) {
 				calculator.addTerm( logSumNestUtilities( p , nest ) );
 			}
 
-			return calculator.computeLogsumExp() / model.getMu();
+			final double r = calculator.computeLogsumExp() / model.getMu();
+			stopWatch.endMeasurement( Measurement.logsumComputation );
+			return r;
 		}
 
 		private double logSumNestUtilities(
@@ -178,7 +194,6 @@ public class NestedLogitAccessibilityCalculator<N extends Enum<N>> {
 		}
 
 	}
-
 
 	private static class LogSumExpCalculator {
 		private final TDoubleArrayList terms;

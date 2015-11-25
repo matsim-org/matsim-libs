@@ -26,7 +26,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.geometry.CoordUtils;
-import playground.boescpa.lib.tools.tripReader.Trip;
+import playground.boescpa.analysis.trips.tripReader.Trip;
 
 import java.util.*;
 

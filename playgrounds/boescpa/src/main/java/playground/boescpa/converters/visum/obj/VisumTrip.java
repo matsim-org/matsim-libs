@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 
-import playground.boescpa.lib.tools.tripReader.Trip;
+import playground.boescpa.analysis.trips.tripReader.Trip;
 
 /**
  * Provides a representation of visum trips.

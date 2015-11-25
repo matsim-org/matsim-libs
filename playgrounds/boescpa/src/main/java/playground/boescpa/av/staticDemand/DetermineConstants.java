@@ -22,7 +22,7 @@
 package playground.boescpa.av.staticDemand;
 
 import org.matsim.core.utils.geometry.CoordUtils;
-import playground.boescpa.lib.tools.tripReader.Trip;
+import playground.boescpa.analysis.trips.tripReader.Trip;
 
 import java.util.ArrayList;
 import java.util.List;

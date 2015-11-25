@@ -188,7 +188,7 @@ public class SeepageTest {
 
 		private final Map<Id<Person>, Map<Id<Link>, Double>> personLinkTravelTimes;
 
-		public PersonLinkTravelTimeEventHandler(Map<Id<Person>, Map<Id<Link>, Double>> agentTravelTimes) {
+		public PersonLinkTravelTimeEventHandler(final Map<Id<Person>, Map<Id<Link>, Double>> agentTravelTimes) {
 			this.personLinkTravelTimes = agentTravelTimes;
 		}
 

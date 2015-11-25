@@ -69,9 +69,6 @@ public class OTFVisWithSignals {
 		server.setListener( playPauseMobsimListener ) ;
 		qSim.addQueueSimulationListeners(playPauseMobsimListener);
 
-		// this is to trigger otfvis-specific cleanup (quite possibly not needed):
-		qSim.addQueueSimulationListeners( new OTFVisMobsimListener(server) );
-
 		server.setSimulation(qSim);
 
 		if (config.transit().isUseTransit()) {

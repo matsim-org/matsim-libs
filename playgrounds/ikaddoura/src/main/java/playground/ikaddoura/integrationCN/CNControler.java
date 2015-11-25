@@ -29,7 +29,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.otfvis.OTFVisModule;
+import org.matsim.contrib.otfvis.OTFVisFileWriterModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
@@ -319,7 +319,7 @@ public class CNControler {
 			throw new RuntimeException("This setup is not considered. Aborting...");
 		}
 		
-		controler.addOverridingModule(new OTFVisModule());
+		controler.addOverridingModule(new OTFVisFileWriterModule());
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		controler.run();
 		

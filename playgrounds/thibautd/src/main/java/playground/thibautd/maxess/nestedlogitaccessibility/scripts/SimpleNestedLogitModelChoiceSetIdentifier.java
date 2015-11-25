@@ -26,18 +26,19 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.socnetsim.utils.QuadTreeRebuilder;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.router.ActivityWrapperFacility;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityOption;
+import org.matsim.utils.objectattributes.ObjectAttributes;
 import playground.thibautd.maxess.nestedlogitaccessibility.framework.Alternative;
 import playground.thibautd.maxess.nestedlogitaccessibility.framework.ChoiceSetIdentifier;
 import playground.thibautd.maxess.nestedlogitaccessibility.framework.Nest;
 import playground.thibautd.maxess.nestedlogitaccessibility.framework.NestedChoiceSet;
 import playground.thibautd.maxess.prepareforbiogeme.tripbased.Trip;
+import playground.thibautd.utils.ConcurrentStopWatch;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -50,6 +51,7 @@ import java.util.Random;
  * @author thibautd
  */
 public class SimpleNestedLogitModelChoiceSetIdentifier implements ChoiceSetIdentifier<ModeNests> {
+	public enum Measurement { carTravelTime, ptTravelTime, bikeTravelTime, walkTravelTime, prismSampling; }
 	private static final double MU_CAR = 1;
 	private static final double MU_PT = 1;
 	private static final double MU_BIKE = 6.4;
@@ -60,18 +62,25 @@ public class SimpleNestedLogitModelChoiceSetIdentifier implements ChoiceSetIdent
 	private final TripRouter router;
 
 	private final ActivityFacilities allFacilities;
+	private final ObjectAttributes personAttributes;
 	private final QuadTree<ActivityFacility> relevantFacilities;
 	private final int budget_m;
 
+	private final ConcurrentStopWatch<Measurement> stopWatch;
+
 	public SimpleNestedLogitModelChoiceSetIdentifier(
+			final ConcurrentStopWatch<Measurement> stopWatch,
 			final String type,
 			final int nSamples,
 			final TripRouter router,
 			final ActivityFacilities allFacilities,
+			final ObjectAttributes personAttributes,
 			final int budget_m ) {
+		this.stopWatch = stopWatch;
 		this.nSamples = nSamples;
 		this.router = router;
 		this.allFacilities = allFacilities;
+		this.personAttributes = personAttributes;
 		this.budget_m = budget_m;
 
 		final QuadTreeRebuilder<ActivityFacility> builder = new QuadTreeRebuilder<>();
@@ -103,32 +112,46 @@ public class SimpleNestedLogitModelChoiceSetIdentifier implements ChoiceSetIdent
 						.setName( ModeNests.walk );
 
 		// Sample and route alternatives
+		stopWatch.startMeasurement( Measurement.prismSampling );
 		final ActivityFacility origin = getOrigin( person );
 		final List<ActivityFacility> prism = calcPrism( origin );
+		stopWatch.endMeasurement( Measurement.prismSampling );
+
 		for ( int i= 0; i < nSamples; i++ ) {
 			final ActivityFacility f = prism.remove( random.nextInt( prism.size() ) );
 
-			carNestBuilder.addAlternative(
-							calcAlternative(
-									i,
-									TransportMode.car,
-									origin,
-									f,
-									person ) );
+			if ( isCarAvailable( person ) ) {
+				stopWatch.startMeasurement( Measurement.carTravelTime );
+				carNestBuilder.addAlternative(
+						calcAlternative(
+								i,
+								TransportMode.car,
+								origin,
+								f,
+								person ) );
+				stopWatch.endMeasurement( Measurement.carTravelTime );
+			}
+			stopWatch.startMeasurement( Measurement.ptTravelTime );
 			ptNestBuilder.addAlternative(
-							calcAlternative(
-									i,
-									TransportMode.pt,
-									origin,
-									f,
-									person ) );
-			bikeNestBuilder.addAlternative(
-							calcAlternative(
-									i,
-									TransportMode.bike,
-									origin,
-									f,
-									person ) );
+					calcAlternative(
+							i,
+							TransportMode.pt,
+							origin,
+							f,
+							person ) );
+			stopWatch.endMeasurement( Measurement.ptTravelTime );
+			if ( isBikeAvailable( person ) ) {
+				stopWatch.startMeasurement( Measurement.bikeTravelTime );
+				bikeNestBuilder.addAlternative(
+						calcAlternative(
+								i,
+								TransportMode.bike,
+								origin,
+								f,
+								person ) );
+				stopWatch.endMeasurement( Measurement.bikeTravelTime );
+			}
+			stopWatch.startMeasurement( Measurement.walkTravelTime );
 			walkNestBuilder.addAlternative(
 							calcAlternative(
 									i,
@@ -136,6 +159,7 @@ public class SimpleNestedLogitModelChoiceSetIdentifier implements ChoiceSetIdent
 									origin,
 									f,
 									person ) );
+			stopWatch.endMeasurement( Measurement.walkTravelTime );
 		}
 
 		return new NestedChoiceSet<>(
@@ -143,6 +167,22 @@ public class SimpleNestedLogitModelChoiceSetIdentifier implements ChoiceSetIdent
 				ptNestBuilder.build(),
 				bikeNestBuilder.build(),
 				walkNestBuilder.build() );
+	}
+
+	private boolean isBikeAvailable( Person person ) {
+		final String avail = (String)
+				personAttributes.getAttribute(
+					person.getId().toString(),
+					"availability: bicycle" );
+		return avail.equals( "always" );
+	}
+
+	private boolean isCarAvailable( Person person ) {
+		final String avail = (String)
+				personAttributes.getAttribute(
+					person.getId().toString(),
+					"availability: car" );
+		return avail.equals( "always" );
 	}
 
 	private Alternative<ModeNests> calcAlternative(
