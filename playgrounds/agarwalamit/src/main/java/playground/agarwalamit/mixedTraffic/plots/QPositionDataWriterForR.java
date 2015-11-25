@@ -100,8 +100,7 @@ public class QPositionDataWriterForR {
 				// next line will write the queue distance and link leave time.
 				writer.write(personId+"\t"+linkId+"\t"+linkEnterTime+"\t"+initialPos+"\t"+timeStepTillFreeSpeed+"\t"+qStartDistFromFNode+"\t"+travelMode+"\n");
 				writer.write(personId+"\t"+linkId+"\t"+timeStepTillFreeSpeed+"\t"+qStartDistFromFNode+"\t"+(Double.valueOf(linkLeaveTime))+"\t"+endOfLink+"\t"+travelMode+"\n");
-				String timeDataLine=personId+"\t"+linkId+"\t"+linkEnterTime+"\t"+linkLeaveTime+"\t"+linkLength+"\t"+travelMode;
-				copyLinkEnterLeaveTimeData.remove(timeDataLine);
+				copyLinkEnterLeaveTimeData.remove(checker);
 			}
 
 			for(PersonInfoChecker checker : copyLinkEnterLeaveTimeData){
