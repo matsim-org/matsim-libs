@@ -63,6 +63,7 @@ public class SimpleNestedLogitModule extends AbstractModule {
 						scenario,
 						cache ),
 				scenario.getActivityFacilities(),
+				scenario.getPopulation().getPersonAttributes(),
 				DISTANCE_BUDGET );
 	}
 }

@@ -26,13 +26,13 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.socnetsim.utils.QuadTreeRebuilder;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.router.ActivityWrapperFacility;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityOption;
+import org.matsim.utils.objectattributes.ObjectAttributes;
 import playground.thibautd.maxess.nestedlogitaccessibility.framework.Alternative;
 import playground.thibautd.maxess.nestedlogitaccessibility.framework.ChoiceSetIdentifier;
 import playground.thibautd.maxess.nestedlogitaccessibility.framework.Nest;
@@ -62,6 +62,7 @@ public class SimpleNestedLogitModelChoiceSetIdentifier implements ChoiceSetIdent
 	private final TripRouter router;
 
 	private final ActivityFacilities allFacilities;
+	private final ObjectAttributes personAttributes;
 	private final QuadTree<ActivityFacility> relevantFacilities;
 	private final int budget_m;
 
@@ -73,11 +74,13 @@ public class SimpleNestedLogitModelChoiceSetIdentifier implements ChoiceSetIdent
 			final int nSamples,
 			final TripRouter router,
 			final ActivityFacilities allFacilities,
+			final ObjectAttributes personAttributes,
 			final int budget_m ) {
 		this.stopWatch = stopWatch;
 		this.nSamples = nSamples;
 		this.router = router;
 		this.allFacilities = allFacilities;
+		this.personAttributes = personAttributes;
 		this.budget_m = budget_m;
 
 		final QuadTreeRebuilder<ActivityFacility> builder = new QuadTreeRebuilder<>();
@@ -117,33 +120,37 @@ public class SimpleNestedLogitModelChoiceSetIdentifier implements ChoiceSetIdent
 		for ( int i= 0; i < nSamples; i++ ) {
 			final ActivityFacility f = prism.remove( random.nextInt( prism.size() ) );
 
-			stopWatch.startMeasurement( Measurement.carTravelTime );
-			carNestBuilder.addAlternative(
-							calcAlternative(
-									i,
-									TransportMode.car,
-									origin,
-									f,
-									person ) );
-			stopWatch.endMeasurement( Measurement.carTravelTime );
+			if ( isCarAvailable( person ) ) {
+				stopWatch.startMeasurement( Measurement.carTravelTime );
+				carNestBuilder.addAlternative(
+						calcAlternative(
+								i,
+								TransportMode.car,
+								origin,
+								f,
+								person ) );
+				stopWatch.endMeasurement( Measurement.carTravelTime );
+			}
 			stopWatch.startMeasurement( Measurement.ptTravelTime );
 			ptNestBuilder.addAlternative(
-							calcAlternative(
-									i,
-									TransportMode.pt,
-									origin,
-									f,
-									person ) );
+					calcAlternative(
+							i,
+							TransportMode.pt,
+							origin,
+							f,
+							person ) );
 			stopWatch.endMeasurement( Measurement.ptTravelTime );
-			stopWatch.startMeasurement( Measurement.bikeTravelTime );
-			bikeNestBuilder.addAlternative(
-							calcAlternative(
-									i,
-									TransportMode.bike,
-									origin,
-									f,
-									person ) );
-			stopWatch.endMeasurement( Measurement.bikeTravelTime );
+			if ( isBikeAvailable( person ) ) {
+				stopWatch.startMeasurement( Measurement.bikeTravelTime );
+				bikeNestBuilder.addAlternative(
+						calcAlternative(
+								i,
+								TransportMode.bike,
+								origin,
+								f,
+								person ) );
+				stopWatch.endMeasurement( Measurement.bikeTravelTime );
+			}
 			stopWatch.startMeasurement( Measurement.walkTravelTime );
 			walkNestBuilder.addAlternative(
 							calcAlternative(
@@ -160,6 +167,22 @@ public class SimpleNestedLogitModelChoiceSetIdentifier implements ChoiceSetIdent
 				ptNestBuilder.build(),
 				bikeNestBuilder.build(),
 				walkNestBuilder.build() );
+	}
+
+	private boolean isBikeAvailable( Person person ) {
+		final String avail = (String)
+				personAttributes.getAttribute(
+					person.getId().toString(),
+					"availability: bicycle" );
+		return avail.equals( "always" );
+	}
+
+	private boolean isCarAvailable( Person person ) {
+		final String avail = (String)
+				personAttributes.getAttribute(
+					person.getId().toString(),
+					"availability: car" );
+		return avail.equals( "always" );
 	}
 
 	private Alternative<ModeNests> calcAlternative(
