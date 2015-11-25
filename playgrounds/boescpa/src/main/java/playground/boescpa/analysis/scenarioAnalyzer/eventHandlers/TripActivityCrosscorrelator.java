@@ -28,12 +28,12 @@ import org.matsim.api.core.v01.events.handler.*;
 import org.matsim.api.core.v01.network.Network;
 import playground.boescpa.analysis.scenarioAnalyzer.ScenarioAnalyzer;
 import playground.boescpa.analysis.spatialCutters.SpatialCutter;
-import playground.boescpa.analysis.trips.tripCreation.TripHandler;
+import playground.boescpa.analysis.trips.TripHandler;
 
 import java.util.*;
 
 /**
- * Decorates playground.boescpa.analysis.trips.tripCreation.TripHandler with the method createResults(..).
+ * Decorates playground.boescpa.analysis.trips.TripHandler with the method createResults(..).
  *
  * Returns for every mode:
  *	o	Number of trips [] to reach every activity.

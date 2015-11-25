@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.boescpa.analysis.trips.tripCreation;
+package playground.boescpa.analysis.trips;
 
 import java.util.*;
 

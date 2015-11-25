@@ -1,4 +1,4 @@
-package playground.boescpa.analysis.trips.tripCreation;
+package playground.boescpa.analysis.trips;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;

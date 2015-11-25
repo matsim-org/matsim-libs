@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.boescpa.analysis.trips.tripCreation;
+package playground.boescpa.analysis.trips;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;

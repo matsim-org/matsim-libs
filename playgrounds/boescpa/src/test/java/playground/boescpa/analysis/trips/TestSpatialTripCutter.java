@@ -1,4 +1,4 @@
-package playground.boescpa.analysis.trips.tripCreation;
+package playground.boescpa.analysis.trips;
 
 import org.junit.Assert;
 import org.junit.Before;

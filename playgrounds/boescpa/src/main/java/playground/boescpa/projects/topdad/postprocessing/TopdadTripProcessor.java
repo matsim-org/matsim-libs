@@ -25,8 +25,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.utils.io.IOUtils;
 import playground.boescpa.analysis.spatialCutters.SpatialCutter;
-import playground.boescpa.analysis.trips.tripCreation.TripHandler;
-import playground.boescpa.analysis.trips.tripCreation.TripProcessor;
+import playground.boescpa.analysis.trips.TripHandler;
+import playground.boescpa.analysis.trips.TripProcessor;
 
 import java.io.BufferedWriter;
 import java.io.IOException;

@@ -28,8 +28,8 @@ import org.matsim.api.core.v01.events.handler.*;
 import org.matsim.api.core.v01.network.Network;
 import playground.boescpa.analysis.scenarioAnalyzer.ScenarioAnalyzer;
 import playground.boescpa.analysis.spatialCutters.SpatialCutter;
-import playground.boescpa.analysis.trips.tripCreation.TripHandler;
-import playground.boescpa.analysis.trips.tripCreation.TripProcessor;
+import playground.boescpa.analysis.trips.TripHandler;
+import playground.boescpa.analysis.trips.TripProcessor;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -37,7 +37,7 @@ import java.util.LinkedList;
 import java.util.Map;
 
 /**
- * Decorates playground.boescpa.analysis.trips.tripCreation.TripHandler with the method createResults(..).
+ * Decorates playground.boescpa.analysis.trips.TripHandler with the method createResults(..).
  *
  * Returns for every mode:
  *	o	Number of trips []

@@ -23,8 +23,8 @@ package playground.boescpa.converters.visum.preprocessing;
 
 import playground.boescpa.analysis.spatialCutters.SHPFileCutter;
 import playground.boescpa.analysis.spatialCutters.SpatialCutter;
-import playground.boescpa.analysis.trips.tripCreation.TripCreator;
-import playground.boescpa.analysis.trips.tripCreation.TripProcessor;
+import playground.boescpa.analysis.trips.TripCreator;
+import playground.boescpa.analysis.trips.TripProcessor;
 
 /**
  * Creates and prepares trips for visum-conversion.

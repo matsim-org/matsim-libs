@@ -29,7 +29,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import playground.boescpa.analysis.trips.tripReader.Trip;
+import playground.boescpa.analysis.trips.Trip;
 
 /**
  * WHAT IS IT FOR?

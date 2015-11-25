@@ -34,8 +34,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import playground.boescpa.analysis.spatialCutters.NoCutter;
 import playground.boescpa.analysis.spatialCutters.SpatialCutter;
-import playground.boescpa.analysis.trips.tripCreation.TripHandler;
-import playground.boescpa.analysis.trips.tripCreation.TripProcessor;
+import playground.boescpa.analysis.trips.TripHandler;
+import playground.boescpa.analysis.trips.TripProcessor;
 
 import java.util.HashMap;
 
