@@ -31,7 +31,7 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.mixedTraffic.MixedTrafficVehiclesUtils;
-import playground.agarwalamit.mixedTraffic.plots.LinkPersonInfoContainer.PersonInfoChecker;
+import playground.agarwalamit.mixedTraffic.plots.LinkPersonInfoContainer.PersonPositionChecker;
 import playground.agarwalamit.utils.LoadMyScenarios;
 
 /**
@@ -66,16 +66,16 @@ public class QPositionDataWriterForR {
 	}
 
 	private static void writeLinkEnterLeaveQueuePosDataForR(){
-		List<PersonInfoChecker> qPositionData = calculationHandler.getPersonLinkEnterTimeVehiclePositionDataToWrite();
-		List<PersonInfoChecker> linkEnterLeaveTimeData = calculationHandler.getPersonLinkEnterLeaveTimeDataToWrite();
-		List<PersonInfoChecker> copyLinkEnterLeaveTimeData = new ArrayList<PersonInfoChecker>(linkEnterLeaveTimeData);
+		List<PersonPositionChecker> qPositionData = calculationHandler.getPersonLinkEnterTimeVehiclePositionDataToWrite();
+		List<PersonPositionChecker> linkEnterLeaveTimeData = calculationHandler.getPersonLinkEnterLeaveTimeDataToWrite();
+		List<PersonPositionChecker> copyLinkEnterLeaveTimeData = new ArrayList<PersonPositionChecker>(linkEnterLeaveTimeData);
 		
 		BufferedWriter writer = IOUtils.getBufferedWriter(outputDir+"/rDataPersonInQueueData6.txt");
 		double vehicleSpeed =0;
 		try {
 			writer.write("personId \t linkId \t startTimeX1 \t initialPositionY1 \t endTimeX2 \t endPositionY2 \t travelMode \n");
 
-			for(PersonInfoChecker checker : qPositionData){
+			for(PersonPositionChecker checker : qPositionData){
 				EnteringPersonInfo enteredPerson = checker.getEnteredPersonInfo();
 				String personId = enteredPerson.getPersonId().toString();
 				String linkId = enteredPerson.getLink().getId().toString();
@@ -103,7 +103,7 @@ public class QPositionDataWriterForR {
 				copyLinkEnterLeaveTimeData.remove(checker);
 			}
 
-			for(PersonInfoChecker checker : copyLinkEnterLeaveTimeData){
+			for(PersonPositionChecker checker : copyLinkEnterLeaveTimeData){
 				EnteringPersonInfo enteredPerson = checker.getEnteredPersonInfo();
 				String personId = enteredPerson.getPersonId().toString();
 				String linkId = enteredPerson.getLink().getId().toString();
@@ -124,11 +124,11 @@ public class QPositionDataWriterForR {
 
 	private static void writeLinkEnterLeaveTimeForR(){
 
-		List<PersonInfoChecker> linkEnterLeaveTimeDataList = calculationHandler.getPersonLinkEnterLeaveTimeDataToWrite();
+		List<PersonPositionChecker> linkEnterLeaveTimeDataList = calculationHandler.getPersonLinkEnterLeaveTimeDataToWrite();
 		BufferedWriter writer = IOUtils.getBufferedWriter(outputDir+"/rDataPersonLinkEnterLeave.txt");
 		try {
 			writer.write("personId \t linkId \t linkEnterTimeX1 \t initialPositionY1 \t linkLeaveTimeX2 \t endPositionY2 \t travelMode \n");
-			for(PersonInfoChecker checker : linkEnterLeaveTimeDataList){
+			for(PersonPositionChecker checker : linkEnterLeaveTimeDataList){
 				EnteringPersonInfo enteredPerson = checker.getEnteredPersonInfo();
 				String personId = enteredPerson.getPersonId().toString();
 				String linkId = enteredPerson.getLink().getId().toString();

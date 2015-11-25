@@ -69,11 +69,11 @@ public class LinkPersonInfoContainer {
 		return person2EnteringPersonInfo;
 	}
 
-	public PersonInfoChecker getPersonInfoChecker(final Id<Person> personId){
-		return new PersonInfoChecker(personId);
+	public PersonPositionChecker getPersonInfoChecker(final Id<Person> personId){
+		return new PersonPositionChecker(personId);
 	}
 
-	public class PersonInfoChecker {
+	public class PersonPositionChecker {
 		private final EnteringPersonInfo enteredPerson;
 		private final LeavingPersonInfo leftPerson;
 		private final double linkEnterTime;
@@ -84,7 +84,7 @@ public class LinkPersonInfoContainer {
 		private double availableLinkSpace ;
 		private double queuingTime;
 
-		public PersonInfoChecker(final Id<Person> personId){
+		public PersonPositionChecker(final Id<Person> personId){
 			this.enteredPerson = person2EnteringPersonInfo.get(personId);
 			this.leftPerson = person2LeavingPersonInfo.get(personId);
 			this.legMode = enteredPerson.getLegMode();

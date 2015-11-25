@@ -38,7 +38,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 
 import playground.agarwalamit.mixedTraffic.MixedTrafficVehiclesUtils;
-import playground.agarwalamit.mixedTraffic.plots.LinkPersonInfoContainer.PersonInfoChecker;
+import playground.agarwalamit.mixedTraffic.plots.LinkPersonInfoContainer.PersonPositionChecker;
 
 /**
  * @author amit
@@ -47,8 +47,8 @@ public class QueuePositionCalculationHandler implements LinkLeaveEventHandler, L
 
 	private static final Logger LOG = Logger.getLogger(QueuePositionCalculationHandler.class);
 	private final Map<Id<Link>,LinkPersonInfoContainer> linkid2Container = new HashMap<>();
-	private final List<PersonInfoChecker> person2LinkEnterLeaveTimeData = new ArrayList<PersonInfoChecker>();
-	private final List<PersonInfoChecker> personLinkEnterLeaveTimeQueuePositionData = new ArrayList<PersonInfoChecker>();
+	private final List<PersonPositionChecker> person2LinkEnterLeaveTimeData = new ArrayList<PersonPositionChecker>();
+	private final List<PersonPositionChecker> personLinkEnterLeaveTimeQueuePositionData = new ArrayList<PersonPositionChecker>();
 
 	private final Map<Id<Person>, String> personId2LegMode = new TreeMap<Id<Person>, String>();
 	private final Scenario scenario;
@@ -133,7 +133,7 @@ public class QueuePositionCalculationHandler implements LinkLeaveEventHandler, L
 			LinkPersonInfoContainer container = this.linkid2Container.get(linkId);
 			for(Id<Person> personId :container.getAgentsOnLink()){
 				for(double time = this.lastEventTimeStep; time <= currentTimeStep; time++){
-					PersonInfoChecker checker = container.getPersonInfoChecker(personId);
+					PersonPositionChecker checker = container.getPersonInfoChecker(personId);
 					checker.updateAvailableLinkSpace(container.getRemainingLinkSpace());
 					checker.checkIfVehicleWillGoInQ(time);
 					if(checker.addVehicleInQueue()){
@@ -156,11 +156,11 @@ public class QueuePositionCalculationHandler implements LinkLeaveEventHandler, L
 		this.lastEventTimeStep=currentTimeStep;
 	}
 	
-	public List<PersonInfoChecker> getPersonLinkEnterTimeVehiclePositionDataToWrite(){
+	public List<PersonPositionChecker> getPersonLinkEnterTimeVehiclePositionDataToWrite(){
 		return this.personLinkEnterLeaveTimeQueuePositionData;
 	}
 
-	public List<PersonInfoChecker> getPersonLinkEnterLeaveTimeDataToWrite(){
+	public List<PersonPositionChecker> getPersonLinkEnterLeaveTimeDataToWrite(){
 		return this.person2LinkEnterLeaveTimeData;
 	}
 }
