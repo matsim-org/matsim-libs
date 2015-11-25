@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -50,8 +51,7 @@ public class NetworkRouteForUncongestedModeTest {
 
 	@Rule public MatsimTestUtils helper = new MatsimTestUtils();
 
-	final static String EQUIL_NETWORK = "../../matsim/examples/equil/network.xml";
-	final static String CONFIG = "../../matsim/examples/tutorial/programming/MultipleSubpopulations/config.xml";
+	private final static String EQUIL_NETWORK = "../../matsim/examples/equil/network.xml";
 
 	/**
 	 * Every link must allow car and ride mode if networkModes are car and ride. 
@@ -60,10 +60,8 @@ public class NetworkRouteForUncongestedModeTest {
 	@Test
 	public void testWithAllowedModesOnLink(){
 
-		String OUTPUT = helper.getOutputDirectory();
-
 		Scenario sc = createSceanrio();
-		sc.getConfig().controler().setOutputDirectory(OUTPUT);
+		sc.getConfig().controler().setOutputDirectory(helper.getOutputDirectory());
 
 		// set allowed modes on each link
 		for (Link l : sc.getNetwork().getLinks().values()) {
@@ -77,17 +75,17 @@ public class NetworkRouteForUncongestedModeTest {
 		//overriding module to get network route for ride mode
 		controler.addOverridingModule(new AbstractModule() { 
 			@Override
-			public void install() {
+			public void install() {// same must be assigned for non-car main modes.
 				addTravelTimeBinding("ride").to(networkTravelTime());
 				addTravelDisutilityFactoryBinding("ride").to(carTravelDisutilityFactoryKey());				
 			}
 		});
 		controler.run();
+		Assert.assertTrue(true);
 	}
 
 	private Scenario createSceanrio () {
 		Config config = ConfigUtils.createConfig();
-
 		config.network().setInputFile(EQUIL_NETWORK);
 		config.controler().setLastIteration(1);
 
@@ -105,7 +103,6 @@ public class NetworkRouteForUncongestedModeTest {
 		}
 		config.qsim().setMainModes(Arrays.asList("car"));
 		config.plansCalcRoute().setNetworkModes(Arrays.asList("car","ride"));
-
 		config.plansCalcRoute().getOrCreateModeRoutingParams("PT").setTeleportedModeSpeed (20/3.6);
 
 		{
@@ -121,7 +118,6 @@ public class NetworkRouteForUncongestedModeTest {
 		}
 
 		Scenario sc = ScenarioUtils.loadScenario(config);
-
 		//create plans with car and ride mode
 		for ( int ii = 1; ii<5; ii++) {
 			Id<Person> personId = Id.createPersonId(ii);
