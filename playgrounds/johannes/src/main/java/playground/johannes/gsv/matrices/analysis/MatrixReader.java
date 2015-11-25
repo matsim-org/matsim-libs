@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,22 +17,32 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.vis.otfvis;
+package playground.johannes.gsv.matrices.analysis;
 
-import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
-import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 
-public class OTFVisMobsimListener implements MobsimBeforeCleanupListener {
+/**
+ * @author johannes
+ */
+public class MatrixReader {
 
-//	private final OnTheFlyServer server;
+    private String separator = ";";
 
-	public OTFVisMobsimListener(OnTheFlyServer server) {
-//		this.server = server;
-	}
+    public void read(String file, RowHandler handler) throws IOException {
+        BufferedReader reader = new BufferedReader(new FileReader(file));
+        String line = reader.readLine();
+        while((line = reader.readLine()) != null) {
+            String tokens[] = line.split(separator);
+            handler.handleRow(tokens[0], tokens[1], tokens[2], tokens[3], tokens[4], tokens[5], tokens[6], tokens[7], Double.parseDouble(tokens[8]));
+        }
+        reader.close();
+    }
 
-	@Override
-	public void notifyMobsimBeforeCleanup(MobsimBeforeCleanupEvent event) {
-//		this.server.getSnapshotReceiver().finish();
-	}
+    public interface RowHandler {
 
+        void handleRow(String from, String to, String purpose, String year, String mode, String direction, String
+                day, String season, double volume);
+    }
 }

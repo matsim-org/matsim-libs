@@ -25,7 +25,7 @@ package org.matsim.contrib.otfvis;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
 
-public class OTFVisModule extends AbstractModule {
+public class OTFVisFileWriterModule extends AbstractModule {
 	@Override
 	public void install() {
 		if (getConfig().controler().getSnapshotFormat().contains("otfvis")) {

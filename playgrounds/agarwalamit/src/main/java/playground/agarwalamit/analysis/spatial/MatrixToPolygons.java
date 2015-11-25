@@ -41,8 +41,8 @@ import com.vividsolutions.jts.geom.Polygon;
 
 public class MatrixToPolygons {
 	
-	private int xBins = 160;
-	private int yBins = 120;
+	private final int xBins = 160;
+	private final int yBins = 120;
 	
 	private final double xMin=4452550.25;
 	private final double xMax=4479483.33;
@@ -50,12 +50,12 @@ public class MatrixToPolygons {
 	private final double yMax=5345696.81;
 	
 	
-	private double xWidth = (xMax - xMin)/xBins;
-	private double yWidth = (yMax - yMin)/yBins;
+	private final double xWidth = (xMax - xMin)/xBins;
+	private final double yWidth = (yMax - yMin)/yBins;
 	
-	private String outFile =  "/Users/amit/Downloads/bk/poly_centroid_toll_weight.txt";
-	private String inputFile_toll = "/Users/amit/Downloads/bk/pricing.1500-baseCase.1500.absoluteDelta.Routput.AvgUserBenefitsDifferencesNoRefund.txt";
-	private String inputFile_weight = "/Users/amit/Downloads/bk/baseCase.1500.Routput.UserBenefitsWeights.txt";
+	private final String outFile =  "/Users/amit/Downloads/bk/poly_centroid_toll_weight.txt";
+	private final String inputFileToll = "/Users/amit/Downloads/bk/pricing.1500-baseCase.1500.absoluteDelta.Routput.AvgUserBenefitsDifferencesNoRefund.txt";
+	private final String inputFileWeight = "/Users/amit/Downloads/bk/baseCase.1500.Routput.UserBenefitsWeights.txt";
 
 	public static void main(String[] args) {
 		new MatrixToPolygons().writeRData();
@@ -69,24 +69,23 @@ public class MatrixToPolygons {
 		Map<Polygon, Double> poly2weight = new HashMap<>();
 		Map<Polygon, Coordinate> poly2Centroid = new HashMap<>();
 		
-		String [] [] array_toll = readInputFile(inputFile_toll);
-		String [] [] array_weight = readInputFile(inputFile_weight);
+		String [] [] arrayToll = readInputFile(inputFileToll);
+		String [] [] arrayWeight = readInputFile(inputFileWeight);
 		
 		//get xs and ys
 		
 		String xCoords [] = new String [xBins];
-		for (int xIndex =1; xIndex < array_toll[0].length;xIndex++){
-			xCoords[xIndex-1] = array_toll[0][xIndex];
+		for (int xIndex =1; xIndex < arrayToll[0].length;xIndex++){
+			xCoords[xIndex-1] = arrayToll[0][xIndex];
 		}
-		String yCoords [] = new String [array_toll.length-1];
- 		for (int yIndex =1; yIndex < array_toll.length;yIndex++){
-			yCoords[yIndex-1] = array_toll[yIndex][0];
+		String yCoords [] = new String [arrayToll.length-1];
+ 		for (int yIndex =1; yIndex < arrayToll.length;yIndex++){
+			yCoords[yIndex-1] = arrayToll[yIndex][0];
 		}
  		
  		// create polygons
- 		System.out.println(xCoords.length+"\t"+yCoords.length);
- 		for(int ii=1;ii<array_toll.length;ii++){
- 			for(int jj=1;jj<array_toll[ii].length;jj++){
+ 		for(int ii=1;ii<arrayToll.length;ii++){
+ 			for(int jj=1;jj<arrayToll[ii].length;jj++){
  				double centroidX = Double.valueOf(xCoords[jj-1]);
  				double centroidY = Double.valueOf(yCoords[ii-1]);
  				Coordinate centroid = new Coordinate(centroidX, centroidY);
@@ -96,8 +95,8 @@ public class MatrixToPolygons {
  				Coordinate c4 =  new Coordinate(centroid.x - xWidth/2, centroid.y+yWidth/2);
  				Polygon poly = gf.createPolygon(new Coordinate[] {c1,c2,c3,c4,c1});
  				poly2Centroid.put(poly, centroid);
- 				poly2toll.put(poly, Double.valueOf(array_toll[ii][jj]));
- 				poly2weight.put(poly, Double.valueOf(array_weight[ii][jj]));
+ 				poly2toll.put(poly, Double.valueOf(arrayToll[ii][jj]));
+ 				poly2weight.put(poly, Double.valueOf(arrayWeight[ii][jj]));
  			}
  		}
  		
@@ -123,7 +122,7 @@ public class MatrixToPolygons {
 		}
 	}
 
-	private String [] [] readInputFile(String inputFile){
+	private String [] [] readInputFile(final String inputFile){
 		BufferedReader reader = IOUtils.getBufferedReader(inputFile);
 		String [] [] array = new String [yBins+1][xBins];
 		try {
@@ -136,7 +135,7 @@ public class MatrixToPolygons {
 				line=reader.readLine();
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
+			throw new RuntimeException("Data is not read from the file. Reason "+e);
 		}
 	return array;
 	}

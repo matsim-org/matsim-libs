@@ -120,12 +120,14 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 				}
 				Coord c2 = OTFServerQuadTree.getOTFTransformation().transform(coord);
 				
+				String txt = act.getType();
 				// there used to be a "cake" diagram, showing which fraction of the activity duration was spent.  That somehow
 				// is gone.  Outputting the activity end time instead.  kai, nov'15
-				String txt = act.getType()+"-"+Time.writeTime(act.getEndTime(), ':');
-				if ( act.getEndTime()== Time.UNDEFINED_TIME ) {
-					txt = act.getType() ;
-				}
+				// But somehow the below does not work; it generates some exception.  Thus commented out again. kai, nov'15
+//				 txt += "-"+Time.writeTime(act.getEndTime(), ':');
+//				if ( act.getEndTime()== Time.UNDEFINED_TIME ) {
+//					txt = act.getType() ;
+//				}
 				result.acts.add(new MyInfoText((float) c2.getX(), (float) c2.getY(), txt ) ) ;
 			}
 		}
