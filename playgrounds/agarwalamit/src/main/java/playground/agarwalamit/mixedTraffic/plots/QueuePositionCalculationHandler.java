@@ -50,11 +50,11 @@ public class QueuePositionCalculationHandler implements LinkLeaveEventHandler, L
 	private final List<PersonInfoChecker> person2LinkEnterLeaveTimeData = new ArrayList<PersonInfoChecker>();
 	private final List<PersonInfoChecker> personLinkEnterLeaveTimeQueuePositionData = new ArrayList<PersonInfoChecker>();
 
-	private Map<Id<Person>, String> personId2LegMode = new TreeMap<Id<Person>, String>();
-	private Scenario scenario;
+	private final Map<Id<Person>, String> personId2LegMode = new TreeMap<Id<Person>, String>();
+	private final Scenario scenario;
 	private double lastEventTimeStep = 0;
 
-	public QueuePositionCalculationHandler(Scenario scenario) {
+	public QueuePositionCalculationHandler(final Scenario scenario) {
 		LOG.info("Calculating queue position of vehicles in mixed traffic.");
 		this.scenario = scenario;
 		for (Link link : scenario.getNetwork().getLinks().values()) {
@@ -127,7 +127,7 @@ public class QueuePositionCalculationHandler implements LinkLeaveEventHandler, L
 		container.getPerson2LeavingPersonInfo().remove(personId);
 	}
 
-	private void updateVehicleOnLinkAndFillToQueue(double currentTimeStep) {
+	private void updateVehicleOnLinkAndFillToQueue(final double currentTimeStep) {
 		for (Link link : this.scenario.getNetwork().getLinks().values()) {
 			Id<Link> linkId = link.getId();
 			LinkPersonInfoContainer container = this.linkid2Container.get(linkId);
@@ -138,9 +138,7 @@ public class QueuePositionCalculationHandler implements LinkLeaveEventHandler, L
 					checker.checkIfVehicleWillGoInQ(time);
 					if(checker.addVehicleInQueue()){
 						Queue<Id<Person>> queue = container.getAgentsInQueue();
-						if(queue.contains(personId)) { 
-							// already in queue
-						} else {
+						if(! queue.contains(personId)) {
 							queue.offer(personId);
 							/*
 							 * If a person (20mps)  starts on link(1000m) at t=0, then will add to queue if time t=51 sec
@@ -150,7 +148,7 @@ public class QueuePositionCalculationHandler implements LinkLeaveEventHandler, L
 							checker.updateQueuingTime(availableSpaceSoFar);
 							double newAvailableSpace = availableSpaceSoFar - MixedTrafficVehiclesUtils.getCellSize(checker.getEnteredPersonInfo().getLegMode());
 							container.updateRemainingLinkSpace(newAvailableSpace);
-						}
+						} // else already in queue
 					} 
 				}
 			}

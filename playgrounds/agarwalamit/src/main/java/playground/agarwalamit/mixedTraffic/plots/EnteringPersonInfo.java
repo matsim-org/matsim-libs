@@ -29,22 +29,27 @@ import org.matsim.api.core.v01.population.Person;
 
 public final class EnteringPersonInfo {
 	
+	private final  Id<Person> personId;
+	private final 	Link link;
+	private final Double enterTime;
+	private final String legMode;
+	
 	public static class Builder {
 		private Id<Person> personId;
 		private Link link;
 		private Double enterTime;
 		private String legMode;
 		
-		public Builder setAgentId(Id<Person> personId) {
+		public Builder setAgentId(final Id<Person> personId) {
 			this.personId = personId ; return this ;
 		}
-		public Builder setLink(Link link) {
+		public Builder setLink(final Link link) {
 			this.link = link ; return this ;
 		}
-		public Builder setEnterTime(double time) {
+		public Builder setEnterTime(final double time) {
 			this.enterTime = time ; return this ;
 		}
-		public Builder setLegMode(String legMode) {
+		public Builder setLegMode(final String legMode) {
 			this.legMode = legMode ; return this ;
 		}
 		public final EnteringPersonInfo build() {
@@ -56,27 +61,22 @@ public final class EnteringPersonInfo {
 		}
 	}
 
-	private final  Id<Person> personId;
-	private final 	Link link;
-	private final Double enterTime;
-	private final String legMode;
-	
-	public EnteringPersonInfo(Id<Person> personId2, Link link, Double enterTime2, String legMode) {
+	public EnteringPersonInfo(final Id<Person> personId2, final Link link, final double enterTime2, final String legMode) {
 		this.personId = personId2 ;
 		this.link = link ;
 		this.enterTime = enterTime2 ;
 		this.legMode = legMode;
 	}
 
-	public final Id<Person> getPersonId() {
+	public Id<Person> getPersonId() {
 		return this.personId;
 	}
 
-	public final Link getLink() {
+	public Link getLink() {
 		return this.link;
 	}
 
-	public final Double getLinkEnterTime() {
+	public Double getLinkEnterTime() {
 		return this.enterTime;
 	}
 	public String getLegMode() {

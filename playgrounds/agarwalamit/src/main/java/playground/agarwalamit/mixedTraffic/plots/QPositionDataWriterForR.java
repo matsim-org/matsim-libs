@@ -46,7 +46,7 @@ public class QPositionDataWriterForR {
 	private static Scenario scenario;
 	private static QueuePositionCalculationHandler calculationHandler;
 
-	private final static Logger logger = Logger.getLogger(QPositionDataWriterForR.class);
+	private final static Logger LOG = Logger.getLogger(QPositionDataWriterForR.class);
 
 	public void run(){
 		scenario  = LoadMyScenarios.loadScenarioFromNetwork(networkFile);
@@ -58,7 +58,7 @@ public class QPositionDataWriterForR {
 		eventsReader.readFile(eventFile);
 		writeLinkEnterLeaveQueuePosDataForR();
 		writeLinkEnterLeaveTimeForR();
-		logger.info("Writing file(s) is finished.");
+		LOG.info("Writing file(s) is finished.");
 	}
 	
 	public static void main(String[] args) {

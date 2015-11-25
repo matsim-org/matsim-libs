@@ -27,6 +27,10 @@ import org.matsim.api.core.v01.population.Person;
  * @author amit
  */
 public class LeavingPersonInfo {
+	private final Id<Person> personId;
+	private final Id<Link> linkId;
+	private final Double leaveTime;
+	private final String legMode;
 	
 	public static class Builder {
 		private Id<Person> personId;
@@ -34,16 +38,16 @@ public class LeavingPersonInfo {
 		private Double leaveTime;
 		private String legMode;
 		
-		public Builder setAgentId(Id<Person> personId) {
+		public Builder setAgentId(final Id<Person> personId) {
 			this.personId = personId ; return this ;
 		}
-		public Builder setLinkId(Id<Link> linkId) {
+		public Builder setLinkId(final Id<Link> linkId) {
 			this.linkId = linkId ; return this ;
 		}
-		public Builder setLeaveTime(double time) {
+		public Builder setLeaveTime(final double time) {
 			this.leaveTime = time ; return this ;
 		}
-		public Builder setLegMode(String legMode) {
+		public Builder setLegMode(final String legMode) {
 			this.legMode = legMode ; return this ;
 		}
 		public final LeavingPersonInfo build() {
@@ -55,27 +59,22 @@ public class LeavingPersonInfo {
 		}
 	}
 
-	private final Id<Person> personId;
-	private final Id<Link> linkId;
-	private final Double leaveTime;
-	private final String legMode;
-	
-	public LeavingPersonInfo(Id<Person> personId2, Id<Link> linkId, Double leaveTime2, String legMode) {
+	public LeavingPersonInfo(final Id<Person> personId2, final Id<Link> linkId, final double leaveTime2, final String legMode) {
 		this.personId = personId2 ;
 		this.linkId = linkId ;
 		this.leaveTime = leaveTime2 ;
 		this.legMode = legMode;
 	}
 
-	public final Id<Person> getPersonId() {
+	public Id<Person> getPersonId() {
 		return this.personId;
 	}
 
-	public final Id<Link> getLinkId() {
+	public Id<Link> getLinkId() {
 		return this.linkId;
 	}
 
-	public final Double getLinkLeaveTime() {
+	public Double getLinkLeaveTime() {
 		return this.leaveTime;
 	}
 	public String getLegMode() {

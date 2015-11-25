@@ -50,7 +50,7 @@ public class LinkPersonInfoContainer {
 	public double getRemainingLinkSpace() {
 		return remainingLinkSpace;
 	}
-	public void updateRemainingLinkSpace(double remainingLinkSpace) {
+	public void updateRemainingLinkSpace(final double remainingLinkSpace) {
 		this.remainingLinkSpace = remainingLinkSpace;
 	}
 	public Id<Link> getLinkId() {
@@ -69,33 +69,29 @@ public class LinkPersonInfoContainer {
 		return person2EnteringPersonInfo;
 	}
 
-	public PersonInfoChecker getPersonInfoChecker(Id<Person> personId){
+	public PersonInfoChecker getPersonInfoChecker(final Id<Person> personId){
 		return new PersonInfoChecker(personId);
 	}
 
 	public class PersonInfoChecker {
+		private final EnteringPersonInfo enteredPerson;
+		private final LeavingPersonInfo leftPerson;
+		private final double linkEnterTime;
+		private final String legMode;
+		private final Link link;
+		private double freeSpeedLinkTravelTime;
+		private boolean addVehicleInQ;
+		private double availableLinkSpace ;
+		private double queuingTime;
 
-		public PersonInfoChecker(Id<Person> personId){
+		public PersonInfoChecker(final Id<Person> personId){
 			this.enteredPerson = person2EnteringPersonInfo.get(personId);
 			this.leftPerson = person2LeavingPersonInfo.get(personId);
 			this.legMode = enteredPerson.getLegMode();
 			this.link = enteredPerson.getLink();
 			this.linkEnterTime = enteredPerson.getLinkEnterTime();
 		}
-
-		private final EnteringPersonInfo enteredPerson;
-		private final LeavingPersonInfo leftPerson;
-
-		private final double linkEnterTime;
-		private final String legMode;
-		private final Link link;
-
-		private double freeSpeedLinkTravelTime;
-
-		private boolean addVehicleInQ;
-		private double availableLinkSpace ;
-		private double queuingTime;
-
+		
 		public double getFreeSpeedLinkTravelTime() {
 			recalculateFreeSpeedLinkTravelTime();
 			return this.freeSpeedLinkTravelTime;
