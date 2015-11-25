@@ -25,15 +25,16 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.events.handler.*;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 import playground.boescpa.analysis.scenarioAnalyzer.ScenarioAnalyzer;
 import playground.boescpa.analysis.spatialCutters.SpatialCutter;
-import playground.boescpa.analysis.trips.TripHandler;
-import playground.boescpa.analysis.trips.TripProcessor;
+import playground.boescpa.analysis.trips.Trip;
+import playground.boescpa.analysis.trips.TripEventHandler;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.Map;
 
 /**
@@ -50,10 +51,11 @@ import java.util.Map;
  */
 public class TripAnalyzer implements ScenarioAnalyzerEventHandler, PersonDepartureEventHandler, PersonArrivalEventHandler,
 		ActivityStartEventHandler, PersonStuckEventHandler, LinkLeaveEventHandler {
-
 	private static Logger log = Logger.getLogger(TripAnalyzer.class);
 
-	private final TripHandler tripHandler;
+    private static final int ANALYSIS_END_TIME = 86400;
+
+	private final TripEventHandler tripHandler;
 	private final Network network;
 	private int scaleFactor = 1;
 	private Map<String, ModeResult> modes = new HashMap<>();
@@ -61,7 +63,7 @@ public class TripAnalyzer implements ScenarioAnalyzerEventHandler, PersonDepartu
 	private SpatialCutter spatialEventCutter = null;
 
 	public TripAnalyzer(Network network) {
-		this.tripHandler = new TripHandler();
+		this.tripHandler = new TripEventHandler(network);
 		this.network = network;
 		this.reset(0);
 	}
@@ -124,19 +126,6 @@ public class TripAnalyzer implements ScenarioAnalyzerEventHandler, PersonDepartu
 	}
 
 	private String getTripResults() {
-		/*String results = "Mode; NumberOfTrips; TotalDuration; MeanDuration; StdDevDuration; TotalDistance; MeanDistance; StdDevDistance" + ScenarioAnalyzer.NL;
-		for (String mode : modes.keySet()) {
-			Double[] modeVals = modes.get(mode).getModeVals();
-			if (mode.contains("pt")) {
-				correctForAdditionalDistancePT(modeVals);
-			}
-			results += mode + ScenarioAnalyzer.DEL;
-			for (int i = 0; i < (modeVals.length - 1); i++) {
-				results += modeVals[i] + ScenarioAnalyzer.DEL;
-			}
-			results += modeVals[modeVals.length - 1] + ScenarioAnalyzer.NL;
-		}
-		return results;*/
 		String results = "Mode; NumberOfTrips; MeanDuration [min]; MeanDistance [km];" + ScenarioAnalyzer.NL;
 		for (String mode : modes.keySet()) {
 			Double[] modeVals = modes.get(mode).getModeVals();
@@ -158,16 +147,6 @@ public class TripAnalyzer implements ScenarioAnalyzerEventHandler, PersonDepartu
 	}
 
 	private String getActivityResults() {
-		/*String results = "Activity; NumberOfExecutions; TotalDuration; MeanDuration; StdDevDuration" + ScenarioAnalyzer.NL;
-		for (String activity : activities.keySet()) {
-			Double[] actVals = activities.get(activity).getActVals();
-			results += activity + ScenarioAnalyzer.DEL;
-			for (int i = 0; i < (actVals.length - 1); i++) {
-				results += actVals[i] + ScenarioAnalyzer.DEL;
-			}
-			results += actVals[actVals.length - 1] + ScenarioAnalyzer.NL;
-		}
-		return results;*/
 		String results = "Activity; NumberOfExecutions; MeanDuration [hr];" + ScenarioAnalyzer.NL;
 		for (String activity : activities.keySet()) {
 			Double[] actVals = activities.get(activity).getActVals();
@@ -179,7 +158,58 @@ public class TripAnalyzer implements ScenarioAnalyzerEventHandler, PersonDepartu
 	}
 
 	private void analyzeEvents() {
-        for (Id personId : tripHandler.getStartLink().keySet()) {
+        Map<Id<Person>, Double> agentCurrentActStartTime = new HashMap<>();
+        Map<Id<Person>, String> agentCurrentActPurpose = new HashMap<>();
+        ActivityResult actVals;
+        for (Trip trip : tripHandler.getTrips()) {
+            // add trip to mode stats
+            if ((considerLink(trip.startLinkId) || considerLink(trip.endLinkId)) && trip.startTime < ANALYSIS_END_TIME) {
+                String mode = trip.mode;
+                if (mode.equals("bike") || mode.equals("walk")) {
+                    mode = "slow_mode";
+                } else if (mode.equals("transit_walk")) {
+                    mode = "pt";
+                }
+                ModeResult modeVals = getMode(mode);
+                modeVals.numberOfTrips++;
+                modeVals.modeDistances.add(trip.distance);
+                modeVals.modeDurations.add(trip.duration);
+            }
+            // add trip to act stats
+            double actStartTime, actEndTime;
+            if (considerLink(trip.startLinkId)) {
+                if (!agentCurrentActStartTime.containsKey(trip.agentId)) {
+                    actVals = getActivity("h");
+                    actStartTime = 0;
+                } else {
+                    actVals = getActivity(agentCurrentActPurpose.get(trip.agentId));
+                    actStartTime = agentCurrentActStartTime.get(trip.agentId);
+                }
+                if (trip.startTime < ANALYSIS_END_TIME) {
+                    actEndTime = trip.startTime;
+                } else {
+                    actEndTime = ANALYSIS_END_TIME;
+                }
+                if (actStartTime < actEndTime) {
+                    actVals.numberOfActivities++;
+                    actVals.actDurations.add(actEndTime - actStartTime);
+                }
+            }
+            // prepare for next activity as long as start of next activity is < ANALYSIS_END_TIME
+            //  (this is independent of inside or outside area)
+            agentCurrentActStartTime.put(trip.agentId, trip.endTime);
+            agentCurrentActPurpose.put(trip.agentId, trip.purpose);
+        }
+        // finish the last activities of all agents with last trip.starttime < ANALYSIS_END_TIME
+        for (Id<Person> agentId : agentCurrentActStartTime.keySet()) {
+            if (agentCurrentActStartTime.get(agentId) < ANALYSIS_END_TIME) {
+                actVals = getActivity(agentCurrentActPurpose.get(agentId));
+                actVals.numberOfActivities++;
+                actVals.actDurations.add(ANALYSIS_END_TIME - agentCurrentActStartTime.get(agentId));
+            }
+        }
+
+       /* for (Id personId : tripHandler.getStartLink().keySet()) {
 			if (!personId.toString().contains("pt")) {
 				ArrayList<Id> startLinks = tripHandler.getStartLink().getValues(personId);
 				ArrayList<String> modes = tripHandler.getMode().getValues(personId);
@@ -190,16 +220,6 @@ public class TripAnalyzer implements ScenarioAnalyzerEventHandler, PersonDepartu
 				ArrayList<LinkedList<Id>> pathList = tripHandler.getPath().getValues(personId);
 
 				// Trip analysis:
-				/*for (int i = 0; i < startLinks.size(); i++) {
-					if (endLinks.get(i) != null) {
-						if (considerLink(startLinks.get(i)) || considerLink(endLinks.get(i))) {
-							ModeResult modeVals = getMode(modes.get(i));
-							modeVals.numberOfTrips++;
-							modeVals.modeDistances.add((double) TripProcessor.calcTravelDistance(pathList.get(i), network, startLinks.get(i), endLinks.get(i)));
-							modeVals.modeDurations.add(TripProcessor.calcTravelTime(startTimes.get(i), endTimes.get(i)));
-						}
-					}
-				}*/
 				for (int i = 0; i < startLinks.size(); i++) {
 					if (endLinks.get(i) != null) {
 						if ((considerLink(startLinks.get(i)) || considerLink(endLinks.get(i))) && startTimes.get(i) < 86400) {
@@ -216,26 +236,6 @@ public class TripAnalyzer implements ScenarioAnalyzerEventHandler, PersonDepartu
 						}
 					}
 				}
-
-				// Activity analysis:
-				/*ActivityResult actVals;
-				if (considerLink(startLinks.get(0))) {
-					actVals = getActivity("h");
-					actVals.numberOfActivities++;
-					actVals.actDurations.add(startTimes.get(0));
-				}
-				for (int i = 1; i < startTimes.size(); i++) {
-					if (endLinks.get(i) != null && considerLink(endLinks.get(i))) {
-						actVals = getActivity(purposes.get(i - 1));
-						actVals.numberOfActivities++;
-						actVals.actDurations.add(startTimes.get(i) - endTimes.get(i - 1));
-					}
-				}
-				if (endLinks.get(endLinks.size()-1) != null && endTimes.get(endTimes.size()-1) < 24*60*60 && considerLink(endLinks.get(endLinks.size()-1))) {
-					actVals = getActivity("h");
-					actVals.numberOfActivities++;
-					actVals.actDurations.add(24*60*60 - endTimes.get(endTimes.size()-1));
-				}*/
 				ActivityResult actVals;
 				if (considerLink(startLinks.get(0))) {
 					actVals = getActivity("h");
@@ -259,11 +259,11 @@ public class TripAnalyzer implements ScenarioAnalyzerEventHandler, PersonDepartu
 					}
 				}
 			}
-		}
+		}*/
 	}
 
-	private boolean considerLink(Id id) {
-		return spatialEventCutter.spatiallyConsideringLink(network.getLinks().get(id));
+	private boolean considerLink(Id<Link> linkId) {
+		return linkId != null && spatialEventCutter.spatiallyConsideringLink(network.getLinks().get(linkId));
 	}
 
 	private ModeResult getMode(String mode) {

@@ -23,21 +23,17 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.events.EventsReaderXMLv1;
-import org.matsim.core.events.EventsUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
-import playground.boescpa.analysis.spatialCutters.NoCutter;
-import playground.boescpa.analysis.spatialCutters.SpatialCutter;
-import playground.boescpa.analysis.trips.TripHandler;
-import playground.boescpa.analysis.trips.TripProcessor;
+import playground.boescpa.analysis.trips.EventsToTrips;
+import playground.boescpa.analysis.trips.Trip;
+import playground.boescpa.analysis.trips.TripWriter;
 
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * 
@@ -56,30 +52,17 @@ public class TestTopdadTripProcessor {
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
 		final Controler controler = new Controler(scenario);
 		controler.run();
-		
-		// Get network
-		Network network = scenario.getNetwork();
-		
-		// Register events handler
-		EventsManager events = EventsUtils.createEventsManager();
-		TripHandler tripHandler = new TripHandler();
-		events.addHandler(tripHandler);
-		tripHandler.reset(0);
-		
-		// Load events file
-		String eventsFile = this.utils.getOutputDirectory() + "ITERS/it.10/10.events.xml.gz";
-		EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
-		reader.parse(eventsFile);
+
+        // Load events file
+        String eventsFile = this.utils.getOutputDirectory() + "ITERS/it.10/10.events.xml.gz";
+        List<Trip> trips = EventsToTrips.createTripsFromEvents(eventsFile, scenario.getNetwork());
 		
 		// run postprocessing
-		SpatialCutter spatialTripCutter = new NoCutter();
-		TripProcessor topdadTripProcessor = new TopdadTripProcessor(this.utils.getOutputDirectory() + "tripResults.txt",
-				this.utils.getOutputDirectory() + "analResults.txt", spatialTripCutter);
-		topdadTripProcessor.printTrips(tripHandler, network);
-		HashMap<String, Object> results = topdadTripProcessor.analyzeTrips(tripHandler, network);
-		Double[] car = (Double[]) results.get("car");
-		Double[] pt = (Double[]) results.get("pt");
-		Double[] transit_walk = (Double[]) results.get("transit_walk");
+        new TripWriter().writeTrips(trips, this.utils.getOutputDirectory() + "tripResults.txt");
+        HashMap<String, Object> results = TopdadTripCreator.calcTravelTimeAndDistance(trips, this.utils.getOutputDirectory() + "analResults.txt");
+        Double[] car = (Double[]) results.get("car");
+        Double[] pt = (Double[]) results.get("pt");
+        Double[] transit_walk = (Double[]) results.get("transit_walk");
 
 		// TripProcessing.analyzeTrips - Time tests
 		Assert.assertEquals("Test: TripProcessing.analyzeTrips - car mode time sum not as expected.", 10147.12, car[0], 0.01);

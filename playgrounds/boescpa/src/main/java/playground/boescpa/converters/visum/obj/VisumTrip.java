@@ -30,8 +30,6 @@ import playground.boescpa.analysis.trips.Trip;
  */
 public class VisumTrip {
 
-	// TODO-boescpa Write tests...
-
     private final Trip trip;
 
     public VisumTrip(Trip trip) {

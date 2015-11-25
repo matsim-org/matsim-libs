@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.population.Person;
  *
  * @author boescpa
  */
-public class Trip {
+public class Trip implements Cloneable{
 
 	public final Id<Person> agentId;
 	public final double startTime;
@@ -44,12 +44,12 @@ public class Trip {
 	public final String mode;
 	public final String purpose;
 	public final double duration;
-	public final long distance;
+	public final double distance;
 
 	public Trip(Id<Person> agentId,
 				double startTime, Id<Link> startLinkId, double startXCoord, double startYCoord,
 				double endTime, Id<Link> endLinkId, double endXCoord, double endYCoord,
-				String mode, String purpose, double duration, long distance) {
+				String mode, String purpose, double duration, double distance) {
 
 		this.agentId = agentId;
 		this.startTime = startTime;
@@ -93,5 +93,23 @@ public class Trip {
                 tripLine[11], // purpose
                 Double.parseDouble(tripLine[12]), // duration
                 Long.parseLong(tripLine[13])); // distance
+    }
+
+    public Trip clone() {
+        return new Trip(
+                Id.createPersonId(this.agentId.toString()),
+                this.startTime,
+                Id.createLinkId(this.startLinkId.toString()),
+                this.startXCoord,
+                this.startYCoord,
+                this.endTime,
+                Id.createLinkId(this.endLinkId.toString()),
+                this.endXCoord,
+                this.endYCoord,
+                this.mode,
+                this.purpose,
+                this.duration,
+                this.distance
+        );
     }
 }

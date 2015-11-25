@@ -19,10 +19,7 @@
 
 package playground.boescpa.lib.obj;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Set;
+import java.util.*;
 
 /**
  * A hashmap that stores more than one value under the same key.
@@ -34,10 +31,10 @@ import java.util.Set;
  */
 public final class BoxedHashMap<K, V> {
 	
-	private HashMap<K, ArrayList<V>> boxedHashMap;
+	private HashMap<K, LinkedList<V>> boxedHashMap;
 	
 	public BoxedHashMap() {
-		boxedHashMap = new HashMap<K, ArrayList<V>>();
+		boxedHashMap = new HashMap<>();
 	}
 	
 	public int size() {
@@ -52,7 +49,7 @@ public final class BoxedHashMap<K, V> {
 	 * Returns all values to which the specified key is mapped,
      * or {@code null} if this map contains no mapping for the key.
      */
-	public ArrayList<V> getValues(K k) {
+	public List<V> getValues(K k) {
 		if (boxedHashMap.containsKey(k)) {
 			return boxedHashMap.get(k);
 		} else {
@@ -85,7 +82,7 @@ public final class BoxedHashMap<K, V> {
 		if (containsKey(k)) {
 			getValues(k).add(v);
 		} else {
-			boxedHashMap.put(k, new ArrayList<V>());
+			boxedHashMap.put(k, new LinkedList<V>());
 			put(k,v);
 		}
 	}
@@ -102,7 +99,7 @@ public final class BoxedHashMap<K, V> {
 	 * Removes from this map the last value mapped to this key.
      */
 	public void removeLast(K k) {
-		ArrayList<V> l = boxedHashMap.get(k);  
+		LinkedList<V> l = boxedHashMap.get(k);
 		l.remove(l.size()-1);
 	}
 	
@@ -115,7 +112,7 @@ public final class BoxedHashMap<K, V> {
      * specified value.
      */
 	public boolean containsValue(V v) {
-		for (ArrayList<V> l:boxedHashMap.values()) {
+		for (LinkedList<V> l:boxedHashMap.values()) {
 			if (l.contains(v)) {
 				return true;
 			}
@@ -127,7 +124,7 @@ public final class BoxedHashMap<K, V> {
 		return boxedHashMap.keySet();
 	}
 	
-	public Collection<ArrayList<V>> values() {
+	public Collection<LinkedList<V>> values() {
 		return boxedHashMap.values();
 	}
 }

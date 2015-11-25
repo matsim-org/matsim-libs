@@ -44,24 +44,30 @@ public class TestSpatialTripCutter {
 
     @Test
     public void testNoCutting() {
-        cutter = new SpatialTripCutter(new NoCutter());
+        cutter = new SpatialTripCutter(new NoCutter(), network);
+
+        Trip trip = new Trip(null, 0, Id.create(1, Link.class), 0, 0, 0, Id.create(2, Link.class), 0, 0, "", "", 0, 0);
 
         Assert.assertTrue("No cutting strategy doesn't return TRUE.",
-                cutter.spatiallyConsideringTrip(network, Id.create(1, Link.class), Id.create(2, Link.class)));
+                cutter.spatiallyConsideringTrip(trip));
     }
 
     @Test
     public void testCirclePointCutting() {
-        cutter = new SpatialTripCutter(new CirclePointCutter(10, 683518.0, 246836.0));
+        cutter = new SpatialTripCutter(new CirclePointCutter(10, 683518.0, 246836.0), network);
 
+        Trip trip = new Trip(null, 0, Id.create(1, Link.class), 0, 0, 0, Id.create(1, Link.class), 0, 0, "", "", 0, 0);
         Assert.assertTrue("CircleBellevueCutting does not recognize link outside circle.",
-                !cutter.spatiallyConsideringTrip(network, Id.create(1, Link.class), Id.create(1, Link.class)));
+                !cutter.spatiallyConsideringTrip(trip));
+        trip = new Trip(null, 0, Id.create(1, Link.class), 0, 0, 0, Id.create(2, Link.class), 0, 0, "", "", 0, 0);
         Assert.assertTrue("CircleBellevueCutting does not recognize path going into the circle.",
-                cutter.spatiallyConsideringTrip(network, Id.create(1, Link.class), Id.create(2, Link.class)));
+                cutter.spatiallyConsideringTrip(trip));
+        trip = new Trip(null, 0, Id.create(2, Link.class), 0, 0, 0, Id.create(1, Link.class), 0, 0, "", "", 0, 0);
         Assert.assertTrue("CircleBellevueCutting does not recognize path going out of circle.",
-                cutter.spatiallyConsideringTrip(network, Id.create(2, Link.class), Id.create(1, Link.class)));
+                cutter.spatiallyConsideringTrip(trip));
+        trip = new Trip(null, 0, Id.create(2, Link.class), 0, 0, 0, Id.create(2, Link.class), 0, 0, "", "", 0, 0);
         Assert.assertTrue("CircleBellevueCutting does not recognize path within circle.",
-                cutter.spatiallyConsideringTrip(network, Id.create(2, Link.class), Id.create(2, Link.class)));
+                cutter.spatiallyConsideringTrip(trip));
     }
 
 

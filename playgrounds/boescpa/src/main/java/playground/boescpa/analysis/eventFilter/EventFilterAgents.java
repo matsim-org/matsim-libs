@@ -49,8 +49,6 @@ import java.util.Set;
  */
 public class EventFilterAgents {
 
-	// TODO-boescpa Write tests...
-
 	private static Logger log = Logger.getLogger(EventFilterAgents.class);
 
 	public static void main(String[] args) {

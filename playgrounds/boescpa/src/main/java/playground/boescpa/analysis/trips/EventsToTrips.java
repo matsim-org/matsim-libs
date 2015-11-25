@@ -22,12 +22,13 @@ package playground.boescpa.analysis.trips;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.scenario.MutableScenario;
-import org.matsim.core.scenario.ScenarioUtils;
+import playground.boescpa.lib.tools.NetworkUtils;
+
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Creates "trips" from events. 
@@ -37,55 +38,54 @@ import org.matsim.core.scenario.ScenarioUtils;
  * IMPORTANT: This is a further developed version of staheale's class 'Events2Trips'.
  * 
  */
-public class TripCreator {
-	
-	private static Logger log = Logger.getLogger(TripCreator.class);
+public class EventsToTrips {
+	private static Logger log = Logger.getLogger(EventsToTrips.class);
 
-	private final String eventsFile; // Path to an events-File, e.g. "run.combined.150.events.xml.gz"
-	private final String networkFile; // Path to the network-File used for the simulation resulting in the above events-File, e.g. "multimodalNetwork2030final.xml.gz"
-	private TripProcessor tripProcessor;
+    public static void main(String[] args) {
+        String eventsFile = args[0]; // Path to an events-File.
+        String networkFile = args[1]; // Path to the network-File used for the simulation resulting in the events-File.
+        String tripFile = args[2]; // Path to where the trip file should be written to.
 
-	public TripCreator(String eventsFile, String networkFile, TripProcessor tripProcessor) {
-		this.eventsFile = eventsFile;
-		this.networkFile = networkFile;
-		this.tripProcessor = tripProcessor;
-	}
+        List<Trip> trips = createTripsFromEvents(eventsFile, networkFile);
 
-	public void setTripProcessor(TripProcessor tripProcessor) {
-		this.tripProcessor = tripProcessor;
-	}
+        log.info("Write trips...");
+        new TripWriter().writeTrips(trips, tripFile);
+        log.info("Write trips...done.");
+    }
 
-	public void createTrips() {
+    public static List<Trip> createTripsFromEvents(String pathToEventsFile, String pathToNetworkFile) {
+        log.info("Reading network xml file...");
+        Network network = NetworkUtils.readNetwork(pathToNetworkFile);
+        log.info("Reading network xml file...done.");
+        return createTripsFromEvents(pathToEventsFile, network);
+    }
 
-		EventsManager events = EventsUtils.createEventsManager();
-		
-		MutableScenario  scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-
-		scenario.getConfig().transit().setUseTransit(true);
-		
-		log.info("Reading network xml file...");
-		MatsimNetworkReader NetworkReader = new MatsimNetworkReader(scenario);
-		NetworkReader.readFile(networkFile);
-		Network network = scenario.getNetwork();
-		log.info("Reading network xml file...done.");
-
-		TripHandler tripHandler = new TripHandler();
-		events.addHandler(tripHandler);
-		tripHandler.reset(0);
+	public static List<Trip> createTripsFromEvents(String pathToEventsFile, Network network) {
+		TripEventHandler tripHandler = new TripEventHandler(network);
+        tripHandler.reset(0);
+        EventsManager events = EventsUtils.createEventsManager();
+        events.addHandler(tripHandler);
 
 		log.info("Reading events file...");
-		if (eventsFile.endsWith(".xml.gz")) { // if events-File is in the newer xml-format
+		if (pathToEventsFile.endsWith(".xml.gz")) { // if events-File is in the newer xml-format
 			EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
-			reader.parse(eventsFile);
+			reader.parse(pathToEventsFile);
 		}
 		else {
 			throw new IllegalArgumentException("Given events-file not of known format.");
 		}
 		log.info("Reading events file...done.");
-		
-		log.info("Postprocessing trips...");
-		tripProcessor.analyzeTrips(tripHandler, network);
-		tripProcessor.printTrips(tripHandler, network);
-		log.info("Postprocessing trips...done.");
+
+        return tripHandler.getTrips();
 	}
+
+    public static List<Trip> filterTrips(List<Trip> trips, SpatialTripCutter cutter) {
+        List<Trip> filteredTrips = new LinkedList<>();
+        for (Trip tempTrip : trips) {
+            if (cutter.spatiallyConsideringTrip(tempTrip)) {
+                filteredTrips.add(tempTrip.clone());
+            }
+        }
+        return Collections.unmodifiableList(filteredTrips);
+    }
 }
