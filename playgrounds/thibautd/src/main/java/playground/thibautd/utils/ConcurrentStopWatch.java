@@ -21,6 +21,7 @@ package playground.thibautd.utils;
 import org.apache.log4j.Logger;
 
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -31,30 +32,45 @@ import java.util.concurrent.atomic.AtomicLong;
 public class ConcurrentStopWatch<T extends Enum<T>> {
 	private static final Logger log = Logger.getLogger( ConcurrentStopWatch.class );
 	private final Class<T> enumType;
+	// Not sure this is strictly necessary to be thread safe,
+	// but just to be sure...
 	private final AtomicLong[] measurements;
+	private final AtomicInteger[] openMeasurements;
 
 	public ConcurrentStopWatch( final Class<T> enumType ) {
 		this.enumType = enumType;
 		this.measurements = new AtomicLong[ enumType.getEnumConstants().length ];
-		for ( int i=0; i < measurements.length; i++ ) measurements[ i ] = new AtomicLong( 0 );
+		this.openMeasurements = new AtomicInteger[ measurements.length ];
+		for ( int i=0; i < measurements.length; i++ ) {
+			measurements[ i ] = new AtomicLong( 0 );
+			openMeasurements[ i ] = new AtomicInteger( 0 );
+		}
 	}
 
 	public void startMeasurement( final T type) {
 		// on the choice between currentTimeMillis and nanoTime, see
 		// http://stackoverflow.com/a/1776053
-		// currentTimeMillis is choosen because it does not depend on CPU
-		// (basically, both might be wrong, but should give a reasonnable idea)
-		measurements[ type.ordinal() ].addAndGet( -System.currentTimeMillis() );
+		// currentTimeMillis is chosen because it does not depend on CPU
+		// (basically, both might be wrong, but should give a reasonable idea)
+		final int i = type.ordinal();
+		measurements[ i ].addAndGet( -System.currentTimeMillis() );
+		openMeasurements[ i ].incrementAndGet();
 	}
 
 	public void endMeasurement( final T type ) {
-		measurements[ type.ordinal() ].addAndGet( System.currentTimeMillis() );
+		final int i = type.ordinal();
+		measurements[ i ].addAndGet( System.currentTimeMillis() );
+		openMeasurements[ i ].decrementAndGet();
 	}
 
 	public void printStats( final TimeUnit unit) {
 		for ( int i=0; i < measurements.length; i++ ) {
 			final T type = enumType.getEnumConstants()[ i ];
 			final long measurement = measurements[ i ].get();
+			if ( openMeasurements[ i ].get() != 0 ) {
+				log.warn( "Not the same number of starts and ends for measurements of type "+type+"! " +
+								" The results are most problably complete rubbish..." );
+			}
 			log.info( "Time elapsed for "+type+" (in "+unit.name()+"): "+
 							unit.convert( measurement , TimeUnit.MILLISECONDS ) );
 		}
