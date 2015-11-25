@@ -84,19 +84,19 @@ public class SubpopulationConfig {
 		config.plans().setSubpopulationAttributeName("incomeGroup");
 
 		for(String subPop : subPopulations){
-			StrategySettings timeAllocationMutator	= new StrategySettings(ConfigUtils.createAvailableStrategyId(config));
+			StrategySettings timeAllocationMutator	= new StrategySettings();
 			timeAllocationMutator.setStrategyName(DefaultPlanStrategiesModule.DefaultStrategy.TimeAllocationMutator.name());
 			timeAllocationMutator.setWeight(0.05);
 
-			StrategySettings expChangeBeta = new StrategySettings(ConfigUtils.createAvailableStrategyId(config));
+			StrategySettings expChangeBeta = new StrategySettings();
 			expChangeBeta.setStrategyName("ChangeExpBeta");
 			expChangeBeta.setWeight(0.9);
 
-			StrategySettings reRoute = new StrategySettings(ConfigUtils.createAvailableStrategyId(config));
+			StrategySettings reRoute = new StrategySettings();
 			reRoute.setStrategyName(DefaultPlanStrategiesModule.DefaultStrategy.ReRoute.name());
 			reRoute.setWeight(0.1);
 
-			StrategySettings modeChoice = new StrategySettings(ConfigUtils.createAvailableStrategyId(config));
+			StrategySettings modeChoice = new StrategySettings();
 			modeChoice.setStrategyName("ChangeLegMode_".concat(subPop));
 			modeChoice.setWeight(0.05);
 
@@ -109,18 +109,20 @@ public class SubpopulationConfig {
 			config.strategy().addStrategySettings(reRoute);
 			config.strategy().addStrategySettings(timeAllocationMutator);
 			config.strategy().addStrategySettings(modeChoice);
-
 		}
 
 		config.strategy().setFractionOfIterationsToDisableInnovation(0.8);
-
 		for(String str : allModes){
 			config.planCalcScore().getOrCreateModeParams(str).setConstant(0.);
 			config.planCalcScore().getOrCreateModeParams(str).setMarginalUtilityOfTraveling(0.);
 		}
 		
 		config.plansCalcRoute().setNetworkModes(mainModes);
-		config.plansCalcRoute().setBeelineDistanceFactor(1.0);
+		
+		config.plansCalcRoute().getOrCreateModeRoutingParams("slum_walk").setBeelineDistanceFactor(1.1);
+		config.plansCalcRoute().getOrCreateModeRoutingParams("nonSlum_walk").setBeelineDistanceFactor( 1.1);
+		config.plansCalcRoute().getOrCreateModeRoutingParams("slum_pt").setBeelineDistanceFactor (1.5);
+		config.plansCalcRoute().getOrCreateModeRoutingParams("nonSlum_pt").setBeelineDistanceFactor (1.5);
 
 		config.plansCalcRoute().getOrCreateModeRoutingParams("slum_walk").setTeleportedModeSpeed(4/3.6);
 		config.plansCalcRoute().getOrCreateModeRoutingParams("nonSlum_walk").setTeleportedModeSpeed( 4/3.6);
@@ -141,5 +143,4 @@ public class SubpopulationConfig {
 	public Config getPatnaConfig(){
 		return this.config;
 	}
-
 }

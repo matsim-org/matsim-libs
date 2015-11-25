@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.mixedTraffic.patnaIndia.analysis;
+package playground.agarwalamit.analysis.travelTime;
 
 import java.io.BufferedWriter;
 import java.util.List;
@@ -32,34 +32,32 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.agarwalamit.analysis.legMode.distributions.LegModeTravelTimeHandler;
+import playground.agarwalamit.analysis.trip.LegModeTripTravelTimeHandler;
 import playground.vsp.analysis.modules.AbstractAnalysisModule;
 
 /**
  * @author amit
  */
 
-public class PatnaTravelTimeAnalyzer extends AbstractAnalysisModule {
+public class ModalTravelTimeAnalyzer extends AbstractAnalysisModule {
 
-
-	public PatnaTravelTimeAnalyzer(String inputEventsFile) {
-		super(PatnaTravelTimeAnalyzer.class.getSimpleName());
+	public ModalTravelTimeAnalyzer(String inputEventsFile) {
+		super(ModalTravelTimeAnalyzer.class.getSimpleName());
 		this.inputEventsFile = inputEventsFile;
 	}
 
 	private SortedMap<String, Double> mode2AvgTripTime = new TreeMap<String, Double>();
 	private SortedMap<String, Double> mode2TotalTravelTime = new TreeMap<String, Double>();
-	private LegModeTravelTimeHandler travelTimeHandler = new LegModeTravelTimeHandler();
+	private LegModeTripTravelTimeHandler travelTimeHandler = new LegModeTripTravelTimeHandler();
 
 	private String inputEventsFile;
 	private static final int iterationNr = 100;
-	
 	
 	public static void main(String[] args) {
 		String dir = "../../../repos/runs-svn/patnaIndia/run105/1pct/evac_passing/";
 		String eventFile = dir+"/ITERS/it."+iterationNr+"/"+iterationNr+".events.xml.gz";
 		String outputFolder = dir+"/analysis/";
-		PatnaTravelTimeAnalyzer timeAnalyzer  = new PatnaTravelTimeAnalyzer(eventFile);
+		ModalTravelTimeAnalyzer timeAnalyzer  = new ModalTravelTimeAnalyzer(eventFile);
 		timeAnalyzer.preProcessData();
 		timeAnalyzer.postProcessData();
 		timeAnalyzer.writeResults(outputFolder);
@@ -69,6 +67,7 @@ public class PatnaTravelTimeAnalyzer extends AbstractAnalysisModule {
 	public List<EventHandler> getEventHandler() {
 		return null;
 	}
+	
 	@Override
 	public void preProcessData() {
 		EventsManager events = EventsUtils.createEventsManager();
@@ -109,5 +108,13 @@ public class PatnaTravelTimeAnalyzer extends AbstractAnalysisModule {
 			throw new RuntimeException("Data is not written in file. Reason: "
 					+ e);
 		}
+	}
+
+	public SortedMap<String, Double> getMode2AvgTripTime() {
+		return mode2AvgTripTime;
+	}
+
+	public SortedMap<String, Double> getMode2TotalTravelTime() {
+		return mode2TotalTravelTime;
 	}
 }

@@ -27,11 +27,14 @@ import playground.thibautd.maxess.nestedlogitaccessibility.framework.ChoiceSetId
 import playground.thibautd.maxess.nestedlogitaccessibility.framework.Utility;
 import playground.thibautd.maxess.prepareforbiogeme.tripbased.RunMzTripChoiceSetConversion;
 import playground.thibautd.router.TripSoftCache;
+import playground.thibautd.utils.ConcurrentStopWatch;
 
 /**
  * @author thibautd
  */
 public class SimpleNestedLogitModule extends AbstractModule {
+	public final ConcurrentStopWatch<SimpleNestedLogitModelChoiceSetIdentifier.Measurement> stopWatch =
+			new ConcurrentStopWatch<>( SimpleNestedLogitModelChoiceSetIdentifier.Measurement.class );
 	private final String TYPE = "leisure";
 	private final int N_SAMPLES = 200;
 	private final int DISTANCE_BUDGET = 20 * 1000;
@@ -53,12 +56,14 @@ public class SimpleNestedLogitModule extends AbstractModule {
 	@Provides
 	public SimpleNestedLogitModelChoiceSetIdentifier createChoiceSetIdentifier( final Scenario scenario ) {
 		return new SimpleNestedLogitModelChoiceSetIdentifier(
+				stopWatch,
 				TYPE,
 				N_SAMPLES,
 				RunMzTripChoiceSetConversion.createTripRouter(
 						scenario,
 						cache ),
 				scenario.getActivityFacilities(),
+				scenario.getPopulation().getPersonAttributes(),
 				DISTANCE_BUDGET );
 	}
 }

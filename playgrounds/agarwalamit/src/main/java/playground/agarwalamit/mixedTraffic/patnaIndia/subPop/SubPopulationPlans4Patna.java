@@ -58,7 +58,7 @@ public class SubPopulationPlans4Patna {
 		scenario = ScenarioUtils.createScenario(config);
 	}
 
-	private static final Logger logger = Logger.getLogger(SubPopulationPlans4Patna.class);
+	private static final Logger LOG = Logger.getLogger(SubPopulationPlans4Patna.class);
 	private Scenario scenario;
 
 	private Collection<SimpleFeature> features;
@@ -76,7 +76,7 @@ public class SubPopulationPlans4Patna {
 		// write persons attributes file here.
 		ObjectAttributesXmlWriter writer = new ObjectAttributesXmlWriter(plans.scenario.getPopulation().getPersonAttributes()) ;
 		writer.writeFile("../../../repos/runs-svn/patnaIndia/inputs/personsAttributesSubPop.xml.gz");
-		logger.info("Writing Plan file is finished.");
+		LOG.info("Writing Plan file is finished.");
 	}
 
 	public void run(){
@@ -129,8 +129,8 @@ public class SubPopulationPlans4Patna {
 					while (iterator.hasNext()){
 
 						SimpleFeature feature = iterator.next();
-						int Id = (Integer) feature.getAttribute("ID1");
-						String zoneId  = String.valueOf(Id);
+						int id = (Integer) feature.getAttribute("ID1");
+						String zoneId  = String.valueOf(id);
 
 						if(fromZoneId.equals(zoneId) ) {
 							p = GeometryUtils.getRandomPointsFromWard(feature);
@@ -199,7 +199,8 @@ public class SubPopulationPlans4Patna {
 		}
 	}
 
-	private void createActivities (Plan plan, Coord toZoneFeatureCoord, Coord fromZoneFeatureCoord, String mode, String tripPurpose) {
+	//ZZ_TODO : modify it according to PatnaUrbanDemandGenerator
+	private void createActivities (final Plan plan, final Coord toZoneFeatureCoord, final Coord fromZoneFeatureCoord, final String mode, final String tripPurpose) {
 		Random random2 = new Random();
 		Population population = scenario.getPopulation();
 		PopulationFactory populationFactory = population.getFactory();

@@ -28,18 +28,20 @@ import org.matsim.core.scenario.ScenarioUtils;
  * @author amit based on PersonFilter of BK.
  */
 
-public class PopulationFilter {
+public final class PopulationFilter {
+	
+	private PopulationFilter() {}
 	
 	private enum PatnaSubPopulations {slum, nonSlum};
 	
-	public static Population getSubPopulation(Population population, PatnaSubPopulations subPopulationType){
+	public static Population getSubPopulation(final Population population, final PatnaSubPopulations subPopulationType){
 		Population filteredPopulation = null;
 		if(subPopulationType.equals(PatnaSubPopulations.slum)) filteredPopulation = getSlumPopulation(population);
 		else if(subPopulationType.equals(PatnaSubPopulations.nonSlum)) filteredPopulation = getNonSlumPopulation(population);
 		return filteredPopulation;
 	}
 	
-	public static Population getSlumPopulation(Population population){
+	public static Population getSlumPopulation(final Population population){
 		Scenario emptyScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Population filteredPopulation = emptyScenario.getPopulation();
 		for(Person person : population.getPersons().values()){
@@ -50,7 +52,7 @@ public class PopulationFilter {
 		return filteredPopulation;
 	}
 	
-	public static Population getNonSlumPopulation(Population population){
+	public static Population getNonSlumPopulation(final Population population){
 		Scenario emptyScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Population filteredPopulation = emptyScenario.getPopulation();
 		for(Person person : population.getPersons().values()){
@@ -61,11 +63,11 @@ public class PopulationFilter {
 		return filteredPopulation;
 	}
 	
-	public static boolean isPersonFromSlum(Person person){
-		return (person.getId().toString().split("_")[1].equals("slum"));
+	public static boolean isPersonFromSlum(final Person person){
+		return person.getId().toString().split("_")[1].equals("slum");
 	}
 	
-	public static boolean isPersonFromNonSlum(Person person){
-		return (person.getId().toString().split("_")[1].equals("nonSlum"));
+	public static boolean isPersonFromNonSlum(final Person person){
+		return person.getId().toString().split("_")[1].equals("nonSlum");
 	}
 }
