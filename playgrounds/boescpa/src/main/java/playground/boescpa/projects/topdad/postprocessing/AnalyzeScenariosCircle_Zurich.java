@@ -27,8 +27,8 @@ import playground.boescpa.analysis.scenarioAnalyzer.eventHandlers.AgentCounter;
 import playground.boescpa.analysis.scenarioAnalyzer.eventHandlers.ScenarioAnalyzerEventHandler;
 import playground.boescpa.analysis.scenarioAnalyzer.eventHandlers.TripActivityCrosscorrelator;
 import playground.boescpa.analysis.scenarioAnalyzer.eventHandlers.TripAnalyzer;
-import playground.boescpa.analysis.scenarioAnalyzer.spatialEventCutters.CirclePointCutter;
-import playground.boescpa.analysis.scenarioAnalyzer.spatialEventCutters.SpatialEventCutter;
+import playground.boescpa.analysis.scenarioAnalyzer.spatialFilters.CirclePointCutter;
+import playground.boescpa.analysis.scenarioAnalyzer.spatialFilters.SpatialEventCutter;
 import playground.boescpa.lib.tools.NetworkUtils;
 
 /**

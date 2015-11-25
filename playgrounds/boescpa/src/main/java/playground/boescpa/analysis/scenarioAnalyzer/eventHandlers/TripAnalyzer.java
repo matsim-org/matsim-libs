@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.events.handler.*;
 import org.matsim.api.core.v01.network.Network;
 import playground.boescpa.analysis.scenarioAnalyzer.ScenarioAnalyzer;
-import playground.boescpa.analysis.scenarioAnalyzer.spatialEventCutters.SpatialEventCutter;
+import playground.boescpa.analysis.scenarioAnalyzer.spatialFilters.SpatialEventCutter;
 import playground.boescpa.analysis.trips.tripCreation.TripHandler;
 import playground.boescpa.analysis.trips.tripCreation.TripProcessor;
 
@@ -114,7 +114,8 @@ public class TripAnalyzer implements ScenarioAnalyzerEventHandler, PersonDepartu
 		this.modes.clear();
 		this.activities.clear();
 		// analyze
-		analyzeEvents(spatialEventCutter);
+        this.spatialEventCutter = spatialEventCutter;
+		analyzeEvents();
 		// create results
 		String results = getTripResults();
 		results += ScenarioAnalyzer.NL;
@@ -177,14 +178,8 @@ public class TripAnalyzer implements ScenarioAnalyzerEventHandler, PersonDepartu
 		return results;
 	}
 
-	private void analyzeEvents(SpatialEventCutter spatialEventCutter) {
-		if (spatialEventCutter != null) {
-			this.spatialEventCutter = spatialEventCutter;
-		} else {
-			log.warn("No spatial event cutter provided. Will analyze the full network.");
-		}
-
-		for (Id personId : tripHandler.getStartLink().keySet()) {
+	private void analyzeEvents() {
+        for (Id personId : tripHandler.getStartLink().keySet()) {
 			if (!personId.toString().contains("pt")) {
 				ArrayList<Id> startLinks = tripHandler.getStartLink().getValues(personId);
 				ArrayList<String> modes = tripHandler.getMode().getValues(personId);
@@ -268,7 +263,7 @@ public class TripAnalyzer implements ScenarioAnalyzerEventHandler, PersonDepartu
 	}
 
 	private boolean considerLink(Id id) {
-		return spatialEventCutter == null || spatialEventCutter.spatiallyConsideringLink(network.getLinks().get(id));
+		return spatialEventCutter.spatiallyConsideringLink(network.getLinks().get(id));
 	}
 
 	private ModeResult getMode(String mode) {

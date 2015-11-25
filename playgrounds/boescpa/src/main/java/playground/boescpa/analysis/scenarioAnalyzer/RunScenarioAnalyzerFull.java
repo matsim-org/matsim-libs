@@ -22,8 +22,8 @@
 package playground.boescpa.analysis.scenarioAnalyzer;
 
 import org.matsim.api.core.v01.network.Network;
-import playground.boescpa.analysis.scenarioAnalyzer.ScenarioAnalyzer;
 import playground.boescpa.analysis.scenarioAnalyzer.eventHandlers.*;
+import playground.boescpa.analysis.scenarioAnalyzer.spatialFilters.NoCutting;
 import playground.boescpa.lib.tools.NetworkUtils;
 
 /**
@@ -32,7 +32,7 @@ import playground.boescpa.lib.tools.NetworkUtils;
  *
  * @author boescpa
  */
-public class RunScenarioAnalyzer {
+public class RunScenarioAnalyzerFull {
 
 	public static void main(String[] args) {
 		Network network = NetworkUtils.readNetwork(args[0]);
@@ -51,7 +51,7 @@ public class RunScenarioAnalyzer {
 			scenarioAnalyzer.analyzeScenario();
 
 			// Return the results:
-			scenarioAnalyzer.createResults(path2EventFile + "_analysisResults.csv", null);
+			scenarioAnalyzer.createResults(path2EventFile + "_analysisResults.csv", new NoCutting());
 
 		} catch (Exception e){
 			e.printStackTrace();

@@ -27,7 +27,7 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.utils.io.IOUtils;
 import playground.boescpa.analysis.scenarioAnalyzer.eventHandlers.ScenarioAnalyzerEventHandler;
-import playground.boescpa.analysis.scenarioAnalyzer.spatialEventCutters.SpatialEventCutter;
+import playground.boescpa.analysis.scenarioAnalyzer.spatialFilters.SpatialEventCutter;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -80,11 +80,7 @@ public class ScenarioAnalyzer {
 	}
 
 	private String getInitialResultsString(SpatialEventCutter spatialEventCutter) {
-		if (spatialEventCutter != null) {
-			return spatialEventCutter.toString() + NL;
-		} else {
-			return "No spatial event cutter loaded. Use full network." + NL;
-		}
+		return spatialEventCutter.toString() + NL;
 	}
 
 	private void showResultsOnTerminal(String results) {

@@ -28,8 +28,8 @@ import playground.boescpa.analysis.scenarioAnalyzer.eventHandlers.AgentCounter;
 import playground.boescpa.analysis.scenarioAnalyzer.eventHandlers.ScenarioAnalyzerEventHandler;
 import playground.boescpa.analysis.scenarioAnalyzer.eventHandlers.TripActivityCrosscorrelator;
 import playground.boescpa.analysis.scenarioAnalyzer.eventHandlers.TripAnalyzer;
-import playground.boescpa.analysis.scenarioAnalyzer.spatialEventCutters.SHPFileCutter;
-import playground.boescpa.analysis.scenarioAnalyzer.spatialEventCutters.SpatialEventCutter;
+import playground.boescpa.analysis.scenarioAnalyzer.spatialFilters.SHPFileCutter;
+import playground.boescpa.analysis.scenarioAnalyzer.spatialFilters.SpatialEventCutter;
 
 /**
  * Analyzes events file from ToPDAd-Simulations...

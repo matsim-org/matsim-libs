@@ -23,7 +23,7 @@ package playground.boescpa.projects.topdad.postprocessing;
 
 import playground.boescpa.analysis.trips.tripCreation.TripCreator;
 import playground.boescpa.analysis.trips.tripCreation.TripProcessor;
-import playground.boescpa.analysis.trips.tripCreation.spatialCuttings.CircleBellevueCutting;
+import playground.boescpa.analysis.trips.tripCreation.spatialCuttings.CirclePointCutting;
 import playground.boescpa.analysis.trips.tripCreation.spatialCuttings.SpatialCuttingStrategy;
 
 /**
@@ -40,8 +40,8 @@ public class TopdadTripCreator {
 		String valueFile = args[3]; // Path to the value-File produced as output, e.g. "vals2030combined.txt"
 		int zoneRadius = Integer.valueOf(args[4]);
 
-		SpatialCuttingStrategy spatialCuttingStrategy = new CircleBellevueCutting(zoneRadius);
-		TripProcessor tripProcessor = new TopdadTripProcessor(tripFile, valueFile, spatialCuttingStrategy);
+		SpatialCuttingStrategy circleBellevueCutting = new CirclePointCutting(zoneRadius, 683518.0, 246836.0);
+		TripProcessor tripProcessor = new TopdadTripProcessor(tripFile, valueFile, circleBellevueCutting);
 		TripCreator tripCreator = new TripCreator(eventsFile, networkFile, tripProcessor);
 		tripCreator.createTrips();
 	}

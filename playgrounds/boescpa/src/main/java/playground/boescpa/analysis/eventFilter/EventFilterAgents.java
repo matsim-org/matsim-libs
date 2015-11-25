@@ -21,14 +21,8 @@
 
 package playground.boescpa.analysis.eventFilter;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -42,6 +36,11 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Given a list of agents, this class filters all events related to those agents from a given events file.
@@ -104,7 +103,6 @@ public class EventFilterAgents {
 
 		private void agentReader(String interestingAgents) {
 			try {
-				Scenario scenarioUtils = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 				BufferedReader in = IOUtils.getBufferedReader(interestingAgents);
 				String newLine = in.readLine();
 				while (newLine != null) {
@@ -124,11 +122,11 @@ public class EventFilterAgents {
 
 		@Override
 		public void handleEvent(Event event) {
-			try {
-				if (this.interestingAgents.contains(((HasPersonId) event).getPersonId())) {
-					eventsWriter.handleEvent(event);
-				}
-			} catch (Exception e) {}
+            if (event instanceof HasPersonId) {
+                if (this.interestingAgents.contains(((HasPersonId) event).getPersonId())) {
+                    eventsWriter.handleEvent(event);
+                }
+            }
 		}
 	}
 }

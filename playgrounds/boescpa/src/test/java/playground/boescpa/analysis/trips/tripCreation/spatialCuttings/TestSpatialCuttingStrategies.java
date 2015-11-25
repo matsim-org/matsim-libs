@@ -19,9 +19,6 @@
 
 package playground.boescpa.analysis.trips.tripCreation.spatialCuttings;
 
-import java.util.Map;
-import java.util.Set;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -33,6 +30,9 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
+
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Tests for the spatial cutting strategies.
@@ -69,8 +69,8 @@ public class TestSpatialCuttingStrategies {
 	}
 	
 	@Test
-	public void testCircleBellevueCutting() {
-		strat = new CircleBellevueCutting(10);
+	public void testCirclePointCutting() {
+		strat = new CirclePointCutting(10, 683518.0, 246836.0);
 		
 		Assert.assertTrue("CircleBellevueCutting does not recognize link outside circle.",
 				!strat.spatiallyConsideringTrip(network, Id.create(1, Link.class), Id.create(1, Link.class)));

@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.events.handler.*;
 import org.matsim.api.core.v01.network.Network;
 import playground.boescpa.analysis.scenarioAnalyzer.ScenarioAnalyzer;
-import playground.boescpa.analysis.scenarioAnalyzer.spatialEventCutters.SpatialEventCutter;
+import playground.boescpa.analysis.scenarioAnalyzer.spatialFilters.SpatialEventCutter;
 import playground.boescpa.analysis.trips.tripCreation.TripHandler;
 
 import java.util.*;
@@ -105,7 +105,8 @@ public class TripActivityCrosscorrelator implements ScenarioAnalyzerEventHandler
 		this.activities.clear();
 		this.counts.clear();
 		// analyze
-		analyzeEvents(spatialEventCutter);
+        this.spatialEventCutter = spatialEventCutter;
+        analyzeEvents();
 		// create results
 		return getResults();
 	}
@@ -128,13 +129,7 @@ public class TripActivityCrosscorrelator implements ScenarioAnalyzerEventHandler
 		return results;
 	}
 
-	private void analyzeEvents(SpatialEventCutter spatialEventCutter) {
-		if (spatialEventCutter != null) {
-			this.spatialEventCutter = spatialEventCutter;
-		} else {
-			log.warn("No spatial event cutter provided. Will analyze the full network.");
-		}
-
+	private void analyzeEvents() {
 		for (Id personId : tripHandler.getStartLink().keySet()) {
 			if (!personId.toString().contains("pt")) {
 				ArrayList<Id> startLinks = tripHandler.getStartLink().getValues(personId);
@@ -165,7 +160,7 @@ public class TripActivityCrosscorrelator implements ScenarioAnalyzerEventHandler
 	}
 
 	private boolean considerLink(Id id) {
-		return spatialEventCutter == null || spatialEventCutter.spatiallyConsideringLink(network.getLinks().get(id));
+		return spatialEventCutter.spatiallyConsideringLink(network.getLinks().get(id));
 	}
 
 	private void addCount(int mode, int act) {

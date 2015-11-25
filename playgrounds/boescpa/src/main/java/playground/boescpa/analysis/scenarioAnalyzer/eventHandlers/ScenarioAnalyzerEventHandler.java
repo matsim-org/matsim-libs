@@ -22,7 +22,7 @@
 package playground.boescpa.analysis.scenarioAnalyzer.eventHandlers;
 
 import org.matsim.core.events.handler.EventHandler;
-import playground.boescpa.analysis.scenarioAnalyzer.spatialEventCutters.SpatialEventCutter;
+import playground.boescpa.analysis.scenarioAnalyzer.spatialFilters.SpatialEventCutter;
 
 /**
  * Any new analysis to be done as part of the ScenarioAnalyzer-process has to implement this interface.

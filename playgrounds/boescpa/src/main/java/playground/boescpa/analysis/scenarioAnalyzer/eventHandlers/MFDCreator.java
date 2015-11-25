@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import playground.boescpa.analysis.scenarioAnalyzer.ScenarioAnalyzer;
-import playground.boescpa.analysis.scenarioAnalyzer.spatialEventCutters.SpatialEventCutter;
+import playground.boescpa.analysis.scenarioAnalyzer.spatialFilters.SpatialEventCutter;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -104,7 +104,7 @@ public class MFDCreator implements ScenarioAnalyzerEventHandler, LinkLeaveEventH
 			// density:
 			int densitiesTimeBin = 0;
 			for (Id<Link> linkId : this.densities.get(i).keySet()) {
-				if (spatialEventCutter == null || spatialEventCutter.spatiallyConsideringLink(this.network.getLinks().get(linkId))) {
+				if (spatialEventCutter.spatiallyConsideringLink(this.network.getLinks().get(linkId))) {
 					densitiesTimeBin += this.densities.get(i).get(linkId);
 				}
 			}
@@ -112,7 +112,7 @@ public class MFDCreator implements ScenarioAnalyzerEventHandler, LinkLeaveEventH
 			// flow:
 			int flowsTimeBin = 0;
 			for (Id<Link> linkId : this.flows.get(i).keySet()) {
-				if (spatialEventCutter == null || spatialEventCutter.spatiallyConsideringLink(this.network.getLinks().get(linkId))) {
+				if (spatialEventCutter.spatiallyConsideringLink(this.network.getLinks().get(linkId))) {
 					flowsTimeBin += this.flows.get(i).get(linkId);
 				}
 			}

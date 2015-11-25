@@ -21,7 +21,7 @@
 
 package playground.boescpa.projects.netcap.postprocessing;
 
-import playground.boescpa.analysis.scenarioAnalyzer.RunScenarioAnalyzer;
+import playground.boescpa.analysis.scenarioAnalyzer.RunScenarioAnalyzerFull;
 
 /**
  * @author boescpa
@@ -29,6 +29,6 @@ import playground.boescpa.analysis.scenarioAnalyzer.RunScenarioAnalyzer;
 public class NCEventsAnalyzer {
 
 	public static void main(String[] args) {
-        RunScenarioAnalyzer.main(args);
+        RunScenarioAnalyzerFull.main(args);
 	}
 }
