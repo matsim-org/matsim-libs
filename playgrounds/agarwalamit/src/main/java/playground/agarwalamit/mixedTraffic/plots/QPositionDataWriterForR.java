@@ -31,6 +31,7 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.mixedTraffic.MixedTrafficVehiclesUtils;
+import playground.agarwalamit.mixedTraffic.plots.LinkPersonInfoContainer.PersonInfoChecker;
 import playground.agarwalamit.utils.LoadMyScenarios;
 
 /**
@@ -65,35 +66,35 @@ public class QPositionDataWriterForR {
 	}
 
 	private static void writeLinkEnterLeaveQueuePosDataForR(){
-		List<String> qPositionData = calculationHandler.getPersonLinkEnterTimeVehiclePositionDataToWrite();
-		List<String> linkEnterLeaveTimeData = calculationHandler.getPersonLinkEnterLeaveTimeDataToWrite();
-		List<String> copyLinkEnterLeaveTimeData = new ArrayList<String>(linkEnterLeaveTimeData);
+		List<PersonInfoChecker> qPositionData = calculationHandler.getPersonLinkEnterTimeVehiclePositionDataToWrite();
+		List<PersonInfoChecker> linkEnterLeaveTimeData = calculationHandler.getPersonLinkEnterLeaveTimeDataToWrite();
+		List<PersonInfoChecker> copyLinkEnterLeaveTimeData = new ArrayList<PersonInfoChecker>(linkEnterLeaveTimeData);
+		
 		BufferedWriter writer = IOUtils.getBufferedWriter(outputDir+"/rDataPersonInQueueData6.txt");
 		double vehicleSpeed =0;
 		try {
 			writer.write("personId \t linkId \t startTimeX1 \t initialPositionY1 \t endTimeX2 \t endPositionY2 \t travelMode \n");
 
-			for(String qPosDataLine : qPositionData){
-				String qParts[] =qPosDataLine.split("\t");
+			for(PersonInfoChecker checker : qPositionData){
+				EnteringPersonInfo enteredPerson = checker.getEnteredPersonInfo();
+				String personId = enteredPerson.getPersonId().toString();
+				String linkId = enteredPerson.getLink().getId().toString();
+				double linkEnterTime = enteredPerson.getLinkEnterTime();
+				double queuingTime = checker.getQueuingTime();
+				double linkLength = enteredPerson.getLink().getLength();
+				String travelMode = enteredPerson.getLegMode();
+				double linkLeaveTime = checker.getLeftPersonInfo().getLinkLeaveTime();
 
-				String personId = qParts[0];
-				String linkId = qParts[1];
-				String linkEnterTime = qParts[2];
-				String queuingTime =qParts[3];
-				String linkLength = qParts[4];
-				String travelMode = qParts[5];
-				String linkLeaveTime = qParts[6];
-
-				vehicleSpeed=MixedTrafficVehiclesUtils.getSpeed(travelMode);
-
-				double initialPos = Double.valueOf(linkId)*Double.valueOf(linkLength);
-				double qStartTime =Double.valueOf(queuingTime);
-				double qStartDistFromFNode = initialPos+(qStartTime-Double.valueOf(linkEnterTime))*vehicleSpeed;
-				if((qStartDistFromFNode-initialPos) > Double.valueOf(linkLength)){
-					qStartDistFromFNode=initialPos + Double.valueOf(linkLength);
+				vehicleSpeed = MixedTrafficVehiclesUtils.getSpeed(travelMode);
+				
+				double initialPos = Double.valueOf(linkId) * linkLength;
+				double qStartTime = queuingTime;
+				double qStartDistFromFNode = initialPos + (qStartTime- linkEnterTime) * vehicleSpeed;
+				if((qStartDistFromFNode-initialPos) > linkLength){
+					qStartDistFromFNode=initialPos + linkLength;
 				}
 				double timeStepTillFreeSpeed = qStartTime;
-				double endOfLink = (1+Double.valueOf(linkId))*Double.valueOf(linkLength);
+				double endOfLink = (1+Double.valueOf(linkId)) * linkLength;
 
 				// first line will write the distance and time for which speed was free flow speed.
 				// next line will write the queue distance and link leave time.
@@ -103,17 +104,17 @@ public class QPositionDataWriterForR {
 				copyLinkEnterLeaveTimeData.remove(timeDataLine);
 			}
 
-			for(String timeDataLine : copyLinkEnterLeaveTimeData){
-				String timeParts[] = timeDataLine.split("\t");
-				String personId = timeParts[0];
-				String linkId = timeParts[1];
-				String linkEnterTime = timeParts[2];
-				String linkLeaveTime = timeParts[3];
-				String linkLength = timeParts[4];
-				String travelMode = timeParts[5];
-
-				double initialPos = Double.valueOf(linkId)*Double.valueOf(linkLength);
-				double finalPos = (1+Double.valueOf(linkId))*Double.valueOf(linkLength);
+			for(PersonInfoChecker checker : copyLinkEnterLeaveTimeData){
+				EnteringPersonInfo enteredPerson = checker.getEnteredPersonInfo();
+				String personId = enteredPerson.getPersonId().toString();
+				String linkId = enteredPerson.getLink().getId().toString();
+				double linkEnterTime = enteredPerson.getLinkEnterTime();
+				double linkLength = enteredPerson.getLink().getLength();
+				String travelMode = enteredPerson.getLegMode();
+				double linkLeaveTime = checker.getLeftPersonInfo().getLinkLeaveTime();
+				
+				double initialPos = Double.valueOf(linkId) * linkLength;
+				double finalPos = ( 1 + Double.valueOf(linkId))* linkLength;
 				writer.write(personId+"\t"+linkId+"\t"+linkEnterTime+"\t"+initialPos+"\t"+linkLeaveTime+"\t"+finalPos+"\t"+travelMode+"\n");
 			}
 			writer.close();
@@ -124,18 +125,18 @@ public class QPositionDataWriterForR {
 
 	private static void writeLinkEnterLeaveTimeForR(){
 
-		List<String> linkEnterLeaveTimeDataList = calculationHandler.getPersonLinkEnterLeaveTimeDataToWrite();
+		List<PersonInfoChecker> linkEnterLeaveTimeDataList = calculationHandler.getPersonLinkEnterLeaveTimeDataToWrite();
 		BufferedWriter writer = IOUtils.getBufferedWriter(outputDir+"/rDataPersonLinkEnterLeave.txt");
 		try {
 			writer.write("personId \t linkId \t linkEnterTimeX1 \t initialPositionY1 \t linkLeaveTimeX2 \t endPositionY2 \t travelMode \n");
-			for(String timeDataLine : linkEnterLeaveTimeDataList){
-				String timeParts[] = timeDataLine.split("\t");
-				String personId = timeParts[0];
-				String linkId = timeParts[1];
-				String linkEnterTime = timeParts[2];
-				String linkLeaveTime = timeParts[3];
-				String linkLength = timeParts[4];
-				String travelMode = timeParts[5];
+			for(PersonInfoChecker checker : linkEnterLeaveTimeDataList){
+				EnteringPersonInfo enteredPerson = checker.getEnteredPersonInfo();
+				String personId = enteredPerson.getPersonId().toString();
+				String linkId = enteredPerson.getLink().getId().toString();
+				double linkEnterTime = enteredPerson.getLinkEnterTime();
+				double linkLength = enteredPerson.getLink().getLength();
+				String travelMode = enteredPerson.getLegMode();
+				double linkLeaveTime = checker.getLeftPersonInfo().getLinkLeaveTime();
 
 				double initialPos = Double.valueOf(linkId)*Double.valueOf(linkLength);
 				double finalPos = (1+Double.valueOf(linkId))*Double.valueOf(linkLength);
