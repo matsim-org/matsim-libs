@@ -45,7 +45,7 @@ import playground.agarwalamit.mixedTraffic.MixedTrafficVehiclesUtils;
  */
 public class QueuePositionCalculationHandler implements LinkLeaveEventHandler, LinkEnterEventHandler, PersonDepartureEventHandler {
 
-	private final Logger logger = Logger.getLogger(QueuePositionCalculationHandler.class);
+	private static final Logger LOG = Logger.getLogger(QueuePositionCalculationHandler.class);
 	private Map<Id<Link>, Map<Id<Person>, PersonOnLinkInformation>> linkId2PersonId2LinkInfo = new TreeMap<Id<Link>, Map<Id<Person>,PersonOnLinkInformation>>();
 	private SortedMap<Id<Link>, Queue<Id<Person>>> linkId2PersonId2VehicleOnLink= new TreeMap<Id<Link>, Queue<Id<Person>>>();
 	private Map<Id<Link>, Queue<Id<Person>>> linkId2PersonId2VehicleInQueue= new TreeMap<Id<Link>, Queue<Id<Person>>>();
@@ -59,7 +59,7 @@ public class QueuePositionCalculationHandler implements LinkLeaveEventHandler, L
 	private double lastEventTimeStep=0;
 
 	public QueuePositionCalculationHandler(Scenario scenario) {
-		this.logger.info("Calculating queue position of vehicles in mixed traffic.");
+		LOG.info("Calculating queue position of vehicles in mixed traffic.");
 		this.scenario = scenario;
 		for (Link link : scenario.getNetwork().getLinks().values()) {
 			this.linkId2PersonId2LinkInfo.put(link.getId(), new TreeMap<Id<Person>, PersonOnLinkInformation>());
