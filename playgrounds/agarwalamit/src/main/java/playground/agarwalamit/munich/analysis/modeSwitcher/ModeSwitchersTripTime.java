@@ -33,7 +33,7 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.utils.collections.Tuple;
 
-import playground.agarwalamit.analysis.legMode.distributions.LegModeTravelTimeHandler;
+import playground.agarwalamit.analysis.trip.LegModeTripTravelTimeHandler;
 
 /**
  *This will first find mode switchers and then returns trip times in groups. 
@@ -118,7 +118,7 @@ public class ModeSwitchersTripTime {
 		EventsManager events = EventsUtils.createEventsManager();
 		MatsimEventsReader reader = new MatsimEventsReader(events);
 
-		LegModeTravelTimeHandler timeHandler = new LegModeTravelTimeHandler();
+		LegModeTripTravelTimeHandler timeHandler = new LegModeTripTravelTimeHandler();
 		events.addHandler(timeHandler);
 
 		reader.readFile(eventsFile);

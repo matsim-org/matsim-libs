@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.analysis.legMode.distributions;
+package playground.agarwalamit.analysis.trip;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -44,9 +44,9 @@ import org.matsim.core.gbl.Gbl;
  * @author amit
  */
 
-public class LegModeTravelTimeHandler implements PersonDepartureEventHandler, PersonArrivalEventHandler, PersonStuckEventHandler {
+public class LegModeTripTravelTimeHandler implements PersonDepartureEventHandler, PersonArrivalEventHandler, PersonStuckEventHandler {
 
-	private final Logger logger = Logger.getLogger(LegModeTravelTimeHandler.class);
+	private final Logger logger = Logger.getLogger(LegModeTripTravelTimeHandler.class);
 	private SortedMap<String, Map<Id<Person>, List<Double>>> mode2PersonId2TravelTimes;
 	private Map<Id<Person>, Double> personId2DepartureTime;
 	private final int maxStuckAndAbortWarnCount=5;
@@ -54,7 +54,7 @@ public class LegModeTravelTimeHandler implements PersonDepartureEventHandler, Pe
 	private Set<Id<Person>> stuckPersons;
 	private SortedMap<String, Double> mode2NumberOfLegs ;
 
-	public LegModeTravelTimeHandler() {
+	public LegModeTripTravelTimeHandler() {
 		this.mode2PersonId2TravelTimes = new TreeMap<String, Map<Id<Person>,List<Double>>>();
 		this.personId2DepartureTime = new HashMap<Id<Person>, Double>();
 		this.stuckPersons = new HashSet<Id<Person>>();
