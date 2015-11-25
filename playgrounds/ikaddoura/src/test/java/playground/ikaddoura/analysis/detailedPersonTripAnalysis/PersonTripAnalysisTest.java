@@ -13,7 +13,7 @@ import java.util.SortedMap;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -42,23 +42,21 @@ public class PersonTripAnalysisTest {
 
 	private static final Logger log = Logger.getLogger(PersonTripAnalysisMain.class);
 
-	private static final String outputPath = "test/output/playground/ikaddoura/analysis/detailedPersonTripAnalysis/PersonTripAnalysisTest/";
+	private String outputPath;
 	
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 	
-	@BeforeClass
-	public static void generateOutput() {
+	@Before
+	public void generateOutput() {
 		
 		Config config = ConfigUtils.createConfig();
 		ActivityParams activityParams = new ActivityParams();
 		activityParams.setActivityType("work");
-		activityParams.setScoringThisActivityAtAll(true);
 		config.planCalcScore().addActivityParams(activityParams);
 		activityParams = new ActivityParams();
 		activityParams.setActivityType("home");
-		activityParams.setScoringThisActivityAtAll(true);
-//		TODO activate scoring here !?
 		config.planCalcScore().addActivityParams(activityParams);
+//		TODO activate scoring here !?		
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		
 		// create Population
@@ -70,12 +68,11 @@ public class PersonTripAnalysisTest {
 		ForkNetworkCreator fnc = new ForkNetworkCreator(scenario, false, false);
 		fnc.createNetwork();
 		
-		String eventsFile = "test/input/playground/ikaddoura/analysis/detailedPersonTripAnalysis/PersonTripAnalysisTest/" + "PersonTripAnalysisEvents.xml";
-		File folder = new File(outputPath);			
-		folder.mkdirs();
-		System.out.println(outputPath);
-		
-		
+//		String eventsFile = "test/input/playground/ikaddoura/analysis/detailedPersonTripAnalysis/PersonTripAnalysisTest/" + "PersonTripAnalysisEvents.xml";
+		String eventsFile = utils.getClassInputDirectory() + "PersonTripAnalysisEvents.xml";
+		outputPath = utils.getOutputDirectory();
+		File outputFolder = new File(outputPath);			
+		outputFolder.mkdirs();
 		
 		// standard events analysis
 	
