@@ -91,7 +91,7 @@ public class MobsimTimeComparator {
 		BufferedReader reader = IOUtils.getBufferedReader(stopwatchFile);
 		try {
 			String line = reader.readLine();
-			do {
+			while(line!=null) {
 				if(line.startsWith("Iteration")) {
 					line = reader.readLine();
 					continue;
@@ -102,7 +102,7 @@ public class MobsimTimeComparator {
 				double mobsimTime = getMobsimTime(mobsimStartTime, mobsimEndTime);
 				totalMobsimTime += mobsimTime;
 				line = reader.readLine();
-			} while(line!=null);
+			} ;
 		} catch (Exception e) {
 			throw new RuntimeException("File not found. Reason "+ e);
 		}

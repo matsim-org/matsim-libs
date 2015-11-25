@@ -18,6 +18,10 @@
  * *********************************************************************** */
 package playground.thibautd.maxess.nestedlogitaccessibility.scripts;
 
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import com.google.inject.Key;
+import com.google.inject.TypeLiteral;
 import gnu.trove.map.TObjectDoubleMap;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -31,14 +35,14 @@ import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
 import org.matsim.population.algorithms.XY2Links;
+import playground.thibautd.maxess.nestedlogitaccessibility.framework.BaseNestedAccessibilityComputationModule;
+import playground.thibautd.maxess.nestedlogitaccessibility.framework.InjectionUtils;
 import playground.thibautd.maxess.nestedlogitaccessibility.framework.NestedLogitAccessibilityCalculator;
-import playground.thibautd.maxess.nestedlogitaccessibility.framework.NestedLogitModel;
 import playground.thibautd.maxess.nestedlogitaccessibility.writers.BasicPersonAccessibilityWriter;
-import playground.thibautd.maxess.prepareforbiogeme.tripbased.RunMzTripChoiceSetConversion;
-import playground.thibautd.router.TripSoftCache;
 import playground.thibautd.utils.MoreIOUtils;
 
 import java.util.Collections;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author thibautd
@@ -54,33 +58,27 @@ public class RunSimpleNestedLogitAccessibility {
 			final Config config = ConfigUtils.loadConfig( configFile );
 			final Scenario scenario = ScenarioUtils.loadScenario( config );
 
+			// Todo: put in a scenario provider
 			final TransportModeNetworkFilter filter = new TransportModeNetworkFilter(scenario.getNetwork());
 			final Network carNetwork = NetworkUtils.createNetwork();
-			filter.filter(carNetwork, Collections.singleton( "car" ));
-			new WorldConnectLocations( config ).connectFacilitiesWithLinks(scenario.getActivityFacilities(), (NetworkImpl) carNetwork);
+			filter.filter( carNetwork, Collections.singleton( "car" ) );
+			new WorldConnectLocations( config ).connectFacilitiesWithLinks(
+					scenario.getActivityFacilities(),
+					(NetworkImpl) carNetwork );
 
 			new XY2Links( carNetwork , scenario.getActivityFacilities() ).run( scenario.getPopulation() );
 
+			final SimpleNestedLogitModule module = new SimpleNestedLogitModule();
 			final NestedLogitAccessibilityCalculator<ModeNests> calculator =
-					new NestedLogitAccessibilityCalculator<>(
-							scenario.getPopulation(),
-							scenario.getActivityFacilities(),
-							new NestedLogitModel<>(
-									new SimpleNestedLogitModelUtility(
-											scenario.getPopulation().getPersonAttributes() ),
-									new SimpleNestedLogitModelChoiceSetIdentifier(
-											"leisure",
-											200,
-											RunMzTripChoiceSetConversion.createTripRouter(
-												scenario,
-												new TripSoftCache(
-														false,
-														TripSoftCache.LocationType.link) ),
-											scenario.getActivityFacilities(),
-											20 * 1000 ) ) );
+					InjectionUtils.createCalculator(
+							new TypeLiteral<ModeNests>() {},
+							new BaseNestedAccessibilityComputationModule<ModeNests>(
+									scenario ) {},
+							module );
 
 			// TODO store and write results
 			final TObjectDoubleMap<Id<Person>> accessibilities = calculator.computeAccessibilities ();
+			module.stopWatch.printStats( TimeUnit.SECONDS );
 			new BasicPersonAccessibilityWriter( scenario , accessibilities ).write( outputDir + "/accessibility_per_person.dat" );
 		}
 		finally {

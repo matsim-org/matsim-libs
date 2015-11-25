@@ -19,6 +19,7 @@
 package playground.agarwalamit.mixedTraffic.patnaIndia.input;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,7 +31,7 @@ import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.CountsWriter;
 
-import playground.agarwalamit.mixedTraffic.patnaIndia.PatnaConstants;
+import playground.agarwalamit.mixedTraffic.patnaIndia.PatnaUtils;
 
 /**
  * @author amit
@@ -42,9 +43,9 @@ public class PatnaCountsGenerator {
 	
 	public static void main(String[] args) {
 	
-		String innerCordonFile = PatnaConstants.inputFilesDir+"/innerCordon.txt";
-		String outerCordonFile = PatnaConstants.inputFilesDir+"/outerCordon.txt";
-		String outCountsFile = PatnaConstants.inputFilesDir+"/innerAndOuterCounts.xml.gz";
+		String innerCordonFile = PatnaUtils.INPUT_FILES_DIR+"/innerCordon.txt";
+		String outerCordonFile = PatnaUtils.INPUT_FILES_DIR+"/outerCordon.txt";
+		String outCountsFile = PatnaUtils.INPUT_FILES_DIR+"/innerAndOuterCounts.xml.gz";
 		
 		PatnaCountsGenerator pcg = new PatnaCountsGenerator();
 		pcg.readFileAndReturnCountInfo(innerCordonFile);
@@ -52,7 +53,7 @@ public class PatnaCountsGenerator {
 		pcg.writeCountsDataToFile(outCountsFile);
 	}
 	
-	private void writeCountsDataToFile(String outCountsFile){
+	private void writeCountsDataToFile(final String outCountsFile){
 		
 		Counts<Link> counts = new Counts<Link>();
 		counts.setYear(2008);
@@ -67,7 +68,7 @@ public class PatnaCountsGenerator {
 		new CountsWriter(counts).write(outCountsFile);
 	}
 	
-	private Map<Tuple<Id<Link>,String>, Map<Integer, Double>> readFileAndReturnCountInfo(String file){
+	private Map<Tuple<Id<Link>,String>, Map<Integer, Double>> readFileAndReturnCountInfo(final String file){
 		
 		try (BufferedReader reader = IOUtils.getBufferedReader(file)) {
 			String line = reader.readLine();
@@ -93,7 +94,7 @@ public class PatnaCountsGenerator {
  				}
  				line = reader.readLine();	
 			}
-		} catch (Exception e) {
+		} catch (IOException e) {
 			throw new RuntimeException("Data is not written. Reason :"+e);
 		}
 		return countStation2time2countInfo;

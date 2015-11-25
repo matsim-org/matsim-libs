@@ -46,7 +46,7 @@ import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Point;
 
-import playground.agarwalamit.mixedTraffic.patnaIndia.PatnaConstants;
+import playground.agarwalamit.mixedTraffic.patnaIndia.PatnaUtils;
 import playground.agarwalamit.utils.GeometryUtils;
 /**
  * @author amit
@@ -58,7 +58,7 @@ public class SubPopulationPlans4Patna {
 		scenario = ScenarioUtils.createScenario(config);
 	}
 
-	private static final Logger logger = Logger.getLogger(SubPopulationPlans4Patna.class);
+	private static final Logger LOG = Logger.getLogger(SubPopulationPlans4Patna.class);
 	private Scenario scenario;
 
 	private Collection<SimpleFeature> features;
@@ -76,7 +76,7 @@ public class SubPopulationPlans4Patna {
 		// write persons attributes file here.
 		ObjectAttributesXmlWriter writer = new ObjectAttributesXmlWriter(plans.scenario.getPopulation().getPersonAttributes()) ;
 		writer.writeFile("../../../repos/runs-svn/patnaIndia/inputs/personsAttributesSubPop.xml.gz");
-		logger.info("Writing Plan file is finished.");
+		LOG.info("Writing Plan file is finished.");
 	}
 
 	public void run(){
@@ -129,18 +129,18 @@ public class SubPopulationPlans4Patna {
 					while (iterator.hasNext()){
 
 						SimpleFeature feature = iterator.next();
-						int Id = (Integer) feature.getAttribute("ID1");
-						String zoneId  = String.valueOf(Id);
+						int id = (Integer) feature.getAttribute("ID1");
+						String zoneId  = String.valueOf(id);
 
 						if(fromZoneId.equals(zoneId) ) {
 							p = GeometryUtils.getRandomPointsFromWard(feature);
 							Coord fromZoneCoord = new Coord(p.getX(), p.getY());
-							homeZoneCoordTransform = PatnaConstants.COORDINATE_TRANSFORMATION.transform(fromZoneCoord);
+							homeZoneCoordTransform = PatnaUtils.COORDINATE_TRANSFORMATION.transform(fromZoneCoord);
 						}
 						else if (toZoneId.equals(zoneId)){
 							q = GeometryUtils.getRandomPointsFromWard(feature);
 							Coord toZoneCoord = new Coord(q.getX(), q.getY());
-							workZoneCoordTransform= PatnaConstants.COORDINATE_TRANSFORMATION.transform(toZoneCoord);
+							workZoneCoordTransform= PatnaUtils.COORDINATE_TRANSFORMATION.transform(toZoneCoord);
 						}
 					}
 				} 
@@ -153,11 +153,11 @@ public class SubPopulationPlans4Patna {
 
 						p = GeometryUtils.getRandomPointsFromWard(feature);
 						Coord fromZoneCoord = new Coord(p.getX(), p.getY());
-						homeZoneCoordTransform = PatnaConstants.COORDINATE_TRANSFORMATION.transform(fromZoneCoord);
+						homeZoneCoordTransform = PatnaUtils.COORDINATE_TRANSFORMATION.transform(fromZoneCoord);
 
 						q = GeometryUtils.getRandomPointsFromWard(feature);
 						Coord toZoneCoord = new Coord(q.getX(), q.getY());
-						workZoneCoordTransform= PatnaConstants.COORDINATE_TRANSFORMATION.transform(toZoneCoord);
+						workZoneCoordTransform= PatnaUtils.COORDINATE_TRANSFORMATION.transform(toZoneCoord);
 					}
 				}
 
@@ -199,7 +199,8 @@ public class SubPopulationPlans4Patna {
 		}
 	}
 
-	private void createActivities (Plan plan, Coord toZoneFeatureCoord, Coord fromZoneFeatureCoord, String mode, String tripPurpose) {
+	//ZZ_TODO : modify it according to PatnaUrbanDemandGenerator
+	private void createActivities (final Plan plan, final Coord toZoneFeatureCoord, final Coord fromZoneFeatureCoord, final String mode, final String tripPurpose) {
 		Random random2 = new Random();
 		Population population = scenario.getPopulation();
 		PopulationFactory populationFactory = population.getFactory();

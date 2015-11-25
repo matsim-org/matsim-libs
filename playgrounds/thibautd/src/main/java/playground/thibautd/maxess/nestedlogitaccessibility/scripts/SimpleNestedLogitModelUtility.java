@@ -18,9 +18,11 @@
  * *********************************************************************** */
 package playground.thibautd.maxess.nestedlogitaccessibility.scripts;
 
+import com.google.inject.Inject;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import playground.thibautd.maxess.nestedlogitaccessibility.framework.Alternative;
 import playground.thibautd.maxess.nestedlogitaccessibility.framework.Utility;
@@ -48,6 +50,11 @@ public class SimpleNestedLogitModelUtility implements Utility<ModeNests> {
 	private static final double BETA_TT_WALK = -0.917;
 
 	private final ObjectAttributes personAttributes;
+
+	@Inject
+	public SimpleNestedLogitModelUtility( final Population population ) {
+		this( population.getPersonAttributes() );
+	}
 
 	public SimpleNestedLogitModelUtility( final ObjectAttributes personAttributes ) {
 		this.personAttributes = personAttributes;

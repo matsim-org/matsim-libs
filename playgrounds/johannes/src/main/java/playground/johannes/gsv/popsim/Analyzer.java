@@ -25,17 +25,21 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import playground.johannes.gsv.popsim.analysis.AnalyzerTaskRunner;
 import playground.johannes.gsv.popsim.analysis.FileIOContext;
-import playground.johannes.gsv.popsim.analysis.PersonLAU2Density;
+import playground.johannes.gsv.popsim.analysis.ModePredicate;
+import playground.johannes.gsv.popsim.analysis.ZoneMobilityRate;
 import playground.johannes.gsv.synPop.mid.PersonCloner;
 import playground.johannes.gsv.synPop.mid.Route2GeoDistance;
+import playground.johannes.synpop.data.CommonValues;
 import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.data.PlainFactory;
 import playground.johannes.synpop.data.PlainPerson;
 import playground.johannes.synpop.data.io.XMLHandler;
 import playground.johannes.synpop.gis.DataPool;
+import playground.johannes.synpop.gis.ZoneCollection;
 import playground.johannes.synpop.gis.ZoneData;
 import playground.johannes.synpop.gis.ZoneDataLoader;
 import playground.johannes.synpop.processing.TaskRunner;
+import playground.johannes.synpop.source.mid2008.MiDKeys;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -92,7 +96,11 @@ public class Analyzer {
 		dataPool.register(new ZoneDataLoader(config.getModule("synPopSim")), ZoneDataLoader.KEY);
 		ZoneData zoneData = (ZoneData) dataPool.get(ZoneDataLoader.KEY);
 		FileIOContext ioContext = new FileIOContext(output);
-		PersonLAU2Density task = new PersonLAU2Density(zoneData.getLayer("lau2"));
+
+		ZoneCollection zones = zoneData.getLayer("lau2");
+		new ZoneSetLAU2Class().apply(zones);
+		ZoneMobilityRate task = new ZoneMobilityRate(MiDKeys.PERSON_LAU2_CLASS, zones, new ModePredicate(CommonValues
+				.LEG_MODE_CAR));
 		task.setIoContext(ioContext);
 		AnalyzerTaskRunner.run(persons, task, ioContext);
 	}

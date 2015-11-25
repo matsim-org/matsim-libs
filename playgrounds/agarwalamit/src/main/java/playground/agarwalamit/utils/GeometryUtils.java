@@ -31,7 +31,9 @@ import com.vividsolutions.jts.geom.Point;
  * @author amit
  */
 
-public class GeometryUtils {
+public final class GeometryUtils {
+	
+	private GeometryUtils(){}
 
 	public static Point getRandomPointsFromWard (SimpleFeature feature) {
 		Random random = MatsimRandom.getRandom(); // matsim random will return same coord.

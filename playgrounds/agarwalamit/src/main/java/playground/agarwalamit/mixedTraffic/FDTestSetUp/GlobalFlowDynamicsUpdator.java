@@ -41,22 +41,18 @@ import org.matsim.vehicles.VehicleType;
 
 class GlobalFlowDynamicsUpdator implements LinkEnterEventHandler {
 
-//	private Scenario scenario;
 	private Map<Id<VehicleType>, TravelModesFlowDynamicsUpdator> travelModesFlowData;
 	private TravelModesFlowDynamicsUpdator globalFlowData;
 
-	public final static Id<Link> flowDynamicsMeasurementLinkId = Id.createLinkId(0);
+	public final static Id<Link> FLOW_DYNAMICS_UPDATE_LINK = Id.createLinkId(0);
 
 	private boolean permanentRegime;
 
-
 	/**
-	 * @param sc
 	 * @param travelModeFlowDataContainer
 	 * container to store static properties of vehicles and dynamic flow properties during simulation 
 	 */
-	public GlobalFlowDynamicsUpdator(/*Scenario sc,*/ Map<Id<VehicleType>, TravelModesFlowDynamicsUpdator> travelModeFlowDataContainer){
-//		this.scenario =  sc;
+	GlobalFlowDynamicsUpdator( Map<Id<VehicleType>, TravelModesFlowDynamicsUpdator> travelModeFlowDataContainer){
 		this.travelModesFlowData = travelModeFlowDataContainer;
 		for (int i=0; i<GenerateFundamentalDiagramData.TRAVELMODES.length; i++){
 			this.travelModesFlowData.get(Id.create(GenerateFundamentalDiagramData.TRAVELMODES[i],VehicleType.class)).initDynamicVariables();
@@ -80,18 +76,16 @@ class GlobalFlowDynamicsUpdator implements LinkEnterEventHandler {
 	public void handleEvent(LinkEnterEvent event) {
 		if (!(permanentRegime)){
 			Id<Person> personId = Id.createPersonId(event.getVehicleId());
-			double pcu_person = 0.;
-
 			String travelMode = GenerateFundamentalDiagramData.person2Mode.get(personId);
-			
+
 			Id<VehicleType> transportMode = Id.create(travelMode,VehicleType.class);
 			this.travelModesFlowData.get(transportMode).handle(event);
-			pcu_person = this.travelModesFlowData.get(transportMode).getVehicleType().getPcuEquivalents();
+			double pcuPerson = this.travelModesFlowData.get(transportMode).getVehicleType().getPcuEquivalents();
 
 			//Aggregated data update
 			double nowTime = event.getTime();
-			if (event.getLinkId().equals(flowDynamicsMeasurementLinkId)){				
-				this.globalFlowData.updateFlow900(nowTime, pcu_person);
+			if (event.getLinkId().equals(FLOW_DYNAMICS_UPDATE_LINK)){				
+				this.globalFlowData.updateFlow900(nowTime, pcuPerson);
 				this.globalFlowData.updateSpeedTable(nowTime, personId);
 				//Waiting for all agents to be on the track before studying stability
 				if ((this.globalFlowData.getNumberOfDrivingAgents() == this.globalFlowData.numberOfAgents) && (nowTime>1800)){	//TODO parametrize this correctly
@@ -120,14 +114,13 @@ class GlobalFlowDynamicsUpdator implements LinkEnterEventHandler {
 					if (modesStable){
 						//Checking global stability
 						if ( /*this.globalData.isSpeedStable() &&*/ this.globalFlowData.isFlowStable() ){
-							//log.info("Global permanent regime attained");
 							GenerateFundamentalDiagramData.LOG.info("========== Global permanent regime is attained");
 							for (int i=0; i<GenerateFundamentalDiagramData.TRAVELMODES.length; i++){
 								this.travelModesFlowData.get(Id.create(GenerateFundamentalDiagramData.TRAVELMODES[i],VehicleType.class)).saveDynamicVariables();
 							}
 							this.globalFlowData.setPermanentAverageVelocity(this.globalFlowData.getActualAverageVelocity());
-							//this.permanentFlow = this.getActualFlow();
-							this.globalFlowData.setPermanentFlow(this.globalFlowData.getCurrentHourlyFlow());
+							//ZZ_TODO : well this could be one of the reason for break downs in fds, don't just multiply it by 4, instead store last three 15 min flows (amit, nov 15)
+							this.globalFlowData.setPermanentFlow(this.globalFlowData.getCurrentHourlyFlow()); 
 							double globalDensity = 0.;
 							for (TravelModesFlowDynamicsUpdator mode : this.travelModesFlowData.values()){
 								globalDensity += mode.getPermanentDensity();
@@ -143,16 +136,11 @@ class GlobalFlowDynamicsUpdator implements LinkEnterEventHandler {
 		}
 	}
 
-	public boolean isPermanent(){
+	boolean isPermanent(){
 		return permanentRegime;
 	}
 
-	public TravelModesFlowDynamicsUpdator getGlobalData(){
+	TravelModesFlowDynamicsUpdator getGlobalData(){
 		return this.globalFlowData;
 	}
-
-	public Map<Id<VehicleType>, TravelModesFlowDynamicsUpdator> getModesData() {
-		return travelModesFlowData;
-	}
-
 }

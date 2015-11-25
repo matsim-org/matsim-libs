@@ -31,7 +31,7 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.agarwalamit.analysis.legMode.distributions.LegModeTravelTimeHandler;
+import playground.agarwalamit.analysis.trip.LegModeTripTravelTimeHandler;
 import playground.agarwalamit.utils.ListUtils;
 
 /**
@@ -56,7 +56,7 @@ public class ModalTravelTime {
 		EventsManager events = EventsUtils.createEventsManager();
 		MatsimEventsReader reader = new MatsimEventsReader(events);
 
-		LegModeTravelTimeHandler timeHandler = new LegModeTravelTimeHandler();
+		LegModeTripTravelTimeHandler timeHandler = new LegModeTripTravelTimeHandler();
 		events.addHandler(timeHandler);
 
 		reader.readFile(eventsFile);

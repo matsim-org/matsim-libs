@@ -19,26 +19,20 @@
  * *********************************************************************** */
 package playground.ikaddoura.integrationCN;
 
-import java.io.InputStream;
-import java.net.URL;
+import java.util.Map;
 import java.util.Stack;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.GenericEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsReaderXMLv1.CustomEventMapper;
-import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.utils.io.MatsimXmlParser;
-import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.vehicles.Vehicle;
 import org.xml.sax.Attributes;
-import org.xml.sax.InputSource;
-import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
 
 import playground.ikaddoura.noise2.data.ReceiverPoint;
 import playground.ikaddoura.noise2.events.NoiseEventAffected;
@@ -46,18 +40,88 @@ import playground.ikaddoura.noise2.events.NoiseEventCaused;
 import playground.vsp.congestion.events.CongestionEvent;
 
 /**
+ * An events reader which reads the default events and the additional custom events CongestionEvent, NoiseEventAffected, NoiseEventCaused.
+ * 
  * @author ikaddoura
  *
  */
 public class CNEventsReader extends MatsimXmlParser {
-
-	private final EventsManager events;
 	
 	EventsReaderXMLv1 delegate;
 
+	public void characters(char[] ch, int start, int length) throws SAXException {
+		delegate.characters(ch, start, length);
+	}
+
 	public CNEventsReader(EventsManager events) {
-		this.events = events;
 		delegate = new EventsReaderXMLv1(events);
+		this.setValidating(false);
+		
+		CustomEventMapper<CongestionEvent> congestionEventMapper = new CustomEventMapper<CongestionEvent>() {
+			
+			@Override
+			public CongestionEvent apply(GenericEvent event) {
+				
+				Map<String, String> attributes = event.getAttributes();
+				
+				Double time = Double.parseDouble(attributes.get(CongestionEvent.ATTRIBUTE_TIME));
+				Id<Link> linkId = Id.createLinkId(attributes.get(CongestionEvent.ATTRIBUTE_LINK));
+				Id<Person> causingAgentId = Id.createPersonId(attributes.get(CongestionEvent.ATTRIBUTE_PERSON));
+				Id<Person> affectedAgentId = Id.createPersonId(attributes.get(CongestionEvent.ATTRIBUTE_AFFECTED_AGENT));
+				Double delay = Double.parseDouble(attributes.get(CongestionEvent.ATTRIBUTE_DELAY));
+				String constraint = attributes.get(CongestionEvent.EVENT_CAPACITY_CONSTRAINT);
+				Double emergenceTime = Double.parseDouble(attributes.get(CongestionEvent.ATTRIBUTE_EMERGENCETIME));
+			
+				return new CongestionEvent(time, constraint, causingAgentId, affectedAgentId, delay, linkId, emergenceTime);
+			}
+		};
+		
+		delegate.addCustomEventMapper(CongestionEvent.EVENT_TYPE, congestionEventMapper);
+		
+		CustomEventMapper<NoiseEventAffected> noiseEventAffectedMapper = new CustomEventMapper<NoiseEventAffected>() {
+			
+			@Override
+			public NoiseEventAffected apply(GenericEvent event) {
+				
+				Map<String, String> attributes = event.getAttributes();
+				
+				Double time = Double.parseDouble(attributes.get(NoiseEventAffected.ATTRIBUTE_TIME));
+				Id<Person> affectedAgentId = Id.createPersonId(attributes.get(NoiseEventAffected.ATTRIBUTE_AGENT_ID));
+				Double amount = Double.parseDouble(attributes.get(NoiseEventAffected.ATTRIBUTE_AMOUNT_DOUBLE));
+				String activityType = attributes.get(NoiseEventAffected.ATTRIBUTE_ACTIVTITY_TYPE);
+				Double emergenceTime = Double.parseDouble(attributes.get(NoiseEventAffected.ATTRIBUTE_EMERGENCE_TIME));
+				Id<ReceiverPoint> receiverPointId = Id.create(attributes.get(NoiseEventAffected.ATTRIBUTE_RECEIVERPOINT_ID), ReceiverPoint.class);
+			
+				return new NoiseEventAffected(time, emergenceTime, affectedAgentId, amount, receiverPointId, activityType);
+			}
+		};
+		
+		delegate.addCustomEventMapper(NoiseEventAffected.EVENT_TYPE, noiseEventAffectedMapper);
+		
+		CustomEventMapper<NoiseEventCaused> noiseEventCausedMapper = new CustomEventMapper<NoiseEventCaused>() {
+			
+			@Override
+			public NoiseEventCaused apply(GenericEvent event) {
+				
+				Map<String, String> attributes = event.getAttributes();
+				
+				Double time = Double.parseDouble(attributes.get(NoiseEventCaused.ATTRIBUTE_TIME));
+				Double emergenceTime = Double.parseDouble(attributes.get(NoiseEventCaused.ATTRIBUTE_EMERGENCE_TIME));
+				Id<Person> causingAgentId = Id.createPersonId(attributes.get(NoiseEventCaused.ATTRIBUTE_AGENT_ID));
+				Id<Vehicle> causingVehicleId = Id.create(attributes.get(NoiseEventCaused.ATTRIBUTE_VEHICLE_ID), Vehicle.class);
+				Double amount = Double.parseDouble(attributes.get(NoiseEventCaused.ATTRIBUTE_AMOUNT_DOUBLE));
+				Id<Link> linkId = Id.createLinkId(attributes.get(NoiseEventCaused.ATTRIBUTE_LINK_ID));
+			
+				return new NoiseEventCaused(time, emergenceTime, causingAgentId, causingVehicleId, amount, linkId);
+			}
+		};
+		
+		delegate.addCustomEventMapper(NoiseEventCaused.EVENT_TYPE, noiseEventCausedMapper);
+	}
+
+	@Override
+	public void startTag(String name, Attributes atts, Stack<String> context) {
+		delegate.startTag(name, atts, context);
 	}
 
 	@Override
@@ -65,246 +129,4 @@ public class CNEventsReader extends MatsimXmlParser {
 		delegate.endTag(name, content, context);
 	}
 	
-	@Override
-	public void startTag(String name, Attributes atts, Stack<String> context) {
-		System.out.println("start tag");
-		delegate.startTag(name, atts, context);
-	}
-
-	public void addCustomEventMapper(String eventType, CustomEventMapper cem) {
-		delegate.addCustomEventMapper(eventType, cem);
-	}
-
-	public void characters(char[] ch, int start, int length)
-			throws SAXException {
-		delegate.characters(ch, start, length);
-	}
-
-	public void endDocument() throws SAXException {
-		delegate.endDocument();
-	}
-
-	public void setValidating(boolean validateXml) {
-		delegate.setValidating(validateXml);
-	}
-
-	public void setNamespaceAware(boolean awareness) {
-		delegate.setNamespaceAware(awareness);
-	}
-
-	public void setLocalDtdDirectory(String localDtdDirectory) {
-		delegate.setLocalDtdDirectory(localDtdDirectory);
-	}
-
-	public void parse(String filename) throws UncheckedIOException {
-		delegate.parse(filename);
-	}
-
-	public void endElement(String uri, String localName, String qName)
-			throws SAXException {
-		delegate.endElement(uri, localName, qName);
-	}
-
-	public void endPrefixMapping(String prefix) throws SAXException {
-		delegate.endPrefixMapping(prefix);
-	}
-
-	public boolean equals(Object obj) {
-		return delegate.equals(obj);
-	}
-
-	public InputSource resolveEntity(String publicId, String systemId) {
-		return delegate.resolveEntity(publicId, systemId);
-	}
-
-	public void error(SAXParseException ex) throws SAXException {
-		delegate.error(ex);
-	}
-
-	public void fatalError(SAXParseException ex) throws SAXException {
-		delegate.fatalError(ex);
-	}
-
-	public int hashCode() {
-		return delegate.hashCode();
-	}
-
-	public void ignorableWhitespace(char[] ch, int start, int length)
-			throws SAXException {
-		delegate.ignorableWhitespace(ch, start, length);
-	}
-
-	public void notationDecl(String name, String publicId, String systemId)
-			throws SAXException {
-		delegate.notationDecl(name, publicId, systemId);
-	}
-
-	public void parse(URL url) throws UncheckedIOException {
-		delegate.parse(url);
-	}
-
-	public void parse(InputStream stream) throws UncheckedIOException {
-		delegate.parse(stream);
-	}
-
-	public void processingInstruction(String target, String data)
-			throws SAXException {
-		delegate.processingInstruction(target, data);
-	}
-
-	public void setDocumentLocator(Locator locator) {
-		delegate.setDocumentLocator(locator);
-	}
-
-	public void skippedEntity(String name) throws SAXException {
-		delegate.skippedEntity(name);
-	}
-
-	public void startDocument() throws SAXException {
-		delegate.startDocument();
-	}
-
-	public void startPrefixMapping(String prefix, String uri)
-			throws SAXException {
-		delegate.startPrefixMapping(prefix, uri);
-	}
-
-	public String toString() {
-		return delegate.toString();
-	}
-
-	public void unparsedEntityDecl(String name, String publicId,
-			String systemId, String notationName) throws SAXException {
-		delegate.unparsedEntityDecl(name, publicId, systemId, notationName);
-	}
-
-	public void warning(SAXParseException ex) throws SAXException {
-		delegate.warning(ex);
-	}
-
-	private void startEventCongestion(final Attributes attributes){
-
-		String eventType = attributes.getValue("type");
-
-		Double time = 0.0;
-		Id<Link> linkId = null;
-		Id<Person> causingAgentId = null;
-		Id<Person> affectedAgentId = null;
-		Double delay = 0.0;
-		String constraint = null;
-		Double emergenceTime = 0.0;
-
-		if(CongestionEvent.EVENT_TYPE.equals(eventType)){
-			
-			for (int i = 0; i < attributes.getLength(); i++){
-				if (attributes.getQName(i).equals("time")){
-					time = Double.parseDouble(attributes.getValue(i));
-				}
-				else if(attributes.getQName(i).equals("type")){
-					eventType = attributes.getValue(i);
-				}
-				else if(attributes.getQName(i).equals(CongestionEvent.ATTRIBUTE_LINK)){
-					linkId = Id.create((attributes.getValue(i)), Link.class);
-				}
-				else if(attributes.getQName(i).equals(CongestionEvent.ATTRIBUTE_PERSON)){
-					causingAgentId = Id.create((attributes.getValue(i)), Person.class);
-				}
-				else if(attributes.getQName(i).equals(CongestionEvent.ATTRIBUTE_AFFECTED_AGENT)){
-					affectedAgentId = Id.create((attributes.getValue(i)), Person.class);
-				}
-				else if(attributes.getQName(i).equals(CongestionEvent.ATTRIBUTE_DELAY)){
-					delay = Double.parseDouble(attributes.getValue(i));
-				}
-				else if(attributes.getQName(i).equals(CongestionEvent.EVENT_CAPACITY_CONSTRAINT)){
-					constraint = attributes.getValue(i);
-				}
-				else if(attributes.getQName(i).equals(CongestionEvent.ATTRIBUTE_EMERGENCETIME)){
-					emergenceTime = Double.parseDouble(attributes.getValue(i));
-				}				
-				else {
-					throw new RuntimeException("Unknown event attribute. Aborting...");
-				}
-			}
-			this.events.processEvent(new CongestionEvent(time, constraint, causingAgentId, affectedAgentId, delay, linkId, emergenceTime));
-		}
-	}
-	
-	private void startEventNoise(final Attributes attributes){
-
-		String eventType = attributes.getValue("type");
-
-		if (NoiseEventCaused.EVENT_TYPE.equals(eventType)){
-			Double time = 0.0;
-			Double emergenceTime = 0.0;
-			Id<Person> causingAgentId = null;
-			Id<Vehicle> causingVehicleId = null;
-			Double amount = 0.0;
-			Id<Link> linkId = null;
-			
-			for (int i = 0; i < attributes.getLength(); i++){
-				if (attributes.getQName(i).equals("time")){
-					time = Double.parseDouble(attributes.getValue(i));
-				}
-				else if(attributes.getQName(i).equals("type")){
-					eventType = attributes.getValue(i);
-				}
-				else if(attributes.getQName(i).equals(NoiseEventCaused.ATTRIBUTE_EMERGENCE_TIME)){
-					emergenceTime = Double.parseDouble(attributes.getValue(i));
-				}	
-				else if(attributes.getQName(i).equals(NoiseEventCaused.ATTRIBUTE_AGENT_ID)){
-					causingAgentId = Id.create((attributes.getValue(i)), Person.class);
-				}
-				else if(attributes.getQName(i).equals(NoiseEventCaused.ATTRIBUTE_VEHICLE_ID)){
-					causingVehicleId = Id.create((attributes.getValue(i)), Vehicle.class);
-				}
-				else if(attributes.getQName(i).equals(NoiseEventCaused.ATTRIBUTE_AMOUNT_DOUBLE)){
-					amount = Double.parseDouble(attributes.getValue(i));
-				}
-				else if(attributes.getQName(i).equals(NoiseEventCaused.ATTRIBUTE_LINK_ID)){
-					linkId = Id.create((attributes.getValue(i)), Link.class);
-				}
-				else {
-					throw new RuntimeException("Unknown event attribute. Aborting... " + attributes.getQName(i));
-				}
-			}
-			this.events.processEvent(new NoiseEventCaused(time, emergenceTime, causingAgentId, causingVehicleId, amount, linkId));
-		}
-		
-		else if (NoiseEventAffected.EVENT_TYPE.equals(eventType)){
-			Double time = 0.0;
-			Double emergenceTime = 0.0;
-			Id<Person> affectedAgentId = null;
-			Double amount = 0.0;
-			Id<ReceiverPoint> receiverPointId = null;
-			String activityType = null;
-			
-			for (int i = 0; i < attributes.getLength(); i++){
-				if (attributes.getQName(i).equals("time")){
-					time = Double.parseDouble(attributes.getValue(i));
-				}
-				else if(attributes.getQName(i).equals("type")){
-					eventType = attributes.getValue(i);
-				}
-				else if(attributes.getQName(i).equals(NoiseEventAffected.ATTRIBUTE_EMERGENCE_TIME)){
-					emergenceTime = Double.parseDouble(attributes.getValue(i));
-				}	
-				else if(attributes.getQName(i).equals(NoiseEventAffected.ATTRIBUTE_AGENT_ID)){
-					affectedAgentId = Id.create((attributes.getValue(i)), Person.class);
-				}
-				else if(attributes.getQName(i).equals(NoiseEventAffected.ATTRIBUTE_ACTIVTITY_TYPE)){
-					activityType = (attributes.getValue(i));
-				}
-				else if(attributes.getQName(i).equals(NoiseEventAffected.ATTRIBUTE_AMOUNT_DOUBLE)){
-					amount = Double.parseDouble(attributes.getValue(i));
-				}
-				else if(attributes.getQName(i).equals(NoiseEventAffected.ATTRIBUTE_RECEIVERPOINT_ID)){
-					receiverPointId = Id.create((attributes.getValue(i)), ReceiverPoint.class);
-				}
-				else {
-					throw new RuntimeException("Unknown event attribute. Aborting... " + attributes.getQName(i));
-				}
-			}
-			this.events.processEvent(new NoiseEventAffected(time, emergenceTime, affectedAgentId, amount, receiverPointId, activityType));
-		}
-	}
 }
