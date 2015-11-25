@@ -42,10 +42,8 @@ class TimeVariantLinkImpl extends LinkImpl {
 
 	private TreeMap<Double,NetworkChangeEvent> changeEvents;
 
-	private int aFreespeedEvents = 1;
-	private double[] aFreespeedValues;
-	private double[] aFreespeedTimes;
-
+	private TimeVariantAttribute variableFreespeed = new TimeVariantAttribute();
+	
 	private int aFlowCapacityEvents = 1;
 	private double[] aFlowCapacityValues;
 	private double[] aFlowCapacityTimes;
@@ -79,7 +77,7 @@ class TimeVariantLinkImpl extends LinkImpl {
 		 * next access.
 		 */
 		if (event.getFreespeedChange() != null) {
-			this.aFreespeedEvents++;
+			this.variableFreespeed.incChangeEvents();
 		}
 		if (event.getFlowCapacityChange() != null) {
 			this.aFlowCapacityEvents++;
@@ -99,14 +97,13 @@ class TimeVariantLinkImpl extends LinkImpl {
 		if(this.changeEvents != null)
 			this.changeEvents.clear();
 
+		variableFreespeed.clearEvents();
+		
 		this.aFlowCapacityTimes = null;
 		this.aFlowCapacityValues = null;
-		this.aFreespeedTimes = null;
-		this.aFreespeedValues = null;
 		this.aLanesTimes = null;
 		this.aLanesValues = null;
 
-		this.aFreespeedEvents = 1;
 		this.aFlowCapacityEvents = 1;
 		this.aLanesEvents = 1;
 	}
@@ -119,14 +116,11 @@ class TimeVariantLinkImpl extends LinkImpl {
 	@Override
 	public synchronized double getFreespeed(final double time) {
 
-		if ((this.aFreespeedTimes == null) || (this.aFreespeedTimes.length != this.aFreespeedEvents)) {
+		if (variableFreespeed.doRequireRecalc()) {
 			initFreespeedEventsArrays();
 		}
 
-		int key = Arrays.binarySearch(this.aFreespeedTimes, time);
-		key = key >= 0 ? key : -key - 2;
-		return this.aFreespeedValues[key];
-
+		return variableFreespeed.getValue(time);
 	}
 
 	@Override
@@ -220,33 +214,7 @@ class TimeVariantLinkImpl extends LinkImpl {
 
 	
 	private synchronized void initFreespeedEventsArrays() {
-
-		this.aFreespeedTimes = new double [this.aFreespeedEvents];
-		this.aFreespeedValues = new double [this.aFreespeedEvents];
-		this.aFreespeedTimes[0] = Double.NEGATIVE_INFINITY;
-		this.aFreespeedValues[0] = this.freespeed;
-
-		int numEvent = 0;
-		if (this.changeEvents != null) {
-			for (NetworkChangeEvent event : this.changeEvents.values()) {
-				ChangeValue value = event.getFreespeedChange();
-				if (value != null) {
-					if (value.getType() == NetworkChangeEvent.ChangeType.FACTOR) {
-						double currentValue = this.aFreespeedValues[numEvent];
-						this.aFreespeedValues[++numEvent] = currentValue * value.getValue();
-						this.aFreespeedTimes[numEvent] = event.getStartTime();
-					} else {
-						this.aFreespeedValues[++numEvent] = value.getValue();
-						this.aFreespeedTimes[numEvent] = event.getStartTime();
-					}
-				}
-			}
-		}
-
-		if (numEvent != this.aFreespeedEvents - 1) {
-			throw new RuntimeException("Expected number of change events (" + (this.aFreespeedEvents -1) + ") differs from the number of events found (" + numEvent + ")!");
-		}
-
+	    variableFreespeed.recalc(changeEvents, freespeed);
 	}
 
 	private synchronized void initFlowCapacityEventsArrays() {
