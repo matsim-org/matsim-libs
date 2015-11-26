@@ -21,7 +21,6 @@
 
 package playground.boescpa.analysis.scenarioAnalyzer.eventHandlers;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.events.handler.*;
@@ -45,9 +44,6 @@ import java.util.List;
  */
 public class TripActivityCrosscorrelator implements ScenarioAnalyzerEventHandler, PersonDepartureEventHandler, PersonArrivalEventHandler,
 		ActivityStartEventHandler, PersonStuckEventHandler, LinkLeaveEventHandler {
-	private static Logger log = Logger.getLogger(TripActivityCrosscorrelator.class);
-
-    private static final int ANALYSIS_END_TIME = 86400;
 
 	private final TripEventHandler tripHandler;
 	private final Network network;
@@ -146,34 +142,6 @@ public class TripActivityCrosscorrelator implements ScenarioAnalyzerEventHandler
                 addCount(getMode(mode), getActivity(trip.purpose));
             }
         }
-
-		/*for (Id personId : tripHandler.getStartLink().keySet()) {
-			if (!personId.toString().contains("pt")) {
-				ArrayList<Id> startLinks = tripHandler.getStartLink().getValues(personId);
-				ArrayList<String> modes = tripHandler.getMode().getValues(personId);
-				ArrayList<String> purposes = tripHandler.getPurpose().getValues(personId);
-				ArrayList<Double> startTimes = tripHandler.getStartTime().getValues(personId);
-				ArrayList<Id> endLinks = tripHandler.getEndLink().getValues(personId);
-
-				// Trip analysis:
-				*//*if (considerLink(startLinks.get(0))) {
-					addCount(getMode("init"), getActivity("h"));
-				}*//*
-				for (int i = 0; i < startLinks.size(); i++) {
-					if ((considerLink(startLinks.get(i)) || (endLinks.get(i) != null && considerLink(endLinks.get(i))))
-							&& startTimes.get(i) < 86400)
-					{
-						String mode = modes.get(i);
-						if (mode.equals("bike") || mode.equals("walk")) {
-							mode = "slow_mode";
-						} else if (mode.equals("transit_walk")) {
-							mode = "pt";
-						}
-						addCount(getMode(mode), getActivity(purposes.get(i)));
-					}
-				}
-			}
-		}*/
 	}
 
 	private boolean considerLink(Id<Link> linkId) {

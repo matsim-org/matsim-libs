@@ -21,7 +21,6 @@
 
 package playground.boescpa.analysis.scenarioAnalyzer.eventHandlers;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.events.handler.*;
@@ -51,9 +50,6 @@ import java.util.Map;
  */
 public class TripAnalyzer implements ScenarioAnalyzerEventHandler, PersonDepartureEventHandler, PersonArrivalEventHandler,
 		ActivityStartEventHandler, PersonStuckEventHandler, LinkLeaveEventHandler {
-	private static Logger log = Logger.getLogger(TripAnalyzer.class);
-
-    private static final int ANALYSIS_END_TIME = 86400;
 
 	private final TripEventHandler tripHandler;
 	private final Network network;
@@ -208,58 +204,6 @@ public class TripAnalyzer implements ScenarioAnalyzerEventHandler, PersonDepartu
                 actVals.actDurations.add(ANALYSIS_END_TIME - agentCurrentActStartTime.get(agentId));
             }
         }
-
-       /* for (Id personId : tripHandler.getStartLink().keySet()) {
-			if (!personId.toString().contains("pt")) {
-				ArrayList<Id> startLinks = tripHandler.getStartLink().getValues(personId);
-				ArrayList<String> modes = tripHandler.getMode().getValues(personId);
-				ArrayList<String> purposes = tripHandler.getPurpose().getValues(personId);
-				ArrayList<Double> startTimes = tripHandler.getStartTime().getValues(personId);
-				ArrayList<Id> endLinks = tripHandler.getEndLink().getValues(personId);
-				ArrayList<Double> endTimes = tripHandler.getEndTime().getValues(personId);
-				ArrayList<LinkedList<Id>> pathList = tripHandler.getPath().getValues(personId);
-
-				// Trip analysis:
-				for (int i = 0; i < startLinks.size(); i++) {
-					if (endLinks.get(i) != null) {
-						if ((considerLink(startLinks.get(i)) || considerLink(endLinks.get(i))) && startTimes.get(i) < 86400) {
-							String mode = modes.get(i);
-							if (mode.equals("bike") || mode.equals("walk")) {
-								mode = "slow_mode";
-							} else if (mode.equals("transit_walk")) {
-								mode = "pt";
-							}
-							ModeResult modeVals = getMode(mode);
-							modeVals.numberOfTrips++;
-							modeVals.modeDistances.add((double) TripProcessor.calcTravelDistance(pathList.get(i), network, startLinks.get(i), endLinks.get(i)));
-							modeVals.modeDurations.add(TripProcessor.calcTravelTime(startTimes.get(i), endTimes.get(i)));
-						}
-					}
-				}
-				ActivityResult actVals;
-				if (considerLink(startLinks.get(0))) {
-					actVals = getActivity("h");
-					actVals.numberOfActivities++;
-					actVals.actDurations.add(startTimes.get(0));
-				}
-				int i = 1;
-				while (i < startTimes.size() && startTimes.get(i) < 86400) {
-					if (endLinks.get(i-1) != null && considerLink(endLinks.get(i-1))) {
-						actVals = getActivity(purposes.get(i-1));
-						actVals.numberOfActivities++;
-						actVals.actDurations.add(startTimes.get(i) - endTimes.get(i-1));
-					}
-					i++;
-				}
-				if (i == startTimes.size() || endTimes.get(i-1) < 86400) {
-					if (endLinks.get(i-1) != null && considerLink(endLinks.get(i-1))) {
-						actVals = getActivity(purposes.get(i-1));
-						actVals.numberOfActivities++;
-						actVals.actDurations.add(86400 - endTimes.get(i-1));
-					}
-				}
-			}
-		}*/
 	}
 
 	private boolean considerLink(Id<Link> linkId) {

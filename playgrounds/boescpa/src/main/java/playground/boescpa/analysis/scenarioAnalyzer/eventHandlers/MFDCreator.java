@@ -125,25 +125,15 @@ public class MFDCreator implements ScenarioAnalyzerEventHandler, LinkLeaveEventH
 
 	private void incDensity(Id<Link> linkId, double time) {
 		// get time bin:
-		int timeBin = (int) Math.floor(time/TIMEBINSIZE);
-		while (currentTimeBin < timeBin) {
-			incTimeBin();
-		}
+        getTimeBin(time);
 
 		// inc density on link:
-		int newLinkDensity = 1;
-		if (densityTimeBin.keySet().contains(linkId)) {
-			newLinkDensity = densityTimeBin.get(linkId) + 1;
-		}
-		densityTimeBin.put(linkId, newLinkDensity);
+        incStat(linkId, densityTimeBin);
 	}
 
 	private void decDensity(Id<Link> linkId, double time) {
 		// get time bin:
-		int timeBin = (int) Math.floor(time/TIMEBINSIZE);
-		while (currentTimeBin < timeBin) {
-			incTimeBin();
-		}
+        getTimeBin(time);
 
 		// dec density on link:
 		Integer newLinkDensity = densityTimeBin.get(linkId);
@@ -161,20 +151,28 @@ public class MFDCreator implements ScenarioAnalyzerEventHandler, LinkLeaveEventH
 
 	private void incFlow(Id<Link> linkId, double time) {
 		// get time bin:
-		int timeBin = (int) Math.floor(time/TIMEBINSIZE);
-		while (currentTimeBin < timeBin) {
-			incTimeBin();
-		}
+        getTimeBin(time);
 
 		// inc flow on link:
-		int newLinkFlow = 1;
-		if (flowTimeBin.keySet().contains(linkId)) {
-			newLinkFlow = flowTimeBin.get(linkId) + 1;
-		}
-		flowTimeBin.put(linkId, newLinkFlow);
+        incStat(linkId, flowTimeBin);
 	}
 
-	private void incTimeBin() {
+    private void incStat(Id<Link> linkId, Map<Id<Link>, Integer> timeBin) {
+        int newLinkValue = 1;
+        if (timeBin.keySet().contains(linkId)) {
+            newLinkValue = timeBin.get(linkId) + 1;
+        }
+        timeBin.put(linkId, newLinkValue);
+    }
+
+    private void getTimeBin(double time) {
+        int timeBin = (int) Math.floor(time/TIMEBINSIZE);
+        while (currentTimeBin < timeBin) {
+            incTimeBin();
+        }
+    }
+
+    private void incTimeBin() {
 		currentTimeBin++;
 		// new densityTimeBin:
 		densityTimeBin = new HashMap<>();

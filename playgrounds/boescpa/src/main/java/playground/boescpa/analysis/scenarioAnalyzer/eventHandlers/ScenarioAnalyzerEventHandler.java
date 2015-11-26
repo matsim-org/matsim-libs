@@ -30,9 +30,12 @@ import playground.boescpa.analysis.spatialCutters.SpatialCutter;
  * @author boescpa
  */
 public interface ScenarioAnalyzerEventHandler extends EventHandler {
+
+    int ANALYSIS_END_TIME = 86400;
+
 	/**
 	 * @param spatialEventCutter
 	 * @return Results of the analysis in form of a (multiline) string.
 	 */
-	public String createResults(SpatialCutter spatialEventCutter, int scaleFactor);
+	String createResults(SpatialCutter spatialEventCutter, int scaleFactor);
 }
