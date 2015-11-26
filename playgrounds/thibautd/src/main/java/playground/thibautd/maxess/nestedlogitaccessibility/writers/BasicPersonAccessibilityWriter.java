@@ -62,7 +62,6 @@ public class BasicPersonAccessibilityWriter implements MatsimWriter {
 			}
 
 			for ( Map.Entry<Id<Person>,PersonAccessibilityComputationResult> e : accessibilityPerPerson.getResultsPerPerson().entrySet() ) {
-				// need to go here and not in "for", because need to "advance" before first element...
 				lineCounter.incCounter();
 				final Person person = scenario.getPopulation().getPersons().get( e.getKey() );
 				final Activity firstActivity = (Activity) person.getSelectedPlan().getPlanElements().get( 0 );
