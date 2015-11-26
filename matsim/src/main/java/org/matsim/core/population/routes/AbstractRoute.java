@@ -45,7 +45,7 @@ public abstract class AbstractRoute implements Route {
 	}
 
 	@Override
-	public double getDistance() {
+	public final double getDistance() {
 		return dist;
 	}
 
