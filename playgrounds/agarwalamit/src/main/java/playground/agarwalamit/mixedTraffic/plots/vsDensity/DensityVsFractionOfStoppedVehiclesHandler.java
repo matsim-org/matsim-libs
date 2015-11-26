@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.mixedTraffic.plots;
+package playground.agarwalamit.mixedTraffic.plots.vsDensity;
 
 import java.util.HashMap;
 import java.util.Map;

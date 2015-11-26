@@ -1,9 +1,9 @@
 /* *********************************************************************** *
- * project: org.matsim.*
+ * project: org.matsim.*												   *
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,10 +16,38 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.mixedTraffic.plots;
+package org.matsim.example;
+
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.scenario.ScenarioUtils;
 
 /**
- * @author amit
+ * @author nagel
+ *
  */
+public class HelloWorld {
+// a comment
 
-// ZZ_TODO: this package is too old; check classes and clean them.
+	public static void main(String[] args) {
+		
+		// This creates a default matsim config:
+		Config config = ConfigUtils.createConfig();
+		
+		config.controler().setLastIteration(1);
+		config.controler().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
+
+		// This creates a default matsim scenario (which is empty):
+		Scenario scenario = ScenarioUtils.createScenario(config) ;
+
+		Controler controler = new Controler( scenario ) ;
+
+		// This indeed runs iterations, but based on an empty scenario:
+		controler.run();
+
+	}
+
+}
