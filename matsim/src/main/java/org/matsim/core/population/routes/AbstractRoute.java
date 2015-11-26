@@ -66,21 +66,23 @@ public abstract class AbstractRoute implements Route {
 
 	@Override
 	public void setEndLinkId(final Id<Link> linkId) {
+		// overridden in Compressed...
 		this.endLinkId = linkId;
 	}
 
 	@Override
 	public void setStartLinkId(final Id<Link> linkId) {
+		// overridden in Compressed...
 		this.startLinkId = linkId;
 	}
 
 	@Override
-	public Id<Link> getStartLinkId() {
+	public final Id<Link> getStartLinkId() {
 		return this.startLinkId;
 	}
 
 	@Override
-	public Id<Link> getEndLinkId() {
+	public final Id<Link> getEndLinkId() {
 		return this.endLinkId;
 	}
 
