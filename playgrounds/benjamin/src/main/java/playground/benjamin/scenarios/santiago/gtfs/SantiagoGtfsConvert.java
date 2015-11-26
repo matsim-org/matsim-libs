@@ -59,18 +59,20 @@ public class SantiagoGtfsConvert {
 	private static final Logger log = Logger.getLogger(SantiagoGtfsConvert.class);
 
 	public static void main( String[] args ) {
-		CoordinateTransformation transform  = TransformationFactory.getCoordinateTransformation("EPSG:4326", SantiagoScenarioConstants.toCRS);
-//		CoordinateTransformation transform0  = new WGS84toCH1903LV03() ;
-		// ---
-		Config config = ConfigUtils.createConfig();
-		Scenario scenario = ScenarioUtils.createScenario(config);
-		// ---
 		final String inputPath = "../../../shared-svn/studies/countries/cl/santiago_pt_demand_matrix/gtfs_201306";
 		final String outputPath = "../../../shared-svn/studies/countries/cl/Kai_und_Daniel/inputForMATSim/transit";
-		// ---
+
+		CoordinateTransformation transform  = TransformationFactory.getCoordinateTransformation("EPSG:4326", SantiagoScenarioConstants.toCRS);
+//		CoordinateTransformation transform0  = new WGS84toCH1903LV03() ;
+
+		Config config = ConfigUtils.createConfig();
+		Scenario scenario = ScenarioUtils.createScenario(config);
+
+		/* TODO: Michaels converter somehow doesnt add lines from frequencies.txt if a line 
+ 		with the same stops already exists from stops.txt; Here a problem mainly for metro in off-peak.
+		Simply comment out line 448 in GtfsConverter. */
 		GtfsConverter converter = new GtfsConverter(inputPath, scenario, transform) ;
 		converter.convert() ;
-		// ---
 		
 		File output = new File(outputPath);
 		if(!output.exists()) createDir(new File(outputPath));
