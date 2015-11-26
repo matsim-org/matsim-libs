@@ -112,22 +112,24 @@ public class SimpleNestedLogitModelChoiceSetIdentifier implements ChoiceSetIdent
 		for ( int i= 0; i < nSamples; i++ ) {
 			final ActivityFacility f = prism.remove( random.nextInt( prism.size() ) );
 
-				stopWatch.startMeasurement( Measurement.carTravelTime );
-				add(
-						calcAlternative(
-								i,
-								TransportMode.car,
-								origin,
-								f,
-								person ),
-						allBuilder.carNestBuilder,
-						isCarAvailable( person ) ?
-								baseBuilder.carNestBuilder :
-								null,
-						noptBuilder.carNestBuilder,
-						nobikeBuilder.carNestBuilder,
-						nowalkBuilder.carNestBuilder );
+			//-------------------------------------------------------------
+			stopWatch.startMeasurement( Measurement.carTravelTime );
+			add(
+					calcAlternative(
+							i,
+							TransportMode.car,
+							origin,
+							f,
+							person ),
+					allBuilder.carNestBuilder,
+					isCarAvailable( person ) ?
+							baseBuilder.carNestBuilder :
+							null,
+					noptBuilder.carNestBuilder,
+					nobikeBuilder.carNestBuilder,
+					nowalkBuilder.carNestBuilder );
 			stopWatch.endMeasurement( Measurement.carTravelTime );
+			//-------------------------------------------------------------
 			stopWatch.startMeasurement( Measurement.ptTravelTime );
 			add(
 					calcAlternative(
@@ -142,6 +144,7 @@ public class SimpleNestedLogitModelChoiceSetIdentifier implements ChoiceSetIdent
 					nobikeBuilder.ptNestBuilder,
 					nowalkBuilder.ptNestBuilder );
 			stopWatch.endMeasurement( Measurement.ptTravelTime );
+			//-------------------------------------------------------------
 			stopWatch.startMeasurement( Measurement.bikeTravelTime );
 			add(
 					calcAlternative(
@@ -158,6 +161,7 @@ public class SimpleNestedLogitModelChoiceSetIdentifier implements ChoiceSetIdent
 					noptBuilder.bikeNestBuilder,
 					nowalkBuilder.bikeNestBuilder );
 			stopWatch.endMeasurement( Measurement.bikeTravelTime );
+			//-------------------------------------------------------------
 			stopWatch.startMeasurement( Measurement.walkTravelTime );
 			add(
 					calcAlternative(
@@ -172,6 +176,7 @@ public class SimpleNestedLogitModelChoiceSetIdentifier implements ChoiceSetIdent
 					nobikeBuilder.walkNestBuilder,
 					noptBuilder.walkNestBuilder );
 			stopWatch.endMeasurement( Measurement.walkTravelTime );
+			//-------------------------------------------------------------
 		}
 
 		final Map<String, NestedChoiceSet<ModeNests>> result = new LinkedHashMap<>();
