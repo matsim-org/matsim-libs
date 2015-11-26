@@ -43,6 +43,8 @@ import playground.thibautd.utils.ConcurrentStopWatch;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -94,22 +96,11 @@ public class SimpleNestedLogitModelChoiceSetIdentifier implements ChoiceSetIdent
 
 	@Override
 	public Map<String, NestedChoiceSet<ModeNests>> identifyChoiceSet( final Person person ) {
-		final Nest.Builder<ModeNests> carNestBuilder =
-				new Nest.Builder<ModeNests>()
-						.setMu( MU_CAR )
-						.setName( ModeNests.car );
-		final Nest.Builder<ModeNests> ptNestBuilder =
-				new Nest.Builder<ModeNests>()
-						.setMu( MU_PT )
-						.setName( ModeNests.pt );
-		final Nest.Builder<ModeNests> bikeNestBuilder =
-				new Nest.Builder<ModeNests>()
-						.setMu( MU_BIKE )
-						.setName( ModeNests.bike );
-		final Nest.Builder<ModeNests> walkNestBuilder =
-				new Nest.Builder<ModeNests>()
-						.setMu( MU_WALK )
-						.setName( ModeNests.walk );
+		final ChoiceSetBuilder baseBuilder = new ChoiceSetBuilder();
+		final ChoiceSetBuilder nocarBuilder = new ChoiceSetBuilder();
+		final ChoiceSetBuilder noptBuilder = new ChoiceSetBuilder();
+		final ChoiceSetBuilder nobikeBuilder = new ChoiceSetBuilder();
+		final ChoiceSetBuilder nowalkBuilder = new ChoiceSetBuilder();
 
 		// Sample and route alternatives
 		stopWatch.startMeasurement( Measurement.prismSampling );
@@ -120,56 +111,72 @@ public class SimpleNestedLogitModelChoiceSetIdentifier implements ChoiceSetIdent
 		for ( int i= 0; i < nSamples; i++ ) {
 			final ActivityFacility f = prism.remove( random.nextInt( prism.size() ) );
 
-			if ( isCarAvailable( person ) ) {
 				stopWatch.startMeasurement( Measurement.carTravelTime );
-				carNestBuilder.addAlternative(
+				add(
 						calcAlternative(
 								i,
 								TransportMode.car,
 								origin,
 								f,
-								person ) );
-				stopWatch.endMeasurement( Measurement.carTravelTime );
-			}
+								person ),
+						isCarAvailable( person ) ?
+								baseBuilder.carNestBuilder :
+								null,
+						noptBuilder.carNestBuilder,
+						nobikeBuilder.carNestBuilder,
+						nowalkBuilder.carNestBuilder );
+			stopWatch.endMeasurement( Measurement.carTravelTime );
 			stopWatch.startMeasurement( Measurement.ptTravelTime );
-			ptNestBuilder.addAlternative(
+			add(
 					calcAlternative(
 							i,
 							TransportMode.pt,
 							origin,
 							f,
-							person ) );
+							person ),
+					baseBuilder.ptNestBuilder,
+					nocarBuilder.ptNestBuilder,
+					nobikeBuilder.ptNestBuilder,
+					nowalkBuilder.ptNestBuilder );
 			stopWatch.endMeasurement( Measurement.ptTravelTime );
-			if ( isBikeAvailable( person ) ) {
-				stopWatch.startMeasurement( Measurement.bikeTravelTime );
-				bikeNestBuilder.addAlternative(
-						calcAlternative(
-								i,
-								TransportMode.bike,
-								origin,
-								f,
-								person ) );
-				stopWatch.endMeasurement( Measurement.bikeTravelTime );
-			}
+			stopWatch.startMeasurement( Measurement.bikeTravelTime );
+			add(
+					calcAlternative(
+							i,
+							TransportMode.bike,
+							origin,
+							f,
+							person ),
+					isBikeAvailable( person ) ?
+							baseBuilder.bikeNestBuilder :
+							null,
+					nocarBuilder.bikeNestBuilder,
+					noptBuilder.bikeNestBuilder,
+					nowalkBuilder.bikeNestBuilder );
+			stopWatch.endMeasurement( Measurement.bikeTravelTime );
 			stopWatch.startMeasurement( Measurement.walkTravelTime );
-			walkNestBuilder.addAlternative(
-							calcAlternative(
-									i,
-									TransportMode.walk,
-									origin,
-									f,
-									person ) );
+			add(
+					calcAlternative(
+							i,
+							TransportMode.walk,
+							origin,
+							f,
+							person ),
+					baseBuilder.walkNestBuilder,
+					nocarBuilder.walkNestBuilder,
+					nobikeBuilder.walkNestBuilder,
+					noptBuilder.walkNestBuilder );
 			stopWatch.endMeasurement( Measurement.walkTravelTime );
 		}
 
-		return
-				Collections.singletonMap(
-						"base",
-						new NestedChoiceSet<>(
-							carNestBuilder.build(),
-							ptNestBuilder.build(),
-							bikeNestBuilder.build(),
-							walkNestBuilder.build() ) );
+		final Map<String, NestedChoiceSet<ModeNests>> result = new LinkedHashMap<>();
+		result.put( "base" , baseBuilder.build() );
+		result.put( "nocar" , nocarBuilder.build() );
+		result.put( "nobike" , nobikeBuilder.build() );
+		result.put( "nopt" , noptBuilder.build() );
+		result.put( "nowalk" , nowalkBuilder.build() );
+
+		return result;
 	}
 
 	private boolean isBikeAvailable( Person person ) {
@@ -259,11 +266,45 @@ public class SimpleNestedLogitModelChoiceSetIdentifier implements ChoiceSetIdent
 
 		Collection<ActivityFacility> prism = Collections.emptyList();
 
-		final double radius = Math.max( budget_m , 1.1 * CoordUtils.calcDistance( f1, f2 ) );
+		final double radius = Math.max( budget_m, 1.1 * CoordUtils.calcDistance( f1, f2 ) );
 		for ( int i=1; prism.size() < nSamples; i++ ) {
 			prism = relevantFacilities.getElliptical(f1.getX(), f1.getY(), f2.getX(), f2.getY(), i * radius);
 		}
 
 		return prism instanceof List ? (List<ActivityFacility>) prism : new ArrayList<>( prism );
+	}
+
+	private void add( Alternative<ModeNests> alternative , Nest.Builder<ModeNests>... sets ) {
+		for ( Nest.Builder<ModeNests> set : sets ) {
+			if ( set == null ) continue;
+			set.addAlternative( alternative );
+		}
+	}
+
+	private static class ChoiceSetBuilder {
+		final Nest.Builder<ModeNests> carNestBuilder =
+				new Nest.Builder<ModeNests>()
+						.setMu( MU_CAR )
+						.setName( ModeNests.car );
+		final Nest.Builder<ModeNests> ptNestBuilder =
+				new Nest.Builder<ModeNests>()
+						.setMu( MU_PT )
+						.setName( ModeNests.pt );
+		final Nest.Builder<ModeNests> bikeNestBuilder =
+				new Nest.Builder<ModeNests>()
+						.setMu( MU_BIKE )
+						.setName( ModeNests.bike );
+		final Nest.Builder<ModeNests> walkNestBuilder =
+				new Nest.Builder<ModeNests>()
+						.setMu( MU_WALK )
+						.setName( ModeNests.walk );
+
+		public NestedChoiceSet<ModeNests> build() {
+			return new NestedChoiceSet<>(
+					carNestBuilder.build(),
+					ptNestBuilder.build(),
+					bikeNestBuilder.build(),
+					walkNestBuilder.build() );
+		}
 	}
 }
