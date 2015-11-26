@@ -59,7 +59,7 @@ import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Geometry;
 
-import playground.benjamin.scenarios.santiago.SantiagoScenarioConstants;
+import playground.santiago.SantiagoScenarioConstants;
 
 public class CSVToPlans {
 	private static final Logger log = Logger.getLogger(CSVToPlans.class);

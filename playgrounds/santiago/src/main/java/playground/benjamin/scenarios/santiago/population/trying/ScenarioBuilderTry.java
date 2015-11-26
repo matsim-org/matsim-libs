@@ -88,10 +88,10 @@ import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.config.TransitRouterConfigGroup;
 import org.matsim.pt.transitSchedule.api.Departure;
 
-import playground.benjamin.scenarios.santiago.SantiagoScenarioConstants;
-import playground.benjamin.scenarios.santiago.SantiagoScenarioConstants.SubpopulationName;
 import playground.benjamin.scenarios.santiago.population.ActivityClassifier;
 import playground.benjamin.scenarios.santiago.population.CSVToPlans;
+import playground.santiago.SantiagoScenarioConstants;
+import playground.santiago.SantiagoScenarioConstants.SubpopulationName;
 
 /**
  * Creates an initial population and config for the Greater Santiago Area, executing the following steps:

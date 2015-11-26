@@ -41,8 +41,8 @@ import org.matsim.pt.PtConstants;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.Vehicles;
 
-import playground.benjamin.scenarios.santiago.SantiagoScenarioConstants;
 import playground.benjamin.scenarios.santiago.population.SantiagoScenarioBuilder;
+import playground.santiago.SantiagoScenarioConstants;
 
 /**
  * Calculates public transport fares for the Santiago scenario.

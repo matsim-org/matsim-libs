@@ -56,8 +56,8 @@ import org.opengis.feature.simple.SimpleFeature;
 import com.vividsolutions.jts.geom.Coordinate;
 
 import floetteroed.utilities.networks.containerloaders.MATSimNetworkContainerLoader;
-import playground.benjamin.scenarios.santiago.SantiagoScenarioConstants;
 import playground.benjamin.utils.MergeNetworks;
+import playground.santiago.SantiagoScenarioConstants;
 
 public class SantiagoNetworkBuilder {
 	private static final Logger log = Logger.getLogger(SantiagoNetworkBuilder.class);

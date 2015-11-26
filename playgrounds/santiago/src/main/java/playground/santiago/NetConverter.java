@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.benjamin.scenarios.santiago;
+package playground.santiago;
 
 import java.io.BufferedReader;
 import java.io.IOException;

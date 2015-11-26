@@ -86,8 +86,8 @@ import org.matsim.pt.PtConstants;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.config.TransitRouterConfigGroup;
 
-import playground.benjamin.scenarios.santiago.SantiagoScenarioConstants;
-import playground.benjamin.scenarios.santiago.SantiagoScenarioConstants.SubpopulationName;
+import playground.santiago.SantiagoScenarioConstants;
+import playground.santiago.SantiagoScenarioConstants.SubpopulationName;
 
 public class SantiagoScenarioBuilder {
 	private static final Logger log = Logger.getLogger(SantiagoScenarioBuilder.class);

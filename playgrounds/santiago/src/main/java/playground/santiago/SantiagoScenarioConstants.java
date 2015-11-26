@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.benjamin.scenarios.santiago;
+package playground.santiago;
 
 public final class SantiagoScenarioConstants {
 

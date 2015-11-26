@@ -52,8 +52,8 @@ import org.matsim.pt.utils.CreatePseudoNetwork;
 import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vehicles.Vehicles;
 
-import playground.benjamin.scenarios.santiago.SantiagoScenarioConstants;
 import playground.mzilske.gtfs.GtfsConverter;
+import playground.santiago.SantiagoScenarioConstants;
 
 public class SantiagoGtfsConvert {
 	private static final Logger log = Logger.getLogger(SantiagoGtfsConvert.class);

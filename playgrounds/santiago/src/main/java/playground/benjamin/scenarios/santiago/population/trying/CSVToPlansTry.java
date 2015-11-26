@@ -59,10 +59,10 @@ import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Geometry;
 
-import playground.benjamin.scenarios.santiago.SantiagoScenarioConstants;
 import playground.benjamin.scenarios.santiago.population.Etapa;
 import playground.benjamin.scenarios.santiago.population.Persona;
 import playground.benjamin.scenarios.santiago.population.Viaje;
+import playground.santiago.SantiagoScenarioConstants;
 
 public class CSVToPlansTry {
 	private static final Logger log = Logger.getLogger(CSVToPlansTry.class);

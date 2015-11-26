@@ -49,7 +49,7 @@ import org.matsim.core.replanning.modules.SubtourModeChoice;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.benjamin.scenarios.santiago.SantiagoScenarioConstants;
+import playground.santiago.SantiagoScenarioConstants;
 
 public class SantiagoScenarioRunner {
 
