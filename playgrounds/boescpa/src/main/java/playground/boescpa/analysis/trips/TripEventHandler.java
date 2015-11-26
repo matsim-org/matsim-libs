@@ -40,6 +40,11 @@ public class TripEventHandler implements PersonDepartureEventHandler, PersonArri
 	
 	// TODO-boescpa create "path" for pt and transit_walk too!
 
+    private static boolean anonymizeTrips = false;
+    public static void setAnonymizeTrips(boolean anonymizeTrips) {
+        TripEventHandler.anonymizeTrips = anonymizeTrips;
+    }
+
     private boolean tripsChanged;
     private List<Trip> trips;
     private final Network network;
@@ -185,11 +190,12 @@ public class TripEventHandler implements PersonDepartureEventHandler, PersonArri
                 List<Id<Link>> endLinks = this.endLink.getValues(personId);
                 List<Double> endTimes = this.endTime.getValues(personId);
                 List<List<Id<Link>>> pathList = this.path.getValues(personId);
+                Id<Person> tripPerson = anonymizeTrips ? Id.createPersonId(incognitoPersonId++) : personId;
 
                 for (int i = 0; i < startLinks.size(); i++) {
                     if (endLinks.get(i) != null) {
                         tempTrip = new Trip(
-                                Id.createPersonId(incognitoPersonId++),
+                                tripPerson,
                                 startTimes.get(i),
                                 startLinks.get(i),
                                 network.getLinks().get(startLinks.get(i)).getCoord().getX(),
@@ -205,7 +211,7 @@ public class TripEventHandler implements PersonDepartureEventHandler, PersonArri
                         );
                     } else {
                         tempTrip = new Trip(
-                                Id.createPersonId(incognitoPersonId++),
+                                tripPerson,
                                 startTimes.get(i),
                                 startLinks.get(i),
                                 network.getLinks().get(startLinks.get(i)).getCoord().getX(),
