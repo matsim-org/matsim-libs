@@ -14,6 +14,30 @@ import java.util.List;
  */
 public class TripFilter {
 
+    /**
+     * Returns all trips travelled with the specified mode.
+     *
+     * @param trips The trips to filter.
+     * @param mode The mode for which will be filtered.
+     * @return An unmodifiable List of only the trips with the specified mode.
+     */
+    public static List<Trip> modalTripFilter(List<Trip> trips, String mode) {
+        List<Trip> filteredTrips = new LinkedList<>();
+        for (Trip tempTrip : trips) {
+            if (tempTrip.mode.equals(mode)) {
+                filteredTrips.add(tempTrip.clone());
+            }
+        }
+        return Collections.unmodifiableList(filteredTrips);
+    }
+
+    /**
+     * Returns all trips in the area defined by the cutter.
+     *
+     * @param trips The trips to filter.
+     * @param cutter The spatial cutter specifying the resulting area.
+     * @return An unmodifiable list of only the trips in the specified area.
+     */
     public static List<Trip> spatialTripFilter(List<Trip> trips, SpatialTripCutter cutter) {
         List<Trip> filteredTrips = new LinkedList<>();
         for (Trip tempTrip : trips) {
