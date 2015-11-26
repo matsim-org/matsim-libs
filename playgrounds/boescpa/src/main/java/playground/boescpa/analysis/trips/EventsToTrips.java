@@ -46,7 +46,7 @@ public class EventsToTrips {
         String networkFile = args[1]; // Path to the network-File used for the simulation resulting in the events-File.
         String tripFile = args[2]; // Path to where the trip file should be written to.
 
-        TripEventHandler.setAnonymizeTrips(false);
+        TripEventHandler.setAnonymizeTrips(true);
         List<Trip> trips = createTripsFromEvents(eventsFile, networkFile);
 
         log.info("Write trips...");

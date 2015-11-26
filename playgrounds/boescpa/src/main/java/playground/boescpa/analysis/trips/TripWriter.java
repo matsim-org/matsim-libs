@@ -54,11 +54,11 @@ public class TripWriter {
 	 * 
 	 * If a pt trip only contains transit_walk legs, the main mode is transit walk.
 	 */
-	public void writeTrips(TripEventHandler tripHandler, String outputFile) {
-        this.writeTrips(tripHandler.getTrips(), outputFile);
+	public static void writeTrips(TripEventHandler tripHandler, String outputFile) {
+        TripWriter.writeTrips(tripHandler.getTrips(), outputFile);
 	}
 
-    public void writeTrips(List<Trip> trips, String outputFile) {
+    public static void writeTrips(List<Trip> trips, String outputFile) {
         try {
             final BufferedWriter out = IOUtils.getBufferedWriter(outputFile);
             out.write(Trip.getHeader());

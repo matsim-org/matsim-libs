@@ -15,6 +15,23 @@ import java.util.List;
 public class TripFilter {
 
     /**
+     * Returns all trips travelled with the specified purpose.
+     *
+     * @param trips The trips to filter.
+     * @param purpose The purpose for which will be filtered.
+     * @return An unmodifiable List of only the trips with the specified purpose.
+     */
+    public static List<Trip> purposeTripFilter(List<Trip> trips, String purpose) {
+        List<Trip> filteredTrips = new LinkedList<>();
+        for (Trip tempTrip : trips) {
+            if (tempTrip.purpose.equals(purpose)) {
+                filteredTrips.add(tempTrip.clone());
+            }
+        }
+        return Collections.unmodifiableList(filteredTrips);
+    }
+
+    /**
      * Returns all trips travelled with the specified mode.
      *
      * @param trips The trips to filter.
@@ -52,7 +69,7 @@ public class TripFilter {
      * Check for all found trips if they have failed. If so, remove them.
      *
      * @param trips The trips to clean.
-     * @param failedAgents Into this list all ids of agents with unfinished trips will be added.
+     * @param failedAgents Into this list all ids of agents with unfinished trips will be added. May be null.
      * @return An unmodifiable list of only the finished trips.
      */
     public static List<Trip> removeUnfinishedTrips(List<Trip> trips, List<Id<Person>> failedAgents) {
@@ -62,7 +79,7 @@ public class TripFilter {
             if (!(tempTrip.endLinkId == null) && !tempTrip.purpose.equals("null") && !tempTrip.purpose.equals("stuck")) {
                 finishedTrips.add(tempTrip.clone());
             } else {
-                failedAgents.add(tempTrip.agentId);
+                if (failedAgents != null) failedAgents.add(tempTrip.agentId);
             }
         }
         return Collections.unmodifiableList(finishedTrips);

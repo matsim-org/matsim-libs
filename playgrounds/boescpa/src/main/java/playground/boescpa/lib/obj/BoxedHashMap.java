@@ -100,7 +100,9 @@ public final class BoxedHashMap<K, V> {
      */
 	public void removeLast(K k) {
 		LinkedList<V> l = boxedHashMap.get(k);
-		l.remove(l.size()-1);
+		if (l != null && l.size() > 0) {
+            l.remove(l.size() - 1);
+        }
 	}
 	
 	public void clear() {

@@ -32,6 +32,8 @@ import org.matsim.api.core.v01.population.Person;
  */
 public class Trip implements Cloneable{
 
+    private final static String dl = ";"; // delimiter used for the trip as string representation
+
 	public final Id<Person> agentId;
 	public final double startTime;
 	public final Id<Link> startLinkId;
@@ -67,18 +69,19 @@ public class Trip implements Cloneable{
 	}
 
 	public static String getHeader() {
-		return "agentId\tstartTime\tstartLink\tstartXCoord\tstartYCoord\tendTime\tendLink\tendXCoord\tendYCoord\tmode\tpurpose\tduration\tdistance";
+		return "agentId"+dl+"startTime"+dl+"startLink"+dl+"startXCoord"+dl+"startYCoord"+dl+"endTime"+dl+
+                "endLink"+dl+"endXCoord"+dl+"endYCoord"+dl+"mode"+dl+"purpose"+dl+"duration"+dl+"distance";
 	}
 
 	@Override
 	public String toString() {
-		return agentId + "\t" + startTime + "\t" + startLinkId + "\t" + startXCoord + "\t"
-				+ startYCoord + "\t" + endTime + "\t" + endLinkId + "\t" + endXCoord + "\t" + endYCoord
-				+ "\t" + mode + "\t" + purpose + "\t" + duration + "\t" + distance;
+		return agentId + dl + startTime + dl + startLinkId + dl + startXCoord + dl
+				+ startYCoord + dl + endTime + dl + endLinkId + dl + endXCoord + dl + endYCoord
+				+ dl + mode + dl + purpose + dl + duration + dl + distance;
 	}
 
     public static Trip parseTrip(String tripString) {
-        String[] tripLine = tripString.split("\t");
+        String[] tripLine = tripString.split(dl);
         return new Trip(
                 Id.create(tripLine[1], Person.class), //agentId
                 Double.parseDouble(tripLine[2]), // startTime
