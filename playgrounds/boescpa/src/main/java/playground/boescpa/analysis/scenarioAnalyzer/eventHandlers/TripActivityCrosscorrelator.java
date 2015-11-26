@@ -93,7 +93,7 @@ public class TripActivityCrosscorrelator implements ScenarioAnalyzerEventHandler
 	 * * Returns for every mode:
 	 *	o	Number of trips [] to reach every activity
 	 *
-	 * @param spatialEventCutter
+	 * @param spatialEventCutter Defining the area to analyze.
 	 * @param scaleFactor	The number of trips is scaled with this factor before returned.
 	 * @return A multiline String containing the above listed results.
 	 */

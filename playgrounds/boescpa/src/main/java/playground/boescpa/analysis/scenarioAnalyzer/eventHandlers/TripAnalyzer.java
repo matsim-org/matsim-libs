@@ -102,7 +102,7 @@ public class TripAnalyzer implements ScenarioAnalyzerEventHandler, PersonDepartu
 	 *	o	Total duration [min]
 	 *	o	Mean and standard deviation of durations [min]
 	 *
-	 * @param spatialEventCutter
+	 * @param spatialEventCutter Defining the area to analyze.
 	 * @return A multiline String containing the above listed results.
 	 */
 	@Override
