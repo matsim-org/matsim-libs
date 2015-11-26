@@ -93,7 +93,7 @@ public class SimpleNestedLogitModelChoiceSetIdentifier implements ChoiceSetIdent
 	}
 
 	@Override
-	public NestedChoiceSet<ModeNests> identifyChoiceSet( final Person person ) {
+	public Map<String, NestedChoiceSet<ModeNests>> identifyChoiceSet( final Person person ) {
 		final Nest.Builder<ModeNests> carNestBuilder =
 				new Nest.Builder<ModeNests>()
 						.setMu( MU_CAR )
@@ -162,11 +162,14 @@ public class SimpleNestedLogitModelChoiceSetIdentifier implements ChoiceSetIdent
 			stopWatch.endMeasurement( Measurement.walkTravelTime );
 		}
 
-		return new NestedChoiceSet<>(
-				carNestBuilder.build(),
-				ptNestBuilder.build(),
-				bikeNestBuilder.build(),
-				walkNestBuilder.build() );
+		return
+				Collections.singletonMap(
+						"base",
+						new NestedChoiceSet<>(
+							carNestBuilder.build(),
+							ptNestBuilder.build(),
+							bikeNestBuilder.build(),
+							walkNestBuilder.build() ) );
 	}
 
 	private boolean isBikeAvailable( Person person ) {

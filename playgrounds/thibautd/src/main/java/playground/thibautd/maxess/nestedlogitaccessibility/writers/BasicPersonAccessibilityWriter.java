@@ -18,8 +18,6 @@
  * *********************************************************************** */
 package playground.thibautd.maxess.nestedlogitaccessibility.writers;
 
-import gnu.trove.iterator.TObjectDoubleIterator;
-import gnu.trove.map.TObjectDoubleMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -31,21 +29,24 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.facilities.ActivityFacility;
+import playground.thibautd.maxess.nestedlogitaccessibility.framework.AccessibilityComputationResult;
+import playground.thibautd.maxess.nestedlogitaccessibility.framework.AccessibilityComputationResult.PersonAccessibilityComputationResult;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.util.Map;
 
 /**
  * @author thibautd
  */
 public class BasicPersonAccessibilityWriter implements MatsimWriter {
 	private static final Logger log = Logger.getLogger( BasicPersonAccessibilityWriter.class );
-	private final TObjectDoubleMap<Id<Person>> accessibilityPerPerson;
+	private final AccessibilityComputationResult accessibilityPerPerson;
 	private final Scenario scenario;
 
 	public BasicPersonAccessibilityWriter(
 			final Scenario scenario,
-			final TObjectDoubleMap<Id<Person>> accessibilityPerPerson ) {
+			final AccessibilityComputationResult accessibilityPerPerson ) {
 		this.accessibilityPerPerson = accessibilityPerPerson;
 		this.scenario = scenario;
 	}
@@ -55,26 +56,30 @@ public class BasicPersonAccessibilityWriter implements MatsimWriter {
 		log.info( "Write accessibility per person to file "+filename );
 		final Counter lineCounter = new Counter( "write accessibility for person # " );
 		try ( final BufferedWriter writer = IOUtils.getBufferedWriter( filename ) ) {
-			writer.write( "person_id\tfacility_id\tx\ty\taccessibility" );
+			writer.write( "person_id\tfacility_id\tx\ty" );
+			for ( String name : accessibilityPerPerson.getTypes() ) {
+				writer.write( "\taccessibility_"+name );
+			}
 
-			for ( TObjectDoubleIterator<Id<Person>> it = accessibilityPerPerson.iterator();
-						it.hasNext(); ) {
+			for ( Map.Entry<Id<Person>,PersonAccessibilityComputationResult> e : accessibilityPerPerson.getResultsPerPerson().entrySet() ) {
 				// need to go here and not in "for", because need to "advance" before first element...
-				it.advance();
 				lineCounter.incCounter();
-				final Person person = scenario.getPopulation().getPersons().get( it.key() );
+				final Person person = scenario.getPopulation().getPersons().get( e.getKey() );
 				final Activity firstActivity = (Activity) person.getSelectedPlan().getPlanElements().get( 0 );
 				final Id<ActivityFacility> facilityId = firstActivity.getFacilityId();
 				final Coord coord = firstActivity.getCoord() != null ?
 							firstActivity.getCoord() :
 							scenario.getActivityFacilities().getFacilities().get( facilityId ).getCoord();
-				final double accessibility = it.value();
+				final Map<String, Double> accessibilities = e.getValue().getAccessibilities();
 
 				writer.newLine();
 				writer.write( person.getId()+"\t" );
 				writer.write( facilityId+"\t" );
-				writer.write( coord.getX()+"\t"+coord.getY()+"\t" );
-				writer.write( accessibility+"" );
+				writer.write( coord.getX() + "\t" + coord.getY() );
+				for ( String name : accessibilityPerPerson.getTypes() ) {
+					final Double a = accessibilities.get( name );
+					writer.write( "\t"+( a != null ? a : "NA" ) );
+				}
 			}
 			lineCounter.printCounter();
 			log.info( "Write accessibility per person to file "+filename+" : DONE" );
