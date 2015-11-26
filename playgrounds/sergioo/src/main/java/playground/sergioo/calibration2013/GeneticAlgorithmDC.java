@@ -21,8 +21,8 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
@@ -116,7 +116,7 @@ public class GeneticAlgorithmDC {
 			TransitActsRemover transitActsRemover = new TransitActsRemover();
 			Collection<PlanImpl> copiedPlans = new ArrayList<PlanImpl>();
 			for(Person person:scenario.getPopulation().getPersons().values()) {
-				Person copyPerson = PersonImpl.createPerson(person.getId());
+				Person copyPerson = PopulationUtils.createPerson(person.getId());
 				PlanImpl copyPlan = new PlanImpl(copyPerson);
 				copyPlan.copyFrom(person.getSelectedPlan());
 				copyPerson.addPlan(copyPlan);

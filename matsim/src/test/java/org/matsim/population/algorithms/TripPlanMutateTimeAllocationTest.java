@@ -31,6 +31,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.pt.PtConstants;
 
@@ -42,7 +43,7 @@ public class TripPlanMutateTimeAllocationTest {
 	@Test
 	public void testRun() {
 		// setup population with one person
-		PersonImpl person = (PersonImpl) PersonImpl.createPerson(Id.create(1, Person.class));
+		PersonImpl person = (PersonImpl) PopulationUtils.createPerson(Id.create(1, Person.class));
 		PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 		ActivityImpl act = plan.createAndAddActivity("home", new Coord((double) 0, (double) 0));
 		act.setEndTime(8.0 * 3600);

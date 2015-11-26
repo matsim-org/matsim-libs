@@ -31,8 +31,8 @@ import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scoring.EventsToActivities;
 import org.matsim.core.scoring.EventsToActivities.ActivityHandler;
 import org.matsim.core.scoring.EventsToLegs;
@@ -80,7 +80,7 @@ public class EventsToPlans implements ActivityStartEventHandler, ActivityEndEven
 								new MapUtils.Factory<Plan>() {
 									@Override
 									public Plan create() {
-										return new PlanImpl(PersonImpl.createPerson(agentId));
+										return new PlanImpl(PopulationUtils.createPerson(agentId));
 									}
 								});
 						plan.addActivity( activity );
@@ -100,7 +100,7 @@ public class EventsToPlans implements ActivityStartEventHandler, ActivityEndEven
 								new MapUtils.Factory<Plan>() {
 									@Override
 									public Plan create() {
-										return new PlanImpl(PersonImpl.createPerson(agentId));
+										return new PlanImpl(PopulationUtils.createPerson(agentId));
 									}
 								});
 							plan.addLeg( leg );

@@ -27,11 +27,10 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.population.PersonImpl;
-
 import org.matsim.contrib.socnetsim.framework.population.JointPlans;
 import org.matsim.contrib.socnetsim.framework.replanning.grouping.ReplanningGroup;
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.coalitionselector.CoalitionSelector.ConflictSolver;
+import org.matsim.core.population.PopulationUtils;
 
 /**
  * @author thibautd
@@ -51,7 +50,7 @@ public class LeastAverageWeightJointPlanPruningConflictSolverTest {
 
 		Id<Person> id = Id.create( 1 , Person.class );
 		{
-			final Person person = PersonImpl.createPerson(id);
+			final Person person = PopulationUtils.createPerson(id);
 			group.addPerson( person );
 			{
 				final Plan plan = jointPlans.getFactory().createIndividualPlan( person );
@@ -69,7 +68,7 @@ public class LeastAverageWeightJointPlanPruningConflictSolverTest {
 
 		id = Id.create( 2 , Person.class );
 		{
-			final Person person = PersonImpl.createPerson(id);
+			final Person person = PopulationUtils.createPerson(id);
 			group.addPerson( person );
 			{
 				final Plan plan = jointPlans.getFactory().createIndividualPlan( person );
@@ -87,7 +86,7 @@ public class LeastAverageWeightJointPlanPruningConflictSolverTest {
 
 		id = Id.create( 3 , Person.class );
 		{
-			final Person person = PersonImpl.createPerson(id);
+			final Person person = PopulationUtils.createPerson(id);
 			group.addPerson( person );
 			{
 				final Plan plan = jointPlans.getFactory().createIndividualPlan( person );

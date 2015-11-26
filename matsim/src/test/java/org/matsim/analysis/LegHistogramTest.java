@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -53,9 +53,9 @@ public class LegHistogramTest extends MatsimTestCase {
 		Link link = network.createAndAddLink(Id.create(1, Link.class), node1, node2, 1000.0, 100.0, 1.0, 1);
 		Id<Link> linkId = link.getId();
 
-		Person person1 = PersonImpl.createPerson(Id.create(1, Person.class));
+		Person person1 = PopulationUtils.createPerson(Id.create(1, Person.class));
 		Id<Person> person1Id = person1.getId();
-		Person person2 = PersonImpl.createPerson(Id.create(2, Person.class));
+		Person person2 = PopulationUtils.createPerson(Id.create(2, Person.class));
 		Id<Person> person2Id = person2.getId();
 		LegImpl leg = new org.matsim.core.population.LegImpl(TransportMode.car);
 		leg.setDepartureTime(7*3600);
@@ -105,7 +105,7 @@ public class LegHistogramTest extends MatsimTestCase {
 		Link link = network.createAndAddLink(Id.create(1, Link.class), node1, node2, 1000.0, 100.0, 1.0, 1);
 		Id<Link> linkId = link.getId();
 
-		Person person1 = PersonImpl.createPerson(Id.create(1, Person.class));
+		Person person1 = PopulationUtils.createPerson(Id.create(1, Person.class));
 		Id<Person> person1Id = person1.getId();
 		LegImpl leg = new org.matsim.core.population.LegImpl(TransportMode.car);
 		leg.setDepartureTime(7*3600);
@@ -144,7 +144,7 @@ public class LegHistogramTest extends MatsimTestCase {
 		Link link = network.createAndAddLink(Id.create(1, Link.class), node1, node2, 1000.0, 100.0, 1.0, 1);
 		Id<Link> linkId = link.getId();
 
-		Person person1 = PersonImpl.createPerson(Id.create(1, Person.class));
+		Person person1 = PopulationUtils.createPerson(Id.create(1, Person.class));
 		Id<Person> person1Id = person1.getId();
 		LegImpl leg = new org.matsim.core.population.LegImpl(TransportMode.car);
 		leg.setDepartureTime(7*3600);

@@ -25,7 +25,7 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.AgentWaitingForPtEvent;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -38,7 +38,7 @@ public class AgentWaitingForPtEventTest {
 
 	@Test
 	public void testReadWriteXml() {
-		Person person = PersonImpl.createPerson(Id.create(1, Person.class));
+		Person person = PopulationUtils.createPerson(Id.create(1, Person.class));
 		Id<TransitStopFacility> waitStopId = Id.create("1980", TransitStopFacility.class);
 		Id<TransitStopFacility> destinationStopId = Id.create("0511", TransitStopFacility.class);
 		double time = 5.0 * 3600 + 11.0 + 60;

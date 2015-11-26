@@ -27,8 +27,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonUtils;
+import org.matsim.core.population.PopulationUtils;
 
 /**
  * Default implementation of {@link Person} interface.
@@ -42,15 +42,15 @@ public class PersonImplPops implements Person {
 	private Id<Population> populationId;
 
 	public PersonImplPops(Id<Person> id) {
-		delegate = PersonImpl.createPerson(id);
+		delegate = PopulationUtils.createPerson(id);
 		this.populationId = DEFAULT_POP_ID;
 	}
 	public PersonImplPops(Id<Person> id, Id<Population> populationId) {
-		delegate = PersonImpl.createPerson(id);
+		delegate = PopulationUtils.createPerson(id);
 		this.populationId = populationId==null?DEFAULT_POP_ID:populationId;
 	}
 	public PersonImplPops(Person person, Id<Population> populationId) {
-		delegate = PersonImpl.createPerson(person.getId());
+		delegate = PopulationUtils.createPerson(person.getId());
 		PersonUtils.setAge(this, PersonUtils.getAge(person));
 		PersonUtils.setCarAvail(this, PersonUtils.getCarAvail(person));
 		PersonUtils.setEmployed(this, PersonUtils.isEmployed(person));

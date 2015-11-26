@@ -36,7 +36,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Injector;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityFactory;
@@ -130,7 +130,7 @@ public class TripRouterFactoryImplTest {
 				new LinkFacility( l1 ),
 				new LinkFacility( l3 ),
 				0,
-				PersonImpl.createPerson(Id.create("toto", Person.class)));
+				PopulationUtils.createPerson(Id.create("toto", Person.class)));
 
 		Leg l = (Leg) trip.get( 0 );
 
@@ -202,7 +202,7 @@ public class TripRouterFactoryImplTest {
 				new LinkFacility( l1 ),
 				new LinkFacility( l3 ),
 				0,
-				PersonImpl.createPerson(Id.create("toto", Person.class)));
+				PopulationUtils.createPerson(Id.create("toto", Person.class)));
 
 		Leg l = (Leg) trip.get( 0 );
 

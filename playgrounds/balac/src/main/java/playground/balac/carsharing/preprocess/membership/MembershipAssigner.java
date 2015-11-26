@@ -16,8 +16,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonUtils;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -195,7 +195,7 @@ public class MembershipAssigner
         log.error("More than one plan for person: " + pi.getId());
       }
       if (PersonUtils.getLicense(pi).equalsIgnoreCase("yes")) {
-        Person personWithLicense = PersonImpl.createPerson(pi.getId());
+        Person personWithLicense = PopulationUtils.createPerson(pi.getId());
         PersonUtils.setAge(personWithLicense, PersonUtils.getAge(pi));
         personWithLicense.addPlan(pi.getSelectedPlan());
         PersonUtils.setCarAvail(personWithLicense, PersonUtils.getCarAvail(pi));

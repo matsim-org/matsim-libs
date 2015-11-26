@@ -20,38 +20,30 @@
 
 package org.matsim.core.population;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.matsim.api.core.v01.Customizable;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.scenario.CustomizableUtils;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeSet;
 /**
  * Default implementation of {@link Person} interface.
  */
 public final class PersonImpl implements Person {
 
-	protected List<Plan> plans = new ArrayList<Plan>(6);
-	protected Id<Person> id;
-
-	private TreeSet<String> travelcards = null;
+	private List<Plan> plans = new ArrayList<Plan>(6);
+	private Id<Person> id;
 
 	private Plan selectedPlan = null;
 
 	private Customizable customizableDelegate;
 
-	@Deprecated // please try to use the factory: pop.getFactory().create...
-	 PersonImpl(final Id<Person> id) {
+	/* deliberately package */ PersonImpl(final Id<Person> id) {
 		this.id = id;
-	}
-
-	public static Person createPerson(final Id<Person> id) {
-		return new PersonImpl(id);
 	}
 
 	@Override

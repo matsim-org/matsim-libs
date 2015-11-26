@@ -20,9 +20,9 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
@@ -128,7 +128,7 @@ public class CarTravelTimes {
 			Coord coordEnd = new Coord(Double.parseDouble(arr[7]), Double.parseDouble(arr[8]));
 			Link lEnd = MyLinkUtils.getClosestLink(network, coordEnd);
 			
-			Person person = PersonImpl.createPerson(Id.create(arr[0], Person.class));
+			Person person = PopulationUtils.createPerson(Id.create(arr[0], Person.class));
 			
 			PlanImpl plan = (PlanImpl) sc.getPopulation().getFactory().createPlan();
 			ActivityImpl act = new ActivityImpl("home", lStart.getId());

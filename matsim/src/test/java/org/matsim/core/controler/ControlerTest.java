@@ -55,8 +55,8 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -342,7 +342,7 @@ public class ControlerTest {
 		Leg leg1 = null;
 		Leg leg2 = null;
 
-		person1 = PersonImpl.createPerson(Id.create(1, Person.class));
+		person1 = PopulationUtils.createPerson(Id.create(1, Person.class));
 		// --- plan 1 ---
 		Plan plan1 = factory.createPlan();
 		person1.addPlan(plan1);
