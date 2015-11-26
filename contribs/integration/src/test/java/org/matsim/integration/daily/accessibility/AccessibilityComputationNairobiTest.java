@@ -130,19 +130,13 @@ public class AccessibilityComputationNairobiTest {
 //		ActivityFacilities homes = AccessibilityRunUtils.collectActivityFacilitiesOfType(scenario, activityFacilityType);
 
 		
-		// network density Points
-		ActivityFacilitiesFactory aff = new ActivityFacilitiesFactoryImpl();
-		ActivityFacilities networkDensityFacilities = FacilitiesUtils.createActivityFacilities("network_densities");
-		ActivityFacilities measuringPoints = GridUtils.createGridLayerByGridSizeByBoundingBoxV2(xMin, yMin, xMax, yMax, cellSize);
-		for (ActivityFacility measuringPoint : measuringPoints.getFacilities().values() ) {
-			Coord coord = measuringPoint.getCoord();
-			Link link = NetworkUtils.getNearestLink(scenario.getNetwork(), coord);
-			double distance = ((LinkImpl) link).calcDistance(coord);
-			if (distance <= cellSize/2.) {
-				ActivityFacility facility = aff.createActivityFacility(measuringPoint.getId(), coord);
-				networkDensityFacilities.addActivityFacility(facility);
-			}
-		}		
+		// network density points
+		ActivityFacilities measuringPoints = 
+				AccessibilityRunUtils.createMeasuringPointsFromNetwork(scenario.getNetwork(), cellSize);
+		
+		double maximumAllowedDistance = 0.5 * cellSize;
+		ActivityFacilities networkDensityFacilities = AccessibilityRunUtils.createNetworkDensityFacilities(
+				scenario.getNetwork(), measuringPoints, maximumAllowedDistance);		
 		
 
 		Map<String, ActivityFacilities> activityFacilitiesMap = new HashMap<String, ActivityFacilities>();
