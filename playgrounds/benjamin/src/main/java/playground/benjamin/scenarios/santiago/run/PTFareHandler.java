@@ -37,6 +37,7 @@ import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.controler.Controler;
+import org.matsim.pt.PtConstants;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.Vehicles;
 
@@ -46,14 +47,15 @@ import playground.benjamin.scenarios.santiago.population.SantiagoScenarioBuilder
 /**
  * Calculates public transport fares for the Santiago scenario.
  * The full fare scheme is available under http://www.transantiago.cl/tarifas-y-pagos/conoce-las-tarifas.
- * TODO: Keep track of interchanges so a reduced/no additional fare is charged; see e.g. StageContainer2AgentMoneyEvent
- * TODO: Integrate different pricing for peak/offPeak interchanges. 
- * TODO: Integrate studentSeniorFare?
+ * 
+ * Currently, interchanges do not cost any money.
+ * TODO: Integrate different fares for peak/offPeak interchanges between metro and bus. 
+ * TODO: Integrate studentSeniorFare
  * 
  * @author benjamin
  * 
  */
-public class PTFareHandler implements PersonDepartureEventHandler, PersonEntersVehicleEventHandler {
+public class PTFareHandler implements ActivityStartEventHandler, PersonDepartureEventHandler, PersonEntersVehicleEventHandler {
 	private static final Logger log = Logger.getLogger(PersonDepartureEventHandler.class);
 
 	private final double peakFare = -720.;
@@ -79,6 +81,7 @@ public class PTFareHandler implements PersonDepartureEventHandler, PersonEntersV
 	private Vehicles transitVehicles;
 	private Population population;
 	private Set<String> ptModes;
+	private Set<Id<Person>> personsOnPtTrip = new HashSet<Id<Person>>();
 	
 	public PTFareHandler(final Controler controler, boolean doModeChoice, Population population){
 		this.controler = controler;
@@ -93,7 +96,18 @@ public class PTFareHandler implements PersonDepartureEventHandler, PersonEntersV
 
 	@Override
 	public void reset(int iteration) {
-		//nothing to do
+		personsOnPtTrip.clear();
+	}
+
+	@Override
+	public void handleEvent(ActivityStartEvent event) {
+		if(event.getActType().equals(PtConstants.TRANSIT_ACTIVITY_TYPE)){
+			// do nothing
+		} else {
+			if(personsOnPtTrip.contains(event.getPersonId())){
+				personsOnPtTrip.remove(event.getPersonId()); // person started activity, i.e. trip is finished
+			}
+		}
 	}
 	
 	//only if mode choice is ON (i.e. transit vehicles are there)
@@ -110,10 +124,15 @@ public class PTFareHandler implements PersonDepartureEventHandler, PersonEntersV
 				// person is entering a non-transit vehicle; no fare to pay.
 			} else {
 				if(population.getPersons().get(pid) == null){
-					//this is a TransitDriverAgent who should not pay fare!
+					//this is a TransitDriverAgent who should not pay fare.
 				} else {
-					double fare = getTimedependentFare(time);
-					this.controler.getEvents().processEvent(new PersonMoneyEvent(time, pid, fare));
+					if(personsOnPtTrip.contains(pid)){
+						// person has already paid fare for this trip.
+					} else {
+						double fare = getTimedependentFare(time);
+						this.controler.getEvents().processEvent(new PersonMoneyEvent(time, pid, fare));
+						personsOnPtTrip.add(pid);
+					}
 				}
 			}
 		}

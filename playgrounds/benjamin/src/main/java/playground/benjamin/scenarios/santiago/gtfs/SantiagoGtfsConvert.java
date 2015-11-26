@@ -84,7 +84,8 @@ public class SantiagoGtfsConvert {
 		removeNetworkRoutes(ts);
 		
 		// There are (most likely) wrongly coded departures at midnight; thus, deleting them...
-		removeMidnightDepartures(ts);
+		// TODO: cannot delete departures only, other adjustments in schedule need to be done.
+//		removeMidnightDepartures(ts);
 		
 		Network transitNet = NetworkUtils.createNetwork();
 		CreatePseudoNetwork creator = new CreatePseudoNetwork(ts, transitNet, TransportMode.pt);

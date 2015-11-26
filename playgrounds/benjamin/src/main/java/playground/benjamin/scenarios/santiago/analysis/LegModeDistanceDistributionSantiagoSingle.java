@@ -38,9 +38,10 @@ import playground.vsp.analysis.modules.legModeDistanceDistribution.LegModeDistan
 public class LegModeDistanceDistributionSantiagoSingle {
 	private final static Logger logger = Logger.getLogger(LegModeDistanceDistributionSantiagoSingle.class);
 	
-	static String baseFolder = "../../../runs-svn/santiago/run32/output/";
+	static String baseFolder = "../../../runs-svn/santiago/run37/output/";
 	static String configFile = baseFolder + "output_config.xml.gz";
-	static String iteration = "0";
+//	static String iteration = "0";
+	static String iteration = "50";
 	
 	//TODO: adapt this to agentAttributes
 	static UserGroup userGroup = null;

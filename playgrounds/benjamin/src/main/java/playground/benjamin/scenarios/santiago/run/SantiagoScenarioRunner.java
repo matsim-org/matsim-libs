@@ -55,7 +55,7 @@ public class SantiagoScenarioRunner {
 
 //	private static String inputPath = "../../../runs-svn/santiago/run20/input/";
 //	private static boolean doModeChoice = false;
-	private static String inputPath = "../../../runs-svn/santiago/run33/input/";
+	private static String inputPath = "../../../runs-svn/santiago/run40/input/";
 	private static boolean doModeChoice = true;
 	
 	public static void main(String args[]){

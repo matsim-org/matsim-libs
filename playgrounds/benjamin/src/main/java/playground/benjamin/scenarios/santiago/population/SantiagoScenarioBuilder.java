@@ -94,7 +94,7 @@ public class SantiagoScenarioBuilder {
 	
 //	final String pathForMatsim = "../../../runs-svn/santiago/run20/";
 //	final boolean prepareForModeChoice = false;
-	final String pathForMatsim = "../../../runs-svn/santiago/run33/";
+	final String pathForMatsim = "../../../runs-svn/santiago/run34/";
 	final boolean prepareForModeChoice = true;
 	
 	final int writeStuffInterval = 50;
@@ -666,7 +666,8 @@ public class SantiagoScenarioBuilder {
 		pcs.setFractionOfIterationsToStartScoreMSA(0.8);
 //		pcs.setLateArrival_utils_hr(-18.0);
 		pcs.setLearningRate(1.0);
-		pcs.setMarginalUtilityOfMoney(0.0023);
+		double marginalUtlOfMoney = 0.0023;
+		pcs.setMarginalUtilityOfMoney(marginalUtlOfMoney);
 		pcs.setPerforming_utils_hr(4.014);
 		pcs.setUsingOldScoringBelowZeroUtilityDuration(false);
 //		pcs.setUtilityOfLineSwitch(-1.0);
@@ -687,13 +688,16 @@ public class SantiagoScenarioBuilder {
 		rideParams.setMonetaryDistanceRate(-0.0);
 		pcs.addModeParams(rideParams);
 		
+		// fare from Alejandro (Seremi de Transportes y Telecommunicationes de la Region Metropolitana):
+		// in 2013: 250 Pesos fixed fare; 120 Pesos per 200m
 		ModeParams taxiParams = new ModeParams(SantiagoScenarioConstants.Modes.taxi.toString());
-		taxiParams.setConstant(0.0);
+		taxiParams.setConstant(marginalUtlOfMoney * (-250.));
 //		taxiParams.setMarginalUtilityOfDistance(0.0);
 		taxiParams.setMarginalUtilityOfTraveling(-1.056);
-		taxiParams.setMonetaryDistanceRate(-1.0); //see http://www.numbeo.com/taxi-fare/city_result.jsp?country=Chile&city=Santiago
+		taxiParams.setMonetaryDistanceRate(-0.6);
 		pcs.addModeParams(taxiParams);
 		
+		// some things on colectivos, see http://www.ubicatucolectivo.cl/cliente_final/all_lines/vercion_1.php?id=14
 		ModeParams colectivoParams = new ModeParams(SantiagoScenarioConstants.Modes.colectivo.toString());
 		colectivoParams.setConstant(0.0);
 //		colectivoParams.setMarginalUtilityOfDistance(0.0);
@@ -728,7 +732,9 @@ public class SantiagoScenarioBuilder {
 			
 		} else {
 			ModeParams ptParams = new ModeParams(TransportMode.pt);
-			ptParams.setConstant(-1.0);
+//			walkParams.setConstant(0.0);
+//			walkParams.setConstant(-1.0);
+			ptParams.setConstant(-1.0575263095);
 //			ptParams.setMarginalUtilityOfDistance(0.0);
 			ptParams.setMarginalUtilityOfTraveling(-1.056);
 			ptParams.setMonetaryDistanceRate(-0.0);
@@ -739,7 +745,8 @@ public class SantiagoScenarioBuilder {
 		 * */
 		
 		ModeParams walkParams = new ModeParams(TransportMode.walk);
-		walkParams.setConstant(0.0);
+//		walkParams.setConstant(0.0);
+		walkParams.setConstant(-0.1432823063);
 //		walkParams.setMarginalUtilityOfDistance(0.0);
 		walkParams.setMarginalUtilityOfTraveling(-1.056);
 		walkParams.setMonetaryDistanceRate(-0.0);
@@ -836,9 +843,7 @@ public class SantiagoScenarioBuilder {
 	}
 	
 	private void setQSimParameters(QSimConfigGroup qsim, double sampleSizeEOD){
-		// TODO: avoiding wrongly coded pt departures at midnight; would be better to get them out of the transitschedule (see comments there). 
-//		qsim.setStartTime(0 * 3600);
-		qsim.setStartTime(2 * 3600);
+		qsim.setStartTime(0 * 3600);
 		qsim.setEndTime(30 * 3600);
 		double flowCapFactor = (sampleSizeEOD / SantiagoScenarioConstants.N);
 		qsim.setFlowCapFactor(flowCapFactor);

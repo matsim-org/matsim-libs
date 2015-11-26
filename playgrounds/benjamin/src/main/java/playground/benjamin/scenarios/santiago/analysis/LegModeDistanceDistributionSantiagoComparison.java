@@ -40,8 +40,7 @@ import playground.vsp.analysis.modules.legModeDistanceDistribution.LegModeDistan
 public class LegModeDistanceDistributionSantiagoComparison {
 	private final static Logger logger = Logger.getLogger(LegModeDistanceDistributionSantiagoComparison.class);
 	
-//	static String baseFolder1 = "../../../runs-svn/detEval/mobilTUM/run20/";
-	static String baseFolder1 = "../../../runs-svn/santiago/run32/output/";
+	static String baseFolder1 = "../../../runs-svn/santiago/run40/output/";
 	static String configFile1 = baseFolder1 + "output_config.xml.gz";
 	static String iteration1 = "0";
 	
@@ -75,9 +74,11 @@ public class LegModeDistanceDistributionSantiagoComparison {
 			if(anaModule instanceof LegModeDistanceDistribution){
 				((LegModeDistanceDistribution) anaModule).setMode2DistanceClass2LegCount(modeDifference2DistanceClassLegCount);
 				((LegModeDistanceDistribution) anaModule).setMode2Share(mode2ShareDifference);
-				anaModule.writeResults(baseFolder1  + "ITERS/it." + iteration1 + 
-						"/defaultAnalysis/" + anaModule.getName() + "/"
-						+ iteration2 + "-" + iteration1 + ".");
+
+				anaModule.writeResults(baseFolder1 + iteration2 + "-" + iteration1 + ".");
+//				anaModule.writeResults(baseFolder1  + "ITERS/it." + iteration1 + 
+//						"/defaultAnalysis/" + anaModule.getName() + "/"
+//						+ iteration2 + "-" + iteration1 + ".");
 			}	
 		}
 		// end ugly code...
