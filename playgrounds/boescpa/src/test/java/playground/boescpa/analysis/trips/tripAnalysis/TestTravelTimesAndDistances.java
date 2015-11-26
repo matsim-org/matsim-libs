@@ -59,7 +59,7 @@ public class TestTravelTimesAndDistances {
 		
 		// run postprocessing
         new TripWriter().writeTrips(trips, this.utils.getOutputDirectory() + "tripResults.txt");
-        HashMap<String, Double[]> results = ravelTimesAndDistances.calcTravelTimeAndDistance(trips, this.utils.getOutputDirectory() + "analResults.txt");
+        HashMap<String, Double[]> results = TravelTimesAndDistances.calcTravelTimeAndDistance(trips, this.utils.getOutputDirectory() + "analResults.txt");
         Double[] car = results.get("car");
         Double[] pt = results.get("pt");
         Double[] transit_walk = results.get("transit_walk");
