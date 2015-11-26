@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.boescpa.projects.topdad.postprocessing;
+package playground.boescpa.analysis.trips.tripAnalysis;
 
 import org.junit.Assert;
 import org.junit.Rule;
@@ -40,7 +40,7 @@ import java.util.List;
  * @author pboesch
  *
  */
-public class TestTopdadTripCreator {
+public class TestTravelTimesAndDistances {
 	
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 	
@@ -59,15 +59,15 @@ public class TestTopdadTripCreator {
 		
 		// run postprocessing
         new TripWriter().writeTrips(trips, this.utils.getOutputDirectory() + "tripResults.txt");
-        HashMap<String, Object> results = TopdadTripCreator.calcTravelTimeAndDistance(trips, this.utils.getOutputDirectory() + "analResults.txt");
-        Double[] car = (Double[]) results.get("car");
-        Double[] pt = (Double[]) results.get("pt");
-        Double[] transit_walk = (Double[]) results.get("transit_walk");
+        HashMap<String, Double[]> results = TravelTimesAndDistances.calcTravelTimeAndDistance(trips, this.utils.getOutputDirectory() + "analResults.txt");
+        Double[] car = results.get("car");
+        Double[] pt = results.get("pt");
+        Double[] transit_walk = results.get("transit_walk");
 
 		// TripProcessing.analyzeTrips - Time tests
-		Assert.assertEquals("Test: TripProcessing.analyzeTrips - car mode time sum not as expected.", 7375.53, car[0], 0.01);
-		Assert.assertEquals("Test: TripProcessing.analyzeTrips - pt mode time sum not as expected.", 25675.47, pt[0], 0.01);
-		Assert.assertEquals("Test: TripProcessing.analyzeTrips - transit_walk mode time sum not as expected.", 20605.08, transit_walk[0], 0.01);
+		Assert.assertEquals("Test: TripProcessing.analyzeTrips - car mode time sum not as expected.", 442532, car[0], 0);
+		Assert.assertEquals("Test: TripProcessing.analyzeTrips - pt mode time sum not as expected.", 1540528, pt[0], 0);
+		Assert.assertEquals("Test: TripProcessing.analyzeTrips - transit_walk mode time sum not as expected.", 1236305, transit_walk[0], 0);
 		// TripProcessing.analyzeTrips - Distance tests
 		Assert.assertEquals("Test: TripProcessing.analyzeTrips - car mode distance sum not as expected.", 5256000.00, car[1], 0);
 		Assert.assertEquals("Test: TripProcessing.analyzeTrips - pt mode distance sum not as expected.", 2334138.27, pt[1], 0.01);
