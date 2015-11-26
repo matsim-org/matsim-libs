@@ -24,7 +24,8 @@ import org.matsim.facilities.FacilitiesUtils;
 public class AccessibilityRunUtils {
 	
 	/**
-	 * collects all facilities of a given type that have been loaded to the sceanrio
+	 * Collects all facilities of a given type that have been loaded to the sceanrio.
+	 * 
 	 * @param scenario
 	 * @param activityFacilityType
 	 * @return
@@ -43,7 +44,8 @@ public class AccessibilityRunUtils {
 
 	
 	/**
-	 * collects the types of all facilities that have been loaded to the scenario
+	 * Collects the types of all facilities that have been loaded to the scenario.
+	 * 
 	 * @param scenario
 	 * @return
 	 */
@@ -62,7 +64,7 @@ public class AccessibilityRunUtils {
 
 	
 	/**
-	 * goes through a given set of measuring points and creates a facility on the measuring point if the
+	 * Goes through a given set of measuring points and creates a facility on the measuring point if the
 	 * nearest link from that measure point lies within a specified maximum allowed distance. The presence
 	 * of such networkDensityFacilites can then be used to plot a density layer, e.g. to excluded tiles
 	 * from being drawn if there is no network. The network density is thereby used as a proxy for settlement
@@ -92,7 +94,8 @@ public class AccessibilityRunUtils {
 
 
 	/**
-	 * creates measuring points based on the scenario's network and a specified cell size
+	 * Creates measuring points based on the scenario's network and a specified cell size.
+	 * 
 	 * @param scenario
 	 * @param cellSize
 	 * @return
@@ -111,7 +114,8 @@ public class AccessibilityRunUtils {
 	
 	
 	/**
-	 * calculates the sum of the values of a given list
+	 * Calculates the sum of the values of a given list.
+	 * 
 	 * @param valueList
 	 * @return sum
 	 */
@@ -125,7 +129,11 @@ public class AccessibilityRunUtils {
 	
 	
 	/**
-	 * calculates Gini coefficient of the values of a given values
+	 * Calculates Gini coefficient of the values of a given values. The Gini Coefficient is equals to the half of
+	 * the relative mean absolute difference (RMD).
+	 * 
+	 * @see <a href="https://en.wikipedia.org/wiki/Gini_coefficient">
+	 * @see <a href="https://en.wikipedia.org/wiki/Mean_absolute_difference#Relative_mean_absolute_difference">
 	 * @param valueList
 	 * @return giniCoefficient
 	 */
