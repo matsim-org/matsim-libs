@@ -22,11 +22,13 @@
 package playground.boescpa.converters.visum;
 
 import org.apache.log4j.Logger;
+import playground.boescpa.analysis.trips.TripReader;
 import playground.boescpa.converters.visum.obj.VisumTrip;
-import playground.boescpa.analysis.trips.tripReader.Trip;
+import playground.boescpa.analysis.trips.Trip;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Provides the main method to create OD-matrices for visum
@@ -37,7 +39,7 @@ import java.util.HashMap;
 public class CreateODMatrixFromTripsAndShapes {
 	
 	private static Logger log = Logger.getLogger(CreateODMatrixFromTripsAndShapes.class);
-	private static HashMap<Long, VisumTrip> tripCollection;
+	private static List<VisumTrip> tripCollection;
 		
 	public static void main(String[] args) {
 		
@@ -49,9 +51,9 @@ public class CreateODMatrixFromTripsAndShapes {
 		int time = Integer.parseInt(args[5]); // Beginning of the 24-hour hour, for which OD-matrix. E.g. if from 17.00 to 18.00 then argument: "17". If full 24h, then "-1" for the hour.;
 		
 		log.info("Reading trip file...");
-		HashMap<Long, Trip> tempTripCollection = Trip.createTripCollection(sourceTripFile);
-		for (Long tripId : tempTripCollection.keySet()) {
-			tripCollection.put(tripId, new VisumTrip(tempTripCollection.get(tripId).toString().split("\t")));
+		List<Trip> tempTripCollection = TripReader.createTripCollection(sourceTripFile);
+		for (Trip tempTrip : tempTripCollection) {
+			tripCollection.add(new VisumTrip(tempTrip));
 		}
 		log.info("Reading trip file...done.");
 		

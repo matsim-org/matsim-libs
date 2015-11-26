@@ -47,6 +47,7 @@ public class ZoneSetLAU2Class {
     public void apply(ZoneCollection zones) {
         for(Zone zone : zones.getZones()) {
             String inhabitantsVal = zone.getAttribute(ZoneData.POPULATION_KEY);
+//            String inhabitantsVal = zone.getAttribute("EWZ");
             if(inhabitantsVal != null) {
                 double inhabitants = Double.parseDouble(inhabitantsVal);
                 String category = inhabitants2Class(inhabitants);
