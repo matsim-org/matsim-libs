@@ -1,4 +1,4 @@
-package playground.boescpa.ivtBaseline.preparation;
+package playground.boescpa.analysis;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
@@ -22,11 +22,11 @@ public class ActivityAnalyzer {
 
     private final Map<String, Integer> actChains;
 
-    protected ActivityAnalyzer() {
+    public ActivityAnalyzer() {
         actChains = new HashMap<>();
     }
 
-    protected void addActChain(final String actChain) {
+    public void addActChain(final String actChain) {
         if (actChains.containsKey(actChain)) {
             actChains.put(actChain, actChains.get(actChain) + 1);
         } else {
@@ -34,7 +34,7 @@ public class ActivityAnalyzer {
         }
     }
 
-    protected void analyzePopulation(final Population population) {
+    public void analyzePopulation(final Population population) {
         String actChain;
         for (Person p : population.getPersons().values()) {
             if (p.getSelectedPlan() != null) {
@@ -53,7 +53,7 @@ public class ActivityAnalyzer {
         }
     }
 
-    protected void printActChainAnalysis(final String pathToOutputFile) {
+    public void printActChainAnalysis(final String pathToOutputFile) {
         try {
             BufferedWriter writer = IOUtils.getBufferedWriter(pathToOutputFile);
             for (String actChain : actChains.keySet()) {
@@ -66,7 +66,7 @@ public class ActivityAnalyzer {
         }
     }
 
-    protected void printActChainAnalysis() {
+    public void printActChainAnalysis() {
         log.info("");
         log.info("The following act chains were found in the population:");
         for (String actChain : actChains.keySet()) {
