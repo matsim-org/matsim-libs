@@ -7,7 +7,6 @@ import playground.boescpa.analysis.scenarioAnalyzer.ScenarioAnalyzer;
 import playground.boescpa.analysis.scenarioAnalyzer.eventHandlers.*;
 import playground.boescpa.analysis.spatialCutters.NoCutter;
 import playground.boescpa.analysis.trips.*;
-import playground.boescpa.analysis.trips.tripAnalysis.TravelTimesAndDistances;
 import playground.boescpa.lib.tools.NetworkUtils;
 import playground.boescpa.lib.tools.PopulationUtils;
 

@@ -14,8 +14,8 @@ import java.util.List;
  *
  * @author boescpa
  */
-public class TravelTimesAndDistances {
-    private static Logger log = Logger.getLogger(TravelTimesAndDistances.class);
+public class ravelTimesAndDistances {
+    private static Logger log = Logger.getLogger(ravelTimesAndDistances.class);
 
     /**
      * Calculates the total travel distance and travel time per mode
