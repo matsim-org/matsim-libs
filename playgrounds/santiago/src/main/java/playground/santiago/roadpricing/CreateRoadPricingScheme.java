@@ -42,9 +42,9 @@ public class CreateRoadPricingScheme {
 
 	private static final Logger log = Logger.getLogger(CreateCountingStations.class) ;
 
-	private static final String svnWorkingDir = "../../shared-svn/"; 	//Path: KT (SVN-checkout)
-	private static final String workingDirInputFiles = svnWorkingDir + "Kai_und_Daniel/inputFromElsewhere/exportedFilesFromDatabase/" ;
-	private static final String outputDir = svnWorkingDir + "Kai_und_Daniel/inputForMATSim/roadpricing/" ; //outputDir of this class -> input for Matsim (KT)
+	private static final String svnWorkingDir = "../../../shared-svn/projects/santiago/";	//Path: KT (SVN-checkout)
+	private static final String workingDirInputFiles = svnWorkingDir + "scenario/inputFromElsewhere/exportedFilesFromDatabase/" ;
+	private static final String outputDir = svnWorkingDir + "scenario/inputForMATSim/roadpricing/" ; //outputDir of this class -> input for Matsim (KT)
 
 	//Data of tolled links (Input from Alejandro) 
 	private static final String TollDataFILE = workingDirInputFiles + ".csv" ; //TODO: Name and include it

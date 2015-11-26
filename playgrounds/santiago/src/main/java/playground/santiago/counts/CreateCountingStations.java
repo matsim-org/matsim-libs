@@ -39,16 +39,16 @@ public class CreateCountingStations {
 
 	private static final Logger log = Logger.getLogger(CreateCountingStations.class) ;
 
-	private static final String svnWorkingDir = "../../../shared-svn/studies/countries/cl/"; 	//Path: KT (SVN-checkout)
-	private static final String workingDirInputFiles = svnWorkingDir + "Kai_und_Daniel/inputFromElsewhere/exportedFilesFromDatabase/" ;
-	private static final String outputDir = svnWorkingDir + "Kai_und_Daniel/inputForMATSim/counts/" ; //outputDir of this class -> input for Matsim (KT)
+	private static final String svnWorkingDir = "../../../shared-svn/projects/santiago/scenario/";	//Path: KT (SVN-checkout)
+	private static final String workingDirInputFiles = svnWorkingDir + "inputFromElsewhere/exportedFilesFromDatabase/" ;
+	private static final String outputDir = svnWorkingDir + "inputForMATSim/counts/" ; //outputDir of this class -> input for Matsim (KT)
 
 	//A: Position (linkId) of counting stations
 	private static final String CSIdFILE_NAME = "CSId-LinkId_merged";		
 	private static final String CSIdFILE = workingDirInputFiles + "../counts/" + CSIdFILE_NAME + ".csv" ;
 
 	//B: recent network-File
-	private static final String NETFILE = svnWorkingDir + "Kai_und_Daniel/inputForMATSim/network/network_merged_cl.xml.gz";	
+	private static final String NETFILE = svnWorkingDir + "inputForMATSim/network/network_merged_cl.xml.gz";	
 
 
 	//TODO: Integrate this class to the network creation? (kt 2015-08-15)

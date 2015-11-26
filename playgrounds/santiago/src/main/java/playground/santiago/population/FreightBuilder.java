@@ -51,16 +51,16 @@ import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.core.utils.io.IOUtils;
 import org.opengis.feature.simple.SimpleFeature;
 
-public class Freight {
+public class FreightBuilder {
 
-	private static final String svnWorkingDir = "../../../shared-svn/studies/countries/cl/"; 	//Path: KT (SVN-checkout)
-	private static final String workingDirInputFiles = svnWorkingDir + "Kai_und_Daniel/inputFromElsewhere/exportedFilesFromDatabase/" ;
-	private static final String outputDir = svnWorkingDir + "Kai_und_Daniel/inputForMATSim/plans/" ; //outputDir of this class -> input for Matsim (KT)
+	private static final String svnWorkingDir = "../../../shared-svn/projects/santiago/scenario/"; 	//Path: KT (SVN-checkout)
+	private static final String workingDirInputFiles = svnWorkingDir + "inputFromElsewhere/exportedFilesFromDatabase/" ;
+	private static final String outputDir = svnWorkingDir + "inputForMATSim/plans/" ; //outputDir of this class -> input for Matsim (KT)
 
 	private static Map<String, Coord> zonaId2Coord = new HashMap<String, Coord>();
 	private static Map<String, FreightTrip> tripId2FreightTrip = new HashMap<String, FreightTrip>(); 
 
-	private static final Logger log = Logger.getLogger(Freight.class);
+	private static final Logger log = Logger.getLogger(FreightBuilder.class);
 
 	//TODO: Pläne aus den Informationen erstellen (Haben nur 2 Aktivitäten: Start und Zielort. Muss aber getrennt erfolgen, 
 	// da für Outgoing Verkehr die Startzeit unbekannt ist.) -> Alternativ: Rundtrip draus machen

@@ -100,15 +100,10 @@ public class SantiagoScenarioBuilder {
 	final int writeStuffInterval = 50;
 	final int nrOfThreads = 6;
 
-	final String svnWorkingDir = "../../../shared-svn/studies/countries/cl/";
-	final String workingDirInputFiles = svnWorkingDir + "Kai_und_Daniel/inputFromElsewhere/";
-	final String boundariesInputDir = workingDirInputFiles + "exported_boundaries/";
-	final String databaseFilesDir = workingDirInputFiles + "exportedFilesFromDatabase/";
-	final String visualizationsDir = workingDirInputFiles + "Visualisierungen/";
-	final String outputDir = svnWorkingDir + "Kai_und_Daniel/inputForMATSim/";
-	
-	final String transitFilesDir = svnWorkingDir + "santiago_pt_demand_matrix/pt_stops_schedule_2013/";
-	final String gtfsFilesDir = svnWorkingDir + "santiago_pt_demand_matrix/gtfs_201306/";
+	final String svnWorkingDir = "../../../shared-svn/projects/santiago/scenario/";
+	final String boundariesInputDir = svnWorkingDir + "inputFromElsewhere/exported_boundaries/";
+	final String databaseFilesDir = svnWorkingDir + "inputFromElsewhere/exportedFilesFromDatabase/";
+	final String outputDir = svnWorkingDir + "inputForMATSim/";
 	
 	final String popA0eAX = "A0equalAX";		//Population with first Activity = last Activity
 	final String popA0neAX = "A0NoNequalAX";	//Population with first Activity != last Activity

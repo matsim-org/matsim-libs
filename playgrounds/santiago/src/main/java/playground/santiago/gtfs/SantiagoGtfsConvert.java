@@ -59,8 +59,8 @@ public class SantiagoGtfsConvert {
 	private static final Logger log = Logger.getLogger(SantiagoGtfsConvert.class);
 
 	public static void main( String[] args ) {
-		final String inputPath = "../../../shared-svn/studies/countries/cl/santiago_pt_demand_matrix/gtfs_201306";
-		final String outputPath = "../../../shared-svn/studies/countries/cl/Kai_und_Daniel/inputForMATSim/transit";
+		final String inputPath = "../../../shared-svn/projects/santiago/santiago_pt_demand_matrix/gtfs_201306";
+		final String outputPath = "../../../shared-svn/projects/santiago/scenario/inputForMATSim/transit";
 
 		CoordinateTransformation transform  = TransformationFactory.getCoordinateTransformation("EPSG:4326", SantiagoScenarioConstants.toCRS);
 //		CoordinateTransformation transform0  = new WGS84toCH1903LV03() ;
