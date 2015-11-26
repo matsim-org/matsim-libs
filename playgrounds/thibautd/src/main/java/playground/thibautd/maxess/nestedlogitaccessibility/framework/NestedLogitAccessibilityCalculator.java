@@ -187,6 +187,7 @@ public class NestedLogitAccessibilityCalculator<N extends Enum<N>> {
 			stopWatch.startMeasurement( Measurement.logsumComputation );
 			final LogSumExpCalculator calculator = new LogSumExpCalculator( choiceSet.getNests().size() );
 			for ( Nest<N> nest : choiceSet.getNests() ) {
+				if ( nest.getAlternatives().isEmpty() ) continue;
 				calculator.addTerm( logSumNestUtilities( p , nest ) );
 			}
 
@@ -199,6 +200,7 @@ public class NestedLogitAccessibilityCalculator<N extends Enum<N>> {
 				final Person p,
 				final Nest<N> nest ) {
 			final LogSumExpCalculator calculator = new LogSumExpCalculator( nest.getAlternatives().size() );
+			assert !nest.getAlternatives().isEmpty();
 			for ( Alternative<N> alternative : nest.getAlternatives() ) {
 				calculator.addTerm( nest.getMu_n() *
 								model.getUtility().calcUtility(
@@ -228,6 +230,7 @@ public class NestedLogitAccessibilityCalculator<N extends Enum<N>> {
 		}
 
 		public double computeLogsumExp() {
+			if ( terms.isEmpty() ) throw new IllegalStateException( "nothing to sum!" );
 			// under and overflow avoidance
 			// see http://jblevins.org/log/log-sum-exp
 			// Note that this can only avoid underflow OR overflow,
