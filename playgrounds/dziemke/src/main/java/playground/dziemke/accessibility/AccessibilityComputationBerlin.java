@@ -7,13 +7,19 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
 import org.matsim.contrib.accessibility.FacilityTypes;
 import org.matsim.contrib.accessibility.GridBasedAccessibilityControlerListenerV3;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
+import org.matsim.contrib.accessibility.utils.AccessibilityRunUtils;
 import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtRouterConfigGroup;
+import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
+import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -47,9 +53,17 @@ public class AccessibilityComputationBerlin {
 //		String travelTimeMatrix = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/pt/be_04/travelTimeMatrix.csv.gz";
 //		String travelDistanceMatrix = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/pt/be_04/travelDistanceMatrix.csv.gz";
 //		String ptStops = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/pt/be_04/stops.csv.gz";
+		
+		String travelTimeMatrixFile = "../../matsimExamples/countries/za/nmb/regular-pt/travelTimeMatrix_space.csv";
+		String travelDistanceMatrixFile = "../../matsimExamples/countries/za/nmb/regular-pt/travelDistanceMatrix_space.csv";
+		String ptStopsFile = "../../matsimExamples/countries/za/nmb/regular-pt/ptStops.csv";
+		
+		
 		LogToOutputSaver.setOutputDirectory(outputDirectory);
+		
 
 		// Parameters
+		boolean createQGisOutput = true;
 //		boolean includeDensityLayer = true;
 		boolean includeDensityLayer = false;
 		String crs = TransformationFactory.DHDN_GK4;
@@ -65,141 +79,74 @@ public class AccessibilityComputationBerlin {
 //		int symbolSize = 210;
 		int symbolSize = 510;
 		int populationThreshold = (int) (200 / (1000/cellSize * 1000/cellSize));
+		
+        double[] mapViewExtent = {4574000-1000, 5802000-1000, 4620000+1000, 5839000+1000};
 				
 				
-//		Config config = ConfigUtils.createConfig( new AccessibilityConfigGroup() ) ;
-		Config config = ConfigUtils.createConfig( new AccessibilityConfigGroup(), new MatrixBasedPtRouterConfigGroup()) ;
-		
-//		AccessibilityConfigGroup acg = (AccessibilityConfigGroup) config.getModule( AccessibilityConfigGroup.GROUP_NAME ) ;
-//		MatrixBasedPtRouterConfigGroup mbpcg = (MatrixBasedPtRouterConfigGroup) config.getModule( MatrixBasedPtRouterConfigGroup.GROUP_NAME);
-		
+		// config and scenario
+		Config config = ConfigUtils.createConfig(new AccessibilityConfigGroup(), new MatrixBasedPtRouterConfigGroup()) ;
 		config.network().setInputFile(networkFile);
 		config.facilities().setInputFile(facilitiesFile);
 		config.controler().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
 		config.controler().setOutputDirectory(outputDirectory);
 		config.controler().setLastIteration(0);
 
-//		config.vspExperimental().setVspDefaultsCheckingLevel( VspDefaultsCheckingLevel.abort );
 
-		// some (otherwise irrelevant) settings to make the vsp check happy:
-//		config.timeAllocationMutator().setMutationRange(7200.);
-//		config.timeAllocationMutator().setAffectingDuration(false);
-//		config.plans().setRemovingUnneccessaryPlanAttributes(true);
-//		config.plans().setActivityDurationInterpretation( PlansConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration );
-//
-//		{
-//			StrategySettings stratSets = new StrategySettings( ConfigUtils.createAvailableStrategyId(config) );
-//			stratSets.setStrategyName( DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta.toString() );
-//			stratSets.setWeight(1.);
-//			config.strategy().addStrategySettings(stratSets);
-//		}
-		
 		Scenario scenario = ScenarioUtils.loadScenario( config ) ;
-		
-//		scenario.getConfig().transit().setUseTransit(true);
-		
-//		mbpcg.setUsingTravelTimesAndDistances(true);
-//		mbpcg.setPtStopsInputFile(ptStops);
-//		mbpcg.setPtTravelTimesInputFile(travelTimeMatrix);
-//		mbpcg.setPtTravelDistancesInputFile(travelDistanceMatrix);
-		
-//		PlansCalcRouteConfigGroup plansCalcRoute = config.plansCalcRoute();
-//        
-//        System.out.println("teleported mode speed factors (1): " + plansCalcRoute.getTeleportedModeFreespeedFactors());
-//        System.out.println("teleported mode speeds (1): " + plansCalcRoute.getTeleportedModeSpeeds());
-//        System.out.println("beeline distance factors (1): " + plansCalcRoute.getBeelineDistanceFactors());
-          
-        // teleported mode speed for pt also required, see PtMatrix:120
-//        ModeRoutingParams ptParameters = new ModeRoutingParams(TransportMode.pt);
-//        ptParameters.setTeleportedModeSpeed(50./3.6);
-//        plansCalcRoute.addModeRoutingParams(ptParameters );
-        
-        // by adding ModeRoutingParams (as done above for pt), the other parameters are deleted
-        // those parameters which are needed, have to be set again to be available.
 
-        // teleported mode speed for walking also required, see PtMatrix:141
-//        ModeRoutingParams walkParameters = new ModeRoutingParams(TransportMode.walk);
-//        walkParameters.setTeleportedModeSpeed(3./3.6);
-//        plansCalcRoute.addModeRoutingParams(walkParameters );
-//        
-//        // teleported mode speed for bike also required, see AccessibilityControlerListenerImpl:168
-//        ModeRoutingParams bikeParameters = new ModeRoutingParams(TransportMode.bike);
-//        bikeParameters.setTeleportedModeSpeed(15./3.6);
-//        plansCalcRoute.addModeRoutingParams(bikeParameters );	
-//		
-//		System.out.println("teleported mode speed factors (2): " + plansCalcRoute.getTeleportedModeFreespeedFactors());
-//		System.out.println("teleported mode speeds (2): " + plansCalcRoute.getTeleportedModeSpeeds());
-//		System.out.println("beeline distance factors (2): " + plansCalcRoute.getBeelineDistanceFactors());
 
-		
-		// new
-//		// adding pt matrix, based on transit stops
-//		// should actually work. Problem is, however, that there are just too many pt stops (for minibus; ca. 36000),
-//		// So, the computation takes forever
-//		// Therefore, use different approach below (only create pt matrix for measuring points)
-//		MatrixBasedPtRouterConfigGroup mbpcg = (MatrixBasedPtRouterConfigGroup) config.getModule( MatrixBasedPtRouterConfigGroup.GROUP_NAME);
-//		// add transit stops
-//		mbpcg.setPtStopsInputFile(ptStopsFile);
-//
-//        PlansCalcRouteConfigGroup plansCalcRoute = config.plansCalcRoute();
-//        
-//        System.out.println("teleported mode speed factors (1): " + plansCalcRoute.getTeleportedModeFreespeedFactors());
-//        System.out.println("teleported mode speeds (1): " + plansCalcRoute.getTeleportedModeSpeeds());
-//        System.out.println("beeline distance factors (1): " + plansCalcRoute.getBeelineDistanceFactors());
-//          
-//        // if no travel matrix (distances and times) is provided, the teleported mode speed for pt needs to be set
-//        ModeRoutingParams ptParameters = new ModeRoutingParams(TransportMode.pt);
-//        ptParameters.setTeleportedModeSpeed(50./3.6);
-//        plansCalcRoute.addModeRoutingParams(ptParameters );
-//        
-//        // by adding ModeRoutingParams (as done above for pt), the other parameters are deleted
-//        // the walk parameters are needed, however. This is why they have to be set here again
-//
-//        ModeRoutingParams walkParameters = new ModeRoutingParams(TransportMode.walk);
-//        plansCalcRoute.addModeRoutingParams(walkParameters );	
-//		
-//		System.out.println("teleported mode speed factors (2): " + plansCalcRoute.getTeleportedModeFreespeedFactors());
-//		System.out.println("teleported mode speeds (2): " + plansCalcRoute.getTeleportedModeSpeeds());
-//		System.out.println("beeline distance factors (2): " + plansCalcRoute.getBeelineDistanceFactors());
-//
-//        BoundingBox nbb = BoundingBox.createBoundingBox(scenario.getNetwork());
-//			
-//		PtMatrix ptMatrix = PtMatrix.createPtMatrix(plansCalcRoute, nbb, mbpcg);
-		// end adding pt matrix
+		// matrix-based pt
+		MatrixBasedPtRouterConfigGroup mbpcg = (MatrixBasedPtRouterConfigGroup) config.getModule(MatrixBasedPtRouterConfigGroup.GROUP_NAME);
+		mbpcg.setPtStopsInputFile(ptStopsFile);
+		mbpcg.setUsingTravelTimesAndDistances(true);
+		mbpcg.setPtTravelDistancesInputFile(travelDistanceMatrixFile);
+		mbpcg.setPtTravelTimesInputFile(travelTimeMatrixFile);
 
-		
-		List<String> activityTypes = new ArrayList<String>() ;
-		ActivityFacilities homes = FacilitiesUtils.createActivityFacilities("homes") ;
-		for ( ActivityFacility fac : scenario.getActivityFacilities().getFacilities().values()  ) {
-			for ( ActivityOption option : fac.getActivityOptions().values() ) {
-				// figure out all activity types
-				if ( !activityTypes.contains(option.getType()) ) {
-					activityTypes.add( option.getType() ) ;
-				}
-				// figure out where the homes are
-//				if ( option.getType().equals("h") ) {
-				if ( option.getType().equals(FacilityTypes.HOME) ) {
-					homes.addActivityFacility(fac);
-				}
-			}
-		}
-		
-//		BoundingBox boundingBox = BoundingBox.createBoundingBox(scenario.getNetwork());
-	
-        
-        
-        double[] mapViewExtent = {4574000-1000, 5802000-1000, 4620000+1000, 5839000+1000};
-			
-//		PtMatrix ptMatrix = PtMatrix.createPtMatrix(plansCalcRoute, boundingBox, mbpcg);
-		// end new
-		
-		Map<String, ActivityFacilities> activityFacilitiesMap = new HashMap<String, ActivityFacilities>();
-		Controler controler = new Controler(scenario) ;
 
+		// plansClacRoute parameters
+		PlansCalcRouteConfigGroup plansCalcRoute = config.plansCalcRoute();
+
+		// if no travel matrix (distances and times) is provided, the teleported mode speed for pt needs to be set
+		// teleported mode speed for pt also required, see PtMatrix:120
+//		ModeRoutingParams ptParameters = new ModeRoutingParams(TransportMode.pt);
+//		ptParameters.setTeleportedModeSpeed(50./3.6);
+//		plansCalcRoute.addModeRoutingParams(ptParameters);
+
+		// by adding ModeRoutingParams (as done above for pt), the other parameters are deleted
+		// the walk and bike parameters are needed, however. This is why they have to be set here again
+
+		// teleported mode speed for walking also required, see PtMatrix:141
+		ModeRoutingParams walkParameters = new ModeRoutingParams(TransportMode.walk);
+		walkParameters.setTeleportedModeSpeed(3./3.6);
+		plansCalcRoute.addModeRoutingParams(walkParameters );
+
+		// teleported mode speed for bike also required, see AccessibilityControlerListenerImpl:168
+		ModeRoutingParams bikeParameters = new ModeRoutingParams(TransportMode.bike);
+		bikeParameters.setTeleportedModeSpeed(15./3.6);
+		plansCalcRoute.addModeRoutingParams(bikeParameters );
+
+		// pt matrix
+		BoundingBox boundingBox = BoundingBox.createBoundingBox(scenario.getNetwork());
+		PtMatrix ptMatrix = PtMatrix.createPtMatrix(plansCalcRoute, boundingBox, mbpcg);
+
+
+		// collect activity types
+		List<String> activityTypes = AccessibilityRunUtils.collectAllFacilityTypes(scenario);
 		log.warn( "found activity types: " + activityTypes );
 		// yyyy there is some problem with activity types: in some algorithms, only the first letter is interpreted, in some
 		// other algorithms, the whole string.  BEWARE!  This is not good software design and should be changed.  kai, feb'14
 
+		// collect homes
+		String activityFacilityType = FacilityTypes.HOME;
+		ActivityFacilities homes = AccessibilityRunUtils.collectActivityFacilitiesOfType(scenario, activityFacilityType);
+
+		
+		Map<String, ActivityFacilities> activityFacilitiesMap = new HashMap<String, ActivityFacilities>();
+		
+		
+		Controler controler = new Controler(scenario) ;
+
+		
 		// loop over activity types to add one GridBasedAccessibilityControlerListenerV3 for each combination
 		for ( String actType : activityTypes ) {
 //			if ( !actType.equals("s") ) {
@@ -207,44 +154,24 @@ public class AccessibilityComputationBerlin {
 //				continue ;
 //			}
 
-			ActivityFacilities opportunities = FacilitiesUtils.createActivityFacilities() ;
-			for ( ActivityFacility fac : scenario.getActivityFacilities().getFacilities().values()  ) {
-				for ( ActivityOption option : fac.getActivityOptions().values() ) {
-					if ( option.getType().equals(actType) ) {
-						opportunities.addActivityFacility(fac);
-					}
-				}
-			}
-
+			ActivityFacilities opportunities = AccessibilityRunUtils.collectActivityFacilitiesOfType(scenario, actType);
+			
 			activityFacilitiesMap.put(actType, opportunities);
 
 			GridBasedAccessibilityControlerListenerV3 listener = 
-					new GridBasedAccessibilityControlerListenerV3(activityFacilitiesMap.get(actType), config, scenario.getNetwork());
-//					new GridBasedAccessibilityControlerListenerV3(activityFacilitiesMap.get(actType), ptMatrix, config, scenario.getNetwork());
-				
-			// define the mode that will be considered
+					new GridBasedAccessibilityControlerListenerV3(activityFacilitiesMap.get(actType), ptMatrix, config, scenario.getNetwork());
 			listener.setComputingAccessibilityForMode(Modes4Accessibility.freeSpeed, true);
 			listener.setComputingAccessibilityForMode(Modes4Accessibility.car, true);
 			listener.setComputingAccessibilityForMode(Modes4Accessibility.walk, true);
 			listener.setComputingAccessibilityForMode(Modes4Accessibility.bike, true);
-//			listener.setComputingAccessibilityForMode(Modes4Accessibility.pt, true);
+			listener.setComputingAccessibilityForMode(Modes4Accessibility.pt, true);
 				
 			listener.addAdditionalFacilityData(homes) ;
 //			listener.generateGridsAndMeasuringPointsByNetwork(cellSize);
 			// Boundaries of Berlin are approx.: 4570000, 4613000, 5836000, 5806000
-			
-			
-			// new; more additional data
-	
-			
-//			listener.addAdditionalFacilityData(lakes);
-			
-			// end new
-			
 			listener.generateGridsAndMeasuringPointsByCustomBoundary(4574000, 5802000, 4620000, 5839000, cellSize);
 //			listener.generateGridsAndMeasuringPointsByCustomBoundary(4590000, 5815000, 4595000, 5820000, cellSize);
 			
-				
 			listener.writeToSubdirectoryWithName(actType);
 				
 			listener.setUrbansimMode(false); // avoid writing some (eventually: all) files that related to matsim4urbansim
@@ -254,27 +181,24 @@ public class AccessibilityComputationBerlin {
 
 		controler.run();
 			
-		String workingDirectory =  config.controler().getOutputDirectory();
-	
-		String osName = System.getProperty("os.name");
-	
-		for (String actType : activityTypes) {
-			String actSpecificWorkingDirectory =  workingDirectory + actType + "/";
 		
-			for ( Modes4Accessibility mode : Modes4Accessibility.values()) {
-//				if ( !actType.equals("s") ) {
-//					RunAccessibilityBe.log.error("skipping everything except work for debugging purposes; remove in production code. kai, feb'14") ;
-//					continue ;
-//				}
-//				if ( !mode.equals(Modes4Accessibility.freeSpeed) ) {
-//					RunAccessibilityBe.log.error("skipping everything except work for debugging purposes; remove in production code. kai, feb'14") ;
-//					continue ;
-//				}
-//				VisualizationUtilsDZ.createQGisOutput(actType, mode, mapViewExtent, workingDirectory, crs, includeDensityLayer);
-				VisualizationUtilsDZ.createQGisOutput(actType, mode, mapViewExtent, workingDirectory, crs, includeDensityLayer,
-						lowerBound, upperBound, range, symbolSize, populationThreshold);
-				VisualizationUtilsDZ.createSnapshot(actSpecificWorkingDirectory, mode, osName);
-			}
+		if (createQGisOutput == true) {
+			String osName = System.getProperty("os.name");
+			String workingDirectory = config.controler().getOutputDirectory();
+
+			for (String actType : activityTypes) {
+				String actSpecificWorkingDirectory = workingDirectory + actType + "/";
+
+				for ( Modes4Accessibility mode : Modes4Accessibility.values()) {
+					if ( !actType.equals("w") ) {
+						log.error("skipping everything except work for debugging purposes; remove in production code. kai, feb'14") ;
+						continue ;
+					}
+					VisualizationUtilsDZ.createQGisOutput(actType, mode, mapViewExtent, workingDirectory, crs, includeDensityLayer,
+							lowerBound, upperBound, range, symbolSize, populationThreshold);
+					VisualizationUtilsDZ.createSnapshot(actSpecificWorkingDirectory, mode, osName);
+				}
+			}  
 		}
 	}
 }
