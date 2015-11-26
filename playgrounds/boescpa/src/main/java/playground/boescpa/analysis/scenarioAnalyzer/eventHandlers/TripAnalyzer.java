@@ -48,7 +48,7 @@ import java.util.Map;
  *
  * @author boescpa
  */
-public class TripAnalyzer implements ScenarioAnalyzerEventHandler, PersonDepartureEventHandler, PersonArrivalEventHandler,
+public class TripAnalyzer extends ScenarioAnalyzerEventHandler implements PersonDepartureEventHandler, PersonArrivalEventHandler,
 		ActivityStartEventHandler, PersonStuckEventHandler, LinkLeaveEventHandler {
 
 	private final TripEventHandler tripHandler;

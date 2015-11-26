@@ -42,7 +42,7 @@ import java.util.List;
  *
  * @author boescpa
  */
-public class TripActivityCrosscorrelator implements ScenarioAnalyzerEventHandler, PersonDepartureEventHandler, PersonArrivalEventHandler,
+public class TripActivityCrosscorrelator extends ScenarioAnalyzerEventHandler implements PersonDepartureEventHandler, PersonArrivalEventHandler,
 		ActivityStartEventHandler, PersonStuckEventHandler, LinkLeaveEventHandler {
 
 	private final TripEventHandler tripHandler;
