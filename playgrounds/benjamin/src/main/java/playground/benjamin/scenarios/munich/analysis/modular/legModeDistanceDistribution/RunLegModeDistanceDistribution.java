@@ -72,7 +72,8 @@ public class RunLegModeDistanceDistribution {
 		List<AbstractAnalysisModule> anaModules = this.analysis.getAnaModules();
 		for(AbstractAnalysisModule anaModule : anaModules){
 			if(anaModule instanceof LegModeDistanceDistribution){
-				anaModule.writeResults(this.iterationOutputDir + "defaultAnalysis/" + anaModule.getName() + "/" + this.iteration + ".");
+				anaModule.writeResults(this.baseFolder + this.iteration + ".");
+//				anaModule.writeResults(this.iterationOutputDir + "defaultAnalysis/" + anaModule.getName() + "/" + this.iteration + ".");
 			}
 		}
 	}

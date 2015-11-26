@@ -21,7 +21,7 @@
 
 package playground.boescpa.av.staticDemand;
 
-import playground.boescpa.analysis.trips.tripReader.Trip;
+import playground.boescpa.analysis.trips.Trip;
 
 import java.util.*;
 

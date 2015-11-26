@@ -28,8 +28,8 @@ import playground.boescpa.analysis.scenarioAnalyzer.eventHandlers.AgentCounter;
 import playground.boescpa.analysis.scenarioAnalyzer.eventHandlers.ScenarioAnalyzerEventHandler;
 import playground.boescpa.analysis.scenarioAnalyzer.eventHandlers.TripActivityCrosscorrelator;
 import playground.boescpa.analysis.scenarioAnalyzer.eventHandlers.TripAnalyzer;
-import playground.boescpa.analysis.scenarioAnalyzer.spatialEventCutters.SHPFileCutter;
-import playground.boescpa.analysis.scenarioAnalyzer.spatialEventCutters.SpatialEventCutter;
+import playground.boescpa.analysis.spatialCutters.SHPFileCutter;
+import playground.boescpa.analysis.spatialCutters.SpatialCutter;
 
 /**
  * Analyzes events file from ToPDAd-Simulations...
@@ -45,7 +45,7 @@ public class AnalyzeScenariosSHP_OnlyZurich {
 		Network network = NetworkUtils.readNetwork(args[0]);
 
 		String shpZurichPath = args[1];
-		SpatialEventCutter zurichCutter = new SHPFileCutter(shpZurichPath);
+		SpatialCutter zurichCutter = new SHPFileCutter(shpZurichPath);
 
 		for (int i = 2; i < args.length; i++) {
 			try {

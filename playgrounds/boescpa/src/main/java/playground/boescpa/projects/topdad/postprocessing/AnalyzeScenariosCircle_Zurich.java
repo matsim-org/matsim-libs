@@ -27,8 +27,8 @@ import playground.boescpa.analysis.scenarioAnalyzer.eventHandlers.AgentCounter;
 import playground.boescpa.analysis.scenarioAnalyzer.eventHandlers.ScenarioAnalyzerEventHandler;
 import playground.boescpa.analysis.scenarioAnalyzer.eventHandlers.TripActivityCrosscorrelator;
 import playground.boescpa.analysis.scenarioAnalyzer.eventHandlers.TripAnalyzer;
-import playground.boescpa.analysis.scenarioAnalyzer.spatialEventCutters.CirclePointCutter;
-import playground.boescpa.analysis.scenarioAnalyzer.spatialEventCutters.SpatialEventCutter;
+import playground.boescpa.analysis.spatialCutters.CirclePointCutter;
+import playground.boescpa.analysis.spatialCutters.SpatialCutter;
 import playground.boescpa.lib.tools.NetworkUtils;
 
 /**
@@ -57,7 +57,7 @@ public class AnalyzeScenariosCircle_Zurich {
 
 				// Return the results:
 				//	Zurich
-				SpatialEventCutter circlePointCutter = new CirclePointCutter(30000, 683518.0, 246836.0); // 30km around Zurich, Bellevue
+				SpatialCutter circlePointCutter = new CirclePointCutter(30000, 683518.0, 246836.0); // 30km around Zurich, Bellevue
 				scenarioAnalyzer.createResults(path2EventFile + "_analysisResults_Zurich.csv", circlePointCutter);
 
 			} catch (Exception e){

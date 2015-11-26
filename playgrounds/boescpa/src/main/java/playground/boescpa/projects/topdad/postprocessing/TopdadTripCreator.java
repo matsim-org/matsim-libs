@@ -21,10 +21,14 @@
 
 package playground.boescpa.projects.topdad.postprocessing;
 
-import playground.boescpa.analysis.trips.tripCreation.TripCreator;
-import playground.boescpa.analysis.trips.tripCreation.TripProcessor;
-import playground.boescpa.analysis.trips.tripCreation.spatialCuttings.CircleBellevueCutting;
-import playground.boescpa.analysis.trips.tripCreation.spatialCuttings.SpatialCuttingStrategy;
+import org.matsim.api.core.v01.network.Network;
+import playground.boescpa.analysis.spatialCutters.CirclePointCutter;
+import playground.boescpa.analysis.trips.*;
+import playground.boescpa.analysis.trips.tripAnalysis.TravelTimesAndDistances;
+import playground.boescpa.lib.tools.NetworkUtils;
+
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * Creates and evaluates trips for topdad-postprocessing.
@@ -33,17 +37,22 @@ import playground.boescpa.analysis.trips.tripCreation.spatialCuttings.SpatialCut
  */
 public class TopdadTripCreator {
 
-	public static void main(String[] args) {
-		String eventsFile = args[0]; // Path to an events-File, e.g. "run.combined.150.events.xml.gz"
-		String networkFile = args[1]; // Path to the network-File used for the simulation resulting in the above events-File, e.g. "multimodalNetwork2030final.xml.gz"
-		String tripFile = args[2]; // Path to the trip-File produced as output, e.g. "trips2030combined.txt"
-		String valueFile = args[3]; // Path to the value-File produced as output, e.g. "vals2030combined.txt"
-		int zoneRadius = Integer.valueOf(args[4]);
+    public static List<Trip> trips;
+    public static HashMap<String, Double[]> travelTimesAndDistances;
 
-		SpatialCuttingStrategy spatialCuttingStrategy = new CircleBellevueCutting(zoneRadius);
-		TripProcessor tripProcessor = new TopdadTripProcessor(tripFile, valueFile, spatialCuttingStrategy);
-		TripCreator tripCreator = new TripCreator(eventsFile, networkFile, tripProcessor);
-		tripCreator.createTrips();
-	}
+    public static void main(String[] args) {
+        String eventsFile = args[0]; // Path to an events-File
+        String networkFile = args[1]; // Path to the network-File used for the simulation resulting in the above events-File
+        String tripFile = args[2]; // Path to the trip-File produced as output
+        String valueFile = args[3]; // Path to the value-File produced as output, e.g. "vals2030combined.txt"
+        int zoneRadius = Integer.valueOf(args[4]);
+
+        Network network = NetworkUtils.readNetwork(networkFile);
+        SpatialTripCutter spatialTripCutter = new SpatialTripCutter(new CirclePointCutter(zoneRadius, 683518.0, 246836.0), network);
+        trips = EventsToTrips.createTripsFromEvents(eventsFile, network);
+        trips = TripFilter.spatialTripFilter(trips, spatialTripCutter);
+        travelTimesAndDistances = TravelTimesAndDistances.calcTravelTimeAndDistance(trips, valueFile);
+        new TripWriter().writeTrips(trips, tripFile);
+    }
 
 }

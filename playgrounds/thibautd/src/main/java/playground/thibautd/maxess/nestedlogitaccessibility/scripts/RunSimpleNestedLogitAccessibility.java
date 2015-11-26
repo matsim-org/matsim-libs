@@ -79,7 +79,7 @@ public class RunSimpleNestedLogitAccessibility {
 			// TODO store and write results
 			final TObjectDoubleMap<Id<Person>> accessibilities = calculator.computeAccessibilities ();
 			module.stopWatch.printStats( TimeUnit.SECONDS );
-			new BasicPersonAccessibilityWriter( scenario , accessibilities ).write( outputDir + "/accessibility_per_person.dat" );
+			new BasicPersonAccessibilityWriter( scenario , accessibilities ).write( outputDir + "/accessibility_per_person.xy" );
 		}
 		finally {
 			MoreIOUtils.closeOutputDirLogging();
