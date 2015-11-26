@@ -25,16 +25,10 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.List;
-
 import org.matsim.core.utils.io.IOUtils;
-
-import com.orientechnologies.orient.core.storage.OStorage.SIZE;
-
 import playground.nmviljoen.network.JungCentrality;
+import playground.nmviljoen.network.generator.ShortestPathCollection;
 import playground.nmviljoen.network.JungClusters;
 import playground.nmviljoen.network.JungGraphDistance;
 import playground.nmviljoen.network.NmvLink;
@@ -44,7 +38,7 @@ import playground.nmviljoen.network.NmvNode;
 import edu.uci.ics.jung.graph.DirectedGraph;
 import edu.uci.ics.jung.graph.DirectedSparseMultigraph;
 import edu.uci.ics.jung.graph.util.EdgeType;
-import edu.uci.ics.jung.algorithms.shortestpath.DijkstraShortestPath;
+
 
 public class GenDirectedNetwork {
 	/** MyNode and MyLink are classes at the end of the script*/
@@ -56,8 +50,8 @@ public class GenDirectedNetwork {
 	}
 	public void constructGridGraph(){
 		//get the linklist
-		int row=50;
-		int col = 50;
+		int row=10;
+		int col = 10;
 		int [][] linkList = Grid.linkList(row, col);
 		double defaultWeight = 1;
 		double defaultTransProb = 1;
@@ -172,6 +166,8 @@ public class GenDirectedNetwork {
 		//Graph distance
 		JungGraphDistance.calculateAndWriteUnweightedDistances(myGraphCalc, filenames[8][0]);
 	}
+	
+
 	public static void main(String[] args) throws FileNotFoundException{
 
 		//filenameVector - GridNetwork
@@ -235,19 +231,17 @@ public class GenDirectedNetwork {
 
 		//		myAppGrid.calcMetrics(myAppGrid.myGraphGrid,nodeListGrid,linkListGrid,filenamesGrid);
 		//		myAppGrid.calcMetrics(myAppGrid.myGraphHub,nodeListHub,linkListHub,filenamesHub);
-
-		//int [][] assocList = LayerGraphs.assocList(linkListGrid, linkListHub, nodeListGrid, nodeListHub);
 		String shortListFile;
 		String assocFile;
-		for (int rep = 0; rep<1000;rep++){
-//			shortListFile = "/Users/nadiaviljoen/Documents/workspace/ArticleRegister/GridNetworkFiles/Malik/fixShortestPath/shortListFile";
+//		for (int rep = 0; rep<1000;rep++){
+			shortListFile = "/Users/nadiaviljoen/Documents/PhD_gridNetwork/GhostProtocol/shortListFiles/shortListFile";
 //			shortListFile =shortListFile.concat(String.valueOf(rep));
-//			shortListFile =shortListFile.concat(".csv");
-			assocFile = "/Users/nadiaviljoen/Documents/workspace/ArticleRegister/GridNetworkFiles/baseline50x50/assocFile/assocFile";
-			assocFile =assocFile.concat(String.valueOf(rep));
-			assocFile =assocFile.concat(".csv");
+			shortListFile =shortListFile.concat("TEST.csv");
+			assocFile = "/Users/nadiaviljoen/Documents/PhD_gridNetwork/GhostProtocol/assocFiles/assocFile";
+//			assocFile =assocFile.concat(String.valueOf(rep));
+			assocFile =assocFile.concat("TEST.csv");
 			int [][] assocList = LayerMalik.assocList(myAppGrid.myGraphGrid,linkListGrid, linkListHub, nodeListGrid, nodeListHub);
-//			ShortestPath.collectShortest(myAppGrid.myGraphGrid,myAppGrid.myGraphHub,linkListGrid, linkListHub, nodeListGrid, nodeListHub, assocList,shortListFile);
+			ShortestPath.collectShortest(myAppGrid.myGraphGrid,myAppGrid.myGraphHub,linkListGrid, linkListHub, nodeListGrid, nodeListHub, assocList,shortListFile);
 			BufferedWriter bw = IOUtils.getBufferedWriter(assocFile);
 			try{
 				bw.write("Malik id, Malik index,Grid id, Grid index");
@@ -265,53 +259,49 @@ public class GenDirectedNetwork {
 				}
 			}
 
-		}
-
-
-		//		int [][] assocList = LayerMalik.assocList(myAppGrid.myGraphGrid,linkListGrid, linkListHub, nodeListGrid, nodeListHub);
-		//		ShortestPath.collectShortest(myAppGrid.myGraphGrid,linkListGrid, linkListHub, nodeListGrid, nodeListHub, assocList,shortListFile);
-
-
-		//		BufferedWriter bw = IOUtils.getBufferedWriter("/Users/nadiaviljoen/Documents/workspace/ArticleRegister/GridNetworkFiles/Malik/TEST3.csv");
-		//		try{
-		//			bw.write("Malik Node List");
-		//			bw.newLine();
-		//			bw.write("Malik id, Malik index");
-		//			bw.newLine();
-		//			for (int y = 0; y<nodeListHub.size();y++){
-		//				bw.write(String.format("%s,%d\n",nodeListHub.get(y).getId(),y));
-		//			}
-		//			bw.newLine();
-		//			bw.write("Grid Node List");
-		//			bw.newLine();
-		//			bw.write("Grid id, Grid index");
-		//			bw.newLine();
-		//			for (int y = 0; y<nodeListGrid.size();y++){
-		//				bw.write(String.format("%s,%d\n",nodeListGrid.get(y).getId(),y));
-		//			}
-		//			bw.newLine();
-		//			bw.write("assocList");
-		//			bw.newLine();
-		//			bw.write("Malik id, Malik index,Grid id, Grid index");
-		//			bw.newLine();
-		//			for (int j =0; j< assocList.length;j++){
-		//				bw.write(String.format("%d,%d,%d,%d\n",assocList[j][0],assocList[j][1],assocList[j][2],assocList[j][3]));
-		//			}
-		//		} catch (IOException e) {
-		//			e.printStackTrace();
-		////			LOG.error("Oops, couldn't write to file.");
-		//		} finally{
-		//			try {
-		//				bw.close();
-		//			} catch (IOException e) {
-		//				e.printStackTrace();
-		////				LOG.error("Oops, couldn't close");
-		//			}
-		//		}
-
-
-
-
+//		}
+//			Create set of all shortest paths for Ghost Network
+			int [][] fullPathCollect = new int[1000000][10+10+1];
+			int marker =0;
+			int test =0;
+			//for each node pair in the assocList - remember that shortest path sets may eventually not be symmetric and therefore you have to do all
+			for (int y = 0; y<assocList.length;y++){
+				for (int x = 0; x<assocList.length;x++){
+					if (x!=y){
+						int [][] interimPathCollect = ShortestPathCollection.pathBuilder(myAppGrid.myGraphGrid, nodeListGrid,assocList[y][3], assocList[x][3]);
+						//insert into fullPathCollect
+						for (int u = 0; u<interimPathCollect.length;u++){
+							for (int g=0;g<interimPathCollect[0].length;g++){
+								fullPathCollect[marker][g]=interimPathCollect[u][g];
+							}	
+							marker++;
+							
+						}
+						test=test+interimPathCollect.length;
+					}
+				}
+			}
+			
+			//write fullPathCollect out
+			BufferedWriter bf = IOUtils.getBufferedWriter("/Users/nadiaviljoen/Documents/PhD_gridNetwork/GhostProtocol/fullPathSet.csv");
+			try{
+				for (int j =0; j< marker;j++){
+					for (int r=0;r<fullPathCollect[0].length;r++){
+						if (fullPathCollect[j][r]!=0){
+							bf.write(nodeListGrid.get(fullPathCollect[j][r]).getId()+" ");
+						}	
+					}
+					bf.newLine();	
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			} finally{
+				try {
+					bf.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
 
 	}
 }
