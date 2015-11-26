@@ -21,19 +21,21 @@
 
 package playground.boescpa.analysis.scenarioAnalyzer.eventHandlers;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.events.handler.*;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import playground.boescpa.analysis.scenarioAnalyzer.ScenarioAnalyzer;
-import playground.boescpa.analysis.scenarioAnalyzer.spatialEventCutters.SpatialEventCutter;
-import playground.boescpa.analysis.trips.tripCreation.TripHandler;
+import playground.boescpa.analysis.spatialCutters.SpatialCutter;
+import playground.boescpa.analysis.trips.Trip;
+import playground.boescpa.analysis.trips.TripEventHandler;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * Decorates playground.boescpa.analysis.trips.tripCreation.TripHandler with the method createResults(..).
+ * Decorates playground.boescpa.analysis.trips.TripHandler with the method createResults(..).
  *
  * Returns for every mode:
  *	o	Number of trips [] to reach every activity.
@@ -43,18 +45,16 @@ import java.util.*;
 public class TripActivityCrosscorrelator implements ScenarioAnalyzerEventHandler, PersonDepartureEventHandler, PersonArrivalEventHandler,
 		ActivityStartEventHandler, PersonStuckEventHandler, LinkLeaveEventHandler {
 
-	private static Logger log = Logger.getLogger(TripActivityCrosscorrelator.class);
-
-	private final TripHandler tripHandler;
+	private final TripEventHandler tripHandler;
 	private final Network network;
 	private int scaleFactor = 1;
 	private List<String> modes = new ArrayList<>();
 	private List<String> activities = new ArrayList<>();
 	private List<List<Integer>> counts = new ArrayList<>(); // outer field: modes, inner field: activities
-	private SpatialEventCutter spatialEventCutter = null;
+	private SpatialCutter spatialEventCutter = null;
 
 	public TripActivityCrosscorrelator(Network network) {
-		this.tripHandler = new TripHandler();
+		this.tripHandler = new TripEventHandler(network);
 		this.network = network;
 		this.reset(0);
 	}
@@ -93,19 +93,20 @@ public class TripActivityCrosscorrelator implements ScenarioAnalyzerEventHandler
 	 * * Returns for every mode:
 	 *	o	Number of trips [] to reach every activity
 	 *
-	 * @param spatialEventCutter
+	 * @param spatialEventCutter Defining the area to analyze.
 	 * @param scaleFactor	The number of trips is scaled with this factor before returned.
 	 * @return A multiline String containing the above listed results.
 	 */
 	@Override
-	public String createResults(SpatialEventCutter spatialEventCutter, int scaleFactor) {
+	public String createResults(SpatialCutter spatialEventCutter, int scaleFactor) {
 		this.scaleFactor = scaleFactor;
 		// reset the analysis
 		this.modes.clear();
 		this.activities.clear();
 		this.counts.clear();
 		// analyze
-		analyzeEvents(spatialEventCutter);
+        this.spatialEventCutter = spatialEventCutter;
+        analyzeEvents();
 		// create results
 		return getResults();
 	}
@@ -128,44 +129,23 @@ public class TripActivityCrosscorrelator implements ScenarioAnalyzerEventHandler
 		return results;
 	}
 
-	private void analyzeEvents(SpatialEventCutter spatialEventCutter) {
-		if (spatialEventCutter != null) {
-			this.spatialEventCutter = spatialEventCutter;
-		} else {
-			log.warn("No spatial event cutter provided. Will analyze the full network.");
-		}
-
-		for (Id personId : tripHandler.getStartLink().keySet()) {
-			if (!personId.toString().contains("pt")) {
-				ArrayList<Id> startLinks = tripHandler.getStartLink().getValues(personId);
-				ArrayList<String> modes = tripHandler.getMode().getValues(personId);
-				ArrayList<String> purposes = tripHandler.getPurpose().getValues(personId);
-				ArrayList<Double> startTimes = tripHandler.getStartTime().getValues(personId);
-				ArrayList<Id> endLinks = tripHandler.getEndLink().getValues(personId);
-
-				// Trip analysis:
-				/*if (considerLink(startLinks.get(0))) {
-					addCount(getMode("init"), getActivity("h"));
-				}*/
-				for (int i = 0; i < startLinks.size(); i++) {
-					if ((considerLink(startLinks.get(i)) || (endLinks.get(i) != null && considerLink(endLinks.get(i))))
-							&& startTimes.get(i) < 86400)
-					{
-						String mode = modes.get(i);
-						if (mode.equals("bike") || mode.equals("walk")) {
-							mode = "slow_mode";
-						} else if (mode.equals("transit_walk")) {
-							mode = "pt";
-						}
-						addCount(getMode(mode), getActivity(purposes.get(i)));
-					}
-				}
-			}
-		}
+	private void analyzeEvents() {
+        for (Trip trip : tripHandler.getTrips()) {
+            // add trip to mode stats
+            if ((considerLink(trip.startLinkId) || considerLink(trip.endLinkId)) && trip.startTime < ANALYSIS_END_TIME) {
+                String mode = trip.mode;
+                if (mode.equals("bike") || mode.equals("walk")) {
+                    mode = "slow_mode";
+                } else if (mode.equals("transit_walk")) {
+                    mode = "pt";
+                }
+                addCount(getMode(mode), getActivity(trip.purpose));
+            }
+        }
 	}
 
-	private boolean considerLink(Id id) {
-		return spatialEventCutter == null || spatialEventCutter.spatiallyConsideringLink(network.getLinks().get(id));
+	private boolean considerLink(Id<Link> linkId) {
+        return linkId != null && spatialEventCutter.spatiallyConsideringLink(network.getLinks().get(linkId));
 	}
 
 	private void addCount(int mode, int act) {

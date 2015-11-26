@@ -21,10 +21,16 @@
 
 package playground.boescpa.converters.visum.preprocessing;
 
-import playground.boescpa.analysis.trips.tripCreation.TripCreator;
-import playground.boescpa.analysis.trips.tripCreation.TripProcessor;
-import playground.boescpa.analysis.trips.tripCreation.spatialCuttings.ShpFileCutting;
-import playground.boescpa.analysis.trips.tripCreation.spatialCuttings.SpatialCuttingStrategy;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
+import playground.boescpa.analysis.spatialCutters.SHPFileCutter;
+import playground.boescpa.analysis.trips.*;
+import playground.boescpa.lib.tools.NetworkUtils;
+
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Creates and prepares trips for visum-conversion.
@@ -33,16 +39,22 @@ import playground.boescpa.analysis.trips.tripCreation.spatialCuttings.SpatialCut
  */
 public class VisumTripCreator {
 
-	public static void main(String[] args) {
-		String eventsFile = args[0]; // Path to an events-File, e.g. "run.combined.150.events.xml.gz"
-		String networkFile = args[1]; // Path to the network-File used for the simulation resulting in the above events-File, e.g. "multimodalNetwork2030final.xml.gz"
-		String tripFile = args[2]; // Path to the trip-File produced as output, e.g. "trips2030combined.txt"
+    public static List<Trip> trips;
+    public static List<Id<Person>> failedAgents;
+
+    public static void main(String[] args) {
+		String eventsFile = args[0]; // Path to an events-File
+		String networkFile = args[1]; // Path to the network-File used for the simulation resulting in the above events-File
+		String tripFile = args[2]; // Path to the trip-File produced as output
 		String shpFile = args[3]; // Path to a shp-File which defines the considered area.
 
-		SpatialCuttingStrategy spatialCuttingStrategy = new ShpFileCutting(shpFile);
-		TripProcessor tripProcessor = new VisumTripProcessor(tripFile, spatialCuttingStrategy);
-		TripCreator tripCreator = new TripCreator(eventsFile, networkFile, tripProcessor);
-		tripCreator.createTrips();
+        Network network = NetworkUtils.readNetwork(networkFile);
+        SpatialTripCutter spatialTripCutter = new SpatialTripCutter(new SHPFileCutter(shpFile), network);
+        trips = EventsToTrips.createTripsFromEvents(eventsFile, network);
+        trips = TripFilter.spatialTripFilter(trips, spatialTripCutter);
+        trips = TripFilter.removeUnfinishedTrips(trips, failedAgents);
+        new TripWriter().writeTrips(trips, tripFile);
 	}
+
 
 }

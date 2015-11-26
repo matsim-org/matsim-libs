@@ -33,8 +33,6 @@ import playground.nmviljoen.network.NmvNode;
 public class LayerMalik {
 	public static int [][] assocList(DirectedGraph<NmvNode, NmvLink> myGraphGrid, LinkedList<NmvLink> gridLinks, LinkedList<NmvLink> hubLinks,ArrayList<NmvNode> gridNodes,ArrayList<NmvNode> hubNodes){
 		int [][] assocList = new int[hubNodes.size()][4];
-		Iterator<NmvNode> HubIterator = hubNodes.iterator();
-		Iterator<NmvNode> GridIterator = gridNodes.iterator();
 		boolean flag = false;
 		boolean use = true;
 		boolean repeat = true;
@@ -61,7 +59,7 @@ public class LayerMalik {
 			repeat = true;
 			while (repeat){
 				use = true;
-				gen = randomGen.nextInt(2501);
+				gen = randomGen.nextInt(101);
 				//test if it's been used
 				for (int t = 0; t<taken.length;t++){
 					if(taken[t]==gen) use = false;
@@ -110,7 +108,7 @@ public class LayerMalik {
 				repeat = true;
 				while (repeat){
 					use = true;
-					gen = randomGen.nextInt(2501);
+					gen = randomGen.nextInt(101);
 					//test if taken
 					for (int t = 0; t<taken.length;t++){
 						if(taken[t]==gen)use = false;

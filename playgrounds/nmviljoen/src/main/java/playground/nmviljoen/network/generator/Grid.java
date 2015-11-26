@@ -237,7 +237,7 @@ public class Grid {
 				count = count + 4;
 			}
 			try {
-				File file = new File("/Users/nadiaviljoen/Documents/workspace/ArticleRegister/GridNetworkFiles/baseline50x50/linkListGrid.csv");
+				File file = new File("/Users/nadiaviljoen/Documents/PhD_gridNetwork/GhostProtocol/linkListGrid.csv");
 				FileWriter fw = new FileWriter(file.getAbsoluteFile());
 				BufferedWriter bw = new BufferedWriter(fw);
 				for (int r =0;r<links;r++) {

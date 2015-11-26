@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import playground.boescpa.analysis.scenarioAnalyzer.ScenarioAnalyzer;
-import playground.boescpa.analysis.scenarioAnalyzer.spatialEventCutters.SpatialEventCutter;
+import playground.boescpa.analysis.spatialCutters.SpatialCutter;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -95,7 +95,7 @@ public class MFDCreator implements ScenarioAnalyzerEventHandler, LinkLeaveEventH
 	}
 
 	@Override
-	public String createResults(SpatialEventCutter spatialEventCutter, int scaleFactor) {
+	public String createResults(SpatialCutter spatialEventCutter, int scaleFactor) {
 		String timebinString = "time bins" + ScenarioAnalyzer.DEL;
 		String densityString = "densities" + ScenarioAnalyzer.DEL;
 		String flowString = "flows" + ScenarioAnalyzer.DEL;
@@ -104,7 +104,7 @@ public class MFDCreator implements ScenarioAnalyzerEventHandler, LinkLeaveEventH
 			// density:
 			int densitiesTimeBin = 0;
 			for (Id<Link> linkId : this.densities.get(i).keySet()) {
-				if (spatialEventCutter == null || spatialEventCutter.spatiallyConsideringLink(this.network.getLinks().get(linkId))) {
+				if (spatialEventCutter.spatiallyConsideringLink(this.network.getLinks().get(linkId))) {
 					densitiesTimeBin += this.densities.get(i).get(linkId);
 				}
 			}
@@ -112,7 +112,7 @@ public class MFDCreator implements ScenarioAnalyzerEventHandler, LinkLeaveEventH
 			// flow:
 			int flowsTimeBin = 0;
 			for (Id<Link> linkId : this.flows.get(i).keySet()) {
-				if (spatialEventCutter == null || spatialEventCutter.spatiallyConsideringLink(this.network.getLinks().get(linkId))) {
+				if (spatialEventCutter.spatiallyConsideringLink(this.network.getLinks().get(linkId))) {
 					flowsTimeBin += this.flows.get(i).get(linkId);
 				}
 			}
@@ -125,25 +125,15 @@ public class MFDCreator implements ScenarioAnalyzerEventHandler, LinkLeaveEventH
 
 	private void incDensity(Id<Link> linkId, double time) {
 		// get time bin:
-		int timeBin = (int) Math.floor(time/TIMEBINSIZE);
-		while (currentTimeBin < timeBin) {
-			incTimeBin();
-		}
+        getTimeBin(time);
 
 		// inc density on link:
-		int newLinkDensity = 1;
-		if (densityTimeBin.keySet().contains(linkId)) {
-			newLinkDensity = densityTimeBin.get(linkId) + 1;
-		}
-		densityTimeBin.put(linkId, newLinkDensity);
+        incStat(linkId, densityTimeBin);
 	}
 
 	private void decDensity(Id<Link> linkId, double time) {
 		// get time bin:
-		int timeBin = (int) Math.floor(time/TIMEBINSIZE);
-		while (currentTimeBin < timeBin) {
-			incTimeBin();
-		}
+        getTimeBin(time);
 
 		// dec density on link:
 		Integer newLinkDensity = densityTimeBin.get(linkId);
@@ -161,20 +151,28 @@ public class MFDCreator implements ScenarioAnalyzerEventHandler, LinkLeaveEventH
 
 	private void incFlow(Id<Link> linkId, double time) {
 		// get time bin:
-		int timeBin = (int) Math.floor(time/TIMEBINSIZE);
-		while (currentTimeBin < timeBin) {
-			incTimeBin();
-		}
+        getTimeBin(time);
 
 		// inc flow on link:
-		int newLinkFlow = 1;
-		if (flowTimeBin.keySet().contains(linkId)) {
-			newLinkFlow = flowTimeBin.get(linkId) + 1;
-		}
-		flowTimeBin.put(linkId, newLinkFlow);
+        incStat(linkId, flowTimeBin);
 	}
 
-	private void incTimeBin() {
+    private void incStat(Id<Link> linkId, Map<Id<Link>, Integer> timeBin) {
+        int newLinkValue = 1;
+        if (timeBin.keySet().contains(linkId)) {
+            newLinkValue = timeBin.get(linkId) + 1;
+        }
+        timeBin.put(linkId, newLinkValue);
+    }
+
+    private void getTimeBin(double time) {
+        int timeBin = (int) Math.floor(time/TIMEBINSIZE);
+        while (currentTimeBin < timeBin) {
+            incTimeBin();
+        }
+    }
+
+    private void incTimeBin() {
 		currentTimeBin++;
 		// new densityTimeBin:
 		densityTimeBin = new HashMap<>();

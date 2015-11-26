@@ -23,13 +23,13 @@ package playground.boescpa.av.staticDemand;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.io.IOUtils;
+import playground.boescpa.analysis.trips.Trip;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import playground.boescpa.analysis.trips.tripReader.Trip;
 
 /**
  * WHAT IS IT FOR?
@@ -59,11 +59,11 @@ public class Stats {
     private double minTravelTimeMetDemand = 0; // minutes
     private double maxTravelTimeMetDemand = 0; // minutes
     private double totalTravelTimeMetDemand = 0; // minutes
-    private long travelDistanceMetDemand = 0; // m
+    private double travelDistanceMetDemand = 0; // m
     private double minTravelTimeLateMetDemand = 0; // minutes
     private double maxTravelTimeLateMetDemand = 0; // minutes
     private double totalTravelTimeLateMetDemand = 0; // minutes
-    private long travelDistanceLateMetDemand = 0; // m
+    private double travelDistanceLateMetDemand = 0; // m
 
     private double totalWaitingTimeForAssignmentMetDemand = 0; // seconds
     private double maxWaitingTimeForAssignmentMetDemand = 0; // seconds
@@ -141,7 +141,7 @@ public class Stats {
         }
     }
 
-    public void incTravelDistanceMetDemand(long distance) {
+    public void incTravelDistanceMetDemand(double distance) {
         if (distance >= 0) {
             travelDistanceMetDemand += distance;
         } else {
@@ -166,7 +166,7 @@ public class Stats {
         }
     }
 
-    public void incTravelDistanceLateMetDemand(long distance) {
+    public void incTravelDistanceLateMetDemand(double distance) {
         if (distance >= 0) {
             travelDistanceLateMetDemand += distance;
         } else {

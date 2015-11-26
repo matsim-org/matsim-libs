@@ -19,16 +19,15 @@
 
 package playground.boescpa.lib.obj;
 
-import static org.junit.Assert.*;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Set;
-
 import org.junit.Before;
 import org.junit.Test;
 
-import playground.boescpa.lib.obj.BoxedHashMap;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+
+import static org.junit.Assert.*;
 
 public class TestBoxedHashMap {
 	
@@ -63,7 +62,7 @@ public class TestBoxedHashMap {
 		assertEquals("Error in test of <getValue>", 1, i);
 		assertNull("Error in test of <getValue>", bhm.getValue(8));
 		// getValues
-		ArrayList<Integer> al = bhm.getValues(1);
+		List<Integer> al = bhm.getValues(1);
 		assertEquals("Error in test of <getValues>", 2, al.size());
 		assertNull("Error in test of <getValue>", bhm.getValues(8));
 	}
@@ -72,7 +71,7 @@ public class TestBoxedHashMap {
 	public void testModification() {
 		// removeLast
 		bhm.put(1, 5);
-		ArrayList<Integer> al = bhm.getValues(1);
+		List<Integer> al = bhm.getValues(1);
 		assertEquals("Error in test of <getValues>", 3, al.size());
 		bhm.removeLast(1);
 		al = bhm.getValues(1);
@@ -91,7 +90,7 @@ public class TestBoxedHashMap {
 		assertEquals("Error in test of <keySet>", 2, s.size());
 		assertTrue("Error in test of <keySet>", s.contains(256));
 		// values
-		Collection<ArrayList<Integer>> c = bhm.values();
+		Collection<LinkedList<Integer>> c = bhm.values();
 		assertEquals("Error in test of <values>", 2, c.size());
 	}
 }

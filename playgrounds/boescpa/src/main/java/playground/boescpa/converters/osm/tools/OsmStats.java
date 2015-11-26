@@ -27,7 +27,7 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
-import playground.boescpa.analysis.scenarioAnalyzer.spatialEventCutters.SHPFileCutter;
+import playground.boescpa.analysis.spatialCutters.SHPFileCutter;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;

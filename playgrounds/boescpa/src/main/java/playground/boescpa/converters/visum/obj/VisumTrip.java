@@ -21,56 +21,34 @@
 
 package playground.boescpa.converters.visum.obj;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Person;
-
-import playground.boescpa.analysis.trips.tripReader.Trip;
+import playground.boescpa.analysis.trips.Trip;
 
 /**
  * Provides a representation of visum trips.
  *
  * @author boescpa
  */
-public class VisumTrip extends Trip {
+public class VisumTrip {
 
-	// TODO-boescpa Write tests...
+    private final Trip trip;
 
-	public VisumTrip(Id agentId, double startTime, Id startLinkId, double startXCoord, double startYCoord, double endTime, Id endLinkId, double endXCoord, double endYCoord, String mode, String purpose, double duration, long distance) {
-		super(agentId, startTime, startLinkId, startXCoord, startYCoord, endTime, endLinkId, endXCoord, endYCoord, mode, purpose, duration, distance);
-	}
+    public VisumTrip(Trip trip) {
+        this.trip = trip;
+    }
 
-	public VisumTrip(String[] tripLine) {
-		this(
-				Id.create(tripLine[1], Person.class), //agentId
-				Double.parseDouble(tripLine[2]), // startTime
-				Id.create(tripLine[3], Link.class), // startLinkId
-				Double.parseDouble(tripLine[4]), // startXCoord
-				Double.parseDouble(tripLine[5]), // startYCoord
-				Double.parseDouble(tripLine[6]), // endTime
-				Id.create(tripLine[7], Link.class), // endLinkId
-				Double.parseDouble(tripLine[8]), // endXCoord
-				Double.parseDouble(tripLine[9]), // endYCoord
-				tripLine[10], // mode
-				tripLine[11], // purpose
-				Double.parseDouble(tripLine[12]), // duration
-				Long.parseLong(tripLine[13]) // distance
-		);
-	}
-
-	public boolean isModeType(String mode) {
-		return mode.equals(this.mode);
+    public boolean isModeType(String mode) {
+		return mode.equals(trip.mode);
 	}
 
 	public boolean isWithinZone(Zone interestingArea) {
 		boolean withinZone = false;
 
 		// Check startPoint:
-		withinZone = interestingArea.isWithinZone(startXCoord, startYCoord);
+		withinZone = interestingArea.isWithinZone(trip.startXCoord, trip.startYCoord);
 
 		// Check endPoint:
 		if (!withinZone) {
-			withinZone = interestingArea.isWithinZone(endXCoord, endYCoord);
+			withinZone = interestingArea.isWithinZone(trip.endXCoord, trip.endYCoord);
 		}
 
 		return withinZone;
@@ -81,22 +59,22 @@ public class VisumTrip extends Trip {
 		boolean withinTime = false;
 
 		// Check startTime:
-		withinTime = startTime >= time && startTime <= time + 3600;
+		withinTime = trip.startTime >= time && trip.startTime <= time + 3600;
 
 		// Check endTime:
 		if (!withinTime) {
-			withinTime = endTime >= time && endTime <= time + 3600;
+			withinTime = trip.endTime >= time && trip.endTime <= time + 3600;
 		}
 
 		return withinTime;
 	}
 
 	public boolean isOriginZone(Zone zone) {
-		return zone.isWithinZone(startXCoord, startYCoord);
+		return zone.isWithinZone(trip.startXCoord, trip.startYCoord);
 	}
 
 	public boolean isDestinZone(Zone zone) {
-		return zone.isWithinZone(endXCoord, endYCoord);
+		return zone.isWithinZone(trip.endXCoord, trip.endYCoord);
 	}
 
 	public double distanceToCentroid(Zone centroid, boolean origOrDest) {
@@ -105,11 +83,11 @@ public class VisumTrip extends Trip {
 
 		if (origOrDest) {
 			// <=> origOrDest = true => Origin
-			return centroid.getDistToCentroid(this.startXCoord, this.startYCoord);
+			return centroid.getDistToCentroid(trip.startXCoord, trip.startYCoord);
 		}
 		else {
 			// <=> origOrDest = false => Destination
-			return centroid.getDistToCentroid(this.endXCoord, this.endYCoord);
+			return centroid.getDistToCentroid(trip.endXCoord, trip.endYCoord);
 		}
 	}
 }

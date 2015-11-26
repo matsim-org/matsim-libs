@@ -13,6 +13,7 @@ import org.matsim.core.utils.misc.Counter;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
+import playground.boescpa.analysis.ActivityAnalyzer;
 
 import java.util.Random;
 

@@ -23,7 +23,7 @@ package playground.boescpa.av.staticDemand;
 
 import org.matsim.core.utils.geometry.CoordUtils;
 import playground.boescpa.av.staticDemand.ForceModel.Force;
-import playground.boescpa.analysis.trips.tripReader.Trip;
+import playground.boescpa.analysis.trips.Trip;
 
 import java.util.*;
 

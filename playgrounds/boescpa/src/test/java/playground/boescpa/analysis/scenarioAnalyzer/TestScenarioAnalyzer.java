@@ -32,6 +32,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import playground.boescpa.analysis.scenarioAnalyzer.eventHandlers.*;
+import playground.boescpa.analysis.spatialCutters.NoCutter;
 
 /**
  * @author boescpa
@@ -54,7 +55,7 @@ public class TestScenarioAnalyzer {
 
 		// Get network and events file
 		Network network = scenario.getNetwork();
-		String eventFile = this.utils.getOutputDirectory() + "ITERS/it.10/10.events.xml.gz";
+		String eventFile = this.utils.getOutputDirectory() + "ITERS/it.0/0.events.xml.gz";
 
 		// Analyze the events:
 		ScenarioAnalyzerEventHandler[] handlers = {
@@ -70,6 +71,6 @@ public class TestScenarioAnalyzer {
 	@Test
 	public void testAnalyzer() {
 		// Return the results:
-		scenarioAnalyzer.createResults(utils.getOutputDirectory() + "scenarioAnalyzerResults.txt", null);
+		scenarioAnalyzer.createResults(utils.getOutputDirectory() + "scenarioAnalyzerResults.txt", new NoCutter());
 	}
 }

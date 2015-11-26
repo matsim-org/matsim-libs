@@ -71,6 +71,21 @@ public class ZoneMobilityRate extends AbstractAnalyzerTask<Collection<? extends 
         this.predicate = predicate;
     }
 
+    public TObjectDoubleHashMap<Zone> getMobilityRatePerZone(ZoneCollection zones) {
+        TObjectDoubleHashMap<Zone> rates = new TObjectDoubleHashMap<>();
+        for(Zone zone : zones.getZones()) {
+            String category = zone.getAttribute(categoryKey);
+            double rate = categoryMobilityRate.get(category);
+            if(rate > 0) {
+                rates.put(zone, rate);
+            } else {
+                throw new RuntimeException("Mobility rate = 0 not allowed");
+            }
+        }
+
+        return rates;
+    }
+
     @Override
     public void analyze(Collection<? extends Person> persons, List<StatsContainer> containers) {
 

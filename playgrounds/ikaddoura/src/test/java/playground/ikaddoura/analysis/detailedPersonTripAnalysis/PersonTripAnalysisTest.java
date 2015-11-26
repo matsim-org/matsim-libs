@@ -13,7 +13,7 @@ import java.util.SortedMap;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -24,8 +24,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ScoringParameterSet;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.TypicalDurationScoreComputation;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -44,40 +42,30 @@ public class PersonTripAnalysisTest {
 
 	private static final Logger log = Logger.getLogger(PersonTripAnalysisMain.class);
 
-	private static final String outputPath = "test/output/playground/ikaddoura/analysis/detailedPersonTripAnalysis/PersonTripAnalysisTest/";
+	private String outputPath;
 	
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 	
-	@BeforeClass
-	public static void generateOutput() {
+	@Before
+	public void generateOutput() {
 		
 		Config config = ConfigUtils.createConfig();
 		ActivityParams activityParams = new ActivityParams();
 		activityParams.setActivityType("work");
-		activityParams.setScoringThisActivityAtAll(true);
 		config.planCalcScore().addActivityParams(activityParams);
 		activityParams = new ActivityParams();
 		activityParams.setActivityType("home");
-		activityParams.setScoringThisActivityAtAll(true);
-//		TODO activate scoring here !?
 		config.planCalcScore().addActivityParams(activityParams);
+		config.plans().setInputFile(utils.getClassInputDirectory() + "PersonTripAnalysisPlans.xml");
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		
-		// create Population
-		int personNumber = 2;
-		for (int i = 0; i < personNumber; i++) {
-			scenario.getPopulation().addPerson(scenario.getPopulation().getFactory().createPerson(Id.create(i, Person.class)));
-		}
 		
 		ForkNetworkCreator fnc = new ForkNetworkCreator(scenario, false, false);
 		fnc.createNetwork();
 		
-		String eventsFile = "test/input/playground/ikaddoura/analysis/detailedPersonTripAnalysis/PersonTripAnalysisTest/" + "PersonTripAnalysisEvents.xml";
-		File folder = new File(outputPath);			
-		folder.mkdirs();
-		System.out.println(outputPath);
-		
-		
+		String eventsFile = utils.getClassInputDirectory() + "PersonTripAnalysisEvents.xml";
+		outputPath = utils.getOutputDirectory();
+		File outputFolder = new File(outputPath);			
+		outputFolder.mkdirs();
 		
 		// standard events analysis
 	
@@ -103,8 +91,7 @@ public class PersonTripAnalysisTest {
 		
 		Map<Id<Person>, Double> personId2userBenefit = new HashMap<>();
 		for (Person person : scenario.getPopulation().getPersons().values()) {
-//			 TODO scoring doesn't work
-			personId2userBenefit.put(person.getId(), 1.0);//person.getSelectedPlan().getScore() / scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney());
+			personId2userBenefit.put(person.getId(), person.getSelectedPlan().getScore() / scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney());
 		}
 
 		// congestion events analysis
@@ -161,7 +148,7 @@ public class PersonTripAnalysisTest {
 	}
 	
 	@Test
-	public void testMultipleTripsInfo(){
+	public void testPersonAndTripInfo(){
 		File personInfoFile = new File(outputPath + "person_info_car.csv");	
 		File tripInfoFile = new File(outputPath + "trip_info_car.csv");	
 		ArrayList<String[]> personInfos = new ArrayList<String[]>();
@@ -226,7 +213,41 @@ public class PersonTripAnalysisTest {
 					travelDistanceSums.get(Id.createPersonId(personInfo[0])), Double.parseDouble(personInfo[5]), MatsimTestUtils.EPSILON);
 		}
 		
-		
+		// test scoring of the selected plans of both agents (where other plans exist)
+		Assert.assertEquals("Scoring of selected plan does not work right for Person " + Id.createPersonId(0),
+				987.654321, Double.parseDouble(personInfos.get(0)[6]), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Scoring of selected plan does not work right for Person " + Id.createPersonId(1),
+				123.456789, Double.parseDouble(personInfos.get(1)[6]), MatsimTestUtils.EPSILON);
 	}
 	
+	@Test
+	public void testAggregatedInfo(){
+		File aggregatedInfoFile = new File(outputPath + "aggregated_info_car.csv");	
+		ArrayList<String[]> aggregatedInfos = new ArrayList<String[]>();
+		try {
+			BufferedReader br = new BufferedReader(new FileReader(aggregatedInfoFile));
+			String line = br.readLine();
+			while(line != null) {
+				aggregatedInfos.add(line.split(";"));
+				System.out.println(line);
+				line = br.readLine();
+			}
+			br.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		Assert.assertEquals("Number of car trips wrong", 3, Integer.parseInt(aggregatedInfos.get(2)[1]));
+		Assert.assertEquals("Car travel distance wrong", 12.0, 
+				Double.parseDouble(aggregatedInfos.get(5)[1]), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Car travel time wrong", 0.5138888888888888, 
+				Double.parseDouble(aggregatedInfos.get(7)[1]), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Total congestion wrong", 0.027777777777777776, 
+				Double.parseDouble(aggregatedInfos.get(13)[1]), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Affected noise cost wrong", 100.0, 
+				Double.parseDouble(aggregatedInfos.get(16)[1]), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Caused noise cost wrong", 100.0, 
+				Double.parseDouble(aggregatedInfos.get(18)[1]), MatsimTestUtils.EPSILON);
+	}
 }
