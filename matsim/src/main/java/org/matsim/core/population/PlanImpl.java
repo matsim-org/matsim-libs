@@ -33,9 +33,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class PlanImpl implements Plan {
+public final class PlanImpl implements Plan {
 
-	protected ArrayList<PlanElement> actsLegs = new ArrayList<PlanElement>();
+	private ArrayList<PlanElement> actsLegs = new ArrayList<PlanElement>();
 
 	private Double score = null;
 	private Person person = null;
@@ -70,23 +70,23 @@ public class PlanImpl implements Plan {
 	}
 
 	@Deprecated // use scenario.getPopulation().getFactory().createActivity(...) instead, and add it yourself
-	public final ActivityImpl createAndAddActivity(final String type, final Coord coord) {
-		ActivityImpl a = new ActivityImpl(type, coord);
+	public final ActivityImpl createAndAddActivity(final String type1, final Coord coord) {
+		ActivityImpl a = new ActivityImpl(type1, coord);
 		getPlanElements().add(a);
 		return a;
 	}
 
 	@Deprecated // use scenario.getPopulation().getFactory().createActivity(...) instead, and add it yourself
-	public final ActivityImpl createAndAddActivity(final String type) {
-		ActivityImpl a = new ActivityImpl(type);
+	public final ActivityImpl createAndAddActivity(final String type1) {
+		ActivityImpl a = new ActivityImpl(type1);
 		getPlanElements().add(a);
 		return a;
 	}
 
 
 	@Deprecated // use scenario.getPopulation().getFactory().createActivity(...) instead, and add it yourself
-	public final ActivityImpl createAndAddActivity(final String type, final Id<Link> linkId) {
-		ActivityImpl a = new ActivityImpl(type, linkId);
+	public final ActivityImpl createAndAddActivity(final String type1, final Id<Link> linkId) {
+		ActivityImpl a = new ActivityImpl(type1, linkId);
 		getPlanElements().add(a);
 		return a;
 	}

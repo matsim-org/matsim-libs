@@ -146,8 +146,13 @@ public class GroupPlans {
 		}
 
 		for (Plan p : plans.getIndividualPlans()) {
-			PlanImpl newPlan = jointPlanFactory.createIndividualPlan( p.getPerson() );
-			newPlan.copyFrom( p );
+			Plan newPlan = JointPlanFactory.createIndividualPlan( p.getPerson() );
+			((PlanImpl)newPlan).copyFrom( p );
+			// I think that the above cast will now fail.  It probably worked originally, since JointPlan was an extension of PlanImpl, which is
+			// no longer allowed. I would, however, say that it was not a clean copy anyways, since it ignored the additional fields
+			// of JointPlan.  Thibaut, I am confident that you can resolve this if you encounter it, but please let me know if you want to dicuss.
+			// kai, nov'15
+			
 			p.getPerson().addPlan( newPlan );
 			ps.add( newPlan );
 		}

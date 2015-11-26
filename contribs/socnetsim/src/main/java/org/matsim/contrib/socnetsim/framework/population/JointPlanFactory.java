@@ -83,19 +83,23 @@ public class JointPlanFactory implements MatsimFactory {
 				addAtIndividualLevel );
 	}
 
-	private Map<Id<Person>, Plan> cloneIndividualPlans(final JointPlan plan) {
+	private static Map<Id<Person>, Plan> cloneIndividualPlans(final JointPlan plan) {
 		final Map<Id<Person> , Plan> plans = new LinkedHashMap< >();
 
 		for (Map.Entry<Id<Person>, Plan> indiv : plan.getIndividualPlans().entrySet()) {
-			final PlanImpl newPlan = createIndividualPlan( indiv.getValue().getPerson() );
-			newPlan.copyFrom( indiv.getValue() );
+			final Plan newPlan = createIndividualPlan( indiv.getValue().getPerson() );
+			((PlanImpl)newPlan).copyFrom( indiv.getValue() );
+			// I think that the above cast will now fail.  It probably worked originally, since JointPlan was an extension of PlanImpl, which is
+			// no longer allowed. I would, however, say that it was not a clean copy anyways, since it ignored the additional fields
+			// of JointPlan.  Thibaut, I am confident that you can resolve this if you encounter it, but please let me know if you want to dicuss.
+			// kai, nov'15
 			plans.put( indiv.getKey() , newPlan );
 		}
 		
 		return plans;
 	}
 
-	public PlanImpl createIndividualPlan( final Person person) {
+	public static Plan createIndividualPlan( final Person person) {
 		return new PlanWithCachedJointPlan( person );
 	}
 }
