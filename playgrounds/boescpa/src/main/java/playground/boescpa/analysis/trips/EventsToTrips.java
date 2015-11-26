@@ -78,14 +78,4 @@ public class EventsToTrips {
 
         return tripHandler.getTrips();
 	}
-
-    public static List<Trip> filterTrips(List<Trip> trips, SpatialTripCutter cutter) {
-        List<Trip> filteredTrips = new LinkedList<>();
-        for (Trip tempTrip : trips) {
-            if (cutter.spatiallyConsideringTrip(tempTrip)) {
-                filteredTrips.add(tempTrip.clone());
-            }
-        }
-        return Collections.unmodifiableList(filteredTrips);
-    }
 }

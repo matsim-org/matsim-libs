@@ -59,34 +59,6 @@ public class TripEventHandler implements PersonDepartureEventHandler, PersonArri
 	private Map<Id<Person>,Id<Link>> stageEndLinkId;
 	private Map<Id<Person>,Double> stageEndTime;
 
-	/*public BoxedHashMap<Id<Person>, Id<Link>> getStartLink() {
-		return startLink;
-	}
-	
-	public BoxedHashMap<Id<Person>, Double> getStartTime() {
-		return startTime;
-	}
-	
-	public BoxedHashMap<Id<Person>, String> getMode() {
-		return mode;
-	}
-	
-	public BoxedHashMap<Id<Person>, String> getPurpose() {
-		return purpose;
-	}
-	
-	public BoxedHashMap<Id<Person>, List<Id<Link>>> getPath() {
-		return path;
-	}
-	
-	public BoxedHashMap<Id<Person>, Id<Link>> getEndLink() {
-		return endLink;
-	}
-
-	public BoxedHashMap<Id<Person>, Double> getEndTime() {
-		return endTime;
-	}*/
-
     public TripEventHandler(Network network) {
         this.reset(0);
         this.network = network;

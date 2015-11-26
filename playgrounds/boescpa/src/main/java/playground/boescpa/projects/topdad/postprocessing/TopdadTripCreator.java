@@ -25,10 +25,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.utils.io.IOUtils;
 import playground.boescpa.analysis.spatialCutters.CirclePointCutter;
-import playground.boescpa.analysis.trips.EventsToTrips;
-import playground.boescpa.analysis.trips.SpatialTripCutter;
-import playground.boescpa.analysis.trips.Trip;
-import playground.boescpa.analysis.trips.TripWriter;
+import playground.boescpa.analysis.trips.*;
 import playground.boescpa.lib.tools.NetworkUtils;
 
 import java.io.BufferedWriter;
@@ -57,7 +54,7 @@ public class TopdadTripCreator {
         Network network = NetworkUtils.readNetwork(networkFile);
         SpatialTripCutter spatialTripCutter = new SpatialTripCutter(new CirclePointCutter(zoneRadius, 683518.0, 246836.0), network);
         trips = EventsToTrips.createTripsFromEvents(eventsFile, network);
-        trips = EventsToTrips.filterTrips(trips, spatialTripCutter);
+        trips = TripFilter.spatialTripFilter(trips, spatialTripCutter);
         travelTimesAndDistances = calcTravelTimeAndDistance(trips, valueFile);
         new TripWriter().writeTrips(trips, tripFile);
     }

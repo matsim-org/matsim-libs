@@ -55,7 +55,7 @@ public class TestScenarioAnalyzer {
 
 		// Get network and events file
 		Network network = scenario.getNetwork();
-		String eventFile = this.utils.getOutputDirectory() + "ITERS/it.10/10.events.xml.gz";
+		String eventFile = this.utils.getOutputDirectory() + "ITERS/it.0/0.events.xml.gz";
 
 		// Analyze the events:
 		ScenarioAnalyzerEventHandler[] handlers = {

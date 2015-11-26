@@ -40,7 +40,7 @@ import java.util.List;
  * @author pboesch
  *
  */
-public class TestTopdadTripProcessor {
+public class TestTopdadTripCreator {
 	
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 	
@@ -54,7 +54,7 @@ public class TestTopdadTripProcessor {
 		controler.run();
 
         // Load events file
-        String eventsFile = this.utils.getOutputDirectory() + "ITERS/it.10/10.events.xml.gz";
+        String eventsFile = this.utils.getOutputDirectory() + "ITERS/it.0/0.events.xml.gz";
         List<Trip> trips = EventsToTrips.createTripsFromEvents(eventsFile, scenario.getNetwork());
 		
 		// run postprocessing
@@ -65,14 +65,14 @@ public class TestTopdadTripProcessor {
         Double[] transit_walk = (Double[]) results.get("transit_walk");
 
 		// TripProcessing.analyzeTrips - Time tests
-		Assert.assertEquals("Test: TripProcessing.analyzeTrips - car mode time sum not as expected.", 10147.12, car[0], 0.01);
-		Assert.assertEquals("Test: TripProcessing.analyzeTrips - pt mode time sum not as expected.", 15227.68, pt[0], 0.01);
-		Assert.assertEquals("Test: TripProcessing.analyzeTrips - transit_walk mode time sum not as expected.", 13114.93, transit_walk[0], 0.01);
+		Assert.assertEquals("Test: TripProcessing.analyzeTrips - car mode time sum not as expected.", 7375.53, car[0], 0.01);
+		Assert.assertEquals("Test: TripProcessing.analyzeTrips - pt mode time sum not as expected.", 25675.47, pt[0], 0.01);
+		Assert.assertEquals("Test: TripProcessing.analyzeTrips - transit_walk mode time sum not as expected.", 20605.08, transit_walk[0], 0.01);
 		// TripProcessing.analyzeTrips - Distance tests
-		Assert.assertEquals("Test: TripProcessing.analyzeTrips - car mode distance sum not as expected.", 7231200.0, car[1], 0);
-		Assert.assertEquals("Test: TripProcessing.analyzeTrips - pt mode distance sum not as expected.", 1453968.0, pt[1], 0);
+		Assert.assertEquals("Test: TripProcessing.analyzeTrips - car mode distance sum not as expected.", 5256000.00, car[1], 0);
+		Assert.assertEquals("Test: TripProcessing.analyzeTrips - pt mode distance sum not as expected.", 2334138.27, pt[1], 0.01);
 			// Test above expects calculation of pt distances by euclidian distance. Should this change, this value needs to be readjusted...
-		Assert.assertEquals("Test: TripProcessing.analyzeTrips - transit_walk mode distance sum not as expected.", 649569.0, transit_walk[1], 0);
+		Assert.assertEquals("Test: TripProcessing.analyzeTrips - transit_walk mode distance sum not as expected.", 953810.68, transit_walk[1], 0.01);
 			// Test above expects calculation of transit_walk distances by euclidian distance. Should this change, this value needs to be readjusted...
 	}
 }

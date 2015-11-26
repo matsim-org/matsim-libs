@@ -38,12 +38,6 @@ import java.util.List;
 public class TripWriter {
 	protected static Logger log = Logger.getLogger(TripWriter.class);
 
-    private SpatialTripCutter tripCutter = null;
-
-    public void setTripCutter(SpatialCutter cutter, Network network) {
-        this.tripCutter = new SpatialTripCutter(cutter, network);
-    }
-
 	/**
 	 * Creates a text file containing all trips based on a given events file.
 	 * 
@@ -71,10 +65,8 @@ public class TripWriter {
             out.newLine();
             log.info("Writing trips file...");
             for (Trip tempTrip : trips) {
-                if (this.tripCutter != null && this.tripCutter.spatiallyConsideringTrip(tempTrip)) {
-                    out.write(tempTrip.toString());
-                    out.newLine();
-                }
+                out.write(tempTrip.toString());
+                out.newLine();
             }
             out.close();
             log.info("Writing trips file...done.");
