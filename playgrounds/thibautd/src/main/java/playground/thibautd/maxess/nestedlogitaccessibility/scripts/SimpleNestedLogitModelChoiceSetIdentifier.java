@@ -101,6 +101,7 @@ public class SimpleNestedLogitModelChoiceSetIdentifier implements ChoiceSetIdent
 		final ChoiceSetBuilder noptBuilder = new ChoiceSetBuilder();
 		final ChoiceSetBuilder nobikeBuilder = new ChoiceSetBuilder();
 		final ChoiceSetBuilder nowalkBuilder = new ChoiceSetBuilder();
+		final ChoiceSetBuilder allBuilder = new ChoiceSetBuilder();
 
 		// Sample and route alternatives
 		stopWatch.startMeasurement( Measurement.prismSampling );
@@ -119,6 +120,7 @@ public class SimpleNestedLogitModelChoiceSetIdentifier implements ChoiceSetIdent
 								origin,
 								f,
 								person ),
+						allBuilder.carNestBuilder,
 						isCarAvailable( person ) ?
 								baseBuilder.carNestBuilder :
 								null,
@@ -134,6 +136,7 @@ public class SimpleNestedLogitModelChoiceSetIdentifier implements ChoiceSetIdent
 							origin,
 							f,
 							person ),
+					allBuilder.ptNestBuilder,
 					baseBuilder.ptNestBuilder,
 					nocarBuilder.ptNestBuilder,
 					nobikeBuilder.ptNestBuilder,
@@ -147,6 +150,7 @@ public class SimpleNestedLogitModelChoiceSetIdentifier implements ChoiceSetIdent
 							origin,
 							f,
 							person ),
+					allBuilder.bikeNestBuilder,
 					isBikeAvailable( person ) ?
 							baseBuilder.bikeNestBuilder :
 							null,
@@ -162,6 +166,7 @@ public class SimpleNestedLogitModelChoiceSetIdentifier implements ChoiceSetIdent
 							origin,
 							f,
 							person ),
+					allBuilder.walkNestBuilder,
 					baseBuilder.walkNestBuilder,
 					nocarBuilder.walkNestBuilder,
 					nobikeBuilder.walkNestBuilder,
@@ -170,6 +175,7 @@ public class SimpleNestedLogitModelChoiceSetIdentifier implements ChoiceSetIdent
 		}
 
 		final Map<String, NestedChoiceSet<ModeNests>> result = new LinkedHashMap<>();
+		result.put( "all" , allBuilder.build() );
 		result.put( "base" , baseBuilder.build() );
 		result.put( "nocar" , nocarBuilder.build() );
 		result.put( "nobike" , nobikeBuilder.build() );
