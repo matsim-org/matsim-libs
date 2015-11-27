@@ -135,7 +135,8 @@ public class NestedLogitAccessibilityCalculator<N extends Enum<N>> {
 		final Counter emptyCounter;
 
 		private ComputationRunnable(
-				AccessibilityComputationResult result, final NestedLogitModel<N> model,
+				final AccessibilityComputationResult result,
+				final NestedLogitModel<N> model,
 				final ConcurrentStopWatch<Measurement> stopWatch,
 				final Counter personCounter,
 				final Counter emptyCounter ) {
@@ -224,6 +225,9 @@ public class NestedLogitAccessibilityCalculator<N extends Enum<N>> {
 		}
 
 		public void addTerm( final double util ) {
+			if ( Double.isNaN( util ) || Double.isInfinite( util ) ) {
+				throw new IllegalArgumentException( "Only finite terms are allowed, got "+util );
+			}
 			terms.add( util );
 			min = Math.min( util , min );
 			max = Math.max( util , max );
@@ -243,12 +247,18 @@ public class NestedLogitAccessibilityCalculator<N extends Enum<N>> {
 			for ( double d : terms.toArray() ) {
 				sum += Math.exp( d - c );
 				// TODO check if underflow (how? compare with 0?)
-				if ( Double.isInfinite( sum ) ) {
-					throw new RuntimeException( "got an overflow for exp "+d+" with correction "+c+"! (resulting in exp("+(d - c)+"))" );
+				if ( Double.isInfinite( sum ) || Double.isNaN( sum ) ) {
+					throw new RuntimeException( "got sum "+sum+" for exp "+d+" with correction "+c+"! (resulting in exp("+(d - c)+"))" );
 				}
 			}
 
-			return Math.log( sum ) + c;
+			final double logsum = Math.log( sum ) + c;
+
+			if ( Double.isNaN( logsum ) || Double.isInfinite( logsum ) ) {
+				throw new RuntimeException( "logsum is "+logsum+" for sum "+sum+" and correction term "+c );
+			}
+
+			return logsum;
 		}
 	}
 
