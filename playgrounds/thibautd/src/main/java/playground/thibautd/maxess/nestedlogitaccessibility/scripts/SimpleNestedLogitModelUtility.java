@@ -62,7 +62,7 @@ public class SimpleNestedLogitModelUtility implements Utility<ModeNests> {
 
 	@Override
 	public double calcUtility( final Person p, final Alternative<ModeNests> a ) {
-		final double logTT = Math.log( getTravelTime( a ) );
+		final double logTT = Math.log( 1 + getTravelTime( a ) );
 		switch ( a.getNestId() ) {
 			case car:
 				return ASC_CAR +
