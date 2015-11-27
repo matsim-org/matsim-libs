@@ -40,8 +40,8 @@ public class AccessibilityComputationKiberaTest {
 	@Test
 	public void doAccessibilityTest() throws IOException {
 		// Input and output
-		String folderStructure = "../../../"; // local on dz's computer
-//		String folderStructure = "../../"; // server
+//		String folderStructure = "../../../"; // local on dz's computer
+		String folderStructure = "../../"; // server
 			
 		String networkFile = folderStructure + "matsimExamples/countries/ke/kibera/network/2015-11-05_kibera_paths_detailed.xml";
 		String facilitiesFile = folderStructure + "matsimExamples/countries/ke/kibera/facilities/facilities.xml";

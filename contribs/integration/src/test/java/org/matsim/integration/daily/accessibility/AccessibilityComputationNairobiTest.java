@@ -49,8 +49,8 @@ public class AccessibilityComputationNairobiTest {
 
 	@Test
 	public void doAccessibilityTest() throws IOException {
-		String folderStructure = "../../../"; // local on dz's computer
-//		String folderStructure = "../../"; // server
+//		String folderStructure = "../../../"; // local on dz's computer
+		String folderStructure = "../../"; // server
 			
 		String networkFile = folderStructure + "matsimExamples/countries/ke/nairobi/network/2015-10-15_nairobi.xml";
 		String facilitiesFile = folderStructure + "matsimExamples/countries/ke/nairobi/facilities/facilities.xml";

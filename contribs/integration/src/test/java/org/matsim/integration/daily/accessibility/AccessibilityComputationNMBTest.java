@@ -44,8 +44,8 @@ public class AccessibilityComputationNMBTest {
 
 	@Test
 	public void doAccessibilityTest() throws IOException {
-		String folderStructure = "../../../"; // local on dz's computer
-//		String folderStructure = "../../"; // server
+//		String folderStructure = "../../../"; // local on dz's computer
+		String folderStructure = "../../"; // server
 			
 		String networkFile = folderStructure + "matsimExamples/countries/za/nmb/network/NMBM_Network_CleanV7.xml.gz";
 		String facilitiesFile = folderStructure + "matsimExamples/countries/za/nmb/facilities/20121010/facilities.xml.gz";
