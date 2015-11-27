@@ -90,7 +90,7 @@ public class RunSimpleNestedLogitAccessibility {
 					new AdvantageColumnCalculator(
 							"pt_advantage",
 							"all",
-							"pt" ) ).write( outputDir + "/accessibility_per_person.xy" );
+							"nopt" ) ).write( outputDir + "/accessibility_per_person.xy" );
 		}
 		finally {
 			MoreIOUtils.closeOutputDirLogging();

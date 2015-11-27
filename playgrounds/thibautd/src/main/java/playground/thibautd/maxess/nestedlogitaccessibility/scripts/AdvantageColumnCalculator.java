@@ -18,6 +18,7 @@
  * *********************************************************************** */
 package playground.thibautd.maxess.nestedlogitaccessibility.scripts;
 
+import org.apache.log4j.Logger;
 import playground.thibautd.maxess.nestedlogitaccessibility.framework.AccessibilityComputationResult;
 import playground.thibautd.maxess.nestedlogitaccessibility.writers.BasicPersonAccessibilityWriter;
 
@@ -25,6 +26,7 @@ import playground.thibautd.maxess.nestedlogitaccessibility.writers.BasicPersonAc
  * @author thibautd
  */
 public class AdvantageColumnCalculator implements BasicPersonAccessibilityWriter.ColumnCalculator {
+	private static final Logger log = Logger.getLogger( AdvantageColumnCalculator.class );
 	private final String name;
 	private final String better;
 	private final String worse;
@@ -45,8 +47,16 @@ public class AdvantageColumnCalculator implements BasicPersonAccessibilityWriter
 
 	@Override
 	public double computeValue( AccessibilityComputationResult.PersonAccessibilityComputationResult personResults ) {
-		final double noCar = personResults.getAccessibilities().get( worse );
-		final double all = personResults.getAccessibilities().get( better );
-		return all - noCar;
+		final Double noCar = personResults.getAccessibilities().get( worse );
+		final Double all = personResults.getAccessibilities().get( better );
+
+		if ( noCar == null ) {
+			log.error( "no value of accessibility found for "+worse );
+		}
+		if ( all == null ) {
+			log.error( "no value of accessibility found for "+better );
+		}
+
+		return all == null || noCar == null ? Double.NaN : all - noCar;
 	}
 }
