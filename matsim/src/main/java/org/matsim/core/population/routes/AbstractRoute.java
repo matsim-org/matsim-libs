@@ -30,7 +30,7 @@ import org.matsim.core.utils.misc.Time;
  *
  * @author mrieser
  */
-public abstract class AbstractRoute implements Route {
+public abstract class AbstractRoute implements Route, Cloneable {
 
 	private double dist = Double.NaN;
 
