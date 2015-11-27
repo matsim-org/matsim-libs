@@ -25,40 +25,40 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.emissions.events.WarmEmissionEvent;
-import org.matsim.contrib.emissions.types.WarmPollutant;
+import org.matsim.contrib.emissions.events.ColdEmissionEvent;
+import org.matsim.contrib.emissions.events.ColdEmissionEventHandler;
+import org.matsim.contrib.emissions.types.ColdPollutant;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
 
 import playground.agarwalamit.utils.GeometryUtils;
-import playground.vsp.analysis.modules.emissionsAnalyzer.EmissionsPerPersonWarmEventHandler;
+import playground.benjamin.scenarios.munich.analysis.nectar.EmissionsPerLinkColdEventHandler;
 
 /**
  * @author amit
  */
 
-public class SortedWarmEmissionHandler extends EmissionsPerPersonWarmEventHandler  {
-	private final EmissionsPerPersonWarmEventHandler delegate;
-	private final Collection<SimpleFeature> features ;
+public class SortedColdEmissionPerLinkHandler implements ColdEmissionEventHandler{
+	private EmissionsPerLinkColdEventHandler delegate;
+	private Collection<SimpleFeature> features ;
 	private Network network;
 	private boolean isSorting;
 
-	public SortedWarmEmissionHandler (String shapeFile, Network network){
-		delegate = new EmissionsPerPersonWarmEventHandler();
-		features = new ShapeFileReader().readFileAndInitialize(shapeFile);
-		this.network = network;
-		isSorting = true;
-	}
-	
-	public SortedWarmEmissionHandler (){
-		delegate = new EmissionsPerPersonWarmEventHandler();
+	public SortedColdEmissionPerLinkHandler(double simulationEndTime, int noOfTimeBins) {
+		delegate = new EmissionsPerLinkColdEventHandler(simulationEndTime, noOfTimeBins);
 		features = new ArrayList<>();
 		isSorting = false;
 	}
 
+	public SortedColdEmissionPerLinkHandler(double simulationEndTime, int noOfTimeBins,String shapeFile, Network network) {
+		delegate = new EmissionsPerLinkColdEventHandler(simulationEndTime, noOfTimeBins);
+		features = new ShapeFileReader().readFileAndInitialize(shapeFile);
+		this.network = network;
+		isSorting = true;
+	}	
+
 	@Override
-	public void handleEvent(WarmEmissionEvent event) {
+	public void handleEvent(ColdEmissionEvent event) {
 		if(isSorting) {
 			Link link = network.getLinks().get(event.getLinkId());
 			if(GeometryUtils.isLinkInsideCity(features, link) ) delegate.handleEvent(event);
@@ -67,9 +67,8 @@ public class SortedWarmEmissionHandler extends EmissionsPerPersonWarmEventHandle
 		}
 	}
 
-	@Override
-	public Map<Id<Person>, Map<WarmPollutant, Double>> getWarmEmissionsPerPerson() {
-		return delegate.getWarmEmissionsPerPerson();
+	public Map<Double, Map<Id<Link>, Map<ColdPollutant, Double>>> getColdEmissionsPerLinkAndTimeInterval() {
+		return delegate.getColdEmissionsPerLinkAndTimeInterval();
 	}
 
 	@Override
