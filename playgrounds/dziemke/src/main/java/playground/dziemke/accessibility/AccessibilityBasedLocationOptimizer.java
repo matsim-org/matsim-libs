@@ -49,7 +49,7 @@ public class AccessibilityBasedLocationOptimizer {
 		
 		
 		// Parameters
-		int searchInterval = 7; // only every searchInterval-th measuring point will be considered to speed up the analysis
+		int searchInterval = 1; // only every searchInterval-th measuring point will be considered to speed up the analysis
 		String actType = FacilityTypes.HOSPITAL;
 
 
