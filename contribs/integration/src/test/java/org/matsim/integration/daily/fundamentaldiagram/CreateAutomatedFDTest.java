@@ -147,9 +147,10 @@ public class CreateAutomatedFDTest {
 		scenario.getConfig().qsim().setEndTime(14*3600);
 		scenario.getConfig().qsim().setLinkDynamics(linkDynamics.name());
 	
-		if(linkDynamics.equals(LinkDynamics.SeepageQ)) {
-			scenario.getConfig().setParam("seepage", "seepMode", "bike");
-			scenario.getConfig().setParam("seepage", "isRestrictingNumberOfSeepMode", "true");
+		if(linkDynamics.equals(LinkDynamics.SeepageQ)){
+			scenario.getConfig().qsim().setSeepMode("bike");
+			scenario.getConfig().qsim().setSeepModeStorageFree(false);
+			scenario.getConfig().qsim().setRestrictingSeepage(true);
 		}
 		
 		scenario.getConfig().vspExperimental().setVspDefaultsCheckingLevel( VspDefaultsCheckingLevel.abort );

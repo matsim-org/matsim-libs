@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.flowDynamics;
+package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -159,10 +159,10 @@ public class SeepageTest {
 			config.qsim().setMainModes(Arrays.asList(TransportMode.car,TransportMode.walk));
 			config.qsim().setLinkDynamics(LinkDynamics.SeepageQ.name());
 			
-			config.setParam("seepage", "seepMode", "walk");
-			config.setParam("seepage","isSeepModeStorageFree","false");
-			config.setParam("seepage", "isRestrictingNumberOfSeepMode", "false");
-
+			config.qsim().setSeepMode("walk");
+			config.qsim().setSeepModeStorageFree(false);
+			config.qsim().setRestrictingSeepage(true);
+			
 			network = (NetworkImpl) scenario.getNetwork();
 			this.network.setCapacityPeriod(Time.parseTime("1:00:00"));
 			double x = -100.0;

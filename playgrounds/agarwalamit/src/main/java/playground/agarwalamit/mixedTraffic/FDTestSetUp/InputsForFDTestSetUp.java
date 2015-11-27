@@ -99,9 +99,9 @@ public class InputsForFDTestSetUp {
 		}
 		
 		if(linkDynamics.equals(LinkDynamics.SeepageQ)){
-			config.setParam("seepage", "seepMode","bike");
-			config.setParam("seepage", "isSeepModeStorageFree", "false");
-			config.setParam("seepage", "isRestrictingNumberOfSeepMode", "true");
+			config.qsim().setSeepMode("bike");
+			config.qsim().setSeepModeStorageFree(false);
+			config.qsim().setRestrictingSeepage(true);
 		}
 
 		config.vspExperimental().setVspDefaultsCheckingLevel( VspDefaultsCheckingLevel.abort );

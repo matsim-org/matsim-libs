@@ -110,7 +110,14 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup implements Mobs
 	public static enum VehiclesSource { defaultVehicle, fromVehiclesData } ;
 	private VehiclesSource vehiclesSource = VehiclesSource.defaultVehicle ;
 	// ---
-
+	private static final String SEEP_MODE = "seepMode";
+	private static final String IS_SEEP_MODE_STORAGE_FREE = "isSeepModeStorageFree";
+	private static final String IS_RESTRICTING_SEEPAGE = "isRestrictingSeepage";
+	private String seepMode = "bike";
+	private boolean isSeepModeStorageFree = false;
+	private boolean isRestrictingSeepage = true;
+	// ---
+	
 	public QSimConfigGroup() {
 		super(GROUP_NAME);
 	}
@@ -241,6 +248,9 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup implements Mobs
 			map.put( VEHICLES_SOURCE, "If vehicles should all be the same default vehicle, or come from the vehicles file, "
 					+ "or something else.  Possible values: " + stb );
 		}
+		map.put(SEEP_MODE, "If link dynamics is set as "+ LinkDynamics.SeepageQ+", set a seep mode. Default is bike.");
+		map.put(IS_SEEP_MODE_STORAGE_FREE, "If link dynamics is set as "+ LinkDynamics.SeepageQ+", set to true if seep mode do not consumes any space on the link. Default is false.");
+		map.put(IS_RESTRICTING_SEEPAGE, "If link dynamics is set as "+ LinkDynamics.SeepageQ+", set to false if all seep modes should perform seepage. Default is true (better option).");
 		return map;
 	}
 
@@ -507,4 +517,30 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup implements Mobs
 		this.useLanes = useLanes;
 	}
 
+	// ---
+	@StringGetter(SEEP_MODE)
+	public String getSeepMode() {
+		return seepMode;
+	}
+	@StringSetter(SEEP_MODE)
+	public void setSeepMode(String seepMode) {
+		this.seepMode = seepMode;
+	}
+	@StringGetter(IS_SEEP_MODE_STORAGE_FREE)
+	public boolean isSeepModeStorageFree() {
+		return isSeepModeStorageFree;
+	}
+	@StringSetter(IS_SEEP_MODE_STORAGE_FREE)
+	public void setSeepModeStorageFree(boolean isSeepModeStorageFree) {
+		this.isSeepModeStorageFree = isSeepModeStorageFree;
+	}
+	@StringGetter(IS_RESTRICTING_SEEPAGE)
+	public boolean isRestrictingSeepage() {
+		return isRestrictingSeepage;
+	}
+	@StringSetter(IS_RESTRICTING_SEEPAGE)
+	public void setRestrictingSeepage(boolean isRestrictingSeepage) {
+		this.isRestrictingSeepage = isRestrictingSeepage;
+	}
+	// ---
 }

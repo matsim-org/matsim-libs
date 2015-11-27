@@ -168,12 +168,12 @@ public class QNetsimEngine implements MobsimEngine {
 		QueueWithBuffer.fastCapacityUpdate = qSimConfigGroup.isUsingFastCapacityUpdate() ;
 		
 		if(qSimConfigGroup.getLinkDynamics().equals(LinkDynamics.SeepageQ)){
-			QueueWithBuffer.seepageAllowed = true;
-			QueueWithBuffer.seepMode = config.getParam("seepage", "seepMode");
-			QueueWithBuffer.isSeepModeStorageFree = Boolean.valueOf(config.getParam("seepage", "isSeepModeStorageFree"));
+			QueueWithBuffer.isSeepageAllowed = true;
+			QueueWithBuffer.seepMode = qSimConfigGroup.getSeepMode();
+			QueueWithBuffer.isSeepModeStorageFree = qSimConfigGroup.isSeepModeStorageFree();
 			log.info("Seepage is allowed. Seep mode is "+QueueWithBuffer.seepMode+".");
 			if(QueueWithBuffer.isSeepModeStorageFree) log.warn("Seep mode "+QueueWithBuffer.seepMode+" do not take storage space thus only considered for flow capacities.");
-			QueueWithBuffer.isRestrictingNumberOfSeepMode = Boolean.valueOf(config.getParam("seepage", "isRestrictingNumberOfSeepMode"));
+			QueueWithBuffer.isRestrictingSeepage = qSimConfigGroup.isRestrictingSeepage();
 		}
 		
 		if ( QSimConfigGroup.SnapshotStyle.withHoles.equals( qsimConfigGroup.getSnapshotStyle() ) ) {

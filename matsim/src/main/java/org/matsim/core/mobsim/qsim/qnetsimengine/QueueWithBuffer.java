@@ -469,7 +469,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 
 			addToBuffer(veh, now);
 			removeVehicleFromQueue(now,veh);
-			if(isRestrictingNumberOfSeepMode && seepageAllowed && veh.getDriver().getMode().equals(seepMode)) noOfSeepModeBringFwd++;
+			if(isRestrictingSeepage && isSeepageAllowed && veh.getDriver().getMode().equals(seepMode)) noOfSeepModeBringFwd++;
 		} // end while
 	}
 
@@ -479,7 +479,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 
 		QVehicle veh = pollFromVehQueue(veh2Remove); 
 
-		if(seepageAllowed && isSeepModeStorageFree && veh.getVehicle().getType().getId().toString().equals(seepMode) ){
+		if(isSeepageAllowed && isSeepModeStorageFree && veh.getVehicle().getType().getId().toString().equals(seepMode) ){
 			// yyyy above line feels quite slow/consuming computer time.  Should be switched off completely when seepage is not used. kai, may'15
 
 		} else {
@@ -849,25 +849,25 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		}
 	}
 
-	static boolean seepageAllowed = false;
-	static String seepMode = null; 
-	static boolean isSeepModeStorageFree = false;
+	static boolean isSeepageAllowed ;
+	static String seepMode ; 
+	static boolean isSeepModeStorageFree ;
 
 	private int maxSeepModeAllowed = 4;
 	private int noOfSeepModeBringFwd = 0;
 	/**
 	 * basically required to get more data points in the congested branch of FD
 	 */
-	static boolean isRestrictingNumberOfSeepMode = false;
+	static boolean isRestrictingSeepage = true;
 	
 	private QVehicle peekFromVehQueue(){
 		double now = network.simEngine.getMobsim().getSimTimer().getTimeOfDay();
 
 		QVehicle returnVeh = vehQueue.peek();
 
-		if(seepageAllowed){
+		if(isSeepageAllowed){
 
-			if(isRestrictingNumberOfSeepMode && noOfSeepModeBringFwd == maxSeepModeAllowed) {
+			if(isRestrictingSeepage && noOfSeepModeBringFwd == maxSeepModeAllowed) {
 				noOfSeepModeBringFwd = 0;
 				return returnVeh;
 			}

@@ -134,9 +134,9 @@ public class PatnaSimulationTimeWriter {
 		config.qsim().setTrafficDynamics(td);
 
 		if(ld.equals(QSimConfigGroup.LinkDynamics.SeepageQ)) {
-			config.setParam("seepage", "seepMode","bike");
-			config.setParam("seepage", "isSeepModeStorageFree", "false");
-			config.setParam("seepage", "isRestrictingNumberOfSeepMode", "true");
+			config.qsim().setSeepMode("bike");
+			config.qsim().setSeepModeStorageFree(false);
+			config.qsim().setRestrictingSeepage(true);
 		}
 
 		config.controler().setCreateGraphs(false);
