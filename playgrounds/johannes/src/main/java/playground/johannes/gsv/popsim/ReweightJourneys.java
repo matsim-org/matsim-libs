@@ -57,7 +57,8 @@ public class ReweightJourneys implements PersonsTask {
 
         referenceHist = new TDoubleDoubleHashMap();
         try {
-            BufferedReader reader = new BufferedReader(new FileReader("/home/johannes/gsv/matrix2014/mid-fusion/tomtom.dist.txt"));
+            BufferedReader reader = new BufferedReader(new FileReader
+                    ("/home/johannes/gsv/matrix2014/popgen/mid-fusion/tomtom.dist.txt"));
             String line = reader.readLine();
             while ((line = reader.readLine()) != null) {
                 String[] tokens = line.split("\t");
