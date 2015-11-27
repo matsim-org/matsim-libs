@@ -48,14 +48,14 @@ public class ActivityAnalyzer {
                     if (pe instanceof ActivityImpl) {
                         ActivityImpl act = (ActivityImpl) pe;
                         if (!actToIgnore.contains(act.getType())) {
-                            actChain = actChain.concat(act.getType().substring(0, 1));
+                            actChain = actChain.concat(act.getType().substring(0,2) + "-");
                         }
                     }
-                    this.addActChain(actChain);
                 }
+                this.addActChain(actChain.substring(0, actChain.length()-1));
             }
             else {
-                log.warn("person " +p.getId().toString()+ " has no plan defined");
+                log.warn("person " + p.getId().toString() + " has no plan defined");
             }
         }
     }
