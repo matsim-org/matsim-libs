@@ -34,6 +34,8 @@ import playground.thibautd.maxess.nestedlogitaccessibility.framework.Accessibili
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -44,11 +46,19 @@ public class BasicPersonAccessibilityWriter implements MatsimWriter {
 	private final AccessibilityComputationResult accessibilityPerPerson;
 	private final Scenario scenario;
 
+	private final List<ColumnCalculator> additionalColumns = new ArrayList<>();
+
 	public BasicPersonAccessibilityWriter(
 			final Scenario scenario,
-			final AccessibilityComputationResult accessibilityPerPerson ) {
+			final AccessibilityComputationResult accessibilityPerPerson,
+			final ColumnCalculator... columns ) {
 		this.accessibilityPerPerson = accessibilityPerPerson;
 		this.scenario = scenario;
+		for ( ColumnCalculator c : columns ) addColumnCalculator( c );
+	}
+
+	public void addColumnCalculator( final ColumnCalculator c ) {
+		this.additionalColumns.add( c );
 	}
 
 	@Override
@@ -59,6 +69,9 @@ public class BasicPersonAccessibilityWriter implements MatsimWriter {
 			writer.write( "person_id\tfacility_id\tx\ty" );
 			for ( String name : accessibilityPerPerson.getTypes() ) {
 				writer.write( "\taccessibility_"+name );
+			}
+			for ( ColumnCalculator c : additionalColumns ) {
+				writer.write( "\t"+c.getColumnName() );
 			}
 
 			for ( Map.Entry<Id<Person>,PersonAccessibilityComputationResult> e : accessibilityPerPerson.getResultsPerPerson().entrySet() ) {
@@ -79,6 +92,9 @@ public class BasicPersonAccessibilityWriter implements MatsimWriter {
 					final Double a = accessibilities.get( name );
 					writer.write( "\t"+( a != null ? a : "NA" ) );
 				}
+				for ( ColumnCalculator c : additionalColumns ) {
+					writer.write( "\t"+c.computeValue( e.getValue() ) );
+				}
 			}
 			lineCounter.printCounter();
 			log.info( "Write accessibility per person to file "+filename+" : DONE" );
@@ -86,5 +102,10 @@ public class BasicPersonAccessibilityWriter implements MatsimWriter {
 		catch ( IOException e ) {
 			throw new UncheckedIOException( e );
 		}
+	}
+
+	public interface ColumnCalculator {
+		String getColumnName();
+		double computeValue( PersonAccessibilityComputationResult personResults );
 	}
 }

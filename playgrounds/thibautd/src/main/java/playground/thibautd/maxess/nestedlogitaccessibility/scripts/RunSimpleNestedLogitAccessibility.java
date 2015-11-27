@@ -80,7 +80,17 @@ public class RunSimpleNestedLogitAccessibility {
 			// TODO store and write results
 			final AccessibilityComputationResult accessibilities = calculator.computeAccessibilities ();
 			module.stopWatch.printStats( TimeUnit.SECONDS );
-			new BasicPersonAccessibilityWriter( scenario , accessibilities ).write( outputDir + "/accessibility_per_person.xy" );
+			new BasicPersonAccessibilityWriter(
+					scenario,
+					accessibilities,
+					new AdvantageColumnCalculator(
+							"car_advantage",
+							"all",
+							"nocar" ),
+					new AdvantageColumnCalculator(
+							"pt_advantage",
+							"all",
+							"pt" ) ).write( outputDir + "/accessibility_per_person.xy" );
 		}
 		finally {
 			MoreIOUtils.closeOutputDirLogging();
