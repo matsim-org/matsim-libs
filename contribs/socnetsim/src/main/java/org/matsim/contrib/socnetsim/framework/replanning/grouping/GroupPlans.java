@@ -29,6 +29,7 @@ import org.matsim.core.population.PlanImpl;
 
 import org.matsim.contrib.socnetsim.framework.population.JointPlan;
 import org.matsim.contrib.socnetsim.framework.population.JointPlanFactory;
+import org.matsim.contrib.socnetsim.framework.population.PlanWithCachedJointPlan;
 
 /**
  * Stores plans for a group.
@@ -147,7 +148,7 @@ public class GroupPlans {
 
 		for (Plan p : plans.getIndividualPlans()) {
 			Plan newPlan = JointPlanFactory.createIndividualPlan( p.getPerson() );
-			((PlanImpl)newPlan).copyFrom( p );
+			((PlanWithCachedJointPlan)newPlan).copyFrom( p );
 			// I think that the above cast will now fail.  It probably worked originally, since JointPlan was an extension of PlanImpl, which is
 			// no longer allowed. I would, however, say that it was not a clean copy anyways, since it ignored the additional fields
 			// of JointPlan.  Thibaut, I am confident that you can resolve this if you encounter it, but please let me know if you want to dicuss.

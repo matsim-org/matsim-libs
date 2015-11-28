@@ -35,14 +35,14 @@ import org.matsim.core.population.PlanImpl;
  *
  * @author thibautd
  */
-final class PlanWithCachedJointPlan implements Plan {
+public final class PlanWithCachedJointPlan implements Plan {
 	// should be small, because we use linear search: the idea is to be much faster
 	// then a HashMap lookup, which runs in constant time but is relatively slow.
 	// For a given state of the plans, there are typically two joint plans to remember:
 	// the "weak" and "strong" plans. Hence the size.
 	private static final int SIZE = 3;
 	
-	Plan delegate ;
+	private Plan delegate ;
 
 	private final JointPlan[] jointPlans = new JointPlan[ SIZE ];
 	private final int[] lastAccess = new int[ SIZE ];
@@ -138,6 +138,8 @@ final class PlanWithCachedJointPlan implements Plan {
 	@Override
 	public boolean isSelected() {
 		return this.delegate.isSelected();
+//		return this.getPerson().getSelectedPlan() == this;
+		// yy cannot delegate this since getSelectedPlan returns this plan here, but inside the delegate "this" returns the delegate.
 	}
 
 	@Override
@@ -179,5 +181,12 @@ final class PlanWithCachedJointPlan implements Plan {
 	public void setPerson(Person person) {
 		this.delegate.setPerson(person);
 	}
+	
+	public final void copyFrom( Plan in) {
+		// yy we really need a more systematic way for plans copying.  kai, nov15
+		((PlanImpl) this.delegate).copyFrom(in);
+	}
+	
+	
 }
 

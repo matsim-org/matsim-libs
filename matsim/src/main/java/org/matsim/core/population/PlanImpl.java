@@ -181,8 +181,8 @@ public final class PlanImpl implements Plan {
 	}
 
 	@Override
-	public final PersonImpl getPerson() {
-		return (PersonImpl) this.person;
+	public final Person getPerson() {
+		return this.person;
 	}
 
 	@Override
@@ -227,9 +227,32 @@ public final class PlanImpl implements Plan {
 
 	@Override
 	public final boolean isSelected() {
-		return this.getPerson().getSelectedPlan() == this;
+//		return this.getPerson().getSelectedPlan() == this;
+		// yyyy the above does not work when using delegation instead of inheritance!!!!! kai, nov'15
+		return this.equals( getPerson().getSelectedPlan() ) ;
 	}
 
+	@Override
+	public final boolean equals( Object in ) {
+		if ( ! ( in instanceof Plan ) ) {
+			return false ;
+		}
+		Plan otherPlan = (Plan) in ;
+		if ( otherPlan.getPerson() != this.getPerson() ) {
+			return false ;
+		}
+		if ( otherPlan.getPlanElements() != this.getPlanElements() ) {
+			return false ;
+		}
+		if ( otherPlan.getCustomAttributes() != this.getCustomAttributes() ) {
+			return false ;
+		}
+		if ( otherPlan.getScore() != this.getScore() ) {
+			return false ;
+		}
+		return true ;
+	}
+	
 	@Override
 	public final String toString() {
 
