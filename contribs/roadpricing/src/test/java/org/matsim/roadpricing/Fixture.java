@@ -41,8 +41,8 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.MutableScenario;
@@ -185,7 +185,7 @@ import junit.framework.TestCase;
 	}
 
 	private static Person createPerson1(final int personId, final String startTime, final Id homeLinkId, final List<Id<Link>> routeLinkIds, final Id workLinkId) {
-		Person person = PersonImpl.createPerson(Id.create(personId, Person.class));
+		Person person = PopulationUtils.createPerson(Id.create(personId, Person.class));
 		PlanImpl plan = new org.matsim.core.population.PlanImpl(person);
 		person.addPlan(plan);
 		plan.createAndAddActivity("h", homeLinkId).setEndTime(Time.parseTime(startTime));
@@ -198,7 +198,7 @@ import junit.framework.TestCase;
 	}
 
 	private static Person createPerson2(final int personId, final String startTime, final Link homeLink, final Link workLink, final Link finishLink) {
-		Person person = PersonImpl.createPerson(Id.create(personId, Person.class));
+		Person person = PopulationUtils.createPerson(Id.create(personId, Person.class));
 		PlanImpl plan = new org.matsim.core.population.PlanImpl(person);
 		person.addPlan(plan);
 		ActivityImpl act = plan.createAndAddActivity("h", homeLink.getId());

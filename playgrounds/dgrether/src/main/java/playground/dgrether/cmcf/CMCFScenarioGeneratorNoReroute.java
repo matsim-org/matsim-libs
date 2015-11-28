@@ -37,8 +37,8 @@ import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
@@ -180,7 +180,7 @@ public class CMCFScenarioGeneratorNoReroute {
 		Link l6 = this.network.getLinks().get(Id.create(6, Link.class));
 
 		for (int i = 1; i <= 7200; i++) {
-			Person p = PersonImpl.createPerson(Id.create(i, Person.class));
+			Person p = PopulationUtils.createPerson(Id.create(i, Person.class));
 			PlanImpl plan = new org.matsim.core.population.PlanImpl(p);
 			p.addPlan(plan);
 			// home % 2

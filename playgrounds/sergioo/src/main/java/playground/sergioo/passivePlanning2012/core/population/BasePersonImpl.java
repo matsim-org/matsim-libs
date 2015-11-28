@@ -6,9 +6,9 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.TripRouter;
 import org.matsim.facilities.ActivityFacilities;
 
@@ -23,7 +23,7 @@ public class BasePersonImpl implements BasePerson {
 	
 	//Constructors
 	public BasePersonImpl(Id<Person> id) {
-		delegate = PersonImpl.createPerson(id) ;
+		delegate = PopulationUtils.createPerson(id) ;
 	}
 
 	//Static methods

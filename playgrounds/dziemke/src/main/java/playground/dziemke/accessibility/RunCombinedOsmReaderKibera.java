@@ -42,7 +42,7 @@ public class RunCombinedOsmReaderKibera {
 	final private static Logger log = Logger.getLogger(RunCombinedOsmReaderKibera.class);
 
 	/**
-	 * Implementing the {@link LandUseBuildingReader} class. 
+	 * Implementing the {@link CombinedOsmReader} class. 
 	 * @param args The main method requires three arguments:
 	 * <ol>
 	 * 	<li> the OpenStreetMap file, *.osm;

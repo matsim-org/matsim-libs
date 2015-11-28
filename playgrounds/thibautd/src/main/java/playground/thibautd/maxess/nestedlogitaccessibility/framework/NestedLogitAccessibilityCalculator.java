@@ -22,10 +22,7 @@ import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import gnu.trove.list.array.TDoubleArrayList;
-import gnu.trove.map.TObjectDoubleMap;
-import gnu.trove.map.hash.TObjectDoubleHashMap;
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
@@ -35,6 +32,7 @@ import playground.thibautd.utils.ConcurrentStopWatch;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -61,7 +59,7 @@ public class NestedLogitAccessibilityCalculator<N extends Enum<N>> {
 		this.model = model;
 	}
 
-	public TObjectDoubleMap<Id<Person>> computeAccessibilities() {
+	public AccessibilityComputationResult computeAccessibilities() {
 		log.info( "Compute accessibility for "+population.getPersons().size()+" persons using "+nThreads+" threads" );
 		final ComputationThreadHandler<N> runner =
 				new ComputationThreadHandler<>(
@@ -83,6 +81,7 @@ public class NestedLogitAccessibilityCalculator<N extends Enum<N>> {
 		final ConcurrentStopWatch<ComputationRunnable.Measurement> stopWatch =
 				new ConcurrentStopWatch<>(
 						ComputationRunnable.Measurement.class );
+		final AccessibilityComputationResult result = new AccessibilityComputationResult();
 
 		public ComputationThreadHandler(
 				final Provider<NestedLogitModel<N>> models,
@@ -92,6 +91,7 @@ public class NestedLogitAccessibilityCalculator<N extends Enum<N>> {
 			for ( int i = 0; i < nThreads; i++ ) {
 				runnables.add(
 						new ComputationRunnable<>(
+								result,
 								models.get(),
 								stopWatch,
 								counter,
@@ -105,7 +105,7 @@ public class NestedLogitAccessibilityCalculator<N extends Enum<N>> {
 			n %= runnables.size();
 		}
 
-		public TObjectDoubleMap<Id<Person>> run() {
+		public AccessibilityComputationResult run() {
 			final List<Thread>  threads = new ArrayList<>( runnables.size() );
 			for ( ComputationRunnable<N> r : runnables ) threads.add( new Thread( r ) );
 
@@ -120,11 +120,7 @@ public class NestedLogitAccessibilityCalculator<N extends Enum<N>> {
 			emptyCounter.printCounter();
 			stopWatch.printStats( TimeUnit.SECONDS );
 
-			final TObjectDoubleMap<Id<Person>> results = new TObjectDoubleHashMap<>(  );
-			for ( ComputationRunnable<N> r : runnables ) {
-				results.putAll( r.result );
-			}
-			return results;
+			return result;
 		}
 	}
 
@@ -132,17 +128,19 @@ public class NestedLogitAccessibilityCalculator<N extends Enum<N>> {
 		enum Measurement { choiceSampling, logsumComputation;}
 		private final NestedLogitModel<N> model;
 		private final List<Person> persons = new ArrayList<>(  );
-		private final TObjectDoubleMap<Id<Person>> result = new TObjectDoubleHashMap<>( );
+		private final AccessibilityComputationResult result;
 		private final ConcurrentStopWatch<Measurement> stopWatch;
 
 		final Counter personCounter;
 		final Counter emptyCounter;
 
 		private ComputationRunnable(
+				final AccessibilityComputationResult result,
 				final NestedLogitModel<N> model,
 				final ConcurrentStopWatch<Measurement> stopWatch,
 				final Counter personCounter,
 				final Counter emptyCounter ) {
+			this.result = result;
 			this.model = model;
 			this.stopWatch = stopWatch;
 			this.personCounter = personCounter;
@@ -157,20 +155,40 @@ public class NestedLogitAccessibilityCalculator<N extends Enum<N>> {
 					emptyCounter.incCounter();
 					continue;
 				}
-				result.put(
+				result.addResults(
 						p.getId(),
 						computeAccessibility( p ) );
 			}
 		}
 
-		private double computeAccessibility( Person p ) {
+		private AccessibilityComputationResult.PersonAccessibilityComputationResult computeAccessibility( final Person p ) {
 			stopWatch.startMeasurement( Measurement.choiceSampling );
-			final NestedChoiceSet<N> choiceSet = model.getChoiceSetIdentifier().identifyChoiceSet( p );
+			final Map<String, NestedChoiceSet<N>> choiceSets =
+					model.getChoiceSetIdentifier().identifyChoiceSet(
+						p );
 			stopWatch.endMeasurement( Measurement.choiceSampling );
 
+			final AccessibilityComputationResult.PersonAccessibilityComputationResult accessibilities =
+					new AccessibilityComputationResult.PersonAccessibilityComputationResult();
+
+			for ( Map.Entry<String, NestedChoiceSet<N>> choiceSet : choiceSets.entrySet() ){
+				accessibilities.addAccessibility(
+						choiceSet.getKey(),
+						computeExpectedMaximumUtility(
+								p,
+								choiceSet.getValue() ) );
+			}
+
+			return accessibilities;
+		}
+
+		private double computeExpectedMaximumUtility(
+				final Person p,
+				final NestedChoiceSet<N> choiceSet ) {
 			stopWatch.startMeasurement( Measurement.logsumComputation );
 			final LogSumExpCalculator calculator = new LogSumExpCalculator( choiceSet.getNests().size() );
 			for ( Nest<N> nest : choiceSet.getNests() ) {
+				if ( nest.getAlternatives().isEmpty() ) continue;
 				calculator.addTerm( logSumNestUtilities( p , nest ) );
 			}
 
@@ -183,6 +201,7 @@ public class NestedLogitAccessibilityCalculator<N extends Enum<N>> {
 				final Person p,
 				final Nest<N> nest ) {
 			final LogSumExpCalculator calculator = new LogSumExpCalculator( nest.getAlternatives().size() );
+			assert !nest.getAlternatives().isEmpty();
 			for ( Alternative<N> alternative : nest.getAlternatives() ) {
 				calculator.addTerm( nest.getMu_n() *
 								model.getUtility().calcUtility(
@@ -206,12 +225,16 @@ public class NestedLogitAccessibilityCalculator<N extends Enum<N>> {
 		}
 
 		public void addTerm( final double util ) {
+			if ( Double.isNaN( util ) || Double.isInfinite( util ) ) {
+				throw new IllegalArgumentException( "Only finite terms are allowed, got "+util );
+			}
 			terms.add( util );
 			min = Math.min( util , min );
 			max = Math.max( util , max );
 		}
 
 		public double computeLogsumExp() {
+			if ( terms.isEmpty() ) throw new IllegalStateException( "nothing to sum!" );
 			// under and overflow avoidance
 			// see http://jblevins.org/log/log-sum-exp
 			// Note that this can only avoid underflow OR overflow,
@@ -224,12 +247,18 @@ public class NestedLogitAccessibilityCalculator<N extends Enum<N>> {
 			for ( double d : terms.toArray() ) {
 				sum += Math.exp( d - c );
 				// TODO check if underflow (how? compare with 0?)
-				if ( Double.isInfinite( sum ) ) {
-					throw new RuntimeException( "got an overflow for exp "+d+" with correction "+c+"! (resulting in exp("+(d - c)+"))" );
+				if ( Double.isInfinite( sum ) || Double.isNaN( sum ) ) {
+					throw new RuntimeException( "got sum "+sum+" for exp "+d+" with correction "+c+"! (resulting in exp("+(d - c)+"))" );
 				}
 			}
 
-			return Math.log( sum ) + c;
+			final double logsum = Math.log( sum ) + c;
+
+			if ( Double.isNaN( logsum ) || Double.isInfinite( logsum ) ) {
+				throw new RuntimeException( "logsum is "+logsum+" for sum "+sum+" and correction term "+c );
+			}
+
+			return logsum;
 		}
 	}
 

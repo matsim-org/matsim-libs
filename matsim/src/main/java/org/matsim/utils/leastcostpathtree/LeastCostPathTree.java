@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
@@ -65,7 +65,7 @@ public class LeastCostPathTree {
 	private HashMap<Id<Node>, NodeData> nodeData = null;
 	
 	private final Vehicle VEHICLE = VehicleUtils.getFactory().createVehicle(Id.create("theVehicle", Vehicle.class), VehicleUtils.getDefaultVehicleType());
-	private final Person PERSON = PersonImpl.createPerson(Id.create("thePerson", Person.class));
+	private final Person PERSON = PopulationUtils.createPerson(Id.create("thePerson", Person.class));
 
 	// ////////////////////////////////////////////////////////////////////
 	// constructors

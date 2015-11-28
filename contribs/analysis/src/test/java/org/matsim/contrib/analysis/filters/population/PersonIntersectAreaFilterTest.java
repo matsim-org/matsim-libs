@@ -60,7 +60,7 @@ public class PersonIntersectAreaFilterTest extends MatsimTestCase {
 		Link link5 = network.createAndAddLink(Id.create("5", Link.class), node4, node5, 20, 20, 100, 1);
 
 		// create a test person
-		Person person = PersonImpl.createPerson(Id.create("1", Person.class));
+		Person person = PopulationUtils.createPerson(Id.create("1", Person.class));
 		PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 
 		ActivityImpl act1 = plan.createAndAddActivity("h", link0.getId());

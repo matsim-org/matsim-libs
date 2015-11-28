@@ -37,7 +37,7 @@ import org.matsim.contrib.socnetgen.sna.snowball.SampledGraphProjectionBuilder;
 import org.matsim.contrib.socnetgen.sna.snowball.SampledVertexDecorator;
 import org.matsim.contrib.socnetgen.sna.snowball.io.SampledGraphProjMLWriter;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import playground.johannes.studies.sbsurvey.io.EgoAlterTableReader.RespondentData;
 
@@ -168,7 +168,7 @@ public class GraphBuilderTXT {
 	}
 	
 	private SocialPerson createPerson(RespondentData data) {
-		Person matsimPerson = PersonImpl.createPerson(Id.create(data.id, Person.class));
+		Person matsimPerson = PopulationUtils.createPerson(Id.create(data.id, Person.class));
 		SocialPerson person = new SocialPerson(matsimPerson);
 		return person;
 	}

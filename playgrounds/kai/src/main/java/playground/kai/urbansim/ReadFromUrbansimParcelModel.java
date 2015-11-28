@@ -24,9 +24,9 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -159,7 +159,7 @@ public class ReadFromUrbansimParcelModel {
 				String[] parts = line.split("[\t\n]+");
 
 				Id<Person> personId = Id.create( parts[idxFromKey.get("person_id")], Person.class ) ;
-				Person newPerson = PersonImpl.createPerson(personId);
+				Person newPerson = PopulationUtils.createPerson(personId);
 
 				if ( !( flag || MatsimRandom.getRandom().nextDouble() < samplingRate || (oldPop.getPersons().get( personId))!=null ) ) {
 					continue ;

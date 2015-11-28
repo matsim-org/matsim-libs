@@ -28,9 +28,10 @@ import org.matsim.pt.PtConstants;
 import com.google.inject.name.Names;
 
 import playground.balac.induceddemand.config.ActivityStrategiesConfigGroup;
-import playground.balac.induceddemand.strategies.InsertRandomActivityStrategy;
+import playground.balac.induceddemand.controler.listener.ActivitiesAnalysisListener;
 import playground.balac.induceddemand.strategies.RandomActivitiesSwaperStrategy;
 import playground.balac.induceddemand.strategies.RemoveRandomActivityStrategy;
+import playground.balac.induceddemand.strategies.insertactivity.InsertRandomActivityWithLocationChoiceStrategy;
 import playground.ivt.kticompatibility.KtiLikeScoringConfigGroup;
 import playground.ivt.matsim2030.scoring.MATSim2010ScoringFunctionFactory;
 
@@ -79,6 +80,7 @@ public class ZurichScenarioControler {
 
 		initializeLocationChoice( controler );
 		initializeActivityStrategies(scenario, controler);
+		controler.addControlerListener(new ActivitiesAnalysisListener(scenario));
 		// We use a specific scoring function, that uses individual preferences
 		// for activity durations.
 		controler.setScoringFunctionFactory(
@@ -128,7 +130,7 @@ public class ZurichScenarioControler {
 		controler.addOverridingModule( new AbstractModule() {
 			@Override
 			public void install() {
-				this.addPlanStrategyBinding("InsertRandomActivityStrategy").to( InsertRandomActivityStrategy.class ) ;
+				this.addPlanStrategyBinding("InsertRandomActivityWithLocationChoiceStrategy").to( InsertRandomActivityWithLocationChoiceStrategy.class ) ;
 
 				this.addPlanStrategyBinding("RandomActivitiesSwaperStrategy").to( RandomActivitiesSwaperStrategy.class ) ;
 				

@@ -26,7 +26,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.mobsim.jdeqsim.util.Timer;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.DijkstraFactory;
@@ -58,7 +58,7 @@ public class ComparePerformanceMultimodalRoutingWithAndWithoutSubnetworks {
                         ptTimeCostCalc,
                         ptTimeCostCalc);
 
-		final Person person = PersonImpl.createPerson(null);
+		final Person person = PopulationUtils.createPerson(null);
 
 		final Timer timer = new Timer();
 		timer.startTimer();

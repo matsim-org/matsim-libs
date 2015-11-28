@@ -54,13 +54,13 @@ public class TriGraphConstructor {
 	static DirectedGraph<NmvNode, NmvLink> myGraphGhost;
 	public TriGraphConstructor() {       
 	}
-	public static DirectedGraph<NmvNode, NmvLink> constructGridGraphSim(String path){
+	public static DirectedGraph<NmvNode, NmvLink> constructGridGraphSim(String path, int SimDim){
 		//read in the linklist
 		String filename = path+"GridLinkList.csv";
 		BufferedReader br1 = null;
 		String lineNode = "";
 		int counter =0;
-		int [][] linkList = new int[324][3]; 
+		int [][] linkList = new int[SimDim][3]; 
 		try {
 			br1 = new BufferedReader(new FileReader(filename));
 						String heading=br1.readLine();

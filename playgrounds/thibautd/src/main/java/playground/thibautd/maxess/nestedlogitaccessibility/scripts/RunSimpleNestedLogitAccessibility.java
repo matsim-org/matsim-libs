@@ -35,6 +35,7 @@ import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
 import org.matsim.population.algorithms.XY2Links;
+import playground.thibautd.maxess.nestedlogitaccessibility.framework.AccessibilityComputationResult;
 import playground.thibautd.maxess.nestedlogitaccessibility.framework.BaseNestedAccessibilityComputationModule;
 import playground.thibautd.maxess.nestedlogitaccessibility.framework.InjectionUtils;
 import playground.thibautd.maxess.nestedlogitaccessibility.framework.NestedLogitAccessibilityCalculator;
@@ -77,9 +78,19 @@ public class RunSimpleNestedLogitAccessibility {
 							module );
 
 			// TODO store and write results
-			final TObjectDoubleMap<Id<Person>> accessibilities = calculator.computeAccessibilities ();
+			final AccessibilityComputationResult accessibilities = calculator.computeAccessibilities ();
 			module.stopWatch.printStats( TimeUnit.SECONDS );
-			new BasicPersonAccessibilityWriter( scenario , accessibilities ).write( outputDir + "/accessibility_per_person.xy" );
+			new BasicPersonAccessibilityWriter(
+					scenario,
+					accessibilities,
+					new AdvantageColumnCalculator(
+							"car_advantage",
+							"all",
+							"nocar" ),
+					new AdvantageColumnCalculator(
+							"pt_advantage",
+							"all",
+							"nopt" ) ).write( outputDir + "/accessibility_per_person.xy" );
 		}
 		finally {
 			MoreIOUtils.closeOutputDirLogging();
