@@ -237,9 +237,11 @@ public class QNetsimEngine implements MobsimEngine {
 		final SnapshotStyle snapshotStyle = scenario.getConfig().qsim().getSnapshotStyle();
 		switch( snapshotStyle ) {
 		case queue:
+			return new QueueAgentSnapshotInfoBuilder(scenario, this.network.getAgentSnapshotInfoFactory());
 		case withHoles:
 			// the difference is not in the spacing, thus cannot be differentiated by using different classes.  kai, sep'14
-			return new QueueAgentSnapshotInfoBuilder(scenario, this.network.getAgentSnapshotInfoFactory());
+			// ??? kai, nov'15
+			return new WithHolesAgentSnapshotInfoBuilder(scenario, this.network.getAgentSnapshotInfoFactory());
 		case equiDist:
 			return new EquiDistAgentSnapshotInfoBuilder(scenario, this.network.getAgentSnapshotInfoFactory());
 		default:
