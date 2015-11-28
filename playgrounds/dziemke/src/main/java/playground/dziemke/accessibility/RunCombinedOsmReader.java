@@ -38,12 +38,12 @@ import playground.dziemke.utils.LogToOutputSaver;
 /**
  * @author dziemke
  */
-public class RunCombinedOsmReaderBerlin {
-	final private static Logger log = Logger.getLogger(RunCombinedOsmReaderBerlin.class);
+public class RunCombinedOsmReader {
+	final private static Logger log = Logger.getLogger(RunCombinedOsmReader.class);
 	//TODO write logger output somewhere
 
 	/**
-	 * Implementing the {@link LandUseBuildingReader} class. 
+	 * Implementing the {@link CombinedOsmReader} class. 
 	 * @param args The main method requires three arguments:
 	 * <ol>
 	 * 	<li> the OpenStreetMap file, *.osm;

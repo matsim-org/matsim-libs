@@ -28,7 +28,9 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
@@ -40,25 +42,25 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class MatrixBasesPtInputTest {
 
-	@Rule // test
-	public MatsimTestUtils testUtils = new MatsimTestUtils(); // test
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
 	
 	private static final Logger log = Logger.getLogger(MatrixBasesPtInputTest.class);
 
-	@Test // test
-	public final void test1(){ // test
-//	public static void main(String[] args) {
+	@Test
+	public final void test() {
 		String transitScheduleFile = "../../matsim/examples/pt-tutorial/transitschedule.xml";
 		String networkFile = "../../matsim/examples/pt-tutorial/multimodalnetwork.xml";
-		String outputRoot = testUtils.getOutputDirectory();
-		
-		// writing logfiles to file not needed on build server
-//		initLogging(outputRoot);
+		String outputRoot = utils.getOutputDirectory();
 		
 		double departureTime = 8. * 60 * 60;
 
-		Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.createConfig());
+		
+		Config config = ConfigUtils.createConfig();
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		Scenario scenario = ScenarioUtils.loadScenario(config);
 		scenario.getConfig().transit().setUseTransit(true);
+		
 		
 		TransitScheduleReader transitScheduleReader = new TransitScheduleReader(scenario);
 		transitScheduleReader.readFile(transitScheduleFile);
@@ -78,18 +80,23 @@ public class MatrixBasesPtInputTest {
 		
 		// The locationFacilitiesMap is passed twice: Once for origins and once for destinations.
 		// In other uses the two maps may be different -- thus the duplication here.
-		new ThreadedMatrixCreator(scenario, ptMatrixLocationsMap, ptMatrixLocationsMap, departureTime, outputRoot, " ", 1);
-		// TODO the TreadedMatrixCreator does not work when started from the test
-		// when this same class is titled as the main class instead of as test1 it runs without problems
-	}
-	
-	
-//	private static void initLogging(String outputBase) {
-//		try	{
-//			OutputDirectoryLogging.initLoggingWithOutputDirectory(outputBase);
-//		} catch (IOException e)	{
-//			log.error("Cannot create logfiles: " + e.getMessage());
-//			e.printStackTrace();
+		ThreadedMatrixCreator tmc = new ThreadedMatrixCreator(scenario, ptMatrixLocationsMap, 
+				ptMatrixLocationsMap, departureTime, outputRoot, " ", 1);
+		
+		// TODO starting the thread is actually already contained within the ThreadedMatrixCreator
+		// In normal classed it works starting it like that. Here (in a test), however, it seems that
+		// it must be started here
+		Thread thread = new Thread(tmc);
+		thread.start();
+//		try {
+//			Thread.sleep(1000);
+//		} catch (InterruptedException e1) {
+//			e1.printStackTrace();
 //		}
-//	}
+		try {
+			thread.join();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
 }

@@ -26,7 +26,7 @@ import org.matsim.contrib.socnetsim.framework.population.JointPlans;
 import org.matsim.contrib.socnetsim.framework.replanning.grouping.ReplanningGroup;
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.coalitionselector.CoalitionSelector;
 import org.matsim.contrib.socnetsim.utils.CollectionUtils;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
 
@@ -102,7 +102,7 @@ public class AnalysePerformanceOfCoalitionSelection {
 		final ReplanningGroup group = new ReplanningGroup();
 
 		for ( int i = 0; i < groupSize; i++ ) {
-			group.addPerson(PersonImpl.createPerson(Id.create(i, Person.class)));
+			group.addPerson(PopulationUtils.createPerson(Id.create(i, Person.class)));
 		}
 
 		for ( Person person : group.getPersons() ) {

@@ -264,7 +264,6 @@ public class NetworkUtils {
 	 * This method expects the nearest link to a given measure point. 
 	 * It calculates the euclidian distance for both nodes of the link, 
 	 * "fromNode" and "toNode" and returns the node with shorter distance
-	 *
 	 */
 	public static Node getCloserNodeOnLink(Coord coord, Link link) {
 		// yyyy I don't think there is a test for this anywhere.  kai, mar'14
@@ -281,19 +280,19 @@ public class NetworkUtils {
 	}
 
 	/**
-		 * returns the euclidean distance between two coordinates
-		 *
-		 */
-		public static double getEuclidianDistance(Coord origin, Coord destination){
-			double xDiff = origin.getX() - destination.getX();
-			double yDiff = origin.getY() - destination.getY();
-			double distance = Math.sqrt( (xDiff*xDiff) + (yDiff*yDiff) );
-			
-			return distance;
-		}
-
-	/** returns the euclidean distance between two points (x1,y1) and (x2,y2)
+	 * returns the euclidean distance between two coordinates
 	 *
+	 */
+	public static double getEuclidianDistance(Coord origin, Coord destination){
+		double xDiff = origin.getX() - destination.getX();
+		double yDiff = origin.getY() - destination.getY();
+		double distance = Math.sqrt( (xDiff*xDiff) + (yDiff*yDiff) );
+
+		return distance;
+	}
+
+	/** 
+	 * returns the euclidean distance between two points (x1,y1) and (x2,y2)
 	 */
 	public static double getEuclidianDistance(double x1, double y1, double x2, double y2){
 		

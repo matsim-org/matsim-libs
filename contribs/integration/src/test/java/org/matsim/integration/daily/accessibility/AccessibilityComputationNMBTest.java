@@ -3,7 +3,6 @@ package org.matsim.integration.daily.accessibility;
 import static org.junit.Assert.assertNotNull;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +15,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
 import org.matsim.contrib.accessibility.GridBasedAccessibilityControlerListenerV3;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
+import org.matsim.contrib.accessibility.utils.AccessibilityRunUtils;
 import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtRouterConfigGroup;
 import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
@@ -32,9 +32,6 @@ import org.matsim.core.replanning.DefaultPlanStrategiesModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.facilities.ActivityFacilities;
-import org.matsim.facilities.ActivityFacility;
-import org.matsim.facilities.ActivityOption;
-import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 public class AccessibilityComputationNMBTest {
@@ -47,9 +44,8 @@ public class AccessibilityComputationNMBTest {
 
 	@Test
 	public void doAccessibilityTest() throws IOException {
-
-		String folderStructure = "../../../"; // local on dz's computer
-//		String folderStructure = "../../"; // server
+//		String folderStructure = "../../../"; // local on dz's computer
+		String folderStructure = "../../"; // server
 			
 		String networkFile = folderStructure + "matsimExamples/countries/za/nmb/network/NMBM_Network_CleanV7.xml.gz";
 		String facilitiesFile = folderStructure + "matsimExamples/countries/za/nmb/facilities/20121010/facilities.xml.gz";
@@ -66,8 +62,10 @@ public class AccessibilityComputationNMBTest {
 		
 		
 		// Parameters
+		boolean createQGisOutput = false;
 		boolean includeDensityLayer = true;
 		String crs = TransformationFactory.WGS84_SA_Albers;
+		
 		Double lowerBound = 2.;
 		Double upperBound = 5.5;
 		Integer range = 9;
@@ -82,10 +80,10 @@ public class AccessibilityComputationNMBTest {
 		
 		// config and scenario
 		Config config = ConfigUtils.createConfig(new AccessibilityConfigGroup(), new MatrixBasedPtRouterConfigGroup());
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.network().setInputFile(networkFile);
 		config.facilities().setInputFile(facilitiesFile);
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
+		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.controler().setLastIteration(0);
 
 		config.vspExperimental().setVspDefaultsCheckingLevel(VspDefaultsCheckingLevel.abort);
@@ -103,7 +101,9 @@ public class AccessibilityComputationNMBTest {
 			config.strategy().addStrategySettings(stratSets);
 		}
 		
+		
 		Scenario scenario = ScenarioUtils.loadScenario( config );
+		
 		
 		// matrix-based pt
 		MatrixBasedPtRouterConfigGroup mbpcg = (MatrixBasedPtRouterConfigGroup) config.getModule(MatrixBasedPtRouterConfigGroup.GROUP_NAME);
@@ -116,18 +116,15 @@ public class AccessibilityComputationNMBTest {
 		// plansClacRoute parameters
 		PlansCalcRouteConfigGroup plansCalcRoute = config.plansCalcRoute();
 
-		System.out.println("teleported mode speed factors (1): " + plansCalcRoute.getTeleportedModeFreespeedFactors());
-		System.out.println("teleported mode speeds (1): " + plansCalcRoute.getTeleportedModeSpeeds());
-		System.out.println("beeline distance factors (1): " + plansCalcRoute.getBeelineDistanceFactors());
-
+		// if no travel matrix (distances and times) is provided, the teleported mode speed for pt needs to be set
 		// teleported mode speed for pt also required, see PtMatrix:120
 //      ModeRoutingParams ptParameters = new ModeRoutingParams(TransportMode.pt);
 //      ptParameters.setTeleportedModeSpeed(50./3.6);
 //      plansCalcRoute.addModeRoutingParams(ptParameters);
 
 		// by adding ModeRoutingParams (as done above for pt), the other parameters are deleted
-		// those parameters which are needed, have to be set again to be available.
-
+		// the walk and bike parameters are needed, however. This is why they have to be set here again
+        
 		// teleported mode speed for walking also required, see PtMatrix:141
 		ModeRoutingParams walkParameters = new ModeRoutingParams(TransportMode.walk);
 		walkParameters.setTeleportedModeSpeed(3./3.6);
@@ -142,61 +139,41 @@ public class AccessibilityComputationNMBTest {
         BoundingBox boundingBox = BoundingBox.createBoundingBox(scenario.getNetwork());
 		PtMatrix ptMatrix = PtMatrix.createPtMatrix(plansCalcRoute, boundingBox, mbpcg);
 
+		
 		assertNotNull(config);
 
-
-		// collect activity types and home facilities
-		List<String> activityTypes = new ArrayList<String>() ;
-		ActivityFacilities homes = FacilitiesUtils.createActivityFacilities("homes") ;
-		for (ActivityFacility fac : scenario.getActivityFacilities().getFacilities().values()) {
-			for (ActivityOption option : fac.getActivityOptions().values()) {
-				// collect all activity types that are contained within the provided facilities file
-				if ( !activityTypes.contains(option.getType()) ) {
-					activityTypes.add( option.getType() ) ;
-				}
-				// collect all home facilities that are contained within the provided facilities file
-				if ( option.getType().equals("h") ) {
-					homes.addActivityFacility(fac);
-				}
-			}
-		}
-
-
 		
-		// yyyyyy the above needs to be made automatic, maybe by adding something to boundingBox.  kai, jul'15
-
-		Map<String, ActivityFacilities> activityFacilitiesMap = new HashMap<String, ActivityFacilities>();
-		
-		// ---
-		
-		Controler controler = new Controler(scenario) ;
-
+		// collect activity types
+		List<String> activityTypes = AccessibilityRunUtils.collectAllFacilityTypes(scenario);
 		log.warn( "found activity types: " + activityTypes );
 		// yyyy there is some problem with activity types: in some algorithms, only the first letter is interpreted, in some
 		// other algorithms, the whole string.  BEWARE!  This is not good software design and should be changed.  kai, feb'14
+		
+		// collect homes
+		String activityFacilityType = "h";
+		ActivityFacilities homes = AccessibilityRunUtils.collectActivityFacilitiesOfType(scenario, activityFacilityType);
 
+
+		Map<String, ActivityFacilities> activityFacilitiesMap = new HashMap<String, ActivityFacilities>();
+		
+		
+		Controler controler = new Controler(scenario) ;
+
+		
 		// loop over activity types to add one GridBasedAccessibilityControlerListenerV3 for each combination
 		for ( String actType : activityTypes ) {
-			if ( !actType.equals("w") ) {
-				log.error("skipping everything except work for debugging purposes; remove in production code. kai, feb'14") ;
-				continue ;
-			}
+//			if ( !actType.equals("w") ) {
+//				log.error("skipping everything except work for debugging purposes; remove in production code. kai, feb'14") ;
+//				continue ;
+//			}
 
-			ActivityFacilities opportunities = FacilitiesUtils.createActivityFacilities() ;
-			for ( ActivityFacility fac : scenario.getActivityFacilities().getFacilities().values()  ) {
-				for ( ActivityOption option : fac.getActivityOptions().values() ) {
-					if ( option.getType().equals(actType) ) {
-						opportunities.addActivityFacility(fac);
-					}
-				}
-			}
+			ActivityFacilities opportunities = AccessibilityRunUtils.collectActivityFacilitiesOfType(scenario, actType);
 
 			activityFacilitiesMap.put(actType, opportunities);
 
 			GridBasedAccessibilityControlerListenerV3 listener = 
 					new GridBasedAccessibilityControlerListenerV3(activityFacilitiesMap.get(actType), 
 							ptMatrix, config, scenario.getNetwork());
-			
 			listener.setComputingAccessibilityForMode(Modes4Accessibility.freeSpeed, true);
 			listener.setComputingAccessibilityForMode(Modes4Accessibility.car, true);
 			listener.setComputingAccessibilityForMode(Modes4Accessibility.walk, true);
@@ -208,6 +185,7 @@ public class AccessibilityComputationNMBTest {
 			
 			listener.writeToSubdirectoryWithName(actType);
 			
+			// for push to geoserver
 			listener.addSpatialGridDataExchangeListener(new GeoserverUpdater());
 			
 			listener.setUrbansimMode(false); // avoid writing some (eventually: all) files that related to matsim4urbansim
@@ -215,27 +193,26 @@ public class AccessibilityComputationNMBTest {
 			controler.addControlerListener(listener);
 		}
 
-		// ---
-		
 		controler.run();
 
-		String workingDirectory =  config.controler().getOutputDirectory();
+		
+		if (createQGisOutput == true) {
+			String osName = System.getProperty("os.name");
+			String workingDirectory = config.controler().getOutputDirectory();
 
-		String osName = System.getProperty("os.name");
+			for (String actType : activityTypes) {
+				String actSpecificWorkingDirectory = workingDirectory + actType + "/";
 
-		for (String actType : activityTypes) {
-			String actSpecificWorkingDirectory =  workingDirectory + actType + "/";
-
-			for ( Modes4Accessibility mode : Modes4Accessibility.values()) {
-				if ( !actType.equals("w") ) {
-					log.error("skipping everything except work for debugging purposes; remove in production code. kai, feb'14") ;
-					continue ;
+				for ( Modes4Accessibility mode : Modes4Accessibility.values()) {
+//					if ( !actType.equals("w") ) {
+//						log.error("skipping everything except work for debugging purposes; remove in production code. kai, feb'14") ;
+//						continue ;
+//					}
+					VisualizationUtils.createQGisOutput(actType, mode, mapViewExtent, workingDirectory, crs, includeDensityLayer,
+							lowerBound, upperBound, range, symbolSize, populationThreshold);
+					VisualizationUtils.createSnapshot(actSpecificWorkingDirectory, mode, osName);
 				}
-				VisualizationUtils.createQGisOutput(actType, mode, mapViewExtent, workingDirectory, crs, includeDensityLayer,
-						lowerBound, upperBound, range, symbolSize, populationThreshold);
-				VisualizationUtils.createSnapshot(actSpecificWorkingDirectory, mode, osName);
-			}
+			}  
 		}
-		   
 	}
 }

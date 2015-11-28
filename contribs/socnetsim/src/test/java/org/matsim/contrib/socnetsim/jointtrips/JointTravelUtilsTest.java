@@ -29,8 +29,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.contrib.socnetsim.framework.population.JointPlan;
 import org.matsim.contrib.socnetsim.framework.population.JointPlanFactory;
@@ -56,8 +56,8 @@ public class JointTravelUtilsTest {
 
 	@Before
 	public void initOnePassengerFixture() {
-		final Person driver = PersonImpl.createPerson(Id.createPersonId("Alain Prost"));
-		final Person passenger1 = PersonImpl.createPerson(Id.createPersonId("Tintin"));
+		final Person driver = PopulationUtils.createPerson(Id.createPersonId("Alain Prost"));
+		final Person passenger1 = PopulationUtils.createPerson(Id.createPersonId("Tintin"));
 
 		final Id<Link> link1 = Id.create( 1 , Link.class);
 		final Id<Link> link2 = Id.create( 2 , Link.class);
@@ -116,9 +116,9 @@ public class JointTravelUtilsTest {
 
 	@Before
 	public void initTwoPassengerTwoOdFixture() {
-		final Person driver = PersonImpl.createPerson(Id.create("Alain Prost", Person.class));
-		final Person passenger1 = PersonImpl.createPerson(Id.create("Tintin", Person.class));
-		final Person passenger2 = PersonImpl.createPerson(Id.create("Milou", Person.class));
+		final Person driver = PopulationUtils.createPerson(Id.create("Alain Prost", Person.class));
+		final Person passenger1 = PopulationUtils.createPerson(Id.create("Tintin", Person.class));
+		final Person passenger2 = PopulationUtils.createPerson(Id.create("Milou", Person.class));
 
 		final Id<Link> link1 = Id.create( 1, Link.class );
 		final Id<Link> link2 = Id.create( 2, Link.class );
@@ -207,9 +207,9 @@ public class JointTravelUtilsTest {
 
 	@Before
 	public void initTwoPassengersTwoOdsTwoJtFixture() {
-		final Person driver = PersonImpl.createPerson(Id.createPersonId("Alain Prost"));
-		final Person passenger1 = PersonImpl.createPerson(Id.createPersonId("Tintin"));
-		final Person passenger2 = PersonImpl.createPerson(Id.createPersonId("Milou"));
+		final Person driver = PopulationUtils.createPerson(Id.createPersonId("Alain Prost"));
+		final Person passenger1 = PopulationUtils.createPerson(Id.createPersonId("Tintin"));
+		final Person passenger2 = PopulationUtils.createPerson(Id.createPersonId("Milou"));
 
 		final Id<Link> link1 = Id.create( 1 , Link.class );
 		final Id<Link> link2 = Id.create( 2 , Link.class );
@@ -328,9 +328,9 @@ public class JointTravelUtilsTest {
 
 	@Before
 	public void initTwoPassengersMiddleTripFixture() {
-		final Person driver = PersonImpl.createPerson(Id.createPersonId("Alain Prost"));
-		final Person passenger1 = PersonImpl.createPerson(Id.createPersonId("Tintin"));
-		final Person passenger2 = PersonImpl.createPerson(Id.createPersonId("Milou"));
+		final Person driver = PopulationUtils.createPerson(Id.createPersonId("Alain Prost"));
+		final Person passenger1 = PopulationUtils.createPerson(Id.createPersonId("Tintin"));
+		final Person passenger2 = PopulationUtils.createPerson(Id.createPersonId("Milou"));
 
 		final Id<Link> link1 = Id.create( 1, Link.class );
 		final Id<Link> link2 = Id.create( 2, Link.class );
@@ -427,8 +427,8 @@ public class JointTravelUtilsTest {
 
 	@Before
 	public void initOnePassengerTwoTripsFixture() {
-		final Person driver = PersonImpl.createPerson(Id.createPersonId("Alain Prost"));
-		final Person passenger1 = PersonImpl.createPerson(Id.createPersonId("Tintin"));
+		final Person driver = PopulationUtils.createPerson(Id.createPersonId("Alain Prost"));
+		final Person passenger1 = PopulationUtils.createPerson(Id.createPersonId("Tintin"));
 
 		final Id<Link> link1 = Id.create( 1 , Link.class );
 		final Id<Link> link2 = Id.create( 2 , Link.class );
@@ -516,9 +516,9 @@ public class JointTravelUtilsTest {
 
 	@Before
 	public void initOnePassengerTwoTripsWithDifferentDriversFixture() {
-		final Person driver1 = PersonImpl.createPerson(Id.createPersonId("Alain Prost"));
-		final Person driver2 = PersonImpl.createPerson(Id.createPersonId("Michel Vaillant"));
-		final Person passenger1 = PersonImpl.createPerson(Id.createPersonId("Tintin"));
+		final Person driver1 = PopulationUtils.createPerson(Id.createPersonId("Alain Prost"));
+		final Person driver2 = PopulationUtils.createPerson(Id.createPersonId("Michel Vaillant"));
+		final Person passenger1 = PopulationUtils.createPerson(Id.createPersonId("Tintin"));
 
 		final Id<Link> link1 = Id.create( 1 , Link.class );
 		final Id<Link> link2 = Id.create( 2 , Link.class );
@@ -612,9 +612,9 @@ public class JointTravelUtilsTest {
 	// bugs may depend on iteration order...
 	@Before
 	public void initOnePassengerTwoTripsWithDifferentDriversSecondDriverFirstFixture() {
-		final Person driver1 = PersonImpl.createPerson(Id.createPersonId("Alain Prost"));
-		final Person driver2 = PersonImpl.createPerson(Id.createPersonId("Michel Vaillant"));
-		final Person passenger1 = PersonImpl.createPerson(Id.createPersonId("Tintin"));
+		final Person driver1 = PopulationUtils.createPerson(Id.createPersonId("Alain Prost"));
+		final Person driver2 = PopulationUtils.createPerson(Id.createPersonId("Michel Vaillant"));
+		final Person passenger1 = PopulationUtils.createPerson(Id.createPersonId("Tintin"));
 
 		final Id<Link> link1 = Id.create( 1, Link.class );
 		final Id<Link> link2 = Id.create( 2, Link.class );
@@ -713,8 +713,8 @@ public class JointTravelUtilsTest {
 	 */
 	@Before
 	public void initOnePassengerTwoTripsInconsistentSequenceFixture() {
-		final Person driver = PersonImpl.createPerson(Id.createPersonId("Alain Prost"));
-		final Person passenger1 = PersonImpl.createPerson(Id.createPersonId("Tintin"));
+		final Person driver = PopulationUtils.createPerson(Id.createPersonId("Alain Prost"));
+		final Person passenger1 = PopulationUtils.createPerson(Id.createPersonId("Tintin"));
 
 		final Id<Link> link1 = Id.create( 1, Link.class );
 		final Id<Link> link2 = Id.create( 2, Link.class );

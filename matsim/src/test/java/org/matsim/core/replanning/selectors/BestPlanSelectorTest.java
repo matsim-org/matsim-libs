@@ -23,8 +23,8 @@ package org.matsim.core.replanning.selectors;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonUtils;
+import org.matsim.core.population.PopulationUtils;
 
 /**
  * Test for {@link BestPlanSelector}.
@@ -44,7 +44,7 @@ public class BestPlanSelectorTest extends AbstractPlanSelectorTest {
 	 * @author mrieser
 	 */
 	public void testBestPlan() {
-		Person person = PersonImpl.createPerson(Id.create(1, Person.class));
+		Person person = PopulationUtils.createPerson(Id.create(1, Person.class));
 		Plan plan;
 		PersonUtils.createAndAddPlan(person, false);
 		plan = PersonUtils.createAndAddPlan(person, false);

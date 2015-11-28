@@ -31,8 +31,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 
 class MetaPopulation implements HasPlansAndId<MetaPopulationPlan, Person> {
 
@@ -96,7 +96,7 @@ class MetaPopulation implements HasPlansAndId<MetaPopulationPlan, Person> {
         if (deltaAgents > 0) {
             for (int i=0; i<deltaAgents; i++) {
                 Person templatePerson = templatePopulation.get(random.nextInt(templatePopulation.size()));
-                Person person = PersonImpl.createPerson(Id.create(id.toString() + "_" + nextId++, Person.class));
+                Person person = PopulationUtils.createPerson(Id.create(id.toString() + "_" + nextId++, Person.class));
                 for (Plan templatePlan : templatePerson.getPlans()) {
                     PlanImpl plan = new PlanImpl();
                     plan.copyFrom(templatePlan);

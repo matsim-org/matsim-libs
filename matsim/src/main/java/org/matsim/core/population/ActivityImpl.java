@@ -35,7 +35,7 @@ import org.matsim.facilities.ActivityFacility;
  * </ul>
  *
  */
-public class ActivityImpl implements Activity {
+public final class ActivityImpl implements Activity {
 
 	private double endTime = Time.UNDEFINED_TIME;
 
@@ -48,8 +48,8 @@ public class ActivityImpl implements Activity {
 
 	private String type;
 	private Coord coord = null;
-	protected Id<Link> linkId = null;
-	protected Id<ActivityFacility> facilityId = null;
+	private Id<Link> linkId = null;
+	private Id<ActivityFacility> facilityId = null;
 
 	/*package*/ ActivityImpl(final String type) {
 		this.type = type.intern();
