@@ -70,6 +70,7 @@ public class AccessibilityComputationNairobiTest {
 		boolean createQGisOutput = false;
 		boolean includeDensityLayer = true;
 		String crs = "EPSG:21037"; // = Arc 1960 / UTM zone 37S, for Nairobi, Kenya
+		String name = "ke_nairobi_work_1000";
 		
 		Double lowerBound = 2.;
 		Double upperBound = 5.5;
@@ -174,7 +175,7 @@ public class AccessibilityComputationNairobiTest {
 			listener.writeToSubdirectoryWithName(actType);
 			
 			// for push to geoserver
-			listener.addSpatialGridDataExchangeListener(new GeoserverUpdater());
+			listener.addSpatialGridDataExchangeListener(new GeoserverUpdater(crs, name));
 			
 			listener.setUrbansimMode(false); // avoid writing some (eventually: all) files that related to matsim4urbansim
 

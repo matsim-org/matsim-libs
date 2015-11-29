@@ -40,8 +40,8 @@ public class AccessibilityComputationKiberaTest {
 	@Test
 	public void doAccessibilityTest() throws IOException {
 		// Input and output
-//		String folderStructure = "../../../"; // local on dz's computer
-		String folderStructure = "../../"; // server
+		String folderStructure = "../../../"; // local on dz's computer
+//		String folderStructure = "../../"; // server
 			
 		String networkFile = folderStructure + "matsimExamples/countries/ke/kibera/network/2015-11-05_kibera_paths_detailed.xml";
 		String facilitiesFile = folderStructure + "matsimExamples/countries/ke/kibera/facilities/facilities.xml";
@@ -53,6 +53,7 @@ public class AccessibilityComputationKiberaTest {
 		boolean createQGisOutput = false;
 		boolean includeDensityLayer = false;
 		String crs = "EPSG:21037"; // = Arc 1960 / UTM zone 37S, for Nairobi, Kenya
+		String name = "ke_kibera_drinkingwater_100";
 		
 		Double lowerBound = 2.;
 		Double upperBound = 5.5;
@@ -138,7 +139,7 @@ public class AccessibilityComputationKiberaTest {
 			listener.writeToSubdirectoryWithName(actType);
 			
 			// for push to geoserver
-			listener.addSpatialGridDataExchangeListener(new GeoserverUpdater());
+			listener.addSpatialGridDataExchangeListener(new GeoserverUpdater(crs, name));
 			
 			listener.setUrbansimMode(false); // avoid writing some (eventually: all) files that related to matsim4urbansim
 

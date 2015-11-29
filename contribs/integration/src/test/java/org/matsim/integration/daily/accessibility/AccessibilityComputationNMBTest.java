@@ -65,6 +65,7 @@ public class AccessibilityComputationNMBTest {
 		boolean createQGisOutput = false;
 		boolean includeDensityLayer = true;
 		String crs = TransformationFactory.WGS84_SA_Albers;
+		String name = "za_nmb_work_100";
 		
 		Double lowerBound = 2.;
 		Double upperBound = 5.5;
@@ -186,7 +187,7 @@ public class AccessibilityComputationNMBTest {
 			listener.writeToSubdirectoryWithName(actType);
 			
 			// for push to geoserver
-			listener.addSpatialGridDataExchangeListener(new GeoserverUpdater());
+			listener.addSpatialGridDataExchangeListener(new GeoserverUpdater(crs, name));
 			
 			listener.setUrbansimMode(false); // avoid writing some (eventually: all) files that related to matsim4urbansim
 
