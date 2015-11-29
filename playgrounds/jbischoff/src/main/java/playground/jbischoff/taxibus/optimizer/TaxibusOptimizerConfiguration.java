@@ -3,7 +3,7 @@ package playground.jbischoff.taxibus.optimizer;
 import org.matsim.contrib.dvrp.MatsimVrpContext;
 import org.matsim.core.router.util.*;
 
-import playground.jbischoff.taxibus.optimizer.filter.TaxibusFilterFactory;
+import playground.jbischoff.taxibus.optimizer.defaultOptimizer.filter.TaxibusFilterFactory;
 import playground.jbischoff.taxibus.scheduler.TaxibusScheduler;
 
 

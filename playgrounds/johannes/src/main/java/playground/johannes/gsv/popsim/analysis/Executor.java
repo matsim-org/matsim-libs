@@ -18,23 +18,54 @@
  * *********************************************************************** */
 package playground.johannes.gsv.popsim.analysis;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * @author jillenberger
  */
 public class Executor {
 
-    private static java.util.concurrent.ExecutorService service;
+    private static ThreadPoolExecutor service;
 
     private static void init() {
         if (service == null) {
-            service = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+            service = (ThreadPoolExecutor) Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
         }
     }
 
+    public static void shutdown() {
+        if(service != null) service.shutdown();
+    }
+
     public static Future<?> submit(Runnable task) {
+        init();
         return service.submit(task);
+    }
+
+    public static void submitAndWait(List<? extends Runnable> runnables) {
+        init();
+        List<Future<?>> futures = new ArrayList<>(runnables.size());
+        for(Runnable runnable : runnables) {
+            futures.add(service.submit(runnable));
+        }
+
+        for(Future<?> future : futures) {
+            try {
+                future.get();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public static int getFreePoolSize() {
+        return service.getMaximumPoolSize() - service.getActiveCount();
     }
 }

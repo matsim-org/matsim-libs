@@ -19,13 +19,7 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetgen.sna.snowball.sim;
 
-import gnu.trove.TObjectIntHashMap;
-import org.apache.log4j.Logger;
-import org.matsim.contrib.socnetgen.sna.graph.Vertex;
-import org.matsim.contrib.socnetgen.sna.graph.analysis.AnalyzerTask;
-import org.matsim.contrib.socnetgen.sna.snowball.SampledVertex;
-import org.matsim.contrib.socnetgen.sna.snowball.SampledVertexDecorator;
-import org.matsim.contrib.socnetgen.sna.snowball.analysis.PiEstimator;
+import gnu.trove.map.hash.TObjectIntHashMap;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -33,6 +27,13 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
+
+import org.apache.log4j.Logger;
+import org.matsim.contrib.socnetgen.sna.graph.Vertex;
+import org.matsim.contrib.socnetgen.sna.graph.analysis.AnalyzerTask;
+import org.matsim.contrib.socnetgen.sna.snowball.SampledVertex;
+import org.matsim.contrib.socnetgen.sna.snowball.SampledVertexDecorator;
+import org.matsim.contrib.socnetgen.sna.snowball.analysis.PiEstimator;
 
 
 /**

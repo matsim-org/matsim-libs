@@ -89,4 +89,24 @@ public class ExtendedPersonFilter extends PersonFilter {
 		}
 		return outUG;
 	}
+	
+	/**
+	 * @param personId
+	 * @return Urban or (Rev) commuter or Freight from person id.
+	 */
+	public String getMyUserGroupFromPersonId(Id<Person> personId) {
+		return getMyUserGroup(getUserGroupFromPersonId(personId));
+	}
+	
+	/**
+	 * @param ug
+	 * Helpful for writing data to files.
+	 */
+	public String getMyUserGroup(UserGroup ug){
+		if(ug.equals(UserGroup.URBAN)) return "Urban";
+		else if(ug.equals(UserGroup.COMMUTER)) return "(Rev)commuter";
+		else if(ug.equals(UserGroup.REV_COMMUTER)) return "(Rev)commuter";
+		else if (ug.equals(UserGroup.FREIGHT)) return "Freight";
+		else throw new RuntimeException("User group "+ug+" is not recongnised. Aborting ...");
+	}
 }

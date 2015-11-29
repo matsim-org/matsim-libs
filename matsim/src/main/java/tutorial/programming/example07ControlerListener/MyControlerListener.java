@@ -7,6 +7,7 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -29,6 +30,9 @@ public class MyControlerListener implements StartupListener, IterationEndsListen
 	
 	@Inject
 	private MyEventHandler eventHandler; 
+	
+	@Inject
+	private EventsManager events ;
 
 	private Map<Integer, Double> timePerIterationMap = new HashMap<Integer, Double>();
 
@@ -36,7 +40,7 @@ public class MyControlerListener implements StartupListener, IterationEndsListen
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		// after the controler is started create and add the event handler for events of the mobility simulation
-		event.getControler().getEvents().addHandler(this.eventHandler);
+		this.events.addHandler(this.eventHandler);
 	}
 
 

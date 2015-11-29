@@ -28,13 +28,12 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.population.PersonImpl;
-
 import org.matsim.contrib.socnetsim.framework.population.JointPlan;
 import org.matsim.contrib.socnetsim.framework.population.JointPlanFactory;
 import org.matsim.contrib.socnetsim.framework.population.JointPlans;
 import org.matsim.contrib.socnetsim.framework.replanning.ExtraPlanRemover;
 import org.matsim.contrib.socnetsim.framework.replanning.grouping.ReplanningGroup;
+import org.matsim.core.population.PopulationUtils;
 
 /**
  * @author thibautd
@@ -48,7 +47,7 @@ public class LexicographicRemoverTest {
 		final JointPlans jointPlans = new JointPlans();
 
 		for ( int i=0; i < 4; i++ ) {
-			final Person person = PersonImpl.createPerson(Id.create(i, Person.class));
+			final Person person = PopulationUtils.createPerson(Id.create(i, Person.class));
 			group.addPerson( person );
 
 			for ( double score = 0; score < 3; score++ ) {
@@ -72,7 +71,7 @@ public class LexicographicRemoverTest {
 		final ReplanningGroup group = new ReplanningGroup();
 
 		for ( int i=0; i < 4; i++ ) {
-			group.addPerson(PersonImpl.createPerson(Id.create(i, Person.class)));
+			group.addPerson(PopulationUtils.createPerson(Id.create(i, Person.class)));
 		}
 		
 		final JointPlans jointPlans = new JointPlans();
@@ -106,7 +105,7 @@ public class LexicographicRemoverTest {
 		final ReplanningGroup group = new ReplanningGroup();
 
 		for ( int i=0; i < 4; i++ ) {
-			group.addPerson(PersonImpl.createPerson(Id.create(i, Person.class)));
+			group.addPerson(PopulationUtils.createPerson(Id.create(i, Person.class)));
 		}
 		
 		final JointPlans jointPlans = new JointPlans();

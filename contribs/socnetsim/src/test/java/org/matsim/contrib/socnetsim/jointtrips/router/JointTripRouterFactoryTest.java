@@ -39,8 +39,8 @@ import org.matsim.core.controler.Injector;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityModule;
@@ -102,7 +102,7 @@ public class JointTripRouterFactoryTest {
 		Id<Person> passengerId = Id.create( "passenger" , Person.class );
 
 		// driver
-		Person pers = PersonImpl.createPerson(driverId);
+		Person pers = PopulationUtils.createPerson(driverId);
 		PlanImpl plan = new PlanImpl( pers );
 		pers.addPlan( plan );
 		pers.setSelectedPlan( plan );
@@ -121,7 +121,7 @@ public class JointTripRouterFactoryTest {
 		dLeg.setRoute( dRoute );
 
 		// passenger
-		pers = PersonImpl.createPerson(passengerId);
+		pers = PopulationUtils.createPerson(passengerId);
 		plan = new PlanImpl( pers );
 		pers.addPlan( plan );
 		pers.setSelectedPlan( plan );

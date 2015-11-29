@@ -23,14 +23,15 @@
  */
 package org.matsim.contrib.socnetgen.sna.graph.io;
 
-import gnu.trove.TObjectDoubleHashMap;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
+
+import java.util.Set;
+
 import org.apache.commons.math.stat.StatUtils;
 import org.matsim.contrib.socnetgen.sna.graph.Edge;
 import org.matsim.contrib.socnetgen.sna.graph.Graph;
 import org.matsim.contrib.socnetgen.sna.graph.Vertex;
 import org.matsim.contrib.socnetgen.sna.graph.analysis.Transitivity;
-
-import java.util.Set;
 
 /**
  * @author illenberger
@@ -48,8 +49,8 @@ public class PajekClusteringColorizer<V extends Vertex, E extends Edge> extends 
 	public PajekClusteringColorizer(Graph g) {
 		super();
 		clustering = Transitivity.getInstance().localClusteringCoefficients((Set<V>)g.getVertices());		
-		c_min = StatUtils.min(clustering.getValues());
-		c_max = StatUtils.max(clustering.getValues());
+		c_min = StatUtils.min(clustering.values());
+		c_max = StatUtils.max(clustering.values());
 	}
 	
 	@Override

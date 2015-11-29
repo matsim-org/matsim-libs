@@ -19,8 +19,8 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetgen.sna.math;
 
-import gnu.trove.TDoubleDoubleHashMap;
-import gnu.trove.TDoubleDoubleIterator;
+import gnu.trove.iterator.TDoubleDoubleIterator;
+import gnu.trove.map.hash.TDoubleDoubleHashMap;
 import junit.framework.TestCase;
 
 /**

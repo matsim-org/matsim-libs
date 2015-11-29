@@ -38,6 +38,7 @@ import org.matsim.core.utils.io.IOUtils;
 /**
  * @author amit
  */
+//ZZ_TODO : probably mode this to some templates.
 public class RoadTypeMappingCreator {
 
 	private static BufferedWriter writer;

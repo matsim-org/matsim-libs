@@ -21,7 +21,6 @@ package playground.johannes.gsv.popsim;
 
 import org.apache.log4j.Logger;
 import org.matsim.contrib.common.util.XORShiftRandom;
-import playground.johannes.gsv.synPop.analysis.AnalyzerTaskComposite;
 import playground.johannes.gsv.synPop.analysis.LegGeoDistanceTask;
 import playground.johannes.gsv.synPop.analysis.ProxyAnalyzer;
 import playground.johannes.gsv.synPop.mid.PersonCloner;
@@ -50,10 +49,10 @@ public class Analyzer {
 	 */
 	public static void main(String[] args) throws IOException {
 	
-		String output = "/home/johannes/gsv/matrix2014/mid-fusion/";
+		String output = "/home/johannes/gsv/matrix2014/popgen/mid-fusion";
 
-//		String personFile = "/home/johannes/gsv/germany-scenario/mid2008/pop/mid2008.merged.xml";
-		String personFile = "/home/johannes/gsv/germany-scenario/mid2008/pop/mid2008.midjourneys.validated.xml";
+		String personFile = "/home/johannes/gsv/matrix2014/popgen/pop/mid2008.merged.xml";
+//		String personFile = "/home/johannes/gsv/germany-scenario/mid2008/pop/mid2008.midjourneys.validated.xml";
 //		String personFile = "/home/johannes/gsv/germany-scenario/mid2008/pop/mid2008.midtrips.validated.xml";
 		
 		XMLHandler parser = new XMLHandler(new PlainFactory());
@@ -72,15 +71,28 @@ public class Analyzer {
 
 		TaskRunner.run(new Route2GeoDistance(new Simulator.Route2GeoDistFunction()), persons);
 
-		AnalyzerTaskComposite task = new AnalyzerTaskComposite();
-//		task.setOutputDirectory(output);
+		playground.johannes.gsv.synPop.analysis.AnalyzerTaskComposite task = new playground.johannes.gsv.synPop.analysis.AnalyzerTaskComposite();
+		task.setOutputDirectory(output);
 //		task.addTask(new AgeIncomeCorrelation());
 		task.addTask(new ActTypeDistanceTask());
 		task.addTask(new LegGeoDistanceTask("car"));
+//		task.addTask(new DaySeasonTask());
 		task.setOutputDirectory(output);
 		
 		ProxyAnalyzer.analyze(persons, task);
-
+//		final Config config = new Config();
+//		ConfigUtils.loadConfig(config, "/home/johannes/gsv/germany-scenario/sim/config/simulator.xml");
+//		DataPool dataPool = new DataPool();
+//		dataPool.register(new ZoneDataLoader(config.getModule("synPopSim")), ZoneDataLoader.KEY);
+//		ZoneData zoneData = (ZoneData) dataPool.get(ZoneDataLoader.KEY);
+//		FileIOContext ioContext = new FileIOContext(output);
+//
+//		ZoneCollection zones = zoneData.getLayer("lau2");
+//		new ZoneSetLAU2Class().apply(zones);
+//		ZoneMobilityRate task = new ZoneMobilityRate(MiDKeys.PERSON_LAU2_CLASS, zones, new ModePredicate(CommonValues
+//				.LEG_MODE_CAR));
+//		task.setIoContext(ioContext);
+//		AnalyzerTaskRunner.run(persons, task, ioContext);
 	}
 
 }

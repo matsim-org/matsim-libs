@@ -19,7 +19,7 @@
 
 package playground.johannes.gsv.fpd;
 
-import gnu.trove.TDoubleDoubleHashMap;
+import gnu.trove.map.hash.TDoubleDoubleHashMap;
 import org.joda.time.LocalDateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;

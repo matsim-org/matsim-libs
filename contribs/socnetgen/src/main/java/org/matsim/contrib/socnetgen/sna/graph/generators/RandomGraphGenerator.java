@@ -19,18 +19,23 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetgen.sna.graph.generators;
 
-import gnu.trove.TObjectIntHashMap;
-import gnu.trove.TObjectIntIterator;
-import org.apache.commons.math.FunctionEvaluationException;
-import org.apache.commons.math.analysis.UnivariateRealFunction;
-import org.apache.log4j.Logger;
-import org.matsim.contrib.common.util.ProgressLogger;
-import org.matsim.contrib.socnetgen.sna.graph.*;
+import gnu.trove.iterator.TObjectIntIterator;
+import gnu.trove.map.hash.TObjectIntHashMap;
 
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
+
+import org.apache.commons.math.FunctionEvaluationException;
+import org.apache.commons.math.analysis.UnivariateRealFunction;
+import org.apache.log4j.Logger;
+import org.matsim.contrib.common.util.ProgressLogger;
+import org.matsim.contrib.socnetgen.sna.graph.Edge;
+import org.matsim.contrib.socnetgen.sna.graph.Graph;
+import org.matsim.contrib.socnetgen.sna.graph.GraphBuilder;
+import org.matsim.contrib.socnetgen.sna.graph.GraphUtils;
+import org.matsim.contrib.socnetgen.sna.graph.Vertex;
 
 /**
  * @author illenberger

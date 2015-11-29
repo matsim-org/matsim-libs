@@ -31,9 +31,9 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -326,7 +326,7 @@ public class ReadFromUrbanSimModel {
 				compensationFlag = false;
 				currentZoneLocations	 = new ZoneLocations();
 				
-				Person newPerson = PersonImpl.createPerson(personId);
+				Person newPerson = PopulationUtils.createPerson(personId);
 
 				// get home location id
 				Id<ActivityFacility> homeZoneId = Id.create( parts[ indexZoneID_HOME ], ActivityFacility.class );
@@ -444,7 +444,7 @@ public class ReadFromUrbanSimModel {
 				// see reason of this flag below
 				compensationFlag = false;
 				
-				Person newPerson = PersonImpl.createPerson(personId);
+				Person newPerson = PopulationUtils.createPerson(personId);
 
 				// get home location id
 				Id<ActivityFacility> homeParcelId = Id.create( parts[ indexParcelID_HOME ], ActivityFacility.class );

@@ -19,12 +19,17 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetgen.sna.graph.social.analysis;
 
-import gnu.trove.TObjectIntHashMap;
-import gnu.trove.TObjectIntIterator;
-import org.matsim.contrib.socnetgen.sna.graph.Vertex;
+import gnu.trove.iterator.TObjectIntIterator;
+import gnu.trove.map.hash.TObjectIntHashMap;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
+
+import org.matsim.contrib.socnetgen.sna.graph.Vertex;
 
 /**
  * @author illenberger

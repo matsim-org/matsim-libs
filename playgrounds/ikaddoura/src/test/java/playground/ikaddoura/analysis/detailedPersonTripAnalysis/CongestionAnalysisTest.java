@@ -2,7 +2,6 @@ package playground.ikaddoura.analysis.detailedPersonTripAnalysis;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -12,24 +11,20 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 import playground.ikaddoura.analysis.detailedPersonTripAnalysis.handler.BasicPersonTripAnalysisHandler;
 import playground.ikaddoura.analysis.detailedPersonTripAnalysis.handler.CongestionAnalysisHandler;
+import playground.ikaddoura.integrationCN.CNEventsReader;
 import playground.tschlenther.createNetwork.ForkNetworkCreator;
-import playground.vsp.congestion.events.CongestionEventsReader;
 
 /**
- * @author gthunig
+ * @author gthunig, ikaddoura
  * 
- * This class tests the Analysis which is provided by the
- * CongestionAnalysisHandler. 
- * Therefor several scenarios are created which are declared above their testmethod.
- * Every scenario has its own method.
- * Every scenario has the same network which is declared in its class; 
- * current status: ForkNetworkCreator
+ * This class tests the congestion-specific analysis provided by the CongestionAnalysisHandler. 
+ * In each test, a small events file is analyzed, and a scenario is created using the ForkNetworkCreator.
+ * 
  */
 public class CongestionAnalysisTest {
 
@@ -235,12 +230,16 @@ public class CongestionAnalysisTest {
 		events.addHandler(congestionHandler);
 		
 		log.info("Reading the events file...");
-		MatsimEventsReader reader = new MatsimEventsReader(events);
-		reader.readFile(eventsFile);
-		CongestionEventsReader congestionEventsReader = new CongestionEventsReader(events);		
-		congestionEventsReader.parse(eventsFile);
-		log.info("Reading the events file... Done.");
 		
+//		MatsimEventsReader reader = new MatsimEventsReader(events);
+//		reader.readFile(eventsFile);
+//		CongestionEventsReader congestionEventsReader = new CongestionEventsReader(events);		
+//		congestionEventsReader.parse(eventsFile);
+		
+		CNEventsReader reader = new CNEventsReader(events);
+		reader.parse(eventsFile);
+		
+		log.info("Reading the events file... Done.");
 		return congestionHandler;
 	}
 	

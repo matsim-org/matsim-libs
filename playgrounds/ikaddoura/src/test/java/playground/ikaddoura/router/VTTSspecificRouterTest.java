@@ -36,7 +36,7 @@ import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.contrib.otfvis.OTFVisModule;
+import org.matsim.contrib.otfvis.OTFVisFileWriterModule;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -117,7 +117,7 @@ public class VTTSspecificRouterTest {
 		});
 		
 		
-		controler.addOverridingModule(new OTFVisModule());
+		controler.addOverridingModule(new OTFVisFileWriterModule());
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		controler.run();
 		
@@ -192,7 +192,7 @@ public class VTTSspecificRouterTest {
 		});
 		
 		
-		controler.addOverridingModule(new OTFVisModule());
+		controler.addOverridingModule(new OTFVisFileWriterModule());
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		controler.run();
 				
@@ -278,7 +278,7 @@ public class VTTSspecificRouterTest {
 		});
 		
 		
-		controler.addOverridingModule(new OTFVisModule());
+		controler.addOverridingModule(new OTFVisFileWriterModule());
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		controler.run();
 		
@@ -357,7 +357,7 @@ public class VTTSspecificRouterTest {
 		});
 		
 		
-		controler.addOverridingModule(new OTFVisModule());
+		controler.addOverridingModule(new OTFVisFileWriterModule());
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		controler.run();
 		
@@ -411,7 +411,7 @@ public class VTTSspecificRouterTest {
 		
 		controler1.addControlerListener(new VTTScomputation(vttsHandler1));
 		
-		controler1.addOverridingModule(new OTFVisModule());
+		controler1.addOverridingModule(new OTFVisFileWriterModule());
 		controler1.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		controler1.run();
 		
@@ -428,7 +428,7 @@ public class VTTSspecificRouterTest {
 		final String configFile2 = testUtils.getPackageInputDirectory() + "vttsSpecificRouter/configVTTS_noDistanceCost_largePopulation_2.xml";
 		final Controler controler2 = new Controler(configFile2);
 		
-		controler2.addOverridingModule(new OTFVisModule());
+		controler2.addOverridingModule(new OTFVisFileWriterModule());
 		controler2.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		controler2.run();
 		
@@ -466,7 +466,7 @@ public class VTTSspecificRouterTest {
 		
 		controler1.addControlerListener(new VTTScomputation(vttsHandler1));
 		
-		controler1.addOverridingModule(new OTFVisModule());
+		controler1.addOverridingModule(new OTFVisFileWriterModule());
 		controler1.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		controler1.run();
 		
@@ -482,7 +482,7 @@ public class VTTSspecificRouterTest {
 		final String configFile2 = testUtils.getPackageInputDirectory() + "vttsSpecificRouter/configVTTS_withDistanceCost_largePopulation_2.xml";
 		final Controler controler2 = new Controler(configFile2);
 		
-		controler2.addOverridingModule(new OTFVisModule());
+		controler2.addOverridingModule(new OTFVisFileWriterModule());
 		controler2.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		controler2.run();
 		
@@ -553,7 +553,7 @@ public class VTTSspecificRouterTest {
 		});
 		
 		
-		controler.addOverridingModule(new OTFVisModule());
+		controler.addOverridingModule(new OTFVisFileWriterModule());
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		controler.run();
 		

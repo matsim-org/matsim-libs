@@ -20,13 +20,12 @@
 package eu.eunoiaproject.bikesharing.examples.example01runwithoutrelocation.run;
 
 import com.google.inject.Provider;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
-
 import eu.eunoiaproject.bikesharing.framework.qsim.BikeSharingWithoutRelocationQsimFactory;
 import eu.eunoiaproject.bikesharing.framework.router.BikeSharingTripRouterModule;
 import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingScenarioUtils;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.Mobsim;
 
 /**

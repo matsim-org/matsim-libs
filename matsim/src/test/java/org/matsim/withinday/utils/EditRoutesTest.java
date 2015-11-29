@@ -37,8 +37,8 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Injector;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.PlanRouter;
@@ -320,7 +320,7 @@ public class EditRoutesTest extends MatsimTestCase {
 	 * @author cdobler
 	 */
 	private void createSamplePlan() {
-		plan = new PlanImpl(PersonImpl.createPerson(Id.create(1, Person.class)));
+		plan = new PlanImpl(PopulationUtils.createPerson(Id.create(1, Person.class)));
 		
 		Activity activityH1 = ((PlanImpl) plan).createAndAddActivity("h", Id.create("l1", Link.class));
 		((PlanImpl) plan).createAndAddLeg(TransportMode.car);

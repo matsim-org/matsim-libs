@@ -42,23 +42,20 @@ public class RunEventsHandlingWithControlerExample {
 			config = ConfigUtils.loadConfig( args[0] ) ;
 		}
 		
-		Scenario scenario = ScenarioUtils.loadScenario(config) ;
+		final Scenario scenario = ScenarioUtils.loadScenario(config) ;
 
 		//Create an instance of the controler
 		Controler controler = new Controler(config);
 		
 		// add the events handlers
-		controler.getEvents().addHandler( new MyEventHandler1() );
-		controler.getEvents().addHandler( new MyEventHandler2( 500 ) );
-		controler.getEvents().addHandler( new MyEventHandler3() );
-		controler.getEvents().addHandler( new CongestionDetectionEventHandler( scenario.getNetwork() ) ) ;
-		
-// alternative syntax:
-//		controler.addOverridingModule(new AbstractModule(){
-//			@Override public void install() {
-//				this.addEventHandlerBinding().toInstance( new MyEventHandler1() );
-//			}
-//		});
+		controler.addOverridingModule(new AbstractModule(){
+			@Override public void install() {
+				this.addEventHandlerBinding().toInstance( new MyEventHandler1() );
+				this.addEventHandlerBinding().toInstance( new MyEventHandler2( 500 ) );
+				this.addEventHandlerBinding().toInstance( new MyEventHandler3() );
+				this.addEventHandlerBinding().toInstance( new CongestionDetectionEventHandler( scenario.getNetwork() )  );
+			}
+		});
 		
 		//call run() to start the simulation
 		controler.run();

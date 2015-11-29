@@ -30,11 +30,15 @@ import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.util.*;
+import org.matsim.core.router.util.FastAStarLandmarksFactory;
+import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
+import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.collections.MapUtils;
 import org.matsim.core.utils.collections.Tuple;
@@ -123,7 +127,7 @@ public class AccessEgressMultimodalTripRouterModule extends AbstractModule {
 										scenario.getConfig().planCalcScore());
 			final TravelDisutility nonPersonnalizableDisutility =
 					new TravelDisutility() {
-						private final Person dummy = PersonImpl.createPerson(Id.create("dummy", Person.class));
+						private final Person dummy = PopulationUtils.createPerson(Id.create("dummy", Person.class));
 						@Override
 						public double getLinkTravelDisutility(
 								final Link link,

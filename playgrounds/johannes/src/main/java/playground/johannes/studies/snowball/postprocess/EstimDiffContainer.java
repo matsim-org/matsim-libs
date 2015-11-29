@@ -19,8 +19,8 @@
  * *********************************************************************** */
 package playground.johannes.studies.snowball.postprocess;
 
-import gnu.trove.TIntDoubleHashMap;
-import gnu.trove.TIntIntHashMap;
+import gnu.trove.map.hash.TIntDoubleHashMap;
+import gnu.trove.map.hash.TIntIntHashMap;
 
 /**
  * @author illenberger

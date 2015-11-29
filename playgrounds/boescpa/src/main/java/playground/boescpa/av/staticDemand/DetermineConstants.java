@@ -22,7 +22,8 @@
 package playground.boescpa.av.staticDemand;
 
 import org.matsim.core.utils.geometry.CoordUtils;
-import playground.boescpa.lib.tools.tripReader.Trip;
+import playground.boescpa.analysis.trips.Trip;
+import playground.boescpa.analysis.trips.TripReader;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,8 +39,7 @@ public class DetermineConstants {
 
 	public static void main(String[] args) {
 		// Beeline factor street:
-		final Map<Long, Trip> tripsOriginal = Trip.createTripCollection(args[0]);
-		final List<Trip> filteredTrips = filterTrips(tripsOriginal);
+		final List<Trip> filteredTrips = filterTrips(TripReader.createTripCollection(args[0]));
 		double totalStreetDist = 0;
 		double totalBeelineDist = 0;
 		for (Trip trip : filteredTrips) {
@@ -51,11 +51,11 @@ public class DetermineConstants {
 		System.out.println("Beeline Factor Street = " + (totalStreetDist / totalBeelineDist));
 	}
 
-	private static List<Trip> filterTrips(Map<Long, Trip> trips) {
+	private static List<Trip> filterTrips(List<Trip> trips) {
 		List<Trip> modeFilteredTrips = new ArrayList<>();
 		// filter mode:
 		for (String mode : Constants.MODES_REPLACED_BY_AV) {
-			for (Trip trip : trips.values()) {
+			for (Trip trip : trips) {
 				if (mode.equals(trip.mode)) {
 					modeFilteredTrips.add(trip);
 				}

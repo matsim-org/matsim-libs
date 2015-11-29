@@ -98,7 +98,7 @@ public class VWRCreateDemand {
 		// String basedir = "C:/Users/Gabriel/Desktop/VSP/SVN
 		// VSP/shared-svn/projects/vw_rufbus/scenario/network/generation/";
 		String basedir = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/network/generation/";
-		String network = "../../input/network.xml";
+		String network = "../network_nopt.xml";
 		String counties = "landkreise/landkreise.shp";
 		String commercial = "landuse/commercial.shp";
 		String industrial = "landuse/industrial.shp";
@@ -108,8 +108,8 @@ public class VWRCreateDemand {
 		String universities = "landuse/universities.shp";
 //		double scalefactor = 0.05;
 //		double scalefactor = 0.1;
-		double scalefactor = 1.0;
-//		double scalefactor = 0.01;
+//		double scalefactor = 1.0;
+		double scalefactor = 0.01;
 		String plansOutputComplete = basedir + "../../input/initial_plans"+scalefactor+".xml.gz";
 		String objectAttributesFile = basedir + "../../input/initial_plans_oA"+scalefactor+".xml.gz";
 		String transitSchedule = basedir+"../pt/output_transitschedule.xml.gz";
@@ -440,7 +440,7 @@ public class VWRCreateDemand {
 	
 	private void createVWWorkers(String from, String origin, double flex, double threeshift, double partTime, double carcommuterFactor,
 			double bikecommuterFactor, double walkcommuterFactor){
-		Geometry homeCounty = this.counties.get(origin);
+		Geometry homeCounty = getCounty(origin);
 		
 		
 			Coord homeC = findClosestCoordFromMap(drawRandomPointFromGeometry(homeCounty), this.residential);
@@ -481,7 +481,9 @@ public class VWRCreateDemand {
 	
 	private void createWorkers(String from, String to, double commuters, double carcommuterFactor,
 			double bikecommuterFactor, double walkcommuterFactor, String origin, String destination) {
-		Geometry homeCounty = this.counties.get(origin);
+		
+		
+		Geometry homeCounty = getCounty(origin);
 		Geometry commuteDestinationCounty = this.counties.get(destination);
 
 		double walkcommuters = commuters * walkcommuterFactor;
@@ -568,7 +570,7 @@ public class VWRCreateDemand {
 
 	private void createPupils(String from, String to, double commuters, double carcommuterFactor,
 			double bikecommuterFactor, double walkcommuterFactor, String origin, String destination) {
-		Geometry homeCounty = this.counties.get(origin);
+		Geometry homeCounty = getCounty(origin);
 		Geometry commuteDestinationCounty = this.counties.get(destination);
 
 		double walkcommuters = commuters * walkcommuterFactor;
@@ -599,7 +601,7 @@ public class VWRCreateDemand {
 
 	private void createStudents(String from, String to, double commuters, double carcommuterFactor,
 			double bikecommuterFactor, double walkcommuterFactor, String origin, String destination) {
-		Geometry homeCounty = this.counties.get(origin);
+		Geometry homeCounty = getCounty(origin);
 		Geometry commuteDestinationCounty = this.counties.get(destination);
 
 		double walkcommuters = commuters * walkcommuterFactor;
@@ -626,6 +628,13 @@ public class VWRCreateDemand {
 			createOneStudent(commuterCounter, homeC, commuteDestinationC, mode, from + "_" + to);
 			commuterCounter++;
 		}
+	}
+
+	private Geometry getCounty(String origin) {
+		if (origin == "03151"){
+			if (random.nextDouble()<0.3) {origin ="99999";}
+		}
+		return this.counties.get(origin);
 	}
 
 	private void createOneVWFlexitimeWorker(int i, Coord homeC, String mode, String fromToPrefix) {

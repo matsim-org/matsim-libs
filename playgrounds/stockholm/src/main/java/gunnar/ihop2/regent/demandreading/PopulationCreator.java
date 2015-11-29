@@ -338,8 +338,8 @@ public class PopulationCreator {
 			final Person person = this.newPerson(personId, xy2links,
 					coordinateTransform);
 			if (person != null) {
-				Logger.getLogger(this.getClass().getName()).info(
-						"creating person " + personId);
+				// Logger.getLogger(this.getClass().getName()).info(
+				// "creating person " + personId);
 				this.scenario.getPopulation().addPerson(person);
 			}
 		}
@@ -355,14 +355,15 @@ public class PopulationCreator {
 
 		System.out.println("STARTED ...");
 
-		final String zonesShapeFileName = "./data_ZZZ/shapes/sverige_TZ_EPSG3857.shp";
-		final String buildingShapeFileName = "./data_ZZZ/shapes/by_full_EPSG3857_2.shp";
-		final String populationFileName = "./data_ZZZ/synthetic_population/151008_trips.xml";
+		final String zonesShapeFileName = "./ihop2/demand-input/sverige_TZ_EPSG3857.shp";
+		final String buildingShapeFileName = "./ihop2/demand-input/by_full_EPSG3857_2.shp";
 
-		final String networkFileName = "./data_ZZZ/run/network-plain.xml";
+		final String populationFileName = "./ihop2/demand-input/trips.xml";
+
+		final String networkFileName = "./ihop2/network-output/network.xml";
+		final String initialPlansFile = "./ihop2/demand-output/initial-plans.xml";
 		// final String linkAttributesFileName =
 		// "./data/run/link-attributes.xml";
-		final String initialPlansFile = "./data_ZZZ/run/initial-plans-FULL.xml";
 
 		// final ObjectAttributes linkAttributes = new ObjectAttributes();
 		// final ObjectAttributesXmlReader reader = new

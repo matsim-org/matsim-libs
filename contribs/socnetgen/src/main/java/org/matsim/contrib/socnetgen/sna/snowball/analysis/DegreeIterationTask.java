@@ -19,15 +19,8 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetgen.sna.snowball.analysis;
 
-import gnu.trove.TIntDoubleHashMap;
-import gnu.trove.TIntObjectHashMap;
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.apache.log4j.Logger;
-import org.matsim.contrib.socnetgen.sna.graph.Graph;
-import org.matsim.contrib.socnetgen.sna.graph.Vertex;
-import org.matsim.contrib.socnetgen.sna.graph.analysis.Degree;
-import org.matsim.contrib.socnetgen.sna.graph.analysis.ModuleAnalyzerTask;
-import org.matsim.contrib.socnetgen.sna.snowball.SampledVertex;
+import gnu.trove.map.hash.TIntDoubleHashMap;
+import gnu.trove.map.hash.TIntObjectHashMap;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -36,6 +29,14 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.apache.log4j.Logger;
+import org.matsim.contrib.socnetgen.sna.graph.Graph;
+import org.matsim.contrib.socnetgen.sna.graph.Vertex;
+import org.matsim.contrib.socnetgen.sna.graph.analysis.Degree;
+import org.matsim.contrib.socnetgen.sna.graph.analysis.ModuleAnalyzerTask;
+import org.matsim.contrib.socnetgen.sna.snowball.SampledVertex;
 
 /**
  * @author illenberger

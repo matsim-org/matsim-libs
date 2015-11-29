@@ -25,6 +25,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Locale;
 
 /**
  * @author jillenberger
@@ -76,11 +77,11 @@ public class AnalyzerTaskRunner {
 
     private static String doubleToString(Double value) {
         if(value == null) return nullString;
-        else return String.format(format, value);
+        else return String.format(Locale.US, format, value);
     }
 
     private static String intToString(Integer value) {
         if(value == null) return nullString;
-        else return String.format("%d", value);
+        else return String.format(Locale.US, "%d", value);
     }
 }

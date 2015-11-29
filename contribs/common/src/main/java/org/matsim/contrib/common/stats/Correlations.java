@@ -23,15 +23,15 @@
  */
 package org.matsim.contrib.common.stats;
 
-import gnu.trove.TDoubleDoubleHashMap;
-import gnu.trove.TDoubleDoubleIterator;
-import gnu.trove.TDoubleIntHashMap;
-import gnu.trove.TDoubleObjectHashMap;
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import gnu.trove.iterator.TDoubleDoubleIterator;
+import gnu.trove.map.hash.TDoubleDoubleHashMap;
+import gnu.trove.map.hash.TDoubleIntHashMap;
+import gnu.trove.map.hash.TDoubleObjectHashMap;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 
 /**
  * @author illenberger

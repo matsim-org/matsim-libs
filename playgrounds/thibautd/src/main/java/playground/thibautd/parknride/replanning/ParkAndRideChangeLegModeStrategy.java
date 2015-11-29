@@ -32,7 +32,6 @@ import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.modules.TripsToLegsModule;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.StageActivityTypes;
-
 import playground.thibautd.parknride.ParkAndRideConstants;
 
 

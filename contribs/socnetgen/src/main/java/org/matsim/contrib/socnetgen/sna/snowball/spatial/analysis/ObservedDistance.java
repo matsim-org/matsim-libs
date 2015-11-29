@@ -19,14 +19,15 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetgen.sna.snowball.spatial.analysis;
 
-import gnu.trove.TObjectDoubleHashMap;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
+
+import java.util.Set;
+
 import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialVertex;
 import org.matsim.contrib.socnetgen.sna.graph.spatial.analysis.Distance;
 import org.matsim.contrib.socnetgen.sna.math.Distribution;
 import org.matsim.contrib.socnetgen.sna.snowball.analysis.SnowballPartitions;
 import org.matsim.contrib.socnetgen.sna.snowball.spatial.SpatialSampledVertexDecorator;
-
-import java.util.Set;
 
 /**
  * @author illenberger

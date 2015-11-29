@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package playground.johannes.studies.sbsurvey.analysis;
 
-import gnu.trove.TObjectDoubleHashMap;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.socnetgen.sna.graph.Graph;

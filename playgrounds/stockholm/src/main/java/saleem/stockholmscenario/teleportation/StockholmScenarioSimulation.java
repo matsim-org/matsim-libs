@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -15,6 +14,8 @@ import org.matsim.vehicles.VehicleCapacity;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.Vehicles;
 
+import saleem.stockholmscenario.teleportation.ptoptimisation.PTControlListener;
+
 public class StockholmScenarioSimulation {
 public static void main(String[] args) {
 	
@@ -22,13 +23,14 @@ public static void main(String[] args) {
  * standing capacity and passenger car equivalents of the vehicle types based on the sample size. This is done to balance out the effect of setting storage capacity 
  * factor and flow capacity factor (in the Config file) on the PT links.
 */
-        String path = "/home/saleem/input/config.xml";
+//        String path = "/home/saleem/input/config.xml";
+		String path = "H:\\Matsim\\Stockholm Scenario\\teleportation\\input\\config.xml";
         Config config = ConfigUtils.loadConfig(path);
 		double samplesize = config.qsim().getStorageCapFactor();
 //        double samplesize = 0.1;
         Controler controler = new Controler(config);
-        controler.addControlerListener(new StockholmControlListener());
 		Scenario scenario = controler.getScenario();
+		controler.addControlerListener(new PTControlListener(scenario));
 		Network network = scenario.getNetwork();
 		Vehicles vehicles = scenario.getTransitVehicles();
 		ArrayList<VehicleType> vehcilestypes = toArrayList(vehicles.getVehicleTypes().values().iterator());

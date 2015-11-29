@@ -20,9 +20,10 @@
 package playground.johannes.synpop.sim;
 
 import com.vividsolutions.jts.geom.Coordinate;
-import gnu.trove.TDoubleFunction;
-import gnu.trove.TObjectDoubleHashMap;
-import gnu.trove.TObjectDoubleIterator;
+import gnu.trove.function.TDoubleFunction;
+import gnu.trove.impl.Constants;
+import gnu.trove.iterator.TObjectDoubleIterator;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.common.util.ProgressLogger;
 import org.matsim.facilities.ActivityFacility;
@@ -45,10 +46,16 @@ public class SetHomeFacilities implements PersonsTask {
 
     private final String zoneLayerKey;
 
+    private TObjectDoubleHashMap<Zone> zoneWeights;
+
     public SetHomeFacilities(DataPool dataPool, String zoneLayerKey, Random random) {
         this.dataPool = dataPool;
         this.random = random;
         this.zoneLayerKey = zoneLayerKey;
+    }
+
+    public void setZoneWeights(TObjectDoubleHashMap<Zone> zoneWeights) {
+        this.zoneWeights = zoneWeights;
     }
 
     @Override
@@ -56,7 +63,10 @@ public class SetHomeFacilities implements PersonsTask {
         ZoneCollection zones = ((ZoneData) dataPool.get(ZoneDataLoader.KEY)).getLayer(zoneLayerKey);
         FacilityData facilityData = (FacilityData) dataPool.get(FacilityDataLoader.KEY);
 
-        TObjectDoubleHashMap<Zone> probabilities = calculateProbabilities(zones);
+        if(zoneWeights == null) {
+            zoneWeights = new TObjectDoubleHashMap<>(Constants.DEFAULT_CAPACITY, Constants.DEFAULT_LOAD_FACTOR, 1.0);
+        }
+        TObjectDoubleHashMap<Zone> probabilities = calculateProbabilities(zones, zoneWeights);
 
         logger.info("Assigning facilities to zones...");
         List<ActivityFacility> homeFacilities = facilityData.getFacilities(ActivityTypes.HOME);
@@ -74,14 +84,15 @@ public class SetHomeFacilities implements PersonsTask {
 
     }
 
-    private TObjectDoubleHashMap<Zone> calculateProbabilities(ZoneCollection zones) {
+    private TObjectDoubleHashMap<Zone> calculateProbabilities(ZoneCollection zones, TObjectDoubleHashMap<Zone>
+            weights) {
         TObjectDoubleHashMap<Zone> zoneValues = new TObjectDoubleHashMap<>();
 
         double sum = 0;
         for (Zone zone : zones.getZones()) {
             String value = zone.getAttribute(ZoneData.POPULATION_KEY);
             if (value != null & !value.isEmpty()) {
-                double population = Double.parseDouble(value);
+                double population = Double.parseDouble(value) * weights.get(zone);
                 zoneValues.put(zone, population);
                 sum += population;
             }

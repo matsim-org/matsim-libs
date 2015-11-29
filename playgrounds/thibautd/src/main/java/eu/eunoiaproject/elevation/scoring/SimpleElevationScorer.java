@@ -19,14 +19,13 @@
  * *********************************************************************** */
 package eu.eunoiaproject.elevation.scoring;
 
+import eu.eunoiaproject.elevation.ElevationProvider;
+import eu.eunoiaproject.elevation.scoring.SimpleElevationScorerParameters.Params;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.scoring.SumScoringFunction.ActivityScoring;
 import org.matsim.core.scoring.SumScoringFunction.LegScoring;
-
-import eu.eunoiaproject.elevation.ElevationProvider;
-import eu.eunoiaproject.elevation.scoring.SimpleElevationScorerParameters.Params;
 
 /**
  * @author thibautd

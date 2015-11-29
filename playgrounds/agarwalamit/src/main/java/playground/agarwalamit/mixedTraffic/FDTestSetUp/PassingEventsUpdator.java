@@ -34,12 +34,26 @@ import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 
+import playground.agarwalamit.utils.ListUtils;
+
 /**
  * @author amit
  */
 
 public class PassingEventsUpdator implements LinkEnterEventHandler, LinkLeaveEventHandler, PersonDepartureEventHandler {
+	private final Map<Id<Person>, Double> personId2LinkEnterTime;
+	private final Map<Id<Person>, String> personId2LegMode;
 
+	private final List<Double> bikesPassedByEachCarPerKm;
+	private final List<Double> bikesPassedByAllCarPerKm;
+	private final List<Double> carsPerKm;
+
+	private final static Id<Link> TRACKING_START_LINK = Id.createLinkId(0);
+	private final static Id<Link> TRACKING_END_LINK = Id.createLinkId(InputsForFDTestSetUp.SUBDIVISION_FACTOR*3-1);
+	private boolean isFirstBikeLeavingTrack = false;
+	private Id<Person> firstCarId ;
+	private double noOfCycles = 0;
+	
 	public PassingEventsUpdator() {
 		this.personId2LinkEnterTime = new HashMap<>();
 		this.personId2LegMode = new HashMap<>();
@@ -47,19 +61,6 @@ public class PassingEventsUpdator implements LinkEnterEventHandler, LinkLeaveEve
 		this.bikesPassedByAllCarPerKm = new ArrayList<Double>();
 		this.carsPerKm = new ArrayList<Double>();
 	}
-
-	private Map<Id<Person>, Double> personId2LinkEnterTime;
-	private Map<Id<Person>, String> personId2LegMode;
-
-	private List<Double> bikesPassedByEachCarPerKm;
-	private List<Double> bikesPassedByAllCarPerKm;
-	private List<Double> carsPerKm;
-
-	private final static Id<Link> trackStartLink = Id.createLinkId(0);
-	private final static Id<Link> trackEndLink = Id.createLinkId(InputsForFDTestSetUp.SUBDIVISION_FACTOR*3-1);
-	private boolean firstBikeLeavingTrack = false;
-	private Id<Person> firstCarId ;
-	private double noOfCycles = 0;
 	
 	@Override
 	public void reset(int iteration) {
@@ -72,8 +73,8 @@ public class PassingEventsUpdator implements LinkEnterEventHandler, LinkLeaveEve
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		Id<Person> personId = Id.createPersonId(event.getVehicleId());
-		if(event.getLinkId().equals(trackStartLink)){
+		Id<Person> personId = Id.createPersonId(event.getDriverId());
+		if(event.getLinkId().equals(TRACKING_START_LINK)){
 			this.personId2LinkEnterTime.put(personId, event.getTime());
 		}
 	}
@@ -81,19 +82,18 @@ public class PassingEventsUpdator implements LinkEnterEventHandler, LinkLeaveEve
 	private List<Double> tempAvgBikePassedPerCar  = new ArrayList<Double>();
 	@Override 
 	public void handleEvent(LinkLeaveEvent event){
-		Id<Person> personId = Id.createPersonId(event.getVehicleId());
+		Id<Person> personId = Id.createPersonId(event.getDriverId());
 
-		if (event.getLinkId().equals(trackEndLink)){
-
+		if (event.getLinkId().equals(TRACKING_END_LINK)){
 			// startsAveraging when first bike leaves test track
-			if(this.personId2LegMode.get(personId).equals(TransportMode.bike) && !firstBikeLeavingTrack) firstBikeLeavingTrack = true;
+			if(this.personId2LegMode.get(personId).equals(TransportMode.bike) && !isFirstBikeLeavingTrack) isFirstBikeLeavingTrack = true;
 			
 			//start counting cycles when first bike leaves test track
-			if(!this.personId2LegMode.get(personId).equals(TransportMode.bike) && firstBikeLeavingTrack && noOfCycles==0) {
+			if(!this.personId2LegMode.get(personId).equals(TransportMode.bike) && isFirstBikeLeavingTrack && noOfCycles==0) {
 				firstCarId = personId;
 			}
 
-			if(firstBikeLeavingTrack && !this.personId2LegMode.get(personId).equals(TransportMode.bike)) {
+			if(isFirstBikeLeavingTrack && !this.personId2LegMode.get(personId).equals(TransportMode.bike)) {
 				double numberOfBicyclesOvertaken = getNumberOfBicycleOvertaken(personId);
 				double noOfBikesPerCarPerKm = numberOfBicyclesOvertaken *1000/(InputsForFDTestSetUp.LINK_LENGTH*3);
 				this.bikesPassedByEachCarPerKm.add(noOfBikesPerCarPerKm);
@@ -119,7 +119,6 @@ public class PassingEventsUpdator implements LinkEnterEventHandler, LinkLeaveEve
 				this.carsPerKm.add(noOfCarsPerkm);
 //				this.bikesPassedByAllCarPerKm.add(noOfBikesPerCarPerKm*noOfCarsPerkm);
 			}
-
 			this.personId2LinkEnterTime.remove(personId);
 		}
 	}
@@ -153,35 +152,19 @@ public class PassingEventsUpdator implements LinkEnterEventHandler, LinkLeaveEve
 	}
 
 	public double getAvgBikesPassingRate(){
-		double avg=0;
-		for(double d:this.bikesPassedByEachCarPerKm){
-			avg += d;
-		}
-		return avg/this.bikesPassedByEachCarPerKm.size();
+		return ListUtils.doubleMean(this.bikesPassedByEachCarPerKm);
 	}
 
 	public double getTotalBikesPassedByAllCarsPerKm(){
-		double sum =0;
 //		for(double d:this.bikesPassedByEachCarPerKm){
 //			sum += d;
 //		}
 //		return (sum/noOfCycles)*1000/(InputsForFDTestSetUp.LINK_LENGTH*3);
-		
-		for(double d:this.bikesPassedByAllCarPerKm){
-			sum += d;
-		}
-		return sum/bikesPassedByAllCarPerKm.size();
+		return ListUtils.doubleMean(this.bikesPassedByAllCarPerKm);
 	}
 	
 	public double getNoOfCarsPerKm(){
-		double avg=0;
-		for(double d:this.carsPerKm){
-			avg += d;
-		}
-//		System.out.println("avg bikes passed per car per km \t "+getAvgBikesPassingRate());
-//		System.out.println("total bikes passed by all cars per km from simulation \t "+getTotalBikesPassedByAllCarsPerKm());
-//		System.out.println("total bikes passed by all cars per km from theory \t "+getAvgBikesPassingRate()*avg/this.carsPerKm.size());
-		return avg/this.carsPerKm.size();
+		return ListUtils.doubleMean(this.carsPerKm);
 	}
 
 }

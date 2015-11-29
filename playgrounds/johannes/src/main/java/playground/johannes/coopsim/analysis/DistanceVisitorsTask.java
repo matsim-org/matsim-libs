@@ -19,9 +19,9 @@
  * *********************************************************************** */
 package playground.johannes.coopsim.analysis;
 
-import gnu.trove.TDoubleArrayList;
-import gnu.trove.TDoubleDoubleHashMap;
-import gnu.trove.TObjectDoubleHashMap;
+import gnu.trove.list.array.TDoubleArrayList;
+import gnu.trove.map.hash.TDoubleDoubleHashMap;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
@@ -110,6 +110,6 @@ public class DistanceVisitorsTask extends TrajectoryAnalyzerTask {
 			}
 		}
 
-		return Correlations.mean(visitorVals.toNativeArray(), distVals.toNativeArray());
+		return Correlations.mean(visitorVals.toArray(), distVals.toArray());
 	}
 }

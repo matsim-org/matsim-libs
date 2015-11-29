@@ -153,7 +153,7 @@ public class CTLink implements CTNetworkEntity {
 				this.cells.add(cell);
 				qt.put(cell.getX(), cell.getY(), cell);
 				for (GraphEdge ge : pt.edges) {
-					debugGe(ge);
+//					debugGe(ge);
 					ProtoCell protoNeighbor = pt.nb.get(ge);
 					Geometry nCh = geoMap.get(protoNeighbor);
 					CTCell neighbor = null;
@@ -322,7 +322,7 @@ public class CTLink implements CTNetworkEntity {
 		maxY = maxY > y3 ? maxY : y3;
 		List<GraphEdge> edges = v.generateVoronoi(xa, ya, minX - WIDTH, maxX + WIDTH, minY - WIDTH, maxY + WIDTH);
 		for (GraphEdge ge : edges) {
-			debugGe(ge);
+//			debugGe(ge);
 //			double aa = ge.x1-ge.x2;
 //			double bb = ge.y1-ge.y2;
 //			double cc = Math.sqrt(aa*aa+bb*bb);
@@ -337,19 +337,6 @@ public class CTLink implements CTNetworkEntity {
 
 		}
 		return cells;
-	}
-
-	private void debugGe(GraphEdge ge) {
-		if (!CTRunner.DEBUG) {
-			return;
-		}
-		LineSegment s = new LineSegment();
-		s.x0 = ge.x1;
-		s.x1 = ge.x2;
-		s.y0 = ge.y1;
-		s.y1 = ge.y2;
-		LineEvent le = new LineEvent(0, s, true, 128, 128, 128, 255, 10, 0.1, 0.2);
-		em.processEvent(le);
 	}
 
 	private void debugBound(Coordinate[] bounds) {
@@ -397,6 +384,19 @@ public class CTLink implements CTNetworkEntity {
 			em.processEvent(le);
 		}
 
+	}
+
+	private void debugGe(GraphEdge ge) {
+		if (!CTRunner.DEBUG) {
+			return;
+		}
+		LineSegment s = new LineSegment();
+		s.x0 = ge.x1;
+		s.x1 = ge.x2;
+		s.y0 = ge.y1;
+		s.y1 = ge.y2;
+		LineEvent le = new LineEvent(0, s, true, 128, 128, 128, 255, 10, 0.1, 0.2);
+		em.processEvent(le);
 	}
 
 	private void debugEntrances(double dsX, double usX, double dsY, double usY) {

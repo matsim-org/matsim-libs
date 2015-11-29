@@ -21,17 +21,12 @@ package playground.thibautd.scripts.scenariohandling;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkWriter;
-import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
-import org.matsim.contrib.multimodal.tools.MultiModalNetworkCreator;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
-import playground.ivt.matsim2030.Matsim2030Utils;
 
 import java.util.Arrays;
 import java.util.HashSet;

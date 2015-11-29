@@ -34,8 +34,8 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.contrib.socnetsim.framework.population.JointPlan;
 import org.matsim.contrib.socnetsim.framework.population.JointPlanFactory;
@@ -204,7 +204,7 @@ public class GroupPlanStrategyTest {
 			final boolean joint,
 			final Map<Id<Person>, Plan> jointPlan) {
 		Id<Person> id = Id.createPersonId( count );
-		Person person = PersonImpl.createPerson(id);
+		Person person = PopulationUtils.createPerson(id);
 		PlanImpl plan = new PlanImpl( person );
 		person.addPlan( plan );
 		if (joint) jointPlan.put( id , plan );

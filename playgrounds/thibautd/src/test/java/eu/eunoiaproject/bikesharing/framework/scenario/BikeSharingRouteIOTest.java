@@ -19,10 +19,9 @@
  * *********************************************************************** */
 package eu.eunoiaproject.bikesharing.framework.scenario;
 
-import java.util.Arrays;
-
-import org.apache.log4j.Logger;
+import eu.eunoiaproject.bikesharing.framework.BikeSharingConstants;
 import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -37,12 +36,12 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
-import eu.eunoiaproject.bikesharing.framework.BikeSharingConstants;
+import java.util.Arrays;
 
 /**
  * @author thibautd
@@ -159,7 +158,7 @@ public class BikeSharingRouteIOTest {
 	}
 
 	private Person wrapInPlan( final BikeSharingRoute outRoute ) {
-		final Person person = PersonImpl.createPerson(Id.createPersonId("p"));
+		final Person person = PopulationUtils.createPerson(Id.createPersonId("p"));
 
 		final Plan plan = new PlanImpl( person );
 		person.addPlan( plan );

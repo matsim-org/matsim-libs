@@ -9,13 +9,10 @@ public class LogToOutputSaver {
 	final private static Logger log = Logger.getLogger(LogToOutputSaver.class);
 	
 	public static void setOutputDirectory(String outputBase) {
-		try
-		{
+		try	{
 			OutputDirectoryLogging.initLoggingWithOutputDirectory(outputBase);
 			log.info("Logging will be stored at " + outputBase);
-		}
-		catch (IOException e)
-		{
+		} catch (IOException e)	{
 			log.error("Cannot create logfiles: " + e.getMessage());
 			e.printStackTrace();
 		}

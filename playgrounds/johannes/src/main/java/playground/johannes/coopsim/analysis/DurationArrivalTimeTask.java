@@ -19,8 +19,8 @@
  * *********************************************************************** */
 package playground.johannes.coopsim.analysis;
 
-import gnu.trove.TDoubleArrayList;
-import gnu.trove.TDoubleDoubleHashMap;
+import gnu.trove.list.array.TDoubleArrayList;
+import gnu.trove.map.hash.TDoubleDoubleHashMap;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.contrib.common.stats.Correlations;
@@ -78,9 +78,9 @@ public class DurationArrivalTimeTask extends TrajectoryAnalyzerTask {
 			}
 		}
 
-//		TDoubleDoubleHashMap map = Correlations.mean(arrivals.toNativeArray(), durations.toNativeArray(), 3600);
-		Discretizer d = FixedSampleSizeDiscretizer.create(arrivals.toNativeArray(), 100, 100);
-		TDoubleDoubleHashMap map = Correlations.mean(arrivals.toNativeArray(), durations.toNativeArray(), d);
+//		TDoubleDoubleHashMap map = Correlations.mean(arrivals.toArray(), durations.toArray(), 3600);
+		Discretizer d = FixedSampleSizeDiscretizer.create(arrivals.toArray(), 100, 100);
+		TDoubleDoubleHashMap map = Correlations.mean(arrivals.toArray(), durations.toArray(), d);
 		try {
 			if(purpose == null)
 				StatsWriter.writeHistogram(map, "arr", "dur", String.format("%1$s/dur_arr.txt", getOutputDirectory()));

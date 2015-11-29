@@ -1,6 +1,6 @@
 package gunnar.ihop2.transmodeler.networktransformation;
 
-import static gunnar.ihop2.transmodeler.networktransformation.Transmodeler2MATSimNetwork.newUnidirectionalId;
+import static gunnar.ihop2.transmodeler.networktransformation.Transmodeler2MATSimNetwork.newUnidirectionalLinkId;
 import gunnar.ihop2.transmodeler.networktransformation.Transmodeler2MATSimNetwork.DIR;
 
 import java.util.LinkedHashMap;
@@ -30,9 +30,10 @@ class TransmodelerLink extends TransmodelerElement {
 	final Map<TransmodelerLink, Double> downstreamLink2turnLength = new LinkedHashMap<TransmodelerLink, Double>();
 
 	TransmodelerLink(final String bidirectionalId, final DIR dir,
+			final String abDir, final String baDir,
 			final TransmodelerNode fromNode, final TransmodelerNode toNode,
 			final String type) {
-		super(newUnidirectionalId(bidirectionalId, dir));
+		super(newUnidirectionalLinkId(bidirectionalId, dir, abDir, baDir));
 		this.bidirectionalId = bidirectionalId;
 		this.dir = dir;
 		this.fromNode = fromNode;

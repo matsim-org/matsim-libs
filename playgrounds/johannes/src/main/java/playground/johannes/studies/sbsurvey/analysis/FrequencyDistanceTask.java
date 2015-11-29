@@ -20,8 +20,8 @@
 package playground.johannes.studies.sbsurvey.analysis;
 
 import com.vividsolutions.jts.geom.Point;
-import gnu.trove.TDoubleArrayList;
-import gnu.trove.TDoubleDoubleHashMap;
+import gnu.trove.list.array.TDoubleArrayList;
+import gnu.trove.map.hash.TDoubleDoubleHashMap;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.common.gis.CartesianDistanceCalculator;
 import org.matsim.contrib.common.gis.DistanceCalculator;
@@ -74,14 +74,14 @@ public class FrequencyDistanceTask extends AnalyzerTask {
 			}
 		}
 		
-		TDoubleDoubleHashMap map = Correlations.mean(values1.toNativeArray(), values2.toNativeArray(), new LogDiscretizer(1.12, 52));
+		TDoubleDoubleHashMap map = Correlations.mean(values1.toArray(), values2.toArray(), new LogDiscretizer(1.12, 52));
 		
 			Correlations.writeToFile(map, getOutputDirectory() + "d_freq.txt", "frequency", "distance");
 //			Correlations.writeToFile(map, getOutputDirectory() + "cost_freq.txt", "frequency", "cost");
 			
-//			map = Correlations.correlationMean(values2.toNativeArray(), values1.toNativeArray(), new LinearDiscretizer(1000));
-			map = Correlations.mean(values2.toNativeArray(), values1.toNativeArray(), FixedSampleSizeDiscretizer.create(values2.toNativeArray(), 200));
-//			map = Correlations.correlationMean(values2.toNativeArray(), values1.toNativeArray(), new LogDiscretizer(2, 1000));
+//			map = Correlations.correlationMean(values2.toArray(), values1.toArray(), new LinearDiscretizer(1000));
+			map = Correlations.mean(values2.toArray(), values1.toArray(), FixedSampleSizeDiscretizer.create(values2.toArray(), 200));
+//			map = Correlations.correlationMean(values2.toArray(), values1.toArray(), new LogDiscretizer(2, 1000));
 			Correlations.writeToFile(map, getOutputDirectory() + "freq_d.txt", "distance", "frequency");
 			
 //			Distribution.writeHistogram(wDistr.normalizedDistribution(wDistr.absoluteDistributionFixed(100)), getOutputDirectory()+"/d_freqWeighted.txt");

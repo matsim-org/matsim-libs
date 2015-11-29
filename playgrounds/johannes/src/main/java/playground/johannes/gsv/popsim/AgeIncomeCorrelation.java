@@ -19,15 +19,12 @@
 
 package playground.johannes.gsv.popsim;
 
-import gnu.trove.TDoubleArrayList;
-import gnu.trove.TDoubleDoubleHashMap;
+import gnu.trove.list.array.TDoubleArrayList;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.matsim.contrib.common.stats.*;
 import playground.johannes.gsv.synPop.analysis.AnalyzerTask;
 import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.Person;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
 
@@ -67,17 +64,17 @@ public class AgeIncomeCorrelation extends AnalyzerTask {
 		
 		/*
 		try {
-//			TDoubleDoubleHashMap hist = Histogram.createHistogram(ages.toNativeArray(), new LinearDiscretizer(5), false);
-			TDoubleDoubleHashMap hist = Histogram.createHistogram(ages.toNativeArray(), new DummyDiscretizer(), false);
+//			TDoubleDoubleHashMap hist = Histogram.createHistogram(ages.toArray(), new LinearDiscretizer(5), false);
+			TDoubleDoubleHashMap hist = Histogram.createHistogram(ages.toArray(), new DummyDiscretizer(), false);
 			StatsWriter.writeHistogram(hist, "age", "n", getOutputDirectory() + "/age.txt");
 			
-			hist = Histogram.createHistogram(incomes.toNativeArray(), new LinearDiscretizer(500), false);
-//			hist = Histogram.createHistogram(incomes.toNativeArray(), new InterpolatingDiscretizer(incomes.toNativeArray()), false);
+			hist = Histogram.createHistogram(incomes.toArray(), new LinearDiscretizer(500), false);
+//			hist = Histogram.createHistogram(incomes.toArray(), new InterpolatingDiscretizer(incomes.toArray()), false);
 			StatsWriter.writeHistogram(hist, "income", "n", getOutputDirectory() + "/income.txt");
 			
 			StatsWriter.writeScatterPlot(ages, incomes, "age", "income", getOutputDirectory() + "/age.income.txt");
 			
-			StatsWriter.writeHistogram(Correlations.mean(ages.toNativeArray(), incomes.toNativeArray()), "age", "income", getOutputDirectory() + "/age.income.mean.txt");
+			StatsWriter.writeHistogram(Correlations.mean(ages.toArray(), incomes.toArray()), "age", "income", getOutputDirectory() + "/age.income.mean.txt");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

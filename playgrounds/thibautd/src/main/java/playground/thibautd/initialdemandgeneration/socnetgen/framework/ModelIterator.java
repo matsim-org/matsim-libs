@@ -19,10 +19,10 @@
  * *********************************************************************** */
 package playground.thibautd.initialdemandgeneration.socnetgen.framework;
 
+import org.apache.log4j.Logger;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import org.apache.log4j.Logger;
 
 /**
  * Iteratively runs a ModelRunner, modifying the thresholds at each time step,

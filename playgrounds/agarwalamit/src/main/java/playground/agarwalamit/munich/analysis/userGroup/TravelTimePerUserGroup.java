@@ -37,7 +37,7 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.agarwalamit.analysis.legMode.distributions.LegModeTravelTimeHandler;
+import playground.agarwalamit.analysis.trip.LegModeTripTravelTimeHandler;
 import playground.agarwalamit.munich.utils.UserGroupUtilsExtended;
 import playground.agarwalamit.utils.LoadMyScenarios;
 import playground.benjamin.scenarios.munich.analysis.filter.PersonFilter;
@@ -51,7 +51,7 @@ public class TravelTimePerUserGroup extends AbstractAnalysisModule {
 
 	public TravelTimePerUserGroup() {
 		super(TravelTimePerUserGroup.class.getSimpleName());
-		this.travelTimeHandler = new LegModeTravelTimeHandler();
+		this.travelTimeHandler = new LegModeTripTravelTimeHandler();
 		this.sc = LoadMyScenarios.loadScenarioFromPlansNetworkAndConfig(this.populationFile, this.networkFile, this.configFile);
 		this.lastIteration = LoadMyScenarios.getLastIteration(this.configFile);
 		this.eventsFile = this.outputDir+"/ITERS/it."+this.lastIteration+"/"+this.lastIteration+".events.xml.gz";
@@ -59,7 +59,7 @@ public class TravelTimePerUserGroup extends AbstractAnalysisModule {
 		userGrpToBoxPlotData = new TreeMap<UserGroup, List<Double>>();
 	}
 
-	private LegModeTravelTimeHandler travelTimeHandler;
+	private LegModeTripTravelTimeHandler travelTimeHandler;
 	private Scenario sc; 
 	private int lastIteration;
 	private Logger logger = Logger.getLogger(TravelTimePerUserGroup.class);

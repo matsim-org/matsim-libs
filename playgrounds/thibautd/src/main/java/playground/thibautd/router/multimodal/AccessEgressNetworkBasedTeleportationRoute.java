@@ -19,10 +19,6 @@
  * *********************************************************************** */
 package playground.thibautd.router.multimodal;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONTokener;
@@ -32,6 +28,10 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.socnetsim.utils.CollectionUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.vehicles.Vehicle;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @author thibautd

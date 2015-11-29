@@ -42,13 +42,16 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
 import playground.agarwalamit.mixedTraffic.MixedTrafficVehiclesUtils;
-import playground.agarwalamit.mixedTraffic.patnaIndia.BackwardCompatibilityForRouteType;
+import playground.agarwalamit.mixedTraffic.patnaIndia.PatnaUtils;
+import playground.agarwalamit.utils.plans.BackwardCompatibilityForOldPlansType;
 
 /**
  * @author amit
@@ -118,8 +121,8 @@ public class PatnaSimulationTimeWriter {
 		Config config = createBasicConfigSettings();
 		String outPlans = inputFilesDir + "/SelectedPlans_new.xml.gz";
 
-		BackwardCompatibilityForRouteType bcrt = new BackwardCompatibilityForRouteType(inputFilesDir+"/SelectedPlansOnly.xml", mainModes);
-		bcrt.startProcessing();
+		BackwardCompatibilityForOldPlansType bcrt = new BackwardCompatibilityForOldPlansType(inputFilesDir+"/SelectedPlansOnly.xml", mainModes);
+		bcrt.extractPlansExcludingLinkInfo();
 		bcrt.writePopOut(outPlans);
 
 		config.plans().setInputFile(outPlans);
@@ -130,71 +133,33 @@ public class PatnaSimulationTimeWriter {
 		config.qsim().setLinkDynamics(ld.toString());
 		config.qsim().setTrafficDynamics(td);
 
-		if(ld.toString().equals("SeepageQ")) {// probably this will not work but following commented line will work after merging seepageInLinkDynamics branch.
-//		if(ld.equals(QSimConfigGroup.LinkDynamics.SeepageQ)) {
-			config.setParam("seepage", "seepMode","bike");
-			config.setParam("seepage", "isSeepModeStorageFree", "false");
-			config.setParam("seepage", "isRestrictingNumberOfSeepMode", "true");
+		if(ld.equals(QSimConfigGroup.LinkDynamics.SeepageQ)) {
+			config.qsim().setSeepMode("bike");
+			config.qsim().setSeepModeStorageFree(false);
+			config.qsim().setRestrictingSeepage(true);
 		}
 
 		config.controler().setCreateGraphs(false);
 		config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.fromVehiclesData);
 		Scenario sc = ScenarioUtils.loadScenario(config);
 
-		Map<String, VehicleType> modesType = new HashMap<String, VehicleType>(); 
-		VehicleType car = VehicleUtils.getFactory().createVehicleType(Id.create("car",VehicleType.class));
-		car.setMaximumVelocity(MixedTrafficVehiclesUtils.getSpeed("car"));
-		car.setPcuEquivalents(1.0);
-		modesType.put("car", car);
-		sc.getVehicles().addVehicleType(car);
-
-		VehicleType motorbike = VehicleUtils.getFactory().createVehicleType(Id.create("motorbike",VehicleType.class));
-		motorbike.setMaximumVelocity(MixedTrafficVehiclesUtils.getSpeed("motorbike"));
-		motorbike.setPcuEquivalents(0.25);
-		modesType.put("motorbike", motorbike);
-		sc.getVehicles().addVehicleType(motorbike);
-
-		VehicleType bike = VehicleUtils.getFactory().createVehicleType(Id.create("bike",VehicleType.class));
-		bike.setMaximumVelocity(MixedTrafficVehiclesUtils.getSpeed("bike"));
-		bike.setPcuEquivalents(0.25);
-		modesType.put("bike", bike);
-		sc.getVehicles().addVehicleType(bike);
-
-		VehicleType walk = VehicleUtils.getFactory().createVehicleType(Id.create("walk",VehicleType.class));
-		walk.setMaximumVelocity(MixedTrafficVehiclesUtils.getSpeed("walk"));
-		//		walk.setPcuEquivalents(0.10);  			
-		modesType.put("walk",walk);
-		sc.getVehicles().addVehicleType(walk);
-
-		VehicleType pt = VehicleUtils.getFactory().createVehicleType(Id.create("pt",VehicleType.class));
-		pt.setMaximumVelocity(MixedTrafficVehiclesUtils.getSpeed("pt"));
-		//		pt.setPcuEquivalents(5);  			
-		modesType.put("pt",pt);
-		sc.getVehicles().addVehicleType(pt);
-
-		for(Person p:sc.getPopulation().getPersons().values()){
-			Id<Vehicle> vehicleId = Id.create(p.getId(),Vehicle.class);
-			String travelMode = null;
-			for(PlanElement pe :p.getSelectedPlan().getPlanElements()){
-				if (pe instanceof Leg) {
-					travelMode = ((Leg)pe).getMode();
-					break;
-				}
-			}
-			Vehicle vehicle = VehicleUtils.getFactory().createVehicle(vehicleId,modesType.get(travelMode));
-			sc.getVehicles().addVehicle(vehicle);
-		}
+		PatnaUtils.createAndAddVehiclesToScenario(sc);
 
 		final Controler controler = new Controler(sc);
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		controler.setDumpDataAtEnd(false);
 
+		final RandomizingTimeDistanceTravelDisutility.Builder builder = new RandomizingTimeDistanceTravelDisutility.Builder("bike");
+		
 		controler.addOverridingModule(new AbstractModule() {
 			// following must be added in order to get travel time and travel disutility in the router for modes other than car
 			@Override
 			public void install() {
-				addTravelTimeBinding("bike").to(networkTravelTime());
-				addTravelDisutilityFactoryBinding("bike").to(carTravelDisutilityFactoryKey());
+				addTravelTimeBinding("bike").to(FreeSpeedTravelTime.class);
+				addTravelDisutilityFactoryBinding("bike").toInstance(builder);
+				// alternatively test -->  addTravelDisutilityFactoryBinding("bike").to(carTravelDisutilityFactoryKey()); after removing builder injection line.
+//				addTravelTimeBinding("bike").to(networkTravelTime());
+//				addTravelDisutilityFactoryBinding("bike").to(carTravelDisutilityFactoryKey());
 				addTravelTimeBinding("motorbike").to(networkTravelTime());
 				addTravelDisutilityFactoryBinding("motorbike").to(carTravelDisutilityFactoryKey());
 			}
@@ -226,15 +191,15 @@ public class PatnaSimulationTimeWriter {
 		config.setParam("TimeAllocationMutator", "mutationAffectsDuration", "false");
 		config.setParam("TimeAllocationMutator", "mutationRange", "7200.0");
 
-		StrategySettings expChangeBeta = new StrategySettings(Id.create("1",StrategySettings.class));
+		StrategySettings expChangeBeta = new StrategySettings();
 		expChangeBeta.setStrategyName("ChangeExpBeta");
 		expChangeBeta.setWeight(0.85);
 
-		StrategySettings reRoute = new StrategySettings(Id.create("2",StrategySettings.class));
+		StrategySettings reRoute = new StrategySettings();
 		reRoute.setStrategyName("ReRoute");
 		reRoute.setWeight(0.1);
 
-		StrategySettings timeAllocationMutator	= new StrategySettings(Id.create("3",StrategySettings.class));
+		StrategySettings timeAllocationMutator	= new StrategySettings();
 		timeAllocationMutator.setStrategyName("TimeAllocationMutator");
 		timeAllocationMutator.setWeight(0.05);
 

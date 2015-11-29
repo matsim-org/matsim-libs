@@ -19,8 +19,15 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetgen.sna.snowball.analysis;
 
-import gnu.trove.TIntIntHashMap;
-import gnu.trove.TIntIntIterator;
+import gnu.trove.iterator.TIntIntIterator;
+import gnu.trove.map.hash.TIntIntHashMap;
+
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Map;
+
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.socnetgen.sna.graph.Edge;
@@ -28,12 +35,6 @@ import org.matsim.contrib.socnetgen.sna.graph.Graph;
 import org.matsim.contrib.socnetgen.sna.graph.Vertex;
 import org.matsim.contrib.socnetgen.sna.graph.analysis.AnalyzerTask;
 import org.matsim.contrib.socnetgen.sna.snowball.SampledVertex;
-
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Map;
 
 
 /**

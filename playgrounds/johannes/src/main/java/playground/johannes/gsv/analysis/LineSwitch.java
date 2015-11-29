@@ -1,6 +1,6 @@
 package playground.johannes.gsv.analysis;
 
-import gnu.trove.TObjectDoubleHashMap;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.pt.PtConstants;
 import playground.johannes.coopsim.analysis.AbstractTrajectoryProperty;

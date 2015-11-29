@@ -57,7 +57,7 @@ public class TaxibusVehicleRequestPathFinder
                 bestCost = cost;
             }
         }
-
+        if(bestVrp!= null) bestVrp.path.add(calculateVrpPath(req, bestVrp.path.get(0).getArrivalTime()));
         return bestVrp;
     }
 
@@ -67,6 +67,13 @@ public class TaxibusVehicleRequestPathFinder
         LinkTimePair departure = scheduler.getImmediateDiversionOrEarliestIdleness(veh);
         return departure == null ? //
                 null : VrpPaths.calcAndCreatePath(departure.link, req.getFromLink(), departure.time,
+                        routerWithCache, optimConfig.travelTime);
+    }
+    
+    private VrpPathWithTravelData calculateVrpPath(TaxibusRequest req, double start)
+    {
+        
+    	return VrpPaths.calcAndCreatePath(req.getFromLink(), req.getToLink(), start,
                         routerWithCache, optimConfig.travelTime);
     }
 
@@ -157,7 +164,7 @@ public class TaxibusVehicleRequestPathFinder
     }
 
 
-    private Tuple<VrpPathWithTravelData, TaxibusRequest> getNextDropoffSegment(
+    private  Tuple<VrpPathWithTravelData, TaxibusRequest> getNextDropoffSegment(
             TreeSet<TaxibusRequest> allRequests, VrpPathWithTravelData currentSegment)
     {
 

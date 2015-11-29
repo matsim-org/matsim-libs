@@ -41,7 +41,7 @@ public class FileIOContext {
 
     public void append(String path) {
         this.fullPath = String.format("%s/%s", root, path);
-        new File(path).mkdirs();
+        new File(fullPath).mkdirs();
     }
 
 

@@ -33,9 +33,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class PlanImpl implements Plan {
+public final class PlanImpl implements Plan {
 
-	protected ArrayList<PlanElement> actsLegs = new ArrayList<PlanElement>();
+	private ArrayList<PlanElement> actsLegs = new ArrayList<PlanElement>();
 
 	private Double score = null;
 	private Person person = null;
@@ -70,23 +70,23 @@ public class PlanImpl implements Plan {
 	}
 
 	@Deprecated // use scenario.getPopulation().getFactory().createActivity(...) instead, and add it yourself
-	public final ActivityImpl createAndAddActivity(final String type, final Coord coord) {
-		ActivityImpl a = new ActivityImpl(type, coord);
+	public final ActivityImpl createAndAddActivity(final String type1, final Coord coord) {
+		ActivityImpl a = new ActivityImpl(type1, coord);
 		getPlanElements().add(a);
 		return a;
 	}
 
 	@Deprecated // use scenario.getPopulation().getFactory().createActivity(...) instead, and add it yourself
-	public final ActivityImpl createAndAddActivity(final String type) {
-		ActivityImpl a = new ActivityImpl(type);
+	public final ActivityImpl createAndAddActivity(final String type1) {
+		ActivityImpl a = new ActivityImpl(type1);
 		getPlanElements().add(a);
 		return a;
 	}
 
 
 	@Deprecated // use scenario.getPopulation().getFactory().createActivity(...) instead, and add it yourself
-	public final ActivityImpl createAndAddActivity(final String type, final Id<Link> linkId) {
-		ActivityImpl a = new ActivityImpl(type, linkId);
+	public final ActivityImpl createAndAddActivity(final String type1, final Id<Link> linkId) {
+		ActivityImpl a = new ActivityImpl(type1, linkId);
 		getPlanElements().add(a);
 		return a;
 	}
@@ -181,8 +181,8 @@ public class PlanImpl implements Plan {
 	}
 
 	@Override
-	public final PersonImpl getPerson() {
-		return (PersonImpl) this.person;
+	public final Person getPerson() {
+		return this.person;
 	}
 
 	@Override
@@ -227,9 +227,32 @@ public class PlanImpl implements Plan {
 
 	@Override
 	public final boolean isSelected() {
-		return this.getPerson().getSelectedPlan() == this;
+//		return this.getPerson().getSelectedPlan() == this;
+		// yyyy the above does not work when using delegation instead of inheritance!!!!! kai, nov'15
+		return this.equals( getPerson().getSelectedPlan() ) ;
 	}
 
+	@Override
+	public final boolean equals( Object in ) {
+		if ( ! ( in instanceof Plan ) ) {
+			return false ;
+		}
+		Plan otherPlan = (Plan) in ;
+		if ( otherPlan.getPerson() != this.getPerson() ) {
+			return false ;
+		}
+		if ( otherPlan.getPlanElements() != this.getPlanElements() ) {
+			return false ;
+		}
+		if ( otherPlan.getCustomAttributes() != this.getCustomAttributes() ) {
+			return false ;
+		}
+		if ( otherPlan.getScore() != this.getScore() ) {
+			return false ;
+		}
+		return true ;
+	}
+	
 	@Override
 	public final String toString() {
 

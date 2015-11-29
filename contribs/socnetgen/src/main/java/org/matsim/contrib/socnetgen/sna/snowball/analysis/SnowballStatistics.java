@@ -19,10 +19,11 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetgen.sna.snowball.analysis;
 
-import gnu.trove.TIntIntHashMap;
-import org.matsim.contrib.socnetgen.sna.snowball.SampledVertex;
+import gnu.trove.map.hash.TIntIntHashMap;
 
 import java.util.Set;
+
+import org.matsim.contrib.socnetgen.sna.snowball.SampledVertex;
 
 /**
  * A utility class to calculate common statistics for a snowball sample.

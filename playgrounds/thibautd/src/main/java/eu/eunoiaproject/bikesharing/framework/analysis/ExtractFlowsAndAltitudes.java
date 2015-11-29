@@ -19,11 +19,10 @@
  * *********************************************************************** */
 package eu.eunoiaproject.bikesharing.framework.analysis;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-
+import eu.eunoiaproject.bikesharing.framework.BikeSharingConstants;
+import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingFacilities;
+import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingFacilitiesReader;
+import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingFacility;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
@@ -34,18 +33,17 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.collections.MapUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
-
 import playground.ivt.utils.ArgParser;
 import playground.ivt.utils.ArgParser.Args;
-import org.matsim.core.utils.collections.MapUtils;
 
-import eu.eunoiaproject.bikesharing.framework.BikeSharingConstants;
-import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingFacilities;
-import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingFacilitiesReader;
-import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingFacility;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author thibautd

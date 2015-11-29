@@ -21,7 +21,7 @@ package playground.agarwalamit.siouxFalls.simulationInputs;
 import org.matsim.contrib.emissions.EmissionModule;
 import org.matsim.contrib.emissions.example.EmissionControlerListener;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
-import org.matsim.contrib.otfvis.OTFVisModule;
+import org.matsim.contrib.otfvis.OTFVisFileWriterModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
@@ -131,14 +131,12 @@ public class SiouxFallsControler {
 				OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		controler.getConfig().controler().setCreateGraphs(true);
         controler.setDumpDataAtEnd(true);
-		controler.addOverridingModule(new OTFVisModule());
+		controler.addOverridingModule(new OTFVisFileWriterModule());
 		controler.addControlerListener(new WelfareAnalysisControlerListener((MutableScenario) controler.getScenario()));
 		
 		if(Boolean.valueOf(args[0])==false && Boolean.valueOf(args[2])==false){
 			controler.addControlerListener(new EmissionControlerListener());
 		}
 		controler.run();	
-
 	}
-
 }

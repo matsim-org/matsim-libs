@@ -19,10 +19,15 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetgen.sna.snowball.analysis;
 
-import gnu.trove.TIntObjectHashMap;
-import org.matsim.contrib.socnetgen.sna.snowball.SampledVertex;
+import gnu.trove.map.hash.TIntObjectHashMap;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import org.matsim.contrib.socnetgen.sna.snowball.SampledVertex;
 
 /**
  * Utility class for creating subsets of snowball sampled vertices.

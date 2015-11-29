@@ -19,21 +19,22 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetgen.sna.snowball.analysis;
 
-import gnu.trove.TIntDoubleHashMap;
-import gnu.trove.TIntDoubleIterator;
-import gnu.trove.TIntIntHashMap;
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.matsim.contrib.socnetgen.sna.graph.Edge;
-import org.matsim.contrib.socnetgen.sna.graph.Graph;
-import org.matsim.contrib.socnetgen.sna.graph.Vertex;
-import org.matsim.contrib.socnetgen.sna.graph.analysis.AnalyzerTask;
-import org.matsim.contrib.socnetgen.sna.snowball.SampledVertex;
+import gnu.trove.iterator.TIntDoubleIterator;
+import gnu.trove.map.hash.TIntDoubleHashMap;
+import gnu.trove.map.hash.TIntIntHashMap;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Map;
+
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.matsim.contrib.socnetgen.sna.graph.Edge;
+import org.matsim.contrib.socnetgen.sna.graph.Graph;
+import org.matsim.contrib.socnetgen.sna.graph.Vertex;
+import org.matsim.contrib.socnetgen.sna.graph.analysis.AnalyzerTask;
+import org.matsim.contrib.socnetgen.sna.snowball.SampledVertex;
 
 /**
  * @author illenberger

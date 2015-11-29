@@ -20,7 +20,6 @@ package playground.agarwalamit.mixedTraffic.patnaIndia.input;
 
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
@@ -33,7 +32,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -41,52 +39,43 @@ import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 
-import playground.agarwalamit.mixedTraffic.patnaIndia.PatnaConstants;
+import playground.agarwalamit.mixedTraffic.patnaIndia.PatnaUtils;
 import playground.andreas.utils.net.NetworkSimplifier;
 /**
  * @author amit
  */
 
 public class PatnaNetworkGenerator {       
-	
-	public PatnaNetworkGenerator(String outputDir) {
-		this.outputDir = outputDir;
-	}
 
-	private static final Logger logger = Logger.getLogger(PatnaNetworkGenerator.class);
-	private String outputDir ;
+	private static final Logger LOG = Logger.getLogger(PatnaNetworkGenerator.class);
+	private Scenario scenario;
 
 	public static void main(String[] args) throws IOException  {  
-		new PatnaNetworkGenerator("../../../../repos/runs-svn/patnaIndia/run105/").processDataAndWriteNetwork();
+		PatnaNetworkGenerator png =  new PatnaNetworkGenerator();
+		png.startProcessingFile();
+		new NetworkWriter(png.getPatnaNetwork()).write("../../../../repos/runs-svn/patnaIndia/run108/input/network_diff_linkSpeed.xml.gz");
 	}
 
-	public void processDataAndWriteNetwork() {
-		Config config = ConfigUtils.createConfig();                                    
-		final Scenario scenario = ScenarioUtils.createScenario(config);                                       
+	public void startProcessingFile() {
+		scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());                                       
 		final Network network = scenario.getNetwork();
-		final Set <String> allModesAllowed = new HashSet<String>();
-		/*
-		 *  'bike' is referred as "bicycle" and 
-		 *  therefore "motorbike" is used for referring motorcycles.
-		 */
-		allModesAllowed.addAll(Arrays.asList("car","motorbike","pt", "bike", "walk"));
 
-		String inputFileNetwork    =  PatnaConstants.inputFilesDir+"/networkInputTransCad.csv" ;
+		String inputFileNetwork = PatnaUtils.INPUT_FILES_DIR+"/networkInputTransCad.csv" ;
 
 		TabularFileParserConfig tabularFileParserConfig = new TabularFileParserConfig();       
 		tabularFileParserConfig.setFileName(inputFileNetwork);
 		tabularFileParserConfig.setDelimiterTags(new String[] {","});                               
 		tabularFileParserConfig.setStartTag("linkId");											
 		TabularFileHandler tabularFileHandler = new TabularFileHandler()
-
-		{            
+				// ZZ_TODO : increase capacity of roundabout links.
+				{            
 			@ Override
 			public void startRow(String[] row) {
 
 				String linkId = row[0];
 				String widthOfRoad = row [3];
 				String lengthInKm = row [6];
-				//				String speedInKmph = row[7];
+				String speedInKmph = row[7];
 				String FromNodeId = row[8];							
 				String ToNodeId = row[9];
 				String fromNodeXCoord = row [10];				
@@ -101,10 +90,10 @@ public class PatnaNetworkGenerator {
 					fromNode = network.getNodes().get(fromNodeId);
 				}
 				else {
-					double xcord = ((Double.parseDouble(fromNodeXCoord))/(1000000));				
-					double ycord = ((Double.parseDouble(fromNodeYCoord))/(1000000));
+					double xcord = (Double.parseDouble(fromNodeXCoord))/(1000000);				
+					double ycord = (Double.parseDouble(fromNodeYCoord))/(1000000);
 					Coord createCoord = new Coord(xcord, ycord);
-					fromNode = network.getFactory().createNode(fromNodeId, PatnaConstants.COORDINATE_TRANSFORMATION.transform( createCoord));
+					fromNode = network.getFactory().createNode(fromNodeId, PatnaUtils.COORDINATE_TRANSFORMATION.transform( createCoord));
 					network.addNode(fromNode);
 				}
 
@@ -114,32 +103,30 @@ public class PatnaNetworkGenerator {
 					toNode = network.getNodes().get(toNodeId);
 				}
 				else {
-					double xcord = ((Double.parseDouble(toNodeXCoord))/(1000000));
-					double ycord = ((Double.parseDouble(toNodeYCoord))/(1000000));
+					double xcord = (Double.parseDouble(toNodeXCoord))/(1000000);
+					double ycord = (Double.parseDouble(toNodeYCoord))/(1000000);
 					Coord createCoord = new Coord(xcord, ycord);
-					toNode = network.getFactory().createNode(toNodeId, PatnaConstants.COORDINATE_TRANSFORMATION.transform(createCoord) );
+					toNode = network.getFactory().createNode(toNodeId, PatnaUtils.COORDINATE_TRANSFORMATION.transform(createCoord) );
 					network.addNode(toNode);
 				}
 
 				Link link1 = network.getFactory().createLink(Id.create(linkId,Link.class), fromNode, toNode); 
 				Link link2 = network.getFactory().createLink(Id.create(linkId + "10000",Link.class), toNode, fromNode);   
 
-				//				int streamSpeed = Integer.parseInt(speedInKmph);
-				//				double freeSpeed = 0;
-				// type of road is Arterial, sub arterial and collector so speeds are 50. 40 . 40kph respectively.
-				// in given data speed is stream speeds (25, 20 and 15) not free flow speed
-				//				switch (streamSpeed)						
-				//				{ 
-				//				case 25 :	freeSpeed = 50; break;
-				//				case 20 :	freeSpeed = 40; break;
-				//				case 15 : 	freeSpeed = 40; break;
-				//				case 50 :	freeSpeed = 60; break;
-				//				}
-				//				double freeSpeedInMPS = freeSpeed/3.6;	
-				
-				double freeSpeedInMPS = 60/3.6; //ZZ_TODO : WHY UNIFORM SPEED?
-				
-				double roadWidth = (0.5*Double.parseDouble(widthOfRoad));			
+				double freeSpeed = 0;
+				//				type of road is Arterial, sub arterial and collector so speeds are 50. 40 . 40kph respectively.
+				//				in given data speed is stream speeds (25, 20 and 15) not free flow speed
+				switch (speedInKmph){ 
+				case "25" :	freeSpeed = 50; break;
+				case "20" :	freeSpeed = 40; break;
+				case "15" : 	freeSpeed = 40; break;
+				case "50" :	freeSpeed = 60; break;
+				default : throw new RuntimeException("The speed code "+speedInKmph+" is not recognized. Aborting...");
+				}
+				double freeSpeedInMPS = freeSpeed/3.6;	
+				//				double freeSpeedInMPS = 60/3.6; 
+
+				double roadWidth = 0.5*Double.parseDouble(widthOfRoad);			
 				int numberoflanes = 0;
 
 				if ( roadWidth < 4) numberoflanes = 1;								
@@ -152,38 +139,39 @@ public class PatnaNetworkGenerator {
 				link1.setCapacity(capacityOfLink(widthOfRoad));
 				link1.setNumberOfLanes(numberoflanes);
 				link1.setLength(linkLength);
-				link1.setAllowedModes(allModesAllowed);
+				link1.setAllowedModes(new HashSet<>(PatnaUtils.ALL_MODES));
 				network.addLink(link1);
 
 				link2.setFreespeed(freeSpeedInMPS);
 				link2.setCapacity(capacityOfLink(widthOfRoad));
 				link2.setNumberOfLanes(numberoflanes);
 				link2.setLength(linkLength);
-				link2.setAllowedModes(allModesAllowed);
+				link2.setAllowedModes(new HashSet<>(PatnaUtils.ALL_MODES));
 				network.addLink(link2);
-
 			}
-		};
-		
-		TabularFileParser tabularFileParser = new TabularFileParser();
-		tabularFileParser.parse(tabularFileParserConfig, tabularFileHandler);  
-		new NetworkCleaner().run(network);
+				};
 
-		logger.info("Number of links in the network are"+ network.getLinks().size()+" and number of nodes in the link are"+network.getNodes().size());
+				TabularFileParser tabularFileParser = new TabularFileParser();
+				tabularFileParser.parse(tabularFileParserConfig, tabularFileHandler);  
+				new NetworkCleaner().run(network);
 
-		NetworkSimplifier simplifier = new NetworkSimplifier();
-		Set<Integer> nodeTypesToMerge = new TreeSet<Integer>();
+				LOG.info("Number of links in the network are"+ network.getLinks().size()+" and number of nodes in the link are"+network.getNodes().size());
 
-		nodeTypesToMerge.add(new Integer(4));
-		nodeTypesToMerge.add(new Integer(5));
+				NetworkSimplifier simplifier = new NetworkSimplifier();
+				Set<Integer> nodeTypesToMerge = new TreeSet<Integer>();
 
-		simplifier.setNodesToMerge(nodeTypesToMerge);
-		simplifier.run(network);
+				nodeTypesToMerge.add(Integer.valueOf(4));
+				nodeTypesToMerge.add(Integer.valueOf(4));
 
-		new NetworkWriter(network).write(outputDir+"/network.xml.gz");
+				simplifier.setNodesToMerge(nodeTypesToMerge);
+				simplifier.run(network);
 	}    
 
-	private double capacityOfLink (String roadwidth) {
+	public Network getPatnaNetwork() {
+		return scenario.getNetwork();
+	}
+
+	private double capacityOfLink (final String roadwidth) {
 		double linkCapacity =0;
 		double w = Double.parseDouble(roadwidth);
 		double capacityCarrigway = -2184-22.6*Math.pow(w, 2)+857.4*w;  
@@ -191,7 +179,4 @@ public class PatnaNetworkGenerator {
 		if (linkCapacity < 300) linkCapacity = 300; 
 		return linkCapacity;
 	}
-
-}                                                                                                        
-
-
+}

@@ -20,7 +20,12 @@
 package playground.johannes.studies.sbsurvey.analysis;
 
 import com.vividsolutions.jts.geom.Point;
-import gnu.trove.*;
+import gnu.trove.iterator.TDoubleDoubleIterator;
+import gnu.trove.iterator.TDoubleObjectIterator;
+import gnu.trove.map.hash.TDoubleDoubleHashMap;
+import gnu.trove.map.hash.TDoubleIntHashMap;
+import gnu.trove.map.hash.TDoubleObjectHashMap;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.common.gis.CartesianDistanceCalculator;
@@ -64,7 +69,7 @@ public class AcceptPropConst extends AbstractVertexProperty {
 		
 		logger.info("Creating partitions...");
 		
-		AttributePartition partitioner = new AttributePartition(FixedSampleSizeDiscretizer.create(partitionAttributes.getValues(), 20, 100));
+		AttributePartition partitioner = new AttributePartition(FixedSampleSizeDiscretizer.create(partitionAttributes.values(), 20, 100));
 		TDoubleObjectHashMap<Set<Vertex>> partitions = partitioner.partition(partitionAttributes);
 		logger.info(String.format("Created %1$s partitions.", partitions.size()));
 		

@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package playground.johannes.coopsim.analysis;
 
-import gnu.trove.TObjectDoubleHashMap;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.api.core.v01.population.Person;
 

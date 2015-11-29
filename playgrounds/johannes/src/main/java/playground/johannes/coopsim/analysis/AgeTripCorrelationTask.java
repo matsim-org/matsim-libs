@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package playground.johannes.coopsim.analysis;
 
-import gnu.trove.TObjectDoubleHashMap;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
 import org.matsim.contrib.socnetgen.sna.graph.Vertex;
 import org.matsim.contrib.socnetgen.sna.graph.social.SocialGraph;
 import org.matsim.contrib.socnetgen.sna.graph.social.SocialVertex;

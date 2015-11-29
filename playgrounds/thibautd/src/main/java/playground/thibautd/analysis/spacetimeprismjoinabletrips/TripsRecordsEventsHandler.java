@@ -19,11 +19,6 @@
  * *********************************************************************** */
 package playground.thibautd.analysis.spacetimeprismjoinabletrips;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
@@ -35,8 +30,12 @@ import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.pt.PtConstants;
-
 import playground.thibautd.analysis.joinabletripsidentifier.Trip;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Parses events to get trip records.

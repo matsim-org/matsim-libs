@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetgen.sna.graph.matrix;
 
-import gnu.trove.TIntArrayList;
+import gnu.trove.list.array.TIntArrayList;
 
 
 /**

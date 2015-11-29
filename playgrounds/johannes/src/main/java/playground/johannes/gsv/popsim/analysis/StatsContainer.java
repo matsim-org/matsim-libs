@@ -19,8 +19,7 @@
 package playground.johannes.gsv.popsim.analysis;
 
 import org.apache.commons.math.stat.StatUtils;
-
-import java.util.List;
+import org.matsim.contrib.socnetgen.sna.math.WeightedSampleMean;
 
 /**
  * @author jillenberger
@@ -53,6 +52,18 @@ public class StatsContainer {
         max = StatUtils.max(values);
         N = values.length;
         variance = StatUtils.variance(values);
+    }
+
+    public StatsContainer(String name, double[] values, double[] weights) {
+        this(name);
+        WeightedSampleMean wsm = new WeightedSampleMean();
+        for(int i = 0; i < weights.length; i++) weights[i] = 1/weights[i];
+        wsm.setPiValues(weights);
+        mean = wsm.evaluate(values);
+
+        min = StatUtils.min(values);
+        max = StatUtils.max(values);
+        N = values.length;
     }
 
     public String getName() {

@@ -19,9 +19,13 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetgen.sna.graph.social.analysis;
 
-import gnu.trove.TDoubleDoubleHashMap;
-import gnu.trove.TDoubleObjectHashMap;
-import gnu.trove.TObjectDoubleHashMap;
+import gnu.trove.map.hash.TDoubleDoubleHashMap;
+import gnu.trove.map.hash.TDoubleObjectHashMap;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
+
+import java.io.IOException;
+import java.util.Map;
+
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
 import org.matsim.contrib.common.stats.LinearDiscretizer;
@@ -32,9 +36,6 @@ import org.matsim.contrib.socnetgen.sna.graph.analysis.ModuleAnalyzerTask;
 import org.matsim.contrib.socnetgen.sna.graph.analysis.VertexPropertyCorrelation;
 import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialGraph;
 import org.matsim.contrib.socnetgen.sna.graph.spatial.analysis.Accessibility;
-
-import java.io.IOException;
-import java.util.Map;
 
 /**
  * @author illenberger
@@ -66,11 +67,11 @@ public class AgeAccessibilityTask extends ModuleAnalyzerTask<Accessibility> {
 			try {
 				TObjectDoubleHashMap<Vertex> yVals = Age.getInstance().values(spatialGraph.getVertices());
 				TDoubleDoubleHashMap correl = VertexPropertyCorrelation.mean(yVals, xVals,
-					FixedSampleSizeDiscretizer.create(xVals.getValues(), 50, 100));
+					FixedSampleSizeDiscretizer.create(xVals.values(), 50, 100));
 
 				StatsWriter.writeHistogram(correl, "A", "age", getOutputDirectory() + "age_mean_A.txt");
 				
-				TDoubleObjectHashMap<DescriptiveStatistics> table = VertexPropertyCorrelation.statistics(yVals, xVals, new LinearDiscretizer(xVals.getValues(), 200));
+				TDoubleObjectHashMap<DescriptiveStatistics> table = VertexPropertyCorrelation.statistics(yVals, xVals, new LinearDiscretizer(xVals.values(), 200));
 				StatsWriter.writeBoxplotStats(table, String.format("%1$s/age_A.table.txt", getOutputDirectory()));
 				StatsWriter.writeScatterPlot(table, String.format("%1$s/age_A.xy.txt", getOutputDirectory()));
 			} catch (IOException e) {

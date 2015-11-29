@@ -86,9 +86,9 @@ public abstract class CTCell {
 		if (!CTRunner.DEBUG) {
 			return;
 		}
-		for (CTCellFace f : faces) {
-			debug(f, em);
-		}
+//		for (CTCellFace f : faces) {
+//			debug(f, em);
+//		}
 
 	}
 
@@ -97,6 +97,7 @@ public abstract class CTCell {
 //	}
 
 	private void debug(CTCellFace f, EventsManager em) {
+
 		if (!CTRunner.DEBUG) {
 			return;
 		}

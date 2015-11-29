@@ -42,6 +42,7 @@ public class TaxibusVehicleRequestPath implements Comparable<TaxibusVehicleReque
     private Double t0 = null;
     private Double arrivalTime = null;
     private Link initialDestination = null;
+    double earliestNextDeparture = 0;
     
     public TaxibusVehicleRequestPath(Vehicle vehicle, TaxibusRequest request, VrpPathWithTravelData path)
     {
@@ -52,7 +53,9 @@ public class TaxibusVehicleRequestPath implements Comparable<TaxibusVehicleReque
         this.path.add(path);
         this.t0 = request.getT0();
         this.arrivalTime = path.getArrivalTime();
+        this.earliestNextDeparture = Math.max(request.getT0(), path.getArrivalTime());
         this.initialDestination = request.getToLink();
+        
     }
     public TaxibusVehicleRequestPath(Vehicle vehicle, Set<TaxibusRequest> requests, ArrayList<VrpPathWithTravelData> path)
     {
@@ -62,6 +65,29 @@ public class TaxibusVehicleRequestPath implements Comparable<TaxibusVehicleReque
         
     
     }
+    
+    public void addRequestAndPath(TaxibusRequest request, VrpPathWithTravelData path){
+    	this.requests.add(request);
+//    	System.out.println(requests);
+    	this.path.add(path);
+    	this.earliestNextDeparture = Math.max(request.getT0(), path.getArrivalTime());
+    }
+    
+    public void addPath(VrpPathWithTravelData path){
+    	this.path.add(path);
+    	this.earliestNextDeparture = Math.max(this.earliestNextDeparture, path.getArrivalTime());
+    }
+    
+    
+    public double getEarliestNextDeparture() {
+    	
+		return earliestNextDeparture;
+	}
+    
+    public VrpPathWithTravelData getLastPathAdded(){
+    	return this.path.get(path.size()-1);
+    }
+    
 	public Double getT0() {
 		if (t0 == null){
 			throw new IllegalStateException("Only initial requests paths have a distinct t0.");
@@ -96,6 +122,9 @@ public class TaxibusVehicleRequestPath implements Comparable<TaxibusVehicleReque
 
 		return t0.compareTo(arg0.getT0());
 	}
+	
+	
+	
 	
     public TreeSet<TaxibusRequest> getPickUpsForLink(Link link){
     	TreeSet<TaxibusRequest> beginningRequests = new TreeSet<>(Requests.ABSOLUTE_COMPARATOR);

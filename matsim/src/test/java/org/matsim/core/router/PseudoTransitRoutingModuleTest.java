@@ -35,8 +35,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
@@ -52,7 +52,7 @@ public class PseudoTransitRoutingModuleTest {
 		FreespeedTravelTimeAndDisutility freespeed = new FreespeedTravelTimeAndDisutility(-6.0/3600, +6.0/3600, 0.0);
 		LeastCostPathCalculator routeAlgo = new Dijkstra(f.s.getNetwork(), freespeed, freespeed);
 
-		Person person = PersonImpl.createPerson(Id.create(1, Person.class));
+		Person person = PopulationUtils.createPerson(Id.create(1, Person.class));
 		Leg leg = new LegImpl(TransportMode.pt);
 		Activity fromAct = new ActivityImpl("h", new Coord(0, 0));
 		((ActivityImpl) fromAct).setLinkId(Id.create("1", Link.class));

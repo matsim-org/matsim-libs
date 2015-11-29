@@ -19,7 +19,8 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetgen.sna.snowball.sim;
 
-import gnu.trove.TIntIntHashMap;
+import gnu.trove.map.hash.TIntIntHashMap;
+
 import org.matsim.contrib.socnetgen.sna.snowball.SampledGraph;
 import org.matsim.contrib.socnetgen.sna.snowball.SampledVertex;
 
