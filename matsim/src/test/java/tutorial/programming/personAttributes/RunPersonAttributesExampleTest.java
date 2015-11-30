@@ -34,13 +34,7 @@ public class RunPersonAttributesExampleTest {
 
 	@Test
 	public void test(){
-		try{
 		RunPersonAttributesExample.main(null);
-		}
-		catch(Exception e){
-			Assert.fail(e.toString());
-		}
 	}
 	
-	//testtesttest
 }
