@@ -72,6 +72,7 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
@@ -80,6 +81,7 @@ import org.matsim.vehicles.VehicleUtils;
 /**
  * Generates fundamental diagrams for the all combination of link and traffic dynamics for car/bike and car/truck groups.
  * Also generates car/bike FDs using fast capacity update method.
+ * Results are archived at @see <a href="https://svn.vsp.tu-berlin.de/testresults/">https://svn.vsp.tu-berlin.de/testresults/</a>
  * @author amit
  */
 
@@ -90,6 +92,14 @@ public class CreateAutomatedFDTest {
 		this.linkDynamics = linkDynamics;
 		this.trafficDynamics = trafficDynamics;
 		this.travelModes = new String [] {"car","bike"};
+		
+		//a temporary fix to deleted old directories after change of method names.
+		String dir1 = "test/output/" + CreateAutomatedFDTest.class.getCanonicalName().replace('.', '/') + "/" +"FDs_carBike/";
+		String dir2 = "test/output/" + CreateAutomatedFDTest.class.getCanonicalName().replace('.', '/') + "/" +"FDs_carTruck/";
+		String dir3 = "test/output/" + CreateAutomatedFDTest.class.getCanonicalName().replace('.', '/') + "/" +"Fds_carBike_fastCapacityUpdate/";
+		if(new File(dir1).exists()) IOUtils.deleteDirectory(new File(dir1));
+		if(new File(dir2).exists()) IOUtils.deleteDirectory(new File(dir2));
+		if(new File(dir3).exists()) IOUtils.deleteDirectory(new File(dir3));
 	}
 
 	private LinkDynamics linkDynamics;
