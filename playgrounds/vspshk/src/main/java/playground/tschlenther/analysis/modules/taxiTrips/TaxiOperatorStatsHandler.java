@@ -48,21 +48,17 @@ import org.matsim.vehicles.Vehicle;
 		        this.network = network;
 		        this.startTimes = new HashMap<Id<Person>, Double>();
 		        this.endTimes = new HashMap<Id<Person>, Double>();
-		        
 		        this.errors = new ArrayList<String>();
 	    	}	
-
 
 		public void registerTaxi(Id<Vehicle> vehId) {
     		this.taxiTravelDistance.put(vehId, 0.0);
 		}
 
-
 	    @Override
 	    public void reset(int iteration){
 	        // TODO Auto-generated method stub
 	    }
-
 
 	    @Override
 	    public void handleEvent(LinkLeaveEvent event){
@@ -82,11 +78,115 @@ import org.matsim.vehicles.Vehicle;
 	        }
 	    }
 
-
 	    private boolean isMonitoredVehicle(Id<Vehicle> vehicleID){
 	        return (this.taxiTravelDistance.containsKey(vehicleID));
 	    }
 
+	    @Override
+	    public void handleEvent(PersonLeavesVehicleEvent event){
+	    	Id<Vehicle> vehID = event.getVehicleId();
+
+	    	if (isMonitoredVehicle(vehID)){
+	    		if(vehID.equals(event.getPersonId())){
+		            handleTaxiDriverLeavesEvent(event);
+		        	return;
+	    		}
+	    	System.out.println("agent " + event.getPersonId() + " is trying to leave out of vehicle " + vehID);
+	    	System.out.println("corresponding taxi is occupied : " + this.isOccupied(vehID));
+	        double travelTimeWithPax = 0;
+			double totalTravelTimeWithPax =  0.;
+	    	if(this.lastDepartureWithPassenger.get(vehID) == null) System.out.println("keine abfahrt mit passagier in taxi " + vehID +" bekannt");
+	    	else {travelTimeWithPax = event.getTime() - this.lastDepartureWithPassenger.get(vehID);}
+//	        double totalTravelTimeWithPax = 0.;
+	        if (this.taxiTravelDurationwithPassenger.containsKey(vehID))
+	            totalTravelTimeWithPax = this.taxiTravelDurationwithPassenger.get(vehID);
+	        totalTravelTimeWithPax = totalTravelTimeWithPax + travelTimeWithPax;
+	        this.taxiTravelDurationwithPassenger.put(vehID, totalTravelTimeWithPax);
+	        this.lastDepartureWithPassenger.remove(vehID);
+	        this.occupiedVehicles.remove(vehID);
+//	        numPTrips ++;
+//	        System.out.println("--number of passenger trips: --" + numPTrips );
+	    
+	    	}
+	    }
+
+
+	    @Override
+	    public void handleEvent(PersonEntersVehicleEvent event){
+	    	Id<Vehicle> vehID = event.getVehicleId();
+	    	
+	    	if(event.getPersonId().equals(vehID)){
+	    		taxiDriverEntersVehicle(vehID, event.getTime());
+	    		return;
+	    	}
+	        if (isMonitoredVehicle(vehID)){
+	        	if(isOccupied(vehID)){
+	        		log.error("PersonEntersVehicleEvent for an occupied Vehicle. ID: " + vehID  
+	        				/*	+ " why is this happening? several passengers in one taxi ?? Drivers changing?? Driver entering after passenger??"*/);
+	        		this.errors.add("PersonEntersVehicleEvent for an occupied Vehicle. ID: " + vehID);
+	        	}
+	        	else{
+	        		numPTrips ++;
+	        		System.out.println("started " + numPTrips +". trip in vehicle " + vehID);
+	        		this.lastDepartureWithPassenger.put(vehID, event.getTime());
+	    	        this.occupiedVehicles.add(vehID);
+	        	}
+	        }
+	    }
+
+
+	    private void handleTaxiDriverLeavesEvent(PersonLeavesVehicleEvent event){
+	        double travelTime = 0.;
+	        if (this.lastDeparture.containsKey(event.getPersonId())){
+	            travelTime = event.getTime() - this.lastDeparture.get(event.getPersonId());
+	        }
+	        else{
+	        	log.error("taxi driver leaves vehicle without known last departure");
+	        }
+	        double totalTravelTime = 0.;
+	        if (this.taxiTravelDuration.containsKey(event.getVehicleId()))
+	            totalTravelTime = this.taxiTravelDuration.get(event.getPersonId());
+	        totalTravelTime = totalTravelTime + travelTime;
+	        this.taxiTravelDuration.put(event.getVehicleId(), totalTravelTime);
+	        this.lastDeparture.remove(event.getPersonId());
+	        log.info("++ TAXI DRIVER " + event.getPersonId() + " leaves taxi ++ ");
+	    }
+
+	    private boolean isOccupied(Id<Vehicle> vehId){
+	    	return this.occupiedVehicles.contains(vehId);
+	    }
+	    
+
+	    private void taxiDriverEntersVehicle(Id<Vehicle> vehID, Double time){
+	    	if(!this.taxiTravelDistance.containsKey(vehID)){
+    			registerTaxi(vehID);
+    		}
+    		this.lastDeparture.put(vehID, time);   
+	    }
+
+
+	    @Override
+	    public void handleEvent(ActivityEndEvent event){
+	        if (event.getActType().startsWith("Before schedule:"))
+	            handleBeforeSchedule(event);
+	    }
+
+
+	    private void handleBeforeSchedule(ActivityEndEvent event){
+	        this.startTimes.put(event.getPersonId(), event.getTime());
+	    }
+
+
+	    @Override
+	    public void handleEvent(ActivityStartEvent event){
+	        if (event.getActType().startsWith("After schedule:"))
+	            handleAfterSchedule(event);
+	    }
+
+
+	    private void handleAfterSchedule(ActivityStartEvent event){
+	        this.endTimes.put(event.getPersonId(), event.getTime());
+	    }
 
 	    public void printTravelDistanceStatistics(){
 	        double tkm = 0.;
@@ -191,110 +291,5 @@ import org.matsim.vehicles.Vehicle;
 	            ret = map.get(id);
 	        return ret;
 	    }
-
-
-	    @Override
-	    public void handleEvent(PersonLeavesVehicleEvent event){
-	    	Id<Vehicle> vehID = event.getVehicleId();
-	    	
-	    	if (isMonitoredVehicle(vehID)){
-	    		if(vehID.equals(event.getPersonId())){
-		            handleTaxiDriverLeavesEvent(event);
-		        	return;
-	    		}
-	    	System.out.println("agent " + event.getPersonId() + " is trying to leave out of vehicle " + vehID);
-	    	System.out.println("corresponding taxi (driver) is driving around : " + this.taxiTravelDistance.containsKey(vehID));
-	        double travelTimeWithPax = event.getTime() - this.lastDepartureWithPassenger.get(vehID);
-	        double totalTravelTimeWithPax = 0.;
-	        if (this.taxiTravelDurationwithPassenger.containsKey(vehID))
-	            totalTravelTimeWithPax = this.taxiTravelDurationwithPassenger.get(vehID);
-	        totalTravelTimeWithPax = totalTravelTimeWithPax + travelTimeWithPax;
-	        this.taxiTravelDurationwithPassenger.put(vehID, totalTravelTimeWithPax);
-	        this.lastDepartureWithPassenger.remove(vehID);
-	        this.occupiedVehicles.remove(vehID);
-//	        numPTrips ++;
-//	        System.out.println("--number of passenger trips: --" + numPTrips );
-	    
-	    	}
-	    }
-
-
-	    @Override
-	    public void handleEvent(PersonEntersVehicleEvent event){
-	    	Id<Vehicle> vehID = event.getVehicleId();
-	    	
-	    	if(event.getPersonId().equals(vehID)){
-	    		taxiDriverEntersVehicle(vehID, event.getTime());
-	    		return;
-	    	}
-	        if (isMonitoredVehicle(vehID)){
-	        	if(isOccupied(vehID)){
-	        		log.error("PersonEntersVehicleEvent for an occupied Vehicle. ID: " + vehID  
-	        				/*	+ " why is this happening? several passengers in one taxi ?? Drivers changing?? Driver entering after passenger??"*/);
-	        		this.errors.add("PersonEntersVehicleEvent for an occupied Vehicle. ID: " + vehID);
-	        	}
-	        	else{
-	        		numPTrips ++;
-	        		System.out.println("started " + numPTrips +". trip in vehicle " + vehID);
-	        		this.lastDepartureWithPassenger.put(vehID, event.getTime());
-	    	        this.occupiedVehicles.add(vehID);
-	        	}
-	        }
-	    }
-
-
-	    private void handleTaxiDriverLeavesEvent(PersonLeavesVehicleEvent event){
-	        double travelTime = 0.;
-	        if (this.lastDeparture.containsKey(event.getPersonId()))
-	            travelTime = event.getTime() - this.lastDeparture.get(event.getPersonId());
-	        double totalTravelTime = 0.;
-	        if (this.taxiTravelDuration.containsKey(event.getVehicleId()))
-	            totalTravelTime = this.taxiTravelDuration.get(event.getPersonId());
-	        totalTravelTime = totalTravelTime + travelTime;
-	        this.taxiTravelDuration.put(event.getVehicleId(), totalTravelTime);
-	        this.lastDeparture.remove(event.getPersonId());
-	    }
-
-	    private boolean isOccupied(Id<Vehicle> vehId){
-	    	return this.occupiedVehicles.contains(vehId);
-	    }
-	    
-
-	    private void taxiDriverEntersVehicle(Id<Vehicle> vehID, Double time){
-	    	if(!this.taxiTravelDistance.containsKey(vehID)){
-    			registerTaxi(vehID);
-    		}
-	    	else{
-	    		String e = "Driver " + vehID + " is entering an already registered vehicle." ;
-	    		log.error(e); 
-	    		this.errors.add(e);
-	    	}
-    		this.lastDeparture.put(vehID, time);   
-	    }
-
-
-	    @Override
-	    public void handleEvent(ActivityEndEvent event){
-	        if (event.getActType().startsWith("Before schedule:"))
-	            handleBeforeSchedule(event);
-	    }
-
-
-	    private void handleBeforeSchedule(ActivityEndEvent event){
-	        this.startTimes.put(event.getPersonId(), event.getTime());
-	    }
-
-
-	    @Override
-	    public void handleEvent(ActivityStartEvent event){
-	        if (event.getActType().startsWith("After schedule:"))
-	            handleAfterSchedule(event);
-	    }
-
-
-	    private void handleAfterSchedule(ActivityStartEvent event){
-	        this.endTimes.put(event.getPersonId(), event.getTime());
-	    }
-
 
 }
