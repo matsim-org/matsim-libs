@@ -145,7 +145,7 @@ import org.matsim.core.utils.misc.Time;
 			out.write(plan.getScore().toString());
 			out.write("\"");
 		}
-		if (plan.isSelected(plan))
+		if (PersonUtils.isSelected(plan))
 			out.write(" selected=\"yes\"");
 		else
 			out.write(" selected=\"no\"");

@@ -140,7 +140,7 @@ import org.matsim.facilities.ActivityOptionImpl;
 		out.write("\t\t<plan");
 		if (plan.getScore() != null)
 			out.write(" score=\"" + plan.getScore().toString() + "\"");
-		if (plan.isSelected(plan))
+		if (PersonUtils.isSelected(plan))
 			out.write(" selected=\"" + "yes" + "\"");
 		else
 			out.write(" selected=\"" + "no" + "\"");

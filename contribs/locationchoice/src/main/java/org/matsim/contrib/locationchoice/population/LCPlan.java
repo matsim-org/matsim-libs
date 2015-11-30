@@ -90,11 +90,6 @@ public class LCPlan implements Plan {
 	}
 
 	@Override
-	public final boolean isSelected(Plan plan) {
-		return this.getPerson().getSelectedPlan() == this;
-	}
-
-	@Override
 	public final List<PlanElement> getPlanElements() {
 		return this.planElements;
 	}

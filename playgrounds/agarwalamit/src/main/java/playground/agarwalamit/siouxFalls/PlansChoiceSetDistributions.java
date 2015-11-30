@@ -36,6 +36,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -228,7 +229,7 @@ public class PlansChoiceSetDistributions {
 			}
 			int count =1;
 			for(Plan plan:p.getPlans()){
-				if(plan.isSelected(plan)){
+				if(PersonUtils.isSelected(plan)){
 					scoresChoiceSet.set(0, String.valueOf(plan.getScore()));
 				} else {
 					scoresChoiceSet.set(count, String.valueOf(plan.getScore()));
@@ -255,7 +256,7 @@ public class PlansChoiceSetDistributions {
 			// strictly forcing leg for selected plan at 0th position.
 			int count =1;
 			for(Plan plan:p.getPlans()){
-				if (plan.isSelected(plan)){
+				if (PersonUtils.isSelected(plan)){
 					PlanElement pe = plan.getPlanElements().get(1);
 					String leg = ((Leg) pe).getMode();
 					legsChoiceSet.set(0, leg);

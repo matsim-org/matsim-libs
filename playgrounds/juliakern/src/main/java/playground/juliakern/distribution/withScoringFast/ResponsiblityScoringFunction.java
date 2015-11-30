@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.scoring.ScoringFunction;
 
 public class ResponsiblityScoringFunction implements ScoringFunction {
@@ -66,7 +67,7 @@ public class ResponsiblityScoringFunction implements ScoringFunction {
 		//TODO recalc to price/mtutil of money?
 		Id personId = plan.getPerson().getId();
 
-		if(!plan.isSelected(plan))System.out.println("++++++++++++++++shouldnt happen");
+		if(!PersonUtils.isSelected(plan))System.out.println("++++++++++++++++shouldnt happen");
 		if(ecl.getCausedEmCosts()!=null){
 			if(ecl.getCausedEmCosts().containsKey(personId)){
 				Double amount = new Double(ecl.getCausedEmCosts().get(personId));

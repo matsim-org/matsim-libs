@@ -29,7 +29,7 @@ public class PersonUtils {
 	public static void removeUnselectedPlans(Person person) {
 		for (Iterator<? extends Plan> iter = person.getPlans().iterator(); iter.hasNext(); ) {
 			Plan plan = iter.next();
-			if (!plan.isSelected(plan)) {
+			if (!PersonUtils.isSelected(plan)) {
 				iter.remove();
 			}
 		}
@@ -105,5 +105,9 @@ public class PersonUtils {
 	@Deprecated // use PersonAttributes
 	public static TreeSet<String> getTravelcards(Person person) {
 		return (TreeSet<String>) person.getCustomAttributes().get(TRAVELCARDS);
+	}
+
+	public static boolean isSelected(Plan plan) {
+		return plan.getPerson().getSelectedPlan()==plan ;
 	}
 }

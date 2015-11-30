@@ -34,6 +34,7 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.replanning.ReplanningContext;
@@ -71,7 +72,7 @@ public class GroupPlanStrategyTest {
 		strategy.run( createContext() , jointPlans , Arrays.asList( group ) );
 		for ( Person person : group.getPersons() ) {
 			for ( Plan plan : person.getPlans() ) {
-				if ( plan.isSelected(plan) ) {
+				if ( PersonUtils.isSelected(plan) ) {
 					// new plan: selection status inverted
 					assertFalse(
 							"old plan still selected",
@@ -119,10 +120,10 @@ public class GroupPlanStrategyTest {
 		int countSelectedIndiv = 0;
 		for ( Person person : group.getPersons() ) {
 			for (Plan plan : person.getPlans()) {
-				if (plan.isSelected(plan) && jointPlans.getJointPlan( plan ) != null) {
+				if (PersonUtils.isSelected(plan) && jointPlans.getJointPlan( plan ) != null) {
 					countSelectedJoint++;
 				}
-				if (plan.isSelected(plan) && jointPlans.getJointPlan( plan ) == null) {
+				if (PersonUtils.isSelected(plan) && jointPlans.getJointPlan( plan ) == null) {
 					countSelectedIndiv++;
 				}
 			}
@@ -153,10 +154,10 @@ public class GroupPlanStrategyTest {
 		int countNonSelectedIndiv = 0;
 		for ( Person person : group.getPersons() ) {
 			for (Plan plan : person.getPlans()) {
-				if (!plan.isSelected(plan) && jointPlans.getJointPlan( plan ) != null) {
+				if (!PersonUtils.isSelected(plan) && jointPlans.getJointPlan( plan ) != null) {
 					countNonSelectedJoint++;
 				}
-				if (!plan.isSelected(plan) && jointPlans.getJointPlan( plan ) == null) {
+				if (!PersonUtils.isSelected(plan) && jointPlans.getJointPlan( plan ) == null) {
 					countNonSelectedIndiv++;
 				}
 			}
@@ -208,7 +209,7 @@ public class GroupPlanStrategyTest {
 		PlanImpl plan = new PlanImpl( person );
 		person.addPlan( plan );
 		if (joint) jointPlan.put( id , plan );
-		if ( !plan.isSelected(plan) ) throw new RuntimeException();
+		if ( !PersonUtils.isSelected(plan) ) throw new RuntimeException();
 
 		return person;
 	}

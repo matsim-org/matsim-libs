@@ -140,11 +140,6 @@ public class RoutingUtils {
 
         }
 
-        @Override
-		public boolean isSelected(Plan plan) {
-			throw new UnsupportedOperationException();
-		}
-
 		@Override
 		public void setScore(Double score) {
 			throw new UnsupportedOperationException();

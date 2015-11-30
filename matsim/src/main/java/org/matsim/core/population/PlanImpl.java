@@ -226,34 +226,6 @@ public final class PlanImpl implements Plan {
 	}
 
 	@Override
-	public final boolean isSelected(Plan plan) {
-//		return this.getPerson().getSelectedPlan() == this;
-		// yyyy the above does not work when using delegation instead of inheritance!!!!! kai, nov'15
-		return this.equals( getPerson().getSelectedPlan() ) ;
-	}
-
-	@Override
-	public final boolean equals( Object in ) {
-		if ( ! ( in instanceof Plan ) ) {
-			return false ;
-		}
-		Plan otherPlan = (Plan) in ;
-		if ( otherPlan.getPerson() != this.getPerson() ) {
-			return false ;
-		}
-		if ( otherPlan.getPlanElements() != this.getPlanElements() ) {
-			return false ;
-		}
-		if ( otherPlan.getCustomAttributes() != this.getCustomAttributes() ) {
-			return false ;
-		}
-		if ( otherPlan.getScore() != this.getScore() ) {
-			return false ;
-		}
-		return true ;
-	}
-	
-	@Override
 	public final String toString() {
 
 		String scoreString = "undefined";
@@ -266,7 +238,7 @@ public final class PlanImpl implements Plan {
 		}
 
 		return "[score=" + scoreString + "]" +
-				"[selected=" + this.isSelected(this) + "]" +
+//				"[selected=" + PersonUtils.isSelected(this) + "]" +
 				"[nof_acts_legs=" + getPlanElements().size() + "]" +
 				"[type=" + this.type + "]" +
 				"[personId=" + personIdString + "]" ;

@@ -33,6 +33,7 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
@@ -165,7 +166,7 @@ public class ScoreStatsControlerListener implements StartupListener, IterationEn
                 cntScores++;
 
                 // executed plan?
-                if (plan.isSelected(plan)) {
+                if (PersonUtils.isSelected(plan)) {
                     sumExecutedScores += score;
                     nofExecutedScores++;
                 }

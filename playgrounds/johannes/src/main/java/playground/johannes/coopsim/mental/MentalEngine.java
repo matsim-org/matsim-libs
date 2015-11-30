@@ -23,6 +23,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.socnetgen.sna.graph.social.SocialGraph;
 import org.matsim.contrib.socnetgen.sna.graph.social.SocialVertex;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.utils.collections.Tuple;
 import playground.johannes.coopsim.mental.choice.ActivityGroupSelector;
 import playground.johannes.coopsim.mental.choice.ChoiceSelector;
@@ -110,7 +111,7 @@ public class MentalEngine {
 		
 		for(SocialVertex ego : egos) {
 			Person person = ego.getPerson().getPerson();
-			if(person.getPlans().get(0).isSelected(person.getPlans().get(0))) {
+			if(PersonUtils.isSelected(person.getPlans().get(0))) {
 				newState.add(person.getPlans().get(0));
 				oldState.add(person.getPlans().get(1));
 			} else {

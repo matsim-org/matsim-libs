@@ -35,8 +35,6 @@ import java.util.List;
  */
 public interface Plan extends MatsimPopulationObject, Customizable, BasicPlan {
 	
-	public abstract boolean isSelected(Plan plan);
-
 	public List<PlanElement> getPlanElements();
 
 	public void addLeg(final Leg leg);

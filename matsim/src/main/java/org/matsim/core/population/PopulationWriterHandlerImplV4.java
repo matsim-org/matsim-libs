@@ -197,7 +197,7 @@ public class PopulationWriterHandlerImplV4 extends AbstractPopulationWriterHandl
 			out.write(plan.getScore().toString());
 			out.write("\"");
 		}
-		if (plan.isSelected(plan))
+		if (PersonUtils.isSelected(plan))
 			out.write(" selected=\"yes\"");
 		else
 			out.write(" selected=\"no\"");

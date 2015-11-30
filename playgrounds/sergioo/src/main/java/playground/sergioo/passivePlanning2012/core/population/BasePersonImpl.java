@@ -47,7 +47,7 @@ public class BasePersonImpl implements BasePerson {
 		PersonUtils.setLicence(newPerson, PersonUtils.getLicense(person));
 		PersonUtils.setSex(newPerson, PersonUtils.getSex(person));
 		for(Plan plan:person.getPlans())
-			if(!plan.isSelected(plan))
+			if(!PersonUtils.isSelected(plan))
 				newPerson.addPlan(plan);
 		BasePlanImpl.convertToBasePlan(newPerson, person.getSelectedPlan());
 		return newPerson;

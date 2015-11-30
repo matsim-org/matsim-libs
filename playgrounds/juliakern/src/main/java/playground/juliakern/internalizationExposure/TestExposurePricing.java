@@ -42,6 +42,7 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
@@ -294,10 +295,10 @@ public class TestExposurePricing {
 						Leg leg = (Leg)pe;
 						LinkNetworkRouteImpl lnri = (LinkNetworkRouteImpl) leg.getRoute();
 						if(lnri.getLinkIds().contains(Id.create("39", Link.class))){
-							logger.info("This plan uses node 9 and has score " + p.getScore()+ ". Selected = " + p.isSelected(p));
+							logger.info("This plan uses node 9 and has score " + p.getScore()+ ". Selected = " + PersonUtils.isSelected(p));
 						}
 						if(lnri.getLinkIds().contains(Id.create("38", Link.class))){
-							logger.info("This plan uses node 8 and has score " + p.getScore() + ". Selected = " + p.isSelected(p));
+							logger.info("This plan uses node 8 and has score " + p.getScore() + ". Selected = " + PersonUtils.isSelected(p));
 						}
 					}
 				}
