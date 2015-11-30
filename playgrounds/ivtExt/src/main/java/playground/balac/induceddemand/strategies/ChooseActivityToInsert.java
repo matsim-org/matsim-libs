@@ -77,7 +77,7 @@ public class ChooseActivityToInsert implements PlanAlgorithm {
 				newActivity.setCoord(primaryActivity.getCoord());
 				newActivity.setEndTime(  t.get(randomIndex - 1).getEndTime() + 3600.0);
 
-				newActivity.setMaximumDuration(3600);
+			//	newActivity.setMaximumDuration(3600);
 				
 			}
 			
