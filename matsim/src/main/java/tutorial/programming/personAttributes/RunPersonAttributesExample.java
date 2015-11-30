@@ -38,7 +38,7 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
  * @author jwjoubert
  */
 public class RunPersonAttributesExample {
-	final private static Logger LOG = Logger.getLogger(RunPersonAttributesExample.class);
+	final private static Logger LOG = Logger.getLogger(RunPersonAttributesExampleTest.class);
 
 	/**
 	 * Running the example where we show how to add three different attribute
@@ -47,6 +47,7 @@ public class RunPersonAttributesExample {
 	 * @param args
 	 */
 	public static void main(String[] args) {
+		
 		LOG.info("Adding a single person to the population with the following attributes:");
 		LOG.info("   |_ gender: male");
 		LOG.info("   |_ age: 35");
@@ -70,6 +71,7 @@ public class RunPersonAttributesExample {
 		LOG.info("   |_ gender: " + personAttributes.getAttribute(person.getId().toString(), "gender"));
 		LOG.info("   |_ age: " + personAttributes.getAttribute(person.getId().toString(), "age"));
 		LOG.info("   |_ employed: " + personAttributes.getAttribute(person.getId().toString(), "employed"));
+
 	}
 
 }
