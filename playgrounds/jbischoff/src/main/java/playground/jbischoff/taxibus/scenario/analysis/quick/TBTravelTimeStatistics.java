@@ -17,43 +17,28 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jbischoff.taxibus.scenario.strategies;
+package playground.jbischoff.taxibus.scenario.analysis.quick;
 
-import java.util.Collection;
-
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Plan;
-
-import playground.jbischoff.taxibus.optimizer.fifo.Lines.LineDispatcher;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.MatsimEventsReader;
 
 /**
- * @author  jbischoff
- *	this one is totally scenario specific
- * and picks either scheduled or teleported pt (defined as mode "tpt") depending on an agent's subpopulation
+ * @author jbischoff
+ *
  */
-public class TaxibusAndWOBScenarioPermissibleModesCalculator extends TaxibusPermissibleModesCalculatorImpl {
+public class TBTravelTimeStatistics {
 
-	private final Scenario scenario;
-	
-	public TaxibusAndWOBScenarioPermissibleModesCalculator(String[] availableModes, LineDispatcher dispatcher, Scenario scenario) {
-		super(availableModes, dispatcher);
-		this.scenario = scenario;
-	}
-	
-	
-	@Override
-	public Collection<String> getPermissibleModes(Plan plan) {
-		Collection<String> permissibleModes = super.getPermissibleModes(plan);
-		String subpop = (String) scenario.getPopulation().getPersonAttributes().getAttribute(plan.getPerson().getId().toString(), "subpopulation");
-		if (subpop.equals("schedulePt")){
-			permissibleModes.remove("tpt");
-			
-		}
-		else if (subpop.equals("teleportPt")){
-			permissibleModes.remove("pt");
-		}
-		
-		return permissibleModes;
+	public static void main(String[] args) {
+		String inputFile = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/input/output/tb/ITERS/it.0/tb.0.events.xml.gz";
+
+		EventsManager events = EventsUtils.createEventsManager();
+		TaxiBusTravelTimesAnalyzer a = new TaxiBusTravelTimesAnalyzer();
+
+		events.addHandler(a);
+		new MatsimEventsReader(events).readFile(inputFile);
+		System.out.println(inputFile);
+		a.printOutput();
 	}
 
 }

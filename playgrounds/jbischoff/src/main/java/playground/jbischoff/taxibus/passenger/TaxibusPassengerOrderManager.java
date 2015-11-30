@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimAgent.State;
 import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
@@ -67,17 +68,16 @@ public class TaxibusPassengerOrderManager implements ActivityStartEventHandler, 
 				if (mobsimAgent.getState().equals(State.LEG))
 					return;
 				PlanAgent agent = (PlanAgent) mobsimAgent;
-				if (agent.getNextPlanElement() != null) {
-					if (agent.getNextPlanElement() instanceof Activity) {
+				PlanElement nextPlanElement = agent.getNextPlanElement();
+				if (nextPlanElement != null) {
+					if (nextPlanElement instanceof Activity) {
 						Logger.getLogger(getClass()).error(
 								"Agent" + mid.toString() + " started activity: " + event.getActType() + " next act ");
 						return;
 					}
-					if (agent.getNextPlanElement() instanceof Leg) {
-						Leg leg = (Leg) agent.getNextPlanElement();
+					if (nextPlanElement instanceof Leg) {
+						Leg leg = (Leg) nextPlanElement;
 						if (leg.getMode().equals(TaxibusUtils.TAXIBUS_MODE)) {
-							// if (leg.getMode().equals("car")){
-
 							Double departureTime = mobsimAgent.getActivityEndTime();
 							if (departureTime > event.getTime())
 								departureTime = event.getTime() + 60;

@@ -61,13 +61,10 @@ public class TaxibusVehicleCreator
 	
 	public static void main(String[] args) {
 		TaxibusVehicleCreator tvc = new TaxibusVehicleCreator();
-		tvc.run(10, Id.createLinkId("vw131"));
-		tvc.run(10, Id.createLinkId("53690"));
-		tvc.run(10, Id.createLinkId("18697"));
-		tvc.run(10, Id.createLinkId("52118"));
-		tvc.run(10, Id.createLinkId("3769"));
-		tvc.run(10, Id.createLinkId("19769"));
-		new VehicleWriter(tvc.vehicles).write(tvc.vehiclesFilePrefix+"l.xml.gz");
+		tvc.run(100, Id.createLinkId("vw131"));
+		tvc.run(100, Id.createLinkId("53690"));
+
+		new VehicleWriter(tvc.vehicles).write(tvc.vehiclesFilePrefix+"l100.xml.gz");
 
 //		for (int i = 10; i<150 ; i=i+10 ){
 //			System.out.println(i);

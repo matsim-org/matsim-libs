@@ -77,6 +77,8 @@ public class FifoOptimizer extends AbstractTaxibusOptimizer {
 
 	@Override
 	protected void scheduleUnplannedRequests() {
+		
+		
 		Set<TaxibusRequest> handledRequests = new HashSet<>();
 		for (TaxibusRequest req : unplannedRequests) {
 			
@@ -87,6 +89,9 @@ public class FifoOptimizer extends AbstractTaxibusOptimizer {
 				handledRequests.add(req);
 				continue;
 			}
+			
+			if (this.optimConfig.context.getTime()>req.getT0()-3600){
+			
 			TaxibusVehicleRequestPath requestPath = this.currentRequestPathForLine.get(line.getId());
 			if (requestPath == null) {
 				Vehicle veh = line.getNextEmptyVehicle();
@@ -111,6 +116,7 @@ public class FifoOptimizer extends AbstractTaxibusOptimizer {
 				this.currentTwMax.put(line.getId(), null);
 			}
 		}
+		}
 		unplannedRequests.removeAll(handledRequests);
 	}
 
@@ -126,9 +132,8 @@ public class FifoOptimizer extends AbstractTaxibusOptimizer {
 			requestPath.addPath(nextTuple.getFirst());
 			allRequests.remove(nextTuple.getSecond());
 		}
-		Id<TaxibusLine> returnLineId = this.dispatcher.getLines().get(id).getReturnRouteId();
 		Link toLink = this.optimConfig.context.getScenario().getNetwork().getLinks()
-				.get(this.dispatcher.getLines().get(returnLineId).getHoldingPosition());
+				.get(this.dispatcher.calculateNextHoldingPointForTaxibus(requestPath.vehicle,id));
 		VrpPathWithTravelData lastPath = VrpPaths.calcAndCreatePath(requestPath.getLastPathAdded().getToLink(), toLink,
 				requestPath.getEarliestNextDeparture(), routerWithCache, optimConfig.travelTime);
 		requestPath.addPath(lastPath);

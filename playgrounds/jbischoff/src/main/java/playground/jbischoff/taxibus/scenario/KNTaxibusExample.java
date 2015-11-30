@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.gbl.Gbl;
@@ -64,7 +65,7 @@ public class KNTaxibusExample {
 
 		Config config = ConfigUtils.loadConfig("../../../shared-svn/projects/vw_rufbus/scenario/input/example/configVWTB.xml", new TaxibusConfigGroup());
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
-
+		config.qsim().setSnapshotStyle(SnapshotStyle.queue);
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		Controler controler = new Controler(scenario);

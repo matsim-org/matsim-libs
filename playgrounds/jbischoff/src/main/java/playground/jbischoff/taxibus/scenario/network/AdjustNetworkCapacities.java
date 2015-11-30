@@ -17,48 +17,53 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jbischoff.taxibus.scenario.plans;
+package playground.jbischoff.taxibus.scenario.network;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.opensaml.ws.security.ServletRequestX509CredentialAdapter;
 
 /**
  * @author  jbischoff
  *
  */
-public class WOBTBFilter {
-public static void main(String[] args) {
+public class AdjustNetworkCapacities {
+	public static void main(String[] args) {
+		
 	Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-	
-	new MatsimPopulationReader(scenario).readFile("C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/input/output/vw028.100pct/vw028.100pct.output_plans.xml.gz");
-	Scenario scenario2 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-	Population pop2 = scenario2.getPopulation();
-	int i = 0;
-	for (Person p : scenario.getPopulation().getPersons().values()){
-		if (p.getId().toString().endsWith("vw")){
-			
-			boolean copyPerson = true;
-			i++;
-			if (i%10000 == 0) System.out.println(i);
-			for (Plan plan : p.getPlans()){
-				int pes = plan.getPlanElements().size();
-				Activity act = (Activity) plan.getPlanElements().get(pes-1);
-				if (act.getStartTime()>23*3600) copyPerson = false;
-			}
-			if (copyPerson){
-				pop2.addPerson(p);
-			}
-			
+	String basedir = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/input/";
+	new MatsimNetworkReader(scenario).readFile(basedir+"networkptcc.xml");
+	for (Link link : scenario.getNetwork().getLinks().values()){
+		if (link.getId().toString().startsWith("pt")) continue;
+		if (decideToAdjust(link.getCoord())){
+			link.setCapacity(link.getCapacity()*2);
+			if (link.getCapacity()<2000) link.setCapacity(2000);
+		}else 
+		{
+			link.setCapacity(link.getCapacity()*1.1);
 		}
+		
 	}
-	System.out.println(i + " persons found ; "+pop2.getPersons().size()+" persons copied");
-	new PopulationWriter(pop2).write("C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/input/output/vw028.100pct/filtered_plans.xml.gz");
-}
+	new NetworkWriter(scenario.getNetwork()).write(basedir+"networkptcg.xml");
+	
+	}
+
+
+//	static boolean decideToAdjust(Coord coord){
+//		if (coord.getX()<593084) return true;
+//		else if (coord.getX()>629810) return true;
+//		else if (coord.getY()<5785583) return true;
+//		else if (coord.getY()>5817600) return true;
+//		else return false;
+//	} 
+	static boolean decideToAdjust(Coord coord){
+		if ((coord.getY()>5807061&&coord.getY()<5823872)&&(coord.getX()>597553&&coord.getX()<614025)) return true;
+		else return false;
+		
+	} 
 }

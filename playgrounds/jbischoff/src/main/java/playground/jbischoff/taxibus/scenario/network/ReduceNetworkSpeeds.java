@@ -17,48 +17,41 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jbischoff.taxibus.network;
+package playground.jbischoff.taxibus.scenario.network;
 
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.opensaml.ws.security.ServletRequestX509CredentialAdapter;
 
 /**
  * @author  jbischoff
  *
  */
-public class AdjustNetworkCapacities {
+public class ReduceNetworkSpeeds {
+
 	public static void main(String[] args) {
-		
-	Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-	String basedir = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/input/";
-	new MatsimNetworkReader(scenario).readFile(basedir+"networkpt.xml");
-	for (Link link : scenario.getNetwork().getLinks().values()){
-		if (link.getId().toString().startsWith("pt")) continue;
-		if (decideToAdjust(link.getCoord())){
-			link.setCapacity(link.getCapacity()*2);
-			if (link.getCapacity()<2000) link.setCapacity(2000);
-		}else 
-		{
-			link.setCapacity(link.getCapacity()*1.1);
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		String basedir = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/input/";
+		new MatsimNetworkReader(scenario).readFile(basedir+"network.xml");
+		for (Link link : scenario.getNetwork().getLinks().values()){
+			double speed = link.getFreespeed();
+			if (speed<10) link.setFreespeed(0.75*speed);
+			else if (speed<20) link.setFreespeed(0.7*speed);
+			else if (speed<30) 
+			{
+				if (link.getNumberOfLanes()<2) link.setFreespeed(0.7*speed);
+				else link.setFreespeed(0.75*speed);
+			}
+			else link.setFreespeed(0.7*speed);
+			
 		}
+		new NetworkWriter(scenario.getNetwork()).write(basedir+"networks.xml");
+		
+		
 		
 	}
-	new NetworkWriter(scenario.getNetwork()).write(basedir+"networkptcc.xml");
-	
-	}
 
-
-	static boolean decideToAdjust(Coord coord){
-		if (coord.getX()<593084) return true;
-		else if (coord.getX()>629810) return true;
-		else if (coord.getY()<5785583) return true;
-		else if (coord.getY()>5817600) return true;
-		else return false;
-	} 
 }

@@ -18,8 +18,8 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.contrib.util.random.WeightedRandomSelection;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -27,6 +27,9 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
+import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
+import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
@@ -52,6 +55,10 @@ public class VWRCreateDemand {
 	private Map<String, Coord> retail;
 	private Map<String, Coord> schools;
 	private Map<String, Coord> universities;
+	private Map<String, Geometry> bs;
+	private Map<String, Geometry> wb;
+    private final WeightedRandomSelection<String> wrs;
+
 
 	private Id<Link> vwGateFE1LinkID = Id.createLinkId("vw2");
 	private Id<Link> vwGateFE2LinkID = Id.createLinkId("vw222");
@@ -90,6 +97,15 @@ public class VWRCreateDemand {
 		this.retail = geometryMapToCoordMap(readShapeFile(config.getRetailFileString(), "osm_id"));
 		this.schools = geometryMapToCoordMap(readShapeFile(config.getSchoolsFileString(), "osm_id"));
 		this.universities = geometryMapToCoordMap(readShapeFile(config.getUniversitiesFileString(), "osm_id"));
+		this.bs = readShapeFile(config.getBs(), "bez");
+		this.wb = readShapeFile(config.getWb(), "bez");
+		this.wrs = new WeightedRandomSelection<>();
+        readPopulationData();
+
+		
+		
+		
+		
 
 	}
 
@@ -106,15 +122,19 @@ public class VWRCreateDemand {
 		String retail = "landuse/retail.shp";
 		String schools = "landuse/schools.shp";
 		String universities = "landuse/universities.shp";
+		String bs = "zones/bs.shp";
+		String bsb = "zones/bev_bs.txt";
+		
+		String wb = "zones/wb.shp";
 //		double scalefactor = 0.05;
-//		double scalefactor = 0.1;
+		double scalefactor = 0.1;
 //		double scalefactor = 1.0;
-		double scalefactor = 0.01;
+//		double scalefactor = 0.01;
 		String plansOutputComplete = basedir + "../../input/initial_plans"+scalefactor+".xml.gz";
 		String objectAttributesFile = basedir + "../../input/initial_plans_oA"+scalefactor+".xml.gz";
 		String transitSchedule = basedir+"../pt/output_transitschedule.xml.gz";
 		VWRConfig config = new VWRConfig(basedir, network, counties, commercial, industrial, residential, retail,
-				schools, universities, plansOutputComplete, scalefactor,transitSchedule,objectAttributesFile);
+				schools, universities, plansOutputComplete, scalefactor,transitSchedule,objectAttributesFile,bs,bsb,wb);
 
 		VWRCreateDemand cd = new VWRCreateDemand(config);
 		cd.run();
@@ -128,7 +148,7 @@ public class VWRCreateDemand {
 		// Wolfenbüttel - WL
 		// Helmstedt - HS
 		// Peine - PE
-		// Salzgitter, Stadt - SG
+		// Salzgitter, Stadt - SG 
 		// Börde - BR
 		// Altmarkkreis Salzwedel - AS
 		// Region Hannover - RH
@@ -167,15 +187,15 @@ public class VWRCreateDemand {
 		createStudents("WB", "WB", 8823 * config.getScalefactor(), 0.01, 0.4, 0.25, "03103", "03103");
 
 		// Gifhorn - Wolfsburg, Stadt | work
-		createWorkers("GH", "WB", (26484-15152) * config.getScalefactor(), 0.8, 0.0, 0.0, "03151", "03103");
-		createVWWorkers("GH", "03151", 9156, 1050+4758, 518, 0.8, 0.0, 0.0);
+		createWorkers("GH", "WB", (26484-15152-3000) * config.getScalefactor(), 0.75, 0.0, 0.0, "03151", "03103");
+		createVWWorkers("GH", "03151", 9156, 1050+4758, 518, 0.75, 0.0, 0.0);
 		//3151	9156	1050	4758	188	15152
 
 		// Gifhorn - Gifhorn | work
-		createWorkers("GH", "GH", 26414 * config.getScalefactor(), 0.63, 0.15, 0.15, "03151", "03151");
+		createWorkers("GH", "GH", 10000 * config.getScalefactor(), 0.63, 0.15, 0.15, "03151", "03151");
 
 		// Gifhorn - Gifhorn | school
-		createPupils("GH", "GH", 26429 * config.getScalefactor(), 0.2, 0.3, 0.2, "03151", "03151");
+		createPupils("GH", "GH", 15000 * config.getScalefactor(), 0.05, 0.3, 0.2, "03151", "03151");
 
 		// Wolfenbüttel - Braunschweig, Stadt | work
 		createWorkers("WL", "BS", 13304 * config.getScalefactor(), 0.8, 0.0, 0.0, "03158", "03101");
@@ -206,7 +226,7 @@ public class VWRCreateDemand {
 
 		// Börde - Wolfsburg, Stadt | work
 		createWorkers("BR", "WB", (3685-856) * config.getScalefactor(), 0.8, 0.0, 0.0, "15085", "03103");
-		createVWWorkers("BR", "15085", 396, 460,0, 0.8, 0.0, 0.0);
+		createVWWorkers("BR", "15085", 396, 460, 0, 0.8, 0.0, 0.0);
 		//		15362	396	0	460	0	856
 
 		// Altmarkkreis Salzwedel - Wolfsburg, Stadt | work
@@ -443,7 +463,7 @@ public class VWRCreateDemand {
 		Geometry homeCounty = getCounty(origin);
 		
 		
-			Coord homeC = findClosestCoordFromMap(drawRandomPointFromGeometry(homeCounty), this.residential);
+		Coord homeC = (origin.equals("3101"))? drawRandomPointFromGeometry(homeCounty): findClosestCoordFromMap(drawRandomPointFromGeometry(homeCounty), this.residential);
 
 			for (int i = 0; i<=flex*config.getScalefactor(); i++){
 				vwWorkerCounter++;
@@ -502,7 +522,7 @@ public class VWRCreateDemand {
 				}
 			}
 
-			Coord homeC = findClosestCoordFromMap(drawRandomPointFromGeometry(homeCounty), this.residential);
+			Coord homeC = (origin.equals("3101"))? drawRandomPointFromGeometry(homeCounty): findClosestCoordFromMap(drawRandomPointFromGeometry(homeCounty), this.residential);
 
 //			double wvWorkerOrNot = random.nextDouble();
 //			if (to == "WB" && wvWorkerOrNot < 0.6363) {
@@ -588,8 +608,8 @@ public class VWRCreateDemand {
 					}
 				}
 			}
-
-			Coord homeC = findClosestCoordFromMap(drawRandomPointFromGeometry(homeCounty), this.residential);
+			
+			Coord homeC = (origin.equals("3101"))? drawRandomPointFromGeometry(homeCounty): findClosestCoordFromMap(drawRandomPointFromGeometry(homeCounty), this.residential);
 
 			Coord commuteDestinationC = findClosestCoordFromMap(drawRandomPointFromGeometry(commuteDestinationCounty),
 					this.schools);
@@ -620,7 +640,7 @@ public class VWRCreateDemand {
 				}
 			}
 
-			Coord homeC = findClosestCoordFromMap(drawRandomPointFromGeometry(homeCounty), this.residential);
+			Coord homeC = (origin.equals("3101"))? drawRandomPointFromGeometry(homeCounty): findClosestCoordFromMap(drawRandomPointFromGeometry(homeCounty), this.residential);
 			
 			Coord commuteDestinationC = findClosestCoordFromMap(drawRandomPointFromGeometry(commuteDestinationCounty),
 					this.universities);
@@ -634,6 +654,21 @@ public class VWRCreateDemand {
 		if (origin == "03151"){
 			if (random.nextDouble()<0.3) {origin ="99999";}
 		}
+		if (origin == "03101"){
+			String bez = this.wrs.select();
+			return this.bs.get(bez);
+		}
+		if (origin == "03103"){
+			if (random.nextBoolean()){
+				return this.wb.get("0");
+			}else {
+				return this.wb.get("111");
+			}
+			
+		}
+		
+		
+		
 		return this.counties.get(origin);
 	}
 
@@ -664,7 +699,7 @@ public class VWRCreateDemand {
 		work.setMaximumDuration(minHrs*3600 + random.nextDouble()*spread  );
 		plan.addActivity(work);
 		if ( additionalTrips == 1 || additionalTrips == 3){
-			enrichPlanBySingleLegAndActivity(coord, plan,mode, 5400, false);
+			enrichPlanBySingleLegAndActivity(coord, plan,mode, 4800, false);
 		}
 
 		Leg returnTrip = scenario.getPopulation().getFactory().createLeg(mode);
@@ -677,7 +712,7 @@ public class VWRCreateDemand {
 		if (additionalTrips>1){
 			home2.setMaximumDuration(random.nextInt(5400));
 
-			enrichPlanByReturnLegAndActivity(home2, plan,mode, 5400);
+			enrichPlanByReturnLegAndActivity(home2, plan,mode, 4800);
 
 		}
 		scenario.getPopulation().addPerson(person);
@@ -707,7 +742,7 @@ public class VWRCreateDemand {
 			shift1.setEndTime(13 * 60 * 60 + 40 * 60);
 			plan.addActivity(shift1);
 			if ( additionalTrips == 1 || additionalTrips == 3){
-				enrichPlanBySingleLegAndActivity(coord3, plan,mode, 5400, false);
+				enrichPlanBySingleLegAndActivity(coord3, plan,mode, 4800, false);
 			}
 
 			Leg returnTrip = scenario.getPopulation().getFactory().createLeg(mode);
@@ -716,9 +751,9 @@ public class VWRCreateDemand {
 			Activity home2 = scenario.getPopulation().getFactory().createActivityFromCoord("home", homeC);
 			plan.addActivity(home2);
 			if (additionalTrips>1){
-				home2.setMaximumDuration(random.nextInt(5400));
+				home2.setMaximumDuration(random.nextInt(3600));
 
-				enrichPlanByReturnLegAndActivity(home2, plan,mode, 5400);
+				enrichPlanByReturnLegAndActivity(home2, plan,mode, 4800);
 
 			}
 			break;
@@ -820,7 +855,7 @@ public class VWRCreateDemand {
 	}
 
 	private void createOneWorker(int i, Coord homeC, Coord coordWork, String mode, String fromToPrefix) {
-		int additionalTrips = random.nextInt(4);
+		int additionalTrips = random.nextInt(2)+random.nextInt(3);
 
 		Id<Person> personId = Id.createPersonId(fromToPrefix + i);
 		Person person = scenario.getPopulation().getFactory().createPerson(personId);
@@ -849,7 +884,7 @@ public class VWRCreateDemand {
 		if (additionalTrips>1){
 			home2.setMaximumDuration(random.nextInt(5400));
 
-			enrichPlanByReturnLegAndActivity(home2, plan,mode, 10800);
+			enrichPlanByReturnLegAndActivity(home2, plan,mode, 4800);
 
 		}
 
@@ -889,7 +924,7 @@ public class VWRCreateDemand {
 		if (additionalTrips>1){
 			home2.setMaximumDuration(random.nextInt(5400));
 
-			enrichPlanByReturnLegAndActivity(home2, plan,mode, 10800);
+			enrichPlanByReturnLegAndActivity(home2, plan,mode, 4800);
 
 		}
 		person.addPlan(plan);
@@ -926,7 +961,7 @@ public class VWRCreateDemand {
 		plan.addActivity(home2);
 		if (additionalTrips>1){
 			home2.setMaximumDuration(random.nextInt(5400));
-			enrichPlanByReturnLegAndActivity(home2, plan,mode, 5400);
+			enrichPlanByReturnLegAndActivity(home2, plan,mode, 4800);
 
 		}
 		person.addPlan(plan);
@@ -1206,6 +1241,25 @@ public class VWRCreateDemand {
 			}
 		}
 	}
+	
+
+
+private void readPopulationData() {
+	
+	TabularFileParserConfig cfg = new TabularFileParserConfig();
+    cfg.setDelimiterTags(new String[] {"\t"});
+    cfg.setFileName(config.getBsb());
+    cfg.setCommentTags(new String[] { "#" });
+    new TabularFileParser().parse(cfg, new TabularFileHandler() {
+		
+		@Override
+		public void startRow(String[] row) {
+
+			wrs.add(row[0], Double.parseDouble(row[2]));
+		}
+	});
+    
+}	
 }
 
 

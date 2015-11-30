@@ -104,4 +104,9 @@ public class LineDispatcher implements ActivityStartEventHandler {
 		return false;
 	}
 
+	public Id<Link> calculateNextHoldingPointForTaxibus(Vehicle vehicle, Id<TaxibusLine> id) {
+		
+		return this.lines.get(id).getHoldingPosition();
+	}
+
 }

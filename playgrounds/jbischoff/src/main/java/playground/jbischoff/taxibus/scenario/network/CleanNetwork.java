@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jbischoff.taxibus.network;
+package playground.jbischoff.taxibus.scenario.network;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.ConfigUtils;

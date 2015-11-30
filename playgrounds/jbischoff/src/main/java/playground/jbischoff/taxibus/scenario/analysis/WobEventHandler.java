@@ -32,7 +32,7 @@ class WobEventHandler implements PersonDepartureEventHandler,
 
 	private Map<Id<Person>, Double> currentCarLegDistance = new HashMap<>();
 	private Map<Id<Person>, Double> currentCarLegDepartureTime = new HashMap<>();
-//	private Map<Id<Person>, Id<Link>> currentCarLegStartLink = new HashMap<>();
+	private Map<Id<Person>, Id<Link>> currentCarLegStartLink = new HashMap<>();
 
 	private double drivenDistances = 0;
 	private double drivenTimes = 0;
@@ -88,7 +88,7 @@ class WobEventHandler implements PersonDepartureEventHandler,
 		if (event.getLegMode().equals("car")) {
 			this.currentCarLegDepartureTime.put(personId, event.getTime());
 			this.currentCarLegDistance.put(personId, 0.0);
-//			this.currentCarLegStartLink.put(personId, event.getLinkId());
+			this.currentCarLegStartLink.put(personId, event.getLinkId());
 		}
 	}
 
@@ -152,28 +152,28 @@ class WobEventHandler implements PersonDepartureEventHandler,
 			double drivenTime = event.getTime()
 					- currentCarLegDepartureTime.remove(personId);
 			double drivenDistance = currentCarLegDistance.remove(personId);
-//			Link startLink = this.network.getLinks().get(
-//					currentCarLegStartLink.remove(personId));
-//			Link destinationLink = this.network.getLinks().get(
-//					event.getLinkId());
+			Link startLink = this.network.getLinks().get(
+					currentCarLegStartLink.remove(personId));
+			Link destinationLink = this.network.getLinks().get(
+					event.getLinkId());
 
-//			double beelineDistance = NetworkUtils.getEuclidianDistance(
-//					startLink.getCoord(), destinationLink.getCoord());
+			double beelineDistance = NetworkUtils.getEuclidianDistance(
+					startLink.getCoord(), destinationLink.getCoord());
 			String s = personId + "_" + leg;
 			this.drivenDistances = this.drivenDistances+drivenDistance;
 			this.drivenTimes = this.drivenTimes+drivenDistance;
 			
-//			this.drivenEuclidianDistance.put(s, beelineDistance);
+			this.drivenEuclidianDistance.put(s, beelineDistance);
 //			this.drivenTimes.put(s, drivenTime);
 			
-//			if ((drivenDistance!=0)&&(beelineDistance > 1) ){
+			if ((drivenDistance!=0)&&(beelineDistance > 1) ){
 				
-//				double beelineDistanceFactor = drivenDistance / beelineDistance;
-//				if (beelineDistanceFactor > 10){
-//					System.out.println(beelineDistanceFactor+" seems a lil high for sl" + startLink.getId() + " and dl "+ destinationLink.getId()+" Driven distance: "+ drivenDistance +" vs bl distance "+ beelineDistance);
-//				}
-//				this.drivenBeeLineDerivationFactor.put(s, beelineDistanceFactor);
-//			}
+				double beelineDistanceFactor = drivenDistance / beelineDistance;
+				if (beelineDistanceFactor > 10){
+					System.out.println(beelineDistanceFactor+" seems a lil high for sl" + startLink.getId() + " and dl "+ destinationLink.getId()+" Driven distance: "+ drivenDistance +" vs bl distance "+ beelineDistance);
+				}
+				this.drivenBeeLineDerivationFactor.put(s, beelineDistanceFactor);
+			}
 
 			String activity = event.getActType();
 			WobDistanceAnalyzer.addStringDoubleToMap(travelDistanceToActivity,
