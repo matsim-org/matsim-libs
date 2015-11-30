@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * RunPersonAttributesExample.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,23 +17,39 @@
  *                                                                         *
  * *********************************************************************** */
 
+package tutorial.programming.planStrategyForRemoval;
+
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+
 /**
- * 
- */
-package tutorial.programming.personAttributes;
+* @author ikaddoura
+*/
+public class RunPlanStrategyForRemovalExample {
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
-import org.matsim.testcases.MatsimTestUtils;
+	private static final String SELECTOR_NAME = "selectorName";
 
-public class RunPersonAttributesExampleTest {
+	public static void main(String[] args) {
+		
+		Config config = ConfigUtils.createConfig();	
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controler().setLastIteration(1);
+		Controler controler = new Controler(config);
 
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
+		controler.addOverridingModule(new AbstractModule(){
+			
+			@Override
+			public void install() {
+				this.addPlanSelectorForRemovalBinding(SELECTOR_NAME).toProvider(MyExpBetaPlanChangerForRemoval.class);
+			}
+		});
+		
+		controler.run();
 
-	@Test
-	public void test(){
-		RunPersonAttributesExample.main(null);
 	}
-	
+
 }
+

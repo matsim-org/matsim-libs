@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * RunPersonAttributesExample.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,23 +17,30 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
-package tutorial.programming.personAttributes;
+package tutorial.programming.planStrategyForRemoval;
 
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.testcases.MatsimTestUtils;
 
-public class RunPersonAttributesExampleTest {
+/**
+* @author ikaddoura
+*/
+
+public class RunPlanStrategyForRemovalExampleTest {
 
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
 
 	@Test
-	public void test(){
-		RunPersonAttributesExample.main(null);
+	public final void testMain() {
+		
+		try {
+			RunPlanStrategyForRemovalExample.main(null);
+		} catch(Exception e) {
+			Assert.fail(e.toString());
+		}
 	}
-	
+
 }
+

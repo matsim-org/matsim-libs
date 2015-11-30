@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * RunPersonAttributesExample.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,23 +17,32 @@
  *                                                                         *
  * *********************************************************************** */
 
+package tutorial.programming.planStrategyForRemoval;
+
+import javax.inject.Inject;
+import javax.inject.Provider;
+
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.config.Config;
+import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
+
 /**
- * 
- */
-package tutorial.programming.personAttributes;
+* @author ikaddoura
+*/
+public class MyExpBetaPlanChangerForRemoval implements Provider<ExpBetaPlanChanger<Plan, Person>> {
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
-import org.matsim.testcases.MatsimTestUtils;
+	private Config config;
 
-public class RunPersonAttributesExampleTest {
+    @Inject
+    MyExpBetaPlanChangerForRemoval(Config config) {
+        this.config = config;
+    }
 
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
-
-	@Test
-	public void test(){
-		RunPersonAttributesExample.main(null);
-	}
+    @Override
+    public ExpBetaPlanChanger<Plan, Person> get() {
+        return new ExpBetaPlanChanger<>( - config.planCalcScore().getBrainExpBeta());
+    }
 	
 }
+

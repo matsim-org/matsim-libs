@@ -71,7 +71,6 @@ public class RunPersonAttributesExample {
 		LOG.info("   |_ gender: " + personAttributes.getAttribute(person.getId().toString(), "gender"));
 		LOG.info("   |_ age: " + personAttributes.getAttribute(person.getId().toString(), "age"));
 		LOG.info("   |_ employed: " + personAttributes.getAttribute(person.getId().toString(), "employed"));
-
 	}
 
 }
