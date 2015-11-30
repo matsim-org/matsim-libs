@@ -275,8 +275,8 @@ public class CreateAutomatedFDTest {
 
 		String outDir  = "test/output/" + CreateAutomatedFDTest.class.getCanonicalName().replace('.', '/') + "/" + helper.getMethodName() + "/";
 		String fileName = linkDynamics+"_"+trafficDynamics+".png";
-		String outFile ;
-
+		String outFile ; 
+		//ZZ_TODO : what is there exists some different directory => changing method name will keep collecting the old data.
 		if(!new File(outDir).exists() || new File(outDir+fileName).exists()){
 			outFile = helper.getOutputDirectory()+fileName;
 		} else {
@@ -286,7 +286,7 @@ public class CreateAutomatedFDTest {
 		//plotting data
 		scatterPlot(outData,outFile);
 	}
-
+	
 	static class MySimplifiedRoundAndRoundAgent implements MobsimAgent, MobsimDriverAgent {
 
 		private static final Id<Link> ORIGIN_LINK_ID = Id.createLinkId("home");
