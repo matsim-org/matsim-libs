@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * RunEmissionToolOffline.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,40 +16,37 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package tutorial.programming.example21tutorialTUBclass.leastCostPath;
+package tutorial.programming.example07ControlerListener;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
-import org.matsim.core.scenario.ScenarioUtils;
+import static org.junit.Assert.fail;
 
-/**
- * @author jbischoff
- *
- *
- */
-public class RunLeastCostPathCalculatorExample {
-	public static void main(String[] args) {
-		Config config = ConfigUtils.loadConfig("examples/equil/config.xml");
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
-		config.controler().setLastIteration(0);
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-		Controler controler = new Controler(scenario);
+import java.io.File;
 
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				bindLeastCostPathCalculatorFactory().to(MatsimClassLeastCostPathCalculatorFactory.class);	
-			}
+import org.junit.Test;
+import org.matsim.core.utils.io.IOUtils;
+
+public class ControlerListnerExampleTest {
+	
+	/**
+	 * Test method for {@link tutorial.programming.example07ControlerListener.RunControlerListnerExample#main(java.lang.String[])}.
+	 */
+	@SuppressWarnings("static-method")
+	@Test
+	public final void testMain() {
+		
+		final String pathname = "./output/example7/";
+		try {
+			IOUtils.deleteDirectory(new File(pathname),false);
+		} catch ( IllegalArgumentException ee ) {
+			// (normally, the directory should NOT be there initially.  It might, however, be there if someone ran the main class in some other way,
+			// and did not remove the directory afterwards.)
 		}
-
-
-				);
-
-		controler.run();
+		
+		try {
+			RunControlerListenerExample.main(null);
+		} catch ( Exception ee ) {
+			ee.printStackTrace();
+			fail( "Got an exception while running subpopulation example: "+ee ) ;
+		}
 	}
-
 }

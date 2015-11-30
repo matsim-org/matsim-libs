@@ -19,12 +19,12 @@ public class RunControlerListenerExample {
 		String filename = "examples/tutorial/programming/example7-config.xml" ;
 		
 		Config config = ConfigUtils.loadConfig(filename) ;
+		config.controler().setLastIteration(1);
 		
 		Scenario scenario = ScenarioUtils.loadScenario(config) ;
 
 		//Create an instance of the controler and
 		Controler controler = new Controler(scenario);
-		
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
