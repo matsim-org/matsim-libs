@@ -29,6 +29,7 @@ import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 
+import playground.jbischoff.taxibus.run.configuration.TaxibusConfigGroup;
 import playground.michalm.zone.Zone;
 import playground.michalm.zone.Zones;
 
@@ -38,8 +39,8 @@ import playground.michalm.zone.Zones;
  */
 public class LinesUtils {
 
-	public static LineDispatcher createLineDispatcher(String linesFile, String zonesXml, String zonesShp, MatsimVrpContext context ){
-		final LineDispatcher dispatcher = new LineDispatcher(context);
+	public static LineDispatcher createLineDispatcher(String linesFile, String zonesXml, String zonesShp, MatsimVrpContext context, TaxibusConfigGroup tbcg){
+		final LineDispatcher dispatcher = new LineDispatcher(context,tbcg);
 		final Map<Id<Zone>,Zone> zones = Zones.readZones(zonesXml, zonesShp);
 		
 		TabularFileParserConfig config = new TabularFileParserConfig();

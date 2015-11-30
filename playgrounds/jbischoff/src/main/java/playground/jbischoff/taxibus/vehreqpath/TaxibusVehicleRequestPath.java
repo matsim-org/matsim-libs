@@ -42,7 +42,9 @@ public class TaxibusVehicleRequestPath implements Comparable<TaxibusVehicleReque
     private Double t0 = null;
     private Double arrivalTime = null;
     private Link initialDestination = null;
-    double earliestNextDeparture = 0;
+    private double earliestNextDeparture = 0;
+    
+    double twMax;
     
     public TaxibusVehicleRequestPath(Vehicle vehicle, TaxibusRequest request, VrpPathWithTravelData path)
     {
@@ -87,6 +89,14 @@ public class TaxibusVehicleRequestPath implements Comparable<TaxibusVehicleReque
     public VrpPathWithTravelData getLastPathAdded(){
     	return this.path.get(path.size()-1);
     }
+    public void setTwMax(double twMax) {
+		this.twMax = twMax;
+	}
+    public double getTwMax() {
+		return twMax;
+	}
+    
+    
     
 	public Double getT0() {
 		if (t0 == null){

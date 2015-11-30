@@ -136,7 +136,7 @@ public class TaxibusQSimProvider implements Provider<QSim> {
 		optimizer = new DefaultTaxibusOptimizer(optimConfig,  false);}
 		
 		else if (tbcg.getAlgorithmConfig().equals("line")){
-		LineDispatcher dispatcher = LinesUtils.createLineDispatcher(tbcg.getLinesFile(), tbcg.getZonesXmlFile(), tbcg.getZonesShpFile(),context);	
+		LineDispatcher dispatcher = LinesUtils.createLineDispatcher(tbcg.getLinesFile(), tbcg.getZonesXmlFile(), tbcg.getZonesShpFile(),context,tbcg);	
 		events.addHandler(dispatcher);	
 		optimizer = new FifoOptimizer(optimConfig, dispatcher, false);
 		

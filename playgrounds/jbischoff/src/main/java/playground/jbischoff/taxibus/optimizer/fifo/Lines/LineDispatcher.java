@@ -32,6 +32,7 @@ import org.matsim.contrib.dvrp.MatsimVrpContext;
 import org.matsim.contrib.dvrp.data.Vehicle;
 
 import playground.jbischoff.taxibus.passenger.TaxibusRequest;
+import playground.jbischoff.taxibus.run.configuration.TaxibusConfigGroup;
 
 /**
  * @author jbischoff
@@ -44,9 +45,29 @@ public class LineDispatcher implements ActivityStartEventHandler {
 	private Map<Id<TaxibusLine>, TaxibusLine> lines = new HashMap<>();
 	private Map<Id<Link>, Id<TaxibusLine>> holdingPositions = new HashMap<>();
 	private final MatsimVrpContext context;
-
-	public LineDispatcher(MatsimVrpContext context) {
+	private final TaxibusConfigGroup tbcg;
+	private final LineBalanceMethod balanceMethod;
+	enum LineBalanceMethod {SAME, RETURN, BALANCED};
+	
+	public LineDispatcher(MatsimVrpContext context, TaxibusConfigGroup tbcg) {
 		this.context = context;
+		this.tbcg = tbcg;
+		switch (this.tbcg.getBalancingMethod()){
+		case "same":
+			balanceMethod = LineBalanceMethod.SAME;
+			break;
+		case "return":
+			balanceMethod = LineBalanceMethod.RETURN;
+			break;
+		case "balanced":
+			balanceMethod = LineBalanceMethod.BALANCED;
+			break;
+		
+		default:
+			log.error("invalid balancing method set "+ tbcg.getBalancingMethod());
+			throw new RuntimeException("invalid balancing method set "+ tbcg.getBalancingMethod());
+		}
+		
 	}
 
 	public void addLine(TaxibusLine line) {
@@ -105,8 +126,16 @@ public class LineDispatcher implements ActivityStartEventHandler {
 	}
 
 	public Id<Link> calculateNextHoldingPointForTaxibus(Vehicle vehicle, Id<TaxibusLine> id) {
-		
-		return this.lines.get(id).getHoldingPosition();
+		switch (this.balanceMethod){
+		case SAME:
+			return this.lines.get(id).getHoldingPosition();
+		case RETURN:
+			return this.lines.get(this.lines.get(id).getReturnRouteId()).getHoldingPosition();
+		case BALANCED:
+		default:
+			throw new RuntimeException("not yet implemented");
+			
+		}
 	}
 
 }
