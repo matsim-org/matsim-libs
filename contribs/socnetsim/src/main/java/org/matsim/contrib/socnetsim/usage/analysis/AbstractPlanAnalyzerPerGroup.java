@@ -187,7 +187,7 @@ public abstract class AbstractPlanAnalyzerPerGroup implements IterationEndsListe
 
 			if (stat > maxStat) maxStat = stat;
 			if (stat < minStat) minStat = stat;
-			if (plan.isSelected()) executedStat = stat;
+			if (plan.isSelected(plan)) executedStat = stat;
 
 			statsSum += stat;
 		}

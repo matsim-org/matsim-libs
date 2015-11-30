@@ -37,7 +37,7 @@ public class PlanAverageScore extends AbstractPersonAlgorithm implements PlanAlg
 	@Override
 	public void run(Person person) {
 		for (Plan plan : person.getPlans()) {
-			if (plan.isSelected()) {
+			if (plan.isSelected(plan)) {
 				run(plan);
 			}
 		}

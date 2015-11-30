@@ -167,7 +167,7 @@ public class ScoreStats implements StartupListener, IterationEndsListener, Shutd
 						cntScores++;
 
 						// executed plan?
-						if (plan.isSelected()) {
+						if (plan.isSelected(plan)) {
 							sumExecutedScores += score;
 							nofExecutedScores++;
 							//					if (plan.getType() == Plan.Type.CAR) {

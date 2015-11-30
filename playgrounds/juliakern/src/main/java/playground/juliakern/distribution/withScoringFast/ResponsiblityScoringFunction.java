@@ -66,7 +66,7 @@ public class ResponsiblityScoringFunction implements ScoringFunction {
 		//TODO recalc to price/mtutil of money?
 		Id personId = plan.getPerson().getId();
 
-		if(!plan.isSelected())System.out.println("++++++++++++++++shouldnt happen");
+		if(!plan.isSelected(plan))System.out.println("++++++++++++++++shouldnt happen");
 		if(ecl.getCausedEmCosts()!=null){
 			if(ecl.getCausedEmCosts().containsKey(personId)){
 				Double amount = new Double(ecl.getCausedEmCosts().get(personId));

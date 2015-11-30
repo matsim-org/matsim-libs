@@ -165,7 +165,7 @@ public class ScoreStatsControlerListener implements StartupListener, IterationEn
                 cntScores++;
 
                 // executed plan?
-                if (plan.isSelected()) {
+                if (plan.isSelected(plan)) {
                     sumExecutedScores += score;
                     nofExecutedScores++;
                 }

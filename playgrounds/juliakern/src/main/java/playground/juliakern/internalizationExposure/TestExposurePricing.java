@@ -294,10 +294,10 @@ public class TestExposurePricing {
 						Leg leg = (Leg)pe;
 						LinkNetworkRouteImpl lnri = (LinkNetworkRouteImpl) leg.getRoute();
 						if(lnri.getLinkIds().contains(Id.create("39", Link.class))){
-							logger.info("This plan uses node 9 and has score " + p.getScore()+ ". Selected = " + p.isSelected());
+							logger.info("This plan uses node 9 and has score " + p.getScore()+ ". Selected = " + p.isSelected(p));
 						}
 						if(lnri.getLinkIds().contains(Id.create("38", Link.class))){
-							logger.info("This plan uses node 8 and has score " + p.getScore() + ". Selected = " + p.isSelected());
+							logger.info("This plan uses node 8 and has score " + p.getScore() + ". Selected = " + p.isSelected(p));
 						}
 					}
 				}

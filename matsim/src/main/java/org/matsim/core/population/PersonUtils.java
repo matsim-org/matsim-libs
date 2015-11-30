@@ -29,7 +29,7 @@ public class PersonUtils {
 	public static void removeUnselectedPlans(Person person) {
 		for (Iterator<? extends Plan> iter = person.getPlans().iterator(); iter.hasNext(); ) {
 			Plan plan = iter.next();
-			if (!plan.isSelected()) {
+			if (!plan.isSelected(plan)) {
 				iter.remove();
 			}
 		}

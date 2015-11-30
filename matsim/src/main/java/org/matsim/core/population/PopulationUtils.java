@@ -297,8 +297,8 @@ public final class PopulationUtils {
 		}
 
 		@Override
-		public boolean isSelected() {
-			return delegate.isSelected();
+		public boolean isSelected(Plan plan) {
+			return delegate.isSelected(plan);
 		}
 
 		@Override

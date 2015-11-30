@@ -110,7 +110,7 @@ public class MentalEngine {
 		
 		for(SocialVertex ego : egos) {
 			Person person = ego.getPerson().getPerson();
-			if(person.getPlans().get(0).isSelected()) {
+			if(person.getPlans().get(0).isSelected(person.getPlans().get(0))) {
 				newState.add(person.getPlans().get(0));
 				oldState.add(person.getPlans().get(1));
 			} else {

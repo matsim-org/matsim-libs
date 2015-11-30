@@ -160,7 +160,7 @@ public class FullyExploredPlansProvider {
 		boolean foundNonSelected = false;
 
 		for ( Plan p : jp.getIndividualPlans().values() ) {
-			if ( p.isSelected() ) foundSelected = true;
+			if ( p.isSelected(p) ) foundSelected = true;
 			else foundNonSelected = true;
 		}
 		return !(foundSelected && foundNonSelected);

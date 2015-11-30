@@ -42,7 +42,7 @@ public class PersonFilterSelectedPlan extends AbstractPersonAlgorithm {
 
 		for (int planId = 0; planId < nofPlans; planId++) {
 			Plan plan = person.getPlans().get(planId);
-			if (!plan.isSelected()) {
+			if (!plan.isSelected(plan)) {
 				person.getPlans().remove(planId);
 				planId--;
 				nofPlans--;

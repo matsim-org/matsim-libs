@@ -186,7 +186,7 @@ public class ChoiceSetGenerator implements ShutdownListener {
 				/* Departure time modification */
 				for (Plan planToModify : population.getPersons().get(personId).getPlans()) {
 
-					if (((Leg) planToModify.getPlanElements().get(1)).getMode().equals(mode) && !planToModify.isSelected()) {
+					if (((Leg) planToModify.getPlanElements().get(1)).getMode().equals(mode) && !planToModify.isSelected(planToModify)) {
 
 						//Home departure time + 1h
 						if (planModCounter == 0) {
@@ -262,7 +262,7 @@ public class ChoiceSetGenerator implements ShutdownListener {
 			for (Plan newPlan : population.getPersons().get(personId).getPlans()) {
 				if(personId.toString().equals("1000"))
 					System.out.println();
-				if (!newPlan.isSelected()) {
+				if (!newPlan.isSelected(newPlan)) {
 					count++;
 					Person newPerson = populationFactory.createPerson(Id.createPersonId(personId.toString() + "_" + count));
 					newPerson.addPlan(newPlan);

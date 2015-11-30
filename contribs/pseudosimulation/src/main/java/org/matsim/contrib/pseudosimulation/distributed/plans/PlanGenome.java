@@ -227,7 +227,7 @@ public class PlanGenome implements Plan {
     }
 
     @Override
-    public final boolean isSelected() {
+    public final boolean isSelected(Plan plan) {
         return this.getPerson().getSelectedPlan() == this;
     }
 
@@ -244,7 +244,7 @@ public class PlanGenome implements Plan {
         }
 
         return "[score=" + scoreString + "]" +
-                "[selected=" + this.isSelected() + "]" +
+                "[selected=" + this.isSelected(this) + "]" +
                 "[nof_acts_legs=" + getPlanElements().size() + "]" +
                 "[type=" + this.type + "]" +
                 "[personId=" + personIdString + "]";

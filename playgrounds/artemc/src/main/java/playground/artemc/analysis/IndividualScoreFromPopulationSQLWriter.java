@@ -54,7 +54,7 @@ public class IndividualScoreFromPopulationSQLWriter {
 			}
 
 			for (Plan plan : person.getPlans()) {
-				if (!plan.isSelected()) {
+				if (!plan.isSelected(plan)) {
 					dataMap.get(person.getId().toString()).add(plan.getScore().toString());
 					if (plan.getCustomAttributes().containsKey("toll")) {
 						dataMap.get(person.getId().toString()).add((String) plan.getCustomAttributes().get("toll"));

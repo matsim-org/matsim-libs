@@ -90,7 +90,7 @@ public class LCPlan implements Plan {
 	}
 
 	@Override
-	public final boolean isSelected() {
+	public final boolean isSelected(Plan plan) {
 		return this.getPerson().getSelectedPlan() == this;
 	}
 

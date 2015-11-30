@@ -71,7 +71,7 @@ public class WorkHomeShapeCounter extends AbstractPersonAlgorithm{
 			Plan plan = person.getPlans().get(planId);
 			
 			// search selected plan
-			if (plan.isSelected()) {
+			if (plan.isSelected(plan)) {
 				
 				// do something				
 				for (PlanElement pEOne : plan.getPlanElements()) {

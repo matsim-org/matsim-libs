@@ -64,7 +64,7 @@ public class SlaveScoreStatsCalculator{
                 cntScores++;
 
                 // executed plan?
-                if (plan.isSelected()) {
+                if (plan.isSelected(plan)) {
                     sumExecutedScores += score;
                     nofExecutedScores++;
                 }

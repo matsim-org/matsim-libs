@@ -228,7 +228,7 @@ public class PlansChoiceSetDistributions {
 			}
 			int count =1;
 			for(Plan plan:p.getPlans()){
-				if(plan.isSelected()){
+				if(plan.isSelected(plan)){
 					scoresChoiceSet.set(0, String.valueOf(plan.getScore()));
 				} else {
 					scoresChoiceSet.set(count, String.valueOf(plan.getScore()));
@@ -255,7 +255,7 @@ public class PlansChoiceSetDistributions {
 			// strictly forcing leg for selected plan at 0th position.
 			int count =1;
 			for(Plan plan:p.getPlans()){
-				if (plan.isSelected()){
+				if (plan.isSelected(plan)){
 					PlanElement pe = plan.getPlanElements().get(1);
 					String leg = ((Leg) pe).getMode();
 					legsChoiceSet.set(0, leg);

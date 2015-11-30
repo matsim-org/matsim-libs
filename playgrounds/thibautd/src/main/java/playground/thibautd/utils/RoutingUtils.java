@@ -141,7 +141,7 @@ public class RoutingUtils {
         }
 
         @Override
-		public boolean isSelected() {
+		public boolean isSelected(Plan plan) {
 			throw new UnsupportedOperationException();
 		}
 

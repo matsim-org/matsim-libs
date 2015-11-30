@@ -229,7 +229,7 @@ public class TestEmissionPricing {
 		// check not selected plans - score should be worse if link 39 is used
 		boolean plan9ex=false;
 		for(Plan p: activeAgent.getPlans()){			
-			if(p.isSelected()==false){
+			if(p.isSelected(p)==false){
 				logger.info("This plan is not selected. It's score is " + p.getScore());
 				for(PlanElement pe: p.getPlanElements()){
 					if(pe instanceof Leg){
