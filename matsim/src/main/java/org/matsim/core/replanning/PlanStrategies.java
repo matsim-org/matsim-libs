@@ -24,11 +24,11 @@ package org.matsim.core.replanning;
 
 class PlanStrategies {
 
-    static boolean isOnlySelector(PlanStrategy planStrategy) {
-        if (planStrategy instanceof PlanStrategyImpl) {
-            return ((PlanStrategyImpl) planStrategy).getNumberOfStrategyModules() == 0;
-        }
-        return false;
-    }
+	static boolean isOnlySelector(PlanStrategy planStrategy) {
+		if (planStrategy instanceof PlanStrategyImpl) {
+			return ((PlanStrategyImpl) planStrategy).getNumberOfStrategyModules() == 0;
+		}
+		return false;
+	}
 
 }
