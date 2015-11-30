@@ -1,5 +1,8 @@
 package playground.tschlenther.analysis.modules.taxiTrips;
 
+import java.io.File;
+import java.io.IOException;
+
 import org.apache.log4j.Logger;
 import org.jfree.util.Log;
 import org.matsim.api.core.v01.network.Network;
@@ -31,12 +34,12 @@ public class TaxiAnalysisTest {
 		MatsimNetworkReader netReader = new MatsimNetworkReader(scenario);
 		netReader.readFile(networkFile);
 		Network net = scenario.getNetwork();
-		VspAnalyzer analyzer = new VspAnalyzer(outputDir,eventsFile);
-		analyzer.addAnalysisModule(new TaxiTripsAnalyzer(net));						
-
-		logger.info("----STARTING TO RUN ANALYZER----");
-		analyzer.run();
-		logger.info("VSP-analyzer finished..now prepare to run old version of jbischoff to compare");
+//		VspAnalyzer analyzer = new VspAnalyzer(outputDir,eventsFile);
+//		analyzer.addAnalysisModule(new TaxiTripsAnalyzer(net));						
+//
+//		logger.info("----STARTING TO RUN ANALYZER----");
+//		analyzer.run();
+//		logger.info("VSP-analyzer finished..now prepare to run old version of jbischoff to compare");
 		
 		EventsManager manager = EventsUtils.createEventsManager();
 		TaxiCustomerWaitTimeAnalyser tcwta = new TaxiCustomerWaitTimeAnalyser(scenario);
