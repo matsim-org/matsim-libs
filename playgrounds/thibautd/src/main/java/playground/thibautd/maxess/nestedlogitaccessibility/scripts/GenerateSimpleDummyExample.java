@@ -21,6 +21,7 @@ package playground.thibautd.maxess.nestedlogitaccessibility.scripts;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.NetworkWriter;
@@ -33,8 +34,8 @@ import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
-import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacilitiesFactory;
@@ -72,6 +73,9 @@ public class GenerateSimpleDummyExample {
 
 	private static final double RADIUS_CBD = 20 * 1000;
 	private static final int N_FACILITIES = 300;
+
+	private static final double FREESPEED = 70 * 1000 / 3600;
+	private static final double SPEED_PT = 150 * 1000 / 3600;
 
 	public static void main( final String... args ) {
 		final String outputDirectory = args[ 0 ];
@@ -143,7 +147,7 @@ public class GenerateSimpleDummyExample {
 		final List<TransitRouteStop> outboundStops = new ArrayList<>();
 		final List<TransitRouteStop> inboundStops = new ArrayList<>();
 
-		final double arrivalDelay = 500 / ( 50 * 1000 / 3600 );
+		final double arrivalDelay = 500 / SPEED_PT;
 
 		Coord coord = CENTER;
 		double time = 0;
@@ -179,7 +183,7 @@ public class GenerateSimpleDummyExample {
 				outboundStops,
 				"pt" );
 
-		for ( double t = 0; t <= 24 * 3600; t += 3600) {
+		for ( double t = 0; t <= 24 * 3600; t += 600) {
 			inboundRoute.addDeparture(
 					factory.createDeparture(
 							Id.create(
@@ -308,6 +312,14 @@ public class GenerateSimpleDummyExample {
 								newNode,
 								lastNode ) );
 				lastNode = newNode;
+			}
+
+			for ( Link l : net.getLinks().values() ) {
+				l.setFreespeed( FREESPEED );
+				l.setLength(
+						CoordUtils.calcDistance(
+								l.getFromNode().getCoord(),
+								l.getToNode().getCoord() ) );
 			}
 		}
 	}
