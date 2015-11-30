@@ -45,8 +45,8 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
@@ -119,7 +119,7 @@ public class MyControler1 extends Controler {
 		Link link9 = network.getLinks().get(Id.create("9", Link.class));
 		Link link15 = network.getLinks().get(Id.create("15", Link.class));
 		for (int i=0; i<100; i++) {
-			Person p = PersonImpl.createPerson(Id.create(i + 1, Person.class));
+			Person p = PopulationUtils.createPerson(Id.create(i + 1, Person.class));
 
 			try {
 				PlanImpl plan1 = new PlanImpl(p);
@@ -317,7 +317,7 @@ public class MyControler1 extends Controler {
 	}
 
 	private void generatePerson(final int ii, final Link sourceLink, final Link destLink, final Population population){
-		Person p = PersonImpl.createPerson(Id.create(ii, Person.class));
+		Person p = PopulationUtils.createPerson(Id.create(ii, Person.class));
 		PlanImpl plan = new org.matsim.core.population.PlanImpl(p);
 		try {
 			ActivityImpl act1 = plan.createAndAddActivity("h", new Coord(100., 100.));

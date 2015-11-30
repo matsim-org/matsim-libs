@@ -99,10 +99,11 @@ public class CreateAutomatedFDTest {
 	@Parameters
 	public static Collection<Object[]> createFds() {
 		Object[] [] fdData = new Object [][] { 
-			{LinkDynamics.FIFO, TrafficDynamics.queue},
-			{LinkDynamics.FIFO, TrafficDynamics.withHoles}, 
-			{LinkDynamics.PassingQ,TrafficDynamics.queue},
-			{LinkDynamics.PassingQ,TrafficDynamics.withHoles}
+				{LinkDynamics.FIFO, TrafficDynamics.queue},
+				{LinkDynamics.FIFO, TrafficDynamics.withHoles}, 
+				{LinkDynamics.PassingQ,TrafficDynamics.queue},
+				{LinkDynamics.PassingQ,TrafficDynamics.withHoles},
+				{LinkDynamics.SeepageQ,TrafficDynamics.withHoles}
 		};
 		return Arrays.asList(fdData);
 	}
@@ -145,6 +146,13 @@ public class CreateAutomatedFDTest {
 		scenario.getConfig().qsim().setMainModes(Arrays.asList(travelModes));
 		scenario.getConfig().qsim().setEndTime(14*3600);
 		scenario.getConfig().qsim().setLinkDynamics(linkDynamics.name());
+	
+		if(linkDynamics.equals(LinkDynamics.SeepageQ)){
+			scenario.getConfig().qsim().setSeepMode("bike");
+			scenario.getConfig().qsim().setSeepModeStorageFree(false);
+			scenario.getConfig().qsim().setRestrictingSeepage(true);
+		}
+		
 		scenario.getConfig().vspExperimental().setVspDefaultsCheckingLevel( VspDefaultsCheckingLevel.abort );
 		scenario.getConfig().qsim().setTrafficDynamics(trafficDynamics);
 

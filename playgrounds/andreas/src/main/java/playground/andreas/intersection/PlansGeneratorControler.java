@@ -32,8 +32,8 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -159,7 +159,7 @@ public class PlansGeneratorControler extends Controler {
 
 	/** Generates one Person a time */
 	private void generatePerson(final int ii, final Link fromLink, final Link toLink, final Population population) {
-		Person p = PersonImpl.createPerson(Id.create(String.valueOf(ii), Person.class));
+		Person p = PopulationUtils.createPerson(Id.create(String.valueOf(ii), Person.class));
 		PlanImpl plan = new org.matsim.core.population.PlanImpl(p);
 		try {
 			ActivityImpl act1 = plan.createAndAddActivity("h", new Coord(100., 100.));

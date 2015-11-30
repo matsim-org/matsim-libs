@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.flowDynamics;
+package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -44,7 +44,8 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.config.groups.QSimConfigGroup.LinkDynamics;
+import org.matsim.core.config.groups.QSimConfigGroup.VehiclesSource;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
@@ -75,8 +76,7 @@ public class SeepageTest {
 		SimpleNetwork net = new SimpleNetwork();
 		
 		Scenario sc = net.scenario;
-		sc.getConfig().qsim().setUseDefaultVehicles(false);
-
+		sc.getConfig().qsim().setVehiclesSource(VehiclesSource.fromVehiclesData);
 
 		Map<String, VehicleType> modesType = new HashMap<String, VehicleType>();
 		VehicleType car = VehicleUtils.getFactory().createVehicleType(Id.create(TransportMode.car,VehicleType.class));
@@ -157,12 +157,12 @@ public class SeepageTest {
 			config.qsim().setFlowCapFactor(1.0);
 			config.qsim().setStorageCapFactor(1.0);
 			config.qsim().setMainModes(Arrays.asList(TransportMode.car,TransportMode.walk));
-			config.qsim().setLinkDynamics(QSimConfigGroup.LinkDynamics.PassingQ.name());
-
-			config.setParam("seepage", "isSeepageAllowed", "true");
-			config.setParam("seepage", "seepMode", "walk");
-			config.setParam("seepage","isSeepModeStorageFree","false");
-
+			config.qsim().setLinkDynamics(LinkDynamics.SeepageQ.name());
+			
+			config.qsim().setSeepMode("walk");
+			config.qsim().setSeepModeStorageFree(false);
+			config.qsim().setRestrictingSeepage(true);
+			
 			network = (NetworkImpl) scenario.getNetwork();
 			this.network.setCapacityPeriod(Time.parseTime("1:00:00"));
 			double x = -100.0;

@@ -40,7 +40,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scoring.EventsToActivities.ActivityHandler;
@@ -140,7 +139,7 @@ class ScoringFunctionsForPopulation implements ActivityHandler, LegHandler {
 	public void writeExperiencedPlans(String iterationFilename) {
 		Population population = PopulationUtils.createPopulation(scenario.getConfig());
 		for (Entry<Id<Person>, Plan> entry : this.agentRecords.entrySet()) {
-			Person person = PersonImpl.createPerson(entry.getKey());
+			Person person = PopulationUtils.createPerson(entry.getKey());
 			Plan plan = entry.getValue();
 			plan.setScore(getScoringFunctionForAgent(person.getId()).getScore());
 			person.addPlan(plan);

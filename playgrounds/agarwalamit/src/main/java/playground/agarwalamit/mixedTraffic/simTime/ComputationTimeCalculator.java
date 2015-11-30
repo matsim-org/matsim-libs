@@ -66,7 +66,7 @@ public class ComputationTimeCalculator {
 
 		calc.run(LinkDynamics.FIFO.name());
 		calc.run(LinkDynamics.PassingQ.name());
-		calc.run("seepage");
+		calc.run(LinkDynamics.SeepageQ.name());
 	}
 
 	private BufferedWriter writer;
@@ -87,26 +87,18 @@ public class ComputationTimeCalculator {
 
 	private void run (String ld) {
 
-		if(! ld.equals("seepage")){
-
-			Scenario sc = createBasicSceanrio();
-			sc.getConfig().qsim().setLinkDynamics(ld);
-			EventsManager events = EventsUtils.createEventsManager();
-//			events.addHandler(new EventWriterXML(outDir+"/events.xml.gz"));
-			processSceanarios(sc, events);
-
-		} else {
-			outDir = outDir+"seepage_";
-			Scenario sc = createBasicSceanrio();
-			sc.getConfig().qsim().setLinkDynamics(LinkDynamics.PassingQ.name()); // must for seepage
-
-			sc.getConfig().setParam("seepage", "isSeepageAllowed", "true");
-			sc.getConfig().setParam("seepage", "seepMode", "bike");
-			sc.getConfig().setParam("seepage","isSeepModeStorageFree","false");
-
-			EventsManager events = EventsUtils.createEventsManager();
-			processSceanarios(sc, events);
+		Scenario sc = createBasicSceanrio();
+		outDir = outDir+ld+"_";
+		sc.getConfig().qsim().setLinkDynamics(ld);
+		
+		if(ld.equals(LinkDynamics.SeepageQ.name())){
+			sc.getConfig().qsim().setSeepMode("bike");
+			sc.getConfig().qsim().setSeepModeStorageFree(false);
+			sc.getConfig().qsim().setRestrictingSeepage(true);
 		}
+		EventsManager events = EventsUtils.createEventsManager();
+//		events.addHandler(new EventWriterXML(outDir+"/events.xml.gz"));
+		processSceanarios(sc, events);
 	}
 
 	private void processSceanarios(Scenario sc, EventsManager events){

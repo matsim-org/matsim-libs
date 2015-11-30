@@ -28,13 +28,22 @@ import java.util.Map;
 class GeoserverUpdater implements SpatialGridDataExchangeInterface {
 
 	static Logger log = Logger.getLogger(GeoserverUpdater.class);
+	
+	private String crs;
+	private String name;
+	
+	
+	public GeoserverUpdater (String crs, String name) {
+		this.crs = crs;
+		this.name = name;
+	}
 
 	@Override
 	public void setAndProcessSpatialGrids(Map<Modes4Accessibility, SpatialGrid> spatialGrids) {
 		log.info("starting setAndProcessSpatialGrids ...");
 		GeometryFactory fac = new GeometryFactory();
 		SimpleFeatureTypeBuilder b = new SimpleFeatureTypeBuilder();
-		b.setName("accessibilities");
+		b.setName(name);
 		b.setCRS(MGC.getCRS(TransformationFactory.WGS84));
 		b.add("the_geom", Point.class);
 		b.add("x", Double.class);
@@ -48,7 +57,7 @@ class GeoserverUpdater implements SpatialGridDataExchangeInterface {
 		SimpleFeatureBuilder featureBuilder = new SimpleFeatureBuilder(featureType);
 		final SpatialGrid spatialGrid = spatialGrids.get(Modes4Accessibility.freeSpeed);
 		// yy for time being, have to assume that this is always there
-		CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84_SA_Albers, TransformationFactory.WGS84);
+		CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation(this.crs, TransformationFactory.WGS84);
 
 		for(double y = spatialGrid.getYmin(); y <= spatialGrid.getYmax(); y += spatialGrid.getResolution()) {
 			for(double x = spatialGrid.getXmin(); x <= spatialGrid.getXmax(); x += spatialGrid.getResolution()) {
@@ -74,20 +83,20 @@ class GeoserverUpdater implements SpatialGridDataExchangeInterface {
 		try {
 			Map<String,Object> params = new HashMap<>();
 			params.put( "dbtype", "postgis");
-			params.put( "host", "wiki.vsp.tu-berlin.de");
+			params.put( "host", "geo.vsp.tu-berlin.de");
 			params.put( "port", 5432);
 			params.put( "schema", "public");
-			params.put( "database", "vspgeo");
-			params.put( "user", "postgres");
+			params.put( "database", "vspgeodb");
+			params.put( "user", "vsppostgres");
 			params.put( "passwd", "jafs30_A");
 			DataStore dataStore = DataStoreFinder.getDataStore(params);
 			try {
-				dataStore.removeSchema("accessibilities");
+				dataStore.removeSchema(name);
 			} catch (IllegalArgumentException e) {
 				log.warn("Could not remove schema. Perhaps it does not exist. Probably doesn't matter.");
 			}
 			dataStore.createSchema(featureType);
-			SimpleFeatureStore featureStore = (SimpleFeatureStore) dataStore.getFeatureSource("accessibilities");
+			SimpleFeatureStore featureStore = (SimpleFeatureStore) dataStore.getFeatureSource(name);
 			// ---
 			Transaction t = new DefaultTransaction(); // new
 			featureStore.setTransaction(t); // new

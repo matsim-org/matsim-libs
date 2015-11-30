@@ -32,8 +32,8 @@ import org.matsim.core.config.Config;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacilitiesImpl;
@@ -208,12 +208,12 @@ public class PlanAnalyzeSubtoursTest extends MatsimTestCase {
 	}
 
 	private PlanImpl createPlan(NetworkImpl network, String facString) {
-		Person person = PersonImpl.createPerson(Id.create("1000", Person.class));
+		Person person = PopulationUtils.createPerson(Id.create("1000", Person.class));
 		return createPlanFromLinks(network, person, TransportMode.car, facString);
 	}
 
 	private PlanImpl createPlan(ActivityFacilities facilities, String facString) {
-		Person person = PersonImpl.createPerson(Id.create("1000", Person.class));
+		Person person = PopulationUtils.createPerson(Id.create("1000", Person.class));
 		return createPlanFromFacilities((ActivityFacilitiesImpl) facilities, person, TransportMode.car, facString);
 	}
 

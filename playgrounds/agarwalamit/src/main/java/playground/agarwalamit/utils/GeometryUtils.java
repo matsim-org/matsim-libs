@@ -18,13 +18,17 @@
  * *********************************************************************** */
 package playground.agarwalamit.utils;
 
+import java.util.Collection;
 import java.util.Random;
 
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.opengis.feature.simple.SimpleFeature;
 
+import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
 
 /**
@@ -45,5 +49,18 @@ public final class GeometryUtils {
 			p= MGC.xy2Point(x, y);
 		} while (!((Geometry) feature.getDefaultGeometry()).contains(p));
 		return p;
+	}
+	
+	public static boolean isLinkInsideCity(Collection<SimpleFeature> features, Link link) {
+		boolean isLinkInsideMunich = false;
+		GeometryFactory gf = new GeometryFactory();
+		Geometry geo = gf.createPoint(new Coordinate(link.getCoord().getX(), link.getCoord().getY()));
+		for(SimpleFeature sf : features){
+			if ( ((Geometry) sf.getDefaultGeometry()).contains(geo) ) {
+				isLinkInsideMunich = true;
+				break;
+			}
+		}
+		return isLinkInsideMunich;
 	}
 }

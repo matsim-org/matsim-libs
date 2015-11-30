@@ -9,8 +9,8 @@ import java.util.TreeSet;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonUtils;
+import org.matsim.core.population.PopulationUtils;
 
 public class PersonSerializable implements Serializable {
     protected List<PlanSerializable> plans = new ArrayList<>(5);
@@ -41,7 +41,7 @@ public class PersonSerializable implements Serializable {
     private Boolean isEmployed;
 
     public Person getPerson() {
-        Person person = PersonImpl.createPerson(Id.createPersonId(id));
+        Person person = PopulationUtils.createPerson(Id.createPersonId(id));
         PersonUtils.setAge(person, age);
         PersonUtils.setCarAvail(person, carAvail);
 

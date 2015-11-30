@@ -28,6 +28,7 @@ import org.matsim.pt.PtConstants;
 import com.google.inject.name.Names;
 
 import playground.balac.induceddemand.config.ActivityStrategiesConfigGroup;
+import playground.balac.induceddemand.controler.listener.ActivitiesAnalysisListener;
 import playground.balac.induceddemand.strategies.RandomActivitiesSwaperStrategy;
 import playground.balac.induceddemand.strategies.RemoveRandomActivityStrategy;
 import playground.balac.induceddemand.strategies.insertactivity.InsertRandomActivityWithLocationChoiceStrategy;
@@ -79,6 +80,7 @@ public class ZurichScenarioControler {
 
 		initializeLocationChoice( controler );
 		initializeActivityStrategies(scenario, controler);
+		controler.addControlerListener(new ActivitiesAnalysisListener(scenario));
 		// We use a specific scoring function, that uses individual preferences
 		// for activity durations.
 		controler.setScoringFunctionFactory(

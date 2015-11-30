@@ -19,7 +19,14 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.framework.population;
 
+import java.util.List;
+import java.util.Map;
+
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.PlanImpl;
 
 /**
@@ -28,12 +35,14 @@ import org.matsim.core.population.PlanImpl;
  *
  * @author thibautd
  */
-final class PlanWithCachedJointPlan extends PlanImpl {
+public final class PlanWithCachedJointPlan implements Plan {
 	// should be small, because we use linear search: the idea is to be much faster
 	// then a HashMap lookup, which runs in constant time but is relatively slow.
 	// For a given state of the plans, there are typically two joint plans to remember:
 	// the "weak" and "strong" plans. Hence the size.
 	private static final int SIZE = 3;
+	
+	private Plan delegate ;
 
 	private final JointPlan[] jointPlans = new JointPlan[ SIZE ];
 	private final int[] lastAccess = new int[ SIZE ];
@@ -42,7 +51,7 @@ final class PlanWithCachedJointPlan extends PlanImpl {
 	private int accessCount = 0;
 
 	public PlanWithCachedJointPlan( final Person person ) {
-		super( person );
+		delegate = new PlanImpl( person ) ;
 
 		for ( int i=0; i < SIZE; i++ ) {
 			lastAccess[ i ] = -1;
@@ -115,5 +124,69 @@ final class PlanWithCachedJointPlan extends PlanImpl {
 			}
 		}
 	}
+
+	@Override
+	public void setScore(Double score) {
+		this.delegate.setScore(score);
+	}
+
+	@Override
+	public Double getScore() {
+		return this.delegate.getScore();
+	}
+
+	@Override
+	public boolean isSelected() {
+		return this.delegate.isSelected();
+//		return this.getPerson().getSelectedPlan() == this;
+		// yy cannot delegate this since getSelectedPlan returns this plan here, but inside the delegate "this" returns the delegate.
+	}
+
+	@Override
+	public List<PlanElement> getPlanElements() {
+		return this.delegate.getPlanElements();
+	}
+
+	@Override
+	public void addLeg(Leg leg) {
+		this.delegate.addLeg(leg);
+	}
+
+	@Override
+	public void addActivity(Activity act) {
+		this.delegate.addActivity(act);
+	}
+
+	@Override
+	public Map<String, Object> getCustomAttributes() {
+		return this.delegate.getCustomAttributes();
+	}
+
+	@Override
+	public String getType() {
+		return this.delegate.getType();
+	}
+
+	@Override
+	public void setType(String type) {
+		this.delegate.setType(type);
+	}
+
+	@Override
+	public Person getPerson() {
+		return this.delegate.getPerson();
+	}
+
+	@Override
+	public void setPerson(Person person) {
+		this.delegate.setPerson(person);
+	}
+	
+	public final void copyFrom( Plan in) {
+		// yy we really need a more systematic way for plans copying.  kai, nov15
+		((PlanImpl) this.delegate).copyFrom(in);
+	}
+	
+	
 }
 

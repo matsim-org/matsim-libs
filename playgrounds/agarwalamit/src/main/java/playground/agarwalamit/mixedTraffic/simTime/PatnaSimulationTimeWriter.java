@@ -42,7 +42,9 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
@@ -131,11 +133,10 @@ public class PatnaSimulationTimeWriter {
 		config.qsim().setLinkDynamics(ld.toString());
 		config.qsim().setTrafficDynamics(td);
 
-		if(ld.toString().equals("SeepageQ")) {// probably this will not work but following commented line will work after merging seepageInLinkDynamics branch.
-//		if(ld.equals(QSimConfigGroup.LinkDynamics.SeepageQ)) {
-			config.setParam("seepage", "seepMode","bike");
-			config.setParam("seepage", "isSeepModeStorageFree", "false");
-			config.setParam("seepage", "isRestrictingNumberOfSeepMode", "true");
+		if(ld.equals(QSimConfigGroup.LinkDynamics.SeepageQ)) {
+			config.qsim().setSeepMode("bike");
+			config.qsim().setSeepModeStorageFree(false);
+			config.qsim().setRestrictingSeepage(true);
 		}
 
 		config.controler().setCreateGraphs(false);
@@ -148,12 +149,17 @@ public class PatnaSimulationTimeWriter {
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		controler.setDumpDataAtEnd(false);
 
+		final RandomizingTimeDistanceTravelDisutility.Builder builder = new RandomizingTimeDistanceTravelDisutility.Builder("bike");
+		
 		controler.addOverridingModule(new AbstractModule() {
 			// following must be added in order to get travel time and travel disutility in the router for modes other than car
 			@Override
 			public void install() {
-				addTravelTimeBinding("bike").to(networkTravelTime());
-				addTravelDisutilityFactoryBinding("bike").to(carTravelDisutilityFactoryKey());
+				addTravelTimeBinding("bike").to(FreeSpeedTravelTime.class);
+				addTravelDisutilityFactoryBinding("bike").toInstance(builder);
+				// alternatively test -->  addTravelDisutilityFactoryBinding("bike").to(carTravelDisutilityFactoryKey()); after removing builder injection line.
+//				addTravelTimeBinding("bike").to(networkTravelTime());
+//				addTravelDisutilityFactoryBinding("bike").to(carTravelDisutilityFactoryKey());
 				addTravelTimeBinding("motorbike").to(networkTravelTime());
 				addTravelDisutilityFactoryBinding("motorbike").to(carTravelDisutilityFactoryKey());
 			}

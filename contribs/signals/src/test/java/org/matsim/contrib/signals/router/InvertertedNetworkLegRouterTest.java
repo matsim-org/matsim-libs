@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility.Builder;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
@@ -63,7 +63,7 @@ public class InvertertedNetworkLegRouterTest {
 		TravelDisutilityFactory tc = new Builder( TransportMode.car );
 		LeastCostPathCalculatorFactory lcpFactory = new DijkstraFactory();
 
-		Person person = PersonImpl.createPerson(Id.create(1, Person.class));
+		Person person = PopulationUtils.createPerson(Id.create(1, Person.class));
 		Leg leg = new LegImpl(TransportMode.car);
 		Activity fromAct = new ActivityImpl("h", Id.create("12", Link.class));
 		Activity toAct = new ActivityImpl("h", Id.create("78", Link.class));

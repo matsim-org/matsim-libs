@@ -66,11 +66,10 @@ public class EvacPatnaControler {
 		if(congestionPricing) config.controler().setOutputDirectory(config.controler().getOutputDirectory()+"/congestionPricing/");
 		
 		if(isUsingSeepage){	
-			config.setParam("seepage", "isSeepageAllowed", "true");
-			config.setParam("seepage", "seepMode", "bike");
-			config.setParam("seepage", "isSeepModeStorageFree", "false");
-			
-			config.qsim().setLinkDynamics(LinkDynamics.PassingQ.toString()); // for seepage, link dynamics must be passingQ.
+			config.qsim().setLinkDynamics(LinkDynamics.SeepageQ.toString());
+			config.qsim().setSeepMode("bike");
+			config.qsim().setSeepModeStorageFree(false);
+			config.qsim().setRestrictingSeepage(true);
 			
 			String outputDir = config.controler().getOutputDirectory()+"/evac_seepage/";
 			config.controler().setOutputDirectory(outputDir);

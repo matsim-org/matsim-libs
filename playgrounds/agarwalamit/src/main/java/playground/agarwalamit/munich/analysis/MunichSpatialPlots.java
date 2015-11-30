@@ -347,14 +347,12 @@ public class MunichSpatialPlots {
 		SpatialInterpolation plot = new SpatialInterpolation(inputs,runDir+"/analysis/spatialPlots/"+noOfBins+"timeBins/");
 
 		EmissionLinkAnalyzer emsLnkAna = new EmissionLinkAnalyzer(LoadMyScenarios.getSimulationEndTime(inputs.initialCaseConfig), inputs.initialCaseEmissionEventsFile, noOfBins);
-		emsLnkAna.init();
 		emsLnkAna.preProcessData();
 		emsLnkAna.postProcessData();
 		linkEmissionsBau = emsLnkAna.getLink2TotalEmissions();
 
 		if(inputs.isComparing){
 			emsLnkAna = new EmissionLinkAnalyzer(LoadMyScenarios.getSimulationEndTime(inputs.compareToCaseConfig), inputs.compareToCaseEmissionEventsFile, noOfBins);
-			emsLnkAna.init();
 			emsLnkAna.preProcessData();
 			emsLnkAna.postProcessData();
 			linkEmissionsPolicy = emsLnkAna.getLink2TotalEmissions();

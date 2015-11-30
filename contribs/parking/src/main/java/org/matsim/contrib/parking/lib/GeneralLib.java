@@ -753,7 +753,7 @@ public class GeneralLib {
 	 * @return
 	 */
 	public static Person copyPerson(Person person) {
-		Person newPerson = PersonImpl.createPerson(person.getId());
+		Person newPerson = PopulationUtils.createPerson(person.getId());
 		PlanImpl newPlan = new PlanImpl();
 		newPlan.copyFrom(person.getSelectedPlan());
 		newPlan.setPerson(newPerson);

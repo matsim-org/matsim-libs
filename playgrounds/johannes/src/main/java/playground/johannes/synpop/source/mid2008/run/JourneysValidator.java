@@ -20,7 +20,7 @@
 package playground.johannes.synpop.source.mid2008.run;
 
 import org.apache.log4j.Logger;
-import playground.johannes.synpop.data.Episode;
+import playground.johannes.gsv.popsim.ReweightJourneys;
 import playground.johannes.synpop.data.Factory;
 import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.data.PlainFactory;
@@ -30,7 +30,6 @@ import playground.johannes.synpop.processing.TaskRunner;
 import playground.johannes.synpop.processing.ValidateNoPlans;
 import playground.johannes.synpop.source.mid2008.processing.*;
 
-import java.util.Collection;
 import java.util.Set;
 
 /**
@@ -55,7 +54,7 @@ public class JourneysValidator {
         TaskRunner.run(new VacationsTypeTask(), persons);
 
         logger.info("Adjusting weights...");
-//        new ReweightJourneys().apply(persons);
+        new ReweightJourneys().apply(persons);
         TaskRunner.run(new AdjustJourneyWeight(), persons);
 
         logger.info("Adding return episodes...");
@@ -64,16 +63,5 @@ public class JourneysValidator {
         logger.info("Writing validated population...");
         PopulationIO.writeToXML(args[1], persons);
         logger.info("Done.");
-    }
-
-    private static int countActivities(Collection<? extends Person> persons) {
-        int cnt = 0;
-        for (Person p : persons) {
-            for (Episode e : p.getEpisodes()) {
-                cnt += e.getActivities().size();
-            }
-        }
-
-        return cnt;
     }
 }

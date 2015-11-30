@@ -48,6 +48,7 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -97,7 +98,7 @@ public class HerbiePlanBasedLegScoringFunctionTest {
 	}
 
 	private static Plan getCarPlan() {
-		PersonImpl person = (PersonImpl) PersonImpl.createPerson(Id.create("jojo", Person.class));
+		PersonImpl person = (PersonImpl) PopulationUtils.createPerson(Id.create("jojo", Person.class));
 		//Desires desires = person.createDesires( "bwarf" );
 		//desires.putActivityDuration( "h" , 12 * 3600 );
 		//desires.putActivityDuration( "w" , 12 * 3600 );
@@ -134,7 +135,7 @@ public class HerbiePlanBasedLegScoringFunctionTest {
 	}
 
 	private static Plan getPtPlanNoTransfer() {
-		PersonImpl person = (PersonImpl) PersonImpl.createPerson(Id.create("jojo", Person.class));
+		PersonImpl person = (PersonImpl) PopulationUtils.createPerson(Id.create("jojo", Person.class));
 		//Desires desires = person.createDesires( "bwarf" );
 		//desires.putActivityDuration( "h" , 12 * 3600 );
 		//desires.putActivityDuration( "w" , 12 * 3600 );
@@ -169,7 +170,7 @@ public class HerbiePlanBasedLegScoringFunctionTest {
 	}
 
 	private static Plan getPtPlanTransfer() {
-		PersonImpl person = (PersonImpl) PersonImpl.createPerson(Id.create("jojo", Person.class));
+		PersonImpl person = (PersonImpl) PopulationUtils.createPerson(Id.create("jojo", Person.class));
 		//Desires desires = person.createDesires( "bwarf" );
 //		desires.putActivityDuration( "h" , 12 * 3600 );
 //		desires.putActivityDuration( "w" , 12 * 3600 );
@@ -219,7 +220,7 @@ public class HerbiePlanBasedLegScoringFunctionTest {
 	}
 
 	private static Plan getWalkPlan() {
-		PersonImpl person = (PersonImpl) PersonImpl.createPerson(Id.create("jojo", Person.class));
+		PersonImpl person = (PersonImpl) PopulationUtils.createPerson(Id.create("jojo", Person.class));
 		//Desires desires = person.createDesires( "bwarf" );
 		//desires.putActivityDuration( "h" , 12 * 3600 );
 		//desires.putActivityDuration( "w" , 12 * 3600 );

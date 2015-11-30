@@ -36,7 +36,9 @@ import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.config.groups.QSimConfigGroup.LinkDynamics;
 import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
 import org.matsim.core.config.groups.QSimConfigGroup.VehicleBehavior;
 import org.matsim.core.gbl.Gbl;
@@ -44,11 +46,9 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.lanes.data.v20.Lanes;
 import org.matsim.vehicles.Vehicle;
 
 import javax.inject.Inject;
@@ -126,7 +126,8 @@ public class QNetsimEngine implements MobsimEngine {
 	public QNetsimEngine(final QSim sim, NetsimNetworkFactory netsimNetworkFactory ) {
 		this.qsim = sim;
 
-		final QSimConfigGroup qsimConfigGroup = sim.getScenario().getConfig().qsim();
+		final Config config = sim.getScenario().getConfig();
+		final QSimConfigGroup qsimConfigGroup = config.qsim();
 		this.stucktimeCache = qsimConfigGroup.getStuckTime();
 		this.usingThreadpool = qsimConfigGroup.isUsingThreadpool() ;
 
@@ -157,13 +158,31 @@ public class QNetsimEngine implements MobsimEngine {
 					+ qsimConfigGroup.getTrafficDynamics() ) ;
 		}
 
+		if(QueueWithBuffer.HOLES && config.getModule("WITH_HOLE")!=null){
+			QueueWithBuffer.hole_speed = Double.valueOf(config.getParam("WITH_HOLE", "HOLE_SPEED"));
+			if (QueueWithBuffer.hole_speed!=15) {
+				log.warn("Hole speed is set to "+QueueWithBuffer.hole_speed+". Default hardcoded value is 15.");
+			}
+		}
+		
+		QueueWithBuffer.fastCapacityUpdate = qSimConfigGroup.isUsingFastCapacityUpdate() ;
+		
+		if(qSimConfigGroup.getLinkDynamics().equals(LinkDynamics.SeepageQ)){
+			QueueWithBuffer.isSeepageAllowed = true;
+			QueueWithBuffer.seepMode = qSimConfigGroup.getSeepMode();
+			QueueWithBuffer.isSeepModeStorageFree = qSimConfigGroup.isSeepModeStorageFree();
+			log.info("Seepage is allowed. Seep mode is "+QueueWithBuffer.seepMode+".");
+			if(QueueWithBuffer.isSeepModeStorageFree) log.warn("Seep mode "+QueueWithBuffer.seepMode+" do not take storage space thus only considered for flow capacities.");
+			QueueWithBuffer.isRestrictingSeepage = qSimConfigGroup.isRestrictingSeepage();
+		}
+		
 		if ( QSimConfigGroup.SnapshotStyle.withHoles.equals( qsimConfigGroup.getSnapshotStyle() ) ) {
 			QueueWithBuffer.VIS_HOLES = true ;
 		}
 
 		// the following is so confused because I can't separate it out, the reason being that ctor calls need to be the 
 		// first in ctors calling each other.  kai, feb'12
-		if (sim.getScenario().getConfig().qsim().isUseLanes()) {
+		if (config.qsim().isUseLanes()) {
 			log.info("Lanes enabled...");
 			if ( netsimNetworkFactory != null ) {
 				throw new RuntimeException("both `lanes' and `netsimNetworkFactory' are defined; don't know what that means; aborting") ;
@@ -174,7 +193,7 @@ public class QNetsimEngine implements MobsimEngine {
 							new QLanesNetworkFactory(new DefaultQNetworkFactory(), sim.getScenario().getLanes()));
 		} else if ( netsimNetworkFactory != null ){
 			network = new QNetwork( sim.getScenario().getNetwork(), netsimNetworkFactory ) ;
-		} else if ( qsimConfigGroup.getLinkDynamics() == QSimConfigGroup.LinkDynamics.PassingQ) {
+		} else if ( qsimConfigGroup.getLinkDynamics() == QSimConfigGroup.LinkDynamics.PassingQ  || qsimConfigGroup.getLinkDynamics() == QSimConfigGroup.LinkDynamics.SeepageQ ) {
 			network = new QNetwork(sim.getScenario().getNetwork(), new NetsimNetworkFactory() {
 				@Override
 				public QLinkImpl createNetsimLink(final Link link, final QNetwork network2, final QNode toQueueNode) {
@@ -218,9 +237,11 @@ public class QNetsimEngine implements MobsimEngine {
 		final SnapshotStyle snapshotStyle = scenario.getConfig().qsim().getSnapshotStyle();
 		switch( snapshotStyle ) {
 		case queue:
+			return new QueueAgentSnapshotInfoBuilder(scenario, this.network.getAgentSnapshotInfoFactory());
 		case withHoles:
 			// the difference is not in the spacing, thus cannot be differentiated by using different classes.  kai, sep'14
-			return new QueueAgentSnapshotInfoBuilder(scenario, this.network.getAgentSnapshotInfoFactory());
+			// ??? kai, nov'15
+			return new WithHolesAgentSnapshotInfoBuilder(scenario, this.network.getAgentSnapshotInfoFactory());
 		case equiDist:
 			return new EquiDistAgentSnapshotInfoBuilder(scenario, this.network.getAgentSnapshotInfoFactory());
 		default:

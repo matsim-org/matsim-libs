@@ -139,7 +139,7 @@ public class Fcd {
 			
 			if(lastEvent == null){
 				lastEvent = currentEvent;
-				currentPerson = PersonImpl.createPerson(Id.create(numberOfPlans + "-" + currentEvent.getVehId().toString(), Person.class));
+				currentPerson = PopulationUtils.createPerson(Id.create(numberOfPlans + "-" + currentEvent.getVehId().toString(), Person.class));
 				pop.addPerson(currentPerson);
 				numberOfPlans++;
 				currentPerson.addPlan(new PlanImpl());
@@ -154,7 +154,7 @@ public class Fcd {
 				
 			} else {
 				// different one, new person
-				currentPerson = PersonImpl.createPerson(Id.create(numberOfPlans + "-" + currentEvent.getVehId().toString(), Person.class));
+				currentPerson = PopulationUtils.createPerson(Id.create(numberOfPlans + "-" + currentEvent.getVehId().toString(), Person.class));
 				pop.addPerson(currentPerson);
 				numberOfPlans++;
 				currentPerson.addPlan(new PlanImpl());
@@ -207,7 +207,7 @@ public class Fcd {
 			
 			if(lastEvent == null){
 				lastEvent = currentEvent;
-				currentPerson = PersonImpl.createPerson(Id.create(numberOfPlans + "-" + currentEvent.getVehId().toString(), Person.class));
+				currentPerson = PopulationUtils.createPerson(Id.create(numberOfPlans + "-" + currentEvent.getVehId().toString(), Person.class));
 				pop.addPerson(currentPerson);
 				numberOfPlans++;
 				currentPerson.addPlan(new PlanImpl());
@@ -224,7 +224,7 @@ public class Fcd {
 				
 			} else {
 				// different one, new person
-				currentPerson = PersonImpl.createPerson(Id.create(numberOfPlans + "-" + currentEvent.getVehId().toString(), Person.class));
+				currentPerson = PopulationUtils.createPerson(Id.create(numberOfPlans + "-" + currentEvent.getVehId().toString(), Person.class));
 				pop.addPerson(currentPerson);
 				numberOfPlans++;
 				currentPerson.addPlan(new PlanImpl());

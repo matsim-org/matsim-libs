@@ -18,11 +18,14 @@
  * *********************************************************************** */
 package playground.thibautd.maxess.nestedlogitaccessibility.framework;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
+
+import java.util.Map;
 
 /**
  * @author thibautd
  */
 public interface ChoiceSetIdentifier<N extends Enum<N>> {
-	NestedChoiceSet<N> identifyChoiceSet( Person p );
+	Map<String, NestedChoiceSet<N>> identifyChoiceSet( Person p );
 }

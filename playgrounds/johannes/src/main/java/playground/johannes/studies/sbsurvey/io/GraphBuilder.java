@@ -39,8 +39,8 @@ import org.matsim.contrib.socnetgen.sna.snowball.SampledVertexDecorator;
 import org.matsim.contrib.socnetgen.sna.snowball.io.SampledGraphProjMLWriter;
 import org.matsim.contrib.socnetgen.sna.snowball.spatial.SpatialSampledGraphProjectionBuilder;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonUtils;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import playground.johannes.studies.sbsurvey.io.AlterTableReader.VertexRecord;
@@ -202,7 +202,7 @@ public class GraphBuilder {
 	}
 	
 	private SocialPerson createPerson(VertexRecord record, SQLDumpReader sqlData) {
-		Person matsimPerson = PersonImpl.createPerson(Id.create(record.id, Person.class));
+		Person matsimPerson = PopulationUtils.createPerson(Id.create(record.id, Person.class));
 		SocialPerson person = new SocialPerson(matsimPerson);
 		
 		int age;

@@ -32,8 +32,8 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.contrib.socnetsim.framework.cliques.Clique;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonUtils;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Counter;
 import playground.thibautd.householdsfromcensus.CliquesWriter;
@@ -97,7 +97,7 @@ public class GenerateHomeWorkPlansForJointTrips {
 			final boolean isDriver = i % 2 == 0;
 			final String mode = isDriver ? TransportMode.car : TransportMode.pt;
 
-			Person person = PersonImpl.createPerson(ids.next());
+			Person person = PopulationUtils.createPerson(ids.next());
 			if (!isDriver) PersonUtils.setCarAvail(person, "never");
 			persons.add( person );
 
