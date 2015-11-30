@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * RunEmissionToolOffline.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,40 +16,40 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package tutorial.programming.example21tutorialTUBclass.leastCostPath;
 
-import org.matsim.api.core.v01.Scenario;
+package tutorial.programming.planStrategyForRemoval;
+
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
-import org.matsim.core.scenario.ScenarioUtils;
 
 /**
- * @author jbischoff
- *
- *
- */
-public class RunLeastCostPathCalculatorExample {
-	public static void main(String[] args) {
-		Config config = ConfigUtils.loadConfig("examples/equil/config.xml");
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
-		config.controler().setLastIteration(0);
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-		Controler controler = new Controler(scenario);
+* @author ikaddoura
+*/
+public class RunPlanStrategyForRemovalExample {
 
-		controler.addOverridingModule(new AbstractModule() {
+	private static final String SELECTOR_NAME = "selectorName";
+
+	public static void main(String[] args) {
+		
+		Config config = ConfigUtils.createConfig();	
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controler().setLastIteration(1);
+		Controler controler = new Controler(config);
+
+		controler.addOverridingModule(new AbstractModule(){
+			
 			@Override
 			public void install() {
-				bindLeastCostPathCalculatorFactory().to(MatsimClassLeastCostPathCalculatorFactory.class);	
+				this.addPlanSelectorForRemovalBinding(SELECTOR_NAME).toProvider(MyExpBetaPlanChangerForRemoval.class);
 			}
-		}
-
-
-				);
-
+		});
+		
 		controler.run();
+
 	}
 
 }
+

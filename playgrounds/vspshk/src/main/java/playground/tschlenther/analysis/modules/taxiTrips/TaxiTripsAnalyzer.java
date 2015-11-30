@@ -22,6 +22,7 @@ public class TaxiTripsAnalyzer extends AbstractAnalysisModule {
 	
 	TaxiCustomerWaitHandler customerHandler;
 	TaxiOperatorStatsHandler operatorHandler;
+	V2OperatorHandler v2operatorHandler;
 	
 	/**
 	 * @param name
@@ -30,13 +31,15 @@ public class TaxiTripsAnalyzer extends AbstractAnalysisModule {
 		super(TaxiTripsAnalyzer.class.getSimpleName());
 		customerHandler = new TaxiCustomerWaitHandler();
 		operatorHandler = new TaxiOperatorStatsHandler(network);
+		v2operatorHandler = new V2OperatorHandler(network);
 	}
 
 	@Override
 	public List<EventHandler> getEventHandler() {
 		List<EventHandler> l = new ArrayList<EventHandler>();
 		l.add(customerHandler);
-		l.add(operatorHandler);
+//		l.add(operatorHandler);
+		l.add(v2operatorHandler);
 		return l;
 	}
 
@@ -56,9 +59,13 @@ public class TaxiTripsAnalyzer extends AbstractAnalysisModule {
 		log.info("writing taxi customer stats to " + actualOutput);
 		this.customerHandler.writeCustomerStats(actualOutput);
 		
-		actualOutput = outputFolder + "/operatorStats";
-		log.info("writing operator stats to " + actualOutput);
-		this.operatorHandler.writeTravelDistanceStatsToFiles(actualOutput);
+//		actualOutput = outputFolder + "/operatorStats";
+//		log.info("writing operator stats to " + actualOutput);
+//		this.operatorHandler.writeTravelDistanceStatsToFiles(actualOutput);
+		
+		actualOutput = outputFolder + "/V2operatorStats";
+		log.info("writing V2operator stats to " + actualOutput);
+		this.v2operatorHandler.writeTravelDistanceStatsToFiles(actualOutput);
 		
 		log.info("TaxiTripsAnalyzer finished writing output to " + outputFolder);
 

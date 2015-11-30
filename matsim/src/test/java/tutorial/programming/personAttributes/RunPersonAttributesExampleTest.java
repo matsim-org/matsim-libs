@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * RunEmissionToolOffline.java
+ * RunPersonAttributesExample.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,40 +17,24 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package tutorial.programming.example21tutorialTUBclass.leastCostPath;
-
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
-import org.matsim.core.scenario.ScenarioUtils;
 
 /**
- * @author jbischoff
- *
- *
+ * 
  */
-public class RunLeastCostPathCalculatorExample {
-	public static void main(String[] args) {
-		Config config = ConfigUtils.loadConfig("examples/equil/config.xml");
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
-		config.controler().setLastIteration(0);
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-		Controler controler = new Controler(scenario);
+package tutorial.programming.personAttributes;
 
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				bindLeastCostPathCalculatorFactory().to(MatsimClassLeastCostPathCalculatorFactory.class);	
-			}
-		}
+import org.junit.Assert;
+import org.junit.Rule;
+import org.junit.Test;
+import org.matsim.testcases.MatsimTestUtils;
 
+public class RunPersonAttributesExampleTest {
 
-				);
+	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
 
-		controler.run();
+	@Test
+	public void test(){
+		RunPersonAttributesExample.main(null);
 	}
-
+	
 }
