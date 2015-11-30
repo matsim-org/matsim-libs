@@ -30,7 +30,10 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.ConfigWriter;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacilities;
@@ -45,6 +48,7 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.pt.utils.CreatePseudoNetwork;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 import playground.thibautd.utils.MoreIOUtils;
@@ -62,7 +66,7 @@ public class GenerateSimpleDummyExample {
 	private static final double STEP = 1000;
 	private static final int N_RADII = 60;
 
-	private static final int SIZE_SUBPOP = 100;
+	private static final int SIZE_SUBPOP = 500;
 	private static final double CENTER_POP = 40 * 1000;
 	private static final double RADIUS_POP = 10 * 1000;
 
@@ -81,15 +85,24 @@ public class GenerateSimpleDummyExample {
 			generateFacilities( scenario );
 			generatePT( scenario );
 
+			final Config config = ConfigUtils.createConfig();
 			new NetworkWriter( scenario.getNetwork() ).write( outputDirectory + "/network.xml.gz" );
+			config.network().setInputFile( outputDirectory + "/network.xml.gz" );
 
-			new PopulationWriter( scenario.getPopulation() , scenario.getNetwork() ).write( outputDirectory+"/population.xml.gz" );
+			new PopulationWriter( scenario.getPopulation() , scenario.getNetwork() ).write( outputDirectory + "/population.xml.gz" );
+			config.plans().setInputFile( outputDirectory + "/population.xml.gz" );
 			new ObjectAttributesXmlWriter( scenario.getPopulation().getPersonAttributes() ).writeFile( outputDirectory + "/personAttributes.xml.gz" );
+			config.plans().setInputPersonAttributeFile( outputDirectory + "/personAttributes.xml.gz" );
 
-			new FacilitiesWriter( scenario.getActivityFacilities() ).write( outputDirectory+"/facilities.xml.gz" );
+			new FacilitiesWriter( scenario.getActivityFacilities() ).write( outputDirectory + "/facilities.xml.gz" );
+			config.facilities().setInputFile( outputDirectory + "/facilities.xml.gz" );
 
-			new TransitScheduleWriter( scenario.getTransitSchedule() ).writeFile( outputDirectory+"/pt_schedule.xml.gz" );
-			// No simulation: should not need a vehicles file
+			new TransitScheduleWriter( scenario.getTransitSchedule() ).writeFile( outputDirectory + "/pt_schedule.xml.gz" );
+			config.transit().setTransitScheduleFile( outputDirectory + "/pt_schedule.xml.gz" );
+			config.transit().setUseTransit( true );
+			// No simulation: do not need a vehicles file
+
+			new ConfigWriter( config ).write( outputDirectory+"/config.xml.gz" );
 		}
 		finally {
 			MoreIOUtils.closeOutputDirLogging();
@@ -132,21 +145,23 @@ public class GenerateSimpleDummyExample {
 
 		final double arrivalDelay = 500 / ( 50 * 1000 / 3600 );
 
-		Coord lastCoord = CENTER;
+		Coord coord = CENTER;
+		double time = 0;
 		for ( double d = 0; d < RADIUS; d += 500 ) {
-			final Coord newCoord =
-					new Coord(
-						lastCoord.getX() + xStep,
-						lastCoord.getY() + yStep );
 			final TransitStopFacility stop =
 					factory.createTransitStopFacility(
 						Id.create( "" + d, TransitStopFacility.class ),
-						newCoord,
+						coord,
 						false );
 			schedule.addStopFacility( stop );
 
-			outboundStops.add( factory.createTransitRouteStop( stop, arrivalDelay, 0 ) );
-			inboundStops.add( 0, factory.createTransitRouteStop( stop, arrivalDelay, 0 ) );
+			outboundStops.add( factory.createTransitRouteStop( stop, time, time ) );
+			inboundStops.add( 0, factory.createTransitRouteStop( stop, time, time ) );
+			time += arrivalDelay;
+
+			coord =	new Coord(
+						coord.getX() + xStep,
+						coord.getY() + yStep );
 		}
 
 		final TransitRoute inboundRoute = factory.createTransitRoute(
@@ -182,6 +197,11 @@ public class GenerateSimpleDummyExample {
 		line.addRoute( inboundRoute );
 		line.addRoute( outboundRoute );
 		schedule.addTransitLine( line );
+
+		new CreatePseudoNetwork(
+				schedule,
+				scenario.getNetwork(),
+				"pt-" ).createNetwork();
 	}
 
 	private static void generatePopulation( Scenario scenario ) {
@@ -282,6 +302,11 @@ public class GenerateSimpleDummyExample {
 								Id.createLinkId( linkId++ ),
 								lastNode,
 								newNode ) );
+				net.addLink(
+						f.createLink(
+								Id.createLinkId( linkId++ ),
+								newNode,
+								lastNode ) );
 				lastNode = newNode;
 			}
 		}
@@ -314,7 +339,7 @@ public class GenerateSimpleDummyExample {
 
 			att.putAttribute( p.getId().toString(),
 					"abonnement: Halbtax",
-					"no" );
+					"yes" );
 
 			att.putAttribute( p.getId().toString(),
 					"abonnement: GA first class",
