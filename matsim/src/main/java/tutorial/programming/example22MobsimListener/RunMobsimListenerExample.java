@@ -15,11 +15,14 @@ import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
  *
  */
 public class RunMobsimListenerExample {
+	
+	public static String outputDirectory = "mobsim-listener";
 
 	public static void main(String[] args) {
 		Config config = ConfigUtils.createConfig();
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setLastIteration(1);
+		config.controler().setOutputDirectory(outputDirectory);
 		Controler controler = new Controler(config);
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
