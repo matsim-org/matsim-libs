@@ -92,14 +92,6 @@ public class CreateAutomatedFDTest {
 		this.linkDynamics = linkDynamics;
 		this.trafficDynamics = trafficDynamics;
 		this.travelModes = new String [] {"car","bike"};
-		
-		//a temporary fix to deleted old directories after change of method names.
-		String dir1 = "test/output/" + CreateAutomatedFDTest.class.getCanonicalName().replace('.', '/') + "/" +"FDs_carBike/";
-		String dir2 = "test/output/" + CreateAutomatedFDTest.class.getCanonicalName().replace('.', '/') + "/" +"FDs_carTruck/";
-		String dir3 = "test/output/" + CreateAutomatedFDTest.class.getCanonicalName().replace('.', '/') + "/" +"Fds_carBike_fastCapacityUpdate/";
-		if(new File(dir1).exists()) IOUtils.deleteDirectory(new File(dir1));
-		if(new File(dir2).exists()) IOUtils.deleteDirectory(new File(dir2));
-		if(new File(dir3).exists()) IOUtils.deleteDirectory(new File(dir3));
 	}
 
 	private LinkDynamics linkDynamics;
