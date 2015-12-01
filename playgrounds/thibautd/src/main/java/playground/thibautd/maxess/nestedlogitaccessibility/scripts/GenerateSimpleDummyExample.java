@@ -104,7 +104,10 @@ public class GenerateSimpleDummyExample {
 			new TransitScheduleWriter( scenario.getTransitSchedule() ).writeFile( outputDirectory + "/pt_schedule.xml.gz" );
 			config.transit().setTransitScheduleFile( outputDirectory + "/pt_schedule.xml.gz" );
 			config.transit().setUseTransit( true );
-			// No simulation: do not need a vehicles file
+			// set search radius to 1m: will only look at closest station (even if further away than 1m),
+			// making computation faster (city center is dense, but it does not make sense to look at other
+			// stops than the closest given the topology. Default of 1km results in lots of options)
+			config.transitRouter().setSearchRadius( 10 );
 
 			new ConfigWriter( config ).write( outputDirectory+"/config.xml.gz" );
 		}
@@ -132,16 +135,40 @@ public class GenerateSimpleDummyExample {
 	}
 
 	private static void generatePT( Scenario scenario ) {
+		final double angleBigLine = 2 * Math.PI / 3;
+		generateLine(
+				scenario,
+				angleBigLine,
+				RADIUS );
+
+		for ( int i=1; i < N_RADII; i++ ) {
+			generateLine(
+					scenario,
+					angleBigLine + i * (2 * Math.PI / N_RADII),
+					RADIUS_CBD );
+		}
+
+		new CreatePseudoNetwork(
+				scenario.getTransitSchedule(),
+				scenario.getNetwork(),
+				"pt-" ).createNetwork();
+	}
+
+
+	private static void generateLine(
+			final Scenario scenario,
+			final double angle,
+			final double radius ) {
 		final TransitSchedule schedule = scenario.getTransitSchedule();
 		final TransitScheduleFactory factory = schedule.getFactory();
 
-		final double xStep = Math.cos( 2 * Math.PI / 3 ) * 500;
-		final double yStep = Math.sin( 2 * Math.PI / 3 ) * 500;
+		final double xStep = Math.cos( angle ) * 500;
+		final double yStep = Math.sin( angle ) * 500;
 
 		final TransitLine line =
 				factory.createTransitLine(
 						Id.create(
-								"theline",
+								"line "+angle,
 								TransitLine.class ) );
 
 		final List<TransitRouteStop> outboundStops = new ArrayList<>();
@@ -151,10 +178,10 @@ public class GenerateSimpleDummyExample {
 
 		Coord coord = CENTER;
 		double time = 0;
-		for ( double d = 0; d < RADIUS; d += 500 ) {
+		for ( double d = 0; d < radius; d += 500 ) {
 			final TransitStopFacility stop =
 					factory.createTransitStopFacility(
-						Id.create( "" + d, TransitStopFacility.class ),
+						Id.create( angle +"-" + d, TransitStopFacility.class ),
 						coord,
 						false );
 			schedule.addStopFacility( stop );
@@ -201,11 +228,6 @@ public class GenerateSimpleDummyExample {
 		line.addRoute( inboundRoute );
 		line.addRoute( outboundRoute );
 		schedule.addTransitLine( line );
-
-		new CreatePseudoNetwork(
-				schedule,
-				scenario.getNetwork(),
-				"pt-" ).createNetwork();
 	}
 
 	private static void generatePopulation( Scenario scenario ) {
