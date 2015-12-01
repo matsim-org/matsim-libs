@@ -76,6 +76,7 @@ public class GenerateSimpleDummyExample {
 
 	private static final double FREESPEED = 70 * 1000 / 3600;
 	private static final double SPEED_PT = 150 * 1000 / 3600;
+	private static final double PT_STEP = 1000;
 
 	public static void main( final String... args ) {
 		final String outputDirectory = args[ 0 ];
@@ -162,8 +163,8 @@ public class GenerateSimpleDummyExample {
 		final TransitSchedule schedule = scenario.getTransitSchedule();
 		final TransitScheduleFactory factory = schedule.getFactory();
 
-		final double xStep = Math.cos( angle ) * 500;
-		final double yStep = Math.sin( angle ) * 500;
+		final double xStep = Math.cos( angle ) * PT_STEP;
+		final double yStep = Math.sin( angle ) * PT_STEP;
 
 		final TransitLine line =
 				factory.createTransitLine(
@@ -174,11 +175,11 @@ public class GenerateSimpleDummyExample {
 		final List<TransitRouteStop> outboundStops = new ArrayList<>();
 		final List<TransitRouteStop> inboundStops = new ArrayList<>();
 
-		final double arrivalDelay = 500 / SPEED_PT;
+		final double arrivalDelay = PT_STEP / SPEED_PT;
 
 		Coord coord = CENTER;
 		double time = 0;
-		for ( double d = 0; d < radius; d += 500 ) {
+		for ( double d = 0; d < radius; d += PT_STEP ) {
 			final TransitStopFacility stop =
 					factory.createTransitStopFacility(
 						Id.create( angle +"-" + d, TransitStopFacility.class ),
