@@ -24,10 +24,14 @@ package playground.boescpa.lib.tools.spatialCutting;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.*;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkReaderMatsimV1;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import playground.boescpa.lib.tools.NetworkUtils;
 
@@ -114,13 +118,14 @@ public class NetworkCutter {
 				filteredNetwork.addLink(newLink);
 			}
 		}
+		if (pathToOutputNetwork != null) {
+			new NetworkWriter(filteredNetwork).write(pathToOutputNetwork);
+			// test network
+			new NetworkReaderMatsimV1(ScenarioUtils.createScenario(ConfigUtils.createConfig())).parse(pathToOutputNetwork);
+		}
 		log.info(" Filter network... done.");
 		log.info(" Filtered " + filteredNetwork.getNodes().size() + " nodes of originally " + network.getNodes().size() + " nodes");
 		log.info(" Filtered " + filteredNetwork.getLinks().size() + " links of originally " + network.getLinks().size() + " links");
-
-		if (pathToOutputNetwork != null) {
-			new NetworkWriter(filteredNetwork).write(pathToOutputNetwork);
-		}
 
 		Set<Id<Link>> borderLinks = new HashSet<>();
 		for(Link link : filteredNetwork.getLinks().values()) {
