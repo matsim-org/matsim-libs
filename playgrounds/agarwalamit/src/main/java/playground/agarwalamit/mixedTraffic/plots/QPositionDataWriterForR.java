@@ -39,7 +39,9 @@ import playground.agarwalamit.utils.LoadMyScenarios;
  */
 public class QPositionDataWriterForR {
 
-	private static String outputDir ="../../../../repos/shared-svn/projects/mixedTraffic/triangularNetwork/run308/carBike/carBikePassing/";
+	private static String outputDir ="../../../../repos/shared-svn/projects/mixedTraffic/triangularNetwork/"
+//			+ "run313/car_2lanes_60/";
+			+ "run308/carBike/carBikePassing/";
 	private static String eventFile = outputDir+"/events.xml";
 	private static String networkFile=outputDir+"/network.xml";
 	

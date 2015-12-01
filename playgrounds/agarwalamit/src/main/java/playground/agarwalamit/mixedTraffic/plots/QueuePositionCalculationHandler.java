@@ -58,7 +58,7 @@ public class QueuePositionCalculationHandler implements LinkLeaveEventHandler, L
 		LOG.info("Calculating queue position of vehicles in mixed traffic.");
 		this.scenario = scenario;
 		for (Link link : scenario.getNetwork().getLinks().values()) {
-			this.linkid2Container.put(link.getId(), new LinkPersonInfoContainer(link.getId(), link.getLength()));
+			this.linkid2Container.put(link.getId(), new LinkPersonInfoContainer(link.getId()));
 		}
 	}
 
@@ -92,7 +92,6 @@ public class QueuePositionCalculationHandler implements LinkLeaveEventHandler, L
 
 		Queue<Id<Person>> personId2AgentPositions = container.getAgentsOnLink();
 		personId2AgentPositions.offer(personId);
-		updateVehicleOnLinkAndFillToQueue(event.getTime());
 	}
 
 	@Override
@@ -111,47 +110,53 @@ public class QueuePositionCalculationHandler implements LinkLeaveEventHandler, L
 		LeavingPersonInfo leavingPersonInfo = builder.build();
 		container.getPerson2LeavingPersonInfo().put(personId, leavingPersonInfo);
 		
-		this.person2LinkEnterLeaveTimeData.add(container.getPersonInfoChecker(personId));
+		PersonPositionChecker checker = container.getOrCreatePersonPositionChecker(personId);
+		checker.updatePresonLeavingInfo();
+		
+		this.person2LinkEnterLeaveTimeData.add(checker);
 		updateVehicleOnLinkAndFillToQueue(event.getTime());
 		container.getAgentsOnLink().remove(personId);
 
 		if(container.getAgentsInQueue().contains(personId)) {
-			this.personLinkEnterLeaveTimeQueuePositionData.add(container.getPersonInfoChecker(personId));
+			this.personLinkEnterLeaveTimeQueuePositionData.add(checker);
 
 			container.getAgentsInQueue().remove(personId);
-			double availableSpaceSoFar = container.getRemainingLinkSpace();
+			double availableSpaceSoFar = checker.getAvailableLinkSpace();
 			double newAvailableSpace = availableSpaceSoFar + MixedTrafficVehiclesUtils.getCellSize(leavingPersonInfo.getLegMode());
-			container.updateRemainingLinkSpace(newAvailableSpace);
+			checker.updateAvailableLinkSpace(newAvailableSpace);
 		}
 	}
 
-	private void updateVehicleOnLinkAndFillToQueue(final double currentTimeStep) {
-		for (Link link : this.scenario.getNetwork().getLinks().values()) {
-			Id<Link> linkId = link.getId();
+	private void updateVehicleOnLinkAndFillToQueue(final double now) {
+		for ( Id<Link> linkId : this.linkid2Container.keySet() ) {
 			LinkPersonInfoContainer container = this.linkid2Container.get(linkId);
+			
 			for(Id<Person> personId :container.getAgentsOnLink()){
-				for(double time = this.lastEventTimeStep; time <= currentTimeStep; time++){
-					PersonPositionChecker checker = container.getPersonInfoChecker(personId);
-					checker.updateAvailableLinkSpace(container.getRemainingLinkSpace());
-					checker.checkIfVehicleWillGoInQ(time);
-					if(checker.isAddingVehicleInQueue()){
+				PersonPositionChecker checker = container.getOrCreatePersonPositionChecker(personId);
+				double presonPositionUpdateTimeStep = Math.max( this.lastEventTimeStep, checker.getQueuingTime());
+				
+				for(double time = presonPositionUpdateTimeStep; time <= now && !checker.isPersonAlreadyQueued(); time++){
+					
+					if( checker.isAddingVehicleInQueue(time) ){
 						Queue<Id<Person>> queue = container.getAgentsInQueue();
-						if(! queue.contains(personId)) {
+						if(! queue.contains(personId) ) {
 							queue.offer(personId);
 							/*
 							 * If a person (20mps)  starts on link(1000m) at t=0, then will add to queue if time t=51 sec
 							 * time-1 is actually physically correct time at which it will add to Q.
 							 */
-							double availableSpaceSoFar = container.getRemainingLinkSpace();
-							checker.updateQueuingTime(availableSpaceSoFar);
+							double availableSpaceSoFar = checker.getAvailableLinkSpace();
 							double newAvailableSpace = availableSpaceSoFar - MixedTrafficVehiclesUtils.getCellSize(checker.getEnteredPersonInfo().getLegMode());
-							container.updateRemainingLinkSpace(newAvailableSpace);
-						} // else already in queue
+							checker.updateAvailableLinkSpace(newAvailableSpace);
+						}  else throw new RuntimeException("Person is alreay in queue. Aborting ...");
+						
 					} 
 				}
+				
 			}
+			
 		}
-		this.lastEventTimeStep=currentTimeStep;
+		this.lastEventTimeStep=now;
 	}
 	
 	public List<PersonPositionChecker> getPersonLinkEnterTimeVehiclePositionDataToWrite(){
