@@ -19,15 +19,16 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetgen.sna.graph.matrix;
 
-import gnu.trove.TDoubleArrayList;
-import gnu.trove.TIntArrayList;
+import gnu.trove.list.array.TDoubleArrayList;
+import gnu.trove.list.array.TIntArrayList;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.common.util.ProgressLogger;
 import org.matsim.contrib.socnetgen.sna.util.MultiThreading;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author illenberger

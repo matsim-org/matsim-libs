@@ -31,7 +31,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
 import playground.boescpa.lib.tools.coordUtils.CoordAnalyzer;
-import playground.boescpa.lib.tools.shpUtils.SHPFileUtil;
+import playground.boescpa.lib.tools.SHPFileUtils;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -61,7 +61,7 @@ public class MsNetworkMapper extends AbstractNetworkMapper {
 		// Prepare zones and identifier.
 		Set<SimpleFeature> features = new HashSet<SimpleFeature>();
 		features.addAll(ShapeFileReader.getAllFeatures(path2VissimZoneShp));
-		SHPFileUtil util = new SHPFileUtil();
+		SHPFileUtils util = new SHPFileUtils();
 		Geometry cuttingArea = util.mergeGeometries(features);
 		CoordAnalyzer coordAnalyzer = new CoordAnalyzer(cuttingArea);
 		// Identify links not in zones.

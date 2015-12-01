@@ -23,17 +23,18 @@
  */
 package org.matsim.contrib.socnetgen.sna.graph.io;
 
-import gnu.trove.TObjectIntHashMap;
-import org.matsim.contrib.socnetgen.sna.graph.Edge;
-import org.matsim.contrib.socnetgen.sna.graph.Graph;
-import org.matsim.contrib.socnetgen.sna.graph.Vertex;
-import org.matsim.core.utils.collections.Tuple;
+import gnu.trove.map.hash.TObjectIntHashMap;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.matsim.contrib.socnetgen.sna.graph.Edge;
+import org.matsim.contrib.socnetgen.sna.graph.Graph;
+import org.matsim.contrib.socnetgen.sna.graph.Vertex;
+import org.matsim.core.utils.collections.Tuple;
 
 
 /**

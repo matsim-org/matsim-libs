@@ -19,11 +19,10 @@
  * *********************************************************************** */
 package playground.thibautd.geocoding;
 
-import java.util.Iterator;
-
 import org.apache.log4j.Logger;
-
 import org.matsim.core.utils.misc.Counter;
+
+import java.util.Iterator;
 
 /**
  * @author thibautd

@@ -264,7 +264,6 @@ public class NetworkUtils {
 	 * This method expects the nearest link to a given measure point. 
 	 * It calculates the euclidian distance for both nodes of the link, 
 	 * "fromNode" and "toNode" and returns the node with shorter distance
-	 *
 	 */
 	public static Node getCloserNodeOnLink(Coord coord, Link link) {
 		// yyyy I don't think there is a test for this anywhere.  kai, mar'14
@@ -281,19 +280,19 @@ public class NetworkUtils {
 	}
 
 	/**
-		 * returns the euclidean distance between two coordinates
-		 *
-		 */
-		public static double getEuclidianDistance(Coord origin, Coord destination){
-			double xDiff = origin.getX() - destination.getX();
-			double yDiff = origin.getY() - destination.getY();
-			double distance = Math.sqrt( (xDiff*xDiff) + (yDiff*yDiff) );
-			
-			return distance;
-		}
-
-	/** returns the euclidean distance between two points (x1,y1) and (x2,y2)
+	 * returns the euclidean distance between two coordinates
 	 *
+	 */
+	public static double getEuclidianDistance(Coord origin, Coord destination){
+		double xDiff = origin.getX() - destination.getX();
+		double yDiff = origin.getY() - destination.getY();
+		double distance = Math.sqrt( (xDiff*xDiff) + (yDiff*yDiff) );
+
+		return distance;
+	}
+
+	/** 
+	 * returns the euclidean distance between two points (x1,y1) and (x2,y2)
 	 */
 	public static double getEuclidianDistance(double x1, double y1, double x2, double y2){
 		
@@ -475,10 +474,10 @@ public class NetworkUtils {
 	}
 
 	/**
-	 * Calculates the orientation of the outLinks for a given inLink
-	 * beginning from the right if the inLink goes north to south.
-	 * The most 'left' outLink comes last.
-	 * backLink is ignored
+	 * Calculates the orientation of downstream links (MATSim slang is 'outLinks') for a given 
+	 * upstream link (slang inLink)beginning from the right if the inLink goes 
+	 * north to south. The most 'left' outLink comes last. The link back to the 
+	 * inLinks upstream Node (slang fromNode) is ignored. 
 	 *
 	 * @param inLink The inLink given
 	 * @return Collection of outLinks, or an empty collection, if there is only
@@ -487,30 +486,22 @@ public class NetworkUtils {
 	public static TreeMap<Double, Link> getOutLinksSortedByAngle(Link inLink){
 		Coord coordInLink = getVector(inLink);
 		double thetaInLink = Math.atan2(coordInLink.getY(), coordInLink.getX());
-
-		TreeMap<Double, Link> leftLane = new TreeMap<Double, Link>();
+		TreeMap<Double, Link> outLinksByOrientation = new TreeMap<Double, Link>();
 
 		for (Link outLink : inLink.getToNode().getOutLinks().values()) {
-
 			if (!(outLink.getToNode().equals(inLink.getFromNode()))){
-
 				Coord coordOutLink = getVector(outLink);
 				double thetaOutLink = Math.atan2(coordOutLink.getY(), coordOutLink.getX());
-
 				double thetaDiff = thetaOutLink - thetaInLink;
-
 				if (thetaDiff < -Math.PI){
 					thetaDiff += 2 * Math.PI;
 				} else if (thetaDiff > Math.PI){
 					thetaDiff -= 2 * Math.PI;
 				}
-
-				leftLane.put(Double.valueOf(-thetaDiff), outLink);
-
+				outLinksByOrientation.put(Double.valueOf(-thetaDiff), outLink);
 			}
 		}
-
-		return leftLane;
+		return outLinksByOrientation;
 	}
 
 	private static Coord getVector(Link link){

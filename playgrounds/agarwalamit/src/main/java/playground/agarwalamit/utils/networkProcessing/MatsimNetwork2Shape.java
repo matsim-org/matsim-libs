@@ -90,5 +90,4 @@ public class MatsimNetwork2Shape {
 		}
 		ShapeFileWriter.writeGeometries(features, outShapeLocation+"network_nodes.shp");
 	}
-
 }

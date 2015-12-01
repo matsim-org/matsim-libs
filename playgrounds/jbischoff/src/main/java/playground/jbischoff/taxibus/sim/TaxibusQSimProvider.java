@@ -35,6 +35,7 @@ import org.matsim.contrib.dvrp.util.TimeDiscretizer;
 import org.matsim.contrib.dvrp.vrpagent.VrpLegs;
 import org.matsim.contrib.dvrp.vrpagent.VrpLegs.LegCreator;
 import org.matsim.contrib.dynagent.run.DynAgentLauncherUtils;
+import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -42,13 +43,19 @@ import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
+import org.matsim.vis.otfvis.OTFClientLive;
 
 import playground.jbischoff.taxibus.TaxibusActionCreator;
-import playground.jbischoff.taxibus.optimizer.DefaultTaxibusOptimizer;
+import playground.jbischoff.taxibus.optimizer.TaxibusOptimizer;
 import playground.jbischoff.taxibus.optimizer.TaxibusOptimizerConfiguration;
 import playground.jbischoff.taxibus.optimizer.TaxibusOptimizerConfiguration.Goal;
-import playground.jbischoff.taxibus.optimizer.filter.DefaultTaxibusFilterFactory;
-import playground.jbischoff.taxibus.optimizer.filter.TaxibusFilterFactory;
+import playground.jbischoff.taxibus.optimizer.defaultOptimizer.DefaultTaxibusOptimizer;
+import playground.jbischoff.taxibus.optimizer.defaultOptimizer.filter.DefaultTaxibusFilterFactory;
+import playground.jbischoff.taxibus.optimizer.defaultOptimizer.filter.TaxibusFilterFactory;
+import playground.jbischoff.taxibus.optimizer.fifo.FifoOptimizer;
+import playground.jbischoff.taxibus.optimizer.fifo.Lines.LineDispatcher;
+import playground.jbischoff.taxibus.optimizer.fifo.Lines.LinesUtils;
 import playground.jbischoff.taxibus.passenger.TaxibusPassengerEngine;
 import playground.jbischoff.taxibus.passenger.TaxibusPassengerOrderManager;
 import playground.jbischoff.taxibus.passenger.TaxibusRequestCreator;
@@ -69,7 +76,7 @@ import com.google.inject.Provider;
 public class TaxibusQSimProvider implements Provider<QSim> {
 	private TaxibusConfigGroup tbcg;
 	private MatsimVrpContextImpl context;
-	private DefaultTaxibusOptimizer optimizer;
+	private TaxibusOptimizer optimizer;
 	private EventsManager events;
 	private TravelTime travelTime;
 
@@ -102,6 +109,9 @@ public class TaxibusQSimProvider implements Provider<QSim> {
 				passengerEngine, legCreator, tbcg.getPickupDuration());
 		VrpLauncherUtils.initAgentSources(qSim, context, optimizer,
 				actionCreator);
+		if (tbcg.isOtfvis()){
+		OTFClientLive.run(sc.getConfig(), OTFVis.startServerAndRegisterWithQSim(sc.getConfig(), sc, eventsManager, qSim));
+		}
 		return qSim;
 	}
 
@@ -113,25 +123,25 @@ public class TaxibusQSimProvider implements Provider<QSim> {
 		TaxibusSchedulerParams params = new TaxibusSchedulerParams(tbcg.getPickupDuration(), tbcg.getDropoffDuration());
 		
 		resetSchedules(context.getVrpData().getVehicles().values());
-		
-		LeastCostPathCalculator router = new Dijkstra(context.getScenario()
-				.getNetwork(), travelDisutility, travelTime);
 
-		LeastCostPathCalculatorWithCache routerWithCache = new DefaultLeastCostPathCalculatorWithCache(
-				router, new TimeDiscretizer(31 * 4, 15 * 60, false));
- 
-		VrpPathCalculator calculator = new VrpPathCalculatorImpl(
-				routerWithCache, new VrpPathFactoryImpl(travelTime, travelDisutility));
-		TaxibusScheduler scheduler = new TaxibusScheduler(context, calculator, params);
-		TaxibusVehicleRequestPathFinder vrpFinder = new TaxibusVehicleRequestPathFinder(
-				calculator, scheduler);
-
+		TaxibusScheduler scheduler = new TaxibusScheduler(context, params);
+	
 		TaxibusFilterFactory filterFactory = new DefaultTaxibusFilterFactory(scheduler, tbcg.getNearestRequestsLimit(), tbcg.getNearestVehiclesLimit());
-
+		
 		TaxibusOptimizerConfiguration optimConfig = new TaxibusOptimizerConfiguration(
-				context, calculator, scheduler, vrpFinder, filterFactory,
+				context, travelTime, travelDisutility, scheduler, filterFactory,
 				Goal.MIN_WAIT_TIME, tbcg.getOutputDir());
-		optimizer = new DefaultTaxibusOptimizer(optimConfig,  false);
+
+		if (tbcg.getAlgorithmConfig().equals("default")){
+		optimizer = new DefaultTaxibusOptimizer(optimConfig,  false);}
+		
+		else if (tbcg.getAlgorithmConfig().equals("line")){
+		LineDispatcher dispatcher = LinesUtils.createLineDispatcher(tbcg.getLinesFile(), tbcg.getZonesXmlFile(), tbcg.getZonesShpFile(),context);	
+		events.addHandler(dispatcher);	
+		optimizer = new FifoOptimizer(optimConfig, dispatcher, false);
+		
+		}
+		else throw new RuntimeException("No config parameter set for algorithm, please check and assign in config");
 
 	}
 	

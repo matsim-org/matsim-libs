@@ -30,7 +30,7 @@ import org.matsim.core.utils.misc.Time;
  *
  * @author mrieser
  */
-public abstract class AbstractRoute implements Route {
+public abstract class AbstractRoute implements Route, Cloneable {
 
 	private double dist = Double.NaN;
 
@@ -45,7 +45,7 @@ public abstract class AbstractRoute implements Route {
 	}
 
 	@Override
-	public double getDistance() {
+	public final double getDistance() {
 		return dist;
 	}
 
@@ -66,21 +66,23 @@ public abstract class AbstractRoute implements Route {
 
 	@Override
 	public void setEndLinkId(final Id<Link> linkId) {
+		// overridden in Compressed...
 		this.endLinkId = linkId;
 	}
 
 	@Override
 	public void setStartLinkId(final Id<Link> linkId) {
+		// overridden in Compressed...
 		this.startLinkId = linkId;
 	}
 
 	@Override
-	public Id<Link> getStartLinkId() {
+	public final Id<Link> getStartLinkId() {
 		return this.startLinkId;
 	}
 
 	@Override
-	public Id<Link> getEndLinkId() {
+	public final Id<Link> getEndLinkId() {
 		return this.endLinkId;
 	}
 

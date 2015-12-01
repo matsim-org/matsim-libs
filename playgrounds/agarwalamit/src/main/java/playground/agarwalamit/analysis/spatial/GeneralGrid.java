@@ -201,6 +201,7 @@ public class GeneralGrid{
 	 * 		  on the coordinate points of the centroids.  
 	 */
 	public void writeGrid(String folder, String originalCRS){
+		//ZZ_TODO : more arguments are passed than than actually needed (wants 4 but 5 are passed)
 		String filename = String.format("%s%s%s_%.0f.csv", folder, (folder.endsWith("/") ? "" : "/"), this.type, this.width, ".csv");
 		LOG.info("Writing grid to file: " + filename);
 

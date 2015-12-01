@@ -121,7 +121,6 @@ public class LinkTollFromExternalCosts {
 		int lastIt = sc.getConfig().controler().getLastIteration();
 		String emissionEventsFile = sc.getConfig().controler().getOutputDirectory()+"/ITERS/it."+lastIt+"/"+lastIt+".emission.events.xml.gz";
 		EmissionLinkAnalyzer emissionAnalyzer = new EmissionLinkAnalyzer(sc.getConfig().qsim().getEndTime(), emissionEventsFile, noOfTimeBin);
-		emissionAnalyzer.init();
 		emissionAnalyzer.preProcessData();
 		emissionAnalyzer.postProcessData();
 		SortedMap<Double, Map<Id<Link>, SortedMap<String, Double>>> link2TotalEmissions = emissionAnalyzer.getLink2TotalEmissions();
@@ -146,7 +145,5 @@ public class LinkTollFromExternalCosts {
 			}
 		}
 		return linkEmissionCosts;
-
 	}
-
 }

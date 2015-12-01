@@ -46,6 +46,9 @@ import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 import org.matsim.vis.snapshotwriters.VisLink;
 
 
+/**
+ * I think this is responsible when agents are visualized "live", i.e. directly from the simulation. kai, nov'15
+ */
 public class OTFLinkAgentsHandler extends OTFDataReader {
 
 	public static boolean showParked = false;

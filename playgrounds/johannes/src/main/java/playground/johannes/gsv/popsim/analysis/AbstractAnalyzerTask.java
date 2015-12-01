@@ -18,7 +18,7 @@
  * *********************************************************************** */
 package playground.johannes.gsv.popsim.analysis;
 
-import gnu.trove.TDoubleDoubleHashMap;
+import gnu.trove.map.hash.TDoubleDoubleHashMap;
 import org.matsim.contrib.common.stats.Discretizer;
 import org.matsim.contrib.common.stats.Histogram;
 import org.matsim.contrib.common.stats.StatsWriter;
@@ -43,6 +43,10 @@ public abstract class AbstractAnalyzerTask<T> implements AnalyzerTask<T> {
 
     public void setIoContext(FileIOContext ioContext) {
         this.ioContext = ioContext;
+    }
+
+    public void addDiscretizer(Discretizer discretizer, String type) {
+        addDiscretizer(discretizer, type, false);
     }
 
     public void addDiscretizer(Discretizer discretizer, String type, boolean reweight) {

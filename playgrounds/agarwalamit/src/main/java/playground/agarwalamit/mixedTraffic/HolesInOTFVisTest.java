@@ -53,6 +53,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.OnTheFlyServer;
+import org.matsim.vis.otfvis.OTFVisConfigGroup.ColoringScheme;
 
 /**
  * @author amit
@@ -108,6 +109,7 @@ public class HolesInOTFVisTest {
 			// otfvis configuration.  There is more you can do here than via file!
 			final OTFVisConfigGroup otfVisConfig = ConfigUtils.addOrGetModule(qSim.getScenario().getConfig(), OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class);
 			otfVisConfig.setDrawTransitFacilities(false) ; // this DOES work
+			otfVisConfig.setColoringScheme(ColoringScheme.byId);
 			//				otfVisConfig.setShowParking(true) ; // this does not really work
 
 			OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(sc.getConfig(), sc, manager, qSim);

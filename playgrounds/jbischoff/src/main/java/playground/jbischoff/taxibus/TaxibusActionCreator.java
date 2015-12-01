@@ -24,10 +24,7 @@ import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.vrpagent.*;
 import org.matsim.contrib.dynagent.DynAction;
 
-import playground.jbischoff.taxibus.scheduler.TaxibusDropoffTask;
-import playground.jbischoff.taxibus.scheduler.TaxibusPickupTask;
-import playground.jbischoff.taxibus.scheduler.TaxibusStayTask;
-import playground.jbischoff.taxibus.scheduler.TaxibusTask;
+import playground.jbischoff.taxibus.scheduler.*;
 
 
 

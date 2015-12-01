@@ -16,7 +16,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.MutableScenario;
@@ -86,7 +85,7 @@ public class BBIextraDemand {
 				// create agents heading for BBI
 				for (int i = 1; i < demandBox.numberOfPassengers() * this.scaleFactor; i++) {
 
-					Person person = PersonImpl.createPerson(Id.create("BBI_" + demandBox.getNameBySourceAndDescription() + "_" + (i), Person.class));
+					Person person = PopulationUtils.createPerson(Id.create("BBI_" + demandBox.getNameBySourceAndDescription() + "_" + (i), Person.class));
 
 					PlanImpl plan = new PlanImpl();
 					ActivityImpl act = new ActivityImpl("home", demandBox.getCoord());
@@ -112,7 +111,7 @@ public class BBIextraDemand {
 				// create agents heading for TXL
 				for (int i = 1; i < demandBox.numberOfPassengers() * this.scaleFactor * demandBox.getShareTXL(); i++) {
 
-					Person person = PersonImpl.createPerson(Id.create("TXL_" + demandBox.getNameBySourceAndDescription() + "_" + (i), Person.class));
+					Person person = PopulationUtils.createPerson(Id.create("TXL_" + demandBox.getNameBySourceAndDescription() + "_" + (i), Person.class));
 
 					PlanImpl plan = new PlanImpl();
 					ActivityImpl act = new ActivityImpl("home", demandBox.getCoord());
@@ -131,7 +130,7 @@ public class BBIextraDemand {
 				// create agents heading for SXF
 				for (int i = 1; i < demandBox.numberOfPassengers() * this.scaleFactor * (1 - demandBox.getShareTXL()); i++) {
 
-					Person person = PersonImpl.createPerson(Id.create("SXF_" + demandBox.getNameBySourceAndDescription() + "_" + (i), Person.class));
+					Person person = PopulationUtils.createPerson(Id.create("SXF_" + demandBox.getNameBySourceAndDescription() + "_" + (i), Person.class));
 
 					PlanImpl plan = new PlanImpl();
 					ActivityImpl act = new ActivityImpl("home", demandBox.getCoord());

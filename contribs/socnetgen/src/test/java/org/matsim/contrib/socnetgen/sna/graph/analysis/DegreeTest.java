@@ -19,9 +19,10 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetgen.sna.graph.analysis;
 
-import gnu.trove.TObjectDoubleHashMap;
-import gnu.trove.TObjectDoubleIterator;
+import gnu.trove.iterator.TObjectDoubleIterator;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
 import junit.framework.TestCase;
+
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.socnetgen.sna.graph.SparseGraph;
 import org.matsim.contrib.socnetgen.sna.graph.SparseGraphBuilder;

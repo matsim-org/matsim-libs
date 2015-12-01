@@ -19,8 +19,6 @@
 
 package eu.eunoiaproject.bikesharing.framework.router;
 
-import java.util.List;
-
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -31,6 +29,8 @@ import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.Facility;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkNode;
+
+import java.util.List;
 
 public class InitialNodeRouter {
 	private final RoutingModule delegate;

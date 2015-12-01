@@ -36,6 +36,7 @@ import org.matsim.core.utils.io.IOUtils;
 import playground.agarwalamit.analysis.congestion.ExperiencedDelayAnalyzer;
 import playground.agarwalamit.utils.LoadMyScenarios;
 import playground.benjamin.internalization.EmissionCostFactors;
+import playground.agarwalamit.utils.MapUtils;
 import playground.benjamin.scenarios.munich.analysis.filter.PersonFilter;
 import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 import playground.vsp.analysis.modules.emissionsAnalyzer.EmissionsAnalyzer;
@@ -116,7 +117,7 @@ public class DelaysAndEmissionCostsDiff {
 
 			Map<Id<Person>, Double> delaysCostsRun = getDelaysPerPerson(configFile, eventsFile, sc); 
 
-			runCase2PersonId2DelaysCostDiff.put(run, getDifferenceMaps(delaysCostsBAU, delaysCostsRun));
+			runCase2PersonId2DelaysCostDiff.put(run, MapUtils.subtractMaps(delaysCostsBAU, delaysCostsRun));
 		}
 		return runCase2PersonId2DelaysCostDiff;
 	}
@@ -140,17 +141,9 @@ public class DelaysAndEmissionCostsDiff {
 
 			Map<Id<Person>, Double> emissionsCostsRun = getEmissionsPerPerson(emissionEventsFile, sc);
 
-			runCase2PersonId2EmissionsCostDiff.put(run, getDifferenceMaps(emissionsCostsBAU, emissionsCostsRun));
+			runCase2PersonId2EmissionsCostDiff.put(run, MapUtils.subtractMaps(emissionsCostsBAU, emissionsCostsRun));
 		}
 		return runCase2PersonId2EmissionsCostDiff;
-	}
-
-	private Map<Id<Person>, Double> getDifferenceMaps(Map<Id<Person>, Double> m1, Map<Id<Person>, Double>m2){
-		Map<Id<Person>, Double> outMap = new HashMap<Id<Person>, Double>();
-		for(Id<Person> id : m1.keySet()){
-			if(m2.containsKey(id)) outMap.put(id, m2.get(id)-m1.get(id));
-		}
-		return outMap;
 	}
 
 	private Map<Id<Person>, Double> getDelaysPerPerson(String configFile, String eventsFile, Scenario sc){
@@ -192,5 +185,4 @@ public class DelaysAndEmissionCostsDiff {
 		}
 		return personId2EmissionsCosts;
 	}
-
 }

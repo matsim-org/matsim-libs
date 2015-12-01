@@ -19,13 +19,21 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetgen.sna.graph.io;
 
-import gnu.trove.TIntObjectHashMap;
-import org.apache.log4j.Logger;
-import org.matsim.contrib.socnetgen.sna.graph.*;
+import gnu.trove.map.hash.TIntObjectHashMap;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+
+import org.apache.log4j.Logger;
+import org.matsim.contrib.socnetgen.sna.graph.Edge;
+import org.matsim.contrib.socnetgen.sna.graph.Graph;
+import org.matsim.contrib.socnetgen.sna.graph.GraphBuilder;
+import org.matsim.contrib.socnetgen.sna.graph.SparseEdge;
+import org.matsim.contrib.socnetgen.sna.graph.SparseGraph;
+import org.matsim.contrib.socnetgen.sna.graph.SparseGraphBuilder;
+import org.matsim.contrib.socnetgen.sna.graph.SparseVertex;
+import org.matsim.contrib.socnetgen.sna.graph.Vertex;
 
 /**
  * @author illenberger
@@ -74,7 +82,7 @@ public class EdgeListReader<G extends Graph, V extends Vertex, E extends Edge> {
 					logger.info(String.format("Loading graph... %1$s vertices, %2$s edges.", graph.getVertices().size(), graph.getEdges().size()));
 			}
 		}
-		
+		reader.close();
 		return graph;
 	}
 	

@@ -20,16 +20,15 @@
 package playground.thibautd.initialdemandgeneration.socnetgensimulated.framework;
 
 import gnu.trove.set.TIntSet;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.junit.Assert;
+import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
-
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.junit.Assert;
-import org.junit.Test;
 
 /**
  * @author thibautd

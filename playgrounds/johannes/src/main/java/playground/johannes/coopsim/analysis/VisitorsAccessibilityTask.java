@@ -19,10 +19,10 @@
  * *********************************************************************** */
 package playground.johannes.coopsim.analysis;
 
-import gnu.trove.TDoubleArrayList;
-import gnu.trove.TDoubleDoubleHashMap;
-import gnu.trove.TDoubleObjectHashMap;
-import gnu.trove.TObjectDoubleHashMap;
+import gnu.trove.list.array.TDoubleArrayList;
+import gnu.trove.map.hash.TDoubleDoubleHashMap;
+import gnu.trove.map.hash.TDoubleObjectHashMap;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
@@ -101,11 +101,11 @@ public class VisitorsAccessibilityTask extends TrajectoryAnalyzerTask {
 				purpose = "all";
 			
 			if(accessVals.size() > 0) {
-			Discretizer discretizer = FixedSampleSizeDiscretizer.create(accessVals.toNativeArray(), 50, 50);
-			TDoubleDoubleHashMap correl = Correlations.mean(accessVals.toNativeArray(), visitorVals.toNativeArray(),
+			Discretizer discretizer = FixedSampleSizeDiscretizer.create(accessVals.toArray(), 50, 50);
+			TDoubleDoubleHashMap correl = Correlations.mean(accessVals.toArray(), visitorVals.toArray(),
 					discretizer);
-			TDoubleObjectHashMap<DescriptiveStatistics> stats = Correlations.statistics(accessVals.toNativeArray(),
-					visitorVals.toNativeArray(), discretizer);
+			TDoubleObjectHashMap<DescriptiveStatistics> stats = Correlations.statistics(accessVals.toArray(),
+					visitorVals.toArray(), discretizer);
 			try {
 				StatsWriter.writeHistogram(correl, "A", "n", String.format("%1$s/visitors_A.%2$s.txt", getOutputDirectory(), purpose));
 				StatsWriter.writeStatistics(stats, "access",

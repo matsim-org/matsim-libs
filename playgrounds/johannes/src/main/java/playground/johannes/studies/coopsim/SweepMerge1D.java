@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package playground.johannes.studies.coopsim;
 
-import gnu.trove.TDoubleDoubleHashMap;
+import gnu.trove.map.hash.TDoubleDoubleHashMap;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.common.stats.StatsWriter;

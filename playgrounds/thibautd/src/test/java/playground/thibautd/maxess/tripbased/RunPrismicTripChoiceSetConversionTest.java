@@ -10,8 +10,6 @@ import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.testcases.MatsimTestUtils;
 import playground.thibautd.maxess.prepareforbiogeme.tripbased.PrismicConversionConfigGroup;
 import playground.thibautd.maxess.prepareforbiogeme.tripbased.RunPrismicTripChoiceSetConversion;
-import sun.security.provider.MD5;
-import sun.security.rsa.RSASignature;
 
 import java.io.BufferedReader;
 import java.io.IOException;

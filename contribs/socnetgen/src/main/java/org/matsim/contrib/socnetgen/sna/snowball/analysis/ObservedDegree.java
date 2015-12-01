@@ -19,7 +19,10 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetgen.sna.snowball.analysis;
 
-import gnu.trove.TObjectDoubleHashMap;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
+
+import java.util.Set;
+
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.socnetgen.sna.graph.Graph;
 import org.matsim.contrib.socnetgen.sna.graph.Vertex;
@@ -27,8 +30,6 @@ import org.matsim.contrib.socnetgen.sna.graph.analysis.Degree;
 import org.matsim.contrib.socnetgen.sna.snowball.SampledEdge;
 import org.matsim.contrib.socnetgen.sna.snowball.SampledGraph;
 import org.matsim.contrib.socnetgen.sna.snowball.SampledVertex;
-
-import java.util.Set;
 
 /**
  * 

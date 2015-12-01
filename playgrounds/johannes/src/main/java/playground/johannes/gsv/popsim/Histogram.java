@@ -19,8 +19,8 @@
 
 package playground.johannes.gsv.popsim;
 
-import gnu.trove.TDoubleFunction;
-import gnu.trove.TObjectDoubleHashMap;
+import gnu.trove.function.TDoubleFunction;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
 
 /**
  * @author johannes
@@ -29,7 +29,7 @@ public class Histogram {
 
     public static TObjectDoubleHashMap<?> normalize(TObjectDoubleHashMap<?> histogram) {
         double sum = 0;
-        double[] values = histogram.getValues();
+        double[] values = histogram.values();
 
         for (int i = 0; i < values.length; i++) {
             sum += values[i];

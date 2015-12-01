@@ -18,11 +18,13 @@
  * *********************************************************************** */
 package playground.johannes.gsv.popsim.analysis;
 
+import org.matsim.contrib.common.stats.Discretizer;
 import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.data.Segment;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -32,22 +34,67 @@ public class GeoDistanceBuilder {
 
     private Map<String, Predicate<Segment>> predicates;
 
-    AnalyzerTask<Collection<? extends Person>> build() {
+    private final FileIOContext ioContext;
 
-        AnalyzerTaskComposite<Collection<? extends Person>> composite = new AnalyzerTaskComposite<>();
+    private final Map<String, Discretizer> discretizers;
 
-        for(Map.Entry<String, Predicate<Segment>> entry : predicates.entrySet()) {
-            ValueProvider<Double, Segment> getter = new NumericAttributeProvider(CommonKeys.LEG_GEO_DISTANCE);
-            LegCollector<Double> collector = new LegCollector<>(getter);
-            collector.setPredicate(entry.getValue());
+    public GeoDistanceBuilder(FileIOContext ioContext) {
+        this(ioContext, null);
+    }
 
-            String name = String.format("%s.%s", CommonKeys.LEG_GEO_DISTANCE, entry.getKey());
-            NumericAnalyzer analyzer = new NumericAnalyzer(collector, name);
+    public GeoDistanceBuilder(FileIOContext ioContext, Map<String, Predicate<Segment>> predicates) {
+        this.ioContext = ioContext;
+        this.setPredicates(predicates);
+        this.discretizers = new HashMap<>();
+    }
 
-            composite.addComponent(analyzer);
+    public void setPredicates(Map<String, Predicate<Segment>> predicates) {
+        this.predicates = predicates;
+    }
 
+    public void addDiscretizer(Discretizer discretizer, String name) {
+        discretizers.put(name, discretizer);
+    }
+
+    public AnalyzerTask<Collection<? extends Person>> build() {
+        AnalyzerTask<Collection<? extends Person>> task;
+
+        if (predicates == null || predicates.isEmpty()) {
+            NumericAnalyzer analyzer = buildWithPredicate(null, null);
+            setDiscretizers(analyzer);
+            task = analyzer;
+        } else {
+            ConcurrentAnalyzerTask<Collection<? extends Person>> composite = new ConcurrentAnalyzerTask<>();
+
+            for (Map.Entry<String, Predicate<Segment>> entry : predicates.entrySet()) {
+                NumericAnalyzer analyzer = buildWithPredicate(entry.getValue(), entry.getKey());
+                setDiscretizers(analyzer);
+                composite.addComponent(analyzer);
+            }
+
+            task = composite;
         }
 
-        return composite;
+        return task;
+    }
+
+    private NumericAnalyzer buildWithPredicate(Predicate<Segment> predicate, String predicateName) {
+        ValueProvider<Double, Segment> getter = new NumericAttributeProvider(CommonKeys.LEG_GEO_DISTANCE);
+
+        LegCollector<Double> collector = new LegCollector<>(getter);
+        if (predicate != null)
+            collector.setPredicate(predicate);
+
+        String name = CommonKeys.LEG_GEO_DISTANCE;
+        if (predicateName != null)
+            name = String.format("%s.%s", CommonKeys.LEG_GEO_DISTANCE, predicateName);
+
+        return new NumericAnalyzer(collector, name, ioContext);
+    }
+
+    private void setDiscretizers(NumericAnalyzer analyzer) {
+        for(Map.Entry<String, Discretizer> entry : discretizers.entrySet()) {
+            analyzer.addDiscretizer(entry.getValue(), entry.getKey(), true);
+        }
     }
 }

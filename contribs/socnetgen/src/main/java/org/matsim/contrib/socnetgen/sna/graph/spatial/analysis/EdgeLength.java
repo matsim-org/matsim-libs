@@ -19,7 +19,10 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetgen.sna.graph.spatial.analysis;
 
-import gnu.trove.TObjectDoubleHashMap;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
+
+import java.util.Set;
+
 import org.matsim.contrib.common.gis.CRSUtils;
 import org.matsim.contrib.common.gis.DistanceCalculator;
 import org.matsim.contrib.socnetgen.sna.gis.DistanceCalculatorFactory;
@@ -27,8 +30,6 @@ import org.matsim.contrib.socnetgen.sna.graph.Edge;
 import org.matsim.contrib.socnetgen.sna.graph.analysis.AbstractEdgeProperty;
 import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialEdge;
 import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialVertex;
-
-import java.util.Set;
 
 /**
  * @author illenberger

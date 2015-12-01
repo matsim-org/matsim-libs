@@ -469,7 +469,7 @@ public class PTMapperBusAndTram extends PTMapper {
 				boolean removeRoute = false;
 				NetworkRoute networkRoute = transitRoute.getRoute();
 
-				// todo-boescpa: This check here should not be necessary. Find reason!!!
+				// TODO-boescpa: This check here should not be necessary. Find reason!!!
 				if (networkRoute.getStartLinkId() == null || networkRoute.getEndLinkId() == null) {
 					removeRoute = true;
 				}

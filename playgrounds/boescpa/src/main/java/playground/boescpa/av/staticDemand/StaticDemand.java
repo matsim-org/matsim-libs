@@ -24,7 +24,8 @@ package playground.boescpa.av.staticDemand;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.gbl.MatsimRandom;
-import playground.boescpa.lib.tools.tripReader.Trip;
+import playground.boescpa.analysis.trips.Trip;
+import playground.boescpa.analysis.trips.TripReader;
 
 import java.util.*;
 
@@ -49,12 +50,10 @@ public class StaticDemand {
         this.shareOfOriginalAgentsServedByAV = shareOfOriginalAgentsServedByAV;
         this.modes = modes;
         log.info("Read demand...");
-        final Map<Long, Trip> tripsOriginal = Trip.createTripCollection(pathToTripFile);
-        this.originalDemand = new ArrayList<>();
-        this.originalDemand.addAll(tripsOriginal.values());
+        this.originalDemand = TripReader.createTripCollection(pathToTripFile);
         log.info("Read demand... done.");
         log.info("Filter demand...");
-        this.filteredDemand = filterTrips(tripsOriginal);
+        this.filteredDemand = filterTrips(TripReader.createTripCollection(pathToTripFile));
         log.info("Filter demand... done.");
         log.info("Sort demand...");
         this.sortedDemand = new ArrayList<>();
@@ -86,14 +85,13 @@ public class StaticDemand {
 
     /**
      * Filter trips for modes and for number...
-     * @param trips
      * @return
      */
-    private List<Trip> filterTrips(Map<Long, Trip> trips) {
+    private List<Trip> filterTrips(List<Trip> originalDemand) {
         List<Trip> modeFilteredTrips = new ArrayList<>();
         // filter mode:
         for (String mode : modes) {
-            for (Trip trip : trips.values()) {
+            for (Trip trip : originalDemand) {
                 if (mode.equals(trip.mode)) {
                     modeFilteredTrips.add(trip);
                 }

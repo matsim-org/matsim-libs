@@ -30,44 +30,32 @@ import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
 public class DynamicLinkDemandAnalysisMain {
-	private static final Logger log = Logger.getLogger(DynamicLinkDemandAnalysisMain.class);
 	
-	private static String eventsFile;
-	private static String networkFile;
-	private static String outputPath;
+	private static final Logger log = Logger.getLogger(DynamicLinkDemandAnalysisMain.class);
+	private static String OUTPUT_BASE_DIR;
 
 	public static void main(String[] args) {
 		
 		if (args.length > 0) {
-			eventsFile = args[0];		
-			log.info("eventsFile: " + eventsFile);
 			
-			networkFile = args[1];		
-			log.info("networkFile: " + networkFile);
-			
-			outputPath = args[2];		
-			log.info("outputPath: " + outputPath);
+			OUTPUT_BASE_DIR = args[0];
+			log.info("Output base directory: " + OUTPUT_BASE_DIR);
 			
 		} else {
 			
-//			eventsFile = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalization_noise_averageVSmarginal/output/int_1_marginalCost/ITERS/it.100/100.events.xml.gz";
-//			networkFile = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalization_noise_averageVSmarginal/output/int_1_marginalCost/output_network.xml.gz";
-//			outputPath = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalization_noise_averageVSmarginal/output/int_1_marginalCost/ITERS/it.100/";
-			
-			eventsFile = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalization_noise_averageVSmarginal/output/int_1_averageCost/ITERS/it.100/100.events.xml.gz";
-			networkFile = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalization_noise_averageVSmarginal/output/int_1_averageCost/output_network.xml.gz";
-			outputPath = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalization_noise_averageVSmarginal/output/int_1_averageCost/ITERS/it.100/";
+			OUTPUT_BASE_DIR = "../../../runs-svn/berlin-1pct/";			
 		}
-		
+
 		DynamicLinkDemandAnalysisMain analysis = new DynamicLinkDemandAnalysisMain();
 		analysis.run();
 	}
 
 	private void run() {
 		
-		Config config = ConfigUtils.createConfig();		
+		
+		Config config = ConfigUtils.loadConfig(OUTPUT_BASE_DIR + "output_config.xml.gz");
 		config.plans().setInputFile(null);		
-		config.network().setInputFile(networkFile);
+		config.network().setInputFile(OUTPUT_BASE_DIR + "output_network.xml.gz");
 		
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.loadScenario(config);
 		EventsManager events = EventsUtils.createEventsManager();
@@ -75,10 +63,12 @@ public class DynamicLinkDemandAnalysisMain {
 		DynamicLinkDemandEventHandler handler = new DynamicLinkDemandEventHandler(scenario.getNetwork());
 		events.addHandler(handler);
 				
+		String eventsFile = OUTPUT_BASE_DIR + "ITERS/it." + config.controler().getLastIteration() + "/" + config.controler().getLastIteration() + ".events.xml.gz";
 		MatsimEventsReader reader = new MatsimEventsReader(events);
 		reader.readFile(eventsFile);
 		
-		handler.printResults(outputPath);
+		String analysis_output_dir = OUTPUT_BASE_DIR + "ITERS/it." + config.controler().getLastIteration() + "/";
+		handler.printResults(analysis_output_dir);
 	}
 			 
 }

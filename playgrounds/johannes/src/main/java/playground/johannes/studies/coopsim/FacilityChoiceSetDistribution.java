@@ -20,7 +20,7 @@
 package playground.johannes.studies.coopsim;
 
 import com.vividsolutions.jts.geom.Point;
-import gnu.trove.TDoubleDoubleHashMap;
+import gnu.trove.map.hash.TDoubleDoubleHashMap;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.common.gis.CartesianDistanceCalculator;
 import org.matsim.contrib.common.gis.DistanceCalculator;

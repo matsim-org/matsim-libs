@@ -19,8 +19,8 @@
  * *********************************************************************** */
 package playground.johannes.studies.mz2005.io;
 
-import gnu.trove.TIntIntHashMap;
-import gnu.trove.TIntIntIterator;
+import gnu.trove.iterator.TIntIntIterator;
+import gnu.trove.map.hash.TIntIntHashMap;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;

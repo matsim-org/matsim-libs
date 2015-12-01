@@ -58,11 +58,11 @@ public class EmissionCongestionTravelDisutilityCalculator implements TravelDisut
 	private double marginalUtlOfTravelTime;
 	private EmissionModule emissionModule;
 	private EmissionCostModule emissionCostModule;
-	private final Set<Id> hotspotLinks;
+	private final Set<Id<Link>> hotspotLinks;
 	private TollHandler tollHandler;
 
 
-	public EmissionCongestionTravelDisutilityCalculator(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup, EmissionModule emissionModule, EmissionCostModule emissionCostModule, Set<Id> hotspotLinks, TollHandler tollHandler) {
+	public EmissionCongestionTravelDisutilityCalculator(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup, EmissionModule emissionModule, EmissionCostModule emissionCostModule, Set<Id<Link>> hotspotLinks, TollHandler tollHandler) {
 		this.timeCalculator = timeCalculator;
 		this.marginalUtlOfMoney = cnScoringGroup.getMarginalUtilityOfMoney();
 		this.distanceCostRateCar = cnScoringGroup.getModes().get(TransportMode.car).getMonetaryDistanceRate();

@@ -51,9 +51,9 @@ public class ConfigBasedTaxibusLaunchUtils {
       	context = new MatsimVrpContextImpl();
 		context.setScenario(controler.getScenario());
 		VrpData vrpData = VrpLauncherUtils.initVrpData(context, tbcg.getVehiclesFile());
+		
 		context.setVrpData(vrpData);	 
-    
-       
+           
 		controler.addOverridingModule(new AbstractModule(){
 
 			@Override

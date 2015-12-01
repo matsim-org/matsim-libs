@@ -17,12 +17,11 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
 package org.matsim.contrib.locationchoice.bestresponse;
 
-import java.util.Collections;
+import gnu.trove.map.TObjectIntMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -62,6 +61,8 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
  */
 public class DestinationChoiceBestResponseContext implements MatsimToplevelContainer {
 	
+	private static final Logger log = Logger.getLogger(DestinationChoiceBestResponseContext.class);
+	
 	public static final String ELEMENT_NAME = "DestinationChoiceBestResponseContext";
 	
 	private final Scenario scenario;
@@ -70,7 +71,6 @@ public class DestinationChoiceBestResponseContext implements MatsimToplevelConta
 	private HashSet<String> flexibleTypes;
 	private CharyparNagelScoringParameters params;
 	private DestinationChoiceConfigGroup dccg;
-	private static final Logger log = Logger.getLogger(DestinationChoiceBestResponseContext.class);
 	private int arekValsRead = 1;
 	private ObjectAttributes personsBetas = new ObjectAttributes();
 	private ObjectAttributes facilitiesAttributes = new ObjectAttributes();
@@ -79,9 +79,9 @@ public class DestinationChoiceBestResponseContext implements MatsimToplevelConta
 
 	private double[] facilitiesKValuesArray;
 	private double[] personsKValuesArray;
-	private Map<Id<ActivityFacility>, Integer> facilityIndices;
+	private TObjectIntMap<Id<ActivityFacility>> facilityIndices;
 	private Map<Id<ActivityFacility>, ActivityFacilityWithIndex> faciliesWithIndexMap;
-	private Map<Id<Person>, Integer> personIndices;
+	private TObjectIntMap<Id<Person>> personIndices;
 		
 	/**
 	 * If this is set to true, QuadTrees are stored in memory.
@@ -126,7 +126,7 @@ public class DestinationChoiceBestResponseContext implements MatsimToplevelConta
 		ObjectAttributes personsKValues = computer.getPersonsKValues();
 		ObjectAttributes facilitiesKValues = computer.getFacilitiesKValues();
 		
-		this.personIndices = new HashMap<Id<Person>, Integer>();
+		this.personIndices = new TObjectIntHashMap<>();
 		this.personsKValuesArray = new double[this.scenario.getPopulation().getPersons().size()];
 		int personIndex = 0;
 		for (Id<Person> personId : this.scenario.getPopulation().getPersons().keySet()) {
@@ -135,7 +135,7 @@ public class DestinationChoiceBestResponseContext implements MatsimToplevelConta
 			personIndex++;
 		}		
 		
-		this.facilityIndices = new HashMap<>();
+		this.facilityIndices = new TObjectIntHashMap<>();
 		this.faciliesWithIndexMap = new HashMap<>();
 		this.facilitiesKValuesArray = new double[this.scenario.getActivityFacilities().getFacilities().size()];
 		int facilityIndex = 0;
@@ -219,7 +219,7 @@ public class DestinationChoiceBestResponseContext implements MatsimToplevelConta
 	
 	private Tuple<QuadTree<ActivityFacilityWithIndex>, ActivityFacilityImpl[]> getTuple(String activityType) {
 
-		TreesBuilder treesBuilder = new TreesBuilder(CollectionUtils.stringToSet(activityType), this.scenario.getNetwork(), (DestinationChoiceConfigGroup) this.scenario.getConfig().getModule("locationchoice"));
+		TreesBuilder treesBuilder = new TreesBuilder(CollectionUtils.stringToSet(activityType), this.scenario.getNetwork(), this.dccg);
 		treesBuilder.setActTypeConverter(this.getConverter());
 		treesBuilder.createTrees(scenario.getActivityFacilities());
 		
@@ -287,17 +287,17 @@ public class DestinationChoiceBestResponseContext implements MatsimToplevelConta
 		return facilitiesKValuesArray;
 	}
 
-	public Map<Id<Person>, Integer> getPersonIndices() {
-		return Collections.unmodifiableMap(this.personIndices);
-	}
+//	public Map<Id<Person>, Integer> getPersonIndices() {
+//		return Collections.unmodifiableMap(this.personIndices);
+//	}
 	
 	public int getPersonIndex(Id<Person> id) {
 		return this.personIndices.get(id);
 	}
 	
-	public Map<Id<ActivityFacility>, Integer> getFacilityIndices() {
-		return Collections.unmodifiableMap(this.facilityIndices);
-	}
+//	public Map<Id<ActivityFacility>, Integer> getFacilityIndices() {
+//		return Collections.unmodifiableMap(this.facilityIndices);
+//	}
 	
 	public int getFacilityIndex(Id<ActivityFacility> id) {
 		return this.facilityIndices.get(id);

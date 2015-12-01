@@ -36,6 +36,7 @@ import org.matsim.core.utils.io.IOUtils;
  * @author amit
  *
  */
+// ZZ_TODO : probably mode this to some templates.
 public class AdditionOfRoadTypeInNetwork {
 	
 	private static BufferedWriter writer;
@@ -76,7 +77,5 @@ public class AdditionOfRoadTypeInNetwork {
 		} catch (IOException e) {
 			throw new RuntimeException("Counld not write file.", e);
 		}
-
 	}
-
 }

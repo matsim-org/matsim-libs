@@ -40,7 +40,7 @@ import playground.gregor.hybridsim.factories.HybridMobsimProvider;
 public class RunMyHybridSim {
 
 	public static void main(String [] args) {
-		String config = "/Users/laemmel/arbeit/papers/2015/trgindia2015/hhwsim/input/config.xml";
+		String config = null;
 		if (args.length == 1) {
 			config = args[0];
 		}

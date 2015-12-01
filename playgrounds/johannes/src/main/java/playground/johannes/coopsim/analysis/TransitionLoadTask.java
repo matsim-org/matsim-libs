@@ -19,8 +19,8 @@
 
 package playground.johannes.coopsim.analysis;
 
-import gnu.trove.TDoubleArrayList;
-import gnu.trove.TDoubleDoubleHashMap;
+import gnu.trove.list.array.TDoubleArrayList;
+import gnu.trove.map.hash.TDoubleDoubleHashMap;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.contrib.common.stats.Discretizer;
@@ -106,8 +106,8 @@ public abstract class TransitionLoadTask extends TrajectoryAnalyzerTask {
 	private void write(TDoubleArrayList samples, String filter) {
 		try {
 			if (!samples.isEmpty()) {
-				Discretizer disc = FixedSampleSizeDiscretizer.create(samples.toNativeArray(), 50, 100);
-				TDoubleDoubleHashMap load = Histogram.createHistogram(samples.toNativeArray(), disc, true);
+				Discretizer disc = FixedSampleSizeDiscretizer.create(samples.toArray(), 50, 100);
+				TDoubleDoubleHashMap load = Histogram.createHistogram(samples.toArray(), disc, true);
 				StatsWriter.writeHistogram(load, "time", "n", String.format("%s/%s.%s.txt", getOutputDirectory(), key, filter));
 			}
 

@@ -68,7 +68,7 @@ class SingleRunTaxiLauncher
 
     void run()
     {
-        initVrpPathCalculator();
+        initTravelTimeAndDisutility();
         simulateIteration();
         generateOutput();
     }

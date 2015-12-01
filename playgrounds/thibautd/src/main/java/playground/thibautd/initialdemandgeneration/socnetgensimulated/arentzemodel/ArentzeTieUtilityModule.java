@@ -23,7 +23,6 @@ import com.google.inject.Inject;
 import com.google.inject.Provider;
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.geometry.CoordUtils;
-import playground.thibautd.initialdemandgeneration.socnetgensimulated.framework.IndexedPopulation;
 import playground.thibautd.initialdemandgeneration.socnetgensimulated.framework.TieUtility.DeterministicPart;
 import playground.thibautd.initialdemandgeneration.socnetgensimulated.framework.TieUtility.ErrorTerm;
 import playground.thibautd.initialdemandgeneration.socnetgensimulated.framework.TieUtility.GumbelErrorTerm;

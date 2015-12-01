@@ -21,9 +21,6 @@ package playground.thibautd.herbie;
 
 import herbie.running.config.HerbieConfigGroup;
 import herbie.running.scoring.TravelScoringFunction;
-
-import java.util.TreeSet;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
@@ -35,6 +32,8 @@ import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkLink;
 import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
 import org.matsim.pt.router.TransitTravelDisutility;
 import org.matsim.vehicles.Vehicle;
+
+import java.util.TreeSet;
 
 /**
  * Travel time disutility taking into account travel distance

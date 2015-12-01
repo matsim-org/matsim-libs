@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package playground.johannes.coopsim.mental;
 
-import gnu.trove.TIntArrayList;
+import gnu.trove.list.array.TIntArrayList;
 import org.matsim.contrib.socnetgen.sna.graph.matrix.AdjacencyMatrix;
 import org.matsim.contrib.socnetgen.sna.graph.matrix.Dijkstra;
 import org.matsim.contrib.socnetgen.sna.graph.social.SocialGraph;

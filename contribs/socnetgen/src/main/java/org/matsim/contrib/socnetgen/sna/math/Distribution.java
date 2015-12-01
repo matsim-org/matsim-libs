@@ -23,17 +23,18 @@
  */
 package org.matsim.contrib.socnetgen.sna.math;
 
-import gnu.trove.TDoubleArrayList;
-import gnu.trove.TDoubleDoubleHashMap;
-import gnu.trove.TDoubleFunction;
-import org.matsim.contrib.common.stats.Discretizer;
-import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
-import org.matsim.core.utils.io.IOUtils;
+import gnu.trove.function.TDoubleFunction;
+import gnu.trove.list.array.TDoubleArrayList;
+import gnu.trove.map.hash.TDoubleDoubleHashMap;
 
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Arrays;
+
+import org.matsim.contrib.common.stats.Discretizer;
+import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
+import org.matsim.core.utils.io.IOUtils;
 
 /**
  * Representation of an empirical discrete distribution. Allows to apply weights
@@ -112,7 +113,7 @@ public class Distribution {
 	 * @return the set of samples.
 	 */
 	public double[] getValues() {
-		return values.toNativeArray();
+		return values.toArray();
 	}
 	
 	/**
@@ -121,7 +122,7 @@ public class Distribution {
 	 * @return the weights.
 	 */
 	public double[] getWeights() {
-		return weights.toNativeArray();
+		return weights.toArray();
 	}
 	
 	/**
@@ -350,7 +351,7 @@ public class Distribution {
 	 * @return a histogram.
 	 */
 	public TDoubleDoubleHashMap absoluteDistributionFixed(int minSize) {
-		Discretizer discretizer = FixedSampleSizeDiscretizer.create(values.toNativeArray(), minSize);
+		Discretizer discretizer = FixedSampleSizeDiscretizer.create(values.toArray(), minSize);
 		TDoubleDoubleHashMap freq = new TDoubleDoubleHashMap();
 		int size = values.size();
 		for(int i = 0; i < size; i++) {
@@ -390,7 +391,7 @@ public class Distribution {
 	 */
 	public TDoubleDoubleHashMap normalizedDistribution(TDoubleDoubleHashMap distr) {
 		double sum = 0;
-		double[] values = distr.getValues();
+		double[] values = distr.values();
 		
 		for(int i = 0; i < values.length; i++) {
 			sum += values[i];

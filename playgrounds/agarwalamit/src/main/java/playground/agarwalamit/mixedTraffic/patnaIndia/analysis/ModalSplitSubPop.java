@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.analysis.legMode.ModalShareGenerator;
+import playground.agarwalamit.mixedTraffic.patnaIndia.subPop.PopulationFilter;
 import playground.agarwalamit.utils.LoadMyScenarios;
 
 /**
@@ -46,36 +47,33 @@ public class ModalSplitSubPop {
 		Population pop = sc.getPopulation();
 		ModalShareGenerator msg = new ModalShareGenerator();
 		
-		
 		String outFile = "/Users/amit/Documents/repos/runs-svn/patnaIndia/run104/"+outFolder+"/"+outFolder+"_modalSplit.txt";
 		BufferedWriter writer = IOUtils.getBufferedWriter(outFile);
-		SortedMap<String, Double> wholePop_modalSplot = msg.getMode2PctShareFromPlans(pop);
+		SortedMap<String, Double> wholePopModalSplot = msg.getMode2PctShareFromPlans(pop);
 		try {
 			writer.write("pop \t");
-			for(String mode : wholePop_modalSplot.keySet()){
+			for(String mode : wholePopModalSplot.keySet()){
 				writer.write(mode+"\t");
 			}
 			writer.newLine();
 			
 			writer.write("wholePop \t");
-			for(String mode :wholePop_modalSplot.keySet()){
-				writer.write(wholePop_modalSplot.get(mode)+"\t");
+			for(String mode :wholePopModalSplot.keySet()){
+				writer.write(wholePopModalSplot.get(mode)+"\t");
 			}
 			writer.newLine();
 			
 			writer.write("slum \t");
-			for(String mode :wholePop_modalSplot.keySet()){
+			for(String mode :wholePopModalSplot.keySet()){
 				writer.write(msg.getMode2PctShareFromPlans(PopulationFilter.getSlumPopulation(pop)).get(mode)+"\t");
 			}
 			writer.newLine();
 			
 			writer.write("nonSlum \t");
-			for(String mode :wholePop_modalSplot.keySet()){
+			for(String mode :wholePopModalSplot.keySet()){
 				writer.write(msg.getMode2PctShareFromPlans(PopulationFilter.getNonSlumPopulation(pop)).get(mode)+"\t");
 			}
-
 			writer.close();
-			
 		} catch (Exception e) {
 			throw new RuntimeException("Data is not written in file. Reason: "+ e);
 		}

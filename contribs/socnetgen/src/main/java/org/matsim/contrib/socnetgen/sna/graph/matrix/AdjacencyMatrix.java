@@ -23,9 +23,9 @@
  */
 package org.matsim.contrib.socnetgen.sna.graph.matrix;
 
-import gnu.trove.TIntArrayList;
-import gnu.trove.TIntIntHashMap;
-import gnu.trove.TObjectIntHashMap;
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.hash.TIntIntHashMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
 import org.matsim.contrib.socnetgen.sna.graph.Edge;
 import org.matsim.contrib.socnetgen.sna.graph.Graph;
 import org.matsim.contrib.socnetgen.sna.graph.GraphBuilder;
@@ -356,7 +356,7 @@ public class AdjacencyMatrix<V extends Vertex> {
 			}
 		}
 
-		neighbors_i.remove(neighbors_i.indexOf(j));
+		neighbors_i.removeAt(neighbors_i.indexOf(j));
 	}
 
 	/**

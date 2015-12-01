@@ -14,6 +14,7 @@ import com.google.inject.name.Names;
 
 import playground.balac.iduceddemand.strategies.InsertRandomActivityStrategy;
 import playground.balac.iduceddemand.strategies.RandomActivitiesSwaperStrategy;
+import playground.balac.iduceddemand.strategies.RemoveRandomActivityStrategy;
 
 public class RunExample {
 
@@ -64,6 +65,9 @@ public class RunExample {
 				this.addPlanStrategyBinding("InsertRandomActivityStrategy").to( InsertRandomActivityStrategy.class ) ;
 
 				this.addPlanStrategyBinding("RandomActivitiesSwaperStrategy").to( RandomActivitiesSwaperStrategy.class ) ;
+				
+				this.addPlanStrategyBinding("RemoveRandomActivityStrategy").to( RemoveRandomActivityStrategy.class ) ;
+
 			}
 		});		
 		controler.run();

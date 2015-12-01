@@ -24,7 +24,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 
 
-public class GenericRouteImpl extends AbstractRoute implements Cloneable {
+public final class GenericRouteImpl extends AbstractRoute implements Cloneable {
 
 	/*package*/ final static String ROUTE_TYPE = "generic";
 	

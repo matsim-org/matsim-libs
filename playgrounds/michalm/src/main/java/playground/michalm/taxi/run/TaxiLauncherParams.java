@@ -116,13 +116,13 @@ class TaxiLauncherParams
         if (algorithmConfig.ttimeSource == TravelTimeSource.FREE_FLOW_SPEED) {
             if (eventsFile != null) {
                 throw new IllegalStateException(
-                        "eventsFile ignored when TravelTimeSource.FREE_FLOW_SPEED");
+                        "eventsFile works only for TravelTimeSource.EVENTS");
             }
         }
         else {//TravelTimeSource.EVENTS
             if (changeEventsFile != null) {
                 throw new IllegalStateException(
-                        "changeEventsFile ignored when TravelTimeSource.EVENTS");
+                        "changeEventsFile works only for TravelTimeSource.FREE_FLOW_SPEED");
             }
         }
 

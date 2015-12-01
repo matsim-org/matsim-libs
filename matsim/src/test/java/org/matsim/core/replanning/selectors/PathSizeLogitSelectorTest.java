@@ -36,8 +36,8 @@ import org.matsim.core.config.Config;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
@@ -89,7 +89,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		Link l7 = network.getLinks().get(Id.create("7", Link.class));
 
 		// test with only one plan...
-		Person person = PersonImpl.createPerson(Id.create(1, Person.class));
+		Person person = PopulationUtils.createPerson(Id.create(1, Person.class));
 		PlanImpl p1 = new PlanImpl(person);
 		Activity a = new ActivityImpl("h", l6.getId());
 		Activity b = new ActivityImpl("w", l7.getId());
@@ -160,7 +160,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		assertNotNull(selector.selectPlan(person));
 
 		// test with only one plan, but with NEGATIVE_INFINITY...
-		person = PersonImpl.createPerson(Id.create(1, Person.class));
+		person = PopulationUtils.createPerson(Id.create(1, Person.class));
 		p1 = new org.matsim.core.population.PlanImpl(person);
 		a = new org.matsim.core.population.ActivityImpl("h", l6.getId());
 		b = new org.matsim.core.population.ActivityImpl("w", l7.getId());
@@ -191,7 +191,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		Link l6 = network.getLinks().get(Id.create("6", Link.class));
 		Link l7 = network.getLinks().get(Id.create("7", Link.class));
 
-		Person person = PersonImpl.createPerson(Id.create(1, Person.class));
+		Person person = PopulationUtils.createPerson(Id.create(1, Person.class));
 		PlanImpl p1 = new org.matsim.core.population.PlanImpl(person);
 		ActivityImpl a = new org.matsim.core.population.ActivityImpl("h", l6.getId());
 		ActivityImpl b = new org.matsim.core.population.ActivityImpl("w", l7.getId());
@@ -226,7 +226,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		Link l6 = network.getLinks().get(Id.create("6", Link.class));
 		Link l7 = network.getLinks().get(Id.create("7", Link.class));
 
-		Person person = PersonImpl.createPerson(Id.create(1, Person.class));
+		Person person = PopulationUtils.createPerson(Id.create(1, Person.class));
 		PlanImpl p1 = new org.matsim.core.population.PlanImpl(person);
 		ActivityImpl a = new org.matsim.core.population.ActivityImpl("h", l6.getId());
 		ActivityImpl b = new org.matsim.core.population.ActivityImpl("w", l7.getId());

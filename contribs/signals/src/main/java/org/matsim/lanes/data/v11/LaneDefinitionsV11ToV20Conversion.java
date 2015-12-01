@@ -49,17 +49,35 @@ import java.util.*;
  *   <li>One or more Lanes are created that lead from the beginning of the link to the Lanes at
  *   the end of the link.</li>
  *   <li>Based on the geometry information in the network graph topology information is added.</li>
- *   <li>To the lane which is the most left one (looking south to north on the link) a additional out 
- *   link is added to enable U-Turn funcitonality.</li>
+ *   <li>Optional: To the lane which is the most left one (looking south to north on the link) a additional out 
+ *   link is added to enable U-Turn functionality.</li>
  * </ul>
  * 
  * @author dgrether
+ * @author aneumann
  */
 public abstract class LaneDefinitionsV11ToV20Conversion {
 	
 //	private static final Logger log = Logger.getLogger(LaneDefinitionsV11ToV20Conversion.class);
 
+	/**
+	 * Specifies which type of UTurn is created. The interpretation of 
+	 * left or right lane depends on the coordinate system and the
+	 * behavior of NetworkUtils.getOutLinksSortedByAngle()
+	 * 
+	 * @author dgrether
+	 *
+	 */
+	public enum UTurnCreation {OFF, ON_LEFT_LANE, ON_RIGHT_LANE}
+	
+	/**
+	 * Syntactic sugar to keep old code running. 
+	 */
 	public static void convertTo20(LaneDefinitions11 in, Lanes out, Network network) {
+		convertTo20(in, out, network, UTurnCreation.ON_LEFT_LANE);
+	}	
+	
+	public static void convertTo20(LaneDefinitions11 in, Lanes out, Network network, UTurnCreation uturn) {
 		LaneDefinitionsFactory20 lanedefs20fac = out.getFactory();
 		org.matsim.lanes.data.v20.LanesToLinkAssignment20 l2lnew;
 		Lane lanev20;
@@ -143,8 +161,12 @@ public abstract class LaneDefinitionsV11ToV20Conversion {
 					newLane = l2lnew.getLanes().get(oldLane.getId());
 
 					//add uturn functionality if the first lane is processed, i.e. the most left lane that is indicated by an empty set of assignedLanes
-					if (assignedLanes.isEmpty()){
+					if (UTurnCreation.ON_LEFT_LANE.equals(uturn) && assignedLanes.isEmpty()){
 						addUTurn(link, newLane);
+					}
+					else if (UTurnCreation.ON_RIGHT_LANE.equals(uturn) && 
+							(assignedLanes.size() == (l2lv11.getLanes().size() - 1))) {
+						addUTurn(outlink, newLane);
 					}
 
 					if (newLane.getToLinkIds().contains(outlink.getId())){
@@ -162,9 +184,16 @@ public abstract class LaneDefinitionsV11ToV20Conversion {
 		}
 	}
 
+	/**
+	 * Syntactic sugar to keep old code running. 
+	 */
 	public static Lanes convertTo20(LaneDefinitions11 lanedefs11, Network network) {
+		return convertTo20(lanedefs11, network, UTurnCreation.ON_LEFT_LANE);
+	}
+	
+	public static Lanes convertTo20(LaneDefinitions11 lanedefs11, Network network, UTurnCreation uturns) {
 		Lanes lanedefs20 = new LaneDefinitions20Impl();
-		convertTo20(lanedefs11, lanedefs20, network);
+		convertTo20(lanedefs11, lanedefs20, network, uturns);
 		return lanedefs20;
 	}
 	

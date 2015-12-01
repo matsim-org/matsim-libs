@@ -19,6 +19,7 @@
 
 package playground.jbischoff.taxibus.passenger;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.MatsimVrpContext;
@@ -61,6 +62,8 @@ public class TaxibusPassengerEngine extends PassengerEngine {
 		        if (request == null) {
 		        	return false;
 		        	//we don't want immediate requests for Taxibus
+		        	
+		        	//shouldn't we throw here some exception? michal, nov'15
 		        }
 		        else {
 		            PassengerPickupActivity awaitingPickup = awaitingPickupStorage
@@ -80,7 +83,8 @@ public class TaxibusPassengerEngine extends PassengerEngine {
 	public boolean prebookTrip(double now, MobsimPassengerAgent passenger, Id<Link> fromLinkId,
 			Id<Link> toLinkId, Double departureTime) {
 		    		        if (departureTime <= now ) {
-		            throw new IllegalStateException("This is not a call ahead (departure time: "+departureTime+" now: "+now);
+		            Logger.getLogger(this.getClass()).info("This is not a call ahead (departure time: "+departureTime+" now: "+now);
+		            departureTime = now+1;
 		        }
 
 		        PassengerRequest request = createRequest(passenger, fromLinkId, toLinkId, departureTime+1,

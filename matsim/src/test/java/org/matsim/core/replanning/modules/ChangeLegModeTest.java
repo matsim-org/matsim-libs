@@ -32,9 +32,9 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 
 /**
  * @author mrieser
@@ -80,7 +80,7 @@ public class ChangeLegModeTest {
 		final String[] modes = new String[] {TransportMode.car, TransportMode.pt, TransportMode.walk};
 
 		module.prepareReplanning(null);
-		Person person = PersonImpl.createPerson(Id.create(1, Person.class));
+		Person person = PopulationUtils.createPerson(Id.create(1, Person.class));
 		PersonUtils.setCarAvail(person, "never");
 		PlanImpl plan = new org.matsim.core.population.PlanImpl(person);
 		plan.createAndAddActivity("home", new Coord((double) 0, (double) 0));

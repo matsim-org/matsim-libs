@@ -19,7 +19,6 @@
 package playground.thibautd.maxess.prepareforbiogeme.framework;
 
 import com.google.inject.Provider;
-import eu.eunoiaproject.examples.schedulebasedteleportation.Run;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
@@ -28,7 +27,11 @@ import org.matsim.core.utils.misc.Counter;
 import playground.thibautd.maxess.prepareforbiogeme.framework.ChoiceDataSetWriter.ChoiceSetRecordFiller;
 
 import java.io.IOException;
-import java.util.concurrent.*;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author thibautd

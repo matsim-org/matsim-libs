@@ -47,7 +47,6 @@ public class DelaysAndWelfare {
 		for(String runCase :runCases){
 			writeCongestionStatsExternally(runCase);
 		}
-		
 	}
 
 	private static void writeCongestionStatsExternally(String runCase){
@@ -92,6 +91,4 @@ public class DelaysAndWelfare {
 			break;
 		}
 	}
-
-
 }

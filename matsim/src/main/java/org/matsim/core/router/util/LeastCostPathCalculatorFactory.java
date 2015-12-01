@@ -21,10 +21,21 @@
 package org.matsim.core.router.util;
 
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.api.internal.MatsimExtensionPoint;
 import org.matsim.core.api.internal.MatsimFactory;
 
-public interface LeastCostPathCalculatorFactory extends MatsimFactory {
-
+/**
+ * Example(s):<ul>
+ * <li> {@link tutorial.programming.example21tutorialTUBclass.leastCostPath.RunLeastCostPathCalculatorExample}
+ * </ul>
+ *
+ */
+public interface LeastCostPathCalculatorFactory extends MatsimFactory, MatsimExtensionPoint {
+	
+	/**
+	 * Creational method, since Network may not be exactly the scenario's network
+	 */
+	
 	public LeastCostPathCalculator createPathCalculator(final Network network, final TravelDisutility travelCosts, final TravelTime travelTimes);
 
 }

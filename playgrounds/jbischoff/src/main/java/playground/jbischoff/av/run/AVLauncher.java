@@ -39,12 +39,12 @@ public class AVLauncher {
 		Config config = ConfigUtils.loadConfig("C:/Users/Joschka/Documents/shared-svn/projects/audi_av/scenario/config.xml");
 		
 		TaxiConfigGroup tcg = new TaxiConfigGroup();
-		tcg.addParam("vehiclesFile", "C:/Users/Joschka/Documents/shared-svn/projects/audi_av/scenario/v36/taxi_vehicles_200000.xml.gz");
+		tcg.addParam("vehiclesFile", "C:/Users/Joschka/Documents/shared-svn/projects/audi_av/scenario/v10pct/taxi_vehicles_19000.xml.gz");
 		tcg.addParam("ranksFile", "C:/Users/Joschka/Documents/shared-svn/projects/audi_av/scenario/ranks.xml");
 		tcg.addParam("outputDir", config.controler().getOutputDirectory()+"/taxi");
 		tcg.addParam("algorithm", "dummy");
-		tcg.addParam("nearestVehicleLimit", "50");
-		tcg.addParam("nearestRequestLimit", "50");
+		tcg.addParam("nearestVehicleLimit", "20");
+		tcg.addParam("nearestRequestLimit", "20");
 		tcg.addParam("pickupDuration", "60");
 		tcg.addParam("dropOffDuration", "60");
 		config.addModule(tcg);

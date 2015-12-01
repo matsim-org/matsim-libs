@@ -19,13 +19,8 @@
  * *********************************************************************** */
 package eu.eunoiaproject.bikesharing.examples.example02randomvehiclerelocation.qsim;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.WeakHashMap;
-
+import eu.eunoiaproject.bikesharing.framework.qsim.BikeSharingManager;
+import eu.eunoiaproject.bikesharing.framework.qsim.StatefulBikeSharingFacility;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -47,8 +42,12 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
-import eu.eunoiaproject.bikesharing.framework.qsim.BikeSharingManager;
-import eu.eunoiaproject.bikesharing.framework.qsim.StatefulBikeSharingFacility;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.WeakHashMap;
 
 /**
  * Must be added as first activity handler!

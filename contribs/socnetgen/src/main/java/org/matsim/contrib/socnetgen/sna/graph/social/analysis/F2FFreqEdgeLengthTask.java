@@ -19,8 +19,12 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetgen.sna.graph.social.analysis;
 
-import gnu.trove.TDoubleDoubleHashMap;
-import gnu.trove.TObjectDoubleHashMap;
+import gnu.trove.map.hash.TDoubleDoubleHashMap;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
+
+import java.io.IOException;
+import java.util.Map;
+
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.common.stats.Discretizer;
 import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
@@ -30,9 +34,6 @@ import org.matsim.contrib.socnetgen.sna.graph.Graph;
 import org.matsim.contrib.socnetgen.sna.graph.analysis.AnalyzerTask;
 import org.matsim.contrib.socnetgen.sna.graph.analysis.VertexPropertyCorrelation;
 import org.matsim.contrib.socnetgen.sna.graph.spatial.analysis.EdgeLength;
-
-import java.io.IOException;
-import java.util.Map;
 
 /**
  * @author illenberger
@@ -46,7 +47,7 @@ public class F2FFreqEdgeLengthTask extends AnalyzerTask {
 		len.setIgnoreZero(true);
 		
 		TObjectDoubleHashMap<Edge> lenVals = len.values(graph.getEdges());
-		Discretizer discretizer = FixedSampleSizeDiscretizer.create(lenVals.getValues(), 200, 100);
+		Discretizer discretizer = FixedSampleSizeDiscretizer.create(lenVals.values(), 200, 100);
 		
 		
 		TDoubleDoubleHashMap hist = VertexPropertyCorrelation.mean(F2FFrequency.getInstance(), len, graph.getEdges(), discretizer);
