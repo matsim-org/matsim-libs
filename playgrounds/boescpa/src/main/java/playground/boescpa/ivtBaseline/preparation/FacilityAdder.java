@@ -1,7 +1,6 @@
 package playground.boescpa.ivtBaseline.preparation;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -16,7 +15,6 @@ import org.matsim.core.utils.misc.Counter;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.FacilitiesReaderMatsimV1;
-import org.matsim.facilities.Facility;
 
 import java.util.HashMap;
 import java.util.Map;

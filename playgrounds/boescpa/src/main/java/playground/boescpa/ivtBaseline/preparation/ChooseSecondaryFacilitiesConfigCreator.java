@@ -30,8 +30,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * WHAT IS IT FOR?
- * WHAT DOES IT?
+ * Creates an ivt config with location choice.
  *
  * @author boescpa
  */
