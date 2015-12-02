@@ -97,14 +97,14 @@ public class PlanTimesAdapter {
 	 * 
 	 */
 	/* package */ double adaptTimesAndScorePlan(Plan plan, int actlegIndex, Plan planTmp, ScoringFunctionFactory scoringFunctionFactory) {
-		
+
 		// yyyy Note: getPrevious/NextLeg/Activity all relies on alternating activities and leg, which was given up as a requirement
 		// a long time ago (which is why it is not in the interface).  kai, jan'13
-		
+
 		// This used to use ScoringFunction accumulator (wrongly, as it started the first activity),
 		// with the same instance used over and over. td, mai'14
 		final ScoringFunction scoringFunction = scoringFunctionFactory.createNewScoringFunction(plan.getPerson());
-		
+
 		// iterate through plan and adapt travel and activity times
 		int planElementIndex = -1;
 		for (PlanElement pe : plan.getPlanElements()) {
@@ -122,31 +122,47 @@ public class PlanTimesAdapter {
 //					System.err.println("10 score: " + scoringFunction.getScore() ) ;
 				continue;
 			}
-			
+
+			// Those 3 variables are essentially the return value of the procedure below,
+			// that depends on the approximation level
+			// Before correcting for PT, this was only PathCosts
 			PathCosts pathCosts = null;
-			List<? extends PlanElement> listPlanElements = null;			
-			Leg previousLegPlanTmp = (Leg) planTmp.getPlanElements().get(planElementIndex - 1);
+			List<? extends PlanElement> listPlanElements = null;
 			double legTravelTime = 0.0;
 
+			final Leg previousLegPlanTmp = (Leg) planTmp.getPlanElements().get(planElementIndex - 1);
+
+			// This should be split in 3 methods, returning an Object containing all the relevant information
+			// td dec 15
 			if (this.approximationLevel == ApproximationLevel.COMPLETE_ROUTING) {
-				Leg previousLeg = PlanUtils.getPreviousLeg(plan, act);
-				String mode = previousLeg.getMode();
-				Activity previousActivity = PlanUtils.getPreviousActivity(plan, previousLeg);
+				final Leg previousLeg = PlanUtils.getPreviousLeg(plan, act);
+				final String mode = previousLeg.getMode();
+				final Activity previousActivity = PlanUtils.getPreviousActivity(plan, previousLeg);
 				pathCosts = computeTravelTimeFromCompleteRouting(plan, previousActivity, act, mode);
-				listPlanElements = this.router.calcRoute(mode, new LinkWrapperFacility(this.network.getLinks().get(previousActivity.getLinkId())),
-					new LinkWrapperFacility(this.network.getLinks().get(act.getLinkId())), previousActivity.getEndTime(), plan.getPerson());
-				
+				listPlanElements =
+						this.router.calcRoute(
+								mode,
+								new LinkWrapperFacility(
+										this.network.getLinks().get(
+												previousActivity.getLinkId())),
+								new LinkWrapperFacility(
+										this.network.getLinks().get(
+												act.getLinkId())),
+								previousActivity.getEndTime(),
+								plan.getPerson());
+
 				for(PlanElement pel : listPlanElements) {
-					
 					if (pel instanceof Leg) {
 						scoringFunction.handleLeg( (Leg)pel );
 						legTravelTime += ((Leg) pel).getTravelTime();
-					}					
+					}
 				}
-								
-				GenericRouteImpl route = new GenericRouteImpl( ((Leg) listPlanElements.get(0)).getRoute().getStartLinkId(),
-						((Leg) listPlanElements.get(listPlanElements.size() - 1)).getRoute().getEndLinkId());
-				
+
+				final GenericRouteImpl route =
+						new GenericRouteImpl(
+								((Leg) listPlanElements.get(0)).getRoute().getStartLinkId(),
+								((Leg) listPlanElements.get(listPlanElements.size() - 1)).getRoute().getEndLinkId());
+
 				previousLegPlanTmp.setRoute(route);
 				previousLegPlanTmp.setTravelTime(legTravelTime);
 
@@ -155,15 +171,13 @@ public class PlanTimesAdapter {
 				previousLegPlanTmp.setRoute(pathCosts.getRoute());
 				legTravelTime = pathCosts.getRoute().getTravelTime();
 				previousLegPlanTmp.setTravelTime(legTravelTime);
-
-
 			} else if (this.approximationLevel == ApproximationLevel.NO_ROUTING ) {
 				pathCosts = approximateTravelTimeFromDistance(plan, actlegIndex, planElementIndex, act);
 				previousLegPlanTmp.setRoute(pathCosts.getRoute());
 				legTravelTime = pathCosts.getRoute().getTravelTime();
 				previousLegPlanTmp.setTravelTime(legTravelTime);
 			}
-			
+
 			double actDur = act.getMaximumDuration();
 
 			final Activity prevActTmp = (Activity) planTmp.getPlanElements().get(planElementIndex - 2);
