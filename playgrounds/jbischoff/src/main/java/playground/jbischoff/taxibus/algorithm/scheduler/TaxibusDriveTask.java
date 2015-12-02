@@ -17,43 +17,33 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jbischoff.taxibus.scenario.strategies;
+package playground.jbischoff.taxibus.algorithm.scheduler;
 
-import java.util.Collection;
-
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Plan;
-
-import playground.jbischoff.taxibus.algorithm.optimizer.fifo.Lines.LineDispatcher;
+import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
+import org.matsim.contrib.dvrp.schedule.DriveTaskImpl;
 
 /**
  * @author  jbischoff
- *	this one is totally scenario specific
- * and picks either scheduled or teleported pt (defined as mode "tpt") depending on an agent's subpopulation
+ *	Task for driving w/o pax
  */
-public class TaxibusAndWOBScenarioPermissibleModesCalculator extends TaxibusPermissibleModesCalculatorImpl {
+public class TaxibusDriveTask extends DriveTaskImpl implements TaxibusTask {
 
-	private final Scenario scenario;
-	
-	public TaxibusAndWOBScenarioPermissibleModesCalculator(String[] availableModes, LineDispatcher dispatcher, Scenario scenario) {
-		super(availableModes, dispatcher);
-		this.scenario = scenario;
+	public TaxibusDriveTask(VrpPathWithTravelData path) {
+		super(path);
+		// TODO Auto-generated constructor stub
 	}
-	
-	
+
 	@Override
-	public Collection<String> getPermissibleModes(Plan plan) {
-		Collection<String> permissibleModes = super.getPermissibleModes(plan);
-		String subpop = (String) scenario.getPopulation().getPersonAttributes().getAttribute(plan.getPerson().getId().toString(), "subpopulation");
-		if (subpop.equals("schedulePt")){
-			permissibleModes.remove("tpt");
-			
-		}
-		else if (subpop.equals("teleportPt")){
-			permissibleModes.remove("pt");
-		}
+	public TaxibusTaskType getTaxibusTaskType() {
 		
-		return permissibleModes;
+		return TaxibusTaskType.DRIVE_EMPTY;
 	}
+
+    @Override
+    protected String commonToString()
+    {
+        return "[" + getTaxibusTaskType().name() + "]" + super.commonToString();
+    }
+
 
 }

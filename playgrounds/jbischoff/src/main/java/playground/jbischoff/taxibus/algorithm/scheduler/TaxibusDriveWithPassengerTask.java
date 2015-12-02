@@ -17,43 +17,68 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jbischoff.taxibus.scenario.strategies;
+package playground.jbischoff.taxibus.algorithm.scheduler;
 
-import java.util.Collection;
+import java.util.Set;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Plan;
+import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
+import org.matsim.contrib.dvrp.schedule.DriveTaskImpl;
 
-import playground.jbischoff.taxibus.algorithm.optimizer.fifo.Lines.LineDispatcher;
+import playground.jbischoff.taxibus.algorithm.passenger.TaxibusRequest;
+
 
 /**
  * @author  jbischoff
- *	this one is totally scenario specific
- * and picks either scheduled or teleported pt (defined as mode "tpt") depending on an agent's subpopulation
+ *
  */
-public class TaxibusAndWOBScenarioPermissibleModesCalculator extends TaxibusPermissibleModesCalculatorImpl {
-
-	private final Scenario scenario;
+public class TaxibusDriveWithPassengerTask extends DriveTaskImpl implements TaxibusTaskWithRequests {
 	
-	public TaxibusAndWOBScenarioPermissibleModesCalculator(String[] availableModes, LineDispatcher dispatcher, Scenario scenario) {
-		super(availableModes, dispatcher);
-		this.scenario = scenario;
+	private Set<TaxibusRequest> requests;
+	
+	public TaxibusDriveWithPassengerTask(Set<TaxibusRequest> requests, VrpPathWithTravelData path) {
+		super(path);
+		this.requests = requests;
+		for (TaxibusRequest req: this.requests){
+			req.addDriveWithPassengerTask(this);
+		}
+		}
+
+	
+
+	@Override
+	public TaxibusTaskType getTaxibusTaskType() {
+		
+		return TaxibusTaskType.DRIVE_WITH_PASSENGER;
 	}
 	
 	
+
 	@Override
-	public Collection<String> getPermissibleModes(Plan plan) {
-		Collection<String> permissibleModes = super.getPermissibleModes(plan);
-		String subpop = (String) scenario.getPopulation().getPersonAttributes().getAttribute(plan.getPerson().getId().toString(), "subpopulation");
-		if (subpop.equals("schedulePt")){
-			permissibleModes.remove("tpt");
+	public Set<TaxibusRequest> getRequests() {
+		return requests;
+	}
+	
+
+	
+
+	@Override
+	public void removeFromRequest(TaxibusRequest request) {
+		
+		request.addDriveWithPassengerTask(null);
+		this.requests.remove(request);
+
+	}
+
+	@Override
+	public void removeFromAllRequests() {
+		for (TaxibusRequest request : this.requests){
+			request.addDriveWithPassengerTask(null);
 			
 		}
-		else if (subpop.equals("teleportPt")){
-			permissibleModes.remove("pt");
-		}
-		
-		return permissibleModes;
+		this.requests.clear();
 	}
+
+
+	
 
 }

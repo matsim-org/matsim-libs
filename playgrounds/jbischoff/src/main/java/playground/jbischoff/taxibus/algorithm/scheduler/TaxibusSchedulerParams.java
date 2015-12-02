@@ -17,43 +17,21 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jbischoff.taxibus.scenario.strategies;
+package playground.jbischoff.taxibus.algorithm.scheduler;
 
-import java.util.Collection;
-
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Plan;
-
-import playground.jbischoff.taxibus.algorithm.optimizer.fifo.Lines.LineDispatcher;
+import playground.michalm.taxi.scheduler.TaxiSchedulerParams;
 
 /**
  * @author  jbischoff
- *	this one is totally scenario specific
- * and picks either scheduled or teleported pt (defined as mode "tpt") depending on an agent's subpopulation
+ *
  */
-public class TaxibusAndWOBScenarioPermissibleModesCalculator extends TaxibusPermissibleModesCalculatorImpl {
+public class TaxibusSchedulerParams extends TaxiSchedulerParams {
 
-	private final Scenario scenario;
-	
-	public TaxibusAndWOBScenarioPermissibleModesCalculator(String[] availableModes, LineDispatcher dispatcher, Scenario scenario) {
-		super(availableModes, dispatcher);
-		this.scenario = scenario;
-	}
-	
-	
-	@Override
-	public Collection<String> getPermissibleModes(Plan plan) {
-		Collection<String> permissibleModes = super.getPermissibleModes(plan);
-		String subpop = (String) scenario.getPopulation().getPersonAttributes().getAttribute(plan.getPerson().getId().toString(), "subpopulation");
-		if (subpop.equals("schedulePt")){
-			permissibleModes.remove("tpt");
-			
-		}
-		else if (subpop.equals("teleportPt")){
-			permissibleModes.remove("pt");
-		}
+	public TaxibusSchedulerParams(double pickupDuration,
+			double dropoffDuration) {
+		super(true, false, pickupDuration, dropoffDuration);
+		//		We assume we a) know where we are heading to and b) do not allow diversions once a bus is running
 		
-		return permissibleModes;
 	}
 
 }
