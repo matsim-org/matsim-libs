@@ -46,8 +46,6 @@ public class ActivityAdder {
         testFacilities(pathToOutputFacilities);
     }
 
-
-
     protected void addActivityToFacilities(String actTypeToAdd, String existingActToAddTo, double defaultCapacity,
                                            double defaultOpenFrom, double defaultOpenTill) {
         for (ActivityFacility facility : facilities.getFacilities().values()) {
@@ -57,9 +55,18 @@ public class ActivityAdder {
                 newActivity.setCapacity(defaultCapacity);
                 newActivity.addOpeningTime(new OpeningTimeImpl(defaultOpenFrom, defaultOpenTill));
                 facility.addActivityOption(newActivity);
+				correctFacility(facility);
             }
         }
     }
 
+	private void correctFacility(ActivityFacility facility) {
+		if (facility.getActivityOptions().containsKey("home")) {
+			facility.getActivityOptions().get("home").getOpeningTimes().clear();
+		}
+		if (facility.getActivityOptions().containsKey("remote_home")) {
+			facility.getActivityOptions().get("remote_home").getOpeningTimes().clear();
+		}
+	}
 
 }

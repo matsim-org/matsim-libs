@@ -18,6 +18,7 @@
  * *********************************************************************** */
 package playground.thibautd.maxess.prepareforbiogeme.tripbased;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.facilities.ActivityFacility;
@@ -30,6 +31,7 @@ import java.util.List;
  * @author thibautd
  */
 public class Trip {
+	private static final Logger log = Logger.getLogger( Trip.class );
 	private final ActivityFacility origin;
 	private final ActivityFacility destination;
 	private final List<? extends PlanElement> trip;
@@ -44,6 +46,8 @@ public class Trip {
 		this.origin = origin;
 		this.destination = destination;
 		this.trip = trip;
+
+		if ( log.isTraceEnabled() ) log.trace( "Created "+this );
 	}
 
 	public ActivityFacility getOrigin() {

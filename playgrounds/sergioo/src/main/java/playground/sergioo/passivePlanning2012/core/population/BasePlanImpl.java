@@ -185,10 +185,6 @@ public class BasePlanImpl implements BasePlan {
 
     }
 
-    @Override
-	public boolean isSelected() {
-		return this.getPerson().getSelectedPlan() == this;
-	}
 	@Override
 	public void setScore(Double score) {
 		this.score = score;

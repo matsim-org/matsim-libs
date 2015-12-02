@@ -30,6 +30,7 @@ import org.matsim.contrib.parking.PC2.infrastructure.PC2Parking;
 import org.matsim.contrib.parking.PC2.infrastructure.PPRestrictedToFacilities;
 import org.matsim.contrib.parking.PC2.infrastructure.PrivateParking;
 import org.matsim.contrib.parking.PC2.infrastructure.PublicParking;
+import org.matsim.contrib.parking.PC2.infrastructure.RentableParking;
 import org.matsim.contrib.parking.PC2.scoring.ParkingScoreManager;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.obj.LinkedListValueHashMap;
@@ -51,9 +52,20 @@ public class ParkingInfrastructureManager {
 	// facilityId -> parkings available to users of that facility
 	private LinkedListValueHashMap<Id<ActivityFacility>, PPRestrictedToFacilities> privateParkingsRestrictedToFacilities;
 
+	// available to parking owner and sometimes to others (renting out)
+	private HashMap<Id<Person>, RentableParking> rentablePrivateParking;
+	// TODO: cont here!!!!
+
+	// owner can always use it -> also for other activities (e.g. shopping close
+	// to home)
+
+	// => public or rentable parking useable.
+
 	// TODO: later - to improve parformance, a second variable could be added,
 	// where full parking are put.
 	private QuadTree<PC2Parking> publicParkingsQuadTree;
+	
+	
 	private HashMap<String, QuadTree<PC2Parking>> publicParkingGroupQuadTrees;
 
 	// TODO: make private parking (attached to facility)
@@ -66,6 +78,7 @@ public class ParkingInfrastructureManager {
 		parkedVehicles = new HashMap<>();
 		setAllParkings(new HashMap<Id<PC2Parking>, PC2Parking>());
 		privateParkingsRestrictedToFacilities = new LinkedListValueHashMap<>();
+		rentablePrivateParking = new HashMap<>();
 	}
 
 	public synchronized void setPublicParkings(LinkedList<PublicParking> publicParkings) {
@@ -104,7 +117,15 @@ public class ParkingInfrastructureManager {
 		quadTree.put(parking.getCoordinate().getX(), parking.getCoordinate().getY(), parking);
 	}
 
-	public synchronized void setPrivateParkingRestrictedToFacilities(LinkedList<PPRestrictedToFacilities> ppRestrictedToFacilities) {
+	public synchronized void setRentableParking(LinkedList<RentableParking> rentableParkings) {
+		for (RentableParking pp : rentableParkings) {
+			rentablePrivateParking.put(pp.getOwnerId(), pp);
+			getAllParkings().put(pp.getId(), pp);
+		}
+	}
+
+	public synchronized void setPrivateParkingRestrictedToFacilities(
+			LinkedList<PPRestrictedToFacilities> ppRestrictedToFacilities) {
 		for (PPRestrictedToFacilities pp : ppRestrictedToFacilities) {
 			for (Id<ActivityFacility> facilityId : pp.getFacilityIds()) {
 				privateParkingsRestrictedToFacilities.put(facilityId, pp);
@@ -116,20 +137,25 @@ public class ParkingInfrastructureManager {
 	public synchronized void reset() {
 		parkedVehicles.clear();
 
-		for ( PC2Parking parking : getAllParkings().values() ) {
+		for (PC2Parking parking : getAllParkings().values()) {
 			if (parking.getAvailableParkingCapacity() == 0) {
-				// yyyyyy I have no idea what this is doing and why.  Why should parking be full at the end of simulation?  Why put it 
-				// into a quad tree?  Maybe this is an implicit marker that has been added during the previous iteration??? kai, jul'15
+				// yyyyyy I have no idea what this is doing and why. Why should
+				// parking be full at the end of simulation? Why put it
+				// into a quad tree? Maybe this is an implicit marker that has
+				// been added during the previous iteration??? kai, jul'15
 				if (!(parking instanceof PrivateParking)) {
 					addParkingToQuadTree(publicParkingsQuadTree, parking);
 					addParkingToQuadTree(publicParkingGroupQuadTrees.get(parking.getGroupName()), parking);
-					// yyyyyy I could speculate that full parking lots are removed from the quad tree, and it is re-added as soon
-					// as space becomes available.  But this is not commented, and it also does not look like it would work in that way.
+					// yyyyyy I could speculate that full parking lots are
+					// removed from the quad tree, and it is re-added as soon
+					// as space becomes available. But this is not commented,
+					// and it also does not look like it would work in that way.
 					// kai, jul'15
 				}
 			}
 			parking.resetAvailability();
-			// (resets the available parking capacity to the maximum parking capacity, which should be > 0. kai, jul15)
+			// (resets the available parking capacity to the maximum parking
+			// capacity, which should be > 0. kai, jul15)
 
 			if (parking.getAvailableParkingCapacity() == 0) {
 				DebugLib.stopSystemAndReportInconsistency();
@@ -143,7 +169,8 @@ public class ParkingInfrastructureManager {
 		return publicParkingsQuadTree;
 	}
 
-	public synchronized PC2Parking parkAtClosestPublicParkingNonPersonalVehicle(Coord destCoordinate, String groupName) {
+	public synchronized PC2Parking parkAtClosestPublicParkingNonPersonalVehicle(Coord destCoordinate,
+			String groupName) {
 		PC2Parking parking = null;
 		if (groupName == null) {
 			parking = publicParkingsQuadTree.getClosest(destCoordinate.getX(), destCoordinate.getY());
@@ -152,7 +179,8 @@ public class ParkingInfrastructureManager {
 			parking = quadTree.getClosest(destCoordinate.getX(), destCoordinate.getY());
 
 			if (parking == null) {
-				DebugLib.stopSystemAndReportInconsistency("not enough parking available for parkingGroupName:" + groupName);
+				DebugLib.stopSystemAndReportInconsistency(
+						"not enough parking available for parkingGroupName:" + groupName);
 			}
 		}
 		parkVehicle(parking);
@@ -164,14 +192,16 @@ public class ParkingInfrastructureManager {
 		eventsManager.processEvent(new ParkingArrivalEvent(0, parking.getId(), null, null, 0));
 	}
 
-	public synchronized PC2Parking parkAtClosestPublicParkingNonPersonalVehicle(Coord destCoordinate, String groupName, 
+	public synchronized PC2Parking parkAtClosestPublicParkingNonPersonalVehicle(Coord destCoordinate, String groupName,
 			Id<Person> personId, double parkingDurationInSeconds, double arrivalTime) {
 		PC2Parking parking = parkAtClosestPublicParkingNonPersonalVehicle(destCoordinate, groupName);
 
-		double walkScore = parkingScoreManager.calcWalkScore(destCoordinate, parking, personId, parkingDurationInSeconds);
+		double walkScore = parkingScoreManager.calcWalkScore(destCoordinate, parking, personId,
+				parkingDurationInSeconds);
 		parkingScoreManager.addScore(personId, walkScore);
 
-		eventsManager.processEvent(new ParkingArrivalEvent(arrivalTime, parking.getId(), personId, destCoordinate, walkScore));
+		eventsManager.processEvent(
+				new ParkingArrivalEvent(arrivalTime, parking.getId(), personId, destCoordinate, walkScore));
 
 		return parking;
 	}
@@ -186,17 +216,19 @@ public class ParkingInfrastructureManager {
 
 		PC2Parking selectedParking = null;
 		boolean parkingFound = false;
-		
+
 		// first search for parking at selected facility:
-		for (PPRestrictedToFacilities pp : privateParkingsRestrictedToFacilities.get(parkingOperationRequestAttributes.facilityId)) {
+		for (PPRestrictedToFacilities pp : privateParkingsRestrictedToFacilities
+				.get(parkingOperationRequestAttributes.facilityId)) {
 			if (pp.getAvailableParkingCapacity() > 0) {
 
-				// this tells the parking lot to decrease the number of available spaces:
+				// this tells the parking lot to decrease the number of
+				// available spaces:
 				pp.parkVehicle();
 
 				// this puts the personId (!!!! yyyyyy) at the parking location:
 				parkedVehicles.put(parkingOperationRequestAttributes.personId, pp.getId());
-				
+
 				parkingFound = true;
 				selectedParking = pp;
 			}
@@ -205,21 +237,16 @@ public class ParkingInfrastructureManager {
 		// if not found, search within distance of 300m:
 		double distance = 300;
 		if (!parkingFound) {
-			Collection<PC2Parking> collection = getPublicParkingQuadTree().getDisk(
-					parkingOperationRequestAttributes.destCoordinate.getX(),
-					parkingOperationRequestAttributes.destCoordinate.getY(), distance);
-
-			if (!parkingFound) { 
-				// yyyyyy no idea why the condition is checked again but it is certainly still valid.  
-				
+			Collection<PC2Parking> collection = getFilteredCollection(parkingOperationRequestAttributes, distance);
+			
 				while (collection.size() == 0) {
 					distance *= 2;
-					collection = getPublicParkingQuadTree().getDisk(parkingOperationRequestAttributes.destCoordinate.getX(),
-							parkingOperationRequestAttributes.destCoordinate.getY(), distance);
+					collection = getFilteredCollection(parkingOperationRequestAttributes, distance);
 
 					if (distance > 100000000) {
 						// stop infinite loop
-						DebugLib.stopSystemAndReportInconsistency("not enough public parking in scenario - introduce dummy parking to solve problem");
+						DebugLib.stopSystemAndReportInconsistency(
+								"not enough public parking in scenario - introduce dummy parking to solve problem");
 					}
 
 				}
@@ -230,7 +257,8 @@ public class ParkingInfrastructureManager {
 					double score = parkingScoreManager.calcScore(parkingOperationRequestAttributes.destCoordinate,
 							parkingOperationRequestAttributes.arrivalTime,
 							parkingOperationRequestAttributes.parkingDurationInSeconds, parking,
-							parkingOperationRequestAttributes.personId, parkingOperationRequestAttributes.legIndex);
+							parkingOperationRequestAttributes.personId, parkingOperationRequestAttributes.legIndex,
+							false);
 					queue.add(new SortableMapObject<PC2Parking>(parking, -1.0 * score));
 				}
 
@@ -241,82 +269,141 @@ public class ParkingInfrastructureManager {
 				finalScore = poll.getScore();
 				selectedParking = poll.getKey();
 
+				if (rentablePrivateParking.containsKey(parkingOperationRequestAttributes.personId)) {
+					RentableParking rentableParking = rentablePrivateParking
+							.get(parkingOperationRequestAttributes.personId);
+
+					if (rentableParking.getAvailableParkingCapacity() > 0) {
+
+						double score = parkingScoreManager.calcScore(parkingOperationRequestAttributes.destCoordinate,
+								parkingOperationRequestAttributes.arrivalTime,
+								parkingOperationRequestAttributes.parkingDurationInSeconds, rentableParking,
+								parkingOperationRequestAttributes.personId, parkingOperationRequestAttributes.legIndex,
+								true);
+
+						if (score > finalScore) {
+							selectedParking = rentableParking;
+						}
+					}
+				}
+
 				// this puts the personId (!!!! yyyyyy) at the parking location:
 				parkedVehicles.put(parkingOperationRequestAttributes.personId, selectedParking.getId());
 
-				// this tells the parking lot to decrease the number of available spaces:
+				// this tells the parking lot to decrease the number of
+				// available spaces:
 				parkVehicle(selectedParking);
 
-//				PC2Parking closestParking = getPublicParkingQuadTree().get(parkingOperationRequestAttributes.destCoordinate.getX(),
-//				parkingOperationRequestAttributes.destCoordinate.getY());
-//		double distanceClosestParking = GeneralLib.getDistance(closestParking.getCoordinate(),
-//				parkingOperationRequestAttributes.destCoordinate);
+				// PC2Parking closestParking =
+				// getPublicParkingQuadTree().get(parkingOperationRequestAttributes.destCoordinate.getX(),
+				// parkingOperationRequestAttributes.destCoordinate.getY());
+				// double distanceClosestParking =
+				// GeneralLib.getDistance(closestParking.getCoordinate(),
+				// parkingOperationRequestAttributes.destCoordinate);
 
-//				double distanceSelectedParking = GeneralLib.getDistance(selectedParking.getCoordinate(),
-//						parkingOperationRequestAttributes.destCoordinate);
-//
-//				if (selectedParking.getId().toString().contains("stp") && distanceSelectedParking>300) {
-//					DebugLib.emptyFunctionForSettingBreakPoint();
-//				}
-//				
-//				if (distanceSelectedParking > distanceClosestParking * 1.5 && distanceSelectedParking > 200) {
-//					Id closestParkingId = closestParking.getId();
-//					Id selectedParkingId = selectedParking.getId();
-//
-//					if (closestParkingId.toString().contains("stp") && selectedParkingId.toString().contains("stp")) {
-//
-//						for (Parking parking : collection) {
-//							if (parking.getId().toString().contains("stp")) {
-//								System.out.println(parking.getId()
-//										+ "\t"
-//										+ Math.round(GeneralLib.getDistance(parking.getCoordinate(),
-//												parkingOperationRequestAttributes.destCoordinate)));
-//							}
-//						}
-//
-//						while (queue.size() > 0) {
-//							SortableMapObject<Parking> p = queue.poll();
-//							double costScore = parkingScoreManager.calcCostScore(parkingOperationRequestAttributes.arrivalTime,
-//									parkingOperationRequestAttributes.parkingDurationInSeconds, p.getKey(),
-//									parkingOperationRequestAttributes.personId);
-//							double walkScore = parkingScoreManager.calcWalkScore(parkingOperationRequestAttributes.destCoordinate,
-//									p.getKey(), parkingOperationRequestAttributes.personId,
-//									parkingOperationRequestAttributes.parkingDurationInSeconds);
-//							System.out.println(p.getKey().getId() + "\t" + p.getScore() + "\t" + costScore + "\t" + walkScore);
-//						}
-//
-//						DebugLib.emptyFunctionForSettingBreakPoint();
-//					}
-//
-//				}
-			}
+				// double distanceSelectedParking =
+				// GeneralLib.getDistance(selectedParking.getCoordinate(),
+				// parkingOperationRequestAttributes.destCoordinate);
+				//
+				// if (selectedParking.getId().toString().contains("stp") &&
+				// distanceSelectedParking>300) {
+				// DebugLib.emptyFunctionForSettingBreakPoint();
+				// }
+				//
+				// if (distanceSelectedParking > distanceClosestParking * 1.5 &&
+				// distanceSelectedParking > 200) {
+				// Id closestParkingId = closestParking.getId();
+				// Id selectedParkingId = selectedParking.getId();
+				//
+				// if (closestParkingId.toString().contains("stp") &&
+				// selectedParkingId.toString().contains("stp")) {
+				//
+				// for (Parking parking : collection) {
+				// if (parking.getId().toString().contains("stp")) {
+				// System.out.println(parking.getId()
+				// + "\t"
+				// + Math.round(GeneralLib.getDistance(parking.getCoordinate(),
+				// parkingOperationRequestAttributes.destCoordinate)));
+				// }
+				// }
+				//
+				// while (queue.size() > 0) {
+				// SortableMapObject<Parking> p = queue.poll();
+				// double costScore =
+				// parkingScoreManager.calcCostScore(parkingOperationRequestAttributes.arrivalTime,
+				// parkingOperationRequestAttributes.parkingDurationInSeconds,
+				// p.getKey(),
+				// parkingOperationRequestAttributes.personId);
+				// double walkScore =
+				// parkingScoreManager.calcWalkScore(parkingOperationRequestAttributes.destCoordinate,
+				// p.getKey(), parkingOperationRequestAttributes.personId,
+				// parkingOperationRequestAttributes.parkingDurationInSeconds);
+				// System.out.println(p.getKey().getId() + "\t" + p.getScore() +
+				// "\t" + costScore + "\t" + walkScore);
+				// }
+				//
+				// DebugLib.emptyFunctionForSettingBreakPoint();
+				// }
+				//
+				// }
 		}
 
-		eventsManager.processEvent(new ParkingArrivalEvent(parkingOperationRequestAttributes.arrivalTime, selectedParking.getId(),
-				parkingOperationRequestAttributes.personId, parkingOperationRequestAttributes.destCoordinate, finalScore));
-		// yyyyyy the parking arrival event returns person id, not vehicle id.  Do we change to vehicle id, or add the vehicle
-		// id to the event?  In the code, the person id is used for the walk distance. kai, jul'15
+		try {
+			eventsManager.processEvent(new ParkingArrivalEvent(parkingOperationRequestAttributes.arrivalTime,
+					selectedParking.getId(), parkingOperationRequestAttributes.personId,
+					parkingOperationRequestAttributes.destCoordinate, finalScore));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		// yyyyyy the parking arrival event returns person id, not vehicle id.
+		// Do we change to vehicle id, or add the vehicle
+		// id to the event? In the code, the person id is used for the walk
+		// distance. kai, jul'15
 
 		return selectedParking;
 	}
 
-//	private synchronized void availablePublicParkingAtCityCentre() {
-//		CoordImpl lindenHof = new CoordImpl(683235.0, 247497.0);
-//		Collection<PC2Parking> collection2 = getPublicParkingQuadTree().get(lindenHof.getX(), lindenHof.getY(), 1000);
-//
-//		if (collection2.size() > 0) {
-//			DebugLib.emptyFunctionForSettingBreakPoint();
-//		}
-//
-//		printParkingGroupSizes();
-//		DebugLib.emptyFunctionForSettingBreakPoint();
-//	}
+	private Collection<PC2Parking> getFilteredCollection(
+			ParkingOperationRequestAttributes parkingOperationRequestAttributes, double distance) {
+		Collection<PC2Parking> collection = getPublicParkingQuadTree().getDisk(
+				parkingOperationRequestAttributes.destCoordinate.getX(),
+				parkingOperationRequestAttributes.destCoordinate.getY(), distance);
 
-//	private synchronized void printParkingGroupSizes() {
-//		for (String groupName : publicParkingGroupQuadTrees.keySet()) {
-//			System.out.println(groupName + "\t" + publicParkingGroupQuadTrees.get(groupName).size());
-//		}
-//	}
+				LinkedList<PC2Parking> deleteList=new LinkedList<>();
+		
+				for (PC2Parking parking:collection){
+					if (parking instanceof RentableParking){
+						RentableParking rp=(RentableParking) parking;
+						
+						if (!rp.isRentable(parkingOperationRequestAttributes.arrivalTime)){
+							deleteList.add(rp);
+						}
+					}
+				}
+				collection.removeAll(deleteList);
+		return collection;
+	}
+
+	// private synchronized void availablePublicParkingAtCityCentre() {
+	// CoordImpl lindenHof = new CoordImpl(683235.0, 247497.0);
+	// Collection<PC2Parking> collection2 =
+	// getPublicParkingQuadTree().get(lindenHof.getX(), lindenHof.getY(), 1000);
+	//
+	// if (collection2.size() > 0) {
+	// DebugLib.emptyFunctionForSettingBreakPoint();
+	// }
+	//
+	// printParkingGroupSizes();
+	// DebugLib.emptyFunctionForSettingBreakPoint();
+	// }
+
+	// private synchronized void printParkingGroupSizes() {
+	// for (String groupName : publicParkingGroupQuadTrees.keySet()) {
+	// System.out.println(groupName + "\t" +
+	// publicParkingGroupQuadTrees.get(groupName).size());
+	// }
+	// }
 
 	private synchronized void parkVehicle(PC2Parking parking) {
 		int startAvailability = parking.getAvailableParkingCapacity();
@@ -324,7 +411,8 @@ public class ParkingInfrastructureManager {
 		parking.parkVehicle();
 		if (parking.getAvailableParkingCapacity() == 0) {
 			boolean wasRemoved = false;
-			wasRemoved = publicParkingsQuadTree.remove(parking.getCoordinate().getX(), parking.getCoordinate().getY(), parking);
+			wasRemoved = publicParkingsQuadTree.remove(parking.getCoordinate().getX(), parking.getCoordinate().getY(),
+					parking);
 
 			if (!wasRemoved) {
 				DebugLib.stopSystemAndReportInconsistency(parking.getId().toString());
@@ -337,15 +425,19 @@ public class ParkingInfrastructureManager {
 				DebugLib.stopSystemAndReportInconsistency(parking.getId().toString());
 			}
 
-			Collection<PC2Parking> collection = publicParkingsQuadTree.getDisk(parking.getCoordinate().getX(), parking.getCoordinate().getY(), 1);
+			Collection<PC2Parking> collection = publicParkingsQuadTree.getDisk(parking.getCoordinate().getX(),
+					parking.getCoordinate().getY(), 1);
 			if (collection.size() == 1) {
 				for (PC2Parking p : collection) {
-					// yyyyyy no idea why we first test for "size of collection == 1" and then iterate over it.  kai, jul'15
-					
+					// yyyyyy no idea why we first test for "size of collection
+					// == 1" and then iterate over it. kai, jul'15
+
 					if (p.getId().toString().equalsIgnoreCase(parking.getId().toString())) {
-						// (i.e. the found parking is not the same as the one that should be at the coordinate; two parking locations are
+						// (i.e. the found parking is not the same as the one
+						// that should be at the coordinate; two parking
+						// locations are
 						// on top of each other)
-						
+
 						DebugLib.stopSystemAndReportInconsistency();
 					}
 				}
@@ -358,25 +450,27 @@ public class ParkingInfrastructureManager {
 
 	}
 
-//	public synchronized LinkedList<PC2Parking> getNonFullParking(Collection<PC2Parking> parkings) {
-//		LinkedList<PC2Parking> result = new LinkedList<PC2Parking>();
-//		for (PC2Parking p : parkings) {
-//			if (p.getAvailableParkingCapacity() > 0) {
-//				result.add(p);
-//			}
-//		}
-//		return result;
-//	}
+	// public synchronized LinkedList<PC2Parking>
+	// getNonFullParking(Collection<PC2Parking> parkings) {
+	// LinkedList<PC2Parking> result = new LinkedList<PC2Parking>();
+	// for (PC2Parking p : parkings) {
+	// if (p.getAvailableParkingCapacity() > 0) {
+	// result.add(p);
+	// }
+	// }
+	// return result;
+	// }
 	// never used. kai, jul'15
 
 	// TODO: make this method abstract
-	public synchronized PC2Parking personCarDepartureEvent(ParkingOperationRequestAttributes parkingOperationRequestAttributes) {
+	public synchronized PC2Parking personCarDepartureEvent(
+			ParkingOperationRequestAttributes parkingOperationRequestAttributes) {
 		final Id<Person> personId = parkingOperationRequestAttributes.personId;
 		Id<PC2Parking> parkingFacilityId = parkedVehicles.get(personId);
 		PC2Parking parking = getAllParkings().get(parkingFacilityId);
 
 		parkedVehicles.remove(personId);
-		
+
 		unParkVehicle(parking, parkingOperationRequestAttributes.arrivalTime
 				+ parkingOperationRequestAttributes.parkingDurationInSeconds, personId);
 		return parking;
@@ -385,15 +479,17 @@ public class ParkingInfrastructureManager {
 	public synchronized void scoreParkingOperation(ParkingOperationRequestAttributes parkingOperationRequestAttributes,
 			PC2Parking parking) {
 		double score = parkingScoreManager.calcScore(parkingOperationRequestAttributes.destCoordinate,
-				parkingOperationRequestAttributes.arrivalTime, parkingOperationRequestAttributes.parkingDurationInSeconds, parking,
-				parkingOperationRequestAttributes.personId, parkingOperationRequestAttributes.legIndex);
+				parkingOperationRequestAttributes.arrivalTime,
+				parkingOperationRequestAttributes.parkingDurationInSeconds, parking,
+				parkingOperationRequestAttributes.personId, parkingOperationRequestAttributes.legIndex,false);
 		parkingScoreManager.addScore(parkingOperationRequestAttributes.personId, score);
 	}
 
 	public synchronized void unParkVehicle(PC2Parking parking, double departureTime, Id<Person> personId) {
-		// yyyy I would prefer if this could not be called publicly ... since it allows to bypass parkedVehicles.remove(personId);
-		// in personCarDepartureEvent(...).  kai, jul'15
-		
+		// yyyy I would prefer if this could not be called publicly ... since it
+		// allows to bypass parkedVehicles.remove(personId);
+		// in personCarDepartureEvent(...). kai, jul'15
+
 		if (parking == null) {
 			DebugLib.emptyFunctionForSettingBreakPoint();
 		}
@@ -405,11 +501,16 @@ public class ParkingInfrastructureManager {
 			if (!(parking instanceof PrivateParking)) {
 				addParkingToQuadTree(publicParkingsQuadTree, parking);
 				addParkingToQuadTree(publicParkingGroupQuadTrees.get(parking.getGroupName()), parking);
-				// I could speculate that full parking lots are removed from the quad tree, and it is re-added as soon
-				// as space becomes available.  But this is not commented, and it also does not look like it would work in that way.
+				// I could speculate that full parking lots are removed from the
+				// quad tree, and it is re-added as soon
+				// as space becomes available. But this is not commented, and it
+				// also does not look like it would work in that way.
 				// kai, jul'15
-				// No, actually I now think that it works.  When remainingCapacity==0, then the parking is removed from the list, and
-				// when (again) ==1, it is re-inserted.  In addition, it is re-inserted in reset.
+				// No, actually I now think that it works. When
+				// remainingCapacity==0, then the parking is removed from the
+				// list, and
+				// when (again) ==1, it is re-inserted. In addition, it is
+				// re-inserted in reset.
 			}
 		}
 

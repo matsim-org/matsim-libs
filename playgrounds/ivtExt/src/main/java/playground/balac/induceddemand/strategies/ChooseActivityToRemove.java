@@ -39,11 +39,13 @@ public class ChooseActivityToRemove implements PlanAlgorithm {
 		
 		int actIndex = plan.getPlanElements().indexOf(t.get(index));
 		
-		if (( (Activity) plan.getPlanElements().get(actIndex)).getType().equals("home") || 
-				( (Activity) plan.getPlanElements().get(actIndex)).getType().equals("work") ||
-				( (Activity) plan.getPlanElements().get(actIndex)).getType().equals("education")) 
+		if (index == t.size() - 1 || index == 0) 
 			return;
 		
+		int activitiesCount = countActivities(t.get(index).getType(), t);
+		
+		if ((t.get(index).getType().equals("work") || t.get(index).getType().equals("education")) && activitiesCount == 1)
+			return;
 		
 		boolean previous = false;
 		boolean next = false;
@@ -81,5 +83,16 @@ public class ChooseActivityToRemove implements PlanAlgorithm {
 			}			
 			
 		}		
+	}
+
+	private int countActivities(String type, List<Activity> t) {
+		
+		int count = 0;
+		for (Activity a : t) {
+			
+			if (a.getType().equals(type))
+				count++;
+		}
+		return count;
 	}
 }

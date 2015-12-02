@@ -10,6 +10,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import playground.artemc.analysis.IndividualScoreFromPopulationSQLWriter;
@@ -186,7 +187,7 @@ public class ChoiceSetAndCrowdingAnalysisGenerator implements ShutdownListener {
 				/* Departure time modification */
 				for (Plan planToModify : population.getPersons().get(personId).getPlans()) {
 
-					if (((Leg) planToModify.getPlanElements().get(1)).getMode().equals(mode) && !planToModify.isSelected()) {
+					if (((Leg) planToModify.getPlanElements().get(1)).getMode().equals(mode) && !PersonUtils.isSelected(planToModify)) {
 
 						//Home departure time + 1h
 						if (planModCounter == 0) {
@@ -260,7 +261,7 @@ public class ChoiceSetAndCrowdingAnalysisGenerator implements ShutdownListener {
 			int count = 0;
 			population.getPersons().get(personId).setSelectedPlan(planMap.get(initialMode));
 			for (Plan newPlan : population.getPersons().get(personId).getPlans()) {
-				if (!newPlan.isSelected()) {
+				if (!PersonUtils.isSelected(newPlan)) {
 					count++;
 					Person newPerson = populationFactory.createPerson(Id.createPersonId(personId.toString() + "_" + count));
 					newPerson.addPlan(newPlan);

@@ -297,11 +297,6 @@ public final class PopulationUtils {
 		}
 
 		@Override
-		public boolean isSelected() {
-			return delegate.isSelected();
-		}
-
-		@Override
 		public void setPerson(Person person) {
 			throw new UnsupportedOperationException() ;
 		}
