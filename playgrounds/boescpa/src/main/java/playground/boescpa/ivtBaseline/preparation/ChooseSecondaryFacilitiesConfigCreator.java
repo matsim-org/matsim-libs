@@ -25,6 +25,7 @@ import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
+import playground.ivt.kticompatibility.KtiLikeScoringConfigGroup;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -38,7 +39,7 @@ public class ChooseSecondaryFacilitiesConfigCreator extends IVTConfigCreator {
 
 	public static void main(String[] args) {
 		int prctScenario = Integer.parseInt(args[1]); // the percentage of the scenario in percent (e.g. 1%-Scenario -> "1")
-		Config config = ConfigUtils.createConfig(new DestinationChoiceConfigGroup());
+		Config config = ConfigUtils.createConfig(new KtiLikeScoringConfigGroup(), new DestinationChoiceConfigGroup());
 		new ChooseSecondaryFacilitiesConfigCreator().makeConfigIVT(config, prctScenario);
 
 		// Reduce to one replanning phase
