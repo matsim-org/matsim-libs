@@ -43,7 +43,7 @@ import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.collections.MapUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
-import playground.thibautd.utils.SoftCache;
+import playground.ivt.utils.SoftCache;
 
 import javax.inject.Provider;
 import java.util.HashMap;

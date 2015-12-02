@@ -45,7 +45,8 @@ public class QPositionDataWriterForR {
 	public void run(){
 		scenario  = LoadMyScenarios.loadScenarioFromNetwork(networkFile);
 
-		calculationHandler = new QueuePositionCalculationHandler(scenario,outputDir);
+		calculationHandler = new QueuePositionCalculationHandler(scenario);
+		calculationHandler.openWriter(outputDir);
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		eventsManager.addHandler(calculationHandler);
 		MatsimEventsReader eventsReader = new MatsimEventsReader(eventsManager);

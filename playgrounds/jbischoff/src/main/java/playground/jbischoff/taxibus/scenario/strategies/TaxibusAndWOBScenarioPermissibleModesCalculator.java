@@ -24,7 +24,7 @@ import java.util.Collection;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Plan;
 
-import playground.jbischoff.taxibus.optimizer.fifo.Lines.LineDispatcher;
+import playground.jbischoff.taxibus.algorithm.optimizer.fifo.Lines.LineDispatcher;
 
 /**
  * @author  jbischoff

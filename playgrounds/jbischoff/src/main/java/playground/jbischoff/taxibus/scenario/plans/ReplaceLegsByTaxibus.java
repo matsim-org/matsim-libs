@@ -34,7 +34,7 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.jbischoff.taxibus.utils.TaxibusUtils;
+import playground.jbischoff.taxibus.algorithm.utils.TaxibusUtils;
 
 /**
  * @author  jbischoff

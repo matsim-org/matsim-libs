@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.population.algorithms.PermissibleModesCalculator;
 
-import playground.jbischoff.taxibus.optimizer.fifo.Lines.LineDispatcher;
+import playground.jbischoff.taxibus.algorithm.optimizer.fifo.Lines.LineDispatcher;
 
 /**
  * @author  jbischoff

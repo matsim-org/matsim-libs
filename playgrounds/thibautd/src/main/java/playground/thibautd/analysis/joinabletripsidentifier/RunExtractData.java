@@ -28,7 +28,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.scenario.ScenarioUtils;
-import playground.thibautd.utils.MoreIOUtils;
+import playground.ivt.utils.MoreIOUtils;
 
 import java.util.ArrayList;
 import java.util.List;
