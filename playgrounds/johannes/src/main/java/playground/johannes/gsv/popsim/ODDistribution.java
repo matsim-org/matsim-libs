@@ -20,14 +20,21 @@
 package playground.johannes.gsv.popsim;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import gnu.trove.impl.Constants;
+import gnu.trove.iterator.TIntDoubleIterator;
+import gnu.trove.iterator.TIntObjectIterator;
 import gnu.trove.map.hash.TIntDoubleHashMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.common.gis.CartesianDistanceCalculator;
+import org.matsim.contrib.common.gis.DistanceCalculator;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
+import playground.johannes.gsv.zones.KeyMatrix;
 import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.data.Segment;
 import playground.johannes.synpop.gis.*;
 import playground.johannes.synpop.sim.AttributeChangeListener;
@@ -58,37 +65,114 @@ public class ODDistribution implements AttributeChangeListener, Hamiltonian {
 
     private TObjectIntHashMap<String> zoneIndices;
 
+    private TIntObjectHashMap<Zone> idx2Zone;
+
+    private TObjectIntHashMap<Zone> zone2Idx;
+
+    private TObjectIntHashMap<String> id2Idx;
+
+    private String primaryKey;
+
+    private final double threshold;
+
     private double hamiltonianValue;
 
     private double scaleFactor;
 
-    private TIntObjectHashMap<TIntDoubleHashMap> initMatrix(Set<? extends Episode> episodes, DataPool dataPool,
-                                                            String layerName) {
-        ZoneCollection zones = ((ZoneData)dataPool.get(ZoneDataLoader.KEY)).getLayer(layerName);
-        ActivityFacilities facilities = ((FacilityData)dataPool.get(FacilityDataLoader.KEY)).getAll();
-        Map<ActivityFacility, Zone> fac2zone = new HashMap<>();
-        TObjectIntHashMap<Zone> zone2Idx = new TObjectIntHashMap<>();
-        AtomicInteger maxIdx = new AtomicInteger(0);
+    public ODDistribution(Collection<? extends Person> simPersons, KeyMatrix refKeyMatrix, DataPool dataPool, String
+            layerName, String primaryKey, double threshold) {
+        this.primaryKey = primaryKey;
+        this.threshold = threshold;
+        zoneIndices = new TObjectIntHashMap<>(Constants.DEFAULT_CAPACITY, Constants.DEFAULT_LOAD_FACTOR, -1);
+        idx2Zone = new TIntObjectHashMap<>();
+        zone2Idx = new TObjectIntHashMap<>(Constants.DEFAULT_CAPACITY, Constants.DEFAULT_LOAD_FACTOR, -1);
+        id2Idx = new TObjectIntHashMap<>(Constants.DEFAULT_CAPACITY, Constants.DEFAULT_LOAD_FACTOR, -1);
 
+        simMatrix = initMatrix(simPersons, dataPool, layerName);
+        refMatrix = initRefMatrix(refKeyMatrix);
+
+        ZoneData zoneData = (ZoneData)dataPool.get(ZoneData.POPULATION_KEY);
+        ZoneCollection zones = zoneData.getLayer(layerName);
+        double simSum = calculateSum(simMatrix, threshold, zones);
+        double refSum = calculateSum(refMatrix, threshold, zones);
+        scaleFactor = simSum/refSum;
+
+    }
+
+    private TIntObjectHashMap<TIntDoubleHashMap> initRefMatrix(KeyMatrix keyMatrix) {
         TIntObjectHashMap<TIntDoubleHashMap> matrix = new TIntObjectHashMap<>();
-
-        for(Episode episode : episodes) {
-            for(int i = 1; i < episode.getActivities().size(); i++) {
-                Segment origin = episode.getActivities().get(i - 1);
-                Segment destination = episode.getActivities().get(i);
-
-                int idx_i = getZoneIndex(origin, zones, facilities, maxIdx, fac2zone, zone2Idx);
-                int idx_j = getZoneIndex(destination, zones, facilities, maxIdx, fac2zone, zone2Idx);
-
-                adjustCellValue(idx_i, idx_j, 1.0, matrix);
+        Set<String> keys = keyMatrix.keys();
+        for(String i : keys) {
+            int idx_i = id2Idx.get(i);
+            for(String j : keys) {
+                Double val = keyMatrix.get(i, j);
+                if(val != null) {
+                    int idx_j = id2Idx.get(j);
+                    adjustCellValue(idx_i, idx_j, val, matrix);
+                }
             }
         }
 
         return matrix;
     }
 
+    private TIntObjectHashMap<TIntDoubleHashMap> initMatrix(Collection<? extends Person> persons, DataPool dataPool,
+                                                            String layerName) {
+        ZoneCollection zones = ((ZoneData)dataPool.get(ZoneDataLoader.KEY)).getLayer(layerName);
+        ActivityFacilities facilities = ((FacilityData)dataPool.get(FacilityDataLoader.KEY)).getAll();
+        Map<ActivityFacility, Zone> fac2zone = new HashMap<>();
+
+        AtomicInteger maxIdx = new AtomicInteger(0);
+
+        TIntObjectHashMap<TIntDoubleHashMap> matrix = new TIntObjectHashMap<>();
+
+        for(Person person : persons) {
+            for (Episode episode : person.getEpisodes()) {
+                for (int i = 1; i < episode.getActivities().size(); i++) {
+                    Segment origin = episode.getActivities().get(i - 1);
+                    Segment destination = episode.getActivities().get(i);
+
+                    int idx_i = getZoneIndex(origin, zones, facilities, maxIdx, fac2zone);
+                    int idx_j = getZoneIndex(destination, zones, facilities, maxIdx, fac2zone);
+
+                    adjustCellValue(idx_i, idx_j, 1.0, matrix);
+                }
+            }
+        }
+
+        return matrix;
+    }
+
+    private double calculateSum(TIntObjectHashMap<TIntDoubleHashMap> matrix, double threshold, ZoneCollection zones) {
+        double sum = 0;
+
+        DistanceCalculator dCalc = CartesianDistanceCalculator.getInstance();
+
+        TIntObjectIterator<TIntDoubleHashMap> rowIt = matrix.iterator();
+        for(int i = 0; i < matrix.size(); i++) {
+            rowIt.advance();
+            TIntDoubleHashMap row = rowIt.value();
+            int iIdx = rowIt.key();
+            Zone zone_i = idx2Zone.get(iIdx);
+
+            TIntDoubleIterator colIt = row.iterator();
+            for(int j = 0; j < row.size(); j++) {
+                colIt.advance();
+                int jIdx = colIt.key();
+                Zone zone_j = idx2Zone.get(jIdx);
+
+                double d = dCalc.distance(zone_i.getGeometry().getCentroid(), zone_j.getGeometry().getCentroid());
+                if(d >= threshold) {
+                    sum += colIt.value();
+                }
+            }
+        }
+
+        return sum;
+    }
+
     private int getZoneIndex(Segment act, ZoneCollection zones, ActivityFacilities facilities, AtomicInteger maxIdx,
-                             Map<ActivityFacility, Zone> fac2zone, TObjectIntHashMap<Zone> zone2Idx) {
+                             Map<ActivityFacility, Zone> fac2zone) {
         String id = act.getAttribute(CommonKeys.ACTIVITY_FACILITY);
         if(zoneIndices.containsKey(id)) {
             return zoneIndices.get(id);
@@ -104,6 +188,8 @@ public class ODDistribution implements AttributeChangeListener, Hamiltonian {
             if(zone2Idx.containsKey(zone)) {
                 idx = maxIdx.incrementAndGet();
                 zone2Idx.put(zone, idx);
+                idx2Zone.put(idx, zone);
+                id2Idx.put(zone.getAttribute(primaryKey), idx);
             }
             zoneIndices.put(facility.getId().toString(), idx);
             return idx;

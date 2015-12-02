@@ -35,7 +35,7 @@ public abstract class AbstractAnalyzerTask<T> implements AnalyzerTask<T> {
 
     protected FileIOContext ioContext;
 
-    private List<Discretizer> discretizers;
+    private List<DiscretizerBuilder> discretizers;
 
     private List<String> discretizerTypes;
 
@@ -45,11 +45,11 @@ public abstract class AbstractAnalyzerTask<T> implements AnalyzerTask<T> {
         this.ioContext = ioContext;
     }
 
-    public void addDiscretizer(Discretizer discretizer, String type) {
+    public void addDiscretizer(DiscretizerBuilder discretizer, String type) {
         addDiscretizer(discretizer, type, false);
     }
 
-    public void addDiscretizer(Discretizer discretizer, String type, boolean reweight) {
+    public void addDiscretizer(DiscretizerBuilder discretizer, String type, boolean reweight) {
         if (discretizers == null) {
             discretizers = new LinkedList<>();
             discretizerTypes = new LinkedList<>();
@@ -70,7 +70,7 @@ public abstract class AbstractAnalyzerTask<T> implements AnalyzerTask<T> {
     protected void writeHistograms(double[] values, double[] weights, String name) {
         if (ioContext != null && discretizers != null) {
             for (int i = 0; i < discretizers.size(); i++) {
-                Discretizer discretizer = discretizers.get(i);
+                Discretizer discretizer = discretizers.get(i).build(values);
                 String type = discretizerTypes.get(i);
                 boolean reweight = discretizerFlags.get(i);
 

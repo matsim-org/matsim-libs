@@ -41,8 +41,10 @@ public class GenerateODAttributes {
     public static final void main(String args[]) throws IOException {
 //        ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON(args[1], "NO");
         DistanceCalculator dCalc = WGS84DistanceCalculator.getInstance();
+//        ZoneCollection zones = ZoneEsriShapeIO.read
+//                ("/mnt/cifs/B-drive/C_Vertrieb/2014_03_01_Nachfragematrizen_PV/07_Qlik/nuts3.SHP");
         ZoneCollection zones = ZoneEsriShapeIO.read
-                ("/mnt/cifs/B-drive/C_Vertrieb/2014_03_01_Nachfragematrizen_PV/07_Qlik/nuts3.SHP");
+                ("/home/johannes/gsv/gis/modena/shp/zones.SHP");
         zones.setPrimaryKey("NO");
 
         KeyMatrix idMatrix = new KeyMatrix();
@@ -51,14 +53,14 @@ public class GenerateODAttributes {
         int idCounter = 0;
 
         BufferedWriter writer = new BufferedWriter(new FileWriter
-                ("/mnt/cifs/B-drive/C_Vertrieb/2014_03_01_Nachfragematrizen_PV/07_Qlik/odAttributes-kreis.csv"));
+                ("/mnt/cifs/B-drive/C_Vertrieb/2014_03_01_Nachfragematrizen_PV/07_Qlik/odAttributes-modena.csv"));
         writer.write("from;to;id;distance");
         writer.newLine();
 
 //        BufferedWriter writer2 = new BufferedWriter(new FileWriter(args[3]));
 
         BufferedReader reader = new BufferedReader(new FileReader
-                ("/mnt/cifs/B-drive/C_Vertrieb/2014_03_01_Nachfragematrizen_PV/07_Qlik/MIV_Flug_Kreis_2013.csv"));
+                ("/mnt/cifs/B-drive/C_Vertrieb/2014_03_01_Nachfragematrizen_PV/07_Qlik/Matrix_BahnMIVFlug_2013_Modena_Zweck.csv"));
         String line = reader.readLine();
 //        writer2.write(line);
 //        writer2.write(";\"odId\";\"distance\"");
@@ -118,52 +120,52 @@ public class GenerateODAttributes {
 //            writer2.newLine();
         }
 
-        reader = new BufferedReader(new FileReader
-                ("/mnt/cifs/B-drive/C_Vertrieb/2014_03_01_Nachfragematrizen_PV/07_Qlik/Bahn_Kreis_2013.csv"));
-        line = reader.readLine();
-
-        while((line = reader.readLine()) != null) {
-            String tokens[] = line.split(";");
-            String i = tokens[0];
-            String j = tokens[1];
-
-            Double id = idMatrix.get(i, j);
-            Double d = distMatrix.get(i, j);
-
-            if(id == null) {
-                id = new Double(idCounter);
-                idMatrix.set(i, j, id);
-                idCounter++;
-
-                writer.write(i);
-                writer.write(";");
-                writer.write(j);
-                writer.write(";");
-                writer.write(String.valueOf(id.intValue()));
-                writer.write(";");
-
-                Zone zi = zones.get(i);
-                Zone zj = zones.get(j);
-
-                if(zi != null && zj != null) {
-                    if(zi != zj) {
-                        d = dCalc.distance(zi.getGeometry().getCentroid(), zj.getGeometry().getCentroid());
-                    } else {
-                        Geometry geo = zi.getGeometry();
-                        Coordinate c = new MinimumDiameter(geo).getWidthCoordinate();
-                        d = dCalc.distance(geo.getCentroid(), geometryFactory.createPoint(c));
-                    }
-                    distMatrix.set(i, j, d);
-                    writer.write(String.valueOf(d));
-                } else {
-                    d = 0.0;
-                }
-
-                writer.newLine();
-
-                count++;
-                if(count % 10000 == 0) System.out.println(String.format("Parsed %s lines...", count));
-            }
-        }
+//        reader = new BufferedReader(new FileReader
+//                ("/mnt/cifs/B-drive/C_Vertrieb/2014_03_01_Nachfragematrizen_PV/07_Qlik/Matrix_BahnMIVFlug_2013_Modena_Zweck.csv"));
+//        line = reader.readLine();
+//
+//        while((line = reader.readLine()) != null) {
+//            String tokens[] = line.split(";");
+//            String i = tokens[0];
+//            String j = tokens[1];
+//
+//            Double id = idMatrix.get(i, j);
+//            Double d = distMatrix.get(i, j);
+//
+//            if(id == null) {
+//                id = new Double(idCounter);
+//                idMatrix.set(i, j, id);
+//                idCounter++;
+//
+//                writer.write(i);
+//                writer.write(";");
+//                writer.write(j);
+//                writer.write(";");
+//                writer.write(String.valueOf(id.intValue()));
+//                writer.write(";");
+//
+//                Zone zi = zones.get(i);
+//                Zone zj = zones.get(j);
+//
+//                if(zi != null && zj != null) {
+//                    if(zi != zj) {
+//                        d = dCalc.distance(zi.getGeometry().getCentroid(), zj.getGeometry().getCentroid());
+//                    } else {
+//                        Geometry geo = zi.getGeometry();
+//                        Coordinate c = new MinimumDiameter(geo).getWidthCoordinate();
+//                        d = dCalc.distance(geo.getCentroid(), geometryFactory.createPoint(c));
+//                    }
+//                    distMatrix.set(i, j, d);
+//                    writer.write(String.valueOf(d));
+//                } else {
+//                    d = 0.0;
+//                }
+//
+//                writer.newLine();
+//
+//                count++;
+//                if(count % 10000 == 0) System.out.println(String.format("Parsed %s lines...", count));
+//            }
+//        }
     }
 }

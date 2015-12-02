@@ -48,12 +48,12 @@ public class AgeIncomeDemo {
     private static final Logger logger = Logger.getLogger(AgeIncomeDemo.class);
 
     public static void main(String args[]) {
-        String refPopFile = "/Users/jillenberger/work/mid2008.midtrips.valid.xml";
+        String refPopFile = "/home/johannes/gsv/matrix2014/popgen/demo/mid2008.midtrips.validated.xml";
         int simPopSize = 100000;
         long iterations = (long)1e7;
         int logInterval = (int)1e6;
         int dumpInterval = (int)2e6;
-        String outputRoot = "/Users/jillenberger/work/";
+        String outputRoot = "/home/johannes/gsv/matrix2014/popgen/demo/output/";
 
         Random random = new XORShiftRandom(4711);
 
@@ -95,13 +95,13 @@ public class AgeIncomeDemo {
         ageAnalyzer.setIoContext(ioContext);
         incomeAnalyzer.setIoContext(ioContext);
 
-        ageAnalyzer.addDiscretizer(new LinearDiscretizer(1), "linear");
+        ageAnalyzer.addDiscretizer(new PassThroughDiscretizerBuilder(new LinearDiscretizer(1)), "linear");
 
         PersonCollector<Double> incomeCollector = new PersonCollector<>(new NumericAttributeProvider<Person>(CommonKeys.HH_INCOME));
         double[] incomeValues = CollectionUtils.toNativeArray(incomeCollector.collect(refPersons));
         Discretizer incomeDiscretizer = new InterpolatingDiscretizer(incomeValues);
 //        incomeAnalyzer.addDiscretizer(new LinearDiscretizer(500), "linear");
-        incomeAnalyzer.addDiscretizer(incomeDiscretizer, "linear");
+        incomeAnalyzer.addDiscretizer(new PassThroughDiscretizerBuilder(incomeDiscretizer), "linear");
 
         AgeIncomeCorrelation ageIncomeCorrelation = new AgeIncomeCorrelation();
         ageIncomeCorrelation.setIoContext(ioContext);
@@ -128,7 +128,7 @@ public class AgeIncomeDemo {
         BivariatMean ageIncomeTerm = new BivariatMean(refPersons, simPersons, CommonKeys.PERSON_AGE, CommonKeys.HH_INCOME, ageDiscretizer);
 
         HamiltonianComposite hamiltonian = new HamiltonianComposite();
-        hamiltonian.addComponent(ageTerm, 5e2);
+        hamiltonian.addComponent(ageTerm, 10);
         hamiltonian.addComponent(incomeTerm, 1e4);
         hamiltonian.addComponent(ageIncomeTerm, 0.6);
         /*

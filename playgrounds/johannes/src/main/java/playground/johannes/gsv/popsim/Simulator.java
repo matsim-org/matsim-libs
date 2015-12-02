@@ -77,6 +77,10 @@ public class Simulator {
         TaskRunner.run(new ReplaceActTypes(), refPersons);
         new GuessMissingActTypes(random).apply(refPersons);
         TaskRunner.run(new Route2GeoDistance(new Route2GeoDistFunction()), refPersons);
+        logger.info("Cloning ref persons...");
+        int size = (int) Double.parseDouble(config.getParam(MODULE_NAME, "populationSize"));
+        refPersons = (Set<PlainPerson>) PersonUtils.weightedCopy(refPersons, new PlainFactory(), size,
+                random);
 		/*
 		Setting up data loaders.
 		 */
@@ -85,13 +89,16 @@ public class Simulator {
         dataPool.register(new FacilityDataLoader(config.getParam(MODULE_NAME, "facilities"), random), FacilityDataLoader.KEY);
         dataPool.register(new ZoneDataLoader(config.getModule(MODULE_NAME)), ZoneDataLoader.KEY);
 		/*
-		Setup the simulation population.
+		Generating simulation population...
 		 */
-        logger.info("Cloning persons...");
-        int size = (int) Double.parseDouble(config.getParam(MODULE_NAME, "populationSize"));
+        logger.info("Cloning sim persons...");
+//        int size = (int) Double.parseDouble(config.getParam(MODULE_NAME, "populationSize"));
         Set<PlainPerson> simPersons = (Set<PlainPerson>) PersonUtils.weightedCopy(refPersons, new PlainFactory(), size,
                 random);
         logger.info(String.format("Generated %s persons.", simPersons.size()));
+        /*
+        Initializing simulation population...
+         */
         logger.info("Assigning home locations...");
         ZoneCollection lau2Zones = ((ZoneData)dataPool.get(ZoneDataLoader.KEY)).getLayer("lau2");
         ZoneCollection modenaZones = ((ZoneData)dataPool.get(ZoneDataLoader.KEY)).getLayer("modena");
@@ -126,8 +133,10 @@ public class Simulator {
         final ConcurrentAnalyzerTask<Collection<? extends Person>> task = new ConcurrentAnalyzerTask<>();
         GeoDistanceBuilder geoDistanceBuilder = new GeoDistanceBuilder(ioContext);
         geoDistanceBuilder.setPredicates(predicates);
-        geoDistanceBuilder.addDiscretizer(new LinearDiscretizer(50000), "linear");
+        geoDistanceBuilder.addDiscretizer(new PassThroughDiscretizerBuilder(new LinearDiscretizer(50000)), "linear");
+        geoDistanceBuilder.addDiscretizer(new StratifiedDiscretizerBuilder(100, 100), "stratified");
         task.addComponent(geoDistanceBuilder.build());
+        task.addComponent(buildLAU2DistAnalyzers(predicates, ioContext));
         task.addComponent(new GeoDistLau2ClassTask(ioContext));
         zoneMobilityRate.setIoContext(ioContext);
         task.addComponent(zoneMobilityRate);
@@ -241,6 +250,33 @@ public class Simulator {
         }
     }
 
+    private static AnalyzerTask<Collection<? extends Person>> buildLAU2DistAnalyzers(Map<String, Predicate<Segment>>
+                                                                                             predicates,
+                                                                                     FileIOContext ioContext) {
+//        ConcurrentAnalyzerTask<Collection<? extends Person>> task = new ConcurrentAnalyzerTask<>();
+        AnalyzerTaskComposite task = new AnalyzerTaskComposite();
+        for(int idx = 0; idx < 6; idx++) {
+            Predicate<Segment> lauClassPred = new LegPersonAttributePredicate(MiDKeys.PERSON_LAU2_CLASS, String.valueOf
+                    (idx));
+
+            Map<String, Predicate<Segment>> newPredicates = new HashMap<>();
+            for(Map.Entry<String, Predicate<Segment>> entry : predicates.entrySet()) {
+                PredicateAndComposite<Segment> predicateAnd = new PredicateAndComposite<>();
+                predicateAnd.addComponent(entry.getValue());
+                predicateAnd.addComponent(lauClassPred);
+
+                newPredicates.put(String.format("%s.lau%s", entry.getKey(), idx), predicateAnd);
+            }
+
+            GeoDistanceBuilder geoDistanceBuilder = new GeoDistanceBuilder(ioContext);
+            geoDistanceBuilder.setPredicates(newPredicates);
+            geoDistanceBuilder.addDiscretizer(new PassThroughDiscretizerBuilder(new LinearDiscretizer(50000)), "linear");
+            geoDistanceBuilder.addDiscretizer(new StratifiedDiscretizerBuilder(100, 100), "stratified");
+            task.addComponent(geoDistanceBuilder.build());
+        }
+        return task;
+    }
+
     public static class Route2GeoDistFunction implements UnivariateRealFunction {
 
         @Override
@@ -250,20 +286,4 @@ public class Simulator {
             return routDist * factor * 1000;
         }
     }
-
-//    private static TObjectDoubleHashMap<Zone> assignZoneWeights(ZoneCollection zones, TObjectDoubleHashMap<String>
-//            monilityRates) {
-//        TObjectDoubleHashMap<Zone> rates = new TObjectDoubleHashMap<>();
-//        for(Zone zone : zones.getZones()) {
-////            String inhabitantsVal = zone
-////            String category = zone.getAttribute(categoryKey);
-////            if(category != null) {
-//                double rate = monilityRates.get(category);
-//                rates.put(zone, rate);
-//            }
-//        }
-//
-//        return rates;
-//
-//    }
 }

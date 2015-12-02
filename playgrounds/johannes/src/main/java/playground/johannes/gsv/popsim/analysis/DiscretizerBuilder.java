@@ -17,54 +17,15 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.matrices.io;
+package playground.johannes.gsv.popsim.analysis;
 
-import playground.johannes.gsv.zones.KeyMatrix;
-import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
-
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.Set;
+import org.matsim.contrib.common.stats.Discretizer;
 
 /**
  * @author johannes
- *
  */
-public class KeyMatrix2Txt {
+public interface DiscretizerBuilder {
 
-	/**
-	 * @param args
-	 * @throws IOException 
-	 */
-	public static void main(String[] args) throws IOException {
-		KeyMatrixXMLReader reader = new KeyMatrixXMLReader();
-		reader.setValidating(false);
-		reader.parse(args[0]);
-		KeyMatrix m = reader.getMatrix();
-
-		int odId = 0;
-		BufferedWriter writer = new BufferedWriter(new FileWriter(args[1]));
-		writer.write("from\tto\tvolume\todId");
-		writer.newLine();
-		Set<String> keys = m.keys();
-		for(String i : keys) {
-			for(String j : keys) {
-				Double val = m.get(i, j);
-				if(val != null) {
-					writer.write(i);
-					writer.write("\t");
-					writer.write(j);
-					writer.write("\t");
-					writer.write(String.valueOf(val));
-					writer.write("\t");
-					writer.write(String.valueOf(odId));
-					writer.newLine();
-					odId++;
-				}
-			}
-		}
-		writer.close();
-	}
+    Discretizer build(double[] values);
 
 }
