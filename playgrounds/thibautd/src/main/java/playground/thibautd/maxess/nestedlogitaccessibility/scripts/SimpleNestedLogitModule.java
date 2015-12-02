@@ -26,7 +26,7 @@ import org.matsim.api.core.v01.Scenario;
 import playground.thibautd.maxess.nestedlogitaccessibility.framework.ChoiceSetIdentifier;
 import playground.thibautd.maxess.nestedlogitaccessibility.framework.Utility;
 import playground.thibautd.maxess.prepareforbiogeme.tripbased.RunMzTripChoiceSetConversion;
-import playground.thibautd.router.TripSoftCache;
+import playground.ivt.router.TripSoftCache;
 import playground.thibautd.utils.ConcurrentStopWatch;
 
 /**

@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.router;
+package playground.ivt.router;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
@@ -25,8 +25,8 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.facilities.Facility;
-import playground.thibautd.router.TripSoftCache.Departure;
-import playground.thibautd.router.TripSoftCache.LocationType;
+import playground.ivt.router.TripSoftCache.Departure;
+import playground.ivt.router.TripSoftCache.LocationType;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;

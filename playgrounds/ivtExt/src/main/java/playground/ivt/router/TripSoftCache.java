@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.router;
+package playground.ivt.router;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.facilities.Facility;
-import playground.thibautd.utils.SoftCache;
+import playground.ivt.utils.SoftCache;
 
 import java.util.ArrayList;
 import java.util.List;

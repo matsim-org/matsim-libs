@@ -40,8 +40,8 @@ import org.matsim.pt.PtConstants;
 import playground.thibautd.maxess.prepareforbiogeme.framework.ChoiceSetSampler;
 import playground.thibautd.maxess.prepareforbiogeme.framework.ChoicesIdentifier;
 import playground.thibautd.maxess.prepareforbiogeme.framework.Converter;
-import playground.thibautd.router.CachingRoutingModuleWrapper;
-import playground.thibautd.router.TripSoftCache;
+import playground.ivt.router.CachingRoutingModuleWrapper;
+import playground.ivt.router.TripSoftCache;
 import playground.thibautd.utils.MoreIOUtils;
 
 import java.io.BufferedWriter;
