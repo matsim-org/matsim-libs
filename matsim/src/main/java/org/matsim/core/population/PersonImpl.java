@@ -121,4 +121,13 @@ public final class PersonImpl implements Person {
 		return this.customizableDelegate.getCustomAttributes();
 	}
 
+	public final void setLocked() {
+		// note that this does NOT lock the add/remove plans logic, but just some fields. kai, dec'15
+		for ( Plan plan : this.plans ) {
+			if ( plan instanceof PlanImpl ) {
+				((PlanImpl)plan).setLocked() ;
+			}
+		}
+	}
+
 }

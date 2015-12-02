@@ -363,4 +363,14 @@ public final class PlanImpl implements Plan {
 		return this.customizableDelegate.getCustomAttributes();
 	}
 
+	public final void setLocked() {
+		for ( PlanElement pe : this.actsLegs ) {
+			if ( pe instanceof ActivityImpl ) {
+				((ActivityImpl) pe).setLocked(); 
+			} else if ( pe instanceof LegImpl ) {
+//				((LegImpl) pe).setLocked() ;
+			}
+		}
+	}
+
 }

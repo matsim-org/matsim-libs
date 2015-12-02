@@ -36,6 +36,10 @@ import org.matsim.facilities.ActivityFacility;
  *
  */
 public final class ActivityImpl implements Activity {
+	// Assume this as input to iterations.  Cases:
+	// Case (0): comes with coord and linkId.  No problem.
+	// Case (1): comes with linkId but w/o coord.  Coord is (presumably) set in prepareForIterations.
+	// Case (2): comes with coord but w/o linkId.  LinkId is (presumably) set in prepareForIterations.
 
 	private double endTime = Time.UNDEFINED_TIME;
 
@@ -50,6 +54,8 @@ public final class ActivityImpl implements Activity {
 	private Coord coord = null;
 	private Id<Link> linkId = null;
 	private Id<ActivityFacility> facilityId = null;
+	
+	private boolean locked = false ;
 
 	/*package*/ ActivityImpl(final String type) {
 		this.type = type.intern();
@@ -57,24 +63,24 @@ public final class ActivityImpl implements Activity {
 
 	public ActivityImpl(final String type, final Id<Link> linkId) {
 		this(type);
-		this.setLinkId(linkId);
+		this.linkId = linkId ;
 	}
 
 	public ActivityImpl(final String type, final Coord coord) {
 		this(type);
-		this.setCoord(coord);
+		this.coord = coord ;
 	}
 
 	public ActivityImpl(final String type, final Coord coord, final Id<Link> linkId) {
 		this(type, linkId);
-		this.setCoord(coord);
+		this.coord = coord ;
 	}
 
 	public ActivityImpl(final Activity act) {
 		this(act.getType());
 		// Act coord could be null according to first c'tor!
 		Coord c = act.getCoord() == null ? null : new Coord(act.getCoord().getX(), act.getCoord().getY());
-		this.setCoord(c);
+		this.coord = c ;
 		this.linkId = act.getLinkId();
 		this.setStartTime(act.getStartTime());
 		this.setEndTime(act.getEndTime());
@@ -124,7 +130,11 @@ public final class ActivityImpl implements Activity {
 	}
 
 	public void setCoord(final Coord coord) {
-		this.coord = coord;
+		if ( !this.locked ) {
+			this.coord = coord;
+		} else {
+			throw new RuntimeException("too late to set coordinate for activity") ;
+		}
 	}
 
 	@Override
@@ -142,7 +152,11 @@ public final class ActivityImpl implements Activity {
 	}
 
 	public final void setLinkId(final Id<Link> linkId) {
-		this.linkId = linkId;
+		if ( !this.locked ) {
+			this.linkId = linkId;
+		} else {
+			throw new RuntimeException("too late to set link id for coordinate") ;
+		}
 	}
 
 	@Override
@@ -163,6 +177,10 @@ public final class ActivityImpl implements Activity {
 	@Override
 	public void setMaximumDuration(final double dur) {
 		this.dur = dur;
+	}
+	
+	public final void setLocked() {
+		this.locked = true ;
 	}
 
 }
