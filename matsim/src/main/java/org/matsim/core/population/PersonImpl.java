@@ -41,6 +41,7 @@ public final class PersonImpl implements Person {
 	private Plan selectedPlan = null;
 
 	private Customizable customizableDelegate;
+	private boolean locked;
 
 	/* deliberately package */ PersonImpl(final Id<Person> id) {
 		this.id = id;
@@ -87,6 +88,7 @@ public final class PersonImpl implements Person {
 
     // Not on interface. Only to be used for demand generation.
 	public void setId(final Id<Person> id) {
+		testForLocked() ;
 		this.id = id;
 	}
 
@@ -122,6 +124,8 @@ public final class PersonImpl implements Person {
 	}
 
 	public final void setLocked() {
+		this.locked = true ;
+		
 		// note that this does NOT lock the add/remove plans logic, but just some fields. kai, dec'15
 		for ( Plan plan : this.plans ) {
 			if ( plan instanceof PlanImpl ) {
@@ -129,5 +133,11 @@ public final class PersonImpl implements Person {
 			}
 		}
 	}
+	private void testForLocked() {
+		if ( this.locked ) {
+			throw new RuntimeException("too late to do this") ;
+		}
+	}
+
 
 }

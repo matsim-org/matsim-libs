@@ -367,7 +367,7 @@ public final class PlanImpl implements Plan {
 		for ( PlanElement pe : this.actsLegs ) {
 			if ( pe instanceof ActivityImpl ) {
 				((ActivityImpl) pe).setLocked(); 
-			} else if ( pe instanceof LegImpl ) {
+//			} else if ( pe instanceof LegImpl ) {
 //				((LegImpl) pe).setLocked() ;
 			}
 		}

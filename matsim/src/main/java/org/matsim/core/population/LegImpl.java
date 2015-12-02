@@ -34,6 +34,8 @@ public final class LegImpl implements Leg {
 
 	private double arrTime = Time.UNDEFINED_TIME;
 
+	private boolean locked;
+
 	public LegImpl(final String transportMode) {
 		this.mode = transportMode;
 	}
@@ -109,5 +111,14 @@ public final class LegImpl implements Leg {
 				"[arrTime=" + Time.writeTime(this.getArrivalTime()) + "]" +
 				"[route=" + this.route + "]";
 	}
+
+//	public void setLocked() {
+//		this.locked = true ;
+//	}
+//	private void testForLocked() {
+//		if ( this.locked ) {
+//			throw new RuntimeException("too late to change this") ;
+//		}
+//	}
 
 }

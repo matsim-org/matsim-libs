@@ -130,13 +130,9 @@ public final class ActivityImpl implements Activity {
 	}
 
 	public void setCoord(final Coord coord) {
-		if ( !this.locked ) {
-			this.coord = coord;
-		} else {
-			throw new RuntimeException("too late to set coordinate for activity") ;
-		}
+		testForLocked();
+		this.coord = coord;
 	}
-
 	@Override
 	public final Id<Link> getLinkId() {
 		return this.linkId;
@@ -148,15 +144,13 @@ public final class ActivityImpl implements Activity {
 	}
 
 	public final void setFacilityId(final Id<ActivityFacility> facilityId) {
+		testForLocked();
 		this.facilityId = facilityId;
 	}
 
 	public final void setLinkId(final Id<Link> linkId) {
-		if ( !this.locked ) {
-			this.linkId = linkId;
-		} else {
-			throw new RuntimeException("too late to set link id for coordinate") ;
-		}
+		testForLocked();
+		this.linkId = linkId;
 	}
 
 	@Override
@@ -182,5 +176,9 @@ public final class ActivityImpl implements Activity {
 	public final void setLocked() {
 		this.locked = true ;
 	}
-
+	private final void testForLocked() {
+		if ( this.locked ) {
+			throw new RuntimeException("too late to do this") ;
+		}
+	}
 }
