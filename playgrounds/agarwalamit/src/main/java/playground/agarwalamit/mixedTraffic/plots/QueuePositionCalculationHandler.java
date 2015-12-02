@@ -88,7 +88,7 @@ public class QueuePositionCalculationHandler implements LinkLeaveEventHandler, L
 		builder.setLegMode(this.personId2LegMode.get(personId));
 		builder.setLink(link);
 		PersonPositionChecker checker = container.getPerson2PersonPositionChecker().get(personId);
-		
+
 		if( checker!=null && checker.getLink().getId().equals(linkId) ){
 			checker.updateCycleNumberOfPerson();
 		} 
@@ -105,7 +105,7 @@ public class QueuePositionCalculationHandler implements LinkLeaveEventHandler, L
 
 		LinkPersonInfoContainer container = this.linkid2Container.get(linkId);
 		if( ! container.getPerson2EnteringPersonInfo().containsKey(personId) ) return; // if agent has departed on this link
-		
+
 		LeavingPersonInfo.Builder builder = new LeavingPersonInfo.Builder();
 		builder.setAgentId(personId);
 		builder.setLeaveTime(event.getTime());
@@ -113,65 +113,61 @@ public class QueuePositionCalculationHandler implements LinkLeaveEventHandler, L
 		builder.setLinkId(linkId);
 		LeavingPersonInfo leavingPersonInfo = builder.build();
 		container.getPerson2LeavingPersonInfo().put(personId, leavingPersonInfo);
-		
+
 		PersonPositionChecker checker = container.getOrCreatePersonPositionChecker(personId);
-		
-		writeString(writer1, checker.getPersonId()+"\t"+
-					checker.getLink().getId()+"\t"+
-					checker.getEnteredPersonInfo().getLinkEnterTime()+"\t"+
-					Double.valueOf(checker.getLink().getId().toString())*checker.getLink().getLength()+"\t"+
-					checker.getLeftPersonInfo().getLinkLeaveTime()+"\t"+
-					(1+Double.valueOf(checker.getLink().getId().toString()))*checker.getLink().getLength()+"\t"+
-					checker.getEnteredPersonInfo().getLegMode()+"\n"
-					);
-				
+
+		writeString(writer1, getPersonEnterLeaveInfo(checker) );
+
 		updateVehicleOnLinkAndFillToQueue(event.getTime());
 		container.getAgentsOnLink().remove(personId);
 
-		if(container.getAgentsInQueue().contains(personId)) {
+		if(container.getAgentsInQueue().contains(personId)) {//write info for queuing
 			double initialPos = Double.valueOf(checker.getLink().getId().toString())*checker.getLink().getLength();
 			double vehicleSpeed =  MixedTrafficVehiclesUtils.getSpeed(checker.getEnteredPersonInfo().getLegMode());
 			double qStartDistFromFNode = initialPos + (checker.getQueuingTime()- checker.getEnteredPersonInfo().getLinkEnterTime()) * vehicleSpeed;
-			
+
 			if((qStartDistFromFNode-initialPos) > checker.getLink().getLength()){
 				qStartDistFromFNode=initialPos + checker.getLink().getLength();
 			}
-			
-			writeString(writer2,checker.getPersonId()+"\t"+	
-						checker.getLink().getId()+"\t"+
-						checker.getEnteredPersonInfo().getLinkEnterTime()+"\t"+
-						initialPos+"\t"+
-						checker.getQueuingTime()+"\t"+
-						qStartDistFromFNode +"\t"+
-						checker.getEnteredPersonInfo().getLegMode()+"\n"
+
+			writeString(writer2,personId+"\t"+	
+					linkId+"\t"+
+					checker.getEnteredPersonInfo().getLinkEnterTime()+"\t"+
+					initialPos+"\t"+
+					checker.getQueuingTime()+"\t"+
+					qStartDistFromFNode +"\t"+
+					checker.getEnteredPersonInfo().getLegMode()+"\n"
 					);
-			
-			writeString(writer2,checker.getPersonId()+"\t"+	
-					checker.getLink().getId()+"\t"+
+
+			writeString(writer2,personId+"\t"+	
+					linkId+"\t"+
 					checker.getQueuingTime()+"\t"+
 					qStartDistFromFNode+"\t"+
 					checker.getLeftPersonInfo().getLinkLeaveTime()+"\t"+
 					(1 + Double.valueOf(checker.getLink().getId().toString() ) )*checker.getLink().getLength() + "\t"+
 					checker.getEnteredPersonInfo().getLegMode()+"\n"
-				);
-			
-			container.getAgentsInQueue().remove(personId);
-			double availableSpaceSoFar = container.getAvailableLinkSpace();
-			double newAvailableSpace = availableSpaceSoFar + MixedTrafficVehiclesUtils.getCellSize(leavingPersonInfo.getLegMode());
-			container.setAvailableLinkSpace(newAvailableSpace);
-		} else {
-			writeString(writer2, checker.getPersonId()+"\t"+
-					checker.getLink().getId()+"\t"+
-					checker.getEnteredPersonInfo().getLinkEnterTime()+"\t"+
-					Double.valueOf(checker.getLink().getId().toString())*checker.getLink().getLength()+"\t"+
-					checker.getLeftPersonInfo().getLinkLeaveTime()+"\t"+
-					(1+Double.valueOf(checker.getLink().getId().toString()))*checker.getLink().getLength()+"\t"+
-					checker.getEnteredPersonInfo().getLegMode()+"\n"
 					);
+
+			container.getAgentsInQueue().remove(personId);
+			double newAvailableSpace = container.getAvailableLinkSpace() + MixedTrafficVehiclesUtils.getCellSize(leavingPersonInfo.getLegMode());
+			container.setAvailableLinkSpace(newAvailableSpace);
+
+		} else {//write info for non queuing
+			writeString(writer2, getPersonEnterLeaveInfo(checker) );
 		}
 		container.getPerson2PersonPositionChecker().remove(personId);
 	}
-	
+
+	private String getPersonEnterLeaveInfo(PersonPositionChecker checker) {
+		return 	checker.getPersonId()+"\t"+
+				checker.getLink().getId()+"\t"+
+				checker.getEnteredPersonInfo().getLinkEnterTime()+"\t"+
+				Double.valueOf(checker.getLink().getId().toString())*checker.getLink().getLength()+"\t"+
+				checker.getLeftPersonInfo().getLinkLeaveTime()+"\t"+
+				(1+Double.valueOf(checker.getLink().getId().toString()))*checker.getLink().getLength()+"\t"+
+				checker.getEnteredPersonInfo().getLegMode()+"\n";
+	}
+
 	private void writeString (BufferedWriter writer, String str){
 		try {
 			writer.write(str);
@@ -183,34 +179,25 @@ public class QueuePositionCalculationHandler implements LinkLeaveEventHandler, L
 	private void updateVehicleOnLinkAndFillToQueue(final double now) {
 		for ( Id<Link> linkId : this.linkid2Container.keySet() ) {
 			LinkPersonInfoContainer container = this.linkid2Container.get(linkId);
-			
+
 			for(Id<Person> personId :container.getAgentsOnLink()){
 				PersonPositionChecker checker = container.getOrCreatePersonPositionChecker(personId);
 				double personPositionUpdateTimeStep = Math.floor( Math.max( this.lastEventTimeStep, checker.getProbableQueuingTime()) );
-				
+
 				for(double time = personPositionUpdateTimeStep; time <= now && !checker.isPersonAlreadyQueued(); time++){
 					if( checker.isAddingVehicleInQueue(time) ){
 						Queue<Id<Person>> queue = container.getAgentsInQueue();
-						
-						if(! queue.contains(personId) ) {
-							queue.offer(personId);
-							checker.updateQueuingTime();
-							/*
-							 * If a person (20mps)  starts on link(1000m) at t=0, then will add to queue if time t=51 sec
-							 * time-1 is actually physically correct time at which it will add to Q.
-							 */
-							double availableSpaceSoFar = this.linkid2Container.get(linkId).getAvailableLinkSpace();
-							double newAvailableSpace = availableSpaceSoFar - MixedTrafficVehiclesUtils.getCellSize(checker.getEnteredPersonInfo().getLegMode());
-							this.linkid2Container.get(linkId).setAvailableLinkSpace(newAvailableSpace);
-						}  else throw new RuntimeException("Person is alreay in queue. Aborting ...");
-						
+						queue.offer(personId);
+						checker.updateQueuingTime();
+						double newAvailableSpace = container.getAvailableLinkSpace() - MixedTrafficVehiclesUtils.getCellSize(checker.getEnteredPersonInfo().getLegMode());
+						container.setAvailableLinkSpace(newAvailableSpace);
 					} 
 				}
 			}
 		}
 		this.lastEventTimeStep=now;
 	}
-	
+
 	public void openWriter(final String outputFolder){
 		this.writer1 = IOUtils.getBufferedWriter(outputFolder+"rDataPersonLinkEnterLeave.txt");
 		this.writer2 = IOUtils.getBufferedWriter(outputFolder+"rDataPersonInQueueData6.txt");
@@ -222,7 +209,7 @@ public class QueuePositionCalculationHandler implements LinkLeaveEventHandler, L
 		}
 
 	}
-	
+
 	public void closeWriter(){
 		try {
 			this.writer1.close();
