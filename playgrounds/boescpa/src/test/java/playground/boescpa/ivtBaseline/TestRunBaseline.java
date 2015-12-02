@@ -19,27 +19,39 @@
  * *********************************************************************** *
  */
 
-package playground.boescpa.ivtBaseline.preparation;
+package playground.boescpa.ivtBaseline;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.facilities.*;
 import org.matsim.testcases.MatsimTestUtils;
-import playground.boescpa.ivtBaseline.TestRunBaseline;
+import org.matsim.utils.objectattributes.ObjectAttributes;
+import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
+import playground.boescpa.ivtBaseline.preparation.*;
 import playground.boescpa.lib.tools.fileCreation.F2LCreator;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author boescpa
  */
-public class TestRunLocationChoice {
+public class TestRunBaseline {
 
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
@@ -61,16 +73,18 @@ public class TestRunLocationChoice {
 		Scenario tempScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(tempScenario).readFile(pathToOnlyStreetNetwork);
 		new MatsimPopulationReader(tempScenario).readFile(pathToInitialPopulation);
-		TestRunBaseline.createPrefs(tempScenario, pathToPrefs);
-		TestRunBaseline.createFacilities(tempScenario, pathToFacilities);
+		createPrefs(tempScenario, pathToPrefs);
+		createFacilities(tempScenario, pathToFacilities);
 		F2LCreator.createF2L(tempScenario, pathToF2L);
 		new PopulationWriter(tempScenario.getPopulation()).write(pathToPopulation);
 
 		// create config
 		String[] argsConfig = {pathToConfig, "100"};
-		ChooseSecondaryFacilitiesConfigCreator.main(argsConfig);
+		IVTConfigCreator.main(argsConfig);
 		Config config = ConfigUtils.loadConfig(pathToConfig);
 		config.setParam("controler", "outputDirectory", utils.getOutputDirectory() + "output/");
+			// Reduce iterations to one write out interval + 1
+		config.setParam("controler", "lastIteration", "11");
 			// Set files
 		config.setParam("facilities", "inputFacilitiesFile", pathToFacilities);
 		config.setParam("f2l", "inputF2LFile", pathToF2L);
@@ -81,10 +95,6 @@ public class TestRunLocationChoice {
 		config.setParam("plans", "inputPlansFile", pathToPopulation);
 		config.setParam("transit", "transitScheduleFile", pathToSchedule);
 		config.setParam("transit", "vehiclesFile", pathToVehicles);
-			// handle location choice
-		config.setParam("locationchoice", "prefsFile", pathToPrefs);
-		config.setParam("locationchoice", "flexible_types", "shop");
-		config.setParam("locationchoice", "epsilonScaleFactors", "0.3");
 			// Set threads to 1
 		config.setParam("global", "numberOfThreads", "1");
 		config.setParam("parallelEventHandling", "numberOfThreads", "1");
@@ -92,11 +102,51 @@ public class TestRunLocationChoice {
 		new ConfigWriter(config).write(pathToConfig);
 
 		String[] argsSim = {pathToConfig};
-		RunLocationChoice.main(argsSim);
+		RunIVTBaseline.main(argsSim);
 	}
 
 	@Test
 	public void testScenario() {
 
 	}
+
+	public static void createPrefs(Scenario tempScenario, String pathToPrefsFile) {
+		ObjectAttributes prefs = PrefsCreator.createPrefsBasedOnPlans(tempScenario.getPopulation());
+		ObjectAttributesXmlWriter attributesXmlWriterWriter = new ObjectAttributesXmlWriter(prefs);
+		attributesXmlWriterWriter.writeFile(pathToPrefsFile);
+	}
+
+	public static void createFacilities(Scenario tempScenario, String pathToFacilitiesFile) {
+		int facilityId = 0;
+		Map<Coord, Id<ActivityFacility>> facilities = new HashMap<>();
+		ActivityFacilities activityFacilities = tempScenario.getActivityFacilities();
+		for (Person person : tempScenario.getPopulation().getPersons().values()) {
+			if (person.getSelectedPlan() != null) {
+				List<PlanElement> plan = person.getSelectedPlan().getPlanElements();
+				for (PlanElement planElement : plan) {
+					if (planElement instanceof ActivityImpl) {
+						ActivityImpl act = (ActivityImpl) planElement;
+						if (!facilities.containsKey(act.getCoord())) {
+							ActivityFacility activityFacility =
+									activityFacilities.getFactory().createActivityFacility(Id.create(facilityId++, ActivityFacility.class), act.getCoord());
+							activityFacilities.addActivityFacility(activityFacility);
+							facilities.put(act.getCoord(), activityFacility.getId());
+						}
+						ActivityFacility activityFacility = activityFacilities.getFacilities().get(facilities.get(act.getCoord()));
+						if (!activityFacility.getActivityOptions().containsKey(act.getType())) {
+							ActivityOption activityOption =
+									activityFacilities.getFactory().createActivityOption(act.getType());
+							if (!act.getType().equals("home")) {
+								activityOption.addOpeningTime(new OpeningTimeImpl(21600, act.getEndTime()));
+							}
+							activityFacility.addActivityOption(activityOption);
+						}
+						act.setFacilityId(activityFacility.getId());
+					}
+				}
+			}
+		}
+		new FacilitiesWriter(tempScenario.getActivityFacilities()).write(pathToFacilitiesFile);
+	}
+
 }
