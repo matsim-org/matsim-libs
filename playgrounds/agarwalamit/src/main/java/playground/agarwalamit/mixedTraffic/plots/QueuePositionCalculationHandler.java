@@ -159,6 +159,15 @@ public class QueuePositionCalculationHandler implements LinkLeaveEventHandler, L
 			double availableSpaceSoFar = container.getAvailableLinkSpace();
 			double newAvailableSpace = availableSpaceSoFar + MixedTrafficVehiclesUtils.getCellSize(leavingPersonInfo.getLegMode());
 			container.setAvailableLinkSpace(newAvailableSpace);
+		} else {
+			writeString(writer2, checker.getPersonId()+"\t"+
+					checker.getLink().getId()+"\t"+
+					checker.getEnteredPersonInfo().getLinkEnterTime()+"\t"+
+					Double.valueOf(checker.getLink().getId().toString())*checker.getLink().getLength()+"\t"+
+					checker.getLeftPersonInfo().getLinkLeaveTime()+"\t"+
+					(1+Double.valueOf(checker.getLink().getId().toString()))*checker.getLink().getLength()+"\t"+
+					checker.getEnteredPersonInfo().getLegMode()+"\n"
+					);
 		}
 		container.getPerson2PersonPositionChecker().remove(personId);
 	}
