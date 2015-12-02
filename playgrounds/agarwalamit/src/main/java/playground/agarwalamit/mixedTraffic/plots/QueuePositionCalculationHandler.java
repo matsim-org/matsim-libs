@@ -169,6 +169,7 @@ public class QueuePositionCalculationHandler implements LinkLeaveEventHandler, L
 			double newAvailableSpace = availableSpaceSoFar + MixedTrafficVehiclesUtils.getCellSize(leavingPersonInfo.getLegMode());
 			container.setAvailableLinkSpace(newAvailableSpace);
 		}
+		container.getPerson2PersonPositionChecker().remove(personId);
 	}
 	
 	private void writeString (BufferedWriter writer, String str){
@@ -185,7 +186,7 @@ public class QueuePositionCalculationHandler implements LinkLeaveEventHandler, L
 			
 			for(Id<Person> personId :container.getAgentsOnLink()){
 				PersonPositionChecker checker = container.getOrCreatePersonPositionChecker(personId);
-				double personPositionUpdateTimeStep = Math.floor( Math.max( this.lastEventTimeStep, checker.getQueuingTime()) );
+				double personPositionUpdateTimeStep = Math.floor( Math.max( this.lastEventTimeStep, checker.getProbableQueuingTime()) );
 				
 				for(double time = personPositionUpdateTimeStep; time <= now && !checker.isPersonAlreadyQueued(); time++){
 					if( checker.isAddingVehicleInQueue(time) ){
