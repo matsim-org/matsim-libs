@@ -62,6 +62,7 @@ public class TestRunLocationChoice {
 	@Before
 	public void prepareTests() {
 
+		final String pathToOnlyStreetNetwork = utils.getClassInputDirectory() + "onlystreetnetwork.xml";
 		final String pathToNetwork = "test/scenarios/pt-tutorial/multimodalnetwork.xml";
 		final String pathToInitialPopulation = utils.getClassInputDirectory() + "population.xml";
 		final String pathToPopulation = utils.getOutputDirectory() + "population.xml";
@@ -73,7 +74,7 @@ public class TestRunLocationChoice {
 		final String pathToVehicles = "test/scenarios/pt-tutorial/transitVehicles.xml";
 
 		Scenario tempScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(tempScenario).readFile(pathToNetwork);
+		new MatsimNetworkReader(tempScenario).readFile(pathToOnlyStreetNetwork);
 		new MatsimPopulationReader(tempScenario).readFile(pathToInitialPopulation);
 		createPrefs(tempScenario, pathToPrefs);
 		createFacilities(tempScenario, pathToFacilities);
