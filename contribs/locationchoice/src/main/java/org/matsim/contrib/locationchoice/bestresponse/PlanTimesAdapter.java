@@ -19,6 +19,7 @@
 
 package org.matsim.contrib.locationchoice.bestresponse;
 
+import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -39,6 +40,7 @@ import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
+import org.matsim.core.router.LinkWrapperFacility;
 import org.matsim.core.router.MultiNodeDijkstra;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.scoring.ScoringFunction;
@@ -110,6 +112,8 @@ public class PlanTimesAdapter {
 			if (!(pe instanceof Activity)) continue;
 
 			Activity act = (Activity) pe;
+			if (act.getLinkId().toString().startsWith("tr"))
+				new RuntimeException("Activity is mapped to a transit link!");
 			if (planElementIndex == 0) {
 				final Activity actTmp = (Activity) planTmp.getPlanElements().get(planElementIndex);
 				// this used to assume the activity starts at 00:00:00, but this
@@ -122,42 +126,54 @@ public class PlanTimesAdapter {
 			}
 			
 			PathCosts pathCosts = null;
+			List<? extends PlanElement> listPlanElements = null;			
+			Leg previousLegPlanTmp = (Leg) planTmp.getPlanElements().get(planElementIndex - 1);
+			double legTravelTime = 0.0;
+
 			if (this.approximationLevel == ApproximationLevel.COMPLETE_ROUTING) {
 				Leg previousLeg = PlanUtils.getPreviousLeg(plan, act);
 				String mode = previousLeg.getMode();
 				Activity previousActivity = PlanUtils.getPreviousActivity(plan, previousLeg);
 				pathCosts = computeTravelTimeFromCompleteRouting(plan, previousActivity, act, mode);
-//				pathCosts = computeTravelTimeFromCompleteRouting(plan.getPerson(),
-//					plan.getPreviousActivity(plan.getPreviousLeg(act)), act, ((Leg)plan.getPreviousLeg(act)).getMode());
+				listPlanElements = this.router.calcRoute(mode, new LinkWrapperFacility(this.network.getLinks().get(previousActivity.getLinkId())),
+					new LinkWrapperFacility(this.network.getLinks().get(act.getLinkId())), previousActivity.getEndTime(), plan.getPerson());
+				
+				for(PlanElement pel : listPlanElements) {
+					
+					if (pel instanceof Leg) {
+						scoringFunction.handleLeg( (Leg)pel );
+						legTravelTime += ((Leg) pel).getTravelTime();
+					}					
+				}
+								
+				GenericRouteImpl route = new GenericRouteImpl( ((Leg) listPlanElements.get(0)).getRoute().getStartLinkId(),
+						((Leg) listPlanElements.get(listPlanElements.size() - 1)).getRoute().getEndLinkId());
+				
+				previousLegPlanTmp.setRoute(route);
+				previousLegPlanTmp.setTravelTime(legTravelTime);
+
 			} else if (this.approximationLevel == ApproximationLevel.LOCAL_ROUTING ) {
 				pathCosts = computeTravelTimeFromLocalRouting(plan, actlegIndex, planElementIndex, act);
+				previousLegPlanTmp.setRoute(pathCosts.getRoute());
+				legTravelTime = pathCosts.getRoute().getTravelTime();
+				previousLegPlanTmp.setTravelTime(legTravelTime);
+
+
 			} else if (this.approximationLevel == ApproximationLevel.NO_ROUTING ) {
 				pathCosts = approximateTravelTimeFromDistance(plan, actlegIndex, planElementIndex, act);
+				previousLegPlanTmp.setRoute(pathCosts.getRoute());
+				legTravelTime = pathCosts.getRoute().getTravelTime();
+				previousLegPlanTmp.setTravelTime(legTravelTime);
 			}
 			
-			double legTravelTime = pathCosts.getRoute().getTravelTime();
 			double actDur = act.getMaximumDuration();
-			
-			// set new leg travel time, departure time and arrival time
-			// XXX This will silently fail with multi-legs trips without "stage" activity! td may'14
-			Leg previousLegPlanTmp = (Leg) planTmp.getPlanElements().get(planElementIndex - 1);
-			previousLegPlanTmp.setTravelTime(legTravelTime);
-			// this assumes "tryEndTimeThenDuration"
+
 			final Activity prevActTmp = (Activity) planTmp.getPlanElements().get(planElementIndex - 2);
 			double departureTime = 
 				prevActTmp.getEndTime() != Time.UNDEFINED_TIME ?
 					prevActTmp.getEndTime() :
 					prevActTmp.getStartTime() + prevActTmp.getMaximumDuration();
-			previousLegPlanTmp.setDepartureTime(departureTime);
 			double arrivalTime = departureTime + legTravelTime;
-			previousLegPlanTmp.setRoute(pathCosts.getRoute());
-			
-			// this should not be necessary, as scoring functions can reconstruct
-			// this information from interface methods,
-			// but one never knows. I feel safer this way. td, may'14
-			PlanUtils.setArrivalTime(previousLegPlanTmp, arrivalTime);
-			
-			scoringFunction.handleLeg(previousLegPlanTmp);
 
 			// yyyy I think this is really more complicated than it should be since it could/should just copy the time structure of the 
 			// original plan and not think so much.  kai, jan'13
@@ -333,13 +349,13 @@ public class PlanTimesAdapter {
 				pathCosts.setRoute(route);
 			}
 			
-//		} else if (mode.equals(TransportMode.pt) && config.transit().isUseTransit()) {
-//			LegImpl leg = new org.matsim.core.population.LegImpl(TransportMode.pt);
-//			leg.setDepartureTime(0.0);
-//			leg.setTravelTime(0.0);
-//			leg.setArrivalTime(0.0);
-//			PlanRouterAdapter.handleLeg(router, person, leg, fromAct, toAct, fromAct.getEndTime());		
-//			legTravelTime = leg.getTravelTime();			
+	//	} else if (mode.equals(TransportMode.pt) && config.transit().isUseTransit()) {
+		//	LegImpl leg = new org.matsim.core.population.LegImpl(TransportMode.pt);
+			//leg.setDepartureTime(0.0);
+			//leg.setTravelTime(0.0);
+			//leg.setArrivalTime(0.0);
+     		//PlanRouterAdapter.handleLeg(router, plan.getPerson(), leg, fromAct, toAct, fromAct.getEndTime());	
+			
 		} else {
 			pathCosts = this.getTravelTimeApproximation(plan, toAct);
 		}
