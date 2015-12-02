@@ -112,8 +112,6 @@ public class PlanTimesAdapter {
 			if (!(pe instanceof Activity)) continue;
 
 			Activity act = (Activity) pe;
-			if (act.getLinkId().toString().startsWith("tr"))
-				new RuntimeException("Activity is mapped to a transit link!");
 			if (planElementIndex == 0) {
 				final Activity actTmp = (Activity) planTmp.getPlanElements().get(planElementIndex);
 				// this used to assume the activity starts at 00:00:00, but this
