@@ -12,22 +12,19 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 import playground.ikaddoura.analysis.detailedPersonTripAnalysis.handler.BasicPersonTripAnalysisHandler;
+import playground.ikaddoura.integrationCN.CNEventsReader;
 import playground.tschlenther.createNetwork.ForkNetworkCreator;
 
 /**
- * @author gthunig
+ * @author gthunig, ikaddoura
  * 
- * This class tests the Basic Person Trip Analysis which is provided by the
- * BasicPersonTripAnalysisHandler. 
- * Therefor several scenarios are created which are declared above their testmethod.
- * Every scenario has its own method.
- * Every scenario has the same network which is declared in its class; 
- * current status: ForkNetworkCreator
+ * This class tests the basic analysis provided by the BasicPersonTripAnalysisHandler. 
+ * In each test, a small events file is analyzed, and a scenario is created using the ForkNetworkCreator.
+ * 
  */
 public class BasicPersonTripAnalysisTest {
 	
@@ -184,8 +181,13 @@ public class BasicPersonTripAnalysisTest {
 		events.addHandler(basicHandler);
 		
 		log.info("Reading the events file...");
-		MatsimEventsReader reader = new MatsimEventsReader(events);
-		reader.readFile(eventsFile);
+		
+//		MatsimEventsReader reader = new MatsimEventsReader(events);
+//		reader.readFile(eventsFile);
+		
+		CNEventsReader cnReader = new CNEventsReader(events);
+		cnReader.parse(eventsFile);
+		
 		log.info("Reading the events file... Done.");
 		
 		return basicHandler;

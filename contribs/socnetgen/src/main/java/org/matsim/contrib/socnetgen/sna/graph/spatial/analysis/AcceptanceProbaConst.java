@@ -19,8 +19,15 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetgen.sna.graph.spatial.analysis;
 
-import com.vividsolutions.jts.geom.Point;
-import gnu.trove.*;
+import gnu.trove.iterator.TDoubleDoubleIterator;
+import gnu.trove.iterator.TDoubleObjectIterator;
+import gnu.trove.map.hash.TDoubleDoubleHashMap;
+import gnu.trove.map.hash.TDoubleIntHashMap;
+import gnu.trove.map.hash.TDoubleObjectHashMap;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
+
+import java.util.Set;
+
 import org.matsim.contrib.common.gis.CartesianDistanceCalculator;
 import org.matsim.contrib.common.gis.DistanceCalculator;
 import org.matsim.contrib.common.stats.Discretizer;
@@ -33,7 +40,7 @@ import org.matsim.contrib.socnetgen.sna.graph.analysis.AttributePartition;
 import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialVertex;
 import org.matsim.contrib.socnetgen.sna.snowball.spatial.analysis.ObservedLogAccessibility;
 
-import java.util.Set;
+import com.vividsolutions.jts.geom.Point;
 
 /**
  * @author illenberger
@@ -56,7 +63,7 @@ public class AcceptanceProbaConst extends AbstractVertexProperty {
 		GravityCostFunction function = new GravityCostFunction(1.6, 0.0, distanceCalculator);
 		TObjectDoubleHashMap<SpatialVertex> values = access.values((Set<? extends SpatialVertex>) vertices, function, points);
 		
-		AttributePartition partitioner = new AttributePartition(FixedSampleSizeDiscretizer.create(values.getValues(), 10));
+		AttributePartition partitioner = new AttributePartition(FixedSampleSizeDiscretizer.create(values.values(), 10));
 		TDoubleObjectHashMap<Set<SpatialVertex>> partitions = partitioner.partition(values);
 		
 		TObjectDoubleHashMap<Vertex> constValues = new TObjectDoubleHashMap<Vertex>();

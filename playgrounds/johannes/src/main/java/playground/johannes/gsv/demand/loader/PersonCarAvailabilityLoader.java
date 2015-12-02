@@ -22,7 +22,7 @@
  */
 package playground.johannes.gsv.demand.loader;
 
-import gnu.trove.TIntDoubleHashMap;
+import gnu.trove.map.hash.TIntDoubleHashMap;
 import playground.johannes.gsv.demand.AbstractTaskWrapper;
 import playground.johannes.gsv.demand.LoaderUtils;
 import playground.johannes.gsv.demand.tasks.PersonCarAvailability;

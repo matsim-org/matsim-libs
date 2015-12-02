@@ -29,6 +29,7 @@ import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.contrib.socnetsim.framework.cliques.Clique;
@@ -187,7 +188,7 @@ public abstract class AbstractPlanAnalyzerPerGroup implements IterationEndsListe
 
 			if (stat > maxStat) maxStat = stat;
 			if (stat < minStat) minStat = stat;
-			if (plan.isSelected()) executedStat = stat;
+			if (PersonUtils.isSelected(plan)) executedStat = stat;
 
 			statsSum += stat;
 		}

@@ -23,7 +23,8 @@
  */
 package org.matsim.contrib.socnetgen.sna.graph.spatial.io;
 
-import gnu.trove.TObjectDoubleHashMap;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
+
 import org.matsim.contrib.socnetgen.sna.graph.io.PajekColorizer;
 import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialSparseEdge;
 import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialSparseGraph;
@@ -52,7 +53,7 @@ public class PajekDistanceColorizer extends PajekColorizer<SpatialSparseVertex, 
 		
 		d_min = Double.MAX_VALUE;
 		d_max = Double.MIN_VALUE;
-		for(double value : d_mean.getValues()) {
+		for(double value : d_mean.values()) {
 			d_min = Math.min(value, d_min); 
 			d_max = Math.max(value, d_max);
 		}

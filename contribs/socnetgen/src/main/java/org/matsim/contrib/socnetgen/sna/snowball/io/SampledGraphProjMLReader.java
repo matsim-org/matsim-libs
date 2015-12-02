@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetgen.sna.snowball.io;
 
+import java.io.File;
+
 import org.matsim.contrib.socnetgen.sna.graph.Edge;
 import org.matsim.contrib.socnetgen.sna.graph.Graph;
 import org.matsim.contrib.socnetgen.sna.graph.GraphUtils;
@@ -29,8 +31,6 @@ import org.matsim.contrib.socnetgen.sna.snowball.SampledGraphProjection;
 import org.matsim.contrib.socnetgen.sna.snowball.SampledGraphProjectionBuilder;
 import org.matsim.contrib.socnetgen.sna.snowball.SampledVertexDecorator;
 import org.xml.sax.Attributes;
-
-import java.io.File;
 
 
 /**

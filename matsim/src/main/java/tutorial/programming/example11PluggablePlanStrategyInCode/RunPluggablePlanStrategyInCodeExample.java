@@ -25,8 +25,10 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 
 public class RunPluggablePlanStrategyInCodeExample {
+	private static final String STRATEGY_NAME = "doSomethingSpecial";
 
 	public static void main(final String[] args) {
 
@@ -37,17 +39,26 @@ public class RunPluggablePlanStrategyInCodeExample {
 			config = ConfigUtils.loadConfig(args[0]);
 		}
 		
-		int lastStrategyIdx = config.strategy().getStrategySettings().size() ;
-		StrategySettings stratSets = new StrategySettings(Id.create(lastStrategyIdx+1, StrategySettings.class));
-		stratSets.setStrategyName("doSomethingSpecial");
+		//add a strategy to the config
+		StrategySettings stratSets = new StrategySettings();
+		stratSets.setStrategyName(STRATEGY_NAME);
 		stratSets.setWeight(0.1);
 		config.strategy().addStrategySettings(stratSets);
 		
+		//let the output directory be overwritten
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		
+		//only run one iteration
+		config.controler().setFirstIteration(0);
+		config.controler().setLastIteration(1);
+		
 		final Controler controler = new Controler(config);
+		
+		//add the binding strategy 
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				addPlanStrategyBinding("doSomethingSpecial").toProvider(MyPlanStrategyFactory.class);
+				addPlanStrategyBinding(STRATEGY_NAME).toProvider(MyPlanStrategyFactory.class);
 			}
 		});
 		controler.run();

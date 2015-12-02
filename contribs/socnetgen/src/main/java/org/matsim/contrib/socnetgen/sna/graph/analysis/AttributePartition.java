@@ -19,18 +19,19 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetgen.sna.graph.analysis;
 
-import gnu.trove.TDoubleObjectHashMap;
-import gnu.trove.TObjectDoubleHashMap;
-import gnu.trove.TObjectDoubleIterator;
-import org.matsim.contrib.common.stats.Discretizer;
-import org.matsim.contrib.common.stats.DummyDiscretizer;
-import org.matsim.contrib.socnetgen.sna.graph.Vertex;
+import gnu.trove.iterator.TObjectDoubleIterator;
+import gnu.trove.map.hash.TDoubleObjectHashMap;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+
+import org.matsim.contrib.common.stats.Discretizer;
+import org.matsim.contrib.common.stats.DummyDiscretizer;
+import org.matsim.contrib.socnetgen.sna.graph.Vertex;
 
 
 /**

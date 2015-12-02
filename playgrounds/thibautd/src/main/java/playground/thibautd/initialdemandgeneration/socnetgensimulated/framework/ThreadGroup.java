@@ -19,10 +19,10 @@
 
 package playground.thibautd.initialdemandgeneration.socnetgensimulated.framework;
 
+import org.apache.log4j.Logger;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import org.apache.log4j.Logger;
 
 class ThreadGroup {
 	private final static Logger log = Logger.getLogger( ThreadGroup.class );

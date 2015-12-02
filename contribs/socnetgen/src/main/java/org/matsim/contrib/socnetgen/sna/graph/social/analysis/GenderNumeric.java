@@ -19,13 +19,14 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetgen.sna.graph.social.analysis;
 
-import gnu.trove.TObjectDoubleHashMap;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
+
+import java.util.Set;
+
 import org.matsim.contrib.socnetgen.sna.graph.Vertex;
 import org.matsim.contrib.socnetgen.sna.graph.analysis.AbstractVertexProperty;
 import org.matsim.contrib.socnetgen.sna.graph.social.SocialVertex;
 import org.matsim.core.population.PersonUtils;
-
-import java.util.Set;
 
 /**
  * @author illenberger

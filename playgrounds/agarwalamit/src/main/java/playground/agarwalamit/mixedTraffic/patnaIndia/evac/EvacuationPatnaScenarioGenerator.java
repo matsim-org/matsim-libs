@@ -18,7 +18,6 @@
  * *********************************************************************** */
 package playground.agarwalamit.mixedTraffic.patnaIndia.evac;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -39,6 +38,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup.LinkDynamics;
@@ -58,6 +58,7 @@ import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Geometry;
 
+import playground.agarwalamit.mixedTraffic.patnaIndia.PatnaUtils;
 import playground.agarwalamit.utils.LoadMyScenarios;
 
 /**
@@ -66,18 +67,17 @@ import playground.agarwalamit.utils.LoadMyScenarios;
 
 public class EvacuationPatnaScenarioGenerator {
 
-	private Collection <String> mainModes = Arrays.asList("car","motorbike","bike");
-	private String dir = "../../../repos/runs-svn/patnaIndia/";
+	private final String dir = "../../../repos/runs-svn/patnaIndia/";
 
-	private String networkFile = dir+"/inputs/networkUniModal.xml";
-	private String outNetworkFile = dir+"/run105/input/evac_network.xml.gz";
+	private final String networkFile = dir+"/inputs/networkUniModal.xml";
+	private final String outNetworkFile = dir+"/run105/input/evac_network.xml.gz";
 
-	private String popFile = dir+"/run105/input/patna_evac_plans_100Pct.xml.gz";
-	private String outPopFile = dir+"/run105/input/patna_evac_plans_100Pct_filtered.xml.gz";
+	private final String popFile = dir+"/run105/input/patna_evac_plans_100Pct.xml.gz";
+	private final String outPopFile = dir+"/run105/input/patna_evac_plans_100Pct_filtered.xml.gz";
 	
-	private String outConfigFile = dir+"/run105/input/patna_evac_config.xml.gz";
+	private final String outConfigFile = dir+"/run105/input/patna_evac_config.xml.gz";
 
-	private String areShapeFile = dir+"/run105/input/area_epsg24345.shp";
+	private final String areShapeFile = dir+"/run105/input/area_epsg24345.shp";
 	private final Id<Link> safeLinkId = Id.createLinkId("safeLink_Patna");
 
 	private Scenario scenario;
@@ -97,12 +97,10 @@ public class EvacuationPatnaScenarioGenerator {
 		createEvacPopulation();
 		scenario.getConfig().plans().setInputFile(outPopFile);
 		
-		//config
 		createConfig();
 	}
 	
 	private void createConfig(){
-		
 		Config config = scenario.getConfig();
 		config.network().setInputFile(outNetworkFile);
 		config.plans().setInputFile(outPopFile);
@@ -121,14 +119,14 @@ public class EvacuationPatnaScenarioGenerator {
 		config.qsim().setEndTime(30*3600);
 		config.qsim().setStuckTime(100000);
 		config.qsim().setLinkDynamics(LinkDynamics.PassingQ.name());
-		config.qsim().setMainModes(mainModes);
+		config.qsim().setMainModes(PatnaUtils.MAIN_MODES);
 		config.qsim().setTrafficDynamics(QSimConfigGroup.TrafficDynamics.withHoles);
 
-		StrategySettings expChangeBeta = new StrategySettings(Id.create("1",StrategySettings.class));
+		StrategySettings expChangeBeta = new StrategySettings();
 		expChangeBeta.setStrategyName("ChangeExpBeta");
 		expChangeBeta.setWeight(0.9);
 
-		StrategySettings reRoute = new StrategySettings(Id.create("2",StrategySettings.class));
+		StrategySettings reRoute = new StrategySettings();
 		reRoute.setStrategyName("ReRoute");
 		reRoute.setWeight(0.1);
 
@@ -153,24 +151,20 @@ public class EvacuationPatnaScenarioGenerator {
 		evacAct.setTypicalDuration(1*3600);
 		config.planCalcScore().addActivityParams(evacAct);
 
-//		config.planCalcScore().setPerforming_utils_hr(6.0);
-//		config.planCalcScore().setTraveling_utils_hr(0);
-//		config.planCalcScore().setTravelingBike_utils_hr(0);
-//		config.planCalcScore().setTravelingOther_utils_hr(0);
-//		config.planCalcScore().setTravelingPt_utils_hr(0);
-//		config.planCalcScore().setTravelingWalk_utils_hr(0);
-//
-//		config.planCalcScore().setConstantCar(-3.50);
-//		config.planCalcScore().setConstantOther(-2.2);
-//		config.planCalcScore().setConstantBike(0);
-//		config.planCalcScore().setConstantPt(-3.4);
-//		config.planCalcScore().setConstantWalk(-0.0);
-
-		config.plansCalcRoute().setNetworkModes(mainModes);
-		config.plansCalcRoute().setBeelineDistanceFactor(1.0);
-		config.plansCalcRoute().setTeleportedModeSpeed("walk", 4/3.6); 
-		config.plansCalcRoute().setTeleportedModeSpeed("pt", 20/3.6);
+		config.plansCalcRoute().setNetworkModes(PatnaUtils.MAIN_MODES);
 		
+		{
+			ModeRoutingParams mrp = new ModeRoutingParams("walk");
+			mrp.setTeleportedModeSpeed(4./3.6);
+			mrp.setBeelineDistanceFactor(1.0);
+			config.plansCalcRoute().addModeRoutingParams(mrp);
+		}
+		{
+			ModeRoutingParams mrp = new ModeRoutingParams("pt");
+			mrp.setTeleportedModeSpeed(20./3.6);
+			mrp.setBeelineDistanceFactor(1.3);
+			config.plansCalcRoute().addModeRoutingParams(mrp);
+		}
 		new ConfigWriter(config).write(outConfigFile);
 	}
 
@@ -226,7 +220,7 @@ public class EvacuationPatnaScenarioGenerator {
 			Activity evacAct = popFact.createActivityFromLinkId("evac", safeLinkId);
 			planOut.addActivity(evacAct);
 
-			if(mainModes.contains(leg.getMode())){
+			if(PatnaUtils.MAIN_MODES.contains(leg.getMode())){
 				TripRouter router = new TripRouter();
 				router.setRoutingModule(leg.getMode(), DefaultRoutingModules.createNetworkRouter(leg.getMode(), popFact, scenario.getNetwork(), new Dijkstra(scenario.getNetwork(), new OnlyTimeDependentTravelDisutility(new FreeSpeedTravelTime()) , new FreeSpeedTravelTime())));
 				List<? extends PlanElement> routeInfo = router.calcRoute(leg.getMode(), new ActivityWrapperFacility(home), new ActivityWrapperFacility(evacAct), home.getEndTime(), pOut);

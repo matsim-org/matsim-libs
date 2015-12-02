@@ -19,8 +19,8 @@
  * *********************************************************************** */
 package org.matsim.contrib.common.stats;
 
-import gnu.trove.TDoubleArrayList;
-import gnu.trove.TDoubleIntHashMap;
+import gnu.trove.list.array.TDoubleArrayList;
+import gnu.trove.map.hash.TDoubleIntHashMap;
 
 import java.util.Arrays;
 
@@ -83,7 +83,7 @@ public class FixedSampleSizeDiscretizer {
 		if (binsize > 0)
 			borders.add(samples[samples.length - 1]);
 
-		return new FixedBordersDiscretizer(borders.toNativeArray());
+		return new FixedBordersDiscretizer(borders.toArray());
 	}
 
 	/**

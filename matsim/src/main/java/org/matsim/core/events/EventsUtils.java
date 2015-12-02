@@ -13,6 +13,11 @@ public class EventsUtils {
         Integer numberOfThreads = config.parallelEventHandling().getNumberOfThreads();
         Long estimatedNumberOfEvents = config.parallelEventHandling().getEstimatedNumberOfEvents();
         Boolean synchronizeOnSimSteps = config.parallelEventHandling().getSynchronizeOnSimSteps();
+        Boolean oneThreadPerHandler = config.parallelEventHandling().getOneThreadPerHandler();
+        if (oneThreadPerHandler != null && oneThreadPerHandler) {
+        	 if (synchronizeOnSimSteps != null) return new ParallelEventsManager(synchronizeOnSimSteps);
+        	 else return new ParallelEventsManager(true);
+        }
         if (numberOfThreads != null) {
             if (synchronizeOnSimSteps != null && synchronizeOnSimSteps) {
                 return new SimStepParallelEventsManagerImpl(numberOfThreads);
@@ -33,13 +38,15 @@ public class EventsUtils {
      * SynchronizedEventsManagerImpl.
      */
     public static EventsManager getParallelFeedableInstance(EventsManager events) {
-        if (events instanceof SimStepParallelEventsManagerImpl) {
-            return events;
-        } else if (events instanceof SynchronizedEventsManagerImpl) {
-            return events;
-        } else {
-            return new SynchronizedEventsManagerImpl(events);
-        }
+    	if (events instanceof SimStepParallelEventsManagerImpl) {
+    		return events;
+    	} else if (events instanceof ParallelEventsManager) {
+    		return events;
+    	}
+    	else if (events instanceof SynchronizedEventsManagerImpl) {
+    		return events;
+    	} else {
+    		return new SynchronizedEventsManagerImpl(events);
+    	}
     }
-
 }

@@ -19,11 +19,8 @@
 
 package playground.johannes.gsv.zones;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
 
 /**
  * @author johannes
@@ -84,5 +81,13 @@ public class ObjectKeyMatrix<T> {
 		}
 		
 		return keys;
+	}
+
+	public List<T> values() {
+		List<T> values = new ArrayList<>();
+		for(Entry<String, Map<String, T>> entry : matrix.entrySet()) {
+			values.addAll(entry.getValue().values());
+		}
+		return values;
 	}
 }

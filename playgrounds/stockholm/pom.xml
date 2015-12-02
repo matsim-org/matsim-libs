@@ -19,6 +19,11 @@
   		<artifactId>roadpricing</artifactId>
   		<version>0.8.0-SNAPSHOT</version>
   	</dependency>
+  	<dependency>
+  		<groupId>org.matsim.contrib</groupId>
+  		<artifactId>signals</artifactId>
+  		<version>0.8.0-SNAPSHOT</version>
+  	</dependency>
   	
   	<dependency>	
 		<groupId>net.sf.opencsv</groupId>

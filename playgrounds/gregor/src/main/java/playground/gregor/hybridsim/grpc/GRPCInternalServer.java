@@ -20,15 +20,15 @@
 
 package playground.gregor.hybridsim.grpc;
 
-import io.grpc.ServerImpl;
-import io.grpc.transport.netty.NettyServerBuilder;
 
-import java.util.concurrent.CyclicBarrier;
-
+import io.grpc.internal.ServerImpl;
+import io.grpc.netty.NettyServerBuilder;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.hybrid.MATSimInterfaceServiceGrpc;
 import org.matsim.hybrid.MATSimInterfaceServiceGrpc.MATSimInterfaceService;
+
+import java.util.concurrent.CyclicBarrier;
 
 public class GRPCInternalServer implements Runnable{
 
@@ -36,16 +36,26 @@ public class GRPCInternalServer implements Runnable{
 
 	/* The port on which the server should run */
 	private final int port = 9999;
-	private ServerImpl server;
+
 
 	private final MATSimInterfaceService mi;
 
 	private final CyclicBarrier startupBarrier;
+	private ServerImpl server;
 
 	public GRPCInternalServer(MATSimInterfaceService mi, CyclicBarrier startupBarrier) {
 		Logger.getLogger("io.netty").setLevel(Level.OFF);
 		this.mi = mi;
 		this.startupBarrier = startupBarrier;
+	}
+
+	@Override
+	public void run() {
+		try {
+			start();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	private void start() throws Exception {
@@ -63,21 +73,12 @@ public class GRPCInternalServer implements Runnable{
 				System.err.println("*** server shut down");
 			}
 		});
-		
+
 	}
 
 	private void stop() {
 		if (this.server != null) {
 			this.server.shutdown();
-		}
-	}
-
-	@Override
-	public void run() {
-		try {
-			start();
-		} catch (Exception e) {
-			e.printStackTrace();
 		}
 	}
 

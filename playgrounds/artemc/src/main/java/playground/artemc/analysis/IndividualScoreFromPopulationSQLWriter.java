@@ -4,6 +4,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
+import org.matsim.core.population.PersonUtils;
+
 import playground.artemc.analysis.postgresql.PostgresType;
 import playground.artemc.analysis.postgresql.PostgresqlCSVWriter;
 import playground.artemc.analysis.postgresql.PostgresqlColumnDefinition;
@@ -54,7 +56,7 @@ public class IndividualScoreFromPopulationSQLWriter {
 			}
 
 			for (Plan plan : person.getPlans()) {
-				if (!plan.isSelected()) {
+				if (!PersonUtils.isSelected(plan)) {
 					dataMap.get(person.getId().toString()).add(plan.getScore().toString());
 					if (plan.getCustomAttributes().containsKey("toll")) {
 						dataMap.get(person.getId().toString()).add((String) plan.getCustomAttributes().get("toll"));

@@ -19,9 +19,6 @@
  * *********************************************************************** */
 package playground.thibautd.utils.charts;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.plot.CategoryPlot;
@@ -29,6 +26,9 @@ import org.jfree.chart.plot.Plot;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.Range;
 import org.matsim.core.utils.charts.ChartUtil;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Given a list of charts, set all Y and/or X axis to the same range.

@@ -19,9 +19,6 @@
  * *********************************************************************** */
 package playground.thibautd.parknride.replanning;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
@@ -32,10 +29,12 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.router.ActivityWrapperFacility;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.collections.QuadTree;
-
 import playground.thibautd.parknride.ParkAndRideConstants;
 import playground.thibautd.parknride.ParkAndRideFacilities;
 import playground.thibautd.parknride.ParkAndRideFacility;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**

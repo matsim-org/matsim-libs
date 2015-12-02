@@ -19,9 +19,13 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetgen.sna.graph.spatial.analysis;
 
-import gnu.trove.TDoubleDoubleHashMap;
-import gnu.trove.TObjectDoubleHashMap;
-import gnu.trove.TObjectDoubleIterator;
+import gnu.trove.iterator.TObjectDoubleIterator;
+import gnu.trove.map.hash.TDoubleDoubleHashMap;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
+
+import java.io.IOException;
+import java.util.Map;
+
 import org.apache.commons.math.stat.correlation.PearsonsCorrelation;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
@@ -33,9 +37,6 @@ import org.matsim.contrib.socnetgen.sna.graph.analysis.Degree;
 import org.matsim.contrib.socnetgen.sna.graph.analysis.ModuleAnalyzerTask;
 import org.matsim.contrib.socnetgen.sna.graph.analysis.VertexPropertyCorrelation;
 import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialGraph;
-
-import java.io.IOException;
-import java.util.Map;
 
 /**
  * @author illenberger
@@ -73,7 +74,7 @@ public class DegreeAccessibilityTask extends ModuleAnalyzerTask<Accessibility> {
 		if(outputDirectoryNotNull()) {
 			
 			
-			TDoubleDoubleHashMap correl = VertexPropertyCorrelation.mean(yVals, xVals, FixedSampleSizeDiscretizer.create(xVals.getValues(), 20, 100));
+			TDoubleDoubleHashMap correl = VertexPropertyCorrelation.mean(yVals, xVals, FixedSampleSizeDiscretizer.create(xVals.values(), 20, 100));
 //			TDoubleDoubleHashMap correl = VertexPropertyCorrelation.mean(yVals, xVals, new LinearDiscretizer(5.0));
 			try {
 				StatsWriter.writeHistogram(correl, "A", "k", getOutputDirectory() + "k_mean_A.txt");
@@ -90,7 +91,7 @@ public class DegreeAccessibilityTask extends ModuleAnalyzerTask<Accessibility> {
 				yVals.put(it.key(), k/A);
 			}
 			
-			correl = VertexPropertyCorrelation.mean(yVals, xVals, FixedSampleSizeDiscretizer.create(xVals.getValues(), 20, 100));
+			correl = VertexPropertyCorrelation.mean(yVals, xVals, FixedSampleSizeDiscretizer.create(xVals.values(), 20, 100));
 
 			try {
 				StatsWriter.writeHistogram(correl, "A", "c_i", getOutputDirectory() + "c_i_A.txt");

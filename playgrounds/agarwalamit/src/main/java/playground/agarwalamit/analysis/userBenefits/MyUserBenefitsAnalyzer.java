@@ -61,7 +61,6 @@ public class MyUserBenefitsAnalyzer extends AbstractAnalysisModule{
 		super(MyUserBenefitsAnalyzer.class.getSimpleName());
 	}
 	
-	
 	/**
 	 * @param scenario
 	 * @param welfareMeasure user welfare or logsum

@@ -18,12 +18,11 @@
  * *********************************************************************** */
 package playground.agarwalamit.mixedTraffic.plots;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Queue;
-import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
@@ -37,177 +36,186 @@ import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.mixedTraffic.MixedTrafficVehiclesUtils;
+import playground.agarwalamit.mixedTraffic.plots.LinkPersonInfoContainer.PersonPositionChecker;
 
 /**
  * @author amit
  */
 public class QueuePositionCalculationHandler implements LinkLeaveEventHandler, LinkEnterEventHandler, PersonDepartureEventHandler {
 
-	private final Logger logger = Logger.getLogger(QueuePositionCalculationHandler.class);
-	private Map<Id<Link>, Map<Id<Person>, PersonOnLinkInformation>> linkId2PersonId2LinkInfo = new TreeMap<Id<Link>, Map<Id<Person>,PersonOnLinkInformation>>();
-	private SortedMap<Id<Link>, Queue<Id<Person>>> linkId2PersonId2VehicleOnLink= new TreeMap<Id<Link>, Queue<Id<Person>>>();
-	private Map<Id<Link>, Queue<Id<Person>>> linkId2PersonId2VehicleInQueue= new TreeMap<Id<Link>, Queue<Id<Person>>>();
-	private Map<Id<Link>, Double> linkId2LinkAvailableSpace = new TreeMap<Id<Link>, Double>();
+	private static final Logger LOG = Logger.getLogger(QueuePositionCalculationHandler.class);
+	private final Map<Id<Link>,LinkPersonInfoContainer> linkid2Container = new HashMap<>();
+	private final BufferedWriter writer1 ;
+	private final BufferedWriter writer2 ;
 
-	private List<String> personIdLinkIdLinkEnterTimeLinkLeaveTimeData = new ArrayList<String>();
-	private List<String> personIdLinkIdLinkEnterTimeLinkLeaveTimeQueuePositionData = new ArrayList<String>();
+	private final Map<Id<Person>, String> personId2LegMode = new TreeMap<Id<Person>, String>();
+	private final Scenario scenario;
+	private double lastEventTimeStep = 0;
 
-	private Map<Id<Person>, String> personId2LegMode = new TreeMap<Id<Person>, String>();
-	private Scenario scenario;
-	private double lastEventTimeStep=0;
-
-	public QueuePositionCalculationHandler(Scenario scenario) {
-		this.logger.info("Calculating queue position of vehicles in mixed traffic.");
+	public QueuePositionCalculationHandler(final Scenario scenario, final String outputFolder) {
+		LOG.info("Calculating queue position of vehicles in mixed traffic.");
 		this.scenario = scenario;
+		this.writer1 = IOUtils.getBufferedWriter(outputFolder+"rDataPersonLinkEnterLeave.txt");
+		this.writer2 = IOUtils.getBufferedWriter(outputFolder+"rDataPersonInQueueData6.txt");
+		try {
+			this.writer1.write("personId \t linkId \t linkEnterTimeX1 \t initialPositionY1 \t linkLeaveTimeX2 \t endPositionY2 \t travelMode \n");
+			this.writer2.write("personId \t linkId \t startTimeX1 \t initialPositionY1 \t endTimeX2 \t endPositionY2 \t travelMode \n");
+		} catch (Exception e) {
+			throw new RuntimeException("Data is not written. Reason -"+ e);
+		}
+		
 		for (Link link : scenario.getNetwork().getLinks().values()) {
-			this.linkId2PersonId2LinkInfo.put(link.getId(), new TreeMap<Id<Person>, PersonOnLinkInformation>());
-			this.linkId2PersonId2VehicleOnLink.put(link.getId(), new LinkedList<Id<Person>>());
-			this.linkId2PersonId2VehicleInQueue.put(link.getId(), new LinkedList<Id<Person>>());
-			this.linkId2LinkAvailableSpace.put(link.getId(), link.getLength());
+			this.linkid2Container.put(link.getId(), new LinkPersonInfoContainer(link.getId(),link.getLength()));
 		}
 	}
 
 	@Override
 	public void reset(int iteration) {
-		this.linkId2PersonId2LinkInfo.clear();
-		this.linkId2PersonId2VehicleInQueue.clear();
-		this.linkId2PersonId2VehicleOnLink.clear();
+		this.linkid2Container.clear();
 		this.personId2LegMode.clear();
-		this.personIdLinkIdLinkEnterTimeLinkLeaveTimeQueuePositionData.clear();
-		this.personIdLinkIdLinkEnterTimeLinkLeaveTimeData.clear();
 	}
 
 	@Override
 	public void handleEvent(PersonDepartureEvent event){
 		this.personId2LegMode.put(event.getPersonId(), event.getLegMode());
-//		updateVehicleOnLinkAndFillToQueue(event.getTime());
 	}
 
 	@Override
-	public void handleEvent(LinkEnterEvent event) { 
+	public void handleEvent(LinkEnterEvent event) {
 		Id<Person> personId= event.getDriverId();
-		Link link = this.scenario.getNetwork().getLinks().get(event.getLinkId());
-		if(this.linkId2PersonId2LinkInfo.get(event.getLinkId()).containsKey(personId)){
-			throw new RuntimeException("Person is already on the link. Cannot happen.");
-		}
+		Id<Link> linkId = event.getLinkId();
 
-		Map<Id<Person>, PersonOnLinkInformation> personId2LinkInfo = this.linkId2PersonId2LinkInfo.get(link.getId());
-		PersonOnLinkInformation personOnLinkInfo = insertLinkEnterInfo(event, link);
-		personId2LinkInfo.put(personId, personOnLinkInfo);
+		//store info
+		LinkPersonInfoContainer container = this.linkid2Container.get(linkId);
+		Link link = this.scenario.getNetwork().getLinks().get(linkId);
+		EnteringPersonInfo.Builder builder = new EnteringPersonInfo.Builder();
+		builder.setAgentId(personId);
+		builder.setEnterTime(event.getTime());
+		builder.setLegMode(this.personId2LegMode.get(personId));
+		builder.setLink(link);
+		PersonPositionChecker checker = container.getPerson2PersonPositionChecker().get(personId);
+		
+		if( checker!=null && checker.getLink().getId().equals(linkId) ){
+			checker.updateCycleNumberOfPerson();
+		} 
+		container.getPerson2EnteringPersonInfo().put(personId, builder.build());
 
-		if(this.linkId2PersonId2VehicleOnLink.get(event.getLinkId()).contains(personId)){
-			throw new RuntimeException("Same person can not come on the link again until it leaves the link.");
-		}
-		Queue<Id<Person>> personId2Position = this.linkId2PersonId2VehicleOnLink.get(event.getLinkId());
-		personId2Position.offer(personId);
-		updateVehicleOnLinkAndFillToQueue(event.getTime());
+		Queue<Id<Person>> personId2AgentPositions = container.getAgentsOnLink();
+		personId2AgentPositions.offer(personId);
 	}
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		if(event.getLinkId().equals(Id.create("-1",Link.class))) {
-		} else {
-			Id<Link> linkId = event.getLinkId();
-			Id<Person> personId = event.getDriverId();
-			Map<Id<Person>, PersonOnLinkInformation> personId2LinkInfo = this.linkId2PersonId2LinkInfo.get(linkId);
+		Id<Link> linkId = event.getLinkId();
+		Id<Person> personId = event.getDriverId();
 
-			if (personId2LinkInfo == null) {
-				throw new RuntimeException("Cannot happen.");
+		LinkPersonInfoContainer container = this.linkid2Container.get(linkId);
+		if( ! container.getPerson2EnteringPersonInfo().containsKey(personId) ) return; // if agent has departed on this link
+		
+		LeavingPersonInfo.Builder builder = new LeavingPersonInfo.Builder();
+		builder.setAgentId(personId);
+		builder.setLeaveTime(event.getTime());
+		builder.setLegMode(this.personId2LegMode.get(personId));
+		builder.setLinkId(linkId);
+		LeavingPersonInfo leavingPersonInfo = builder.build();
+		container.getPerson2LeavingPersonInfo().put(personId, leavingPersonInfo);
+		
+		PersonPositionChecker checker = container.getOrCreatePersonPositionChecker(personId);
+		
+		writeString(writer1, checker.getPersonId()+"\t"+
+					checker.getLink().getId()+"\t"+
+					checker.getEnteredPersonInfo().getLinkEnterTime()+"\t"+
+					Double.valueOf(checker.getLink().getId().toString())*checker.getLink().getLength()+"\t"+
+					checker.getLeftPersonInfo().getLinkLeaveTime()+"\t"+
+					(1+Double.valueOf(checker.getLink().getId().toString()))*checker.getLink().getLength()+"\t"+
+					checker.getEnteredPersonInfo().getLegMode()+"\n"
+					);
+				
+		updateVehicleOnLinkAndFillToQueue(event.getTime());
+		container.getAgentsOnLink().remove(personId);
+
+		if(container.getAgentsInQueue().contains(personId)) {
+			double initialPos = Double.valueOf(checker.getLink().getId().toString())*checker.getLink().getLength();
+			double vehicleSpeed =  MixedTrafficVehiclesUtils.getSpeed(checker.getEnteredPersonInfo().getLegMode());
+			double qStartDistFromFNode = initialPos + (checker.getQueuingTime()- checker.getEnteredPersonInfo().getLinkEnterTime()) * vehicleSpeed;
+			
+			if((qStartDistFromFNode-initialPos) > checker.getLink().getLength()){
+				qStartDistFromFNode=initialPos + checker.getLink().getLength();
 			}
 			
-			PersonOnLinkInformation personOnLinkInfo = personId2LinkInfo.get(personId);
-			personOnLinkInfo.setLinkLeaveTime( event.getTime());
-
-			String dataToWriteInList = personId+"\t"+linkId+"\t"
-					+personOnLinkInfo.getLinkEnterTime()+"\t"
-					+personOnLinkInfo.getLinkLeaveTime()+"\t"
-					+personOnLinkInfo.getLinkLength()+"\t"
-					+personOnLinkInfo.getLegMode(); 
-			this.personIdLinkIdLinkEnterTimeLinkLeaveTimeData.add(dataToWriteInList);
-
-			updateVehicleOnLinkAndFillToQueue(event.getTime());
-			this.linkId2PersonId2VehicleOnLink.get(linkId).remove(personId);
-
-			if(this.linkId2PersonId2VehicleInQueue.get(linkId).contains(personId)) {
-//				if(!((LinkedList<Id>)linkId2PersonId2VehicleInQueue.get(linkId)).get(0).equals(personId)) {
-//					// perhaps check if this is at the front of the queue (only for no passing case).
-//					//logger.warn("Leaving vehicle should be first in queue if it was entered on link first.");
-//				}
-				String qDataToWriteInList = personId+"\t"+linkId+"\t"
-						+personOnLinkInfo.getLinkEnterTime()+"\t"
-						+personOnLinkInfo.getQueuingTime()+"\t"
-						+personOnLinkInfo.getLinkLength()+"\t"
-						+personOnLinkInfo.getLegMode()+"\t"
-						+personOnLinkInfo.getLinkLeaveTime();
-				this.personIdLinkIdLinkEnterTimeLinkLeaveTimeQueuePositionData.add(qDataToWriteInList);
-
-				this.linkId2PersonId2VehicleInQueue.get(linkId).remove(personId);
-				double availableSpaceSoFar = Double.valueOf(this.linkId2LinkAvailableSpace.get(linkId));
-				double newAvailableSpace = availableSpaceSoFar+MixedTrafficVehiclesUtils.getCellSize(personOnLinkInfo.getLegMode());
-				this.linkId2LinkAvailableSpace.put(linkId, Double.valueOf(newAvailableSpace));
-			}
-			this.linkId2PersonId2LinkInfo.get(linkId).remove(personId);
+			writeString(writer2,checker.getPersonId()+"\t"+	
+						checker.getLink().getId()+"\t"+
+						checker.getEnteredPersonInfo().getLinkEnterTime()+"\t"+
+						initialPos+"\t"+
+						checker.getQueuingTime()+"\t"+
+						qStartDistFromFNode +"\t"+
+						checker.getEnteredPersonInfo().getLegMode()+"\n"
+					);
+			
+			writeString(writer2,checker.getPersonId()+"\t"+	
+					checker.getLink().getId()+"\t"+
+					checker.getQueuingTime()+"\t"+
+					qStartDistFromFNode+"\t"+
+					checker.getLeftPersonInfo().getLinkLeaveTime()+"\t"+
+					(1 + Double.valueOf(checker.getLink().getId().toString() ) )*checker.getLink().getLength() + "\t"+
+					checker.getEnteredPersonInfo().getLegMode()+"\n"
+				);
+			
+			container.getAgentsInQueue().remove(personId);
+			double availableSpaceSoFar = container.getAvailableLinkSpace();
+			double newAvailableSpace = availableSpaceSoFar + MixedTrafficVehiclesUtils.getCellSize(leavingPersonInfo.getLegMode());
+			container.setAvailableLinkSpace(newAvailableSpace);
 		}
 	}
 	
-	private PersonOnLinkInformation insertLinkEnterInfo(LinkEnterEvent event, Link link){
-		PersonOnLinkInformation personOnLinkInfo = new PersonOnLinkInformation();
-		personOnLinkInfo.setLink(link);
-		personOnLinkInfo.setLinkEnterTime(event.getTime());
-		personOnLinkInfo.setLegMode(this.personId2LegMode.get(event.getDriverId()));
-		return personOnLinkInfo;
+	private void writeString (BufferedWriter writer, String str){
+		try {
+			writer.write(str);
+		} catch (Exception e) {
+			throw new RuntimeException("Data is not written. Reason -"+ e);
+		}
 	}
 
-	public List<String> getPersonLinkEnterTimeVehiclePositionDataToWrite(){
-		return this.personIdLinkIdLinkEnterTimeLinkLeaveTimeQueuePositionData;
-	}
-
-	public List<String> getPersonLinkEnterLeaveTimeDataToWrite(){
-		return this.personIdLinkIdLinkEnterTimeLinkLeaveTimeData;
-	}
-	
-	private void updateVehicleOnLinkAndFillToQueue(double currentTimeStep) {
-		for (Link link : this.scenario.getNetwork().getLinks().values()) {
-			Id<Link> linkId = link.getId();
-			for(Id<Person> personId :this.linkId2PersonId2VehicleOnLink.get(linkId)){
-				for(double time = this.lastEventTimeStep;time<=currentTimeStep;time++){
-					PersonOnLinkInformation personOnLinkInfo = this.linkId2PersonId2LinkInfo.get(linkId).get(personId);
-					personOnLinkInfo.setAvailableLinkSpace(Double.valueOf(this.linkId2LinkAvailableSpace.get(linkId)));
-					personOnLinkInfo.checkIfVehicleWillGoInQ(time);
-					if (personOnLinkInfo.addVehicleInQ()){
-						Queue<Id<Person>> queue = this.linkId2PersonId2VehicleInQueue.get(linkId);
-						if(queue.contains(personId)) { 
-							// already in queue
-						} else {
+	private void updateVehicleOnLinkAndFillToQueue(final double now) {
+		for ( Id<Link> linkId : this.linkid2Container.keySet() ) {
+			LinkPersonInfoContainer container = this.linkid2Container.get(linkId);
+			
+			for(Id<Person> personId :container.getAgentsOnLink()){
+				PersonPositionChecker checker = container.getOrCreatePersonPositionChecker(personId);
+				double personPositionUpdateTimeStep = Math.floor( Math.max( this.lastEventTimeStep, checker.getQueuingTime()) );
+				
+				for(double time = personPositionUpdateTimeStep; time <= now && !checker.isPersonAlreadyQueued(); time++){
+					if( checker.isAddingVehicleInQueue(time) ){
+						Queue<Id<Person>> queue = container.getAgentsInQueue();
+						
+						if(! queue.contains(personId) ) {
 							queue.offer(personId);
+							checker.updateQueuingTime();
 							/*
 							 * If a person (20mps)  starts on link(1000m) at t=0, then will add to queue if time t=51 sec
 							 * time-1 is actually physically correct time at which it will add to Q.
 							 */
-							double availableSpaceSoFar=Double.valueOf(this.linkId2LinkAvailableSpace.get(linkId));
-							personOnLinkInfo.setQueuingTime(availableSpaceSoFar);
-//							personOnLinkInfo.setQueuingTime(time-1);
-							double newAvailableSpace = availableSpaceSoFar-MixedTrafficVehiclesUtils.getCellSize(personOnLinkInfo.getLegMode());
-							this.linkId2LinkAvailableSpace.put(linkId, Double.valueOf(newAvailableSpace));
-						}
+							double availableSpaceSoFar = this.linkid2Container.get(linkId).getAvailableLinkSpace();
+							double newAvailableSpace = availableSpaceSoFar - MixedTrafficVehiclesUtils.getCellSize(checker.getEnteredPersonInfo().getLegMode());
+							this.linkid2Container.get(linkId).setAvailableLinkSpace(newAvailableSpace);
+						}  else throw new RuntimeException("Person is alreay in queue. Aborting ...");
+						
 					} 
 				}
 			}
 		}
-		this.lastEventTimeStep=currentTimeStep;
+		this.lastEventTimeStep=now;
 	}
-
-//	private double getCellSize(String travelMode){
-//		double effCellSize =7.5;
-//		if(travelMode.equals("cars") || travelMode.equals("fast")) {
-//			effCellSize= 7.5;
-//		} else if(travelMode.equals("motorbikes") || travelMode.equals("med")) {
-//			effCellSize = 7.5/4;
-//		} else if(travelMode.equals("bicycles") || travelMode.equals("truck") ){
-//			effCellSize= 7.5/4;
-//		}
-//		return effCellSize;
-//	}
+	
+	public void closeWriter(){
+		try {
+			this.writer1.close();
+			this.writer2.close();
+		} catch (IOException e) {
+			throw new RuntimeException("Data is not written. Reason -"+ e);
+		}
+	}
 }

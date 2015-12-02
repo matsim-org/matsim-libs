@@ -28,7 +28,6 @@ import playground.dgrether.signalsystems.laemmer.controler.LaemmerControlerListe
 
 /**
  * @author dgrether
- *
  */
 public class LaemmerMain {
   
@@ -52,10 +51,7 @@ public class LaemmerMain {
 		Controler controler = new Controler(args2);
         //FIXME: Take care that the normal SignalsControllerListener is NOT added.
         controler.addControlerListener(new LaemmerControlerListenerFactory().createSignalsControllerListener());
-		controler.getConfig().controler().setOverwriteFileSetting(
-				true ?
-						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		controler.run();
 
 	}

@@ -22,7 +22,7 @@ package playground.johannes.gsv.qlik;
 import com.vividsolutions.jts.geom.Point;
 import playground.johannes.synpop.gis.Zone;
 import playground.johannes.synpop.gis.ZoneCollection;
-import playground.johannes.synpop.gis.ZoneGeoJsonIO;
+import playground.johannes.synpop.gis.ZoneEsriShapeIO;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -36,7 +36,9 @@ public class Zones2Centroids {
     private final static String SEPARATOR = ";";
 
     public static void main(String args[]) throws IOException {
-        ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON("/home/johannes/gsv/gis/nuts/world/nuts3-psmobility.geojson", "NO");
+//        ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON("/home/johannes/gsv/gis/nuts/world/nuts3-psmobility.geojson", "NO");
+        ZoneCollection zones = ZoneEsriShapeIO.read
+                ("/mnt/cifs/B-drive/C_Vertrieb/2014_03_01_Nachfragematrizen_PV/07_Qlik/nuts3.SHP");
 
         BufferedWriter writer = new BufferedWriter(new FileWriter
                 ("/mnt/cifs/B-drive/C_Vertrieb/2014_03_01_Nachfragematrizen_PV/07_Qlik/nuts3.csv"));

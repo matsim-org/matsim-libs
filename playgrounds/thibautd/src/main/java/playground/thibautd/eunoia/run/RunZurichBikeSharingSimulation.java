@@ -19,10 +19,12 @@
  * *********************************************************************** */
 package playground.thibautd.eunoia.run;
 
-import java.io.File;
-import java.util.Map;
-
 import com.google.inject.Provider;
+import eu.eunoiaproject.bikesharing.framework.BikeSharingConstants;
+import eu.eunoiaproject.bikesharing.framework.qsim.BikeSharingWithoutRelocationQsimFactory;
+import eu.eunoiaproject.bikesharing.framework.router.TransitMultiModalAccessRoutingModule.RoutingData;
+import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingScenarioUtils;
+import eu.eunoiaproject.bikesharing.scoring.StepBasedFareConfigGroup;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -42,7 +44,6 @@ import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.pt.router.TransitRouterNetwork;
-
 import playground.ivt.matsim2030.Matsim2030Utils;
 import playground.ivt.matsim2030.generation.ScenarioMergingConfigGroup;
 import playground.ivt.matsim2030.router.TransitRouterNetworkReader;
@@ -52,11 +53,8 @@ import playground.thibautd.router.multimodal.CachingLeastCostPathAlgorithmWrappe
 import playground.thibautd.router.multimodal.LinkSlopeScorer;
 import playground.thibautd.utils.SoftCache;
 
-import eu.eunoiaproject.bikesharing.framework.BikeSharingConstants;
-import eu.eunoiaproject.bikesharing.framework.qsim.BikeSharingWithoutRelocationQsimFactory;
-import eu.eunoiaproject.bikesharing.framework.router.TransitMultiModalAccessRoutingModule.RoutingData;
-import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingScenarioUtils;
-import eu.eunoiaproject.bikesharing.scoring.StepBasedFareConfigGroup;
+import java.io.File;
+import java.util.Map;
 
 /**
  * @author thibautd

@@ -19,16 +19,21 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetgen.sna.graph.analysis;
 
-import gnu.trove.*;
+import gnu.trove.iterator.TObjectDoubleIterator;
+import gnu.trove.list.array.TDoubleArrayList;
+import gnu.trove.map.hash.TDoubleDoubleHashMap;
+import gnu.trove.map.hash.TDoubleObjectHashMap;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
+
+import java.util.HashSet;
+import java.util.Set;
+
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.common.stats.Correlations;
 import org.matsim.contrib.common.stats.Discretizer;
 import org.matsim.contrib.common.stats.DummyDiscretizer;
 import org.matsim.contrib.socnetgen.sna.graph.Edge;
 import org.matsim.contrib.socnetgen.sna.graph.Vertex;
-
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * @author illenberger
@@ -76,7 +81,7 @@ public class VertexPropertyCorrelation {
 
 		discretizeValues(propValuesY, propValuesX, valuesX, valuesY, discretizer);
 		
-		return Correlations.mean(valuesX.toNativeArray(), valuesY.toNativeArray());
+		return Correlations.mean(valuesX.toArray(), valuesY.toArray());
 	}
 	
 	public static TDoubleObjectHashMap<DescriptiveStatistics> statistics(VertexProperty propY, VertexProperty porpX, Set<? extends Vertex> vertices) {
@@ -97,7 +102,7 @@ public class VertexPropertyCorrelation {
 		
 		discretizeValues(propValuesY, propValuesX, valuesX, valuesY, discretizer);
 		
-		return Correlations.statistics(valuesX.toNativeArray(), valuesY.toNativeArray(), discretizer);
+		return Correlations.statistics(valuesX.toArray(), valuesY.toArray(), discretizer);
 	}
 	
 	private static <T> void discretizeValues(TObjectDoubleHashMap<T> propValuesY, TObjectDoubleHashMap<T> propValuesX, TDoubleArrayList valuesX, TDoubleArrayList valuesY, Discretizer discretizer) {

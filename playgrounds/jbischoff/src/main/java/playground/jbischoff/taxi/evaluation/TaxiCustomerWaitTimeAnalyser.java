@@ -19,6 +19,7 @@
 
 package playground.jbischoff.taxi.evaluation;
 
+
 import java.io.*;
 import java.util.*;
 import java.util.Map.Entry;
@@ -191,6 +192,7 @@ public class TaxiCustomerWaitTimeAnalyser
             bw.close();
 
             bw = new BufferedWriter(new FileWriter(new File(waitstatsFile + "linkWait.txt")));
+            bw.append("linkId\tx\ty\tWaitTime\tTrips\n");
             for (Entry<Id, Double> e : this.linkWaitTime.entrySet()) {
                 Coord coord = scenario.getNetwork().getLinks().get(e.getKey()).getCoord();
                 bw.write(e.getKey() + "\t" + coord.getX() + "\t" + coord.getY() + "\t"
@@ -202,6 +204,8 @@ public class TaxiCustomerWaitTimeAnalyser
             bw.close();
 
             bw = new BufferedWriter(new FileWriter(new File(waitstatsFile + "agentWaitTimes.txt")));
+            bw.append("time\tagent\tlinkId\twaitTime");
+            bw.newLine();
             for (WaitTimeLogRow wtlr : this.waitTimes) {
                 bw.append(wtlr.toString());
                 bw.newLine();

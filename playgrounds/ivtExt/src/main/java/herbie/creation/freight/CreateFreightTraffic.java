@@ -244,7 +244,7 @@ public class CreateFreightTraffic {
 	}
 		
 	private Person createPerson(int originIndex, int destinationIndex, int index) {
-		Person p = PersonImpl.createPerson(Id.create(this.freightOffset + index, Person.class));
+		Person p = PopulationUtils.createPerson(Id.create(this.freightOffset + index, Person.class));
 		PersonUtils.setEmployed(p, true);
 		PersonUtils.setCarAvail(p, "always");
 //		((PersonImpl)p).createDesires("freight");

@@ -286,7 +286,7 @@ public class QSimIntegrationTest extends MatsimTestCase {
 		double departureTime = depTime;
 		List<Person> persons = new ArrayList<Person>(count);
 		for(int i = 0; i < count; i++) {
-			Person person = PersonImpl.createPerson(Id.create(i + (int) departureTime, Person.class));
+			Person person = PopulationUtils.createPerson(Id.create(i + (int) departureTime, Person.class));
 			PlanImpl plan1 = PersonUtils.createAndAddPlan(person, true);
 			ActivityImpl a1 = plan1.createAndAddActivity("h", depLink.getId());
 			a1.setEndTime(departureTime);

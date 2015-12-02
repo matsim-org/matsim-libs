@@ -65,83 +65,83 @@ public class TravelTimePerModeEventHandler implements PersonArrivalEventHandler,
 
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
-//		
-//		Map<Id<Person>, Double> personId2DepartureTime;
-//
-//		String legMode = event.getLegMode();
-//		Id<Person> personId = event.getPersonId();
-//		Double departureTime = event.getTime();
-//		
-//		if (this.ptDriverIdAna.isPtDriver(personId)){
-//			// pt driver!
-//		} else {
-//			if(this.mode2personId2DepartureTime.get(legMode) == null){
-//			personId2DepartureTime = new HashMap<Id<Person>, Double>();
-//			personId2DepartureTime.put(personId, departureTime);
-//			} else {
-//				personId2DepartureTime = this.mode2personId2DepartureTime.get(legMode);
-//	
-//				if(personId2DepartureTime.get(personId) == null){
-//					personId2DepartureTime.put(personId, departureTime);
-//				} else {
-//					throw new RuntimeException("Person " + personId + " is still in departure list. Aborting...");
-//				}
-//			}
-//			this.mode2personId2DepartureTime.put(legMode, personId2DepartureTime);
-//	
-//			// calculating the number of trips...
-//			double modeTripsAfter;		
-//			if(this.mode2noOfTrips.get(legMode) == null){
-//				modeTripsAfter = 1.0;
-//			} else {
-//				double modeTripsSoFar = this.mode2noOfTrips.get(legMode);
-//				modeTripsAfter = modeTripsSoFar + 1.0;
-//			}
-//			this.mode2noOfTrips.put(legMode, modeTripsAfter);
-//		}
+		
+		Map<Id<Person>, Double> personId2DepartureTime;
+
+		String legMode = event.getLegMode();
+		Id<Person> personId = event.getPersonId();
+		Double departureTime = event.getTime();
+		
+		if (this.ptDriverIdAna.isPtDriver(personId)){
+			// pt driver!
+		} else {
+			if(this.mode2personId2DepartureTime.get(legMode) == null){
+			personId2DepartureTime = new HashMap<Id<Person>, Double>();
+			personId2DepartureTime.put(personId, departureTime);
+			} else {
+				personId2DepartureTime = this.mode2personId2DepartureTime.get(legMode);
+	
+				if(personId2DepartureTime.get(personId) == null){
+					personId2DepartureTime.put(personId, departureTime);
+				} else {
+					throw new RuntimeException("Person " + personId + " is still in departure list. Aborting...");
+				}
+			}
+			this.mode2personId2DepartureTime.put(legMode, personId2DepartureTime);
+	
+			// calculating the number of trips...
+			double modeTripsAfter;		
+			if(this.mode2noOfTrips.get(legMode) == null){
+				modeTripsAfter = 1.0;
+			} else {
+				double modeTripsSoFar = this.mode2noOfTrips.get(legMode);
+				modeTripsAfter = modeTripsSoFar + 1.0;
+			}
+			this.mode2noOfTrips.put(legMode, modeTripsAfter);
+		}
 	}
 
 	@Override
 	public void handleEvent(PersonArrivalEvent event) {
-//		Map<Id<Person>, Double> personId2DepartureTime;
-//		Map<Id<Person>, Double> personId2TravelTime;
-//
-//		String legMode = event.getLegMode();
-//		Id<Person> personId = event.getPersonId();
-//		Double arrivalTime = event.getTime();
-//		
-//		if (this.ptDriverIdAna.isPtDriver(personId)){
-//			// pt driver!
-//		} else {
-//			if(this.mode2personId2DepartureTime.get(legMode) == null){
-//				throw new RuntimeException("Person " + personId + " is arriving with an unknown transport mode. Aborting...");
-//			} else {
-//				personId2DepartureTime = mode2personId2DepartureTime.get(legMode);
-//
-//				if(personId2DepartureTime.get(personId) == null){
-//					throw new RuntimeException("Person " + personId + " is arriving with another transport mode than leaving at departure. Aborting...");
-//				} else {
-//					double departureTime = personId2DepartureTime.get(personId);
-//					double travelTimeOfEvent = arrivalTime - departureTime;
-//
-//					if(this.mode2personId2TravelTime.get(legMode) == null){
-//						personId2TravelTime = new HashMap<>();
-//					} else {
-//						personId2TravelTime = this.mode2personId2TravelTime.get(legMode);
-//
-//						if(personId2TravelTime.get(personId) == null){
-//							personId2TravelTime.put(personId, travelTimeOfEvent);
-//						} else {
-//							double travelTimeSoFar = personId2TravelTime.get(personId);
-//							double sumOfTravelTime = travelTimeSoFar + travelTimeOfEvent;
-//							personId2TravelTime.put(personId, sumOfTravelTime);
-//						}
-//					}
-//				}
-//				this.mode2personId2TravelTime.put(legMode, personId2TravelTime);
-//				this.mode2personId2DepartureTime.get(legMode).remove(personId);
-//			}
-//		}
+		Map<Id<Person>, Double> personId2DepartureTime;
+		Map<Id<Person>, Double> personId2TravelTime;
+
+		String legMode = event.getLegMode();
+		Id<Person> personId = event.getPersonId();
+		Double arrivalTime = event.getTime();
+		
+		if (this.ptDriverIdAna.isPtDriver(personId)){
+			// pt driver!
+		} else {
+			if(this.mode2personId2DepartureTime.get(legMode) == null){
+				throw new RuntimeException("Person " + personId + " is arriving with an unknown transport mode. Aborting...");
+			} else {
+				personId2DepartureTime = mode2personId2DepartureTime.get(legMode);
+
+				if(personId2DepartureTime.get(personId) == null){
+					throw new RuntimeException("Person " + personId + " is arriving with another transport mode than leaving at departure. Aborting...");
+				} else {
+					double departureTime = personId2DepartureTime.get(personId);
+					double travelTimeOfEvent = arrivalTime - departureTime;
+
+					if(this.mode2personId2TravelTime.get(legMode) == null){
+						personId2TravelTime = new HashMap<>();
+					} else {
+						personId2TravelTime = this.mode2personId2TravelTime.get(legMode);
+
+						if(personId2TravelTime.get(personId) == null){
+							personId2TravelTime.put(personId, travelTimeOfEvent);
+						} else {
+							double travelTimeSoFar = personId2TravelTime.get(personId);
+							double sumOfTravelTime = travelTimeSoFar + travelTimeOfEvent;
+							personId2TravelTime.put(personId, sumOfTravelTime);
+						}
+					}
+				}
+				this.mode2personId2TravelTime.put(legMode, personId2TravelTime);
+				this.mode2personId2DepartureTime.get(legMode).remove(personId);
+			}
+		}
 	}
 
 	public Map<String, Map<Id<Person>, Double>> getMode2personId2TravelTime() {

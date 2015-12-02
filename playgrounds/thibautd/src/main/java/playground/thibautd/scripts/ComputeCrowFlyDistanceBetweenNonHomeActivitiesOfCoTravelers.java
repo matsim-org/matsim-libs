@@ -19,9 +19,6 @@
  * *********************************************************************** */
 package playground.thibautd.scripts;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
@@ -42,6 +39,9 @@ import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
+
+import java.io.BufferedWriter;
+import java.io.IOException;
 
 /**
  * looks at co travelers with only one joint trip in a 3 acts plan, and computes the crow fly distance

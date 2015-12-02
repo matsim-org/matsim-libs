@@ -19,8 +19,8 @@
  * *********************************************************************** */
 package playground.johannes.studies.snowball.postprocess;
 
-import gnu.trove.TDoubleDoubleHashMap;
-import gnu.trove.TDoubleDoubleIterator;
+import gnu.trove.iterator.TDoubleDoubleIterator;
+import gnu.trove.map.hash.TDoubleDoubleHashMap;
 import org.apache.log4j.Logger;
 
 import java.io.*;

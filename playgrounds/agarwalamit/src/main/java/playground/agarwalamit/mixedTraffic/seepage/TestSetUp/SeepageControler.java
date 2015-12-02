@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.groups.QSimConfigGroup.VehiclesSource;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -54,7 +55,7 @@ public class SeepageControler {
 		inputs.run();
 		Scenario sc = inputs.getScenario();
 		
-		sc.getConfig().qsim().setUseDefaultVehicles(false);
+		sc.getConfig().qsim().setVehiclesSource(VehiclesSource.fromVehiclesData);
 
 		Map<String, VehicleType> modeVehicleTypes = new HashMap<String, VehicleType>();
 
@@ -93,17 +94,5 @@ public class SeepageControler {
 	
 	public static void main(String[] args) {
 		new SeepageControler().run();
-//		CreateInputs inputs = new CreateInputs();
-//		inputs.run();
-//		Scenario sc = inputs.getScenario();
-//		
-//		Controler myController = new Controler(sc.getConfig());	
-//		myController.setOverwriteFiles(true) ;
-//		myController.setCreateGraphs(true);
-//		myController.setMobsimFactory(new PatnaQSimFactory()); 
-////		myController.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
-//		myController.setDumpDataAtEnd(true);
-//		myController.run();
-//		myController.setMobsimFactory(new SeepageMobsimfactory());
 	}
 }

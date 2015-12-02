@@ -19,15 +19,17 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetgen.sna.gis.io;
 
-import com.vividsolutions.jts.geom.Geometry;
-import gnu.trove.TObjectDoubleHashMap;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
+
+import java.util.HashSet;
+import java.util.Set;
+
 import org.matsim.contrib.socnetgen.sna.gis.Zone;
 import org.matsim.contrib.socnetgen.sna.gis.ZoneLayer;
 import org.matsim.contrib.socnetgen.sna.graph.spatial.io.Colorizable;
 import org.matsim.contrib.socnetgen.sna.graph.spatial.io.NumericAttributeColorizer;
 
-import java.util.HashSet;
-import java.util.Set;
+import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * @author illenberger

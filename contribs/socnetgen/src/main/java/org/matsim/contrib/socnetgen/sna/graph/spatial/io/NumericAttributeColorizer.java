@@ -19,10 +19,10 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetgen.sna.graph.spatial.io;
 
-import gnu.trove.TObjectDoubleHashMap;
-import gnu.trove.TObjectDoubleIterator;
+import gnu.trove.iterator.TObjectDoubleIterator;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
 
-import java.awt.*;
+import java.awt.Color;
 
 /**
  * @author jillenberger
@@ -30,7 +30,7 @@ import java.awt.*;
  */
 public class NumericAttributeColorizer implements Colorizable {
 
-	private final TObjectDoubleHashMap values;
+	private final TObjectDoubleHashMap<?> values;
 	
 	private double max;
 	

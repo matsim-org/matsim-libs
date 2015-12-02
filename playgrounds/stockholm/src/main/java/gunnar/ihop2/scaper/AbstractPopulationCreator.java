@@ -1,24 +1,20 @@
 package gunnar.ihop2.scaper;
 
 import static gunnar.ihop2.regent.demandreading.ShapeUtils.drawPointFromGeometry;
-import gunnar.ihop2.regent.demandreading.RegentPopulationReader;
 import gunnar.ihop2.regent.demandreading.ZonalSystem;
 import gunnar.ihop2.regent.demandreading.Zone;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.io.File;
 import java.util.logging.Logger;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.utils.objectattributes.ObjectAttributeUtils2;
-import org.matsim.utils.objectattributes.ObjectAttributes;
+import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.xml.sax.helpers.DefaultHandler;
 
 import saleem.stockholmscenario.utils.StockholmTransformationFactory;
@@ -29,7 +25,7 @@ import saleem.stockholmscenario.utils.StockholmTransformationFactory;
  *
  */
 public class AbstractPopulationCreator extends DefaultHandler {
-	
+
 	// -------------------- MEMBERS --------------------
 
 	// TODO encapsulate
@@ -40,8 +36,7 @@ public class AbstractPopulationCreator extends DefaultHandler {
 	// -------------------- CONSTRUCTION --------------------
 
 	public AbstractPopulationCreator(final String networkFileName,
-			final String zoneShapeFileName, final String zonalCoordinateSystem,
-			final String populationFileName) {
+			final String zoneShapeFileName, final String zonalCoordinateSystem) {
 		this.scenario = ScenarioUtils
 				.createScenario(ConfigUtils.createConfig());
 		(new MatsimNetworkReader(this.scenario)).readFile(networkFileName);
@@ -52,31 +47,29 @@ public class AbstractPopulationCreator extends DefaultHandler {
 		Logger.getLogger(this.getClass().getName()).info(
 				"number of zones in zonal system is "
 						+ this.zonalSystem.getId2zoneView().size());
-		new RegentPopulationReader(populationFileName, this.zonalSystem,
-				this.scenario.getPopulation().getPersonAttributes());
 	}
 
-	public void setBuildingsFileName(final String buildingShapeFileName) {
-		this.zonalSystem.addBuildings(buildingShapeFileName);
-	}
+	// public void setBuildingsFileName(final String buildingShapeFileName) {
+	// this.zonalSystem.addBuildings(buildingShapeFileName);
+	// }
 
-	public void removeExpandedLinks(final ObjectAttributes linkAttributes) {
-		final Set<String> tmLinkIds = new LinkedHashSet<String>(
-				ObjectAttributeUtils2.allObjectKeys(linkAttributes));
-		final Set<Id<Link>> removeTheseLinkIds = new LinkedHashSet<Id<Link>>();
-		for (Id<Link> candidateId : this.scenario.getNetwork().getLinks()
-				.keySet()) {
-			if (!tmLinkIds.contains(candidateId.toString())) {
-				removeTheseLinkIds.add(candidateId);
-			}
-		}
-		Logger.getLogger(this.getClass().getName()).info(
-				"Excluding " + removeTheseLinkIds.size()
-						+ " expanded links from being activity locations.");
-		for (Id<Link> linkId : removeTheseLinkIds) {
-			this.scenario.getNetwork().removeLink(linkId);
-		}
-	}
+	// public void removeExpandedLinks(final ObjectAttributes linkAttributes) {
+	// final Set<String> tmLinkIds = new LinkedHashSet<String>(
+	// ObjectAttributeUtils2.allObjectKeys(linkAttributes));
+	// final Set<Id<Link>> removeTheseLinkIds = new LinkedHashSet<Id<Link>>();
+	// for (Id<Link> candidateId : this.scenario.getNetwork().getLinks()
+	// .keySet()) {
+	// if (!tmLinkIds.contains(candidateId.toString())) {
+	// removeTheseLinkIds.add(candidateId);
+	// }
+	// }
+	// Logger.getLogger(this.getClass().getName()).info(
+	// "Excluding " + removeTheseLinkIds.size()
+	// + " expanded links from being activity locations.");
+	// for (Id<Link> linkId : removeTheseLinkIds) {
+	// this.scenario.getNetwork().removeLink(linkId);
+	// }
+	// }
 
 	// -------------------- INTERNALS --------------------
 
@@ -103,13 +96,14 @@ public class AbstractPopulationCreator extends DefaultHandler {
 	}
 
 	protected Coord drawOtherCoordinate(final String personId,
-			final CoordinateTransformation coordinateTransform, final String otherZoneId) {
-			final Zone otherZone = this.zonalSystem.getZone(otherZoneId);
-			if (!this.zonalSystem.getNodes(otherZone).isEmpty()) {
-				return coordinateTransform
-						.transform(drawPointFromGeometry(otherZone
-								.drawWorkGeometry()));
-			}
+			final CoordinateTransformation coordinateTransform,
+			final String otherZoneId) {
+		final Zone otherZone = this.zonalSystem.getZone(otherZoneId);
+		if (!this.zonalSystem.getNodes(otherZone).isEmpty()) {
+			return coordinateTransform
+					.transform(drawPointFromGeometry(otherZone
+							.drawWorkGeometry()));
+		}
 		return null;
 	}
 

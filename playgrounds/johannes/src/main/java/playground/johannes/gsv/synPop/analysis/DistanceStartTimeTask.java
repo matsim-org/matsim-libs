@@ -19,8 +19,8 @@
 
 package playground.johannes.gsv.synPop.analysis;
 
-import gnu.trove.TDoubleArrayList;
-import gnu.trove.TDoubleDoubleHashMap;
+import gnu.trove.list.array.TDoubleArrayList;
+import gnu.trove.map.hash.TDoubleDoubleHashMap;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.common.stats.Correlations;
 import org.matsim.contrib.common.stats.StatsWriter;
@@ -58,7 +58,7 @@ public class DistanceStartTimeTask extends AnalyzerTask {
 
         if(outputDirectoryNotNull()) {
             try {
-                TDoubleDoubleHashMap corr = Correlations.mean(startVals.toNativeArray(), distVals.toNativeArray(), 3600);
+                TDoubleDoubleHashMap corr = Correlations.mean(startVals.toArray(), distVals.toArray(), 3600);
                 StatsWriter.writeHistogram(corr, "startTime", "distance", getOutputDirectory() + "/distStartTime.txt");
 
                 StatsWriter.writeScatterPlot(startVals, distVals, "startTime", "distance", getOutputDirectory() + "/distStartTime.scatter.txt");

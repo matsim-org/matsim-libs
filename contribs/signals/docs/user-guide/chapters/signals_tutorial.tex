@@ -68,12 +68,14 @@ This is especially important if you implement a custom, traffic-responsive signa
 	\item Include the .jar file of the contrib into your java classpath
 	\item Write a java \lstinline$main(..)$ method that loads your config and contains the following lines of code:
 		\begin{lstlisting}
-		Scenario scenario = ScenarioUtils.loadScenario( config ) ;
-		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, 
-				new SignalsScenarioLoader(config.signalSystems()).loadSignalsData());
+Scenario scenario = ScenarioUtils.loadScenario( config ) ;
+SignalSystemsConfigGroup signalsConfigGroup = ConfigUtils.addOrGetModule(config, 
+		SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
+scenario.addScenarioElement(SignalsData.ELEMENT_NAME, 
+		new SignalsScenarioLoader(signalsConfigGroup).loadSignalsData());
 
-		Controler c = new Controler( scenario );
-		c.addOverridingModule(new SignalsModule());
+Controler c = new Controler( scenario );
+c.addOverridingModule(new SignalsModule());
 		\end{lstlisting}
 	\item Execute \lstinline$c.run(..)$ somewhere in your \lstinline$main(..)$
 \end{itemize}
@@ -87,9 +89,11 @@ If input files for signal systems are already available, simulation of traffic l
 \begin{itemize}
 	\item Set at least three input file names in the config module signalsystems:
 		\begin{itemize}
+			\item parameter name: \lstinline$useSignalsystems$ value: \lstinline$true$ or \lstinline$false$
 			\item parameter name: \lstinline$signalsystems$ value: path to a file in the \lstinline$signalSystems_v2.0.xsd$ file format
   		\item parameter name: \lstinline$signalgroups$ value: path to a file in the \lstinline$signalGroups_v2.0.xsd$ file format
  			\item parameter name: \lstinline$signalcontrol$ value: path to a file in the \lstinline$signalControl_v2.0.xsd$ file format
+ 			\item parameter name: \lstinline$useAmbertimes$ (optional) value: \lstinline$true$ or \lstinline$false$
  			\item parameter name: \lstinline$ambertimes$ (optional) value: path to a file in the \lstinline$amberTimes_v1.0.xsd$ file format
 			\item parameter name: \lstinline$useIntergreenTimes$ (optional) value: \lstinline$true$ or \lstinline$false$
 			\item parameter name: \lstinline$intergreentimes$ (optional) value: path to a file in the \lstinline$intergreenTimes_v1.0.xsd$ file format
@@ -107,19 +111,26 @@ For case studies in German, see \cite{Bischoff2010BaSylvia,Neumann2008DA,Roeder2
 
 \section{Generating Input Data -- Example}
 
-There is a small example in order to help you getting started, the class is CreateSimpleTrafficSignalScenario.
+There is a small example in order to help you getting started, the class is RunCreateTrafficSignalScenarioExample.
 
-The example creates the network attached to this page as pdf (http://matsim.org/uploads/2012\_ks\_2010\_network.pdf). The numbers show the link ids. Traffic lights to be created are shown as small icons.
+The example uses the network shown in Figure~\ref{fig:RunCreateTrafficSignalScenarioExampleNetwork}. 
 
-The following highlights important lines of code method by method
+\begin{figure}[htbp]
+	\center
+	\includegraphics{data/RunCreateTrafficSignalScenarioExampleNetwork}
+	\caption{Network used by the scenario in RunCreateTrafficSignalScenarioExample. The numbers show the link ids. Traffic lights to be created are shown as small icons.}
+	\label{fig:RunCreateTrafficSignalScenarioExampleNetwork}
+\end{figure}
+
+The following highlights important lines of code method by method.
 
 \subsubsection{Code}
 
-Input files for the examples can be found in the folder examples/tutorial/unsupported/example90TrafficLights of the current MATSim release / head.
+Input files for the examples can be found in the folder  contribs/signals/examples/tutorial/example90TrafficLights of the current MATSim release.
 
-Example code can be found in the folder src/main/java in the package tutorial.unsupported.example90TrafficLig
+Example code can be found in the folder src/main/java in the package tutorial.trafficsignals in the signals contrib.
 
-\subsubsection{CreateSimpleTrafficSignalScenario.run()}
+\subsubsection{RunCreateTrafficSignalScenarioExample.run()}
 
 This method sets up the config and writes the signals that are created in submethods to file.
 
@@ -134,29 +145,33 @@ Then, qsim as mobility simulation should be used:
 \texttt{\nolinebreak config.controler().setMobsim("qsim"); \nolinebreak }
 
 
-\texttt{\nolinebreak config.addQSimConfigGroup(new QSimConfigGroup());}
-
-After the scenario is loaded, the top-level container for all signal related data is retrieved by:
+After the scenario is loaded, the top-level container for all signal related data has to be added: 
 
 
-\texttt{\nolinebreak SignalsData signalsData = scenario.getScenarioElement(SignalsData.class);}
+\texttt{\nolinebreak SignalSystemsConfigGroup signalsConfigGroup = ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);}
 
-\subsubsection{CreateSimpleTrafficSignalScenario.createSignalSystemsAndGroups(..)}
+\texttt{\nolinebreak scenario.addScenarioElement(SignalsData.ELEMENT\_NAME, new SignalsScenarioLoader(signalsConfigGroup).loadSignalsData());}
+
+and is afterwards retrieved by: 
+
+\texttt{\nolinebreak SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT\_NAME);}
+
+\subsubsection{RunCreateTrafficSignalScenarioExample.createSignalSystemsAndGroups(..)}
 
 This method creates the physics, i.e. locations of signals. Furthermore SignalGroups for the Signals are created.
 
 First a SignalSystem has to be created and explicitly added to the container:
 
 
-\texttt{\nolinebreak SignalSystemData sys = systems.getFactory().createSignalSystemData(scenario.createId("3"));
+\texttt{\nolinebreak SignalSystemData sys = systems.getFactory().createSignalSystemData(Id.create("3", SignalSystem.class));
 \\  \nolinebreak systems.addSignalSystemData(sys);}
 
 Then on link 23 a Signal with Id 1 can be created:
 
 
-\texttt{\nolinebreak SignalData signal = systems.getFactory().createSignalData(scenario.createId("1"));
+\texttt{\nolinebreak SignalData signal = systems.getFactory().createSignalData(Id.create("1", Signal.class));
 \\\nolinebreak sys.addSignalData(signal);
-\\\nolinebreak signal.setLinkId(scenario.createId("23"));}
+\\\nolinebreak signal.setLinkId(Id.create("23", Link.class));}
 
 The Signal must be added to the SignalSystem after creation.
 
@@ -167,7 +182,7 @@ We then need some SignalGroup for the Signals. In this example each Signal has i
 
 \texttt{\nolinebreak SignalUtils.createAndAddSignalGroups4Signals(groups, sys);}
 
-\subsubsection{CreateSimpleTrafficSignalScenario.createSignalControl(..)}
+\subsubsection{RunCreateTrafficSignalScenarioExample.createSignalControl(..)}
 
 This method adds a fixed-time traffic signal control on top of the SignalGroups created by the last method. The SignalGroups control the hardware, i.e. the Signals. MATSim Events are created for SignalGroups.
 
@@ -178,22 +193,22 @@ The Code can be read as follows:
 Create a fixed-time control and add it to the container:
 
 
-\texttt{\nolinebreak  SignalSystemControllerData controller = control.getFactory().createSignalSystemControllerData(id);\nolinebreak control.addSignalSystemControllerData(controller);\nolinebreak controller.setControllerIdentifier(DefaultPlanbasedSignalSystemController.IDENTIFIER);\nolinebreak }
+\texttt{\nolinebreak  SignalSystemControllerData controller = control.getFactory().createSignalSystemControllerData(id); \\ \nolinebreak control.addSignalSystemControllerData(controller); \\ \nolinebreak controller.setControllerIdentifier( DefaultPlanbasedSignalSystemController.IDENTIFIER);\nolinebreak }
 
 Then, create a fixed-time control plan (a plan can be disabled or changed at a certain time of day) and add it to the container:
 
 
-\texttt{\nolinebreak    SignalPlanData plan = control.getFactory().createSignalPlanData(scenario.createId("1"));\nolinebreak    controller.addSignalPlanData(plan);\nolinebreak  }
+\texttt{\nolinebreak    SignalPlanData plan = control.getFactory().createSignalPlanData(Id.create("1", SignalPlan.class));\\ \nolinebreak    controller.addSignalPlanData(plan);\nolinebreak  }
 
 Each fixed-time control plan has specific attributes for cycle and synchronization offset:
 
 
-\texttt{\nolinebreak    plan.setCycleTime(cycle);\nolinebreak   plan.setOffset(0);\nolinebreak }
+\texttt{\nolinebreak    plan.setCycleTime(cycle);\\ \nolinebreak   plan.setOffset(0);\nolinebreak }
 
 Create specific green times (onset = switch to green, offset = switch to amber/red) for all SignalGroups and add them to the signal control plan via
 
 
-\texttt{\nolinebreak    SignalGroupSettingsData settings1 = control.getFactory().createSignalGroupSettingsData(scenario.createId("1"));\nolinebreak   plan.addSignalGroupSettings(settings1);\nolinebreak   settings1.setOnset(0);\nolinebreak   settings1.setDropping(55);\nolinebreak }
+\texttt{\nolinebreak    SignalGroupSettingsData settings1 = control.getFactory().createSignalGroupSettingsData(Id.create("1", SignalGroup.class));\\ \nolinebreak   plan.addSignalGroupSettings(settings1);\\ \nolinebreak   settings1.setOnset(0);\\ \nolinebreak   settings1.setDropping(55);\\ \nolinebreak }
 
 \subsubsection{Visualization}
 
@@ -211,15 +226,15 @@ Another option is to write the scenario to file via the example code and then st
 \subsection{Links}
 \begin{itemize}
 	\item \href{http://ci.matsim.org:8080/job/MATSim_M2/javadoc/org/matsim/signalsystems/package-summary.html}{Technical Documentation (JavaDoc)}
-	\item \href{http://matsim.org/node/384}{Module Documentation and Publications}
 	\item \href{http://matsim.org/node/693}{OTFVis}
+	\item \href{https://opus4.kobv.de/opus4-tuberlin/frontdoor/index/index/docId/5325}{Dissertation of D. Grether}	
 \end{itemize}
 
 \subsection{Intergreens}
 
 There is a small example how to create an intergreen xml file with given
 intergreen times for specific signal groups (see
-tutorial.unsupported.example90TrafficLights.CreateIntergreens.java).
+tutorial.trafficsignals.RunCreateIntergreensExample.java).
 
 If there is no intergreen data available for your scenario you may use the
 intergreen times of a correct fixed time signal control, i.~e. a signal control

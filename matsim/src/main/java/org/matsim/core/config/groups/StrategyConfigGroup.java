@@ -74,11 +74,14 @@ public final class StrategyConfigGroup extends ConfigGroup {
 			this( Id.create( MatsimRandom.getRandom().nextLong(), StrategySettings.class) );
 		}
 
+		@Deprecated // use empty constructor. kai/mz, nov'15
 		public StrategySettings(final Id<StrategySettings> id) {
 			super( SET_NAME );
 			this.id = id;
+//			this.name = id.toString() ; // safety net, can be overridden by (also deprecated) setStrategyName(...).  kai/mz, nov'15
+			// putting the above into the code fails at least one test.  We would vote for removing that test ...
 		}
-
+		
 		@Override
 		public final Map<String, String> getComments() {
 			Map<String,String> map = super.getComments();
@@ -163,6 +166,7 @@ public final class StrategyConfigGroup extends ConfigGroup {
 			return this.exePath;
 		}
 
+		@Deprecated // not clear if this is only for backwards compatibility (config v1) or should actually be used. kai/mz, nov'15
 		public Id<StrategySettings> getId() {
 			return this.id;
 		}

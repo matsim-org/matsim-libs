@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package playground.johannes.gsv.synPop.analysis;
 
-import gnu.trove.TDoubleDoubleHashMap;
+import gnu.trove.map.hash.TDoubleDoubleHashMap;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.common.stats.Discretizer;
@@ -34,66 +34,65 @@ import java.util.Map;
 
 /**
  * @author illenberger
- *
  */
 public abstract class AnalyzerTask {
 
-	private static final Logger logger = Logger.getLogger(AnalyzerTask.class);
-	
-	private static boolean overwrite = false;
-	
-	private static int overwriteBins;
-	
-	private static int overwriteMinsize;
-	
-	public static void overwriteStratification(int bins, int minsize) {
-		overwrite = true;
-		overwriteBins = bins;
-		overwriteMinsize = minsize;
-	}
-	
-	private String output;
-	
-	public void setOutputDirectory(String outputDir) {
-		this.output = outputDir;
-	}
-	
-	public String getOutputDirectory() {
-		return output;
-	}
-	
-	protected boolean outputDirectoryNotNull() {
-		if(getOutputDirectory() == null) {
-			logger.warn("No output directory specified.");
-			return false;
-		} else {
-			return true;
-		}
-	}
-	
-	public abstract void analyze(Collection<? extends Person> persons, Map<String, DescriptiveStatistics> results);
-		
-	protected void writeHistograms(DescriptiveStatistics stats, String name, int bins, int minsize) throws IOException {
-		double[] values = stats.getValues();
-		if (values.length > 0) {
-			if(overwrite) {
-				logger.warn("Overwriting stratification!");
-				bins = overwriteBins;
-				minsize = overwriteMinsize;
-			}
-			
-			TDoubleDoubleHashMap hist = Histogram.createHistogram(stats, FixedSampleSizeDiscretizer.create(values, minsize, bins), true);
-			Histogram.normalize(hist);
-			StatsWriter.writeHistogram(hist, name, "p", String.format("%1$s/%2$s.strat.txt", getOutputDirectory(), name));
-		} else {
-			logger.debug(String.format("Cannot create histogram: No samples for %s.", name));
-		}
-	}
-	
-	protected void writeHistograms(DescriptiveStatistics stats, Discretizer discretizer, String name, boolean reweight) throws IOException {
-		TDoubleDoubleHashMap hist = Histogram.createHistogram(stats, discretizer, reweight);
-		StatsWriter.writeHistogram(hist, name, "n", String.format("%1$s/%2$s.txt", output, name));
-		Histogram.normalize(hist);
-		StatsWriter.writeHistogram(hist, name, "p", String.format("%1$s/%2$s.share.txt", output, name));
-	}
+    private static final Logger logger = Logger.getLogger(AnalyzerTask.class);
+
+    private static boolean overwrite = false;
+
+    private static int overwriteBins;
+
+    private static int overwriteMinsize;
+
+    public static void overwriteStratification(int bins, int minsize) {
+        overwrite = true;
+        overwriteBins = bins;
+        overwriteMinsize = minsize;
+    }
+
+    private String output;
+
+    public void setOutputDirectory(String outputDir) {
+        this.output = outputDir;
+    }
+
+    public String getOutputDirectory() {
+        return output;
+    }
+
+    protected boolean outputDirectoryNotNull() {
+        if (getOutputDirectory() == null) {
+            logger.warn("No output directory specified.");
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    public abstract void analyze(Collection<? extends Person> persons, Map<String, DescriptiveStatistics> results);
+
+    protected void writeHistograms(DescriptiveStatistics stats, String name, int bins, int minsize) throws IOException {
+        double[] values = stats.getValues();
+        if (values.length > 0) {
+            if (overwrite) {
+                logger.warn("Overwriting stratification!");
+                bins = overwriteBins;
+                minsize = overwriteMinsize;
+            }
+
+            TDoubleDoubleHashMap hist = Histogram.createHistogram(stats, FixedSampleSizeDiscretizer.create(values, minsize, bins), true);
+            Histogram.normalize(hist);
+            StatsWriter.writeHistogram(hist, name, "p", String.format("%1$s/%2$s.strat.txt", getOutputDirectory(), name));
+        } else {
+            logger.debug(String.format("Cannot create histogram: No samples for %s.", name));
+        }
+    }
+
+    protected void writeHistograms(DescriptiveStatistics stats, Discretizer discretizer, String name, boolean reweight) throws IOException {
+        TDoubleDoubleHashMap hist = Histogram.createHistogram(stats, discretizer, reweight);
+        StatsWriter.writeHistogram(hist, name, "n", String.format("%1$s/%2$s.txt", output, name));
+        Histogram.normalize(hist);
+        StatsWriter.writeHistogram(hist, name, "p", String.format("%1$s/%2$s.share.txt", output, name));
+    }
 }

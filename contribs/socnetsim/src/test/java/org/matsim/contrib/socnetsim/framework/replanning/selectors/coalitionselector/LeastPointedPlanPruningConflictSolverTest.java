@@ -27,11 +27,10 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.population.PersonImpl;
-
 import org.matsim.contrib.socnetsim.framework.population.JointPlans;
 import org.matsim.contrib.socnetsim.framework.replanning.grouping.ReplanningGroup;
 import org.matsim.contrib.socnetsim.framework.replanning.selectors.coalitionselector.CoalitionSelector.ConflictSolver;
+import org.matsim.core.population.PopulationUtils;
 
 /**
  * @author thibautd
@@ -48,7 +47,7 @@ public class LeastPointedPlanPruningConflictSolverTest {
 
 		Id<Person> id = Id.createPersonId( 1 );
 		{
-			final Person person = PersonImpl.createPerson(id);
+			final Person person = PopulationUtils.createPerson(id);
 			group.addPerson( person );
 			{
 				final Plan plan = jointPlans.getFactory().createIndividualPlan( person );
@@ -66,7 +65,7 @@ public class LeastPointedPlanPruningConflictSolverTest {
 
 		id = Id.createPersonId( 2 );
 		{
-			final Person person = PersonImpl.createPerson(id);
+			final Person person = PopulationUtils.createPerson(id);
 			group.addPerson( person );
 			{
 				final Plan plan = jointPlans.getFactory().createIndividualPlan( person );
@@ -84,7 +83,7 @@ public class LeastPointedPlanPruningConflictSolverTest {
 
 		id = Id.createPersonId( 3 );
 		{
-			final Person person = PersonImpl.createPerson(id);
+			final Person person = PopulationUtils.createPerson(id);
 			group.addPerson( person );
 			{
 				final Plan plan = jointPlans.getFactory().createIndividualPlan( person );

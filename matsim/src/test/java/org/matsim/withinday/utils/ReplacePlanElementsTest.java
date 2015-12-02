@@ -29,8 +29,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.testcases.MatsimTestCase;
 
 public class ReplacePlanElementsTest extends MatsimTestCase {
@@ -87,7 +87,7 @@ public class ReplacePlanElementsTest extends MatsimTestCase {
 	 * @author cdobler
 	 */
 	private Plan createSamplePlan() {
-		PlanImpl plan = new PlanImpl(PersonImpl.createPerson(Id.create(1, Person.class)));
+		PlanImpl plan = new PlanImpl(PopulationUtils.createPerson(Id.create(1, Person.class)));
 		
 		plan.createAndAddActivity("h", new Coord(0, 0));
 		plan.createAndAddLeg(TransportMode.car);

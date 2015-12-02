@@ -1,5 +1,6 @@
 package tutorial.programming.example11PluggablePlanStrategyInCode;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.replanning.PlanStrategy;
@@ -13,6 +14,8 @@ class MyPlanStrategyFactory implements Provider<PlanStrategy> {
 
     private EventsManager eventsManager;
     private Scenario scenario;
+    
+    private static final Logger log = Logger.getLogger(MyPlanSelector.class);
 
     @Inject
     MyPlanStrategyFactory(EventsManager eventsManager, Scenario scenario) {
@@ -22,6 +25,8 @@ class MyPlanStrategyFactory implements Provider<PlanStrategy> {
 
     @Override
 	public PlanStrategy get() {
+    	
+    	log.error("calling PlanStradegy.get()");
         // A PlanStrategy is something that can be applied to a Person (not a Plan).
         // It first selects one of the plans:
         MyPlanSelector planSelector = new MyPlanSelector();

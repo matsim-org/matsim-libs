@@ -19,9 +19,13 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetgen.sna.graph.spatial.analysis;
 
-import gnu.trove.TDoubleDoubleHashMap;
-import gnu.trove.TObjectDoubleHashMap;
-import gnu.trove.TObjectDoubleIterator;
+import gnu.trove.iterator.TObjectDoubleIterator;
+import gnu.trove.map.hash.TDoubleDoubleHashMap;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
+
+import java.io.IOException;
+import java.util.Map;
+
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.common.stats.Correlations;
 import org.matsim.contrib.common.stats.Discretizer;
@@ -31,9 +35,6 @@ import org.matsim.contrib.socnetgen.sna.graph.Edge;
 import org.matsim.contrib.socnetgen.sna.graph.Graph;
 import org.matsim.contrib.socnetgen.sna.graph.Vertex;
 import org.matsim.contrib.socnetgen.sna.graph.analysis.ModuleAnalyzerTask;
-
-import java.io.IOException;
-import java.util.Map;
 
 /**
  * @author illenberger
@@ -56,7 +57,7 @@ public class EdgeLengthAccessibilityTask extends ModuleAnalyzerTask<Accessibilit
 		if (accessValues == null)
 			accessValues = module.values(graph.getVertices());
 
-		Discretizer discretizer = FixedSampleSizeDiscretizer.create(accessValues.getValues(), 1, 50);
+		Discretizer discretizer = FixedSampleSizeDiscretizer.create(accessValues.values(), 1, 50);
 		
 		TObjectDoubleHashMap<Edge> lengths = new EdgeLength().values(graph.getEdges());
 		double[] xVals = new double[lengths.size() * 2];

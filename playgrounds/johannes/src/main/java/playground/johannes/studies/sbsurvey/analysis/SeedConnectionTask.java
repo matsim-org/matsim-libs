@@ -19,9 +19,9 @@
  * *********************************************************************** */
 package playground.johannes.studies.sbsurvey.analysis;
 
-import gnu.trove.TDoubleArrayList;
-import gnu.trove.TDoubleDoubleHashMap;
-import gnu.trove.TIntArrayList;
+import gnu.trove.list.array.TDoubleArrayList;
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.hash.TDoubleDoubleHashMap;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.common.stats.Correlations;
 import org.matsim.contrib.common.stats.StatsWriter;
@@ -204,10 +204,10 @@ public class SeedConnectionTask extends AnalyzerTask {
 					
 				}
 				
-				TDoubleDoubleHashMap map = Correlations.mean(xVals.toNativeArray(), yVals.toNativeArray());
+				TDoubleDoubleHashMap map = Correlations.mean(xVals.toArray(), yVals.toArray());
 				StatsWriter.writeHistogram(map, "k", "connects", String.format("%1$s/connects_k.txt", getOutputDirectory()));
 				
-				map = Correlations.mean(xVals2.toNativeArray(), yVals2.toNativeArray());
+				map = Correlations.mean(xVals2.toArray(), yVals2.toArray());
 				StatsWriter.writeHistogram(map, "k", "closeness", String.format("%1$s/closeness_k.txt", getOutputDirectory()));
 			} catch (IOException e) {
 				e.printStackTrace();

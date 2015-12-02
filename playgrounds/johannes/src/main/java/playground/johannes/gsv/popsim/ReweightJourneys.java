@@ -19,7 +19,11 @@
 
 package playground.johannes.gsv.popsim;
 
-import gnu.trove.*;
+import gnu.trove.function.TDoubleFunction;
+import gnu.trove.iterator.TDoubleDoubleIterator;
+import gnu.trove.iterator.TDoubleObjectIterator;
+import gnu.trove.map.hash.TDoubleDoubleHashMap;
+import gnu.trove.map.hash.TDoubleObjectHashMap;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.common.stats.Discretizer;
 import org.matsim.contrib.common.stats.Histogram;
@@ -53,7 +57,8 @@ public class ReweightJourneys implements PersonsTask {
 
         referenceHist = new TDoubleDoubleHashMap();
         try {
-            BufferedReader reader = new BufferedReader(new FileReader("/home/johannes/gsv/matrix2014/mid-fusion/tomtom.dist.txt"));
+            BufferedReader reader = new BufferedReader(new FileReader
+                    ("/home/johannes/gsv/matrix2014/popgen/mid-fusion/tomtom.dist.txt"));
             String line = reader.readLine();
             while ((line = reader.readLine()) != null) {
                 String[] tokens = line.split("\t");

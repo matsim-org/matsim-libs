@@ -125,7 +125,7 @@ public class LegModeTimeOfDayDistribution extends AbstractAnalysisModule{
 		return outMap;
 	}
 
-	private class LegModeTimeOfDayHandler implements PersonDepartureEventHandler {
+	public class LegModeTimeOfDayHandler implements PersonDepartureEventHandler {
 
 		private final Logger log = Logger.getLogger(LegModeTimeOfDayDistribution.class);
 

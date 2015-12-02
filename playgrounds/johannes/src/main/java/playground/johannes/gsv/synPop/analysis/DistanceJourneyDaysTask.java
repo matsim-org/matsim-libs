@@ -19,8 +19,8 @@
 
 package playground.johannes.gsv.synPop.analysis;
 
-import gnu.trove.TDoubleArrayList;
-import gnu.trove.TDoubleDoubleHashMap;
+import gnu.trove.list.array.TDoubleArrayList;
+import gnu.trove.map.hash.TDoubleDoubleHashMap;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.common.stats.Correlations;
 import org.matsim.contrib.common.stats.StatsWriter;
@@ -72,7 +72,7 @@ public class DistanceJourneyDaysTask extends AnalyzerTask {
 				}
 			}
 
-			TDoubleDoubleHashMap map = Correlations.mean(days.toNativeArray(), distances.toNativeArray());
+			TDoubleDoubleHashMap map = Correlations.mean(days.toArray(), distances.toArray());
 			try {
 				StatsWriter.writeHistogram(map, "days", "distance", String.format("%s/d.days.txt", getOutputDirectory()));
 			} catch (IOException e) {

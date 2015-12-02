@@ -127,7 +127,6 @@ public class Padang2CT {
 		CTRunner.main(new String[]{inputDir + "/config.xml", "false"});
 
 
-
 	}
 
 	private static void loadAndModifyNetwork(Scenario sc) {
@@ -140,6 +139,7 @@ public class Padang2CT {
 				l.setLength(1000);
 			}
 			l.setAllowedModes(mode);
+
 		}
 	}
 

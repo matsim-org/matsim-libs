@@ -19,17 +19,19 @@
 
 package playground.johannes.gsv.matrices.postprocess;
 
-import gnu.trove.TObjectDoubleHashMap;
-import gnu.trove.TObjectDoubleIterator;
+import gnu.trove.iterator.TObjectDoubleIterator;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.common.gis.DistanceCalculator;
 import org.matsim.contrib.common.gis.WGS84DistanceCalculator;
 import org.matsim.contrib.common.stats.Discretizer;
 import org.matsim.contrib.common.stats.FixedBordersDiscretizer;
+import org.matsim.contrib.common.util.ProgressLogger;
+import playground.johannes.gsv.popsim.Histogram;
 import playground.johannes.gsv.zones.KeyMatrix;
 import playground.johannes.synpop.gis.Zone;
 import playground.johannes.synpop.gis.ZoneCollection;
-import playground.johannes.synpop.gis.ZoneEsriShapeIO;
+import playground.johannes.synpop.gis.ZoneGeoJsonIO;
 
 import java.io.*;
 import java.util.*;
@@ -46,20 +48,20 @@ public class AdjustDays {
     public static void main(String args[]) throws IOException {
         BufferedReader reader = new BufferedReader(new FileReader(args[0]));
         BufferedWriter writer = new BufferedWriter(new FileWriter(args[1]));
-//        ZoneCollection zones = ZoneEsriShapeIO.read("/home/johannes/gsv/gis/modena/shp/zones.SHP");
-        ZoneCollection zones = ZoneEsriShapeIO.read("/home/johannes/gsv/gis/modena/shp/zones.SHP");
-        zones.setPrimaryKey("NO");
+        ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON(args[2], "NO");
 
         DistanceCalculator distCalc = WGS84DistanceCalculator.getInstance();
         KeyMatrix distances = new KeyMatrix();
         Set<String> subkeys = new HashSet<>();
         Map<String, Double> volumes = new HashMap<>();
 
+        Discretizer discretizer = new FixedBordersDiscretizer(new double[]{20000, 50000, 100000, 10000000});
+
         String line = reader.readLine();
         writer.write(line);
         writer.newLine();
 
-        Map<String, TObjectDoubleHashMap<String>> days = new HashMap<>();
+        Map<String, TObjectDoubleHashMap<String>> histograms = new HashMap<>();
 
         logger.info("Loading file...");
         while ((line = reader.readLine()) != null) {
@@ -78,6 +80,9 @@ public class AdjustDays {
             String key = buildKey(from, to, purpose, year, mode, direction, day, season);
             volumes.put(key, volume);
 
+            String subkey = buildSubKey(from, to, purpose, year, mode, direction, season);
+            subkeys.add(subkey);
+
             Zone fromZone = zones.get(from);
             Zone toZone = zones.get(to);
             Double d = distances.get(from, to);
@@ -89,22 +94,33 @@ public class AdjustDays {
                     distances.set(to, from, d);
                 }
             }
-            Discretizer discretizer = new FixedBordersDiscretizer(new double[]{100000, 10000000});
+
             d = discretizer.discretize(d);
 
-            String histKey = String.format("%s;%d;%s", purpose, (int)(d/1000), season);
-            TObjectDoubleHashMap<String> hist = days.get(histKey);
+            String histKey = buildHistKey(purpose, d);
+            TObjectDoubleHashMap<String> hist = histograms.get(histKey);
             if (hist == null) {
                 hist = new TObjectDoubleHashMap<>();
-                days.put(histKey, hist);
+                histograms.put(histKey, hist);
             }
 
             hist.adjustOrPutValue(day, volume, volume);
+
+            if(purpose.equals("F2")) {
+                histKey = buildHistKey("U", d);
+                hist = histograms.get(histKey);
+                if (hist == null) {
+                    hist = new TObjectDoubleHashMap<>();
+                    histograms.put(histKey, hist);
+                }
+
+                hist.adjustOrPutValue(day, volume, volume);
+            }
         }
 
-        for (Map.Entry<String, TObjectDoubleHashMap<String>> entry : days.entrySet()) {
+        for (Map.Entry<String, TObjectDoubleHashMap<String>> entry : histograms.entrySet()) {
             TObjectDoubleHashMap<String> hist = entry.getValue();
-//            Histogram.normalize(hist);
+            Histogram.normalize(hist);
 
             StringBuilder builder = new StringBuilder();
             TObjectDoubleIterator<String> it = hist.iterator();
@@ -112,12 +128,83 @@ public class AdjustDays {
                 it.advance();
                 builder.append(it.key());
                 builder.append("=");
-                builder.append(String.format(Locale.US, "%.1f", it.value()));
+                builder.append(String.format(Locale.US, "%.2f", it.value()));
                 builder.append(", ");
             }
-//            logger.info(String.format("%s: %s", entry.getKey(), builder.toString()));
-            System.out.println(String.format("%s: %s", entry.getKey(), builder.toString()));
+            logger.info(String.format("%s: %s", entry.getKey(), builder.toString()));
+//            System.out.println(String.format("%s: %s", entry.getKey(), builder.toString()));
         }
+
+        List<String> dayCodes = new ArrayList<>(5);
+        dayCodes.add("1");
+        dayCodes.add("2");
+        dayCodes.add("5");
+        dayCodes.add("6");
+        dayCodes.add("7");
+
+        logger.info("Adjusting days...");
+        ProgressLogger.init(subkeys.size(), 2, 10);
+        for(String subkey : subkeys) {
+            String tokens[] = subkey.split(COL_SEPARATOR);
+
+            double totalVol = 0.0;
+
+            List<String> keys = new ArrayList<>(5);
+            for(String dayCode : dayCodes) {
+                String key = rebuildKey(tokens, dayCode);
+                keys.add(key);
+                Double vol = volumes.get(key);
+                if(vol != null) {
+                    totalVol += vol;
+                }
+            }
+
+            String from = tokens[0];
+            String to = tokens[1];
+
+            Double d = distances.get(from, to);
+            d = discretizer.discretize(d);
+
+            String histKey = buildHistKey(tokens[2], d);
+            TObjectDoubleHashMap<String> hist = histograms.get(histKey);
+
+            for(int i = 0; i < dayCodes.size(); i++) {
+                String dayCode = dayCodes.get(i);
+                double factor = hist.get(dayCode);
+                double vol = totalVol * factor;
+
+                String key = keys.get(i);
+                writer.write(key);
+                writer.write(COL_SEPARATOR);
+                writer.write(String.valueOf(vol));
+                writer.newLine();
+            }
+
+            ProgressLogger.step();
+        }
+        ProgressLogger.termiante();
+        writer.close();
+        logger.info("Done.");
+
+    }
+
+    private static String buildHistKey(String purpose, double d) {
+        return String.format("%s;%d", purpose, (int)(d/1000));
+    }
+
+    private static String rebuildKey(String tokens[], String day) {
+        StringBuilder builder = new StringBuilder(200);
+
+        for(int i = 0; i < 6; i++) {
+            builder.append(tokens[i]);
+            builder.append(COL_SEPARATOR);
+        }
+        builder.append(day);
+        builder.append(COL_SEPARATOR);
+        builder.append(tokens[6]);
+
+
+        return builder.toString();
     }
 
     private static String buildKey(String from, String to, String purpose, String year, String mode, String
@@ -137,6 +224,29 @@ public class AdjustDays {
         builder.append(direction);
         builder.append(COL_SEPARATOR);
         builder.append(day);
+        builder.append(COL_SEPARATOR);
+        builder.append(season);
+
+        return builder.toString();
+    }
+
+    private static String buildSubKey(String from, String to, String purpose, String year, String mode, String
+            direction, String season) {
+        StringBuilder builder = new StringBuilder(200);
+
+        builder.append(from);
+        builder.append(COL_SEPARATOR);
+        builder.append(to);
+        builder.append(COL_SEPARATOR);
+        builder.append(purpose);
+        builder.append(COL_SEPARATOR);
+        builder.append(year);
+        builder.append(COL_SEPARATOR);
+        builder.append(mode);
+        builder.append(COL_SEPARATOR);
+        builder.append(direction);
+//        builder.append(COL_SEPARATOR);
+//        builder.append(day);
         builder.append(COL_SEPARATOR);
         builder.append(season);
 

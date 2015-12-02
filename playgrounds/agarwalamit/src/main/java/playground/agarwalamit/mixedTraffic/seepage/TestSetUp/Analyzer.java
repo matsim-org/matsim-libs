@@ -48,5 +48,4 @@ public class Analyzer {
 		log.info("Outflow : - "+linkFlow.getOutflow().toString());
 		
 	}
-	
 }

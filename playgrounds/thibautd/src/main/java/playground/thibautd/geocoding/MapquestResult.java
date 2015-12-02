@@ -19,15 +19,14 @@
  * *********************************************************************** */
 package playground.thibautd.geocoding;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * @author thibautd

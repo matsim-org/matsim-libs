@@ -115,7 +115,7 @@ public class MyDemandGenerator {
 				while((line = br.readLine()) != null){
 					String[] entry = line.split(",");
 					String agentId = entry[0];
-					Person agent = PersonImpl.createPerson(Id.create(agentId, Person.class));
+					Person agent = PopulationUtils.createPerson(Id.create(agentId, Person.class));
 					PersonUtils.setEmployed(agent, true);
 
 					Plan plan = new PlanImpl(agent);

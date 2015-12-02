@@ -28,6 +28,7 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.emissions.events.EmissionEventsReader;
 import org.matsim.contrib.emissions.types.ColdPollutant;
 import org.matsim.contrib.emissions.types.WarmPollutant;
@@ -36,8 +37,8 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.handler.EventHandler;
 
-import playground.benjamin.scenarios.munich.analysis.nectar.EmissionsPerLinkColdEventHandler;
-import playground.benjamin.scenarios.munich.analysis.nectar.EmissionsPerLinkWarmEventHandler;
+import playground.agarwalamit.analysis.emission.sorting.SortedColdEmissionPerLinkHandler;
+import playground.agarwalamit.analysis.emission.sorting.SortedWarmEmissionPerLinkHandler;
 import playground.vsp.analysis.modules.AbstractAnalysisModule;
 
 /**
@@ -48,28 +49,31 @@ public class EmissionLinkAnalyzer extends AbstractAnalysisModule {
 	private final Logger logger = Logger.getLogger(EmissionLinkAnalyzer.class);
 	private final String emissionEventsFile;
 	private EmissionUtils emissionUtils;
-	private EmissionsPerLinkWarmEventHandler warmHandler;
-	private EmissionsPerLinkColdEventHandler coldHandler;
+	private SortedWarmEmissionPerLinkHandler warmHandler;
+	private SortedColdEmissionPerLinkHandler coldHandler;
 	private Map<Double, Map<Id<Link>, Map<WarmPollutant, Double>>> link2WarmEmissions;
 	private Map<Double, Map<Id<Link>, Map<ColdPollutant, Double>>> link2ColdEmissions;
 	private SortedMap<Double, Map<Id<Link>, SortedMap<String, Double>>> link2TotalEmissions;
-	private final int noOfTimeBins;
-	private double simulationEndTime;
 
-	public EmissionLinkAnalyzer(double simulationEndTime, String emissionEventFile, int noOfTimeBin) {
+	public EmissionLinkAnalyzer(double simulationEndTime, String emissionEventFile, int noOfTimeBins, String shapeFile, Network network ) {
 		super(EmissionLinkAnalyzer.class.getSimpleName());
 		this.emissionEventsFile = emissionEventFile;
-		this.noOfTimeBins = noOfTimeBin;
-		this.simulationEndTime = simulationEndTime;
-	}
-
-	public void init() {
-		this.logger.info("Aggregating emissions for each "+this.simulationEndTime/this.noOfTimeBins+" sec time bin.");
+		this.logger.info("Aggregating emissions for each "+simulationEndTime/noOfTimeBins+" sec time bin.");
 		this.emissionUtils = new EmissionUtils();
-		this.warmHandler = new EmissionsPerLinkWarmEventHandler(this.simulationEndTime, this.noOfTimeBins);
-		this.coldHandler = new EmissionsPerLinkColdEventHandler(this.simulationEndTime, this.noOfTimeBins);
+		this.warmHandler = new SortedWarmEmissionPerLinkHandler(simulationEndTime, noOfTimeBins, shapeFile, network);
+		this.coldHandler = new SortedColdEmissionPerLinkHandler(simulationEndTime, noOfTimeBins, shapeFile, network);
 	}
 	
+	
+	public EmissionLinkAnalyzer(double simulationEndTime, String emissionEventFile, int noOfTimeBins) {
+		super(EmissionLinkAnalyzer.class.getSimpleName());
+		this.emissionEventsFile = emissionEventFile;
+		this.logger.info("Aggregating emissions for each "+simulationEndTime/noOfTimeBins+" sec time bin.");
+		this.emissionUtils = new EmissionUtils();
+		this.warmHandler = new SortedWarmEmissionPerLinkHandler(simulationEndTime, noOfTimeBins);
+		this.coldHandler = new SortedColdEmissionPerLinkHandler(simulationEndTime, noOfTimeBins);
+	}
+
 	@Override
 	public List<EventHandler> getEventHandler() {
 		List<EventHandler> handler = new LinkedList<EventHandler>();
@@ -83,6 +87,7 @@ public class EmissionLinkAnalyzer extends AbstractAnalysisModule {
 
 		eventsManager.addHandler(this.warmHandler);
 		eventsManager.addHandler(this.coldHandler);
+		eventsManager.addHandler(new SortedColdEmissionPerLinkHandler(30., 9));
 
 		emissionReader.parse(this.emissionEventsFile);
 	}

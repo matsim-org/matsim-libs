@@ -56,7 +56,7 @@ public class ChooseActivityToInsert implements PlanAlgorithm {
 			
 			int index = this.rng.nextInt(allActTypes.length);
 
-			int actIndex = plan.getPlanElements().indexOf(t.get(this.rng.nextInt(t.size() - 1)));
+			int actIndex = plan.getPlanElements().indexOf(t.get(this.rng.nextInt(t.size() - 1) + 1));
 			
 			ActivityFacility actFacility;
 			
