@@ -27,7 +27,7 @@ import playground.thibautd.maxess.nestedlogitaccessibility.framework.ChoiceSetId
 import playground.thibautd.maxess.nestedlogitaccessibility.framework.Utility;
 import playground.thibautd.maxess.prepareforbiogeme.tripbased.RunMzTripChoiceSetConversion;
 import playground.ivt.router.TripSoftCache;
-import playground.thibautd.utils.ConcurrentStopWatch;
+import playground.ivt.utils.ConcurrentStopWatch;
 
 /**
  * @author thibautd

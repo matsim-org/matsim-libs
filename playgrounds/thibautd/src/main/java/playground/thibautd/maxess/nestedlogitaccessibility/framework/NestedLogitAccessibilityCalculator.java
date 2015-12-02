@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.facilities.ActivityFacilities;
-import playground.thibautd.utils.ConcurrentStopWatch;
+import playground.ivt.utils.ConcurrentStopWatch;
 
 import java.util.ArrayList;
 import java.util.List;

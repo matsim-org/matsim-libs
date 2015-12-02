@@ -38,12 +38,11 @@ import playground.thibautd.maxess.nestedlogitaccessibility.framework.ChoiceSetId
 import playground.thibautd.maxess.nestedlogitaccessibility.framework.Nest;
 import playground.thibautd.maxess.nestedlogitaccessibility.framework.NestedChoiceSet;
 import playground.thibautd.maxess.prepareforbiogeme.tripbased.Trip;
-import playground.thibautd.utils.ConcurrentStopWatch;
+import playground.ivt.utils.ConcurrentStopWatch;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
