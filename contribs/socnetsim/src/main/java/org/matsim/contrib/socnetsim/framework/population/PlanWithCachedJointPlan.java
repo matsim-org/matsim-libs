@@ -136,13 +136,6 @@ public final class PlanWithCachedJointPlan implements Plan {
 	}
 
 	@Override
-	public boolean isSelected() {
-		return this.delegate.isSelected();
-//		return this.getPerson().getSelectedPlan() == this;
-		// yy cannot delegate this since getSelectedPlan returns this plan here, but inside the delegate "this" returns the delegate.
-	}
-
-	@Override
 	public List<PlanElement> getPlanElements() {
 		return this.delegate.getPlanElements();
 	}

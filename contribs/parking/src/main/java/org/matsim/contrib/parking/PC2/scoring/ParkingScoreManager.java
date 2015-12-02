@@ -28,11 +28,14 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.multimodal.router.util.WalkTravelTime;
 import org.matsim.contrib.parking.PC2.infrastructure.PC2Parking;
 import org.matsim.contrib.parking.lib.DebugLib;
+import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 public final class ParkingScoreManager {
+	
+	private Double beelineDistanceFactor = 1.3 ;
 
 	private AbstractParkingBetas parkingBetas;
 	private double parkingScoreScalingFactor;
@@ -58,7 +61,7 @@ public final class ParkingScoreManager {
 		double linkLength = link.getLength();		
 		
 		double walkDistance = CoordUtils.calcDistance(destCoord, parking.getCoordinate()) 
-				* scenario.getConfig().plansCalcRoute().getBeelineDistanceFactors().get("walk");;
+				* scenario.getConfig().plansCalcRoute().getBeelineDistanceFactors().get("walk")* beelineDistanceFactor;
 		
 		double walkSpeed = linkLength / this.walkTravelTime.getLinkTravelTime(link, 0, person, null);
 
@@ -79,10 +82,16 @@ public final class ParkingScoreManager {
 		double parkingCost = parking.getCost(personId, arrivalTime, parkingDurationInSeconds);
 		return (parkingCostBeta * parkingCost) * parkingScoreScalingFactor;
 	}
-
-	public double calcScore(Coord destCoord, double arrivalTime, double parkingDurationInSeconds, PC2Parking parking, Id<Person> personId, int legIndex) {
+	
+	
+	public double calcScore(Coord destCoord, double arrivalTime, double parkingDurationInSeconds, PC2Parking parking, Id<Person> personId, int legIndex, boolean setCostToZero) {
 		double walkScore = calcWalkScore(destCoord, parking, personId, parkingDurationInSeconds);
 		double costScore = calcCostScore(arrivalTime, parkingDurationInSeconds, parking, personId);
+		
+		if (setCostToZero){
+			costScore=0;
+		}
+		
 		double randomError=0;
 
 		if (randomErrorTermManager!=null){

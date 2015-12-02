@@ -22,7 +22,7 @@ package playground.thibautd.scripts;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.misc.Counter;
-import playground.thibautd.utils.SoftCache;
+import playground.ivt.utils.SoftCache;
 
 import java.util.Random;
 

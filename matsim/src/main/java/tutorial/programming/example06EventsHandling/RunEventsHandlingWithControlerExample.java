@@ -31,6 +31,8 @@ import org.matsim.core.scenario.ScenarioUtils;
  */
 public class RunEventsHandlingWithControlerExample {
 
+	public static final String outputDirectory = "output/example7" ;
+
 	/**
 	 * @param args
 	 */
@@ -41,6 +43,8 @@ public class RunEventsHandlingWithControlerExample {
 		} else {
 			config = ConfigUtils.loadConfig( args[0] ) ;
 		}
+		
+		config.controler().setOutputDirectory(outputDirectory);
 		
 		final Scenario scenario = ScenarioUtils.loadScenario(config) ;
 

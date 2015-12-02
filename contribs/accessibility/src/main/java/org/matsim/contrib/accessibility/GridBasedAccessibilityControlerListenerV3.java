@@ -266,7 +266,12 @@ public final class GridBasedAccessibilityControlerListenerV3 implements Shutdown
 
 		log.info("Triggering " + spatialGridDataExchangeListener.size() + " SpatialGridDataExchangeListener(s) ...");
 		for (SpatialGridDataExchangeInterface spatialGridDataExchangeInterface : spatialGridDataExchangeListener) {
-			spatialGridDataExchangeInterface.setAndProcessSpatialGrids(spatialGridAggregator.getAccessibilityGrids());
+			try {
+				spatialGridDataExchangeInterface.setAndProcessSpatialGrids(spatialGridAggregator.getAccessibilityGrids());
+			} catch ( Exception ee ) {
+				log.warn("Had a problem here; printing stack trace but then continuing anyways") ;
+				ee.printStackTrace(); 
+			}
 		}
 
 	}

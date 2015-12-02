@@ -38,7 +38,7 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
  * @author jwjoubert
  */
 public class RunPersonAttributesExample {
-	final private static Logger LOG = Logger.getLogger(RunPersonAttributesExampleTest.class);
+	final private static Logger LOG = Logger.getLogger(RunPersonAttributesExample.class);
 
 	/**
 	 * Running the example where we show how to add three different attribute
