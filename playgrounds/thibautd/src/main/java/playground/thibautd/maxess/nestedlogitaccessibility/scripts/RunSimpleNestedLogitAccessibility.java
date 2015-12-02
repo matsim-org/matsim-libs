@@ -18,17 +18,9 @@
  * *********************************************************************** */
 package playground.thibautd.maxess.nestedlogitaccessibility.scripts;
 
-import com.google.inject.Guice;
-import com.google.inject.Injector;
-import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
-import gnu.trove.map.TObjectDoubleMap;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkImpl;
@@ -42,8 +34,7 @@ import playground.thibautd.maxess.nestedlogitaccessibility.framework.BaseNestedA
 import playground.thibautd.maxess.nestedlogitaccessibility.framework.InjectionUtils;
 import playground.thibautd.maxess.nestedlogitaccessibility.framework.NestedLogitAccessibilityCalculator;
 import playground.thibautd.maxess.nestedlogitaccessibility.writers.BasicPersonAccessibilityWriter;
-import playground.thibautd.maxess.prepareforbiogeme.tripbased.Trip;
-import playground.thibautd.utils.MoreIOUtils;
+import playground.ivt.utils.MoreIOUtils;
 
 import java.util.Collections;
 import java.util.concurrent.TimeUnit;

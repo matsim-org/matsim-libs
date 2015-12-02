@@ -41,7 +41,7 @@ import playground.thibautd.maxess.prepareforbiogeme.framework.Converter;
 import playground.ivt.router.CachingRoutingModuleWrapper;
 import playground.ivt.router.TripSoftCache;
 import playground.ivt.router.TripSoftCache.LocationType;
-import playground.thibautd.utils.MoreIOUtils;
+import playground.ivt.utils.MoreIOUtils;
 
 import java.io.File;
 import java.util.Collections;

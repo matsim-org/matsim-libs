@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.utils;
+package playground.ivt.utils;
 
 import org.apache.log4j.Appender;
 import org.apache.log4j.FileAppender;

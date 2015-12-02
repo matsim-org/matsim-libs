@@ -31,7 +31,7 @@ import playground.thibautd.initialdemandgeneration.socnetgensimulated.framework.
 import playground.thibautd.initialdemandgeneration.socnetgensimulated.framework.PreprocessedModelRunnerConfigGroup;
 import playground.thibautd.initialdemandgeneration.socnetgensimulated.framework.SocNetGenFrameworkModule;
 import playground.thibautd.initialdemandgeneration.socnetgensimulated.framework.SocialNetworkGenerationConfigGroup;
-import playground.thibautd.utils.MoreIOUtils;
+import playground.ivt.utils.MoreIOUtils;
 import playground.ivt.utils.SoftCache;
 
 /**
