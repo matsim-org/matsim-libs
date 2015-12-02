@@ -17,52 +17,29 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jbischoff.av.run;
+package playground.jbischoff.taxibus.scenario.trains;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.jbischoff.taxi.usability.ConfigBasedTaxiLaunchUtils;
-import playground.jbischoff.taxi.usability.TaxiConfigGroup;
+import playground.andreas.mzilske.bvg09.MergeNetworks;
 
 /**
  * @author  jbischoff
  *
  */
-public class AVLauncher {
-
-	public static void main(String[] args) {
-		Config config = ConfigUtils.loadConfig("C:/Users/Joschka/Documents/shared-svn/projects/audi_av/scenario/config.xml");
-		
-		TaxiConfigGroup tcg = new TaxiConfigGroup();
-		tcg.addParam("vehiclesFile", "C:/Users/Joschka/Documents/shared-svn/projects/audi_av/scenario/v48/taxi_vehicles_250000.xml.gz");
-		tcg.addParam("ranksFile", "C:/Users/Joschka/Documents/shared-svn/projects/audi_av/scenario/ranks.xml");
-		tcg.addParam("outputDir", config.controler().getOutputDirectory()+"/taxi");
-		tcg.addParam("algorithm", "dummy");
-		tcg.addParam("nearestVehicleLimit", "20");
-		tcg.addParam("nearestRequestLimit", "20");
-		tcg.addParam("pickupDuration", "60");
-		tcg.addParam("dropOffDuration", "60");
-		config.addModule(tcg);
-		config.global().setNumberOfThreads(16);
-		config.qsim().setNumberOfThreads(16);
-		
-		
-		
-		
-		
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
+public class MergeTrainNet {
+public static void main(String[] args) {
+	Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+	Scenario scenario2 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 	
-		
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-
-		Controler controler = new Controler(scenario);
-		new ConfigBasedTaxiLaunchUtils(controler).initiateTaxis();
-		controler.run();
-	}
-
+	new MatsimNetworkReader(scenario).readFile("C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/network/versions/networkptcg.xml");
+	new MatsimNetworkReader(scenario2).readFile("C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/network/trains/net32N.xml");
+	MergeNetworks.merge(scenario.getNetwork(), "", scenario2.getNetwork());
+	
+	new NetworkWriter(scenario.getNetwork()).write("C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/network/versions/networkptcgt.xml");
+}
 }

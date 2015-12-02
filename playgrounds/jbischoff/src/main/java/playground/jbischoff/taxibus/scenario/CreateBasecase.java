@@ -130,10 +130,10 @@ static CadytsContext prepareConfig(Config config, boolean useCadyts){
 	double scale = 0.01;
 	
 	ControlerConfigGroup ccg = config.controler();
-	ccg.setRunId("vw042");
+	ccg.setRunId("vw043");
 	ccg.setOutputDirectory(basedir+"output/"+ccg.getRunId()+"/");
 	ccg.setFirstIteration(0);
-	int lastIteration = 0;
+	int lastIteration = 50;
 	ccg.setLastIteration(lastIteration);
 	int disableAfter = (int) (lastIteration * 0.8);
 	ccg.setMobsim("qsim");
@@ -152,7 +152,7 @@ static CadytsContext prepareConfig(Config config, boolean useCadyts){
 	
 	config.parallelEventHandling().setNumberOfThreads(6);
 	
-	config.network().setInputFile(basedir + "networkptcg.xml");
+	config.network().setInputFile(basedir + "networkptcgt.xml");
 	
 	
 	config.plans().setInputFile(basedir+"initial_plans0.01.xml.gz");

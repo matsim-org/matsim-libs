@@ -19,12 +19,8 @@
 
 package playground.jbischoff.taxibus.optimizer.fifo.Lines;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Queue;
-import java.util.Set;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -53,9 +49,9 @@ public class TaxibusLineImpl implements TaxibusLine {
 	private Queue<Vehicle> vehiclesInHold = new LinkedList<>();
 
 	private double currentLambda = 0.;
-	private double currentTwMax = 15 * 60;
+	private double currentTwMax = 30 * 60;
 	private double currentOccupationRate = 8;
-
+	private int maxVehicles = 8;
 	private double singleTripTravelTime;
 
 	public TaxibusLineImpl(Id<TaxibusLine> lineId, Id<Link> holdingPosition, MultiPolygon departureZone,
@@ -127,6 +123,10 @@ public class TaxibusLineImpl implements TaxibusLine {
 	public Vehicle getNextEmptyVehicle() {
 		return this.vehiclesInHold.poll();
 	}
+	@Override
+	public boolean isVehicleInHold(){
+		return (!this.vehiclesInHold.isEmpty());
+	}
 
 	@Override
 	public boolean lineServesRequest(TaxibusRequest request) {
@@ -139,6 +139,12 @@ public class TaxibusLineImpl implements TaxibusLine {
 	public boolean lineCoversCoordinate(Coord coord) {
 		Geometry g = MGC.coord2Point(coord);
 		return (departureZone.contains(g) || arrivalZone.contains(g));
+	}
+
+	@Override
+	public int getMaximumOpenVehicles() {
+
+		return maxVehicles;
 	}
 
 }

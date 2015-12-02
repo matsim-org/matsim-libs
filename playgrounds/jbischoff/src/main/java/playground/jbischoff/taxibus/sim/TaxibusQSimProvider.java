@@ -54,6 +54,7 @@ import playground.jbischoff.taxibus.optimizer.defaultOptimizer.DefaultTaxibusOpt
 import playground.jbischoff.taxibus.optimizer.defaultOptimizer.filter.DefaultTaxibusFilterFactory;
 import playground.jbischoff.taxibus.optimizer.defaultOptimizer.filter.TaxibusFilterFactory;
 import playground.jbischoff.taxibus.optimizer.fifo.FifoOptimizer;
+import playground.jbischoff.taxibus.optimizer.fifo.MultipleFifoOptimizer;
 import playground.jbischoff.taxibus.optimizer.fifo.Lines.LineDispatcher;
 import playground.jbischoff.taxibus.optimizer.fifo.Lines.LinesUtils;
 import playground.jbischoff.taxibus.passenger.TaxibusPassengerEngine;
@@ -141,6 +142,12 @@ public class TaxibusQSimProvider implements Provider<QSim> {
 		optimizer = new FifoOptimizer(optimConfig, dispatcher, false);
 		
 		}
+		else if (tbcg.getAlgorithmConfig().equals("multipleLine")){
+			LineDispatcher dispatcher = LinesUtils.createLineDispatcher(tbcg.getLinesFile(), tbcg.getZonesXmlFile(), tbcg.getZonesShpFile(),context,tbcg);	
+			events.addHandler(dispatcher);	
+			optimizer = new MultipleFifoOptimizer(optimConfig, dispatcher, false);
+			
+			}
 		else throw new RuntimeException("No config parameter set for algorithm, please check and assign in config");
 
 	}

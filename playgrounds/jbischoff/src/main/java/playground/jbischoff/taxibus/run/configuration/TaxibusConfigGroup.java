@@ -148,7 +148,7 @@ public class TaxibusConfigGroup extends ConfigGroup {
 			map.put(TAXI_RANKS_FILE, "Taxi rank file; optional if you don't use ranks");
 			map.put(OUTPUT_DIRECTORY, "Output directory for taxi stats");
 			map.put(VEHICLE_CAPACITY, "taxicab vehicle capacity. Default = 4");
-			map.put(ALGORITHM, "Taxicab algorithm: Possible parameters are default, line, (...)");
+			map.put(ALGORITHM, "Taxibus algorithms: Possible parameters are default, line, multipleLine (...)");
 			
 			map.put(DESTINATION_KNOWN,"determines wether the destination known upon ordering a taxi. Works only with some algorithms" );
 			map.put(VEHICLE_DIVERSION, "can taxis be re-assigned en route to customer. Default: false. Works only with some algorithms");

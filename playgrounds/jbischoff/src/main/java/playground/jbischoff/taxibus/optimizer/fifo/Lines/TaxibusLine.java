@@ -83,6 +83,10 @@ public interface TaxibusLine {
 	public boolean lineServesRequest(TaxibusRequest request);
 	
 	public boolean lineCoversCoordinate(Coord coord);
+
+	public boolean isVehicleInHold();
+
+	public int getMaximumOpenVehicles();
 	
 	
 }
