@@ -61,20 +61,23 @@ class TaxiLauncher
     {
         this.params = params;
 
-//        scenario = VrpLauncherUtils.initScenario(params.netFile, params.plansFile,
-//                params.changeEventsFile, 30);
-
-        //only for AUDI
+        int hours = 30;//TODO migrate to TaxiParams?
+        hours = 50;//only for AUDI 48-hour scenario
         scenario = VrpLauncherUtils.initScenario(params.netFile, params.plansFile,
-                params.changeEventsFile, 50);
+                params.changeEventsFile, hours);
 
-        QSimConfigGroup qsc = scenario.getConfig().qsim(); 
-        qsc.setStorageCapFactor(0.3); 
-        qsc.setFlowCapFactor(0.2);
-        /////////////////
+        double storageCapFactor = 1.0;//TODO migrate to TaxiParams?
+        double flowCapFactor = 1.0;//TODO migrate to TaxiParams?
         
+        //AUDI 10% scenario
+        storageCapFactor = 0.3;
+        flowCapFactor = 0.2;
 
-        
+        //TODO this will overwrite VARIANT_NETWORK_FLOW_CAP_FACTOR from VrpLauncherUtils
+        QSimConfigGroup qsc = scenario.getConfig().qsim();
+        qsc.setStorageCapFactor(storageCapFactor);
+        qsc.setFlowCapFactor(flowCapFactor);
+
         if (params.taxiCustomersFile != null) {
             List<String> passengerIds = PersonCreatorWithRandomTaxiMode
                     .readTaxiCustomerIds(params.taxiCustomersFile);
@@ -172,13 +175,13 @@ class TaxiLauncher
 
     TaxiOptimizerConfiguration createOptimizerConfiguration()
     {
-//        TaxiSchedulerParams schedulerParams = new TaxiSchedulerParams(params.destinationKnown,
-//                params.vehicleDiversion, params.pickupDuration, params.dropoffDuration, ???);
-        
-        //for AUDI 2.5 still gives accurate results
+        double AStarEuclideanOverdoFactor = 1.0;//TODO migrate to TaxiParams?
+
+        AStarEuclideanOverdoFactor = 2.5;//for AUDI 2.5 still gives accurate results
         TaxiSchedulerParams schedulerParams = new TaxiSchedulerParams(params.destinationKnown,
-                params.vehicleDiversion, params.pickupDuration, params.dropoffDuration, 2.5);
-        
+                params.vehicleDiversion, params.pickupDuration, params.dropoffDuration,
+                AStarEuclideanOverdoFactor);
+
         TaxiScheduler scheduler = new TaxiScheduler(context, schedulerParams, travelTime,
                 travelDisutility);
 
