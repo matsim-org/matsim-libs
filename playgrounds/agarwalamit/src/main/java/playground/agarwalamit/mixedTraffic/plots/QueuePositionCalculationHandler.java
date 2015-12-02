@@ -48,25 +48,16 @@ public class QueuePositionCalculationHandler implements LinkLeaveEventHandler, L
 
 	private static final Logger LOG = Logger.getLogger(QueuePositionCalculationHandler.class);
 	private final Map<Id<Link>,LinkPersonInfoContainer> linkid2Container = new HashMap<>();
-	private final BufferedWriter writer1 ;
-	private final BufferedWriter writer2 ;
+	private BufferedWriter writer1 ;
+	private BufferedWriter writer2 ;
 
 	private final Map<Id<Person>, String> personId2LegMode = new TreeMap<Id<Person>, String>();
 	private final Scenario scenario;
 	private double lastEventTimeStep = 0;
 
-	public QueuePositionCalculationHandler(final Scenario scenario, final String outputFolder) {
+	public QueuePositionCalculationHandler(final Scenario scenario) {
 		LOG.info("Calculating queue position of vehicles in mixed traffic.");
 		this.scenario = scenario;
-		this.writer1 = IOUtils.getBufferedWriter(outputFolder+"rDataPersonLinkEnterLeave.txt");
-		this.writer2 = IOUtils.getBufferedWriter(outputFolder+"rDataPersonInQueueData6.txt");
-		try {
-			this.writer1.write("personId \t linkId \t linkEnterTimeX1 \t initialPositionY1 \t linkLeaveTimeX2 \t endPositionY2 \t travelMode \n");
-			this.writer2.write("personId \t linkId \t startTimeX1 \t initialPositionY1 \t endTimeX2 \t endPositionY2 \t travelMode \n");
-		} catch (Exception e) {
-			throw new RuntimeException("Data is not written. Reason -"+ e);
-		}
-		
 		for (Link link : scenario.getNetwork().getLinks().values()) {
 			this.linkid2Container.put(link.getId(), new LinkPersonInfoContainer(link.getId(),link.getLength()));
 		}
@@ -209,6 +200,18 @@ public class QueuePositionCalculationHandler implements LinkLeaveEventHandler, L
 			}
 		}
 		this.lastEventTimeStep=now;
+	}
+	
+	public void openWriter(final String outputFolder){
+		this.writer1 = IOUtils.getBufferedWriter(outputFolder+"rDataPersonLinkEnterLeave.txt");
+		this.writer2 = IOUtils.getBufferedWriter(outputFolder+"rDataPersonInQueueData6.txt");
+		try {
+			this.writer1.write("personId \t linkId \t linkEnterTimeX1 \t initialPositionY1 \t linkLeaveTimeX2 \t endPositionY2 \t travelMode \n");
+			this.writer2.write("personId \t linkId \t startTimeX1 \t initialPositionY1 \t endTimeX2 \t endPositionY2 \t travelMode \n");
+		} catch (Exception e) {
+			throw new RuntimeException("Data is not written. Reason -"+ e);
+		}
+
 	}
 	
 	public void closeWriter(){
