@@ -254,7 +254,7 @@ public class QSimIntegrationTest extends MatsimTestCase {
 	private NetworkImpl createNetwork(MutableScenario scenario) {
 		// create a network
 		NetworkFactoryImpl nf = (NetworkFactoryImpl) scenario.getNetwork().getFactory();
-		nf.setLinkFactory(new TimeVariantLinkFactory());
+		nf.setLinkFactory(new VariableIntervalTimeVariantLinkFactory());
 		final NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 		network.setCapacityPeriod(3600.0);
 

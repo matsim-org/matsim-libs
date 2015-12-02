@@ -34,7 +34,7 @@ public class TaxibusVehicleRequestPathFinder
                 optimConfig.travelTime);
 
         routerWithCache = new DefaultLeastCostPathCalculatorWithCache(router,
-                new TimeDiscretizer(30 * 4, 15 * 60, false));
+                TimeDiscretizer.ACYCLIC_15_MIN);
     }
 
 

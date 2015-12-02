@@ -284,18 +284,54 @@ public class ResultsPostProcessor
     }
 
 
-    public static void processAudiAV()
+    public static void processAudiAV_10()
     {
         String dir = "d:/PP-rad/audi_av/audi_av_10pct_2015_10/";
         String subDirPrefix = "taxi_vehicles_";
 
         new ResultsPostProcessor(//
                 "10000", //
+                "11000", //
+                "12000", //
                 "13000", //
+                "14000", //
+                "15000", //
                 "16000", //
+                "17000", //
+                "18000", //
                 "19000", //
+                "20000", //
+                "21000", //
                 "22000", //
+                "23000", //
+                "24000", //
                 "25000" //
+        ).process(dir, subDirPrefix, "stats");
+    }
+
+
+    public static void processAudiAV_100()
+    {
+        String dir = "d:/PP-rad/audi_av/audi_av_2015_10/";
+        String subDirPrefix = "taxi_vehicles_";
+
+        new ResultsPostProcessor(//
+                "100000", //
+                "110000", //
+                "120000", //
+                "130000", //
+                "140000", //
+                "150000", //
+                "160000", //
+                "170000", //
+                "180000", //
+                "190000", //
+                "200000", //
+                "210000", //
+                "220000", //
+                "230000", //
+                "240000", //
+                "250000" //
         ).process(dir, subDirPrefix, "stats");
     }
 
@@ -303,9 +339,10 @@ public class ResultsPostProcessor
     public static void main(String[] args)
     {
         //processMielec();
-        processBerlin();
+        //processBerlin();
         //processBarcelonaVariableDemand();
         //processBarcelonaVariableSupply();
-        //processAudiAV();
+        processAudiAV_10();
+        //processAudiAV_100();
     }
 }

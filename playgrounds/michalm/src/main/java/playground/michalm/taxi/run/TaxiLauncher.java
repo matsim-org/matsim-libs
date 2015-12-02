@@ -27,10 +27,10 @@ import org.matsim.contrib.dvrp.extensions.taxi.TaxiUtils;
 import org.matsim.contrib.dvrp.passenger.*;
 import org.matsim.contrib.dvrp.run.*;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelTimeSource;
-import org.matsim.contrib.dvrp.util.TimeDiscretizer;
 import org.matsim.contrib.dvrp.vrpagent.VrpLegs;
 import org.matsim.contrib.dvrp.vrpagent.VrpLegs.LegCreator;
 import org.matsim.contrib.dynagent.run.DynAgentLauncherUtils;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.router.util.*;
 import org.matsim.core.trafficmonitoring.*;
@@ -61,9 +61,20 @@ class TaxiLauncher
     {
         this.params = params;
 
-        scenario = VrpLauncherUtils.initScenario(params.netFile, params.plansFile,
-                params.changeEventsFile);
+//        scenario = VrpLauncherUtils.initScenario(params.netFile, params.plansFile,
+//                params.changeEventsFile, 30);
 
+        //only for AUDI
+        scenario = VrpLauncherUtils.initScenario(params.netFile, params.plansFile,
+                params.changeEventsFile, 50);
+
+        QSimConfigGroup qsc = scenario.getConfig().qsim(); 
+        qsc.setStorageCapFactor(0.3); 
+        qsc.setFlowCapFactor(0.2);
+        /////////////////
+        
+
+        
         if (params.taxiCustomersFile != null) {
             List<String> passengerIds = PersonCreatorWithRandomTaxiMode
                     .readTaxiCustomerIds(params.taxiCustomersFile);
@@ -91,7 +102,7 @@ class TaxiLauncher
         else {// TravelTimeSource.EVENTS
             if (travelTimeCalculator == null) {
                 travelTimeCalculator = VrpLauncherUtils.initTravelTimeCalculatorFromEvents(scenario,
-                        params.eventsFile, TimeDiscretizer.CYCLIC_15_MIN.getTimeInterval());
+                        params.eventsFile, 15 * 60);
             }
 
             travelTime = travelTimeCalculator.getLinkTravelTimes();
@@ -161,8 +172,13 @@ class TaxiLauncher
 
     TaxiOptimizerConfiguration createOptimizerConfiguration()
     {
+//        TaxiSchedulerParams schedulerParams = new TaxiSchedulerParams(params.destinationKnown,
+//                params.vehicleDiversion, params.pickupDuration, params.dropoffDuration, ???);
+        
+        //for AUDI 2.5 still gives accurate results
         TaxiSchedulerParams schedulerParams = new TaxiSchedulerParams(params.destinationKnown,
-                params.vehicleDiversion, params.pickupDuration, params.dropoffDuration);
+                params.vehicleDiversion, params.pickupDuration, params.dropoffDuration, 2.5);
+        
         TaxiScheduler scheduler = new TaxiScheduler(context, schedulerParams, travelTime,
                 travelDisutility);
 

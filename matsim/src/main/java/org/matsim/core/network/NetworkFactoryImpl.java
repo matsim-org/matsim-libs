@@ -85,7 +85,8 @@ public class NetworkFactoryImpl implements NetworkFactory {
 	}
 	
 	public boolean isTimeVariant() {
-		return (this.linkFactory instanceof TimeVariantLinkFactory);
+		return (this.linkFactory instanceof VariableIntervalTimeVariantLinkFactory || //
+		        this.linkFactory instanceof FixedIntervalTimeVariantLinkFactory);
 	}
 
 }

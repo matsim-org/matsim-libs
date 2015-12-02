@@ -20,14 +20,10 @@
 
 package org.matsim.core.network;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
-
-import java.util.Arrays;
 import java.util.TreeMap;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.*;
 
 /**
  * @author laemmel
@@ -42,23 +38,29 @@ class TimeVariantLinkImpl extends LinkImpl {
 
 	private TreeMap<Double,NetworkChangeEvent> changeEvents;
 
-	private TimeVariantAttribute variableFreespeed = new TimeVariantAttribute();
+    private final TimeVariantAttribute variableFreespeed;
+    private final TimeVariantAttribute variableFlowCapacity;
+    private final TimeVariantAttribute variableLanes;
 	
-	private int aFlowCapacityEvents = 1;
-	private double[] aFlowCapacityValues;
-	private double[] aFlowCapacityTimes;
-
-	private int aLanesEvents = 1;
-	private double[] aLanesValues;
-	private double[] aLanesTimes;
-
 	//////////////////////////////////////////////////////////////////////
 	// constructor
 	//////////////////////////////////////////////////////////////////////
 
 	TimeVariantLinkImpl(final Id<Link> id, final Node from, final Node to, final Network network, final double length, final double freespeed, final double capacity, final double lanes) {
 		super(id, from, to, network, length, freespeed, capacity, lanes);
+		this.variableFreespeed = new VariableIntervalTimeVariantAttribute();
+		this.variableFlowCapacity = new VariableIntervalTimeVariantAttribute();
+		this.variableLanes = new VariableIntervalTimeVariantAttribute();
 	}
+
+   TimeVariantLinkImpl(final Id<Link> id, final Node from, final Node to, final Network network, final double length, final double freespeed, final double capacity, final double lanes,
+           final int interval, final int intervalCount) {
+        super(id, from, to, network, length, freespeed, capacity, lanes);
+        this.variableFreespeed = new FixedIntervalTimeVariantAttribute(interval, intervalCount);
+        this.variableFlowCapacity = new FixedIntervalTimeVariantAttribute(interval, intervalCount);
+        this.variableLanes = new FixedIntervalTimeVariantAttribute(interval, intervalCount);
+    }
+
 
 	/**
 	 * Applies a new change event to the link.
@@ -71,19 +73,14 @@ class TimeVariantLinkImpl extends LinkImpl {
 
 		this.changeEvents.put(event.getStartTime(), event);
 
-
-		/*
-		 * Increment the arrays size, so that they will be re-initialized on
-		 * next access.
-		 */
 		if (event.getFreespeedChange() != null) {
 			this.variableFreespeed.incChangeEvents();
 		}
 		if (event.getFlowCapacityChange() != null) {
-			this.aFlowCapacityEvents++;
+			this.variableFlowCapacity.incChangeEvents();
 		}
 		if (event.getLanesChange() != null) {
-			this.aLanesEvents++;
+			this.variableLanes.incChangeEvents();
 		}
 	}
 
@@ -98,14 +95,8 @@ class TimeVariantLinkImpl extends LinkImpl {
 			this.changeEvents.clear();
 
 		variableFreespeed.clearEvents();
-		
-		this.aFlowCapacityTimes = null;
-		this.aFlowCapacityValues = null;
-		this.aLanesTimes = null;
-		this.aLanesValues = null;
-
-		this.aFlowCapacityEvents = 1;
-		this.aLanesEvents = 1;
+		variableFlowCapacity.clearEvents();
+		variableLanes.clearEvents();
 	}
 
 	/**
@@ -116,8 +107,8 @@ class TimeVariantLinkImpl extends LinkImpl {
 	@Override
 	public synchronized double getFreespeed(final double time) {
 
-		if (variableFreespeed.doRequireRecalc()) {
-			initFreespeedEventsArrays();
+		if (variableFreespeed.isRecalcRequired()) {
+			recalcFreespeed();
 		}
 
 		return variableFreespeed.getValue(time);
@@ -126,7 +117,7 @@ class TimeVariantLinkImpl extends LinkImpl {
 	@Override
 	public void setFreespeed(double freespeed) {
 		super.setFreespeed(freespeed);
-		this.initFreespeedEventsArrays();
+		this.recalcFreespeed();
 	}
 
 
@@ -146,20 +137,17 @@ class TimeVariantLinkImpl extends LinkImpl {
 	@Override
 	public synchronized double getFlowCapacity(final double time) {
 
-		if ((this.aFlowCapacityTimes == null) || (this.aFlowCapacityTimes.length != this.aFlowCapacityEvents)) {
-			initFlowCapacityEventsArrays();
+		if (variableFlowCapacity.isRecalcRequired()) {
+			recalcFlowCapacity();
 		}
 
-		int key = Arrays.binarySearch(this.aFlowCapacityTimes, time);
-		key = key >= 0 ? key : -key - 2;
-		return this.aFlowCapacityValues[key];
-
+		return variableFlowCapacity.getValue(time);
 	}
 	
 	@Override
 	public final void setCapacity(double capacityPerNetworkCapcityPeriod){
 		super.setCapacity(capacityPerNetworkCapcityPeriod);
-		this.initFlowCapacityEventsArrays();
+		this.recalcFlowCapacity();
 	}
 
 
@@ -172,16 +160,7 @@ class TimeVariantLinkImpl extends LinkImpl {
 	 */
 	@Override
 	public synchronized double getCapacity(final double time) {
-
-		if ((this.aFlowCapacityTimes == null) || (this.aFlowCapacityTimes.length != this.aFlowCapacityEvents)) {
-			initFlowCapacityEventsArrays();
-		}
-
-		int key = Arrays.binarySearch(this.aFlowCapacityTimes, time);
-		key = key >= 0 ? key : -key - 2;
-
-		double capacityPeriod = getCapacityPeriod();
-		return this.aFlowCapacityValues[key] * capacityPeriod;
+		return getFlowCapacity() * getCapacityPeriod();
 	}
 
 
@@ -197,86 +176,31 @@ class TimeVariantLinkImpl extends LinkImpl {
 	 */
 	@Override
 	public synchronized double getNumberOfLanes(final double time) {
-		if ((this.aLanesTimes == null) || (this.aLanesTimes.length != this.aLanesEvents)) {
-			initLanesEventsArrays();
+		if (variableLanes.isRecalcRequired()) {
+			recalcLanes();
 		}
 
-		int key = Arrays.binarySearch(this.aLanesTimes, time);
-		key = key >= 0 ? key : -key - 2;
-		return this.aLanesValues[key];
+		return variableLanes.getValue(time);
 	}
 
 	@Override
 	public void setNumberOfLanes(double lanes) {
 		super.setNumberOfLanes(lanes);
-		this.initLanesEventsArrays();
+		this.recalcLanes();
 	}
 
 	
-	private synchronized void initFreespeedEventsArrays() {
-	    variableFreespeed.recalc(changeEvents, freespeed);
+	private synchronized void recalcFreespeed() {
+	    variableFreespeed.recalc(changeEvents, TimeVariantAttribute.FREESPEED_GETTER, freespeed);
 	}
 
-	private synchronized void initFlowCapacityEventsArrays() {
-
-		this.aFlowCapacityTimes = new double [this.aFlowCapacityEvents];
-		this.aFlowCapacityValues = new double [this.aFlowCapacityEvents];
-		this.aFlowCapacityTimes[0] = Double.NEGATIVE_INFINITY;
-		double capacityPeriod = getCapacityPeriod();
-		this.aFlowCapacityValues[0] = this.capacity / capacityPeriod;
-
-		int numEvent = 0;
-		if (this.changeEvents != null) {
-			for (NetworkChangeEvent event : this.changeEvents.values()) {
-				ChangeValue value = event.getFlowCapacityChange();
-				if (value != null) {
-					if (value.getType() == NetworkChangeEvent.ChangeType.FACTOR) {
-						double currentValue = this.aFlowCapacityValues[numEvent];
-						this.aFlowCapacityValues[++numEvent] = currentValue * value.getValue();
-						this.aFlowCapacityTimes[numEvent] = event.getStartTime();
-					} else {
-						this.aFlowCapacityValues[++numEvent] = value.getValue();
-						this.aFlowCapacityTimes[numEvent] = event.getStartTime();
-					}
-				}
-			}
-		}
-
-		if (numEvent != this.aFlowCapacityEvents - 1) {
-			throw new RuntimeException("Expected number of change events (" + (this.aFlowCapacityEvents -1) + ") differs from the number of events found (" + numEvent + ")!");
-		}
-
+	private synchronized void recalcFlowCapacity() {
+	    double baseFlowCapacity = this.capacity / getCapacityPeriod();
+	    variableFlowCapacity.recalc(changeEvents, TimeVariantAttribute.FLOW_CAPACITY_GETTER, baseFlowCapacity);
 	}
 
-	private synchronized void initLanesEventsArrays() {
-
-		this.aLanesTimes = new double [this.aLanesEvents];
-		this.aLanesValues = new double [this.aLanesEvents];
-		this.aLanesTimes[0] = Double.NEGATIVE_INFINITY;
-		this.aLanesValues[0] = this.nofLanes;
-
-		int numEvent = 0;
-		if (this.changeEvents != null) {
-			for (NetworkChangeEvent event : this.changeEvents.values()) {
-				ChangeValue value = event.getLanesChange();
-				if (value != null) {
-					if (value.getType() == NetworkChangeEvent.ChangeType.FACTOR) {
-						double currentValue = this.aLanesValues[numEvent];
-						this.aLanesValues[++numEvent] = currentValue * value.getValue();
-						this.aLanesTimes[numEvent] = event.getStartTime();
-					} else {
-						this.aLanesValues[++numEvent] = value.getValue();
-						this.aLanesTimes[numEvent] = event.getStartTime();
-					}
-				}
-			}
-		}
-
-		if (numEvent != this.aLanesEvents - 1) {
-			throw new RuntimeException("Expected number of change events (" + (this.aLanesEvents -1) + ") differs from the number of events found (" + numEvent + ")!");
-		}
-
+	private synchronized void recalcLanes() {
+		variableLanes.recalc(changeEvents, TimeVariantAttribute.LANES_GETTER, nofLanes);
 	}
-
 }
 

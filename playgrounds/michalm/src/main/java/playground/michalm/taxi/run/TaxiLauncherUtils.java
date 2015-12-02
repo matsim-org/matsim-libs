@@ -49,23 +49,6 @@ public class TaxiLauncherUtils
     }
 
 
-    public static TimeDiscretizer getTimeDiscretizer(Scenario scenario,
-            TravelTimeSource ttimeSource, TravelDisutilitySource tdisSource)
-    {
-        if (tdisSource == TravelDisutilitySource.DISTANCE) {
-            return TimeDiscretizer.CYCLIC_24_HOURS;
-        }
-
-        //else if TravelDisutilitySource.Time:
-        if (ttimeSource == TravelTimeSource.FREE_FLOW_SPEED && //
-                !scenario.getConfig().network().isTimeVariantNetwork()) {
-            return TimeDiscretizer.CYCLIC_24_HOURS;
-        }
-
-        return TimeDiscretizer.CYCLIC_15_MIN;
-    }
-
-
     public static void initChargersAndVehicles(ETaxiData taxiData)
     {
         // TODO reduce charging speed in winter

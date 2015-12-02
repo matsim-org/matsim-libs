@@ -131,7 +131,7 @@ import playground.michalm.util.MovingAgentsRegister;
         writeSimEvents = true;
         waitList = new ArrayList<String>();
 
-        scenario = VrpLauncherUtils.initScenario(netFileName, plansFileName, changeEventsFilename);
+        scenario = VrpLauncherUtils.initScenario(netFileName, plansFileName, changeEventsFilename, 30);
 
         //        List<String> taxiCustomerIds;
         //        taxiCustomerIds = ODDemandGenerator.readTaxiCustomerIds(taxiCustomersFileName);
@@ -180,7 +180,7 @@ import playground.michalm.util.MovingAgentsRegister;
 
         double pickupDuration = 120;
         double dropoffDuration = 60;
-        TaxiSchedulerParams params = new TaxiSchedulerParams(false, false, pickupDuration, dropoffDuration);
+        TaxiSchedulerParams params = new TaxiSchedulerParams(false, false, pickupDuration, dropoffDuration, 1);
 
         NOSRankTaxiOptimizer optimizer = NOSRankTaxiOptimizer.createNOSRankTaxiOptimizer(context,
                 params,travelTime , travelDisutility, dirName);

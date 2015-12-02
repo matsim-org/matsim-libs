@@ -39,7 +39,7 @@ public class TimeVariantLinkImplTest extends MatsimTestCase {
 	public void testGetFreespeedTravelTime(){
 		final NetworkImpl network = NetworkImpl.createNetwork();
 		NetworkFactoryImpl nf = new NetworkFactoryImpl(network);
-		nf.setLinkFactory(new TimeVariantLinkFactory());
+		nf.setLinkFactory(new VariableIntervalTimeVariantLinkFactory());
 		network.setFactory(nf);
 		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new Coord((double) 0, (double) 0));
 		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new Coord((double) 0, (double) 1000));
@@ -76,7 +76,7 @@ public class TimeVariantLinkImplTest extends MatsimTestCase {
 	public void testFreespeedChangeAbsolute() {
 		final NetworkImpl network = NetworkImpl.createNetwork();
 		NetworkFactoryImpl nf = new NetworkFactoryImpl(network);
-		nf.setLinkFactory(new TimeVariantLinkFactory());
+		nf.setLinkFactory(new VariableIntervalTimeVariantLinkFactory());
 		network.setFactory(nf);
 
 		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new Coord((double) 0, (double) 0));
@@ -117,7 +117,7 @@ public class TimeVariantLinkImplTest extends MatsimTestCase {
 	public void testFreespeedChangeRelative() {
 		final NetworkImpl network = NetworkImpl.createNetwork();
 		NetworkFactoryImpl nf = new NetworkFactoryImpl(network);
-		nf.setLinkFactory(new TimeVariantLinkFactory());
+		nf.setLinkFactory(new VariableIntervalTimeVariantLinkFactory());
 		network.setFactory(nf);
 
 		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new Coord((double) 0, (double) 0));
@@ -158,7 +158,7 @@ public class TimeVariantLinkImplTest extends MatsimTestCase {
 	public void testMultipleFreespeedChanges() {
 		final NetworkImpl network = NetworkImpl.createNetwork();
 		NetworkFactoryImpl nf = new NetworkFactoryImpl(network);
-		nf.setLinkFactory(new TimeVariantLinkFactory());
+		nf.setLinkFactory(new VariableIntervalTimeVariantLinkFactory());
 		network.setFactory(nf);
 
 		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new Coord((double) 0, (double) 0));
@@ -253,7 +253,7 @@ public class TimeVariantLinkImplTest extends MatsimTestCase {
 	public void testFlowCapChangeAbsolute() {
 		final NetworkImpl network = NetworkImpl.createNetwork();
 		NetworkFactoryImpl nf = new NetworkFactoryImpl(network);
-		nf.setLinkFactory(new TimeVariantLinkFactory());
+		nf.setLinkFactory(new VariableIntervalTimeVariantLinkFactory());
 		network.setFactory(nf);
 		network.setCapacityPeriod(3600.0);
 
@@ -288,7 +288,7 @@ public class TimeVariantLinkImplTest extends MatsimTestCase {
 	public void testLanesChangeAbsolute() {
 		final NetworkImpl network = NetworkImpl.createNetwork();
 		NetworkFactoryImpl nf = new NetworkFactoryImpl(network);
-		nf.setLinkFactory(new TimeVariantLinkFactory());
+		nf.setLinkFactory(new VariableIntervalTimeVariantLinkFactory());
 		network.setFactory(nf);
 		network.setCapacityPeriod(3600.0);
 

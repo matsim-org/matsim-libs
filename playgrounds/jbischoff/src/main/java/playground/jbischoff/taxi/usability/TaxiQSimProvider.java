@@ -101,7 +101,7 @@ public class TaxiQSimProvider
         TravelDisutility travelDisutility = new DistanceAsTravelDisutility();
 
         TaxiSchedulerParams params = new TaxiSchedulerParams(tcg.isDestinationKnown(),
-                tcg.isVehicleDiversion(), tcg.getPickupDuration(), tcg.getDropoffDuration());
+                tcg.isVehicleDiversion(), tcg.getPickupDuration(), tcg.getDropoffDuration(), 1);
 
         resetSchedules(context.getVrpData().getVehicles().values());
 

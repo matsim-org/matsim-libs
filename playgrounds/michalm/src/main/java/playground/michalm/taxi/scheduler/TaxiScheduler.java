@@ -54,7 +54,6 @@ public class TaxiScheduler
         this.params = params;
         this.travelTime = travelTime;
 
-        //TODO FreeSpeedTravelDisutility?
         PreProcessEuclidean preProcessEuclidean = new PreProcessEuclidean(travelDisutility);
         preProcessEuclidean.run(context.getScenario().getNetwork());
         
@@ -63,7 +62,7 @@ public class TaxiScheduler
                 .createRoutingNetwork(context.getScenario().getNetwork());
 
         router = new FastAStarEuclidean(routingNetwork, preProcessEuclidean, travelDisutility,
-                travelTime, 1.5, fastRouterFactory);
+                travelTime, params.AStarEuclideanOverdoFactor, fastRouterFactory);
 
         for (Vehicle veh : context.getVrpData().getVehicles().values()) {
             Schedule<TaxiTask> schedule = TaxiSchedules.asTaxiSchedule(veh.getSchedule());

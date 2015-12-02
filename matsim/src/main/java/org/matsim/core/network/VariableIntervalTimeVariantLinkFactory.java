@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 
-public class TimeVariantLinkFactory implements LinkFactory {
+public class VariableIntervalTimeVariantLinkFactory implements LinkFactory {
 
 	@Override
 	public Link createLink(Id<Link> id, Node from, Node to, Network network, double length, double freespeed,

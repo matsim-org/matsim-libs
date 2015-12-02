@@ -25,14 +25,15 @@ public class TaxiSchedulerParams
     public final boolean vehicleDiversion;
     public final double pickupDuration;
     public final double dropoffDuration;
-
+    public final double AStarEuclideanOverdoFactor;
 
     public TaxiSchedulerParams(boolean destinationKnown, boolean vehicleDiversion,
-            double pickupDuration, double dropoffDuration)
+            double pickupDuration, double dropoffDuration, double AStarEuclideanOverdoFactor)
     {
         this.destinationKnown = destinationKnown;
         this.vehicleDiversion = vehicleDiversion;
         this.pickupDuration = pickupDuration;
         this.dropoffDuration = dropoffDuration;
+        this.AStarEuclideanOverdoFactor = AStarEuclideanOverdoFactor;
     }
 }
