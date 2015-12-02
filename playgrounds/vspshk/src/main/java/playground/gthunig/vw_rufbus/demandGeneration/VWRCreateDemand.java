@@ -114,7 +114,7 @@ public class VWRCreateDemand {
 		// String basedir = "C:/Users/Gabriel/Desktop/VSP/SVN
 		// VSP/shared-svn/projects/vw_rufbus/scenario/network/generation/";
 		String basedir = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/network/generation/";
-		String network = "../network_nopt.xml";
+		String network = "../versions/network_nopt.xml";
 		String counties = "landkreise/landkreise.shp";
 		String commercial = "landuse/commercial.shp";
 		String industrial = "landuse/industrial.shp";
@@ -127,12 +127,12 @@ public class VWRCreateDemand {
 		
 		String wb = "zones/wb.shp";
 //		double scalefactor = 0.05;
-		double scalefactor = 0.1;
-//		double scalefactor = 1.0;
+//		double scalefactor = 0.1;
+		double scalefactor = 1.0;
 //		double scalefactor = 0.01;
 		String plansOutputComplete = basedir + "../../input/initial_plans"+scalefactor+".xml.gz";
 		String objectAttributesFile = basedir + "../../input/initial_plans_oA"+scalefactor+".xml.gz";
-		String transitSchedule = basedir+"../pt/output_transitschedule.xml.gz";
+		String transitSchedule = basedir+"../../input/transitschedule.xml";
 		VWRConfig config = new VWRConfig(basedir, network, counties, commercial, industrial, residential, retail,
 				schools, universities, plansOutputComplete, scalefactor,transitSchedule,objectAttributesFile,bs,bsb,wb);
 
@@ -739,7 +739,7 @@ public class VWRCreateDemand {
 			Coord coord3 = scenario.getNetwork().getLinks().get(calcVWWorkLinkId()).getCoord();
 			Activity shift1 = scenario.getPopulation().getFactory().createActivityFromCoord("work_vw_shift1",
 					coord3);
-			shift1.setEndTime(13 * 60 * 60 + 40 * 60);
+			shift1.setEndTime(14 * 60 * 60 + 5 * 60);
 			plan.addActivity(shift1);
 			if ( additionalTrips == 1 || additionalTrips == 3){
 				enrichPlanBySingleLegAndActivity(coord3, plan,mode, 4800, false);
@@ -780,7 +780,7 @@ public class VWRCreateDemand {
 			Coord coord = scenario.getNetwork().getLinks().get(calcVWWorkLinkId()).getCoord();
 			Activity shift2 = scenario.getPopulation().getFactory().createActivityFromCoord("work_vw_shift2",
 					coord);
-			shift2.setEndTime(21 * 60 * 60 + 40 * 60);
+			shift2.setEndTime(22 * 60 * 60 + 5 * 60);
 			plan.addActivity(shift2);
 			
 			returnTrip = scenario.getPopulation().getFactory().createLeg(mode);
@@ -795,7 +795,7 @@ public class VWRCreateDemand {
 			Coord coord2 = scenario.getNetwork().getLinks().get(workLink).getCoord();
 			Activity shift3 = scenario.getPopulation().getFactory().createActivityFromCoord("work_vw_shift3",coord2
 					);
-			shift3.setEndTime(5 * 60 * 60 + 40 * 60);
+			shift3.setEndTime(6 * 60 * 60 + 5 * 60);
 			plan.addActivity(shift3);
 			
 			if ( additionalTrips == 1 || additionalTrips == 3){

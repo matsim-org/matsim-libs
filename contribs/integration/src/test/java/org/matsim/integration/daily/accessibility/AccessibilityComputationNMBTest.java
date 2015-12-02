@@ -3,6 +3,7 @@ package org.matsim.integration.daily.accessibility;
 import static org.junit.Assert.assertNotNull;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,13 +38,15 @@ import org.matsim.testcases.MatsimTestUtils;
 public class AccessibilityComputationNMBTest {
 	public static final Logger log = Logger.getLogger( AccessibilityComputationNMBTest.class ) ;
 
-	private static final double cellSize = 1000.;
+//	private static final double cellSize = 1000.;
+	private static final double cellSize = 10000.;
 
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
 
 
 	@Test
 	public void doAccessibilityTest() throws IOException {
+//		public static void main( String[] args ) {
 //		String folderStructure = "../../../"; // local on dz's computer
 		String folderStructure = "../../"; // server
 			
@@ -160,6 +163,15 @@ public class AccessibilityComputationNMBTest {
 		
 		Controler controler = new Controler(scenario) ;
 
+		final GeoserverUpdater geoserverUpdater = new GeoserverUpdater(crs, name);
+		geoserverUpdater.addAdditionalFacilityData(homes) ; 
+
+		List<Modes4Accessibility> modes = new ArrayList<>() ;
+		modes.add( Modes4Accessibility.freeSpeed ) ;
+		modes.add( Modes4Accessibility.car ) ;
+		modes.add( Modes4Accessibility.walk ) ;
+		modes.add( Modes4Accessibility.bike ) ;
+		modes.add( Modes4Accessibility.pt ) ;
 		
 		// loop over activity types to add one GridBasedAccessibilityControlerListenerV3 for each combination
 		for ( String actType : activityTypes ) {
@@ -171,6 +183,8 @@ public class AccessibilityComputationNMBTest {
 			ActivityFacilities opportunities = AccessibilityRunUtils.collectActivityFacilitiesOfType(scenario, actType);
 
 			activityFacilitiesMap.put(actType, opportunities);
+			
+			
 
 			GridBasedAccessibilityControlerListenerV3 listener = 
 					new GridBasedAccessibilityControlerListenerV3(activityFacilitiesMap.get(actType), 
@@ -180,6 +194,7 @@ public class AccessibilityComputationNMBTest {
 			listener.setComputingAccessibilityForMode(Modes4Accessibility.walk, true);
 			listener.setComputingAccessibilityForMode(Modes4Accessibility.bike, true);
 			listener.setComputingAccessibilityForMode(Modes4Accessibility.pt, true);
+			// yyyy replace by "set .... ModeS( modes ) " 
 			
 			listener.addAdditionalFacilityData(homes) ;
 			listener.generateGridsAndMeasuringPointsByNetwork(cellSize);
@@ -187,7 +202,7 @@ public class AccessibilityComputationNMBTest {
 			listener.writeToSubdirectoryWithName(actType);
 			
 			// for push to geoserver
-			listener.addSpatialGridDataExchangeListener(new GeoserverUpdater(crs, name));
+			listener.addFacilityDataExchangeListener(geoserverUpdater);
 			
 			listener.setUrbansimMode(false); // avoid writing some (eventually: all) files that related to matsim4urbansim
 
@@ -195,6 +210,8 @@ public class AccessibilityComputationNMBTest {
 		}
 
 		controler.run();
+		
+		geoserverUpdater.setAndProcessSpatialGrids( modes ) ;
 
 		
 		if (createQGisOutput == true) {

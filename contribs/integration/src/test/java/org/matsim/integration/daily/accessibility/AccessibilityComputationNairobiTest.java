@@ -175,7 +175,7 @@ public class AccessibilityComputationNairobiTest {
 			listener.writeToSubdirectoryWithName(actType);
 			
 			// for push to geoserver
-			listener.addSpatialGridDataExchangeListener(new GeoserverUpdater(crs, name));
+			listener.addFacilityDataExchangeListener(new GeoserverUpdater(crs, name));
 			
 			listener.setUrbansimMode(false); // avoid writing some (eventually: all) files that related to matsim4urbansim
 

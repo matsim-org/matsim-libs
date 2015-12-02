@@ -105,6 +105,7 @@ public class CreateAutomatedFDTest {
 				{LinkDynamics.FIFO, TrafficDynamics.withHoles}, 
 				{LinkDynamics.PassingQ,TrafficDynamics.queue},
 				{LinkDynamics.PassingQ,TrafficDynamics.withHoles},
+				{LinkDynamics.SeepageQ,TrafficDynamics.queue},
 				{LinkDynamics.SeepageQ,TrafficDynamics.withHoles}
 		};
 		return Arrays.asList(fdData);
