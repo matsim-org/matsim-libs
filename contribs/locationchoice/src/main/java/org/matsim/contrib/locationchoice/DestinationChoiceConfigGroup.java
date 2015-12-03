@@ -31,7 +31,7 @@ public class DestinationChoiceConfigGroup extends ConfigGroup {
 	public enum Algotype { random, bestResponse, localSearchRecursive, localSearchSingleAct };
 	public enum EpsilonDistributionTypes { gumbel, gaussian };
 	public enum InternalPlanDataStructure { planImpl, lcPlan };
-	public enum ApproximationLevel { COMPLETE_ROUTING, LOCAL_ROUTING, NO_ROUTING }
+	public enum ApproximationLevel {completeRouting, localRouting, noRouting}
 
 	public static final String GROUP_NAME = "locationchoice";
 	
@@ -103,7 +103,7 @@ public class DestinationChoiceConfigGroup extends ConfigGroup {
 	private String flexible_types = "null";	// TODO !!
 	
 	private Algotype algorithm = Algotype.bestResponse;
-	private ApproximationLevel tt_approximationLevel = ApproximationLevel.LOCAL_ROUTING;
+	private ApproximationLevel tt_approximationLevel = ApproximationLevel.localRouting;
 	private double maxDistanceDCScore = -1.0;
 	private String planSelector = "SelectExpBeta";
 	
@@ -356,13 +356,13 @@ public class DestinationChoiceConfigGroup extends ConfigGroup {
 			// backward compatibility
 			switch ( value ) {
 				case "0":
-					this.setTravelTimeApproximationLevel( ApproximationLevel.COMPLETE_ROUTING );
+					this.setTravelTimeApproximationLevel( ApproximationLevel.completeRouting );
 					break;
 				case "1":
-					this.setTravelTimeApproximationLevel( ApproximationLevel.LOCAL_ROUTING );
+					this.setTravelTimeApproximationLevel( ApproximationLevel.localRouting );
 					break;
 				case "2":
-					this.setTravelTimeApproximationLevel( ApproximationLevel.NO_ROUTING );
+					this.setTravelTimeApproximationLevel( ApproximationLevel.noRouting );
 					break;
 				default:
 					this.setTravelTimeApproximationLevel( ApproximationLevel.valueOf( value ) );

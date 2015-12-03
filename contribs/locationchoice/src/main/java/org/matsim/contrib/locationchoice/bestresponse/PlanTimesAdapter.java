@@ -86,9 +86,9 @@ public class PlanTimesAdapter {
 	 * - Adapt activities and legs in planTmp: times and routes
 	 * 
 	 * ApproximationLevel:
-	 * 	- COMPLETE_ROUTING: calculate route for EACH leg
-	 * 	- LOCAL_ROUTING: calculate new routes from and to the adapted activity, take other route information from existing leg
-	 * 	- NO_ROUTING: same as LOCAL_ROUTING but with estimated travel times for the calculated routes
+	 * 	- completeRouting: calculate route for EACH leg
+	 * 	- localRouting: calculate new routes from and to the adapted activity, take other route information from existing leg
+	 * 	- noRouting: same as localRouting but with estimated travel times for the calculated routes
 	 * 
 	 */
 	/* package */ double adaptTimesAndScorePlan(
@@ -209,22 +209,22 @@ public class PlanTimesAdapter {
 		final String mode = previousLeg.getMode();
 
 		switch ( this.approximationLevel ) {
-			case COMPLETE_ROUTING:
+			case completeRouting:
 				return computeTravelTimeFromCompleteRouting(
 						plan.getPerson(),
 						previousActivity,
 						act,
 						mode);
-			case NO_ROUTING:
+			case noRouting:
 				// Yes, those two are doing the same. I passed some time to simplify the (rather convoluted) code,
 				// and it boiled down to this. No idea of since how long this is not doing what it is claiming to do...
-				// The only difference is that "NO_ROUTING" was getting travel times from the route for car if it exists
+				// The only difference is that "noRouting" was getting travel times from the route for car if it exists
 				// td dec 15
 				if ( mode.equals( TransportMode.car ) && previousLeg.getTravelTime() != Time.UNDEFINED_TIME ) {
 					return Collections.singletonList( previousLeg );
 				}
 				// fall through to local routing if not car or previous travel time not found
-			case LOCAL_ROUTING:
+			case localRouting:
 				return getTravelTimeApproximation(
 						previousActivity,
 						act,

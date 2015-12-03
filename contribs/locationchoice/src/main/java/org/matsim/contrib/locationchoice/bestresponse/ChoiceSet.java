@@ -227,8 +227,8 @@ public class ChoiceSet {
 		// currently handled activity which should be re-located
 		Activity act = (Activity) plan.getPlanElements().get(actlegIndex);
 		
-		// We need to calculate the multi node dijkstra stuff only in case LOCAL_ROUTING is used.
-		if (this.approximationLevel == DestinationChoiceConfigGroup.ApproximationLevel.LOCAL_ROUTING) {
+		// We need to calculate the multi node dijkstra stuff only in case localRouting is used.
+		if (this.approximationLevel == DestinationChoiceConfigGroup.ApproximationLevel.localRouting ) {
 			Node fromNode;
 			/*
 			 * Assuming that both, forward and backward Dijkstra, route to the end nodes of links where

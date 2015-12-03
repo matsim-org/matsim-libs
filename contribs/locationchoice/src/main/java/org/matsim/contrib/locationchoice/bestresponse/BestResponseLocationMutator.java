@@ -302,7 +302,7 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 						planTmp,
 						scoringFunction,
 						this.getTripRouter(),
-						DestinationChoiceConfigGroup.ApproximationLevel.COMPLETE_ROUTING);
+						DestinationChoiceConfigGroup.ApproximationLevel.completeRouting );
 
 		PlanUtils.copyPlanFieldsToFrom(plan, planTmp);	// copy( to, from )
 		return score;
