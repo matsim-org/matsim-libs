@@ -54,6 +54,8 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 import playground.jbischoff.taxibus.run.configuration.ConfigBasedTaxibusLaunchUtils;
 import playground.jbischoff.taxibus.run.configuration.TaxibusConfigGroup;
+import playground.jbischoff.taxibus.scenario.analysis.quick.TTEventHandler;
+import playground.jbischoff.taxibus.scenario.analysis.quick.TaxiBusTravelTimesAnalyzer;
 
 /**
  * @author jbischoff
@@ -90,8 +92,13 @@ public class KNTaxibusExample {
 //				return sum ;
 //			}
 //		});
-
+		TaxiBusTravelTimesAnalyzer a = new TaxiBusTravelTimesAnalyzer();
+		TTEventHandler b = new TTEventHandler();
+		controler.getEvents().addHandler(a);
+		controler.getEvents().addHandler(b);
 		controler.run();
+		a.printOutput();
+		b.printOutput();
 	}
 
 	static class MyLegScoring implements org.matsim.core.scoring.SumScoringFunction.LegScoring, org.matsim.core.scoring.SumScoringFunction.ArbitraryEventScoring {

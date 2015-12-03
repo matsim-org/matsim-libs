@@ -281,7 +281,7 @@ import java.util.concurrent.ConcurrentHashMap;
 		// ========================================================================
 		// go through all nodes (keys) that have a measuring point (origin) assigned
 		for ( Id<Node> nodeId : aggregatedOrigins.keySet() ) {
-
+			
 			bar.update();
 
 			Node fromNode = scenario.getNetwork().getNodes().get( nodeId );
@@ -293,7 +293,7 @@ import java.util.concurrent.ConcurrentHashMap;
 			// get list with origins that are assigned to "fromNode"
 			for ( ActivityFacility origin : aggregatedOrigins.get( nodeId ) ) {
 				assert( origin.getCoord() != null );
-
+				
 				for (SumOfExpUtils gc : gcs) {
 					gc.reset();
 				}
@@ -328,6 +328,7 @@ import java.util.concurrent.ConcurrentHashMap;
 					//log.info("here");
 					zoneDataExchangeInterface.setFacilityAccessibilities(origin, departureTime, accessibilities);
 				}
+
 			}
 
 		}

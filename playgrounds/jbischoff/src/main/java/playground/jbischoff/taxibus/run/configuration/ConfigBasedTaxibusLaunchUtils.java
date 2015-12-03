@@ -26,9 +26,9 @@ import org.matsim.contrib.dvrp.run.VrpLauncherUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 
-import playground.jbischoff.taxibus.sim.TaxibusQSimProvider;
-import playground.jbischoff.taxibus.sim.TaxibusServiceRoutingModule;
-import playground.jbischoff.taxibus.sim.TaxibusTripRouterFactory;
+import playground.jbischoff.taxibus.run.sim.TaxibusQSimProvider;
+import playground.jbischoff.taxibus.run.sim.TaxibusServiceRoutingModule;
+import playground.jbischoff.taxibus.run.sim.TaxibusTripRouterFactory;
 
 /**
  * @author jbischoff

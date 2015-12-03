@@ -21,6 +21,7 @@ package playground.jbischoff.av.preparation;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -40,6 +41,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PopulationWriter;
@@ -76,7 +78,7 @@ public class CarEventsToTaxiPlans {
 		MatsimEventsReader reader = new MatsimEventsReader(events);
 //		reader.readFile("C:/Users/Joschka/Documents/runs-svn/bvg.run192.100pct/ITERS/it.100/bvg.run192.100pct.100.events.xml.gz");
 		reader.readFile("C:/Users/Joschka/Documents/runs-svn/bvg.run189.10pct/ITERS/it.100/bvg.run189.10pct.100.events.filtered.xml.gz");
-		new PopulationWriter(ch.population).write("C:/Users/Joschka/Documents/shared-svn/projects/audi_av/scenario/plansWithCars0.10.xml.gz");
+		new PopulationWriter(ch.population).write("C:/Users/Joschka/Documents/shared-svn/projects/audi_av/scenario/subscenarios/tenpercentpt/plansWithCars0.10.xml.gz");
 	}
 	
 }
@@ -87,7 +89,7 @@ class ConverterEventHandler implements PersonDepartureEventHandler, PersonArriva
 	NetworkImpl network;
 	Network oldNetwork;
 	CoordinateTransformation dest = TransformationFactory.getCoordinateTransformation(TransformationFactory.DHDN_GK4,"EPSG:25833");
-
+	Random rand = MatsimRandom.getRandom();
 	Map<Id<Person>, Tuple<Id<Link>, Double>> departures = new HashMap<>();
 	int i = 0;
 	private Geometry shape;
@@ -116,6 +118,14 @@ class ConverterEventHandler implements PersonDepartureEventHandler, PersonArriva
 			Tuple<Id<Link>, Double> t = departures.remove(event.getPersonId());
 			if (t == null) {
 				System.err.println("arrival without departure?");
+				return;
+			}
+			createAndAddPerson(t.getFirst(), t.getSecond(), event.getLinkId(), event.getTime());
+		}
+		
+		if (event.getLegMode().equals("pt")) {
+			Tuple<Id<Link>, Double> t = departures.remove(event.getPersonId());
+			if (t == null) {
 				return;
 			}
 			createAndAddPerson(t.getFirst(), t.getSecond(), event.getLinkId(), event.getTime());
@@ -170,6 +180,10 @@ class ConverterEventHandler implements PersonDepartureEventHandler, PersonArriva
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
 		if (event.getLegMode().equals("car")) {
+			departures.put(event.getPersonId(), new Tuple<Id<Link>, Double>(event.getLinkId(), event.getTime()));
+
+		}
+		if (event.getLegMode().equals("pt")&&rand.nextDouble()<=.1) {
 			departures.put(event.getPersonId(), new Tuple<Id<Link>, Double>(event.getLinkId(), event.getTime()));
 
 		}

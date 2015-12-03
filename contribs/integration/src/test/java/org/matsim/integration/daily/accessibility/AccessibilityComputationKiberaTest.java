@@ -32,7 +32,7 @@ import org.matsim.testcases.MatsimTestUtils;
 public class AccessibilityComputationKiberaTest {
 	public static final Logger log = Logger.getLogger( AccessibilityComputationKiberaTest.class ) ;
 
-	private static final double cellSize = 100.;
+	private static final double cellSize = 25.;
 
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
 
@@ -139,7 +139,7 @@ public class AccessibilityComputationKiberaTest {
 			listener.writeToSubdirectoryWithName(actType);
 			
 			// for push to geoserver
-			listener.addSpatialGridDataExchangeListener(new GeoserverUpdater(crs, name));
+			listener.addFacilityDataExchangeListener(new GeoserverUpdater(crs, name));
 			
 			listener.setUrbansimMode(false); // avoid writing some (eventually: all) files that related to matsim4urbansim
 

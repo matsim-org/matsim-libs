@@ -31,6 +31,7 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
@@ -42,6 +43,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility.Builder;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 
@@ -163,7 +165,18 @@ public class VTTSspecificRouterTest {
 				
 		final String configFile1 = testUtils.getPackageInputDirectory() + "vttsSpecificRouter/configVTTS.xml";
 		final Controler controler = new Controler(configFile1);
-				
+			
+		// current default:
+//		final Builder factory = new Builder( TransportMode.car );
+//		factory.setSigma(0.0);
+//
+//		controler.addOverridingModule(new AbstractModule(){
+//			@Override
+//			public void install() {
+//				this.bindCarTravelDisutilityFactory().toInstance( factory );
+//			}
+//		});
+		
 		final Map<Id<Vehicle>, Set<Id<Link>>> vehicleId2linkIds = new HashMap<>();
 
 		controler.addControlerListener( new StartupListener() {
@@ -559,6 +572,7 @@ public class VTTSspecificRouterTest {
 		
 		
 		Id<Link> longDistanceShortTimeLinkId = Id.createLinkId("link_1_2");
+		Id<Link> shortDistanceLongTimeLinkId = Id.createLinkId("link_3_6");
 		
 		for (Id<Vehicle> id : vehicleId2linkIds.keySet()) {
 
@@ -566,14 +580,86 @@ public class VTTSspecificRouterTest {
 				
 				// the high VTTS person should use the fast but expensive route
 				Assert.assertEquals(true, vehicleId2linkIds.get(id).contains(longDistanceShortTimeLinkId));
-				
 			}
 			
 			if (id.toString().contains("lowVTTS")) {
 
-				// without randomness, the low VTTS person should use the slow but cheap route
-				// with randomness, the low VTTS person may also use the fast but expensive route...
+				// the low VTTS person should use the slow but cheap route
+				Assert.assertEquals(true, vehicleId2linkIds.get(id).contains(shortDistanceLongTimeLinkId));
+			}
+		}		
+	}
+	
+	
+	/**
+	 * Use the default router but set sigma to 3.0
+	 * 
+	 */
+	@Test
+	public final void test8(){
+				
+		final String configFile1 = testUtils.getPackageInputDirectory() + "vttsSpecificRouter/configVTTS.xml";
+		
+		
+		final Controler controler = new Controler(configFile1);
+
+		final Builder factory = new Builder( TransportMode.car );
+		factory.setSigma(3.0);
+
+		controler.addOverridingModule(new AbstractModule(){
+			@Override
+			public void install() {
+				this.bindCarTravelDisutilityFactory().toInstance( factory );
+			}
+		}); 	
+		
+		final Map<Id<Vehicle>, Set<Id<Link>>> vehicleId2linkIds = new HashMap<>();
+
+		controler.addControlerListener( new StartupListener() {
+
+			@Override
+			public void notifyStartup(StartupEvent event) {
+				event.getControler().getEvents().addHandler(new LinkLeaveEventHandler() {
+					
+					@Override
+					public void reset(int iteration) {
+						vehicleId2linkIds.clear();
+					}
+					
+					@Override
+					public void handleEvent(LinkLeaveEvent event) {
+						if (vehicleId2linkIds.containsKey(event.getVehicleId())) {
+							vehicleId2linkIds.get(event.getVehicleId()).add(event.getLinkId());
+						} else {
+							Set<Id<Link>> linkIds = new HashSet<Id<Link>>();
+							linkIds.add(event.getLinkId());
+							vehicleId2linkIds.put(event.getVehicleId(), linkIds);
+						}
+					}
+				});		
+			}		
+		});
+		
+		
+		controler.addOverridingModule(new OTFVisFileWriterModule());
+		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+		controler.run();
+		
+		Id<Link> longDistanceShortTimeLinkId = Id.createLinkId("link_1_2");
+		Id<Link> shortDistanceLongTimeLinkId = Id.createLinkId("link_3_6");
+		
+		for (Id<Vehicle> id : vehicleId2linkIds.keySet()) {
+
+			if (id.toString().contains("highVTTS")) {
+				
+				// the high VTTS person should use the fast but expensive route
 				Assert.assertEquals(true, vehicleId2linkIds.get(id).contains(longDistanceShortTimeLinkId));
+			}
+			
+			if (id.toString().contains("lowVTTS")) {
+
+				// the low VTTS person should use the slow but cheap route
+				Assert.assertEquals(true, vehicleId2linkIds.get(id).contains(shortDistanceLongTimeLinkId));
 			}
 		}		
 	}

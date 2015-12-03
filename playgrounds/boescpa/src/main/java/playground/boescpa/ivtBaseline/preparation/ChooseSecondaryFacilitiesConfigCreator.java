@@ -41,8 +41,8 @@ public class ChooseSecondaryFacilitiesConfigCreator extends IVTConfigCreator {
 		Config config = ConfigUtils.createConfig(new DestinationChoiceConfigGroup());
 		new ChooseSecondaryFacilitiesConfigCreator().makeConfigIVT(config, prctScenario);
 
-		//
-		config.setParam("controler", "lastIteration", "0");
+		// Reduce to one replanning phase
+		config.setParam("controler", "lastIteration", "1");
 
 		// Set location choice activities
 		config.setParam("locationchoice", "flexible_types", "remote_work, leisure, shop, escort_kids, escort_other");
