@@ -48,7 +48,7 @@ import java.util.Map;
  *
  * @author boescpa
  */
-public class TripAnalyzer implements ScenarioAnalyzerEventHandler, PersonDepartureEventHandler, PersonArrivalEventHandler,
+public class TripAnalyzer extends ScenarioAnalyzerEventHandler implements PersonDepartureEventHandler, PersonArrivalEventHandler,
 		ActivityStartEventHandler, PersonStuckEventHandler, LinkLeaveEventHandler {
 
 	private final TripEventHandler tripHandler;
@@ -198,7 +198,7 @@ public class TripAnalyzer implements ScenarioAnalyzerEventHandler, PersonDepartu
         }
         // finish the last activities of all agents with last trip.starttime < ANALYSIS_END_TIME
         for (Id<Person> agentId : agentCurrentActStartTime.keySet()) {
-            if (agentCurrentActStartTime.get(agentId) < ANALYSIS_END_TIME) {
+            if (agentCurrentActStartTime.get(agentId) < ANALYSIS_END_TIME && agentCurrentActPurpose.get(agentId) != null) {
                 actVals = getActivity(agentCurrentActPurpose.get(agentId));
                 actVals.numberOfActivities++;
                 actVals.actDurations.add(ANALYSIS_END_TIME - agentCurrentActStartTime.get(agentId));

@@ -30,6 +30,8 @@ import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.vehicles.VehicleType;
 
+import playground.agarwalamit.utils.ListUtils;
+
 /**
  * @author amit after ssix
  */ 
@@ -56,7 +58,7 @@ class TravelModesFlowDynamicsUpdator {
 	private List<Double> speedTable;
 	private Double flowTime;
 	private List<Double> flowTable900;
-	private List<Double> lastXFlows900;;//recording a number of flows to ensure stability
+	private List<Double> lastXHourlyFlows;;//recording a number of flows to ensure stability
 	private boolean speedStability;
 	private boolean flowStability;
 
@@ -122,9 +124,9 @@ class TravelModesFlowDynamicsUpdator {
 	private void updateLastXFlows900(){
 		Double nowFlow = new Double(this.getCurrentHourlyFlow());
 		for (int i=NUMBER_OF_MEMORIZED_FLOWS-2; i>=0; i--){
-			this.lastXFlows900.set(i+1, this.lastXFlows900.get(i).doubleValue());
+			this.lastXHourlyFlows.set(i+1, this.lastXHourlyFlows.get(i).doubleValue());
 		}
-		this.lastXFlows900.set(0, nowFlow);
+		this.lastXHourlyFlows.set(0, nowFlow);
 	}
 
 	void updateSpeedTable(double nowTime, Id<Person> personId){
@@ -144,11 +146,7 @@ class TravelModesFlowDynamicsUpdator {
 
 	void checkSpeedStability(){
 		double relativeDeviances = 0.;
-		double averageSpeed = 0;
-		for (int i=0; i<this.speedTableSize; i++){
-			averageSpeed += this.speedTable.get(i).doubleValue();
-		}
-		averageSpeed /= this.speedTableSize;
+		double averageSpeed = ListUtils.doubleMean(this.speedTable);
 		for (int i=0; i<this.speedTableSize; i++){
 			relativeDeviances += Math.pow( ( (this.speedTable.get(i).doubleValue() - averageSpeed) / averageSpeed) , 2);
 		}
@@ -162,7 +160,7 @@ class TravelModesFlowDynamicsUpdator {
 	}
 
 	void checkFlowStability900(){
-		double absoluteDeviances = this.lastXFlows900.get(this.lastXFlows900.size()-1) - this.lastXFlows900.get(0);
+		double absoluteDeviances = this.lastXHourlyFlows.get(this.lastXHourlyFlows.size()-1) - this.lastXHourlyFlows.get(0);
 		if (Math.abs(absoluteDeviances) < 1){
 			this.flowStability = true;
 			if(modeId==null) GenerateFundamentalDiagramData.LOG.info("========== Reaching a certain flow stability for global flow.");
@@ -185,9 +183,9 @@ class TravelModesFlowDynamicsUpdator {
 
 		flowTableReset();
 
-		this.lastXFlows900 = new LinkedList<Double>();
+		this.lastXHourlyFlows = new LinkedList<Double>();
 		for (int i=0; i<NUMBER_OF_MEMORIZED_FLOWS; i++){
-			this.lastXFlows900.add(0.);
+			this.lastXHourlyFlows.add(0.);
 		}
 		this.speedStability = false;
 		this.flowStability = false;
@@ -226,12 +224,10 @@ class TravelModesFlowDynamicsUpdator {
 		this.permanentDensity = this.numberOfAgents / (InputsForFDTestSetUp.LINK_LENGTH*3) *1000 * this.vehicleType.getPcuEquivalents();
 		this.permanentAverageVelocity = this.getActualAverageVelocity();
 		GenerateFundamentalDiagramData.LOG.info("Calculated permanent Speed from "+modeId+"'s lastXSpeeds : "+speedTable+"\nResult is : "+this.permanentAverageVelocity);
-		this.permanentFlow = /*this.getActualFlow900();*///Done: Sliding average instead of taking just the last value (seen to be sometimes farther from the average than expected)
-				this.getSlidingAverageLastXFlows900();
-		GenerateFundamentalDiagramData.LOG.info("Calculated permanent Flow from "+modeId+"'s lastXFlows900 : "+lastXFlows900+"\nResult is :"+this.permanentFlow);	
+		this.permanentFlow = this.getSlidingAverageOfLastXHourlyFlows();
+		GenerateFundamentalDiagramData.LOG.info("Calculated permanent Flow from "+modeId+"'s lastXFlows900 : "+lastXHourlyFlows+"\nResult is :"+this.permanentFlow);	
 	}
 
-	//Getters/Setters
 	VehicleType getVehicleType(){
 		return this.vehicleType;
 	}
@@ -241,26 +237,16 @@ class TravelModesFlowDynamicsUpdator {
 	}
 
 	double getActualAverageVelocity(){
-		double nowSpeed = 0.;
-		for (int i=0; i<this.speedTableSize; i++){
-			nowSpeed += this.speedTable.get(i);
-		}
-		nowSpeed /= this.speedTableSize;
-		return nowSpeed;
+		return ListUtils.doubleMean(this.speedTable); 
 	}
 
 	double getCurrentHourlyFlow(){
-		double nowFlow = 0.;
-		for (int i=0; i<900; i++){
-			nowFlow += this.flowTable900.get(i);
-		}
+		double nowFlow = ListUtils.doubleSum(this.flowTable900);
 		return nowFlow*4;
 	}
 
-	double getSlidingAverageLastXFlows900(){
-		double average = 0;
-		for (double flow : this.lastXFlows900){ average += flow; }
-		return average / NUMBER_OF_MEMORIZED_FLOWS;
+	double getSlidingAverageOfLastXHourlyFlows(){
+		return ListUtils.doubleMean(this.lastXHourlyFlows);
 	}
 
 	boolean isSpeedStable(){

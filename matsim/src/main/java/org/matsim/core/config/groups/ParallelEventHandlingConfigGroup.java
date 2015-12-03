@@ -42,6 +42,9 @@ public final class ParallelEventHandlingConfigGroup extends ReflectiveConfigGrou
 	private final static String SYNCHRONIZE_ON_SIMSTEPS = "synchronizeOnSimSteps"; 
 	private Boolean synchronizeOnSimSteps = true;
 	
+	private final static String ONE_THREAD_PER_HANDLER = "oneThreadPerHandler"; 
+	private Boolean oneThreadPerHandler = false;
+	
 	private boolean locked = false;
 
 	public ParallelEventHandlingConfigGroup() {
@@ -53,6 +56,10 @@ public final class ParallelEventHandlingConfigGroup extends ReflectiveConfigGrou
 		Map<String, String> comments = super.getComments();
 		comments.put(NUMBER_OF_THREADS, NUMBER_OF_THREADS_COMMENT);
 		comments.put(ESTIMATED_NUMBER_OF_EVENTS, "Estimated number of events during mobsim run. An optional optimization hint for the framework.");
+		comments.put(SYNCHRONIZE_ON_SIMSTEPS, "If enabled, it is ensured that all events that are created during a time step of the mobility simulation are processed "
+				+ "before the next time step is simulated. E.g. neccessary when within-day replanning is used.");
+		comments.put(ONE_THREAD_PER_HANDLER, "If enabled, each event handler is assigned to its own thread. Note that enabling this feature disabled the " + NUMBER_OF_THREADS + " option! "
+				+ "This feature is still experimental!");
 		return comments;
 	}
 
@@ -106,8 +113,21 @@ public final class ParallelEventHandlingConfigGroup extends ReflectiveConfigGrou
 		}
 	}
 
+	@StringGetter( ONE_THREAD_PER_HANDLER )
+	public Boolean getOneThreadPerHandler() {
+		return this.oneThreadPerHandler;
+	}
+
+	@StringSetter( ONE_THREAD_PER_HANDLER )
+	public void setOneThreadPerHandler(Boolean oneThreadPerHandler) {
+		if ( !this.locked ) {
+			this.oneThreadPerHandler = oneThreadPerHandler;
+		} else {
+			throw new RuntimeException("it is too late in the control flow to modify this parameter");
+		}
+	}
+	
 	public void makeLocked() {
 		this.locked = true;
 	}
-
 }

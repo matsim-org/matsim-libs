@@ -21,6 +21,7 @@ package playground.kai.test.test4;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -37,6 +38,18 @@ class Main {
 	public static void main(String[] args) {
 		Config config = ConfigUtils.createConfig() ;
 		
+		String name = null ;
+
+		int lastIteration = 1000 ;
+		config.controler().setLastIteration(lastIteration);
+		StrategySettings stratSets = new StrategySettings() ;
+		stratSets.setStrategyName(name);
+		stratSets.setDisableAfter( (int)(0.8*lastIteration) );
+		config.strategy().addStrategySettings(stratSets);
+		
+		config.strategy().setFractionOfIterationsToDisableInnovation(0.8);
+		
+
 		Scenario scenario = ScenarioUtils.loadScenario(config) ;
 		
 		Controler controler = new Controler( scenario ) ;

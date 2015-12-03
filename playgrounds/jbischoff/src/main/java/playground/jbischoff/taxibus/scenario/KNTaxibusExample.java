@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.gbl.Gbl;
@@ -53,6 +54,8 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 import playground.jbischoff.taxibus.run.configuration.ConfigBasedTaxibusLaunchUtils;
 import playground.jbischoff.taxibus.run.configuration.TaxibusConfigGroup;
+import playground.jbischoff.taxibus.scenario.analysis.quick.TTEventHandler;
+import playground.jbischoff.taxibus.scenario.analysis.quick.TaxiBusTravelTimesAnalyzer;
 
 /**
  * @author jbischoff
@@ -64,7 +67,7 @@ public class KNTaxibusExample {
 
 		Config config = ConfigUtils.loadConfig("../../../shared-svn/projects/vw_rufbus/scenario/input/example/configVWTB.xml", new TaxibusConfigGroup());
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
-
+		config.qsim().setSnapshotStyle(SnapshotStyle.queue);
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		Controler controler = new Controler(scenario);
@@ -89,8 +92,13 @@ public class KNTaxibusExample {
 //				return sum ;
 //			}
 //		});
-
+		TaxiBusTravelTimesAnalyzer a = new TaxiBusTravelTimesAnalyzer();
+		TTEventHandler b = new TTEventHandler();
+		controler.getEvents().addHandler(a);
+		controler.getEvents().addHandler(b);
 		controler.run();
+		a.printOutput();
+		b.printOutput();
 	}
 
 	static class MyLegScoring implements org.matsim.core.scoring.SumScoringFunction.LegScoring, org.matsim.core.scoring.SumScoringFunction.ArbitraryEventScoring {

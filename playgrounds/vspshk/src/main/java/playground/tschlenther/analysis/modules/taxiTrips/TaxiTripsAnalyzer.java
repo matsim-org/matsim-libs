@@ -56,8 +56,8 @@ public class TaxiTripsAnalyzer extends AbstractAnalysisModule {
 		log.info("writing taxi customer stats to " + actualOutput);
 		this.customerHandler.writeCustomerStats(actualOutput);
 		
-		actualOutput = outputFolder + "/operatorStats";
-		log.info("writing operator stats to " + actualOutput);
+		actualOutput = outputFolder + "/V2operatorStats";
+		log.info("writing V2operator stats to " + actualOutput);
 		this.operatorHandler.writeTravelDistanceStatsToFiles(actualOutput);
 		
 		log.info("TaxiTripsAnalyzer finished writing output to " + outputFolder);

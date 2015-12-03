@@ -66,6 +66,7 @@ public class AnalyzeScenariosSHP_FullSwitzerland {
 				String path2EventFile = args[i];
 
 				// Analyze the events:
+                ScenarioAnalyzerEventHandler.setAnalysisEndTime(86400);
 				ScenarioAnalyzerEventHandler[] handlers = {
 						new AgentCounter(network),
 						new TripAnalyzer(network),

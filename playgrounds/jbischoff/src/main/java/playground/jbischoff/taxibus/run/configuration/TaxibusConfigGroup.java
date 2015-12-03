@@ -29,6 +29,8 @@ public class TaxibusConfigGroup extends ConfigGroup {
 	private static final String LINES= "linesFile";
 	private static final String ZONESSHP = "zonesShape";
 	private static final String ZONESXML= "zonesXML";
+
+	private static final String BALANCING = "balanceLines";
 	
 	
 	
@@ -58,6 +60,8 @@ public class TaxibusConfigGroup extends ConfigGroup {
 	private String linesFile = null;
 	private String zonesShpFile = null;
 	private String zonesXmlFile = null;
+	
+	private String balancingMethod = "return";
 
 	public TaxibusConfigGroup() {
 		super(GROUP_NAME);
@@ -101,6 +105,9 @@ public class TaxibusConfigGroup extends ConfigGroup {
 		}else if (LINES.equals(key)) {
 			this.linesFile = value;
 		}
+		else if (BALANCING.equals(key)) {
+			this.balancingMethod = value;
+		}
 		
 		
 		
@@ -128,6 +135,7 @@ public class TaxibusConfigGroup extends ConfigGroup {
 		map.put(LINES, linesFile);
 		map.put(ZONESSHP, zonesShpFile);
 		map.put(ZONESXML, zonesXmlFile);
+		map.put(BALANCING, balancingMethod);
 		return map;
 
 	}
@@ -140,7 +148,7 @@ public class TaxibusConfigGroup extends ConfigGroup {
 			map.put(TAXI_RANKS_FILE, "Taxi rank file; optional if you don't use ranks");
 			map.put(OUTPUT_DIRECTORY, "Output directory for taxi stats");
 			map.put(VEHICLE_CAPACITY, "taxicab vehicle capacity. Default = 4");
-			map.put(ALGORITHM, "Taxicab algorithm: Possible parameters are default, line, (...)");
+			map.put(ALGORITHM, "Taxibus algorithms: Possible parameters are default, line, multipleLine (...)");
 			
 			map.put(DESTINATION_KNOWN,"determines wether the destination known upon ordering a taxi. Works only with some algorithms" );
 			map.put(VEHICLE_DIVERSION, "can taxis be re-assigned en route to customer. Default: false. Works only with some algorithms");
@@ -151,6 +159,7 @@ public class TaxibusConfigGroup extends ConfigGroup {
 			map.put(ZONESSHP, "Zones shape file, if required by algorithm.");
 			map.put(ZONESXML, "Zones xml file, if required by algorithm.");
 			map.put(LINES, "Lines file, if required by algorithm. Uses zone IDs for reference");
+			map.put(BALANCING, "Balancing vehicles between line. Possible parameters: same (returns to same line), return (return line), balanced (balances between lines)");
 			
 			return map;
 	 }
@@ -211,4 +220,7 @@ public class TaxibusConfigGroup extends ConfigGroup {
 	public String getZonesXmlFile() {
 		return zonesXmlFile;
 	}
+	public String getBalancingMethod() {
+		return balancingMethod;
+	};
 }

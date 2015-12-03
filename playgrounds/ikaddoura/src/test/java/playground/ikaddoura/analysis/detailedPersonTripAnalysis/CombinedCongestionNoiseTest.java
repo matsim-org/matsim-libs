@@ -2,7 +2,6 @@ package playground.ikaddoura.analysis.detailedPersonTripAnalysis;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -24,7 +23,7 @@ import playground.tschlenther.createNetwork.ForkNetworkCreator;
 /**
  * @author gthunig, ikaddoura
  * 
- * This class tests the if the CNEventsReader is capable of reading both congestion- and noise-events of the same file. 
+ * This class tests if the CNEventsReader is capable of reading both congestion- and noise-events of the same file. 
  * A small events file is analyzed, and a scenario is created using the ForkNetworkCreator.
  * 
  */
@@ -37,33 +36,64 @@ public class CombinedCongestionNoiseTest {
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 	
 	/**
-	 * Scenario: 2 Persons
-	 *  1.Person: has 1 trip with causingDelay of 100 to person2
-	 *  2.Person: has 1 trip with affectedDelay of 100 from person1
+	 * Scenario: 3 Persons
+	 *  1.Person: is causing noise of 100 to person3 and congestion of 100 to person2
+	 *  2.Person: is causing noise of 100 to person3 and gets affected congestion of 100 by person1
+	 *  3.Person: has an affected amount of 200 noise by person1 and person2
 	 */
-	@Ignore
 	@Test
-	public void testSingleCongestion() {
+	public void testCombinedCongestionNoise() {
 		
-		String eventsFile = utils.getInputDirectory() + "testSingleCongestionEvents.xml";
+		String eventsFile = utils.getInputDirectory() + "testCombinedCongestionNoiseEvents.xml";
 		
-		Scenario scenario = createScenario(2);
+		Scenario scenario = createScenario(3);
 		CongestionAndNoiseHandler congestionAndNoiseHandler = analyseScenario(eventsFile, scenario);
 		
 		if (printResults) printResults(congestionAndNoiseHandler, scenario);
 		
+		// check congestion
+		
 		Assert.assertTrue("There should be a handled CongestionEvent!", congestionAndNoiseHandler.getCongestionHandler().isCaughtCongestionEvent());
-//		Assert.assertEquals("The totalDelay should be 100!", 100.0, congestionHandler.getTotalDelay(), MatsimTestUtils.EPSILON);
-//		
-//		Assert.assertEquals("There should be a causedDelay of 100 for person 0, trip 1!", 100.0, 
-//				congestionHandler.getPersonId2tripNumber2causedDelay().get(Id.create(0, Person.class)).get(1), MatsimTestUtils.EPSILON);
-//		Assert.assertNull("There should not be a affectedDelay for person 0, trip 1!", 
-//				congestionHandler.getPersonId2tripNumber2affectedDelay().get(Id.create(0, Person.class)));
-//		
-//		Assert.assertNull("There should not be a causedDelay for person 1, trip 1!", 
-//				congestionHandler.getPersonId2tripNumber2causedDelay().get(Id.create(1, Person.class)));
-//		Assert.assertEquals("There should be a affectedDelay of 100 for person 1, trip 1!", 100.0, 
-//				congestionHandler.getPersonId2tripNumber2affectedDelay().get(Id.create(1, Person.class)).get(1), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("The totalDelay should be 100!", 100.0, congestionAndNoiseHandler.getCongestionHandler().getTotalDelay(), MatsimTestUtils.EPSILON);
+		
+		Assert.assertEquals("There should be a causedDelay of 100 for person 0, trip 1!", 100.0, 
+				congestionAndNoiseHandler.getCongestionHandler().getPersonId2tripNumber2causedDelay().get(Id.create(0, Person.class)).get(1), MatsimTestUtils.EPSILON);
+		Assert.assertNull("There should not be a affectedDelay for person 0, trip 1!", 
+				congestionAndNoiseHandler.getCongestionHandler().getPersonId2tripNumber2affectedDelay().get(Id.create(0, Person.class)));
+		
+		Assert.assertNull("There should not be a causedDelay for person 1, trip 1!", 
+				congestionAndNoiseHandler.getCongestionHandler().getPersonId2tripNumber2causedDelay().get(Id.create(1, Person.class)));
+		Assert.assertEquals("There should be a affectedDelay of 100 for person 1, trip 1!", 100.0, 
+				congestionAndNoiseHandler.getCongestionHandler().getPersonId2tripNumber2affectedDelay().get(Id.create(1, Person.class)).get(1), MatsimTestUtils.EPSILON);
+		
+		// check noise
+		
+		Assert.assertTrue("There should be a handled NoiseEvent!", congestionAndNoiseHandler.getNoiseHandler().isCaughtNoiseEvent());
+		Assert.assertEquals("The total causedNoiseCosts should be 200!", 200.0, congestionAndNoiseHandler.getNoiseHandler().getCausedNoiseCost(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("The total affectedNoiseCosts should be 200!", 200.0, congestionAndNoiseHandler.getNoiseHandler().getAffectedNoiseCost(), MatsimTestUtils.EPSILON);
+		
+		Assert.assertEquals("The total causedNoiseCosts of person 0 should be 100!", 100.0, 
+				congestionAndNoiseHandler.getNoiseHandler().getPersonId2causedNoiseCost().get(Id.create(0, Person.class)), MatsimTestUtils.EPSILON);
+		Assert.assertNotNull("There should be a causedNoiseCost for at least one trip for person 0!", 
+				congestionAndNoiseHandler.getNoiseHandler().getPersonId2tripNumber2causedNoiseCost().get(Id.create(0, Person.class)));
+		Assert.assertEquals("The causedNoiseCosts of person 0 for trip 0 should be 100!", 100.0, 
+				congestionAndNoiseHandler.getNoiseHandler().getPersonId2tripNumber2causedNoiseCost().get(Id.create(0, Person.class)).get(1), MatsimTestUtils.EPSILON);
+		Assert.assertNull("There should not be affectedNoiseCosts at all for person 0!", 
+				congestionAndNoiseHandler.getNoiseHandler().getPersonId2affectedNoiseCost().get(Id.create(0, Person.class)));
+		
+		Assert.assertEquals("The total causedNoiseCosts of person 1 should be 100!", 100.0, 
+				congestionAndNoiseHandler.getNoiseHandler().getPersonId2causedNoiseCost().get(Id.create(1, Person.class)), MatsimTestUtils.EPSILON);
+		Assert.assertNotNull("There should be a causedNoiseCost for at least one trip for person 1!", 
+				congestionAndNoiseHandler.getNoiseHandler().getPersonId2tripNumber2causedNoiseCost().get(Id.create(1, Person.class)));
+		Assert.assertEquals("The causedNoiseCosts of person 1 for trip 0 should be 100!", 100.0, 
+				congestionAndNoiseHandler.getNoiseHandler().getPersonId2tripNumber2causedNoiseCost().get(Id.create(1, Person.class)).get(1), MatsimTestUtils.EPSILON);
+		Assert.assertNull("There should not be affectedNoiseCosts at all for person 1!", 
+				congestionAndNoiseHandler.getNoiseHandler().getPersonId2affectedNoiseCost().get(Id.create(1, Person.class)));
+		
+		Assert.assertNull("There should not be causedNoiseCosts at all for person 2!", 
+				congestionAndNoiseHandler.getNoiseHandler().getPersonId2causedNoiseCost().get(Id.create(2, Person.class)));
+		Assert.assertEquals("The affectedNoiseCosts of person 2 should be 200!", 200.0, 
+				congestionAndNoiseHandler.getNoiseHandler().getPersonId2affectedNoiseCost().get(Id.create(2, Person.class)), MatsimTestUtils.EPSILON);
 		
 	}
 	
