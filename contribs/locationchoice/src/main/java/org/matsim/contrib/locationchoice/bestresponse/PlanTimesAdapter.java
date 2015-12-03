@@ -19,67 +19,62 @@
 
 package org.matsim.contrib.locationchoice.bestresponse;
 
-import java.util.List;
-import java.util.Map;
-
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
-import org.matsim.contrib.locationchoice.router.BackwardFastMultiNodeDijkstra;
-import org.matsim.contrib.locationchoice.router.PlanRouterAdapter;
 import org.matsim.contrib.locationchoice.utils.PlanUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.routes.GenericRouteImpl;
-import org.matsim.core.router.LinkWrapperFacility;
-import org.matsim.core.router.MultiNodeDijkstra;
+import org.matsim.core.router.ActivityWrapperFacility;
+import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.utils.misc.Time;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
 public class PlanTimesAdapter {
-	
-	public static enum ApproximationLevel { COMPLETE_ROUTING, LOCAL_ROUTING, NO_ROUTING } ;
-	
+
+	public enum ApproximationLevel { COMPLETE_ROUTING, LOCAL_ROUTING, NO_ROUTING } ;
+
 	// 0: complete routing
 	// 1: local routing
 	// 2: no routing (distance-based approximation)
-	private ApproximationLevel approximationLevel = ApproximationLevel.COMPLETE_ROUTING; 
-	private final MultiNodeDijkstra forwardMultiNodeDijkstra;
-	private final BackwardFastMultiNodeDijkstra backwardMultiNodeDijkstra;
+	private final ApproximationLevel approximationLevel;
 	private final Network network;
 	private final Config config;
 	private final Map<String, Double> teleportedModeSpeeds;
 	private final Map<String, Double> beelineDistanceFactors;
 	private final DestinationChoiceConfigGroup dccg;
 	private final TripRouter router;
-	
-	private static final Logger log = Logger.getLogger(PlanTimesAdapter.class);
-	
-	/* package */ PlanTimesAdapter(ApproximationLevel approximationLevel, MultiNodeDijkstra forwardMultiNodeDijkstra, 
-			BackwardFastMultiNodeDijkstra backwardMultiNodeDijkstra, TripRouter router, Scenario scenario, 
-			Map<String, Double> teleportedModeSpeeds, Map<String, Double> beelineDistanceFactors) {
+
+	/* package */ PlanTimesAdapter(
+			final ApproximationLevel approximationLevel,
+			final TripRouter router,
+			final Scenario scenario,
+			final Map<String, Double> teleportedModeSpeeds,
+			final Map<String, Double> beelineDistanceFactors) {
 		this.approximationLevel = approximationLevel;
-		this.forwardMultiNodeDijkstra = forwardMultiNodeDijkstra;
-		this.backwardMultiNodeDijkstra = backwardMultiNodeDijkstra;
 		this.network = scenario.getNetwork();
 		this.router = router;
 		this.config = scenario.getConfig();
 		this.teleportedModeSpeeds = teleportedModeSpeeds;
 		this.beelineDistanceFactors = beelineDistanceFactors;
 		this.dccg = (DestinationChoiceConfigGroup) this.config.getModule(DestinationChoiceConfigGroup.GROUP_NAME);
-	}	
-	
+	}
+
 	/*
 	 * Why do we have plan and planTmp?!
 	 * Probably to avoid something like concurrent modification problems?
@@ -96,86 +91,44 @@ public class PlanTimesAdapter {
 	 * 	- NO_ROUTING: same as LOCAL_ROUTING but with estimated travel times for the calculated routes
 	 * 
 	 */
-	/* package */ double adaptTimesAndScorePlan(Plan plan, int actlegIndex, Plan planTmp, ScoringFunctionFactory scoringFunctionFactory) {
+	/* package */ double adaptTimesAndScorePlan(
+			final Plan plan,
+			final Plan planTmp,
+			final ScoringFunctionFactory scoringFunctionFactory ) {
 
 		// yyyy Note: getPrevious/NextLeg/Activity all relies on alternating activities and leg, which was given up as a requirement
 		// a long time ago (which is why it is not in the interface).  kai, jan'13
 
-		// This used to use ScoringFunction accumulator (wrongly, as it started the first activity),
-		// with the same instance used over and over. td, mai'14
 		final ScoringFunction scoringFunction = scoringFunctionFactory.createNewScoringFunction(plan.getPerson());
 
 		// iterate through plan and adapt travel and activity times
-		int planElementIndex = -1;
-		for (PlanElement pe : plan.getPlanElements()) {
-			planElementIndex++;
-			if (!(pe instanceof Activity)) continue;
-
-			Activity act = (Activity) pe;
-			if (planElementIndex == 0) {
+		boolean isFirstActivity = true;
+		for ( Activity act : TripStructureUtils.getActivities( plan , EmptyStageActivityTypes.INSTANCE ) ) {
+			final int planElementIndex = plan.getPlanElements().indexOf( act );
+			if ( isFirstActivity ) {
+				isFirstActivity = false;
 				final Activity actTmp = (Activity) planTmp.getPlanElements().get(planElementIndex);
 				// this used to assume the activity starts at 00:00:00, but this
 				// is not what happens in the iterations: the first activity
 				// has no start time, the last has no end time.
 				actTmp.setStartTime( Time.UNDEFINED_TIME );
 				scoringFunction.handleActivity( actTmp );
-//					System.err.println("10 score: " + scoringFunction.getScore() ) ;
 				continue;
 			}
 
-			// Those 3 variables are essentially the return value of the procedure below,
-			// that depends on the approximation level
-			// Before correcting for PT, this was only PathCosts
-			PathCosts pathCosts = null;
-			List<? extends PlanElement> listPlanElements = null;
-			double legTravelTime = 0.0;
+			final List<? extends PlanElement> trip = estimateTravelTime( plan, act );
 
-			final Leg previousLegPlanTmp = (Leg) planTmp.getPlanElements().get(planElementIndex - 1);
-
-			// This should be split in 3 methods, returning an Object containing all the relevant information
-			// td dec 15
-			if (this.approximationLevel == ApproximationLevel.COMPLETE_ROUTING) {
-				final Leg previousLeg = PlanUtils.getPreviousLeg(plan, act);
-				final String mode = previousLeg.getMode();
-				final Activity previousActivity = PlanUtils.getPreviousActivity(plan, previousLeg);
-				pathCosts = computeTravelTimeFromCompleteRouting(plan, previousActivity, act, mode);
-				listPlanElements =
-						this.router.calcRoute(
-								mode,
-								new LinkWrapperFacility(
-										this.network.getLinks().get(
-												previousActivity.getLinkId())),
-								new LinkWrapperFacility(
-										this.network.getLinks().get(
-												act.getLinkId())),
-								previousActivity.getEndTime(),
-								plan.getPerson());
-
-				for(PlanElement pel : listPlanElements) {
-					if (pel instanceof Leg) {
-						scoringFunction.handleLeg( (Leg)pel );
-						legTravelTime += ((Leg) pel).getTravelTime();
-					}
+			for ( PlanElement pe : trip ) {
+				if ( pe instanceof Activity ) {
+					// ignore this for the time being (otherwise, need to check times and re-create start and end time
+					// scoringFunction.handleActivity( (Activity) pe );
 				}
-
-				final GenericRouteImpl route =
-						new GenericRouteImpl(
-								((Leg) listPlanElements.get(0)).getRoute().getStartLinkId(),
-								((Leg) listPlanElements.get(listPlanElements.size() - 1)).getRoute().getEndLinkId());
-
-				previousLegPlanTmp.setRoute(route);
-				previousLegPlanTmp.setTravelTime(legTravelTime);
-
-			} else if (this.approximationLevel == ApproximationLevel.LOCAL_ROUTING ) {
-				pathCosts = computeTravelTimeFromLocalRouting(plan, actlegIndex, planElementIndex, act);
-				previousLegPlanTmp.setRoute(pathCosts.getRoute());
-				legTravelTime = pathCosts.getRoute().getTravelTime();
-				previousLegPlanTmp.setTravelTime(legTravelTime);
-			} else if (this.approximationLevel == ApproximationLevel.NO_ROUTING ) {
-				pathCosts = approximateTravelTimeFromDistance(plan, actlegIndex, planElementIndex, act);
-				previousLegPlanTmp.setRoute(pathCosts.getRoute());
-				legTravelTime = pathCosts.getRoute().getTravelTime();
-				previousLegPlanTmp.setTravelTime(legTravelTime);
+				else if ( pe instanceof Leg ){
+					scoringFunction.handleLeg( (Leg) pe );
+				}
+				else {
+					throw new RuntimeException( "unknown plan element type? "+pe.getClass().getName() );
+				}
 			}
 
 			double actDur = act.getMaximumDuration();
@@ -185,7 +138,16 @@ public class PlanTimesAdapter {
 				prevActTmp.getEndTime() != Time.UNDEFINED_TIME ?
 					prevActTmp.getEndTime() :
 					prevActTmp.getStartTime() + prevActTmp.getMaximumDuration();
-			double arrivalTime = departureTime + legTravelTime;
+
+			if ( departureTime == Time.UNDEFINED_TIME ) {
+				throw new RuntimeException( "could not infer departure time after activity "+prevActTmp );
+			}
+
+			final double arrivalTime = departureTime + getTravelTime( trip );
+
+			if ( arrivalTime == Time.UNDEFINED_TIME ) {
+				throw new RuntimeException( "could not infer arrival time after trip "+trip );
+			}
 
 			// yyyy I think this is really more complicated than it should be since it could/should just copy the time structure of the 
 			// original plan and not think so much.  kai, jan'13
@@ -198,11 +160,10 @@ public class PlanTimesAdapter {
 
 			actTmp.setStartTime(arrivalTime);
 
-			PlansConfigGroup.ActivityDurationInterpretation actDurInterpr = ( config.plans().getActivityDurationInterpretation() ) ;
+			final PlansConfigGroup.ActivityDurationInterpretation actDurInterpr = ( config.plans().getActivityDurationInterpretation() ) ;
 			switch ( actDurInterpr ) {
 			case tryEndTimeThenDuration:
-				if ( act.getEndTime() == Time.UNDEFINED_TIME &&
-						act.getMaximumDuration() != Time.UNDEFINED_TIME) {
+				if ( act.getEndTime() == Time.UNDEFINED_TIME && act.getMaximumDuration() != Time.UNDEFINED_TIME) {
 					// duration based definition: requires some care
 					actTmp.setMaximumDuration( act.getMaximumDuration() ) ;
 
@@ -229,148 +190,119 @@ public class PlanTimesAdapter {
 		return scoringFunction.getScore();
 	}
 
-	private PathCosts approximateTravelTimeFromDistance(Plan plan, int actlegIndex, int planElementIndex, PlanElement pe) {
-		
-		PathCosts pathCosts = new PathCostsGeneric(this.network);
+	private double getTravelTime( List<? extends PlanElement> trip ) {
+		double tt = 0;
+		for ( PlanElement pe : trip ) {
+			if ( pe instanceof Leg ) {
+				final double curr = ((Leg) pe).getTravelTime();
+				if ( curr == Time.UNDEFINED_TIME ) throw new RuntimeException( "undefined travel time in "+pe );
+				tt += curr;
+			}
+		}
+		return tt;
+	}
 
-		if (planElementIndex ==  actlegIndex || planElementIndex == (actlegIndex + 2)) {
-			pathCosts = getTravelTimeApproximation(plan, (Activity) pe);
+	private List<? extends PlanElement> estimateTravelTime( Plan plan , Activity act ) {
+		// Ouch... should be passed as parameter!
+		final Leg previousLeg = PlanUtils.getPreviousLeg( plan, act );
+		final Activity previousActivity = PlanUtils.getPreviousActivity( plan, previousLeg );
+		final String mode = previousLeg.getMode();
+
+		switch ( this.approximationLevel ) {
+			case COMPLETE_ROUTING:
+				return computeTravelTimeFromCompleteRouting(
+						plan.getPerson(),
+						previousActivity,
+						act,
+						mode);
+			case NO_ROUTING:
+				// Yes, those two are doing the same. I passed some time to simplify the (rather convoluted) code,
+				// and it boiled down to this. No idea of since how long this is not doing what it is claiming to do...
+				// The only difference is that "NO_ROUTING" was getting travel times from the route for car if it exists
+				// td dec 15
+				if ( mode.equals( TransportMode.car ) && previousLeg.getTravelTime() != Time.UNDEFINED_TIME ) {
+					return Collections.singletonList( previousLeg );
+				}
+				// fall through to local routing if not car or previous travel time not found
+			case LOCAL_ROUTING:
+				return getTravelTimeApproximation(
+						previousActivity,
+						act,
+						mode );
+			default:
+				throw new RuntimeException( "unknown method "+this.approximationLevel );
+		}
+	}
+
+	private static void fillInLegTravelTimes(
+			final double departureTime,
+			final List<? extends PlanElement> trip ) {
+		double time = departureTime;
+		for ( PlanElement pe : trip ) {
+			if ( !(pe instanceof Leg) ) continue;
+			final Leg leg = (Leg) pe;
+			if ( leg.getDepartureTime() == Time.UNDEFINED_TIME ) {
+				leg.setDepartureTime( time );
+			}
+			if ( leg.getTravelTime() == Time.UNDEFINED_TIME ) {
+				leg.setTravelTime( leg.getRoute().getTravelTime() );
+			}
+			time += leg.getTravelTime();
+		}
+	}
+
+	private List<? extends PlanElement> getTravelTimeApproximation(
+			Activity fromAct,
+			Activity toAct,
+			String mode ) {
+		// TODO: as soon as plansCalcRoute provides defaults for all modes use them
+		// I do not want users having to set dc parameters in other config modules!
+		double speed;
+
+		// Those two parameters could probably be defined with more flexibility...
+		if ( mode.equals( TransportMode.pt )) {
+			speed = this.dccg.getTravelSpeed_pt();
+		}
+		else if ( mode.equals( TransportMode.car ) ) {
+			speed = this.dccg.getTravelSpeed_car();
+		}
+		else if ( mode.equals( TransportMode.bike )) {
+			speed = this.teleportedModeSpeeds.get( TransportMode.bike );
+		}
+		else if ( mode.equals( TransportMode.walk ) || mode.equals( TransportMode.transit_walk )) {
+			speed = this.teleportedModeSpeeds.get(TransportMode.walk);
 		}
 		else {
-			//use travel times from last iteration for efficiency reasons if route is available
-//			Route routeOfPlan = plan.getPreviousLeg((Activity) pe).getRoute();
-			Activity activity = (Activity) pe;
-			Leg previousLeg = PlanUtils.getPreviousLeg(plan, activity);
-			Route routeOfPlan = previousLeg.getRoute();
-			if (routeOfPlan != null) {
-				pathCosts.setRoute(routeOfPlan);
-			} else {
-				pathCosts = getTravelTimeApproximation(plan, (Activity) pe);
-			}
-		}
-		return pathCosts;
-	}
-
-	private PathCosts computeTravelTimeFromLocalRouting(Plan plan, int actlegIndex, int planElementIndex, PlanElement pe) {
-
-		PathCosts pathCosts = new PathCostsNetwork(this.network);
-		Activity actToMove = (Activity) plan.getPlanElements().get(actlegIndex);		
-		
-		if  (!PlanUtils.getPreviousLeg(plan, actToMove).getMode().equals(TransportMode.car)) {
-			pathCosts = this.getTravelTimeApproximation(plan, actToMove);
-		} else {
-			/*
-			 * TODO: fix this! the if statement above compared the previous leg (the getMode() part was missing!!) with
-			 * Transportmode.car, which of course always failed. Therefore, the code below was never executed. Seems that
-			 * it is not running anymore - probably never did? cdobler oct'15
-			 */
-			pathCosts = this.getTravelTimeApproximation(plan, actToMove);
-			
-//			if (planElementIndex == actlegIndex) {
-//				// adapt travel times: actPre -> actToMove
-////				Activity previousActivity = plan.getPreviousActivity(plan.getPreviousLeg((ActivityImpl) pe));
-//				Activity activity = (Activity) pe;
-//				Leg previousLeg = PlanUtils.getPreviousLeg(plan, activity);
-//				Activity previousActivity = PlanUtils.getPreviousActivity(plan, previousLeg);
-//				
-//				Id<Link> fromLinkId = previousActivity.getLinkId();
-//				Id<Link> toLinkId = actToMove.getLinkId();
-//				Node fromNode = network.getLinks().get(fromLinkId).getToNode();
-//				Node toNode = network.getLinks().get(toLinkId).getToNode();
-//
-//				Path p = this.forwardMultiNodeDijkstra.constructPath(fromNode, toNode, previousActivity.getEndTime());
-//				
-//				((PathCostsNetwork) pathCosts).createRoute(fromLinkId, p, toLinkId);			
-//			}
-//			else if (planElementIndex == (actlegIndex + 2)) {
-//				//adapt travel times: actToMove -> actPost
-//				// replaced approximation: legTravelTime = getTravelTimeApproximation((PlanImpl)plan, (ActivityImpl)pe);
-//				
-//				Activity activity = (Activity) pe;
-//				Id<Link> fromLinkId = activity.getLinkId();
-//				Id<Link> toLinkId = actToMove.getLinkId();
-//				Node fromNode = network.getLinks().get(fromLinkId).getToNode();
-//				Node toNode = network.getLinks().get(toLinkId).getToNode();
-//				
-//				/*
-//				 * Use activity.getStartTime() as time for the routing. Does this make sense?
-//				 */
-//				Path p = this.backwardMultiNodeDijkstra.constructPath(fromNode, toNode, ((Activity) pe).getStartTime());
-//				((PathCostsNetwork) pathCosts).createRoute(fromLinkId, p, toLinkId);
-//			}
-//			else {
-//				//use travel times from last iteration for efficiency reasons
-//				Activity activity = (Activity) pe;
-//				Leg previousLeg = PlanUtils.getPreviousLeg(plan, activity);
-//				if (previousLeg.getRoute() != null) pathCosts.setRoute(previousLeg.getRoute());
-//				
-//				// Seems that this case occurs - not sure whether this is okay or not. cdobler oct'15
-//				else pathCosts = this.getTravelTimeApproximation(plan, actToMove);
-//			}
-		}
-		return pathCosts;
-	}
-	
-	private PathCosts getTravelTimeApproximation(Plan plan, Activity act) {
-		
-		Leg previousLeg = PlanUtils.getPreviousLeg(plan, act);
-		Activity actPre = PlanUtils.getPreviousActivity(plan, previousLeg);
-		String mode = previousLeg.getMode();
-//		Activity actPre = plan.getPreviousActivity(plan.getPreviousLeg(act));
-//		String mode = plan.getPreviousLeg(act).getMode();
-		PathCosts pathCosts = new PathCostsGeneric(this.network);
-		
-		// TODO: as soon as plansCalcRoute provides defaults for all modes use them 
-		// I do not want users having to set dc parameters in other config modules!
-		double speed = this.dccg.getTravelSpeed_car();	// seems to be overwritten in any case? cdobler, oct'14
-		
-		if (mode.equals(TransportMode.pt)) {
-			speed = this.dccg.getTravelSpeed_pt();	
-		} else if (mode.equals(TransportMode.bike)) {
-			speed = this.teleportedModeSpeeds.get(TransportMode.bike);
-		} else if (mode.equals(TransportMode.walk) || mode.equals(TransportMode.transit_walk)) {
-			speed = this.teleportedModeSpeeds.get(TransportMode.walk);
-		} else {
 			speed = this.teleportedModeSpeeds.get(PlansCalcRouteConfigGroup.UNDEFINED);
 		}
-		((PathCostsGeneric) pathCosts).createRoute(
-				this.network.getLinks().get(actPre.getLinkId()), 
-				this.network.getLinks().get(act.getLinkId()),
-				this.beelineDistanceFactors.get(PlansCalcRouteConfigGroup.UNDEFINED),
-				speed);
-		return pathCosts;
+
+		// This is the only place where this class is used: delete it? td dec 15
+		final PathCostsGeneric pathCosts = new PathCostsGeneric( network );
+		pathCosts.createRoute(
+				this.network.getLinks().get( fromAct.getLinkId() ),
+				this.network.getLinks().get( toAct.getLinkId() ),
+				this.beelineDistanceFactors.get( PlansCalcRouteConfigGroup.UNDEFINED ),
+				speed );
+		final Leg l = new LegImpl( mode );
+		l.setRoute( pathCosts.getRoute() );
+		l.setTravelTime( pathCosts.getRoute().getTravelTime() );
+		l.setDepartureTime( fromAct.getEndTime() );
+		return Collections.singletonList( l );
 	}
-	
-	private PathCosts computeTravelTimeFromCompleteRouting(Plan plan, Activity fromAct, Activity toAct, String mode) {
-		PathCosts pathCosts = new PathCostsNetwork(this.network);
-		
-		if (mode.equals(TransportMode.car)) {
-			LegImpl leg = new org.matsim.core.population.LegImpl(TransportMode.car);
-			leg.setDepartureTime(0.0);
-			leg.setTravelTime(0.0);
-			leg.setArrivalTime(0.0);
-			
-			try {
-				PlanRouterAdapter.handleLeg(this.router, plan.getPerson(), leg, fromAct, toAct, fromAct.getEndTime());	
-				pathCosts.setRoute(leg.getRoute());
-			} catch (Exception e) {
-				log.info("plan routing not working for person " + plan.getPerson().getId().toString());
-				GenericRouteImpl route = new GenericRouteImpl(null, null);
-				route.setTravelTime(Double.MAX_VALUE);
-				route.setDistance(Double.MAX_VALUE);
-				pathCosts.setRoute(route);
-			}
-			
-	//	} else if (mode.equals(TransportMode.pt) && config.transit().isUseTransit()) {
-		//	LegImpl leg = new org.matsim.core.population.LegImpl(TransportMode.pt);
-			//leg.setDepartureTime(0.0);
-			//leg.setTravelTime(0.0);
-			//leg.setArrivalTime(0.0);
-     		//PlanRouterAdapter.handleLeg(router, plan.getPerson(), leg, fromAct, toAct, fromAct.getEndTime());	
-			
-		} else {
-			pathCosts = this.getTravelTimeApproximation(plan, toAct);
-		}
-		return pathCosts;
+
+	private List<? extends PlanElement> computeTravelTimeFromCompleteRouting(
+				final Person person,
+				final Activity fromAct,
+				final Activity toAct,
+				final String mode) {
+		final List<? extends PlanElement> trip =
+				this.router.calcRoute(
+						mode,
+						new ActivityWrapperFacility( fromAct ),
+						new ActivityWrapperFacility( toAct ),
+						fromAct.getEndTime(),
+						person );
+		fillInLegTravelTimes( fromAct.getEndTime() , trip );
+		return trip;
 	}
 }

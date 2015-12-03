@@ -343,11 +343,8 @@ public class ChoiceSet {
 			final double score =
 					this.adaptAndScoreTimes(
 							plan,
-							actlegIndex,
 							planTmp,
 							scoringFunction,
-							forwardMultiNodeDijkstra,
-							backwardMultiNodeDijkstra,
 							router,
 							this.approximationLevel);
 			
@@ -467,11 +464,13 @@ public class ChoiceSet {
 		return mapNormalized;
 	}
 	
-	double adaptAndScoreTimes(Plan plan, int actlegIndex, Plan planTmp, ScoringFunctionFactory scoringFunction, 
-			MultiNodeDijkstra forwardMultiNodeDijkstra, BackwardFastMultiNodeDijkstra backwardMultiNodeDijkstra, TripRouter router, 
-			ApproximationLevel approximationLevelTmp) {
-		PlanTimesAdapter adapter = new PlanTimesAdapter(approximationLevelTmp, forwardMultiNodeDijkstra, backwardMultiNodeDijkstra, 
+	double adaptAndScoreTimes( Plan plan,
+			Plan planTmp,
+			ScoringFunctionFactory scoringFunction,
+			TripRouter router,
+			ApproximationLevel approximationLevelTmp ) {
+		PlanTimesAdapter adapter = new PlanTimesAdapter(approximationLevelTmp,
 				router, this.scenario, this.teleportedModeSpeeds, this.beelineDistanceFactors);
-		return adapter.adaptTimesAndScorePlan(plan, actlegIndex, planTmp, scoringFunction);
+		return adapter.adaptTimesAndScorePlan(plan, planTmp, scoringFunction);
 	}
 }

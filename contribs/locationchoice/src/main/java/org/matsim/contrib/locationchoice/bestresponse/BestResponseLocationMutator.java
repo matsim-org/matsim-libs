@@ -297,35 +297,27 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 		// looked into it but could not find a reason. Removed it and tests are still fine. cdobler, oct'15
 
 //		Plan planTmp = plan;
-		
+
 		Plan planTmp = null;
 		if (this.dccg.getInternalPlanDataStructure() == InternalPlanDataStructure.planImpl) {
 			planTmp = new PlanImpl(plan.getPerson());
-			PlanUtils.copyFrom(plan, planTmp);						
+			PlanUtils.copyFrom(plan, planTmp);
 		} else if (this.dccg.getInternalPlanDataStructure() == InternalPlanDataStructure.lcPlan) {
 			planTmp = new LCPlan(plan);
 		}
 
-		// these three values are not used in the sub-method since ApproximationLevel is COMPLETE_ROUTING!
-		int actlegIndex = Integer.MIN_VALUE;
-		MultiNodeDijkstra forwardMultiNodeDijkstra = null; 
-		BackwardFastMultiNodeDijkstra backwardMultiNodeDijkstra = null;
-		
-		final double score = 
+		final double score =
 				cs.adaptAndScoreTimes(
 						plan,
-						actlegIndex,	// is not used!
 						planTmp,
 						scoringFunction,
-						forwardMultiNodeDijkstra,	// is not used!
-						backwardMultiNodeDijkstra,	// is not used!
-						this.getTripRouter(), 
-						ApproximationLevel.COMPLETE_ROUTING);	
-		
+						this.getTripRouter(),
+						ApproximationLevel.COMPLETE_ROUTING);
+
 		PlanUtils.copyPlanFieldsToFrom(plan, planTmp);	// copy( to, from )
 		return score;
 	}
-	
+
 	/**
 	 * Conversion of the "frozen" logit model epsilon into a distance.
 	 */
