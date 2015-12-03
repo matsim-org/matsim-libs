@@ -59,9 +59,10 @@ public class TransferLocationChoices {
 				if (planElementOld instanceof ActivityImpl) {
 					ActivityImpl actOld = (ActivityImpl) planElementOld;
 					if (!actOld.getType().equals("pt interaction")) {
-						j += 2;
 						ActivityImpl actNew = (ActivityImpl) planNew.get(j);
 						actNew.setFacilityId(actOld.getFacilityId());
+						actNew.setCoord(actOld.getCoord());
+						j += 2;
 					}
 				}
 			}
