@@ -49,6 +49,9 @@ public class ChooseSecondaryFacilitiesConfigCreator extends IVTConfigCreator {
 		config.setParam("locationchoice", "flexible_types", "remote_work, leisure, shop, escort_kids, escort_other");
 		config.setParam("locationchoice", "epsilonScaleFactors", "0.3, 0.1, 0.1, 0.1, 0.2");
 
+		// Change travel time calculation
+		config.setParam("locationchoice", "tt_approximationLevel","2");
+
 		// Add files
 		config.setParam("locationchoice", "prefsFile", INBASE_FILES + POPULATION_ATTRIBUTES);
 
