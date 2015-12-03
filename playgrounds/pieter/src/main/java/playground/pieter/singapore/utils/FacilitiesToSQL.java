@@ -351,7 +351,7 @@ public class FacilitiesToSQL {
 	}
 
 
-    private void loadFacilitiesFromSQL(String secondaryFacilitiesTable) {
+    public void loadFacilitiesFromSQL(String secondaryFacilitiesTable) {
         try {
 
             ResultSet rs = dba.executeQuery(String.format("SELECT * FROM %s",
