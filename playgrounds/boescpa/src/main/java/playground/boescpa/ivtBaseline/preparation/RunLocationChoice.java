@@ -47,7 +47,7 @@ public class RunLocationChoice {
         Logger.getLogger( org.matsim.pt.router.MultiNodeDijkstra.class ).setLevel( Level.ERROR );
 
         // It is suggested to use the config created with ChooseSecondaryFacilitiesConfigCreator.java.
-        final Config config = ConfigUtils.loadConfig(configFile, new KtiLikeScoringConfigGroup(), new DestinationChoiceConfigGroup());
+        final Config config = ConfigUtils.loadConfig(configFile, new DestinationChoiceConfigGroup());
 
         // This is currently needed for location choice: initializing
         // the location choice writes K-values files to the output directory, which:
@@ -70,7 +70,7 @@ public class RunLocationChoice {
 
         // We use a specific scoring function, that uses individual preferences for activity durations.
         controler.setScoringFunctionFactory(
-                new MATSim2010ScoringFunctionFactory(controler.getScenario(),
+                new IVTBaselineScoringFunctionFactory(controler.getScenario(),
                         new StageActivityTypesImpl(PtConstants.TRANSIT_ACTIVITY_TYPE)));
 
         controler.run();

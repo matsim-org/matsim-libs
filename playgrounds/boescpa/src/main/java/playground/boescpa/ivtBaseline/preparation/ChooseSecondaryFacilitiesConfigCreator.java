@@ -39,7 +39,7 @@ public class ChooseSecondaryFacilitiesConfigCreator extends IVTConfigCreator {
 
 	public static void main(String[] args) {
 		int prctScenario = Integer.parseInt(args[1]); // the percentage of the scenario in percent (e.g. 1%-Scenario -> "1")
-		Config config = ConfigUtils.createConfig(new KtiLikeScoringConfigGroup(), new DestinationChoiceConfigGroup());
+		Config config = ConfigUtils.createConfig(new DestinationChoiceConfigGroup());
 		new ChooseSecondaryFacilitiesConfigCreator().makeConfigIVT(config, prctScenario);
 
 		// Reduce to one replanning phase
