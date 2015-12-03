@@ -37,7 +37,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
-import org.matsim.contrib.locationchoice.bestresponse.PlanTimesAdapter.ApproximationLevel;
+import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup.ApproximationLevel;
 import org.matsim.contrib.locationchoice.router.BackwardFastMultiNodeDijkstra;
 import org.matsim.contrib.locationchoice.utils.PlanUtils;
 import org.matsim.core.network.NetworkImpl;
@@ -228,7 +228,7 @@ public class ChoiceSet {
 		Activity act = (Activity) plan.getPlanElements().get(actlegIndex);
 		
 		// We need to calculate the multi node dijkstra stuff only in case LOCAL_ROUTING is used.
-		if (this.approximationLevel == ApproximationLevel.LOCAL_ROUTING) {
+		if (this.approximationLevel == DestinationChoiceConfigGroup.ApproximationLevel.LOCAL_ROUTING) {
 			Node fromNode;
 			/*
 			 * Assuming that both, forward and backward Dijkstra, route to the end nodes of links where

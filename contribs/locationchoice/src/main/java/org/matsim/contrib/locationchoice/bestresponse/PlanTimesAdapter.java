@@ -47,12 +47,12 @@ import java.util.Map;
 
 public class PlanTimesAdapter {
 
-	public enum ApproximationLevel { COMPLETE_ROUTING, LOCAL_ROUTING, NO_ROUTING } ;
+	;
 
 	// 0: complete routing
 	// 1: local routing
 	// 2: no routing (distance-based approximation)
-	private final ApproximationLevel approximationLevel;
+	private final DestinationChoiceConfigGroup.ApproximationLevel approximationLevel;
 	private final Network network;
 	private final Config config;
 	private final Map<String, Double> teleportedModeSpeeds;
@@ -61,7 +61,7 @@ public class PlanTimesAdapter {
 	private final TripRouter router;
 
 	/* package */ PlanTimesAdapter(
-			final ApproximationLevel approximationLevel,
+			final DestinationChoiceConfigGroup.ApproximationLevel approximationLevel,
 			final TripRouter router,
 			final Scenario scenario,
 			final Map<String, Double> teleportedModeSpeeds,
