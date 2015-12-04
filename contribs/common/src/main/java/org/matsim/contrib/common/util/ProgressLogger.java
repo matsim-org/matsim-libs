@@ -20,6 +20,7 @@
 package org.matsim.contrib.common.util;
 
 import java.text.NumberFormat;
+import java.util.concurrent.atomic.AtomicLong;
 
 
 /**
@@ -40,7 +41,7 @@ public class ProgressLogger {
 	
 	private static long majorTickVal;
 	
-	private static long counter;
+	private static AtomicLong counter;
 
 	/**
 	 * Initializes the progress logger.
@@ -52,7 +53,7 @@ public class ProgressLogger {
 		maxVal = max;
 		minorTickVal = (long) Math.ceil(max/100.0 * minorTick);
 		majorTickVal = (long) Math.ceil(max/100.0 * majorTick);
-		counter = 0;
+		counter = new AtomicLong(0);
 		System.out.print("\tProgress: 0%");
 	}
 
@@ -60,13 +61,13 @@ public class ProgressLogger {
 	 * Moves the internal counter one step forward and prints a dot or the percentage respectively.
 	 */
 	public static void step() {
-		counter++;
-		if(counter == maxVal) {
-			System.out.print(NumberFormat.getPercentInstance().format(counter/(double)maxVal));
+		counter.incrementAndGet();
+		if(counter.get() == maxVal) {
+			System.out.print(NumberFormat.getPercentInstance().format(counter.get()/(double)maxVal));
 			System.out.print("\n");
-		} else if(counter % majorTickVal == 0) {
-			System.out.print(NumberFormat.getPercentInstance().format(counter/(double)maxVal));
-		} else if(counter % minorTickVal == 0) {
+		} else if(counter.get() % majorTickVal == 0) {
+			System.out.print(NumberFormat.getPercentInstance().format(counter.get()/(double)maxVal));
+		} else if(counter.get() % minorTickVal == 0) {
 			System.out.print(DOT);
 		}
 		
@@ -77,8 +78,8 @@ public class ProgressLogger {
 	 * reached the total number of steps.
 	 */
 	public static void termiante() {
-		if(counter != maxVal) {
-			System.out.println(NumberFormat.getPercentInstance().format(counter/(double)maxVal));
+		if(counter.get() != maxVal) {
+			System.out.println(NumberFormat.getPercentInstance().format(counter.get()/(double)maxVal));
 		}
 	}
 }
