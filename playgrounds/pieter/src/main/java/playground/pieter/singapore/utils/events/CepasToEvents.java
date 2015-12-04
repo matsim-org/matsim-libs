@@ -1568,7 +1568,7 @@ public class CepasToEvents {
         MatsimNetworkReader nwr = new MatsimNetworkReader(scenario.getNetwork());
         nwr.readFile(networkFile);
         scenario.getConfig().transit().setUseTransit(true);
-        scenario.getConfig().scenario().setUseVehicles(true);
+//        scenario.getConfig().scenario().setUseVehicles(true);
         TransitScheduleReader tsr = new TransitScheduleReader(scenario);
         tsr.readFile(transitSchedule);
         this.outputEventsPath = outputEventsPath;
@@ -1797,7 +1797,7 @@ public class CepasToEvents {
 //			dba.executeStatement(query);
 //			query = String
                     .format("create table %s_passenger_preprocess as select card_id, boarding_stop_stn, alighting_stop_stn, (EXTRACT(epoch FROM (ride_start_time::TEXT)::interval)) as boarding_time,"
-                                    + "((EXTRACT(epoch FROM (ride_start_time::TEXT)::interval)) + (60 * ride_time))::INT AS alighting_time, "
+                                    + "((EXTRACT(epoch FROM (ride_start_time::TEXT)::interval)) + (60 * ride_duration))::INT AS alighting_time, "
                                     + "srvc_number, direction, bus_reg_num"
                                     + " from %s order by srvc_number, direction, bus_reg_num, boarding_time, alighting_time;"
                                     + "alter table %s_passenger_preprocess add column idx serial;", tripTableName,
