@@ -33,19 +33,26 @@ import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
+import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.vehicles.Vehicle;
 
 /**
  * @author ikaddoura
  *
  */
-public class OperatorCostHandler implements TransitDriverStartsEventHandler, LinkLeaveEventHandler, PersonDepartureEventHandler, PersonArrivalEventHandler {
+public class OperatorCostHandler implements TransitDriverStartsEventHandler, LinkLeaveEventHandler, PersonDepartureEventHandler,
+PersonArrivalEventHandler, Wait2LinkEventHandler, VehicleLeavesTrafficEventHandler {
+	
 	private Network network;
 	private double vehicleKm;
 	private double operatingHours_excludingSlackTimes;
@@ -56,6 +63,8 @@ public class OperatorCostHandler implements TransitDriverStartsEventHandler, Lin
 	
 	private final List<Id<Person>> ptDriverIDs = new ArrayList<>();
 	private final List<Id<Vehicle>> ptVehicleIDs = new ArrayList<>();
+	
+	private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
 	
 	public OperatorCostHandler(Network network) {
 		this.network = network;
@@ -70,6 +79,8 @@ public class OperatorCostHandler implements TransitDriverStartsEventHandler, Lin
 		this.ptVehicleIDs.clear();
 		this.vehicleKm = 0.0;
 		this.operatingHours_excludingSlackTimes = 0.0;
+		this.delegate.reset(iteration);
+
 	}
 	
 	@Override
@@ -88,7 +99,7 @@ public class OperatorCostHandler implements TransitDriverStartsEventHandler, Lin
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
 		
-		if (ptDriverIDs.contains(event.getDriverId())){
+		if (ptDriverIDs.contains(delegate.getDriverOfVehicle(event.getVehicleId()))){
 			this.vehicleKm = this.vehicleKm + network.getLinks().get(event.getLinkId()).getLength() / 1000.;
 		}
 	}
@@ -155,6 +166,16 @@ public class OperatorCostHandler implements TransitDriverStartsEventHandler, Lin
 
 	public double getOperatingHours_excludingSlackTimes() {
 		return operatingHours_excludingSlackTimes / 3600.0;
+	}
+
+	@Override
+	public void handleEvent(VehicleLeavesTrafficEvent event) {
+		delegate.handleEvent(event);		
+	}
+
+	@Override
+	public void handleEvent(VehicleEntersTrafficEvent event) {
+		delegate.handleEvent(event);		
 	}
 
 }

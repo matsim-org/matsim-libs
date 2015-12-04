@@ -34,6 +34,7 @@ import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * @author Ihab
@@ -44,12 +45,12 @@ public class LinkFlowHandler implements LinkLeaveEventHandler {
 	private final static Logger log = Logger.getLogger(LinkFlowHandler.class);
 	private final Network network;
 	
-	private Map<Id, Double> linkId2previousLinkLeaveTime = new HashMap<Id, Double>();
+	private Map<Id<Link>, Double> linkId2previousLinkLeaveTime = new HashMap<Id<Link>, Double>();
 
 	private int counterNoCong = 0;
 	private int counterCong = 0;
 
-	private final List<Id> ptVehicleIDs = new ArrayList<Id>();
+	private final List<Id<Vehicle>> ptVehicleIDs = new ArrayList<Id<Vehicle>>();
 	
 	public LinkFlowHandler(Network network) {
 		this.network = network;
@@ -88,7 +89,7 @@ public class LinkFlowHandler implements LinkLeaveEventHandler {
 				} else {
 										
 					System.out.println("----------------------------");
-					System.out.println("personId: " + event.getDriverId() + " // linkId: " + event.getLinkId() + " // flowDelay: " + flowDelay + " // gap: " + gap);
+					System.out.println("driverId: " + event.getVehicleId() + " // linkId: " + event.getLinkId() + " // flowDelay: " + flowDelay + " // gap: " + gap);
 					System.out.println(event.toString());
 
 				}

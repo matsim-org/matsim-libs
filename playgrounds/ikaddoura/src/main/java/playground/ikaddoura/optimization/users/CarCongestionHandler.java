@@ -23,32 +23,49 @@
  */
 package playground.ikaddoura.optimization.users;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
+import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * @author Ihab
  *
  */
-public class CarCongestionHandler implements LinkLeaveEventHandler, LinkEnterEventHandler, PersonDepartureEventHandler {
+public class CarCongestionHandler implements TransitDriverStartsEventHandler, LinkLeaveEventHandler, LinkEnterEventHandler, PersonDepartureEventHandler, 
+Wait2LinkEventHandler, VehicleLeavesTrafficEventHandler {
 
 	private final static Logger log = Logger.getLogger(CarCongestionHandler.class);
 	private final Network network;
+	
 	private Map<Id<Person>, Double> personId2enteringTime = new HashMap<Id<Person>, Double>();
 	private Map<Id<Person>, Double> personId2t0MinusTAkt = new HashMap<Id<Person>, Double>();
 	
+	private final List<Id<Vehicle>> ptVehicleIDs = new ArrayList<>();
+	private final List<Id<Person>> ptDriverIDs = new ArrayList<>();
+
+	private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
+
 	public CarCongestionHandler(Network network) {
 		this.network = network;
 	}
@@ -57,33 +74,39 @@ public class CarCongestionHandler implements LinkLeaveEventHandler, LinkEnterEve
 	public void reset(int iteration) {
 		this.personId2enteringTime.clear();
 		this.personId2t0MinusTAkt.clear();
+		this.ptVehicleIDs.clear();
+		this.ptDriverIDs.clear();
+		this.delegate.reset(iteration);
 	}
 	
 	@Override
 		public void handleEvent(LinkEnterEvent event) {
 
-			if (event.getDriverId().toString().contains("person") && event.getVehicleId().toString().contains("person")){
+			if (!ptVehicleIDs.contains(event.getVehicleId())){
 				// a car is entering a link
-				this.personId2enteringTime.put(event.getDriverId(), event.getTime());
+				this.personId2enteringTime.put(delegate.getDriverOfVehicle(event.getVehicleId()), event.getTime());
 			}
 		}
 	
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
 
-		if (event.getDriverId().toString().contains("person") && event.getVehicleId().toString().contains("person")){
+		Id<Person> driverId = delegate.getDriverOfVehicle(event.getVehicleId());
+		
+		if (!ptVehicleIDs.contains(event.getVehicleId())){
 			// a car is leaving a link
-			if (this.personId2enteringTime.get(event.getDriverId()) == null){
+			
+			if (this.personId2enteringTime.get(driverId) == null){
 				// person just started from an activity, therefore not calculating travel times...
 				
 			} else {
-				double tActLink = event.getTime() - this.personId2enteringTime.get(event.getDriverId());
+				double tActLink = event.getTime() - this.personId2enteringTime.get(driverId);
 				Link link = this.network.getLinks().get(event.getLinkId());
 				double t0Link = link.getLength() / link.getFreespeed();
 				double diff = t0Link - tActLink;
 				
 				if (diff > 0) {
-					log.warn(event.getDriverId() + " is faster than freespeed! Doesn't make sense!");
+					log.warn(driverId + " is faster than freespeed! Doesn't make sense!");
 				}
 				
 				if (Math.abs(diff) < 0.1){
@@ -91,14 +114,14 @@ public class CarCongestionHandler implements LinkLeaveEventHandler, LinkEnterEve
 					diff = 0;
 				}
 							
-				if (this.personId2t0MinusTAkt.get(event.getDriverId()) == null){
-					this.personId2t0MinusTAkt.put(event.getDriverId(), diff);
+				if (this.personId2t0MinusTAkt.get(driverId) == null){
+					this.personId2t0MinusTAkt.put(driverId, diff);
 				} else {
-					double diffSumThisPerson = this.personId2t0MinusTAkt.get(event.getDriverId());
-					this.personId2t0MinusTAkt.put(event.getDriverId(), diffSumThisPerson + diff);
+					double diffSumThisPerson = this.personId2t0MinusTAkt.get(driverId);
+					this.personId2t0MinusTAkt.put(driverId, diffSumThisPerson + diff);
 				}
 				
-				this.personId2enteringTime.put(event.getDriverId(), null);
+				this.personId2enteringTime.put(driverId, null);
 			}
 		}
 	}
@@ -124,11 +147,32 @@ public class CarCongestionHandler implements LinkLeaveEventHandler, LinkEnterEve
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
 
-		if (event.getPersonId().toString().contains("person")){
+		if (!this.ptDriverIDs.contains(event.getPersonId())){
 			// a car is departing
 			this.personId2enteringTime.put(event.getPersonId(), null);
 			
 		}
+	}
+
+	@Override
+	public void handleEvent(TransitDriverStartsEvent event) {
+		if (!this.ptVehicleIDs.contains(event.getVehicleId())){
+			this.ptVehicleIDs.add(event.getVehicleId());
+		}	
+		
+		if (!this.ptDriverIDs.contains(event.getDriverId())){
+			this.ptDriverIDs.add(event.getDriverId());
+		}	
+	}
+
+	@Override
+	public void handleEvent(VehicleLeavesTrafficEvent event) {
+		delegate.handleEvent(event);		
+	}
+
+	@Override
+	public void handleEvent(VehicleEntersTrafficEvent event) {
+		delegate.handleEvent(event);		
 	}
 	
 }
