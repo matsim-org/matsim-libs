@@ -18,6 +18,7 @@ public class RentPrivateParkingModel extends GeneralParkingModule {
 	private EventWriterXML eventsWriter;
 	private AverageWalkDistanceStatsZH averageWalkDistanceStatsZH;
 	private ParkingGroupOccupanciesZH parkingGroupOccupanciesZH;
+	private RentableParkingHandler rentableParkingHandler;
 	
 	public RentPrivateParkingModel(Controler controler) {
 		super(controler);
@@ -34,6 +35,8 @@ public class RentPrivateParkingModel extends GeneralParkingModule {
 		eventsManager = EventsUtils.createEventsManager();
 		eventsWriter = new EventWriterXML(event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "parkingEvents.xml.gz"));
 		eventsManager.addHandler(eventsWriter);
+		rentableParkingHandler = new RentableParkingHandler();
+		eventsManager.addHandler(rentableParkingHandler);
 		
 		eventsManager.resetHandlers(0);
 		eventsWriter.init(event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "parkingEvents.xml.gz"));

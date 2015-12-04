@@ -362,7 +362,7 @@ public class ParkingInfrastructureManager {
 		try {
 			eventsManager.processEvent(new ParkingArrivalEvent(parkingOperationRequestAttributes.arrivalTime,
 					selectedParking.getId(), parkingOperationRequestAttributes.personId,
-					parkingOperationRequestAttributes.destCoordinate, finalScore));
+					parkingOperationRequestAttributes.destCoordinate, -1.0* finalScore));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
