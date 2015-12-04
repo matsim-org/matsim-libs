@@ -34,7 +34,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.EventHandler;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.utils.geometry.geotools.MGC;
 
 import playground.agarwalamit.analysis.congestion.ExperiencedDelayAnalyzer;
@@ -335,14 +335,12 @@ public class KrasnojarskSpatialPlots {
 		String networkFile = bau+"/network.xml";
 		
 		EmissionLinkAnalyzer emsLnkAna = new EmissionLinkAnalyzer(LoadMyScenarios.getSimulationEndTime(inputs.initialCaseConfig), emissionEventsFile, noOfBins);
-		emsLnkAna.init();
 		emsLnkAna.preProcessData();
 		emsLnkAna.postProcessData();
 		linkEmissionsBau = emsLnkAna.getLink2TotalEmissions();
 
 		if(inputs.isComparing){
 			emsLnkAna = new EmissionLinkAnalyzer(LoadMyScenarios.getSimulationEndTime(inputs.compareToCaseConfig), inputs.compareToCaseEmissionEventsFile, noOfBins);
-			emsLnkAna.init();
 			emsLnkAna.preProcessData();
 			emsLnkAna.postProcessData();
 			linkEmissionsPolicy = emsLnkAna.getLink2TotalEmissions();

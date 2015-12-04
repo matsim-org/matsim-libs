@@ -51,6 +51,10 @@ public class ZoneCollection {
 		buildKeyIndex();
 	}
 
+	public String getPrimaryKey() {
+		return primaryKey;
+	}
+
 	public void add(Zone zone) {
 		this.zones.add(zone);
 		buildIndex();

@@ -23,7 +23,7 @@ package playground.pieter.balmermi.world;
 import java.util.Stack;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.xml.sax.Attributes;
@@ -42,7 +42,7 @@ class MatsimWorldReader extends MatsimXmlParser {
 	private final static String WORLD_V1 = "world_v1.dtd";
 	private final static String WORLD_V2 = "world_v2.dtd";
 
-	private final ScenarioImpl scenario;
+	private final MutableScenario scenario;
 	private MatsimXmlParser delegate = null;
 
 	private final World world;
@@ -52,7 +52,7 @@ class MatsimWorldReader extends MatsimXmlParser {
 	 *
 	 * @param scenario The Scenario-object to store the world in.
 	 */
-    private MatsimWorldReader(final ScenarioImpl scenario, final World world) {
+    private MatsimWorldReader(final MutableScenario scenario, final World world) {
 		this.scenario = scenario;
 		this.world = world;
 	}

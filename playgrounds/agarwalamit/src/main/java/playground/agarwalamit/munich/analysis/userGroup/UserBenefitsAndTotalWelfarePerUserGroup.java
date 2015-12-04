@@ -34,7 +34,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.EventHandler;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.analysis.userBenefits.MyUserBenefitsAnalyzer;
@@ -173,7 +173,7 @@ public class UserBenefitsAndTotalWelfarePerUserGroup {
 		logger.info("User welfare will be calculated using welfare measure as "+ wm.toString());
 
 		MyUserBenefitsAnalyzer userBenefitsAnalyzer = new MyUserBenefitsAnalyzer();
-		userBenefitsAnalyzer.init((ScenarioImpl)scenario, this.wm, false);
+		userBenefitsAnalyzer.init((MutableScenario)scenario, this.wm, false);
 		userBenefitsAnalyzer.preProcessData();
 		userBenefitsAnalyzer.postProcessData();
 
@@ -185,7 +185,7 @@ public class UserBenefitsAndTotalWelfarePerUserGroup {
 
 	private void getPersonId2MonetaryPayment(String runCase){
 		MonetaryPaymentsAnalyzer paymentsAnalyzer = new MonetaryPaymentsAnalyzer();
-		paymentsAnalyzer.init((ScenarioImpl)scenario);
+		paymentsAnalyzer.init((MutableScenario)scenario);
 		paymentsAnalyzer.preProcessData();
 
 		EventsManager events = EventsUtils.createEventsManager();

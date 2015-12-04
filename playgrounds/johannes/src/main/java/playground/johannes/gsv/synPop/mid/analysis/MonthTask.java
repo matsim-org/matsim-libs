@@ -19,7 +19,7 @@
 
 package playground.johannes.gsv.synPop.mid.analysis;
 
-import gnu.trove.TObjectDoubleHashMap;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.common.stats.StatsWriter;
 import playground.johannes.gsv.synPop.analysis.AnalyzerTask;

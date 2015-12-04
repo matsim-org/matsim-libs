@@ -26,7 +26,7 @@ import org.matsim.contrib.common.util.LoggerUtils;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import playground.johannes.coopsim.pysical.Trajectory;
 
@@ -48,7 +48,7 @@ public class PlansWriterTask extends TrajectoryAnalyzerTask {
 	@Override
 	public void analyze(Set<Trajectory> trajectories, Map<String, DescriptiveStatistics> results) {
 		LoggerUtils.setVerbose(false);
-        ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+        MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
         Population population = PopulationUtils.createPopulation(sc.getConfig(), sc.getNetwork());
 		for(Trajectory t : trajectories) {
 			population.addPerson(t.getPerson());

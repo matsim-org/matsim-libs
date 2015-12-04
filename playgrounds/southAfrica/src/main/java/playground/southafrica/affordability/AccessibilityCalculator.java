@@ -36,7 +36,7 @@ import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.PreProcessLandmarks;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.Tuple;
@@ -70,7 +70,7 @@ import playground.southafrica.utilities.Header;
 public class AccessibilityCalculator {
 	private final static Logger LOG = Logger.getLogger(AccessibilityCalculator.class);
 	
-	private ScenarioImpl sc;
+	private MutableScenario sc;
 	private Households hhs;
 	private Network transitNetwork;
 	
@@ -114,7 +114,7 @@ public class AccessibilityCalculator {
 		Config config = ConfigUtils.createConfig();
 		config.transit().setUseTransit(true);
 //		config.scenario().setUseVehicles(true);
-		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(config);
 		
 		/* Read households. */
 		String householdFile = args[0];
@@ -213,7 +213,7 @@ public class AccessibilityCalculator {
 	 * @param transitNetwork
 	 */
 	public AccessibilityCalculator(Scenario scenario, Households households, Network transitNetwork) {
-		this.sc = (ScenarioImpl) scenario;
+		this.sc = (MutableScenario) scenario;
 		this.hhs = households;
 		this.transitNetwork = transitNetwork;
 		

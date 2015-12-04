@@ -19,19 +19,17 @@
  * *********************************************************************** */
 package playground.johannes.coopsim.mental;
 
-import gnu.trove.TIntArrayList;
+import gnu.trove.list.array.TIntArrayList;
+import org.matsim.contrib.socnetgen.sna.graph.matrix.AdjacencyMatrix;
+import org.matsim.contrib.socnetgen.sna.graph.matrix.Dijkstra;
+import org.matsim.contrib.socnetgen.sna.graph.social.SocialGraph;
+import org.matsim.contrib.socnetgen.sna.graph.social.SocialVertex;
+import playground.johannes.coopsim.Profiler;
+import playground.johannes.studies.sbsurvey.io.SocialSparseGraphMLReader;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-
-
-import playground.johannes.coopsim.Profiler;
-import playground.johannes.sna.graph.matrix.AdjacencyMatrix;
-import playground.johannes.sna.graph.matrix.Dijkstra;
-import playground.johannes.socialnetworks.graph.social.SocialGraph;
-import playground.johannes.socialnetworks.graph.social.SocialVertex;
-import playground.johannes.socialnetworks.survey.ivt2009.graph.io.SocialSparseGraphMLReader;
 
 /**
  * @author illenberger

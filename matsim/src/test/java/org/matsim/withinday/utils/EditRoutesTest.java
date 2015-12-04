@@ -34,22 +34,23 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.Injector;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterProviderImpl;
+import org.matsim.core.router.TripRouterModule;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityFactory;
-import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.testcases.MatsimTestCase;
 
-import javax.inject.Provider;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class EditRoutesTest extends MatsimTestCase {
@@ -319,7 +320,7 @@ public class EditRoutesTest extends MatsimTestCase {
 	 * @author cdobler
 	 */
 	private void createSamplePlan() {
-		plan = new PlanImpl(PersonImpl.createPerson(Id.create(1, Person.class)));
+		plan = new PlanImpl(PopulationUtils.createPerson(Id.create(1, Person.class)));
 		
 		Activity activityH1 = ((PlanImpl) plan).createAndAddActivity("h", Id.create("l1", Link.class));
 		((PlanImpl) plan).createAndAddLeg(TransportMode.car);
@@ -354,15 +355,20 @@ public class EditRoutesTest extends MatsimTestCase {
 	 * @author cdobler
 	 */
 	private void createTripRouter() {
-		
-		Provider<TripRouter> tripRouterFactory = new TripRouterProviderImpl(
-				scenario,
-				new OnlyTimeDependentTravelDisutilityFactory(),
-				new FreeSpeedTravelTime(),
-				new DijkstraFactory(),
-				null);
-		
-		tripRouter = tripRouterFactory.get();
+		Injector injector = Injector.createInjector(scenario.getConfig(), new AbstractModule() {
+			@Override
+			public void install() {
+				install(AbstractModule.override(Arrays.asList(new TripRouterModule()), new AbstractModule() {
+					@Override
+					public void install() {
+						bind(Scenario.class).toInstance(scenario);
+						addTravelTimeBinding("car").toInstance(new FreeSpeedTravelTime());
+						addTravelDisutilityFactoryBinding("car").toInstance(new OnlyTimeDependentTravelDisutilityFactory());
+					}
+				}));
+			}
+		});
+		tripRouter = injector.getInstance(TripRouter.class);
 	}
 	
 	/**

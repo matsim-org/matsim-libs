@@ -25,12 +25,13 @@ package playground.johannes.gsv.demand.tasks;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.contrib.common.collections.CollectionUtils;
 import org.matsim.contrib.common.util.ProgressLogger;
-import org.matsim.core.router.*;
-import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
+import org.matsim.core.router.PlanRouter;
+import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.pt.config.TransitConfigGroup;
 import playground.johannes.gsv.demand.PopulationTask;
-import playground.johannes.socialnetworks.utils.CollectionUtils;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -98,7 +99,7 @@ public class PlanRouteLegs implements PopulationTask {
 				e.printStackTrace();
 			}
 		}
-		ProgressLogger.termiante();
+		ProgressLogger.terminate();
 		
 	}
 	
@@ -118,10 +119,8 @@ public class PlanRouteLegs implements PopulationTask {
 //			TransitRouterConfigGroup routerConfig = (TransitRouterConfigGroup) scenario.getConfig().getModule(TransitRouterConfigGroup.GROUP_NAME);
 //			routerConfig.setSearchRadius(0);
 //			routerConfig.setExtensionRadius(0);
-			
-			FreespeedTravelTimeAndDisutility timeCostCalculator = new FreespeedTravelTimeAndDisutility(scenario.getConfig().planCalcScore());
-			RoutingContext context = new RoutingContextImpl(timeCostCalculator, timeCostCalculator);
-			TripRouter tripRouter = new TripRouterFactoryBuilderWithDefaults().build(scenario).instantiateAndConfigureTripRouter(context);
+
+			TripRouter tripRouter = new TripRouterFactoryBuilderWithDefaults().build(scenario).get();
 			PlanRouter router = new PlanRouter(tripRouter);
 			for (Person p : persons) {
 				router.run( p );

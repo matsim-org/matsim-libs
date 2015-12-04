@@ -9,12 +9,12 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.contrib.common.collections.CollectionUtils;
 import org.matsim.contrib.common.util.ProgressLogger;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import playground.johannes.coopsim.mental.choice.ChoiceSet;
 import playground.johannes.gsv.demand.PopulationTask;
-import playground.johannes.socialnetworks.utils.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -90,7 +90,7 @@ public class PlanPrimaryActivity2 implements PopulationTask {
 				e.printStackTrace();
 			}
 		}
-		ProgressLogger.termiante();
+		ProgressLogger.terminate();
 		
 	}
 	

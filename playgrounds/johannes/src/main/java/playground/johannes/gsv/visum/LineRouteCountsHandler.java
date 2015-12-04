@@ -22,19 +22,17 @@
  */
 package playground.johannes.gsv.visum;
 
-import gnu.trove.TObjectDoubleHashMap;
-
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
-
+import gnu.trove.map.hash.TObjectDoubleHashMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkUtils;
-
 import playground.johannes.gsv.visum.NetFileReader.TableHandler;
+
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author johannes

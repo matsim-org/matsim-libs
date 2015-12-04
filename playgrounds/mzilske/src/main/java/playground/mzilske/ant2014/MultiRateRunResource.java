@@ -34,13 +34,9 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterProviderImpl;
-import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityFactory;
+import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.util.DijkstraFactory;
-import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scenario.ScenarioUtils.ScenarioBuilder;
-import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 
 import playground.mzilske.cdr.CallBehavior;
 import playground.mzilske.cdr.CallBehaviorModule;
@@ -394,10 +390,8 @@ class MultiRateRunResource {
             public void write(PrintWriter pw) throws IOException {
                 for (String rate : getRates()) {
                     Scenario scenario = getRateRun(rate).getLastIteration().getExperiencedPlansAndNetwork();
-                    TripRouter tripRouter = new TripRouterProviderImpl(
+                    TripRouter tripRouter = TripRouterFactoryBuilderWithDefaults.createTripRouterProvider(
                             scenario,
-                            new OnlyTimeDependentTravelDisutilityFactory(),
-                            new FreeSpeedTravelTime(),
                             new DijkstraFactory(),
                             null)
                             .get();

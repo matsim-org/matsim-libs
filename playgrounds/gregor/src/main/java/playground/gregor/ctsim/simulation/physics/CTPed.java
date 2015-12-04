@@ -87,6 +87,7 @@ public class CTPed {
 	public void notifyMoveOverNode() {
 		CTNetworkEntity p = tentativeNextCell.getParent();
 		if (p instanceof CTLink) {
+			//TODO this.dir already set! 
 			CTLink ctLink = (CTLink) p;
 			Link us = ctLink.getUsLink();
 			Link ds = ctLink.getDsLink();
@@ -112,5 +113,14 @@ public class CTPed {
 	public Id<Link> getNextLinkId() {
 		return this.driver.chooseNextLinkId();
 
+	}
+
+	@Override
+	public String toString() {
+		return "id: " + driver.getId().toString();
+	}
+
+	public void setDir(double dir) {
+		this.dir = dir;
 	}
 }

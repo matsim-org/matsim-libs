@@ -26,10 +26,12 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.contrib.common.gis.CartesianDistanceCalculator;
+import org.matsim.contrib.common.gis.DistanceCalculator;
 import org.matsim.contrib.common.stats.Discretizer;
 import org.matsim.contrib.common.stats.LinearDiscretizer;
 import org.matsim.contrib.common.util.ProgressLogger;
+import org.matsim.contrib.common.util.XORShiftRandom;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -37,28 +39,23 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.facilities.*;
 import playground.johannes.coopsim.mental.choice.ChoiceSet;
-import playground.johannes.coopsim.util.MatsimCoordUtils;
+import playground.johannes.coopsim.utils.MatsimCoordUtils;
 import playground.johannes.gsv.zones.KeyMatrix;
 import playground.johannes.gsv.zones.MatrixOperations;
 import playground.johannes.gsv.zones.ObjectKeyMatrix;
 import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
-import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
-import playground.johannes.socialnetworks.gis.DistanceCalculator;
-import playground.johannes.socialnetworks.utils.XORShiftRandom;
 import playground.johannes.synpop.data.ActivityTypes;
 import playground.johannes.synpop.gis.Zone;
 import playground.johannes.synpop.gis.ZoneCollection;
 import playground.johannes.synpop.gis.ZoneGeoJsonIO;
 
+import javax.inject.Provider;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -128,7 +125,7 @@ public class ODBruteForceCalibrator {
 			}
 			ProgressLogger.step();
 		}
-		ProgressLogger.termiante();
+		ProgressLogger.terminate();
 	}
 
 	public void run(Population population) {
@@ -370,7 +367,7 @@ public class ODBruteForceCalibrator {
 			ProgressLogger.step();
 		}
 
-		ProgressLogger.termiante();
+		ProgressLogger.terminate();
 
 		return m;
 	}
@@ -443,11 +440,13 @@ public class ODBruteForceCalibrator {
 			((ActivityFacilityImpl) facility).setLinkId(link.getId());
 		}
 
-		TripRouterFactoryBuilderWithDefaults builder = new TripRouterFactoryBuilderWithDefaults();
-		TripRouterFactory factory = builder.build(scenario);
 		FreespeedTravelTimeAndDisutility tt = new FreespeedTravelTimeAndDisutility(1, 0, 0);
-		RoutingContextImpl context = new RoutingContextImpl(tt, tt);
-		TripRouter router = factory.instantiateAndConfigureTripRouter(context);
+		TripRouterFactoryBuilderWithDefaults builder = new TripRouterFactoryBuilderWithDefaults();
+		builder.setTravelDisutility(tt);
+		builder.setTravelTime(tt);
+
+		Provider<TripRouter> factory = builder.build(scenario);
+		TripRouter router = factory.get();
 
 		KeyMatrixXMLReader reader = new KeyMatrixXMLReader();
 		reader.setValidating(false);

@@ -63,7 +63,8 @@ public class FacilitiesLoadCalculator implements StartupListener, BeforeMobsimLi
 		 * Scales the load of the facilities (for e.g. 10 % runs), assuming that only integers
 		 * can be used to scale a  x% scenario ((100 MOD x == 0) runs e.g. x=10%)
 		 */
-		double scaleNumberOfPersons = Double.parseDouble(controler.getConfig().findParam("locationchoice", "scaleFactor"));
+		DestinationChoiceConfigGroup dccg = (DestinationChoiceConfigGroup) controler.getConfig().getModule(DestinationChoiceConfigGroup.GROUP_NAME);
+		double scaleNumberOfPersons = dccg.getScaleFactor();
         this.eventsToFacilityLoad = new EventsToFacilityLoad(
         		controler.getScenario().getActivityFacilities(), 
         		scaleNumberOfPersons,

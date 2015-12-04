@@ -41,7 +41,7 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
@@ -100,7 +100,7 @@ public class MATSim2010ScoringFunctionFactory implements ScoringFunctionFactory 
 					new KtiActivityScoring(
 						person.getSelectedPlan(),
 						params,
-						((ScenarioImpl) scenario).getActivityFacilities() )) );
+						((MutableScenario) scenario).getActivityFacilities() )) );
 
 		// standard modes
 		scoringFunctionAccumulator.addScoringFunction(

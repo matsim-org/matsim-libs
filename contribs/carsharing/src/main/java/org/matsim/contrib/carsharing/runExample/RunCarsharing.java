@@ -21,6 +21,10 @@ public class RunCarsharing {
 		Logger.getLogger( "org.matsim.core.controler.Injector" ).setLevel(Level.OFF);
 
 		final Config config = ConfigUtils.loadConfig(args[0]);
+		
+		if(Integer.parseInt(config.getModule("qsim").getValue("numberOfThreads")) > 1)
+			Logger.getLogger( "org.matsim.core.controler" ).warn("Carsharing contrib is not stable for parallel qsim!! If the error occures please use 1 as the number of threads.");
+		
 		CarsharingUtils.addConfigModules(config);
 
 		final Scenario sc = ScenarioUtils.loadScenario(config);
@@ -52,7 +56,7 @@ public class RunCarsharing {
 			}
 		});
 
-		controler.setTripRouterFactory(CarsharingUtils.createTripRouterFactory(sc));
+		controler.addOverridingModule(CarsharingUtils.createModule());
 
 		//setting up the scoring function factory, inside different scoring functions are set-up
 		controler.setScoringFunctionFactory( new CarsharingScoringFunctionFactory( sc ) );

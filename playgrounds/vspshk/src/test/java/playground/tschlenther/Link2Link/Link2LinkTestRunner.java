@@ -18,7 +18,7 @@ import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.controler.SignalsModule;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.SignalsScenarioLoader;
-import org.matsim.contrib.signals.router.InvertedNetworkTripRouterFactoryModule;
+import org.matsim.contrib.signals.router.InvertedNetworkRoutingModuleModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
@@ -30,6 +30,7 @@ import org.matsim.core.replanning.DefaultPlanStrategiesModule.DefaultSelector;
 import org.matsim.core.replanning.DefaultPlanStrategiesModule.DefaultStrategy;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
+
 
 /**
  * 
@@ -138,7 +139,7 @@ public class Link2LinkTestRunner {
 
 		if (config.controler().isLinkToLinkRoutingEnabled()) {
 			// add the module for link to link routing if enabled
-			controler.addOverridingModule(new InvertedNetworkTripRouterFactoryModule());
+			controler.addOverridingModule(new InvertedNetworkRoutingModuleModule());
 		}
 		new Link2LinkTestNetworkCreator(scenario, runSettings.isUseLanes(), runSettings.isUseSignals()).createNetwork();
 		this.createPersons(scenario);

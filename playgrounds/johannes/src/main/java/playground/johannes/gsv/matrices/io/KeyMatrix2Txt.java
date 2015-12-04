@@ -19,13 +19,13 @@
 
 package playground.johannes.gsv.matrices.io;
 
+import playground.johannes.gsv.zones.KeyMatrix;
+import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
+
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Set;
-
-import playground.johannes.gsv.zones.KeyMatrix;
-import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
 
 /**
  * @author johannes
@@ -43,11 +43,9 @@ public class KeyMatrix2Txt {
 		reader.parse(args[0]);
 		KeyMatrix m = reader.getMatrix();
 
-//		playground.johannes.gsv.zones.MatrixOperations.applyFactor(m, 11);
-//		playground.johannes.gsv.zones.MatrixOperations.applyDiagonalFactor(m, 1.25);
-
+		int odId = 0;
 		BufferedWriter writer = new BufferedWriter(new FileWriter(args[1]));
-		writer.write("from\tto\tvolume");
+		writer.write("from\tto\tvalue\todId");
 		writer.newLine();
 		Set<String> keys = m.keys();
 		for(String i : keys) {
@@ -59,7 +57,10 @@ public class KeyMatrix2Txt {
 					writer.write(j);
 					writer.write("\t");
 					writer.write(String.valueOf(val));
+					writer.write("\t");
+					writer.write(String.valueOf(odId));
 					writer.newLine();
+					odId++;
 				}
 			}
 		}

@@ -19,12 +19,12 @@
 
 package playground.johannes.gsv.synPop.analysis;
 
-import gnu.trove.TDoubleArrayList;
-import gnu.trove.TDoubleDoubleHashMap;
+import gnu.trove.list.array.TDoubleArrayList;
+import gnu.trove.map.hash.TDoubleDoubleHashMap;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.matsim.contrib.common.stats.Correlations;
 import org.matsim.contrib.common.stats.LinearDiscretizer;
 import org.matsim.contrib.common.stats.StatsWriter;
-import playground.johannes.socialnetworks.statistics.Correlations;
 import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.Episode;
@@ -101,7 +101,7 @@ public class SpeedFactorAnalyzer extends AnalyzerTask {
 			
 			if(outputDirectoryNotNull()) {
 		
-			TDoubleDoubleHashMap map = Correlations.mean(distances.toNativeArray(), durations.toNativeArray(), new LinearDiscretizer(1000));
+			TDoubleDoubleHashMap map = Correlations.mean(distances.toArray(), durations.toArray(), new LinearDiscretizer(1000));
 			try {
 				StatsWriter.writeHistogram(map, "Distance", "Traveltime", getOutputDirectory() + key + ".txt");
 			} catch (IOException e) {

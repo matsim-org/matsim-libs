@@ -29,7 +29,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.population.algorithms.XY2Links;
-
 import playground.johannes.gsv.demand.PopulationTask;
 
 /**

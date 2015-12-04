@@ -20,10 +20,10 @@
 package playground.johannes.gsv.synPop;
 
 import org.apache.log4j.Logger;
-import playground.johannes.synpop.data.io.XMLHandler;
-import playground.johannes.synpop.data.io.XMLWriter;
 import playground.johannes.synpop.data.PlainFactory;
 import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.data.io.XMLHandler;
+import playground.johannes.synpop.data.io.XMLWriter;
 
 import java.util.HashSet;
 import java.util.Iterator;
@@ -37,18 +37,18 @@ public class MergePopulations {
 		XMLHandler parser = new XMLHandler(new PlainFactory());
 		parser.setValidating(false);
 
-		parser.addToBlacklist("workLoc");
-		parser.addToBlacklist("homeLoc");
-		parser.addToBlacklist("homeCoord");
-		parser.addToBlacklist("location");
-		parser.addToBlacklist("coord");
-		parser.addToBlacklist("state");
-		parser.addToBlacklist("inhabClass");
-		parser.addToBlacklist("index");
-		parser.addToBlacklist("roundTrip");
-		parser.addToBlacklist("origin");
-		parser.addToBlacklist("purpose");
-		parser.addToBlacklist("delete");
+//		parser.addToBlacklist("workLoc");
+//		parser.addToBlacklist("homeLoc");
+//		parser.addToBlacklist("homeCoord");
+//		parser.addToBlacklist("location");
+//		parser.addToBlacklist("coord");
+//		parser.addToBlacklist("state");
+//		parser.addToBlacklist("inhabClass");
+//		parser.addToBlacklist("index");
+//		parser.addToBlacklist("roundTrip");
+//		parser.addToBlacklist("origin");
+//		parser.addToBlacklist("purpose");
+//		parser.addToBlacklist("delete");
 		
 		logger.info("Loading persons...");
 		parser.parse(args[0]);

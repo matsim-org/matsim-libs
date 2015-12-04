@@ -25,20 +25,19 @@ package org.matsim.contrib.matrixbasedptrouter;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.core.router.DefaultTripRouterFactoryImpl;
-import org.matsim.core.router.RoutingContext;
-import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.*;
+
+import javax.inject.Provider;
 
 /**
  * @author thomas
  *
  */
-public final class MatrixBasedPtRouterFactoryImpl implements TripRouterFactory {
+public final class MatrixBasedPtRouterFactoryImpl implements Provider<TripRouter> {
 
 	private static final Logger log = Logger.getLogger(MatrixBasedPtRouterFactoryImpl.class);
 
-	private TripRouterFactory delegate; 
+	private Provider<TripRouter> delegate;
 
 	private final PtMatrix ptMatrix; // immutable, shared between instances
 
@@ -46,16 +45,16 @@ public final class MatrixBasedPtRouterFactoryImpl implements TripRouterFactory {
 
 	public MatrixBasedPtRouterFactoryImpl(final Scenario scenario, final PtMatrix ptMatrix) {
 		this.ptMatrix = ptMatrix;
-		this.delegate = DefaultTripRouterFactoryImpl.createRichTripRouterFactoryImpl(scenario);
+		this.delegate = TripRouterFactoryBuilderWithDefaults.createDefaultTripRouterFactoryImpl(scenario);
 		this.scenario = scenario;
 	}
 
 	@Override
-	public TripRouter instantiateAndConfigureTripRouter(RoutingContext iterationContext) {
+	public TripRouter get() {
 		if ( scenario.getConfig().transit().isUseTransit() ) {
 			log.warn("you try to use PseudoPtRoutingModule and physical transit simulation at the same time. This probably will not work!");
 		}
-		TripRouter tripRouter = this.delegate.instantiateAndConfigureTripRouter(iterationContext);
+		TripRouter tripRouter = this.delegate.get();
 		tripRouter.setRoutingModule(TransportMode.pt, new MatrixBasedPtRoutingModule(scenario, ptMatrix));
 		return tripRouter;
 	}

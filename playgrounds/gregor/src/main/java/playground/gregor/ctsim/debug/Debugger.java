@@ -65,7 +65,7 @@ public class Debugger {
 				int rnd = (int) (MatsimRandom.getRandom().nextInt(n) * 0.1);
 				for (int i = 0; i < rnd; i++) {
 					nrPeds++;
-					DriverAgent walker = new SimpleCTNetworkWalker(links);
+					DriverAgent walker = new SimpleCTNetworkWalker(links, Id.createPersonId(nrPeds++));
 
 					CTPed ped = new CTPed(cell, walker);
 					cell.jumpOnPed(ped, 0);

@@ -121,11 +121,10 @@ public class Padang2CT {
 		loadPopulation(sc);
 
 		Population pop = sc.getPopulation();
-		new PopulationWriter(pop, sc.getNetwork(), 0.01).write(c.plans()
+		new PopulationWriter(pop, sc.getNetwork(), 0.1).write(c.plans()
 				.getInputFile());
 
 		CTRunner.main(new String[]{inputDir + "/config.xml", "false"});
-
 
 
 	}
@@ -136,9 +135,11 @@ public class Padang2CT {
 		mode.add("walkct");
 		for (Link l : sc.getNetwork().getLinks().values()) {
 			if (l.getId().toString().contains("el")) {
-				l.setCapacity(100 * 1.33);
+				l.setCapacity(20 * 1.33);
+				l.setLength(1000);
 			}
 			l.setAllowedModes(mode);
+
 		}
 	}
 

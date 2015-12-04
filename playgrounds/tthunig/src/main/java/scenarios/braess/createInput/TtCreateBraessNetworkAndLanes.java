@@ -23,6 +23,7 @@ package scenarios.braess.createInput;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -35,7 +36,7 @@ import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.lanes.LanesUtils;
 import org.matsim.lanes.data.v20.Lane;
-import org.matsim.lanes.data.v20.LaneDefinitions20;
+import org.matsim.lanes.data.v20.Lanes;
 import org.matsim.lanes.data.v20.LaneDefinitionsFactory20;
 import org.matsim.lanes.data.v20.LaneDefinitionsWriter20;
 import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
@@ -268,7 +269,7 @@ public final class TtCreateBraessNetworkAndLanes {
 	 */
 	private void createTrivialLanes() {
 		
-		LaneDefinitions20 laneDef20 = this.scenario.getLanes();
+		Lanes laneDef20 = this.scenario.getLanes();
 		LaneDefinitionsFactory20 fac = laneDef20.getFactory();
 		
 		for (Link link: scenario.getNetwork().getLinks().values()){
@@ -295,7 +296,7 @@ public final class TtCreateBraessNetworkAndLanes {
 	 */
 	private void createRealisticLanes() {
 		
-		LaneDefinitions20 laneDef20 = this.scenario.getLanes();
+		Lanes laneDef20 = this.scenario.getLanes();
 		LaneDefinitionsFactory20 fac = laneDef20.getFactory();
 
 		// create link assignment of link 1_2
@@ -311,21 +312,21 @@ public final class TtCreateBraessNetworkAndLanes {
 		if (simulateInflowCap) {
 			LanesUtils.createAndAddLane20(linkAssignment, fac,
 					Id.create("1_2.l", Lane.class), capFirstLast,
-					linkLength / 2, -1, 1, 
-					Arrays.asList(Id.createLinkId("2_23")),	null);
+					linkLength / 2, -1, 1,
+					Collections.singletonList(Id.createLinkId("2_23")),	null);
 			LanesUtils.createAndAddLane20(linkAssignment, fac,
 					Id.create("1_2.r", Lane.class), capFirstLast,
-					linkLength / 2, 1, 1,  
-					Arrays.asList(Id.createLinkId("2_24")), null);
+					linkLength / 2, 1, 1,
+					Collections.singletonList(Id.createLinkId("2_24")), null);
 		} else {
 			LanesUtils.createAndAddLane20(linkAssignment, fac,
 					Id.create("1_2.l", Lane.class), capFirstLast,
-					linkLength / 2, -1, 1, 
-					Arrays.asList(Id.createLinkId("2_3")), null);
+					linkLength / 2, -1, 1,
+					Collections.singletonList(Id.createLinkId("2_3")), null);
 			LanesUtils.createAndAddLane20(linkAssignment, fac,
 					Id.create("1_2.r", Lane.class), capFirstLast,
-					linkLength / 2, 1, 1,  
-					Arrays.asList(Id.createLinkId("2_4")), null);
+					linkLength / 2, 1, 1,
+					Collections.singletonList(Id.createLinkId("2_4")), null);
 		}	
 		
 		laneDef20.addLanesToLinkAssignment(linkAssignment);
@@ -347,12 +348,12 @@ public final class TtCreateBraessNetworkAndLanes {
 				LanesUtils.createAndAddLane20(linkAssignment, fac,
 						Id.create("23_3.f", Lane.class), capMain,
 						linkLength / 2, 0, 1,
-						Arrays.asList(Id.createLinkId("3_5")), null);
+						Collections.singletonList(Id.createLinkId("3_5")), null);
 
 				LanesUtils.createAndAddLane20(linkAssignment, fac,
 						Id.create("23_3.r", Lane.class), capMain,
 						linkLength / 2, 1, 1,
-						Arrays.asList(Id.createLinkId("3_4")), null);
+						Collections.singletonList(Id.createLinkId("3_4")), null);
 
 				laneDef20.addLanesToLinkAssignment(linkAssignment);
 			} else {
@@ -368,12 +369,12 @@ public final class TtCreateBraessNetworkAndLanes {
 				LanesUtils.createAndAddLane20(linkAssignment, fac,
 						Id.create("2_3.f", Lane.class), capMain,
 						linkLength / 2, 0, 1,
-						Arrays.asList(Id.createLinkId("3_5")), null);
+						Collections.singletonList(Id.createLinkId("3_5")), null);
 
 				LanesUtils.createAndAddLane20(linkAssignment, fac,
 						Id.create("2_3.r", Lane.class), capMain,
 						linkLength / 2, 1, 1,
-						Arrays.asList(Id.createLinkId("3_4")), null);
+						Collections.singletonList(Id.createLinkId("3_4")), null);
 
 				laneDef20.addLanesToLinkAssignment(linkAssignment);
 			}

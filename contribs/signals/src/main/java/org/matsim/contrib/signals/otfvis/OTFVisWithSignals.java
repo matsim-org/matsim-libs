@@ -39,7 +39,7 @@ import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
 import org.matsim.core.mobsim.qsim.pt.TransitStopAgentTracker;
-import org.matsim.lanes.data.v20.LaneDefinitions20;
+import org.matsim.lanes.data.v20.Lanes;
 import org.matsim.vis.otfvis.handler.FacilityDrawer;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.vis.otfvis.*;
@@ -69,9 +69,6 @@ public class OTFVisWithSignals {
 		server.setListener( playPauseMobsimListener ) ;
 		qSim.addQueueSimulationListeners(playPauseMobsimListener);
 
-		// this is to trigger otfvis-specific cleanup (quite possibly not needed):
-		qSim.addQueueSimulationListeners( new OTFVisMobsimListener(server) );
-
 		server.setSimulation(qSim);
 
 		if (config.transit().isUseTransit()) {
@@ -88,14 +85,14 @@ public class OTFVisWithSignals {
 		if ( (config.qsim().isUseLanes() || config.network().getLaneDefinitionsFile()!=null ) 
 				&& (!(boolean) ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).isUseSignalSystems())) {
 			ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).setScaleQuadTreeRect(true);
-			OTFLaneWriter otfLaneWriter = new OTFLaneWriter(qSim.getVisNetwork(), (LaneDefinitions20) scenario.getScenarioElement(LaneDefinitions20.ELEMENT_NAME), scenario.getConfig());
+			OTFLaneWriter otfLaneWriter = new OTFLaneWriter(qSim.getVisNetwork(), (Lanes) scenario.getScenarioElement(Lanes.ELEMENT_NAME), scenario.getConfig());
 			server.addAdditionalElement(otfLaneWriter);
 		} else if ((boolean) ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).isUseSignalSystems()) {
 			ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).setScaleQuadTreeRect(true);
 			SignalGroupStateChangeTracker signalTracker = new SignalGroupStateChangeTracker();
 			events.addHandler(signalTracker);
 			SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
-			LaneDefinitions20 laneDefs = scenario.getLanes();
+			Lanes laneDefs = scenario.getLanes();
 			SignalSystemsData systemsData = signalsData.getSignalSystemsData();
 			SignalGroupsData groupsData = signalsData.getSignalGroupsData();
 			OTFSignalWriter otfSignalWriter = new OTFSignalWriter(qSim.getVisNetwork(), laneDefs, scenario.getConfig(), systemsData, groupsData , signalTracker);

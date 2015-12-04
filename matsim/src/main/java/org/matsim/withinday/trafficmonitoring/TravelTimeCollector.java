@@ -46,6 +46,7 @@ import org.matsim.core.utils.misc.Counter;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
 
+import javax.inject.Inject;
 import java.util.*;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.ConcurrentHashMap;
@@ -97,7 +98,12 @@ public class TravelTimeCollector implements TravelTime,
 	
 	private int resetCnt = 0 ;
 	boolean problem = true ;
-	
+
+	@Inject
+	TravelTimeCollector(Scenario scenario) {
+		this(scenario, null);
+	}
+
 	public TravelTimeCollector(Scenario scenario, Set<String> analyzedModes) {
 		/*
 		 * The parallelization should scale almost linear, therefore we do use

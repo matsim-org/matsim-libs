@@ -19,55 +19,82 @@
 
 package playground.johannes.gsv.qlik;
 
+import com.vividsolutions.jts.algorithm.MinimumDiameter;
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import org.apache.log4j.Logger;
+import org.geotools.geometry.jts.JTSFactoryFinder;
+import org.matsim.contrib.common.gis.DistanceCalculator;
+import org.matsim.contrib.common.gis.WGS84DistanceCalculator;
 import playground.johannes.gsv.zones.KeyMatrix;
-import playground.johannes.socialnetworks.gis.DistanceCalculator;
-import playground.johannes.socialnetworks.gis.WGS84DistanceCalculator;
 import playground.johannes.synpop.gis.Zone;
 import playground.johannes.synpop.gis.ZoneCollection;
-import playground.johannes.synpop.gis.ZoneGeoJsonIO;
+import playground.johannes.synpop.gis.ZoneEsriShapeIO;
 
 import java.io.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author johannes
  */
 public class GenerateODAttributes {
 
+    private static final Logger logger = Logger.getLogger(GenerateODAttributes.class);
+
     public static final void main(String args[]) throws IOException {
-        ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON(args[1], "NO");
-        DistanceCalculator dCalc = WGS84DistanceCalculator.getInstance();
+        String matrixFile1 = "/mnt/cifs/B-drive/C_Vertrieb/2014_03_01_Nachfragematrizen_PV/07_Qlik/MIV_Flug_Kreis_2013.csv";
+        String matrixFile2 = "/mnt/cifs/B-drive/C_Vertrieb/2014_03_01_Nachfragematrizen_PV/07_Qlik/Bahn_Kreis_2013.csv";
+        String zonesFile = "/home/johannes/gsv/gis/nuts/world/psmobility.shp";
+        String outFile = "/mnt/cifs/B-drive/C_Vertrieb/2014_03_01_Nachfragematrizen_PV/07_Qlik/odAttributes-kreis.csv";
 
-        KeyMatrix idMatrix = new KeyMatrix();
-        KeyMatrix distMatrix = new KeyMatrix();
+//        ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON(args[1], "NO");
+        logger.info("Loading zones...");
+        ZoneCollection zones = ZoneEsriShapeIO.read(zonesFile);
+        zones.setPrimaryKey("NO");
 
-        int idCounter = 0;
-
-        BufferedWriter writer = new BufferedWriter(new FileWriter(args[2]));
+        BufferedWriter writer = new BufferedWriter(new FileWriter(outFile));
         writer.write("from;to;id;distance");
         writer.newLine();
 
-        BufferedWriter writer2 = new BufferedWriter(new FileWriter(args[3]));
+        KeyMatrix idMatrix = new KeyMatrix();
+        KeyMatrix distMatrix = new KeyMatrix();
+        AtomicInteger idCounter = new AtomicInteger(0);
+        DistanceCalculator dCalc = WGS84DistanceCalculator.getInstance();
 
-        BufferedReader reader = new BufferedReader(new FileReader(args[0]));
+        logger.info(String.format("Loading matrix %s...", matrixFile1));
+        BufferedReader reader = new BufferedReader(new FileReader(matrixFile1));
+        read(reader, writer, idCounter, idMatrix, distMatrix, zones, dCalc);
+        reader.close();
+
+        logger.info(String.format("Loading matrix %s...", matrixFile2));
+        reader = new BufferedReader(new FileReader(matrixFile2));
+        read(reader, writer, idCounter, idMatrix, distMatrix, zones, dCalc);
+        reader.close();
+
+        writer.close();
+        logger.info("Done.");
+    }
+
+    private static void read(BufferedReader reader, BufferedWriter writer, AtomicInteger idCounter, KeyMatrix
+            idMatrix, KeyMatrix distMatrix, ZoneCollection zones, DistanceCalculator dCalc) throws IOException {
+
+        GeometryFactory geometryFactory = JTSFactoryFinder.getGeometryFactory();
         String line = reader.readLine();
-        writer2.write(line);
-        writer2.write(";\"odId\";\"distance\"");
-        writer2.newLine();
+        int count = 0;
 
-//        double d = 0.0;
-
-        while((line = reader.readLine()) != null) {
+        while ((line = reader.readLine()) != null) {
             String tokens[] = line.split(";");
             String i = tokens[0];
             String j = tokens[1];
 
             Double id = idMatrix.get(i, j);
-            Double d = distMatrix.get(i, j);
+            Double d;
 
-            if(id == null) {
-                id = new Double(idCounter);
+            if (id == null) {
+                id = new Double(idCounter.get());
                 idMatrix.set(i, j, id);
-                idCounter++;
+                idCounter.incrementAndGet();
 
                 writer.write(i);
                 writer.write(";");
@@ -79,20 +106,25 @@ public class GenerateODAttributes {
                 Zone zi = zones.get(i);
                 Zone zj = zones.get(j);
 
-                if(zi != null && zj != null) {
-                    d = dCalc.distance(zi.getGeometry().getCentroid(), zj.getGeometry().getCentroid());
+                if (zi != null && zj != null) {
+                    if (zi != zj) {
+                        d = dCalc.distance(zi.getGeometry().getCentroid(), zj.getGeometry().getCentroid());
+                    } else {
+                        Geometry geo = zi.getGeometry();
+                        Coordinate c = new MinimumDiameter(geo).getWidthCoordinate();
+                        d = dCalc.distance(geo.getCentroid(), geometryFactory.createPoint(c));
+                    }
                     distMatrix.set(i, j, d);
                     writer.write(String.valueOf(d));
                 } else {
-                    d = 0.0;
+                    writer.write("NA");
                 }
 
                 writer.newLine();
-            }
 
-            writer2.write(line);
-            writer2.write(String.format(";%s;%s", id.intValue(), d.intValue()));
-            writer2.newLine();
+                count++;
+                if (count % 100000 == 0) System.out.println(String.format("Parsed %s lines...", count));
+            }
         }
     }
 }

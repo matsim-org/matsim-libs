@@ -55,10 +55,10 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -198,7 +198,7 @@ public class ControlerTest {
 		final Config config = this.utils.loadConfig(null);
 		config.controler().setLastIteration(0);
 
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		// create a very simple network with one link only and an empty population
 		Network network = scenario.getNetwork();
 		Node node1 = network.getFactory().createNode(Id.create(1, Node.class), new Coord(0, 0));
@@ -342,7 +342,7 @@ public class ControlerTest {
 		Leg leg1 = null;
 		Leg leg2 = null;
 
-		person1 = PersonImpl.createPerson(Id.create(1, Person.class));
+		person1 = PopulationUtils.createPerson(Id.create(1, Person.class));
 		// --- plan 1 ---
 		Plan plan1 = factory.createPlan();
 		person1.addPlan(plan1);
@@ -922,7 +922,7 @@ public class ControlerTest {
 	 * @author mrieser
 	 */
 	private static class Fixture {
-		final ScenarioImpl scenario;
+		final MutableScenario scenario;
 		final Network network;
 		Node node1 = null;
 		Node node2 = null;
@@ -933,7 +933,7 @@ public class ControlerTest {
 		Link link3 = null;
 
 		protected Fixture(final Config config) {
-			this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+			this.scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 			this.network = this.scenario.getNetwork();
 
 			/* Create a simple network with 4 nodes and 3 links:

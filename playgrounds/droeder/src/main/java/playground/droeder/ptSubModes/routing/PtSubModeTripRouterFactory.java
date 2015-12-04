@@ -30,13 +30,9 @@ import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
-import org.matsim.core.router.RoutingContext;
-import org.matsim.core.router.TransitRouterWrapper;
-import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.*;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.DefaultRoutingModules;
 import org.matsim.core.router.util.*;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
@@ -45,7 +41,7 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
  * @author droeder
  *
  */
-public class PtSubModeTripRouterFactory implements TripRouterFactory{
+public class PtSubModeTripRouterFactory implements javax.inject.Provider<TripRouter>{
 
 
 
@@ -66,7 +62,7 @@ public class PtSubModeTripRouterFactory implements TripRouterFactory{
 	private Controler controler;
 
 	/**
-	 * based on {@link org.matsim.core.router.TripRouterProviderImpl}. Own Implementation is just necessary to add pt-submodes.
+	 * based on {@link TripRouterFactoryBuilderWithDefaults.TripRouterProviderImpl}. Own Implementation is just necessary to add pt-submodes.
 	 * @param controler
 	 * @param transitRouterFactory 
 	 */
@@ -85,7 +81,7 @@ public class PtSubModeTripRouterFactory implements TripRouterFactory{
 	}
 	
 	@Override
-	public TripRouter instantiateAndConfigureTripRouter(RoutingContext iterationContext) {
+	public TripRouter get() {
 		
 		this.config = controler.getScenario().getConfig();
 		this.network = controler.getScenario().getNetwork();

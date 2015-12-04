@@ -7,7 +7,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.utils.charts.XYLineChart;
 import playground.artemc.analysis.TripAnalysisHandler;
 
@@ -24,7 +24,7 @@ import java.util.TreeMap;
 public class DisaggregatedScoreAnalyzer implements IterationEndsListener{
 	private static final Logger log = Logger.getLogger(DisaggregatedScoreAnalyzer.class);
 
-	private ScenarioImpl scenario;
+	private MutableScenario scenario;
 	private Map<Id, DisaggregatedScore> disaggregatedScores = new HashMap<Id, DisaggregatedScore>();
 	private Map<Integer, Double> activityUtility2it = new TreeMap<Integer, Double>();
 	private Map<Integer, Double> legUtilityTotal2it = new TreeMap<Integer, Double>();
@@ -34,7 +34,7 @@ public class DisaggregatedScoreAnalyzer implements IterationEndsListener{
 	private Map<Integer, Double> sumUtility2it = new TreeMap<Integer, Double>();
 	private TripAnalysisHandler tripAnalysisHandler;
 
-	public DisaggregatedScoreAnalyzer(ScenarioImpl scenario, TripAnalysisHandler tripAnalysisHandler) {
+	public DisaggregatedScoreAnalyzer(MutableScenario scenario, TripAnalysisHandler tripAnalysisHandler) {
 		super();
 		this.scenario = scenario;
 		this.tripAnalysisHandler = tripAnalysisHandler;

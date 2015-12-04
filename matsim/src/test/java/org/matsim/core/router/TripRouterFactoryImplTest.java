@@ -33,11 +33,17 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.Injector;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityFactory;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.DijkstraFactory;
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.Facility;
 import org.matsim.pt.router.TransitRouterConfig;
@@ -46,6 +52,7 @@ import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 
 import javax.inject.Provider;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -55,17 +62,6 @@ import java.util.Map;
  * @author thibautd
  */
 public class TripRouterFactoryImplTest {
-	/**
-	 * When using PT, car should not be routed on links restricted to pt modes,
-	 * such as railways.
-	 */
-	@Test
-	public void testRestrictedNetworkPt() throws Exception {
-		Config config = ConfigUtils.createConfig();
-		config.transit().setUseTransit( true );
-
-		testRestrictedNetwork( config );
-	}
 
 	/**
 	 * When not using PT but using a multimodal network, car should not be routed on links restricted to pt modes,
@@ -82,7 +78,7 @@ public class TripRouterFactoryImplTest {
 	private static void testRestrictedNetwork(final Config config) throws Exception {
 		// create a simple scenario, with two parallel links,
 		// a long one for cars, a short one for pt.
-		Scenario scenario = ScenarioUtils.createScenario( config );
+		final Scenario scenario = ScenarioUtils.createScenario( config );
 		Network net = scenario.getNetwork();
 
 		Node n1 = net.getFactory().createNode( Id.create( 1, Node.class ) , new Coord((double) 0, (double) 0));
@@ -110,20 +106,22 @@ public class TripRouterFactoryImplTest {
 		net.addLink( l2pt );
 		net.addLink( l3 );
 
+		Injector injector = Injector.createInjector(scenario.getConfig(), new AbstractModule() {
+			@Override
+			public void install() {
+				install(AbstractModule.override(Arrays.asList(new TripRouterModule()), new AbstractModule() {
+					@Override
+					public void install() {
+						bind(Scenario.class).toInstance(scenario);
+						addTravelTimeBinding("car").toInstance(new FreespeedTravelTimeAndDisutility( config.planCalcScore() ));
+						addTravelDisutilityFactoryBinding("car").toInstance(new OnlyTimeDependentTravelDisutilityFactory());
+					}
+				}));
+			}
+		});
+
 		// create the factory, get a router, route.
-		Provider<TripRouter> factory =
-			new TripRouterProviderImpl(
-					scenario,
-					new OnlyTimeDependentTravelDisutilityFactory(),
-					new FreespeedTravelTimeAndDisutility( config.planCalcScore() ),
-					new DijkstraFactory(),
-					new TransitRouterImplFactory(
-						new TransitScheduleFactoryImpl().createTransitSchedule() ,
-						new TransitRouterConfig(
-							config.planCalcScore(),
-							config.plansCalcRoute(),
-							config.transitRouter(),
-							config.vspExperimental())) );
+		Provider<TripRouter> factory = injector.getProvider(TripRouter.class);
 
 		TripRouter router = factory.get();
 
@@ -132,7 +130,7 @@ public class TripRouterFactoryImplTest {
 				new LinkFacility( l1 ),
 				new LinkFacility( l3 ),
 				0,
-				PersonImpl.createPerson(Id.create("toto", Person.class)));
+				PopulationUtils.createPerson(Id.create("toto", Person.class)));
 
 		Leg l = (Leg) trip.get( 0 );
 
@@ -155,8 +153,8 @@ public class TripRouterFactoryImplTest {
 	 */
 	@Test
 	public void testMonomodalNetwork() throws Exception {
-		Config config = ConfigUtils.createConfig();
-		Scenario scenario = ScenarioUtils.createScenario( config );
+		final Config config = ConfigUtils.createConfig();
+		final Scenario scenario = ScenarioUtils.createScenario( config );
 		Network net = scenario.getNetwork();
 
 		Node n1 = net.getFactory().createNode( Id.create( 1, Node.class) , new Coord((double) 0, (double) 0));
@@ -183,28 +181,28 @@ public class TripRouterFactoryImplTest {
 		net.addLink( l3 );
 
 		// create the factory, get a router, route.
-		Provider<TripRouter> factory =
-			new TripRouterProviderImpl(
-					scenario,
-					new OnlyTimeDependentTravelDisutilityFactory(),
-					new FreespeedTravelTimeAndDisutility( config.planCalcScore() ),
-					new DijkstraFactory(),
-					new TransitRouterImplFactory(
-						new TransitScheduleFactoryImpl().createTransitSchedule() ,
-						new TransitRouterConfig(
-							config.planCalcScore(),
-							config.plansCalcRoute(),
-							config.transitRouter(),
-							config.vspExperimental())) );
+		Injector injector = Injector.createInjector(scenario.getConfig(), new AbstractModule() {
+			@Override
+			public void install() {
+				install(AbstractModule.override(Arrays.asList(new TripRouterModule()), new AbstractModule() {
+					@Override
+					public void install() {
+						bind(Scenario.class).toInstance(scenario);
+						addTravelTimeBinding("car").toInstance(new FreespeedTravelTimeAndDisutility( config.planCalcScore() ));
+						addTravelDisutilityFactoryBinding("car").toInstance(new OnlyTimeDependentTravelDisutilityFactory());
+					}
+				}));
+			}
+		});
 
-		TripRouter router = factory.get();
+		TripRouter router = injector.getInstance(TripRouter.class);
 
 		List<? extends PlanElement> trip = router.calcRoute(
 				TransportMode.car,
 				new LinkFacility( l1 ),
 				new LinkFacility( l3 ),
 				0,
-				PersonImpl.createPerson(Id.create("toto", Person.class)));
+				PopulationUtils.createPerson(Id.create("toto", Person.class)));
 
 		Leg l = (Leg) trip.get( 0 );
 

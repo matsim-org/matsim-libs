@@ -112,8 +112,6 @@ public class CompareCongestionEvents  {
 			}
 		}
 		
-		
-		
 		System.out.println("Wrong events are "+wronglyChargedEventsList.size());
 		System.out.println("Uncharged events are "+eventsImpl4.size());
 		checkWrongEventsList();

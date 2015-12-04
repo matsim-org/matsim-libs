@@ -8,7 +8,7 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ArgumentParser;
 
@@ -76,7 +76,7 @@ public class SimpleXY2Links {
 	 */
 	public void run(final String[] args) {
 		parseArguments(args);
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario.getConfig().addCoreModules();
 		scenario.getConfig().network().setInputFile(this.networkfile);
 		scenario.getConfig().plans().setInputFile(this.plansfileIN);

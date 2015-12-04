@@ -35,7 +35,6 @@ import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.router.PlanRouter;
-import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -133,10 +132,8 @@ public class SimpleCottbusFanCreator implements CottbusFanCreator {
 		PlanAlgorithm router =
 				new PlanRouter(
 						new TripRouterFactoryBuilderWithDefaults().build(
-								sc ).instantiateAndConfigureTripRouter(
-										new RoutingContextImpl(
-												timeCostCalc,
-												timeCostCalc ) ) );
+								sc ).get(
+						) );
 		PersonPrepareForSim pp4s = new PersonPrepareForSim(router, sc);
 		
 //		Scenario sc2 = ScenarioUtils.createScenario(sc.getConfig());

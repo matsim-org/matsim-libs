@@ -29,22 +29,25 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
+import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup.InternalPlanDataStructure;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext.ActivityFacilityWithIndex;
-import org.matsim.contrib.locationchoice.bestresponse.PlanTimesAdapter.ApproximationLevel;
+import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup.ApproximationLevel;
 import org.matsim.contrib.locationchoice.bestresponse.scoring.ScaleEpsilon;
+import org.matsim.contrib.locationchoice.population.LCPlan;
 import org.matsim.contrib.locationchoice.router.BackwardFastMultiNodeDijkstra;
 import org.matsim.contrib.locationchoice.timegeography.RecursiveLocationMutator;
 import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
 import org.matsim.contrib.locationchoice.utils.PlanUtils;
-import org.matsim.contrib.locationchoice.utils.QuadTreeRing;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.MultiNodeDijkstra;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.scoring.ScoringFunctionFactory;
+import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
@@ -52,6 +55,7 @@ import org.matsim.facilities.ActivityFacilityImpl;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
 public final class BestResponseLocationMutator extends RecursiveLocationMutator {
+	
 	private final ActivityFacilities facilities;
 	private final ObjectAttributes personsMaxDCScoreUnscaled;
 	private final ScaleEpsilon scaleEpsilon;
@@ -63,16 +67,18 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 	private final ScoringFunctionFactory scoringFunctionFactory;
 	private final int iteration;
 	private final Map<Id<ActivityFacility>, Id<Link>> nearestLinks;
+	private final Map<String, Double> teleportedModeSpeeds;
+	private final Map<String, Double> beelineDistanceFactors;
 	
 	/*
 	 * This is not nice! We hide the object of the super-super class since
 	 * it expects a QuadTreeRing<ActivityFacility>. Find a better solution for this...
 	 * cdobler, oct'13.
 	 */
-	protected TreeMap<String, QuadTreeRing<ActivityFacilityWithIndex>> quadTreesOfType;
+	protected TreeMap<String, QuadTree<ActivityFacilityWithIndex>> quadTreesOfType;
 	
 	public BestResponseLocationMutator(
-			TreeMap<String, QuadTreeRing<ActivityFacilityWithIndex>> quad_trees,
+			TreeMap<String, QuadTree<ActivityFacilityWithIndex>> quad_trees,
 			TreeMap<String, ActivityFacilityImpl []> facilities_of_type,
 			ObjectAttributes personsMaxDCScoreUnscaled, DestinationChoiceBestResponseContext lcContext,
 			DestinationSampler sampler, TripRouter tripRouter, MultiNodeDijkstra forwardMultiNodeDijkstra,
@@ -92,6 +98,10 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 		this.iteration = iteration;
 		this.nearestLinks = nearestLinks;
 		
+		// Cache maps since otherwise they would be created on the fly every time when accessing them via the config object.
+		this.teleportedModeSpeeds = this.lcContext.getScenario().getConfig().plansCalcRoute().getTeleportedModeSpeeds();
+		this.beelineDistanceFactors = this.lcContext.getScenario().getConfig().plansCalcRoute().getBeelineDistanceFactors();
+		
 		this.quadTreesOfType = quad_trees;
 	}
 
@@ -104,54 +114,62 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 		Long idExclusion = this.dccg.getIdExclusion();
 		if (idExclusion != null && Long.parseLong(person.getId().toString()) > idExclusion) return;
 
-		// why is all this plans copying necessary?  Could you please explain the design a bit?  Thanks.  kai, jan'13
-		// (this may be done by now. kai, jan'13)
-
-		Plan bestPlan = new PlanImpl(person);	
-
-		// bestPlan is initialized as a copy from the old plan:
-		((PlanImpl)bestPlan).copyFrom(plan);
-
-		// this will probably generate an improved bestPlan (?):
-		int personIndex = this.lcContext.getPersonIndex(person.getId());
-		this.handleActivities(plan, bestPlan, personIndex);
-
-		// copy the best plan into replanned plan
-		// making a deep copy
-		PlanUtils.copyPlanFieldsToFrom((PlanImpl)plan, (PlanImpl)bestPlan);
-		// yy ( the syntax of this is copy( to, from) !!! )
-
-		super.resetRoutes(plan);
+		if (this.dccg.getInternalPlanDataStructure() == InternalPlanDataStructure.planImpl) {
+			// why is all this plans copying necessary?  Could you please explain the design a bit?  Thanks.  kai, jan'13
+			// (this may be done by now. kai, jan'13)
+			
+			Plan bestPlan = new PlanImpl(person);
+			
+			// bestPlan is initialized as a copy from the old/input plan:
+			((PlanImpl) bestPlan).copyFrom(plan);
+			
+			// this will probably generate an improved bestPlan (?):
+			int personIndex = this.lcContext.getPersonIndex(person.getId());
+			this.handleActivities(plan, bestPlan, personIndex);
+			
+			// copy the best plan into replanned plan
+			// making a deep copy
+			PlanUtils.copyPlanFieldsToFrom(plan, bestPlan);
+			// yy ( the syntax of this is copy( to, from) !!! )
+			
+			PlanUtils.resetRoutes(plan);
+		} else if (this.dccg.getInternalPlanDataStructure() == InternalPlanDataStructure.lcPlan) {
+			
+			// create a memory efficient version of the plan that can be copied easily
+			LCPlan lcPlan = new LCPlan(plan);
+			
+			LCPlan bestPlan = LCPlan.createCopy(lcPlan);
+			
+			// this will probably generate an improved bestPlan (?):
+			int personIndex = this.lcContext.getPersonIndex(person.getId());
+			this.handleActivities(lcPlan, bestPlan, personIndex);
+			
+			// copy the best plan into replanned plan
+			// making a deep copy
+//			PlanUtils.copyPlanFieldsToFrom((LCPlan) lcPlan, (LCPlan) bestPlan);
+			PlanUtils.copyPlanFieldsToFrom(plan, bestPlan);
+			// yy ( the syntax of this is copy( to, from) !!! )
+			
+			PlanUtils.resetRoutes(plan);
+		} else throw new RuntimeException("Unknown InternalPlanDataStructure was found: " + this.dccg.getInternalPlanDataStructure().toString() + ". Aborting!");
 	}
 
-	private void handleActivities(Plan plan, final Plan bestPlan, int personIndex) {
-		int tmp = this.dccg.getTravelTimeApproximationLevel();
-		ApproximationLevel travelTimeApproximationLevel;
-		if (tmp == 0) {
-			travelTimeApproximationLevel = ApproximationLevel.COMPLETE_ROUTING ;
-		} else if (tmp == 1) {
-			travelTimeApproximationLevel = ApproximationLevel.LOCAL_ROUTING ;
-		} else if (tmp == 2) {
-			travelTimeApproximationLevel = ApproximationLevel.NO_ROUTING ;
-		} else {
-			throw new RuntimeException("unknwon travel time approximation level") ;
-		}
-		// yyyy the above is not great, but when I found it, it was passing integers all the way down to the method.  kai, jan'13
+	private void handleActivities(final Plan plan, final Plan bestPlan, final int personIndex) {
+		ApproximationLevel travelTimeApproximationLevel = this.dccg.getTravelTimeApproximationLevel();
 
-		
 		int actlegIndex = -1;
 		for (PlanElement pe : plan.getPlanElements()) {
 			actlegIndex++;
 			if (pe instanceof Activity) {
-				String actType = ((ActivityImpl)plan.getPlanElements().get(actlegIndex)).getType();
+				String actType = ((Activity) plan.getPlanElements().get(actlegIndex)).getType();
 //				System.err.println("looking at act of type: " + actType ) ;
 				if (actlegIndex > 0 && this.scaleEpsilon.isFlexibleType(actType)) {
 
 					List<? extends PlanElement> actslegs = plan.getPlanElements();
-					final Activity actToMove = (Activity)pe;
-					final Activity actPre = (Activity)actslegs.get(actlegIndex - 2);
+					final Activity actToMove = (Activity) pe;
+					final Activity actPre = (Activity) actslegs.get(actlegIndex - 2);
 
-					final Activity actPost = (Activity)actslegs.get(actlegIndex + 2);					
+					final Activity actPost = (Activity) actslegs.get(actlegIndex + 2);					
 					double distanceDirect = CoordUtils.calcDistance(actPre.getCoord(), actPost.getCoord());
 					double maximumDistance = this.convertEpsilonIntoDistance(plan.getPerson(), 
 							this.actTypeConverter.convertType(actToMove.getType()));
@@ -171,7 +189,7 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 					// yy why? kai, feb'13
 
 					final Id<ActivityFacility> choice = cs.getWeightedRandomChoice(
-							actlegIndex, scoringFunctionFactory, plan, this.getTripRouter(), this.lcContext.getPersonsKValuesArray()[personIndex],
+							actlegIndex, this.scoringFunctionFactory, plan, this.getTripRouter(), this.lcContext.getPersonsKValuesArray()[personIndex],
 							this.forwardMultiNodeDijkstra, this.backwardMultiNodeDijkstra, this.iteration);
 
 					this.setLocation(actToMove, choice);
@@ -179,7 +197,7 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 //					printTentativePlanToConsole(plan);
 
 					// the change was done to "plan".  Now check if we want to copy this to bestPlan:
-					this.evaluateAndAdaptPlans(plan, bestPlan, cs, scoringFunctionFactory);
+					this.evaluateAndAdaptPlans(plan, bestPlan, cs, this.scoringFunctionFactory);
 
 					// yyyy if I understand this correctly, this means that, if the location change is accepted, all subsequent locachoice 
 					// optimization attempts will be run with that new location.  kai, jan'13
@@ -191,10 +209,10 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 	}
 
 	private ChoiceSet createChoiceSetFromCircle(Plan plan, int personIndex,
-			ApproximationLevel travelTimeApproximationLevel,
+			final ApproximationLevel travelTimeApproximationLevel,
 			final Activity actToMove, double maxRadius, Coord center) {
 
-		ChoiceSet cs = new ChoiceSet(travelTimeApproximationLevel, this.scenario, this.nearestLinks);
+		ChoiceSet cs = new ChoiceSet(travelTimeApproximationLevel, this.scenario, this.nearestLinks, this.teleportedModeSpeeds, this.beelineDistanceFactors);
 
 		final String convertedType = this.actTypeConverter.convertType(actToMove.getType());
 		Collection<ActivityFacilityWithIndex> list = this.quadTreesOfType.get(convertedType).getDisk(center.getX(), center.getY(), maxRadius);
@@ -205,7 +223,8 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 			if (this.sampler.sample(facilityIndex, personIndex)) { 
 				
 				// only add destination if it can be reached with the chosen mode
-				String mode = ((PlanImpl)plan).getPreviousLeg(actToMove).getMode();	
+				Leg previousLeg = PlanUtils.getPreviousLeg(plan, actToMove);
+				String mode = previousLeg.getMode();	
 				
 				Id<Link> linkId = null;
 				// try to get linkId from facility, else get it from act. other options not allowed!
@@ -230,8 +249,9 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 	}
 
 	private void setLocation(Activity act2, Id<ActivityFacility> facilityId) {
-		ActivityImpl act = (ActivityImpl) act2;
-		act.setFacilityId(facilityId);
+//		ActivityImpl act = (ActivityImpl) act2;
+//		act.setFacilityId(facilityId);
+		PlanUtils.setFacilityId(act2, facilityId);
 		ActivityFacility facility = this.facilities.getFacilities().get(facilityId);
 		
 		Id<Link> linkId = null;
@@ -242,8 +262,10 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 		else {
 			linkId = this.nearestLinks.get(facilityId);
 		}	
-		act.setLinkId(linkId);
-		act.setCoord(facility.getCoord());
+//		act.setLinkId(linkId);
+//		act.setCoord(facility.getCoord());
+		PlanUtils.setLinkId(act2, linkId);
+		PlanUtils.setCoord(act2, facility.getCoord());
 	}
 	
 	private void evaluateAndAdaptPlans(Plan plan, Plan bestPlanSoFar, ChoiceSet cs, ScoringFunctionFactory scoringFunction) {		
@@ -251,33 +273,41 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 //		System.err.println("expected score of new plan is: " + score ) ;
 //		System.err.println("existing score of old plan is: " + bestPlanSoFar.getScore() ) ;
 		if (score > bestPlanSoFar.getScore() + 0.0000000000001) {
-			plan.setScore(score);
-			((PlanImpl)bestPlanSoFar).getPlanElements().clear();
-			((PlanImpl)bestPlanSoFar).copyFrom(plan);
+//			plan.setScore(score);
+//			bestPlanSoFar.getPlanElements().clear();
+//			((PlanImpl) bestPlanSoFar).copyFrom(plan);
+			Plan source = plan;
+			Plan destination = bestPlanSoFar;
+			PlanUtils.copyFrom(source, destination);
 		}
 	}
 
 	private double computeScoreAndAdaptPlan(Plan plan, ChoiceSet cs, ScoringFunctionFactory scoringFunction) {
 		// yyyy why is all this plans copying necessary?  kai, jan'13
+		// looked into it but could not find a reason. Removed it and tests are still fine. cdobler, oct'15
 
-		PlanImpl planTmp = new PlanImpl(plan.getPerson());
-		planTmp.copyFrom(plan);			
+//		Plan planTmp = plan;
 
-		final double score = 
+		Plan planTmp = null;
+		if (this.dccg.getInternalPlanDataStructure() == InternalPlanDataStructure.planImpl) {
+			planTmp = new PlanImpl(plan.getPerson());
+			PlanUtils.copyFrom(plan, planTmp);
+		} else if (this.dccg.getInternalPlanDataStructure() == InternalPlanDataStructure.lcPlan) {
+			planTmp = new LCPlan(plan);
+		}
+
+		final double score =
 				cs.adaptAndScoreTimes(
-						(PlanImpl) plan,
-						0,
+						plan,
 						planTmp,
 						scoringFunction,
-						null,
-						null,
-						this.getTripRouter(), 
-						ApproximationLevel.COMPLETE_ROUTING);	
-		PlanUtils.copyPlanFieldsToFrom((PlanImpl)plan, (PlanImpl)planTmp);	// copy( to, from )
+						this.getTripRouter(),
+						DestinationChoiceConfigGroup.ApproximationLevel.completeRouting );
+
+		PlanUtils.copyPlanFieldsToFrom(plan, planTmp);	// copy( to, from )
 		return score;
 	}
-	
-	
+
 	/**
 	 * Conversion of the "frozen" logit model epsilon into a distance.
 	 */

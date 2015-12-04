@@ -2,13 +2,17 @@ package playground.agarwalamit.mixedTraffic.FDTestSetUp;
 
 import java.util.List;
 
+/**
+ * @author ssix
+ *
+ */
 public class BinaryAdditionModule {
 
-	private List<Integer> maxValues;
-	private List<Integer> steps;
-	private Integer[] point;
+	private final List<Integer> maxValues;
+	private final List<Integer> steps;
+	private final Integer[] point;
 	
-	public BinaryAdditionModule(List<Integer> maxValues, List<Integer> steps, Integer[] point){
+	public BinaryAdditionModule(final List<Integer> maxValues, final List<Integer> steps, final Integer[] point){
 		this.maxValues = maxValues;
 		this.steps = steps;
 		this.point = point;
@@ -30,14 +34,14 @@ public class BinaryAdditionModule {
 	public void add1To(Integer[] point, int index){
 		if (furtherAdditionPossible()){
 			if ( ! ((point[index].intValue()+this.steps.get(index).intValue()) > this.maxValues.get(index).intValue())){
-				Integer newIndexValue = new Integer(point[index].intValue() + this.steps.get(index).intValue());
+				Integer newIndexValue = Integer.valueOf(point[index].intValue() + this.steps.get(index).intValue());
 				point[index] = newIndexValue;
 			} else {
-				point[index] = new Integer(0);
+				point[index] = Integer.valueOf(0);
 				add1To(point, index-1);
 			}
 		} else {
-			GenerateFundamentalDiagramData.log.info("Already tried too many combinations!!!");
+			GenerateFundamentalDiagramData.LOG.info("Already tried too many combinations!!!");
 			return;
 		}
 	}

@@ -25,6 +25,9 @@ import java.util.Iterator;
 
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.router.priorityqueue.BinaryMinHeap;
+import org.matsim.core.router.util.ArrayRoutingNetwork;
+import org.matsim.core.router.util.ArrayRoutingNetworkNode;
 import org.matsim.core.router.util.DijkstraNodeData;
 import org.matsim.core.router.util.DijkstraNodeDataFactory;
 import org.matsim.core.router.util.PreProcessDijkstra;
@@ -48,6 +51,8 @@ public class FastMultiNodeDijkstra extends MultiNodeDijkstra {
 
 	/*package*/ final RoutingNetwork routingNetwork;
 	private final FastRouterDelegate fastRouter;
+	private BinaryMinHeap<ArrayRoutingNetworkNode> heap = null;
+	private int maxSize = -1;
 	
 	/*
 	 * Create the routing network here and clear the nodeData map 
@@ -90,6 +95,29 @@ public class FastMultiNodeDijkstra extends MultiNodeDijkstra {
 		} else routingNetworkToNode = routingNetwork.getNodes().get(toNode.getId());
 		
 		return super.calcLeastCostPath(routingNetworkFromNode, routingNetworkToNode, startTime, person, vehicle);
+	}
+	
+	@Override
+	/*package*/ RouterPriorityQueue<? extends Node> createRouterPriorityQueue() {
+		/*
+		 * Re-use existing BinaryMinHeap instead of creating a new one. For large networks (> 10^6 nodes and links) this reduced
+		 * the computation time by 40%! cdobler, oct'15
+		 */
+		if (this.routingNetwork instanceof ArrayRoutingNetwork) {
+			int size = this.routingNetwork.getNodes().size();
+			if (this.heap == null || this.maxSize != size) {
+				this.maxSize = size;
+				this.heap = new BinaryMinHeap<>(maxSize);
+				return this.heap;
+			} else {
+				this.heap.reset();
+				return this.heap;
+			}
+//			int maxSize = this.routingNetwork.getNodes().size();
+//			return new BinaryMinHeap<ArrayRoutingNetworkNode>(maxSize);
+		} else {
+			return super.createRouterPriorityQueue();
+		}
 	}
 	
 	/*

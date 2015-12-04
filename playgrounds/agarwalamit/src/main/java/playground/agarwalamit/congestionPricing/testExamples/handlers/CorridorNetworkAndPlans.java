@@ -45,7 +45,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 public class CorridorNetworkAndPlans {
 
-
 	/**
 	 * generates network with 3 links. 
 	 *<p>			

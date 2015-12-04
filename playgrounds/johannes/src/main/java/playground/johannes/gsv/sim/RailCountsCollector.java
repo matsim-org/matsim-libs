@@ -22,17 +22,16 @@
  */
 package playground.johannes.gsv.sim;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.pt.transitSchedule.api.TransitLine;
-
 import playground.johannes.gsv.analysis.RailCounts;
 import playground.johannes.gsv.analysis.TransitLineAttributes;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author johannes

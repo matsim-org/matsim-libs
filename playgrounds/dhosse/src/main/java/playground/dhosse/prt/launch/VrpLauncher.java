@@ -65,7 +65,7 @@ public class VrpLauncher {
 //        PrtData prtData = new PrtData(scenario.getNetwork(), taxiData);
 //        
 //        PrtTripRouterFactoryImpl tripRouterFactory = new PrtTripRouterFactoryImpl(this.context, this.travelTime, this.travelDisutility);
-//        final PersonAlgorithm router = new PlanRouter(tripRouterFactory.instantiateAndConfigureTripRouter(new RoutingContextImpl(this.travelDisutility, this.travelTime)));
+//        final PersonAlgorithm router = new PlanRouter(tripRouterFactory.get(new RoutingContextImpl(this.travelDisutility, this.travelTime)));
 //
 //        for(Person p : scenario.getPopulation().getPersons().values()){
 //        	

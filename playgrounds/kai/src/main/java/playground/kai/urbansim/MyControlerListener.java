@@ -21,6 +21,7 @@ package playground.kai.urbansim;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -60,7 +61,7 @@ public class MyControlerListener implements /*IterationEndsListener,*/ ShutdownL
 		Controler controler = event.getControler() ;
 
 		TravelTime ttc = controler.getLinkTravelTimes();
-		LeastCostPathTree st = new LeastCostPathTree(ttc, new RandomizingTimeDistanceTravelDisutility.Builder().createTravelDisutility(ttc, controler.getConfig().planCalcScore()));
+		LeastCostPathTree st = new LeastCostPathTree(ttc, new RandomizingTimeDistanceTravelDisutility.Builder( TransportMode.car ).createTravelDisutility(ttc, controler.getConfig().planCalcScore()));
 
         NetworkImpl network = (NetworkImpl) controler.getScenario().getNetwork();
 		double dpTime = 8.*3600 ;

@@ -24,8 +24,8 @@ package playground.johannes.gsv.demand;
 
 import com.vividsolutions.jts.geom.Geometry;
 import org.matsim.contrib.common.gis.EsriShapeIO;
+import org.matsim.contrib.socnetgen.sna.gis.Zone;
 import org.opengis.feature.simple.SimpleFeature;
-import playground.johannes.sna.gis.Zone;
 
 import java.io.BufferedReader;
 import java.io.FileReader;

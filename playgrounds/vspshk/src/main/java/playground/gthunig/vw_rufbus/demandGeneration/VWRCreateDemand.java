@@ -2,9 +2,11 @@ package playground.gthunig.vw_rufbus.demandGeneration;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Coord;
@@ -16,8 +18,8 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.contrib.util.random.WeightedRandomSelection;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -25,6 +27,9 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
+import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
+import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
@@ -50,6 +55,10 @@ public class VWRCreateDemand {
 	private Map<String, Coord> retail;
 	private Map<String, Coord> schools;
 	private Map<String, Coord> universities;
+	private Map<String, Geometry> bs;
+	private Map<String, Geometry> wb;
+    private final WeightedRandomSelection<String> wrs;
+
 
 	private Id<Link> vwGateFE1LinkID = Id.createLinkId("vw2");
 	private Id<Link> vwGateFE2LinkID = Id.createLinkId("vw222");
@@ -67,7 +76,7 @@ public class VWRCreateDemand {
 	private Id<Link> a2TruckerEastLinkIDEnd = Id.createLinkId(57868);
 	private Id<Link> a2TruckerWestLinkID = Id.createLinkId(10799);
 	private Id<Link> a2TruckerWestLinkIDEnd = Id.createLinkId(10865);
-
+	private Set<Id<Person>> teleportPtUsers = new HashSet<>();
 	private Random random = MatsimRandom.getRandom();
 
 	private int commuterCounter = 0;
@@ -88,6 +97,15 @@ public class VWRCreateDemand {
 		this.retail = geometryMapToCoordMap(readShapeFile(config.getRetailFileString(), "osm_id"));
 		this.schools = geometryMapToCoordMap(readShapeFile(config.getSchoolsFileString(), "osm_id"));
 		this.universities = geometryMapToCoordMap(readShapeFile(config.getUniversitiesFileString(), "osm_id"));
+		this.bs = readShapeFile(config.getBs(), "bez");
+		this.wb = readShapeFile(config.getWb(), "bez");
+		this.wrs = new WeightedRandomSelection<>();
+        readPopulationData();
+
+		
+		
+		
+		
 
 	}
 
@@ -96,7 +114,7 @@ public class VWRCreateDemand {
 		// String basedir = "C:/Users/Gabriel/Desktop/VSP/SVN
 		// VSP/shared-svn/projects/vw_rufbus/scenario/network/generation/";
 		String basedir = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/network/generation/";
-		String network = "../../input/network.xml";
+		String network = "../versions/network_nopt.xml";
 		String counties = "landkreise/landkreise.shp";
 		String commercial = "landuse/commercial.shp";
 		String industrial = "landuse/industrial.shp";
@@ -104,15 +122,19 @@ public class VWRCreateDemand {
 		String retail = "landuse/retail.shp";
 		String schools = "landuse/schools.shp";
 		String universities = "landuse/universities.shp";
+		String bs = "zones/bs.shp";
+		String bsb = "zones/bev_bs.txt";
+		
+		String wb = "zones/wb.shp";
 //		double scalefactor = 0.05;
-		double scalefactor = 0.1;
-//		double scalefactor = 1.0;
+//		double scalefactor = 0.1;
+		double scalefactor = 1.0;
 //		double scalefactor = 0.01;
 		String plansOutputComplete = basedir + "../../input/initial_plans"+scalefactor+".xml.gz";
 		String objectAttributesFile = basedir + "../../input/initial_plans_oA"+scalefactor+".xml.gz";
-		String transitSchedule = basedir+"../pt/output_transitschedule.xml.gz";
+		String transitSchedule = basedir+"../../input/transitschedule.xml";
 		VWRConfig config = new VWRConfig(basedir, network, counties, commercial, industrial, residential, retail,
-				schools, universities, plansOutputComplete, scalefactor,transitSchedule,objectAttributesFile);
+				schools, universities, plansOutputComplete, scalefactor,transitSchedule,objectAttributesFile,bs,bsb,wb);
 
 		VWRCreateDemand cd = new VWRCreateDemand(config);
 		cd.run();
@@ -126,7 +148,7 @@ public class VWRCreateDemand {
 		// Wolfenbüttel - WL
 		// Helmstedt - HS
 		// Peine - PE
-		// Salzgitter, Stadt - SG
+		// Salzgitter, Stadt - SG 
 		// Börde - BR
 		// Altmarkkreis Salzwedel - AS
 		// Region Hannover - RH
@@ -165,15 +187,15 @@ public class VWRCreateDemand {
 		createStudents("WB", "WB", 8823 * config.getScalefactor(), 0.01, 0.4, 0.25, "03103", "03103");
 
 		// Gifhorn - Wolfsburg, Stadt | work
-		createWorkers("GH", "WB", (26484-15152) * config.getScalefactor(), 0.8, 0.0, 0.0, "03151", "03103");
-		createVWWorkers("GH", "03151", 9156, 1050+4758, 518, 0.8, 0.0, 0.0);
+		createWorkers("GH", "WB", (26484-15152-3000) * config.getScalefactor(), 0.75, 0.0, 0.0, "03151", "03103");
+		createVWWorkers("GH", "03151", 9156, 1050+4758, 518, 0.75, 0.0, 0.0);
 		//3151	9156	1050	4758	188	15152
 
 		// Gifhorn - Gifhorn | work
-		createWorkers("GH", "GH", 26414 * config.getScalefactor(), 0.63, 0.15, 0.15, "03151", "03151");
+		createWorkers("GH", "GH", 10000 * config.getScalefactor(), 0.63, 0.15, 0.15, "03151", "03151");
 
 		// Gifhorn - Gifhorn | school
-		createPupils("GH", "GH", 26429 * config.getScalefactor(), 0.2, 0.3, 0.2, "03151", "03151");
+		createPupils("GH", "GH", 15000 * config.getScalefactor(), 0.05, 0.3, 0.2, "03151", "03151");
 
 		// Wolfenbüttel - Braunschweig, Stadt | work
 		createWorkers("WL", "BS", 13304 * config.getScalefactor(), 0.8, 0.0, 0.0, "03158", "03101");
@@ -204,7 +226,7 @@ public class VWRCreateDemand {
 
 		// Börde - Wolfsburg, Stadt | work
 		createWorkers("BR", "WB", (3685-856) * config.getScalefactor(), 0.8, 0.0, 0.0, "15085", "03103");
-		createVWWorkers("BR", "15085", 396, 460,0, 0.8, 0.0, 0.0);
+		createVWWorkers("BR", "15085", 396, 460, 0, 0.8, 0.0, 0.0);
 		//		15362	396	0	460	0	856
 
 		// Altmarkkreis Salzwedel - Wolfsburg, Stadt | work
@@ -365,10 +387,13 @@ public class VWRCreateDemand {
 		System.out.println("VW Workers: " + vwWorkerCounter);
 		System.out.println("Workers: " + workerCounter);
 		createAgentGroupNearTransitstrops(scenario, 1500,config.getTransitSchedule() );
+		replaceSptByPtp();
 		PopulationWriter pw = new PopulationWriter(scenario.getPopulation(), scenario.getNetwork());
 		pw.write(config.getPlansOutputString());
 		new ObjectAttributesXmlWriter(scenario.getPopulation().getPersonAttributes()).writeFile(config.getObjectAttributes());
 	}
+
+	
 
 	private void replaceDoubtfulLegsByOtherMode() {
 		for (Person p : scenario.getPopulation().getPersons().values()){
@@ -435,10 +460,10 @@ public class VWRCreateDemand {
 	
 	private void createVWWorkers(String from, String origin, double flex, double threeshift, double partTime, double carcommuterFactor,
 			double bikecommuterFactor, double walkcommuterFactor){
-		Geometry homeCounty = this.counties.get(origin);
+		Geometry homeCounty = getCounty(origin);
 		
 		
-			Coord homeC = findClosestCoordFromMap(drawRandomPointFromGeometry(homeCounty), this.residential);
+		Coord homeC = (origin.equals("3101"))? drawRandomPointFromGeometry(homeCounty): findClosestCoordFromMap(drawRandomPointFromGeometry(homeCounty), this.residential);
 
 			for (int i = 0; i<=flex*config.getScalefactor(); i++){
 				vwWorkerCounter++;
@@ -476,7 +501,9 @@ public class VWRCreateDemand {
 	
 	private void createWorkers(String from, String to, double commuters, double carcommuterFactor,
 			double bikecommuterFactor, double walkcommuterFactor, String origin, String destination) {
-		Geometry homeCounty = this.counties.get(origin);
+		
+		
+		Geometry homeCounty = getCounty(origin);
 		Geometry commuteDestinationCounty = this.counties.get(destination);
 
 		double walkcommuters = commuters * walkcommuterFactor;
@@ -495,7 +522,7 @@ public class VWRCreateDemand {
 				}
 			}
 
-			Coord homeC = findClosestCoordFromMap(drawRandomPointFromGeometry(homeCounty), this.residential);
+			Coord homeC = (origin.equals("3101"))? drawRandomPointFromGeometry(homeCounty): findClosestCoordFromMap(drawRandomPointFromGeometry(homeCounty), this.residential);
 
 //			double wvWorkerOrNot = random.nextDouble();
 //			if (to == "WB" && wvWorkerOrNot < 0.6363) {
@@ -563,7 +590,7 @@ public class VWRCreateDemand {
 
 	private void createPupils(String from, String to, double commuters, double carcommuterFactor,
 			double bikecommuterFactor, double walkcommuterFactor, String origin, String destination) {
-		Geometry homeCounty = this.counties.get(origin);
+		Geometry homeCounty = getCounty(origin);
 		Geometry commuteDestinationCounty = this.counties.get(destination);
 
 		double walkcommuters = commuters * walkcommuterFactor;
@@ -572,7 +599,7 @@ public class VWRCreateDemand {
 
 		for (int i = 0; i <= commuters; i++) {
 			String mode = "car";
-			if (i < carcommuters) {
+			if (i > carcommuters) {
 				mode = "bike";
 				if (i > bikecommuters + carcommuters) {
 					mode = "walk";
@@ -581,8 +608,8 @@ public class VWRCreateDemand {
 					}
 				}
 			}
-
-			Coord homeC = findClosestCoordFromMap(drawRandomPointFromGeometry(homeCounty), this.residential);
+			
+			Coord homeC = (origin.equals("3101"))? drawRandomPointFromGeometry(homeCounty): findClosestCoordFromMap(drawRandomPointFromGeometry(homeCounty), this.residential);
 
 			Coord commuteDestinationC = findClosestCoordFromMap(drawRandomPointFromGeometry(commuteDestinationCounty),
 					this.schools);
@@ -594,7 +621,7 @@ public class VWRCreateDemand {
 
 	private void createStudents(String from, String to, double commuters, double carcommuterFactor,
 			double bikecommuterFactor, double walkcommuterFactor, String origin, String destination) {
-		Geometry homeCounty = this.counties.get(origin);
+		Geometry homeCounty = getCounty(origin);
 		Geometry commuteDestinationCounty = this.counties.get(destination);
 
 		double walkcommuters = commuters * walkcommuterFactor;
@@ -603,7 +630,7 @@ public class VWRCreateDemand {
 
 		for (int i = 0; i <= commuters; i++) {
 			String mode = "car";
-			if (i < carcommuters) {
+			if (i > carcommuters) {
 				mode = "bike";
 				if (i > bikecommuters + carcommuters) {
 					mode = "walk";
@@ -613,7 +640,7 @@ public class VWRCreateDemand {
 				}
 			}
 
-			Coord homeC = findClosestCoordFromMap(drawRandomPointFromGeometry(homeCounty), this.residential);
+			Coord homeC = (origin.equals("3101"))? drawRandomPointFromGeometry(homeCounty): findClosestCoordFromMap(drawRandomPointFromGeometry(homeCounty), this.residential);
 			
 			Coord commuteDestinationC = findClosestCoordFromMap(drawRandomPointFromGeometry(commuteDestinationCounty),
 					this.universities);
@@ -621,6 +648,28 @@ public class VWRCreateDemand {
 			createOneStudent(commuterCounter, homeC, commuteDestinationC, mode, from + "_" + to);
 			commuterCounter++;
 		}
+	}
+
+	private Geometry getCounty(String origin) {
+		if (origin == "03151"){
+			if (random.nextDouble()<0.3) {origin ="99999";}
+		}
+		if (origin == "03101"){
+			String bez = this.wrs.select();
+			return this.bs.get(bez);
+		}
+		if (origin == "03103"){
+			if (random.nextBoolean()){
+				return this.wb.get("0");
+			}else {
+				return this.wb.get("111");
+			}
+			
+		}
+		
+		
+		
+		return this.counties.get(origin);
 	}
 
 	private void createOneVWFlexitimeWorker(int i, Coord homeC, String mode, String fromToPrefix) {
@@ -650,7 +699,7 @@ public class VWRCreateDemand {
 		work.setMaximumDuration(minHrs*3600 + random.nextDouble()*spread  );
 		plan.addActivity(work);
 		if ( additionalTrips == 1 || additionalTrips == 3){
-			enrichPlanBySingleLegAndActivity(coord, plan,mode, 5400, false);
+			enrichPlanBySingleLegAndActivity(coord, plan,mode, 4800, false);
 		}
 
 		Leg returnTrip = scenario.getPopulation().getFactory().createLeg(mode);
@@ -663,7 +712,7 @@ public class VWRCreateDemand {
 		if (additionalTrips>1){
 			home2.setMaximumDuration(random.nextInt(5400));
 
-			enrichPlanByReturnLegAndActivity(home2, plan,mode, 5400);
+			enrichPlanByReturnLegAndActivity(home2, plan,mode, 4800);
 
 		}
 		scenario.getPopulation().addPerson(person);
@@ -690,10 +739,10 @@ public class VWRCreateDemand {
 			Coord coord3 = scenario.getNetwork().getLinks().get(calcVWWorkLinkId()).getCoord();
 			Activity shift1 = scenario.getPopulation().getFactory().createActivityFromCoord("work_vw_shift1",
 					coord3);
-			shift1.setEndTime(13 * 60 * 60 + 40 * 60);
+			shift1.setEndTime(14 * 60 * 60 + 5 * 60);
 			plan.addActivity(shift1);
 			if ( additionalTrips == 1 || additionalTrips == 3){
-				enrichPlanBySingleLegAndActivity(coord3, plan,mode, 5400, false);
+				enrichPlanBySingleLegAndActivity(coord3, plan,mode, 4800, false);
 			}
 
 			Leg returnTrip = scenario.getPopulation().getFactory().createLeg(mode);
@@ -702,9 +751,9 @@ public class VWRCreateDemand {
 			Activity home2 = scenario.getPopulation().getFactory().createActivityFromCoord("home", homeC);
 			plan.addActivity(home2);
 			if (additionalTrips>1){
-				home2.setMaximumDuration(random.nextInt(5400));
+				home2.setMaximumDuration(random.nextInt(3600));
 
-				enrichPlanByReturnLegAndActivity(home2, plan,mode, 5400);
+				enrichPlanByReturnLegAndActivity(home2, plan,mode, 4800);
 
 			}
 			break;
@@ -731,7 +780,7 @@ public class VWRCreateDemand {
 			Coord coord = scenario.getNetwork().getLinks().get(calcVWWorkLinkId()).getCoord();
 			Activity shift2 = scenario.getPopulation().getFactory().createActivityFromCoord("work_vw_shift2",
 					coord);
-			shift2.setEndTime(21 * 60 * 60 + 40 * 60);
+			shift2.setEndTime(22 * 60 * 60 + 5 * 60);
 			plan.addActivity(shift2);
 			
 			returnTrip = scenario.getPopulation().getFactory().createLeg(mode);
@@ -746,7 +795,7 @@ public class VWRCreateDemand {
 			Coord coord2 = scenario.getNetwork().getLinks().get(workLink).getCoord();
 			Activity shift3 = scenario.getPopulation().getFactory().createActivityFromCoord("work_vw_shift3",coord2
 					);
-			shift3.setEndTime(5 * 60 * 60 + 40 * 60);
+			shift3.setEndTime(6 * 60 * 60 + 5 * 60);
 			plan.addActivity(shift3);
 			
 			if ( additionalTrips == 1 || additionalTrips == 3){
@@ -806,7 +855,7 @@ public class VWRCreateDemand {
 	}
 
 	private void createOneWorker(int i, Coord homeC, Coord coordWork, String mode, String fromToPrefix) {
-		int additionalTrips = random.nextInt(4);
+		int additionalTrips = random.nextInt(2)+random.nextInt(3);
 
 		Id<Person> personId = Id.createPersonId(fromToPrefix + i);
 		Person person = scenario.getPopulation().getFactory().createPerson(personId);
@@ -835,7 +884,7 @@ public class VWRCreateDemand {
 		if (additionalTrips>1){
 			home2.setMaximumDuration(random.nextInt(5400));
 
-			enrichPlanByReturnLegAndActivity(home2, plan,mode, 10800);
+			enrichPlanByReturnLegAndActivity(home2, plan,mode, 4800);
 
 		}
 
@@ -875,7 +924,7 @@ public class VWRCreateDemand {
 		if (additionalTrips>1){
 			home2.setMaximumDuration(random.nextInt(5400));
 
-			enrichPlanByReturnLegAndActivity(home2, plan,mode, 10800);
+			enrichPlanByReturnLegAndActivity(home2, plan,mode, 4800);
 
 		}
 		person.addPlan(plan);
@@ -912,7 +961,7 @@ public class VWRCreateDemand {
 		plan.addActivity(home2);
 		if (additionalTrips>1){
 			home2.setMaximumDuration(random.nextInt(5400));
-			enrichPlanByReturnLegAndActivity(home2, plan,mode, 10800);
+			enrichPlanByReturnLegAndActivity(home2, plan,mode, 4800);
 
 		}
 		person.addPlan(plan);
@@ -1139,9 +1188,12 @@ public class VWRCreateDemand {
 		return coords;
 	}
 	
-	static void createAgentGroupNearTransitstrops(Scenario scenario,double distance, String transitScheduleFile ){
+	void createAgentGroupNearTransitstrops(Scenario scenario,double distance, String transitScheduleFile ){
 		new TransitScheduleReader(scenario).readFile(transitScheduleFile);
 		for(Person p : scenario.getPopulation().getPersons().values()){
+			if (scenario.getPopulation().getPersonAttributes().getAttribute(p.getId().toString(), "subpopulation")!=null){
+				return;
+			}
 			ArrayList<Boolean> isIt = new ArrayList<>();
 			for (Plan plan : p.getPlans()){
 				for (PlanElement pe : plan.getPlanElements()){
@@ -1167,11 +1219,47 @@ public class VWRCreateDemand {
 			scenario.getPopulation().getPersonAttributes().putAttribute(p.getId().toString(), "subpopulation", "schedulePt");
 		}else {
 			scenario.getPopulation().getPersonAttributes().putAttribute(p.getId().toString(), "subpopulation", "teleportPt");
+			this.teleportPtUsers.add(p.getId());
 		}
 		}
 		
 	}
 
+	private void replaceSptByPtp() {
+		for (Id<Person> pid : this.teleportPtUsers){
+			Person p = scenario.getPopulation().getPersons().get(pid);
+			for (Plan plan : p.getPlans()){
+				for (PlanElement pe : plan.getPlanElements()){
+					if (pe instanceof Leg){
+						Leg leg = (Leg) pe;
+						if (leg.getMode().equals("pt")){
+							leg.setMode("tpt");
+						}
+						
+					}
+				}
+			}
+		}
+	}
+	
+
+
+private void readPopulationData() {
+	
+	TabularFileParserConfig cfg = new TabularFileParserConfig();
+    cfg.setDelimiterTags(new String[] {"\t"});
+    cfg.setFileName(config.getBsb());
+    cfg.setCommentTags(new String[] { "#" });
+    new TabularFileParser().parse(cfg, new TabularFileHandler() {
+		
+		@Override
+		public void startRow(String[] row) {
+
+			wrs.add(row[0], Double.parseDouble(row[2]));
+		}
+	});
+    
+}	
 }
 
 

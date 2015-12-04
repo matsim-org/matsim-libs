@@ -20,23 +20,19 @@
 package playground.johannes.gsv.matrices.analysis;
 
 import com.vividsolutions.jts.geom.Point;
-import gnu.trove.TDoubleArrayList;
-import gnu.trove.TDoubleDoubleHashMap;
-import gnu.trove.TObjectDoubleHashMap;
+import gnu.trove.list.array.TDoubleArrayList;
+import gnu.trove.map.hash.TDoubleDoubleHashMap;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.matsim.contrib.common.stats.DescriptivePiStatistics;
-import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
-import org.matsim.contrib.common.stats.Histogram;
-import org.matsim.contrib.common.stats.StatsWriter;
+import org.matsim.contrib.common.gis.OrthodromicDistanceCalculator;
+import org.matsim.contrib.common.stats.*;
+import org.matsim.contrib.socnetgen.sna.gis.Zone;
+import org.matsim.contrib.socnetgen.sna.gis.ZoneLayer;
+import org.matsim.contrib.socnetgen.sna.gis.io.ZoneLayerSHP;
 import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrix;
 import org.matsim.visum.VisumMatrixReader;
 import playground.johannes.gsv.matrices.MatrixOperations;
-import playground.johannes.sna.gis.Zone;
-import playground.johannes.sna.gis.ZoneLayer;
-import playground.johannes.socialnetworks.gis.OrthodromicDistanceCalculator;
-import playground.johannes.socialnetworks.gis.io.ZoneLayerSHP;
-import playground.johannes.socialnetworks.statistics.Correlations;
 
 import java.io.IOException;
 import java.util.*;
@@ -156,7 +152,7 @@ public class MatrixCompare {
 
 	public static DescriptiveStatistics errorStats(TObjectDoubleHashMap<String> values) {
 		DescriptiveStatistics stats = new DescriptiveStatistics();
-		for (double val : values.getValues()) {
+		for (double val : values.values()) {
 			stats.addValue(val);
 		}
 
@@ -212,7 +208,7 @@ public class MatrixCompare {
 		return distErrCorrelation(m1, m2, zones, zoneIds, absolute, ignoreZeros);
 	}
 	
-	public static TDoubleDoubleHashMap distErrCorrelation(Matrix m1, Matrix m2, ZoneLayer<Map<String, Object>> zones,  Set<String> zoneIds, boolean absolute, boolean ignoreZeros) {
+	public static TDoubleDoubleHashMap distErrCorrelation(Matrix m1, Matrix m2, ZoneLayer<Map<String, Object>> zones, Set<String> zoneIds, boolean absolute, boolean ignoreZeros) {
 		int zeros = 0;
 
 		Map<String, Zone<?>> zoneMapping = new HashMap<>();
@@ -285,7 +281,7 @@ public class MatrixCompare {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return Correlations.mean(dists.toNativeArray(), errs.toNativeArray(), 10000);
+		return Correlations.mean(dists.toArray(), errs.toArray(), 10000);
 	}
 	/**
 	 * @param args

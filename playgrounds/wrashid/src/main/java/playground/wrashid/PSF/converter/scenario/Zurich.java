@@ -1,7 +1,7 @@
 package playground.wrashid.PSF.converter.scenario;
 
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 
 import playground.wrashid.PSF.converter.addingParkings.AddParkingsToPlans;
 import playground.wrashid.PSF.converter.addingParkings.GenerateParkingFacilities;
@@ -15,7 +15,7 @@ public class Zurich {
 		String outputPlansPath="a:/data/matsim/input/runRW1003/plans-1pml-miv-dilzh30km-osm-mapped-withParkArrAndDepActs.xml.gz";
 		String outputFacilitiesPath="a:/data/matsim/input/runRW1003/facilities.zrhCutC-withParkingArrAndDep.xml.gz";
 		
-		ScenarioImpl scenario = (ScenarioImpl) GeneralLib.readScenario(inputPlansPath, inputNetworkPath, inputFacilitiesPath);
+		MutableScenario scenario = (MutableScenario) GeneralLib.readScenario(inputPlansPath, inputNetworkPath, inputFacilitiesPath);
 
 		// generate parking facilities
 		GenerateParkingFacilities.generateParkingFacilties(scenario);		

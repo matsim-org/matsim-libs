@@ -19,12 +19,13 @@
 
 package playground.johannes.gsv.popsim;
 
-import gnu.trove.TDoubleArrayList;
-import gnu.trove.TDoubleDoubleHashMap;
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import gnu.trove.list.array.TDoubleArrayList;
+import gnu.trove.map.hash.TDoubleDoubleHashMap;
+import org.matsim.contrib.common.stats.Correlations;
 import org.matsim.contrib.common.stats.StatsWriter;
-import playground.johannes.gsv.synPop.analysis.AnalyzerTask;
-import playground.johannes.socialnetworks.statistics.Correlations;
+import playground.johannes.gsv.popsim.analysis.AbstractAnalyzerTask;
+import playground.johannes.gsv.popsim.analysis.FileIOContext;
+import playground.johannes.gsv.popsim.analysis.StatsContainer;
 import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.Episode;
@@ -33,25 +34,30 @@ import playground.johannes.synpop.source.mid2008.MiDKeys;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Map;
+import java.util.List;
 
 /**
  * @author johannes
  */
-public class GeoDistLau2ClassTask extends AnalyzerTask {
+public class GeoDistLau2ClassTask extends AbstractAnalyzerTask<Collection<? extends Person>> {
+
+    public GeoDistLau2ClassTask(FileIOContext ioContext) {
+        setIoContext(ioContext);
+    }
+
     @Override
-    public void analyze(Collection<? extends Person> persons, Map<String, DescriptiveStatistics> results) {
+    public void analyze(Collection<? extends Person> persons, List<StatsContainer> containers) {
         TDoubleArrayList xVals = new TDoubleArrayList();
         TDoubleArrayList yVals = new TDoubleArrayList();
 
-        for(Person person : persons) {
+        for (Person person : persons) {
             String xStr = person.getAttribute(MiDKeys.PERSON_LAU2_CLASS);
-            for(Episode plan : person.getEpisodes()) {
-                for(Attributable leg : plan.getLegs()) {
+            for (Episode plan : person.getEpisodes()) {
+                for (Attributable leg : plan.getLegs()) {
 
                     String yStr = leg.getAttribute(CommonKeys.LEG_GEO_DISTANCE);
 
-                    if(xStr != null && yStr != null) {
+                    if (xStr != null && yStr != null) {
                         xVals.add(Double.parseDouble(xStr));
                         yVals.add(Double.parseDouble(yStr));
                     }
@@ -59,11 +65,11 @@ public class GeoDistLau2ClassTask extends AnalyzerTask {
             }
         }
 
-        if(outputDirectoryNotNull()) {
+        if (ioContext != null) {
             try {
-                String filename = String.format("%s/munic.dist.mean.txt", getOutputDirectory());
-                double[] x = xVals.toNativeArray();
-                double[] y = yVals.toNativeArray();
+                String filename = String.format("%s/munic.dist.mean.txt", ioContext.getPath());
+                double[] x = xVals.toArray();
+                double[] y = yVals.toArray();
 //                Discretizer disc = FixedSampleSizeDiscretizer.create(x, 50, 100);
                 TDoubleDoubleHashMap corr = Correlations.mean(x, y);
                 StatsWriter.writeHistogram(corr, "munic", "distance", filename);

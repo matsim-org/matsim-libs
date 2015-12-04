@@ -19,9 +19,6 @@
  * *********************************************************************** */
 package playground.thibautd.utils.charts;
 
-import java.awt.Color;
-import java.util.List;
-
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.LegendItem;
@@ -31,6 +28,9 @@ import org.jfree.chart.renderer.category.StatisticalBarRenderer;
 import org.jfree.data.statistics.DefaultBoxAndWhiskerCategoryDataset;
 import org.jfree.data.statistics.DefaultStatisticalCategoryDataset;
 import org.matsim.core.utils.charts.ChartUtil;
+
+import java.awt.*;
+import java.util.List;
 
 /**
  * @author thibautd

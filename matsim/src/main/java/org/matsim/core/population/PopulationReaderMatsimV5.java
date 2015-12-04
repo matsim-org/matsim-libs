@@ -155,10 +155,11 @@ public class PopulationReaderMatsimV5 extends MatsimXmlParser implements Populat
 
 	private void startPerson(final Attributes atts) {
 		String ageString = atts.getValue(ATTR_PERSON_AGE);
-		int age = Integer.MIN_VALUE;
+//		int age = Integer.MIN_VALUE;
+		Integer age = null ;
 		if (ageString != null)
 			age = Integer.parseInt(ageString);
-		this.currperson = PersonImpl.createPerson(Id.create(atts.getValue(ATTR_PERSON_ID), Person.class));
+		this.currperson = PopulationUtils.createPerson(Id.create(atts.getValue(ATTR_PERSON_ID), Person.class));
 		PersonUtils.setSex(this.currperson, atts.getValue(ATTR_PERSON_SEX));
 		PersonUtils.setAge(this.currperson, age);
 		PersonUtils.setLicence(this.currperson, atts.getValue(ATTR_PERSON_LICENSE));

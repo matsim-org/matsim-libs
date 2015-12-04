@@ -19,14 +19,13 @@
  * *********************************************************************** */
 package playground.thibautd.geocoding;
 
+import org.matsim.core.utils.io.IOUtils;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
-
 import java.util.ArrayList;
 import java.util.Scanner;
-
-import org.matsim.core.utils.io.IOUtils;
 
 /**
  * Geolocalizer should attempt to simplify results as much as possible, but this

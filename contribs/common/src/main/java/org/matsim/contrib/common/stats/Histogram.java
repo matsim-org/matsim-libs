@@ -19,13 +19,14 @@
  * *********************************************************************** */
 package org.matsim.contrib.common.stats;
 
-import gnu.trove.TDoubleDoubleHashMap;
-import gnu.trove.TDoubleDoubleIterator;
-import gnu.trove.TDoubleFunction;
-import org.apache.commons.math.stat.StatUtils;
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import gnu.trove.function.TDoubleFunction;
+import gnu.trove.iterator.TDoubleDoubleIterator;
+import gnu.trove.map.hash.TDoubleDoubleHashMap;
 
 import java.util.Arrays;
+
+import org.apache.commons.math.stat.StatUtils;
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 
 /**
  * Utility functions to generate histograms.
@@ -118,7 +119,7 @@ public class Histogram {
      */
     public static TDoubleDoubleHashMap normalize(TDoubleDoubleHashMap histogram) {
         double sum = 0;
-        double[] values = histogram.getValues();
+        double[] values = histogram.values();
 
         for (int i = 0; i < values.length; i++) {
             sum += values[i];

@@ -1,13 +1,12 @@
 package playground.thibautd.analysis.joinabletripsidentifier;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
-
 import playground.thibautd.analysis.joinabletripsidentifier.DataPloter.PassengerFilter;
 import playground.thibautd.analysis.joinabletripsidentifier.JoinableTrips.TripRecord;
+
+import java.util.ArrayList;
+import java.util.List;
 
 class CommutersFilter implements PassengerFilter {
 	private static final String WORK_REGEXP = "w.*";

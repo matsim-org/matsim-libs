@@ -14,7 +14,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.*;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
@@ -56,7 +56,7 @@ public class CreatePlansFromTrips {
 	
 	private static final Logger log = Logger.getLogger(CreatePlansFromTrips.class);
 	
-	private ScenarioImpl scenario;
+	private MutableScenario scenario;
 	private ZoneLayer zones = null;
 	private final List<String> tripsFieldNames = Arrays.asList(new String[]
 				{"hhid", //Household ID
@@ -99,7 +99,7 @@ public class CreatePlansFromTrips {
 	// ////////////////////////////////////////////////////////////////////
 	
 	public CreatePlansFromTrips(){
-		this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		this.scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 	}
 	
 	// ////////////////////////////////////////////////////////////////////
@@ -239,7 +239,7 @@ public class CreatePlansFromTrips {
 			Person P;
 
 			if (!scenario.getPopulation().getPersons().containsKey(pid)) {
-				P = PersonImpl.createPerson(pid);
+				P = PopulationUtils.createPerson(pid);
 				scenario.getPopulation().addPerson(P);
 				personHouseholdMap.put(pid, tr.current().get("hhid"));
 								
@@ -453,7 +453,7 @@ public class CreatePlansFromTrips {
 					//Create the new person
 					Id newPid = Id.create(newHhId + "-" + pid.toString().split("-")[1], Person.class); //Assumes that person Ids are formatted as "[hhid]-[person#]"
 					personHouseholdMap.put(newPid, newHhId); //Map the new person to the new household
-					Person P = PersonImpl.createPerson(newPid);
+					Person P = PopulationUtils.createPerson(newPid);
 					scenario.getPopulation().addPerson(P);
 					personsAdded++;
 					
@@ -797,7 +797,7 @@ public class CreatePlansFromTrips {
 			Id nId = scrambler[e.getValue()];
 			
 			Person op = this.scenario.getPopulation().getPersons().remove(oId); //Removed from the population
-			Person np = PersonImpl.createPerson(nId);
+			Person np = PopulationUtils.createPerson(nId);
 			np.addPlan(op.getSelectedPlan());
 			
 			this.scenario.getPopulation().addPerson(np);

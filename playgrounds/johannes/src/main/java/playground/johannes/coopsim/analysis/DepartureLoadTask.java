@@ -32,55 +32,8 @@ public class DepartureLoadTask extends TransitionLoadTask {
 	 */
 	public DepartureLoadTask() {
 		super("t_dep");
-		// TODO Auto-generated constructor stub
 	}
 
-//	@Override
-//	public void analyze(Set<Trajectory> trajectories, Map<String, DescriptiveStatistics> results) {
-//		Set<String> purposes = new HashSet<String>();
-//		for(Trajectory t : trajectories) {
-//			for(int i = 0; i < t.getElements().size(); i += 2) {
-//				purposes.add(((Activity)t.getElements().get(i)).getType());
-//			}
-//		}
-//		
-//		purposes.add(null);
-//		
-//		for(String purpose : purposes) {
-//			analyze(trajectories, purpose);
-//		}
-//	}
-//
-//	private void analyze(Set<Trajectory> trajectories, String type) {
-//		TDoubleArrayList samples = new TDoubleArrayList(trajectories.size());
-//		
-//		for(Trajectory t : trajectories) {
-//			for(int i = 1; i < t.getTransitions().size() - 1; i += 2) {
-//				Activity act = (Activity) t.getElements().get(i + 1);
-//				if(type == null || act.getType().equals(type)) {
-//					double time = t.getTransitions().get(i);
-//					samples.add(time);
-//				}
-//			}
-//		}
-//		
-//		try {
-//			if(type == null)
-//				type = "all";
-//			
-//			if(!samples.isEmpty()) {
-//				TDoubleDoubleHashMap load = Histogram.createHistogram(samples.toNativeArray(), FixedSampleSizeDiscretizer.create(samples.toNativeArray(), 50, 50), true);
-//				TXTWriter.writeHistogram(load, "time", "n", String.format("%1$s/depload.%2$s.txt", getOutputDirectory(), type));
-//			}
-//			
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
-//	}
-
-	/* (non-Javadoc)
-	 * @see playground.johannes.coopsim.analysis.TransitionLoadTask#getTime(playground.johannes.coopsim.pysical.Trajectory, int)
-	 */
 	@Override
 	protected double getTime(Trajectory t, int idx) {
 		return t.getTransitions().get(idx);

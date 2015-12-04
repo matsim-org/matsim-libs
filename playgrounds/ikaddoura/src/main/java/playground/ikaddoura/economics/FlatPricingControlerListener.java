@@ -27,7 +27,7 @@ package playground.ikaddoura.economics;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 
 /**
  * @author ikaddoura
@@ -36,11 +36,11 @@ import org.matsim.core.scenario.ScenarioImpl;
 
 public class FlatPricingControlerListener implements StartupListener {
 
-	private final ScenarioImpl scenario;
+	private final MutableScenario scenario;
 	private PricingHandler flatPricingHandler;
 	private double toll;
 
-	public FlatPricingControlerListener(ScenarioImpl scenario, double toll){
+	public FlatPricingControlerListener(MutableScenario scenario, double toll){
 		this.scenario = scenario;
 		this.toll = toll;
 	}

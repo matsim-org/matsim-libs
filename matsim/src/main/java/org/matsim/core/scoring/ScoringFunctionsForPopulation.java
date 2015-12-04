@@ -20,14 +20,16 @@
 
 package org.matsim.core.scoring;
 
+import gnu.trove.TDoubleCollection;
+import gnu.trove.iterator.TDoubleIterator;
+import gnu.trove.list.array.TDoubleArrayList;
+
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -38,7 +40,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scoring.EventsToActivities.ActivityHandler;
@@ -46,10 +47,10 @@ import org.matsim.core.scoring.EventsToLegs.LegHandler;
 import org.matsim.core.utils.io.IOUtils;
 
 /**
- * 
  * This class helps EventsToScore by keeping ScoringFunctions for the entire Population - one per Person -, and dispatching Activities
  * and Legs to the ScoringFunctions. It also gives out the ScoringFunctions, so they can be given other events by EventsToScore.
  * It is not independently useful. Please do not make public.
+ * 
  * @author michaz
  *
  */
@@ -59,10 +60,19 @@ class ScoringFunctionsForPopulation implements ActivityHandler, LegHandler {
 	
 	private ScoringFunctionFactory scoringFunctionFactory = null;
 
-	private final TreeMap<Id<Person>, ScoringFunction> agentScorers = new TreeMap<>();
-
-	private final Map<Id<Person>, Plan> agentRecords = new TreeMap<>();
-	private final Map<Id<Person>, List<Double>> partialScores = new TreeMap<>() ;
+	/*
+	 * Replaced TreeMaps with (Linked)HashMaps since they should perform much better. For 'partialScores'
+	 * a LinkedHashMap is used to ensure that agents are written in a deterministic order to the output files.
+	 * 
+	 * Replaced List with TDoubleCollection (TDoubleArrayList) in the partialScores map. This collection allows
+	 * storing primitive objects, i.e. its double entries don't have to be wrapped into Double objects which
+	 * should be faster and reduce the memory overhead.
+	 * 
+	 * cdobler, nov'15  
+	 */
+	private final Map<Id<Person>, ScoringFunction> agentScorers = new HashMap<>();
+	private final Map<Id<Person>, Plan> agentRecords = new HashMap<>();
+	private final Map<Id<Person>, TDoubleCollection> partialScores = new LinkedHashMap<>();
 
 	private Scenario scenario;
 
@@ -73,7 +83,7 @@ class ScoringFunctionsForPopulation implements ActivityHandler, LegHandler {
 			ScoringFunction data = this.scoringFunctionFactory.createNewScoringFunction(person);
 			this.agentScorers.put(person.getId(), data);
 			this.agentRecords.put(person.getId(), new PlanImpl());
-			this.partialScores.put(person.getId(), new ArrayList<Double>());
+			this.partialScores.put(person.getId(), new TDoubleArrayList());
 		}
 	}
 
@@ -92,7 +102,7 @@ class ScoringFunctionsForPopulation implements ActivityHandler, LegHandler {
 	}
 
 	public Map<Id<Person>, Plan> getAgentRecords() {
-		return agentRecords;
+		return this.agentRecords;
 	}
 
 	@Override
@@ -100,9 +110,9 @@ class ScoringFunctionsForPopulation implements ActivityHandler, LegHandler {
 		ScoringFunction scoringFunctionForAgent = this.getScoringFunctionForAgent(agentId);
 		if (scoringFunctionForAgent != null) {
 			scoringFunctionForAgent.handleActivity(activity);
-			agentRecords.get(agentId).addActivity(activity);
-			Collection<Double> partialScoresForAgent = partialScores.get(agentId) ;
-			partialScoresForAgent.add( scoringFunctionForAgent.getScore() ) ;
+			this.agentRecords.get(agentId).addActivity(activity);
+			TDoubleCollection partialScoresForAgent = this.partialScores.get(agentId);
+			partialScoresForAgent.add( scoringFunctionForAgent.getScore());
 		}
 	}
 
@@ -112,24 +122,24 @@ class ScoringFunctionsForPopulation implements ActivityHandler, LegHandler {
 		if (scoringFunctionForAgent != null) {
 			scoringFunctionForAgent.handleLeg(leg);
 			agentRecords.get(agentId).addLeg(leg);
-			Collection<Double> partialScoresForAgent = partialScores.get(agentId) ;
-			partialScoresForAgent.add(scoringFunctionForAgent.getScore()) ;
+			TDoubleCollection partialScoresForAgent = this.partialScores.get(agentId);
+			partialScoresForAgent.add(scoringFunctionForAgent.getScore());
 		}
 	}
 
 	public void finishScoringFunctions() {
-		for (ScoringFunction sf : agentScorers.values()) {
+		for (ScoringFunction sf : this.agentScorers.values()) {
 			sf.finish();
 		}
-		for ( Entry<Id<Person>, List<Double>> entry : this.partialScores.entrySet() ) {
+		for (Entry<Id<Person>, TDoubleCollection> entry : this.partialScores.entrySet()) {
 			entry.getValue().add(this.getScoringFunctionForAgent(entry.getKey()).getScore());
 		}
 	}
 
 	public void writeExperiencedPlans(String iterationFilename) {
 		Population population = PopulationUtils.createPopulation(scenario.getConfig());
-		for (Entry<Id<Person>, Plan> entry : agentRecords.entrySet()) {
-			Person person = PersonImpl.createPerson(entry.getKey());
+		for (Entry<Id<Person>, Plan> entry : this.agentRecords.entrySet()) {
+			Person person = PopulationUtils.createPerson(entry.getKey());
 			Plan plan = entry.getValue();
 			plan.setScore(getScoringFunctionForAgent(person.getId()).getScore());
 			person.addPlan(plan);
@@ -142,10 +152,11 @@ class ScoringFunctionsForPopulation implements ActivityHandler, LegHandler {
 
 		BufferedWriter out = IOUtils.getBufferedWriter(iterationFilename + "_scores.xml.gz");
 		try {
-			for (Entry<Id<Person>,List<Double>> entry : partialScores.entrySet()) {
-				out.write( entry.getKey().toString());
-				for (Double score : entry.getValue()) {
-					out.write('\t'+ score.toString());
+			for (Entry<Id<Person>, TDoubleCollection> entry : this.partialScores.entrySet()) {
+				out.write(entry.getKey().toString());
+				TDoubleIterator iterator = entry.getValue().iterator();
+				while (iterator.hasNext()) {
+					out.write('\t' + String.valueOf(iterator.next()));					
 				}
 				out.newLine();
 			}
@@ -154,5 +165,4 @@ class ScoringFunctionsForPopulation implements ActivityHandler, LegHandler {
 			throw new RuntimeException(e);
 		}
 	}
-
 }

@@ -19,9 +19,8 @@
  * *********************************************************************** */
 package playground.johannes.coopsim;
 
+import gnu.trove.map.hash.TObjectLongHashMap;
 import org.apache.log4j.Logger;
-
-import gnu.trove.TObjectLongHashMap;
 
 /**
  * @author illenberger

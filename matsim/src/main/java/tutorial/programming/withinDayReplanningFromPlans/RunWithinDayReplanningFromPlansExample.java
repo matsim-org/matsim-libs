@@ -26,9 +26,6 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactory;
-import org.matsim.core.router.TripRouterProviderImpl;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.withinday.trafficmonitoring.TravelTimeCollector;
 
@@ -36,16 +33,18 @@ public class RunWithinDayReplanningFromPlansExample {
 
 	public static void main(String[] args){		
 		final Controler controler = new Controler("examples/tutorial/programming/example50VeryExperimentalWithinDayReplanning/withinday-config.xml");
-		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
+
+		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+		// (need to make sure that test fails if it does not get the output directory right! kai, nov'15)
 
 		// define the travel time collector (/predictor) that you want to use for routing:
 		Set<String> analyzedModes = new HashSet<>();
 		analyzedModes.add(TransportMode.car);
 		final TravelTimeCollector travelTime = new TravelTimeCollector(controler.getScenario(), analyzedModes);
-		controler.getEvents().addHandler(travelTime);
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
+				this.addEventHandlerBinding().toInstance( travelTime );
 				this.bind(TravelTime.class).toInstance(travelTime);
 				this.addMobsimListenerBinding().to(MyWithinDayMobsimListener.class);
 				this.addMobsimListenerBinding().toInstance(travelTime);

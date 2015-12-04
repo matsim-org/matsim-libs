@@ -19,10 +19,10 @@
 
 package playground.johannes.gsv.matrices.plans2matrix;
 
-import gnu.trove.TObjectIntHashMap;
-import gnu.trove.TObjectIntIterator;
+import gnu.trove.iterator.TObjectIntIterator;
+import gnu.trove.map.hash.TObjectIntHashMap;
+import org.matsim.contrib.common.util.XORShiftRandom;
 import playground.johannes.coopsim.mental.choice.ChoiceSet;
-import playground.johannes.socialnetworks.utils.XORShiftRandom;
 import playground.johannes.synpop.data.*;
 import playground.johannes.synpop.processing.PersonsTask;
 
@@ -45,8 +45,10 @@ public class ReplaceMiscType implements PersonsTask {
 			for(Episode plan : person.getEpisodes()) {
 				for(Attributable act : plan.getActivities()) {
 					String type = act.getAttribute(CommonKeys.ACTIVITY_TYPE);
-					if(!ActivityTypes.HOME.equalsIgnoreCase(type) && !ActivityTypes.MISC.equalsIgnoreCase(type)) {
-						typeCounts.adjustOrPutValue(type, 1, 1);
+					if(type != null) {
+						if (!ActivityTypes.HOME.equalsIgnoreCase(type) && !ActivityTypes.MISC.equalsIgnoreCase(type)) {
+							typeCounts.adjustOrPutValue(type, 1, 1);
+						}
 					}
 				}
 			}

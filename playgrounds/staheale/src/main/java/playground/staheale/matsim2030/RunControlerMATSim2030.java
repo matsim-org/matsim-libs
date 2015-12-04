@@ -15,10 +15,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.router.MainModeIdentifierImpl;
-import org.matsim.core.router.StageActivityTypesImpl;
-import org.matsim.core.router.TripRouterFactory;
-import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
+import org.matsim.core.router.*;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilities;
@@ -27,6 +24,8 @@ import org.matsim.pt.PtConstants;
 import org.matsim.pt.router.TransitRouterConfig;
 
 import playground.ivt.utils.TripModeShares;
+
+import javax.inject.Provider;
 
 
 public class RunControlerMATSim2030 extends Controler {
@@ -109,8 +108,8 @@ public class RunControlerMATSim2030 extends Controler {
 		MultiModalConfigGroup mmcg = new MultiModalConfigGroup();
 		mmcg.setSimulatedModes("");
 		getConfig().addModule(mmcg);
-		TripRouterFactory defaultDelegateFactory = new DefaultDelegateFactory(this.getScenario(), leastCostPathCalculatorFactory);
-		TripRouterFactory transitTripRouterFactory = new TransitTripRouterFactory(this.getScenario(), defaultDelegateFactory, 
+		Provider<TripRouter> defaultDelegateFactory = new DefaultDelegateFactory(this.getScenario(), leastCostPathCalculatorFactory);
+		Provider<TripRouter> transitTripRouterFactory = new TransitTripRouterFactory(this.getScenario(), defaultDelegateFactory,
 				factory);
 		this.setTripRouterFactory(transitTripRouterFactory);
 		

@@ -67,7 +67,7 @@ public class CharyparNagelOpenTimesActivityScoring extends CharyparNagelActivity
 				foundAct = true;
 
 				opentimes = facility.getActivityOptions().get(facilityActType).getOpeningTimes();
-				if (opentimes != null) {
+				if (opentimes != null && !opentimes.isEmpty()) {
 					// ignoring lunch breaks with the following procedure:
 					// if there is only one open time interval, use it
 					// if there are two or more, use the earliest start time and the latest end time

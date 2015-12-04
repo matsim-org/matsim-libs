@@ -14,7 +14,7 @@ import org.matsim.contrib.accessibility.gis.ZoneLayer;
 import org.matsim.contrib.accessibility.utils.AggregationObject;
 import org.matsim.contrib.matsim4urbansim.utils.io.misc.ProgressBar;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 
@@ -24,7 +24,7 @@ public class AccessibilityCalcV2 {
 	
 	private SpatialGrid freeSpeedGrid;
 	
-	private ScenarioImpl scenario;
+	private MutableScenario scenario;
 	
 	private ZoneLayer<Id> measuringPoints;
 	
@@ -34,7 +34,7 @@ public class AccessibilityCalcV2 {
 	
 	private String ouputFolder = null;
 	
-	public AccessibilityCalcV2(ZoneLayer<Id> measuringPoints, SpatialGrid freeSpeedGrid, ScenarioImpl scenario, String output) {
+	public AccessibilityCalcV2(ZoneLayer<Id> measuringPoints, SpatialGrid freeSpeedGrid, MutableScenario scenario, String output) {
 		
 		this.freeSpeedGrid = freeSpeedGrid;
 		this.scenario = scenario;

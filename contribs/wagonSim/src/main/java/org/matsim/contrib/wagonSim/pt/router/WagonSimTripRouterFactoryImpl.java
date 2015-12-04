@@ -37,12 +37,10 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
-import org.matsim.core.router.RoutingContext;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TransitRouterWrapper;
 import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.DefaultRoutingModules;
 import org.matsim.facilities.Facility;
 import org.matsim.pt.PtConstants;
@@ -57,7 +55,7 @@ import javax.inject.Provider;
  * @author droeder
  *
  */
-public final class WagonSimTripRouterFactoryImpl implements TripRouterFactory {
+public final class WagonSimTripRouterFactoryImpl implements Provider<TripRouter> {
 
 	@SuppressWarnings("unused")
 	private static final Logger log = Logger
@@ -90,8 +88,8 @@ public final class WagonSimTripRouterFactoryImpl implements TripRouterFactory {
 	}
 
 	@Override
-	public TripRouter instantiateAndConfigureTripRouter(RoutingContext routingContext) {
-//		TripRouter tripRouter = this.delegate.instantiateAndConfigureTripRouter();
+	public TripRouter get() {
+//		TripRouter tripRouter = this.delegate.get();
 		TripRouter tripRouter = new TripRouter();
 		tripRouter.setRoutingModule(TransportMode.pt, 
 				new WagonSimRouterWrapper(routerFactory.get(), transitSchedule, network, walkRouter, minShuntingTimes));

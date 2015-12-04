@@ -19,16 +19,16 @@
 
 package playground.johannes.gsv.synPop.sim3;
 
-import gnu.trove.TObjectDoubleHashMap;
-import gnu.trove.TObjectDoubleIterator;
+import gnu.trove.iterator.TObjectDoubleIterator;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.common.util.ProgressLogger;
+import org.matsim.contrib.socnetgen.sna.gis.Zone;
+import org.matsim.contrib.socnetgen.sna.gis.ZoneLayer;
 import org.matsim.facilities.ActivityFacility;
-import playground.johannes.coopsim.util.MatsimCoordUtils;
+import playground.johannes.coopsim.utils.MatsimCoordUtils;
 import playground.johannes.gsv.synPop.data.LandUseData;
 import playground.johannes.gsv.synPop.data.LandUseDataLoader;
-import playground.johannes.sna.gis.Zone;
-import playground.johannes.sna.gis.ZoneLayer;
 import playground.johannes.synpop.data.ActivityTypes;
 import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.data.PlainPerson;
@@ -142,7 +142,7 @@ public class InitHomeLocations implements PersonsTask {
 			logger.info(String.format("Assigend %s persons a random home.", cnt));
 		}
 
-		ProgressLogger.termiante();
+		ProgressLogger.terminate();
 	}
 
 }

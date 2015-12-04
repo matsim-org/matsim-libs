@@ -19,19 +19,19 @@
  * *********************************************************************** */
 package playground.johannes.coopsim.analysis;
 
-import gnu.trove.TDoubleDoubleHashMap;
-import gnu.trove.TObjectDoubleHashMap;
+import gnu.trove.map.hash.TDoubleDoubleHashMap;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
 import org.apache.commons.collections.bidimap.DualHashBidiMap;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
 import org.matsim.contrib.common.stats.StatsWriter;
+import org.matsim.contrib.socnetgen.sna.graph.Vertex;
+import org.matsim.contrib.socnetgen.sna.graph.analysis.Degree;
+import org.matsim.contrib.socnetgen.sna.graph.analysis.VertexPropertyCorrelation;
+import org.matsim.contrib.socnetgen.sna.graph.social.SocialGraph;
 import org.matsim.facilities.ActivityFacilities;
 import playground.johannes.coopsim.pysical.Trajectory;
-import playground.johannes.sna.graph.Vertex;
-import playground.johannes.sna.graph.analysis.Degree;
-import playground.johannes.socialnetworks.graph.analysis.VertexPropertyCorrelation;
-import playground.johannes.socialnetworks.graph.social.SocialGraph;
 
 import java.io.IOException;
 import java.util.HashSet;
@@ -78,7 +78,7 @@ public class TripDistanceDegreeTask extends TrajectoryAnalyzerTask {
 			TObjectDoubleHashMap<Vertex> yVals = vAdaptor.values(graph.getVertices());
 
 			TDoubleDoubleHashMap correl = VertexPropertyCorrelation.mean(yVals, xVals,
-					FixedSampleSizeDiscretizer.create(xVals.getValues(), 50, 100));
+					FixedSampleSizeDiscretizer.create(xVals.values(), 50, 100));
 			
 			if(purpose == null)
 				purpose = "all";

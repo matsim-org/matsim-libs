@@ -22,7 +22,7 @@ package playground.dgrether.satellic;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -44,7 +44,7 @@ public class DgHighwayNet2Shape {
 		String net = "/media/data/work/repos/shared-svn/projects/satellicHsUlm2010/network_cleaned_wgs84.xml.gz";
 		String out = "/media/data/work/repos/shared-svn/projects/satellicHsUlm2010/network_cleaned_wgs84.shp";
 
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario.getConfig().network().setInputFile(net);
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(net);

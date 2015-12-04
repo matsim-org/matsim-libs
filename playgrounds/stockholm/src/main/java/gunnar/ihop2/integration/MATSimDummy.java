@@ -1,22 +1,30 @@
 package gunnar.ihop2.integration;
 
+import static java.lang.Boolean.parseBoolean;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.List;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Random;
 import java.util.logging.FileHandler;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutility;
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
+import org.matsim.roadpricing.RoadPricingConfigGroup;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
+import org.matsim.vehicles.Vehicle;
 
 import saleem.stockholmscenario.utils.StockholmTransformationFactory;
 import cadyts.utilities.misc.StreamFlushHandler;
@@ -24,11 +32,14 @@ import floetteroed.utilities.SimpleLogFormatter;
 import floetteroed.utilities.Time;
 import floetteroed.utilities.config.Config;
 import floetteroed.utilities.config.ConfigReader;
-import gunnar.ihop2.regent.costwriting.TourTravelTimes;
-import gunnar.ihop2.regent.costwriting.TravelTimeMatrices;
+import gunnar.ihop2.regent.costwriting.HalfTourCostMatrices;
+import gunnar.ihop2.regent.costwriting.LinkTollCostInCrownes;
+import gunnar.ihop2.regent.costwriting.LinkTravelDistanceInKilometers;
+import gunnar.ihop2.regent.costwriting.LinkTravelTimeInMinutes;
+import gunnar.ihop2.regent.costwriting.TripCostMatrices;
 import gunnar.ihop2.regent.demandreading.PopulationCreator;
 import gunnar.ihop2.regent.demandreading.ZonalSystem;
-import gunnar.ihop2.utils.StringAsIntegerComparator;
+import gunnar.ihop2.scaper.ScaperPopulationCreator;
 
 /**
  * 
@@ -53,15 +64,23 @@ public class MATSimDummy {
 
 	public static final String LINKATTRIBUTE_FILENAME_ELEMENT = "linkattributefile";
 
+	public static final String DEMANDMODEL_ELEMENT = "demandmodel";
+
+	public enum DEMANDMODEL {
+		regent, scaper
+	};
+
 	public static final String TRAVELTIME_MATRIX_FILENAME_ELEMENT = "traveltimes";
+
+	public static final String DISTANCE_MATRIX_FILENAME_ELEMENT = "distances";
+
+	public static final String TOLL_MATRIX_FILENAME_ELEMENT = "tolls";
 
 	public static final String REGENT_FOLDER_ELEMENT = "regentfolder";
 
 	public static final String REGENT_COMMAND_ELEMENT = "regentcommand";
 
 	public static final String ITERATIONS_ELEMENT = "iterations";
-
-	public static final String ZONE_ELEMENT = "zone";
 
 	public static final String RANDOMSEED_ELEMENT = "randomseed";
 
@@ -73,13 +92,22 @@ public class MATSimDummy {
 
 	public static final String NODESAMPLE_SIZE_ELEMENT = "nodesamplesize";
 
-	private static void fatal(final String msg) {
+	public static final String TRAVELTIME_COSTTYPE = "traveltimes";
+
+	public static final String DISTANCE_COSTTYPE = "distance";
+
+	public static final String TOLL_COSTTYPE = "toll";
+
+	// TODO NEW
+	public static final String USETOLL_ELEMENT = "usetoll";
+
+	public static void fatal(final String msg) {
 		Logger.getLogger(MATSimDummy.class.getName()).severe(
 				"FATAL ERROR: " + msg);
 		System.exit(-1);
 	}
 
-	private static void fatal(final Exception e) {
+	public static void fatal(final Exception e) {
 		Logger.getLogger(MATSimDummy.class.getName()).severe(
 				"FATAL ERROR: " + e);
 		e.printStackTrace();
@@ -214,12 +242,35 @@ public class MATSimDummy {
 		Logger.getLogger(MATSimDummy.class.getName()).info(
 				LINKATTRIBUTE_FILENAME_ELEMENT + " = " + linkAttributeFileName);
 
+		final String demandModelName = config.get(IHOP2_ELEMENT,
+				DEMANDMODEL_ELEMENT).toLowerCase();
+		DEMANDMODEL demandModel = null;
+		try {
+			demandModel = DEMANDMODEL.valueOf(demandModelName);
+		} catch (IllegalArgumentException e) {
+			fatal("Demand model \"" + demandModelName + "\" is unknown.");
+		}
+		Logger.getLogger(MATSimDummy.class.getName()).info(
+				DEMANDMODEL_ELEMENT + " = " + demandModel);
+
 		final String traveltimesFileName = config.get(IHOP2_ELEMENT,
 				TRAVELTIME_MATRIX_FILENAME_ELEMENT);
 		checkNonNull(traveltimesFileName, "traveltimes file name");
 		Logger.getLogger(MATSimDummy.class.getName()).info(
 				TRAVELTIME_MATRIX_FILENAME_ELEMENT + " = "
 						+ traveltimesFileName);
+
+		final String distancesFileName = config.get(IHOP2_ELEMENT,
+				DISTANCE_MATRIX_FILENAME_ELEMENT);
+		checkNonNull(distancesFileName, "distances file name");
+		Logger.getLogger(MATSimDummy.class.getName()).info(
+				DISTANCE_MATRIX_FILENAME_ELEMENT + " = " + distancesFileName);
+
+		final String tollsFileName = config.get(IHOP2_ELEMENT,
+				TOLL_MATRIX_FILENAME_ELEMENT);
+		checkNonNull(tollsFileName, "toll file name");
+		Logger.getLogger(MATSimDummy.class.getName()).info(
+				TOLL_MATRIX_FILENAME_ELEMENT + " = " + tollsFileName);
 
 		final String regentFolder = config.get(IHOP2_ELEMENT,
 				REGENT_FOLDER_ELEMENT);
@@ -243,18 +294,6 @@ public class MATSimDummy {
 		}
 		Logger.getLogger(MATSimDummy.class.getName()).info(
 				ITERATIONS_ELEMENT + " = " + maxIterations);
-
-		final List<String> zoneIDs = config
-				.getList(IHOP2_ELEMENT, ZONE_ELEMENT);
-		if (zoneIDs == null) {
-			fatal("could not read the " + ZONE_ELEMENT + " XML element.");
-			System.exit(-1);
-		} else if (zoneIDs.size() == 0) {
-			fatal("there are no zones defined in the xml file.");
-		}
-		Collections.sort(zoneIDs, new StringAsIntegerComparator());
-		Logger.getLogger(MATSimDummy.class.getName()).info(
-				"Number of relevant zones: " + zoneIDs.size());
 
 		final String randomSeedStr = config.get(IHOP2_ELEMENT,
 				RANDOMSEED_ELEMENT);
@@ -320,6 +359,12 @@ public class MATSimDummy {
 		Logger.getLogger(MATSimDummy.class.getName()).info(
 				NODESAMPLE_SIZE_ELEMENT + " = " + nodeSampleSize);
 
+		// TODO NEW
+		final Boolean useToll = parseBoolean(config.get(IHOP2_ELEMENT,
+				USETOLL_ELEMENT));
+		Logger.getLogger(MATSimDummy.class.getName()).info(
+				USETOLL_ELEMENT + " = " + useToll);
+
 		Logger.getLogger(MATSimDummy.class.getName()).info(
 				"... program parameters appear OK so far.");
 
@@ -345,7 +390,8 @@ public class MATSimDummy {
 					"Loading matsim configuration file: "
 							+ matsimConfigFileName + " ... ");
 			final org.matsim.core.config.Config matsimConfig = ConfigUtils
-					.loadConfig(matsimConfigFileName);
+					.loadConfig(matsimConfigFileName,
+							new RoadPricingConfigGroup());
 			final String matsimNetworkFileName = matsimConfig.getModule(
 					"network").getValue("inputNetworkFile");
 			final String initialPlansFileName = matsimConfig.getModule("plans")
@@ -357,25 +403,40 @@ public class MATSimDummy {
 			Logger.getLogger(MATSimDummy.class.getName()).info(
 					"Creating MATSim population ... ");
 
-			final PopulationCreator populationCreator = new PopulationCreator(
-					matsimNetworkFileName, zoneShapeFileName,
-					StockholmTransformationFactory.WGS84_EPSG3857,
-					populationFileName);
-			populationCreator.setBuildingsFileName(buildingShapeFileName);
-			// pc.setAgentHomeXYFile("./data/demand_output/agenthomeXY_v03.txt");
-			// pc.setAgentWorkXYFile("./data/demand_output/agentWorkXY_v03.txt");
-			// pc.setNetworkNodeXYFile("./data/demand_output/nodeXY_v03.txt");
-			populationCreator
-					.setPopulationSampleFactor(matsimPopulationSubSample);
-			final ObjectAttributes linkAttributes = new ObjectAttributes();
-			final ObjectAttributesXmlReader reader = new ObjectAttributesXmlReader(
-					linkAttributes);
-			reader.parse(linkAttributeFileName);
-			populationCreator.setLinkAttributes(linkAttributes);
-			try {
-				populationCreator.run(initialPlansFileName);
-			} catch (FileNotFoundException e1) {
-				throw new RuntimeException(e1);
+			if (DEMANDMODEL.regent.equals(demandModel)) {
+
+				final PopulationCreator populationCreator = new PopulationCreator(
+						matsimNetworkFileName, zoneShapeFileName,
+						StockholmTransformationFactory.WGS84_EPSG3857,
+						populationFileName);
+				populationCreator.setBuildingsFileName(buildingShapeFileName);
+				populationCreator
+						.setPopulationSampleFactor(matsimPopulationSubSample);
+				final ObjectAttributes linkAttributes = new ObjectAttributes();
+				final ObjectAttributesXmlReader reader = new ObjectAttributesXmlReader(
+						linkAttributes);
+				reader.parse(linkAttributeFileName);
+				Logger.getLogger(MATSimDummy.class.getName()).warning(
+						"Removing all expanded links. This *should* have no "
+								+ "effect if a non-expanded network is used.");
+				populationCreator.removeExpandedLinks(linkAttributes);
+				try {
+					populationCreator.run(initialPlansFileName);
+				} catch (FileNotFoundException e1) {
+					throw new RuntimeException(e1);
+				}
+
+			} else if (DEMANDMODEL.scaper.equals(demandModel)) {
+
+				final ScaperPopulationCreator reader = new ScaperPopulationCreator(
+						matsimNetworkFileName, zoneShapeFileName,
+						StockholmTransformationFactory.WGS84_EPSG3857,
+						populationFileName);
+				PopulationWriter popwriter = new PopulationWriter(
+						reader.scenario.getPopulation(),
+						reader.scenario.getNetwork());
+				popwriter.write(initialPlansFileName);
+
 			}
 
 			Logger.getLogger(MATSimDummy.class.getName()).info(
@@ -388,19 +449,35 @@ public class MATSimDummy {
 			Logger.getLogger(MATSimDummy.class.getName()).info(
 					"Running MATSim ...");
 
-			Controler controler = new Controler(matsimConfig);
+			final Controler controler = new Controler(matsimConfig);
+
+			final double networkUpscaleFactor = 2.0;
+			Logger.getLogger(MATSimDummy.class.getName()).info(
+					"scaling up the network by " + networkUpscaleFactor
+							+ " to account for link removals during "
+							+ "Transmodeler -> MATSim network conversion");
 
 			matsimConfig.getModule("qsim").addParam(
 					"flowCapacityFactor",
-					Double.toString(regentPopulationSample
+					Double.toString(networkUpscaleFactor
+							* regentPopulationSample
 							* matsimPopulationSubSample));
 			matsimConfig.getModule("qsim").addParam(
 					"storageCapacityFactor",
-					Double.toString(regentPopulationSample
+					Double.toString(networkUpscaleFactor
+							* regentPopulationSample
 							* matsimPopulationSubSample));
 			matsimConfig.planCalcScore().setWriteExperiencedPlans(true);
 			matsimConfig.getModule("controler").addParam("overwriteFiles",
 					"deleteDirectoryIfExists");
+
+			matsimConfig.getModule("controler").addParam("outputDirectory",
+					"./matsim-output." + iteration + "/");
+
+			if (useToll) {
+				controler
+						.setModules(new ControlerDefaultsWithRoadPricingModule());
+			}
 
 			controler.run();
 
@@ -419,50 +496,71 @@ public class MATSimDummy {
 					StockholmTransformationFactory.WGS84_EPSG3857);
 			zonalSystem.addNetwork(controler.getScenario().getNetwork(),
 					StockholmTransformationFactory.WGS84_SWEREF99);
-			// final String lastIteration = matsimConfig.getModule("controler")
-			// .getValue("lastIteration");
-			// final String eventsFileName = matsimConfig.getModule("controler")
-			// .getValue("outputDirectory")
-			// + "ITERS/it."
-			// + lastIteration
-			// + "/" + lastIteration + ".events.xml.gz";
 
-			// final int ttCalcTimeBinSize = 15 * 60;
-			// final int ttCalcEndTime = 24 * 3600 - 1; // one sec before
-			// midnight
-			// final TravelTimeCalculator ttcalc = new TravelTimeCalculator(
-			// controler.getScenario().getNetwork(), ttCalcTimeBinSize,
-			// ttCalcEndTime, controler.getScenario().getConfig()
-			// .travelTimeCalculator());
-			// Logger.getLogger(TourTravelTimes.class.getName()).info(
-			// "number of time bins in matsim tt calc: "
-			// + ttcalc.getNumSlots());
-			// Logger.getLogger(TourTravelTimes.class.getName()).info(
-			// "time bin size in matsim tt calc: " + ttcalc.getTimeSlice()
-			// + " seconds");
-			// final EventsManager events = EventsUtils.createEventsManager();
-			// events.addHandler(ttcalc);
-			// final MatsimEventsReader eventsReader = new MatsimEventsReader(
-			// events);
-			// eventsReader.readFile(eventsFileName);
-			// final TravelTime linkTTs = ttcalc.getLinkTravelTimes();
+			final Map<String, TravelDisutility> costType2travelDisutility = new LinkedHashMap<>();
+			costType2travelDisutility
+					.put(TRAVELTIME_COSTTYPE, new LinkTravelTimeInMinutes(
+							controler.getLinkTravelTimes()));
+			costType2travelDisutility.put(DISTANCE_COSTTYPE,
+					new LinkTravelDistanceInKilometers());
+			if (useToll) {
+				costType2travelDisutility.put(
+						TOLL_COSTTYPE,
+						new LinkTollCostInCrownes(matsimConfig.getModule(
+								"roadpricing").getValue("tollLinksFile")));
+			} else {
+				costType2travelDisutility.put(TOLL_COSTTYPE,
+						new TravelDisutility() {
+							@Override
+							public double getLinkTravelDisutility(Link link,
+									double time, Person person, Vehicle vehicle) {
+								return 0;
+							}
 
-			final TravelTime linkTTs = controler.getLinkTravelTimes();
+							@Override
+							public double getLinkMinimumTravelDisutility(
+									Link link) {
+								return 0;
+							}
+						});
+			}
 
-			final TravelTimeMatrices travelTimeMatrices = new TravelTimeMatrices(
-					controler.getScenario().getNetwork(), linkTTs,
-					new LinkedHashSet<>(zoneIDs), zonalSystem, rnd,
+			final TripCostMatrices tripCostMatrices = new TripCostMatrices(
+					controler.getLinkTravelTimes(),
+					new OnlyTimeDependentTravelDisutility(controler
+							.getLinkTravelTimes()), controler.getScenario()
+							.getNetwork(), zonalSystem,
 					analysisStartTime_s, analysisBinSize_s, analysisBinCnt,
-					nodeSampleSize);
+					rnd, nodeSampleSize, costType2travelDisutility);
+			tripCostMatrices.writeSummaryToFile("./travel-cost-statistics."
+					+ iteration + ".txt");
 
-			Logger.getLogger(MATSimDummy.class.getName()).info(
-					"Computing tour travel times ...");
+			if (DEMANDMODEL.regent.equals(demandModel)) {
 
-			final TourTravelTimes tourTravelTimes = new TourTravelTimes(
-					controler.getScenario(), travelTimeMatrices);
-			tourTravelTimes.writeTourTravelTimesToFile(traveltimesFileName);
-			tourTravelTimes
-					.writeHistogramsToFile("./departure-time-histograms.txt");
+				Logger.getLogger(MATSimDummy.class.getName()).info(
+						"Computing tour travel times ...");
+
+				final Map<String, String> costType2tourCostFileName = new LinkedHashMap<>();
+				costType2tourCostFileName.put(TRAVELTIME_COSTTYPE,
+						traveltimesFileName);
+				costType2tourCostFileName.put(DISTANCE_COSTTYPE,
+						distancesFileName);
+				costType2tourCostFileName.put(TOLL_COSTTYPE, tollsFileName);
+
+				// TODO ensure the population uses the experienced travel times.
+				final HalfTourCostMatrices tourTravelTimes = new HalfTourCostMatrices(
+						controler.getScenario(), tripCostMatrices);
+				tourTravelTimes
+						.writeHalfTourTravelTimesToFiles(costType2tourCostFileName);
+				tourTravelTimes
+						.writeHistogramsToFile("./departure-time-histograms."
+								+ iteration + ".txt");
+
+			} else if (DEMANDMODEL.scaper.equals(demandModel)) {
+
+				tripCostMatrices.writeToScaperFiles(traveltimesFileName);
+
+			}
 
 			Logger.getLogger(MATSimDummy.class.getName()).info(
 					"... succeeded to write traveltime matrices to file: "
@@ -473,7 +571,7 @@ public class MATSimDummy {
 			 */
 
 			Logger.getLogger(MATSimDummy.class.getName()).info(
-					"Running Regent: " + regentCommand + " ...");
+					"Running demand model: " + regentCommand + " ...");
 
 			final Process proc;
 			final int exitVal;
@@ -492,7 +590,22 @@ public class MATSimDummy {
 					"... succeeded to run Regent");
 		}
 
+		Logger.getLogger(MATSimDummy.class.getName()).info(
+				"Completed simulation.");
+
+		/*
+		 * Create summary data.
+		 */
+
+		Logger.getLogger(MATSimDummy.class.getName()).info(
+				"Creating folder with summary data.");
+		try {
+			SummaryCreator.run(maxIterations);
+		} catch (Exception e) {
+			Logger.getLogger(MATSimDummy.class.getName()).severe(
+					"failed to write summary data: " + e.getMessage());
+		}
+
 		Logger.getLogger(MATSimDummy.class.getName()).info("DONE");
-		System.out.println("... DONE");
 	}
 }

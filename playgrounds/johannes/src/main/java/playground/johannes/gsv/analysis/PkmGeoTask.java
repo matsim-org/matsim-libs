@@ -1,19 +1,17 @@
 package playground.johannes.gsv.analysis;
 
-import gnu.trove.TObjectDoubleHashMap;
-import gnu.trove.TObjectDoubleIterator;
-
-import java.util.Map;
-import java.util.Set;
-
+import gnu.trove.iterator.TObjectDoubleIterator;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.facilities.ActivityFacilities;
-
 import playground.johannes.coopsim.analysis.LegModeCondition;
 import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTask;
 import playground.johannes.coopsim.analysis.TrajectoryUtils;
 import playground.johannes.coopsim.analysis.TripDistanceTotal;
 import playground.johannes.coopsim.pysical.Trajectory;
+
+import java.util.Map;
+import java.util.Set;
 
 public class PkmGeoTask extends TrajectoryAnalyzerTask {
 

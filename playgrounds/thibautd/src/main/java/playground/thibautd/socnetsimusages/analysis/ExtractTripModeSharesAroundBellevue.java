@@ -19,11 +19,10 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsimusages.analysis;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-
+import eu.eunoiaproject.bikesharing.framework.BikeSharingConstants;
+import eu.eunoiaproject.bikesharing.framework.router.BikeSharingModeIdentifier;
+import eu.eunoiaproject.bikesharing.framework.router.MainModeIdentifierForMultiModalAccessPt;
+import eu.eunoiaproject.bikesharing.framework.router.TransitMultiModalAccessRoutingModule;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -36,6 +35,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.contrib.socnetsim.jointtrips.JointMainModeIdentifier;
+import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -55,16 +56,14 @@ import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.pt.PtConstants;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
-
-import eu.eunoiaproject.bikesharing.framework.BikeSharingConstants;
-import eu.eunoiaproject.bikesharing.framework.router.BikeSharingModeIdentifier;
-import eu.eunoiaproject.bikesharing.framework.router.MainModeIdentifierForMultiModalAccessPt;
-import eu.eunoiaproject.bikesharing.framework.router.TransitMultiModalAccessRoutingModule;
 import playground.ivt.utils.AcceptAllFilter;
 import playground.ivt.utils.ArgParser;
 import playground.ivt.utils.SubpopulationFilter;
-import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
-import org.matsim.contrib.socnetsim.jointtrips.JointMainModeIdentifier;
+
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author thibautd

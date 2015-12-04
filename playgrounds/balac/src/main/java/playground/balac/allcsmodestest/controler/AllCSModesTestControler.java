@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -13,11 +11,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.router.DefaultTripRouterFactoryImpl;
-import org.matsim.core.router.MainModeIdentifier;
-import org.matsim.core.router.RoutingContext;
-import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.*;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.balac.allcsmodestest.config.AllCSModesConfigGroup;
@@ -36,7 +30,6 @@ public class AllCSModesTestControler {
 	
 	
 	public static void main(final String[] args) {
-		Logger.getLogger( "org.matsim.core.controler.Injector" ).setLevel(Level.OFF);
 		
     	final Config config = ConfigUtils.loadConfig(args[0]);
     	OneWayCarsharingRDConfigGroup configGroup = new OneWayCarsharingRDConfigGroup();
@@ -61,65 +54,45 @@ public class AllCSModesTestControler {
                 bindMobsim().toProvider( AllCSModesQsimFactory.class );
             }
         });
+		
+		controler.addOverridingModule(new AbstractModule() {
 
-		controler.setTripRouterFactory(
-                new TripRouterFactory() {
-                    @Override
-                    public TripRouter instantiateAndConfigureTripRouter(RoutingContext routingContext) {
-                        // this factory initializes a TripRouter with default modules,
-                        // taking into account what is asked for in the config
+			@Override
+			public void install() {
 
-                        // This allows us to just add our module and go.
-                        final TripRouterFactory delegate = DefaultTripRouterFactoryImpl.createRichTripRouterFactoryImpl(controler.getScenario());
+				addRoutingModuleBinding("twowaycarsharing").toInstance(new TwoWayCSRoutingModule());
+				addRoutingModuleBinding("freefloating").toInstance(new FreeFloatingRoutingModule());
+				addRoutingModuleBinding("onewaycarsharing").toInstance(new OneWayCarsharingRDRoutingModule());
 
-                        final TripRouter router = delegate.instantiateAndConfigureTripRouter(routingContext);
+				bind(MainModeIdentifier.class).toInstance(new MainModeIdentifier() {
 
-                        // add our module to the instance
-                        router.setRoutingModule(
-                            "twowaycarsharing",
-                            new TwoWayCSRoutingModule());
+                    final MainModeIdentifier defaultModeIdentifier = new MainModeIdentifierImpl();
+					
+					@Override
+					public String identifyMainMode(List<? extends PlanElement> tripElements) {
 
-                        router.setRoutingModule(
-                                "freefloating",
-                                new FreeFloatingRoutingModule());
-
-                        router.setRoutingModule(
-                                "onewaycarsharing",
-                                new OneWayCarsharingRDRoutingModule());
-
-                        // we still need to provide a way to identify our trips
-                        // as being twowaycarsharing trips.
-                        // This is for instance used at re-routing.
-                        final MainModeIdentifier defaultModeIdentifier =
-                            router.getMainModeIdentifier();
-                        router.setMainModeIdentifier(
-                                new MainModeIdentifier() {
-                                    @Override
-                                    public String identifyMainMode(
-                                            final List<? extends PlanElement> tripElements) {
-                                        for ( PlanElement pe : tripElements ) {
-                                            if ( pe instanceof Leg && ((Leg) pe).getMode().equals( "twowaycarsharing" ) ) {
-                                                return "twowaycarsharing";
-                                            }
-                                            else if ( pe instanceof Leg && ((Leg) pe).getMode().equals( "onewaycarsharing" ) ) {
-                                                return "onewaycarsharing";
-                                            }
-                                            else if ( pe instanceof Leg && ((Leg) pe).getMode().equals( "freefloating" ) ) {
-                                                return "freefloating";
-                                            }
-                                        }
-                                        // if the trip doesn't contain a carsharing leg,
-                                        // fall back to the default identification method.
-                                        return defaultModeIdentifier.identifyMainMode( tripElements );
-                                    }
-                                });
-
-                        return router;
-                    }
-
-
-            });
-
+						for ( PlanElement pe : tripElements ) {
+                            if ( pe instanceof Leg && ((Leg) pe).getMode().equals( "twowaycarsharing" ) ) {
+                                return "twowaycarsharing";
+                            }
+                            else if ( pe instanceof Leg && ((Leg) pe).getMode().equals( "onewaycarsharing" ) ) {
+                                return "onewaycarsharing";
+                            }
+                            else if ( pe instanceof Leg && ((Leg) pe).getMode().equals( "freefloating" ) ) {
+                                return "freefloating";
+                            }
+                        }
+                        // if the trip doesn't contain a carsharing leg,
+                        // fall back to the default identification method.
+                        return defaultModeIdentifier.identifyMainMode( tripElements );
+					
+					}				
+					
+				});		
+				
+			}
+			
+		});
 
 		//setting up the scoring function factory, inside different scoring functions are set-up
 		AllCSModesScoringFunctionFactory allCSModesScoringFunctionFactory = new AllCSModesScoringFunctionFactory(

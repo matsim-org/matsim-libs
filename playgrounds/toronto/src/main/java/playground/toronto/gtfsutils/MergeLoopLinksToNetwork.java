@@ -12,7 +12,7 @@ import org.matsim.core.network.LinkFactoryImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
@@ -33,11 +33,11 @@ public class MergeLoopLinksToNetwork {
 		String outputNetworkFile = args[2];
 		String reportOutputFile = args[3];
 		
-		ScenarioImpl scenario1 = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario scenario1 = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario1).readFile(baseNetworkFile);
 		Network baseNetwork = scenario1.getNetwork();
 		
-		ScenarioImpl scenario2 = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario scenario2 = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario2).readFile(updatedNetworkFile);
 		Network updatedNetwork = scenario2.getNetwork();
 		

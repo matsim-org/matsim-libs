@@ -39,7 +39,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
@@ -148,7 +148,7 @@ public class CalculateModeShareForRegion {
 	public static void filterPersonActs(String networkFile, String inPlansFile, String statsFile, Coord minSourceCoord, Coord maxSourceCoord){
 		Gbl.startMeasurement();
 
-		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 //		Network net = sc.getNetwork();
 		new MatsimNetworkReader(sc).readFile(networkFile);

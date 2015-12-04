@@ -24,7 +24,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.utils.misc.Time;
 
-public class LegImpl implements Leg {
+public final class LegImpl implements Leg {
 
 	protected Route route = null;
 
@@ -109,5 +109,16 @@ public class LegImpl implements Leg {
 				"[arrTime=" + Time.writeTime(this.getArrivalTime()) + "]" +
 				"[route=" + this.route + "]";
 	}
+
+//	private boolean locked;
+//
+//	public void setLocked() {
+//		this.locked = true ;
+//	}
+//	private void testForLocked() {
+//		if ( this.locked ) {
+//			throw new RuntimeException("too late to change this") ;
+//		}
+//	}
 
 }

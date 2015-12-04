@@ -19,8 +19,6 @@
  * *********************************************************************** */
 package playground.thibautd.router.multimodal;
 
-import java.util.Arrays;
-
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -37,6 +35,8 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
+
+import java.util.Arrays;
 
 /**
  * @author thibautd

@@ -93,7 +93,7 @@ public class LaneDefinitionsReaderWriterTest extends MatsimTestCase {
 		checkContent(f.scenario.getLanes());
 	}
 
-	private void checkContent(LaneDefinitions20 lanedefs) {
+	private void checkContent(Lanes lanedefs) {
 		assertEquals(2, lanedefs.getLanesToLinkAssignments().size());
 		LanesToLinkAssignment20 l2la;
 		List<LanesToLinkAssignment20> assignments = new ArrayList<>();

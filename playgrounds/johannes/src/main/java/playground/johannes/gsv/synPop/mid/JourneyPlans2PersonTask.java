@@ -20,10 +20,10 @@
 package playground.johannes.gsv.synPop.mid;
 
 import playground.johannes.synpop.data.CommonKeys;
-import playground.johannes.synpop.processing.PersonTask;
 import playground.johannes.synpop.data.Episode;
 import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.processing.PersonTask;
 
 import java.util.HashSet;
 import java.util.Map.Entry;

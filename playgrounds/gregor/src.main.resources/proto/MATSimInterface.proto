@@ -1,4 +1,4 @@
-syntax = "proto2";
+syntax = "proto3";
 option java_generic_services = false;
 //option java_outer_classname="ProtoMATSimInterface";
 option java_package = "org.matsim.hybrid";
@@ -139,7 +139,6 @@ service ExternInterfaceService {
 	rpc reqExternDoSimStep(ExternDoSimStep) returns (ExternDoSimStepReceived);
 	rpc reqExternOnPrepareSim(ExternOnPrepareSim) returns (ExternOnPrepareSimConfirmed);
 	rpc reqExternAfterSim(ExternAfterSim) returns (ExternAfterSimConfirmed);
-
 
 }
 

@@ -19,36 +19,35 @@
  * *********************************************************************** */
 package playground.johannes.studies.mz2005;
 
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.contrib.common.gis.CRSUtils;
+import org.matsim.contrib.socnetgen.sna.graph.social.SocialPerson;
+import org.matsim.contrib.socnetgen.sna.graph.social.SocialSparseGraph;
+import org.matsim.contrib.socnetgen.sna.graph.social.SocialSparseGraphBuilder;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.MatsimFacilitiesReader;
-
 import playground.johannes.coopsim.analysis.ActivityDurationTask;
 import playground.johannes.coopsim.analysis.TrajectoryAnalyzer;
 import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTaskComposite;
 import playground.johannes.coopsim.pysical.Trajectory;
-import playground.johannes.coopsim.util.MatsimCoordUtils;
-import playground.johannes.mz2005.analysis.TrajectoryPlanBuilder;
-import playground.johannes.mz2005.io.EscortData;
-import playground.johannes.mz2005.utils.FacilityFromActivity;
-import playground.johannes.mz2005.validate.RoundTrips;
-import playground.johannes.sna.gis.CRSUtils;
-import playground.johannes.socialnetworks.graph.social.SocialPerson;
-import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseGraph;
-import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseGraphBuilder;
+import playground.johannes.coopsim.utils.MatsimCoordUtils;
+import playground.johannes.studies.mz2005.analysis.TrajectoryPlanBuilder;
+import playground.johannes.studies.mz2005.io.EscortData;
+import playground.johannes.studies.mz2005.utils.FacilityFromActivity;
+import playground.johannes.studies.mz2005.validate.RoundTrips;
+
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 
 /**
@@ -76,9 +75,9 @@ public class Analyzer {
 		
 		EscortData escortData = EscortData.read("/Users/jillenberger/Work/socialnets/data/schweiz/mz2005/rawdata/07-09-2011/escort.sun.txt", scenario.getPopulation());
 		
-		MatsimFacilitiesReader facReader = new MatsimFacilitiesReader((ScenarioImpl) scenario);
+		MatsimFacilitiesReader facReader = new MatsimFacilitiesReader((MutableScenario) scenario);
 		facReader.readFile("/Users/jillenberger/Work/shared-svn/studies/schweiz-ivtch/baseCase/facilities/facilities.cg.xml");
-		ActivityFacilities facilities = ((ScenarioImpl) scenario).getActivityFacilities();
+		ActivityFacilities facilities = ((MutableScenario) scenario).getActivityFacilities();
 		
 		FacilityFromActivity.createActivities(scenario.getPopulation(), facilities);
 		

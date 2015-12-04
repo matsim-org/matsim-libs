@@ -41,11 +41,11 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.EventsToScore;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
@@ -65,7 +65,7 @@ import junit.framework.TestCase;
 	}
 
 	/** Creates a simple network consisting of 5 equal links in a row. */
-	static void createNetwork1(final ScenarioImpl scenario) {
+	static void createNetwork1(final MutableScenario scenario) {
 		/* This creates the following network:
 		 *
 		 * (1)-------(2)-------(3)-------(4)-------(5)-------(6)
@@ -90,7 +90,7 @@ import junit.framework.TestCase;
 	}
 
 	/** Creates a simple network with route alternatives in 2 places. */
-	static void createNetwork2(final ScenarioImpl scenario) {
+	static void createNetwork2(final MutableScenario scenario) {
 		/* This creates the following network:
 		 *
 		 *            3 /----(3)----\ 4
@@ -149,7 +149,7 @@ import junit.framework.TestCase;
 	/**
 	 * Creates a population for network1
 	 **/
-	static void createPopulation1(final ScenarioImpl scenario) {
+	static void createPopulation1(final MutableScenario scenario) {
 		Population population = scenario.getPopulation();
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 
@@ -177,7 +177,7 @@ import junit.framework.TestCase;
 	/**
 	 * Creates a population for network2
 	 **/
-	static void createPopulation2(final ScenarioImpl scenario) {
+	static void createPopulation2(final MutableScenario scenario) {
 		Population population = scenario.getPopulation();
 		Network network = scenario.getNetwork();
 
@@ -185,7 +185,7 @@ import junit.framework.TestCase;
 	}
 
 	private static Person createPerson1(final int personId, final String startTime, final Id homeLinkId, final List<Id<Link>> routeLinkIds, final Id workLinkId) {
-		Person person = PersonImpl.createPerson(Id.create(personId, Person.class));
+		Person person = PopulationUtils.createPerson(Id.create(personId, Person.class));
 		PlanImpl plan = new org.matsim.core.population.PlanImpl(person);
 		person.addPlan(plan);
 		plan.createAndAddActivity("h", homeLinkId).setEndTime(Time.parseTime(startTime));
@@ -198,7 +198,7 @@ import junit.framework.TestCase;
 	}
 
 	private static Person createPerson2(final int personId, final String startTime, final Link homeLink, final Link workLink, final Link finishLink) {
-		Person person = PersonImpl.createPerson(Id.create(personId, Person.class));
+		Person person = PopulationUtils.createPerson(Id.create(personId, Person.class));
 		PlanImpl plan = new org.matsim.core.population.PlanImpl(person);
 		person.addPlan(plan);
 		ActivityImpl act = plan.createAndAddActivity("h", homeLink.getId());
@@ -216,7 +216,7 @@ import junit.framework.TestCase;
 
 	protected static Population createReferencePopulation1(final Config config) {
 		// run mobsim once without toll and get score for network1/population1
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		Fixture.createNetwork1(scenario);
 		Fixture.createPopulation1(scenario);
 		Population referencePopulation = scenario.getPopulation();

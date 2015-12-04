@@ -22,21 +22,22 @@ package playground.anhorni.rc.microwdr;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.router.RoutingContext;
-import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.TripRouter;
 import org.matsim.withinday.mobsim.WithinDayEngine;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;
 
+import javax.inject.Provider;
+
 public class CurrentLegMicroReplannerFactory extends WithinDayDuringLegReplannerFactory {
 
 	private final Scenario scenario;
-	private final TripRouterFactory tripRouterFactory;
+	private final Provider<TripRouter> tripRouterFactory;
 	private final RoutingContext routingContext;
 	private final Controler controler;
 	
 	public CurrentLegMicroReplannerFactory(Scenario scenario, WithinDayEngine withinDayEngine,
-			TripRouterFactory tripRouterFactory, RoutingContext routingContext, Controler controler) {
+										   Provider<TripRouter> tripRouterFactory, RoutingContext routingContext, Controler controler) {
 		super(withinDayEngine);
 		this.scenario = scenario;
 		this.tripRouterFactory = tripRouterFactory;
@@ -48,7 +49,7 @@ public class CurrentLegMicroReplannerFactory extends WithinDayDuringLegReplanner
 	public WithinDayDuringLegReplanner createReplanner() {
 		WithinDayDuringLegReplanner replanner = new CurrentLegMicroReplanner(super.getId(), scenario,
 				this.getWithinDayEngine().getActivityRescheduler(), 
-				this.tripRouterFactory.instantiateAndConfigureTripRouter(routingContext),
+				this.tripRouterFactory.get(),
 				this.controler);
 		return replanner;
 	}

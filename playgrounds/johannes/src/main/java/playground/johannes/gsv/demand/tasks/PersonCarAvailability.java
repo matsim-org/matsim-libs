@@ -22,15 +22,13 @@
  */
 package playground.johannes.gsv.demand.tasks;
 
-import gnu.trove.TIntDoubleHashMap;
-
-import java.util.Random;
-
+import gnu.trove.map.hash.TIntDoubleHashMap;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-
 import org.matsim.core.population.PersonUtils;
 import playground.johannes.gsv.demand.PopulationTask;
+
+import java.util.Random;
 
 /**
  * @author johannes

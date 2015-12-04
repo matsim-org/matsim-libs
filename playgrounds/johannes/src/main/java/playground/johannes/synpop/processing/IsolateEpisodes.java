@@ -24,7 +24,10 @@ import playground.johannes.synpop.data.Factory;
 import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.data.PersonUtils;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author johannes

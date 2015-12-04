@@ -31,7 +31,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.events.handler.EventHandler;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 
 import playground.vsp.analysis.modules.AbstractAnalysisModule;
 import playground.vsp.analysis.modules.userBenefits.UserBenefitsAnalyzer;
@@ -48,7 +48,7 @@ import playground.vsp.analysis.modules.userBenefits.WelfareMeasure;
 public class MyUserBenefitsAnalyzer extends AbstractAnalysisModule{
 	
 	private final Logger log = Logger.getLogger(UserBenefitsAnalyzer.class);
-	private ScenarioImpl scenario;
+	private MutableScenario scenario;
 	private UserBenefitsCalculator userWelfareCalculator;
 	
 	private double allUsersLogSum;
@@ -61,13 +61,12 @@ public class MyUserBenefitsAnalyzer extends AbstractAnalysisModule{
 		super(MyUserBenefitsAnalyzer.class.getSimpleName());
 	}
 	
-	
 	/**
 	 * @param scenario
 	 * @param welfareMeasure user welfare or logsum
 	 * @param considerAllPlans include plans with negative or null score or not
 	 */
-	public void init(ScenarioImpl scenario, WelfareMeasure welfareMeasure, boolean considerAllPlans) {
+	public void init(MutableScenario scenario, WelfareMeasure welfareMeasure, boolean considerAllPlans) {
 		this.scenario = scenario;
 		this.welfareMeasure = welfareMeasure;
 		this.userWelfareCalculator = new UserBenefitsCalculator(this.scenario.getConfig(), this.welfareMeasure, considerAllPlans);

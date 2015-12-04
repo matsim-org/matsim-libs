@@ -26,7 +26,10 @@ import playground.johannes.synpop.sim.data.CachedPerson;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.Collection;
+import java.util.Locale;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -48,18 +51,30 @@ public class HamiltonianLogger implements MarkovEngineListener {
 
     private final String outdir;
 
-    public HamiltonianLogger(Hamiltonian h, int logInterval) {
-        this(h, logInterval, null);
+    private final DecimalFormat format;
+
+    private final String name;
+
+    public HamiltonianLogger(Hamiltonian h, int logInterval, String name) {
+        this(h, logInterval, name, null);
     }
 
-    public HamiltonianLogger(Hamiltonian h, long logInterval, String outdir) {
+    public HamiltonianLogger(Hamiltonian h, long logInterval, String name, String outdir) {
         this.h = h;
         this.logInterval = logInterval;
         this.outdir = outdir;
 
+        if(name == null)
+            this.name = h.getClass().getSimpleName();
+        else
+            this.name = name;
+
+        format = new DecimalFormat("0E0", new DecimalFormatSymbols(Locale.US));
+        format.setMaximumFractionDigits(340);
+
         if (outdir != null) {
             try {
-                writer = new BufferedWriter(new FileWriter(outdir + "/" + h.getClass().getSimpleName() + ".txt"));
+                writer = new BufferedWriter(new FileWriter(outdir + "/" + name + ".txt"));
                 writer.write("iter\th");
                 writer.newLine();
             } catch (IOException e) {
@@ -73,7 +88,7 @@ public class HamiltonianLogger implements MarkovEngineListener {
         if (iter.get() % logInterval == 0) {
             long iterNow = iter.get();
             double hVal = h.evaluate(population);
-            logger.info(String.format("%s [%s]: %s", h.getClass().getSimpleName(), iterNow, hVal));
+            logger.info(String.format("%s [%s]: %s", name, format.format(iterNow), hVal));
 
             if (writer != null) {
                 try {

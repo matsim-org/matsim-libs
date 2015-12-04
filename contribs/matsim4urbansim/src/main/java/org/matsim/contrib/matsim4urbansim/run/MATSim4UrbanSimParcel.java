@@ -41,6 +41,7 @@ import org.matsim.contrib.accessibility.GridBasedAccessibilityControlerListenerV
 import org.matsim.contrib.accessibility.Modes4Accessibility;
 import org.matsim.contrib.accessibility.ZoneBasedAccessibilityControlerListenerV3;
 import org.matsim.contrib.accessibility.utils.AggregationObject;
+import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtModule;
 import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtRouterConfigGroup;
 import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtRouterFactoryImpl;
 import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
@@ -65,7 +66,7 @@ import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacilitiesImpl;
@@ -209,7 +210,7 @@ class MATSim4UrbanSimParcel{
 		log.info("### DONE with demand generation from urbansim ###");
 
 		// set population in scenario
-		((ScenarioImpl) scenario).setPopulation(newPopulation);
+		((MutableScenario) scenario).setPopulation(newPopulation);
 
 		// running mobsim and assigned controller listener
 		runControler(zones, parcels, opportunities);
@@ -301,7 +302,7 @@ class MATSim4UrbanSimParcel{
 			log.info("Initializing MATSim4UrbanSim pseudo pt router ...");
 			BoundingBox nbb = BoundingBox.createBoundingBox(controler.getScenario().getNetwork());
 			ptMatrix = PtMatrix.createPtMatrix(controler.getScenario().getConfig().plansCalcRoute(), nbb, ConfigUtils.addOrGetModule(controler.getScenario().getConfig(), MatrixBasedPtRouterConfigGroup.GROUP_NAME, MatrixBasedPtRouterConfigGroup.class));	
-			controler.setTripRouterFactory( new MatrixBasedPtRouterFactoryImpl(scenario, ptMatrix) ); // the car and pt router
+			controler.addOverridingModule(new MatrixBasedPtModule(ptMatrix)); // the car and pt router
 
 			log.error("reconstructing pt route distances; not tested ...") ;
 			for ( Person person : scenario.getPopulation().getPersons().values() ) {

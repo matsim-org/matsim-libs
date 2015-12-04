@@ -24,10 +24,15 @@ import java.util.HashMap;
 import com.google.inject.Provider;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.transEnergySim.vehicles.api.BatteryElectricVehicle;
 import org.matsim.contrib.transEnergySim.vehicles.api.Vehicle;
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.EnergyConsumptionModel;
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.EnergyConsumptionTracker;
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.ricardoFaria2012.EnergyConsumptionModelRicardoFaria2012;
+import org.matsim.contrib.transEnergySim.vehicles.impl.BatteryElectricVehicleImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
@@ -36,6 +41,8 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.scenario.ScenarioUtils;
 
+import playground.jbischoff.energy.charging.Charger;
+import playground.jbischoff.energy.charging.ChargerImpl;
 import playground.jbischoff.energy.charging.ChargingHandler;
 
 public class ElectricCBMain
@@ -59,25 +66,25 @@ public class ElectricCBMain
         this.scenario = ScenarioUtils.loadScenario(config);
         
         ChargingHandler ch = new ChargingHandler();
-//        for (Person person : scenario.getPopulation().getPersons().values()){
-//            Id<Person> personId = person.getId();
-//            String pNoString = personId.toString().split("_")[0];
-//            if (pNoString.endsWith("00")){
-//                
-//                Id<Vehicle> vid =  Id.create(personId, Vehicle.class);
-//                BatteryElectricVehicle bev = new BatteryElectricVehicleImpl(ecm, 20*1000*3600,vid);
-//                this.bevs.put(vid, bev);
-//                
-//                Activity act = (Activity)person.getPlans().get(0).getPlanElements().get(2);
-//                Id<Link> linkId = act.getLinkId();
-//                Id<Charger> chargerId = Id.create(linkId+"_"+pNoString, Charger.class);
-//                ChargerImpl c = new ChargerImpl(chargerId, linkId, 4, 1);
-//                ch.addCharger(c);
-//                
-//            }
-//            
-//        }
-//        ch.addVehicles(bevs);
+        for (Person person : scenario.getPopulation().getPersons().values()){
+            Id<Person> personId = person.getId();
+            String pNoString = personId.toString().split("_")[0];
+            if (pNoString.endsWith("00")){
+                
+                Id<Vehicle> vid =  Id.create(personId, Vehicle.class);
+                BatteryElectricVehicle bev = new BatteryElectricVehicleImpl(ecm, 20*1000*3600,vid);
+                this.bevs.put(vid, bev);
+                
+                Activity act = (Activity)person.getPlans().get(0).getPlanElements().get(2);
+                Id<Link> linkId = act.getLinkId();
+                Id<Charger> chargerId = Id.create(linkId+"_"+pNoString, Charger.class);
+                ChargerImpl c = new ChargerImpl(chargerId, linkId, 4, 1);
+                ch.addCharger(c);
+                
+            }
+            
+        }
+        ch.addVehicles(bevs);
         EnergyConsumptionTracker ect = new EnergyConsumptionTracker(bevs, scenario.getNetwork());
         final EVehQSimFactory ev = new EVehQSimFactory(ch,ect);
         

@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.jointtrips.router;
 
+import com.google.inject.Provider;
+import com.google.inject.name.Names;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Before;
@@ -30,19 +32,21 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.*;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.Injector;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
-import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.TripRouterModule;
+import org.matsim.core.router.costcalculators.TravelDisutilityModule;
 import org.matsim.core.router.util.DijkstraFactory;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
+import org.matsim.core.trafficmonitoring.TravelTimeCalculatorModule;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -62,7 +66,7 @@ public class JointTripRouterFactoryTest {
 	private static final Logger log =
 		Logger.getLogger(JointTripRouterFactoryTest.class);
 
-	private JointTripRouterFactory factory;
+	private Provider<TripRouter> factory;
 	private Scenario scenario;
 
 	@Before
@@ -98,7 +102,7 @@ public class JointTripRouterFactoryTest {
 		Id<Person> passengerId = Id.create( "passenger" , Person.class );
 
 		// driver
-		Person pers = PersonImpl.createPerson(driverId);
+		Person pers = PopulationUtils.createPerson(driverId);
 		PlanImpl plan = new PlanImpl( pers );
 		pers.addPlan( plan );
 		pers.setSelectedPlan( plan );
@@ -117,7 +121,7 @@ public class JointTripRouterFactoryTest {
 		dLeg.setRoute( dRoute );
 
 		// passenger
-		pers = PersonImpl.createPerson(passengerId);
+		pers = PopulationUtils.createPerson(passengerId);
 		plan = new PlanImpl( pers );
 		pers.addPlan( plan );
 		pers.setSelectedPlan( plan );
@@ -145,24 +149,22 @@ public class JointTripRouterFactoryTest {
 		return sc;
 	}
 
-	private static JointTripRouterFactory createFactory( final Scenario scenario ) {
-		return new JointTripRouterFactory(
-				scenario,
-				Collections.<String,TravelDisutilityFactory>singletonMap(
-						TransportMode.car,
-						new TravelDisutilityFactory () {
-							@Override
-							public TravelDisutility createTravelDisutility(
-									TravelTime timeCalculator,
-									PlanCalcScoreConfigGroup cnScoringGroup) {
-								return new RandomizingTimeDistanceTravelDisutility.Builder().createTravelDisutility(timeCalculator, cnScoringGroup);
-							}
-						} ),
-				Collections.<String,TravelTime>singletonMap(
-						TransportMode.car,
-						new FreeSpeedTravelTime() ),
-				new DijkstraFactory(),
-				null);
+	private static Provider<TripRouter> createFactory(final Scenario scenario) {
+		Injector injector = Injector.createInjector(
+				scenario.getConfig(),
+				AbstractModule.override(Collections.singleton(new AbstractModule() {
+					@Override
+					public void install() {
+						bind(Scenario.class).toInstance(scenario);
+						bind(EventsManager.class).toInstance(EventsUtils.createEventsManager(scenario.getConfig()));
+						install(new TripRouterModule());
+						install(new TravelTimeCalculatorModule());
+						install(new TravelDisutilityModule());
+						bind(Integer.class).annotatedWith(Names.named("iteration")).toInstance(0);
+					}
+				}), new JointTripRouterModule()));
+
+		return injector.getProvider(TripRouter.class);
 	}
 
 	@Test

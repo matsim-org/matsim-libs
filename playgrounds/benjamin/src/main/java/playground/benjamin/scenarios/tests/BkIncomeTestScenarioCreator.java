@@ -38,7 +38,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.benjamin.BkPaths;
@@ -60,9 +60,9 @@ public class BkIncomeTestScenarioCreator {
 	private final Id<Link> id6 = Id.create(6, Link.class);
 	private final Id<Link> id7 = Id.create(7, Link.class);
 
-	private final ScenarioImpl scenario;
+	private final MutableScenario scenario;
 
-	public BkIncomeTestScenarioCreator(ScenarioImpl scenario) {
+	public BkIncomeTestScenarioCreator(MutableScenario scenario) {
 		this.scenario = scenario;
 	}
 
@@ -154,7 +154,7 @@ public class BkIncomeTestScenarioCreator {
 	 * @throws FileNotFoundException
 	 */
 	public static void main(String[] args) throws FileNotFoundException, IOException {
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		String outfile = BkPaths.SHAREDSVN + "studies/bkick/oneRouteTwoModeIncomeTest/plans.xml";
 		String networkFile = BkPaths.SHAREDSVN + "studies/bkick/oneRouteTwoModeIncomeTest/network.xml";
 		Network uselessNetwork = scenario.getNetwork();

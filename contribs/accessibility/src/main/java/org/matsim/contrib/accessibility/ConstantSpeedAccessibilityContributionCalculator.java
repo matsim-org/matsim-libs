@@ -76,13 +76,13 @@ public class ConstantSpeedAccessibilityContributionCalculator implements Accessi
 	}
 
 	@Override
-	public void notifyNewOriginNode(Node fromNode) {
+	public void notifyNewOriginNode(Node fromNode, Double departureTime) {
 		this.fromNode = fromNode;
 		this.lcptTravelDistance.calculate(scenario.getNetwork(), fromNode, departureTime);
 	}
 
 	@Override
-	public double computeContributionOfOpportunity(ActivityFacility origin, AggregationObject destination) {
+	public double computeContributionOfOpportunity(ActivityFacility origin, AggregationObject destination, Double departureTime) {
 		// get the nearest link:
 		Link nearestLink = ((NetworkImpl)scenario.getNetwork()).getNearestLinkExactly(origin.getCoord());
 

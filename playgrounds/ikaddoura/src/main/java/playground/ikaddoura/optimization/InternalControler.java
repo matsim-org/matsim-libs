@@ -25,13 +25,13 @@ package playground.ikaddoura.optimization;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.contrib.otfvis.OTFVisModule;
+import org.matsim.contrib.otfvis.OTFVisFileWriterModule;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.vehicles.VehicleReaderV1;
 
@@ -51,7 +51,7 @@ public class InternalControler {
 	private final boolean calculate_carCongestionEffects;
 	private final boolean calculate_capacityDelayEffects;
 	
-	private final ScenarioImpl scenario;
+	private final MutableScenario scenario;
 	private final double fare;
 	
 	private final double MARGINAL_UTILITY_OF_MONEY = 0.062;
@@ -76,7 +76,7 @@ public class InternalControler {
 	private final double STUCK_SCORE = -100;
 
 	public InternalControler(
-			ScenarioImpl scenario,
+			MutableScenario scenario,
 			double fare,
 			boolean calculate_inVehicleTimeDelayEffects,
 			boolean calculate_waitingTimeDelayEffects,
@@ -112,7 +112,7 @@ public class InternalControler {
 		Controler controler = new Controler(this.scenario);
 		controler.getConfig().controler().setOverwriteFileSetting(
 				OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
-		controler.addOverridingModule(new OTFVisModule());
+		controler.addOverridingModule(new OTFVisFileWriterModule());
 		controler.addControlerListener(
 				new OptControlerListener(this.fare, 
 						this.scenario,

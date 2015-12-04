@@ -40,7 +40,7 @@ import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.router.TripRouter;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
 import org.matsim.withinday.utils.EditRoutes;
@@ -90,7 +90,7 @@ public class HUPCReplanner extends WithinDayDuringLegReplanner {
 
 		ActivityImpl firstParkingAct = (ActivityImpl) plan.getPlanElements().get(firstParkingActIndex);
 		firstParkingAct.setFacilityId(parkingFacilityId);
-		ActivityFacility parkingFacility = ((ScenarioImpl) scenario).getActivityFacilities().getFacilities()
+		ActivityFacility parkingFacility = ((MutableScenario) scenario).getActivityFacilities().getFacilities()
 				.get(parkingFacilityId);
 		firstParkingAct.setLinkId(parkingFacility.getLinkId());
 

@@ -25,7 +25,7 @@ import org.matsim.core.events.EventsUtils;
 public class ParkingGroupOccupanciesZHGraph {
 
 	public static void main(String[] args) {
-		String eventsFile = "C:/data/FreeFloatingParking/output/ITERS/it.1/run1.1.events.xml.gz";
+		String eventsFile = args[0];
 
 		EventsManager events = EventsUtils.createEventsManager();
 

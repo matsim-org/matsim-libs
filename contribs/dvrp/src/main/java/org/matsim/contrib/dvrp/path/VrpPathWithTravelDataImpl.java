@@ -31,12 +31,11 @@ public class VrpPathWithTravelDataImpl
 {
     private final double departureTime;
     private final double travelTime;
-    private final double travelCost;
     private final Link[] links;
-    private final double[] linkTTs;//accumulated link travel times
+    private final double[] linkTTs;
 
 
-    public VrpPathWithTravelDataImpl(double departureTime, double travelTime, double travelCost, Link[] links,
+    public VrpPathWithTravelDataImpl(double departureTime, double travelTime, Link[] links,
             double[] linkTTs)
     {
         if (links.length == 0 || links.length != linkTTs.length) {
@@ -45,7 +44,6 @@ public class VrpPathWithTravelDataImpl
 
         this.departureTime = departureTime;
         this.travelTime = travelTime;
-        this.travelCost = travelCost;
         this.links = links;
         this.linkTTs = linkTTs;
     }
@@ -69,13 +67,6 @@ public class VrpPathWithTravelDataImpl
     public double getArrivalTime()
     {
         return departureTime + travelTime;
-    }
-
-
-    @Override
-    public double getTravelCost()
-    {
-        return travelCost;
     }
 
 
@@ -119,15 +110,4 @@ public class VrpPathWithTravelDataImpl
     {
         return Iterators.forArray(links);
     }
-
-    @Override
-	public Link[] getLinks() {
-		return links;
-	}
-
-    @Override
-	public double[] getLinkTTs() {
-		return linkTTs;
-	}
-    
 }

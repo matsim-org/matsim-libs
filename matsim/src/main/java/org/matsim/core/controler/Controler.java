@@ -58,15 +58,15 @@ import org.matsim.core.mobsim.framework.ObservableMobsim;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -104,6 +104,7 @@ public class Controler extends AbstractController {
 	public static final String FILENAME_LANES = "output_lanes.xml.gz";
 	public static final String FILENAME_CONFIG = "output_config.xml.gz";
 	public static final String FILENAME_PERSON_ATTRIBUTES = "output_personAttributes.xml.gz" ; 
+	public static final String FILENAME_COUNTS = "output_counts.xml.gz" ;
 
 	private static final Logger log = Logger.getLogger(Controler.class);
 
@@ -144,8 +145,6 @@ public class Controler extends AbstractController {
     private AbstractModule overrides = AbstractModule.emptyModule();
 
 	private final List<MobsimListener> simulationListeners = new ArrayList<>();
-
-	private boolean dumpDataAtEnd = true; 
 
     public static void main(final String[] args) {
 		if ((args == null) || (args.length == 0)) {
@@ -306,7 +305,7 @@ public class Controler extends AbstractController {
                     }
                 });
 
-		if (this.dumpDataAtEnd) {
+		if (getConfig().controler().getDumpDataAtEnd()) {
 			this.addCoreControlerListener( injector.getInstance( DumpDataAtEnd.class ) );
 		}
 
@@ -330,8 +329,8 @@ public class Controler extends AbstractController {
 	@Override
 	protected final void prepareForSim() {
 
-		if ( scenario  instanceof ScenarioImpl ) {
-			((ScenarioImpl)scenario ).setLocked();
+		if ( scenario  instanceof MutableScenario ) {
+			((MutableScenario)scenario ).setLocked();
 			// see comment in ScenarioImpl. kai, sep'14
 		}
 
@@ -359,6 +358,10 @@ public class Controler extends AbstractController {
 						Controler.this.scenario, net);
 			}
 		});
+        if ( scenario.getPopulation() instanceof PopulationImpl ) {
+      	  ((PopulationImpl) scenario.getPopulation()).setLocked();
+        }
+        
 	}
 
 	@Override
@@ -463,13 +466,17 @@ public class Controler extends AbstractController {
 	    return scenario;
     }
 
-    public final EventsManager getEvents() {
-	    return events;
-    }
-
-    public final Injector getInjector() {
-	    return this.injector;
-    }
+    	/**
+    	 * @deprecated -- preferably use "@Inject EventsManager events" or "addEventHandlerBinding().toInstance(...) from AbstractModule". kai/mz, nov'15
+    	 */
+    	@Deprecated // preferably use "@Inject EventsManager events" or "addEventHandlerBinding().toInstance(...) from AbstractModule". kai/mz, nov'15
+    	public final EventsManager getEvents() {
+    		return events;
+    	}
+    	
+    	public final Injector getInjector() {
+    		return this.injector;
+    	}
 
 	/**
 	 * @deprecated Do not use this, as it may not contain values in every
@@ -480,7 +487,7 @@ public class Controler extends AbstractController {
 		return this.injector.getInstance(CalcLinkStats.class);
 	}
 
-    public final VolumesAnalyzer getVolumes() {
+	public final VolumesAnalyzer getVolumes() {
 		return this.injector.getInstance(VolumesAnalyzer.class);
 	}
 
@@ -537,11 +544,11 @@ public class Controler extends AbstractController {
      * implement your own complex travel mode.
      * See {@link org.matsim.core.router.TripRouter} for more information and pointers to examples.
      */
-	public final void setTripRouterFactory(final TripRouterFactory factory) {
+	public final void setTripRouterFactory(final javax.inject.Provider<TripRouter> factory) {
         this.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
-				bind(TripRouterFactory.class).toInstance(factory);
+				bind(TripRouter.class).toProvider(factory);
 			}
         });
 	}
@@ -560,7 +567,7 @@ public class Controler extends AbstractController {
 	 *            config etc should be dumped to a file.
 	 */
 	public final void setDumpDataAtEnd(final boolean dumpData) {
-		this.dumpDataAtEnd = dumpData;
+		this.getConfig().controler().setDumpDataAtEnd(dumpData);
 	}
 	
 	

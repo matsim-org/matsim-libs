@@ -70,7 +70,7 @@ import org.matsim.core.network.KmlNetworkWriter;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.population.*;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -103,7 +103,7 @@ public class GeneralLib {
 	 */
 	@Deprecated // use centralized infrastructure
 	public static Scenario readScenario(String plansFile, String networkFile) {
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils
+		MutableScenario scenario = (MutableScenario) ScenarioUtils
 				.createScenario(ConfigUtils.createConfig());
 
 		new MatsimNetworkReader(scenario).readFile(networkFile);
@@ -120,7 +120,7 @@ public class GeneralLib {
 	@Deprecated // use centralized infrastructure
 	public static Scenario readScenario(String plansFile, String networkFile,
 			String facilititiesPath) {
-		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils
+		MutableScenario sc = (MutableScenario) ScenarioUtils
 				.createScenario(ConfigUtils.createConfig());
 
 		sc.getConfig().setParam("plans", "inputPlansFile", plansFile);
@@ -138,7 +138,7 @@ public class GeneralLib {
 	 */
 	@Deprecated // use centralized infrastructure
 	public static Network readNetwork(String networkFile) {
-		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils
+		MutableScenario sc = (MutableScenario) ScenarioUtils
 				.createScenario(ConfigUtils.createConfig());
 
 		sc.getConfig().setParam("network", "inputNetworkFile", networkFile);
@@ -171,7 +171,7 @@ public class GeneralLib {
 	@Deprecated // use centralized infrastructure
 	public static ActivityFacilities readActivityFacilities(
 			String facilitiesFile) {
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils
+		MutableScenario scenario = (MutableScenario) ScenarioUtils
 				.createScenario(ConfigUtils.createConfig());
 		ActivityFacilities facilities = scenario.getActivityFacilities();
 		new MatsimFacilitiesReader(scenario).readFile(facilitiesFile);
@@ -717,7 +717,7 @@ public class GeneralLib {
 	 */
 	public static void writePersons(Collection<? extends Person> persons,
 			String outputPlansFileName, Network network) {
-        PopulationWriter popWriter = new PopulationWriter(PopulationUtils.createPopulation(((ScenarioImpl) null).getConfig(), ((ScenarioImpl) null).getNetwork()), network);
+        PopulationWriter popWriter = new PopulationWriter(PopulationUtils.createPopulation(((MutableScenario) null).getConfig(), ((MutableScenario) null).getNetwork()), network);
 		popWriter.writeStartPlans(outputPlansFileName);
 
 		for (Person person : persons) {
@@ -735,7 +735,7 @@ public class GeneralLib {
 	 * @param network
 	 */
 	public static void writePersons(Collection<? extends Person> persons,
-			String outputPlansFileName, Network network, ScenarioImpl scenario) {
+			String outputPlansFileName, Network network, MutableScenario scenario) {
         PopulationWriter popWriter = new PopulationWriter(PopulationUtils.createPopulation(scenario.getConfig(), scenario.getNetwork()), network);
 		popWriter.writeStartPlans(outputPlansFileName);
 
@@ -753,7 +753,7 @@ public class GeneralLib {
 	 * @return
 	 */
 	public static Person copyPerson(Person person) {
-		Person newPerson = PersonImpl.createPerson(person.getId());
+		Person newPerson = PopulationUtils.createPerson(person.getId());
 		PlanImpl newPlan = new PlanImpl();
 		newPlan.copyFrom(person.getSelectedPlan());
 		newPlan.setPerson(newPerson);

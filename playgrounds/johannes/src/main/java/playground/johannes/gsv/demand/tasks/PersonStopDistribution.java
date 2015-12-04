@@ -32,7 +32,10 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.contrib.common.gis.CRSUtils;
 import org.matsim.contrib.common.util.ProgressLogger;
+import org.matsim.contrib.socnetgen.sna.gis.Zone;
+import org.matsim.contrib.socnetgen.sna.gis.ZoneLayer;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.opengis.referencing.FactoryException;
@@ -40,9 +43,6 @@ import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 import playground.johannes.gsv.demand.ActivityTypes;
 import playground.johannes.gsv.demand.PopulationTask;
-import playground.johannes.sna.gis.CRSUtils;
-import playground.johannes.sna.gis.Zone;
-import playground.johannes.sna.gis.ZoneLayer;
 
 import java.util.*;
 
@@ -223,7 +223,7 @@ public class PersonStopDistribution implements PopulationTask {
 					N - processed));
 		}
 
-		ProgressLogger.termiante();
+		ProgressLogger.terminate();
 	}
 
 }

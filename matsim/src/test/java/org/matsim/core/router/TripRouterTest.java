@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Test;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
@@ -34,6 +35,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.facilities.ActivityFacility;
 
 /**
  * @author thibautd
@@ -161,16 +163,59 @@ public class TripRouterTest {
 				TripRouter.insertTrip( plan , o , trip , d ) );
 	}
 
-	private static class EqualsActivity extends ActivityImpl {
-		public EqualsActivity(final String type, final Id<Link> link) {
-			super( type , link );
+	private static class EqualsActivity implements Activity {
+		Activity delegate ;
+		@Override
+		public double getEndTime() {
+			return this.delegate.getEndTime();
 		}
-
+		@Override
+		public void setEndTime(double seconds) {
+			this.delegate.setEndTime(seconds);
+		}
+		@Override
+		public String getType() {
+			return this.delegate.getType();
+		}
+		@Override
+		public void setType(String type) {
+			this.delegate.setType(type);
+		}
+		@Override
+		public Coord getCoord() {
+			return this.delegate.getCoord();
+		}
+		@Override
+		public double getStartTime() {
+			return this.delegate.getStartTime();
+		}
+		@Override
+		public void setStartTime(double seconds) {
+			this.delegate.setStartTime(seconds);
+		}
+		@Override
+		public double getMaximumDuration() {
+			return this.delegate.getMaximumDuration();
+		}
+		@Override
+		public void setMaximumDuration(double seconds) {
+			this.delegate.setMaximumDuration(seconds);
+		}
+		@Override
+		public Id<Link> getLinkId() {
+			return this.delegate.getLinkId();
+		}
+		@Override
+		public Id<ActivityFacility> getFacilityId() {
+			return this.delegate.getFacilityId();
+		}
+		public EqualsActivity(final String type, final Id<Link> link) {
+			delegate = new ActivityImpl( type, link ) ;
+		}
 		@Override
 		public int hashCode() {
 			return 1;
 		}
-
 		@Override
 		public boolean equals(final Object o) {
 			return true;

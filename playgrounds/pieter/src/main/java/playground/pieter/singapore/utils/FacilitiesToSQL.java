@@ -7,18 +7,12 @@ import java.io.StringReader;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.facilities.ActivityFacilities;
-import org.matsim.facilities.ActivityFacility;
-import org.matsim.facilities.ActivityFacilityImpl;
-import org.matsim.facilities.ActivityOption;
-import org.matsim.facilities.ActivityOptionImpl;
-import org.matsim.facilities.MatsimFacilitiesReader;
-import org.matsim.facilities.OpeningTime;
-import org.matsim.facilities.OpeningTimeImpl;
+import org.matsim.facilities.*;
 import org.postgresql.PGConnection;
 import org.postgresql.copy.CopyManager;
 
@@ -26,23 +20,22 @@ import others.sergioo.util.dataBase.DataBaseAdmin;
 import others.sergioo.util.dataBase.NoConnectionException;
 
 
-
 public class FacilitiesToSQL {
 	private final DataBaseAdmin dba;
-	private final ScenarioImpl scenario;
-	
-	public FacilitiesToSQL(DataBaseAdmin dba, ScenarioImpl scenario) {
+	private final MutableScenario scenario;
+
+	public FacilitiesToSQL(DataBaseAdmin dba, MutableScenario scenario) {
 		super();
 		this.dba = dba;
 		this.scenario = scenario;
 	}
 	public void createShortSQLFacilityList(String tableName) throws SQLException, NoConnectionException{
-		dba.executeStatement(String.format("DROP TABLE IF EXISTS %s;",tableName));
+		dba.executeStatement(String.format("DROP TABLE IF EXISTS %s;", tableName));
 		dba.executeStatement(String.format("CREATE TABLE %s(" +
 				"id VARCHAR(45)," +
 				"x_utm48n real," +
 				"y_utm48n real," +
-				"description VARCHAR(255)" +			
+				"description VARCHAR(255)" +
 				")",tableName));
 		ActivityFacilities facs = scenario.getActivityFacilities();
 		for(ActivityFacility fac:facs.getFacilities().values()){
@@ -57,8 +50,8 @@ public class FacilitiesToSQL {
 
 		}
 	}
-	
-	
+
+
 	public void createShortSQLFacilityListPostgres(String tableName) {
 		try {
 			dba.executeStatement(String.format("DROP TABLE IF EXISTS %s;",
@@ -139,7 +132,7 @@ public class FacilitiesToSQL {
 				"capacity REAL," +
 				"day VARCHAR(45)," +
 				"startTime REAL," +
-				"endTime REAL" +				
+				"endTime REAL" +
 				")",tableName));
 		System.out.println("Filling the table");
 		ActivityFacilities facs = scenario.getActivityFacilities();
@@ -176,7 +169,7 @@ public class FacilitiesToSQL {
 				System.out.println("Processed facility no "+modfactor);
 				modfactor = counter;
 			}
-			
+
 		}
 		//write out the rest
 		dba.executeStatement(sb.toString());
@@ -191,7 +184,7 @@ public class FacilitiesToSQL {
 		dba.executeStatement("CREATE INDEX idx"+tableName.split(".")[1]+
 				" ON "+ tableName + " USING GIST(geom_utm48n);");
 	}
-	
+
 	public void createCompleteFacilityAndActivityTablePostgres(String tableName) throws SQLException, NoConnectionException{
 		dba.executeStatement(String.format("DROP TABLE IF EXISTS %s cascade;",tableName));
 		dba.executeStatement(String.format("CREATE TABLE %s(" +
@@ -203,10 +196,10 @@ public class FacilitiesToSQL {
 				"capacity REAL," +
 				"day VARCHAR(45)," +
 				"startTime REAL," +
-				"endTime REAL" +				
+				"endTime REAL" +
 				")",tableName));
 		dba.executeStatement(String.format("DROP TABLE IF EXISTS %s;",
-				tableName+"_sh"));
+                tableName + "_sh"));
 		dba.executeStatement(String.format("CREATE TABLE %s("
 				+ "id VARCHAR(45)," + "x_utm48n real," + "y_utm48n real" +
 				// "description VARCHAR(255)" +
@@ -264,7 +257,7 @@ public class FacilitiesToSQL {
 				System.out.println("Processed facility no "+counter);
 				modfactor = counter;
 			}
-			
+
 		}
 		//write out the rest
 		try {
@@ -277,7 +270,7 @@ public class FacilitiesToSQL {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		System.out.println("Processed facility no "+counter);
+		System.out.println("Processed facility no " + counter);
 		//add geometry and spatial index to the table]\
 		dba.executeStatement("SELECT AddGeometryColumn( '" +tableName.split("\\.")[0]+
 				"', '" +tableName.split("\\.")[1]+"_sh"+
@@ -289,9 +282,9 @@ public class FacilitiesToSQL {
 		dba.executeStatement("CREATE INDEX idx_id_"+tableName.split("\\.")[1]+
 				" ON "+ tableName + "(id);");
 	}
-	
 
-	
+
+
 	public void mapActFromSQLtoXML(ResultSet rs) throws SQLException{
 		rs.beforeFirst();
 		while(rs.next()){
@@ -305,7 +298,7 @@ public class FacilitiesToSQL {
             }
 		}
 	}
-	
+
 	public void mapTimesFromSQLtoXML(ResultSet rs) throws SQLException{
 //		rs.beforeFirst();
 		while(rs.next()){
@@ -335,11 +328,11 @@ public class FacilitiesToSQL {
 			f.setDesc(s.replaceFirst("[0-9]*:", ""));
 		}
 	}
-	
+
 	public static void main(String[] args) throws InstantiationException, IllegalAccessException, ClassNotFoundException, IOException, SQLException, NoConnectionException {
 //		DataBaseAdmin dba = new DataBaseAdmin(new File("data/matsim2.properties"));
 		DataBaseAdmin dba = new DataBaseAdmin(new File("data/matsim2postgres.properties"));
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		MatsimFacilitiesReader fcr = new MatsimFacilitiesReader(scenario);
 		fcr.readFile(args[0]);
 		FacilitiesToSQL f2sql = new FacilitiesToSQL(dba, scenario);
@@ -348,13 +341,48 @@ public class FacilitiesToSQL {
 //		f2sql.createShortSQLFacilityListPostgres(args[1]+"_short");
 		f2sql.createCompleteFacilityAndActivityTablePostgres(args[1]);
 //		f2sql.createShortSQLFacilityList("full_facility_list");
-		
+
 //		ResultSet rs = dba.executeQuery("select distinct id, starttime, endtime, acttype,day from u_fouriep.edu_facility_detail_08112012");
 //		f2sql.mapTimesFromSQLtoXML(rs);
-//		
+//
 //		FacilitiesWriter fcw =  new FacilitiesWriter(f2sql.scenario.getActivityFacilities());
 //		String completeFacilitiesXMLFile = args[2];
 //		fcw.write(completeFacilitiesXMLFile);
 	}
 
+
+    public void loadFacilitiesFromSQL(String secondaryFacilitiesTable) {
+        try {
+
+            ResultSet rs = dba.executeQuery(String.format("SELECT * FROM %s",
+                    secondaryFacilitiesTable));
+
+            while (rs.next()) {
+                Id<ActivityFacility> id = Id.create(rs.getInt("id"), ActivityFacility.class);
+                ActivityFacility facility = scenario.getActivityFacilities().getFacilities().get(id);
+                if (facility == null)
+                    facility = ((ActivityFacilitiesImpl) scenario
+                            .getActivityFacilities()).createAndAddFacility(
+                            id,
+                            new Coord(rs.getDouble("x"), rs
+                                    .getDouble("y")));
+                ActivityFacilityImpl implementation = (ActivityFacilityImpl) facility;
+                implementation.setDesc(String.valueOf(rs.getInt("description")));
+                ActivityOption actOption = implementation.getActivityOptions().get(rs.getString("acttype"));
+                if (actOption == null) {
+
+                    actOption = implementation
+                            .createActivityOption(rs.getString("acttype"));
+                    actOption.setCapacity(rs.getDouble("capacity"));
+                    actOption.addOpeningTime(new OpeningTimeImpl(rs.getDouble("starttime"), rs.getDouble("endtime")));
+                } else {
+                    double oldcap = actOption.getCapacity();
+                    actOption.setCapacity(rs.getDouble("capacity") + oldcap);
+                }
+
+            }
+        } catch (SQLException | NoConnectionException e) {
+            e.printStackTrace();
+        }
+    }
 }

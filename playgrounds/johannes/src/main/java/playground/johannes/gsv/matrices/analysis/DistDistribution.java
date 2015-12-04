@@ -20,15 +20,15 @@
 package playground.johannes.gsv.matrices.analysis;
 
 import com.vividsolutions.jts.geom.Point;
-import gnu.trove.TDoubleDoubleHashMap;
+import gnu.trove.map.hash.TDoubleDoubleHashMap;
+import org.matsim.contrib.common.gis.DistanceCalculator;
+import org.matsim.contrib.common.gis.WGS84DistanceCalculator;
 import org.matsim.contrib.common.stats.DescriptivePiStatistics;
 import org.matsim.contrib.common.stats.Histogram;
 import org.matsim.contrib.common.stats.LinearDiscretizer;
 import org.matsim.contrib.common.stats.StatsWriter;
 import playground.johannes.gsv.zones.KeyMatrix;
 import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
-import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
-import playground.johannes.socialnetworks.gis.DistanceCalculator;
 import playground.johannes.synpop.gis.Zone;
 import playground.johannes.synpop.gis.ZoneCollection;
 import playground.johannes.synpop.gis.ZoneGeoJsonIO;
@@ -49,12 +49,11 @@ public class DistDistribution {
 	public static void main(String[] args) throws IOException {
 		KeyMatrixXMLReader reader = new KeyMatrixXMLReader();
 		reader.setValidating(false);
-		reader.parse("/home/johannes/sge/prj/matsim/run/874/output/matrices-averaged/miv.sym.xml");
-//		reader.parse("/home/johannes/gsv/miv-matrix/refmatrices/tomtom.de.modena.xml");
+		reader.parse("/home/johannes/gsv/miv-matrix/refmatrices/tomtom.de.xml");
 		KeyMatrix m = reader.getMatrix();
 
-		ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON("/home/johannes/gsv/gis/modena/geojson/zones.gk3.geojson", "NO");
-		DistanceCalculator dCalc = new CartesianDistanceCalculator();
+		ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON("/home/johannes/gsv/gis/nuts/ger/geojson/psmobility.geojson", "NO");
+		DistanceCalculator dCalc = new WGS84DistanceCalculator();
 		DescriptivePiStatistics stats = new DescriptivePiStatistics();
 
 		Set<String> keys = m.keys();
@@ -76,10 +75,9 @@ public class DistDistribution {
 			}
 		}
 
-		TDoubleDoubleHashMap hist = Histogram.createHistogram(stats, new LinearDiscretizer(25000), true);
+		TDoubleDoubleHashMap hist = Histogram.createHistogram(stats, new LinearDiscretizer(50000), true);
 		Histogram.normalize(hist);
-//		TXTWriter.writeHistogram(hist, "d", "p", "/home/johannes/gsv/miv-matrix/analysis/distances/tomtom.dist.txt");
-		StatsWriter.writeHistogram(hist, "d", "p", "/home/johannes/gsv/miv-matrix/analysis/distances/874.dist.txt");
+		StatsWriter.writeHistogram(hist, "d", "p", "/home/johannes/gsv/matrix2014/mid-fusion/tomtom.dist.txt");
 	}
 
 }

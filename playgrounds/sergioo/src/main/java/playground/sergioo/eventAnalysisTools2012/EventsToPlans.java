@@ -11,7 +11,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.EventsToActivities;
 import org.matsim.core.scoring.EventsToActivities.ActivityHandler;
@@ -46,7 +46,7 @@ public class EventsToPlans implements ActivityHandler, LegHandler {
 	}
 	
 	public void writeExperiencedPlans(String iterationFilename) {
-        Population population = PopulationUtils.createPopulation(((ScenarioImpl) scenario).getConfig(), ((ScenarioImpl) scenario).getNetwork());
+        Population population = PopulationUtils.createPopulation(((MutableScenario) scenario).getConfig(), ((MutableScenario) scenario).getNetwork());
 		PopulationFactory factory = population.getFactory();
         for (Entry<Id<Person>, Plan> entry : agentRecords.entrySet()) {
 			Person person = factory.createPerson(entry.getKey());

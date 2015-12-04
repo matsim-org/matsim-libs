@@ -24,7 +24,8 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.signals.router.InvertedNetworkTripRouterFactoryModule;
+import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.contrib.signals.router.InvertedNetworkRoutingModuleModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlansConfigGroup;
@@ -70,28 +71,40 @@ public class SignalSystemsIntegrationTest {
 		config.network().setLaneDefinitionsFile(lanes20);
 		config.controler().setWriteEventsInterval(10);
 		config.controler().setWritePlansInterval(10);
-		Controler c = new Controler(config);
-		c.getScenario().addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsScenarioLoader(ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class)).loadSignalsData());
-		c.addOverridingModule(new SignalsModule());
-		c.addOverridingModule(new InvertedNetworkTripRouterFactoryModule());
-		c.getConfig().controler().setOutputDirectory(controlerOutputDir);
-        c.getConfig().controler().setCreateGraphs(false);
-        c.setDumpDataAtEnd(false);
-		c.run();
+
+		config.controler().setOutputDirectory(controlerOutputDir);
+		config.controler().setCreateGraphs(false);
 		
+		// ---
+		
+		Scenario scenario = ScenarioUtils.loadScenario(config) ;
+		
+		// ---
+
+		Controler c = new Controler(scenario);
+
+		c.getScenario().addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsScenarioLoader(ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class)).loadSignalsData());
+		// yy for unknown reasons, cannot add this scenario element to the scenario further above. kai, nov'15
+		
+		c.addOverridingModule(new SignalsModule());
+		c.addOverridingModule(new InvertedNetworkRoutingModuleModule());
+		c.setDumpDataAtEnd(false);
+		c.run();
+
 		String inputDirectory = testUtils.getInputDirectory();
 		{
 			//iteration 0 
 			String iterationOutput = controlerOutputDir + "ITERS/it.0/";
-			
+
 			Assert.assertEquals("different events files after iteration 0 ", EventsFileComparator.compare(inputDirectory + "0.events.xml.gz", iterationOutput + "0.events.xml.gz"),0);
 
 			Scenario expectedPopulation = ScenarioUtils.createScenario(c.getConfig());
 			new MatsimNetworkReader(expectedPopulation).readFile(c.getConfig().network().getInputFile());
 			new MatsimPopulationReader(expectedPopulation).readFile(testUtils.getInputDirectory() + "0.plans.xml.gz");
+
 			Scenario actualPopulation = ScenarioUtils.createScenario(c.getConfig());
 			new MatsimPopulationReader(actualPopulation).readFile(iterationOutput + "0.plans.xml.gz");
-			
+
 			new org.matsim.core.population.PopulationWriter(expectedPopulation.getPopulation()).write(testUtils.getOutputDirectory()+"/expected_plans.xml.gz");
 			new org.matsim.core.population.PopulationWriter(actualPopulation.getPopulation()).write(testUtils.getOutputDirectory()+"/actual_plans.xml.gz");
 
@@ -144,21 +157,21 @@ public class SignalSystemsIntegrationTest {
 		Controler c = new Controler(config);
 		c.getScenario().addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsScenarioLoader(ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class)).loadSignalsData());
 		c.addOverridingModule(new SignalsModule());
-		c.addOverridingModule(new InvertedNetworkTripRouterFactoryModule());
+		c.addOverridingModule(new InvertedNetworkRoutingModuleModule());
 		c.getConfig().controler().setOutputDirectory(controlerOutputDir);
-        c.getConfig().controler().setCreateGraphs(false);
-        c.setDumpDataAtEnd(false);
+		c.getConfig().controler().setCreateGraphs(false);
+		c.setDumpDataAtEnd(false);
 		c.run();
 
-		
+
 		String inputDirectory = testUtils.getInputDirectory();
 		{
 			//iteration 0 
 			String iterationOutput = controlerOutputDir + "ITERS/it.0/";
-			
+
 			Assert.assertEquals("different events files after iteration 0 ", 
 					EventsFileComparator.compare(inputDirectory + "0.events.xml.gz", iterationOutput + "0.events.xml.gz"),
-                    0);
+					0);
 
 			Scenario expectedPopulation = ScenarioUtils.createScenario(c.getConfig());
 			new MatsimNetworkReader(expectedPopulation).readFile(c.getConfig().network().getInputFile());

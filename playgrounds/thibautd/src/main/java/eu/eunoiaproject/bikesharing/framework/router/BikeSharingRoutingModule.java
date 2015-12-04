@@ -19,30 +19,33 @@
  * *********************************************************************** */
 package eu.eunoiaproject.bikesharing.framework.router;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Random;
-
+import com.google.inject.Inject;
+import eu.eunoiaproject.bikesharing.framework.BikeSharingConstants;
+import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingConfigGroup;
+import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingFacilities;
+import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingFacility;
+import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingRoute;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.StageActivityTypesImpl;
-import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.Facility;
 
-import eu.eunoiaproject.bikesharing.framework.BikeSharingConstants;
-import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingFacilities;
-import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingFacility;
-import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingRoute;
+import javax.inject.Named;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Random;
 
 /**
  * a {@link RoutingModule} for bike sharing trips.
@@ -60,18 +63,36 @@ public class BikeSharingRoutingModule implements RoutingModule {
 
 	private final Random random;
 	private final BikeSharingFacilities bikeSharingFacilities;
-	private final TripRouter router;
 	private final double searchRadius;
+
+	private final RoutingModule walkRouting;
+	private final RoutingModule bikeRouting;
+
+	@Inject
+	public BikeSharingRoutingModule(
+			final Scenario scenario,
+			@Named( TransportMode.walk )
+			final RoutingModule walkRouting,
+			@Named( TransportMode.bike )
+			final RoutingModule bikeRouting) {
+		this(MatsimRandom.getLocalInstance(),
+				(BikeSharingFacilities) scenario.getScenarioElement( BikeSharingFacilities.ELEMENT_NAME ),
+				((BikeSharingConfigGroup) scenario.getConfig().getModule( BikeSharingConfigGroup.GROUP_NAME )).getSearchRadius(),
+				walkRouting,
+				bikeRouting );
+	}
 
 	public BikeSharingRoutingModule(
 			final Random random,
 			final BikeSharingFacilities bikeSharingFacilities,
 			final double searchRadius,
-			final TripRouter router ) {
+			final RoutingModule walkRouting,
+			final RoutingModule bikeRouting) {
 		this.random = random;
 		this.bikeSharingFacilities = bikeSharingFacilities;
-		this.router = router;
 		this.searchRadius = searchRadius;
+		this.walkRouting = walkRouting;
+		this.bikeRouting = bikeRouting;
 	}
 
 	@Override
@@ -91,13 +112,12 @@ public class BikeSharingRoutingModule implements RoutingModule {
 			// "tag" trip as bike sharing.
 			trip.add( createInteraction( fromFacility ) );
 			trip.addAll(
-					router.calcRoute(
-						TransportMode.walk,
-						fromFacility,
-						toFacility,
-						departureTime,
-						person ) );
-			return null;
+					walkRouting.calcRoute(
+							fromFacility,
+							toFacility,
+							departureTime,
+							person));
+			return trip;
 		}
 
 		final List<PlanElement> trip = new ArrayList< >( 5 );
@@ -132,8 +152,7 @@ public class BikeSharingRoutingModule implements RoutingModule {
 			final double departureTime,
 			final Person person) {
 		final List<? extends PlanElement> trip =
-			router.calcRoute(
-					TransportMode.bike,
+			bikeRouting.calcRoute(
 					startStation,
 					endStation,
 					departureTime,
@@ -185,8 +204,7 @@ public class BikeSharingRoutingModule implements RoutingModule {
 			final double departureTime,
 			final Person person) {
 		final List<? extends PlanElement> trip =
-			router.calcRoute(
-					TransportMode.walk,
+			walkRouting.calcRoute(
 					fromFacility,
 					toFacility,
 					departureTime,

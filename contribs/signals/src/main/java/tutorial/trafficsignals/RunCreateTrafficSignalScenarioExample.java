@@ -20,6 +20,10 @@
 package tutorial.trafficsignals;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -67,6 +71,9 @@ public class RunCreateTrafficSignalScenarioExample {
 	
 	private static final Logger log = Logger.getLogger(RunCreateTrafficSignalScenarioExample.class);
 
+	private static final String INPUT_DIR = "./examples/tutorial/example90TrafficLights/";
+
+	private static final String OUTPUT_DIR = "output/example90TrafficLights/";
 	
 	private void createSignalSystemsAndGroups(Scenario scenario, SignalsData signalsData){
 		SignalSystemsData systems = signalsData.getSignalSystemsData();
@@ -170,10 +177,10 @@ public class RunCreateTrafficSignalScenarioExample {
 
 	
 	
-	public String run() {
+	public String run() throws IOException {
 		Config config = ConfigUtils.createConfig();
-		config.network().setInputFile("examples/tutorial/unsupported/example90TrafficLights/network.xml.gz");
-		config.plans().setInputFile("examples/tutorial/unsupported/example90TrafficLights/population.xml.gz");
+		config.network().setInputFile(INPUT_DIR + "network.xml.gz");
+		config.plans().setInputFile(INPUT_DIR + "population.xml.gz");
 		ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setUseSignalSystems(true);
 		config.qsim().setNodeOffset(20.0);
 		config.controler().setMobsim("qsim");
@@ -184,16 +191,15 @@ public class RunCreateTrafficSignalScenarioExample {
 		this.createSignalSystemsAndGroups(scenario, signalsData);
 		this.createSignalControl(scenario, signalsData);
 		
-		File outputDirectory = new File("output/example90TrafficLights/");
-		if (! outputDirectory.exists()) {
-			outputDirectory.mkdir();
-		}
+		Path p = Paths.get(OUTPUT_DIR);
+		Path absp = p.toAbsolutePath();
+		Files.createDirectories(Paths.get(OUTPUT_DIR));
 		
 		//write to file
-		String configFile = "output/example90TrafficLights/config.xml";
-		String signalSystemsFile = "output/example90TrafficLights/signal_systems.xml";
-		String signalGroupsFile = "output/example90TrafficLights/signal_groups.xml";
-		String signalControlFile = "output/example90TrafficLights/signal_control.xml";
+		String configFile = OUTPUT_DIR  + "config.xml";
+		String signalSystemsFile = OUTPUT_DIR  + "signal_systems.xml";
+		String signalGroupsFile = OUTPUT_DIR  + "signal_groups.xml";
+		String signalControlFile = OUTPUT_DIR  + "signal_control.xml";
 
 		
 		SignalsScenarioWriter signalsWriter = new SignalsScenarioWriter();
@@ -215,8 +221,9 @@ public class RunCreateTrafficSignalScenarioExample {
 	
 	/**
 	 * @param args
+	 * @throws IOException 
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		new RunCreateTrafficSignalScenarioExample().run();
 	}
 

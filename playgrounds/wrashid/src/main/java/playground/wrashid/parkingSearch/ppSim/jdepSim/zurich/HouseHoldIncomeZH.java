@@ -22,11 +22,11 @@ import java.util.HashMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 
 public class HouseHoldIncomeZH {
 
-	public static HashMap<Id, Double> getHouseHoldIncomeCantonZH(ScenarioImpl scenario) {
+	public static HashMap<Id, Double> getHouseHoldIncomeCantonZH(MutableScenario scenario) {
 		HashMap<Id, Double> houseHoldIncome=new HashMap<Id, Double>();
 		
 		for (Id personId : scenario.getPopulation().getPersons().keySet()) {

@@ -37,7 +37,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import playground.vsp.analysis.modules.simpleTripAnalyzer.SimpleTripAnalyzerModule;
@@ -230,7 +230,7 @@ class BuildingEnergyMATSimDataReader {
 	 */
 	private Scenario prepareScenario(String plansFile, String networkFile, BuildingEnergyPlansAnalyzer plansAna) {
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-        ScenarioImpl sc1 = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+        MutableScenario sc1 = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
         plansAna.setPopulation(PopulationUtils.createPopulation(sc1.getConfig(), sc1.getNetwork()));
 		new MatsimNetworkReader(sc).readFile(networkFile);
 		if(links == null){

@@ -20,27 +20,17 @@
 
 package playground.ikaddoura.analysis.linkDemand;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
 public class LinkDemandAnalysisMain {
 	
-//	private static String eventsFile = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalization_noise_averageVSmarginal/output/int_1_marginalCost/ITERS/it.100/100.events.xml.gz";
-//	private static String netFile = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalization_noise_averageVSmarginal/output/int_1_marginalCost/output_network.xml.gz";
-//	private static String outputFile = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalization_noise_averageVSmarginal/output/int_1_marginalCost/ITERS/it.100/link_demand.csv";
-	
-//	private static String eventsFile = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalization_noise_averageVSmarginal/output/int_1_averageCost/ITERS/it.100/100.events.xml.gz";
-//	private static String netFile = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalization_noise_averageVSmarginal/output/int_1_averageCost/output_network.xml.gz";
-//	private static String outputFile = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalization_noise_averageVSmarginal/output/int_1_averageCost/ITERS/it.100/link_demand.csv";
-	
-	private static String eventsFile = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalization_noise_averageVSmarginal/output/baseCase/ITERS/it.100/100.events.xml.gz";
-	private static String netFile = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalization_noise_averageVSmarginal/output/baseCase/output_network.xml.gz";
-	private static String outputFile = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalization_noise_averageVSmarginal/output/baseCase/ITERS/it.100/link_demand.csv";
+	private static String OUTPUT_BASE_DIR = "../../../runs-svn/berlin-1pct/";
 	
 	public static void main(String[] args) {
 		LinkDemandAnalysisMain anaMain = new LinkDemandAnalysisMain();
@@ -49,18 +39,21 @@ public class LinkDemandAnalysisMain {
 
 	private void run() {
 	
-		Config config = ConfigUtils.createConfig();
-		config.network().setInputFile(netFile);
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.loadScenario(config);
+		Config config = ConfigUtils.loadConfig(OUTPUT_BASE_DIR + "output_config.xml.gz");
+		config.plans().setInputFile(null);		
+		config.network().setInputFile(OUTPUT_BASE_DIR + "output_network.xml.gz");
+		Scenario scenario = ScenarioUtils.loadScenario(config);
 		EventsManager events = EventsUtils.createEventsManager();
 				
 		LinkDemandEventHandler handler = new LinkDemandEventHandler(scenario.getNetwork());
 		events.addHandler(handler);
 		
+		String eventsFile = OUTPUT_BASE_DIR + "ITERS/it." + config.controler().getLastIteration() + "/" + config.controler().getLastIteration() + ".events.xml.gz";
 		MatsimEventsReader reader = new MatsimEventsReader(events);
 		reader.readFile(eventsFile);
 		
-		handler.printResults(outputFile);
+		String analysis_output_file = OUTPUT_BASE_DIR + "ITERS/it." + config.controler().getLastIteration() + "/link_dailyDemand.csv";
+		handler.printResults(analysis_output_file);
 	}
 			 
 }

@@ -47,6 +47,9 @@ public final class PopulationImpl implements Population {
 	private long nextMsg = 1;
 	private boolean isStreaming = false;
 	
+	private String name ;
+	private boolean locked = false ;
+
 	private Map<Id<Person>, Person> persons = new LinkedHashMap<Id<Person>, Person>();
 
 	// algorithms over plans
@@ -178,8 +181,6 @@ public final class PopulationImpl implements Population {
 		return this.populationFactory;
 	}
 	
-	private String name ;
-
 	@Override
 	public String getName() {
 		return this.name ;
@@ -188,6 +189,15 @@ public final class PopulationImpl implements Population {
 	@Override
 	public void setName(String name) {
 		this.name = name ;
+	}
+
+	public final void setLocked() {
+		this.locked = true ;
+		for ( Person person : this.persons.values() ) {
+			if ( person instanceof PersonImpl ) {
+				((PersonImpl)person).setLocked() ;
+			}
+		}
 	}
 
 }

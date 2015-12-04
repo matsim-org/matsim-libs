@@ -16,9 +16,9 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonUtils;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.ActivityFacility;
@@ -32,7 +32,7 @@ public class MembershipAssigner
   implements SupplySideModel
 {
   private static final Logger log = Logger.getLogger(MembershipAssigner.class);
-  private ScenarioImpl scenario;
+  private MutableScenario scenario;
   private Map<Id<ActivityFacility>, ? extends ActivityFacility> facilities;
   private TreeMap<Integer, Coord> solutionDecoder = new TreeMap<Integer, Coord>();
   private CarSharingStations carStations;
@@ -48,13 +48,13 @@ public class MembershipAssigner
   protected ArrayList<Integer> initialSolution = new ArrayList<Integer>();
   private ArrayList<LinkImpl> availableLinks = new ArrayList< LinkImpl>();
 
-  public MembershipAssigner(ScenarioImpl scenario) {
+  public MembershipAssigner(MutableScenario scenario) {
 	  this.scenario = scenario;
 	  this.facilities = scenario.getActivityFacilities().getFacilities();
 	  init();
   }
 
-  public MembershipAssigner(ScenarioImpl scenario, FacilitiesPortfolio carStations, SupplySideModel model) throws IOException
+  public MembershipAssigner(MutableScenario scenario, FacilitiesPortfolio carStations, SupplySideModel model) throws IOException
   {
 	  this.facilities = scenario.getActivityFacilities().getFacilities();
 	  this.scenario = scenario;
@@ -195,7 +195,7 @@ public class MembershipAssigner
         log.error("More than one plan for person: " + pi.getId());
       }
       if (PersonUtils.getLicense(pi).equalsIgnoreCase("yes")) {
-        Person personWithLicense = PersonImpl.createPerson(pi.getId());
+        Person personWithLicense = PopulationUtils.createPerson(pi.getId());
         PersonUtils.setAge(personWithLicense, PersonUtils.getAge(pi));
         personWithLicense.addPlan(pi.getSelectedPlan());
         PersonUtils.setCarAvail(personWithLicense, PersonUtils.getCarAvail(pi));

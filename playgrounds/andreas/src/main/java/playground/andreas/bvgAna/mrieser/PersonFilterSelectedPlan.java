@@ -22,6 +22,7 @@ package playground.andreas.bvgAna.mrieser;
 
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
 /**
@@ -42,7 +43,7 @@ public class PersonFilterSelectedPlan extends AbstractPersonAlgorithm {
 
 		for (int planId = 0; planId < nofPlans; planId++) {
 			Plan plan = person.getPlans().get(planId);
-			if (!plan.isSelected()) {
+			if (!PersonUtils.isSelected(plan)) {
 				person.getPlans().remove(planId);
 				planId--;
 				nofPlans--;

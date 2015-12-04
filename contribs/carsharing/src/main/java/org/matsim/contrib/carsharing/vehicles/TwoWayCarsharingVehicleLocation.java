@@ -10,7 +10,8 @@ import org.matsim.core.utils.collections.QuadTree;
 public class TwoWayCarsharingVehicleLocation {
 	
 	private QuadTree<TwoWayCarsharingStation> vehicleLocationQuadTree;	
-	
+	//private static final Logger log = Logger.getLogger(TwoWayCarsharingVehicleLocation.class);
+
 	public TwoWayCarsharingVehicleLocation(Scenario scenario, ArrayList<TwoWayCarsharingStation> stations) {
 	    double minx = (1.0D / 0.0D);
 	    double miny = (1.0D / 0.0D);
@@ -38,61 +39,19 @@ public class TwoWayCarsharingVehicleLocation {
 		
 		return vehicleLocationQuadTree;
 	}
-	
-	public void addVehicle(Link link, String id) {
 		
-		TwoWayCarsharingStation f = vehicleLocationQuadTree.getClosest(link.getCoord().getX(), link.getCoord().getY());
+	public void addVehicle(TwoWayCarsharingStation station, String id) {
 		
-		if (f == null || !f.getLink().getId().toString().equals(link.getId().toString())) {
-			
-			
-			ArrayList<String> vehIDs = new ArrayList<String>();
-			
-			vehIDs.add(id);
-			
-			TwoWayCarsharingStation fNew = new TwoWayCarsharingStation(link, 1, vehIDs);		
-			
-			vehicleLocationQuadTree.put(link.getCoord().getX(), link.getCoord().getY(), fNew);
-			
-			
-		}
-		else {
-			ArrayList<String> vehIDs = f.getIDs();
-			ArrayList<String> newvehIDs = new ArrayList<String>();
-			for (String s : vehIDs) {
-				newvehIDs.add(s);
-			}
-			newvehIDs.add(0, id);
-			TwoWayCarsharingStation fNew = new TwoWayCarsharingStation(link, f.getNumberOfVehicles() + 1, newvehIDs);		
-			vehicleLocationQuadTree.remove(link.getCoord().getX(), link.getCoord().getY(), f);
-			vehicleLocationQuadTree.put(link.getCoord().getX(), link.getCoord().getY(), fNew);
-			
-		}
-		
-		
+		station.getIDs().add(id);
+		station.addCar();
 	}
 	
 	public void removeVehicle(TwoWayCarsharingStation station, String id) {
 		
+		if (!station.getIDs().remove(id)) 
+			throw new NullPointerException("Removing the vehicle did not work!");
+		station.removeCar();
 		
-			ArrayList<String> vehIDs = station.getIDs();
-			ArrayList<String> newvehIDs = new ArrayList<String>();
-			for (String s : vehIDs) {
-				newvehIDs.add(s);
-			}
-			
-			if (!newvehIDs.remove(id))
-				throw new NullPointerException("Removing the vehicle did not wok");
-
-			TwoWayCarsharingStation fNew = new TwoWayCarsharingStation(station.getLink(), station.getNumberOfVehicles() - 1, newvehIDs);	
-			
-						
-			if (!vehicleLocationQuadTree.remove(station.getLink().getCoord().getX(), station.getLink().getCoord().getY(), station)) 
-				throw new NullPointerException("Removing the station did not wok");
-			vehicleLocationQuadTree.put(station.getLink().getCoord().getX(), station.getLink().getCoord().getY(), fNew);
-			
-		
-	}
-	
+	}	
 	
 }

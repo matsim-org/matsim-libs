@@ -53,6 +53,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlansConfigGroup;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -90,7 +91,7 @@ public class MultiModalControlerListenerTest {
 
 		MultiModalConfigGroup multiModalConfigGroup = new MultiModalConfigGroup();
 		multiModalConfigGroup.setMultiModalSimulationEnabled(true);
-		multiModalConfigGroup.setSimulatedModes("walk,bike,unknown");
+		multiModalConfigGroup.setSimulatedModes("walk,bike,other");
 		multiModalConfigGroup.setNumberOfThreads(numberOfThreads);
 		config.addModule(multiModalConfigGroup);
 
@@ -108,7 +109,7 @@ public class MultiModalControlerListenerTest {
 
 		// set unkown mode speed
 		double unknownModeSpeed = 2.0;
-		config.plansCalcRoute().setTeleportedModeSpeed("unknown", unknownModeSpeed);
+		config.plansCalcRoute().setTeleportedModeSpeed("other", unknownModeSpeed);
 
         config.travelTimeCalculator().setFilterModes(true);
 
@@ -133,12 +134,12 @@ public class MultiModalControlerListenerTest {
 		link4.setLength(1000.0);
 		link5.setLength(1.0);
 
-		link0.setAllowedModes(CollectionUtils.stringToSet("car,bike,walk,unknown"));
+		link0.setAllowedModes(CollectionUtils.stringToSet("car,bike,walk,other"));
 		link1.setAllowedModes(CollectionUtils.stringToSet("car"));
 		link2.setAllowedModes(CollectionUtils.stringToSet("bike"));
 		link3.setAllowedModes(CollectionUtils.stringToSet("walk"));
-		link4.setAllowedModes(CollectionUtils.stringToSet("unknown"));
-		link5.setAllowedModes(CollectionUtils.stringToSet("car,bike,walk,unknown"));
+		link4.setAllowedModes(CollectionUtils.stringToSet("other"));
+		link5.setAllowedModes(CollectionUtils.stringToSet("car,bike,walk,other"));
 
 		scenario.getNetwork().addNode(node0);
 		scenario.getNetwork().addNode(node1);
@@ -154,16 +155,13 @@ public class MultiModalControlerListenerTest {
 		scenario.getPopulation().addPerson(createPerson(scenario, "p0", "car"));
 		scenario.getPopulation().addPerson(createPerson(scenario, "p1", "bike"));
 		scenario.getPopulation().addPerson(createPerson(scenario, "p2", "walk"));
-		scenario.getPopulation().addPerson(createPerson(scenario, "p3", "unknown"));
+		scenario.getPopulation().addPerson(createPerson(scenario, "p3", "other"));
 
 		Controler controler = new Controler(scenario);
         controler.getConfig().controler().setCreateGraphs(false);
         controler.setDumpDataAtEnd(false);
 		controler.getConfig().controler().setWriteEventsInterval(0);
-		controler.getConfig().controler().setOverwriteFileSetting(
-				true ?
-						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 
 		// controler listener that initializes the multi-modal simulation
         controler.setModules(new ControlerDefaultsWithMultiModalModule());
@@ -245,13 +243,17 @@ public class MultiModalControlerListenerTest {
         controler.getConfig().controler().setCreateGraphs(false);
         controler.setDumpDataAtEnd(false);
 		controler.getConfig().controler().setWriteEventsInterval(0);
-		controler.getConfig().controler().setOverwriteFileSetting(
-				true ?
-						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 
 		// controler listener that initializes the multi-modal simulation
-        controler.setModules(new ControlerDefaultsWithMultiModalModule());
+        controler.addOverridingModule(new MultiModalModule());
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				addTravelTimeBinding(TransportMode.ride).to(networkTravelTime());
+        		addTravelDisutilityFactoryBinding(TransportMode.ride).to(carTravelDisutilityFactoryKey());
+			}
+		});
 
         LinkModeChecker linkModeChecker = new LinkModeChecker(controler.getScenario().getNetwork());
 		controler.getEvents().addHandler(linkModeChecker);
@@ -335,14 +337,14 @@ public class MultiModalControlerListenerTest {
 			leftCountPerMode.put(TransportMode.walk, 0);
 			leftCountPerMode.put(TransportMode.ride, 0);
 			leftCountPerMode.put(TransportMode.pt, 0);
-			leftCountPerMode.put("unknown", 0);
+			leftCountPerMode.put("other", 0);
 
 			travelTimesPerMode.put(TransportMode.car, 0.0);
 			travelTimesPerMode.put(TransportMode.bike, 0.0);
 			travelTimesPerMode.put(TransportMode.walk, 0.0);
 			travelTimesPerMode.put(TransportMode.ride, 0.0);
 			travelTimesPerMode.put(TransportMode.pt, 0.0);
-			travelTimesPerMode.put("unknown", 0.0);
+			travelTimesPerMode.put("other", 0.0);
 		}
 
 		@Override

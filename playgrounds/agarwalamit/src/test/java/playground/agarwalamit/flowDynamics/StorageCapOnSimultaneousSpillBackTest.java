@@ -18,6 +18,11 @@
  * *********************************************************************** */
 package playground.agarwalamit.flowDynamics;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -30,32 +35,24 @@ import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.TeleportationEngine;
-import org.matsim.core.mobsim.qsim.agents.AgentFactory;
-import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
-import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
+import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.testcases.MatsimTestUtils;
-import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.VehicleUtils;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * 
@@ -68,9 +65,7 @@ import java.util.Map;
  */
 
 public class StorageCapOnSimultaneousSpillBackTest {
-
-	private final int numberOfPersonInPlan = 4;
-
+	
 	@Test
 	public void storageCapTest4BottleneckLink (){
 		/*
@@ -107,13 +102,13 @@ public class StorageCapOnSimultaneousSpillBackTest {
 		Assert.assertEquals("Person 4 is leaving from link 2 at wrong time.", 24.0, person2EnterTime.get(Id.createPersonId(4)).getSecond(),MatsimTestUtils.EPSILON);
 	}
 
-	private Map<Id<Person>, Tuple<Double,Double>> getPerson2LinkEnterTime(Tuple<Id<Link>, Id<Link>> startLinkIds){
+	private Map<Id<Person>, Tuple<Double,Double>> getPerson2LinkEnterTime(final Tuple<Id<Link>, Id<Link>> startLinkIds){
 		
 		MatsimRandom.reset(); // resetting the random nos with default seed.
 		
 		MergingNetworkAndPlans pseudoInputs = new MergingNetworkAndPlans();
 		pseudoInputs.createNetwork();
-		pseudoInputs.createPopulation(numberOfPersonInPlan, startLinkIds );
+		pseudoInputs.createPopulation(startLinkIds );
 		Scenario sc = pseudoInputs.scenario;
 
 		ScenarioUtils.loadScenario(sc);
@@ -121,68 +116,39 @@ public class StorageCapOnSimultaneousSpillBackTest {
 
 		EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(new PersonLinkEnterLeaveTime(person2LinkEnterTime));
-		QSim sim = createQSim(sc, events);
+		QSim sim = QSimUtils.createDefaultQSim(sc, events);
 		sim.run();
 		return person2LinkEnterTime;
-
 	}
 
 	private class PersonLinkEnterLeaveTime implements LinkEnterEventHandler, LinkLeaveEventHandler{
 
-		Map<Id<Person>, Tuple<Double,Double>> personLinkEnterLeaveTime ;
+		Map<Id<Person>, Tuple<Double,Double>> person2linkleaveEnterTime ;
 
 		private PersonLinkEnterLeaveTime(Map<Id<Person>, Tuple<Double,Double>> person2LinkEnterTime){
-			this.personLinkEnterLeaveTime = person2LinkEnterTime;
+			this.person2linkleaveEnterTime = person2LinkEnterTime;
 		}
 
 		@Override
 		public void reset(int iteration) {
-			this.personLinkEnterLeaveTime.clear();
+			this.person2linkleaveEnterTime.clear();
 		}
 
 		@Override
 		public void handleEvent(LinkLeaveEvent event) {
 			if(event.getLinkId().equals(Id.createLinkId(2))){
-				Tuple<Double, Double> linkEnterTime = personLinkEnterLeaveTime.get(Id.createPersonId(event.getVehicleId()));
-				personLinkEnterLeaveTime.put(Id.createPersonId(event.getVehicleId()), new Tuple<Double, Double>(linkEnterTime.getFirst(),event.getTime()));
+				Tuple<Double, Double> linkEnterTime = person2linkleaveEnterTime.get(Id.createPersonId(event.getVehicleId()));
+				person2linkleaveEnterTime.put(Id.createPersonId(event.getVehicleId()), new Tuple<Double, Double>(linkEnterTime.getFirst(),event.getTime()));
 			}
 		}
 
 		@Override
 		public void handleEvent(LinkEnterEvent event) {
 			if(event.getLinkId().equals(Id.createLinkId(2))){
-				personLinkEnterLeaveTime.put(Id.createPersonId(event.getVehicleId()), new Tuple<Double, Double>(event.getTime(), 0.));
+				person2linkleaveEnterTime.put(Id.createPersonId(event.getVehicleId()), new Tuple<Double, Double>(event.getTime(), 0.));
 			}
 		}
 	}
-
-
-	private QSim createQSim (Scenario sc, EventsManager manager){
-		QSim qSim1 = new QSim(sc, manager);
-		ActivityEngine activityEngine = new ActivityEngine(manager, qSim1.getAgentCounter());
-		qSim1.addMobsimEngine(activityEngine);
-		qSim1.addActivityHandler(activityEngine);
-
-		QNetsimEngine netsimEngine = new QNetsimEngine(qSim1);
-		qSim1.addMobsimEngine(netsimEngine);
-		qSim1.addDepartureHandler(netsimEngine.getDepartureHandler());
-		TeleportationEngine teleportationEngine = new TeleportationEngine(sc, manager);
-		qSim1.addMobsimEngine(teleportationEngine);
-		QSim qSim = qSim1;
-		AgentFactory agentFactory = new DefaultAgentFactory(qSim);
-		PopulationAgentSource agentSource = new PopulationAgentSource(sc.getPopulation(), agentFactory, qSim);
-
-		Map<String, VehicleType> modeVehicleTypes = new HashMap<String, VehicleType>();
-
-		VehicleType car = VehicleUtils.getFactory().createVehicleType(Id.create("car", VehicleType.class));
-		car.setMaximumVelocity(20);
-		car.setPcuEquivalents(1.0);
-		modeVehicleTypes.put("car", car);
-		agentSource.setModeVehicleTypes(modeVehicleTypes);
-		qSim.addAgentSource(agentSource);
-		return qSim;
-	}
-
 
 	private class MergingNetworkAndPlans {
 		/**
@@ -195,10 +161,10 @@ public class StorageCapOnSimultaneousSpillBackTest {
 		 *<p> 		  o	
 		 *<p>				  
 		 */
-		Scenario scenario;
-		Config config;
-		NetworkImpl network;
-		Population population;
+		final Scenario scenario;
+		final Config config;
+		final NetworkImpl network;
+		final Population population;
 		Link link1;
 		Link link2;
 		Link link3;
@@ -230,11 +196,10 @@ public class StorageCapOnSimultaneousSpillBackTest {
 			link4 = network.createAndAddLink(Id.createLinkId(String.valueOf("4")), node5, node2,1000.0,20.0,3600.,1,null,"7");
 		}
 
-		private void createPopulation(int numberOfPersons, Tuple<Id<Link>, Id<Link>> startLinkIds){
-
+		private void createPopulation(final Tuple<Id<Link>, Id<Link>> startLinkIds){
+			int numberOfPersonInPlan = 4;
 			/*Alternative persons from different links*/
-
-			for(int i=1;i<=numberOfPersons;i++){
+			for(int i=1;i<=numberOfPersonInPlan;i++){
 				Id<Person> id = Id.createPersonId(i);
 				Person p = population.getFactory().createPerson(id);
 				Plan plan = population.getFactory().createPlan();
@@ -265,5 +230,4 @@ public class StorageCapOnSimultaneousSpillBackTest {
 			}
 		}
 	}
-
 }

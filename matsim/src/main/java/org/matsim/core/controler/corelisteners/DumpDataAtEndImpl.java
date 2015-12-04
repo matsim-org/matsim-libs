@@ -24,6 +24,7 @@ import com.google.inject.Singleton;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.controler.Controler;
@@ -35,11 +36,13 @@ import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.counts.Counts;
+import org.matsim.counts.CountsWriter;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.FacilitiesWriter;
 import org.matsim.households.Households;
 import org.matsim.households.HouseholdsWriterV10;
-import org.matsim.lanes.data.v20.LaneDefinitions20;
+import org.matsim.lanes.data.v20.Lanes;
 import org.matsim.lanes.data.v20.LaneDefinitionsWriter20;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
@@ -113,9 +116,16 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 			}
 		} catch ( Exception ee ) {}
 		try {
-			final LaneDefinitions20 lanes = scenarioData.getLanes();
+			final Lanes lanes = scenarioData.getLanes();
 			if ( lanes != null ) { 
 				new LaneDefinitionsWriter20(lanes).write(controlerIO.getOutputFilename(Controler.FILENAME_LANES));
+			}
+		} catch ( Exception ee ) {}
+		try {
+			@SuppressWarnings("unchecked")
+			final Counts<Link> counts = (Counts<Link>) scenarioData.getScenarioElement(Counts.ELEMENT_NAME) ;
+			if ( counts != null ) {
+				new CountsWriter(counts).write( controlerIO.getOutputFilename( Controler.FILENAME_COUNTS ) );
 			}
 		} catch ( Exception ee ) {}
 		if (!event.isUnexpected() && scenarioData.getConfig().vspExperimental().isWritingOutputEvents()) {

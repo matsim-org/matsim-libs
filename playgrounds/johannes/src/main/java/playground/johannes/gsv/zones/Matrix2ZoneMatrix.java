@@ -19,11 +19,11 @@
 
 package playground.johannes.gsv.zones;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrix;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author johannes

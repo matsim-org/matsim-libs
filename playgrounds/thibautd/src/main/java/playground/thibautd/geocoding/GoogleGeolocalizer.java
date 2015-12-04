@@ -19,11 +19,10 @@
  * *********************************************************************** */
 package playground.thibautd.geocoding;
 
-import java.net.URL;
-
 import org.apache.log4j.Logger;
-
 import org.json.JSONObject;
+
+import java.net.URL;
 
 /**
  * @author thibautd

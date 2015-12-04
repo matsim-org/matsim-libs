@@ -140,8 +140,8 @@ public class PersonTripAnalysis {
 				if (basicHandler.getPersonId2tripNumber2legMode().containsKey(id)) {
 					for (Integer trip : basicHandler.getPersonId2tripNumber2legMode().get(id).keySet()) {
 						
-						if (basicHandler.getPersonId2tripNumber2amount().containsKey(id) && basicHandler.getPersonId2tripNumber2amount().get(id).containsKey(trip)) {
-							tollPayments = tollPayments + basicHandler.getPersonId2tripNumber2amount().get(id).get(trip);
+						if (basicHandler.getPersonId2tripNumber2payment().containsKey(id) && basicHandler.getPersonId2tripNumber2payment().get(id).containsKey(trip)) {
+							tollPayments = tollPayments + basicHandler.getPersonId2tripNumber2payment().get(id).get(trip);
 						}
 						
 						if (noiseHandler.getPersonId2tripNumber2causedNoiseCost().containsKey(id) && noiseHandler.getPersonId2tripNumber2causedNoiseCost().get(id).containsKey(trip)) {
@@ -458,8 +458,8 @@ public class PersonTripAnalysis {
 							}
 						}
 						
-						if (basicHandler.getPersonId2tripNumber2amount().containsKey(id) && basicHandler.getPersonId2tripNumber2amount().get(id).containsKey(trip)) {
-							tollPayments = tollPayments + basicHandler.getPersonId2tripNumber2amount().get(id).get(trip);
+						if (basicHandler.getPersonId2tripNumber2payment().containsKey(id) && basicHandler.getPersonId2tripNumber2payment().get(id).containsKey(trip)) {
+							tollPayments = tollPayments + basicHandler.getPersonId2tripNumber2payment().get(id).get(trip);
 						}
 						
 						if (noiseHandler.getPersonId2tripNumber2causedNoiseCost().containsKey(id) && noiseHandler.getPersonId2tripNumber2causedNoiseCost().get(id).containsKey(trip)) {

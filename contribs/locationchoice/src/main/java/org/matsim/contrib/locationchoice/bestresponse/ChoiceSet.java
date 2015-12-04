@@ -19,21 +19,29 @@
 
 package org.matsim.contrib.locationchoice.bestresponse;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Random;
+import java.util.TreeMap;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
-import org.matsim.contrib.locationchoice.bestresponse.PlanTimesAdapter.ApproximationLevel;
+import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup.ApproximationLevel;
 import org.matsim.contrib.locationchoice.router.BackwardFastMultiNodeDijkstra;
-import org.matsim.core.config.Config;
+import org.matsim.contrib.locationchoice.utils.PlanUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.ImaginaryNode;
 import org.matsim.core.router.InitialNode;
 import org.matsim.core.router.MultiNodeDijkstra;
@@ -42,19 +50,18 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 
-import java.util.*;
-import java.util.Map.Entry;
-
 public class ChoiceSet {
 	
 	private int numberOfAlternatives;	
 	private ApproximationLevel approximationLevel;		
-	private List<Id<ActivityFacility>> destinations = new Vector<Id<ActivityFacility>>();
-	private List<Id<ActivityFacility>> notYetVisited = new Vector<Id<ActivityFacility>>();
+	private List<Id<ActivityFacility>> destinations = new LinkedList<Id<ActivityFacility>>();
+	private List<Id<ActivityFacility>> notYetVisited = new LinkedList<Id<ActivityFacility>>();
 	private final Network network;
 	private final ActivityFacilities facilities;
-	private Config config;
-	private Scenario scenario;
+	private final Scenario scenario;
+	private final Map<String, Double> teleportedModeSpeeds;
+	private final Map<String, Double> beelineDistanceFactors;
+	private final boolean reUsePlans;
 	
 	private final Map<Id<ActivityFacility>, Id<Link>> nearestLinks;
 	
@@ -73,13 +80,15 @@ public class ChoiceSet {
 		return stb.toString() ;
 	}
 			
-	ChoiceSet(ApproximationLevel approximationLevel, Scenario scenario, Map<Id<ActivityFacility>, Id<Link>> nearestLinks) {
+	ChoiceSet(ApproximationLevel approximationLevel, Scenario scenario, Map<Id<ActivityFacility>, Id<Link>> nearestLinks, 
+			Map<String, Double> teleportedModeSpeeds, Map<String, Double> beelineDistanceFactors) {
 		this.approximationLevel = approximationLevel;
 		this.network = scenario.getNetwork();
 		this.facilities = scenario.getActivityFacilities();
-		this.config = scenario.getConfig();
 		this.scenario = scenario;
 		this.nearestLinks = nearestLinks;
+		this.teleportedModeSpeeds = teleportedModeSpeeds;
+		this.beelineDistanceFactors = beelineDistanceFactors;
 				
 //		this.exponent = Double.parseDouble(config.locationchoice().getProbChoiceExponent());
 //		if ( wrnCnt < 1 ) {
@@ -95,6 +104,7 @@ public class ChoiceSet {
 //		}
 		DestinationChoiceConfigGroup dccg = (DestinationChoiceConfigGroup) this.scenario.getConfig().getModule(DestinationChoiceConfigGroup.GROUP_NAME);
 		this.numberOfAlternatives = dccg.getProbChoiceSetSize();
+		this.reUsePlans = dccg.getReUseTemporaryPlans();
 	}
 	
 	public void addDestination(Id<ActivityFacility> facilityId) {
@@ -137,7 +147,7 @@ public class ChoiceSet {
 		
 		// if we have no destinations defined so far, we can shorten this
 		if (this.destinations.size() > 0) {
-			map = this.createReducedChoiceSetWithScores(actlegIndex, facilities, scoringFunction, plan, 
+			map = this.createReducedChoiceSetWithScores(actlegIndex, this.facilities, scoringFunction, plan, 
 					tripRouter, forwardMultiNodeDijkstra, backwardMultiNodeDijkstra);		
 		} else {
 			// currently handled activity which should be re-located
@@ -217,8 +227,8 @@ public class ChoiceSet {
 		// currently handled activity which should be re-located
 		Activity act = (Activity) plan.getPlanElements().get(actlegIndex);
 		
-		// We need to calculate the multi node dijkstra stuff only in case LOCAL_ROUTING is used.
-		if (this.approximationLevel == ApproximationLevel.LOCAL_ROUTING) {
+		// We need to calculate the multi node dijkstra stuff only in case localRouting is used.
+		if (this.approximationLevel == DestinationChoiceConfigGroup.ApproximationLevel.localRouting ) {
 			Node fromNode;
 			/*
 			 * Assuming that both, forward and backward Dijkstra, route to the end nodes of links where
@@ -243,9 +253,11 @@ public class ChoiceSet {
 			
 			// ---
 			
-			Activity previousActivity = ((PlanImpl)plan).getPreviousActivity(((PlanImpl)plan).getPreviousLeg(act));
+//			Activity previousActivity = ((PlanImpl)plan).getPreviousActivity(((PlanImpl)plan).getPreviousLeg(act));
+			Leg previousLeg = PlanUtils.getPreviousLeg(plan, act);
+			Activity previousActivity = PlanUtils.getPreviousActivity(plan, previousLeg);
 			fromNode = this.network.getLinks().get(previousActivity.getLinkId()).getToNode();
-			
+
 			forwardMultiNodeDijkstra.calcLeastCostPath(fromNode, destinationNode, previousActivity.getEndTime(), plan.getPerson(), null);			
 			
 //		ForwardDijkstraMultipleDestinations leastCostPathCalculatorForward = new ForwardDijkstraMultipleDestinations(network, travelCost, travelTime);
@@ -253,8 +265,10 @@ public class ChoiceSet {
 			
 			// ---
 			
-			Activity nextActivity = ((PlanImpl)plan).getNextActivity(((PlanImpl)plan).getNextLeg(act));
-			fromNode = network.getLinks().get(nextActivity.getLinkId()).getToNode();
+//			Activity nextActivity = ((PlanImpl)plan).getNextActivity(((PlanImpl)plan).getNextLeg(act));
+			Leg nextLeg = PlanUtils.getNextLeg(plan, act);
+			Activity nextActivity = PlanUtils.getPreviousActivity(plan, nextLeg);
+			fromNode = this.network.getLinks().get(nextActivity.getLinkId()).getToNode();
 			
 			/*
 			 * The original code below uses the relocated activities end time as start time. Does this make sense?
@@ -295,23 +309,42 @@ public class ChoiceSet {
 		 * Can this be merged with the for loop above? So far, facilities are looked up twice.
 		 * cdobler, oct'13
 		 */
+		
+		Plan planTmp = null;
+
+		// In case we try to re-use a single copy of the plan: create the copy here and re-use it within the loop.
+		if (this.reUsePlans) planTmp = PlanUtils.createCopy(plan);
+				
 		for (Id<ActivityFacility> destinationId : this.destinations) {
-			// tentatively set 
+			// tentatively set
 			ActivityFacility facility = facilities.getFacilities().get(destinationId);
-			((ActivityImpl)act).setFacilityId(destinationId);
-			((ActivityImpl)act).setCoord(facility.getCoord());
-			((ActivityImpl)act).setLinkId(this.nearestLinks.get(destinationId));
 			
-			PlanImpl planTmp = new PlanImpl();
-			planTmp.copyFrom(plan);
+			// As far as I can see, activity location is updated in the plan. Then the routes from and to that activity 
+			// are calculated. The resulting travel times are written to the temporary plan. If this is true, it should 
+			// not be necessary to update the activity location in the copied plan? I am not sure about this, therefore 
+			// keep the update in the "if(this.ReUsePlans)" block. cdobler oct'15
+			PlanUtils.setFacilityId(act, destinationId);
+			PlanUtils.setCoord(act, facility.getCoord());
+			PlanUtils.setLinkId(act, this.nearestLinks.get(destinationId));
+			
+//			PlanImpl planTmp = new PlanImpl();
+//			planTmp.copyFrom(plan);
+			
+			if (this.reUsePlans) {
+				// we have to update the copied plan
+				Activity actTmp = (Activity) planTmp.getPlanElements().get(actlegIndex);
+				PlanUtils.setFacilityId(actTmp, destinationId);
+				PlanUtils.setCoord(actTmp, facility.getCoord());
+				PlanUtils.setLinkId(actTmp, this.nearestLinks.get(destinationId));
+			}
+			// If we don't re-use a single copy of the plan, create a new one.
+			else planTmp = PlanUtils.createCopy(plan);
+			
 			final double score =
 					this.adaptAndScoreTimes(
-							(PlanImpl)plan,
-							actlegIndex,
+							plan,
 							planTmp,
 							scoringFunction,
-							forwardMultiNodeDijkstra,
-							backwardMultiNodeDijkstra,
 							router,
 							this.approximationLevel);
 			
@@ -411,12 +444,10 @@ public class ChoiceSet {
 //		return mapNormalized;
 //	}
 	
-	
 	/*
 	 * Use approximation to golden ratio (contains sqrt) with specified number of alternatives 
 	 * (more than around 5 makes no sense actually)
 	 */
-	
 	private TreeMap<Double, Id<ActivityFacility>> generateReducedChoiceSet(ArrayList<ScoredAlternative> list) {
 		/* 
 		 * list is given here in descending order -> see compareTo in ScoredAlternative
@@ -432,12 +463,14 @@ public class ChoiceSet {
 		}
 		return mapNormalized;
 	}
-			
-	double adaptAndScoreTimes(PlanImpl plan, int actlegIndex, PlanImpl planTmp, ScoringFunctionFactory scoringFunction, 
-			MultiNodeDijkstra forwardMultiNodeDijkstra, BackwardFastMultiNodeDijkstra backwardMultiNodeDijkstra, TripRouter router, 
-			ApproximationLevel approximationLevelTmp) {
-		PlanTimesAdapter adapter = new PlanTimesAdapter(approximationLevelTmp, forwardMultiNodeDijkstra, backwardMultiNodeDijkstra, 
-				router, this.scenario);
-		return adapter.adaptTimesAndScorePlan(plan, actlegIndex, planTmp, scoringFunction);
+	
+	double adaptAndScoreTimes( Plan plan,
+			Plan planTmp,
+			ScoringFunctionFactory scoringFunction,
+			TripRouter router,
+			ApproximationLevel approximationLevelTmp ) {
+		PlanTimesAdapter adapter = new PlanTimesAdapter(approximationLevelTmp,
+				router, this.scenario, this.teleportedModeSpeeds, this.beelineDistanceFactors);
+		return adapter.adaptTimesAndScorePlan(plan, planTmp, scoringFunction);
 	}
 }

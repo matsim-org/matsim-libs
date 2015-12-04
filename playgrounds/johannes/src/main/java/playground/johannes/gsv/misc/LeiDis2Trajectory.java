@@ -22,8 +22,8 @@ package playground.johannes.gsv.misc;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
 import org.matsim.contrib.common.gis.EsriShapeIO;
+import org.matsim.contrib.common.gis.WGS84DistanceCalculator;
 import org.opengis.feature.simple.SimpleFeature;
-import playground.johannes.socialnetworks.gis.WGS84DistanceCalculator;
 
 import java.io.*;
 import java.util.*;

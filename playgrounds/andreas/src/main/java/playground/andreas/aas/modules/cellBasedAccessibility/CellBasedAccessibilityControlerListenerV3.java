@@ -9,7 +9,7 @@ import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.utils.leastcostpathtree.LeastCostPathTree;
@@ -118,7 +118,7 @@ public class CellBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 													 SpatialGrid walkGrid, 										// table for walk travel times in accessibility computation
 													 String fileExtension,										// adds an extension to output files whether a shape-file or network boundaries are used for calculation
 													 Benchmark benchmark,										// Benchmark tool
-													 ScenarioImpl scenario){	
+													 MutableScenario scenario){	
 		log.info("Initializing CellBasedAccessibilityControlerListenerV3 ...");
 		
 		assert (startZones != null);

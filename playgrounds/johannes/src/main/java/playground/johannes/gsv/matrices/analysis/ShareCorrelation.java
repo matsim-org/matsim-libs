@@ -20,16 +20,16 @@
 package playground.johannes.gsv.matrices.analysis;
 
 import com.vividsolutions.jts.geom.Point;
-import gnu.trove.TDoubleArrayList;
-import gnu.trove.TDoubleDoubleHashMap;
+import gnu.trove.list.array.TDoubleArrayList;
+import gnu.trove.map.hash.TDoubleDoubleHashMap;
+import org.matsim.contrib.common.gis.CartesianDistanceCalculator;
+import org.matsim.contrib.common.gis.DistanceCalculator;
+import org.matsim.contrib.common.stats.Correlations;
 import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
 import org.matsim.contrib.common.stats.StatsWriter;
 import playground.johannes.gsv.zones.KeyMatrix;
 import playground.johannes.gsv.zones.MatrixOperations;
 import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
-import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
-import playground.johannes.socialnetworks.gis.DistanceCalculator;
-import playground.johannes.socialnetworks.statistics.Correlations;
 import playground.johannes.synpop.gis.Zone;
 import playground.johannes.synpop.gis.ZoneCollection;
 import playground.johannes.synpop.gis.ZoneGeoJsonIO;
@@ -96,11 +96,11 @@ public class ShareCorrelation {
 		}
 		
 		System.out.println(String.format("%s relations", errVals.size()));
-		TDoubleDoubleHashMap values = Correlations.mean(shareVals.toNativeArray(), errVals.toNativeArray(), FixedSampleSizeDiscretizer.create(shareVals.toNativeArray(), 50));
-//		TDoubleDoubleHashMap values = Correlations.mean(errVals.toNativeArray(), shareVals.toNativeArray(), 0.05);
+		TDoubleDoubleHashMap values = Correlations.mean(shareVals.toArray(), errVals.toArray(), FixedSampleSizeDiscretizer.create(shareVals.toArray(), 50));
+//		TDoubleDoubleHashMap values = Correlations.mean(errVals.toArray(), shareVals.toArray(), 0.05);
 		StatsWriter.writeHistogram(values, "share", "error", "/home/johannes/gsv/matrices/analysis/marketShares/shareCorrelation.txt");
 		
-		values = Correlations.mean(volVals.toNativeArray(), errVals.toNativeArray(), FixedSampleSizeDiscretizer.create(volVals.toNativeArray(), 50));
+		values = Correlations.mean(volVals.toArray(), errVals.toArray(), FixedSampleSizeDiscretizer.create(volVals.toArray(), 50));
 		StatsWriter.writeHistogram(values, "volume", "error", "/home/johannes/gsv/matrices/analysis/marketShares/volCorrelation.txt");
 	}
 	
