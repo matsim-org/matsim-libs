@@ -49,12 +49,12 @@ public class LinkLeaveEvent extends Event {
 
 	/**
 	 * Please use getVehicleId() instead. 
-	 * Vehicle-driver relations can be made by Wait2Link and VehicleLeavesTraffic Events.
+	 * Vehicle-driver relations can be made by Wait2Link (now: VehicleEntersTraffic) and VehicleLeavesTraffic Events.
 	 */
-	@Deprecated
-	Id<Person> getDriverId() {
-		return null;
-	}
+//	@Deprecated
+//	Id<Person> getDriverId() {
+//		return null;
+//	}
 
 	public Id<Link> getLinkId() {
 		return this.linkId;

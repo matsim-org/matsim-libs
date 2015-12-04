@@ -56,18 +56,18 @@ public class EventsConverterXML extends MatsimXmlParser{
 
 	private static final String EVENT = "event";
 	private static final String ATTRIBUTE_PERSON = "person";
-	
+
 	private final EventsManager events;
 	private final EventsReaderXMLv1 basicEventsReader;
 	private boolean containsVehicleLeavesTrafficEvents = false;
 	private Map<Id<Person>, Id<Vehicle>> driverToVeh = new HashMap<>();
-	
+
 	public EventsConverterXML(final EventsManager events) {
 		this.events = events;
 		this.setValidating(false);// events-files have no DTD, thus they cannot validate
 		this.basicEventsReader = new EventsReaderXMLv1(events);
 	}
-	
+
 	/**
 	 * Parses the specified events file. This method calls {@link #parse(String)}, but handles all
 	 * possible exceptions on its own.
@@ -78,83 +78,85 @@ public class EventsConverterXML extends MatsimXmlParser{
 	public void readFile(final String filename) throws UncheckedIOException {
 		parse(filename);
 	}
-	
+
 	@Override
 	public void startTag(String name, Attributes atts, Stack<String> context) {
-		if (EVENT.equals(name)) {
-			double time = Double.parseDouble(atts.getValue("time"));
-			String eventType = atts.getValue("type");
-			
-			switch (eventType){
-			case VehicleEntersTrafficEvent.EVENT_TYPE:
-				Id<Person> driverId = Id.createPersonId(atts.getValue(VehicleEntersTrafficEvent.ATTRIBUTE_DRIVER));
-				Id<Vehicle> vehicleId;
-				if (atts.getValue(VehicleEntersTrafficEvent.ATTRIBUTE_VEHICLE) == null || atts.getValue(VehicleEntersTrafficEvent.ATTRIBUTE_VEHICLE).equals("null")){
-					// use the person id as vehicle id
-					vehicleId = Id.create(driverId, Vehicle.class);
-				} else {
-					vehicleId = Id.create(atts.getValue(VehicleEntersTrafficEvent.ATTRIBUTE_VEHICLE), Vehicle.class);
-				}
-				
-				// remember driver to vehicle relation
-				driverToVeh.put(driverId, vehicleId);				
-				// process event with correct vehicleId
-				this.events.processEvent(new VehicleEntersTrafficEvent(time, driverId, Id.createLinkId(atts.getValue(VehicleEntersTrafficEvent.ATTRIBUTE_LINK)), 
-						vehicleId, atts.getValue(VehicleEntersTrafficEvent.ATTRIBUTE_NETWORKMODE), 1.0));
-				break;
-			case LinkEnterEvent.EVENT_TYPE:
-				if (atts.getValue(LinkEnterEvent.ATTRIBUTE_VEHICLE) == null || atts.getValue(LinkEnterEvent.ATTRIBUTE_VEHICLE).equals("null")){
-					// create an link enter event with the correct vehicle id
-					this.events.processEvent(new LinkEnterEvent(time, driverToVeh.get(Id.createPersonId(atts.getValue(ATTRIBUTE_PERSON))), 
-							Id.create(atts.getValue(LinkEnterEvent.ATTRIBUTE_LINK), Link.class)));
-				} else {
-					// the event already contains the vehicle id and can be processed normally
-					this.basicEventsReader.startTag(name, atts, context);
-				}
-				break;
-			case LinkLeaveEvent.EVENT_TYPE:
-				if (atts.getValue(LinkLeaveEvent.ATTRIBUTE_VEHICLE) == null || atts.getValue(LinkLeaveEvent.ATTRIBUTE_VEHICLE).equals("null")){
-					// create an link leave event with the correct vehicle id
-					this.events.processEvent(new LinkLeaveEvent(time, driverToVeh.get(Id.createPersonId(atts.getValue(ATTRIBUTE_PERSON))), 
-							Id.create(atts.getValue(LinkLeaveEvent.ATTRIBUTE_LINK), Link.class)));
-				} else {
-					// the event already contains the vehicle id and can be processed normally
-					this.basicEventsReader.startTag(name, atts, context);
-				}
-				break;
-			case VehicleLeavesTrafficEvent.EVENT_TYPE:
-				this.containsVehicleLeavesTrafficEvents  = true;
-				this.basicEventsReader.startTag(name, atts, context);
-				break;
-			case PersonLeavesVehicleEvent.EVENT_TYPE:
-				if (driverToVeh.containsKey(Id.createPersonId(atts.getValue(PersonLeavesVehicleEvent.ATTRIBUTE_PERSON))) && !this.containsVehicleLeavesTrafficEvents){
-					/* if the person is a driver and the vehicle leaves traffic event is missing ...
-					 * ... process the event later (during person arrival) to be able to collect 
-					 * some information about the missing vehicle leaves traffic event before */
-				} else {
-					// process normally
-					this.basicEventsReader.startTag(name, atts, context);
-				}
-				break;
-			case PersonArrivalEvent.EVENT_TYPE:
-				Id<Person> personId = Id.createPersonId(atts.getValue(PersonArrivalEvent.ATTRIBUTE_PERSON));
-				Id<Link> linkId = Id.createLinkId(atts.getValue(PersonArrivalEvent.ATTRIBUTE_LINK));
-				String mode = atts.getValue(PersonArrivalEvent.ATTRIBUTE_LEGMODE);
-				
-				// create a vehicle leaves traffic event if it is missing
-				if (driverToVeh.containsKey(personId) && !this.containsVehicleLeavesTrafficEvents){
-					Id<Vehicle> vehicleIdOfDriver = driverToVeh.get(personId);
-					
-					this.events.processEvent(new VehicleLeavesTrafficEvent(time, personId, linkId, vehicleIdOfDriver, mode, 1.0));
-					this.events.processEvent(new PersonLeavesVehicleEvent(time, personId, vehicleIdOfDriver));
-				}
-				// process the PersonArrivalEvent normally, independently of missing VehicleLeavesTrafficEvents
-				this.basicEventsReader.startTag(name, atts, context);
-				break;
-			default:
-				this.basicEventsReader.startTag(name, atts, context);
-				break;
+		if ( !EVENT.equals(name)) {
+			throw new RuntimeException("unexpected name") ;
+		}
+		double time = Double.parseDouble(atts.getValue("time"));
+		String eventType = atts.getValue("type");
+
+		switch (eventType){
+		case VehicleEntersTrafficEvent.EVENT_TYPE:
+			// (assumes that the reader has already converted the wait2link events)
+			Id<Person> driverId = Id.createPersonId(atts.getValue(VehicleEntersTrafficEvent.ATTRIBUTE_DRIVER));
+			Id<Vehicle> vehicleId;
+			if (atts.getValue(VehicleEntersTrafficEvent.ATTRIBUTE_VEHICLE) == null || atts.getValue(VehicleEntersTrafficEvent.ATTRIBUTE_VEHICLE).equals("null")){
+				// use the person id as vehicle id
+				vehicleId = Id.create(driverId, Vehicle.class);
+			} else {
+				vehicleId = Id.create(atts.getValue(VehicleEntersTrafficEvent.ATTRIBUTE_VEHICLE), Vehicle.class);
 			}
+
+			// remember driver to vehicle relation
+			driverToVeh.put(driverId, vehicleId);				
+			// process event with correct vehicleId
+			this.events.processEvent(new VehicleEntersTrafficEvent(time, driverId, Id.createLinkId(atts.getValue(VehicleEntersTrafficEvent.ATTRIBUTE_LINK)), 
+					vehicleId, atts.getValue(VehicleEntersTrafficEvent.ATTRIBUTE_NETWORKMODE), 1.0));
+			break;
+		case LinkEnterEvent.EVENT_TYPE:
+			if (atts.getValue(LinkEnterEvent.ATTRIBUTE_VEHICLE) == null || atts.getValue(LinkEnterEvent.ATTRIBUTE_VEHICLE).equals("null")){
+				// create an link enter event with the correct vehicle id
+				this.events.processEvent(new LinkEnterEvent(time, driverToVeh.get(Id.createPersonId(atts.getValue(ATTRIBUTE_PERSON))), 
+						Id.create(atts.getValue(LinkEnterEvent.ATTRIBUTE_LINK), Link.class)));
+			} else {
+				// the event already contains the vehicle id and can be processed normally
+				this.basicEventsReader.startTag(name, atts, context);
+			}
+			break;
+		case LinkLeaveEvent.EVENT_TYPE:
+			if (atts.getValue(LinkLeaveEvent.ATTRIBUTE_VEHICLE) == null || atts.getValue(LinkLeaveEvent.ATTRIBUTE_VEHICLE).equals("null")){
+				// create an link leave event with the correct vehicle id
+				this.events.processEvent(new LinkLeaveEvent(time, driverToVeh.get(Id.createPersonId(atts.getValue(ATTRIBUTE_PERSON))), 
+						Id.create(atts.getValue(LinkLeaveEvent.ATTRIBUTE_LINK), Link.class)));
+			} else {
+				// the event already contains the vehicle id and can be processed normally
+				this.basicEventsReader.startTag(name, atts, context);
+			}
+			break;
+		case VehicleLeavesTrafficEvent.EVENT_TYPE:
+			this.containsVehicleLeavesTrafficEvents  = true;
+			this.basicEventsReader.startTag(name, atts, context);
+			break;
+		case PersonLeavesVehicleEvent.EVENT_TYPE:
+			if (driverToVeh.containsKey(Id.createPersonId(atts.getValue(PersonLeavesVehicleEvent.ATTRIBUTE_PERSON))) && !this.containsVehicleLeavesTrafficEvents){
+				/* if the person is a driver and the vehicle leaves traffic event is missing ...
+				 * ... process the event later (during person arrival) to be able to collect 
+				 * some information about the missing vehicle leaves traffic event before */
+			} else {
+				// process normally
+				this.basicEventsReader.startTag(name, atts, context);
+			}
+			break;
+		case PersonArrivalEvent.EVENT_TYPE:
+			Id<Person> personId = Id.createPersonId(atts.getValue(PersonArrivalEvent.ATTRIBUTE_PERSON));
+			Id<Link> linkId = Id.createLinkId(atts.getValue(PersonArrivalEvent.ATTRIBUTE_LINK));
+			String mode = atts.getValue(PersonArrivalEvent.ATTRIBUTE_LEGMODE);
+
+			// create a vehicle leaves traffic event if it is missing
+			if (driverToVeh.containsKey(personId) && !this.containsVehicleLeavesTrafficEvents){
+				Id<Vehicle> vehicleIdOfDriver = driverToVeh.get(personId);
+
+				this.events.processEvent(new VehicleLeavesTrafficEvent(time, personId, linkId, vehicleIdOfDriver, mode, 1.0));
+				this.events.processEvent(new PersonLeavesVehicleEvent(time, personId, vehicleIdOfDriver));
+			}
+			// process the PersonArrivalEvent normally, independently of missing VehicleLeavesTrafficEvents
+			this.basicEventsReader.startTag(name, atts, context);
+			break;
+		default:
+			this.basicEventsReader.startTag(name, atts, context);
+			break;
 		}
 	}
 
