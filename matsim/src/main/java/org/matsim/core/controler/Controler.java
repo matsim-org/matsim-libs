@@ -466,14 +466,17 @@ public class Controler extends AbstractController {
 	    return scenario;
     }
 
-    @Deprecated // preferably use "@Inject EventsManager events" or "addEventHandlerBinding().toInstance(...) from AbstractModule". kai/mz, nov'15
-    public final EventsManager getEvents() {
-	    return events;
-    }
-
-    public final Injector getInjector() {
-	    return this.injector;
-    }
+    	/**
+    	 * @deprecated -- preferably use "@Inject EventsManager events" or "addEventHandlerBinding().toInstance(...) from AbstractModule". kai/mz, nov'15
+    	 */
+    	@Deprecated // preferably use "@Inject EventsManager events" or "addEventHandlerBinding().toInstance(...) from AbstractModule". kai/mz, nov'15
+    	public final EventsManager getEvents() {
+    		return events;
+    	}
+    	
+    	public final Injector getInjector() {
+    		return this.injector;
+    	}
 
 	/**
 	 * @deprecated Do not use this, as it may not contain values in every
@@ -484,7 +487,7 @@ public class Controler extends AbstractController {
 		return this.injector.getInstance(CalcLinkStats.class);
 	}
 
-    public final VolumesAnalyzer getVolumes() {
+	public final VolumesAnalyzer getVolumes() {
 		return this.injector.getInstance(VolumesAnalyzer.class);
 	}
 
