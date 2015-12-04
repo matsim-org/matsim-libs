@@ -18,9 +18,10 @@
  * *********************************************************************** */
 package playground.ivt.router.lazyschedulebasedmatrix;
 
-import gnu.trove.map.hash.TDoubleObjectHashMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
@@ -36,6 +37,7 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author thibautd
@@ -84,16 +86,55 @@ public class LazyScheduleBasedMatrixRoutingModule implements RoutingModule {
 		final List<? extends PlanElement> cached = uncache( originCoord , destinationCoord , departureTime );
 		if ( cached != null ) return adapt( cached , fromFacility , toFacility );
 
-		// TODO route from center of cell at end of time bin
 		final List<? extends PlanElement> trip =
-				delegate.calcRoute(
-					fromFacility,
-					toFacility,
-					departureTime,
-					person );
+				calcBinnedRoute(
+						fromFacility,
+						toFacility,
+						departureTime );
 		cache( originCoord , destinationCoord , departureTime , trim( trip ) );
 
 		return trip;
+	}
+
+	private List<? extends PlanElement> calcBinnedRoute(
+			final Facility fromFacility,
+			final Facility toFacility,
+			final double departureTime ) {
+		return delegate.calcRoute(
+				binFacility( fromFacility ),
+				binFacility( toFacility ),
+				// start at the end of the time bin
+				Math.ceil( (departureTime / timeBinDuration_s) ) * timeBinDuration_s,
+				null );
+	}
+
+	private Facility binFacility( final Facility fromFacility ) {
+		return new Facility() {
+			@Override
+			public Id<Link> getLinkId() {
+				throw new UnsupportedOperationException( "did not implement searching for link at the middle of a cell" );
+			}
+
+			@Override
+			public Coord getCoord() {
+				final int cellX = (int) (fromFacility.getCoord().getX() / cellSize_m);
+				final int cellY = (int) (fromFacility.getCoord().getY() / cellSize_m);
+
+				return new Coord(
+						cellX * cellSize_m + cellSize_m / 2,
+						cellY * cellSize_m + cellSize_m / 2 );
+			}
+
+			@Override
+			public Map<String, Object> getCustomAttributes() {
+				throw new UnsupportedOperationException( );
+			}
+
+			@Override
+			public Id getId() {
+				throw new UnsupportedOperationException( );
+			}
+		};
 	}
 
 	private List<? extends PlanElement> trim( List<? extends PlanElement> trip ) {
@@ -127,6 +168,8 @@ public class LazyScheduleBasedMatrixRoutingModule implements RoutingModule {
 	private List<? extends PlanElement> calcWalkTrip(
 			final Facility fromFacility,
 			final Facility toFacility ) {
+		// deliberately pass null as a person, as we do not want a router that takes
+		// the person into account anyway...
 		return walkRouter.calcRoute( fromFacility , toFacility , 12 * 3600d , null );
 	}
 
