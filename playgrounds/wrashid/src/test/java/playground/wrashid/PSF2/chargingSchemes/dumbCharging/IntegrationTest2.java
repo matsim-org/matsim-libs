@@ -38,7 +38,9 @@ public class IntegrationTest2 extends MatsimTestCase {
 		performSingleAgentRun();
 		
 		LinkedList<ChargeLog> chargingTimesForAgent1 = ParametersPSF2.chargingTimes.get(Id.create(1, Person.class)).getChargingTimes();
+
 		assertEquals(2, chargingTimesForAgent1.size());
+		// ok when I run the test separately; fails when I run all wrashid playground tests.  kai, dec'15
 		
 		assertEquals(22500, chargingTimesForAgent1.get(0).getStartChargingTime(),1.0);
 		assertEquals(38040, chargingTimesForAgent1.get(1).getStartChargingTime(),1.0);

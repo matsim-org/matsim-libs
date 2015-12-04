@@ -28,10 +28,10 @@ import tutorial.converter.completeEventFilesRegardingVehicleInformation.EventsCo
  * @author nagel
  *
  */
-public class MyEventsConverterWait2LinkEtc {
+public class KNEventsConverterWait2LinkEtc {
 	// select the event file you want to convert
-	private static String inputFile = "/Users/nagel/git/matsim/playgrounds/wrashid/test/input/playground/wrashid/PSF2/pluggable/agent2UsesCarNotAsModeForFirstLeg.events.xml";
-	private static String outputFile = "/Users/nagel/kw/events.xml";
+	private static String inputFile = "/Users/nagel/git/matsim/playgrounds/wrashid/test/input/playground/wrashid/PSF2/pluggable/0.events.xml";
+	private static String outputFile = "/Users/nagel/git/matsim/playgrounds/wrashid/test/input/playground/wrashid/PSF2/pluggable/output.events.xml";
 
 	public static void main(String[] args) {
 

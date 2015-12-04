@@ -4,7 +4,6 @@
 		<!ENTITY INBASE  "test/scenarios/equil">
 		<!ENTITY OUTBASE "test/output/playground/wrashid/PSF2/chargingSchemes/dumbCharging/2">
 		<!ENTITY TESTBASE  "test/input/playground/wrashid/PSF2/chargingSchemes/dumbCharging">
-		<!ENTITY TESTBASE2  "test/input/playground/wrashid/PSF2/pluggable">
 		
 	]
 >
@@ -92,7 +91,7 @@
 		<param name="default.chargingPowerAtParking" value="3500" /> <!-- in [W]  -->
 		<param name="main.chargingTimesOutputFilePath" value="&OUTBASE;/chargingLog.txt" />
 		<param name="main.energyUsageStatistics" value="&OUTBASE;/vehicleEnergyConsumption" />
-		<param name="main.inputEventsForSimulationPath" value="&TESTBASE2;/0.events.xml" />
+		<param name="main.inputEventsForSimulationPath" value="&TESTBASE;/input_events.xml" />
 		
 	
 		<param name="testingModeOn" value="false" /> <!-- this is the main switch for all testing values -->

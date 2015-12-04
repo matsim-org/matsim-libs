@@ -38,6 +38,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility.Builder;
+import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -101,11 +102,11 @@ public class LegModeCheckerTest extends MatsimTestCase {
 		 */
 		TravelTime travelTimes = new FreeSpeedTravelTime();
 		TravelDisutility travelCosts = new Builder( TransportMode.car ).createTravelDisutility(travelTimes, config.planCalcScore());
-		PlanAlgorithm plansCalcRoute =
-				new PlanRouter(
-						new TripRouterFactoryBuilderWithDefaults().build(
-								sc ).get(
-						) );
+		TripRouterFactoryBuilderWithDefaults builder = new TripRouterFactoryBuilderWithDefaults() ;
+		builder.setLeastCostPathCalculatorFactory( new DijkstraFactory() );
+		builder.setTravelTime(travelTimes);
+		builder.setTravelDisutility(travelCosts);
+		PlanAlgorithm plansCalcRoute = new PlanRouter( builder.build( sc ).get() ) ;
 
 		/*
 		 * Create LegModeChecker to check and adapt leg modes
