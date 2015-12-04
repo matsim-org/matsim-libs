@@ -41,8 +41,8 @@ import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.events.VehicleAbortsEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
-import org.matsim.api.core.v01.events.Wait2LinkEvent;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
@@ -348,8 +348,8 @@ public class SingleHandlerEventsManager implements EventsManager {
 		} else if (this.isLinkEnterHandler && klass == LinkEnterEvent.class) {
 			((LinkEnterEventHandler) this.eventHandler).handleEvent((LinkEnterEvent)ev);
 			return true;
-		} else if (this.isWait2LinkHandler && klass == Wait2LinkEvent.class) {
-			((Wait2LinkEventHandler) this.eventHandler).handleEvent((Wait2LinkEvent)ev);
+		} else if (this.isWait2LinkHandler && klass == VehicleEntersTrafficEvent.class) {
+			((Wait2LinkEventHandler) this.eventHandler).handleEvent((VehicleEntersTrafficEvent)ev);
 			return true;
 		} else if (this.isPersonArrivalHandler && klass == PersonArrivalEvent.class) {
 			((PersonArrivalEventHandler) this.eventHandler).handleEvent((PersonArrivalEvent)ev);
