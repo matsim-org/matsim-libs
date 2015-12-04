@@ -1,7 +1,6 @@
 package gunnar.ihop2.regent.costwriting;
 
 import static floetteroed.utilities.math.Histogram.newHistogramWithUniformBins;
-import static gunnar.ihop2.regent.demandreading.PopulationCreator.HOME;
 
 import java.io.PrintWriter;
 import java.util.LinkedHashMap;
@@ -94,7 +93,9 @@ public class HalfTourCostMatrices {
 				for (PlanElement planElement : plan.getPlanElements()) {
 					if (planElement instanceof Activity) {
 						final Activity currentAct = (Activity) planElement;
-						if (!HOME.equals(currentAct.getType())) {
+						// TODO CHECK, NEW:
+						if (!currentAct.getType().toUpperCase().startsWith("H")) {
+							// if (!HOME.equals(currentAct.getType())) {
 							// Prev. trip was from home to activity location.
 							this.addTourStartTime(currentAct.getType(),
 									prevDptTime_s);
