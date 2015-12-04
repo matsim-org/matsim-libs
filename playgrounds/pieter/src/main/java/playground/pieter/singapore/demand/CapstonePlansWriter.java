@@ -253,20 +253,34 @@ public class CapstonePlansWriter {
     Map<String, Household> households;
     Map<String, PersonEntry> persons;
 
+    /**
+     * 
+     * @param args
+     * 0 - facilities table
+     * 1 - output file
+     * 2 - sample fraction (0,1]
+     * 3 - data base properties file
+     * @throws SQLException
+     * @throws NoConnectionException
+     * @throws ClassNotFoundException
+     * @throws InstantiationException
+     * @throws IllegalAccessException
+     * @throws IOException
+     */
     public static void main(String[] args) throws SQLException, NoConnectionException, ClassNotFoundException,
             InstantiationException, IllegalAccessException, IOException {
-        DataBaseAdmin dba = new DataBaseAdmin(new File("connections/matsim2postgres.properties"));
+        DataBaseAdmin dba = new DataBaseAdmin(new File(args[3]));
         MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
         FacilitiesToSQL f2sql = new FacilitiesToSQL(dba, scenario);
         f2sql.loadFacilitiesFromSQL(args[0]);
-        new CapstonePlansWriter(scenario, dba).run(args[1]);
+        new CapstonePlansWriter(scenario, dba).run(args[1], Double.parseDouble(args[2]));
 
     }
 
-    public void run(String plansFile) throws SQLException, NoConnectionException {
-        ResultSet resultSet = dataBaseAdmin.executeQuery("SELECT *  FROM ro_plansgeneration.plans_input p " +
+    public void run(String plansFile, double fraction) throws SQLException, NoConnectionException {
+        ResultSet resultSet = dataBaseAdmin.executeQuery("SELECT p.*  FROM ro_plansgeneration.plans_input p " +
                 "INNER JOIN ro_population.households h on p.hhid = h.hhid " +
-                "WHERE h.rand <= 0.0001 " +
+                "WHERE h.rand <= "+ fraction +
                 "ORDER BY p.hhid, persid, \"no\" ;");
         String hhid = null;
         String persid = null;

@@ -87,7 +87,11 @@ public class BestReplyDestinationChoice extends AbstractMultithreadedModule {
 		// instead of just the nearest link we probably should check whether the facility is attached to a link? cdobler, oct'14
 		this.nearestLinks = new HashMap<>();
 		for (ActivityFacility facility : this.scenario.getActivityFacilities().getFacilities().values()) {
-			this.nearestLinks.put(facility.getId(), NetworkUtils.getNearestLink((this.scenario.getNetwork()), facility.getCoord()).getId());
+			if (facility.getLinkId() != null)
+				this.nearestLinks.put(facility.getId(), facility.getLinkId());
+			else
+				this.nearestLinks.put(facility.getId(), NetworkUtils.getNearestLink(scenario.getNetwork(),
+						facility.getCoord()).getId());
 		}
 		
 		initLocal();
