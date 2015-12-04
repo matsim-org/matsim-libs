@@ -41,11 +41,17 @@ class TaxiLauncherParams
 
     Boolean onlineVehicleTracker;
     Boolean advanceRequestSubmission;
+    
+    //TaxiSchedulerParams
     Boolean destinationKnown;
     Boolean vehicleDiversion;
-
     Double pickupDuration;
     Double dropoffDuration;
+    Double AStarEuclideanOverdoFactor;
+
+    //QSim params
+    Double storageCapFactor;
+    Double flowCapFactor;
 
     Boolean batteryChargingDischarging;
 
@@ -92,11 +98,17 @@ class TaxiLauncherParams
 
         onlineVehicleTracker = getBoolean("onlineVehicleTracker");
         advanceRequestSubmission = getBoolean("advanceRequestSubmission");
+        
+        //TaxiSchedulerParams
         destinationKnown = getBoolean("destinationKnown");
         vehicleDiversion = getBoolean("vehicleDiversion");
-
         pickupDuration = getDouble("pickupDuration");
         dropoffDuration = getDouble("dropoffDuration");
+        AStarEuclideanOverdoFactor = getDouble("AStarEuclideanOverdoFactor");
+        
+        //QSim params
+        storageCapFactor = getDouble("storageCapFactor");
+        flowCapFactor = getDouble("flowCapFactor");
 
         batteryChargingDischarging = getBoolean("batteryChargingDischarging");
 

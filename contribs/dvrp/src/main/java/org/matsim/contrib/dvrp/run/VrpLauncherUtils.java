@@ -45,7 +45,6 @@ public class VrpLauncherUtils
 {
     //to avoid congestion; only the free-flow speed should decide on the movement of vehicles
     public static final double VARIANT_NETWORK_FLOW_CAP_FACTOR = 100;
-    public static final int TIME_INTERVAL = 15 * 60; //15 minutes
 
 
     public enum TravelTimeSource
@@ -62,11 +61,11 @@ public class VrpLauncherUtils
 
     public static Scenario initScenario(String netFile, String plansFile)
     {
-        return initScenario(netFile, plansFile, null, -1);
+        return initScenario(netFile, plansFile, null, -1, -1);
     }
 
 
-    public static Scenario initScenario(String netFile, String plansFile, String changeEventsFile, int hours)
+    public static Scenario initScenario(String netFile, String plansFile, String changeEventsFile, int interval, int intervalCount)
     {
         Scenario scenario = ScenarioUtils.createScenario(VrpConfigUtils.createConfig());
         NetworkImpl network = (NetworkImpl)scenario.getNetwork();
@@ -74,7 +73,7 @@ public class VrpLauncherUtils
         if (changeEventsFile != null) {
             scenario.getConfig().network().setTimeVariantNetwork(true);
             scenario.getConfig().qsim().setFlowCapFactor(VARIANT_NETWORK_FLOW_CAP_FACTOR);
-            network.getFactory().setLinkFactory(new FixedIntervalTimeVariantLinkFactory(TIME_INTERVAL, 4 * hours));
+            network.getFactory().setLinkFactory(new FixedIntervalTimeVariantLinkFactory(interval, intervalCount));
         }
 
         new MatsimNetworkReader(scenario).readFile(netFile);

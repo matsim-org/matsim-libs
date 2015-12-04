@@ -5,7 +5,7 @@ import java.io.PrintWriter;
 import org.apache.commons.math3.stat.descriptive.*;
 import org.matsim.contrib.dvrp.data.VrpData;
 
-import playground.michalm.taxi.util.stats.TaxiStatsCalculator.TaxiStats;
+import playground.michalm.taxi.util.stats.TaxiStats;
 
 
 public class MultiRunStats
@@ -65,7 +65,7 @@ public class MultiRunStats
                 driveWithPassengerTime.getMean(), //
                 driveEmptyRatio.getMean() * 100, //in [%]
                 //
-                computationTime.getMean(),
+                computationTime.getMean(), //
                 computationTime.getPercentile(50));
     }
 }

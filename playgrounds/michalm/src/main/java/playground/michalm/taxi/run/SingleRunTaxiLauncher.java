@@ -15,8 +15,7 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.vis.otfvis.OTFVisConfigGroup.ColoringScheme;
 
 import playground.michalm.taxi.util.chart.TaxiScheduleChartUtils;
-import playground.michalm.taxi.util.stats.TaxiStatsCalculator;
-import playground.michalm.taxi.util.stats.TaxiStatsCalculator.TaxiStats;
+import playground.michalm.taxi.util.stats.*;
 import playground.michalm.util.*;
 
 

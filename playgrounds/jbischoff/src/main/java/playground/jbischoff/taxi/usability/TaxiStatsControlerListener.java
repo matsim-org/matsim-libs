@@ -25,8 +25,7 @@ import org.matsim.contrib.dvrp.MatsimVrpContext;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 
-import playground.michalm.taxi.util.stats.TaxiStatsCalculator;
-import playground.michalm.taxi.util.stats.TaxiStatsCalculator.TaxiStats;
+import playground.michalm.taxi.util.stats.*;
 
 /**
  * @author  jbischoff

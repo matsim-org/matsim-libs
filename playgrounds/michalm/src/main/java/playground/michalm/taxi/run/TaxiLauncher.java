@@ -55,28 +55,21 @@ class TaxiLauncher
 
     private TravelTime travelTime;
     private TravelDisutility travelDisutility;
+    public static final int TIME_INTERVAL = 15 * 60; //15 minutes
 
 
     TaxiLauncher(TaxiLauncherParams params)
     {
         this.params = params;
 
-        int hours = 30;//TODO migrate to TaxiParams?
-        hours = 50;//only for AUDI 48-hour scenario
+        int hours = 30;//migrate to TaxiParams??
         scenario = VrpLauncherUtils.initScenario(params.netFile, params.plansFile,
-                params.changeEventsFile, hours);
+                params.changeEventsFile, TIME_INTERVAL, hours * 3600 / TIME_INTERVAL);
 
-        double storageCapFactor = 1.0;//TODO migrate to TaxiParams?
-        double flowCapFactor = 1.0;//TODO migrate to TaxiParams?
-        
-        //AUDI 10% scenario
-        storageCapFactor = 0.3;
-        flowCapFactor = 0.2;
-
-        //TODO this will overwrite VARIANT_NETWORK_FLOW_CAP_FACTOR from VrpLauncherUtils
+        //overwrites the values set by VrpLauncherUtils.initScenario()
         QSimConfigGroup qsc = scenario.getConfig().qsim();
-        qsc.setStorageCapFactor(storageCapFactor);
-        qsc.setFlowCapFactor(flowCapFactor);
+        qsc.setStorageCapFactor(params.storageCapFactor);
+        qsc.setFlowCapFactor(params.flowCapFactor);
 
         if (params.taxiCustomersFile != null) {
             List<String> passengerIds = PersonCreatorWithRandomTaxiMode
@@ -175,12 +168,9 @@ class TaxiLauncher
 
     TaxiOptimizerConfiguration createOptimizerConfiguration()
     {
-        double AStarEuclideanOverdoFactor = 1.0;//TODO migrate to TaxiParams?
-
-        AStarEuclideanOverdoFactor = 2.5;//for AUDI 2.5 still gives accurate results
         TaxiSchedulerParams schedulerParams = new TaxiSchedulerParams(params.destinationKnown,
                 params.vehicleDiversion, params.pickupDuration, params.dropoffDuration,
-                AStarEuclideanOverdoFactor);
+                params.AStarEuclideanOverdoFactor);
 
         TaxiScheduler scheduler = new TaxiScheduler(context, schedulerParams, travelTime,
                 travelDisutility);

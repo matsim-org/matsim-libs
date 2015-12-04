@@ -27,20 +27,25 @@ import playground.michalm.taxi.schedule.*;
 import playground.michalm.taxi.schedule.TaxiTask.TaxiTaskType;
 
 
-public class TaxiStatsCalculator
+public class HourlyTaxiStatsCalculator
 {
-    private final TaxiStats stats = new TaxiStats();
+    private final TaxiStats[] stats;
 
 
-    public TaxiStatsCalculator(Iterable<? extends Vehicle> vehicles)
+    public HourlyTaxiStatsCalculator(Iterable<? extends Vehicle> vehicles, int hours)
     {
+        stats = new TaxiStats[hours];
+        for (int i = 0; i < hours; i++) {
+            stats[i] = new TaxiStats();
+        }
+
         for (Vehicle v : vehicles) {
             calculateStatsImpl(v);
         }
     }
 
 
-    public TaxiStats getStats()
+    public TaxiStats[] getStats()
     {
         return stats;
     }
@@ -55,13 +60,19 @@ public class TaxiStatsCalculator
         }
 
         for (TaxiTask t : schedule.getTasks()) {
-            stats.addTask(t);
+            stats[hour(t.getBeginTime())].addTask(t);
 
             if (t.getTaxiTaskType() == TaxiTaskType.PICKUP) {
                 Request req = ((TaxiPickupTask)t).getRequest();
                 double waitTime = Math.max(t.getBeginTime() - req.getT0(), 0);
-                stats.passengerWaitTimes.addValue(waitTime);
+                stats[hour(req.getT0())].passengerWaitTimes.addValue(waitTime);
             }
         }
+    }
+    
+    
+    private int hour(double time)
+    {
+        return (int)(time / 3600);
     }
 }

@@ -28,8 +28,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 
-import playground.michalm.taxi.util.stats.TaxiStatsCalculator;
-import playground.michalm.taxi.util.stats.TaxiStatsCalculator.TaxiStats;
+import playground.michalm.taxi.util.stats.*;
 
 
 class MultiRunTaxiLauncher

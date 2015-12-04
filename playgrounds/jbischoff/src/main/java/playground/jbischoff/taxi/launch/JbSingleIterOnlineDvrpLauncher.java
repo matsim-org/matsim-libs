@@ -51,7 +51,6 @@ import playground.michalm.taxi.data.TaxiRequest.TaxiRequestStatus;
 import playground.michalm.taxi.run.TaxiLauncherUtils;
 import playground.michalm.taxi.scheduler.*;
 import playground.michalm.taxi.util.stats.*;
-import playground.michalm.taxi.util.stats.TaxiStatsCalculator.TaxiStats;
 import playground.michalm.util.MovingAgentsRegister;
 
 
@@ -131,7 +130,7 @@ import playground.michalm.util.MovingAgentsRegister;
         writeSimEvents = true;
         waitList = new ArrayList<String>();
 
-        scenario = VrpLauncherUtils.initScenario(netFileName, plansFileName, changeEventsFilename, 30);
+        scenario = VrpLauncherUtils.initScenario(netFileName, plansFileName, changeEventsFilename, 15 * 60, 30 * 15);
 
         //        List<String> taxiCustomerIds;
         //        taxiCustomerIds = ODDemandGenerator.readTaxiCustomerIds(taxiCustomersFileName);
