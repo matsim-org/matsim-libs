@@ -55,8 +55,6 @@ public final class ActivityImpl implements Activity {
 	private Id<Link> linkId = null;
 	private Id<ActivityFacility> facilityId = null;
 	
-	private boolean locked = false ;
-
 	/*package*/ ActivityImpl(final String type) {
 		this.type = type.intern();
 	}
@@ -130,7 +128,8 @@ public final class ActivityImpl implements Activity {
 	}
 
 	public void setCoord(final Coord coord) {
-		testForLocked();
+//		testForLocked();
+		// I currently think that rather than enforcing data consistency we should just walk them from coordinate to link. kai, dec'15
 		this.coord = coord;
 	}
 	@Override
@@ -144,12 +143,13 @@ public final class ActivityImpl implements Activity {
 	}
 
 	public final void setFacilityId(final Id<ActivityFacility> facilityId) {
-		testForLocked();
+//		testForLocked();
 		this.facilityId = facilityId;
 	}
 
 	public final void setLinkId(final Id<Link> linkId) {
-		testForLocked();
+//		testForLocked();
+		// I currently think that rather than enforcing data consistency we should just walk them from coordinate to link. kai, dec'15
 		this.linkId = linkId;
 	}
 
@@ -173,12 +173,13 @@ public final class ActivityImpl implements Activity {
 		this.dur = dur;
 	}
 	
-	public final void setLocked() {
-		this.locked = true ;
-	}
-	private final void testForLocked() {
-		if ( this.locked ) {
-			throw new RuntimeException("too late to do this") ;
-		}
-	}
+//	private boolean locked = false ;
+//	public final void setLocked() {
+//		this.locked = true ;
+//	}
+//	private final void testForLocked() {
+//		if ( this.locked ) {
+//			throw new RuntimeException("too late to do this") ;
+//		}
+//	}
 }

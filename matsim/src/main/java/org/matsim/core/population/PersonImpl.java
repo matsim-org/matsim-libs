@@ -129,7 +129,8 @@ public final class PersonImpl implements Person {
 		// note that this does NOT lock the add/remove plans logic, but just some fields. kai, dec'15
 		for ( Plan plan : this.plans ) {
 			if ( plan instanceof PlanImpl ) {
-				((PlanImpl)plan).setLocked() ;
+//				((PlanImpl)plan).setLocked() ;
+				// does not really do that much since it only affects the initial plan(s). kai, dec'15
 			}
 		}
 	}
