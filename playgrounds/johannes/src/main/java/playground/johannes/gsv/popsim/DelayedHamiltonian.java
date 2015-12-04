@@ -17,54 +17,40 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.matrices.io;
+package playground.johannes.gsv.popsim;
 
-import playground.johannes.gsv.zones.KeyMatrix;
-import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
+import playground.johannes.synpop.data.Attributable;
+import playground.johannes.synpop.sim.Hamiltonian;
+import playground.johannes.synpop.sim.MarkovEngineListener;
+import playground.johannes.synpop.sim.data.CachedPerson;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.Set;
+import java.util.Collection;
 
 /**
  * @author johannes
- *
  */
-public class KeyMatrix2Txt {
+public class DelayedHamiltonian implements Hamiltonian, MarkovEngineListener {
 
-	/**
-	 * @param args
-	 * @throws IOException 
-	 */
-	public static void main(String[] args) throws IOException {
-		KeyMatrixXMLReader reader = new KeyMatrixXMLReader();
-		reader.setValidating(false);
-		reader.parse(args[0]);
-		KeyMatrix m = reader.getMatrix();
+    private final long activationIteration;
 
-		int odId = 0;
-		BufferedWriter writer = new BufferedWriter(new FileWriter(args[1]));
-		writer.write("from\tto\tvalue\todId");
-		writer.newLine();
-		Set<String> keys = m.keys();
-		for(String i : keys) {
-			for(String j : keys) {
-				Double val = m.get(i, j);
-				if(val != null) {
-					writer.write(i);
-					writer.write("\t");
-					writer.write(j);
-					writer.write("\t");
-					writer.write(String.valueOf(val));
-					writer.write("\t");
-					writer.write(String.valueOf(odId));
-					writer.newLine();
-					odId++;
-				}
-			}
-		}
-		writer.close();
-	}
+    private final Hamiltonian hamiltonian;
 
+    private long iteration = 0;
+
+    public DelayedHamiltonian(Hamiltonian hamiltonian, long activationIteration) {
+        this.hamiltonian = hamiltonian;
+        this.activationIteration = activationIteration;
+    }
+    @Override
+    public double evaluate(Collection<CachedPerson> population) {
+        if(iteration > activationIteration)
+            return hamiltonian.evaluate(population);
+        else
+            return 0;
+    }
+
+    @Override
+    public void afterStep(Collection<CachedPerson> population, Collection<? extends Attributable> mutations, boolean accepted) {
+        iteration++;
+    }
 }

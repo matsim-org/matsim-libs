@@ -26,7 +26,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.common.gis.CartesianDistanceCalculator;
 import org.matsim.contrib.common.gis.DistanceCalculator;
 import org.matsim.contrib.common.stats.Discretizer;
@@ -45,7 +44,6 @@ import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.facilities.*;
 import playground.johannes.coopsim.mental.choice.ChoiceSet;
 import playground.johannes.coopsim.utils.MatsimCoordUtils;
 import playground.johannes.gsv.zones.KeyMatrix;
@@ -127,7 +125,7 @@ public class ODBruteForceCalibrator {
 			}
 			ProgressLogger.step();
 		}
-		ProgressLogger.termiante();
+		ProgressLogger.terminate();
 	}
 
 	public void run(Population population) {
@@ -369,7 +367,7 @@ public class ODBruteForceCalibrator {
 			ProgressLogger.step();
 		}
 
-		ProgressLogger.termiante();
+		ProgressLogger.terminate();
 
 		return m;
 	}

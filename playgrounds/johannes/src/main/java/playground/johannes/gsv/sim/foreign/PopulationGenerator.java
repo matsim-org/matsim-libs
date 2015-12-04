@@ -202,7 +202,7 @@ public class PopulationGenerator {
 				}
 			}
 
-			ProgressLogger.termiante();
+			ProgressLogger.terminate();
 
 			for (RunThread thread : threads) {
 				origVolume += thread.origVolume;
@@ -241,7 +241,7 @@ public class PopulationGenerator {
 			}
 			ProgressLogger.step();
 		}
-		ProgressLogger.termiante();
+		ProgressLogger.terminate();
 		if (cnt > 0) {
 			logger.info(String.format("%s facilities cannot be assigned to a zone.", cnt));
 		}

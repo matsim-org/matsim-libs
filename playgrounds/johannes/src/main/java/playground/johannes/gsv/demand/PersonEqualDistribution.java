@@ -102,7 +102,7 @@ public class PersonEqualDistribution implements PopulationTask {
 			
 			
 		}
-		ProgressLogger.termiante();
+		ProgressLogger.terminate();
 	}
 
 }

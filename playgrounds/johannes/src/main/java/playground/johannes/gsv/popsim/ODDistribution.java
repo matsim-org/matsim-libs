@@ -26,6 +26,7 @@ import gnu.trove.iterator.TIntObjectIterator;
 import gnu.trove.map.hash.TIntDoubleHashMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.common.gis.CartesianDistanceCalculator;
 import org.matsim.contrib.common.gis.DistanceCalculator;
@@ -55,6 +56,8 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class ODDistribution implements AttributeChangeListener, Hamiltonian {
 
+    private static final Logger logger = Logger.getLogger(ODDistribution.class);
+
     private static final Object zoneIndexKey = new Object();
 
     private TIntObjectHashMap<TIntDoubleHashMap> refMatrix;
@@ -71,6 +74,10 @@ public class ODDistribution implements AttributeChangeListener, Hamiltonian {
 
     private TObjectIntHashMap<String> id2Idx;
 
+    private Map<ActivityFacility, Zone> fac2zone = new HashMap<>();
+
+    private ZoneCollection zones;
+
     private String primaryKey;
 
     private final double threshold;
@@ -78,6 +85,12 @@ public class ODDistribution implements AttributeChangeListener, Hamiltonian {
     private double hamiltonianValue;
 
     private double scaleFactor;
+
+    private final long rescaleInterval = 1000000;
+
+    private long changeCounter;
+
+    private final double refSum;
 
     public ODDistribution(Collection<? extends Person> simPersons, KeyMatrix refKeyMatrix, DataPool dataPool, String
             layerName, String primaryKey, double threshold) {
@@ -91,12 +104,20 @@ public class ODDistribution implements AttributeChangeListener, Hamiltonian {
         simMatrix = initMatrix(simPersons, dataPool, layerName);
         refMatrix = initRefMatrix(refKeyMatrix);
 
-        ZoneData zoneData = (ZoneData)dataPool.get(ZoneData.POPULATION_KEY);
-        ZoneCollection zones = zoneData.getLayer(layerName);
+        ZoneData zoneData = (ZoneData)dataPool.get(ZoneDataLoader.KEY);
+        zones = zoneData.getLayer(layerName);
         double simSum = calculateSum(simMatrix, threshold, zones);
-        double refSum = calculateSum(refMatrix, threshold, zones);
+        refSum = calculateSum(refMatrix, threshold, zones);
         scaleFactor = simSum/refSum;
 
+        int[] indices = idx2Zone.keys();
+        for(int i : indices) {
+            for(int j : indices) {
+                double simVal = getCellValue(i, j, simMatrix);
+                double refVal = getCellValue(i, j, refMatrix);
+                hamiltonianValue += calculateError(simVal, refVal);
+            }
+        }
     }
 
     private TIntObjectHashMap<TIntDoubleHashMap> initRefMatrix(KeyMatrix keyMatrix) {
@@ -120,7 +141,7 @@ public class ODDistribution implements AttributeChangeListener, Hamiltonian {
                                                             String layerName) {
         ZoneCollection zones = ((ZoneData)dataPool.get(ZoneDataLoader.KEY)).getLayer(layerName);
         ActivityFacilities facilities = ((FacilityData)dataPool.get(FacilityDataLoader.KEY)).getAll();
-        Map<ActivityFacility, Zone> fac2zone = new HashMap<>();
+
 
         AtomicInteger maxIdx = new AtomicInteger(0);
 
@@ -185,7 +206,7 @@ public class ODDistribution implements AttributeChangeListener, Hamiltonian {
             }
 
             int idx = zone2Idx.get(zone);
-            if(zone2Idx.containsKey(zone)) {
+            if(!zone2Idx.containsKey(zone)) {
                 idx = maxIdx.incrementAndGet();
                 zone2Idx.put(zone, idx);
                 idx2Zone.put(idx, zone);
@@ -196,14 +217,34 @@ public class ODDistribution implements AttributeChangeListener, Hamiltonian {
         }
     }
 
+    private int getIndex(ActivityFacility facility) {
+        int idx = zoneIndices.get(facility);
+        if(idx == -1) {
+            Zone zone = zones.get(new Coordinate(facility.getCoord().getX(), facility.getCoord().getY()));
+            idx = zone2Idx.get(zone);
+            zoneIndices.put(facility.getId().toString(), idx);
+        }
+
+        return idx;
+    }
+
     @Override
     public void onChange(Object dataKey, Object oldValue, Object newValue, CachedElement element) {
         if(this.facilityDataKey == null) this.facilityDataKey = Converters.getObjectKey(CommonKeys.ACTIVITY_FACILITY);
 
         if(this.facilityDataKey.equals(dataKey)) {
+            changeCounter++;
+            if(changeCounter % rescaleInterval == 0) {
+                logger.info("Rescaling simulation matrix...");
+                double simSum = calculateSum(simMatrix, threshold, zones);
+//                double refSum = calculateSum(refMatrix, threshold, zones);
+                scaleFactor = simSum/refSum;
+                logger.info(String.format("Done. New scale factor %s.", scaleFactor));
+            }
+
             CachedSegment act = (CachedSegment)element;
-            int oldIdx = zoneIndices.get(oldValue);
-            int newIdx = zoneIndices.get(newValue);
+            int oldIdx = getIndex((ActivityFacility)oldValue);
+            int newIdx = getIndex((ActivityFacility)newValue);
             /*
             if there is a preceding trip...
              */
@@ -281,11 +322,12 @@ public class ODDistribution implements AttributeChangeListener, Hamiltonian {
     }
 
     private double calculateError(double simVal, double refVal) {
+        simVal = simVal/scaleFactor;
         if (refVal > 0) {
             return Math.abs(simVal - refVal) / refVal;
         } else {
             if (simVal == 0) return 0;
-            else return simVal/scaleFactor; //TODO: this should be invariant from the sample size of sim values.
+            else return simVal;
             // Not sure if scaleFactor is the appropriate normalization...
         }
     }

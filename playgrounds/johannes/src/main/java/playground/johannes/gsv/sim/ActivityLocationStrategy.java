@@ -20,7 +20,6 @@
 package playground.johannes.gsv.sim;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.common.util.ProgressLogger;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.replanning.GenericPlanStrategy;
@@ -138,7 +137,7 @@ public class ActivityLocationStrategy implements GenericPlanStrategy<Plan, Perso
 			}
 		}
 
-		ProgressLogger.termiante();
+		ProgressLogger.terminate();
 
 	}
 

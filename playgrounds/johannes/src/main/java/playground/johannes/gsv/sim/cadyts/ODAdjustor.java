@@ -25,7 +25,6 @@ import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.hash.TDoubleIntHashMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.common.gis.CartesianDistanceCalculator;
 import org.matsim.contrib.common.gis.DistanceCalculator;
 import org.matsim.contrib.common.stats.Discretizer;
@@ -116,7 +115,7 @@ public class ODAdjustor {
 			}
 			ProgressLogger.step();
 		}
-		ProgressLogger.termiante();
+		ProgressLogger.terminate();
 	}
 
 	public void run(Population pop) {
@@ -359,7 +358,7 @@ public class ODAdjustor {
 			ProgressLogger.step();
 		}
 
-		ProgressLogger.termiante();
+		ProgressLogger.terminate();
 
 		return m;
 	}
@@ -433,7 +432,7 @@ public class ODAdjustor {
 			}
 			ProgressLogger.step();
 		}
-		ProgressLogger.termiante();
+		ProgressLogger.terminate();
 	}
 
 	private static class ODRelation {

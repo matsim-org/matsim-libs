@@ -34,7 +34,6 @@ import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.common.gis.CartesianDistanceCalculator;
 import org.matsim.contrib.common.gis.DistanceCalculator;
 import org.matsim.contrib.common.util.ProgressLogger;
@@ -163,7 +162,7 @@ public class ODCalibrator implements PersonDepartureEventHandler, PersonArrivalE
 			}
 			ProgressLogger.step();
 		}
-		ProgressLogger.termiante();
+		ProgressLogger.terminate();
 		
 		if(cnt > 0) {
 			logger.warn(String.format("%s facilities cannot be assigned to a virtual node.", cnt));
@@ -389,7 +388,7 @@ public class ODCalibrator implements PersonDepartureEventHandler, PersonArrivalE
 			ProgressLogger.step();
 		}
 		
-		ProgressLogger.termiante();
+		ProgressLogger.terminate();
 		
 		return m;
 	}
@@ -457,7 +456,7 @@ public class ODCalibrator implements PersonDepartureEventHandler, PersonArrivalE
 			}
 			ProgressLogger.step();
 		}
-		ProgressLogger.termiante();
+		ProgressLogger.terminate();
 		
 		logger.info("Determining simulation candidates...");
 		candidates = new LinkedHashSet<>();
@@ -482,7 +481,7 @@ public class ODCalibrator implements PersonDepartureEventHandler, PersonArrivalE
 			}
 			ProgressLogger.step();
 		}
-		ProgressLogger.termiante();
+		ProgressLogger.terminate();
 		
 		logger.info(String.format("Determined %s simulation candidates.", candidates.size()));
 	}

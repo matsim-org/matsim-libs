@@ -90,7 +90,7 @@ public class PlanPrimaryActivity2 implements PopulationTask {
 				e.printStackTrace();
 			}
 		}
-		ProgressLogger.termiante();
+		ProgressLogger.terminate();
 		
 	}
 	

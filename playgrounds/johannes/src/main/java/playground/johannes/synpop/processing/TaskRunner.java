@@ -58,7 +58,7 @@ public class TaskRunner {
         }
 
         if (verbose)
-            ProgressLogger.termiante();
+            ProgressLogger.terminate();
     }
 
     public static void validatePersons(PersonTask task, Collection<? extends Person> persons) {

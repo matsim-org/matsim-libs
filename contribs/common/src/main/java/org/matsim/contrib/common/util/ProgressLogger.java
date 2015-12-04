@@ -77,7 +77,7 @@ public class ProgressLogger {
 	 * Terminates the logger. Use this function to abort logging before the number of {@code #step()} calls has
 	 * reached the total number of steps.
 	 */
-	public static void termiante() {
+	public static void terminate() {
 		if(counter.get() != maxVal) {
 			System.out.println(NumberFormat.getPercentInstance().format(counter.get()/(double)maxVal));
 		}

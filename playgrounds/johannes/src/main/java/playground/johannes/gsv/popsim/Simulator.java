@@ -32,6 +32,8 @@ import playground.johannes.gsv.popsim.analysis.*;
 import playground.johannes.gsv.popsim.config.MatrixAnalyzerConfigurator;
 import playground.johannes.gsv.synPop.mid.Route2GeoDistance;
 import playground.johannes.gsv.synPop.sim3.ReplaceActTypes;
+import playground.johannes.gsv.zones.KeyMatrix;
+import playground.johannes.gsv.zones.io.KeyMatrixTxtIO;
 import playground.johannes.synpop.data.*;
 import playground.johannes.synpop.data.io.PopulationIO;
 import playground.johannes.synpop.gis.*;
@@ -88,6 +90,10 @@ public class Simulator {
         DataPool dataPool = new DataPool();
         dataPool.register(new FacilityDataLoader(config.getParam(MODULE_NAME, "facilities"), random), FacilityDataLoader.KEY);
         dataPool.register(new ZoneDataLoader(config.getModule(MODULE_NAME)), ZoneDataLoader.KEY);
+
+        ValidateFacilities.validate(dataPool, "modena");
+        ValidateFacilities.validate(dataPool, "lau2");
+        ValidateFacilities.validate(dataPool, "nuts3");
 		/*
 		Generating simulation population...
 		 */
@@ -164,6 +170,16 @@ public class Simulator {
 		 */
         BivariatMean meanDistLau2Term = buildMeanDistLau2Term(refPersons, simPersons);
         hamiltonian.addComponent(meanDistLau2Term, Double.parseDouble(config.getParam(MODULE_NAME, "theta_distLau2")));
+        /*
+        Setup matrix calibrator
+         */
+        KeyMatrix refMatrix = new KeyMatrix();
+        KeyMatrixTxtIO.read(refMatrix, config.getParam(MODULE_NAME, "calibrationMatrix"));
+        String layerName = config.getParam(MODULE_NAME, "calibrationLayerName");
+        ODDistribution odDistribution = new ODDistribution(simPersons, refMatrix, dataPool, layerName, "NO", 100000);
+        long delay = (long)Double.parseDouble(config.getParam(MODULE_NAME, "calibrationDelay"));
+        DelayedHamiltonian odDistributionDelayed = new DelayedHamiltonian(odDistribution, delay);
+        hamiltonian.addComponent(odDistributionDelayed, 1);
 		/*
 		Setup listeners for changes on geo distance.
 		 */
@@ -175,7 +191,12 @@ public class Simulator {
 		 */
         FacilityMutatorBuilder mutatorBuilder = new FacilityMutatorBuilder(dataPool, random);
         mutatorBuilder.addToBlacklist(ActivityTypes.HOME);
-        mutatorBuilder.setListener(new GeoDistanceUpdater(geoDistListeners));
+        GeoDistanceUpdater geoDistanceUpdater = new GeoDistanceUpdater(geoDistListeners);
+        geoDistanceUpdater.setPredicate(new ModePredicate(CommonValues.LEG_MODE_CAR));
+        AttributeChangeListenerComposite mutatorListenerComposite = new AttributeChangeListenerComposite();
+        mutatorListenerComposite.addComponent(geoDistanceUpdater);
+        mutatorListenerComposite.addComponent(odDistribution);
+        mutatorBuilder.setListener(mutatorListenerComposite);
         Mutator<? extends Attributable> mutator = mutatorBuilder.build();
 		/*
 		Setup the sampler.
@@ -193,6 +214,9 @@ public class Simulator {
                 output));
         engineListeners.addComponent(new HamiltonianLogger(meanDistLau2Term, logInterval, "MeanDistanceLAU2",
                 output));
+        engineListeners.addComponent(new HamiltonianLogger(odDistributionDelayed, logInterval, "ODCalibrator", output));
+        engineListeners.addComponent(new TransitionLogger(logInterval));
+        engineListeners.addComponent(odDistributionDelayed);
 
         sampler.setListener(engineListeners);
 
@@ -203,8 +227,8 @@ public class Simulator {
 
     private static UnivariatFrequency buildDistDistrTerm(Set<PlainPerson> refPersons, Set<PlainPerson>
             simPersons) {
-        Set<Attributable> refLegs = getLegs(refPersons);
-        Set<Attributable> simLegs = getLegs(simPersons);
+        Set<Attributable> refLegs = getCarLegs(refPersons);
+        Set<Attributable> simLegs = getCarLegs(simPersons);
 
         List<Double> values = new LegCollector(new NumericAttributeProvider(CommonKeys.LEG_GEO_DISTANCE)).collect(refPersons);
         double[] nativeValues = CollectionUtils.toNativeArray(values);
@@ -215,11 +239,14 @@ public class Simulator {
         return f;
     }
 
-    private static Set<Attributable> getLegs(Set<? extends Person> persons) {
+    private static Set<Attributable> getCarLegs(Set<? extends Person> persons) {
+        Predicate<Segment> carPredicate = new ModePredicate(CommonValues.LEG_MODE_CAR);
         Set<Attributable> legs = new HashSet<>();
         for (Person p : persons) {
             Episode e = p.getEpisodes().get(0);
-            legs.addAll(e.getLegs());
+            for(Segment leg : e.getLegs()) {
+                if(carPredicate.test(leg)) legs.add(leg);
+            }
         }
 
         return legs;
@@ -229,8 +256,8 @@ public class Simulator {
         copyLau2ClassAttribute(refPersons);
         copyLau2ClassAttribute(simPersons);
 
-        Set<Attributable> refLegs = getLegs(refPersons);
-        Set<Attributable> simLegs = getLegs(simPersons);
+        Set<Attributable> refLegs = getCarLegs(refPersons);
+        Set<Attributable> simLegs = getCarLegs(simPersons);
 
         Converters.register(MiDKeys.PERSON_LAU2_CLASS, DoubleConverter.getInstance());
         BivariatMean bm = new BivariatMean(refLegs, simLegs, MiDKeys.PERSON_LAU2_CLASS, CommonKeys.LEG_GEO_DISTANCE,

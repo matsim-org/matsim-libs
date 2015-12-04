@@ -223,7 +223,7 @@ public class PersonStopDistribution implements PopulationTask {
 					N - processed));
 		}
 
-		ProgressLogger.termiante();
+		ProgressLogger.terminate();
 	}
 
 }

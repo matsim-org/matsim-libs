@@ -45,7 +45,7 @@ public class ModalSplitPopDensity {
     public static final void main(String args[]) throws IOException {
         String outdir = "/home/johannes/gsv/miv-matrix/qs2013/";
         String matrixFile = "/home/johannes/gsv/miv-matrix/qs2013/matrix.txt";
-        String zoneFile = "/home/johannes/gsv/gis/nuts/ger/geojson/nuts3.psm.gk3.geojson";
+        String zoneFile = "/home/johannes/gsv/gis/zones/geojson/nuts3.psm.gk3.geojson";
         String inhabFile = "/home/johannes/gsv/miv-matrix/qs2013/inhabitants.csv";
 
         final KeyMatrix carVol = new KeyMatrix();
@@ -116,7 +116,7 @@ public class ModalSplitPopDensity {
             }
             ProgressLogger.step();
         }
-        ProgressLogger.termiante();
+        ProgressLogger.terminate();
 
         logger.info("Calculating averages...");
         keys = odCounts.keys();
