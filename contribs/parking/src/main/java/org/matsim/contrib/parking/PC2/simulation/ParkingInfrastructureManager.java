@@ -64,8 +64,7 @@ public class ParkingInfrastructureManager {
 	// TODO: later - to improve parformance, a second variable could be added,
 	// where full parking are put.
 	private QuadTree<PC2Parking> publicParkingsQuadTree;
-	
-	
+
 	private HashMap<String, QuadTree<PC2Parking>> publicParkingGroupQuadTrees;
 
 	// TODO: make private parking (attached to facility)
@@ -238,114 +237,126 @@ public class ParkingInfrastructureManager {
 		double distance = 300;
 		if (!parkingFound) {
 			Collection<PC2Parking> collection = getFilteredCollection(parkingOperationRequestAttributes, distance);
-			
-				while (collection.size() == 0) {
-					distance *= 2;
-					collection = getFilteredCollection(parkingOperationRequestAttributes, distance);
 
-					if (distance > 100000000) {
-						// stop infinite loop
-						DebugLib.stopSystemAndReportInconsistency(
-								"not enough public parking in scenario - introduce dummy parking to solve problem");
-					}
+			while (collection.size() == 0) {
+				distance *= 2;
+				collection = getFilteredCollection(parkingOperationRequestAttributes, distance);
 
+				if (distance > 100000000) {
+					// stop infinite loop
+					DebugLib.stopSystemAndReportInconsistency(
+							"not enough public parking in scenario - introduce dummy parking to solve problem");
 				}
 
-				// put parking that was found into a sorted queue:
-				PriorityQueue<SortableMapObject<PC2Parking>> queue = new PriorityQueue<SortableMapObject<PC2Parking>>();
-				for (PC2Parking parking : collection) {
+			}
+
+			// put parking that was found into a sorted queue:
+			PriorityQueue<SortableMapObject<PC2Parking>> queue = new PriorityQueue<SortableMapObject<PC2Parking>>();
+			for (PC2Parking parking : collection) {
+				double score = parkingScoreManager.calcScore(parkingOperationRequestAttributes.destCoordinate,
+						parkingOperationRequestAttributes.arrivalTime,
+						parkingOperationRequestAttributes.parkingDurationInSeconds, parking,
+						parkingOperationRequestAttributes.personId, parkingOperationRequestAttributes.legIndex, false);
+				queue.add(new SortableMapObject<PC2Parking>(parking, -1.0 * score)); // score made positive, so that priority queue works properly
+			}
+
+			// TODO: should I make MNL only on top 5 here?
+
+			// select the best one from the queue:
+			SortableMapObject<PC2Parking> poll = queue.peek();
+			finalScore = poll.getScore();
+			selectedParking = poll.getKey();
+
+			if (selectedParking instanceof RentableParking) {
+				DebugLib.emptyFunctionForSettingBreakPoint();
+			}
+
+			if (rentablePrivateParking.containsKey(parkingOperationRequestAttributes.personId)) {
+				RentableParking rentableParking = rentablePrivateParking
+						.get(parkingOperationRequestAttributes.personId);
+
+				if (rentableParking.getAvailableParkingCapacity() > 0) {
+
 					double score = parkingScoreManager.calcScore(parkingOperationRequestAttributes.destCoordinate,
 							parkingOperationRequestAttributes.arrivalTime,
-							parkingOperationRequestAttributes.parkingDurationInSeconds, parking,
+							parkingOperationRequestAttributes.parkingDurationInSeconds, rentableParking,
 							parkingOperationRequestAttributes.personId, parkingOperationRequestAttributes.legIndex,
-							false);
-					queue.add(new SortableMapObject<PC2Parking>(parking, -1.0 * score));
-				}
+							true);
 
-				// TODO: should I make MNL only on top 5 here?
-
-				// select the best one from the queue:
-				SortableMapObject<PC2Parking> poll = queue.peek();
-				finalScore = poll.getScore();
-				selectedParking = poll.getKey();
-
-				if (rentablePrivateParking.containsKey(parkingOperationRequestAttributes.personId)) {
-					RentableParking rentableParking = rentablePrivateParking
-							.get(parkingOperationRequestAttributes.personId);
-
-					if (rentableParking.getAvailableParkingCapacity() > 0) {
-
-						double score = parkingScoreManager.calcScore(parkingOperationRequestAttributes.destCoordinate,
-								parkingOperationRequestAttributes.arrivalTime,
-								parkingOperationRequestAttributes.parkingDurationInSeconds, rentableParking,
-								parkingOperationRequestAttributes.personId, parkingOperationRequestAttributes.legIndex,
-								true);
-
-						if (score > finalScore) {
-							selectedParking = rentableParking;
-						}
+					if (score > finalScore*-1) {
+						selectedParking = rentableParking;
 					}
 				}
+			}
 
-				// this puts the personId (!!!! yyyyyy) at the parking location:
-				parkedVehicles.put(parkingOperationRequestAttributes.personId, selectedParking.getId());
+			if (finalScore>0){
+				DebugLib.emptyFunctionForSettingBreakPoint();
+			}
+			
+			
+			if (selectedParking instanceof RentableParking) {
+				DebugLib.emptyFunctionForSettingBreakPoint();
+			}
 
-				// this tells the parking lot to decrease the number of
-				// available spaces:
-				parkVehicle(selectedParking);
+			// this puts the personId (!!!! yyyyyy) at the parking location:
+			parkedVehicles.put(parkingOperationRequestAttributes.personId, selectedParking.getId());
 
-				// PC2Parking closestParking =
-				// getPublicParkingQuadTree().get(parkingOperationRequestAttributes.destCoordinate.getX(),
-				// parkingOperationRequestAttributes.destCoordinate.getY());
-				// double distanceClosestParking =
-				// GeneralLib.getDistance(closestParking.getCoordinate(),
-				// parkingOperationRequestAttributes.destCoordinate);
+			// this tells the parking lot to decrease the number of
+			// available spaces:
+			parkVehicle(selectedParking);
 
-				// double distanceSelectedParking =
-				// GeneralLib.getDistance(selectedParking.getCoordinate(),
-				// parkingOperationRequestAttributes.destCoordinate);
-				//
-				// if (selectedParking.getId().toString().contains("stp") &&
-				// distanceSelectedParking>300) {
-				// DebugLib.emptyFunctionForSettingBreakPoint();
-				// }
-				//
-				// if (distanceSelectedParking > distanceClosestParking * 1.5 &&
-				// distanceSelectedParking > 200) {
-				// Id closestParkingId = closestParking.getId();
-				// Id selectedParkingId = selectedParking.getId();
-				//
-				// if (closestParkingId.toString().contains("stp") &&
-				// selectedParkingId.toString().contains("stp")) {
-				//
-				// for (Parking parking : collection) {
-				// if (parking.getId().toString().contains("stp")) {
-				// System.out.println(parking.getId()
-				// + "\t"
-				// + Math.round(GeneralLib.getDistance(parking.getCoordinate(),
-				// parkingOperationRequestAttributes.destCoordinate)));
-				// }
-				// }
-				//
-				// while (queue.size() > 0) {
-				// SortableMapObject<Parking> p = queue.poll();
-				// double costScore =
-				// parkingScoreManager.calcCostScore(parkingOperationRequestAttributes.arrivalTime,
-				// parkingOperationRequestAttributes.parkingDurationInSeconds,
-				// p.getKey(),
-				// parkingOperationRequestAttributes.personId);
-				// double walkScore =
-				// parkingScoreManager.calcWalkScore(parkingOperationRequestAttributes.destCoordinate,
-				// p.getKey(), parkingOperationRequestAttributes.personId,
-				// parkingOperationRequestAttributes.parkingDurationInSeconds);
-				// System.out.println(p.getKey().getId() + "\t" + p.getScore() +
-				// "\t" + costScore + "\t" + walkScore);
-				// }
-				//
-				// DebugLib.emptyFunctionForSettingBreakPoint();
-				// }
-				//
-				// }
+			// PC2Parking closestParking =
+			// getPublicParkingQuadTree().get(parkingOperationRequestAttributes.destCoordinate.getX(),
+			// parkingOperationRequestAttributes.destCoordinate.getY());
+			// double distanceClosestParking =
+			// GeneralLib.getDistance(closestParking.getCoordinate(),
+			// parkingOperationRequestAttributes.destCoordinate);
+
+			// double distanceSelectedParking =
+			// GeneralLib.getDistance(selectedParking.getCoordinate(),
+			// parkingOperationRequestAttributes.destCoordinate);
+			//
+			// if (selectedParking.getId().toString().contains("stp") &&
+			// distanceSelectedParking>300) {
+			// DebugLib.emptyFunctionForSettingBreakPoint();
+			// }
+			//
+			// if (distanceSelectedParking > distanceClosestParking * 1.5 &&
+			// distanceSelectedParking > 200) {
+			// Id closestParkingId = closestParking.getId();
+			// Id selectedParkingId = selectedParking.getId();
+			//
+			// if (closestParkingId.toString().contains("stp") &&
+			// selectedParkingId.toString().contains("stp")) {
+			//
+			// for (Parking parking : collection) {
+			// if (parking.getId().toString().contains("stp")) {
+			// System.out.println(parking.getId()
+			// + "\t"
+			// + Math.round(GeneralLib.getDistance(parking.getCoordinate(),
+			// parkingOperationRequestAttributes.destCoordinate)));
+			// }
+			// }
+			//
+			// while (queue.size() > 0) {
+			// SortableMapObject<Parking> p = queue.poll();
+			// double costScore =
+			// parkingScoreManager.calcCostScore(parkingOperationRequestAttributes.arrivalTime,
+			// parkingOperationRequestAttributes.parkingDurationInSeconds,
+			// p.getKey(),
+			// parkingOperationRequestAttributes.personId);
+			// double walkScore =
+			// parkingScoreManager.calcWalkScore(parkingOperationRequestAttributes.destCoordinate,
+			// p.getKey(), parkingOperationRequestAttributes.personId,
+			// parkingOperationRequestAttributes.parkingDurationInSeconds);
+			// System.out.println(p.getKey().getId() + "\t" + p.getScore() +
+			// "\t" + costScore + "\t" + walkScore);
+			// }
+			//
+			// DebugLib.emptyFunctionForSettingBreakPoint();
+			// }
+			//
+			// }
 		}
 
 		try {
@@ -370,18 +381,20 @@ public class ParkingInfrastructureManager {
 				parkingOperationRequestAttributes.destCoordinate.getX(),
 				parkingOperationRequestAttributes.destCoordinate.getY(), distance);
 
-				LinkedList<PC2Parking> deleteList=new LinkedList<>();
-		
-				for (PC2Parking parking:collection){
-					if (parking instanceof RentableParking){
-						RentableParking rp=(RentableParking) parking;
-						
-						if (!rp.isRentable(parkingOperationRequestAttributes.arrivalTime)){
-							deleteList.add(rp);
-						}
-					}
+		LinkedList<PC2Parking> deleteList = new LinkedList<>();
+
+		for (PC2Parking parking : collection) {
+			if (parking instanceof RentableParking) {
+				RentableParking rp = (RentableParking) parking;
+
+				if (!rp.isRentable(parkingOperationRequestAttributes.arrivalTime)) {
+					deleteList.add(rp);
+				} else {
+					DebugLib.emptyFunctionForSettingBreakPoint();
 				}
-				collection.removeAll(deleteList);
+			}
+		}
+		collection.removeAll(deleteList);
 		return collection;
 	}
 
@@ -481,7 +494,7 @@ public class ParkingInfrastructureManager {
 		double score = parkingScoreManager.calcScore(parkingOperationRequestAttributes.destCoordinate,
 				parkingOperationRequestAttributes.arrivalTime,
 				parkingOperationRequestAttributes.parkingDurationInSeconds, parking,
-				parkingOperationRequestAttributes.personId, parkingOperationRequestAttributes.legIndex,false);
+				parkingOperationRequestAttributes.personId, parkingOperationRequestAttributes.legIndex, false);
 		parkingScoreManager.addScore(parkingOperationRequestAttributes.personId, score);
 	}
 
