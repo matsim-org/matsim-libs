@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
-import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.vehicles.Vehicle;
@@ -40,7 +40,7 @@ import org.matsim.vehicles.Vehicle;
  *
  * @author mrieser
  */
-public class VolumesAnalyzer implements LinkLeaveEventHandler, Wait2LinkEventHandler {
+public class VolumesAnalyzer implements LinkLeaveEventHandler, VehicleEntersTrafficEventHandler {
 
 	private final static Logger log = Logger.getLogger(VolumesAnalyzer.class);
 	private final int timeBinSize;

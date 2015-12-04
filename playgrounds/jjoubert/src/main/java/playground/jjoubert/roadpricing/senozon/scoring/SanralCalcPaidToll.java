@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
-import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -44,7 +44,7 @@ import playground.jjoubert.roadpricing.senozon.SanralTollFactor;
  *
  * @author mrieser
  */
-public class SanralCalcPaidToll implements LinkEnterEventHandler, Wait2LinkEventHandler {
+public class SanralCalcPaidToll implements LinkEnterEventHandler, VehicleEntersTrafficEventHandler {
 
 	static class AgentInfo {
 		public double toll = 0.0;

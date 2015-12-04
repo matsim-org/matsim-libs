@@ -28,9 +28,9 @@ import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
-import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 
-public class DensityInfoCollector implements LinkEnterEventHandler, LinkLeaveEventHandler, Wait2LinkEventHandler{
+public class DensityInfoCollector implements LinkEnterEventHandler, LinkLeaveEventHandler, VehicleEntersTrafficEventHandler{
 
 	
 	public static void main(String[] args) {
@@ -64,11 +64,11 @@ public class DensityInfoCollector implements LinkEnterEventHandler, LinkLeaveEve
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		if (linkEntranceTime.get(event.getDriverId())==null){
+		if (linkEntranceTime.get(event.getVehicleId())==null){
 			return;
 		}
 		
-		double linkTravelTime=event.getTime() - linkEntranceTime.get(event.getDriverId());
+		double linkTravelTime=event.getTime() - linkEntranceTime.get(event.getVehicleId());
 		
 		System.out.println("link travel time:" + linkTravelTime);
 		
@@ -81,7 +81,7 @@ public class DensityInfoCollector implements LinkEnterEventHandler, LinkLeaveEve
 	
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		linkEntranceTime.put(event.getDriverId(), event.getTime());
+		linkEntranceTime.put(event.getVehicleId(), event.getTime());
 	}
 
 	@Override

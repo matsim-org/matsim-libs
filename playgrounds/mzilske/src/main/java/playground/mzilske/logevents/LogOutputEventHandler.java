@@ -42,7 +42,7 @@ import org.matsim.api.core.v01.events.handler.PersonMoneyEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
-import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.core.api.experimental.events.LaneEnterEvent;
 import org.matsim.core.api.experimental.events.LaneLeaveEvent;
 import org.matsim.contrib.signals.events.SignalGroupStateChangedEvent;
@@ -64,7 +64,7 @@ public class LogOutputEventHandler implements LinkEnterEventHandler, LinkLeaveEv
 	ActivityStartEventHandler, ActivityEndEventHandler, 
 	PersonDepartureEventHandler, PersonArrivalEventHandler, 
 	PersonMoneyEventHandler, PersonStuckEventHandler, 
-	Wait2LinkEventHandler,
+	VehicleEntersTrafficEventHandler,
 	LaneEnterEventHandler, LaneLeaveEventHandler,
 	SignalGroupStateChangedEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler,
 	VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler {

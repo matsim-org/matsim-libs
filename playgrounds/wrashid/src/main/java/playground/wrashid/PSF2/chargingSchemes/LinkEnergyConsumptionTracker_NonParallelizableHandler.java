@@ -23,10 +23,16 @@ package playground.wrashid.PSF2.chargingSchemes;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.parking.lib.GeneralLib;
+import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
+
 import playground.wrashid.PSF2.ParametersPSF2;
 import playground.wrashid.PSF2.vehicle.vehicleFleet.Vehicle;
 import playground.wrashid.lib.obj.TwoHashMapsConcatenated;
@@ -39,25 +45,28 @@ import playground.wrashid.lib.obj.TwoHashMapsConcatenated;
  * @author wrashid
  * 
  */
-public class LinkEnergyConsumptionTracker_NonParallelizableHandler implements LinkEnterEventHandler, LinkLeaveEventHandler {
+public class LinkEnergyConsumptionTracker_NonParallelizableHandler implements LinkEnterEventHandler, LinkLeaveEventHandler,
+VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
+	private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler() ;
 
 	// personId,linkId,timeOfLinkEnterance
 	TwoHashMapsConcatenated<Id, Id, Double> linkEntranceTime = new TwoHashMapsConcatenated<Id, Id, Double>();
 
 	@Override
 	public void reset(int iteration) {
+		this.delegate.reset(iteration) ;
 		linkEntranceTime = new TwoHashMapsConcatenated<Id, Id, Double>();
 	}
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		Id personId = event.getDriverId();
+		Id driverId = delegate.getDriverOfVehicle( event.getVehicleId() ) ;
 
 
         Link link = ParametersPSF2.controler.getScenario().getNetwork().getLinks().get(event.getLinkId());
-		Vehicle vehicle = ParametersPSF2.vehicles.getValue(event.getDriverId());
+		Vehicle vehicle = ParametersPSF2.vehicles.getValue(driverId);
 
-		Double linkEnteranceTime = linkEntranceTime.get(event.getDriverId(), event.getLinkId());
+		Double linkEnteranceTime = linkEntranceTime.get(driverId, event.getLinkId());
 		if (linkEnteranceTime != null) {
 			double timeSpendOnLink = GeneralLib.getIntervalDuration(linkEnteranceTime, event.getTime());
 			ParametersPSF2.energyStateMaintainer.processVehicleEnergyState(vehicle, timeSpendOnLink, link);
@@ -66,11 +75,16 @@ public class LinkEnergyConsumptionTracker_NonParallelizableHandler implements Li
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		Id personId = event.getDriverId();
-
-		
-		
-		linkEntranceTime.put(event.getDriverId(), event.getLinkId(), event.getTime());
+		Id driverId = delegate.getDriverOfVehicle( event.getVehicleId() ) ;
+		linkEntranceTime.put(driverId, event.getLinkId(), event.getTime());
+	}
+	@Override
+	public void handleEvent(VehicleEntersTrafficEvent event) {
+		this.delegate.handleEvent(event);
+	}
+	@Override
+	public void handleEvent(VehicleLeavesTrafficEvent event) {
+		this.delegate.handleEvent(event);
 	}
 
 }

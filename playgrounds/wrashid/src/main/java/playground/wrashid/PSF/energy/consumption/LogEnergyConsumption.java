@@ -5,12 +5,15 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
-import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 
 import java.util.HashMap;
 
@@ -21,11 +24,14 @@ import java.util.HashMap;
  * => we need to assign a different such curve to each agent (we need to put this attribute to the agent)
  * 
  */
-public class LogEnergyConsumption implements LinkEnterEventHandler, LinkLeaveEventHandler, Wait2LinkEventHandler {
+public class LogEnergyConsumption implements LinkEnterEventHandler, LinkLeaveEventHandler, VehicleEntersTrafficEventHandler,
+VehicleLeavesTrafficEventHandler {
 
 	private static final Logger log = Logger.getLogger(LogEnergyConsumption.class);
 	Controler controler;
 	HashMap<Id<Person>, EnergyConsumption> energyConsumption = new HashMap<>();
+	
+	private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler() ;	
 
 	/*
 	 * Register the time, when the vehicle entered the link (non-Javadoc)
@@ -34,7 +40,7 @@ public class LogEnergyConsumption implements LinkEnterEventHandler, LinkLeaveEve
 	 */
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		Id<Person> personId = event.getDriverId();
+		Id<Person> personId = delegate.getDriverOfVehicle( event.getVehicleId() ) ;
 
 		if (!energyConsumption.containsKey(personId)) {
 			energyConsumption.put(personId, new EnergyConsumption());
@@ -52,7 +58,7 @@ public class LogEnergyConsumption implements LinkEnterEventHandler, LinkLeaveEve
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		Id<Person> personId = event.getDriverId();
+		Id<Person> personId = delegate.getDriverOfVehicle( event.getVehicleId() ) ;
 
 		EnergyConsumption eConsumption = energyConsumption.get(personId);
 
@@ -84,6 +90,8 @@ public class LogEnergyConsumption implements LinkEnterEventHandler, LinkLeaveEve
 	 */
 	@Override
 	public void handleEvent(VehicleEntersTrafficEvent event) {
+		this.delegate.handleEvent(event);
+		
 		Id<Person> personId = event.getPersonId();
 		if (!energyConsumption.containsKey(personId)) {
 			energyConsumption.put(personId, new EnergyConsumption());
@@ -91,6 +99,11 @@ public class LogEnergyConsumption implements LinkEnterEventHandler, LinkLeaveEve
 		EnergyConsumption eConsumption = energyConsumption.get(personId);
 
 		eConsumption.setTempEnteranceTimeOfLastLink(event.getTime());
+	}
+
+	@Override
+	public void handleEvent(VehicleLeavesTrafficEvent event) {
+		this.delegate.handleEvent(event);
 	}
 
 }

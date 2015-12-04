@@ -43,7 +43,7 @@ import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonMoneyEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
-import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.utils.io.IOUtils;
@@ -51,7 +51,7 @@ import org.matsim.vehicles.Vehicle;
 
 public class EventWriterTXT implements EventWriter, ActivityEndEventHandler, ActivityStartEventHandler, PersonArrivalEventHandler, 
 		PersonDepartureEventHandler, PersonStuckEventHandler, PersonMoneyEventHandler, 
-		Wait2LinkEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler {
+		VehicleEntersTrafficEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler {
 	
 	/* Implement all the different event handlers by its own. Future event types will no longer be
 	 * suitable to be written to a TXT-format file, but will have additional attributes that need to be

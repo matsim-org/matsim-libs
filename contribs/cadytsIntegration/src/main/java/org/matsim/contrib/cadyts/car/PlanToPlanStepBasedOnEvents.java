@@ -34,7 +34,7 @@ import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
-import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -46,7 +46,7 @@ import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import cadyts.demand.PlanBuilder;
 
 public class PlanToPlanStepBasedOnEvents implements PlansTranslator<Link>, LinkLeaveEventHandler, 
-Wait2LinkEventHandler, VehicleLeavesTrafficEventHandler {
+VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 	
 	private static final Logger log = Logger.getLogger(PlanToPlanStepBasedOnEvents.class);
 

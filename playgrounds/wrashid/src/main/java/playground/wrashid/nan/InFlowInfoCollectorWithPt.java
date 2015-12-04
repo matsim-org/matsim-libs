@@ -26,11 +26,11 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
-import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 
 public class InFlowInfoCollectorWithPt implements LinkEnterEventHandler,
-		Wait2LinkEventHandler {
+		VehicleEntersTrafficEventHandler {
 
 	private int binSizeInSeconds; // set the length of interval
 

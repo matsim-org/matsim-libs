@@ -54,7 +54,7 @@ import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonMoneyEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
-import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.core.api.experimental.events.AgentWaitingForPtEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
@@ -293,7 +293,7 @@ public class EventsManagerImpl implements EventsManager {
 			((LinkEnterEventHandler)handler).handleEvent((LinkEnterEvent)ev);
 			return true;
 		} else if (klass == VehicleEntersTrafficEvent.class) {
-			((Wait2LinkEventHandler)handler).handleEvent((VehicleEntersTrafficEvent)ev);
+			((VehicleEntersTrafficEventHandler)handler).handleEvent((VehicleEntersTrafficEvent)ev);
 			return true;
 		} else if (klass == PersonArrivalEvent.class) {
 			((PersonArrivalEventHandler)handler).handleEvent((PersonArrivalEvent)ev);

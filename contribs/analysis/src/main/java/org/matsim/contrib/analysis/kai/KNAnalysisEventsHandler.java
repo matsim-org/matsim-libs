@@ -55,7 +55,7 @@ public class KNAnalysisEventsHandler implements
 PersonDepartureEventHandler, PersonArrivalEventHandler, 
 PersonMoneyEventHandler, 
 LinkLeaveEventHandler, LinkEnterEventHandler, 
-PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler, Wait2LinkEventHandler, VehicleLeavesTrafficEventHandler {
+PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 
 	private final static Logger log = Logger.getLogger(KNAnalysisEventsHandler.class);
 

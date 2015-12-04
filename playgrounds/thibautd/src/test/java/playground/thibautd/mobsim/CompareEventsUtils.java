@@ -37,7 +37,7 @@ import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
-import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.core.api.experimental.events.AgentWaitingForPtEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
@@ -175,7 +175,7 @@ public class CompareEventsUtils {
 	}
 
 	private static class EventStreamComparator implements
-			LinkEnterEventHandler, LinkLeaveEventHandler, Wait2LinkEventHandler,
+			LinkEnterEventHandler, LinkLeaveEventHandler, VehicleEntersTrafficEventHandler,
 			VehicleLeavesTrafficEventHandler,
 			PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler,
 			TransitDriverStartsEventHandler, AgentWaitingForPtEventHandler,

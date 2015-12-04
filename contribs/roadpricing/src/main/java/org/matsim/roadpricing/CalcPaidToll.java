@@ -33,7 +33,7 @@ import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
-import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
@@ -50,7 +50,7 @@ import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
  *
  * @author mrieser
  */
-public class CalcPaidToll implements LinkEnterEventHandler, Wait2LinkEventHandler, VehicleLeavesTrafficEventHandler {
+public class CalcPaidToll implements LinkEnterEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 
 	Logger log = Logger.getLogger( CalcPaidToll.class ) ;
 

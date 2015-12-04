@@ -63,7 +63,7 @@ import java.util.concurrent.CyclicBarrier;
  */
 public class TravelTimeCollector implements TravelTime,
 		LinkEnterEventHandler, LinkLeaveEventHandler, PersonStuckEventHandler,
-		VehicleLeavesTrafficEventHandler, Wait2LinkEventHandler,
+		VehicleLeavesTrafficEventHandler, VehicleEntersTrafficEventHandler,
 		MobsimInitializedListener, MobsimBeforeSimStepListener, MobsimAfterSimStepListener,
 		MobsimBeforeCleanupListener {
 

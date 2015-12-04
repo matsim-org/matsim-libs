@@ -120,16 +120,16 @@ public class PPSim implements Mobsim {
 				
 				for (int i=1;i<linkIds.size()-1;i++){
 					Id linkId = linkIds.get(i);
-					event=new LinkEnterEvent(time,personId,linkId,personId);
+					event=new LinkEnterEvent(time,personId,linkId);
 					eventsManager.processEvent(event);
 					time+=getTravelTime(time, linkId);
-					event=new LinkLeaveEvent(time,personId,linkId,personId);
+					event=new LinkLeaveEvent(time,personId,linkId);
 					eventsManager.processEvent(event);
 				}
 			}
 			
 			Id endLinkId = leg.getRoute().getEndLinkId();
-			event=new LinkEnterEvent(time,personId,endLinkId,personId);
+			event=new LinkEnterEvent(time,personId,endLinkId);
 			eventsManager.processEvent(event);
 			time+=getTravelTime(time, endLinkId);
 			event = new PersonArrivalEvent(time, personId, endLinkId , leg.getMode());

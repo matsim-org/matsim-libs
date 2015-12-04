@@ -33,7 +33,7 @@ import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
-import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LaneEnterEvent;
@@ -287,7 +287,7 @@ public class MixedLaneTest {
 
 
 	private static class MixedLanesEventsHandler implements LaneEnterEventHandler, LinkEnterEventHandler, 
-		LaneLeaveEventHandler, PersonDepartureEventHandler, Wait2LinkEventHandler {
+		LaneLeaveEventHandler, PersonDepartureEventHandler, VehicleEntersTrafficEventHandler {
 
 		LaneEnterEvent lastLane1olEnterEvent = null;
 		LaneLeaveEvent lastLane1olLeaveEvent = null;

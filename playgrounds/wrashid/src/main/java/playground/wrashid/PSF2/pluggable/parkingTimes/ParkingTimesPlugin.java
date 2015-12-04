@@ -28,15 +28,18 @@ import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
-import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.obj.LinkedListValueHashMap;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 
 
 /**
@@ -52,8 +55,10 @@ import org.matsim.core.controler.Controler;
  * 
  */
 
-public class ParkingTimesPlugin implements Wait2LinkEventHandler, PersonArrivalEventHandler, LinkEnterEventHandler,
-		ActivityStartEventHandler {
+public class ParkingTimesPlugin implements VehicleEntersTrafficEventHandler, PersonArrivalEventHandler, LinkEnterEventHandler,
+		ActivityStartEventHandler, VehicleLeavesTrafficEventHandler {
+	
+	Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler() ;
 
 	// agent Id, linked list of parkingInterval
 	LinkedListValueHashMap<Id<Person>, ParkingIntervalInfo> parkingTimeIntervals;
@@ -116,6 +121,7 @@ public class ParkingTimesPlugin implements Wait2LinkEventHandler, PersonArrivalE
 
 	@Override
 	public void reset(int iteration) {
+		delegate.reset( iteration );
 		parkingTimeIntervals = new LinkedListValueHashMap<>();
 		lastLinkEntered = new HashMap<>();
 	}
@@ -170,11 +176,13 @@ public class ParkingTimesPlugin implements Wait2LinkEventHandler, PersonArrivalE
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		lastLinkEntered.put(event.getDriverId(), event.getLinkId());
+		Id<Person> driverId = delegate.getDriverOfVehicle( event.getVehicleId() ) ; 
+		lastLinkEntered.put(driverId, event.getLinkId());
 	}
 
 	@Override
 	public void handleEvent(VehicleEntersTrafficEvent event) {
+		this.delegate.handleEvent(event);
 		if (leavingFirstParking(event.getPersonId())) {
 			initializeParkingTimeIntervalsForPerson(event.getPersonId(), event.getLinkId());
 		}
@@ -204,6 +212,10 @@ public class ParkingTimesPlugin implements Wait2LinkEventHandler, PersonArrivalE
 	@Override
 	public void handleEvent(ActivityStartEvent event) {
 		setActTypeOfParkingInterval(event);
+	}
+	@Override
+	public void handleEvent(VehicleLeavesTrafficEvent event) {
+		this.delegate.handleEvent(event);
 	}
 
 }

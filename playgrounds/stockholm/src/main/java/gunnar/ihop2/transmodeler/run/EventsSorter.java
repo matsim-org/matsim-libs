@@ -22,7 +22,7 @@ import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
-import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
@@ -35,7 +35,7 @@ import org.matsim.core.events.algorithms.EventWriterXML;
  */
 public class EventsSorter implements ActivityEndEventHandler,
 		PersonDepartureEventHandler, PersonEntersVehicleEventHandler,
-		Wait2LinkEventHandler, LinkLeaveEventHandler, LinkEnterEventHandler,
+		VehicleEntersTrafficEventHandler, LinkLeaveEventHandler, LinkEnterEventHandler,
 		VehicleLeavesTrafficEventHandler, PersonLeavesVehicleEventHandler,
 		PersonArrivalEventHandler, ActivityStartEventHandler {
 

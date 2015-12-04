@@ -28,16 +28,20 @@ import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
-import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 import org.matsim.contrib.parking.lib.obj.LinkedListValueHashMap;
+import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 
 
 /**
@@ -50,8 +54,10 @@ import org.matsim.contrib.parking.lib.obj.LinkedListValueHashMap;
  * @author wrashid
  * 
  */
-public class EnergyConsumptionPlugin implements LinkEnterEventHandler, LinkLeaveEventHandler, Wait2LinkEventHandler,
-		PersonArrivalEventHandler {
+public class EnergyConsumptionPlugin implements LinkEnterEventHandler, LinkLeaveEventHandler, VehicleEntersTrafficEventHandler,
+		PersonArrivalEventHandler, VehicleLeavesTrafficEventHandler {
+	
+	Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler() ;
 
 	private EnergyConsumptionModelLAV_v1 energyConsumptionModel;
 
@@ -102,6 +108,7 @@ public class EnergyConsumptionPlugin implements LinkEnterEventHandler, LinkLeave
 
 	@Override
 	public void reset(int iteration) {
+		this.delegate.reset(iteration);
 		timeOfEnteringOrWaitingToEnterCurrentLink = new HashMap<Id, Double>();
 		energyConsumptionOfCurrentLeg = new DoubleValueHashMap<Id>();
 		energyConsumptionOfLegs = new LinkedListValueHashMap<Id, Double>();
@@ -110,13 +117,15 @@ public class EnergyConsumptionPlugin implements LinkEnterEventHandler, LinkLeave
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		logLinkEnteranceTime(event.getDriverId(), event.getTime());
+		Id<Person> driverId = delegate.getDriverOfVehicle( event.getVehicleId() ) ;
+		logLinkEnteranceTime(driverId, event.getTime());
 
-		lastLinkEntered.put(event.getDriverId(), event.getLinkId());
+		lastLinkEntered.put(driverId, event.getLinkId());
 	}
 
 	@Override
 	public void handleEvent(VehicleEntersTrafficEvent event) {
+		this.delegate.handleEvent(event);
 		logLinkEnteranceTime(event.getPersonId(), event.getTime());
 	}
 
@@ -126,7 +135,9 @@ public class EnergyConsumptionPlugin implements LinkEnterEventHandler, LinkLeave
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		updateEnergyConsumptionOfLeg(event.getDriverId(), event.getTime(), event.getLinkId());
+		Id<Person> driverId = delegate.getDriverOfVehicle( event.getVehicleId() ) ;
+		
+		updateEnergyConsumptionOfLeg(driverId, event.getTime(), event.getLinkId());
 	}
 
 	@Override
@@ -270,5 +281,9 @@ public class EnergyConsumptionPlugin implements LinkEnterEventHandler, LinkLeave
 
 	public void writeOutputLog(String outputFileName) {
 		GeneralLib.writeList(outputLogEnergyConsumptionPerLink, outputFileName);
+	}
+	@Override
+	public void handleEvent(VehicleLeavesTrafficEvent event) {
+		this.delegate.handleEvent(event);
 	}
 }

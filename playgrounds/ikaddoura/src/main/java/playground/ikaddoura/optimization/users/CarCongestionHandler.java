@@ -39,7 +39,7 @@ import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
-import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
@@ -53,7 +53,7 @@ import org.matsim.vehicles.Vehicle;
  *
  */
 public class CarCongestionHandler implements TransitDriverStartsEventHandler, LinkLeaveEventHandler, LinkEnterEventHandler, PersonDepartureEventHandler, 
-Wait2LinkEventHandler, VehicleLeavesTrafficEventHandler {
+VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 
 	private final static Logger log = Logger.getLogger(CarCongestionHandler.class);
 	private final Network network;

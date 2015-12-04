@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
-import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.LaneEnterEvent;
@@ -48,7 +48,7 @@ import org.matsim.lanes.data.v20.Lanes;
  *
  */
 public class DgSensorManager implements LinkEnterEventHandler, LinkLeaveEventHandler, 
-	VehicleLeavesTrafficEventHandler, Wait2LinkEventHandler, LaneEnterEventHandler, LaneLeaveEventHandler{
+	VehicleLeavesTrafficEventHandler, VehicleEntersTrafficEventHandler, LaneEnterEventHandler, LaneLeaveEventHandler{
 
 	private static final Logger log = Logger.getLogger(DgSensorManager.class);
 	

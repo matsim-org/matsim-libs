@@ -23,7 +23,7 @@ import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
-import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
@@ -37,7 +37,7 @@ import org.matsim.core.utils.charts.XYScatterChart;
 import org.matsim.core.config.ConfigUtils;
 import org.xml.sax.SAXException;
 
-public class TimeSpaceDistribution implements LinkEnterEventHandler, LinkLeaveEventHandler, Wait2LinkEventHandler, PersonArrivalEventHandler, PersonStuckEventHandler {
+public class TimeSpaceDistribution implements LinkEnterEventHandler, LinkLeaveEventHandler, VehicleEntersTrafficEventHandler, PersonArrivalEventHandler, PersonStuckEventHandler {
 	
 	public static double TIME_INTERVAL;
 	public final static long millisSingapore = 27000000;

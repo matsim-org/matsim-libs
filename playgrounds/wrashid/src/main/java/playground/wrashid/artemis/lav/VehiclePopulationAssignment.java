@@ -6,8 +6,13 @@ import java.util.PriorityQueue;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
@@ -17,6 +22,7 @@ import org.matsim.contrib.parking.lib.obj.list.Lists;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.core.scenario.MutableScenario;
 
 
@@ -256,7 +262,11 @@ public class VehiclePopulationAssignment {
 	}
 
 
-	private static class TotalLengthOfAllCarLegsInDay implements LinkLeaveEventHandler{
+	private static class TotalLengthOfAllCarLegsInDay implements LinkLeaveEventHandler,
+	VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
+		private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler() ;
+		
+		
 		public DoubleValueHashMap<Id> totalTripLengths=new DoubleValueHashMap<Id>();
 		private final Network network;
 		
@@ -266,12 +276,22 @@ public class VehiclePopulationAssignment {
 		
 		@Override
 		public void reset(int iteration) {
-			// TODO Auto-generated method stub
+			this.delegate.reset(iteration);
 		}
 
 		@Override
 		public void handleEvent(LinkLeaveEvent event) {
-			totalTripLengths.incrementBy(event.getDriverId(), network.getLinks().get(event.getLinkId()).getLength());
+			Id<Person> driverId = this.delegate.getDriverOfVehicle( event.getVehicleId() ) ;
+			
+			totalTripLengths.incrementBy(driverId, network.getLinks().get(event.getLinkId()).getLength());
+		}
+
+		public void handleEvent(VehicleEntersTrafficEvent event) {
+			this.delegate.handleEvent(event);
+		}
+
+		public void handleEvent(VehicleLeavesTrafficEvent event) {
+			this.delegate.handleEvent(event);
 		}
 	}
 	

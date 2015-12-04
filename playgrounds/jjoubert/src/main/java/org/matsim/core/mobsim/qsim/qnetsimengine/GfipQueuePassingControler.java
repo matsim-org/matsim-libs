@@ -41,7 +41,7 @@ import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
-import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.NetworkWriter;
@@ -364,7 +364,7 @@ public class GfipQueuePassingControler {
 	
 
 	private static class LinkCounter implements LinkEnterEventHandler, LinkLeaveEventHandler, 
-	Wait2LinkEventHandler, PersonArrivalEventHandler,
+	VehicleEntersTrafficEventHandler, PersonArrivalEventHandler,
 	IterationEndsListener, MobsimInitializedListener, MobsimBeforeCleanupListener{
 		private final Logger log = Logger.getLogger(LinkCounter.class);
 		private final QueueType queueType;

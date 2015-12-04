@@ -40,7 +40,7 @@ import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
-import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
@@ -65,7 +65,7 @@ public final class SimpleTripAnalyzer extends AbstractPersonAlgorithm
 								implements LinkLeaveEventHandler,
 										PersonArrivalEventHandler,
 										PersonDepartureEventHandler, 
-										PersonStuckEventHandler, Wait2LinkEventHandler, VehicleLeavesTrafficEventHandler {
+										PersonStuckEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 
 	@SuppressWarnings("unused")
 	private static final Logger log = Logger

@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
-import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
@@ -75,7 +75,7 @@ public class SignalsMixedLaneTest {
 		Assert.assertTrue(handler.hasCollectedLink3Event );
 	}
 
-	private static class MixedLanesEventsHandler implements Wait2LinkEventHandler, LinkEnterEventHandler {
+	private static class MixedLanesEventsHandler implements VehicleEntersTrafficEventHandler, LinkEnterEventHandler {
 
 		boolean hasCollectedLink3Event = false;
 		boolean hasCollectedLink2Event = false;

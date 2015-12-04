@@ -33,12 +33,18 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
@@ -52,7 +58,10 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.ActivityFacility;
 // events werden während sim step geschmissen, aftermobsimstep kommt nachher.
 public class ParkingAgentsTracker implements LinkEnterEventHandler, PersonArrivalEventHandler, PersonDepartureEventHandler,
-		MobsimInitializedListener, MobsimAfterSimStepListener {
+		MobsimInitializedListener, MobsimAfterSimStepListener, VehicleEntersTrafficEventHandler, 
+		VehicleLeavesTrafficEventHandler {
+	
+	private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler() ;
 
 	private final Scenario scenario;
 	private final double distance;
@@ -166,10 +175,12 @@ public class ParkingAgentsTracker implements LinkEnterEventHandler, PersonArriva
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		if (carLegAgents.contains(event.getDriverId())) {
-			if (!searchingAgents.contains(event.getDriverId())) {
+		Id<Person> driverId = delegate.getDriverOfVehicle( event.getVehicleId() ) ;
+		
+		if (carLegAgents.contains(driverId)) {
+			if (!searchingAgents.contains(driverId)) {
 				Coord coord = scenario.getNetwork().getLinks().get(event.getLinkId()).getCoord();
-				ActivityFacility facility = nextActivityFacilityMap.get(event.getDriverId());
+				ActivityFacility facility = nextActivityFacilityMap.get(driverId);
 				double distanceToNextActivity = CoordUtils.calcDistance(facility.getCoord(), coord);
 
 				/*
@@ -181,13 +192,13 @@ public class ParkingAgentsTracker implements LinkEnterEventHandler, PersonArriva
 				 */
 				
 				if (shouldStartSearchParking(event.getLinkId(), facility.getLinkId(), distanceToNextActivity)) {
-					searchingAgents.add(event.getDriverId());
-					linkEnteredAgents.add(event.getDriverId());
+					searchingAgents.add(driverId);
+					linkEnteredAgents.add(driverId);
 				}
 			}
 			// the agent is already searching: update its position
 			else {
-				linkEnteredAgents.add(event.getDriverId());
+				linkEnteredAgents.add(driverId);
 			}
 		}
 	}
@@ -198,6 +209,7 @@ public class ParkingAgentsTracker implements LinkEnterEventHandler, PersonArriva
 
 	@Override
 	public void reset(int iteration) {
+		delegate.reset(iteration);
 		agents.clear();
 		carLegAgents.clear();
 		searchingAgents.clear();
@@ -205,6 +217,16 @@ public class ParkingAgentsTracker implements LinkEnterEventHandler, PersonArriva
 		selectedParkingsMap.clear();
 		nextActivityFacilityMap.clear();
 		lastTimeStepsLinkEnteredAgents.clear();
+	}
+
+	@Override
+	public void handleEvent(VehicleEntersTrafficEvent event) {
+		this.delegate.handleEvent(event);
+	}
+
+	@Override
+	public void handleEvent(VehicleLeavesTrafficEvent event) {
+		this.delegate.handleEvent(event);
 	}
 
 }

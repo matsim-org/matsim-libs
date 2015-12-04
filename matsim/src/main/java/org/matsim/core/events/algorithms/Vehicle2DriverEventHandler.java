@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
-import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.vehicles.Vehicle;
 
@@ -38,7 +38,7 @@ import org.matsim.vehicles.Vehicle;
  * 
  * @author tthunig
  */
-public final class Vehicle2DriverEventHandler implements Wait2LinkEventHandler, VehicleLeavesTrafficEventHandler {
+public final class Vehicle2DriverEventHandler implements VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 
 	private final Map<Id<Vehicle>, Id<Person>> driverAgents = new HashMap<>();
 	

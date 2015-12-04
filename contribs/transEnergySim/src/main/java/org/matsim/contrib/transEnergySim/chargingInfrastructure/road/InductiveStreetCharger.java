@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
-import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
@@ -58,7 +58,7 @@ import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
  * 
  */
 public class InductiveStreetCharger implements PersonDepartureEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler,
-		PersonArrivalEventHandler, StartupListener, Wait2LinkEventHandler, VehicleLeavesTrafficEventHandler {
+		PersonArrivalEventHandler, StartupListener, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 
 	private DoubleValueHashMap<Id<Link>> chargableStreets;
 	private ChargingOutputLog log;

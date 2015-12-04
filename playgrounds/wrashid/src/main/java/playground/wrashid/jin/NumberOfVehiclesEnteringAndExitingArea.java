@@ -13,6 +13,8 @@ import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.network.Network;
@@ -22,6 +24,7 @@ import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.api.core.v01.events.handler.*;
 
 public class NumberOfVehiclesEnteringAndExitingArea {
@@ -62,7 +65,10 @@ public class NumberOfVehiclesEnteringAndExitingArea {
 	}
 
 	private static class IndividualUserHandler
-			implements LinkEnterEventHandler, PersonArrivalEventHandler, PersonDepartureEventHandler {
+			implements LinkEnterEventHandler, PersonArrivalEventHandler, PersonDepartureEventHandler,
+			VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
+		private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler() ;
+		
 		HashMap<Id<Person>, ParkingAgentEvent> parkingAgentEvent = new HashMap<>();
 
 		LinkedList<ParkingAgentEvent> completedEvents = new LinkedList<>();
@@ -105,7 +111,7 @@ public class NumberOfVehiclesEnteringAndExitingArea {
 
 		@Override
 		public void reset(int iteration) {
-
+			this.delegate.reset(iteration);
 		}
 
 		@Override
@@ -151,18 +157,20 @@ public class NumberOfVehiclesEnteringAndExitingArea {
 
 		@Override
 		public void handleEvent(LinkEnterEvent event) {
+			Id<Person> driverId = this.delegate.getDriverOfVehicle( event.getVehicleId() ) ;
+			
 			Coord linkCoord = network.getLinks().get(event.getLinkId()).getCoord();
 			if (isInArea(linkCoord)) {
-				if (!areaEnterTime.containsKey(event.getDriverId())) {
-					areaEnterTime.put(event.getDriverId(), event.getTime());
+				if (!areaEnterTime.containsKey(driverId)) {
+					areaEnterTime.put(driverId, event.getTime());
 				}
-			} else if (parkingAgentEvent.containsKey(event.getDriverId())) {
+			} else if (parkingAgentEvent.containsKey(driverId)) {
 				// leaving area
-				ParkingAgentEvent pae = parkingAgentEvent.get(event.getDriverId());
+				ParkingAgentEvent pae = parkingAgentEvent.get(driverId);
 				pae.leaveAreaTime = event.getTime();
 				completedEvents.add(pae);
-				parkingAgentEvent.remove(event.getDriverId());
-				areaEnterTime.remove(event.getDriverId());
+				parkingAgentEvent.remove(driverId);
+				areaEnterTime.remove(driverId);
 			}
 		}
 
@@ -185,9 +193,20 @@ public class NumberOfVehiclesEnteringAndExitingArea {
 			double leaveAreaTime;
 		}
 
+		@Override
+		public void handleEvent(VehicleEntersTrafficEvent event) {
+			this.delegate.handleEvent(event);
+		}
+		@Override
+		public void handleEvent(VehicleLeavesTrafficEvent event) {
+			this.delegate.handleEvent(event);
+		}
+
 	}
 
-	private static class AreaHandler implements ActivityEndEventHandler, LinkEnterEventHandler {
+	private static class AreaHandler implements ActivityEndEventHandler, LinkEnterEventHandler,
+	VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
+		private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler() ;
 
 		int binSizeInSeconds = 60;
 		int arraySize = 200 * 60 * 60 / binSizeInSeconds;
@@ -231,25 +250,27 @@ public class NumberOfVehiclesEnteringAndExitingArea {
 
 		@Override
 		public void handleEvent(LinkEnterEvent event) {
+			Id<Person> driverId = delegate.getDriverOfVehicle( event.getVehicleId() ) ;
+			
 			Coord linkCoord = network.getLinks().get(event.getLinkId()).getCoord();
 
 			// leaving area
-			if (vehicleInArea.contains(event.getDriverId()) && !isInArea(linkCoord)) {
+			if (vehicleInArea.contains(driverId) && !isInArea(linkCoord)) {
 				outFlow[(int) Math.round(event.getTime() / binSizeInSeconds)]++;
 				// output.add(Math.round(event.getTime()) + "\t" + "-1");
 			}
 
 			// entering area
-			if (!vehicleInArea.contains(event.getDriverId()) && isInArea(linkCoord)) {
+			if (!vehicleInArea.contains(driverId) && isInArea(linkCoord)) {
 				inFlow[(int) Math.round(event.getTime() / binSizeInSeconds)]++;
 				// output.add(Math.round(event.getTime()) + "\t" + "+1");
 			}
 
 			// update vehicleInArea
 			if (isInArea(linkCoord)) {
-				vehicleInArea.add(event.getDriverId());
+				vehicleInArea.add(driverId);
 			} else {
-				vehicleInArea.remove(event.getDriverId());
+				vehicleInArea.remove(driverId);
 			}
 		}
 
@@ -261,6 +282,14 @@ public class NumberOfVehiclesEnteringAndExitingArea {
 			} else {
 				vehicleInArea.remove(event.getPersonId());
 			}
+		}
+		@Override
+		public void handleEvent(VehicleEntersTrafficEvent event) {
+			this.delegate.handleEvent(event);
+		}
+		@Override
+		public void handleEvent(VehicleLeavesTrafficEvent event) {
+			this.delegate.handleEvent(event);
 		}
 	}
 

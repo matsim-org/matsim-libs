@@ -7,16 +7,22 @@ import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
-import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.parking.lib.obj.TwoKeyHashMapWithDouble;
+import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 
 
 public abstract class AbstractDualSimHandler implements LinkLeaveEventHandler,
 		LinkEnterEventHandler, PersonArrivalEventHandler,
-		Wait2LinkEventHandler {
+		VehicleEntersTrafficEventHandler , VehicleLeavesTrafficEventHandler {
+	
+	Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler() ;
 
 	public abstract boolean isJDEQSim();
 
@@ -32,19 +38,21 @@ public abstract class AbstractDualSimHandler implements LinkLeaveEventHandler,
 
 	@Override
 	public void reset(int iteration) {
-
+		this.delegate.reset(iteration);
 	}
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
+		Id<Person> driverId = delegate.getDriverOfVehicle( event.getVehicleId() ) ;
+		
 		if (isLinkPartOfStudyArea(event.getLinkId())) {
-			if (agentsTravellingOnLinks.contains(event.getDriverId())) {
-				processLeaveLink(event.getLinkId(), event.getDriverId(),
-						linkEnterTime.get(event.getLinkId(), event.getDriverId()), event.getTime());
+			if (agentsTravellingOnLinks.contains(driverId)) {
+				processLeaveLink(event.getLinkId(), driverId,
+						linkEnterTime.get(event.getLinkId(), driverId), event.getTime());
 			}
 		}
-		agentsTravellingOnLinks.remove(event.getDriverId());
-		linkEnterTime.removeValue(event.getLinkId(), event.getDriverId());
+		agentsTravellingOnLinks.remove(driverId);
+		linkEnterTime.removeValue(event.getLinkId(), driverId);
 	}
 
 	@Override
@@ -63,13 +71,15 @@ public abstract class AbstractDualSimHandler implements LinkLeaveEventHandler,
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		agentsTravellingOnLinks.add(event.getDriverId());
-		linkEnterTime.put(event.getLinkId(), event.getDriverId(),
+		Id<Person> driverId = delegate.getDriverOfVehicle( event.getVehicleId() ) ;
+		agentsTravellingOnLinks.add(driverId);
+		linkEnterTime.put(event.getLinkId(), driverId,
 				event.getTime());
 	}
 
 	@Override
 	public void handleEvent(VehicleEntersTrafficEvent event) {
+		this.delegate.handleEvent(event);
 		if (isJDEQSim()) {
 			agentsTravellingOnLinks.add(event.getPersonId());
 			linkEnterTime.put(event.getLinkId(), event.getPersonId(),
@@ -77,5 +87,9 @@ public abstract class AbstractDualSimHandler implements LinkLeaveEventHandler,
 		} else {
 			agentsTravellingOnLinks.remove(event.getPersonId());
 		}
+	}
+	@Override
+	public void handleEvent(VehicleLeavesTrafficEvent event) {
+		this.delegate.handleEvent(event);
 	}
 }

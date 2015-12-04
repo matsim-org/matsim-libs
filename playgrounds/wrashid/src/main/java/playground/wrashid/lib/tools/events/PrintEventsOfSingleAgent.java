@@ -18,7 +18,7 @@ import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonMoneyEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
-import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsReaderXMLv1;
@@ -50,7 +50,7 @@ public class PrintEventsOfSingleAgent {
 	
 	private static class SingleAgentEventsPrinter implements ActivityEndEventHandler, ActivityStartEventHandler, PersonArrivalEventHandler, 
 	PersonDepartureEventHandler, PersonStuckEventHandler, PersonMoneyEventHandler, 
-	Wait2LinkEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler{
+	VehicleEntersTrafficEventHandler /*, LinkEnterEventHandler, LinkLeaveEventHandler*/{
 
 		private final Id<Person> filterEventsForAgentId;
 
@@ -64,20 +64,20 @@ public class PrintEventsOfSingleAgent {
 			
 		}
 
-		@Override
-		public void handleEvent(LinkLeaveEvent event) {
-			if (event.getDriverId().equals(filterEventsForAgentId)){
-				System.out.println(event.toString());
-			}
-		}
-
-
-		@Override
-		public void handleEvent(LinkEnterEvent event) {
-			if (event.getDriverId().equals(filterEventsForAgentId)){
-				System.out.println(event.toString());
-			}
-		}
+//		@Override
+//		public void handleEvent(LinkLeaveEvent event) {
+//			if (event.getDriverId().equals(filterEventsForAgentId)){
+//				System.out.println(event.toString());
+//			}
+//		}
+//
+//
+//		@Override
+//		public void handleEvent(LinkEnterEvent event) {
+//			if (event.getDriverId().equals(filterEventsForAgentId)){
+//				System.out.println(event.toString());
+//			}
+//		}
 
 		@Override
 		public void handleEvent(VehicleEntersTrafficEvent event) {

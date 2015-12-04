@@ -10,7 +10,7 @@ import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
-import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.LaneEnterEvent;
 import org.matsim.core.api.experimental.events.LaneLeaveEvent;
@@ -19,7 +19,7 @@ import org.matsim.core.api.experimental.events.handler.LaneLeaveEventHandler;
 import org.matsim.lanes.data.v20.Lane;
 
 class LaneTestEventHandler implements LaneEnterEventHandler,
-		LaneLeaveEventHandler, Wait2LinkEventHandler , LinkEnterEventHandler,/*  LinkLeaveEventHandler,
+		LaneLeaveEventHandler, VehicleEntersTrafficEventHandler , LinkEnterEventHandler,/*  LinkLeaveEventHandler,
 		PersonDepartureEventHandler,*/ PersonArrivalEventHandler {
 
 	Map<Id<Person>,Double> departureTimes = new HashMap<Id<Person>, Double>();

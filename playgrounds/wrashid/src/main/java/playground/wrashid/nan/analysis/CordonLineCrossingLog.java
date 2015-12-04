@@ -6,8 +6,12 @@ import java.util.LinkedList;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.contrib.parking.lib.GeneralLib;
@@ -16,6 +20,7 @@ import org.matsim.contrib.parking.lib.obj.list.Lists;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.core.scenario.MutableScenario;
 
 
@@ -42,7 +47,10 @@ public class CordonLineCrossingLog {
 		
 	}
 	
-	private static class CordonVolumeCounter implements LinkEnterEventHandler, PersonDepartureEventHandler {
+	private static class CordonVolumeCounter implements LinkEnterEventHandler, PersonDepartureEventHandler,
+	VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler
+	{
+			private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler() ;
 
 		IntegerValueHashMap<Id> currentLegIndex=new IntegerValueHashMap<Id>(-1);
 		private MutableScenario scenarioImpl;
@@ -58,13 +66,12 @@ public class CordonLineCrossingLog {
 
 		@Override
 		public void reset(int iteration) {
-			// TODO Auto-generated method stub
-			
+			delegate.reset(iteration);
 		}
 
 		@Override
 		public void handleEvent(LinkEnterEvent event) {
-			Id personId = event.getDriverId();
+			Id personId = delegate.getDriverOfVehicle( event.getVehicleId() ) ;
 			Coord prevLink=previousLinkCoordinate.get(personId);
 			Coord curLink=getLinkCoordinate(event.getLinkId());
 			
@@ -108,6 +115,14 @@ public class CordonLineCrossingLog {
 		
 		private Coord getLinkCoordinate(Id linkId){
 			return scenarioImpl.getNetwork().getLinks().get(linkId).getCoord();
+		}
+
+		public void handleEvent(VehicleEntersTrafficEvent event) {
+			this.delegate.handleEvent(event);
+		}
+
+		public void handleEvent(VehicleLeavesTrafficEvent event) {
+			this.delegate.handleEvent(event);
 		}
 		
 	}

@@ -10,7 +10,7 @@ import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
-import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
@@ -39,7 +39,7 @@ public class FilterEventsOfSingleLink {
 
 	}
 	
-	private static class EventsFilter implements PersonDepartureEventHandler, PersonArrivalEventHandler,Wait2LinkEventHandler,LinkEnterEventHandler,LinkLeaveEventHandler {
+	private static class EventsFilter implements PersonDepartureEventHandler, PersonArrivalEventHandler,VehicleEntersTrafficEventHandler,LinkEnterEventHandler,LinkLeaveEventHandler {
 		private Id<Link> filterLinkId;
 		private EventWriterXML eventWriter;
 

@@ -38,7 +38,7 @@ import java.util.*;
  *
  * @author mrieser
  */
-public class LinkOccupancyAnalyzer implements LinkEnterEventHandler, LinkLeaveEventHandler, PersonDepartureEventHandler, Wait2LinkEventHandler, PersonArrivalEventHandler, AfterMobsimListener {
+public class LinkOccupancyAnalyzer implements LinkEnterEventHandler, LinkLeaveEventHandler, PersonDepartureEventHandler, VehicleEntersTrafficEventHandler, PersonArrivalEventHandler, AfterMobsimListener {
 
 	private final static Logger log = Logger.getLogger(LinkOccupancyAnalyzer.class);
 	private final int timeBinSize;

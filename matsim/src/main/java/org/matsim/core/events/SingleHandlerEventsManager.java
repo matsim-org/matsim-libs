@@ -56,7 +56,7 @@ import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleAbortsEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
-import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.core.api.experimental.events.AgentWaitingForPtEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
@@ -122,7 +122,7 @@ public class SingleHandlerEventsManager implements EventsManager {
 		if (this.eventHandler instanceof LinkEnterEventHandler) this.isLinkEnterHandler = true;
 		else this.isLinkEnterHandler = false;
 
-		if (this.eventHandler instanceof Wait2LinkEventHandler) this.isWait2LinkHandler = true;
+		if (this.eventHandler instanceof VehicleEntersTrafficEventHandler) this.isWait2LinkHandler = true;
 		else this.isWait2LinkHandler = false;
 
 		if (this.eventHandler instanceof PersonArrivalEventHandler) this.isPersonArrivalHandler = true;
@@ -349,7 +349,7 @@ public class SingleHandlerEventsManager implements EventsManager {
 			((LinkEnterEventHandler) this.eventHandler).handleEvent((LinkEnterEvent)ev);
 			return true;
 		} else if (this.isWait2LinkHandler && klass == VehicleEntersTrafficEvent.class) {
-			((Wait2LinkEventHandler) this.eventHandler).handleEvent((VehicleEntersTrafficEvent)ev);
+			((VehicleEntersTrafficEventHandler) this.eventHandler).handleEvent((VehicleEntersTrafficEvent)ev);
 			return true;
 		} else if (this.isPersonArrivalHandler && klass == PersonArrivalEvent.class) {
 			((PersonArrivalEventHandler) this.eventHandler).handleEvent((PersonArrivalEvent)ev);

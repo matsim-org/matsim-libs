@@ -6,14 +6,18 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
-import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 
 // TODO: create test based on existing events file
 
@@ -61,7 +65,9 @@ public class TTMatrixFromEvents extends TTMatrix {
 
 	
 
-	private class TTMatrixTimesHandler implements LinkEnterEventHandler, LinkLeaveEventHandler, Wait2LinkEventHandler {
+	private class TTMatrixTimesHandler implements LinkEnterEventHandler, LinkLeaveEventHandler, VehicleEntersTrafficEventHandler,
+	VehicleLeavesTrafficEventHandler {
+		private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler() ;
 
 		private HashMap<Id<Link>, double[]> linkTravelTimes;
 		private HashMap<Id, int[]> numberOfSamples;
@@ -107,15 +113,17 @@ public class TTMatrixFromEvents extends TTMatrix {
 
 		@Override
 		public void reset(int iteration) {
-
+			delegate.reset(iteration);
 		}
 
 		@Override
 		public void handleEvent(LinkLeaveEvent event) {
-			if (agentEnterLinkTime.containsKey(event.getDriverId())) {
-				int timeBinIndex = (int) (Math.round(GeneralLib.projectTimeWithin24Hours(agentEnterLinkTime.get(event.getDriverId()))) / ttMatrix.timeBinSizeInSeconds);
+			Id<Person> driverId = delegate.getDriverOfVehicle( event.getVehicleId() ) ;
+			
+			if (agentEnterLinkTime.containsKey(driverId)) {
+				int timeBinIndex = (int) (Math.round(GeneralLib.projectTimeWithin24Hours(agentEnterLinkTime.get(driverId))) / ttMatrix.timeBinSizeInSeconds);
 
-				double travelTime=event.getTime()-agentEnterLinkTime.get(event.getDriverId());
+				double travelTime=event.getTime()-agentEnterLinkTime.get(driverId);
 				
 				if (!linkTravelTimes.containsKey(event.getLinkId())){
 					int numberOfBins = ttMatrix.getNumberOfBins();
@@ -128,18 +136,24 @@ public class TTMatrixFromEvents extends TTMatrix {
 				int[] ns = numberOfSamples.get(event.getLinkId());
 				ns[timeBinIndex]++;
 				
-				agentEnterLinkTime.remove(event.getDriverId());
+				agentEnterLinkTime.remove(driverId);
 			}
 		}
 
 		@Override
 		public void handleEvent(LinkEnterEvent event) {
-			agentEnterLinkTime.put(event.getDriverId(), event.getTime());
+			Id<Person> driverId = delegate.getDriverOfVehicle( event.getVehicleId() ) ;
+			agentEnterLinkTime.put(driverId, event.getTime());
 		}
 
 		@Override
 		public void handleEvent(VehicleEntersTrafficEvent event) {
+			this.delegate.handleEvent(event);
 			agentEnterLinkTime.put(event.getPersonId(), event.getTime());
+		}
+
+		public void handleEvent(VehicleLeavesTrafficEvent event) {
+			this.delegate.handleEvent(event);
 		}
 
 	}

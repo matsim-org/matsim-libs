@@ -26,7 +26,7 @@ import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
-import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.contrib.parking.lib.EventHandlerAtStartupAdder;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
@@ -41,7 +41,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 
 public class ElectricPtSimModule implements VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler,
-		LinkEnterEventHandler, LinkLeaveEventHandler, Wait2LinkEventHandler {
+		LinkEnterEventHandler, LinkLeaveEventHandler, VehicleEntersTrafficEventHandler {
 
 	private HashMap<Id<Vehicle>, EnergyConsumptionModel> vehicleEnergyConsumption;
 	private DoubleValueHashMap<Id<TransitStopFacility>> chargingPowerAtStops;

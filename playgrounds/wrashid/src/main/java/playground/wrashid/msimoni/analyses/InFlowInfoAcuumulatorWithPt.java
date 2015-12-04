@@ -30,13 +30,22 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 
 public class InFlowInfoAcuumulatorWithPt implements LinkEnterEventHandler,
-		PersonDepartureEventHandler, PersonArrivalEventHandler {
+		PersonDepartureEventHandler, PersonArrivalEventHandler, VehicleEntersTrafficEventHandler,
+		VehicleLeavesTrafficEventHandler {
+	
+	private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler() ;
 
 	private final int binSizeInSeconds; // set the length of interval
 	private final int numBins;
@@ -56,6 +65,7 @@ public class InFlowInfoAcuumulatorWithPt implements LinkEnterEventHandler,
 
 	@Override
 	public void reset(int iteration) {
+		delegate.reset(iteration);
 		// reset the variables (private ones)
 		linkInFlow = new HashMap<Id, int[]>();
 		entersPerLink = new HashMap<Id, Integer>();
@@ -64,9 +74,10 @@ public class InFlowInfoAcuumulatorWithPt implements LinkEnterEventHandler,
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
+		Id<Person> driverId = delegate.getDriverOfVehicle( event.getVehicleId() ) ;
 		
 		// ignore non-car travelers
-		if (!this.carAgents.contains(event.getDriverId())) return;
+		if (!this.carAgents.contains(driverId)) return;
 				
 		// call from NetworkReadExample
 		enterLink(event.getLinkId(), event.getTime());
@@ -132,8 +143,14 @@ public class InFlowInfoAcuumulatorWithPt implements LinkEnterEventHandler,
 		}
 	}
 
-	public HashMap<Id, int[]> getLinkInFlow() {
+	public HashMap<Id, int[]> getLinkInFlow() 
+{
 		return linkInFlow;
 	}
-
+	public void handleEvent(VehicleEntersTrafficEvent event) {
+		this.delegate.handleEvent(event);
+	}
+	public void handleEvent(VehicleLeavesTrafficEvent event) {
+		this.delegate.handleEvent(event);
+	}
 }

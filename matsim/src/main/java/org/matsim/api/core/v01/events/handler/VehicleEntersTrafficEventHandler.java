@@ -23,6 +23,6 @@ package org.matsim.api.core.v01.events.handler;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.core.events.handler.EventHandler;
 
-public interface Wait2LinkEventHandler extends EventHandler {
+public interface VehicleEntersTrafficEventHandler extends EventHandler {
 	public void handleEvent (VehicleEntersTrafficEvent event);
 }

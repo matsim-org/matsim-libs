@@ -34,7 +34,7 @@ import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
-import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.parking.lib.GeneralLib;
@@ -65,7 +65,7 @@ import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
  */
 
 public class EnergyConsumptionTracker implements LinkEnterEventHandler, LinkLeaveEventHandler, PersonDepartureEventHandler,
-		PersonArrivalEventHandler, Wait2LinkEventHandler, VehicleLeavesTrafficEventHandler {
+		PersonArrivalEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 
 	private EnergyConsumptionOutputLog log;
 

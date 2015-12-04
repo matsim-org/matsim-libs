@@ -33,7 +33,7 @@ import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
-import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 
 /**
@@ -42,7 +42,7 @@ import org.matsim.api.core.v01.network.Link;
  *         track the average density and flow inside a link
  * 
  */
-class FlowAndDensityCollector implements LinkLeaveEventHandler, LinkEnterEventHandler, PersonArrivalEventHandler, Wait2LinkEventHandler {
+class FlowAndDensityCollector implements LinkLeaveEventHandler, LinkEnterEventHandler, PersonArrivalEventHandler, VehicleEntersTrafficEventHandler {
 	private final int binSizeInSeconds; // set the length of interval
 	private HashMap<Id, int[]> linkOutFlow; // define
 	private HashMap<Id, int[]> linkInFlow;

@@ -25,15 +25,19 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
-import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 
 import playground.wrashid.parkingChoice.trb2011.ParkingHerbieControler;
 
@@ -93,7 +97,9 @@ public class SearchTraffic {
 	}
 	
 	private static class TrafficOnRoadsCount implements 
-	Wait2LinkEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler{
+	VehicleEntersTrafficEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler,
+	VehicleLeavesTrafficEventHandler {
+		private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler() ;
 
 		DoubleValueHashMap<Id> linkEnterTime=new DoubleValueHashMap<Id>();
 
@@ -102,13 +108,12 @@ public class SearchTraffic {
 		
 		@Override
 		public void reset(int iteration) {
-			// TODO Auto-generated method stub
-			
+			delegate.reset(iteration);
 		}
 
 		@Override
 		public void handleEvent(LinkLeaveEvent event) {
-//			if (event.getDriverId().equals(filterEventsForAgentId)){
+//			if (driverId.equals(filterEventsForAgentId)){
 //				System.out.println(event.toString());
 //			}
 		}
@@ -116,12 +121,18 @@ public class SearchTraffic {
 
 		@Override
 		public void handleEvent(LinkEnterEvent event) {
-			linkEnterTime.put(event.getDriverId(), event.getTime());
+			Id<Person> driverId = delegate.getDriverOfVehicle( event.getVehicleId() ) ;
+			linkEnterTime.put(driverId, event.getTime());
 		}
 
 		@Override
 		public void handleEvent(VehicleEntersTrafficEvent event) {
+			this.delegate.handleEvent(event);
 			linkEnterTime.put(event.getPersonId(), event.getTime());
+		}
+
+		public void handleEvent(VehicleLeavesTrafficEvent event) {
+			this.delegate.handleEvent(event);
 		}
 
 	}

@@ -28,9 +28,9 @@ import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
-import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 
-public class DensityInfoCollector implements LinkEnterEventHandler, LinkLeaveEventHandler, Wait2LinkEventHandler{
+public class DensityInfoCollector implements LinkEnterEventHandler, LinkLeaveEventHandler, VehicleEntersTrafficEventHandler{
 
 	
 	public static void main(String[] args) {

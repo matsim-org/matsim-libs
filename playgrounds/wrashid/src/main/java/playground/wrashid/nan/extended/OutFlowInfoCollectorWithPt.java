@@ -6,17 +6,25 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 
 //the program is currently calculating the destination flows
 //public class OutFlowInfoCollectorWithPt implements LinkEnterEventHandler,LinkLeaveEventHandler
 public class OutFlowInfoCollectorWithPt implements LinkEnterEventHandler, PersonArrivalEventHandler
 //public class OutFlowInfoCollectorWithPt implements AgentArrivalEventHandler
 //public class OutFlowInfoCollectorWithPt implements LinkEnterEventHandler,LinkLeaveEventHandler,AgentArrivalEventHandler 
+, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler
 {
+	private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler() ;
+	
 	private int binSizeInSeconds; // set the length of interval
 	public HashMap<Id<Link>, int[]> linkOutFlow; // define
 	private Map<Id<Link>, Link> filteredEquilNetLinks; // define personId, linkId
@@ -34,7 +42,10 @@ public class OutFlowInfoCollectorWithPt implements LinkEnterEventHandler, Person
 	}
 
 	@Override
-	public void reset(int iteration) {linkOutFlow = new HashMap<>();} // reset the variables (private
+	public void reset(int iteration) {
+		delegate.reset(iteration);
+		linkOutFlow = new HashMap<>();
+	} // reset the variables (private
 //												// ones)
 //	public void handleEvent(LinkLeaveEvent event) {  
 //		linkLeave(event.getLinkId(), event.getTime());
@@ -43,7 +54,8 @@ public class OutFlowInfoCollectorWithPt implements LinkEnterEventHandler, Person
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		lastEnteredLink.put(event.getDriverId(), event.getLinkId());
+		Id<Person> driverId = delegate.getDriverOfVehicle( event.getVehicleId() ) ;
+		lastEnteredLink.put(driverId, event.getLinkId());
 	}
 	
 	@Override
@@ -57,10 +69,11 @@ public class OutFlowInfoCollectorWithPt implements LinkEnterEventHandler, Person
 	}
 	
 	public void handleEvent(LinkLeaveEvent event) {
-		if (lastEnteredLink.containsKey(event.getDriverId()) && lastEnteredLink.get(event.getDriverId())!=null) {
-			if (lastEnteredLink.get(event.getDriverId()).equals(event.getLinkId())){
+		Id<Person> driverId = delegate.getDriverOfVehicle( event.getVehicleId() ) ;
+		if (lastEnteredLink.containsKey(driverId) && lastEnteredLink.get(driverId)!=null) {
+			if (lastEnteredLink.get(driverId).equals(event.getLinkId())){
 				linkLeave(event.getLinkId(), event.getTime());
-				lastEnteredLink.put(event.getDriverId(),null); //reset value
+				lastEnteredLink.put(driverId,null); //reset value
 			}
 		}
 	}
@@ -131,6 +144,14 @@ public class OutFlowInfoCollectorWithPt implements LinkEnterEventHandler, Person
 
 	public HashMap<Id<Link>, int[]> getLinkOutFlow() {
 		return linkOutFlow;
+	}
+
+	public void handleEvent(VehicleEntersTrafficEvent event) {
+		this.delegate.handleEvent(event);
+	}
+
+	public void handleEvent(VehicleLeavesTrafficEvent event) {
+		this.delegate.handleEvent(event);
 	}
 
 }

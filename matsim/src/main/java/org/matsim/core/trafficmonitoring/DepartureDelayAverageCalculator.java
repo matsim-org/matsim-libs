@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
-import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
@@ -41,7 +41,7 @@ import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
  *
  * @author meisterk
  */
-public class DepartureDelayAverageCalculator implements PersonDepartureEventHandler, LinkLeaveEventHandler, Wait2LinkEventHandler, VehicleLeavesTrafficEventHandler {
+public class DepartureDelayAverageCalculator implements PersonDepartureEventHandler, LinkLeaveEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 
 	private Network network;
 	private int timeBinSize;
