@@ -43,7 +43,7 @@ public class DynamicLinkDemandAnalysisMain {
 			
 		} else {
 			
-			OUTPUT_BASE_DIR = "../../../runs-svn/cn2/output/cn8/";			
+			OUTPUT_BASE_DIR = "../../../runs-svn/berlin-1pct/";			
 		}
 
 		DynamicLinkDemandAnalysisMain analysis = new DynamicLinkDemandAnalysisMain();

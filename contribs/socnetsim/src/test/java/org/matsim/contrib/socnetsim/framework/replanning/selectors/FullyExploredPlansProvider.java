@@ -39,6 +39,7 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Counter;
@@ -160,7 +161,7 @@ public class FullyExploredPlansProvider {
 		boolean foundNonSelected = false;
 
 		for ( Plan p : jp.getIndividualPlans().values() ) {
-			if ( p.isSelected() ) foundSelected = true;
+			if ( PersonUtils.isSelected(p) ) foundSelected = true;
 			else foundNonSelected = true;
 		}
 		return !(foundSelected && foundNonSelected);

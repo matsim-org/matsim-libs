@@ -38,7 +38,7 @@ import java.util.Set;
  *
  * @author boescpa
  */
-public class AgentCounter implements ScenarioAnalyzerEventHandler, ActivityEndEventHandler {
+public class AgentCounter extends ScenarioAnalyzerEventHandler implements ActivityEndEventHandler {
 
 	private final List<String[]> agentsAndLinks = new ArrayList<>();
 	private final Network network;

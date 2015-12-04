@@ -43,6 +43,7 @@ public static void main(String[] args) {
 	int i = 0;
 	for (Person p : scenario.getPopulation().getPersons().values()){
 		if (p.getId().toString().endsWith("vw")){
+			
 			boolean copyPerson = true;
 			i++;
 			if (i%10000 == 0) System.out.println(i);

@@ -14,14 +14,11 @@ import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dvrp.extensions.taxi.TaxiUtils;
 
-
 public class TaxiCustomerWaitHandler implements PersonDepartureEventHandler, PersonEntersVehicleEventHandler {
 
 	private int numberOfTrips;
 	private double totalWaitingTime;
-	
 	private Map<Id<Person>, Double> personsTaxiCallTime;
-
 	
 		public TaxiCustomerWaitHandler() {
 			this.numberOfTrips = 0;
@@ -59,9 +56,9 @@ public class TaxiCustomerWaitHandler implements PersonDepartureEventHandler, Per
 	            BufferedWriter bw = new BufferedWriter(new FileWriter(new File(fileDir)));
 	            bw.write("total number of customer's taxi trips: \t" + this.numberOfTrips);
 	            bw.newLine();
-	            bw.write("total waiting time: \t" + this.totalWaitingTime);
+	            bw.write("total waiting time (h) : \t" + (this.totalWaitingTime / 3600));
 	            bw.newLine();
-	            bw.write("average waiting time per trip: \t " + getAvgWaitingTime());
+	            bw.write("average waiting time per trip (s) : \t " + getAvgWaitingTime());
 	            bw.flush();
 	            bw.close();
 	        }

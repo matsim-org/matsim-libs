@@ -10,7 +10,9 @@ import org.matsim.core.utils.io.IOUtils;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Analyzes and prints or writes to file the activity chains of a population.
@@ -21,9 +23,12 @@ public class ActivityAnalyzer {
     private final static Logger log = Logger.getLogger(ActivityAnalyzer.class);
 
     private final Map<String, Integer> actChains;
+    private final Set<String> actToIgnore;
 
     public ActivityAnalyzer() {
         actChains = new HashMap<>();
+        actToIgnore = new HashSet<>();
+        actToIgnore.add("pt interaction");
     }
 
     public void addActChain(final String actChain) {
@@ -42,13 +47,15 @@ public class ActivityAnalyzer {
                 for (PlanElement pe : p.getSelectedPlan().getPlanElements()) {
                     if (pe instanceof ActivityImpl) {
                         ActivityImpl act = (ActivityImpl) pe;
-                        actChain = actChain.concat(act.getType().substring(0, 1));
+                        if (!actToIgnore.contains(act.getType())) {
+                            actChain = actChain.concat(act.getType().substring(0,2) + "-");
+                        }
                     }
-                    this.addActChain(actChain);
                 }
+                this.addActChain(actChain.substring(0, actChain.length()-1));
             }
             else {
-                log.warn("person " +p.getId().toString()+ " has no plan defined");
+                log.warn("person " + p.getId().toString() + " has no plan defined");
             }
         }
     }

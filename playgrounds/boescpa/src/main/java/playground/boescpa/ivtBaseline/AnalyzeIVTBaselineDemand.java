@@ -4,7 +4,10 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import playground.boescpa.analysis.ActivityAnalyzer;
 import playground.boescpa.analysis.scenarioAnalyzer.ScenarioAnalyzer;
-import playground.boescpa.analysis.scenarioAnalyzer.eventHandlers.*;
+import playground.boescpa.analysis.scenarioAnalyzer.eventHandlers.AgentCounter;
+import playground.boescpa.analysis.scenarioAnalyzer.eventHandlers.ScenarioAnalyzerEventHandler;
+import playground.boescpa.analysis.scenarioAnalyzer.eventHandlers.TripActivityCrosscorrelator;
+import playground.boescpa.analysis.scenarioAnalyzer.eventHandlers.TripAnalyzer;
 import playground.boescpa.analysis.spatialCutters.NoCutter;
 import playground.boescpa.analysis.trips.*;
 import playground.boescpa.lib.tools.NetworkUtils;
@@ -34,7 +37,7 @@ public class AnalyzeIVTBaselineDemand {
         // analyze trips
         TripEventHandler.setAnonymizeTrips(false);
         List<Trip> origTrips = EventsToTrips.createTripsFromEvents(pathToEventsFile, network);
-        TripWriter.writeTrips(origTrips, "all_trips.csv");
+        TripWriter.writeTrips(origTrips, pathToOutputFolder + "all_trips.csv");
         List<Trip> noStuckTrips = TripFilter.removeUnfinishedTrips(origTrips, null);
         analyzeTrips(noStuckTrips, population, pathToOutputFolder);
 
@@ -44,29 +47,29 @@ public class AnalyzeIVTBaselineDemand {
         activityAnalyzer.printActChainAnalysis(pathToOutputFolder + "actChainAnalysis.csv");
     }
 
-    private static void analyzeTrips(List<Trip> origTrips, Population population, String pathToOutputFiles) {
+    private static void analyzeTrips(List<Trip> origTrips, Population population, String pathToOutputFolder) {
         List<Trip> homeTrips = TripFilter.purposeTripFilter(origTrips, "home");
-        TripWriter.writeTrips(homeTrips, pathToOutputFiles + "trips_home.csv");
+        TripWriter.writeTrips(homeTrips, pathToOutputFolder + "trips_home.csv");
 
         List<Trip> workTrips = TripFilter.purposeTripFilter(origTrips, "work");
-        List<Trip> childWorkTrips = filterTripsForAge(population, workTrips, 0, 16);
-        TripWriter.writeTrips(childWorkTrips, pathToOutputFiles + "trips_childWork.csv");
-        List<Trip> teenWorkTrips = filterTripsForAge(population, workTrips, 17, 20);
-        TripWriter.writeTrips(teenWorkTrips, pathToOutputFiles + "trips_teenWork.csv");
+        List<Trip> childWorkTrips = filterTripsForAge(population, workTrips, 0, 15);
+        TripWriter.writeTrips(childWorkTrips, pathToOutputFolder + "trips_childWork.csv");
+        List<Trip> teenWorkTrips = filterTripsForAge(population, workTrips, 16, 20);
+        TripWriter.writeTrips(teenWorkTrips, pathToOutputFolder + "trips_teenWork.csv");
         List<Trip> adultWorkTrips = filterTripsForAge(population, workTrips, 21, 65);
-        TripWriter.writeTrips(adultWorkTrips, pathToOutputFiles + "trips_adultWork.csv");
+        TripWriter.writeTrips(adultWorkTrips, pathToOutputFolder + "trips_adultWork.csv");
         List<Trip> retireeWorkTrips = filterTripsForAge(population, workTrips, 66, 150);
-        TripWriter.writeTrips(retireeWorkTrips, pathToOutputFiles + "trips_retireeWork.csv");
+        TripWriter.writeTrips(retireeWorkTrips, pathToOutputFolder + "trips_retireeWork.csv");
 
         List<Trip> educationTrips = TripFilter.purposeTripFilter(origTrips, "education");
         List<Trip> kindergartenTrips = filterTripsForAge(population, educationTrips, 0, 6);
-        TripWriter.writeTrips(kindergartenTrips, pathToOutputFiles + "trips_kindergarten.csv");
+        TripWriter.writeTrips(kindergartenTrips, pathToOutputFolder + "trips_kindergarten.csv");
         List<Trip> schoolTrips = filterTripsForAge(population, educationTrips, 7, 16);
-        TripWriter.writeTrips(schoolTrips, pathToOutputFiles + "trips_school.csv");
+        TripWriter.writeTrips(schoolTrips, pathToOutputFolder + "trips_school.csv");
         List<Trip> highschoolTrips = filterTripsForAge(population, educationTrips, 17, 20);
-        TripWriter.writeTrips(highschoolTrips, pathToOutputFiles + "trips_highschool.csv");
+        TripWriter.writeTrips(highschoolTrips, pathToOutputFolder + "trips_highschool.csv");
         List<Trip> higherEducationTrips = filterTripsForAge(population, educationTrips, 21, 150);
-        TripWriter.writeTrips(higherEducationTrips, pathToOutputFiles + "trips_higherEducation.csv");
+        TripWriter.writeTrips(higherEducationTrips, pathToOutputFolder + "trips_higherEducation.csv");
     }
 
     private static List<Trip> filterTripsForAge(Population population, List<Trip> origTrips, int minAge, int maxAge) {

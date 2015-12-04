@@ -62,9 +62,9 @@ public class WobDistanceAnalyzer {
 	private WobEventHandler kjaEventHandler;
 
 	public static void main(String[] args) {
-		String dir = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/input/output/vw021.100pct/";
-		String events = dir + "ITERS/it.120/vw021.100pct.120.events.xml.gz";
-		String network = dir+"vw021.100pct.output_network.xml.gz";
+		String dir = "D:/runs-svn/vw_rufbus/vw040/";
+		String events = dir + "vw040.output_events.xml.gz";
+		String network = dir+"vw040.output_network.xml.gz";
 
 		WobDistanceAnalyzer kjaDistanceAnalyzer = new WobDistanceAnalyzer(
 				events, network,  dir + "outfile.txt", dir

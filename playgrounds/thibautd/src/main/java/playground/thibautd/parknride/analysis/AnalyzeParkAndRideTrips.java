@@ -24,7 +24,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.charts.ChartUtil;
-import playground.thibautd.utils.MoreIOUtils;
+import playground.ivt.utils.MoreIOUtils;
 
 /**
  * @author thibautd

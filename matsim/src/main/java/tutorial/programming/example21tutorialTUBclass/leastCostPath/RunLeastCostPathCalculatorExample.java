@@ -36,6 +36,7 @@ public class RunLeastCostPathCalculatorExample {
 	public static void main(String[] args) {
 		Config config = ConfigUtils.loadConfig("examples/equil/config.xml");
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
+		config.controler().setLastIteration(0);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controler controler = new Controler(scenario);
 

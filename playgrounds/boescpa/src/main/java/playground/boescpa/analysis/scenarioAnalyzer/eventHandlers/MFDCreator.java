@@ -42,7 +42,7 @@ import java.util.Map;
  *
  * @author boescpa
  */
-public class MFDCreator implements ScenarioAnalyzerEventHandler, LinkLeaveEventHandler,
+public class MFDCreator extends ScenarioAnalyzerEventHandler implements LinkLeaveEventHandler,
 		LinkEnterEventHandler, PersonArrivalEventHandler {
 
 	private static final int TIMEBINSIZE = 5*60; // [sec]

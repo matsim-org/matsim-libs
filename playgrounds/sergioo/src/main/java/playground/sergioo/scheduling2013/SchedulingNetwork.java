@@ -1,5 +1,6 @@
 package playground.sergioo.scheduling2013;
 
+import java.awt.Toolkit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -254,7 +255,15 @@ public class SchedulingNetwork implements Network {
 	private double currentMaximumUtility = -Double.MAX_VALUE;
 	private boolean withMaximumDepth = true;
 	private int maximumDepth = Integer.MAX_VALUE;
+	private long initialMillis;
+	private long MAX_TIME_MILLIS = Long.MAX_VALUE;
 	
+	public SchedulingNetwork() {
+	}
+	
+	public SchedulingNetwork(long maxTimeMillis) {
+		this.MAX_TIME_MILLIS = maxTimeMillis;
+	}
 	
 	@Override
 	public NetworkFactory getFactory() {
@@ -307,6 +316,7 @@ public class SchedulingNetwork implements Network {
 		//Create spatiotemporal nodes
 		/*if(endTime-previousActivities.get(previousActivities.size()-1).getSecond()>8*3600)
 			System.out.println();*/
+		this.initialMillis = System.currentTimeMillis();
 		this.previousActivities = previousActivities;
 		this.followingActivities = followingActivities;
 		this.lastActivity = followingActivities.get(0).getFirst();
@@ -315,7 +325,7 @@ public class SchedulingNetwork implements Network {
 		this.facilities = facilities;
 		this.now = now;
 		this.endTime = (int) (followingActivities.get(0).getSecond().getFirst()-followingActivities.get(0).getSecond().getSecond());
-		endTime = endTime-endTime%timeInterval;
+		endTime = endTime-endTime%timeInterval+timeInterval;
 		Coord destination = facilities.getFacilities().get(destinationId).getCoord();
 		SchedulingNode lastNode = new SchedulingNode(Id.createNodeId(destinationId.toString()+"("+(int)this.endTime+")"), destination, this.endTime, 0);
 		addNode(lastNode);
@@ -328,7 +338,7 @@ public class SchedulingNetwork implements Network {
 			if(MatsimRandom.getRandom().nextInt(placeSharer.getKnownPlaces().size())<MAX_PLACES)
 				knownPlaces.put(knownPlace.getFacilityId(), knownPlace);
 		placeSharer.setAreKnownPlacesUsed(false);
-		knownPlaces.put(originId, placeSharer.getKnownPlace(originId));
+		knownPlaces.put(originId, placeSharer.getKnownPlace(originId));//TODO
 		Tuple<String, Tuple<Double, Double>> previousActivity = previousActivities.remove(previousActivities.size()-1);
 		Tuple<Double, Double> times = previousActivity.getSecond();
 		double timeOfDay = times.getFirst(), previousTime = timeOfDay-times.getSecond();
@@ -358,50 +368,33 @@ public class SchedulingNetwork implements Network {
 		addNodesAndLinks(fromNode, originId, modes, modes.contains("car")?originId:null, knownPlaces, agenda, path, modes.contains("car"), mobsimStatus);
 		if(mobsimStatus.isMobsimEnds() || now.getNow()+fastest>endTime)
 			return null;
-		/*double variableStartTime = ((SchedulingNode)path.get(path.size()-1).toNode).time;
-		while(((SchedulingNode)path.get(path.size()-1).toNode).time<endTime) {
-			addNodesAndLinks(fromNode, facilities, originId, destinationId, lastActivity, lastTime, timeInterval, modes, modes.contains("car")?originId:null, placeSharer, agenda, path, modes.contains("car"));
-			variableStartTime+=timeInterval;
-			Id<Node> toNodeId = Id.createNodeId(originId+"("+variableStartTime+")");
-			fromNode = (SchedulingNode) delegate.getNodes().get(toNodeId);
-			if(fromNode==null) {
-				fromNode = new SchedulingNode(toNodeId, facilities.getFacilities().get(originId).getCoord(), variableStartTime, getMaxActivityUtility(endTime-variableStartTime));
-				addNode(fromNode);
-			}
-			String activityType = ((ActivitySchedulingLink)path.get(path.size()-1)).activityType;
-			Id<Link> linkId = Id.createLinkId(activityType+","+originId+"("+(int)((SchedulingNode)path.get(path.size()-1).fromNode).time+"-"+fromNode.time+")");
-			SchedulingLink link = (SchedulingLink) delegate.getLinks().get(linkId);
-			if(link==null) {
-				link = new ActivitySchedulingLink(linkId, path.get(path.size()-1).fromNode, fromNode, activityType, originId);
-				addLink(link);
-			}
-			path.remove(path.size()-1);
-			path.add(link);
-		}*/
 		if(lastNode.path!=null) {
-			lastNode.path.remove(0);
+			//lastNode.path.remove(0);
 			for(SchedulingLink link:lastNode.path)
 				if(link instanceof ActivitySchedulingLink) {
 					AgendaElement agendaElement = agenda.getElements().get(((ActivitySchedulingLink)link).activityType);
-					if(agendaElement!=null)
-						agendaElement.performActivityTime(link.duration);
+					/*if(agendaElement!=null)
+						agendaElement.performActivityTime(link.duration);*///TODO
 				}
 		}
+		//System.out.println("("+lastNode.utility+")"+lastNode.path);
 		previousActivities.add(previousActivity);
 		return lastNode.path;
 	}
 
 	private void addNodesAndLinks(SchedulingNode node, Id<ActivityFacility> originId, Set<String> modes, Id<ActivityFacility> carLocationId, Map<Id<ActivityFacility>, KnownPlace> knownPlaces, Agenda agenda, List<SchedulingLink> path, boolean hadCar, final MobsimStatus mobsimStatus) {
-		if(mobsimStatus.isMobsimEnds() || now.getNow()+fastest>endTime || (withMaximumDepth && path.size()-1>maximumDepth))
+		if(((System.currentTimeMillis()-initialMillis>MAX_TIME_MILLIS)&&currentMaximumUtility>-Double.MAX_VALUE) ||
+				mobsimStatus.isMobsimEnds() || now.getNow()+fastest>endTime ||
+				(withMaximumDepth && path.size()-1>maximumDepth))
 			return;
 		double utility = getUtility(path, agenda, hadCar, endTime);
 		if(utility+node.maxUtilityFrom<currentMaximumUtility)
 			return;
-		KnownPlace place = knownPlaces.get(originId);
 		if(originId.equals(destinationId) && node.time==endTime)
 			node.updatePath(path, utility);
-		else if(path.size()<=maximumDepth) {
+		else if(path.size()<=maximumDepth || (originId.equals(destinationId) && node.time<endTime)) {
 			SchedulingLink pLink = path.get(path.size()-1);
+			KnownPlace place = knownPlaces.get(originId);
 			if(originId.equals(destinationId) && node.time<endTime) {
 				if(!(pLink instanceof ActivitySchedulingLink && ((ActivitySchedulingLink)pLink).getActivityType().equals("visit"))) {
 					Id<Node> toNodeId = Id.createNodeId(originId.toString()+"("+(int)endTime+")");
@@ -413,13 +406,14 @@ public class SchedulingNetwork implements Network {
 						addLink(link);
 					}
 					path.add(link);
-					addNodesAndLinks(toNode, originId, modes, carLocationId, knownPlaces, agenda, path, hadCar, mobsimStatus);
+					utility = getUtility(path, agenda, hadCar, endTime);
+					toNode.updatePath(path, utility);
 					path.remove(path.size()-1);
 					if(lastActivity.equals("home") && pLink instanceof JourneySchedulingLink && ((JourneySchedulingLink)pLink).getMode().equals("car"))
 						hadCar = false;
 				}
 			}
-			if(path.get(path.size()-1) instanceof ActivitySchedulingLink || path.size()<maximumDepth) {
+			if(pLink instanceof ActivitySchedulingLink || path.size()<maximumDepth) {
 				boolean hasCar = modes.contains("car");
 				if(originId.equals(carLocationId))
 					modes.add("car");
@@ -441,7 +435,7 @@ public class SchedulingNetwork implements Network {
 						AgendaElement agendaElement = agenda.getElements().get(activityType);
 						if(agendaElement!=null && agendaElement.getCurrentPerformedTime()>0)
 							if(pLink instanceof JourneySchedulingLink || !(((ActivitySchedulingLink)pLink).activityType.equals(activityType)||((ActivitySchedulingLink)pLink).activityType.equals("visit")||activityType.equals("visit")))
-								for(int variableEndTime = (int) (endTime-fastest-(endTime-fastest)%timeInterval); variableEndTime>node.time; variableEndTime-=timeInterval) {
+								for(int variableEndTime = (int) (endTime-fastest-(endTime-fastest)%timeInterval+timeInterval); variableEndTime>node.time; variableEndTime-=timeInterval) {
 									double duration = variableEndTime-node.time;
 									double numTimes = 0;
 									for(SchedulingLink link:path)
@@ -469,8 +463,8 @@ public class SchedulingNetwork implements Network {
 								}
 					}
 				if(pLink instanceof ActivitySchedulingLink) {
-					if(!originId.equals(destinationId))
-						knownPlaces.remove(originId);
+					/*if(!originId.equals(destinationId))
+						knownPlaces.remove(originId);*/
 					List<KnownPlace> knownPlacesList = new ArrayList<KnownPlace>(knownPlaces.values());
 					for(int i=0; i<knownPlacesList.size(); i++) {
 						KnownPlace knownPlace = knownPlacesList.get(i);
@@ -532,8 +526,9 @@ public class SchedulingNetwork implements Network {
 		if(duration<=agendaElement.getCurrentPerformedTime() && duration<=highD && duration>=lowD)
 			if(numTimes>0) {
 				RealDistribution numTimesPerPeriod = agendaElement.getNumTimesPerPeriod();
-				double lowT = numTimesPerPeriod.inverseCumulativeProbability(0.15);
-				double highT = numTimesPerPeriod.inverseCumulativeProbability(0.85);
+				double mean = numTimesPerPeriod.getNumericalMean();
+				double lowT = Math.min(numTimesPerPeriod.inverseCumulativeProbability(0.15),Math.max(mean-1,0));
+				double highT = Math.max(numTimesPerPeriod.inverseCumulativeProbability(0.85),mean+1);
 				if(numTimes+1>lowT && numTimes+1<highT)
 					return true;
 				else
@@ -557,7 +552,7 @@ public class SchedulingNetwork implements Network {
 		totalDurations.put("religion", 1.0);
 		totalDurations.put("accomp", 1.0);
 	}
-	private double getUtility(List<SchedulingLink> path, Agenda agenda, boolean hadCar, double endTime) {	
+	private double getUtility(List<SchedulingLink> path, Agenda agenda, boolean hadCar, double endTime) {
 		double utility = 0;
 		Map<String, Double> acts = new HashMap<String, Double>();
 		double time = 0;
@@ -582,6 +577,9 @@ public class SchedulingNetwork implements Network {
 			time = previousActivity.getSecond().getFirst();
 			acts.put(activityType, time);
 		}
+		ActivitySchedulingLink lastActivityLink = null;
+		if(path.size()>0 && path.get(path.size()-1) instanceof ActivitySchedulingLink && followingActivities.get(0).getFirst().equals(((ActivitySchedulingLink)path.get(path.size()-1)).getActivityType()))
+			lastActivityLink = (ActivitySchedulingLink) path.remove(path.size()-1);
 		for(SchedulingLink link:path) {
 			if(link instanceof ActivitySchedulingLink) {
 				String activityType = ((ActivitySchedulingLink)link).activityType;
@@ -603,10 +601,16 @@ public class SchedulingNetwork implements Network {
 			}
 			time += link.getDuration();
 		}
+		/*int aa=0, bb=0;
+		for(SchedulingLink link:path) {
+			if(link instanceof JourneySchedulingLink && ((JourneySchedulingLink)link).getMode().equals("car"))
+				aa++;
+			else if(link instanceof ActivitySchedulingLink && ((ActivitySchedulingLink)link).getActivityType().equals("visit"))
+				bb++;
+		}
+		if(aa>=3 && bb==0 && utility>207)
+			System.out.println();*/
 		utility-= hadCar && !lastMode.equals("car")?50:0;
-		ActivitySchedulingLink lastActivityLink = null;
-		if(path.size()>0 && path.get(path.size()-1) instanceof ActivitySchedulingLink && followingActivities.get(0).getFirst().equals(((ActivitySchedulingLink)path.get(path.size()-1)).getActivityType()))
-			lastActivityLink = (ActivitySchedulingLink) path.remove(path.size()-1);
 		time = endTime;
 		boolean lastActivityAdded = lastActivityLink==null;
 		for(int i=0; i<followingActivities.size()-1; i++) {
@@ -688,7 +692,7 @@ public class SchedulingNetwork implements Network {
 	}
 
 	private double getJourneyUtility(String mode, double duration) {
-		return (mode.equals("car")?-8:mode.equals("pt")?-4:-1)*duration/3600;
+		return (mode.equals("car")?-50:mode.equals("pt")?-4:-1)*duration/3600;
 	}
 
 	private double getActivityUtility(String activityType, double duration, double sinceLastTime, double durationMean, double numTimesPerPeriod) {
@@ -721,11 +725,11 @@ public class SchedulingNetwork implements Network {
 	}
 
 	private double getActivityBeta(String activityType) {
-		if(activityType.equals("home"))
+		if(activityType.equals("home") || activityType.equals("work") || activityType.equals("edu"))
 			return 6.0/3600;
 		else if(activityType.equals("visit"))
 			return 0;
-		return 6.0/3600;
+		return 7.0/3600;
 	}
 	
 	public static void main(String[] args) {
@@ -747,10 +751,10 @@ public class SchedulingNetwork implements Network {
 				placeSharer.addKnownPlace(originId, startTime+2*3600, args[1]);
 				placeSharer.addKnownPlace(originId, startTime+4*3600, args[1]);
 				placeSharer.addKnownPlace(originId, startTime+6*3600, args[1]);
-				/*placeSharer.addKnownPlace(facility.getId(), startTime, "visit");
+				placeSharer.addKnownPlace(facility.getId(), startTime, "visit");
 				placeSharer.addKnownPlace(facility.getId(), startTime+2*3600, "visit");
 				placeSharer.addKnownPlace(facility.getId(), startTime+4*3600, "visit");
-				placeSharer.addKnownPlace(facility.getId(), startTime+6*3600, "visit");*/
+				placeSharer.addKnownPlace(facility.getId(), startTime+6*3600, "visit");
 				origin = true;
 				if(destination && shop==0 && sport==0)
 					break;
@@ -762,10 +766,10 @@ public class SchedulingNetwork implements Network {
 				placeSharer.addKnownPlace(destinationId, startTime+2*3600, args[2]);
 				placeSharer.addKnownPlace(destinationId, startTime+4*3600, args[2]);
 				placeSharer.addKnownPlace(destinationId, startTime+6*3600, args[2]);
-				/*placeSharer.addKnownPlace(facility.getId(), startTime, "visit");
+				placeSharer.addKnownPlace(facility.getId(), startTime, "visit");
 				placeSharer.addKnownPlace(facility.getId(), startTime+2*3600, "visit");
 				placeSharer.addKnownPlace(facility.getId(), startTime+4*3600, "visit");
-				placeSharer.addKnownPlace(facility.getId(), startTime+6*3600, "visit");*/
+				placeSharer.addKnownPlace(facility.getId(), startTime+6*3600, "visit");
 				destination = true;
 				if(origin && shop==0 && sport==0)
 					break;
@@ -798,14 +802,14 @@ public class SchedulingNetwork implements Network {
 		new FacilitiesWriter(facilities).write(args[6]);
 		SchedulingNetwork network = new SchedulingNetwork();
 		Agenda agenda = new Agenda();
-		agenda.addElement(args[1], new NormalDistribution(8, 2), new NormalDistribution(8*3600, 2*3600));
-		agenda.addElement(args[2], new NormalDistribution(10, 2), new NormalDistribution(10*3600, 2*3600));
-		agenda.addElement("shop", new NormalDistribution(2, 1), new NormalDistribution(2*3600, 1*3600));
-		agenda.addElement("sport", new NormalDistribution(2, 0.5), new NormalDistribution(2*3600, 0.5*3600));
-		//agenda.addElement("visit", new NormalDistributionImpl(0.4, 0.2), new NormalDistributionImpl(0.2*3600, 0.1*3600));
+		agenda.addElement(args[1], new NormalDistribution(1, 0.1), new NormalDistribution(8*3600, 2*3600));
+		agenda.addElement(args[2], new NormalDistribution(1, 0.1), new NormalDistribution(10*3600, 2*3600));
+		agenda.addElement("shop", new NormalDistribution(1, 1), new NormalDistribution(2*3600, 1*3600));
+		agenda.addElement("sport", new NormalDistribution(1, 0.5), new NormalDistribution(2*3600, 0.5*3600));
+		agenda.addElement("visit", new NormalDistribution(1, 0.2), new NormalDistribution(0.3*3600, 0.1*3600));
 		List<Tuple<String, Tuple<Double, Double>>> previousActivities = new ArrayList<Tuple<String, Tuple<Double, Double>>>();
-		previousActivities.add(new Tuple<String,Tuple<Double, Double>>(args[2], new Tuple<Double, Double>(startTime, 28800.0)));
-		previousActivities.add(new Tuple<String,Tuple<Double, Double>>(args[1], new Tuple<Double, Double>(startTime-28800, startTime-28800)));
+		previousActivities.add(new Tuple<String,Tuple<Double, Double>>(args[2], new Tuple<Double, Double>(startTime-28800, startTime-28800)));
+		previousActivities.add(new Tuple<String,Tuple<Double, Double>>(args[1], new Tuple<Double, Double>(startTime, 28800.0)));
 		List<Tuple<String, Tuple<Double, Double>>> followingActivities = new ArrayList<Tuple<String, Tuple<Double, Double>>>();
 		followingActivities.add(new Tuple<String, Tuple<Double, Double>>(args[2], new Tuple<Double, Double>(24*3600.0, 24*3600.0-Double.parseDouble(args[4]))));
 		long time = System.currentTimeMillis();

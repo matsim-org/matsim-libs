@@ -1,12 +1,10 @@
 package playground.boescpa.ivtBaseline.preparation;
 
-import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
-import playground.ivt.kticompatibility.KtiLikeScoringConfigGroup;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,10 +16,10 @@ import java.util.Map;
  */
 public class IVTConfigCreator {
 
-    private final static String numberOfThreads = "8";
-    private final static String inbaseFiles = "";
-    private final static String writeOutInterval = "10";
-    private final static String coordinateSystem = "CH1903_LV03_Plus";
+    protected final static String NUMBER_OF_THREADS = "8";
+    protected final static String INBASE_FILES = "";
+    protected final static String WRITE_OUT_INTERVAL = "10";
+    protected final static String COORDINATE_SYSTEM = "CH1903_LV03_Plus";
 
     public static final String FACILITIES = "facilities.xml.gz";
     public static final String HOUSEHOLD_ATTRIBUTES = "household_attributes.xml.gz";
@@ -35,31 +33,26 @@ public class IVTConfigCreator {
 
     public static void main(String[] args) {
         int prctScenario = Integer.parseInt(args[1]); // the percentage of the scenario in percent (e.g. 1%-Scenario -> "1")
-        new ConfigWriter(getIVTConfig(prctScenario)).write(args[0]);
+        // Create config and add kti-scoring and destination choice
+        Config config = ConfigUtils.createConfig();
+        new IVTConfigCreator().makeConfigIVT(config, prctScenario);
+        new ConfigWriter(config).write(args[0]);
     }
 
-    private static Config getIVTConfig(final int prctScenario) {
-        // Create config and add kti-scoring and destination choice
-        Config config = ConfigUtils.createConfig(
-                new KtiLikeScoringConfigGroup(),
-                new DestinationChoiceConfigGroup());
-
+    protected void makeConfigIVT(Config config, final int prctScenario) {
         // Correct routing algorithm
         config.setParam("controler", "routingAlgorithmType", "FastAStarLandmarks");
         // Change write out intervals
-        config.setParam("controler", "writeEventsInterval", writeOutInterval);
-        config.setParam("controler", "writePlansInterval", writeOutInterval);
-        config.setParam("controler", "writeSnapshotsInterval", writeOutInterval);
-        config.setParam("counts", "writeCountsInterval", writeOutInterval);
-        config.setParam("ptCounts", "ptCountsInterval", writeOutInterval);
+        config.setParam("controler", "writeEventsInterval", WRITE_OUT_INTERVAL);
+        config.setParam("controler", "writePlansInterval", WRITE_OUT_INTERVAL);
+        config.setParam("controler", "writeSnapshotsInterval", WRITE_OUT_INTERVAL);
+        config.setParam("counts", "writeCountsInterval", WRITE_OUT_INTERVAL);
+        config.setParam("ptCounts", "ptCountsInterval", WRITE_OUT_INTERVAL);
         // Add f2l
         config.createModule(WorldConnectLocations.CONFIG_F2L);
         config.setParam(WorldConnectLocations.CONFIG_F2L, WorldConnectLocations.CONFIG_F2L_INPUTF2LFile, "");
         // Set coordinate system
-        config.setParam("global", "coordinateSystem", coordinateSystem);
-        // Set location choice activities
-        config.setParam("locationchoice", "flexible_types", "remote_work, leisure, shop, escort_kids, escort_other");
-        config.setParam("locationchoice", "epsilonScaleFactors", "0.3, 0.1, 0.1, 0.1, 0.2");
+        config.setParam("global", "coordinateSystem", COORDINATE_SYSTEM);
         // Add activity parameters
         //  <-> We have these as agent-specific parameters now...
         /*Map<String, Double> activityDescr = getActivityDescr();
@@ -81,40 +74,36 @@ public class IVTConfigCreator {
         }
         // Activate transit
         config.setParam("transit", "useTransit", "true");
-        // Set threads to numberOfThreads
-        config.setParam("global", "numberOfThreads", numberOfThreads);
-        config.setParam("parallelEventHandling", "numberOfThreads", numberOfThreads);
-        config.setParam("qsim", "numberOfThreads", numberOfThreads);
+        // Set threads to NUMBER_OF_THREADS
+        config.setParam("global", "numberOfThreads", NUMBER_OF_THREADS);
+        config.setParam("parallelEventHandling", "numberOfThreads", NUMBER_OF_THREADS);
+        config.setParam("qsim", "numberOfThreads", NUMBER_OF_THREADS);
         // Account for prct-scenario
         config.setParam("counts", "countsScaleFactor", Double.toString(100d / prctScenario));
         config.setParam("ptCounts", "countsScaleFactor", Double.toString(100d/prctScenario));
         config.setParam("qsim", "flowCapacityFactor", Double.toString(prctScenario/100d));
         // Add files
-        config.setParam("facilities", "inputFacilitiesFile", inbaseFiles + FACILITIES);
-        config.setParam("f2l", "inputF2LFile", inbaseFiles + FACILITIES2LINKS);
-        config.setParam("households", "inputFile", inbaseFiles + HOUSEHOLDS);
-        config.setParam("households", "inputHouseholdAttributesFile", inbaseFiles + HOUSEHOLD_ATTRIBUTES);
-        config.setParam("network", "inputNetworkFile", inbaseFiles + NETWORK);
-        config.setParam("plans", "inputPersonAttributesFile", inbaseFiles + POPULATION_ATTRIBUTES);
-        config.setParam("plans", "inputPlansFile", inbaseFiles + POPULATION);
-        config.setParam("transit", "transitScheduleFile", inbaseFiles + SCHEDULE);
-        config.setParam("transit", "vehiclesFile", inbaseFiles + VEHICLES);
-        config.setParam("locationchoice", "prefsFile", inbaseFiles + POPULATION_ATTRIBUTES);
-
-        return config;
+        config.setParam("facilities", "inputFacilitiesFile", INBASE_FILES + FACILITIES);
+        config.setParam("f2l", "inputF2LFile", INBASE_FILES + FACILITIES2LINKS);
+        config.setParam("households", "inputFile", INBASE_FILES + HOUSEHOLDS);
+        config.setParam("households", "inputHouseholdAttributesFile", INBASE_FILES + HOUSEHOLD_ATTRIBUTES);
+        config.setParam("network", "inputNetworkFile", INBASE_FILES + NETWORK);
+        config.setParam("plans", "inputPersonAttributesFile", INBASE_FILES + POPULATION_ATTRIBUTES);
+        config.setParam("plans", "inputPlansFile", INBASE_FILES + POPULATION);
+        config.setParam("transit", "transitScheduleFile", INBASE_FILES + SCHEDULE);
+        config.setParam("transit", "vehiclesFile", INBASE_FILES + VEHICLES);
     }
 
-    private static Map<String, Double> getStrategyDescr() {
+    protected Map<String, Double> getStrategyDescr() {
         Map<String, Double> strategyDescr = new HashMap<>();
         strategyDescr.put("ChangeExpBeta", 0.5);
         strategyDescr.put("ReRoute", 0.2);
         strategyDescr.put("TimeAllocationMutator", 0.1);
-        strategyDescr.put("org.matsim.contrib.locationchoice.BestReplyLocationChoicePlanStrategy", 0.1);
         strategyDescr.put("SubtourModeChoice", 0.1);
         return strategyDescr;
     }
 
-    private static Map<String, Double> getActivityDescr() {
+    protected Map<String, Double> getActivityDescr() {
         Map<String, Double> activityDescr = new HashMap<>();
         activityDescr.put("home", 43200.);
         activityDescr.put("shop", 7200.);

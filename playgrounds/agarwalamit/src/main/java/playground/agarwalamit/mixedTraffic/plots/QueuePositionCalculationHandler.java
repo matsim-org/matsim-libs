@@ -18,9 +18,9 @@
  * *********************************************************************** */
 package playground.agarwalamit.mixedTraffic.plots;
 
-import java.util.ArrayList;
+import java.io.BufferedWriter;
+import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.TreeMap;
@@ -36,6 +36,7 @@ import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.mixedTraffic.MixedTrafficVehiclesUtils;
 import playground.agarwalamit.mixedTraffic.plots.LinkPersonInfoContainer.PersonPositionChecker;
@@ -47,8 +48,8 @@ public class QueuePositionCalculationHandler implements LinkLeaveEventHandler, L
 
 	private static final Logger LOG = Logger.getLogger(QueuePositionCalculationHandler.class);
 	private final Map<Id<Link>,LinkPersonInfoContainer> linkid2Container = new HashMap<>();
-	private final List<PersonPositionChecker> person2LinkEnterLeaveTimeData = new ArrayList<PersonPositionChecker>();
-	private final List<PersonPositionChecker> personLinkEnterLeaveTimeQueuePositionData = new ArrayList<PersonPositionChecker>();
+	private BufferedWriter writer1 ;
+	private BufferedWriter writer2 ;
 
 	private final Map<Id<Person>, String> personId2LegMode = new TreeMap<Id<Person>, String>();
 	private final Scenario scenario;
@@ -58,7 +59,7 @@ public class QueuePositionCalculationHandler implements LinkLeaveEventHandler, L
 		LOG.info("Calculating queue position of vehicles in mixed traffic.");
 		this.scenario = scenario;
 		for (Link link : scenario.getNetwork().getLinks().values()) {
-			this.linkid2Container.put(link.getId(), new LinkPersonInfoContainer(link.getId(), link.getLength()));
+			this.linkid2Container.put(link.getId(), new LinkPersonInfoContainer(link.getId(),link.getLength()));
 		}
 	}
 
@@ -66,8 +67,6 @@ public class QueuePositionCalculationHandler implements LinkLeaveEventHandler, L
 	public void reset(int iteration) {
 		this.linkid2Container.clear();
 		this.personId2LegMode.clear();
-		this.personLinkEnterLeaveTimeQueuePositionData.clear();
-		this.person2LinkEnterLeaveTimeData.clear();
 	}
 
 	@Override
@@ -88,11 +87,15 @@ public class QueuePositionCalculationHandler implements LinkLeaveEventHandler, L
 		builder.setEnterTime(event.getTime());
 		builder.setLegMode(this.personId2LegMode.get(personId));
 		builder.setLink(link);
+		PersonPositionChecker checker = container.getPerson2PersonPositionChecker().get(personId);
+
+		if( checker!=null && checker.getLink().getId().equals(linkId) ){
+			checker.updateCycleNumberOfPerson();
+		} 
 		container.getPerson2EnteringPersonInfo().put(personId, builder.build());
 
 		Queue<Id<Person>> personId2AgentPositions = container.getAgentsOnLink();
 		personId2AgentPositions.offer(personId);
-		updateVehicleOnLinkAndFillToQueue(event.getTime());
 	}
 
 	@Override
@@ -102,7 +105,7 @@ public class QueuePositionCalculationHandler implements LinkLeaveEventHandler, L
 
 		LinkPersonInfoContainer container = this.linkid2Container.get(linkId);
 		if( ! container.getPerson2EnteringPersonInfo().containsKey(personId) ) return; // if agent has departed on this link
-		
+
 		LeavingPersonInfo.Builder builder = new LeavingPersonInfo.Builder();
 		builder.setAgentId(personId);
 		builder.setLeaveTime(event.getTime());
@@ -110,55 +113,109 @@ public class QueuePositionCalculationHandler implements LinkLeaveEventHandler, L
 		builder.setLinkId(linkId);
 		LeavingPersonInfo leavingPersonInfo = builder.build();
 		container.getPerson2LeavingPersonInfo().put(personId, leavingPersonInfo);
-		
-		this.person2LinkEnterLeaveTimeData.add(container.getPersonInfoChecker(personId));
+
+		PersonPositionChecker checker = container.getOrCreatePersonPositionChecker(personId);
+
+		writeString(writer1, getPersonEnterLeaveInfo(checker) );
+
 		updateVehicleOnLinkAndFillToQueue(event.getTime());
 		container.getAgentsOnLink().remove(personId);
 
-		if(container.getAgentsInQueue().contains(personId)) {
-			this.personLinkEnterLeaveTimeQueuePositionData.add(container.getPersonInfoChecker(personId));
+		if(container.getAgentsInQueue().contains(personId)) {//write info for queuing
+			double initialPos = Double.valueOf(checker.getLink().getId().toString())*checker.getLink().getLength();
+			double vehicleSpeed =  MixedTrafficVehiclesUtils.getSpeed(checker.getEnteredPersonInfo().getLegMode());
+			double qStartDistFromFNode = initialPos + (checker.getQueuingTime()- checker.getEnteredPersonInfo().getLinkEnterTime()) * vehicleSpeed;
+
+			if((qStartDistFromFNode-initialPos) > checker.getLink().getLength()){
+				qStartDistFromFNode=initialPos + checker.getLink().getLength();
+			}
+
+			writeString(writer2,personId+"\t"+	
+					linkId+"\t"+
+					checker.getEnteredPersonInfo().getLinkEnterTime()+"\t"+
+					initialPos+"\t"+
+					checker.getQueuingTime()+"\t"+
+					qStartDistFromFNode +"\t"+
+					checker.getEnteredPersonInfo().getLegMode()+"\n"
+					);
+
+			writeString(writer2,personId+"\t"+	
+					linkId+"\t"+
+					checker.getQueuingTime()+"\t"+
+					qStartDistFromFNode+"\t"+
+					checker.getLeftPersonInfo().getLinkLeaveTime()+"\t"+
+					(1 + Double.valueOf(checker.getLink().getId().toString() ) )*checker.getLink().getLength() + "\t"+
+					checker.getEnteredPersonInfo().getLegMode()+"\n"
+					);
 
 			container.getAgentsInQueue().remove(personId);
-			double availableSpaceSoFar = container.getRemainingLinkSpace();
-			double newAvailableSpace = availableSpaceSoFar + MixedTrafficVehiclesUtils.getCellSize(leavingPersonInfo.getLegMode());
-			container.updateRemainingLinkSpace(newAvailableSpace);
+			double newAvailableSpace = container.getAvailableLinkSpace() + MixedTrafficVehiclesUtils.getCellSize(leavingPersonInfo.getLegMode());
+			container.setAvailableLinkSpace(newAvailableSpace);
+
+		} else {//write info for non queuing
+			writeString(writer2, getPersonEnterLeaveInfo(checker) );
+		}
+		container.getPerson2PersonPositionChecker().remove(personId);
+	}
+
+	private String getPersonEnterLeaveInfo(PersonPositionChecker checker) {
+		return 	checker.getPersonId()+"\t"+
+				checker.getLink().getId()+"\t"+
+				checker.getEnteredPersonInfo().getLinkEnterTime()+"\t"+
+				Double.valueOf(checker.getLink().getId().toString())*checker.getLink().getLength()+"\t"+
+				checker.getLeftPersonInfo().getLinkLeaveTime()+"\t"+
+				(1+Double.valueOf(checker.getLink().getId().toString()))*checker.getLink().getLength()+"\t"+
+				checker.getEnteredPersonInfo().getLegMode()+"\n";
+	}
+
+	private void writeString (BufferedWriter writer, String str){
+		try {
+			writer.write(str);
+		} catch (Exception e) {
+			throw new RuntimeException("Data is not written. Reason -"+ e);
 		}
 	}
 
-	private void updateVehicleOnLinkAndFillToQueue(final double currentTimeStep) {
-		for (Link link : this.scenario.getNetwork().getLinks().values()) {
-			Id<Link> linkId = link.getId();
+	private void updateVehicleOnLinkAndFillToQueue(final double now) {
+		for ( Id<Link> linkId : this.linkid2Container.keySet() ) {
 			LinkPersonInfoContainer container = this.linkid2Container.get(linkId);
+
 			for(Id<Person> personId :container.getAgentsOnLink()){
-				for(double time = this.lastEventTimeStep; time <= currentTimeStep; time++){
-					PersonPositionChecker checker = container.getPersonInfoChecker(personId);
-					checker.updateAvailableLinkSpace(container.getRemainingLinkSpace());
-					checker.checkIfVehicleWillGoInQ(time);
-					if(checker.isAddingVehicleInQueue()){
+				PersonPositionChecker checker = container.getOrCreatePersonPositionChecker(personId);
+				double personPositionUpdateTimeStep = Math.floor( Math.max( this.lastEventTimeStep, checker.getProbableQueuingTime()) );
+
+				for(double time = personPositionUpdateTimeStep; time <= now && !checker.isPersonAlreadyQueued(); time++){
+					if( checker.isAddingVehicleInQueue(time) ){
 						Queue<Id<Person>> queue = container.getAgentsInQueue();
-						if(! queue.contains(personId)) {
-							queue.offer(personId);
-							/*
-							 * If a person (20mps)  starts on link(1000m) at t=0, then will add to queue if time t=51 sec
-							 * time-1 is actually physically correct time at which it will add to Q.
-							 */
-							double availableSpaceSoFar = container.getRemainingLinkSpace();
-							checker.updateQueuingTime(availableSpaceSoFar);
-							double newAvailableSpace = availableSpaceSoFar - MixedTrafficVehiclesUtils.getCellSize(checker.getEnteredPersonInfo().getLegMode());
-							container.updateRemainingLinkSpace(newAvailableSpace);
-						} // else already in queue
+						queue.offer(personId);
+						checker.updateQueuingTime();
+						double newAvailableSpace = container.getAvailableLinkSpace() - MixedTrafficVehiclesUtils.getCellSize(checker.getEnteredPersonInfo().getLegMode());
+						container.setAvailableLinkSpace(newAvailableSpace);
 					} 
 				}
 			}
 		}
-		this.lastEventTimeStep=currentTimeStep;
-	}
-	
-	public List<PersonPositionChecker> getPersonLinkEnterTimeVehiclePositionDataToWrite(){
-		return this.personLinkEnterLeaveTimeQueuePositionData;
+		this.lastEventTimeStep=now;
 	}
 
-	public List<PersonPositionChecker> getPersonLinkEnterLeaveTimeDataToWrite(){
-		return this.person2LinkEnterLeaveTimeData;
+	public void openWriter(final String outputFolder){
+		this.writer1 = IOUtils.getBufferedWriter(outputFolder+"rDataPersonLinkEnterLeave.txt");
+		this.writer2 = IOUtils.getBufferedWriter(outputFolder+"rDataPersonInQueueData6.txt");
+		try {
+			this.writer1.write("personId \t linkId \t linkEnterTimeX1 \t initialPositionY1 \t linkLeaveTimeX2 \t endPositionY2 \t travelMode \n");
+			this.writer2.write("personId \t linkId \t startTimeX1 \t initialPositionY1 \t endTimeX2 \t endPositionY2 \t travelMode \n");
+		} catch (Exception e) {
+			throw new RuntimeException("Data is not written. Reason -"+ e);
+		}
+
+	}
+
+	public void closeWriter(){
+		try {
+			this.writer1.close();
+			this.writer2.close();
+		} catch (IOException e) {
+			throw new RuntimeException("Data is not written. Reason -"+ e);
+		}
 	}
 }

@@ -50,7 +50,7 @@ public class TaxibusVehicleCreator
 	{
 
 
-	private String networkFile = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/network/network_nopt.xml";
+	private String networkFile = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/network/versions/network_nopt.xml";
 	private String vehiclesFilePrefix = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/input/taxibus_vehicles_";
 	
 	private Scenario scenario ;
@@ -63,11 +63,8 @@ public class TaxibusVehicleCreator
 		TaxibusVehicleCreator tvc = new TaxibusVehicleCreator();
 		tvc.run(10, Id.createLinkId("vw131"));
 		tvc.run(10, Id.createLinkId("53690"));
-		tvc.run(10, Id.createLinkId("18697"));
-		tvc.run(10, Id.createLinkId("52118"));
-		tvc.run(10, Id.createLinkId("3769"));
-		tvc.run(10, Id.createLinkId("19769"));
-		new VehicleWriter(tvc.vehicles).write(tvc.vehiclesFilePrefix+"l.xml.gz");
+
+		new VehicleWriter(tvc.vehicles).write(tvc.vehiclesFilePrefix+"l10.xml.gz");
 
 //		for (int i = 10; i<150 ; i=i+10 ){
 //			System.out.println(i);
