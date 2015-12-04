@@ -38,7 +38,7 @@ import org.matsim.vehicles.Vehicle;
  * 
  * @author tthunig
  */
-public class Vehicle2DriverEventHandler implements Wait2LinkEventHandler, VehicleLeavesTrafficEventHandler {
+public final class Vehicle2DriverEventHandler implements Wait2LinkEventHandler, VehicleLeavesTrafficEventHandler {
 
 	private final Map<Id<Vehicle>, Id<Person>> driverAgents = new HashMap<>();
 	
