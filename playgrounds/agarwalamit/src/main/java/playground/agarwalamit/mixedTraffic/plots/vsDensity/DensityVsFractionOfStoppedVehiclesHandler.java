@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 
 import playground.agarwalamit.mixedTraffic.MixedTrafficVehiclesUtils;
 
@@ -46,7 +47,8 @@ public class DensityVsFractionOfStoppedVehiclesHandler implements PersonDepartur
 	private double localDensity = 0.;
 	private Map<Id<Person>, Double> personId2LinkEnterTime;
 	private Map<String, Double> legMode2FreeSpeddTravelTime;
-
+	private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
+	
 	public DensityVsFractionOfStoppedVehiclesHandler(Id<Link> linkId, double linkLength) {
 		this.linkId = linkId;
 
@@ -75,11 +77,12 @@ public class DensityVsFractionOfStoppedVehiclesHandler implements PersonDepartur
 		this.personId2LegMode.clear();
 //		this.legMode2PCU.clear();
 		this.personId2LinkEnterTime.clear();
+		this.delegate.reset(iteration);
 	}
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		Id<Person> personId = event.getDriverId();
+		Id<Person> personId = this.delegate.getDriverOfVehicle(event.getVehicleId());
 		if(event.getLinkId().equals(this.linkId)){
 			double nowPCU = MixedTrafficVehiclesUtils.getPCU(this.personId2LegMode.get(personId));
 			this.localDensity -= nowPCU;
@@ -103,7 +106,7 @@ public class DensityVsFractionOfStoppedVehiclesHandler implements PersonDepartur
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		Id<Person> personId = event.getDriverId();
+		Id<Person> personId = this.delegate.getDriverOfVehicle(event.getVehicleId());
 
 		if(event.getLinkId().equals(this.linkId)){
 			this.personId2LinkEnterTime.put(personId, event.getTime());

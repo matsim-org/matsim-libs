@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 
 import playground.agarwalamit.utils.ListUtils;
 
@@ -47,6 +48,7 @@ public class PassingEventsUpdator implements LinkEnterEventHandler, LinkLeaveEve
 	private final List<Double> bikesPassedByEachCarPerKm;
 	private final List<Double> bikesPassedByAllCarPerKm;
 	private final List<Double> carsPerKm;
+	private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
 
 	private final static Id<Link> TRACKING_START_LINK = Id.createLinkId(0);
 	private final static Id<Link> TRACKING_END_LINK = Id.createLinkId(InputsForFDTestSetUp.SUBDIVISION_FACTOR*3-1);
@@ -69,11 +71,12 @@ public class PassingEventsUpdator implements LinkEnterEventHandler, LinkLeaveEve
 		this.bikesPassedByEachCarPerKm.clear();
 		this.bikesPassedByAllCarPerKm.clear();
 		this.carsPerKm.clear();
+		this.delegate.reset(iteration);
 	}
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		Id<Person> personId = Id.createPersonId(event.getDriverId());
+		Id<Person> personId = this.delegate.getDriverOfVehicle(event.getVehicleId());
 		if(event.getLinkId().equals(TRACKING_START_LINK)){
 			this.personId2LinkEnterTime.put(personId, event.getTime());
 		}
@@ -82,7 +85,7 @@ public class PassingEventsUpdator implements LinkEnterEventHandler, LinkLeaveEve
 	private List<Double> tempAvgBikePassedPerCar  = new ArrayList<Double>();
 	@Override 
 	public void handleEvent(LinkLeaveEvent event){
-		Id<Person> personId = Id.createPersonId(event.getDriverId());
+		Id<Person> personId = this.delegate.getDriverOfVehicle(event.getVehicleId());
 
 		if (event.getLinkId().equals(TRACKING_END_LINK)){
 			// startsAveraging when first bike leaves test track

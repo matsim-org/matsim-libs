@@ -36,6 +36,7 @@ import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.mixedTraffic.MixedTrafficVehiclesUtils;
@@ -48,6 +49,7 @@ public class QueuePositionCalculationHandler implements LinkLeaveEventHandler, L
 
 	private static final Logger LOG = Logger.getLogger(QueuePositionCalculationHandler.class);
 	private final Map<Id<Link>,LinkPersonInfoContainer> linkid2Container = new HashMap<>();
+	private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
 	private BufferedWriter writer1 ;
 	private BufferedWriter writer2 ;
 
@@ -67,6 +69,7 @@ public class QueuePositionCalculationHandler implements LinkLeaveEventHandler, L
 	public void reset(int iteration) {
 		this.linkid2Container.clear();
 		this.personId2LegMode.clear();
+		this.delegate.reset(iteration);
 	}
 
 	@Override
@@ -76,7 +79,7 @@ public class QueuePositionCalculationHandler implements LinkLeaveEventHandler, L
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		Id<Person> personId= event.getDriverId();
+		Id<Person> personId= this.delegate.getDriverOfVehicle(event.getVehicleId());
 		Id<Link> linkId = event.getLinkId();
 
 		//store info
@@ -101,7 +104,7 @@ public class QueuePositionCalculationHandler implements LinkLeaveEventHandler, L
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
 		Id<Link> linkId = event.getLinkId();
-		Id<Person> personId = event.getDriverId();
+		Id<Person> personId = this.delegate.getDriverOfVehicle(event.getVehicleId());
 
 		LinkPersonInfoContainer container = this.linkid2Container.get(linkId);
 		if( ! container.getPerson2EnteringPersonInfo().containsKey(personId) ) return; // if agent has departed on this link

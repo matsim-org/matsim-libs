@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.vehicles.VehicleType;
 
 
@@ -49,7 +50,8 @@ class GlobalFlowDynamicsUpdator implements LinkEnterEventHandler, PersonDepartur
 	private final Map<Id<Person>, String> person2Mode = new HashMap<Id<Person>, String>();
 	
 	public final static Id<Link> FLOW_DYNAMICS_UPDATE_LINK = Id.createLinkId(0);
-
+	private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
+	
 	private boolean permanentRegime;
 
 	/**
@@ -76,6 +78,7 @@ class GlobalFlowDynamicsUpdator implements LinkEnterEventHandler, PersonDepartur
 		}
 		this.globalFlowData.reset();
 		this.permanentRegime = false;
+		this.delegate.reset(iteration);
 	}
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
@@ -84,8 +87,9 @@ class GlobalFlowDynamicsUpdator implements LinkEnterEventHandler, PersonDepartur
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
+		Id<Person> personId = this.delegate.getDriverOfVehicle(event.getVehicleId());
 		if (!(permanentRegime)){
-			String travelMode = person2Mode.get(event.getDriverId());
+			String travelMode = person2Mode.get(personId);
 
 			Id<VehicleType> transportMode = Id.create(travelMode, VehicleType.class);
 			this.travelModesFlowData.get(transportMode).handle(event);
@@ -95,7 +99,7 @@ class GlobalFlowDynamicsUpdator implements LinkEnterEventHandler, PersonDepartur
 			double nowTime = event.getTime();
 			if (event.getLinkId().equals(FLOW_DYNAMICS_UPDATE_LINK)){				
 				this.globalFlowData.updateFlow900(nowTime, pcuPerson);
-				this.globalFlowData.updateSpeedTable(nowTime, Id.createPersonId(event.getDriverId()));
+				this.globalFlowData.updateSpeedTable(nowTime, Id.createPersonId(personId));
 				//Waiting for all agents to be on the track before studying stability
 				if ((this.globalFlowData.getNumberOfDrivingAgents() == this.globalFlowData.numberOfAgents) && (nowTime>1800)){	//TODO parametrize this correctly
 					/*//Taking speed check out, as it is not reliable on the global speed table

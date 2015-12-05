@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 
 import playground.agarwalamit.mixedTraffic.MixedTrafficVehiclesUtils;
 
@@ -48,6 +49,7 @@ public class DensityVsPassingDistributionHandler implements PersonDepartureEvent
 	private Map<Id<Person>, Double> personId2LinkEnterTime;
 	private final Id<Link> linkId;
 	private BufferedWriter writer;
+	private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
 
 	public DensityVsPassingDistributionHandler(Id<Link> linkId, BufferedWriter writer) {
 		this.personId2LegMode = new HashMap<Id<Person>, String>();
@@ -64,11 +66,12 @@ public class DensityVsPassingDistributionHandler implements PersonDepartureEvent
 		this.density2TotalOvertakenBicycles.clear();
 		this.density2AverageOvertakenBicycles.clear();
 		this.personId2LinkEnterTime.clear();
+		this.delegate.reset(iteration);
 	}
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		Id<Person> personId = event.getDriverId();
+		Id<Person> personId = this.delegate.getDriverOfVehicle(event.getVehicleId());
 		if(event.getLinkId().equals(this.linkId)){
 			double nowPCU = MixedTrafficVehiclesUtils.getPCU(this.personId2LegMode.get(personId));
 			this.localDensity -= nowPCU;
@@ -81,7 +84,7 @@ public class DensityVsPassingDistributionHandler implements PersonDepartureEvent
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		Id<Person> personId = event.getDriverId();
+		Id<Person> personId = this.delegate.getDriverOfVehicle(event.getVehicleId());
 
 		if(event.getLinkId().equals(this.linkId)){
 			this.personId2LinkEnterTime.put(personId, event.getTime());
@@ -116,7 +119,7 @@ public class DensityVsPassingDistributionHandler implements PersonDepartureEvent
 		//enter time of car is more than bike enter time and leave time of bike is not reached yet
 		// if end time of bike will reach, it won't be in linkEnterList 
 		for(Id<Person> personId:this.personId2LinkEnterTime.keySet()){
-			if(this.personId2LinkEnterTime.get(event.getDriverId()) > this.personId2LinkEnterTime.get(personId)){
+			if(this.personId2LinkEnterTime.get(this.delegate.getDriverOfVehicle(event.getVehicleId())) > this.personId2LinkEnterTime.get(personId)){
 				overtakenBicycles++;
 			}
 		}

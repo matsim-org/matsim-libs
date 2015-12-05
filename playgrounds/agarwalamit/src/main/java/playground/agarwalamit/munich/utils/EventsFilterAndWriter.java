@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
-import org.matsim.api.core.v01.events.Wait2LinkEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
@@ -41,6 +41,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.EventWriterXML;
+import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.core.scenario.MutableScenario;
 
 import playground.agarwalamit.utils.LoadMyScenarios;
@@ -107,9 +108,11 @@ public class EventsFilterAndWriter {
 	PersonArrivalEventHandler {
 
 		private List<Event> listOfEvents = new ArrayList<>();
+		private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
 
 		@Override
 		public void reset(int iteration) {
+			this.delegate.reset(iteration);
 
 		}
 
@@ -119,7 +122,7 @@ public class EventsFilterAndWriter {
 		}
 
 		@Override
-		public void handleEvent(Wait2LinkEvent event) {
+		public void handleEvent(VehicleEntersTrafficEvent event) {
 			listOfEvents.add(event);
 		}
 
