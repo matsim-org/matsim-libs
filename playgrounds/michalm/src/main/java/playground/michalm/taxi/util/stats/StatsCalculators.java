@@ -20,13 +20,19 @@
 package playground.michalm.taxi.util.stats;
 
 import org.apache.commons.math3.stat.descriptive.moment.Mean;
+import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.schedule.Schedule;
+import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 
+import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 
 import playground.michalm.ev.UnitConversionRatios;
 import playground.michalm.taxi.data.*;
 import playground.michalm.taxi.data.TaxiRequest.TaxiRequestStatus;
 import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration;
+import playground.michalm.taxi.schedule.*;
+import playground.michalm.taxi.schedule.TaxiTask.TaxiTaskType;
 import playground.michalm.taxi.scheduler.TaxiSchedulerUtils;
 import playground.michalm.taxi.util.stats.StatsCollector.StatsCalculator;
 
@@ -58,9 +64,36 @@ public class StatsCalculators
             @Override
             public Integer calculateStat()
             {
-                return Iterables
-                        .size(Iterables.filter(optimConfig.context.getVrpData().getVehicles().values(),
+                return Iterables.size(
+                        Iterables.filter(optimConfig.context.getVrpData().getVehicles().values(),
                                 TaxiSchedulerUtils.createIsIdle(optimConfig.scheduler)));
+            }
+        };
+    }
+
+
+    public static StatsCalculator<Integer> createCurrentTaxiTaskOfTypeCounter(
+            final TaxiOptimizerConfiguration optimConfig, final TaxiTaskType taxiTaskType)
+    {
+        return new StatsCalculator<Integer>() {
+            @Override
+            public Integer calculateStat()
+            {
+                return Iterables.size(
+                        Iterables.filter(optimConfig.context.getVrpData().getVehicles().values(),
+                                new Predicate<Vehicle>() {
+                    @Override
+                    public boolean apply(Vehicle veh)
+                    {
+                        if (veh.getSchedule().getStatus() != ScheduleStatus.STARTED) {
+                            return false;
+                        }
+
+                        Schedule<TaxiTask> schedule = TaxiSchedules
+                                .asTaxiSchedule(veh.getSchedule());
+                        return schedule.getCurrentTask().getTaxiTaskType() == taxiTaskType;
+                    }
+                }));
             }
         };
     }

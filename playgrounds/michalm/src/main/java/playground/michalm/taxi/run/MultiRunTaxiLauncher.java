@@ -84,7 +84,7 @@ class MultiRunTaxiLauncher
         for (int i = 0; i < runs; i += 4) {
             MatsimRandom.reset(RANDOM_SEEDS[i]);
             initTravelTimeAndDisutility();
-            simulateIteration();
+            simulateIteration("warmup" + i);
         }
 
         warmup = false;
@@ -109,7 +109,7 @@ class MultiRunTaxiLauncher
         for (int i = 0; i < runs; i++) {
             long t0 = System.currentTimeMillis();
             MatsimRandom.reset(RANDOM_SEEDS[i]);
-            simulateIteration();
+            simulateIteration(i + "");
             TaxiStats evaluation = new TaxiStatsCalculator(
                     context.getVrpData().getVehicles().values()).getStats();
             long t1 = System.currentTimeMillis();

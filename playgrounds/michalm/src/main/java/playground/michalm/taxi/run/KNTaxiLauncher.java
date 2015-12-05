@@ -56,7 +56,7 @@ class KNTaxiLauncher
         }
 
         launcher.initTravelTimeAndDisutility();
-        launcher.simulateIteration();
+        launcher.simulateIteration("");
     }
 
 

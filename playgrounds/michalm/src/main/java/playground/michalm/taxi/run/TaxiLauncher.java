@@ -40,7 +40,10 @@ import playground.michalm.taxi.*;
 import playground.michalm.taxi.data.*;
 import playground.michalm.taxi.data.TaxiRequest.TaxiRequestStatus;
 import playground.michalm.taxi.optimizer.*;
+import playground.michalm.taxi.schedule.TaxiTask.TaxiTaskType;
 import playground.michalm.taxi.scheduler.*;
+import playground.michalm.taxi.util.stats.*;
+import playground.michalm.taxi.util.stats.StatsCollector.StatsCalculator;
 import playground.michalm.zone.*;
 
 
@@ -112,7 +115,7 @@ class TaxiLauncher
     /**
      * Can be called several times (1 call == 1 simulation)
      */
-    void simulateIteration()
+    void simulateIteration(String simId)
     {
         MatsimVrpContextImpl contextImpl = new MatsimVrpContextImpl();
         this.context = contextImpl;
@@ -155,7 +158,36 @@ class TaxiLauncher
             TaxiLauncherUtils.initChargersAndVehicles(taxiData);
             TaxiLauncherUtils.initChargingAndDischargingHandlers(taxiData, scenario.getNetwork(),
                     qSim, travelTime);
-            TaxiLauncherUtils.initStatsCollection(taxiData, qSim, null);
+            
+            if (params.outputDir != null) {
+                TaxiLauncherUtils.initStatsCollection(taxiData, qSim, params.outputDir + "eStats" + simId);
+            }
+        }
+
+        if (params.outputDir != null) {
+            StatsCalculator<String> dispatchStatsCalc = StatsCalculators.combineStatsCalculators(
+                    StatsCalculators.createCurrentTaxiTaskOfTypeCounter(optimizerConfig,
+                            TaxiTaskType.DRIVE_EMPTY), //
+                    StatsCalculators.createCurrentTaxiTaskOfTypeCounter(optimizerConfig,
+                            TaxiTaskType.PICKUP), //
+                    StatsCalculators.createCurrentTaxiTaskOfTypeCounter(optimizerConfig,
+                            TaxiTaskType.DRIVE_WITH_PASSENGER), //
+                    StatsCalculators.createCurrentTaxiTaskOfTypeCounter(optimizerConfig,
+                            TaxiTaskType.DROPOFF), //
+                    StatsCalculators.createCurrentTaxiTaskOfTypeCounter(optimizerConfig,
+                            TaxiTaskType.STAY), //
+                    StatsCalculators.createIdleVehicleCounter(optimizerConfig), //
+                    StatsCalculators.createRequestsWithStatusCounter(taxiData,
+                            TaxiRequestStatus.UNPLANNED));
+            qSim.addQueueSimulationListeners(new StatsCollector<>(dispatchStatsCalc, 300,
+                    "DRIVE_EMPTY\t" + //
+                            "PICKUP\t" + //
+                            "DRIVE_WITH_PASSENGER\t" + //
+                            "DROPOFF\t" + //
+                            "STAY\t" + //
+                            "IDLE\t" + //
+                            "UNPLANNED", //
+                    params.outputDir + "simStats" + simId));
         }
 
         beforeQSim(qSim);
