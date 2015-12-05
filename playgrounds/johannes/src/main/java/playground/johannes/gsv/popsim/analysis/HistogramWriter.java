@@ -24,67 +24,49 @@ import org.matsim.contrib.common.stats.Histogram;
 import org.matsim.contrib.common.stats.StatsWriter;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
  * @author jillenberger
  */
-public abstract class AbstractAnalyzerTask<T> implements AnalyzerTask<T> {
+public class HistogramWriter {
 
-    protected FileIOContext ioContext;
+    private final FileIOContext ioContext;
 
-    private List<DiscretizerBuilder> discretizers;
+    private final List<DiscretizerBuilder> builders;
 
-    private List<String> discretizerTypes;
-
-    private List<Boolean> discretizerFlags;
-
-    public void setIoContext(FileIOContext ioContext) {
+    public HistogramWriter(FileIOContext ioContext, DiscretizerBuilder builder) {
         this.ioContext = ioContext;
+        this.builders = new ArrayList<>();
+        addBuilder(builder);
     }
 
-    public void addDiscretizer(DiscretizerBuilder discretizer, String type) {
-        addDiscretizer(discretizer, type, false);
+    public void addBuilder(DiscretizerBuilder builder) {
+        builders.add(builder);
     }
 
-    public void addDiscretizer(DiscretizerBuilder discretizer, String type, boolean reweight) {
-        if (discretizers == null) {
-            discretizers = new LinkedList<>();
-            discretizerTypes = new LinkedList<>();
-            discretizerFlags = new LinkedList<>();
-        }
-
-        discretizers.add(discretizer);
-        discretizerTypes.add(type);
-        discretizerFlags.add(reweight);
-    }
-
-    protected void writeHistograms(double[] values, String name) {
+    public void writeHistograms(double[] values, String name) {
         double[] weights = new double[values.length];
         Arrays.fill(weights, 1.0);
         writeHistograms(values, weights, name);
     }
 
-    protected void writeHistograms(double[] values, double[] weights, String name) {
-        if (ioContext != null && discretizers != null) {
-            for (int i = 0; i < discretizers.size(); i++) {
-                Discretizer discretizer = discretizers.get(i).build(values);
-                String type = discretizerTypes.get(i);
-                boolean reweight = discretizerFlags.get(i);
+    public void writeHistograms(double[] values, double[] weights, String name) {
+        for (int i = 0; i < builders.size(); i++) {
+            Discretizer discretizer = builders.get(i).build(values);
+            String type = builders.get(i).getName();
 
-                try {
-                    TDoubleDoubleHashMap hist = Histogram.createHistogram(values, weights, discretizer, reweight);
-                    StatsWriter.writeHistogram(hist, name, "frequency", String.format("%s/%s.%s.txt", ioContext.getPath(), name, type));
+            try {
+                TDoubleDoubleHashMap hist = Histogram.createHistogram(values, weights, discretizer, true);
+                StatsWriter.writeHistogram(hist, name, "frequency", String.format("%s/%s.%s.txt", ioContext.getPath(), name, type));
 
-                    hist = Histogram.normalize(hist);
-                    StatsWriter.writeHistogram(hist, name, "probability", String.format("%s/%s.%s.norm.txt", ioContext.getPath(), name, type));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                hist = Histogram.normalize(hist);
+                StatsWriter.writeHistogram(hist, name, "probability", String.format("%s/%s.%s.norm.txt", ioContext.getPath(), name, type));
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
     }
-
 }

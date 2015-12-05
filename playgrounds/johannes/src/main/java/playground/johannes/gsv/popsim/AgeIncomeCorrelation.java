@@ -23,7 +23,8 @@ import gnu.trove.list.array.TDoubleArrayList;
 import gnu.trove.map.hash.TDoubleDoubleHashMap;
 import org.matsim.contrib.common.stats.Correlations;
 import org.matsim.contrib.common.stats.StatsWriter;
-import playground.johannes.gsv.popsim.analysis.AbstractAnalyzerTask;
+import playground.johannes.gsv.popsim.analysis.AnalyzerTask;
+import playground.johannes.gsv.popsim.analysis.FileIOContext;
 import playground.johannes.gsv.popsim.analysis.StatsContainer;
 import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.Person;
@@ -36,7 +37,13 @@ import java.util.List;
  * @author johannes
  *
  */
-public class AgeIncomeCorrelation extends AbstractAnalyzerTask<Collection<? extends Person>> {
+public class AgeIncomeCorrelation implements AnalyzerTask<Collection<? extends Person>> {
+
+	private final FileIOContext ioContext;
+
+	public AgeIncomeCorrelation(FileIOContext ioContext) {
+		this.ioContext = ioContext;
+	}
 
 	@Override
 	public void analyze(Collection<? extends Person> persons, List<StatsContainer> containers) {

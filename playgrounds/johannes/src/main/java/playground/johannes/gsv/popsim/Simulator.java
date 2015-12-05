@@ -137,21 +137,19 @@ public class Simulator {
         predicates.put(CommonValues.LEG_MODE_CAR, new ModePredicate(CommonValues.LEG_MODE_CAR));
 
         final ConcurrentAnalyzerTask<Collection<? extends Person>> task = new ConcurrentAnalyzerTask<>();
-        GeoDistanceBuilder geoDistanceBuilder = new GeoDistanceBuilder(ioContext);
+        HistogramWriter histogramWriter = new HistogramWriter(ioContext, new PassThroughDiscretizerBuilder(new LinearDiscretizer(50000), "linear"));
+        histogramWriter.addBuilder(new StratifiedDiscretizerBuilder(100, 100));
+        GeoDistanceBuilder geoDistanceBuilder = new GeoDistanceBuilder(histogramWriter);
         geoDistanceBuilder.setPredicates(predicates);
-        geoDistanceBuilder.addDiscretizer(new PassThroughDiscretizerBuilder(new LinearDiscretizer(50000)), "linear");
-        geoDistanceBuilder.addDiscretizer(new StratifiedDiscretizerBuilder(100, 100), "stratified");
         task.addComponent(geoDistanceBuilder.build());
         task.addComponent(buildLAU2DistAnalyzers(predicates, ioContext));
         task.addComponent(new GeoDistLau2ClassTask(ioContext));
-        zoneMobilityRate.setIoContext(ioContext);
         task.addComponent(zoneMobilityRate);
         logger.info("Analyzing reference population...");
         ioContext.append("ref");
         AnalyzerTaskRunner.run(refPersons, task, ioContext);
 
         MatrixAnalyzer mAnalyzer = (MatrixAnalyzer) new MatrixAnalyzerConfigurator(config.getModule("matrixAnalyzer"), dataPool).load();
-        mAnalyzer.setIoContext(ioContext);
         mAnalyzer.setPredicate(new ModePredicate(CommonValues.LEG_MODE_CAR));
         task.addComponent(mAnalyzer);
 
@@ -295,10 +293,10 @@ public class Simulator {
                 newPredicates.put(String.format("%s.lau%s", entry.getKey(), idx), predicateAnd);
             }
 
-            GeoDistanceBuilder geoDistanceBuilder = new GeoDistanceBuilder(ioContext);
+            HistogramWriter hWriter = new HistogramWriter(ioContext, new PassThroughDiscretizerBuilder(new LinearDiscretizer(50000), "linear"));
+            hWriter.addBuilder(new StratifiedDiscretizerBuilder(100, 100));
+            GeoDistanceBuilder geoDistanceBuilder = new GeoDistanceBuilder(hWriter);
             geoDistanceBuilder.setPredicates(newPredicates);
-            geoDistanceBuilder.addDiscretizer(new PassThroughDiscretizerBuilder(new LinearDiscretizer(50000)), "linear");
-            geoDistanceBuilder.addDiscretizer(new StratifiedDiscretizerBuilder(100, 100), "stratified");
             task.addComponent(geoDistanceBuilder.build());
         }
         return task;

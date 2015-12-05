@@ -48,12 +48,14 @@ public class AgeIncomeDemo {
     private static final Logger logger = Logger.getLogger(AgeIncomeDemo.class);
 
     public static void main(String args[]) {
-        String refPopFile = "/home/johannes/gsv/matrix2014/popgen/demo/mid2008.midtrips.validated.xml";
+//        String refPopFile = "/home/johannes/gsv/matrix2014/popgen/demo/mid2008.midtrips.validated.xml";
+        String refPopFile = "/Users/jillenberger/work/mid2008.midtrips.valid.xml";
         int simPopSize = 100000;
         long iterations = (long)1e7;
         int logInterval = (int)1e6;
         int dumpInterval = (int)2e6;
-        String outputRoot = "/home/johannes/gsv/matrix2014/popgen/demo/output/";
+//        String outputRoot = "/home/johannes/gsv/matrix2014/popgen/demo/output/";
+        String outputRoot = "/Users/jillenberger/work/";
 
         Random random = new XORShiftRandom(4711);
 
@@ -87,24 +89,19 @@ public class AgeIncomeDemo {
         logger.info("Setting up analyzer...");
         FileIOContext ioContext = new FileIOContext(outputRoot);
 
+        DiscretizerBuilder ageDiscretizerBuilder = new PassThroughDiscretizerBuilder(new LinearDiscretizer(1), "linear");
+        HistogramWriter ageHWriter = new HistogramWriter(ioContext, ageDiscretizerBuilder);
         NumericAnalyzer ageAnalyzer = new NumericAnalyzer(
-                new PersonCollector<>(new NumericAttributeProvider<Person>(CommonKeys.PERSON_AGE)), CommonKeys.PERSON_AGE);
-        NumericAnalyzer incomeAnalyzer = new NumericAnalyzer(
-                new PersonCollector<>(new NumericAttributeProvider<Person>(CommonKeys.HH_INCOME)), CommonKeys.HH_INCOME);
-
-        ageAnalyzer.setIoContext(ioContext);
-        incomeAnalyzer.setIoContext(ioContext);
-
-        ageAnalyzer.addDiscretizer(new PassThroughDiscretizerBuilder(new LinearDiscretizer(1)), "linear");
+                new PersonCollector<>(new NumericAttributeProvider<Person>(CommonKeys.PERSON_AGE)), CommonKeys.PERSON_AGE, ageHWriter);
 
         PersonCollector<Double> incomeCollector = new PersonCollector<>(new NumericAttributeProvider<Person>(CommonKeys.HH_INCOME));
         double[] incomeValues = CollectionUtils.toNativeArray(incomeCollector.collect(refPersons));
         Discretizer incomeDiscretizer = new InterpolatingDiscretizer(incomeValues);
-//        incomeAnalyzer.addDiscretizer(new LinearDiscretizer(500), "linear");
-        incomeAnalyzer.addDiscretizer(new PassThroughDiscretizerBuilder(incomeDiscretizer), "linear");
+        HistogramWriter incomeHWriter = new HistogramWriter(ioContext, new PassThroughDiscretizerBuilder(incomeDiscretizer, "linear"));
+        NumericAnalyzer incomeAnalyzer = new NumericAnalyzer(
+                new PersonCollector<>(new NumericAttributeProvider<Person>(CommonKeys.HH_INCOME)), CommonKeys.HH_INCOME, incomeHWriter);
 
-        AgeIncomeCorrelation ageIncomeCorrelation = new AgeIncomeCorrelation();
-        ageIncomeCorrelation.setIoContext(ioContext);
+        AgeIncomeCorrelation ageIncomeCorrelation = new AgeIncomeCorrelation(ioContext);
 
         ConcurrentAnalyzerTask<Collection<? extends Person>> task = new ConcurrentAnalyzerTask<>();
         task.addComponent(ageAnalyzer);

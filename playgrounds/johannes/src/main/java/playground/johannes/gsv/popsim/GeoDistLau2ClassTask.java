@@ -23,7 +23,7 @@ import gnu.trove.list.array.TDoubleArrayList;
 import gnu.trove.map.hash.TDoubleDoubleHashMap;
 import org.matsim.contrib.common.stats.Correlations;
 import org.matsim.contrib.common.stats.StatsWriter;
-import playground.johannes.gsv.popsim.analysis.AbstractAnalyzerTask;
+import playground.johannes.gsv.popsim.analysis.AnalyzerTask;
 import playground.johannes.gsv.popsim.analysis.FileIOContext;
 import playground.johannes.gsv.popsim.analysis.StatsContainer;
 import playground.johannes.synpop.data.Attributable;
@@ -39,10 +39,12 @@ import java.util.List;
 /**
  * @author johannes
  */
-public class GeoDistLau2ClassTask extends AbstractAnalyzerTask<Collection<? extends Person>> {
+public class GeoDistLau2ClassTask implements AnalyzerTask<Collection<? extends Person>> {
+
+    private final FileIOContext ioContext;
 
     public GeoDistLau2ClassTask(FileIOContext ioContext) {
-        setIoContext(ioContext);
+        this.ioContext = ioContext;
     }
 
     @Override
@@ -65,20 +67,15 @@ public class GeoDistLau2ClassTask extends AbstractAnalyzerTask<Collection<? exte
             }
         }
 
-        if (ioContext != null) {
-            try {
-                String filename = String.format("%s/munic.dist.mean.txt", ioContext.getPath());
-                double[] x = xVals.toArray();
-                double[] y = yVals.toArray();
-//                Discretizer disc = FixedSampleSizeDiscretizer.create(x, 50, 100);
-                TDoubleDoubleHashMap corr = Correlations.mean(x, y);
-                StatsWriter.writeHistogram(corr, "munic", "distance", filename);
+        try {
+            String filename = String.format("%s/munic.dist.mean.txt", ioContext.getPath());
+            double[] x = xVals.toArray();
+            double[] y = yVals.toArray();
+            TDoubleDoubleHashMap corr = Correlations.mean(x, y);
+            StatsWriter.writeHistogram(corr, "munic", "distance", filename);
 
-//                filename = String.format("%s/munic.dist.scatter.txt", getOutputDirectory());
-//                StatsWriter.writeScatterPlot(xVals, yVals, "munic", "distance", filename);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }

@@ -27,17 +27,31 @@ import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
  */
 public class StratifiedDiscretizerBuilder implements DiscretizerBuilder {
 
+    public static final String DEFAULT_NAME = "stratified";
+
     private final int numBins;
 
     private final int minSize;
 
+    private final String name;
+
     public StratifiedDiscretizerBuilder(int numBins, int minSize) {
+        this(numBins, minSize, DEFAULT_NAME);
+    }
+
+    public StratifiedDiscretizerBuilder(int numBins, int minSize, String name) {
         this.numBins = numBins;
         this.minSize = minSize;
+        this.name = name;
     }
 
     @Override
     public Discretizer build(double[] values) {
         return FixedSampleSizeDiscretizer.create(values, minSize, numBins);
+    }
+
+    @Override
+    public String getName() {
+        return name;
     }
 }

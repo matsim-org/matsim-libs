@@ -22,9 +22,7 @@ import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.data.Segment;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author jillenberger
@@ -33,26 +31,22 @@ public class GeoDistanceBuilder {
 
     private Map<String, Predicate<Segment>> predicates;
 
-    private final FileIOContext ioContext;
+    private final HistogramWriter histogramWriter;
 
-    private final Map<String, DiscretizerBuilder> discretizers;
+//    private final List<DiscretizerBuilder> builders;
 
-    public GeoDistanceBuilder(FileIOContext ioContext) {
-        this(ioContext, null);
+    public GeoDistanceBuilder(HistogramWriter histogramWriter) {
+        this(histogramWriter, null);
     }
 
-    public GeoDistanceBuilder(FileIOContext ioContext, Map<String, Predicate<Segment>> predicates) {
-        this.ioContext = ioContext;
+    public GeoDistanceBuilder(HistogramWriter histogramWriter, Map<String, Predicate<Segment>> predicates) {
+        this.histogramWriter = histogramWriter;
         this.setPredicates(predicates);
-        this.discretizers = new HashMap<>();
+//        this.builders = new ArrayList<>();
     }
 
     public void setPredicates(Map<String, Predicate<Segment>> predicates) {
         this.predicates = predicates;
-    }
-
-    public void addDiscretizer(DiscretizerBuilder discretizer, String name) {
-        discretizers.put(name, discretizer);
     }
 
     public AnalyzerTask<Collection<? extends Person>> build() {
@@ -60,14 +54,14 @@ public class GeoDistanceBuilder {
 
         if (predicates == null || predicates.isEmpty()) {
             NumericAnalyzer analyzer = buildWithPredicate(null, null);
-            setDiscretizers(analyzer);
+//            setDiscretizers(histogramWriter);
             task = analyzer;
         } else {
             ConcurrentAnalyzerTask<Collection<? extends Person>> composite = new ConcurrentAnalyzerTask<>();
 
             for (Map.Entry<String, Predicate<Segment>> entry : predicates.entrySet()) {
                 NumericAnalyzer analyzer = buildWithPredicate(entry.getValue(), entry.getKey());
-                setDiscretizers(analyzer);
+//                setDiscretizers(histogramWriter);
                 composite.addComponent(analyzer);
             }
 
@@ -88,12 +82,12 @@ public class GeoDistanceBuilder {
         if (predicateName != null)
             name = String.format("%s.%s", CommonKeys.LEG_GEO_DISTANCE, predicateName);
 
-        return new NumericAnalyzer(collector, name, ioContext);
+        return new NumericAnalyzer(collector, name, histogramWriter);
     }
 
-    private void setDiscretizers(NumericAnalyzer analyzer) {
-        for(Map.Entry<String, DiscretizerBuilder> entry : discretizers.entrySet()) {
-            analyzer.addDiscretizer(entry.getValue(), entry.getKey(), true);
-        }
-    }
+//    private void setDiscretizers(HistogramWriter writer) {
+//        for(DiscretizerBuilder builder : builders) {
+//            writer.addBuilder(builder);
+//        }
+//    }
 }

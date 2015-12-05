@@ -28,4 +28,6 @@ public interface DiscretizerBuilder {
 
     Discretizer build(double[] values);
 
+    String getName();
+
 }

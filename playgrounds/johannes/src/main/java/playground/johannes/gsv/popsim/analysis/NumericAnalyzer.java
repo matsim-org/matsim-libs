@@ -27,20 +27,23 @@ import java.util.List;
 /**
  * @author jillenberger
  */
-public class NumericAnalyzer extends AbstractAnalyzerTask<Collection<? extends Person>> {
+public class NumericAnalyzer implements AnalyzerTask<Collection<? extends Person>> {
 
-    private Collector<Double> collector;
+    private final Collector<Double> collector;
 
-    private String dimension;
+    private final String dimension;
+
+    private final HistogramWriter histogramWriter;
 
     public NumericAnalyzer(Collector<Double> collector, String dimension) {
-        this.collector = collector;
-        this.dimension = dimension;
+        this(collector, dimension, null);
     }
 
-    public NumericAnalyzer(Collector<Double> collector, String dimension, FileIOContext ioContext) {
-        this(collector, dimension);
-        setIoContext(ioContext);
+    public NumericAnalyzer(Collector<Double> collector, String dimension, HistogramWriter histogramWriter) {
+        this.collector = collector;
+        this.dimension = dimension;
+        this.histogramWriter = histogramWriter;
+
     }
 
     @Override
@@ -49,6 +52,8 @@ public class NumericAnalyzer extends AbstractAnalyzerTask<Collection<? extends P
         double[] doubleValues = CollectionUtils.toNativeArray(values);
 
         containers.add(new StatsContainer(dimension, doubleValues));
-        writeHistograms(doubleValues, dimension);
+        if (histogramWriter != null)
+            histogramWriter.writeHistograms(doubleValues, dimension);
+
     }
 }

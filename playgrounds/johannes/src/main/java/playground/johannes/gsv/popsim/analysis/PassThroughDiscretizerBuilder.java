@@ -28,12 +28,20 @@ public class PassThroughDiscretizerBuilder implements DiscretizerBuilder {
 
     private final Discretizer discretizer;
 
-    public PassThroughDiscretizerBuilder(Discretizer discretizer) {
+    private final String name;
+
+    public PassThroughDiscretizerBuilder(Discretizer discretizer, String name) {
         this.discretizer = discretizer;
+        this.name = name;
     }
 
     @Override
     public Discretizer build(double[] values) {
         return discretizer;
+    }
+
+    @Override
+    public String getName() {
+        return name;
     }
 }

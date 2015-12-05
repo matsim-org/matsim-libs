@@ -36,7 +36,7 @@ import java.util.List;
 /**
  * @author johannes
  */
-public class ZoneMobilityRate extends AbstractAnalyzerTask<Collection<? extends Person>> {
+public class ZoneMobilityRate implements AnalyzerTask<Collection<? extends Person>> {
 
     private Predicate<Segment> predicate;
 
@@ -50,7 +50,14 @@ public class ZoneMobilityRate extends AbstractAnalyzerTask<Collection<? extends 
 
     private TObjectDoubleHashMap<String> categoryMobilityRate;
 
+    private final FileIOContext ioContext;
+
     public ZoneMobilityRate(String categoryKey, ZoneCollection zones, Predicate<Segment> predicate) {
+        this(categoryKey, zones, predicate, null);
+    }
+
+    public ZoneMobilityRate(String categoryKey, ZoneCollection zones, Predicate<Segment> predicate, FileIOContext ioContext) {
+        this.ioContext = ioContext;
         this.categoryKey = categoryKey;
         setPredicate(predicate);
 

@@ -41,7 +41,7 @@ import java.util.Set;
 /**
  * @author johannes
  */
-public class MatrixAnalyzer extends AbstractAnalyzerTask<Collection<? extends Person>> {
+public class MatrixAnalyzer implements AnalyzerTask<Collection<? extends Person>> {
 
     private static final String KEY = "matrix";
 
@@ -51,10 +51,24 @@ public class MatrixAnalyzer extends AbstractAnalyzerTask<Collection<? extends Pe
 
     private Predicate<Segment> predicate;
 
+    private final FileIOContext ioContext;
+
+    private final HistogramWriter histogramWriter;
+
     public MatrixAnalyzer(FacilityData facilityData, ZoneCollection zones, Map<String, KeyMatrix> refMatrices) {
-        matrixBuilder = new MatrixBuilder(facilityData, zones);
+        this(facilityData, zones, refMatrices, null);
+    }
+
+    public MatrixAnalyzer(FacilityData facilityData, ZoneCollection zones, Map<String, KeyMatrix> refMatrices, FileIOContext ioContext) {
         this.refMatrices = refMatrices;
-        addDiscretizer(new PassThroughDiscretizerBuilder(new LinearDiscretizer(0.05)), "linear");
+        this.ioContext = ioContext;
+
+        matrixBuilder = new MatrixBuilder(facilityData, zones);
+
+        if(ioContext != null)
+            histogramWriter = new HistogramWriter(ioContext, new PassThroughDiscretizerBuilder(new LinearDiscretizer(0.05), "linear"));
+        else
+            histogramWriter = null;
     }
 
     public void setPredicate(Predicate<Segment> predicate) {
@@ -82,7 +96,8 @@ public class MatrixAnalyzer extends AbstractAnalyzerTask<Collection<? extends Pe
             StatsContainer container = new StatsContainer(name, errors);
             containers.add(container);
 
-            writeHistograms(errors, name);
+            if(histogramWriter != null)
+                histogramWriter.writeHistograms(errors, name);
             /*
             weighted error matrix
              */
