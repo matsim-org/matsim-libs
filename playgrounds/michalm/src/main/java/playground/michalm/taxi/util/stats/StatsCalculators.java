@@ -33,7 +33,7 @@ import playground.michalm.taxi.util.stats.StatsCollector.StatsCalculator;
 
 public class StatsCalculators
 {
-    public static StatsCalculator<String> combineStatsCalculator(
+    public static StatsCalculator<String> combineStatsCalculators(
             final StatsCalculator<?>... calculators)
     {
         return new StatsCalculator<String>() {

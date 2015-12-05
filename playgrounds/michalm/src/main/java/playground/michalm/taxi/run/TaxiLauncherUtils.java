@@ -94,7 +94,7 @@ public class TaxiLauncherUtils
 
     public static void initStatsCollection(ETaxiData taxiData, QSim qSim, String output)
     {
-        StatsCalculator<String> socStatsCalc = StatsCalculators.combineStatsCalculator(
+        StatsCalculator<String> socStatsCalc = StatsCalculators.combineStatsCalculators(
                 StatsCalculators.createMeanSocCalculator(taxiData),
                 StatsCalculators.createDischargedVehiclesCounter(taxiData));
         qSim.addQueueSimulationListeners(
