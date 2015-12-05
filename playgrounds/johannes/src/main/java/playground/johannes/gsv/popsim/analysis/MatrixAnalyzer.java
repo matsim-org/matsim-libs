@@ -54,7 +54,7 @@ public class MatrixAnalyzer extends AbstractAnalyzerTask<Collection<? extends Pe
     public MatrixAnalyzer(FacilityData facilityData, ZoneCollection zones, Map<String, KeyMatrix> refMatrices) {
         matrixBuilder = new MatrixBuilder(facilityData, zones);
         this.refMatrices = refMatrices;
-        addDiscretizer(new LinearDiscretizer(0.05), "linear");
+        addDiscretizer(new PassThroughDiscretizerBuilder(new LinearDiscretizer(0.05)), "linear");
     }
 
     public void setPredicate(Predicate<Segment> predicate) {

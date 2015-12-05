@@ -127,7 +127,7 @@ public class ODBruteForceCalibrator {
 			}
 			ProgressLogger.step();
 		}
-		ProgressLogger.termiante();
+		ProgressLogger.terminate();
 	}
 
 	public void run(Population population) {
@@ -369,7 +369,7 @@ public class ODBruteForceCalibrator {
 			ProgressLogger.step();
 		}
 
-		ProgressLogger.termiante();
+		ProgressLogger.terminate();
 
 		return m;
 	}

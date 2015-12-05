@@ -99,7 +99,7 @@ public class PlanRouteLegs implements PopulationTask {
 				e.printStackTrace();
 			}
 		}
-		ProgressLogger.termiante();
+		ProgressLogger.terminate();
 		
 	}
 	

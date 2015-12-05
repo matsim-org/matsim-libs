@@ -20,7 +20,9 @@ package playground.johannes.synpop.sim;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.facilities.ActivityFacility;
+import playground.johannes.gsv.popsim.analysis.Predicate;
 import playground.johannes.synpop.data.CommonKeys;
+import playground.johannes.synpop.data.Segment;
 import playground.johannes.synpop.sim.data.CachedElement;
 import playground.johannes.synpop.sim.data.CachedSegment;
 import playground.johannes.synpop.sim.data.Converters;
@@ -37,12 +39,18 @@ public class GeoDistanceUpdater implements AttributeChangeListener {
 
     private AttributeChangeListener listener;
 
+    private Predicate<Segment> predicate;
+
     public GeoDistanceUpdater() {
         this.listener = null;
     }
 
     public GeoDistanceUpdater(AttributeChangeListener listener) {
         setListener(listener);
+    }
+
+    public void setPredicate(Predicate<Segment> predicate) {
+        this.predicate = predicate;
     }
 
     public void setListener(AttributeChangeListener listener) {
@@ -64,7 +72,10 @@ public class GeoDistanceUpdater implements AttributeChangeListener {
                 Object old = toLeg.getData(geoDistDataKey);
                 toLeg.setData(geoDistDataKey, d);
 
-                if(listener != null) listener.onChange(geoDistDataKey, old, d, toLeg);
+                if (listener != null) {
+                    if (predicate == null || predicate.test(toLeg))
+                        listener.onChange(geoDistDataKey, old, d, toLeg);
+                }
             }
 
             if (fromLeg != null) {
@@ -73,7 +84,10 @@ public class GeoDistanceUpdater implements AttributeChangeListener {
                 Object old = fromLeg.getData(geoDistDataKey);
                 fromLeg.setData(geoDistDataKey, d);
 
-                if(listener != null) listener.onChange(geoDistDataKey, old, d, fromLeg);
+                if (listener != null) {
+                    if (predicate == null || predicate.test(fromLeg))
+                        listener.onChange(geoDistDataKey, old, d, fromLeg);
+                }
             }
         }
     }

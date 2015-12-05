@@ -139,7 +139,7 @@ public class AdjustSeason {
 
             ProgressLogger.step();
         }
-        ProgressLogger.termiante();
+        ProgressLogger.terminate();
         writer.close();
 
         logger.info("Done.");

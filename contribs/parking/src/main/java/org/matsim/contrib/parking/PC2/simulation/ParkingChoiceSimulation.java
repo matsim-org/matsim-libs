@@ -174,9 +174,8 @@ public final class ParkingChoiceSimulation
 		currentPlanElementIndex.increment(personId);
 	}
 	
-	
 	private boolean isNotTransitAgent(Id<Person> persondId) {
-		return !(Integer.parseInt(persondId.toString())< 1000000000);
+		return (Integer.parseInt(persondId.toString())< 1000000000);
 	}
 
 	public void prepareForNewIteration() {

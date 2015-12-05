@@ -187,7 +187,7 @@ public class NetworkRoutingModule implements RoutingModule {
 //		CarRoute route = null;
 		Path path = null;
 		if (toLink != fromLink) {
-			// do not drive/walk around, if we stay on the same link
+			// (a "true" route)
 			path = this.routeAlgo.calcLeastCostPath(startNode, endNode, depTime, person, null);
 			if (path == null) throw new RuntimeException("No route found from node " + startNode.getId() + " to node " + endNode.getId() + ".");
 			NetworkRoute route = this.routeFactory.createRoute(NetworkRoute.class, fromLink.getId(), toLink.getId());
@@ -199,6 +199,7 @@ public class NetworkRoutingModule implements RoutingModule {
 			travTime = (int) path.travelTime;
 		} else {
 			// create an empty route == staying on place if toLink == endLink
+			// note that we still do a route: someone may drive from one location to another on the link. kai, dec'15
 			NetworkRoute route = this.routeFactory.createRoute(NetworkRoute.class, fromLink.getId(), toLink.getId());
 			route.setTravelTime(0);
 			route.setDistance(0.0);
@@ -208,7 +209,10 @@ public class NetworkRoutingModule implements RoutingModule {
 
 		leg.setDepartureTime(depTime);
 		leg.setTravelTime(travTime);
-		((LegImpl) leg).setArrivalTime(depTime + travTime); // yy something needs to be done once there are alternative implementations of the interface.  kai, apr'10
+		if ( leg instanceof LegImpl ) {
+			((LegImpl) leg).setArrivalTime(depTime + travTime); 
+			// (not in interface!)
+		}
 		return travTime;
 	}
 

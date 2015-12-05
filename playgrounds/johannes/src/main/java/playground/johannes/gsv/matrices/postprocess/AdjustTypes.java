@@ -229,7 +229,7 @@ public class AdjustTypes {
             }
             ProgressLogger.step();
         }
-        ProgressLogger.termiante();
+        ProgressLogger.terminate();
 
         writer.close();
         logger.info("Done.");

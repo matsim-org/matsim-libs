@@ -22,6 +22,7 @@ package playground.johannes.gsv.matrices.analysis;
 import gnu.trove.map.hash.TObjectDoubleHashMap;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.common.stats.Discretizer;
+import org.matsim.contrib.common.stats.DummyDiscretizer;
 import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
 import org.matsim.contrib.common.util.ProgressLogger;
 import playground.johannes.gsv.zones.KeyMatrix;
@@ -45,7 +46,7 @@ public class ModalSplitPopDensity {
     public static final void main(String args[]) throws IOException {
         String outdir = "/home/johannes/gsv/miv-matrix/qs2013/";
         String matrixFile = "/home/johannes/gsv/miv-matrix/qs2013/matrix.txt";
-        String zoneFile = "/home/johannes/gsv/gis/nuts/ger/geojson/nuts3.psm.gk3.geojson";
+        String zoneFile = "/home/johannes/gsv/gis/zones/geojson/nuts3.psm.gk3.geojson";
         String inhabFile = "/home/johannes/gsv/miv-matrix/qs2013/inhabitants.csv";
 
         final KeyMatrix carVol = new KeyMatrix();
@@ -77,7 +78,8 @@ public class ModalSplitPopDensity {
         KeyMatrix airShare = new KeyMatrix();
         KeyMatrix odCounts = new KeyMatrix();
 
-        Discretizer discr = FixedSampleSizeDiscretizer.create(zoneRho.values(), 1, 20);
+//        Discretizer discr = FixedSampleSizeDiscretizer.create(zoneRho.values(), 1, 20);
+        Discretizer discr = new DummyDiscretizer();
 
         Set<String> keys = carVol.keys();
         keys.addAll(railVol.keys());
@@ -116,7 +118,7 @@ public class ModalSplitPopDensity {
             }
             ProgressLogger.step();
         }
-        ProgressLogger.termiante();
+        ProgressLogger.terminate();
 
         logger.info("Calculating averages...");
         keys = odCounts.keys();

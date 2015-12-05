@@ -18,7 +18,6 @@
  * *********************************************************************** */
 package playground.johannes.gsv.popsim.analysis;
 
-import org.matsim.contrib.common.stats.Discretizer;
 import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.data.Segment;
@@ -36,7 +35,7 @@ public class GeoDistanceBuilder {
 
     private final FileIOContext ioContext;
 
-    private final Map<String, Discretizer> discretizers;
+    private final Map<String, DiscretizerBuilder> discretizers;
 
     public GeoDistanceBuilder(FileIOContext ioContext) {
         this(ioContext, null);
@@ -52,7 +51,7 @@ public class GeoDistanceBuilder {
         this.predicates = predicates;
     }
 
-    public void addDiscretizer(Discretizer discretizer, String name) {
+    public void addDiscretizer(DiscretizerBuilder discretizer, String name) {
         discretizers.put(name, discretizer);
     }
 
@@ -93,7 +92,7 @@ public class GeoDistanceBuilder {
     }
 
     private void setDiscretizers(NumericAnalyzer analyzer) {
-        for(Map.Entry<String, Discretizer> entry : discretizers.entrySet()) {
+        for(Map.Entry<String, DiscretizerBuilder> entry : discretizers.entrySet()) {
             analyzer.addDiscretizer(entry.getValue(), entry.getKey(), true);
         }
     }

@@ -110,7 +110,7 @@ public class SetupParkingForZHScenario {
 		
 		// TODO: 
 		// fill in "rentableParking"
-		RentableParking rp=new RentableParking(Id.create("", PC2Parking.class), 1, new Coord(682922.588,247474.957), null, "rentableParking");
+		RentableParking rp=new RentableParking(Id.create("rentableParking", PC2Parking.class), 1, new Coord(682922.588,247474.957), null, "rentableParking");
 		rp.setStartRentableTime(1000);
 		rp.setEndRentableTime(70000);
 		rp.setOwnerId(Id.create("dummyUser", Person.class));

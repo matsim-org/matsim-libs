@@ -63,7 +63,7 @@ public class KeyMatrixTxtIO {
         BufferedReader reader = IOUtils.getBufferedReader(file);
 
         String line = reader.readLine();
-        if(line.equals(HEADER)) {
+        if(line.startsWith(HEADER)) {
             while((line = reader.readLine()) != null) {
                 String tokens[] = line.split(TAB);
 

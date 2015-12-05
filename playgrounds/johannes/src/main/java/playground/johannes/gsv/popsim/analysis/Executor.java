@@ -66,6 +66,7 @@ public class Executor {
     }
 
     public static int getFreePoolSize() {
+        init();
         return service.getMaximumPoolSize() - service.getActiveCount();
     }
 }

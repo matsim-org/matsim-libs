@@ -71,6 +71,12 @@ public class MergePopulations {
         TaskRunner.run(new DeleteShortLongTrips(3000, true), persons);
         TaskRunner.validatePersons(new DeleteNoLegs(), persons);
         logger.info(String.format("Persons after filter: %s", persons.size()));
+
+        logger.info("Removing legs with more than 1000 KM...");
+        TaskRunner.run(new DeleteShortLongTrips(1000000, false), persons);
+        TaskRunner.validatePersons(new DeleteNoLegs(), persons);
+        logger.info(String.format("Persons after filter: %s", persons.size()));
+
         PopulationIO.writeToXML(args[2], persons);
     }
 }

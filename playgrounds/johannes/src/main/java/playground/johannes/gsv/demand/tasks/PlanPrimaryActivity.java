@@ -175,7 +175,7 @@ public class PlanPrimaryActivity implements PopulationTask {
 			
 			ProgressLogger.step();
 		}
-		ProgressLogger.termiante();
+		ProgressLogger.terminate();
 	}
 
 }
