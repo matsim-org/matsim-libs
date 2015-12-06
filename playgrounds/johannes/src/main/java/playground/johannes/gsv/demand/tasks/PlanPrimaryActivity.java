@@ -44,7 +44,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
-import playground.johannes.coopsim.mental.choice.ChoiceSet;
+import org.matsim.contrib.common.collections.ChoiceSet;
 import playground.johannes.coopsim.utils.MatsimCoordUtils;
 import playground.johannes.gsv.demand.PopulationTask;
 
@@ -137,7 +137,7 @@ public class PlanPrimaryActivity implements PopulationTask {
 				for(Zone<Double> zone : attractivities.getZones()) {
 					double d = OrthodromicDistanceCalculator.getInstance().distance(homeZone.getGeometry().getCentroid(), zone.getGeometry().getCentroid());
 					double w = Math.pow(d, -1.4) * zone.getAttribute();
-					choiceSet.addChoice(zone, w);
+					choiceSet.addOption(zone, w);
 				}
 				choiceSets.put(homeZone, choiceSet);
 				

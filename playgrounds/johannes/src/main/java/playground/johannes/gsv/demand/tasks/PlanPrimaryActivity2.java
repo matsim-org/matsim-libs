@@ -13,7 +13,7 @@ import org.matsim.contrib.common.collections.CollectionUtils;
 import org.matsim.contrib.common.util.ProgressLogger;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-import playground.johannes.coopsim.mental.choice.ChoiceSet;
+import org.matsim.contrib.common.collections.ChoiceSet;
 import playground.johannes.gsv.demand.PopulationTask;
 
 import java.util.ArrayList;
@@ -114,7 +114,7 @@ public class PlanPrimaryActivity2 implements PopulationTask {
 					double dy = coord.getY() - target.getY();
 					double d = Math.sqrt(dx*dx + dy*dy);
 					double p = Math.pow(d, -1.3);
-					choiceSet.addChoice(target, p);
+					choiceSet.addOption(target, p);
 				}
 				
 				Coord choice = choiceSet.randomWeightedChoice();

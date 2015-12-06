@@ -25,7 +25,7 @@ package playground.johannes.gsv.demand.loader;
 import org.matsim.contrib.socnetgen.sna.gis.Zone;
 import org.matsim.contrib.socnetgen.sna.gis.ZoneLayer;
 import org.matsim.core.utils.collections.Tuple;
-import playground.johannes.coopsim.mental.choice.ChoiceSet;
+import org.matsim.contrib.common.collections.ChoiceSet;
 import playground.johannes.gsv.demand.AbstractTaskWrapper;
 import playground.johannes.gsv.demand.NutsLevel3Zones;
 import playground.johannes.gsv.demand.tasks.PersonAge;
@@ -66,7 +66,7 @@ public class PersonAgeWrapper extends AbstractTaskWrapper {
 				for (Category cat : entry.getValue()) {
 					Tuple<Integer, Integer> bounds = new Tuple<Integer, Integer>(
 							cat.lower, cat.upper);
-					choiceSet.addChoice(bounds, cat.inhabitants);
+					choiceSet.addOption(bounds, cat.inhabitants);
 				}
 				newzone.setAttribute(choiceSet);
 				zones.add(newzone);

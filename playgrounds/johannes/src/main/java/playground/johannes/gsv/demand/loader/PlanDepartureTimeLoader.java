@@ -22,7 +22,7 @@
  */
 package playground.johannes.gsv.demand.loader;
 
-import playground.johannes.coopsim.mental.choice.ChoiceSet;
+import org.matsim.contrib.common.collections.ChoiceSet;
 import playground.johannes.gsv.demand.AbstractTaskWrapper;
 import playground.johannes.gsv.demand.tasks.PlanDepartureTime;
 
@@ -47,7 +47,7 @@ public class PlanDepartureTimeLoader extends AbstractTaskWrapper {
 			 */
 			String tokens[] = line.split(";");
 			for(int i = 2; i < 26; i++) {
-				choiceSet.addChoice(i-2, Double.parseDouble(tokens[i].replace(",", ".")));
+				choiceSet.addOption(i-2, Double.parseDouble(tokens[i].replace(",", ".")));
 			}
 			break;
 		}

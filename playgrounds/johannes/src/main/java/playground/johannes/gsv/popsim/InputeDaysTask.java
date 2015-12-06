@@ -22,7 +22,7 @@ package playground.johannes.gsv.popsim;
 import gnu.trove.iterator.TObjectIntIterator;
 import gnu.trove.map.hash.TObjectIntHashMap;
 import org.matsim.contrib.common.util.XORShiftRandom;
-import playground.johannes.coopsim.mental.choice.ChoiceSet;
+import org.matsim.contrib.common.collections.ChoiceSet;
 import playground.johannes.synpop.data.*;
 import playground.johannes.synpop.processing.PersonTask;
 import playground.johannes.synpop.source.mid2008.MiDValues;
@@ -78,7 +78,7 @@ public class InputeDaysTask implements PersonTask {
             TObjectIntIterator<String> it = days.iterator();
             for(int i = 0; i < days.size(); i++) {
                 it.advance();
-                choiceSet.addChoice(it.key(), it.value());
+                choiceSet.addOption(it.key(), it.value());
 
                 System.out.print(it.key());
                 System.out.print("=");

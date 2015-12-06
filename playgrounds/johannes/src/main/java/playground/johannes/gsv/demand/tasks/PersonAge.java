@@ -32,7 +32,7 @@ import org.matsim.contrib.socnetgen.sna.gis.Zone;
 import org.matsim.contrib.socnetgen.sna.gis.ZoneLayer;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.utils.collections.Tuple;
-import playground.johannes.coopsim.mental.choice.ChoiceSet;
+import org.matsim.contrib.common.collections.ChoiceSet;
 import playground.johannes.coopsim.utils.MatsimCoordUtils;
 import playground.johannes.gsv.demand.PopulationTask;
 
