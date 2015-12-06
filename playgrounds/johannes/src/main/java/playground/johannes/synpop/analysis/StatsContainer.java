@@ -19,7 +19,7 @@
 package playground.johannes.synpop.analysis;
 
 import org.apache.commons.math.stat.StatUtils;
-import org.matsim.contrib.socnetgen.sna.math.WeightedSampleMean;
+import org.matsim.contrib.common.stats.WeightedSampleMean;
 
 import java.util.List;
 
