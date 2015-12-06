@@ -20,6 +20,8 @@ package playground.johannes.synpop.util;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -35,6 +37,8 @@ public class Executor {
     private static void init() {
         if (service == null) {
             service = (ThreadPoolExecutor) Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+            Timer timer = new Timer(true);
+            timer.scheduleAtFixedRate(new ShutdownTask(), 0, 60 * 1000);
         }
     }
 
@@ -68,5 +72,15 @@ public class Executor {
     public static int getFreePoolSize() {
         init();
         return service.getMaximumPoolSize() - service.getActiveCount();
+    }
+
+    private static class ShutdownTask extends TimerTask {
+
+        @Override
+        public void run() {
+            if(service.getActiveCount() == 0) {
+                service.shutdown();
+            }
+        }
     }
 }
