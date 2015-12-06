@@ -20,6 +20,7 @@
 package playground.johannes.gsv.popsim.analysis;
 
 import org.matsim.contrib.common.stats.Discretizer;
+import playground.johannes.synpop.analysis.DiscretizerBuilder;
 
 /**
  * @author johannes

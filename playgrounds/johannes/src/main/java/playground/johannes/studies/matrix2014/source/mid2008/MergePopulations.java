@@ -17,9 +17,10 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.synpop.source.mid2008.run;
+package playground.johannes.studies.matrix2014.source.mid2008;
 
 import org.apache.log4j.Logger;
+import playground.johannes.gsv.popsim.FilterLegDistance;
 import playground.johannes.gsv.popsim.InputeDaysTask;
 import playground.johannes.gsv.synPop.ConvertRide2Car;
 import playground.johannes.gsv.synPop.DeleteModes;
@@ -45,6 +46,8 @@ public class MergePopulations {
         Factory factory = new PlainFactory();
         Set<? extends Person> tripPersons = PopulationIO.loadFromXML(args[0], factory);
         Set<? extends Person> journeyPersons = PopulationIO.loadFromXML(args[1], factory);
+
+        TaskRunner.validateEpisodes(new FilterLegDistance(), tripPersons);
 
         Set<Person> persons = new HashSet<>();
         persons.addAll(tripPersons);

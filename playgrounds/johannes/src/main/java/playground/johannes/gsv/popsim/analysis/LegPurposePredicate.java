@@ -19,6 +19,7 @@
 
 package playground.johannes.gsv.popsim.analysis;
 
+import playground.johannes.synpop.analysis.Predicate;
 import playground.johannes.synpop.data.Segment;
 
 /**

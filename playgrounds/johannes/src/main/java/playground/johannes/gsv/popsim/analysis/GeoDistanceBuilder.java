@@ -18,11 +18,13 @@
  * *********************************************************************** */
 package playground.johannes.gsv.popsim.analysis;
 
+import playground.johannes.synpop.analysis.*;
 import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.data.Segment;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Map;
 
 /**
  * @author jillenberger

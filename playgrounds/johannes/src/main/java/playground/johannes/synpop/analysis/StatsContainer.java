@@ -16,10 +16,13 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.gsv.popsim.analysis;
+package playground.johannes.synpop.analysis;
 
 import org.apache.commons.math.stat.StatUtils;
 import org.matsim.contrib.socnetgen.sna.math.WeightedSampleMean;
+import playground.johannes.gsv.popsim.CollectionUtils;
+
+import java.util.List;
 
 /**
  * @author jillenberger
@@ -37,6 +40,8 @@ public class StatsContainer {
     private Double max;
 
     private Integer N;
+
+    private Integer nullValues;
 
     private Double variance;
 
@@ -66,6 +71,22 @@ public class StatsContainer {
         N = values.length;
     }
 
+    public StatsContainer(String name, List<Double> values) {
+        this(name);
+        nullValues = new Integer(0);
+        for(Double value : values) {
+            if(value == null) nullValues++;
+        }
+
+        double[] nativeValues = CollectionUtils.toNativeArray(values);
+        mean = StatUtils.mean(nativeValues);
+        median = StatUtils.percentile(nativeValues, 50);
+        min = StatUtils.min(nativeValues);
+        max = StatUtils.max(nativeValues);
+        N = nativeValues.length;
+        variance = StatUtils.variance(nativeValues);
+    }
+
     public String getName() {
         return name;
     }
@@ -88,6 +109,10 @@ public class StatsContainer {
 
     public Integer getN() {
         return N;
+    }
+
+    public Integer getNullValues() {
+        return nullValues;
     }
 
     public Double getVariance() {

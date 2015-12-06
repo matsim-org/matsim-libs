@@ -24,9 +24,9 @@ import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.common.stats.StatsWriter;
 import org.matsim.facilities.ActivityFacilities;
 import playground.johannes.gsv.popsim.analysis.LegBeelineDistance;
-import playground.johannes.gsv.popsim.analysis.LegCollector;
-import playground.johannes.gsv.popsim.analysis.NumericAttributeProvider;
 import playground.johannes.gsv.synPop.analysis.AnalyzerTask;
+import playground.johannes.synpop.analysis.LegCollector;
+import playground.johannes.synpop.analysis.NumericAttributeProvider;
 import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.Person;
 

@@ -16,44 +16,33 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.gsv.popsim.analysis;
+package playground.johannes.synpop.analysis;
 
-import playground.johannes.gsv.popsim.CollectionUtils;
-import playground.johannes.synpop.data.Person;
-
-import java.util.Collection;
-import java.util.List;
+import java.io.File;
 
 /**
  * @author jillenberger
  */
-public class NumericAnalyzer implements AnalyzerTask<Collection<? extends Person>> {
+public class FileIOContext {
 
-    private final Collector<Double> collector;
+    private final String root;
 
-    private final String dimension;
+    private String fullPath;
 
-    private final HistogramWriter histogramWriter;
-
-    public NumericAnalyzer(Collector<Double> collector, String dimension) {
-        this(collector, dimension, null);
+    public FileIOContext(String root) {
+        this.root = root;
+        this.fullPath = root;
+        new File(fullPath).mkdirs();
     }
 
-    public NumericAnalyzer(Collector<Double> collector, String dimension, HistogramWriter histogramWriter) {
-        this.collector = collector;
-        this.dimension = dimension;
-        this.histogramWriter = histogramWriter;
-
+    public String getPath() {
+        return fullPath;
     }
 
-    @Override
-    public void analyze(Collection<? extends Person> persons, List<StatsContainer> containers) {
-        List<Double> values = collector.collect(persons);
-        double[] doubleValues = CollectionUtils.toNativeArray(values);
-
-        containers.add(new StatsContainer(dimension, doubleValues));
-        if (histogramWriter != null)
-            histogramWriter.writeHistograms(doubleValues, dimension);
-
+    public void append(String path) {
+        this.fullPath = String.format("%s/%s", root, path);
+        new File(fullPath).mkdirs();
     }
+
+
 }

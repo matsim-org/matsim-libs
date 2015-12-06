@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.gsv.popsim.analysis;
+package playground.johannes.synpop.analysis;
 
 import playground.johannes.synpop.data.Attributable;
 

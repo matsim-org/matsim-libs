@@ -27,6 +27,7 @@ import playground.johannes.gsv.popsim.MatrixBuilder;
 import playground.johannes.gsv.zones.KeyMatrix;
 import playground.johannes.gsv.zones.MatrixOperations;
 import playground.johannes.gsv.zones.io.KeyMatrixTxtIO;
+import playground.johannes.synpop.analysis.*;
 import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.data.Segment;
 import playground.johannes.synpop.gis.FacilityData;

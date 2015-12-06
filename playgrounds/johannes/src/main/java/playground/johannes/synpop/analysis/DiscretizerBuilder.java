@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,       *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,33 +16,18 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.gsv.popsim.analysis;
 
-import java.io.File;
+package playground.johannes.synpop.analysis;
+
+import org.matsim.contrib.common.stats.Discretizer;
 
 /**
- * @author jillenberger
+ * @author johannes
  */
-public class FileIOContext {
+public interface DiscretizerBuilder {
 
-    private final String root;
+    Discretizer build(double[] values);
 
-    private String fullPath;
-
-    public FileIOContext(String root) {
-        this.root = root;
-        this.fullPath = root;
-        new File(fullPath).mkdirs();
-    }
-
-    public String getPath() {
-        return fullPath;
-    }
-
-    public void append(String path) {
-        this.fullPath = String.format("%s/%s", root, path);
-        new File(fullPath).mkdirs();
-    }
-
+    String getName();
 
 }

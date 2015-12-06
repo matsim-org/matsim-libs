@@ -17,11 +17,9 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.popsim.analysis;
+package playground.johannes.synpop.analysis;
 
-import playground.johannes.synpop.data.Episode;
 import playground.johannes.synpop.data.Person;
-import playground.johannes.synpop.data.Segment;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -30,29 +28,29 @@ import java.util.List;
 /**
  * @author johannes
  */
-public class LegCollector<T> extends AbstractCollector<T, Segment> {
+public class PersonCollector<T> implements Collector<T> {
 
-    public LegCollector(ValueProvider<T, Segment> provider) {
-        super(provider);
+    private Predicate<Person> predicate;
+
+    private final ValueProvider<T, Person> provider;
+
+    public PersonCollector(ValueProvider<T, Person> provider) {
+        this.provider = provider;
+    }
+
+    public void setPredicate(Predicate<Person> predicate) {
+        this.predicate = predicate;
     }
 
     @Override
     public List<T> collect(Collection<? extends Person> persons) {
-        ArrayList<T> values = new ArrayList<>(persons.size() * 10);
-
-        for (Person p : persons) {
-            for (Episode e : p.getEpisodes()) {
-                for (Segment leg : e.getLegs()) {
-                    if (predicate == null || predicate.test(leg)) {
-                        values.add(provider.get(leg));
-                    }
-                }
+        List<T> values = new ArrayList<>(persons.size());
+        for(Person p : persons) {
+            if(predicate == null || predicate.test(p)) {
+                values.add(provider.get(p));
             }
         }
 
-        values.trimToSize();
-
         return values;
     }
-
 }

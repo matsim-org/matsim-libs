@@ -17,40 +17,18 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.popsim.analysis;
+package playground.johannes.synpop.analysis;
 
 import playground.johannes.synpop.data.Person;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 /**
  * @author johannes
  */
-public class PersonCollector<T> implements Collector<T> {
+public interface Collector<T> {
 
-    private Predicate<Person> predicate;
+    List<T> collect(Collection<? extends Person> persons);
 
-    private final ValueProvider<T, Person> provider;
-
-    public PersonCollector(ValueProvider<T, Person> provider) {
-        this.provider = provider;
-    }
-
-    public void setPredicate(Predicate<Person> predicate) {
-        this.predicate = predicate;
-    }
-
-    @Override
-    public List<T> collect(Collection<? extends Person> persons) {
-        List<T> values = new ArrayList<>(persons.size());
-        for(Person p : persons) {
-            if(predicate == null || predicate.test(p)) {
-                values.add(provider.get(p));
-            }
-        }
-
-        return values;
-    }
 }

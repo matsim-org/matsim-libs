@@ -20,6 +20,7 @@
 package playground.johannes.gsv.popsim.analysis;
 
 import org.matsim.contrib.common.collections.Composite;
+import playground.johannes.synpop.analysis.Predicate;
 import playground.johannes.synpop.data.Attributable;
 
 /**

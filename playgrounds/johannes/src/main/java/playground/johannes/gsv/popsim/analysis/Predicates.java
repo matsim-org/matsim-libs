@@ -20,6 +20,7 @@
 package playground.johannes.gsv.popsim.analysis;
 
 import playground.johannes.gsv.popsim.ActTypePredicate;
+import playground.johannes.synpop.analysis.Predicate;
 import playground.johannes.synpop.data.*;
 
 import java.util.*;

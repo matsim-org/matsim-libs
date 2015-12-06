@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,       *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,18 +16,36 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.johannes.synpop.analysis;
 
-package playground.johannes.gsv.popsim.analysis;
+import org.matsim.contrib.common.collections.Composite;
+import playground.johannes.synpop.util.Executor;
 
-import org.matsim.contrib.common.stats.Discretizer;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
- * @author johannes
+ * @author jillenberger
  */
-public interface DiscretizerBuilder {
+public class ConcurrentAnalyzerTask<T> extends Composite<AnalyzerTask<T>> implements AnalyzerTask<T> {
 
-    Discretizer build(double[] values);
+    @Override
+    public void analyze(final T object, final List<StatsContainer> containers) {
+        final List<StatsContainer> concurrentContainers = new CopyOnWriteArrayList<>();
 
-    String getName();
+        List<Runnable> runnables = new ArrayList<>(components.size());
+        for (final AnalyzerTask<T> task : components) {
+            runnables.add(new Runnable() {
+                @Override
+                public void run() {
+                    task.analyze(object, concurrentContainers);
+                }
+            });
+        }
 
+        Executor.submitAndWait(runnables);
+
+        containers.addAll(concurrentContainers);
+    }
 }

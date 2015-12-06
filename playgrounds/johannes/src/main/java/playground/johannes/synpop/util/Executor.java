@@ -16,33 +16,42 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.gsv.popsim.analysis;
-
-import org.matsim.contrib.common.collections.Composite;
+package playground.johannes.synpop.util;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * @author jillenberger
  */
-public class ConcurrentAnalyzerTask<T> extends Composite<AnalyzerTask<T>> implements AnalyzerTask<T> {
+public class Executor {
 
-    @Override
-    public void analyze(final T object, final List<StatsContainer> containers) {
-        final List<StatsContainer> concurrentContainers = new CopyOnWriteArrayList<>();
-        List<Future<?>> futures = new ArrayList<>(components.size());
+    private static ThreadPoolExecutor service;
 
-        for (final AnalyzerTask<T> task : components) {
-            futures.add(Executor.submit(new Runnable() {
-                @Override
-                public void run() {
-                    task.analyze(object, concurrentContainers);
-                }
-            }));
+    private static void init() {
+        if (service == null) {
+            service = (ThreadPoolExecutor) Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+        }
+    }
+
+    public static void shutdown() {
+        if(service != null) service.shutdown();
+    }
+
+    public static Future<?> submit(Runnable task) {
+        init();
+        return service.submit(task);
+    }
+
+    public static void submitAndWait(List<? extends Runnable> runnables) {
+        init();
+        List<Future<?>> futures = new ArrayList<>(runnables.size());
+        for(Runnable runnable : runnables) {
+            futures.add(service.submit(runnable));
         }
 
         for(Future<?> future : futures) {
@@ -54,7 +63,10 @@ public class ConcurrentAnalyzerTask<T> extends Composite<AnalyzerTask<T>> implem
                 e.printStackTrace();
             }
         }
+    }
 
-        containers.addAll(concurrentContainers);
+    public static int getFreePoolSize() {
+        init();
+        return service.getMaximumPoolSize() - service.getActiveCount();
     }
 }

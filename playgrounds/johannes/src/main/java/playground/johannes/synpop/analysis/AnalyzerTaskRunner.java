@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.gsv.popsim.analysis;
+package playground.johannes.synpop.analysis;
 
 import playground.johannes.synpop.data.Person;
 
@@ -45,7 +45,7 @@ public class AnalyzerTaskRunner {
     public static void run(Collection<? extends Person> persons, AnalyzerTask<Collection<? extends Person>> task, String file) {
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-            writer.write("dimension\tmean\tmin\tmax\tsize\tmedian\tvariance");
+            writer.write("dimension\tmean\tmin\tmax\tsize\tmedian\tvariance\tnullValues");
             writer.newLine();
 
             ArrayList<StatsContainer> containers = new ArrayList<>();
@@ -65,6 +65,8 @@ public class AnalyzerTaskRunner {
                 writer.write(doubleToString(container.getMedian()));
                 writer.write(TAB);
                 writer.write(doubleToString(container.getVariance()));
+                writer.write(TAB);
+                writer.write(intToString(container.getNullValues()));
 
                 writer.newLine();
             }

@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,       *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,14 +16,42 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.gsv.popsim.analysis;
 
+package playground.johannes.synpop.sim;
+
+import org.apache.log4j.Logger;
 import playground.johannes.synpop.data.Attributable;
+import playground.johannes.synpop.sim.data.CachedPerson;
+
+import java.util.Collection;
 
 /**
- * @author jillenberger
+ * @author johannes
  */
-public interface ValueProvider<T, A extends Attributable> {
+public class TransitionLogger implements MarkovEngineListener {
 
-    T get(A attributable);
+    private static final Logger logger = Logger.getLogger(TransitionLogger.class);
+
+    private long acceptedIterations;
+
+    private long rejectedIterations;
+
+    private long interval;
+
+    public TransitionLogger(long interval) {
+        this.interval = interval;
+    }
+
+    @Override
+    public void afterStep(Collection<CachedPerson> population, Collection<? extends Attributable> mutations, boolean accepted) {
+        if(accepted) acceptedIterations++;
+        else rejectedIterations++;
+
+        if((acceptedIterations + rejectedIterations) % interval == 0) {
+            logger.info(String.format("Steps accepted %s, rejected %s, accepted ratio %.4f.", acceptedIterations,
+                    rejectedIterations, acceptedIterations/(double)(acceptedIterations + rejectedIterations)));
+            acceptedIterations = 0;
+            rejectedIterations = 0;
+        }
+    }
 }

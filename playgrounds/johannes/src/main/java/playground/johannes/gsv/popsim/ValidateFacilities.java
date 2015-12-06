@@ -23,8 +23,8 @@ import com.vividsolutions.jts.geom.Coordinate;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.common.util.ProgressLogger;
 import org.matsim.facilities.ActivityFacility;
-import playground.johannes.gsv.popsim.analysis.Executor;
 import playground.johannes.synpop.gis.*;
+import playground.johannes.synpop.util.Executor;
 
 import java.util.ArrayList;
 import java.util.Collection;

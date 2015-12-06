@@ -19,9 +19,9 @@
 
 package playground.johannes.synpop.sim;
 
-import playground.johannes.gsv.popsim.analysis.AnalyzerTask;
-import playground.johannes.gsv.popsim.analysis.FileIOContext;
-import playground.johannes.gsv.popsim.analysis.StatsContainer;
+import playground.johannes.synpop.analysis.AnalyzerTask;
+import playground.johannes.synpop.analysis.FileIOContext;
+import playground.johannes.synpop.analysis.StatsContainer;
 import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.data.io.PopulationIO;
 

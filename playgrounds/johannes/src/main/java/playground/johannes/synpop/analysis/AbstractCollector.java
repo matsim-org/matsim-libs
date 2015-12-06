@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,       *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,26 +16,29 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.johannes.synpop.analysis;
 
-package playground.johannes.gsv.popsim.analysis;
-
-import playground.johannes.synpop.analysis.Predicate;
-import playground.johannes.synpop.data.CommonKeys;
-import playground.johannes.synpop.data.Segment;
+import playground.johannes.synpop.data.Attributable;
 
 /**
- * @author johannes
+ * @author jillenberger
  */
-public class ModePredicate implements Predicate<Segment> {
+public abstract class AbstractCollector<T, A extends Attributable> implements Collector<T> {
 
-    private final String mode;
+    protected Predicate<A> predicate;
 
-    public ModePredicate(String mode) {
-        this.mode = mode;
+    protected final ValueProvider<T, A> provider;
+
+    public AbstractCollector(ValueProvider<T, A> provider) {
+        this.provider = provider;
     }
 
-    @Override
-    public boolean test(Segment segment) {
-        return mode.equalsIgnoreCase(segment.getAttribute(CommonKeys.LEG_MODE));
+    public void setPredicate(Predicate<A> predicate) {
+        this.predicate = predicate;
     }
+
+    public Predicate<A> getPredicate() {
+        return predicate;
+    }
+
 }

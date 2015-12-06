@@ -16,57 +16,45 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.gsv.popsim.analysis;
+package playground.johannes.synpop.analysis;
 
-import java.util.ArrayList;
+import playground.johannes.gsv.popsim.CollectionUtils;
+import playground.johannes.synpop.data.Person;
+
+import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * @author jillenberger
  */
-public class Executor {
+public class NumericAnalyzer implements AnalyzerTask<Collection<? extends Person>> {
 
-    private static ThreadPoolExecutor service;
+    private final Collector<Double> collector;
 
-    private static void init() {
-        if (service == null) {
-            service = (ThreadPoolExecutor) Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+    private final String dimension;
+
+    private final HistogramWriter histogramWriter;
+
+    public NumericAnalyzer(Collector<Double> collector, String dimension) {
+        this(collector, dimension, null);
+    }
+
+    public NumericAnalyzer(Collector<Double> collector, String dimension, HistogramWriter histogramWriter) {
+        this.collector = collector;
+        this.dimension = dimension;
+        this.histogramWriter = histogramWriter;
+
+    }
+
+    @Override
+    public void analyze(Collection<? extends Person> persons, List<StatsContainer> containers) {
+        List<Double> values = collector.collect(persons);
+        containers.add(new StatsContainer(dimension, values));
+
+        if (histogramWriter != null) {
+            double[] doubleValues = CollectionUtils.toNativeArray(values);
+            histogramWriter.writeHistograms(doubleValues, dimension);
         }
-    }
 
-    public static void shutdown() {
-        if(service != null) service.shutdown();
-    }
-
-    public static Future<?> submit(Runnable task) {
-        init();
-        return service.submit(task);
-    }
-
-    public static void submitAndWait(List<? extends Runnable> runnables) {
-        init();
-        List<Future<?>> futures = new ArrayList<>(runnables.size());
-        for(Runnable runnable : runnables) {
-            futures.add(service.submit(runnable));
-        }
-
-        for(Future<?> future : futures) {
-            try {
-                future.get();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (ExecutionException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    public static int getFreePoolSize() {
-        init();
-        return service.getMaximumPoolSize() - service.getActiveCount();
     }
 }

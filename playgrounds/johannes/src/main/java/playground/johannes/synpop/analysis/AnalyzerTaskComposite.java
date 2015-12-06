@@ -16,29 +16,21 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.gsv.popsim.analysis;
+package playground.johannes.synpop.analysis;
 
-import playground.johannes.synpop.data.Attributable;
+import org.matsim.contrib.common.collections.Composite;
+
+import java.util.List;
 
 /**
  * @author jillenberger
  */
-public abstract class AbstractCollector<T, A extends Attributable> implements Collector<T> {
+public class AnalyzerTaskComposite<T> extends Composite<AnalyzerTask<T>> implements AnalyzerTask<T> {
 
-    protected Predicate<A> predicate;
-
-    protected final ValueProvider<T, A> provider;
-
-    public AbstractCollector(ValueProvider<T, A> provider) {
-        this.provider = provider;
+    @Override
+    public void analyze(T object, List<StatsContainer> containers) {
+        for(AnalyzerTask<T> task : components) {
+            task.analyze(object, containers);
+        }
     }
-
-    public void setPredicate(Predicate<A> predicate) {
-        this.predicate = predicate;
-    }
-
-    public Predicate<A> getPredicate() {
-        return predicate;
-    }
-
 }

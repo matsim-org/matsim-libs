@@ -19,6 +19,8 @@
 
 package playground.johannes.gsv.popsim.analysis;
 
+import playground.johannes.synpop.analysis.AbstractCollector;
+import playground.johannes.synpop.analysis.ValueProvider;
 import playground.johannes.synpop.data.Episode;
 import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.data.Segment;
