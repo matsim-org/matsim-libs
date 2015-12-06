@@ -22,7 +22,6 @@ package playground.johannes.gsv.popsim.analysis;
 import gnu.trove.list.array.TDoubleArrayList;
 import org.matsim.contrib.common.stats.LinearDiscretizer;
 import org.matsim.contrib.common.stats.StatsWriter;
-import playground.johannes.gsv.popsim.CollectionUtils;
 import playground.johannes.gsv.popsim.MatrixBuilder;
 import playground.johannes.gsv.zones.KeyMatrix;
 import playground.johannes.gsv.zones.MatrixOperations;
@@ -91,7 +90,7 @@ public class MatrixAnalyzer implements AnalyzerTask<Collection<? extends Person>
 
             KeyMatrix errMatrix = MatrixOperations.errorMatrix(refMatrix, simMatrix);
 
-            double[] errors = CollectionUtils.toNativeArray(errMatrix.values());
+            double[] errors = org.matsim.contrib.common.collections.CollectionUtils.toNativeArray(errMatrix.values());
 
             String name = String.format("%s.%s.err", KEY, matrixName);
             StatsContainer container = new StatsContainer(name, errors);

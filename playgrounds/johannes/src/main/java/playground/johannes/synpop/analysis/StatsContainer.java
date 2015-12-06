@@ -20,7 +20,6 @@ package playground.johannes.synpop.analysis;
 
 import org.apache.commons.math.stat.StatUtils;
 import org.matsim.contrib.socnetgen.sna.math.WeightedSampleMean;
-import playground.johannes.gsv.popsim.CollectionUtils;
 
 import java.util.List;
 
@@ -78,7 +77,7 @@ public class StatsContainer {
             if(value == null) nullValues++;
         }
 
-        double[] nativeValues = CollectionUtils.toNativeArray(values);
+        double[] nativeValues = org.matsim.contrib.common.collections.CollectionUtils.toNativeArray(values);
         mean = StatUtils.mean(nativeValues);
         median = StatUtils.percentile(nativeValues, 50);
         min = StatUtils.min(nativeValues);

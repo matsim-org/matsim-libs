@@ -18,7 +18,6 @@
  * *********************************************************************** */
 package playground.johannes.synpop.analysis;
 
-import playground.johannes.gsv.popsim.CollectionUtils;
 import playground.johannes.synpop.data.Person;
 
 import java.util.Collection;
@@ -52,7 +51,7 @@ public class NumericAnalyzer implements AnalyzerTask<Collection<? extends Person
         containers.add(new StatsContainer(dimension, values));
 
         if (histogramWriter != null) {
-            double[] doubleValues = CollectionUtils.toNativeArray(values);
+            double[] doubleValues = org.matsim.contrib.common.collections.CollectionUtils.toNativeArray(values);
             histogramWriter.writeHistograms(doubleValues, dimension);
         }
 

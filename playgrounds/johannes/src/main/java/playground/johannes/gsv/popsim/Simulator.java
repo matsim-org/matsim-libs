@@ -231,7 +231,7 @@ public class Simulator {
         Set<Attributable> simLegs = getCarLegs(simPersons);
 
         List<Double> values = new LegCollector(new NumericAttributeProvider(CommonKeys.LEG_GEO_DISTANCE)).collect(refPersons);
-        double[] nativeValues = CollectionUtils.toNativeArray(values);
+        double[] nativeValues = org.matsim.contrib.common.collections.CollectionUtils.toNativeArray(values);
         Discretizer disc = FixedSampleSizeDiscretizer.create(nativeValues, 50, 100);
 
         UnivariatFrequency f = new UnivariatFrequency(refLegs, simLegs, CommonKeys.LEG_GEO_DISTANCE, disc);

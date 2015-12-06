@@ -24,7 +24,6 @@ import org.matsim.contrib.common.stats.InterpolatingDiscretizer;
 import org.matsim.contrib.common.stats.LinearDiscretizer;
 import org.matsim.contrib.common.util.XORShiftRandom;
 import playground.johannes.gsv.popsim.AgeIncomeCorrelation;
-import playground.johannes.gsv.popsim.CollectionUtils;
 import playground.johannes.gsv.popsim.analysis.PassThroughDiscretizerBuilder;
 import playground.johannes.synpop.analysis.*;
 import playground.johannes.synpop.data.CommonKeys;
@@ -96,7 +95,7 @@ public class AgeIncomeDemo {
                 new PersonCollector<>(new NumericAttributeProvider<Person>(CommonKeys.PERSON_AGE)), CommonKeys.PERSON_AGE, ageHWriter);
 
         PersonCollector<Double> incomeCollector = new PersonCollector<>(new NumericAttributeProvider<Person>(CommonKeys.HH_INCOME));
-        double[] incomeValues = CollectionUtils.toNativeArray(incomeCollector.collect(refPersons));
+        double[] incomeValues = org.matsim.contrib.common.collections.CollectionUtils.toNativeArray(incomeCollector.collect(refPersons));
         Discretizer incomeDiscretizer = new InterpolatingDiscretizer(incomeValues);
         HistogramWriter incomeHWriter = new HistogramWriter(ioContext, new PassThroughDiscretizerBuilder(incomeDiscretizer, "linear"));
         NumericAnalyzer incomeAnalyzer = new NumericAnalyzer(
