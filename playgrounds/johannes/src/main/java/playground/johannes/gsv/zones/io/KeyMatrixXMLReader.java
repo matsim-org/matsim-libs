@@ -39,12 +39,12 @@ public class KeyMatrixXMLReader extends MatsimXmlParser {
 	
 	@Override
 	public void startTag(String name, Attributes atts, Stack<String> context) {
-		if(name.equalsIgnoreCase(ODMatrixXMLWriter.MATRIX_TAG)) {
+		if(name.equalsIgnoreCase(KeyMatrixXMLWriter.MATRIX_TAG)) {
 			m = new KeyMatrix();
-		} else if(name.equalsIgnoreCase(ODMatrixXMLWriter.CELL_TAG)) {
-			String row = atts.getValue(ODMatrixXMLWriter.ROW_KEY);
-			String col = atts.getValue(ODMatrixXMLWriter.COL_KEY);
-			String val = atts.getValue(ODMatrixXMLWriter.VALUE_KEY);
+		} else if(name.equalsIgnoreCase(KeyMatrixXMLWriter.CELL_TAG)) {
+			String row = atts.getValue(KeyMatrixXMLWriter.ROW_KEY);
+			String col = atts.getValue(KeyMatrixXMLWriter.COL_KEY);
+			String val = atts.getValue(KeyMatrixXMLWriter.VALUE_KEY);
 			
 			m.set(row, col, new Double(val));
 		}
