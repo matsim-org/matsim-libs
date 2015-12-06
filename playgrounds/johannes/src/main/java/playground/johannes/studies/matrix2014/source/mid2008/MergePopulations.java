@@ -20,9 +20,6 @@
 package playground.johannes.studies.matrix2014.source.mid2008;
 
 import org.apache.log4j.Logger;
-import playground.johannes.gsv.popsim.FilterLegDistance;
-import playground.johannes.gsv.popsim.InputeDaysTask;
-import playground.johannes.gsv.popsim.ReweightJourneys;
 import playground.johannes.gsv.synPop.ConvertRide2Car;
 import playground.johannes.gsv.synPop.DeleteModes;
 import playground.johannes.gsv.synPop.DeleteNoLegs;

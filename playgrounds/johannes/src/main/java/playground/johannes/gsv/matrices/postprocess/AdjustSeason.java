@@ -22,7 +22,7 @@ package playground.johannes.gsv.matrices.postprocess;
 import gnu.trove.map.hash.TObjectDoubleHashMap;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.common.util.ProgressLogger;
-import playground.johannes.gsv.popsim.Histogram;
+import playground.johannes.studies.matrix2014.stats.Histogram;
 
 import java.io.*;
 import java.util.HashMap;
