@@ -79,7 +79,7 @@ public class ActTypeDistanceTask extends AnalyzerTask {
 
                 List<Double> dists = distColletor.collect(persons);
                 double[] distArray = org.matsim.contrib.common.collections.CollectionUtils.toNativeArray(dists);
-                TDoubleDoubleHashMap hist = Histogram.createHistogram(distArray, new LinearDiscretizer(100000), false);
+                TDoubleDoubleHashMap hist = org.matsim.contrib.common.stats.Histogram.createHistogram(distArray, new LinearDiscretizer(100000), false);
 
                 String purpose = entry.getKey();
                 writer.write(purpose);
