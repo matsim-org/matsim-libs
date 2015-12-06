@@ -20,7 +20,7 @@ package playground.johannes.synpop.sim;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.facilities.ActivityFacility;
-import playground.johannes.gsv.popsim.analysis.Predicate;
+import playground.johannes.synpop.analysis.Predicate;
 import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.Segment;
 import playground.johannes.synpop.sim.data.CachedElement;
