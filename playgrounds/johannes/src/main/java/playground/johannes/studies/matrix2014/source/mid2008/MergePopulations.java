@@ -22,6 +22,7 @@ package playground.johannes.studies.matrix2014.source.mid2008;
 import org.apache.log4j.Logger;
 import playground.johannes.gsv.popsim.FilterLegDistance;
 import playground.johannes.gsv.popsim.InputeDaysTask;
+import playground.johannes.gsv.popsim.ReweightJourneys;
 import playground.johannes.gsv.synPop.ConvertRide2Car;
 import playground.johannes.gsv.synPop.DeleteModes;
 import playground.johannes.gsv.synPop.DeleteNoLegs;
@@ -31,6 +32,8 @@ import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.data.PlainFactory;
 import playground.johannes.synpop.data.io.PopulationIO;
 import playground.johannes.synpop.processing.TaskRunner;
+import playground.johannes.synpop.source.mid2008.processing.AdjustJourneyWeight;
+import playground.johannes.synpop.source.mid2008.processing.ReturnEpisodeTask;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -48,6 +51,13 @@ public class MergePopulations {
         Set<? extends Person> journeyPersons = PopulationIO.loadFromXML(args[1], factory);
 
         TaskRunner.validateEpisodes(new FilterLegDistance(), tripPersons);
+
+        logger.info("Adjusting weights...");
+        new ReweightJourneys().apply(journeyPersons);
+        TaskRunner.run(new AdjustJourneyWeight(), journeyPersons);
+
+        logger.info("Adding return episodes...");
+        TaskRunner.run(new ReturnEpisodeTask(), journeyPersons);
 
         Set<Person> persons = new HashSet<>();
         persons.addAll(tripPersons);
