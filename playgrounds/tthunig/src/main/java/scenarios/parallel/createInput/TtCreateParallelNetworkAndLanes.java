@@ -202,39 +202,39 @@ public final class TtCreateParallelNetworkAndLanes {
 	}
 
 	private void initLinkIds() {
-		links.put("1_2", Id.create("12", Link.class));
-		links.put("2_1", Id.create("21", Link.class));
-		links.put("2_3", Id.create("23", Link.class));
-		links.put("3_2", Id.create("32", Link.class));
-		links.put("3_4", Id.create("34", Link.class));
-		links.put("4_3", Id.create("43", Link.class));
-		links.put("4_5", Id.create("45", Link.class));
-		links.put("5_4", Id.create("54", Link.class));
-		links.put("5_6", Id.create("56", Link.class));
-		links.put("6_5", Id.create("65", Link.class));
-		links.put("2_7", Id.create("27", Link.class));
-		links.put("7_2", Id.create("72", Link.class));
-		links.put("7_8", Id.create("78", Link.class));
-		links.put("8_7", Id.create("87", Link.class));
-		links.put("5_8", Id.create("58", Link.class));
-		links.put("8_5", Id.create("85", Link.class));
+		links.put("1_2", Id.create("1_2", Link.class));
+		links.put("2_1", Id.create("2_1", Link.class));
+		links.put("2_3", Id.create("2_3", Link.class));
+		links.put("3_2", Id.create("3_2", Link.class));
+		links.put("3_4", Id.create("3_4", Link.class));
+		links.put("4_3", Id.create("4_3", Link.class));
+		links.put("4_5", Id.create("4_5", Link.class));
+		links.put("5_4", Id.create("5_4", Link.class));
+		links.put("5_6", Id.create("5_6", Link.class));
+		links.put("6_5", Id.create("6_5", Link.class));
+		links.put("2_7", Id.create("2_7", Link.class));
+		links.put("7_2", Id.create("7_2", Link.class));
+		links.put("7_8", Id.create("7_8", Link.class));
+		links.put("8_7", Id.create("8_7", Link.class));
+		links.put("5_8", Id.create("5_8", Link.class));
+		links.put("8_5", Id.create("8_5", Link.class));
 		if (useSecondODPair) {
-			links.put("3_7", Id.create("37", Link.class));
-			links.put("7_3", Id.create("73", Link.class));
-			links.put("4_8", Id.create("48", Link.class));
-			links.put("8_4", Id.create("84", Link.class));
-			links.put("3_9", Id.create("39", Link.class));
-			links.put("9_3", Id.create("93", Link.class));
-			links.put("4_9", Id.create("49", Link.class));
-			links.put("9_4", Id.create("94", Link.class));
-			links.put("9_10", Id.create("910", Link.class));
-			links.put("10_9", Id.create("109", Link.class));
-			links.put("7_11", Id.create("711", Link.class));
-			links.put("11_7", Id.create("117", Link.class));
-			links.put("8_11", Id.create("811", Link.class));
-			links.put("11_8", Id.create("118", Link.class));
-			links.put("11_12", Id.create("1112", Link.class));
-			links.put("12_11", Id.create("1211", Link.class));
+			links.put("3_7", Id.create("3_7", Link.class));
+			links.put("7_3", Id.create("7_3", Link.class));
+			links.put("4_8", Id.create("4_8", Link.class));
+			links.put("8_4", Id.create("8_4", Link.class));
+			links.put("3_9", Id.create("3_9", Link.class));
+			links.put("9_3", Id.create("9_3", Link.class));
+			links.put("4_9", Id.create("4_9", Link.class));
+			links.put("9_4", Id.create("9_4", Link.class));
+			links.put("9_10", Id.create("9_10", Link.class));
+			links.put("10_9", Id.create("10_9", Link.class));
+			links.put("7_11", Id.create("7_11", Link.class));
+			links.put("11_7", Id.create("11_7", Link.class));
+			links.put("8_11", Id.create("8_11", Link.class));
+			links.put("11_8", Id.create("11_8", Link.class));
+			links.put("11_12", Id.create("11_12", Link.class));
+			links.put("12_11", Id.create("12_11", Link.class));
 		}
 	}
 
@@ -345,10 +345,11 @@ public final class TtCreateParallelNetworkAndLanes {
 	}
 
 	/**
-	 * Setting this flag true will expand the
-	 * {@link playground.dgrether.koehlerstrehlersignal.figure9scenario.DgFigure9ScenarioGenerator}
-	 * with a second origin_destination pair.
+	 *
 	 * @param useSecondODPair
+	 * 			Setting this flag true will expand the
+	 * 			{@link playground.dgrether.koehlerstrehlersignal.figure9scenario.DgFigure9ScenarioGenerator}
+	 * 			with a second origin_destination pair.
      */
 	public void setUseSecondODPair(boolean useSecondODPair) {
 		this.useSecondODPair = useSecondODPair;
@@ -356,6 +357,16 @@ public final class TtCreateParallelNetworkAndLanes {
 
 	public void setCapacity(double capacity) {
 		this.capacity = capacity;
+	}
+
+	/**
+	 * Checks whether the second ODPair is in use
+	 */
+	public static boolean checkNetworkForSecondODPair(Network network) {
+		return (network.getNodes().containsKey(Id.createNodeId(9))	&&
+				network.getNodes().containsKey(Id.createNodeId(10)) &&
+				network.getNodes().containsKey(Id.createNodeId(11)) &&
+				network.getNodes().containsKey(Id.createNodeId(12)));
 	}
 
 }
