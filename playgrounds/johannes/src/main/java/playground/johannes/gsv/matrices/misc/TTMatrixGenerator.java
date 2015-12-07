@@ -177,7 +177,7 @@ public class TTMatrixGenerator {
 			}
 		}
 		
-		ProgressLogger.termiante();
+		ProgressLogger.terminate();
 		
 		if(errors > 0) {
 			logger.info(String.format("%s errors occured.", errors));

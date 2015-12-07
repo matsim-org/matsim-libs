@@ -21,7 +21,7 @@ package playground.johannes.synpop.processing;
 
 import gnu.trove.iterator.TObjectIntIterator;
 import gnu.trove.map.hash.TObjectIntHashMap;
-import playground.johannes.coopsim.mental.choice.ChoiceSet;
+import org.matsim.contrib.common.collections.ChoiceSet;
 import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.Episode;
 import playground.johannes.synpop.data.Person;
@@ -63,7 +63,7 @@ public class GuessMissingActTypes implements PersonsTask {
         TObjectIntIterator<String> it = counts.iterator();
         for (int i = 0; i < counts.size(); i++) {
             it.advance();
-            set.addChoice(it.key(), it.value());
+            set.addOption(it.key(), it.value());
         }
 
         for (Segment s : activities) {

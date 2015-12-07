@@ -31,9 +31,11 @@ public class PersonUtils {
 
     public static  Set<? extends Person> weightedCopy(Collection<? extends Person> persons, Factory factory, int N,
                                                       Random random) {
-        if(persons.size() == N) {
-            return new HashSet<>(persons); //TODO weights are left untouched
-        } else if(persons.size() > N) {
+//        if(persons.size() == N) {
+//
+//              return new HashSet<>(persons); //TODO weights are left untouched
+//        } else if(persons.size() > N) {
+        if(persons.size() > N) {
             throw new IllegalArgumentException("Cannot shrink population.");
         }
 

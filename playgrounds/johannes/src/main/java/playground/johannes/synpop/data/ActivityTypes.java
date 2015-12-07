@@ -54,5 +54,7 @@ public interface ActivityTypes {
 	String PRIVATE = "private";
 
 	String PICKDROP = "pickdrop";
+
+	String WECOMMUTER = "wecommuter";
 	
 }

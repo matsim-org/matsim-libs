@@ -39,6 +39,11 @@ public final class ListUtils {
 		}
 		return sum;
 	}
+	
+	public static int intMean(final List<Integer> intList){
+		int sum =ListUtils.intSum(intList);
+		return sum/intList.size();
+	}
 
 	public static double doubleSum(final List<Double> doubleList){
 		if(doubleList==null) throw new NullPointerException("The list is null. Aborting ...");
@@ -51,8 +56,6 @@ public final class ListUtils {
 	}
 
 	public static double doubleMean(final List<Double> doubleList){
-		if(doubleList==null )	throw new NullPointerException("The list is null. Aborting ...");
-
 		double sum = ListUtils.doubleSum(doubleList);
 		return sum/doubleList.size();
 	}

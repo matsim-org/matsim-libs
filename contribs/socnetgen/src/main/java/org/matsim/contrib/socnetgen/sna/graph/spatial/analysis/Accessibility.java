@@ -19,12 +19,9 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetgen.sna.graph.spatial.analysis;
 
+import com.vividsolutions.jts.geom.Point;
 import gnu.trove.iterator.TObjectDoubleIterator;
 import gnu.trove.map.hash.TObjectDoubleHashMap;
-
-import java.util.List;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
 import org.matsim.contrib.common.collections.CollectionUtils;
 import org.matsim.contrib.common.util.ProgressLogger;
@@ -33,7 +30,8 @@ import org.matsim.contrib.socnetgen.sna.graph.Vertex;
 import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialVertex;
 import org.matsim.contrib.socnetgen.sna.util.MultiThreading;
 
-import com.vividsolutions.jts.geom.Point;
+import java.util.List;
+import java.util.Set;
 
 /**
  * @author illenberger
@@ -83,7 +81,7 @@ public class Accessibility extends AbstractSpatialProperty {
 				e.printStackTrace();
 			}
 		}
-		ProgressLogger.termiante();
+		ProgressLogger.terminate();
 		/*
 		 * merge results
 		 */

@@ -23,6 +23,7 @@ import com.vividsolutions.jts.geom.Point;
 import gnu.trove.map.hash.TDoubleDoubleHashMap;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.common.collections.ChoiceSet;
 import org.matsim.contrib.common.gis.CartesianDistanceCalculator;
 import org.matsim.contrib.common.gis.DistanceCalculator;
 import org.matsim.contrib.common.stats.Discretizer;
@@ -87,7 +88,7 @@ public class ActivityFacilitySelector implements ChoiceSelector {
 		
 		for(SocialVertex ego : egos) {
 			Point p1 = ego.getPoint();
-			for(Id id : choiceSet.getChoices()) {
+			for(Id id : choiceSet.getOptions()) {
 				ActivityFacility fac = facilities.getFacilities().get(id);
 				Point p2 = MatsimCoordUtils.coordToPoint(fac.getCoord());
 				

@@ -148,7 +148,7 @@ public class NetLoad {
 			}
 			ProgressLogger.step();
 		}
-		ProgressLogger.termiante();
+		ProgressLogger.terminate();
 		/*
 		 * compare counts
 		 */

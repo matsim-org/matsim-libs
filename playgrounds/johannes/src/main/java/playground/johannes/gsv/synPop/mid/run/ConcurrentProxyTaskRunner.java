@@ -76,6 +76,6 @@ public class ConcurrentProxyTaskRunner {
 			}
 		}
 		
-		ProgressLogger.termiante();
+		ProgressLogger.terminate();
 	}
 }

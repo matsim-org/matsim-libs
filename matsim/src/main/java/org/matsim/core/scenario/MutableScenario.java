@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacilitiesImpl;

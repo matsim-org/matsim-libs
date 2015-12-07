@@ -115,7 +115,7 @@ public class MalikLabExperiments {
 	}
 	
 	public static void main(String[] args) throws FileNotFoundException{
-		Header.printHeader(MalikLabExperiments.class.toString(), args);
+//		Header.printHeader(MalikLabExperiments.class.toString(), args);
 		
 		int ModeSwitch = Integer.parseInt(args[2]); //if ModeSwitch = 0 then it's a base run; if =1 then it's a simulation
 		int runStart = Integer.parseInt(args[3]);
@@ -134,7 +134,7 @@ public class MalikLabExperiments {
 			mle.runThisSpecificExperiment();
 		}
 		
-		Header.printFooter();
+//		Header.printFooter();
 	}
 
 }

@@ -58,6 +58,7 @@ import org.matsim.core.mobsim.framework.ObservableMobsim;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
@@ -357,6 +358,10 @@ public class Controler extends AbstractController {
 						Controler.this.scenario, net);
 			}
 		});
+        if ( scenario.getPopulation() instanceof PopulationImpl ) {
+      	  ((PopulationImpl) scenario.getPopulation()).setLocked();
+        }
+        
 	}
 
 	@Override
@@ -461,14 +466,17 @@ public class Controler extends AbstractController {
 	    return scenario;
     }
 
-    @Deprecated // preferably use "@Inject EventsManager events" or "addEventHandlerBinding().toInstance(...) from AbstractModule". kai/mz, nov'15
-    public final EventsManager getEvents() {
-	    return events;
-    }
-
-    public final Injector getInjector() {
-	    return this.injector;
-    }
+    	/**
+    	 * @deprecated -- preferably use "@Inject EventsManager events" or "addEventHandlerBinding().toInstance(...) from AbstractModule". kai/mz, nov'15
+    	 */
+    	@Deprecated // preferably use "@Inject EventsManager events" or "addEventHandlerBinding().toInstance(...) from AbstractModule". kai/mz, nov'15
+    	public final EventsManager getEvents() {
+    		return events;
+    	}
+    	
+    	public final Injector getInjector() {
+    		return this.injector;
+    	}
 
 	/**
 	 * @deprecated Do not use this, as it may not contain values in every
@@ -479,7 +487,7 @@ public class Controler extends AbstractController {
 		return this.injector.getInstance(CalcLinkStats.class);
 	}
 
-    public final VolumesAnalyzer getVolumes() {
+	public final VolumesAnalyzer getVolumes() {
 		return this.injector.getInstance(VolumesAnalyzer.class);
 	}
 

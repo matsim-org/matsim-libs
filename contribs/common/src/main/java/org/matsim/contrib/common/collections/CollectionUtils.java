@@ -115,4 +115,52 @@ public class CollectionUtils {
 
         return sorted;
     }
+
+    /**
+     * Converts a list of double objects to a native double array by ignoring all null objects, Nan and infinite
+     * values.
+     *
+     * @param values a list of double objects
+     * @return a native double array
+     */
+    public static double[] toNativeArray(List<Double> values) {
+        return toNativeArray(values, true, true, true);
+    }
+
+    /**
+     * Converts a list of double objects to a native double array.
+     *
+     * @param values     a list of double objects
+     * @param ignoreNull if <tt>true</tt> null values are ignored, otherwise they treated as 0.0
+     * @param ignoreNAN  if <tt>true</tt> Nan values are ignored, otherwise treated as {@link Double#NaN}
+     * @param ignoreInf  if <tt>true</tt> infinite values are ignored, otherwise treated as {@link
+     *                   Double#POSITIVE_INFINITY} of {@link Double#NEGATIVE_INFINITY} respectively
+     * @return a native double array
+     */
+    public static double[] toNativeArray(List<Double> values, boolean ignoreNull, boolean ignoreNAN, boolean
+            ignoreInf) {
+        double[] nativeVals = new double[values.size()];
+        int cnt = 0;
+
+        for (Double val : values) {
+            if (!ignoreNull || val != null) {
+
+                if (val == null) val = 0.0;
+
+                if (!ignoreNAN || !val.isNaN()) {
+
+                    if (!ignoreInf || !val.isInfinite()) {
+                        nativeVals[cnt] = val;
+                        cnt++;
+                    }
+                }
+            }
+        }
+
+        if (cnt < values.size()) {
+            nativeVals = Arrays.copyOf(nativeVals, cnt);
+        }
+
+        return nativeVals;
+    }
 }

@@ -270,7 +270,7 @@ public class TriGraphConstructor {
 		//Now you have all the shortest paths for all the directly connected Malik links. Put them together to build the whole set.
 
 		//		Create set of all shortest paths for Ghost Network
-		int [][] fullPathCollect = new int[1500000][55];
+		int [][] fullPathCollect = new int[5000000][55];
 		for (int[] row: fullPathCollect){
 			Arrays.fill(row, 999);
 		}

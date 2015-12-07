@@ -127,7 +127,6 @@ class GlobalFlowDynamicsUpdator implements LinkEnterEventHandler, PersonDepartur
 								this.travelModesFlowData.get(vehTyp).saveDynamicVariables();
 							}
 							this.globalFlowData.setPermanentAverageVelocity(this.globalFlowData.getActualAverageVelocity());
-							//ZZ_TODO : well this could be one of the reason for break downs in fds, don't just multiply it by 4, instead store last three 15 min flows (amit, nov 15)
 							this.globalFlowData.setPermanentFlow(this.globalFlowData.getCurrentHourlyFlow()); 
 							double globalDensity = 0.;
 							for (TravelModesFlowDynamicsUpdator mode : this.travelModesFlowData.values()){

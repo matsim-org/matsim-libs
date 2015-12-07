@@ -55,16 +55,31 @@ public class PopulationCreator {
 
 	private final Random rnd = MatsimRandom.getRandom(); // TODO
 
-	public static final String HOME = "home";
+	public static final String W1S = "w1s";
+	public static final String W1L = "w1l";
+	public static final String HgivenW1S = "h|w1s";
+	public static final String HgivenW1L = "h|w1l";
 
-	public static final String WORK = "work";
+	public static final String O1 = "o1";
+	public static final String HgivenO1 = "h|o1";
 
-	public static final String OTHER = "other";
+	public static final String W2S = "w2s";
+	public static final String W2L = "w2l";
+	public static final String HgivenW2S = "h|w2s";
+	public static final String HgivenW2L = "h|w2l";
+	public static final String H2givenW2S = "h2|w2s";
+	public static final String H2givenW2L = "h2|w2l";
+	public static final String O2givenW2S = "o2|w2s";
+	public static final String O2givenW2L = "o2|w2l";
 
-	// TODO These should be configurable distributions.
-	final double workDuration_s = 9.0 * 3600.0;
-	final double intermediateHomeDuration_s = 0.5 * 3600.0;
-	final double otherDuration_s = 1.5 * 3600.0;
+	// public static final String HOME = "home";
+	// public static final String WORK = "work";
+	// public static final String OTHER = "other";
+
+	// anything not completely nonsensical, just to get started
+	final double workDuration_s = 8.0 * 3600.0;
+	final double intermediateHomeDuration_s = 1.0 * 3600.0;
+	final double otherDuration_s = 1.0 * 3600.0;
 	final double tripDuration_s = 0.5 * 3600;
 
 	// -------------------- MEMBERS --------------------
@@ -174,9 +189,9 @@ public class PopulationCreator {
 	}
 
 	private void addHomeActivity(final Plan plan, final Coord homeCoord,
-			final Double endTime_s) {
+			final Double endTime_s, final String type) {
 		final Activity home = this.scenario.getPopulation().getFactory()
-				.createActivityFromCoord(HOME, homeCoord);
+				.createActivityFromCoord(type, homeCoord);
 		if (endTime_s != null) {
 			home.setEndTime(endTime_s);
 		}
@@ -253,64 +268,81 @@ public class PopulationCreator {
 			 * HOME - WORK - HOME
 			 */
 
-			final double initialHomeEndTime_s = MathHelpers.draw(6.0, 8.0,
-					this.rnd) * 3600.0;
-			this.addHomeActivity(plan, homeCoord, initialHomeEndTime_s);
+			final boolean shortWork = (this.rnd.nextDouble() < 0.63);
 
-			final double workEndTime_s = initialHomeEndTime_s + tripDuration_s
-					+ workDuration_s;
+			final double initialHomeEndTime_s = MathHelpers.draw(5.0, 7.0,
+					this.rnd) * 3600.0;
+			this.addHomeActivity(plan, homeCoord, initialHomeEndTime_s,
+					(shortWork ? HgivenW1S : HgivenW1L));
+
+			final double workEndTime_s = initialHomeEndTime_s
+					+ this.tripDuration_s + this.workDuration_s;
 			final String workTourMode = regent2matsim.get(this.attr(personId,
 					WORKTOURMODE_ATTRIBUTE));
-			// TODO Work may be done at home!
-			this.addTour(plan, WORK, workCoord, workTourMode, workEndTime_s);
+			this.addTour(plan, (shortWork ? W1S : W1L), workCoord,
+					workTourMode, workEndTime_s);
+
+			this.addHomeActivity(plan, homeCoord, null, (shortWork ? HgivenW1S
+					: HgivenW1L));
 
 		} else if ((workCoord == null) && (otherCoord != null)) {
 
 			/*
 			 * HOME - OTHER - HOME
 			 */
-			final double initialHomeEndTime_s = MathHelpers.draw(6.0, 21.0,
+			final double initialHomeEndTime_s = MathHelpers.draw(9.0, 19.0,
 					this.rnd) * 3600.0;
-			this.addHomeActivity(plan, homeCoord, initialHomeEndTime_s);
+			this.addHomeActivity(plan, homeCoord, initialHomeEndTime_s,
+					HgivenO1);
 
-			final double otherEndTime_s = initialHomeEndTime_s + tripDuration_s
-					+ otherDuration_s;
+			final double otherEndTime_s = initialHomeEndTime_s
+					+ this.tripDuration_s + this.otherDuration_s;
 			final String otherTourMode = regent2matsim.get(this.attr(personId,
 					OTHERTOURMODE_ATTRIBUTE));
-			this.addTour(plan, OTHER, otherCoord, otherTourMode, otherEndTime_s);
+			this.addTour(plan, O1, otherCoord, otherTourMode, otherEndTime_s);
 
+			this.addHomeActivity(plan, homeCoord, null, HgivenO1);
+			
 		} else if ((homeCoord != null) && (workCoord != null)) {
 
 			/*
 			 * HOME - WORK - HOME - OTHER - HOME
 			 */
 
-			final double initialHomeEndTime_s = MathHelpers.draw(6.0, 8.0,
-					this.rnd) * 3600.0;
-			this.addHomeActivity(plan, homeCoord, initialHomeEndTime_s);
+			final boolean shortWork = (this.rnd.nextDouble() < 0.41);
 
-			final double workEndTime_s = initialHomeEndTime_s + tripDuration_s
-					+ workDuration_s;
+			final double initialHomeEndTime_s = MathHelpers.draw(5.0, 7.0,
+					this.rnd) * 3600.0;
+			this.addHomeActivity(plan, homeCoord, initialHomeEndTime_s,
+					(shortWork ? HgivenW2S : HgivenW2L));
+
+			final double workEndTime_s = initialHomeEndTime_s
+					+ this.tripDuration_s + this.workDuration_s;
 			final String workTourMode = regent2matsim.get(this.attr(personId,
 					WORKTOURMODE_ATTRIBUTE));
-			// TODO Work may be done at home!
-			this.addTour(plan, WORK, workCoord, workTourMode, workEndTime_s);
+			this.addTour(plan, (shortWork ? W2S : W2L), workCoord,
+					workTourMode, workEndTime_s);
 
 			final double intermediateHomeEndTime_s = workEndTime_s
-					+ tripDuration_s + intermediateHomeDuration_s;
-			this.addHomeActivity(plan, homeCoord, intermediateHomeEndTime_s);
+					+ this.tripDuration_s + this.intermediateHomeDuration_s;
+			this.addHomeActivity(plan, homeCoord, intermediateHomeEndTime_s,
+					(shortWork ? H2givenW2S : H2givenW2L));
 
 			final double otherEndTime_s = intermediateHomeEndTime_s
-					+ tripDuration_s + otherDuration_s;
+					+ this.tripDuration_s + this.otherDuration_s;
 			final String otherTourMode = regent2matsim.get(this.attr(personId,
 					OTHERTOURMODE_ATTRIBUTE));
-			this.addTour(plan, OTHER, otherCoord, otherTourMode, otherEndTime_s);
-		}
+			this.addTour(plan, (shortWork ? O2givenW2S : O2givenW2L),
+					otherCoord, otherTourMode, otherEndTime_s);
 
-		/*
-		 * Last (open-end) home activity of the day.
-		 */
-		this.addHomeActivity(plan, homeCoord, null);
+			this.addHomeActivity(plan, homeCoord, null, (shortWork ? HgivenW2S
+					: HgivenW2L));
+			
+		} else {
+
+			return null;
+
+		}
 
 		/*
 		 * Assign activity coordinates to links.
