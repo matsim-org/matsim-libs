@@ -18,18 +18,25 @@
  * *********************************************************************** */
 package playground.ivt.router.lazyschedulebasedmatrix;
 
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.ActivityWrapperFacility;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TransitRouterWrapper;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.facilities.Facility;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
@@ -43,6 +50,7 @@ import java.util.Map;
  * @author thibautd
  */
 public class LazyScheduleBasedMatrixRoutingModule implements RoutingModule {
+	private final Network network;
 	private final RoutingModule delegate;
 	private final RoutingModule walkRouter;
 
@@ -57,6 +65,21 @@ public class LazyScheduleBasedMatrixRoutingModule implements RoutingModule {
 								TIntObjectHashMap<
 									List<? extends PlanElement>>>>>> matrix = new TIntObjectHashMap<>();
 
+	@Inject
+	public LazyScheduleBasedMatrixRoutingModule(
+			final Scenario scenario,
+			final TransitRouter router,
+			@Named(TransportMode.transit_walk)
+			final RoutingModule walkRouter) {
+		// TODO: pass bin sizes via config
+		this( 15 * 60,
+				1000,
+				router,
+				scenario.getTransitSchedule(),
+				scenario.getNetwork(),
+				walkRouter );
+	}
+
 	public LazyScheduleBasedMatrixRoutingModule(
 			final double timeBinDuration_s,
 			final double cellSize_m,
@@ -70,6 +93,7 @@ public class LazyScheduleBasedMatrixRoutingModule implements RoutingModule {
 				network,
 				walkRouter );
 		this.walkRouter = walkRouter;
+		this.network = network;
 		this.timeBinDuration_s = timeBinDuration_s;
 		this.cellSize_m = cellSize_m;
 	}
@@ -110,19 +134,29 @@ public class LazyScheduleBasedMatrixRoutingModule implements RoutingModule {
 
 	private Facility binFacility( final Facility fromFacility ) {
 		return new Facility() {
+			private Coord coord = null;
+			private Id<Link> linkId = null;
+
 			@Override
 			public Id<Link> getLinkId() {
-				throw new UnsupportedOperationException( "did not implement searching for link at the middle of a cell" );
+				if ( linkId == null ) {
+					// TODO: check if networkImpl and complain if not
+					linkId = ((NetworkImpl) network).getNearestLinkExactly( coord ).getId();
+				}
+				return linkId;
 			}
 
 			@Override
 			public Coord getCoord() {
-				final int cellX = (int) (fromFacility.getCoord().getX() / cellSize_m);
-				final int cellY = (int) (fromFacility.getCoord().getY() / cellSize_m);
+				if ( coord == null ) {
+					final int cellX = (int) ( fromFacility.getCoord().getX() / cellSize_m );
+					final int cellY = (int) ( fromFacility.getCoord().getY() / cellSize_m );
 
-				return new Coord(
-						cellX * cellSize_m + cellSize_m / 2,
-						cellY * cellSize_m + cellSize_m / 2 );
+					coord = new Coord(
+							cellX * cellSize_m + cellSize_m / 2,
+							cellY * cellSize_m + cellSize_m / 2 );
+				}
+				return coord;
 			}
 
 			@Override
@@ -160,7 +194,7 @@ public class LazyScheduleBasedMatrixRoutingModule implements RoutingModule {
 		trip.addAll(
 				calcWalkTrip(
 						new ActivityWrapperFacility( (Activity) trip.get( cached.size() - 1 ) ),
-						toFacility ));
+						toFacility ) );
 
 		return trip;
 	}
