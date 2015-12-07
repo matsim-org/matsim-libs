@@ -97,7 +97,7 @@ class GlobalFlowDynamicsUpdator implements LinkEnterEventHandler, PersonDepartur
 				this.globalFlowData.updateFlow900(nowTime, pcuPerson);
 				this.globalFlowData.updateSpeedTable(nowTime, Id.createPersonId(event.getDriverId()));
 				//Waiting for all agents to be on the track before studying stability
-				if ((this.globalFlowData.getNumberOfDrivingAgents() == this.globalFlowData.numberOfAgents) && (nowTime>1800)){	//TODO parametrize this correctly
+				if ((this.globalFlowData.getNumberOfDrivingAgents() == this.globalFlowData.numberOfAgents) && (nowTime > InputsForFDTestSetUp.MAX_ACT_END_TIME * 2)){	
 					/*//Taking speed check out, as it is not reliable on the global speed table
 					 *  Maybe making a list of moving averages could be smart, 
 					 *  but there is no reliable converging process even in that case. (ssix, 25.10.13)
