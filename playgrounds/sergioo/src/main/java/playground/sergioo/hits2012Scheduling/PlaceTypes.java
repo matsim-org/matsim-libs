@@ -45,7 +45,7 @@ public class PlaceTypes {
 			PlaceType.CIVIC, PlaceType.HOME_OTHER, PlaceType.PARK, PlaceType.REC}));
 	
 	public static void main(String[] args) throws NumberFormatException, IOException, ParseException {
-		Map<String, Household> households = HitsReader.readHits(args[0], args[1]);
+		Map<String, Household> households = HitsReader.readHits(args[0]);
 		IncomeEstimation.init();
 		IncomeEstimation.setIncome(households);
 		Map<String, Map<String, Integer>> typesPlaces = new HashMap<String, Map<String, Integer>>();

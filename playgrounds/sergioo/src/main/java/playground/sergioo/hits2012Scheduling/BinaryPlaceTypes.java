@@ -1,6 +1,7 @@
 package playground.sergioo.hits2012Scheduling;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -64,7 +65,7 @@ public class BinaryPlaceTypes {
 	}
 	
 	public static void main(String[] args) throws NumberFormatException, IOException, ParseException {
-		Map<String, Household> households = HitsReader.readHits(args[0], args[1]);
+		Map<String, Household> households = HitsReader.readHits(args[0]);
 		IncomeEstimation.init();
 		IncomeEstimation.setIncome(households);
 		for(Household household:households.values())
@@ -304,7 +305,7 @@ public class BinaryPlaceTypes {
 			printer.close();
 		}
 		for(String purpose:FLEX_ATIVITIES) {
-			Set<DetailedType> detailedTypes = new HashSet<DetailedType>();
+			List<DetailedType> detailedTypes = new ArrayList<DetailedType>();
 			for(DetailedType detailedType:Location.DetailedType.values()) {
 				Integer num = typesPlaces.get(purpose).get(detailedType);
 				if(num!=null && num>MIN_OCURR)
@@ -482,7 +483,7 @@ public class BinaryPlaceTypes {
 		}
 	}
 
-	private static Map<String, Map<String, Map<DetailedType, Double>>> calculateAccessibilities(Map<String, Node> nodes, Map<DetailedType, Map<String, String>> locs, Map<String, Map<String, Double>> ttMap, Map<String, Set<Observation>> obsMap) {
+	private static Map<String, Map<String, Map<DetailedType, Double>>> calculateAccessibilities(Map<String, Node> nodes, Map<DetailedType, Map<String, String>> locs, Map<String, Map<String, Double>> ttMap, Map<String, Set<Observation>> obsMap) throws FileNotFoundException {
 		Map<String, Map<String, Map<DetailedType, Double>>> accs = new HashMap<>();
 		OLSMultipleLinearRegression mlr = new OLSMultipleLinearRegression();
 		Map<String,double[]> maxMinsA = new HashMap<>();
@@ -499,6 +500,7 @@ public class BinaryPlaceTypes {
 		maxMinsB.put("social", new double[]{0.2, 0.3, 0.1});
 		maxMinsB.put("accomp", new double[]{-0.1, 0.0, 0.1});
 		maxMinsB.put("eat", new double[]{0.82, 0.83, 0.02});
+		PrintWriter writer = new PrintWriter("./data/hits/accsN.txt");
 		for(String purpose:FLEX_ATIVITIES) {
 			Set<Observation> obs = obsMap.get(purpose);
 			double maxT = 0, maxA = Double.NaN, maxB = Double.NaN;
@@ -544,6 +546,7 @@ public class BinaryPlaceTypes {
 						Location location = Household.LOCATIONS.get(entry.getKey());
 						sum+=Math.pow(location.getTypes().get(location.getType(detailedType).text), maxB)*Math.exp(-maxA*ttMap.get(nodeE.getValue().getId().toString()).get(entry.getValue()));
 					}
+					writer.println(purpose+","+nodeE.getKey()+","+detailedType+","+sum);
 					accMap.put(detailedType, sum);
 				}
 				maxAccsPurpose.put(nodeE.getKey(), accMap);
@@ -551,6 +554,7 @@ public class BinaryPlaceTypes {
 			System.out.println(maxA+" "+maxB+" "+maxT+" "+obs.size()+" "+purpose);
 			accs.put(purpose, maxAccsPurpose);
 		}
+		writer.close();
 		return accs;
 	}
 
@@ -585,7 +589,7 @@ public class BinaryPlaceTypes {
 		printer.println();
 	}
 
-	private static void writeHeaderP(PrintWriter printer, Set<DetailedType> detailedTypes) {
+	private static void writeHeaderP(PrintWriter printer, List<DetailedType> detailedTypes) {
 		printer.print("DURATION\t");
 		printer.print("DURATION_SQR\t");
 		List<String> titles = new ArrayList<>();
@@ -618,7 +622,7 @@ public class BinaryPlaceTypes {
 				printer.print(params.get(i)+params.get(j)+"\t");
 	}
 
-	private static void writeHeaderPB(PrintWriter printer, Set<DetailedType> detailedTypes) {
+	private static void writeHeaderPB(PrintWriter printer, List<DetailedType> detailedTypes) {
 		printer.print("AGE\t");
 		printer.print("INCOME\t");
 		printer.print("MAIN_INCOME\t");

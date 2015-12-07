@@ -1,9 +1,10 @@
 package playground.sergioo.hits2012Scheduling.test;
 
 import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.PrintWriter;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -17,7 +18,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -29,16 +29,13 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.events.EventsReaderXMLv1;
-import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
-import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityFactory;
+import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.PreProcessDijkstra;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -47,10 +44,6 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.facilities.ActivityFacilities;
-import org.matsim.facilities.ActivityFacilitiesImpl;
-import org.matsim.facilities.ActivityFacility;
-import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 
@@ -62,27 +55,16 @@ import playground.sergioo.hits2012.Location;
 import playground.sergioo.hits2012.Location.DetailedType;
 import playground.sergioo.hits2012.Person.Role;
 import playground.sergioo.hits2012.Person;
-import playground.sergioo.hits2012.Stage;
 import playground.sergioo.hits2012.Trip;
 import playground.sergioo.hits2012.Trip.PlaceType;
 import playground.sergioo.hits2012.Trip.Purpose;
-import playground.sergioo.hits2012.stages.MotorDriverStage;
 import playground.sergioo.hits2012Scheduling.IncomeEstimation;
-import playground.sergioo.passivePlanning2012.core.population.PlacesConnoisseur;
-import playground.sergioo.passivePlanning2012.core.population.agenda.Agenda;
-import playground.sergioo.passivePlanning2012.population.parallelPassivePlanning.PassivePlannerManager.CurrentTime;
-import playground.sergioo.passivePlanning2012.population.parallelPassivePlanning.PassivePlannerManager.MobsimStatus;
-import playground.sergioo.scheduling2013.SchedulingNetwork;
-import playground.sergioo.scheduling2013.SchedulingNetwork.ActivitySchedulingLink;
-import playground.sergioo.scheduling2013.SchedulingNetwork.SchedulingLink;
-import playground.sergioo.scheduling2013.SchedulingNetwork.SchedulingNode;
 import playground.sergioo.singapore2012.transitRouterVariable.TransitRouterVariableImpl;
 import playground.sergioo.singapore2012.transitRouterVariable.TransitRouterWSImplFactory;
 import playground.sergioo.singapore2012.transitRouterVariable.stopStopTimes.StopStopTimeCalculator;
 import playground.sergioo.singapore2012.transitRouterVariable.waitTimes.WaitTimeCalculator;
-import playground.sergioo.weeklySimulation.util.misc.Time;
 
-public class TestSchedulingHITS {
+public class T2 {
 
 	private static final double FRAC_SAMPLE = 0.8;
 	private static CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.WGS84_UTM48N);
@@ -144,25 +126,7 @@ public class TestSchedulingHITS {
 		 */
 		private static final long serialVersionUID = 1L;
 		private double lowValue = Double.NaN;
-		private double mean = Double.NaN;
 		private double highValue = Double.NaN;
-		
-		public DummyDistribution() {
-			
-		}
-		public DummyDistribution(double lowValue, double mean, double highValue) {
-			this.lowValue = lowValue;
-			this.mean = mean;
-			this.highValue = highValue;
-		}
-		
-		@Override
-		public double getNumericalMean() {
-			if(Double.isNaN(mean))
-				return super.getNumericalMean();
-			return mean;
-		}
-		
 		@Override
 		public double inverseCumulativeProbability(double p) {
 			if(p==0.15) {
@@ -383,11 +347,10 @@ public class TestSchedulingHITS {
 					if(placeI==null) {
 						placeI = new LocationInfo(place, net);
 						placesT.put(place, placeI);
-						allLocations.put(place, placeI);
 					}
 				}
 				for(Trip trip:person.getTrips().values()) {
-					//if(IMPORTANT_TYPES.contains(trip.getPlaceType())) {
+					if(IMPORTANT_TYPES.contains(trip.getPlaceType())) {
 						String loc = trip.getEndPostalCode();
 						Map<String, LocationInfo> locType = locations.get(trip.getPlaceType());
 						LocationInfo locI = allLocations.get(loc);
@@ -395,12 +358,10 @@ public class TestSchedulingHITS {
 							locI = new LocationInfo(loc, net);
 							allLocations.put(loc, locI);
 						}
-						if(locType!=null) {
-							locType.put(loc, locI);
-							locI.types.add(trip.getPlaceType());
-							locI.purposes.add(trip.getPurpose());
-						}
-					//}
+						locType.put(loc, locI);
+						locI.types.add(trip.getPlaceType());
+						locI.purposes.add(trip.getPurpose());
+					}
 				}
 			}
 			else if(places.isEmpty())
@@ -411,9 +372,9 @@ public class TestSchedulingHITS {
 		Map<String, TypePlaceInfo> typesPlaceInfo = new HashMap<>();
 		for(String type:IMPORTANT_TYPES)
 			typesPlaceInfo.put(type, new TypePlaceInfo(type));
-		Map<String, AbstractRealDistribution> totalNumTimes = new HashMap<>();
+		Map<String, AbstractRealDistribution> totalDurations = new HashMap<>();
 		for(String type:FLEX_ATIVITIES)
-			totalNumTimes.put(type, new DummyDistribution());
+			totalDurations.put(type, new DummyDistribution());
 		Map<String, AbstractRealDistribution> durations = new HashMap<>();
 		for(String type:FLEX_ATIVITIES)
 			durations.put(type, new DummyDistribution());
@@ -457,7 +418,7 @@ public class TestSchedulingHITS {
 			}
 			for(String type:FLEX_ATIVITIES)
 				if(sDurations.get(type)>0)
-					((ContinuousRealDistribution)totalNumTimes.get(type)).addValue(sDurations.get(type));
+					((ContinuousRealDistribution)totalDurations.get(type)).addValue(sDurations.get(type));
 		}
 		TravelTimeCalculator travelTimeCalculator = new TravelTimeCalculator(scenario.getNetwork(), scenario.getConfig().travelTimeCalculator());
 		WaitTimeCalculator waitTimeCalculator = new WaitTimeCalculator(scenario.getTransitSchedule(), scenario.getConfig());
@@ -472,62 +433,61 @@ public class TestSchedulingHITS {
 		TransitRouter transitRouter = factory.get();
 		PreProcessDijkstra preProcessDijkstra = new PreProcessDijkstra();
 		preProcessDijkstra.run(scenario.getNetwork());
-		Dijkstra dijkstra = new Dijkstra(scenario.getNetwork(), disutilityFunction, travelTimeCalculator.getLinkTravelTimes(), preProcessDijkstra);
-		//MultiDestinationDijkstra multiDijkstra = new MultiDestinationDijkstra(scenario.getNetwork(), disutilityFunction, travelTimeCalculator.getLinkTravelTimes(), preProcessDijkstra);
+		MultiDestinationDijkstra dijkstra = new MultiDestinationDijkstra(scenario.getNetwork(), disutilityFunction, travelTimeCalculator.getLinkTravelTimes(), preProcessDijkstra);
+		Map<LocationInfo, Map<LocationInfo, PlaceToLocation>> placesToAllLocations = new HashMap<>();
 		long time = System.currentTimeMillis();
-		/*Map<LocationInfo, Map<LocationInfo, PlaceToLocation>> placesToAllLocations = new HashMap<>();
-		bjectInputStream fis = new ObjectInputStream(new FileInputStream("./data/hits/tt1.dat"));		
+		ObjectInputStream fis = new ObjectInputStream(new FileInputStream("./data/hits/tt1.dat"));		
 		Map<String, Map<String, Double[]>> timesDistances = (Map<String, Map<String, Double[]>>) fis.readObject();
 		for(Entry<LocationInfo, Map<LocationInfo, PlaceToLocation>> homeToLocations:homesToLocations.entrySet()) {
-			Set<Node> nodes = new HashSet<>();
+			/*Set<Node> nodes = new HashSet<>();
 			for(LocationInfo loc:homeToLocations.getValue().keySet())
 				nodes.add(loc.node);
 			Map<Id<Node>, Path> paths = dijkstra.calcLeastCostPath(homeToLocations.getKey().node, nodes, 8*3600, null, null);*/
-			//Map<String, Double[]> timeDistance = timesDistances.get(homeToLocations.getKey().node.getId().toString());
+			Map<String, Double[]> timeDistance = timesDistances.get(homeToLocations.getKey().node.getId().toString());
 			/*if(timeDistance==null) {
 				timeDistance = new HashMap<>();
 				timesDistances.put(homeToLocations.getKey().node.getId().toString(), timeDistance);
 			}*/
-			//for(Entry<LocationInfo, PlaceToLocation> loc:homeToLocations.getValue().entrySet()) {
+			for(Entry<LocationInfo, PlaceToLocation> loc:homeToLocations.getValue().entrySet()) {
 				/*Path path = paths.get(loc.getKey().node.getId());
 				double networkDistance = 0;
 				for(Link link:path.links)
 					networkDistance += link.getLength();*/
-				//loc.getValue().networkDistance = timeDistance.get(loc.getKey().node.getId().toString())[0];
-				//loc.getValue().travelTime = timeDistance.get(loc.getKey().node.getId().toString())[1];
+				loc.getValue().networkDistance = timeDistance.get(loc.getKey().node.getId().toString())[0];
+				loc.getValue().travelTime = timeDistance.get(loc.getKey().node.getId().toString())[1];
 				//timeDistance.put(loc.getKey().node.getId().toString(), new Double[]{networkDistance, path.travelTime, path.travelCost});
-			//}
-		//}
+			}
+		}
 		System.out.println("After Sample: "+(System.currentTimeMillis()-time)/60000.0);
 		time = System.currentTimeMillis();
-		//Map<String, Map<String, Double[]>> timesDistances2 = (Map<String, Map<String, Double[]>>) fis.readObject();
-		//for(LocationInfo home:placesT.values()) {
+		Map<String, Map<String, Double[]>> timesDistances2 = (Map<String, Map<String, Double[]>>) fis.readObject();
+		for(LocationInfo home:placesT.values()) {
 			/*Set<Node> nodes = new HashSet<>();
 			for(LocationInfo loc:allLocations.values())
 				nodes.add(loc.node);
 			Map<Id<Node>, Path> paths = dijkstra.calcLeastCostPath(home.node, nodes, 8*3600, null, null);*/
-			//Map<LocationInfo, PlaceToLocation> allLocsHome = new HashMap<>();
-			//Map<String, Double[]> timeDistance = timesDistances2.get(home.node.getId().toString());
+			Map<LocationInfo, PlaceToLocation> allLocsHome = new HashMap<>();
+			Map<String, Double[]> timeDistance = timesDistances2.get(home.node.getId().toString());
 			/*if(timeDistance==null) {
 				timeDistance = new HashMap<>();
 				timesDistances2.put(home.node.getId().toString(), timeDistance);
 			}*/
-			//for(LocationInfo loc:allLocations.values()) {
-				//PlaceToLocation homeToLocation = new PlaceToLocation(home, loc);
+			for(LocationInfo loc:allLocations.values()) {
+				PlaceToLocation homeToLocation = new PlaceToLocation(home, loc);
 				/*Path path = paths.get(loc.node.getId());
 				double networkDistance = 0;
 				for(Link link:path.links)
 					networkDistance += link.getLength();*/
-				//homeToLocation.networkDistance = timeDistance.get(loc.node.getId().toString())[0];
-				//homeToLocation.travelTime = timeDistance.get(loc.node.getId().toString())[1];
-				//allLocsHome.put(loc, homeToLocation);
+				homeToLocation.networkDistance = timeDistance.get(loc.node.getId().toString())[0];
+				homeToLocation.travelTime = timeDistance.get(loc.node.getId().toString())[1];
+				allLocsHome.put(loc, homeToLocation);
 				//timeDistance.put(loc.node.getId().toString(), new Double[]{networkDistance, path.travelTime, path.travelCost});
-			//}
-			//placesToAllLocations.put(home, allLocsHome);
-		//}
-		//fis.close();
+			}
+			placesToAllLocations.put(home, allLocsHome);
+		}
+		fis.close();
 		System.out.println("After Test: "+(System.currentTimeMillis()-time)/60000.0);
-		/*Map<String, Collection<Double>> eDisDistributions = new HashMap<>();
+		Map<String, Collection<Double>> eDisDistributions = new HashMap<>();
 		for(String type:IMPORTANT_TYPES)
 			eDisDistributions.put(type, new ArrayList<Double>());
 		Map<String, Collection<Double>> nDisDistributions = new HashMap<>();
@@ -546,7 +506,7 @@ public class TestSchedulingHITS {
 		Map<String, RealDistribution> distributions = new HashMap<>(); 
 		for(String type:IMPORTANT_TYPES)
 			distributions.put(type, new ContinuousRealDistribution(ttDistributions.get(type)));
-		PrintWriter writer = new PrintWriter("./data/hits/ttDistr.txt");
+		/*PrintWriter writer = new PrintWriter("./data/hits/ttDistr.txt");
 		for(Entry<String, RealDistribution> distribution:distributions.entrySet())
 			for(Double num:((ContinuousRealDistribution)distribution.getValue()).getValues())
 				writer.println(distribution.getKey()+","+num);
@@ -561,322 +521,271 @@ public class TestSchedulingHITS {
 		START
 		###########################################
 		*/
+		int k=0;
 		long maxCTime = Long.MIN_VALUE;
 		Map<String, Map<String, Map<DetailedType, Double>>> accs = loadAccs();
-		Map<String, Set<LocationInfo>[]> allKnownPlaces = new HashMap<>();
-		BufferedReader reader = new BufferedReader(new FileReader("./data/hits/kPlacesT.txt"));
-		String line = reader.readLine();
-		while(line!=null) {
-			String[] parts = line.split(",");
-			Set<LocationInfo>[] kP = allKnownPlaces.get(parts[0]);
-			if(kP==null) {
-				kP = new HashSet[4];
-				allKnownPlaces.put(parts[0], kP);
-			}
-			int index = Integer.parseInt(parts[1]);
-			if(kP[index]==null) {
-				kP[index] = new HashSet<>();
-			}
-			kP[index].add(allLocations.get(parts[2]));
-			line = reader.readLine();
-		}
-		reader.close();
-		Map<String, Map<String, Map<String, Double[]>>> tTimes = new HashMap<>();
-		reader = new BufferedReader(new FileReader("./data/hits/tTimesT.txt"));
-		line = reader.readLine();
-		while(line!=null) {
-			String[] parts = line.split(",");
-			Map<String, Map<String, Double[]>> personIMap = tTimes.get(parts[0]+">"+parts[1]);
-			if(personIMap==null) {
-				personIMap = new HashMap<>();
-				tTimes.put(parts[0]+">"+parts[1], personIMap);
-			}
-			Map<String, Double[]> placesMap = personIMap.get(parts[2]);
-			if(placesMap == null) {
-				placesMap = new HashMap<>();
-				personIMap.put(parts[2], placesMap);
-			}
-			Double[] tts = placesMap.get(parts[3]);
-			if(tts==null) {
-				tts = new Double[2];
-				placesMap.put(parts[3], tts);
-			}
-			tts[parts[4].equals("pt")?1:0] = Double.parseDouble(parts[5]);
-			line = reader.readLine();
-		}
-		reader.close();
-		PrintWriter writerP = new PrintWriter(new FileWriter("./data/hits/resP.txt", false));
-		PrintWriter writerT = new PrintWriter(new FileWriter("./data/hits/resT.txt", false));
-		SortedMap<String, Boolean> wentType = new TreeMap<>();
-		int last = 0;
-		int k=-1;
+		PrintWriter writerTT = new PrintWriter("./data/hits/tTimes.txt");
+		PrintWriter writerKP = new PrintWriter("./data/hits/kPlaces.txt");
+		/*PrintWriter writerP = new PrintWriter("./data/hits/resP.txt");
+		PrintWriter writerT = new PrintWriter("./data/hits/resT.txt");
+		SortedMap<String, Boolean> wentType = new TreeMap<>();*/
 		for(Entry<String, Set<String>> personPlaces:personPlacesT.entrySet()) {
-			k++;
-			if(last<=k) {
-				Tuple<Household, Person> pH = peopleTest.get(personPlaces.getKey());
-				Person person = pH.getSecond();
-				Set<LocationInfo>[] knownPlacesA = allKnownPlaces.get(person.getId());
-				if(knownPlacesA!=null) {
-					long cTime = -System.currentTimeMillis();
-					System.out.println(k+"/"+personPlacesT.size());
-					Set<String> placesA = personPlaces.getValue();
-					/*Set<Map<LocationInfo, PlaceToLocation>> maps = new HashSet<>();
-					for(String placeA:placesA)
-						maps.add(placesToAllLocations.get(placesT.get(placeA)));*/
-					/*Set<LocationInfo>[] knownPlacesA = getKnownPlacesTypes(person, pH.getFirst(), placesA, accs, allLocations, maps, distributions);
-					knownPlacesA[0] = getKnownPlacesRandom(person, locations);
-					knownPlacesA[1] = getKnownPlacesRandomTypes(person, allLocations, maps, distributions);*/
-					ActivityFacilities[]  facilitiesA = new ActivityFacilities[]{
-							FacilitiesUtils.createActivityFacilities(),
-							FacilitiesUtils.createActivityFacilities(),
-							FacilitiesUtils.createActivityFacilities(),
-							FacilitiesUtils.createActivityFacilities()
-					};
-					PlacesConnoisseur[] placeConnoisseurA = new PlacesConnoisseur[]{
-							new PlacesConnoisseur(), 
-							new PlacesConnoisseur(),
-							new PlacesConnoisseur(),
-							new PlacesConnoisseur()
-					};
-					for(int i=0; i<knownPlacesA.length; i++) {
-						Set<LocationInfo> knownPlaces = knownPlacesA[i];
-						ActivityFacilities facilities = facilitiesA[i];
-						PlacesConnoisseur placeConnoisseur = placeConnoisseurA[i];
-						for(LocationInfo knownPlace:knownPlaces) {
-							Id<ActivityFacility> id = Id.create(knownPlace.location, ActivityFacility.class);
-							if(facilities.getFacilities().get(id)==null)
-								((ActivityFacilitiesImpl)facilities).createAndAddFacility(id, knownPlace.coord);
-							for(String purpose:knownPlace.purposes) {
-								double min = Double.MAX_VALUE;
-								double max = Double.MIN_VALUE;
-								for(String type:knownPlace.types) {
-									double[] times = typesPlaceInfo.get(type).purposes.get(purpose);
-									if(times!=null) {
-										if(times[0]<min)
-											min = times[0];
-										if(times[1]>max)
-											max = times[1];
-									}
-								}
-								if(min<Double.MAX_VALUE && max>Double.MIN_VALUE && min<max)
-									placeConnoisseur.addKnownPlace(id, min, max, purpose);
+			System.out.println(k+++"/"+personPlacesT.size());
+			Tuple<Household, Person> pH = peopleTest.get(personPlaces.getKey());
+			Person person = pH.getSecond();
+			Set<String> placesA = personPlaces.getValue();
+			Set<Map<LocationInfo, PlaceToLocation>> maps = new HashSet<>();
+			PrintWriter writer=null;
+			if(placesA.size()>1)
+				writer = new PrintWriter("./data/hits/testPerson2.csv");
+			int kkk=0;
+			for(String placeA:placesA) {
+				LocationInfo loc = placesT.get(placeA);
+				maps.add(placesToAllLocations.get(loc));
+				if(placesA.size()>1)
+					writer.println(loc.coord.getX()+","+loc.coord.getY()+","+kkk);
+			}
+			Set<LocationInfo>[] knownPlacesA = getKnownPlacesTypes(person, pH.getFirst(), placesA, accs, allLocations, maps, distributions);
+			knownPlacesA[0] = getKnownPlacesRandom(person, locations);
+			knownPlacesA[1] = getKnownPlacesRandomTypes(person, allLocations, maps, distributions);
+			if(placesA.size()>1) {
+				kkk++;
+				for(Set<LocationInfo> locs:knownPlacesA) {
+					for(LocationInfo loc:locs)
+						writer.println(loc.coord.getX()+","+loc.coord.getY()+","+kkk);
+					kkk++;
+				}
+				writer.close();
+			}
+			System.out.println();
+			/*ActivityFacilities[]  facilitiesA = new ActivityFacilities[]{
+					FacilitiesUtils.createActivityFacilities(),
+					FacilitiesUtils.createActivityFacilities(),
+					FacilitiesUtils.createActivityFacilities(),
+					FacilitiesUtils.createActivityFacilities()
+			};
+			PlacesConnoisseur[] placeConnoisseurA = new PlacesConnoisseur[]{
+					new PlacesConnoisseur(), 
+					new PlacesConnoisseur(),
+					new PlacesConnoisseur(),
+					new PlacesConnoisseur()
+			};
+			for(int i=0; i<knownPlacesA.length; i++) {
+				Set<LocationInfo> knownPlaces = knownPlacesA[i];
+				ActivityFacilities facilities = facilitiesA[i];
+				PlacesConnoisseur placeConnoisseur = placeConnoisseurA[i];
+				for(LocationInfo knownPlace:knownPlaces) {
+					Id<ActivityFacility> id = Id.create(knownPlace.location, ActivityFacility.class);
+					if(facilities.getFacilities().get(id)==null)
+						((ActivityFacilitiesImpl)facilities).createAndAddFacility(id, knownPlace.coord);
+					for(String purpose:knownPlace.purposes) {
+						double min = Double.MAX_VALUE;
+						double max = Double.MIN_VALUE;
+						for(String type:knownPlace.types) {
+							double[] times = typesPlaceInfo.get(type).purposes.get(purpose);
+							if(times!=null) {
+								if(times[0]<min)
+									min = times[0];
+								if(times[1]>max)
+									max = times[1];
 							}
 						}
+						if(min<Double.MAX_VALUE && max>Double.MIN_VALUE && min<max)
+							placeConnoisseur.addKnownPlace(id, min, max, purpose);
 					}
-					/*Id<ActivityFacility> id = Id.create(homeA, ActivityFacility.class);
-					((ActivityFacilitiesImpl)facilities).createAndAddFacility(id, home.coord);
-					placeConnoisseur.addKnownPlace(id, 0, 48*3600, Trip.Purpose.HOME.text);
-					knownPlaces.add(home);*/
-					List<Tuple<String, Tuple<Double, Double>>> previousActivities = new ArrayList<Tuple<String, Tuple<Double, Double>>>();
-					List<Tuple<String, Tuple<Double, Double>>> followingActivities = new ArrayList<Tuple<String, Tuple<Double, Double>>>();
-					Trip lastTrip = person.getTrips().get(person.getTrips().lastKey());
-					int prevTime = 0;
-					if(lastTrip.getPurpose().equals(Trip.Purpose.HOME.text) == person.isStartHome())
-						prevTime = getSeconds(lastTrip.getEndTime())-24*3600;
-					String prevAct = "";
-					String prevType = "";
-					if(person.isStartHome())
-						prevAct=Purpose.HOME.text;
-					boolean previous = true, following = false;
-					String origin = "", destination = "";
-					modes.clear();
-					modes.add("pt");
-					String mode = "pt";
-					int prevTTime = -1, numFlex = 0;
-					String prevLoc = "";
-					String lineConsole = "";
-					for(String t:FLEX_ATIVITIES)
-						wentType.put(t, false);
-					boolean correct = true;
-					Set<String> lines = new HashSet<>();
-					for(Trip trip:person.getTrips().values()) {
-						mode = "pt";
-						for(Stage stage:trip.getStages().values())
-							if(stage instanceof MotorDriverStage) {
-								modes.add("car");
-								mode = "car";
-							}
-						if(previous && !prevAct.isEmpty()) {
-							previousActivities.add(new Tuple<>(prevAct,new Tuple<>((double)getSeconds(trip.getStartTime()), (double)getSeconds(trip.getStartTime())-prevTime)));
-							if(FLEX_ATIVITIES.contains(trip.getPurpose())) {
-								previous = false;
-								lineConsole = "["+mode+","+getSeconds(trip.getEndTime());
-								origin = trip.getStartPostalCode();
-								Id<ActivityFacility> id = Id.create(origin, ActivityFacility.class);
-								if(IMPORTANT_TYPES.contains(prevType))
-									for(Entry<String, double[]> typePlaceInfo:typesPlaceInfo.get(prevType).purposes.entrySet())
-										if(locations.get(prevType).get(origin)!=null)
-											for(PlacesConnoisseur placeConnoisseur:placeConnoisseurA)
-												placeConnoisseur.addKnownPlace(id, typePlaceInfo.getValue()[0], typePlaceInfo.getValue()[1], typePlaceInfo.getKey());
-								for(PlacesConnoisseur placeConnoisseur:placeConnoisseurA)
-									placeConnoisseur.addKnownPlace(id, 0, 48*3600, prevAct);
-								LocationInfo origLoc = new LocationInfo(origin, net);
-								for(int i=0; i<knownPlacesA.length; i++) {
-									Set<LocationInfo> knownPlaces = knownPlacesA[i];
-									ActivityFacilities facilities = facilitiesA[i];
-									knownPlaces.add(origLoc);
-									if(facilities.getFacilities().get(id)==null)
-										((ActivityFacilitiesImpl)facilities).createAndAddFacility(id, origLoc.coord);
-								}
-							}
-						}
-						else if(following) {
-							if(!prevAct.isEmpty())
-								followingActivities.add(new Tuple<>(prevAct,new Tuple<>((double)getSeconds(trip.getStartTime()), (double)getSeconds(trip.getStartTime())-prevTime)));
-						}
-						else if(!previous && !FLEX_ATIVITIES.contains(trip.getPurpose())) {
-							double duration = (getSeconds(trip.getStartTime())-prevTime);
-							if(duration<=0)
-								correct = false;
-							lines.add(person.getId()+",-1,-1,"+prevAct+","+getSeconds(trip.getStartTime())+","+duration+","+trip.getStartPostalCode()+","+prevTTime+","+prevLoc+","+prevType+"#");
-							wentType.put(prevAct, true);
-							lineConsole += ", ("+prevAct+")"+getSeconds(trip.getStartTime())+"<"+trip.getStartPostalCode()+">, "+mode+","+getSeconds(trip.getEndTime());
-							numFlex++;
-							following = true;
-							destination = trip.getEndPostalCode();
-							Id<ActivityFacility> id = Id.create(destination, ActivityFacility.class);
-							if(IMPORTANT_TYPES.contains(trip.getPlaceType()))
-								for(Entry<String, double[]> typePlaceInfo:typesPlaceInfo.get(trip.getPlaceType()).purposes.entrySet())
-									if(locations.get(trip.getPlaceType()).get(destination)!=null)
-										for(PlacesConnoisseur placeConnoisseur:placeConnoisseurA)
-											placeConnoisseur.addKnownPlace(id, typePlaceInfo.getValue()[0], typePlaceInfo.getValue()[1], typePlaceInfo.getKey());
-							for(PlacesConnoisseur placeConnoisseur:placeConnoisseurA)
-								placeConnoisseur.addKnownPlace(id, 0, 48*3600, trip.getPurpose());
-							LocationInfo destLoc = new LocationInfo(destination, net);
-							destLoc.types.add(trip.getPlaceType());
-							for(int i=0; i<knownPlacesA.length; i++) {
-								Set<LocationInfo> knownPlaces = knownPlacesA[i];
-								ActivityFacilities facilities = facilitiesA[i];
-								knownPlaces.add(destLoc);
-								if(facilities.getFacilities().get(id)==null)
-									((ActivityFacilitiesImpl)facilities).createAndAddFacility(id, destLoc.coord);
-							}
-						}
-						else if(!previous){
-							double duration = (getSeconds(trip.getStartTime())-prevTime);
-							if(duration<=0)
-								correct = false;
-							lines.add(person.getId()+",-1,-1,"+prevAct+","+getSeconds(trip.getStartTime())+","+duration+","+trip.getStartPostalCode()+","+prevTTime+","+prevLoc+","+prevType+"#");
-							wentType.put(prevAct, true);
-							lineConsole += ", ("+prevAct+")"+getSeconds(trip.getStartTime())+"<"+trip.getStartPostalCode()+">, "+mode+","+getSeconds(trip.getEndTime());
-							numFlex++;
-						}
-						prevAct = trip.getPurpose();
-						prevType = trip.getPlaceType();
-						int prevTimeP = getSeconds(trip.getEndTime());
-						if(prevTimeP<prevTime)
-							prevTimeP+=24*3600;
-						prevTime = prevTimeP;
-						if(mode.equals("car"))
-							prevTTime = (int) dijkstra.calcLeastCostPath(scenario.getNetwork().getNodes().get(allLocations.get(trip.getStartPostalCode()).node.getId()), scenario.getNetwork().getNodes().get(allLocations.get(trip.getEndPostalCode()).node.getId()), getSeconds(trip.getStartTime()), null, null).travelTime;
-						else
-							prevTTime = (int) ((TransitRouterVariableImpl)transitRouter).calcPathRoute(allLocations.get(trip.getStartPostalCode()).coord, allLocations.get(trip.getEndPostalCode()).coord, getSeconds(trip.getStartTime()), null).travelTime;
-						prevLoc = trip.getStartPostalCode();
-					}
-					String typesChain = "";
-					for(Entry<String, Boolean> wentE:wentType.entrySet())
-						typesChain+=wentE.getValue()?"1,":"0,";
-					String placesChain = "";
-					for(String place:placesA)
-						placesChain+=place+"#";
-					if(following) {
-						if(!prevAct.isEmpty()) {
-							boolean sameAct = lastTrip.getPurpose().equals(Trip.Purpose.HOME.text) == person.isStartHome();
-							double endTime = (sameAct?(double)getSeconds(person.getTrips().get(person.getTrips().firstKey()).getStartTime()):0)+24*3600;
-							followingActivities.add(new Tuple<>(prevAct ,new Tuple<>(endTime, endTime-prevTime)));
-						}
-					}
-					for(int i=0; i<knownPlacesA.length; i++) {
-						Set<LocationInfo> knownPlaces = knownPlacesA[i];
-						PlacesConnoisseur placeConnoisseur = placeConnoisseurA[i];
-						Map<String, Map<String, Double[]>> tTimesPI = tTimes.get(person.getId()+">"+i);
-						for(LocationInfo locationInfo:knownPlaces) {
-							Map<String, Double[]> tTimesPIP = tTimesPI.get(locationInfo.location);
-							for(LocationInfo locationInfoO:knownPlaces)
-								if(!locationInfo.location.equals(locationInfoO.location)) {
-									Double[] ttimes = tTimesPIP.get(locationInfoO.location);
-									for(Time.Period period:Time.Period.values()) {
-										placeConnoisseur.addKnownTravelTime(Id.create(locationInfo.location, ActivityFacility.class), Id.create(locationInfoO.location, ActivityFacility.class), "car", period.getMiddleTime(), ttimes[0]);
-										placeConnoisseur.addKnownTravelTime(Id.create(locationInfo.location, ActivityFacility.class), Id.create(locationInfoO.location, ActivityFacility.class), "pt", period.getMiddleTime(), ttimes[1]);
-									}
-								}
-						}
-					}
-					if(correct && previousActivities.size()>0 && followingActivities.size()>0) {
-						writerP.println(person.getId()+",-1,-1,"+typesChain+numFlex+","+person.getAgeInterval().getCenter()+","+placesChain+",0");
-						for(String lineF:lines)
-							writerT.println(lineF);
-						if(person.getId().equals("424654CR5_2"))
-							System.out.println();
-						double durat = (followingActivities.get(0).getSecond().getFirst()-followingActivities.get(0).getSecond().getSecond()-previousActivities.get(previousActivities.size()-1).getSecond().getFirst());
-						System.out.println("----------------------------------------------");
-						System.out.println(person.getId()+": "+origin+"-->"+destination+"("+durat+")");
-						System.out.println("----------------------------------------------");
-						System.out.println(lineConsole+"]");
-						System.out.println("----------------------------------------------");
-						Agenda[] agendas = getAgenda(person, pH.getFirst(), new HashSet<>(Arrays.asList(new String[]{origin, destination})), accs, totalNumTimes, durations, durat);
-						agendas[0] = getRandomAgenda(totalNumTimes, durations);
-						for(int i=0; i<knownPlacesA.length; i++) {
-							ActivityFacilities facilities = facilitiesA[i];
-							PlacesConnoisseur placeConnoisseur = placeConnoisseurA[i];
-							int j=0;
-							for(Agenda agenda:agendas) {
-								long timeS = -System.currentTimeMillis();
-								if(i==2 && j==1) {
-								List<SchedulingLink> path = new SchedulingNetwork(30*1000).createNetwork(new CurrentTime(), facilities, Id.create(origin, ActivityFacility.class), Id.create(destination, ActivityFacility.class), 15*60, modes, placeConnoisseur, agenda, previousActivities, followingActivities, new MobsimStatus());
-								timeS+=System.currentTimeMillis();
-								if(path==null) {
-									System.out.println("ppppppppppppppppppppppppppppppppppppppppppppp");
-									//path = new SchedulingNetwork().createNetwork(new CurrentTime(), facilities, Id.create(origin, ActivityFacility.class), Id.create(destination, ActivityFacility.class), 15*60, modes, placeConnoisseur, agenda, previousActivities, followingActivities, new MobsimStatus());
-								}
-								else {
-									SchedulingLink prevLink = null;
-									for(String t:FLEX_ATIVITIES)
-										wentType.put(t, false);
-									numFlex = 0;
-									for(SchedulingLink link:path)
-										if(link instanceof ActivitySchedulingLink) {
-											ActivitySchedulingLink aLink = (ActivitySchedulingLink)link;
-											if(FLEX_ATIVITIES.contains(aLink.getActivityType())) {
-												String locId = aLink.getFromNode().getId().toString().split("\\(")[0];
-												LocationInfo locationInfo = allLocations.get(locId);
-												typesChain = "";
-												for(String type:locationInfo.types)
-													typesChain+=type+"#";
-												writerT.println(person.getId()+","+i+","+j+","+aLink.getActivityType()+","+((SchedulingNode)aLink.getToNode()).getTime()+","+aLink.getDuration()+","+locId+","+(int)(prevLink==null?0:prevLink.getDuration())+","+(prevLink==null?0:prevLink.getFromNode().getId().toString().split("\\(")[0])+","+typesChain);
-												wentType.put(aLink.getActivityType(), true);
-												numFlex++;
-											}
-										}
-										else
-											prevLink = link;
-									typesChain = "";
-									for(Entry<String, Boolean> wentE:wentType.entrySet())
-										typesChain+=wentE.getValue()?"1,":"0,";
-									placesChain = "";
-									for(String place:placesA)
-										placesChain+=place+"#";
-									writerP.println(person.getId()+","+i+","+j+","+typesChain+numFlex+","+person.getAgeInterval().getCenter()+","+placesChain+","+timeS);
-									System.out.println(path);
-									/*if((followingActivities.get(0).getSecond().getFirst()-followingActivities.get(0).getSecond().getSecond()-previousActivities.get(previousActivities.size()-1).getSecond().getFirst())>5000 && path.size()==1)
-										path = new SchedulingNetwork().createNetwork(new CurrentTime(), facilities, Id.create(origin, ActivityFacility.class), Id.create(destination, ActivityFacility.class), 15*60, modes, placeConnoisseur, agenda, previousActivities, followingActivities, new MobsimStatus());*/
-								}
-								}
-								j++;
-							}
-						}
-						System.out.println("----------------------------------------------");
-					}
-					cTime+=System.currentTimeMillis();
-					maxCTime += (cTime/1000);
-					writerP.flush();
-					writerT.flush();
 				}
 			}
+			/*Id<ActivityFacility> id = Id.create(homeA, ActivityFacility.class);
+			((ActivityFacilitiesImpl)facilities).createAndAddFacility(id, home.coord);
+			placeConnoisseur.addKnownPlace(id, 0, 48*3600, Trip.Purpose.HOME.text);
+			knownPlaces.add(home);*/
+			/*List<Tuple<String, Tuple<Double, Double>>> previousActivities = new ArrayList<Tuple<String, Tuple<Double, Double>>>();
+			List<Tuple<String, Tuple<Double, Double>>> followingActivities = new ArrayList<Tuple<String, Tuple<Double, Double>>>();
+			Trip lastTrip = person.getTrips().get(person.getTrips().lastKey());
+			int prevTime = 0;
+			if(lastTrip.getPurpose().equals(Trip.Purpose.HOME.text) == person.isStartHome())
+				prevTime = getSeconds(lastTrip.getEndTime())-24*3600;
+			String prevType = "";*/
+			String prevAct = "";
+			if(person.isStartHome())
+				prevAct=Purpose.HOME.text;
+			boolean previous = true, following = false;
+			String origin = "", destination = "";
+			/*modes.clear();
+			modes.add("pt");
+			int prevTTime = -1, numFlex = 0;
+			String prevLoc = "";*/
+			/*for(String t:FLEX_ATIVITIES)
+				wentType.put(t, false);*/
+			for(Trip trip:person.getTrips().values()) {
+				/*for(Stage stage:trip.getStages().values())
+					if(stage instanceof MotorDriverStage)
+						modes.add("car");*/
+				if(previous && !prevAct.isEmpty()) {
+					//previousActivities.add(new Tuple<>(prevAct,new Tuple<>((double)getSeconds(trip.getStartTime()), (double)getSeconds(trip.getStartTime())-prevTime)));
+					if(FLEX_ATIVITIES.contains(trip.getPurpose())) {
+						previous = false;
+						origin = trip.getStartPostalCode();
+						/*Id<ActivityFacility> id = Id.create(origin, ActivityFacility.class);
+						if(IMPORTANT_TYPES.contains(prevType))
+							for(Entry<String, double[]> typePlaceInfo:typesPlaceInfo.get(prevType).purposes.entrySet())
+								if(locations.get(prevType).get(origin)!=null)
+									for(PlacesConnoisseur placeConnoisseur:placeConnoisseurA)
+										placeConnoisseur.addKnownPlace(id, typePlaceInfo.getValue()[0], typePlaceInfo.getValue()[1], typePlaceInfo.getKey());
+						for(PlacesConnoisseur placeConnoisseur:placeConnoisseurA)
+							placeConnoisseur.addKnownPlace(id, 0, 48*3600, prevAct);*/
+						LocationInfo origLoc = new LocationInfo(origin, net);
+						for(int i=0; i<knownPlacesA.length; i++) {
+							Set<LocationInfo> knownPlaces = knownPlacesA[i];
+							//ActivityFacilities facilities = facilitiesA[i];
+							knownPlaces.add(origLoc);
+							/*if(facilities.getFacilities().get(id)==null)
+								((ActivityFacilitiesImpl)facilities).createAndAddFacility(id, origLoc.coord);*/
+						}
+					}
+				}
+				else if(following) {
+					/*if(!prevAct.isEmpty())
+						followingActivities.add(new Tuple<>(prevAct,new Tuple<>((double)getSeconds(trip.getStartTime()), (double)getSeconds(trip.getStartTime())-prevTime)));*/
+				}
+				else if(!previous && !FLEX_ATIVITIES.contains(trip.getPurpose())) {
+					following = true;
+					destination = trip.getEndPostalCode();
+					/*Id<ActivityFacility> id = Id.create(destination, ActivityFacility.class);
+					if(IMPORTANT_TYPES.contains(trip.getPlaceType()))
+						for(Entry<String, double[]> typePlaceInfo:typesPlaceInfo.get(trip.getPlaceType()).purposes.entrySet())
+							if(locations.get(trip.getPlaceType()).get(destination)!=null)
+								for(PlacesConnoisseur placeConnoisseur:placeConnoisseurA)
+									placeConnoisseur.addKnownPlace(id, typePlaceInfo.getValue()[0], typePlaceInfo.getValue()[1], typePlaceInfo.getKey());
+					for(PlacesConnoisseur placeConnoisseur:placeConnoisseurA)
+						placeConnoisseur.addKnownPlace(id, 0, 48*3600, trip.getPurpose());*/
+					LocationInfo destLoc = new LocationInfo(destination, net);
+					destLoc.types.add(trip.getPlaceType());
+					for(int i=0; i<knownPlacesA.length; i++) {
+						Set<LocationInfo> knownPlaces = knownPlacesA[i];
+						//ActivityFacilities facilities = facilitiesA[i];
+						knownPlaces.add(destLoc);
+						/*if(facilities.getFacilities().get(id)==null)
+							((ActivityFacilitiesImpl)facilities).createAndAddFacility(id, destLoc.coord);*/
+					}
+				}
+				if(FLEX_ATIVITIES.contains(prevAct)) {
+					/*writerT.println(person.getId()+",-1,-1,"+prevAct+","+getSeconds(trip.getStartTime())+","+(getSeconds(trip.getStartTime())-prevTime)+","+trip.getStartPostalCode()+","+prevTTime+","+prevLoc+","+prevType+"#");
+					wentType.put(prevAct, true);
+					numFlex++;*/
+				}
+				prevAct = trip.getPurpose();
+				/*prevType = trip.getPlaceType();
+				int prevTimeP = getSeconds(trip.getEndTime());
+				if(prevTimeP<prevTime)
+					prevTimeP+=24*3600;
+				prevTime = prevTimeP;
+				prevTTime = getSeconds(trip.getEndTime())-getSeconds(trip.getStartTime());
+				prevLoc = trip.getStartPostalCode();*/
+			}
+			/*String typesChain = "";
+			for(Entry<String, Boolean> wentE:wentType.entrySet())
+				typesChain+=wentE.getValue()?"1,":"0,";
+			String placesChain = "";
+			for(String place:placesA)
+				placesChain+=place+"#";
+			writerP.println(person.getId()+",-1,-1,"+typesChain+numFlex+","+person.getAgeInterval().getCenter()+","+placesChain+",0");
+			if(following) {
+				if(!prevAct.isEmpty()) {
+					boolean sameAct = lastTrip.getPurpose().equals(Trip.Purpose.HOME.text) == person.isStartHome();
+					double endTime = (sameAct?(double)getSeconds(person.getTrips().get(person.getTrips().firstKey()).getStartTime()):0)+24*3600;
+					followingActivities.add(new Tuple<>(prevAct ,new Tuple<>(endTime, endTime-prevTime)));
+				}
+			}*/
+			for(int i=0; i<knownPlacesA.length; i++) {
+				Set<LocationInfo> knownPlaces = knownPlacesA[i];
+				//PlacesConnoisseur placeConnoisseur = placeConnoisseurA[i];
+				for(LocationInfo locationInfo:knownPlaces) {
+					writerKP.println(person.getId()+","+i+","+locationInfo.location);
+					Set<Node> nodes = new HashSet<>();
+					for(LocationInfo locationInfoO:knownPlaces)
+						if(locationInfo!=locationInfoO) {
+							nodes.add(locationInfoO.node);
+							Path path = ((TransitRouterVariableImpl)transitRouter).calcPathRoute(locationInfo.coord, locationInfoO.coord, 8*3600, null);
+							writerTT.println(person.getId()+","+i+","+locationInfo.location+","+locationInfoO.location+",pt,"+path.travelTime);
+							/*for(Time.Period period:Time.Period.values())
+								placeConnoisseur.addKnownTravelTime(Id.create(locationInfo.location, ActivityFacility.class), Id.create(locationInfoO.location, ActivityFacility.class), "pt", period.getMiddleTime(), path.travelTime);*/
+						}
+					Map<Id<Node>, Path> paths = dijkstra.calcLeastCostPath(locationInfo.node, nodes, 8*3600, null, null);
+					for(LocationInfo locationInfoO:knownPlaces)
+						if(locationInfo!=locationInfoO) {
+							double travelTime = paths.get(locationInfoO.node.getId()).travelTime;
+							writerTT.println(person.getId()+","+i+","+locationInfo.location+","+locationInfoO.location+",car,"+travelTime);
+							/*for(Time.Period period:Time.Period.values())
+								placeConnoisseur.addKnownTravelTime(Id.create(locationInfo.location, ActivityFacility.class), Id.create(locationInfoO.location, ActivityFacility.class), "car", period.getMiddleTime(), travelTime);*/
+						}
+				}
+			}
+			writerTT.flush();
+			writerKP.flush();
+			/*if(previousActivities.size()>0 && followingActivities.size()>0) {
+				double durat = (followingActivities.get(0).getSecond().getFirst()-followingActivities.get(0).getSecond().getSecond()-previousActivities.get(previousActivities.size()-1).getSecond().getFirst());
+				System.out.println(person.getId()+": "+origin+"-->"+destination+"("+durat+")");
+				Agenda[] agendas = getAgenda(person, pH.getFirst(), new HashSet<>(Arrays.asList(new String[]{origin, destination})), accs, totalDurations, durations, (int) Math.round(durat/7200));
+				agendas[0] = getRandomAgenda(totalDurations, durations);
+				for(int i=0; i<knownPlacesA.length; i++) {
+					ActivityFacilities facilities = facilitiesA[i];
+					PlacesConnoisseur placeConnoisseur = placeConnoisseurA[i];
+					int j=0;
+					for(Agenda agenda:agendas) {
+						long timeS = -System.currentTimeMillis();
+						List<SchedulingLink> path = new SchedulingNetwork().createNetwork(new CurrentTime(), facilities, Id.create(origin, ActivityFacility.class), Id.create(destination, ActivityFacility.class), 15*60, modes, placeConnoisseur, agenda, previousActivities, followingActivities, new MobsimStatus());
+						timeS+=System.currentTimeMillis();
+						if(path==null) {
+							System.out.println("ppppppppppppppppppppppppppppppppppppppppppppp");
+							//path = new SchedulingNetwork().createNetwork(new CurrentTime(), facilities, Id.create(origin, ActivityFacility.class), Id.create(destination, ActivityFacility.class), 15*60, modes, placeConnoisseur, agenda, previousActivities, followingActivities, new MobsimStatus());
+						}
+						else {
+							SchedulingLink prevLink = null;
+							for(String t:FLEX_ATIVITIES)
+								wentType.put(t, false);
+							numFlex = 0;
+							for(SchedulingLink link:path)
+								if(link instanceof ActivitySchedulingLink) {
+									ActivitySchedulingLink aLink = (ActivitySchedulingLink)link;
+									if(FLEX_ATIVITIES.contains(aLink.getActivityType())) {
+										String locId = aLink.getFromNode().getId().toString().split("\\(")[0];
+										LocationInfo locationInfo = allLocations.get(locId);
+										typesChain = "";
+										for(String type:locationInfo.types)
+											typesChain+=type+"#";
+										writerT.println(person.getId()+","+i+","+j+","+aLink.getActivityType()+","+((SchedulingNode)aLink.getToNode()).getTime()+","+aLink.getDuration()+","+locId+","+(int)(prevLink==null?0:prevLink.getDuration())+","+(prevLink==null?0:prevLink.getFromNode().getId().toString().split("\\(")[0])+","+typesChain);
+										wentType.put(aLink.getActivityType(), true);
+										numFlex++;
+									}
+								}
+								else
+									prevLink = link;
+							typesChain = "";
+							for(Entry<String, Boolean> wentE:wentType.entrySet())
+								typesChain+=wentE.getValue()?"1,":"0,";
+							placesChain = "";
+							for(String place:placesA)
+								placesChain+=place+"#";
+							writerP.println(person.getId()+","+i+","+j+","+typesChain+numFlex+","+person.getAgeInterval().getCenter()+","+placesChain+","+timeS);
+							System.out.println(path);
+							/*if((followingActivities.get(0).getSecond().getFirst()-followingActivities.get(0).getSecond().getSecond()-previousActivities.get(previousActivities.size()-1).getSecond().getFirst())>5000 && path.size()==1)
+								path = new SchedulingNetwork().createNetwork(new CurrentTime(), facilities, Id.create(origin, ActivityFacility.class), Id.create(destination, ActivityFacility.class), 15*60, modes, placeConnoisseur, agenda, previousActivities, followingActivities, new MobsimStatus());*/
+						/*}
+						j++;
+					}
+				}
+			}
+			cTime+=System.currentTimeMillis();
+			maxCTime += cTime;
+			writerP.flush();
+			writerT.flush();*/
 		}
-		writerP.close();
-		writerT.close();
-		System.out.println(maxCTime/k);
+		/*writerP.close();
+		writerT.close();*/
+		writerKP.close();
+		writerTT.close();
+		System.out.println(maxCTime/(1000*k));
 		//writer.close();
 	}
 	private static Map<String, Map<String, Map<DetailedType, Double>>> loadAccs() throws IOException {
@@ -905,60 +814,6 @@ public class TestSchedulingHITS {
 		Calendar cal = new GregorianCalendar();
 		cal.setTime(time);
 		return cal.get(Calendar.HOUR_OF_DAY)*3600+cal.get(Calendar.MINUTE)*60+cal.get(Calendar.SECOND);
-	}
-	private static Agenda getRandomAgenda(Map<String, AbstractRealDistribution> totalNumTimes, Map<String, AbstractRealDistribution> durations) {
-		double[] probs = new double[]{
-				randomG.nextDouble(),
-				randomG.nextDouble(),
-				randomG.nextDouble(),
-				randomG.nextDouble(),
-				randomG.nextDouble()};
-		Agenda agenda = new Agenda();
-		int i=0;
-		for(String act:FLEX_ATIVITIES)
-			if(randomG.nextDouble()<probs[i++])
-				agenda.addElement(act, totalNumTimes.get(act), durations.get(act));
-		return agenda;
-	}
-	private static Agenda[] getAgenda(Person person, Household household, Set<String> places, Map<String, Map<String, Map<DetailedType, Double>>> accs, Map<String, AbstractRealDistribution> totalNumTimes, Map<String, AbstractRealDistribution> durations, double totalDuration) {
-		double[] probs = new double[]{
-				isEat(getValues(person, household, Trip.Purpose.EAT.text, places, accs)),
-				isErrands(getValues(person, household, Trip.Purpose.ERRANDS.text, places, accs)),
-				isRec(getValues(person, household, Trip.Purpose.REC.text, places, accs)),
-				isShop(getValues(person, household, Trip.Purpose.SHOP.text, places, accs)),
-				isSocial(getValues(person, household, Trip.Purpose.SOCIAL.text, places, accs))};
-		double max = 0;
-		for(double prob:probs)
-			if(prob>max)
-				max = prob;
-		Agenda agenda = new Agenda();
-		int i=0;
-		for(String act:FLEX_ATIVITIES)
-			if(randomG.nextDouble()<probs[i++]/max) {
-				/*AbstractRealDistribution distribution = durations.get(act);
-				double p = distribution.cumulativeProbability(totalDuration);
-				double f = Math.min(0.7, p);
-				double low = distribution.inverseCumulativeProbability(p-f);
-				double mean = distribution.inverseCumulativeProbability(p-(f/2));*/
-				agenda.addElement(act, totalNumTimes.get(act), new DummyDistribution(totalDuration/3, 2*totalDuration/3, totalDuration));
-			}
-		Agenda agenda2 = new Agenda();
-		Set<String> flexes = new HashSet<>();
-		for(int k=0; k<Math.round(totalDuration/7200) && k<FLEX_ATIVITIES.size(); k++) {
-			double maxS=0;
-			String maxA = null;
-			i=0;
-			for(String act:FLEX_ATIVITIES) {
-				if(!flexes.contains(act) && probs[i]>maxS) {
-					maxS = probs[i];
-					maxA = act;
-				}
-				i++;
-			}
-			flexes.add(maxA);
-			agenda2.addElement(maxA, totalNumTimes.get(maxA), new DummyDistribution(totalDuration/3, 2*totalDuration/3, totalDuration));
-		}
-		return new Agenda[]{null, agenda, agenda2};
 	}
 	private static Set<LocationInfo> getKnownPlacesRandom(Person person, Map<String, Map<String, LocationInfo>> locations) {
 		int[] nums = new int[IMPORTANT_TYPES.size()];
@@ -1111,7 +966,7 @@ public class TestSchedulingHITS {
 			if(randomG.nextDouble()<mult)
 				typeScores.add(locationInfo);
 		}
-		Map<LocationInfo, Map<String, Double>> distanceScoresType = new HashMap<>();
+		Map<LocationInfo, Map<String, Double>> ttScoresType = new HashMap<>();
 		for(Map<LocationInfo, PlaceToLocation> map:maps)
 			for(Entry<LocationInfo, PlaceToLocation> locationInfo:map.entrySet()) {
 				boolean is = false;
@@ -1119,10 +974,10 @@ public class TestSchedulingHITS {
 					if(locScore.location.equals(locationInfo.getKey().location))
 						is = true;
 				if(is) {
-					Map<String, Double> types = distanceScoresType.get(locationInfo.getKey());
+					Map<String, Double> types = ttScoresType.get(locationInfo.getKey());
 					if(types==null) {
 						types = new HashMap<>();
-						distanceScoresType.put(locationInfo.getKey(), types);
+						ttScoresType.put(locationInfo.getKey(), types);
 					}
 					for(String type:locationInfo.getKey().types) {
 						Double scoreO = types.get(type);
@@ -1134,7 +989,7 @@ public class TestSchedulingHITS {
 			}
 		List<LocationScore> distanceScores = new ArrayList<>();
 		double sum = 0;
-		for(Entry<LocationInfo, Map<String, Double>> entry:distanceScoresType.entrySet()) {
+		for(Entry<LocationInfo, Map<String, Double>> entry:ttScoresType.entrySet()) {
 			double maxS = 0;
 			for(Double score:entry.getValue().values())
 				if(maxS<score)
@@ -2413,3 +2268,4 @@ public class TestSchedulingHITS {
 	}
 	
 }
+
