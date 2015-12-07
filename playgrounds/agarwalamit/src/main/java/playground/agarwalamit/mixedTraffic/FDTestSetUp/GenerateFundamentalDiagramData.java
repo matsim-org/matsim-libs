@@ -115,15 +115,15 @@ public class GenerateFundamentalDiagramData {
 			
 			args = new String [8];
 			
-			String myDir = "../../../../repos/shared-svn/projects/mixedTraffic/triangularNetwork/run313/";
-			String outFolder ="/carBikeHolesPassing/";
+			String myDir = "../../../../repos/shared-svn/projects/mixedTraffic/triangularNetwork/run313//";
+			String outFolder ="/car40_alt/";
 			
 			args[0] = myDir + outFolder ;
-			args[1] = "car,bike"; // travel (main) modes
-			args[2] = "1.0,1.0"; // modal split in pcu
-			args[3] = TrafficDynamics.withHoles.toString(); // isUsingHoles
-			args[4] = LinkDynamics.PassingQ.toString(); // isPassingAllowed
-			args[5] = "5"; // reduce number of data points by this factor
+			args[1] = "car"; // travel (main) modes
+			args[2] = "1.0"; // modal split in pcu
+			args[3] = TrafficDynamics.queue.toString(); // isUsingHoles
+			args[4] = LinkDynamics.FIFO.toString(); // isPassingAllowed
+			args[5] = "1"; // reduce number of data points by this factor
 			args[6] = "false"; // is plotting modal split distribution
 		}
 		
@@ -138,7 +138,7 @@ public class GenerateFundamentalDiagramData {
 		generateFDData.setReduceDataPointsByFactor(Integer.valueOf(args[5]));
 		generateFDData.setIsPlottingDistribution(Boolean.valueOf(args[6]));
 		generateFDData.setIsUsingLiveOTFVis(false);
-		generateFDData.setIsWritingEventsFileForEachIteration(true);
+		generateFDData.setIsWritingEventsFileForEachIteration(false);
 		generateFDData.run();
 	}
 
@@ -477,12 +477,12 @@ public class GenerateFundamentalDiagramData {
 
 			@Override
 			public void insertAgentsIntoMobsim() {
-
+				
 				for ( Id<Person> personId : person2Mode.keySet()) {
 					String travelMode = person2Mode.get(personId);
 					double randDouble = MatsimRandom.getRandom().nextDouble();
-					double actEndTime = randDouble*900;
-
+					double actEndTime = randDouble*1800;
+					
 					MobsimAgent agent = new MySimplifiedRoundAndRoundAgent(personId, actEndTime, travelMode);
 					qSim.insertAgentIntoMobsim(agent);
 

@@ -148,7 +148,7 @@ class TravelModesFlowDynamicsUpdator {
 		double relativeDeviances = 0.;
 		double averageSpeed = ListUtils.doubleMean(this.speedTable);
 		for (int i=0; i<this.speedTableSize; i++){
-			relativeDeviances += Math.pow( ( (this.speedTable.get(i).doubleValue() - averageSpeed) / averageSpeed) , 2);
+			relativeDeviances += Math.pow( (this.speedTable.get(i).doubleValue() - averageSpeed) / averageSpeed, 2);
 		}
 		relativeDeviances /= this.noOfModes;//taking dependence on number of modes away
 		if (relativeDeviances < 0.0005){
@@ -160,8 +160,16 @@ class TravelModesFlowDynamicsUpdator {
 	}
 
 	void checkFlowStability900(){
+//		double relativeDeviances = 0.;
+//		double avgFlow = ListUtils.doubleMean(this.lastXHourlyFlows);
+//		for(int i=0;i<this.NUMBER_OF_MEMORIZED_FLOWS;i++){
+//			relativeDeviances  += Math.pow( (this.lastXHourlyFlows.get(i).doubleValue() - avgFlow)/avgFlow , 2);
+//		}
+//		relativeDeviances /= this.NUMBER_OF_MEMORIZED_FLOWS;
+		
 		double absoluteDeviances = this.lastXHourlyFlows.get(this.lastXHourlyFlows.size()-1) - this.lastXHourlyFlows.get(0);
 		if (Math.abs(absoluteDeviances) < 1){
+//		if(relativeDeviances < 0.05){
 			this.flowStability = true;
 			if(modeId==null) GenerateFundamentalDiagramData.LOG.info("========== Reaching a certain flow stability for global flow.");
 			else GenerateFundamentalDiagramData.LOG.info("========== Reaching a certain flow stability in mode: "+modeId.toString());

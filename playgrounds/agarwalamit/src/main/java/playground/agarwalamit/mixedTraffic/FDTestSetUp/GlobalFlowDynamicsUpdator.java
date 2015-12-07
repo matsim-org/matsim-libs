@@ -113,7 +113,7 @@ class GlobalFlowDynamicsUpdator implements LinkEnterEventHandler, PersonDepartur
 					boolean modesStable = true;
 					for (Id<VehicleType> vehTyp : travelModesFlowData.keySet()){
 						if (this.travelModesFlowData.get(vehTyp).numberOfAgents != 0){
-							if (! this.travelModesFlowData.get(vehTyp).isSpeedStable() || !(this.travelModesFlowData.get(vehTyp).isFlowStable())) {
+							if (! this.travelModesFlowData.get(vehTyp).isSpeedStable() || ! this.travelModesFlowData.get(vehTyp).isFlowStable() ) {
 								modesStable = false;
 								break;
 							} 
@@ -121,7 +121,7 @@ class GlobalFlowDynamicsUpdator implements LinkEnterEventHandler, PersonDepartur
 					}
 					if (modesStable){
 						//Checking global stability
-						if ( /*this.globalData.isSpeedStable() &&*/ this.globalFlowData.isFlowStable() ){
+						if ( /*this.globalFlowData.isSpeedStable() &&*/ this.globalFlowData.isFlowStable() ){
 							GenerateFundamentalDiagramData.LOG.info("========== Global permanent regime is attained");
 							for (Id<VehicleType> vehTyp : travelModesFlowData.keySet()){
 								this.travelModesFlowData.get(vehTyp).saveDynamicVariables();
