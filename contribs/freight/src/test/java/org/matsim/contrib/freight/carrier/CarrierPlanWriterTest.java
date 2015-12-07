@@ -38,7 +38,7 @@ import org.matsim.testcases.MatsimTestUtils;
 public class CarrierPlanWriterTest {
 
 	@Rule
-	MatsimTestUtils testUtils = new MatsimTestUtils();
+	public MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	@Test
 	public void testCarrierPlanWriterWrites() {
