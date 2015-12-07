@@ -28,25 +28,25 @@
 
 package org.matsim.contrib.freight.carrier;
 
+import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 
 /**
  */
-public class CarrierPlanWriterTest extends MatsimTestCase {
+public class CarrierPlanWriterTest {
+
+	@Rule
+	MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	@Test
 	public void testCarrierPlanWriterWrites() {
 		Carriers carriers = new Carriers();
 		CarrierPlanReader carrierPlanReader = new CarrierPlanReader(carriers);
-		carrierPlanReader.read(getInputDirectory() + "carrierPlansEquils.xml");
+		carrierPlanReader.read(testUtils.getInputDirectory() + "carrierPlansEquils.xml");
 		CarrierPlanWriter planWriter = new CarrierPlanWriter(carriers.getCarriers().values());
-		try {
-			planWriter.write(getInputDirectory() + "carrierPlansEquilsWritten.xml");
-			assertTrue(true);
-		} catch (Exception e) {
-			assertFalse(true);
-		}
+		planWriter.write(testUtils.getOutputDirectory() + "carrierPlansEquilsWritten.xml");
 	}
 	
 	
