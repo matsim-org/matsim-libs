@@ -99,7 +99,7 @@ public class HitchHikingDistancesEventHandler implements BasicEventHandler {
 	}
 
 	private void handleLinkEvent(final LinkEnterEvent event) {
-		Distance dist = tripDistances.get( event.getDriverId() );
+		Distance dist = tripDistances.get( event.getVehicleId() );
 		if (dist == null) return;
 
 		dist.distance += network.getLinks().get( event.getLinkId() ).getLength();

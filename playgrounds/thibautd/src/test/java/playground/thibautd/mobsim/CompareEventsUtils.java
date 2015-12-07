@@ -29,8 +29,8 @@ import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
-import org.matsim.api.core.v01.events.Wait2LinkEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
@@ -308,7 +308,7 @@ public class CompareEventsUtils {
 			if ( ignoreLinkEvents ) return;
 			handleEvent(
 				eventsPerPerson,
-				event.getDriverId(),
+				event.getVehicleId(),
 				event );
 		}
 
@@ -317,7 +317,7 @@ public class CompareEventsUtils {
 			if ( ignoreLinkEvents ) return;
 			handleEvent(
 				eventsPerPerson,
-				event.getDriverId(),
+				event.getVehicleId(),
 				event );
 		}
 

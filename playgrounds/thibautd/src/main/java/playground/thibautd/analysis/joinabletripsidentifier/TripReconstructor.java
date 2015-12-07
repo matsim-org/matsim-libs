@@ -38,6 +38,7 @@ import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.utils.collections.QuadTree;
+import playground.ivt.utils.PassengerTracker;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -68,11 +69,15 @@ public class TripReconstructor implements
 		new HashMap<Id, LinkInformation>();
 	private final List<Trip> trips = new ArrayList<Trip>();
 
+	private final PassengerTracker tracker;
+
 	// /////////////////////////////////////////////////////////////////////////
 	// constructor
 	// /////////////////////////////////////////////////////////////////////////
 	public TripReconstructor(
-			final Network network) {
+			final PassengerTracker tracker,
+			final Network network ) {
+		this.tracker = tracker;
 		this.network = network;
 
 		double maxX = Double.NEGATIVE_INFINITY;
@@ -165,16 +170,16 @@ public class TripReconstructor implements
 
 	@Override
 	public void handleEvent(final LinkEnterEvent event) {
-		if (isPtEvent(event.getDriverId())) return;
+		if (isPtEvent( tracker.getDriver( event.getVehicleId() ))) return;
 		//TODO: check if the entry exists
-		this.agentsData.get( event.getDriverId() ).handleEvent(event);
+		this.agentsData.get( tracker.getDriver( event.getVehicleId() ) ).handleEvent(event);
 	}
 
 	@Override
 	public void handleEvent(final LinkLeaveEvent event) {
-		if (isPtEvent(event.getDriverId())) return;
+		if (isPtEvent( tracker.getDriver( event.getVehicleId() ))) return;
 		//TODO: check if the entry exists
-		this.agentsData.get( event.getDriverId() ).handleEvent(event);
+		this.agentsData.get( tracker.getDriver( event.getVehicleId() ) ).handleEvent(event);
 	}
 
 	@Override

@@ -27,8 +27,8 @@ import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
-import org.matsim.api.core.v01.events.Wait2LinkEvent;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.socnetsim.qsim.QVehicleProvider;
@@ -429,18 +429,16 @@ public class PseudoQsimEngine implements MobsimEngine, DepartureHandler {
 				eventsManager.processEvent(
 					new LinkLeaveEvent(
 						time,
-						agent.getId(),
-						event.linkId,
-						event.vehicle.getId() ) );
+						event.vehicle.getId(),
+						event.linkId ) );
 
 				agent.notifyMoveOverNode( nextLinkId );
 
 				eventsManager.processEvent(
 					new LinkEnterEvent(
 						time,
-						agent.getId(),
-						nextLinkId,
-						event.vehicle.getId() ) );
+						event.vehicle.getId(),
+						nextLinkId ) );
 
 				arrivalQueue.add(
 						calcArrival(
