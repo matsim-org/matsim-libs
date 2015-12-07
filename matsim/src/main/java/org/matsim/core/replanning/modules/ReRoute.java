@@ -41,7 +41,7 @@ public class ReRoute extends AbstractMultithreadedModule {
 	}
 
 	@Override
-	public PlanAlgorithm getPlanAlgoInstance() {
+	public final PlanAlgorithm getPlanAlgoInstance() {
 
 			return new PlanRouter(
 					getReplanningContext().getTripRouter(),

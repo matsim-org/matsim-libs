@@ -24,8 +24,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.vehicles.Vehicle;
 
-import tutorial.programming.randomizingRouter.RunRandomizingRouterExample;
-
 /**
  * A simple interface to retrieve the disutility to travel on links.
  * <p/>
@@ -34,7 +32,7 @@ import tutorial.programming.randomizingRouter.RunRandomizingRouterExample;
  * simultaneously.  If I understand this correctly, this can only be achieved by never writing to fields in any methods besides the constructor.  kai, jan'13
  * </ul>
  * <p/>
- * See {@link RunRandomizingRouterExample} for an example.
+ * See {@link tutorial.programming.randomizingRouter.RunRandomizingRouterExample} for an example.
  *
  * @author mrieser
  */

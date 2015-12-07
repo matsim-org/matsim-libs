@@ -31,39 +31,42 @@ public class ProductionRunner {
 		 * ALL POSSIBLE PARAMETERS
 		 */
 
-		final String nodesFile = "./ihop2/network-input/Nodes.csv";
-		final String segmentsFile = "./ihop2/network-input/Segments.csv";
-		final String lanesFile = "./ihop2/network-input/Lanes.csv";
-		final String laneConnectorsFile = "./ihop2/network-input/Lane Connectors.csv";
-		final String linksFile = "./ihop2/network-input/Links.csv";
-		final String matsimNetworkFile = "./ihop2/network-output/network.xml";
-		final String matsimFullNetworkFile = "./ihop2/network-output/network-full.xml";
-		final String linkAttributesFile = "./ihop2/network-output/link-attributes.xml";
-		final String matsimLanesFile11 = "./ihop2/network-output/lanes11.xml";
-		final String matsimLanesFile20 = "./ihop2/network-output/lanes20.xml";
-		final String matsimTollFile = "./ihop2/network-output/toll.xml";
+		final String nodesFile = "./ihop2-data/network-input/Nodes.csv";
+		final String segmentsFile = "./ihop2-data/network-input/Segments.csv";
+		final String lanesFile = "./ihop2-data/network-input/Lanes.csv";
+		final String laneConnectorsFile = "./ihop2-data/network-input/Lane Connectors.csv";
+		final String linksFile = "./ihop2-data/network-input/Links.csv";
+
+		final String matsimNetworkFile = "./ihop2-data/network-output/network.xml";
+		final String matsimFullNetworkFile = "./ihop2-data/network-output/network-full.xml";
+		final String linkAttributesFile = "./ihop2-data/network-output/link-attributes.xml";
+		final String matsimLanesFile11 = "./ihop2-data/network-output/lanes11.xml";
+		final String matsimLanesFile20 = "./ihop2-data/network-output/lanes20.xml";
+		final String matsimTollFile = "./ihop2-data/network-output/toll.xml";
 
 		final double populationSample = 0.01;
-		final String zonesShapeFileName = "./ihop2/demand-input/sverige_TZ_EPSG3857.shp";
-		final String buildingShapeFileName = "./ihop2/demand-input/by_full_EPSG3857_2.shp";
-		final String populationFileName = "./ihop2/demand-input/trips.xml";
-		final String initialPlansFile = "./ihop2/demand-output/initial-plans_"
-				+ populationSample + ".xml";
+		final String zonesShapeFileName = "./ihop2-data/demand-input/sverige_TZ_EPSG3857.shp";
+		final String buildingShapeFileName = "./ihop2-data/demand-input/by_full_EPSG3857_2.shp";
+		final String populationFileName = "./ihop2-data/demand-input/trips.xml";
 
-		final String configFileName = "./ihop2/matsim-input/matsim-config.xml";
-		final double networkUpscaleFactor = 20.0;
+		final String initialPlansFile = // "./ihop2-data/playground/initial-trips.xml";
+		"./ihop2-data/demand-output/initial-plans_" + populationSample + ".xml";
+
+		final String configFileName = "./ihop2-data/matsim-input/matsim-config.xml";
+		final double networkUpscaleFactor = 2.0;
 		final String lastIteration = "1";
-		final boolean useLanes = true;
-		final boolean useRoadPricing = true;
+		final boolean useLanes = false;
+		final boolean useRoadPricing = false;
 		final boolean doRouteChoice = true; // changes "module 2"'s choice proba
+		final boolean doTimeChoice = true; // changes "module 3"'s choice proba
 
 		/*
 		 * DECIDE WHAT TO ACTUALLY DO
 		 */
 
 		final boolean doNetworkConversion = false;
-		final boolean doPopulationGeneration = false;
-		final boolean runMATSim = false;
+		final boolean doPopulationGeneration = true;
+		final boolean runMATSim = true;
 
 		/*
 		 * TRANSMODELER -> MATSIM NETWORK CONVERSION
@@ -131,6 +134,14 @@ public class ProductionRunner {
 						"0.0");
 			}
 
+			if (doTimeChoice) {
+				config.getModule("strategy").addParam("ModuleProbability_3",
+						"0.1");
+			} else {
+				config.getModule("strategy").addParam("ModuleProbability_3",
+						"0.0");
+			}
+
 			final Controler controler = new Controler(config);
 			if (useLanes) {
 				controler
@@ -143,6 +154,5 @@ public class ProductionRunner {
 
 			controler.run();
 		}
-
 	}
 }

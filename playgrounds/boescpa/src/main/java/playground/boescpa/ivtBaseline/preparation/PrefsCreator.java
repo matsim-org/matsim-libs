@@ -80,13 +80,13 @@ public class PrefsCreator {
         attributesXmlWriterWriter.writeFile(pathToOutputPrefs);
     }
 
-    protected static ObjectAttributes createPrefsBasedOnPlans(final Population population) {
+    public static ObjectAttributes createPrefsBasedOnPlans(final Population population) {
         ObjectAttributes prefs = new ObjectAttributes();
         createPrefsBasedOnPlans(population, prefs);
         return prefs;
     }
 
-    protected static void createPrefsBasedOnPlans(final Population population, final ObjectAttributes prefs) {
+    public static void createPrefsBasedOnPlans(final Population population, final ObjectAttributes prefs) {
         Counter counter = new Counter(" person # ");
         ActivityAnalyzer activityAnalyzer = new ActivityAnalyzer();
         String actChain;

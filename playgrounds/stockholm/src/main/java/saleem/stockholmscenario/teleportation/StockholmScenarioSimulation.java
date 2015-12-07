@@ -5,6 +5,7 @@ import java.util.Iterator;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -55,8 +56,8 @@ public static void main(String[] args) {
 ////				link.setCapacity(link.getCapacity()/config.qsim().getFlowCapFactor());
 //			}
 //		}
-//		NetworkWriter networkWriter =  new NetworkWriter(network);
-//		networkWriter.write("H:\\Matsim\\Stockholm Scenario\\teleportation\\input\\PseudoNetwork.xml");
+		NetworkWriter networkWriter =  new NetworkWriter(network);
+		networkWriter.write("H:\\Matsim\\Stockholm Scenario\\teleportation\\input\\PseudoNetwork.xml");
 //		TransitScheduleWriter tw = new TransitScheduleWriter(schedule);
 //		tw.writeFile("H:\\Matsim\\Stockholm Scenario\\teleportation\\input\\PseudoSchedule.xml");
 

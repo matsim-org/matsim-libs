@@ -46,6 +46,7 @@ public class PreparationScript {
     private static final String SECONDARY_FACILITIES = File.separator + "SecondaryFacilitiesInclBorder.xml.gz";
     // OTHER
     private static final String CONFIG = File.separator + "defaultIVTConfig.xml";
+	private static final String LC_CONFIG = File.separator + "lcIVTConfig.xml";
     private static final String FACILITIES2LINKS = File.separator + IVTConfigCreator.FACILITIES2LINKS;
 
     private final static Logger log = Logger.getLogger(PreparationScript.class);
@@ -61,6 +62,7 @@ public class PreparationScript {
     private static String pathPopulationAttributes;
     private static String pathHouseholds;
     private static String pathConfig;
+    private static String pathLCConfig;
 
     public static void main(final String[] args) {
         pathScenario = args[0];
@@ -79,6 +81,7 @@ public class PreparationScript {
                 setInitialFacilitiesForAllActivities();
                 createPrefsForPopulation();
                 createDefaultIVTConfig(prctScenario);
+				createIVTLCConfig(prctScenario);
                 // to finish the process copy all files together to the final scenario
                 createNewScenario();
             }
@@ -94,9 +97,10 @@ public class PreparationScript {
 
     }
 
-    private static void createNewScenario() throws IOException {
+	private static void createNewScenario() throws IOException {
         log.info(" ------- Create New Scenario ------- ");
         Files.move(Paths.get(pathConfig), Paths.get(pathScenario + CONFIG));
+        Files.move(Paths.get(pathLCConfig), Paths.get(pathScenario + LC_CONFIG));
         Files.move(Paths.get(pathFacilities), Paths.get(pathScenario + FACILITIES));
         Files.move(Paths.get(pathHouseholds), Paths.get(pathScenario + HOUSEHOLDS));
         Files.move(Paths.get(pathHouseholdAttributes), Paths.get(pathScenario + HOUSEHOLD_ATTRIBUTES));
@@ -107,6 +111,16 @@ public class PreparationScript {
         Files.copy(Paths.get(pathResources + SCHEDULE), Paths.get(pathScenario + SCHEDULE));
         Files.copy(Paths.get(pathResources + VEHICLES), Paths.get(pathScenario + VEHICLES));
     }
+
+	private static void createIVTLCConfig(int prctScenario) {
+		log.info(" ------- Create LC IVT Config ------- ");
+		pathLCConfig = tempFolder + LC_CONFIG;
+		final String[] args = {
+				pathLCConfig,
+				Integer.toString(prctScenario)
+		};
+		ChooseSecondaryFacilitiesConfigCreator.main(args);
+	}
 
     private static void createDefaultIVTConfig(int prctScenario) {
         log.info(" ------- Create Default IVT Config ------- ");

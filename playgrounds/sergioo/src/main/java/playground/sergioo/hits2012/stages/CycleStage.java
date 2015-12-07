@@ -11,5 +11,9 @@ public class CycleStage extends Stage {
 		super(id, mode, walkTime, inVehicleTime, lastWalkTime);
 		this.type = type;
 	}
+
+	public String getType() {
+		return type;
+	}
 	
 }

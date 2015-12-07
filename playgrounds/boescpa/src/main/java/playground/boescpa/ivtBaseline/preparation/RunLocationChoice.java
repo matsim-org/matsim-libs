@@ -19,6 +19,8 @@ import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
 import org.matsim.pt.PtConstants;
 import playground.boescpa.ivtBaseline.IVTBaselineScoringFunctionFactory;
+import playground.ivt.kticompatibility.KtiLikeScoringConfigGroup;
+import playground.ivt.matsim2030.scoring.MATSim2010ScoringFunctionFactory;
 
 import java.io.File;
 

@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.contrib.common.collections.ChoiceSet;
 import org.matsim.contrib.common.gis.CartesianDistanceCalculator;
 import org.matsim.contrib.common.util.LoggerUtils;
 import org.matsim.contrib.common.util.XORShiftRandom;
@@ -319,9 +320,9 @@ public class Simulator {
 		}
 		FixedActivityTypeSelector actTypeSelector = new FixedActivityTypeSelector(types);
 //		ChoiceSet<String> choiceSet = new ChoiceSet<String>(random);
-//		choiceSet.addChoice(ActivityType.visit.name());
-//		choiceSet.addChoice(ActivityType.gastro.name());
-//		choiceSet.addChoice(ActivityType.culture.name());
+//		choiceSet.addOption(ActivityType.visit.name());
+//		choiceSet.addOption(ActivityType.gastro.name());
+//		choiceSet.addOption(ActivityType.culture.name());
 //		ActivityTypeSelector actTypeSelector = new ActivityTypeSelector(choiceSet);
 		choiceSelector.addComponent(actTypeSelector);
 		
@@ -454,9 +455,9 @@ public class Simulator {
 			 * activity types
 			 */
 			ChoiceSet<String> actTypeChoiceSet = new ChoiceSet<String>(random);
-			actTypeChoiceSet.addChoice(ActivityType.visit.name(), Double.parseDouble(config.getParam(SOCNET_MODULE_NAME, "actshare_visit")));
-			actTypeChoiceSet.addChoice(ActivityType.gastro.name(), Double.parseDouble(config.getParam(SOCNET_MODULE_NAME, "actshare_gastro")));
-			actTypeChoiceSet.addChoice(ActivityType.culture.name(), Double.parseDouble(config.getParam(SOCNET_MODULE_NAME, "actshare_culture")));
+			actTypeChoiceSet.addOption(ActivityType.visit.name(), Double.parseDouble(config.getParam(SOCNET_MODULE_NAME, "actshare_visit")));
+			actTypeChoiceSet.addOption(ActivityType.gastro.name(), Double.parseDouble(config.getParam(SOCNET_MODULE_NAME, "actshare_gastro")));
+			actTypeChoiceSet.addOption(ActivityType.culture.name(), Double.parseDouble(config.getParam(SOCNET_MODULE_NAME, "actshare_culture")));
 
 			for(SocialVertex v : graph.getVertices()) {
 				ActivityDesires desire = personDesires.get(v.getPerson().getPerson());

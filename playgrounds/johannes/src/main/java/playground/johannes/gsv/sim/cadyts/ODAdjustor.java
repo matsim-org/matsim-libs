@@ -116,7 +116,7 @@ public class ODAdjustor {
 			}
 			ProgressLogger.step();
 		}
-		ProgressLogger.termiante();
+		ProgressLogger.terminate();
 	}
 
 	public void run(Population pop) {
@@ -359,7 +359,7 @@ public class ODAdjustor {
 			ProgressLogger.step();
 		}
 
-		ProgressLogger.termiante();
+		ProgressLogger.terminate();
 
 		return m;
 	}
@@ -433,7 +433,7 @@ public class ODAdjustor {
 			}
 			ProgressLogger.step();
 		}
-		ProgressLogger.termiante();
+		ProgressLogger.terminate();
 	}
 
 	private static class ODRelation {

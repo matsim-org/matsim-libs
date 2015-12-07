@@ -172,7 +172,7 @@ public class Matrix2Population {
 			
 			ProgressLogger.step();
 		}
-		ProgressLogger.termiante();
+		ProgressLogger.terminate();
 		
 		return zone2facs;
 	}

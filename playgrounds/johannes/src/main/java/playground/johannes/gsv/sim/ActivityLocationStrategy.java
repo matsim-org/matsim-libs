@@ -138,7 +138,7 @@ public class ActivityLocationStrategy implements GenericPlanStrategy<Plan, Perso
 			}
 		}
 
-		ProgressLogger.termiante();
+		ProgressLogger.terminate();
 
 	}
 

@@ -74,7 +74,7 @@ public class PopRndSubSample {
 				newPop.addPerson(persons.get(i));
 				ProgressLogger.step();
 			}
-			ProgressLogger.termiante();
+			ProgressLogger.terminate();
 			logger.info(String.format("New population size: %1$s.", pop.getPersons().size()));
 			
 			new PopulationWriter(newPop, scenario.getNetwork()).write(output);

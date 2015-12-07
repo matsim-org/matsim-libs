@@ -27,7 +27,7 @@ import org.matsim.contrib.common.gis.WGS84DistanceCalculator;
 import org.matsim.contrib.common.stats.Discretizer;
 import org.matsim.contrib.common.stats.FixedBordersDiscretizer;
 import org.matsim.contrib.common.util.ProgressLogger;
-import playground.johannes.gsv.popsim.Histogram;
+import playground.johannes.studies.matrix2014.stats.Histogram;
 import playground.johannes.gsv.zones.KeyMatrix;
 import playground.johannes.synpop.gis.Zone;
 import playground.johannes.synpop.gis.ZoneCollection;
@@ -182,7 +182,7 @@ public class AdjustDays {
 
             ProgressLogger.step();
         }
-        ProgressLogger.termiante();
+        ProgressLogger.terminate();
         writer.close();
         logger.info("Done.");
 

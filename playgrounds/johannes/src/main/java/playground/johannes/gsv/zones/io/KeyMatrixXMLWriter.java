@@ -33,6 +33,12 @@ import java.util.Set;
  */
 public class KeyMatrixXMLWriter extends MatsimXmlWriter {
 
+	static final String MATRIX_TAG = "matrix";
+	static final String CELL_TAG = "cell";
+	static final String ROW_KEY = "row";
+	static final String COL_KEY = "col";
+	static final String VALUE_KEY = "value";
+
 	public void write(KeyMatrix m, String file) {
 		openFile(file);
 		writeXmlHead();

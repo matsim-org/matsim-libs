@@ -33,9 +33,10 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup.InternalPlanDataStructure;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext.ActivityFacilityWithIndex;
-import org.matsim.contrib.locationchoice.bestresponse.PlanTimesAdapter.ApproximationLevel;
+import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup.ApproximationLevel;
 import org.matsim.contrib.locationchoice.bestresponse.scoring.ScaleEpsilon;
 import org.matsim.contrib.locationchoice.population.LCPlan;
 import org.matsim.contrib.locationchoice.router.BackwardFastMultiNodeDijkstra;
@@ -154,18 +155,7 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 	}
 
 	private void handleActivities(final Plan plan, final Plan bestPlan, final int personIndex) {
-		int tmp = this.dccg.getTravelTimeApproximationLevel();
-		ApproximationLevel travelTimeApproximationLevel;
-		if (tmp == 0) {
-			travelTimeApproximationLevel = ApproximationLevel.COMPLETE_ROUTING ;
-		} else if (tmp == 1) {
-			travelTimeApproximationLevel = ApproximationLevel.LOCAL_ROUTING ;
-		} else if (tmp == 2) {
-			travelTimeApproximationLevel = ApproximationLevel.NO_ROUTING ;
-		} else {
-			throw new RuntimeException("unknwon travel time approximation level") ;
-		}
-		// yyyy the above is not great, but when I found it, it was passing integers all the way down to the method.  kai, jan'13
+		ApproximationLevel travelTimeApproximationLevel = this.dccg.getTravelTimeApproximationLevel();
 
 		int actlegIndex = -1;
 		for (PlanElement pe : plan.getPlanElements()) {
@@ -297,35 +287,27 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 		// looked into it but could not find a reason. Removed it and tests are still fine. cdobler, oct'15
 
 //		Plan planTmp = plan;
-		
+
 		Plan planTmp = null;
 		if (this.dccg.getInternalPlanDataStructure() == InternalPlanDataStructure.planImpl) {
 			planTmp = new PlanImpl(plan.getPerson());
-			PlanUtils.copyFrom(plan, planTmp);						
+			PlanUtils.copyFrom(plan, planTmp);
 		} else if (this.dccg.getInternalPlanDataStructure() == InternalPlanDataStructure.lcPlan) {
 			planTmp = new LCPlan(plan);
 		}
 
-		// these three values are not used in the sub-method since ApproximationLevel is COMPLETE_ROUTING!
-		int actlegIndex = Integer.MIN_VALUE;
-		MultiNodeDijkstra forwardMultiNodeDijkstra = null; 
-		BackwardFastMultiNodeDijkstra backwardMultiNodeDijkstra = null;
-		
-		final double score = 
+		final double score =
 				cs.adaptAndScoreTimes(
 						plan,
-						actlegIndex,	// is not used!
 						planTmp,
 						scoringFunction,
-						forwardMultiNodeDijkstra,	// is not used!
-						backwardMultiNodeDijkstra,	// is not used!
-						this.getTripRouter(), 
-						ApproximationLevel.COMPLETE_ROUTING);	
-		
+						this.getTripRouter(),
+						DestinationChoiceConfigGroup.ApproximationLevel.completeRouting );
+
 		PlanUtils.copyPlanFieldsToFrom(plan, planTmp);	// copy( to, from )
 		return score;
 	}
-	
+
 	/**
 	 * Conversion of the "frozen" logit model epsilon into a distance.
 	 */

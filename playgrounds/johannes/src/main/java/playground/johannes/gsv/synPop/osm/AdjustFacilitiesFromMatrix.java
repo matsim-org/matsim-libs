@@ -141,7 +141,7 @@ public class AdjustFacilitiesFromMatrix {
 			}
 			ProgressLogger.step();
 		}
-		ProgressLogger.termiante();
+		ProgressLogger.terminate();
 
 		if (notfound > 0) {
 			logger.warn(String.format("Cannot assign %s facilities to a zone.", notfound));

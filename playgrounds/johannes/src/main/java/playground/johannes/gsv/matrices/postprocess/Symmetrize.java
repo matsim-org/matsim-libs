@@ -115,7 +115,7 @@ public class Symmetrize {
 
             ProgressLogger.step();
         }
-        ProgressLogger.termiante();
+        ProgressLogger.terminate();
 
         logger.info("Writing intermediate trips...");
         for (String outline : untouched) {
