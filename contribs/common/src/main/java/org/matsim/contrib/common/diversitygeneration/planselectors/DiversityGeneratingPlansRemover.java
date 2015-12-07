@@ -47,11 +47,15 @@ import java.util.Map;
  * In the present incarnation, we make sure that not the best of those 4 will be removed.
  * <p/>
  * Note that once all similar plans are removed, the remaining best plan will not be similar to any other plan any more, and
- * thus no longer incurr a similarity penalty.  So it will never be removed.
+ * thus no longer incur a similarity penalty.  So it will never be removed.
  * <p/>
  * This class has <i>not</i> yet been extensively tested and so it is not clear if it contains bugs, how well it works, or if parameters
  * should be set differently.  If someone wants to experiment, the class presumably should be made configurable (or copied before 
  * modification). 
+ * <p/>
+ * There is also material in playground.vsp .
+ * <p/>
+ * There are also some hints to literature at {@link PopulationUtils#calculateSimilarity}
  * 
  * @author nagel, ikaddoura
  */
