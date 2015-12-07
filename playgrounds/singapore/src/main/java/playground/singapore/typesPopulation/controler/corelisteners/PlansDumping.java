@@ -48,7 +48,7 @@ public class PlansDumping implements BeforeMobsimListener {
 		Scenario sc = event.getControler().getScenario() ;
 		int firstIteration = event.getControler().getConfig().controler().getFirstIteration() ;
 		int writePlansInterval = sc.getConfig().controler().getWritePlansInterval() ;
-		IterationStopWatch stopwatch = event.getControler().stopwatch ;
+		IterationStopWatch stopwatch = super.getStopwatch();
 		OutputDirectoryHierarchy controlerIO = event.getControler().getControlerIO() ;
 		if ((writePlansInterval > 0) && ((event.getIteration() % writePlansInterval== 0)
 				|| (event.getIteration() == (firstIteration + 1)))) {

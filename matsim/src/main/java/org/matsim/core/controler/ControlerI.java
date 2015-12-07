@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TransimsSnapshotWriterFactory.java
+ * ControlerI.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007, 2008 by the members listed in the COPYING,  *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,30 +18,10 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.vis.snapshotwriters;
+package org.matsim.core.controler;
 
-import com.google.inject.Inject;
-import org.matsim.core.controler.ControlerI;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
+public interface ControlerI extends Runnable {
 
-import javax.inject.Named;
-import javax.inject.Provider;
-
-class TransimsSnapshotWriterFactory implements Provider<SnapshotWriter> {
-
-	private OutputDirectoryHierarchy controlerIO;
-	private final int iteration;
-
-	@Inject
-	TransimsSnapshotWriterFactory(OutputDirectoryHierarchy controlerIO, ControlerI controler) {
-		this.iteration = controler.getIterationNumber();
-		this.controlerIO = controlerIO;
-	}
-
-	@Override
-	public SnapshotWriter get() {
-		String fileName = controlerIO.getIterationFilename(iteration, "T.veh.gz");
-		return new TransimsSnapshotWriter(fileName);
-	}
+	Integer getIterationNumber();
 
 }
