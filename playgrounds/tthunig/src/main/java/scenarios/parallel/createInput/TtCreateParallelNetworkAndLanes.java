@@ -53,7 +53,8 @@ public final class TtCreateParallelNetworkAndLanes {
 
 	private static final double LINK_LENGTH = 300.0; // m
 	private static final double FREESPEED = 10.0; // m/s
-	private static final double CAPACITY = 2000.0; // veh/h
+
+	private double capacity; // veh/h
 
 	private boolean useSecondODPair = false;
 
@@ -99,102 +100,102 @@ public final class TtCreateParallelNetworkAndLanes {
 		initLinkIds();
 
 		Link l = fac.createLink(links.get("1_2"), n1, n2);
-		setLinkAttributes(l, CAPACITY, LINK_LENGTH, FREESPEED);
+		setLinkAttributes(l, capacity, LINK_LENGTH, FREESPEED);
 		net.addLink(l);
 		l = fac.createLink(links.get("2_1"), n2, n1);
-		setLinkAttributes(l, CAPACITY, LINK_LENGTH, FREESPEED);
+		setLinkAttributes(l, capacity, LINK_LENGTH, FREESPEED);
 		net.addLink(l);
 		l = fac.createLink(links.get("2_3"), n2, n3);
-		setLinkAttributes(l, CAPACITY, LINK_LENGTH, FREESPEED);
+		setLinkAttributes(l, capacity, LINK_LENGTH, FREESPEED);
 		net.addLink(l);
 		l = fac.createLink(links.get("3_2"), n3, n2);
-		setLinkAttributes(l, CAPACITY, LINK_LENGTH, FREESPEED);
+		setLinkAttributes(l, capacity, LINK_LENGTH, FREESPEED);
 		net.addLink(l);
 		l = fac.createLink(links.get("3_4"), n3, n4);
-		setLinkAttributes(l, CAPACITY, LINK_LENGTH, FREESPEED);
+		setLinkAttributes(l, capacity, LINK_LENGTH, FREESPEED);
 		net.addLink(l);
 		l = fac.createLink(links.get("4_3"), n4, n3);
-		setLinkAttributes(l, CAPACITY, LINK_LENGTH, FREESPEED);
+		setLinkAttributes(l, capacity, LINK_LENGTH, FREESPEED);
 		net.addLink(l);
 		l = fac.createLink(links.get("4_5"), n4, n5);
-		setLinkAttributes(l, CAPACITY, LINK_LENGTH, FREESPEED);
+		setLinkAttributes(l, capacity, LINK_LENGTH, FREESPEED);
 		net.addLink(l);
 		l = fac.createLink(links.get("5_4"), n5, n4);
-		setLinkAttributes(l, CAPACITY, LINK_LENGTH, FREESPEED);
+		setLinkAttributes(l, capacity, LINK_LENGTH, FREESPEED);
 		net.addLink(l);
 		l = fac.createLink(links.get("5_6"), n5, n6);
-		setLinkAttributes(l, CAPACITY, LINK_LENGTH, FREESPEED);
+		setLinkAttributes(l, capacity, LINK_LENGTH, FREESPEED);
 		net.addLink(l);
 		l = fac.createLink(links.get("6_5"), n6, n5);
-		setLinkAttributes(l, CAPACITY, LINK_LENGTH, FREESPEED);
+		setLinkAttributes(l, capacity, LINK_LENGTH, FREESPEED);
 		net.addLink(l);
 		l = fac.createLink(links.get("2_7"), n2, n7);
-		setLinkAttributes(l, CAPACITY, LINK_LENGTH, FREESPEED);
+		setLinkAttributes(l, capacity, LINK_LENGTH, FREESPEED);
 		net.addLink(l);
 		l = fac.createLink(links.get("7_2"), n7, n2);
-		setLinkAttributes(l, CAPACITY, LINK_LENGTH, FREESPEED);
+		setLinkAttributes(l, capacity, LINK_LENGTH, FREESPEED);
 		net.addLink(l);
 		l = fac.createLink(links.get("7_8"), n7, n8);
-		setLinkAttributes(l, CAPACITY, LINK_LENGTH, FREESPEED);
+		setLinkAttributes(l, capacity, LINK_LENGTH, FREESPEED);
 		net.addLink(l);
 		l = fac.createLink(links.get("8_7"), n8, n7);
-		setLinkAttributes(l, CAPACITY, LINK_LENGTH, FREESPEED);
+		setLinkAttributes(l, capacity, LINK_LENGTH, FREESPEED);
 		net.addLink(l);
 		l = fac.createLink(links.get("8_5"), n8, n5);
-		setLinkAttributes(l, CAPACITY, LINK_LENGTH, FREESPEED);
+		setLinkAttributes(l, capacity, LINK_LENGTH, FREESPEED);
 		net.addLink(l);
 		l = fac.createLink(links.get("5_8"), n5, n8);
-		setLinkAttributes(l, CAPACITY, LINK_LENGTH, FREESPEED);
+		setLinkAttributes(l, capacity, LINK_LENGTH, FREESPEED);
 		net.addLink(l);
 
 		if (useSecondODPair) {
 			l = fac.createLink(links.get("3_7"), n3, n7);
-			setLinkAttributes(l, CAPACITY, LINK_LENGTH, FREESPEED);
+			setLinkAttributes(l, capacity, LINK_LENGTH, FREESPEED);
 			net.addLink(l);
 			l = fac.createLink(links.get("7_3"), n7, n3);
-			setLinkAttributes(l, CAPACITY, LINK_LENGTH, FREESPEED);
+			setLinkAttributes(l, capacity, LINK_LENGTH, FREESPEED);
 			net.addLink(l);
 			l = fac.createLink(links.get("4_8"), n4, n8);
-			setLinkAttributes(l, CAPACITY, LINK_LENGTH, FREESPEED);
+			setLinkAttributes(l, capacity, LINK_LENGTH, FREESPEED);
 			net.addLink(l);
 			l = fac.createLink(links.get("8_4"), n8, n4);
-			setLinkAttributes(l, CAPACITY, LINK_LENGTH, FREESPEED);
+			setLinkAttributes(l, capacity, LINK_LENGTH, FREESPEED);
 			net.addLink(l);
 			l = fac.createLink(links.get("3_9"), n3, n9);
-			setLinkAttributes(l, CAPACITY, LINK_LENGTH, FREESPEED);
+			setLinkAttributes(l, capacity, LINK_LENGTH, FREESPEED);
 			net.addLink(l);
 			l = fac.createLink(links.get("9_3"), n9, n3);
-			setLinkAttributes(l, CAPACITY, LINK_LENGTH, FREESPEED);
+			setLinkAttributes(l, capacity, LINK_LENGTH, FREESPEED);
 			net.addLink(l);
 			l = fac.createLink(links.get("4_9"), n4, n9);
-			setLinkAttributes(l, CAPACITY, LINK_LENGTH, FREESPEED);
+			setLinkAttributes(l, capacity, LINK_LENGTH, FREESPEED);
 			net.addLink(l);
 			l = fac.createLink(links.get("9_4"), n9, n4);
-			setLinkAttributes(l, CAPACITY, LINK_LENGTH, FREESPEED);
+			setLinkAttributes(l, capacity, LINK_LENGTH, FREESPEED);
 			net.addLink(l);
 			l = fac.createLink(links.get("9_10"), n9, n10);
-			setLinkAttributes(l, CAPACITY, LINK_LENGTH, FREESPEED);
+			setLinkAttributes(l, capacity, LINK_LENGTH, FREESPEED);
 			net.addLink(l);
 			l = fac.createLink(links.get("10_9"), n10, n9);
-			setLinkAttributes(l, CAPACITY, LINK_LENGTH, FREESPEED);
+			setLinkAttributes(l, capacity, LINK_LENGTH, FREESPEED);
 			net.addLink(l);
 			l = fac.createLink(links.get("7_11"), n7, n11);
-			setLinkAttributes(l, CAPACITY, LINK_LENGTH, FREESPEED);
+			setLinkAttributes(l, capacity, LINK_LENGTH, FREESPEED);
 			net.addLink(l);
 			l = fac.createLink(links.get("11_7"), n11, n7);
-			setLinkAttributes(l, CAPACITY, LINK_LENGTH, FREESPEED);
+			setLinkAttributes(l, capacity, LINK_LENGTH, FREESPEED);
 			net.addLink(l);
 			l = fac.createLink(links.get("8_11"), n8, n11);
-			setLinkAttributes(l, CAPACITY, LINK_LENGTH, FREESPEED);
+			setLinkAttributes(l, capacity, LINK_LENGTH, FREESPEED);
 			net.addLink(l);
 			l = fac.createLink(links.get("11_8"), n11, n8);
-			setLinkAttributes(l, CAPACITY, LINK_LENGTH, FREESPEED);
+			setLinkAttributes(l, capacity, LINK_LENGTH, FREESPEED);
 			net.addLink(l);
 			l = fac.createLink(links.get("11_12"), n11, n12);
-			setLinkAttributes(l, CAPACITY, LINK_LENGTH, FREESPEED);
+			setLinkAttributes(l, capacity, LINK_LENGTH, FREESPEED);
 			net.addLink(l);
 			l = fac.createLink(links.get("12_11"), n12, n11);
-			setLinkAttributes(l, CAPACITY, LINK_LENGTH, FREESPEED);
+			setLinkAttributes(l, capacity, LINK_LENGTH, FREESPEED);
 			net.addLink(l);
 		}
 		createLanes();
@@ -259,17 +260,17 @@ public final class TtCreateParallelNetworkAndLanes {
 		LanesToLinkAssignment20 linkAssignment = fac.createLanesToLinkAssignment(links.get("1_2"));
 
 		LanesUtils.createAndAddLane20(linkAssignment, fac,
-				Id.create("1_2.ol", Lane.class), CAPACITY,
+				Id.create("1_2.ol", Lane.class), capacity,
 				LINK_LENGTH, 0, 1, null,
 				Arrays.asList(Id.create("1_2.l", Lane.class),
 				Id.create("1_2.r", Lane.class)));
 
 			LanesUtils.createAndAddLane20(linkAssignment, fac,
-					Id.create("1_2.l", Lane.class), CAPACITY,
+					Id.create("1_2.l", Lane.class), capacity,
 					LINK_LENGTH / 2, -1, 1,
 					Collections.singletonList(links.get("2_3")), null);
 			LanesUtils.createAndAddLane20(linkAssignment, fac,
-					Id.create("1_2.r", Lane.class), CAPACITY,
+					Id.create("1_2.r", Lane.class), capacity,
 					LINK_LENGTH / 2, 1, 1,
 					Collections.singletonList(links.get("2_7")), null);
 
@@ -279,17 +280,17 @@ public final class TtCreateParallelNetworkAndLanes {
 		linkAssignment = fac.createLanesToLinkAssignment(links.get("6_5"));
 
 		LanesUtils.createAndAddLane20(linkAssignment, fac,
-				Id.create("6_5.ol", Lane.class), CAPACITY,
+				Id.create("6_5.ol", Lane.class), capacity,
 				LINK_LENGTH, 0, 1, null,
 				Arrays.asList(Id.create("6_5.l", Lane.class),
 						Id.create("6_5.r", Lane.class)));
 
 		LanesUtils.createAndAddLane20(linkAssignment, fac,
-				Id.create("6_5.l", Lane.class), CAPACITY,
+				Id.create("6_5.l", Lane.class), capacity,
 				LINK_LENGTH / 2, -1, 1,
 				Collections.singletonList(links.get("5_8")), null);
 		LanesUtils.createAndAddLane20(linkAssignment, fac,
-				Id.create("6_5.r", Lane.class), CAPACITY,
+				Id.create("6_5.r", Lane.class), capacity,
 				LINK_LENGTH / 2, 1, 1,
 				Collections.singletonList(links.get("5_4")), null);
 
@@ -300,17 +301,17 @@ public final class TtCreateParallelNetworkAndLanes {
 			linkAssignment = fac.createLanesToLinkAssignment(links.get("10_9"));
 
 			LanesUtils.createAndAddLane20(linkAssignment, fac,
-					Id.create("10_9.ol", Lane.class), CAPACITY,
+					Id.create("10_9.ol", Lane.class), capacity,
 					LINK_LENGTH, 0, 1, null,
 					Arrays.asList(Id.create("10_9.l", Lane.class),
 							Id.create("10_9.r", Lane.class)));
 
 			LanesUtils.createAndAddLane20(linkAssignment, fac,
-					Id.create("10_9.l", Lane.class), CAPACITY,
+					Id.create("10_9.l", Lane.class), capacity,
 					LINK_LENGTH / 2, -1, 1,
 					Collections.singletonList(links.get("9_4")), null);
 			LanesUtils.createAndAddLane20(linkAssignment, fac,
-					Id.create("10_9.r", Lane.class), CAPACITY,
+					Id.create("10_9.r", Lane.class), capacity,
 					LINK_LENGTH / 2, 1, 1,
 					Collections.singletonList(links.get("9_3")), null);
 
@@ -320,17 +321,17 @@ public final class TtCreateParallelNetworkAndLanes {
 			linkAssignment = fac.createLanesToLinkAssignment(links.get("12_11"));
 
 			LanesUtils.createAndAddLane20(linkAssignment, fac,
-					Id.create("12_11.ol", Lane.class), CAPACITY,
+					Id.create("12_11.ol", Lane.class), capacity,
 					LINK_LENGTH, 0, 1, null,
 					Arrays.asList(Id.create("12_11.l", Lane.class),
 							Id.create("12_11.r", Lane.class)));
 
 			LanesUtils.createAndAddLane20(linkAssignment, fac,
-					Id.create("12_11.l", Lane.class), CAPACITY,
+					Id.create("12_11.l", Lane.class), capacity,
 					LINK_LENGTH / 2, -1, 1,
 					Collections.singletonList(links.get("11_7")), null);
 			LanesUtils.createAndAddLane20(linkAssignment, fac,
-					Id.create("12_11.r", Lane.class), CAPACITY,
+					Id.create("12_11.r", Lane.class), capacity,
 					LINK_LENGTH / 2, 1, 1,
 					Collections.singletonList(links.get("11_8")), null);
 
@@ -351,6 +352,10 @@ public final class TtCreateParallelNetworkAndLanes {
      */
 	public void setUseSecondODPair(boolean useSecondODPair) {
 		this.useSecondODPair = useSecondODPair;
+	}
+
+	public void setCapacity(double capacity) {
+		this.capacity = capacity;
 	}
 
 }
