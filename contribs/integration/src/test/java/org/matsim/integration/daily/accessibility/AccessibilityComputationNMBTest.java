@@ -39,7 +39,8 @@ public class AccessibilityComputationNMBTest {
 	public static final Logger log = Logger.getLogger( AccessibilityComputationNMBTest.class ) ;
 
 //	private static final double cellSize = 1000.;
-	private static final double cellSize = 10000.;
+//	private static final double cellSize = 10000.;
+	private static final Double cellSize = 1000.;
 
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
 
@@ -68,7 +69,7 @@ public class AccessibilityComputationNMBTest {
 		boolean createQGisOutput = false;
 		boolean includeDensityLayer = true;
 		String crs = TransformationFactory.WGS84_SA_Albers;
-		String name = "za_nmb_work_100";
+		String name = "za_nmb_" + cellSize.toString().split("\\.")[0];
 		
 		Double lowerBound = 2.;
 		Double upperBound = 5.5;
