@@ -19,10 +19,13 @@
  * *********************************************************************** */
 package playground.ivt.utils;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LaneEnterEvent;
 import org.matsim.core.api.experimental.events.LaneLeaveEvent;
@@ -30,14 +33,20 @@ import org.matsim.core.api.internal.HasPersonId;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.handler.EventHandler;
+import org.matsim.core.utils.collections.MapUtils;
 import org.matsim.utils.objectattributes.ObjectAttributes;
+import org.matsim.vehicles.Vehicle;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * An events manager which (attempts to) transmit only events relevant for a given
  * subpopulation.
  * The "attempts to" in the previous sentence comes from the fact that one can
  * never be sure that an event is not specific to a person, even if it does not implement
- * {@link HasPerson}. Currently, events implementing {@link HasPerson}, as well as link
+ * {@link HasPersonId}. Currently, events implementing {@link HasPersonId}, as well as link
  * events, are filtered, the rest simply transmitted.
  * <br>
  * It always transmits only the events for one specific subpopulation: if non is provided,
@@ -52,6 +61,8 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
 public class SubpopulationFilteringEventsManager implements EventsManager {
 	private final EventsManager delegate = EventsUtils.createEventsManager();
 	private final Filter<Id> filter;
+
+	private final Map<Id<Vehicle>, Set<Id<Person>>> passengers = new HashMap<>();
 
 	/**
 	 * Contructs an instance, using the default subpopulation and
@@ -113,6 +124,18 @@ public class SubpopulationFilteringEventsManager implements EventsManager {
 
 		// Those "core" events have a person but do not implement
 		// HasPersonId: handle them specially
+		if ( event instanceof PersonEntersVehicleEvent ) {
+			MapUtils.getSet( ( (PersonEntersVehicleEvent) event ).getVehicleId(),
+					passengers ).add(
+					( (PersonEntersVehicleEvent) event ).getPersonId() );
+		}
+
+		if ( event instanceof PersonLeavesVehicleEvent ) {
+			MapUtils.getSet( ( (PersonLeavesVehicleEvent) event ).getVehicleId(),
+					passengers ).remove(
+					( (PersonLeavesVehicleEvent) event ).getPersonId() );
+		}
+
 		if ( event instanceof LaneEnterEvent ) {
 			final Id id = ((LaneEnterEvent) event).getPersonId();
 			if ( !filter.accept( id ) ) return;
@@ -124,13 +147,25 @@ public class SubpopulationFilteringEventsManager implements EventsManager {
 		}
 		
 		if ( event instanceof LinkEnterEvent ) {
-			final Id id = ((LinkEnterEvent) event).getDriverId();
-			if ( !filter.accept( id ) ) return;
+			boolean accept = false;
+			for ( Id<Person> p : MapUtils.getSet( ( (LinkEnterEvent) event ).getVehicleId() , passengers ) ) {
+				if ( filter.accept( p ) ) {
+					accept = true;
+					break;
+				}
+			}
+			if ( !accept ) return;
 		}
 		
 		if ( event instanceof LinkLeaveEvent ) {
-			final Id id = ((LinkLeaveEvent) event).getDriverId();
-			if ( !filter.accept( id ) ) return;
+			boolean accept = false;
+			for ( Id<Person> p : MapUtils.getSet( ( (LinkLeaveEvent) event ).getVehicleId() , passengers ) ) {
+				if ( filter.accept( p ) ) {
+					accept = true;
+					break;
+				}
+			}
+			if ( !accept ) return;
 		}
 		
 		delegate.processEvent(event);
