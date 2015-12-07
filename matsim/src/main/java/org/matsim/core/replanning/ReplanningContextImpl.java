@@ -24,6 +24,7 @@ package org.matsim.core.replanning;
 
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
+import org.matsim.core.controler.ControlerI;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
@@ -45,8 +46,8 @@ class ReplanningContextImpl implements ReplanningContext {
     private Provider<ScoringFunctionFactory> scoringFunctionFactory;
 
     @Inject
-    ReplanningContextImpl(@Named("iteration") int iteration, Config config, Map<String,TravelDisutilityFactory> travelDisutility, Map<String,TravelTime> travelTime, Provider<TripRouter> tripRouter, Provider<ScoringFunctionFactory> scoringFunctionFactory) {
-        this.iteration = iteration;
+    ReplanningContextImpl(ControlerI controler, Config config, Map<String,TravelDisutilityFactory> travelDisutility, Map<String,TravelTime> travelTime, Provider<TripRouter> tripRouter, Provider<ScoringFunctionFactory> scoringFunctionFactory) {
+        this.iteration = controler.getIterationNumber();
         this.config = config;
         this.travelDisutility = travelDisutility;
         this.travelTime = travelTime;

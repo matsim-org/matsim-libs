@@ -70,7 +70,7 @@ final class PlansDumpingImpl implements PlansDumping, BeforeMobsimListener {
 			this.sc = event.getControler().getScenario() ;
 			this.firstIteration = event.getControler().getConfig().controler().getFirstIteration() ;
 			this.writePlansInterval = sc.getConfig().controler().getWritePlansInterval() ;
-			this.stopwatch = event.getControler().stopwatch ;
+			this.stopwatch = event.getControler().getStopwatch();
 			this.controlerIO = event.getControler().getControlerIO() ;
 		}
 		if ((writePlansInterval > 0) && ((event.getIteration() % writePlansInterval== 0)
