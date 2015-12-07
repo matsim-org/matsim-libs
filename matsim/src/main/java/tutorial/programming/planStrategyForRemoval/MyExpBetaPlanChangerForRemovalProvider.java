@@ -19,37 +19,30 @@
 
 package tutorial.programming.planStrategyForRemoval;
 
+import javax.inject.Inject;
+import javax.inject.Provider;
+
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
 
 /**
 * @author ikaddoura
 */
-public class RunPlanStrategyForRemovalExample {
+public class MyExpBetaPlanChangerForRemovalProvider implements Provider<ExpBetaPlanChanger<Plan, Person>> {
 
-	private static final String SELECTOR_NAME = "selectorName";
+	private Config config;
 
-	public static void main(String[] args) {
-		
-		Config config = ConfigUtils.createConfig();	
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controler().setLastIteration(1);
-		Controler controler = new Controler(config);
+    @Inject
+    MyExpBetaPlanChangerForRemovalProvider(Config config) {
+        this.config = config;
+    }
 
-		controler.addOverridingModule(new AbstractModule(){
-			
-			@Override
-			public void install() {
-				this.addPlanSelectorForRemovalBinding(SELECTOR_NAME).toProvider(MyExpBetaPlanChangerForRemoval.class);
-			}
-		});
-		
-		controler.run();
-
-	}
-
+    @Override
+    public ExpBetaPlanChanger<Plan, Person> get() {
+        return new ExpBetaPlanChanger<>( - config.planCalcScore().getBrainExpBeta());
+    }
+	
 }
 
