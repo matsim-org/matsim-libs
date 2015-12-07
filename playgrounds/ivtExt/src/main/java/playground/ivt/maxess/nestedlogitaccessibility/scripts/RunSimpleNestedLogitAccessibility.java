@@ -34,6 +34,8 @@ import playground.ivt.maxess.nestedlogitaccessibility.framework.BaseNestedAccess
 import playground.ivt.maxess.nestedlogitaccessibility.writers.BasicPersonAccessibilityWriter;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.InjectionUtils;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.NestedLogitAccessibilityCalculator;
+import playground.ivt.router.CachingFreespeedCarRouterModule;
+import playground.ivt.router.lazyschedulebasedmatrix.LazyScheduleBasedMatrixModule;
 import playground.ivt.utils.MoreIOUtils;
 
 import java.util.Collections;
@@ -70,6 +72,8 @@ public class RunSimpleNestedLogitAccessibility {
 							new TypeLiteral<ModeNests>() {},
 							new BaseNestedAccessibilityComputationModule<ModeNests>(
 									scenario ) {},
+							new CachingFreespeedCarRouterModule(),
+							new LazyScheduleBasedMatrixModule(),
 							module );
 
 			// TODO store and write results
