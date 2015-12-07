@@ -132,7 +132,6 @@ class MatsimRuntimeModifications {
 			if (unexpectedShutdown.get()) {
 				log.error("ERROR --- This was an unexpected shutdown! See the log file for a possible reason.");
 			}
-			OutputDirectoryLogging.closeOutputDirLogging();
 			Thread.setDefaultUncaughtExceptionHandler(previousDefaultUncaughtExceptionHandler);
 			// Propagate Exception in case Controler.run is called by someone who wants to catch
 			// it. It is probably not strictly correct to wrap the exception here.

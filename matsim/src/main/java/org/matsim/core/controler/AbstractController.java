@@ -100,6 +100,7 @@ public abstract class AbstractController {
             }
         };
         MatsimRuntimeModifications.run(runnable, dirtyShutdown);
+        OutputDirectoryLogging.closeOutputDirLogging();
     }
 
     protected abstract void loadCoreListeners();
