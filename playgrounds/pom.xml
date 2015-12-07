@@ -151,17 +151,6 @@
 			<id>matsim</id>
 			<url>http://matsim.org/m2repo</url>
 		</repository>
-		<repository>
-			<id>oss-jfrog-artifactory</id>
-			<name>artifactory-snapshots</name>
-			<releases>
-				<enabled>false</enabled>
-			</releases>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-			<url>http://oss.jfrog.org/artifactory/libs-snapshot</url>
-		</repository>
 	</repositories>
 	
 	<dependencies>
