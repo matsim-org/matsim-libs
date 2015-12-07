@@ -30,10 +30,7 @@ public class TextReaderWriter {
 	public ArrayList<Double> readFromTextFile(String path){
 		ArrayList<Double> values = new ArrayList<>();
 		try { 
-			for (String line : Files.readAllLines(Paths.get(path))) {
-				Logger.getLogger(this.getClass()).fatal("the above line did not compile because second argument was missing "
-						+ "in readAllLines( arg1, arg2 ).  I added `null' to make it compile but do not know if this is the right choice. "
-						+ "kai, sep'15");
+			for (String line : Files.readAllLines(Paths.get(path), null)) {
 			    for (String part : line.split(" ")) {
 			        Double i = Double.valueOf(part);
 			        values.add(i);
