@@ -25,8 +25,6 @@ package org.matsim.core.router;
 import com.google.inject.Key;
 import com.google.inject.name.Named;
 import com.google.inject.name.Names;
-
-import org.junit.Assert;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
@@ -142,14 +140,14 @@ public class TripRouterFactoryModule extends AbstractModule {
             }
 
             final TravelDisutilityFactory travelDisutilityFactory = travelDisutilityFactoryMap.get(mode);
-            Assert.assertNotNull( "cannot get travel disutility factory for mode=" + mode, travelDisutilityFactory );
-		final TravelTime timeCalculator = travelTimesMap.get(mode);
-		Assert.assertNotNull( timeCalculator );
-		LeastCostPathCalculator routeAlgo =
-                    leastCostPathCalculatorFactory.createPathCalculator(
-                            filteredNetwork,
-                            travelDisutilityFactory.createTravelDisutility(timeCalculator, scenario.getConfig().planCalcScore()),
-                            timeCalculator);
+            assert travelDisutilityFactory != null : mode;
+			final TravelTime timeCalculator = travelTimesMap.get(mode);
+			assert timeCalculator != null;
+			LeastCostPathCalculator routeAlgo =
+						leastCostPathCalculatorFactory.createPathCalculator(
+								filteredNetwork,
+								travelDisutilityFactory.createTravelDisutility(timeCalculator, scenario.getConfig().planCalcScore()),
+								timeCalculator);
 
             return DefaultRoutingModules.createNetworkRouter(mode, scenario.getPopulation().getFactory(),
                     filteredNetwork, routeAlgo);

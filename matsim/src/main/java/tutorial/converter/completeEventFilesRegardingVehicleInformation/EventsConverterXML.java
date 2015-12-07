@@ -21,18 +21,13 @@
  */
 package tutorial.converter.completeEventFilesRegardingVehicleInformation;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Stack;
-
-import org.junit.Assert;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
-import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -41,6 +36,10 @@ import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.vehicles.Vehicle;
 import org.xml.sax.Attributes;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Stack;
 
 /**
  * This class reads and completes event files regarding vehicle ids.
@@ -100,7 +99,7 @@ public class EventsConverterXML extends MatsimXmlParser{
 				} else {
 					vehicleId = Id.create(atts.getValue(VehicleEntersTrafficEvent.ATTRIBUTE_VEHICLE), Vehicle.class);
 				}
-				Assert.assertNotNull(vehicleId);
+				assert vehicleId != null;
 
 				// remember driver to vehicle relation
 				driverToVeh.put(driverId, vehicleId);				
@@ -122,11 +121,11 @@ public class EventsConverterXML extends MatsimXmlParser{
 				if (atts.getValue(LinkLeaveEvent.ATTRIBUTE_VEHICLE) == null || atts.getValue(LinkLeaveEvent.ATTRIBUTE_VEHICLE).equals("null")){
 					// create an link leave event with the correct vehicle id
 					final Id<Person> personId = Id.createPersonId(atts.getValue(ATTRIBUTE_PERSON));
-					Assert.assertNotNull( personId );
+					assert personId != null;
 					final Id<Link> linkId = Id.create(atts.getValue(LinkLeaveEvent.ATTRIBUTE_LINK), Link.class);
-					Assert.assertNotNull( linkId );
+					assert linkId != null;
 					vehicleId = driverToVeh.get(personId);
-					Assert.assertNotNull( vehicleId );
+					assert vehicleId != null;
 					this.events.processEvent(new LinkLeaveEvent(time, vehicleId, linkId));
 				} else {
 					// the event already contains the vehicle id and can be processed normally
