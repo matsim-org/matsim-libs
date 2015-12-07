@@ -64,6 +64,9 @@ public class LazyScheduleBasedMatrixRoutingModule implements RoutingModule {
 						TIntObjectHashMap<
 								TIntObjectHashMap<
 									List<? extends PlanElement>>>>>> matrix = new TIntObjectHashMap<>();
+	private final TIntObjectHashMap<
+			TIntObjectHashMap<
+					Facility>> binnedFacilities = new TIntObjectHashMap<>();
 
 	@Inject
 	public LazyScheduleBasedMatrixRoutingModule(
@@ -133,42 +136,47 @@ public class LazyScheduleBasedMatrixRoutingModule implements RoutingModule {
 	}
 
 	private Facility binFacility( final Facility fromFacility ) {
-		return new Facility() {
-			private Coord coord = null;
-			private Id<Link> linkId = null;
+		final int cellX = (int) ( fromFacility.getCoord().getX() / cellSize_m );
+		final int cellY = (int) ( fromFacility.getCoord().getY() / cellSize_m );
 
-			@Override
-			public Id<Link> getLinkId() {
-				if ( linkId == null ) {
-					// TODO: check if networkImpl and complain if not
-					linkId = ((NetworkImpl) network).getNearestLinkExactly( coord ).getId();
+		TIntObjectHashMap<Facility> atX = binnedFacilities.get( cellX );
+		if ( atX == null ) {
+			atX = new TIntObjectHashMap<>();
+			binnedFacilities.put( cellX , atX );
+		}
+
+		Facility f = atX.get( cellY );
+		if ( f == null ) {
+			f = new Facility() {
+				private Coord coord = new Coord(
+						cellX * cellSize_m + cellSize_m / 2,
+						cellY * cellSize_m + cellSize_m / 2 );
+				private Id<Link> linkId = ( (NetworkImpl) network ).getNearestLinkExactly( coord ).getId();
+
+				@Override
+				public Id<Link> getLinkId() {
+					return linkId;
 				}
-				return linkId;
-			}
 
-			@Override
-			public Coord getCoord() {
-				if ( coord == null ) {
-					final int cellX = (int) ( fromFacility.getCoord().getX() / cellSize_m );
-					final int cellY = (int) ( fromFacility.getCoord().getY() / cellSize_m );
-
-					coord = new Coord(
-							cellX * cellSize_m + cellSize_m / 2,
-							cellY * cellSize_m + cellSize_m / 2 );
+				@Override
+				public Coord getCoord() {
+					return coord;
 				}
-				return coord;
-			}
 
-			@Override
-			public Map<String, Object> getCustomAttributes() {
-				throw new UnsupportedOperationException( );
-			}
+				@Override
+				public Map<String, Object> getCustomAttributes() {
+					throw new UnsupportedOperationException();
+				}
 
-			@Override
-			public Id getId() {
-				throw new UnsupportedOperationException( );
-			}
-		};
+				@Override
+				public Id getId() {
+					throw new UnsupportedOperationException();
+				}
+			};
+			atX.put( cellY , f );
+		}
+
+		return f;
 	}
 
 	private List<? extends PlanElement> trim( List<? extends PlanElement> trip ) {
