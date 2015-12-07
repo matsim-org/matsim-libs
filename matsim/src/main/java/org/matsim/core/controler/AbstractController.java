@@ -32,8 +32,15 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public abstract class AbstractController {
 	private static boolean dirtyShutdown = false ;
-	
-	private static class InterruptAndJoin extends Thread {
+
+    /**
+     * This was  public in the design that I found. kai, jul'12
+     */
+    public IterationStopWatch getStopwatch() {
+        return stopwatch;
+    }
+
+    private static class InterruptAndJoin extends Thread {
         private final Thread controllerThread;
         private AtomicBoolean unexpectedShutdown;
 
@@ -72,10 +79,7 @@ public abstract class AbstractController {
 
     private OutputDirectoryHierarchy controlerIO;
 
-    /**
-     * This was  public in the design that I found. kai, jul'12
-     */
-    public final IterationStopWatch stopwatch = new IterationStopWatch();
+    private final IterationStopWatch stopwatch;
 
     /*
      * Strings used to identify the operations in the IterationStopWatch.
@@ -96,11 +100,16 @@ public abstract class AbstractController {
 
 
     protected AbstractController() {
+        this(new IterationStopWatch());
+    }
+
+    AbstractController(IterationStopWatch stopWatch) {
         OutputDirectoryLogging.catchLogEntries();
         Gbl.printSystemInfo();
         Gbl.printBuildInfo();
         log.info("Used Controler-Class: " + this.getClass().getCanonicalName());
         this.controlerListenerManager = new ControlerListenerManager();
+        this.stopwatch = stopWatch;
     }
 
 
@@ -115,6 +124,11 @@ public abstract class AbstractController {
 
     protected final void setupOutputDirectory(final String outputDirectory, String runId, final OverwriteFileSetting overwriteFiles) {
         this.controlerIO = new OutputDirectoryHierarchy(outputDirectory, runId, overwriteFiles); // output dir needs to be there before logging
+        OutputDirectoryLogging.initLogging(this.getControlerIO()); // logging needs to be early
+    }
+
+    final void setupOutputDirectory(OutputDirectoryHierarchy controlerIO) {
+        this.controlerIO = controlerIO;
         OutputDirectoryLogging.initLogging(this.getControlerIO()); // logging needs to be early
     }
 
@@ -235,7 +249,7 @@ public abstract class AbstractController {
 
     private void iteration(final Config config, final int iteration) throws UnexpectedShutdownException {
         this.thisIteration = iteration;
-        this.stopwatch.beginIteration(iteration);
+        this.getStopwatch().beginIteration(iteration);
 
         log.info(DIVIDER);
         log.info(MARKER + "ITERATION " + iteration + " BEGINS");
@@ -276,10 +290,10 @@ public abstract class AbstractController {
             }
         });
 
-        this.stopwatch.endIteration();
-        this.stopwatch.writeTextFile(this.getControlerIO().getOutputFilename("stopwatch"));
+        this.getStopwatch().endIteration();
+        this.getStopwatch().writeTextFile(this.getControlerIO().getOutputFilename("stopwatch"));
         if (config.controler().isCreateGraphs()) {
-            this.stopwatch.writeGraphFile(this.getControlerIO().getOutputFilename("stopwatch"));
+            this.getStopwatch().writeGraphFile(this.getControlerIO().getOutputFilename("stopwatch"));
         }
         log.info(MARKER + "ITERATION " + iteration + " ENDS");
         log.info(DIVIDER);
@@ -334,9 +348,9 @@ public abstract class AbstractController {
     }
 
     private void iterationStep(String iterationStepName, Runnable iterationStep) throws UnexpectedShutdownException {
-        this.stopwatch.beginOperation(iterationStepName);
+        this.getStopwatch().beginOperation(iterationStepName);
         iterationStep.run();
-        this.stopwatch.endOperation(iterationStepName);
+        this.getStopwatch().endOperation(iterationStepName);
         if (Thread.interrupted()) {
             throw new UnexpectedShutdownException();
         }
@@ -368,7 +382,7 @@ public abstract class AbstractController {
 
 
 	@SuppressWarnings("static-method")
-	public final void setDirtyShutdown(boolean dirtyShutdown) {
+	public static final void setDirtyShutdown(boolean dirtyShutdown) {
 		AbstractController.dirtyShutdown = dirtyShutdown;
 	}
 

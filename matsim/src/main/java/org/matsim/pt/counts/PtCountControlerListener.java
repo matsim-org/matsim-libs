@@ -118,7 +118,7 @@ BeforeMobsimListener, AfterMobsimListener  {
 		int iter = event.getIteration();
 		if ( isActiveInThisIteration( iter ) ) {
 
-			controler.stopwatch.beginOperation(OPERATION_COMPAREPTCOUNTS);
+			controler.getStopwatch().beginOperation(OPERATION_COMPAREPTCOUNTS);
 
 			double countsScaleFactor = Double.parseDouble(this.config.getParam(MODULE_NAME, "countsScaleFactor"));
             Network network = controler.getScenario().getNetwork();
@@ -193,7 +193,7 @@ BeforeMobsimListener, AfterMobsimListener  {
 				}
 			}
 
-			controler.stopwatch.endOperation(OPERATION_COMPAREPTCOUNTS);
+			event.getControler().getStopwatch().endOperation(OPERATION_COMPAREPTCOUNTS);
 		}
 	}
 

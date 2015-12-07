@@ -16,36 +16,44 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.ivt.maxess.nestedlogitaccessibility.framework;
+package playground.ivt.router;
 
-import com.google.inject.Guice;
-import com.google.inject.Injector;
-import com.google.inject.Key;
-import com.google.inject.Module;
-import com.google.inject.TypeLiteral;
-import com.google.inject.util.Types;
-
-import java.lang.reflect.ParameterizedType;
+import com.google.inject.Inject;
+import com.google.inject.Provider;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
+import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.router.RoutingModule;
+import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
+import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 
 /**
  * @author thibautd
  */
-public class InjectionUtils {
-	private InjectionUtils() {}
+public class CachingFreespeedCarRouterModule extends AbstractModule {
+	private final TripSoftCache cache = new TripSoftCache( false , TripSoftCache.LocationType.link );
 
-	// As far as I can see, this is safe, even though unchecked: I do not see a way to create something else than the
-	// return type.
-	@SuppressWarnings( "unchecked" )
-	public static <N extends Enum<N>> NestedLogitAccessibilityCalculator<N> createCalculator(
-				final TypeLiteral<N> nestType,
-				final Module... modules ) {
-		Injector injector = Guice.createInjector( modules );
+	@Override
+	public void install() {
+		addRoutingModuleBinding( TransportMode.car ).toProvider(
+				new Provider<RoutingModule>() {
+					@Inject
+					Scenario sc = null;
+					@Override
+					public RoutingModule get() {
+						final FreespeedTravelTimeAndDisutility tt = new FreespeedTravelTimeAndDisutility(sc.getConfig().planCalcScore());
 
-		final ParameterizedType newType =
-				Types.newParameterizedType(
-						NestedLogitAccessibilityCalculator.class,
-						nestType.getType() );
+						final TripRouterFactoryBuilderWithDefaults b = new TripRouterFactoryBuilderWithDefaults();
+						b.setTravelTime( tt );
+						b.setTravelDisutility( tt );
+						final TripRouter tripRouter = b.build(sc).get();
 
-		return (NestedLogitAccessibilityCalculator<N>) injector.getInstance( Key.get( newType ) );
+						return new CachingRoutingModuleWrapper(
+										cache,
+										tripRouter.getRoutingModule(
+												TransportMode.car));
+					}
+				} );
 	}
 }
