@@ -30,6 +30,8 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.ActivityWrapperFacility;
@@ -74,9 +76,22 @@ public class LazyScheduleBasedMatrixRoutingModule implements RoutingModule {
 			final TransitRouter router,
 			@Named(TransportMode.transit_walk)
 			final RoutingModule walkRouter) {
-		// TODO: pass bin sizes via config
-		this( 15 * 60,
-				1000,
+		this( ConfigUtils.addOrGetModule(
+						scenario.getConfig(),
+						LazyScheduleBasedMatrixConfigGroup.GROUP_NAME,
+						LazyScheduleBasedMatrixConfigGroup.class ),
+				scenario,
+				router,
+				walkRouter );
+	}
+
+	private LazyScheduleBasedMatrixRoutingModule(
+			final LazyScheduleBasedMatrixConfigGroup config,
+			final Scenario scenario,
+			final TransitRouter router,
+			final RoutingModule walkRouter) {
+		this( config.getTimeBinDuration_s(),
+				config.getCellSize_m(),
 				router,
 				scenario.getTransitSchedule(),
 				scenario.getNetwork(),
