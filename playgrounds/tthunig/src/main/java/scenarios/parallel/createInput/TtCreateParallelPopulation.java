@@ -35,8 +35,8 @@ import java.util.List;
 /**
  * Class to create a population for the parallel scenario.
  * 
- * Choose the number of persons you like to simulate
- * before calling the method createPersons(...)
+ * Choose the number of persons you like to simulate and choose whether they
+ * should get an initial route before calling the method createPersons(...)
  * 
  * @author gthunig
  */
@@ -55,7 +55,7 @@ public class TtCreateParallelPopulation {
 	}
 
 	/**
-	 * Fills a population container with the given number of persons per OD Pair * 2.
+	 * Fills a population container with the given number of persons per OD Pair.
 	 * All persons travel from all cardinal directions to the opposite cardinal direction.
 	 * 
 	 * All agents start at 8am.
@@ -96,12 +96,12 @@ public class TtCreateParallelPopulation {
 			Person person = population.getFactory().createPerson(
 					Id.createPersonId(Integer.toString(i) + "_WE"));
 
-			// create a start activity at link 0_1
+			// create a start activity
 			Activity startAct = population.getFactory()
 					.createActivityFromLinkId("dummy_WE", Id.createLinkId("1_2"));
 			startAct.setEndTime(8 * 3600);
 
-			// create a drain activity at link 5_6
+			// create a drain activity
 			Activity drainAct = population.getFactory().createActivityFromLinkId(
 					"dummy_WE", Id.createLinkId("5_6"));
 
@@ -128,7 +128,7 @@ public class TtCreateParallelPopulation {
 		}
 	}
 
-	public Leg createWestEastLeg(boolean takeNorthernPath) {
+	private Leg createWestEastLeg(boolean takeNorthernPath) {
 		Leg leg = population.getFactory().createLeg(TransportMode.car);
 
 		List<Id<Link>> path = new ArrayList<>();
@@ -155,12 +155,12 @@ public class TtCreateParallelPopulation {
 			Person person = population.getFactory().createPerson(
 					Id.createPersonId(Integer.toString(i) + "_EW"));
 
-			// create a start activity at link 0_1
+			// create a start activity
 			Activity startAct = population.getFactory()
 					.createActivityFromLinkId("dummy_EW", Id.createLinkId("6_5"));
 			startAct.setEndTime(8 * 3600);
 
-			// create a drain activity at link 5_6
+			// create a drain activity
 			Activity drainAct = population.getFactory().createActivityFromLinkId(
 					"dummy_EW", Id.createLinkId("2_1"));
 
@@ -187,7 +187,7 @@ public class TtCreateParallelPopulation {
 		}
 	}
 
-	public Leg createEastWestLeg(boolean takeNorthernPath) {
+	private Leg createEastWestLeg(boolean takeNorthernPath) {
 		Leg leg = population.getFactory().createLeg(TransportMode.car);
 
 		List<Id<Link>> path = new ArrayList<>();
@@ -214,12 +214,12 @@ public class TtCreateParallelPopulation {
 			Person person = population.getFactory().createPerson(
 					Id.createPersonId(Integer.toString(i) + "_NS"));
 
-			// create a start activity at link 0_1
+			// create a start activity
 			Activity startAct = population.getFactory()
 					.createActivityFromLinkId("dummy_NS", Id.createLinkId("9_10"));
 			startAct.setEndTime(8 * 3600);
 
-			// create a drain activity at link 5_6
+			// create a drain activity
 			Activity drainAct = population.getFactory().createActivityFromLinkId(
 					"dummy_NS", Id.createLinkId("11_12"));
 
@@ -246,7 +246,7 @@ public class TtCreateParallelPopulation {
 		}
 	}
 
-	public Leg createNorthSouthLeg(boolean takeWesternPath) {
+	private Leg createNorthSouthLeg(boolean takeWesternPath) {
 		Leg leg = population.getFactory().createLeg(TransportMode.car);
 
 		List<Id<Link>> path = new ArrayList<>();
@@ -273,12 +273,12 @@ public class TtCreateParallelPopulation {
 			Person person = population.getFactory().createPerson(
 					Id.createPersonId(Integer.toString(i) + "_SN"));
 
-			// create a start activity at link 0_1
+			// create a start activity
 			Activity startAct = population.getFactory()
 					.createActivityFromLinkId("dummy_SN", Id.createLinkId("12_11"));
 			startAct.setEndTime(8 * 3600);
 
-			// create a drain activity at link 5_6
+			// create a drain activity
 			Activity drainAct = population.getFactory().createActivityFromLinkId(
 					"dummy_SN", Id.createLinkId("10_9"));
 
@@ -305,7 +305,7 @@ public class TtCreateParallelPopulation {
 		}
 	}
 
-	public Leg createSouthNorthLeg(boolean takeWesternPath) {
+	private Leg createSouthNorthLeg(boolean takeWesternPath) {
 		Leg leg = population.getFactory().createLeg(TransportMode.car);
 
 		List<Id<Link>> path = new ArrayList<>();

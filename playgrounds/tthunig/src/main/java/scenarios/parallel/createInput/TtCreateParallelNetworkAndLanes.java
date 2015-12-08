@@ -42,6 +42,10 @@ import java.util.Map;
 /**
  * Class to create network and lanes for the parallel scenario.
  * 
+ * Set the capacity and choose whether you want to have a third and fourth OD
+ * pair (the vertically relation - in addition to the horizontally relation)
+ * before calling the method createNetworkWithLanes().
+ * 
  * @author gthunig
  * 
  */
@@ -345,18 +349,23 @@ public final class TtCreateParallelNetworkAndLanes {
 	}
 
 	/**
+	 * Setting this flag true will expand the
+	 * {@link playground.dgrether.koehlerstrehlersignal.figure9scenario.DgFigure9ScenarioGenerator}
+	 * with a second origin_destination pair.
 	 *
 	 * @param useSecondODPair
-	 * 			Setting this flag true will expand the
-	 * 			{@link playground.dgrether.koehlerstrehlersignal.figure9scenario.DgFigure9ScenarioGenerator}
-	 * 			with a second origin_destination pair.
      */
 	public void setUseSecondODPair(boolean useSecondODPair) {
 		this.useSecondODPair = useSecondODPair;
 	}
 
-	public void setCapacity(double capacity) {
-		this.capacity = capacity;
+	/**
+	 * Adapts the link capacity to the number of persons.
+	 * 
+	 * @param numberOfPersons demand of each OD pair
+	 */
+	public void setCapacity(double numberOfPersons) {
+		this.capacity = numberOfPersons;
 	}
 
 	/**
