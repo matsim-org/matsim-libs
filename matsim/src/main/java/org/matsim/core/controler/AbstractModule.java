@@ -83,8 +83,6 @@ public abstract class AbstractModule implements Module {
 	private Multibinder<SnapshotWriter> snapshotWriterMultibinder;
 	private MapBinder<String, GenericPlanSelector<Plan, Person>> planSelectorForRemovalMultibinder;
 	private MapBinder<String, PlanStrategy> planStrategyMultibinder;
-	private MapBinder<String, TravelDisutilityFactory> travelDisutilityFactoryMultibinder;
-	private MapBinder<String, TravelTime> travelTimeMultibinder;
 
 	@Inject
 	com.google.inject.Injector bootstrapInjector;
@@ -111,9 +109,6 @@ public abstract class AbstractModule implements Module {
 		this.controlerListenerMultibinder = Multibinder.newSetBinder(this.binder, ControlerListener.class);
 		this.planStrategyMultibinder = MapBinder.newMapBinder(this.binder, String.class, PlanStrategy.class);
 		this.planSelectorForRemovalMultibinder = MapBinder.newMapBinder(this.binder, new TypeLiteral<String>(){}, new TypeLiteral<GenericPlanSelector<Plan, Person>>(){});
-		this.travelDisutilityFactoryMultibinder = MapBinder.newMapBinder(this.binder, new TypeLiteral<String>(){}, new TypeLiteral<TravelDisutilityFactory>(){});
-		this.travelTimeMultibinder = MapBinder.newMapBinder(this.binder, new TypeLiteral<String>(){}, new TypeLiteral<TravelTime>(){});
-		//        this.routingModuleMultibinder = MapBinder.newMapBinder(binder(), String.class, RoutingModule.class);
 		this.install();
 	}
 
@@ -176,7 +171,7 @@ public abstract class AbstractModule implements Module {
 	}
 
 	protected final com.google.inject.binder.LinkedBindingBuilder<TravelDisutilityFactory> addTravelDisutilityFactoryBinding(String mode) {
-		return travelDisutilityFactoryMultibinder.addBinding(mode);
+		return binder().bind(TravelDisutilityFactory.class).annotatedWith(Names.named(mode));
 	}
 
 	protected final com.google.inject.binder.LinkedBindingBuilder<LeastCostPathCalculatorFactory> bindLeastCostPathCalculatorFactory() {
@@ -184,7 +179,7 @@ public abstract class AbstractModule implements Module {
 	}
 
 	protected final com.google.inject.binder.LinkedBindingBuilder<TravelTime> addTravelTimeBinding(String mode) {
-		return travelTimeMultibinder.addBinding(mode);
+		return binder().bind(TravelTime.class).annotatedWith(Names.named(mode));
 	}
 
 	protected final LinkedBindingBuilder<RoutingModule> addRoutingModuleBinding(String mode) {

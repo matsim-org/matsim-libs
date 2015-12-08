@@ -16,21 +16,36 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.ivt.router.lazyschedulebasedmatrix;
+package playground.ivt.replanning;
 
-import org.matsim.api.core.v01.TransportMode;
-import org.matsim.core.controler.AbstractModule;
+import org.junit.Rule;
+import org.junit.Test;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.PlansConfigGroup;
+import org.matsim.core.config.groups.StrategyConfigGroup;
+import org.matsim.core.controler.Controler;
+import org.matsim.testcases.MatsimTestUtils;
 
 /**
- * Adds a wrapper around the PT router, to store a matrix of the best routes.
- * It does not seem to help a lot, at least in the accessibility computation runs
- * (where there are probably to seldom several agents at the same origin)
  * @author thibautd
  */
-public class LazyScheduleBasedMatrixModule extends AbstractModule {
-	@Override
-	public void install() {
-		bind( LazyScheduleBasedMatrixRoutingModule.Cache.class );
-		addRoutingModuleBinding( TransportMode.pt ).to( LazyScheduleBasedMatrixRoutingModule.class );
+public class BlackListedTAMTest {
+	@Rule
+	public final MatsimTestUtils utils = new MatsimTestUtils();
+
+	@Test
+	public void testDoesNotCrash() {
+		final Config config = utils.loadConfig( "test/scenarios/siouxfalls-2014-reduced/config_default.xml" );
+		config.controler().setLastIteration( 1 );
+		config.plans().setActivityDurationInterpretation(
+				PlansConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration );
+		final StrategyConfigGroup.StrategySettings settings = new StrategyConfigGroup.StrategySettings();
+		settings.setStrategyName( "BlackListedTimeAllocationMutator" );
+		settings.setWeight( 100 );
+		config.strategy().addStrategySettings( settings );
+
+		final Controler controler = new Controler( config );
+		controler.addOverridingModule( new BlackListedTimeAllocationMutatorStrategyModule() );
+		controler.run();
 	}
 }

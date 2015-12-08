@@ -51,16 +51,12 @@ public class TtCreateParallelSignals {
 			.getLogger(TtCreateParallelSignals.class);
 
 	private static final int CYCLE_TIME = 60;
-	private static final int INTERGREEN_TIME = 0;
+	private static final int INTERGREEN_TIME = 5;
 
 	private Scenario scenario;
 
-	private boolean usedSecondODPair;
-
 	public TtCreateParallelSignals(Scenario scenario) {
 		this.scenario = scenario;
-
-		usedSecondODPair = TtCreateParallelNetworkAndLanes.checkNetworkForSecondODPair(this.scenario.getNetwork());
 	}
 
 	public void createSignals() {
@@ -72,7 +68,6 @@ public class TtCreateParallelSignals {
 
 	/**
 	 * Creates signal systems depending on the network situation.
-	 *
 	 */
 	private void createSignalSystems() {
 
@@ -82,7 +77,8 @@ public class TtCreateParallelSignals {
 		createSignalSystemAtNode(this.scenario.getNetwork().getNodes().get(Id.createNodeId(5)));
 		createSignalSystemAtNode(this.scenario.getNetwork().getNodes().get(Id.createNodeId(7)));
 		createSignalSystemAtNode(this.scenario.getNetwork().getNodes().get(Id.createNodeId(8)));
-		if (usedSecondODPair) {
+		
+		if (TtCreateParallelNetworkAndLanes.checkNetworkForSecondODPair(this.scenario.getNetwork())) {
 			createSignalSystemAtNode(this.scenario.getNetwork().getNodes().get(Id.createNodeId(9)));
 			createSignalSystemAtNode(this.scenario.getNetwork().getNodes().get(Id.createNodeId(11)));
 		}
@@ -176,170 +172,170 @@ public class TtCreateParallelSignals {
 
 			case "signal1_2.1": // signal for turning left (northern route) at node 2
 				onset = 0;
-				dropping = 25 - INTERGREEN_TIME;
+				dropping = 30 - INTERGREEN_TIME;
 				signalSystemOffset = 0;
 				break;
 			case "signal2_3.1": // signal for going straight (northern route) at node 3
 				onset = 0;
-				dropping = 25 - INTERGREEN_TIME;
+				dropping = 30 - INTERGREEN_TIME;
 				signalSystemOffset = 0;
 				break;
 			case "signal3_4.1": // signal for going straight (northern route) at node 4
 				onset = 0;
-				dropping = 25 - INTERGREEN_TIME;
+				dropping = 30 - INTERGREEN_TIME;
 				signalSystemOffset = 0;
 				break;
 			case "signal4_5.1": // signal for going straight (northern route) at node 5
 				onset = 0;
-				dropping = 25 - INTERGREEN_TIME;
+				dropping = 30 - INTERGREEN_TIME;
 				signalSystemOffset = 0;
 				break;
 
 			case "signal1_2.2": // signal for turning right (southern route) at node 2
 				onset = 30;
-				dropping = 55 - INTERGREEN_TIME;
+				dropping = 60 - INTERGREEN_TIME;
 				signalSystemOffset = 0;
 				break;
 			case "signal2_7.1": // signal for going straight (southern route) at node 7
 				onset = 0;
-				dropping = 25 - INTERGREEN_TIME;
+				dropping = 30 - INTERGREEN_TIME;
 				signalSystemOffset = 0;
 				break;
 			case "signal7_8.1": // signal for going straight (southern route) at node 8
 				onset = 0;
-				dropping = 25 - INTERGREEN_TIME;
+				dropping = 30 - INTERGREEN_TIME;
 				signalSystemOffset = 0;
 				break;
 			case "signal8_5.1": // signal for going straight (southern route) at node 5
 				onset = 0;
-				dropping = 25 - INTERGREEN_TIME;
+				dropping = 30 - INTERGREEN_TIME;
 				signalSystemOffset = 0;
 				break;
 
 			case "signal6_5.1": // signal for turning left (southern route) at node 5
 				onset = 0;
-				dropping = 25 - INTERGREEN_TIME;
+				dropping = 30 - INTERGREEN_TIME;
 				signalSystemOffset = 0;
 				break;
 			case "signal5_8.1": // signal for going straight (southern route) at node 8
 				onset = 0;
-				dropping = 25 - INTERGREEN_TIME;
+				dropping = 30 - INTERGREEN_TIME;
 				signalSystemOffset = 0;
 				break;
 			case "signal8_7.1": // signal for going straight (southern route) at node 7
 				onset = 0;
-				dropping = 25 - INTERGREEN_TIME;
+				dropping = 30 - INTERGREEN_TIME;
 				signalSystemOffset = 0;
 				break;
 			case "signal7_2.1": // signal for going straight (southern route) at node 2
 				onset = 0;
-				dropping = 25 - INTERGREEN_TIME;
+				dropping = 30 - INTERGREEN_TIME;
 				signalSystemOffset = 0;
 				break;
 
 			case "signal6_5.2": // signal for turning right (northern route) at node 5
 				onset = 0;
-				dropping = 25 - INTERGREEN_TIME;
+				dropping = 30 - INTERGREEN_TIME;
 				signalSystemOffset = 0;
 				break;
 			case "signal5_4.1": // signal for going straight (northern route) at node 4
 				onset = 0;
-				dropping = 25 - INTERGREEN_TIME;
+				dropping = 30 - INTERGREEN_TIME;
 				signalSystemOffset = 0;
 				break;
 			case "signal4_3.1": // signal for going straight (northern route) at node 3
 				onset = 0;
-				dropping = 25 - INTERGREEN_TIME;
+				dropping = 30 - INTERGREEN_TIME;
 				signalSystemOffset = 0;
 				break;
 			case "signal3_2.1": // signal for going straight (northern route) at node 2
 				onset = 0;
-				dropping = 25 - INTERGREEN_TIME;
+				dropping = 30 - INTERGREEN_TIME;
 				signalSystemOffset = 0;
 				break;
 
 
 			case "signal9_10.1": // signal for turning left (eastern route) at node 10
 				onset = 30;
-				dropping = 55 - INTERGREEN_TIME;
+				dropping = 60 - INTERGREEN_TIME;
 				signalSystemOffset = 0;
 				break;
 			case "signal10_4.1": // signal for going straight (eastern route) at node 4
 				onset = 30;
-				dropping = 55 - INTERGREEN_TIME;
+				dropping = 60 - INTERGREEN_TIME;
 				signalSystemOffset = 0;
 				break;
 			case "signal4_8.1": // signal for going straight (eastern route) at node 8
 				onset = 30;
-				dropping = 55 - INTERGREEN_TIME;
+				dropping = 60 - INTERGREEN_TIME;
 				signalSystemOffset = 0;
 				break;
 			case "signal8_11.1": // signal for going straight (eastern route) at node 11
 				onset = 30;
-				dropping = 55 - INTERGREEN_TIME;
+				dropping = 60 - INTERGREEN_TIME;
 				signalSystemOffset = 0;
 				break;
 
 			case "signal9_10.2": // signal for turning right (western route) at node 10
 				onset = 30;
-				dropping = 55 - INTERGREEN_TIME;
+				dropping = 60 - INTERGREEN_TIME;
 				signalSystemOffset = 0;
 				break;
 			case "signal10_3.1": // signal for going straight (western route) at node 3
 				onset = 30;
-				dropping = 55 - INTERGREEN_TIME;
+				dropping = 60 - INTERGREEN_TIME;
 				signalSystemOffset = 0;
 				break;
 			case "signal3_7.1": // signal for going straight (western route) at node 7
 				onset = 30;
-				dropping = 55 - INTERGREEN_TIME;
+				dropping = 60 - INTERGREEN_TIME;
 				signalSystemOffset = 0;
 				break;
 			case "signal7_11.1": // signal for going straight (western route) at node 11
 				onset = 30;
-				dropping = 55 - INTERGREEN_TIME;
+				dropping = 60 - INTERGREEN_TIME;
 				signalSystemOffset = 0;
 				break;
 
 			case "signal12_11.1": // signal for turning left (western route) at node 11
 				onset = 30;
-				dropping = 55 - INTERGREEN_TIME;
+				dropping = 60 - INTERGREEN_TIME;
 				signalSystemOffset = 0;
 				break;
 			case "signal11_7.1": // signal for going straight (western route) at node 7
 				onset = 30;
-				dropping = 55 - INTERGREEN_TIME;
+				dropping = 60 - INTERGREEN_TIME;
 				signalSystemOffset = 0;
 				break;
 			case "signal7_3.1": // signal for going straight (western route) at node 3
 				onset = 30;
-				dropping = 55 - INTERGREEN_TIME;
+				dropping = 60 - INTERGREEN_TIME;
 				signalSystemOffset = 0;
 				break;
 			case "signal3_10.1": // signal for going straight (western route) at node 10
 				onset = 30;
-				dropping = 55 - INTERGREEN_TIME;
+				dropping = 60 - INTERGREEN_TIME;
 				signalSystemOffset = 0;
 				break;
 
 			case "signal12_11.2": // signal for turning right (eastern route) at node 11
 				onset = 30;
-				dropping = 55 - INTERGREEN_TIME;
+				dropping = 60 - INTERGREEN_TIME;
 				signalSystemOffset = 0;
 				break;
 			case "signal11_8.1": // signal for going straight (eastern route) at node 8
 				onset = 30;
-				dropping = 55 - INTERGREEN_TIME;
+				dropping = 60 - INTERGREEN_TIME;
 				signalSystemOffset = 0;
 				break;
 			case "signal8_4.1": // signal for going straight (eastern route) at node 4
 				onset = 30;
-				dropping = 55 - INTERGREEN_TIME;
+				dropping = 60 - INTERGREEN_TIME;
 				signalSystemOffset = 0;
 				break;
 			case "signal4_10.1": // signal for going straight (eastern route) at node 11
 				onset = 30;
-				dropping = 55 - INTERGREEN_TIME;
+				dropping = 60 - INTERGREEN_TIME;
 				signalSystemOffset = 0;
 				break;
 			default:
