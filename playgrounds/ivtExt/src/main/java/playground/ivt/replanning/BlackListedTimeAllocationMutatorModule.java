@@ -54,7 +54,7 @@ public class BlackListedTimeAllocationMutatorModule extends AbstractMultithreade
 		} else if ( actDurInterpr == PlansConfigGroup.ActivityDurationInterpretation.endTimeOnly ) {
 			useActivityDurations = false ;
 		} else if ( actDurInterpr == PlansConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration ) {
-			throw new UnsupportedOperationException( "need to clarify the correct setting here.  Probably not a big deal, but not done yet.  kai, aug'10") ;
+			useActivityDurations = false ;
 		} else {
 			throw new IllegalStateException( "beahvior not defined for this configuration setting") ;
 		}
