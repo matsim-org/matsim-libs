@@ -246,14 +246,6 @@ public class Controler extends AbstractController implements ControlerI {
 		}
 
 		run(config);
-		// "run(config)" is:
-		//		loadCoreListeners();
-		//		this.controlerListenerManager.fireControlerStartupEvent();
-		//		checkConfigConsistencyAndWriteToLog(config, "config dump before iterations start" ) ;
-		//		prepareForSim();
-		//		doIterations(config.controler().getFirstIteration(), config.global().getRandomSeed());
-		//		shutdown(false);
-
 	}
 
 	private void setupTransitSimulation() {

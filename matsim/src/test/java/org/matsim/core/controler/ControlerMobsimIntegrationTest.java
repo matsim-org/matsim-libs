@@ -78,7 +78,6 @@ public class ControlerMobsimIntegrationTest {
         c.setDumpDataAtEnd(false);
 		c.getConfig().controler().setWriteEventsInterval(0);
 		c.run();
-        Assert.assertNotNull("expected exception, but there was none.", c.uncaughtException);
 	}
 
 	private static class CountingMobsimFactory implements MobsimFactory {
