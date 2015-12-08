@@ -43,9 +43,10 @@ public class RunIVTBaseline {
 
         connectFacilitiesWithNetwork(controler);
 
-        // We use a specific scoring function, that uses individual preferences for activity durations.
+		// We use a time allocation mutator that allows to exclude certain activities.
 		controler.addOverridingModule(new BlackListedTimeAllocationMutatorStrategyModule());
-        controler.setScoringFunctionFactory(
+		// We use a specific scoring function, that uses individual preferences for activity durations.
+		controler.setScoringFunctionFactory(
                 new IVTBaselineScoringFunctionFactory(controler.getScenario(),
                         new StageActivityTypesImpl(PtConstants.TRANSIT_ACTIVITY_TYPE)));
 
