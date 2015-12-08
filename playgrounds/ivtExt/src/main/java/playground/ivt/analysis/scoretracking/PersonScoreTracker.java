@@ -20,7 +20,9 @@ package playground.ivt.analysis.scoretracking;
 
 import org.matsim.core.scoring.SumScoringFunction.BasicScoring;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * @author thibautd

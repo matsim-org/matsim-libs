@@ -20,12 +20,6 @@
 
 package playground.meisterk;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -58,7 +52,6 @@ import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.population.algorithms.PersonRemoveLinkAndRoute;
 import org.matsim.run.XY2Links;
-
 import playground.meisterk.PersonAnalyseTimesByActivityType.Activities;
 import playground.meisterk.kti.config.KtiConfigGroup;
 import playground.meisterk.kti.router.KtiPtRoute;
@@ -67,6 +60,12 @@ import playground.meisterk.org.matsim.config.PlanomatConfigGroup;
 import playground.meisterk.org.matsim.config.groups.MeisterkConfigGroup;
 import playground.meisterk.org.matsim.population.algorithms.PersonSetFirstActEndTime;
 import playground.meisterk.org.matsim.population.algorithms.PlanAnalyzeTourModeChoiceSet;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
 
 public class MyRuns {
 

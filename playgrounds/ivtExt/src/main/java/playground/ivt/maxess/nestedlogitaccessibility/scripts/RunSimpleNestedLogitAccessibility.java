@@ -19,24 +19,21 @@
 package playground.ivt.maxess.nestedlogitaccessibility.scripts;
 
 import com.google.inject.TypeLiteral;
-import com.google.inject.util.Modules;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
-import org.matsim.core.router.TripRouterModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
 import org.matsim.population.algorithms.XY2Links;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.AccessibilityComputationResult;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.BaseNestedAccessibilityComputationModule;
-import playground.ivt.maxess.nestedlogitaccessibility.writers.BasicPersonAccessibilityWriter;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.InjectionUtils;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.NestedLogitAccessibilityCalculator;
+import playground.ivt.maxess.nestedlogitaccessibility.writers.BasicPersonAccessibilityWriter;
 import playground.ivt.router.CachingFreespeedCarRouterModule;
 import playground.ivt.router.lazyschedulebasedmatrix.LazyScheduleBasedMatrixModule;
 import playground.ivt.utils.MoreIOUtils;

@@ -19,9 +19,6 @@
 
 package playground.meisterk.kti.router;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.ConfigUtils;
@@ -30,10 +27,12 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.matrices.Matrices;
 import org.matsim.matrices.Matrix;
 import org.matsim.visum.VisumMatrixReader;
-
 import playground.balmermi.world.MatsimWorldReader;
 import playground.balmermi.world.World;
 import playground.meisterk.kti.config.KtiConfigGroup;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 
 public class PlansCalcRouteKtiInfo {

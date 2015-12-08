@@ -1,7 +1,5 @@
 package playground.wrashid.ABMT.vehicleShare;
 
-import java.io.PrintWriter;
-
 import org.matsim.core.config.Config;
 
 public class GlobalTESFParameters {
