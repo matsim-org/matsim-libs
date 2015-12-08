@@ -105,7 +105,7 @@ public class PatnaExternalDemandGenerator {
 
 						Plan plan = pf.createPlan();
 						Activity firstAct = pf.createActivityFromLinkId(countingStationKey+"_Start", firstActLink);
-						firstAct.setEndTime(random.nextDouble()*(timebin-1));
+						firstAct.setEndTime((timebin-1)*3600+random.nextDouble()*3600);
 						plan.addActivity(firstAct);
 						plan.addLeg(pf.createLeg(mode));
 
