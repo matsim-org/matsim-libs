@@ -1,15 +1,16 @@
 package playground.sergioo.hits2012;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-public class Trip {
+public class Trip implements Serializable {
 
 	//Enumerations
-	public static enum Column {
+	public static enum Column implements Serializable {
 	
 		START_POSTAL_CODE(73,"BV"),
 		END_POSTAL_CODE(74,"BW"),
@@ -31,7 +32,7 @@ public class Trip {
 		}
 	
 	}
-	public static enum PlaceType {
+	public static enum PlaceType implements Serializable {
 		TEMPLE("temple"),
 		GOVERMENT("goverment"),
 		PETROL("petrol"),

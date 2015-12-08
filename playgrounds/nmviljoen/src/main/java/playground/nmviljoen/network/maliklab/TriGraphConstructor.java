@@ -164,7 +164,7 @@ public class TriGraphConstructor {
 
 	}
 
-	public static DirectedGraph<NmvNode, NmvLink> constructGhostGraph(String path, int[][]assocList){
+	public static DirectedGraph<NmvNode, NmvLink> constructGhostGraph(String path, int[][]assocList, int fullPathSize, int segSize){
 		ArrayList<NmvNode> nodeListGrid = new ArrayList<NmvNode>(TriGraphConstructor.myGraphGrid.getVertices());
 		ArrayList<NmvLink> linkListMalik = new ArrayList<NmvLink>(TriGraphConstructor.myGraphMalik.getEdges());
 		ArrayList<NmvNode> nodeListMalik = new ArrayList<NmvNode>(TriGraphConstructor.myGraphMalik.getVertices());
@@ -270,7 +270,7 @@ public class TriGraphConstructor {
 		//Now you have all the shortest paths for all the directly connected Malik links. Put them together to build the whole set.
 
 		//		Create set of all shortest paths for Ghost Network
-		int [][] fullPathCollect = new int[1500000][55];
+		int [][] fullPathCollect = new int[fullPathSize][55];
 		for (int[] row: fullPathCollect){
 			Arrays.fill(row, 999);
 		}
@@ -288,17 +288,17 @@ public class TriGraphConstructor {
 				//			for (int x = 1; x<8;x++){ //test
 				if (x!=y){
 
-					int[][] segment1 = new int[13000][19];
+					int[][] segment1 = new int[segSize][19];
 					for (int[] row: segment1){
 						Arrays.fill(row, 999);
 					}
 					int seg1C=0;
-					int[][] segment2 = new int[13000][19];
+					int[][] segment2 = new int[segSize][19];
 					for (int[] row: segment2){
 						Arrays.fill(row, 999);
 					}
 					int seg2C=0;
-					int[][] segment3 = new int[13000][19];
+					int[][] segment3 = new int[segSize][19];
 					for (int[] row: segment3){
 						Arrays.fill(row, 999);
 					}

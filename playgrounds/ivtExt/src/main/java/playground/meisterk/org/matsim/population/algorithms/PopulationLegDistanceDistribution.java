@@ -20,8 +20,6 @@
 
 package playground.meisterk.org.matsim.population.algorithms;
 
-import java.io.PrintStream;
-
 import org.apache.commons.math.stat.Frequency;
 import org.apache.commons.math.util.ResizableDoubleArray;
 import org.matsim.api.core.v01.population.Leg;
@@ -29,6 +27,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.population.algorithms.PlanAlgorithm;
+
+import java.io.PrintStream;
 
 /**
  * Generates a crosstab of the absolute number of legs in a population, by leg mode and route distance.

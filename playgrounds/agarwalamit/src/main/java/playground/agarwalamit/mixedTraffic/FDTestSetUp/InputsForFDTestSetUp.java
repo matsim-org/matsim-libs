@@ -48,15 +48,16 @@ import playground.agarwalamit.mixedTraffic.MixedTrafficVehiclesUtils;
  * @author amit
  */
 public class InputsForFDTestSetUp {
-	public static final int SUBDIVISION_FACTOR = 1; //all sides of the triangle will be divided into subdivisionFactor links
-	public static final double LINK_LENGTH = 1000;//in m, length of one the triangle sides.
-	public static final double NO_OF_LANES = 1;
-	private static final String HOLE_SPEED = "15";
+	static final int SUBDIVISION_FACTOR = 1; //all sides of the triangle will be divided into subdivisionFactor links
+	static final double LINK_LENGTH = 1000;//in m, length of one the triangle sides.
+	static final double NO_OF_LANES = 1;
+	static final String HOLE_SPEED = "15";
+	static final double MAX_ACT_END_TIME = 1800.0; // agents departs randomly between 0 and MAX_ACT_END_TIME
 	
 	private final double LINK_CAPACITY = 2700; //in PCU/h
 	private final double END_TIME = 24*3600;
 	private final double FREESPEED = 60.;	//in km/h, maximum authorized velocity on the track
-	private final double STUCK_TIME = 10;
+	private double stuckTime = 10;
 	
 	private LinkDynamics linkDynamics = LinkDynamics.FIFO;
 	private TrafficDynamics trafficDynamics = TrafficDynamics.queue;
@@ -72,10 +73,9 @@ public class InputsForFDTestSetUp {
 			throw new RuntimeException("Modal split for each travel mode is necessray parameter, it is not defined correctly. Check your static variable!!! \n Aborting ...");
 		}
 		
+		stuckTime = this.travelModes.length==1 && (this.travelModes[0]=="car" || this.travelModes[0]=="truck") ? 60 : 10;
 		setUpConfig();
 		createTriangularNetwork();
-		//Initializing modeData objects//ZZ_TODO should be initialized when instancing FundamentalDiagrams, no workaround still found
-		//Need to be currently initialized at this point to initialize output and modified QSim
 		fillTravelModeData();
 	}
 
@@ -84,7 +84,7 @@ public class InputsForFDTestSetUp {
 		Config config = ConfigUtils.createConfig();
 
 		config.qsim().setMainModes(Arrays.asList(this.travelModes));
-		config.qsim().setStuckTime(STUCK_TIME);//allows to overcome maximal density regime
+		config.qsim().setStuckTime(stuckTime);//allows to overcome maximal density regime
 		config.qsim().setEndTime(END_TIME);
 
 		config.qsim().setLinkDynamics(linkDynamics.toString());

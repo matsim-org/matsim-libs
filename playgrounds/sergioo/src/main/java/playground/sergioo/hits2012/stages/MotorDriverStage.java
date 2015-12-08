@@ -25,5 +25,25 @@ public class MotorDriverStage extends MotorStage {
 		this.parkType = parkType;
 		this.parkReimbursed = parkReimbursed;
 	}
+	
+	public double getErpCost() {
+		return erpCost;
+	}
+	
+	public boolean isErpReimbursed() {
+		return erpReimbursed;
+	}
+	
+	public double getParkCost() {
+		return parkCost;
+	}
+	
+	public String getParkType() {
+		return parkType;
+	}
+	
+	public boolean isParkReimbursed() {
+		return parkReimbursed;
+	}
 
 }

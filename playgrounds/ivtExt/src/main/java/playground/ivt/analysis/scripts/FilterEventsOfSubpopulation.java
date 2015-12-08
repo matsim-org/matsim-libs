@@ -19,11 +19,10 @@
  * *********************************************************************** */
 package playground.ivt.analysis.scripts;
 
-import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.events.EventsReaderXMLv1;
+import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
-
 import playground.ivt.utils.ArgParser;
 import playground.ivt.utils.ArgParser.Args;
 import playground.ivt.utils.SubpopulationFilteringEventsManager;

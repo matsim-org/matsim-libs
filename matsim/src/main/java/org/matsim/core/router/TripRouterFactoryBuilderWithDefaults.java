@@ -36,6 +36,7 @@ import org.matsim.pt.router.TransitRouterModule;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 import javax.inject.Provider;
+import java.util.Arrays;
 import java.util.Collections;
 
 public class TripRouterFactoryBuilderWithDefaults {
@@ -65,46 +66,41 @@ public class TripRouterFactoryBuilderWithDefaults {
 	}
 	
 	public Provider<TripRouter> build(final Scenario scenario) {
-		Config config = scenario.getConfig();
-		
-		if (leastCostPathCalculatorFactory == null) {
-			leastCostPathCalculatorFactory = createDefaultLeastCostPathCalculatorFactory(scenario);
-		}
-
-		if (transitRouterFactory == null && config.transit().isUseTransit()) {
-            transitRouterFactory = createDefaultTransitRouter(scenario);
-        }
-        return createDefaultTripRouterFactory(scenario);
-    }
-
-    private Provider<TripRouter> createDefaultTripRouterFactory(final Scenario scenario) {
         return Injector.createInjector(scenario.getConfig(),
-                AbstractModule.override(Collections.singleton(new TripRouterModule()), new AbstractModule() {
-                    @Override
-                    public void install() {
-                        bind(LeastCostPathCalculatorFactory.class).toInstance(leastCostPathCalculatorFactory);
-                        if (transitRouterFactory != null) {
-                            bind(TransitRouter.class).toProvider(transitRouterFactory);
-                        }
-                        if (carTravelDisutility != null) {
-                            addTravelDisutilityFactoryBinding("car").toInstance(new TravelDisutilityFactory() {
-
-                                @Override
-                                public TravelDisutility createTravelDisutility(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
-                                    return carTravelDisutility;
-                                }
-                            });
-                        }
-                        if (carTravelTime != null) {
-                            addTravelTimeBinding("car").toInstance(carTravelTime);
-                        }
-                    }
-                }), new AbstractModule() {
+                AbstractModule.override(
+                        Arrays.asList(
+                                new TripRouterModule(),
+                                new TravelDisutilityModule(),
+                                new TravelTimeCalculatorModule()),
+                        new AbstractModule() {
+							@Override
+							public void install() {
+								if (leastCostPathCalculatorFactory != null) {
+									bind(LeastCostPathCalculatorFactory.class).toInstance(leastCostPathCalculatorFactory);
+								}
+								if (transitRouterFactory != null && getConfig().transit().isUseTransit()) {
+									bind(TransitRouter.class).toProvider(transitRouterFactory);
+								}
+								if (carTravelDisutility != null) {
+									addTravelDisutilityFactoryBinding("car").toInstance(new TravelDisutilityFactory() {
+																								@Override
+																								public TravelDisutility createTravelDisutility(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
+											return carTravelDisutility;
+									}
+											});
+								}
+								if (carTravelTime != null) {
+									addTravelTimeBinding("car").toInstance(carTravelTime);
+								}
+							}
+						}),
+                new AbstractModule() {
                     @Override
                     public void install() {
                         bind(Scenario.class).toInstance(scenario);
                     }
-                }).getProvider(TripRouter.class);
+                },
+                new ScenarioElementsModule() ).getProvider(TripRouter.class);
     }
 
     public static Provider<TripRouter> createDefaultTripRouterFactoryImpl(final Scenario scenario) {
@@ -155,27 +151,4 @@ public class TripRouterFactoryBuilderWithDefaults {
         this.carTravelDisutility = travelDisutility;
     }
 
-    /**
-	 * Default factory, which sets the routing modules according to the
-	 * config file.
-	 * @author thibautd
-	 */
-	private class TripRouterProviderImpl implements Provider<TripRouter> {
-		private final Provider<TripRouter> delegate;
-
-
-        TripRouterProviderImpl(
-                final Scenario scenario) {
-			this.delegate = createDefaultTripRouterFactory(
-					scenario
-            );
-
-        }
-
-
-		@Override
-		public TripRouter get() {
-			return delegate.get();
-		}
-	}
 }

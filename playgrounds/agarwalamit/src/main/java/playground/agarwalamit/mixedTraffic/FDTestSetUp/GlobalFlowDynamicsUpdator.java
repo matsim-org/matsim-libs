@@ -97,7 +97,7 @@ class GlobalFlowDynamicsUpdator implements LinkEnterEventHandler, PersonDepartur
 				this.globalFlowData.updateFlow900(nowTime, pcuPerson);
 				this.globalFlowData.updateSpeedTable(nowTime, Id.createPersonId(event.getDriverId()));
 				//Waiting for all agents to be on the track before studying stability
-				if ((this.globalFlowData.getNumberOfDrivingAgents() == this.globalFlowData.numberOfAgents) && (nowTime>1800)){	//TODO parametrize this correctly
+				if ((this.globalFlowData.getNumberOfDrivingAgents() == this.globalFlowData.numberOfAgents) && (nowTime > InputsForFDTestSetUp.MAX_ACT_END_TIME * 2)){	
 					/*//Taking speed check out, as it is not reliable on the global speed table
 					 *  Maybe making a list of moving averages could be smart, 
 					 *  but there is no reliable converging process even in that case. (ssix, 25.10.13)
@@ -113,7 +113,7 @@ class GlobalFlowDynamicsUpdator implements LinkEnterEventHandler, PersonDepartur
 					boolean modesStable = true;
 					for (Id<VehicleType> vehTyp : travelModesFlowData.keySet()){
 						if (this.travelModesFlowData.get(vehTyp).numberOfAgents != 0){
-							if (! this.travelModesFlowData.get(vehTyp).isSpeedStable() || !(this.travelModesFlowData.get(vehTyp).isFlowStable())) {
+							if (! this.travelModesFlowData.get(vehTyp).isSpeedStable() || ! this.travelModesFlowData.get(vehTyp).isFlowStable() ) {
 								modesStable = false;
 								break;
 							} 
@@ -121,7 +121,7 @@ class GlobalFlowDynamicsUpdator implements LinkEnterEventHandler, PersonDepartur
 					}
 					if (modesStable){
 						//Checking global stability
-						if ( /*this.globalData.isSpeedStable() &&*/ this.globalFlowData.isFlowStable() ){
+						if ( /*this.globalFlowData.isSpeedStable() &&*/ this.globalFlowData.isFlowStable() ){
 							GenerateFundamentalDiagramData.LOG.info("========== Global permanent regime is attained");
 							for (Id<VehicleType> vehTyp : travelModesFlowData.keySet()){
 								this.travelModesFlowData.get(vehTyp).saveDynamicVariables();

@@ -42,7 +42,7 @@ import org.matsim.testcases.MatsimTestUtils;
 public class AccessibilityComputationNairobiTest {
 	public static final Logger log = Logger.getLogger( AccessibilityComputationNairobiTest.class ) ;
 
-	private static final double cellSize = 1000.;
+	private static final Double cellSize = 1000.;
 
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
 
@@ -70,7 +70,7 @@ public class AccessibilityComputationNairobiTest {
 		boolean createQGisOutput = false;
 		boolean includeDensityLayer = true;
 		String crs = "EPSG:21037"; // = Arc 1960 / UTM zone 37S, for Nairobi, Kenya
-		String name = "ke_nairobi_work_1000";
+		String name = "ke_nairobi_" + cellSize.toString().split("\\.")[0];
 		
 		Double lowerBound = 2.;
 		Double upperBound = 5.5;
