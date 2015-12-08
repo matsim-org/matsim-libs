@@ -42,6 +42,7 @@ public class BlackListedTAMTest {
 		final StrategyConfigGroup.StrategySettings settings = new StrategyConfigGroup.StrategySettings();
 		settings.setStrategyName( "BlackListedTimeAllocationMutator" );
 		settings.setWeight( 100 );
+		config.strategy().addStrategySettings( settings );
 
 		final Controler controler = new Controler( config );
 		controler.addOverridingModule( new BlackListedTimeAllocationMutatorStrategyModule() );
