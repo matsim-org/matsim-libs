@@ -30,7 +30,7 @@ import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.StageActivityTypes;
 import playground.thibautd.parknride.ParkAndRideConstants;
-import playground.thibautd.router.replanning.TimeAllocationMutatorModule;
+import playground.ivt.replanning.BlackListedTimeAllocationMutatorModule;
 
 /**
  * @author thibautd
@@ -42,7 +42,7 @@ public class ParkAndRideTimeAllocationMutator implements PlanStrategy {
 		strategy = new PlanStrategyImpl( new RandomPlanSelector() );
 
 		addStrategyModule(
-				new TimeAllocationMutatorModule(
+				new BlackListedTimeAllocationMutatorModule(
 					controler,
 					new BlackList( controler ) ) );
 

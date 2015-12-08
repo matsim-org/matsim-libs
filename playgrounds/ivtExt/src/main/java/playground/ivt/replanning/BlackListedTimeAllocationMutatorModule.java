@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.router.replanning;
+package playground.ivt.replanning;
 
 import org.matsim.contrib.socnetsim.framework.replanning.modules.BlackListedTimeAllocationMutator;
 import org.matsim.contrib.socnetsim.framework.replanning.modules.BlackListedTimeAllocationMutator.Setting;
@@ -33,7 +33,7 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 /**
  * @author thibautd
  */
-public class TimeAllocationMutatorModule extends AbstractMultithreadedModule {
+public class BlackListedTimeAllocationMutatorModule extends AbstractMultithreadedModule {
 	private final Controler controler;
 	private final StageActivityTypes blackList;
 
@@ -48,7 +48,7 @@ public class TimeAllocationMutatorModule extends AbstractMultithreadedModule {
 	 *
 	 * @param controler the controler from which to get the config and the {@link StageActivityTypes}
 	 */
-	public TimeAllocationMutatorModule(final Controler controler) {
+	public BlackListedTimeAllocationMutatorModule( final Controler controler ) {
 		this( controler , null );
 	}
 
@@ -57,7 +57,7 @@ public class TimeAllocationMutatorModule extends AbstractMultithreadedModule {
 	 * @param blackList the {@link StageActivityTypes}. If null, an instance is obtained
 	 * from the {@link TripRouter} created by the controler's factory when needed.
 	 */
-	public TimeAllocationMutatorModule(final Controler controler , final StageActivityTypes blackList) {
+	public BlackListedTimeAllocationMutatorModule( final Controler controler, final StageActivityTypes blackList ) {
 		super( controler.getConfig().global() );
 		this.controler = controler;
 		this.blackList = blackList;
