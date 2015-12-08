@@ -75,7 +75,7 @@ import scenarios.braess.createInput.TtCreateBraessSignals.SignalControlType;
 
 /**
  * Class to run a simulation of the braess scenario with or without signals. 
- * It analyzes the simulation with help of AnalyseBraessSimulation.java.
+ * It analyzes the simulation with help of TtAnalyzeBraess.java.
  * 
  * @author tthunig
  * 
@@ -250,7 +250,7 @@ public final class RunBraessSimulation {
 		config.planCalcScore().setBrainExpBeta( 20 );
 
 		// choose between link to link and node to node routing
-		boolean link2linkRouting = false;
+		boolean link2linkRouting = true;
 		config.controler().setLinkToLinkRoutingEnabled(link2linkRouting);
 		
 		config.travelTimeCalculator().setCalculateLinkToLinkTravelTimes(link2linkRouting);
