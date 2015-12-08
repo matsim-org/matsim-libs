@@ -23,9 +23,11 @@ package org.matsim.core.events;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.Config;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.gbl.Gbl;
 
+import javax.inject.Inject;
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.ArrayList;
 import java.util.List;
@@ -61,6 +63,11 @@ class SimStepParallelEventsManagerImpl implements EventsManager {
 	
 	private AtomicLong counter;
 	private AtomicBoolean hadException;
+
+	@Inject
+	SimStepParallelEventsManagerImpl(Config config) {
+		this(config.parallelEventHandling().getNumberOfThreads() != null ? config.parallelEventHandling().getNumberOfThreads() : 1);
+	}
 
     public SimStepParallelEventsManagerImpl() {
 		this(1);

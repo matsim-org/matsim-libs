@@ -27,6 +27,7 @@ import org.matsim.analysis.ScoreStatsModule;
 import org.matsim.analysis.VolumesAnalyzerModule;
 import org.matsim.analysis.LegHistogramModule;
 import org.matsim.analysis.LinkStatsModule;
+import org.matsim.core.events.EventsManagerModule;
 import org.matsim.core.mobsim.DefaultMobsimModule;
 import org.matsim.core.replanning.StrategyManagerModule;
 import org.matsim.core.router.TripRouterModule;
@@ -42,6 +43,7 @@ import org.matsim.vis.snapshotwriters.SnapshotWritersModule;
 public class ControlerDefaultsModule extends AbstractModule {
     @Override
     public void install() {
+        install(new EventsManagerModule());
         install(new DefaultMobsimModule());
         install(new ScenarioElementsModule());
         install(new TravelTimeCalculatorModule());

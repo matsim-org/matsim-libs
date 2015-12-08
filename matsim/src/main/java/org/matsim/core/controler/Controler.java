@@ -36,6 +36,7 @@ import org.matsim.analysis.ScoreStats;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
@@ -50,7 +51,6 @@ import org.matsim.core.controler.corelisteners.PlansDumping;
 import org.matsim.core.controler.corelisteners.PlansReplanning;
 import org.matsim.core.controler.corelisteners.PlansScoring;
 import org.matsim.core.controler.listener.ControlerListener;
-import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.mobsim.external.ExternalMobsim;
 import org.matsim.core.mobsim.framework.Mobsim;
@@ -115,8 +115,6 @@ public class Controler extends AbstractController implements ControlerI {
 	private final Config config; 
 	private final Scenario scenario ;
 
-	private final EventsManager events;
-
 	private Injector injector;
 	private boolean injectorCreated = false;
 
@@ -165,14 +163,12 @@ public class Controler extends AbstractController implements ControlerI {
 	}
 
 	@Inject
-	Controler(com.google.inject.Injector injector, Config config, Scenario scenario, EventsManager events, IterationStopWatch stopWatch) {
+	Controler(com.google.inject.Injector injector, Config config, Scenario scenario, IterationStopWatch stopWatch) {
 		super(stopWatch);
 		this.scenario  = scenario;
-		this.config = scenario.getConfig();
+		this.config = config;
 		this.config.addConfigConsistencyChecker(new ConfigConsistencyCheckerImpl());
-		this.events = events;
 		this.controlerListenerManager.setControler(this);
-		this.config.parallelEventHandling().makeLocked();
 		this.injector = Injector.fromGuiceInjector(injector);
 		this.injectorCreated = true;
 		injectSelf();
@@ -227,7 +223,6 @@ public class Controler extends AbstractController implements ControlerI {
 			this.scenario  = ScenarioUtils.createScenario(this.config);
 			ScenarioUtils.loadScenario(this.scenario );
 		}
-		this.events = EventsUtils.createEventsManager(this.config);
 		this.controlerListenerManager.setControler(this);
 		this.config.parallelEventHandling().makeLocked();
 	}
@@ -297,7 +292,6 @@ public class Controler extends AbstractController implements ControlerI {
 							install(AbstractModule.override(baseModules, overrides));
 
 							bind(Scenario.class).toInstance(scenario);
-							bind(EventsManager.class).toInstance(events);
 							bind(OutputDirectoryHierarchy.class).toInstance(getControlerIO());
 							bind(IterationStopWatch.class).toInstance(getStopwatch());
 							bind(ControlerI.class).toInstance(Controler.this);
@@ -388,7 +382,7 @@ public class Controler extends AbstractController implements ControlerI {
 	private Mobsim getNewMobsim() {
 		if (this.config.getModule(SimulationConfigGroup.GROUP_NAME) != null &&
 				((SimulationConfigGroup) this.config.getModule(SimulationConfigGroup.GROUP_NAME)).getExternalExe() != null ) {
-			ExternalMobsim simulation = new ExternalMobsim(this.scenario , this.events);
+			ExternalMobsim simulation = new ExternalMobsim(this.scenario , getEvents());
 			simulation.setControlerIO(this.getControlerIO());
 			simulation.setIterationNumber(this.getIterationNumber());
 			return simulation;
@@ -476,17 +470,61 @@ public class Controler extends AbstractController implements ControlerI {
 	    return scenario;
     }
 
-    	/**
-    	 * @deprecated -- preferably use "@Inject EventsManager events" or "addEventHandlerBinding().toInstance(...) from AbstractModule". kai/mz, nov'15
-    	 */
-    	@Deprecated // preferably use "@Inject EventsManager events" or "addEventHandlerBinding().toInstance(...) from AbstractModule". kai/mz, nov'15
-    	public final EventsManager getEvents() {
-    		return events;
-    	}
-    	
-    	public final Injector getInjector() {
-    		return this.injector;
-    	}
+	/**
+	 * @deprecated -- preferably use "@Inject EventsManager events" or "addEventHandlerBinding().toInstance(...) from AbstractModule". kai/mz, nov'15
+	 */
+	@Deprecated // preferably use "@Inject EventsManager events" or "addEventHandlerBinding().toInstance(...) from AbstractModule". kai/mz, nov'15
+	public final EventsManager getEvents() {
+		if (this.injector != null) {
+			return this.injector.getInstance(EventsManager.class);
+		} else {
+			return new EventsManager() {
+				@Override
+				public void processEvent(Event event) {
+					throw new UnsupportedOperationException();
+				}
+
+				@Override
+				public void addHandler(final EventHandler handler) {
+					addOverridingModule(new AbstractModule() {
+						@Override
+						public void install() {
+							addEventHandlerBinding().toInstance(handler);
+						}
+					});
+				}
+
+				@Override
+				public void removeHandler(EventHandler handler) {
+					throw new UnsupportedOperationException();
+				}
+
+				@Override
+				public void resetHandlers(int iteration) {
+					throw new UnsupportedOperationException();
+				}
+
+				@Override
+				public void initProcessing() {
+					throw new UnsupportedOperationException();
+				}
+
+				@Override
+				public void afterSimStep(double time) {
+					throw new UnsupportedOperationException();
+				}
+
+				@Override
+				public void finishProcessing() {
+					throw new UnsupportedOperationException();
+				}
+			};
+		}
+	}
+
+	public final Injector getInjector() {
+		return this.injector;
+	}
 
 	/**
 	 * @deprecated Do not use this, as it may not contain values in every

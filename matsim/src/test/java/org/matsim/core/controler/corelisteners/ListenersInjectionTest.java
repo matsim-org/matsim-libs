@@ -84,7 +84,6 @@ public class ListenersInjectionTest {
 						bind(OutputDirectoryHierarchy.class).toInstance( new OutputDirectoryHierarchy( outputDir , OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists ) );
 						bind(IterationStopWatch.class).toInstance( new IterationStopWatch() );
 						bind(Scenario.class).toInstance( ScenarioUtils.createScenario( config ) );
-						bind(EventsManager.class).toInstance( new EventsManagerImpl() );
 						bind(ControlerI.class).toInstance(new ControlerI() {
 
 							@Override
