@@ -60,6 +60,7 @@ public final class TtCreateParallelSignals {
 	}
 
 	public void createSignals() {
+		log.info("Create signals ...");
 		
 		createSignalSystems();
 		createSignalGroups();

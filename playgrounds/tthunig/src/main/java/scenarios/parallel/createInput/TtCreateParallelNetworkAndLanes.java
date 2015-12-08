@@ -72,6 +72,8 @@ public final class TtCreateParallelNetworkAndLanes {
 	 * Creates the Network for the parallel scenario and the required lanes.
      */
 	public void createNetworkWithLanes() {
+		log.info("Create network and lanes ...");
+		
 		Network net = this.scenario.getNetwork();
 		if (net.getCapacityPeriod() != 3600.0){
 			throw new IllegalStateException();
