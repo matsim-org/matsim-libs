@@ -21,6 +21,7 @@
  */
 package scenarios.parallel.createInput;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -35,19 +36,24 @@ import java.util.List;
 /**
  * Class to create a population for the parallel scenario.
  * 
- * Choose the number of persons you like to simulate and choose whether they
- * should get an initial route before calling the method createPersons(...)
+ * You can modify 
+ * 	- the number of persons you like to simulate, 
+ * 	- whether they should get an initial route and 
+ *  - the score of the initial route.
  * 
  * @author gthunig
  */
 public final class TtCreateParallelPopulation {
+	
+	private static final Logger log = Logger
+			.getLogger(TtCreateParallelPopulation.class);
 
 	private Population population;
 	private Network network;
 
-	private boolean initRoutes = false;
-
 	private int numberOfPersons;
+	private boolean initRoutes = false;
+	private Double initPlanScore = null;
 
 	public TtCreateParallelPopulation(Population pop, Network net) {
 		this.population = pop;
@@ -55,28 +61,37 @@ public final class TtCreateParallelPopulation {
 	}
 
 	/**
-	 * Fills a population container with the given number of persons per OD Pair.
-	 * All persons travel from all cardinal directions to the opposite cardinal direction.
+	 * Fills a population container with the given number of persons per OD
+	 * Pair. All persons travel from all cardinal directions to the opposite
+	 * cardinal direction.
 	 * 
 	 * All agents start at 8am.
 	 * 
-	 * If initRouteSpecification is false, all agents are initialized with no initial
-	 * routes.
-	 * If it is true they are initialized with both routes for their OD Pair,
-	 * whereby every second agent gets the first and every other agent the other route
-	 * as initial selected route.
-	 *
+	 * @param numberOfPersons
+	 *            the number of persons per OD pair
+	 * @param initRoutes
+	 *            flag that determines whether agents are initialized with or
+	 *            without initial routes. If it is false, all agents are
+	 *            initialized with no initial routes. If it is true, they are
+	 *            initialized with both routes for their OD Pair, whereby every
+	 *            second agent gets the first and every other agent the other
+	 *            route as initial selected route.
 	 * @param initPlanScore
 	 *            initial score for all plans the persons will get. Use null for
 	 *            no scores.
 	 */
-	public void createPersons(Double initPlanScore) {
-
-		createWestEastDemand(initPlanScore);
-		createEastWestDemand(initPlanScore);
+	public void createPersons(int numberOfPersons, boolean initRoutes, Double initPlanScore) {
+		this.numberOfPersons = numberOfPersons;
+		this.initRoutes = initRoutes;
+		this.initPlanScore = initPlanScore;
+		
+		log.info("Create population ...");
+		
+		createWestEastDemand();
+		createEastWestDemand();
 		if (TtCreateParallelNetworkAndLanes.checkNetworkForSecondODPair(this.network)) {
-			createNorthSouthDemand(initPlanScore);
-			createSouthNorthDemand(initPlanScore);
+			createNorthSouthDemand();
+			createSouthNorthDemand();
 		}
 	}
 
@@ -89,7 +104,7 @@ public final class TtCreateParallelPopulation {
 		writePopFile("../../runs-svn/parallel/");
 	}
 
-	private void createWestEastDemand(Double initPlanScore) {
+	private void createWestEastDemand() {
 		for (int i = 0; i < this.numberOfPersons; i++) {
 
 			// create a person
@@ -98,12 +113,13 @@ public final class TtCreateParallelPopulation {
 
 			// create a start activity
 			Activity startAct = population.getFactory()
-					.createActivityFromLinkId("dummy_WE", Id.createLinkId("1_2"));
-			startAct.setEndTime(8 * 3600);
+					.createActivityFromLinkId("dummy", Id.createLinkId("1_2"));
+			// distribute agents uniformly between 8 and 9 am.
+			startAct.setEndTime(8 * 3600 + (double)(i)/numberOfPersons * 3600);
 
 			// create a drain activity
 			Activity drainAct = population.getFactory().createActivityFromLinkId(
-					"dummy_WE", Id.createLinkId("5_6"));
+					"dummy", Id.createLinkId("5_6"));
 
 			if (initRoutes) {
 				Leg leg = createWestEastLeg(true);
@@ -148,7 +164,7 @@ public final class TtCreateParallelPopulation {
 		return leg;
 	}
 
-	private void createEastWestDemand(Double initPlanScore) {
+	private void createEastWestDemand() {
 		for (int i = 0; i < this.numberOfPersons; i++) {
 
 			// create a person
@@ -157,12 +173,13 @@ public final class TtCreateParallelPopulation {
 
 			// create a start activity
 			Activity startAct = population.getFactory()
-					.createActivityFromLinkId("dummy_EW", Id.createLinkId("6_5"));
-			startAct.setEndTime(8 * 3600);
+					.createActivityFromLinkId("dummy", Id.createLinkId("6_5"));
+			// distribute agents uniformly between 8 and 9 am.
+			startAct.setEndTime(8 * 3600 + (double)(i)/numberOfPersons * 3600);
 
 			// create a drain activity
 			Activity drainAct = population.getFactory().createActivityFromLinkId(
-					"dummy_EW", Id.createLinkId("2_1"));
+					"dummy", Id.createLinkId("2_1"));
 
 			if (initRoutes) {
 				Leg leg = createEastWestLeg(true);
@@ -207,7 +224,7 @@ public final class TtCreateParallelPopulation {
 		return leg;
 	}
 
-	private void createNorthSouthDemand(Double initPlanScore) {
+	private void createNorthSouthDemand() {
 		for (int i = 0; i < this.numberOfPersons; i++) {
 
 			// create a person
@@ -216,12 +233,13 @@ public final class TtCreateParallelPopulation {
 
 			// create a start activity
 			Activity startAct = population.getFactory()
-					.createActivityFromLinkId("dummy_NS", Id.createLinkId("9_10"));
-			startAct.setEndTime(8 * 3600);
+					.createActivityFromLinkId("dummy", Id.createLinkId("9_10"));
+			// distribute agents uniformly between 8 and 9 am.
+			startAct.setEndTime(8 * 3600 + (double)(i)/numberOfPersons * 3600);
 
 			// create a drain activity
 			Activity drainAct = population.getFactory().createActivityFromLinkId(
-					"dummy_NS", Id.createLinkId("11_12"));
+					"dummy", Id.createLinkId("11_12"));
 
 			if (initRoutes) {
 				Leg leg = createNorthSouthLeg(true);
@@ -266,7 +284,7 @@ public final class TtCreateParallelPopulation {
 		return leg;
 	}
 
-	private void createSouthNorthDemand(Double initPlanScore) {
+	private void createSouthNorthDemand() {
 		for (int i = 0; i < this.numberOfPersons; i++) {
 
 			// create a person
@@ -275,12 +293,13 @@ public final class TtCreateParallelPopulation {
 
 			// create a start activity
 			Activity startAct = population.getFactory()
-					.createActivityFromLinkId("dummy_SN", Id.createLinkId("12_11"));
-			startAct.setEndTime(8 * 3600);
+					.createActivityFromLinkId("dummy", Id.createLinkId("12_11"));
+			// distribute agents uniformly between 8 and 9 am.
+			startAct.setEndTime(8 * 3600 + (double)(i)/numberOfPersons * 3600);
 
 			// create a drain activity
 			Activity drainAct = population.getFactory().createActivityFromLinkId(
-					"dummy_SN", Id.createLinkId("10_9"));
+					"dummy", Id.createLinkId("10_9"));
 
 			if (initRoutes) {
 				Leg leg = createSouthNorthLeg(true);
@@ -336,13 +355,5 @@ public final class TtCreateParallelPopulation {
 		plan.setScore(initPlanScore);
 		
 		return plan;
-	}
-
-	public void setInitRoutes(boolean initRoutes) {
-		this.initRoutes = initRoutes;
-	}
-
-	public void setNumberOfPersons(int numberOfPersons) {
-		this.numberOfPersons = numberOfPersons;
 	}
 }
