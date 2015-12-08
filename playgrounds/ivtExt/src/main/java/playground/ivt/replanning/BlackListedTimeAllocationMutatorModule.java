@@ -28,6 +28,7 @@ import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripRouter;
 import org.matsim.population.algorithms.PlanAlgorithm;
+import org.matsim.population.algorithms.PlanMutateTimeAllocationSimplified;
 
 /**
  * @author thibautd
@@ -62,12 +63,12 @@ public class BlackListedTimeAllocationMutatorModule extends AbstractMultithreade
 
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
-		BlackListedTimeAllocationMutator mutator =
-			new BlackListedTimeAllocationMutator(
+		PlanAlgorithm mutator =
+			new PlanMutateTimeAllocationSimplified(
 					blackList,
 					this.mutationRange,
+					useActivityDurations,
 					MatsimRandom.getLocalInstance());
-		mutator.setSetting( useActivityDurations ? Setting.MUTATE_DUR : Setting.MUTATE_END_AS_DUR );
 		return mutator;
 	}
 }
