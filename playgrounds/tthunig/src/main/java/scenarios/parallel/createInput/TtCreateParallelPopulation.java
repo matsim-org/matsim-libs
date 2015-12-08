@@ -40,7 +40,7 @@ import java.util.List;
  * 
  * @author gthunig
  */
-public class TtCreateParallelPopulation {
+public final class TtCreateParallelPopulation {
 
 	private Population population;
 	private Network network;

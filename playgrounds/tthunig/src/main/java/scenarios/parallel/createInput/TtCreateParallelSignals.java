@@ -45,7 +45,7 @@ import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
  * @author gthunig
  * 
  */
-public class TtCreateParallelSignals {
+public final class TtCreateParallelSignals {
 
 	private static final Logger log = Logger
 			.getLogger(TtCreateParallelSignals.class);

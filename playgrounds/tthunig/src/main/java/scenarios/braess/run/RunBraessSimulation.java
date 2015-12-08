@@ -80,7 +80,7 @@ import scenarios.braess.createInput.TtCreateBraessSignals.SignalControlType;
  * @author tthunig
  * 
  */
-public class RunBraessSimulation {
+public final class RunBraessSimulation {
 
 	private static final Logger log = Logger
 			.getLogger(RunBraessSimulation.class);
