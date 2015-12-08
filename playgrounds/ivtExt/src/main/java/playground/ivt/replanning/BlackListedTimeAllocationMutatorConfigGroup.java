@@ -18,12 +18,10 @@
  * *********************************************************************** */
 package playground.ivt.replanning;
 
-import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
 import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.utils.collections.CollectionUtils;
 
 import java.util.Collections;
-import java.util.List;
 import java.util.Set;
 
 /**
