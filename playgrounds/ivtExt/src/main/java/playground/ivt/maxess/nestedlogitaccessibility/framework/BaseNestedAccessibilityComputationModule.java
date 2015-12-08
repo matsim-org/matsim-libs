@@ -18,13 +18,13 @@
  * *********************************************************************** */
 package playground.ivt.maxess.nestedlogitaccessibility.framework;
 
-import com.google.inject.AbstractModule;
 import com.google.inject.TypeLiteral;
 import com.google.inject.util.Types;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.config.Config;
+import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.router.TripRouterModule;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
@@ -42,7 +42,7 @@ import java.lang.reflect.Type;
  *
  * @author thibautd
  */
-public abstract class BaseNestedAccessibilityComputationModule<N extends Enum<N>> extends AbstractModule{
+public abstract class BaseNestedAccessibilityComputationModule<N extends Enum<N>> extends AbstractModule {
 	private final Scenario scenario;
 	private final TypeLiteral<N> type;
 
@@ -61,14 +61,16 @@ public abstract class BaseNestedAccessibilityComputationModule<N extends Enum<N>
 	}
 
 	@Override
-	protected final void configure() {
+	public final void install() {
 		// bind scenario elements
 		bind( Scenario.class ).toInstance( scenario );
 		bind( ActivityFacilities.class ).toInstance( scenario.getActivityFacilities() );
 		bind( Population.class ).toInstance( scenario.getPopulation() );
-		bind( Config.class ).toInstance( scenario.getConfig() );
+		//bind( Config.class ).toInstance( scenario.getConfig() );
 		bind( Network.class ).toInstance( scenario.getNetwork() );
 		bind( TransitSchedule.class ).toInstance( scenario.getTransitSchedule() );
+
+		install( new TripRouterModule() );
 
 		// Do not really understand how this can possibly work, but this allows to bind generic types
 		// with specific type parameters.

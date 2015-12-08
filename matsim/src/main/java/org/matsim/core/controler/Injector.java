@@ -61,7 +61,7 @@ public class Injector {
             @Override
             public void configure(Binder binder) {
                 binder.requireExplicitBindings(); // For now, we are conservative
-                binder.disableCircularProxies(); // and disable any kind of magic.
+//                binder.disableCircularProxies(); // and disable any kind of magic.
                 binder.bind(Config.class).toInstance(config);
             }
         });

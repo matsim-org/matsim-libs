@@ -27,10 +27,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.ControlerDefaultsModule;
-import org.matsim.core.controler.Injector;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.controler.*;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -88,7 +85,18 @@ public class ListenersInjectionTest {
 						bind(IterationStopWatch.class).toInstance( new IterationStopWatch() );
 						bind(Scenario.class).toInstance( ScenarioUtils.createScenario( config ) );
 						bind(EventsManager.class).toInstance( new EventsManagerImpl() );
-						binder().bind(Integer.class).annotatedWith(Names.named("iteration")).toInstance( new Integer( 1 ) );
+						bind(ControlerI.class).toInstance(new ControlerI() {
+
+							@Override
+							public void run() {
+
+							}
+
+							@Override
+							public Integer getIterationNumber() {
+								return 1;
+							}
+						});
                     }
                 },
 				new ControlerDefaultCoreListenersModule());

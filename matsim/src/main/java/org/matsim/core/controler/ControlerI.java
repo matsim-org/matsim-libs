@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * ControlerI.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007, 2008 by the members listed in the COPYING,  *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,32 +18,10 @@
  *                                                                         *
  * *********************************************************************** */
 
-package tutorial.programming.planStrategyForRemoval;
+package org.matsim.core.controler;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
+public interface ControlerI extends Runnable {
 
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.config.Config;
-import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
+	Integer getIterationNumber();
 
-/**
-* @author ikaddoura
-*/
-public class MyExpBetaPlanChangerForRemoval implements Provider<ExpBetaPlanChanger<Plan, Person>> {
-
-	private Config config;
-
-    @Inject
-    MyExpBetaPlanChangerForRemoval(Config config) {
-        this.config = config;
-    }
-
-    @Override
-    public ExpBetaPlanChanger<Plan, Person> get() {
-        return new ExpBetaPlanChanger<>( - config.planCalcScore().getBrainExpBeta());
-    }
-	
 }
-

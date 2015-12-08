@@ -20,16 +20,16 @@
 
 package playground.meisterk.org.matsim.population.algorithms;
 
-import java.io.PrintStream;
-import java.text.NumberFormat;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.commons.math.stat.Frequency;
 import org.apache.commons.math.stat.StatUtils;
 import org.apache.commons.math.util.ResizableDoubleArray;
 import org.apache.log4j.Logger;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
+
+import java.io.PrintStream;
+import java.text.NumberFormat;
+import java.util.HashMap;
+import java.util.Map;
 
 public abstract class AbstractClassifiedFrequencyAnalysis extends AbstractPersonAlgorithm {
 

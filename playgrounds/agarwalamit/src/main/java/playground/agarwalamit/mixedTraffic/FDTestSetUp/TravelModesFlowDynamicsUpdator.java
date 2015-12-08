@@ -86,7 +86,7 @@ class TravelModesFlowDynamicsUpdator {
 			//Making sure all agents are on the track before testing stability
 			//Also waiting half an hour to let the database build itself.
 
-			if ((this.getNumberOfDrivingAgents() == this.numberOfAgents) && (nowTime > 1800)){//TODO empirical factor
+			if ((this.getNumberOfDrivingAgents() == this.numberOfAgents) && (nowTime > InputsForFDTestSetUp.MAX_ACT_END_TIME * 2)){
 				if (!(this.speedStability)){
 					this.checkSpeedStability();
 				}

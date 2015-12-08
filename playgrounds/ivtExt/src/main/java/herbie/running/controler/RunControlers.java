@@ -1,8 +1,6 @@
 package herbie.running.controler;
 
 import java.util.ArrayList;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /**
  * To start the HerbieControler.java parallel.

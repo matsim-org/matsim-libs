@@ -77,7 +77,8 @@ public class AccessibilityIntegrationTest {
 		config.addModule( acg);
 		
 		config.controler().setLastIteration(1);
-		
+		config.controler().setOutputDirectory(utils.getOutputDirectory());
+
 		Network network = CreateTestNetwork.createTestNetwork();
 		
 		ScenarioUtils.ScenarioBuilder builder = new ScenarioUtils.ScenarioBuilder(config) ;

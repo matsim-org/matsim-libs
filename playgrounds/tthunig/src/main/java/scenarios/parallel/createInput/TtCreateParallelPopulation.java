@@ -45,7 +45,6 @@ public class TtCreateParallelPopulation {
 	private Population population;
 	private Network network;
 
-	private boolean usedSecondODPair = false;
 	private boolean initRoutes = false;
 
 	private int numberOfPersons;
@@ -53,47 +52,29 @@ public class TtCreateParallelPopulation {
 	public TtCreateParallelPopulation(Population pop, Network net) {
 		this.population = pop;
 		this.network = net;
-		
-		checkNetworkProperties();
 	}
 
 	/**
-	 * Checks whether the second ODPair is in use
-	 */
-	private void checkNetworkProperties() {
-		if (this.network.getNodes().containsKey(Id.createNodeId(9))	&&
-				this.network.getNodes().containsKey(Id.createNodeId(10)) &&
-				this.network.getNodes().containsKey(Id.createNodeId(11)) &&
-				this.network.getNodes().containsKey(Id.createNodeId(12))) {
-			this.usedSecondODPair = true;
-		}
-	}
-
-	/**
-	 * Fills a population container with the given number of persons. All
-	 * persons travel from the left to the right through the network as in
-	 * Braess's original paradox.
+	 * Fills a population container with the given number of persons per OD Pair * 2.
+	 * All persons travel from all cardinal directions to the opposite cardinal direction.
 	 * 
-	 * All agents start uniformly distributed between 8 and 9 am.
+	 * All agents start at 8am.
 	 * 
-	 * If initRouteSpecification is NONE, all agents are initialized with no initial
-	 * routes. 
-	 * If it is ONLY_MIDDLE, all agents are initialized with the middle route.
-	 * If it is ALL they are initialized with all three routes in this
-	 * scenario, whereby every second agent gets the upper and every other agent
-	 * the lower route as initial selected route. 
-	 * If it is ONLY_OUTER, all agents are initialized with both outer routes, 
-	 * whereby they are again alternately selected.
+	 * If initRouteSpecification is false, all agents are initialized with no initial
+	 * routes.
+	 * If it is true they are initialized with both routes for their OD Pair,
+	 * whereby every second agent gets the first and every other agent the other route
+	 * as initial selected route.
 	 *
 	 * @param initPlanScore
 	 *            initial score for all plans the persons will get. Use null for
 	 *            no scores.
 	 */
-	public void createPersons(Double initPlanScore, boolean writePopFile) {
+	public void createPersons(Double initPlanScore) {
 
 		createWestEastDemand(initPlanScore);
 		createEastWestDemand(initPlanScore);
-		if (usedSecondODPair) {
+		if (TtCreateParallelNetworkAndLanes.checkNetworkForSecondODPair(this.network)) {
 			createNorthSouthDemand(initPlanScore);
 			createSouthNorthDemand(initPlanScore);
 		}
