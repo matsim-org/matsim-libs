@@ -43,7 +43,7 @@ public class ParkAndRideTimeAllocationMutator implements PlanStrategy {
 
 		addStrategyModule(
 				new BlackListedTimeAllocationMutatorModule(
-					controler,
+					controler.getConfig(),
 					new BlackList( controler ) ) );
 
 		addStrategyModule( new ParkAndRideInvalidateStartTimes( controler ) );

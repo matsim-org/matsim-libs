@@ -23,7 +23,6 @@ import org.matsim.contrib.socnetsim.framework.replanning.modules.BlackListedTime
 import org.matsim.contrib.socnetsim.framework.replanning.modules.BlackListedTimeAllocationMutator.Setting;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansConfigGroup;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.StageActivityTypes;
@@ -34,35 +33,19 @@ import org.matsim.population.algorithms.PlanAlgorithm;
  * @author thibautd
  */
 public class BlackListedTimeAllocationMutatorModule extends AbstractMultithreadedModule {
-	private final Controler controler;
 	private final StageActivityTypes blackList;
 
 	private final double mutationRange;
 	private final boolean useActivityDurations;
 
 	/**
-	 * Creates a new TimeAllocationMutator with a mutation range as defined in
-	 * the configuration (module "TimeAllocationMutator", param "mutationRange"),
-	 * or the default value of 1800 (seconds) if there is no value specified in
-	 * the configuration.
-	 *
-	 * @param controler the controler from which to get the config and the {@link StageActivityTypes}
-	 */
-	public BlackListedTimeAllocationMutatorModule( final Controler controler ) {
-		this( controler , null );
-	}
-
-	/**
-	 * @param controler the controler from which to get the config
 	 * @param blackList the {@link StageActivityTypes}. If null, an instance is obtained
 	 * from the {@link TripRouter} created by the controler's factory when needed.
 	 */
-	public BlackListedTimeAllocationMutatorModule( final Controler controler, final StageActivityTypes blackList ) {
-		super( controler.getConfig().global() );
-		this.controler = controler;
+	public BlackListedTimeAllocationMutatorModule( final Config config , final StageActivityTypes blackList ) {
+		super( config.global() );
 		this.blackList = blackList;
 
-		Config config = controler.getConfig();
 		this.mutationRange = config.timeAllocationMutator().getMutationRange();
 
 		PlansConfigGroup.ActivityDurationInterpretation actDurInterpr = ( config.plans().getActivityDurationInterpretation() ) ;
@@ -81,7 +64,7 @@ public class BlackListedTimeAllocationMutatorModule extends AbstractMultithreade
 	public PlanAlgorithm getPlanAlgoInstance() {
 		BlackListedTimeAllocationMutator mutator =
 			new BlackListedTimeAllocationMutator(
-					blackList != null ? blackList : controler.getTripRouterProvider().get().getStageActivityTypes(),
+					blackList,
 					this.mutationRange,
 					MatsimRandom.getLocalInstance());
 		mutator.setSetting( useActivityDurations ? Setting.MUTATE_DUR : Setting.MUTATE_END_AS_DUR );
