@@ -1,10 +1,12 @@
 package playground.boescpa.ivtBaseline.preparation;
 
+import org.matsim.contrib.socnetsim.framework.replanning.modules.BlackListedTimeAllocationMutator;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
+import playground.ivt.replanning.BlackListedTimeAllocationMutatorConfigGroup;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -72,6 +74,9 @@ public class IVTConfigCreator {
             strategySettings.setWeight(strategyDescr.get(strategy));
             config.getModule(StrategyConfigGroup.GROUP_NAME).addParameterSet(strategySettings);
         }
+		// Add black listed time mutation and the black listed modes:
+		config.createModule(BlackListedTimeAllocationMutatorConfigGroup.GROUP_NAME);
+		config.setParam("blackListedTimeAllocationMutator", "blackList", "home, remote_home, work, education");
         // Activate transit
         config.setParam("transit", "useTransit", "true");
         // Set threads to NUMBER_OF_THREADS
@@ -98,7 +103,8 @@ public class IVTConfigCreator {
         Map<String, Double> strategyDescr = new HashMap<>();
         strategyDescr.put("ChangeExpBeta", 0.5);
         strategyDescr.put("ReRoute", 0.2);
-        strategyDescr.put("TimeAllocationMutator", 0.1);
+        //strategyDescr.put("TimeAllocationMutator", 0.1);
+		strategyDescr.put("BlackListedTimeAllocationMutator", 0.1);
         strategyDescr.put("SubtourModeChoice", 0.1);
         return strategyDescr;
     }

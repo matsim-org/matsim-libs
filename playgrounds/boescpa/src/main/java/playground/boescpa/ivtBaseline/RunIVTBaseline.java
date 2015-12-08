@@ -3,6 +3,7 @@ package playground.boescpa.ivtBaseline;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.OutputDirectoryLogging;
@@ -12,6 +13,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
 import org.matsim.pt.PtConstants;
+import playground.ivt.replanning.BlackListedTimeAllocationMutatorConfigGroup;
+import playground.ivt.replanning.BlackListedTimeAllocationMutatorStrategyModule;
 
 /**
  * Basic main for the ivt baseline scenarios.
@@ -30,7 +33,7 @@ public class RunIVTBaseline {
         OutputDirectoryLogging.catchLogEntries();
 
         // It is suggested to use the config created by playground/boescpa/baseline/ConfigCreator.java.
-        final Config config = ConfigUtils.loadConfig(configFile);
+        final Config config = ConfigUtils.loadConfig(configFile, new BlackListedTimeAllocationMutatorConfigGroup());
 
         final Scenario scenario = ScenarioUtils.loadScenario(config);
         final Controler controler = new Controler(scenario);
@@ -41,6 +44,7 @@ public class RunIVTBaseline {
         connectFacilitiesWithNetwork(controler);
 
         // We use a specific scoring function, that uses individual preferences for activity durations.
+		controler.addOverridingModule(new BlackListedTimeAllocationMutatorStrategyModule());
         controler.setScoringFunctionFactory(
                 new IVTBaselineScoringFunctionFactory(controler.getScenario(),
                         new StageActivityTypesImpl(PtConstants.TRANSIT_ACTIVITY_TYPE)));
