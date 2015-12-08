@@ -31,6 +31,7 @@ import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.CompositeStageActivityTypes;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.StageActivityTypesImpl;
+import org.matsim.core.router.TripRouter;
 
 /**
  * @author thibautd
@@ -41,7 +42,7 @@ public class BlackListedTimeAllocationMutatorStrategyModule extends AbstractModu
 		addPlanStrategyBinding( "BlackListedTimeAllocationMutator" ).toProvider(
 				new Provider<PlanStrategy>() {
 					@Inject
-					private StageActivityTypes routerBlackList;
+					private TripRouter tripRouter;
 
 					@Override
 					public PlanStrategy get() {
@@ -58,7 +59,7 @@ public class BlackListedTimeAllocationMutatorStrategyModule extends AbstractModu
 												new CompositeStageActivityTypes(
 														new StageActivityTypesImpl(
 																configGroup.getBlackList() ),
-														routerBlackList )) )
+														tripRouter.getStageActivityTypes() )) )
 								.build();
 					}
 				} );
