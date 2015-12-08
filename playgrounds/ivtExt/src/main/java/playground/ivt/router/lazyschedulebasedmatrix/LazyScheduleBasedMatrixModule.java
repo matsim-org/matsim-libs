@@ -27,6 +27,7 @@ import org.matsim.core.controler.AbstractModule;
 public class LazyScheduleBasedMatrixModule extends AbstractModule {
 	@Override
 	public void install() {
+		bind( LazyScheduleBasedMatrixRoutingModule.Cache.class );
 		addRoutingModuleBinding( TransportMode.pt ).to( LazyScheduleBasedMatrixRoutingModule.class );
 	}
 }
