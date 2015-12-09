@@ -131,7 +131,7 @@ public class PatnaCadytsControler {
 		config.qsim().setStorageCapFactor(0.03);
 		config.qsim().setMainModes(Arrays.asList("car","bike","motorbike","truck"));
 		config.qsim().setLinkDynamics(LinkDynamics.PassingQ.name());
-		config.qsim().setEndTime(30*3600);
+		config.qsim().setEndTime(36*3600);
 		config.qsim().setSnapshotStyle(SnapshotStyle.queue);
 		config.qsim().setVehiclesSource(VehiclesSource.fromVehiclesData);
 
@@ -146,16 +146,25 @@ public class PatnaCadytsControler {
 		config.controler().setWritePlansInterval(50);
 		config.controler().setWriteEventsInterval(50);
 
-		StrategySettings strategySettings1 = new StrategySettings();
-		strategySettings1.setStrategyName("ReRoute");
-		strategySettings1.setWeight(0.3);
-		strategySettings1.setDisableAfter(80);
-		config.strategy().addStrategySettings(strategySettings1);
+		StrategySettings reRoute = new StrategySettings();
+		reRoute.setStrategyName("ReRoute");
+		reRoute.setWeight(0.3);
+		reRoute.setDisableAfter(80);
+		config.strategy().addStrategySettings(reRoute);
 		
 		StrategySettings expChangeBeta = new StrategySettings();
 		expChangeBeta.setStrategyName("ChangeExpBeta");
-		expChangeBeta.setWeight(0.85);
+		expChangeBeta.setWeight(0.7);
 		config.strategy().addStrategySettings(expChangeBeta);
+		
+		config.setParam("TimeAllocationMutator", "mutationAffectsDuration", "false");
+		config.setParam("TimeAllocationMutator", "mutationRange", "7200.0");
+		
+		StrategySettings timeAllocationMutator	= new StrategySettings();
+		timeAllocationMutator.setStrategyName("TimeAllocationMutator");
+		timeAllocationMutator.setWeight(0.05);
+		config.strategy().addStrategySettings(timeAllocationMutator);
+		config.strategy().setMaxAgentPlanMemorySize(6);
 
 		ActivityParams ac1 = new ActivityParams("E2E_Start");
 		ac1.setTypicalDuration(10*60*60);
@@ -176,8 +185,7 @@ public class PatnaCadytsControler {
 		config.plans().setRemovingUnneccessaryPlanAttributes(true);
 		config.vspExperimental().addParam("vspDefaultsCheckingLevel", "abort");
 		config.vspExperimental().setWritingOutputEvents(true);
-		config.vspExperimental().setWritingOutputEvents(true);
-
+		
 		config.planCalcScore().setMarginalUtlOfWaiting_utils_hr(0);
 		config.planCalcScore().setPerforming_utils_hr(6.0);
 
