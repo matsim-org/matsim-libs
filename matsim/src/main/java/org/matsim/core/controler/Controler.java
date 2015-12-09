@@ -320,10 +320,6 @@ public class Controler extends AbstractController implements ControlerI {
 		this.addCoreControlerListener(injector.getInstance(EventsHandling.class));
 		// must be last being added (=first being executed)
 
-		Set<EventHandler> eventHandlersDeclaredByModules = this.injector.getEventHandlersDeclaredByModules();
-		for (EventHandler eventHandler : eventHandlersDeclaredByModules) {
-			this.getEvents().addHandler(eventHandler);
-		}
 		Set<ControlerListener> controlerListenersDeclaredByModules = this.injector.getControlerListenersDeclaredByModules();
 		for (ControlerListener controlerListener : controlerListenersDeclaredByModules) {
 			this.addControlerListener(controlerListener);
