@@ -20,7 +20,9 @@ package playground.agarwalamit.mixedTraffic.patnaIndia.input;
 
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -165,6 +167,33 @@ public class PatnaNetworkGenerator {
 
 				simplifier.setNodesToMerge(nodeTypesToMerge);
 				simplifier.run(network);
+
+				// manual cleaning of the network.
+				// remove links
+				List<String> links2remove = Arrays.asList("1478","147810000",
+						"1128-126410000-1262-126810000-126710000-127010000-126610000-1271-1258-128510000-71710000-1672-167310000-165510000-167710000-167610000-163910000-170410000-163810000-1735",
+						"173510000-1638-1704-1639-1676-1677-1655-1673-167210000-717-1285-125810000-127110000-1266-1270-1267-1268-126210000-1264-112810000",
+						"1841910000-18503","1850310000-18419");
+				for (String str : links2remove){
+					network.removeLink(Id.createLinkId(str));
+					LOG.warn("The link "+str+" is removed from the network.");
+				}
+
+				// increase capacity
+				{//it looks a dead end link, but part of a highway, capacity can be something like -- 1800 at least in both directions.
+					network.getLinks().get(Id.createLinkId("13800-13851-13857-13860")).setCapacity(1800.); 
+					network.getLinks().get(Id.createLinkId("1386010000-1385710000-1385110000-1380010000")).setCapacity(1800.); 
+				}
+				{//a major link, increase capacity from 300 to at least 1000.0
+					network.getLinks().get(Id.createLinkId("858810000-8593-8592-8596-8534-8581-779610000-8111-8099-"
+							+ "8104-8105-8101-8103-8084-8097-8091-8094-7959-8015-7986-800810000-7999-493-3204-3195")).setCapacity(1800.);
+					network.getLinks().get(Id.createLinkId("319510000-320410000-49310000-799910000-8008-798610000-"
+							+ "801510000-795910000-809410000-809110000-809710000-808410000-810310000-810110000-810510000-810410000-809910000-811110000-7796-858110000-853410000-859610000-859210000-859310000-8588")).setCapacity(1800.); 
+				}
+				{//a major link, increase capacity from 300 to at least 1000.0
+					network.getLinks().get(Id.createLinkId("191610000-314110000")).setCapacity(1000.);
+					network.getLinks().get(Id.createLinkId("3141-1916")).setCapacity(1000.);
+				}
 	}    
 
 	public Network getPatnaNetwork() {
@@ -178,5 +207,13 @@ public class PatnaNetworkGenerator {
 		linkCapacity = 0.5*capacityCarrigway;
 		if (linkCapacity < 300) linkCapacity = 300; 
 		return linkCapacity;
+	}
+
+	private void modifyLinksBasedOnExperience(){
+		/*
+		 * 
+		 * 858810000-8593-8592-8596-8534-8581-779610000-8111-8099-8104-8105-8101-8103-8084-8097-8091-8094-7959-8015-7986-800810000-7999-493-3204-3195 -- a major link, increase capacity from 300 to at least 1000.0
+		 * 191610000-314110000
+		 */
 	}
 }
