@@ -25,8 +25,11 @@ package org.matsim.core.scenario;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.population.PopulationFactoryImpl;
+import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 import javax.inject.Inject;
@@ -45,6 +48,8 @@ public class ScenarioElementsModule extends AbstractModule {
     public void install() {
         bind(Network.class).toProvider(NetworkProvider.class);
         bind(Population.class).toProvider(PopulationProvider.class);
+        bind(PopulationFactory.class).to(PopulationFactoryImpl.class).asEagerSingleton();
+        bind(ModeRouteFactory.class).asEagerSingleton();
         if (getConfig().transit().isUseTransit()) {
             bind(TransitSchedule.class).toProvider(TransitScheduleProvider.class);
         }

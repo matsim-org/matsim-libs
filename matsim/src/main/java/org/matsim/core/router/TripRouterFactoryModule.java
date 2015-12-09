@@ -28,6 +28,9 @@ import com.google.inject.name.Names;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.network.NetworkUtils;
@@ -111,7 +114,13 @@ public class TripRouterFactoryModule extends AbstractModule {
         SingleModeNetworksCache singleModeNetworksCache;
 
         @Inject
-        Scenario scenario;
+        Config config;
+
+        @Inject
+        Network network;
+
+        @Inject
+        PopulationFactory populationFactory;
 
         @Inject
         LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
@@ -130,7 +139,7 @@ public class TripRouterFactoryModule extends AbstractModule {
             synchronized (this.singleModeNetworksCache.getSingleModeNetworksCache()) {
                 filteredNetwork = this.singleModeNetworksCache.getSingleModeNetworksCache().get(mode);
                 if (filteredNetwork == null) {
-                    TransportModeNetworkFilter filter = new TransportModeNetworkFilter(scenario.getNetwork());
+                    TransportModeNetworkFilter filter = new TransportModeNetworkFilter(network);
                     Set<String> modes = new HashSet<>();
                     modes.add(mode);
                     filteredNetwork = NetworkUtils.createNetwork();
@@ -142,10 +151,10 @@ public class TripRouterFactoryModule extends AbstractModule {
             LeastCostPathCalculator routeAlgo =
                     leastCostPathCalculatorFactory.createPathCalculator(
                             filteredNetwork,
-                            travelDisutilityFactory.get(mode).createTravelDisutility(travelTimes.get(mode), scenario.getConfig().planCalcScore()),
+                            travelDisutilityFactory.get(mode).createTravelDisutility(travelTimes.get(mode), config.planCalcScore()),
                             travelTimes.get(mode));
 
-            return DefaultRoutingModules.createNetworkRouter(mode, scenario.getPopulation().getFactory(),
+            return DefaultRoutingModules.createNetworkRouter(mode, populationFactory,
                     filteredNetwork, routeAlgo);
         }
     }
@@ -159,7 +168,10 @@ public class TripRouterFactoryModule extends AbstractModule {
         }
 
         @Inject
-        private Scenario scenario;
+        private Network network;
+
+        @Inject
+        private PopulationFactory populationFactory;
 
         @Inject
         private LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
@@ -170,11 +182,11 @@ public class TripRouterFactoryModule extends AbstractModule {
                     new FreespeedTravelTimeAndDisutility(-1.0, 0.0, 0.0);
             LeastCostPathCalculator routeAlgoPtFreeFlow =
                     leastCostPathCalculatorFactory.createPathCalculator(
-                            scenario.getNetwork(),
+                            network,
                             ptTimeCostCalc,
                             ptTimeCostCalc);
-            return DefaultRoutingModules.createPseudoTransitRouter(params.getMode(), scenario.getPopulation().getFactory(),
-                    scenario.getNetwork(), routeAlgoPtFreeFlow, params);
+            return DefaultRoutingModules.createPseudoTransitRouter(params.getMode(), populationFactory,
+                    network, routeAlgoPtFreeFlow, params);
         }
     }
 
@@ -187,11 +199,11 @@ public class TripRouterFactoryModule extends AbstractModule {
         }
 
         @Inject
-        private Scenario scenario;
+        private PopulationFactory populationFactory;
 
         @Override
         public RoutingModule get() {
-            return DefaultRoutingModules.createTeleportationRouter(params.getMode(), scenario.getPopulation().getFactory(), params);
+            return DefaultRoutingModules.createTeleportationRouter(params.getMode(), populationFactory, params);
         }
     }
 
