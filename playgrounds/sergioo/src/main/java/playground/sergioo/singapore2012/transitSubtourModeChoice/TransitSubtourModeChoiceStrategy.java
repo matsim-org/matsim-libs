@@ -13,7 +13,10 @@ import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.modules.SubtourModeChoice;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 
+import org.matsim.core.router.TripRouter;
 import playground.sergioo.singapore2012.transitLocationChoice.TransitActsRemoverStrategy;
+
+import javax.inject.Provider;
 
 public class TransitSubtourModeChoiceStrategy implements PlanStrategy {
 	private static final Logger log =
@@ -22,14 +25,14 @@ public class TransitSubtourModeChoiceStrategy implements PlanStrategy {
 
 	private PlanStrategyImpl delegate;
 	
-	public TransitSubtourModeChoiceStrategy(Scenario scenario) {
+	public TransitSubtourModeChoiceStrategy(Scenario scenario, Provider<TripRouter> tripRouterProvider) {
 		delegate = new PlanStrategyImpl(new RandomPlanSelector());
 		delegate.addStrategyModule(new TransitActsRemoverStrategy(scenario.getConfig()));
 		log.warn( "your stategy now uses vanilla SubtourModeChoice, not a hacked copy thereof" );
 		log.warn( "just set config.subtourModeChoice.considerCarAvailability to true in the config to get the same behavior" );
 		log.warn( "... but actually, you may just delete this strategy altogether, it does not provide anything matsim doesn't provide. td, 22. feb. 2013" );
-		delegate.addStrategyModule(new SubtourModeChoice(scenario.getConfig()));
-		delegate.addStrategyModule(new ReRoute(scenario));
+		delegate.addStrategyModule(new SubtourModeChoice(scenario.getConfig(), tripRouterProvider));
+		delegate.addStrategyModule(new ReRoute(scenario, tripRouterProvider));
 	}
 	
 	public void addStrategyModule(PlanStrategyModule module) {

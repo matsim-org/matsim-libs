@@ -35,17 +35,21 @@ import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
+import org.matsim.core.router.TripRouter;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 
 public class BestReplyLocationChoicePlanStrategy implements PlanStrategy {
 
 	private PlanStrategyImpl delegate;
 	private Scenario scenario;
-	
+	private final Provider<TripRouter> tripRouterProvider;
+
 	@Inject
-	public BestReplyLocationChoicePlanStrategy(Scenario scenario) {
+	public BestReplyLocationChoicePlanStrategy(Scenario scenario, Provider<TripRouter> tripRouterProvider) {
 		this.scenario = scenario;
+		this.tripRouterProvider = tripRouterProvider;
 	}
 		
 	@Override
@@ -77,8 +81,8 @@ public class BestReplyLocationChoicePlanStrategy implements PlanStrategy {
 			delegate = new PlanStrategyImpl(new ExpBetaPlanSelector(config.planCalcScore()));
 		}
 		delegate.addStrategyModule(new TripsToLegsModule(scenario.getConfig()));
-		delegate.addStrategyModule(new BestReplyDestinationChoice(lcContext, maxDcScoreWrapper.getPersonsMaxDCScoreUnscaled()));
-		delegate.addStrategyModule(new ReRoute(lcContext.getScenario()));
+		delegate.addStrategyModule(new BestReplyDestinationChoice(tripRouterProvider, lcContext, maxDcScoreWrapper.getPersonsMaxDCScoreUnscaled()));
+		delegate.addStrategyModule(new ReRoute(lcContext.getScenario(), tripRouterProvider));
 		
 		delegate.init(replanningContext);
 	}

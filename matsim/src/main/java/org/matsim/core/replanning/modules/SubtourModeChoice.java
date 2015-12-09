@@ -29,6 +29,8 @@ import org.matsim.population.algorithms.PermissibleModesCalculator;
 import org.matsim.population.algorithms.PermissibleModesCalculatorImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
+import javax.inject.Provider;
+
 /**
  * Changes the transportation mode of all legs of one randomly chosen subtour in a plan to a randomly chosen
  * different mode given a list of possible modes.
@@ -48,24 +50,28 @@ import org.matsim.population.algorithms.PlanAlgorithm;
  * 
  */
 public class SubtourModeChoice extends AbstractMultithreadedModule {
+
+	private final Provider<TripRouter> tripRouterProvider;
+
 	private PermissibleModesCalculator permissibleModesCalculator;
 	
 	private final String[] chainBasedModes;
 	private final String[] modes;
 	
-	public SubtourModeChoice(final Config config) {
+	public SubtourModeChoice(final Config config, Provider<TripRouter> tripRouterProvider) {
 		this( config.global().getNumberOfThreads(),
 				config.subtourModeChoice().getModes(),
 				config.subtourModeChoice().getChainBasedModes(),
-				config.subtourModeChoice().considerCarAvailability());
+				config.subtourModeChoice().considerCarAvailability(), tripRouterProvider);
 	}
 
 	public SubtourModeChoice(
 			final int numberOfThreads,
 			final String[] modes,
 			final String[] chainBasedModes,
-			final boolean considerCarAvailability) {
+			final boolean considerCarAvailability, Provider<TripRouter> tripRouterProvider) {
 		super(numberOfThreads);
+		this.tripRouterProvider = tripRouterProvider;
 		this.modes = modes.clone();
 		this.chainBasedModes = chainBasedModes.clone();
 		this.permissibleModesCalculator =
@@ -80,7 +86,7 @@ public class SubtourModeChoice extends AbstractMultithreadedModule {
 
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
-		final TripRouter tripRouter = getReplanningContext().getTripRouter();
+		final TripRouter tripRouter = tripRouterProvider.get();
 		final ChooseRandomLegModeForSubtour chooseRandomLegMode =
 				new ChooseRandomLegModeForSubtour(
 						tripRouter.getStageActivityTypes(),

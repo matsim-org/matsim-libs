@@ -43,7 +43,7 @@ public class LocationChoiceStrategyFactory implements Provider<PlanStrategy> {
 		PlanStrategyImpl strategy = new PlanStrategyImpl(new RandomPlanSelector());
 		strategy.addStrategyModule(new TripsToLegsModule(scenario.getConfig()));
 		//strategy.addStrategyModule(new ChangeSingleLegMode(scenario.getConfig()));
-		strategy.addStrategyModule(new ReRoute(scenario));
+		strategy.addStrategyModule(new ReRoute(scenario, tripRouterProvider));
 		return strategy;
 	}
 

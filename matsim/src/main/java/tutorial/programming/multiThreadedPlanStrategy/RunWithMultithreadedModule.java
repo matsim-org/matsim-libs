@@ -36,6 +36,8 @@ import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.TripRouter;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
+import javax.inject.Inject;
+import javax.inject.Provider;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -77,12 +79,14 @@ public class RunWithMultithreadedModule {
 
                         final PlanStrategyImpl myStrategy = new PlanStrategyImpl(new RandomPlanSelector<Plan, Person>());
                         myStrategy.addStrategyModule(new AbstractMultithreadedModule(controler.getConfig().global()) {
+
+							@Inject private Provider<TripRouter> tripRouterProvider;
                             @Override
                             public PlanAlgorithm getPlanAlgoInstance() {
                                 return new PlanAlgorithm() {
 // This method is called n times if the framework wants to run n threads.
 
-                                    TripRouter tripRouter = getReplanningContext().getTripRouter();
+                                    TripRouter tripRouter = tripRouterProvider.get();
 
                                     @Override
                                     public void run(Plan plan) {

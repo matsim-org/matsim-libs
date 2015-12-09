@@ -42,16 +42,14 @@ class ReplanningContextImpl implements ReplanningContext {
     private Config config;
     private Map<String, TravelDisutilityFactory> travelDisutility;
     private Map<String, TravelTime> travelTime;
-    private Provider<TripRouter> tripRouter;
     private Provider<ScoringFunctionFactory> scoringFunctionFactory;
 
     @Inject
-    ReplanningContextImpl(ControlerI controler, Config config, Map<String,TravelDisutilityFactory> travelDisutility, Map<String,TravelTime> travelTime, Provider<TripRouter> tripRouter, Provider<ScoringFunctionFactory> scoringFunctionFactory) {
+    ReplanningContextImpl(ControlerI controler, Config config, Map<String, TravelDisutilityFactory> travelDisutility, Map<String, TravelTime> travelTime, Provider<ScoringFunctionFactory> scoringFunctionFactory) {
         this.iteration = controler.getIterationNumber();
         this.config = config;
         this.travelDisutility = travelDisutility;
         this.travelTime = travelTime;
-        this.tripRouter = tripRouter;
         this.scoringFunctionFactory = scoringFunctionFactory;
     }
 
@@ -63,11 +61,6 @@ class ReplanningContextImpl implements ReplanningContext {
     @Override
     public TravelTime getTravelTime() {
         return travelTime.get(TransportMode.car);
-    }
-
-    @Override
-    public TripRouter getTripRouter() {
-        return tripRouter.get();
     }
 
     @Override

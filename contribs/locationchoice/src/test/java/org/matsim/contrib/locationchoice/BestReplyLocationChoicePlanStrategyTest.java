@@ -104,9 +104,5 @@ public class BestReplyLocationChoicePlanStrategyTest {
 			return 0;
 		}
 
-		@Override
-		public TripRouter getTripRouter() {
-			return this.tripRouterFactory.get();
-		}
 	}
 }

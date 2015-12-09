@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.TreeMap;
 
+import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -52,9 +53,12 @@ import org.matsim.facilities.ActivityFacilityImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
+import javax.inject.Provider;
+
 public class BestReplyDestinationChoice extends AbstractMultithreadedModule {
 
     private static final Logger log = Logger.getLogger(BestReplyDestinationChoice.class);
+	private final Provider<TripRouter> tripRouterProvider;
 
     private DestinationChoiceConfigGroup dccg;
 	private ObjectAttributes personsMaxEpsUnscaled;
@@ -70,9 +74,10 @@ public class BestReplyDestinationChoice extends AbstractMultithreadedModule {
 	
 	public static double useScaleEpsilonFromConfig = -99.0;
 
-	public BestReplyDestinationChoice(DestinationChoiceBestResponseContext lcContext, ObjectAttributes personsMaxDCScoreUnscaled) {
+	public BestReplyDestinationChoice(Provider<TripRouter> tripRouterProvider, DestinationChoiceBestResponseContext lcContext, ObjectAttributes personsMaxDCScoreUnscaled) {
 		super(lcContext.getScenario().getConfig().global());
-		
+		this.tripRouterProvider = tripRouterProvider;
+
 		this.dccg = (DestinationChoiceConfigGroup) lcContext.getScenario().getConfig().getModule(DestinationChoiceConfigGroup.GROUP_NAME);
 		if (!DestinationChoiceConfigGroup.Algotype.bestResponse.equals(this.dccg.getAlgorithm())) {
 			throw new RuntimeException("wrong class for selected location choice algorithm type; aborting ...") ;
@@ -139,7 +144,7 @@ public class BestReplyDestinationChoice extends AbstractMultithreadedModule {
 		// this one corresponds to the "frozen epsilon" paper(s)
 		// the random number generators are re-seeded anyway in the dc module. So we do not need a MatsimRandom instance here
 
-		TripRouter tripRouter = replanningContext.getTripRouter();
+		TripRouter tripRouter = tripRouterProvider.get();
 		ScoringFunctionFactory scoringFunctionFactory = replanningContext.getScoringFunctionFactory();
 		int iteration = replanningContext.getIteration();
 		

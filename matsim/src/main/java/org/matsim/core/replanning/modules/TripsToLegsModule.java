@@ -19,12 +19,15 @@
  * *********************************************************************** */
 package org.matsim.core.replanning.modules;
 
+import com.google.inject.Inject;
 import org.matsim.core.config.Config;
 import org.matsim.core.router.CompositeStageActivityTypes;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripRouter;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.population.algorithms.TripsToLegsAlgorithm;
+
+import javax.inject.Provider;
 
 /**
  * Removes trips and replaces them by legs.
@@ -34,6 +37,9 @@ import org.matsim.population.algorithms.TripsToLegsAlgorithm;
  * @author thibautd
  */
 public class TripsToLegsModule extends AbstractMultithreadedModule {
+	@Inject
+	Provider<TripRouter> tripRouterProvider;
+
 	private final StageActivityTypes additionalBlackList;
 
 	/**
@@ -57,7 +63,7 @@ public class TripsToLegsModule extends AbstractMultithreadedModule {
 
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
-		TripRouter router = getReplanningContext().getTripRouter();
+		TripRouter router = tripRouterProvider.get();
 		StageActivityTypes blackListToUse = router.getStageActivityTypes();
 
 		if (additionalBlackList != null) {

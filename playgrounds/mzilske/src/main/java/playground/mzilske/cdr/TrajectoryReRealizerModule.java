@@ -30,6 +30,7 @@ import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
+import org.matsim.core.router.TripRouter;
 import playground.mzilske.clones.CloneService;
 
 import javax.inject.Inject;
@@ -47,20 +48,22 @@ public class TrajectoryReRealizerModule extends AbstractModule {
         private Sightings sightings;
         private ZoneTracker.LinkToZoneResolver zones;
         private CloneService cloneService;
+        private Provider<TripRouter> tripRouterProvider;
 
         @Inject
-        TrajectoryReRealizerProvider(Scenario scenario, Sightings sightings, ZoneTracker.LinkToZoneResolver zones, CloneService cloneService) {
+        TrajectoryReRealizerProvider(Scenario scenario, Sightings sightings, ZoneTracker.LinkToZoneResolver zones, CloneService cloneService, Provider<TripRouter> tripRouterProvider) {
             this.scenario = scenario;
             this.sightings = sightings;
             this.zones = zones;
             this.cloneService = cloneService;
+            this.tripRouterProvider = tripRouterProvider;
         }
 
         @Override
         public PlanStrategy get() {
             PlanStrategyImpl planStrategy = new PlanStrategyImpl(new RandomPlanSelector<Plan, Person>());
             planStrategy.addStrategyModule(new TrajectoryReRealizer(scenario, sightings, zones, cloneService));
-            planStrategy.addStrategyModule(new ReRoute(scenario));
+            planStrategy.addStrategyModule(new ReRoute(scenario, tripRouterProvider));
             return planStrategy;
         }
     }

@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.google.inject.Provider;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -32,7 +33,6 @@ import org.matsim.contrib.multimodal.MultiModalControlerListener;
 import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.contrib.multimodal.router.util.BikeTravelTimeFactory;
 import org.matsim.contrib.multimodal.router.util.WalkTravelTimeFactory;
-import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
@@ -48,6 +48,7 @@ import org.matsim.core.replanning.modules.SubtourModeChoice;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.MainModeIdentifierImpl;
+import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactoryModule;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
@@ -61,15 +62,12 @@ import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
 import org.matsim.core.scoring.functions.SubpopulationCharyparNagelScoringParameters;
-import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.population.algorithms.XY2Links;
 import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
 import org.matsim.roadpricing.RoadPricingConfigGroup;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
-
-import com.google.inject.Binder;
 
 import playground.dhosse.gap.Global;
 import playground.dhosse.gap.analysis.SpatialAnalysis;
@@ -479,6 +477,7 @@ public class GAPScenarioRunner {
 				
 				@Override
 				public void install() {
+					final Provider<TripRouter> tripRouterProvider = binder().getProvider(TripRouter.class);
 					addPlanStrategyBinding("SubtourModeChoice_".concat(Global.GP_CAR)).toProvider(new javax.inject.Provider<PlanStrategy>() {
 						String[] availableModes = {TransportMode.car, TransportMode.pt, TransportMode.bike, TransportMode.walk, "onewaycarsharing"};
 						String[] chainBasedModes = {TransportMode.car, TransportMode.bike};
@@ -486,8 +485,8 @@ public class GAPScenarioRunner {
 						@Override
 						public PlanStrategy get() {
 							final Builder builder = new Builder(new RandomPlanSelector<Plan, Person>());
-							builder.addStrategyModule(new SubtourModeChoice(controler.getConfig().global().getNumberOfThreads(), availableModes, chainBasedModes, false));
-							builder.addStrategyModule(new ReRoute(controler.getScenario()));
+							builder.addStrategyModule(new SubtourModeChoice(controler.getConfig().global().getNumberOfThreads(), availableModes, chainBasedModes, false, tripRouterProvider));
+							builder.addStrategyModule(new ReRoute(controler.getScenario(), tripRouterProvider));
 							return builder.build();
 						}
 					});
@@ -499,6 +498,7 @@ public class GAPScenarioRunner {
 				
 				@Override
 				public void install() {
+					final Provider<TripRouter> tripRouterProvider = binder().getProvider(TripRouter.class);
 					addPlanStrategyBinding("SubtourModeChoice_".concat("NO_CAR")).toProvider(new javax.inject.Provider<PlanStrategy>() {
 						String[] availableModes = {TransportMode.pt, TransportMode.bike, TransportMode.walk};
 						String[] chainBasedModes = {TransportMode.bike};
@@ -506,8 +506,8 @@ public class GAPScenarioRunner {
 						@Override
 						public PlanStrategy get() {
 							final Builder builder = new Builder(new RandomPlanSelector<Plan, Person>());
-							builder.addStrategyModule(new SubtourModeChoice(controler.getConfig().global().getNumberOfThreads(), availableModes, chainBasedModes, false));
-							builder.addStrategyModule(new ReRoute(controler.getScenario()));
+							builder.addStrategyModule(new SubtourModeChoice(controler.getConfig().global().getNumberOfThreads(), availableModes, chainBasedModes, false, tripRouterProvider));
+							builder.addStrategyModule(new ReRoute(controler.getScenario(), tripRouterProvider));
 							return builder.build();
 						}
 					});
@@ -519,6 +519,7 @@ public class GAPScenarioRunner {
 				
 				@Override
 				public void install() {
+					final Provider<TripRouter> tripRouterProvider = binder().getProvider(TripRouter.class);
 					addPlanStrategyBinding("SubtourModeChoice_".concat(Global.COMMUTER)).toProvider(new javax.inject.Provider<PlanStrategy>() {
 						String[] availableModes = {TransportMode.car, TransportMode.pt};
 						String[] chainBasedModes = {TransportMode.car, TransportMode.bike};
@@ -526,8 +527,8 @@ public class GAPScenarioRunner {
 						@Override
 						public PlanStrategy get() {
 							final Builder builder = new Builder(new RandomPlanSelector<Plan, Person>());
-							builder.addStrategyModule(new SubtourModeChoice(controler.getConfig().global().getNumberOfThreads(), availableModes, chainBasedModes, false));
-							builder.addStrategyModule(new ReRoute(controler.getScenario()));
+							builder.addStrategyModule(new SubtourModeChoice(controler.getConfig().global().getNumberOfThreads(), availableModes, chainBasedModes, false, tripRouterProvider));
+							builder.addStrategyModule(new ReRoute(controler.getScenario(), tripRouterProvider));
 							return builder.build();
 						}
 					});
@@ -539,6 +540,7 @@ public class GAPScenarioRunner {
 				
 				@Override
 				public void install() {
+					final Provider<TripRouter> tripRouterProvider = binder().getProvider(TripRouter.class);
 					addPlanStrategyBinding("SubtourModeChoice_".concat(Global.LICENSE_OWNER)).toProvider(new javax.inject.Provider<PlanStrategy>() {
 						String[] availableModes = {TransportMode.pt, TransportMode.bike, TransportMode.walk, "onewaycarsharing"};
 						String[] chainBasedModes = {TransportMode.bike};
@@ -546,8 +548,8 @@ public class GAPScenarioRunner {
 						@Override
 						public PlanStrategy get() {
 							final Builder builder = new Builder(new RandomPlanSelector<Plan, Person>());
-							builder.addStrategyModule(new SubtourModeChoice(controler.getConfig().global().getNumberOfThreads(), availableModes, chainBasedModes, false));
-							builder.addStrategyModule(new ReRoute(controler.getScenario()));
+							builder.addStrategyModule(new SubtourModeChoice(controler.getConfig().global().getNumberOfThreads(), availableModes, chainBasedModes, false, tripRouterProvider));
+							builder.addStrategyModule(new ReRoute(controler.getScenario(), tripRouterProvider));
 							return builder.build();
 						}
 					});
@@ -561,6 +563,7 @@ public class GAPScenarioRunner {
 				
 				@Override
 				public void install() {
+					final Provider<TripRouter> tripRouterProvider = binder().getProvider(TripRouter.class);
 					addPlanStrategyBinding("SubtourModeChoice_".concat(Global.GP_CAR)).toProvider(new javax.inject.Provider<PlanStrategy>() {
 						String[] availableModes = {TransportMode.car, TransportMode.pt, TransportMode.bike, TransportMode.walk};
 						String[] chainBasedModes = {TransportMode.car, TransportMode.bike};
@@ -568,8 +571,8 @@ public class GAPScenarioRunner {
 						@Override
 						public PlanStrategy get() {
 							final Builder builder = new Builder(new RandomPlanSelector<Plan, Person>());
-							builder.addStrategyModule(new SubtourModeChoice(controler.getConfig().global().getNumberOfThreads(), availableModes, chainBasedModes, false));
-							builder.addStrategyModule(new ReRoute(controler.getScenario()));
+							builder.addStrategyModule(new SubtourModeChoice(controler.getConfig().global().getNumberOfThreads(), availableModes, chainBasedModes, false, tripRouterProvider));
+							builder.addStrategyModule(new ReRoute(controler.getScenario(), tripRouterProvider));
 							return builder.build();
 						}
 					});
@@ -581,6 +584,7 @@ public class GAPScenarioRunner {
 				
 				@Override
 				public void install() {
+					final Provider<TripRouter> tripRouterProvider = binder().getProvider(TripRouter.class);
 					addPlanStrategyBinding("SubtourModeChoice_".concat("NO_CAR")).toProvider(new javax.inject.Provider<PlanStrategy>() {
 						String[] availableModes = {TransportMode.pt, TransportMode.bike, TransportMode.walk};
 						String[] chainBasedModes = {TransportMode.bike};
@@ -588,8 +592,8 @@ public class GAPScenarioRunner {
 						@Override
 						public PlanStrategy get() {
 							final Builder builder = new Builder(new RandomPlanSelector<Plan, Person>());
-							builder.addStrategyModule(new SubtourModeChoice(controler.getConfig().global().getNumberOfThreads(), availableModes, chainBasedModes, false));
-							builder.addStrategyModule(new ReRoute(controler.getScenario()));
+							builder.addStrategyModule(new SubtourModeChoice(controler.getConfig().global().getNumberOfThreads(), availableModes, chainBasedModes, false, tripRouterProvider));
+							builder.addStrategyModule(new ReRoute(controler.getScenario(), tripRouterProvider));
 							return builder.build();
 						}
 					});
@@ -601,6 +605,7 @@ public class GAPScenarioRunner {
 				
 				@Override
 				public void install() {
+					final Provider<TripRouter> tripRouterProvider = binder().getProvider(TripRouter.class);
 					addPlanStrategyBinding("SubtourModeChoice_".concat(Global.COMMUTER)).toProvider(new javax.inject.Provider<PlanStrategy>() {
 						String[] availableModes = {TransportMode.car, TransportMode.pt};
 						String[] chainBasedModes = {TransportMode.car, TransportMode.bike};
@@ -608,8 +613,8 @@ public class GAPScenarioRunner {
 						@Override
 						public PlanStrategy get() {
 							final Builder builder = new Builder(new RandomPlanSelector<Plan, Person>());
-							builder.addStrategyModule(new SubtourModeChoice(controler.getConfig().global().getNumberOfThreads(), availableModes, chainBasedModes, false));
-							builder.addStrategyModule(new ReRoute(controler.getScenario()));
+							builder.addStrategyModule(new SubtourModeChoice(controler.getConfig().global().getNumberOfThreads(), availableModes, chainBasedModes, false, tripRouterProvider));
+							builder.addStrategyModule(new ReRoute(controler.getScenario(), tripRouterProvider));
 							return builder.build();
 						}
 					});
@@ -621,6 +626,7 @@ public class GAPScenarioRunner {
 				
 				@Override
 				public void install() {
+					final Provider<TripRouter> tripRouterProvider = binder().getProvider(TripRouter.class);
 					addPlanStrategyBinding("SubtourModeChoice_".concat(Global.LICENSE_OWNER)).toProvider(new javax.inject.Provider<PlanStrategy>() {
 						String[] availableModes = {TransportMode.pt, TransportMode.bike, TransportMode.walk};
 						String[] chainBasedModes = {TransportMode.bike};
@@ -628,8 +634,8 @@ public class GAPScenarioRunner {
 						@Override
 						public PlanStrategy get() {
 							final Builder builder = new Builder(new RandomPlanSelector<Plan, Person>());
-							builder.addStrategyModule(new SubtourModeChoice(controler.getConfig().global().getNumberOfThreads(), availableModes, chainBasedModes, false));
-							builder.addStrategyModule(new ReRoute(controler.getScenario()));
+							builder.addStrategyModule(new SubtourModeChoice(controler.getConfig().global().getNumberOfThreads(), availableModes, chainBasedModes, false, tripRouterProvider));
+							builder.addStrategyModule(new ReRoute(controler.getScenario(), tripRouterProvider));
 							return builder.build();
 						}
 					});

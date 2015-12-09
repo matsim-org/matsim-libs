@@ -192,10 +192,6 @@ public class IterativeAlgorithmDC {
 			public int getIteration() {
 				return 1;
 			}
-			@Override
-			public TripRouter getTripRouter() {
-				return TripRouterFactoryBuilderWithDefaults.createTripRouterProvider(scenario, new DijkstraFactory(), transitRouterFactory).get();
-			}
 		};
 		double minValue = new Double(args[5]), maxValue = new Double(args[6]);
 		int numParts = new Integer(args[7]), numIterations = new Integer(args[8]);
@@ -214,7 +210,7 @@ public class IterativeAlgorithmDC {
 					ReadOrComputeMaxDCScore rcms = new ReadOrComputeMaxDCScore(dcContext);
                     rcms.readOrCreateMaxDCScore(new Controler(scenario).getConfig(), dcContext.kValsAreRead());
                     rcms.getPersonsMaxEpsUnscaled();
-					BestReplyDestinationChoice module = new BestReplyDestinationChoice(dcContext, rcms.getPersonsMaxEpsUnscaled());
+					BestReplyDestinationChoice module = new BestReplyDestinationChoice(TripRouterFactoryBuilderWithDefaults.createTripRouterProvider(scenario, new DijkstraFactory(), transitRouterFactory), dcContext, rcms.getPersonsMaxEpsUnscaled());
 					module.prepareReplanning(context);
 					Collection<PlanImpl> copiedPlans = new ArrayList<PlanImpl>();
 					for(Person person:typePopulations.get(type)) {

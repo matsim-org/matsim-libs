@@ -22,6 +22,7 @@ package playground.sergioo.passivePlanning2012.core.replanning;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.modules.TimeAllocationMutator;
+import org.matsim.core.router.TripRouter;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -30,16 +31,18 @@ public class TimeAllocationMutatorPlanStrategyFactory implements
         Provider<PlanStrategy> {
 
     private Scenario scenario;
+    private javax.inject.Provider<org.matsim.core.router.TripRouter> tripRouterProvider;
 
     @Inject
-    public TimeAllocationMutatorPlanStrategyFactory(Scenario scenario) {
+    public TimeAllocationMutatorPlanStrategyFactory(Scenario scenario, Provider<TripRouter> tripRouterProvider) {
         this.scenario = scenario;
+        this.tripRouterProvider = tripRouterProvider;
     }
 
     @Override
 	public PlanStrategy get() {
 		BasePlanModulesStrategy strategy = new BasePlanModulesStrategy(scenario);
-		strategy.addStrategyModule(new TimeAllocationMutator(scenario.getConfig()));
+		strategy.addStrategyModule(new TimeAllocationMutator(scenario.getConfig(), tripRouterProvider));
 		return strategy;
 	}
 

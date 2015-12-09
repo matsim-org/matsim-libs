@@ -29,6 +29,7 @@ import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.ReplanningContext;
+import org.matsim.core.router.TripRouter;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import playground.johannes.synpop.data.CommonKeys;
@@ -62,15 +63,17 @@ public class ActivityLocationStrategyFactory implements Provider<PlanStrategy> {
 	private Set<Person> candidates;
 
 	private final double threshold;
+	private final Provider<TripRouter> tripRouterProvider;
 
 	public ActivityLocationStrategyFactory(Random random, int numThreads, String blacklist, Controler controler, double mutationError,
-			double threshold) {
+										   double threshold, Provider<TripRouter> tripRouterProvider) {
 		this.random = random;
 		this.numThreads = numThreads;
 		this.blacklist = blacklist;
 		this.controler = controler;
 		this.mutationError = mutationError;
 		this.threshold = threshold;
+		this.tripRouterProvider = tripRouterProvider;
 	}
 
 	@Override
@@ -78,7 +81,7 @@ public class ActivityLocationStrategyFactory implements Provider<PlanStrategy> {
 		if (strategy == null) {
 			ActivityFacilities facilities = controler.getScenario().getActivityFacilities();
 			Population pop = controler.getScenario().getPopulation();
-			ActivityLocationStrategy delegate = new ActivityLocationStrategy(facilities, pop, random, numThreads, blacklist, mutationError);
+			ActivityLocationStrategy delegate = new ActivityLocationStrategy(facilities, pop, random, numThreads, blacklist, mutationError, tripRouterProvider);
 			strategy = new Strategy(delegate);
 			controler.addControlerListener(strategy);
 

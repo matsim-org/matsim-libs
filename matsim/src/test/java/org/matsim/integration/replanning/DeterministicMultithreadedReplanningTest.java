@@ -26,12 +26,14 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.ControlerDefaults;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.modules.TimeAllocationMutator;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
+import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -63,7 +65,7 @@ public class DeterministicMultithreadedReplanningTest extends MatsimTestCase {
 		config.global().setNumberOfThreads(4); // just use any number > 1
 
 		PlanStrategyImpl strategy = new PlanStrategyImpl(new RandomPlanSelector());
-		strategy.addStrategyModule(new TimeAllocationMutator(config));
+		strategy.addStrategyModule(new TimeAllocationMutator(config, null));
 		StrategyManager strategyManager = new StrategyManager();
 		strategyManager.addStrategyForDefaultSubpopulation(strategy, 1.0);
 
@@ -106,8 +108,8 @@ public class DeterministicMultithreadedReplanningTest extends MatsimTestCase {
 		
 		config.controler().setOutputDirectory(getOutputDirectory() + "/run1/");
 		TestControler controler = new TestControler(config, strategyManager);
-		strategy.addStrategyModule(new ReRoute(controler.getScenario())); // finish strategy configuration
-		strategy.addStrategyModule(new TimeAllocationMutator(config));
+		strategy.addStrategyModule(new ReRoute(controler.getScenario(), TripRouterFactoryBuilderWithDefaults.createDefaultTripRouterFactoryImpl(controler.getScenario()))); // finish strategy configuration
+		strategy.addStrategyModule(new TimeAllocationMutator(config, TripRouterFactoryBuilderWithDefaults.createDefaultTripRouterFactoryImpl(controler.getScenario())));
 		controler.run();
 
 		// setup run2
@@ -118,8 +120,8 @@ public class DeterministicMultithreadedReplanningTest extends MatsimTestCase {
 		
 		config.controler().setOutputDirectory(getOutputDirectory() + "/run2/");
 		TestControler controler2 = new TestControler(config, strategyManager2);
-		strategy2.addStrategyModule(new ReRoute(controler2.getScenario())); // finish strategy configuration
-		strategy2.addStrategyModule(new TimeAllocationMutator(config));
+		strategy2.addStrategyModule(new ReRoute(controler2.getScenario(), TripRouterFactoryBuilderWithDefaults.createDefaultTripRouterFactoryImpl(controler.getScenario()))); // finish strategy configuration
+		strategy2.addStrategyModule(new TimeAllocationMutator(config, TripRouterFactoryBuilderWithDefaults.createDefaultTripRouterFactoryImpl(controler.getScenario())));
 		controler2.run();
 
 		for (int i = 0; i <= lastIteration; i++) {
@@ -156,7 +158,7 @@ public class DeterministicMultithreadedReplanningTest extends MatsimTestCase {
 
 		config.controler().setOutputDirectory(getOutputDirectory() + "/run1/");
 		TestControler controler = new TestControler(config, strategyManager);
-		strategy.addStrategyModule(new ReRoute(controler.getScenario()));
+		strategy.addStrategyModule(new ReRoute(controler.getScenario(), TripRouterFactoryBuilderWithDefaults.createDefaultTripRouterFactoryImpl(controler.getScenario())));
 		controler.run();
 
 		// setup run2
@@ -167,7 +169,7 @@ public class DeterministicMultithreadedReplanningTest extends MatsimTestCase {
 		config.controler().setOutputDirectory(getOutputDirectory() + "/run2/");
 		config.global().setNumberOfThreads(3); // use a different number of threads because the result must be the same
 		TestControler controler2 = new TestControler(config, strategyManager2);
-		strategy2.addStrategyModule(new ReRoute(controler.getScenario()));
+		strategy2.addStrategyModule(new ReRoute(controler.getScenario(), TripRouterFactoryBuilderWithDefaults.createDefaultTripRouterFactoryImpl(controler.getScenario())));
 
 		controler2.run();
 
@@ -205,7 +207,7 @@ public class DeterministicMultithreadedReplanningTest extends MatsimTestCase {
 
 		config.controler().setOutputDirectory(getOutputDirectory() + "/run1/");
 		TestControler controler = new TestControler(config, strategyManager);
-		strategy.addStrategyModule(new ReRoute(controler.getScenario()));
+		strategy.addStrategyModule(new ReRoute(controler.getScenario(), TripRouterFactoryBuilderWithDefaults.createDefaultTripRouterFactoryImpl(controler.getScenario())));
 		controler.run();
 
 		// setup run2
@@ -216,7 +218,7 @@ public class DeterministicMultithreadedReplanningTest extends MatsimTestCase {
 		config.controler().setOutputDirectory(getOutputDirectory() + "/run2/");
 		config.global().setNumberOfThreads(3); // use a different number of threads because the result must be the same
 		TestControler controler2 = new TestControler(config, strategyManager2);
-		strategy2.addStrategyModule(new ReRoute(controler.getScenario()));
+		strategy2.addStrategyModule(new ReRoute(controler.getScenario(), TripRouterFactoryBuilderWithDefaults.createDefaultTripRouterFactoryImpl(controler.getScenario())));
 		controler2.run();
 
 		for (int i = 0; i <= lastIteration; i++) {

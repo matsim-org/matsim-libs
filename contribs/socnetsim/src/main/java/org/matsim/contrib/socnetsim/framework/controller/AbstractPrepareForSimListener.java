@@ -82,11 +82,6 @@ public abstract class AbstractPrepareForSimListener extends AbstractMultithreade
 			}
 
 			@Override
-			public TripRouter getTripRouter() {
-				return tripRouter.get();
-			}
-
-			@Override
 			public ScoringFunctionFactory getScoringFunctionFactory() {
 				return scoringFunctionFactory;
 			}

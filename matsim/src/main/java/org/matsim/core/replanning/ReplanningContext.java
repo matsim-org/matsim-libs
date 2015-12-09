@@ -19,7 +19,6 @@
 
 package org.matsim.core.replanning;
 
-import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -48,13 +47,6 @@ public interface ReplanningContext {
 	 */
 	TravelTime getTravelTime();
 	
-	/**
-	 * Gives an instance of the TripRouter which the Controler knows about.
-	 * Again, this may produce a new instance every time, but clients just
-	 * call this and use it.
-	 */
-	TripRouter getTripRouter();
-
 	/**
 	 * Gives access to the scoring the Controler knows about.
 	 * This is a Factory not because of threads or some such, but 

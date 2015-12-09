@@ -20,10 +20,14 @@
 
 package org.matsim.core.replanning.modules;
 
+import com.google.inject.Inject;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.router.PlanRouter;
+import org.matsim.core.router.TripRouter;
 import org.matsim.population.algorithms.PlanAlgorithm;
+
+import javax.inject.Provider;
 
 /**
  * Uses the routing algorithm provided by the {@linkplain Controler} for 
@@ -35,16 +39,19 @@ public class ReRoute extends AbstractMultithreadedModule {
 	
 	private Scenario scenario;
 
-	public ReRoute(Scenario scenario) {
+	private final Provider<TripRouter> tripRouterProvider;
+
+	public ReRoute(Scenario scenario, Provider<TripRouter> tripRouterProvider) {
 		super(scenario.getConfig().global());
 		this.scenario = scenario;
+		this.tripRouterProvider = tripRouterProvider;
 	}
 
 	@Override
 	public final PlanAlgorithm getPlanAlgoInstance() {
 
 			return new PlanRouter(
-					getReplanningContext().getTripRouter(),
+					tripRouterProvider.get(),
 					scenario.getActivityFacilities());
 	}
 

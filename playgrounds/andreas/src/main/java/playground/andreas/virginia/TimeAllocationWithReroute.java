@@ -29,7 +29,10 @@ import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.modules.TimeAllocationMutator;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
+import org.matsim.core.router.TripRouter;
 import org.matsim.pt.replanning.TransitActsRemoverStrategy;
+
+import javax.inject.Provider;
 
 /**
  * 
@@ -41,15 +44,17 @@ import org.matsim.pt.replanning.TransitActsRemoverStrategy;
  *
  */
 public class TimeAllocationWithReroute implements PlanStrategy {
-	
-	
+
+
+	private final Provider<TripRouter> tripRouterProvider;
 	private PlanStrategyImpl strategy;
 
-	public TimeAllocationWithReroute(Scenario scenario) {
+	public TimeAllocationWithReroute(Scenario scenario, Provider<TripRouter> tripRouterProvider) {
+		this.tripRouterProvider = tripRouterProvider;
 		PlanStrategyImpl strategy = new PlanStrategyImpl(new RandomPlanSelector());
 		strategy.addStrategyModule(new TransitActsRemoverStrategy(scenario.getConfig()));
-		strategy.addStrategyModule(new TimeAllocationMutator(scenario.getConfig()));
-		strategy.addStrategyModule(new ReRoute(scenario));
+		strategy.addStrategyModule(new TimeAllocationMutator(scenario.getConfig(), this.tripRouterProvider));
+		strategy.addStrategyModule(new ReRoute(scenario, this.tripRouterProvider));
 		this.strategy = strategy;
 	}
 

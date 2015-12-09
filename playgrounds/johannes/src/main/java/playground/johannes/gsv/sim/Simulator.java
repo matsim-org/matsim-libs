@@ -53,6 +53,7 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.StrategyManagerModule;
+import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityModule;
 import org.matsim.core.router.util.TravelTime;
@@ -125,8 +126,9 @@ public class Simulator {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
+				final javax.inject.Provider<TripRouter> tripRouterProvider = binder().getProvider(TripRouter.class);
 				addPlanStrategyBinding("activityLocations").toProvider(new ActivityLocationStrategyFactory(random, numThreads, "home", controler,
-						mutationError, threshold));
+						mutationError, threshold, tripRouterProvider));
 			}
 		});
 

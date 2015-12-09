@@ -109,11 +109,6 @@ public class ExternalModuleTest {
             }
 
             @Override
-            public TripRouter getTripRouter() {
-                return null;
-            }
-
-            @Override
             public ScoringFunctionFactory getScoringFunctionFactory() {
                 return null;
             }
