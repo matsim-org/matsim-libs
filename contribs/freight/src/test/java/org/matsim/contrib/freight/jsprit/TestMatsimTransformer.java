@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import jsprit.core.problem.Location;
 import jsprit.core.problem.VehicleRoutingProblem;
 import jsprit.core.problem.job.Job;
 import jsprit.core.problem.job.Service;
@@ -72,7 +73,7 @@ public class TestMatsimTransformer {
 	@Test
 	public void whenTransforming_jspritVehicle2matsimVehicle_itIsMadeCorrectly(){
 		VehicleType jspritType = VehicleTypeImpl.Builder.newInstance("myType").addCapacityDimension(0, 50).setCostPerDistance(10.0).setCostPerTime(5.0).setFixedCost(100.0).build();
-		Vehicle jspritVehicle = VehicleImpl.Builder.newInstance("myVehicle").setEarliestStart(10.0).setLatestArrival(20.0).setStartLocationId("loc").setType(jspritType).build();
+		Vehicle jspritVehicle = VehicleImpl.Builder.newInstance("myVehicle").setEarliestStart(10.0).setLatestArrival(20.0).setStartLocation(Location.newInstance("loc")).setType(jspritType).build();
 		CarrierVehicle matsimVehicle = MatsimJspritFactory.createCarrierVehicle(jspritVehicle);
 		assertNotNull(matsimVehicle);
 		assertEquals("myType", matsimVehicle.getVehicleType().getId().toString());
@@ -92,7 +93,7 @@ public class TestMatsimTransformer {
 		assertEquals("matsimVehicle",jspritVehicle.getId());
 		assertEquals(10.0,jspritVehicle.getEarliestDeparture(),0.01);
 		assertEquals(20.0,jspritVehicle.getLatestArrival(),0.01);
-		assertEquals("loc",jspritVehicle.getStartLocationId());
+		assertEquals("loc",jspritVehicle.getStartLocation().getId());
 	}
 	
 	@Test
@@ -101,7 +102,7 @@ public class TestMatsimTransformer {
 				.setCapacityDemand(50).setServiceDuration(30.0).setServiceStartTimeWindow(TimeWindow.newInstance(10.0, 20.0)).build();
 		Service service = MatsimJspritFactory.createService(carrierService, null);
 		assertNotNull(service);
-		assertEquals("locationId", service.getLocationId());
+		assertEquals("locationId", service.getLocation().getId());
 		assertEquals(30.0 , service.getServiceDuration(), 0.01);
 		assertEquals(50, service.getSize().get(0));
 		assertEquals(10.0, service.getTimeWindow().getStart(),0.01);
@@ -113,7 +114,7 @@ public class TestMatsimTransformer {
 	
 	@Test
 	public void whenTransforming_jspritService2matsimService_isMadeCorrectly(){
-		Service carrierService = Service.Builder.newInstance("serviceId").addSizeDimension(0, 50).setLocationId("locationId")
+		Service carrierService = Service.Builder.newInstance("serviceId").addSizeDimension(0, 50).setLocation(Location.newInstance("locationId"))
 				.setServiceTime(30.0).setTimeWindow(jsprit.core.problem.solution.route.activity.TimeWindow.newInstance(10.0, 20.0)).build();
 		
 		CarrierService service = MatsimJspritFactory.createCarrierService(carrierService);
@@ -152,7 +153,7 @@ public class TestMatsimTransformer {
             if(e instanceof org.matsim.contrib.freight.carrier.Tour.TourActivity){
                 if(e instanceof org.matsim.contrib.freight.carrier.Tour.ServiceActivity){
                     CarrierService carrierService = ((org.matsim.contrib.freight.carrier.Tour.ServiceActivity) e).getService();
-                    Service service = Service.Builder.newInstance(carrierService.getId().toString()).setLocationId(carrierService.getLocationLinkId().toString()).build();
+                    Service service = Service.Builder.newInstance(carrierService.getId().toString()).setLocation(Location.newInstance(carrierService.getLocationLinkId().toString())).build();
                     services.add(service);
                 }
             }
@@ -164,7 +165,7 @@ public class TestMatsimTransformer {
         return VehicleImpl.Builder.newInstance(vehicle.getVehicleId().toString())
                 .setEarliestStart(vehicle.getEarliestStartTime())
                 .setLatestArrival(vehicle.getLatestEndTime())
-                .setStartLocationId(vehicle.getLocation().toString()).build();
+                .setStartLocation(Location.newInstance(vehicle.getLocation().toString())).build();
     }
 
     @Test

@@ -19,14 +19,12 @@
  * *********************************************************************** */
 package playground.thibautd.scripts;
 
-import java.util.Random;
-
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-
 import org.matsim.core.utils.misc.Counter;
+import playground.ivt.utils.SoftCache;
 
-import playground.thibautd.utils.SoftCache;
+import java.util.Random;
 
 /**
  * For testing. It seems the JVM is smart enough to clean only part of

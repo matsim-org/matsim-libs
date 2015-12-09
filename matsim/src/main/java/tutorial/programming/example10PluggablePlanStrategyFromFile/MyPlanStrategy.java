@@ -32,46 +32,42 @@ import javax.inject.Inject;
 
 
 class MyPlanStrategy implements PlanStrategy {
-	
-	private final PlanStrategy planStrategyDelegate;
+
+	private final PlanStrategy delegate;
 
 	@Inject // The constructor must be annotated so that the framework knows which one to use.
-    MyPlanStrategy(Scenario scenario, EventsManager eventsManager) {
+	MyPlanStrategy(Scenario scenario, EventsManager eventsManager) {
 		// A PlanStrategy is something that can be applied to a Person (not a Plan).
-        // It first selects one of the plans:
-        MyPlanSelector planSelector = new MyPlanSelector();
-        PlanStrategyImpl.Builder builder = new PlanStrategyImpl.Builder(planSelector);
+		// Define how to select between existing plans:
+		PlanStrategyImpl.Builder builder = new PlanStrategyImpl.Builder(new MyPlanSelector());
 
-        // the plan selector may, at the same time, collect events:
-        eventsManager.addHandler(planSelector);
-
-        // if you just want to select plans, you can stop here.
+		// if you just want to select plans, you can stop here (except for the builder.build() below).
 
 
-        // Otherwise, to do something with that plan, one needs to add modules into the strategy.  If there is at least
-        // one module added here, then the plan is copied and then modified.
-        MyPlanStrategyModule mod = new MyPlanStrategyModule(scenario);
-        builder.addStrategyModule(mod);
+		// Otherwise, to do something with that plan, one needs to add modules into the strategy.  If there is at least
+		// one module added here, then the plan is copied and then modified.
+		MyPlanStrategyModule mod = new MyPlanStrategyModule(scenario);
+		builder.addStrategyModule(mod);
 
-        // these modules may, at the same time, be events listeners (so that they can collect information):
-        eventsManager.addHandler(mod);
+		// these modules may, at the same time, be events listeners (so that they can collect information):
+		eventsManager.addHandler(mod);
 
-        planStrategyDelegate = builder.build();
+		delegate = builder.build();
 	}
 
 	@Override
 	public void finish() {
-		planStrategyDelegate.finish();
+		delegate.finish();
 	}
 
 	@Override
 	public void init(ReplanningContext replanningContext) {
-		planStrategyDelegate.init(replanningContext);
+		delegate.init(replanningContext);
 	}
 
 	@Override
 	public void run(HasPlansAndId<Plan, Person> person) {
-		planStrategyDelegate.run(person);
+		delegate.run(person);
 	}
 
 }

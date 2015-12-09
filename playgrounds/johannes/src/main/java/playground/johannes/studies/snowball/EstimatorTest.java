@@ -19,7 +19,12 @@
  * *********************************************************************** */
 package playground.johannes.studies.snowball;
 
-import gnu.trove.*;
+import gnu.trove.iterator.TDoubleDoubleIterator;
+import gnu.trove.iterator.TIntObjectIterator;
+import gnu.trove.list.array.TDoubleArrayList;
+import gnu.trove.map.hash.TDoubleDoubleHashMap;
+import gnu.trove.map.hash.TIntIntHashMap;
+import gnu.trove.map.hash.TIntObjectHashMap;
 import org.apache.commons.math.stat.StatUtils;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Level;
@@ -377,11 +382,11 @@ public class EstimatorTest implements SamplerListener {
             bias_p[i] = bias_p[i] / (double) samples[i];
             bias_w[i] = bias_w[i] / (double) samples[i];
 
-            double[] values = N_estim[i].toNativeArray();
+            double[] values = N_estim[i].toArray();
             N_estim_mean[i] = StatUtils.mean(values);
             N_estim_hist[i] = new Distribution(values).absoluteDistribution((StatUtils.max(values) - StatUtils.min(values)) / 100.0);
 
-            values = M_estim[i].toNativeArray();
+            values = M_estim[i].toArray();
             M_estim_mean[i] = StatUtils.mean(values);
             M_estim_hist[i] = new Distribution(values).absoluteDistribution((StatUtils.max(values) - StatUtils.min(values)) / 100.0);
 

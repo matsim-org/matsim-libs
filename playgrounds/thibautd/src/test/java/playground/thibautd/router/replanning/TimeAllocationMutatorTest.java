@@ -19,11 +19,6 @@
  * *********************************************************************** */
 package playground.thibautd.router.replanning;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Random;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -45,6 +40,11 @@ import org.matsim.population.algorithms.TripPlanMutateTimeAllocation;
 import org.matsim.population.algorithms.TripsToLegsAlgorithm;
 import org.matsim.pt.PtConstants;
 import org.matsim.testcases.MatsimTestUtils;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Random;
 
 
 /**

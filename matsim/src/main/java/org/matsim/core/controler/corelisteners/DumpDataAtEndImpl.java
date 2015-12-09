@@ -24,6 +24,7 @@ import com.google.inject.Singleton;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.controler.Controler;
@@ -35,6 +36,8 @@ import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.counts.Counts;
+import org.matsim.counts.CountsWriter;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.FacilitiesWriter;
 import org.matsim.households.Households;
@@ -116,6 +119,13 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 			final Lanes lanes = scenarioData.getLanes();
 			if ( lanes != null ) { 
 				new LaneDefinitionsWriter20(lanes).write(controlerIO.getOutputFilename(Controler.FILENAME_LANES));
+			}
+		} catch ( Exception ee ) {}
+		try {
+			@SuppressWarnings("unchecked")
+			final Counts<Link> counts = (Counts<Link>) scenarioData.getScenarioElement(Counts.ELEMENT_NAME) ;
+			if ( counts != null ) {
+				new CountsWriter(counts).write( controlerIO.getOutputFilename( Controler.FILENAME_COUNTS ) );
 			}
 		} catch ( Exception ee ) {}
 		if (!event.isUnexpected() && scenarioData.getConfig().vspExperimental().isWritingOutputEvents()) {

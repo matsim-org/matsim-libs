@@ -21,6 +21,7 @@ package playground.jbischoff.av.preparation;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -40,6 +41,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PopulationWriter;
@@ -74,9 +76,9 @@ public class CarEventsToTaxiPlans {
 		EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(ch);
 		MatsimEventsReader reader = new MatsimEventsReader(events);
-		reader.readFile("C:/Users/Joschka/Documents/runs-svn/bvg.run192.100pct/ITERS/it.100/bvg.run192.100pct.100.events.xml.gz");
-//		reader.readFile("C:/Users/Joschka/Documents/runs-svn/bvg.run189.10pct/ITERS/it.100/bvg.run189.10pct.100.events.filtered.xml.gz");
-		new PopulationWriter(ch.population).write("C:/Users/Joschka/Documents/shared-svn/projects/audi_av/scenario/eventBasedPlansWithCars.xml.gz");
+//		reader.readFile("C:/Users/Joschka/Documents/runs-svn/bvg.run192.100pct/ITERS/it.100/bvg.run192.100pct.100.events.xml.gz");
+		reader.readFile("C:/Users/Joschka/Documents/runs-svn/bvg.run189.10pct/ITERS/it.100/bvg.run189.10pct.100.events.filtered.xml.gz");
+		new PopulationWriter(ch.population).write("C:/Users/Joschka/Documents/shared-svn/projects/audi_av/scenario/subscenarios/tenpercentpt/plansWithCars0.10.xml.gz");
 	}
 	
 }
@@ -87,7 +89,7 @@ class ConverterEventHandler implements PersonDepartureEventHandler, PersonArriva
 	NetworkImpl network;
 	Network oldNetwork;
 	CoordinateTransformation dest = TransformationFactory.getCoordinateTransformation(TransformationFactory.DHDN_GK4,"EPSG:25833");
-
+	Random rand = MatsimRandom.getRandom();
 	Map<Id<Person>, Tuple<Id<Link>, Double>> departures = new HashMap<>();
 	int i = 0;
 	private Geometry shape;
@@ -120,6 +122,14 @@ class ConverterEventHandler implements PersonDepartureEventHandler, PersonArriva
 			}
 			createAndAddPerson(t.getFirst(), t.getSecond(), event.getLinkId(), event.getTime());
 		}
+		
+		if (event.getLegMode().equals("pt")) {
+			Tuple<Id<Link>, Double> t = departures.remove(event.getPersonId());
+			if (t == null) {
+				return;
+			}
+			createAndAddPerson(t.getFirst(), t.getSecond(), event.getLinkId(), event.getTime());
+		}
 	}
 
 	private void createAndAddPerson(Id<Link> fromLinkId, double departureTime, Id<Link> toLinkId, double arrivalTime) {
@@ -142,7 +152,7 @@ class ConverterEventHandler implements PersonDepartureEventHandler, PersonArriva
 		home.setEndTime(departureTime);
 		plan.addActivity(home);
 		Leg leg = population.getFactory().createLeg(mode);
-		leg.setRoute(new GenericRouteImpl(fromLinkId, toLinkId));
+		if(mode == "taxi") leg.setRoute(new GenericRouteImpl(fromLinkId, toLinkId));
 		plan.addLeg(leg);
 		Activity work = population.getFactory().createActivityFromLinkId("work", toLinkId);
 		work.setStartTime(arrivalTime);
@@ -170,6 +180,10 @@ class ConverterEventHandler implements PersonDepartureEventHandler, PersonArriva
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
 		if (event.getLegMode().equals("car")) {
+			departures.put(event.getPersonId(), new Tuple<Id<Link>, Double>(event.getLinkId(), event.getTime()));
+
+		}
+		if (event.getLegMode().equals("pt")&&rand.nextDouble()<=.1) {
 			departures.put(event.getPersonId(), new Tuple<Id<Link>, Double>(event.getLinkId(), event.getTime()));
 
 		}

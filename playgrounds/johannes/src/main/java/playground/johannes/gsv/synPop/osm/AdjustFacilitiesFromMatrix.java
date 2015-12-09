@@ -20,7 +20,7 @@
 package playground.johannes.gsv.synPop.osm;
 
 import com.vividsolutions.jts.geom.Point;
-import gnu.trove.TObjectDoubleHashMap;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -141,7 +141,7 @@ public class AdjustFacilitiesFromMatrix {
 			}
 			ProgressLogger.step();
 		}
-		ProgressLogger.termiante();
+		ProgressLogger.terminate();
 
 		if (notfound > 0) {
 			logger.warn(String.format("Cannot assign %s facilities to a zone.", notfound));

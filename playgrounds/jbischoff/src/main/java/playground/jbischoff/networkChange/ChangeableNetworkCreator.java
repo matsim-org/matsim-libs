@@ -28,14 +28,14 @@ public class ChangeableNetworkCreator {
 	private List<NetworkChangeEvent> networkChangeEvents;
 	private final int ENDTIME = 30*3600;
 	private final int TIMESTEP = 15*60;
-	private final String NETWORKFILE = "C:/Users/Joschka/Documents/shared-svn/projects/sustainability-w-michal-and-dlr/data/scenarios/subfleets_v7/berlin_brb.xml";
-	private final String EVENTSFILE =  "C:/Users/Joschka/Documents/shared-svn/projects/sustainability-w-michal-and-dlr/data/scenarios/2kW.15.1000/2kW.15.1000.events.xml.gz";
-	private final String CHANGEFILE = "C:/Users/Joschka/Documents/shared-svn/projects/sustainability-w-michal-and-dlr/data/scenarios/subfleets_v7/changeevents_min1.xml";
+	private final String NETWORKFILE = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/input/networkptcc.xml";
+	private final String EVENTSFILE =  "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/input/output/vw028.100pct/ITERS/it.210/vw028.100pct.210.events.xml.gz";
+	private final String CHANGEFILE = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/input/changeevents.xml";
 //	 private final String NETWORKFILE = "C:/local_jb/cottbus/network.xml.gz";
 //	 private final String EVENTSFILE =  "C:/local_jb/cottbus/1212.0.events_nosig.xml.gz";
 //	 private final String CHANGEFILE = "C:/local_jb/cottbus/changeevents.xml";
 	
-	private final double MINIMUMFREESPEED = 1;
+	private final double MINIMUMFREESPEED = 3;
 
 	public ChangeableNetworkCreator(){
 		this.networkChangeEvents = new ArrayList<NetworkChangeEvent>();
@@ -58,6 +58,7 @@ public class ChangeableNetworkCreator {
 	public void createNetworkChangeEvents(Network network, TravelTimeCalculator tcc2) {
 		NetworkChangeEventFactory factory = new NetworkChangeEventFactoryImpl();
 		for (Link l : network.getLinks().values()){
+			if (l.getId().toString().startsWith("pt")) continue;
 			double length = l.getLength();
 			double previousTravelTime=l.getLength()/l.getFreespeed()	;	
 			

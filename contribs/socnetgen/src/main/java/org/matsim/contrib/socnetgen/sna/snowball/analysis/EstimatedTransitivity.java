@@ -19,8 +19,12 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetgen.sna.snowball.analysis;
 
-import gnu.trove.TObjectDoubleHashMap;
-import gnu.trove.TObjectDoubleIterator;
+import gnu.trove.iterator.TObjectDoubleIterator;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
+
+import java.util.Collection;
+import java.util.Set;
+
 import org.matsim.contrib.common.stats.DescriptivePiStatistics;
 import org.matsim.contrib.socnetgen.sna.graph.Graph;
 import org.matsim.contrib.socnetgen.sna.graph.Vertex;
@@ -28,9 +32,6 @@ import org.matsim.contrib.socnetgen.sna.graph.analysis.Transitivity;
 import org.matsim.contrib.socnetgen.sna.math.DescriptivePiStatisticsFactory;
 import org.matsim.contrib.socnetgen.sna.snowball.SampledGraph;
 import org.matsim.contrib.socnetgen.sna.snowball.SampledVertex;
-
-import java.util.Collection;
-import java.util.Set;
 
 
 /**

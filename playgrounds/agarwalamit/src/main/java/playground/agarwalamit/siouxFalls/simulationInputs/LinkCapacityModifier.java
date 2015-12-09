@@ -45,7 +45,6 @@ public class LinkCapacityModifier {
 		new LinkCapacityModifier(sc.getNetwork()).processNetwork(1.);
 	}
 
-
 	public void processNetwork(double linkCap_modificationFactor){
 		log.info("Link capacity of each link in network will be modified by a factor of "+ linkCap_modificationFactor);
 
@@ -59,5 +58,4 @@ public class LinkCapacityModifier {
 	public void writeNetwork(String outputFile){
 		new NetworkWriter(network).write(outputFile);
 	}
-
 }

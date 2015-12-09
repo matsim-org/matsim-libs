@@ -22,15 +22,14 @@ package playground.thibautd.initialdemandgeneration.transformation;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.scenario.ScenarioUtils;
-
-import playground.ivt.utils.ArgParser;
 import org.matsim.contrib.socnetsim.framework.population.SocialNetwork;
 import org.matsim.contrib.socnetsim.framework.population.SocialNetworkReader;
 import org.matsim.contrib.socnetsim.framework.population.SocialNetworkWriter;
-import playground.thibautd.utils.MoreIOUtils;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.scenario.ScenarioUtils;
+import playground.ivt.utils.ArgParser;
+import playground.ivt.utils.MoreIOUtils;
 
 /**
  * Given a population for a wide area (say Switzerland), goes through a dilution

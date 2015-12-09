@@ -19,8 +19,8 @@
 
 package playground.johannes.gsv.analysis;
 
-import gnu.trove.TDoubleArrayList;
-import gnu.trove.TDoubleDoubleHashMap;
+import gnu.trove.list.array.TDoubleArrayList;
+import gnu.trove.map.hash.TDoubleDoubleHashMap;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
@@ -111,10 +111,10 @@ public class CountsCompareAnalyzer implements AfterMobsimListener {
 		String outdir = event.getControler().getControlerIO().getIterationPath(event.getIteration());
 
 		try {
-			TDoubleDoubleHashMap map = Correlations.mean(caps.toNativeArray(), errorVals.toNativeArray());
+			TDoubleDoubleHashMap map = Correlations.mean(caps.toArray(), errorVals.toArray());
 			StatsWriter.writeHistogram(map, "capacity", "counts", String.format("%s/countsError.capacity.txt", outdir));
 
-			map = Correlations.mean(speeds.toNativeArray(), errorVals.toNativeArray());
+			map = Correlations.mean(speeds.toArray(), errorVals.toArray());
 			StatsWriter.writeHistogram(map, "speed", "counts", String.format("%s/countsError.speed.txt", outdir));
 
 			StatsWriter.writeHistogram(Histogram.createHistogram(error, new LinearDiscretizer(0.1), false), "Error", "Frequency",

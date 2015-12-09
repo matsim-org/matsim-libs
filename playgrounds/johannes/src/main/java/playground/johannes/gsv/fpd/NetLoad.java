@@ -20,7 +20,7 @@
 package playground.johannes.gsv.fpd;
 
 import com.vividsolutions.jts.geom.Point;
-import gnu.trove.TObjectDoubleHashMap;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
 import org.geotools.referencing.CRS;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -148,7 +148,7 @@ public class NetLoad {
 			}
 			ProgressLogger.step();
 		}
-		ProgressLogger.termiante();
+		ProgressLogger.terminate();
 		/*
 		 * compare counts
 		 */

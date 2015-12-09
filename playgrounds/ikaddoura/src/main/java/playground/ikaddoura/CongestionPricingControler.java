@@ -28,7 +28,7 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.contrib.otfvis.OTFVisModule;
+import org.matsim.contrib.otfvis.OTFVisFileWriterModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
@@ -40,6 +40,7 @@ import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisut
 import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripAnalysisMain;
 import playground.ikaddoura.analysis.vtts.VTTSHandler;
 import playground.ikaddoura.analysis.vtts.VTTScomputation;
+import playground.ikaddoura.analysis.welfare.WelfareAnalysisControlerListener;
 import playground.ikaddoura.router.VTTSCongestionTollTimeDistanceTravelDisutilityFactory;
 import playground.ikaddoura.router.VTTSTimeDistanceTravelDisutilityFactory;
 import playground.vsp.congestion.controler.AdvancedMarginalCongestionPricingContolerListener;
@@ -224,7 +225,9 @@ public class CongestionPricingControler {
 
 		}
 		
-		controler.addOverridingModule(new OTFVisModule());
+		controler.addControlerListener(new WelfareAnalysisControlerListener(controler.getScenario()));
+		
+		controler.addOverridingModule(new OTFVisFileWriterModule());
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		controler.run();
 		

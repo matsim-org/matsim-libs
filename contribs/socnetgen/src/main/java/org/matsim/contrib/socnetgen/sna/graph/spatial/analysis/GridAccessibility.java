@@ -23,7 +23,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
-import gnu.trove.TObjectDoubleHashMap;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
 import org.matsim.contrib.common.util.ProgressLogger;
 import org.matsim.contrib.socnetgen.sna.gis.PointUtils;
 import org.matsim.contrib.socnetgen.sna.gis.SpatialCostFunction;
@@ -82,7 +82,7 @@ public class GridAccessibility extends Accessibility {
 				ProgressLogger.step();
 			}
 		}
-		ProgressLogger.termiante();
+		ProgressLogger.terminate();
 		
 		TObjectDoubleHashMap<Vertex> values = new TObjectDoubleHashMap<Vertex>(vertices.size());
 		for(Vertex v : vertices) {

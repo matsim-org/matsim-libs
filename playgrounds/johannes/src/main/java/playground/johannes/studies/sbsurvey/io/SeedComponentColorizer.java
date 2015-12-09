@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package playground.johannes.studies.sbsurvey.io;
 
-import gnu.trove.TObjectDoubleHashMap;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
 import org.matsim.contrib.socnetgen.sna.graph.io.PajekColorizer;
 import org.matsim.contrib.socnetgen.sna.graph.spatial.io.ColorUtils;
 import org.matsim.contrib.socnetgen.sna.snowball.SampledEdge;

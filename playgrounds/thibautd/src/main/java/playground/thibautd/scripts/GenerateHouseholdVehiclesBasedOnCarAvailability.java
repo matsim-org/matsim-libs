@@ -19,13 +19,6 @@
  * *********************************************************************** */
 package playground.thibautd.scripts;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.Stack;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -45,9 +38,15 @@ import org.matsim.households.HouseholdsWriterV10;
 import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.vehicles.Vehicle;
 import org.xml.sax.Attributes;
-
 import playground.ivt.utils.ArgParser;
 import playground.ivt.utils.ArgParser.Args;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.Stack;
 
 /**
  * Generates as many vehicles as persons with "always" a car in each household.

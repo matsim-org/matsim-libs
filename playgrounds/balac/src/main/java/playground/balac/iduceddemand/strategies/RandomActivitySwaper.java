@@ -16,7 +16,7 @@ public class RandomActivitySwaper extends AbstractMultithreadedModule {
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
 		final TripRouter tripRouter = getReplanningContext().getTripRouter();
-		ChooseRandomActivities algo = new ChooseRandomActivities(MatsimRandom.getLocalInstance(), tripRouter.getStageActivityTypes());
+		ChooseRandomActivitiesToSwap algo = new ChooseRandomActivitiesToSwap(MatsimRandom.getLocalInstance(), tripRouter.getStageActivityTypes());
 
 		return algo;
 	}

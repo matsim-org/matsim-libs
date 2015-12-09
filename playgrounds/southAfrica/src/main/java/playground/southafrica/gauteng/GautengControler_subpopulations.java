@@ -30,6 +30,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.contrib.analysis.kai.KaiAnalysisListener;
+import org.matsim.contrib.common.diversitygeneration.planselectors.DiversityGeneratingPlansRemover;
+import org.matsim.contrib.common.diversitygeneration.planselectors.DiversityGeneratingPlansRemover.Builder;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.consistency.VspConfigConsistencyCheckerImpl;
@@ -60,8 +62,6 @@ import org.matsim.vehicles.*;
 import playground.southafrica.gauteng.roadpricingscheme.SanralTollFactor_Subpopulation;
 import playground.southafrica.gauteng.scoring.GautengScoringFunctionFactory;
 import playground.southafrica.utilities.Header;
-import playground.vsp.planselectors.DiversityGeneratingPlansRemover;
-import playground.vsp.planselectors.DiversityGeneratingPlansRemover.Builder;
 
 import java.util.Arrays;
 

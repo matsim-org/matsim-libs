@@ -19,16 +19,29 @@
  * *********************************************************************** */
 package org.matsim.contrib.common.stats;
 
-import gnu.trove.*;
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.matsim.core.utils.collections.Tuple;
+import gnu.trove.iterator.TDoubleObjectIterator;
+import gnu.trove.iterator.TObjectDoubleIterator;
+import gnu.trove.list.array.TDoubleArrayList;
+import gnu.trove.map.hash.TDoubleDoubleHashMap;
+import gnu.trove.map.hash.TDoubleObjectHashMap;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.SortedMap;
+import java.util.TreeMap;
+
+import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.matsim.core.utils.collections.Tuple;
 
 /**
  * Utility functions for writing distributions and histograms to plain text files (for further plotting or processing in

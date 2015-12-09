@@ -20,8 +20,8 @@
 package org.matsim.contrib.socnetgen.sna.graph.spatial.analysis;
 
 import com.vividsolutions.jts.geom.Point;
-import gnu.trove.TDoubleArrayList;
-import gnu.trove.TDoubleDoubleHashMap;
+import gnu.trove.list.array.TDoubleArrayList;
+import gnu.trove.map.hash.TDoubleDoubleHashMap;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.common.gis.CartesianDistanceCalculator;
 import org.matsim.contrib.common.gis.DistanceCalculator;
@@ -113,7 +113,7 @@ public class AcceptanceProbability {
 				e.printStackTrace();
 			}
 		}
-		ProgressLogger.termiante();
+		ProgressLogger.terminate();
 		/*
 		 * merge results
 		 */
@@ -154,7 +154,7 @@ public class AcceptanceProbability {
 							distances.add(distanceCalculator.distance(p1, p2));
 						}
 					}
-					double[] distanceArray = distances.toNativeArray();
+					double[] distanceArray = distances.toArray();
 					Discretizer discretizer = FixedSampleSizeDiscretizer.create(distanceArray, 200, 300);
 					TDoubleDoubleHashMap n_d = Histogram.createHistogram(distanceArray, discretizer, true);
 

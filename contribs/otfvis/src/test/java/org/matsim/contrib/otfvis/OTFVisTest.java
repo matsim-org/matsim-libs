@@ -27,6 +27,7 @@ import java.io.File;
 import java.util.Arrays;
 
 import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -34,7 +35,7 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * Simple test case to ensure the converting from eventsfile to .mvi-file
@@ -43,13 +44,16 @@ import org.matsim.testcases.MatsimTestCase;
  * @author yu
  * 
  */
-public class OTFVisTest extends MatsimTestCase {
+public class OTFVisTest {
+
+	@Rule
+	public MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	@Test
 	public void testConvert() {
 		String networkFilename = "test/scenarios/equil/network.xml";
 		String eventsFilename = "test/scenarios/equil/events.xml";
-		String mviFilename = "test/scenarios/equil/events.mvi";
+		String mviFilename = testUtils.getOutputDirectory()+"/events.mvi";
 
 		String[] args = {"-convert", eventsFilename, networkFilename, mviFilename, "300"};
 		OTFVis.main(args);
@@ -71,18 +75,15 @@ public class OTFVisTest extends MatsimTestCase {
 		qSimConfigGroup.setSnapshotStyle( SnapshotStyle.equiDist ) ;;
 
 		final Controler controler = new Controler(config);
-		controler.addOverridingModule(new OTFVisModule());
-		controler.getConfig().controler().setOverwriteFileSetting(
-				true ?
-						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+		controler.addOverridingModule(new OTFVisFileWriterModule());
+		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		controler.getConfig().controler().setCreateGraphs(false);
         controler.setDumpDataAtEnd(false);
 		controler.run();
 
-		assertTrue(new File(controler.getControlerIO().getIterationFilename(0, "otfvis.mvi")).exists());
-		assertTrue(new File(controler.getControlerIO().getIterationFilename(1, "otfvis.mvi")).exists());
-		assertTrue(new File(controler.getControlerIO().getIterationFilename(2, "otfvis.mvi")).exists());
+		Assert.assertTrue(new File(controler.getControlerIO().getIterationFilename(0, "otfvis.mvi")).exists());
+		Assert.assertTrue(new File(controler.getControlerIO().getIterationFilename(1, "otfvis.mvi")).exists());
+		Assert.assertTrue(new File(controler.getControlerIO().getIterationFilename(2, "otfvis.mvi")).exists());
 	}
 
 }

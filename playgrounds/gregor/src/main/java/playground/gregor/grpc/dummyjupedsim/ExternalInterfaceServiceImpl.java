@@ -21,19 +21,9 @@
 package playground.gregor.grpc.dummyjupedsim;
 
 import io.grpc.stub.StreamObserver;
-
 import org.apache.log4j.Logger;
 import org.matsim.hybrid.ExternInterfaceServiceGrpc.ExternInterfaceService;
-import org.matsim.hybrid.MATSimInterface.ExternAfterSim;
-import org.matsim.hybrid.MATSimInterface.ExternAfterSimConfirmed;
-import org.matsim.hybrid.MATSimInterface.ExternDoSimStep;
-import org.matsim.hybrid.MATSimInterface.ExternDoSimStepReceived;
-import org.matsim.hybrid.MATSimInterface.ExternOnPrepareSim;
-import org.matsim.hybrid.MATSimInterface.ExternOnPrepareSimConfirmed;
-import org.matsim.hybrid.MATSimInterface.MATSim2ExternHasSpace;
-import org.matsim.hybrid.MATSimInterface.MATSim2ExternHasSpaceConfirmed;
-import org.matsim.hybrid.MATSimInterface.MATSim2ExternPutAgent;
-import org.matsim.hybrid.MATSimInterface.MATSim2ExternPutAgentConfirmed;
+import org.matsim.hybrid.MATSimInterface.*;
 
 public class ExternalInterfaceServiceImpl implements ExternInterfaceService{
 
@@ -49,7 +39,7 @@ public class ExternalInterfaceServiceImpl implements ExternInterfaceService{
 			StreamObserver<MATSim2ExternHasSpaceConfirmed> responseObserver) {
 //		log.info("has space called for node" + request.getNodeId());
 		MATSim2ExternHasSpaceConfirmed resp = MATSim2ExternHasSpaceConfirmed.newBuilder().setHasSpace(true).build();
-		responseObserver.onValue(resp);
+		responseObserver.onNext(resp);
 		responseObserver.onCompleted();
 	}
 
@@ -58,7 +48,7 @@ public class ExternalInterfaceServiceImpl implements ExternInterfaceService{
 			StreamObserver<MATSim2ExternPutAgentConfirmed> responseObserver) {
 		this.sim.putAgent(request);
 		MATSim2ExternPutAgentConfirmed resp = MATSim2ExternPutAgentConfirmed.newBuilder().build();
-		responseObserver.onValue(resp);
+		responseObserver.onNext(resp);
 		responseObserver.onCompleted();
 		
 	}
@@ -68,7 +58,7 @@ public class ExternalInterfaceServiceImpl implements ExternInterfaceService{
 			StreamObserver<ExternDoSimStepReceived> responseObserver) {
 		this.sim.doSimstep(request);
 		ExternDoSimStepReceived resp = ExternDoSimStepReceived.newBuilder().build();
-		responseObserver.onValue(resp);
+		responseObserver.onNext(resp);
 		responseObserver.onCompleted();		
 	}
 
@@ -77,7 +67,7 @@ public class ExternalInterfaceServiceImpl implements ExternInterfaceService{
 			StreamObserver<ExternOnPrepareSimConfirmed> responseObserver) {
 		this.sim.onPrepareSim(request);
 		ExternOnPrepareSimConfirmed resp = ExternOnPrepareSimConfirmed.newBuilder().build();
-		responseObserver.onValue(resp);
+		responseObserver.onNext(resp);
 		responseObserver.onCompleted();		
 		
 	}
@@ -87,7 +77,7 @@ public class ExternalInterfaceServiceImpl implements ExternInterfaceService{
 			StreamObserver<ExternAfterSimConfirmed> responseObserver) {
 		this.sim.afterSim(request);
 		ExternAfterSimConfirmed resp = ExternAfterSimConfirmed.newBuilder().build();
-		responseObserver.onValue(resp);
+		responseObserver.onNext(resp);
 		responseObserver.onCompleted();		
 	}
 

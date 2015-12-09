@@ -163,7 +163,7 @@ public class ODCalibrator implements PersonDepartureEventHandler, PersonArrivalE
 			}
 			ProgressLogger.step();
 		}
-		ProgressLogger.termiante();
+		ProgressLogger.terminate();
 		
 		if(cnt > 0) {
 			logger.warn(String.format("%s facilities cannot be assigned to a virtual node.", cnt));
@@ -389,7 +389,7 @@ public class ODCalibrator implements PersonDepartureEventHandler, PersonArrivalE
 			ProgressLogger.step();
 		}
 		
-		ProgressLogger.termiante();
+		ProgressLogger.terminate();
 		
 		return m;
 	}
@@ -457,7 +457,7 @@ public class ODCalibrator implements PersonDepartureEventHandler, PersonArrivalE
 			}
 			ProgressLogger.step();
 		}
-		ProgressLogger.termiante();
+		ProgressLogger.terminate();
 		
 		logger.info("Determining simulation candidates...");
 		candidates = new LinkedHashSet<>();
@@ -482,7 +482,7 @@ public class ODCalibrator implements PersonDepartureEventHandler, PersonArrivalE
 			}
 			ProgressLogger.step();
 		}
-		ProgressLogger.termiante();
+		ProgressLogger.terminate();
 		
 		logger.info(String.format("Determined %s simulation candidates.", candidates.size()));
 	}

@@ -27,7 +27,7 @@ import playground.johannes.synpop.processing.EpisodeTask;
  */
 public class InfereWeCommuter implements EpisodeTask {
 
-    public static final String WECOMMUTER = "wecommuter";
+    public static final String WECOMMUTER = ActivityTypes.WECOMMUTER;
 
     private final double threshold;
 

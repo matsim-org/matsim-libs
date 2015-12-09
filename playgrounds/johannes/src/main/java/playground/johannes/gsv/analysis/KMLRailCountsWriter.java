@@ -22,8 +22,8 @@
  */
 package playground.johannes.gsv.analysis;
 
-import gnu.trove.TDoubleObjectHashMap;
-import gnu.trove.TObjectDoubleHashMap;
+import gnu.trove.map.hash.TDoubleObjectHashMap;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
 import net.opengis.kml._2.*;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;

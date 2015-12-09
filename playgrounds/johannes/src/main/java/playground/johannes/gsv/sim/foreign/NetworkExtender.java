@@ -86,7 +86,7 @@ public class NetworkExtender {
 			}
 			ProgressLogger.step();
 		}
-		ProgressLogger.termiante();
+		ProgressLogger.terminate();
 		return links;
 	}
 
@@ -295,7 +295,7 @@ public class NetworkExtender {
 			connectZone(p, nodes, scenario.getNetwork(), scenario.getActivityFacilities(), zone.getAttribute("NO"));
 			ProgressLogger.step();
 		}
-		ProgressLogger.termiante();
+		ProgressLogger.terminate();
 
 		logger.info("Writing network...");
 		NetworkWriter netWriter = new NetworkWriter(scenario.getNetwork());

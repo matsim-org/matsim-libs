@@ -21,9 +21,8 @@ package playground.johannes.gsv.zones.io;
 
 import playground.johannes.gsv.zones.KeyMatrix;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
+import java.util.Set;
 
 /**
  * @author johannes
@@ -66,5 +65,38 @@ public class VisumOMatrixReader {
 		reader.close();
 
 		return m;
+	}
+
+	public static void write(KeyMatrix m, String file) throws IOException {
+		BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+		writer.write("$O;D3");
+		writer.newLine();
+		writer.write("* Von  Bis");
+		writer.newLine();
+		writer.write("0.00 24.00");
+		writer.newLine();
+		writer.write("* Faktor");
+		writer.newLine();
+		writer.write("1.00");
+		writer.newLine();
+		writer.write("*");
+		writer.newLine();
+
+		Set<String> keys = m.keys();
+		for(String i : keys) {
+			for(String j : keys) {
+				Double vol = m.get(i, j);
+				if(vol != null) {
+					writer.write(i);
+					writer.write(" ");
+					writer.write(j);
+					writer.write(" ");
+					writer.write(String.valueOf(vol));
+					writer.newLine();
+				}
+			}
+		}
+
+		writer.close();
 	}
 }

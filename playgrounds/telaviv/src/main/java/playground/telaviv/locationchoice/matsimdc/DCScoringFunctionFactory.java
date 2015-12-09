@@ -108,7 +108,12 @@ public class DCScoringFunctionFactory implements ScoringFunctionFactory {
 		
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();		
 		CharyparNagelActivityScoring activityScoringFunction = new DCActivityScoringFunction(
-					(PlanImpl) person, 
+
+//					(PlanImpl) person,
+					person.getSelectedPlan(),
+					// I found "(PlanImpl) person".  This could never have worked.  But when making PlanImpl final, it does not even
+					// compile any more.  I am thus speculating that person.getSelectedPlan() was meant.  kai, nov'15
+					
 					this.dcContext.getFacilityPenalties(), 
 					dcContext,
 					this.facilityToZoneIndexMap,

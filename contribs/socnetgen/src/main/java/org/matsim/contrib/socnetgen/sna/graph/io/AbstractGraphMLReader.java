@@ -23,7 +23,20 @@
  */
 package org.matsim.contrib.socnetgen.sna.graph.io;
 
-import gnu.trove.TIntObjectHashMap;
+import gnu.trove.map.hash.TIntObjectHashMap;
+
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.zip.GZIPInputStream;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+
 import org.apache.log4j.Logger;
 import org.matsim.contrib.socnetgen.sna.graph.Edge;
 import org.matsim.contrib.socnetgen.sna.graph.Graph;
@@ -33,12 +46,6 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
-
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-import java.io.*;
-import java.util.zip.GZIPInputStream;
 
 /**
  * Abstract class providing basic parsing functionality for graphs stored in the

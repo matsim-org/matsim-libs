@@ -19,23 +19,22 @@
  * *********************************************************************** */
 package playground.thibautd.analysis.joinabletripsidentifier;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigGroup;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.charts.ChartUtil;
 import org.matsim.core.utils.collections.Tuple;
-
-import playground.thibautd.utils.MoreIOUtils;
+import playground.ivt.utils.MoreIOUtils;
 import playground.thibautd.utils.charts.ChartsAxisUnifier;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Executable class able to plot statistics about exported XML data

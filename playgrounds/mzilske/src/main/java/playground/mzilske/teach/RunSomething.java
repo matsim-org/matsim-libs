@@ -23,11 +23,13 @@
 package playground.mzilske.teach;
 
 
+import java.io.IOException;
+
 import tutorial.trafficsignals.VisSimpleTrafficSignalScenario;
 
 public class RunSomething {
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		VisSimpleTrafficSignalScenario.main(args);
 	}
 

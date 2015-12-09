@@ -130,7 +130,7 @@ public class ExternalEngine implements MobsimEngine, MATSimInterfaceService {
 		}
 
 		Extern2MATSimConfirmed resp = b.build();
-		responseObserver.onValue(resp);
+		responseObserver.onNext(resp);
 		responseObserver.onCompleted();
 	}
 
@@ -151,7 +151,7 @@ public class ExternalEngine implements MobsimEngine, MATSimInterfaceService {
 
 //		AgentsStuckConfirmed resp = AgentsStuckConfirmed.newBuilder().build();
 		AgentsStuckConfirmed resp = AgentsStuckConfirmed.getDefaultInstance();
-		responseObserver.onValue(resp);
+		responseObserver.onNext(resp);
 		responseObserver.onCompleted();
 	}
 
@@ -164,7 +164,7 @@ public class ExternalEngine implements MobsimEngine, MATSimInterfaceService {
 		log.info("client connected. openning backward channel to host:" + host + " at port:" + port);
 		this.client = new GRPCExternalClient(host,port);
 		ExternalConnectConfirmed resp = ExternalConnectConfirmed.getDefaultInstance();
-		responseObserver.onValue(resp);
+		responseObserver.onNext(resp);
 		responseObserver.onCompleted();
 		log.info("client up and running.");
 		try {
@@ -183,7 +183,7 @@ public class ExternalEngine implements MobsimEngine, MATSimInterfaceService {
 			e.printStackTrace();
 		}
 		ExternSimStepFinishedReceived resp = ExternSimStepFinishedReceived.getDefaultInstance();
-		responseObserver.onValue(resp);
+		responseObserver.onNext(resp);
 		responseObserver.onCompleted();
 	}
 
@@ -191,7 +191,7 @@ public class ExternalEngine implements MobsimEngine, MATSimInterfaceService {
 	public void reqMaximumNumberOfAgents(MaximumNumberOfAgents request,
 			StreamObserver<MaximumNumberOfAgentsConfirmed> responseObserver) {
 		MaximumNumberOfAgentsConfirmed resp = MaximumNumberOfAgentsConfirmed.newBuilder().setNumber(this.sim.getScenario().getPopulation().getPersons().size()).build();
-		responseObserver.onValue(resp);
+		responseObserver.onNext(resp);
 		responseObserver.onCompleted();
 
 	}
@@ -221,7 +221,7 @@ public class ExternalEngine implements MobsimEngine, MATSimInterfaceService {
 
 //		MATSim2ExternTrajectoriesReceived resp = MATSim2ExternTrajectoriesReceived.newBuilder().build();
 		MATSim2ExternTrajectoriesReceived resp = MATSim2ExternTrajectoriesReceived.getDefaultInstance();
-		responseObserver.onValue(resp);
+		responseObserver.onNext(resp);
 		responseObserver.onCompleted();
 	}
 

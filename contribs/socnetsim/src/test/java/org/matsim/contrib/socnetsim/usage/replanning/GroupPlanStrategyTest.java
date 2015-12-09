@@ -34,8 +34,9 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.contrib.socnetsim.framework.population.JointPlan;
 import org.matsim.contrib.socnetsim.framework.population.JointPlanFactory;
@@ -71,7 +72,7 @@ public class GroupPlanStrategyTest {
 		strategy.run( createContext() , jointPlans , Arrays.asList( group ) );
 		for ( Person person : group.getPersons() ) {
 			for ( Plan plan : person.getPlans() ) {
-				if ( plan.isSelected() ) {
+				if ( PersonUtils.isSelected(plan) ) {
 					// new plan: selection status inverted
 					assertFalse(
 							"old plan still selected",
@@ -119,10 +120,10 @@ public class GroupPlanStrategyTest {
 		int countSelectedIndiv = 0;
 		for ( Person person : group.getPersons() ) {
 			for (Plan plan : person.getPlans()) {
-				if (plan.isSelected() && jointPlans.getJointPlan( plan ) != null) {
+				if (PersonUtils.isSelected(plan) && jointPlans.getJointPlan( plan ) != null) {
 					countSelectedJoint++;
 				}
-				if (plan.isSelected() && jointPlans.getJointPlan( plan ) == null) {
+				if (PersonUtils.isSelected(plan) && jointPlans.getJointPlan( plan ) == null) {
 					countSelectedIndiv++;
 				}
 			}
@@ -153,10 +154,10 @@ public class GroupPlanStrategyTest {
 		int countNonSelectedIndiv = 0;
 		for ( Person person : group.getPersons() ) {
 			for (Plan plan : person.getPlans()) {
-				if (!plan.isSelected() && jointPlans.getJointPlan( plan ) != null) {
+				if (!PersonUtils.isSelected(plan) && jointPlans.getJointPlan( plan ) != null) {
 					countNonSelectedJoint++;
 				}
-				if (!plan.isSelected() && jointPlans.getJointPlan( plan ) == null) {
+				if (!PersonUtils.isSelected(plan) && jointPlans.getJointPlan( plan ) == null) {
 					countNonSelectedIndiv++;
 				}
 			}
@@ -204,11 +205,11 @@ public class GroupPlanStrategyTest {
 			final boolean joint,
 			final Map<Id<Person>, Plan> jointPlan) {
 		Id<Person> id = Id.createPersonId( count );
-		Person person = PersonImpl.createPerson(id);
+		Person person = PopulationUtils.createPerson(id);
 		PlanImpl plan = new PlanImpl( person );
 		person.addPlan( plan );
 		if (joint) jointPlan.put( id , plan );
-		if ( !plan.isSelected() ) throw new RuntimeException();
+		if ( !PersonUtils.isSelected(plan) ) throw new RuntimeException();
 
 		return person;
 	}

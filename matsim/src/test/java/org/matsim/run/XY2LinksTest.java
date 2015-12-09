@@ -61,7 +61,7 @@ public class XY2LinksTest extends MatsimTestCase {
 
 		// create one person with missing link in act
 		Population population = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation();
-		Person person = PersonImpl.createPerson(Id.create("1", Person.class));
+		Person person = PopulationUtils.createPerson(Id.create("1", Person.class));
 		population.addPerson(person);
 		PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 		ActivityImpl a1 = plan.createAndAddActivity("h", new Coord(50, 25));

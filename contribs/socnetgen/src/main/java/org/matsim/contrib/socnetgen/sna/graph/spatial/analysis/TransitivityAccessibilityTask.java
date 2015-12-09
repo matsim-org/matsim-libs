@@ -19,8 +19,12 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetgen.sna.graph.spatial.analysis;
 
-import gnu.trove.TDoubleDoubleHashMap;
-import gnu.trove.TObjectDoubleHashMap;
+import gnu.trove.map.hash.TDoubleDoubleHashMap;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
+
+import java.io.IOException;
+import java.util.Map;
+
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.common.stats.Discretizer;
 import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
@@ -30,9 +34,6 @@ import org.matsim.contrib.socnetgen.sna.graph.Vertex;
 import org.matsim.contrib.socnetgen.sna.graph.analysis.ModuleAnalyzerTask;
 import org.matsim.contrib.socnetgen.sna.graph.analysis.Transitivity;
 import org.matsim.contrib.socnetgen.sna.graph.analysis.VertexPropertyCorrelation;
-
-import java.io.IOException;
-import java.util.Map;
 
 /**
  * @author illenberger
@@ -58,7 +59,7 @@ public class TransitivityAccessibilityTask extends ModuleAnalyzerTask<Accessibil
 		
 		TObjectDoubleHashMap<Vertex> localClustering = Transitivity.getInstance().values(graph.getVertices());
 		
-		Discretizer discretizer = FixedSampleSizeDiscretizer.create(accessValues.getValues(), 1, 30);
+		Discretizer discretizer = FixedSampleSizeDiscretizer.create(accessValues.values(), 1, 30);
 		TDoubleDoubleHashMap correl = VertexPropertyCorrelation.mean(localClustering, accessValues,	discretizer);
 		
 		try {

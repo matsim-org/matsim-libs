@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetgen.sna.graph.social.analysis;
 
-import gnu.trove.TObjectDoubleHashMap;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
 
 import java.util.Collection;
 

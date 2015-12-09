@@ -19,8 +19,8 @@
 
 package playground.johannes.gsv.synPop.sim3;
 
-import gnu.trove.TObjectDoubleHashMap;
-import gnu.trove.TObjectDoubleIterator;
+import gnu.trove.iterator.TObjectDoubleIterator;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.common.util.ProgressLogger;
 import org.matsim.contrib.socnetgen.sna.gis.Zone;
@@ -142,7 +142,7 @@ public class InitHomeLocations implements PersonsTask {
 			logger.info(String.format("Assigend %s persons a random home.", cnt));
 		}
 
-		ProgressLogger.termiante();
+		ProgressLogger.terminate();
 	}
 
 }

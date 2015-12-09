@@ -30,8 +30,8 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.MainModeIdentifierImpl;
 import org.matsim.core.router.TripRouter;
@@ -103,7 +103,7 @@ public class InsertionRemovalIgnoranceBehaviorTest {
 
 		for (int i=0; i < 100; i++) {
 			Id driverId = Id.create( "driver"+i , Person.class );
-			Person person = PersonImpl.createPerson(driverId);
+			Person person = PopulationUtils.createPerson(driverId);
 			PlanImpl plan = new PlanImpl( person );
 			individualPlans.put( driverId , plan );
 			plan.createAndAddActivity( "first_act_d"+i , Id.create( "some_link" , Link.class ) ).setEndTime( 10 );
@@ -111,7 +111,7 @@ public class InsertionRemovalIgnoranceBehaviorTest {
 			plan.createAndAddActivity( "second_act_d"+i , Id.create( "nowhere" , Link.class ) );
 
 			Id passengerId = Id.create( "passenger"+i , Person.class );
-			person = PersonImpl.createPerson(passengerId);
+			person = PopulationUtils.createPerson(passengerId);
 			plan = new PlanImpl( person );
 			individualPlans.put( passengerId , plan );
 			plan.createAndAddActivity( "first_act_p"+i , Id.create( "earth" , Link.class ) ).setEndTime( 10 );
@@ -130,7 +130,7 @@ public class InsertionRemovalIgnoranceBehaviorTest {
 
 		for (int i=0; i < 100; i++) {
 			Id driverId = Id.create( "driver"+i , Person.class );
-			Person person = PersonImpl.createPerson(driverId);
+			Person person = PopulationUtils.createPerson(driverId);
 			PlanImpl plan = new PlanImpl( person );
 			individualPlans.put( driverId , plan );
 			plan.createAndAddActivity( "first_act_d"+i , Id.create( "some_link" , Link.class ) ).setEndTime( 10 );
@@ -142,7 +142,7 @@ public class InsertionRemovalIgnoranceBehaviorTest {
 			plan.createAndAddActivity( "second_act_d"+i , Id.create( "nowhere" , Link.class ) );
 
 			Id passengerId = Id.create( "passenger"+i , Person.class );
-			person = PersonImpl.createPerson(passengerId);
+			person = PopulationUtils.createPerson(passengerId);
 			plan = new PlanImpl( person );
 			individualPlans.put( passengerId , plan );
 			plan.createAndAddActivity( "first_act_p"+i , Id.create( "earth" , Link.class ) ).setEndTime( 10 );

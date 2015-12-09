@@ -9,7 +9,12 @@
   <artifactId>thibautd</artifactId>
   <name>thibautd</name>
   <dependencies>
-  	<dependency>
+	  <dependency>
+		  <groupId>org.matsim.contrib</groupId>
+		  <artifactId>accessibility</artifactId>
+		  <version>0.8.0-SNAPSHOT</version>
+	  </dependency>
+	  <dependency>
   		<groupId>playground</groupId>
   		<artifactId>ivtExt</artifactId>
   		<version>0.8.0-SNAPSHOT</version>

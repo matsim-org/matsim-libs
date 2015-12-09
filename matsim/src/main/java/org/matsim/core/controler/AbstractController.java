@@ -27,55 +27,13 @@ import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 
-import java.lang.Thread.UncaughtExceptionHandler;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 public abstract class AbstractController {
-	private static boolean dirtyShutdown = false ;
-	
-	private static class InterruptAndJoin extends Thread {
-        private final Thread controllerThread;
-        private AtomicBoolean unexpectedShutdown;
-
-        public InterruptAndJoin(Thread controllerThread, AtomicBoolean unexpectedShutdown) {
-            this.controllerThread = controllerThread;
-            this.unexpectedShutdown = unexpectedShutdown;
-        }
-
-        @Override
-        public void run() {
-            log.error("received unexpected shutdown request.");
-            unexpectedShutdown.set(true);
-            log.info("sending interrupt request to controllerThread");
-            controllerThread.interrupt();
-            
-            if (!dirtyShutdown) {
-                // for me, the following code just makes the shutdown hang indefinitely (on mac, tested mostly with otfvis).
-            	// Therefore, now providing a switch.  kai, mar'15
-            	try {
-            		// Wait until it has shut down.
-            		log.info("waiting for controllerThread to terminate") ;
-            		controllerThread.join();
-            		log.info("controllerThread terminated") ;
-            	} catch (InterruptedException e) {
-            		throw new RuntimeException(e);
-            	}
-            	// The JVM will exit when this method returns.
-            }
-        }
-    }
-
-    class UnexpectedShutdownException extends Exception {
-    }
 
     private static Logger log = Logger.getLogger(AbstractController.class);
 
     private OutputDirectoryHierarchy controlerIO;
 
-    /**
-     * This was  public in the design that I found. kai, jul'12
-     */
-    public final IterationStopWatch stopwatch = new IterationStopWatch();
+    private final IterationStopWatch stopwatch;
 
     /*
      * Strings used to identify the operations in the IterationStopWatch.
@@ -87,20 +45,22 @@ public abstract class AbstractController {
      */
     ControlerListenerManager controlerListenerManager;
 
-    // for tests
-    protected volatile Throwable uncaughtException;
-
-    private AtomicBoolean unexpectedShutdown = new AtomicBoolean(false);
 
     private Integer thisIteration = null;
 
+    private boolean dirtyShutdown = false;
 
     protected AbstractController() {
+        this(new IterationStopWatch());
+    }
+
+    AbstractController(IterationStopWatch stopWatch) {
         OutputDirectoryLogging.catchLogEntries();
         Gbl.printSystemInfo();
         Gbl.printBuildInfo();
         log.info("Used Controler-Class: " + this.getClass().getCanonicalName());
         this.controlerListenerManager = new ControlerListenerManager();
+        this.stopwatch = stopWatch;
     }
 
 
@@ -118,63 +78,29 @@ public abstract class AbstractController {
         OutputDirectoryLogging.initLogging(this.getControlerIO()); // logging needs to be early
     }
 
-    protected final void run(Config config) {
-        UncaughtExceptionHandler previousDefaultUncaughtExceptionHandler = Thread.getDefaultUncaughtExceptionHandler();
-        final Thread controllerThread = Thread.currentThread();
-        Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionHandler() {
-            @Override
-            public void uncaughtException(Thread t, Throwable e) {
-                // We want to shut down when any Thread dies with an Exception.
-                logMemorizeAndRequestShutdown(t, e);
-                controllerThread.interrupt();
-            }
-        });
-        Thread shutdownHook = new InterruptAndJoin(controllerThread, unexpectedShutdown);
-        Runtime.getRuntime().addShutdownHook(shutdownHook);
-        try {
-            loadCoreListeners();
-            this.controlerListenerManager.fireControlerStartupEvent();
-            ControlerUtils.checkConfigConsistencyAndWriteToLog(config, "config dump before iterations start");
-            prepareForSim();
-            doIterations(config);
-        } catch (UnexpectedShutdownException e) {
-            // Doesn't matter. Just shut down.
-        } catch (Throwable e) {
-            // Don't let it fall through to the UncaughtExceptionHandler. We want to first log the Exception,
-            // then shut down.
-            logMemorizeAndRequestShutdown(Thread.currentThread(), e);
-        } finally {
-            try {
-                Runtime.getRuntime().removeShutdownHook(shutdownHook);
-            } catch (IllegalStateException e) {
-                // Doesn't matter. Only means that we are already shutting down.
-                // But if we are not, this is neccessary because otherwise the
-                // shutdown hook will try to interrupt and join this thread later where
-                // it may already be used for something else.
-                // I still think all this JVM-stuff should go somewhere outside,
-                // where it is only used when e.g. run from the command line,
-                // and not e.g. from tests or scripts, where multiple
-                // instances of Controler can be run.
-            }
-            shutdown();
-            Thread.setDefaultUncaughtExceptionHandler(previousDefaultUncaughtExceptionHandler);
-            // Propagate Exception in case Controler.run is called by someone who wants to catch
-            // it. It is probably not strictly correct to wrap the exception here.
-            // But otherwise, this method would have to declare "throws Throwable".
-            // In theory, a run method for test cases would probably need to
-            // be different from the run method of the "MATSim platform" which
-            // takes control of the JVM by installing hooks and exception
-            // handlers.
-            if (uncaughtException != null) {
-                throw new RuntimeException(uncaughtException);
-            }
-        }
+    final void setupOutputDirectory(OutputDirectoryHierarchy controlerIO) {
+        this.controlerIO = controlerIO;
+        OutputDirectoryLogging.initLogging(this.getControlerIO()); // logging needs to be early
     }
 
-    private void logMemorizeAndRequestShutdown(Thread t, Throwable e) {
-        log.error("Getting uncaught Exception in Thread " + t.getName(), e);
-        uncaughtException = e;
-        unexpectedShutdown.set(true);
+    protected final void run(final Config config) {
+        MatsimRuntimeModifications.MyRunnable runnable = new MatsimRuntimeModifications.MyRunnable() {
+            @Override
+            public void run() throws MatsimRuntimeModifications.UnexpectedShutdownException {
+                loadCoreListeners();
+                controlerListenerManager.fireControlerStartupEvent();
+                ControlerUtils.checkConfigConsistencyAndWriteToLog(config, "config dump before iterations start");
+                prepareForSim();
+                doIterations(config);
+            }
+
+            @Override
+            public void shutdown(boolean unexpected) {
+                controlerListenerManager.fireControlerShutdownEvent(unexpected);
+            }
+        };
+        MatsimRuntimeModifications.run(runnable, dirtyShutdown);
+        OutputDirectoryLogging.closeOutputDirLogging();
     }
 
     protected abstract void loadCoreListeners();
@@ -193,49 +119,19 @@ public abstract class AbstractController {
      */
     protected abstract boolean continueIterations(int iteration);
 
-    private void doIterations(Config config) throws UnexpectedShutdownException {
+    private void doIterations(Config config) throws MatsimRuntimeModifications.UnexpectedShutdownException {
         for (int iteration = config.controler().getFirstIteration(); continueIterations(iteration); iteration++) {
             iteration(config, iteration);
         }
     }
 
-    private void shutdown() {
-        log.info("S H U T D O W N   ---   start shutdown.");
-        if (this.unexpectedShutdown.get()) {
-        	log.error("ERROR --- This is an unexpected shutdown!");
-        }
-        if (this.uncaughtException != null) {
-        	log.error("Shutdown possibly caused by the following Exception:", this.uncaughtException);
-        }
-        try {
-            this.controlerListenerManager.fireControlerShutdownEvent(unexpectedShutdown.get());
-        } catch (Exception e) {
-            unexpectedShutdown.set(true);
-            log.error("Exception during shutdown:", e);
-            if (this.uncaughtException == null) {
-                // If there has been a previous exception, it is likely more important
-                // than this new one. This new one may just be a consequence of the
-                // previous one.
-                this.uncaughtException = e;
-            }
-        }
-        if (this.unexpectedShutdown.get()) {
-            log.error("ERROR --- MATSim unexpectedly terminated. Please check the output or the logfile with warnings and errors for hints.");
-            log.error("ERROR --- results should not be used for further analysis.");
-        }
-        log.info("S H U T D O W N   ---   shutdown completed.");
-        if (this.unexpectedShutdown.get()) {
-        	log.error("ERROR --- This was an unexpected shutdown! See the log file for a possible reason.");
-        }
-        OutputDirectoryLogging.closeOutputDirLogging();
-    }
 
     final String DIVIDER = "###################################################";
     final String MARKER = "### ";
 
-    private void iteration(final Config config, final int iteration) throws UnexpectedShutdownException {
+    private void iteration(final Config config, final int iteration) throws MatsimRuntimeModifications.UnexpectedShutdownException {
         this.thisIteration = iteration;
-        this.stopwatch.beginIteration(iteration);
+        this.getStopwatch().beginIteration(iteration);
 
         log.info(DIVIDER);
         log.info(MARKER + "ITERATION " + iteration + " BEGINS");
@@ -276,16 +172,16 @@ public abstract class AbstractController {
             }
         });
 
-        this.stopwatch.endIteration();
-        this.stopwatch.writeTextFile(this.getControlerIO().getOutputFilename("stopwatch"));
+        this.getStopwatch().endIteration();
+        this.getStopwatch().writeTextFile(this.getControlerIO().getOutputFilename("stopwatch"));
         if (config.controler().isCreateGraphs()) {
-            this.stopwatch.writeGraphFile(this.getControlerIO().getOutputFilename("stopwatch"));
+            this.getStopwatch().writeGraphFile(this.getControlerIO().getOutputFilename("stopwatch"));
         }
         log.info(MARKER + "ITERATION " + iteration + " ENDS");
         log.info(DIVIDER);
     }
 
-    private void mobsim(final Config config, final int iteration) throws UnexpectedShutdownException {
+    private void mobsim(final Config config, final int iteration) throws MatsimRuntimeModifications.UnexpectedShutdownException {
         // ControlerListeners may create managed resources in
         // beforeMobsim which need to be cleaned up in afterMobsim.
         // Hence the finally block.
@@ -333,12 +229,12 @@ public abstract class AbstractController {
         }
     }
 
-    private void iterationStep(String iterationStepName, Runnable iterationStep) throws UnexpectedShutdownException {
-        this.stopwatch.beginOperation(iterationStepName);
+    private void iterationStep(String iterationStepName, Runnable iterationStep) throws MatsimRuntimeModifications.UnexpectedShutdownException {
+        this.getStopwatch().beginOperation(iterationStepName);
         iterationStep.run();
-        this.stopwatch.endOperation(iterationStepName);
+        this.getStopwatch().endOperation(iterationStepName);
         if (Thread.interrupted()) {
-            throw new UnexpectedShutdownException();
+            throw new MatsimRuntimeModifications.UnexpectedShutdownException();
         }
     }
 
@@ -366,11 +262,12 @@ public abstract class AbstractController {
 		return this.thisIteration;
 	}
 
+    public IterationStopWatch getStopwatch() {
+        return stopwatch;
+    }
 
-	@SuppressWarnings("static-method")
-	public final void setDirtyShutdown(boolean dirtyShutdown) {
-		AbstractController.dirtyShutdown = dirtyShutdown;
+    public void setDirtyShutdown(boolean dirtyShutdown) {
+		this.dirtyShutdown = dirtyShutdown;
 	}
-
 
 }

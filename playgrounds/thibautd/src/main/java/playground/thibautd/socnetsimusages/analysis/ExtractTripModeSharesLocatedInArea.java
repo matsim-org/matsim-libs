@@ -23,7 +23,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
-
 import playground.ivt.utils.AcceptAllFilter;
 import playground.ivt.utils.ArgParser;
 import playground.ivt.utils.ArgParser.Args;

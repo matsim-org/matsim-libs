@@ -22,7 +22,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.contrib.otfvis.OTFVisModule;
+import org.matsim.contrib.otfvis.OTFVisFileWriterModule;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -80,7 +80,7 @@ class PricingControler {
 		controler.getConfig().controler().setOverwriteFileSetting(
 				OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		controler.setDumpDataAtEnd(true);
-		controler.addOverridingModule(new OTFVisModule());
+		controler.addOverridingModule(new OTFVisFileWriterModule());
 		
 		TollHandler tollHandler = new TollHandler(sc);
 		final TollDisutilityCalculatorFactory fact = new TollDisutilityCalculatorFactory(tollHandler);

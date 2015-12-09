@@ -20,7 +20,7 @@
 package playground.johannes.gsv.fpd;
 
 import com.vividsolutions.jts.geom.Point;
-import gnu.trove.TDoubleDoubleHashMap;
+import gnu.trove.map.hash.TDoubleDoubleHashMap;
 import org.matsim.contrib.common.gis.CartesianDistanceCalculator;
 import org.matsim.contrib.common.gis.DistanceCalculator;
 import org.matsim.contrib.common.stats.*;
@@ -52,7 +52,7 @@ public class Compare {
 		reader.setValidating(false);
 
 //		reader.parse("/home/johannes/gsv/fpd/fraunhofer/study/data/matrix/24-04-2015/iais.3d.xml");
-		reader.parse("/home/johannes/gsv/fpd/telefonica/matrix/avr.xml");
+		reader.parse("/home/johannes/gsv/fpd/telefonica/matrixv2/avr.xml");
 		KeyMatrix iais = reader.getMatrix();
 
 		reader.parse("/home/johannes/gsv/miv-matrix/refmatrices/tomtom.xml");
@@ -77,14 +77,16 @@ public class Compare {
 //		c = ODUtils.calcNormalization(iais, sim);
 //		playground.johannes.gsv.zones.MatrixOperations.applyFactor(sim, 1/c);
 
-		BufferedWriter writer = new BufferedWriter(new FileWriter("/home/johannes/gsv/fpd/telefonica/analysis/compare.txt"));
+		BufferedWriter writer = new BufferedWriter(new FileWriter
+				("/home/johannes/gsv/fpd/telefonica/analysisv2/compare.txt"));
 		writer.write("from\tto\tvolIais\tvolTomTom");
 		writer.newLine();
 
 //		TDoubleArrayList iaisVols = new TDoubleArrayList();
 //		TDoubleArrayList tomtomVols = new TDoubleArrayList();
 
-		BufferedWriter scatterWriter = new BufferedWriter(new FileWriter("/home/johannes/gsv/fpd/telefonica/analysis/scatter.txt"));
+		BufferedWriter scatterWriter = new BufferedWriter(new FileWriter
+				("/home/johannes/gsv/fpd/telefonica/analysisv2/scatter.txt"));
 		scatterWriter.write("iais\ttomtom\tmodel\tsim");
 		scatterWriter.newLine();
 
@@ -129,13 +131,13 @@ public class Compare {
 
 		ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON("/home/johannes/gsv/gis/nuts/ger/geojson/de.nuts3.gk3.geojson", "gsvId");
 		TDoubleDoubleHashMap hist = calcDistDistribution(zones, iais, iais);
-		StatsWriter.writeHistogram(hist, "d", "p", "/home/johannes/gsv/fpd/telefonica/analysis/fpd.dist.txt");
+		StatsWriter.writeHistogram(hist, "d", "p", "/home/johannes/gsv/fpd/telefonica/analysisv2/fpd.dist.txt");
 
 		hist = calcDistDistribution(zones, model, iais);
-		StatsWriter.writeHistogram(hist, "d", "p", "/home/johannes/gsv/fpd/telefonica/analysis/model.dist.txt");
+		StatsWriter.writeHistogram(hist, "d", "p", "/home/johannes/gsv/fpd/telefonica/analysisv2/model.dist.txt");
 
 		hist = calcDistDistribution(zones, sim, iais);
-		StatsWriter.writeHistogram(hist, "d", "p", "/home/johannes/gsv/fpd/telefonica/analysis/sim.dist.txt");
+		StatsWriter.writeHistogram(hist, "d", "p", "/home/johannes/gsv/fpd/telefonica/analysisv2/sim.dist.txt");
 	}
 
 	private static TDoubleDoubleHashMap calcDistDistribution(ZoneCollection zones, KeyMatrix m, KeyMatrix relations) {

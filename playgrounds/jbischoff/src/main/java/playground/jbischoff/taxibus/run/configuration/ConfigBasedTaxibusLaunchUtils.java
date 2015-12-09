@@ -26,9 +26,9 @@ import org.matsim.contrib.dvrp.run.VrpLauncherUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 
-import playground.jbischoff.taxibus.sim.TaxibusQSimProvider;
-import playground.jbischoff.taxibus.sim.TaxibusServiceRoutingModule;
-import playground.jbischoff.taxibus.sim.TaxibusTripRouterFactory;
+import playground.jbischoff.taxibus.run.sim.TaxibusQSimProvider;
+import playground.jbischoff.taxibus.run.sim.TaxibusServiceRoutingModule;
+import playground.jbischoff.taxibus.run.sim.TaxibusTripRouterFactory;
 
 /**
  * @author jbischoff
@@ -51,9 +51,9 @@ public class ConfigBasedTaxibusLaunchUtils {
       	context = new MatsimVrpContextImpl();
 		context.setScenario(controler.getScenario());
 		VrpData vrpData = VrpLauncherUtils.initVrpData(context, tbcg.getVehiclesFile());
+		
 		context.setVrpData(vrpData);	 
-    
-       
+           
 		controler.addOverridingModule(new AbstractModule(){
 
 			@Override

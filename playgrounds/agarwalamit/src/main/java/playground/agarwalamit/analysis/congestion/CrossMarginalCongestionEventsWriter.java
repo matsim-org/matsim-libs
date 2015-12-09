@@ -74,6 +74,7 @@ public class CrossMarginalCongestionEventsWriter {
 		default : throw new RuntimeException(congestionImpl+ "is not supported. Available implementations are implV3, implV4, implV6. Aborting ...");
 		}
 		manager.addHandler(eh);
+//		ZZ_TODO : this is stupid, it will write multiple congestion and money events. See EventsFilterAndWriter.java
 		EventWriterXML writer = new EventWriterXML(outputEventsFile);
 		manager.addHandler(writer);
 		

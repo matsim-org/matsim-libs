@@ -19,8 +19,8 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetgen.sna.graph.generators;
 
-import gnu.trove.TObjectIntHashMap;
-import gnu.trove.TObjectIntIterator;
+import gnu.trove.iterator.TObjectIntIterator;
+import gnu.trove.map.hash.TObjectIntHashMap;
 import org.apache.commons.math.FunctionEvaluationException;
 import org.apache.commons.math.analysis.UnivariateRealFunction;
 import org.apache.log4j.Logger;
@@ -155,7 +155,7 @@ public class RandomGraphGenerator<G extends Graph, V extends Vertex, E extends E
                         }
 
                         if (connected) {
-                            ProgressLogger.termiante();
+                            ProgressLogger.terminate();
                             logger.warn(String.format("Degree distribution not exact. %1$s vertices still pending.", pending.size()));
                             invalidGraphs++;
                             return graph;
@@ -166,7 +166,7 @@ public class RandomGraphGenerator<G extends Graph, V extends Vertex, E extends E
         }
 
         if (!pending.isEmpty()) {
-            ProgressLogger.termiante();
+            ProgressLogger.terminate();
             logger.warn(String.format("Degree distribution not exact. %1$s vertices still pending.", pending.size()));
             invalidGraphs++;
         }

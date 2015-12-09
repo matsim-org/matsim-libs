@@ -1,8 +1,5 @@
 package playground.wrashid.ABMT.vehicleShare;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.scoring.SumScoringFunction.BasicScoring;

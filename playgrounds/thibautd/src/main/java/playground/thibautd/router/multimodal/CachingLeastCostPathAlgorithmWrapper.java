@@ -19,10 +19,7 @@
  * *********************************************************************** */
 package playground.thibautd.router.multimodal;
 
-import java.util.concurrent.atomic.AtomicLong;
-
 import org.apache.log4j.Logger;
-
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
@@ -31,8 +28,9 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
+import playground.ivt.utils.SoftCache;
 
-import playground.thibautd.utils.SoftCache;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Wraps a least cost path algo, caching result for further use.

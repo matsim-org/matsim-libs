@@ -19,7 +19,7 @@
 
 package playground.johannes.gsv.matrices;
 
-import gnu.trove.TObjectDoubleHashMap;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
 import org.matsim.matrices.Matrix;
 
 import java.util.ArrayList;

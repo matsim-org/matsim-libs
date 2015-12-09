@@ -42,10 +42,10 @@ import playground.boescpa.converters.osm.ptMapping.PseudoNetworkCreator;
 import playground.boescpa.converters.osm.scheduleCreator.PTScheduleCreatorDefaultV2;
 import playground.boescpa.converters.osm.tools.TransitRouterNetworkThinner;
 import playground.boescpa.converters.osm.tools.TransitRouterNetworkWriter;
-import playground.boescpa.lib.tools.cutter.ScheduleCutter;
-import playground.boescpa.lib.tools.merger.NetworkMerger;
-import playground.boescpa.lib.tools.merger.ScheduleMerger;
-import playground.boescpa.lib.tools.merger.VehicleMerger;
+import playground.boescpa.lib.tools.spatialCutting.ScheduleCutter;
+import playground.boescpa.lib.tools.fileMerging.NetworkMerger;
+import playground.boescpa.lib.tools.fileMerging.ScheduleMerger;
+import playground.boescpa.lib.tools.fileMerging.VehicleMerger;
 
 /**
  * New main to create multimodal MATSim environment from OSM and HAFAS.
@@ -124,7 +124,7 @@ public class OSM2MixedV2 {
 		new VehicleWriterV1(mixedVehicles).writeFile(outbase + "MixedVehicles.xml.gz");
 
 		// **************** Cut Schedule ****************
-		new ScheduleCutter(mixedSchedule, cutCenter, cutRadius).cutSchedule();
+		new ScheduleCutter(mixedSchedule, null, cutCenter, cutRadius).cutSchedule();
 
 		// **************** Route Schedule ****************
 		new NetworkReaderMatsimV1(mixedScenario).parse(networkPath);
@@ -159,7 +159,7 @@ public class OSM2MixedV2 {
 		new VehicleWriterV1(onlyPTVehicles).writeFile(outbase + "OnlyPTVehicles.xml.gz");
 
 		// **************** Cut Schedule ****************
-		new ScheduleCutter(onlyPTSchedule, cutCenter, cutRadius).cutSchedule();
+		new ScheduleCutter(onlyPTSchedule, null, cutCenter, cutRadius).cutSchedule();
 
 		// **************** Route Schedule ****************
 		final Network onlyPTNetwork = onlyPTScenario.getNetwork();

@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package playground.johannes.studies.coopsim;
 
-import gnu.trove.TObjectDoubleHashMap;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
 import org.apache.commons.math.stat.StatUtils;
 import org.matsim.contrib.common.gis.CartesianDistanceCalculator;
 import org.matsim.contrib.socnetgen.sna.gis.GravityCostFunction;
@@ -54,11 +54,11 @@ public class AgePopDistributer {
 		Age age = new Age();
 		TObjectDoubleHashMap<Vertex> ageVals = age.values(graph.getVertices());
 		
-		double[] accessArray = accessVals.getValues();
+		double[] accessArray = accessVals.values();
 		double minAccess = StatUtils.min(accessArray);
 		double maxAccess = StatUtils.max(accessArray);
 		
-		double[] ageArray = ageVals.getValues();
+		double[] ageArray = ageVals.values();
 		double minAge = StatUtils.min(ageArray);
 		double maxAge = StatUtils.max(ageArray);
 		

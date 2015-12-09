@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.population.PlanImpl;
 
+import playground.agarwalamit.utils.MapUtils;
 import playground.benjamin.utils.BkNumberUtils;
 
 /**
@@ -44,7 +45,7 @@ public class ModalShareGenerator {
 	private final Logger logger = Logger.getLogger(ModalShareGenerator.class);
 	
 	public void getModalShareFromEvents(){
-		// TODO [AA] should get modal share from events as well.
+		// ZZ_TODO should get modal share from events as well.
 		throw new RuntimeException("Not implemented yet.");
 	}
 	
@@ -55,7 +56,7 @@ public class ModalShareGenerator {
 
 		this.logger.info("=====The following transport modes are used: " + usedModes+".=====");
 		Map<String, Integer> mode2NoOfLegs = getMode2NoOfLegs(population);
-		int totalNoOfLegs = getTotalNoOfLegs(mode2NoOfLegs);
+		int totalNoOfLegs = MapUtils.intSum(mode2NoOfLegs);
 		
 		for(String mode : mode2NoOfLegs.keySet()){
 			double noOfLegs = (double) mode2NoOfLegs.get(mode);
@@ -63,15 +64,6 @@ public class ModalShareGenerator {
 			mode2PctShare.put(mode, noOfLegPct);
 		}
 		return mode2PctShare;
-	}
-	
-	private int getTotalNoOfLegs(Map<String, Integer> mode2NoOfLegs) {
-		int totalNoOfLegs = 0;
-		for(String mode : mode2NoOfLegs.keySet()){
-			int noOfLegs = mode2NoOfLegs.get(mode);
-			totalNoOfLegs += noOfLegs;
-		}
-		return totalNoOfLegs;
 	}
 
 	public SortedMap<String, Integer> getMode2NoOfLegs(Population pop) {

@@ -36,6 +36,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.config.groups.QSimConfigGroup.VehiclesSource;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -132,7 +133,7 @@ public class PassingTest {
 
 		SimpleNetwork net = new SimpleNetwork();
 
-		net.scenario.getConfig().qsim().setUseDefaultVehicles(false);
+		net.scenario.getConfig().qsim().setVehiclesSource(VehiclesSource.fromVehiclesData);
 
 		Map<String, VehicleType> mode2VehType = getVehicleTypeInfo();
 

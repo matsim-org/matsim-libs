@@ -19,6 +19,11 @@
  * *********************************************************************** */
 package playground.thibautd.initialdemandgeneration.socnetgen.framework;
 
+import org.junit.Assert;
+import org.junit.Test;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -29,11 +34,6 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.TreeSet;
-
-import org.junit.Assert;
-import org.junit.Test;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Person;
 
 /**
  * @author thibautd

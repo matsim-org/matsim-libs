@@ -19,16 +19,8 @@
  * *********************************************************************** */
 package playground.ivt.utils;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.TreeSet;
-
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.xy.DefaultTableXYDataset;
@@ -50,8 +42,15 @@ import org.matsim.core.utils.charts.ChartUtil;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 /**
  * @author thibautd

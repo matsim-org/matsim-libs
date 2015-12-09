@@ -54,9 +54,9 @@ public class IKNetworkPopulationWriter {
 
 	private Scenario scenario;
 	
-	private final String networkFile = "/Users/ihab/Documents/vsp/@Projects/Manteuffelstrasse/input/bvg.run190.25pct.dilution001.network20150727.v2.static/bvg.run190.25pct.dilution001.network20150727.v2.static.output_network.xml";
+	private final String networkFile = "../../../runs-svn/berlin-1pct/output_network.xml.gz";
 	private final String populationFile = null;
-	private final String outputPath = "/Users/ihab/Desktop/outputShapeFiles/";
+	private final String outputPath = "../../../runs-svn/berlin-1pct/gis/";
 
 //	private final String networkFile = "../../shared-svn/studies/ihab/noiseTestScenario/output/output_network.xml.gz";
 //	private final String populationFile = "../../shared-svn/studies/ihab/noiseTestScenario/output/output_plans.xml.gz";

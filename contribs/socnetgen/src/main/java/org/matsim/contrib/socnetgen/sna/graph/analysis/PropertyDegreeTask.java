@@ -19,14 +19,15 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetgen.sna.graph.analysis;
 
-import gnu.trove.TDoubleDoubleHashMap;
-import gnu.trove.TDoubleObjectHashMap;
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.matsim.contrib.common.stats.StatsWriter;
-import org.matsim.contrib.socnetgen.sna.graph.Graph;
+import gnu.trove.map.hash.TDoubleDoubleHashMap;
+import gnu.trove.map.hash.TDoubleObjectHashMap;
 
 import java.io.IOException;
 import java.util.Map;
+
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.matsim.contrib.common.stats.StatsWriter;
+import org.matsim.contrib.socnetgen.sna.graph.Graph;
 
 
 /**

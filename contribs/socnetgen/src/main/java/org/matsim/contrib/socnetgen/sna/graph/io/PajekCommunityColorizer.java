@@ -19,11 +19,12 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetgen.sna.graph.io;
 
-import gnu.trove.TObjectDoubleHashMap;
-import org.matsim.contrib.socnetgen.sna.graph.Edge;
-import org.matsim.contrib.socnetgen.sna.graph.Vertex;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
 
 import java.util.Set;
+
+import org.matsim.contrib.socnetgen.sna.graph.Edge;
+import org.matsim.contrib.socnetgen.sna.graph.Vertex;
 
 
 /**

@@ -24,9 +24,9 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 
 /**
  * Test for {@link RandomPlanSelector}.
@@ -46,7 +46,7 @@ public class RandomPlanSelectorTest extends AbstractPlanSelectorTest {
 	 * Test that each of a person's plans is randomly selected.
 	 */
 	public void testRandom() {
-		Person person = PersonImpl.createPerson(Id.create(1, Person.class));
+		Person person = PopulationUtils.createPerson(Id.create(1, Person.class));
 		PlanImpl plan1 = PersonUtils.createAndAddPlan(person, false);
 		PlanImpl plan2 = PersonUtils.createAndAddPlan(person, false);
 		plan2.setScore(10.0);

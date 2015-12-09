@@ -19,15 +19,8 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetgen.sna.snowball.analysis;
 
-import gnu.trove.TDoubleDoubleHashMap;
-import gnu.trove.TDoubleDoubleIterator;
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.matsim.contrib.common.stats.Discretizer;
-import org.matsim.contrib.common.stats.Histogram;
-import org.matsim.contrib.common.stats.LinearDiscretizer;
-import org.matsim.contrib.socnetgen.sna.snowball.SampledVertexDecorator;
-import org.matsim.contrib.socnetgen.sna.snowball.sim.Sampler;
-import org.matsim.contrib.socnetgen.sna.snowball.sim.SamplerListener;
+import gnu.trove.iterator.TDoubleDoubleIterator;
+import gnu.trove.map.hash.TDoubleDoubleHashMap;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -35,6 +28,14 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Map.Entry;
 import java.util.TreeMap;
+
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.matsim.contrib.common.stats.Discretizer;
+import org.matsim.contrib.common.stats.Histogram;
+import org.matsim.contrib.common.stats.LinearDiscretizer;
+import org.matsim.contrib.socnetgen.sna.snowball.SampledVertexDecorator;
+import org.matsim.contrib.socnetgen.sna.snowball.sim.Sampler;
+import org.matsim.contrib.socnetgen.sna.snowball.sim.SamplerListener;
 
 /**
  * @author illenberger

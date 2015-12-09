@@ -20,6 +20,9 @@
 
 package playground.wrashid.parkingSearch.withinday;
 
+import java.util.HashMap;
+import java.util.HashSet;
+
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.matsim.api.core.v01.Coord;
@@ -41,6 +44,7 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
@@ -60,61 +64,59 @@ import org.matsim.facilities.ActivityFacilitiesFactory;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.population.algorithms.PersonPrepareForSim;
 import org.matsim.testcases.MatsimTestCase;
+
 import playground.wrashid.parkingSearch.withindayFW.core.InsertParkingActivities;
 import playground.wrashid.parkingSearch.withindayFW.core.ParkingInfrastructure;
 import playground.wrashid.parkingSearch.withindayFW.core.mobsim.ParkingPopulationAgentSource;
 import playground.wrashid.parkingSearch.withindayFW.impl.ParkingCostCalculatorFW;
 
-import java.util.HashMap;
-import java.util.HashSet;
-
 public class InsertParkingActivitiesTest extends MatsimTestCase {
 
 	private static final Logger log = Logger.getLogger(InsertParkingActivitiesTest.class);
-	
+
 	public void testInsertParkingActivities() {
 		Config config = super.loadConfig(null);
 		Scenario sc = ScenarioUtils.createScenario(config);
 		createNetwork(sc);
 		createFacilities(sc);
-		
+
 		PopulationFactory factory = sc.getPopulation().getFactory();
-		
+
 		Person person = factory.createPerson(Id.create("1", Person.class));
 		sc.getPopulation().addPerson(person);
 		Plan plan = factory.createPlan();
 		person.addPlan(plan);
-		
+
 		ActivityImpl activity;
-		
+
 		activity = (ActivityImpl) factory.createActivityFromLinkId("home", Id.create("l2", Link.class));
 		activity.setFacilityId(Id.create("f2", ActivityFacility.class));
 		plan.addActivity(activity);
-		
+
 		plan.addLeg(factory.createLeg(TransportMode.car));
-		
+
 		activity = (ActivityImpl) factory.createActivityFromLinkId("work", Id.create("l4", Link.class));
 		activity.setFacilityId(Id.create("f4", ActivityFacility.class));
 		plan.addActivity(activity);
-		
+
 		plan.addLeg(factory.createLeg(TransportMode.car));
-		
+
 		activity = (ActivityImpl) factory.createActivityFromLinkId("home", Id.create("l2", Link.class));
 		activity.setFacilityId(Id.create("f2", ActivityFacility.class));
 		plan.addActivity(activity);
-		
+
 		plan.addLeg(factory.createLeg(TransportMode.walk));
-		
+
 		activity = (ActivityImpl) factory.createActivityFromLinkId("shopping", Id.create("l5", Link.class));
 		activity.setFacilityId(Id.create("f5", ActivityFacility.class));
 		plan.addActivity(activity);
-		
+
 		plan.addLeg(factory.createLeg(TransportMode.pt));
-		
+
 		activity = (ActivityImpl) factory.createActivityFromLinkId("home", Id.create("l2", Link.class));
 		activity.setFacilityId(Id.create("f2", ActivityFacility.class));
 		plan.addActivity(activity);
-		
+
 		/*
 		 * Set activity durations and coordinates
 		 */
@@ -125,23 +127,21 @@ public class InsertParkingActivitiesTest extends MatsimTestCase {
 				activity.setCoord(sc.getNetwork().getLinks().get(activity.getLinkId()).getCoord());
 			}
 		}
-				
+
 		assertEquals(9, plan.getPlanElements().size());
 
-		TravelTime travelTime = TravelTimeCalculator.create(sc.getNetwork(), sc.getConfig().travelTimeCalculator()).getLinkTravelTimes() ;
-		
 		TripRouter tripRouter = TripRouterFactoryBuilderWithDefaults.createTripRouterProvider(sc, new DijkstraFactory(), null).get();
-		
+
 		// initialize routes
 		new PersonPrepareForSim(new PlanRouter(tripRouter), sc).run(sc.getPopulation());
 
-//		ParkingInfrastructure parkingInfrastructure = new ParkingInfrastructure(sc, null, null);
+		//		ParkingInfrastructure parkingInfrastructure = new ParkingInfrastructure(sc, null, null);
 		HashMap<String, HashSet<Id>> parkingTypes = new HashMap<String, HashSet<Id>>();
 		HashSet<Id> streetParking = new HashSet<Id>();
 		HashSet<Id> garageParking = new HashSet<Id>();
 		parkingTypes.put("streetParking", streetParking);
 		parkingTypes.put("garageParking", garageParking);
-		
+
 		for (ActivityFacility facility : ((MutableScenario) sc).getActivityFacilities().getFacilities().values()) {
 			// if the facility offers a parking activity
 			if (facility.getActivityOptions().containsKey("parking")) {
@@ -152,11 +152,11 @@ public class InsertParkingActivitiesTest extends MatsimTestCase {
 				}
 			}
 		}
-		
+
 		ParkingInfrastructure parkingInfrastructure = new ParkingInfrastructure(sc, parkingTypes, new ParkingCostCalculatorFW(parkingTypes));
 
 		InsertParkingActivities insertParkingActivities = new InsertParkingActivities(sc, tripRouter, parkingInfrastructure);
-		
+
 		// init parking facility capacities
 		IntegerValueHashMap<Id> facilityCapacities = new IntegerValueHashMap<Id>();
 		parkingInfrastructure.setFacilityCapacities(facilityCapacities);
@@ -166,30 +166,30 @@ public class InsertParkingActivitiesTest extends MatsimTestCase {
 
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		QSim qSim = new QSim(sc, eventsManager);
-        QNetsimEngine netsimEngine = new QNetsimEngine(qSim);
+		QNetsimEngine netsimEngine = new QNetsimEngine(qSim);
 		qSim.addMobsimEngine(netsimEngine);
-//        AgentFactory agentFactory = new ExperimentalBasicWithindayAgentFactory(qSim);
+		//        AgentFactory agentFactory = new ExperimentalBasicWithindayAgentFactory(qSim);
 		AgentFactory agentFactory = new DefaultAgentFactory(qSim) ;
-        AgentSource agentSource = new ParkingPopulationAgentSource(sc.getPopulation(), agentFactory, qSim, 
-        		insertParkingActivities, parkingInfrastructure, 1);
-        qSim.addAgentSource(agentSource);
-		
-        agentSource.insertAgentsIntoMobsim(); 
-        PersonDriverAgentImpl agent = null;
-        for (MobsimAgent a : qSim.getAgents()) {
-        	agent = (PersonDriverAgentImpl) a;
-        	break;
-        }
-        
-//		ExperimentalBasicWithindayAgent agent = ExperimentalBasicWithindayAgent.createExperimentalBasicWithindayAgent(person, qSim);
-//		insertParkingActivities.run(agent.getSelectedPlan());
-		
+		AgentSource agentSource = new ParkingPopulationAgentSource(sc.getPopulation(), agentFactory, qSim, 
+				insertParkingActivities, parkingInfrastructure, 1);
+		qSim.addAgentSource(agentSource);
+
+		agentSource.insertAgentsIntoMobsim(); 
+		PlanAgent agent = null;
+		for (MobsimAgent a : qSim.getAgents()) {
+			agent = (PlanAgent) a;
+			break;
+		}
+
+		//		ExperimentalBasicWithindayAgent agent = ExperimentalBasicWithindayAgent.createExperimentalBasicWithindayAgent(person, qSim);
+		//		insertParkingActivities.run(agent.getSelectedPlan());
+
 		assertEquals(17, agent.getCurrentPlan().getPlanElements().size());
-		
+
 		for (PlanElement planElement : agent.getCurrentPlan().getPlanElements()) {
 			log.info(planElement.toString());
 		}
-				
+
 		/*
 		 * Add two consecutive car legs which cannot be handled by the Replanner
 		 */
@@ -199,15 +199,15 @@ public class InsertParkingActivitiesTest extends MatsimTestCase {
 		plan.addLeg(factory.createLeg(TransportMode.car));
 		plan.addLeg(factory.createLeg(TransportMode.car));
 		plan.addActivity(factory.createActivityFromLinkId("home", Id.create("l2", Link.class)));
-		
-//		agent = ExperimentalBasicWithindayAgent.createExperimentalBasicWithindayAgent(person, qSim);
+
+		//		agent = ExperimentalBasicWithindayAgent.createExperimentalBasicWithindayAgent(person, qSim);
 		agent = new PersonDriverAgentImpl(person.getSelectedPlan(),qSim) ;
 		try {
 			insertParkingActivities.run(agent.getCurrentPlan());
 			Assert.fail("Expected RuntimeException, but there was none.");
 		} catch (RuntimeException e) { }
 	}
-	
+
 	/*
 	 * Network:
 	 *           l7
@@ -224,7 +224,7 @@ public class InsertParkingActivitiesTest extends MatsimTestCase {
 	 *    ---------------7
 	 */
 	private void createNetwork(Scenario sc) {
-		
+
 		Network network = sc.getNetwork();
 		NetworkFactory networkFactory = network.getFactory();
 
@@ -236,7 +236,7 @@ public class InsertParkingActivitiesTest extends MatsimTestCase {
 		Node n6 = networkFactory.createNode(Id.create("n6", Node.class), new Coord((double) 40000, (double) 0));
 		double y = -10000;
 		Node n7 = networkFactory.createNode(Id.create("n7", Node.class), new Coord((double) 30000, y));
-		
+
 		network.addNode(n1);
 		network.addNode(n2);
 		network.addNode(n3);
@@ -244,7 +244,7 @@ public class InsertParkingActivitiesTest extends MatsimTestCase {
 		network.addNode(n5);
 		network.addNode(n6);
 		network.addNode(n7);
-		
+
 		Link l1 = networkFactory.createLink(Id.create("l1", Link.class), n1, n2);
 		Link l2 = networkFactory.createLink(Id.create("l2", Link.class), n2, n3);
 		Link l3 = networkFactory.createLink(Id.create("l3", Link.class), n3, n4);
@@ -254,7 +254,7 @@ public class InsertParkingActivitiesTest extends MatsimTestCase {
 		Link l7 = networkFactory.createLink(Id.create("l7", Link.class), n5, n1);
 		Link l8 = networkFactory.createLink(Id.create("l8", Link.class), n6, n1);
 		Link l9 = networkFactory.createLink(Id.create("l9", Link.class), n7, n1);
-		
+
 		l1.setFreespeed(10.0);
 		l2.setFreespeed(10.0);
 		l3.setFreespeed(10.0);
@@ -264,7 +264,7 @@ public class InsertParkingActivitiesTest extends MatsimTestCase {
 		l7.setFreespeed(10.0);
 		l8.setFreespeed(10.0);
 		l9.setFreespeed(10.0);
-		
+
 		l1.setLength(10000.0);
 		l2.setLength(10000.0);
 		l3.setLength(10000.0);
@@ -274,7 +274,7 @@ public class InsertParkingActivitiesTest extends MatsimTestCase {
 		l7.setLength(40000.0);
 		l8.setLength(40000.0);
 		l9.setLength(40000.0);
-		
+
 		network.addLink(l1);
 		network.addLink(l2);
 		network.addLink(l3);
@@ -285,45 +285,45 @@ public class InsertParkingActivitiesTest extends MatsimTestCase {
 		network.addLink(l8);
 		network.addLink(l9);
 	}
-	
+
 	private void createFacilities(Scenario sc) {
-		
+
 		ActivityFacility facility = null;
 		ActivityFacilities facilities = sc.getActivityFacilities();
 		ActivityFacilitiesFactory factory = facilities.getFactory();
-		
+
 		facility = factory.createActivityFacility(Id.create("f1", ActivityFacility.class), sc.getNetwork().getLinks().get(Id.create("l1", Link.class)).getCoord());
 		facilities.addActivityFacility(facility);
 		facility.addActivityOption(factory.createActivityOption("parking"));
-		
+
 		facility = factory.createActivityFacility(Id.create("f2", ActivityFacility.class), sc.getNetwork().getLinks().get(Id.create("l2", Link.class)).getCoord());
 		facilities.addActivityFacility(facility);
 		facility.addActivityOption(factory.createActivityOption("home"));
-		
+
 		facility = factory.createActivityFacility(Id.create("f3", ActivityFacility.class), sc.getNetwork().getLinks().get(Id.create("l3", Link.class)).getCoord());
 		facilities.addActivityFacility(facility);
 		facility.addActivityOption(factory.createActivityOption("parking"));
-		
+
 		facility = factory.createActivityFacility(Id.create("f4", ActivityFacility.class), sc.getNetwork().getLinks().get(Id.create("l4", Link.class)).getCoord());
 		facilities.addActivityFacility(facility);
 		facility.addActivityOption(factory.createActivityOption("work"));
-		
+
 		facility = factory.createActivityFacility(Id.create("f5", ActivityFacility.class), sc.getNetwork().getLinks().get(Id.create("l5", Link.class)).getCoord());
 		facilities.addActivityFacility(facility);
 		facility.addActivityOption(factory.createActivityOption("shopping"));
-		
+
 		facility = factory.createActivityFacility(Id.create("f6", ActivityFacility.class), sc.getNetwork().getLinks().get(Id.create("l6", Link.class)).getCoord());
 		facilities.addActivityFacility(facility);
 		facility.addActivityOption(factory.createActivityOption("parking"));
-		
+
 		facility = factory.createActivityFacility(Id.create("f7", ActivityFacility.class), sc.getNetwork().getLinks().get(Id.create("l7", Link.class)).getCoord());
 		facilities.addActivityFacility(facility);
 		facility.addActivityOption(factory.createActivityOption("parking"));
-		
+
 		facility = factory.createActivityFacility(Id.create("f8", ActivityFacility.class), sc.getNetwork().getLinks().get(Id.create("l8", Link.class)).getCoord());
 		facilities.addActivityFacility(facility);
 		facility.addActivityOption(factory.createActivityOption("parking"));
-		
+
 		facility = factory.createActivityFacility(Id.create("f9", ActivityFacility.class), sc.getNetwork().getLinks().get(Id.create("l9", Link.class)).getCoord());
 		facilities.addActivityFacility(facility);
 		facility.addActivityOption(factory.createActivityOption("parking"));		

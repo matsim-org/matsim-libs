@@ -46,7 +46,7 @@ import org.matsim.core.population.routes.LinkNetworkRouteImpl;
  * 
  * @author tthunig
  */
-public class TtCreateBraessPopulation {
+public final class TtCreateBraessPopulation {
 
 	public enum InitRoutes{
 		ALL, ONLY_MIDDLE, ONLY_OUTER, NONE

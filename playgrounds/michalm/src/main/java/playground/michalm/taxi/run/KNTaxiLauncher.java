@@ -19,7 +19,7 @@
 
 package playground.michalm.taxi.run;
 
-import java.util.*;
+import java.util.Map;
 
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.population.*;
@@ -55,7 +55,7 @@ class KNTaxiLauncher
             otfConfig.setLinkWidth(2);
         }
 
-        launcher.initVrpPathCalculator();
+        launcher.initTravelTimeAndDisutility();
         launcher.simulateIteration();
     }
 
@@ -64,29 +64,30 @@ class KNTaxiLauncher
     {
         TaxiLauncherParams params = new TaxiLauncherParams();
 
-        //demands: 10, 15, 20, 25, 30, 35, 40
-        //supplies: 25, 50
-        //path pattern: mielec-2-peaks-new-$supply$-$demand$
         params.inputDir =
-                "/Users/nagel/shared-svn/projects/maciejewski/input/2014_02/mielec-2-peaks-new-40-25/";
-                //"d:/svn-vsp/maciejewski/input/2014_02/mielec-2-peaks-new-40-25/";
+                "/Users/nagel/shared-svn/projects/maciejewski/Mielec/2014_02/mielec-2-peaks-new/";
+                //"d:/svn-vsp/maciejewski/Mielec/2014_02/mielec-2-peaks-new/";
 
-        params.netFile = params.inputDir + "../mielec-2-peaks-new/network.xml";
-        params.plansFile = params.inputDir + "../mielec-2-peaks-new/output/ITERS/it.20/20.plans.xml.gz";
+        params.netFile = params.inputDir + "network.xml";
+        params.plansFile = params.inputDir + "output/ITERS/it.20/20.plans.xml.gz";
 
+        //demand: 10, 15, 20, 25, 30, 35, 40
         params.taxiCustomersFile = params.inputDir + "taxiCustomers_40_pc.txt";
+        
+        //supply: 25, 50
         params.taxisFile = params.inputDir + "taxis-25.xml";
+        
         params.ranksFile = params.inputDir + "taxi_ranks-0.xml";
 
-//        params.eventsFile = params.inputDir + "../mielec-2-peaks-new/output/ITERS/it.20/20.events.xml.gz";
+//        params.eventsFile = params.inputDir + "output/ITERS/it.20/20.events.xml.gz";
         params.changeEventsFile = null;
 
-        params.algorithmConfig = AlgorithmConfig.FIFO_RES_TW_FF;
+        params.algorithmConfig = AlgorithmConfig.RULE_DSE_FF;
 
         params.nearestRequestsLimit = 0;
         params.nearestVehiclesLimit = 0;
 
-        params.onlineVehicleTracker = Boolean.TRUE;
+        params.onlineVehicleTracker = Boolean.FALSE;
         params.advanceRequestSubmission = Boolean.FALSE;
         params.destinationKnown = Boolean.FALSE;
         params.vehicleDiversion = Boolean.FALSE;

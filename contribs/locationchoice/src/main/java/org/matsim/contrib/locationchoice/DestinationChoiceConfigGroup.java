@@ -20,18 +20,19 @@
 
 package org.matsim.contrib.locationchoice;
 
-import java.util.Map;
-import java.util.TreeMap;
-
 import org.apache.log4j.Logger;
 import org.matsim.core.config.ConfigGroup;
 
+import java.util.Map;
+import java.util.TreeMap;
+
 public class DestinationChoiceConfigGroup extends ConfigGroup {
 
-	public static enum Algotype { random, bestResponse, localSearchRecursive, localSearchSingleAct };
-	public static enum EpsilonDistributionTypes { gumbel, gaussian };
-	public static enum InternalPlanDataStructure { planImpl, lcPlan };
-	
+	public enum Algotype { random, bestResponse, localSearchRecursive, localSearchSingleAct };
+	public enum EpsilonDistributionTypes { gumbel, gaussian };
+	public enum InternalPlanDataStructure { planImpl, lcPlan };
+	public enum ApproximationLevel {completeRouting, localRouting, noRouting}
+
 	public static final String GROUP_NAME = "locationchoice";
 	
 	private static final String RESTR_FCN_FACTOR = "restraintFcnFactor";
@@ -80,7 +81,6 @@ public class DestinationChoiceConfigGroup extends ConfigGroup {
 	private static final double defaultCarSpeed = 8.5;
 	private static final double defaultPtSpeed = 5.0;
 	private static final int defaultMaxRecursions = 10; 
-	private static final int defaultTt_approximationLevel = 1;
 	private static final long defaultRandomSeed = 221177;
 	private static final int defaultProbChoiceSetSize = 5;
 	private static final double defaultAnalysisBoundary = 200000;
@@ -103,7 +103,7 @@ public class DestinationChoiceConfigGroup extends ConfigGroup {
 	private String flexible_types = "null";	// TODO !!
 	
 	private Algotype algorithm = Algotype.bestResponse;
-	private int tt_approximationLevel = 1;
+	private ApproximationLevel tt_approximationLevel = ApproximationLevel.localRouting;
 	private double maxDistanceDCScore = -1.0;
 	private String planSelector = "SelectExpBeta";
 	
@@ -148,10 +148,12 @@ public class DestinationChoiceConfigGroup extends ConfigGroup {
 		map.put(USE_CONFIG_PARAMS_FOR_SCORING, "Default is 'true'. Parameter was already present in the DCScoringFunction.");
 		map.put(USE_INDIVIDUAL_SCORING_PARAMETERS, "MATSim supports individual scoring parameters for sub-populations or even single agents. "
 				+ "If you use global parameters, this can be set to 'false' (default is 'true').");
-		map.put(RE_USE_TEMPORARY_PLANS, "Default is 'false'. During the location choice process, many potential locations are evaluated. "
-				+ "For each of them, a copy of the person's current plan is created, which results in a huge workload for the "
-				+ "garbage collector as well as the memory bus. When this option is set to 'true', only one copy of the plan is created "
-				+ "and re-used for each checked location. Note that this is still experimental! cdobler oct'15");
+		map.put(
+				RE_USE_TEMPORARY_PLANS,
+				"Default is 'false'. During the location choice process, many potential locations are evaluated. "
+						+ "For each of them, a copy of the person's current plan is created, which results in a huge workload for the "
+						+ "garbage collector as well as the memory bus. When this option is set to 'true', only one copy of the plan is created "
+						+ "and re-used for each checked location. Note that this is still experimental! cdobler oct'15" );
 		
 		return map;
 	}
@@ -351,13 +353,20 @@ public class DestinationChoiceConfigGroup extends ConfigGroup {
 				setAlgorithm(Algotype.bestResponse);
 //			}
 		} else if (TT_APPROX_LEVEL.equals(key)) {
-			int intValue = Integer.parseInt(value);
-			if (intValue != 0 && intValue != 1 && intValue != 2) {
-				log.warn("set travel time approximation level to 0, 1 or 2. Set to default value '" + defaultTt_approximationLevel + "' now");
-				this.setTravelTimeApproximationLevel(defaultTt_approximationLevel);
-			}
-			else {
-				this.setTravelTimeApproximationLevel(intValue);
+			// backward compatibility
+			switch ( value ) {
+				case "0":
+					this.setTravelTimeApproximationLevel( ApproximationLevel.completeRouting );
+					break;
+				case "1":
+					this.setTravelTimeApproximationLevel( ApproximationLevel.localRouting );
+					break;
+				case "2":
+					this.setTravelTimeApproximationLevel( ApproximationLevel.noRouting );
+					break;
+				default:
+					this.setTravelTimeApproximationLevel( ApproximationLevel.valueOf( value ) );
+					break;
 			}
 		} else if (MAXDISTANCEDCSCORE.equals(key)) {
 			double doubleValue = Double.parseDouble(value);
@@ -647,10 +656,10 @@ public class DestinationChoiceConfigGroup extends ConfigGroup {
 	public void setAlgorithm(Algotype algorithm) {
 		this.algorithm = algorithm;
 	}
-	public int getTravelTimeApproximationLevel() {
+	public ApproximationLevel getTravelTimeApproximationLevel() {
 		return this.tt_approximationLevel;
 	}
-	public void setTravelTimeApproximationLevel(int tt_approximationLevel) {
+	public void setTravelTimeApproximationLevel(ApproximationLevel tt_approximationLevel) {
 		this.tt_approximationLevel = tt_approximationLevel;
 	}
 	public double getMaxDistanceDCScore() {

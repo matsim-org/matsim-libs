@@ -19,16 +19,15 @@
  * *********************************************************************** */
 package playground.thibautd.scripts.scenariohandling;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.facilities.ActivityFacility;
-
 import playground.ivt.matsim2030.Matsim2030Utils;
+
+import java.io.BufferedWriter;
+import java.io.IOException;
 
 /**
  * @author thibautd

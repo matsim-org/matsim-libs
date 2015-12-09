@@ -28,7 +28,10 @@ import org.matsim.core.scenario.ScenarioUtils;
  * return different scenarios used in almost every analysis code.
  * @author amit
  */
-public class LoadMyScenarios {
+public final class LoadMyScenarios {
+	
+	private LoadMyScenarios(){}
+	
 	private final static Logger logger = Logger.getLogger(LoadMyScenarios.class);
 	
 	/**

@@ -21,9 +21,9 @@ package playground.johannes.studies.sbsurvey.io;
 
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
-import gnu.trove.TDoubleArrayList;
-import gnu.trove.TDoubleDoubleHashMap;
-import gnu.trove.TObjectIntHashMap;
+import gnu.trove.list.array.TDoubleArrayList;
+import gnu.trove.map.hash.TDoubleDoubleHashMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
 import org.apache.commons.math.stat.StatUtils;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
@@ -39,8 +39,8 @@ import org.matsim.contrib.socnetgen.sna.snowball.SampledVertexDecorator;
 import org.matsim.contrib.socnetgen.sna.snowball.io.SampledGraphProjMLWriter;
 import org.matsim.contrib.socnetgen.sna.snowball.spatial.SpatialSampledGraphProjectionBuilder;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonUtils;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import playground.johannes.studies.sbsurvey.io.AlterTableReader.VertexRecord;
@@ -202,7 +202,7 @@ public class GraphBuilder {
 	}
 	
 	private SocialPerson createPerson(VertexRecord record, SQLDumpReader sqlData) {
-		Person matsimPerson = PersonImpl.createPerson(Id.create(record.id, Person.class));
+		Person matsimPerson = PopulationUtils.createPerson(Id.create(record.id, Person.class));
 		SocialPerson person = new SocialPerson(matsimPerson);
 		
 		int age;
@@ -383,25 +383,25 @@ public class GraphBuilder {
 			Histogram.normalize(histSize);
 			StatsWriter.writeHistogram(histSize, "size", "freq", "/Users/jillenberger/Work/socialnets/data/ivt2009/11-2011/augmented/numPersons.txt");
 			
-			Discretizer discretizer = FixedSampleSizeDiscretizer.create(kSizeValues.toNativeArray(), 20, 20);
+			Discretizer discretizer = FixedSampleSizeDiscretizer.create(kSizeValues.toArray(), 20, 20);
 			TDoubleArrayList valuesX = new TDoubleArrayList();
 			for(int i = 0; i < kSizeValues.size(); i++) {
 				valuesX.add(discretizer.discretize(kSizeValues.get(i)));
 			}
 			
-			Correlations.writeToFile(Correlations.mean(valuesX.toNativeArray(), sizeValues.toNativeArray()),
+			Correlations.writeToFile(Correlations.mean(valuesX.toArray(), sizeValues.toArray()),
 					"/Users/jillenberger/Work/socialnets/data/ivt2009/11-2011/augmented/size_k.txt", "k", "size");
 			
-			discretizer = FixedSampleSizeDiscretizer.create(kNumValues.toNativeArray(), 20, 20);
+			discretizer = FixedSampleSizeDiscretizer.create(kNumValues.toArray(), 20, 20);
 			valuesX = new TDoubleArrayList();
 			for(int i = 0; i < kNumValues.size(); i++) {
 				valuesX.add(discretizer.discretize(kNumValues.get(i)));
 			}
 			
-			Correlations.writeToFile(Correlations.mean(valuesX.toNativeArray(), numValues.toNativeArray()), 
+			Correlations.writeToFile(Correlations.mean(valuesX.toArray(), numValues.toArray()), 
 					"/Users/jillenberger/Work/socialnets/data/ivt2009/11-2011/augmented/num_k.txt", "k", "n");
 			
-			Correlations.writeToFile(Correlations.mean(numValues2.toNativeArray(), sizeValues.toNativeArray()), 
+			Correlations.writeToFile(Correlations.mean(numValues2.toArray(), sizeValues.toArray()), 
 					"/Users/jillenberger/Work/socialnets/data/ivt2009/11-2011/augmented/size_num.txt", "num", "size");
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block

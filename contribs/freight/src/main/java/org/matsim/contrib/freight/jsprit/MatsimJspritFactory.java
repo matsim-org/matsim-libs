@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import jsprit.core.problem.Location;
 import jsprit.core.problem.VehicleRoutingProblem;
 import jsprit.core.problem.VehicleRoutingProblem.FleetSize;
 import jsprit.core.problem.cost.VehicleRoutingActivityCosts;
@@ -66,24 +67,27 @@ public class MatsimJspritFactory {
 	
 	static CarrierShipment createCarrierShipment(Service service, String depotLink){
 		return CarrierShipment.Builder.newInstance(Id.create(depotLink, Link.class),
-				Id.create(service.getLocationId(), Link.class), service.getSize().get(0)).
+				Id.create(service.getLocation().getId(), Link.class), service.getSize().get(0)).
 				setDeliveryServiceTime(service.getServiceDuration()).
 				setDeliveryTimeWindow(TimeWindow.newInstance(service.getTimeWindow().getStart(),service.getTimeWindow().getEnd())).build();
 	}
 	
 	static Service createService(CarrierService carrierService, Coord locationCoord) {
+		Location.Builder locationBuilder = Location.Builder.newInstance();
+		locationBuilder.setId(carrierService.getLocationLinkId().toString());
+		if(locationCoord != null) {
+			locationBuilder.setCoordinate(Coordinate.newInstance(locationCoord.getX(), locationCoord.getY()));
+		}
+		Location location = locationBuilder.build();
 		Builder serviceBuilder = Service.Builder.newInstance(carrierService.getId().toString());
 		serviceBuilder.addSizeDimension(0, carrierService.getCapacityDemand());
-		serviceBuilder.setLocationId(carrierService.getLocationLinkId().toString()).setServiceTime(carrierService.getServiceDuration())
+		serviceBuilder.setLocation(location).setServiceTime(carrierService.getServiceDuration())
 			.setTimeWindow(jsprit.core.problem.solution.route.activity.TimeWindow.newInstance(carrierService.getServiceStartTimeWindow().getStart(), carrierService.getServiceStartTimeWindow().getEnd()));
-		if(locationCoord != null){
-			serviceBuilder.setCoord(Coordinate.newInstance(locationCoord.getX(), locationCoord.getY()));
-		}
 		return serviceBuilder.build();
 	}
 	
 	static CarrierService createCarrierService(Service service) {
-		CarrierService.Builder serviceBuilder = CarrierService.Builder.newInstance(Id.create(service.getId(), CarrierService.class), Id.create(service.getLocationId(), Link.class));
+		CarrierService.Builder serviceBuilder = CarrierService.Builder.newInstance(Id.create(service.getId(), CarrierService.class), Id.create(service.getLocation().getId(), Link.class));
 		serviceBuilder.setCapacityDemand(service.getSize().get(0));
 		serviceBuilder.setServiceDuration(service.getServiceDuration());
 		serviceBuilder.setServiceStartTimeWindow(TimeWindow.newInstance(service.getTimeWindow().getStart(), service.getTimeWindow().getEnd()));
@@ -99,19 +103,23 @@ public class MatsimJspritFactory {
 	 * @see Vehicle, CarrierVehicle
 	 */
 	static Vehicle createVehicle(CarrierVehicle carrierVehicle, Coord locationCoord){
+		Location.Builder vehicleLocationBuilder = Location.Builder.newInstance();
+		vehicleLocationBuilder.setId(carrierVehicle.getLocation().toString());
+		if(locationCoord != null) {
+			vehicleLocationBuilder.setCoordinate(Coordinate.newInstance(locationCoord.getX(), locationCoord.getY()));
+		}
+		Location vehicleLocation = vehicleLocationBuilder.build();
 		VehicleType vehicleType = createVehicleType(carrierVehicle.getVehicleType());
 		VehicleImpl.Builder vehicleBuilder = VehicleImpl.Builder.newInstance(carrierVehicle.getVehicleId().toString());
 		vehicleBuilder.setEarliestStart(carrierVehicle.getEarliestStartTime())
 		.setLatestArrival(carrierVehicle.getLatestEndTime())
-		.setStartLocationId(carrierVehicle.getLocation().toString())
+		.setStartLocation(vehicleLocation)
 		.setType(vehicleType);
-		if(locationCoord != null){
-			vehicleBuilder.setStartLocationCoordinate(Coordinate.newInstance(locationCoord.getX(), locationCoord.getY()));
-		}
+
 		VehicleImpl vehicle = vehicleBuilder.build();
 		assert carrierVehicle.getEarliestStartTime() == vehicle.getEarliestDeparture() : "carrierVeh must have the same earliestDep as vrpVeh";
 		assert carrierVehicle.getLatestEndTime() == vehicle.getLatestArrival() : "carrierVeh must have the same latestArr as vrpVeh";
-		assert carrierVehicle.getLocation().toString() == vehicle.getStartLocationId() : "locations must be equal";
+		assert carrierVehicle.getLocation().toString() == vehicle.getStartLocation().getId() : "locations must be equal";
 		return vehicle;
 	}
 	
@@ -124,7 +132,8 @@ public class MatsimJspritFactory {
 	 */
 	static CarrierVehicle createCarrierVehicle(Vehicle vehicle){
 		String vehicleId = vehicle.getId();
-		CarrierVehicle.Builder vehicleBuilder = CarrierVehicle.Builder.newInstance(Id.create(vehicleId, org.matsim.vehicles.Vehicle.class), Id.create(vehicle.getStartLocationId(), Link.class));
+		CarrierVehicle.Builder vehicleBuilder = CarrierVehicle.Builder.newInstance(Id.create(vehicleId, org.matsim.vehicles.Vehicle.class),
+				Id.create(vehicle.getStartLocation().getId(), Link.class));
 		CarrierVehicleType carrierVehicleType = createCarrierVehicleType(vehicle.getType());
 		vehicleBuilder.setType(carrierVehicleType);
 		vehicleBuilder.setEarliestStart(vehicle.getEarliestDeparture());
@@ -132,7 +141,7 @@ public class MatsimJspritFactory {
 		CarrierVehicle carrierVehicle = vehicleBuilder.build();
 		assert vehicle.getEarliestDeparture() == carrierVehicle.getEarliestStartTime() : "vehicles must have the same earliestStartTime";
 		assert vehicle.getLatestArrival() == carrierVehicle.getLatestEndTime() : "vehicles must have the same latestEndTime";
-		assert vehicle.getStartLocationId() == carrierVehicle.getLocation().toString() : "locs must be the same";
+		assert vehicle.getStartLocation().getId() == carrierVehicle.getLocation().toString() : "locs must be the same";
 		return carrierVehicle;
 	}
 	

@@ -85,7 +85,7 @@ public class CopyMiDAttributes {
 
             ProgressLogger.step();
         }
-        ProgressLogger.termiante();
+        ProgressLogger.terminate();
 
         if(notFound > 0) {
             logger.info(String.format("Could not find templates for %s persons.", notFound));

@@ -66,18 +66,34 @@ import org.matsim.core.utils.collections.CollectionUtils;
 public class CreateBasecase {
 
 	public static void main(String[] args) {
-		
+		boolean useCadyts = true;
+		final CadytsContext cContext;
 		final Config config;
-		if (args[0]!=null){
+		final Scenario scenario;
+		if (args.length>0){
 			config = ConfigUtils.loadConfig(args[0] );
+			boolean useCadytsConf= Boolean.parseBoolean(args[1]);
+			useCadyts=useCadytsConf;
+			System.out.println("using cadyts: "+useCadyts);
+			cContext = new CadytsContext(config);
+			scenario = ScenarioUtils.loadScenario(config);
 		}
 		else
-		{config = prepareConfig();}
-		final CadytsContext cContext = new CadytsContext(config);
+		{
+			config = ConfigUtils.createConfig();
+			System.out.println("using cadyts: "+useCadyts);
+			cContext =	prepareConfig(config, useCadyts);
+			scenario = ScenarioUtils.loadScenario(config);
 
-		final Scenario scenario = ScenarioUtils.loadScenario(config);
-		final	Controler controler = new Controler(scenario);
 		
+		}
+		
+		
+		System.out.println("using cadyts: "+useCadyts);
+
+		
+		final	Controler controler = new Controler(scenario);
+		if (useCadyts){
 		// create the cadyts context and add it to the control(l)er:
 
 				controler.addControlerListener(cContext);
@@ -103,20 +119,21 @@ public class CreateBasecase {
 						return scoringFunctionAccumulator;
 					}
 				}) ;
+				
+		}
 		controler.run();
 		
 	}
-static Config prepareConfig(){
+static CadytsContext prepareConfig(Config config, boolean useCadyts){
 	String basedir = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/input/";
 //	String basedir = "/net/ils4/jbischoff/input/";
-	double scale = 1.00;
+	double scale = 0.01;
 	
-	final Config config = ConfigUtils.createConfig();
 	ControlerConfigGroup ccg = config.controler();
-	ccg.setRunId("vw018.100pct");
+	ccg.setRunId("vw043");
 	ccg.setOutputDirectory(basedir+"output/"+ccg.getRunId()+"/");
 	ccg.setFirstIteration(0);
-	int lastIteration = 150;
+	int lastIteration = 50;
 	ccg.setLastIteration(lastIteration);
 	int disableAfter = (int) (lastIteration * 0.8);
 	ccg.setMobsim("qsim");
@@ -129,18 +146,17 @@ static Config prepareConfig(){
 	qsc.setUsingFastCapacityUpdate(true);
 	qsc.setTrafficDynamics(TrafficDynamics.withHoles);
 	qsc.setNumberOfThreads(6);
-//	qsc.setStorageCapFactor(0.05);
-	qsc.setFlowCapFactor(scale);
+	qsc.setStorageCapFactor(1);
+	qsc.setFlowCapFactor(2);
 	qsc.setEndTime(30*3600);
 	
 	config.parallelEventHandling().setNumberOfThreads(6);
 	
-	config.network().setInputFile(basedir + "networkpt.xml");
+	config.network().setInputFile(basedir + "networkptcgt.xml");
 	
 	
-	config.plans().setInputFile(basedir+"initial_plans1.0.xml.gz");
-//	config.plans().setInputFile(basedir+"vw012.100pct.200.plans.xml");
-	config.plans().setInputPersonAttributeFile(basedir+"initial_plans_oA1.0.xml.gz");
+	config.plans().setInputFile(basedir+"initial_plans0.01.xml.gz");
+	config.plans().setInputPersonAttributeFile(basedir+"initial_plans_oA0.01.xml.gz");
 	
 	config.plans().setRemovingUnneccessaryPlanAttributes(true);
 	
@@ -155,11 +171,15 @@ static Config prepareConfig(){
 	counts.setAnalyzedModes("car");
 	counts.setCountsFileName(basedir+"counts.xml");
 	counts.setCountsScaleFactor(1.0/scale);
+	
+	CadytsContext context = new CadytsContext(config);
+	if (useCadyts){
 	CadytsConfigGroup cadyts = (CadytsConfigGroup) config.getModule("cadytsCar");
 	cadyts.setStartTime(6*3600);
 	cadyts.setEndTime(21*3600+1);
 	cadyts.setTimeBinSize(3600);
 	cadyts.addParam("calibratedLinks","65601,48358,62489,71335,44441,53098" );
+	}
 	
 	StrategyConfigGroup scg = config.strategy();
 	scg.setMaxAgentPlanMemorySize(5);
@@ -312,14 +332,14 @@ static Config prepareConfig(){
 	ActivityParams home = new ActivityParams();
 	home.setActivityType("home");
 	home.setTypicalDurationScoreComputation(TypicalDurationScoreComputation.relative);
-	home.setTypicalDuration(3600*14);
+	home.setTypicalDuration(3600*7);
 	pcs.addActivityParams(home);
 	
 	//shift workers home
 	ActivityParams home2 = new ActivityParams();
 	home2.setActivityType("homeD");
 	home2.setTypicalDurationScoreComputation(TypicalDurationScoreComputation.relative);
-	home2.setTypicalDuration(3600*14);
+	home2.setTypicalDuration(3600*8);
 	home2.setOpeningTime(6*3600);
 	home2.setClosingTime(3600*21.75);
 	pcs.addActivityParams(home2);
@@ -355,7 +375,7 @@ static Config prepareConfig(){
 	vwf.setTypicalDuration(3600*7.75);
 	
 	vwf.setOpeningTime(7.5*3600);
-	vwf.setLatestStartTime(9.5*3600);
+	vwf.setLatestStartTime(9*3600);
 	vwf.setEarliestEndTime(14.5*3600);
 	vwf.setClosingTime(17.75*3600);
 	pcs.addActivityParams(vwf);
@@ -444,7 +464,8 @@ static Config prepareConfig(){
 	source.setActivityType("source");
 	pcs.addActivityParams(source);
 	
-	return config;
+	return context;
+
 	
 }
 }

@@ -19,13 +19,6 @@
  * *********************************************************************** */
 package playground.thibautd.hitchiking.analysis;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
@@ -35,8 +28,14 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
-
 import playground.thibautd.hitchiking.qsim.events.PassengerDepartsWithDriverEvent;
+
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author thibautd

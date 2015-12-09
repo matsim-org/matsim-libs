@@ -45,6 +45,7 @@ public class EmissionRoadPricing {
 	 * @param scenario minimally have network
 	 */
 	public EmissionRoadPricing(double timeBinSize, Scenario scenario, EmissionModule emissionModule, EmissionCostModule emissionCostModule) {
+//		ZZ_TODO : yet to complete this.
 		this.scheme = new RoadPricingSchemeImpl();
 		this.timeBinSize = timeBinSize;
 		this.sc = scenario;

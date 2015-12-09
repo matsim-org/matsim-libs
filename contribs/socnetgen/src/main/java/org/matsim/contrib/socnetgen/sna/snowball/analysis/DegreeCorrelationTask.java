@@ -19,20 +19,21 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetgen.sna.snowball.analysis;
 
-import gnu.trove.TIntArrayList;
-import gnu.trove.TIntObjectHashMap;
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.matsim.contrib.socnetgen.sna.graph.Graph;
-import org.matsim.contrib.socnetgen.sna.graph.Vertex;
-import org.matsim.contrib.socnetgen.sna.graph.analysis.Degree;
-import org.matsim.contrib.socnetgen.sna.graph.analysis.ModuleAnalyzerTask;
-import org.matsim.contrib.socnetgen.sna.snowball.SampledVertex;
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.hash.TIntObjectHashMap;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Map;
+
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.matsim.contrib.socnetgen.sna.graph.Graph;
+import org.matsim.contrib.socnetgen.sna.graph.Vertex;
+import org.matsim.contrib.socnetgen.sna.graph.analysis.Degree;
+import org.matsim.contrib.socnetgen.sna.graph.analysis.ModuleAnalyzerTask;
+import org.matsim.contrib.socnetgen.sna.snowball.SampledVertex;
 
 
 /**

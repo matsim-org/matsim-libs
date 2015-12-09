@@ -4,6 +4,7 @@ import org.matsim.utils.objectattributes.ObjectAttributeUtils2;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
+@Deprecated
 public class RegentPopulationReader {
 
 	// CONSTANTS
@@ -40,6 +41,12 @@ public class RegentPopulationReader {
 
 	// CONSTRUCTION
 
+	public RegentPopulationReader(final String populationFileName,
+			final ObjectAttributes personAttributes) {
+		this(populationFileName, null, personAttributes);
+	}
+
+	@Deprecated
 	public RegentPopulationReader(final String populationFileName,
 			final ZonalSystem zonalSystem,
 			final ObjectAttributes personAttributes) {
