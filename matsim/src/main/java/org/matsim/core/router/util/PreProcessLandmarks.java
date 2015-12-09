@@ -230,13 +230,18 @@ public class PreProcessLandmarks extends PreProcessEuclidean {
 	}
 
 	@Override
-	public DeadEndData getNodeData(final Node n) {
+	public LandmarksData getNodeData(final Node n) {
 		DeadEndData r = this.nodeData.get(n);
 		if (r == null) {
 			r = new LandmarksData(this.landmarkCount);
 			this.nodeData.put(n, r);
 		}
-		return r;
+		// would be better to work with a Map<Node,LandmarksData>, but for some reason the implementor of this class
+		// decided to inherit from PreProcessEuclidean, which inherits from PreprocessDijkstra, which is wehre the field
+		// is..
+		// Before I casted here, the cast was done from whithin AStarLandmarks algorithm, which is even worse.
+		// td dec 15
+		return (LandmarksData) r;
 	}
 
 	public class LandmarksData extends DeadEndData {
