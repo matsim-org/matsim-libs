@@ -147,7 +147,9 @@ public class PatnaExternalDemandGenerator {
 						
 						Activity middleAct = pf.createActivityFromCoord("Ext-Int-middleAct", middleActCoord);
 						//ZZ_TODO : here the act duration is assigned randomly between 7 to 8 hours. This means, the agent will be counted in reverse direction of the same counting station.
-						middleAct.setEndTime(firstAct.getEndTime() + 7*3600 + random.nextDouble() * 3600);
+						double middleActEndTime = firstAct.getEndTime() + 7*3600 + random.nextDouble() * 3600;
+						if(middleActEndTime > 24*3600 ) middleActEndTime = middleActEndTime - 24*3600;
+						middleAct.setEndTime( middleActEndTime );
 						plan.addActivity(middleAct);
 						plan.addLeg(pf.createLeg(mode));
 						Activity lastAct = pf.createActivityFromCoord( countingStationKey, firstLastActCoord);
@@ -197,15 +199,20 @@ public class PatnaExternalDemandGenerator {
 						
 						double actEndTime ;
 						if(countingDirection.equalsIgnoreCase("In")){// --> trip originates at given counting stationNumber
-							lastActLink = getLinkFromOuterCordonKey( OuterCordonUtils.getCountingStationKey("OC"+jj, "Out"), false ).getId();
+							String countingStationKeyForOtherActLink = OuterCordonUtils.getCountingStationKey("OC"+jj, "In");
+							lastActLink = getLinkFromOuterCordonKey(countingStationKeyForOtherActLink, false ).getId();
 							actEndTime = (timebin-1)*3600+random.nextDouble()*3600;
-							lastActType = countingStationKey+"_End";
+							lastActType = countingStationKeyForOtherActLink+"_End";
 						} else {// --> trip terminates at given counting stationNumber
 							String countingStationKeyForOtherActLink = OuterCordonUtils.getCountingStationKey("OC"+jj, "In"); 
 							firstActLink = 	getLinkFromOuterCordonKey( countingStationKeyForOtherActLink, true ).getId();
 							double travelTime = 30*60; // ZZ_TODO : it is assumed that agent will take 30 min to reach the destination counting station in desired time bin.
-							actEndTime = (timebin-1)*3600 - travelTime + random.nextDouble()*3600 - 30*60;
+							actEndTime = Math.min( (timebin-1)*3600 - travelTime + random.nextDouble()*3600 - 30*60 , random.nextDouble()*1800); // math.min is required, else for timebin==1, end time can be negative.
 							firstActType = countingStationKeyForOtherActLink+"_Start";
+						}
+						
+						if(actEndTime < 0){
+							System.out.println("Negative time---");
 						}
 						
 						Plan plan = pf.createPlan();
