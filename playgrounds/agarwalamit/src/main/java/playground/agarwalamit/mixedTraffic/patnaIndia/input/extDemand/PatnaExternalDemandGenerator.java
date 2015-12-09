@@ -207,13 +207,11 @@ public class PatnaExternalDemandGenerator {
 							String countingStationKeyForOtherActLink = OuterCordonUtils.getCountingStationKey("OC"+jj, "In"); 
 							firstActLink = 	getLinkFromOuterCordonKey( countingStationKeyForOtherActLink, true ).getId();
 							double travelTime = 30*60; // ZZ_TODO : it is assumed that agent will take 30 min to reach the destination counting station in desired time bin.
-							actEndTime = Math.min( (timebin-1)*3600 - travelTime + random.nextDouble()*3600 - 30*60 , random.nextDouble()*1800); // math.min is required, else for timebin==1, end time can be negative.
+							actEndTime = (timebin-1)*3600 - travelTime + random.nextDouble()*3600 - 30*60 ; 
 							firstActType = countingStationKeyForOtherActLink+"_Start";
 						}
 						
-						if(actEndTime < 0){
-							System.out.println("Negative time---");
-						}
+						if(actEndTime < 0)	actEndTime = random.nextDouble()*900; //for time bin =1, actEndTime (in the else statment) can be negative, thus assining sometime between initial 15 mins.
 						
 						Plan plan = pf.createPlan();
 						Activity firstAct = pf.createActivityFromLinkId(firstActType, firstActLink);
