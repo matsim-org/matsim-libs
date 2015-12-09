@@ -187,7 +187,7 @@ public class PatnaCadytsControler {
 		motorbike.setMarginalUtilityOfTraveling(0.0);
 		config.planCalcScore().addModeParams(motorbike);
 
-		ModeParams truck = new ModeParams("truck");//ZZ_TODO : should I calibrate based on this??
+		ModeParams truck = new ModeParams("truck");//ZZ_TODO : should I calibrate asc for truck??
 		truck.setConstant(0.0);
 		truck.setMarginalUtilityOfTraveling(0.0);
 		config.planCalcScore().addModeParams(truck);
