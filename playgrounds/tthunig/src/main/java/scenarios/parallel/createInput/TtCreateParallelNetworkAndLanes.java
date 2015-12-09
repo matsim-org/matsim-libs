@@ -41,7 +41,43 @@ import java.util.Map;
 
 /**
  * Class to create network and lanes for the parallel scenario.
- * 
+ *
+ * Network without second ODPair:
+ *
+ *                 (3)---------(4)
+ *                ´               `
+ *              ´                   `
+ * (1)-------(2)                     (5)-------(6)
+ *		        `                   ´
+ *			      `               ´
+ *			       (7)---------(8)
+ *
+ *
+ * Network with second ODPair:
+ *
+ *					     (9)
+ * 					      |
+ *				      	  |
+ * 			      		  |
+ * 		      	         (10)
+ * 	                    ´   `
+ * 				      ´	      `
+ *                 (3)---------(4)
+ *                ´ |           | `
+ *              ´   |           |   `
+ * (1)-------(2)    |           |    (5)-------(6)
+ *		        `   |           |   ´
+ *			      ` |           | ´
+ *			       (7)---------(8)
+ * 				      `       ´
+ * 				        `   ´
+ *   				     (11)
+ * 					      |
+ * 					      |
+ * 					      |
+ * 					     (12)
+ *
+ *
  * @author gthunig
  * 
  */
