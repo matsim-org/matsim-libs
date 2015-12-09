@@ -109,17 +109,17 @@ public final class TtCreateParallelPopulation {
 
 			// create a person
 			Person person = population.getFactory().createPerson(
-					Id.createPersonId(Integer.toString(i) + "_WE"));
+					Id.createPersonId(Integer.toString(i) + "_ab"));
 
 			// create a start activity
 			Activity startAct = population.getFactory()
-					.createActivityFromLinkId("dummy", Id.createLinkId("1_2"));
+					.createActivityFromLinkId("dummy", Id.createLinkId("a_1"));
 			// distribute agents uniformly between 8 and 9 am.
 			startAct.setEndTime(8 * 3600 + (double)(i)/numberOfPersons * 3600);
 
 			// create a drain activity
 			Activity drainAct = population.getFactory().createActivityFromLinkId(
-					"dummy", Id.createLinkId("5_6"));
+					"dummy", Id.createLinkId("6_b"));
 
 			if (initRoutes) {
 				Leg leg = createWestEastLeg(true);
@@ -148,6 +148,7 @@ public final class TtCreateParallelPopulation {
 		Leg leg = population.getFactory().createLeg(TransportMode.car);
 
 		List<Id<Link>> path = new ArrayList<>();
+		path.add(Id.createLinkId("1_2"));
 		if (takeNorthernPath) {
 			path.add(Id.createLinkId("2_3"));
 			path.add(Id.createLinkId("3_4"));
@@ -158,7 +159,9 @@ public final class TtCreateParallelPopulation {
 			path.add(Id.createLinkId("8_5"));
 		}
 
-		Route route = new LinkNetworkRouteImpl(Id.createLinkId("1_2"), path, Id.createLinkId("5_6"));
+		path.add(Id.createLinkId("5_6"));
+
+		Route route = new LinkNetworkRouteImpl(Id.createLinkId("a_1"), path, Id.createLinkId("6_b"));
 
 		leg.setRoute(route);
 		return leg;
@@ -169,17 +172,17 @@ public final class TtCreateParallelPopulation {
 
 			// create a person
 			Person person = population.getFactory().createPerson(
-					Id.createPersonId(Integer.toString(i) + "_EW"));
+					Id.createPersonId(Integer.toString(i) + "_ba"));
 
 			// create a start activity
 			Activity startAct = population.getFactory()
-					.createActivityFromLinkId("dummy", Id.createLinkId("6_5"));
+					.createActivityFromLinkId("dummy", Id.createLinkId("b_6"));
 			// distribute agents uniformly between 8 and 9 am.
 			startAct.setEndTime(8 * 3600 + (double)(i)/numberOfPersons * 3600);
 
 			// create a drain activity
 			Activity drainAct = population.getFactory().createActivityFromLinkId(
-					"dummy", Id.createLinkId("2_1"));
+					"dummy", Id.createLinkId("1_a"));
 
 			if (initRoutes) {
 				Leg leg = createEastWestLeg(true);
@@ -208,6 +211,7 @@ public final class TtCreateParallelPopulation {
 		Leg leg = population.getFactory().createLeg(TransportMode.car);
 
 		List<Id<Link>> path = new ArrayList<>();
+		path.add(Id.createLinkId("6_5"));
 		if (takeNorthernPath) {
 			path.add(Id.createLinkId("5_4"));
 			path.add(Id.createLinkId("4_3"));
@@ -217,8 +221,9 @@ public final class TtCreateParallelPopulation {
 			path.add(Id.createLinkId("8_7"));
 			path.add(Id.createLinkId("7_2"));
 		}
+		path.add(Id.createLinkId("2_1"));
 
-		Route route = new LinkNetworkRouteImpl(Id.createLinkId("6_5"), path, Id.createLinkId("2_1"));
+		Route route = new LinkNetworkRouteImpl(Id.createLinkId("b_6"), path, Id.createLinkId("1_a"));
 
 		leg.setRoute(route);
 		return leg;
@@ -229,17 +234,17 @@ public final class TtCreateParallelPopulation {
 
 			// create a person
 			Person person = population.getFactory().createPerson(
-					Id.createPersonId(Integer.toString(i) + "_NS"));
+					Id.createPersonId(Integer.toString(i) + "_cd"));
 
 			// create a start activity
 			Activity startAct = population.getFactory()
-					.createActivityFromLinkId("dummy", Id.createLinkId("9_10"));
+					.createActivityFromLinkId("dummy", Id.createLinkId("c_9"));
 			// distribute agents uniformly between 8 and 9 am.
 			startAct.setEndTime(8 * 3600 + (double)(i)/numberOfPersons * 3600);
 
 			// create a drain activity
 			Activity drainAct = population.getFactory().createActivityFromLinkId(
-					"dummy", Id.createLinkId("11_12"));
+					"dummy", Id.createLinkId("12_d"));
 
 			if (initRoutes) {
 				Leg leg = createNorthSouthLeg(true);
@@ -268,6 +273,7 @@ public final class TtCreateParallelPopulation {
 		Leg leg = population.getFactory().createLeg(TransportMode.car);
 
 		List<Id<Link>> path = new ArrayList<>();
+		path.add(Id.createLinkId("9_10"));
 		if (takeWesternPath) {
 			path.add(Id.createLinkId("10_3"));
 			path.add(Id.createLinkId("3_7"));
@@ -277,8 +283,9 @@ public final class TtCreateParallelPopulation {
 			path.add(Id.createLinkId("4_8"));
 			path.add(Id.createLinkId("8_11"));
 		}
+		path.add(Id.createLinkId("11_12"));
 
-		Route route = new LinkNetworkRouteImpl(Id.createLinkId("9_10"), path, Id.createLinkId("11_12"));
+		Route route = new LinkNetworkRouteImpl(Id.createLinkId("c_9"), path, Id.createLinkId("12_d"));
 
 		leg.setRoute(route);
 		return leg;
@@ -289,17 +296,17 @@ public final class TtCreateParallelPopulation {
 
 			// create a person
 			Person person = population.getFactory().createPerson(
-					Id.createPersonId(Integer.toString(i) + "_SN"));
+					Id.createPersonId(Integer.toString(i) + "_dc"));
 
 			// create a start activity
 			Activity startAct = population.getFactory()
-					.createActivityFromLinkId("dummy", Id.createLinkId("12_11"));
+					.createActivityFromLinkId("dummy", Id.createLinkId("d_12"));
 			// distribute agents uniformly between 8 and 9 am.
 			startAct.setEndTime(8 * 3600 + (double)(i)/numberOfPersons * 3600);
 
 			// create a drain activity
 			Activity drainAct = population.getFactory().createActivityFromLinkId(
-					"dummy", Id.createLinkId("10_9"));
+					"dummy", Id.createLinkId("9_c"));
 
 			if (initRoutes) {
 				Leg leg = createSouthNorthLeg(true);
@@ -328,6 +335,7 @@ public final class TtCreateParallelPopulation {
 		Leg leg = population.getFactory().createLeg(TransportMode.car);
 
 		List<Id<Link>> path = new ArrayList<>();
+		path.add(Id.createLinkId("12_11"));
 		if (takeWesternPath) {
 			path.add(Id.createLinkId("11_7"));
 			path.add(Id.createLinkId("7_3"));
@@ -337,8 +345,9 @@ public final class TtCreateParallelPopulation {
 			path.add(Id.createLinkId("8_4"));
 			path.add(Id.createLinkId("4_10"));
 		}
+		path.add(Id.createLinkId("9_c"));
 
-		Route route = new LinkNetworkRouteImpl(Id.createLinkId("12_11"), path, Id.createLinkId("10_9"));
+		Route route = new LinkNetworkRouteImpl(Id.createLinkId("d_12"), path, Id.createLinkId("9_c"));
 
 		leg.setRoute(route);
 		return leg;
