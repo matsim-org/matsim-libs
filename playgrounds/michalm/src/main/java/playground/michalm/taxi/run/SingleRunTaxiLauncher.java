@@ -5,16 +5,12 @@ import java.util.Map;
 
 import org.matsim.analysis.LegHistogram;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils;
-import org.matsim.contrib.dvrp.util.Schedules2GIS;
 import org.matsim.contrib.dynagent.run.DynAgentLauncherUtils;
-import org.matsim.contrib.util.chart.ChartWindowUtils;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.algorithms.*;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.vis.otfvis.OTFVisConfigGroup.ColoringScheme;
 
-import playground.michalm.taxi.util.chart.TaxiScheduleChartUtils;
 import playground.michalm.taxi.util.stats.*;
 import playground.michalm.util.*;
 
