@@ -37,7 +37,7 @@
 	<strategy>
 		<memory>1</memory>
 		<searchStrategies>
-			<searchStrategy name="radialRuinAndRecreate">
+			<searchStrategy name="randomRuinAndRecreate">
 				<selector name="selectBest"/>
 				<acceptor name="acceptNewRemoveWorst"/>
 				<modules>

@@ -1,7 +1,16 @@
 package org.matsim.contrib.freight.usecases.chessboard;
 
+import java.io.File;
+
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.freight.carrier.*;
+import org.matsim.contrib.freight.carrier.Carrier;
+import org.matsim.contrib.freight.carrier.CarrierPlan;
+import org.matsim.contrib.freight.carrier.CarrierPlanXmlReaderV2;
+import org.matsim.contrib.freight.carrier.CarrierPlanXmlWriterV2;
+import org.matsim.contrib.freight.carrier.CarrierVehicleTypeLoader;
+import org.matsim.contrib.freight.carrier.CarrierVehicleTypeReader;
+import org.matsim.contrib.freight.carrier.CarrierVehicleTypes;
+import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.controler.CarrierModule;
 import org.matsim.contrib.freight.replanning.CarrierPlanStrategyManagerFactory;
 import org.matsim.contrib.freight.scoring.CarrierScoringFunctionFactory;
@@ -27,8 +36,6 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.SumScoringFunction;
 
-import java.io.File;
-
 public class RunChessboard {
 
 	public static void main(String[] args) {
@@ -37,10 +44,10 @@ public class RunChessboard {
         long lastSeed = 4711L;
 
         for(int i=0;i<nuRuns;i++) {
-            String outputDir = "sschroeder/output/" + i + ".run/";
+            String outputDir = "output/" + i + ".run/";
             createOutputDir(outputDir);
 
-            String configFile = "sschroeder/input/usecases/chessboard/passenger/config.xml";
+            String configFile = "input/usecases/chessboard/passenger/config.xml";
             Config config = ConfigUtils.loadConfig(configFile);
 //            config.setQSimConfigGroup(new QSimConfigGroup());
             config.global().setRandomSeed(lastSeed);
@@ -50,10 +57,10 @@ public class RunChessboard {
 
 
             final Carriers carriers = new Carriers();
-            new CarrierPlanXmlReaderV2(carriers).read("sschroeder/input/usecases/chessboard/freight/carrierPlans_1_2hTW.xml");
+            new CarrierPlanXmlReaderV2(carriers).read("input/usecases/chessboard/freight/carrierPlans.xml");
 
             CarrierVehicleTypes types = new CarrierVehicleTypes();
-            new CarrierVehicleTypeReader(types).read("sschroeder/input/usecases/chessboard/freight/vehicleTypes.xml");
+            new CarrierVehicleTypeReader(types).read("input/usecases/chessboard/freight/vehicleTypes.xml");
             new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(types);
 
             CarrierPlanStrategyManagerFactory strategyManagerFactory = createStrategyManagerFactory(types, controler);
@@ -81,7 +88,7 @@ public class RunChessboard {
         // if the directory does not exist, create it
         if (!dir.exists()){
             System.out.println("creating directory "+outdir);
-            boolean result = dir.mkdir();
+            boolean result = dir.mkdirs();
             if(result) System.out.println(outdir+" created");
         }
     }
