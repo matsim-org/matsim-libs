@@ -33,14 +33,13 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.util.GeometryCombiner;
 
 /**
  * @author amit
  */
 
 public final class GeometryUtils {
-	
+
 	private GeometryUtils(){}
 	private static final Random random = MatsimRandom.getRandom(); // matsim random will return same coord.
 
@@ -54,7 +53,7 @@ public final class GeometryUtils {
 		} while (!((Geometry) feature.getDefaultGeometry()).contains(p));
 		return p;
 	}
-	
+
 	public static boolean isLinkInsideCity(Collection<SimpleFeature> features, Link link) {
 		boolean isLinkInsideMunich = false;
 		GeometryFactory gf = new GeometryFactory();
@@ -67,7 +66,7 @@ public final class GeometryUtils {
 		}
 		return isLinkInsideMunich;
 	}
-	
+
 	public static Point getRandomPointsInsideFeatures (List<SimpleFeature> features) {
 		Tuple<Double,Double> xs = getMaxMinXFromFeatures(features);
 		Tuple<Double,Double> ys = getMaxMinYFromFeatures(features);
@@ -81,34 +80,45 @@ public final class GeometryUtils {
 		} while (! (combinedGeometry).contains(p) );
 		return p;
 	}
-	
+
 	public static Tuple<Double,Double> getMaxMinXFromFeatures (List<SimpleFeature> features){
 		double minX = Double.POSITIVE_INFINITY;
 		double maxX = Double.NEGATIVE_INFINITY;
-		
+
 		for (SimpleFeature f : features){
 			if (minX > f.getBounds().getMinX()) minX =  f.getBounds().getMinX();
 			if (maxX < f.getBounds().getMaxX()) maxX =  f.getBounds().getMaxX();
 		}
 		return new Tuple<Double, Double>(minX, maxX);
 	}
-	
+
 	public static Tuple<Double,Double> getMaxMinYFromFeatures (List<SimpleFeature> features){
 		double minY = Double.POSITIVE_INFINITY;
 		double maxY = Double.NEGATIVE_INFINITY;
-		
+
 		for (SimpleFeature f : features){
 			if (minY > f.getBounds().getMinY()) minY =  f.getBounds().getMinY();
 			if (maxY < f.getBounds().getMaxY()) maxY =  f.getBounds().getMaxY();
 		}
 		return new Tuple<Double, Double>(minY, maxY);
 	}
-	
+
 	public static Geometry getGemetryFromListOfFeatures(List<SimpleFeature> featues) {
 		List<Geometry> geoms = new ArrayList<>();
 		for(SimpleFeature sf : featues){
 			geoms.add( (Geometry) sf.getDefaultGeometry() );
 		}
-		return GeometryCombiner.combine(geoms);
+		return combine(geoms);
+	}
+
+	public static Geometry combine(List<Geometry> geoms){
+		Geometry geom = null;
+		for(Geometry g : geoms){
+			if(geom==null) geom = g;
+			else {
+				geom.union(g);
+			}
+		}
+		return geom;
 	}
 }
