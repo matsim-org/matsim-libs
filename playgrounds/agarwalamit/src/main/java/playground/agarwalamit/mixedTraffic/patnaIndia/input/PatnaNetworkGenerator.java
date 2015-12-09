@@ -161,7 +161,7 @@ public class PatnaNetworkGenerator {
 				Set<Integer> nodeTypesToMerge = new TreeSet<Integer>();
 
 				nodeTypesToMerge.add(Integer.valueOf(4));
-				nodeTypesToMerge.add(Integer.valueOf(4));
+				nodeTypesToMerge.add(Integer.valueOf(5));
 
 				simplifier.setNodesToMerge(nodeTypesToMerge);
 				simplifier.run(network);
