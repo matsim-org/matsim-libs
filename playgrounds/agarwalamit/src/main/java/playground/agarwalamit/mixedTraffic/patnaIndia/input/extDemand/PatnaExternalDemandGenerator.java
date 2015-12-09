@@ -51,40 +51,102 @@ public class PatnaExternalDemandGenerator {
 	public static void main(String[] args) {
 		new PatnaExternalDemandGenerator().run();
 	}
-	
+
 	private void run(){
 		scenario = LoadMyScenarios.loadScenarioFromNetwork(networkFile);
-		createExternalToExternalDemandForAllStations();
+		createDemandForAllStations();
+		System.out.println("Number of persons in the population are "+scenario.getPopulation().getPersons().size());
 	}
 
-	private void createExternalToExternalDemandForAllStations(){
+	private void createDemandForAllStations(){
 		//OC1
-		createExternalToExternalPlans(inputFilesDir+"/oc1_patna2Fatua.txt", OuterCordonUtils.getCountingStationKey("OC1", "Out"));
-		createExternalToExternalPlans(inputFilesDir+"/oc1_fatua2Patna.txt", OuterCordonUtils.getCountingStationKey("OC1", "In"));
+		createExternalToExternalPlans(inputFilesDir+"/oc1_patna2Fatua.txt", "OC1", "Out" );
+		createExternalToExternalPlans(inputFilesDir+"/oc1_fatua2Patna.txt", "OC1", "In" );
+
+		createInternalToExternalPlans(inputFilesDir+"/oc1_patna2Fatua.txt", OuterCordonUtils.getCountingStationKey("OC1", "In"));
+		createExternalToInternalPlans(inputFilesDir+"/oc1_fatua2Patna.txt",OuterCordonUtils.getCountingStationKey("OC1", "Out"));
+
 		//OC2
-		createExternalToExternalPlans(inputFilesDir+"/oc2_patna2Fatua.txt", OuterCordonUtils.getCountingStationKey("OC2", "Out"));
-		createExternalToExternalPlans(inputFilesDir+"/oc2_fatua2Patna.txt", OuterCordonUtils.getCountingStationKey("OC2", "In"));
+		createExternalToExternalPlans(inputFilesDir+"/oc2_patna2Fatua.txt", "OC2", "Out");
+		createExternalToExternalPlans(inputFilesDir+"/oc2_fatua2Patna.txt", "OC2", "In");
+
+		createInternalToExternalPlans(inputFilesDir+"/oc2_patna2Fatua.txt", OuterCordonUtils.getCountingStationKey("OC2", "In"));
+		createExternalToInternalPlans(inputFilesDir+"/oc2_fatua2Patna.txt", OuterCordonUtils.getCountingStationKey("OC2", "Out"));
+
 		//OC3
-		createExternalToExternalPlans(inputFilesDir+"/oc3_patna2Punpun.txt", OuterCordonUtils.getCountingStationKey("OC3", "Out"));
-		createExternalToExternalPlans(inputFilesDir+"/oc3_punpun2Patna.txt", OuterCordonUtils.getCountingStationKey("OC3", "In"));
+		createExternalToExternalPlans(inputFilesDir+"/oc3_patna2Punpun.txt", "OC3", "Out");
+		createExternalToExternalPlans(inputFilesDir+"/oc3_punpun2Patna.txt", "OC3", "In");
+
+		createInternalToExternalPlans(inputFilesDir+"/oc3_patna2Punpun.txt", OuterCordonUtils.getCountingStationKey("OC3", "In"));
+		createExternalToInternalPlans(inputFilesDir+"/oc3_punpun2Patna.txt", OuterCordonUtils.getCountingStationKey("OC3", "Out"));
+
 		//OC4
-		createExternalToExternalPlans(inputFilesDir+"/oc4_patna2Muz.txt", OuterCordonUtils.getCountingStationKey("OC4", "Out"));
-		createExternalToExternalPlans(inputFilesDir+"/oc4_muz2Patna.txt", OuterCordonUtils.getCountingStationKey("OC4", "In"));
+		createExternalToExternalPlans(inputFilesDir+"/oc4_patna2Muz.txt", "OC4", "Out");
+		createExternalToExternalPlans(inputFilesDir+"/oc4_muz2Patna.txt", "OC4", "In");
+
+		createInternalToExternalPlans(inputFilesDir+"/oc4_muz2Patna.txt", OuterCordonUtils.getCountingStationKey("OC4", "In"));
+		createExternalToInternalPlans(inputFilesDir+"/oc4_patna2Muz.txt", OuterCordonUtils.getCountingStationKey("OC4", "Out"));
+
 		//OC5
-		createExternalToExternalPlans(inputFilesDir+"/oc5_patna2Danapur.txt", OuterCordonUtils.getCountingStationKey("OC5", "Out"));
-		createExternalToExternalPlans(inputFilesDir+"/oc5_danapur2Patna.txt", OuterCordonUtils.getCountingStationKey("OC5", "In"));
+		createExternalToExternalPlans(inputFilesDir+"/oc5_patna2Danapur.txt", "OC5", "Out");
+		createExternalToExternalPlans(inputFilesDir+"/oc5_danapur2Patna.txt", "OC5", "In");
+
+		createInternalToExternalPlans(inputFilesDir+"/oc5_danapur2Patna.txt", OuterCordonUtils.getCountingStationKey("OC5", "In"));
+		createExternalToInternalPlans(inputFilesDir+"/oc5_patna2Danapur.txt", OuterCordonUtils.getCountingStationKey("OC5", "Out"));
+
 		//OC6
-		createExternalToExternalPlans(inputFilesDir+"/oc6_Noera2Fatua.txt", OuterCordonUtils.getCountingStationKey("OC6", "Out"));
-		createExternalToExternalPlans(inputFilesDir+"/oc6_fatua2Noera.txt", OuterCordonUtils.getCountingStationKey("OC6", "In"));
+		createExternalToExternalPlans(inputFilesDir+"/oc6_Noera2Fatua.txt", "OC6", "Out");
+		createExternalToExternalPlans(inputFilesDir+"/oc6_fatua2Noera.txt", "OC6", "In");
+
+		createInternalToExternalPlans(inputFilesDir+"/oc6_fatua2Noera.txt", OuterCordonUtils.getCountingStationKey("OC6", "In"));
+		createExternalToInternalPlans(inputFilesDir+"/oc6_Noera2Fatua.txt", OuterCordonUtils.getCountingStationKey("OC6", "Out"));
+
 		//OC7
-		createExternalToExternalPlans(inputFilesDir+"/oc7_patna2Danapur.txt", OuterCordonUtils.getCountingStationKey("OC7", "Out"));
-		createExternalToExternalPlans(inputFilesDir+"/oc7_danapur2Patna.txt", OuterCordonUtils.getCountingStationKey("OC7", "In"));
+		createExternalToExternalPlans(inputFilesDir+"/oc7_patna2Danapur.txt", "OC7", "Out");
+		createExternalToExternalPlans(inputFilesDir+"/oc7_danapur2Patna.txt", "OC7", "In");
+
+		createInternalToExternalPlans(inputFilesDir+"/oc7_danapur2Patna.txt", OuterCordonUtils.getCountingStationKey("OC7", "In"));
+		createExternalToInternalPlans(inputFilesDir+"/oc7_patna2Danapur.txt", OuterCordonUtils.getCountingStationKey("OC7", "Out"));
 	}
 
-	private void createExternalToExternalPlans(String file, String countingStationKey){
+	private void createInternalToExternalPlans(String file, final String countingStationKey){
+
+	}
+
+	private void createExternalToInternalPlans(final String file, final String countingStationKey){
 		Population population = scenario.getPopulation();
 		PopulationFactory pf = population.getFactory();
 		Map<Double, Map<String,Double>> timebin2mode2count = readFileAndReturnMap(file);
+
+		for(double timebin : timebin2mode2count.keySet()){
+			for(String mode : timebin2mode2count.get(timebin).keySet()){
+				double directionSplitFactor = OuterCordonUtils.getDirectionalFactorFromOuterCordonKey(countingStationKey, "E2E");
+				double count = Math.round(timebin2mode2count.get(timebin).get(mode)* directionSplitFactor / PatnaUtils.COUNT_SCALE_FACTOR);
+			}
+		}
+	}
+
+	/**
+	 * @param countingDirection "In" for outside to Patna, "Out" for Patna to outside.
+	 */
+	private void createExternalToExternalPlans(final String file, final String countingStationNumber, final String countingDirection){
+ 		Population population = scenario.getPopulation();
+		PopulationFactory pf = population.getFactory();
+		Map<Double, Map<String,Double>> timebin2mode2count = readFileAndReturnMap(file);
+
+		String countingStationKey = OuterCordonUtils.getCountingStationKey(countingStationNumber, countingDirection); 
+		Id<Link> firstActLink = null; 
+		String firstActType = null;
+		Id<Link> lastActLink = null;
+		String lastActType = null;
+		
+		if(countingDirection.equalsIgnoreCase("In")){// --> trip originates at counting stationNumber
+			firstActLink = getLinkIdFromOuterCordonKey(countingStationKey, true);
+			firstActType = countingStationKey+"_Start";
+		} else {// --> trip terminates at counting stationNumber
+			lastActLink = getLinkIdFromOuterCordonKey(countingStationKey, false);
+			lastActType = countingStationKey+"_End";
+		}
 
 		for(double timebin : timebin2mode2count.keySet()){
 			for(String mode : timebin2mode2count.get(timebin).keySet()){
@@ -95,22 +157,32 @@ public class PatnaExternalDemandGenerator {
 					String prefix = countingStationKey+"_E2E_";
 					Id<Person> personId = Id.createPersonId(prefix+ population.getPersons().size());
 					Person p = pf.createPerson(personId);
-					population.addPerson(p);
 
-					Id<Link> firstActLink = getLinkIdFromOuterCordonKey(countingStationKey, true);
 					for (int jj =1;jj<=7;jj++){ // 6 plans for each outer cordon location
-
-						String countingStationKeyForLastActLink = OuterCordonUtils.getCountingStationKey("OC"+jj, "Out"); // ext to ext-- so going out
-						if(countingStationKey.equalsIgnoreCase(countingStationKeyForLastActLink)) continue; // excluding same origin- destination
-
+						
+						if(countingStationNumber.equalsIgnoreCase("OC"+jj)) continue; // excluding same origin- destination
+						
+						double actEndTime ;
+						if(countingDirection.equalsIgnoreCase("In")){// --> trip originates at given counting stationNumber
+							lastActLink = getLinkIdFromOuterCordonKey( OuterCordonUtils.getCountingStationKey("OC"+jj, "Out"), false );
+							actEndTime = (timebin-1)*3600+random.nextDouble()*3600;
+							lastActType = countingStationKey+"_End";
+						} else {// --> trip terminates at given counting stationNumber
+							String countingStationKeyForOtherActLink = OuterCordonUtils.getCountingStationKey("OC"+jj, "In"); 
+							firstActLink = 	getLinkIdFromOuterCordonKey( countingStationKeyForOtherActLink, true );
+							double travelTime = 30*60; // ZZ_TODO : it is assumed that agent will take 30 min to reach the destination counting station in desired time bin.
+							actEndTime = (timebin-1)*3600 - travelTime + random.nextDouble()*3600 - 30*60;
+							firstActType = countingStationKeyForOtherActLink+"_Start";
+						}
+						
+						population.addPerson(p);
 						Plan plan = pf.createPlan();
-						Activity firstAct = pf.createActivityFromLinkId(countingStationKey+"_Start", firstActLink);
-						firstAct.setEndTime((timebin-1)*3600+random.nextDouble()*3600);
+						Activity firstAct = pf.createActivityFromLinkId(firstActType, firstActLink);
+						firstAct.setEndTime(actEndTime );
 						plan.addActivity(firstAct);
 						plan.addLeg(pf.createLeg(mode));
 
-						Id<Link> lastActLink = getLinkIdFromOuterCordonKey(countingStationKeyForLastActLink, false);
-						Activity lastAct = pf.createActivityFromLinkId(countingStationKeyForLastActLink+"_End", lastActLink);
+						Activity lastAct = pf.createActivityFromLinkId(lastActType, lastActLink);
 						plan.addActivity(lastAct);
 						p.addPlan(plan);
 					}
@@ -122,7 +194,7 @@ public class PatnaExternalDemandGenerator {
 	/**
 	 * @return the adjacent link (previous link for origin link and next link for destination link) corresponding to the counting station.
 	 */
-	private Id<Link> getLinkIdFromOuterCordonKey(String countingStationKey, boolean isOrigin){
+	private Id<Link> getLinkIdFromOuterCordonKey(final String countingStationKey, final boolean isOrigin){
 		Id<Link> linkId = OuterCordonUtils.getCountStationLinkId(countingStationKey);
 		Link link = scenario.getNetwork().getLinks().get(linkId);
 		if(isOrigin) {
@@ -132,7 +204,7 @@ public class PatnaExternalDemandGenerator {
 		}
 	}
 
-	private Map<Double, Map<String,Double>> readFileAndReturnMap(String inputFile){
+	private Map<Double, Map<String,Double>> readFileAndReturnMap(final String inputFile){
 		Map<Double, Map<String,Double>> time2mode2count = new HashMap<>();
 		try (BufferedReader reader = IOUtils.getBufferedReader(inputFile)){
 			String line = reader.readLine();
