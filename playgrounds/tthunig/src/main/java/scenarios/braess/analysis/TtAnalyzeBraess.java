@@ -34,7 +34,7 @@ import scenarios.analysis.TtAbstractAnalysisTool;
  * @author tthunig
  * 
  */
-public class TtAnalyzeBraess extends TtAbstractAnalysisTool {
+public final class TtAnalyzeBraess extends TtAbstractAnalysisTool {
 	
 	@Override
 	protected int determineRoute(LinkEnterEvent linkEnterEvent) {

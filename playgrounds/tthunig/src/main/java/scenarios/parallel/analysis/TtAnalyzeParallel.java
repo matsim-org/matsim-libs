@@ -34,7 +34,7 @@ import scenarios.analysis.TtAbstractAnalysisTool;
  * @author tthunig
  * 
  */
-public class TtAnalyzeParallel extends TtAbstractAnalysisTool {
+public final class TtAnalyzeParallel extends TtAbstractAnalysisTool {
 	
 	@Override
 	protected int determineRoute(LinkEnterEvent linkEnterEvent) {

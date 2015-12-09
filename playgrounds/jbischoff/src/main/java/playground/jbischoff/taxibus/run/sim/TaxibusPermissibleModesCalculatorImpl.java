@@ -17,44 +17,60 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jbischoff.taxibus.scenario.strategies;
+package playground.jbischoff.taxibus.run.sim;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
-import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.population.algorithms.PermissibleModesCalculator;
 
 import playground.jbischoff.taxibus.algorithm.optimizer.fifo.Lines.LineDispatcher;
-import playground.jbischoff.taxibus.run.sim.TaxibusPermissibleModesCalculatorImpl;
 
 /**
  * @author  jbischoff
- *	this one is totally scenario specific
- * and picks either scheduled or teleported pt (defined as mode "tpt") depending on an agent's subpopulation
+ *
  */
-public class TaxibusAndWOBScenarioPermissibleModesCalculator extends TaxibusPermissibleModesCalculatorImpl {
+public class TaxibusPermissibleModesCalculatorImpl implements PermissibleModesCalculator, TaxibusPermissibleModesCalculator {
 
-	private final Scenario scenario;
+	private final LineDispatcher dispatcher;
+	private List<String> availableModes;
 	
-	public TaxibusAndWOBScenarioPermissibleModesCalculator(String[] availableModes, LineDispatcher dispatcher, Scenario scenario) {
-		super(availableModes, dispatcher);
-		this.scenario = scenario;
+	public TaxibusPermissibleModesCalculatorImpl(String[] availableModes, LineDispatcher dispatcher) {
+		this.availableModes = new ArrayList<>();
+		this.availableModes.addAll(Arrays.asList(availableModes));
+		if (this.availableModes.contains("taxibus")){
+			this.availableModes.remove("taxibus");
+		}
+		this.dispatcher = dispatcher;
 	}
 	
-	
+	/* (non-Javadoc)
+	 * @see playground.jbischoff.taxibus.run.sim.TaxibusPermissibleModesCalculator#getPermissibleModes(org.matsim.api.core.v01.population.Plan)
+	 */
 	@Override
 	public Collection<String> getPermissibleModes(Plan plan) {
-		Collection<String> permissibleModes = super.getPermissibleModes(plan);
-		String subpop = (String) scenario.getPopulation().getPersonAttributes().getAttribute(plan.getPerson().getId().toString(), "subpopulation");
-		if (subpop.equals("schedulePt")){
-			permissibleModes.remove("tpt");
-			
+		boolean isServedByTaxibus = true;
+		for (PlanElement pe : plan.getPlanElements()){
+			if (pe instanceof Activity){
+				Activity act = (Activity) pe;
+				if (!dispatcher.coordIsServedByLine(act.getCoord())){
+					isServedByTaxibus = false;
+//					System.out.println(plan.getPerson().getId() +" not served");
+					break;
+				} 
+			}
 		}
-		else if (subpop.equals("teleportPt")){
-			permissibleModes.remove("pt");
+		List<String> allModes = new ArrayList<>();
+		allModes.addAll(availableModes);
+		if (isServedByTaxibus){
+			allModes.add("taxibus");
 		}
-		
-		return permissibleModes;
+		return allModes;
 	}
 
 }

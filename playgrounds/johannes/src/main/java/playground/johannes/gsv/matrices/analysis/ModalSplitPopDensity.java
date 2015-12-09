@@ -22,7 +22,6 @@ package playground.johannes.gsv.matrices.analysis;
 import gnu.trove.map.hash.TObjectDoubleHashMap;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.common.stats.Discretizer;
-import org.matsim.contrib.common.stats.DummyDiscretizer;
 import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
 import org.matsim.contrib.common.util.ProgressLogger;
 import playground.johannes.gsv.zones.KeyMatrix;
@@ -78,8 +77,8 @@ public class ModalSplitPopDensity {
         KeyMatrix airShare = new KeyMatrix();
         KeyMatrix odCounts = new KeyMatrix();
 
-//        Discretizer discr = FixedSampleSizeDiscretizer.create(zoneRho.values(), 1, 20);
-        Discretizer discr = new DummyDiscretizer();
+        Discretizer discr = FixedSampleSizeDiscretizer.create(zoneRho.values(), 1, 20);
+//        Discretizer discr = new DummyDiscretizer();
 
         Set<String> keys = carVol.keys();
         keys.addAll(railVol.keys());
@@ -96,24 +95,23 @@ public class ModalSplitPopDensity {
                 Double air = airVol.get(from, to);
                 if (air == null) air = 0.0;
 
-                if (car > 0 && rail > 0 && air > 0) {
-                        double fromRho = zoneRho.get(from);
-                        double toRho = zoneRho.get(to);
+                if (car > 0) {// && rail > 0) {// && air > 0) {
+                    double total = car + rail + air;
 
-                        fromRho = discr.discretize(fromRho);
-                        toRho = discr.discretize(toRho);
+                    double fromRho = zoneRho.get(from);
+                    double toRho = zoneRho.get(to);
 
-                        String fromRhoStr = String.valueOf(fromRho);
-                        String toRhoStr = String.valueOf(toRho);
-                        odCounts.add(fromRhoStr, toRhoStr, 1);
+                    fromRho = discr.discretize(fromRho);
+                    toRho = discr.discretize(toRho);
 
-                        double total = car + rail + air;
+                    String fromRhoStr = String.valueOf(fromRho);
+                    String toRhoStr = String.valueOf(toRho);
+                    odCounts.add(fromRhoStr, toRhoStr, 1);
+//                    odCounts.add(fromRhoStr, toRhoStr, total);
 
-                        carShare.add(fromRhoStr, toRhoStr, car / total);
-                        railShare.add(fromRhoStr, toRhoStr, rail / total);
-                        airShare.add(fromRhoStr, toRhoStr, air / total);
-
-
+                    carShare.add(fromRhoStr, toRhoStr, car / total);
+                    railShare.add(fromRhoStr, toRhoStr, rail / total);
+                    airShare.add(fromRhoStr, toRhoStr, air / total);
                 }
             }
             ProgressLogger.step();

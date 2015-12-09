@@ -87,6 +87,8 @@ public interface TaxibusLine {
 	public boolean isVehicleInHold();
 
 	public int getMaximumOpenVehicles();
+
+	public void reset();
 	
 	
 }

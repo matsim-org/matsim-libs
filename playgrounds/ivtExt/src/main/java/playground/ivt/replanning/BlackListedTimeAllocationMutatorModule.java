@@ -28,6 +28,7 @@ import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripRouter;
 import org.matsim.population.algorithms.PlanAlgorithm;
+import org.matsim.population.algorithms.PlanMutateTimeAllocationSimplified;
 
 /**
  * @author thibautd
@@ -54,7 +55,7 @@ public class BlackListedTimeAllocationMutatorModule extends AbstractMultithreade
 		} else if ( actDurInterpr == PlansConfigGroup.ActivityDurationInterpretation.endTimeOnly ) {
 			useActivityDurations = false ;
 		} else if ( actDurInterpr == PlansConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration ) {
-			throw new UnsupportedOperationException( "need to clarify the correct setting here.  Probably not a big deal, but not done yet.  kai, aug'10") ;
+			useActivityDurations = false ;
 		} else {
 			throw new IllegalStateException( "beahvior not defined for this configuration setting") ;
 		}
@@ -62,12 +63,12 @@ public class BlackListedTimeAllocationMutatorModule extends AbstractMultithreade
 
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
-		BlackListedTimeAllocationMutator mutator =
-			new BlackListedTimeAllocationMutator(
+		PlanAlgorithm mutator =
+			new PlanMutateTimeAllocationSimplified(
 					blackList,
 					this.mutationRange,
+					useActivityDurations,
 					MatsimRandom.getLocalInstance());
-		mutator.setSetting( useActivityDurations ? Setting.MUTATE_DUR : Setting.MUTATE_END_AS_DUR );
 		return mutator;
 	}
 }

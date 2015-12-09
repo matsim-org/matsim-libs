@@ -45,7 +45,7 @@ import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
  * @author gthunig
  * 
  */
-public class TtCreateParallelSignals {
+public final class TtCreateParallelSignals {
 
 	private static final Logger log = Logger
 			.getLogger(TtCreateParallelSignals.class);
@@ -60,6 +60,7 @@ public class TtCreateParallelSignals {
 	}
 
 	public void createSignals() {
+		log.info("Create signals ...");
 		
 		createSignalSystems();
 		createSignalGroups();
@@ -84,6 +85,9 @@ public class TtCreateParallelSignals {
 		}
 	}
 
+	// TODO this is not correct yet: node 2, 5, 9 and 11 should get signals that allow the two alternatives 
+	// (but not more, e.g. traveling from 3_2 to 2_7 is not allowed), 
+	// nodes 3, 4, 7, 8 should get signals that only allow traveling straight (no turns)
 	private void createSignalSystemAtNode(Node node) {
 		SignalsData signalsData = (SignalsData) this.scenario
 				.getScenarioElement(SignalsData.ELEMENT_NAME);
