@@ -100,11 +100,14 @@ public final class TtCreateParallelSignals {
 		// create a signal for every inLink outLink pair
 		for (Id<Link> inLinkId : node.getInLinks().keySet()){
 			int outLinkCounter = 0;
+            log.error("inLinkId" + inLinkId);
 			for (Id<Link> outLinkId : node.getOutLinks().keySet()) {
+                log.error("outLinkId" + outLinkId);
 				outLinkCounter++;
 				SignalData signal = fac.createSignalData(Id.create("signal" + inLinkId
 						+ "." + outLinkCounter, Signal.class));
-				switch (inLinkId.toString()) {
+                signal.addTurningMoveRestriction(Id.createLinkId(new StringBuffer(inLinkId.toString()).reverse().toString()));
+                switch (inLinkId.toString()) {
 					case "3_2":
 						signal.addTurningMoveRestriction(Id.createLinkId("2_3"));
 						break;
@@ -171,7 +174,6 @@ public final class TtCreateParallelSignals {
 						break;
 
 					default:
-						log.error("inLinkid " + inLinkId + " is not known.");
 						break;
 				}
 
@@ -181,7 +183,6 @@ public final class TtCreateParallelSignals {
 				LanesToLinkAssignment20 linkLanes = this.scenario.getLanes().getLanesToLinkAssignments().get(inLinkId);
 				// the link only contains one lane (the trivial lane)
 				signal.addLaneId(linkLanes.getLanes().firstKey());
-				//signal.addTurningMoveRestriction(outLinkId);
 			}
 		}
 	}
