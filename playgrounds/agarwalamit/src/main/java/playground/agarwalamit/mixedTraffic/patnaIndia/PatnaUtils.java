@@ -53,7 +53,7 @@ public final class PatnaUtils {
 	}
 	
 	public static final Collection <String> MAIN_MODES = Arrays.asList("car","motorbike","bike");
-	public static final Collection <String> ALL_MODES = Arrays.asList("car","motorbike","bike","pt","walk");
+	public static final Collection <String> ALL_MODES = Arrays.asList("car","motorbike","truck","bike","pt","walk");
 	
 	private PatnaUtils(){} 
 	
