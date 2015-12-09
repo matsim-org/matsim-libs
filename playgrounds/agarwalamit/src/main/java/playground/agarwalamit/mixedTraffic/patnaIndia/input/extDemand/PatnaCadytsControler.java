@@ -121,6 +121,8 @@ public class PatnaCadytsControler {
 
 	private Config getConfig(){
 		Config config = ConfigUtils.createConfig();
+		
+		config.global().setCoordinateSystem("EPSG:24345");
 
 		config.plans().setInputFile("../../../../repos/runs-svn/patnaIndia/run108/input/outerCordonDemand.xml.gz");
 		config.network().setInputFile("../../../../repos/runs-svn/patnaIndia/run108/input/network_diff_linkSpeed.xml.gz");
@@ -136,6 +138,7 @@ public class PatnaCadytsControler {
 		config.counts().setCountsFileName("../../../../repos/runs-svn/patnaIndia/run108/input/outerCordonCounts.xml.gz");
 		config.counts().setWriteCountsInterval(20);
 		config.counts().setCountsScaleFactor(100);
+		config.counts().setOutputFormat("all");
 
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(100);
