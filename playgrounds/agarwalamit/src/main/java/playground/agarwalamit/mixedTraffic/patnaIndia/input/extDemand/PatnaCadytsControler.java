@@ -128,7 +128,7 @@ public class PatnaCadytsControler {
 		config.network().setInputFile("../../../../repos/runs-svn/patnaIndia/run108/input/network_diff_linkSpeed.xml.gz");
 
 		config.qsim().setFlowCapFactor(0.01);
-		config.qsim().setStorageCapFactor(0.01);
+		config.qsim().setStorageCapFactor(0.03);
 		config.qsim().setMainModes(Arrays.asList("car","bike","motorbike","truck"));
 		config.qsim().setLinkDynamics(LinkDynamics.PassingQ.name());
 		config.qsim().setEndTime(30*3600);
