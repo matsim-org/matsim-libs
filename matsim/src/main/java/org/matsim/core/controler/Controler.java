@@ -113,7 +113,15 @@ public class Controler extends AbstractController implements ControlerI {
 			"%d{ISO8601} %5p %C{1}:%L %m%n");
 
 	private final Config config; 
-	private final Scenario scenario ;
+	private final Scenario scenario;
+
+	@Inject private EventsHandling eventsHandling;
+	@Inject private PlansDumping plansDumping;
+	@Inject private PlansReplanning plansReplanning;
+	@Inject private PlansScoring plansScoring;
+	@Inject private DumpDataAtEnd dumpDataAtEnd;
+
+	@Inject private Set<ControlerListener> controlerListenersDeclaredByModules;
 
 	private Injector injector;
 	private boolean injectorCreated = false;
@@ -171,7 +179,6 @@ public class Controler extends AbstractController implements ControlerI {
 		this.controlerListenerManager.setControler(this);
 		this.injector = Injector.fromGuiceInjector(injector);
 		this.injectorCreated = true;
-		injectSelf();
 	}
 
 	/**
@@ -297,11 +304,12 @@ public class Controler extends AbstractController implements ControlerI {
 							bind(ControlerI.class).toInstance(Controler.this);
 						}
 					});
-			injectSelf();
+			this.injector.getInstance(com.google.inject.Injector.class).injectMembers(this);
 		}
+		addListenersToSelf();
 	}
 
-	private void injectSelf() {
+	private void addListenersToSelf() {
 		/*
 		 * The order how the listeners are added is very important! As
 		 * dependencies between different listeners exist or listeners may read
@@ -311,17 +319,16 @@ public class Controler extends AbstractController implements ControlerI {
 		 * are added to the list.
 		 */
 		if (getConfig().controler().getDumpDataAtEnd()) {
-			this.addCoreControlerListener(injector.getInstance(DumpDataAtEnd.class));
+			this.addCoreControlerListener(this.dumpDataAtEnd);
 		}
 
-		this.addCoreControlerListener(injector.getInstance(PlansScoring.class));
-		this.addCoreControlerListener(injector.getInstance(PlansReplanning.class));
-		this.addCoreControlerListener(injector.getInstance(PlansDumping.class));
-		this.addCoreControlerListener(injector.getInstance(EventsHandling.class));
+		this.addCoreControlerListener(this.plansScoring);
+		this.addCoreControlerListener(this.plansReplanning);
+		this.addCoreControlerListener(this.plansDumping);
+		this.addCoreControlerListener(this.eventsHandling);
 		// must be last being added (=first being executed)
 
-		Set<ControlerListener> controlerListenersDeclaredByModules = this.injector.getControlerListenersDeclaredByModules();
-		for (ControlerListener controlerListener : controlerListenersDeclaredByModules) {
+		for (ControlerListener controlerListener : this.controlerListenersDeclaredByModules) {
 			this.addControlerListener(controlerListener);
 		}
 	}
