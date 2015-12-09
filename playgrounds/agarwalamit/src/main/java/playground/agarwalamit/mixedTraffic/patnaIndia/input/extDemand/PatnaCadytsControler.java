@@ -133,7 +133,7 @@ public class PatnaCadytsControler {
 		config.qsim().setSnapshotStyle(SnapshotStyle.queue);
 		config.qsim().setVehiclesSource(VehiclesSource.fromVehiclesData);
 
-		config.counts().setCountsFileName("../../../../repos/runs-svn/patnaIndia/run108/input/innerAndOuterCounts.xml.gz");
+		config.counts().setCountsFileName("../../../../repos/runs-svn/patnaIndia/run108/input/outerCordonCounts.xml.gz");
 		config.counts().setWriteCountsInterval(20);
 		config.counts().setCountsScaleFactor(100);
 
@@ -171,6 +171,7 @@ public class PatnaCadytsControler {
 
 		config.plans().setRemovingUnneccessaryPlanAttributes(true);
 		config.vspExperimental().addParam("vspDefaultsCheckingLevel", "abort");
+		config.vspExperimental().setWritingOutputEvents(true);
 		config.vspExperimental().setWritingOutputEvents(true);
 
 		config.planCalcScore().setMarginalUtlOfWaiting_utils_hr(0);
