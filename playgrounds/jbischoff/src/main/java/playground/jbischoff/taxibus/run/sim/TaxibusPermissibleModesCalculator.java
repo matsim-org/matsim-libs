@@ -17,44 +17,18 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jbischoff.taxibus.scenario.strategies;
+package playground.jbischoff.taxibus.run.sim;
 
 import java.util.Collection;
 
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Plan;
-
-import playground.jbischoff.taxibus.algorithm.optimizer.fifo.Lines.LineDispatcher;
-import playground.jbischoff.taxibus.run.sim.TaxibusPermissibleModesCalculatorImpl;
 
 /**
  * @author  jbischoff
- *	this one is totally scenario specific
- * and picks either scheduled or teleported pt (defined as mode "tpt") depending on an agent's subpopulation
+ *
  */
-public class TaxibusAndWOBScenarioPermissibleModesCalculator extends TaxibusPermissibleModesCalculatorImpl {
+public interface TaxibusPermissibleModesCalculator {
 
-	private final Scenario scenario;
-	
-	public TaxibusAndWOBScenarioPermissibleModesCalculator(String[] availableModes, LineDispatcher dispatcher, Scenario scenario) {
-		super(availableModes, dispatcher);
-		this.scenario = scenario;
-	}
-	
-	
-	@Override
-	public Collection<String> getPermissibleModes(Plan plan) {
-		Collection<String> permissibleModes = super.getPermissibleModes(plan);
-		String subpop = (String) scenario.getPopulation().getPersonAttributes().getAttribute(plan.getPerson().getId().toString(), "subpopulation");
-		if (subpop.equals("schedulePt")){
-			permissibleModes.remove("tpt");
-			
-		}
-		else if (subpop.equals("teleportPt")){
-			permissibleModes.remove("pt");
-		}
-		
-		return permissibleModes;
-	}
+	Collection<String> getPermissibleModes(Plan plan);
 
 }

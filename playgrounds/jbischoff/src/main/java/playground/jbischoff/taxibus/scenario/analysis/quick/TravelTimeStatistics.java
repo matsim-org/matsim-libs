@@ -43,8 +43,9 @@ public class TravelTimeStatistics   {
 //		String inputFile = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/input/output/vw029.100pct/ITERS/it.180/vw029.100pct.180.events.xml.gz";
 //		String inputFile = "D:/runs-svn/vw_rufbus/vw038/ITERS/it.0/vw038.0.events.xml.gz";
 //		String inputFile = "D:/runs-svn/vw_rufbus/vw040/ITERS/it.180/vw040.180.events.xml.gz";
+//		String inputFile = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/input/output/vw042/ITERS/it.0/vw042.0.events.xml.gz";
+		String inputFile = "D:/runs-svn/vw_rufbus/vw047/vw047.output_events.xml.gz";
 		
-		String inputFile = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/input/output/vw042/ITERS/it.0/vw042.0.events.xml.gz";
 				EventsManager events = EventsUtils.createEventsManager();
 
 		Set<Id<Link>> links = new HashSet<>();
