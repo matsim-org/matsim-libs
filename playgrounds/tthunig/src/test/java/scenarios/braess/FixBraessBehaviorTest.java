@@ -73,6 +73,8 @@ public final class FixBraessBehaviorTest{
 	
 	@Test
 	public void testBraessWoPricing() {
+		// TODO change everything to 3600 persons (no rounding differences in activity end times)
+		// results for no pricing should than be 19, 3558, 23, 7104064
 		fixRouteDistributionAndTT(RunBraessSimulation.PricingType.NONE, 11, 1978, 11, 3949870);
 	}
 

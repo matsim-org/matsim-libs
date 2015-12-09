@@ -26,7 +26,10 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
@@ -35,6 +38,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.replanning.DefaultPlanStrategiesModule.DefaultSelector;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.testcases.MatsimTestUtils;
 
 import scenarios.analysis.TtAbstractAnalysisTool;
@@ -57,15 +61,28 @@ public class ReadVsCreatePopulationTest {
 	
 	@Test
 	public void testReadVsCreatePopulation() {
-		TtAbstractAnalysisTool handlerRead = run(false);
-		TtAbstractAnalysisTool handlerCreate = run(true);
+		Tuple<TtAbstractAnalysisTool,Population> readResults = run(false);
+		Tuple<TtAbstractAnalysisTool,Population> createResults = run(true);
+		
+		// compare populations
+		for (Person pRead : readResults.getSecond().getPersons().values()){
+			Person pCreate = createResults.getSecond().getPersons().get(pRead.getId());
+			
+			for (Plan planRead : pRead.getPlans()){
+				for (Plan planCreate : pCreate.getPlans()){
+					Activity startActRead = (Activity) planRead.getPlanElements().get(0);
+					Activity startActCreate = (Activity) planCreate.getPlanElements().get(0);
+					Assert.assertEquals("activity end times differ", startActRead.getEndTime(), startActCreate.getEndTime(), MatsimTestUtils.EPSILON);
+				}
+			}
+		}
 		
 		// compare results
-		log.info("the total travel times are: " + handlerRead.getTotalTT() + " and " + handlerCreate.getTotalTT());
-		log.info("the route distributions are: " + handlerRead.getRouteUsers()[0] + ", " + handlerRead.getRouteUsers()[1] + ", " + handlerRead.getRouteUsers()[2] 
-				+ " and " + handlerCreate.getRouteUsers()[0] + ", " + handlerCreate.getRouteUsers()[1] + ", " + handlerCreate.getRouteUsers()[2]);
-		Assert.assertArrayEquals("route distribution does not match", handlerRead.getRouteUsers(), handlerCreate.getRouteUsers());
-		Assert.assertEquals("total travel time does not match", handlerRead.getTotalTT(), handlerCreate.getTotalTT(), MatsimTestUtils.EPSILON);
+		log.info("the total travel times are: " + readResults.getFirst().getTotalTT() + " and " + createResults.getFirst().getTotalTT());
+		log.info("the route distributions are: " + readResults.getFirst().getRouteUsers()[0] + ", " + readResults.getFirst().getRouteUsers()[1] + ", " + readResults.getFirst().getRouteUsers()[2] 
+				+ " and " + createResults.getFirst().getRouteUsers()[0] + ", " + createResults.getFirst().getRouteUsers()[1] + ", " + createResults.getFirst().getRouteUsers()[2]);
+		Assert.assertArrayEquals("route distributions differ", readResults.getFirst().getRouteUsers(), createResults.getFirst().getRouteUsers());
+		Assert.assertEquals("total travel times differ", readResults.getFirst().getTotalTT(), createResults.getFirst().getTotalTT(), MatsimTestUtils.EPSILON);
 	}
 
 	/**
@@ -76,7 +93,7 @@ public class ReadVsCreatePopulationTest {
 	 *            population from file if false
 	 * @return the handler that contains the results
 	 */
-	private TtAbstractAnalysisTool run(boolean createPopulation) {
+	private Tuple<TtAbstractAnalysisTool,Population> run(boolean createPopulation) {
 		
 		Config config = defineConfig(createPopulation);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -90,26 +107,23 @@ public class ReadVsCreatePopulationTest {
 		// add a controller listener to analyze results
 		TtAbstractAnalysisTool handler = new TtAnalyzeBraess();
 		controler.addControlerListener(new TtListenerToBindAndWriteAnalysis(scenario, handler));
-			
+		
 		controler.run();
 		
-		return handler;
+		return new Tuple<TtAbstractAnalysisTool,Population>(handler,scenario.getPopulation());
 	}
 	
 	private Config defineConfig(boolean createPopulation) {
 		Config config = ConfigUtils.createConfig();
 
 		// set network and population
-		config.network().setInputFile(testUtils.getClassInputDirectory() + "network_cap2000-1000.xml");
+		config.network().setInputFile(testUtils.getClassInputDirectory() + "network_cap3600-1800.xml");
 		if (!createPopulation){ // read population
-			config.plans().setInputFile(testUtils.getClassInputDirectory() + "plans2000_initRoutes.xml");
+			config.plans().setInputFile(testUtils.getClassInputDirectory() + "plans3600_initRoutes.xml");
 		}
 
 		// set number of iterations
 		config.controler().setLastIteration(1);
-
-		// set brain exp beta
-		config.planCalcScore().setBrainExpBeta(20);
 
 		// define strategies:
 		{
@@ -119,11 +133,8 @@ public class ReadVsCreatePopulationTest {
 			strat.setDisableAfter(config.controler().getLastIteration());
 			config.strategy().addStrategySettings(strat);
 		}
-		
-		// choose maximal number of plans per agent. 0 means unlimited
-		config.strategy().setMaxAgentPlanMemorySize(3);
 
-		config.controler().setOutputDirectory(testUtils.getOutputDirectory());
+		config.controler().setOutputDirectory(createPopulation? testUtils.getOutputDirectory() + "create/" : testUtils.getOutputDirectory() + "read/");
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 
 		config.controler().setWriteEventsInterval(config.controler().getLastIteration());
@@ -142,8 +153,7 @@ public class ReadVsCreatePopulationTest {
 		
 		TtCreateBraessPopulation popCreator = 
 				new TtCreateBraessPopulation(scenario.getPopulation(), scenario.getNetwork());
-		popCreator.setNumberOfPersons(2000);
-		
+		popCreator.setNumberOfPersons(3600);
 		popCreator.createPersons(InitRoutes.ALL, 110.);
 	}
 	
