@@ -27,6 +27,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -168,7 +169,7 @@ public abstract class AbstractModule implements Module {
 
 	@SuppressWarnings("static-method")
 	protected final Key<TravelDisutilityFactory> carTravelDisutilityFactoryKey() {
-		return Key.get(TravelDisutilityFactory.class, ForCar.class);
+		return Key.get(TravelDisutilityFactory.class, Names.named(TransportMode.car));
 	}
 
 	protected final com.google.inject.binder.LinkedBindingBuilder<TravelDisutilityFactory> addTravelDisutilityFactoryBinding(String mode) {
@@ -197,7 +198,7 @@ public abstract class AbstractModule implements Module {
 
 	@SuppressWarnings("static-method")
 	protected final Key<TravelTime> networkTravelTime() {
-		return Key.get(TravelTime.class, ForCar.class);
+		return Key.get(TravelTime.class, Names.named(TransportMode.car));
 	}
 
 	protected <T> AnnotatedBindingBuilder<T> bind(Class<T> aClass) {
@@ -240,10 +241,5 @@ public abstract class AbstractModule implements Module {
 			@Override
 			public void install() {}
 		};
-	}
-
-	@BindingAnnotation
-	@Retention(RetentionPolicy.RUNTIME)
-	@interface ForCar {
 	}
 }

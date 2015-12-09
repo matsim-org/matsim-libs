@@ -55,9 +55,8 @@ public class TravelTimeCalculatorModule extends AbstractModule {
         // The Controler will wire it into the EventsManager later.
         // (Again, there is a second method to add an instance directly.)
         addEventHandlerBinding().to(TravelTimeCalculator.class);
-        bindNetworkTravelTime().toProvider(FromTravelTimeCalculator.class);
         for (String mode : CollectionUtils.stringToSet(getConfig().travelTimeCalculator().getAnalyzedModes())) {
-            addTravelTimeBinding(mode).to(networkTravelTime());
+            addTravelTimeBinding(mode).toProvider(FromTravelTimeCalculator.class);
         }
         bind(LinkToLinkTravelTime.class).toProvider(LinkToLinkTravelTimeProvider.class);
     }
