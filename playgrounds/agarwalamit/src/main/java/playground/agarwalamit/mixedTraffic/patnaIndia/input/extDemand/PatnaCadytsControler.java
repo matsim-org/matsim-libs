@@ -158,11 +158,11 @@ public class PatnaCadytsControler {
 		config.strategy().addStrategySettings(expChangeBeta);
 
 		ActivityParams ac1 = new ActivityParams("E2E_Start");
-		ac1.setTypicalDuration(12*60*60);
+		ac1.setTypicalDuration(10*60*60);
 		config.planCalcScore().addActivityParams(ac1);
 
 		ActivityParams act2 = new ActivityParams("E2E_End");
-		act2.setTypicalDuration(8*60*60);
+		act2.setTypicalDuration(10*60*60);
 		config.planCalcScore().addActivityParams(act2);
 
 		ActivityParams act3 = new ActivityParams("E2I_Start");
