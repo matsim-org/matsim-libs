@@ -36,6 +36,7 @@ import org.matsim.contrib.signals.model.Signal;
 import org.matsim.contrib.signals.model.SignalGroup;
 import org.matsim.contrib.signals.model.SignalSystem;
 import org.matsim.contrib.signals.utils.SignalUtils;
+import org.matsim.lanes.data.v20.Lane;
 import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
 
 /**
@@ -102,7 +103,11 @@ public final class TtCreateParallelSignals {
 			int outLinkCounter = 0;
             log.error("inLinkId" + inLinkId);
 			for (Id<Link> outLinkId : node.getOutLinks().keySet()) {
-                log.error("outLinkId" + outLinkId);
+
+				//TODO nicht für alle outlinks ein signal sondern nur für die "ampeln"
+				//turningmoverestriction sagt wo man fahren kann
+
+				log.error("outLinkId" + outLinkId);
 				outLinkCounter++;
 				SignalData signal = fac.createSignalData(Id.create("signal" + inLinkId
 						+ "." + outLinkCounter, Signal.class));
@@ -181,8 +186,14 @@ public final class TtCreateParallelSignals {
 				signal.setLinkId(inLinkId);
 
 				LanesToLinkAssignment20 linkLanes = this.scenario.getLanes().getLanesToLinkAssignments().get(inLinkId);
-				// the link only contains one lane (the trivial lane)
-				signal.addLaneId(linkLanes.getLanes().firstKey());
+				if (linkLanes != null) {
+					for (Lane l : linkLanes.getLanes().values()) {
+						if (l.getToLinkIds().get(0).toString().equals(outLinkId.toString())) {
+							signal.addLaneId(l.getId());
+						}
+					}
+
+				}
 			}
 		}
 	}
