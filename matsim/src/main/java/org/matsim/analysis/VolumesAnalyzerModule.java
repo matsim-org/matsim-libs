@@ -23,7 +23,8 @@
 package org.matsim.analysis;
 
 import com.google.inject.Singleton;
-import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.AbstractModule;
 
 import javax.inject.Inject;
@@ -33,17 +34,21 @@ public class VolumesAnalyzerModule extends AbstractModule {
     @Override
     public void install() {
         bind(VolumesAnalyzer.class).toProvider(VolumesAnalyzerProvider.class).in(Singleton.class);
-        addEventHandlerBinding().to(VolumesAnalyzer.class);
     }
 
     static class VolumesAnalyzerProvider implements Provider<VolumesAnalyzer> {
 
         @Inject
-        Scenario scenario;
+        Network network;
+
+        @Inject
+        EventsManager eventsManager;
 
         @Override
         public VolumesAnalyzer get() {
-            return new VolumesAnalyzer(3600, 24 * 3600 - 1, scenario.getNetwork());
+            VolumesAnalyzer volumesAnalyzer = new VolumesAnalyzer(3600, 24 * 3600 - 1, network);
+            eventsManager.addHandler(volumesAnalyzer);
+            return volumesAnalyzer;
         }
     }
 

@@ -25,6 +25,7 @@ package org.matsim.core.trafficmonitoring;
 import com.google.inject.Singleton;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.router.util.LinkToLinkTravelTime;
@@ -53,10 +54,6 @@ public class TravelTimeCalculatorModule extends AbstractModule {
         // If I was in a script, I could also pass an instance directly which I created myself, but
         // here, the Scenario is not available yet, so I defer construction.
         bind(TravelTimeCalculator.class).toProvider(TravelTimeCalculatorProvider.class).in(Singleton.class);
-        // I declare that my single TravelTimeCalculator is an EventHandler.
-        // The Controler will wire it into the EventsManager later.
-        // (Again, there is a second method to add an instance directly.)
-        addEventHandlerBinding().to(TravelTimeCalculator.class);
         for (String mode : CollectionUtils.stringToSet(getConfig().travelTimeCalculator().getAnalyzedModes())) {
             addTravelTimeBinding(mode).toProvider(FromTravelTimeCalculator.class);
         }
@@ -93,11 +90,16 @@ public class TravelTimeCalculatorModule extends AbstractModule {
         Config config;
 
         @Inject
+        EventsManager eventsManager;
+
+        @Inject
         Network network;
 
         @Override
         public TravelTimeCalculator get() {
-            return TravelTimeCalculator.create(network, config.travelTimeCalculator());
+            TravelTimeCalculator travelTimeCalculator = TravelTimeCalculator.create(network, config.travelTimeCalculator());
+            eventsManager.addHandler(travelTimeCalculator);
+            return travelTimeCalculator;
         }
 
     }
