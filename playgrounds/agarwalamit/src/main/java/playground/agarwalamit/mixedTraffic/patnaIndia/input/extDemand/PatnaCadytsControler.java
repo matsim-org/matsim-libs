@@ -182,7 +182,7 @@ public class PatnaCadytsControler {
 		config.planCalcScore().setPerforming_utils_hr(6.0);
 
 		ModeParams car = new ModeParams("car");
-		car.setConstant(-3.30);
+		car.setConstant(0.0);
 		car.setMarginalUtilityOfTraveling(0.0);
 		config.planCalcScore().addModeParams(car);
 
@@ -192,7 +192,7 @@ public class PatnaCadytsControler {
 		config.planCalcScore().addModeParams(bike);
 
 		ModeParams motorbike = new ModeParams("motorbike");
-		motorbike.setConstant(-2.20);
+		motorbike.setConstant(0.0);
 		motorbike.setMarginalUtilityOfTraveling(0.0);
 		config.planCalcScore().addModeParams(motorbike);
 
