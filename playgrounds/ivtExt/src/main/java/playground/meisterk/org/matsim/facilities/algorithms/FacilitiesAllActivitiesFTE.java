@@ -20,12 +20,6 @@
 
 package playground.meisterk.org.matsim.facilities.algorithms;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Random;
-import java.util.Set;
-import java.util.TreeMap;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -35,12 +29,17 @@ import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
 import org.matsim.facilities.ActivityOptionImpl;
-
 import playground.meisterk.org.matsim.enterprisecensus.EnterpriseCensus;
 import playground.meisterk.org.matsim.enterprisecensus.EnterpriseCensus.ProductionSector;
 import playground.meisterk.org.matsim.enterprisecensus.EnterpriseCensusParser;
 import playground.meisterk.org.matsim.run.facilities.FacilitiesProductionKTI;
 import playground.meisterk.org.matsim.run.facilities.FacilitiesProductionKTI.KTIYear;
+
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Random;
+import java.util.Set;
+import java.util.TreeMap;
 
 public class FacilitiesAllActivitiesFTE {
 

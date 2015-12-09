@@ -21,13 +21,11 @@
 package herbie.running.controler;
 
 import com.google.inject.Singleton;
-
 import herbie.running.config.HerbieConfigGroup;
 import herbie.running.controler.listeners.CalcLegTimesHerbieListener;
 import herbie.running.controler.listeners.LegDistanceDistributionWriter;
 import herbie.running.controler.listeners.ScoreElements;
 import herbie.running.replanning.TransitStrategyManager;
-
 import org.apache.log4j.Logger;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;

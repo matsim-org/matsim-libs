@@ -31,13 +31,14 @@ import org.matsim.facilities.algorithms.WorldConnectLocations;
 import org.matsim.population.algorithms.XY2Links;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.AccessibilityComputationResult;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.BaseNestedAccessibilityComputationModule;
-import playground.ivt.maxess.nestedlogitaccessibility.writers.BasicPersonAccessibilityWriter;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.InjectionUtils;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.NestedLogitAccessibilityCalculator;
+import playground.ivt.maxess.nestedlogitaccessibility.writers.BasicPersonAccessibilityWriter;
 import playground.ivt.router.CachingFreespeedCarRouterModule;
 import playground.ivt.router.lazyschedulebasedmatrix.LazyScheduleBasedMatrixModule;
 import playground.ivt.utils.MoreIOUtils;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
@@ -69,11 +70,15 @@ public class RunSimpleNestedLogitAccessibility {
 			final SimpleNestedLogitModule module = new SimpleNestedLogitModule();
 			final NestedLogitAccessibilityCalculator<ModeNests> calculator =
 					InjectionUtils.createCalculator(
-							new TypeLiteral<ModeNests>() {},
-							new BaseNestedAccessibilityComputationModule<ModeNests>(
-									scenario ) {},
-							new CachingFreespeedCarRouterModule(),
-							new LazyScheduleBasedMatrixModule(),
+							config,
+							new TypeLiteral<ModeNests>() {
+							},
+							InjectionUtils.override(
+									new BaseNestedAccessibilityComputationModule<ModeNests>(
+											scenario ) {},
+									Arrays.asList(
+											new LazyScheduleBasedMatrixModule(),
+											new CachingFreespeedCarRouterModule() ) ),
 							module );
 
 			// TODO store and write results

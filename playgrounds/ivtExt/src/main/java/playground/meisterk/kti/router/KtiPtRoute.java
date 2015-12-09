@@ -24,11 +24,9 @@ import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.population.routes.AbstractRoute;
-import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.StringUtils;
 import org.matsim.matrices.Entry;
-
 import playground.balmermi.world.Zone;
 
 public class KtiPtRoute extends AbstractRoute {

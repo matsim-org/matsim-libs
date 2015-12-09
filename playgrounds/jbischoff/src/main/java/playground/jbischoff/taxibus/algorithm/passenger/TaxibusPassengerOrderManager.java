@@ -68,6 +68,9 @@ public class TaxibusPassengerOrderManager implements ActivityStartEventHandler, 
 			if (mobsimAgent instanceof PlanAgent) {
 				if (mobsimAgent.getState().equals(State.LEG))
 					return;
+				if (mobsimAgent.getState().equals(State.ABORT))
+					return;
+				
 				PlanAgent agent = (PlanAgent) mobsimAgent;
 				PlanElement nextPlanElement = agent.getNextPlanElement();
 				if (nextPlanElement != null) {

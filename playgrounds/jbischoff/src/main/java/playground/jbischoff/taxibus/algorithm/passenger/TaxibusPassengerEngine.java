@@ -38,6 +38,7 @@ import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
  */
 public class TaxibusPassengerEngine extends PassengerEngine {
 
+	private int abortWarn = 0;
 	public TaxibusPassengerEngine(String mode, EventsManager eventsManager, PassengerRequestCreator requestCreator,
 			VrpOptimizer optimizer, MatsimVrpContext context) {
 		super(mode, eventsManager, requestCreator, optimizer, context);
@@ -73,7 +74,13 @@ public class TaxibusPassengerEngine extends PassengerEngine {
 		                awaitingPickup.notifyPassengerIsReadyForDeparture(passenger, now);
 		            }
 		        }
-
+		        if (request.isRejected()){
+		        	
+		        	if (abortWarn<10) Logger.getLogger(getClass()).error(agent.getId().toString() + " is aborted, no Taxibus was found");
+		        	abortWarn++;
+		        	if (abortWarn==10) Logger.getLogger(getClass()).error("no more aborted taxibus agents will be displayed");
+		        	agent.setStateToAbort(now);
+		        }
 		        return !request.isRejected();
 		    }
 		

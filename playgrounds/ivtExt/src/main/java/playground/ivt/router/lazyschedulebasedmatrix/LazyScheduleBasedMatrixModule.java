@@ -22,11 +22,15 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.controler.AbstractModule;
 
 /**
+ * Adds a wrapper around the PT router, to store a matrix of the best routes.
+ * It does not seem to help a lot, at least in the accessibility computation runs
+ * (where there are probably to seldom several agents at the same origin)
  * @author thibautd
  */
 public class LazyScheduleBasedMatrixModule extends AbstractModule {
 	@Override
 	public void install() {
+		bind( LazyScheduleBasedMatrixRoutingModule.Cache.class );
 		addRoutingModuleBinding( TransportMode.pt ).to( LazyScheduleBasedMatrixRoutingModule.class );
 	}
 }

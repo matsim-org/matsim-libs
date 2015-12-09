@@ -1,5 +1,6 @@
 package playground.balac.induceddemand.strategies;
 
+import com.google.inject.Inject;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Person;
@@ -9,8 +10,6 @@ import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
-
-import com.google.inject.Inject;
 
 
 public class RandomActivitiesSwaperStrategy implements PlanStrategy{

@@ -31,6 +31,10 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.transitSchedule.api.*;
+import org.matsim.vehicles.VehicleReaderV1;
+import org.matsim.vehicles.VehicleUtils;
+import org.matsim.vehicles.VehicleWriterV1;
+import org.matsim.vehicles.Vehicles;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -46,11 +50,13 @@ public class ScheduleCutter {
     private final int radius;
     private final Coord center;
     private final TransitSchedule schedule;
+	private final Vehicles vehicles;
 
-    public ScheduleCutter(TransitSchedule schedule, Coord center, int radius) {
+    public ScheduleCutter(TransitSchedule schedule, Vehicles vehicles, Coord center, int radius) {
         this.radius = radius;
         this.center = center;
         this.schedule = schedule;
+		this.vehicles = vehicles;
 
         log.info(" Area of interest (AOI): center=" + this.center + "; radius=" + this.radius);
     }
@@ -61,27 +67,35 @@ public class ScheduleCutter {
         // args 2: Y-coord center (double)
         // args 3: Radius (int)
         // args 4: Path to schedule-output
+		// args 5: Path to vehicles-output
 
-        // For 30km around Zurich Center (Bellevue): X - 683518.0, Y - 246836.0, radius - 30000
-
+        // For 30km around Zurich Center (Bellevue): X - 2683518.0, Y - 1246836.0, radius - 30000
 
         // Read schedule
         Config config = ConfigUtils.loadConfig(args[0]);
         Scenario scenario = ScenarioUtils.createScenario(config);
         scenario.getConfig().transit().setUseTransit(true);
-        scenario.getConfig().scenario().setUseVehicles(true);
         new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
         new TransitScheduleReader(scenario).readFile(config.transit().getTransitScheduleFile());
+		Vehicles vehicles = VehicleUtils.createVehiclesContainer();
+		new VehicleReaderV1(vehicles).readFile(config.transit().getVehiclesFile());
 
         // Cut schedule
         ScheduleCutter cutter = new ScheduleCutter(
-                scenario.getTransitSchedule(),
+                scenario.getTransitSchedule(), vehicles,
                 new Coord(Double.parseDouble(args[1]), Double.parseDouble(args[2])),
                 Integer.parseInt(args[3]));
         cutter.cutSchedule();
 
-        // Write schedule
+        // Write schedule and vehicles
         new TransitScheduleWriter(scenario.getTransitSchedule()).writeFile(args[4]);
+		new VehicleWriterV1(vehicles).writeFile(args[5]);
+
+		// Test schedule and vehicles
+		scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		new TransitScheduleReader(scenario).readFile(args[4]);
+		vehicles = VehicleUtils.createVehiclesContainer();
+		new VehicleReaderV1(vehicles).readFile(config.transit().getVehiclesFile());
     }
 
     public void cutSchedule() {
@@ -96,6 +110,7 @@ public class ScheduleCutter {
 
         // Identify all routes not crossing area and therefore to remove:
         int routesRemoved = 0;
+		int vehiclesRemoved = 0;
         Set<TransitLine> linesToRemove = new HashSet<>();
         for (TransitLine line : schedule.getTransitLines().values()) {
             Set<TransitRoute> routesToRemove = new HashSet<>();
@@ -110,9 +125,13 @@ public class ScheduleCutter {
                     routesToRemove.add(route);
                 }
             }
-            // Remove identified routes:
+            // Remove identified routes (and their vehicles):
             for (TransitRoute routeToRemove : routesToRemove) {
                 line.removeRoute(routeToRemove);
+				if (vehicles != null) {
+					vehicles.removeVehicle(routeToRemove.getRoute().getVehicleId());
+					vehiclesRemoved++;
+				}
                 routesRemoved++;
             }
             if (line.getRoutes().isEmpty()) {
@@ -120,6 +139,7 @@ public class ScheduleCutter {
             }
         }
         log.info(" Routes removed: " + routesRemoved);
+		log.info(" Vehicles removed: " + vehiclesRemoved);
         // Remove empty lines:
         for (TransitLine lineToRemove : linesToRemove) {
             schedule.removeTransitLine(lineToRemove);

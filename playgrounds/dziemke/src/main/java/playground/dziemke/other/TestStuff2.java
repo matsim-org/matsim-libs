@@ -22,5 +22,10 @@ public class TestStuff2 {
 		System.out.println(Integer.MIN_VALUE);
 		System.out.println(Double.MAX_VALUE);
 		System.out.println(Double.MIN_VALUE);
+		
+		
+		Double cellSize = 1000.;
+		System.out.println(cellSize.toString().split("\\.")[0]);
+				
 	}
 }

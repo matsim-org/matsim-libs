@@ -22,13 +22,11 @@
 
 package org.matsim.core.controler;
 
-import com.google.inject.*;
-import com.google.inject.binder.AnnotatedBindingBuilder;
-import com.google.inject.binder.LinkedBindingBuilder;
-import com.google.inject.multibindings.MapBinder;
-import com.google.inject.multibindings.Multibinder;
-import com.google.inject.name.Names;
-import com.google.inject.util.Modules;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
@@ -37,6 +35,8 @@ import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.replanning.PlanStrategy;
+import org.matsim.core.replanning.StrategyManagerConfigLoader;
+import org.matsim.core.replanning.StrategyManagerModule;
 import org.matsim.core.replanning.selectors.GenericPlanSelector;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
@@ -44,10 +44,20 @@ import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vis.snapshotwriters.SnapshotWriter;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.util.ArrayList;
-import java.util.List;
+import com.google.inject.Binder;
+import com.google.inject.BindingAnnotation;
+import com.google.inject.Inject;
+import com.google.inject.Key;
+import com.google.inject.Module;
+import com.google.inject.TypeLiteral;
+import com.google.inject.binder.AnnotatedBindingBuilder;
+import com.google.inject.binder.LinkedBindingBuilder;
+import com.google.inject.multibindings.MapBinder;
+import com.google.inject.multibindings.Multibinder;
+import com.google.inject.name.Names;
+import com.google.inject.util.Modules;
+
+import tutorial.programming.planStrategyForRemoval.RunPlanSelectorForRemovalExample;
 
 /**
  * "Designed for inheritance."
@@ -73,8 +83,6 @@ public abstract class AbstractModule implements Module {
 	private Multibinder<SnapshotWriter> snapshotWriterMultibinder;
 	private MapBinder<String, GenericPlanSelector<Plan, Person>> planSelectorForRemovalMultibinder;
 	private MapBinder<String, PlanStrategy> planStrategyMultibinder;
-	private MapBinder<String, TravelDisutilityFactory> travelDisutilityFactoryMultibinder;
-	private MapBinder<String, TravelTime> travelTimeMultibinder;
 
 	@Inject
 	com.google.inject.Injector bootstrapInjector;
@@ -101,9 +109,6 @@ public abstract class AbstractModule implements Module {
 		this.controlerListenerMultibinder = Multibinder.newSetBinder(this.binder, ControlerListener.class);
 		this.planStrategyMultibinder = MapBinder.newMapBinder(this.binder, String.class, PlanStrategy.class);
 		this.planSelectorForRemovalMultibinder = MapBinder.newMapBinder(this.binder, new TypeLiteral<String>(){}, new TypeLiteral<GenericPlanSelector<Plan, Person>>(){});
-		this.travelDisutilityFactoryMultibinder = MapBinder.newMapBinder(this.binder, new TypeLiteral<String>(){}, new TypeLiteral<TravelDisutilityFactory>(){});
-		this.travelTimeMultibinder = MapBinder.newMapBinder(this.binder, new TypeLiteral<String>(){}, new TypeLiteral<TravelTime>(){});
-		//        this.routingModuleMultibinder = MapBinder.newMapBinder(binder(), String.class, RoutingModule.class);
 		this.install();
 	}
 
@@ -123,12 +128,19 @@ public abstract class AbstractModule implements Module {
 	}
 
 	/**
-	 * See {@link org.matsim.core.controler.listener.ControlerListener} for information.
+	 * See {@link RunControlerListenerExample} for an example.
+	 * 
+	 * @see {@link ControlerListener}
 	 */
 	protected final LinkedBindingBuilder<ControlerListener> addControlerListenerBinding() {
 		return controlerListenerMultibinder.addBinding();
 	}
 
+	/**
+	 * See {@link RunPlanSelectorForRemovalExample} for an example.
+	 * 
+	 * @see {@link StrategyManagerModule}, {@link StrategyManagerConfigLoader}
+	 */
 	protected final com.google.inject.binder.LinkedBindingBuilder<GenericPlanSelector<Plan, Person>> addPlanSelectorForRemovalBinding(String selectorName) {
 		return planSelectorForRemovalMultibinder.addBinding(selectorName);
 	}
@@ -153,12 +165,13 @@ public abstract class AbstractModule implements Module {
 		return bind(carTravelDisutilityFactoryKey());
 	}
 
+	@SuppressWarnings("static-method")
 	protected final Key<TravelDisutilityFactory> carTravelDisutilityFactoryKey() {
 		return Key.get(TravelDisutilityFactory.class, ForCar.class);
 	}
 
 	protected final com.google.inject.binder.LinkedBindingBuilder<TravelDisutilityFactory> addTravelDisutilityFactoryBinding(String mode) {
-		return travelDisutilityFactoryMultibinder.addBinding(mode);
+		return binder().bind(TravelDisutilityFactory.class).annotatedWith(Names.named(mode));
 	}
 
 	protected final com.google.inject.binder.LinkedBindingBuilder<LeastCostPathCalculatorFactory> bindLeastCostPathCalculatorFactory() {
@@ -166,7 +179,7 @@ public abstract class AbstractModule implements Module {
 	}
 
 	protected final com.google.inject.binder.LinkedBindingBuilder<TravelTime> addTravelTimeBinding(String mode) {
-		return travelTimeMultibinder.addBinding(mode);
+		return binder().bind(TravelTime.class).annotatedWith(Names.named(mode));
 	}
 
 	protected final LinkedBindingBuilder<RoutingModule> addRoutingModuleBinding(String mode) {
@@ -177,6 +190,7 @@ public abstract class AbstractModule implements Module {
 		return bind(networkTravelTime());
 	}
 
+	@SuppressWarnings("static-method")
 	protected final Key<TravelTime> networkTravelTime() {
 		return Key.get(TravelTime.class, ForCar.class);
 	}

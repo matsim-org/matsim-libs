@@ -19,14 +19,14 @@
  * *********************************************************************** */
 package playground.ivt.matsim2030.generation;
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.Set;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.utils.collections.CollectionUtils;
+
+import java.util.Collections;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * For increased modularity, the different scenario elements
