@@ -31,7 +31,6 @@ import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.ActivityFacility;
@@ -172,17 +171,11 @@ public class IterativeAlgorithmDC {
 		events.addHandler(stopStopTimeCalculator);
 		new MatsimEventsReader(events).readFile(args[10]);
 		final TravelDisutilityFactory factory = new Builder( TransportMode.car );
-		final TravelDisutility disutility = factory.createTravelDisutility(travelTimeCalculator.getLinkTravelTimes(), scenario.getConfig().planCalcScore());
+		Map<String, TravelDisutilityFactory> factories = new HashMap<>();
+		factories.put(TransportMode.car, factory);
+
 		final Provider<TransitRouter> transitRouterFactory = new TransitRouterWSImplFactory(scenario, waitTimeCalculator.getWaitTimes(), stopStopTimeCalculator.getStopStopTimes());
 		context = new ReplanningContext() {
-			@Override
-			public TravelDisutility getTravelDisutility() {
-				return disutility;
-			}
-			@Override
-			public TravelTime getTravelTime() {
-				return travelTimeCalculator.getLinkTravelTimes();
-			}
 			@Override
 			public int getIteration() {
 				return 1;
@@ -205,7 +198,9 @@ public class IterativeAlgorithmDC {
 					ReadOrComputeMaxDCScore rcms = new ReadOrComputeMaxDCScore(dcContext);
                     rcms.readOrCreateMaxDCScore(new Controler(scenario).getConfig(), dcContext.kValsAreRead());
                     rcms.getPersonsMaxEpsUnscaled();
-					BestReplyDestinationChoice module = new BestReplyDestinationChoice(TripRouterFactoryBuilderWithDefaults.createTripRouterProvider(scenario, new DijkstraFactory(), transitRouterFactory), dcContext, rcms.getPersonsMaxEpsUnscaled(), new CharyparNagelOpenTimesScoringFunctionFactory(scenario.getConfig().planCalcScore(), scenario));
+					Map<String, TravelTime> travelTimes = new HashMap<>();
+					travelTimes.put(TransportMode.car, travelTimeCalculator.getLinkTravelTimes());
+					BestReplyDestinationChoice module = new BestReplyDestinationChoice(TripRouterFactoryBuilderWithDefaults.createTripRouterProvider(scenario, new DijkstraFactory(), transitRouterFactory), dcContext, rcms.getPersonsMaxEpsUnscaled(), new CharyparNagelOpenTimesScoringFunctionFactory(scenario.getConfig().planCalcScore(), scenario), travelTimes, factories);
 					module.prepareReplanning(context);
 					Collection<PlanImpl> copiedPlans = new ArrayList<PlanImpl>();
 					for(Person person:typePopulations.get(type)) {

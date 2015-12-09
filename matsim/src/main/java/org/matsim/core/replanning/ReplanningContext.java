@@ -31,23 +31,6 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
 public interface ReplanningContext {
 
 	/**
-	 * Gives the TravelDisutility of the previous iteration.
-	 * Internally, this may return a new instance every time
-	 * because TravelDisutility may not be thread-safe, but clients
-	 * of this interface will just getTravelDisutility(), use it
-	 * and that's it.
-	 */
-	TravelDisutility getTravelDisutility();
-
-	/**
-	 * Gives the TravelTime of the previous iteration.
-	 * Internally, this is connected to the TravelTimeCalculator which collects
-	 * events, but this does not matter here. Clients of this interface just
-	 * get the TravelTime and that's it, and they do this again every iteration. 
-	 */
-	TravelTime getTravelTime();
-
-	/**
 	 * The current iteration.
 	 */
 	int getIteration();

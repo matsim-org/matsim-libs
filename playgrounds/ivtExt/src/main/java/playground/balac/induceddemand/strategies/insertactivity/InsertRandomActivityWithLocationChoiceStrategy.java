@@ -21,11 +21,14 @@ import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.utils.collections.QuadTree;
 import playground.balac.induceddemand.strategies.InsertRandomActivity;
 
 import javax.inject.Provider;
+import java.util.Map;
 
 public class InsertRandomActivityWithLocationChoiceStrategy implements PlanStrategy {
 	private PlanStrategyImpl planStrategyDelegate;
@@ -34,12 +37,14 @@ public class InsertRandomActivityWithLocationChoiceStrategy implements PlanStrat
 	private Scenario scenario;
 	private Provider<TripRouter> tripRouterProvider;
 	private ScoringFunctionFactory scoringFunctionFactory;
+	private Map<String, TravelTime> travelTimes;
+	private Map<String, TravelDisutilityFactory> travelDisutilities;
 
 
 	@Inject
 	public  InsertRandomActivityWithLocationChoiceStrategy(final Scenario scenario,
 														   @Named("shopQuadTree") QuadTree shopFacilityQuadTree,
-														   @Named("leisureQuadTree") QuadTree leisureFacilityQuadTree, Provider<TripRouter> tripRouterProvider, ScoringFunctionFactory scoringFunctionFactory) {
+														   @Named("leisureQuadTree") QuadTree leisureFacilityQuadTree, Provider<TripRouter> tripRouterProvider, ScoringFunctionFactory scoringFunctionFactory, Map<String, TravelTime> travelTimes, Map<String, TravelDisutilityFactory> travelDisutilities) {
 		
 	   // PlanStrategyImpl.Builder builder = new PlanStrategyImpl.Builder(new RandomPlanSelector<Plan, Person>() );
 	   
@@ -48,6 +53,8 @@ public class InsertRandomActivityWithLocationChoiceStrategy implements PlanStrat
 		this.leisureFacilityQuadTree = leisureFacilityQuadTree;
 		this.tripRouterProvider = tripRouterProvider;
 		this.scoringFunctionFactory = scoringFunctionFactory;
+		this.travelTimes = travelTimes;
+		this.travelDisutilities = travelDisutilities;
 	}
 	
 	@Override
@@ -84,7 +91,7 @@ public class InsertRandomActivityWithLocationChoiceStrategy implements PlanStrat
 		}
 		planStrategyDelegate.addStrategyModule(new TripsToLegsModule(scenario.getConfig()));
 		planStrategyDelegate.addStrategyModule(ira);
-		planStrategyDelegate.addStrategyModule(new BestReplyDestinationChoice(tripRouterProvider, lcContext, maxDcScoreWrapper.getPersonsMaxDCScoreUnscaled(), scoringFunctionFactory));
+		planStrategyDelegate.addStrategyModule(new BestReplyDestinationChoice(tripRouterProvider, lcContext, maxDcScoreWrapper.getPersonsMaxDCScoreUnscaled(), scoringFunctionFactory, travelTimes, travelDisutilities));
 		planStrategyDelegate.addStrategyModule(new ReRoute(lcContext.getScenario(), tripRouterProvider));
 		planStrategyDelegate.init(replanningContext);
 		

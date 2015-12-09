@@ -36,10 +36,13 @@ import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
+import java.util.Map;
 
 public class BestReplyLocationChoicePlanStrategy implements PlanStrategy {
 
@@ -47,12 +50,16 @@ public class BestReplyLocationChoicePlanStrategy implements PlanStrategy {
 	private Scenario scenario;
 	private final Provider<TripRouter> tripRouterProvider;
 	private ScoringFunctionFactory scoringFunctionFactory;
+	private Map<String, TravelTime> travelTimes;
+	private Map<String, TravelDisutilityFactory> travelDisutilities;
 
 	@Inject
-	BestReplyLocationChoicePlanStrategy(Scenario scenario, Provider<TripRouter> tripRouterProvider, ScoringFunctionFactory scoringFunctionFactory) {
+	BestReplyLocationChoicePlanStrategy(Scenario scenario, Provider<TripRouter> tripRouterProvider, ScoringFunctionFactory scoringFunctionFactory, Map<String, TravelTime> travelTimes, Map<String, TravelDisutilityFactory> travelDisutilities) {
 		this.scenario = scenario;
 		this.tripRouterProvider = tripRouterProvider;
 		this.scoringFunctionFactory = scoringFunctionFactory;
+		this.travelTimes = travelTimes;
+		this.travelDisutilities = travelDisutilities;
 	}
 		
 	@Override
@@ -84,7 +91,7 @@ public class BestReplyLocationChoicePlanStrategy implements PlanStrategy {
 			delegate = new PlanStrategyImpl(new ExpBetaPlanSelector(config.planCalcScore()));
 		}
 		delegate.addStrategyModule(new TripsToLegsModule(scenario.getConfig()));
-		delegate.addStrategyModule(new BestReplyDestinationChoice(tripRouterProvider, lcContext, maxDcScoreWrapper.getPersonsMaxDCScoreUnscaled(), scoringFunctionFactory));
+		delegate.addStrategyModule(new BestReplyDestinationChoice(tripRouterProvider, lcContext, maxDcScoreWrapper.getPersonsMaxDCScoreUnscaled(), scoringFunctionFactory, travelTimes, travelDisutilities));
 		delegate.addStrategyModule(new ReRoute(lcContext.getScenario(), tripRouterProvider));
 		
 		delegate.init(replanningContext);

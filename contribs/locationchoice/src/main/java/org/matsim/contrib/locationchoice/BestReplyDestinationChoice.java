@@ -19,15 +19,13 @@
 
 package org.matsim.contrib.locationchoice;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.locationchoice.bestresponse.BestResponseLocationMutator;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
@@ -42,8 +40,11 @@ import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.MultiNodeDijkstra;
 import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.FastMultiNodeDijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.Tuple;
@@ -70,15 +71,19 @@ public class BestReplyDestinationChoice extends AbstractMultithreadedModule {
 	private HashSet<String> flexibleTypes;
 	private final LeastCostPathCalculatorFactory forwardMultiNodeDijsktaFactory;
 	private final LeastCostPathCalculatorFactory backwardMultiNodeDijsktaFactory;
-	private final Map<Id<ActivityFacility>, Id<Link>> nearestLinks; 
-	
+	private final Map<Id<ActivityFacility>, Id<Link>> nearestLinks;
+
 	public static double useScaleEpsilonFromConfig = -99.0;
 	private ScoringFunctionFactory scoringFunctionFactory;
+	private Map<String, TravelTime> travelTimes;
+	private Map<String, TravelDisutilityFactory> travelDisutilities;
 
-	public BestReplyDestinationChoice(Provider<TripRouter> tripRouterProvider, DestinationChoiceBestResponseContext lcContext, ObjectAttributes personsMaxDCScoreUnscaled, ScoringFunctionFactory scoringFunctionFactory) {
+	public BestReplyDestinationChoice(Provider<TripRouter> tripRouterProvider, DestinationChoiceBestResponseContext lcContext, ObjectAttributes personsMaxDCScoreUnscaled, ScoringFunctionFactory scoringFunctionFactory, Map<String, TravelTime> travelTimes, Map<String, TravelDisutilityFactory> travelDisutilities) {
 		super(lcContext.getScenario().getConfig().global());
 		this.tripRouterProvider = tripRouterProvider;
 		this.scoringFunctionFactory = scoringFunctionFactory;
+		this.travelTimes = travelTimes;
+		this.travelDisutilities = travelDisutilities;
 
 		this.dccg = (DestinationChoiceConfigGroup) lcContext.getScenario().getConfig().getModule(DestinationChoiceConfigGroup.GROUP_NAME);
 		if (!DestinationChoiceConfigGroup.Algotype.bestResponse.equals(this.dccg.getAlgorithm())) {
@@ -138,10 +143,10 @@ public class BestReplyDestinationChoice extends AbstractMultithreadedModule {
 		ReplanningContext replanningContext = this.getReplanningContext();
 		
 		MultiNodeDijkstra forwardMultiNodeDijkstra = (MultiNodeDijkstra) this.forwardMultiNodeDijsktaFactory.createPathCalculator(this.scenario.getNetwork(), 
-				replanningContext.getTravelDisutility(), this.getReplanningContext().getTravelTime());
+				travelDisutilities.get(TransportMode.car).createTravelDisutility(travelTimes.get(TransportMode.car), scenario.getConfig().planCalcScore()), travelTimes.get(TransportMode.car));
 
 		BackwardFastMultiNodeDijkstra backwardMultiNodeDijkstra = (BackwardFastMultiNodeDijkstra) this.backwardMultiNodeDijsktaFactory.createPathCalculator(
-				this.scenario.getNetwork(), replanningContext.getTravelDisutility(), this.getReplanningContext().getTravelTime());
+				this.scenario.getNetwork(), travelDisutilities.get(TransportMode.car).createTravelDisutility(travelTimes.get(TransportMode.car), scenario.getConfig().planCalcScore()), travelTimes.get(TransportMode.car));
 		
 		// this one corresponds to the "frozen epsilon" paper(s)
 		// the random number generators are re-seeded anyway in the dc module. So we do not need a MatsimRandom instance here

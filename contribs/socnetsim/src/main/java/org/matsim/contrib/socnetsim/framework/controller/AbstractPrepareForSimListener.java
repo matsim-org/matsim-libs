@@ -70,17 +70,6 @@ public abstract class AbstractPrepareForSimListener extends AbstractMultithreade
 
 		// not nice, but replanningcontextimp wants iteration number...
 		final ReplanningContext context = new ReplanningContext() {
-
-			@Override
-			public TravelDisutility getTravelDisutility() {
-				return travelDisutility.get(TransportMode.car ).createTravelDisutility(getTravelTime(), sc.getConfig().planCalcScore());
-			}
-
-			@Override
-			public TravelTime getTravelTime() {
-				return travelTime.get( TransportMode.car ).get();
-			}
-
 			@Override
 			public int getIteration() {
 				return 0;

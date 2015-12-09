@@ -216,14 +216,6 @@ public class PopulationCreator {
 		final TravelDisutility travelDisutility = travelDisutilityFactory.createTravelDisutility(travelTime, scenario.getConfig().planCalcScore());
 		ReplanningContext context = new ReplanningContext() {
 			@Override
-			public TravelDisutility getTravelDisutility() {
-				return travelDisutility;
-			}
-			@Override
-			public TravelTime getTravelTime() {
-				return travelTime;
-			}
-			@Override
 			public int getIteration() {
 				return 0;
 			}

@@ -69,35 +69,5 @@ public class BestReplyLocationChoicePlanStrategyTest {
 //
 //		for (Person person : scenario.getPopulation().getPersons().values()) planStrategy.run(person);
 	}
-	
-	private static class ReplanningContextImpl implements ReplanningContext {
-		
-		private final TravelTime travelTime;
-		private final TravelDisutility travelDisutility;
-		private final ScoringFunctionFactory scoringFunctionFactory;
-		private final Provider<TripRouter> tripRouterFactory;
-		
-		public ReplanningContextImpl(Scenario scenario) {
-			this.travelTime = new FreeSpeedTravelTime();
-			this.travelDisutility = new RandomizingTimeDistanceTravelDisutility.Builder( TransportMode.car ).createTravelDisutility(this.travelTime, scenario.getConfig().planCalcScore());
-			this.scoringFunctionFactory = new CharyparNagelScoringFunctionFactory( scenario );
-			this.tripRouterFactory = new TripRouterFactoryBuilderWithDefaults().build(scenario);
-		}
-				
-		@Override
-		public TravelDisutility getTravelDisutility() {
-			return this.travelDisutility;
-		}
 
-		@Override
-		public TravelTime getTravelTime() {
-			return this.travelTime;
-		}
-
-		@Override
-		public int getIteration() {
-			return 0;
-		}
-
-	}
 }
