@@ -143,13 +143,12 @@ public class PatnaCadytsControler {
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(100);
 		config.controler().setOutputDirectory("../../../../repos/runs-svn/patnaIndia/run108/outerCordonOutput/");
-		config.controler().setWritePlansInterval(50);
-		config.controler().setWriteEventsInterval(50);
+		config.controler().setWritePlansInterval(100);
+		config.controler().setWriteEventsInterval(100);
 
 		StrategySettings reRoute = new StrategySettings();
 		reRoute.setStrategyName("ReRoute");
 		reRoute.setWeight(0.3);
-		reRoute.setDisableAfter(80);
 		config.strategy().addStrategySettings(reRoute);
 		
 		StrategySettings expChangeBeta = new StrategySettings();
@@ -157,13 +156,15 @@ public class PatnaCadytsControler {
 		expChangeBeta.setWeight(0.7);
 		config.strategy().addStrategySettings(expChangeBeta);
 		
-		config.setParam("TimeAllocationMutator", "mutationAffectsDuration", "false");
-		config.setParam("TimeAllocationMutator", "mutationRange", "7200.0");
+//		config.setParam("TimeAllocationMutator", "mutationAffectsDuration", "true");
+//		config.setParam("TimeAllocationMutator", "mutationRange", "7200.0");
+//		
+//		StrategySettings timeAllocationMutator	= new StrategySettings();
+//		timeAllocationMutator.setStrategyName("TimeAllocationMutator");
+//		timeAllocationMutator.setWeight(0.15);
+//		config.strategy().addStrategySettings(timeAllocationMutator);
 		
-		StrategySettings timeAllocationMutator	= new StrategySettings();
-		timeAllocationMutator.setStrategyName("TimeAllocationMutator");
-		timeAllocationMutator.setWeight(0.05);
-		config.strategy().addStrategySettings(timeAllocationMutator);
+		config.strategy().setFractionOfIterationsToDisableInnovation(0.8);
 		config.strategy().setMaxAgentPlanMemorySize(6);
 
 		ActivityParams ac1 = new ActivityParams("E2E_Start");
