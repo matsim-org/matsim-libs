@@ -37,32 +37,8 @@ public class StrategyManagerModule extends AbstractModule {
 	@Override
 	public void install() {
 		install(new DefaultPlanStrategiesModule());
-		bind(StrategyManager.class).toProvider(StrategyManagerProvider.class).in(Singleton.class);
+		bind(StrategyManager.class).in(Singleton.class);
 		bind(ReplanningContext.class).to(ReplanningContextImpl.class);
 	}
 
-	private static class StrategyManagerProvider implements Provider<StrategyManager> {
-
-		private Injector injector;
-		private Map<String, GenericPlanSelector<Plan, Person>> planSelectorsForRemoval;
-		private Map<String, PlanStrategy> planStrategies;
-
-		@Inject
-		StrategyManagerProvider(com.google.inject.Injector injector, Map<String, GenericPlanSelector<Plan, Person>> planSelectorsForRemoval, Map<String, PlanStrategy> planStrategies) {
-			// yy if this works the way I understand it, then it is a bit unstable: If I throw a Map<String,...Selector...> into
-			// the inject framework, then it is interpreted as "selector for removal".  However, if I throw a Map<String,...Strategy>,
-			// then it is interpreted for normal selection.  Kai, aug'15
-
-			this.injector = Injector.fromGuiceInjector(injector);
-			this.planSelectorsForRemoval = planSelectorsForRemoval;
-			this.planStrategies = planStrategies;
-		}
-
-		@Override
-		public StrategyManager get() {
-			StrategyManager manager = new StrategyManager();
-			StrategyManagerConfigLoader.load(injector, this.planStrategies, this.planSelectorsForRemoval, manager);
-			return manager;
-		}
-	}
 }
