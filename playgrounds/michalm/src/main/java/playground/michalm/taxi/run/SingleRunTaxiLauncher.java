@@ -85,14 +85,14 @@ class SingleRunTaxiLauncher
         pw.println(stats);
         pw.flush();
 
-        if (params.vrpOutDir != null) {
-            new Schedules2GIS(context.getVrpData().getVehicles().values(),
-                    TransformationFactory.WGS84_UTM33N).write(params.vrpOutDir);
-        }
+        // if (params.vrpOutDir != null) {
+        //     new Schedules2GIS(context.getVrpData().getVehicles().values(),
+        //             TransformationFactory.WGS84_UTM33N).write(params.vrpOutDir);
+        // }
 
         // ChartUtils.showFrame(RouteChartUtils.chartRoutesByStatus(data.getVrpData()));
-        ChartWindowUtils.showFrame(
-                TaxiScheduleChartUtils.chartSchedule(context.getVrpData().getVehicles().values()));
+        // ChartWindowUtils.showFrame(
+        //        TaxiScheduleChartUtils.chartSchedule(context.getVrpData().getVehicles().values()));
 
         if (params.histogramOutDir != null) {
             VrpLauncherUtils.writeHistograms(legHistogram, params.histogramOutDir);
