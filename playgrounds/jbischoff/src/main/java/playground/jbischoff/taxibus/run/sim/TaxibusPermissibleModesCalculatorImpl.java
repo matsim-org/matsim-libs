@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jbischoff.taxibus.scenario.strategies;
+package playground.jbischoff.taxibus.run.sim;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,19 +35,23 @@ import playground.jbischoff.taxibus.algorithm.optimizer.fifo.Lines.LineDispatche
  * @author  jbischoff
  *
  */
-public class TaxibusPermissibleModesCalculatorImpl implements PermissibleModesCalculator {
+public class TaxibusPermissibleModesCalculatorImpl implements PermissibleModesCalculator, TaxibusPermissibleModesCalculator {
 
 	private final LineDispatcher dispatcher;
 	private List<String> availableModes;
 	
 	public TaxibusPermissibleModesCalculatorImpl(String[] availableModes, LineDispatcher dispatcher) {
-		this.availableModes = Arrays.asList(availableModes);
-		if (!this.availableModes.contains("taxibus")){
+		this.availableModes = new ArrayList<>();
+		this.availableModes.addAll(Arrays.asList(availableModes));
+		if (this.availableModes.contains("taxibus")){
 			this.availableModes.remove("taxibus");
 		}
 		this.dispatcher = dispatcher;
 	}
 	
+	/* (non-Javadoc)
+	 * @see playground.jbischoff.taxibus.run.sim.TaxibusPermissibleModesCalculator#getPermissibleModes(org.matsim.api.core.v01.population.Plan)
+	 */
 	@Override
 	public Collection<String> getPermissibleModes(Plan plan) {
 		boolean isServedByTaxibus = true;
@@ -56,6 +60,7 @@ public class TaxibusPermissibleModesCalculatorImpl implements PermissibleModesCa
 				Activity act = (Activity) pe;
 				if (!dispatcher.coordIsServedByLine(act.getCoord())){
 					isServedByTaxibus = false;
+//					System.out.println(plan.getPerson().getId() +" not served");
 					break;
 				} 
 			}
