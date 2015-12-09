@@ -108,7 +108,7 @@ public final class RunBraessSimulation {
 	// (higher sigma cause more randomness. use 0.0 for no randomness.)
 	private static final double SIGMA = 0.0;	
 		
-	private static final boolean WRITE_INITIAL_FILES = false;
+	private static final boolean WRITE_INITIAL_FILES = true;
 	
 	private static String OUTPUT_BASE_DIR = "../../../runs-svn/braess/test/";
 	

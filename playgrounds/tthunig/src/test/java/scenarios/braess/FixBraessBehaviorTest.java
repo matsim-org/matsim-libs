@@ -49,6 +49,8 @@ import playground.vsp.congestion.handlers.TollHandler;
 import scenarios.analysis.TtAbstractAnalysisTool;
 import scenarios.analysis.TtListenerToBindAndWriteAnalysis;
 import scenarios.braess.analysis.TtAnalyzeBraess;
+import scenarios.braess.createInput.TtCreateBraessPopulation;
+import scenarios.braess.createInput.TtCreateBraessPopulation.InitRoutes;
 import scenarios.braess.run.RunBraessSimulation;
 import scenarios.braess.run.RunBraessSimulation.PricingType;
 
@@ -112,6 +114,9 @@ public final class FixBraessBehaviorTest{
 		Config config = defineConfig();
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
+		// TODO why is this necessary? see ReadVsCreatePopulationTest
+		createPopulation(scenario);
+		
 		Controler controler = new Controler(scenario);
 		
 		if (!pricingType.equals(PricingType.NONE) && !pricingType.equals(PricingType.FLOWBASED)) {
@@ -138,7 +143,7 @@ public final class FixBraessBehaviorTest{
 			controler.addControlerListener(new MarginalCongestionPricingContolerListener(controler.getScenario(), tollHandler, congestionHandler));
 		} else if (pricingType.equals(PricingType.FLOWBASED)) {
 			Initializer initializer = new Initializer();
-			controler.addControlerListener(initializer);		
+			controler.addControlerListener(initializer);
 		}
 					
 		// add a controller listener to analyze results
@@ -160,13 +165,13 @@ public final class FixBraessBehaviorTest{
 		double totalTT = handler.getTotalTT();
 		Assert.assertEquals("The total travel time has changed to previous MATSim behavior.", expectedTotalTT, totalTT, MatsimTestUtils.EPSILON);
 	}
-
+	
 	private Config defineConfig() {
 		Config config = ConfigUtils.createConfig();
 
 		// set network and population
 		config.network().setInputFile(testUtils.getClassInputDirectory() + "network_cap2000-1000.xml");
-		config.plans().setInputFile(testUtils.getClassInputDirectory() + "plans2000_initRoutes.xml");
+//		config.plans().setInputFile(testUtils.getClassInputDirectory() + "plans2000_initRoutes.xml");
 
 		// set number of iterations
 		config.controler().setLastIteration(100);
@@ -182,7 +187,7 @@ public final class FixBraessBehaviorTest{
 			strat.setDisableAfter(config.controler().getLastIteration());
 			config.strategy().addStrategySettings(strat);
 		}
-
+		
 		// choose maximal number of plans per agent. 0 means unlimited
 		config.strategy().setMaxAgentPlanMemorySize(3);
 
@@ -210,6 +215,15 @@ public final class FixBraessBehaviorTest{
 		config.controler().setCreateGraphs(false);
 
 		return config;
+	}
+
+	private static void createPopulation(Scenario scenario) {
+		
+		TtCreateBraessPopulation popCreator = 
+				new TtCreateBraessPopulation(scenario.getPopulation(), scenario.getNetwork());
+		popCreator.setNumberOfPersons(2000);
+		
+		popCreator.createPersons(InitRoutes.ALL, 110.);
 	}
 	
 }
