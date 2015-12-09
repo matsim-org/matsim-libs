@@ -118,6 +118,7 @@ public class Controler extends AbstractController implements ControlerI {
 	@Inject private EventsHandling eventsHandling;
 	@Inject private PlansDumping plansDumping;
 	@Inject private PlansReplanning plansReplanning;
+	@Inject private Provider<Mobsim> mobsimProvider;
 	@Inject private PlansScoring plansScoring;
 	@Inject private DumpDataAtEnd dumpDataAtEnd;
 
@@ -390,7 +391,7 @@ public class Controler extends AbstractController implements ControlerI {
 			simulation.setIterationNumber(this.getIterationNumber());
 			return simulation;
 		} else {
-			Mobsim simulation = injector.getInstance(Mobsim.class);
+			Mobsim simulation = this.mobsimProvider.get();
 			enrichSimulation(simulation);
 			return simulation;
 		}
