@@ -99,7 +99,7 @@ public final class RunBraessSimulation {
 	private static final LaneType LANE_TYPE = LaneType.NONE;
 	
 	// defines which kind of pricing should be used
-	private static final PricingType PRICING_TYPE = PricingType.V3;
+	private static final PricingType PRICING_TYPE = PricingType.NONE;
 	public enum PricingType{
 		NONE, V3, V4, V8, V9, FLOWBASED
 	}
@@ -110,7 +110,7 @@ public final class RunBraessSimulation {
 		
 	private static final boolean WRITE_INITIAL_FILES = false;
 	
-	private static String OUTPUT_BASE_DIR = "../../../runs-svn/braess/withoutLanes_signalsVsTolls/";
+	private static String OUTPUT_BASE_DIR = "../../../runs-svn/braess/test/";
 	
 	public static void main(String[] args) {
 		Config config = defineConfig();
@@ -250,13 +250,13 @@ public final class RunBraessSimulation {
 		config.planCalcScore().setBrainExpBeta( 20 );
 
 		// choose between link to link and node to node routing
-		boolean link2linkRouting = true;
+		boolean link2linkRouting = false;
 		config.controler().setLinkToLinkRoutingEnabled(link2linkRouting);
 		
 		config.travelTimeCalculator().setCalculateLinkToLinkTravelTimes(link2linkRouting);
 		config.travelTimeCalculator().setCalculateLinkTravelTimes(true);
 		
-		// set travelTimeBinSize
+		// set travelTimeBinSize (only has effect if reRoute is used)
 		config.travelTimeCalculator().setTraveltimeBinSize( 900 );
 		
 		config.travelTimeCalculator().setTravelTimeCalculatorType(
@@ -302,7 +302,7 @@ public final class RunBraessSimulation {
 		}
 
 		// choose maximal number of plans per agent. 0 means unlimited
-		config.strategy().setMaxAgentPlanMemorySize( 0 );
+		config.strategy().setMaxAgentPlanMemorySize( 3 );
 		
 		config.qsim().setStuckTime(3600 * 10.);
 		
