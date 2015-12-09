@@ -154,20 +154,21 @@ public class PatnaCadytsControler {
 		expChangeBeta.setWeight(0.85);
 		config.strategy().addStrategySettings(expChangeBeta);
 
-		ActivityParams homeActivity = new ActivityParams("E2E_Start");
-		homeActivity.setTypicalDuration(12*60*60);
-		config.planCalcScore().addActivityParams(homeActivity);
+		ActivityParams ac1 = new ActivityParams("E2E_Start");
+		ac1.setTypicalDuration(12*60*60);
+		config.planCalcScore().addActivityParams(ac1);
 
-		ActivityParams workActivity = new ActivityParams("E2E_End");
-		workActivity.setTypicalDuration(8*60*60);
+		ActivityParams act2 = new ActivityParams("E2E_End");
+		act2.setTypicalDuration(8*60*60);
+		config.planCalcScore().addActivityParams(act2);
 
-		ActivityParams leisureActivity = new ActivityParams("E2I_Start");
-		leisureActivity.setTypicalDuration(12*60*60);
-		config.planCalcScore().addActivityParams(leisureActivity);
+		ActivityParams act3 = new ActivityParams("E2I_Start");
+		act3.setTypicalDuration(12*60*60);
+		config.planCalcScore().addActivityParams(act3);
 
-		ActivityParams shopActivity = new ActivityParams("E2I_mid");
-		shopActivity.setTypicalDuration(8*60*60);
-		config.planCalcScore().addActivityParams(shopActivity);
+		ActivityParams act4 = new ActivityParams("E2I_mid");
+		act4.setTypicalDuration(8*60*60);
+		config.planCalcScore().addActivityParams(act4);
 
 		config.plans().setRemovingUnneccessaryPlanAttributes(true);
 		config.vspExperimental().addParam("vspDefaultsCheckingLevel", "abort");
