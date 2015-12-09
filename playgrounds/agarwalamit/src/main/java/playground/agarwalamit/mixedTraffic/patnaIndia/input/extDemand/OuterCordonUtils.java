@@ -19,7 +19,9 @@
 package playground.agarwalamit.mixedTraffic.patnaIndia.input.extDemand;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -29,9 +31,18 @@ import org.matsim.api.core.v01.network.Link;
  */
 
 public class OuterCordonUtils {
+	
+	public static Map<String, List<Integer>> getAreaType2ZoneIds(){//(from Fig.4-9 in PatnaReport)
+		Map<String, List<Integer>> areas2zones = new HashMap<>();
+		areas2zones.put("Institutional", Arrays.asList(8,9,20));
+		areas2zones.put("Industrial", Arrays.asList(61,62));
+		areas2zones.put("CBD and Railway Station", Arrays.asList(21));
+		areas2zones.put("Educational", Arrays.asList(37,38,39,40,41,42));
+		areas2zones.put("Old city and market area", Arrays.asList(54,57));
+		return areas2zones;
+	}
 
 	public enum OuterCordonLinks{
-
 		/*
 		 * P -- Patna
 		 * F -- Fatua
@@ -75,7 +86,6 @@ public class OuterCordonUtils {
 	}
 
 	public enum OuterCordonDirectionalFactors{
-
 		/*
 		 * E -- external
 		 * I -- internal
