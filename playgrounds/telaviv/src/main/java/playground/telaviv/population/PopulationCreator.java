@@ -214,7 +214,6 @@ public class PopulationCreator {
 		final TravelTime travelTime = new FreeSpeedTravelTime();
 		TravelDisutilityFactory travelDisutilityFactory = new Builder( TransportMode.car );
 		final TravelDisutility travelDisutility = travelDisutilityFactory.createTravelDisutility(travelTime, scenario.getConfig().planCalcScore());
-		final ScoringFunctionFactory scoringFunctionFactory = new CharyparNagelOpenTimesScoringFunctionFactory( scenario );
 		ReplanningContext context = new ReplanningContext() {
 			@Override
 			public TravelDisutility getTravelDisutility() {
@@ -223,10 +222,6 @@ public class PopulationCreator {
 			@Override
 			public TravelTime getTravelTime() {
 				return travelTime;
-			}
-			@Override
-			public ScoringFunctionFactory getScoringFunctionFactory() {
-				return scoringFunctionFactory;
 			}
 			@Override
 			public int getIteration() {

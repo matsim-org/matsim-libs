@@ -73,10 +73,12 @@ public class BestReplyDestinationChoice extends AbstractMultithreadedModule {
 	private final Map<Id<ActivityFacility>, Id<Link>> nearestLinks; 
 	
 	public static double useScaleEpsilonFromConfig = -99.0;
+	private ScoringFunctionFactory scoringFunctionFactory;
 
-	public BestReplyDestinationChoice(Provider<TripRouter> tripRouterProvider, DestinationChoiceBestResponseContext lcContext, ObjectAttributes personsMaxDCScoreUnscaled) {
+	public BestReplyDestinationChoice(Provider<TripRouter> tripRouterProvider, DestinationChoiceBestResponseContext lcContext, ObjectAttributes personsMaxDCScoreUnscaled, ScoringFunctionFactory scoringFunctionFactory) {
 		super(lcContext.getScenario().getConfig().global());
 		this.tripRouterProvider = tripRouterProvider;
+		this.scoringFunctionFactory = scoringFunctionFactory;
 
 		this.dccg = (DestinationChoiceConfigGroup) lcContext.getScenario().getConfig().getModule(DestinationChoiceConfigGroup.GROUP_NAME);
 		if (!DestinationChoiceConfigGroup.Algotype.bestResponse.equals(this.dccg.getAlgorithm())) {
@@ -145,7 +147,6 @@ public class BestReplyDestinationChoice extends AbstractMultithreadedModule {
 		// the random number generators are re-seeded anyway in the dc module. So we do not need a MatsimRandom instance here
 
 		TripRouter tripRouter = tripRouterProvider.get();
-		ScoringFunctionFactory scoringFunctionFactory = replanningContext.getScoringFunctionFactory();
 		int iteration = replanningContext.getIteration();
 		
 		return new BestResponseLocationMutator(this.quadTreesOfType, this.facilitiesOfType, this.personsMaxEpsUnscaled, 

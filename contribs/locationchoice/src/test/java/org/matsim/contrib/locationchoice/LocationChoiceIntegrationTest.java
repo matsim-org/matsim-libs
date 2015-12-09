@@ -104,10 +104,7 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 
 		// CONTROL(L)ER:
 		Controler controler = new Controler(scenario);
-		controler.getConfig().controler().setOverwriteFileSetting(
-				true ?
-						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 
 		ReadOrComputeMaxDCScore computer = new ReadOrComputeMaxDCScore(lcContext);
         computer.readOrCreateMaxDCScore(controler.getConfig(), lcContext.kValsAreRead());
@@ -135,13 +132,7 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				final Provider<TripRouter> tripRouterProvider = binder().getProvider(TripRouter.class);
-				addPlanStrategyBinding("MyLocationChoice").toProvider(new javax.inject.Provider<PlanStrategy>() {
-					@Override
-					public PlanStrategy get() {
-						return new BestReplyLocationChoicePlanStrategy(scenario, tripRouterProvider);
-					}
-				});
+				addPlanStrategyBinding("MyLocationChoice").to(BestReplyLocationChoicePlanStrategy.class);
 			}
 		});
 
@@ -186,10 +177,7 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 
 		// CONTROL(L)ER:
 		Controler controler = new Controler(scenario);
-		controler.getConfig().controler().setOverwriteFileSetting(
-				true ?
-						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 
 		ReadOrComputeMaxDCScore computer = new ReadOrComputeMaxDCScore(lcContext);
         computer.readOrCreateMaxDCScore(controler.getConfig(), lcContext.kValsAreRead());
@@ -210,13 +198,7 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				final Provider<TripRouter> tripRouterProvider = binder().getProvider(TripRouter.class);
-				addPlanStrategyBinding("MyLocationChoice").toProvider(new javax.inject.Provider<PlanStrategy>() {
-					@Override
-					public PlanStrategy get() {
-						return new BestReplyLocationChoicePlanStrategy(scenario, tripRouterProvider);
-					}
-				});
+				addPlanStrategyBinding("MyLocationChoice").to(BestReplyLocationChoicePlanStrategy.class);
 			}
 		});
 

@@ -90,13 +90,7 @@ public class RunLocationChoiceFrozenEpsilons {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				final Provider<TripRouter> tripRouterProvider = binder().getProvider(TripRouter.class);
-				addPlanStrategyBinding(MY_LOCATION_CHOICE).toProvider(new javax.inject.Provider<PlanStrategy>() {
-					@Override
-					public PlanStrategy get() {
-						return new BestReplyLocationChoicePlanStrategy(scenario, tripRouterProvider);
-					}
-				});
+				addPlanStrategyBinding(MY_LOCATION_CHOICE).to(BestReplyLocationChoicePlanStrategy.class);
 			}
 		});
 

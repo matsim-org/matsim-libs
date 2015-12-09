@@ -82,11 +82,6 @@ public abstract class AbstractPrepareForSimListener extends AbstractMultithreade
 			}
 
 			@Override
-			public ScoringFunctionFactory getScoringFunctionFactory() {
-				return scoringFunctionFactory;
-			}
-
-			@Override
 			public int getIteration() {
 				return 0;
 			}

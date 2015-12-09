@@ -21,6 +21,7 @@ import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.TripRouter;
+import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.utils.collections.QuadTree;
 import playground.balac.induceddemand.strategies.InsertRandomActivity;
 
@@ -32,12 +33,13 @@ public class InsertRandomActivityWithLocationChoiceStrategy implements PlanStrat
 	private final QuadTree leisureFacilityQuadTree;
 	private Scenario scenario;
 	private Provider<TripRouter> tripRouterProvider;
+	private ScoringFunctionFactory scoringFunctionFactory;
 
 
 	@Inject
 	public  InsertRandomActivityWithLocationChoiceStrategy(final Scenario scenario,
 														   @Named("shopQuadTree") QuadTree shopFacilityQuadTree,
-														   @Named("leisureQuadTree") QuadTree leisureFacilityQuadTree, Provider<TripRouter> tripRouterProvider) {
+														   @Named("leisureQuadTree") QuadTree leisureFacilityQuadTree, Provider<TripRouter> tripRouterProvider, ScoringFunctionFactory scoringFunctionFactory) {
 		
 	   // PlanStrategyImpl.Builder builder = new PlanStrategyImpl.Builder(new RandomPlanSelector<Plan, Person>() );
 	   
@@ -45,6 +47,7 @@ public class InsertRandomActivityWithLocationChoiceStrategy implements PlanStrat
 		this.shopFacilityQuadTree = shopFacilityQuadTree;
 		this.leisureFacilityQuadTree = leisureFacilityQuadTree;
 		this.tripRouterProvider = tripRouterProvider;
+		this.scoringFunctionFactory = scoringFunctionFactory;
 	}
 	
 	@Override
@@ -81,7 +84,7 @@ public class InsertRandomActivityWithLocationChoiceStrategy implements PlanStrat
 		}
 		planStrategyDelegate.addStrategyModule(new TripsToLegsModule(scenario.getConfig()));
 		planStrategyDelegate.addStrategyModule(ira);
-		planStrategyDelegate.addStrategyModule(new BestReplyDestinationChoice(tripRouterProvider, lcContext, maxDcScoreWrapper.getPersonsMaxDCScoreUnscaled()));
+		planStrategyDelegate.addStrategyModule(new BestReplyDestinationChoice(tripRouterProvider, lcContext, maxDcScoreWrapper.getPersonsMaxDCScoreUnscaled(), scoringFunctionFactory));
 		planStrategyDelegate.addStrategyModule(new ReRoute(lcContext.getScenario(), tripRouterProvider));
 		planStrategyDelegate.init(replanningContext);
 		

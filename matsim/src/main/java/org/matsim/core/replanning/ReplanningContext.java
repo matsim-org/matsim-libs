@@ -46,13 +46,6 @@ public interface ReplanningContext {
 	 * get the TravelTime and that's it, and they do this again every iteration. 
 	 */
 	TravelTime getTravelTime();
-	
-	/**
-	 * Gives access to the scoring the Controler knows about.
-	 * This is a Factory not because of threads or some such, but 
-	 * because ScoringFunctions are particular to a Person.
-	 */
-	ScoringFunctionFactory getScoringFunctionFactory();
 
 	/**
 	 * The current iteration.

@@ -36,6 +36,7 @@ import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.TripRouter;
+import org.matsim.core.scoring.ScoringFunctionFactory;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -45,11 +46,13 @@ public class BestReplyLocationChoicePlanStrategy implements PlanStrategy {
 	private PlanStrategyImpl delegate;
 	private Scenario scenario;
 	private final Provider<TripRouter> tripRouterProvider;
+	private ScoringFunctionFactory scoringFunctionFactory;
 
 	@Inject
-	public BestReplyLocationChoicePlanStrategy(Scenario scenario, Provider<TripRouter> tripRouterProvider) {
+	BestReplyLocationChoicePlanStrategy(Scenario scenario, Provider<TripRouter> tripRouterProvider, ScoringFunctionFactory scoringFunctionFactory) {
 		this.scenario = scenario;
 		this.tripRouterProvider = tripRouterProvider;
+		this.scoringFunctionFactory = scoringFunctionFactory;
 	}
 		
 	@Override
@@ -81,7 +84,7 @@ public class BestReplyLocationChoicePlanStrategy implements PlanStrategy {
 			delegate = new PlanStrategyImpl(new ExpBetaPlanSelector(config.planCalcScore()));
 		}
 		delegate.addStrategyModule(new TripsToLegsModule(scenario.getConfig()));
-		delegate.addStrategyModule(new BestReplyDestinationChoice(tripRouterProvider, lcContext, maxDcScoreWrapper.getPersonsMaxDCScoreUnscaled()));
+		delegate.addStrategyModule(new BestReplyDestinationChoice(tripRouterProvider, lcContext, maxDcScoreWrapper.getPersonsMaxDCScoreUnscaled(), scoringFunctionFactory));
 		delegate.addStrategyModule(new ReRoute(lcContext.getScenario(), tripRouterProvider));
 		
 		delegate.init(replanningContext);

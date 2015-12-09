@@ -24,7 +24,6 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.replanning.ReplanningContext;
-import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility.Builder;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
@@ -185,10 +184,6 @@ public class IterativeAlgorithmDC {
 				return travelTimeCalculator.getLinkTravelTimes();
 			}
 			@Override
-			public ScoringFunctionFactory getScoringFunctionFactory() {
-				return new CharyparNagelOpenTimesScoringFunctionFactory(scenario.getConfig().planCalcScore(), scenario);
-			}
-			@Override
 			public int getIteration() {
 				return 1;
 			}
@@ -210,7 +205,7 @@ public class IterativeAlgorithmDC {
 					ReadOrComputeMaxDCScore rcms = new ReadOrComputeMaxDCScore(dcContext);
                     rcms.readOrCreateMaxDCScore(new Controler(scenario).getConfig(), dcContext.kValsAreRead());
                     rcms.getPersonsMaxEpsUnscaled();
-					BestReplyDestinationChoice module = new BestReplyDestinationChoice(TripRouterFactoryBuilderWithDefaults.createTripRouterProvider(scenario, new DijkstraFactory(), transitRouterFactory), dcContext, rcms.getPersonsMaxEpsUnscaled());
+					BestReplyDestinationChoice module = new BestReplyDestinationChoice(TripRouterFactoryBuilderWithDefaults.createTripRouterProvider(scenario, new DijkstraFactory(), transitRouterFactory), dcContext, rcms.getPersonsMaxEpsUnscaled(), new CharyparNagelOpenTimesScoringFunctionFactory(scenario.getConfig().planCalcScore(), scenario));
 					module.prepareReplanning(context);
 					Collection<PlanImpl> copiedPlans = new ArrayList<PlanImpl>();
 					for(Person person:typePopulations.get(type)) {

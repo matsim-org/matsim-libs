@@ -95,11 +95,6 @@ public class BestReplyLocationChoicePlanStrategyTest {
 		}
 
 		@Override
-		public ScoringFunctionFactory getScoringFunctionFactory() {
-			return this.scoringFunctionFactory;
-		}
-
-		@Override
 		public int getIteration() {
 			return 0;
 		}

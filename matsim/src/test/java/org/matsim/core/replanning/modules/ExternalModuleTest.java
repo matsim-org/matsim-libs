@@ -109,11 +109,6 @@ public class ExternalModuleTest {
             }
 
             @Override
-            public ScoringFunctionFactory getScoringFunctionFactory() {
-                return null;
-            }
-
-            @Override
             public int getIteration() {
                 return 0;
             }
