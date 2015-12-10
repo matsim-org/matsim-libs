@@ -25,15 +25,15 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.LinkEnterEvent;
-import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.vehicles.Vehicle;
 
 /**
  * @author amit
  */
-public class LinkVolumeHandler implements LinkEnterEventHandler {
+public class LinkVolumeHandler implements LinkLeaveEventHandler {
 
 	private final Logger logger = Logger.getLogger(LinkVolumeHandler.class);
 	private Map<Id<Link>, Map<Integer,Double>> linkId2Time2Volume = new HashMap<Id<Link>, Map<Integer,Double>>();
@@ -53,7 +53,7 @@ public class LinkVolumeHandler implements LinkEnterEventHandler {
 		return (int)time/3600;
 	}
 	@Override
-	public void handleEvent(LinkEnterEvent event) {
+	public void handleEvent(LinkLeaveEvent event) {
 		int slotInt = getSlot(event.getTime());
 		Map<Integer, Double> volsTime = new HashMap<Integer, Double>();
 		Map<Integer, List<Id<Vehicle>>> time2persons = new HashMap<Integer, List<Id<Vehicle>>>();
