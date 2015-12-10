@@ -477,7 +477,7 @@ public class MultiNodeAStarLandmarks {
 					l);
 			return true;
 		}
-		else if (currCost + travelCost + remainingTravelCost < data.getExpectedRemainingCost()) {
+		else if (currCost + travelCost + remainingTravelCost < data.getExpectedCost()) {
 			revisitNode(
 					n,
 					data,
