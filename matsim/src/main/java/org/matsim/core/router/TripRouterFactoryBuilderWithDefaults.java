@@ -24,6 +24,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Injector;
+import org.matsim.core.events.EventsManagerModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityModule;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
@@ -71,29 +72,30 @@ public class TripRouterFactoryBuilderWithDefaults {
                         Arrays.asList(
                                 new TripRouterModule(),
                                 new TravelDisutilityModule(),
-                                new TravelTimeCalculatorModule()),
+                                new TravelTimeCalculatorModule(),
+                                new EventsManagerModule()),
                         new AbstractModule() {
 							@Override
-							public void install() {
-								if (leastCostPathCalculatorFactory != null) {
-									bind(LeastCostPathCalculatorFactory.class).toInstance(leastCostPathCalculatorFactory);
-								}
-								if (transitRouterFactory != null && getConfig().transit().isUseTransit()) {
-									bind(TransitRouter.class).toProvider(transitRouterFactory);
-								}
-								if (carTravelDisutility != null) {
-									addTravelDisutilityFactoryBinding("car").toInstance(new TravelDisutilityFactory() {
-																								@Override
-																								public TravelDisutility createTravelDisutility(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
-											return carTravelDisutility;
-									}
-											});
-								}
-								if (carTravelTime != null) {
-									addTravelTimeBinding("car").toInstance(carTravelTime);
-								}
-							}
-						}),
+                            public void install() {
+                                if (leastCostPathCalculatorFactory != null) {
+                                    bind(LeastCostPathCalculatorFactory.class).toInstance(leastCostPathCalculatorFactory);
+                                }
+                                if (transitRouterFactory != null && getConfig().transit().isUseTransit()) {
+                                    bind(TransitRouter.class).toProvider(transitRouterFactory);
+                                }
+                                if (carTravelDisutility != null) {
+                                    addTravelDisutilityFactoryBinding("car").toInstance(new TravelDisutilityFactory() {
+                                        @Override
+                                        public TravelDisutility createTravelDisutility(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
+                                            return carTravelDisutility;
+                                        }
+                                    });
+                                }
+                                if (carTravelTime != null) {
+                                    addTravelTimeBinding("car").toInstance(carTravelTime);
+                                }
+                            }
+                        }),
                 new AbstractModule() {
                     @Override
                     public void install() {

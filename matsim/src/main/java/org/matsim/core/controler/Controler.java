@@ -147,7 +147,7 @@ public class Controler extends AbstractController implements ControlerI {
     // DefaultControlerModule includes submodules. If you want less than what the Controler does
     // by default, you can leave ControlerDefaultsModule out, look at what it does,
     // and only include what you want.
-    private List<AbstractModule> modules = Arrays.<AbstractModule>asList(new ControlerDefaultsModule());
+    private List<AbstractModule> modules = new ArrayList<>(Arrays.<AbstractModule>asList(new ControlerDefaultsModule()));
     // this defines the core of the process, and is mandatory: thus it is not in the "ControlerDefaultsModule",
     // which is more for default facultative stuff (analysis etc.)
     // One can override selected sub-modules by adding an overriding module.
@@ -233,12 +233,12 @@ public class Controler extends AbstractController implements ControlerI {
 		this.controlerListenerManager.setControler(this);
 		this.config.parallelEventHandling().makeLocked();
 		final Scenario scenarioToBind = scenario;
-		this.modules.add(new AbstractModule() {
+		this.overrides = new AbstractModule() {
 			@Override
 			public void install() {
 				bind(Scenario.class).toInstance(scenarioToBind);
 			}
-		});
+		};
 	}
 
 	/**
