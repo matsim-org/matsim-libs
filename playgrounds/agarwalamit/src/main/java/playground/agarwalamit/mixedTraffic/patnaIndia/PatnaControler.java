@@ -46,7 +46,7 @@ public class PatnaControler {
 
 		config.network().setInputFile(INPUT_FILE_DIR+"/network_diff_linkSpeed.xml.gz");
 
-		BackwardCompatibilityForOldPlansType bcrt = new BackwardCompatibilityForOldPlansType(INPUT_FILE_DIR+"/SelectedPlansOnly.xml", PatnaUtils.MAIN_MODES);
+		BackwardCompatibilityForOldPlansType bcrt = new BackwardCompatibilityForOldPlansType(INPUT_FILE_DIR+"/SelectedPlansOnly.xml", PatnaUtils.URBAN_MAIN_MODES);
 		bcrt.extractPlansExcludingLinkInfo();
 		String plansFile = INPUT_FILE_DIR+"/selectedPlans_diff_tripPurpose.xml.gz";
 		bcrt.writePopOut(plansFile);

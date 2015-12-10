@@ -119,7 +119,7 @@ public class EvacuationPatnaScenarioGenerator {
 		config.qsim().setEndTime(30*3600);
 		config.qsim().setStuckTime(100000);
 		config.qsim().setLinkDynamics(LinkDynamics.PassingQ.name());
-		config.qsim().setMainModes(PatnaUtils.MAIN_MODES);
+		config.qsim().setMainModes(PatnaUtils.URBAN_MAIN_MODES);
 		config.qsim().setTrafficDynamics(QSimConfigGroup.TrafficDynamics.withHoles);
 
 		StrategySettings expChangeBeta = new StrategySettings();
@@ -151,7 +151,7 @@ public class EvacuationPatnaScenarioGenerator {
 		evacAct.setTypicalDuration(1*3600);
 		config.planCalcScore().addActivityParams(evacAct);
 
-		config.plansCalcRoute().setNetworkModes(PatnaUtils.MAIN_MODES);
+		config.plansCalcRoute().setNetworkModes(PatnaUtils.URBAN_MAIN_MODES);
 		
 		{
 			ModeRoutingParams mrp = new ModeRoutingParams("walk");
@@ -220,7 +220,7 @@ public class EvacuationPatnaScenarioGenerator {
 			Activity evacAct = popFact.createActivityFromLinkId("evac", safeLinkId);
 			planOut.addActivity(evacAct);
 
-			if(PatnaUtils.MAIN_MODES.contains(leg.getMode())){
+			if(PatnaUtils.URBAN_MAIN_MODES.contains(leg.getMode())){
 				TripRouter router = new TripRouter();
 				router.setRoutingModule(leg.getMode(), DefaultRoutingModules.createNetworkRouter(leg.getMode(), popFact, scenario.getNetwork(), new Dijkstra(scenario.getNetwork(), new OnlyTimeDependentTravelDisutility(new FreeSpeedTravelTime()) , new FreeSpeedTravelTime())));
 				List<? extends PlanElement> routeInfo = router.calcRoute(leg.getMode(), new ActivityWrapperFacility(home), new ActivityWrapperFacility(evacAct), home.getEndTime(), pOut);
