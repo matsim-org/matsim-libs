@@ -22,11 +22,7 @@
 
 package org.matsim.core.controler;
 
-import org.matsim.analysis.LegTimesModule;
-import org.matsim.analysis.ScoreStatsModule;
-import org.matsim.analysis.VolumesAnalyzerModule;
-import org.matsim.analysis.LegHistogramModule;
-import org.matsim.analysis.LinkStatsModule;
+import org.matsim.analysis.*;
 import org.matsim.core.events.EventsManagerModule;
 import org.matsim.core.mobsim.DefaultMobsimModule;
 import org.matsim.core.replanning.StrategyManagerModule;
@@ -55,6 +51,7 @@ public class ControlerDefaultsModule extends AbstractModule {
         install(new VolumesAnalyzerModule());
         install(new LegHistogramModule());
         install(new LegTimesModule());
+        install(new TravelDistanceStatsModule());
         install(new ScoreStatsModule());
         install(new CountsModule());
         install(new PtCountsModule());

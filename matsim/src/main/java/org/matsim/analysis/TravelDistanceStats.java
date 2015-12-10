@@ -31,7 +31,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -39,13 +38,9 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
-import org.matsim.pt.routes.ExperimentalTransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 import javax.inject.Inject;
 
@@ -66,24 +61,21 @@ import javax.inject.Inject;
 public class TravelDistanceStats {
 
 	final private Config config;
-	final private Network network;
 	final private BufferedWriter out;
 	final private String fileName;
 
-	private final boolean createPNG;
 	private double[] history = null;
 
 	private Thread[] threads = null;
 	private StatsCalculator[] statsCalculators = null;
 	private final AtomicBoolean hadException = new AtomicBoolean(false);
 	private final ExceptionHandler exceptionHandler = new ExceptionHandler(this.hadException);
-	private TransitSchedule transitSchedule;
 
 	private final static Logger log = Logger.getLogger(TravelDistanceStats.class);
 
 	@Inject
-	TravelDistanceStats(Config config, Network network, TransitSchedule transitSchedule, OutputDirectoryHierarchy controlerIO) {
-		this(config, network, transitSchedule, controlerIO.getOutputFilename(Controler.FILENAME_TRAVELDISTANCESTATS), config.controler().isCreateGraphs());
+	TravelDistanceStats(Config config, OutputDirectoryHierarchy controlerIO) {
+		this(config, controlerIO.getOutputFilename(Controler.FILENAME_TRAVELDISTANCESTATS), config.controler().isCreateGraphs());
 	}
 
 	/**
@@ -91,13 +83,10 @@ public class TravelDistanceStats {
 	 * @param createPNG true if in every iteration, the distance statistics should be visualized in a graph and written to disk.
 	 * @throws UncheckedIOException
 	 */
-	public TravelDistanceStats(final Config config, final Network network, final TransitSchedule transitSchedule, final String filename, final boolean createPNG) throws UncheckedIOException {
+	public TravelDistanceStats(final Config config, final String filename, final boolean createPNG) throws UncheckedIOException {
 		this.config = config;
-		this.network = network;
-		this.transitSchedule = transitSchedule;
 		this.fileName = filename;
-		this.createPNG = createPNG;
-		if (this.createPNG) {
+		if (createPNG) {
 			int iterations = config.controler().getLastIteration() - config.controler().getFirstIteration();
 			if (iterations > 5000) {
 				iterations = 5000; // limit the history size
@@ -230,7 +219,7 @@ public class TravelDistanceStats {
 		double sumAvgPlanLegTravelDistanceExecuted = 0.0;
 		int nofLegTravelDistanceExecuted = 0;
 
-		private Collection<Plan> persons = new ArrayList<Plan>();
+		private Collection<Plan> persons = new ArrayList<>();
 
 		public void addPerson(Plan plan) {
 			persons.add(plan);
@@ -253,18 +242,10 @@ public class TravelDistanceStats {
 			for (PlanElement pe : plan.getPlanElements()) {
 				if (pe instanceof Leg) {
 					final Leg leg = (Leg) pe;
-					if (leg.getRoute() instanceof NetworkRoute) {
-						planTravelDistance += RouteUtils.calcDistance((NetworkRoute) leg.getRoute(), network);
+					double distance = leg.getRoute().getDistance();
+					if (!Double.isNaN(distance)) {
+						planTravelDistance += distance;
 						numberOfLegs++;
-					} else if (leg.getRoute() instanceof ExperimentalTransitRoute) {
-						planTravelDistance += RouteUtils.calcDistance((ExperimentalTransitRoute) leg.getRoute(), transitSchedule, network);
-						numberOfLegs++;
-					} else {
-						double distance = leg.getRoute().getDistance();
-						if (!Double.isNaN(distance)) {
-							planTravelDistance += distance;
-							numberOfLegs++;
-						}
 					}
 				}
 			}
