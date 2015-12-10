@@ -27,7 +27,6 @@ import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
@@ -73,8 +72,6 @@ public final class FixBraessBehaviorTest{
 	
 	@Test
 	public void testBraessWoPricing() {
-		// TODO change everything to 3600 persons (no rounding differences in activity end times)
-		// results for no pricing should than be 19, 3558, 23, 7104064
 		fixRouteDistributionAndTT(RunBraessSimulation.PricingType.NONE, 11, 1978, 11, 3949870);
 	}
 
@@ -116,7 +113,11 @@ public final class FixBraessBehaviorTest{
 		Config config = defineConfig();
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
-		// TODO why is this necessary? see ReadVsCreatePopulationTest
+		/*
+		 * create population instead of reading a population file, so that it is
+		 * comparable to the results of RunBraessSimulation. for differences
+		 * of reading vs creating population, see ReadVsCreatePopulationTest.
+		 */
 		createPopulation(scenario);
 		
 		Controler controler = new Controler(scenario);
@@ -171,11 +172,8 @@ public final class FixBraessBehaviorTest{
 	private Config defineConfig() {
 		Config config = ConfigUtils.createConfig();
 
-		// set network and population
 		config.network().setInputFile(testUtils.getClassInputDirectory() + "network_cap2000-1000.xml");
-//		config.plans().setInputFile(testUtils.getClassInputDirectory() + "plans2000_initRoutes.xml");
 
-		// set number of iterations
 		config.controler().setLastIteration(100);
 
 		// set brain exp beta
@@ -198,11 +196,6 @@ public final class FixBraessBehaviorTest{
 		// set end time to 12 am (4 hours after simulation start) to
 		// shorten simulation run time
 		config.qsim().setEndTime(3600 * 12);
-
-		// adapt monetary distance cost rate
-		config.planCalcScore().getModes().get(TransportMode.car).setMonetaryDistanceRate(-0.0);
-
-		config.planCalcScore().setMarginalUtilityOfMoney(1.0); // default is 1.0
 
 		config.controler().setOutputDirectory(testUtils.getOutputDirectory());
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
