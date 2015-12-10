@@ -138,12 +138,12 @@ public class PreProcessLandmarks extends PreProcessEuclidean {
 		}
 
 		for (Node node : network.getNodes().values()) {
-			LandmarksData r = (LandmarksData) getNodeData(node);
+			LandmarksData r = getNodeData(node);
 			r.updateMinMaxTravelTimes();
 		}
 
 		for (Node node : network.getNodes().values()) {
-			LandmarksData r = (LandmarksData) getNodeData(node);
+			LandmarksData r = getNodeData(node);
 			for (int i = 0; i < this.landmarks.length; i++) {
 				if (r.getMinLandmarkTravelTime(i) > r.getMaxLandmarkTravelTime(i)) {
 					log.info("Min > max for node " + node.getId() + " and landmark " + i);
@@ -244,7 +244,7 @@ public class PreProcessLandmarks extends PreProcessEuclidean {
 		return (LandmarksData) r;
 	}
 
-	public class LandmarksData extends DeadEndData {
+	public static class LandmarksData extends DeadEndData {
 
 		private final double[] landmarkTravelTime1;
 		private final double[] landmarkTravelTime2;
