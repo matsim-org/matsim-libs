@@ -22,6 +22,7 @@ package org.matsim.population;
 import com.google.inject.Inject;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansConfigGroup;
@@ -37,19 +38,19 @@ import org.matsim.core.utils.misc.Time;
  */
 class VspPlansCleaner implements BeforeMobsimListener {
 
-    private final Scenario scenario;
+    private final Config config;
+	private final Population population;
 
     @Inject
-    VspPlansCleaner(Scenario scenarioData) {
-        this.scenario = scenarioData;
-    }
+    VspPlansCleaner(Config config, Population population) {
+		this.config = config;
+		this.population = population;
+	}
 	
 	@Override
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
-		Population pop = scenario.getPopulation();
-		Config config = scenario.getConfig() ;
 		PlansConfigGroup.ActivityDurationInterpretation actDurInterp = ( config.plans().getActivityDurationInterpretation() ) ;
-		for ( Person person : pop.getPersons().values() ) {
+		for ( Person person : population.getPersons().values() ) {
 
 			Plan plan = person.getSelectedPlan() ; 
 			// do this only for the selected plan in the assumption that the other ones are clean
