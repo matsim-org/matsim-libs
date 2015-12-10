@@ -48,11 +48,11 @@ public class AccessibilityComputationCapeTownTest {
 	@Test
 	public void doAccessibilityTest() throws IOException {
 //		public static void main( String[] args ) {
-//		String folderStructure = "../../../"; // local on dz's computer
-		String folderStructure = "../../"; // server
+		String folderStructure = "../../../"; // local on dz's computer
+//		String folderStructure = "../../"; // server
 			
-		String networkFile = folderStructure + "matsimExamples/countries/za/capetown/network.xml";
-		String facilitiesFile = folderStructure + "matsimExamples/countries/za/capetown/facilities.xml";
+		String networkFile = folderStructure + "matsimExamples/countries/za/capetown/2015-10-15_network.xml";
+		String facilitiesFile = folderStructure + "matsimExamples/countries/za/capetown/2015-10-15_facilities.xml";
 		
 		// minibus-pt
 //		String travelTimeMatrix = folderStructure + "matsimExamples/countries/za/nmbm/minibus-pt/JTLU_14i/travelTimeMatrix.csv.gz";
@@ -157,10 +157,10 @@ public class AccessibilityComputationCapeTownTest {
 		
 		// loop over activity types to add one GridBasedAccessibilityControlerListenerV3 for each combination
 		for (String actType : activityTypes) {
-//			if (!actType.equals(FacilityTypes.EDUCATION)) {
-//				log.error("skipping everything except work for debugging purposes; remove in production code. kai, feb'14");
-//				continue;
-//			}
+			if (!actType.equals(FacilityTypes.MEDICAL)) {
+				log.error("skipping everything except work for debugging purposes; remove in production code. kai, feb'14");
+				continue;
+			}
 
 			ActivityFacilities opportunities = AccessibilityRunUtils.collectActivityFacilitiesOfType(scenario, actType);
 			final GeoserverUpdater geoserverUpdater = new GeoserverUpdater(crs, name + "_" + actType);
