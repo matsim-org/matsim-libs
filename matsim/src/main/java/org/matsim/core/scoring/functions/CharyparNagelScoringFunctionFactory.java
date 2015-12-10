@@ -46,12 +46,12 @@ public final class CharyparNagelScoringFunctionFactory implements ScoringFunctio
 
 	private final CharyparNagelScoringParametersForPerson params;
 
-	@Inject
 	public CharyparNagelScoringFunctionFactory( final Scenario sc ) {
 		this( new SubpopulationCharyparNagelScoringParameters( sc ) , sc.getNetwork() );
 	}
 
-    public CharyparNagelScoringFunctionFactory(final CharyparNagelScoringParametersForPerson params, Network network) {
+	@Inject
+	CharyparNagelScoringFunctionFactory(final CharyparNagelScoringParametersForPerson params, Network network) {
 		this.params = params;
 		this.network = network;
 	}

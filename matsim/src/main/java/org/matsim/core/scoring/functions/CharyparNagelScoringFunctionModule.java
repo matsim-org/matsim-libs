@@ -30,5 +30,6 @@ public class CharyparNagelScoringFunctionModule extends AbstractModule {
     @Override
     public void install() {
         bind(ScoringFunctionFactory.class).to(CharyparNagelScoringFunctionFactory.class);
+        bind(CharyparNagelScoringParametersForPerson.class).to(SubpopulationCharyparNagelScoringParameters.class);
     }
 }

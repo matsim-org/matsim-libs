@@ -113,7 +113,6 @@ public class Controler extends AbstractController implements ControlerI {
 			"%d{ISO8601} %5p %C{1}:%L %m%n");
 
 	private final Config config; 
-	private final Scenario scenario;
 
 	@Inject private EventsHandling eventsHandling;
 	@Inject private PlansDumping plansDumping;
@@ -172,9 +171,8 @@ public class Controler extends AbstractController implements ControlerI {
 	}
 
 	@Inject
-	Controler(com.google.inject.Injector injector, Config config, Scenario scenario, IterationStopWatch stopWatch) {
+	Controler(com.google.inject.Injector injector, Config config, IterationStopWatch stopWatch) {
 		super(stopWatch);
-		this.scenario  = scenario;
 		this.config = config;
 		this.config.addConfigConsistencyChecker(new ConfigConsistencyCheckerImpl());
 		this.controlerListenerManager.setControler(this);
@@ -208,10 +206,9 @@ public class Controler extends AbstractController implements ControlerI {
 		this((String) null, null, scenario);
 	}
 
-	private Controler(final String configFileName, final Config config, final Scenario scenario) {
+	private Controler(final String configFileName, final Config config, Scenario scenario) {
 		if (scenario != null) {
 			// scenario already loaded (recommended):
-			this.scenario  = scenario;
 			this.config = scenario.getConfig();
 			this.config.addConfigConsistencyChecker(new ConfigConsistencyCheckerImpl());
 		} else {
@@ -228,11 +225,18 @@ public class Controler extends AbstractController implements ControlerI {
 			this.config.addConfigConsistencyChecker(new ConfigConsistencyCheckerImpl());
 
 			// load scenario:
-			this.scenario  = ScenarioUtils.createScenario(this.config);
-			ScenarioUtils.loadScenario(this.scenario );
+			scenario  = ScenarioUtils.createScenario(this.config);
+			ScenarioUtils.loadScenario(scenario) ;
 		}
 		this.controlerListenerManager.setControler(this);
 		this.config.parallelEventHandling().makeLocked();
+		final Scenario scenarioToBind = scenario;
+		this.modules.add(new AbstractModule() {
+			@Override
+			public void install() {
+				bind(Scenario.class).toInstance(scenarioToBind);
+			}
+		});
 	}
 
 	/**
@@ -299,7 +303,6 @@ public class Controler extends AbstractController implements ControlerI {
 							// other setters on this Controler.
 							install(AbstractModule.override(baseModules, overrides));
 
-							bind(Scenario.class).toInstance(scenario);
 							bind(OutputDirectoryHierarchy.class).toInstance(getControlerIO());
 							bind(IterationStopWatch.class).toInstance(getStopwatch());
 							bind(ControlerI.class).toInstance(Controler.this);
@@ -337,8 +340,8 @@ public class Controler extends AbstractController implements ControlerI {
 	@Override
 	protected final void prepareForSim() {
 
-		if ( scenario  instanceof MutableScenario ) {
-			((MutableScenario)scenario ).setLocked();
+		if (getScenario() instanceof MutableScenario ) {
+			((MutableScenario)getScenario()).setLocked();
 			// see comment in ScenarioImpl. kai, sep'14
 		}
 
@@ -348,14 +351,14 @@ public class Controler extends AbstractController implements ControlerI {
 		 * be probably adapted in a way that other main modes are possible as well. cdobler, oct'15.
 		 */
 		final Network net;
-		if (NetworkUtils.isMultimodal(this.scenario.getNetwork())) {
+		if (NetworkUtils.isMultimodal(this.getScenario().getNetwork())) {
 			log.info("Network seems to be multimodal. Create car-only network which is handed over to PersonPrepareForSim.");
-			TransportModeNetworkFilter filter = new TransportModeNetworkFilter(this.scenario.getNetwork());
+			TransportModeNetworkFilter filter = new TransportModeNetworkFilter(this.getScenario().getNetwork());
 			net = NetworkUtils.createNetwork();
 			HashSet<String> modes = new HashSet<String>();
 			modes.add(TransportMode.car);
 			filter.filter(net, modes);
-		} else net = this.scenario.getNetwork();
+		} else net = this.getScenario().getNetwork();
 		
 		// make sure all routes are calculated.
         ParallelPersonAlgorithmRunner.run(getScenario().getPopulation(), this.config.global().getNumberOfThreads(),
@@ -363,11 +366,11 @@ public class Controler extends AbstractController implements ControlerI {
 					@Override
 					public AbstractPersonAlgorithm getPersonAlgorithm() {
 						return new PersonPrepareForSim(new PlanRouter(getTripRouterProvider().get(), getScenario().getActivityFacilities()),
-								Controler.this.scenario, net);
+								Controler.this.getScenario(), net);
 			}
 		});
-        if ( scenario.getPopulation() instanceof PopulationImpl ) {
-      	  ((PopulationImpl) scenario.getPopulation()).setLocked();
+        if (getScenario().getPopulation() instanceof PopulationImpl) {
+      	  ((PopulationImpl) getScenario().getPopulation()).setLocked();
         }
         
 	}
@@ -386,7 +389,7 @@ public class Controler extends AbstractController implements ControlerI {
 	private Mobsim getNewMobsim() {
 		if (this.config.getModule(SimulationConfigGroup.GROUP_NAME) != null &&
 				((SimulationConfigGroup) this.config.getModule(SimulationConfigGroup.GROUP_NAME)).getExternalExe() != null ) {
-			ExternalMobsim simulation = new ExternalMobsim(this.scenario , getEvents());
+			ExternalMobsim simulation = new ExternalMobsim(getScenario(), getEvents());
 			simulation.setControlerIO(this.getControlerIO());
 			simulation.setIterationNumber(this.getIterationNumber());
 			return simulation;
@@ -471,7 +474,7 @@ public class Controler extends AbstractController implements ControlerI {
 	}
 
     public final Scenario getScenario() {
-	    return scenario;
+	    return this.injector.getInstance(Scenario.class);
     }
 
 	/**
