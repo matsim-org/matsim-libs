@@ -158,6 +158,14 @@ public class OuterCordonUtils {
 		return links;
 	}
 	
+	public static List<Id<Link>> getInternalToExternalCountStationLinkIds(){
+		List<Id<Link>> links = new ArrayList<>();
+		for(OuterCordonLinks l : OuterCordonLinks.values()){
+			if(l.toString().split("_")[1].equals("P2X")) links.add( l.getLinkId() ) ;
+		}
+		return links;
+	}
+	
 	public static boolean isVehicleFromThroughTraffic(Id<Vehicle> vehicleId){
 		return vehicleId.toString().split("_")[2].equals("E2E");
 	}

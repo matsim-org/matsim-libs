@@ -19,9 +19,11 @@
 package playground.agarwalamit.mixedTraffic.patnaIndia.input.extDemand;
 
 import java.io.BufferedWriter;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -43,10 +45,10 @@ import playground.agarwalamit.mixedTraffic.patnaIndia.input.extDemand.OuterCordo
 public class OuterCountVolumeAnalyzer {
 
 	private LinkVolumeHandler handler = new LinkVolumeHandler();
-	private Map<Id<Link>, Tuple<Integer,Integer>> link2totalCounts = new HashMap<>();
+	private SortedMap<Id<Link>, Tuple<Integer,Integer>> link2totalCounts = new TreeMap<>();
 
 	public static void main(String[] args) {
-		String outputFolder ="../../../../repos/runs-svn/patnaIndia/run108/outerCordonOutput_looksGood/";
+		String outputFolder ="../../../../repos/runs-svn/patnaIndia/run108/outerCordonOutput/";
 		String eventsFile = outputFolder+"/output_events.xml.gz";
 		OuterCountVolumeAnalyzer ocva =	new OuterCountVolumeAnalyzer();
 		ocva.run(eventsFile);
@@ -64,9 +66,13 @@ public class OuterCountVolumeAnalyzer {
 	public void writeData(String outputFolder){
 		BufferedWriter writer = IOUtils.getBufferedWriter(outputFolder+"/external2InternalSimCountData.txt");
 		try {
-			writer.write("OuterCountStationNumber \t linkId \t ext-extCount \t ext-intCount \n");
-			for(Id<Link> linkId : link2totalCounts.keySet()){
-				writer.write(OuterCordonLinks.getOuterCordonNumberFromLink(linkId.toString())+"\t"+linkId+"\t"+link2totalCounts.get(linkId).getFirst()*PatnaUtils.COUNT_SCALE_FACTOR+"\t"+link2totalCounts.get(linkId).getSecond()*PatnaUtils.COUNT_SCALE_FACTOR+"\n");
+			writer.write("OuterCountStationNumber \t linkId \t ext-intCount \t ext-extCount \n");
+			for(Id<Link> linkId : OuterCordonUtils.getExternalToInternalCountStationLinkIds()){
+				writer.write(OuterCordonLinks.getOuterCordonNumberFromLink(linkId.toString())+"\t"+linkId+"\t"+link2totalCounts.get(linkId).getSecond()*PatnaUtils.COUNT_SCALE_FACTOR+"\t"+link2totalCounts.get(linkId).getFirst()*PatnaUtils.COUNT_SCALE_FACTOR+"\n");
+			}
+			writer.newLine();
+			for(Id<Link> linkId : OuterCordonUtils.getInternalToExternalCountStationLinkIds()){
+				writer.write(OuterCordonLinks.getOuterCordonNumberFromLink(linkId.toString())+"\t"+linkId+"\t"+link2totalCounts.get(linkId).getSecond()*PatnaUtils.COUNT_SCALE_FACTOR+"\t"+link2totalCounts.get(linkId).getFirst()*PatnaUtils.COUNT_SCALE_FACTOR+"\n");
 			}
 			writer.close();
 		} catch (Exception e) {
@@ -76,7 +82,10 @@ public class OuterCountVolumeAnalyzer {
 
 	private void getVolume(){
 		Map<Id<Link>, Map<Integer, List<Id<Vehicle>>>> link2time2vehicles = handler.getLinkId2TimeSlot2VehicleIds();
-		for (Id<Link> linkId : OuterCordonUtils.getExternalToInternalCountStationLinkIds()){
+		List<Id<Link>> allCountStationLinks = new ArrayList<>();
+		allCountStationLinks.addAll(OuterCordonUtils.getExternalToInternalCountStationLinkIds());
+		allCountStationLinks.addAll(OuterCordonUtils.getInternalToExternalCountStationLinkIds());
+		for (Id<Link> linkId : allCountStationLinks){
 			Map<Integer, List<Id<Vehicle>>> time2vehicles = link2time2vehicles.get(linkId);
 			int E2ECount = 0;
 			int E2ICount = 0;

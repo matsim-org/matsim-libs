@@ -105,8 +105,7 @@ public class PatnaCadytsControler {
 				sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
 				
 				final CadytsScoring<Link> scoringFunction = new CadytsScoring<Link>(person.getSelectedPlan(), config, cContext);
-				//final double cadytsScoringWeight = 0.0;
-				final double cadytsScoringWeight = 25.0;
+				final double cadytsScoringWeight = 15.0;
 				scoringFunction.setWeightOfCadytsCorrection(cadytsScoringWeight) ;
 				sumScoringFunction.addScoringFunction(scoringFunction );
 

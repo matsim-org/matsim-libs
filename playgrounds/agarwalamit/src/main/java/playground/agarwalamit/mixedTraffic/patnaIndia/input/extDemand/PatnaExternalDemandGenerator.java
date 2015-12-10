@@ -145,15 +145,15 @@ public class PatnaExternalDemandGenerator {
 						
 						Activity middleAct = pf.createActivityFromCoord("E2I_mid", middleActCoord);
 						//ZZ_TODO : here the act duration is assigned randomly between 7 to 8 hours. This means, the agent will be counted in reverse direction of the same counting station.
-						double middleActEndTime = firstAct.getEndTime() + 7*3600 + random.nextDouble() * 3600;
+						double middleActEndTime = firstAct.getEndTime() + 6*3600 + random.nextDouble() * 3600;
 						Activity lastAct = pf.createActivityFromCoord( "E2I_Start", firstLastActCoord);
 
-						if(middleActEndTime > 23*3600 ) { // midAct - startAct - midAct ==> this will give count in both time bins for desired counting station
-							middleActEndTime = middleActEndTime - 23*3600;
+						if(middleActEndTime > 24*3600 ) { // midAct - startAct - midAct ==> this will give count in both time bins for desired counting station
+							middleActEndTime = middleActEndTime - 24*3600;
 							middleAct.setEndTime( middleActEndTime );
 							plan.addActivity(middleAct);
 							plan.addLeg(pf.createLeg(mode));
-							firstAct.setEndTime( middleActEndTime + 11*3600 + random.nextDouble() * 3600 );
+							firstAct.setEndTime( middleActEndTime + 6*3600 + random.nextDouble() * 3600 );
 							plan.addActivity(firstAct);
 							plan.addLeg(pf.createLeg(mode));
 							plan.addActivity( pf.createActivityFromCoord("E2I_mid", middleActCoord)  );
