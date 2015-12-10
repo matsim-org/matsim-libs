@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.config.Config;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -60,6 +61,10 @@ public class TransitRouterAStar implements TransitRouter {
     private final TransitDisutilityWithMinimum travelDisutility;
 
     private final PreparedTransitSchedule preparedTransitSchedule;
+
+	public TransitRouterAStar(final Config config, final TransitSchedule schedule) {
+		this( new TransitRouterConfig( config ) , schedule );
+	}
 
     public TransitRouterAStar(final TransitRouterConfig config, final TransitSchedule schedule) {
         this.preparedTransitSchedule = new PreparedTransitSchedule(schedule);

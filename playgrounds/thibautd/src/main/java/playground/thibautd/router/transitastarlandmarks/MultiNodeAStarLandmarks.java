@@ -175,24 +175,26 @@ public class MultiNodeAStarLandmarks {
 
 			if (outNode == null) {
 				// seems we have no more nodes left, but not yet reached all endNodes...
-				endNodes.clear();
-			} else {
-				final DijkstraNodeData data = getData(outNode);
-				final boolean isEndNode = endNodes.remove(outNode);
-				if (isEndNode) {
-					final InitialNode initData = toNodesMap.get(outNode);
-					final double cost = data.getCost() + initData.initialCost;
-					if (cost < minCost) {
-						minCost = cost;
-						minCostNode = outNode;
-					}
-				}
-				if (data.getCost() > minCost) {
-					endNodes.clear(); // we can't get any better now
-				} else {
-					relaxNode(outNode, null, pendingNodes);
+				break;
+			}
+
+			final DijkstraNodeData data = getData(outNode);
+			final boolean isEndNode = endNodes.remove(outNode);
+			if (isEndNode) {
+				final InitialNode initData = toNodesMap.get(outNode);
+				final double cost = data.getCost() + initData.initialCost;
+				if (cost < minCost) {
+					minCost = cost;
+					minCostNode = outNode;
 				}
 			}
+
+			if (data.getCost() > minCost) {
+				break;
+			}
+
+			relaxNode(outNode, toNodes, pendingNodes);
+
 		}
 
 		if (minCostNode == null) {
@@ -247,6 +249,17 @@ public class MultiNodeAStarLandmarks {
 				}
 			}
 		}
+	}
+
+	protected double estimateRemainingTravelCost(
+			final Node fromNode,
+			final Iterable<InitialNode> toNodes) {
+		double bestEstimatedRemainingCost = Double.POSITIVE_INFINITY;
+		for ( InitialNode n : toNodes ) {
+			final double c = estimateRemainingTravelCost( fromNode , n );
+			if ( c < bestEstimatedRemainingCost ) bestEstimatedRemainingCost = c;
+		}
+		return bestEstimatedRemainingCost;
 	}
 
 	protected double estimateRemainingTravelCost(
@@ -339,15 +352,13 @@ public class MultiNodeAStarLandmarks {
 	/**
 	 * Expands the given Node in the routing algorithm; may be overridden in
 	 * sub-classes.
-	 *
-	 * @param outNode
+	 *  @param outNode
 	 *            The Node to be expanded.
 	 * @param toNode
 	 *            The target Node of the route.
 	 * @param pendingNodes
-	 *            The set of pending nodes so far.
 	 */
-	protected void relaxNode(final Node outNode, final InitialNode toNode, final RouterPriorityQueue<Node> pendingNodes) {
+	protected void relaxNode(final Node outNode, final Iterable<InitialNode> toNode, final RouterPriorityQueue<Node> pendingNodes) {
 
 		DijkstraNodeData outData = getData(outNode);
 		double currTime = outData.getTime();
@@ -362,7 +373,7 @@ public class MultiNodeAStarLandmarks {
 	 * By doing so, the FastDijkstra can overwrite relaxNode without copying the logic.
 	 */
 	/*package*/ void relaxNodeLogic(final Link l, final RouterPriorityQueue<Node> pendingNodes,
-			final double currTime, final double currCost, final InitialNode toNode,
+			final double currTime, final double currCost, final Iterable<InitialNode> toNode,
 			final PreProcessDijkstra.DeadEndData ddOutData) {
 		// In AStarLandmarks, also checks if new landmarks should be "activated"
 		// here, we (for the moment) always use every landmark
@@ -370,7 +381,7 @@ public class MultiNodeAStarLandmarks {
 	}
 
 	private boolean addToPendingNodes(final Link l, final Node n, final RouterPriorityQueue<Node> pendingNodes,
-			final double currTime, final double currCost, final InitialNode toNode) {
+			final double currTime, final double currCost, final Iterable<InitialNode> toNode) {
 
 		final double travelTime = this.timeFunction.getLinkTravelTime( l, currTime, person, vehicle );
 		final double travelCost = this.costFunction.getLinkTravelDisutility(
