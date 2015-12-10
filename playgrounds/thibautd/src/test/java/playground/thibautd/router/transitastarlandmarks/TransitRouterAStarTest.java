@@ -92,19 +92,19 @@ public class TransitRouterAStarTest {
 			final List<Leg> referenceTrip ) {
 		Assert.assertEquals(
 				"wrong number of elements for "+description,
-				testedTrip.size(),
-				referenceTrip.size() );
+				referenceTrip.size(),
+				testedTrip.size() );
 
 		for ( int i=0; i < testedTrip.size(); i++ ) {
 			Assert.assertEquals(
 					"unexpected mode for leg "+i+"/"+testedTrip.size()+" of "+description,
-					testedTrip.get( i ).getMode(),
-					referenceTrip.get( i ).getMode() );
+					referenceTrip.get( i ).getMode(),
+					testedTrip.get( i ).getMode() );
 
 			Assert.assertEquals(
 					"unexpected duration for leg "+i+"/"+testedTrip.size()+" of "+description,
-					testedTrip.get( i ).getTravelTime(),
 					referenceTrip.get( i ).getTravelTime(),
+					testedTrip.get( i ).getTravelTime(),
 					1E-9 );
 
 			final Route testedRoute = testedTrip.get( i ).getRoute();
@@ -119,18 +119,18 @@ public class TransitRouterAStarTest {
 
 			Assert.assertEquals(
 					"unexpected route type for leg "+i+"/"+testedTrip.size()+" of "+description,
-					testedRoute.getClass(),
-					referenceRoute.getClass() );
+					referenceRoute.getClass(),
+					testedRoute.getClass() );
 
 			Assert.assertEquals(
 					"unexpected origin link for leg "+i+"/"+testedTrip.size()+" of "+description,
-					testedRoute.getStartLinkId(),
-					referenceRoute.getStartLinkId() );
+					referenceRoute.getStartLinkId(),
+					testedRoute.getStartLinkId() );
 
 			Assert.assertEquals(
 					"unexpected destination link for leg "+i+"/"+testedTrip.size()+" of "+description,
-					testedRoute.getEndLinkId(),
-					referenceRoute.getEndLinkId() );
+					referenceRoute.getEndLinkId(),
+					testedRoute.getEndLinkId() );
 		}
 	}
 }
