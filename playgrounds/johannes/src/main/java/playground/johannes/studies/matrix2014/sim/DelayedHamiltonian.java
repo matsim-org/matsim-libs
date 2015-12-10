@@ -43,7 +43,7 @@ public class DelayedHamiltonian implements Hamiltonian, MarkovEngineListener {
     }
     @Override
     public double evaluate(Collection<CachedPerson> population) {
-        if(iteration > activationIteration)
+        if(iteration >= activationIteration)
             return hamiltonian.evaluate(population);
         else
             return 0;

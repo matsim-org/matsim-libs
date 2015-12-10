@@ -46,8 +46,9 @@ public class Terralytics2Matrix {
         DateTimeFormatter hourFormatter = DateTimeFormat.forPattern("HH");
 
         Map<String, KeyMatrix> map = new HashMap<String, KeyMatrix>();
-        BufferedReader reader = new BufferedReader(new FileReader("/mnt/cifs/B-drive/C_Vertrieb/2013_01_01_Floating Phone Data/04 Telefonica/Matrizen/od_start_daily.csv"));
-//        BufferedReader reader = new BufferedReader(new FileReader("/home/johannes/gsv/fpd/telefonica/Telefonica_Pilotmatrix_Frankfurt-Berlin/od_201503_hourly_start.csv"));
+//        BufferedReader reader = new BufferedReader(new FileReader("/mnt/cifs/B-drive/C_Vertrieb/2013_01_01_Floating Phone Data/04 Telefonica/Matrizen/od_start_daily.csv"));
+        BufferedReader reader = new BufferedReader(new FileReader("/mnt/cifs/B-drive/C_Vertrieb/2013_01_01_Floating " +
+                "Phone Data/04 Telefonica/Matrizen/od_start_hourly.csv"));
 
         String line = reader.readLine();
 
@@ -81,7 +82,7 @@ public class Terralytics2Matrix {
 
         KeyMatrixXMLWriter writer = new KeyMatrixXMLWriter();
         for(Map.Entry<String, KeyMatrix> entry : map.entrySet()) {
-            writer.write(entry.getValue(), String.format("%s/%s.xml", outdir, entry.getKey()));
+//            writer.write(entry.getValue(), String.format("%s/%s.xml", outdir, entry.getKey()));
         }
 
         StatsWriter.writeHistogram(hourHist, "hour", "trips", String.format("%s/startTime.hist.txt", outdir));

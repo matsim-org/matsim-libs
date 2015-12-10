@@ -86,7 +86,7 @@ public class ODDistribution implements AttributeChangeListener, Hamiltonian {
 
     private double scaleFactor;
 
-    private final long rescaleInterval = 1000000;
+    private final long rescaleInterval = 10000000;
 
     private long changeCounter;
 

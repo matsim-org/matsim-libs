@@ -157,7 +157,8 @@ public class Simulator {
         ioContext.append("ref");
         AnalyzerTaskRunner.run(refPersons, task, ioContext);
 
-        MatrixAnalyzer mAnalyzer = (MatrixAnalyzer) new MatrixAnalyzerConfigurator(config.getModule("matrixAnalyzer"), dataPool).load();
+        MatrixAnalyzer mAnalyzer = (MatrixAnalyzer) new MatrixAnalyzerConfigurator(config.getModule("matrixAnalyzer")
+                , dataPool, ioContext).load();
         mAnalyzer.setPredicate(new ModePredicate(CommonValues.LEG_MODE_CAR));
         task.addComponent(mAnalyzer);
 
@@ -182,7 +183,8 @@ public class Simulator {
         KeyMatrix refMatrix = new KeyMatrix();
         KeyMatrixTxtIO.read(refMatrix, config.getParam(MODULE_NAME, "calibrationMatrix"));
         String layerName = config.getParam(MODULE_NAME, "calibrationLayerName");
-        ODDistribution odDistribution = new ODDistribution(simPersons, refMatrix, dataPool, layerName, "NO", 100000);
+//        ODDistribution odDistribution = new ODDistribution(simPersons, refMatrix, dataPool, layerName, "NO", 100000);
+        ODCalibrator odDistribution = new ODCalibratorBuilder().build(refMatrix, dataPool, layerName, "NO", 100000);
         long delay = (long)Double.parseDouble(config.getParam(MODULE_NAME, "calibrationDelay"));
         DelayedHamiltonian odDistributionDelayed = new DelayedHamiltonian(odDistribution, delay);
         hamiltonian.addComponent(odDistributionDelayed, 1);
@@ -226,8 +228,9 @@ public class Simulator {
 
         sampler.setListener(engineListeners);
 
+        logger.info("Begin sampling...");
         sampler.run((long) Double.parseDouble(config.getParam(MODULE_NAME, "iterations")));
-
+        logger.info("Done.");
         Executor.shutdown();
     }
 

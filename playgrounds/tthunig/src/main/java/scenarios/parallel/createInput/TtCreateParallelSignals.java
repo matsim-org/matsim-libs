@@ -36,6 +36,7 @@ import org.matsim.contrib.signals.model.Signal;
 import org.matsim.contrib.signals.model.SignalGroup;
 import org.matsim.contrib.signals.model.SignalSystem;
 import org.matsim.contrib.signals.utils.SignalUtils;
+import org.matsim.lanes.data.v20.Lane;
 import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
 
 /**
@@ -85,9 +86,6 @@ public final class TtCreateParallelSignals {
 		}
 	}
 
-	// TODO this is not correct yet: node 2, 5, 9 and 11 should get signals that allow the two alternatives 
-	// (but not more, e.g. traveling from 3_2 to 2_7 is not allowed), 
-	// nodes 3, 4, 7, 8 should get signals that only allow traveling straight (no turns)
 	private void createSignalSystemAtNode(Node node) {
 		SignalsData signalsData = (SignalsData) this.scenario
 				.getScenarioElement(SignalsData.ELEMENT_NAME);
@@ -103,17 +101,99 @@ public final class TtCreateParallelSignals {
 		// create a signal for every inLink outLink pair
 		for (Id<Link> inLinkId : node.getInLinks().keySet()){
 			int outLinkCounter = 0;
+            log.error("inLinkId" + inLinkId);
 			for (Id<Link> outLinkId : node.getOutLinks().keySet()) {
+
+				//TODO nicht für alle outlinks ein signal sondern nur für die "ampeln"
+				//turningmoverestriction sagt wo man fahren kann
+
+				log.error("outLinkId" + outLinkId);
 				outLinkCounter++;
 				SignalData signal = fac.createSignalData(Id.create("signal" + inLinkId
 						+ "." + outLinkCounter, Signal.class));
+                signal.addTurningMoveRestriction(Id.createLinkId(new StringBuffer(inLinkId.toString()).reverse().toString()));
+                switch (inLinkId.toString()) {
+					case "3_2":
+						signal.addTurningMoveRestriction(Id.createLinkId("2_3"));
+						break;
+					case "7_2":
+						signal.addTurningMoveRestriction(Id.createLinkId("3_2"));
+						break;
+
+					case "3_10":
+						signal.addTurningMoveRestriction(Id.createLinkId("10_4"));
+						break;
+					case "4_10":
+						signal.addTurningMoveRestriction(Id.createLinkId("10_3"));
+						break;
+
+					case "4_5":
+						signal.addTurningMoveRestriction(Id.createLinkId("5_8"));
+						break;
+					case "8_5":
+						signal.addTurningMoveRestriction(Id.createLinkId("5_4"));
+						break;
+
+					case "7_11":
+						signal.addTurningMoveRestriction(Id.createLinkId("11_8"));
+						break;
+					case "8_11":
+						signal.addTurningMoveRestriction(Id.createLinkId("11_7"));
+						break;
+
+
+					case "2_3": case "4_3":
+						signal.addTurningMoveRestriction(Id.createLinkId("3_7"));
+						signal.addTurningMoveRestriction(Id.createLinkId("3_10"));
+						break;
+					case "10_3": case "7_3":
+						signal.addTurningMoveRestriction(Id.createLinkId("3_2"));
+						signal.addTurningMoveRestriction(Id.createLinkId("3_4"));
+						break;
+
+					case "3_4": case "5_4":
+						signal.addTurningMoveRestriction(Id.createLinkId("4_8"));
+						signal.addTurningMoveRestriction(Id.createLinkId("4_10"));
+						break;
+					case "10_4": case "8_4":
+						signal.addTurningMoveRestriction(Id.createLinkId("4_3"));
+						signal.addTurningMoveRestriction(Id.createLinkId("4_5"));
+						break;
+
+					case "2_7": case "8_7":
+						signal.addTurningMoveRestriction(Id.createLinkId("7_3"));
+						signal.addTurningMoveRestriction(Id.createLinkId("7_11"));
+						break;
+					case "3_7": case "11_7":
+						signal.addTurningMoveRestriction(Id.createLinkId("7_2"));
+						signal.addTurningMoveRestriction(Id.createLinkId("7_8"));
+						break;
+
+					case "7_8": case "5_8":
+						signal.addTurningMoveRestriction(Id.createLinkId("8_4"));
+						signal.addTurningMoveRestriction(Id.createLinkId("8_11"));
+						break;
+					case "11_8": case "4_8":
+						signal.addTurningMoveRestriction(Id.createLinkId("8_7"));
+						signal.addTurningMoveRestriction(Id.createLinkId("8_5"));
+						break;
+
+					default:
+						break;
+				}
+
 				signalSystem.addSignalData(signal);
 				signal.setLinkId(inLinkId);
 
 				LanesToLinkAssignment20 linkLanes = this.scenario.getLanes().getLanesToLinkAssignments().get(inLinkId);
-				// the link only contains one lane (the trivial lane)
-				signal.addLaneId(linkLanes.getLanes().firstKey());
-				//signal.addTurningMoveRestriction(outLinkId);
+				if (linkLanes != null) {
+					for (Lane l : linkLanes.getLanes().values()) {
+						if (l.getToLinkIds().get(0).toString().equals(outLinkId.toString())) {
+							signal.addLaneId(l.getId());
+						}
+					}
+
+				}
 			}
 		}
 	}
@@ -342,6 +422,7 @@ public final class TtCreateParallelSignals {
 				dropping = 60 - INTERGREEN_TIME;
 				signalSystemOffset = 0;
 				break;
+
 			default:
 				log.error("Signal group id " + signalGroupId + " is not known.");
 				break;

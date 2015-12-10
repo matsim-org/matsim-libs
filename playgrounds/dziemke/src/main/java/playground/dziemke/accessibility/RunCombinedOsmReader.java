@@ -30,6 +30,7 @@ import org.apache.log4j.Logger;
 import org.matsim.contrib.accessibility.FacilityTypes;
 import org.matsim.contrib.accessibility.osm.CombinedOsmReader;
 import org.matsim.contrib.accessibility.osm.LandUseBuildingReader;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.facilities.Facility;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
@@ -40,7 +41,6 @@ import playground.dziemke.utils.LogToOutputSaver;
  */
 public class RunCombinedOsmReader {
 	final private static Logger log = Logger.getLogger(RunCombinedOsmReader.class);
-	//TODO write logger output somewhere
 
 	/**
 	 * Implementing the {@link CombinedOsmReader} class. 
@@ -61,16 +61,16 @@ public class RunCombinedOsmReader {
 		// Input and output
 //		String osmFile = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/osm/schlesische_str/2015-06-24_schlesische_str.osm";
 //		String osmFile = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/osm/kreuzberg/2015-09-13_kreuzberg.osm";
-
 //		String osmFile = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/osm/berlin/2015-09-13_berlin.osm";
-		String osmFile = "/Users/dominik/Accessibility/Data/OSM/2015-10-15_nairobi.osm.xml";
+//		String osmFile = "/Users/dominik/Accessibility/Data/OSM/2015-10-15_nairobi.osm.xml";
+		String osmFile = "../../../../Workspace/data/accessibility/osm/2015-10-15_capetown_central.osm.xml";
 		
 //		String outputBase = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/osm/schlesische_str/07/";
 //		String outputBase = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/osm/kreuzberg/02/";
 //		String outputBase = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/osm/berlin/09/";
-
 //		String outputBase = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/osm/berlin/combined/01/";
-		String outputBase = "/Users/dominik/Accessibility/Data/nairobi/combined/02/";
+//		String outputBase = "/Users/dominik/Accessibility/Data/nairobi/combined/02/";
+		String outputBase = "../../../../Workspace/data/accessibility/capetown/facilities/01/";
 		
 		String facilityFile = outputBase + "facilities.xml";
 		String attributeFile = outputBase + "facilitiy_attributes.xml";
@@ -81,7 +81,8 @@ public class RunCombinedOsmReader {
 		
 		// Parameters
 //		String outputCRS = "EPSG:31468"; // = DHDN GK4, for Berlin
-		String outputCRS = "EPSG:21037"; // = Arc 1960 / UTM zone 37S, for Nairobi, Kenya
+//		String outputCRS = "EPSG:21037"; // = Arc 1960 / UTM zone 37S, for Nairobi, Kenya
+		String outputCRS = TransformationFactory.WGS84_SA_Albers; // for South Africa
 		
 		// building types are either taken from the building itself and, if building does not have a type, taken from
 		// the type of land use of the area which the build belongs to.

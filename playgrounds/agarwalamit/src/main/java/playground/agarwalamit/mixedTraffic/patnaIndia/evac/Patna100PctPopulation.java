@@ -111,7 +111,7 @@ public class Patna100PctPopulation {
 					String zoneId  = String.valueOf(id);
 
 					if(fromZoneId.equals(zoneId) ) {
-						p = GeometryUtils.getRandomPointsFromWard(feature);
+						p = GeometryUtils.getRandomPointsInsideFeature(feature);
 						Coord fromZoneCoord = new Coord(p.getX(), p.getY());
 						homeZoneCoordTransform = PatnaUtils.COORDINATE_TRANSFORMATION.transform(fromZoneCoord);
 					}

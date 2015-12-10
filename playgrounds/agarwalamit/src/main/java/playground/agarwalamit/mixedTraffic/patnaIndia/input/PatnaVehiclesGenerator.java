@@ -68,7 +68,7 @@ public class PatnaVehiclesGenerator {
 			for(PlanElement pe:p.getSelectedPlan().getPlanElements()) {
 				if(pe instanceof Leg ){
 					String travelMode =  ((Leg) pe).getMode();
-					if( ! modesType.containsKey(travelMode) ) throw new RuntimeException("Vehicle Type is not defined. Define"+ travelMode+ "vehicle Type.");	
+					if( ! modesType.containsKey(travelMode) ) throw new RuntimeException("Vehicle Type is not defined. Define "+ travelMode+ " vehicle Type.");	
 
 					VehicleType vType = modesType.get(travelMode);
 					Vehicle veh =  VehicleUtils.getFactory().createVehicle(Id.create(p.getId(), Vehicle.class), vType);

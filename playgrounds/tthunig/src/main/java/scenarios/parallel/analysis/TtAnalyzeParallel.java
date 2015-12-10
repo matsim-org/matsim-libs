@@ -39,7 +39,7 @@ public final class TtAnalyzeParallel extends TtAbstractAnalysisTool {
 	@Override
 	protected int determineRoute(LinkEnterEvent linkEnterEvent) {
 		// in the parallel scenario the route is unique if one gets a link enter
-		// event of link 2_3, 2_7, 5_4, 5_8, 9_3, 9_4, 11_7, 11_8
+		// event of link 2_3, 2_7, 5_4, 5_8, 10_3, 10_4, 11_7, 11_8
 		int route = -1;
 		switch (linkEnterEvent.getLinkId().toString()) {
 		case "2_3":
@@ -58,11 +58,11 @@ public final class TtAnalyzeParallel extends TtAbstractAnalysisTool {
 			// lower route of B-A relation
 			route = 3;
 			break;
-		case "9_3":
+		case "10_3":
 			// left route of C-D relation
 			route = 4;
 			break;
-		case "9_4":
+		case "10_4":
 			// right route of C-D relation
 			route = 5;
 			break;
