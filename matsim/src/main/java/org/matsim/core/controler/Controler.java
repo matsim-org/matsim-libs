@@ -157,6 +157,8 @@ public class Controler extends AbstractController implements ControlerI {
     private AbstractModule overrides = AbstractModule.emptyModule();
 
 	private final List<MobsimListener> simulationListeners = new ArrayList<>();
+	@Inject Set<MobsimListener> mobsimListeners = new HashSet<>(); // added by modules
+	@Inject Set<SnapshotWriter> snapshotWriters = new HashSet<>(); // added by modules
 
     public static void main(final String[] args) {
 		if ((args == null) || (args.length == 0)) {
@@ -402,7 +404,7 @@ public class Controler extends AbstractController implements ControlerI {
 
 	private void enrichSimulation(final Mobsim simulation) {
 		if (simulation instanceof ObservableMobsim) {
-			for (MobsimListener l : this.injector.getMobsimListeners()) {
+			for (MobsimListener l : this.mobsimListeners) {
 				((ObservableMobsim) simulation).addQueueSimulationListeners(l);
 			}
 			for (MobsimListener l : this.getMobsimListeners()) {
@@ -411,7 +413,7 @@ public class Controler extends AbstractController implements ControlerI {
 
 			if (config.controler().getWriteSnapshotsInterval() != 0 && this.getIterationNumber() % config.controler().getWriteSnapshotsInterval() == 0) {
 				SnapshotWriterManager manager = new SnapshotWriterManager(config);
-				for (SnapshotWriter snapshotWriter : this.injector.getSnapshotWriters()) {
+				for (SnapshotWriter snapshotWriter : this.snapshotWriters) {
 					manager.addSnapshotWriter(snapshotWriter);
 				}
 				((ObservableMobsim) simulation).addQueueSimulationListeners(manager);
