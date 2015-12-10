@@ -48,6 +48,18 @@ import scenarios.braess.createInput.TtCreateBraessPopulation;
 import scenarios.braess.createInput.TtCreateBraessPopulation.InitRoutes;
 
 /**
+ * This test compares the simulation results of two runs, that only differ by
+ * the population handling.
+ * 
+ * The first run creates the population in code. The second run reads a
+ * population file, that corresponds to the one that is written by the first.
+ * 
+ * Differences may occur by activity end times that are non integer values
+ * (because they are written as integer values in the plans file). With 3600
+ * agents all activity end times are integer.
+ * 
+ * Remaining differences are not understood yet.
+ * 
  * @author tthunig
  *
  */
@@ -61,10 +73,10 @@ public class ReadVsCreatePopulationTest {
 	
 	@Test
 	public void testReadVsCreatePopulation() {
-		Tuple<TtAbstractAnalysisTool,Population> readResults = run(false);
 		Tuple<TtAbstractAnalysisTool,Population> createResults = run(true);
+		Tuple<TtAbstractAnalysisTool,Population> readResults = run(false);
 		
-		// compare populations
+		// compare populations regarding activity end times
 		for (Person pRead : readResults.getSecond().getPersons().values()){
 			Person pCreate = createResults.getSecond().getPersons().get(pRead.getId());
 			
