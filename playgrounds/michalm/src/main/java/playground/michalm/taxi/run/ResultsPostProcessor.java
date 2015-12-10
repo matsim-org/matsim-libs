@@ -321,6 +321,11 @@ public class ResultsPostProcessor
         String subDirPrefix = "taxi_vehicles_";
 
         new ResultsPostProcessor(//
+                "050000", //
+                "060000", //
+                "070000", //
+                "080000", //
+                "090000", //
                 "100000", //
 //                "110000", //
 //                "120000", //
@@ -347,7 +352,7 @@ public class ResultsPostProcessor
         //processBerlin();
         //processBarcelonaVariableDemand();
         //processBarcelonaVariableSupply();
-        processAudiAV_10();
-        //processAudiAV_100();
+        //processAudiAV_10();
+        processAudiAV_100();
     }
 }
