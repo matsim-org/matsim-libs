@@ -21,7 +21,6 @@
 package org.matsim.analysis;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
@@ -78,16 +77,14 @@ public class ScoreStatsControlerListener implements StartupListener, IterationEn
     private final static Logger log = Logger.getLogger(ScoreStatsControlerListener.class);
 
     @Inject
-    ScoreStatsControlerListener(Scenario scenario, OutputDirectoryHierarchy controlerIO) {
-        this(scenario.getConfig(), scenario.getPopulation(), controlerIO.getOutputFilename(FILENAME_SCORESTATS), scenario.getConfig().controler().isCreateGraphs());
+    ScoreStatsControlerListener(Config config, Population population, OutputDirectoryHierarchy controlerIO) {
+        this(config, population, controlerIO.getOutputFilename(FILENAME_SCORESTATS), config.controler().isCreateGraphs());
     }
 
     /**
      * Creates a new ScoreStats instance.
      *
      *
-     * @param config
-     * @param population
      * @param filename including the path, excluding the file type extension
      * @param createPNG true if in every iteration, the scorestats should be visualized in a graph and written to disk.
      * @throws UncheckedIOException

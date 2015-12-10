@@ -23,6 +23,7 @@ package org.matsim.core.scoring;
 import java.util.Map;
 import java.util.HashMap;
 
+import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -37,16 +38,18 @@ import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.internal.HasPersonId;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.handler.BasicEventHandler;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
-import javax.inject.Inject;
 
 /**
  * Calculates the score of the selected plans of a given scenario
@@ -69,8 +72,12 @@ public class EventsToScore implements BasicEventHandler {
 	private EventsToActivities eventsToActivities;
 	private EventsToLegs eventsToLegs;
 	private ScoringFunctionsForPopulation scoringFunctionsForPopulation;
-	private Scenario scenario;
-	private ScoringFunctionFactory scoringFunctionFactory;
+	private final Config config;
+	private final Population population;
+	private final ScoringFunctionFactory scoringFunctionFactory;
+	private final Network network;
+	private @Inject(optional = true) TransitSchedule transitSchedule = null;
+
 	private double learningRate;
 	private boolean finished = false;
 	
@@ -82,42 +89,45 @@ public class EventsToScore implements BasicEventHandler {
 
 
 	@Inject
-	EventsToScore(final Scenario scenario, final ScoringFunctionFactory factory, EventsManager eventsManager) {
-		this(scenario, factory);
+	EventsToScore(final ScoringFunctionFactory factory, EventsManager eventsManager, Config config, Population population, Network network) {
+		this.population = population;
+		this.config = config;
+		this.scoringFunctionFactory = factory;
+		this.network = network;
+		this.learningRate = config.planCalcScore().getLearningRate();
+		initHandlers(scoringFunctionFactory);
+		init(config);
+		// With the Inject-Constructor, this class adds itself as an EventHandler.
 		eventsManager.addHandler(this);
 	}
 
-	/**
-	 * Initializes EventsToScore with a learningRate of 1.0.
-	 *
-	 * @param scenario
-	 * @param factory
-	 */
 	public EventsToScore(final Scenario scenario, final ScoringFunctionFactory factory) {
 		this(scenario, factory, 1.0);
 	}
 
 	public EventsToScore(final Scenario scenario, final ScoringFunctionFactory scoringFunctionFactory, final double learningRate) {
-		this.scenario = scenario;
+		this.config = scenario.getConfig();
+		this.population = scenario.getPopulation();
+		this.network = scenario.getNetwork();
 		this.scoringFunctionFactory = scoringFunctionFactory;
 		this.learningRate = learningRate;
 		initHandlers(scoringFunctionFactory);
-		
-		Config config = this.scenario.getConfig() ;
-		
+		init(config);
+	}
+
+	private void init(Config config) {
 		if ( config.planCalcScore().getFractionOfIterationsToStartScoreMSA()!=null ) {
 			final int diff = config.controler().getLastIteration() - config.controler().getFirstIteration();
-			this.scoreMSAstartsAtIteration = (int) (diff 
+			this.scoreMSAstartsAtIteration = (int) (diff
 				* config.planCalcScore().getFractionOfIterationsToStartScoreMSA() + config.controler().getFirstIteration());
 		}
-		
 	}
 
 	private void initHandlers(final ScoringFunctionFactory factory) {
 		this.eventsToActivities = new EventsToActivities();
-		this.scoringFunctionsForPopulation = new ScoringFunctionsForPopulation(scenario, factory);
+		this.scoringFunctionsForPopulation = new ScoringFunctionsForPopulation(config, network, population, factory);
 		this.eventsToActivities.setActivityHandler(this.scoringFunctionsForPopulation);
-		this.eventsToLegs = new EventsToLegs(this.scenario);
+		this.eventsToLegs = new EventsToLegs(network, transitSchedule);
 		this.eventsToLegs.setLegHandler(this.scoringFunctionsForPopulation);
 	}
 
@@ -182,11 +192,11 @@ public class EventsToScore implements BasicEventHandler {
 		finished = true;
 	}
 	
-	private Map<Plan,Integer> msaContributions = new HashMap<Plan,Integer>() ;
+	private Map<Plan,Integer> msaContributions = new HashMap<>() ;
 	private void assignNewScores() {
 		log.info("it: " + this.iteration + " msaStart: " + this.scoreMSAstartsAtIteration );
 
-		for (Person person : scenario.getPopulation().getPersons().values()) {
+		for (Person person : population.getPersons().values()) {
 			ScoringFunction sf = scoringFunctionsForPopulation.getScoringFunctionForAgent(person.getId());
 			double score = sf.getScore();
 			Plan plan = person.getSelectedPlan();

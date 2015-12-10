@@ -20,6 +20,7 @@
 package org.matsim.core.replanning.modules;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.config.Config;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
@@ -29,16 +30,16 @@ import javax.inject.Provider;
 
 public class SelectExpBetaPlanStrategyFactory implements Provider<PlanStrategy> {
 
-    private Scenario scenario;
+    private final Config config;
 
     @Inject
-    SelectExpBetaPlanStrategyFactory(Scenario scenario) {
-        this.scenario = scenario;
+    SelectExpBetaPlanStrategyFactory(Config config) {
+        this.config=config;
     }
 
     @Override
 	public PlanStrategy get() {
-		PlanStrategy strategy = new PlanStrategyImpl(new ExpBetaPlanSelector(scenario.getConfig().planCalcScore()));
+		PlanStrategy strategy = new PlanStrategyImpl(new ExpBetaPlanSelector(config.planCalcScore()));
 		return strategy;
 	}
 

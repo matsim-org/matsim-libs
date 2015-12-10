@@ -33,13 +33,14 @@ import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.core.config.Config;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scoring.EventsToActivities.ActivityHandler;
@@ -57,8 +58,9 @@ import org.matsim.core.utils.io.IOUtils;
 class ScoringFunctionsForPopulation implements ActivityHandler, LegHandler {
 
 	private final static Logger log = Logger.getLogger(ScoringFunctionsForPopulation.class);
-	
-	private ScoringFunctionFactory scoringFunctionFactory = null;
+
+	private Config config;
+	private Network network;
 
 	/*
 	 * Replaced TreeMaps with (Linked)HashMaps since they should perform much better. For 'partialScores'
@@ -74,13 +76,12 @@ class ScoringFunctionsForPopulation implements ActivityHandler, LegHandler {
 	private final Map<Id<Person>, Plan> agentRecords = new HashMap<>();
 	private final Map<Id<Person>, TDoubleCollection> partialScores = new LinkedHashMap<>();
 
-	private Scenario scenario;
 
-	public ScoringFunctionsForPopulation(Scenario scenario, ScoringFunctionFactory scoringFunctionFactory) {
-		this.scoringFunctionFactory = scoringFunctionFactory;
-		this.scenario = scenario;
-		for (Person person : scenario.getPopulation().getPersons().values()) {
-			ScoringFunction data = this.scoringFunctionFactory.createNewScoringFunction(person);
+	ScoringFunctionsForPopulation(Config config, Network network, Population population, ScoringFunctionFactory scoringFunctionFactory) {
+		this.config = config;
+		this.network = network;
+		for (Person person : population.getPersons().values()) {
+			ScoringFunction data = scoringFunctionFactory.createNewScoringFunction(person);
 			this.agentScorers.put(person.getId(), data);
 			this.agentRecords.put(person.getId(), new PlanImpl());
 			this.partialScores.put(person.getId(), new TDoubleArrayList());
@@ -137,7 +138,7 @@ class ScoringFunctionsForPopulation implements ActivityHandler, LegHandler {
 	}
 
 	public void writeExperiencedPlans(String iterationFilename) {
-		Population population = PopulationUtils.createPopulation(scenario.getConfig());
+		Population population = PopulationUtils.createPopulation(config);
 		for (Entry<Id<Person>, Plan> entry : this.agentRecords.entrySet()) {
 			Person person = PopulationUtils.createPerson(entry.getKey());
 			Plan plan = entry.getValue();
@@ -148,7 +149,7 @@ class ScoringFunctionsForPopulation implements ActivityHandler, LegHandler {
 				log.warn("score is NaN; plan:" + plan.toString());
 			}
 		}
-		new PopulationWriter(population, scenario.getNetwork()).writeV5(iterationFilename + ".xml.gz");
+		new PopulationWriter(population, network).writeV5(iterationFilename + ".xml.gz");
 
 		BufferedWriter out = IOUtils.getBufferedWriter(iterationFilename + "_scores.xml.gz");
 		try {
