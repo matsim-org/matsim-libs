@@ -26,7 +26,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.router.util.AStarNodeData;
 import org.matsim.core.router.util.DijkstraNodeData;
 import org.matsim.core.router.util.LeastCostPathCalculator;
-import org.matsim.core.router.util.PreProcessDijkstra;
 import org.matsim.core.router.util.PreProcessLandmarks;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
@@ -36,8 +35,10 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -82,6 +83,9 @@ public class MultiNodeAStarLandmarks {
 
 	private InternalLandmarkData fromData;
 	private InternalLandmarkData toData;
+	private int controlCounter = 0;
+
+	private static final int CONTROL_INTERVAL = 40;
 
 	public MultiNodeAStarLandmarks(
 			final Network network,
@@ -144,17 +148,11 @@ public class MultiNodeAStarLandmarks {
 		}
 		augmentIterationId();
 
-		RouterPriorityQueue<Node> pendingNodes = (RouterPriorityQueue<Node>) createRouterPriorityQueue();
+		final RouterPriorityQueue<Node> pendingNodes = (RouterPriorityQueue<Node>) createRouterPriorityQueue();
 		for ( InitialNode from : fromNodes ) {
-			double bestEstimatedCost = Double.POSITIVE_INFINITY;
-			for ( InitialNode to : toNodes ) {
-				final double cost =
-					estimateRemainingTravelCost(
-							from.node );
-				if ( cost < bestEstimatedCost ) {
-					bestEstimatedCost = cost;
-				}
-			}
+			final double cost =
+				estimateRemainingTravelCost(
+						new InternalLandmarkData( from.node ) );
 
 			AStarNodeData data = getData( from.node );
 			visitNode(
@@ -163,7 +161,7 @@ public class MultiNodeAStarLandmarks {
 					pendingNodes,
 					from.initialTime,
 					from.initialCost,
-					bestEstimatedCost,
+					cost,
 					null );
 		}
 
@@ -195,7 +193,7 @@ public class MultiNodeAStarLandmarks {
 				break;
 			}
 
-			relaxNode(outNode, toNodes, pendingNodes);
+			relaxNode(outNode, pendingNodes);
 
 		}
 
@@ -252,15 +250,13 @@ public class MultiNodeAStarLandmarks {
 	}
 
 	private double estimateRemainingTravelCost(
-			final Node fromNode) {
+			final InternalLandmarkData fromNode) {
 		// avoid instanciation: only one instance
-		final InternalLandmarkData data = new InternalLandmarkData(  );
 		double travCost = 0;
-		for (int i = 0, n = this.activeLandmarkIndexes.length; i < n; i++) {
-			data.setDelegate( preprocess.getNodeData( fromNode ) );
+		for (int landmark : this.activeLandmarkIndexes) {
 			final double tmpTravCost = estimateRemainingTravelCost(
-					data,
-					this.activeLandmarkIndexes[i]);
+					fromNode,
+					landmark );
 			// this is all lower bounds, so the highest the better
 			if (tmpTravCost > travCost) {
 				travCost = tmpTravCost;
@@ -281,6 +277,43 @@ public class MultiNodeAStarLandmarks {
 	}
 
 	/**
+	 * Checks whether there is a landmark in the set of the non-active
+	 * landmarks that yields a better estimation than the best active
+	 * landmark. If there is, this landmark is added to the set of active
+	 * landmark and its index is returned.
+	 * @param fromNode The node for which we estimate the remaining travel
+	 * time to the toNode.
+	 * @return The index of the landmark that has been added to the set of
+	 * active landmarks, or -1 if no landmark was added.
+	 */
+	private int checkToAddLandmark(final InternalLandmarkData fromNode) {
+		if ( activeLandmarkIndexes.length == preprocess.getLandmarks().length ) {
+			return -1;
+		}
+
+		double bestTravCostEst = estimateRemainingTravelCost(fromNode);
+
+		int bestIndex = -1;
+		for (int i = 0; i < preprocess.getLandmarks().length; i++) {
+			// this also goes through active landmarks, which is kind of silly
+			final double tmpTravTime = estimateRemainingTravelCost( fromNode , i);
+
+			if (tmpTravTime > bestTravCostEst) {
+				bestIndex = i;
+				bestTravCostEst = tmpTravTime;
+			}
+		}
+
+		if (bestIndex != -1) {
+			final int[] newActiveLandmarks = new int[this.activeLandmarkIndexes.length + 1];
+			System.arraycopy(this.activeLandmarkIndexes, 0, newActiveLandmarks, 0, this.activeLandmarkIndexes.length);
+			newActiveLandmarks[this.activeLandmarkIndexes.length] = bestIndex;
+			this.activeLandmarkIndexes = newActiveLandmarks;
+		}
+		return bestIndex;
+	}
+
+	/**
 	 * Estimates the remaining travel cost from fromNode to toNode
 	 * using the landmark given by index.
 	 * @param fromRole The first node/role.
@@ -291,6 +324,10 @@ public class MultiNodeAStarLandmarks {
 	protected double estimateRemainingTravelCost(
 			final InternalLandmarkData fromRole,
 			final int index) {
+		// I have to admit I do not really undertand the deal with min and max here.
+		// min and max are the min/max of the two possible directions.
+		// This might have to do with trying to get the highest lower bound possible,
+		// but I would have to pass some time with paper and pencil to check that...
 		double tmpTravTime;
 		final double fromMinLandmarkTravelTime = fromRole.getMinLandmarkTravelTime(index);
 		final double toMaxLandmarkTravelTime = toData.getMaxLandmarkTravelTime(index);
@@ -339,11 +376,17 @@ public class MultiNodeAStarLandmarks {
 	 * sub-classes.
 	 *  @param outNode
 	 *            The Node to be expanded.
-	 * @param toNode
-	 *            The target Node of the route.
 	 * @param pendingNodes
 	 */
-	protected void relaxNode(final Node outNode, final Iterable<InitialNode> toNode, final RouterPriorityQueue<Node> pendingNodes) {
+	protected void relaxNode(final Node outNode, final RouterPriorityQueue<Node> pendingNodes) {
+		this.controlCounter++;
+		if ( this.controlCounter == CONTROL_INTERVAL ) {
+			int newLandmarkIndex = checkToAddLandmark( new InternalLandmarkData( outNode ) );
+			if (newLandmarkIndex >= 0) {
+				updatePendingNodes(newLandmarkIndex, pendingNodes);
+			}
+			this.controlCounter = 0;
+		}
 
 		DijkstraNodeData outData = getData(outNode);
 		double currTime = outData.getTime();
@@ -354,18 +397,64 @@ public class MultiNodeAStarLandmarks {
 	}
 
 	/**
+	 * If a landmark has been added to the set of the active landmarks,
+	 * this function re-evaluates the estimated remaining travel time based
+	 * on the new set of active landmarks of the nodes contained in
+	 * pendingNodes. If this estimation improved, the node's position in
+	 * the pendingNodes queue is updated.
+	 * @param newLandmarkIndex The index of the new active landmark.
+	 * @param pendingNodes The nodes visited so far.
+	 */
+	private void updatePendingNodes(
+			final int newLandmarkIndex,
+			final RouterPriorityQueue<Node> pendingNodes) {
+		final List<Double> newEstRemTravCosts = new ArrayList<>();
+		final List<Node> nodesToBeUpdated = new ArrayList<>();
+		final InternalLandmarkData landmarkData = new InternalLandmarkData(  );
+
+		for ( Node node : pendingNodes ) {
+			final AStarNodeData role = getData(node);
+			final PreProcessLandmarks.LandmarksData ppRole = preprocess.getNodeData(node);
+
+			landmarkData.setDelegate( ppRole );
+			final double newEstRemTravCost =
+					estimateRemainingTravelCost(
+							landmarkData,
+							newLandmarkIndex);
+
+			if (newEstRemTravCost > role.getExpectedRemainingCost() ) {
+				nodesToBeUpdated.add(node);
+				newEstRemTravCosts.add(newEstRemTravCost);
+			}
+		}
+
+		for (Node node : nodesToBeUpdated) {
+			pendingNodes.remove(node);
+		}
+
+		for (int i = 0; i < nodesToBeUpdated.size(); i++) {
+			final Node node = nodesToBeUpdated.get(i);
+			final AStarNodeData data = getData(node);
+			data.setExpectedRemainingCost(newEstRemTravCosts.get(i));
+			pendingNodes.add(node, getPriority(data));
+		}
+	}
+
+	/**
 	 * Logic that was previously located in the relaxNode(...) method.
 	 * By doing so, the FastDijkstra can overwrite relaxNode without copying the logic.
 	 */
 	/*package*/ void relaxNodeLogic(final Link l, final RouterPriorityQueue<Node> pendingNodes,
 			final double currTime, final double currCost) {
-		// In AStarLandmarks, also checks if new landmarks should be "activated"
-		// here, we (for the moment) always use every landmark
 		addToPendingNodes(l, l.getToNode(), pendingNodes, currTime, currCost);
 	}
 
-	private boolean addToPendingNodes(final Link l, final Node n, final RouterPriorityQueue<Node> pendingNodes,
-			final double currTime, final double currCost) {
+	private boolean addToPendingNodes(
+			final Link l,
+			final Node n,
+			final RouterPriorityQueue<Node> pendingNodes,
+			final double currTime,
+			final double currCost) {
 
 		final double travelTime = this.timeFunction.getLinkTravelTime( l, currTime, person, vehicle );
 		final double travelCost = this.costFunction.getLinkTravelDisutility(
@@ -374,15 +463,29 @@ public class MultiNodeAStarLandmarks {
 				person,
 				vehicle );
 		final AStarNodeData data = getData( n );
-		final double nCost = data.getCost();
+
+		final double remainingTravelCost =
+				estimateRemainingTravelCost(
+						new InternalLandmarkData( n ) );
 		if (!data.isVisited(getIterationId())) {
-			final double remainingTravelCost = estimateRemainingTravelCost(n);
-			visitNode(n, data, pendingNodes, currTime + travelTime, currCost
-					+ travelCost, remainingTravelCost, l);
+			visitNode(n,
+					data,
+					pendingNodes,
+					currTime + travelTime,
+					currCost + travelCost,
+					remainingTravelCost,
+					l);
 			return true;
-		} else if (currCost + travelCost < nCost) {
-			revisitNode(n, data, pendingNodes, currTime + travelTime, currCost
-					+ travelCost, l);
+		}
+		else if (currCost + travelCost + remainingTravelCost < data.getExpectedRemainingCost()) {
+			revisitNode(
+					n,
+					data,
+					pendingNodes,
+					currTime + travelTime,
+					currCost + travelCost,
+					remainingTravelCost,
+					l);
 			return true;
 		}
 		return false;
@@ -405,12 +508,18 @@ public class MultiNodeAStarLandmarks {
 	 * @param outLink
 	 *            The link from which we came visiting n.
 	 */
-	void revisitNode(final Node n, final DijkstraNodeData data,
-			final RouterPriorityQueue<Node> pendingNodes, final double time, final double cost,
+	void revisitNode(
+			final Node n,
+			final AStarNodeData data,
+			final RouterPriorityQueue<Node> pendingNodes,
+			final double time,
+			final double cost,
+			final double expectedRemainingCost,
 			final Link outLink) {
 		pendingNodes.remove(n);
 
 		data.visit(outLink, cost, time, getIterationId());
+		data.setExpectedRemainingCost( expectedRemainingCost );
 		pendingNodes.add(n, getPriority(data));
 	}
 
@@ -419,8 +528,8 @@ public class MultiNodeAStarLandmarks {
 	 * This implementation compares the total effective travel cost
 	 * to sort the nodes in the pending nodes queue during routing.
 	 */
-	private double getPriority(final DijkstraNodeData data) {
-		return data.getCost();
+	private double getPriority(final AStarNodeData data) {
+		return data.getExpectedCost();
 	}
 
 	public static class InitialNode {
@@ -459,6 +568,12 @@ public class MultiNodeAStarLandmarks {
 		private final double[] minTravelTimes;
 		private final double[] maxTravelTimes;
 
+		public InternalLandmarkData( final Node node ) {
+			minTravelTimes = null;
+			maxTravelTimes = null;
+			this.delegate = preprocess.getNodeData( node );
+		}
+
 		public InternalLandmarkData( ) {
 			minTravelTimes = null;
 			maxTravelTimes = null;
@@ -479,6 +594,9 @@ public class MultiNodeAStarLandmarks {
 				maxTravelTimes[ i ] = Double.POSITIVE_INFINITY;
 			}
 
+			// This becomes a bit strange here: min and max are the min and max of both directions.
+			// But now, as we parse several possible paths, they might correspond to the same direction.
+			// I do not know the implications...
 			for ( InitialNode n : nodes ) {
 				final PreProcessLandmarks.LandmarksData data = preprocess.getNodeData( n.node );
 

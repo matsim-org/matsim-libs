@@ -34,6 +34,7 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.pt.router.MultiNodeDijkstra;
 import org.matsim.pt.router.PreparedTransitSchedule;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
@@ -83,7 +84,15 @@ public class TransitRouterAStar implements TransitRouter {
 				this.travelDisutility);
     }
 
-    private Iterable<MultiNodeAStarLandmarks.InitialNode> locateWrappedNearestTransitNodes(Person person, Coord coord, double departureTime) {
+	MultiNodeAStarLandmarks getAStarAlgorithm() {
+		return dijkstra;
+	}
+
+	MultiNodeDijkstra getEquivalentDijkstra() {
+		return new MultiNodeDijkstra( transitNetwork , travelDisutility , travelDisutility );
+	}
+
+    Iterable<MultiNodeAStarLandmarks.InitialNode> locateWrappedNearestTransitNodes(Person person, Coord coord, double departureTime) {
         Collection<TransitRouterNetwork.TransitRouterNetworkNode> nearestNodes = this.transitNetwork.getNearestNodes(coord, this.config.getSearchRadius());
         if (nearestNodes.size() < 2) {
             // also enlarge search area if only one stop found, maybe a second one is near the border of the search area
