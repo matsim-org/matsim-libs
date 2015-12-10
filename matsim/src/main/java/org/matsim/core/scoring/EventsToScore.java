@@ -39,11 +39,14 @@ import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.internal.HasPersonId;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.handler.BasicEventHandler;
+
+import javax.inject.Inject;
 
 /**
  * Calculates the score of the selected plans of a given scenario
@@ -76,7 +79,13 @@ public class EventsToScore implements BasicEventHandler {
 	private double scoreSum = 0.0;
 	private long scoreCount = 0;
 	private Integer scoreMSAstartsAtIteration;
-	
+
+
+	@Inject
+	EventsToScore(final Scenario scenario, final ScoringFunctionFactory factory, EventsManager eventsManager) {
+		this(scenario, factory);
+		eventsManager.addHandler(this);
+	}
 
 	/**
 	 * Initializes EventsToScore with a learningRate of 1.0.

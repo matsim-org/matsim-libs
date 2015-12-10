@@ -20,30 +20,33 @@
 package org.matsim.core.replanning.modules;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.config.Config;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.TripRouter;
+import org.matsim.facilities.ActivityFacilities;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 
 public class ChangeLegModeStrategyFactory implements Provider<PlanStrategy> {
-
-    private Scenario scenario;
 	private Provider<TripRouter> tripRouterProvider;
+	private Config config;
+	private ActivityFacilities activityFacilities;
 
 	@Inject
-    protected ChangeLegModeStrategyFactory(Scenario scenario, Provider<TripRouter> tripRouterProvider) {
-        this.scenario = scenario;
+    ChangeLegModeStrategyFactory(Config config, ActivityFacilities activityFacilities, Provider<TripRouter> tripRouterProvider) {
+		this.config = config;
+		this.activityFacilities = activityFacilities;
 		this.tripRouterProvider = tripRouterProvider;
 	}
 
     @Override
 	public PlanStrategy get() {
 		PlanStrategyImpl strategy = new PlanStrategyImpl(new RandomPlanSelector());
-		strategy.addStrategyModule(new ChangeLegMode(scenario.getConfig()));
-		strategy.addStrategyModule(new ReRoute(scenario, tripRouterProvider));
+		strategy.addStrategyModule(new ChangeLegMode(config));
+		strategy.addStrategyModule(new ReRoute(config, activityFacilities, tripRouterProvider));
 		return strategy;
 	}
 

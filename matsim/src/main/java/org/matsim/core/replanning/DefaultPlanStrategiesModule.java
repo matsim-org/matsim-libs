@@ -24,6 +24,7 @@ package org.matsim.core.replanning;
 
 import com.google.inject.TypeLiteral;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
@@ -112,17 +113,13 @@ public class DefaultPlanStrategiesModule extends AbstractModule {
 
     private static class PathSizeLogitSelectorForRemoval implements Provider<PathSizeLogitSelector> {
 
-        private Scenario scenario;
-
-        @Inject
-        PathSizeLogitSelectorForRemoval(Scenario scenario) {
-            this.scenario = scenario;
-        }
+        @Inject Config config;
+        @Inject Network network;
 
         @Override
         public PathSizeLogitSelector get() {
-            return new PathSizeLogitSelector(scenario.getConfig().planCalcScore().getPathSizeLogitBeta(), -scenario.getConfig().planCalcScore().getBrainExpBeta(),
-                    scenario.getNetwork());
+            return new PathSizeLogitSelector(config.planCalcScore().getPathSizeLogitBeta(), -config.planCalcScore().getBrainExpBeta(),
+                    network);
         }
     }
 

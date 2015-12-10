@@ -22,9 +22,11 @@ package org.matsim.core.replanning.modules;
 
 import com.google.inject.Inject;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
+import org.matsim.facilities.ActivityFacilities;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import javax.inject.Provider;
@@ -37,22 +39,25 @@ import javax.inject.Provider;
  */
 public class ReRoute extends AbstractMultithreadedModule {
 	
-	private Scenario scenario;
+	private ActivityFacilities facilities;
 
 	private final Provider<TripRouter> tripRouterProvider;
 
-	public ReRoute(Scenario scenario, Provider<TripRouter> tripRouterProvider) {
-		super(scenario.getConfig().global());
-		this.scenario = scenario;
+	ReRoute(Config config, ActivityFacilities facilities, Provider<TripRouter> tripRouterProvider) {
+		super(config.global());
+		this.facilities = facilities;
 		this.tripRouterProvider = tripRouterProvider;
+	}
+
+	public ReRoute(Scenario scenario, Provider<TripRouter> tripRouterProvider) {
+		this(scenario.getConfig(), scenario.getActivityFacilities(), tripRouterProvider);
 	}
 
 	@Override
 	public final PlanAlgorithm getPlanAlgoInstance() {
-
 			return new PlanRouter(
 					tripRouterProvider.get(),
-					scenario.getActivityFacilities());
+					facilities);
 	}
 
 }

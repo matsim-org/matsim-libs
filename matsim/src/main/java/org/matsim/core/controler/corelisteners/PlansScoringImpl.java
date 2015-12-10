@@ -21,13 +21,12 @@
 package org.matsim.core.controler.corelisteners;
 
 import org.matsim.analysis.TravelDistanceStats;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
@@ -38,11 +37,11 @@ import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.scoring.EventsToScore;
-import org.matsim.core.scoring.ScoringFunction;
-import org.matsim.core.scoring.ScoringFunctionFactory;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+
+import javax.inject.Provider;
 
 /**
  * A {@link org.matsim.core.controler.listener.ControlerListener} that manages the
@@ -53,33 +52,24 @@ import com.google.inject.Singleton;
  * @author mrieser, michaz
  */
 @Singleton
-final class PlansScoringImpl implements PlansScoring, ScoringListener, IterationStartsListener, IterationEndsListener, ShutdownListener {
+final class PlansScoringImpl implements PlansScoring, ScoringListener, IterationEndsListener, ShutdownListener {
 
 	private EventsToScore eventsToScore;
 
-	private Scenario sc;
-
-	private EventsManager events;
-
-	private ScoringFunctionFactory scoringFunctionFactory;
+	private Config config;
+	private Population population;
 
 	private OutputDirectoryHierarchy controlerIO;
 
 	private TravelDistanceStats travelDistanceStats; 
 
 	@Inject
-	PlansScoringImpl( Scenario sc, EventsManager events, OutputDirectoryHierarchy controlerIO, ScoringFunctionFactory scoringFunctionFactory ) {
-		this.sc = sc ;
-		this.events = events ;
-		this.scoringFunctionFactory = scoringFunctionFactory ;
+	PlansScoringImpl(EventsToScore eventsToScore, Config config, Population population, OutputDirectoryHierarchy controlerIO, TravelDistanceStats travelDistanceStats) {
+		this.eventsToScore = eventsToScore;
+		this.config = config;
+		this.population = population;
 		this.controlerIO = controlerIO;
-		this.travelDistanceStats = new TravelDistanceStats(sc.getConfig(), sc.getNetwork(), sc.getTransitSchedule(), controlerIO.getOutputFilename(Controler.FILENAME_TRAVELDISTANCESTATS), sc.getConfig().controler().isCreateGraphs());
-	}
-
-	@Override
-	public void notifyIterationStarts(final IterationStartsEvent event) {
-		this.eventsToScore = new EventsToScore( this.sc, this.scoringFunctionFactory, this.sc.getConfig().planCalcScore().getLearningRate() );
-		this.events.addHandler(this.eventsToScore);
+		this.travelDistanceStats = travelDistanceStats;
 	}
 
 	@Override
@@ -89,16 +79,15 @@ final class PlansScoringImpl implements PlansScoring, ScoringListener, Iteration
 
 	@Override
 	public void notifyIterationEnds(final IterationEndsEvent event) {
-		this.events.removeHandler(this.eventsToScore);
-		if(sc.getConfig().planCalcScore().isWriteExperiencedPlans()) {
-			final int writePlansInterval = sc.getConfig().controler().getWritePlansInterval();
+		if(config.planCalcScore().isWriteExperiencedPlans()) {
+			final int writePlansInterval = config.controler().getWritePlansInterval();
 			if (writePlansInterval > 0 && event.getIteration() % writePlansInterval == 0) {
 				this.eventsToScore.writeExperiencedPlans(controlerIO.getIterationFilename(event.getIteration(), "experienced_plans"));
 			}
 		}
 		this.travelDistanceStats.addIteration(event.getIteration(), eventsToScore.getAgentRecords());
-		if ( sc.getConfig().planCalcScore().isMemorizingExperiencedPlans() ) {
-			for ( Person person : this.sc.getPopulation().getPersons().values() ) {
+		if (config.planCalcScore().isMemorizingExperiencedPlans() ) {
+			for ( Person person : this.population.getPersons().values() ) {
 				Plan experiencedPlan = eventsToScore.getAgentRecords().get( person.getId() ) ;
 				if ( experiencedPlan==null ) {
 					throw new RuntimeException("experienced plan is null; I don't think this should happen") ;

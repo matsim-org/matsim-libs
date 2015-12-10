@@ -20,6 +20,7 @@
 package org.matsim.core.replanning.modules;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.config.Config;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
@@ -31,19 +32,19 @@ import javax.inject.Provider;
 public class TimeAllocationMutatorPlanStrategyFactory implements
 		Provider<PlanStrategy> {
 
-    private Scenario scenario;
+    private Config config;
 	private javax.inject.Provider<org.matsim.core.router.TripRouter> tripRouterProvider;
 
 	@Inject
-    protected TimeAllocationMutatorPlanStrategyFactory(Scenario scenario, Provider<TripRouter> tripRouterProvider) {
-        this.scenario = scenario;
+    TimeAllocationMutatorPlanStrategyFactory(Config config, Provider<TripRouter> tripRouterProvider) {
+        this.config = config;
 		this.tripRouterProvider = tripRouterProvider;
 	}
 
     @Override
 	public PlanStrategy get() {
 		PlanStrategyImpl strategy = new PlanStrategyImpl(new RandomPlanSelector());
-		TimeAllocationMutator tam = new TimeAllocationMutator(scenario.getConfig(), tripRouterProvider);
+		TimeAllocationMutator tam = new TimeAllocationMutator(config, tripRouterProvider);
 		strategy.addStrategyModule(tam);
 		return strategy;
 	}
