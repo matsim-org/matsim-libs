@@ -71,7 +71,8 @@ public class TripAnalyzer {
 	    
 	    
 	    // Input and output files
-	    String networkFile = "/Users/dominik/Workspace/shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml";
+//	    String networkFile = "/Users/dominik/Workspace/shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml";
+	    String networkFile = "../../../../Workspace/shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml";
 //	    String networkFile = "D:/Workspace/shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml";
 //	    String networkFile = "D:/Workspace/runs-svn/"  + runId + "/counts_network_merged.xml_cl.xml.gz";
 	    
@@ -80,21 +81,25 @@ public class TripAnalyzer {
 //	    		+ runId + "." + usedIteration + ".events.txt.gz";
 //	    String eventsFile = "D:/Workspace/runs-svn/cemdapMatsimCadyts/" + runId + "/ITERS/it." + usedIteration + "/" 
 //				+ runId + "." + usedIteration + ".events.xml.gz";
-	    String eventsFile = "/Users/dominik/Workspace/runs-svn/cemdapMatsimCadyts/" + runId + "/ITERS/it." + usedIteration + "/" 
+	    String eventsFile = "../../../../Workspace/runs-svn/cemdapMatsimCadyts/" + runId + "/ITERS/it." + usedIteration + "/" 
+//	    String eventsFile = "/Users/dominik/Workspace/runs-svn/cemdapMatsimCadyts/" + runId + "/ITERS/it." + usedIteration + "/" 
 				+ runId + "." + usedIteration + ".events.xml.gz";
 
 //	    String cemdapPersonFile = "D:/Workspace/data/cemdapMatsimCadyts/input/cemdap_berlin/19/persons1.dat"; // wrong!!!
 //	    String cemdapPersonFile = "D:/Workspace/data/cemdapMatsimCadyts/input/cemdap_berlin/18/persons1.dat";
 //	    String cemdapPersonFile = "D:/Workspace/data/cemdapMatsimCadyts/input/cemdap_berlin/21/persons1.dat";
-	    String cemdapPersonFile = "/Users/dominik/Workspace/data/cemdapMatsimCadyts/input/cemdap_berlin/21/persons1.dat";
+	    String cemdapPersonFile = "../../../../Workspace/data/cemdapMatsimCadyts/input/cemdap_berlin/21/persons1.dat";
+//	    String cemdapPersonFile = "/Users/dominik/Workspace/data/cemdapMatsimCadyts/input/cemdap_berlin/21/persons1.dat";
 	    
 	    //String outputDirectory = "D:/Workspace/data/cemdapMatsimCadyts/output/" + runId + "/analysis";
 //	    String outputDirectory = "D:/Workspace/runs-svn/cemdapMatsimCadyts/" + runId + "/analysis";
-	    String outputDirectory = "/Users/dominik/Workspace/runs-svn/cemdapMatsimCadyts/" + runId + "/analysis";
+	    String outputDirectory = "../../../../Workspace/runs-svn/cemdapMatsimCadyts/" + runId + "/analysis";
+//	    String outputDirectory = "/Users/dominik/Workspace/runs-svn/cemdapMatsimCadyts/" + runId + "/analysis";
 //	    String outputDirectory = "D:/Workspace/runs-svn/other/" + runId + "/analysis";
 	    
 //	    String shapeFileBerlin = "D:/Workspace/data/cemdapMatsimCadyts/input/shapefiles/Berlin_DHDN_GK4.shp";
-	    String shapeFileBerlin = "/Users/dominik/Workspace/data/cemdapMatsimCadyts/input/shapefiles/Berlin_DHDN_GK4.shp";
+	    String shapeFileBerlin = "../../../../Workspace/data/cemdapMatsimCadyts/input/shapefiles/Berlin_DHDN_GK4.shp";
+//	    String shapeFileBerlin = "/Users/dominik/Workspace/data/cemdapMatsimCadyts/input/shapefiles/Berlin_DHDN_GK4.shp";
 	    Map<Integer, Geometry> zoneGeometries = ShapeReader.read(shapeFileBerlin, "NR");
 	    Geometry berlinGeometry = zoneGeometries.get(planningAreaId);
 	    
@@ -135,6 +140,11 @@ public class TripAnalyzer {
 			outputDirectory = outputDirectory + "_" + maxAge.toString();
 		}
 		// --------------------------------------------------------------------------------------------------
+		
+		
+		// new 2015-12-09 for doublecheck
+		outputDirectory = outputDirectory + "_2";
+		// ----
 		
 		
 		// Create an EventsManager instance (MATSim infrastructure)

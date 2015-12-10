@@ -36,6 +36,7 @@ import org.matsim.contrib.signals.model.Signal;
 import org.matsim.contrib.signals.model.SignalGroup;
 import org.matsim.contrib.signals.model.SignalSystem;
 import org.matsim.contrib.signals.utils.SignalUtils;
+import org.matsim.lanes.data.v20.Lane;
 import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
 
 /**
@@ -100,11 +101,18 @@ public final class TtCreateParallelSignals {
 		// create a signal for every inLink outLink pair
 		for (Id<Link> inLinkId : node.getInLinks().keySet()){
 			int outLinkCounter = 0;
+            log.error("inLinkId" + inLinkId);
 			for (Id<Link> outLinkId : node.getOutLinks().keySet()) {
+
+				//TODO nicht für alle outlinks ein signal sondern nur für die "ampeln"
+				//turningmoverestriction sagt wo man fahren kann
+
+				log.error("outLinkId" + outLinkId);
 				outLinkCounter++;
 				SignalData signal = fac.createSignalData(Id.create("signal" + inLinkId
 						+ "." + outLinkCounter, Signal.class));
-				switch (inLinkId.toString()) {
+                signal.addTurningMoveRestriction(Id.createLinkId(new StringBuffer(inLinkId.toString()).reverse().toString()));
+                switch (inLinkId.toString()) {
 					case "3_2":
 						signal.addTurningMoveRestriction(Id.createLinkId("2_3"));
 						break;
@@ -171,7 +179,6 @@ public final class TtCreateParallelSignals {
 						break;
 
 					default:
-						log.error("inLinkid " + inLinkId + " is not known.");
 						break;
 				}
 
@@ -179,9 +186,14 @@ public final class TtCreateParallelSignals {
 				signal.setLinkId(inLinkId);
 
 				LanesToLinkAssignment20 linkLanes = this.scenario.getLanes().getLanesToLinkAssignments().get(inLinkId);
-				// the link only contains one lane (the trivial lane)
-				signal.addLaneId(linkLanes.getLanes().firstKey());
-				//signal.addTurningMoveRestriction(outLinkId);
+				if (linkLanes != null) {
+					for (Lane l : linkLanes.getLanes().values()) {
+						if (l.getToLinkIds().get(0).toString().equals(outLinkId.toString())) {
+							signal.addLaneId(l.getId());
+						}
+					}
+
+				}
 			}
 		}
 	}
