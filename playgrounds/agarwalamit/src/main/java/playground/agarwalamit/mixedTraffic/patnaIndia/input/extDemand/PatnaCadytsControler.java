@@ -18,8 +18,6 @@
  * *********************************************************************** */
 package playground.agarwalamit.mixedTraffic.patnaIndia.input.extDemand;
 
-import java.util.Arrays;
-
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.cadyts.car.CadytsContext;
@@ -108,7 +106,7 @@ public class PatnaCadytsControler {
 				
 				final CadytsScoring<Link> scoringFunction = new CadytsScoring<Link>(person.getSelectedPlan(), config, cContext);
 				//final double cadytsScoringWeight = 0.0;
-				final double cadytsScoringWeight = 15.0;
+				final double cadytsScoringWeight = 25.0;
 				scoringFunction.setWeightOfCadytsCorrection(cadytsScoringWeight) ;
 				sumScoringFunction.addScoringFunction(scoringFunction );
 
@@ -129,7 +127,7 @@ public class PatnaCadytsControler {
 
 		config.qsim().setFlowCapFactor(0.01);
 		config.qsim().setStorageCapFactor(0.03);
-		config.qsim().setMainModes(Arrays.asList("car","bike","motorbike","truck"));
+		config.qsim().setMainModes(PatnaUtils.ALL_MAIN_MODES);
 		config.qsim().setLinkDynamics(LinkDynamics.PassingQ.name());
 		config.qsim().setEndTime(36*3600);
 		config.qsim().setSnapshotStyle(SnapshotStyle.queue);
@@ -155,14 +153,6 @@ public class PatnaCadytsControler {
 		expChangeBeta.setStrategyName("ChangeExpBeta");
 		expChangeBeta.setWeight(0.7);
 		config.strategy().addStrategySettings(expChangeBeta);
-		
-//		config.setParam("TimeAllocationMutator", "mutationAffectsDuration", "true");
-//		config.setParam("TimeAllocationMutator", "mutationRange", "7200.0");
-//		
-//		StrategySettings timeAllocationMutator	= new StrategySettings();
-//		timeAllocationMutator.setStrategyName("TimeAllocationMutator");
-//		timeAllocationMutator.setWeight(0.15);
-//		config.strategy().addStrategySettings(timeAllocationMutator);
 		
 		config.strategy().setFractionOfIterationsToDisableInnovation(0.8);
 		config.strategy().setMaxAgentPlanMemorySize(6);
@@ -210,7 +200,7 @@ public class PatnaCadytsControler {
 		truck.setMarginalUtilityOfTraveling(0.0);
 		config.planCalcScore().addModeParams(truck);
 
-		config.plansCalcRoute().setNetworkModes(Arrays.asList("car","bike","motorbike","truck"));
+		config.plansCalcRoute().setNetworkModes(PatnaUtils.ALL_MAIN_MODES);
 
 		//following is necessary to override all defaults for teleportation.
 		ModeRoutingParams mrp = new ModeRoutingParams("pt");
