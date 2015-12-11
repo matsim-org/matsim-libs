@@ -66,7 +66,7 @@ public class ODDistribution implements AttributeChangeListener, Hamiltonian {
 
     private Object facilityDataKey;
 
-    private TObjectIntHashMap<String> zoneIndices;
+    private TObjectIntHashMap<String> facId2ZoneIdx;
 
     private TIntObjectHashMap<Zone> idx2Zone;
 
@@ -86,7 +86,7 @@ public class ODDistribution implements AttributeChangeListener, Hamiltonian {
 
     private double scaleFactor;
 
-    private final long rescaleInterval = 1000000;
+    private final long rescaleInterval = 10000000;
 
     private long changeCounter;
 
@@ -96,7 +96,7 @@ public class ODDistribution implements AttributeChangeListener, Hamiltonian {
             layerName, String primaryKey, double threshold) {
         this.primaryKey = primaryKey;
         this.threshold = threshold;
-        zoneIndices = new TObjectIntHashMap<>(Constants.DEFAULT_CAPACITY, Constants.DEFAULT_LOAD_FACTOR, -1);
+        facId2ZoneIdx = new TObjectIntHashMap<>(Constants.DEFAULT_CAPACITY, Constants.DEFAULT_LOAD_FACTOR, -1);
         idx2Zone = new TIntObjectHashMap<>();
         zone2Idx = new TObjectIntHashMap<>(Constants.DEFAULT_CAPACITY, Constants.DEFAULT_LOAD_FACTOR, -1);
         id2Idx = new TObjectIntHashMap<>(Constants.DEFAULT_CAPACITY, Constants.DEFAULT_LOAD_FACTOR, -1);
@@ -195,8 +195,8 @@ public class ODDistribution implements AttributeChangeListener, Hamiltonian {
     private int getZoneIndex(Segment act, ZoneCollection zones, ActivityFacilities facilities, AtomicInteger maxIdx,
                              Map<ActivityFacility, Zone> fac2zone) {
         String id = act.getAttribute(CommonKeys.ACTIVITY_FACILITY);
-        if(zoneIndices.containsKey(id)) {
-            return zoneIndices.get(id);
+        if(facId2ZoneIdx.containsKey(id)) {
+            return facId2ZoneIdx.get(id);
         } else {
             ActivityFacility facility = facilities.getFacilities().get(Id.create(id, ActivityFacility.class));
             Zone zone = fac2zone.get(facility);
@@ -212,17 +212,17 @@ public class ODDistribution implements AttributeChangeListener, Hamiltonian {
                 idx2Zone.put(idx, zone);
                 id2Idx.put(zone.getAttribute(primaryKey), idx);
             }
-            zoneIndices.put(facility.getId().toString(), idx);
+            facId2ZoneIdx.put(facility.getId().toString(), idx);
             return idx;
         }
     }
 
     private int getIndex(ActivityFacility facility) {
-        int idx = zoneIndices.get(facility);
+        int idx = facId2ZoneIdx.get(facility.getId().toString());
         if(idx == -1) {
             Zone zone = zones.get(new Coordinate(facility.getCoord().getX(), facility.getCoord().getY()));
             idx = zone2Idx.get(zone);
-            zoneIndices.put(facility.getId().toString(), idx);
+            facId2ZoneIdx.put(facility.getId().toString(), idx);
         }
 
         return idx;
@@ -282,14 +282,14 @@ public class ODDistribution implements AttributeChangeListener, Hamiltonian {
     }
 
     private int getZoneIndex(CachedSegment act) {
-        Object idx = act.getData(zoneIndexKey);
-        if(idx == null) {
+//        Object idx = act.getData(zoneIndexKey);
+//        if(idx == null) {
             ActivityFacility facility = (ActivityFacility) act.getData(facilityDataKey);
-            idx = zoneIndices.get(facility.getId().toString());
-            act.setData(idx, facilityDataKey);
+            return facId2ZoneIdx.get(facility.getId().toString());
+//            act.setData(idx, facilityDataKey);
 
-        }
-        return (Integer)idx;
+//        }
+//        return (Integer)idx;
     }
 
     private double changeCellContent(int i, int j, double amount) {

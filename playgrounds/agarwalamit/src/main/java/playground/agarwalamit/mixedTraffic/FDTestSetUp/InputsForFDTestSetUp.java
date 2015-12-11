@@ -48,10 +48,11 @@ import playground.agarwalamit.mixedTraffic.MixedTrafficVehiclesUtils;
  * @author amit
  */
 public class InputsForFDTestSetUp {
-	public static final int SUBDIVISION_FACTOR = 1; //all sides of the triangle will be divided into subdivisionFactor links
-	public static final double LINK_LENGTH = 1000;//in m, length of one the triangle sides.
-	public static final double NO_OF_LANES = 1;
-	private static final String HOLE_SPEED = "15";
+	static final int SUBDIVISION_FACTOR = 1; //all sides of the triangle will be divided into subdivisionFactor links
+	static final double LINK_LENGTH = 1000;//in m, length of one the triangle sides.
+	static final double NO_OF_LANES = 1;
+	static final String HOLE_SPEED = "15";
+	static final double MAX_ACT_END_TIME = 1800.0; // agents departs randomly between 0 and MAX_ACT_END_TIME
 	
 	private final double LINK_CAPACITY = 2700; //in PCU/h
 	private final double END_TIME = 24*3600;

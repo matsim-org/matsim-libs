@@ -68,14 +68,19 @@ public class TaxibusQSimProvider implements Provider<QSim> {
 	private TaxibusOptimizer optimizer;
 	private EventsManager events;
 	private TravelTime travelTime;
-
+	private LineDispatcher dispatcher;
+	private 	TaxibusPassengerEngine passengerEngine;
+	private TaxibusPassengerOrderManager orderManager ;
 	@Inject
-	TaxibusQSimProvider(Config config, MatsimVrpContext context , EventsManager events, Map<String,TravelTime> travelTimes) {
-		
+	TaxibusQSimProvider(Config config, MatsimVrpContext context , EventsManager events, Map<String,TravelTime> travelTimes, LineDispatcher dispatcher) {
+		this.dispatcher = dispatcher;
 		this.tbcg = (TaxibusConfigGroup) config.getModule("taxibusConfig");
 		this.context = (MatsimVrpContextImpl) context;
 		this.events=events;
 		this.travelTime = travelTimes.get("car");
+		passengerEngine = new TaxibusPassengerEngine(TaxibusUtils.TAXIBUS_MODE, events, new TaxibusRequestCreator(), optimizer, context);
+		orderManager = new TaxibusPassengerOrderManager(passengerEngine);
+		events.addHandler(orderManager);
 
 	}
 
@@ -86,12 +91,10 @@ public class TaxibusQSimProvider implements Provider<QSim> {
 		
 		context.setMobsimTimer(qSim.getSimTimer());
 		
-		TaxibusPassengerEngine passengerEngine = new TaxibusPassengerEngine(TaxibusUtils.TAXIBUS_MODE, eventsManager, new TaxibusRequestCreator(), optimizer, context);
 		qSim.addMobsimEngine(passengerEngine);
 		qSim.addDepartureHandler(passengerEngine);
-		TaxibusPassengerOrderManager orderManager = new TaxibusPassengerOrderManager(passengerEngine);
 		qSim.addQueueSimulationListeners(orderManager);
-		eventsManager.addHandler(orderManager);
+
 		LegCreator legCreator = VrpLegs.createLegWithOfflineTrackerCreator(qSim
 				.getSimTimer());
 		TaxibusActionCreator actionCreator = new TaxibusActionCreator(
@@ -120,14 +123,11 @@ public class TaxibusQSimProvider implements Provider<QSim> {
 				context, travelTime, travelDisutility, scheduler, tbcg.getOutputDir());
 
 	 if (tbcg.getAlgorithmConfig().equals("line")){
-		LineDispatcher dispatcher = LinesUtils.createLineDispatcher(tbcg.getLinesFile(), tbcg.getZonesXmlFile(), tbcg.getZonesShpFile(),context,tbcg);	
-		events.addHandler(dispatcher);	
+		
 		optimizer = new FifoOptimizer(optimConfig, dispatcher, false);
 		
 		}
 		else if (tbcg.getAlgorithmConfig().equals("multipleLine")){
-			LineDispatcher dispatcher = LinesUtils.createLineDispatcher(tbcg.getLinesFile(), tbcg.getZonesXmlFile(), tbcg.getZonesShpFile(),context,tbcg);	
-			events.addHandler(dispatcher);	
 			optimizer = new MultipleFifoOptimizer(optimConfig, dispatcher, false);
 			
 			}

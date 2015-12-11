@@ -63,6 +63,9 @@ public class TransferLocationChoices {
 						actNew.setFacilityId(actOld.getFacilityId());
 						actNew.setCoord(actOld.getCoord());
 						j += 2;
+						while (j < planNew.size() && ((ActivityImpl) planNew.get(j)).getType().equals("pt interaction")) {
+							j += 2;
+						}
 					}
 				}
 			}

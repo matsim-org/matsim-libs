@@ -35,13 +35,13 @@ public class Average {
     public static void main(String args[]) {
         Set<KeyMatrix> matrices = new HashSet<KeyMatrix>();
         Set<String> files = new HashSet<String>();
-        files.add("/home/johannes/gsv/fpd/telefonica/matrix/09.xml");
-        files.add("/home/johannes/gsv/fpd/telefonica/matrix/10.xml");
-        files.add("/home/johannes/gsv/fpd/telefonica/matrix/11.xml");
-        files.add("/home/johannes/gsv/fpd/telefonica/matrix/12.xml");
-        files.add("/home/johannes/gsv/fpd/telefonica/matrix/13.xml");
-        files.add("/home/johannes/gsv/fpd/telefonica/matrix/14.xml");
-        files.add("/home/johannes/gsv/fpd/telefonica/matrix/15.xml");
+        files.add("/home/johannes/gsv/fpd/telefonica/matrixv2/07.xml");
+        files.add("/home/johannes/gsv/fpd/telefonica/matrixv2/08.xml");
+        files.add("/home/johannes/gsv/fpd/telefonica/matrixv2/09.xml");
+        files.add("/home/johannes/gsv/fpd/telefonica/matrixv2/10.xml");
+        files.add("/home/johannes/gsv/fpd/telefonica/matrixv2/11.xml");
+        files.add("/home/johannes/gsv/fpd/telefonica/matrixv2/12.xml");
+        files.add("/home/johannes/gsv/fpd/telefonica/matrixv2/13.xml");
 
         KeyMatrixXMLReader reader = new KeyMatrixXMLReader();
         reader.setValidating(false);
@@ -53,7 +53,7 @@ public class Average {
         KeyMatrix avt = MatrixOperations.average(matrices);
 
         KeyMatrixXMLWriter writer = new KeyMatrixXMLWriter();
-        writer.write(avt, "/home/johannes/gsv/fpd/telefonica/matrix/avr.xml");
+        writer.write(avt, "/home/johannes/gsv/fpd/telefonica/matrixv2/avr.xml");
     }
 
 

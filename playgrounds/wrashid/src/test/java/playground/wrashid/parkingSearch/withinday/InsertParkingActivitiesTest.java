@@ -130,8 +130,6 @@ public class InsertParkingActivitiesTest extends MatsimTestCase {
 
 		assertEquals(9, plan.getPlanElements().size());
 
-		TravelTime travelTime = TravelTimeCalculator.create(sc.getNetwork(), sc.getConfig().travelTimeCalculator()).getLinkTravelTimes() ;
-
 		TripRouter tripRouter = TripRouterFactoryBuilderWithDefaults.createTripRouterProvider(sc, new DijkstraFactory(), null).get();
 
 		// initialize routes

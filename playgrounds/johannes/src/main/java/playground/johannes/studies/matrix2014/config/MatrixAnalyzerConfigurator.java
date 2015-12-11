@@ -24,6 +24,7 @@ import playground.johannes.studies.matrix2014.analysis.MatrixAnalyzer;
 import playground.johannes.gsv.zones.KeyMatrix;
 import playground.johannes.gsv.zones.io.KeyMatrixTxtIO;
 import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
+import playground.johannes.synpop.analysis.FileIOContext;
 import playground.johannes.synpop.gis.*;
 
 import java.io.IOException;
@@ -48,9 +49,12 @@ public class MatrixAnalyzerConfigurator implements DataLoader {
 
     private final DataPool dataPool;
 
-    public MatrixAnalyzerConfigurator(ConfigGroup config, DataPool dataPool) {
+    private final FileIOContext ioContext;
+
+    public MatrixAnalyzerConfigurator(ConfigGroup config, DataPool dataPool, FileIOContext ioContext) {
         this.config = config;
         this.dataPool = dataPool;
+        this.ioContext = ioContext;
     }
 
     @Override
@@ -85,6 +89,6 @@ public class MatrixAnalyzerConfigurator implements DataLoader {
             referenceMatrices.put(name, m);
         }
 
-        return new MatrixAnalyzer(facilityData, zones, referenceMatrices);
+        return new MatrixAnalyzer(facilityData, zones, referenceMatrices, ioContext);
     }
 }

@@ -20,8 +20,6 @@
 
 package playground.meisterk.org.matsim.run.portland;
 
-import java.io.IOException;
-
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -37,6 +35,8 @@ import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.FacilitiesReaderMatsimV1;
+
+import java.io.IOException;
 
 public class GenerateDemand {
 

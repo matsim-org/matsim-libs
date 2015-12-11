@@ -115,12 +115,12 @@ public class GenerateFundamentalDiagramData {
 			
 			args = new String [8];
 			
-			String myDir = "../../../../repos/shared-svn/projects/mixedTraffic/triangularNetwork/run313//";
-			String outFolder ="/car40_alt/";
+			String myDir = "../../../../repos/shared-svn/projects/mixedTraffic/triangularNetwork/run313/singleModes/holes/2lanes_3600/";
+			String outFolder ="/car/";
 			
 			args[0] = myDir + outFolder ;
 			args[1] = "car"; // travel (main) modes
-			args[2] = "1.0"; // modal split in pcu
+			args[2] = "5.0"; // modal split in pcu
 			args[3] = TrafficDynamics.queue.toString(); // isUsingHoles
 			args[4] = LinkDynamics.FIFO.toString(); // isPassingAllowed
 			args[5] = "1"; // reduce number of data points by this factor
@@ -481,7 +481,7 @@ public class GenerateFundamentalDiagramData {
 				for ( Id<Person> personId : person2Mode.keySet()) {
 					String travelMode = person2Mode.get(personId);
 					double randDouble = MatsimRandom.getRandom().nextDouble();
-					double actEndTime = randDouble*1800;
+					double actEndTime = randDouble*InputsForFDTestSetUp.MAX_ACT_END_TIME;
 					
 					MobsimAgent agent = new MySimplifiedRoundAndRoundAgent(personId, actEndTime, travelMode);
 					qSim.insertAgentIntoMobsim(agent);

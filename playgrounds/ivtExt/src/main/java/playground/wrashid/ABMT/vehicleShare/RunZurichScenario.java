@@ -36,7 +36,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
 import org.matsim.pt.PtConstants;
-
 import playground.ivt.kticompatibility.KtiLikeScoringConfigGroup;
 
 import java.io.File;

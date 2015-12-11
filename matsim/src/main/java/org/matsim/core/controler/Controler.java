@@ -80,7 +80,8 @@ import org.matsim.vis.snapshotwriters.SnapshotWriterManager;
 import com.google.inject.Key;
 import com.google.inject.Provider;
 import com.google.inject.TypeLiteral;
-import com.google.inject.name.Names;
+
+import javax.inject.Inject;
 
 /**
  * The Controler is responsible for complete simulation runs, including the
@@ -89,7 +90,7 @@ import com.google.inject.name.Names;
  *
  * @author mrieser
  */
-public class Controler extends AbstractController {
+public class Controler extends AbstractController implements ControlerI {
 	// yyyy Design thoughts:
 	// * Seems to me that we should try to get everything here final.  Flexibility is provided by the ability to set or add factories.  If this is
 	// not sufficient, people should use AbstractController.  kai, jan'13
@@ -118,6 +119,11 @@ public class Controler extends AbstractController {
 
 	private Injector injector;
 	private boolean injectorCreated = false;
+
+	@Override
+	public IterationStopWatch getStopwatch() {
+		return super.getStopwatch();
+	}
 
 	public interface TerminationCriterion {
 		boolean continueIterations( int iteration ) ;
@@ -158,6 +164,20 @@ public class Controler extends AbstractController {
 		System.exit(0);
 	}
 
+	@Inject
+	Controler(com.google.inject.Injector injector, Config config, Scenario scenario, EventsManager events, IterationStopWatch stopWatch) {
+		super(stopWatch);
+		this.scenario  = scenario;
+		this.config = scenario.getConfig();
+		this.config.addConfigConsistencyChecker(new ConfigConsistencyCheckerImpl());
+		this.events = events;
+		this.controlerListenerManager.setControler(this);
+		this.config.parallelEventHandling().makeLocked();
+		this.injector = Injector.fromGuiceInjector(injector);
+		this.injectorCreated = true;
+		injectSelf();
+	}
+
 	/**
 	 * Initializes a new instance of Controler with the given arguments.
 	 *
@@ -177,11 +197,11 @@ public class Controler extends AbstractController {
 	}
 
 	public Controler(final Config config) {
-		this(null, config, null);
+		this((String) null, config, null);
 	}
 
 	public Controler(final Scenario scenario) {
-		this(null, null, scenario);
+		this((String) null, null, scenario);
 	}
 
 	private Controler(final String configFileName, final Config config, final Scenario scenario) {
@@ -216,23 +236,16 @@ public class Controler extends AbstractController {
 	 * Starts the iterations.
 	 */
 	public final void run() {
-		setupOutputDirectory(
-				this.config.controler().getOutputDirectory(),
-				this.config.controler().getRunId(),
-				this.config.controler().getOverwriteFileSetting() );
+		if (injectorCreated) {
+			setupOutputDirectory(injector.getInstance(OutputDirectoryHierarchy.class));
+		} else {
+			setupOutputDirectory(new OutputDirectoryHierarchy(config));
+		}
 		if (this.config.transit().isUseTransit()) {
 			setupTransitSimulation();
 		}
 
 		run(config);
-		// "run(config)" is:
-		//		loadCoreListeners();
-		//		this.controlerListenerManager.fireControlerStartupEvent();
-		//		checkConfigConsistencyAndWriteToLog(config, "config dump before iterations start" ) ;
-		//		prepareForSim();
-		//		doIterations(config.controler().getFirstIteration(), config.global().getRandomSeed());
-		//		shutdown(false);
-
 	}
 
 	private void setupTransitSimulation() {
@@ -269,6 +282,32 @@ public class Controler extends AbstractController {
 	 */
 	@Override
 	protected final void loadCoreListeners() {
+		if (!injectorCreated) {
+			this.injectorCreated = true;
+			this.injector = Injector.createInjector(
+					config,
+					new AbstractModule() {
+						@Override
+						public void install() {
+							final List<AbstractModule> baseModules = new ArrayList<>();
+							baseModules.add(coreListenersModule);
+							baseModules.addAll(modules);
+							// Use all the modules set with setModules, but overriding them with things set with
+							// other setters on this Controler.
+							install(AbstractModule.override(baseModules, overrides));
+
+							bind(Scenario.class).toInstance(scenario);
+							bind(EventsManager.class).toInstance(events);
+							bind(OutputDirectoryHierarchy.class).toInstance(getControlerIO());
+							bind(IterationStopWatch.class).toInstance(getStopwatch());
+							bind(ControlerI.class).toInstance(Controler.this);
+						}
+					});
+			injectSelf();
+		}
+	}
+
+	private void injectSelf() {
 		/*
 		 * The order how the listeners are added is very important! As
 		 * dependencies between different listeners exist or listeners may read
@@ -277,53 +316,24 @@ public class Controler extends AbstractController {
 		 * IMPORTANT: The execution order is reverse to the order the listeners
 		 * are added to the list.
 		 */
-
-		this.injectorCreated = true;
-        this.injector = Injector.createInjector(
-                config,
-                new AbstractModule() {
-                    @Override
-                    public void install() {
-                    	final List<AbstractModule> baseModules = new ArrayList<>();
-                    	baseModules.add( coreListenersModule );
-                    	baseModules.addAll( modules );
-                        // Use all the modules set with setModules, but overriding them with things set with
-                        // other setters on this Controler.
-                        install(AbstractModule.override(baseModules, overrides));
-
-                        // Bootstrap it with the Scenario and some controler context.
-						bind(OutputDirectoryHierarchy.class).toInstance(getControlerIO());
-						bind(IterationStopWatch.class).toInstance(stopwatch);
-						bind(Scenario.class).toInstance(scenario);
-						bind(EventsManager.class).toInstance(events);
-						binder().bind(Integer.class).annotatedWith(Names.named("iteration")).toProvider(new com.google.inject.Provider<Integer>() {
-                            @Override
-                            public Integer get() {
-                                return getIterationNumber();
-                            }
-                        });
-                    }
-                });
-
 		if (getConfig().controler().getDumpDataAtEnd()) {
-			this.addCoreControlerListener( injector.getInstance( DumpDataAtEnd.class ) );
+			this.addCoreControlerListener(injector.getInstance(DumpDataAtEnd.class));
 		}
 
-        this.addCoreControlerListener( injector.getInstance( PlansScoring.class ) );
-        this.addCoreControlerListener( injector.getInstance( PlansReplanning.class ) );
-		this.addCoreControlerListener( injector.getInstance( PlansDumping.class ) );
-		this.addCoreControlerListener( injector.getInstance( EventsHandling.class ) );
+		this.addCoreControlerListener(injector.getInstance(PlansScoring.class));
+		this.addCoreControlerListener(injector.getInstance(PlansReplanning.class));
+		this.addCoreControlerListener(injector.getInstance(PlansDumping.class));
+		this.addCoreControlerListener(injector.getInstance(EventsHandling.class));
 		// must be last being added (=first being executed)
 
-        Set<EventHandler> eventHandlersDeclaredByModules = this.injector.getEventHandlersDeclaredByModules();
-        for (EventHandler eventHandler : eventHandlersDeclaredByModules) {
-            this.getEvents().addHandler(eventHandler);
-        }
-        Set<ControlerListener> controlerListenersDeclaredByModules = this.injector.getControlerListenersDeclaredByModules();
-        for (ControlerListener controlerListener : controlerListenersDeclaredByModules) {
-            this.addControlerListener(controlerListener);
-        }
-
+		Set<EventHandler> eventHandlersDeclaredByModules = this.injector.getEventHandlersDeclaredByModules();
+		for (EventHandler eventHandler : eventHandlersDeclaredByModules) {
+			this.getEvents().addHandler(eventHandler);
+		}
+		Set<ControlerListener> controlerListenersDeclaredByModules = this.injector.getControlerListenersDeclaredByModules();
+		for (ControlerListener controlerListener : controlerListenersDeclaredByModules) {
+			this.addControlerListener(controlerListener);
+		}
 	}
 
 	@Override
@@ -352,10 +362,10 @@ public class Controler extends AbstractController {
 		// make sure all routes are calculated.
         ParallelPersonAlgorithmRunner.run(getScenario().getPopulation(), this.config.global().getNumberOfThreads(),
 				new ParallelPersonAlgorithmRunner.PersonAlgorithmProvider() {
-			@Override
-			public AbstractPersonAlgorithm getPersonAlgorithm() {
-				return new PersonPrepareForSim(new PlanRouter(getTripRouterProvider().get(), getScenario().getActivityFacilities()), 
-						Controler.this.scenario, net);
+					@Override
+					public AbstractPersonAlgorithm getPersonAlgorithm() {
+						return new PersonPrepareForSim(new PlanRouter(getTripRouterProvider().get(), getScenario().getActivityFacilities()),
+								Controler.this.scenario, net);
 			}
 		});
         if ( scenario.getPopulation() instanceof PopulationImpl ) {

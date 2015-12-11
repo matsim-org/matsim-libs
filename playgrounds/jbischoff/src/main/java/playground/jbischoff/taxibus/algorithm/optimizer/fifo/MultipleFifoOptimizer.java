@@ -99,7 +99,7 @@ public class MultipleFifoOptimizer extends AbstractTaxibusOptimizer {
 			Set<TaxibusVehicleRequestPath> setToDepart =new HashSet<>();
 			TaxibusLine line = dispatcher.findLineForRequest(req);
 			if (line == null) {
-				log.error("rejecting reqeuest" + req.getId() + " f " + req.getPassenger());
+//				log.error("rejecting reqeuest" + req.getId() + " f " + req.getPassenger());
 				req.setRejected(true);
 				handledRequests.add(req);
 				continue;

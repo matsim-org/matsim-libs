@@ -39,15 +39,16 @@ import java.util.Map;
 public class Terralytics2Matrix {
 
     public static void main(String[] args) throws IOException {
-        String outdir = "/home/johannes/gsv/fpd/telefonica/matrix";
+        String outdir = "/home/johannes/gsv/fpd/telefonica/matrixv2";
 
         DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
         DateTimeFormatter dayformatter = DateTimeFormat.forPattern("dd");
         DateTimeFormatter hourFormatter = DateTimeFormat.forPattern("HH");
 
         Map<String, KeyMatrix> map = new HashMap<String, KeyMatrix>();
-//        BufferedReader reader = new BufferedReader(new FileReader("/home/johannes/gsv/fpd/telefonica/Telefonica_Pilotmatrix_Frankfurt-Berlin/od_201503_daily_start.csv"));
-        BufferedReader reader = new BufferedReader(new FileReader("/home/johannes/gsv/fpd/telefonica/Telefonica_Pilotmatrix_Frankfurt-Berlin/od_201503_hourly_start.csv"));
+//        BufferedReader reader = new BufferedReader(new FileReader("/mnt/cifs/B-drive/C_Vertrieb/2013_01_01_Floating Phone Data/04 Telefonica/Matrizen/od_start_daily.csv"));
+        BufferedReader reader = new BufferedReader(new FileReader("/mnt/cifs/B-drive/C_Vertrieb/2013_01_01_Floating " +
+                "Phone Data/04 Telefonica/Matrizen/od_start_hourly.csv"));
 
         String line = reader.readLine();
 

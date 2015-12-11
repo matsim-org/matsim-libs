@@ -21,6 +21,7 @@
 package org.matsim.vis.snapshotwriters;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.controler.ControlerI;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
@@ -35,10 +36,10 @@ class KMLSnapshotWriterFactory implements Provider<SnapshotWriter> {
 	private final int iteration;
 
 	@Inject
-	KMLSnapshotWriterFactory(Scenario scenario, OutputDirectoryHierarchy controlerIO, @Named("iteration") int iteration) {
+	KMLSnapshotWriterFactory(Scenario scenario, OutputDirectoryHierarchy controlerIO, ControlerI controler) {
 		this.scenario = scenario;
 		this.controlerIO = controlerIO;
-		this.iteration = iteration;
+		this.iteration = controler.getIterationNumber();
 	}
 
 	public SnapshotWriter get() {

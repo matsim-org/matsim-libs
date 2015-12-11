@@ -50,6 +50,9 @@ public class HalfTourCostMatrices {
 			final TripCostMatrices tripCostMatrices) {
 		this.tripCostMatrices = tripCostMatrices;
 		this.extractHistograms(scenario);
+		// >>>>> TODO NEW >>>>>
+		this.ensureWellFormedHistograms();
+		// <<<<< TODO NEW <<<<<
 		if (tripCostMatrices != null) {
 			this.computeHalfTourCosts();
 		}
@@ -58,8 +61,21 @@ public class HalfTourCostMatrices {
 	// ------------------ INTERNALS ------------------
 
 	private void addTimeToHistogram(
-			final Map<String, Histogram> actType2timeHist,
-			final String actType, final double time_s) {
+			final Map<String, Histogram> actType2timeHist, String actType,
+			final double time_s) {
+
+		// >>>>>>>>>> TODO NEW >>>>>>>>>>
+
+		if (actType.toUpperCase().startsWith("W")) {
+			actType = "work";
+		} else if (actType.toUpperCase().startsWith("O")) {
+			actType = "other";
+		} else {
+			throw new RuntimeException("unknown activity type: " + actType);
+		}
+
+		// <<<<<<<<<< TODO NEW <<<<<<<<<<
+
 		Histogram histogram = actType2timeHist.get(actType);
 		if (histogram == null) {
 			histogram = newHistogramWithUniformBins(
@@ -109,6 +125,18 @@ public class HalfTourCostMatrices {
 					}
 				}
 			}
+		}
+	}
+
+	private void ensureWellFormedHistograms() {
+		Logger.getLogger(this.getClass().getName()).info(
+				"Adding one to all trip start histogram time bins in order to "
+						+ "avoid numerical problems.");
+		for (Histogram hist : this.actType2tourStartTimeHist.values()) {
+			hist.makeNonZero();
+		}
+		for (Histogram hist : this.actType2returnTripStartTimeHist.values()) {
+			hist.makeNonZero();
 		}
 	}
 
@@ -168,43 +196,6 @@ public class HalfTourCostMatrices {
 							freqSumReturnTripStart, tripCostMatrices);
 					threadPool.execute(halfTourMatrixCostCalculator);
 				}
-
-				// for (int costMatrixBin = 0; costMatrixBin <
-				// this.tripCostMatrices
-				// .getBinCnt(); costMatrixBin++) {
-				// // contribution of trips towards the activity
-				// add(halfTourCostMatrix,
-				// this.tripCostMatrices.getMatrix(costType,
-				// costMatrixBin),
-				// this.actType2tourStartTimeHist.get(actType).freq(
-				// costMatrixBin + 1)
-				// / freqSumTourStart);
-				// // contribution of trips back from the activity
-				// add(halfTourCostMatrix, this.tripCostMatrices.getMatrix(
-				// costType, costMatrixBin),
-				// this.actType2returnTripStartTimeHist.get(actType)
-				// .freq(costMatrixBin + 1)
-				// / freqSumReturnTripStart);
-				// }
-				//
-				// /*
-				// * Dividing tour travel times by half, for compatibility with
-				// * Regent's way of processing that data.
-				// */
-				//
-				// Logger.getLogger(this.getClass().getName()).info(
-				// "Dividing _tour_ travel time matrix for " + actType
-				// + " by two in order to obtain "
-				// + "_half-tour_ travel times.");
-				// MatrixUtils.mult(halfTourCostMatrix, 0.5);
-				//
-				// /*
-				// * Finally, round this down to two digits in order to obtain
-				// * somewhat manageable file sizes.
-				// */
-				//
-				// round(halfTourCostMatrix, 2);
-
 			}
 		}
 
