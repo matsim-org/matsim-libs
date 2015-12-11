@@ -120,12 +120,12 @@ public class PatnaExternalDemandGenerator {
 		Population population = scenario.getPopulation();
 		PopulationFactory pf = population.getFactory();
 		Map<Double, Map<String,Double>> timebin2mode2count = readFileAndReturnMap(file);
-		
 		Map<String, List<SimpleFeature>> area2ZonesLists = getInternalZoneFeaturesForExtInternalTrips();
 		
 		String countingStationKey = OuterCordonUtils.getCountingStationKey(countingStationNumber, "In");
-		Coord firstLastActCoord = getLinkFromOuterCordonKey(countingStationKey, true).getCoord();
-
+		Link firstActLink = getLinkFromOuterCordonKey(countingStationKey, true);
+		Link lastActLink = getLinkFromOuterCordonKey(countingStationKey, false);
+		
 		for(double timebin : timebin2mode2count.keySet()){
 			for(String mode : timebin2mode2count.get(timebin).keySet()){
 				double directionSplitFactor = OuterCordonUtils.getDirectionalFactorFromOuterCordonKey(countingStationKey, "E2I");
@@ -138,7 +138,7 @@ public class PatnaExternalDemandGenerator {
 					population.addPerson(p);
 					for( String area : area2ZonesLists.keySet() ){ // create a plan for each zone (ext-int-ext)
 						Plan plan = pf.createPlan();
-						Activity firstAct = pf.createActivityFromCoord( "E2I_Start", firstLastActCoord);
+						Activity firstAct = pf.createActivityFromLinkId( "E2I_Start", firstActLink.getId());
 						firstAct.setEndTime( (timebin-1)*3600 + random.nextDouble()*3600);
 						
 						Point randomPointInZone = GeometryUtils.getRandomPointsInsideFeatures(area2ZonesLists.get(area));
@@ -147,7 +147,7 @@ public class PatnaExternalDemandGenerator {
 						Activity middleAct = pf.createActivityFromCoord("E2I_mid", middleActCoord);
 						//ZZ_TODO : here the act duration is assigned randomly between 7 to 8 hours. This means, the agent will be counted in reverse direction of the same counting station.
 						double middleActEndTime = firstAct.getEndTime() + 6*3600 + random.nextDouble() * 3600;
-						Activity lastAct = pf.createActivityFromCoord( "E2I_Start", firstLastActCoord);
+						Activity lastAct = pf.createActivityFromLinkId( "E2I_Start", lastActLink.getId());
 
 						if(middleActEndTime > 24*3600 ) { // midAct - startAct - midAct ==> this will give count in both time bins for desired counting station
 							middleActEndTime = middleActEndTime - 24*3600;
@@ -155,7 +155,7 @@ public class PatnaExternalDemandGenerator {
 							plan.addActivity(middleAct);
 							plan.addLeg(pf.createLeg(mode));
 							firstAct.setEndTime( middleActEndTime + 6*3600 + random.nextDouble() * 3600 );
-							plan.addActivity(firstAct);
+							plan.addActivity(lastAct);
 							plan.addLeg(pf.createLeg(mode));
 							plan.addActivity( pf.createActivityFromCoord("E2I_mid", middleActCoord)  );
 						} else { // startAct - midAct - startAct
