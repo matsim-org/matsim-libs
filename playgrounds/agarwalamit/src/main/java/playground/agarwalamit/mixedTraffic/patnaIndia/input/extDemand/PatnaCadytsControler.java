@@ -21,6 +21,7 @@ package playground.agarwalamit.mixedTraffic.patnaIndia.input.extDemand;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.cadyts.car.CadytsContext;
+import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
 import org.matsim.contrib.cadyts.general.CadytsScoring;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -67,7 +68,11 @@ public class PatnaCadytsControler {
 		config.vehicles().setVehiclesFile(patnaVehicles);
 
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-
+		
+		CadytsConfigGroup cadytsConfigGroup = ConfigUtils.addOrGetModule(config, CadytsConfigGroup.GROUP_NAME, CadytsConfigGroup.class);
+		cadytsConfigGroup.setStartTime(06*3600);
+		cadytsConfigGroup.setEndTime(18*3600-1);
+		
 		final Controler controler = new Controler(config);
 		controler.setDumpDataAtEnd(true);
 
@@ -87,9 +92,6 @@ public class PatnaCadytsControler {
 
 		final CadytsContext cContext = new CadytsContext(controler.getConfig());
 		controler.addControlerListener(cContext);
-
-		controler.getConfig().getModule("cadytsCar").addParam("startTime", "00:00:00");
-		controler.getConfig().getModule("cadytsCar").addParam("endTime", "24:00:00");
 
 		// scoring function
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
