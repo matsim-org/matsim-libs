@@ -45,9 +45,9 @@ import java.util.concurrent.TimeUnit;
  */
 public class PreProcessLandmarks extends PreProcessEuclidean {
 
-	private final Rectangle2D.Double travelZone;
-
 	private final int landmarkCount;
+
+	private final Landmarker landmarker;
 
 	private Node[] landmarks;
 	
@@ -90,10 +90,19 @@ public class PreProcessLandmarks extends PreProcessEuclidean {
 	 * @param landmarkCount
 	 */
 	public PreProcessLandmarks(final TravelDisutility costFunction, final Rectangle2D.Double travelZone, final int landmarkCount) {
+		this( costFunction ,
+				new PieSlicesLandmarker( travelZone ),
+				landmarkCount );
+	}
+
+	public PreProcessLandmarks(
+			final TravelDisutility costFunction,
+			final Landmarker landmarker,
+			final int landmarkCount) {
 		super(costFunction);
 
-		this.travelZone = travelZone;
 		this.landmarkCount = landmarkCount;
+		this.landmarker = landmarker;
 	}
 
 	@Override
@@ -102,8 +111,7 @@ public class PreProcessLandmarks extends PreProcessEuclidean {
 		
 		log.info("Putting landmarks on network...");
 		long now = System.currentTimeMillis();
-		LandmarkerPieSlices landmarker = new LandmarkerPieSlices(this.landmarkCount, this.travelZone);
-		landmarker.run(network);
+		landmarks = landmarker.identifyLandmarks( landmarkCount , network );
 		log.info("done in " + (System.currentTimeMillis() - now) + " ms");
 
 		log.info("Initializing landmarks data");
@@ -111,7 +119,6 @@ public class PreProcessLandmarks extends PreProcessEuclidean {
 			this.nodeData.put(node, new LandmarksData(this.landmarkCount));
 		}
 		
-		this.landmarks = landmarker.getLandmarks();
 		int nOfThreads = this.numberOfThreads;
 		if (nOfThreads > this.landmarks.length) {
 			nOfThreads = this.landmarks.length;
