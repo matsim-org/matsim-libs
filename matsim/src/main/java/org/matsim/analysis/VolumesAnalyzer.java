@@ -34,6 +34,9 @@ import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.api.experimental.events.EventsManager;
+
+import javax.inject.Inject;
 
 /**
  * Counts the number of vehicles leaving a link, aggregated into time bins of a specified size.
@@ -52,6 +55,12 @@ public class VolumesAnalyzer implements LinkLeaveEventHandler, PersonDepartureEv
 	private final boolean observeModes;
 	private final Map<Id<Person>, String> enRouteModes;
 	private final Map<Id<Link>, Map<String, int[]>> linksPerMode;
+
+	@Inject
+	VolumesAnalyzer(Network network, EventsManager eventsManager) {
+		this(3600, 24 * 3600 - 1, network);
+		eventsManager.addHandler(this);
+	}
 
 	public VolumesAnalyzer(final int timeBinSize, final int maxTime, final Network network) {
 		this(timeBinSize, maxTime, network, true);

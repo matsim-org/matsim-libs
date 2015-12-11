@@ -35,6 +35,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Injector;
+import org.matsim.core.events.EventsManagerModule;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
@@ -171,6 +172,8 @@ public class SimulateAndScoreTest extends MatsimTestCase {
 			public void install() {
 				install(new ScenarioByInstanceModule(scenario));
 				install(new TripRouterModule());
+				install(new TravelTimeCalculatorModule());
+				install(new EventsManagerModule());
 				addTravelDisutilityFactoryBinding("car").toInstance(new Builder( TransportMode.car ));
 			}
 		});

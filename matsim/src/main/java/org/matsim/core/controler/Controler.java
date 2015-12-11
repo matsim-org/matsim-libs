@@ -496,7 +496,7 @@ public class Controler extends AbstractController implements ControlerI {
 			return new EventsManager() {
 				@Override
 				public void processEvent(Event event) {
-					throw new UnsupportedOperationException();
+					Controler.this.injector.getInstance(EventsManager.class).processEvent(event);
 				}
 
 				@Override
