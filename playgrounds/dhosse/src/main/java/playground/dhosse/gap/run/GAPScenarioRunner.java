@@ -688,7 +688,9 @@ public class GAPScenarioRunner {
 //				this.addPlanStrategyBinding("RandomTripToCarsharingStrategy").to( RandomTripToCarsharingStrategy.class ) ;
 //				this.addPlanStrategyBinding("CarsharingSubtourModeChoiceStrategy").to( CarsharingSubtourModeChoiceStrategy.class ) ;
 				bindMobsim().toProvider( CarsharingQsimFactory.class );
-				
+				//setting up the scoring function factory, inside different scoring functions are set-up
+				bindScoringFunctionFactory().to(CarsharingScoringFunctionFactory.class);
+
 				addRoutingModuleBinding("onewaycarsharing").toInstance(new OneWayCarsharingRoutingModule());
 				
 				bind(MainModeIdentifier.class).toInstance(new MainModeIdentifier() {
@@ -719,9 +721,6 @@ public class GAPScenarioRunner {
 			}
 		});
 		
-		//setting up the scoring function factory, inside different scoring functions are set-up
-		controler.setScoringFunctionFactory( new CarsharingScoringFunctionFactory( controler.getScenario() ) );
-
 		controler.addControlerListener(new CarsharingListener(controler,
 				cs.getStatsWriterFrequency() ) ) ;
 		

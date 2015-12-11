@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package org.matsim.core.replanning.modules;
 
-import com.google.inject.Inject;
 import org.matsim.core.config.Config;
 import org.matsim.core.router.CompositeStageActivityTypes;
 import org.matsim.core.router.StageActivityTypes;
@@ -37,16 +36,15 @@ import javax.inject.Provider;
  * @author thibautd
  */
 public class TripsToLegsModule extends AbstractMultithreadedModule {
-	@Inject
-	Provider<TripRouter> tripRouterProvider;
 
 	private final StageActivityTypes additionalBlackList;
+	private final Provider<TripRouter> tripRouterProvider;
 
 	/**
 	 * Initializes an instance using the stage activity types from the controler
 	 */
-	public TripsToLegsModule(Config config) {
-		this( config, null );
+	public TripsToLegsModule(Config config, Provider<TripRouter> tripRouterProvider) {
+		this( config, null, tripRouterProvider);
 	}
 
 	/**
@@ -54,10 +52,11 @@ public class TripsToLegsModule extends AbstractMultithreadedModule {
 	 * consider as stage activities.
 	 * @param controler
 	 * @param additionalBlackList a {@link StageActivityTypes} instance identifying
-	 * the additionnal types
+	 * @param tripRouterProvider
 	 */
-	public TripsToLegsModule(final Config config, final StageActivityTypes additionalBlackList) {
+	public TripsToLegsModule(final Config config, final StageActivityTypes additionalBlackList, Provider<TripRouter> tripRouterProvider) {
 		super( config.global() );
+		this.tripRouterProvider = tripRouterProvider;
 		this.additionalBlackList = additionalBlackList;
 	}
 

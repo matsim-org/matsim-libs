@@ -29,6 +29,7 @@
 package org.matsim.contrib.freight.controler;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierPlan;
@@ -36,11 +37,12 @@ import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.mobsim.CarrierAgentTracker;
 import org.matsim.contrib.freight.replanning.CarrierPlanStrategyManagerFactory;
 import org.matsim.contrib.freight.scoring.CarrierScoringFunctionFactory;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.events.*;
 import org.matsim.core.controler.listener.*;
 import org.matsim.core.replanning.GenericStrategyManager;
 
+import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
@@ -67,10 +69,13 @@ class CarrierControlerListener implements StartupListener, ShutdownListener, Bef
 
     private Carriers carriers;
 
+    @Inject EventsManager eventsManager;
+    @Inject Network network;
 
     /**
      * Constructs a controller with a set of carriers, re-planning capabilities and scoring-functions.
      */
+    @Inject
     CarrierControlerListener(Carriers carriers, CarrierPlanStrategyManagerFactory strategyManagerFactory, CarrierScoringFunctionFactory scoringFunctionFactory) {
         this.carriers = carriers;
         this.carrierPlanStrategyManagerFactory = strategyManagerFactory;
@@ -87,15 +92,13 @@ class CarrierControlerListener implements StartupListener, ShutdownListener, Bef
 
     @Override
     public void notifyBeforeMobsim(BeforeMobsimEvent event) {
-        Controler controler = event.getControler();
-        carrierAgentTracker = new CarrierAgentTracker(carriers, event.getControler().getScenario().getNetwork(), carrierScoringFunctionFactory);
-        controler.getEvents().addHandler(carrierAgentTracker);
+        carrierAgentTracker = new CarrierAgentTracker(carriers, network, carrierScoringFunctionFactory);
+        eventsManager.addHandler(carrierAgentTracker);
     }
 
     @Override
     public void notifyAfterMobsim(AfterMobsimEvent event) {
-        Controler controler = event.getControler();
-        controler.getEvents().removeHandler(carrierAgentTracker);
+        eventsManager.removeHandler(carrierAgentTracker);
     }
 
     @Override

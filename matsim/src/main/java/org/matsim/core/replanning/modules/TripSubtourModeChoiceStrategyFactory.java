@@ -45,7 +45,7 @@ public class TripSubtourModeChoiceStrategyFactory implements Provider<PlanStrate
     @Override
 	public PlanStrategy get() {
 		PlanStrategyImpl strategy = new PlanStrategyImpl(new RandomPlanSelector());
-		strategy.addStrategyModule(new TripsToLegsModule(config));
+		strategy.addStrategyModule(new TripsToLegsModule(config, tripRouterProvider));
 		strategy.addStrategyModule(new SubtourModeChoice(config, tripRouterProvider));
 		strategy.addStrategyModule(new ReRoute(config, activityFacilities, tripRouterProvider));
 		return strategy;

@@ -45,7 +45,7 @@ public class ChangeTripModeStrategyFactory implements Provider<PlanStrategy> {
     @Override
 	public PlanStrategy get() {
 		PlanStrategyImpl strategy = new PlanStrategyImpl(new RandomPlanSelector());
-		strategy.addStrategyModule(new TripsToLegsModule(config));
+		strategy.addStrategyModule(new TripsToLegsModule(config, tripRouterProvider));
 		strategy.addStrategyModule(new ChangeLegMode(config));
 		strategy.addStrategyModule(new ReRoute(config, facilities, tripRouterProvider));
 		return strategy;

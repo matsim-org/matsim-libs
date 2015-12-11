@@ -45,6 +45,7 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityModule;
 import org.matsim.core.router.util.DijkstraFactory;
+import org.matsim.core.scenario.ScenarioElementsModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorModule;
 import org.matsim.facilities.ActivityFacilities;
@@ -157,6 +158,7 @@ public class JointTripRouterFactoryTest {
 					public void install() {
 						bind(Scenario.class).toInstance(scenario);
 						bind(EventsManager.class).toInstance(EventsUtils.createEventsManager(scenario.getConfig()));
+						install(new ScenarioElementsModule());
 						install(new TripRouterModule());
 						install(new TravelTimeCalculatorModule());
 						install(new TravelDisutilityModule());

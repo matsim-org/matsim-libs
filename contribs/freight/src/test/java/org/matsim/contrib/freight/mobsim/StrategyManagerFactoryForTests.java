@@ -1,7 +1,9 @@
 package org.matsim.contrib.freight.mobsim;
 
 import org.junit.Ignore;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierPlan;
@@ -18,14 +20,14 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
 
+import javax.inject.Inject;
+import java.util.Map;
+
 @Ignore
 public class StrategyManagerFactoryForTests implements CarrierPlanStrategyManagerFactory {
 
-    private Controler controler;
-
-    public StrategyManagerFactoryForTests(Controler controler) {
-        this.controler = controler;
-    }
+    @Inject Network network;
+    @Inject Map<String, TravelTime> travelTimes;
 
     static class MyTravelCosts implements TravelDisutility {
 
@@ -60,14 +62,11 @@ public class StrategyManagerFactoryForTests implements CarrierPlanStrategyManage
     @Override
     public GenericStrategyManager<CarrierPlan, Carrier> createStrategyManager() {
 
-        final LeastCostPathCalculator router = new FastDijkstraFactory().createPathCalculator(controler.getScenario()
-                .getNetwork(), new MyTravelCosts(controler
-                .getLinkTravelTimes()), controler
-                .getLinkTravelTimes());
+        final LeastCostPathCalculator router = new FastDijkstraFactory().createPathCalculator(network, new MyTravelCosts(travelTimes.get(TransportMode.car)), travelTimes.get(TransportMode.car));
 
         GenericPlanStrategyImpl<CarrierPlan, Carrier> planStrat_reRoutePlan =
                 new GenericPlanStrategyImpl<CarrierPlan, Carrier>(new BestPlanSelector<CarrierPlan, Carrier>());
-        planStrat_reRoutePlan.addStrategyModule(new ReRouteVehicles(router, controler.getScenario().getNetwork(), controler.getLinkTravelTimes()));
+        planStrat_reRoutePlan.addStrategyModule(new ReRouteVehicles(router, network, travelTimes.get(TransportMode.car)));
 
 
         GenericStrategyManager<CarrierPlan, Carrier> stratManager = new GenericStrategyManager<CarrierPlan, Carrier>();

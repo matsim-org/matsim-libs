@@ -20,12 +20,7 @@
 
 package org.matsim.core.controler;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import org.apache.log4j.Layout;
 import org.apache.log4j.Logger;
@@ -112,7 +107,8 @@ public class Controler extends AbstractController implements ControlerI {
 	public static final Layout DEFAULTLOG4JLAYOUT = new PatternLayout(
 			"%d{ISO8601} %5p %C{1}:%L %m%n");
 
-	private final Config config; 
+	private final Config config;
+	private Scenario scenario;
 
 	@Inject private EventsHandling eventsHandling;
 	@Inject private PlansDumping plansDumping;
@@ -157,8 +153,8 @@ public class Controler extends AbstractController implements ControlerI {
     private AbstractModule overrides = AbstractModule.emptyModule();
 
 	private final List<MobsimListener> simulationListeners = new ArrayList<>();
-	@Inject Set<MobsimListener> mobsimListeners = new HashSet<>(); // added by modules
-	@Inject Set<SnapshotWriter> snapshotWriters = new HashSet<>(); // added by modules
+	@Inject Collection<Provider<MobsimListener>> mobsimListeners = new HashSet<>(); // added by modules
+	@Inject Collection<Provider<SnapshotWriter>> snapshotWriters = new HashSet<>(); // added by modules
 
     public static void main(final String[] args) {
 		if ((args == null) || (args.length == 0)) {
@@ -232,11 +228,11 @@ public class Controler extends AbstractController implements ControlerI {
 		}
 		this.controlerListenerManager.setControler(this);
 		this.config.parallelEventHandling().makeLocked();
-		final Scenario scenarioToBind = scenario;
+		this.scenario = scenario;
 		this.overrides = new AbstractModule() {
 			@Override
 			public void install() {
-				bind(Scenario.class).toInstance(scenarioToBind);
+				bind(Scenario.class).toInstance(Controler.this.scenario);
 			}
 		};
 	}
@@ -307,7 +303,17 @@ public class Controler extends AbstractController implements ControlerI {
 
 							bind(OutputDirectoryHierarchy.class).toInstance(getControlerIO());
 							bind(IterationStopWatch.class).toInstance(getStopwatch());
-							bind(ControlerI.class).toInstance(Controler.this);
+							bind(ControlerI.class).toInstance(new ControlerI() {
+								@Override
+								public void run() {
+									throw new RuntimeException("Already running.");
+								}
+
+								@Override
+								public Integer getIterationNumber() {
+									return Controler.this.getIterationNumber();
+								}
+							});
 						}
 					});
 			this.injector.getInstance(com.google.inject.Injector.class).injectMembers(this);
@@ -404,8 +410,8 @@ public class Controler extends AbstractController implements ControlerI {
 
 	private void enrichSimulation(final Mobsim simulation) {
 		if (simulation instanceof ObservableMobsim) {
-			for (MobsimListener l : this.mobsimListeners) {
-				((ObservableMobsim) simulation).addQueueSimulationListeners(l);
+			for (Provider<MobsimListener> l : this.mobsimListeners) {
+				((ObservableMobsim) simulation).addQueueSimulationListeners(l.get());
 			}
 			for (MobsimListener l : this.getMobsimListeners()) {
 				((ObservableMobsim) simulation).addQueueSimulationListeners(l);
@@ -413,8 +419,8 @@ public class Controler extends AbstractController implements ControlerI {
 
 			if (config.controler().getWriteSnapshotsInterval() != 0 && this.getIterationNumber() % config.controler().getWriteSnapshotsInterval() == 0) {
 				SnapshotWriterManager manager = new SnapshotWriterManager(config);
-				for (SnapshotWriter snapshotWriter : this.snapshotWriters) {
-					manager.addSnapshotWriter(snapshotWriter);
+				for (Provider<SnapshotWriter> snapshotWriter : this.snapshotWriters) {
+					manager.addSnapshotWriter(snapshotWriter.get());
 				}
 				((ObservableMobsim) simulation).addQueueSimulationListeners(manager);
 			}
@@ -476,7 +482,11 @@ public class Controler extends AbstractController implements ControlerI {
 	}
 
     public final Scenario getScenario() {
-	    return this.injector.getInstance(Scenario.class);
+		if (this.injectorCreated) {
+			return this.injector.getInstance(Scenario.class);
+		} else {
+			return this.scenario;
+		}
     }
 
 	/**

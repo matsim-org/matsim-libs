@@ -44,6 +44,7 @@ import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.vis.snapshotwriters.SnapshotWriter;
 
 import com.google.inject.Binder;
@@ -153,6 +154,10 @@ public abstract class AbstractModule implements Module {
 
 	protected final com.google.inject.binder.LinkedBindingBuilder<Mobsim> bindMobsim() {
 		return bind(Mobsim.class);
+	}
+
+	protected final com.google.inject.binder.LinkedBindingBuilder<ScoringFunctionFactory> bindScoringFunctionFactory() {
+		return bind(ScoringFunctionFactory.class);
 	}
 
 	protected final com.google.inject.binder.LinkedBindingBuilder<MobsimListener> addMobsimListenerBinding() {

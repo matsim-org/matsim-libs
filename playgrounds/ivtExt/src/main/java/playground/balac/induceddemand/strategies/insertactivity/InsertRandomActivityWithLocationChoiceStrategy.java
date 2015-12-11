@@ -89,7 +89,7 @@ public class InsertRandomActivityWithLocationChoiceStrategy implements PlanStrat
 		} else {
 			planStrategyDelegate = new PlanStrategyImpl(new ExpBetaPlanSelector(config.planCalcScore()));
 		}
-		planStrategyDelegate.addStrategyModule(new TripsToLegsModule(scenario.getConfig()));
+		planStrategyDelegate.addStrategyModule(new TripsToLegsModule(scenario.getConfig(), tripRouterProvider));
 		planStrategyDelegate.addStrategyModule(ira);
 		planStrategyDelegate.addStrategyModule(new BestReplyDestinationChoice(tripRouterProvider, lcContext, maxDcScoreWrapper.getPersonsMaxDCScoreUnscaled(), scoringFunctionFactory, travelTimes, travelDisutilities));
 		planStrategyDelegate.addStrategyModule(new ReRoute(lcContext.getScenario(), tripRouterProvider));
