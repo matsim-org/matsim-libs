@@ -19,7 +19,7 @@
 
 package playground.johannes.gsv.synPop.sim3;
 
-import playground.johannes.coopsim.mental.choice.ChoiceSet;
+import org.matsim.contrib.common.collections.ChoiceSet;
 import playground.johannes.synpop.data.Person;
 
 import java.util.List;
@@ -40,7 +40,7 @@ public class MutatorComposite implements Mutator {
 	}
 
 	public void addMutator(Mutator mutator) {
-		mutators.addChoice(mutator);
+		mutators.addOption(mutator);
 	}
 	
 	@Override

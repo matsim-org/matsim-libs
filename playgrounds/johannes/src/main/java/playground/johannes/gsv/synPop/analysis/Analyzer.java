@@ -26,7 +26,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.FacilitiesReaderMatsimV1;
-import playground.johannes.gsv.popsim.DetourFactor;
+import playground.johannes.studies.matrix2014.analysis.DetourFactor;
 import playground.johannes.gsv.synPop.mid.analysis.MonthTask;
 import playground.johannes.gsv.synPop.mid.analysis.SeasonsTask;
 import playground.johannes.synpop.data.PlainFactory;

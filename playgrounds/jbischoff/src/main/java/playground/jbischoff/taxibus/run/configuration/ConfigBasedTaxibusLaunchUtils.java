@@ -25,10 +25,14 @@ import org.matsim.contrib.dvrp.data.VrpData;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.population.algorithms.PermissibleModesCalculator;
 
+import playground.jbischoff.taxibus.algorithm.optimizer.fifo.Lines.LineDispatcher;
+import playground.jbischoff.taxibus.algorithm.optimizer.fifo.Lines.LinesUtils;
+import playground.jbischoff.taxibus.run.sim.TaxibusPermissibleModesCalculatorImpl;
 import playground.jbischoff.taxibus.run.sim.TaxibusQSimProvider;
 import playground.jbischoff.taxibus.run.sim.TaxibusServiceRoutingModule;
-import playground.jbischoff.taxibus.run.sim.TaxibusTripRouterFactory;
+import playground.jbischoff.taxibus.scenario.strategies.TaxibusAndWOBScenarioPermissibleModesCalculator;
 
 /**
  * @author jbischoff
@@ -42,36 +46,65 @@ public class ConfigBasedTaxibusLaunchUtils {
 		
 		public ConfigBasedTaxibusLaunchUtils(Controler controler) {
 			this.controler = controler;
+			
 		}
 		
 	 
-	public  void initiateTaxibusses(){
+	public  void initiateTaxibusses(boolean wobCase){
 		//this is done exactly once per simulation
+		
+		
 		final TaxibusConfigGroup tbcg = (TaxibusConfigGroup) controler.getScenario().getConfig().getModule("taxibusConfig");
       	context = new MatsimVrpContextImpl();
 		context.setScenario(controler.getScenario());
 		VrpData vrpData = VrpLauncherUtils.initVrpData(context, tbcg.getVehiclesFile());
+		final PermissibleModesCalculator taxibusPermissibleModesCalculator;
+		
+		final LineDispatcher dispatcher = LinesUtils.createLineDispatcher(tbcg.getLinesFile(), tbcg.getZonesXmlFile(), tbcg.getZonesShpFile(),context,tbcg);	
+		final String[] availableModes = controler.getScenario().getConfig().subtourModeChoice().getModes();
+		final String[] chainBasedModes = controler.getScenario().getConfig().subtourModeChoice().getChainBasedModes();
+		if (wobCase){
+			taxibusPermissibleModesCalculator = new TaxibusAndWOBScenarioPermissibleModesCalculator(availableModes, dispatcher, controler.getScenario());
+		}
+		else {
+			taxibusPermissibleModesCalculator = new TaxibusPermissibleModesCalculatorImpl(availableModes, dispatcher);
+		}
 		
 		context.setVrpData(vrpData);	 
            
-		controler.addOverridingModule(new AbstractModule(){
-
-			@Override
-			public void install() {
-				addRoutingModuleBinding("taxibus").toInstance(new TaxibusServiceRoutingModule(controler));
-			}
-			
-		});
 		controler.addOverridingModule(new AbstractModule() {
 			
 			@Override
 			public void install() {
+				
+//				addPlanStrategyBinding(DefaultStrategy.SubtourModeChoice.name()+"_new").toProvider(new javax.inject.Provider<PlanStrategy>(){
+//					@Override
+//					public PlanStrategy get() {
+//						SubtourModeChoice choice  = new SubtourModeChoice(controler.getConfig().global().getNumberOfThreads(), availableModes, chainBasedModes, false);
+//						choice.setPermissibleModesCalculator(taxibusPermissibleModesCalculator);
+//						final Builder builder = new Builder(new RandomPlanSelector<Plan, Person>());
+//						builder.addStrategyModule(new ReRoute(controler.getScenario()));
+//						builder.addStrategyModule(choice);
+//						return builder.build();
+//					}
+//				});
+				addEventHandlerBinding().toInstance(dispatcher);
 				bindMobsim().toProvider(TaxibusQSimProvider.class);
+				addRoutingModuleBinding("taxibus").toInstance(new TaxibusServiceRoutingModule(controler));
+
 				bind(MatsimVrpContext.class).toInstance(context);
+				bind(LineDispatcher.class).toInstance(dispatcher);
+
 			}
 		});
 		
 		
 		
+		
+	}
+
+
+	public void initiateTaxibusses() {
+		initiateTaxibusses(false);	
 	} 
 }

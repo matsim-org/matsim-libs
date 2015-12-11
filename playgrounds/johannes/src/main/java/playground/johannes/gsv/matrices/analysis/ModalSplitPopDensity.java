@@ -78,6 +78,7 @@ public class ModalSplitPopDensity {
         KeyMatrix odCounts = new KeyMatrix();
 
         Discretizer discr = FixedSampleSizeDiscretizer.create(zoneRho.values(), 1, 20);
+//        Discretizer discr = new DummyDiscretizer();
 
         Set<String> keys = carVol.keys();
         keys.addAll(railVol.keys());
@@ -95,23 +96,22 @@ public class ModalSplitPopDensity {
                 if (air == null) air = 0.0;
 
                 if (car > 0 && rail > 0 && air > 0) {
-                        double fromRho = zoneRho.get(from);
-                        double toRho = zoneRho.get(to);
+                    double total = car + rail + air;
 
-                        fromRho = discr.discretize(fromRho);
-                        toRho = discr.discretize(toRho);
+                    double fromRho = zoneRho.get(from);
+                    double toRho = zoneRho.get(to);
 
-                        String fromRhoStr = String.valueOf(fromRho);
-                        String toRhoStr = String.valueOf(toRho);
-                        odCounts.add(fromRhoStr, toRhoStr, 1);
+                    fromRho = discr.discretize(fromRho);
+                    toRho = discr.discretize(toRho);
 
-                        double total = car + rail + air;
+                    String fromRhoStr = String.valueOf(fromRho);
+                    String toRhoStr = String.valueOf(toRho);
+                    odCounts.add(fromRhoStr, toRhoStr, 1);
+//                    odCounts.add(fromRhoStr, toRhoStr, total);
 
-                        carShare.add(fromRhoStr, toRhoStr, car / total);
-                        railShare.add(fromRhoStr, toRhoStr, rail / total);
-                        airShare.add(fromRhoStr, toRhoStr, air / total);
-
-
+                    carShare.add(fromRhoStr, toRhoStr, car / total);
+                    railShare.add(fromRhoStr, toRhoStr, rail / total);
+                    airShare.add(fromRhoStr, toRhoStr, air / total);
                 }
             }
             ProgressLogger.step();

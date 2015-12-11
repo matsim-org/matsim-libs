@@ -133,12 +133,12 @@ public class SubPopulationPlans4Patna {
 						String zoneId  = String.valueOf(id);
 
 						if(fromZoneId.equals(zoneId) ) {
-							p = GeometryUtils.getRandomPointsFromWard(feature);
+							p = GeometryUtils.getRandomPointsInsideFeature(feature);
 							Coord fromZoneCoord = new Coord(p.getX(), p.getY());
 							homeZoneCoordTransform = PatnaUtils.COORDINATE_TRANSFORMATION.transform(fromZoneCoord);
 						}
 						else if (toZoneId.equals(zoneId)){
-							q = GeometryUtils.getRandomPointsFromWard(feature);
+							q = GeometryUtils.getRandomPointsInsideFeature(feature);
 							Coord toZoneCoord = new Coord(q.getX(), q.getY());
 							workZoneCoordTransform= PatnaUtils.COORDINATE_TRANSFORMATION.transform(toZoneCoord);
 						}
@@ -151,11 +151,11 @@ public class SubPopulationPlans4Patna {
 
 						SimpleFeature feature = iterator.next();
 
-						p = GeometryUtils.getRandomPointsFromWard(feature);
+						p = GeometryUtils.getRandomPointsInsideFeature(feature);
 						Coord fromZoneCoord = new Coord(p.getX(), p.getY());
 						homeZoneCoordTransform = PatnaUtils.COORDINATE_TRANSFORMATION.transform(fromZoneCoord);
 
-						q = GeometryUtils.getRandomPointsFromWard(feature);
+						q = GeometryUtils.getRandomPointsInsideFeature(feature);
 						Coord toZoneCoord = new Coord(q.getX(), q.getY());
 						workZoneCoordTransform= PatnaUtils.COORDINATE_TRANSFORMATION.transform(toZoneCoord);
 					}

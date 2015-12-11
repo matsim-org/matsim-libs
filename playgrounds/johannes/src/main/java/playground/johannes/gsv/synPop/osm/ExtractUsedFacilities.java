@@ -29,6 +29,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.facilities.*;
 
 import java.util.HashSet;
 import java.util.Set;

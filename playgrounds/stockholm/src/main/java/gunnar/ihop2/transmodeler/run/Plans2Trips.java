@@ -20,6 +20,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.population.algorithms.XY2Links;
 
 /**
  * 
@@ -61,7 +62,7 @@ public class Plans2Trips {
 				getCoordinateTransformation(WGS84_EPSG3857, WGS84_SWEREF99));
 
 		// TODO NEW
-		this.actLocSampler.setZonesMustContainNodes(false);
+		this.actLocSampler.setZonesMustContainNodes(true);
 	}
 
 	// -------------------- IMPLEMENTATION --------------------
@@ -95,6 +96,8 @@ public class Plans2Trips {
 	}
 
 	public void createTripMakers(final String tripsFileName, final int cloneCnt) {
+
+		final XY2Links xy2links = new XY2Links(this.scenario);
 
 		for (Person person : new LinkedHashSet<>(this.scenario.getPopulation()
 				.getPersons().values())) {
@@ -139,6 +142,8 @@ public class Plans2Trips {
 					clonePlan.addActivity(newEndAct);
 					this.resampleLocation(person, newEndAct);
 					newEndAct.setEndTime(Time.UNDEFINED_TIME);
+					
+					xy2links.run(clone);
 				}
 			}
 
@@ -162,11 +167,10 @@ public class Plans2Trips {
 		final String buildingsFile = "./ihop2-data/demand-input/by_full_EPSG3857_2.shp";
 
 		final Plans2Trips p2t = new Plans2Trips(
-				"./ihop2-data/playground/200.plans.xml",
-				// "./ihop2-data/matsim-output/ITERS/it.0/0.plans.xml.gz",
+				"./ihop2-data/without-toll/ITERS/it.200/200.plans.xml.gz",
 				populationFile, networkFile, zonesFile, WGS84_EPSG3857,
 				buildingsFile);
-		p2t.createTripMakers("./ihop2-data/playground/200.trips.xml",
+		p2t.createTripMakers("./ihop2-data/without-toll/ITERS/it.200/200.trips-from-plans_0.50.xml",
 		// "./ihop2-data/playground/initial-trips.xml",
 				cloneCnt);
 

@@ -34,6 +34,7 @@ import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.common.gis.CartesianDistanceCalculator;
 import org.matsim.contrib.common.gis.DistanceCalculator;
 import org.matsim.contrib.common.util.ProgressLogger;

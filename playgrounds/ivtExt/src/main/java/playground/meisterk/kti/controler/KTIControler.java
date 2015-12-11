@@ -25,7 +25,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.NetworkRoute;
-
 import playground.meisterk.kti.config.KtiConfigGroup;
 import playground.meisterk.kti.controler.listeners.CalcLegTimesKTIListener;
 import playground.meisterk.kti.controler.listeners.KtiPopulationPreparation;

@@ -45,14 +45,16 @@ public final class PatnaUtils {
 	public static final CoordinateTransformation COORDINATE_TRANSFORMATION = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84,"EPSG:24345");
 	
 	public static final String INPUT_FILES_DIR = "../../../../repos/shared-svn/projects/patnaIndia/inputs/";
-	public static final String ZONE_FILE = PatnaUtils.INPUT_FILES_DIR+"/wardFile/Wards.shp";	
+	public static final String ZONE_FILE = PatnaUtils.INPUT_FILES_DIR+"/wardFile/Wards.shp";
+	public static final int COUNT_SCALE_FACTOR = 100;
 	
 	public enum PatnaActivityTypes {
 		home, work, educational, social, other, unknown;
 	}
 	
-	public static final Collection <String> MAIN_MODES = Arrays.asList("car","motorbike","bike");
-	public static final Collection <String> ALL_MODES = Arrays.asList("car","motorbike","bike","pt","walk");
+	public static final Collection <String> URBAN_MAIN_MODES = Arrays.asList("car","motorbike","bike");
+	public static final Collection <String> ALL_MAIN_MODES = Arrays.asList("car","motorbike","bike","truck");
+	public static final Collection <String> ALL_MODES = Arrays.asList("car","motorbike","truck","bike","pt","walk");
 	
 	private PatnaUtils(){} 
 	

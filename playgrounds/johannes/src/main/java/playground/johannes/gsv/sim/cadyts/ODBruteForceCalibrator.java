@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.common.gis.CartesianDistanceCalculator;
 import org.matsim.contrib.common.gis.DistanceCalculator;
 import org.matsim.contrib.common.stats.Discretizer;
@@ -44,7 +45,8 @@ import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
-import playground.johannes.coopsim.mental.choice.ChoiceSet;
+import org.matsim.facilities.*;
+import org.matsim.contrib.common.collections.ChoiceSet;
 import playground.johannes.coopsim.utils.MatsimCoordUtils;
 import playground.johannes.gsv.zones.KeyMatrix;
 import playground.johannes.gsv.zones.MatrixOperations;
@@ -191,7 +193,7 @@ public class ODBruteForceCalibrator {
 
 			ChoiceSet<Tuple<String, String>> lowODKeys = new ChoiceSet<>(random);
 			for (Entry<Tuple<String, String>, Double> e : lowODs.entrySet()) {
-				lowODKeys.addChoice(e.getKey(), Math.abs(e.getValue()));// check
+				lowODKeys.addOption(e.getKey(), Math.abs(e.getValue()));// check
 																		// negative
 																		// weights
 			}
@@ -221,7 +223,7 @@ public class ODBruteForceCalibrator {
 							} else {
 								fails++;
 								if (fails > 100) {
-									lowODKeys.removeChoice(od);
+									lowODKeys.removeOption(od);
 									logger.info("Failed shifting for 100 times. Removing OD from choice set.");
 								}
 							}

@@ -34,6 +34,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.ControlerI;
 import org.matsim.core.controler.Injector;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.NetworkImpl;
@@ -85,7 +86,17 @@ public class ChangeLegModeIntegrationTest extends MatsimTestCase {
         Injector injector = Injector.createInjector(config, new AbstractModule() {
             @Override
             public void install() {
-				bind(Integer.class).annotatedWith(Names.named("iteration")).toInstance(0);
+				bind(ControlerI.class).toInstance(new ControlerI() {
+					@Override
+					public Integer getIterationNumber() {
+						return 0;
+					}
+
+					@Override
+					public void run() {
+
+					}
+				});
                 bind(Scenario.class).toInstance(scenario);
                 bind(EventsManager.class).toInstance(EventsUtils.createEventsManager());
                 install(new StrategyManagerModule());

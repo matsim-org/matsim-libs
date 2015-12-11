@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
@@ -37,9 +38,9 @@ import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
 import org.matsim.population.algorithms.XY2Links;
 import org.matsim.pt.PtConstants;
+import playground.ivt.maxess.prepareforbiogeme.framework.ChoiceSetSampler;
 import playground.ivt.maxess.prepareforbiogeme.framework.ChoicesIdentifier;
 import playground.ivt.maxess.prepareforbiogeme.framework.Converter;
-import playground.ivt.maxess.prepareforbiogeme.framework.ChoiceSetSampler;
 import playground.ivt.router.CachingRoutingModuleWrapper;
 import playground.ivt.router.TripSoftCache;
 import playground.ivt.utils.MoreIOUtils;
@@ -58,6 +59,9 @@ public class RunMzTripChoiceSetConversion {
 	public static void main( final String... args ) {
 		final PrismicConversionConfigGroup group = new PrismicConversionConfigGroup();
 		final Config config = ConfigUtils.loadConfig( args[ 0 ], group );
+		// random generators are obtained from MatsimRandom.getLocalInstance().
+		// Allow varying the seed from the config file
+		MatsimRandom.reset( config.global().getRandomSeed() );
 
 		if ( new File( group.getOutputPath() ).exists() ) throw new RuntimeException( group.getOutputPath()+" exists" );
 		MoreIOUtils.initOut( group.getOutputPath() );

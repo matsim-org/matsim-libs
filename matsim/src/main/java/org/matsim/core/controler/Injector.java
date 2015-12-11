@@ -41,6 +41,8 @@ import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.selectors.GenericPlanSelector;
 import org.matsim.core.router.RoutingModule;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.vis.snapshotwriters.SnapshotWriter;
 
 import javax.inject.Named;
@@ -60,8 +62,7 @@ public class Injector {
         com.google.inject.Injector bootstrapInjector = Guice.createInjector(new Module() {
             @Override
             public void configure(Binder binder) {
-                binder.requireExplicitBindings(); // For now, we are conservative
-                binder.disableCircularProxies(); // and disable any kind of magic.
+                binder.requireExplicitBindings(); // For now, we are conservative and disable this kind of magic.
                 binder.bind(Config.class).toInstance(config);
             }
         });
@@ -74,55 +75,47 @@ public class Injector {
             guiceModules.add(module);
         }
         com.google.inject.Injector realInjector = bootstrapInjector.createChildInjector(insertMapBindings(guiceModules));
-        System.out.flush() ; System.err.flush(); 
         for (Map.Entry<Key<?>, Binding<?>> entry : realInjector.getBindings().entrySet()) {
       	  Level level = Level.INFO ;
-//            logger.debug(String.format("%s\n-> %s", entry.getKey(), entry.getValue()));
       	  if ( entry.getKey().toString().contains("type=org.matsim") ) {
-//      		  logger.log( Level.WARN, entry.getKey() ); System.err.flush();
-//      		  logger.log( Level.WARN, entry.getKey().getAnnotation() ); System.err.flush();
-//      		  logger.log( Level.WARN, entry.getKey().getAnnotationType() ); System.err.flush();
-      		  logger.log( level, entry.getKey().getTypeLiteral() ); System.err.flush();
-//      		  logger.log( Level.WARN, entry.getKey().withoutAttributes() ); System.err.flush();
-      		  logger.log( level, "   -> " + entry.getValue().getProvider() ) ; System.out.flush(); 
-      		  
-//      		  logger.log( level, "   -> annotation type: " + entry.getValue().getKey().getAnnotationType() ) ;
-//      		  logger.log( level, "   -> annotation: " + entry.getValue().getKey().getAnnotation() ) ;
-
-//      		  try {
-//      			  logger.log( level, "   -> " + entry.getValue().getProvider().get().getClass() ) ; System.out.flush();
-//      		  } catch ( Exception ee ) {
-//      			  logger.log( level, "  -> not provided (only a problem if this is truly needed later)" ) ;
-//      		  }
-      		  // the above _instantiates_ the class, which is not what we want ( we just want the name ). 
-      		  
+      		  logger.log( level, entry.getKey().getTypeLiteral() );
+      		  logger.log(level, "   -> " + entry.getValue().getProvider());
       	  }
         }
         return fromGuiceInjector(realInjector);
     }
 
     private static Module insertMapBindings(List<Module> guiceModules) {
+        com.google.inject.AbstractModule routingModuleBindings = createMapBindingsForType(guiceModules, RoutingModule.class);
+        com.google.inject.AbstractModule travelTimeBindings = createMapBindingsForType(guiceModules, TravelTime.class);
+        com.google.inject.AbstractModule travelDisutilityFactoryBindings = createMapBindingsForType(guiceModules, TravelDisutilityFactory.class);
+        return Modules.combine(Modules.combine(guiceModules), routingModuleBindings, travelTimeBindings, travelDisutilityFactoryBindings);
+    }
+
+    private static <T> com.google.inject.AbstractModule createMapBindingsForType(List<Module> guiceModules, final Class<T> aClass) {
         final Set<String> modes = new HashSet<>();
         for (Element element : Elements.getElements(guiceModules)) {
             element.acceptVisitor(new DefaultElementVisitor<Object>() {
                 @Override
                 public <T> Object visit(Binding<T> binding) {
-                    if (binding.getKey().getTypeLiteral().getRawType().equals(RoutingModule.class)) {
-                        modes.add(((com.google.inject.name.Named) binding.getKey().getAnnotation()).value());
+                    if (binding.getKey().getTypeLiteral().getRawType().equals(aClass)) {
+                        if (binding.getKey().getAnnotation() instanceof com.google.inject.name.Named) {
+                            modes.add(((com.google.inject.name.Named) binding.getKey().getAnnotation()).value());
+                        }
                     }
                     return null;
                 }
             });
         }
-        return Modules.combine(Modules.combine(guiceModules), new com.google.inject.AbstractModule() {
+        return new com.google.inject.AbstractModule() {
             @Override
             protected void configure() {
-                MapBinder<String, RoutingModule> routingModuleMultibinder = MapBinder.newMapBinder(binder(), String.class, RoutingModule.class);
+                MapBinder<String, T> routingModuleMultibinder = MapBinder.newMapBinder(binder(), String.class, aClass);
                 for (String mode : modes) {
-                    routingModuleMultibinder.addBinding(mode).to(Key.get(RoutingModule.class, Names.named(mode)));
+                    routingModuleMultibinder.addBinding(mode).to(Key.get(aClass, Names.named(mode)));
                 }
             }
-        });
+        };
     }
 
     public static Injector fromGuiceInjector(com.google.inject.Injector injector) {

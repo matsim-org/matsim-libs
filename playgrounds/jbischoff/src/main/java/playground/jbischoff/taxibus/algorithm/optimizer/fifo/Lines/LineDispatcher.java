@@ -89,13 +89,16 @@ public class LineDispatcher implements ActivityStartEventHandler {
 				return line;
 			}
 		}
-		log.error("no taxibus line was found for request: Person " + req.getPassenger().getId().toString() + " from "
-				+ req.getFromLink().getId().toString() + " to " + req.getToLink().getId().toString());
+//		log.error("no taxibus line was found for request: Person " + req.getPassenger().getId().toString() + " from "
+//				+ req.getFromLink().getId().toString() + " to " + req.getToLink().getId().toString());
 		return null;
 	}
 
 	@Override
 	public void reset(int iteration) {
+		for (TaxibusLine line : this.lines.values()){
+			line.reset();
+		}
 	}
 
 	@Override

@@ -21,6 +21,7 @@
 package org.matsim.vis.otfvis;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.controler.ControlerI;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.vis.snapshotwriters.SnapshotWriter;
 
@@ -35,9 +36,9 @@ public class OTFFileWriterFactory implements Provider<SnapshotWriter> {
 	private final int iteration;
 
 	@Inject
-	OTFFileWriterFactory(Scenario scenario, @Named("iteration") int iteration, OutputDirectoryHierarchy controlerIO) {
+	OTFFileWriterFactory(Scenario scenario, ControlerI controler, OutputDirectoryHierarchy controlerIO) {
 		this.scenario = scenario;
-		this.iteration = iteration;
+		this.iteration = controler.getIterationNumber();
 		this.controlerIO = controlerIO;
 	}
 

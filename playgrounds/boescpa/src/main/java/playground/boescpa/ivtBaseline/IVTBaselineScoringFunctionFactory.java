@@ -21,6 +21,8 @@
 
 package playground.boescpa.ivtBaseline;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
@@ -81,6 +83,10 @@ public class IVTBaselineScoringFunctionFactory implements ScoringFunctionFactory
 		scoringFunctionAccumulator.addScoringFunction(
 				new BlackListedActivityScoringFunction(blackList,
 						new CharyparNagelOpenTimesActivityScoring(params, scenario.getActivityFacilities())));
+		//		CharyparNagelActivityScoring warns if first activity of the day and last activity of the day are not equal.
+		//		As we have home and remote_home activities, this case occurs on intention very often in our scenarios.
+		//		Ergo we have to suppress this output or we will get GBs of logs...
+		Logger.getLogger( org.matsim.core.scoring.functions.CharyparNagelActivityScoring.class ).setLevel( Level.ERROR );
 
 		// legs
 		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(params, scenario.getNetwork()));

@@ -63,7 +63,7 @@ public class PopulationBasedTaxiVehicleCreator
 
 	private String networkFile = "C:/Users/Joschka/Documents/shared-svn/projects/audi_av/scenario/networkc.xml.gz";
 	private String shapeFile = "C:/Users/Joschka/Documents/shared-svn/projects/audi_av/shp/Planungsraum.shp";
-	private String vehiclesFilePrefix = "C:/Users/Joschka/Documents/shared-svn/projects/audi_av/scenario/taxi_vehicles_";
+	private String vehiclesFilePrefix = "C:/Users/Joschka/Documents/shared-svn/projects/audi_av/scenario/v100pct/taxi_vehicles_";
 	private String populationData = "C:/Users/Joschka/Documents/shared-svn/projects/audi_av/shp/bevoelkerung.txt";
 	
 	private Scenario scenario ;
@@ -74,7 +74,7 @@ public class PopulationBasedTaxiVehicleCreator
 
 	
 	public static void main(String[] args) {
-		for (int i = 100000; i<251000 ; i=i+10000 ){
+		for (int i = 50000; i<100000 ; i=i+10000 ){
 			PopulationBasedTaxiVehicleCreator tvc = new PopulationBasedTaxiVehicleCreator();
 			System.out.println(i);
 			tvc.run(i);
@@ -113,7 +113,7 @@ public class PopulationBasedTaxiVehicleCreator
 		for (int i = 0 ; i< amount; i++){
 		Point p = TaxiDemandWriter.getRandomPointInFeature(random, geometry.get(wrs.select()));
 		Link link = ((NetworkImpl) scenario.getNetwork()).getNearestLinkExactly(MGC.point2Coord(p));
-        Vehicle v = new VehicleImpl(Id.create("rt"+i, Vehicle.class), link, 5, Math.round(1), Math.round(48*3600));
+        Vehicle v = new VehicleImpl(Id.create("rt"+i, Vehicle.class), link, 5, Math.round(1), Math.round(25*3600));
         vehicles.add(v);
 
 		}

@@ -41,10 +41,10 @@ public class ControlerSingapore {
 	//private static DestinationChoiceBestResponseContext dcContext;
 	
 	public static void main(String[] args) {
-		Config config = ConfigUtils.loadConfig(args[0], new DestinationChoiceConfigGroup());
+		Config config = ConfigUtils.loadConfig(args[0]/*, new DestinationChoiceConfigGroup()*/);
 		final Controler controler = new Controler(ScenarioUtils.loadScenario(config));
         Logger logger = Logger.getLogger("SINGAPORECONTROLER");
-        logger.warn("Doing the workaround to associate facilities with car links...");
+        /*logger.warn("Doing the workaround to associate facilities with car links...");
 		for(Link link:controler.getScenario().getNetwork().getLinks().values()) {
 			Set<String> modes = new HashSet<String>(link.getAllowedModes());
 			modes.add("pt");
@@ -64,7 +64,7 @@ public class ControlerSingapore {
 				true ?
 						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
 						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
-		// controler.addControlerListener(new CalibrationStatsListener(controler.getEvents(), new String[]{args[1], args[2]}, 1, "Travel Survey (Benchmark)", "Red_Scheme", new HashSet<Id<Person>>()));
+		// controler.addControlerListener(new CalibrationStatsListener(controler.getEvents(), new String[]{args[1], args[2]}, 1, "Travel Survey (Benchmark)", "Red_Scheme", new HashSet<Id<Person>>()));*/
         WaitTimeStuckCalculator waitTimeCalculator = new WaitTimeStuckCalculator(controler.getScenario().getPopulation(), controler.getScenario().getTransitSchedule(), controler.getConfig().travelTimeCalculator().getTraveltimeBinSize(), (int) (controler.getConfig().qsim().getEndTime()-controler.getConfig().qsim().getStartTime()));
 		controler.getEvents().addHandler(waitTimeCalculator);
         logger.warn("About to init StopStopTimeCalculator...");
@@ -73,10 +73,10 @@ public class ControlerSingapore {
         logger.warn("About to init TransitRouterWSImplFactory...");
         controler.addOverridingModule(new TransitRouterEventsWSModule(waitTimeCalculator.getWaitTimes(), stopStopTimeCalculator.getStopStopTimes()));
         //controler.setTransitRouterFactory(new TransitRouterEventsWSFactory(controler.getScenario(), waitTimeCalculator.getWaitTimes(), stopStopTimeCalculator.getStopStopTimes()));
-		controler.setScoringFunctionFactory(new CharyparNagelOpenTimesScoringFunctionFactory(controler.getConfig().planCalcScore(), controler.getScenario()));
+		//controler.setScoringFunctionFactory(new CharyparNagelOpenTimesScoringFunctionFactory(controler.getConfig().planCalcScore(), controler.getScenario()));
 		// comment: I would argue that when you add waitTime/stopTime to the router, you also need to adapt the scoring function accordingly.
 		// kai, sep'13
-		controler.addOverridingModule(new AbstractModule() {
+		/*controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				addPlanStrategyBinding("TransitLocationChoice").toProvider(new javax.inject.Provider<PlanStrategy>() {
@@ -86,7 +86,7 @@ public class ControlerSingapore {
 					}
 				});
 			}
-		});
+		});*/
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
