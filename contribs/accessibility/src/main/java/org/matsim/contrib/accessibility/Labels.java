@@ -9,8 +9,8 @@ public class Labels {
 	public static final String ACCESSIBILITY_BY_PT = "pt_accessibility";
 	
 	public static final String ZONE_ID = "zone_id";
-	public static final String X_COORDINATE = "x_coord";
-	public static final String Y_COORDINATE = "y_coord";
+	public static final String X_COORDINATE = "xcoord";
+	public static final String Y_COORDINATE = "ycoord";
 	public static final String TIME = "time";
 //	public static final String NEARESTNODE_ID = "nearest_node_id";
 //	public static final String NEARESTNODE_X_COORD = "x_coord_nn";

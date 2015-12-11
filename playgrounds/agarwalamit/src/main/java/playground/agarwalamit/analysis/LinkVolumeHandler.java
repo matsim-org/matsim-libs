@@ -18,22 +18,26 @@
  * *********************************************************************** */
 package playground.agarwalamit.analysis;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.LinkEnterEvent;
-import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * @author amit
  */
-public class LinkVolumeHandler implements LinkEnterEventHandler {
+public class LinkVolumeHandler implements LinkLeaveEventHandler {
 
 	private final Logger logger = Logger.getLogger(LinkVolumeHandler.class);
 	private Map<Id<Link>, Map<Integer,Double>> linkId2Time2Volume = new HashMap<Id<Link>, Map<Integer,Double>>();
+	private Map<Id<Link>, Map<Integer,List<Id<Vehicle>>>> linkId2Time2Persons = new HashMap<Id<Link>, Map<Integer,List<Id<Vehicle>>>>();
 
 	public LinkVolumeHandler () {
 		this.logger.info("Starting volume count on links.");
@@ -42,35 +46,59 @@ public class LinkVolumeHandler implements LinkEnterEventHandler {
 	@Override
 	public void reset(int iteration) {
 		this.linkId2Time2Volume.clear();
+		this.linkId2Time2Persons.clear();
 	}
 
 	private int getSlot(double time){
 		return (int)time/3600;
 	}
 	@Override
-	public void handleEvent(LinkEnterEvent event) {
+	public void handleEvent(LinkLeaveEvent event) {
 		int slotInt = getSlot(event.getTime());
 		Map<Integer, Double> volsTime = new HashMap<Integer, Double>();
+		Map<Integer, List<Id<Vehicle>>> time2persons = new HashMap<Integer, List<Id<Vehicle>>>();
 
-		if(this.linkId2Time2Volume.containsKey(event.getLinkId())){
-			volsTime =	this.linkId2Time2Volume.get(event.getLinkId());
+		Id<Link> linkId = event.getLinkId();
+		if(this.linkId2Time2Volume.containsKey(linkId)){
+			volsTime =	this.linkId2Time2Volume.get(linkId);
+			
+			time2persons = this.linkId2Time2Persons.get(linkId);
+			List<Id<Vehicle>> vehicles = new ArrayList<>();
+			
 			if(volsTime.containsKey(slotInt)) {
+				
+				vehicles = time2persons.get(slotInt);
+				vehicles.add(event.getVehicleId());
+				
 				double counter = (volsTime.get(slotInt));
 				double newCounter = counter+1;
 				volsTime.put(slotInt, newCounter);
-				this.linkId2Time2Volume.put(event.getLinkId(), volsTime);
-			}
-			else {
+				this.linkId2Time2Volume.put(linkId, volsTime);
+				
+			}else {
+				
+				vehicles.add(event.getVehicleId());
+				time2persons.put(slotInt, vehicles);
+				this.linkId2Time2Persons.put(linkId, time2persons);
 				volsTime.put(slotInt, 1.0);
-				this.linkId2Time2Volume.put(event.getLinkId(), volsTime);
+				this.linkId2Time2Volume.put(linkId, volsTime);
 			} 
 		}else {
+			List<Id<Vehicle>> vehicles = new ArrayList<>();
+			vehicles.add(event.getVehicleId());
+			time2persons.put(slotInt,vehicles);
+			this.linkId2Time2Persons.put(linkId, time2persons);
+			
 			volsTime.put(slotInt, 1.0);
-			this.linkId2Time2Volume.put(event.getLinkId(), volsTime);
+			this.linkId2Time2Volume.put(linkId, volsTime);
 		}
 	}
 
 	public Map<Id<Link>, Map<Integer, Double>> getLinkId2TimeSlot2LinkVolume(){
 		return this.linkId2Time2Volume;
+	}
+	
+	public Map<Id<Link>, Map<Integer, List<Id<Vehicle>>>> getLinkId2TimeSlot2VehicleIds(){
+		return this.linkId2Time2Persons;
 	}
 }

@@ -46,8 +46,14 @@ public class TransmodelerMATSim {
 
 	public static final String TRANSMODELERCOMMAND_ELEMENT = "transmodelercommand";
 
+	public static final String MOBILITYSIMULATION_ELEMENT = "mobilitysimulation";
+
 	public static final String TRANSMODELERCONFIG = "transmodeler";
-	
+
+	public static enum MOBSIM {
+		matsim, transmodeler
+	};
+
 	private static void checkNonNull(final String fileName,
 			final String definition) {
 		if (fileName == null) {
@@ -62,6 +68,12 @@ public class TransmodelerMATSim {
 			Logger.getLogger(TransmodelerMATSim.class.getName()).severe(
 					definition + " \"" + fileName + "\" could not be found.");
 		}
+	}
+
+	public static void fatal(final String msg) {
+		Logger.getLogger(MATSimDummy.class.getName()).severe(
+				"FATAL ERROR: " + msg);
+		System.exit(-1);
 	}
 
 	public static void main(String[] args) {
@@ -162,6 +174,17 @@ public class TransmodelerMATSim {
 		Logger.getLogger(TransmodelerMATSim.class.getName()).info(
 				TRANSMODELERCOMMAND_ELEMENT + " = " + transmodelerCommand);
 
+		final String mobsimName = config.get(IHOP2_ELEMENT,
+				MOBILITYSIMULATION_ELEMENT);
+		MOBSIM mobsim = null;
+		try {
+			mobsim = MOBSIM.valueOf(mobsimName);
+		} catch (IllegalArgumentException e) {
+			fatal("Mobility simulation \"" + mobsimName + "\" is unknown.");
+		}
+		Logger.getLogger(MATSimDummy.class.getName()).info(
+				MOBILITYSIMULATION_ELEMENT + " = " + mobsim);
+
 		Logger.getLogger(TransmodelerMATSim.class.getName()).info(
 				"... program parameters look OK so far.");
 
@@ -174,45 +197,60 @@ public class TransmodelerMATSim {
 		Logger.getLogger(MATSimDummy.class.getName()).info(
 				"Loading matsim configuration file: " + matsimConfigFileName
 						+ " ... ");
+
 		final org.matsim.core.config.Config matsimConfig = ConfigUtils
 				.loadConfig(matsimConfigFileName);
 		matsimConfig.getModule("controler").addParam("overwriteFiles",
 				"deleteDirectoryIfExists");
 		matsimConfig.getModule("controler").addParam("outputDirectory",
 				"./matsim-output." + iteration + "/");
+
 		matsimConfig.network().setLaneDefinitionsFile(lanesFileName);
 		matsimConfig.travelTimeCalculator().setCalculateLinkToLinkTravelTimes(
 				true);
 		matsimConfig.controler().setLinkToLinkRoutingEnabled(true);
-
-		final ConfigGroup transmodelerConfigGroup = new ConfigGroup(
-				TRANSMODELERCONFIG);
-		transmodelerConfigGroup.addParam(EVENTS_ELEMENT, eventsFileName);
-		transmodelerConfigGroup.addParam(TRANSMODELERFOLDER_ELEMENT,
-				transmodelerFolderName);
-		transmodelerConfigGroup.addParam(TRANSMODELERCOMMAND_ELEMENT,
-				transmodelerCommand);
-		transmodelerConfigGroup.addParam(LINKATTRIBUTE_FILENAME_ELEMENT,
-				linkAttributeFileName);
-		transmodelerConfigGroup.addParam(PATHS_ELEMENT, pathsFileName);
-		transmodelerConfigGroup.addParam(TRIPS_ELEMENT, tripsFileName);
-		matsimConfig.addModule(transmodelerConfigGroup);
 
 		/*
 		 * -------------------- RUN MATSIM --------------------
 		 */
 
 		Logger.getLogger(MATSimDummy.class.getName()).info(
-				"Running MATSim/Transmodeler ...");
+				"Starting Assignment ...");
 
 		final Controler controler = new Controler(matsimConfig);
 		controler.addOverridingModule(new InvertedNetworkRoutingModuleModule());
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				binder().bind(Mobsim.class).to(TransmodelerMobsim.class);
-			}
-		});
+
+		if (MOBSIM.transmodeler.equals(mobsim)) {
+
+			Logger.getLogger(MATSimDummy.class.getName()).info(
+					"Binding Transmodeler to MATSim ...");
+
+			final ConfigGroup transmodelerConfigGroup = new ConfigGroup(
+					TRANSMODELERCONFIG);
+			transmodelerConfigGroup.addParam(EVENTS_ELEMENT, eventsFileName);
+			transmodelerConfigGroup.addParam(TRANSMODELERFOLDER_ELEMENT,
+					transmodelerFolderName);
+			transmodelerConfigGroup.addParam(TRANSMODELERCOMMAND_ELEMENT,
+					transmodelerCommand);
+			transmodelerConfigGroup.addParam(LINKATTRIBUTE_FILENAME_ELEMENT,
+					linkAttributeFileName);
+			transmodelerConfigGroup.addParam(PATHS_ELEMENT, pathsFileName);
+			transmodelerConfigGroup.addParam(TRIPS_ELEMENT, tripsFileName);
+			matsimConfig.addModule(transmodelerConfigGroup);
+
+			controler.addOverridingModule(new AbstractModule() {
+				@Override
+				public void install() {
+					binder().bind(Mobsim.class).to(TransmodelerMobsim.class);
+				}
+			});
+
+		} else if (MOBSIM.matsim.equals(mobsim)) {
+
+			Logger.getLogger(MATSimDummy.class.getName()).info(
+					"Using MATSim's queueing simulation");
+
+		}
 
 		controler.run();
 

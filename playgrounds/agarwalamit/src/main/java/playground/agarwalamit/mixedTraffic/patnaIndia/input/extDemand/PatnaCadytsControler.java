@@ -18,11 +18,10 @@
  * *********************************************************************** */
 package playground.agarwalamit.mixedTraffic.patnaIndia.input.extDemand;
 
-import java.util.Arrays;
-
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.cadyts.car.CadytsContext;
+import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
 import org.matsim.contrib.cadyts.general.CadytsScoring;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -69,7 +68,11 @@ public class PatnaCadytsControler {
 		config.vehicles().setVehiclesFile(patnaVehicles);
 
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-
+		
+		CadytsConfigGroup cadytsConfigGroup = ConfigUtils.addOrGetModule(config, CadytsConfigGroup.GROUP_NAME, CadytsConfigGroup.class);
+		cadytsConfigGroup.setStartTime(06*3600);
+		cadytsConfigGroup.setEndTime(18*3600-1);
+		
 		final Controler controler = new Controler(config);
 		controler.setDumpDataAtEnd(true);
 
@@ -90,9 +93,6 @@ public class PatnaCadytsControler {
 		final CadytsContext cContext = new CadytsContext(controler.getConfig());
 		controler.addControlerListener(cContext);
 
-		controler.getConfig().getModule("cadytsCar").addParam("startTime", "00:00:00");
-		controler.getConfig().getModule("cadytsCar").addParam("endTime", "24:00:00");
-
 		// scoring function
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
 			final CharyparNagelScoringParametersForPerson parameters = new SubpopulationCharyparNagelScoringParameters( controler.getScenario() );
@@ -107,7 +107,6 @@ public class PatnaCadytsControler {
 				sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
 				
 				final CadytsScoring<Link> scoringFunction = new CadytsScoring<Link>(person.getSelectedPlan(), config, cContext);
-				//final double cadytsScoringWeight = 0.0;
 				final double cadytsScoringWeight = 15.0;
 				scoringFunction.setWeightOfCadytsCorrection(cadytsScoringWeight) ;
 				sumScoringFunction.addScoringFunction(scoringFunction );
@@ -128,10 +127,10 @@ public class PatnaCadytsControler {
 		config.network().setInputFile("../../../../repos/runs-svn/patnaIndia/run108/input/network_diff_linkSpeed.xml.gz");
 
 		config.qsim().setFlowCapFactor(0.01);
-		config.qsim().setStorageCapFactor(0.01);
-		config.qsim().setMainModes(Arrays.asList("car","bike","motorbike","truck"));
+		config.qsim().setStorageCapFactor(0.03);
+		config.qsim().setMainModes(PatnaUtils.ALL_MAIN_MODES);
 		config.qsim().setLinkDynamics(LinkDynamics.PassingQ.name());
-		config.qsim().setEndTime(30*3600);
+		config.qsim().setEndTime(36*3600);
 		config.qsim().setSnapshotStyle(SnapshotStyle.queue);
 		config.qsim().setVehiclesSource(VehiclesSource.fromVehiclesData);
 
@@ -143,19 +142,21 @@ public class PatnaCadytsControler {
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(100);
 		config.controler().setOutputDirectory("../../../../repos/runs-svn/patnaIndia/run108/outerCordonOutput/");
-		config.controler().setWritePlansInterval(50);
-		config.controler().setWriteEventsInterval(50);
+		config.controler().setWritePlansInterval(100);
+		config.controler().setWriteEventsInterval(100);
 
-		StrategySettings strategySettings1 = new StrategySettings();
-		strategySettings1.setStrategyName("ReRoute");
-		strategySettings1.setWeight(0.3);
-		strategySettings1.setDisableAfter(80);
-		config.strategy().addStrategySettings(strategySettings1);
+		StrategySettings reRoute = new StrategySettings();
+		reRoute.setStrategyName("ReRoute");
+		reRoute.setWeight(0.3);
+		config.strategy().addStrategySettings(reRoute);
 		
 		StrategySettings expChangeBeta = new StrategySettings();
 		expChangeBeta.setStrategyName("ChangeExpBeta");
-		expChangeBeta.setWeight(0.85);
+		expChangeBeta.setWeight(0.7);
 		config.strategy().addStrategySettings(expChangeBeta);
+		
+		config.strategy().setFractionOfIterationsToDisableInnovation(0.8);
+		config.strategy().setMaxAgentPlanMemorySize(6);
 
 		ActivityParams ac1 = new ActivityParams("E2E_Start");
 		ac1.setTypicalDuration(10*60*60);
@@ -176,13 +177,12 @@ public class PatnaCadytsControler {
 		config.plans().setRemovingUnneccessaryPlanAttributes(true);
 		config.vspExperimental().addParam("vspDefaultsCheckingLevel", "abort");
 		config.vspExperimental().setWritingOutputEvents(true);
-		config.vspExperimental().setWritingOutputEvents(true);
-
+		
 		config.planCalcScore().setMarginalUtlOfWaiting_utils_hr(0);
 		config.planCalcScore().setPerforming_utils_hr(6.0);
 
 		ModeParams car = new ModeParams("car");
-		car.setConstant(-3.30);
+		car.setConstant(0.0);
 		car.setMarginalUtilityOfTraveling(0.0);
 		config.planCalcScore().addModeParams(car);
 
@@ -192,7 +192,7 @@ public class PatnaCadytsControler {
 		config.planCalcScore().addModeParams(bike);
 
 		ModeParams motorbike = new ModeParams("motorbike");
-		motorbike.setConstant(-2.20);
+		motorbike.setConstant(0.0);
 		motorbike.setMarginalUtilityOfTraveling(0.0);
 		config.planCalcScore().addModeParams(motorbike);
 
@@ -201,7 +201,7 @@ public class PatnaCadytsControler {
 		truck.setMarginalUtilityOfTraveling(0.0);
 		config.planCalcScore().addModeParams(truck);
 
-		config.plansCalcRoute().setNetworkModes(Arrays.asList("car","bike","motorbike","truck"));
+		config.plansCalcRoute().setNetworkModes(PatnaUtils.ALL_MAIN_MODES);
 
 		//following is necessary to override all defaults for teleportation.
 		ModeRoutingParams mrp = new ModeRoutingParams("pt");

@@ -187,7 +187,8 @@ public class Simulator {
         ODCalibrator odDistribution = new ODCalibratorBuilder().build(refMatrix, dataPool, layerName, "NO", 100000);
         long delay = (long)Double.parseDouble(config.getParam(MODULE_NAME, "calibrationDelay"));
         DelayedHamiltonian odDistributionDelayed = new DelayedHamiltonian(odDistribution, delay);
-        hamiltonian.addComponent(odDistributionDelayed, 1);
+        hamiltonian.addComponent(odDistributionDelayed, Double.parseDouble(config.getParam(MODULE_NAME,
+                "theta_matrix")));
 		/*
 		Setup listeners for changes on geo distance.
 		 */

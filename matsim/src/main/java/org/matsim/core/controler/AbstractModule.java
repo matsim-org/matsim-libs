@@ -57,8 +57,6 @@ import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Names;
 import com.google.inject.util.Modules;
 
-import tutorial.programming.planStrategyForRemoval.RunPlanSelectorForRemovalExample;
-
 /**
  * "Designed for inheritance."
  * Extend this class, overwrite configure, and use the methods of this class to
@@ -96,6 +94,7 @@ public abstract class AbstractModule implements Module {
 		this.config = config;
 	}
 
+	@Override
 	public final void configure(Binder binder) {
 		if (this.config == null) {
 			this.config = bootstrapInjector.getInstance(Config.class);
@@ -128,7 +127,7 @@ public abstract class AbstractModule implements Module {
 	}
 
 	/**
-	 * See {@link RunControlerListenerExample} for an example.
+	 * See {@link tutorial.programming.example07ControlerListener.RunControlerListenerExample} for an example.
 	 * 
 	 * @see {@link ControlerListener}
 	 */
@@ -137,7 +136,7 @@ public abstract class AbstractModule implements Module {
 	}
 
 	/**
-	 * See {@link RunPlanSelectorForRemovalExample} for an example.
+	 * See {@link tutorial.programming.planStrategyForRemoval.RunPlanSelectorForRemovalExample} for an example.
 	 * 
 	 * @see {@link StrategyManagerModule}, {@link StrategyManagerConfigLoader}
 	 */

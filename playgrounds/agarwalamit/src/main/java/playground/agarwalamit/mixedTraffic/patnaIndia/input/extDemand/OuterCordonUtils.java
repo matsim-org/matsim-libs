@@ -18,6 +18,7 @@
  * *********************************************************************** */
 package playground.agarwalamit.mixedTraffic.patnaIndia.input.extDemand;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -25,6 +26,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * @author amit
@@ -80,8 +82,15 @@ public class OuterCordonUtils {
 			this.linkIdAsString = linkId;
 		}
 
-		public String getLinkId(){
-			return linkIdAsString;
+		public Id<Link> getLinkId(){
+			return Id.createLinkId( linkIdAsString );
+		}
+		
+		public static OuterCordonLinks getOuterCordonNumberFromLink(String linkId){
+			for(OuterCordonLinks l :OuterCordonLinks.values()){
+				if(l.getLinkId().toString().equals(linkId)) return l;
+			}
+			return null;
 		}
 	}
 
@@ -117,8 +126,7 @@ public class OuterCordonUtils {
 	}
 
 	public static Id<Link> getCountStationLinkId(final String countingStationKey){
-		String linkId = OuterCordonLinks.valueOf(countingStationKey).getLinkId();
-		return Id.createLinkId(linkId);
+		return OuterCordonLinks.valueOf(countingStationKey).getLinkId();
 	}
 
 	public static double getDirectionalFactorFromOuterCordonKey(final String countingStationKey, final String extIntKey){
@@ -140,5 +148,29 @@ public class OuterCordonUtils {
 	public static String getCountingStationKey(final String countingStationNumber, final String countingDirection){
 		String prefix = countingDirection.equalsIgnoreCase("In") ? "X2P" : "P2X" ;
 		return countingStationNumber.toUpperCase()+"_"+prefix.toUpperCase();
+	}
+	
+	public static List<Id<Link>> getExternalToInternalCountStationLinkIds(){
+		List<Id<Link>> links = new ArrayList<>();
+		for(OuterCordonLinks l : OuterCordonLinks.values()){
+			if(l.toString().split("_")[1].equals("X2P")) links.add( l.getLinkId() ) ;
+		}
+		return links;
+	}
+	
+	public static List<Id<Link>> getInternalToExternalCountStationLinkIds(){
+		List<Id<Link>> links = new ArrayList<>();
+		for(OuterCordonLinks l : OuterCordonLinks.values()){
+			if(l.toString().split("_")[1].equals("P2X")) links.add( l.getLinkId() ) ;
+		}
+		return links;
+	}
+	
+	public static boolean isVehicleFromThroughTraffic(Id<Vehicle> vehicleId){
+		return vehicleId.toString().split("_")[2].equals("E2E");
+	}
+	
+	public static boolean isVehicleCommuter(Id<Vehicle> vehicleId){
+		return vehicleId.toString().split("_")[2].equals("E2I");
 	}
 }

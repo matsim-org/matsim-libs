@@ -49,12 +49,12 @@ public class ProductionRunner {
 		final String buildingShapeFileName = "./ihop2-data/demand-input/by_full_EPSG3857_2.shp";
 		final String populationFileName = "./ihop2-data/demand-input/trips.xml";
 
-		final String initialPlansFile = // "./ihop2-data/playground/initial-trips.xml";
-		"./ihop2-data/demand-output/initial-plans_" + populationSample + ".xml";
+		final String initialPlansFile = "./ihop2-data/without-toll/ITERS/it.200/200.plans.xml.gz";
+		// "./ihop2-data/demand-output/initial-plans_" + populationSample + ".xml";
 
 		final String configFileName = "./ihop2-data/matsim-input/matsim-config.xml";
-		final double networkUpscaleFactor = 2.0;
-		final String lastIteration = "1";
+		final double networkUpscaleFactor = 2;
+		final String lastIteration = "200";
 		final boolean useLanes = false;
 		final boolean useRoadPricing = false;
 		final boolean doRouteChoice = true; // changes "module 2"'s choice proba
@@ -65,7 +65,7 @@ public class ProductionRunner {
 		 */
 
 		final boolean doNetworkConversion = false;
-		final boolean doPopulationGeneration = true;
+		final boolean doPopulationGeneration = false;
 		final boolean runMATSim = true;
 
 		/*

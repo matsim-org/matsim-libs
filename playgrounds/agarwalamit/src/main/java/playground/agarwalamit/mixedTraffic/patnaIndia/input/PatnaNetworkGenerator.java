@@ -20,7 +20,9 @@ package playground.agarwalamit.mixedTraffic.patnaIndia.input;
 
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -53,7 +55,9 @@ public class PatnaNetworkGenerator {
 	public static void main(String[] args) throws IOException  {  
 		PatnaNetworkGenerator png =  new PatnaNetworkGenerator();
 		png.startProcessingFile();
-		new NetworkWriter(png.getPatnaNetwork()).write("../../../../repos/runs-svn/patnaIndia/run108/input/network_diff_linkSpeed.xml.gz");
+		String outNetwork = "../../../../repos/runs-svn/patnaIndia/run108/input/network_diff_linkSpeed.xml.gz";
+		new NetworkWriter(png.getPatnaNetwork()).write(outNetwork);
+		LOG.info("The network file is written to - "+ outNetwork);
 	}
 
 	public void startProcessingFile() {
@@ -66,9 +70,8 @@ public class PatnaNetworkGenerator {
 		tabularFileParserConfig.setFileName(inputFileNetwork);
 		tabularFileParserConfig.setDelimiterTags(new String[] {","});                               
 		tabularFileParserConfig.setStartTag("linkId");											
-		TabularFileHandler tabularFileHandler = new TabularFileHandler()
-				// ZZ_TODO : increase capacity of roundabout links.
-				{            
+		TabularFileHandler tabularFileHandler = new TabularFileHandler() {
+			// ZZ_TODO : increase capacity of roundabout links.            
 			@ Override
 			public void startRow(String[] row) {
 
@@ -134,37 +137,70 @@ public class PatnaNetworkGenerator {
 				else if ( roadWidth <12 && roadWidth >= 9) numberoflanes =3;
 
 				double linkLength = 1000 * Double.parseDouble(lengthInKm);
+				double capacity = capacityOfLink(widthOfRoad);
 
 				link1.setFreespeed(freeSpeedInMPS);
-				link1.setCapacity(capacityOfLink(widthOfRoad));
+				link1.setCapacity(capacity);
 				link1.setNumberOfLanes(numberoflanes);
 				link1.setLength(linkLength);
-				link1.setAllowedModes(new HashSet<>(PatnaUtils.ALL_MODES));
+				link1.setAllowedModes(new HashSet<>(PatnaUtils.ALL_MAIN_MODES));
 				network.addLink(link1);
 
 				link2.setFreespeed(freeSpeedInMPS);
-				link2.setCapacity(capacityOfLink(widthOfRoad));
+				link2.setCapacity(capacity);
 				link2.setNumberOfLanes(numberoflanes);
 				link2.setLength(linkLength);
-				link2.setAllowedModes(new HashSet<>(PatnaUtils.ALL_MODES));
+				link2.setAllowedModes(new HashSet<>(PatnaUtils.ALL_MAIN_MODES));
 				network.addLink(link2);
 			}
-				};
+		};
 
-				TabularFileParser tabularFileParser = new TabularFileParser();
-				tabularFileParser.parse(tabularFileParserConfig, tabularFileHandler);  
-				new NetworkCleaner().run(network);
+		TabularFileParser tabularFileParser = new TabularFileParser();
+		tabularFileParser.parse(tabularFileParserConfig, tabularFileHandler);  
+		new NetworkCleaner().run(network);
 
-				LOG.info("Number of links in the network are"+ network.getLinks().size()+" and number of nodes in the link are"+network.getNodes().size());
+		LOG.info("Number of links in the network are"+ network.getLinks().size()+" and number of nodes in the link are"+network.getNodes().size());
 
-				NetworkSimplifier simplifier = new NetworkSimplifier();
-				Set<Integer> nodeTypesToMerge = new TreeSet<Integer>();
+		NetworkSimplifier simplifier = new NetworkSimplifier();
+		Set<Integer> nodeTypesToMerge = new TreeSet<Integer>();
 
-				nodeTypesToMerge.add(Integer.valueOf(4));
-				nodeTypesToMerge.add(Integer.valueOf(5));
+		nodeTypesToMerge.add(Integer.valueOf(4));
+		nodeTypesToMerge.add(Integer.valueOf(5));
 
-				simplifier.setNodesToMerge(nodeTypesToMerge);
-				simplifier.run(network);
+		simplifier.setNodesToMerge(nodeTypesToMerge);
+		simplifier.run(network);
+
+		// manual cleaning of the network.
+		// remove links
+		List<String> links2remove = Arrays.asList("1478","147810000",
+				"1128-126410000-1262-126810000-126710000-127010000-126610000-1271-1258-128510000-71710000-1672-167310000-165510000-167710000-167610000-163910000-170410000-163810000-1735",
+				"173510000-1638-1704-1639-1676-1677-1655-1673-167210000-717-1285-125810000-127110000-1266-1270-1267-1268-126210000-1264-112810000",
+				"1841910000-18503","1850310000-18419",
+				"18174","1817410000",
+				"1861710000","18617",
+				"145310000-1340-157710000-157110000-1569-156310000-68410000-1122-112310000-1124-109410000-110510000-1106-1101-1104-110210000-1103", //a useless links, dont know, y agents are diverted on it.
+				"110310000-1102-110410000-110110000-110610000-1105-1094-112410000-1123-112210000-684-1563-156910000-1571-1577-134010000-1453",
+				"145810000-1461-146210000","1462-146110000-1458","145510000","1455","1470-1471","147110000-147010000");
+		for (String str : links2remove){
+			network.removeLink(Id.createLinkId(str));
+			LOG.warn("The link "+str+" is removed from the network.");
+		}
+
+		// increase capacity
+		{//it looks a dead end link, but part of a highway, capacity can be something like -- 1800 at least in both directions.
+			network.getLinks().get(Id.createLinkId("13800-13851-13857-13860")).setCapacity(1800.);
+			network.getLinks().get(Id.createLinkId("1386010000-1385710000-1385110000-1380010000")).setCapacity(1800.); 
+		}
+		{//a major link, increase capacity from 300 to at least 1000.0
+			network.getLinks().get(Id.createLinkId("858810000-8593-8592-8596-8534-8581-779610000-8111-8099-"
+					+ "8104-8105-8101-8103-8084-8097-8091-8094-7959-8015-7986-800810000-7999-493-3204-3195")).setCapacity(1800.);
+			network.getLinks().get(Id.createLinkId("319510000-320410000-49310000-799910000-8008-798610000-"
+					+ "801510000-795910000-809410000-809110000-809710000-808410000-810310000-810110000-810510000-810410000-809910000-811110000-7796-858110000-853410000-859610000-859210000-859310000-8588")).setCapacity(1800.); 
+		}
+		{//a major link, increase capacity from 300 to at least 1000.0
+			network.getLinks().get(Id.createLinkId("191610000-314110000")).setCapacity(1000.);
+			network.getLinks().get(Id.createLinkId("3141-1916")).setCapacity(1000.);
+		}
 	}    
 
 	public Network getPatnaNetwork() {

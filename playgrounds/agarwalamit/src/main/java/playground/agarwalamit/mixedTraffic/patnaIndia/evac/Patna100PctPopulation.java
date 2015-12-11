@@ -120,7 +120,7 @@ public class Patna100PctPopulation {
 				for (int j=0; j<100; j++){ //run with 100% sample
 
 					String travelMode = getTravelMode(parts [8]);
-					if(PatnaUtils.MAIN_MODES.contains(travelMode)) {
+					if(PatnaUtils.URBAN_MAIN_MODES.contains(travelMode)) {
 						Population pop = scenario.getPopulation();
 						PopulationFactory populationFactory = pop.getFactory();
 

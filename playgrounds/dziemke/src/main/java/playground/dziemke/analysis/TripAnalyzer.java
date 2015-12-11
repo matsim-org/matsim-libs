@@ -88,7 +88,10 @@ public class TripAnalyzer {
 //	    String cemdapPersonFile = "D:/Workspace/data/cemdapMatsimCadyts/input/cemdap_berlin/19/persons1.dat"; // wrong!!!
 //	    String cemdapPersonFile = "D:/Workspace/data/cemdapMatsimCadyts/input/cemdap_berlin/18/persons1.dat";
 //	    String cemdapPersonFile = "D:/Workspace/data/cemdapMatsimCadyts/input/cemdap_berlin/21/persons1.dat";
-	    String cemdapPersonFile = "../../../../Workspace/data/cemdapMatsimCadyts/input/cemdap_berlin/21/persons1.dat";
+	    
+//	    String cemdapPersonFile = "../../../../Workspace/data/cemdapMatsimCadyts/input/cemdap_berlin/21/persons1.dat";
+	    String cemdapPersonFile = "../../../../Workspace/shared-svn/projects/cemdapMatsimCadyts/scenario/cemdap_berlin/21/persons1.dat";
+	    
 //	    String cemdapPersonFile = "/Users/dominik/Workspace/data/cemdapMatsimCadyts/input/cemdap_berlin/21/persons1.dat";
 	    
 	    //String outputDirectory = "D:/Workspace/data/cemdapMatsimCadyts/output/" + runId + "/analysis";
@@ -98,15 +101,18 @@ public class TripAnalyzer {
 //	    String outputDirectory = "D:/Workspace/runs-svn/other/" + runId + "/analysis";
 	    
 //	    String shapeFileBerlin = "D:/Workspace/data/cemdapMatsimCadyts/input/shapefiles/Berlin_DHDN_GK4.shp";
-	    String shapeFileBerlin = "../../../../Workspace/data/cemdapMatsimCadyts/input/shapefiles/Berlin_DHDN_GK4.shp";
+	    
+//	    String shapeFileBerlin = "../../../../Workspace/data/cemdapMatsimCadyts/input/shapefiles/Berlin_DHDN_GK4.shp";
+	    String shapeFileBerlin = "../../../../Workspace/shared-svn/projects/cemdapMatsimCadyts/scenario/shapefiles/Berlin_DHDN_GK4.shp";
+	    
 //	    String shapeFileBerlin = "/Users/dominik/Workspace/data/cemdapMatsimCadyts/input/shapefiles/Berlin_DHDN_GK4.shp";
 	    Map<Integer, Geometry> zoneGeometries = ShapeReader.read(shapeFileBerlin, "NR");
 	    Geometry berlinGeometry = zoneGeometries.get(planningAreaId);
 	    
 	       
 	    // Output naming
-	    Integer usedIt = Integer.parseInt(usedIteration);
-	    if (!usedIt.equals(150)) {
+	    Integer iteration4Analysis = Integer.parseInt(usedIteration);
+	    if (!iteration4Analysis.equals(150)) {
 	    	outputDirectory = outputDirectory + "_" + usedIteration;
 	    }
 	    

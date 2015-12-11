@@ -48,6 +48,13 @@ public abstract class CachedElement implements Attributable {
         return delegate.getAttribute(key);
     }
 
+    /*
+    FIXME: experimental
+     */
+    public String getAttributeDirect(String key) {
+        return delegate.getAttribute(key);
+    }
+
     @Override
     public String setAttribute(String key, String value) {
         invalidateCache(key);

@@ -139,21 +139,32 @@ public class PatnaExternalDemandGenerator {
 						Plan plan = pf.createPlan();
 						Activity firstAct = pf.createActivityFromCoord( "E2I_Start", firstLastActCoord);
 						firstAct.setEndTime( (timebin-1)*3600 + random.nextDouble()*3600);
-						plan.addActivity(firstAct);
-						plan.addLeg(pf.createLeg(mode));
 						
 						Point randomPointInZone = GeometryUtils.getRandomPointsInsideFeatures(area2ZonesLists.get(area));
 						Coord middleActCoord = PatnaUtils.COORDINATE_TRANSFORMATION.transform( new Coord(randomPointInZone.getX(),randomPointInZone.getY()) );
 						
 						Activity middleAct = pf.createActivityFromCoord("E2I_mid", middleActCoord);
 						//ZZ_TODO : here the act duration is assigned randomly between 7 to 8 hours. This means, the agent will be counted in reverse direction of the same counting station.
-						double middleActEndTime = firstAct.getEndTime() + 7*3600 + random.nextDouble() * 3600;
-						if(middleActEndTime > 24*3600 ) middleActEndTime = middleActEndTime - 24*3600;
-						middleAct.setEndTime( middleActEndTime );
-						plan.addActivity(middleAct);
-						plan.addLeg(pf.createLeg(mode));
+						double middleActEndTime = firstAct.getEndTime() + 6*3600 + random.nextDouble() * 3600;
 						Activity lastAct = pf.createActivityFromCoord( "E2I_Start", firstLastActCoord);
-						plan.addActivity(lastAct);
+
+						if(middleActEndTime > 24*3600 ) { // midAct - startAct - midAct ==> this will give count in both time bins for desired counting station
+							middleActEndTime = middleActEndTime - 24*3600;
+							middleAct.setEndTime( middleActEndTime );
+							plan.addActivity(middleAct);
+							plan.addLeg(pf.createLeg(mode));
+							firstAct.setEndTime( middleActEndTime + 6*3600 + random.nextDouble() * 3600 );
+							plan.addActivity(firstAct);
+							plan.addLeg(pf.createLeg(mode));
+							plan.addActivity( pf.createActivityFromCoord("E2I_mid", middleActCoord)  );
+						} else { // startAct - midAct - startAct
+							plan.addActivity(firstAct);
+							plan.addLeg(pf.createLeg(mode));
+							middleAct.setEndTime( middleActEndTime );
+							plan.addActivity(middleAct);
+							plan.addLeg(pf.createLeg(mode));
+							plan.addActivity(lastAct);	
+						}
 						p.addPlan(plan);
 					}
 				}
