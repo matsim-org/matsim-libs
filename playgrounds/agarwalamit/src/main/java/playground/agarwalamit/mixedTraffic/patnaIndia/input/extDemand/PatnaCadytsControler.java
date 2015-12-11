@@ -90,8 +90,8 @@ public class PatnaCadytsControler {
 		controler.addControlerListener(cContext);
 		
 		CadytsConfigGroup cadytsConfigGroup = ConfigUtils.addOrGetModule(config, CadytsConfigGroup.GROUP_NAME, CadytsConfigGroup.class);
-		cadytsConfigGroup.setStartTime(06*3600);
-		cadytsConfigGroup.setEndTime(18*3600-1);
+		cadytsConfigGroup.setStartTime(0);
+		cadytsConfigGroup.setEndTime(24*3600-1);
 
 		// scoring function
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
