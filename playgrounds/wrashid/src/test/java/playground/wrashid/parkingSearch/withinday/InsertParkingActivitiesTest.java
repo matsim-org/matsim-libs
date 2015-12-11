@@ -133,7 +133,6 @@ public class InsertParkingActivitiesTest extends MatsimTestCase {
 
 		assertEquals(9, plan.getPlanElements().size());
 
-<<<<<<< HEAD
 		TravelTime travelTime = TravelTimeCalculator.create(sc.getNetwork(), sc.getConfig().travelTimeCalculator()).getLinkTravelTimes() ;
 
 		TravelDisutility travelDisutility = new RandomizingTimeDistanceTravelDisutility.Builder( TransportMode.car ).createTravelDisutility(travelTime, sc.getConfig().planCalcScore() ) ;
@@ -144,9 +143,6 @@ public class InsertParkingActivitiesTest extends MatsimTestCase {
 		builder.setTravelDisutility(travelDisutility);
 		
 		TripRouter tripRouter = builder.build( sc ).get() ;
-=======
-		TripRouter tripRouter = TripRouterFactoryBuilderWithDefaults.createTripRouterProvider(sc, new DijkstraFactory(), null).get();
->>>>>>> refs/heads/master
 
 		// initialize routes
 		new PersonPrepareForSim(new PlanRouter(tripRouter), sc).run(sc.getPopulation());
