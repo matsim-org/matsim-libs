@@ -71,7 +71,7 @@ public class GroupSubtourModeChoiceFactory extends AbstractConfigurableSelection
 		strategy.addStrategyModule(
 				new IndividualBasedGroupStrategyModule(
 					new SubtourModeChoice(
-						sc.getConfig(), tripRouterProvider) ) );
+							tripRouterProvider, sc.getConfig().global(), sc.getConfig().subtourModeChoice()) ) );
 
 		// TODO: add an option to enable or disable this part?
 		final VehicleRessources vehicles =

@@ -49,7 +49,7 @@ public class ParkAndRideChangeLegModeStrategy implements PlanStrategy {
 	public ParkAndRideChangeLegModeStrategy(final Controler controler, Provider<TripRouter> tripRouterProvider) {
 		StageActivityTypes pnrList = ParkAndRideConstants.PARKING_ACT_TYPE;
 
-		addStrategyModule( new TripsToLegsModule( controler.getConfig() , pnrList, tripRouterProvider) );
+		addStrategyModule( new TripsToLegsModule(pnrList, tripRouterProvider, controler.getConfig().global()) );
 		addStrategyModule( new ChangeLegMode( controler.getConfig() ) );
 		addStrategyModule( new ReRoute(controler.getScenario(), tripRouterProvider) );
 		addStrategyModule( new ParkAndRideInvalidateStartTimes( controler ) );

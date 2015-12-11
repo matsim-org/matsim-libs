@@ -43,7 +43,7 @@ public class HitchHikingInsertionRemovalStrategy implements PlanStrategy {
 	public HitchHikingInsertionRemovalStrategy(
 			final Controler controler, Provider<TripRouter> tripRouterProvider) {
 		delegate = new PlanStrategyImpl( new RandomPlanSelector() );
-		delegate.addStrategyModule( new TripsToLegsModule( controler.getConfig(), tripRouterProvider) );
+		delegate.addStrategyModule( new TripsToLegsModule(tripRouterProvider, controler.getConfig().global()) );
 		delegate.addStrategyModule( new HitchHikingInsertionRemovalModule( controler ) );
 		delegate.addStrategyModule( new ReRoute(controler.getScenario(), tripRouterProvider) );
 	}

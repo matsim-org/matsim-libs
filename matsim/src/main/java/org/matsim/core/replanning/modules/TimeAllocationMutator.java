@@ -23,8 +23,10 @@ package org.matsim.core.replanning.modules;
 import com.google.inject.Inject;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup.ActivityDurationInterpretation;
+import org.matsim.core.config.groups.TimeAllocationMutatorConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.router.TripRouter;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -53,12 +55,12 @@ public class TimeAllocationMutator extends AbstractMultithreadedModule {
 	 * Creates a new TimeAllocationMutator with a mutation range as defined in
 	 * the configuration (module "TimeAllocationMutator", param "mutationRange").
 	 */
-	public TimeAllocationMutator(Config config, Provider<TripRouter> tripRouterProvider) {
-		super(config.global());
+	public TimeAllocationMutator(Provider<TripRouter> tripRouterProvider, PlansConfigGroup plansConfigGroup, TimeAllocationMutatorConfigGroup timeAllocationMutatorConfigGroup, GlobalConfigGroup globalConfigGroup) {
+		super(globalConfigGroup);
 		this.tripRouterProvider = tripRouterProvider;
-		this.mutationRange = config.timeAllocationMutator().getMutationRange();
-		this.affectingDuration = config.timeAllocationMutator().isAffectingDuration() ;
-		this.activityDurationInterpretation = (config.plans().getActivityDurationInterpretation());
+		this.mutationRange = timeAllocationMutatorConfigGroup.getMutationRange();
+		this.affectingDuration = timeAllocationMutatorConfigGroup.isAffectingDuration() ;
+		this.activityDurationInterpretation = (plansConfigGroup.getActivityDurationInterpretation());
 	}
 
 	public TimeAllocationMutator(Config config, Provider<TripRouter> tripRouterProvider, final double mutationRange, boolean affectingDuration) {

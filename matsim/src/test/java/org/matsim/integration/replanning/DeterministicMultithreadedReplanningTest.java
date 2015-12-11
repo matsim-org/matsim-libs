@@ -23,14 +23,12 @@ package org.matsim.integration.replanning;
 import com.google.inject.Singleton;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.ControlerDefaults;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.StrategyManager;
@@ -39,7 +37,6 @@ import org.matsim.core.replanning.modules.TimeAllocationMutator;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.utils.misc.CRCChecksum;
-import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.MatsimTestUtils;
 
 import javax.inject.Provider;
@@ -79,7 +76,7 @@ public class DeterministicMultithreadedReplanningTest {
 			config.controler().setOutputDirectory(testUtils.getOutputDirectory() + "/run1/");
 			TestControler controler = new TestControler(config, strategyManager);
 			PlanStrategyImpl strategy = new PlanStrategyImpl(new RandomPlanSelector());
-			strategy.addStrategyModule(new TimeAllocationMutator(config, TripRouterFactoryBuilderWithDefaults.createDefaultTripRouterFactoryImpl(controler.getScenario())));
+			strategy.addStrategyModule(new TimeAllocationMutator(TripRouterFactoryBuilderWithDefaults.createDefaultTripRouterFactoryImpl(controler.getScenario()), config.plans(), config.timeAllocationMutator(), config.global()));
 			strategyManager.addStrategyForDefaultSubpopulation(strategy, 1.0);
 			controler.run();
 		}
@@ -89,7 +86,7 @@ public class DeterministicMultithreadedReplanningTest {
 			config.controler().setOutputDirectory(testUtils.getOutputDirectory() + "/run2/");
 			TestControler controler = new TestControler(config, strategyManager);
 			PlanStrategyImpl strategy = new PlanStrategyImpl(new RandomPlanSelector());
-			strategy.addStrategyModule(new TimeAllocationMutator(config, TripRouterFactoryBuilderWithDefaults.createDefaultTripRouterFactoryImpl(controler.getScenario())));
+			strategy.addStrategyModule(new TimeAllocationMutator(TripRouterFactoryBuilderWithDefaults.createDefaultTripRouterFactoryImpl(controler.getScenario()), config.plans(), config.timeAllocationMutator(), config.global()));
 			strategyManager.addStrategyForDefaultSubpopulation(strategy, 1.0);
 			controler.run();
 		}
@@ -130,7 +127,7 @@ public class DeterministicMultithreadedReplanningTest {
 			config.controler().setOutputDirectory(testUtils.getOutputDirectory() + "/run1/");
 			TestControler controler = new TestControler(config, strategyManager);
 			strategy.addStrategyModule(new ReRoute(controler.getScenario(), TripRouterFactoryBuilderWithDefaults.createDefaultTripRouterFactoryImpl(controler.getScenario()))); // finish strategy configuration
-			strategy.addStrategyModule(new TimeAllocationMutator(config, TripRouterFactoryBuilderWithDefaults.createDefaultTripRouterFactoryImpl(controler.getScenario())));
+			strategy.addStrategyModule(new TimeAllocationMutator(TripRouterFactoryBuilderWithDefaults.createDefaultTripRouterFactoryImpl(controler.getScenario()), config.plans(), config.timeAllocationMutator(), config.global()));
 			controler.run();
 		}
 		{
@@ -143,7 +140,7 @@ public class DeterministicMultithreadedReplanningTest {
 			config.controler().setOutputDirectory(testUtils.getOutputDirectory() + "/run2/");
 			TestControler controler2 = new TestControler(config, strategyManager2);
 			strategy2.addStrategyModule(new ReRoute(controler2.getScenario(), TripRouterFactoryBuilderWithDefaults.createDefaultTripRouterFactoryImpl(controler2.getScenario()))); // finish strategy configuration
-			strategy2.addStrategyModule(new TimeAllocationMutator(config, TripRouterFactoryBuilderWithDefaults.createDefaultTripRouterFactoryImpl(controler2.getScenario())));
+			strategy2.addStrategyModule(new TimeAllocationMutator(TripRouterFactoryBuilderWithDefaults.createDefaultTripRouterFactoryImpl(controler2.getScenario()), config.plans(), config.timeAllocationMutator(), config.global()));
 			controler2.run();
 		}
 

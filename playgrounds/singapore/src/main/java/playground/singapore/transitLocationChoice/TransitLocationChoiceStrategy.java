@@ -51,7 +51,7 @@ public class TransitLocationChoiceStrategy implements PlanStrategy {
 		filter.filter(net, modes);
 		((DestinationChoiceConfigGroup)scenario.getConfig().getModule("locationchoice")).setAlgorithm(DestinationChoiceConfigGroup.Algotype.localSearchRecursive);
 		addStrategyModule(new DestinationChoice(tripRouterProvider, scenario));
-		addStrategyModule(new TimeAllocationMutator(scenario.getConfig(), tripRouterProvider));
+		addStrategyModule(new TimeAllocationMutator(tripRouterProvider, scenario.getConfig().plans(), scenario.getConfig().timeAllocationMutator(), scenario.getConfig().global()));
 		addStrategyModule(new ReRoute(scenario, tripRouterProvider));
 	}
 	

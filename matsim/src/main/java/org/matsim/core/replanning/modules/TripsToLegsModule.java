@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package org.matsim.core.replanning.modules;
 
-import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.router.CompositeStageActivityTypes;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripRouter;
@@ -43,8 +43,8 @@ public class TripsToLegsModule extends AbstractMultithreadedModule {
 	/**
 	 * Initializes an instance using the stage activity types from the controler
 	 */
-	public TripsToLegsModule(Config config, Provider<TripRouter> tripRouterProvider) {
-		this( config, null, tripRouterProvider);
+	public TripsToLegsModule(Provider<TripRouter> tripRouterProvider, GlobalConfigGroup globalConfigGroup) {
+		this(null, tripRouterProvider, globalConfigGroup);
 	}
 
 	/**
@@ -53,9 +53,10 @@ public class TripsToLegsModule extends AbstractMultithreadedModule {
 	 * @param controler
 	 * @param additionalBlackList a {@link StageActivityTypes} instance identifying
 	 * @param tripRouterProvider
+	 * @param globalConfigGroup
 	 */
-	public TripsToLegsModule(final Config config, final StageActivityTypes additionalBlackList, Provider<TripRouter> tripRouterProvider) {
-		super( config.global() );
+	public TripsToLegsModule(final StageActivityTypes additionalBlackList, Provider<TripRouter> tripRouterProvider, GlobalConfigGroup globalConfigGroup) {
+		super(globalConfigGroup);
 		this.tripRouterProvider = tripRouterProvider;
 		this.additionalBlackList = additionalBlackList;
 	}

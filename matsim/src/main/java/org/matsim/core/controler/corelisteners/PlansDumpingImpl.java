@@ -22,11 +22,9 @@ package org.matsim.core.controler.corelisteners;
 
 import org.apache.log4j.Logger;
 import org.matsim.analysis.IterationStopWatch;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
@@ -56,9 +54,9 @@ final class PlansDumpingImpl implements PlansDumping, BeforeMobsimListener {
 	private int writePlansInterval, firstIteration;
 
 	@Inject
-	PlansDumpingImpl(Config config) {
-		this.firstIteration = config.controler().getFirstIteration();
-		this.writePlansInterval = config.controler().getWritePlansInterval();
+	PlansDumpingImpl(ControlerConfigGroup config) {
+		this.firstIteration = config.getFirstIteration();
+		this.writePlansInterval = config.getWritePlansInterval();
 	}
 
 	@Override

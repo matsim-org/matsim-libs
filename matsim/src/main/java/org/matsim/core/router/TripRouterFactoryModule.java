@@ -28,9 +28,8 @@ import com.google.inject.name.Names;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.network.NetworkUtils;
@@ -114,7 +113,7 @@ public class TripRouterFactoryModule extends AbstractModule {
         SingleModeNetworksCache singleModeNetworksCache;
 
         @Inject
-        Config config;
+        PlanCalcScoreConfigGroup planCalcScoreConfigGroup;
 
         @Inject
         Network network;
@@ -159,7 +158,7 @@ public class TripRouterFactoryModule extends AbstractModule {
             LeastCostPathCalculator routeAlgo =
                     leastCostPathCalculatorFactory.createPathCalculator(
                             filteredNetwork,
-                            travelDisutilityFactory.createTravelDisutility(travelTime, config.planCalcScore()),
+                            travelDisutilityFactory.createTravelDisutility(travelTime, planCalcScoreConfigGroup),
                             travelTime);
 
             return DefaultRoutingModules.createNetworkRouter(mode, populationFactory,

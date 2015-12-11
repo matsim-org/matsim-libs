@@ -19,8 +19,9 @@
  * *********************************************************************** */
 package org.matsim.core.replanning.modules;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.GlobalConfigGroup;
+import org.matsim.core.config.groups.PlansConfigGroup;
+import org.matsim.core.config.groups.TimeAllocationMutatorConfigGroup;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
@@ -34,22 +35,17 @@ import javax.inject.Provider;
  * @author thibautd
  */
 public class TimeAllocationMutatorReRoutePlanStrategyFactory implements Provider<PlanStrategy> {
-	private Provider<TripRouter> tripRouterProvider;
-	private Config config;
-	private ActivityFacilities activityFacilities;
-
-	@Inject
-    TimeAllocationMutatorReRoutePlanStrategyFactory(Config config, ActivityFacilities activityFacilities, Provider<TripRouter> tripRouterProvider) {
-		this.config = config;
-		this.activityFacilities = activityFacilities;
-		this.tripRouterProvider = tripRouterProvider;
-	}
+	@Inject private Provider<TripRouter> tripRouterProvider;
+	@Inject private GlobalConfigGroup globalConfigGroup;
+	@Inject private TimeAllocationMutatorConfigGroup timeAllocationMutatorConfigGroup;
+	@Inject private PlansConfigGroup plansConfigGroup;
+	@Inject private ActivityFacilities activityFacilities;
 
     @Override
 	public PlanStrategy get() {
 		final PlanStrategyImpl strategy = new PlanStrategyImpl(new RandomPlanSelector());
-		strategy.addStrategyModule( new TimeAllocationMutator(config, tripRouterProvider) );
-		strategy.addStrategyModule( new ReRoute(config, activityFacilities, tripRouterProvider) );
+		strategy.addStrategyModule( new TimeAllocationMutator(tripRouterProvider, plansConfigGroup, timeAllocationMutatorConfigGroup, globalConfigGroup) );
+		strategy.addStrategyModule( new ReRoute(activityFacilities, tripRouterProvider, globalConfigGroup));
 		return strategy;
 	}
 }

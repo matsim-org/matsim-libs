@@ -22,6 +22,8 @@ package org.matsim.core.replanning.modules;
 
 
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.GlobalConfigGroup;
+import org.matsim.core.config.groups.SubtourModeChoiceConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.router.TripRouter;
 import org.matsim.population.algorithms.ChooseRandomLegModeForSubtour;
@@ -58,11 +60,11 @@ public class SubtourModeChoice extends AbstractMultithreadedModule {
 	private final String[] chainBasedModes;
 	private final String[] modes;
 	
-	public SubtourModeChoice(final Config config, Provider<TripRouter> tripRouterProvider) {
-		this( config.global().getNumberOfThreads(),
-				config.subtourModeChoice().getModes(),
-				config.subtourModeChoice().getChainBasedModes(),
-				config.subtourModeChoice().considerCarAvailability(), tripRouterProvider);
+	public SubtourModeChoice(Provider<TripRouter> tripRouterProvider, GlobalConfigGroup globalConfigGroup, SubtourModeChoiceConfigGroup subtourModeChoiceConfigGroup) {
+		this(globalConfigGroup.getNumberOfThreads(),
+				subtourModeChoiceConfigGroup.getModes(),
+				subtourModeChoiceConfigGroup.getChainBasedModes(),
+				subtourModeChoiceConfigGroup.considerCarAvailability(), tripRouterProvider);
 	}
 
 	public SubtourModeChoice(

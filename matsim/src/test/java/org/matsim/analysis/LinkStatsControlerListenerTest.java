@@ -36,6 +36,8 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.LinkStatsConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.ControlerDefaultsModule;
+import org.matsim.core.controler.Injector;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -58,8 +60,8 @@ public class LinkStatsControlerListenerTest {
 	@Test
 	public void testUseVolumesOfIteration() {
 		Config config = ConfigUtils.createConfig();
-		LinkStatsControlerListener lscl = new LinkStatsControlerListener(config, null, null, null, null);
-		
+		LinkStatsControlerListener lscl = Injector.createInjector(config, new ControlerDefaultsModule()).getInstance(LinkStatsControlerListener.class);
+
 		// test defaults
 		Assert.assertEquals(10, config.linkStats().getWriteLinkStatsInterval());
 		Assert.assertEquals(5, config.linkStats().getAverageLinkStatsOverIterations());

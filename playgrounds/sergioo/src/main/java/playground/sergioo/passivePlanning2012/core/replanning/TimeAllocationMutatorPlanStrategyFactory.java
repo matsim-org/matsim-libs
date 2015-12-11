@@ -31,7 +31,7 @@ public class TimeAllocationMutatorPlanStrategyFactory implements
         Provider<PlanStrategy> {
 
     private Scenario scenario;
-    private javax.inject.Provider<org.matsim.core.router.TripRouter> tripRouterProvider;
+    private Provider<org.matsim.core.router.TripRouter> tripRouterProvider;
 
     @Inject
     public TimeAllocationMutatorPlanStrategyFactory(Scenario scenario, Provider<TripRouter> tripRouterProvider) {
@@ -42,7 +42,7 @@ public class TimeAllocationMutatorPlanStrategyFactory implements
     @Override
 	public PlanStrategy get() {
 		BasePlanModulesStrategy strategy = new BasePlanModulesStrategy(scenario);
-		strategy.addStrategyModule(new TimeAllocationMutator(scenario.getConfig(), tripRouterProvider));
+		strategy.addStrategyModule(new TimeAllocationMutator(tripRouterProvider, scenario.getConfig().plans(), scenario.getConfig().timeAllocationMutator(), scenario.getConfig().global()));
 		return strategy;
 	}
 

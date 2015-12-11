@@ -36,6 +36,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.ControlerConfigGroup;
+import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.utils.charts.XYLineChart;
@@ -60,7 +62,8 @@ import javax.inject.Inject;
 
 public class TravelDistanceStats {
 
-	final private Config config;
+	private final ControlerConfigGroup controlerConfigGroup;
+	private final GlobalConfigGroup globalConfigGroup;
 	final private BufferedWriter out;
 	final private String fileName;
 
@@ -74,8 +77,8 @@ public class TravelDistanceStats {
 	private final static Logger log = Logger.getLogger(TravelDistanceStats.class);
 
 	@Inject
-	TravelDistanceStats(Config config, OutputDirectoryHierarchy controlerIO) {
-		this(config, controlerIO.getOutputFilename(Controler.FILENAME_TRAVELDISTANCESTATS), config.controler().isCreateGraphs());
+	TravelDistanceStats(ControlerConfigGroup controlerConfigGroup, GlobalConfigGroup globalConfigGroup, OutputDirectoryHierarchy controlerIO) {
+		this(controlerConfigGroup, globalConfigGroup, controlerIO.getOutputFilename(Controler.FILENAME_TRAVELDISTANCESTATS), controlerConfigGroup.isCreateGraphs());
 	}
 
 	/**
@@ -84,10 +87,15 @@ public class TravelDistanceStats {
 	 * @throws UncheckedIOException
 	 */
 	public TravelDistanceStats(final Config config, final String filename, final boolean createPNG) throws UncheckedIOException {
-		this.config = config;
+		this(config.controler(), config.global(), filename, createPNG);
+	}
+
+	TravelDistanceStats(ControlerConfigGroup controlerConfigGroup, GlobalConfigGroup globalConfigGroup, String filename, boolean createPNG) {
+		this.controlerConfigGroup = controlerConfigGroup;
+		this.globalConfigGroup = globalConfigGroup;
 		this.fileName = filename;
 		if (createPNG) {
-			int iterations = config.controler().getLastIteration() - config.controler().getFirstIteration();
+			int iterations = controlerConfigGroup.getLastIteration() - controlerConfigGroup.getFirstIteration();
 			if (iterations > 5000) {
 				iterations = 5000; // limit the history size
 			}
@@ -107,7 +115,7 @@ public class TravelDistanceStats {
 
 	public void addIteration(int iteration, Map<Id<Person>, Plan> map) {
 
-		int numOfThreads = this.config.global().getNumberOfThreads();
+		int numOfThreads = this.globalConfigGroup.getNumberOfThreads();
 		if (numOfThreads < 1) numOfThreads = 1;
 
 		initThreads(numOfThreads);
@@ -162,15 +170,15 @@ public class TravelDistanceStats {
 		}
 
 		if (this.history != null) {
-			int index = iteration - config.controler().getFirstIteration();
+			int index = iteration - controlerConfigGroup.getFirstIteration();
 			this.history[index] = (sumAvgPlanLegTravelDistanceExecuted / nofLegTravelDistanceExecuted);
 
-			if (iteration != config.controler().getFirstIteration()) {
+			if (iteration != controlerConfigGroup.getFirstIteration()) {
 				// create chart when data of more than one iteration is available.
 				XYLineChart chart = new XYLineChart("Leg Travel Distance Statistics", "iteration", "average of the average leg distance per plan ");
 				double[] iterations = new double[index + 1];
 				for (int i = 0; i <= index; i++) {
-					iterations[i] = i + config.controler().getFirstIteration();
+					iterations[i] = i + controlerConfigGroup.getFirstIteration();
 				}
 				double[] values = new double[index + 1];
 				System.arraycopy(this.history, 0, values, 0, index + 1);

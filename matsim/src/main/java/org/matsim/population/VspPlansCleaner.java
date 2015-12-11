@@ -38,18 +38,12 @@ import org.matsim.core.utils.misc.Time;
  */
 class VspPlansCleaner implements BeforeMobsimListener {
 
-    private final Config config;
-	private final Population population;
+	@Inject private PlansConfigGroup plansConfigGroup;
+	@Inject private Population population;
 
-    @Inject
-    VspPlansCleaner(Config config, Population population) {
-		this.config = config;
-		this.population = population;
-	}
-	
 	@Override
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
-		PlansConfigGroup.ActivityDurationInterpretation actDurInterp = ( config.plans().getActivityDurationInterpretation() ) ;
+		PlansConfigGroup.ActivityDurationInterpretation actDurInterp = (plansConfigGroup.getActivityDurationInterpretation() ) ;
 		for ( Person person : population.getPersons().values() ) {
 
 			Plan plan = person.getSelectedPlan() ; 
@@ -80,13 +74,13 @@ class VspPlansCleaner implements BeforeMobsimListener {
 						throw new IllegalStateException("should not happen") ;
 					}
 					
-					if ( config.plans().isRemovingUnneccessaryPlanAttributes() ) {
+					if (plansConfigGroup.isRemovingUnneccessaryPlanAttributes()) {
 						act.setStartTime(Time.UNDEFINED_TIME) ;
 					}
 					
 				} else if ( pe instanceof Leg ) {
 					Leg leg = (Leg) pe ;
-					if ( config.plans().isRemovingUnneccessaryPlanAttributes() ) {
+					if (plansConfigGroup.isRemovingUnneccessaryPlanAttributes()) {
 						leg.setDepartureTime(Time.UNDEFINED_TIME) ; // given by activity end time; everything else confuses
 						((LegImpl)leg).setArrivalTime(Time.UNDEFINED_TIME) ;
 						leg.setTravelTime( Time.UNDEFINED_TIME ); // added apr'2015

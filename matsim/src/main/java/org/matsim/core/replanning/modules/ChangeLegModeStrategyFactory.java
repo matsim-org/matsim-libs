@@ -19,7 +19,6 @@
 
 package org.matsim.core.replanning.modules;
 
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
@@ -46,7 +45,7 @@ public class ChangeLegModeStrategyFactory implements Provider<PlanStrategy> {
 	public PlanStrategy get() {
 		PlanStrategyImpl strategy = new PlanStrategyImpl(new RandomPlanSelector());
 		strategy.addStrategyModule(new ChangeLegMode(config));
-		strategy.addStrategyModule(new ReRoute(config, activityFacilities, tripRouterProvider));
+		strategy.addStrategyModule(new ReRoute(activityFacilities, tripRouterProvider, config.global()));
 		return strategy;
 	}
 

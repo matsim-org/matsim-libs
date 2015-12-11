@@ -20,9 +20,8 @@
 
 package org.matsim.core.replanning.modules;
 
-import com.google.inject.Inject;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
@@ -43,14 +42,14 @@ public class ReRoute extends AbstractMultithreadedModule {
 
 	private final Provider<TripRouter> tripRouterProvider;
 
-	ReRoute(Config config, ActivityFacilities facilities, Provider<TripRouter> tripRouterProvider) {
-		super(config.global());
+	ReRoute(ActivityFacilities facilities, Provider<TripRouter> tripRouterProvider, GlobalConfigGroup globalConfigGroup) {
+		super(globalConfigGroup);
 		this.facilities = facilities;
 		this.tripRouterProvider = tripRouterProvider;
 	}
 
 	public ReRoute(Scenario scenario, Provider<TripRouter> tripRouterProvider) {
-		this(scenario.getConfig(), scenario.getActivityFacilities(), tripRouterProvider);
+		this(scenario.getActivityFacilities(), tripRouterProvider, scenario.getConfig().global());
 	}
 
 	@Override

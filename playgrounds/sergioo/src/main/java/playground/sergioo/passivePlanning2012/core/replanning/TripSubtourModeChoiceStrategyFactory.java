@@ -43,7 +43,7 @@ public class TripSubtourModeChoiceStrategyFactory implements Provider<PlanStrate
 	public PlanStrategy get() {
 		BasePlanModulesStrategy strategy = new BasePlanModulesStrategy(scenario);
 		strategy.addStrategyModule(new TransitActsRemoverModule(scenario.getConfig().global()));
-		strategy.addStrategyModule(new SubtourModeChoice(scenario.getConfig(), tripRouterProvider));
+		strategy.addStrategyModule(new SubtourModeChoice(tripRouterProvider, scenario.getConfig().global(), scenario.getConfig().subtourModeChoice()));
 		strategy.addStrategyModule(new ReRoute(scenario, tripRouterProvider));
 		return strategy;
 	}

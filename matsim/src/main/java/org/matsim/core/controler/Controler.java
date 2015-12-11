@@ -240,7 +240,7 @@ public class Controler extends AbstractController implements ControlerI {
 		if (injectorCreated) {
 			setupOutputDirectory(injector.getInstance(OutputDirectoryHierarchy.class));
 		} else {
-			setupOutputDirectory(new OutputDirectoryHierarchy(config));
+			setupOutputDirectory(new OutputDirectoryHierarchy(config.controler()));
 		}
 		if (this.config.transit().isUseTransit()) {
 			setupTransitSimulation();

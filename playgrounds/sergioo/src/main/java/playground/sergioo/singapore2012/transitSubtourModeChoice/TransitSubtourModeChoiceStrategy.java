@@ -31,7 +31,7 @@ public class TransitSubtourModeChoiceStrategy implements PlanStrategy {
 		log.warn( "your stategy now uses vanilla SubtourModeChoice, not a hacked copy thereof" );
 		log.warn( "just set config.subtourModeChoice.considerCarAvailability to true in the config to get the same behavior" );
 		log.warn( "... but actually, you may just delete this strategy altogether, it does not provide anything matsim doesn't provide. td, 22. feb. 2013" );
-		delegate.addStrategyModule(new SubtourModeChoice(scenario.getConfig(), tripRouterProvider));
+		delegate.addStrategyModule(new SubtourModeChoice(tripRouterProvider, scenario.getConfig().global(), scenario.getConfig().subtourModeChoice()));
 		delegate.addStrategyModule(new ReRoute(scenario, tripRouterProvider));
 	}
 	

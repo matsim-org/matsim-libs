@@ -23,10 +23,9 @@
 package org.matsim.core.trafficmonitoring;
 
 import com.google.inject.Singleton;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.router.util.LinkToLinkTravelTime;
 import org.matsim.core.router.util.TravelTime;
@@ -87,7 +86,7 @@ public class TravelTimeCalculatorModule extends AbstractModule {
     private static class TravelTimeCalculatorProvider implements Provider<TravelTimeCalculator> {
 
         @Inject
-        Config config;
+        TravelTimeCalculatorConfigGroup config;
 
         @Inject
         EventsManager eventsManager;
@@ -97,7 +96,7 @@ public class TravelTimeCalculatorModule extends AbstractModule {
 
         @Override
         public TravelTimeCalculator get() {
-            TravelTimeCalculator travelTimeCalculator = TravelTimeCalculator.create(network, config.travelTimeCalculator());
+            TravelTimeCalculator travelTimeCalculator = TravelTimeCalculator.create(network, config);
             eventsManager.addHandler(travelTimeCalculator);
             return travelTimeCalculator;
         }

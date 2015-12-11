@@ -41,6 +41,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scoring.EventsToActivities.ActivityHandler;
@@ -58,8 +59,7 @@ import org.matsim.core.utils.io.IOUtils;
 class ScoringFunctionsForPopulation implements ActivityHandler, LegHandler {
 
 	private final static Logger log = Logger.getLogger(ScoringFunctionsForPopulation.class);
-
-	private Config config;
+	private final PlansConfigGroup plansConfigGroup;
 	private Network network;
 
 	/*
@@ -77,8 +77,8 @@ class ScoringFunctionsForPopulation implements ActivityHandler, LegHandler {
 	private final Map<Id<Person>, TDoubleCollection> partialScores = new LinkedHashMap<>();
 
 
-	ScoringFunctionsForPopulation(Config config, Network network, Population population, ScoringFunctionFactory scoringFunctionFactory) {
-		this.config = config;
+	ScoringFunctionsForPopulation(PlansConfigGroup plansConfigGroup, Network network, Population population, ScoringFunctionFactory scoringFunctionFactory) {
+		this.plansConfigGroup = plansConfigGroup;
 		this.network = network;
 		for (Person person : population.getPersons().values()) {
 			ScoringFunction data = scoringFunctionFactory.createNewScoringFunction(person);
@@ -138,7 +138,7 @@ class ScoringFunctionsForPopulation implements ActivityHandler, LegHandler {
 	}
 
 	public void writeExperiencedPlans(String iterationFilename) {
-		Population population = PopulationUtils.createPopulation(config);
+		Population population = PopulationUtils.createPopulation(plansConfigGroup, network);
 		for (Entry<Id<Person>, Plan> entry : this.agentRecords.entrySet()) {
 			Person person = PopulationUtils.createPerson(entry.getKey());
 			Plan plan = entry.getValue();

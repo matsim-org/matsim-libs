@@ -53,7 +53,7 @@ public class TimeAllocationWithReroute implements PlanStrategy {
 		this.tripRouterProvider = tripRouterProvider;
 		PlanStrategyImpl strategy = new PlanStrategyImpl(new RandomPlanSelector());
 		strategy.addStrategyModule(new TransitActsRemoverStrategy(scenario.getConfig()));
-		strategy.addStrategyModule(new TimeAllocationMutator(scenario.getConfig(), this.tripRouterProvider));
+		strategy.addStrategyModule(new TimeAllocationMutator(this.tripRouterProvider, scenario.getConfig().plans(), scenario.getConfig().timeAllocationMutator(), scenario.getConfig().global()));
 		strategy.addStrategyModule(new ReRoute(scenario, this.tripRouterProvider));
 		this.strategy = strategy;
 	}

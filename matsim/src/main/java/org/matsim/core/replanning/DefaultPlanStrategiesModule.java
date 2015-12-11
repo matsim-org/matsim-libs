@@ -23,11 +23,10 @@
 package org.matsim.core.replanning;
 
 import com.google.inject.TypeLiteral;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.replanning.modules.*;
 import org.matsim.core.replanning.selectors.*;
@@ -83,42 +82,32 @@ public class DefaultPlanStrategiesModule extends AbstractModule {
     
     private static class ExpBetaPlanSelectorForRemoval implements Provider<ExpBetaPlanSelector<Plan, Person>> {
 
-        private Config config;
-
-        @Inject
-        ExpBetaPlanSelectorForRemoval(Config config) {
-            this.config = config;
-        }
+        @Inject private PlanCalcScoreConfigGroup config;
 
         @Override
         public ExpBetaPlanSelector<Plan, Person> get() {
-            return new ExpBetaPlanSelector<>( - config.planCalcScore().getBrainExpBeta());
+            return new ExpBetaPlanSelector<>( - config.getBrainExpBeta());
         }
     }
 
     private static class ExpBetaPlanChangerForRemoval implements Provider<ExpBetaPlanChanger<Plan, Person>> {
 
-        private Config config;
-
-        @Inject
-        ExpBetaPlanChangerForRemoval(Config config) {
-            this.config = config;
-        }
+        @Inject private PlanCalcScoreConfigGroup config;
 
         @Override
         public ExpBetaPlanChanger<Plan, Person> get() {
-            return new ExpBetaPlanChanger<>( - config.planCalcScore().getBrainExpBeta());
+            return new ExpBetaPlanChanger<>( - config.getBrainExpBeta());
         }
     }
 
     private static class PathSizeLogitSelectorForRemoval implements Provider<PathSizeLogitSelector> {
 
-        @Inject Config config;
+        @Inject PlanCalcScoreConfigGroup config;
         @Inject Network network;
 
         @Override
         public PathSizeLogitSelector get() {
-            return new PathSizeLogitSelector(config.planCalcScore().getPathSizeLogitBeta(), -config.planCalcScore().getBrainExpBeta(),
+            return new PathSizeLogitSelector(config.getPathSizeLogitBeta(), -config.getBrainExpBeta(),
                     network);
         }
     }

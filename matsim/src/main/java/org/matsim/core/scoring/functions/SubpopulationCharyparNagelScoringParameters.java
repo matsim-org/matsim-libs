@@ -21,8 +21,8 @@ package org.matsim.core.scoring.functions;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.config.groups.ScenarioConfigGroup;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
@@ -41,15 +41,15 @@ public class SubpopulationCharyparNagelScoringParameters implements CharyparNage
 	private final Map<String, CharyparNagelScoringParameters> params = new HashMap<>();
 
 	@Inject
-	SubpopulationCharyparNagelScoringParameters(Config config, Population population) {
-		this.config = config.planCalcScore();
-		this.scConfig = config.scenario();
+	SubpopulationCharyparNagelScoringParameters(PlansConfigGroup plansConfigGroup, PlanCalcScoreConfigGroup planCalcScoreConfigGroup, ScenarioConfigGroup scenarioConfigGroup, Population population) {
+		this.config = planCalcScoreConfigGroup;
+		this.scConfig = scenarioConfigGroup;
 		this.personAttributes = population.getPersonAttributes();
-		this.subpopulationAttributeName = config.plans().getSubpopulationAttributeName();
+		this.subpopulationAttributeName = plansConfigGroup.getSubpopulationAttributeName();
 	}
 
 	public SubpopulationCharyparNagelScoringParameters(Scenario scenario) {
-		this(scenario.getConfig(), scenario.getPopulation());
+		this(scenario.getConfig().plans(), scenario.getConfig().planCalcScore(), scenario.getConfig().scenario(), scenario.getPopulation());
 	}
 
 	@Override

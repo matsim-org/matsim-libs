@@ -19,7 +19,8 @@
 
 package org.matsim.core.replanning.modules;
 
-import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.GlobalConfigGroup;
+import org.matsim.core.config.groups.SubtourModeChoiceConfigGroup;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
@@ -31,23 +32,17 @@ import javax.inject.Provider;
 
 public class TripSubtourModeChoiceStrategyFactory implements Provider<PlanStrategy> {
 
-	private final Config config;
-	private final ActivityFacilities activityFacilities;
-	private Provider<TripRouter> tripRouterProvider;
-
-	@Inject
-    TripSubtourModeChoiceStrategyFactory(Config config, ActivityFacilities activityFacilities, Provider<TripRouter> tripRouterProvider) {
-        this.config = config;
-		this.activityFacilities = activityFacilities;
-		this.tripRouterProvider = tripRouterProvider;
-	}
+	@Inject private GlobalConfigGroup globalConfigGroup;
+	@Inject private SubtourModeChoiceConfigGroup subtourModeChoice;
+	@Inject private ActivityFacilities activityFacilities;
+	@Inject private Provider<TripRouter> tripRouterProvider;
 
     @Override
 	public PlanStrategy get() {
 		PlanStrategyImpl strategy = new PlanStrategyImpl(new RandomPlanSelector());
-		strategy.addStrategyModule(new TripsToLegsModule(config, tripRouterProvider));
-		strategy.addStrategyModule(new SubtourModeChoice(config, tripRouterProvider));
-		strategy.addStrategyModule(new ReRoute(config, activityFacilities, tripRouterProvider));
+		strategy.addStrategyModule(new TripsToLegsModule(tripRouterProvider, globalConfigGroup));
+		strategy.addStrategyModule(new SubtourModeChoice(tripRouterProvider, globalConfigGroup, subtourModeChoice));
+		strategy.addStrategyModule(new ReRoute(activityFacilities, tripRouterProvider, globalConfigGroup));
 		return strategy;
 	}
 

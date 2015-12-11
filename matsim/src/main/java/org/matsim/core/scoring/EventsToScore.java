@@ -47,6 +47,9 @@ import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.internal.HasPersonId;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.ControlerConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
@@ -69,10 +72,10 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 public class EventsToScore implements BasicEventHandler {
 	static private final Logger log = Logger.getLogger(EventsToScore.class);
 
+	private final PlansConfigGroup plansConfigGroup;
 	private EventsToActivities eventsToActivities;
 	private EventsToLegs eventsToLegs;
 	private ScoringFunctionsForPopulation scoringFunctionsForPopulation;
-	private final Config config;
 	private final Population population;
 	private final ScoringFunctionFactory scoringFunctionFactory;
 	private final Network network;
@@ -89,14 +92,14 @@ public class EventsToScore implements BasicEventHandler {
 
 
 	@Inject
-	EventsToScore(final ScoringFunctionFactory factory, EventsManager eventsManager, Config config, Population population, Network network) {
+	EventsToScore(PlansConfigGroup plansConfigGroup, ControlerConfigGroup controlerConfigGroup, PlanCalcScoreConfigGroup planCalcScoreConfigGroup, ScoringFunctionFactory factory, EventsManager eventsManager, Population population, Network network) {
 		this.population = population;
-		this.config = config;
+		this.plansConfigGroup = plansConfigGroup;
 		this.scoringFunctionFactory = factory;
 		this.network = network;
-		this.learningRate = config.planCalcScore().getLearningRate();
+		this.learningRate = planCalcScoreConfigGroup.getLearningRate();
 		initHandlers(scoringFunctionFactory);
-		init(config);
+		init(planCalcScoreConfigGroup, controlerConfigGroup);
 		// With the Inject-Constructor, this class adds itself as an EventHandler.
 		eventsManager.addHandler(this);
 	}
@@ -106,29 +109,29 @@ public class EventsToScore implements BasicEventHandler {
 	}
 
 	public EventsToScore(final Scenario scenario, final ScoringFunctionFactory scoringFunctionFactory, final double learningRate) {
-		this.config = scenario.getConfig();
 		this.population = scenario.getPopulation();
 		this.network = scenario.getNetwork();
-		if (this.config.transit().isUseTransit()) {
+		this.plansConfigGroup = scenario.getConfig().plans();
+		if (scenario.getConfig().transit().isUseTransit()) {
 			this.transitSchedule = scenario.getTransitSchedule();
 		}
 		this.scoringFunctionFactory = scoringFunctionFactory;
 		this.learningRate = learningRate;
 		initHandlers(scoringFunctionFactory);
-		init(config);
+		init(scenario.getConfig().planCalcScore(), scenario.getConfig().controler());
 	}
 
-	private void init(Config config) {
-		if ( config.planCalcScore().getFractionOfIterationsToStartScoreMSA()!=null ) {
-			final int diff = config.controler().getLastIteration() - config.controler().getFirstIteration();
+	private void init(PlanCalcScoreConfigGroup planCalcScoreConfigGroup, ControlerConfigGroup controlerConfigGroup) {
+		if (planCalcScoreConfigGroup.getFractionOfIterationsToStartScoreMSA()!=null ) {
+			final int diff = controlerConfigGroup.getLastIteration() - controlerConfigGroup.getFirstIteration();
 			this.scoreMSAstartsAtIteration = (int) (diff
-				* config.planCalcScore().getFractionOfIterationsToStartScoreMSA() + config.controler().getFirstIteration());
+				* planCalcScoreConfigGroup.getFractionOfIterationsToStartScoreMSA() + controlerConfigGroup.getFirstIteration());
 		}
 	}
 
 	private void initHandlers(final ScoringFunctionFactory factory) {
 		this.eventsToActivities = new EventsToActivities();
-		this.scoringFunctionsForPopulation = new ScoringFunctionsForPopulation(config, network, population, factory);
+		this.scoringFunctionsForPopulation = new ScoringFunctionsForPopulation(plansConfigGroup, network, population, factory);
 		this.eventsToActivities.setActivityHandler(this.scoringFunctionsForPopulation);
 		this.eventsToLegs = new EventsToLegs(network, transitSchedule);
 		this.eventsToLegs.setLegHandler(this.scoringFunctionsForPopulation);

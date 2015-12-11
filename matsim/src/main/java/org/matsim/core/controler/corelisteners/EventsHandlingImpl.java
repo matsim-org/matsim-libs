@@ -26,7 +26,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -63,12 +63,12 @@ final class EventsHandlingImpl implements EventsHandling, BeforeMobsimListener,
 	@Inject
 	EventsHandlingImpl(
 			final EventsManager eventsManager,
-			final Config config,
+			final ControlerConfigGroup config,
 			final OutputDirectoryHierarchy controlerIO,
 			final Set<EventHandler> eventHandlersDeclaredByModules) {
 		this.eventsManager = eventsManager;
-		this.writeEventsInterval = config.controler().getWriteEventsInterval();
-		this.eventsFileFormats = config.controler().getEventsFileFormats();
+		this.writeEventsInterval = config.getWriteEventsInterval();
+		this.eventsFileFormats = config.getEventsFileFormats();
 		this.controlerIO = controlerIO;
 		for (EventHandler eventHandler : eventHandlersDeclaredByModules) {
 			this.eventsManager.addHandler(eventHandler);

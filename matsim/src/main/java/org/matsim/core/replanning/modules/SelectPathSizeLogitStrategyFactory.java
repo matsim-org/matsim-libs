@@ -20,7 +20,7 @@
 package org.matsim.core.replanning.modules;
 
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.selectors.PathSizeLogitSelector;
@@ -30,19 +30,12 @@ import javax.inject.Provider;
 
 public class SelectPathSizeLogitStrategyFactory implements Provider<PlanStrategy> {
 
-    private Config config;
-    private Network network;
-
-    @Inject
-    SelectPathSizeLogitStrategyFactory(Config config, Network network) {
-        this.config = config;
-        this.network = network;
-    }
+    @Inject private PlanCalcScoreConfigGroup config;
+    @Inject private Network network;
 
     @Override
 	public PlanStrategy get() {
-		PlanStrategy strategy = new PlanStrategyImpl(new PathSizeLogitSelector(config.planCalcScore(), network));
-		return strategy;
+        return new PlanStrategyImpl(new PathSizeLogitSelector(config, network));
 	}
 	
 }
