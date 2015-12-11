@@ -43,6 +43,13 @@ pickupDuration         120
 #duration of a dropoff
 dropoffDuration        60
 
+#for trips with passengers
+AStarEuclideanOverdoFactor 1.0
+
+#QSim config
+storageCapFactor 1.0
+flowCapFactor 1.0
+
 #simulate battery charging and discharging
 #batteryChargingDischarging
 
