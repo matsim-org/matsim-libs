@@ -69,10 +69,6 @@ public class PatnaCadytsControler {
 
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		
-		CadytsConfigGroup cadytsConfigGroup = ConfigUtils.addOrGetModule(config, CadytsConfigGroup.GROUP_NAME, CadytsConfigGroup.class);
-		cadytsConfigGroup.setStartTime(06*3600);
-		cadytsConfigGroup.setEndTime(18*3600-1);
-		
 		final Controler controler = new Controler(config);
 		controler.setDumpDataAtEnd(true);
 
@@ -89,9 +85,13 @@ public class PatnaCadytsControler {
 				addTravelDisutilityFactoryBinding("truck").to(carTravelDisutilityFactoryKey());
 			}
 		});
-
+		
 		final CadytsContext cContext = new CadytsContext(controler.getConfig());
 		controler.addControlerListener(cContext);
+		
+		CadytsConfigGroup cadytsConfigGroup = ConfigUtils.addOrGetModule(config, CadytsConfigGroup.GROUP_NAME, CadytsConfigGroup.class);
+		cadytsConfigGroup.setStartTime(06*3600);
+		cadytsConfigGroup.setEndTime(18*3600-1);
 
 		// scoring function
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
