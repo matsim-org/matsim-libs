@@ -20,7 +20,6 @@
 package org.matsim.core.router;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Injector;
@@ -30,7 +29,7 @@ import org.matsim.core.router.costcalculators.TravelDisutilityModule;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.scenario.ScenarioElementsModule;
+import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorModule;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterModule;
@@ -38,7 +37,6 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 import javax.inject.Provider;
 import java.util.Arrays;
-import java.util.Collections;
 
 public class TripRouterFactoryBuilderWithDefaults {
 
@@ -70,6 +68,7 @@ public class TripRouterFactoryBuilderWithDefaults {
         return Injector.createInjector(scenario.getConfig(),
                 AbstractModule.override(
                         Arrays.asList(
+                                new ScenarioByInstanceModule(scenario),
                                 new TripRouterModule(),
                                 new TravelDisutilityModule(),
                                 new TravelTimeCalculatorModule(),
@@ -95,14 +94,7 @@ public class TripRouterFactoryBuilderWithDefaults {
                                     addTravelTimeBinding("car").toInstance(carTravelTime);
                                 }
                             }
-                        }),
-                new AbstractModule() {
-                    @Override
-                    public void install() {
-                        bind(Scenario.class).toInstance(scenario);
-                    }
-                },
-                new ScenarioElementsModule() ).getProvider(TripRouter.class);
+                        })).getProvider(TripRouter.class);
     }
 
     public static Provider<TripRouter> createDefaultTripRouterFactoryImpl(final Scenario scenario) {
@@ -132,16 +124,10 @@ public class TripRouterFactoryBuilderWithDefaults {
 
 	public static LeastCostPathCalculatorFactory createDefaultLeastCostPathCalculatorFactory(final Scenario scenario) {
         return Injector.createInjector(scenario.getConfig(),
-                new ScenarioElementsModule(),
+                new ScenarioByInstanceModule(scenario),
                 new TravelDisutilityModule(),
                 new TravelTimeCalculatorModule(),
-                new LeastCostPathCalculatorModule(),
-                new AbstractModule() {
-                    @Override
-                    public void install() {
-                        bind(Scenario.class).toInstance(scenario);
-                    }
-                })
+                new LeastCostPathCalculatorModule())
         .getInstance(LeastCostPathCalculatorFactory.class);
     }
 

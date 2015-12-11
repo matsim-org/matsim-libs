@@ -57,7 +57,6 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityModule;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.scenario.ScenarioElementsModule;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
@@ -192,7 +191,6 @@ public class Simulator {
 			@Override
 			public void install() {
 			    install(new DefaultMobsimModule());
-				install(new ScenarioElementsModule());
                 install(new CharyparNagelScoringFunctionModule());
 				// include(new TravelTimeCalculatorModule());
 				install(new TravelDisutilityModule());

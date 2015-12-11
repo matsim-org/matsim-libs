@@ -9,6 +9,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.controler.corelisteners.ControlerDefaultCoreListenersModule;
 import org.matsim.core.events.EventsManagerModule;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -28,7 +29,7 @@ public class InjectionBeforeControlerTest {
 			public void install() {
 				install(new ControlerDefaultsModule());
 				install(new ControlerDefaultCoreListenersModule());
-				bind(Scenario.class).toInstance(scenario);
+				install(new ScenarioByInstanceModule(scenario));
 				bind(OutputDirectoryHierarchy.class).asEagerSingleton();
 				bind(IterationStopWatch.class).asEagerSingleton();
 				bind(ControlerI.class).to(Controler.class).asEagerSingleton();

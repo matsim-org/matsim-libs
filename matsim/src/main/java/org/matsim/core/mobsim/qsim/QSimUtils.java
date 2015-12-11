@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.scenario.ScenarioElementsModule;
+import org.matsim.core.scenario.ScenarioByInstanceModule;
 
 import java.util.Collection;
 
@@ -69,8 +69,7 @@ public class QSimUtils {
 		protected void configure() {
 			binder().requireExplicitBindings();
 			bind(Config.class).toInstance(scenario.getConfig());
-			bind(Scenario.class).toInstance(scenario);
-			install(new ScenarioElementsModule(scenario.getConfig()));
+			install(new ScenarioByInstanceModule(scenario));
 			bind(EventsManager.class).toInstance(eventsManager);
 			install(new QSimModule());
 		}

@@ -62,6 +62,7 @@ import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.MutableScenario;
+import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -229,12 +230,7 @@ public class Controler extends AbstractController implements ControlerI {
 		this.controlerListenerManager.setControler(this);
 		this.config.parallelEventHandling().makeLocked();
 		this.scenario = scenario;
-		this.overrides = new AbstractModule() {
-			@Override
-			public void install() {
-				bind(Scenario.class).toInstance(Controler.this.scenario);
-			}
-		};
+		this.overrides = new ScenarioByInstanceModule(this.scenario);
 	}
 
 	/**

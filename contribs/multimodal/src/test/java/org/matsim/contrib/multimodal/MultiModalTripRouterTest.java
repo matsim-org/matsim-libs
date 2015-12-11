@@ -48,7 +48,7 @@ import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityModule;
-import org.matsim.core.scenario.ScenarioElementsModule;
+import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorModule;
 
@@ -102,9 +102,8 @@ public class MultiModalTripRouterTest {
 				AbstractModule.override(Collections.singleton(new AbstractModule() {
 					@Override
 					public void install() {
-						bind(Scenario.class).toInstance(scenario);
 						bind(EventsManager.class).toInstance(EventsUtils.createEventsManager(config));
-						install(new ScenarioElementsModule());
+						install(new ScenarioByInstanceModule(scenario));
 						install(new TripRouterModule());
 						install(new TravelTimeCalculatorModule());
 						install(new TravelDisutilityModule());
