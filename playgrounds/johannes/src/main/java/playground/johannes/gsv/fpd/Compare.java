@@ -25,6 +25,7 @@ import org.matsim.contrib.common.gis.CartesianDistanceCalculator;
 import org.matsim.contrib.common.gis.DistanceCalculator;
 import org.matsim.contrib.common.stats.*;
 import playground.johannes.gsv.zones.KeyMatrix;
+import playground.johannes.gsv.zones.MatrixOperations;
 import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
 import playground.johannes.synpop.gis.Zone;
 import playground.johannes.synpop.gis.ZoneCollection;
@@ -51,11 +52,12 @@ public class Compare {
 		KeyMatrixXMLReader reader = new KeyMatrixXMLReader();
 		reader.setValidating(false);
 
-		String suffix = "";
-		double threshold = 10;
+		String suffix = "v2";
+		double threshold = 0;
 
 		reader.parse(String.format("/home/johannes/gsv/fpd/telefonica/matrix%s/avr.xml", suffix));
 		KeyMatrix iais = reader.getMatrix();
+		MatrixOperations.applyFactor(iais, 2.0);
 
 		reader.parse("/home/johannes/gsv/miv-matrix/refmatrices/tomtom.xml");
 		KeyMatrix tomtom = reader.getMatrix();
@@ -81,7 +83,7 @@ public class Compare {
 		for(String i : keys) {
 			for(String j : keys) {
 				Double volIais = iais.get(i, j);
-				if(volIais != null && volIais >= 0) {
+				if(volIais != null && volIais >= threshold) {
 
 					Double volTomTom = tomtom.get(i, j);
 					if(volTomTom == null) volTomTom = 0.0;
