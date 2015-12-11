@@ -51,7 +51,11 @@ public class AccessibilityComputationNMBTest {
 //		String folderStructure = "../../../"; // local on dz's computer
 		String folderStructure = "../../"; // server
 			
-		String networkFile = folderStructure + "matsimExamples/countries/za/nmb/network/NMBM_Network_CleanV7.xml.gz";
+		String networkFile = "matsimExamples/countries/za/nmb/network/NMBM_Network_CleanV7.xml.gz";
+
+		PathUtils.tryANumberOfFolderStructures(folderStructure, networkFile);
+
+		networkFile = folderStructure + networkFile ;
 		String facilitiesFile = folderStructure + "matsimExamples/countries/za/nmb/facilities/20121010/facilities.xml.gz";
 		
 		// minibus-pt
@@ -63,7 +67,6 @@ public class AccessibilityComputationNMBTest {
 		String travelTimeMatrixFile = folderStructure + "matsimExamples/countries/za/nmb/regular-pt/travelTimeMatrix_space.csv";
 		String travelDistanceMatrixFile = folderStructure + "matsimExamples/countries/za/nmb/regular-pt/travelDistanceMatrix_space.csv";
 		String ptStopsFile = folderStructure + "matsimExamples/countries/za/nmb/regular-pt/ptStops.csv";
-		
 		
 		// Parameters
 		boolean createQGisOutput = false;
