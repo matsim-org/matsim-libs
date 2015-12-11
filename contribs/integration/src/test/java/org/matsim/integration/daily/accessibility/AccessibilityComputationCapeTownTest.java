@@ -30,6 +30,7 @@ import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.replanning.DefaultPlanStrategiesModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.testcases.MatsimTestUtils;
@@ -48,11 +49,31 @@ public class AccessibilityComputationCapeTownTest {
 	@Test
 	public void doAccessibilityTest() throws IOException {
 //		public static void main( String[] args ) {
-		String folderStructure = "../../../"; // local on dz's computer
-//		String folderStructure = "../../"; // server
+		String folderStructure = "../../"; // arbitrary
 			
-		String networkFile = folderStructure + "matsimExamples/countries/za/capetown/2015-10-15_network.xml";
-		String facilitiesFile = folderStructure + "matsimExamples/countries/za/capetown/2015-10-15_facilities.xml";
+		String networkFile = "matsimExamples/countries/za/capetown/2015-10-15_network.xml";
+		String facilitiesFile = "matsimExamples/countries/za/capetown/2015-10-15_facilities.xml";
+		
+		try {
+			IOUtils.getBufferedReader( folderStructure + networkFile ) ;
+		} catch ( Exception ee ) {
+			String prevFolderStructure = folderStructure ;
+			folderStructure = "../../" ; // build server
+			log.info( "did not find file with folderStructure=" + prevFolderStructure + ", next trying with " + folderStructure ) ;
+		}
+		try { 
+			IOUtils.getBufferedReader( folderStructure + networkFile ) ;
+		} catch ( Exception ee ) {
+			String prevFolderStructure = folderStructure ;
+			folderStructure = "../../../" ; // local on dz's computer
+			log.info( "did not find file with folderStructure=" + prevFolderStructure + ", next trying with " + folderStructure ) ;
+		}
+		try { 
+			IOUtils.getBufferedReader( folderStructure + networkFile ) ;
+		} catch ( Exception ee ) {
+			log.info( "did not find file with folderStructure=" + folderStructure + ", giving up") ;
+			throw new RuntimeException( "cannot find file" ) ;
+		}
 		
 		// minibus-pt
 //		String travelTimeMatrix = folderStructure + "matsimExamples/countries/za/nmbm/minibus-pt/JTLU_14i/travelTimeMatrix.csv.gz";
@@ -82,8 +103,8 @@ public class AccessibilityComputationCapeTownTest {
 		
 		// config and scenario
 		Config config = ConfigUtils.createConfig(new AccessibilityConfigGroup(), new MatrixBasedPtRouterConfigGroup());
-		config.network().setInputFile(networkFile);
-		config.facilities().setInputFile(facilitiesFile);
+		config.network().setInputFile(folderStructure+networkFile);
+		config.facilities().setInputFile(folderStructure+facilitiesFile);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.controler().setLastIteration(0);
