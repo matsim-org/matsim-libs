@@ -148,11 +148,19 @@ public class TripRouterFactoryModule extends AbstractModule {
                 }
             }
 
+            TravelDisutilityFactory travelDisutilityFactory = this.travelDisutilityFactory.get(mode);
+            if (travelDisutilityFactory == null) {
+                throw new RuntimeException("No TravelDisutilityFactory bound for mode "+mode+".");
+            }
+            TravelTime travelTime = travelTimes.get(mode);
+            if (travelTime == null) {
+                throw new RuntimeException("No TravelTime bound for mode "+mode+".");
+            }
             LeastCostPathCalculator routeAlgo =
                     leastCostPathCalculatorFactory.createPathCalculator(
                             filteredNetwork,
-                            travelDisutilityFactory.get(mode).createTravelDisutility(travelTimes.get(mode), config.planCalcScore()),
-                            travelTimes.get(mode));
+                            travelDisutilityFactory.createTravelDisutility(travelTime, config.planCalcScore()),
+                            travelTime);
 
             return DefaultRoutingModules.createNetworkRouter(mode, populationFactory,
                     filteredNetwork, routeAlgo);

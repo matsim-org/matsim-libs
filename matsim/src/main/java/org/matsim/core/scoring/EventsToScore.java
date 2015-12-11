@@ -109,6 +109,9 @@ public class EventsToScore implements BasicEventHandler {
 		this.config = scenario.getConfig();
 		this.population = scenario.getPopulation();
 		this.network = scenario.getNetwork();
+		if (this.config.transit().isUseTransit()) {
+			this.transitSchedule = scenario.getTransitSchedule();
+		}
 		this.scoringFunctionFactory = scoringFunctionFactory;
 		this.learningRate = learningRate;
 		initHandlers(scoringFunctionFactory);

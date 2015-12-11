@@ -33,7 +33,6 @@ import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorModule;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterModule;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 import javax.inject.Provider;
 import java.util.Arrays;
@@ -103,7 +102,7 @@ public class TripRouterFactoryBuilderWithDefaults {
                 new AbstractModule() {
                     @Override
                     public void install() {
-                        bind(Scenario.class).toInstance(scenario);
+                        install(new ScenarioByInstanceModule(scenario));
                     }
                 })
                 .getProvider(TripRouter.class);
@@ -115,8 +114,7 @@ public class TripRouterFactoryBuilderWithDefaults {
                 new AbstractModule() {
                     @Override
                     public void install() {
-                        bind(TransitSchedule.class).toInstance(scenario.getTransitSchedule());
-                        bind(Scenario.class).toInstance(scenario);
+                        install(new ScenarioByInstanceModule(scenario));
                     }
                 })
         .getProvider(TransitRouter.class);
@@ -125,6 +123,7 @@ public class TripRouterFactoryBuilderWithDefaults {
 	public static LeastCostPathCalculatorFactory createDefaultLeastCostPathCalculatorFactory(final Scenario scenario) {
         return Injector.createInjector(scenario.getConfig(),
                 new ScenarioByInstanceModule(scenario),
+                new EventsManagerModule(),
                 new TravelDisutilityModule(),
                 new TravelTimeCalculatorModule(),
                 new LeastCostPathCalculatorModule())

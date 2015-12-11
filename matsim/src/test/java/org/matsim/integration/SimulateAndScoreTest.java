@@ -169,12 +169,9 @@ public class SimulateAndScoreTest extends MatsimTestCase {
 		final Injector injector = Injector.createInjector(scenario.getConfig(), new AbstractModule() {
 			@Override
 			public void install() {
-				install(AbstractModule.override(Arrays.asList(new ScenarioByInstanceModule(scenario), new TravelTimeCalculatorModule(), new TripRouterModule()), new AbstractModule() {
-					@Override
-					public void install() {
-						addTravelDisutilityFactoryBinding("car").toInstance(new Builder( TransportMode.car ));
-					}
-				}));
+				install(new ScenarioByInstanceModule(scenario));
+				install(new TripRouterModule());
+				addTravelDisutilityFactoryBinding("car").toInstance(new Builder( TransportMode.car ));
 			}
 		});
 		final TripRouter tripRouter = injector.getInstance(TripRouter.class);
