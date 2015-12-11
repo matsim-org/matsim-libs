@@ -124,7 +124,7 @@ public class PatnaExternalDemandGenerator {
 		
 		String countingStationKey = OuterCordonUtils.getCountingStationKey(countingStationNumber, "In");
 		Link originActLink = getLinkFromOuterCordonKey(countingStationKey, true);
-		Link destinationActLink = getLinkFromOuterCordonKey(countingStationKey, false);
+		Link destinationActLink = NetworkUtils.getConnectingLink(originActLink.getToNode(), originActLink.getFromNode()); 
 		
 		for(double timebin : timebin2mode2count.keySet()){
 			for(String mode : timebin2mode2count.get(timebin).keySet()){
