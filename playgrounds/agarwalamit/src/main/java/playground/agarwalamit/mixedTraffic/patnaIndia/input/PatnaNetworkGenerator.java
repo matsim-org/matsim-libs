@@ -20,7 +20,9 @@ package playground.agarwalamit.mixedTraffic.patnaIndia.input;
 
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -35,6 +37,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
@@ -137,7 +140,7 @@ public class PatnaNetworkGenerator {
 				else if ( roadWidth <12 && roadWidth >= 9) numberoflanes =3;
 
 				double linkLength = 1000 * Double.parseDouble(lengthInKm);
-				double capacity = capacityOfLink(widthOfRoad);
+				double capacity = getCapacityOfLink(widthOfRoad);
 
 				link1.setFreespeed(freeSpeedInMPS);
 				link1.setCapacity(capacity);
@@ -170,22 +173,54 @@ public class PatnaNetworkGenerator {
 		simplifier.setNodesToMerge(nodeTypesToMerge);
 		simplifier.run(network);
 
-		// manual cleaning of the network.
-		// remove links
-		List<String> links2remove = Arrays.asList("1478","147810000",
-				"1128-126410000-1262-126810000-126710000-127010000-126610000-1271-1258-128510000-71710000-1672-167310000-165510000-167710000-167610000-163910000-170410000-163810000-1735",
-				"173510000-1638-1704-1639-1676-1677-1655-1673-167210000-717-1285-125810000-127110000-1266-1270-1267-1268-126210000-1264-112810000",
-				"1841910000-18503","1850310000-18419",
-				"18174","1817410000",
-				"1861710000","18617",
-				"145310000-1340-157710000-157110000-1569-156310000-68410000-1122-112310000-1124-109410000-110510000-1106-1101-1104-110210000-1103", //a useless links, dont know, y agents are diverted on it.
-				"110310000-1102-110410000-110110000-110610000-1105-1094-112410000-1123-112210000-684-1563-156910000-1571-1577-134010000-1453",
-				"145810000-1461-146210000","1462-146110000-1458","145510000","1455","1470-1471","147110000-147010000");
-		for (String str : links2remove){
-			network.removeLink(Id.createLinkId(str));
-			LOG.warn("The link "+str+" is removed from the network.");
-		}
+		// manual cleaning (filtering) of the network.
+		removeLinks();
+		removeIsolatedNodes();
+		modifyLinkCapacity();
+		addNodesAndLinks();
+	}    
 
+	public Network getPatnaNetwork() {
+		return scenario.getNetwork();
+	}
+
+	private double getCapacityOfLink (final String roadwidth) {
+		double linkCapacity =0;
+		double w = Double.parseDouble(roadwidth);
+		double capacityCarrigway = -2184-22.6*Math.pow(w, 2)+857.4*w;  
+		linkCapacity = 0.5*capacityCarrigway;
+		if (linkCapacity < 300) linkCapacity = 300; 
+		return Math.ceil( linkCapacity );
+	}
+
+	private void addNodesAndLinks(){
+		Network network = scenario.getNetwork();
+		// Adding links near to the counting station links (necessary for external demand)
+		//OC4 -- using existing node (14653)
+		Node oc4_nearestNode = network.getNodes().get(Id.createNodeId("14653"));
+		Coord oc4NodeCoord = new Coord(oc4_nearestNode.getCoord().getX() + 500, oc4_nearestNode.getCoord().getY() + 500);
+		Node oc4Node = network.getFactory().createNode(Id.createNodeId("OC4_node"), oc4NodeCoord); network.addNode(oc4Node);
+		((NetworkImpl)network).createAndAddLink(Id.createLinkId("OC4_in"), oc4Node, oc4_nearestNode, 500., 60., 1500., 2);
+		((NetworkImpl)network).createAndAddLink(Id.createLinkId("OC4_out"), oc4_nearestNode, oc4Node, 500., 60., 1500., 2);
+
+		//OC2 -- using existing node 16224
+		Node oc2_nearestNode = network.getNodes().get(Id.createNodeId("16224"));
+		Coord oc2NodeCoord = new Coord(oc2_nearestNode.getCoord().getX() + 500, oc2_nearestNode.getCoord().getY() - 500);
+		Node oc2Node = network.getFactory().createNode(Id.createNodeId("OC2_node"), oc2NodeCoord); network.addNode(oc2Node);
+		((NetworkImpl)network).createAndAddLink(Id.createLinkId("OC2_in"), oc2Node, oc2_nearestNode, 500., 60., 1500., 2);
+		((NetworkImpl)network).createAndAddLink(Id.createLinkId("OC2_out"), oc2_nearestNode, oc2Node, 500., 60., 1500., 2);
+		
+		//OC5
+		Node oc5_nearestNode = network.getNodes().get(Id.createNodeId("2426"));
+		Coord oc5NodeCoord = new Coord(oc5_nearestNode.getCoord().getX() - 500, oc5_nearestNode.getCoord().getY() + 100);
+		Node oc5Node = network.getFactory().createNode(Id.createNodeId("OC5_node"), oc5NodeCoord); network.addNode(oc5Node);
+		((NetworkImpl)network).createAndAddLink(Id.createLinkId("OC5_in"), oc5Node, oc5_nearestNode, 500., 60., 1500., 2);
+		((NetworkImpl)network).createAndAddLink(Id.createLinkId("OC5_out"), oc5_nearestNode, oc5Node, 500., 60., 1500., 2);
+		
+	}
+	
+	private void modifyLinkCapacity(){
+		Network network = scenario.getNetwork();
 		// increase capacity
 		{//it looks a dead end link, but part of a highway, capacity can be something like -- 1800 at least in both directions.
 			network.getLinks().get(Id.createLinkId("13800-13851-13857-13860")).setCapacity(1800.);
@@ -201,18 +236,39 @@ public class PatnaNetworkGenerator {
 			network.getLinks().get(Id.createLinkId("191610000-314110000")).setCapacity(1000.);
 			network.getLinks().get(Id.createLinkId("3141-1916")).setCapacity(1000.);
 		}
-	}    
-
-	public Network getPatnaNetwork() {
-		return scenario.getNetwork();
 	}
 
-	private double capacityOfLink (final String roadwidth) {
-		double linkCapacity =0;
-		double w = Double.parseDouble(roadwidth);
-		double capacityCarrigway = -2184-22.6*Math.pow(w, 2)+857.4*w;  
-		linkCapacity = 0.5*capacityCarrigway;
-		if (linkCapacity < 300) linkCapacity = 300; 
-		return linkCapacity;
+	private void removeLinks(){
+		// remove links
+		List<String> links2remove = Arrays.asList("1478","147810000",
+				"1128-126410000-1262-126810000-126710000-127010000-126610000-1271-1258-128510000-71710000-1672-167310000-165510000-167710000-167610000-163910000-170410000-163810000-1735",
+				"173510000-1638-1704-1639-1676-1677-1655-1673-167210000-717-1285-125810000-127110000-1266-1270-1267-1268-126210000-1264-112810000",
+				"1841910000-18503","1850310000-18419",
+				"18174","1817410000",
+				"1861710000","18617",
+				"145310000-1340-157710000-157110000-1569-156310000-68410000-1122-112310000-1124-109410000-110510000-1106-1101-1104-110210000-1103", //a useless links, dont know, y agents are diverted on it.
+				"110310000-1102-110410000-110110000-110610000-1105-1094-112410000-1123-112210000-684-1563-156910000-1571-1577-134010000-1453",
+				"145810000-1461-146210000","1462-146110000-1458","145510000","1455","1470-1471","147110000-147010000");
+		for (String str : links2remove){
+			scenario.getNetwork().removeLink(Id.createLinkId(str));
+			LOG.warn("The link "+str+" is removed from the network.");
+		}
+	}
+
+	/**
+	 * Removes nodes which do not have any in/out links.
+	 */
+	private void removeIsolatedNodes(){
+		Collection<? extends Node> nodes = scenario.getNetwork().getNodes().values();
+		List<Id<Node>> nodes2Remove = new ArrayList<>();
+		for(Node n : nodes){
+			if(n.getInLinks().size() == 0 && n.getOutLinks().size() == 0) {
+				nodes2Remove.add(n.getId());
+			}
+		}
+		for(Id<Node> nodeId : nodes2Remove){
+			scenario.getNetwork().removeNode(nodeId);
+			LOG.warn("The isolated node "+nodeId.toString()+" is removed from the network.");
+		}
 	}
 }

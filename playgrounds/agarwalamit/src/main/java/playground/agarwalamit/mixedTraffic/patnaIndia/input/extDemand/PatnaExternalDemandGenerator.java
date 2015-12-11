@@ -37,6 +37,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.IOUtils;
@@ -181,12 +182,13 @@ public class PatnaExternalDemandGenerator {
 		Map<Double, Map<String,Double>> timebin2mode2count = readFileAndReturnMap(file);
 
 		String countingStationKey = OuterCordonUtils.getCountingStationKey(countingStationNumber, countingDirection); 
-		Id<Link> firstActLink = null; 
-		Id<Link> lastActLink = null;
+		Link firstActLink = null; 
+		Link lastActLink = null;
 		
 		if(countingDirection.equalsIgnoreCase("In")){// --> trip originates at counting stationNumber
-			firstActLink = getLinkFromOuterCordonKey(countingStationKey, true).getId();
-		} else {// --> trip terminates at counting stationNumber
+			firstActLink = getLinkFromOuterCordonKey(countingStationKey, true);
+		} else {
+			// --> trip terminates at counting stationNumber
 //			lastActLink = getLinkFromOuterCordonKey(countingStationKey, false).getId();
 		}
 
@@ -206,8 +208,8 @@ public class PatnaExternalDemandGenerator {
 						
 						double actEndTime ;
 						if(countingDirection.equalsIgnoreCase("In")){// --> trip originates at given counting stationNumber
-							String countingStationKeyForOtherActLink = OuterCordonUtils.getCountingStationKey("OC"+jj, "In");
-							lastActLink = getLinkFromOuterCordonKey(countingStationKeyForOtherActLink, false ).getId();
+							String countingStationKeyForOtherActLink = OuterCordonUtils.getCountingStationKey("OC"+jj, "Out");
+							lastActLink = getLinkFromOuterCordonKey(countingStationKeyForOtherActLink, false );
 							actEndTime = (timebin-1)*3600+random.nextDouble()*3600;
 						} else {// --> trip terminates at given counting stationNumber
 							throw new RuntimeException("For external to external counts use other counting direction, i.e. the "+countingStationNumber+ "should be assumed as origin and not destination.");
@@ -220,12 +222,12 @@ public class PatnaExternalDemandGenerator {
 //						if(actEndTime < 0)	actEndTime = random.nextDouble()*900; //for time bin =1, actEndTime (in the else statment) can be negative, thus assining sometime between initial 15 mins.
 						
 						Plan plan = pf.createPlan();
-						Activity firstAct = pf.createActivityFromLinkId("E2E_Start", firstActLink);
+						Activity firstAct = pf.createActivityFromLinkId("E2E_Start", firstActLink.getId());
 						firstAct.setEndTime(actEndTime );
 						plan.addActivity(firstAct);
 						plan.addLeg(pf.createLeg(mode));
 
-						Activity lastAct = pf.createActivityFromLinkId("E2E_End", lastActLink);
+						Activity lastAct = pf.createActivityFromLinkId("E2E_End", lastActLink.getId());
 						plan.addActivity(lastAct);
 						p.addPlan(plan);
 					}
@@ -240,12 +242,23 @@ public class PatnaExternalDemandGenerator {
 	 */
 	private Link getLinkFromOuterCordonKey(final String countingStationKey, final boolean isOrigin){
 		Id<Link> linkId = OuterCordonUtils.getCountStationLinkId(countingStationKey);
-		Link link = scenario.getNetwork().getLinks().get(linkId);
+
+		Link inLink = scenario.getNetwork().getLinks().get(linkId);
+		Link reverlseLink = NetworkUtils.getConnectingLink(inLink.getToNode(), inLink.getFromNode());
 		if(isOrigin) {
-			return link.getFromNode().getInLinks().values().iterator().next();
+		 Iterator<? extends Link> it = inLink.getFromNode().getInLinks().values().iterator();
+			while(it.hasNext() ){
+				Link l = it.next();
+				if(! l.equals(reverlseLink) ) return l;
+			}
 		} else {
-			return link.getToNode().getOutLinks().values().iterator().next();
+			Iterator<? extends Link> it = inLink.getToNode().getOutLinks().values().iterator();
+			while(it.hasNext() ){
+				Link l = it.next();
+				if(! l.equals(reverlseLink) ) return l;
+			}
 		}
+		throw new RuntimeException("A connecting link in the desired direction is not found. Aborting ...");
 	}
 	
 	private Map<String, List<SimpleFeature>> getInternalZoneFeaturesForExtInternalTrips(){
