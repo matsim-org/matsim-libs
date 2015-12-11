@@ -36,11 +36,17 @@ public class PlansAnalyzer {
 			if (plan.getPlanElements().size() == 1) {
 				this.home_cnt++;
 			} else if (plan.getPlanElements().size() == 5) {
-				if ("work".equals(((Activity) plan.getPlanElements().get(2))
-						.getType())) {
+				if (((Activity) plan.getPlanElements().get(2)).getType()
+						.toUpperCase().startsWith("W")
+				// "work".equals(((Activity) plan.getPlanElements().get(2))
+				// .getType())
+				) {
 					this.home_work_home_cnt++;
-				} else if ("other".equals(((Activity) plan.getPlanElements()
-						.get(2)).getType())) {
+				} else if (((Activity) plan.getPlanElements().get(2)).getType()
+						.toUpperCase().startsWith("O")
+				// "other".equals(((Activity) plan.getPlanElements()
+				// .get(2)).getType())
+				) {
 					this.home_other_home_cnt++;
 				} else {
 					throw new RuntimeException("problem with agent " + id);
