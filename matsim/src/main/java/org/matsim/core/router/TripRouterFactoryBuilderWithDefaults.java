@@ -99,6 +99,9 @@ public class TripRouterFactoryBuilderWithDefaults {
     public static Provider<TripRouter> createDefaultTripRouterFactoryImpl(final Scenario scenario) {
         return Injector.createInjector(scenario.getConfig(),
                 new TripRouterModule(),
+                new TravelDisutilityModule(),
+                new TravelTimeCalculatorModule(),
+                new EventsManagerModule(),
                 new AbstractModule() {
                     @Override
                     public void install() {
