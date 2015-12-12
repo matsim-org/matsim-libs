@@ -1,18 +1,19 @@
 package opdytsintegration;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
-
-import floetteroed.opdyts.SimulatorState;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.population.PlanImpl;
 
+import floetteroed.opdyts.SimulatorState;
 import floetteroed.utilities.math.Vector;
 
 /**
@@ -25,7 +26,7 @@ import floetteroed.utilities.math.Vector;
  * 
  * @see SimulatorState
  */
-public abstract class MATSimState implements SimulatorState {
+public class MATSimState implements SimulatorState {
 
 	// -------------------- MEMBERS --------------------
 
@@ -52,8 +53,8 @@ public abstract class MATSimState implements SimulatorState {
 	// -------------------- CONSTRUCTION --------------------
 
 	/**
-	 * Takes over a <em>deep copy</em> of the population and a <em>reference</em> to
-	 * vectorRepresentation.
+	 * Takes over a <em>deep copy</em> of the population and a
+	 * <em>reference</em> to vectorRepresentation.
 	 * 
 	 * @param population
 	 *            the current MATSim population
@@ -75,9 +76,11 @@ public abstract class MATSimState implements SimulatorState {
 							+ person.getId()
 							+ " cannot be found in its plan list.");
 				}
-				this.person2selectedPlanIndex.put(person.getId(), selectedPlanIndex);
+				this.person2selectedPlanIndex.put(person.getId(),
+						selectedPlanIndex);
 			}
-			this.person2planList.put(person.getId(), newDeepCopy(person.getPlans()));
+			this.person2planList.put(person.getId(),
+					newDeepCopy(person.getPlans()));
 		}
 
 		this.vectorRepresentation = vectorRepresentation;
@@ -103,6 +106,19 @@ public abstract class MATSimState implements SimulatorState {
 		} else {
 			return plans.get(index);
 		}
+	}
+	
+	public Set<Id<Person>> getPersonIdView() {
+		return Collections.unmodifiableSet(this.person2planList.keySet());
+	}
+
+	public List<? extends Plan> getPlansView(final Id<Person> personId) {
+		return Collections.unmodifiableList(this.person2planList.get(personId));
+	}
+
+	public Plan getSelectedPlan(final Id<Person> personId) {
+		return getSelectedPlan(this.person2planList.get(personId),
+				this.person2selectedPlanIndex.get(personId));
 	}
 
 	// --------------- IMPLEMENTATION OF SimulatorState ---------------
