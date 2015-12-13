@@ -80,7 +80,6 @@ public class HourlyTaxiStatsCalculator
         HourlyVehicleStats[] stats = new HourlyVehicleStats[hours];
 
         int hourIdx = hour(schedule.getBeginTime());
-        stats[hourIdx] = new HourlyVehicleStats();
 
         for (TaxiTask t : schedule.getTasks()) {
             double from = t.getBeginTime();
@@ -88,13 +87,12 @@ public class HourlyTaxiStatsCalculator
             int toHour = hour(t.getEndTime());
             for (; hourIdx < toHour; hourIdx++) {
                 double to = (hourIdx + 1) * 3600;
-                updateHourlyVehicleStats(stats[hourIdx], t, to - from);
+                updateHourlyVehicleStats(stats, hourIdx, t, to - from);
 
                 from = to;
-                stats[hourIdx + 1] = new HourlyVehicleStats();
             }
 
-            updateHourlyVehicleStats(stats[toHour], t, t.getEndTime() - from);
+            updateHourlyVehicleStats(stats, toHour, t, t.getEndTime() - from);
 
             if (t.getTaxiTaskType() == TaxiTaskType.PICKUP) {
                 Request req = ((TaxiPickupTask)t).getRequest();
@@ -115,28 +113,36 @@ public class HourlyTaxiStatsCalculator
     }
 
 
-    private void updateHourlyVehicleStats(HourlyVehicleStats stats, TaxiTask task,
+    private void updateHourlyVehicleStats(HourlyVehicleStats[] stats, int hour, TaxiTask task,
             double durationWithinHour)
     {
+        if (durationWithinHour == 0) {
+            return;
+        }
+
+        if (stats[hour] == null) {
+            stats[hour] = new HourlyVehicleStats();
+        }
+
         switch (task.getTaxiTaskType()) {
             case DRIVE_EMPTY:
-                stats.empty += durationWithinHour;
+                stats[hour].empty += durationWithinHour;
                 return;
 
             case PICKUP:
-                stats.pickup += durationWithinHour;
+                stats[hour].pickup += durationWithinHour;
                 return;
 
             case DRIVE_WITH_PASSENGER:
-                stats.occupied += durationWithinHour;
+                stats[hour].occupied += durationWithinHour;
                 return;
 
             case DROPOFF:
-                stats.dropoff += durationWithinHour;
+                stats[hour].dropoff += durationWithinHour;
                 return;
 
             case STAY:
-                stats.stay += durationWithinHour;
+                stats[hour].stay += durationWithinHour;
                 return;
 
             default:
