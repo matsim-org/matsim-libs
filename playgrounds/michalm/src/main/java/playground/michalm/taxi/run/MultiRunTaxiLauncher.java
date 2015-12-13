@@ -91,6 +91,9 @@ class MultiRunTaxiLauncher
     }
 
 
+    private static final int STATS_HOURS = 25;
+
+
     void run(int runs)
     {
         if (runs < 0 || runs > RANDOM_SEEDS.length) {
@@ -103,23 +106,37 @@ class MultiRunTaxiLauncher
             runWarmupConditionally(runs);
         }
 
-        MultiRunStats multipleRunStats = new MultiRunStats();
+        MultiRunStats multiRunStats = new MultiRunStats();
         initTravelTimeAndDisutility();//the same for all runs
 
         for (int i = 0; i < runs; i++) {
             long t0 = System.currentTimeMillis();
             MatsimRandom.reset(RANDOM_SEEDS[i]);
             simulateIteration(i + "");
-            TaxiStats evaluation = new TaxiStatsCalculator(
-                    context.getVrpData().getVehicles().values()).getStats();
+
+            TaxiStats stats = new TaxiStatsCalculator(context.getVrpData().getVehicles().values())
+                    .getStats();
             long t1 = System.currentTimeMillis();
-            multipleRunStats.updateStats(evaluation, t1 - t0);
+            multiRunStats.updateStats(stats, t1 - t0);
+
+            HourlyTaxiStats[] hourlyStats = new HourlyTaxiStatsCalculator(
+                    context.getVrpData().getVehicles().values(), STATS_HOURS).getStats();
+
+            try (PrintWriter hourlyStatsWriter = new PrintWriter(
+                    params.outputDir + "hourly_stats_run_" + i)) {
+                for (int h = 0; h < STATS_HOURS; h++) {
+                    hourlyStats[h].printStats(pw);
+                }
+            }
+            catch (FileNotFoundException e) {
+                throw new RuntimeException(e);
+            }
         }
 
         VrpData data = context.getVrpData();
         String cfg = params.algorithmConfig.name();
 
-        multipleRunStats.printStats(pw, cfg, data);
+        multiRunStats.printStats(pw, cfg, data);
         pw.flush();
     }
 

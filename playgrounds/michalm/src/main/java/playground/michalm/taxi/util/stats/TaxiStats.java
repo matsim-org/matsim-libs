@@ -52,8 +52,14 @@ public class TaxiStats
     public double getDriveEmptyRatio()
     {
         double empty = timesByTaskType.get(TaxiTaskType.DRIVE_EMPTY).getSum();//not mean!
-        double withPassenger = timesByTaskType.get(TaxiTaskType.DRIVE_WITH_PASSENGER).getSum();//not mean!
-        return empty / (empty + withPassenger);
+        double occupied = timesByTaskType.get(TaxiTaskType.DRIVE_WITH_PASSENGER).getSum();//not mean!
+        return empty / (empty + occupied);
+    }
+
+
+    public double getStayTime()
+    {
+        return timesByTaskType.get(TaxiTaskType.STAY).getSum();//not mean!
     }
 
 

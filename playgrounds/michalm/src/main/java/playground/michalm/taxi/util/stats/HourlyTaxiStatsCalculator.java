@@ -29,50 +29,167 @@ import playground.michalm.taxi.schedule.TaxiTask.TaxiTaskType;
 
 public class HourlyTaxiStatsCalculator
 {
-    private final TaxiStats[] stats;
+    private static class HourlyVehicleStats
+    {
+        private double empty = 0;
+        private double pickup = 0;
+        private double occupied = 0;
+        private double dropoff = 0;
+        private double stay = 0;
+
+
+        private double total()
+        {
+            return empty + pickup + occupied + dropoff + stay;
+        }
+    }
+
+
+    private final int hours;
+    private final HourlyTaxiStats[] hourlyStats;
 
 
     public HourlyTaxiStatsCalculator(Iterable<? extends Vehicle> vehicles, int hours)
     {
-        stats = new TaxiStats[hours];
-        for (int i = 0; i < hours; i++) {
-            stats[i] = new TaxiStats();
+        this.hours = hours;
+
+        hourlyStats = new HourlyTaxiStats[hours];
+        for (int h = 0; h < hours; h++) {
+            hourlyStats[h] = new HourlyTaxiStats(h);
         }
 
         for (Vehicle v : vehicles) {
-            calculateStatsImpl(v);
+            updateHourlyStatsForVehicle(v);
         }
     }
 
 
-    public TaxiStats[] getStats()
+    public HourlyTaxiStats[] getStats()
     {
-        return stats;
+        return hourlyStats;
     }
 
 
-    private void calculateStatsImpl(Vehicle vehicle)
+    private void updateHourlyStatsForVehicle(Vehicle vehicle)
     {
         Schedule<TaxiTask> schedule = TaxiSchedules.asTaxiSchedule(vehicle.getSchedule());
-
         if (schedule.getStatus() == ScheduleStatus.UNPLANNED) {
             return;// do not evaluate - the vehicle is unused
         }
 
+        HourlyVehicleStats[] stats = new HourlyVehicleStats[hours];
+
+        int hourIdx = hour(schedule.getBeginTime());
+        stats[hourIdx] = new HourlyVehicleStats();
+
         for (TaxiTask t : schedule.getTasks()) {
-            stats[hour(t.getBeginTime())].addTask(t);
+            double from = t.getBeginTime();
+
+            int toHour = hour(t.getEndTime());
+            for (; hourIdx < toHour; hourIdx++) {
+                double to = (hourIdx + 1) * 3600;
+                updateHourlyVehicleStats(stats[hourIdx], t, to - from);
+
+                from = to;
+                stats[hourIdx + 1] = new HourlyVehicleStats();
+            }
+
+            updateHourlyVehicleStats(stats[toHour], t, t.getEndTime() - from);
 
             if (t.getTaxiTaskType() == TaxiTaskType.PICKUP) {
                 Request req = ((TaxiPickupTask)t).getRequest();
                 double waitTime = Math.max(t.getBeginTime() - req.getT0(), 0);
-                stats[hour(req.getT0())].passengerWaitTimes.addValue(waitTime);
+                int hour = hour(req.getT0());
+                hourlyStats[hour].passengerWaitTimes.addValue(waitTime);
+            }
+        }
+
+        validateHourlyVehicleStats(stats);
+        updateHourlyStats(stats);
+    }
+
+
+    private int hour(double time)
+    {
+        return (int) (time / 3600);
+    }
+
+
+    private void updateHourlyVehicleStats(HourlyVehicleStats stats, TaxiTask task,
+            double durationWithinHour)
+    {
+        switch (task.getTaxiTaskType()) {
+            case DRIVE_EMPTY:
+                stats.empty += durationWithinHour;
+                return;
+
+            case PICKUP:
+                stats.pickup += durationWithinHour;
+                return;
+
+            case DRIVE_WITH_PASSENGER:
+                stats.occupied += durationWithinHour;
+                return;
+
+            case DROPOFF:
+                stats.dropoff += durationWithinHour;
+                return;
+
+            case STAY:
+                stats.stay += durationWithinHour;
+                return;
+
+            default:
+                throw new RuntimeException();
+        }
+    }
+
+
+    //temp validation - only for audi
+    private void validateHourlyVehicleStats(HourlyVehicleStats[] stats)
+    {
+        for (HourlyVehicleStats s : stats) {
+            if (s.total() != 3600) {
+                throw new RuntimeException("Vehicle must be always on duty");
             }
         }
     }
-    
-    
-    private int hour(double time)
+
+
+    private void updateHourlyStats(HourlyVehicleStats[] vehStats)
     {
-        return (int)(time / 3600);
+        for (int h = 0; h < hours; h++) {
+            HourlyVehicleStats vhs = vehStats[h];
+            if (vhs == null) {
+                continue;
+            }
+
+            double emptyRatio = vhs.empty / (vhs.empty + vhs.occupied);
+            double stayRatio = vhs.stay / vhs.total();
+
+            HourlyTaxiStats hs = hourlyStats[h];
+            hs.emptyDriveRatio.addValue(emptyRatio);
+            hs.stayRatio.addValue(stayRatio);
+
+            if (stayRatio < 1.0) {
+                hs.stayLt100PctCount++;
+
+                if (stayRatio < 0.75) {
+                    hs.stayLt75PctCount++;
+
+                    if (stayRatio < 0.5) {
+                        hs.stayLt50PctCount++;
+
+                        if (stayRatio < 0.25) {
+                            hs.stayLt25PctCount++;
+
+                            if (stayRatio < 0.01) {
+                                hs.stayLt1PctCount++;
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }
