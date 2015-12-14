@@ -24,7 +24,6 @@ import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 
 import playground.michalm.taxi.schedule.*;
-import playground.michalm.taxi.schedule.TaxiTask.TaxiTaskType;
 
 
 public class HourlyTaxiStatsCalculator
@@ -47,6 +46,8 @@ public class HourlyTaxiStatsCalculator
 
     private final int hours;
     private final HourlyTaxiStats[] hourlyStats;
+    private final HourlyHistograms[] hourlyHistograms;
+    private final DailyHistograms dailyHistograms;
 
 
     public HourlyTaxiStatsCalculator(Iterable<? extends Vehicle> vehicles, int hours)
@@ -54,9 +55,14 @@ public class HourlyTaxiStatsCalculator
         this.hours = hours;
 
         hourlyStats = new HourlyTaxiStats[hours];
+        hourlyHistograms = new HourlyHistograms[hours];
+
         for (int h = 0; h < hours; h++) {
             hourlyStats[h] = new HourlyTaxiStats(h);
+            hourlyHistograms[h] = new HourlyHistograms(h);
         }
+
+        dailyHistograms = new DailyHistograms();
 
         for (Vehicle v : vehicles) {
             updateHourlyStatsForVehicle(v);
@@ -94,15 +100,29 @@ public class HourlyTaxiStatsCalculator
 
             updateHourlyVehicleStats(stats, toHour, t, t.getEndTime() - from);
 
-            if (t.getTaxiTaskType() == TaxiTaskType.PICKUP) {
-                Request req = ((TaxiPickupTask)t).getRequest();
-                double waitTime = Math.max(t.getBeginTime() - req.getT0(), 0);
-                int hour = hour(req.getT0());
-                hourlyStats[hour].passengerWaitTimes.addValue(waitTime);
+            switch (t.getTaxiTaskType()) {
+                case PICKUP:
+                    Request req = ((TaxiPickupTask)t).getRequest();
+                    double waitTime = Math.max(t.getBeginTime() - req.getT0(), 0);
+                    int hour = hour(req.getT0());
+                    hourlyStats[hour].passengerWaitTime.addValue(waitTime);
+                    hourlyHistograms[hour].passengerWaitTime.addValue(waitTime);
+                    break;
+
+                case DRIVE_EMPTY:
+                    hour = hour(t.getBeginTime());
+                    hourlyHistograms[hour].emptyDriveTime
+                            .addValue(t.getEndTime() - t.getBeginTime());
+                    break;
+
+                case DRIVE_WITH_PASSENGER:
+                    hour = hour(t.getBeginTime());
+                    hourlyHistograms[hour].occupiedDriveTime
+                            .addValue(t.getEndTime() - t.getBeginTime());
             }
         }
 
-//        validateHourlyVehicleStats(stats);
+        //        validateHourlyVehicleStats(stats);
         updateHourlyStats(stats);
     }
 
@@ -164,6 +184,11 @@ public class HourlyTaxiStatsCalculator
 
     private void updateHourlyStats(HourlyVehicleStats[] vehStats)
     {
+        double dailyEmpty = 0;
+        double dailyOccupied = 0;
+        double dailyStay = 0;
+        double dailyTotal = 0;
+
         for (int h = 0; h < hours; h++) {
             HourlyVehicleStats vhs = vehStats[h];
             if (vhs == null) {
@@ -173,6 +198,11 @@ public class HourlyTaxiStatsCalculator
             double emptyRatio = vhs.empty / (vhs.empty + vhs.occupied);
             double stayRatio = vhs.stay / vhs.total();
 
+            dailyEmpty += vhs.empty;
+            dailyOccupied += vhs.occupied;
+            dailyStay += vhs.stay;
+            dailyTotal += vhs.total();
+
             HourlyTaxiStats hs = hourlyStats[h];
             if (!Double.isNaN(emptyRatio)) {
                 hs.emptyDriveRatio.addValue(emptyRatio);
@@ -180,7 +210,7 @@ public class HourlyTaxiStatsCalculator
             hs.stayRatio.addValue(stayRatio);
 
             hs.allCount++;
-            
+
             if (stayRatio < 1.0) {
                 hs.stayLt100PctCount++;
 
@@ -200,6 +230,16 @@ public class HourlyTaxiStatsCalculator
                     }
                 }
             }
+
+            HourlyHistograms hh = hourlyHistograms[h];
+            hh.emptyDriveRatio.addValue(emptyRatio);
+            hh.stayRatio.addValue(stayRatio);
         }
+
+        double dailyEmptyRatio = dailyEmpty / (dailyEmpty + dailyOccupied);
+        double dailyStayRatio = dailyStay / dailyTotal;
+
+        dailyHistograms.emptyDriveRatio.addValue(dailyEmptyRatio);
+        dailyHistograms.stayRatio.addValue(dailyStayRatio);
     }
 }

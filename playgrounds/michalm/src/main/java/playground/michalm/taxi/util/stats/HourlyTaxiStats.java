@@ -28,7 +28,7 @@ public class HourlyTaxiStats
 {
     public final int hour;
 
-    public final DescriptiveStatistics passengerWaitTimes = new DescriptiveStatistics();
+    public final DescriptiveStatistics passengerWaitTime = new DescriptiveStatistics();
     public final DescriptiveStatistics emptyDriveRatio = new DescriptiveStatistics();
     public final DescriptiveStatistics stayRatio = new DescriptiveStatistics();
 
@@ -69,16 +69,16 @@ public class HourlyTaxiStats
                         + "%d\t%d\t%d\t%d\t%d\t%d\t\n", //
                 hour, //
                 //
-                passengerWaitTimes.getMean(), //
-                passengerWaitTimes.getMin(), //
-                passengerWaitTimes.getPercentile(2), //
-                passengerWaitTimes.getPercentile(5), //
-                passengerWaitTimes.getPercentile(25), //
-                passengerWaitTimes.getPercentile(50), //
-                passengerWaitTimes.getPercentile(75), //
-                passengerWaitTimes.getPercentile(95), //
-                passengerWaitTimes.getPercentile(98), //
-                passengerWaitTimes.getMax(), //
+                passengerWaitTime.getMean(), //
+                passengerWaitTime.getMin(), //
+                passengerWaitTime.getPercentile(2), //
+                passengerWaitTime.getPercentile(5), //
+                passengerWaitTime.getPercentile(25), //
+                passengerWaitTime.getPercentile(50), //
+                passengerWaitTime.getPercentile(75), //
+                passengerWaitTime.getPercentile(95), //
+                passengerWaitTime.getPercentile(98), //
+                passengerWaitTime.getMax(), //
                 //
                 emptyDriveRatio.getMean(), //
                 emptyDriveRatio.getMin(), //
