@@ -1,9 +1,11 @@
 package playground.boescpa.ivtBaseline.preparation;
 
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.socnetsim.framework.replanning.modules.BlackListedTimeAllocationMutator;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
 import playground.ivt.replanning.BlackListedTimeAllocationMutatorConfigGroup;
@@ -77,10 +79,14 @@ public class IVTConfigCreator {
 		// Add black listed time mutation and the black listed modes:
 		config.createModule(BlackListedTimeAllocationMutatorConfigGroup.GROUP_NAME);
 		config.setParam("blackListedTimeAllocationMutator", "blackList", "home, remote_home, work, education");
-        // Activate transit
-        config.setParam("transit", "useTransit", "true");
+        // Activate transit and correct it to ivt-experience
+		config.transit().setUseTransit(true);
+		config.planCalcScore().setUtilityOfLineSwitch(-2.0);
+		config.transitRouter().setSearchRadius(2000.0);
+		PlanCalcScoreConfigGroup.ModeParams transitWalkSet = getModeParamsTransitWalk(config);
+		transitWalkSet.setMarginalUtilityOfTraveling(-12.0);
         // Set threads to NUMBER_OF_THREADS
-        config.setParam("global", "numberOfThreads", NUMBER_OF_THREADS);
+		config.setParam("global", "numberOfThreads", NUMBER_OF_THREADS);
         config.setParam("parallelEventHandling", "numberOfThreads", NUMBER_OF_THREADS);
         config.setParam("qsim", "numberOfThreads", NUMBER_OF_THREADS);
         // Account for prct-scenario
@@ -99,7 +105,16 @@ public class IVTConfigCreator {
         config.setParam("transit", "vehiclesFile", INBASE_FILES + VEHICLES);
     }
 
-    protected Map<String, Double> getStrategyDescr() {
+	private PlanCalcScoreConfigGroup.ModeParams getModeParamsTransitWalk(Config config) {
+		PlanCalcScoreConfigGroup.ModeParams transitWalkSet = config.planCalcScore().getOrCreateModeParams(TransportMode.transit_walk);
+		transitWalkSet.setConstant(config.planCalcScore().getOrCreateModeParams(TransportMode.walk).getConstant());
+		transitWalkSet.setMarginalUtilityOfDistance(config.planCalcScore().getOrCreateModeParams(TransportMode.walk).getMarginalUtilityOfDistance());
+		transitWalkSet.setMarginalUtilityOfTraveling(config.planCalcScore().getOrCreateModeParams(TransportMode.walk).getMarginalUtilityOfTraveling());
+		transitWalkSet.setMonetaryDistanceRate(config.planCalcScore().getOrCreateModeParams(TransportMode.walk).getMonetaryDistanceRate());
+		return transitWalkSet;
+	}
+
+	protected Map<String, Double> getStrategyDescr() {
         Map<String, Double> strategyDescr = new HashMap<>();
         strategyDescr.put("ChangeExpBeta", 0.5);
         strategyDescr.put("ReRoute", 0.2);
