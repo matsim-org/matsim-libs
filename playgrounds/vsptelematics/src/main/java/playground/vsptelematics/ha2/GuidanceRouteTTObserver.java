@@ -24,15 +24,21 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
+
 import playground.vsptelematics.common.ListUtils;
 
 import javax.inject.Singleton;
@@ -42,7 +48,7 @@ import java.util.*;
 
 @Singleton
 public class GuidanceRouteTTObserver implements PersonDepartureEventHandler, PersonArrivalEventHandler,
-		LinkEnterEventHandler, IterationEndsListener, AfterMobsimListener {
+		LinkEnterEventHandler, IterationEndsListener, AfterMobsimListener, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 
 	private Set<Id> route1;
 
@@ -75,6 +81,8 @@ public class GuidanceRouteTTObserver implements PersonDepartureEventHandler, Per
 	private HashMap<Id, Double> unGuidedPersonTTs;
 
 	private HashMap<Id, Double> guidedPersonTTs;
+	
+	Vehicle2DriverEventHandler vehicle2driver = new Vehicle2DriverEventHandler();
 
 	public GuidanceRouteTTObserver(OutputDirectoryHierarchy controlerIO) {
 		this.filename = controlerIO.getOutputFilename("routeTravelTimes.txt");
@@ -117,10 +125,10 @@ public class GuidanceRouteTTObserver implements PersonDepartureEventHandler, Per
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
 		if (event.getLinkId().toString().equals("4")) {
-			route1.add(event.getDriverId());
+			route1.add(vehicle2driver.getDriverOfVehicle(event.getVehicleId()));
 		}
 		else if (event.getLinkId().toString().equals("5")) {
-			route2.add(event.getDriverId());
+			route2.add(vehicle2driver.getDriverOfVehicle(event.getVehicleId()));
 		}
 	}
 
@@ -231,6 +239,17 @@ public class GuidanceRouteTTObserver implements PersonDepartureEventHandler, Per
 
 	public void addGuidedAgentId(Id id) {
 		this.guidedAgentIds.add(id);
+	}
+	
+	@Override
+	public void handleEvent(VehicleEntersTrafficEvent event) {
+		vehicle2driver.handleEvent(event);
+	}
+
+
+	@Override
+	public void handleEvent(VehicleLeavesTrafficEvent event) {
+		vehicle2driver.handleEvent(event);
 	}
 
 }
