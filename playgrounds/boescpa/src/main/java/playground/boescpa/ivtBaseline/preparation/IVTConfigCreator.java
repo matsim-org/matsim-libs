@@ -5,6 +5,7 @@ import org.matsim.contrib.socnetsim.framework.replanning.modules.BlackListedTime
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
+import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
@@ -23,11 +24,24 @@ import java.util.Set;
  */
 public class IVTConfigCreator {
 
+	// Scenario
     protected final static int NUMBER_OF_THREADS = 8;
     protected final static String INBASE_FILES = "";
     protected final static int WRITE_OUT_INTERVAL = 10;
     protected final static String COORDINATE_SYSTEM = "CH1903_LV03_Plus";
 
+	// ActivityTypes
+	public static final String HOME = "home";
+	public static final String REMOTE_HOME = "remote_home";
+	public static final String WORK = "work";
+	public static final String REMOTE_WORK = "remote_work";
+	public static final String EDUCATION = "education";
+	public static final String LEISURE = "leisure";
+	public static final String SHOP = "shop";
+	public static final String ESCORT_KIDS = "escort_kids";
+	public static final String ESCORT_OTHER = "escort_other";
+
+	// Files
     public static final String FACILITIES = "facilities.xml.gz";
     public static final String HOUSEHOLD_ATTRIBUTES = "household_attributes.xml.gz";
     public static final String HOUSEHOLDS = "households.xml.gz";
@@ -79,13 +93,16 @@ public class IVTConfigCreator {
             config.getModule(StrategyConfigGroup.GROUP_NAME).addParameterSet(strategySettings);
         }
 		// Add black listed time mutation and the black listed modes:
-		config.createModule(BlackListedTimeAllocationMutatorConfigGroup.GROUP_NAME);
+		// (black listed are all modes which are not free for the agent to decide the start and end times)
+		BlackListedTimeAllocationMutatorConfigGroup blTAM = new BlackListedTimeAllocationMutatorConfigGroup();
 		Set<String> timeMutationBlackList = new HashSet<>();
-		timeMutationBlackList.add("home");
-		timeMutationBlackList.add("remote_home");
-		timeMutationBlackList.add("work");
-		timeMutationBlackList.add("education");
-		((BlackListedTimeAllocationMutatorConfigGroup)config.getModule("blackListedTimeAllocationMutator")).setBlackList(timeMutationBlackList);
+		timeMutationBlackList.add(WORK);
+		timeMutationBlackList.add(REMOTE_WORK);
+		timeMutationBlackList.add(EDUCATION);
+		timeMutationBlackList.add(ESCORT_KIDS);
+		timeMutationBlackList.add(ESCORT_OTHER);
+		blTAM.setBlackList(timeMutationBlackList);
+		config.addModule(blTAM);
         // Activate transit and correct it to ivt-experience
 		config.transit().setUseTransit(true);
 		config.planCalcScore().setUtilityOfLineSwitch(-2.0);

@@ -15,6 +15,8 @@ import org.matsim.core.utils.misc.Counter;
 import java.util.List;
 import java.util.Random;
 
+import static playground.boescpa.ivtBaseline.preparation.IVTConfigCreator.*;
+
 /**
  * Repairs incomplete and / or broken activity chains.
  *
@@ -48,7 +50,7 @@ public class ActivityChainRepairer {
             if (p.getSelectedPlan() != null) {
                 plan = p.getSelectedPlan().getPlanElements();
                 ActivityImpl lastAct = (ActivityImpl) plan.get(plan.size()-1);
-                if (!lastAct.getType().equals("home") && !lastAct.getType().equals("remote_home")) {
+                if (!lastAct.getType().equals(HOME) && !lastAct.getType().equals(REMOTE_HOME)) {
                     // add end-time to lastAct given typical duration
                     minDurationLastAct = PrefsCreator.actCharacteristics.valueOf(lastAct.getType().toUpperCase()).getMinDur();
                     durationLastAct = Math.round(minDurationLastAct + (random.nextInt(30) / 10 * minDurationLastAct));
