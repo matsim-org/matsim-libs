@@ -56,7 +56,7 @@ public class HourlyTaxiStats
             "mean\tmin\tpc_2\tpc_5\tpc_25\tpc_50\tpc_75\tpc_95\tpc_98\tmax\t" + //
             "mean\tmin\tpc_2\tpc_5\tpc_25\tpc_50\tpc_75\tpc_95\tpc_98\tmax\t" + //
             "mean\tmin\tpc_2\tpc_5\tpc_25\tpc_50\tpc_75\tpc_95\tpc_98\tmax\t" + //
-            "<1\t<25\t<50\t<75\t<100\tall\t";
+            "<1%\t<25%\t<50%\t<75%\t<100%\t<=100%\t";
 
 
     public void printStats(PrintWriter pw)

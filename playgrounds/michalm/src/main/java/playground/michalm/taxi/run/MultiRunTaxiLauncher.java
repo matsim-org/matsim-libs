@@ -166,7 +166,7 @@ class MultiRunTaxiLauncher
         DailyHistograms dailyHistograms = calculator.getDailyHistograms();
         try (PrintWriter dailyHistogramsWriter = new PrintWriter(
                 params.outputDir + "daily_histograms_run_" + run)) {
-            dailyHistogramsWriter.println(HourlyHistograms.MAIN_HEADER);
+            dailyHistogramsWriter.println(DailyHistograms.MAIN_HEADER);
             dailyHistograms.printSubHeaders(dailyHistogramsWriter);
             dailyHistograms.printStats(dailyHistogramsWriter);
         }

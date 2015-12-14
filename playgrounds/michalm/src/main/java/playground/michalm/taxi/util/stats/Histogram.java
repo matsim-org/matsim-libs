@@ -19,6 +19,8 @@
 
 package playground.michalm.taxi.util.stats;
 
+import java.text.DecimalFormat;
+
 public class Histogram
 {
     private final int[] counts;
@@ -53,9 +55,10 @@ public class Histogram
 
     public String binsToString()
     {
+        DecimalFormat df = new DecimalFormat("#.##"); 
         String str = "";
         for (int i = 0; i < counts.length; i++) {
-            str += String.format("%.2f...\t", i * binSize);
+            str += df.format(i * binSize) + "...\t";
         }
         return str;
     }
