@@ -75,7 +75,7 @@ public class TransitRouterAStar implements TransitRouter {
 						config,
 						preparedTransitSchedule);
         this.transitNetwork = TransitRouterNetwork.createFromSchedule(schedule, config.getBeelineWalkConnectionDistance());
-		final PreProcessLandmarks preprocess = new PreProcessLandmarks( travelDisutility );
+		final PreProcessLandmarks preprocess = new PreProcessLandmarks( travelDisutility , new DegreeBasedLandmarker() , 16 );
 		preprocess.run( transitNetwork );
         this.dijkstra = new MultiNodeAStarLandmarks(
 				this.transitNetwork,
