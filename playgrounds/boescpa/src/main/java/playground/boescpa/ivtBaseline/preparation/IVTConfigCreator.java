@@ -5,13 +5,16 @@ import org.matsim.contrib.socnetsim.framework.replanning.modules.BlackListedTime
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
+import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
 import playground.ivt.replanning.BlackListedTimeAllocationMutatorConfigGroup;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Creates a default config for the ivt baseline scenarios.
@@ -20,9 +23,9 @@ import java.util.Map;
  */
 public class IVTConfigCreator {
 
-    protected final static String NUMBER_OF_THREADS = "8";
+    protected final static int NUMBER_OF_THREADS = 8;
     protected final static String INBASE_FILES = "";
-    protected final static String WRITE_OUT_INTERVAL = "10";
+    protected final static int WRITE_OUT_INTERVAL = 10;
     protected final static String COORDINATE_SYSTEM = "CH1903_LV03_Plus";
 
     public static final String FACILITIES = "facilities.xml.gz";
@@ -45,18 +48,17 @@ public class IVTConfigCreator {
 
     protected void makeConfigIVT(Config config, final int prctScenario) {
         // Correct routing algorithm
-        config.setParam("controler", "routingAlgorithmType", "FastAStarLandmarks");
+		config.controler().setRoutingAlgorithmType(ControlerConfigGroup.RoutingAlgorithmType.FastAStarLandmarks);
         // Change write out intervals
-        config.setParam("controler", "writeEventsInterval", WRITE_OUT_INTERVAL);
-        config.setParam("controler", "writePlansInterval", WRITE_OUT_INTERVAL);
-        config.setParam("controler", "writeSnapshotsInterval", WRITE_OUT_INTERVAL);
-        config.setParam("counts", "writeCountsInterval", WRITE_OUT_INTERVAL);
-        config.setParam("ptCounts", "ptCountsInterval", WRITE_OUT_INTERVAL);
+		config.controler().setWriteEventsInterval(WRITE_OUT_INTERVAL);
+		config.controler().setWritePlansInterval(WRITE_OUT_INTERVAL);
+		config.controler().setWriteSnapshotsInterval(WRITE_OUT_INTERVAL);
+		config.counts().setWriteCountsInterval(WRITE_OUT_INTERVAL);
+		config.ptCounts().setPtCountsInterval(WRITE_OUT_INTERVAL);
         // Add f2l
         config.createModule(WorldConnectLocations.CONFIG_F2L);
-        config.setParam(WorldConnectLocations.CONFIG_F2L, WorldConnectLocations.CONFIG_F2L_INPUTF2LFile, "");
         // Set coordinate system
-        config.setParam("global", "coordinateSystem", COORDINATE_SYSTEM);
+		config.global().setCoordinateSystem(COORDINATE_SYSTEM);
         // Add activity parameters
         //  <-> We have these as agent-specific parameters now...
         /*Map<String, Double> activityDescr = getActivityDescr();
@@ -64,10 +66,10 @@ public class IVTConfigCreator {
             PlanCalcScoreConfigGroup.ActivityParams activitySet = new PlanCalcScoreConfigGroup.ActivityParams();
             activitySet.setActivityType(activity);
             activitySet.setTypicalDuration(activityDescr.get(activity));
-            config.getModule(PlanCalcScoreConfigGroup.GROUP_NAME).addParameterSet(activitySet);
+            config.planCalcScore().addParameterSet(activitySet);
         }*/
-        // Set coordinate system
-        config.setParam("qsim", "endTime", "30:00:00");
+        // Set end time
+		config.qsim().setEndTime(108000); // 30:00:00
         // Add strategies
         Map<String, Double> strategyDescr = getStrategyDescr();
         for (String strategy : strategyDescr.keySet()) {
@@ -78,7 +80,12 @@ public class IVTConfigCreator {
         }
 		// Add black listed time mutation and the black listed modes:
 		config.createModule(BlackListedTimeAllocationMutatorConfigGroup.GROUP_NAME);
-		config.setParam("blackListedTimeAllocationMutator", "blackList", "home, remote_home, work, education");
+		Set<String> timeMutationBlackList = new HashSet<>();
+		timeMutationBlackList.add("home");
+		timeMutationBlackList.add("remote_home");
+		timeMutationBlackList.add("work");
+		timeMutationBlackList.add("education");
+		((BlackListedTimeAllocationMutatorConfigGroup)config.getModule("blackListedTimeAllocationMutator")).setBlackList(timeMutationBlackList);
         // Activate transit and correct it to ivt-experience
 		config.transit().setUseTransit(true);
 		config.planCalcScore().setUtilityOfLineSwitch(-2.0);
@@ -86,23 +93,23 @@ public class IVTConfigCreator {
 		PlanCalcScoreConfigGroup.ModeParams transitWalkSet = getModeParamsTransitWalk(config);
 		transitWalkSet.setMarginalUtilityOfTraveling(-12.0);
         // Set threads to NUMBER_OF_THREADS
-		config.setParam("global", "numberOfThreads", NUMBER_OF_THREADS);
-        config.setParam("parallelEventHandling", "numberOfThreads", NUMBER_OF_THREADS);
-        config.setParam("qsim", "numberOfThreads", NUMBER_OF_THREADS);
+		config.global().setNumberOfThreads(NUMBER_OF_THREADS);
+		config.parallelEventHandling().setNumberOfThreads(NUMBER_OF_THREADS);
+		config.qsim().setNumberOfThreads(NUMBER_OF_THREADS);
         // Account for prct-scenario
-        config.setParam("counts", "countsScaleFactor", Double.toString(100d / prctScenario));
-        config.setParam("ptCounts", "countsScaleFactor", Double.toString(100d/prctScenario));
-        config.setParam("qsim", "flowCapacityFactor", Double.toString(prctScenario/100d));
+		config.counts().setCountsScaleFactor(100d / prctScenario);
+		config.ptCounts().setCountsScaleFactor(100d / prctScenario);
+		config.qsim().setFlowCapFactor(prctScenario / 100d);
         // Add files
-        config.setParam("facilities", "inputFacilitiesFile", INBASE_FILES + FACILITIES);
-        config.setParam("f2l", "inputF2LFile", INBASE_FILES + FACILITIES2LINKS);
-        config.setParam("households", "inputFile", INBASE_FILES + HOUSEHOLDS);
-        config.setParam("households", "inputHouseholdAttributesFile", INBASE_FILES + HOUSEHOLD_ATTRIBUTES);
-        config.setParam("network", "inputNetworkFile", INBASE_FILES + NETWORK);
-        config.setParam("plans", "inputPersonAttributesFile", INBASE_FILES + POPULATION_ATTRIBUTES);
-        config.setParam("plans", "inputPlansFile", INBASE_FILES + POPULATION);
-        config.setParam("transit", "transitScheduleFile", INBASE_FILES + SCHEDULE);
-        config.setParam("transit", "vehiclesFile", INBASE_FILES + VEHICLES);
+		config.facilities().setInputFile(INBASE_FILES + FACILITIES);
+		config.setParam(WorldConnectLocations.CONFIG_F2L, WorldConnectLocations.CONFIG_F2L_INPUTF2LFile, INBASE_FILES + FACILITIES2LINKS);
+		config.households().setInputFile(INBASE_FILES + HOUSEHOLDS);
+		config.households().setInputHouseholdAttributesFile(INBASE_FILES + HOUSEHOLD_ATTRIBUTES);
+		config.network().setInputFile(INBASE_FILES + NETWORK);
+		config.plans().setInputFile(INBASE_FILES + POPULATION_ATTRIBUTES);
+		config.plans().setInputPersonAttributeFile(INBASE_FILES + POPULATION);
+		config.transit().setTransitScheduleFile(INBASE_FILES + SCHEDULE);
+		config.transit().setVehiclesFile(INBASE_FILES + VEHICLES);
     }
 
 	private PlanCalcScoreConfigGroup.ModeParams getModeParamsTransitWalk(Config config) {
@@ -118,7 +125,6 @@ public class IVTConfigCreator {
         Map<String, Double> strategyDescr = new HashMap<>();
         strategyDescr.put("ChangeExpBeta", 0.5);
         strategyDescr.put("ReRoute", 0.2);
-        //strategyDescr.put("TimeAllocationMutator", 0.1);
 		strategyDescr.put("BlackListedTimeAllocationMutator", 0.1);
         strategyDescr.put("SubtourModeChoice", 0.1);
         return strategyDescr;
