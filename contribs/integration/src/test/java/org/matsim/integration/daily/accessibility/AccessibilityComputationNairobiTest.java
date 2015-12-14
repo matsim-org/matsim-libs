@@ -10,14 +10,11 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
 import org.matsim.contrib.accessibility.FacilityTypes;
 import org.matsim.contrib.accessibility.GridBasedAccessibilityControlerListenerV3;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
-import org.matsim.contrib.accessibility.gis.GridUtils;
 import org.matsim.contrib.accessibility.utils.AccessibilityRunUtils;
 import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtRouterConfigGroup;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
@@ -28,21 +25,15 @@ import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspDefaultsCheckingLevel;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.replanning.DefaultPlanStrategiesModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilities;
-import org.matsim.facilities.ActivityFacilitiesFactory;
-import org.matsim.facilities.ActivityFacilitiesFactoryImpl;
-import org.matsim.facilities.ActivityFacility;
-import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 public class AccessibilityComputationNairobiTest {
 	public static final Logger log = Logger.getLogger( AccessibilityComputationNairobiTest.class ) ;
 
-	private static final double cellSize = 1000.;
+	private static final Double cellSize = 1000.;
 
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
 
@@ -51,9 +42,13 @@ public class AccessibilityComputationNairobiTest {
 	public void doAccessibilityTest() throws IOException {
 //		String folderStructure = "../../../"; // local on dz's computer
 		String folderStructure = "../../"; // server
+		
+		String networkFile = "matsimExamples/countries/ke/nairobi/2015-10-15_network.xml ";
+
+		folderStructure = PathUtils.tryANumberOfFolderStructures(folderStructure, networkFile);
 			
-		String networkFile = folderStructure + "matsimExamples/countries/ke/nairobi/network/2015-10-15_nairobi.xml";
-		String facilitiesFile = folderStructure + "matsimExamples/countries/ke/nairobi/facilities/facilities.xml";
+		networkFile = folderStructure + networkFile ;
+		String facilitiesFile = folderStructure + "matsimExamples/countries/ke/nairobi/2015-10-15_facilities.xml";
 		
 		// minibus-pt
 //		String travelTimeMatrix = folderStructure + "matsimExamples/countries/za/nmbm/minibus-pt/JTLU_14i/travelTimeMatrix.csv.gz";
@@ -65,12 +60,12 @@ public class AccessibilityComputationNairobiTest {
 //		String travelDistanceMatrixFile = folderStructure + "matsimExamples/countries/za/nmb/regular-pt/travelDistanceMatrix_space.csv";
 //		String ptStopsFile = folderStructure + "matsimExamples/countries/za/nmb/regular-pt/ptStops.csv";
 		
-		
+
 		// Parameters
 		boolean createQGisOutput = false;
 		boolean includeDensityLayer = true;
 		String crs = "EPSG:21037"; // = Arc 1960 / UTM zone 37S, for Nairobi, Kenya
-		String name = "ke_nairobi_work_1000";
+		String name = "ke_nairobi_" + cellSize.toString().split("\\.")[0];
 		
 		Double lowerBound = 2.;
 		Double upperBound = 5.5;

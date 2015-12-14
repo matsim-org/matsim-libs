@@ -32,7 +32,8 @@ import org.matsim.testcases.MatsimTestUtils;
 public class AccessibilityComputationKiberaTest {
 	public static final Logger log = Logger.getLogger( AccessibilityComputationKiberaTest.class ) ;
 
-	private static final double cellSize = 25.;
+//	private static final double cellSize = 25.;
+	private static final Double cellSize = 100.;
 
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
 
@@ -42,18 +43,21 @@ public class AccessibilityComputationKiberaTest {
 		// Input and output
 		String folderStructure = "../../../"; // local on dz's computer
 //		String folderStructure = "../../"; // server
-			
-		String networkFile = folderStructure + "matsimExamples/countries/ke/kibera/network/2015-11-05_kibera_paths_detailed.xml";
-		String facilitiesFile = folderStructure + "matsimExamples/countries/ke/kibera/facilities/facilities.xml";
+		
+		String networkFile = "matsimExamples/countries/ke/kibera/2015-11-05_network_paths_detailed.xml";
+
+		folderStructure = PathUtils.tryANumberOfFolderStructures(folderStructure, networkFile);
+
+		networkFile = folderStructure + networkFile ;	
+		String facilitiesFile = folderStructure + "matsimExamples/countries/ke/kibera/2015-11-05_facilities.xml";
 		
 		// no pt input
-		
 		
 		// Parameters
 		boolean createQGisOutput = false;
 		boolean includeDensityLayer = false;
 		String crs = "EPSG:21037"; // = Arc 1960 / UTM zone 37S, for Nairobi, Kenya
-		String name = "ke_kibera_drinkingwater_100";
+		String name = "ke_kibera_" + cellSize.toString().split("\\.")[0];
 		
 		Double lowerBound = 2.;
 		Double upperBound = 5.5;
@@ -128,7 +132,7 @@ public class AccessibilityComputationKiberaTest {
 					new GridBasedAccessibilityControlerListenerV3(activityFacilitiesMap.get(actType), 
 							config, scenario.getNetwork());
 			listener.setComputingAccessibilityForMode(Modes4Accessibility.freeSpeed, true);
-//			listener.setComputingAccessibilityForMode(Modes4Accessibility.car, true);
+			listener.setComputingAccessibilityForMode(Modes4Accessibility.car, true);
 			listener.setComputingAccessibilityForMode(Modes4Accessibility.walk, true);
 			listener.setComputingAccessibilityForMode(Modes4Accessibility.bike, true);
 //			listener.setComputingAccessibilityForMode(Modes4Accessibility.pt, true);
@@ -158,7 +162,7 @@ public class AccessibilityComputationKiberaTest {
 				String actSpecificWorkingDirectory = workingDirectory + actType + "/";
 
 				for ( Modes4Accessibility mode : Modes4Accessibility.values()) {
-					if ( !actType.equals("w") ) {
+					if ( !actType.equals("drinking_water") ) {
 						log.error("skipping everything except work for debugging purposes; remove in production code. kai, feb'14") ;
 						continue ;
 					}

@@ -147,4 +147,9 @@ public class TaxibusLineImpl implements TaxibusLine {
 		return maxVehicles;
 	}
 
+	@Override
+	public void reset() {
+		this.vehiclesInHold.clear();
+	}
+
 }

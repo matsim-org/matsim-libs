@@ -36,7 +36,7 @@ public class RunPlanStrategyForRemovalExampleTest {
 	public final void testMain() {
 		
 		try {
-			RunPlanStrategyForRemovalExample.main(null);
+			RunPlanSelectorForRemovalExample.main(null);
 		} catch(Exception e) {
 			Assert.fail(e.toString());
 		}

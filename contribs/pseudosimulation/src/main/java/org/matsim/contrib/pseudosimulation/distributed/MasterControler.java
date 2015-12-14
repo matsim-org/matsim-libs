@@ -462,7 +462,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         int firstIteration = config.controler().getFirstIteration();
         if (SelectedSimulationMode.equals(SimulationMode.PARALLEL))
             startSlavesInMode(CommunicationsMode.TRANSMIT_PLANS_TO_MASTER);
-        IterationStopWatch stopwatch = matsimControler.stopwatch;
+        IterationStopWatch stopwatch = event.getControler().getStopwatch();
         if ((writeFullPlansInterval > 0) &&
                 ((event.getIteration() % writeFullPlansInterval == 0) && event.getIteration() > 0)) {
             masterLogger.warn("Dumping plans on slaves. Can be re-assembled into monolithic plans file afterwards.");

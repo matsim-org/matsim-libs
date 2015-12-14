@@ -37,8 +37,9 @@ public class Executor {
     private static void init() {
         if (service == null) {
             service = (ThreadPoolExecutor) Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-            Timer timer = new Timer(true);
-            timer.scheduleAtFixedRate(new ShutdownTask(), 0, 60 * 1000);
+            //TODO: Does not work as expected.
+//            Timer timer = new Timer(true);
+//            timer.scheduleAtFixedRate(new ShutdownTask(), 0, 60 * 1000);
         }
     }
 

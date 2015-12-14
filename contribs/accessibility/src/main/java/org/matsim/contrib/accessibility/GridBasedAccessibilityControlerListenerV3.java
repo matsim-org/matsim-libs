@@ -291,6 +291,8 @@ public final class GridBasedAccessibilityControlerListenerV3 implements Shutdown
 		// write header
 		writer.writeField(Labels.X_COORDINATE);
 		writer.writeField(Labels.Y_COORDINATE);
+		writer.writeField(Labels.TIME);
+		
 		writer.writeField(Labels.ACCESSIBILITY_BY_FREESPEED);
 		writer.writeField(Labels.ACCESSIBILITY_BY_CAR);
 		writer.writeField(Labels.ACCESSIBILITY_BY_BIKE);
@@ -304,13 +306,15 @@ public final class GridBasedAccessibilityControlerListenerV3 implements Shutdown
 
 		final SpatialGrid spatialGrid = spatialGridAggregator.getAccessibilityGrids().get(Modes4Accessibility.freeSpeed) ;
 		// yy for time being, have to assume that this is always there
-		for(double y = spatialGrid.getYmin(); y <= spatialGrid.getYmax() ; y += spatialGrid.getResolution()) {
+		for(double y = spatialGrid.getYmin(); y <= spatialGrid.getYmax(); y += spatialGrid.getResolution()) {
 			for(double x = spatialGrid.getXmin(); x <= spatialGrid.getXmax(); x += spatialGrid.getResolution()) {
 				
+				writer.writeField( x + 0.5*spatialGrid.getResolution());
+				writer.writeField( y + 0.5*spatialGrid.getResolution());
 				
-				writer.writeField( x + 0.5*spatialGrid.getResolution() ) ;
-				writer.writeField( y + 0.5*spatialGrid.getResolution() ) ;
-				for ( Modes4Accessibility mode : Modes4Accessibility.values()  ) {
+//				writer.writeField(time);
+				
+				for (Modes4Accessibility mode : Modes4Accessibility.values()) {
 					if ( delegate.getIsComputingMode().get(mode) ) {
 						final SpatialGrid spatialGridOfMode = spatialGridAggregator.getAccessibilityGrids().get(mode);
 						final double value = spatialGridOfMode.getValue(x, y);
@@ -516,7 +520,7 @@ public final class GridBasedAccessibilityControlerListenerV3 implements Shutdown
 	}
 	
 	
-	public final void addFacilityDataExchangeListener( FacilityDataExchangeInterface listener ) {
+	public final void addFacilityDataExchangeListener(FacilityDataExchangeInterface listener) {
 		this.delegate.addFacilityDataExchangeListener(listener);
 	}
 

@@ -34,9 +34,9 @@ import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityOption;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.Alternative;
-import playground.ivt.maxess.nestedlogitaccessibility.framework.NestedChoiceSet;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.ChoiceSetIdentifier;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.Nest;
+import playground.ivt.maxess.nestedlogitaccessibility.framework.NestedChoiceSet;
 import playground.ivt.maxess.prepareforbiogeme.tripbased.Trip;
 import playground.ivt.utils.ConcurrentStopWatch;
 

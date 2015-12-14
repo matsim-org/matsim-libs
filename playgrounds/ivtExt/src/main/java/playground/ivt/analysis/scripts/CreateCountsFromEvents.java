@@ -19,14 +19,11 @@
  * *********************************************************************** */
 package playground.ivt.analysis.scripts;
 
-import java.util.Locale;
-
 import org.apache.log4j.Logger;
-
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
@@ -35,21 +32,22 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.counts.Count;
+import org.matsim.counts.Counts;
+import org.matsim.counts.MatsimCountsReader;
+import org.matsim.counts.algorithms.CountSimComparisonKMLWriter;
+import org.matsim.counts.algorithms.CountSimComparisonTableWriter;
 import org.matsim.counts.algorithms.CountsComparisonAlgorithm;
 import org.matsim.counts.algorithms.CountsComparisonAlgorithm.DistanceFilter;
 import org.matsim.counts.algorithms.CountsHtmlAndGraphsWriter;
-import org.matsim.counts.algorithms.CountSimComparisonKMLWriter;
-import org.matsim.counts.algorithms.CountSimComparisonTableWriter;
 import org.matsim.counts.algorithms.graphs.CountsErrorGraphCreator;
 import org.matsim.counts.algorithms.graphs.CountsLoadCurveGraphCreator;
 import org.matsim.counts.algorithms.graphs.CountsSimReal24GraphCreator;
 import org.matsim.counts.algorithms.graphs.CountsSimRealPerHourGraphCreator;
-import org.matsim.counts.Count;
-import org.matsim.counts.Counts;
-import org.matsim.counts.MatsimCountsReader;
-
 import playground.ivt.utils.ArgParser;
 import playground.ivt.utils.ArgParser.Args;
+
+import java.util.Locale;
 
 /**
  * @author thibautd

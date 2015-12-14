@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Plan;
 
 import playground.jbischoff.taxibus.algorithm.optimizer.fifo.Lines.LineDispatcher;
+import playground.jbischoff.taxibus.run.sim.TaxibusPermissibleModesCalculatorImpl;
 
 /**
  * @author  jbischoff

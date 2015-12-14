@@ -75,12 +75,12 @@ import scenarios.braess.createInput.TtCreateBraessSignals.SignalControlType;
 
 /**
  * Class to run a simulation of the braess scenario with or without signals. 
- * It analyzes the simulation with help of AnalyseBraessSimulation.java.
+ * It analyzes the simulation with help of TtAnalyzeBraess.java.
  * 
  * @author tthunig
  * 
  */
-public class RunBraessSimulation {
+public final class RunBraessSimulation {
 
 	private static final Logger log = Logger
 			.getLogger(RunBraessSimulation.class);
@@ -99,7 +99,7 @@ public class RunBraessSimulation {
 	private static final LaneType LANE_TYPE = LaneType.NONE;
 	
 	// defines which kind of pricing should be used
-	private static final PricingType PRICING_TYPE = PricingType.V3;
+	private static final PricingType PRICING_TYPE = PricingType.NONE;
 	public enum PricingType{
 		NONE, V3, V4, V8, V9, FLOWBASED
 	}
@@ -108,9 +108,9 @@ public class RunBraessSimulation {
 	// (higher sigma cause more randomness. use 0.0 for no randomness.)
 	private static final double SIGMA = 0.0;	
 		
-	private static final boolean WRITE_INITIAL_FILES = false;
+	private static final boolean WRITE_INITIAL_FILES = true;
 	
-	private static String OUTPUT_BASE_DIR = "../../../runs-svn/braess/withoutLanes_signalsVsTolls/";
+	private static String OUTPUT_BASE_DIR = "../../../runs-svn/braess/test/";
 	
 	public static void main(String[] args) {
 		Config config = defineConfig();
@@ -256,7 +256,7 @@ public class RunBraessSimulation {
 		config.travelTimeCalculator().setCalculateLinkToLinkTravelTimes(link2linkRouting);
 		config.travelTimeCalculator().setCalculateLinkTravelTimes(true);
 		
-		// set travelTimeBinSize
+		// set travelTimeBinSize (only has effect if reRoute is used)
 		config.travelTimeCalculator().setTraveltimeBinSize( 900 );
 		
 		config.travelTimeCalculator().setTravelTimeCalculatorType(
@@ -302,7 +302,7 @@ public class RunBraessSimulation {
 		}
 
 		// choose maximal number of plans per agent. 0 means unlimited
-		config.strategy().setMaxAgentPlanMemorySize( 0 );
+		config.strategy().setMaxAgentPlanMemorySize( 3 );
 		
 		config.qsim().setStuckTime(3600 * 10.);
 		

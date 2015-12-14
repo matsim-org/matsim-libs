@@ -50,7 +50,7 @@ public class TaxibusServiceRoutingModule implements RoutingModule {
 	@Override
 	public List<? extends PlanElement> calcRoute(Facility fromFacility,
 			Facility toFacility, double departureTime, Person person) {
-		double travelTime = 0.0;
+		double travelTime = Double.NaN;
 	
 		List<PlanElement> trip = new ArrayList<PlanElement>();
 

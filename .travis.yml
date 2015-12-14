@@ -1,9 +1,7 @@
 language: java
 script:
     - cd ${TRAVIS_BUILD_DIR}/matsim && mvn test -B -Dmaven.test.redirectTestOutputToFile
-#    - cd ${TRAVIS_BUILD_DIR}/contribs && mvn test -B -Dmaven.test.redirectTestOutputToFile
+    - cd ${TRAVIS_BUILD_DIR}/contribs && mvn test -B -Dmaven.test.redirectTestOutputToFile
 env:
   global:
     - MAVEN_OPTS="-XX:MaxPermSize=1g -Xmx4g"
-
-# seems that "mvn install" is always run, indep of what is said under "script:". kai based on mz, oct'15
