@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.ChangeLegModeConfigGroup;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
@@ -46,7 +47,7 @@ public class ChangeLegModeTest {
 		Config config = ConfigUtils.createConfig();
 		config.global().setNumberOfThreads(0);
 
-		final ChangeLegMode module = new ChangeLegMode(config);
+		final ChangeLegMode module = new ChangeLegMode(config.global(), config.changeLegMode());
 		final String[] modes = new String[] {TransportMode.car, TransportMode.pt};
 		runTest(module, modes);
 	}
@@ -55,9 +56,9 @@ public class ChangeLegModeTest {
 	public void testWithConfig() {
 		Config config = ConfigUtils.createConfig();
 		config.global().setNumberOfThreads(0);
-		config.setParam(ChangeLegMode.CONFIG_MODULE, ChangeLegMode.CONFIG_PARAM_MODES, " car,pt ,bike,walk ");
+		config.setParam(ChangeLegModeConfigGroup.CONFIG_MODULE, ChangeLegModeConfigGroup.CONFIG_PARAM_MODES, " car,pt ,bike,walk ");
 
-		final ChangeLegMode module = new ChangeLegMode(config);
+		final ChangeLegMode module = new ChangeLegMode(config.global(), config.changeLegMode());
 		final String[] modes = new String[] {TransportMode.car, TransportMode.pt, TransportMode.bike, TransportMode.walk};
 		runTest(module, modes);
 	}
@@ -73,10 +74,10 @@ public class ChangeLegModeTest {
 	public void testWithConfig_withoutIgnoreCarAvailability() {
 		Config config = ConfigUtils.createConfig();
 		config.global().setNumberOfThreads(0);
-		config.setParam(ChangeLegMode.CONFIG_MODULE, ChangeLegMode.CONFIG_PARAM_MODES, "car,pt,walk");
-		config.setParam(ChangeLegMode.CONFIG_MODULE, ChangeLegMode.CONFIG_PARAM_IGNORECARAVAILABILITY, "false");
+		config.setParam(ChangeLegModeConfigGroup.CONFIG_MODULE, ChangeLegModeConfigGroup.CONFIG_PARAM_MODES, "car,pt,walk");
+		config.setParam(ChangeLegModeConfigGroup.CONFIG_MODULE, ChangeLegModeConfigGroup.CONFIG_PARAM_IGNORECARAVAILABILITY, "false");
 
-		final ChangeLegMode module = new ChangeLegMode(config);
+		final ChangeLegMode module = new ChangeLegMode(config.global(), config.changeLegMode());
 		final String[] modes = new String[] {TransportMode.car, TransportMode.pt, TransportMode.walk};
 
 		module.prepareReplanning(null);
