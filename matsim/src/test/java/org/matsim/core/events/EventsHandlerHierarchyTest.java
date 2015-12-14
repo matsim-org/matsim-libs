@@ -72,7 +72,7 @@ public class EventsHandlerHierarchyTest extends MatsimTestCase {
 	}
 
 	public final void testHierarchicalReset() {
-		EventsManagerImpl events = (EventsManagerImpl) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		Id<Link> linkId = Id.create("1", Link.class);
 		Id<Vehicle> vehId = Id.create("1", Vehicle.class);
 		//first test if handleEvent is not called twice for A and for C

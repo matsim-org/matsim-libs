@@ -43,6 +43,7 @@ import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Route;
@@ -58,9 +59,11 @@ import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 
+import javax.inject.Inject;
 
 
 /**
@@ -111,8 +114,9 @@ TeleportationArrivalEventHandler, TransitDriverStartsEventHandler, PersonEntersV
 	public interface LegHandler {
 	    void handleLeg(Id<Person> agentId, Leg leg);
 	}
-	
-	private Scenario scenario;
+
+	private Network network;
+	private TransitSchedule transitSchedule;
 	private Map<Id<Person>, LegImpl> legs = new HashMap<>();
 	private Map<Id<Person>, List<Id<Link>>> experiencedRoutes = new HashMap<>();
 	private Map<Id<Person>, TeleportationArrivalEvent> routelessTravels = new HashMap<>();
@@ -120,8 +124,16 @@ TeleportationArrivalEventHandler, TransitDriverStartsEventHandler, PersonEntersV
 	private Map<Id<Vehicle>, LineAndRoute> transitVehicle2currentRoute = new HashMap<>();
 	private LegHandler legHandler;
 	
+
+	@Inject
+	EventsToLegs(Network network, TransitSchedule transitSchedule) {
+		this.network = network;
+		this.transitSchedule = transitSchedule;
+	}
+
 	public EventsToLegs(Scenario scenario) {
-		this.scenario = scenario;
+		this.network = scenario.getNetwork();
+		this.transitSchedule = scenario.getTransitSchedule();
 	}
 
 	@Override
@@ -181,7 +193,7 @@ TeleportationArrivalEventHandler, TransitDriverStartsEventHandler, PersonEntersV
 	        NetworkRoute networkRoute = RouteUtils.createNetworkRoute(experiencedRoute, null);
 	        networkRoute.setTravelTime(travelTime);
 
-	        networkRoute.setDistance(RouteUtils.calcDistance(networkRoute, scenario.getNetwork()));
+	        networkRoute.setDistance(RouteUtils.calcDistance(networkRoute, network));
 	        // TODO MATSIM-227: replace the above by taking distance from List<Id<Link>> experiencedRoute (minus first/last link)
 	        // and add manually distance on first/last link.  Newly based on VehicleEnters/LeavesTrafficEvents, which should (newly)
 	        // contain this information.  kai/mz, sep'15
@@ -189,14 +201,14 @@ TeleportationArrivalEventHandler, TransitDriverStartsEventHandler, PersonEntersV
 	        leg.setRoute(networkRoute);
 	    } else if ((pendingTransitTravel = transitTravels.remove(event.getPersonId())) != null) {
 	    	LineAndRoute lineAndRoute = transitVehicle2currentRoute.get(pendingTransitTravel.vehicleId);
-			TransitLine line = scenario.getTransitSchedule().getTransitLines().get(lineAndRoute.transitLineId);
+			TransitLine line = transitSchedule.getTransitLines().get(lineAndRoute.transitLineId);
 			ExperimentalTransitRoute experimentalTransitRoute = new ExperimentalTransitRoute(
-					scenario.getTransitSchedule().getFacilities().get(pendingTransitTravel.accessStop),
+					transitSchedule.getFacilities().get(pendingTransitTravel.accessStop),
 					line, 
-					line.getRoutes().get(lineAndRoute.transitRouteId), 
-					scenario.getTransitSchedule().getFacilities().get(lineAndRoute.lastFacilityId));
+					line.getRoutes().get(lineAndRoute.transitRouteId),
+					transitSchedule.getFacilities().get(lineAndRoute.lastFacilityId));
 			experimentalTransitRoute.setTravelTime(travelTime);
-			experimentalTransitRoute.setDistance(RouteUtils.calcDistance(experimentalTransitRoute, scenario.getTransitSchedule(), scenario.getNetwork()));
+			experimentalTransitRoute.setDistance(RouteUtils.calcDistance(experimentalTransitRoute, transitSchedule, network));
 			leg.setRoute(experimentalTransitRoute);
 	    } else {
 	    	TeleportationArrivalEvent travelEvent = routelessTravels.remove(event.getPersonId());

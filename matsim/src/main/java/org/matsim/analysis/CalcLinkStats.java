@@ -34,6 +34,8 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.StringUtils;
 
+import javax.inject.Inject;
+
 /**
  * Calculates the average link volumes and travel times over any number of iterations.
  *
@@ -65,9 +67,10 @@ public class CalcLinkStats {
 	private static final int SUM = 2;
 	private static final int NOF_STATS = 3;
 
+	@Inject
 	public CalcLinkStats(final Network network) {
 		this.network = network;
-		this.linkData = new TreeMap<Id<Link>, LinkData>();
+		this.linkData = new TreeMap<>();
 		this.nofHours = 24;
 		reset();
 	}

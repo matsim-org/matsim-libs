@@ -23,31 +23,24 @@
 package org.matsim.core.mobsim.qsim;
 
 import com.google.inject.*;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.mobsim.qsim.interfaces.ActivityHandler;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
-import org.matsim.core.scenario.ScenarioElementsModule;
 
 import javax.inject.Inject;
 import java.util.Collection;
 
 public class QSimProvider implements Provider<QSim> {
 
-    private Scenario scenario;
-    private EventsManager eventsManager;
-    private Injector injector;
+	private Injector injector;
 	private Collection<AbstractQSimPlugin> plugins;
 
 	@Inject
-    QSimProvider(Injector injector, Scenario scenario, EventsManager eventsManager, Collection<AbstractQSimPlugin> plugins) {
+    QSimProvider(Injector injector, Collection<AbstractQSimPlugin> plugins) {
         this.injector = injector;
-        this.scenario = scenario;
-        this.eventsManager = eventsManager;
 		this.plugins = plugins;
     }
 

@@ -13,6 +13,10 @@ import org.matsim.core.replanning.modules.SubtourModeChoice;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 
 import com.google.inject.Inject;
+import org.matsim.core.router.TripRouter;
+
+import javax.inject.Provider;
+
 /**
  * Uses a TripsToLegModule to simplify trips before running subtour
  * mode choice and re-routing
@@ -21,17 +25,17 @@ import com.google.inject.Inject;
 public class CarsharingSubtourModeChoiceStrategy implements PlanStrategy {
 	private final PlanStrategyImpl strategy;
 	@Inject
-	public CarsharingSubtourModeChoiceStrategy(final Scenario scenario) {
+	public CarsharingSubtourModeChoiceStrategy(final Scenario scenario, Provider<TripRouter> tripRouterProvider) {
 		this.strategy = new PlanStrategyImpl( new RandomPlanSelector<Plan, Person>() );
 
 		//addStrategyModule( new TripsToLegsModule(controler.getConfig() ) );   
-		SubtourModeChoice smc = new SubtourModeChoice(scenario.getConfig());
+		SubtourModeChoice smc = new SubtourModeChoice(tripRouterProvider, scenario.getConfig().global(), scenario.getConfig().subtourModeChoice());
 		CarsharingSubTourPermissableModesCalculator cpmc = 
 				new CarsharingSubTourPermissableModesCalculator(scenario, scenario.getConfig().subtourModeChoice().getModes());
 		smc.setPermissibleModesCalculator(cpmc);
 		
 		addStrategyModule(smc );
-		addStrategyModule( new ReRoute(scenario) );
+		addStrategyModule( new ReRoute(scenario, tripRouterProvider) );
 	}
 
 	public void addStrategyModule(final PlanStrategyModule module) {

@@ -20,13 +20,18 @@ public class MATSimSimulator<U extends DecisionVariable> implements Simulator<U>
 
 	private int nextControlerRun = 0;
 
+	private final AbstractModule[] modules;
+	
+	private boolean modulesHaveBeenSet = false;
+	
     public MATSimSimulator(// Set<? extends DecisionVariable> decisionVariables, 
-    		MATSimStateFactory stateFactory, Scenario scenario) {
+    		MATSimStateFactory stateFactory, Scenario scenario, AbstractModule... modules) {
         // this.decisionVariables = decisionVariables;
         this.stateFactory = stateFactory;
         this.scenario = scenario;
 		String outputDirectory = this.scenario.getConfig().controler().getOutputDirectory();
 		this.scenario.getConfig().controler().setOutputDirectory(outputDirectory + "_0");
+		this.modules = modules;
     }
 
     @Override
@@ -46,6 +51,14 @@ public class MATSimSimulator<U extends DecisionVariable> implements Simulator<U>
 		predictor.setBinCnt(6 * 20);
 
 		final Controler controler = new Controler(scenario);
+
+		// Michael, ich weiss nicht ob das hier ideal ist, aber ich brauchte es, um irgendwie das
+		// roadpricing-modul einzusetzen. Gunnar 2015-12-12
+		if (this.modules != null && !this.modulesHaveBeenSet) {
+			controler.setModules(this.modules);
+			this.modulesHaveBeenSet = true;
+		}
+        
 		controler.addControlerListener(predictor);
 		controler.addOverridingModule(new AbstractModule() {
 			@Override

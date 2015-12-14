@@ -19,12 +19,14 @@
  * *********************************************************************** */
 package org.matsim.core.replanning.modules;
 
-import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.router.CompositeStageActivityTypes;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripRouter;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.population.algorithms.TripsToLegsAlgorithm;
+
+import javax.inject.Provider;
 
 /**
  * Removes trips and replaces them by legs.
@@ -34,13 +36,15 @@ import org.matsim.population.algorithms.TripsToLegsAlgorithm;
  * @author thibautd
  */
 public class TripsToLegsModule extends AbstractMultithreadedModule {
+
 	private final StageActivityTypes additionalBlackList;
+	private final Provider<TripRouter> tripRouterProvider;
 
 	/**
 	 * Initializes an instance using the stage activity types from the controler
 	 */
-	public TripsToLegsModule(Config config) {
-		this( config, null );
+	public TripsToLegsModule(Provider<TripRouter> tripRouterProvider, GlobalConfigGroup globalConfigGroup) {
+		this(null, tripRouterProvider, globalConfigGroup);
 	}
 
 	/**
@@ -48,16 +52,18 @@ public class TripsToLegsModule extends AbstractMultithreadedModule {
 	 * consider as stage activities.
 	 * @param controler
 	 * @param additionalBlackList a {@link StageActivityTypes} instance identifying
-	 * the additionnal types
+	 * @param tripRouterProvider
+	 * @param globalConfigGroup
 	 */
-	public TripsToLegsModule(final Config config, final StageActivityTypes additionalBlackList) {
-		super( config.global() );
+	public TripsToLegsModule(final StageActivityTypes additionalBlackList, Provider<TripRouter> tripRouterProvider, GlobalConfigGroup globalConfigGroup) {
+		super(globalConfigGroup);
+		this.tripRouterProvider = tripRouterProvider;
 		this.additionalBlackList = additionalBlackList;
 	}
 
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
-		TripRouter router = getReplanningContext().getTripRouter();
+		TripRouter router = tripRouterProvider.get();
 		StageActivityTypes blackListToUse = router.getStageActivityTypes();
 
 		if (additionalBlackList != null) {

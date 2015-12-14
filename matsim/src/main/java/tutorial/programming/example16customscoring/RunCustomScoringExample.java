@@ -16,6 +16,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.internal.HasPersonId;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
@@ -28,6 +29,8 @@ import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.vehicles.Vehicle;
+
+import javax.inject.Inject;
 
 public class RunCustomScoringExample {
 
@@ -78,7 +81,15 @@ public class RunCustomScoringExample {
 		}
 		
 		Controler controler = new Controler(scenario);
-		final EventsManager eventsManager = controler.getEvents();
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				// We add a class which reacts on people who enter a link and lets it rain on them
+				// if we are within a certain time window.
+				// The class registers itself as an EventHandler and also produces events by itself.
+				bind(RainEngine.class).asEagerSingleton();
+			}
+		});
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
 
 			@Override
@@ -122,7 +133,6 @@ public class RunCustomScoringExample {
 					});
 				}
 
-				// 
 				sumScoringFunction.addScoringFunction(new SumScoringFunction.ArbitraryEventScoring() {
 					private double score;
 					@Override
@@ -142,11 +152,7 @@ public class RunCustomScoringExample {
 			}
 
 		});
-
-		// We add an EventHandler which reacts on people who enter a link and lets it rain on them
-		// if we are within a certain time window.
-		eventsManager.addHandler(new RainEngine(eventsManager));
-		controler.run() ;	
+		controler.run();
 	}
 	
 	static class RainEngine implements PersonEntersVehicleEventHandler, LinkEnterEventHandler {
@@ -155,8 +161,10 @@ public class RunCustomScoringExample {
 		
 		private Map<Id<Vehicle>, Id<Person>> vehicle2driver = new HashMap<>();
 		 
-		public RainEngine(EventsManager eventsManager) {
+		@Inject
+		RainEngine(EventsManager eventsManager) {
 			this.eventsManager = eventsManager;
+			this.eventsManager.addHandler(this);
 		}
 		
 		@Override 

@@ -57,6 +57,7 @@ import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.replanning.GenericStrategyManager;
 
+import javax.inject.Inject;
 /**
  * Controls the workflow of the simulation.
  * <p/>
@@ -79,10 +80,13 @@ class CarrierControlerListener implements StartupListener, ShutdownListener, Bef
 
     private Carriers carriers;
 
+    @Inject EventsManager eventsManager;
+    @Inject Network network;
 
     /**
      * Constructs a controller with a set of carriers, re-planning capabilities and scoring-functions.
      */
+    @Inject
     CarrierControlerListener(Carriers carriers, CarrierPlanStrategyManagerFactory strategyManagerFactory, CarrierScoringFunctionFactory scoringFunctionFactory) {
         this.carriers = carriers;
         this.carrierPlanStrategyManagerFactory = strategyManagerFactory;
@@ -99,15 +103,13 @@ class CarrierControlerListener implements StartupListener, ShutdownListener, Bef
 
     @Override
     public void notifyBeforeMobsim(BeforeMobsimEvent event) {
-        Controler controler = event.getControler();
-        carrierAgentTracker = new CarrierAgentTracker(carriers, event.getControler().getScenario().getNetwork(), carrierScoringFunctionFactory);
-        controler.getEvents().addHandler(carrierAgentTracker);
+        carrierAgentTracker = new CarrierAgentTracker(carriers, network, carrierScoringFunctionFactory);
+        eventsManager.addHandler(carrierAgentTracker);
     }
 
     @Override
     public void notifyAfterMobsim(AfterMobsimEvent event) {
-        Controler controler = event.getControler();
-        controler.getEvents().removeHandler(carrierAgentTracker);
+        eventsManager.removeHandler(carrierAgentTracker);
     }
 
     @Override

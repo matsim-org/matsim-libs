@@ -28,6 +28,8 @@ import com.google.inject.name.Names;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.network.NetworkUtils;
@@ -102,16 +104,22 @@ public class TripRouterFactoryModule extends AbstractModule {
     public static class NetworkRoutingModuleProvider implements Provider<RoutingModule> {
 
         @Inject
-        Map<String, TravelTime> travelTimesMap;
+        Map<String, TravelTime> travelTimes;
 
         @Inject
-        Map<String, TravelDisutilityFactory> travelDisutilityFactoryMap;
+        Map<String, TravelDisutilityFactory> travelDisutilityFactory;
 
         @Inject
         SingleModeNetworksCache singleModeNetworksCache;
 
         @Inject
-        Scenario scenario;
+        PlanCalcScoreConfigGroup planCalcScoreConfigGroup;
+
+        @Inject
+        Network network;
+
+        @Inject
+        PopulationFactory populationFactory;
 
         @Inject
         LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
@@ -130,7 +138,7 @@ public class TripRouterFactoryModule extends AbstractModule {
             synchronized (this.singleModeNetworksCache.getSingleModeNetworksCache()) {
                 filteredNetwork = this.singleModeNetworksCache.getSingleModeNetworksCache().get(mode);
                 if (filteredNetwork == null) {
-                    TransportModeNetworkFilter filter = new TransportModeNetworkFilter(scenario.getNetwork());
+                    TransportModeNetworkFilter filter = new TransportModeNetworkFilter(network);
                     Set<String> modes = new HashSet<>();
                     modes.add(mode);
                     filteredNetwork = NetworkUtils.createNetwork();
@@ -139,17 +147,21 @@ public class TripRouterFactoryModule extends AbstractModule {
                 }
             }
 
-            final TravelDisutilityFactory travelDisutilityFactory = travelDisutilityFactoryMap.get(mode);
-            assert travelDisutilityFactory != null : mode;
-			final TravelTime timeCalculator = travelTimesMap.get(mode);
-			assert timeCalculator != null;
-			LeastCostPathCalculator routeAlgo =
-						leastCostPathCalculatorFactory.createPathCalculator(
-								filteredNetwork,
-								travelDisutilityFactory.createTravelDisutility(timeCalculator, scenario.getConfig().planCalcScore()),
-								timeCalculator);
+            TravelDisutilityFactory travelDisutilityFactory = this.travelDisutilityFactory.get(mode);
+            if (travelDisutilityFactory == null) {
+                throw new RuntimeException("No TravelDisutilityFactory bound for mode "+mode+".");
+            }
+            TravelTime travelTime = travelTimes.get(mode);
+            if (travelTime == null) {
+                throw new RuntimeException("No TravelTime bound for mode "+mode+".");
+            }
+            LeastCostPathCalculator routeAlgo =
+                    leastCostPathCalculatorFactory.createPathCalculator(
+                            filteredNetwork,
+                            travelDisutilityFactory.createTravelDisutility(travelTime, planCalcScoreConfigGroup),
+                            travelTime);
 
-            return DefaultRoutingModules.createNetworkRouter(mode, scenario.getPopulation().getFactory(),
+            return DefaultRoutingModules.createNetworkRouter(mode, populationFactory,
                     filteredNetwork, routeAlgo);
         }
     }
@@ -163,7 +175,10 @@ public class TripRouterFactoryModule extends AbstractModule {
         }
 
         @Inject
-        private Scenario scenario;
+        private Network network;
+
+        @Inject
+        private PopulationFactory populationFactory;
 
         @Inject
         private LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
@@ -174,11 +189,11 @@ public class TripRouterFactoryModule extends AbstractModule {
                     new FreespeedTravelTimeAndDisutility(-1.0, 0.0, 0.0);
             LeastCostPathCalculator routeAlgoPtFreeFlow =
                     leastCostPathCalculatorFactory.createPathCalculator(
-                            scenario.getNetwork(),
+                            network,
                             ptTimeCostCalc,
                             ptTimeCostCalc);
-            return DefaultRoutingModules.createPseudoTransitRouter(params.getMode(), scenario.getPopulation().getFactory(),
-                    scenario.getNetwork(), routeAlgoPtFreeFlow, params);
+            return DefaultRoutingModules.createPseudoTransitRouter(params.getMode(), populationFactory,
+                    network, routeAlgoPtFreeFlow, params);
         }
     }
 
@@ -191,11 +206,11 @@ public class TripRouterFactoryModule extends AbstractModule {
         }
 
         @Inject
-        private Scenario scenario;
+        private PopulationFactory populationFactory;
 
         @Override
         public RoutingModule get() {
-            return DefaultRoutingModules.createTeleportationRouter(params.getMode(), scenario.getPopulation().getFactory(), params);
+            return DefaultRoutingModules.createTeleportationRouter(params.getMode(), populationFactory, params);
         }
     }
 

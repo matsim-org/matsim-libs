@@ -5,6 +5,10 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.TripRouter;
 import org.matsim.population.algorithms.PlanAlgorithm;
+
+import javax.inject.Inject;
+import javax.inject.Provider;
+
 /**
  * @author balacm
  */
@@ -14,11 +18,14 @@ public class CarsharingTripModeChoice extends AbstractMultithreadedModule{
 	/*package*/ final static String CONFIG_PARAM_MODES = "modes";
 	/*package*/ final static String CONFIG_PARAM_IGNORECARAVAILABILITY = "ignoreCarAvailability";
 
+	private final Provider<TripRouter> tripRouterProvider;
+
 	private String[] availableModes = null;
 	private final Scenario scenario;
 
-	public CarsharingTripModeChoice(final Scenario scenario) {
+	public CarsharingTripModeChoice(Provider<TripRouter> tripRouterProvider, final Scenario scenario) {
 		super(scenario.getConfig().global().getNumberOfThreads());
+		this.tripRouterProvider = tripRouterProvider;
 
 		// try to get the modes from the "changeLegMode" module of the config file
 
@@ -55,7 +62,7 @@ public class CarsharingTripModeChoice extends AbstractMultithreadedModule{
 	
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
-		final TripRouter tripRouter = getReplanningContext().getTripRouter();
+		final TripRouter tripRouter = tripRouterProvider.get();
 		ChooseRandomTripMode algo = new ChooseRandomTripMode(this.scenario, this.availableModes, MatsimRandom.getLocalInstance(), tripRouter.getStageActivityTypes());
 		return algo;
 	}

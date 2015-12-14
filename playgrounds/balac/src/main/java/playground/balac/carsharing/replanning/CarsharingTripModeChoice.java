@@ -9,12 +9,18 @@ import org.matsim.core.replanning.modules.ChangeSingleLegMode;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.misc.StringUtils;
 import org.matsim.population.algorithms.PlanAlgorithm;
+
+import javax.inject.Inject;
+import javax.inject.Provider;
+
 /**
  * @author balacm
  */
 public class CarsharingTripModeChoice extends AbstractMultithreadedModule{
 
 	private final static Logger log = Logger.getLogger(ChangeSingleLegMode.class);
+
+	private final Provider<TripRouter> tripRouterProvider;
 
 	/*package*/ final static String CONFIG_MODULE = "ft";
 	/*package*/ final static String CONFIG_PARAM_MODES = "modes";
@@ -23,8 +29,9 @@ public class CarsharingTripModeChoice extends AbstractMultithreadedModule{
 	private String[] availableModes = new String[] { TransportMode.car, TransportMode.pt };
 	private boolean ignoreCarAvailability = true;
 
-	public CarsharingTripModeChoice(final Config config) {
+	public CarsharingTripModeChoice(final Config config, Provider<TripRouter> tripRouterProvider) {
 		super(config.global().getNumberOfThreads());
+		this.tripRouterProvider = tripRouterProvider;
 
 		// try to get the modes from the "changeLegMode" module of the config file
 		String modes = config.findParam(CONFIG_MODULE, CONFIG_PARAM_MODES);
@@ -46,15 +53,16 @@ public class CarsharingTripModeChoice extends AbstractMultithreadedModule{
 
 	}
 	
-	public CarsharingTripModeChoice(final int nOfThreads, final String[] modes, final boolean ignoreCarAvailabilty) {
+	public CarsharingTripModeChoice(final int nOfThreads, final String[] modes, Provider<TripRouter> tripRouterProvider, final boolean ignoreCarAvailabilty) {
 		super(nOfThreads);
+		this.tripRouterProvider = tripRouterProvider;
 		this.availableModes = modes.clone();
 		this.ignoreCarAvailability = ignoreCarAvailabilty;
 	}
 
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
-		final TripRouter tripRouter = getReplanningContext().getTripRouter();
+		final TripRouter tripRouter = tripRouterProvider.get();
 		ChooseRandomTripMode algo = new ChooseRandomTripMode(this.availableModes, MatsimRandom.getLocalInstance(), tripRouter.getStageActivityTypes());
 		algo.setIgnoreCarAvailability(this.ignoreCarAvailability);
 		return algo;

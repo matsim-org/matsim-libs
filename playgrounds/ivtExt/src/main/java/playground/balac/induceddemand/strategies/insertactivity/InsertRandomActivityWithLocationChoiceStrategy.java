@@ -20,27 +20,42 @@ import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
+import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.utils.collections.QuadTree;
 import playground.balac.induceddemand.strategies.InsertRandomActivity;
+
+import javax.inject.Provider;
+import java.util.Map;
 
 public class InsertRandomActivityWithLocationChoiceStrategy implements PlanStrategy {
 	private PlanStrategyImpl planStrategyDelegate;
 	private final QuadTree shopFacilityQuadTree;
 	private final QuadTree leisureFacilityQuadTree;
 	private Scenario scenario;
+	private Provider<TripRouter> tripRouterProvider;
+	private ScoringFunctionFactory scoringFunctionFactory;
+	private Map<String, TravelTime> travelTimes;
+	private Map<String, TravelDisutilityFactory> travelDisutilities;
 
-		
+
 	@Inject
-	public  InsertRandomActivityWithLocationChoiceStrategy(final Scenario scenario, 
-			@Named("shopQuadTree") QuadTree shopFacilityQuadTree,
-			@Named("leisureQuadTree") QuadTree leisureFacilityQuadTree) {
+	public  InsertRandomActivityWithLocationChoiceStrategy(final Scenario scenario,
+														   @Named("shopQuadTree") QuadTree shopFacilityQuadTree,
+														   @Named("leisureQuadTree") QuadTree leisureFacilityQuadTree, Provider<TripRouter> tripRouterProvider, ScoringFunctionFactory scoringFunctionFactory, Map<String, TravelTime> travelTimes, Map<String, TravelDisutilityFactory> travelDisutilities) {
 		
 	   // PlanStrategyImpl.Builder builder = new PlanStrategyImpl.Builder(new RandomPlanSelector<Plan, Person>() );
 	   
 		this.scenario = scenario;
 		this.shopFacilityQuadTree = shopFacilityQuadTree;
 		this.leisureFacilityQuadTree = leisureFacilityQuadTree;
-	}	
+		this.tripRouterProvider = tripRouterProvider;
+		this.scoringFunctionFactory = scoringFunctionFactory;
+		this.travelTimes = travelTimes;
+		this.travelDisutilities = travelDisutilities;
+	}
 	
 	@Override
 	public void run(HasPlansAndId<Plan, Person> person) {
@@ -51,7 +66,7 @@ public class InsertRandomActivityWithLocationChoiceStrategy implements PlanStrat
 	@Override
 	public void init(ReplanningContext replanningContext) {
 		 InsertRandomActivity ira = new InsertRandomActivity(scenario, shopFacilityQuadTree,
-		    		leisureFacilityQuadTree);
+		    		leisureFacilityQuadTree, tripRouterProvider);
 	
 		/*
 		 * Somehow this is ugly. Should be initialized in the constructor. But I do not know, how to initialize the lc scenario elements
@@ -74,10 +89,10 @@ public class InsertRandomActivityWithLocationChoiceStrategy implements PlanStrat
 		} else {
 			planStrategyDelegate = new PlanStrategyImpl(new ExpBetaPlanSelector(config.planCalcScore()));
 		}
-		planStrategyDelegate.addStrategyModule(new TripsToLegsModule(scenario.getConfig()));
+		planStrategyDelegate.addStrategyModule(new TripsToLegsModule(tripRouterProvider, config.global()));
 		planStrategyDelegate.addStrategyModule(ira);
-		planStrategyDelegate.addStrategyModule(new BestReplyDestinationChoice(lcContext, maxDcScoreWrapper.getPersonsMaxDCScoreUnscaled()));
-		planStrategyDelegate.addStrategyModule(new ReRoute(lcContext.getScenario()));
+		planStrategyDelegate.addStrategyModule(new BestReplyDestinationChoice(tripRouterProvider, lcContext, maxDcScoreWrapper.getPersonsMaxDCScoreUnscaled(), scoringFunctionFactory, travelTimes, travelDisutilities));
+		planStrategyDelegate.addStrategyModule(new ReRoute(lcContext.getScenario(), tripRouterProvider));
 		planStrategyDelegate.init(replanningContext);
 		
 	}

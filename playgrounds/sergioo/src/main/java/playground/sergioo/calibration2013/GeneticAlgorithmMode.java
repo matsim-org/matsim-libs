@@ -240,29 +240,6 @@ public class GeneticAlgorithmMode {
 		final TravelDisutilityFactory factory = new Builder( TransportMode.car );
 		final TravelDisutility disutility = factory.createTravelDisutility(travelTimeCalculator.getLinkTravelTimes(), scenario.getConfig().planCalcScore());
 		final Provider<TransitRouter> transitRouterFactory = new TransitRouterWSImplFactory(scenario, waitTimeCalculator.getWaitTimes(), stopStopTimeCalculator.getStopStopTimes());
-		ReplanningContext context = new ReplanningContext() {
-			@Override
-			public TravelDisutility getTravelDisutility() {
-				return disutility;
-			}
-			@Override
-			public TravelTime getTravelTime() {
-				return travelTimeCalculator.getLinkTravelTimes();
-			}
-			@Override
-			public ScoringFunctionFactory getScoringFunctionFactory() {
-				return new CharyparNagelOpenTimesScoringFunctionFactory(scenario.getConfig().planCalcScore(), scenario);
-			}
-			@Override
-			public int getIteration() {
-				return 1;
-			}
-			@Override
-			public TripRouter getTripRouter() {
-				return TripRouterFactoryBuilderWithDefaults.createTripRouterProvider(scenario, new DijkstraFactory(), transitRouterFactory).get();
-			}
-		};
-		ReRoute module = new ReRoute(scenario);
 		int numIterations = new Integer(args[6]);
 		int maxElements = new Integer(args[7]);
 		NavigableSet<ParametersArray> memory = new TreeSet<ParametersArray>(new Comparator<ParametersArray>() {

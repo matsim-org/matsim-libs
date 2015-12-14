@@ -48,12 +48,15 @@ public class AccessibilityComputationCapeTownTest {
 	@Test
 	public void doAccessibilityTest() throws IOException {
 //		public static void main( String[] args ) {
-		String folderStructure = "../../../"; // local on dz's computer
-//		String folderStructure = "../../"; // server
+		String folderStructure = "../../"; // arbitrary
 			
-		String networkFile = folderStructure + "matsimExamples/countries/za/capetown/2015-10-15_network.xml";
-		String facilitiesFile = folderStructure + "matsimExamples/countries/za/capetown/2015-10-15_facilities.xml";
+		String networkFile = "matsimExamples/countries/za/capetown/2015-10-15_network.xml";
 		
+		folderStructure = PathUtils.tryANumberOfFolderStructures(folderStructure, networkFile);
+		
+		networkFile = folderStructure + networkFile ; 
+		String facilitiesFile = folderStructure + "matsimExamples/countries/za/capetown/2015-10-15_facilities.xml";
+ 
 		// minibus-pt
 //		String travelTimeMatrix = folderStructure + "matsimExamples/countries/za/nmbm/minibus-pt/JTLU_14i/travelTimeMatrix.csv.gz";
 //		String travelDistanceMatrix = folderStructure + "matsimExamples/countries/za/nmbm/minibus-pt/JTLU_14i/travelDistanceMatrix.csv.gz";
