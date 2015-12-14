@@ -49,4 +49,24 @@ public class Histogram
     {
         return counts;
     }
+
+
+    public String binsToString()
+    {
+        String str = "";
+        for (int i = 0; i < counts.length; i++) {
+            str += String.format("%.2f...\t", i * binSize);
+        }
+        return str;
+    }
+    
+    
+    public String countsToString()
+    {
+        String str = "";
+        for (int i = 0; i < counts.length; i++) {
+            str += String.format("%d\t", counts[i]);
+        }
+        return str;
+    }
 }

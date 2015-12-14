@@ -118,24 +118,8 @@ class MultiRunTaxiLauncher
                     .getStats();
             long t1 = System.currentTimeMillis();
             multiRunStats.updateStats(stats, t1 - t0);
-
-            HourlyTaxiStats[] hourlyStats = new HourlyTaxiStatsCalculator(
-                    context.getVrpData().getVehicles().values(), STATS_HOURS).getStats();
-
-            try (PrintWriter hourlyStatsWriter = new PrintWriter(
-                    params.outputDir + "hourly_stats_run_" + i)) {
-                hourlyStatsWriter.println(HourlyTaxiStats.MAIN_HEADER);
-                hourlyStatsWriter.println(HourlyTaxiStats.SUB_HEADER);
-
-                for (int h = 0; h < STATS_HOURS; h++) {
-                    hourlyStats[h].printStats(hourlyStatsWriter);
-                }
-
-                hourlyStatsWriter.flush();
-            }
-            catch (FileNotFoundException e) {
-                throw new RuntimeException(e);
-            }
+            
+            produceDetailedStats(i);
         }
 
         VrpData data = context.getVrpData();
@@ -143,6 +127,52 @@ class MultiRunTaxiLauncher
 
         multiRunStats.printStats(pw, cfg, data);
         pw.flush();
+    }
+
+
+    private void produceDetailedStats(int run)
+    {
+        HourlyTaxiStatsCalculator calculator = new HourlyTaxiStatsCalculator(
+                context.getVrpData().getVehicles().values(), STATS_HOURS);
+
+        HourlyTaxiStats[] hourlyStats = calculator.getStats();
+        try (PrintWriter hourlyStatsWriter = new PrintWriter(
+                params.outputDir + "hourly_stats_run_" + run)) {
+            hourlyStatsWriter.println(HourlyTaxiStats.MAIN_HEADER);
+            hourlyStatsWriter.println(HourlyTaxiStats.SUB_HEADER);
+
+            for (int h = 0; h < STATS_HOURS; h++) {
+                hourlyStats[h].printStats(hourlyStatsWriter);
+            }
+        }
+        catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+
+        HourlyHistograms[] hourlyHistograms = calculator.getHourlyHistograms();
+        try (PrintWriter hourlyHistogramsWriter = new PrintWriter(
+                params.outputDir + "hourly_histograms_run_" + run)) {
+            hourlyHistogramsWriter.println(HourlyHistograms.MAIN_HEADER);
+            hourlyHistograms[0].printSubHeaders(hourlyHistogramsWriter);
+
+            for (int h = 0; h < STATS_HOURS; h++) {
+                hourlyHistograms[h].printStats(hourlyHistogramsWriter);
+            }
+        }
+        catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+
+        DailyHistograms dailyHistograms = calculator.getDailyHistograms();
+        try (PrintWriter dailyHistogramsWriter = new PrintWriter(
+                params.outputDir + "daily_histograms_run_" + run)) {
+            dailyHistogramsWriter.println(HourlyHistograms.MAIN_HEADER);
+            dailyHistograms.printSubHeaders(dailyHistogramsWriter);
+            dailyHistograms.printStats(dailyHistogramsWriter);
+        }
+        catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 

@@ -19,9 +19,14 @@
 
 package playground.michalm.taxi.util.stats;
 
+import java.io.PrintWriter;
+
+
 public class HourlyHistograms
 {
     public final int hour;
+
+    public final Histogram passengerWaitTime = new Histogram(5 * 60, 25);
 
     public final Histogram emptyDriveTime = new Histogram(60, 21);
     public final Histogram occupiedDriveTime = new Histogram(60, 21);
@@ -30,11 +35,60 @@ public class HourlyHistograms
     public final Histogram emptyDriveRatio = new Histogram(0.05, 20);
     public final Histogram stayRatio = new Histogram(0.05, 20);
 
-    public final Histogram passengerWaitTime = new Histogram(5 * 60, 25);
-
 
     public HourlyHistograms(int hour)
     {
         this.hour = hour;
+    }
+
+
+    public static final String MAIN_HEADER = "hour\t" + // 
+            "Passenger_Wait_Time" + tabs(25) + //
+    //
+    "Empty_Drive_Time" + tabs(21) + //
+            "Occupied_Drive_Time" + tabs(21) + //
+    //
+    "Empty_Drive_Ratio" + tabs(20) + //
+            "Vehicle_Wait_Ratio" + tabs(20); //
+
+
+    public static String tabs(int binCount)
+    {
+        String tabs = "";
+        for (int i = 0; i < binCount; i++) {
+            tabs += '\t';
+        }
+
+        return tabs;
+    }
+
+
+    public void printSubHeaders(PrintWriter pw)
+    {
+        pw.print("hour\t");
+        //
+        pw.print(passengerWaitTime.binsToString());
+        //
+        pw.print(emptyDriveTime.binsToString());
+        pw.print(occupiedDriveTime.binsToString());
+        //
+        pw.print(emptyDriveRatio.binsToString());
+        pw.print(stayRatio.binsToString());
+        pw.println();
+    }
+
+
+    public void printStats(PrintWriter pw)
+    {
+        pw.print(hour + "\t");
+        //
+        pw.print(passengerWaitTime.countsToString());
+        //
+        pw.print(emptyDriveTime.countsToString());
+        pw.print(occupiedDriveTime.countsToString());
+        //
+        pw.print(emptyDriveRatio.countsToString());
+        pw.print(stayRatio.countsToString());
+        pw.println();
     }
 }

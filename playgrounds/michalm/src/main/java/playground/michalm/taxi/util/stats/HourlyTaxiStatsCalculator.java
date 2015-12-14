@@ -76,6 +76,24 @@ public class HourlyTaxiStatsCalculator
     }
 
 
+    public HourlyHistograms[] getHourlyHistograms()
+    {
+        return hourlyHistograms;
+    }
+
+
+    public DailyHistograms getDailyHistograms()
+    {
+        return dailyHistograms;
+    }
+
+
+    public int getHours()
+    {
+        return hours;
+    }
+
+
     private void updateHourlyStatsForVehicle(Vehicle vehicle)
     {
         Schedule<TaxiTask> schedule = TaxiSchedules.asTaxiSchedule(vehicle.getSchedule());
