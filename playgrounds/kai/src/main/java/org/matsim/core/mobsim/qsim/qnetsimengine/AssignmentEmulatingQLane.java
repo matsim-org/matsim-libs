@@ -231,7 +231,7 @@ class AssignmentEmulatingQLane extends QLaneI {
 		QVehicle veh = buffer.poll();
 		if (this.generatingEvents) {
 			this.qLink.network.simEngine.getMobsim().getEventsManager().processEvent(new LaneLeaveEvent(
-					now, veh.getDriver().getId(), this.qLink.getLink().getId(), this.getId()
+					now, veh.getId(), this.qLink.getLink().getId(), this.getId()
 			));
 		}
 		qLink.network.simEngine.getMobsim().getEventsManager().processEvent(new LinkLeaveEvent(
@@ -302,7 +302,7 @@ class AssignmentEmulatingQLane extends QLaneI {
 
 		if (this.generatingEvents) {
 			this.qLink.network.simEngine.getMobsim().getEventsManager()
-			.processEvent(new LaneEnterEvent(now, veh.getDriver().getId(), this.qLink.getLink().getId(), this.getId()));
+			.processEvent(new LaneEnterEvent(now, veh.getId(), this.qLink.getLink().getId(), this.getId()));
 		}
 	}
 

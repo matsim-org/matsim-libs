@@ -601,7 +601,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		double now = network.simEngine.getMobsim().getSimTimer().getTimeOfDay();
 		if (this.generatingEvents) {
 			this.network.simEngine.getMobsim().getEventsManager().processEvent(new LaneLeaveEvent(
-					now, veh.getDriver().getId(), this.link.getId(), this.getId()
+					now, veh.getId(), this.link.getId(), this.getId()
 					));
 		}
 		network.simEngine.getMobsim().getEventsManager().processEvent(new LinkLeaveEvent(

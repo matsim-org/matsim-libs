@@ -237,7 +237,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 				.getMobsim()
 				.getEventsManager()
 				.processEvent(
-						new LaneEnterEvent(now, veh.getDriver().getId(), this.getLink().getId(),
+						new LaneEnterEvent(now, veh.getId(), this.getLink().getId(),
 								((QueueWithBuffer) this.firstLaneQueue).getId()));
 
 		veh.setCurrentLink(this.getLink());
@@ -329,14 +329,14 @@ public final class QLinkLanesImpl extends AbstractQLink {
 							.getMobsim()
 							.getEventsManager()
 							.processEvent(
-									new LaneLeaveEvent(now, veh.getDriver().getId(), this.getLink()
+									new LaneLeaveEvent(now, veh.getId(), this.getLink()
 											.getId(), ((QueueWithBuffer) queue).getId()));
 					nextQueue.addFromUpstream(veh);
 					this.network.simEngine
 							.getMobsim()
 							.getEventsManager()
 							.processEvent(
-									new LaneEnterEvent(now, veh.getDriver().getId(), this.getLink()
+									new LaneEnterEvent(now, veh.getId(), this.getLink()
 											.getId(), ((QueueWithBuffer) nextQueue).getId()));
 				} else {
 					break;
