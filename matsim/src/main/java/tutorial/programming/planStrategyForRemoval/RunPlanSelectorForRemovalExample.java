@@ -46,7 +46,9 @@ public class RunPlanSelectorForRemovalExample {
 			
 			@Override
 			public void install() {
-				this.addPlanSelectorForRemovalBinding(SELECTOR_NAME).toProvider(MyExpBetaPlanChangerForRemovalProvider.class);
+				if (getConfig().strategy().getPlanSelectorForRemoval().equals(SELECTOR_NAME)) {
+					bindPlanSelectorForRemoval().toProvider(MyExpBetaPlanChangerForRemovalProvider.class);
+				}
 			}
 		});
 		

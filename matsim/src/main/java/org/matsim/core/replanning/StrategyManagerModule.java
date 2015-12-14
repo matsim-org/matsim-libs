@@ -40,5 +40,4 @@ public class StrategyManagerModule extends AbstractModule {
 		bind(StrategyManager.class).in(Singleton.class);
 		bind(ReplanningContext.class).to(ReplanningContextImpl.class);
 	}
-
 }
