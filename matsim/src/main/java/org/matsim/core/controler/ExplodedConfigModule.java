@@ -17,7 +17,9 @@ public class ExplodedConfigModule implements Module {
 		binder.bind(Config.class).toInstance(config);
 		for (ConfigGroup configGroup : config.getModules().values()) {
 			Class materializedConfigGroupSubclass = configGroup.getClass();
-			binder.bind(materializedConfigGroupSubclass).toInstance(configGroup);
+			if (materializedConfigGroupSubclass != ConfigGroup.class) {
+				binder.bind(materializedConfigGroupSubclass).toInstance(configGroup);
+			}
 		}
 	}
 }
