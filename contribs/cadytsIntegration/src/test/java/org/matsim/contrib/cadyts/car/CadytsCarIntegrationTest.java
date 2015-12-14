@@ -71,6 +71,8 @@ import cadyts.measurements.SingleLinkMeasurement;
 import cadyts.utilities.io.tabularFileParser.TabularFileParser;
 import cadyts.utilities.misc.DynamicData;
 
+import javax.inject.Inject;
+
 /**
  * This is a modified copy of CadytsIntegrationTest (which is used for the cadyts pt integration)
  * in order to establish an according test for the cadyts car integration.
@@ -117,9 +119,11 @@ public class CadytsCarIntegrationTest {
 			@Override
 			public void install() {
 				addPlanStrategyBinding(CADYTS_STRATEGY_NAME).toProvider(new javax.inject.Provider<PlanStrategy>() {
+					@Inject
+					Scenario scenario;
 					@Override
 					public PlanStrategy get() {
-						return new PlanStrategyImpl(new CadytsPlanChanger(controler.getScenario(), context));
+						return new PlanStrategyImpl(new CadytsPlanChanger(scenario, context));
 					}
 				});
 			}
@@ -131,12 +135,7 @@ public class CadytsCarIntegrationTest {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				bindMobsim().toProvider(new Provider<Mobsim>() {
-					@Override
-					public Mobsim get() {
-						return new DummyMobsimFactory().createMobsim(controler.getScenario(), controler.getEvents());
-					}
-				});
+				bindMobsim().to(DummyMobsim.class);
 			}
 		});
 		controler.run();
@@ -185,13 +184,16 @@ public class CadytsCarIntegrationTest {
 		controler.addControlerListener(cContext);
 
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
-			private final CharyparNagelScoringParametersForPerson parameters = new SubpopulationCharyparNagelScoringParameters( controler.getScenario() );
+			@Inject
+			private CharyparNagelScoringParametersForPerson parameters;
+			@Inject
+			private Network network;
 			@Override
 			public ScoringFunction createNewScoringFunction(Person person) {
 				final CharyparNagelScoringParameters params = parameters.getScoringParameters(person);
 
 				SumScoringFunction scoringFunctionAccumulator = new SumScoringFunction();
-				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(params, controler.getScenario().getNetwork()));
+				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(params, network));
 				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelActivityScoring(params)) ;
 				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
 
@@ -348,13 +350,6 @@ public class CadytsCarIntegrationTest {
 		}
 		@Override
 		public void run() {
-		}
-	}
-
-	private static class DummyMobsimFactory implements MobsimFactory {
-		@Override
-		public Mobsim createMobsim(final Scenario sc, final EventsManager eventsManager) {
-			return new DummyMobsim();
 		}
 	}
 

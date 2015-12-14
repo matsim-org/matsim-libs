@@ -71,8 +71,8 @@ class CountsControlerListener implements StartupListener, IterationEndsListener 
     private int iterationsUsed = 0;
 
     @Inject
-    CountsControlerListener(final Scenario scenario, VolumesAnalyzer volumesAnalyzer, IterationStopWatch iterationStopwatch, OutputDirectoryHierarchy controlerIO) {
-        this.config = scenario.getConfig().counts();
+    CountsControlerListener(CountsConfigGroup countsConfigGroup, final Scenario scenario, VolumesAnalyzer volumesAnalyzer, IterationStopWatch iterationStopwatch, OutputDirectoryHierarchy controlerIO) {
+        this.config = countsConfigGroup;
 		this.scenario = scenario;
         this.volumesAnalyzer = volumesAnalyzer;
 		this.analyzedModes = CollectionUtils.stringToSet(this.config.getAnalyzedModes());

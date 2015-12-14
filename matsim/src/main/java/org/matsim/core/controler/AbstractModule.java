@@ -27,8 +27,10 @@ import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.events.handler.EventHandler;
@@ -42,6 +44,7 @@ import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.vis.snapshotwriters.SnapshotWriter;
 
 import com.google.inject.Binder;
@@ -152,6 +155,10 @@ public abstract class AbstractModule implements Module {
 		return bind(Mobsim.class);
 	}
 
+	protected final com.google.inject.binder.LinkedBindingBuilder<ScoringFunctionFactory> bindScoringFunctionFactory() {
+		return bind(ScoringFunctionFactory.class);
+	}
+
 	protected final com.google.inject.binder.LinkedBindingBuilder<MobsimListener> addMobsimListenerBinding() {
 		return mobsimListenerMultibinder.addBinding();
 	}
@@ -166,7 +173,7 @@ public abstract class AbstractModule implements Module {
 
 	@SuppressWarnings("static-method")
 	protected final Key<TravelDisutilityFactory> carTravelDisutilityFactoryKey() {
-		return Key.get(TravelDisutilityFactory.class, ForCar.class);
+		return Key.get(TravelDisutilityFactory.class, Names.named(TransportMode.car));
 	}
 
 	protected final com.google.inject.binder.LinkedBindingBuilder<TravelDisutilityFactory> addTravelDisutilityFactoryBinding(String mode) {
@@ -185,13 +192,17 @@ public abstract class AbstractModule implements Module {
 		return binder().bind(RoutingModule.class).annotatedWith(Names.named(mode));
 	}
 
+	protected final com.google.inject.binder.LinkedBindingBuilder<EventsManager> bindEventsManager() {
+		return binder().bind(EventsManager.class);
+	}
+
 	protected final LinkedBindingBuilder<TravelTime> bindNetworkTravelTime() {
 		return bind(networkTravelTime());
 	}
 
 	@SuppressWarnings("static-method")
 	protected final Key<TravelTime> networkTravelTime() {
-		return Key.get(TravelTime.class, ForCar.class);
+		return Key.get(TravelTime.class, Names.named(TransportMode.car));
 	}
 
 	protected <T> AnnotatedBindingBuilder<T> bind(Class<T> aClass) {
@@ -234,10 +245,5 @@ public abstract class AbstractModule implements Module {
 			@Override
 			public void install() {}
 		};
-	}
-
-	@BindingAnnotation
-	@Retention(RetentionPolicy.RUNTIME)
-	@interface ForCar {
 	}
 }

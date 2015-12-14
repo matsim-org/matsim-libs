@@ -22,7 +22,8 @@ package org.matsim.core.controler.corelisteners;
 
 import org.apache.log4j.Logger;
 import org.matsim.analysis.IterationStopWatch;
-import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -45,39 +46,26 @@ import com.google.inject.Singleton;
 final class PlansDumpingImpl implements PlansDumping, BeforeMobsimListener {
 
 	static final private Logger log = Logger.getLogger(PlansDumpingImpl.class);
-	private Scenario sc ;
-	private int writePlansInterval, firstIteration ;
-	private IterationStopWatch stopwatch ;
-	private OutputDirectoryHierarchy controlerIO;
 
-	boolean calledViaOldConstructor = false ;
+	@Inject private Network network;
+	@Inject private Population population;
+	@Inject private IterationStopWatch stopwatch;
+	@Inject private OutputDirectoryHierarchy controlerIO;
+	private int writePlansInterval, firstIteration;
 
 	@Inject
-	PlansDumpingImpl(
-			final Scenario sc,
-			final IterationStopWatch stopwatch,
-			final OutputDirectoryHierarchy controlerIO ) {
-		this.sc = sc ;
-		this.firstIteration = sc.getConfig().controler().getFirstIteration();
-		this.writePlansInterval = sc.getConfig().controler().getWritePlansInterval();
-		this.stopwatch = stopwatch ;
-		this.controlerIO = controlerIO ;
+	PlansDumpingImpl(ControlerConfigGroup config) {
+		this.firstIteration = config.getFirstIteration();
+		this.writePlansInterval = config.getWritePlansInterval();
 	}
 
 	@Override
 	public void notifyBeforeMobsim(final BeforeMobsimEvent event) {
-		if ( calledViaOldConstructor ) {
-			this.sc = event.getControler().getScenario() ;
-			this.firstIteration = event.getControler().getConfig().controler().getFirstIteration() ;
-			this.writePlansInterval = sc.getConfig().controler().getWritePlansInterval() ;
-			this.stopwatch = event.getControler().getStopwatch();
-			this.controlerIO = event.getControler().getControlerIO() ;
-		}
 		if ((writePlansInterval > 0) && ((event.getIteration() % writePlansInterval== 0)
 				|| (event.getIteration() == (firstIteration + 1)))) {
 			stopwatch.beginOperation("dump all plans");
 			log.info("dumping plans...");
-			new PopulationWriter(sc.getPopulation(), sc.getNetwork()).write(controlerIO.getIterationFilename(event.getIteration(), "plans.xml.gz"));
+			new PopulationWriter(population, network).write(controlerIO.getIterationFilename(event.getIteration(), "plans.xml.gz"));
 			log.info("finished plans dump.");
 			stopwatch.endOperation("dump all plans");
 		}

@@ -33,6 +33,10 @@ import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 
 import com.google.inject.Inject;
+import org.matsim.core.router.TripRouter;
+
+import javax.inject.Provider;
+
 /**
  * Uses a TripsToLegModule to simplify trips before running subtour
  * mode choice and re-routing
@@ -41,16 +45,16 @@ import com.google.inject.Inject;
 public class SubtourModeChoiceStrategy implements PlanStrategy {
 	private final PlanStrategyImpl strategy;
 	@Inject
-	public SubtourModeChoiceStrategy(final Scenario scenario) {
+	public SubtourModeChoiceStrategy(final Scenario scenario, Provider<TripRouter> tripRouterProvider) {
 		this.strategy = new PlanStrategyImpl( new RandomPlanSelector<Plan, Person>() );
 
 		//addStrategyModule( new TripsToLegsModule(controler.getConfig() ) );   
-		SubTourModeChoiceCS smc = new SubTourModeChoiceCS(scenario.getConfig());
+		SubTourModeChoiceCS smc = new SubTourModeChoiceCS(scenario.getConfig(), tripRouterProvider);
 		SubTourPermissableModesCalculator cpmc = new SubTourPermissableModesCalculator(scenario);
 		smc.setPermissibleModesCalculator(cpmc);
 		
 		addStrategyModule(smc );
-		addStrategyModule( new ReRoute(scenario) );
+		addStrategyModule( new ReRoute(scenario, tripRouterProvider) );
 	}
 
 	public void addStrategyModule(final PlanStrategyModule module) {

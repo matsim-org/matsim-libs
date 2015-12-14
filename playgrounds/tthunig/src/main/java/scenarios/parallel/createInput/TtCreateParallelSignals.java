@@ -39,405 +39,299 @@ import org.matsim.contrib.signals.utils.SignalUtils;
 import org.matsim.lanes.data.v20.Lane;
 import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
 
+import java.util.*;
+
 /**
  * Class to create signals (signal systems, signal groups and signal control)
  * for the Parallel scenario.
- * 
+ *
  * @author gthunig
- * 
  */
 public final class TtCreateParallelSignals {
 
-	private static final Logger log = Logger
-			.getLogger(TtCreateParallelSignals.class);
+    private static final Logger log = Logger
+            .getLogger(TtCreateParallelSignals.class);
 
-	private static final int CYCLE_TIME = 60;
-	private static final int INTERGREEN_TIME = 5;
+    private static final int CYCLE_TIME = 60;
+    private static final int INTERGREEN_TIME = 5;
 
-	private Scenario scenario;
+    private Scenario scenario;
 
-	public TtCreateParallelSignals(Scenario scenario) {
-		this.scenario = scenario;
-	}
+    private Map<Id<Link>, List<Id<Link>>> possibleSignalMoves = new HashMap<>();
+    private Map<String, Boolean> signal2IsFromSecondODPair = new HashMap<>();
 
-	public void createSignals() {
-		log.info("Create signals ...");
-		
-		createSignalSystems();
-		createSignalGroups();
-		createSignalControl();
-	}
+    public TtCreateParallelSignals(Scenario scenario) {
+        this.scenario = scenario;
+    }
 
-	/**
-	 * Creates signal systems depending on the network situation.
-	 */
-	private void createSignalSystems() {
+    public void createSignals() {
+        log.info("Create signals ...");
 
-		createSignalSystemAtNode(this.scenario.getNetwork().getNodes().get(Id.createNodeId(2)));
-		createSignalSystemAtNode(this.scenario.getNetwork().getNodes().get(Id.createNodeId(3)));
-		createSignalSystemAtNode(this.scenario.getNetwork().getNodes().get(Id.createNodeId(4)));
-		createSignalSystemAtNode(this.scenario.getNetwork().getNodes().get(Id.createNodeId(5)));
-		createSignalSystemAtNode(this.scenario.getNetwork().getNodes().get(Id.createNodeId(7)));
-		createSignalSystemAtNode(this.scenario.getNetwork().getNodes().get(Id.createNodeId(8)));
-		
-		if (TtCreateParallelNetworkAndLanes.checkNetworkForSecondODPair(this.scenario.getNetwork())) {
-			createSignalSystemAtNode(this.scenario.getNetwork().getNodes().get(Id.createNodeId(9)));
-			createSignalSystemAtNode(this.scenario.getNetwork().getNodes().get(Id.createNodeId(11)));
-		}
-	}
+        initPossibleSignalMoves();
+        initSignal2IsFromSecondODPair();
 
-	private void createSignalSystemAtNode(Node node) {
-		SignalsData signalsData = (SignalsData) this.scenario
-				.getScenarioElement(SignalsData.ELEMENT_NAME);
-		SignalSystemsData signalSystems = signalsData.getSignalSystemsData();
-		
-		SignalSystemsDataFactory fac = new SignalSystemsDataFactoryImpl();
-		
-		// create signal system
-		SignalSystemData signalSystem = fac.createSignalSystemData(Id.create("signalSystem"
-				+ node.getId(), SignalSystem.class));
-		signalSystems.addSignalSystemData(signalSystem);
-		
-		// create a signal for every inLink outLink pair
-		for (Id<Link> inLinkId : node.getInLinks().keySet()){
-			int outLinkCounter = 0;
-            log.error("inLinkId" + inLinkId);
-			for (Id<Link> outLinkId : node.getOutLinks().keySet()) {
+        createSignalSystems();
+        createSignalGroups();
+        createSignalControl();
+    }
 
-				//TODO nicht für alle outlinks ein signal sondern nur für die "ampeln"
-				//turningmoverestriction sagt wo man fahren kann
+    private void initPossibleSignalMoves() {
 
-				log.error("outLinkId" + outLinkId);
-				outLinkCounter++;
-				SignalData signal = fac.createSignalData(Id.create("signal" + inLinkId
-						+ "." + outLinkCounter, Signal.class));
-                signal.addTurningMoveRestriction(Id.createLinkId(new StringBuffer(inLinkId.toString()).reverse().toString()));
-                switch (inLinkId.toString()) {
-					case "3_2":
-						signal.addTurningMoveRestriction(Id.createLinkId("2_3"));
-						break;
-					case "7_2":
-						signal.addTurningMoveRestriction(Id.createLinkId("3_2"));
-						break;
+        //signals at node 2
+        possibleSignalMoves.put(Id.createLinkId("3_2"),
+                new ArrayList<>(Collections.singletonList(Id.createLinkId("2_1"))));
+        possibleSignalMoves.put(Id.createLinkId("7_2"),
+                new ArrayList<>(Collections.singletonList(Id.createLinkId("2_1"))));
+        possibleSignalMoves.put(Id.createLinkId("1_2"),
+                new ArrayList<>(Arrays.asList(Id.createLinkId("2_3"), Id.createLinkId("2_7"))));
 
-					case "3_10":
-						signal.addTurningMoveRestriction(Id.createLinkId("10_4"));
-						break;
-					case "4_10":
-						signal.addTurningMoveRestriction(Id.createLinkId("10_3"));
-						break;
+        //signals at node 5
+        possibleSignalMoves.put(Id.createLinkId("8_5"),
+                new ArrayList<>(Collections.singletonList(Id.createLinkId("5_6"))));
+        possibleSignalMoves.put(Id.createLinkId("4_5"),
+                new ArrayList<>(Collections.singletonList(Id.createLinkId("5_6"))));
+        possibleSignalMoves.put(Id.createLinkId("6_5"),
+                new ArrayList<>(Arrays.asList(Id.createLinkId("5_4"), Id.createLinkId("5_8"))));
 
-					case "4_5":
-						signal.addTurningMoveRestriction(Id.createLinkId("5_8"));
-						break;
-					case "8_5":
-						signal.addTurningMoveRestriction(Id.createLinkId("5_4"));
-						break;
+        //signals at node 10
+        possibleSignalMoves.put(Id.createLinkId("3_10"),
+                new ArrayList<>(Collections.singletonList(Id.createLinkId("10_9"))));
+        possibleSignalMoves.put(Id.createLinkId("4_10"),
+                new ArrayList<>(Collections.singletonList(Id.createLinkId("10_9"))));
+        possibleSignalMoves.put(Id.createLinkId("9_10"),
+                new ArrayList<>(Arrays.asList(Id.createLinkId("10_3"), Id.createLinkId("10_4"))));
 
-					case "7_11":
-						signal.addTurningMoveRestriction(Id.createLinkId("11_8"));
-						break;
-					case "8_11":
-						signal.addTurningMoveRestriction(Id.createLinkId("11_7"));
-						break;
+        //signals at node 11
+        possibleSignalMoves.put(Id.createLinkId("7_11"),
+                new ArrayList<>(Collections.singletonList(Id.createLinkId("11_12"))));
+        possibleSignalMoves.put(Id.createLinkId("8_11"),
+                new ArrayList<>(Collections.singletonList(Id.createLinkId("11_12"))));
+        possibleSignalMoves.put(Id.createLinkId("12_11"),
+                new ArrayList<>(Arrays.asList(Id.createLinkId("11_7"), Id.createLinkId("11_8"))));
 
+        //signals at node 3
+        possibleSignalMoves.put(Id.createLinkId("2_3"),
+                new ArrayList<>(Collections.singletonList(Id.createLinkId("3_4"))));
+        possibleSignalMoves.put(Id.createLinkId("10_3"),
+                new ArrayList<>(Collections.singletonList(Id.createLinkId("3_7"))));
+        possibleSignalMoves.put(Id.createLinkId("4_3"),
+                new ArrayList<>(Collections.singletonList(Id.createLinkId("3_2"))));
+        possibleSignalMoves.put(Id.createLinkId("7_3"),
+                new ArrayList<>(Collections.singletonList(Id.createLinkId("3_10"))));
 
-					case "2_3": case "4_3":
-						signal.addTurningMoveRestriction(Id.createLinkId("3_7"));
-						signal.addTurningMoveRestriction(Id.createLinkId("3_10"));
-						break;
-					case "10_3": case "7_3":
-						signal.addTurningMoveRestriction(Id.createLinkId("3_2"));
-						signal.addTurningMoveRestriction(Id.createLinkId("3_4"));
-						break;
+        //signals at node 4
+        possibleSignalMoves.put(Id.createLinkId("3_4"),
+                new ArrayList<>(Collections.singletonList(Id.createLinkId("4_5"))));
+        possibleSignalMoves.put(Id.createLinkId("10_4"),
+                new ArrayList<>(Collections.singletonList(Id.createLinkId("4_8"))));
+        possibleSignalMoves.put(Id.createLinkId("5_4"),
+                new ArrayList<>(Collections.singletonList(Id.createLinkId("4_3"))));
+        possibleSignalMoves.put(Id.createLinkId("8_4"),
+                new ArrayList<>(Collections.singletonList(Id.createLinkId("4_10"))));
 
-					case "3_4": case "5_4":
-						signal.addTurningMoveRestriction(Id.createLinkId("4_8"));
-						signal.addTurningMoveRestriction(Id.createLinkId("4_10"));
-						break;
-					case "10_4": case "8_4":
-						signal.addTurningMoveRestriction(Id.createLinkId("4_3"));
-						signal.addTurningMoveRestriction(Id.createLinkId("4_5"));
-						break;
+        //signals at node 7
+        possibleSignalMoves.put(Id.createLinkId("2_7"),
+                new ArrayList<>(Collections.singletonList(Id.createLinkId("7_8"))));
+        possibleSignalMoves.put(Id.createLinkId("3_7"),
+                new ArrayList<>(Collections.singletonList(Id.createLinkId("7_11"))));
+        possibleSignalMoves.put(Id.createLinkId("11_7"),
+                new ArrayList<>(Collections.singletonList(Id.createLinkId("7_3"))));
+        possibleSignalMoves.put(Id.createLinkId("8_7"),
+                new ArrayList<>(Collections.singletonList(Id.createLinkId("7_2"))));
 
-					case "2_7": case "8_7":
-						signal.addTurningMoveRestriction(Id.createLinkId("7_3"));
-						signal.addTurningMoveRestriction(Id.createLinkId("7_11"));
-						break;
-					case "3_7": case "11_7":
-						signal.addTurningMoveRestriction(Id.createLinkId("7_2"));
-						signal.addTurningMoveRestriction(Id.createLinkId("7_8"));
-						break;
+        //siganls at node 8
+        possibleSignalMoves.put(Id.createLinkId("4_8"),
+                new ArrayList<>(Collections.singletonList(Id.createLinkId("8_11"))));
+        possibleSignalMoves.put(Id.createLinkId("5_8"),
+                new ArrayList<>(Collections.singletonList(Id.createLinkId("8_7"))));
+        possibleSignalMoves.put(Id.createLinkId("11_8"),
+                new ArrayList<>(Collections.singletonList(Id.createLinkId("8_4"))));
+        possibleSignalMoves.put(Id.createLinkId("7_8"),
+                new ArrayList<>(Collections.singletonList(Id.createLinkId("8_5"))));
+    }
 
-					case "7_8": case "5_8":
-						signal.addTurningMoveRestriction(Id.createLinkId("8_4"));
-						signal.addTurningMoveRestriction(Id.createLinkId("8_11"));
-						break;
-					case "11_8": case "4_8":
-						signal.addTurningMoveRestriction(Id.createLinkId("8_7"));
-						signal.addTurningMoveRestriction(Id.createLinkId("8_5"));
-						break;
+    private void initSignal2IsFromSecondODPair() {
 
-					default:
-						break;
-				}
+        signal2IsFromSecondODPair.put("signal1_2.2_3", false);
+        signal2IsFromSecondODPair.put("signal1_2.2_7", false);
+        signal2IsFromSecondODPair.put("signal3_2.2_1", false);
+        signal2IsFromSecondODPair.put("signal7_2.2_1", false);
 
-				signalSystem.addSignalData(signal);
-				signal.setLinkId(inLinkId);
+        signal2IsFromSecondODPair.put("signal9_10.10_3", true);
+        signal2IsFromSecondODPair.put("signal9_10.10_4", true);
+        signal2IsFromSecondODPair.put("signal3_10.10_9", true);
+        signal2IsFromSecondODPair.put("signal4_10.10_9", true);
 
-				LanesToLinkAssignment20 linkLanes = this.scenario.getLanes().getLanesToLinkAssignments().get(inLinkId);
-				if (linkLanes != null) {
-					for (Lane l : linkLanes.getLanes().values()) {
-						if (l.getToLinkIds().get(0).toString().equals(outLinkId.toString())) {
-							signal.addLaneId(l.getId());
-						}
-					}
+        signal2IsFromSecondODPair.put("signal6_5.5_4", false);
+        signal2IsFromSecondODPair.put("signal6_5.5_8", false);
+        signal2IsFromSecondODPair.put("signal4_5.5_6", false);
+        signal2IsFromSecondODPair.put("signal8_5.5_6", false);
 
-				}
-			}
-		}
-	}
+        signal2IsFromSecondODPair.put("signal12_11.11_7", true);
+        signal2IsFromSecondODPair.put("signal12_11.11_8", true);
+        signal2IsFromSecondODPair.put("signal7_11.11_12", true);
+        signal2IsFromSecondODPair.put("signal8_11.11_12", true);
 
-	private void createSignalGroups() {
+        signal2IsFromSecondODPair.put("signal10_3.3_7", true);
+        signal2IsFromSecondODPair.put("signal7_3.3_10", true);
+        signal2IsFromSecondODPair.put("signal2_3.3_4", true);
+        signal2IsFromSecondODPair.put("signal4_3.3_2", true);
 
-		SignalsData signalsData = (SignalsData) this.scenario
-				.getScenarioElement(SignalsData.ELEMENT_NAME);
-		SignalGroupsData signalGroups = signalsData.getSignalGroupsData();
-		SignalSystemsData signalSystems = signalsData.getSignalSystemsData();
+        signal2IsFromSecondODPair.put("signal3_7.7_11", true);
+        signal2IsFromSecondODPair.put("signal11_7.7_3", true);
+        signal2IsFromSecondODPair.put("signal2_7.7_8", true);
+        signal2IsFromSecondODPair.put("signal8_7.7_2", true);
 
-		// create signal groups for each signal system
-		for (SignalSystemData system : signalSystems.getSignalSystemData()
-				.values()) {
-			SignalUtils.createAndAddSignalGroups4Signals(signalGroups, system);
-		}
-	}
+        signal2IsFromSecondODPair.put("signal7_8.8_5", false);
+        signal2IsFromSecondODPair.put("signal5_8.8_7", false);
+        signal2IsFromSecondODPair.put("signal4_8.8_11", false);
+        signal2IsFromSecondODPair.put("signal11_8.8_4", false);
 
-	private void createSignalControl() {
+        signal2IsFromSecondODPair.put("signal8_4.4_10", false);
+        signal2IsFromSecondODPair.put("signal10_4.4_8", false);
+        signal2IsFromSecondODPair.put("signal3_4.4_5", false);
+        signal2IsFromSecondODPair.put("signal5_4.4_3", false);
 
-		SignalsData signalsData = (SignalsData) this.scenario
-				.getScenarioElement(SignalsData.ELEMENT_NAME);
-		SignalSystemsData signalSystems = signalsData.getSignalSystemsData();
-		SignalGroupsData signalGroups = signalsData.getSignalGroupsData();
-		SignalControlData signalControl = signalsData.getSignalControlData();
-		SignalControlDataFactory fac = new SignalControlDataFactoryImpl();
+    }
 
-		// creates a signal control for all signal systems
-		for (SignalSystemData signalSystem : signalSystems
-				.getSignalSystemData().values()) {
+    /**
+     * Creates signal systems depending on the network situation.
+     */
+    private void createSignalSystems() {
 
-			SignalSystemControllerData signalSystemControl = fac
-					.createSignalSystemControllerData(signalSystem.getId());
+        createSignalSystemAtNode(this.scenario.getNetwork().getNodes().get(Id.createNodeId(2)));
+        createSignalSystemAtNode(this.scenario.getNetwork().getNodes().get(Id.createNodeId(3)));
+        createSignalSystemAtNode(this.scenario.getNetwork().getNodes().get(Id.createNodeId(4)));
+        createSignalSystemAtNode(this.scenario.getNetwork().getNodes().get(Id.createNodeId(5)));
+        createSignalSystemAtNode(this.scenario.getNetwork().getNodes().get(Id.createNodeId(7)));
+        createSignalSystemAtNode(this.scenario.getNetwork().getNodes().get(Id.createNodeId(8)));
 
-			// creates a default plan for the signal system (with defined cycle
-			// time and offset 0)
-			SignalPlanData signalPlan = SignalUtils.createSignalPlan(fac, CYCLE_TIME, 0);
-			
-			signalSystemControl.addSignalPlanData(signalPlan);
-			signalSystemControl
-					.setControllerIdentifier(DefaultPlanbasedSignalSystemController.IDENTIFIER);
-			signalControl.addSignalSystemControllerData(signalSystemControl);
-			
-			// specifies signal group settings for all signal groups of this
-			// signal system
-			for (SignalGroupData signalGroup : signalGroups.
-					getSignalGroupDataBySystemId(signalSystem.getId()).values()) {
-				createSignalControl(fac, signalPlan, signalGroup.getId());
-			}
-		}
-	}
+        if (TtCreateParallelNetworkAndLanes.checkNetworkForSecondODPair(this.scenario.getNetwork())) {
+            createSignalSystemAtNode(this.scenario.getNetwork().getNodes().get(Id.createNodeId(10)));
+            createSignalSystemAtNode(this.scenario.getNetwork().getNodes().get(Id.createNodeId(11)));
+        }
+    }
 
-	private void createSignalControl(SignalControlDataFactory fac, SignalPlanData signalPlan,
-			Id<SignalGroup> signalGroupId) {
-		int onset = 0;
-		int dropping = 0;
-		int signalSystemOffset = 0;
-		// set onset and dropping for each signal group and offset for each signal system
-		switch (signalGroupId.toString()){
+    private void createSignalSystemAtNode(Node node) {
+        SignalsData signalsData = (SignalsData) this.scenario
+                .getScenarioElement(SignalsData.ELEMENT_NAME);
+        SignalSystemsData signalSystems = signalsData.getSignalSystemsData();
 
-			case "signal1_2.1": // signal for turning left (northern route) at node 2
-				onset = 0;
-				dropping = 30 - INTERGREEN_TIME;
-				signalSystemOffset = 0;
-				break;
-			case "signal2_3.1": // signal for going straight (northern route) at node 3
-				onset = 0;
-				dropping = 30 - INTERGREEN_TIME;
-				signalSystemOffset = 0;
-				break;
-			case "signal3_4.1": // signal for going straight (northern route) at node 4
-				onset = 0;
-				dropping = 30 - INTERGREEN_TIME;
-				signalSystemOffset = 0;
-				break;
-			case "signal4_5.1": // signal for going straight (northern route) at node 5
-				onset = 0;
-				dropping = 30 - INTERGREEN_TIME;
-				signalSystemOffset = 0;
-				break;
+        SignalSystemsDataFactory fac = new SignalSystemsDataFactoryImpl();
 
-			case "signal1_2.2": // signal for turning right (southern route) at node 2
-				onset = 30;
-				dropping = 60 - INTERGREEN_TIME;
-				signalSystemOffset = 0;
-				break;
-			case "signal2_7.1": // signal for going straight (southern route) at node 7
-				onset = 0;
-				dropping = 30 - INTERGREEN_TIME;
-				signalSystemOffset = 0;
-				break;
-			case "signal7_8.1": // signal for going straight (southern route) at node 8
-				onset = 0;
-				dropping = 30 - INTERGREEN_TIME;
-				signalSystemOffset = 0;
-				break;
-			case "signal8_5.1": // signal for going straight (southern route) at node 5
-				onset = 0;
-				dropping = 30 - INTERGREEN_TIME;
-				signalSystemOffset = 0;
-				break;
+        // create signal system
+        SignalSystemData signalSystem = fac.createSignalSystemData(Id.create("signalSystem"
+                + node.getId(), SignalSystem.class));
+        signalSystems.addSignalSystemData(signalSystem);
 
-			case "signal6_5.1": // signal for turning left (southern route) at node 5
-				onset = 0;
-				dropping = 30 - INTERGREEN_TIME;
-				signalSystemOffset = 0;
-				break;
-			case "signal5_8.1": // signal for going straight (southern route) at node 8
-				onset = 0;
-				dropping = 30 - INTERGREEN_TIME;
-				signalSystemOffset = 0;
-				break;
-			case "signal8_7.1": // signal for going straight (southern route) at node 7
-				onset = 0;
-				dropping = 30 - INTERGREEN_TIME;
-				signalSystemOffset = 0;
-				break;
-			case "signal7_2.1": // signal for going straight (southern route) at node 2
-				onset = 0;
-				dropping = 30 - INTERGREEN_TIME;
-				signalSystemOffset = 0;
-				break;
+        // create a signal for every inLink outLink pair
+        for (Id<Link> inLinkId : node.getInLinks().keySet()) {
+            for (Id<Link> outLinkId : node.getOutLinks().keySet()) {
+                if (possibleSignalMoves.containsKey(inLinkId) &&
+                        possibleSignalMoves.get(inLinkId).contains(outLinkId)) {
 
-			case "signal6_5.2": // signal for turning right (northern route) at node 5
-				onset = 0;
-				dropping = 30 - INTERGREEN_TIME;
-				signalSystemOffset = 0;
-				break;
-			case "signal5_4.1": // signal for going straight (northern route) at node 4
-				onset = 0;
-				dropping = 30 - INTERGREEN_TIME;
-				signalSystemOffset = 0;
-				break;
-			case "signal4_3.1": // signal for going straight (northern route) at node 3
-				onset = 0;
-				dropping = 30 - INTERGREEN_TIME;
-				signalSystemOffset = 0;
-				break;
-			case "signal3_2.1": // signal for going straight (northern route) at node 2
-				onset = 0;
-				dropping = 30 - INTERGREEN_TIME;
-				signalSystemOffset = 0;
-				break;
+                    SignalData signal = fac.createSignalData(Id.create("signal" + inLinkId
+                            + "." + outLinkId, Signal.class));
+                    signal.setLinkId(inLinkId);
+                    signal.addTurningMoveRestriction(outLinkId);
 
+                    LanesToLinkAssignment20 linkLanes = this.scenario.getLanes().getLanesToLinkAssignments().get(inLinkId);
+                    if (linkLanes != null) {
+                        for (Lane l : linkLanes.getLanes().values()) {
+                            if (l.getToLinkIds() != null) {
+                                for (Id<Link> toLinkId : l.getToLinkIds()) {
+                                    if (toLinkId.toString().equals(outLinkId.toString())) {
+                                        signal.addLaneId(l.getId());
+                                    }
+                                }
+                            }
+                        }
 
-			case "signal9_10.1": // signal for turning left (eastern route) at node 10
-				onset = 30;
-				dropping = 60 - INTERGREEN_TIME;
-				signalSystemOffset = 0;
-				break;
-			case "signal10_4.1": // signal for going straight (eastern route) at node 4
-				onset = 30;
-				dropping = 60 - INTERGREEN_TIME;
-				signalSystemOffset = 0;
-				break;
-			case "signal4_8.1": // signal for going straight (eastern route) at node 8
-				onset = 30;
-				dropping = 60 - INTERGREEN_TIME;
-				signalSystemOffset = 0;
-				break;
-			case "signal8_11.1": // signal for going straight (eastern route) at node 11
-				onset = 30;
-				dropping = 60 - INTERGREEN_TIME;
-				signalSystemOffset = 0;
-				break;
+                    }
+                    signalSystem.addSignalData(signal);
+                }
+            }
+        }
+    }
 
-			case "signal9_10.2": // signal for turning right (western route) at node 10
-				onset = 30;
-				dropping = 60 - INTERGREEN_TIME;
-				signalSystemOffset = 0;
-				break;
-			case "signal10_3.1": // signal for going straight (western route) at node 3
-				onset = 30;
-				dropping = 60 - INTERGREEN_TIME;
-				signalSystemOffset = 0;
-				break;
-			case "signal3_7.1": // signal for going straight (western route) at node 7
-				onset = 30;
-				dropping = 60 - INTERGREEN_TIME;
-				signalSystemOffset = 0;
-				break;
-			case "signal7_11.1": // signal for going straight (western route) at node 11
-				onset = 30;
-				dropping = 60 - INTERGREEN_TIME;
-				signalSystemOffset = 0;
-				break;
+    private void createSignalGroups() {
 
-			case "signal12_11.1": // signal for turning left (western route) at node 11
-				onset = 30;
-				dropping = 60 - INTERGREEN_TIME;
-				signalSystemOffset = 0;
-				break;
-			case "signal11_7.1": // signal for going straight (western route) at node 7
-				onset = 30;
-				dropping = 60 - INTERGREEN_TIME;
-				signalSystemOffset = 0;
-				break;
-			case "signal7_3.1": // signal for going straight (western route) at node 3
-				onset = 30;
-				dropping = 60 - INTERGREEN_TIME;
-				signalSystemOffset = 0;
-				break;
-			case "signal3_10.1": // signal for going straight (western route) at node 10
-				onset = 30;
-				dropping = 60 - INTERGREEN_TIME;
-				signalSystemOffset = 0;
-				break;
+        SignalsData signalsData = (SignalsData) this.scenario
+                .getScenarioElement(SignalsData.ELEMENT_NAME);
+        SignalGroupsData signalGroups = signalsData.getSignalGroupsData();
+        SignalSystemsData signalSystems = signalsData.getSignalSystemsData();
 
-			case "signal12_11.2": // signal for turning right (eastern route) at node 11
-				onset = 30;
-				dropping = 60 - INTERGREEN_TIME;
-				signalSystemOffset = 0;
-				break;
-			case "signal11_8.1": // signal for going straight (eastern route) at node 8
-				onset = 30;
-				dropping = 60 - INTERGREEN_TIME;
-				signalSystemOffset = 0;
-				break;
-			case "signal8_4.1": // signal for going straight (eastern route) at node 4
-				onset = 30;
-				dropping = 60 - INTERGREEN_TIME;
-				signalSystemOffset = 0;
-				break;
-			case "signal4_10.1": // signal for going straight (eastern route) at node 11
-				onset = 30;
-				dropping = 60 - INTERGREEN_TIME;
-				signalSystemOffset = 0;
-				break;
+        // create signal groups for each signal system
+        for (SignalSystemData system : signalSystems.getSignalSystemData()
+                .values()) {
+            SignalUtils.createAndAddSignalGroups4Signals(signalGroups, system);
+        }
+    }
 
-			default:
-				log.error("Signal group id " + signalGroupId + " is not known.");
-				break;
-		}
-		signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(fac, signalGroupId, onset, dropping));
-		signalPlan.setOffset(signalSystemOffset);
-	}
+    private void createSignalControl() {
 
-	public void writeSignalFiles(String directory) {
-		SignalsData signalsData = (SignalsData) this.scenario
-				.getScenarioElement(SignalsData.ELEMENT_NAME);
-		
-		new SignalSystemsWriter20(signalsData.getSignalSystemsData()).write(directory + "signalSystems.xml");
-		new SignalControlWriter20(signalsData.getSignalControlData()).write(directory + "signalControl.xml");
-		new SignalGroupsWriter20(signalsData.getSignalGroupsData()).write(directory + "signalGroups.xml");
-	}
+        SignalsData signalsData = (SignalsData) this.scenario
+                .getScenarioElement(SignalsData.ELEMENT_NAME);
+        SignalSystemsData signalSystems = signalsData.getSignalSystemsData();
+        SignalGroupsData signalGroups = signalsData.getSignalGroupsData();
+        SignalControlData signalControl = signalsData.getSignalControlData();
+        SignalControlDataFactory fac = new SignalControlDataFactoryImpl();
+
+        // creates a signal control for all signal systems
+        for (SignalSystemData signalSystem : signalSystems
+                .getSignalSystemData().values()) {
+
+            SignalSystemControllerData signalSystemControl = fac
+                    .createSignalSystemControllerData(signalSystem.getId());
+
+            // creates a default plan for the signal system (with defined cycle
+            // time and offset 0)
+            SignalPlanData signalPlan = SignalUtils.createSignalPlan(fac, CYCLE_TIME, 0);
+
+            signalSystemControl.addSignalPlanData(signalPlan);
+            signalSystemControl
+                    .setControllerIdentifier(DefaultPlanbasedSignalSystemController.IDENTIFIER);
+            signalControl.addSignalSystemControllerData(signalSystemControl);
+
+            // specifies signal group settings for all signal groups of this
+            // signal system
+            for (SignalGroupData signalGroup : signalGroups.
+                    getSignalGroupDataBySystemId(signalSystem.getId()).values()) {
+                createSignalControl(fac, signalPlan, signalGroup.getId());
+            }
+        }
+    }
+
+    private void createSignalControl(SignalControlDataFactory fac, SignalPlanData signalPlan,
+                                     Id<SignalGroup> signalGroupId) {
+        int onset;
+        int dropping;
+        int signalSystemOffset;
+        // set onset and dropping for each signal group and offset for each signal system
+        if (signal2IsFromSecondODPair.containsKey(signalGroupId.toString())) {
+            if (!signal2IsFromSecondODPair.get(signalGroupId.toString())) {
+                onset = 0;
+                dropping = 30 - INTERGREEN_TIME;
+                signalSystemOffset = 0;
+            } else {
+                onset = 30;
+                dropping = 60 - INTERGREEN_TIME;
+                signalSystemOffset = 0;
+            }
+            signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(fac, signalGroupId, onset, dropping));
+            signalPlan.setOffset(signalSystemOffset);
+        } else {
+            log.error("Signal group id " + signalGroupId + " is not known.");
+        }
+    }
+
+    public void writeSignalFiles(String directory) {
+        SignalsData signalsData = (SignalsData) this.scenario
+                .getScenarioElement(SignalsData.ELEMENT_NAME);
+
+        new SignalSystemsWriter20(signalsData.getSignalSystemsData()).write(directory + "signalSystems.xml");
+        new SignalControlWriter20(signalsData.getSignalControlData()).write(directory + "signalControl.xml");
+        new SignalGroupsWriter20(signalsData.getSignalGroupsData()).write(directory + "signalGroups.xml");
+    }
 
 }

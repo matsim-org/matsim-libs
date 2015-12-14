@@ -27,6 +27,8 @@ import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
 
+import javax.inject.Inject;
+
 /**
  * A factory to create scoring functions as described by D. Charypar and K. Nagel.
  * 
@@ -48,7 +50,8 @@ public final class CharyparNagelScoringFunctionFactory implements ScoringFunctio
 		this( new SubpopulationCharyparNagelScoringParameters( sc ) , sc.getNetwork() );
 	}
 
-    public CharyparNagelScoringFunctionFactory(final CharyparNagelScoringParametersForPerson params, Network network) {
+	@Inject
+	CharyparNagelScoringFunctionFactory(final CharyparNagelScoringParametersForPerson params, Network network) {
 		this.params = params;
 		this.network = network;
 	}

@@ -3,6 +3,7 @@ package playground.mzilske.cdr;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.analysis.TravelDistanceStatsModule;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.analysis.VolumesAnalyzerModule;
 import org.matsim.api.core.v01.Id;
@@ -12,12 +13,11 @@ import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.events.EventsManagerModule;
 import org.matsim.core.mobsim.qsim.QSimModule;
-import org.matsim.core.mobsim.qsim.QSimProvider;
 import org.matsim.core.replanning.StrategyManagerModule;
 import org.matsim.core.router.TripRouterModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityModule;
-import org.matsim.core.scenario.ScenarioElementsModule;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionModule;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorModule;
 import org.matsim.counts.Counts;
@@ -62,8 +62,9 @@ public class CDREquilTest {
         Controler controler = new Controler(new OneWorkplace().run(utils.getOutputDirectory()));
         LinkIsZone linkIsZone = new LinkIsZone();
         controler.setModules(
+                new EventsManagerModule(),
+                new TravelDistanceStatsModule(),
                 new CharyparNagelScoringFunctionModule(),
-                new ScenarioElementsModule(),
                 new TripRouterModule(),
                 new TravelDisutilityModule(),
                 new TravelTimeCalculatorModule(),
@@ -91,8 +92,9 @@ public class CDREquilTest {
         Controler controler = new Controler(new TwoWorkplaces().run(utils.getOutputDirectory()));
         LinkIsZone linkIsZone = new LinkIsZone();
         controler.setModules(
+                new EventsManagerModule(),
+                new TravelDistanceStatsModule(),
                 new CharyparNagelScoringFunctionModule(),
-                new ScenarioElementsModule(),
                 new TripRouterModule(),
                 new TravelTimeCalculatorModule(),
                 new TravelDisutilityModule(),

@@ -52,8 +52,6 @@ import java.io.File;
  */
 public class SignalSystemsIntegrationTest {
 
-	private static final Logger log = Logger.getLogger(SignalSystemsIntegrationTest.class);
-
 	private final static String CONFIG_FILE_NAME = "signalSystemsIntegrationConfig.xml";
 
 	@Rule
@@ -78,14 +76,11 @@ public class SignalSystemsIntegrationTest {
 		// ---
 		
 		Scenario scenario = ScenarioUtils.loadScenario(config) ;
-		
+		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsScenarioLoader(ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class)).loadSignalsData());
+
 		// ---
 
 		Controler c = new Controler(scenario);
-
-		c.getScenario().addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsScenarioLoader(ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class)).loadSignalsData());
-		// yy for unknown reasons, cannot add this scenario element to the scenario further above. kai, nov'15
-		
 		c.addOverridingModule(new SignalsModule());
 		c.addOverridingModule(new InvertedNetworkRoutingModuleModule());
 		c.setDumpDataAtEnd(false);
@@ -145,7 +140,6 @@ public class SignalSystemsIntegrationTest {
 
 	@Test
 	public void testSignalSystemsWTryEndTimeThenDuration() {
-		String configFile = testUtils.getClassInputDirectory() + CONFIG_FILE_NAME;
 		Config config = testUtils.loadConfig(testUtils.getClassInputDirectory() + CONFIG_FILE_NAME);
 		String controlerOutputDir = testUtils.getOutputDirectory() + "controlerOutput/";
 		String lanes11 = testUtils.getClassInputDirectory() + "testLaneDefinitions_v1.1.xml";
@@ -154,8 +148,10 @@ public class SignalSystemsIntegrationTest {
 
 		config.network().setLaneDefinitionsFile(lanes20);
 
-		Controler c = new Controler(config);
-		c.getScenario().addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsScenarioLoader(ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class)).loadSignalsData());
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsScenarioLoader(ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class)).loadSignalsData());
+
+		Controler c = new Controler(scenario);
 		c.addOverridingModule(new SignalsModule());
 		c.addOverridingModule(new InvertedNetworkRoutingModuleModule());
 		c.getConfig().controler().setOutputDirectory(controlerOutputDir);
