@@ -124,9 +124,14 @@ class MultiRunTaxiLauncher
 
             try (PrintWriter hourlyStatsWriter = new PrintWriter(
                     params.outputDir + "hourly_stats_run_" + i)) {
+                hourlyStatsWriter.println(HourlyTaxiStats.MAIN_HEADER);
+                hourlyStatsWriter.println(HourlyTaxiStats.SUB_HEADER);
+
                 for (int h = 0; h < STATS_HOURS; h++) {
-                    hourlyStats[h].printStats(pw);
+                    hourlyStats[h].printStats(hourlyStatsWriter);
                 }
+
+                hourlyStatsWriter.flush();
             }
             catch (FileNotFoundException e) {
                 throw new RuntimeException(e);

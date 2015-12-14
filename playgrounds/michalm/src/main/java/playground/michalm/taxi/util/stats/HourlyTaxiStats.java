@@ -22,7 +22,6 @@ package playground.michalm.taxi.util.stats;
 import java.io.PrintWriter;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
-import org.matsim.contrib.dvrp.data.VrpData;
 
 
 public class HourlyTaxiStats
@@ -38,6 +37,7 @@ public class HourlyTaxiStats
     public int stayLt50PctCount = 0;
     public int stayLt75PctCount = 0;
     public int stayLt100PctCount = 0;//== approx. "at least one ride"
+    public int allCount = 0;//== all operating vehicles
 
 
     public HourlyTaxiStats(int hour)
@@ -47,16 +47,16 @@ public class HourlyTaxiStats
 
 
     public static final String MAIN_HEADER = "hour\t" + // 
-            "Passenger_Wait_Time\t\t\t\t\t\t\t\t" + //
-            "Empty_Drive_Ratio\t\t\t\t\t\t\t\t" + //
-            "Vehicle_Wait_Ratio\t\t\t\t\t\t\t\t" + //
+            "Passenger_Wait_Time\t\t\t\t\t\t\t\t\t\t" + //
+            "Empty_Drive_Ratio\t\t\t\t\t\t\t\t\t\t" + //
+            "Vehicle_Wait_Ratio\t\t\t\t\t\t\t\t\t\t" + //
             "Num_Vehicle_Wait_Ratio\t\t\t\t\t";
 
     public static final String SUB_HEADER = "\t" + //
             "mean\tmin\tpc_2\tpc_5\tpc_25\tpc_50\tpc_75\tpc_95\tpc_98\tmax\t" + //
             "mean\tmin\tpc_2\tpc_5\tpc_25\tpc_50\tpc_75\tpc_95\tpc_98\tmax\t" + //
             "mean\tmin\tpc_2\tpc_5\tpc_25\tpc_50\tpc_75\tpc_95\tpc_98\tmax\t" + //
-            "<1\t<25\t<50\t<75\t<100\t";
+            "<1\t<25\t<50\t<75\t<100\tall\t";
 
 
     public void printStats(PrintWriter pw)
@@ -64,9 +64,9 @@ public class HourlyTaxiStats
         pw.printf(
                 "%d\t"//hour
                         + "%.0f\t%.0f\t%.0f\t%.0f\t%.0f\t%.0f\t%.0f\t%.0f\t%.0f\t%.0f\t"//
-                        + "%.0f\t%.0f\t%.0f\t%.0f\t%.0f\t%.0f\t%.0f\t%.0f\t%.0f\t%.0f\t"//
-                        + "%.0f\t%.0f\t%.0f\t%.0f\t%.0f\t%.0f\t%.0f\t%.0f\t%.0f\t%.0f\t"//
-                        + "%d\t%d\t%d\t%d\t%d\t\n", //
+                        + "%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t"//
+                        + "%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t"//
+                        + "%d\t%d\t%d\t%d\t%d\t%d\t\n", //
                 hour, //
                 //
                 passengerWaitTimes.getMean(), //
@@ -106,6 +106,7 @@ public class HourlyTaxiStats
                 stayLt25PctCount, //
                 stayLt50PctCount, //
                 stayLt75PctCount, //
-                stayLt100PctCount);
+                stayLt100PctCount, //
+                allCount);
     }
 }

@@ -102,7 +102,7 @@ public class HourlyTaxiStatsCalculator
             }
         }
 
-        validateHourlyVehicleStats(stats);
+//        validateHourlyVehicleStats(stats);
         updateHourlyStats(stats);
     }
 
@@ -174,9 +174,13 @@ public class HourlyTaxiStatsCalculator
             double stayRatio = vhs.stay / vhs.total();
 
             HourlyTaxiStats hs = hourlyStats[h];
-            hs.emptyDriveRatio.addValue(emptyRatio);
+            if (!Double.isNaN(emptyRatio)) {
+                hs.emptyDriveRatio.addValue(emptyRatio);
+            }
             hs.stayRatio.addValue(stayRatio);
 
+            hs.allCount++;
+            
             if (stayRatio < 1.0) {
                 hs.stayLt100PctCount++;
 
