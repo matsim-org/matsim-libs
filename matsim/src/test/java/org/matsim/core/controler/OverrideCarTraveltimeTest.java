@@ -3,6 +3,7 @@ package org.matsim.core.controler;
 
 import com.google.inject.Provider;
 import org.junit.Assert;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
@@ -18,6 +19,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 
 import javax.inject.Inject;
+import java.util.Map;
 
 public class OverrideCarTraveltimeTest {
 
@@ -64,12 +66,18 @@ public class OverrideCarTraveltimeTest {
     private static class InterestingControlerListener implements ReplanningListener {
 
         @Inject
-        Provider<ReplanningContext> c;
+        Config config;
+
+        @Inject
+        Map<String, TravelTime> travelTimes;
+
+        @Inject
+        Map<String, TravelDisutilityFactory> travelDisutilities;
 
         @Override
         public void notifyReplanning(ReplanningEvent event) {
-            Assert.assertEquals(42.0, c.get().getTravelTime().getLinkTravelTime(null, 0.0, null, null), 0.0);
-            Assert.assertEquals(37.0, c.get().getTravelDisutility().getLinkTravelDisutility(null, 0.0, null, null), 0.0);
+            Assert.assertEquals(42.0, travelTimes.get(TransportMode.car).getLinkTravelTime(null, 0.0, null, null), 0.0);
+            Assert.assertEquals(37.0, travelDisutilities.get(TransportMode.car).createTravelDisutility(travelTimes.get(TransportMode.car), config.planCalcScore()).getLinkTravelDisutility(null, 0.0, null, null), 0.0);
         }
     }
 }

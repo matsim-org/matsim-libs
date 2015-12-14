@@ -24,11 +24,14 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.internal.MatsimManager;
+import org.matsim.core.controler.Injector;
 import org.matsim.core.replanning.selectors.GenericPlanSelector;
 import org.matsim.core.replanning.selectors.WorstPlanForRemovalSelector;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Manages and applies strategies to agents for re-planning.
@@ -40,6 +43,15 @@ import java.util.List;
 public class StrategyManager implements MatsimManager {
 
 	private final GenericStrategyManager<Plan, Person> delegate;
+
+	@Inject
+	StrategyManager(com.google.inject.Injector injector, Map<String, GenericPlanSelector<Plan, Person>> planSelectorsForRemoval, Map<String, PlanStrategy> planStrategies) {
+		// yy if this works the way I understand it, then it is a bit unstable: If I throw a Map<String,...Selector...> into
+		// the inject framework, then it is interpreted as "selector for removal".  However, if I throw a Map<String,...Strategy>,
+		// then it is interpreted for normal selection.  Kai, aug'15
+		this();
+		StrategyManagerConfigLoader.load(Injector.fromGuiceInjector(injector), planStrategies, planSelectorsForRemoval, this);
+	}
 
 	public StrategyManager() {
 		this.delegate = new GenericStrategyManager<>();

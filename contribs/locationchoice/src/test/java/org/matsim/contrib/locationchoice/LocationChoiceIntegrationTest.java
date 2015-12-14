@@ -55,6 +55,7 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.replanning.PlanStrategy;
+import org.matsim.core.router.TripRouter;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
@@ -73,6 +74,7 @@ import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 
+import javax.inject.Provider;
 import java.util.Random;
 
 public class LocationChoiceIntegrationTest extends MatsimTestCase {
@@ -102,10 +104,7 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 
 		// CONTROL(L)ER:
 		Controler controler = new Controler(scenario);
-		controler.getConfig().controler().setOverwriteFileSetting(
-				true ?
-						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 
 		ReadOrComputeMaxDCScore computer = new ReadOrComputeMaxDCScore(lcContext);
         computer.readOrCreateMaxDCScore(controler.getConfig(), lcContext.kValsAreRead());
@@ -133,12 +132,7 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				addPlanStrategyBinding("MyLocationChoice").toProvider(new javax.inject.Provider<PlanStrategy>() {
-					@Override
-					public PlanStrategy get() {
-						return new BestReplyLocationChoicePlanStrategy(scenario);
-					}
-				});
+				addPlanStrategyBinding("MyLocationChoice").to(BestReplyLocationChoicePlanStrategy.class);
 			}
 		});
 
@@ -183,10 +177,7 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 
 		// CONTROL(L)ER:
 		Controler controler = new Controler(scenario);
-		controler.getConfig().controler().setOverwriteFileSetting(
-				true ?
-						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 
 		ReadOrComputeMaxDCScore computer = new ReadOrComputeMaxDCScore(lcContext);
         computer.readOrCreateMaxDCScore(controler.getConfig(), lcContext.kValsAreRead());
@@ -207,12 +198,7 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				addPlanStrategyBinding("MyLocationChoice").toProvider(new javax.inject.Provider<PlanStrategy>() {
-					@Override
-					public PlanStrategy get() {
-						return new BestReplyLocationChoicePlanStrategy(scenario);
-					}
-				});
+				addPlanStrategyBinding("MyLocationChoice").to(BestReplyLocationChoicePlanStrategy.class);
 			}
 		});
 
@@ -307,12 +293,14 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 
 		// set locachoice strategy:
 		controler.addOverridingModule(new AbstractModule() {
+
 			@Override
 			public void install() {
+				final Provider<TripRouter> tripRouterProvider = binder().getProvider(TripRouter.class);
 				addPlanStrategyBinding("MyLocationChoice").toProvider(new javax.inject.Provider<PlanStrategy>() {
 					@Override
 					public PlanStrategy get() {
-						return new LocationChoicePlanStrategy(scenario);
+						return new LocationChoicePlanStrategy(scenario, tripRouterProvider);
 					}
 				});
 			}

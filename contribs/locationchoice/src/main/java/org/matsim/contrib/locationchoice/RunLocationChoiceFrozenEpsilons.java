@@ -35,8 +35,11 @@ import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.PlanStrategy;
+import org.matsim.core.router.TripRouter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.utils.objectattributes.ObjectAttributes;
+
+import javax.inject.Provider;
 
 public class RunLocationChoiceFrozenEpsilons {
 	private static final String MY_LOCATION_CHOICE = "MyLocationChoice";
@@ -87,12 +90,7 @@ public class RunLocationChoiceFrozenEpsilons {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				addPlanStrategyBinding(MY_LOCATION_CHOICE).toProvider(new javax.inject.Provider<PlanStrategy>() {
-					@Override
-					public PlanStrategy get() {
-						return new BestReplyLocationChoicePlanStrategy(scenario);
-					}
-				});
+				addPlanStrategyBinding(MY_LOCATION_CHOICE).to(BestReplyLocationChoicePlanStrategy.class);
 			}
 		});
 

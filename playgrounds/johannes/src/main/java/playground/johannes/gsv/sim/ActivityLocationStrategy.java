@@ -19,6 +19,7 @@
 
 package playground.johannes.gsv.sim;
 
+import com.google.inject.Inject;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.common.util.ProgressLogger;
@@ -33,6 +34,7 @@ import org.matsim.facilities.ActivityOption;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import playground.johannes.synpop.data.CommonKeys;
 
+import javax.inject.Provider;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -45,6 +47,7 @@ public class ActivityLocationStrategy implements GenericPlanStrategy<Plan, Perso
 
 	// private static final Logger logger =
 	// Logger.getLogger(ActivityLocationStrategy.class);
+	private final Provider<TripRouter> tripRouterProvider;
 
 	private Map<String, QuadTree<ActivityFacility>> quadTrees;
 
@@ -70,12 +73,13 @@ public class ActivityLocationStrategy implements GenericPlanStrategy<Plan, Perso
 	
 	private final AtomicInteger replanCnt;
 
-	public ActivityLocationStrategy(ActivityFacilities facilities, Population population, Random random, int numThreads, String blacklist, double mutationError) {
+	public ActivityLocationStrategy(ActivityFacilities facilities, Population population, Random random, int numThreads, String blacklist, double mutationError, Provider<TripRouter> tripRouterProvider) {
 		this.random = random;
 		this.facilities = facilities;
 		this.blacklist = blacklist;
 		this.mutationError = mutationError;
 		this.population = population;
+		this.tripRouterProvider = tripRouterProvider;
 		executor = Executors.newFixedThreadPool(numThreads);
 
 		replanCnt = new AtomicInteger(0);
@@ -146,7 +150,7 @@ public class ActivityLocationStrategy implements GenericPlanStrategy<Plan, Perso
 		// System.out.println("enter");
 		TripRouter router;
 		if (routers.isEmpty()) {
-			router = replanContext.getTripRouter();
+			router = tripRouterProvider.get();
 		} else {
 			router = routers.poll();
 		}

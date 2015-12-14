@@ -44,14 +44,16 @@ public class GroupSubtourModeChoiceFactory extends AbstractConfigurableSelection
 	private final PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory;
 	private final Provider<TripRouter> tripRouterFactory;
 	private final PlanLinkIdentifier planLinkIdentifier;
+	private javax.inject.Provider<TripRouter> tripRouterProvider;
 
 	@Inject
-	public GroupSubtourModeChoiceFactory( Scenario sc , PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory , Provider<TripRouter> tripRouterFactory ,
-			@Strong PlanLinkIdentifier planLinkIdentifier ) {
+	public GroupSubtourModeChoiceFactory(Scenario sc, PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory, Provider<TripRouter> tripRouterFactory,
+										 @Strong PlanLinkIdentifier planLinkIdentifier, javax.inject.Provider<TripRouter> tripRouterProvider) {
 		this.sc = sc;
 		this.planRoutingAlgorithmFactory = planRoutingAlgorithmFactory;
 		this.tripRouterFactory = tripRouterFactory;
 		this.planLinkIdentifier = planLinkIdentifier;
+		this.tripRouterProvider = tripRouterProvider;
 	}
 
 
@@ -69,7 +71,7 @@ public class GroupSubtourModeChoiceFactory extends AbstractConfigurableSelection
 		strategy.addStrategyModule(
 				new IndividualBasedGroupStrategyModule(
 					new SubtourModeChoice(
-						sc.getConfig() ) ) );
+							tripRouterProvider, sc.getConfig().global(), sc.getConfig().subtourModeChoice()) ) );
 
 		// TODO: add an option to enable or disable this part?
 		final VehicleRessources vehicles =

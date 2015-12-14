@@ -23,10 +23,13 @@ package org.matsim.core.controler.corelisteners;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.controler.events.ReplanningEvent;
 import org.matsim.core.controler.listener.ReplanningListener;
+import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.StrategyManager;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+
+import javax.inject.Provider;
 
 /**
  * A {@link org.matsim.core.controler.listener.ControlerListener} that manages the
@@ -38,19 +41,21 @@ import com.google.inject.Singleton;
  */
 @Singleton
 final class PlansReplanningImpl implements PlansReplanning, ReplanningListener {
-	
-	private Population population ;
-	private StrategyManager strategyManager ;
+
+	private final Provider<ReplanningContext> replanningContextProvider;
+	private Population population;
+	private StrategyManager strategyManager;
 	
 	@Inject
-	PlansReplanningImpl( StrategyManager strategyManager, Population pop ) {
-		this.population = pop ;
-		this.strategyManager = strategyManager ;
+	PlansReplanningImpl(StrategyManager strategyManager, Population pop, Provider<ReplanningContext> replanningContextProvider) {
+		this.population = pop;
+		this.strategyManager = strategyManager;
+		this.replanningContextProvider = replanningContextProvider;
 	}
 
 	@Override
 	public void notifyReplanning(final ReplanningEvent event) {
-		strategyManager.run(population, event.getIteration(), event.getReplanningContext());
+		strategyManager.run(population, event.getIteration(), replanningContextProvider.get());
 	}
 
 }
