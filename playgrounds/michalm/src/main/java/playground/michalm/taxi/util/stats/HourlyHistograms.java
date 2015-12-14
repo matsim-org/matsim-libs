@@ -26,10 +26,10 @@ public class HourlyHistograms
 {
     public final int hour;
 
-    public final Histogram passengerWaitTime = new Histogram(5 * 60, 25);
+    public final Histogram passengerWaitTime = new Histogram(2.5 * 60, 25);
 
     public final Histogram emptyDriveTime = new Histogram(60, 21);
-    public final Histogram occupiedDriveTime = new Histogram(60, 21);
+    public final Histogram occupiedDriveTime = new Histogram(120, 21);
 
     //histograms from different hours cannot be aggregated for these two:
     public final Histogram emptyDriveRatio = new Histogram(0.05, 20);
@@ -42,14 +42,14 @@ public class HourlyHistograms
     }
 
 
-    public static final String MAIN_HEADER = "hour\t" + // 
-            "Passenger_Wait_Time" + tabs(25) + //
+    public static final String MAIN_HEADER = //
+    "\tPassenger_Wait_Time [min]" + tabs(25) + //
     //
-    "Empty_Drive_Time" + tabs(21) + //
-            "Occupied_Drive_Time" + tabs(21) + //
+    "\tEmpty_Drive_Time [min]" + tabs(21) + //
+            "\tOccupied_Drive_Time [min]" + tabs(21) + //
     //
-    "Empty_Drive_Ratio" + tabs(20) + //
-            "Vehicle_Wait_Ratio" + tabs(20); //
+    "\tEmpty_Drive_Ratio [%]" + tabs(20) + //
+            "\tVehicle_Wait_Ratio [%]" + tabs(20); //
 
 
     public static String tabs(int binCount)
@@ -66,14 +66,17 @@ public class HourlyHistograms
     public void printSubHeaders(PrintWriter pw)
     {
         pw.print("hour\t");
+        pw.print(passengerWaitTime.binsToString(1. / 60));
         //
-        pw.print(passengerWaitTime.binsToString());
+        pw.print("hour\t");
+        pw.print(emptyDriveTime.binsToString(1. / 60));
+        pw.print("hour\t");
+        pw.print(occupiedDriveTime.binsToString(1. / 60));
         //
-        pw.print(emptyDriveTime.binsToString());
-        pw.print(occupiedDriveTime.binsToString());
-        //
-        pw.print(emptyDriveRatio.binsToString());
-        pw.print(stayRatio.binsToString());
+        pw.print("hour\t");
+        pw.print(emptyDriveRatio.binsToString(100));
+        pw.print("hour\t");
+        pw.print(stayRatio.binsToString(100));
         pw.println();
     }
 
@@ -81,13 +84,16 @@ public class HourlyHistograms
     public void printStats(PrintWriter pw)
     {
         pw.print(hour + "\t");
-        //
         pw.print(passengerWaitTime.countsToString());
         //
+        pw.print(hour + "\t");
         pw.print(emptyDriveTime.countsToString());
+        pw.print(hour + "\t");
         pw.print(occupiedDriveTime.countsToString());
         //
+        pw.print(hour + "\t");
         pw.print(emptyDriveRatio.countsToString());
+        pw.print(hour + "\t");
         pw.print(stayRatio.countsToString());
         pw.println();
     }

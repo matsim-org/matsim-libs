@@ -28,14 +28,14 @@ public class DailyHistograms
     public final Histogram stayRatio = new Histogram(0.05, 20);
 
     public static final String MAIN_HEADER = // 
-    "Empty_Drive_Ratio" + HourlyHistograms.tabs(20) + //
-            "Vehicle_Wait_Ratio" + HourlyHistograms.tabs(20); //
+    "Empty_Drive_Ratio [%]" + HourlyHistograms.tabs(20) + //
+            "Vehicle_Wait_Ratio [%]" + HourlyHistograms.tabs(20); //
 
 
     public void printSubHeaders(PrintWriter pw)
     {
-        pw.print(emptyDriveRatio.binsToString());
-        pw.print(stayRatio.binsToString());
+        pw.print(emptyDriveRatio.binsToString(100));
+        pw.print(stayRatio.binsToString(100));
         pw.println();
     }
 
