@@ -19,27 +19,27 @@
 
 package org.matsim.core.replanning.modules;
 
-import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
+import org.matsim.core.router.TripRouter;
+import org.matsim.facilities.ActivityFacilities;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 
 public class ReRoutePlanStrategyFactory implements Provider<PlanStrategy> {
 
-    private Scenario scenario;
-
-    @Inject
-    protected ReRoutePlanStrategyFactory(Scenario scenario) {
-        this.scenario = scenario;
-    }
+    @Inject private GlobalConfigGroup globalConfigGroup;
+    @Inject private ActivityFacilities facilities;
+    @Inject private Provider<TripRouter> tripRouterProvider;
 
     @Override
 	public PlanStrategy get() {
 		PlanStrategyImpl strategy = new PlanStrategyImpl(new RandomPlanSelector());
-		strategy.addStrategyModule(new ReRoute(scenario));
+		strategy.addStrategyModule(new ReRoute(facilities, tripRouterProvider, globalConfigGroup));
 		return strategy;
 	}
 

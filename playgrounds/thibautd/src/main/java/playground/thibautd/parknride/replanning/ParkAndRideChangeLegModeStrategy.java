@@ -32,7 +32,10 @@ import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.modules.TripsToLegsModule;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.StageActivityTypes;
+import org.matsim.core.router.TripRouter;
 import playground.thibautd.parknride.ParkAndRideConstants;
+
+import javax.inject.Provider;
 
 
 /**
@@ -43,12 +46,12 @@ import playground.thibautd.parknride.ParkAndRideConstants;
 public class ParkAndRideChangeLegModeStrategy implements PlanStrategy {
 	private final PlanStrategyImpl strategy = new PlanStrategyImpl( new RandomPlanSelector() );
 
-	public ParkAndRideChangeLegModeStrategy(final Controler controler) {
+	public ParkAndRideChangeLegModeStrategy(final Controler controler, Provider<TripRouter> tripRouterProvider) {
 		StageActivityTypes pnrList = ParkAndRideConstants.PARKING_ACT_TYPE;
 
-		addStrategyModule( new TripsToLegsModule( controler.getConfig() , pnrList ) );
+		addStrategyModule( new TripsToLegsModule(pnrList, tripRouterProvider, controler.getConfig().global()) );
 		addStrategyModule( new ChangeLegMode( controler.getConfig() ) );
-		addStrategyModule( new ReRoute(controler.getScenario() ) );
+		addStrategyModule( new ReRoute(controler.getScenario(), tripRouterProvider) );
 		addStrategyModule( new ParkAndRideInvalidateStartTimes( controler ) );
 	}
 

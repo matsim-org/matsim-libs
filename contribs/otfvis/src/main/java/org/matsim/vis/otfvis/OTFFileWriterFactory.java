@@ -26,25 +26,24 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.vis.snapshotwriters.SnapshotWriter;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Provider;
 
 public class OTFFileWriterFactory implements Provider<SnapshotWriter> {
 
 	private Scenario scenario;
 	private OutputDirectoryHierarchy controlerIO;
-	private final int iteration;
+	private final ControlerI iterationContext;
 
 	@Inject
 	OTFFileWriterFactory(Scenario scenario, ControlerI controler, OutputDirectoryHierarchy controlerIO) {
 		this.scenario = scenario;
-		this.iteration = controler.getIterationNumber();
+		this.iterationContext = controler;
 		this.controlerIO = controlerIO;
 	}
 
 	@Override
 	public SnapshotWriter get() {
-		String fileName = controlerIO.getIterationFilename(iteration, "otfvis.mvi");
+		String fileName = controlerIO.getIterationFilename(iterationContext.getIterationNumber(), "otfvis.mvi");
 		OTFFileWriter writer = new OTFFileWriter(scenario, fileName);
 		return writer;
 	}

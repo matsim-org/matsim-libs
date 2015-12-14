@@ -20,7 +20,7 @@
 package org.matsim.analysis;
 
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.LinkStatsConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -39,30 +39,20 @@ import java.util.Map;
  */
 final class LinkStatsControlerListener implements IterationEndsListener, IterationStartsListener {
 
-	private final LinkStatsConfigGroup linkStatsConfigGroup;
-    private final Config config;
-    private final CalcLinkStats linkStats;
-    private final VolumesAnalyzer volumes;
-    private final OutputDirectoryHierarchy controlerIO;
-    private final Map<String, TravelTime> travelTime;
+	@Inject private LinkStatsConfigGroup linkStatsConfigGroup;
+	@Inject private ControlerConfigGroup controlerConfigGroup;
+	@Inject private CalcLinkStats linkStats;
+	@Inject private VolumesAnalyzer volumes;
+	@Inject private OutputDirectoryHierarchy controlerIO;
+	@Inject private Map<String, TravelTime> travelTime;
     private int iterationsUsed = 0;
 	private boolean doReset = false;
-
-    @Inject
-    LinkStatsControlerListener(Config config, OutputDirectoryHierarchy controlerIO, CalcLinkStats linkStats, VolumesAnalyzer volumes, Map<String,TravelTime> travelTime) {
-        this.config = config;
-        this.controlerIO = controlerIO;
-        this.linkStats = linkStats;
-        this.volumes = volumes;
-        this.travelTime = travelTime;
-        this.linkStatsConfigGroup = config.linkStats();
-    }
 
     @Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		int iteration = event.getIteration();
 		
-		if (useVolumesOfIteration(iteration, config.controler().getFirstIteration())) {
+		if (useVolumesOfIteration(iteration, controlerConfigGroup.getFirstIteration())) {
 			this.iterationsUsed++;
             linkStats.addData(volumes, travelTime.get(TransportMode.car));
 		}
