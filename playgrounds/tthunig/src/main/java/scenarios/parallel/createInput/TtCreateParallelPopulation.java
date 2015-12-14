@@ -339,13 +339,13 @@ public final class TtCreateParallelPopulation {
 		if (takeWesternPath) {
 			path.add(Id.createLinkId("11_7"));
 			path.add(Id.createLinkId("7_3"));
-			path.add(Id.createLinkId("3_9"));
+			path.add(Id.createLinkId("3_10"));
 		} else {
 			path.add(Id.createLinkId("11_8"));
 			path.add(Id.createLinkId("8_4"));
-			path.add(Id.createLinkId("4_9"));
+			path.add(Id.createLinkId("4_10"));
 		}
-		path.add(Id.createLinkId("9_c"));
+		path.add(Id.createLinkId("10_9"));
 
 		Route route = new LinkNetworkRouteImpl(Id.createLinkId("d_12"), path, Id.createLinkId("9_c"));
 
