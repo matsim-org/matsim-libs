@@ -25,6 +25,8 @@ import java.util.*;
 public class CapstonePlansWriter {
     private final MutableScenario scenario;
     private int badplanCount;
+    public int carlegs, ptlegs, passengerlegs;
+
 
     public CapstonePlansWriter(MutableScenario scenarioWithFacilities, DataBaseAdmin dba) {
         this.dataBaseAdmin = dba;
@@ -134,7 +136,7 @@ public class CapstonePlansWriter {
                 }
             }
 
-            if(mainActType != null && mainPostcode == 0) {
+            if (mainActType != null && mainPostcode == 0) {
                 //bad location
                 badplanCount++;
                 return;
@@ -151,10 +153,9 @@ public class CapstonePlansWriter {
             while (i < activitySequence.size()) {
                 if (i > 0) {
                     String legmode = TransportMode.pt;
-                    ;
-                    if (isDriver)
+                    if (isDriver) {
                         legmode = TransportMode.car;
-                    else {
+                    } else {
                         if (lastAct.getType().equals("pudo")) {
                             if (!prevLeg.getMode().equals("passenger")) {
                                 legmode = "passenger";
@@ -165,6 +166,18 @@ public class CapstonePlansWriter {
                     }
                     Leg leg = populationFactory.createLeg(legmode);
                     plan.addLeg(leg);
+                    switch (legmode) {
+                        case TransportMode.car:
+                            carlegs++;
+                            break;
+                        case TransportMode.pt:
+                            ptlegs++;
+                            break;
+                        case "passenger":
+                            passengerlegs++;
+                            break;
+                    }
+
                 }
 
                 ActivityInfo activityInfo = activitySequence.get(i);
@@ -253,12 +266,10 @@ public class CapstonePlansWriter {
     Map<String, PersonEntry> persons;
 
     /**
-     * 
-     * @param args
-     * 0 - facilities table
-     * 1 - output file
-     * 2 - sample fraction (0,1]
-     * 3 - data base properties file
+     * @param args 0 - facilities table
+     *             1 - output file
+     *             2 - sample fraction (0,1]
+     *             3 - data base properties file
      * @throws SQLException
      * @throws NoConnectionException
      * @throws ClassNotFoundException
@@ -276,10 +287,11 @@ public class CapstonePlansWriter {
 
     }
 
+
     public void run(String plansFile, double fraction) throws SQLException, NoConnectionException {
         ResultSet resultSet = dataBaseAdmin.executeQuery("SELECT p.*  FROM ro_plansgeneration.plans_input p " +
-                "INNER JOIN ro_population.households h on p.hhid = h.hhid " +
-                "WHERE h.rand <= "+ fraction +
+                "INNER JOIN ro_population.independent_random_household_subsampling h on p.hhid = h.hhid " +
+                "WHERE h.rand <= " + fraction +
                 "ORDER BY p.hhid, persid, \"no\" ;");
         String hhid = null;
         String persid = null;
@@ -292,8 +304,12 @@ public class CapstonePlansWriter {
         while (resultSet.next()) {
             String hhid1 = resultSet.getString("hhid");
             if (!hhid1.equals(hhid)) {
-                if (household != null)
+                if (household != null) {
                     household.assignDrivers();
+                    for (PersonEntry personEntry : household.pax.values()) {
+                        personEntry.allocateActivityTimes();
+                    }
+                }
                 hhid = hhid1;
                 household = new Household();
                 household.cars = resultSet.getInt("car");
@@ -302,8 +318,6 @@ public class CapstonePlansWriter {
             }
             String persid1 = resultSet.getString("persid");
             if (!persid1.equals(persid)) {
-                if (persid != null)
-                    person.allocateActivityTimes();
                 persid = persid1;
                 person = new PersonEntry();
                 person.hhid = resultSet.getString("hhid");
@@ -371,6 +385,9 @@ public class CapstonePlansWriter {
         int dur = (int) (end - start) / 1000;
         System.out.printf("Time: %d sec", dur);
         System.err.println("Bad plans: " + badplanCount);
+        System.out.println("car legs:" + carlegs);
+        System.out.println("pt legs:" + ptlegs);
+        System.out.println("psgr legs:" + passengerlegs);
     }
 
     private void writePlans(String plansFile) {
