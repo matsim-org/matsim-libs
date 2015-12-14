@@ -343,7 +343,7 @@ public final class TtCreateParallelPopulation {
 		} else {
 			path.add(Id.createLinkId("11_8"));
 			path.add(Id.createLinkId("8_4"));
-			path.add(Id.createLinkId("4_10"));
+			path.add(Id.createLinkId("4_9"));
 		}
 		path.add(Id.createLinkId("9_c"));
 
