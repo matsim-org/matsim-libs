@@ -56,6 +56,10 @@ public class EventsReaderXMLv1ExtendedSim2DVersion extends MatsimXmlParser {
 	}
 
 	@Override
+	public void endTag(final String name, final String content, final Stack<String> context) {
+	}
+
+	@Override
 	public void characters(char[] ch, int start, int length) throws SAXException {
 		// ignore characters to prevent OutOfMemoryExceptions
 		/* the events-file only contains empty tags with attributes,
@@ -65,10 +69,6 @@ public class EventsReaderXMLv1ExtendedSim2DVersion extends MatsimXmlParser {
 		 */
 	}
 
-	@Override
-	public void endTag(final String name, final String content, final Stack<String> context) {
-	}
-
 	private void startEvent(final Attributes atts) {
 		double time = Double.parseDouble(atts.getValue("time"));
 		String eventType = atts.getValue("type");
@@ -76,9 +76,9 @@ public class EventsReaderXMLv1ExtendedSim2DVersion extends MatsimXmlParser {
 		if (XYVxVyEventImpl.EVENT_TYPE.equals(eventType)) {
 			this.events.processEvent(new XYVxVyEventImpl(Id.create(atts.getValue(XYVxVyEventImpl.ATTRIBUTE_PERSON), Person.class), Double.parseDouble(atts.getValue(XYVxVyEventImpl.ATTRIBUTE_X)), Double.parseDouble(atts.getValue(XYVxVyEventImpl.ATTRIBUTE_Y)), Double.parseDouble(atts.getValue(XYVxVyEventImpl.ATTRIBUTE_VX)), Double.parseDouble(atts.getValue(XYVxVyEventImpl.ATTRIBUTE_VY)), time));
 		}else if (LinkLeaveEvent.EVENT_TYPE.equals(eventType)) {
-			this.events.processEvent(new LinkLeaveEvent(time, Id.create(atts.getValue(LinkLeaveEvent.ATTRIBUTE_PERSON), Person.class), Id.create(atts.getValue(LinkLeaveEvent.ATTRIBUTE_LINK), Link.class), atts.getValue(LinkLeaveEvent.ATTRIBUTE_VEHICLE) == null ? null : Id.create(atts.getValue(LinkLeaveEvent.ATTRIBUTE_VEHICLE), Vehicle.class)));
+			this.events.processEvent(new LinkLeaveEvent(time, atts.getValue(LinkLeaveEvent.ATTRIBUTE_VEHICLE) == null ? null : Id.create(atts.getValue(LinkLeaveEvent.ATTRIBUTE_VEHICLE), Vehicle.class), Id.create(atts.getValue(LinkLeaveEvent.ATTRIBUTE_LINK), Link.class)));
 		} else if (LinkEnterEvent.EVENT_TYPE.equals(eventType)) {
-			this.events.processEvent(new LinkEnterEvent(time, Id.create(atts.getValue(LinkEnterEvent.ATTRIBUTE_PERSON), Person.class), Id.create(atts.getValue(LinkEnterEvent.ATTRIBUTE_LINK), Link.class), atts.getValue(LinkEnterEvent.ATTRIBUTE_VEHICLE) == null ? null : Id.create(atts.getValue(LinkEnterEvent.ATTRIBUTE_VEHICLE), Vehicle.class)));
+			this.events.processEvent(new LinkEnterEvent(time, atts.getValue(LinkEnterEvent.ATTRIBUTE_VEHICLE) == null ? null : Id.create(atts.getValue(LinkEnterEvent.ATTRIBUTE_VEHICLE), Vehicle.class), Id.create(atts.getValue(LinkEnterEvent.ATTRIBUTE_LINK), Link.class)));
 		} else if (ActivityEndEvent.EVENT_TYPE.equals(eventType)) {
 			this.events.processEvent(new ActivityEndEvent(time, Id.create(atts.getValue(ActivityEndEvent.ATTRIBUTE_PERSON), Person.class), Id.create(atts.getValue(ActivityEndEvent.ATTRIBUTE_LINK), Link.class), atts.getValue(ActivityEndEvent.ATTRIBUTE_FACILITY) == null ? null : Id.create(atts.getValue(ActivityEndEvent.ATTRIBUTE_FACILITY), ActivityFacility.class), atts.getValue(ActivityEndEvent.ATTRIBUTE_ACTTYPE)));
 		} else if (ActivityStartEvent.EVENT_TYPE.equals(eventType)) {

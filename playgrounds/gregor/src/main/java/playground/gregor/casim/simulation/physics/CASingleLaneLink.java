@@ -20,25 +20,20 @@
 
 package playground.gregor.casim.simulation.physics;
 
-import java.util.ArrayDeque;
-import java.util.Queue;
-import java.util.concurrent.locks.ReentrantLock;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.LinkEnterEvent;
-import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
-import org.matsim.api.core.v01.events.PersonStuckEvent;
-import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
+import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.MatsimRandom;
-
 import playground.gregor.casim.events.CASimAgentConstructEvent;
 import playground.gregor.casim.simulation.CANetsimEngine;
 import playground.gregor.casim.simulation.physics.CAEvent.CAEventType;
+
+import java.util.ArrayDeque;
+import java.util.Queue;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * This link models the dynamics for pedestrian streams (uni- and bidirectional)
@@ -49,10 +44,10 @@ import playground.gregor.casim.simulation.physics.CAEvent.CAEventType;
 public class CASingleLaneLink implements CANetworkEntity, CALink {
 
 	private static final Logger log = Logger.getLogger(CASingleLaneLink.class);
-
+	private static int EXP_WARN_CNT = 0;
+	final ReentrantLock lock = new ReentrantLock();
 	private final Link dsl;
 	private final Link usl;
-
 	// Particles and dsLeftTimes are backed by arrays, thus for every cell on a
 	// link it consumes an additional 2*64bit.
 	// The number of cells are in the range of RHO_HAT*length*width. For a 100m
@@ -66,36 +61,20 @@ public class CASingleLaneLink implements CANetworkEntity, CALink {
 	private final CAMoveableEntity[] particles;
 	private final double[] lastLeftDsTimes;
 	private final double[] lastLeftUsTimes;
-
 	private final int size;
-
 	private final CASingleLaneNode ds;
-
 	private final CASingleLaneNode us;
-
 	private final AbstractCANetwork net;
-
 	private final double cellLength;
-
-	private double width;
-
 	private final double tFree;
-
-	private double ratio;
 	private final double epsilon;
-
-	final ReentrantLock lock = new ReentrantLock();
-
 	private final int threadNr;
-
-	private double x;
-
-	private double y;
-
-	private static int EXP_WARN_CNT = 0;
-
 	private final Queue<CAMoveableEntity> dsWaitQ = new ArrayDeque<>();
 	private final Queue<CAMoveableEntity> usWaitQ = new ArrayDeque<>();
+	private double width;
+	private double ratio;
+	private double x;
+	private double y;
 
 	public CASingleLaneLink(Link dsl, Link usl, CASingleLaneNode ds,
 			CASingleLaneNode us, AbstractCANetwork net) {
@@ -164,6 +143,70 @@ public class CASingleLaneLink implements CANetworkEntity, CALink {
 			throw new RuntimeException("Unknown event type: "
 					+ e.getCAEventType());
 		}
+	}
+
+	@Override
+	public void lock() {
+		this.ds.lock.lock();
+		this.us.lock.lock();
+		this.lock.lock();
+	}
+
+	@Override
+	public void unlock() {
+		this.ds.lock.unlock();
+		this.us.lock.unlock();
+		this.lock.unlock();
+	}
+
+	@Override
+	public boolean tryLock() {
+		if (!this.ds.lock.tryLock()) {
+			return false;
+		}
+		if (!this.us.lock.tryLock()) {
+			this.ds.lock.unlock();
+			return false;
+		}
+
+		if (!this.lock.tryLock()) {
+			this.ds.lock.unlock();
+			this.us.lock.unlock();
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	public boolean isLocked() {
+		if (this.ds.lock.isLocked()) {
+			return true;
+		}
+		if (this.us.lock.isLocked()) {
+			return true;
+		}
+		return this.lock.isLocked();
+	}
+
+	@Override
+	public int threadNR() {
+		return this.threadNr;
+	}
+
+	@Override
+	public double getX() {
+		return x;
+	}
+
+	@Override
+	public double getY() {
+		return y;
+	}
+
+	@Override
+	public int getNrLanes() {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
 	private void handleTTE(CAMoveableEntity a, double time) {
@@ -469,13 +512,6 @@ public class CASingleLaneLink implements CANetworkEntity, CALink {
 
 	}
 
-	private void triggerTTE(CAMoveableEntity toBeTriggered, CANetworkEntity ne,
-			double time) {
-		CAEvent e = new CAEvent(time, toBeTriggered, ne, CAEventType.TTE);
-		this.net.pushEvent(e);
-
-	}
-
 	private void handleTTADownStreamNode(CAMoveableEntity a, double time) {
 		if (a.getNextLinkId() == null && this.ds.peekForAgent() == null) {
 			letAgentArrive(a, time, this.size - 1);
@@ -691,44 +727,6 @@ public class CASingleLaneLink implements CANetworkEntity, CALink {
 		checkPostConditionForOneSelfOnNodeAdvance(this.us, a, time);
 	}
 
-	// TODO us generic ids for event firing
-	@Override
-	public void fireDownstreamEntered(CAMoveableEntity a, double time) {
-		LinkEnterEvent e = new LinkEnterEvent((int) time, a.getId(),
-				this.usl.getId(), a.getId());
-		this.net.getEventsManager().processEvent(e);
-		// System.out.println("down");
-
-	}
-
-	@Override
-	public void fireUpstreamEntered(CAMoveableEntity a, double time) {
-		LinkEnterEvent e = new LinkEnterEvent((int) time, a.getId(),
-				this.dsl.getId(), a.getId());
-		this.net.getEventsManager().processEvent(e);
-		// System.out.println("up");
-	}
-
-	@Override
-	public void fireDownstreamLeft(CAMoveableEntity a, double time) {
-		LinkLeaveEvent e = new LinkLeaveEvent((int) time, a.getId(),
-				this.dsl.getId(), a.getId());
-		this.net.getEventsManager().processEvent(e);
-
-	}
-
-	@Override
-	public void fireUpstreamLeft(CAMoveableEntity a, double time) {
-		LinkLeaveEvent e = new LinkLeaveEvent((int) time, a.getId(),
-				this.usl.getId(), a.getId());
-		this.net.getEventsManager().processEvent(e);
-	}
-
-	@Override
-	public int getNumOfCells() {
-		return this.size;
-	}
-
 	private void swapOnLink(CAMoveableEntity a, int idx, int dir, double time) {
 
 		if (dir == 1) {
@@ -789,23 +787,6 @@ public class CASingleLaneLink implements CANetworkEntity, CALink {
 		return this.ds;
 	}
 
-	public CAMoveableEntity[] getParticles() {
-		return this.particles;
-	}
-
-	@Override
-	public int getSize() {
-		return this.size;
-	}
-
-	public double[] getLastLeftDsTimes() {
-		return this.lastLeftDsTimes;
-	}
-
-	public double[] getLastLeftUsTimes() {
-		return this.lastLeftUsTimes;
-	}
-
 	@Override
 	public Link getLink() {
 		return this.dsl;
@@ -816,25 +797,70 @@ public class CASingleLaneLink implements CANetworkEntity, CALink {
 		return this.usl;
 	}
 
-	public Link getDownstreamLink() {
-		return this.dsl;
+	@Override
+	public int getNumOfCells() {
+		return this.size;
+	}
+
+	// TODO us generic ids for event firing
+	@Override
+	public void fireDownstreamEntered(CAMoveableEntity a, double time) {
+		LinkEnterEvent e = new LinkEnterEvent((int) time, a.getId(),
+				this.usl.getId());
+		this.net.getEventsManager().processEvent(e);
+		// System.out.println("down");
+
 	}
 
 	@Override
-	public String toString() {
-		return this.dsl.getId().toString();
+	public void fireUpstreamEntered(CAMoveableEntity a, double time) {
+		LinkEnterEvent e = new LinkEnterEvent((int) time, a.getId(),
+				this.dsl.getId());
+		this.net.getEventsManager().processEvent(e);
+		// System.out.println("up");
 	}
 
-	public double getWidth() {
-		return this.width;
+	@Override
+	public void fireDownstreamLeft(CAMoveableEntity a, double time) {
+		LinkLeaveEvent e = new LinkLeaveEvent((int) time, a.getId(),
+				this.dsl.getId());
+		this.net.getEventsManager().processEvent(e);
+
 	}
 
-	public double getTFree() {
-		return this.tFree;
+	@Override
+	public void fireUpstreamLeft(CAMoveableEntity a, double time) {
+		LinkLeaveEvent e = new LinkLeaveEvent((int) time, a.getId(),
+				this.usl.getId());
+		this.net.getEventsManager().processEvent(e);
 	}
 
-	public double getCellLength() {
-		return this.cellLength;
+	@Override
+	public void reset() {
+		for (int i = 0; i < particles.length; i++) {
+			lastLeftDsTimes[i] = 0;
+			lastLeftUsTimes[i] = 0;
+			if (particles[i] != null) {
+				CAMoveableEntity part = particles[i];
+				this.net.unregisterAgent(part);
+				particles[i] = null;
+				if (part instanceof CAVehicle) {
+					double now = net.getEngine().getMobsim().getSimTimer()
+							.getTimeOfDay();
+					CAVehicle veh = (CAVehicle) part;
+
+					Id<Link> currentLinkId = veh.getDir() == 1 ? this.dsl
+							.getId() : this.usl.getId();
+					this.net.getEventsManager().processEvent(
+							new PersonStuckEvent(now, veh.getDriver().getId(),
+									currentLinkId, veh.getDriver().getMode()));
+
+					net.getEngine().getMobsim().getAgentCounter().incLost();
+					net.getEngine().getMobsim().getAgentCounter().decLiving();
+				}
+			}
+		}
+
 	}
 
 	@Override
@@ -869,10 +895,56 @@ public class CASingleLaneLink implements CANetworkEntity, CALink {
 		}
 	}
 
+	private void triggerTTE(CAMoveableEntity toBeTriggered, CANetworkEntity ne,
+							double time) {
+		CAEvent e = new CAEvent(time, toBeTriggered, ne, CAEventType.TTE);
+		this.net.pushEvent(e);
+
+	}
+
+	@Override
+	public int getSize() {
+		return this.size;
+	}
+
+	public CAMoveableEntity[] getParticles() {
+		return this.particles;
+	}
+
+	public double[] getLastLeftDsTimes() {
+		return this.lastLeftDsTimes;
+	}
+
+	public double[] getLastLeftUsTimes() {
+		return this.lastLeftUsTimes;
+	}
+
+	public Link getDownstreamLink() {
+		return this.dsl;
+	}
+
+	@Override
+	public String toString() {
+		return this.dsl.getId().toString();
+	}
+
+	public double getWidth() {
+		return this.width;
+	}
+
+	public double getTFree() {
+		return this.tFree;
+	}
+
+	public double getCellLength() {
+		return this.cellLength;
+	}
+
 	private void letAgentArrive(CAMoveableEntity a, double time, int idx) {
 		if (a.getDir() == 1) {
 			this.lastLeftDsTimes[idx] = time;
-		} else {
+		}
+		else {
 			this.lastLeftUsTimes[idx] = time;
 		}
 		this.particles[idx] = null;
@@ -881,100 +953,5 @@ public class CASingleLaneLink implements CANetworkEntity, CALink {
 			engine.letVehicleArrive((CAVehicle) a);
 		}
 		this.net.unregisterAgent(a);
-	}
-
-	@Override
-	public void reset() {
-		for (int i = 0; i < particles.length; i++) {
-			lastLeftDsTimes[i] = 0;
-			lastLeftUsTimes[i] = 0;
-			if (particles[i] != null) {
-				CAMoveableEntity part = particles[i];
-				this.net.unregisterAgent(part);
-				particles[i] = null;
-				if (part instanceof CAVehicle) {
-					double now = net.getEngine().getMobsim().getSimTimer()
-							.getTimeOfDay();
-					CAVehicle veh = (CAVehicle) part;
-
-					Id<Link> currentLinkId = veh.getDir() == 1 ? this.dsl
-							.getId() : this.usl.getId();
-					this.net.getEventsManager().processEvent(
-							new PersonStuckEvent(now, veh.getDriver().getId(),
-									currentLinkId, veh.getDriver().getMode()));
-
-					net.getEngine().getMobsim().getAgentCounter().incLost();
-					net.getEngine().getMobsim().getAgentCounter().decLiving();
-				}
-			}
-		}
-
-	}
-
-	@Override
-	public void lock() {
-		this.ds.lock.lock();
-		this.us.lock.lock();
-		this.lock.lock();
-	}
-
-	@Override
-	public void unlock() {
-		this.ds.lock.unlock();
-		this.us.lock.unlock();
-		this.lock.unlock();
-	}
-
-	@Override
-	public boolean tryLock() {
-		if (!this.ds.lock.tryLock()) {
-			return false;
-		}
-		if (!this.us.lock.tryLock()) {
-			this.ds.lock.unlock();
-			return false;
-		}
-
-		if (!this.lock.tryLock()) {
-			this.ds.lock.unlock();
-			this.us.lock.unlock();
-			return false;
-		}
-		return true;
-	}
-
-	@Override
-	public boolean isLocked() {
-		if (this.ds.lock.isLocked()) {
-			return true;
-		}
-		if (this.us.lock.isLocked()) {
-			return true;
-		}
-		if (this.lock.isLocked()) {
-			return true;
-		}
-		return false;
-	}
-
-	@Override
-	public int threadNR() {
-		return this.threadNr;
-	}
-
-	@Override
-	public double getX() {
-		return x;
-	}
-
-	@Override
-	public double getY() {
-		return y;
-	}
-
-	@Override
-	public int getNrLanes() {
-		// TODO Auto-generated method stub
-		return 0;
 	}
 }

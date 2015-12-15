@@ -112,7 +112,7 @@ public class CTNodeCell extends CTCell {
 		l.poll();
 		ctPed.notifyMoveOverNode();
 		DriverAgent driver = ctPed.getDriver();
-		LinkEnterEvent e = new LinkEnterEvent(Math.floor(time), driver.getId(), driver.getCurrentLinkId(), Id.create(driver.getId(), Vehicle.class));
+		LinkEnterEvent e = new LinkEnterEvent(Math.floor(time), Id.create(driver.getId(), Vehicle.class), driver.getCurrentLinkId());
 
 		this.net.getEventsManager().processEvent(e);
 
@@ -131,7 +131,7 @@ public class CTNodeCell extends CTCell {
 			return false;
 		}
 
-		LinkLeaveEvent e = new LinkLeaveEvent(Math.floor(time), driver.getId(), driver.getCurrentLinkId(), Id.create(driver.getId(), Vehicle.class));
+		LinkLeaveEvent e = new LinkLeaveEvent(Math.floor(time), Id.create(driver.getId(), Vehicle.class), driver.getCurrentLinkId());
 		this.net.getEventsManager().processEvent(e);
 		if (ctPed.getNextLinkId() == null) {
 			CTNetsimEngine en = this.net.getEngine();

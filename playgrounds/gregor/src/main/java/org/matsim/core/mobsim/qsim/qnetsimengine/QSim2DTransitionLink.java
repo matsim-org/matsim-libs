@@ -20,10 +20,6 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
@@ -33,13 +29,16 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.vis.snapshotwriters.VisData;
-
 import playground.gregor.sim2d_v4.events.Sim2DAgentConstructEvent;
 import playground.gregor.sim2d_v4.scenario.Sim2DEnvironment;
 import playground.gregor.sim2d_v4.simulation.Sim2DAgentFactory;
 import playground.gregor.sim2d_v4.simulation.Sim2DEngine;
 import playground.gregor.sim2d_v4.simulation.physics.Sim2DAgent;
 import playground.gregor.sim2d_v4.simulation.physics.TransitionAreaI;
+
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Set;
 
 public class QSim2DTransitionLink extends AbstractQLink {
 
@@ -58,16 +57,11 @@ public class QSim2DTransitionLink extends AbstractQLink {
 
 
 	private final Sim2DAgentFactory agentBuilder;
-
-	private TransitionAreaI ta;
-
-	private double spawnX;
-
-	private double spawnY;
-
 	private final double area;
-
 	private final QLinkInternalI qPred;
+	private TransitionAreaI ta;
+	private double spawnX;
+	private double spawnY;
 
 	QSim2DTransitionLink(Link link, QNetwork network, QNode toQueueNode, Sim2DEngine hybridEngine, QLinkInternalI qLinkImpl, Sim2DEnvironment env, Sim2DAgentFactory builder) {
 		super(link,network);
@@ -107,102 +101,31 @@ public class QSim2DTransitionLink extends AbstractQLink {
 	}
 
 	@Override
+	boolean doSimStep(double now) {
+		if (!this.transferToSim2D) {
+			return this.qLinkDelegate.doSimStep(now);
+		}
+		else {
+			throw new UnsupportedOperationException();
+		}
+	}
+
+	@Override
 	void addFromUpstream(QVehicle veh) {
 		if (!this.transferToSim2D) {
 			this.qLinkDelegate.addFromUpstream(veh);
 		} else {
-			
-		
+
+
 			Sim2DAgent agent = this.agentBuilder.buildAgent(veh,this.spawnX+MatsimRandom.getRandom().nextDouble()-.5,this.spawnY+MatsimRandom.getRandom().nextDouble()-.5, this.ta.getPhysicalEnvironment());
 			agent.setDesiredSpeed(this.getLink().getFreespeed());
 //			int v = this.qPred.getAllNonParkedVehicles().size();
 			this.ta.addAgentTransitionBuffer(agent,0);
 			double now = this.qNetwork.simEngine.getMobsim().getSimTimer().getTimeOfDay();
 			this.qNetwork.simEngine.getMobsim().getEventsManager().processEvent(
-					new LinkEnterEvent(now, veh.getDriver().getId(),
-							this.getLink().getId(), veh.getId()));
+					new LinkEnterEvent(now, veh.getId(),
+							this.getLink().getId()));
 			this.qNetwork.simEngine.getMobsim().getEventsManager().processEvent(new Sim2DAgentConstructEvent(now, agent));
-		}
-	}
-
-	@Override
-	void clearVehicles() {
-		if (!this.transferToSim2D) {
-			this.qLinkDelegate.clearVehicles();
-		} else {
-//			throw new UnsupportedOperationException() ;
-
-		}
-	}
-
-	@Override
-	boolean doSimStep(double now) {
-		if (!this.transferToSim2D) {
-			return this.qLinkDelegate.doSimStep(now);
-		} else {
-			throw new UnsupportedOperationException() ;
-		}
-	}
-
-	@Override
-	QNode getToNode() {
-		if (!this.transferToSim2D) {
-			return this.qLinkDelegate.getToNode();
-		} else {
-
-			throw new UnsupportedOperationException() ;
-		}
-	}
-
-	@Override
-	Collection<MobsimAgent> getAdditionalAgentsOnLink() {
-		if (!this.transferToSim2D) {
-			return this.qLinkDelegate.getAdditionalAgentsOnLink();
-		} else {
-
-			throw new UnsupportedOperationException() ;
-		}
-	}
-
-	@Override
-	QVehicle getVehicle(Id vehicleId) {
-		if (!this.transferToSim2D) {
-			return this.qLinkDelegate.getVehicle(vehicleId);
-		} else {
-
-			throw new UnsupportedOperationException() ;
-		}
-	}
-
-
-	@Override
-	void registerAdditionalAgentOnLink(MobsimAgent planAgent) {
-		if (!this.transferToSim2D) {
-			this.qLinkDelegate.registerAdditionalAgentOnLink(planAgent);
-		} else {
-			this.qLinkDelegate.registerAdditionalAgentOnLink(planAgent);
-//			throw new UnsupportedOperationException() ;
-		}
-	}
-
-	@Override
-	void registerDriverAgentWaitingForCar(MobsimDriverAgent agent) {
-		if (!this.transferToSim2D) {
-			this.qLinkDelegate.registerDriverAgentWaitingForCar(agent);
-		} else {
-
-			throw new UnsupportedOperationException() ;
-		}
-	}
-
-
-	@Override
-	MobsimAgent unregisterAdditionalAgentOnLink(Id mobsimAgentId) {
-		if (!this.transferToSim2D) {
-			return this.qLinkDelegate.unregisterAdditionalAgentOnLink(mobsimAgentId);
-		} else {
-			return this.qLinkDelegate.unregisterAdditionalAgentOnLink(mobsimAgentId);
-//			throw new UnsupportedOperationException() ;
 		}
 	}
 
@@ -218,12 +141,12 @@ public class QSim2DTransitionLink extends AbstractQLink {
 	}
 
 	@Override
-	double getLastMovementTimeOfFirstVehicle() {
+	QVehicle popFirstVehicle() {
 		if (!this.transferToSim2D) {
-			return this.qLinkDelegate.getLastMovementTimeOfFirstVehicle();
+			return this.qLinkDelegate.popFirstVehicle();
 		} else {
-
-			throw new UnsupportedOperationException() ;
+			return this.qLinkDelegate.popFirstVehicle();
+//			throw new UnsupportedOperationException() ;
 		}
 	}
 
@@ -234,6 +157,16 @@ public class QSim2DTransitionLink extends AbstractQLink {
 		} else {
 			return this.qLinkDelegate.getFirstVehicle();
 //			throw new UnsupportedOperationException() ;
+		}
+	}
+
+	@Override
+	double getLastMovementTimeOfFirstVehicle() {
+		if (!this.transferToSim2D) {
+			return this.qLinkDelegate.getLastMovementTimeOfFirstVehicle();
+		} else {
+
+			throw new UnsupportedOperationException() ;
 		}
 	}
 
@@ -257,27 +190,6 @@ public class QSim2DTransitionLink extends AbstractQLink {
 	}
 
 	@Override
-	QVehicle popFirstVehicle() {
-		if (!this.transferToSim2D) {
-			return this.qLinkDelegate.popFirstVehicle();
-		} else {
-			return this.qLinkDelegate.popFirstVehicle();
-//			throw new UnsupportedOperationException() ;
-		}
-	}
-
-	@Override
-	public Collection<MobsimVehicle> getAllNonParkedVehicles() {
-		if (!this.transferToSim2D) {
-			return this.qLinkDelegate.getAllNonParkedVehicles();
-		} else {
-
-			throw new UnsupportedOperationException() ;
-		}
-	}
-
-
-	@Override
 	public Link getLink() {
 		if (!this.transferToSim2D) {
 			return this.qLinkDelegate.getLink();
@@ -292,15 +204,24 @@ public class QSim2DTransitionLink extends AbstractQLink {
 			this.qLinkDelegate.recalcTimeVariantAttributes(time);
 		} else {
 
-			throw new UnsupportedOperationException() ;
+			throw new UnsupportedOperationException();
 		}
 	}
 
+	@Override
+	public Collection<MobsimVehicle> getAllNonParkedVehicles() {
+		if (!this.transferToSim2D) {
+			return this.qLinkDelegate.getAllNonParkedVehicles();
+		} else {
+
+			throw new UnsupportedOperationException();
+		}
+	}
 
 	@Override
-	public VisData getVisData() {
+	QNode getToNode() {
 		if (!this.transferToSim2D) {
-			return this.qLinkDelegate.getVisData();
+			return this.qLinkDelegate.getToNode();
 		} else {
 
 			throw new UnsupportedOperationException() ;
@@ -308,9 +229,79 @@ public class QSim2DTransitionLink extends AbstractQLink {
 	}
 
 	@Override
+	public VisData getVisData() {
+		if (!this.transferToSim2D) {
+			return this.qLinkDelegate.getVisData();
+		} else {
+
+			throw new UnsupportedOperationException();
+		}
+	}
+
+	@Override
 	QVehicle getParkedVehicle(Id vehicleId) {
 		if (!this.transferToSim2D) {
 			return this.qLinkDelegate.getParkedVehicle(vehicleId);
+		} else {
+
+			throw new UnsupportedOperationException();
+		}
+	}
+
+	@Override
+	void registerAdditionalAgentOnLink(MobsimAgent planAgent) {
+		if (!this.transferToSim2D) {
+			this.qLinkDelegate.registerAdditionalAgentOnLink(planAgent);
+		} else {
+			this.qLinkDelegate.registerAdditionalAgentOnLink(planAgent);
+//			throw new UnsupportedOperationException() ;
+		}
+	}
+
+	@Override
+	MobsimAgent unregisterAdditionalAgentOnLink(Id mobsimAgentId) {
+		if (!this.transferToSim2D) {
+			return this.qLinkDelegate.unregisterAdditionalAgentOnLink(mobsimAgentId);
+		} else {
+			return this.qLinkDelegate.unregisterAdditionalAgentOnLink(mobsimAgentId);
+//			throw new UnsupportedOperationException() ;
+		}
+	}
+
+	@Override
+	Collection<MobsimAgent> getAdditionalAgentsOnLink() {
+		if (!this.transferToSim2D) {
+			return this.qLinkDelegate.getAdditionalAgentsOnLink();
+		} else {
+
+			throw new UnsupportedOperationException() ;
+		}
+	}
+
+	@Override
+	void clearVehicles() {
+		if (!this.transferToSim2D) {
+			this.qLinkDelegate.clearVehicles();
+		} else {
+//			throw new UnsupportedOperationException() ;
+
+		}
+	}
+
+	@Override
+	QVehicle getVehicle(Id vehicleId) {
+		if (!this.transferToSim2D) {
+			return this.qLinkDelegate.getVehicle(vehicleId);
+		} else {
+
+			throw new UnsupportedOperationException() ;
+		}
+	}
+
+	@Override
+	void registerDriverAgentWaitingForCar(MobsimDriverAgent agent) {
+		if (!this.transferToSim2D) {
+			this.qLinkDelegate.registerDriverAgentWaitingForCar(agent);
 		} else {
 
 			throw new UnsupportedOperationException() ;

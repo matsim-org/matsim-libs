@@ -119,8 +119,8 @@ public class ExternalEngine implements MobsimEngine, MATSimInterfaceService {
 
 		if (ql.isAcceptingFromUpstream()) {
 			this.vehicles.remove(persId);
-			this.em.processEvent(new LinkLeaveEvent(now, persId, veh
-					.getDriver().getCurrentLinkId(), veh.getId()));
+			this.em.processEvent(new LinkLeaveEvent(now, veh.getId(), veh
+					.getDriver().getCurrentLinkId()));
 			veh.getDriver().notifyMoveOverNode(nextLId);
 
 			ql.addFromUpstream(veh);
@@ -293,10 +293,10 @@ public class ExternalEngine implements MobsimEngine, MATSimInterfaceService {
 
 		double now = this.sim.getSimTimer().getTimeOfDay();
 		Id<Link> currentLID = veh.getDriver().getCurrentLinkId();
-		this.em.processEvent(new LinkLeaveEvent(now, driverId, currentLID, veh.getId()));
+		this.em.processEvent(new LinkLeaveEvent(now, veh.getId(), currentLID));
 		Id<Link> nextLId = veh.getDriver().chooseNextLinkId();
 		veh.getDriver().notifyMoveOverNode(nextLId);
-		this.em.processEvent(new LinkEnterEvent(now, driverId, nextLId, veh.getId()));
+		this.em.processEvent(new LinkEnterEvent(now, veh.getId(), nextLId));
 
 
 

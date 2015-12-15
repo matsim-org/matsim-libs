@@ -426,7 +426,8 @@ public class TravelTimeIntegrationTest extends MatsimTestCase {
 		@Override
 		public void handleEvent(LinkEnterEvent event) {
 			if (event.getLinkId() == this.linkId) {
-				this.departures.put(event.getDriverId(), event);
+				Id<Person> p = Id.createPersonId(event.getVehicleId());
+				this.departures.put(p, event);
 			}
 
 		}
@@ -434,7 +435,8 @@ public class TravelTimeIntegrationTest extends MatsimTestCase {
 		@Override
 		public void handleEvent(LinkLeaveEvent event) {
 			if (event.getLinkId() == this.linkId) {
-				LinkEnterEvent e = departures.remove(event.getDriverId());
+				Id<Person> p = Id.createPersonId(event.getVehicleId());
+				LinkEnterEvent e = departures.remove(p);
 				double tt = event.getTime() - e.getTime();
 				ttVariance.addVar(tt);
 			}

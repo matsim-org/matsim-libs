@@ -502,7 +502,7 @@ public class CTLink implements CTNetworkEntity {
 		this.em.processEvent(e);
 		cell.jumpOnPed(p, now);
 		//TODO move following to jumpoff method in cell; create pseudo cell class for that purpose
-		LinkEnterEvent le = new LinkEnterEvent(Math.ceil(now), p.getDriver().getId(), p.getDriver().getCurrentLinkId(), Id.create(p.getDriver().getId(), Vehicle.class));
+		LinkEnterEvent le = new LinkEnterEvent(Math.ceil(now), Id.create(p.getDriver().getId(), Vehicle.class), p.getDriver().getCurrentLinkId());
 		this.em.processEvent(le);
 		cell.updateIntendedCellJumpTimeAndChooseNextJumper(now);
 	}

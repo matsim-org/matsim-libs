@@ -20,26 +20,21 @@
 
 package playground.gregor.casim.simulation.physics;
 
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.concurrent.locks.ReentrantLock;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.LinkEnterEvent;
-import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
-import org.matsim.api.core.v01.events.PersonStuckEvent;
-import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
+import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.MatsimRandom;
-
 import playground.gregor.casim.events.CASimAgentConstructEvent;
 import playground.gregor.casim.simulation.CANetsimEngine;
 import playground.gregor.casim.simulation.physics.CAEvent.CAEventType;
+
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * This link models the dynamics for pedestrian streams (uni- and bidirectional)
@@ -53,77 +48,47 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 	//	public static LaneSpeedObserver obs;
 
 
-	private static final Logger log = Logger.getLogger(CAMultiLaneLink.class);
-
 	public static final double LANESWITCH_PROB = 10.1;
-
-	public static boolean LANESWITCH = true;
 	static final double LANESWITCH_TS_TTA = 0;
+	private static final Logger log = Logger.getLogger(CAMultiLaneLink.class);
 	private static final double LANESWITCH_TS_SWAP = 0;
+	public static boolean LANESWITCH = true;
 	// private static final double LANESWITCH_TS_TTA = 1111.8;
 	// private static final double LANESWITCH_TS_SWAP = 1111;
 
 	//	static final int LANESWITCH_HEADWAY_TS = 66666;
-
+	private static int EXP_WARN_CNT = 0;
+	final ReentrantLock lock = new ReentrantLock();
 	private final Link dsl;
 	private final Link usl;
-
 	private final CAMoveableEntity[][] particles;
 	private final double[][] lastLeftDsTimes;
 	private final double[][] lastLeftUsTimes;
-
-
 	private final int size;
-
 	private final CAMultiLaneNode ds;
 
-	private final CAMultiLaneNode us;
-
-	private final AbstractCANetwork net;
-
 	// private final double cellLength;
-
-	public AbstractCANetwork getNet() {
-		return this.net;
-	}
-
+	private final CAMultiLaneNode us;
+	private final AbstractCANetwork net;
 	private final double width;
-
-	private double tFree;
-
 	private final double ratio;
-	private double epsilon; // TODO check if this is still needed [GL Nov.
+	private final int lanes;
 	// '14] // Yes, it is needed - w/o epsilon
 	// agents get stuck [GL Jan. 15]
-
-	final ReentrantLock lock = new ReentrantLock();
-
-	private int threadNr;
-
-	private final int lanes;
-
 	private final double laneWidth;
-
 	private final double laneCellLength;
-
 	private final double x;
-
 	private final double y;
-
-	private static int EXP_WARN_CNT = 0;
-
 	private final LinkedHashSet<CAMoveableEntity> dsWaitQ = new LinkedHashSet<>();
 	private final LinkedHashSet<CAMoveableEntity> usWaitQ = new LinkedHashSet<>();
-
 	private final MultiLaneDensityEstimator k;
-	
-	//signals 
+	private double tFree;
+	private double epsilon; // TODO check if this is still needed [GL Nov.
+	private int threadNr;
+	//signals
 	private boolean isSignalized = false;
-
 	private double offset;
-
 	private double green;
-
 	private double cycle;
 
 	public CAMultiLaneLink(Link dsl, Link usl, CAMultiLaneNode ds,
@@ -159,18 +124,48 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 		this.y = this.getLink().getToNode().getCoord().getY();
 		this.k = k;
 	}
+
+	/* package */
+	static int getIntendedLane(int current, int fromSz, int toSz) {
+		double ratio = (double) toSz / fromSz;
+		int ret = (int) Math.floor(current * ratio);
+		return ret;
+	}
+
+	/* package */
+	static double getD(CAMoveableEntity a) {
+		final double rho = a.getRho();
+		final double tmp = Math.pow(rho * AbstractCANetwork.PED_WIDTH,
+				AbstractCANetwork.GAMMA);
+		final double d = AbstractCANetwork.ALPHA + AbstractCANetwork.BETA * tmp;
+		return d;
+	}
+
+	/* package */
+	static double getZ(CAMoveableEntity a) {
+		double d = getD(a);
+		double z = 1 / (AbstractCANetwork.RHO_HAT + AbstractCANetwork.V_HAT)
+				+ d;
+		// double z = this.tFree + d;
+		return z;
+		//		return 0.5;
+	}
+
+	public AbstractCANetwork getNet() {
+		return this.net;
+	}
 	
 	public boolean isSignalized() {
 		return this.isSignalized;
 	}
-	
+
 	public void setSignalPlan(double offset, double green, double cycle) {
 		this.offset = offset;
 		this.green = green;
 		this.cycle = cycle;
 		this.isSignalized = true;
 	}
-	
+
 	public double timeToWait(double time) {
 		if (offset > time) {
 			return 0;
@@ -181,8 +176,7 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 		}
 		return cycle-cycleTime;
 	}
-	
-	
+
 	public void changeFreeSpd(double spd) {
 		if (spd > AbstractCANetwork.V_HAT) {
 			spd = AbstractCANetwork.V_HAT;
@@ -197,29 +191,6 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 
 	public double getLaneWidth() {
 		return this.laneWidth;
-	}
-
-	/* package */static int getIntendedLane(int current, int fromSz, int toSz) {
-		double ratio = (double)toSz/fromSz;
-		int ret = (int)Math.floor(current*ratio);
-		return ret;
-	}
-
-	/* package */static double getD(CAMoveableEntity a) {
-		final double rho = a.getRho();
-		final double tmp = Math.pow(rho * AbstractCANetwork.PED_WIDTH,
-				AbstractCANetwork.GAMMA);
-		final double d = AbstractCANetwork.ALPHA + AbstractCANetwork.BETA * tmp;
-		return d;
-	}
-
-	/* package */static double getZ(CAMoveableEntity a) {
-		double d = getD(a);
-		double z = 1 / (AbstractCANetwork.RHO_HAT + AbstractCANetwork.V_HAT)
-				+ d;
-		// double z = this.tFree + d;
-		return z;
-		//		return 0.5;
 	}
 
 	public void updateLaneScore(CAMoveableEntity a,double time) {
@@ -318,6 +289,71 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 		}
 	}
 
+	@Override
+	public void lock() {
+		this.ds.lock.lock();
+		this.us.lock.lock();
+		this.lock.lock();
+	}
+
+	@Override
+	public void unlock() {
+		this.ds.unlock();
+		this.us.unlock();
+		// this.lock.unlock();
+	}
+
+	@Override
+	public boolean tryLock() {
+		if (!this.ds.tryLock()) {
+			// log.warn("ds lock failed");
+			return false;
+		}
+		if (!this.us.tryLock()) {
+			this.ds.unlock();
+			// log.warn("us lock failed");
+			return false;
+		}
+
+		// if (!this.lock.tryLock()) {
+		// this.ds.lock.unlock();
+		// this.us.lock.unlock();
+		// return false;
+		// }
+
+		return true;
+	}
+
+	@Override
+	public boolean isLocked() {
+		if (this.ds.lock.isLocked()) {
+			return true;
+		}
+		if (this.us.lock.isLocked()) {
+			return true;
+		}
+		return this.lock.isLocked();
+	}
+
+	@Override
+	public int threadNR() {
+		return this.threadNr;
+	}
+
+	@Override
+	public double getX() {
+		return this.x;
+	}
+
+	@Override
+	public double getY() {
+		return this.y;
+	}
+
+	public final int getNrLanes() {
+		return this.lanes;
+	}
+
 	private void handleTTE(CAMoveableEntity a, double time) {
 		// if (a.getId().toString().equals("3096")) {
 		// log.error("Gotcha!");
@@ -355,7 +391,6 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 			throw new RuntimeException("Agent:" + a
 					+ " is not in the upstream waiting queue!");
 		}
-		;
 		this.particles[lane][desiredPos] = a;
 		a.materialize(desiredPos, -1, lane);
 		if (a instanceof CAVehicle) {
@@ -516,7 +551,7 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 		int intendedSlot = getIntendedLane(a.getLane(), this.getNrLanes(), this.ds.getNrLanes());
 		CAMoveableEntity cand;
 		if ((cand = this.ds.peekForAgentInSlot(intendedSlot)) == null){
-			triggerTTA(a, this, time + this.tFree);	
+			triggerTTA(a, this, time + this.tFree);
 		} else if (cand.getNextLinkId().equals(this.usl.getId())){
 			double d = CAMultiLaneLink.getD(a);
 			d *= this.ds.getNodeRatio();
@@ -635,6 +670,7 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 		a.proceed();
 		a.updateSpdOnProceed(this.laneCellLength, time);
 	}
+
 	private void proceedDownStream(CAMoveableEntity a, int newLane, int idx,
 			double time) {
 		a.proceed();
@@ -763,16 +799,6 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 	private void triggerTTA(CAMoveableEntity toBeTriggered, CANetworkEntity ne,
 			double time) {
 		CAEvent e = new CAEvent(time, toBeTriggered, ne, CAEventType.TTA);
-		this.net.pushEvent(e);
-
-	}
-
-	private void triggerTTE(CAMoveableEntity toBeTriggered, CANetworkEntity ne,
-			double time) {
-		// if (toBeTriggered.getId().toString().equals("3096")) {
-		// log.error("Gotcha!");
-		// }
-		CAEvent e = new CAEvent(time, toBeTriggered, ne, CAEventType.TTE);
 		this.net.pushEvent(e);
 
 	}
@@ -1056,44 +1082,6 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 		}
 	}
 
-	// TODO us generic ids for event firing
-	@Override
-	public void fireDownstreamEntered(CAMoveableEntity a, double time) {
-		LinkEnterEvent e = new LinkEnterEvent((int) time, a.getId(),
-				this.usl.getId(), a.getId());
-		this.net.getEventsManager().processEvent(e);
-		// System.out.println("down");
-
-	}
-
-	@Override
-	public void fireUpstreamEntered(CAMoveableEntity a, double time) {
-		LinkEnterEvent e = new LinkEnterEvent((int) time, a.getId(),
-				this.dsl.getId(), a.getId());
-		this.net.getEventsManager().processEvent(e);
-		// System.out.println("up");
-	}
-
-	@Override
-	public void fireDownstreamLeft(CAMoveableEntity a, double time) {
-		LinkLeaveEvent e = new LinkLeaveEvent((int) time, a.getId(),
-				this.dsl.getId(), a.getId());
-		this.net.getEventsManager().processEvent(e);
-
-	}
-
-	@Override
-	public void fireUpstreamLeft(CAMoveableEntity a, double time) {
-		LinkLeaveEvent e = new LinkLeaveEvent((int) time, a.getId(),
-				this.usl.getId(), a.getId());
-		this.net.getEventsManager().processEvent(e);
-	}
-
-	@Override
-	public int getNumOfCells() {
-		return this.size;
-	}
-
 	private void swapOnLink(CAMoveableEntity a, int idx, int dir, double time,
 			int lane) {
 
@@ -1265,23 +1253,6 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 		return this.ds;
 	}
 
-	public CAMoveableEntity[] getParticles(int lane) {
-		return this.particles[lane];
-	}
-
-	@Override
-	public int getSize() {
-		return this.size;
-	}
-
-	public double[] getLastLeftDsTimes(int lane) {
-		return this.lastLeftDsTimes[lane];
-	}
-
-	public double[] getLastLeftUsTimes(int lane) {
-		return this.lastLeftUsTimes[lane];
-	}
-
 	@Override
 	public Link getLink() {
 		return this.dsl;
@@ -1292,25 +1263,74 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 		return this.usl;
 	}
 
-	public Link getDownstreamLink() {
-		return this.dsl;
+	@Override
+	public int getNumOfCells() {
+		return this.size;
+	}
+
+	// TODO us generic ids for event firing
+	@Override
+	public void fireDownstreamEntered(CAMoveableEntity a, double time) {
+		LinkEnterEvent e = new LinkEnterEvent((int) time, a.getId(),
+				this.usl.getId());
+		this.net.getEventsManager().processEvent(e);
+		// System.out.println("down");
+
 	}
 
 	@Override
-	public String toString() {
-		return this.dsl.getId().toString();
+	public void fireUpstreamEntered(CAMoveableEntity a, double time) {
+		LinkEnterEvent e = new LinkEnterEvent((int) time, a.getId(),
+				this.dsl.getId());
+		this.net.getEventsManager().processEvent(e);
+		// System.out.println("up");
 	}
 
-	public double getWidth() {
-		return this.width;
+	@Override
+	public void fireDownstreamLeft(CAMoveableEntity a, double time) {
+		LinkLeaveEvent e = new LinkLeaveEvent((int) time, a.getId(),
+				this.dsl.getId());
+		this.net.getEventsManager().processEvent(e);
+
 	}
 
-	public double getTFree() {
-		return this.tFree;
+	@Override
+	public void fireUpstreamLeft(CAMoveableEntity a, double time) {
+		LinkLeaveEvent e = new LinkLeaveEvent((int) time, a.getId(),
+				this.usl.getId());
+		this.net.getEventsManager().processEvent(e);
 	}
 
-	public final int getNrLanes() {
-		return this.lanes;
+	@Override
+	public void reset() {
+		for (int i = 0; i < this.lanes; i++) {
+			for (int j = 0; j < this.size; j++) {
+				this.lastLeftDsTimes[i][j] = 0;
+				this.lastLeftUsTimes[i][j] = 0;
+				if (this.particles[i][j] != null) {
+					CAMoveableEntity part = this.particles[i][j];
+					this.net.unregisterAgent(part);
+					this.particles[i][j] = null;
+					if (part instanceof CAVehicle) {
+						double now = this.net.getEngine().getMobsim().getSimTimer()
+								.getTimeOfDay();
+						CAVehicle veh = (CAVehicle) part;
+
+						Id<Link> currentLinkId = veh.getDir() == 1 ? this.dsl
+								.getId() : this.usl.getId();
+						this.net.getEventsManager().processEvent(
+								new PersonStuckEvent(now, veh.getDriver()
+										.getId(), currentLinkId, veh
+										.getDriver().getMode()));
+
+						this.net.getEngine().getMobsim().getAgentCounter().incLost();
+						this.net.getEngine().getMobsim().getAgentCounter()
+								.decLiving();
+					}
+				}
+			}
+		}
+
 	}
 
 	@Override
@@ -1346,11 +1366,62 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 
 	}
 
+	private void triggerTTE(CAMoveableEntity toBeTriggered, CANetworkEntity ne,
+							double time) {
+		// if (toBeTriggered.getId().toString().equals("3096")) {
+		// log.error("Gotcha!");
+		// }
+		CAEvent e = new CAEvent(time, toBeTriggered, ne, CAEventType.TTE);
+		this.net.pushEvent(e);
+
+	}
+
+	@Override
+	public int getSize() {
+		return this.size;
+	}
+
+	public CAMoveableEntity[] getParticles(int lane) {
+		return this.particles[lane];
+	}
+
+
+	//concurrent stuff
+
+	public double[] getLastLeftDsTimes(int lane) {
+		return this.lastLeftDsTimes[lane];
+	}
+
+	public double[] getLastLeftUsTimes(int lane) {
+		return this.lastLeftUsTimes[lane];
+	}
+
+	public Link getDownstreamLink() {
+		return this.dsl;
+	}
+
+	@Override
+	public String toString() {
+		return this.dsl.getId().toString();
+	}
+
+	public double getWidth() {
+		return this.width;
+	}
+
+
+	//other things
+
+	public double getTFree() {
+		return this.tFree;
+	}
+
 	private void letAgentArrive(CAMoveableEntity a, double time, int idx,
-			int lane) {
+								int lane) {
 		if (a.getDir() == 1) {
 			this.lastLeftDsTimes[lane][idx] = time;
-		} else {
+		}
+		else {
 			this.lastLeftUsTimes[lane][idx] = time;
 		}
 		this.particles[lane][idx] = null;
@@ -1365,108 +1436,6 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 
 		// this.net.registerAgent(a);
 		// this.net.unregisterAgent(a);
-	}
-
-	@Override
-	public void reset() {
-		for (int i = 0; i < this.lanes; i++) {
-			for (int j = 0; j < this.size; j++) {
-				this.lastLeftDsTimes[i][j] = 0;
-				this.lastLeftUsTimes[i][j] = 0;
-				if (this.particles[i][j] != null) {
-					CAMoveableEntity part = this.particles[i][j];
-					this.net.unregisterAgent(part);
-					this.particles[i][j] = null;
-					if (part instanceof CAVehicle) {
-						double now = this.net.getEngine().getMobsim().getSimTimer()
-								.getTimeOfDay();
-						CAVehicle veh = (CAVehicle) part;
-
-						Id<Link> currentLinkId = veh.getDir() == 1 ? this.dsl
-								.getId() : this.usl.getId();
-								this.net.getEventsManager().processEvent(
-										new PersonStuckEvent(now, veh.getDriver()
-												.getId(), currentLinkId, veh
-												.getDriver().getMode()));
-
-								this.net.getEngine().getMobsim().getAgentCounter().incLost();
-								this.net.getEngine().getMobsim().getAgentCounter()
-								.decLiving();
-					}
-				}
-			}
-		}
-
-	}
-
-
-	//concurrent stuff
-
-	@Override
-	public void lock() {
-		this.ds.lock.lock();
-		this.us.lock.lock();
-		this.lock.lock();
-	}
-
-	@Override
-	public void unlock() {
-		this.ds.unlock();
-		this.us.unlock();
-		// this.lock.unlock();
-	}
-
-	@Override
-	public boolean tryLock() {
-		if (!this.ds.tryLock()) {
-			// log.warn("ds lock failed");
-			return false;
-		}
-		if (!this.us.tryLock()) {
-			this.ds.unlock();
-			// log.warn("us lock failed");
-			return false;
-		}
-
-		// if (!this.lock.tryLock()) {
-		// this.ds.lock.unlock();
-		// this.us.lock.unlock();
-		// return false;
-		// }
-
-		return true;
-	}
-
-	@Override
-	public boolean isLocked() {
-		if (this.ds.lock.isLocked()) {
-			return true;
-		}
-		if (this.us.lock.isLocked()) {
-			return true;
-		}
-		if (this.lock.isLocked()) {
-			return true;
-		}
-		return false;
-	}
-
-	@Override
-	public int threadNR() {
-		return this.threadNr;
-	}
-
-
-	//other things
-
-	@Override
-	public double getX() {
-		return this.x;
-	}
-
-	@Override
-	public double getY() {
-		return this.y;
 	}
 
 	public MultiLaneDensityEstimator getDensityEstimator() {

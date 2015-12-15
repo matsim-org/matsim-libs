@@ -25,21 +25,17 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.network.Link;
-
 import processing.core.PApplet;
 import processing.core.PImage;
 
 public class AgentTracker implements VisDebuggerAdditionalDrawer,
 		LinkEnterEventHandler {
 
-	double x = 0;
-	double y = 0;
-	
-	private PImage pI = null;
-	
-	
 	private final Id id;// = new IdImpl("carblowup8888");
 	private final Scenario sc;
+	double x = 0;
+	double y = 0;
+	private PImage pI = null;
 	
 	public AgentTracker(Scenario sc, Id car) {
 		this.sc = sc;
@@ -54,7 +50,7 @@ public class AgentTracker implements VisDebuggerAdditionalDrawer,
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		if (event.getDriverId().equals(this.id)) {
+		if (Id.createPersonId(event.getVehicleId()).equals(this.id)) {
 			if (event.getLinkId().toString().contains("el")) {
 				this.x = 0;
 				this.y = 0;
