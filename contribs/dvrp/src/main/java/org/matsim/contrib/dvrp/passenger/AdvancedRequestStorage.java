@@ -55,6 +55,9 @@ public class AdvancedRequestStorage
     }
 
 
+    private boolean warningShown = false;
+
+
     public PassengerRequest retrieveAdvancedRequest(MobsimAgent passenger, Id<Link> fromLinkId,
             Id<Link> toLinkId)
     {
@@ -66,17 +69,25 @@ public class AdvancedRequestStorage
             if (req != null) {
                 if (req.getFromLink().getId() == fromLinkId //
                         && req.getToLink().getId() == toLinkId) {
+                    // so this is the advance request for this leg
+                    //
+                    // This conclusion is based only on the from-to pair, we do not check how
+                    // req.getT0() and context.getTime() relate to each other
+                    //
+                    // TODO should we verify if abs(T0-currTime) <= threshold 
                     passengerAdvReqs.poll();
-                    return req;// this is the advance request for this leg
+                    return req;
                 }
                 else if (context.getTime() > req.getT0()) {
-                    //TODO we have to somehow handle it (in the future)
-                    //Currently this is not a problem since we do not have cases of not turning up...
-                	//my preference: ignore it. I had it turning up in multiple iterations and it doesnt do a thing (plans are sorted out because they end up being bad anyway)
-//                    throw new IllegalStateException(
-//                            "Seems that the agent has skipped a previously submitted request");
-//                    
-                    	
+                    if (!warningShown) {
+                        System.err.println("There is an older prebooked request - "
+                                + "seems that the agent has skipped a previously submitted request(??). "
+                                + "This message is shown only once.");
+                        warningShown = true;
+                    }
+                    //TODO michalm: do we have to somehow handle it (and how/where)?
+                    //
+                    //jb: my preference: ignore it. I had it turning up in multiple iterations and it doesnt do a thing (plans are sorted out because they end up being bad anyway)
                 }
             }
         }
