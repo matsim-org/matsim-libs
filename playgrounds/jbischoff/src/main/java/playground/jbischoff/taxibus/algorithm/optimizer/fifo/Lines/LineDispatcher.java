@@ -112,7 +112,7 @@ public class LineDispatcher implements ActivityStartEventHandler {
 				if (context.getVrpData().getVehicles().containsKey(busId)) {
 					Vehicle veh = context.getVrpData().getVehicles().get(busId);
 					this.lines.get(lineId).addVehicleToHold(veh);
-					log.info(veh.getId() + " on hold for line "+lineId);
+//					log.info(veh.getId() + " on hold for line "+lineId);
 				} else {
 					log.error("bus not found? " + event.getPersonId());
 				}

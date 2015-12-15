@@ -19,6 +19,7 @@
 
 package playground.jbischoff.taxibus.scenario.analysis.quick;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
@@ -34,7 +35,8 @@ import playground.jbischoff.taxibus.algorithm.utils.TaxibusUtils;
  */
 public class TaxiBusTravelTimesAnalyzer implements PersonDepartureEventHandler, PersonArrivalEventHandler, PersonEntersVehicleEventHandler{
 
-	
+	private static final Logger log = Logger.getLogger(TaxiBusTravelTimesAnalyzer.class);
+
 	double traveltimes = 0;
 	double waittimes = 0;
 	double departures = 0;
@@ -42,8 +44,15 @@ public class TaxiBusTravelTimesAnalyzer implements PersonDepartureEventHandler, 
 	
 	@Override
 	public void reset(int iteration) {
-		// TODO Auto-generated method stub
+		log.info("Taxibus statistics for iteration: "+(iteration-1));
+		log.info("Taxibus stats");
+		log.info("Rides:\t"+this.departures);
+		log.info("Average Waiting Time:\t"+this.waittimes/departures);
+		log.info("Average Travel Time:\t"+this.traveltimes/departures);
 		
+		traveltimes = 0;
+		waittimes= 0;
+		departures = 0;
 	}
 
 	@Override
@@ -71,6 +80,7 @@ public class TaxiBusTravelTimesAnalyzer implements PersonDepartureEventHandler, 
 	}
 	
 	public void printOutput(){
+		
 		System.out.println("Taxibus stats");
 		System.out.println("Rides:\t"+this.departures);
 		System.out.println("Average Waiting Time:\t"+this.waittimes/departures);
