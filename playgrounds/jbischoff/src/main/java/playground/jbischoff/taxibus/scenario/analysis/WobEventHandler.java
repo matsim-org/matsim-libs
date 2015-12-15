@@ -95,12 +95,13 @@ class WobEventHandler implements PersonDepartureEventHandler,
 	@SuppressWarnings("deprecation")
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
+		Id<Person> driverId = Id.createPersonId(event.getVehicleId().toString());
 
 		if (this.agentsOnLinkWithArrivalTime.get(event.getLinkId())
-				.containsKey(event.getDriverId())) {
+				.containsKey(driverId)) {
 			double timeOnLink = event.getTime()
 					- this.agentsOnLinkWithArrivalTime.get(event.getLinkId())
-							.get(event.getDriverId());
+							.get(driverId);
 			Link link = network.getLinks().get(event.getLinkId());
 			double freeSpeedTravelTime = link.getLength() / link.getFreespeed();
 			double linkDelay = timeOnLink - freeSpeedTravelTime;
@@ -109,7 +110,7 @@ class WobEventHandler implements PersonDepartureEventHandler,
 			WobDistanceAnalyzer.addIdDoubleToMap(this.delayPerLink,
 					event.getLinkId(), linkDelay);
 			WobDistanceAnalyzer.addPersonIdDoubleToMap(this.delayPerAgent,
-					event.getDriverId(), linkDelay);
+					driverId, linkDelay);
 
 		}
 
@@ -118,13 +119,14 @@ class WobEventHandler implements PersonDepartureEventHandler,
 	@SuppressWarnings("deprecation")
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		if (this.ptDriverIdAnalyzer.isPtDriver(event.getDriverId()))
+		Id<Person> driverId = Id.createPersonId(event.getVehicleId().toString());
+		if (this.ptDriverIdAnalyzer.isPtDriver(driverId))
 			return;
 		this.agentsOnLinkWithArrivalTime.get(event.getLinkId()).put(
-				event.getDriverId(), event.getTime());
+				driverId, event.getTime());
 
 		WobDistanceAnalyzer.addPersonIdDoubleToMap(this.currentCarLegDistance,
-				event.getDriverId(), network.getLinks().get(event.getLinkId())
+				driverId, network.getLinks().get(event.getLinkId())
 						.getLength());
 	}
 
