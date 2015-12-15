@@ -22,8 +22,6 @@
 
 package org.matsim.core.controler;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,7 +46,6 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.vis.snapshotwriters.SnapshotWriter;
 
 import com.google.inject.Binder;
-import com.google.inject.BindingAnnotation;
 import com.google.inject.Inject;
 import com.google.inject.Key;
 import com.google.inject.Module;
@@ -82,7 +79,6 @@ public abstract class AbstractModule implements Module {
 	private Multibinder<ControlerListener> controlerListenerMultibinder;
 	private Multibinder<MobsimListener> mobsimListenerMultibinder;
 	private Multibinder<SnapshotWriter> snapshotWriterMultibinder;
-	private MapBinder<String, GenericPlanSelector<Plan, Person>> planSelectorForRemovalMultibinder;
 	private MapBinder<String, PlanStrategy> planStrategyMultibinder;
 
 	@Inject
@@ -110,7 +106,6 @@ public abstract class AbstractModule implements Module {
 		this.eventHandlerMultibinder = Multibinder.newSetBinder(this.binder, EventHandler.class);
 		this.controlerListenerMultibinder = Multibinder.newSetBinder(this.binder, ControlerListener.class);
 		this.planStrategyMultibinder = MapBinder.newMapBinder(this.binder, String.class, PlanStrategy.class);
-		this.planSelectorForRemovalMultibinder = MapBinder.newMapBinder(this.binder, new TypeLiteral<String>(){}, new TypeLiteral<GenericPlanSelector<Plan, Person>>(){});
 		this.install();
 	}
 
@@ -143,8 +138,8 @@ public abstract class AbstractModule implements Module {
 	 * 
 	 * @see {@link StrategyManagerModule}, {@link StrategyManagerConfigLoader}
 	 */
-	protected final com.google.inject.binder.LinkedBindingBuilder<GenericPlanSelector<Plan, Person>> addPlanSelectorForRemovalBinding(String selectorName) {
-		return planSelectorForRemovalMultibinder.addBinding(selectorName);
+	protected final com.google.inject.binder.LinkedBindingBuilder<GenericPlanSelector<Plan, Person>> bindPlanSelectorForRemoval() {
+		return bind(new TypeLiteral<GenericPlanSelector<Plan, Person>>(){});
 	}
 
 	protected final com.google.inject.binder.LinkedBindingBuilder<PlanStrategy> addPlanStrategyBinding(String selectorName) {

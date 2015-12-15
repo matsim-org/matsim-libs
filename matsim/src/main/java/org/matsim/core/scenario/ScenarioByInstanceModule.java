@@ -7,7 +7,11 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.facilities.ActivityFacilities;
+import org.matsim.households.Households;
+import org.matsim.lanes.data.v20.Lanes;
+import org.matsim.pt.transitSchedule.api.Transit;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.vehicles.Vehicles;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -25,6 +29,7 @@ public class ScenarioByInstanceModule extends AbstractModule {
 		bind(Scenario.class).toInstance(scenario);
 		if (getConfig().transit().isUseTransit()) {
 			bind(TransitSchedule.class).toProvider(TransitScheduleProvider.class);
+			bind(Vehicles.class).annotatedWith(Transit.class).toProvider(TransitVehiclesProvider.class);
 		}
 	}
 
@@ -44,6 +49,21 @@ public class ScenarioByInstanceModule extends AbstractModule {
 		return scenario.getActivityFacilities();
 	}
 
+	@Provides
+	Households provideHouseholds(Scenario scenario) {
+		return scenario.getHouseholds();
+	}
+
+	@Provides
+	Vehicles provideVehicles(Scenario scenario) {
+		return scenario.getVehicles();
+	}
+
+	@Provides
+	Lanes provideLanes(Scenario scenario) {
+		return scenario.getLanes();
+	}
+
 	private static class TransitScheduleProvider implements Provider<TransitSchedule> {
 
 		@Inject
@@ -56,4 +76,14 @@ public class ScenarioByInstanceModule extends AbstractModule {
 
 	}
 
+	private static class TransitVehiclesProvider implements Provider<Vehicles> {
+
+		@Inject
+		Scenario scenario;
+
+		@Override
+		public Vehicles get() {
+			return scenario.getTransitVehicles();
+		}
+	}
 }

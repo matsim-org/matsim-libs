@@ -22,8 +22,6 @@ package playground.jbischoff.taxibus.scenario.analysis.quick;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
@@ -46,10 +44,10 @@ import playground.jbischoff.taxibus.scenario.analysis.WobDistanceAnalyzer;
 public class TTEventHandler implements ActivityStartEventHandler, PersonDepartureEventHandler, ActivityEndEventHandler {
 	Map<Id<Person>, String> lastActivity = new HashMap<>();
 	Map<Id<Person>, Double> lastDeparture = new HashMap<>();
-
 	Map<String, Double> ttToActivity = new TreeMap<>();
 	Map<String, Integer> legsToActivity = new HashMap<>();
-	ArrayList<String> monitoredModes = new ArrayList<>(Arrays.asList(new String[] { "car", "taxibus" }));
+	ArrayList<String> monitoredModes = new ArrayList<>(Arrays.asList(new String[] { "car"}));
+	
 
 	public TTEventHandler() {
 
@@ -57,7 +55,7 @@ public class TTEventHandler implements ActivityStartEventHandler, PersonDepartur
 
 	@Override
 	public void reset(int iteration) {
-
+		
 	}
 
 	@Override
@@ -89,7 +87,9 @@ public class TTEventHandler implements ActivityStartEventHandler, PersonDepartur
 	}
 
 	boolean isRelevantPerson(Id<Person> personId) {
-		return (personId.toString().endsWith("vw") ? true : false);
+//		return (personId.toString().endsWith("vw") ? true : false);
+		return (personId.toString().startsWith("BS_WB") ? true : false);
+//		return true;
 	}
 
 	@Override

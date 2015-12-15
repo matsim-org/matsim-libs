@@ -53,10 +53,14 @@ public class TravelTimeCalculatorModule extends AbstractModule {
         // If I was in a script, I could also pass an instance directly which I created myself, but
         // here, the Scenario is not available yet, so I defer construction.
         bind(TravelTimeCalculator.class).toProvider(TravelTimeCalculatorProvider.class).in(Singleton.class);
-        for (String mode : CollectionUtils.stringToSet(getConfig().travelTimeCalculator().getAnalyzedModes())) {
-            addTravelTimeBinding(mode).toProvider(FromTravelTimeCalculator.class);
+        if (getConfig().travelTimeCalculator().isCalculateLinkTravelTimes()) {
+            for (String mode : CollectionUtils.stringToSet(getConfig().travelTimeCalculator().getAnalyzedModes())) {
+                addTravelTimeBinding(mode).toProvider(FromTravelTimeCalculator.class);
+            }
         }
-        bind(LinkToLinkTravelTime.class).toProvider(LinkToLinkTravelTimeProvider.class);
+        if (getConfig().travelTimeCalculator().isCalculateLinkToLinkTravelTimes()) {
+            bind(LinkToLinkTravelTime.class).toProvider(LinkToLinkTravelTimeProvider.class);
+        }
     }
 
     private static class FromTravelTimeCalculator implements Provider<TravelTime> {

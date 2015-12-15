@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,60 +17,36 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
-package playground.kai.usecases.plansremoval;
+package playground.jbischoff.av.preparation;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.config.Config;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.ControlerDefaultsModule;
-import org.matsim.core.replanning.selectors.PlanSelector;
+import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 
-
 /**
- * @author nagel
+ * @author  jbischoff
  *
  */
-public class Main {
+public class RemoveCarAgents {
 
-	/**
-	 * @param args
-	 */
 	public static void main(String[] args) {
-		final String selectorName = "MySelectorForRemoval" ;
-
-		Config config = ConfigUtils.loadConfig( args[0] ) ;
-		
-		config.strategy().setPlanSelectorForRemoval( selectorName );
-		
-		Scenario scenario = ScenarioUtils.loadScenario(config) ;
-		
-		Controler ctrl = new Controler( scenario ) ;
-		
-		// create a controler defaults "module":
-		AbstractModule modules = new ControlerDefaultsModule() ;
-
-		// create the module that adds the new functionality:
-		AbstractModule modules2 = new AbstractModule(){
-			@Override
-			public void install() {
-				PlanSelector selector = new MySelectorForRemoval() ;
-				if (getConfig().strategy().getPlanSelectorForRemoval().equals(selectorName)) {
-					bindPlanSelectorForRemoval().toInstance( selector);
-				}
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario scenario2 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		new MatsimPopulationReader(scenario).readFile("C:/Users/Joschka/Documents/shared-svn/projects/audi_av/scenario/subscenarios/tenpercentpt/plansWithCarsR0.10.xml.gz");
+		for (Person p : scenario.getPopulation().getPersons().values()){
+			Plan plan = p.getSelectedPlan();
+			Leg leg = (Leg) plan.getPlanElements().get(1);
+			if (leg.getMode().equals("taxi")){
+				scenario2.getPopulation().addPerson(p);
 			}
-		} ; 
-
-		// set both of them simultaneously ; 
-		ctrl.setModules(modules,modules2);
+		}
+		new PopulationWriter(scenario.getPopulation()).write("C:/Users/Joschka/Documents/shared-svn/projects/audi_av/scenario/subscenarios/tenpercentpt/plans0.10.xml.gz");
 		
-		ctrl.run();
-
 	}
 
 }

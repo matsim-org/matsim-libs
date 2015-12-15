@@ -37,6 +37,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.IOUtils;
@@ -71,47 +72,34 @@ public class PatnaExternalDemandGenerator {
 	}
 
 	private void createDemandForAllStations(){
-		//OC1
-//		createExternalToExternalPlans(inputFilesDir+"/oc1_patna2Fatua.txt", "OC1", "Out" );
-		createExternalToExternalPlans(inputFilesDir+"/oc1_fatua2Patna.txt", "OC1", "In" );
+		//for ext-int-ext trips only one of the input files is taken, because (at least) the total count multiply by directional split will give same from both files.
 
-		//for ext-int-ext trips only one of the input files is taken, because (at least) the total count multiply by directional split will give same from both files. 
+		//OC1
+		createExternalToExternalPlans(inputFilesDir+"/oc1_fatua2Patna.txt", "OC1", "In" );
 		createExternalToInternalPlans(inputFilesDir+"/oc1_fatua2Patna.txt","OC1");
 
 		//OC2
-//		createExternalToExternalPlans(inputFilesDir+"/oc2_patna2Fatua.txt", "OC2", "Out");
 		createExternalToExternalPlans(inputFilesDir+"/oc2_fatua2Patna.txt", "OC2", "In");
-
 		createExternalToInternalPlans(inputFilesDir+"/oc2_fatua2Patna.txt", "OC2");
 
 		//OC3
-//		createExternalToExternalPlans(inputFilesDir+"/oc3_patna2Punpun.txt", "OC3", "Out");
 		createExternalToExternalPlans(inputFilesDir+"/oc3_punpun2Patna.txt", "OC3", "In");
-
 		createExternalToInternalPlans(inputFilesDir+"/oc3_punpun2Patna.txt", "OC3");
 
 		//OC4
-//		createExternalToExternalPlans(inputFilesDir+"/oc4_patna2Muz.txt", "OC4", "Out");
 		createExternalToExternalPlans(inputFilesDir+"/oc4_muz2Patna.txt", "OC4", "In");
-
 		createExternalToInternalPlans(inputFilesDir+"/oc4_muz2Patna.txt", "OC4");
 
 		//OC5
-//		createExternalToExternalPlans(inputFilesDir+"/oc5_patna2Danapur.txt", "OC5", "Out");
 		createExternalToExternalPlans(inputFilesDir+"/oc5_danapur2Patna.txt", "OC5", "In");
-
 		createExternalToInternalPlans(inputFilesDir+"/oc5_danapur2Patna.txt", "OC5");
 
 		//OC6
-//		createExternalToExternalPlans(inputFilesDir+"/oc6_noera2Fatua.txt", "OC6", "Out");
 		createExternalToExternalPlans(inputFilesDir+"/oc6_fatua2Noera.txt", "OC6", "In");
-
 		createExternalToInternalPlans(inputFilesDir+"/oc6_fatua2Noera.txt", "OC6");
 
 		//OC7
-//		createExternalToExternalPlans(inputFilesDir+"/oc7_patna2Danapur.txt", "OC7", "Out");
 		createExternalToExternalPlans(inputFilesDir+"/oc7_danapur2Patna.txt", "OC7", "In");
-
 		createExternalToInternalPlans(inputFilesDir+"/oc7_danapur2Patna.txt", "OC7");
 	}
 
@@ -119,12 +107,12 @@ public class PatnaExternalDemandGenerator {
 		Population population = scenario.getPopulation();
 		PopulationFactory pf = population.getFactory();
 		Map<Double, Map<String,Double>> timebin2mode2count = readFileAndReturnMap(file);
-		
 		Map<String, List<SimpleFeature>> area2ZonesLists = getInternalZoneFeaturesForExtInternalTrips();
 		
 		String countingStationKey = OuterCordonUtils.getCountingStationKey(countingStationNumber, "In");
-		Coord firstLastActCoord = getLinkFromOuterCordonKey(countingStationKey, true).getCoord();
-
+		Link originActLink = getLinkFromOuterCordonKey(countingStationKey, true);
+		Link destinationActLink = NetworkUtils.getConnectingLink(originActLink.getToNode(), originActLink.getFromNode()); 
+		
 		for(double timebin : timebin2mode2count.keySet()){
 			for(String mode : timebin2mode2count.get(timebin).keySet()){
 				double directionSplitFactor = OuterCordonUtils.getDirectionalFactorFromOuterCordonKey(countingStationKey, "E2I");
@@ -137,33 +125,33 @@ public class PatnaExternalDemandGenerator {
 					population.addPerson(p);
 					for( String area : area2ZonesLists.keySet() ){ // create a plan for each zone (ext-int-ext)
 						Plan plan = pf.createPlan();
-						Activity firstAct = pf.createActivityFromCoord( "E2I_Start", firstLastActCoord);
-						firstAct.setEndTime( (timebin-1)*3600 + random.nextDouble()*3600);
+						Activity originAct = pf.createActivityFromLinkId( "E2I_Start", originActLink.getId());
+						originAct.setEndTime( (timebin-1)*3600 + random.nextDouble()*3600);
 						
 						Point randomPointInZone = GeometryUtils.getRandomPointsInsideFeatures(area2ZonesLists.get(area));
 						Coord middleActCoord = PatnaUtils.COORDINATE_TRANSFORMATION.transform( new Coord(randomPointInZone.getX(),randomPointInZone.getY()) );
 						
 						Activity middleAct = pf.createActivityFromCoord("E2I_mid", middleActCoord);
 						//ZZ_TODO : here the act duration is assigned randomly between 7 to 8 hours. This means, the agent will be counted in reverse direction of the same counting station.
-						double middleActEndTime = firstAct.getEndTime() + 6*3600 + random.nextDouble() * 3600;
-						Activity lastAct = pf.createActivityFromCoord( "E2I_Start", firstLastActCoord);
+						double middleActEndTime = originAct.getEndTime() + 6*3600 + random.nextDouble() * 3600;
+						Activity destinationAct = pf.createActivityFromLinkId( "E2I_Start", destinationActLink.getId());
 
 						if(middleActEndTime > 24*3600 ) { // midAct - startAct - midAct ==> this will give count in both time bins for desired counting station
 							middleActEndTime = middleActEndTime - 24*3600;
 							middleAct.setEndTime( middleActEndTime );
 							plan.addActivity(middleAct);
 							plan.addLeg(pf.createLeg(mode));
-							firstAct.setEndTime( middleActEndTime + 6*3600 + random.nextDouble() * 3600 );
-							plan.addActivity(firstAct);
+							destinationAct.setEndTime( middleActEndTime + 6*3600 + random.nextDouble() * 3600 );
+							plan.addActivity(destinationAct);
 							plan.addLeg(pf.createLeg(mode));
 							plan.addActivity( pf.createActivityFromCoord("E2I_mid", middleActCoord)  );
 						} else { // startAct - midAct - startAct
-							plan.addActivity(firstAct);
+							plan.addActivity(originAct);
 							plan.addLeg(pf.createLeg(mode));
 							middleAct.setEndTime( middleActEndTime );
 							plan.addActivity(middleAct);
 							plan.addLeg(pf.createLeg(mode));
-							plan.addActivity(lastAct);	
+							plan.addActivity(destinationAct);	
 						}
 						p.addPlan(plan);
 					}
@@ -181,13 +169,12 @@ public class PatnaExternalDemandGenerator {
 		Map<Double, Map<String,Double>> timebin2mode2count = readFileAndReturnMap(file);
 
 		String countingStationKey = OuterCordonUtils.getCountingStationKey(countingStationNumber, countingDirection); 
-		Id<Link> firstActLink = null; 
-		Id<Link> lastActLink = null;
+		Link originActLink = null; 
 		
 		if(countingDirection.equalsIgnoreCase("In")){// --> trip originates at counting stationNumber
-			firstActLink = getLinkFromOuterCordonKey(countingStationKey, true).getId();
-		} else {// --> trip terminates at counting stationNumber
-//			lastActLink = getLinkFromOuterCordonKey(countingStationKey, false).getId();
+			originActLink = getLinkFromOuterCordonKey(countingStationKey, true);
+		} else {
+			throw new RuntimeException("Only trips orginating at the given counting station should be processed. Aborting ...");
 		}
 
 		for(double timebin : timebin2mode2count.keySet()){
@@ -205,27 +192,22 @@ public class PatnaExternalDemandGenerator {
 						if(countingStationNumber.equalsIgnoreCase("OC"+jj)) continue; // excluding same origin- destination
 						
 						double actEndTime ;
+						Link destinationActLink = null;
 						if(countingDirection.equalsIgnoreCase("In")){// --> trip originates at given counting stationNumber
-							String countingStationKeyForOtherActLink = OuterCordonUtils.getCountingStationKey("OC"+jj, "In");
-							lastActLink = getLinkFromOuterCordonKey(countingStationKeyForOtherActLink, false ).getId();
+							String countingStationKeyForOtherActLink = OuterCordonUtils.getCountingStationKey("OC"+jj, "Out");
+							destinationActLink = getLinkFromOuterCordonKey(countingStationKeyForOtherActLink, false );
 							actEndTime = (timebin-1)*3600+random.nextDouble()*3600;
 						} else {// --> trip terminates at given counting stationNumber
 							throw new RuntimeException("For external to external counts use other counting direction, i.e. the "+countingStationNumber+ "should be assumed as origin and not destination.");
-//							String countingStationKeyForOtherActLink = OuterCordonUtils.getCountingStationKey("OC"+jj, "In"); 
-//							firstActLink = 	getLinkFromOuterCordonKey( countingStationKeyForOtherActLink, true ).getId();
-//							double travelTime = 30*60; // ZZ_TODO : it is assumed that agent will take 30 min to reach the destination counting station in desired time bin.
-//							actEndTime = (timebin-1)*3600 - travelTime + random.nextDouble()*3600 - 30*60 ; 
 						}
 						
-//						if(actEndTime < 0)	actEndTime = random.nextDouble()*900; //for time bin =1, actEndTime (in the else statment) can be negative, thus assining sometime between initial 15 mins.
-						
 						Plan plan = pf.createPlan();
-						Activity firstAct = pf.createActivityFromLinkId("E2E_Start", firstActLink);
+						Activity firstAct = pf.createActivityFromLinkId("E2E_Start", originActLink.getId());
 						firstAct.setEndTime(actEndTime );
 						plan.addActivity(firstAct);
 						plan.addLeg(pf.createLeg(mode));
 
-						Activity lastAct = pf.createActivityFromLinkId("E2E_End", lastActLink);
+						Activity lastAct = pf.createActivityFromLinkId("E2E_End", destinationActLink.getId());
 						plan.addActivity(lastAct);
 						p.addPlan(plan);
 					}
@@ -240,12 +222,23 @@ public class PatnaExternalDemandGenerator {
 	 */
 	private Link getLinkFromOuterCordonKey(final String countingStationKey, final boolean isOrigin){
 		Id<Link> linkId = OuterCordonUtils.getCountStationLinkId(countingStationKey);
-		Link link = scenario.getNetwork().getLinks().get(linkId);
+
+		Link inLink = scenario.getNetwork().getLinks().get(linkId);
+		Link reverlseLink = NetworkUtils.getConnectingLink(inLink.getToNode(), inLink.getFromNode());
 		if(isOrigin) {
-			return link.getFromNode().getInLinks().values().iterator().next();
+		 Iterator<? extends Link> it = inLink.getFromNode().getInLinks().values().iterator();
+			while(it.hasNext() ){
+				Link l = it.next();
+				if(! l.equals(reverlseLink) ) return l;
+			}
 		} else {
-			return link.getToNode().getOutLinks().values().iterator().next();
+			Iterator<? extends Link> it = inLink.getToNode().getOutLinks().values().iterator();
+			while(it.hasNext() ){
+				Link l = it.next();
+				if(! l.equals(reverlseLink) ) return l;
+			}
 		}
+		throw new RuntimeException("A connecting link in the desired direction is not found. Aborting ...");
 	}
 	
 	private Map<String, List<SimpleFeature>> getInternalZoneFeaturesForExtInternalTrips(){

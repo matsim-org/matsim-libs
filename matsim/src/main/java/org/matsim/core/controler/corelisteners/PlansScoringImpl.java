@@ -20,7 +20,6 @@
 
 package org.matsim.core.controler.corelisteners;
 
-import org.matsim.analysis.TravelDistanceStats;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
@@ -29,10 +28,8 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ScoringEvent;
-import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ScoringListener;
-import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.scoring.EventsToScore;
 
 import com.google.inject.Inject;
@@ -49,14 +46,13 @@ import javax.inject.Provider;
  * @author mrieser, michaz
  */
 @Singleton
-final class PlansScoringImpl implements PlansScoring, ScoringListener, IterationEndsListener, ShutdownListener {
+final class PlansScoringImpl implements PlansScoring, ScoringListener, IterationEndsListener {
 
 	@Inject private PlanCalcScoreConfigGroup planCalcScoreConfigGroup;
 	@Inject private ControlerConfigGroup controlerConfigGroup;
 	@Inject private EventsToScore eventsToScore;
 	@Inject private Population population;
 	@Inject private OutputDirectoryHierarchy controlerIO;
-	@Inject private TravelDistanceStats travelDistanceStats;
 
 	@Override
 	public void notifyScoring(final ScoringEvent event) {
@@ -71,7 +67,6 @@ final class PlansScoringImpl implements PlansScoring, ScoringListener, Iteration
 				this.eventsToScore.writeExperiencedPlans(controlerIO.getIterationFilename(event.getIteration(), "experienced_plans"));
 			}
 		}
-		this.travelDistanceStats.addIteration(event.getIteration(), eventsToScore.getAgentRecords());
 		if (planCalcScoreConfigGroup.isMemorizingExperiencedPlans() ) {
 			for ( Person person : this.population.getPersons().values() ) {
 				Plan experiencedPlan = eventsToScore.getAgentRecords().get( person.getId() ) ;
@@ -82,11 +77,6 @@ final class PlansScoringImpl implements PlansScoring, ScoringListener, Iteration
 				selectedPlan.getCustomAttributes().put(PlanCalcScoreConfigGroup.EXPERIENCED_PLAN_KEY, experiencedPlan ) ;
 			}
 		}
-	}
-
-	@Override
-	public void notifyShutdown(ShutdownEvent controlerShudownEvent) {
-		travelDistanceStats.close();
 	}
 
 }

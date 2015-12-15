@@ -20,6 +20,8 @@
 package org.matsim.core.replanning.modules;
 
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.ChangeLegModeConfigGroup;
+import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
@@ -30,13 +32,16 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 public class ChangeLegModeStrategyFactory implements Provider<PlanStrategy> {
+
+	private final GlobalConfigGroup globalConfigGroup;
+	private final ChangeLegModeConfigGroup changeLegModeConfigGroup;
 	private Provider<TripRouter> tripRouterProvider;
-	private Config config;
 	private ActivityFacilities activityFacilities;
 
 	@Inject
-    ChangeLegModeStrategyFactory(Config config, ActivityFacilities activityFacilities, Provider<TripRouter> tripRouterProvider) {
-		this.config = config;
+    ChangeLegModeStrategyFactory(GlobalConfigGroup globalConfigGroup, ChangeLegModeConfigGroup changeLegModeConfigGroup, ActivityFacilities activityFacilities, Provider<TripRouter> tripRouterProvider) {
+		this.globalConfigGroup = globalConfigGroup;
+		this.changeLegModeConfigGroup = changeLegModeConfigGroup;
 		this.activityFacilities = activityFacilities;
 		this.tripRouterProvider = tripRouterProvider;
 	}
@@ -44,8 +49,8 @@ public class ChangeLegModeStrategyFactory implements Provider<PlanStrategy> {
     @Override
 	public PlanStrategy get() {
 		PlanStrategyImpl strategy = new PlanStrategyImpl(new RandomPlanSelector());
-		strategy.addStrategyModule(new ChangeLegMode(config));
-		strategy.addStrategyModule(new ReRoute(activityFacilities, tripRouterProvider, config.global()));
+		strategy.addStrategyModule(new ChangeLegMode(globalConfigGroup, changeLegModeConfigGroup));
+		strategy.addStrategyModule(new ReRoute(activityFacilities, tripRouterProvider, globalConfigGroup));
 		return strategy;
 	}
 

@@ -79,7 +79,7 @@ public class TaxibusPassengerEngine extends PassengerEngine {
 		        	if (abortWarn<10) Logger.getLogger(getClass()).error(agent.getId().toString() + " is aborted, no Taxibus was found");
 		        	abortWarn++;
 		        	if (abortWarn==10) Logger.getLogger(getClass()).error("no more aborted taxibus agents will be displayed");
-		        	agent.setStateToAbort(now);
+//		        	agent.setStateToAbort(now);
 		        }
 		        return !request.isRejected();
 		    }

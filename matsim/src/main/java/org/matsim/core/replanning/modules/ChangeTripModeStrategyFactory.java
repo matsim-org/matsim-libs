@@ -19,7 +19,8 @@
 
 package org.matsim.core.replanning.modules;
 
-import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.ChangeLegModeConfigGroup;
+import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
@@ -31,23 +32,25 @@ import javax.inject.Provider;
 
 public class ChangeTripModeStrategyFactory implements Provider<PlanStrategy> {
 
+	private final GlobalConfigGroup globalConfigGroup;
+	private final ChangeLegModeConfigGroup changeLegModeConfigGroup;
 	private Provider<TripRouter> tripRouterProvider;
-	private Config config;
-	private ActivityFacilities facilities;
+	private ActivityFacilities activityFacilities;
 
 	@Inject
-    protected ChangeTripModeStrategyFactory(Provider<TripRouter> tripRouterProvider, Config config, ActivityFacilities facilities) {
+    protected ChangeTripModeStrategyFactory(GlobalConfigGroup globalConfigGroup, ChangeLegModeConfigGroup changeLegModeConfigGroup, ActivityFacilities activityFacilities, Provider<TripRouter> tripRouterProvider) {
+		this.globalConfigGroup = globalConfigGroup;
+		this.changeLegModeConfigGroup = changeLegModeConfigGroup;
+		this.activityFacilities = activityFacilities;
 		this.tripRouterProvider = tripRouterProvider;
-		this.config = config;
-		this.facilities = facilities;
 	}
 
     @Override
 	public PlanStrategy get() {
 		PlanStrategyImpl strategy = new PlanStrategyImpl(new RandomPlanSelector());
-		strategy.addStrategyModule(new TripsToLegsModule(tripRouterProvider, config.global()));
-		strategy.addStrategyModule(new ChangeLegMode(config));
-		strategy.addStrategyModule(new ReRoute(facilities, tripRouterProvider, config.global()));
+		strategy.addStrategyModule(new TripsToLegsModule(tripRouterProvider, globalConfigGroup));
+		strategy.addStrategyModule(new ChangeLegMode(globalConfigGroup, changeLegModeConfigGroup));
+		strategy.addStrategyModule(new ReRoute(activityFacilities, tripRouterProvider, globalConfigGroup));
 		return strategy;
 	}
 
