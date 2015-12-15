@@ -72,47 +72,34 @@ public class PatnaExternalDemandGenerator {
 	}
 
 	private void createDemandForAllStations(){
-		//OC1
-//		createExternalToExternalPlans(inputFilesDir+"/oc1_patna2Fatua.txt", "OC1", "Out" );
-		createExternalToExternalPlans(inputFilesDir+"/oc1_fatua2Patna.txt", "OC1", "In" );
+		//for ext-int-ext trips only one of the input files is taken, because (at least) the total count multiply by directional split will give same from both files.
 
-		//for ext-int-ext trips only one of the input files is taken, because (at least) the total count multiply by directional split will give same from both files. 
+		//OC1
+		createExternalToExternalPlans(inputFilesDir+"/oc1_fatua2Patna.txt", "OC1", "In" );
 		createExternalToInternalPlans(inputFilesDir+"/oc1_fatua2Patna.txt","OC1");
 
 		//OC2
-//		createExternalToExternalPlans(inputFilesDir+"/oc2_patna2Fatua.txt", "OC2", "Out");
 		createExternalToExternalPlans(inputFilesDir+"/oc2_fatua2Patna.txt", "OC2", "In");
-
 		createExternalToInternalPlans(inputFilesDir+"/oc2_fatua2Patna.txt", "OC2");
 
 		//OC3
-//		createExternalToExternalPlans(inputFilesDir+"/oc3_patna2Punpun.txt", "OC3", "Out");
 		createExternalToExternalPlans(inputFilesDir+"/oc3_punpun2Patna.txt", "OC3", "In");
-
 		createExternalToInternalPlans(inputFilesDir+"/oc3_punpun2Patna.txt", "OC3");
 
 		//OC4
-//		createExternalToExternalPlans(inputFilesDir+"/oc4_patna2Muz.txt", "OC4", "Out");
 		createExternalToExternalPlans(inputFilesDir+"/oc4_muz2Patna.txt", "OC4", "In");
-
 		createExternalToInternalPlans(inputFilesDir+"/oc4_muz2Patna.txt", "OC4");
 
 		//OC5
-//		createExternalToExternalPlans(inputFilesDir+"/oc5_patna2Danapur.txt", "OC5", "Out");
 		createExternalToExternalPlans(inputFilesDir+"/oc5_danapur2Patna.txt", "OC5", "In");
-
 		createExternalToInternalPlans(inputFilesDir+"/oc5_danapur2Patna.txt", "OC5");
 
 		//OC6
-//		createExternalToExternalPlans(inputFilesDir+"/oc6_noera2Fatua.txt", "OC6", "Out");
 		createExternalToExternalPlans(inputFilesDir+"/oc6_fatua2Noera.txt", "OC6", "In");
-
 		createExternalToInternalPlans(inputFilesDir+"/oc6_fatua2Noera.txt", "OC6");
 
 		//OC7
-//		createExternalToExternalPlans(inputFilesDir+"/oc7_patna2Danapur.txt", "OC7", "Out");
 		createExternalToExternalPlans(inputFilesDir+"/oc7_danapur2Patna.txt", "OC7", "In");
-
 		createExternalToInternalPlans(inputFilesDir+"/oc7_danapur2Patna.txt", "OC7");
 	}
 
@@ -183,13 +170,11 @@ public class PatnaExternalDemandGenerator {
 
 		String countingStationKey = OuterCordonUtils.getCountingStationKey(countingStationNumber, countingDirection); 
 		Link originActLink = null; 
-		Link destinationActLink = null;
 		
 		if(countingDirection.equalsIgnoreCase("In")){// --> trip originates at counting stationNumber
 			originActLink = getLinkFromOuterCordonKey(countingStationKey, true);
 		} else {
-			// --> trip terminates at counting stationNumber
-//			lastActLink = getLinkFromOuterCordonKey(countingStationKey, false).getId();
+			throw new RuntimeException("Only trips orginating at the given counting station should be processed. Aborting ...");
 		}
 
 		for(double timebin : timebin2mode2count.keySet()){
@@ -207,19 +192,14 @@ public class PatnaExternalDemandGenerator {
 						if(countingStationNumber.equalsIgnoreCase("OC"+jj)) continue; // excluding same origin- destination
 						
 						double actEndTime ;
+						Link destinationActLink = null;
 						if(countingDirection.equalsIgnoreCase("In")){// --> trip originates at given counting stationNumber
 							String countingStationKeyForOtherActLink = OuterCordonUtils.getCountingStationKey("OC"+jj, "Out");
 							destinationActLink = getLinkFromOuterCordonKey(countingStationKeyForOtherActLink, false );
 							actEndTime = (timebin-1)*3600+random.nextDouble()*3600;
 						} else {// --> trip terminates at given counting stationNumber
 							throw new RuntimeException("For external to external counts use other counting direction, i.e. the "+countingStationNumber+ "should be assumed as origin and not destination.");
-//							String countingStationKeyForOtherActLink = OuterCordonUtils.getCountingStationKey("OC"+jj, "In"); 
-//							firstActLink = 	getLinkFromOuterCordonKey( countingStationKeyForOtherActLink, true ).getId();
-//							double travelTime = 30*60; // ZZ_TODO : it is assumed that agent will take 30 min to reach the destination counting station in desired time bin.
-//							actEndTime = (timebin-1)*3600 - travelTime + random.nextDouble()*3600 - 30*60 ; 
 						}
-						
-//						if(actEndTime < 0)	actEndTime = random.nextDouble()*900; //for time bin =1, actEndTime (in the else statment) can be negative, thus assining sometime between initial 15 mins.
 						
 						Plan plan = pf.createPlan();
 						Activity firstAct = pf.createActivityFromLinkId("E2E_Start", originActLink.getId());
