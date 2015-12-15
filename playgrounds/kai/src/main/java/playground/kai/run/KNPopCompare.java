@@ -30,6 +30,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
@@ -40,6 +41,11 @@ import org.matsim.contrib.analysis.kai.KNAnalysisEventsHandler;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.router.MainModeIdentifierImpl;
+import org.matsim.core.router.StageActivityTypes;
+import org.matsim.core.router.StageActivityTypesImpl;
+import org.matsim.core.router.TripStructureUtils;
+import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -47,6 +53,7 @@ import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacilitiesFactory;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.FacilitiesUtils;
+import org.matsim.pt.PtConstants;
 
 /**
  * @author nagel
@@ -61,7 +68,7 @@ public class KNPopCompare {
 	final Map<StatType,DataMap<String>> cntsContainer = new TreeMap<StatType,DataMap<String>>() ;
 
 	public static void main(String[] args) {
-		if ( args.length != 4 ) {
+		if ( args.length != 4 && args.length != 5 ) {
 			System.out.println( "arg[0]: plans_base");
 			System.out.println( "arg[1]: plans_policy");
 			System.out.println( "arg[2]: extendedPersonAttribs_base");
@@ -88,6 +95,10 @@ public class KNPopCompare {
 			} else {
 				throw new RuntimeException("no person attributes") ;
 			}
+			if ( args.length > 4 && args[4] != null && args[4] != "" ) {
+				Logger.getLogger(KNPopCompare.class).info("setting network file to: " + args[4] );
+				config.network().setInputFile( args[4] );
+			}
 
 			Scenario scenario1 = ScenarioUtils.loadScenario( config ) ;
 			pop1 = scenario1.getPopulation() ;
@@ -105,9 +116,15 @@ public class KNPopCompare {
 			} else {
 				throw new RuntimeException("no person attributes") ;
 			}
+			if ( args.length > 4 && args[4] != null && args[4] != "" ) {
+				Logger.getLogger(KNPopCompare.class).info("setting network file to: " + args[4] );
+				config2.network().setInputFile( args[4] );
+			}
 			Scenario scenario1 = ScenarioUtils.loadScenario( config2 ) ;
 			pop2 = scenario1.getPopulation() ;
 		}
+		
+		
 		
 		List<SpatialGrid> spatialGrids = new ArrayList<SpatialGrid>() ;
 		ActivityFacilities homesWithScoreDifferences = FacilitiesUtils.createActivityFacilities("scoreDifferencesAtHome") ;
@@ -255,13 +272,55 @@ public class KNPopCompare {
 		}
 		try {
 			BufferedWriter writer = IOUtils.getBufferedWriter("personscompare.txt") ;
+
+			boolean first = true ;
 			for ( Person person : pop1.getPersons().values() ) {
+				if ( first ) {
+					first = false ;
+					writer.write("personId\tx\ty\tdeltaPt");
+					for ( Object key : person.getCustomAttributes().keySet() ) { // design is such that this might vary person by peron :-(
+						writer.write( "\t" + key );
+					}
+					writer.newLine() ;
+				}
+				// ===
 				writer.write( person.getId().toString() ) ;
+				// ---
+				Coord coord = ((Activity) person.getSelectedPlan().getPlanElements().get(0)).getCoord() ;
+				writer.write( "\t" + coord.getX() + "\t" + coord.getY() );
+				// ---
+				double deltaPt = 0 ;
+				{
+					// pop1 is base
+					List<Trip> trips = TripStructureUtils.getTrips( person.getSelectedPlan(), new StageActivityTypesImpl(PtConstants.TRANSIT_ACTIVITY_TYPE) ) ;
+					//				for ( Trip trip : trips ) {
+					Trip trip = trips.get(0) ;
+					String mode = new MainModeIdentifierImpl().identifyMainMode( trip.getTripElements() ) ;
+					if ( mode.equals( TransportMode.pt ) ) {
+						deltaPt -- ;
+					}
+					//				}
+				}
+				{
+					// pop1 is policy
+					Person person2 = pop2.getPersons().get( person.getId() ) ;
+					List<Trip> trips = TripStructureUtils.getTrips( person2.getSelectedPlan(), new StageActivityTypesImpl(PtConstants.TRANSIT_ACTIVITY_TYPE) ) ;
+					//				for ( Trip trip : trips ) {
+					Trip trip = trips.get(0) ;
+					String mode = new MainModeIdentifierImpl().identifyMainMode( trip.getTripElements() ) ;
+					if ( mode.equals( TransportMode.pt ) ) {
+						deltaPt ++ ;
+					}
+					//				}
+				}
+				writer.write("\t" + deltaPt  );
+				// ---
 				for ( Entry<String,Object> entry : person.getCustomAttributes().entrySet() ) {
-					writer.write( "\t" + entry.getKey() + "\t" + entry.getValue() ) ;
+					writer.write( /* "\t" + entry.getKey() + */ "\t" + entry.getValue() ) ;
 				}
 				writer.newLine(); 
 			}
+			
 		} catch ( IOException ee ) {
 			ee.printStackTrace();
 		}
