@@ -117,14 +117,31 @@ public class EventsReaderXMLv1 extends MatsimXmlParser {
 					Id.create(atts.getValue(LinkEnterEvent.ATTRIBUTE_LINK), Link.class)
 					// had driver id in previous version
 					));
-		} else if (VehicleEntersTrafficEvent.EVENT_TYPE.equals(eventType) || "wait2link".equals(eventType)) {
+		} else if (VehicleEntersTrafficEvent.EVENT_TYPE.equals(eventType) ) {
+			// (this is the new version, marked by the new events name)
+
+			// for the new events type, we assume that the vehicle id is always set:
+			final Id<Vehicle> vehicleId = Id.create(atts.getValue(VehicleEntersTrafficEvent.ATTRIBUTE_VEHICLE), Vehicle.class);
+			
 			this.events.processEvent(new VehicleEntersTrafficEvent(time, 
 					Id.create(atts.getValue(VehicleEntersTrafficEvent.ATTRIBUTE_DRIVER), Person.class), 
 					Id.create(atts.getValue(VehicleEntersTrafficEvent.ATTRIBUTE_LINK), Link.class), 
-					atts.getValue(VehicleEntersTrafficEvent.ATTRIBUTE_VEHICLE) == null ? null : Id.create(atts.getValue(VehicleEntersTrafficEvent.ATTRIBUTE_VEHICLE), Vehicle.class),
-							// (this could return the driver id as vehicle ide when the vehicle id is not present.  would allow to read in old events files.
-							// My intuition would be to combine this with versioning, i.e. when someone says "vehicle=null" in v2, then he/she
-							// actually means it; in v1, he/she means "vehicleId=driverId". kai, dec'15)
+					vehicleId,
+					atts.getValue(VehicleEntersTrafficEvent.ATTRIBUTE_NETWORKMODE), 
+					1.0 // yyyyyy why does it make sense to not read from file? kai, dec'15
+					));
+		} else if ( "wait2link".equals(eventType) ) {
+			// (this is the old version, marked by the old events name)
+			
+			// for the old events type, we set the vehicle id to the driver id:
+			final Id<Vehicle> vehicleId = Id.create(atts.getValue(VehicleEntersTrafficEvent.ATTRIBUTE_DRIVER), Vehicle.class);
+			this.events.processEvent(new VehicleEntersTrafficEvent(time, 
+					Id.create(atts.getValue(VehicleEntersTrafficEvent.ATTRIBUTE_DRIVER), Person.class), 
+					Id.create(atts.getValue(VehicleEntersTrafficEvent.ATTRIBUTE_LINK), Link.class), 
+					vehicleId,
+					// (this could return the driver id as vehicle ide when the vehicle id is not present.  would allow to read in old events files.
+					// My intuition would be to combine this with versioning, i.e. when someone says "vehicle=null" in v2, then he/she
+					// actually means it; in v1, he/she means "vehicleId=driverId". kai, dec'15)
 					atts.getValue(VehicleEntersTrafficEvent.ATTRIBUTE_NETWORKMODE), 
 					1.0 // yyyyyy why does it make sense to not read from file? kai, dec'15
 					));
