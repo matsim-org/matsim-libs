@@ -199,6 +199,10 @@ public class PatnaExternalDemandGenerator {
 						
 						if(countingStationNumber.equalsIgnoreCase("OC"+jj)) continue; // excluding same origin- destination
 						
+						if(countingStationNumber.equalsIgnoreCase("OC1")&&jj==3) {
+							continue; // excluding ext-ext trip between OCt1 to OC3
+						}
+						
 						double actEndTime ;
 						Link destinationActLink = null;
 						if(countingDirection.equalsIgnoreCase("In")){// --> trip originates at given counting stationNumber
