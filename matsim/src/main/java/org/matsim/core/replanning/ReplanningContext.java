@@ -19,7 +19,6 @@
 
 package org.matsim.core.replanning;
 
-import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -30,37 +29,6 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
  *
  */
 public interface ReplanningContext {
-
-	/**
-	 * Gives the TravelDisutility of the previous iteration.
-	 * Internally, this may return a new instance every time
-	 * because TravelDisutility may not be thread-safe, but clients
-	 * of this interface will just getTravelDisutility(), use it
-	 * and that's it.
-	 */
-	TravelDisutility getTravelDisutility();
-
-	/**
-	 * Gives the TravelTime of the previous iteration.
-	 * Internally, this is connected to the TravelTimeCalculator which collects
-	 * events, but this does not matter here. Clients of this interface just
-	 * get the TravelTime and that's it, and they do this again every iteration. 
-	 */
-	TravelTime getTravelTime();
-	
-	/**
-	 * Gives an instance of the TripRouter which the Controler knows about.
-	 * Again, this may produce a new instance every time, but clients just
-	 * call this and use it.
-	 */
-	TripRouter getTripRouter();
-
-	/**
-	 * Gives access to the scoring the Controler knows about.
-	 * This is a Factory not because of threads or some such, but 
-	 * because ScoringFunctions are particular to a Person.
-	 */
-	ScoringFunctionFactory getScoringFunctionFactory();
 
 	/**
 	 * The current iteration.

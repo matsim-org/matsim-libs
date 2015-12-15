@@ -22,57 +22,17 @@
 
 package org.matsim.core.replanning;
 
-import org.matsim.api.core.v01.TransportMode;
-import org.matsim.core.config.Config;
 import org.matsim.core.controler.ControlerI;
-import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.scoring.ScoringFunctionFactory;
 
 import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
-import java.util.Map;
 
 class ReplanningContextImpl implements ReplanningContext {
 
     private int iteration;
-    private Config config;
-    private Map<String, TravelDisutilityFactory> travelDisutility;
-    private Map<String, TravelTime> travelTime;
-    private Provider<TripRouter> tripRouter;
-    private Provider<ScoringFunctionFactory> scoringFunctionFactory;
 
     @Inject
-    ReplanningContextImpl(ControlerI controler, Config config, Map<String,TravelDisutilityFactory> travelDisutility, Map<String,TravelTime> travelTime, Provider<TripRouter> tripRouter, Provider<ScoringFunctionFactory> scoringFunctionFactory) {
+    ReplanningContextImpl(ControlerI controler) {
         this.iteration = controler.getIterationNumber();
-        this.config = config;
-        this.travelDisutility = travelDisutility;
-        this.travelTime = travelTime;
-        this.tripRouter = tripRouter;
-        this.scoringFunctionFactory = scoringFunctionFactory;
-    }
-
-    @Override
-    public TravelDisutility getTravelDisutility() {
-        return travelDisutility.get(TransportMode.car).createTravelDisutility(travelTime.get(TransportMode.car), config.planCalcScore());
-    }
-
-    @Override
-    public TravelTime getTravelTime() {
-        return travelTime.get(TransportMode.car);
-    }
-
-    @Override
-    public TripRouter getTripRouter() {
-        return tripRouter.get();
-    }
-
-    @Override
-    public ScoringFunctionFactory getScoringFunctionFactory() {
-        return scoringFunctionFactory.get();
     }
 
     @Override

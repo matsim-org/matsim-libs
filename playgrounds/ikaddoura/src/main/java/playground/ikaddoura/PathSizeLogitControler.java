@@ -88,7 +88,9 @@ public class PathSizeLogitControler {
 			controler.addOverridingModule(new AbstractModule() {
 				@Override
 				public void install() {
-					addPlanSelectorForRemovalBinding("divGenPlansRemover").toProvider(builder);
+					if (getConfig().strategy().getPlanSelectorForRemoval().equals("divGenPlansRemover")) {
+						bindPlanSelectorForRemoval().toProvider(builder);
+					}
 				}
 			});
 			controler.getConfig().strategy().setPlanSelectorForRemoval("divGenPlansRemover");

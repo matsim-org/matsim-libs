@@ -47,9 +47,12 @@ import org.matsim.core.replanning.PlanStrategyImpl.Builder;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.modules.SubtourModeChoice;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
+import org.matsim.core.router.TripRouter;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.santiago.SantiagoScenarioConstants;
+
+import javax.inject.Provider;
 
 public class SantiagoScenarioRunner {
 
@@ -192,6 +195,7 @@ public class SantiagoScenarioRunner {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
+				final Provider<TripRouter> tripRouterProvider = binder().getProvider(TripRouter.class);
 				Log.info("Adding SubtourModeChoice for agents with a car available...");
 				addPlanStrategyBinding(nameMcCarAvail).toProvider(new javax.inject.Provider<PlanStrategy>() {
 //					String[] availableModes = {TransportMode.car, TransportMode.bike, TransportMode.walk, TransportMode.pt};
@@ -204,8 +208,8 @@ public class SantiagoScenarioRunner {
 						Log.info("Available modes are " + availableModes);
 						Log.info("Chain-based modes are " + chainBasedModes);
 						final Builder builder = new Builder(new RandomPlanSelector<Plan, Person>());
-						builder.addStrategyModule(new SubtourModeChoice(controler.getConfig().global().getNumberOfThreads(), availableModes, chainBasedModes, false));
-						builder.addStrategyModule(new ReRoute(controler.getScenario()));
+						builder.addStrategyModule(new SubtourModeChoice(controler.getConfig().global().getNumberOfThreads(), availableModes, chainBasedModes, false, tripRouterProvider));
+						builder.addStrategyModule(new ReRoute(controler.getScenario(), tripRouterProvider));
 						return builder.build();
 					}
 				});
@@ -214,6 +218,7 @@ public class SantiagoScenarioRunner {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
+				final Provider<TripRouter> tripRouterProvider = binder().getProvider(TripRouter.class);
 				Log.info("Adding SubtourModeChoice for the rest of the agents...");
 				addPlanStrategyBinding(nameMcNonCarAvail).toProvider(new javax.inject.Provider<PlanStrategy>() {
 //					String[] availableModes = {TransportMode.bike, TransportMode.walk, TransportMode.pt};
@@ -226,8 +231,8 @@ public class SantiagoScenarioRunner {
 						Log.info("Available modes are " + availableModes);
 						Log.info("Chain-based modes are " + chainBasedModes);
 						final Builder builder = new Builder(new RandomPlanSelector<Plan, Person>());
-						builder.addStrategyModule(new SubtourModeChoice(controler.getConfig().global().getNumberOfThreads(), availableModes, chainBasedModes, false));
-						builder.addStrategyModule(new ReRoute(controler.getScenario()));
+						builder.addStrategyModule(new SubtourModeChoice(controler.getConfig().global().getNumberOfThreads(), availableModes, chainBasedModes, false, tripRouterProvider));
+						builder.addStrategyModule(new ReRoute(controler.getScenario(), tripRouterProvider));
 						return builder.build();
 					}
 				});

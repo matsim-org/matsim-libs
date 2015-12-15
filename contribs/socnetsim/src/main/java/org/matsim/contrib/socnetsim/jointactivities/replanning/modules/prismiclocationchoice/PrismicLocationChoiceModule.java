@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.jointactivities.replanning.modules.prismiclocationchoice;
 
+import com.google.inject.Inject;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.router.CompositeStageActivityTypes;
@@ -28,16 +29,21 @@ import org.matsim.contrib.socnetsim.framework.population.SocialNetwork;
 import org.matsim.contrib.socnetsim.framework.replanning.GenericPlanAlgorithm;
 import org.matsim.contrib.socnetsim.framework.replanning.grouping.GroupPlans;
 import org.matsim.contrib.socnetsim.framework.replanning.modules.AbstractMultithreadedGenericStrategyModule;
+import org.matsim.core.router.TripRouter;
+
+import javax.inject.Provider;
 
 /**
  * @author thibautd
  */
 public class PrismicLocationChoiceModule  extends AbstractMultithreadedGenericStrategyModule<GroupPlans> {
 	private final Scenario scenario;
+	private Provider<TripRouter> tripRouterProvider;
 
-	public PrismicLocationChoiceModule(final Scenario sc) {
+	public PrismicLocationChoiceModule(final Scenario sc, Provider<TripRouter> tripRouterProvider) {
 		super( sc.getConfig().global() );
 		this.scenario = sc;
+		this.tripRouterProvider = tripRouterProvider;
 	}
 
 	@Override
@@ -47,7 +53,7 @@ public class PrismicLocationChoiceModule  extends AbstractMultithreadedGenericSt
 				scenario.getActivityFacilities(),
 				(SocialNetwork) scenario.getScenarioElement( SocialNetwork.ELEMENT_NAME ),
 				new CompositeStageActivityTypes(
-						replanningContext.getTripRouter().getStageActivityTypes(),
+						tripRouterProvider.get().getStageActivityTypes(),
 						JointActingTypes.JOINT_STAGE_ACTS ) );
 	}
 }

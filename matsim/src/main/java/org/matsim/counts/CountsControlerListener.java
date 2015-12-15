@@ -65,14 +65,15 @@ class CountsControlerListener implements StartupListener, IterationEndsListener 
     private final IterationStopWatch iterationStopwatch;
     private final OutputDirectoryHierarchy controlerIO;
 
-    private Counts<Link> counts;
+    @com.google.inject.Inject(optional=true)
+    private Counts<Link> counts = null;
 
     private final Map<Id<Link>, double[]> linkStats = new HashMap<>();
     private int iterationsUsed = 0;
 
     @Inject
-    CountsControlerListener(final Scenario scenario, VolumesAnalyzer volumesAnalyzer, IterationStopWatch iterationStopwatch, OutputDirectoryHierarchy controlerIO) {
-        this.config = scenario.getConfig().counts();
+    CountsControlerListener(CountsConfigGroup countsConfigGroup, final Scenario scenario, VolumesAnalyzer volumesAnalyzer, IterationStopWatch iterationStopwatch, OutputDirectoryHierarchy controlerIO) {
+        this.config = countsConfigGroup;
 		this.scenario = scenario;
         this.volumesAnalyzer = volumesAnalyzer;
 		this.analyzedModes = CollectionUtils.stringToSet(this.config.getAnalyzedModes());
@@ -82,25 +83,12 @@ class CountsControlerListener implements StartupListener, IterationEndsListener 
 
 	@Override
 	public void notifyStartup(final StartupEvent controlerStartupEvent) {
-        counts = (Counts<Link>) this.scenario.getScenarioElement(Counts.ELEMENT_NAME);
-        loadCountsIfNecessary();
         if (counts != null) {
             for (Id<Link> linkId : counts.getCounts().keySet()) {
                 this.linkStats.put(linkId, new double[24]);
             }
         }
 	}
-
-    private void loadCountsIfNecessary() {
-        if (counts == null) {
-            if (this.config.getCountsFileName() != null) {
-                counts = new Counts();
-                MatsimCountsReader counts_parser = new MatsimCountsReader(counts);
-                counts_parser.readFile(this.config.getCountsFileName());
-                this.scenario.addScenarioElement(Counts.ELEMENT_NAME, counts);
-            }
-        }
-    }
 
     @Override
 	public void notifyIterationEnds(final IterationEndsEvent event) {

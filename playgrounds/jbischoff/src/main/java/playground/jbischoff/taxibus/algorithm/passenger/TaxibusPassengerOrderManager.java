@@ -47,7 +47,10 @@ public class TaxibusPassengerOrderManager implements ActivityStartEventHandler, 
 	private QSim qSim;
 	private TaxibusPassengerEngine passengerEngine;
 
-	public TaxibusPassengerOrderManager(TaxibusPassengerEngine passengerEngine) {
+	public TaxibusPassengerOrderManager() {
+		
+	}
+	public void setPassengerEngine(TaxibusPassengerEngine passengerEngine) {
 		this.passengerEngine = passengerEngine;
 	}
 

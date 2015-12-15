@@ -29,17 +29,21 @@ import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
+import org.matsim.core.router.TripRouter;
+
+import javax.inject.Provider;
 
 public class NewPlanStrategy implements PlanStrategy {
 	
 	PlanStrategyImpl planStrategyDelegate = null ;
 
 	/**
-	 * @param scenario needs to be there because of the class loader 
+	 * @param scenario needs to be there because of the class loader
+	 * @param tripRouterProvider
 	 */
-	public NewPlanStrategy(Scenario scenario) {
+	public NewPlanStrategy(Scenario scenario, Provider<TripRouter> tripRouterProvider) {
 		this.planStrategyDelegate = new PlanStrategyImpl( new RandomPlanSelector() ) ;
-		this.addStrategyModule(new NewStrategyModule());
+		this.addStrategyModule(new NewStrategyModule(tripRouterProvider));
 	}
 
 	public void addStrategyModule(PlanStrategyModule module) {

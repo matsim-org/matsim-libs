@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.vehicles.Vehicle;
@@ -34,7 +35,7 @@ import org.matsim.vehicles.Vehicle;
 public class BasicEventsHandlerTest extends MatsimTestCase {
 
 	public void testLinkEnterEventHandler() {
-		EventsManagerImpl events = (EventsManagerImpl) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		MyLinkEnterEventHandler handler = new MyLinkEnterEventHandler();
 		events.addHandler(handler);
 

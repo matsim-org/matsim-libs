@@ -44,6 +44,7 @@ import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.Facility;
 import org.matsim.pt.router.TransitRouterConfig;
@@ -112,7 +113,7 @@ public class TripRouterFactoryImplTest {
 				install(AbstractModule.override(Arrays.asList(new TripRouterModule()), new AbstractModule() {
 					@Override
 					public void install() {
-						bind(Scenario.class).toInstance(scenario);
+						install(new ScenarioByInstanceModule(scenario));
 						addTravelTimeBinding("car").toInstance(new FreespeedTravelTimeAndDisutility( config.planCalcScore() ));
 						addTravelDisutilityFactoryBinding("car").toInstance(new OnlyTimeDependentTravelDisutilityFactory());
 					}
@@ -184,10 +185,10 @@ public class TripRouterFactoryImplTest {
 		Injector injector = Injector.createInjector(scenario.getConfig(), new AbstractModule() {
 			@Override
 			public void install() {
+				install(new ScenarioByInstanceModule(scenario));
 				install(AbstractModule.override(Arrays.asList(new TripRouterModule()), new AbstractModule() {
 					@Override
 					public void install() {
-						bind(Scenario.class).toInstance(scenario);
 						addTravelTimeBinding("car").toInstance(new FreespeedTravelTimeAndDisutility( config.planCalcScore() ));
 						addTravelDisutilityFactoryBinding("car").toInstance(new OnlyTimeDependentTravelDisutilityFactory());
 					}

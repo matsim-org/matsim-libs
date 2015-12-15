@@ -28,6 +28,9 @@ import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
+import org.matsim.core.router.TripRouter;
+
+import javax.inject.Provider;
 
 /**
  * A way of plugging park-and-ride strategy modules together. Via config file: <param name="Module_#" value="playground.vsp.parkAndRide.replanning.PRStrategyTime" />
@@ -39,7 +42,7 @@ public class PRStrategyTime implements PlanStrategy {
 
 	PlanStrategyImpl planStrategyDelegate = null ;
 	
-	public PRStrategyTime(Controler controler) {
+	public PRStrategyTime(Controler controler, Provider<TripRouter> tripRouterProvider) {
 
 		RandomPlanSelector planSelector = new RandomPlanSelector();
 		planStrategyDelegate = new PlanStrategyImpl( planSelector );
@@ -47,7 +50,7 @@ public class PRStrategyTime implements PlanStrategy {
 		PRTimeAllocationMutator prTimeModule = new PRTimeAllocationMutator(controler.getConfig());
 		planStrategyDelegate.addStrategyModule(prTimeModule);
 		
-		ReRoute reRouteModule = new ReRoute( controler.getScenario() ) ;
+		ReRoute reRouteModule = new ReRoute( controler.getScenario(), tripRouterProvider) ;
 		planStrategyDelegate.addStrategyModule(reRouteModule) ;
 		
 	}
