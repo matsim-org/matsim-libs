@@ -72,8 +72,11 @@ public class AdvancedRequestStorage
                 else if (context.getTime() > req.getT0()) {
                     //TODO we have to somehow handle it (in the future)
                     //Currently this is not a problem since we do not have cases of not turning up...
-                    throw new IllegalStateException(
-                            "Seems that the agent has skipped a previously submitted request");
+                	//my preference: ignore it. I had it turning up in multiple iterations and it doesnt do a thing (plans are sorted out because they end up being bad anyway)
+//                    throw new IllegalStateException(
+//                            "Seems that the agent has skipped a previously submitted request");
+//                    
+                    	
                 }
             }
         }
