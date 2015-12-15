@@ -23,6 +23,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
@@ -89,7 +90,7 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 	private Vehicles transitVehicles = null;
 
 	@Inject(optional = true)
-	private Counts counts = null;
+	private Counts<Link> counts = null;
 
 	@Inject
 	private Households households;

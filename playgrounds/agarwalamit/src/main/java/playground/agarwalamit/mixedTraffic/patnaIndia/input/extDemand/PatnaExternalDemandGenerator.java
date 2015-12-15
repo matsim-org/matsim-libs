@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -54,7 +55,7 @@ import playground.agarwalamit.utils.LoadMyScenarios;
  */
 
 public class PatnaExternalDemandGenerator {
-
+	private static final Logger LOG = Logger.getLogger(PatnaExternalDemandGenerator.class);
 	private Scenario scenario;
 	private final String inputFilesDir = PatnaUtils.INPUT_FILES_DIR+"/externalDemandInputFiles/";
 	private Random random = MatsimRandom.getRandom();
@@ -104,9 +105,12 @@ public class PatnaExternalDemandGenerator {
 	}
 
 	private void createExternalToInternalPlans(final String file, final String countingStationNumber){
+		int noOfPersonsAdded = 0;
+		
 		Population population = scenario.getPopulation();
 		PopulationFactory pf = population.getFactory();
 		Map<Double, Map<String,Double>> timebin2mode2count = readFileAndReturnMap(file);
+		
 		Map<String, List<SimpleFeature>> area2ZonesLists = getInternalZoneFeaturesForExtInternalTrips();
 		
 		String countingStationKey = OuterCordonUtils.getCountingStationKey(countingStationNumber, "In");
@@ -123,6 +127,7 @@ public class PatnaExternalDemandGenerator {
 					Id<Person> personId = Id.createPersonId(prefix+ population.getPersons().size());
 					Person p = pf.createPerson(personId);
 					population.addPerson(p);
+					noOfPersonsAdded++;
 					for( String area : area2ZonesLists.keySet() ){ // create a plan for each zone (ext-int-ext)
 						Plan plan = pf.createPlan();
 						Activity originAct = pf.createActivityFromLinkId( "E2I_Start", originActLink.getId());
@@ -141,7 +146,7 @@ public class PatnaExternalDemandGenerator {
 							middleAct.setEndTime( middleActEndTime );
 							plan.addActivity(middleAct);
 							plan.addLeg(pf.createLeg(mode));
-							destinationAct.setEndTime( middleActEndTime + 6*3600 + random.nextDouble() * 3600 );
+							destinationAct.setEndTime( middleActEndTime + 10*3600 + random.nextDouble() * 7200 ); // act duration is between 10 to 12 hrs.
 							plan.addActivity(destinationAct);
 							plan.addLeg(pf.createLeg(mode));
 							plan.addActivity( pf.createActivityFromCoord("E2I_mid", middleActCoord)  );
@@ -158,13 +163,17 @@ public class PatnaExternalDemandGenerator {
 				}
 			}
 		}
+		LOG.info(noOfPersonsAdded+" external to internal presons are added to the population for counting station "+countingStationNumber);
+		if(noOfPersonsAdded==0)LOG.warn("No external to internal presons are added to the population for counting station "+countingStationNumber);
 	}
 
 	/**
 	 * @param countingDirection "In" for outside to Patna, "Out" for Patna to outside.
 	 */
 	private void createExternalToExternalPlans(final String file, final String countingStationNumber, final String countingDirection){
- 		Population population = scenario.getPopulation();
+		int noOfPersonsAdded = 0;
+		
+		Population population = scenario.getPopulation();
 		PopulationFactory pf = population.getFactory();
 		Map<Double, Map<String,Double>> timebin2mode2count = readFileAndReturnMap(file);
 
@@ -181,7 +190,6 @@ public class PatnaExternalDemandGenerator {
 			for(String mode : timebin2mode2count.get(timebin).keySet()){
 				double directionSplitFactor = OuterCordonUtils.getDirectionalFactorFromOuterCordonKey(countingStationKey, "E2E");
 				double count = Math.round(timebin2mode2count.get(timebin).get(mode)* directionSplitFactor / PatnaUtils.COUNT_SCALE_FACTOR);
-
 				for(int ii=0; ii< count; ii++){ // create person
 					String prefix = countingStationKey+"_E2E_";
 					Id<Person> personId = Id.createPersonId(prefix+ population.getPersons().size());
@@ -190,6 +198,10 @@ public class PatnaExternalDemandGenerator {
 					for (int jj =1;jj<=7;jj++){ // 6 plans for each outer cordon location
 						
 						if(countingStationNumber.equalsIgnoreCase("OC"+jj)) continue; // excluding same origin- destination
+						
+						if(countingStationNumber.equalsIgnoreCase("OC1")&&jj==3) {
+							continue; // excluding ext-ext trip between OCt1 to OC3
+						}
 						
 						double actEndTime ;
 						Link destinationActLink = null;
@@ -212,9 +224,12 @@ public class PatnaExternalDemandGenerator {
 						p.addPlan(plan);
 					}
 					population.addPerson(p);
+					noOfPersonsAdded++;
 				}
 			}
 		}
+		LOG.info(noOfPersonsAdded+" external to external presons are added to the population for counting station "+countingStationNumber);
+		if(noOfPersonsAdded==0)LOG.warn("No external to external presons are added to the population for counting station "+countingStationNumber);
 	}
 
 	/**
@@ -280,7 +295,7 @@ public class PatnaExternalDemandGenerator {
 				double timebin = Double.valueOf(parts[0]);
 				double carCount = Double.valueOf(parts[1]);
 				double motorbikeCount = Double.valueOf(parts[2]);
-				double truckCount = Double.valueOf(parts[2]);
+				double truckCount = Double.valueOf(parts[3]);
 				double bikeCount = Double.valueOf(parts[4]);
 
 				mode2Count.put("car", carCount);
