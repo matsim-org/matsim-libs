@@ -41,14 +41,17 @@ public class AccessibilityComputationKiberaTest {
 	@Test
 	public void doAccessibilityTest() throws IOException {
 		// Input and output
-//		String folderStructure = "../../../"; // local on dz's computer
-		String folderStructure = "../../"; // server
-			
-		String networkFile = folderStructure + "matsimExamples/countries/ke/kibera/network/2015-11-05_kibera_paths_detailed.xml";
-		String facilitiesFile = folderStructure + "matsimExamples/countries/ke/kibera/facilities/facilities.xml";
+		String folderStructure = "../../../"; // local on dz's computer
+//		String folderStructure = "../../"; // server
+		
+		String networkFile = "matsimExamples/countries/ke/kibera/2015-11-05_network_paths_detailed.xml";
+
+		folderStructure = PathUtils.tryANumberOfFolderStructures(folderStructure, networkFile);
+
+		networkFile = folderStructure + networkFile ;	
+		String facilitiesFile = folderStructure + "matsimExamples/countries/ke/kibera/2015-11-05_facilities.xml";
 		
 		// no pt input
-		
 		
 		// Parameters
 		boolean createQGisOutput = false;

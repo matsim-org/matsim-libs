@@ -3,7 +3,6 @@ package playground.boescpa.ivtBaseline;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.OutputDirectoryLogging;
@@ -53,11 +52,10 @@ public class RunIVTBaseline {
         controler.run();
     }
 
-    private static void connectFacilitiesWithNetwork(Controler controler) {
+    public static void connectFacilitiesWithNetwork(Controler controler) {
         ActivityFacilities facilities = controler.getScenario().getActivityFacilities();
         NetworkImpl network = (NetworkImpl) controler.getScenario().getNetwork();
         WorldConnectLocations wcl = new WorldConnectLocations(controler.getConfig());
         wcl.connectFacilitiesWithLinks(facilities, network);
     }
-
 }

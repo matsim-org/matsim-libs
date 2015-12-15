@@ -23,10 +23,10 @@
 package org.matsim.core.replanning;
 
 import com.google.inject.TypeLiteral;
-import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.replanning.modules.*;
 import org.matsim.core.replanning.selectors.*;
@@ -36,18 +36,26 @@ import javax.inject.Provider;
 
 public class DefaultPlanStrategiesModule extends AbstractModule {
 	
-	public static enum DefaultPlansRemover { WorstPlanSelector, SelectRandom, SelectExpBetaForRemoval, ChangeExpBetaForRemoval, 
+	public enum DefaultPlansRemover { WorstPlanSelector, SelectRandom, SelectExpBetaForRemoval, ChangeExpBetaForRemoval,
 		PathSizeLogitSelectorForRemoval }
-
-	public static final String Selector = null; ;
 
     @Override
     public void install() {
-        addPlanSelectorForRemovalBinding(DefaultPlansRemover.WorstPlanSelector.toString()).to(WorstPlanForRemovalSelector.class);
-        addPlanSelectorForRemovalBinding(DefaultPlansRemover.SelectRandom.toString()).to(new TypeLiteral<RandomPlanSelector<Plan, Person>>(){});
-        addPlanSelectorForRemovalBinding(DefaultPlansRemover.SelectExpBetaForRemoval.toString()).toProvider(ExpBetaPlanSelectorForRemoval.class);
-        addPlanSelectorForRemovalBinding(DefaultPlansRemover.ChangeExpBetaForRemoval.toString()).toProvider(ExpBetaPlanChangerForRemoval.class);
-        addPlanSelectorForRemovalBinding(DefaultPlansRemover.PathSizeLogitSelectorForRemoval.toString()).toProvider(PathSizeLogitSelectorForRemoval.class);
+        if (getConfig().strategy().getPlanSelectorForRemoval().equals(DefaultPlansRemover.WorstPlanSelector.toString())) {
+            bindPlanSelectorForRemoval().to(WorstPlanForRemovalSelector.class);
+        }
+        if (getConfig().strategy().getPlanSelectorForRemoval().equals(DefaultPlansRemover.SelectRandom.toString())) {
+            bindPlanSelectorForRemoval().to(new TypeLiteral<RandomPlanSelector<Plan, Person>>(){});
+        }
+        if (getConfig().strategy().getPlanSelectorForRemoval().equals(DefaultPlansRemover.SelectExpBetaForRemoval.toString())) {
+            bindPlanSelectorForRemoval().toProvider(ExpBetaPlanSelectorForRemoval.class);
+        }
+        if (getConfig().strategy().getPlanSelectorForRemoval().equals(DefaultPlansRemover.ChangeExpBetaForRemoval.toString())) {
+            bindPlanSelectorForRemoval().toProvider(ExpBetaPlanChangerForRemoval.class);
+        }
+        if (getConfig().strategy().getPlanSelectorForRemoval().equals(DefaultPlansRemover.PathSizeLogitSelectorForRemoval.toString())) {
+            bindPlanSelectorForRemoval().toProvider(PathSizeLogitSelectorForRemoval.class);
+        }
 
         // strategy packages that only select:
         addPlanStrategyBinding(DefaultSelector.KeepLastSelected.toString()).toProvider(KeepLastSelectedPlanStrategyFactory.class);
@@ -82,47 +90,33 @@ public class DefaultPlanStrategiesModule extends AbstractModule {
     
     private static class ExpBetaPlanSelectorForRemoval implements Provider<ExpBetaPlanSelector<Plan, Person>> {
 
-        private Config config;
-
-        @Inject
-        ExpBetaPlanSelectorForRemoval(Config config) {
-            this.config = config;
-        }
+        @Inject private PlanCalcScoreConfigGroup config;
 
         @Override
         public ExpBetaPlanSelector<Plan, Person> get() {
-            return new ExpBetaPlanSelector<>( - config.planCalcScore().getBrainExpBeta());
+            return new ExpBetaPlanSelector<>( - config.getBrainExpBeta());
         }
     }
 
     private static class ExpBetaPlanChangerForRemoval implements Provider<ExpBetaPlanChanger<Plan, Person>> {
 
-        private Config config;
-
-        @Inject
-        ExpBetaPlanChangerForRemoval(Config config) {
-            this.config = config;
-        }
+        @Inject private PlanCalcScoreConfigGroup config;
 
         @Override
         public ExpBetaPlanChanger<Plan, Person> get() {
-            return new ExpBetaPlanChanger<>( - config.planCalcScore().getBrainExpBeta());
+            return new ExpBetaPlanChanger<>( - config.getBrainExpBeta());
         }
     }
 
     private static class PathSizeLogitSelectorForRemoval implements Provider<PathSizeLogitSelector> {
 
-        private Scenario scenario;
-
-        @Inject
-        PathSizeLogitSelectorForRemoval(Scenario scenario) {
-            this.scenario = scenario;
-        }
+        @Inject PlanCalcScoreConfigGroup config;
+        @Inject Network network;
 
         @Override
         public PathSizeLogitSelector get() {
-            return new PathSizeLogitSelector(scenario.getConfig().planCalcScore().getPathSizeLogitBeta(), -scenario.getConfig().planCalcScore().getBrainExpBeta(),
-                    scenario.getNetwork());
+            return new PathSizeLogitSelector(config.getPathSizeLogitBeta(), -config.getBrainExpBeta(),
+                    network);
         }
     }
 

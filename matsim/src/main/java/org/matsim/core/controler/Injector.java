@@ -63,7 +63,7 @@ public class Injector {
             @Override
             public void configure(Binder binder) {
                 binder.requireExplicitBindings(); // For now, we are conservative and disable this kind of magic.
-                binder.bind(Config.class).toInstance(config);
+                binder.install(new ExplodedConfigModule(config));
             }
         });
         // A MATSim module needs the config at configuration time in order to decide what

@@ -41,11 +41,54 @@ import java.util.Map;
 
 /**
  * Class to create network and lanes for the parallel scenario.
- * 
+ *
  * Set the capacity and choose whether you want to have a third and fourth OD
  * pair (the vertically relation - in addition to the horizontally relation)
  * before calling the method createNetworkWithLanes().
- * 
+ *
+ * Network without second ODPair:
+ *
+ *                           (3)---------(4)
+ *                          ´               `
+ *                        ´                   `
+ * (a)-------(1)-------(2)                     (5)-------(6)-------(b)
+ *                        `                   ´
+ *		                    `               ´
+ *			                 (7)---------(8)
+ *
+ *
+ * Network with second ODPair:
+ *
+ *                                 (c)
+ *                                  |
+ *                                  |
+ *                                  |
+ *                                 (9)
+ *                                  |
+ *                                  |
+ *                                  |
+ * 		      	                   (10)
+ * 	                              ´   `
+ *                              ´       `
+ *                           (3)---------(4)
+ *                          ´ |           | `
+ *                        ´   |           |   `
+ * (a)-------(1)-------(2)    |           |    (5)-------(6)-------(b)
+ *                        `   |           |   ´
+ *                          ` |           | ´
+ *                           (7)---------(8)
+ *                              `       ´
+ *                                `   ´
+ *                                 (11)
+ * 					                |
+ * 	                                |
+ * 	                                |
+ *                                 (12)
+ *                                  |
+ *                                  |
+ *                                  |
+ *                                 (d)
+ *
  * @author gthunig
  * 
  */
@@ -72,8 +115,8 @@ public final class TtCreateParallelNetworkAndLanes {
 	 * Creates the Network for the parallel scenario and the required lanes.
      */
 	public void createNetworkWithLanes() {
-		log.info("Create network and lanes ...");
-		
+        log.info("Create network and lanes ...");
+
 		Network net = this.scenario.getNetwork();
 		if (net.getCapacityPeriod() != 3600.0){
 			throw new IllegalStateException();
@@ -84,28 +127,44 @@ public final class TtCreateParallelNetworkAndLanes {
 		// create nodes
 
 		double scale = LINK_LENGTH;
-		Node n1, n2, n3, n4, n5, n6, n7, n8;
-		net.addNode(n1 = fac.createNode(Id.create(1, Node.class), new Coord(0.0, 0.0)));
-		net.addNode(n2 = fac.createNode(Id.create(2, Node.class), new Coord(1.0 * scale, 0.0)));
-		net.addNode(n3 = fac.createNode(Id.create(3, Node.class), new Coord(2.0 * scale, 1.0 * scale)));
-		net.addNode(n4 = fac.createNode(Id.create(4, Node.class), new Coord(3.0 * scale, 1.0 * scale)));
-		net.addNode(n5 = fac.createNode(Id.create(5, Node.class), new Coord(4.0 * scale, 0.0)));
-		net.addNode(n6 = fac.createNode(Id.create(6, Node.class), new Coord(5.0 * scale, 0.0)));
-		net.addNode(n7 = fac.createNode(Id.create(7, Node.class), new Coord(2.0 * scale, -1.0 * scale)));
-		net.addNode(n8 = fac.createNode(Id.create(8, Node.class), new Coord(3.0 * scale, -1.0 * scale)));
-		Node n9 = null, n10 = null, n11 = null, n12 = null;
+		Node na, nb, n1, n2, n3, n4, n5, n6, n7, n8;
+        net.addNode(na = fac.createNode(Id.create("a", Node.class), new Coord(0.0, 0.0)));
+        net.addNode(nb = fac.createNode(Id.create("b", Node.class), new Coord(7.0 * scale, 0.0)));
+		net.addNode(n1 = fac.createNode(Id.create(1, Node.class), new Coord(1.0 * scale, 0.0)));
+		net.addNode(n2 = fac.createNode(Id.create(2, Node.class), new Coord(2.0 * scale, 0.0)));
+		net.addNode(n3 = fac.createNode(Id.create(3, Node.class), new Coord(3.0 * scale, 1.0 * scale)));
+		net.addNode(n4 = fac.createNode(Id.create(4, Node.class), new Coord(4.0 * scale, 1.0 * scale)));
+		net.addNode(n5 = fac.createNode(Id.create(5, Node.class), new Coord(5.0 * scale, 0.0)));
+		net.addNode(n6 = fac.createNode(Id.create(6, Node.class), new Coord(6.0 * scale, 0.0)));
+		net.addNode(n7 = fac.createNode(Id.create(7, Node.class), new Coord(3.0 * scale, -1.0 * scale)));
+		net.addNode(n8 = fac.createNode(Id.create(8, Node.class), new Coord(4.0 * scale, -1.0 * scale)));
+		Node nc = null, nd = null, n9 = null, n10 = null, n11 = null, n12 = null;
 		if (useSecondODPair) {
-			net.addNode(n9 = fac.createNode(Id.create(9, Node.class), new Coord(2.5 * scale, 2.0 * scale)));
-			net.addNode(n10 = fac.createNode(Id.create(10, Node.class), new Coord(2.5 * scale, 3.0 * scale)));
-			net.addNode(n11 = fac.createNode(Id.create(11, Node.class), new Coord(2.5 * scale, -2.0 * scale)));
-			net.addNode(n12 = fac.createNode(Id.create(12, Node.class), new Coord(2.5 * scale, -3.0 * scale)));
+            net.addNode(nc = fac.createNode(Id.create("c", Node.class), new Coord(3.5 * scale, 4.0 * scale)));
+            net.addNode(nd = fac.createNode(Id.create("d", Node.class), new Coord(3.5 * scale, -4.0 * scale)));
+			net.addNode(n9 = fac.createNode(Id.create(9, Node.class), new Coord(3.5 * scale, 3.0 * scale)));
+			net.addNode(n10 = fac.createNode(Id.create(10, Node.class), new Coord(3.5 * scale, 2.0 * scale)));
+			net.addNode(n11 = fac.createNode(Id.create(11, Node.class), new Coord(3.5 * scale, -2.0 * scale)));
+			net.addNode(n12 = fac.createNode(Id.create(12, Node.class), new Coord(3.5 * scale, -3.0 * scale)));
 		}
 		
 		// create links
 
 		initLinkIds();
 
-		Link l = fac.createLink(links.get("1_2"), n1, n2);
+        Link l = fac.createLink(links.get("a_1"), na, n1);
+        setLinkAttributes(l, capacity, LINK_LENGTH, FREESPEED);
+        net.addLink(l);
+        l = fac.createLink(links.get("1_a"), n1, na);
+        setLinkAttributes(l, capacity, LINK_LENGTH, FREESPEED);
+        net.addLink(l);
+        l = fac.createLink(links.get("6_b"), n6, nb);
+        setLinkAttributes(l, capacity, LINK_LENGTH, FREESPEED);
+        net.addLink(l);
+        l = fac.createLink(links.get("b_6"), nb, n6);
+        setLinkAttributes(l, capacity, LINK_LENGTH, FREESPEED);
+        net.addLink(l);
+		l = fac.createLink(links.get("1_2"), n1, n2);
 		setLinkAttributes(l, capacity, LINK_LENGTH, FREESPEED);
 		net.addLink(l);
 		l = fac.createLink(links.get("2_1"), n2, n1);
@@ -155,6 +214,18 @@ public final class TtCreateParallelNetworkAndLanes {
 		net.addLink(l);
 
 		if (useSecondODPair) {
+            l = fac.createLink(links.get("9_c"), n9, nc);
+            setLinkAttributes(l, capacity, LINK_LENGTH, FREESPEED);
+            net.addLink(l);
+            l = fac.createLink(links.get("c_9"), nc, n9);
+            setLinkAttributes(l, capacity, LINK_LENGTH, FREESPEED);
+            net.addLink(l);
+            l = fac.createLink(links.get("12_d"), n12, nd);
+            setLinkAttributes(l, capacity, LINK_LENGTH, FREESPEED);
+            net.addLink(l);
+            l = fac.createLink(links.get("d_12"), nd, n12);
+            setLinkAttributes(l, capacity, LINK_LENGTH, FREESPEED);
+            net.addLink(l);
 			l = fac.createLink(links.get("3_7"), n3, n7);
 			setLinkAttributes(l, capacity, LINK_LENGTH, FREESPEED);
 			net.addLink(l);
@@ -167,16 +238,16 @@ public final class TtCreateParallelNetworkAndLanes {
 			l = fac.createLink(links.get("8_4"), n8, n4);
 			setLinkAttributes(l, capacity, LINK_LENGTH, FREESPEED);
 			net.addLink(l);
-			l = fac.createLink(links.get("3_9"), n3, n9);
+			l = fac.createLink(links.get("3_10"), n3, n10);
 			setLinkAttributes(l, capacity, LINK_LENGTH, FREESPEED);
 			net.addLink(l);
-			l = fac.createLink(links.get("9_3"), n9, n3);
+			l = fac.createLink(links.get("10_3"), n10, n3);
 			setLinkAttributes(l, capacity, LINK_LENGTH, FREESPEED);
 			net.addLink(l);
-			l = fac.createLink(links.get("4_9"), n4, n9);
+			l = fac.createLink(links.get("4_10"), n4, n10);
 			setLinkAttributes(l, capacity, LINK_LENGTH, FREESPEED);
 			net.addLink(l);
-			l = fac.createLink(links.get("9_4"), n9, n4);
+			l = fac.createLink(links.get("10_4"), n10, n4);
 			setLinkAttributes(l, capacity, LINK_LENGTH, FREESPEED);
 			net.addLink(l);
 			l = fac.createLink(links.get("9_10"), n9, n10);
@@ -208,6 +279,10 @@ public final class TtCreateParallelNetworkAndLanes {
 	}
 
 	private void initLinkIds() {
+        links.put("a_1", Id.create("a_1", Link.class));
+        links.put("1_a", Id.create("1_a", Link.class));
+        links.put("6_b", Id.create("6_b", Link.class));
+        links.put("b_6", Id.create("b_6", Link.class));
 		links.put("1_2", Id.create("1_2", Link.class));
 		links.put("2_1", Id.create("2_1", Link.class));
 		links.put("2_3", Id.create("2_3", Link.class));
@@ -225,14 +300,19 @@ public final class TtCreateParallelNetworkAndLanes {
 		links.put("5_8", Id.create("5_8", Link.class));
 		links.put("8_5", Id.create("8_5", Link.class));
 		if (useSecondODPair) {
+            links.put("9_c", Id.create("9_c", Link.class));
+            links.put("c_9", Id.create("c_9", Link.class));
+            links.put("12_d", Id.create("12_d", Link.class));
+            links.put("d_12", Id.create("d_12", Link.class));
+            links.put("a_1", Id.create("a_1", Link.class));
 			links.put("3_7", Id.create("3_7", Link.class));
 			links.put("7_3", Id.create("7_3", Link.class));
 			links.put("4_8", Id.create("4_8", Link.class));
 			links.put("8_4", Id.create("8_4", Link.class));
-			links.put("3_9", Id.create("3_9", Link.class));
-			links.put("9_3", Id.create("9_3", Link.class));
-			links.put("4_9", Id.create("4_9", Link.class));
-			links.put("9_4", Id.create("9_4", Link.class));
+			links.put("3_10", Id.create("3_10", Link.class));
+			links.put("10_3", Id.create("10_3", Link.class));
+			links.put("4_10", Id.create("4_10", Link.class));
+			links.put("10_4", Id.create("10_4", Link.class));
 			links.put("9_10", Id.create("9_10", Link.class));
 			links.put("10_9", Id.create("10_9", Link.class));
 			links.put("7_11", Id.create("7_11", Link.class));
@@ -303,23 +383,23 @@ public final class TtCreateParallelNetworkAndLanes {
 		laneDef20.addLanesToLinkAssignment(linkAssignment);
 
 		if (useSecondODPair) {
-			// create link assignment of link 10_9
-			linkAssignment = fac.createLanesToLinkAssignment(links.get("10_9"));
+			// create link assignment of link 9_10
+			linkAssignment = fac.createLanesToLinkAssignment(links.get("9_10"));
 
 			LanesUtils.createAndAddLane20(linkAssignment, fac,
-					Id.create("10_9.ol", Lane.class), capacity,
+					Id.create("9_10.ol", Lane.class), capacity,
 					LINK_LENGTH, 0, 1, null,
-					Arrays.asList(Id.create("10_9.l", Lane.class),
-							Id.create("10_9.r", Lane.class)));
+					Arrays.asList(Id.create("9_10.l", Lane.class),
+							Id.create("9_10.r", Lane.class)));
 
 			LanesUtils.createAndAddLane20(linkAssignment, fac,
-					Id.create("10_9.l", Lane.class), capacity,
+					Id.create("9_10.l", Lane.class), capacity,
 					LINK_LENGTH / 2, -1, 1,
-					Collections.singletonList(links.get("9_4")), null);
+					Collections.singletonList(links.get("10_4")), null);
 			LanesUtils.createAndAddLane20(linkAssignment, fac,
-					Id.create("10_9.r", Lane.class), capacity,
+					Id.create("9_10.r", Lane.class), capacity,
 					LINK_LENGTH / 2, 1, 1,
-					Collections.singletonList(links.get("9_3")), null);
+					Collections.singletonList(links.get("10_3")), null);
 
 			laneDef20.addLanesToLinkAssignment(linkAssignment);
 
@@ -351,21 +431,21 @@ public final class TtCreateParallelNetworkAndLanes {
 	}
 
 	/**
-	 * Setting this flag true will expand the
-	 * {@link playground.dgrether.koehlerstrehlersignal.figure9scenario.DgFigure9ScenarioGenerator}
-	 * with a second origin_destination pair.
 	 *
 	 * @param useSecondODPair
+	 * 			Setting this flag true will expand the
+	 * 			{@link playground.dgrether.koehlerstrehlersignal.figure9scenario.DgFigure9ScenarioGenerator}
+	 * 			with a second origin_destination pair.
      */
 	public void setUseSecondODPair(boolean useSecondODPair) {
 		this.useSecondODPair = useSecondODPair;
 	}
 
-	/**
-	 * Adapts the link capacity to the number of persons.
-	 * 
-	 * @param numberOfPersons demand of each OD pair
-	 */
+    /**
+     * Adapts the link capacity to the number of persons.
+     *
+     * @param numberOfPersons demand of each OD pair
+     */
 	public void setCapacity(double numberOfPersons) {
 		this.capacity = numberOfPersons;
 	}

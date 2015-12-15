@@ -95,7 +95,7 @@ public class ModalSplitPopDensity {
                 Double air = airVol.get(from, to);
                 if (air == null) air = 0.0;
 
-                if (car > 0) {// && rail > 0) {// && air > 0) {
+                if (car > 0 && rail > 0 && air > 0) {
                     double total = car + rail + air;
 
                     double fromRho = zoneRho.get(from);

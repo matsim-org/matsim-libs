@@ -67,8 +67,8 @@ public class PopulationCreator {
 	public static final String W2L = "w2l";
 	public static final String HgivenW2S = "h|w2s";
 	public static final String HgivenW2L = "h|w2l";
-	public static final String H2givenW2S = "h2|w2s";
-	public static final String H2givenW2L = "h2|w2l";
+	// public static final String H2givenW2S = "h2|w2s";
+	// public static final String H2givenW2L = "h2|w2l";
 	public static final String O2givenW2S = "o2|w2s";
 	public static final String O2givenW2L = "o2|w2l";
 
@@ -290,7 +290,7 @@ public class PopulationCreator {
 			/*
 			 * HOME - OTHER - HOME
 			 */
-			final double initialHomeEndTime_s = MathHelpers.draw(9.0, 19.0,
+			final double initialHomeEndTime_s = MathHelpers.draw(6.0, 22.0,
 					this.rnd) * 3600.0;
 			this.addHomeActivity(plan, homeCoord, initialHomeEndTime_s,
 					HgivenO1);
@@ -302,7 +302,7 @@ public class PopulationCreator {
 			this.addTour(plan, O1, otherCoord, otherTourMode, otherEndTime_s);
 
 			this.addHomeActivity(plan, homeCoord, null, HgivenO1);
-			
+
 		} else if ((homeCoord != null) && (workCoord != null)) {
 
 			/*
@@ -326,7 +326,7 @@ public class PopulationCreator {
 			final double intermediateHomeEndTime_s = workEndTime_s
 					+ this.tripDuration_s + this.intermediateHomeDuration_s;
 			this.addHomeActivity(plan, homeCoord, intermediateHomeEndTime_s,
-					(shortWork ? H2givenW2S : H2givenW2L));
+					(shortWork ? HgivenW2S : HgivenW2L));
 
 			final double otherEndTime_s = intermediateHomeEndTime_s
 					+ this.tripDuration_s + this.otherDuration_s;
@@ -337,7 +337,7 @@ public class PopulationCreator {
 
 			this.addHomeActivity(plan, homeCoord, null, (shortWork ? HgivenW2S
 					: HgivenW2L));
-			
+
 		} else {
 
 			return null;

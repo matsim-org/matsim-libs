@@ -59,6 +59,7 @@ import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.pt.router.TransitRouter;
+import tutorial.programming.planStrategyForRemoval.MyExpBetaPlanChangerForRemovalProvider;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -239,7 +240,9 @@ public class RunPSim {
         matsimControler.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
-                addPlanSelectorForRemovalBinding("DiversityGeneratingPlansRemover").toProvider(DiversityGeneratingPlansRemover.Builder.class);
+                if (getConfig().strategy().getPlanSelectorForRemoval().equals("DiversityGeneratingPlansRemover")) {
+                    bindPlanSelectorForRemoval().toProvider(DiversityGeneratingPlansRemover.Builder.class);
+                }
             }
         });
         if (Diversity)

@@ -11,18 +11,15 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.OutputDirectoryLogging;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
-import org.matsim.facilities.ActivityFacilities;
-import org.matsim.facilities.algorithms.WorldConnectLocations;
 import org.matsim.pt.PtConstants;
 import playground.boescpa.ivtBaseline.IVTBaselineScoringFunctionFactory;
-import playground.ivt.kticompatibility.KtiLikeScoringConfigGroup;
-import playground.ivt.matsim2030.scoring.MATSim2010ScoringFunctionFactory;
 
 import java.io.File;
+
+import static playground.boescpa.ivtBaseline.RunIVTBaseline.connectFacilitiesWithNetwork;
 
 /**
  * Basic main for the ivt baseline scenarios.
@@ -74,13 +71,6 @@ public class RunLocationChoice {
                         new StageActivityTypesImpl(PtConstants.TRANSIT_ACTIVITY_TYPE)));
 
         controler.run();
-    }
-
-    private static void connectFacilitiesWithNetwork(Controler controler) {
-        ActivityFacilities facilities = controler.getScenario().getActivityFacilities();
-        NetworkImpl network = (NetworkImpl) controler.getScenario().getNetwork();
-        WorldConnectLocations wcl = new WorldConnectLocations(controler.getConfig());
-        wcl.connectFacilitiesWithLinks(facilities, network);
     }
 
     private static void initializeLocationChoice(Controler controler) {

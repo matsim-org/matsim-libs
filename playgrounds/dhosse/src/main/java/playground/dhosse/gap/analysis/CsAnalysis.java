@@ -43,22 +43,28 @@ public class CsAnalysis {
 	
 	public static void main(String args[]){
 		
-		OutputDirectoryLogging.initLogging(new OutputDirectoryHierarchy("/home/dhosse/base/", OverwriteFileSetting.overwriteExistingFiles));
+		String sc = "var_modC";
+		
+		OutputDirectoryLogging.initLogging(new OutputDirectoryHierarchy("/home/dhosse/cs_stations/" + sc + "/", OverwriteFileSetting.overwriteExistingFiles));
 		
 //		SpatialAnalysis.writePopulationToShape(Global.runInputDir + "output_plans.xml.gz", "/home/danielhosse/population.shp");
 
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenario).readFile(Global.runInputDir + "merged-networkV2_20150929.xml");
+		new MatsimNetworkReader(scenario).readFile(Global.runInputDir + "networkMultimodal.xml");
 		ObjectAttributes attributes = new ObjectAttributes();
-		new ObjectAttributesXmlReader(attributes).parse("/home/dhosse/run11/input/subpopulationAtts.xml");
+		new ObjectAttributesXmlReader(attributes).parse(Global.runInputDir + "subpopulationAtts.xml");
 		
-		BufferedReader reader = IOUtils.getBufferedReader("/home/dhosse/run11/output_reducedCosts/ITERS/it." + it + "/" + it + ".OW_CS");
+		BufferedReader reader = IOUtils.getBufferedReader("/home/dhosse/cs_stations/" + sc + "/" + it + ".OW_CS");
 		Set<String> userIds = new HashSet<>();
+		Set<String> vehicleIds = new HashSet<>();
 		
 		RecursiveStatsContainer durationStats = new RecursiveStatsContainer();
 		RecursiveStatsContainer distanceStats = new RecursiveStatsContainer();
 		RecursiveStatsContainer accessStats = new RecursiveStatsContainer();
 		RecursiveStatsContainer egressStats = new RecursiveStatsContainer();
+		
+		int nWays = 0;
+		double totalDrivenDistance = 0.;
 		
 		Map<String, Tuple<Double,Double>> linkId2PassengerInteractions = new HashMap<>();
 		
@@ -87,7 +93,10 @@ public class CsAnalysis {
 				double duration = Double.parseDouble(endTime) - Double.parseDouble(startTime);
 				
 				userIds.add(personId);
+				vehicleIds.add(vehicleId);
+				nWays++;
 				
+				totalDrivenDistance += d;
 				distanceStats.handleNewEntry(d);
 				durationStats.handleNewEntry(duration);
 				accessStats.handleNewEntry(Double.parseDouble(accessTime));
@@ -129,7 +138,7 @@ public class CsAnalysis {
 			
 		}
 		
-		BufferedWriter writer = IOUtils.getBufferedWriter("/home/dhosse/userIds_rC.csv");
+		BufferedWriter writer = IOUtils.getBufferedWriter("/home/dhosse/cs_stations/" + sc + "/userIds_rC.csv");
 		
 		try {
 			
@@ -148,19 +157,23 @@ public class CsAnalysis {
 			
 		}
 		
-		System.out.println(distanceStats.getNumberOfEntries() + " persons used car sharing");
-		System.out.println("###########################################################################");
-		System.out.println("distance stats:");
-		System.out.println("mean: " + distanceStats.getMean() + "\tmax: " + distanceStats.getMax() + "\tmin: " + distanceStats.getMin());
-		System.out.println("###########################################################################");
-		System.out.println("duration stats:");
-		System.out.println("mean: " + Time.writeTime(durationStats.getMean()) + "\tmax: " + Time.writeTime(durationStats.getMax()) + "\tmin: " + Time.writeTime(durationStats.getMin()));
-		System.out.println("###########################################################################");
-		System.out.println("access stats:");
-		System.out.println("mean: " + Time.writeTime(accessStats.getMean()) + "\tmax: " + Time.writeTime(accessStats.getMax()) + "\tmin: " + Time.writeTime(accessStats.getMin()));
-		System.out.println("###########################################################################");
-		System.out.println("egress stats:");
-		System.out.println("mean: " + Time.writeTime(egressStats.getMean()) + "\tmax: " + Time.writeTime(egressStats.getMax()) + "\tmin: " + Time.writeTime(egressStats.getMin()));
+		log.info("###########################################################################");
+		log.info(vehicleIds.size() + " vehicles were used during simulation");
+		log.info(userIds.size() + " persons used car sharing");
+		log.info(nWays + " ways");
+		log.info("###########################################################################");
+		log.info("distance stats:");
+		log.info("total driven distance: " + totalDrivenDistance);
+		log.info("mean: " + distanceStats.getMean() + "\tmax: " + distanceStats.getMax() + "\tmin: " + distanceStats.getMin());
+		log.info("###########################################################################");
+		log.info("duration stats:");
+		log.info("mean: " + Time.writeTime(durationStats.getMean()) + "\tmax: " + Time.writeTime(durationStats.getMax()) + "\tmin: " + Time.writeTime(durationStats.getMin()));
+		log.info("###########################################################################");
+		log.info("access stats:");
+		log.info("mean: " + Time.writeTime(accessStats.getMean()) + "\tmax: " + Time.writeTime(accessStats.getMax()) + "\tmin: " + Time.writeTime(accessStats.getMin()));
+		log.info("###########################################################################");
+		log.info("egress stats:");
+		log.info("mean: " + Time.writeTime(egressStats.getMean()) + "\tmax: " + Time.writeTime(egressStats.getMax()) + "\tmin: " + Time.writeTime(egressStats.getMin()));
 		
 		Builder builder = new Builder();
 		builder.setCrs(MGC.getCRS(Global.toCrs));
@@ -179,7 +192,7 @@ public class CsAnalysis {
 			
 		}
 		
-		ShapeFileWriter.writeGeometries(features, "/home/dhosse/passengerInteractions_rC.shp");
+		ShapeFileWriter.writeGeometries(features, "/home/dhosse/cs_stations/" + sc + "/passengerInteractions_rC.shp");
 		
 		OutputDirectoryLogging.closeOutputDirLogging();
 		

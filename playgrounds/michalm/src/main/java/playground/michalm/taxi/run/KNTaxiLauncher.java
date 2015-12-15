@@ -65,8 +65,8 @@ class KNTaxiLauncher
         TaxiLauncherParams params = new TaxiLauncherParams();
 
         params.inputDir =
-                "/Users/nagel/shared-svn/projects/maciejewski/Mielec/2014_02/mielec-2-peaks-new/";
-                //"d:/svn-vsp/maciejewski/Mielec/2014_02/mielec-2-peaks-new/";
+                "/Users/nagel/shared-svn/projects/maciejewski/Mielec/2014_02_base_scenario/";
+                //"d:/svn-vsp/maciejewski/Mielec/2014_02_base_scenario/";
 
         params.netFile = params.inputDir + "network.xml";
         params.plansFile = params.inputDir + "output/ITERS/it.20/20.plans.xml.gz";

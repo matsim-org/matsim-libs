@@ -29,6 +29,7 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.handler.PersonMoneyEventHandler;
@@ -41,6 +42,7 @@ import org.matsim.core.config.groups.ScenarioConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
@@ -53,6 +55,9 @@ import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
 import playground.vsp.congestion.handlers.MarginalSumScoringFunction;
 import playground.vsp.congestion.handlers.TollHandler;
 import playground.vsp.congestion.routing.TollDisutilityCalculatorFactory;
+
+import javax.inject.Inject;
+import javax.inject.Provider;
 
 /**
  * @author ikaddoura
@@ -229,7 +234,7 @@ public class AdvancedMarginalCongestionPricingTest {
 		
 		String configFile = testUtils.getPackageInputDirectory() + "AdvancedMarginalCongestionPricingTest/config1.xml";
 
-		Controler controler = new Controler(configFile);
+		final Controler controler = new Controler(configFile);
 		
 		EventsManager events = controler.getEvents();
 				
@@ -260,16 +265,22 @@ public class AdvancedMarginalCongestionPricingTest {
 			}	
 		});
 		
-		TollHandler tollHandler = new TollHandler(controler.getScenario());
+		final TollHandler tollHandler = new TollHandler(controler.getScenario());
 		final TollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new TollDisutilityCalculatorFactory(tollHandler);
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
+				addControlerListenerBinding().toProvider(new Provider<ControlerListener>() {
+					@Inject Scenario scenario;
+					@Inject EventsManager eventsManager;
+					@Override
+					public ControlerListener get() {
+						return new AdvancedMarginalCongestionPricingContolerListener(scenario, tollHandler, new CongestionHandlerImplV3(eventsManager, (MutableScenario) scenario));
+					}
+				});
 				bindCarTravelDisutilityFactory().toInstance(tollDisutilityCalculatorFactory);
 			}
 		});
-
-		controler.addControlerListener(new AdvancedMarginalCongestionPricingContolerListener(controler.getScenario(), tollHandler, new CongestionHandlerImplV3(controler.getEvents(), (MutableScenario) controler.getScenario())));
 
 		controler.addOverridingModule(new OTFVisFileWriterModule());
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
@@ -329,17 +340,22 @@ public class AdvancedMarginalCongestionPricingTest {
 			}	
 		});
 		
-		TollHandler tollHandler = new TollHandler(controler.getScenario());
+		final TollHandler tollHandler = new TollHandler(controler.getScenario());
 		final TollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new TollDisutilityCalculatorFactory(tollHandler);
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
+				addControlerListenerBinding().toProvider(new Provider<ControlerListener>() {
+					@Inject Scenario scenario;
+					@Inject EventsManager eventsManager;
+					@Override
+					public ControlerListener get() {
+						return new AdvancedMarginalCongestionPricingContolerListener(scenario, tollHandler, new CongestionHandlerImplV3(eventsManager, (MutableScenario) scenario));
+					}
+				});
 				bindCarTravelDisutilityFactory().toInstance(tollDisutilityCalculatorFactory);
 			}
 		});
-
-		controler.addControlerListener(new AdvancedMarginalCongestionPricingContolerListener(controler.getScenario(), tollHandler, new CongestionHandlerImplV3(controler.getEvents(), (MutableScenario) controler.getScenario())));
-
 		controler.addOverridingModule(new OTFVisFileWriterModule());
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		controler.run();
@@ -404,17 +420,22 @@ public class AdvancedMarginalCongestionPricingTest {
 			}	
 		});
 		
-		TollHandler tollHandler = new TollHandler(controler.getScenario());
+		final TollHandler tollHandler = new TollHandler(controler.getScenario());
 		final TollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new TollDisutilityCalculatorFactory(tollHandler);
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
+				addControlerListenerBinding().toProvider(new Provider<ControlerListener>() {
+					@Inject Scenario scenario;
+					@Inject EventsManager eventsManager;
+					@Override
+					public ControlerListener get() {
+						return new AdvancedMarginalCongestionPricingContolerListener(scenario, tollHandler, new CongestionHandlerImplV3(eventsManager, (MutableScenario) scenario));
+					}
+				});
 				bindCarTravelDisutilityFactory().toInstance(tollDisutilityCalculatorFactory);
 			}
 		});
-
-		controler.addControlerListener(new AdvancedMarginalCongestionPricingContolerListener(controler.getScenario(), tollHandler, new CongestionHandlerImplV3(controler.getEvents(), (MutableScenario) controler.getScenario())));
-
 		controler.addOverridingModule(new OTFVisFileWriterModule());
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		controler.run();
@@ -461,17 +482,22 @@ public class AdvancedMarginalCongestionPricingTest {
 			}	
 		});
 		
-		TollHandler tollHandler = new TollHandler(controler.getScenario());
+		final TollHandler tollHandler = new TollHandler(controler.getScenario());
 		final TollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new TollDisutilityCalculatorFactory(tollHandler);
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
+				addControlerListenerBinding().toProvider(new Provider<ControlerListener>() {
+					@Inject Scenario scenario;
+					@Inject EventsManager eventsManager;
+					@Override
+					public ControlerListener get() {
+						return new AdvancedMarginalCongestionPricingContolerListener(scenario, tollHandler, new CongestionHandlerImplV3(eventsManager, (MutableScenario) scenario));
+					}
+				});
 				bindCarTravelDisutilityFactory().toInstance(tollDisutilityCalculatorFactory);
 			}
 		});
-
-		controler.addControlerListener(new AdvancedMarginalCongestionPricingContolerListener(controler.getScenario(), tollHandler, new CongestionHandlerImplV3(controler.getEvents(), (MutableScenario) controler.getScenario())));
-
 		controler.addOverridingModule(new OTFVisFileWriterModule());
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		controler.run();

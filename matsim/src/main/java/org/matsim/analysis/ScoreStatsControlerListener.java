@@ -21,11 +21,10 @@
 package org.matsim.analysis;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -70,7 +69,7 @@ public class ScoreStatsControlerListener implements StartupListener, IterationEn
     final private String fileName;
 
     private final boolean createPNG;
-    private final Config config;
+    private final ControlerConfigGroup controlerConfigGroup;
     private double[][] history = null;
     private boolean overflown = false;
     private int minIteration = 0;
@@ -78,22 +77,20 @@ public class ScoreStatsControlerListener implements StartupListener, IterationEn
     private final static Logger log = Logger.getLogger(ScoreStatsControlerListener.class);
 
     @Inject
-    ScoreStatsControlerListener(Scenario scenario, OutputDirectoryHierarchy controlerIO) {
-        this(scenario.getConfig(), scenario.getPopulation(), controlerIO.getOutputFilename(FILENAME_SCORESTATS), scenario.getConfig().controler().isCreateGraphs());
+    ScoreStatsControlerListener(ControlerConfigGroup controlerConfigGroup, Population population, OutputDirectoryHierarchy controlerIO) {
+        this(controlerConfigGroup, population, controlerIO.getOutputFilename(FILENAME_SCORESTATS), controlerConfigGroup.isCreateGraphs());
     }
 
     /**
      * Creates a new ScoreStats instance.
      *
      *
-     * @param config
-     * @param population
      * @param filename including the path, excluding the file type extension
      * @param createPNG true if in every iteration, the scorestats should be visualized in a graph and written to disk.
      * @throws UncheckedIOException
      */
-    public ScoreStatsControlerListener(Config config, final Population population, final String filename, final boolean createPNG) throws UncheckedIOException {
-        this.config = config;
+    public ScoreStatsControlerListener(ControlerConfigGroup controlerConfigGroup, final Population population, final String filename, final boolean createPNG) throws UncheckedIOException {
+        this.controlerConfigGroup = controlerConfigGroup;
         this.population = population;
         this.fileName = filename;
         this.createPNG = createPNG;
@@ -111,8 +108,8 @@ public class ScoreStatsControlerListener implements StartupListener, IterationEn
 
     @Override
     public void notifyStartup(final StartupEvent event) {
-        this.minIteration = config.controler().getFirstIteration();
-        int maxIter = config.controler().getLastIteration();
+        this.minIteration = controlerConfigGroup.getFirstIteration();
+        int maxIter = controlerConfigGroup.getLastIteration();
         int iterations = maxIter - this.minIteration;
         if (iterations > 5000) iterations = 5000; // limit the history size
         this.history = new double[4][iterations+1];

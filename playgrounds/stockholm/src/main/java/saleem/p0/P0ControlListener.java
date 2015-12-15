@@ -43,7 +43,7 @@ public class P0ControlListener implements StartupListener, IterationStartsListen
 //		writeInitialAbsolutePressureDifference();
 		handler.plotStats();
 		handler.plotAbsoultePressureDifference(iters, initialabsolutepressuredifference, avgabsolutepressuredifference);
-		handler.printDelayStats();
+		handler.AverageDelayOverLast20Iters();
 		// TODO Auto-generated method stub
 		
 	}
@@ -63,7 +63,7 @@ public class P0ControlListener implements StartupListener, IterationStartsListen
 		handler.plotStats();
 		handler.plotAbsolutePressures();
 		handler.plotAbsoultePressureDifference(iters, initialabsolutepressuredifference, avgabsolutepressuredifference);
-		handler.printDelayStats();
+//		handler.printDelayStats();
 		// TODO Auto-generated method stub
 		
 	}

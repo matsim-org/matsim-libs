@@ -19,7 +19,9 @@
 
 package org.matsim.core.replanning.modules;
 
-import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.config.groups.GlobalConfigGroup;
+import org.matsim.core.config.groups.PlansConfigGroup;
+import org.matsim.core.config.groups.TimeAllocationMutatorConfigGroup;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
@@ -30,17 +32,15 @@ import javax.inject.Provider;
 public class TimeAllocationMutatorPlanStrategyFactory implements
 		Provider<PlanStrategy> {
 
-    private Scenario scenario;
-
-    @Inject
-    protected TimeAllocationMutatorPlanStrategyFactory(Scenario scenario) {
-        this.scenario = scenario;
-    }
+	@Inject private GlobalConfigGroup globalConfigGroup;
+	@Inject private TimeAllocationMutatorConfigGroup timeAllocationMutatorConfigGroup;
+	@Inject private PlansConfigGroup plansConfigGroup;
+	@Inject private Provider<org.matsim.core.router.TripRouter> tripRouterProvider;
 
     @Override
 	public PlanStrategy get() {
 		PlanStrategyImpl strategy = new PlanStrategyImpl(new RandomPlanSelector());
-		TimeAllocationMutator tam = new TimeAllocationMutator(scenario.getConfig());
+		TimeAllocationMutator tam = new TimeAllocationMutator(tripRouterProvider, plansConfigGroup, timeAllocationMutatorConfigGroup, globalConfigGroup);
 		strategy.addStrategyModule(tam);
 		return strategy;
 	}

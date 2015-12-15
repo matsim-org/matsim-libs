@@ -62,7 +62,7 @@ public class CountsControlerListenerTest {
 	public void testUseVolumesOfIteration() {
         Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		CountsConfigGroup config = scenario.getConfig().counts();
-		CountsControlerListener ccl = new CountsControlerListener(scenario, null, null, null);
+		CountsControlerListener ccl = new CountsControlerListener(scenario.getConfig().counts(), scenario, null, null, null);
 		
 		// test defaults
 		Assert.assertEquals(10, config.getWriteCountsInterval());

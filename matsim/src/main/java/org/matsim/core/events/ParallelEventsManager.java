@@ -33,9 +33,12 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.Config;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.misc.Time;
+
+import javax.inject.Inject;
 
 /**
  * @author cdobler
@@ -86,7 +89,12 @@ public class ParallelEventsManager implements EventsManager {
 //	private final int eventsArraySize = 32768;	// syncOnTimeSteps = false
 //	private final int eventsArraySize = 512;	// syncOnTimeSteps = true
 	private final int eventsArraySize;
-	
+
+	@Inject
+	ParallelEventsManager(Config config) {
+		this(config.parallelEventHandling().getSynchronizeOnSimSteps() != null ? config.parallelEventHandling().getSynchronizeOnSimSteps() : true);
+	}
+
 	public ParallelEventsManager(final boolean syncOnTimeSteps) {
 		this(syncOnTimeSteps, true, -1);
 	}

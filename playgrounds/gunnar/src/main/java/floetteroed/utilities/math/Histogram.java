@@ -84,6 +84,16 @@ public class Histogram {
 		this.totalCount++;
 	}
 
+	// TODO NEW
+	public void makeNonZero() {
+		for (int i = 0; i < this.bins.length; i++) {
+			if (this.bins[i] == 0) {
+				this.bins[i]++;
+				this.totalCount++;
+			}
+		}
+	}
+	
 	// -------------------- READ ACCESS --------------------
 
 	public int binCnt() {
