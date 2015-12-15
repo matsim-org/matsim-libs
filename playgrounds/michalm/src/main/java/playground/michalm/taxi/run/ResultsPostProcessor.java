@@ -290,10 +290,15 @@ public class ResultsPostProcessor
         String subDirPrefix = "taxi_vehicles_";
 
         new ResultsPostProcessor(//
+//                "04000", //
+//                "04500", //
 //                "05000", //
+//                "05500", //
 //                "06000", //
+//                "06500", //
 //                "07000", //
-//                "08000", //
+//                "07500", //
+//                "08000" //
                 "09000", //
                 "10000", //
                 "11000", //
