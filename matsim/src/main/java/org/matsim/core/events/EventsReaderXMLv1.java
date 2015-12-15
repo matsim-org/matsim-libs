@@ -104,13 +104,44 @@ public class EventsReaderXMLv1 extends MatsimXmlParser {
 		double time = Double.parseDouble(atts.getValue("time"));
 		String eventType = atts.getValue("type");
 
+		// === material related to wait2link below here ===
 		if (LinkLeaveEvent.EVENT_TYPE.equals(eventType)) {
-			this.events.processEvent(new LinkLeaveEvent(time, Id.create(atts.getValue(LinkLeaveEvent.ATTRIBUTE_VEHICLE), Vehicle.class), 
-					Id.create(atts.getValue(LinkLeaveEvent.ATTRIBUTE_LINK), Link.class)));
+			this.events.processEvent(new LinkLeaveEvent(time, 
+					Id.create(atts.getValue(LinkLeaveEvent.ATTRIBUTE_VEHICLE), Vehicle.class), 
+					Id.create(atts.getValue(LinkLeaveEvent.ATTRIBUTE_LINK), Link.class)
+					// had driver id in previous version
+					));
 		} else if (LinkEnterEvent.EVENT_TYPE.equals(eventType)) {
-			this.events.processEvent(new LinkEnterEvent(time, Id.create(atts.getValue(LinkEnterEvent.ATTRIBUTE_VEHICLE), Vehicle.class), 
-					Id.create(atts.getValue(LinkEnterEvent.ATTRIBUTE_LINK), Link.class)));
-		} else if (ActivityEndEvent.EVENT_TYPE.equals(eventType)) {
+			this.events.processEvent(new LinkEnterEvent(time, 
+					Id.create(atts.getValue(LinkEnterEvent.ATTRIBUTE_VEHICLE), Vehicle.class), 
+					Id.create(atts.getValue(LinkEnterEvent.ATTRIBUTE_LINK), Link.class)
+					// had driver id in previous version
+					));
+		} else if (VehicleEntersTrafficEvent.EVENT_TYPE.equals(eventType) || "wait2link".equals(eventType)) {
+			this.events.processEvent(new VehicleEntersTrafficEvent(time, 
+					Id.create(atts.getValue(VehicleEntersTrafficEvent.ATTRIBUTE_DRIVER), Person.class), 
+					Id.create(atts.getValue(VehicleEntersTrafficEvent.ATTRIBUTE_LINK), Link.class), 
+					atts.getValue(VehicleEntersTrafficEvent.ATTRIBUTE_VEHICLE) == null ? null : Id.create(atts.getValue(VehicleEntersTrafficEvent.ATTRIBUTE_VEHICLE), Vehicle.class),
+							// (this could return the driver id as vehicle ide when the vehicle id is not present.  would allow to read in old events files.
+							// My intuition would be to combine this with versioning, i.e. when someone says "vehicle=null" in v2, then he/she
+							// actually means it; in v1, he/she means "vehicleId=driverId". kai, dec'15)
+					atts.getValue(VehicleEntersTrafficEvent.ATTRIBUTE_NETWORKMODE), 
+					1.0 // yyyyyy why does it make sense to not read from file? kai, dec'15
+					));
+		} else if (VehicleLeavesTrafficEvent.EVENT_TYPE.equals(eventType)) {
+			this.events.processEvent(new VehicleLeavesTrafficEvent(time, 
+					Id.create(atts.getValue(VehicleLeavesTrafficEvent.ATTRIBUTE_DRIVER), Person.class), 
+					Id.create(atts.getValue(VehicleLeavesTrafficEvent.ATTRIBUTE_LINK), Link.class), 
+					atts.getValue(VehicleLeavesTrafficEvent.ATTRIBUTE_VEHICLE) == null ? null : Id.create(atts.getValue(VehicleLeavesTrafficEvent.ATTRIBUTE_VEHICLE), Vehicle.class), 
+							// (this could return the driver id as vehicle ide when the vehicle id is not present.  would allow to read in old events files.
+							// My intuition would be to combine this with versioning, i.e. when someone says "vehicle=null" in v2, then he/she
+							// actually means it; in v1, he/she means "vehicleId=driverId". kai, dec'15)
+					atts.getValue(VehicleLeavesTrafficEvent.ATTRIBUTE_NETWORKMODE), 
+					1.0 // yyyyyy why does it make sense to not read from file? kai, dec'15
+					));
+		}
+		// === material related to wait2link above here
+		else if (ActivityEndEvent.EVENT_TYPE.equals(eventType)) {
 			this.events.processEvent(new ActivityEndEvent(
 					time, 
 					Id.create(atts.getValue(ActivityEndEvent.ATTRIBUTE_PERSON), Person.class), 
@@ -127,16 +158,12 @@ public class EventsReaderXMLv1 extends MatsimXmlParser {
 			String legMode = atts.getValue(PersonDepartureEvent.ATTRIBUTE_LEGMODE);
 			String mode = legMode == null ? null : legMode.intern();
 			this.events.processEvent(new PersonDepartureEvent(time, Id.create(atts.getValue(PersonDepartureEvent.ATTRIBUTE_PERSON), Person.class), Id.create(atts.getValue(PersonDepartureEvent.ATTRIBUTE_LINK), Link.class), mode));
-		} else if (VehicleEntersTrafficEvent.EVENT_TYPE.equals(eventType) || "wait2link".equals(eventType)) {
-			this.events.processEvent(new VehicleEntersTrafficEvent(time, Id.create(atts.getValue(VehicleEntersTrafficEvent.ATTRIBUTE_DRIVER), Person.class), Id.create(atts.getValue(VehicleEntersTrafficEvent.ATTRIBUTE_LINK), Link.class), atts.getValue(VehicleEntersTrafficEvent.ATTRIBUTE_VEHICLE) == null ? null : Id.create(atts.getValue(VehicleEntersTrafficEvent.ATTRIBUTE_VEHICLE), Vehicle.class), atts.getValue(VehicleEntersTrafficEvent.ATTRIBUTE_NETWORKMODE), 1.0));
 		} else if (PersonStuckEvent.EVENT_TYPE.equals(eventType)) {
 			String legMode = atts.getValue(PersonStuckEvent.ATTRIBUTE_LEGMODE);
 			String mode = legMode == null ? null : legMode.intern();
 			String linkIdString = atts.getValue(PersonStuckEvent.ATTRIBUTE_LINK);
 			Id<Link> linkId = linkIdString == null ? null : Id.create(linkIdString, Link.class); // linkId is optional
 			this.events.processEvent(new PersonStuckEvent(time, Id.create(atts.getValue(PersonStuckEvent.ATTRIBUTE_PERSON), Person.class), linkId, mode));
-		} else if (VehicleLeavesTrafficEvent.EVENT_TYPE.equals(eventType)) {
-			this.events.processEvent(new VehicleLeavesTrafficEvent(time, Id.create(atts.getValue(VehicleLeavesTrafficEvent.ATTRIBUTE_DRIVER), Person.class), Id.create(atts.getValue(VehicleLeavesTrafficEvent.ATTRIBUTE_LINK), Link.class), atts.getValue(VehicleLeavesTrafficEvent.ATTRIBUTE_VEHICLE) == null ? null : Id.create(atts.getValue(VehicleLeavesTrafficEvent.ATTRIBUTE_VEHICLE), Vehicle.class), atts.getValue(VehicleLeavesTrafficEvent.ATTRIBUTE_NETWORKMODE), 1.0));
 		} else if (VehicleAbortsEvent.EVENT_TYPE.equals(eventType)) {
 			String linkIdString = atts.getValue(VehicleAbortsEvent.ATTRIBUTE_LINK);
 			Id<Link> linkId = linkIdString == null ? null : Id.create(linkIdString, Link.class);
