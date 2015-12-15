@@ -19,7 +19,9 @@
 
 package org.matsim.core.utils.collections;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -31,7 +33,10 @@ import org.matsim.api.core.v01.Identifiable;
 
 /**
  * Memory-optimized map, backed by a simple array, for storing small number of {@link Identifiable}s.
- * Access using {@link #get(Object)} have a runtime of <code>O(n)</code>, so this map implementation
+ * Access using {@link #get(Object)} have a runtime complexity of <code>O( log( n ) )</code>,
+ * and {@link #put(Object)} has a runtime complexity of <code>O( n * log( n ) )</code>,
+ * because the backing array is resized every time to keep memory footprint low.
+ * Thus, this map implementation
  * should only be used to store a small number of elements in it. But for small number of elements,
  * this implementation performs very well, especially because of its very low memory overhead.
  * 
@@ -41,7 +46,20 @@ public class IdentifiableArrayMap<S, T extends Identifiable<S>> implements Map<I
 
 	@SuppressWarnings("unchecked")
 	private T[] data = (T[]) new Identifiable[0];
-	
+
+	/**
+	 * "smart" comparator that is able to compare Ids with Identifiables
+	 */
+	private static final Comparator COMPARATOR =
+			new Comparator() {
+				@Override
+				public int compare( Object o1, Object o2 ) {
+					final Id id1 = o1 instanceof Id ? (Id) o1 : ((Identifiable) o1).getId();
+					final Id id2 = o2 instanceof Id ? (Id) o2 : ((Identifiable) o2).getId();
+					return id1.compareTo( id2 );
+				}
+			};
+
 	@Override
 	public int size() {
 		return this.data.length;
@@ -54,33 +72,24 @@ public class IdentifiableArrayMap<S, T extends Identifiable<S>> implements Map<I
 
 	@Override
 	public boolean containsKey(final Object key) {
-		for (Identifiable<S> o : this.data) {
-			if (o.getId().equals(key)) {
-				return true;
-			}
-		}
-		return false;
+		if ( !(key instanceof Id) ) return false;
+		final int i = Arrays.binarySearch( data , key , COMPARATOR );
+		return i >= 0;
 	}
 
 	@Override
 	public boolean containsValue(final Object value) {
-		for (Identifiable<S> o : this.data) {
-			if (o.equals(value)) {
-				return true;
-			}
-		}
-		return false;
+		if ( !(value instanceof Identifiable) ) return false;
+		final int i = Arrays.binarySearch( data , value , COMPARATOR );
+		return i >= 0;
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public T get(final Object key) {
-		for (Identifiable<S> o : this.data) {
-			if (o.getId().equals(key)) {
-				return (T) o;
-			}
-		}
-		return null;
+		if ( !(key instanceof Id) ) return null;
+		final int i = Arrays.binarySearch( data , key , COMPARATOR );
+		return i < 0 ? null : data[ i ];
 	}
 
 	public T put(final T value) {
@@ -90,16 +99,21 @@ public class IdentifiableArrayMap<S, T extends Identifiable<S>> implements Map<I
 	@SuppressWarnings("unchecked")
 	@Override
 	public T put(final Id<S> key, final T value) {
-		for (int i = 0; i < this.data.length; i++) {
-			T old = this.data[i];
-			if (old.getId().equals(key)) {
-				this.data[i] = value;
-				return old;
-			}
+		assert value.getId().equals( key );
+		final int i = Arrays.binarySearch( data , value , COMPARATOR );
+
+		if ( i >= 0 ) {
+			T old = data[ i ];
+			data[ i ] = value;
+			return old;
 		}
+
+		assert i < 0;
+		final int insertion = -i - 1;
 		Identifiable<S>[] tmp = new Identifiable[this.data.length + 1];
-		System.arraycopy(this.data, 0, tmp, 0, this.data.length);
-		tmp[this.data.length] = value;
+		System.arraycopy(this.data, 0, tmp, 0, insertion);
+		System.arraycopy(this.data, insertion, tmp, insertion + 1, this.data.length - insertion);
+		tmp[ insertion ] = value;
 		this.data = (T[]) tmp;
 		return null;
 	}
@@ -107,23 +121,20 @@ public class IdentifiableArrayMap<S, T extends Identifiable<S>> implements Map<I
 	@SuppressWarnings("unchecked")
 	@Override
 	public T remove(final Object key) {
-		for (int i = 0; i < this.data.length; i++) {
-			T old = this.data[i];
-			if (old.getId().equals(key)) {
-				
-				Identifiable<S>[] tmp = new Identifiable[this.data.length - 1];
-				if (i > 0) {
-					System.arraycopy(this.data, 0, tmp, 0, i);
-				}
-				if (i + 1 < this.data.length) {
-					System.arraycopy(this.data, i + 1, tmp, i, this.data.length - 1 - i);
-				}
-				this.data = (T[]) tmp;
-				
-				return old;
-			}
+		final int i = Arrays.binarySearch( data , key , COMPARATOR );
+		if ( i < 0 ) return null;
+
+		T old = this.data[i];
+		Identifiable<S>[] tmp = new Identifiable[this.data.length - 1];
+		if (i > 0) {
+			System.arraycopy(this.data, 0, tmp, 0, i);
 		}
-		return null;
+		if (i + 1 < this.data.length) {
+			System.arraycopy(this.data, i + 1, tmp, i, this.data.length - 1 - i);
+		}
+		this.data = (T[]) tmp;
+
+		return old;
 	}
 
 	@Override
