@@ -27,6 +27,7 @@ import org.matsim.core.scoring.EventsToScore;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.functions.ActivityUtilityParameters;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.vehicles.Vehicle;
 
 import java.util.Arrays;
 
@@ -55,7 +56,8 @@ public class HeterogeneousCharyparNagelScoringFunctionForAnalysisFactoryTest {
 	}
 
 	private double calcScore(final Fixture f) {
-		HeterogeneousCharyparNagelScoringFunctionForAnalysisFactory heterogeneousCharyparNagelScoringFunctionForAnalysisFactory = new HeterogeneousCharyparNagelScoringFunctionForAnalysisFactory(f.config.planCalcScore(), f.scenario.getNetwork());
+		HeterogeneousCharyparNagelScoringFunctionForAnalysisFactory heterogeneousCharyparNagelScoringFunctionForAnalysisFactory 
+			= new HeterogeneousCharyparNagelScoringFunctionForAnalysisFactory(f.config.planCalcScore(), f.scenario.getNetwork());
 		heterogeneousCharyparNagelScoringFunctionForAnalysisFactory.setSimulationType("homo");
 		ScoringFunction testee = heterogeneousCharyparNagelScoringFunctionForAnalysisFactory.createNewScoringFunction(PopulationUtils.createPerson(Id.create("1", Person.class)));
 		for (PlanElement planElement : f.plan.getPlanElements()) {
@@ -115,19 +117,26 @@ public class HeterogeneousCharyparNagelScoringFunctionForAnalysisFactoryTest {
 	}
 
 	private void handleLeg(EventsToScore eventsToScore, Fixture f, Leg leg) {
-		eventsToScore.handleEvent(new PersonDepartureEvent(leg.getDepartureTime(), f.person.getId(), leg.getRoute().getStartLinkId(), leg.getMode()));
+		final double time = leg.getDepartureTime();
+		final Id<Person> driverId = f.person.getId();
+		final String networkMode = leg.getMode();
+		eventsToScore.handleEvent(new PersonDepartureEvent(time, driverId, leg.getRoute().getStartLinkId(), networkMode));
 		if (leg.getRoute() instanceof NetworkRoute) {
 			NetworkRoute networkRoute = (NetworkRoute) leg.getRoute();
-			eventsToScore.handleEvent(new LinkLeaveEvent(leg.getDepartureTime(), networkRoute.getVehicleId(), leg.getRoute().getStartLinkId()));
+			final Id<Vehicle> vehicleId = networkRoute.getVehicleId();
+			double relativePositionOnLink = 1.0 ;
+			eventsToScore.handleEvent( new VehicleEntersTrafficEvent(time, driverId, leg.getRoute().getStartLinkId(), vehicleId, networkMode, relativePositionOnLink));
+			eventsToScore.handleEvent(new LinkLeaveEvent(time, vehicleId, leg.getRoute().getStartLinkId()));
 			for (Id<Link> linkId : networkRoute.getLinkIds()) {
-				eventsToScore.handleEvent(new LinkEnterEvent(leg.getDepartureTime(), networkRoute.getVehicleId(), linkId));
-				eventsToScore.handleEvent(new LinkLeaveEvent(leg.getDepartureTime(), networkRoute.getVehicleId(), linkId));
+				eventsToScore.handleEvent(new LinkEnterEvent(time, vehicleId, linkId));
+				eventsToScore.handleEvent(new LinkLeaveEvent(time, vehicleId, linkId));
 			}
-			eventsToScore.handleEvent(new LinkEnterEvent(leg.getDepartureTime() + leg.getTravelTime(), null, leg.getRoute().getEndLinkId()));
+			eventsToScore.handleEvent(new LinkEnterEvent(time + leg.getTravelTime(), vehicleId, leg.getRoute().getEndLinkId()));
+			eventsToScore.handleEvent( new VehicleLeavesTrafficEvent(time + leg.getTravelTime() + 1, driverId, leg.getRoute().getEndLinkId(), vehicleId, networkMode, relativePositionOnLink));
 		} else {
-			eventsToScore.handleEvent(new TeleportationArrivalEvent(leg.getDepartureTime() + leg.getTravelTime(), f.person.getId(), leg.getRoute().getDistance()));
+			eventsToScore.handleEvent(new TeleportationArrivalEvent(time + leg.getTravelTime(), driverId, leg.getRoute().getDistance()));
 		}
-		eventsToScore.handleEvent(new PersonArrivalEvent(leg.getDepartureTime() + leg.getTravelTime(), f.person.getId(), leg.getRoute().getEndLinkId(), leg.getMode()));
+		eventsToScore.handleEvent(new PersonArrivalEvent(time + leg.getTravelTime(), driverId, leg.getRoute().getEndLinkId(), networkMode));
 	}
 
 	private void handleActivity(EventsToScore eventsToScore, Fixture f, Activity activity) {
@@ -763,6 +772,7 @@ public class HeterogeneousCharyparNagelScoringFunctionForAnalysisFactoryTest {
 			route1.setLinkIds(link1.getId(), Arrays.asList(link2.getId()), link3.getId());
 			route1.setTravelTime(firstLegTravelTime);
 			route1.setDistance(RouteUtils.calcDistance(route1, this.network));
+			route1.setVehicleId(Id.createVehicleId("dummyVehicle1"));
 			leg.setRoute(route1);
 
 			ActivityImpl secondActivity = this.plan.createAndAddActivity("w", link3.getId());
