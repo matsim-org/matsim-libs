@@ -1,9 +1,9 @@
 /* *********************************************************************** *
- * project: org.matsim.*
+ * project: org.matsim.*												   *
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,52 +16,40 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package tutorial.programming.ownMobsim;
 
-package tutorial.programming.example11PluggablePlanStrategyInCode;
-
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.scenario.ScenarioUtils;
 
-public class RunPluggablePlanStrategyInCodeExample {
-	private static final String STRATEGY_NAME = "doSomethingSpecial";
+/**
+ * @author nagel
+ *
+ */
+final class RunOwnMobsimExample {
 
-	public static void main(final String[] args) {
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
 
-		Config config;
-		if ( args.length==0 ) {
-			config = ConfigUtils.loadConfig("examples/equil/config.xml") ;
-		} else {
-			config = ConfigUtils.loadConfig(args[0]);
-		}
+		Config config = ConfigUtils.createConfig() ;
 		
-		//add a strategy to the config
-		StrategySettings stratSets = new StrategySettings();
-		stratSets.setStrategyName(STRATEGY_NAME);
-		stratSets.setWeight(0.1);
-		config.strategy().addStrategySettings(stratSets);
+		Scenario scenario = ScenarioUtils.createScenario(config) ;
 		
-		//let the output directory be overwritten
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		Controler controler = new Controler( scenario ) ;
 		
-		//only run one iteration
-		config.controler().setFirstIteration(0);
-		config.controler().setLastIteration(1);
-		
-		final Controler controler = new Controler(config);
-		
-		//add the binding strategy 
-		controler.addOverridingModule(new AbstractModule() {
+		controler.addOverridingModule(new AbstractModule(){
 			@Override
 			public void install() {
-				addPlanStrategyBinding(STRATEGY_NAME).toProvider(MyPlanStrategyFactory.class);
+				this.bindMobsim().to(MyMobsim.class) ;
 			}
 		});
+		
 		controler.run();
-
 	}
 
 }

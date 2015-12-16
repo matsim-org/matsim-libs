@@ -37,7 +37,7 @@ import org.matsim.core.api.internal.MatsimExtensionPoint;
  * More information can be found in the package's Javadoc.
  * <p/>
  * Example(s):<ul>
- * <li> {@link }
+ * <li> {@link RunObjectAttributesExample}
  * </ul>
  * @author mrieser
  */
