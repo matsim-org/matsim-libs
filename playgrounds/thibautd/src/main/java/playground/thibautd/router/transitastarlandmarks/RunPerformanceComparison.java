@@ -29,6 +29,7 @@ import org.matsim.facilities.ActivityFacility;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterImpl;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import playground.ivt.utils.ConcurrentStopWatch;
 
 import java.util.ArrayList;
@@ -39,11 +40,17 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Compares performance of transit routing with and without A Star.
- *
+ * <br/>
  * Improvement seems to depend on the transit schedule. For C. Dobler's full Switzerland (very heavyweight, lots of transfer links),
  * A Star performs worse. For P. Bösch full Switzerland (somehow much lighter), A Star is 25% faster.
- *
- * More details for P. Bösch full switzerland:
+ * <br/>
+ * More details for P. Bösch full switzerland for 1000 random ODs:
+ * <ul>
+ *     <li>overdo 1, 16 landmarks: 25% faster</li>
+ *     <li>overdo 1.25, 16 landmarks:  32% faster</li>
+ *     <li>overdo 1, 32 landmarks:  faster</li>
+ *     <li>overdo 1.25, 32 landmarks:  faster</li>
+ * </ul>
  *
  * @author thibautd
  */
@@ -59,20 +66,20 @@ public class RunPerformanceComparison {
 		final TransitRouterAStar testee = new TransitRouterAStar( config , sc.getTransitSchedule() );
 		final TransitRouter reference = new TransitRouterImpl( new TransitRouterConfig( config ) , sc.getTransitSchedule() );
 
-		final List<Id<ActivityFacility>> facilityIds = new ArrayList<>( sc.getActivityFacilities().getFacilities().keySet() );
+		final List<Id<TransitStopFacility>> facilityIds = new ArrayList<>( sc.getTransitSchedule().getFacilities().keySet() );
 		Collections.sort( facilityIds );
 
 		final ConcurrentStopWatch<Algo> stopWatch = new ConcurrentStopWatch<>( Algo.class );
 		final Random random = new Random( 20151210 );
 		final Counter counter = new Counter( "Compute route for random case # " );
 		for ( int i = 0; i < N_TRIES; i++ ) {
-			final ActivityFacility orign =
-					sc.getActivityFacilities().getFacilities().get(
+			final TransitStopFacility orign =
+					sc.getTransitSchedule().getFacilities().get(
 							facilityIds.get(
 									random.nextInt( facilityIds.size() ) ) );
 
-			final ActivityFacility destination =
-					sc.getActivityFacilities().getFacilities().get(
+			final TransitStopFacility destination =
+					sc.getTransitSchedule().getFacilities().get(
 							facilityIds.get(
 									random.nextInt( facilityIds.size() ) ) );
 
