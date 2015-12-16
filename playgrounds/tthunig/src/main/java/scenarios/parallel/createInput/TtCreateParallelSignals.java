@@ -58,7 +58,6 @@ public final class TtCreateParallelSignals {
     private Scenario scenario;
 
     private Map<Id<Link>, List<Id<Link>>> possibleSignalMoves = new HashMap<>();
-//    private Map<String, Boolean> signalBelongsToSecondODPair = new HashMap<>();
     private List<Id<SignalGroup>> signalGroupsFirstODPair = new ArrayList<>();
     
     public TtCreateParallelSignals(Scenario scenario) {
@@ -151,47 +150,7 @@ public final class TtCreateParallelSignals {
                 new ArrayList<>(Collections.singletonList(Id.createLinkId("8_5"))));
     }
 
-    private void prepareSignalControlInfo() {
-
-//        signalBelongsToSecondODPair.put("signal1_2.2_3", false);
-//        signalBelongsToSecondODPair.put("signal1_2.2_7", false);
-//        signalBelongsToSecondODPair.put("signal3_2.2_1", false);
-//        signalBelongsToSecondODPair.put("signal7_2.2_1", false);
-//
-//        signalBelongsToSecondODPair.put("signal9_10.10_3", true);
-//        signalBelongsToSecondODPair.put("signal9_10.10_4", true);
-//        signalBelongsToSecondODPair.put("signal3_10.10_9", true);
-//        signalBelongsToSecondODPair.put("signal4_10.10_9", true);
-//
-//        signalBelongsToSecondODPair.put("signal6_5.5_4", false);
-//        signalBelongsToSecondODPair.put("signal6_5.5_8", false);
-//        signalBelongsToSecondODPair.put("signal4_5.5_6", false);
-//        signalBelongsToSecondODPair.put("signal8_5.5_6", false);
-//
-//        signalBelongsToSecondODPair.put("signal12_11.11_7", true);
-//        signalBelongsToSecondODPair.put("signal12_11.11_8", true);
-//        signalBelongsToSecondODPair.put("signal7_11.11_12", true);
-//        signalBelongsToSecondODPair.put("signal8_11.11_12", true);
-//
-//        signalBelongsToSecondODPair.put("signal10_3.3_7", true);
-//        signalBelongsToSecondODPair.put("signal7_3.3_10", true);
-//        signalBelongsToSecondODPair.put("signal2_3.3_4", true);
-//        signalBelongsToSecondODPair.put("signal4_3.3_2", true);
-//
-//        signalBelongsToSecondODPair.put("signal3_7.7_11", true);
-//        signalBelongsToSecondODPair.put("signal11_7.7_3", true);
-//        signalBelongsToSecondODPair.put("signal2_7.7_8", true);
-//        signalBelongsToSecondODPair.put("signal8_7.7_2", true);
-//
-//        signalBelongsToSecondODPair.put("signal7_8.8_5", false);
-//        signalBelongsToSecondODPair.put("signal5_8.8_7", false);
-//        signalBelongsToSecondODPair.put("signal4_8.8_11", false);
-//        signalBelongsToSecondODPair.put("signal11_8.8_4", false);
-//
-//        signalBelongsToSecondODPair.put("signal8_4.4_10", false);
-//        signalBelongsToSecondODPair.put("signal10_4.4_8", false);
-//        signalBelongsToSecondODPair.put("signal3_4.4_5", false);
-//        signalBelongsToSecondODPair.put("signal5_4.4_3", false);
+    private void prepareSignalControlInfo() {    	
     	
     	signalGroupsFirstODPair.add(Id.create("signal1_2.2_3", SignalGroup.class));
     	signalGroupsFirstODPair.add(Id.create("signal1_2.2_7", SignalGroup.class));
