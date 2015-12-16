@@ -22,10 +22,8 @@
 
 package org.matsim.contrib.freight.controler;
 
-import com.google.inject.Provider;
 import com.google.inject.Provides;
 import org.matsim.contrib.freight.CarrierConfig;
-import org.matsim.contrib.freight.carrier.CarrierPlanXmlReaderV2;
 import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.mobsim.CarrierAgentTracker;
 import org.matsim.contrib.freight.mobsim.FreightQSimFactory;
@@ -42,21 +40,16 @@ public class CarrierModule extends AbstractModule {
     private CarrierPlanStrategyManagerFactory strategyManagerFactory;
     private CarrierScoringFunctionFactory scoringFunctionFactory;
 
+    /**
+     * CarrierPlanStrategyManagerFactory and CarrierScoringFunctionFactory must me bound separately
+     * when this constructor is used.
+     */
+    public CarrierModule(Carriers carriers) {
+        this.carriers = carriers;
+    }
 
     public CarrierModule(Carriers carriers, CarrierPlanStrategyManagerFactory strategyManagerFactory, CarrierScoringFunctionFactory scoringFunctionFactory) {
         this.carriers = carriers;
-        this.strategyManagerFactory = strategyManagerFactory;
-        this.scoringFunctionFactory = scoringFunctionFactory;
-    }
-
-    CarrierModule(String carrierPlansFilename) {
-        this.carriers = new Carriers();
-        new CarrierPlanXmlReaderV2(carriers).read(carrierPlansFilename);
-    }
-
-    public CarrierModule(String carrierPlansFilename, CarrierPlanStrategyManagerFactory strategyManagerFactory, CarrierScoringFunctionFactory scoringFunctionFactory) {
-        this.carriers = new Carriers();
-        new CarrierPlanXmlReaderV2(carriers).read(carrierPlansFilename);
         this.strategyManagerFactory = strategyManagerFactory;
         this.scoringFunctionFactory = scoringFunctionFactory;
     }
