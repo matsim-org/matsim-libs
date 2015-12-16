@@ -36,9 +36,14 @@ public class LinkEnterEvent extends Event {
 	private final Id<Link> linkId;
 	private final Id<Vehicle> vehicleId;
 
+	final static String missingVehicleIdMessage = "vehicleId=null in LinkEnter/LeaveEvent; this would cause problems downstream thus we are not accepting it";
+
 	public LinkEnterEvent(final double time, final Id<Vehicle> vehicleId, final Id<Link> linkId) {
 		super(time);
 		this.linkId = linkId;
+		if ( vehicleId==null ) {
+			throw new RuntimeException( missingVehicleIdMessage ) ;
+		}
 		this.vehicleId = vehicleId;
 	}
 
@@ -51,10 +56,10 @@ public class LinkEnterEvent extends Event {
 	 * Please use getVehicleId() instead. 
 	 * Vehicle-driver relations can be made by Wait2Link and VehicleLeavesTraffic Events.
 	 */
-//	@Deprecated
-//	Id<Person> getDriverId() {
-//		return null;
-//	}	
+	@Deprecated
+	public Id<Person> getDriverId() {
+		throw new RuntimeException( LinkLeaveEvent.missingDriverIdMessage ) ;
+	}	
 
 	public Id<Link> getLinkId() {
 		return this.linkId;

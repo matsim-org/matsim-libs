@@ -309,20 +309,20 @@ public class XferEventsFromLoResToHiResNetwork{
 
 				double availableTime = arrival.getTime() - departure.getTime();
 				double lastTime = departure.getTime() + 1;
-				Event linkLeave = new LinkLeaveEvent(lastTime += 0.001, driverId, fromLinkId, vehId);
+				Event linkLeave = new LinkLeaveEvent(lastTime += 0.001, vehId, fromLinkId);
 				Event linkEnter = null;
 
 				hiResEvents.addLast(linkLeave);
 				List<Id<Link>> linkIds = subRoute.getLinkIds();
 				for (int i = 0; i < linkIds.size(); i++) {
-					linkEnter = new LinkEnterEvent(lastTime += 0.001, driverId, linkIds.get(i), vehId);
+					linkEnter = new LinkEnterEvent(lastTime += 0.001, vehId, linkIds.get(i));
 					linkLeave = new LinkLeaveEvent(
-							lastTime += (availableTime * linkTravelTimes.get(i) / totalExpectedtravelTime), driverId,
-							linkIds.get(i), vehId);
+							lastTime += (availableTime * linkTravelTimes.get(i) / totalExpectedtravelTime), vehId,
+							linkIds.get(i));
 					hiResEvents.addLast(linkEnter);
 					hiResEvents.addLast(linkLeave);
 				}
-				linkEnter = new LinkEnterEvent(lastTime += 0.001, driverId, toLinkId, vehId);
+				linkEnter = new LinkEnterEvent(lastTime += 0.001, vehId, toLinkId);
 				hiResEvents.addLast(linkEnter);
 				if(eventIterator.hasNext()){
 					departure = (VehicleDepartsAtFacilityEvent) eventIterator.next();					

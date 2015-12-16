@@ -160,8 +160,7 @@ class TimeRepairingEventsManager implements EventsManager {
 				this.prevTime = event.getTime();
 			} else {
 				event = new LinkLeaveEvent(this.prevTime,
-						originalEvent.getDriverId(), originalEvent.getLinkId(),
-						originalEvent.getVehicleId());
+						originalEvent.getVehicleId(), originalEvent.getLinkId());
 			}
 
 		} else if (event instanceof LinkEnterEvent) {
@@ -177,8 +176,7 @@ class TimeRepairingEventsManager implements EventsManager {
 				this.prevTime = event.getTime();
 			} else {
 				event = new LinkEnterEvent(this.prevTime,
-						originalEvent.getDriverId(), originalEvent.getLinkId(),
-						originalEvent.getVehicleId());
+						originalEvent.getVehicleId(), originalEvent.getLinkId());
 			}
 
 		} else if (event instanceof VehicleLeavesTrafficEvent) {

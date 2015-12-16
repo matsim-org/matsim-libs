@@ -80,7 +80,7 @@ public class PassengerTracker implements
 
 	@Override
 	public void handleEvent( VehicleLeavesTrafficEvent event ) {
-		drivers.remove( event.getVehicleId(), event.getPersonId() );
+		drivers.remove( event.getVehicleId() );
 	}
 
 	public Set<Id<Person>> getPassengers( final Id<Vehicle> v ) {

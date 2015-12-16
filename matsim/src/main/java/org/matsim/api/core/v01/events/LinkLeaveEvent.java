@@ -36,9 +36,14 @@ public class LinkLeaveEvent extends Event {
 	private final Id<Link> linkId;
 	private final Id<Vehicle> vehicleId;
 
+	final static String missingDriverIdMessage = "driver (or person) id does no longer exist in LinkEnter/LeaveEvent; use vehicle ID instead.  See Vehicle2DriverEventHandler for an approach to reconstruct the driver id.";
+
 	public LinkLeaveEvent(final double time, final Id<Vehicle> vehicleId, final Id<Link> linkId) {
 		super(time);
 		this.linkId = linkId;
+		if ( vehicleId==null ) {
+			throw new RuntimeException( LinkEnterEvent.missingVehicleIdMessage ) ;
+		}
 		this.vehicleId = vehicleId;
 	}
 
@@ -51,10 +56,10 @@ public class LinkLeaveEvent extends Event {
 	 * Please use getVehicleId() instead. 
 	 * Vehicle-driver relations can be made by Wait2Link (now: VehicleEntersTraffic) and VehicleLeavesTraffic Events.
 	 */
-//	@Deprecated
-//	Id<Person> getDriverId() {
-//		return null;
-//	}
+	@Deprecated
+	public Id<Person> getDriverId() {
+		throw new RuntimeException(missingDriverIdMessage ) ;
+	}
 
 	public Id<Link> getLinkId() {
 		return this.linkId;

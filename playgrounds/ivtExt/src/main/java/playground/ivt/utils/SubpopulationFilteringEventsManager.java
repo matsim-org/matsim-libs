@@ -137,13 +137,15 @@ public class SubpopulationFilteringEventsManager implements EventsManager {
 		}
 
 		if ( event instanceof LaneEnterEvent ) {
-			final Id id = ((LaneEnterEvent) event).getPersonId();
-			if ( !filter.accept( id ) ) return;
+//			final Id id = ((LaneEnterEvent) event).getPersonId();
+			throw new RuntimeException("person id does not longer exist in lane/link enter/leave events.  vehicle id exists instead; pls chk if/how this would work for you as an alternative") ;
+//			if ( !filter.accept( id ) ) return;
 		}
 		
 		if ( event instanceof LaneLeaveEvent ) {
-			final Id id = ((LaneLeaveEvent) event).getPersonId();
-			if ( !filter.accept( id ) ) return;
+//			final Id id = ((LaneLeaveEvent) event).getPersonId();
+			throw new RuntimeException("person id does not longer exist in lane/link enter/leave events.  vehicle id exists instead; pls chk if/how this would work for you as an alternative") ;
+//			if ( !filter.accept( id ) ) return;
 		}
 		
 		if ( event instanceof LinkEnterEvent ) {

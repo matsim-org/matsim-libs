@@ -940,7 +940,7 @@ public class PTQLink implements NetsimLink {
 		this.usedBufferStorageCapacity = this.usedBufferStorageCapacity - veh.getSizeInEquivalents();
 		this.bufferLastMovedTime = now; // just in case there is another vehicle in the buffer that is now the new front-most
 		this.linkEnterTimeMap.remove(veh);
-		this.network.simEngine.getMobsim().getEventsManager().processEvent(new LinkLeaveEvent(now, veh.getDriver().getId(), this.getLink().getId(), veh.getId()));
+		this.network.simEngine.getMobsim().getEventsManager().processEvent(new LinkLeaveEvent(now, veh.getId(), this.getLink().getId()));
 		return veh;
 	}
 
@@ -1145,8 +1145,8 @@ public class PTQLink implements NetsimLink {
 		veh.setCurrentLink(this.getLink());
 		this.vehQueue.add(veh);
 		this.network.simEngine.getMobsim().getEventsManager().processEvent(
-				new LinkEnterEvent(now, veh.getDriver().getId(),
-						this.getLink().getId(), veh.getId()));
+				new LinkEnterEvent(now, veh.getId(),
+						this.getLink().getId()));
 		if ( HOLES ) {
 			holes.poll();
 		}

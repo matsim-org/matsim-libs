@@ -94,7 +94,7 @@ public class EventsEnricher implements BasicEventHandler {
 			vehId = event.getDriverId();
 		}
 		
-		LinkLeaveEvent newEvent = new LinkLeaveEvent(event.getTime(), event.getDriverId(), event.getLinkId(), vehId);
+		LinkLeaveEvent newEvent = new LinkLeaveEvent(event.getTime(), vehId, event.getLinkId());
 		this.eventsWriter.handleEvent(newEvent);
 	}
 
@@ -104,7 +104,7 @@ public class EventsEnricher implements BasicEventHandler {
 			// private car
 			vehId = event.getDriverId();
 		}
-		LinkEnterEvent newEvent = new LinkEnterEvent(event.getTime(), event.getDriverId(), event.getLinkId(), vehId);
+		LinkEnterEvent newEvent = new LinkEnterEvent(event.getTime(), vehId, event.getLinkId());
 		this.eventsWriter.handleEvent(newEvent);
 	}
 

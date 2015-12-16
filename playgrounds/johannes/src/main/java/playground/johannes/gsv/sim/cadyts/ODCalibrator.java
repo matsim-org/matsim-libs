@@ -215,7 +215,7 @@ public class ODCalibrator implements PersonDepartureEventHandler, PersonArrivalE
 					Link vLink = NetworkUtils.getConnectingLink(vStart, vEnd);
 					if (vLink != null) {
 						p2p.handleEvent(new PersonDepartureEvent(event.getTime(), event.getPersonId(), vLink.getId(), event.getLegMode()));
-						p2p.handleEvent(new LinkLeaveEvent(event.getTime(), event.getPersonId(), vLink.getId(), null));
+						p2p.handleEvent(new LinkLeaveEvent(event.getTime(), null, vLink.getId()));
 						p2p.handleEvent(new PersonArrivalEvent(event.getTime(), event.getPersonId(), vLink.getId(), event.getLegMode()));
 
 						adaptor.addVirtualCount(vLink);

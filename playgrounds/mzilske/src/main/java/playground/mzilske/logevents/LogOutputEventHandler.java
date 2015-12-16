@@ -114,11 +114,11 @@ public class LogOutputEventHandler implements LinkEnterEventHandler, LinkLeaveEv
 	}
 
 	public void handleEvent(LaneEnterEvent event) {
-		log.info("LaneEnterEvent at " + Time.writeTime(event.getTime()) + " person id " + event.getPersonId() + " lane id " + event.getLaneId() + " link id " + event.getLinkId());
+		log.info("LaneEnterEvent at " + Time.writeTime(event.getTime()) + " vehicle id " + event.getVehicleId() + " lane id " + event.getLaneId() + " link id " + event.getLinkId());
 	}
 
 	public void handleEvent(LaneLeaveEvent event) {
-		log.info("LaneLeaveEvent at " + Time.writeTime(event.getTime()) + " person id " + event.getPersonId() + " lane id " + event.getLaneId() + " link id " + event.getLinkId());
+		log.info("LaneLeaveEvent at " + Time.writeTime(event.getTime()) + " vehicle id " + event.getVehicleId() + " lane id " + event.getLaneId() + " link id " + event.getLinkId());
 	}
 
 	public void handleEvent(SignalGroupStateChangedEvent event) {
