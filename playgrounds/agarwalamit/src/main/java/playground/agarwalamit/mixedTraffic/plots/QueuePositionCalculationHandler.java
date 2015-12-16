@@ -18,11 +18,10 @@
  * *********************************************************************** */
 package playground.agarwalamit.mixedTraffic.plots;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Queue;
+import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
@@ -36,7 +35,6 @@ import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.mixedTraffic.MixedTrafficVehiclesUtils;
 import playground.agarwalamit.mixedTraffic.plots.LinkPersonInfoContainer.PersonPositionChecker;
@@ -48,9 +46,8 @@ public class QueuePositionCalculationHandler implements LinkLeaveEventHandler, L
 
 	private static final Logger LOG = Logger.getLogger(QueuePositionCalculationHandler.class);
 	private final Map<Id<Link>,LinkPersonInfoContainer> linkid2Container = new HashMap<>();
-	private BufferedWriter writer1 ;
-	private BufferedWriter writer2 ;
-
+	private final Map<Id<Person>,SortedMap<Double,String>> person2startTime2data = new HashMap<>();
+	
 	private final Map<Id<Person>, String> personId2LegMode = new TreeMap<Id<Person>, String>();
 	private final Scenario scenario;
 	private double lastEventTimeStep = 0;
@@ -116,8 +113,6 @@ public class QueuePositionCalculationHandler implements LinkLeaveEventHandler, L
 
 		PersonPositionChecker checker = container.getOrCreatePersonPositionChecker(personId);
 
-		writeString(writer1, getPersonEnterLeaveInfo(checker) );
-
 		updateVehicleOnLinkAndFillToQueue(event.getTime());
 		container.getAgentsOnLink().remove(personId);
 
@@ -130,50 +125,27 @@ public class QueuePositionCalculationHandler implements LinkLeaveEventHandler, L
 				qStartDistFromFNode=initialPos + checker.getLink().getLength();
 			}
 
-			writeString(writer2,personId+"\t"+	
-					linkId+"\t"+
-					checker.getEnteredPersonInfo().getLinkEnterTime()+"\t"+
-					initialPos+"\t"+
-					checker.getQueuingTime()+"\t"+
-					qStartDistFromFNode +"\t"+
-					checker.getEnteredPersonInfo().getLegMode()+"\n"
-					);
-
-			writeString(writer2,personId+"\t"+	
-					linkId+"\t"+
-					checker.getQueuingTime()+"\t"+
-					qStartDistFromFNode+"\t"+
-					checker.getLeftPersonInfo().getLinkLeaveTime()+"\t"+
-					(1 + Double.valueOf(checker.getLink().getId().toString() ) )*checker.getLink().getLength() + "\t"+
-					checker.getEnteredPersonInfo().getLegMode()+"\n"
-					);
-
+			if(person2startTime2data.containsKey(personId)){
+				SortedMap<Double,String> time2String = person2startTime2data.get(personId);
+				time2String.put(checker.getEnteredPersonInfo().getLinkEnterTime(), linkId+"\t"+initialPos+"\t"+
+						checker.getQueuingTime() + "\t" + qStartDistFromFNode +"\t" + checker.getEnteredPersonInfo().getLegMode());
+				time2String.put(checker.getQueuingTime(), linkId+"\t"+qStartDistFromFNode+"\t"+
+						checker.getLeftPersonInfo().getLinkLeaveTime() + "\t" + (1 + Double.valueOf(checker.getLink().getId().toString() ) )*checker.getLink().getLength() +"\t" + checker.getEnteredPersonInfo().getLegMode());
+			} else {
+				SortedMap<Double,String> time2String = new TreeMap<>();
+				time2String.put(checker.getEnteredPersonInfo().getLinkEnterTime(), linkId+"\t"+initialPos+"\t"+
+						checker.getQueuingTime() + "\t" + qStartDistFromFNode +"\t" + checker.getEnteredPersonInfo().getLegMode());
+				time2String.put(checker.getQueuingTime(), linkId+"\t"+qStartDistFromFNode+"\t"+
+						checker.getLeftPersonInfo().getLinkLeaveTime() + "\t" + (1 + Double.valueOf(checker.getLink().getId().toString() ) )*checker.getLink().getLength() +"\t" + checker.getEnteredPersonInfo().getLegMode());
+				person2startTime2data.put(personId, time2String);
+			}
+			
 			container.getAgentsInQueue().remove(personId);
 			double newAvailableSpace = container.getAvailableLinkSpace() + MixedTrafficVehiclesUtils.getCellSize(leavingPersonInfo.getLegMode());
 			container.setAvailableLinkSpace(newAvailableSpace);
 
-		} else {//write info for non queuing
-			writeString(writer2, getPersonEnterLeaveInfo(checker) );
-		}
+		} 
 		container.getPerson2PersonPositionChecker().remove(personId);
-	}
-
-	private String getPersonEnterLeaveInfo(PersonPositionChecker checker) {
-		return 	checker.getPersonId()+"\t"+
-				checker.getLink().getId()+"\t"+
-				checker.getEnteredPersonInfo().getLinkEnterTime()+"\t"+
-				Double.valueOf(checker.getLink().getId().toString())*checker.getLink().getLength()+"\t"+
-				checker.getLeftPersonInfo().getLinkLeaveTime()+"\t"+
-				(1+Double.valueOf(checker.getLink().getId().toString()))*checker.getLink().getLength()+"\t"+
-				checker.getEnteredPersonInfo().getLegMode()+"\n";
-	}
-
-	private void writeString (BufferedWriter writer, String str){
-		try {
-			writer.write(str);
-		} catch (Exception e) {
-			throw new RuntimeException("Data is not written. Reason -"+ e);
-		}
 	}
 
 	private void updateVehicleOnLinkAndFillToQueue(final double now) {
@@ -198,24 +170,10 @@ public class QueuePositionCalculationHandler implements LinkLeaveEventHandler, L
 		this.lastEventTimeStep=now;
 	}
 
-	public void openWriter(final String outputFolder){
-		this.writer1 = IOUtils.getBufferedWriter(outputFolder+"rDataPersonLinkEnterLeave.txt");
-		this.writer2 = IOUtils.getBufferedWriter(outputFolder+"rDataPersonInQueueData6.txt");
-		try {
-			this.writer1.write("personId \t linkId \t linkEnterTimeX1 \t initialPositionY1 \t linkLeaveTimeX2 \t endPositionY2 \t travelMode \n");
-			this.writer2.write("personId \t linkId \t startTimeX1 \t initialPositionY1 \t endTimeX2 \t endPositionY2 \t travelMode \n");
-		} catch (Exception e) {
-			throw new RuntimeException("Data is not written. Reason -"+ e);
-		}
-
-	}
-
-	public void closeWriter(){
-		try {
-			this.writer1.close();
-			this.writer2.close();
-		} catch (IOException e) {
-			throw new RuntimeException("Data is not written. Reason -"+ e);
-		}
+	/**
+	 * @return the person2startTime2 person position info
+	 */
+	public Map<Id<Person>, SortedMap<Double, String>> getPerson2StartTime2PersonPosition() {
+		return person2startTime2data;
 	}
 }
