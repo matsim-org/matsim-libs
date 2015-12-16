@@ -24,6 +24,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
@@ -44,7 +45,7 @@ import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.testcases.MatsimTestCase;
 
 public class ScenarioGeneratorTest extends MatsimTestCase {
-	
+	@Ignore
 	@Test
 	public void testScenarioGenerator() {
 		
