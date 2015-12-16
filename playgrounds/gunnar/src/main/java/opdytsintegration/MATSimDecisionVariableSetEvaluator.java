@@ -15,6 +15,7 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 
+import floetteroed.opdyts.DecisionVariable;
 import floetteroed.opdyts.trajectorysampling.TrajectorySampler;
 import floetteroed.utilities.math.Vector;
 
@@ -24,14 +25,14 @@ import floetteroed.utilities.math.Vector;
  * @author Gunnar Flötteröd
  *
  */
-public class MATSimDecisionVariableSetEvaluator
+public class MATSimDecisionVariableSetEvaluator<U extends DecisionVariable>
 		implements StartupListener, IterationEndsListener, ShutdownListener {
 
 	// -------------------- MEMBERS --------------------
 
-	private final TrajectorySampler trajectorySampler;
+	private final TrajectorySampler<U> trajectorySampler;
 
-	private final MATSimStateFactory stateFactory;
+	private final MATSimStateFactory<U> stateFactory;
 
 	private int binSize_s = 3600;
 
@@ -59,17 +60,8 @@ public class MATSimDecisionVariableSetEvaluator
 	 * @see MATSimStateFactory
 	 */
 	public MATSimDecisionVariableSetEvaluator(
-			final TrajectorySampler trajectorySampler,
-			// final Set<? extends DecisionVariable> decisionVariables,
-			// final ObjectBasedObjectiveFunction objectiveFunction,
-			// final ConvergenceCriterion convergenceCriterion,
-			final MATSimStateFactory stateFactory
-	// final double equilibriumGapWeight, final double uniformityGapWeight,
-	// final Random rnd
-	) {
-		// this.evaluator = new TrajectorySampler(
-		// decisionVariables, objectiveFunction, convergenceCriterion,
-		// rnd, equilibriumGapWeight, uniformityGapWeight);
+			final TrajectorySampler<U> trajectorySampler,
+			final MATSimStateFactory<U> stateFactory) {
 		this.trajectorySampler = trajectorySampler;
 		this.stateFactory = stateFactory;
 	}
@@ -175,7 +167,7 @@ public class MATSimDecisionVariableSetEvaluator
 		 * MICHAEL: Ich erzeuge hier meinen eigenen VolumesAnalyzer, weil ich
 		 * Kontrolle über die bin size und die end time brauche. Weiss nicht, ob
 		 * sich das verlässlich während der MATSim-Initialisierung machen lässt
-		 * -- und vielleicht will man hier ohnehin davon unabhängig sein.
+		 * -- und vielleicht will man hier ohnehin davon unabhängig sein. Gunnar
 		 */
 		this.volumesAnalyzer = new VolumesAnalyzer(this.binSize_s,
 				this.binSize_s * (this.startBin + this.binCnt), event
@@ -224,43 +216,44 @@ public class MATSimDecisionVariableSetEvaluator
 		}
 
 		{
-			final MATSimState newState = createState(event.getControler().getScenario().getPopulation());
+			final MATSimState newState = createState(event.getControler()
+					.getScenario().getPopulation());
 			this.trajectorySampler.afterIteration(newState);
 		}
 	}
 
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {
-		this.finalState = createState(event.getControler().getScenario().getPopulation());
+		this.finalState = createState(event.getControler().getScenario()
+				.getPopulation());
 	}
 
 	private MATSimState createState(Population population) {
-    /*
-     * (3) Create a new summary state vector, either by averaging or by
-     * concatenating past instantaneous state vectors.
-     */
+		/*
+		 * (3) Create a new summary state vector, either by averaging or by
+		 * concatenating past instantaneous state vectors.
+		 */
 		final Vector newSummaryStateVector;
 		if (this.averageMemory) {
-            // average state vectors
-            newSummaryStateVector = this.stateList.getFirst().copy();
-            for (int i = 1; i < this.memory; i++) {
-                newSummaryStateVector.add(this.stateList.get(i));
-            }
-            newSummaryStateVector.mult(1.0 / this.memory);
-        } else {
-            // concatenate state vectors
-            newSummaryStateVector = Vector.concat(this.stateList);
-        }
+			// average state vectors
+			newSummaryStateVector = this.stateList.getFirst().copy();
+			for (int i = 1; i < this.memory; i++) {
+				newSummaryStateVector.add(this.stateList.get(i));
+			}
+			newSummaryStateVector.mult(1.0 / this.memory);
+		} else {
+			// concatenate state vectors
+			newSummaryStateVector = Vector.concat(this.stateList);
+		}
 
-			/*
-			 * (4) Extract the current MATSim state and inform the evaluator
-			 * that one iteration has been completed. The evaluator takes care
-			 * of selecting a new trial decision variable and of implementing
-			 * that decision variable in the simulation.
-			 */
-		return this.stateFactory.newState(population,
-                newSummaryStateVector,
-                this.trajectorySampler.getCurrentDecisionVariable());
+		/*
+		 * (4) Extract the current MATSim state and inform the evaluator that
+		 * one iteration has been completed. The evaluator takes care of
+		 * selecting a new trial decision variable and of implementing that
+		 * decision variable in the simulation.
+		 */
+		return this.stateFactory.newState(population, newSummaryStateVector,
+				this.trajectorySampler.getCurrentDecisionVariable());
 	}
 
 	public MATSimState getFinalState() {

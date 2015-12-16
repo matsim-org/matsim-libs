@@ -48,6 +48,9 @@ public class MATSimState implements SimulatorState {
 	private final Map<Id<Person>, Integer> person2selectedPlanIndex = new LinkedHashMap<>();
 
 	private final Vector vectorRepresentation;
+
+	// Michael, ich glaube, dass dies von Dir kommt. Warum brauchen wir hier die
+	// Population?
 	private Population population;
 
 	// -------------------- CONSTRUCTION --------------------
@@ -107,7 +110,7 @@ public class MATSimState implements SimulatorState {
 			return plans.get(index);
 		}
 	}
-	
+
 	public Set<Id<Person>> getPersonIdView() {
 		return Collections.unmodifiableSet(this.person2planList.keySet());
 	}
@@ -143,6 +146,7 @@ public class MATSimState implements SimulatorState {
 		}
 	}
 
+	// TODO What for?
 	public void setPopulation(Population population) {
 		this.population = population;
 	}

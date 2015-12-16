@@ -1,10 +1,9 @@
 package opdytsintegration;
 
+import org.matsim.api.core.v01.population.Population;
 
 import floetteroed.opdyts.DecisionVariable;
 import floetteroed.opdyts.SimulatorState;
-import org.matsim.api.core.v01.population.Population;
-
 import floetteroed.utilities.math.Vector;
 
 /**
@@ -15,7 +14,7 @@ import floetteroed.utilities.math.Vector;
  * @see SimulatorState
  * @see DecisionVariable
  */
-public interface MATSimStateFactory {
+public interface MATSimStateFactory<U extends DecisionVariable> {
 
 	/**
 	 * Creates a new object representation of the current MATSim simulation
@@ -32,6 +31,6 @@ public interface MATSimStateFactory {
 	 * @return the current MATSim simulation state
 	 */
 	public MATSimState newState(Population population, Vector stateVector,
-			DecisionVariable decisionVariable);
+			U decisionVariable);
 
 }
