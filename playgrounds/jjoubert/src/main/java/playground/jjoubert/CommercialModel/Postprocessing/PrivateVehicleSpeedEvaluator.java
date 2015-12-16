@@ -39,6 +39,7 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.vehicles.Vehicle;
 
 import playground.jjoubert.CommercialModel.Listeners.MyPrivateVehicleSpeedAnalyser;
 import playground.jjoubert.CommercialTraffic.SAZone;
@@ -99,7 +100,7 @@ public class PrivateVehicleSpeedEvaluator {
 		int linksFound = 0;
 		int linksNotFound = 0;
 
-		Map<Id, SAZone> zoneTree = new HashMap<Id, SAZone>();
+		Map<Id<Link>, SAZone> zoneTree = new HashMap<Id<Link>, SAZone>();
 
 		/*
 		 *  TODO Check!! I've changed from LinkImpl to Link since it gave an error.
@@ -107,7 +108,7 @@ public class PrivateVehicleSpeedEvaluator {
 		 */
 		
 		Map<Id<Link>, ? extends Link> map = nl.getLinks();
-		for (Id key : map.keySet()) {
+		for (Id<Link> key : map.keySet()) {
 			Link link = map.get(key);
 
 			Coordinate fromPoint = new Coordinate(link.getFromNode().getCoord().getX(), link.getFromNode().getCoord().getY());

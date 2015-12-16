@@ -29,18 +29,18 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingSchemeImpl;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * A class to evaluate the patronage of agents on a given set of links. Agents
  * can be grouped into one or more different categories.
  * 
- * @author johanwjoubert
+ * @author jwjoubert
  */
 public class MyPatronComparator {
 	private final static Logger log = Logger.getLogger(MyPatronComparator.class);
@@ -66,7 +66,7 @@ public class MyPatronComparator {
 	 *  		required. These arguments will be parsed until the end of the
 	 *  		String array.
 	 * </ol>
-	 * @author johanwjoubert
+	 * @author jwjoubert
 	 */
 	public static void main(String[] args) {
 		log.info("===============================================================================");
@@ -76,9 +76,9 @@ public class MyPatronComparator {
 		String compareFilename = args[1];
 		String linksFilename = args[2];
 		
-		List<Id<Person>> breakList = new ArrayList<>();
+		List<Id<Vehicle>> breakList = new ArrayList<>();
 		for(int i = 3; i < args.length; i++){
-			breakList.add(Id.create(args[i], Person.class));
+			breakList.add(Id.create(args[i], Vehicle.class));
 		}
 		
 		MyPatronComparator mpc = new MyPatronComparator();
@@ -86,7 +86,7 @@ public class MyPatronComparator {
 		
 		/* Read the baseline file and perform some analysis. */
 		log.info("-------------------------------------------------------------------------------");
-		List<Map<Id<Person>,Integer>> baseMaps= mpc.processEventsFile(baseFilename, linkList, breakList);
+		List<Map<Id<Vehicle>,Integer>> baseMaps= mpc.processEventsFile(baseFilename, linkList, breakList);
 		mpc.reportOccurences(baseMaps);
 		log.info("-------------------------------------------------------------------------------");
 //		List<Map<Id,Integer>> compareMaps= mpc.processEventsFile(compareFilename, linkList, breakList);
@@ -115,15 +115,15 @@ public class MyPatronComparator {
 	 * links once, twice, etc.
 	 * @param maps output from {@link MyPatronComparator#processEventsFile(String, List, List)}
 	 */
-	public void reportOccurences(List<Map<Id<Person>,Integer>> maps){
+	public void reportOccurences(List<Map<Id<Vehicle>,Integer>> maps){
 		for(int m = 0; m < maps.size(); m++){
-			Map<Id<Person>,Integer> theMap = maps.get(m);
+			Map<Id<Vehicle>,Integer> theMap = maps.get(m);
 			log.info(" Map " + (m+1) + " (" + theMap.size() + " agents)");
 			
 			/* Check what the minimum and maximum usage was by any one agent. */
 			Integer min = Integer.MAX_VALUE;
 			Integer max = Integer.MIN_VALUE;
-			for(Id<Person> id : theMap.keySet()){
+			for(Id<Vehicle> id : theMap.keySet()){
 				min = Math.min(min, theMap.get(id));
 				max = Math.max(max, theMap.get(id));				
 			}
@@ -137,12 +137,12 @@ public class MyPatronComparator {
 				histList.add(id);
 				histMap.put(id, new Integer(0));
 			}
-			for(Id<Person> id : theMap.keySet()){
+			for(Id<Vehicle> id : theMap.keySet()){
 				int value = theMap.get(id);
 				histMap.put(Id.create(value, Link.class), new Integer(histMap.get(Id.create(value, Link.class))+1));
 			}
 			String s = "";
-			for(Id id: histList){
+			for(Id<Link> id: histList){
 				s += id.toString() + " (" + histMap.get(id) + "); ";
 			}
 			log.info("    Link usage histogram:");
@@ -166,7 +166,7 @@ public class MyPatronComparator {
 	 * 		the	<i>number</i> of times that agent entered observed links.
 	 * @see MyPatronLinkEntryHandler
 	 */
-	public List<Map<Id<Person>,Integer>> processEventsFile(String eventsFile, List<Id<Link>> linkList, List<Id<Person>> breakList){
+	public List<Map<Id<Vehicle>,Integer>> processEventsFile(String eventsFile, List<Id<Link>> linkList, List<Id<Vehicle>> breakList){
 		log.info("Processing events from " + eventsFile);
 		EventsManager em = EventsUtils.createEventsManager();
 		MyPatronLinkEntryHandler eh = new MyPatronLinkEntryHandler(linkList, breakList);

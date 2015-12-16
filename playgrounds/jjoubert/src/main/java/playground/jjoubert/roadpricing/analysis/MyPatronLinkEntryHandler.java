@@ -31,30 +31,31 @@ import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * An implementation of the {@link LinkEnterEventHandler} to analyze the 
- * patronage of {@link Person}s (in one or more categories) on a given set
+ * patronage of {@link Vehicle}s (in one or more categories) on a given set
  * of {@link Link}s. 
  * 
- * @author johanwjoubert
+ * @author jwjoubert
  */
 public class MyPatronLinkEntryHandler implements LinkEnterEventHandler{
 	private Logger log = Logger.getLogger(MyPatronLinkEntryHandler.class);
-	private List<Id<Person>> breaks;
+	private List<Id<Vehicle>> breaks;
 	private List<Id<Link>> linkIds;
-	private List<Map<Id<Person>,Integer>> maps;
+	private List<Map<Id<Vehicle>,Integer>> maps;
 
-	public MyPatronLinkEntryHandler(List<Id<Link>> linkIds, List<Id<Person>> breaks) {
+	public MyPatronLinkEntryHandler(List<Id<Link>> linkIds, List<Id<Vehicle>> breaks) {
 		this.linkIds = linkIds;
 		this.breaks = breaks;
 		maps = new ArrayList<>(breaks.size());
 		for(int i = 0; i < breaks.size(); i++){
-			maps.add(new HashMap<Id<Person>, Integer>());
+			maps.add(new HashMap<Id<Vehicle>, Integer>());
 		}
 	}
 	
-	public List<Map<Id<Person>, Integer>> getMaps(){
+	public List<Map<Id<Vehicle>, Integer>> getMaps(){
 		return maps;
 	}
 	
@@ -77,23 +78,23 @@ public class MyPatronLinkEntryHandler implements LinkEnterEventHandler{
 			boolean found = false;
 			int breakIndex = 0;
 			while(!found && breakIndex < breaks.size()){
-				if(Long.parseLong(event.getDriverId().toString()) < Long.parseLong(breaks.get(breakIndex).toString())){
+				if(Long.parseLong(event.getVehicleId().toString()) < Long.parseLong(breaks.get(breakIndex).toString())){
 					found = true;
 					/* Check if the person entering the link is already contained
 					 * in the map. If so, increment its number of tolled links
 					 * entered. If not, add it to the map with initial value 1.
 					 */
-					if(maps.get(breakIndex).containsKey(event.getDriverId())){
-						maps.get(breakIndex).put(event.getDriverId(), maps.get(breakIndex).get(event.getDriverId())+1);
+					if(maps.get(breakIndex).containsKey(event.getVehicleId())){
+						maps.get(breakIndex).put(event.getVehicleId(), maps.get(breakIndex).get(event.getVehicleId())+1);
 					} else{
-						maps.get(breakIndex).put(event.getDriverId(), new Integer(1));
+						maps.get(breakIndex).put(event.getVehicleId(), new Integer(1));
 					}
 				} else{
 					breakIndex++;
 				}
 			}
 			if(!found){
-				log.warn("Could not identify a category (bracket) for agent " + event.getDriverId().toString());
+				log.warn("Could not identify a category (bracket) for agent " + event.getVehicleId().toString());
 			}
 		}
 	}

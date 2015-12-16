@@ -32,7 +32,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
@@ -40,12 +39,13 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.roadpricing.RoadPricingSchemeImpl;
+import org.matsim.vehicles.Vehicle;
 
 public class MyTollPotentialCalculator {
 	private final static Logger log = Logger.getLogger(MyTollPotentialCalculator.class);
 	private final RoadPricingSchemeImpl scheme;
-	private List<Map<Id,Double>> valueMaps;
-	private List<Map<Id,Integer>> countMaps;
+	private List<Map<Id<Vehicle>,Double>> valueMaps;
+	private List<Map<Id<Vehicle>,Integer>> countMaps;
 
 	/**
 	 * Implementing the class to calculate the potential toll. 
@@ -67,9 +67,9 @@ public class MyTollPotentialCalculator {
 		String linksFilename = args[1];
 		String outputFolder = args[2];
 		
-		List<Id<Person>> breakList = new ArrayList<>();
+		List<Id<Vehicle>> breakList = new ArrayList<>();
 		for(int i = 3; i < args.length; i++){
-			breakList.add(Id.create(args[i], Person.class));
+			breakList.add(Id.create(args[i], Vehicle.class));
 		}
 
 		MyTollPotentialCalculator mtpc = new MyTollPotentialCalculator();
@@ -98,7 +98,7 @@ public class MyTollPotentialCalculator {
 			try {
 				bw = IOUtils.getBufferedWriter(String.format("%sValueMaps_%02d.txt", outputFolder, (i+1)));
 				try{
-					for(Id id : this.valueMaps.get(i).keySet()){
+					for(Id<Vehicle> id : this.valueMaps.get(i).keySet()){
 						bw.write(id.toString());
 						bw.write(",");
 						bw.write(String.valueOf(this.valueMaps.get(i).get(id)));
@@ -121,7 +121,7 @@ public class MyTollPotentialCalculator {
 			try {
 				bw = IOUtils.getBufferedWriter(String.format("%sCountMaps_%02d.txt", outputFolder, (i+1)));
 				try{
-					for(Id id : this.countMaps.get(i).keySet()){
+					for(Id<Vehicle> id : this.countMaps.get(i).keySet()){
 						bw.write(id.toString());
 						bw.write(",");
 						bw.write(String.valueOf(this.countMaps.get(i).get(id)));
@@ -172,7 +172,7 @@ public class MyTollPotentialCalculator {
 	 * 		the	<i>number</i> of times that agent entered observed links.
 	 * @see MyTollPotentialEventHandler
 	 */
-	public void processEventsFile(String eventsFile, List<Id<Link>> linkList, List<Id<Person>> breakList, RoadPricingScheme scheme){
+	public void processEventsFile(String eventsFile, List<Id<Link>> linkList, List<Id<Vehicle>> breakList, RoadPricingScheme scheme){
 		log.info("Processing events from " + eventsFile);
 		EventsManager em = EventsUtils.createEventsManager();
 		MyTollPotentialEventHandler eh = new MyTollPotentialEventHandler(linkList, breakList, scheme);

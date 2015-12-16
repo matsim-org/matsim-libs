@@ -32,8 +32,10 @@ import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
+import org.matsim.vehicles.Vehicle;
 
 import playground.jjoubert.roadpricing.senozon.SanralTollFactor;
 
@@ -45,6 +47,8 @@ import playground.jjoubert.roadpricing.senozon.SanralTollFactor;
  * @author mrieser
  */
 public class SanralCalcPaidToll implements LinkEnterEventHandler, VehicleEntersTrafficEventHandler {
+	
+	private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
 
 	static class AgentInfo {
 		public double toll = 0.0;
@@ -52,7 +56,7 @@ public class SanralCalcPaidToll implements LinkEnterEventHandler, VehicleEntersT
 	}
 
 	final RoadPricingScheme scheme;
-	final TreeMap<Id, AgentInfo> agents = new TreeMap<Id, AgentInfo>();
+	final TreeMap<Id<Vehicle>, AgentInfo> agents = new TreeMap<Id<Vehicle>, AgentInfo>();
 	private final Network network;
 
 	private TollBehaviourI handler = null;
@@ -88,7 +92,7 @@ public class SanralCalcPaidToll implements LinkEnterEventHandler, VehicleEntersT
 			return;
 		} else {
 			// Just like a LinkEnterEvent
-			this.handler.handleEvent(new LinkEnterEvent(event.getTime(), event.getPersonId(), event.getLinkId(), event.getVehicleId()), link);
+			this.handler.handleEvent(new LinkEnterEvent(event.getTime(), event.getVehicleId(), event.getLinkId()), link);
 		}
 	}
 
@@ -104,8 +108,8 @@ public class SanralCalcPaidToll implements LinkEnterEventHandler, VehicleEntersT
 	 * @param events the {@link EventsManager} collection, the generated events are sent to for processing
 	 */
 	public void sendUtilityEvents(final double time, final EventsManager events) {
-		for (Map.Entry<Id, AgentInfo> entries : this.agents.entrySet()) {
-			events.processEvent(new PersonMoneyEvent(time, entries.getKey(), -entries.getValue().toll));
+		for (Map.Entry<Id<Vehicle>, AgentInfo> entries : this.agents.entrySet()) {
+			events.processEvent(new PersonMoneyEvent(time, delegate.getDriverOfVehicle(entries.getKey()), -entries.getValue().toll));
 		}
 	}
 
@@ -121,7 +125,7 @@ public class SanralCalcPaidToll implements LinkEnterEventHandler, VehicleEntersT
 	 * @param agentId
 	 * @return The toll paid by the specified agent, 0.0 if no toll was paid.
 	 */
-	public double getAgentToll(final Id agentId) {
+	public double getAgentToll(final Id<Vehicle> agentId) {
 		AgentInfo info = this.agents.get(agentId);
 		if (info == null) {
 			return 0.0;
@@ -170,13 +174,13 @@ public class SanralCalcPaidToll implements LinkEnterEventHandler, VehicleEntersT
 		@Override
 		public void handleEvent(final LinkEnterEvent event, final Link link) {
 			Cost baseCost = SanralCalcPaidToll.this.scheme.getLinkCostInfo(link.getId(),
-					event.getTime(), event.getDriverId(), event.getVehicleId() );
+					event.getTime(), delegate.getDriverOfVehicle(event.getVehicleId()), event.getVehicleId() );
 			if (baseCost != null) {
-				double newToll = link.getLength() * baseCost.amount * SanralTollFactor.getTollFactor(event.getDriverId(), link.getId(), event.getTime());
-				AgentInfo info = SanralCalcPaidToll.this.agents.get(event.getDriverId());
+				double newToll = link.getLength() * baseCost.amount * SanralTollFactor.getTollFactor(event.getVehicleId(), link.getId(), event.getTime());
+				AgentInfo info = SanralCalcPaidToll.this.agents.get(event.getVehicleId());
 				if (info == null) {
 					info = new AgentInfo();
-					SanralCalcPaidToll.this.agents.put(event.getDriverId(), info);
+					SanralCalcPaidToll.this.agents.put(event.getVehicleId(), info);
 				}
 				info.toll += newToll;
 			}
@@ -188,13 +192,17 @@ public class SanralCalcPaidToll implements LinkEnterEventHandler, VehicleEntersT
 	class AreaTollBehaviour implements TollBehaviourI {
 		@Override
 		public void handleEvent(final LinkEnterEvent event, final Link link) {
-			Cost baseCost = SanralCalcPaidToll.this.scheme.getLinkCostInfo(link.getId(), event.getTime(), event.getDriverId(), event.getVehicleId());
+			Cost baseCost = SanralCalcPaidToll.this.scheme.getLinkCostInfo(
+					link.getId(), 
+					event.getTime(), 
+					delegate.getDriverOfVehicle(event.getVehicleId()), 
+					event.getVehicleId());
 			if (baseCost != null) {
-				AgentInfo info = SanralCalcPaidToll.this.agents.get(event.getDriverId());
+				AgentInfo info = SanralCalcPaidToll.this.agents.get(event.getVehicleId());
 				if (info == null) {
 					info = new AgentInfo();
-					SanralCalcPaidToll.this.agents.put(event.getDriverId(), info);
-					info.toll = baseCost.amount * SanralTollFactor.getTollFactor(event.getDriverId(), link.getId(), event.getTime());
+					SanralCalcPaidToll.this.agents.put(event.getVehicleId(), info);
+					info.toll = baseCost.amount * SanralTollFactor.getTollFactor(event.getVehicleId(), link.getId(), event.getTime());
 				}
 			}
 		}
@@ -207,26 +215,30 @@ public class SanralCalcPaidToll implements LinkEnterEventHandler, VehicleEntersT
 	class CordonTollBehaviour implements TollBehaviourI {
 		@Override
 		public void handleEvent(final LinkEnterEvent event, final Link link) {
-			Cost baseCost = SanralCalcPaidToll.this.scheme.getLinkCostInfo(link.getId(), event.getTime(), event.getDriverId(), event.getVehicleId() );
+			Cost baseCost = SanralCalcPaidToll.this.scheme.getLinkCostInfo(
+					link.getId(), 
+					event.getTime(), 
+					delegate.getDriverOfVehicle(event.getVehicleId()), 
+					event.getVehicleId() );
 			if (baseCost != null) {
 				// this is a link inside the toll area.
-				AgentInfo info = SanralCalcPaidToll.this.agents.get(event.getDriverId());
+				AgentInfo info = SanralCalcPaidToll.this.agents.get(event.getVehicleId());
 				if (info == null) {
 					// no information about this agent, so it did not yet pay the toll
 					info = new AgentInfo();
-					SanralCalcPaidToll.this.agents.put(event.getDriverId(), info);
+					SanralCalcPaidToll.this.agents.put(event.getVehicleId(), info);
 					info.toll = 0.0; // we start in the area, do not toll
 				} else if (!info.insideCordonArea) {
 					// agent was outside before, now inside the toll area --> agent has to pay
 					info.insideCordonArea = true;
-					info.toll += baseCost.amount * SanralTollFactor.getTollFactor(event.getDriverId(), link.getId(), event.getTime());
+					info.toll += baseCost.amount * SanralTollFactor.getTollFactor(event.getVehicleId(), link.getId(), event.getTime());
 				}
 			} else {
 				// this is a link outside the toll area.
-				AgentInfo info = SanralCalcPaidToll.this.agents.get(event.getDriverId());
+				AgentInfo info = SanralCalcPaidToll.this.agents.get(event.getVehicleId());
 				if (info == null) {
 					info = new AgentInfo();
-					SanralCalcPaidToll.this.agents.put(event.getDriverId(), info);
+					SanralCalcPaidToll.this.agents.put(event.getVehicleId(), info);
 				}
 				info.insideCordonArea = false;
 			}

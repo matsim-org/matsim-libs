@@ -46,6 +46,7 @@ import org.matsim.roadpricing.RoadPricingConfigGroup;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingSchemeImpl;
 import org.matsim.roadpricing.RoadPricingSchemeUsingTollFactor;
+import org.matsim.vehicles.Vehicle;
 
 import playground.southafrica.utilities.Header;
 
@@ -53,8 +54,8 @@ public class MyTollPotentialCalculator {
 	private final static Logger log = Logger.getLogger(MyTollPotentialCalculator.class);
 	private final RoadPricingSchemeImpl scheme;
 	private Scenario sc;
-	private List<Map<Id<Person>, Double>> valueMaps;
-	private List<Map<Id<Person>, Integer>> countMaps;
+	private List<Map<Id<Vehicle>, Double>> valueMaps;
+	private List<Map<Id<Vehicle>, Integer>> countMaps;
 
 	/**
 	 * Implementing the class to calculate the potential toll. 
@@ -133,7 +134,7 @@ public class MyTollPotentialCalculator {
 			try {
 				bw = IOUtils.getBufferedWriter(String.format("%sValueMaps_%02d.txt", outputFolder, (i+1)));
 				try{
-					for(Id<Person> id : this.valueMaps.get(i).keySet()){
+					for(Id<Vehicle> id : this.valueMaps.get(i).keySet()){
 						bw.write(id.toString());
 						bw.write(",");
 						bw.write(String.valueOf(this.valueMaps.get(i).get(id)));
@@ -155,7 +156,7 @@ public class MyTollPotentialCalculator {
 			try {
 				bw = IOUtils.getBufferedWriter(String.format("%sCountMaps_%02d.txt", outputFolder, (i+1)));
 				try{
-					for(Id<Person> id : this.countMaps.get(i).keySet()){
+					for(Id<Vehicle> id : this.countMaps.get(i).keySet()){
 						bw.write(id.toString());
 						bw.write(",");
 						bw.write(String.valueOf(this.countMaps.get(i).get(id)));
