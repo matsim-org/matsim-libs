@@ -51,6 +51,12 @@ public final class PopulationImpl implements Population {
 	private boolean locked = false ;
 
 	private Map<Id<Person>, Person> persons = new LinkedHashMap<Id<Person>, Person>();
+	// Use LinkedHashMaps to store persons in the population which allows much faster lookups. 
+	// Added method to sorted a population to PopulationUtils. Use this method in some writers.
+	// c.dobler, 2011-10-14, commit 782bd122fdc2ab6e4741886c330d07556ad92ad8
+	//
+	// yy we are a bit skeptic if this is so great, since a population-generated-in-code now has a different sequence and thus a different
+	// departure sequence then after writing it to file and reading it back in.  kai/theresa, dec'15
 
 	// algorithms over plans
 	private final ArrayList<PersonAlgorithm> personAlgos = new ArrayList<PersonAlgorithm>();
