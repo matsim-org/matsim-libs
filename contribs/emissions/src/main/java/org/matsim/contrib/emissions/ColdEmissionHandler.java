@@ -61,7 +61,7 @@ public class ColdEmissionHandler implements LinkLeaveEventHandler, PersonArrival
     private final Map<Id<Person>, Double> personId2parkingDuration = new TreeMap<>();
     private final Map<Id<Person>, Id<Link>> personId2coldEmissionEventLinkId = new TreeMap<>();
     
-    private Vehicle2DriverEventHandler delegate;
+    private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler() ;
     
     public ColdEmissionHandler(
             Vehicles emissionVehicles,

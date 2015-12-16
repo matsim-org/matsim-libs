@@ -72,7 +72,7 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 	private final Map<Id<Person>, Tuple<Id<Link>, Double>> agentarrival = new HashMap<>();
 	private final Map<Id<Person>, Tuple<Id<Link>, Double>> agentdeparture = new HashMap<>();
 
-    private Vehicle2DriverEventHandler delegate;
+    private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler() ;
     
 	public WarmEmissionHandler(
 			Vehicles emissionVehicles,
