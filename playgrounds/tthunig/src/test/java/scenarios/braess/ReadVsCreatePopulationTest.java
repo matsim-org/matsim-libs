@@ -23,7 +23,6 @@ package scenarios.braess;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
@@ -37,6 +36,7 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.replanning.DefaultPlanStrategiesModule.DefaultSelector;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
@@ -59,7 +59,10 @@ import scenarios.braess.createInput.TtCreateBraessPopulation.InitRoutes;
  * (because they are written as integer values in the plans file). With 3600
  * agents all activity end times are integer.
  * 
- * Remaining differences are not understood yet.
+ * Further differences may occur by different person order: In code the persons
+ * are created with increasing id's. The PopulationWriter sorts them
+ * lexicographically before writing them.
+ * This test avoids this differences by sorting the Population after creation.
  * 
  * @author tthunig
  *
@@ -73,8 +76,6 @@ public class ReadVsCreatePopulationTest {
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
 	
 	@Test
-	@Ignore
-	// TODO is this "problem" relevant? should we try to understand this?
 	public void testReadVsCreatePopulation() {
 		Tuple<TtAbstractAnalysisTool,Population> createResults = run(true);
 		Tuple<TtAbstractAnalysisTool,Population> readResults = run(false);
@@ -115,6 +116,10 @@ public class ReadVsCreatePopulationTest {
 
 		if (createPopulation){
 			createPopulation(scenario);
+			// sort the population. Necessary, since the Map in PopulationImpl
+			// is no longer a TreeMap but a LinkedHashMap, and PopulationWriter
+			// sorts the Population before writing it
+			PopulationUtils.sortPersons(scenario.getPopulation());
 		}
 		
 		Controler controler = new Controler(scenario);
