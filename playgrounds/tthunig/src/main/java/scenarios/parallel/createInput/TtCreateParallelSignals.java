@@ -58,8 +58,9 @@ public final class TtCreateParallelSignals {
     private Scenario scenario;
 
     private Map<Id<Link>, List<Id<Link>>> possibleSignalMoves = new HashMap<>();
-    private Map<String, Boolean> signal2IsFromSecondODPair = new HashMap<>();
-
+//    private Map<String, Boolean> signalBelongsToSecondODPair = new HashMap<>();
+    private List<Id<SignalGroup>> signalGroupsFirstODPair = new ArrayList<>();
+    
     public TtCreateParallelSignals(Scenario scenario) {
         this.scenario = scenario;
     }
@@ -68,11 +69,11 @@ public final class TtCreateParallelSignals {
         log.info("Create signals ...");
 
         initPossibleSignalMoves();
-        initSignal2IsFromSecondODPair();
+        prepareSignalControlInfo();
 
         createSignalSystems();
         createSignalGroups();
-        createSignalControl();
+        createSignalControlData();
     }
 
     private void initPossibleSignalMoves() {
@@ -139,7 +140,7 @@ public final class TtCreateParallelSignals {
         possibleSignalMoves.put(Id.createLinkId("8_7"),
                 new ArrayList<>(Collections.singletonList(Id.createLinkId("7_2"))));
 
-        //siganls at node 8
+        //signals at node 8
         possibleSignalMoves.put(Id.createLinkId("4_8"),
                 new ArrayList<>(Collections.singletonList(Id.createLinkId("8_11"))));
         possibleSignalMoves.put(Id.createLinkId("5_8"),
@@ -150,48 +151,67 @@ public final class TtCreateParallelSignals {
                 new ArrayList<>(Collections.singletonList(Id.createLinkId("8_5"))));
     }
 
-    private void initSignal2IsFromSecondODPair() {
+    private void prepareSignalControlInfo() {
 
-        signal2IsFromSecondODPair.put("signal1_2.2_3", false);
-        signal2IsFromSecondODPair.put("signal1_2.2_7", false);
-        signal2IsFromSecondODPair.put("signal3_2.2_1", false);
-        signal2IsFromSecondODPair.put("signal7_2.2_1", false);
-
-        signal2IsFromSecondODPair.put("signal9_10.10_3", true);
-        signal2IsFromSecondODPair.put("signal9_10.10_4", true);
-        signal2IsFromSecondODPair.put("signal3_10.10_9", true);
-        signal2IsFromSecondODPair.put("signal4_10.10_9", true);
-
-        signal2IsFromSecondODPair.put("signal6_5.5_4", false);
-        signal2IsFromSecondODPair.put("signal6_5.5_8", false);
-        signal2IsFromSecondODPair.put("signal4_5.5_6", false);
-        signal2IsFromSecondODPair.put("signal8_5.5_6", false);
-
-        signal2IsFromSecondODPair.put("signal12_11.11_7", true);
-        signal2IsFromSecondODPair.put("signal12_11.11_8", true);
-        signal2IsFromSecondODPair.put("signal7_11.11_12", true);
-        signal2IsFromSecondODPair.put("signal8_11.11_12", true);
-
-        signal2IsFromSecondODPair.put("signal10_3.3_7", true);
-        signal2IsFromSecondODPair.put("signal7_3.3_10", true);
-        signal2IsFromSecondODPair.put("signal2_3.3_4", true);
-        signal2IsFromSecondODPair.put("signal4_3.3_2", true);
-
-        signal2IsFromSecondODPair.put("signal3_7.7_11", true);
-        signal2IsFromSecondODPair.put("signal11_7.7_3", true);
-        signal2IsFromSecondODPair.put("signal2_7.7_8", true);
-        signal2IsFromSecondODPair.put("signal8_7.7_2", true);
-
-        signal2IsFromSecondODPair.put("signal7_8.8_5", false);
-        signal2IsFromSecondODPair.put("signal5_8.8_7", false);
-        signal2IsFromSecondODPair.put("signal4_8.8_11", false);
-        signal2IsFromSecondODPair.put("signal11_8.8_4", false);
-
-        signal2IsFromSecondODPair.put("signal8_4.4_10", false);
-        signal2IsFromSecondODPair.put("signal10_4.4_8", false);
-        signal2IsFromSecondODPair.put("signal3_4.4_5", false);
-        signal2IsFromSecondODPair.put("signal5_4.4_3", false);
-
+//        signalBelongsToSecondODPair.put("signal1_2.2_3", false);
+//        signalBelongsToSecondODPair.put("signal1_2.2_7", false);
+//        signalBelongsToSecondODPair.put("signal3_2.2_1", false);
+//        signalBelongsToSecondODPair.put("signal7_2.2_1", false);
+//
+//        signalBelongsToSecondODPair.put("signal9_10.10_3", true);
+//        signalBelongsToSecondODPair.put("signal9_10.10_4", true);
+//        signalBelongsToSecondODPair.put("signal3_10.10_9", true);
+//        signalBelongsToSecondODPair.put("signal4_10.10_9", true);
+//
+//        signalBelongsToSecondODPair.put("signal6_5.5_4", false);
+//        signalBelongsToSecondODPair.put("signal6_5.5_8", false);
+//        signalBelongsToSecondODPair.put("signal4_5.5_6", false);
+//        signalBelongsToSecondODPair.put("signal8_5.5_6", false);
+//
+//        signalBelongsToSecondODPair.put("signal12_11.11_7", true);
+//        signalBelongsToSecondODPair.put("signal12_11.11_8", true);
+//        signalBelongsToSecondODPair.put("signal7_11.11_12", true);
+//        signalBelongsToSecondODPair.put("signal8_11.11_12", true);
+//
+//        signalBelongsToSecondODPair.put("signal10_3.3_7", true);
+//        signalBelongsToSecondODPair.put("signal7_3.3_10", true);
+//        signalBelongsToSecondODPair.put("signal2_3.3_4", true);
+//        signalBelongsToSecondODPair.put("signal4_3.3_2", true);
+//
+//        signalBelongsToSecondODPair.put("signal3_7.7_11", true);
+//        signalBelongsToSecondODPair.put("signal11_7.7_3", true);
+//        signalBelongsToSecondODPair.put("signal2_7.7_8", true);
+//        signalBelongsToSecondODPair.put("signal8_7.7_2", true);
+//
+//        signalBelongsToSecondODPair.put("signal7_8.8_5", false);
+//        signalBelongsToSecondODPair.put("signal5_8.8_7", false);
+//        signalBelongsToSecondODPair.put("signal4_8.8_11", false);
+//        signalBelongsToSecondODPair.put("signal11_8.8_4", false);
+//
+//        signalBelongsToSecondODPair.put("signal8_4.4_10", false);
+//        signalBelongsToSecondODPair.put("signal10_4.4_8", false);
+//        signalBelongsToSecondODPair.put("signal3_4.4_5", false);
+//        signalBelongsToSecondODPair.put("signal5_4.4_3", false);
+    	
+    	signalGroupsFirstODPair.add(Id.create("signal1_2.2_3", SignalGroup.class));
+    	signalGroupsFirstODPair.add(Id.create("signal1_2.2_7", SignalGroup.class));
+    	signalGroupsFirstODPair.add(Id.create("signal3_2.2_1", SignalGroup.class));
+    	signalGroupsFirstODPair.add(Id.create("signal7_2.2_1", SignalGroup.class));
+    	
+    	signalGroupsFirstODPair.add(Id.create("signal6_5.5_4", SignalGroup.class));
+    	signalGroupsFirstODPair.add(Id.create("signal6_5.5_8", SignalGroup.class));
+    	signalGroupsFirstODPair.add(Id.create("signal4_5.5_6", SignalGroup.class));
+    	signalGroupsFirstODPair.add(Id.create("signal8_5.5_6", SignalGroup.class));
+    	
+    	signalGroupsFirstODPair.add(Id.create("signal7_8.8_5", SignalGroup.class));
+    	signalGroupsFirstODPair.add(Id.create("signal5_8.8_7", SignalGroup.class));
+    	signalGroupsFirstODPair.add(Id.create("signal4_8.8_11", SignalGroup.class));
+    	signalGroupsFirstODPair.add(Id.create("signal11_8.8_4", SignalGroup.class));
+    	
+    	signalGroupsFirstODPair.add(Id.create("signal8_4.4_10", SignalGroup.class));
+    	signalGroupsFirstODPair.add(Id.create("signal10_4.4_8", SignalGroup.class));
+    	signalGroupsFirstODPair.add(Id.create("signal3_4.4_5", SignalGroup.class));
+    	signalGroupsFirstODPair.add(Id.create("signal5_4.4_3", SignalGroup.class));
     }
 
     /**
@@ -213,25 +233,21 @@ public final class TtCreateParallelSignals {
     }
 
     private void createSignalSystemAtNode(Node node) {
-        SignalsData signalsData = (SignalsData) this.scenario
-                .getScenarioElement(SignalsData.ELEMENT_NAME);
+		SignalsData signalsData = (SignalsData) this.scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
         SignalSystemsData signalSystems = signalsData.getSignalSystemsData();
 
         SignalSystemsDataFactory fac = new SignalSystemsDataFactoryImpl();
 
         // create signal system
-        SignalSystemData signalSystem = fac.createSignalSystemData(Id.create("signalSystem"
-                + node.getId(), SignalSystem.class));
+		SignalSystemData signalSystem = fac.createSignalSystemData(Id.create("signalSystem" + node.getId(), SignalSystem.class));
         signalSystems.addSignalSystemData(signalSystem);
 
-        // create a signal for every inLink outLink pair
+        // create a signal for every inLink outLink pair that is contained in possibleSignalMoves
         for (Id<Link> inLinkId : node.getInLinks().keySet()) {
             for (Id<Link> outLinkId : node.getOutLinks().keySet()) {
-                if (possibleSignalMoves.containsKey(inLinkId) &&
-                        possibleSignalMoves.get(inLinkId).contains(outLinkId)) {
+				if (possibleSignalMoves.containsKey(inLinkId) && possibleSignalMoves.get(inLinkId).contains(outLinkId)) {
 
-                    SignalData signal = fac.createSignalData(Id.create("signal" + inLinkId
-                            + "." + outLinkId, Signal.class));
+					SignalData signal = fac.createSignalData(Id.create("signal" + inLinkId + "." + outLinkId, Signal.class));
                     signal.setLinkId(inLinkId);
                     signal.addTurningMoveRestriction(outLinkId);
 
@@ -256,78 +272,64 @@ public final class TtCreateParallelSignals {
 
     private void createSignalGroups() {
 
-        SignalsData signalsData = (SignalsData) this.scenario
-                .getScenarioElement(SignalsData.ELEMENT_NAME);
+		SignalsData signalsData = (SignalsData) this.scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
         SignalGroupsData signalGroups = signalsData.getSignalGroupsData();
         SignalSystemsData signalSystems = signalsData.getSignalSystemsData();
 
         // create signal groups for each signal system
-        for (SignalSystemData system : signalSystems.getSignalSystemData()
-                .values()) {
+		for (SignalSystemData system : signalSystems.getSignalSystemData().values()) {
             SignalUtils.createAndAddSignalGroups4Signals(signalGroups, system);
         }
     }
 
-    private void createSignalControl() {
+    private void createSignalControlData() {
 
-        SignalsData signalsData = (SignalsData) this.scenario
-                .getScenarioElement(SignalsData.ELEMENT_NAME);
+		SignalsData signalsData = (SignalsData) this.scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
         SignalSystemsData signalSystems = signalsData.getSignalSystemsData();
         SignalGroupsData signalGroups = signalsData.getSignalGroupsData();
         SignalControlData signalControl = signalsData.getSignalControlData();
         SignalControlDataFactory fac = new SignalControlDataFactoryImpl();
 
         // creates a signal control for all signal systems
-        for (SignalSystemData signalSystem : signalSystems
-                .getSignalSystemData().values()) {
+		for (SignalSystemData signalSystem : signalSystems.getSignalSystemData().values()) {
 
-            SignalSystemControllerData signalSystemControl = fac
-                    .createSignalSystemControllerData(signalSystem.getId());
+			SignalSystemControllerData signalSystemControl = fac.createSignalSystemControllerData(signalSystem.getId());
 
-            // creates a default plan for the signal system (with defined cycle
-            // time and offset 0)
+			// creates a default plan for the signal system (with defined cycle time and offset 0)
             SignalPlanData signalPlan = SignalUtils.createSignalPlan(fac, CYCLE_TIME, 0);
 
             signalSystemControl.addSignalPlanData(signalPlan);
-            signalSystemControl
-                    .setControllerIdentifier(DefaultPlanbasedSignalSystemController.IDENTIFIER);
+			signalSystemControl.setControllerIdentifier(DefaultPlanbasedSignalSystemController.IDENTIFIER);
             signalControl.addSignalSystemControllerData(signalSystemControl);
 
-            // specifies signal group settings for all signal groups of this
-            // signal system
-            for (SignalGroupData signalGroup : signalGroups.
-                    getSignalGroupDataBySystemId(signalSystem.getId()).values()) {
-                createSignalControl(fac, signalPlan, signalGroup.getId());
+            // specifies signal group settings for all signal groups of this signal system
+			for (SignalGroupData signalGroup : signalGroups.getSignalGroupDataBySystemId(signalSystem.getId()).values()) {
+                createSignalControlForSignalGroup(fac, signalPlan, signalGroup.getId());
             }
         }
     }
 
-    private void createSignalControl(SignalControlDataFactory fac, SignalPlanData signalPlan,
-                                     Id<SignalGroup> signalGroupId) {
-        int onset;
-        int dropping;
-        int signalSystemOffset;
-        // set onset and dropping for each signal group and offset for each signal system
-        if (signal2IsFromSecondODPair.containsKey(signalGroupId.toString())) {
-            if (!signal2IsFromSecondODPair.get(signalGroupId.toString())) {
-                onset = 0;
-                dropping = 30 - INTERGREEN_TIME;
-                signalSystemOffset = 0;
-            } else {
-                onset = 30;
-                dropping = 60 - INTERGREEN_TIME;
-                signalSystemOffset = 0;
-            }
-            signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(fac, signalGroupId, onset, dropping));
-            signalPlan.setOffset(signalSystemOffset);
-        } else {
-            log.error("Signal group id " + signalGroupId + " is not known.");
-        }
+	private void createSignalControlForSignalGroup(SignalControlDataFactory fac, SignalPlanData signalPlan, Id<SignalGroup> signalGroupId) {
+		int onset;
+		int dropping;
+		int signalSystemOffset;
+		if (signalGroupsFirstODPair.contains(signalGroupId)) {
+			// the signal belongs to the first OD-pair
+			onset = 0;
+			dropping = 30 - INTERGREEN_TIME;
+			signalSystemOffset = 0;
+		} else {
+			// the signal belongs to the second OD-pair
+			onset = 30;
+			dropping = 60 - INTERGREEN_TIME;
+			signalSystemOffset = 0;
+		}
+		signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(fac, signalGroupId, onset, dropping));
+		signalPlan.setOffset(signalSystemOffset);
     }
 
     public void writeSignalFiles(String directory) {
-        SignalsData signalsData = (SignalsData) this.scenario
-                .getScenarioElement(SignalsData.ELEMENT_NAME);
+		SignalsData signalsData = (SignalsData) this.scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
 
         new SignalSystemsWriter20(signalsData.getSignalSystemsData()).write(directory + "signalSystems.xml");
         new SignalControlWriter20(signalsData.getSignalControlData()).write(directory + "signalControl.xml");
