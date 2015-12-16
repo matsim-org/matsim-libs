@@ -35,6 +35,7 @@ import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.utils.collections.Tuple;
 
 import playground.agarwalamit.mixedTraffic.MixedTrafficVehiclesUtils;
 import playground.agarwalamit.mixedTraffic.plots.LinkPersonInfoContainer.PersonPositionChecker;
@@ -50,6 +51,8 @@ public class QueuePositionCalculationHandler implements LinkLeaveEventHandler, L
 	private final Map<Id<Person>,SortedMap<Double,String>> person2startTime2PersonLinkInfo = new HashMap<>();
 	
 	private final Map<Id<Person>, String> personId2LegMode = new TreeMap<Id<Person>, String>();
+	private Tuple<Id<Person>, Double> lastDepartedPerson = new Tuple<Id<Person>, Double>(null, 0.);
+	
 	private final Scenario scenario;
 	private double lastEventTimeStep = 0;
 
@@ -70,6 +73,7 @@ public class QueuePositionCalculationHandler implements LinkLeaveEventHandler, L
 	@Override
 	public void handleEvent(PersonDepartureEvent event){
 		this.personId2LegMode.put(event.getPersonId(), event.getLegMode());
+		this.lastDepartedPerson = new Tuple<Id<Person>, Double>(event.getPersonId(), event.getTime());
 	}
 
 	@Override
@@ -196,5 +200,12 @@ public class QueuePositionCalculationHandler implements LinkLeaveEventHandler, L
 	 */
 	public Map<Id<Person>, SortedMap<Double, String>> getPerson2StartTime2AccumulatedPosition() {
 		return person2startTime2PersonLinkInfo;
+	}
+
+	/**
+	 * @return the lastDepartedPerson
+	 */
+	public Tuple<Id<Person>, Double> getLastDepartedPersonAndTime() {
+		return lastDepartedPerson;
 	}
 }
