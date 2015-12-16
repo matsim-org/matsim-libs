@@ -64,36 +64,21 @@ public class TransitionSequencesAnalyzer<U extends DecisionVariable> {
 	// -------------------- CONSTRUCTION --------------------
 
 	TransitionSequencesAnalyzer(final List<Transition<U>> transitions,
-			final double equilibriumGapWeight, final double uniformityWeight
-	// ,
-	// final floetteroed.opdyts.VectorBasedObjectiveFunction
-	// vectorBasedObjectiveFunction,
-	// final double initialGradientNorm
-	) {
+			final double equilibriumGapWeight, final double uniformityWeight) {
 		if ((transitions == null) || (transitions.size() == 0)) {
 			throw new IllegalArgumentException(
 					"there must be at least one transition");
 		}
 		this.transitions = transitions;
 		this.surrogateObjectiveFunction = new SurrogateObjectiveFunction<>(
-		// null,
-				transitions, equilibriumGapWeight, uniformityWeight
-		// , 0.0
-		);
+				transitions, equilibriumGapWeight, uniformityWeight);
 	}
 
 	TransitionSequencesAnalyzer(
 			final Map<U, TransitionSequence<U>> decisionVariable2transitionSequence,
-			final double equilibriumWeight, final double uniformityWeight
-	// ,
-	// final floetteroed.opdyts.VectorBasedObjectiveFunction
-	// vectorBasedObjectiveFunction,
-	// final double initialGradientNorm
-	) {
+			final double equilibriumWeight, final double uniformityWeight) {
 		this(map2list(decisionVariable2transitionSequence), equilibriumWeight,
-				uniformityWeight
-		// , null, 0.0
-		);
+				uniformityWeight);
 	}
 
 	static <V extends DecisionVariable> List<Transition<V>> map2list(
@@ -142,22 +127,6 @@ public class TransitionSequencesAnalyzer<U extends DecisionVariable> {
 		}
 		return result;
 	}
-
-	// /**
-	// * @deprecated Most likely only used for the (currently!) obsolete alpha
-	// * initialization.
-	// */
-	// public Map<DecisionVariable, Integer> decisionVariable2transitionCnt() {
-	// final Map<DecisionVariable, Integer> result = new
-	// LinkedHashMap<DecisionVariable, Integer>();
-	// for (Transition transition : this.transitions) {
-	// final DecisionVariable decisionVariable = transition
-	// .getDecisionVariable();
-	// final Integer cnt = result.get(decisionVariable);
-	// result.put(decisionVariable, cnt == null ? 1 : cnt + 1);
-	// }
-	// return result;
-	// }
 
 	// -------------------- OPTIMIZATION --------------------
 
@@ -283,58 +252,3 @@ public class TransitionSequencesAnalyzer<U extends DecisionVariable> {
 		}
 	}
 }
-
-// ######################################################################
-// ######################################################################
-// ######################################################################
-//
-// public Vector newInititialAlphas(
-// final Map<DecisionVariable, Double> oldDecisionVariable2alpha,
-// final Map<DecisionVariable, Integer> oldDecisionVariable2alphaCnt) {
-// final Vector initialAlphas = new Vector(this.transitions.size());
-// for (int i = 0; i < this.transitions.size(); i++) {
-// final DecisionVariable decisionVariable = this.transitions.get(i)
-// .getDecisionVariable();
-// final Double oldAlpha = oldDecisionVariable2alpha
-// .get(decisionVariable);
-// if (oldAlpha != null) {
-// final Integer oldCnt = oldDecisionVariable2alphaCnt
-// .get(decisionVariable);
-// if ((oldCnt != null) && (oldCnt >= 1)) {
-// initialAlphas.set(i, oldAlpha / oldCnt);
-// }
-// }
-// }
-// if (initialAlphas.sum() >= 0.99) {
-// initialAlphas.mult(1.0 / initialAlphas.sum());
-// } else {
-// // imprecision too large, fall back to uniform solution
-// initialAlphas.fill(1.0 / initialAlphas.size());
-// }
-// return initialAlphas;
-// }
-
-// /**
-// * @deprecated The initial alphas are not being used, need to invert the
-// MNL
-// * formulation for that.
-// */
-// public Vector optimalAlphas(final Vector initialAlphas) {
-// if (initialAlphas.size() == 1) {
-// return initialAlphas.copy();
-// } else {
-// final NonLinearConjugateGradientOptimizer solver = new
-// NonLinearConjugateGradientOptimizer(
-// NonLinearConjugateGradientOptimizer.Formula.FLETCHER_REEVES,
-// new SimpleValueChecker(1e-8, 1e-8));
-// final PointValuePair result = solver.optimize(
-// new ObjectiveFunction(new MyObjectiveFunction()),
-// new ObjectiveFunctionGradient(new MyGradient()),
-// GoalType.MINIMIZE, new InitialGuess(
-// new double[this.transitions.size() - 1]),
-// new MaxEval(Integer.MAX_VALUE), new MaxIter(
-// this.maxIterations));
-// return proba(newVectPlusOneZero(result.getPoint()));
-// }
-// }
-

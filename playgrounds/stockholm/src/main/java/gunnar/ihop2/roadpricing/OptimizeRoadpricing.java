@@ -50,16 +50,16 @@ class OptimizeRoadpricing {
 				changeTimeProba, changeCostProba, deltaTime_s, deltaCost_money,
 				MatsimRandom.getRandom(), scenario);
 
-		int maxMemoryLength = 10;
+		int maxMemoryLength = 1;
 		boolean keepBestSolution = true;
 		boolean interpolate = true;
-		int maxIterations = 3;
-		int maxTransitions = 100;
-		int populationSize = 5;
+		int maxIterations = 10;
+		int maxTransitions = Integer.MAX_VALUE;
+		int populationSize = 25;
 
 		final ObjectiveFunction objectiveFunction = new TotalScoreObjectiveFunction();
 		final ConvergenceCriterion convergenceCriterion = new FixedIterationNumberConvergenceCriterion(
-				3, 1);
+				100, 5);
 		final RandomSearch<TollLevels> randomSearch = new RandomSearch<>(
 				new MATSimSimulator<TollLevels>(new MATSimStateFactory() {
 					@Override
