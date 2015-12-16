@@ -46,7 +46,8 @@ public class QueuePositionCalculationHandler implements LinkLeaveEventHandler, L
 
 	private static final Logger LOG = Logger.getLogger(QueuePositionCalculationHandler.class);
 	private final Map<Id<Link>,LinkPersonInfoContainer> linkid2Container = new HashMap<>();
-	private final Map<Id<Person>,SortedMap<Double,String>> person2startTime2data = new HashMap<>();
+	private final Map<Id<Person>,SortedMap<Double,String>> person2startTime2PersonQPos = new HashMap<>();
+	private final Map<Id<Person>,SortedMap<Double,String>> person2startTime2PersonLinkInfo = new HashMap<>();
 	
 	private final Map<Id<Person>, String> personId2LegMode = new TreeMap<Id<Person>, String>();
 	private final Scenario scenario;
@@ -94,7 +95,7 @@ public class QueuePositionCalculationHandler implements LinkLeaveEventHandler, L
 		Queue<Id<Person>> personId2AgentPositions = container.getAgentsOnLink();
 		personId2AgentPositions.offer(personId);
 	}
-
+	
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
 		Id<Link> linkId = event.getLinkId();
@@ -113,6 +114,19 @@ public class QueuePositionCalculationHandler implements LinkLeaveEventHandler, L
 
 		PersonPositionChecker checker = container.getOrCreatePersonPositionChecker(personId);
 
+		if(person2startTime2PersonLinkInfo.containsKey(personId)){
+			SortedMap<Double,String> time2String = person2startTime2PersonLinkInfo.get(personId);
+			double initialPos = Double.valueOf( time2String.get(time2String.lastKey()).split("\t")[3] ); // this is lastPosition to keep accumulating distance
+			time2String.put(checker.getEnteredPersonInfo().getLinkEnterTime(), linkId+"\t"+initialPos+"\t"+
+					checker.getLeftPersonInfo().getLinkLeaveTime() + "\t" + String.valueOf(initialPos + checker.getLink().getLength()) +"\t" + checker.getEnteredPersonInfo().getLegMode());
+		} else {
+			double initialPos = 0.;
+			SortedMap<Double,String> time2String = new TreeMap<>();
+			time2String.put(checker.getEnteredPersonInfo().getLinkEnterTime(), linkId+"\t"+initialPos+"\t"+
+					checker.getLeftPersonInfo().getLinkLeaveTime() + "\t" + String.valueOf(initialPos + checker.getLink().getLength()) +"\t" + checker.getEnteredPersonInfo().getLegMode());
+			person2startTime2PersonLinkInfo.put(personId, time2String);
+		}
+		
 		updateVehicleOnLinkAndFillToQueue(event.getTime());
 		container.getAgentsOnLink().remove(personId);
 
@@ -125,8 +139,8 @@ public class QueuePositionCalculationHandler implements LinkLeaveEventHandler, L
 				qStartDistFromFNode=initialPos + checker.getLink().getLength();
 			}
 
-			if(person2startTime2data.containsKey(personId)){
-				SortedMap<Double,String> time2String = person2startTime2data.get(personId);
+			if(person2startTime2PersonQPos.containsKey(personId)){
+				SortedMap<Double,String> time2String = person2startTime2PersonQPos.get(personId);
 				time2String.put(checker.getEnteredPersonInfo().getLinkEnterTime(), linkId+"\t"+initialPos+"\t"+
 						checker.getQueuingTime() + "\t" + qStartDistFromFNode +"\t" + checker.getEnteredPersonInfo().getLegMode());
 				time2String.put(checker.getQueuingTime(), linkId+"\t"+qStartDistFromFNode+"\t"+
@@ -137,7 +151,7 @@ public class QueuePositionCalculationHandler implements LinkLeaveEventHandler, L
 						checker.getQueuingTime() + "\t" + qStartDistFromFNode +"\t" + checker.getEnteredPersonInfo().getLegMode());
 				time2String.put(checker.getQueuingTime(), linkId+"\t"+qStartDistFromFNode+"\t"+
 						checker.getLeftPersonInfo().getLinkLeaveTime() + "\t" + (1 + Double.valueOf(checker.getLink().getId().toString() ) )*checker.getLink().getLength() +"\t" + checker.getEnteredPersonInfo().getLegMode());
-				person2startTime2data.put(personId, time2String);
+				person2startTime2PersonQPos.put(personId, time2String);
 			}
 			
 			container.getAgentsInQueue().remove(personId);
@@ -173,7 +187,14 @@ public class QueuePositionCalculationHandler implements LinkLeaveEventHandler, L
 	/**
 	 * @return the person2startTime2 person position info
 	 */
-	public Map<Id<Person>, SortedMap<Double, String>> getPerson2StartTime2PersonPosition() {
-		return person2startTime2data;
+	public Map<Id<Person>, SortedMap<Double, String>> getPerson2StartTime2PersonQPosition() {
+		return person2startTime2PersonQPos;
+	}
+
+	/**
+	 * @return the person2startTime2 link enter leave time and position, this is useful to show matsim events without interpolation
+	 */
+	public Map<Id<Person>, SortedMap<Double, String>> getPerson2StartTime2AccumulatedPosition() {
+		return person2startTime2PersonLinkInfo;
 	}
 }

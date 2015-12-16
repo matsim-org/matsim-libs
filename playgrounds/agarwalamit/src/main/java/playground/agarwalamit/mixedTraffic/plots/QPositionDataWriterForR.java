@@ -40,7 +40,7 @@ import playground.agarwalamit.utils.LoadMyScenarios;
 public class QPositionDataWriterForR {
 
 	private static String outputDir ="../../../../repos/shared-svn/projects/mixedTraffic/triangularNetwork/"
-			+ "run313/xtPlots/carWithoutHoles/";
+			+ "run313/xtPlots/withoutHoles/car/";
 	private static final String suffix = "events[400]";
 	private static String eventFile = outputDir+"/events/"+suffix+".xml";
 	private static String networkFile=outputDir+"/network.xml";
@@ -48,6 +48,7 @@ public class QPositionDataWriterForR {
 	private static Scenario scenario;
 	private static QueuePositionCalculationHandler calculationHandler;
 	private Map<Id<Person>,SortedMap<Double,String>> person2startTime2data;
+	private Map<Id<Person>, SortedMap<Double, String>> person2StartTime2AccumulatedPos;
 
 	private final static Logger LOG = Logger.getLogger(QPositionDataWriterForR.class);
 
@@ -59,18 +60,21 @@ public class QPositionDataWriterForR {
 		eventsManager.addHandler(calculationHandler);
 		MatsimEventsReader eventsReader = new MatsimEventsReader(eventsManager);
 		eventsReader.readFile(eventFile);
-		this.person2startTime2data = calculationHandler.getPerson2StartTime2PersonPosition();
-		writeData(outputDir);
+		this.person2startTime2data = calculationHandler.getPerson2StartTime2PersonQPosition();
+		this.person2StartTime2AccumulatedPos = calculationHandler.getPerson2StartTime2AccumulatedPosition();
+		writeData(outputDir+"rData_QueuePositions_"+suffix+".txt", this.person2startTime2data);
+		writeData(outputDir+"rData_AccumulatedPositions_"+suffix+".txt", this.person2StartTime2AccumulatedPos);
+		
 		LOG.info("Writing file(s) is finished.");
 	}
 	
-	public void writeData(final String outputFolder){
-		BufferedWriter writer = IOUtils.getBufferedWriter(outputFolder+"rData_QueuePositions_"+suffix+".txt");
+	public void writeData(final String outputFile, final Map<Id<Person>, SortedMap<Double, String>> inData){
+		BufferedWriter writer = IOUtils.getBufferedWriter(outputFile);
 		try {
 			writer.write("personId \t startPositionTime \t linkId \t startPosition \t endPositionTime \t endPosition \t travelMode \n");
-			for(Id<Person> p : this.person2startTime2data.keySet()){
-				for(Double d : this.person2startTime2data.get(p).keySet()){
-					writer.write(p+"\t"+d+"\t"+this.person2startTime2data.get(p).get(d)+"\n");
+			for(Id<Person> p : inData.keySet()){
+				for(Double d : inData.get(p).keySet()){
+					writer.write(p+"\t"+d+"\t"+inData.get(p).get(d)+"\n");
 				}
 			}
 			writer.close();
