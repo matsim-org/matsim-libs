@@ -33,8 +33,6 @@ import org.matsim.core.router.util.Landmarker;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.PieSlicesLandmarker;
 import org.matsim.core.router.util.PreProcessLandmarks;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.router.MultiNodeDijkstra;
@@ -95,11 +93,12 @@ public class TransitRouterAStar implements TransitRouter {
 
 		preprocess.run( transitNetwork );
         this.dijkstra = new MultiNodeAStarLandmarks(
+				astarConfig.getInitiallyActiveLandmarks(),
 				astarConfig.getOverdoFactor(),
 				this.transitNetwork,
 				preprocess,
 				this.travelDisutility,
-				this.travelDisutility);
+				this.travelDisutility );
     }
 
 	private Landmarker createLandmarker( TransitRouterAStarConfigGroup astarConfig ) {

@@ -57,8 +57,6 @@ public class TransitRouterAStarTest {
 		final Config config = utils.loadConfig( "test/scenarios/siouxfalls-2014-reduced/config_default.xml" );
 		final Scenario sc = ScenarioUtils.loadScenario( config );
 
-		final TransitRouterConfig transitConfig = new TransitRouterConfig( config );
-
 		final TransitRouterAStar router = new TransitRouterAStar( config , sc.getTransitSchedule() );
 
 		final MultiNodeAStarLandmarks testee = router.getAStarAlgorithm();

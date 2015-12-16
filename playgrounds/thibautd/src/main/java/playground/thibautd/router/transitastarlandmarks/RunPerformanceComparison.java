@@ -20,12 +20,10 @@ package playground.thibautd.router.transitastarlandmarks;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Counter;
-import org.matsim.facilities.ActivityFacility;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterImpl;
@@ -46,10 +44,11 @@ import java.util.concurrent.TimeUnit;
  * <br/>
  * More details for P. Bösch full switzerland for 1000 random ODs:
  * <ul>
- *     <li>overdo 1, 16 landmarks: 25% faster</li>
- *     <li>overdo 1.25, 16 landmarks:  32% faster</li>
- *     <li>overdo 1, 32 landmarks:  faster</li>
- *     <li>overdo 1.25, 32 landmarks:  faster</li>
+ *     <li>overdo 1, 16 degree landmarks: 25% faster</li>
+ *     <li>overdo 1.25, 16 degree landmarks:  32% faster</li>
+ *     <li>overdo 1.25, 16 degree landmarks, without "smart" per query landmark activation:  34% faster</li>
+ *     <li>overdo 1, 32 degree landmarks:  ??? faster</li>
+ *     <li>overdo 1.25, 32 degree landmarks:  26% faster</li>
  * </ul>
  *
  * @author thibautd

@@ -31,11 +31,26 @@ public class TransitRouterAStarConfigGroup extends ReflectiveConfigGroup {
 	public enum LandmarkComputation { degree, pieSlice; }
 
 	private int nLandmarks = 16;
+	private int initiallyActiveLandmarks = 2;
 	private double overdoFactor = 1;
 	private LandmarkComputation landmarkComputation = LandmarkComputation.degree;
 
 	public TransitRouterAStarConfigGroup( ) {
 		super( GROUP_NAME );
+	}
+
+	@StringGetter( "initiallyActiveLandmarks" )
+	public int getInitiallyActiveLandmarks() {
+		return initiallyActiveLandmarks;
+	}
+
+	@StringSetter( "initiallyActiveLandmarks" )
+	public void setInitiallyActiveLandmarks( int initiallyActiveLandmarks ) {
+		if ( initiallyActiveLandmarks < 1 ) {
+			log.warn( "number of active landmarks below 1 makes no sense! Keeping former value "+this.initiallyActiveLandmarks );
+			return;
+		}
+		this.initiallyActiveLandmarks = initiallyActiveLandmarks;
 	}
 
 	@StringGetter( "nLandmarks" )

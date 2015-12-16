@@ -38,7 +38,6 @@ import org.matsim.vehicles.Vehicle;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -80,6 +79,7 @@ public class MultiNodeAStarLandmarks {
 	private Vehicle vehicle = null;
 	private PreProcessLandmarks preprocess;
 	private final double overdoFactor;
+	private final int initiallyActiveLandmarks;
 
 	private InternalLandmarkData fromData;
 	private InternalLandmarkData toData;
@@ -88,6 +88,7 @@ public class MultiNodeAStarLandmarks {
 	private static final int CONTROL_INTERVAL = 40;
 
 	public MultiNodeAStarLandmarks(
+			final int initiallyActiveLandmarks,
 			final double overdoFactor,
 			final Network network,
 			final PreProcessLandmarks preprocess,
@@ -95,6 +96,10 @@ public class MultiNodeAStarLandmarks {
 			final TravelTime timeFunction ) {
 		if ( overdoFactor < 1 ) throw new IllegalArgumentException( "Overdo factor below 1 makes no sense!" );
 		this.overdoFactor = overdoFactor;
+
+		if ( initiallyActiveLandmarks < 1 ) throw new IllegalArgumentException( "initially active landmarks below 1 makes no sense!" );
+		this.initiallyActiveLandmarks = initiallyActiveLandmarks;
+
 		this.preprocess = preprocess;
 		this.network = network;
 		this.costFunction = costFunction;
@@ -139,7 +144,7 @@ public class MultiNodeAStarLandmarks {
 				fromNodes,
 				toNodes,
 				Math.min(
-						2,
+						initiallyActiveLandmarks,
 						preprocess.getLandmarks().length ) );
 		this.person = person;
 
