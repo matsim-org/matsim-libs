@@ -38,6 +38,13 @@ import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 /**
+ * Compares performance of transit routing with and without A Star.
+ *
+ * Improvement seems to depend on the transit schedule. For C. Dobler's full Switzerland (very heavyweight, lots of transfer links),
+ * A Star performs worse. For P. Bösch full Switzerland (somehow much lighter), A Star is 25% faster.
+ *
+ * More details for P. Bösch full switzerland:
+ *
  * @author thibautd
  */
 public class RunPerformanceComparison {
@@ -49,10 +56,8 @@ public class RunPerformanceComparison {
 		final Config config = ConfigUtils.loadConfig( args[ 0 ] );
 		final Scenario sc = ScenarioUtils.loadScenario( config );
 
-		final TransitRouterConfig transitConfig = new TransitRouterConfig( config );
-
-		final TransitRouterAStar testee = new TransitRouterAStar( transitConfig , sc.getTransitSchedule() );
-		final TransitRouter reference = new TransitRouterImpl( transitConfig , sc.getTransitSchedule() );
+		final TransitRouterAStar testee = new TransitRouterAStar( config , sc.getTransitSchedule() );
+		final TransitRouter reference = new TransitRouterImpl( new TransitRouterConfig( config ) , sc.getTransitSchedule() );
 
 		final List<Id<ActivityFacility>> facilityIds = new ArrayList<>( sc.getActivityFacilities().getFacilities().keySet() );
 		Collections.sort( facilityIds );

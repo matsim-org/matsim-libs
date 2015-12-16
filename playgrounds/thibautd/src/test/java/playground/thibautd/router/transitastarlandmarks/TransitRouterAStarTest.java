@@ -59,7 +59,7 @@ public class TransitRouterAStarTest {
 
 		final TransitRouterConfig transitConfig = new TransitRouterConfig( config );
 
-		final TransitRouterAStar router = new TransitRouterAStar( transitConfig , sc.getTransitSchedule() );
+		final TransitRouterAStar router = new TransitRouterAStar( config , sc.getTransitSchedule() );
 
 		final MultiNodeAStarLandmarks testee = router.getAStarAlgorithm();
 		final MultiNodeDijkstra oracle = router.getEquivalentDijkstra();
@@ -129,7 +129,7 @@ public class TransitRouterAStarTest {
 
 		final TransitRouterConfig transitConfig = new TransitRouterConfig( config );
 
-		final TransitRouterAStar testee = new TransitRouterAStar( transitConfig , sc.getTransitSchedule() );
+		final TransitRouterAStar testee = new TransitRouterAStar( config , sc.getTransitSchedule() );
 		final TransitRouter oracle = new TransitRouterImpl( transitConfig , sc.getTransitSchedule() );
 
 		final List<Id<ActivityFacility>> facilityIds = new ArrayList<>( sc.getActivityFacilities().getFacilities().keySet() );

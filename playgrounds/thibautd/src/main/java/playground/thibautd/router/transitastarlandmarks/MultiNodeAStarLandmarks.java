@@ -79,7 +79,7 @@ public class MultiNodeAStarLandmarks {
 	private Person person = null;
 	private Vehicle vehicle = null;
 	private PreProcessLandmarks preprocess;
-	private final double overdoFactor = 1;
+	private final double overdoFactor;
 
 	private InternalLandmarkData fromData;
 	private InternalLandmarkData toData;
@@ -88,10 +88,13 @@ public class MultiNodeAStarLandmarks {
 	private static final int CONTROL_INTERVAL = 40;
 
 	public MultiNodeAStarLandmarks(
+			final double overdoFactor,
 			final Network network,
 			final PreProcessLandmarks preprocess,
 			final TravelDisutility costFunction,
 			final TravelTime timeFunction ) {
+		if ( overdoFactor < 1 ) throw new IllegalArgumentException( "Overdo factor below 1 makes no sense!" );
+		this.overdoFactor = overdoFactor;
 		this.preprocess = preprocess;
 		this.network = network;
 		this.costFunction = costFunction;

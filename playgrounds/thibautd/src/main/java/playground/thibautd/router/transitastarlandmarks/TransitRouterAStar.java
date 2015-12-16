@@ -26,9 +26,12 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
+import org.matsim.core.router.util.Landmarker;
 import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.router.util.PieSlicesLandmarker;
 import org.matsim.core.router.util.PreProcessLandmarks;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
@@ -64,10 +67,19 @@ public class TransitRouterAStar implements TransitRouter {
     private final PreparedTransitSchedule preparedTransitSchedule;
 
 	public TransitRouterAStar(final Config config, final TransitSchedule schedule) {
-		this( new TransitRouterConfig( config ) , schedule );
+		this(
+				ConfigUtils.addOrGetModule(
+						config,
+						TransitRouterAStarConfigGroup.GROUP_NAME,
+						TransitRouterAStarConfigGroup.class ),
+				new TransitRouterConfig( config ) ,
+				schedule );
 	}
 
-    public TransitRouterAStar(final TransitRouterConfig config, final TransitSchedule schedule) {
+    public TransitRouterAStar(
+			final TransitRouterAStarConfigGroup astarConfig,
+			final TransitRouterConfig config,
+			final TransitSchedule schedule) {
         this.preparedTransitSchedule = new PreparedTransitSchedule(schedule);
         this.config = config;
         this.travelDisutility =
@@ -75,14 +87,30 @@ public class TransitRouterAStar implements TransitRouter {
 						config,
 						preparedTransitSchedule);
         this.transitNetwork = TransitRouterNetwork.createFromSchedule(schedule, config.getBeelineWalkConnectionDistance());
-		final PreProcessLandmarks preprocess = new PreProcessLandmarks( travelDisutility , new DegreeBasedLandmarker() , 16 );
+		final PreProcessLandmarks preprocess =
+				new PreProcessLandmarks(
+						travelDisutility,
+						createLandmarker( astarConfig ),
+						astarConfig.getNLandmarks() );
+
 		preprocess.run( transitNetwork );
         this.dijkstra = new MultiNodeAStarLandmarks(
+				astarConfig.getOverdoFactor(),
 				this.transitNetwork,
 				preprocess,
 				this.travelDisutility,
 				this.travelDisutility);
     }
+
+	private Landmarker createLandmarker( TransitRouterAStarConfigGroup astarConfig ) {
+		switch ( astarConfig.getLandmarkComputation() ) {
+			case degree:
+				return new DegreeBasedLandmarker();
+			case pieSlice:
+				return new PieSlicesLandmarker( null );
+		}
+		throw new RuntimeException( "unknown landmarker "+astarConfig.getLandmarkComputation() );
+	}
 
 	MultiNodeAStarLandmarks getAStarAlgorithm() {
 		return dijkstra;
