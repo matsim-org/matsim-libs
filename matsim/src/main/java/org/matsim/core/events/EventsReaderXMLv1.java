@@ -120,41 +120,45 @@ public class EventsReaderXMLv1 extends MatsimXmlParser {
 		} else if (VehicleEntersTrafficEvent.EVENT_TYPE.equals(eventType) ) {
 			// (this is the new version, marked by the new events name)
 
-			// for the new events type, we assume that the vehicle id is always set:
-			final Id<Vehicle> vehicleId = Id.create(atts.getValue(VehicleEntersTrafficEvent.ATTRIBUTE_VEHICLE), Vehicle.class);
-			
 			this.events.processEvent(new VehicleEntersTrafficEvent(time, 
 					Id.create(atts.getValue(VehicleEntersTrafficEvent.ATTRIBUTE_DRIVER), Person.class), 
 					Id.create(atts.getValue(VehicleEntersTrafficEvent.ATTRIBUTE_LINK), Link.class), 
-					vehicleId,
+					Id.create(atts.getValue(VehicleEntersTrafficEvent.ATTRIBUTE_VEHICLE), Vehicle.class),
 					atts.getValue(VehicleEntersTrafficEvent.ATTRIBUTE_NETWORKMODE), 
-					1.0 // yyyyyy why does it make sense to not read from file? kai, dec'15
+					Double.parseDouble( atts.getValue( VehicleEntersTrafficEvent.ATTRIBUTE_POSITION) )
 					));
 		} else if ( "wait2link".equals(eventType) ) {
 			// (this is the old version, marked by the old events name)
-			
-			// for the old events type, we set the vehicle id to the driver id:
-			final Id<Vehicle> vehicleId = Id.create(atts.getValue(VehicleEntersTrafficEvent.ATTRIBUTE_DRIVER), Vehicle.class);
+
+			// retrofit vehicle Id:
+			Id<Vehicle> vehicleId ;
+			if ( atts.getValue(VehicleEntersTrafficEvent.ATTRIBUTE_VEHICLE) != null ) {
+				vehicleId = Id.create( atts.getValue(VehicleEntersTrafficEvent.ATTRIBUTE_VEHICLE), Vehicle.class ) ;
+			} else {
+				// for the old events type, we set the vehicle id to the driver id if the vehicle id does not exist:
+				vehicleId = Id.create(atts.getValue(VehicleEntersTrafficEvent.ATTRIBUTE_DRIVER), Vehicle.class);
+			}
+			// retrofit position:
+			double position ;
+			if ( atts.getValue( VehicleEntersTrafficEvent.ATTRIBUTE_POSITION)!=null ) {
+				position = Double.parseDouble( atts.getValue( VehicleEntersTrafficEvent.ATTRIBUTE_POSITION) ) ;
+			} else {
+				position = 1.0 ;
+			}
 			this.events.processEvent(new VehicleEntersTrafficEvent(time, 
 					Id.create(atts.getValue(VehicleEntersTrafficEvent.ATTRIBUTE_DRIVER), Person.class), 
 					Id.create(atts.getValue(VehicleEntersTrafficEvent.ATTRIBUTE_LINK), Link.class), 
 					vehicleId,
-					// (this could return the driver id as vehicle ide when the vehicle id is not present.  would allow to read in old events files.
-					// My intuition would be to combine this with versioning, i.e. when someone says "vehicle=null" in v2, then he/she
-					// actually means it; in v1, he/she means "vehicleId=driverId". kai, dec'15)
 					atts.getValue(VehicleEntersTrafficEvent.ATTRIBUTE_NETWORKMODE), 
-					1.0 // yyyyyy why does it make sense to not read from file? kai, dec'15
+					position
 					));
 		} else if (VehicleLeavesTrafficEvent.EVENT_TYPE.equals(eventType)) {
 			this.events.processEvent(new VehicleLeavesTrafficEvent(time, 
 					Id.create(atts.getValue(VehicleLeavesTrafficEvent.ATTRIBUTE_DRIVER), Person.class), 
 					Id.create(atts.getValue(VehicleLeavesTrafficEvent.ATTRIBUTE_LINK), Link.class), 
 					atts.getValue(VehicleLeavesTrafficEvent.ATTRIBUTE_VEHICLE) == null ? null : Id.create(atts.getValue(VehicleLeavesTrafficEvent.ATTRIBUTE_VEHICLE), Vehicle.class), 
-							// (this could return the driver id as vehicle ide when the vehicle id is not present.  would allow to read in old events files.
-							// My intuition would be to combine this with versioning, i.e. when someone says "vehicle=null" in v2, then he/she
-							// actually means it; in v1, he/she means "vehicleId=driverId". kai, dec'15)
 					atts.getValue(VehicleLeavesTrafficEvent.ATTRIBUTE_NETWORKMODE), 
-					1.0 // yyyyyy why does it make sense to not read from file? kai, dec'15
+					Double.parseDouble( atts.getValue( VehicleLeavesTrafficEvent.ATTRIBUTE_POSITION) )
 					));
 		}
 		// === material related to wait2link above here
