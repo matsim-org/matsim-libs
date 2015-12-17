@@ -70,8 +70,8 @@ import org.matsim.core.replanning.GenericStrategyManager;
  * @author sschroeder, mzilske
  */
 
-class CarrierControlerListener implements StartupListener, ShutdownListener, BeforeMobsimListener, AfterMobsimListener, ScoringListener,
-        ReplanningListener, IterationEndsListener {
+class CarrierControlerListener implements BeforeMobsimListener, AfterMobsimListener, ScoringListener,
+        ReplanningListener {
 
     private CarrierScoringFunctionFactory carrierScoringFunctionFactory;
 
@@ -96,10 +96,6 @@ class CarrierControlerListener implements StartupListener, ShutdownListener, Bef
 
     public Map<Id<Carrier>, Carrier> getCarriers() {
         return carriers.getCarriers();
-    }
-
-    @Override
-    public void notifyStartup(StartupEvent event) {
     }
 
     @Override
@@ -133,16 +129,6 @@ class CarrierControlerListener implements StartupListener, ShutdownListener, Bef
             collection.add(carrier);
         }
         strategyManager.run(collection, null, event.getIteration(), event.getReplanningContext());
-    }
-
-    @Override
-    public void notifyIterationEnds(IterationEndsEvent event) {
-
-    }
-
-    @Override
-    public void notifyShutdown(ShutdownEvent event) {
-
     }
 
 }

@@ -35,7 +35,7 @@ public class ControlerDefaultCoreListenersModule extends AbstractModule {
 	@Override
 	public void install() {
 		bind( PlansScoring.class ).to( PlansScoringImpl.class );
-		bind(EventsToScore.class); // NOT a Singleton
+		bind(EventsToScore.class).asEagerSingleton();
 		bind( PlansReplanning.class ).to( PlansReplanningImpl.class );
 		bind( PlansDumping.class ).to( PlansDumpingImpl.class );
 		bind( EventsHandling.class ).to( EventsHandlingImpl.class );

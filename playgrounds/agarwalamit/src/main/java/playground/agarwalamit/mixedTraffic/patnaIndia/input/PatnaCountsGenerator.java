@@ -49,7 +49,7 @@ public class PatnaCountsGenerator {
 		
 		PatnaCountsGenerator pcg = new PatnaCountsGenerator();
 		pcg.readFileAndReturnCountInfo(innerCordonFile);
-		pcg.readFileAndReturnCountInfo(outerCordonFile);
+		pcg.readFileAndReturnCountInfo(outerCordonFile);//ZZ_TODO : I must use OuterCordonLinks enum to generate outer cordon counts.
 		pcg.writeCountsDataToFile(outCountsFile);
 	}
 	

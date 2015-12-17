@@ -8,6 +8,7 @@ public class TravelDistanceStatsModule extends AbstractModule {
 	@Override
 	public void install() {
 		bind(TravelDistanceStats.class).asEagerSingleton();
+		addControlerListenerBinding().to(TravelDistanceStatsControlerListener.class);
 	}
 
 }

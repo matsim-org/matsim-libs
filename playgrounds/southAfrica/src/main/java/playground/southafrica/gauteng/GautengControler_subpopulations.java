@@ -271,7 +271,9 @@ public class GautengControler_subpopulations {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				addPlanSelectorForRemovalBinding(DIVERSITY_GENERATING_PLANS_REMOVER).toProvider(builder);
+				if (getConfig().strategy().getPlanSelectorForRemoval().equals(DIVERSITY_GENERATING_PLANS_REMOVER)) {
+					bindPlanSelectorForRemoval().toProvider(builder);
+				}
 			}
 		});
 		// yyyy needs to be tested.  But in current runs, all plans of an agent are exactly identical at end of 1000it.  kai, mar'13

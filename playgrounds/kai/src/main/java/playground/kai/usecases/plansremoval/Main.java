@@ -60,9 +60,9 @@ public class Main {
 			@Override
 			public void install() {
 				PlanSelector selector = new MySelectorForRemoval() ;
-				this.addPlanSelectorForRemovalBinding(selectorName).toInstance( selector ) ;
-				// (as with the other registers, this will only be used when referred to by the config) 
-				
+				if (getConfig().strategy().getPlanSelectorForRemoval().equals(selectorName)) {
+					bindPlanSelectorForRemoval().toInstance( selector);
+				}
 			}
 		} ; 
 

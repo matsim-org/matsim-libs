@@ -36,18 +36,26 @@ import javax.inject.Provider;
 
 public class DefaultPlanStrategiesModule extends AbstractModule {
 	
-	public static enum DefaultPlansRemover { WorstPlanSelector, SelectRandom, SelectExpBetaForRemoval, ChangeExpBetaForRemoval, 
+	public enum DefaultPlansRemover { WorstPlanSelector, SelectRandom, SelectExpBetaForRemoval, ChangeExpBetaForRemoval,
 		PathSizeLogitSelectorForRemoval }
-
-	public static final String Selector = null; ;
 
     @Override
     public void install() {
-        addPlanSelectorForRemovalBinding(DefaultPlansRemover.WorstPlanSelector.toString()).to(WorstPlanForRemovalSelector.class);
-        addPlanSelectorForRemovalBinding(DefaultPlansRemover.SelectRandom.toString()).to(new TypeLiteral<RandomPlanSelector<Plan, Person>>(){});
-        addPlanSelectorForRemovalBinding(DefaultPlansRemover.SelectExpBetaForRemoval.toString()).toProvider(ExpBetaPlanSelectorForRemoval.class);
-        addPlanSelectorForRemovalBinding(DefaultPlansRemover.ChangeExpBetaForRemoval.toString()).toProvider(ExpBetaPlanChangerForRemoval.class);
-        addPlanSelectorForRemovalBinding(DefaultPlansRemover.PathSizeLogitSelectorForRemoval.toString()).toProvider(PathSizeLogitSelectorForRemoval.class);
+        if (getConfig().strategy().getPlanSelectorForRemoval().equals(DefaultPlansRemover.WorstPlanSelector.toString())) {
+            bindPlanSelectorForRemoval().to(WorstPlanForRemovalSelector.class);
+        }
+        if (getConfig().strategy().getPlanSelectorForRemoval().equals(DefaultPlansRemover.SelectRandom.toString())) {
+            bindPlanSelectorForRemoval().to(new TypeLiteral<RandomPlanSelector<Plan, Person>>(){});
+        }
+        if (getConfig().strategy().getPlanSelectorForRemoval().equals(DefaultPlansRemover.SelectExpBetaForRemoval.toString())) {
+            bindPlanSelectorForRemoval().toProvider(ExpBetaPlanSelectorForRemoval.class);
+        }
+        if (getConfig().strategy().getPlanSelectorForRemoval().equals(DefaultPlansRemover.ChangeExpBetaForRemoval.toString())) {
+            bindPlanSelectorForRemoval().toProvider(ExpBetaPlanChangerForRemoval.class);
+        }
+        if (getConfig().strategy().getPlanSelectorForRemoval().equals(DefaultPlansRemover.PathSizeLogitSelectorForRemoval.toString())) {
+            bindPlanSelectorForRemoval().toProvider(PathSizeLogitSelectorForRemoval.class);
+        }
 
         // strategy packages that only select:
         addPlanStrategyBinding(DefaultSelector.KeepLastSelected.toString()).toProvider(KeepLastSelectedPlanStrategyFactory.class);

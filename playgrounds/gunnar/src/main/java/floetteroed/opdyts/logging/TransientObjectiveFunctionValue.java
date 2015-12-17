@@ -21,7 +21,7 @@
  *
  * contact: gunnar.floetteroed@abe.kth.se
  *
- */ 
+ */
 package floetteroed.opdyts.logging;
 
 import floetteroed.opdyts.trajectorysampling.SamplingStage;
@@ -32,7 +32,7 @@ import floetteroed.utilities.statisticslogging.Statistic;
  * @author Gunnar Flötteröd
  *
  */
-public class InterpolatedObjectiveFunctionValue implements
+public class TransientObjectiveFunctionValue implements
 		Statistic<SamplingStage<?>> {
 
 	@Override

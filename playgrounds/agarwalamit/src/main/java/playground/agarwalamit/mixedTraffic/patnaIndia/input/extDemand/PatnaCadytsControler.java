@@ -35,6 +35,7 @@ import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.replanning.DefaultPlanStrategiesModule;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -69,10 +70,6 @@ public class PatnaCadytsControler {
 
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		
-		CadytsConfigGroup cadytsConfigGroup = ConfigUtils.addOrGetModule(config, CadytsConfigGroup.GROUP_NAME, CadytsConfigGroup.class);
-		cadytsConfigGroup.setStartTime(06*3600);
-		cadytsConfigGroup.setEndTime(18*3600-1);
-		
 		final Controler controler = new Controler(config);
 		controler.setDumpDataAtEnd(true);
 
@@ -89,9 +86,13 @@ public class PatnaCadytsControler {
 				addTravelDisutilityFactoryBinding("truck").to(carTravelDisutilityFactoryKey());
 			}
 		});
-
+		
 		final CadytsContext cContext = new CadytsContext(controler.getConfig());
 		controler.addControlerListener(cContext);
+		
+		CadytsConfigGroup cadytsConfigGroup = ConfigUtils.addOrGetModule(config, CadytsConfigGroup.GROUP_NAME, CadytsConfigGroup.class);
+		cadytsConfigGroup.setStartTime(0);
+		cadytsConfigGroup.setEndTime(24*3600-1);
 
 		// scoring function
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
@@ -135,23 +136,23 @@ public class PatnaCadytsControler {
 		config.qsim().setVehiclesSource(VehiclesSource.fromVehiclesData);
 
 		config.counts().setCountsFileName("../../../../repos/runs-svn/patnaIndia/run108/input/outerCordonCounts.xml.gz");
-		config.counts().setWriteCountsInterval(20);
+		config.counts().setWriteCountsInterval(10);
 		config.counts().setCountsScaleFactor(100);
 		config.counts().setOutputFormat("all");
 
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(100);
-		config.controler().setOutputDirectory("../../../../repos/runs-svn/patnaIndia/run108/outerCordonOutput/");
-		config.controler().setWritePlansInterval(100);
-		config.controler().setWriteEventsInterval(100);
+		config.controler().setOutputDirectory("../../../../repos/runs-svn/patnaIndia/run108/outerCordonOutput_2/");
+		config.controler().setWritePlansInterval(50);
+		config.controler().setWriteEventsInterval(50);
 
 		StrategySettings reRoute = new StrategySettings();
-		reRoute.setStrategyName("ReRoute");
+		reRoute.setStrategyName(DefaultPlanStrategiesModule.DefaultStrategy.ReRoute.name());
 		reRoute.setWeight(0.3);
 		config.strategy().addStrategySettings(reRoute);
 		
 		StrategySettings expChangeBeta = new StrategySettings();
-		expChangeBeta.setStrategyName("ChangeExpBeta");
+		expChangeBeta.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta.name());
 		expChangeBeta.setWeight(0.7);
 		config.strategy().addStrategySettings(expChangeBeta);
 		

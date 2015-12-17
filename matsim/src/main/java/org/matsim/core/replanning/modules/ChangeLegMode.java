@@ -23,6 +23,8 @@ package org.matsim.core.replanning.modules;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.ChangeLegModeConfigGroup;
+import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.misc.StringUtils;
 import org.matsim.population.algorithms.ChooseRandomLegMode;
@@ -50,37 +52,15 @@ import org.matsim.population.algorithms.PlanAlgorithm;
  */
 public class ChangeLegMode extends AbstractMultithreadedModule {
 
-	private final static Logger log = Logger.getLogger(ChangeLegMode.class);
-
-	public final static String CONFIG_MODULE = "changeLegMode";
-	public final static String CONFIG_PARAM_MODES = "modes";
-	public final static String CONFIG_PARAM_IGNORECARAVAILABILITY = "ignoreCarAvailability";
 	// (I made the above static final variables public so they can be used in scripts-in-java. kai, jun'15)
 
-	private String[] availableModes = new String[] { TransportMode.car, TransportMode.pt };
-	private boolean ignoreCarAvailability = true;
+	private String[] availableModes;
+	private boolean ignoreCarAvailability;
 
-	public ChangeLegMode(final Config config) {
-		super(config.global().getNumberOfThreads());
-
-		// try to get the modes from the "changeLegMode" module of the config file
-		String modes = config.findParam(CONFIG_MODULE, CONFIG_PARAM_MODES);
-		String ignorance = config.findParam(CONFIG_MODULE, CONFIG_PARAM_IGNORECARAVAILABILITY);
-
-		// if there was anything in there, replace the default availableModes by the entries in the config file:
-		if (modes != null) {
-			String[] parts = StringUtils.explode(modes, ',');
-			this.availableModes = new String[parts.length];
-			for (int i = 0, n = parts.length; i < n; i++) {
-				this.availableModes[i] = parts[i].trim().intern();
-			}
-		}
-
-		if (ignorance != null) {
-			this.ignoreCarAvailability = Boolean.parseBoolean(ignorance);
-			log.info("using ignoreCarAvailability from configuration: " + this.ignoreCarAvailability);
-		}
-
+	public ChangeLegMode(final GlobalConfigGroup globalConfigGroup, ChangeLegModeConfigGroup changeLegModeConfigGroup) {
+		super(globalConfigGroup.getNumberOfThreads());
+		this.availableModes = changeLegModeConfigGroup.getModes();
+		this.ignoreCarAvailability = changeLegModeConfigGroup.getIgnoreCarAvailability();
 	}
 	
 	public ChangeLegMode(final int nOfThreads, final String[] modes, final boolean ignoreCarAvailabilty) {

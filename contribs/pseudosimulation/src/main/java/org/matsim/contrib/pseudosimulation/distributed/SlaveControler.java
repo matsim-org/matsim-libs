@@ -241,7 +241,9 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
 
                 }
                 bind(TravelTime.class).toInstance(travelTime);
-                addPlanSelectorForRemovalBinding("DiversityGeneratingPlansRemover").toProvider(DiversityGeneratingPlansRemover.Builder.class);
+                if (getConfig().strategy().getPlanSelectorForRemoval().equals("DiversityGeneratingPlansRemover")) {
+                    bindPlanSelectorForRemoval().toProvider(DiversityGeneratingPlansRemover.Builder.class);
+                }
             }
         });
 //        new Thread(new TimesReceiver()).start();

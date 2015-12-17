@@ -13,6 +13,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.consistency.VspConfigConsistencyCheckerImpl;
+import org.matsim.core.config.groups.ChangeLegModeConfigGroup;
 import org.matsim.core.config.groups.ControlerConfigGroup.MobsimType;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
@@ -28,7 +29,6 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.replanning.DefaultPlanStrategiesModule.DefaultStrategy;
-import org.matsim.core.replanning.modules.ChangeLegMode;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.ikaddoura.noise2.NoiseParameters;
@@ -122,7 +122,7 @@ class KNBerlinControler {
 			stratSets.setWeight(0.1);
 			config.strategy().addStrategySettings(stratSets);
 		}
-		config.setParam( ChangeLegMode.CONFIG_MODULE, ChangeLegMode.CONFIG_PARAM_MODES, "walk,bike,car,pt,pt2" );
+		config.setParam( ChangeLegModeConfigGroup.CONFIG_MODULE, ChangeLegModeConfigGroup.CONFIG_PARAM_MODES, "walk,bike,car,pt,pt2" );
 
 		//		for ( ActivityParams params : config.planCalcScore().getActivityParams() ) {
 		//			params.setTypicalDurationScoreComputation( TypicalDurationScoreComputation.relative );

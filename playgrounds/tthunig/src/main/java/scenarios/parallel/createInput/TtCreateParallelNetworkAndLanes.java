@@ -142,8 +142,8 @@ public final class TtCreateParallelNetworkAndLanes {
 		if (useSecondODPair) {
             net.addNode(nc = fac.createNode(Id.create("c", Node.class), new Coord(3.5 * scale, 4.0 * scale)));
             net.addNode(nd = fac.createNode(Id.create("d", Node.class), new Coord(3.5 * scale, -4.0 * scale)));
-			net.addNode(n9 = fac.createNode(Id.create(9, Node.class), new Coord(3.5 * scale, 2.0 * scale)));
-			net.addNode(n10 = fac.createNode(Id.create(10, Node.class), new Coord(3.5 * scale, 3.0 * scale)));
+			net.addNode(n9 = fac.createNode(Id.create(9, Node.class), new Coord(3.5 * scale, 3.0 * scale)));
+			net.addNode(n10 = fac.createNode(Id.create(10, Node.class), new Coord(3.5 * scale, 2.0 * scale)));
 			net.addNode(n11 = fac.createNode(Id.create(11, Node.class), new Coord(3.5 * scale, -2.0 * scale)));
 			net.addNode(n12 = fac.createNode(Id.create(12, Node.class), new Coord(3.5 * scale, -3.0 * scale)));
 		}
@@ -238,16 +238,16 @@ public final class TtCreateParallelNetworkAndLanes {
 			l = fac.createLink(links.get("8_4"), n8, n4);
 			setLinkAttributes(l, capacity, LINK_LENGTH, FREESPEED);
 			net.addLink(l);
-			l = fac.createLink(links.get("3_9"), n3, n9);
+			l = fac.createLink(links.get("3_10"), n3, n10);
 			setLinkAttributes(l, capacity, LINK_LENGTH, FREESPEED);
 			net.addLink(l);
-			l = fac.createLink(links.get("9_3"), n9, n3);
+			l = fac.createLink(links.get("10_3"), n10, n3);
 			setLinkAttributes(l, capacity, LINK_LENGTH, FREESPEED);
 			net.addLink(l);
-			l = fac.createLink(links.get("4_9"), n4, n9);
+			l = fac.createLink(links.get("4_10"), n4, n10);
 			setLinkAttributes(l, capacity, LINK_LENGTH, FREESPEED);
 			net.addLink(l);
-			l = fac.createLink(links.get("9_4"), n9, n4);
+			l = fac.createLink(links.get("10_4"), n10, n4);
 			setLinkAttributes(l, capacity, LINK_LENGTH, FREESPEED);
 			net.addLink(l);
 			l = fac.createLink(links.get("9_10"), n9, n10);
@@ -309,10 +309,10 @@ public final class TtCreateParallelNetworkAndLanes {
 			links.put("7_3", Id.create("7_3", Link.class));
 			links.put("4_8", Id.create("4_8", Link.class));
 			links.put("8_4", Id.create("8_4", Link.class));
-			links.put("3_9", Id.create("3_9", Link.class));
-			links.put("9_3", Id.create("9_3", Link.class));
-			links.put("4_9", Id.create("4_9", Link.class));
-			links.put("9_4", Id.create("9_4", Link.class));
+			links.put("3_10", Id.create("3_10", Link.class));
+			links.put("10_3", Id.create("10_3", Link.class));
+			links.put("4_10", Id.create("4_10", Link.class));
+			links.put("10_4", Id.create("10_4", Link.class));
 			links.put("9_10", Id.create("9_10", Link.class));
 			links.put("10_9", Id.create("10_9", Link.class));
 			links.put("7_11", Id.create("7_11", Link.class));
@@ -383,23 +383,23 @@ public final class TtCreateParallelNetworkAndLanes {
 		laneDef20.addLanesToLinkAssignment(linkAssignment);
 
 		if (useSecondODPair) {
-			// create link assignment of link 10_9
-			linkAssignment = fac.createLanesToLinkAssignment(links.get("10_9"));
+			// create link assignment of link 9_10
+			linkAssignment = fac.createLanesToLinkAssignment(links.get("9_10"));
 
 			LanesUtils.createAndAddLane20(linkAssignment, fac,
-					Id.create("10_9.ol", Lane.class), capacity,
+					Id.create("9_10.ol", Lane.class), capacity,
 					LINK_LENGTH, 0, 1, null,
-					Arrays.asList(Id.create("10_9.l", Lane.class),
-							Id.create("10_9.r", Lane.class)));
+					Arrays.asList(Id.create("9_10.l", Lane.class),
+							Id.create("9_10.r", Lane.class)));
 
 			LanesUtils.createAndAddLane20(linkAssignment, fac,
-					Id.create("10_9.l", Lane.class), capacity,
+					Id.create("9_10.l", Lane.class), capacity,
 					LINK_LENGTH / 2, -1, 1,
-					Collections.singletonList(links.get("9_4")), null);
+					Collections.singletonList(links.get("10_4")), null);
 			LanesUtils.createAndAddLane20(linkAssignment, fac,
-					Id.create("10_9.r", Lane.class), capacity,
+					Id.create("9_10.r", Lane.class), capacity,
 					LINK_LENGTH / 2, 1, 1,
-					Collections.singletonList(links.get("9_3")), null);
+					Collections.singletonList(links.get("10_3")), null);
 
 			laneDef20.addLanesToLinkAssignment(linkAssignment);
 

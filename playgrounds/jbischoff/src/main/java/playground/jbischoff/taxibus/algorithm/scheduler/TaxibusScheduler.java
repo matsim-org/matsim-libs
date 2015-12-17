@@ -214,13 +214,13 @@ public class TaxibusScheduler
         Schedule<TaxibusTask> bestSched = (Schedule<TaxibusTask>)best.vehicle.getSchedule();
         TaxibusTask lastTask = Schedules.getLastTask(bestSched);
         log.info("Bus "+best.vehicle.getId() +" Scheduled Route");
-        for (VrpPathWithTravelData  path : best.path){
-        	log.info(path.getFromLink().getId() + " to " + path.getToLink().getId());
-        }
-        log.info("End of route");
+//        for (VrpPathWithTravelData  path : best.path){
+//        	log.info(path.getFromLink().getId() + " to " + path.getToLink().getId());
+//        }
+//        log.info("End of route");
 
         
-        log.info("scheduled to bus: " + best.requests);
+//        log.info("scheduled to bus: " + best.requests);
         if (lastTask.getTaxibusTaskType() == TaxibusTaskType.STAY) {
             Iterator<VrpPathWithTravelData> iterator = best.path.iterator();
             VrpPathWithTravelData path = iterator.next();
@@ -248,7 +248,7 @@ public class TaxibusScheduler
 
             while (iterator.hasNext()) {
                 path = iterator.next();
-                log.info("to:"+ path.getToLink().getId());
+//                log.info("to:"+ path.getToLink().getId());
                 if (path.getFromLink() != path.getToLink()) {
 
                     lastEndTime = scheduleDriveAlongPath(bestSched, path, onBoard, lastEndTime);
@@ -300,7 +300,7 @@ public class TaxibusScheduler
                 continue;
             double endTime = beginTime + params.dropoffDuration;
             bestSched.addTask(new TaxibusDropoffTask(beginTime, endTime, req));
-            log.info("schedule dropoff" + req);
+//            log.info("schedule dropoff" + req);
             beginTime = endTime;
             if (!onBoard.remove(req)) {
                 throw new IllegalStateException("Dropoff without pickup.");
@@ -322,7 +322,7 @@ public class TaxibusScheduler
                 continue;
             double t3 = Math.max(beginTime, req.getT0()) + params.pickupDuration;
             bestSched.addTask(new TaxibusPickupTask(beginTime, t3, req));
-            log.info("schedule pickup" + req + " at link "+req.getFromLink().getId());
+//            log.info("schedule pickup" + req + " at link "+req.getFromLink().getId());
             onBoard.add(req);
             beginTime = t3;
             pickedUp.add(req);
