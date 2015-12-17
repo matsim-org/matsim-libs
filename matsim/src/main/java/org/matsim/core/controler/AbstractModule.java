@@ -52,7 +52,6 @@ import com.google.inject.Module;
 import com.google.inject.TypeLiteral;
 import com.google.inject.binder.AnnotatedBindingBuilder;
 import com.google.inject.binder.LinkedBindingBuilder;
-import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Names;
 import com.google.inject.util.Modules;
@@ -79,7 +78,6 @@ public abstract class AbstractModule implements Module {
 	private Multibinder<ControlerListener> controlerListenerMultibinder;
 	private Multibinder<MobsimListener> mobsimListenerMultibinder;
 	private Multibinder<SnapshotWriter> snapshotWriterMultibinder;
-	private MapBinder<String, PlanStrategy> planStrategyMultibinder;
 
 	@Inject
 	com.google.inject.Injector bootstrapInjector;
@@ -105,7 +103,6 @@ public abstract class AbstractModule implements Module {
 		this.snapshotWriterMultibinder = Multibinder.newSetBinder(this.binder, SnapshotWriter.class);
 		this.eventHandlerMultibinder = Multibinder.newSetBinder(this.binder, EventHandler.class);
 		this.controlerListenerMultibinder = Multibinder.newSetBinder(this.binder, ControlerListener.class);
-		this.planStrategyMultibinder = MapBinder.newMapBinder(this.binder, String.class, PlanStrategy.class);
 		this.install();
 	}
 
@@ -143,7 +140,7 @@ public abstract class AbstractModule implements Module {
 	}
 
 	protected final com.google.inject.binder.LinkedBindingBuilder<PlanStrategy> addPlanStrategyBinding(String selectorName) {
-		return planStrategyMultibinder.addBinding(selectorName);
+		return binder().bind(PlanStrategy.class).annotatedWith(Names.named(selectorName));
 	}
 
 	protected final com.google.inject.binder.LinkedBindingBuilder<Mobsim> bindMobsim() {

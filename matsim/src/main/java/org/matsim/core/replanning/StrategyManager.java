@@ -58,7 +58,7 @@ public class StrategyManager implements MatsimManager {
 	private final GenericStrategyManager<Plan, Person> delegate;
 
 	@Inject
-	StrategyManager(StrategyConfigGroup strategyConfigGroup, PlansConfigGroup plansConfigGroup, ControlerConfigGroup controlerConfigGroup, com.google.inject.Injector injector, Map<String, PlanStrategy> planStrategies) {
+	StrategyManager(StrategyConfigGroup strategyConfigGroup, PlansConfigGroup plansConfigGroup, ControlerConfigGroup controlerConfigGroup, Map<StrategyConfigGroup.StrategySettings, PlanStrategy> planStrategies) {
 		this();
 		setMaxPlansPerAgent(strategyConfigGroup.getMaxAgentPlanMemorySize());
 
@@ -67,13 +67,9 @@ public class StrategyManager implements MatsimManager {
 		log.info("global innovation switch off after iteration: " + globalInnovationDisableAfter);
 
 		setSubpopulationAttributeName(plansConfigGroup.getSubpopulationAttributeName());
-		for (StrategyConfigGroup.StrategySettings settings : strategyConfigGroup.getStrategySettings()) {
-			PlanStrategy strategy = loadStrategy(settings, planStrategies, Injector.fromGuiceInjector(injector));
-
-			if (strategy == null) {
-				throw new RuntimeException("Strategy named " + settings.getStrategyName() + " not found.");
-			}
-
+		for (Map.Entry<StrategyConfigGroup.StrategySettings, PlanStrategy> entry : planStrategies.entrySet()) {
+			PlanStrategy strategy = entry.getValue();
+			StrategyConfigGroup.StrategySettings settings = entry.getKey();
 			addStrategy(strategy, settings.getSubpopulation(), settings.getWeight());
 
 			// now check if this modules should be disabled after some iterations
@@ -95,41 +91,6 @@ public class StrategyManager implements MatsimManager {
 			}
 		}
 	}
-
-	private static PlanStrategy tryToLoadPlanStrategyByName(final String name, Injector injector) {
-		PlanStrategy strategy;
-		//classes loaded by name must not be part of the matsim core
-		if (name.startsWith("org.matsim.") && !name.startsWith("org.matsim.contrib.")) {
-			throw new RuntimeException("Strategies in the org.matsim package must not be loaded by name!");
-		} else {
-			try {
-				Class<?> klas = Class.forName(name);
-				// Instantiates the class and injects it.
-				strategy = (PlanStrategy) injector.getJITInstance(klas);
-			} catch (ClassNotFoundException e) {
-				throw new RuntimeException(e);
-			}
-		}
-		return strategy;
-	}
-
-
-	private static PlanStrategy loadStrategy(final StrategyConfigGroup.StrategySettings settings, Map<String, PlanStrategy> planStrategyFactoryRegister, Injector injector) {
-		String name = settings.getStrategyName() ;
-		if (name.equals("ExternalModule")) {
-			externalCounter++;
-			String exePath = settings.getExePath();
-			PlanStrategyImpl.Builder builder = new PlanStrategyImpl.Builder(new RandomPlanSelector<Plan, Person>());
-			builder.addStrategyModule(new ExternalModule(exePath, "ext" + externalCounter, injector.getInstance(OutputDirectoryHierarchy.class), injector.getInstance(Scenario.class)));
-			return builder.build();
-		} else if (name.contains(".")) {
-			return tryToLoadPlanStrategyByName(name, injector);
-		} else {
-			return planStrategyFactoryRegister.get(name);
-		}
-	}
-
-
 
 	public StrategyManager() {
 		this.delegate = new GenericStrategyManager<>();
