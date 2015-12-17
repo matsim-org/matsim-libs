@@ -56,10 +56,9 @@ final class MyMobsim implements Mobsim {
 			// ...
 			
 			// events are pushed into the events manager:
-			Id<Person> driverId = null;
 			Id<Link> linkId = null;
 			Id<Vehicle> vehicleId = null;
-			events.processEvent(new LinkLeaveEvent(time, driverId, linkId, vehicleId) );
+			events.processEvent(new LinkLeaveEvent(time, vehicleId, linkId));
 			
 			// ...
 		}
