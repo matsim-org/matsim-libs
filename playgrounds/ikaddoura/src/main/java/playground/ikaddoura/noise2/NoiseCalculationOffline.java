@@ -118,11 +118,11 @@ public class NoiseCalculationOffline {
 		GridParameters gridParameters = new GridParameters();
 		gridParameters.setReceiverPointGap(receiverPointGap);
 		
-		// Berlin Coordinates: Area around the city center of Berlin (Tiergarten)
-		double xMin = 4590855.;
-		double yMin = 5819679.;
-		double xMax = 4594202.;
-		double yMax = 5821736.;
+//		// Berlin Coordinates: Area around the city center of Berlin (Tiergarten)
+//		double xMin = 4590855.;
+//		double yMin = 5819679.;
+//		double xMax = 4594202.;
+//		double yMax = 5821736.;
 		
 //		// Berlin Coordinates: Area around the Tempelhofer Feld 4591900,5813265 : 4600279,5818768
 //		double xMin = 4591900.;
@@ -131,10 +131,10 @@ public class NoiseCalculationOffline {
 //		double yMax = 5818768.;
 				
       // Berlin Coordinates: Area of Berlin
-//		double xMin = 4573258.;
-//		double yMin = 5801225.;
-//		double xMax = 4620323.;
-//		double yMax = 5839639.;
+		double xMin = 4573258.;
+		double yMin = 5801225.;
+		double xMax = 4620323.;
+		double yMax = 5839639.;
 		
 //		// Berlin Coordinates: Manteuffelstrasse
 //		double xMin = 4595288.82;
@@ -167,7 +167,7 @@ public class NoiseCalculationOffline {
 		noiseParameters.setAllowForSpeedsOutsideTheValidRange(false);
 		noiseParameters.setScaleFactor(10.);
 		noiseParameters.setComputePopulationUnits(true);
-		noiseParameters.setComputeNoiseDamages(false);
+		noiseParameters.setComputeNoiseDamages(true);
 		noiseParameters.setInternalizeNoiseDamages(false);
 		noiseParameters.setComputeCausingAgents(false);
 		noiseParameters.setThrowNoiseEventsAffected(false);
