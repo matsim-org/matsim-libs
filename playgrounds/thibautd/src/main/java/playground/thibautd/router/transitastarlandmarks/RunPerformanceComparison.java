@@ -56,6 +56,17 @@ import java.util.concurrent.TimeUnit;
  *     <li>overdo 1.25, 32 degree landmarks:  26% faster</li>
  * </ul>
  *
+ * <br/>
+ * More details for P. Bösch full switzerland for 1000 random trips from the Mikrozensus:
+ * <ul>
+ *     <li>overdo 1, 16 degree landmarks:  0% faster</li>
+ *     <li>overdo 1.25, 16 degree landmarks:  50% faster</li>
+ *     <li>overdo 1, 32 degree landmarks:  20% faster</li>
+ *     <li>overdo 1, 64 degree landmarks:  10% faster</li>
+ *     <li>overdo 1.1, 32 degree landmarks:  20% faster</li>
+ *     <li>overdo 1.25, 32 degree landmarks:  30% faster</li>
+ * </ul>
+ *
  * @author thibautd
  */
 public class RunPerformanceComparison {
@@ -91,7 +102,12 @@ public class RunPerformanceComparison {
 		final StageActivityTypes stages = new StageActivityTypesImpl( PtConstants.TRANSIT_ACTIVITY_TYPE );
 		final List<TripStructureUtils.Trip> trips = new ArrayList<>();
 
+		final Counter planCounter = new Counter( "extract trips from plan # " );
 		for ( Person person : sc.getPopulation().getPersons().values() ) {
+			if ( person.getPlans().isEmpty() ) {
+				continue;
+			}
+			planCounter.incCounter();
 			trips.addAll(
 					 TripStructureUtils.getTrips(
 							 person.getSelectedPlan(),
