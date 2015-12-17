@@ -20,10 +20,15 @@ package playground.thibautd.router.transitastarlandmarks;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.router.StageActivityTypes;
+import org.matsim.core.router.StageActivityTypesImpl;
+import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Counter;
+import org.matsim.pt.PtConstants;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterImpl;
@@ -65,10 +70,67 @@ public class RunPerformanceComparison {
 		final TransitRouterAStar testee = new TransitRouterAStar( config , sc.getTransitSchedule() );
 		final TransitRouter reference = new TransitRouterImpl( new TransitRouterConfig( config ) , sc.getTransitSchedule() );
 
+		final ConcurrentStopWatch<Algo> stopWatch = new ConcurrentStopWatch<>( Algo.class );
+
+		if ( config.plans().getInputFile() == null ) {
+			measureForRandomODs( sc, testee, reference, stopWatch );
+		}
+		else {
+			measureForPopulation( sc, testee, reference, stopWatch );
+		}
+
+		stopWatch.printStats( TimeUnit.MILLISECONDS );
+		stopWatch.printStats( TimeUnit.SECONDS );
+	}
+
+	private static void measureForPopulation(
+			final Scenario sc,
+			final TransitRouterAStar testee,
+			final TransitRouter reference,
+			final ConcurrentStopWatch<Algo> stopWatch ) {
+		final StageActivityTypes stages = new StageActivityTypesImpl( PtConstants.TRANSIT_ACTIVITY_TYPE );
+		final List<TripStructureUtils.Trip> trips = new ArrayList<>();
+
+		for ( Person person : sc.getPopulation().getPersons().values() ) {
+			trips.addAll(
+					 TripStructureUtils.getTrips(
+							 person.getSelectedPlan(),
+							 stages ) );
+		}
+
+		final Counter counter = new Counter( "Compute route for random trip # " );
+		final Random random = new Random( 20151217 );
+		for ( int i = 0; i < N_TRIES; i++ ) {
+			final TripStructureUtils.Trip trip = trips.get( random.nextInt( trips.size() ) );
+
+			counter.incCounter();
+
+			stopWatch.startMeasurement( Algo.AStar );
+			testee.calcRoute(
+					trip.getOriginActivity().getCoord(),
+					trip.getDestinationActivity().getCoord(),
+					trip.getOriginActivity().getEndTime(),
+					null );
+			stopWatch.endMeasurement( Algo.AStar );
+
+			stopWatch.startMeasurement( Algo.classic );
+			reference.calcRoute(
+					trip.getOriginActivity().getCoord(),
+					trip.getDestinationActivity().getCoord(),
+					trip.getOriginActivity().getEndTime(),
+					null );
+			stopWatch.endMeasurement( Algo.classic );
+		}
+		counter.printCounter();
+	}
+
+	private static void measureForRandomODs( Scenario sc,
+			TransitRouterAStar testee,
+			TransitRouter reference,
+			ConcurrentStopWatch<Algo> stopWatch ) {
 		final List<Id<TransitStopFacility>> facilityIds = new ArrayList<>( sc.getTransitSchedule().getFacilities().keySet() );
 		Collections.sort( facilityIds );
 
-		final ConcurrentStopWatch<Algo> stopWatch = new ConcurrentStopWatch<>( Algo.class );
 		final Random random = new Random( 20151210 );
 		final Counter counter = new Counter( "Compute route for random case # " );
 		for ( int i = 0; i < N_TRIES; i++ ) {
@@ -95,8 +157,5 @@ public class RunPerformanceComparison {
 			stopWatch.endMeasurement( Algo.classic );
 		}
 		counter.printCounter();
-
-		stopWatch.printStats( TimeUnit.MILLISECONDS );
-		stopWatch.printStats( TimeUnit.SECONDS );
 	}
 }
