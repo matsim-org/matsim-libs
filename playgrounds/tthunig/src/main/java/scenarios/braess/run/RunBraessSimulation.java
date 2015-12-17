@@ -56,7 +56,6 @@ import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisut
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.data.v20.LaneDefinitionsWriter20;
 
-import playground.artemc.socialCost.SocialCostController.Initializer;
 import playground.vsp.congestion.controler.MarginalCongestionPricingContolerListener;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV4;
@@ -211,8 +210,9 @@ public final class RunBraessSimulation {
 		
 		} else if (PRICING_TYPE.equals(PricingType.FLOWBASED)) {
 			
-			Initializer initializer = new Initializer();
-			controler.addControlerListener(initializer);		
+			throw new UnsupportedOperationException("Not yet implemented!");
+//			Initializer initializer = new Initializer();
+//			controler.addControlerListener(initializer);		
 		} else { // no pricing
 			
 			// adapt sigma for randomized routing
@@ -237,7 +237,7 @@ public final class RunBraessSimulation {
 		Config config = ConfigUtils.createConfig();
 
 		// set number of iterations
-		config.controler().setLastIteration( 100 );
+		config.controler().setLastIteration( 50 );
 
 		// able or enable signals and lanes
 		config.qsim().setUseLanes( LANE_TYPE.equals(LaneType.NONE)? false : true );
