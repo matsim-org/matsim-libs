@@ -121,11 +121,10 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 		}
 
 		public void handleEvent(LinkEnterEvent event) {
-//          scoringFunction.handleEvent(new LinkEnterEvent(event.getTime(),Id.createPersonId(event.getVehicleId().toString()),event.getLinkId(),getVehicle().getVehicleId()));
-//            scoringFunction.handleEvent(new LinkEnterEvent(event.getTime(),getVehicle().getVehicleId(),event.getLinkId()));
-//            /* TODO why don't we do something like:
+            scoringFunction.handleEvent(new LinkEnterEvent(event.getTime(),getVehicle().getVehicleId(),event.getLinkId()));
+            /* why does the following cause failing tests?
             scoringFunction.handleEvent(event);
-//            Theresa Oct'2015 */
+            Theresa Oct'2015 */
             currentRoute.add(event.getLinkId());
 		}
 
