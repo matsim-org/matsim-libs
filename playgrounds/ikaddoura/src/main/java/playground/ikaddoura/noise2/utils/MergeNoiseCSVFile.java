@@ -52,8 +52,9 @@ public final class MergeNoiseCSVFile {
 	private String outputDirectory = "/Users/ihab/Documents/workspace/runs-svn/cn2/output/cn1/noiseAnalysisVia/analysis_it.100/";
 	
 	private String[] workingDirectories = { "/Users/ihab/Documents/workspace/runs-svn/cn2/output/cn1/noiseAnalysisVia/analysis_it.100/immissions/"
-			, "/Users/ihab/Documents/workspace/runs-svn/cn2/output/cn1/noiseAnalysisVia/analysis_it.100/consideredAgentUnits/" };
-	private String[] labels = { "immission" , "consideredAgentUnits" };
+			, "/Users/ihab/Documents/workspace/runs-svn/cn2/output/cn1/noiseAnalysisVia/analysis_it.100/consideredAgentUnits/"
+			, "/Users/ihab/Documents/workspace/runs-svn/cn2/output/cn1/noiseAnalysisVia/analysis_it.100/damages_receiverPoint/"};
+	private String[] labels = { "immission" , "consideredAgentUnits" , "damages_receiverPoint" };
 	
 	private String receiverPointsFile = "/Users/ihab/Documents/workspace/runs-svn/cn2/output/cn1/noiseAnalysisVia/analysis_it.100/receiverPoints/receiverPoints.csv";
 	private String separator = ";";
