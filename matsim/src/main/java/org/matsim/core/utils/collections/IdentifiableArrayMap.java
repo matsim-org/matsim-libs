@@ -34,7 +34,7 @@ import org.matsim.api.core.v01.Identifiable;
 /**
  * Memory-optimized map, backed by a simple array, for storing small number of {@link Identifiable}s.
  * Access using {@link #get(Object)} have a runtime complexity of <code>O( log( n ) )</code>,
- * and {@link #put(Object)} has a runtime complexity of <code>O( n * log( n ) )</code>,
+ * and {@link #put(T)} has a runtime complexity of <code>O( n * log( n ) )</code>,
  * because the backing array is resized every time to keep memory footprint low.
  * Thus, this map implementation
  * should only be used to store a small number of elements in it. But for small number of elements,
@@ -81,7 +81,7 @@ public class IdentifiableArrayMap<S, T extends Identifiable<S>> implements Map<I
 	public boolean containsValue(final Object value) {
 		if ( !(value instanceof Identifiable) ) return false;
 		final int i = Arrays.binarySearch( data , value , COMPARATOR );
-		return i >= 0;
+		return i >= 0 && data[ i ].equals( value );
 	}
 
 	@SuppressWarnings("unchecked")
@@ -99,7 +99,9 @@ public class IdentifiableArrayMap<S, T extends Identifiable<S>> implements Map<I
 	@SuppressWarnings("unchecked")
 	@Override
 	public T put(final Id<S> key, final T value) {
-		assert value.getId().equals( key );
+		if ( !value.getId().equals( key ) ) {
+			throw new IllegalArgumentException( getClass().getSimpleName()+" can only map identifiables to their own Ids. Got "+key+" and "+value );
+		}
 		final int i = Arrays.binarySearch( data , value , COMPARATOR );
 
 		if ( i >= 0 ) {
@@ -121,6 +123,7 @@ public class IdentifiableArrayMap<S, T extends Identifiable<S>> implements Map<I
 	@SuppressWarnings("unchecked")
 	@Override
 	public T remove(final Object key) {
+		if ( !(key instanceof  Id) ) return null;
 		final int i = Arrays.binarySearch( data , key , COMPARATOR );
 		if ( i < 0 ) return null;
 

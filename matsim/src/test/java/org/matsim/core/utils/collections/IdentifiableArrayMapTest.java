@@ -170,6 +170,63 @@ public class IdentifiableArrayMapTest {
 		Assert.assertEquals(to2b, map.get(id2b));
 		Assert.assertEquals(to2b, map.get(id2a));
 	}
+
+	@Test
+	public void testPut_randomOrder_remove() {
+		Map<Id<TO>, TO> map = new IdentifiableArrayMap<TO, TO>();
+		Id<TO> id1 = Id.create(1, TO.class);
+		Id<TO> id2 = Id.create(4, TO.class);
+		Id<TO> id3 = Id.create(6, TO.class);
+		Id<TO> id4 = Id.create(2, TO.class);
+		Id<TO> id5 = Id.create(5, TO.class);
+		Id<TO> id6 = Id.create(3, TO.class);
+
+		TO to1 = new TO(id1);
+		TO to2 = new TO(id2);
+		TO to3 = new TO(id3);
+		TO to4 = new TO(id4);
+		TO to5 = new TO(id5);
+		TO to6 = new TO(id6);
+
+		map.put(id1, to1);
+		Assert.assertEquals(1, map.size());
+
+		map.put(id2, to2);
+		Assert.assertEquals(2, map.size());
+
+		map.put(id3, to3);
+		Assert.assertEquals(3, map.size());
+
+		map.put(id4, to4);
+		Assert.assertEquals(4, map.size());
+
+		map.put(id5, to5);
+		Assert.assertEquals(5, map.size());
+
+		map.put(id6, to6);
+		Assert.assertEquals(6, map.size());
+
+		Assert.assertEquals(to1, map.get(id1));
+		Assert.assertEquals(to2, map.get(id2));
+		Assert.assertEquals(to3, map.get(id3));
+		Assert.assertEquals(to4, map.get(id4));
+		Assert.assertEquals(to5, map.get(id5));
+		Assert.assertEquals(to6, map.get(id6));
+
+		map.remove(id2);
+		Assert.assertEquals(5, map.size());
+
+		Assert.assertEquals(to1, map.get(id1));
+		Assert.assertNull(map.get(id2));
+		Assert.assertEquals(to3, map.get(id3));
+		Assert.assertEquals(to4, map.get(id4));
+		Assert.assertEquals(to5, map.get(id5));
+		Assert.assertEquals(to6, map.get(id6));
+
+		map.put(id2, to2);
+		Assert.assertEquals(6, map.size());
+		Assert.assertEquals(to2, map.get(id2));
+	}
 	
 	@Test
 	public void testContainsKey() {
@@ -205,6 +262,12 @@ public class IdentifiableArrayMapTest {
 		Assert.assertTrue(map.containsKey(id2));
 		Assert.assertTrue(map.containsKey(id2b));
 		Assert.assertTrue(map.containsKey(id3));
+
+		map.remove( id1 );
+		Assert.assertFalse(map.containsKey(id1));
+		Assert.assertTrue(map.containsKey(id2));
+		Assert.assertTrue(map.containsKey(id2b));
+		Assert.assertTrue(map.containsKey(id3));
 	}
 	
 	@Test
@@ -216,25 +279,30 @@ public class IdentifiableArrayMapTest {
 		
 		TO to1 = new TO(id1);
 		TO to2 = new TO(id2);
+		TO to2b = new TO(id2);
 		TO to3 = new TO(id3);
 		
 		Assert.assertFalse(map.containsValue(to1));
 		Assert.assertFalse(map.containsValue(to2));
+		Assert.assertFalse(map.containsValue(to2b));
 		Assert.assertFalse(map.containsValue(to3));
 		
 		map.put(id1, to1);
 		Assert.assertTrue(map.containsValue(to1));
 		Assert.assertFalse(map.containsValue(to2));
+		Assert.assertFalse(map.containsValue(to2b));
 		Assert.assertFalse(map.containsValue(to3));
 		
 		map.put(id2, to2);
 		Assert.assertTrue(map.containsValue(to1));
 		Assert.assertTrue(map.containsValue(to2));
+		Assert.assertFalse(map.containsValue(to2b));
 		Assert.assertFalse(map.containsValue(to3));
 		
 		map.put(id3, to3);
 		Assert.assertTrue(map.containsValue(to1));
 		Assert.assertTrue(map.containsValue(to2));
+		Assert.assertFalse(map.containsValue(to2b));
 		Assert.assertTrue(map.containsValue(to3));
 	}
 	
