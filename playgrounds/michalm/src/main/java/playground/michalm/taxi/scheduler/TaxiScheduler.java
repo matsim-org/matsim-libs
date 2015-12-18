@@ -412,7 +412,7 @@ public class TaxiScheduler
                 }
 
                 case DRIVE_EMPTY:
-                case DRIVE_WITH_PASSENGER: {
+                case DRIVE_OCCUPIED: {
                     // cannot be shortened/lengthen, therefore must be moved forward/backward
                     task.setBeginTime(t);
                     VrpPathWithTravelData path = (VrpPathWithTravelData) ((DriveTask)task)
@@ -532,7 +532,7 @@ public class TaxiScheduler
             case PICKUP:
                 return params.destinationKnown ? 2 : null;
 
-            case DRIVE_WITH_PASSENGER:
+            case DRIVE_OCCUPIED:
                 return 1;
 
             case DRIVE_EMPTY:

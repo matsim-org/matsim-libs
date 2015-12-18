@@ -133,7 +133,7 @@ public class HourlyTaxiStatsCalculator
                             .addValue(t.getEndTime() - t.getBeginTime());
                     break;
 
-                case DRIVE_WITH_PASSENGER:
+                case DRIVE_OCCUPIED:
                     hour = hour(t.getBeginTime());
                     hourlyHistograms[hour].occupiedDriveTime
                             .addValue(t.getEndTime() - t.getBeginTime());
@@ -171,7 +171,7 @@ public class HourlyTaxiStatsCalculator
                 stats[hour].pickup += durationWithinHour;
                 return;
 
-            case DRIVE_WITH_PASSENGER:
+            case DRIVE_OCCUPIED:
                 stats[hour].occupied += durationWithinHour;
                 return;
 

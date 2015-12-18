@@ -14,7 +14,7 @@ public class MultiRunStats
     private final SummaryStatistics pc95PassengerWaitTime = new SummaryStatistics();
     private final SummaryStatistics maxPassengerWaitTime = new SummaryStatistics();
 
-    private final SummaryStatistics driveWithPassengerTime = new SummaryStatistics();
+    private final SummaryStatistics driveOccupiedTime = new SummaryStatistics();
     private final SummaryStatistics driveEmptyRatio = new SummaryStatistics();
 
     private final DescriptiveStatistics computationTime = new DescriptiveStatistics();
@@ -26,7 +26,7 @@ public class MultiRunStats
         pc95PassengerWaitTime.addValue(singleRunStats.passengerWaitTimes.getPercentile(95));
         maxPassengerWaitTime.addValue(singleRunStats.passengerWaitTimes.getMax());
 
-        driveWithPassengerTime.addValue(singleRunStats.getDriveWithPassengerTimes().getMean());
+        driveOccupiedTime.addValue(singleRunStats.getDriveOccupiedTimes().getMean());
         driveEmptyRatio.addValue(singleRunStats.getDriveEmptyRatio());
 
         computationTime.addValue(0.001 * computationTimeInMillis);
@@ -62,7 +62,7 @@ public class MultiRunStats
                 pc95PassengerWaitTime.getMean(), //
                 maxPassengerWaitTime.getMean(), //
                 //
-                driveWithPassengerTime.getMean(), //
+                driveOccupiedTime.getMean(), //
                 driveEmptyRatio.getMean() * 100, //in [%]
                 //
                 computationTime.getMean(), //

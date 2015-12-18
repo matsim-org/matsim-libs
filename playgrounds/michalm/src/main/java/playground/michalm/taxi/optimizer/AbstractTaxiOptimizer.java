@@ -126,7 +126,7 @@ public abstract class AbstractTaxiOptimizer
     protected boolean doReoptimizeAfterNextTask(TaxiTask newCurrentTask)
     {
         return !destinationKnown
-                && newCurrentTask.getTaxiTaskType() == TaxiTaskType.DRIVE_WITH_PASSENGER;
+                && newCurrentTask.getTaxiTaskType() == TaxiTaskType.DRIVE_OCCUPIED;
     }
 
 

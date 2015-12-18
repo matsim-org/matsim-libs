@@ -171,7 +171,7 @@ class TaxiLauncher
                     StatsCalculators.createCurrentTaxiTaskOfTypeCounter(optimizerConfig,
                             TaxiTaskType.PICKUP), //
                     StatsCalculators.createCurrentTaxiTaskOfTypeCounter(optimizerConfig,
-                            TaxiTaskType.DRIVE_WITH_PASSENGER), //
+                            TaxiTaskType.DRIVE_OCCUPIED), //
                     StatsCalculators.createCurrentTaxiTaskOfTypeCounter(optimizerConfig,
                             TaxiTaskType.DROPOFF), //
                     StatsCalculators.createCurrentTaxiTaskOfTypeCounter(optimizerConfig,
@@ -182,7 +182,7 @@ class TaxiLauncher
             qSim.addQueueSimulationListeners(new StatsCollector<>(dispatchStatsCalc, 300,
                     "DRIVE_EMPTY\t" + //
                             "PICKUP\t" + //
-                            "DRIVE_WITH_PASSENGER\t" + //
+                            "DRIVE_OCCUPIED\t" + //
                             "DROPOFF\t" + //
                             "STAY\t" + //
                             "IDLE\t" + //

@@ -52,7 +52,7 @@ public class TaxiStats
     public double getDriveEmptyRatio()
     {
         double empty = timesByTaskType.get(TaxiTaskType.DRIVE_EMPTY).getSum();//not mean!
-        double occupied = timesByTaskType.get(TaxiTaskType.DRIVE_WITH_PASSENGER).getSum();//not mean!
+        double occupied = timesByTaskType.get(TaxiTaskType.DRIVE_OCCUPIED).getSum();//not mean!
         return empty / (empty + occupied);
     }
 
@@ -63,15 +63,15 @@ public class TaxiStats
     }
 
 
-    public DescriptiveStatistics getDriveWithPassengerTimes()
+    public DescriptiveStatistics getDriveOccupiedTimes()
     {
-        return timesByTaskType.get(TaxiTaskType.DRIVE_WITH_PASSENGER);
+        return timesByTaskType.get(TaxiTaskType.DRIVE_OCCUPIED);
     }
 
 
     public static final String HEADER = "WaitT\t" //
             + "MaxWaitT"//
-            + "WithPassengerT"//
+            + "OccupiedT"//
             + "%EmptyDrive\t";
 
 
@@ -81,7 +81,7 @@ public class TaxiStats
         return new StringBuilder()//
                 .append(passengerWaitTimes.getMean()).append('\t') //
                 .append(passengerWaitTimes.getMax()).append('\t') //
-                .append(getDriveWithPassengerTimes().getMean()).append('\t') //
+                .append(getDriveOccupiedTimes().getMean()).append('\t') //
                 .append(getDriveEmptyRatio()).append('\t') //
                 .toString();
     }
