@@ -18,7 +18,10 @@
  * *********************************************************************** */
 package playground.agarwalamit.mixedTraffic.patnaIndia.input.extDemand;
 
+import javax.inject.Inject;
+
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.cadyts.car.CadytsContext;
 import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
@@ -97,13 +100,13 @@ public class PatnaCadytsControler {
 		// scoring function
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
 			final CharyparNagelScoringParametersForPerson parameters = new SubpopulationCharyparNagelScoringParameters( controler.getScenario() );
-
+			@Inject Network network;
 			@Override
 			public ScoringFunction createNewScoringFunction(Person person) {
 				final CharyparNagelScoringParameters params = parameters.getScoringParameters( person );
 
 				SumScoringFunction sumScoringFunction = new SumScoringFunction();
-				sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(params, controler.getScenario().getNetwork()));
+				sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(params, network));
 				sumScoringFunction.addScoringFunction(new CharyparNagelActivityScoring(params)) ;
 				sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
 				
