@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ControlerDefaultCoreListenersModule.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,29 +16,34 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.core.controler.corelisteners;
+package playground.ivt.scripts;
 
-import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.scoring.EventsToScore;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.NetworkWriter;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.algorithms.NetworkCleaner;
+import org.matsim.core.network.algorithms.NetworkMergeDoubleLinks;
+import org.matsim.core.network.algorithms.NetworkSimplifier;
+import org.matsim.core.scenario.ScenarioUtils;
 
 /**
- * Defines the default core listeners.
- * In 99% of the use cases, this should be left as is.
- * Most of the process can be configured using more elemental elements:
- * StrategyManager, ScoringFunction, EventHandlers.
- *
  * @author thibautd
  */
-public class ControlerDefaultCoreListenersModule extends AbstractModule {
+public class SimplifyNetwork {
+	public static void main( final String... args ) {
+		final String inputNetworkFile = args[ 0 ];
+		final String outputNetworkFile = args[ 1 ];
 
-	@Override
-	public void install() {
-		bind( PlansScoring.class ).to( PlansScoringImpl.class );
-		bind(EventsToScore.class).asEagerSingleton();
-		bind( PlansReplanning.class ).to( PlansReplanningImpl.class );
-		bind( PlansDumping.class ).to( PlansDumpingImpl.class );
-		bind( EventsHandling.class ).to( EventsHandlingImpl.class );
-		bind( DumpDataAtEnd.class ).to( DumpDataAtEndImpl.class );
+		final Scenario sc = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
+		new MatsimNetworkReader( sc ).readFile( inputNetworkFile );
+
+		final NetworkSimplifier simplifier = new NetworkSimplifier();
+		simplifier.setMergeLinkStats( true );
+		simplifier.run( sc.getNetwork() );
+		new NetworkMergeDoubleLinks( NetworkMergeDoubleLinks.MergeType.ADDITIVE ).run( sc.getNetwork() );
+		new NetworkCleaner().run( sc.getNetwork() );
+
+		new NetworkWriter( sc.getNetwork() ).write( outputNetworkFile );
 	}
 }
-

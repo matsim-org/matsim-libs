@@ -58,17 +58,14 @@ public class UpperBoundTuner {
 	// -------------------- GETTERS --------------------
 
 	double equilGapWeight = 0.0;
-	
+
 	double unifGapWeight = 0.0;
-	
+
 	// -------------------- OPTIMIZATION --------------------
 
 	public <U extends DecisionVariable> void registerSamplingStageSequence(
 			final List<SamplingStage<U>> samplingStages,
-			final double finalObjectiveFunctionValue
-//			,
-//			final double gradientNorm, final U finalDecisionVariable
-			) {
+			final double finalObjectiveFunctionValue) {
 
 		/*
 		 * Objective function.
@@ -111,9 +108,8 @@ public class UpperBoundTuner {
 
 		this.equilGapWeight = result.getPoint()[0];
 		this.unifGapWeight = result.getPoint()[1];
-		
+
 		System.out.println("ONE-SHOT-OPTIMIZATION: v = " + result.getPoint()[0]
 				+ " w = " + result.getPoint()[1]);
 	}
-
 }

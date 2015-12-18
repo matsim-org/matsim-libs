@@ -46,8 +46,6 @@ public class SingleTrajectorySampler<U extends DecisionVariable> implements
 
 	private final ObjectiveFunction objectBasedObjectiveFunction;
 
-	// private final VectorBasedObjectiveFunction vectorBasedObjectiveFunction;
-
 	private final ConvergenceCriterion convergenceCriterion;
 
 	private SimulatorState fromState = null;
@@ -61,18 +59,8 @@ public class SingleTrajectorySampler<U extends DecisionVariable> implements
 			final ConvergenceCriterion convergenceCriterion) {
 		this.decisionVariable = decisionVariable;
 		this.objectBasedObjectiveFunction = objectBasedObjectiveFunction;
-		// this.vectorBasedObjectiveFunction = null;
 		this.convergenceCriterion = convergenceCriterion;
 	}
-
-	// public SingleTrajectorySampler(final U decisionVariable,
-	// final VectorBasedObjectiveFunction vectorBasedObjectiveFunction,
-	// final ConvergenceCriterion convergenceCriterion) {
-	// this.decisionVariable = decisionVariable;
-	// this.objectBasedObjectiveFunction = null;
-	// this.vectorBasedObjectiveFunction = vectorBasedObjectiveFunction;
-	// this.convergenceCriterion = convergenceCriterion;
-	// }
 
 	// --------------- IMPLEMENTATION OF TrajectorySampler ---------------
 
@@ -126,24 +114,4 @@ public class SingleTrajectorySampler<U extends DecisionVariable> implements
 			return 0;
 		}
 	}
-
-	// @Override
-	// public Map<U, Integer> getDecisionVariable2evaluationCnt() {
-	// return null; // TODO not ideal
-	// }
-	//
-	// @Override
-	// public double getInitialEquilibriumGap() {
-	// return 0.0; // TODO not ideal
-	// }
-	//
-	// @Override
-	// public double getInitialObjectiveFunctionValue() {
-	// return 0.0; // TODO not ideal
-	// }
-	//
-	// @Override
-	// public double getInitialUniformityGap() {
-	// return 0.0; // TODO not ideal
-	// }
 }

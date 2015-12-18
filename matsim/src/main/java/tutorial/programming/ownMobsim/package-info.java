@@ -1,10 +1,9 @@
 /* *********************************************************************** *
- * project: org.matsim.*
- * ControlerDefaultCoreListenersModule.java
+ * project: org.matsim.*												   *
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,29 +16,8 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.core.controler.corelisteners;
-
-import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.scoring.EventsToScore;
-
 /**
- * Defines the default core listeners.
- * In 99% of the use cases, this should be left as is.
- * Most of the process can be configured using more elemental elements:
- * StrategyManager, ScoringFunction, EventHandlers.
+ * @author nagel
  *
- * @author thibautd
  */
-public class ControlerDefaultCoreListenersModule extends AbstractModule {
-
-	@Override
-	public void install() {
-		bind( PlansScoring.class ).to( PlansScoringImpl.class );
-		bind(EventsToScore.class).asEagerSingleton();
-		bind( PlansReplanning.class ).to( PlansReplanningImpl.class );
-		bind( PlansDumping.class ).to( PlansDumpingImpl.class );
-		bind( EventsHandling.class ).to( EventsHandlingImpl.class );
-		bind( DumpDataAtEnd.class ).to( DumpDataAtEndImpl.class );
-	}
-}
-
+package tutorial.programming.ownMobsim;

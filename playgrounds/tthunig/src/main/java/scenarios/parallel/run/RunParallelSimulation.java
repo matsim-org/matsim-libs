@@ -76,9 +76,9 @@ public final class RunParallelSimulation {
 	// initial score for all initial plans. choose null for no score
 	private static final Double INIT_PLAN_SCORE = null; // TODO choose appropriate score
 
-	private static final boolean USE_SECOND_OD_PAIR = false;
+	private static final boolean USE_SECOND_OD_PAIR = true;
 	
-	private static final boolean USE_SIGNALS = false;
+	private static final boolean USE_SIGNALS = true;
 	
 //	// defines which kind of pricing should be used
 //	private static final PricingType PRICING_TYPE = PricingType.V3;
@@ -400,7 +400,7 @@ public final class RunParallelSimulation {
 
 		if (ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME,
 				SignalSystemsConfigGroup.class).isUseSignalSystems()) {
-			runName += "_" + USE_SIGNALS;
+			runName += "_signals";
 		}
 		
 //		if (!PRICING_TYPE.equals(PricingType.NONE)){

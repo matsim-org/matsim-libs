@@ -19,11 +19,16 @@ public class CreateNetwork {
 		// input and output
 //		String osmFile = "/Users/dominik/Accessibility/Data/OSM/2015-10-15_nairobi.osm.xml";
 //		String osmFile = "/Users/dominik/Accessibility/Data/OSM/2015-11-05_kibera.osm.xml";
-		String osmFile = "../../../../Workspace/data/accessibility/osm/2015-10-15_capetown_central.osm.xml";
+//		String osmFile = "../../../../Workspace/data/accessibility/osm/2015-10-15_capetown_central.osm.xml";
+		
+		String osmFile = "../../../../Workspace/shared-svn/projects/accessibility_berlin/otp/2015-05-26_berlin.osm";
 		
 //		String networkFile = "/Users/dominik/Accessibility/Data/Networks/Kenya/2015-10-15_nairobi_paths.xml";
 //		String networkFile = "/Users/dominik/Accessibility/Data/Networks/Kenya/2015-11-05_kibera_paths_detailed.xml";
-		String outputBase = "../../../../Workspace/data/accessibility/capetown/network/2015-10-15/";
+//		String outputBase = "../../../../Workspace/data/accessibility/capetown/network/2015-10-15/";
+		
+		String outputBase = "../../../../Workspace/shared-svn/projects/accessibility_berlin/otp/2015-05-26/";
+		
 		String networkFile = outputBase + "network.xml";
 		
 		LogToOutputSaver.setOutputDirectory(outputBase);

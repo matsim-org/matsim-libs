@@ -258,6 +258,7 @@ class KNBerlinControler {
 		final String receiverPointsFile = outputFilePath + "/receiverPoints/receiverPoints.csv" ;
 
 		// yyyy would be even better to load everything into one file: x, y, t, imissions, damages, ...
+		// this should be possible now by adding working directory and label arrays, see example at the very end of NoiseCalculationOffline... ik 'dec 15
 		
 		{
 			final String label = "immission" ;

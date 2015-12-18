@@ -9,6 +9,7 @@ import org.apache.commons.math.stat.descriptive.moment.Mean;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.parking.lib.DebugLib;
@@ -16,6 +17,7 @@ import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 import org.matsim.contrib.parking.lib.obj.Matrix;
 import org.matsim.core.config.Config;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
@@ -39,6 +41,8 @@ import playground.wrashid.parkingChoice.trb2011.counts.SingleDayGarageParkingsCo
 import playground.wrashid.parkingSearch.planLevel.analysis.ParkingWalkingDistanceMeanAndStandardDeviationGraph;
 import playground.wrashid.parkingSearch.planLevel.occupancy.ParkingOccupancyBins;
 
+import javax.inject.Provider;
+
 
 public class ParkingScoreAccumulator implements AfterMobsimListener {
 	private static final Logger log = Logger.getLogger( ParkingScoreAccumulator.class );
@@ -61,20 +65,25 @@ public class ParkingScoreAccumulator implements AfterMobsimListener {
 	public ParkingScoreAccumulator(ParkingScoreCollector parkingScoreCollector, ParkingManager parkingManager, final Controler controler) {
 		this.parkingScoreCollector = parkingScoreCollector;
 		this.parkingManager = parkingManager;
-
-		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
-			CharyparNagelScoringParametersForPerson parametersForPerson = new SubpopulationCharyparNagelScoringParameters( controler.getScenario() );
+		controler.addOverridingModule(new AbstractModule() {
 			@Override
-			public ScoringFunction createNewScoringFunction(Person person) {
-				CharyparNagelScoringParameters params = parametersForPerson.getScoringParameters( person );
-
-				SumScoringFunction sumScoringFunction = new SumScoringFunction();
-				sumScoringFunction.addScoringFunction(new CharyparNagelActivityScoring(params));
-				sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(params, controler.getScenario().getNetwork()));
-				sumScoringFunction.addScoringFunction(new CharyparNagelMoneyScoring(params));
-				sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
-				sumScoringFunction.addScoringFunction(new ParkingScoring(controler.getConfig(), params, person.getId()));
-				return sumScoringFunction;
+			public void install() {
+				final Provider<Network> networkProvider = binder().getProvider(Network.class);
+				final Provider<CharyparNagelScoringParametersForPerson> paramsProvider = binder().getProvider(CharyparNagelScoringParametersForPerson.class);
+				ScoringFunctionFactory scoringFunctionFactory = new ScoringFunctionFactory() {
+					@Override
+					public ScoringFunction createNewScoringFunction(Person person) {
+						CharyparNagelScoringParameters params = paramsProvider.get().getScoringParameters(person);
+						SumScoringFunction sumScoringFunction = new SumScoringFunction();
+						sumScoringFunction.addScoringFunction(new CharyparNagelActivityScoring(params));
+						sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(params, networkProvider.get()));
+						sumScoringFunction.addScoringFunction(new CharyparNagelMoneyScoring(params));
+						sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
+						sumScoringFunction.addScoringFunction(new ParkingScoring(controler.getConfig(), params, person.getId()));
+						return sumScoringFunction;
+					}
+				};
+				bindScoringFunctionFactory().toInstance(scoringFunctionFactory);
 			}
 		});
 	}
