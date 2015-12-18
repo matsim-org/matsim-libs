@@ -28,12 +28,12 @@ import java.util.TreeSet;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Person;
+import org.matsim.vehicles.Vehicle;
 import org.matsim.core.api.experimental.events.EventsManager;
 
 import javax.inject.Inject;
@@ -43,7 +43,7 @@ import javax.inject.Inject;
  *
  * @author mrieser
  */
-public class VolumesAnalyzer implements LinkLeaveEventHandler, PersonDepartureEventHandler {
+public class VolumesAnalyzer implements LinkLeaveEventHandler, VehicleEntersTrafficEventHandler {
 
 	private final static Logger log = Logger.getLogger(VolumesAnalyzer.class);
 	private final int timeBinSize;
@@ -53,7 +53,7 @@ public class VolumesAnalyzer implements LinkLeaveEventHandler, PersonDepartureEv
 	
 	// for multi-modal support
 	private final boolean observeModes;
-	private final Map<Id<Person>, String> enRouteModes;
+	private final Map<Id<Vehicle>, String> enRouteModes;
 	private final Map<Id<Link>, Map<String, int[]>> linksPerMode;
 
 	@Inject
@@ -83,9 +83,9 @@ public class VolumesAnalyzer implements LinkLeaveEventHandler, PersonDepartureEv
 	}
 	
 	@Override
-	public void handleEvent(PersonDepartureEvent event) {
+	public void handleEvent(VehicleEntersTrafficEvent event) {
 		if (observeModes) {
-			enRouteModes.put(event.getPersonId(), event.getLegMode());
+			enRouteModes.put(event.getVehicleId(), event.getNetworkMode());
 		}
 	}
 	
@@ -105,7 +105,7 @@ public class VolumesAnalyzer implements LinkLeaveEventHandler, PersonDepartureEv
 				modeVolumes = new HashMap<>();
 				this.linksPerMode.put(event.getLinkId(), modeVolumes);
 			}
-			String mode = enRouteModes.get(event.getDriverId());
+			String mode = enRouteModes.get(event.getVehicleId());
 			volumes = modeVolumes.get(mode);
 			if (volumes == null) {
 				volumes = new int[this.maxSlotIndex + 1]; // initialized to 0 by default, according to JVM specs

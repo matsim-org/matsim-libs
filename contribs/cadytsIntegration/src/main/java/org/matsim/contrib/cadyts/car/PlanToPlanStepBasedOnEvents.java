@@ -23,35 +23,36 @@ package org.matsim.contrib.cadyts.car;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.inject.Inject;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
 import org.matsim.contrib.cadyts.general.PlansTranslator;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 
 import cadyts.demand.PlanBuilder;
-import org.matsim.core.config.ConfigUtils;
-
-import javax.inject.Inject;
 
 public class PlanToPlanStepBasedOnEvents implements PlansTranslator<Link>, LinkLeaveEventHandler, 
-		PersonDepartureEventHandler, PersonArrivalEventHandler {
+VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 	
 	private static final Logger log = Logger.getLogger(PlanToPlanStepBasedOnEvents.class);
 
 	private final Scenario scenario;
 
-	private final Set<Id> driverAgents;
+	private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
 	
 	private int iteration = -1;
 
@@ -70,7 +71,6 @@ public class PlanToPlanStepBasedOnEvents implements PlansTranslator<Link>, LinkL
 		for ( String str : abc ) {
 			this.calibratedLinks.add( Id.createLinkId(str) ) ;
 		}
-		this.driverAgents = new HashSet<>();
 	}
 
 	private long plansFound = 0;
@@ -95,31 +95,36 @@ public class PlanToPlanStepBasedOnEvents implements PlansTranslator<Link>, LinkL
 		log.warn("found " + this.plansFound + " out of " + (this.plansFound + this.plansNotFound) + " ("
 				+ (100. * this.plansFound / (this.plansFound + this.plansNotFound)) + "%)");
 		log.warn("(above values may both be at zero for a couple of iterations if multiple plans per agent all have no score)");
-
-		this.driverAgents.clear();
+		
+		delegate.reset(iteration);
 	}
 
 	@Override
-	public void handleEvent(PersonDepartureEvent event) {
-		if (event.getLegMode().equals(TransportMode.car)) this.driverAgents.add(event.getPersonId());
+	public void handleEvent(VehicleEntersTrafficEvent event) {
+		if (event.getNetworkMode().equals(TransportMode.car))
+			delegate.handleEvent(event);
 	}
 	
 	@Override
-	public void handleEvent(PersonArrivalEvent event) {
-		this.driverAgents.remove(event.getPersonId());
+	public void handleEvent(VehicleLeavesTrafficEvent event) {
+		delegate.handleEvent(event);
 	}
 	
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
 		
-		// if it is not a driver, ignore the event
-		if (!driverAgents.contains(event.getDriverId())) return;
+		Id<Person> driverId = delegate.getDriverOfVehicle(event.getVehicleId());
+		
+		// if it is not a car, ignore the event
+		if (driverId == null) 
+			return;
 		
 		// if only a subset of links is calibrated but the link is not contained, ignore the event
-		if (!calibratedLinks.contains(event.getLinkId())) return;
+		if (!calibratedLinks.contains(event.getLinkId())) 
+			return;
 		
 		// get the "Person" behind the id:
-		Person person = this.scenario.getPopulation().getPersons().get(event.getDriverId());
+		Person person = this.scenario.getPopulation().getPersons().get(driverId);
 		
 		// get the selected plan:
 		Plan selectedPlan = person.getSelectedPlan();

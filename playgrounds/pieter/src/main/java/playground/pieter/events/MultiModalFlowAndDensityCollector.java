@@ -33,14 +33,14 @@ import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
-import org.matsim.api.core.v01.events.Wait2LinkEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
-import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 
 /**
@@ -55,7 +55,7 @@ import org.matsim.api.core.v01.network.Link;
  */
 public class MultiModalFlowAndDensityCollector implements LinkLeaveEventHandler, LinkEnterEventHandler,
 		PersonArrivalEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler,
-		Wait2LinkEventHandler, TransitDriverStartsEventHandler {
+		VehicleEntersTrafficEventHandler, TransitDriverStartsEventHandler {
 	private class PTVehicle {
 
 		// Attributes
@@ -236,7 +236,7 @@ public class MultiModalFlowAndDensityCollector implements LinkLeaveEventHandler,
 	}
 
 	@Override
-	public void handleEvent(Wait2LinkEvent event) {
+	public void handleEvent(VehicleEntersTrafficEvent event) {
 		Id vehId = transitDriverIdToVehicleId.get(event.getPersonId());
 		if (vehId != null)
 			ptVehicles.get(vehId).setLastLinkId(event.getLinkId());

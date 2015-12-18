@@ -25,6 +25,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.vehicles.Vehicle;
 
 
 public class EventsToTrips {
@@ -51,7 +52,7 @@ public class EventsToTrips {
     	reader.parse(s);
 		final BufferedWriter outLink = IOUtils.getBufferedWriter(outputFile);
 
-    	HashMap<Id<Person>, ArrayList<RouteInfo>> routes = eventsToTripsHandler.getRoutes();
+    	HashMap<Id<Vehicle>, ArrayList<RouteInfo>> routes = eventsToTripsHandler.getRoutes();
     	int count = 0;
     	int i = 1;
     	for(ArrayList<RouteInfo> ri : routes.values()) {
@@ -108,11 +109,11 @@ public class EventsToTrips {
 	
 	private class EventsToTripsHandler implements PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler{
 
-		HashMap<Id<Person>, Boolean> inVehicle = new HashMap<Id<Person>, Boolean>();
+		HashMap<Id<Vehicle>, Boolean> inVehicle = new HashMap<Id<Vehicle>, Boolean>();
 		HashMap<Id, Double> travelTimes = new HashMap<Id, Double>();
-		HashMap<Id<Person>, ArrayList<RouteInfo>> routes = new HashMap<Id<Person>, ArrayList<RouteInfo>>();
+		HashMap<Id<Vehicle>, ArrayList<RouteInfo>> routes = new HashMap<Id<Vehicle>, ArrayList<RouteInfo>>();
 		
-		public HashMap<Id<Person>, ArrayList<RouteInfo>> getRoutes() {
+		public HashMap<Id<Vehicle>, ArrayList<RouteInfo>> getRoutes() {
 			
 			return this.routes;
 		}
@@ -120,15 +121,15 @@ public class EventsToTrips {
 		@Override
 		public void reset(int iteration) {
 			// TODO Auto-generated method stub
-			inVehicle = new HashMap<Id<Person>, Boolean>();
-			routes = new HashMap<Id<Person>, ArrayList<RouteInfo>>();
+			inVehicle = new HashMap<Id<Vehicle>, Boolean>();
+			routes = new HashMap<Id<Vehicle>, ArrayList<RouteInfo>>();
 		}
 
 		@Override
 		public void handleEvent(PersonLeavesVehicleEvent event) {
 			// TODO Auto-generated method stub
 			if (!event.getVehicleId().toString().contains("_")) {
-				inVehicle.put(event.getPersonId(), false);
+				inVehicle.put(event.getVehicleId(), false);
 				travelTimes.remove(event.getPersonId());
 				
 			}
@@ -139,18 +140,18 @@ public class EventsToTrips {
 		public void handleEvent(PersonEntersVehicleEvent event) {
 			// TODO Auto-generated method stub
 			if (!event.getVehicleId().toString().contains("_")) {
-				inVehicle.put(event.getPersonId(), true);
-				if (this.routes.containsKey(event.getPersonId())) {
+				inVehicle.put(event.getVehicleId(), true);
+				if (this.routes.containsKey(event.getVehicleId())) {
 					RouteInfo newRoute = new RouteInfo();
 					
-					routes.get(event.getPersonId()).add(newRoute);
+					routes.get(event.getVehicleId()).add(newRoute);
 					
 				}
 				else {
 					ArrayList<RouteInfo> newPoint = new ArrayList<RouteInfo>();
 					RouteInfo newRoute = new RouteInfo();
 					newPoint.add(newRoute);
-					this.routes.put(event.getPersonId(), newPoint);
+					this.routes.put(event.getVehicleId(), newPoint);
 				}
 				
 			}
@@ -159,20 +160,21 @@ public class EventsToTrips {
 		@Override
 		public void handleEvent(LinkLeaveEvent event) {
 			// TODO Auto-generated method stub
-			if (inVehicle.containsKey(event.getDriverId()) && inVehicle.get(event.getDriverId()) == true)
-				if (travelTimes.containsKey(event.getDriverId())) {
-					if (routes.containsKey(event.getDriverId())) {
+			
+			if (inVehicle.containsKey(event.getVehicleId()) && inVehicle.get(event.getVehicleId()) == true)
+				if (travelTimes.containsKey(event.getVehicleId())) {
+					if (routes.containsKey(event.getVehicleId())) {
 						
-						routes.get(event.getDriverId()).get(routes.get(event.getDriverId()).size() - 1).addNewLink(event.getLinkId(), -travelTimes.get(event.getDriverId()) + event.getTime());
-						travelTimes.remove(event.getDriverId());
+						routes.get(event.getVehicleId()).get(routes.get(event.getVehicleId()).size() - 1).addNewLink(event.getLinkId(), -travelTimes.get(event.getVehicleId()) + event.getTime());
+						travelTimes.remove(event.getVehicleId());
 					}
 					else {
 						System.out.println("this should never happen");
 						ArrayList<RouteInfo> newPoint = new ArrayList<RouteInfo>();
 						RouteInfo newRoute = new RouteInfo();
-						newRoute.addNewLink(event.getLinkId(), travelTimes.get(event.getDriverId()));
+						newRoute.addNewLink(event.getLinkId(), travelTimes.get(event.getVehicleId()));
 						newPoint.add(newRoute);
-						this.routes.put(event.getDriverId(), newPoint);
+						this.routes.put(event.getVehicleId(), newPoint);
 					}
 				}
 					
@@ -182,8 +184,8 @@ public class EventsToTrips {
 		@Override
 		public void handleEvent(LinkEnterEvent event) {
 			// TODO Auto-generated method stub
-			if (inVehicle.containsKey(event.getDriverId()) && inVehicle.get(event.getDriverId()) == true)
-				travelTimes.put(event.getDriverId(), event.getTime());
+			if (inVehicle.containsKey(event.getVehicleId()) && inVehicle.get(event.getVehicleId()) == true)
+				travelTimes.put(event.getVehicleId(), event.getTime());
 		}
 		
 		

@@ -34,11 +34,11 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
-import org.matsim.api.core.v01.events.Wait2LinkEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
-import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -315,7 +315,7 @@ public class MultiModalControlerListenerTest {
 	}
 
 	private static class LinkModeChecker implements LinkLeaveEventHandler, PersonDepartureEventHandler,
-	PersonArrivalEventHandler, Wait2LinkEventHandler {
+	PersonArrivalEventHandler, VehicleEntersTrafficEventHandler {
 
 		int arrivalCount = 0;
 		int linkLeftCount = 0;
@@ -359,7 +359,7 @@ public class MultiModalControlerListenerTest {
 		}
 
 		@Override
-		public void handleEvent(Wait2LinkEvent event) {
+		public void handleEvent(VehicleEntersTrafficEvent event) {
 			this.vehModes.put(event.getVehicleId(), event.getNetworkMode());
 		}
 

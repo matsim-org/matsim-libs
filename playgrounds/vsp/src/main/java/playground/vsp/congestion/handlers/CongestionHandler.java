@@ -24,7 +24,8 @@ import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
-import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 
 /**
  * @author nagel
@@ -36,8 +37,9 @@ LinkLeaveEventHandler,
 TransitDriverStartsEventHandler,
 PersonDepartureEventHandler, 
 PersonStuckEventHandler,
-Wait2LinkEventHandler,
+VehicleEntersTrafficEventHandler,
 PersonArrivalEventHandler,
-CongestionInternalization {
+CongestionInternalization,
+VehicleLeavesTrafficEventHandler {
 
 }

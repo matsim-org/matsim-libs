@@ -551,7 +551,7 @@ public class CreateAutomatedFDTest {
 		private double permanentAverageVelocity;
 		private double permanentFlow;
 
-		private Map<Id<Person>,Double> lastSeenOnStudiedLinkEnter;//records last entry time for every person, but also useful for getting actual number of people in the simulation
+		private Map<Id<Vehicle>,Double> lastSeenOnStudiedLinkEnter;//records last entry time for every person, but also useful for getting actual number of people in the simulation
 		private int speedTableSize;
 		private List<Double> speedTable;
 		private Double flowTime;
@@ -569,11 +569,12 @@ public class CreateAutomatedFDTest {
 
 		public void handle(LinkEnterEvent event){
 			if (event.getLinkId().equals(flowDynamicsMeasurementLinkId)){
-				Id<Person> personId = Id.createPersonId(event.getDriverId());
+//				Id<Person> personId = Id.createPersonId(event.getDriverId());
 				double nowTime = event.getTime();
 
 				this.updateFlow900(nowTime, this.vehicleType.getPcuEquivalents());
-				this.updateSpeedTable(nowTime, personId);
+//				this.updateSpeedTable(nowTime, personId);
+				this.updateSpeedTable(nowTime, event.getVehicleId() ) ;
 
 				//Checking for stability
 				//Making sure all agents are on the track before testing stability
@@ -622,18 +623,18 @@ public class CreateAutomatedFDTest {
 			this.lastXFlows900.set(0, nowFlow);
 		}
 
-		private void updateSpeedTable(double nowTime, Id<Person> personId){
-			if (this.lastSeenOnStudiedLinkEnter.containsKey(personId)){
-				double lastSeenTime = lastSeenOnStudiedLinkEnter.get(personId);
+		private void updateSpeedTable(double nowTime, Id<Vehicle> vehicleId){
+			if (this.lastSeenOnStudiedLinkEnter.containsKey(vehicleId)){
+				double lastSeenTime = lastSeenOnStudiedLinkEnter.get(vehicleId);
 				double speed = 1000 * 3 / (nowTime-lastSeenTime);//in m/s!!
 				for (int i=speedTableSize-2; i>=0; i--){
 					this.speedTable.set(i+1, this.speedTable.get(i).doubleValue());
 				}
 				this.speedTable.set(0, speed);
 
-				this.lastSeenOnStudiedLinkEnter.put(personId,nowTime);
+				this.lastSeenOnStudiedLinkEnter.put(vehicleId,nowTime);
 			} else {
-				this.lastSeenOnStudiedLinkEnter.put(personId, nowTime);
+				this.lastSeenOnStudiedLinkEnter.put(vehicleId, nowTime);
 			}
 			//this.numberOfDrivingAgents = this.lastSeenOnStudiedLinkEnter.size();
 		}
@@ -827,10 +828,10 @@ public class CreateAutomatedFDTest {
 
 		public void handleEvent(LinkEnterEvent event) {
 			if (!(permanentRegime)){
-				Id<Person> personId = Id.createPersonId(event.getDriverId());
+//				Id<Person> personId = Id.createPersonId(event.getDriverId());
 
 				//Disaggregated data updating methods
-				String travelMode = person2Mode.get(personId);
+				String travelMode = person2Mode.get(event.getVehicleId());
 
 				Id<VehicleType> transportMode = modeVehicleTypes.get(travelMode).getId();
 				this.travelModesFlowData.get(transportMode).handle(event);
@@ -840,7 +841,7 @@ public class CreateAutomatedFDTest {
 				double nowTime = event.getTime();
 				if (event.getLinkId().equals(flowDynamicsMeasurementLinkId)){				
 					this.globalFlowData.updateFlow900(nowTime, pcuVeh);
-					this.globalFlowData.updateSpeedTable(nowTime, personId);
+					this.globalFlowData.updateSpeedTable(nowTime, event.getVehicleId());
 					//Waiting for all agents to be on the track before studying stability
 					if ((this.globalFlowData.getNumberOfDrivingAgents() == this.globalFlowData.numberOfAgents) && (nowTime>1800)){	//TODO parametrize this correctly
 						/*//Taking speed check out, as it is not reliable on the global speed table

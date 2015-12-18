@@ -20,6 +20,7 @@ public class CTNetwork {
 	private static final Logger log = Logger.getLogger(CTNetwork.class);
 
 	private final CTEventsPaulPriorityQueue events = new CTEventsPaulPriorityQueue();
+	//	private final PriorityQueue<CTEvent> events = new PriorityQueue<>();
 	private final CTNetsimEngine engine;
 	private final int cores = Runtime.getRuntime().availableProcessors();
 	private Map<Id<Link>, CTLink> links = new HashMap<>();
@@ -214,7 +215,7 @@ public class CTNetwork {
 
 
 	public void afterSim() {
-
+		System.out.println("?");
 	}
 
 	private final class Worker implements Runnable {

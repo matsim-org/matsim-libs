@@ -22,7 +22,6 @@
 
 package org.matsim.roadpricing;
 
-import com.google.inject.Singleton;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
@@ -45,6 +44,8 @@ import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
 import org.matsim.testcases.MatsimTestUtils;
+
+import com.google.inject.Singleton;
 
 /**
  * Tests {@link PlansCalcRouteWithTollOrNot} as isolated as possible.

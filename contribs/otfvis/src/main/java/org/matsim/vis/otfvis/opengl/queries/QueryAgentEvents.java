@@ -36,7 +36,7 @@ import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
-import org.matsim.api.core.v01.events.Wait2LinkEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
@@ -45,9 +45,10 @@ import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
-import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.vehicles.Vehicle;
 import org.matsim.vis.otfvis.SimulationViewForQueries;
 import org.matsim.vis.otfvis.interfaces.OTFQuery;
 import org.matsim.vis.otfvis.interfaces.OTFQueryResult;
@@ -60,7 +61,7 @@ import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
  * @author michaz
  *
  */
-public class QueryAgentEvents extends AbstractQuery implements PersonDepartureEventHandler, PersonArrivalEventHandler, ActivityStartEventHandler, ActivityEndEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler, Wait2LinkEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler {
+public class QueryAgentEvents extends AbstractQuery implements PersonDepartureEventHandler, PersonArrivalEventHandler, ActivityStartEventHandler, ActivityEndEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler, VehicleEntersTrafficEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler {
 
 	private static transient Logger logger = Logger.getLogger(QueryAgentEvents.class);
 	
@@ -90,6 +91,8 @@ public class QueryAgentEvents extends AbstractQuery implements PersonDepartureEv
 	}
 
 	private Id<Person> agentId = null;
+
+	private Id<Vehicle> agentsVehId = null;
 	
 	private EventsManager eventsManager = null;
 	
@@ -149,11 +152,14 @@ public class QueryAgentEvents extends AbstractQuery implements PersonDepartureEv
 	public void handleEvent(PersonEntersVehicleEvent event) {
 		if(event.getPersonId().equals(this.agentId)){
 			queue.add(event);
+			
+			// remember the agents vehicle
+			agentsVehId = event.getVehicleId();
 		}
 	}
 
 	@Override
-	public void handleEvent(Wait2LinkEvent event) {
+	public void handleEvent(VehicleEntersTrafficEvent event) {
 		if(event.getPersonId().equals(this.agentId)){
 			queue.add(event);
 		}
@@ -161,14 +167,14 @@ public class QueryAgentEvents extends AbstractQuery implements PersonDepartureEv
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		if(event.getDriverId().equals(this.agentId)){
+		if(event.getVehicleId().equals(this.agentsVehId)){
 			queue.add(event);
 		}
 	}
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		if(event.getDriverId().equals(this.agentId)){
+		if(event.getVehicleId().equals(this.agentsVehId)){
 			queue.add(event);
 		}
 	}

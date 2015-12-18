@@ -28,6 +28,7 @@ import java.util.TreeMap;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.vehicles.VehicleType;
 
 import playground.agarwalamit.utils.ListUtils;
@@ -61,6 +62,7 @@ class TravelModesFlowDynamicsUpdator {
 	private List<Double> lastXHourlyFlows;;//recording a number of flows to ensure stability
 	private boolean speedStability;
 	private boolean flowStability;
+	private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
 
 	private int noOfModes;
 
@@ -76,7 +78,7 @@ class TravelModesFlowDynamicsUpdator {
 
 	void handle(LinkEnterEvent event){
 		if (event.getLinkId().equals(GlobalFlowDynamicsUpdator.FLOW_DYNAMICS_UPDATE_LINK)){
-			Id<Person> personId = Id.createPersonId(event.getDriverId());
+			Id<Person> personId = this.delegate.getDriverOfVehicle(event.getVehicleId());
 			double nowTime = event.getTime();
 
 			this.updateFlow900(nowTime, this.vehicleType.getPcuEquivalents());

@@ -13,12 +13,17 @@ import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierShipment;
 import org.matsim.contrib.freight.carrier.Carriers;
@@ -28,6 +33,7 @@ import org.matsim.contrib.freight.mobsim.CarrierAgent.CarrierDriverAgent;
 import org.matsim.contrib.freight.scoring.CarrierScoringFunctionFactory;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.core.scoring.ScoringFunction;
 
 /**
@@ -36,15 +42,17 @@ import org.matsim.core.scoring.ScoringFunction;
  * @author mzilske, sschroeder
  *
  */
-public class CarrierAgentTracker implements ActivityStartEventHandler, ActivityEndEventHandler, PersonDepartureEventHandler, PersonArrivalEventHandler,  LinkEnterEventHandler {
+public class CarrierAgentTracker implements ActivityStartEventHandler, ActivityEndEventHandler, PersonDepartureEventHandler, PersonArrivalEventHandler,  LinkEnterEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 
 	private final Carriers carriers;
 
 	private final EventsManager eventsManager;
+	
+	private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
 
 	private final Collection<CarrierAgent> carrierAgents = new ArrayList<CarrierAgent>();
 	
-	private Map<Id,CarrierAgent> driverAgentMap = new HashMap<Id, CarrierAgent>();
+	private Map<Id<Person>, CarrierAgent> driverAgentMap = new HashMap<Id<Person>, CarrierAgent>();
 
 	public CarrierAgentTracker(Carriers carriers, Network network, CarrierScoringFunctionFactory carrierScoringFunctionFactory) {
 		this.carriers = carriers;
@@ -55,7 +63,7 @@ public class CarrierAgentTracker implements ActivityStartEventHandler, ActivityE
 	private void createCarrierAgents(CarrierScoringFunctionFactory carrierScoringFunctionFactory) {
 		for (Carrier carrier : carriers.getCarriers().values()) {
 			ScoringFunction carrierScoringFunction = carrierScoringFunctionFactory.createScoringFunction(carrier);
-			CarrierAgent carrierAgent = new CarrierAgent(this, carrier, carrierScoringFunction);
+			CarrierAgent carrierAgent = new CarrierAgent(this, carrier, carrierScoringFunction, delegate);
 			carrierAgents.add(carrierAgent);
 		}
 	}
@@ -92,11 +100,10 @@ public class CarrierAgentTracker implements ActivityStartEventHandler, ActivityE
 
 	@Override
 	public void reset(int iteration) {
-		// TODO Auto-generated method stub
-
+		delegate.reset(iteration);
 	}
 
-	private CarrierAgent findCarrierAgent(Id id) {
+	private CarrierAgent findCarrierAgent(Id<Carrier> id) {
 		for (CarrierAgent agent : carrierAgents) {
 			if (agent.getId().equals(id)) {
 				return agent;
@@ -121,11 +128,11 @@ public class CarrierAgentTracker implements ActivityStartEventHandler, ActivityE
 	 * @param time
 	 * @see ShipmentPickedUpEvent, ShipmentPickedUpEventHandler
 	 */
-	public void notifyPickedUp(Id carrierId, Id driverId, CarrierShipment shipment, double time) {
+	public void notifyPickedUp(Id<Carrier> carrierId, Id<Person> driverId, CarrierShipment shipment, double time) {
 		processEvent(new ShipmentPickedUpEvent(carrierId, driverId, shipment, time));
 	}
 
-	public void notifyDelivered(Id carrierId, Id driverId, CarrierShipment shipment, double time) {
+	public void notifyDelivered(Id<Carrier> carrierId, Id<Person> driverId, CarrierShipment shipment, double time) {
 		processEvent(new ShipmentDeliveredEvent(carrierId, driverId, shipment,time));
 	}
 
@@ -138,7 +145,7 @@ public class CarrierAgentTracker implements ActivityStartEventHandler, ActivityE
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		CarrierAgent carrierAgent = getCarrierAgent(event.getDriverId());
+		CarrierAgent carrierAgent = getCarrierAgent(delegate.getDriverOfVehicle(event.getVehicleId()));
 		if(carrierAgent == null) return;
 		carrierAgent.handleEvent(event);
 	}
@@ -165,7 +172,7 @@ public class CarrierAgentTracker implements ActivityStartEventHandler, ActivityE
 		carrierAgent.handleEvent(event);
 	}
 
-	private CarrierAgent getCarrierAgent(Id driverId) {
+	private CarrierAgent getCarrierAgent(Id<Person> driverId) {
 		if(driverAgentMap.containsKey(driverId)){
 			return driverAgentMap.get(driverId);
 		}
@@ -178,9 +185,19 @@ public class CarrierAgentTracker implements ActivityStartEventHandler, ActivityE
 		return null;	
 	}
 	
-	CarrierDriverAgent getDriver(Id driverId){
+	CarrierDriverAgent getDriver(Id<Person> driverId){
 		CarrierAgent carrierAgent = getCarrierAgent(driverId);
 		if(carrierAgent == null) throw new IllegalStateException("missing carrier agent. cannot find carrierAgent to driver " + driverId);
 		return carrierAgent.getDriver(driverId);
+	}
+
+	@Override
+	public void handleEvent(VehicleLeavesTrafficEvent event) {
+		delegate.handleEvent(event);
+	}
+
+	@Override
+	public void handleEvent(VehicleEntersTrafficEvent event) {
+		delegate.handleEvent(event);
 	}
 }

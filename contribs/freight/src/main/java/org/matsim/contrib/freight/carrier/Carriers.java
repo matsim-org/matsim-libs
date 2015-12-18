@@ -18,7 +18,7 @@ public class Carriers {
 
 	private static Logger log = Logger.getLogger(Carriers.class);
 	
-	private Map<Id, Carrier> carriers = new HashMap<Id, Carrier>();
+	private Map<Id<Carrier>, Carrier> carriers = new HashMap<>();
 
 	public Carriers(Collection<Carrier> carriers) {
 		makeMap(carriers);
@@ -34,7 +34,7 @@ public class Carriers {
 
 	}
 
-	public Map<Id, Carrier> getCarriers() {
+	public Map<Id<Carrier>, Carrier> getCarriers() {
 		return carriers;
 	}
 

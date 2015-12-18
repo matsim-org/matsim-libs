@@ -36,7 +36,8 @@ import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
-import org.matsim.api.core.v01.events.Wait2LinkEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 
 import playground.vsp.congestion.DelayInfo;
@@ -77,7 +78,7 @@ public final class CongestionHandlerImplV8 implements CongestionHandler {
 	}
 
 	@Override
-	public final void handleEvent(Wait2LinkEvent event) {
+	public final void handleEvent(VehicleEntersTrafficEvent event) {
 		delegate.handleEvent(event);
 	}
 
@@ -181,5 +182,10 @@ public final class CongestionHandlerImplV8 implements CongestionHandler {
 	@Override
 	public double getTotalRoundingErrorDelay() {
 		return this.delegate.getDelayNotInternalized_roundingErrors();
+	}
+
+	@Override
+	public void handleEvent(VehicleLeavesTrafficEvent event) {
+		delegate.handleEvent(event);
 	}
 }

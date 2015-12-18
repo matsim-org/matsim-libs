@@ -35,6 +35,7 @@ import org.matsim.contrib.freight.carrier.Tour.Pickup;
 import org.matsim.contrib.freight.carrier.Tour.TourActivity;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
 import org.matsim.contrib.freight.scoring.FreightActivity;
+import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
@@ -120,7 +121,10 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 		}
 
 		public void handleEvent(LinkEnterEvent event) {
-            scoringFunction.handleEvent(new LinkEnterEvent(event.getTime(),Id.createPersonId(event.getVehicleId().toString()),event.getLinkId(),getVehicle().getVehicleId()));
+            scoringFunction.handleEvent(new LinkEnterEvent(event.getTime(),getVehicle().getVehicleId(),event.getLinkId()));
+            /* why can't we do something like:
+            scoringFunction.handleEvent(event);
+            (causes test failures in playground kturner), Theresa Dec'2015 */
             currentRoute.add(event.getLinkId());
 		}
 
@@ -212,12 +216,15 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 
 	private final ScoringFunction scoringFunction;
 
-	CarrierAgent(CarrierAgentTracker carrierAgentTracker, Carrier carrier, ScoringFunction carrierScoringFunction) {
+	private final Vehicle2DriverEventHandler vehicle2DriverEventHandler;
+
+	CarrierAgent(CarrierAgentTracker carrierAgentTracker, Carrier carrier, ScoringFunction carrierScoringFunction, Vehicle2DriverEventHandler vehicle2DriverEventHandler) {
 		this.tracker = carrierAgentTracker;
 		this.carrier = carrier;
 		this.id = carrier.getId();
 		assert carrierScoringFunction != null : "scoringFunctionFactory is null. this must not be.";
 		this.scoringFunction = carrierScoringFunction;
+		this.vehicle2DriverEventHandler = vehicle2DriverEventHandler;
 	}
 
 	public Id<Carrier> getId() {
@@ -310,11 +317,11 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 		return id;
 	}
 
-	public void notifyPickup(Id driverId, CarrierShipment shipment, double time) {
+	public void notifyPickup(Id<Person> driverId, CarrierShipment shipment, double time) {
 		tracker.notifyPickedUp(carrier.getId(), driverId, shipment, time);
 	}
 
-	public void notifyDelivery(Id driverId, CarrierShipment shipment,
+	public void notifyDelivery(Id<Person> driverId, CarrierShipment shipment,
 			double time) {
 		tracker.notifyDelivered(carrier.getId(), driverId, shipment, time);
 	}
@@ -340,7 +347,7 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		getDriver(event.getDriverId()).handleEvent(event);
+		getDriver(vehicle2DriverEventHandler.getDriverOfVehicle(event.getVehicleId())).handleEvent(event);
 	}
 
 

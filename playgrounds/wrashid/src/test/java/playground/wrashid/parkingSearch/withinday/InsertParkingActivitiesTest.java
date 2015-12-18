@@ -54,7 +54,10 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility.Builder;
 import org.matsim.core.router.util.DijkstraFactory;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -130,7 +133,16 @@ public class InsertParkingActivitiesTest extends MatsimTestCase {
 
 		assertEquals(9, plan.getPlanElements().size());
 
-		TripRouter tripRouter = TripRouterFactoryBuilderWithDefaults.createTripRouterProvider(sc, new DijkstraFactory(), null).get();
+		TravelTime travelTime = TravelTimeCalculator.create(sc.getNetwork(), sc.getConfig().travelTimeCalculator()).getLinkTravelTimes() ;
+
+		TravelDisutility travelDisutility = new RandomizingTimeDistanceTravelDisutility.Builder( TransportMode.car ).createTravelDisutility(travelTime, sc.getConfig().planCalcScore() ) ;
+		
+		TripRouterFactoryBuilderWithDefaults builder = new TripRouterFactoryBuilderWithDefaults() ;
+		builder.setLeastCostPathCalculatorFactory( new DijkstraFactory() );
+		builder.setTravelTime(travelTime);
+		builder.setTravelDisutility(travelDisutility);
+		
+		TripRouter tripRouter = builder.build( sc ).get() ;
 
 		// initialize routes
 		new PersonPrepareForSim(new PlanRouter(tripRouter), sc).run(sc.getPopulation());

@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.Wait2LinkEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
@@ -42,7 +42,7 @@ import org.matsim.api.core.v01.events.handler.PersonMoneyEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
-import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.core.api.experimental.events.LaneEnterEvent;
 import org.matsim.core.api.experimental.events.LaneLeaveEvent;
 import org.matsim.contrib.signals.events.SignalGroupStateChangedEvent;
@@ -64,7 +64,7 @@ public class LogOutputEventHandler implements LinkEnterEventHandler, LinkLeaveEv
 	ActivityStartEventHandler, ActivityEndEventHandler, 
 	PersonDepartureEventHandler, PersonArrivalEventHandler, 
 	PersonMoneyEventHandler, PersonStuckEventHandler, 
-	Wait2LinkEventHandler,
+	VehicleEntersTrafficEventHandler,
 	LaneEnterEventHandler, LaneLeaveEventHandler,
 	SignalGroupStateChangedEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler,
 	VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler {
@@ -72,13 +72,13 @@ public class LogOutputEventHandler implements LinkEnterEventHandler, LinkLeaveEv
 	private static final Logger log = Logger.getLogger(LogOutputEventHandler.class);
 
 	public void handleEvent(LinkEnterEvent event) {
-		log.info("LinkEnterEvent at " + Time.writeTime(event.getTime()) + " person id " + event.getDriverId() + " link id " + event.getLinkId());
+		log.info("LinkEnterEvent at " + Time.writeTime(event.getTime()) + " vehicle id " + event.getVehicleId() + " link id " + event.getLinkId());
 	}
 
 	public void reset(int iteration) {}
 
 	public void handleEvent(LinkLeaveEvent event) {
-		log.info("LinkLeaveEvent at " + Time.writeTime(event.getTime()) + " person id " + event.getDriverId() + " link id " + event.getLinkId());
+		log.info("LinkLeaveEvent at " + Time.writeTime(event.getTime()) + " vehicle id " + event.getVehicleId() + " link id " + event.getLinkId());
 	}
 
 	public void handleEvent(ActivityStartEvent event) {
@@ -109,16 +109,16 @@ public class LogOutputEventHandler implements LinkEnterEventHandler, LinkLeaveEv
 //		log.info("PersonEvent at " + Time.writeTime(event.getTime()) + " person id "  + event.getDriverId());
 	}
 
-	public void handleEvent(Wait2LinkEvent event) {
+	public void handleEvent(VehicleEntersTrafficEvent event) {
 		log.info("AgentWait2LinkEvent at " + Time.writeTime(event.getTime()) + " person id " + event.getPersonId() + " link id " + event.getLinkId());
 	}
 
 	public void handleEvent(LaneEnterEvent event) {
-		log.info("LaneEnterEvent at " + Time.writeTime(event.getTime()) + " person id " + event.getPersonId() + " lane id " + event.getLaneId() + " link id " + event.getLinkId());
+		log.info("LaneEnterEvent at " + Time.writeTime(event.getTime()) + " vehicle id " + event.getVehicleId() + " lane id " + event.getLaneId() + " link id " + event.getLinkId());
 	}
 
 	public void handleEvent(LaneLeaveEvent event) {
-		log.info("LaneLeaveEvent at " + Time.writeTime(event.getTime()) + " person id " + event.getPersonId() + " lane id " + event.getLaneId() + " link id " + event.getLinkId());
+		log.info("LaneLeaveEvent at " + Time.writeTime(event.getTime()) + " vehicle id " + event.getVehicleId() + " lane id " + event.getLaneId() + " link id " + event.getLinkId());
 	}
 
 	public void handleEvent(SignalGroupStateChangedEvent event) {

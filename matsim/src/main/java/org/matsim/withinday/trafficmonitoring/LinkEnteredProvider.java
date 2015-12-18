@@ -28,11 +28,16 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 
@@ -47,10 +52,12 @@ import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
  * @author cdobler
  */
 public class LinkEnteredProvider implements LinkEnterEventHandler, PersonArrivalEventHandler, PersonStuckEventHandler,
-		MobsimAfterSimStepListener {
+		MobsimAfterSimStepListener, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 
 	private Map<Id<Person>, Id<Link>> linkEnteredAgents = new ConcurrentHashMap<>();	// <agentId, linkId>
 	private Map<Id<Person>, Id<Link>> lastTimeStepLinkEnteredAgents = new ConcurrentHashMap<>();	// <agentId, linkId>
+	
+	private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
 	
 	public Map<Id<Person>, Id<Link>> getLinkEnteredAgentsInLastTimeStep() {
 		return Collections.unmodifiableMap(this.lastTimeStepLinkEnteredAgents);
@@ -60,6 +67,7 @@ public class LinkEnteredProvider implements LinkEnterEventHandler, PersonArrival
 	public void reset(int iteration) {
 		this.linkEnteredAgents.clear();
 		this.lastTimeStepLinkEnteredAgents.clear();
+		delegate.reset(iteration);
 	}
 
 	@Override
@@ -78,13 +86,23 @@ public class LinkEnteredProvider implements LinkEnterEventHandler, PersonArrival
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		this.linkEnteredAgents.put(event.getDriverId(), event.getLinkId());
+		this.linkEnteredAgents.put(delegate.getDriverOfVehicle(event.getVehicleId()), event.getLinkId());
 	}
 
 	@Override
 	public void notifyMobsimAfterSimStep(MobsimAfterSimStepEvent e) {
 		this.lastTimeStepLinkEnteredAgents = linkEnteredAgents;
 		this.linkEnteredAgents = new ConcurrentHashMap<>();
+	}
+
+	@Override
+	public void handleEvent(VehicleLeavesTrafficEvent event) {
+		delegate.handleEvent(event);
+	}
+
+	@Override
+	public void handleEvent(VehicleEntersTrafficEvent event) {
+		delegate.handleEvent(event);
 	}
 
 }

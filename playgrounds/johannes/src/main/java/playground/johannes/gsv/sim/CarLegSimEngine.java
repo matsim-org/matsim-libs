@@ -64,19 +64,19 @@ public class CarLegSimEngine implements LegSimEngine {
 			for (int i = 0; i < ids.size(); i++) {
 				link = network.getLinks().get(ids.get(i));
 				
-				events.processEvent(new LinkEnterEvent(departureTime + tt, person.getId(), link.getId(), null));
+				events.processEvent(new LinkEnterEvent(departureTime + tt, null, link.getId()));
 //				eventList.add(new LinkEnterEvent(departureTime + tt, person.getId(), link.getId(), null));
 				tt += travelTime.getLinkTravelTime(link, departureTime + tt, null, null);
-				events.processEvent(new LinkLeaveEvent(departureTime + tt, person.getId(), link.getId(), null));
+				events.processEvent(new LinkLeaveEvent(departureTime + tt, null, link.getId()));
 //				eventList.add(new LinkLeaveEvent(departureTime + tt, person.getId(), link.getId(), null));
 				tt++;// 1 sec for each node
 			}
 			
 			link = network.getLinks().get(route.getEndLinkId());
-			events.processEvent(new LinkEnterEvent(departureTime + tt, person.getId(), link.getId(), null));
+			events.processEvent(new LinkEnterEvent(departureTime + tt, null, link.getId()));
 //			eventList.add(new LinkEnterEvent(departureTime + tt, person.getId(), link.getId(), null));
 			tt += travelTime.getLinkTravelTime(link, departureTime + tt, null, null);
-			events.processEvent(new LinkLeaveEvent(departureTime + tt, person.getId(), link.getId(), null));
+			events.processEvent(new LinkLeaveEvent(departureTime + tt, null, link.getId()));
 //			eventList.add(new LinkLeaveEvent(departureTime + tt, person.getId(), link.getId(), null));
 		}
 

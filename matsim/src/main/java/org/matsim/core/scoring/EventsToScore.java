@@ -20,10 +20,9 @@
 
 package org.matsim.core.scoring;
 
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
-import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -38,6 +37,8 @@ import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -46,12 +47,13 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.internal.HasPersonId;
-import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
+
+import com.google.inject.Inject;
 
 
 /**
@@ -160,7 +162,11 @@ public class EventsToScore implements BasicEventHandler {
 			eventsToLegs.handleEvent( (VehicleArrivesAtFacilityEvent) event ) ;
 		} else if ( event instanceof TransitDriverStartsEvent ) {
 			eventsToLegs.handleEvent( (TransitDriverStartsEvent) event ) ;
-		} 
+		} else if ( event instanceof VehicleEntersTrafficEvent ) {
+			eventsToLegs.handleEvent((VehicleEntersTrafficEvent) event ) ; 
+		} else if ( event instanceof VehicleLeavesTrafficEvent ) {
+			eventsToLegs.handleEvent((VehicleLeavesTrafficEvent) event ) ; 
+		}
 
 		// this is for the stuff that is directly based on events.
 		// note that this passes on _all_ person events, even those already passed above.

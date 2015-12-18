@@ -1,9 +1,9 @@
 /* *********************************************************************** *
- * project: org.matsim.*
+ * project: org.matsim.*												   *
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,38 +16,38 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.kai.convert;
 
-package playground.kai.usecases.ownmobsim;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.algorithms.EventWriterXML;
 
-import java.util.List;
+import tutorial.converter.completeEventFilesRegardingVehicleInformation.EventsConverterXML;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Node;
+/**
+ * @author nagel
+ *
+ */
+public class KNEventsConverterWait2LinkEtc {
+	// select the event file you want to convert
+	private static String inputFile = "/Users/nagel/git/matsim/playgrounds/wrashid/test/input/playground/wrashid/PSF2/pluggable/0.events.xml";
+	private static String outputFile = "/Users/nagel/git/matsim/playgrounds/wrashid/test/input/playground/wrashid/PSF2/pluggable/output.events.xml";
 
-class MobsimNode {
-	Node originalNode ;
-	
-	MobsimNode(Node node) {
-		this.originalNode = node ;
-	}
-	
-	private List<MobsimLink> incomingLinks ;
+	public static void main(String[] args) {
 
-	public void doSimStep() {
-		for ( MobsimLink inLink : incomingLinks ) {
-			DriverVehicleUnit vehicle = inLink.peek() ;
-			if ( vehicle != null ) {
-				Id nextLinkId = vehicle.getNextLinkId() ;
-				MobsimLink outLink = null ; // (find outLink)
-				if ( outLink.hasSpace() ) {
-					inLink.remove() ;
-					outLink.addFromIntersection( vehicle ) ;
-				}
-			}
-			
-		
+		if (args != null && args.length !=  0){
+			inputFile = args[0];
 		}
-		
+
+		EventsManager em = EventsUtils.createEventsManager();
+		EventWriterXML eventWriter = new EventWriterXML(outputFile);
+		em.addHandler(eventWriter);
+
+		EventsConverterXML converter = new EventsConverterXML(em);
+		converter.readFile(inputFile);
+
+		eventWriter.closeFile();
 	}
+
 
 }

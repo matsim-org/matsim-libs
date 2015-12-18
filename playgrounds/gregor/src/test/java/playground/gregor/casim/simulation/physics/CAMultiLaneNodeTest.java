@@ -720,13 +720,13 @@ public class CAMultiLaneNodeTest extends MatsimTestCase {
 		int idx = 0;
 		for (int i = from; i < tr.l0.getSize(); i++) {
 			if (conf[idx].equals("<")) {
-				CASimpleDynamicAgent a = new CASimpleDynamicAgent(rl, -1, null,
+				CASimpleDynamicAgent a = new CASimpleDynamicAgent(rl, -1, Id.create(idx, CASimpleDynamicAgent.class),
 						tr.l0);
 				a.materialize(i, -1, 0);
 				lane0[i] = a;
 				ret.add(a);
 			} else if (conf[idx].equals(">")) {
-				CASimpleDynamicAgent a = new CASimpleDynamicAgent(lr, 1, null,
+				CASimpleDynamicAgent a = new CASimpleDynamicAgent(lr, 1, Id.create(idx, CASimpleDynamicAgent.class),
 						tr.l0);
 				a.materialize(i, 1, 0);
 				lane0[i] = a;
@@ -737,13 +737,13 @@ public class CAMultiLaneNodeTest extends MatsimTestCase {
 		}
 
 		if (conf[idx].equals("|<|")) {
-			CASimpleDynamicAgent a = new CASimpleDynamicAgent(rl, 1, null,
+			CASimpleDynamicAgent a = new CASimpleDynamicAgent(rl, 1, Id.create(idx, CASimpleDynamicAgent.class),
 					tr.l0);
 			a.materialize(-1, -1, 0);
 			n.putAgentInSlot(0, a);
 			ret.add(a);
 		} else if (conf[idx].equals("|>|")) {
-			CASimpleDynamicAgent a = new CASimpleDynamicAgent(lr, 1, null,
+			CASimpleDynamicAgent a = new CASimpleDynamicAgent(lr, 1, Id.create(idx, CASimpleDynamicAgent.class),
 					tr.l0);
 			a.materialize(-1, 1, 0);
 			n.putAgentInSlot(0, a);
@@ -754,13 +754,13 @@ public class CAMultiLaneNodeTest extends MatsimTestCase {
 		int pIdx = 0;
 		for (int i = idx; i < conf.length; i++) {
 			if (conf[i].equals("<")) {
-				CASimpleDynamicAgent a = new CASimpleDynamicAgent(rl, 1, null,
+				CASimpleDynamicAgent a = new CASimpleDynamicAgent(rl, 1, Id.create(idx, CASimpleDynamicAgent.class),
 						tr.l1);
 				a.materialize(pIdx, -1, 0);
 				lane1[pIdx] = a;
 				ret.add(a);
 			} else if (conf[i].equals(">")) {
-				CASimpleDynamicAgent a = new CASimpleDynamicAgent(rl, -1, null,
+				CASimpleDynamicAgent a = new CASimpleDynamicAgent(rl, -1, Id.create(idx, CASimpleDynamicAgent.class),
 						tr.l1);
 				a.materialize(pIdx, 1, 0);
 				lane1[pIdx] = a;

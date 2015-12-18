@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.Wait2LinkEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.utils.collections.Tuple;
 import org.opengis.feature.simple.SimpleFeature;
@@ -84,8 +84,8 @@ public class GeospatialEventFilter implements EventFilter {
 			LinkLeaveEvent e = (LinkLeaveEvent) event;
 			Id linkId = e.getLinkId();
 			return containsLink(linkId);
-		} else if (event instanceof Wait2LinkEvent) {
-			Wait2LinkEvent e = (Wait2LinkEvent) event;
+		} else if (event instanceof VehicleEntersTrafficEvent) {
+			VehicleEntersTrafficEvent e = (VehicleEntersTrafficEvent) event;
 			Id linkId = e.getLinkId();
 			return containsLink(linkId);
 		} else if (event instanceof PersonDepartureEvent) {

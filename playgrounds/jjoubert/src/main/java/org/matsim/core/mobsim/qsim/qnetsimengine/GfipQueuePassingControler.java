@@ -37,11 +37,11 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.Wait2LinkEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
-import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.NetworkWriter;
@@ -364,7 +364,7 @@ public class GfipQueuePassingControler {
 	
 
 	private static class LinkCounter implements LinkEnterEventHandler, LinkLeaveEventHandler, 
-	Wait2LinkEventHandler, PersonArrivalEventHandler,
+	VehicleEntersTrafficEventHandler, PersonArrivalEventHandler,
 	IterationEndsListener, MobsimInitializedListener, MobsimBeforeCleanupListener{
 		private final Logger log = Logger.getLogger(LinkCounter.class);
 		private final QueueType queueType;
@@ -463,7 +463,7 @@ public class GfipQueuePassingControler {
 		}
 
 		@Override
-		public void handleEvent(Wait2LinkEvent event) {
+		public void handleEvent(VehicleEntersTrafficEvent event) {
 			NetsimLink netsimLink = this.qsim.getNetsimNetwork().getNetsimLink(event.getLinkId());
 			double pcuEquivalent = this.sc.getVehicles().getVehicles().get(event.getVehicleId()).getType().getPcuEquivalents();
 			double oldPcuTotal = (double) netsimLink.getCustomAttributes().get("pcu");

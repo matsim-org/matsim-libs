@@ -6,12 +6,12 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
-import org.matsim.api.core.v01.events.Wait2LinkEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
-import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
 import org.matsim.api.core.v01.network.Link;
 
 import floetteroed.utilities.DynamicData;
@@ -22,7 +22,7 @@ import floetteroed.utilities.DynamicData;
  *
  */
 public class OccupancyAnalyzer implements LinkLeaveEventHandler,
-		LinkEnterEventHandler, Wait2LinkEventHandler,
+		LinkEnterEventHandler, VehicleEntersTrafficEventHandler,
 		VehicleLeavesTrafficEventHandler {
 
 	// -------------------- MEMBERS --------------------
@@ -116,7 +116,7 @@ public class OccupancyAnalyzer implements LinkLeaveEventHandler,
 	}
 
 	@Override
-	public void handleEvent(final Wait2LinkEvent event) {
+	public void handleEvent(final VehicleEntersTrafficEvent event) {
 		this.registerEntry(event.getLinkId(), (int) event.getTime());
 	}
 
@@ -145,22 +145,22 @@ public class OccupancyAnalyzer implements LinkLeaveEventHandler,
 
 		// before time = 10: occupancy = 0
 
-		analyzer.handleEvent(new LinkEnterEvent(10.0, null, id1, null));
+		analyzer.handleEvent(new LinkEnterEvent(10.0, null, id1));
 		// time = 10, in = 1, out = 0
-		analyzer.handleEvent(new Wait2LinkEvent(10.0, null, id1, null, null,
+		analyzer.handleEvent(new VehicleEntersTrafficEvent(10.0, null, id1, null, null,
 				0.0));
 		// time = 10, in = 2, out = 0
-		analyzer.handleEvent(new LinkEnterEvent(14.0, null, id1, null));
+		analyzer.handleEvent(new LinkEnterEvent(14.0, null, id1));
 		// time = 14, in = 3, out = 0
-		analyzer.handleEvent(new LinkLeaveEvent(19.0, null, id1, null));
+		analyzer.handleEvent(new LinkLeaveEvent(19.0, null, id1));
 		// time = 19, in = 3, out = 1
 
 		// before time = 20: occupancy = 2
 
-		analyzer.handleEvent(new Wait2LinkEvent(20.0, null, id1, null, "car",
+		analyzer.handleEvent(new VehicleEntersTrafficEvent(20.0, null, id1, null, "car",
 				0.0));
 		// time = 20, in = 4, out = 1
-		analyzer.handleEvent(new LinkEnterEvent(29.99, null, id1, null));
+		analyzer.handleEvent(new LinkEnterEvent(29.99, null, id1));
 		// time = 29, in = 5, out = 1
 
 		// before time = 30: occupancy = 4
@@ -168,9 +168,9 @@ public class OccupancyAnalyzer implements LinkLeaveEventHandler,
 		analyzer.handleEvent(new VehicleLeavesTrafficEvent(30.0, null, id1,
 				null, "car", 0.0));
 		// time = 30, in = 5, out = 2
-		analyzer.handleEvent(new LinkLeaveEvent(30.0, null, id1, null));
+		analyzer.handleEvent(new LinkLeaveEvent(30.0, null, id1));
 		// time = 30, in = 5, out = 3
-		analyzer.handleEvent(new LinkEnterEvent(30.0, null, id1, null));
+		analyzer.handleEvent(new LinkEnterEvent(30.0, null, id1));
 		// time = 30, in = 6, out = 3
 		analyzer.handleEvent(new VehicleLeavesTrafficEvent(39.99, null, id1,
 				null, "car", 0.0));
@@ -182,10 +182,10 @@ public class OccupancyAnalyzer implements LinkLeaveEventHandler,
 
 		// before time = 40: occupancy = 4
 
-		analyzer.handleEvent(new LinkEnterEvent(40.0, null, id1, null));
-		analyzer.handleEvent(new LinkEnterEvent(40.0, null, id1, null));
-		analyzer.handleEvent(new LinkLeaveEvent(40.0, null, id1, null));
-		analyzer.handleEvent(new LinkLeaveEvent(100.0, null, id1, null));
+		analyzer.handleEvent(new LinkEnterEvent(40.0, null, id1));
+		analyzer.handleEvent(new LinkEnterEvent(40.0, null, id1));
+		analyzer.handleEvent(new LinkLeaveEvent(40.0, null, id1));
+		analyzer.handleEvent(new LinkLeaveEvent(100.0, null, id1));
 
 		analyzer.advanceToEnd();
 
