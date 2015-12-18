@@ -122,9 +122,9 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 
 		public void handleEvent(LinkEnterEvent event) {
             scoringFunction.handleEvent(new LinkEnterEvent(event.getTime(),getVehicle().getVehicleId(),event.getLinkId()));
-            /* why does the following cause failing tests?
+            /* why can't we do something like:
             scoringFunction.handleEvent(event);
-            Theresa Oct'2015 */
+            (causes test failures in playground kturner), Theresa Dec'2015 */
             currentRoute.add(event.getLinkId());
 		}
 
