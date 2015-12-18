@@ -250,7 +250,13 @@ public class HourlyTaxiStatsCalculator
             }
 
             HourlyHistograms hh = hourlyHistograms[h];
-            hh.emptyDriveRatio.addValue(emptyRatio);
+            if (!Double.isNaN(emptyRatio)) {
+                hh.emptyDriveRatio.addValue(emptyRatio);
+            }
+            else {
+                System.err.println("NaN: " + vhs.empty + " / " + (vhs.empty + vhs.occupied));
+            }
+            
             hh.stayRatio.addValue(stayRatio);
         }
 

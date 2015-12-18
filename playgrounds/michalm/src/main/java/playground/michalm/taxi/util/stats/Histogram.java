@@ -21,6 +21,7 @@ package playground.michalm.taxi.util.stats;
 
 import java.text.DecimalFormat;
 
+
 public class Histogram
 {
     private final int[] counts;
@@ -52,23 +53,24 @@ public class Histogram
         return counts;
     }
 
-    
+
     public String binsToString()
     {
         return binsToString(1.0);
     }
 
+
     public String binsToString(double scaleFactor)
     {
-        DecimalFormat df = new DecimalFormat("#.##"); 
+        DecimalFormat df = new DecimalFormat("#.##");
         String str = "";
         for (int i = 0; i < counts.length; i++) {
             str += df.format(i * binSize * scaleFactor) + "+\t";
         }
         return str;
     }
-    
-    
+
+
     public String countsToString()
     {
         String str = "";
