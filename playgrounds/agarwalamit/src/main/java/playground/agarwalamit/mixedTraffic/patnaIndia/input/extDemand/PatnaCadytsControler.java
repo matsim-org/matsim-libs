@@ -62,7 +62,7 @@ public class PatnaCadytsControler {
 		PatnaCadytsControler pcc = new PatnaCadytsControler();
 		final Config config = pcc.getConfig();
 
-		PatnaVehiclesGenerator pvg = new PatnaVehiclesGenerator("../../../../repos/runs-svn/patnaIndia/run108/input/outerCordonDemand.xml.gz");
+		PatnaVehiclesGenerator pvg = new PatnaVehiclesGenerator("../../../../repos/runs-svn/patnaIndia/run108/input/outerCordonDemand_10pct.xml.gz");
 		pvg.createVehicles();
 		String patnaVehicles = PatnaUtils.INPUT_FILES_DIR+"/patnaVehicles.xml.gz";
 		new VehicleWriterV1(pvg.getPatnaVehicles()).writeFile(patnaVehicles);
@@ -127,8 +127,8 @@ public class PatnaCadytsControler {
 		config.plans().setInputFile("../../../../repos/runs-svn/patnaIndia/run108/input/outerCordonDemand.xml.gz");
 		config.network().setInputFile("../../../../repos/runs-svn/patnaIndia/run108/input/network_diff_linkSpeed.xml.gz");
 
-		config.qsim().setFlowCapFactor(0.01);
-		config.qsim().setStorageCapFactor(0.03);
+		config.qsim().setFlowCapFactor(OuterCordonUtils.SAMPLE_SIZE);
+		config.qsim().setStorageCapFactor(3*OuterCordonUtils.SAMPLE_SIZE);
 		config.qsim().setMainModes(PatnaUtils.ALL_MAIN_MODES);
 		config.qsim().setLinkDynamics(LinkDynamics.PassingQ.name());
 		config.qsim().setEndTime(36*3600);
@@ -136,13 +136,13 @@ public class PatnaCadytsControler {
 		config.qsim().setVehiclesSource(VehiclesSource.fromVehiclesData);
 
 		config.counts().setCountsFileName("../../../../repos/runs-svn/patnaIndia/run108/input/outerCordonCounts.xml.gz");
-		config.counts().setWriteCountsInterval(10);
-		config.counts().setCountsScaleFactor(100);
+		config.counts().setWriteCountsInterval(5);
+		config.counts().setCountsScaleFactor(1/OuterCordonUtils.SAMPLE_SIZE);
 		config.counts().setOutputFormat("all");
 
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(100);
-		config.controler().setOutputDirectory("../../../../repos/runs-svn/patnaIndia/run108/outerCordonOutput_2/");
+		config.controler().setOutputDirectory("../../../../repos/runs-svn/patnaIndia/run108/outerCordonOutput_10pct/");
 		config.controler().setWritePlansInterval(50);
 		config.controler().setWriteEventsInterval(50);
 

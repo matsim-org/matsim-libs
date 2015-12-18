@@ -34,6 +34,8 @@ import org.matsim.vehicles.Vehicle;
 
 public class OuterCordonUtils {
 	
+	public static final double SAMPLE_SIZE = 0.01;
+	
 	public static Map<String, List<Integer>> getAreaType2ZoneIds(){//(from Fig.4-9 in PatnaReport)
 		Map<String, List<Integer>> areas2zones = new HashMap<>();
 		areas2zones.put("Institutional", Arrays.asList(8,9,20));
@@ -104,7 +106,7 @@ public class OuterCordonUtils {
 //		OC2_P2X_I2E (0.51), OC2_P2X_E2E (0.49),
 		OC2_X2P_E2I (0.58), OC2_X2P_E2E (0.42),
 //		OC3_P2X_I2E (0.99), OC3_P2X_E2E (0.01),
-		OC3_X2P_E2I (0.94), OC3_X2P_E2E (0.20),//(0.06), with 0.06 and 1% sample, ext-ext trips are zero in all time bin and for all modes
+		OC3_X2P_E2I (0.94), OC3_X2P_E2E (0.06),//(0.20), with 0.06 and 1% sample, ext-ext trips are zero in all time bin and for all modes
 //		OC4_P2X_I2E (0.87), OC4_P2X_E2E (0.13),
 		OC4_X2P_E2I (0.66), OC4_X2P_E2E (0.34),
 //		OC5_P2X_I2E (0.65), OC5_P2X_E2E (0.35),
@@ -112,7 +114,7 @@ public class OuterCordonUtils {
 		OC6_X2P_E2I (0.86), OC6_X2P_E2E (0.14),
 //		OC6_P2X_I2E (0.67), OC6_P2X_E2E (0.33), 
 //		OC7_P2X_I2E (0.62), OC7_P2X_E2E (0.38),
-		OC7_X2P_E2I (0.95), OC7_X2P_E2E (0.25);//(0.05); with 0.05 and 1% sample, ext-ext trips are zero in all time bin and for all modes
+		OC7_X2P_E2I (0.95), OC7_X2P_E2E (0.05);//(0.25); with 0.05 and 1% sample, ext-ext trips are zero in all time bin and for all modes
 
 		private final double factor;
 

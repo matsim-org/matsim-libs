@@ -46,7 +46,6 @@ public final class PatnaUtils {
 	
 	public static final String INPUT_FILES_DIR = "../../../../repos/shared-svn/projects/patnaIndia/inputs/";
 	public static final String ZONE_FILE = PatnaUtils.INPUT_FILES_DIR+"/wardFile/Wards.shp";
-	public static final int COUNT_SCALE_FACTOR = 100;
 	
 	public enum PatnaActivityTypes {
 		home, work, educational, social, other, unknown;
