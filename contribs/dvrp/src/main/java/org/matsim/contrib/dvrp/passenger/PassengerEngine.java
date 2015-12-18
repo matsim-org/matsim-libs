@@ -121,9 +121,12 @@ public class PassengerEngine
 
         PassengerRequest request = createRequest(passenger, fromLinkId, toLinkId, departureTime,
                 now);
-        advanceRequestStorage.storeAdvanceRequest(request);
-
         optimizer.requestSubmitted(request);
+
+        if (!request.isRejected()) {
+            advanceRequestStorage.storeAdvanceRequest(request);
+        }
+
         return !request.isRejected();
     }
 
