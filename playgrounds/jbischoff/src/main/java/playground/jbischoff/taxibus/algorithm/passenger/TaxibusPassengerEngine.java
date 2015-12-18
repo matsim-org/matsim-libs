@@ -57,7 +57,7 @@ public class TaxibusPassengerEngine extends PassengerEngine {
 
 
 		        internalInterface.registerAdditionalAgentOnLink(passenger);
-		        PassengerRequest request = advancedRequestStorage.retrieveAdvancedRequest(passenger,
+		        PassengerRequest request = advanceRequestStorage.retrieveAdvanceRequest(passenger,
 		                fromLinkId, toLinkId);
 
 		        if (request == null) {
@@ -96,7 +96,7 @@ public class TaxibusPassengerEngine extends PassengerEngine {
 
 		        PassengerRequest request = createRequest(passenger, fromLinkId, toLinkId, departureTime+1,
 		                now);
-		        advancedRequestStorage.storeAdvancedRequest(request);
+		        advanceRequestStorage.storeAdvanceRequest(request);
 
 		        optimizer.requestSubmitted(request);
 		        return !request.isRejected();

@@ -141,7 +141,7 @@ class TaxiLauncher
             // yy to my ears, this is not completely clear.  I don't think that it enables advance request submission
             // for arbitrary times, but rather requests all trips before the simulation starts.  Doesn't it?  kai, jul'14
 
-            //Yes. For a fully-featured advanced request submission process, use TripPrebookingManager, michalm, sept'14
+            //Yes. For a fully-featured advance request submission process, use TripPrebookingManager, michalm, sept'14
             qSim.addQueueSimulationListeners(new BeforeSimulationTripPrebooker(passengerEngine));
         }
 
