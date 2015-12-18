@@ -20,12 +20,7 @@
 
 package org.matsim.contrib.evacuation.scenariogenerator;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -36,6 +31,7 @@ import org.matsim.contrib.evacuation.analysis.control.EventReaderThread;
 import org.matsim.contrib.evacuation.control.Controller;
 import org.matsim.contrib.evacuation.io.ConfigIO;
 import org.matsim.contrib.evacuation.model.config.EvacuationConfigModule;
+import org.matsim.contrib.evacuation.utils.NetworksComparator;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
@@ -43,8 +39,11 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.testcases.MatsimTestUtils;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 public class ScenarioGeneratorTest {
 	
@@ -52,7 +51,6 @@ public class ScenarioGeneratorTest {
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
 	
 	@Test
-	@Ignore
 	public void testScenarioGenerator() {
 		
 		ArrayList<Id<Link>> closedRoadIDs = new ArrayList<>();
@@ -92,8 +90,8 @@ public class ScenarioGeneratorTest {
 		
 		//check for files
 		Assert.assertTrue("grips config file is missing", gripsConfigFile.exists());
-		Assert.assertTrue("evacuation area shape file is missing",(new File(inputDir + "/evacuation_area.shp")).exists());
-		Assert.assertTrue("population area shape file is missing",(new File(inputDir + "/population.shp")).exists());
+		Assert.assertTrue("evacuation area shape file is missing", (new File(inputDir + "/evacuation_area.shp")).exists());
+		Assert.assertTrue("population area shape file is missing", (new File(inputDir + "/population.shp")).exists());
 		Assert.assertTrue("open street map file is missing", (new File(inputDir + "/lenzen.osm")).exists());
 		Assert.assertTrue("could not open grips config.", controller.evacuationEvacuationConfig(gripsConfigFile));
 		
@@ -108,13 +106,13 @@ public class ScenarioGeneratorTest {
 			generateScenario = false;
 			e.printStackTrace();
 		}
-		Assert.assertTrue("scenario was not generated",generateScenario);
+		Assert.assertTrue("scenario was not generated", generateScenario);
 		
 		//check and open matsim scenario config file
 		System.out.println("string:" + matsimConfigFileString);
 		matsimConfigFile = new File(matsimConfigFileString);
-		Assert.assertTrue("scenario config file is missing",matsimConfigFile.exists());
-		Assert.assertTrue("could not open matsim config",controller.openMastimConfig(matsimConfigFile));
+		Assert.assertTrue("scenario config file is missing", matsimConfigFile.exists());
+		Assert.assertTrue("could not open matsim config", controller.openMastimConfig(matsimConfigFile));
 		
 		//open matsim config, set first and last iteration
 		mc = controller.getScenario().getConfig();
@@ -127,7 +125,7 @@ public class ScenarioGeneratorTest {
 		for (Id<Link> id : closedRoadIDs)
 			roadClosures.put(id, "00:00");
 		boolean saved = ConfigIO.saveRoadClosures(controller, roadClosures);
-		Assert.assertTrue("could not save road closures",saved);
+		Assert.assertTrue("could not save road closures", saved);
 		
 		//simulate and check scenario
 		boolean simulateScenario = true;
@@ -169,8 +167,11 @@ public class ScenarioGeneratorTest {
 			Assert.assertTrue("a closed road is crossed (id: " + id.toString() + ")", !usedIDs.contains(id));
 		
 //		assertEquals("different config-files.", CRCChecksum.getCRCFromFile(inputDir + "/config.xml"), CRCChecksum.getCRCFromFile(outputDir + "/config.xml"));
-		Assert.assertEquals("different network-files.", CRCChecksum.getCRCFromFile(inputDir + "/network.xml.gz"), CRCChecksum.getCRCFromFile(outputDir + "/network.xml.gz"));
+//		Assert.assertEquals("different network-files.", CRCChecksum.getCRCFromFile(inputDir + "/network.xml.gz"), CRCChecksum.getCRCFromFile(outputDir + "/network.xml.gz"));
+		boolean equalNets = new NetworksComparator().compare(inputDir + "/network.xml.gz", outputDir + "/network.xml.gz");
+		Assert.assertTrue("differnt network-files", equalNets);
 //		assertEquals("different plans-files.", CRCChecksum.getCRCFromFile(inputDir + "/population.xml.gz"), CRCChecksum.getCRCFromFile(outputDir + "/population.xml.gz"));
+//		EventsFileComparator
 	}
 
 }
