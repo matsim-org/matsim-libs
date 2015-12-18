@@ -5,6 +5,6 @@ env:
   global:
     - MAVEN_OPTS="-XX:MaxPermSize=1g -Xmx2g"
   matrix:
-#    - MODULE=matsim
-#    - MODULE=contribs
-    - MODULE=playgrounds
+    - MODULE=matsim
+    - MODULE=contribs
+#    - MODULE=playgrounds
