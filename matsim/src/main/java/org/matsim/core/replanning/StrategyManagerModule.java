@@ -56,10 +56,16 @@ public class StrategyManagerModule extends AbstractModule {
 					throw new RuntimeException("Strategies in the org.matsim package must not be loaded by name!");
 				} else {
 					try {
-						Class<PlanStrategy> klass = (Class<PlanStrategy>) Class.forName(name);
-						planStrategyMapBinder.addBinding(settings).to(klass);
+						Class klass = Class.forName(name);
+						if (PlanStrategy.class.isAssignableFrom(klass)) {
+							planStrategyMapBinder.addBinding(settings).to(klass);
+						} else if (Provider.class.isAssignableFrom(klass)) {
+							planStrategyMapBinder.addBinding(settings).toProvider(klass);
+						} else {
+							throw new RuntimeException("You specified a class name as a strategy, but it is neither a PlanStrategy nor a Provider.");
+						}
 					} catch (ClassNotFoundException e) {
-						throw new RuntimeException(e);
+						throw new RuntimeException("You specified something which looks like a class name as a strategy, but the class could not be found.", e);
 					}
 				}
 			} else {

@@ -17,6 +17,7 @@
 
 	<module name="controler">
 		<param name="outputDirectory" value="./output/pluggable-plan-strategy" />
+		<param name="overwriteFiles" value="deleteDirectoryIfExists" />
 		<param name="firstIteration" value="0" />
 		<param name="lastIteration" value="1" />
 	</module>
@@ -59,7 +60,7 @@
 		<param name="Module_1" value="BestScore" />
 
 		<param name="ModuleProbability_2" value="0.1" />
-		<param name="Module_2" value="tutorial.programming.example10PluggablePlanStrategyFromFile.MyPlanStrategy" />
+		<param name="Module_2" value="tutorial.programming.example10PluggablePlanStrategyFromFile.MyPlanStrategyProvider" />
 	</module>
 
 </config>
