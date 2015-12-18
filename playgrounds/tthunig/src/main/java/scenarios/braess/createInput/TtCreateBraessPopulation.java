@@ -55,7 +55,8 @@ public final class TtCreateBraessPopulation {
 	private Population population;
 	private Network network;
 	
-	private int numberOfPersons;
+	private int numberOfPersons; // per hour
+	private int simulationPeriod = 1; // in hours. default is one hour.
 	
 	private boolean simulateInflowCap23 = false;
 	private boolean simulateInflowCap24 = false;
@@ -95,7 +96,7 @@ public final class TtCreateBraessPopulation {
 	 * persons travel from the left to the right through the network as in
 	 * Braess's original paradox.
 	 * 
-	 * All agents start uniformly distributed between 8 and 9 am.
+	 * All agents start uniformly distributed between 8 and (8 + simulationPeriod) am.
 	 * 
 	 * If initRouteSpecification is NONE, all agents are initialized with no initial
 	 * routes. 
@@ -121,7 +122,7 @@ public final class TtCreateBraessPopulation {
 					+ "with an initial middle route, although no middle link exists.");
 		}
 		
-		for (int i = 0; i < this.numberOfPersons; i++) {
+		for (int i = 0; i < this.numberOfPersons * this.simulationPeriod; i++) {
 
 			// create a person
 			Person person = population.getFactory().createPerson(
@@ -130,8 +131,8 @@ public final class TtCreateBraessPopulation {
 			// create a start activity at link 0_1
 			Activity startAct = population.getFactory()
 					.createActivityFromLinkId("dummy", Id.createLinkId("0_1"));
-			// distribute agents uniformly between 8 and 9 am.
-			startAct.setEndTime(8 * 3600 + (double)(i)/numberOfPersons * 3600);
+			// distribute agents uniformly between 8 and (8 + simulationPeriod) am.
+			startAct.setEndTime(8 * 3600 + (double)(i)/numberOfPersons * 3600 * simulationPeriod);
 		
 			// create a drain activity at link 5_6
 			Activity drainAct = population.getFactory().createActivityFromLinkId(
@@ -293,6 +294,10 @@ public final class TtCreateBraessPopulation {
 
 	public void writePopulation(String file) {
 		new PopulationWriter(population).write(file);
+	}
+
+	public void setSimulationPeriod(int simulationPeriod) {
+		this.simulationPeriod = simulationPeriod;
 	}
 
 }

@@ -56,7 +56,6 @@ import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisut
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.data.v20.LaneDefinitionsWriter20;
 
-import playground.artemc.socialCost.SocialCostController.Initializer;
 import playground.vsp.congestion.controler.MarginalCongestionPricingContolerListener;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV4;
@@ -87,9 +86,10 @@ public final class RunBraessSimulation {
 
 	/* population parameter */
 	
-	private static final int NUMBER_OF_PERSONS = 2000;
+	private static final int NUMBER_OF_PERSONS = 2000; // per hour
+	private static final int SIMULATION_PERIOD = 3; // in hours
 	
-	private static final InitRoutes INIT_ROUTES_TYPE = InitRoutes.ALL;
+	private static final InitRoutes INIT_ROUTES_TYPE = InitRoutes.ONLY_OUTER;
 	// initial score for all initial plans
 	private static final Double INIT_PLAN_SCORE = 110.;
 
@@ -211,8 +211,9 @@ public final class RunBraessSimulation {
 		
 		} else if (PRICING_TYPE.equals(PricingType.FLOWBASED)) {
 			
-			Initializer initializer = new Initializer();
-			controler.addControlerListener(initializer);		
+			throw new UnsupportedOperationException("Not yet implemented!");
+//			Initializer initializer = new Initializer();
+//			controler.addControlerListener(initializer);		
 		} else { // no pricing
 			
 			// adapt sigma for randomized routing
@@ -306,9 +307,8 @@ public final class RunBraessSimulation {
 		
 		config.qsim().setStuckTime(3600 * 10.);
 		
-		// set end time to 12 am (4 hours after simulation start) to
-		// shorten simulation run time
-		config.qsim().setEndTime(3600 * 12);
+		// set end time to shorten simulation run time. (set it to 2 hours after the last agent departs)
+		config.qsim().setEndTime(3600 * (8 + SIMULATION_PERIOD + 2));
 		
 		// adapt monetary distance cost rate
 		// (should be negative. use -12.0 to balance time [h] and distance [m].
@@ -342,7 +342,7 @@ public final class RunBraessSimulation {
 		TtCreateBraessNetworkAndLanes netCreator = new TtCreateBraessNetworkAndLanes(scenario);
 		netCreator.setUseBTUProperties( false );
 		netCreator.setSimulateInflowCap( true );
-		netCreator.setMiddleLinkExists( true );
+		netCreator.setMiddleLinkExists( false );
 		netCreator.setLaneType(LANE_TYPE);
 		netCreator.setNumberOfPersons(NUMBER_OF_PERSONS);
 		netCreator.createNetworkAndLanes();
@@ -353,6 +353,7 @@ public final class RunBraessSimulation {
 		TtCreateBraessPopulation popCreator = 
 				new TtCreateBraessPopulation(scenario.getPopulation(), scenario.getNetwork());
 		popCreator.setNumberOfPersons(NUMBER_OF_PERSONS);
+		popCreator.setSimulationPeriod(SIMULATION_PERIOD);
 		
 		popCreator.createPersons(INIT_ROUTES_TYPE, INIT_PLAN_SCORE);
 	}
@@ -382,6 +383,10 @@ public final class RunBraessSimulation {
 		String runName = date;
 
 		runName += "_" + scenario.getPopulation().getPersons().size() + "p";
+		if (SIMULATION_PERIOD != 1){
+			runName += "_" + SIMULATION_PERIOD + "h";
+		}
+		
 		if (!INIT_ROUTES_TYPE.equals(InitRoutes.NONE)){
 			runName += "_" + INIT_ROUTES_TYPE + "-sel1+3";
 			if (INIT_PLAN_SCORE != null)
