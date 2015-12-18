@@ -34,7 +34,7 @@ import org.matsim.vehicles.Vehicle;
 
 public class OuterCordonUtils {
 	
-	public static final double SAMPLE_SIZE = 0.01;
+	public static final double SAMPLE_SIZE = 0.1;
 	
 	public static Map<String, List<Integer>> getAreaType2ZoneIds(){//(from Fig.4-9 in PatnaReport)
 		Map<String, List<Integer>> areas2zones = new HashMap<>();
