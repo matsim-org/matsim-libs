@@ -1,6 +1,7 @@
 package opdytsintegration;
 
 /**
+ * TODO This is a general-purpose utility; move it somewhere else.
  * 
  * @author Gunnar Flötteröd
  *
@@ -20,16 +21,18 @@ public class RecursiveCountAverage {
 	// -------------------- CONSTRUCTION --------------------
 
 	public RecursiveCountAverage(final double initialTime) {
-		this.reset(initialTime);
+		this.initialTime = initialTime;
+		this.lastTime = initialTime;
+		this.lastValue = 0;
+		this.averageValue = 0.0;
 	}
 
 	// -------------------- IMPLEMENTATION --------------------
 
-	public void reset(final double time) {
+	public void resetTime(final double time) {
 		this.initialTime = time;
 		this.lastTime = time;
-		this.lastValue = 0;
-		this.averageValue = 0.0;
+		this.averageValue = this.lastValue;
 	}
 
 	public void advanceTo(final double time) {

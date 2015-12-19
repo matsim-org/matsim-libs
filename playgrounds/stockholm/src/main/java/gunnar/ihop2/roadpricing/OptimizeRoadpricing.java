@@ -3,6 +3,7 @@ package gunnar.ihop2.roadpricing;
 import opdytsintegration.MATSimSimulator;
 import opdytsintegration.MATSimState;
 import opdytsintegration.MATSimStateFactory;
+import opdytsintegration.TimeDiscretization;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Population;
@@ -13,7 +14,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
 import org.matsim.roadpricing.RoadPricingConfigGroup;
 
-import floetteroed.opdyts.DecisionVariable;
 import floetteroed.opdyts.DecisionVariableRandomizer;
 import floetteroed.opdyts.ObjectiveFunction;
 import floetteroed.opdyts.convergencecriteria.ConvergenceCriterion;
@@ -57,18 +57,24 @@ class OptimizeRoadpricing {
 		int maxTransitions = Integer.MAX_VALUE;
 		int populationSize = 25;
 
+		final TimeDiscretization timeDiscretization = new TimeDiscretization(0,
+				3600, 24);
+
 		final ObjectiveFunction objectiveFunction = new TotalScoreObjectiveFunction();
 		final ConvergenceCriterion convergenceCriterion = new FixedIterationNumberConvergenceCriterion(
 				100, 5);
 		final RandomSearch<TollLevels> randomSearch = new RandomSearch<>(
-				new MATSimSimulator<TollLevels>(new MATSimStateFactory() {
-					@Override
-					public MATSimState newState(final Population population,
-							final Vector stateVector,
-							final DecisionVariable decisionVariable) {
-						return new MATSimState(population, stateVector);
-					}
-				}, scenario, new ControlerDefaultsWithRoadPricingModule()),
+				new MATSimSimulator<TollLevels>(
+						new MATSimStateFactory<TollLevels>() {
+							@Override
+							public MATSimState newState(
+									final Population population,
+									final Vector stateVector,
+									final TollLevels decisionVariable) {
+								return new MATSimState(population, stateVector);
+							}
+						}, scenario, timeDiscretization,
+						new ControlerDefaultsWithRoadPricingModule()),
 				decisionVariableRandomizer, convergenceCriterion,
 				maxIterations, maxTransitions, populationSize,
 				MatsimRandom.getRandom(), interpolate, keepBestSolution,

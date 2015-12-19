@@ -31,6 +31,7 @@ import java.util.List;
 
 import floetteroed.opdyts.DecisionVariable;
 import opdytsintegration.MATSimSimulator;
+import opdytsintegration.TimeDiscretization;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
@@ -132,7 +133,10 @@ public class RunRoadClassification {
 		final ObjectiveFunctionChangeConvergenceCriterion convergenceCriterion = new ObjectiveFunctionChangeConvergenceCriterion(
 				1e-1, 1e-1, minimumAverageIterations);
 
-		RandomSearch<RoadClassificationDecisionVariable> randomSearch = new RandomSearch<>(new MATSimSimulator<RoadClassificationDecisionVariable>(stateFactory, scenario), randomizer, convergenceCriterion, 
+		// Discretizize the day into 24 one-hour time bins, starting at midnight.
+		final TimeDiscretization timeDiscretization = new TimeDiscretization(0, 3600, 24);
+		
+		RandomSearch<RoadClassificationDecisionVariable> randomSearch = new RandomSearch<>(new MATSimSimulator<RoadClassificationDecisionVariable>(stateFactory, scenario, timeDiscretization), randomizer, convergenceCriterion, 
 				// selfTuner, 
 				maxIterations, maxTransitions, populationSize,
 				MatsimRandom.getRandom(), interpolate, keepBestSolution, objectiveFunction, maxMemoryLength);
