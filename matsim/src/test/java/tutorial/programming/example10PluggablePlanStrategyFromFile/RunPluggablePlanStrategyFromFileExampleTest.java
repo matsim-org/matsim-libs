@@ -8,7 +8,7 @@ import static org.junit.Assert.*;
 public class RunPluggablePlanStrategyFromFileExampleTest {
 
 	@Test
-	void testMain() {
+	public void testMain() {
 		RunPluggablePlanStrategyFromFileExample.main(new String[]{});
 	}
 
