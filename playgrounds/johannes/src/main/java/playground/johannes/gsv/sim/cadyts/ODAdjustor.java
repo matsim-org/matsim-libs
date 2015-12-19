@@ -38,12 +38,12 @@ import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityOption;
 import playground.johannes.coopsim.utils.MatsimCoordUtils;
-import playground.johannes.gsv.zones.KeyMatrix;
-import playground.johannes.gsv.zones.MatrixOperations;
-import playground.johannes.gsv.zones.ObjectKeyMatrix;
 import playground.johannes.synpop.data.ActivityTypes;
 import playground.johannes.synpop.gis.Zone;
 import playground.johannes.synpop.gis.ZoneCollection;
+import playground.johannes.synpop.matrix.HashMatrix;
+import playground.johannes.synpop.matrix.MatrixOperations;
+import playground.johannes.synpop.matrix.NumericMatrix;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -73,11 +73,11 @@ public class ODAdjustor {
 
 	private double volumeFactor = 100;
 
-	private final KeyMatrix refMatrix;
+	private final NumericMatrix refMatrix;
 
 	private final String outDir;
 
-	public ODAdjustor(ActivityFacilities facilities, TripRouter router, ZoneCollection zones, KeyMatrix refMatrix, String outDir) {
+	public ODAdjustor(ActivityFacilities facilities, TripRouter router, ZoneCollection zones, NumericMatrix refMatrix, String outDir) {
 		this.facilities = facilities;
 		this.router = router;
 		this.zones = zones;
@@ -120,7 +120,7 @@ public class ODAdjustor {
 	}
 
 	public void run(Population pop) {
-		ObjectKeyMatrix<ODRelation> simMatrix = plans2Matrix(pop, zones, refMatrix);
+		HashMatrix<String, ODRelation> simMatrix = plans2Matrix(pop, zones, refMatrix);
 
 		adjustRefMatrix(refMatrix, simMatrix);
 
@@ -170,7 +170,7 @@ public class ODAdjustor {
 		reroute(pop);
 	}
 
-	private Set<Segment> getTargetZones(Collection<Zone> zoneSet, Zone origin, ObjectKeyMatrix<ODRelation> simMatrix,
+	private Set<Segment> getTargetZones(Collection<Zone> zoneSet, Zone origin, HashMatrix<String, ODRelation> simMatrix,
 			DistanceCalculator distCalc, Discretizer disc) {
 		Map<Double, List<Zone>> relations = new HashMap<>();
 		TDoubleIntHashMap volumes = new TDoubleIntHashMap();
@@ -225,7 +225,7 @@ public class ODAdjustor {
 		return set;
 	}
 
-	private void process(ObjectKeyMatrix<ODRelation> simMatrix, KeyMatrix refMatrix, Zone origin, List<Zone> targets, long iterations, Random random) {
+	private void process(HashMatrix<String, ODRelation> simMatrix, NumericMatrix refMatrix, Zone origin, List<Zone> targets, long iterations, Random random) {
 		String originId = origin.getAttribute(ZONE_ID_KEY);
 
 		for (long i = 0; i < iterations; i++) {
@@ -311,8 +311,8 @@ public class ODAdjustor {
 		}
 	}
 
-	private ObjectKeyMatrix<ODRelation> plans2Matrix(Population pop, ZoneCollection zones, KeyMatrix refMatrix) {
-		ObjectKeyMatrix<ODRelation> m = new ObjectKeyMatrix<>();
+	private HashMatrix<String, ODRelation> plans2Matrix(Population pop, ZoneCollection zones, NumericMatrix refMatrix) {
+		HashMatrix<String, ODRelation> m = new HashMatrix<>();
 
 		ProgressLogger.init(pop.getPersons().size(), 2, 10);
 
@@ -364,7 +364,7 @@ public class ODAdjustor {
 		return m;
 	}
 
-	private double calcAvrError(KeyMatrix refMatrix, ObjectKeyMatrix<ODRelation> simMatrix) {
+	private double calcAvrError(NumericMatrix refMatrix, HashMatrix<String, ODRelation> simMatrix) {
 		double errSum = 0;
 		int cnt = 0;
 
@@ -481,7 +481,7 @@ public class ODAdjustor {
 		}
 	}
 
-	private void adjustRefMatrix(KeyMatrix refMatrix, ObjectKeyMatrix<ODRelation> simMatrix) {
+	private void adjustRefMatrix(NumericMatrix refMatrix, HashMatrix<String, ODRelation> simMatrix) {
 		double c = ODUtils.calcNormalization(refMatrix, object2KeyMatrix(simMatrix));
 		MatrixOperations.applyFactor(refMatrix, c);
 		/*
@@ -502,8 +502,8 @@ public class ODAdjustor {
 		logger.info(String.format("Matrix entry stats: min = %s, max = %s", min, max));
 	}
 
-	private static KeyMatrix object2KeyMatrix(ObjectKeyMatrix<ODRelation> simMatrix) {
-		KeyMatrix m = new KeyMatrix();
+	private static NumericMatrix object2KeyMatrix(HashMatrix<String, ODRelation> simMatrix) {
+		NumericMatrix m = new NumericMatrix();
 		Set<String> keys = simMatrix.keys();
 		for (String i : keys) {
 			for (String j : keys) {

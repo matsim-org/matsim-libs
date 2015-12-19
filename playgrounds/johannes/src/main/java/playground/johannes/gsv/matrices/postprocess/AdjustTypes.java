@@ -30,17 +30,17 @@ import org.matsim.contrib.common.util.ProgressLogger;
 import org.matsim.contrib.common.util.XORShiftRandom;
 import org.matsim.core.utils.io.IOUtils;
 import playground.johannes.gsv.matrices.plans2matrix.ReplaceMiscType;
-import playground.johannes.studies.matrix2014.analysis.ActTypeDistanceTask;
-import playground.johannes.studies.matrix2014.stats.Histogram;
-import playground.johannes.studies.matrix2014.sim.Simulator;
 import playground.johannes.gsv.synPop.mid.PersonCloner;
 import playground.johannes.gsv.synPop.mid.Route2GeoDistance;
-import playground.johannes.gsv.zones.KeyMatrix;
+import playground.johannes.studies.matrix2014.analysis.ActTypeDistanceTask;
+import playground.johannes.studies.matrix2014.sim.Simulator;
+import playground.johannes.studies.matrix2014.stats.Histogram;
 import playground.johannes.synpop.data.*;
 import playground.johannes.synpop.data.io.XMLHandler;
 import playground.johannes.synpop.gis.Zone;
 import playground.johannes.synpop.gis.ZoneCollection;
 import playground.johannes.synpop.gis.ZoneGeoJsonIO;
+import playground.johannes.synpop.matrix.NumericMatrix;
 import playground.johannes.synpop.processing.EpisodeTask;
 import playground.johannes.synpop.processing.TaskRunner;
 
@@ -77,7 +77,7 @@ public class AdjustTypes {
         dayLabels.add("6");
         dayLabels.add("7");
 
-        KeyMatrix distances = new KeyMatrix();
+        NumericMatrix distances = new NumericMatrix();
         Set<String> subkeys = new HashSet<>();
         Map<String, Double> volumes = new HashMap<>();
         TObjectDoubleHashMap<String> volumesWeekType = new TObjectDoubleHashMap<>();
@@ -273,7 +273,7 @@ public class AdjustTypes {
         return hist;
     }
 
-    private static double calculateDistance(String from, String to, KeyMatrix matrix, ZoneCollection zones) {
+    private static double calculateDistance(String from, String to, NumericMatrix matrix, ZoneCollection zones) {
         Double d = matrix.get(from, to);
         if (d == null) {
             Zone zi = zones.get(from);

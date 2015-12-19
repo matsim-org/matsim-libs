@@ -19,10 +19,10 @@
 
 package playground.johannes.gsv.fpd;
 
-import playground.johannes.gsv.zones.KeyMatrix;
-import playground.johannes.gsv.zones.MatrixOperations;
-import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
-import playground.johannes.gsv.zones.io.KeyMatrixXMLWriter;
+import playground.johannes.synpop.matrix.MatrixOperations;
+import playground.johannes.synpop.matrix.NumericMatrix;
+import playground.johannes.synpop.matrix.NumericMatrixXMLReader;
+import playground.johannes.synpop.matrix.NumericMatrixXMLWriter;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -33,7 +33,7 @@ import java.util.Set;
 public class Average {
 
     public static void main(String args[]) {
-        Set<KeyMatrix> matrices = new HashSet<KeyMatrix>();
+        Set<NumericMatrix> matrices = new HashSet<NumericMatrix>();
         Set<String> files = new HashSet<String>();
         files.add("/home/johannes/gsv/fpd/telefonica/matrixv2/07.xml");
         files.add("/home/johannes/gsv/fpd/telefonica/matrixv2/08.xml");
@@ -43,17 +43,18 @@ public class Average {
         files.add("/home/johannes/gsv/fpd/telefonica/matrixv2/12.xml");
         files.add("/home/johannes/gsv/fpd/telefonica/matrixv2/13.xml");
 
-        KeyMatrixXMLReader reader = new KeyMatrixXMLReader();
+        NumericMatrixXMLReader reader = new NumericMatrixXMLReader();
         reader.setValidating(false);
         for(String file : files) {
             reader.parse(file);
             matrices.add(reader.getMatrix());
         }
 
-        KeyMatrix avt = MatrixOperations.average(matrices);
+        NumericMatrix avr = new NumericMatrix();
+        MatrixOperations.average(matrices, avr);
 
-        KeyMatrixXMLWriter writer = new KeyMatrixXMLWriter();
-        writer.write(avt, "/home/johannes/gsv/fpd/telefonica/matrixv2/avr.xml");
+        NumericMatrixXMLWriter writer = new NumericMatrixXMLWriter();
+        writer.write(avr, "/home/johannes/gsv/fpd/telefonica/matrixv2/avr.xml");
     }
 
 

@@ -18,6 +18,7 @@
  * *********************************************************************** */
 package playground.johannes.synpop.analysis;
 
+import org.apache.log4j.Logger;
 import org.matsim.contrib.common.collections.Composite;
 import playground.johannes.synpop.util.Executor;
 
@@ -29,6 +30,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * @author jillenberger
  */
 public class ConcurrentAnalyzerTask<T> extends Composite<AnalyzerTask<T>> implements AnalyzerTask<T> {
+
+    private static final Logger logger = Logger.getLogger(ConcurrentAnalyzerTask.class);
 
     @Override
     public void analyze(final T object, final List<StatsContainer> containers) {
@@ -42,10 +45,13 @@ public class ConcurrentAnalyzerTask<T> extends Composite<AnalyzerTask<T>> implem
                     task.analyze(object, concurrentContainers);
                 }
             });
+            logger.debug(String.format("Submitting analyzer task %s...", task.getClass().getSimpleName()));
         }
 
         Executor.submitAndWait(runnables);
 
         containers.addAll(concurrentContainers);
+
+        logger.debug("Tasks done.");
     }
 }

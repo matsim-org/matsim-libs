@@ -32,12 +32,12 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.scenario.ScenarioUtils;
 import playground.johannes.gsv.matrices.misc.SpanningTree.NodeData;
-import playground.johannes.gsv.zones.KeyMatrix;
-import playground.johannes.gsv.zones.ObjectKeyMatrix;
-import playground.johannes.gsv.zones.io.KeyMatrixXMLWriter;
 import playground.johannes.synpop.gis.Zone;
 import playground.johannes.synpop.gis.ZoneCollection;
 import playground.johannes.synpop.gis.ZoneGeoJsonIO;
+import playground.johannes.synpop.matrix.HashMatrix;
+import playground.johannes.synpop.matrix.NumericMatrix;
+import playground.johannes.synpop.matrix.NumericMatrixXMLWriter;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -67,7 +67,7 @@ public class TTMatrixGenerator {
 		
 		private final SpanningTree sTree;
 		
-		private final ObjectKeyMatrix<CellData> ttMatrix;
+		private final HashMatrix<String, CellData> ttMatrix;
 		
 		private int errors;
 		
@@ -77,10 +77,10 @@ public class TTMatrixGenerator {
 			FreespeedTravelTimeAndDisutility tt = new FreespeedTravelTimeAndDisutility(-1, 0, 0);
 			sTree = new SpanningTree(tt, tt);
 			
-			ttMatrix = new ObjectKeyMatrix<>();
+			ttMatrix = new HashMatrix<>();
 		}
 
-		public ObjectKeyMatrix<CellData> getMatrix() {
+		public HashMatrix<String, CellData> getMatrix() {
 			return ttMatrix;
 		}
 		
@@ -125,7 +125,7 @@ public class TTMatrixGenerator {
 		private double count;
 	}
 	
-	public KeyMatrix generate(Network network, ZoneCollection zones, String zoneIdKey, int nThreads) {
+	public NumericMatrix generate(Network network, ZoneCollection zones, String zoneIdKey, int nThreads) {
 		this.network = network;
 		
 		logger.info("Initializing node mappings...");
@@ -142,13 +142,13 @@ public class TTMatrixGenerator {
 		
 		ProgressLogger.init(futures.size(), 1, 10);
 		
-		ObjectKeyMatrix<CellData> sumMatrix = new ObjectKeyMatrix<>();
+		HashMatrix<String, CellData> sumMatrix = new HashMatrix<>();
 		int errors = 0;
 		
 		for(Future<Worker> future : futures) {
 			try {
 				Worker worker = future.get();
-				ObjectKeyMatrix<CellData> m = worker.getMatrix();
+				HashMatrix<String, CellData> m = worker.getMatrix();
 				Set<String> keys = m.keys();
 		
 				for(String i : keys) {
@@ -185,7 +185,7 @@ public class TTMatrixGenerator {
 		
 		logger.info("Collection results...");
 		
-		KeyMatrix ttMatrix = new KeyMatrix();
+		NumericMatrix ttMatrix = new NumericMatrix();
 		Set<String> keys = sumMatrix.keys();
 		for(String i : keys) {
 			for(String j : keys) {
@@ -238,10 +238,10 @@ public class TTMatrixGenerator {
 		ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON(zoneFile, zoneIdKey);
 		
 		TTMatrixGenerator generator = new TTMatrixGenerator();
-		KeyMatrix m = generator.generate(scenario.getNetwork(), zones, zoneIdKey, nThreads);
+		NumericMatrix m = generator.generate(scenario.getNetwork(), zones, zoneIdKey, nThreads);
 		
 		logger.info("Writing zones...");
-		KeyMatrixXMLWriter writer = new KeyMatrixXMLWriter();
+		NumericMatrixXMLWriter writer = new NumericMatrixXMLWriter();
 		writer.write(m, out);
 		logger.info("Done.");
 	}

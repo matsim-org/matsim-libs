@@ -28,15 +28,12 @@ import org.matsim.contrib.common.stats.LinearDiscretizer;
 import org.matsim.contrib.common.util.XORShiftRandom;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import playground.johannes.studies.matrix2014.config.MatrixAnalyzerConfigurator;
 import playground.johannes.gsv.synPop.mid.Route2GeoDistance;
 import playground.johannes.gsv.synPop.sim3.ReplaceActTypes;
-import playground.johannes.gsv.zones.KeyMatrix;
-import playground.johannes.gsv.zones.io.KeyMatrixTxtIO;
-import playground.johannes.studies.matrix2014.analysis.GeoDistLau2ClassTask;
 import playground.johannes.studies.matrix2014.analysis.GeoDistanceBuilder;
 import playground.johannes.studies.matrix2014.analysis.MatrixAnalyzer;
 import playground.johannes.studies.matrix2014.analysis.ZoneMobilityRate;
+import playground.johannes.studies.matrix2014.config.MatrixAnalyzerConfigurator;
 import playground.johannes.studies.matrix2014.gis.TransferZoneAttribute;
 import playground.johannes.studies.matrix2014.gis.ValidateFacilities;
 import playground.johannes.studies.matrix2014.gis.ZoneSetLAU2Class;
@@ -44,6 +41,8 @@ import playground.johannes.synpop.analysis.*;
 import playground.johannes.synpop.data.*;
 import playground.johannes.synpop.data.io.PopulationIO;
 import playground.johannes.synpop.gis.*;
+import playground.johannes.synpop.matrix.NumericMatrix;
+import playground.johannes.synpop.matrix.NumericMatrixTxtIO;
 import playground.johannes.synpop.processing.CalculateGeoDistance;
 import playground.johannes.synpop.processing.GuessMissingActTypes;
 import playground.johannes.synpop.processing.LegAttributeRemover;
@@ -81,7 +80,7 @@ public class Simulator {
 
         Random random = new XORShiftRandom(Long.parseLong(config.getParam("global", "randomSeed")));
         /*
-		Prepare population for simulation.
+        Prepare population for simulation.
 		 */
         logger.info("Preparing reference simulation...");
         TaskRunner.run(new ReplaceActTypes(), refPersons);
@@ -114,8 +113,8 @@ public class Simulator {
         Initializing simulation population...
          */
         logger.info("Assigning home locations...");
-        ZoneCollection lau2Zones = ((ZoneData)dataPool.get(ZoneDataLoader.KEY)).getLayer("lau2");
-        ZoneCollection modenaZones = ((ZoneData)dataPool.get(ZoneDataLoader.KEY)).getLayer("modena");
+        ZoneCollection lau2Zones = ((ZoneData) dataPool.get(ZoneDataLoader.KEY)).getLayer("lau2");
+        ZoneCollection modenaZones = ((ZoneData) dataPool.get(ZoneDataLoader.KEY)).getLayer("modena");
         new ZoneSetLAU2Class().apply(lau2Zones);
         ZoneMobilityRate zoneMobilityRate = new ZoneMobilityRate(MiDKeys.PERSON_LAU2_CLASS, lau2Zones, new
                 ModePredicate(CommonValues.LEG_MODE_CAR));
@@ -133,7 +132,8 @@ public class Simulator {
         logger.info("Resetting LAU2Class attributes...");
         SetLAU2Attribute lTask = new SetLAU2Attribute(dataPool, "lau2");
         TaskRunner.run(lTask, simPersons);
-        if(lTask.getErrors() > 0) logger.warn(String.format("Cannot set LAU2Class attribute for %s persons.", lTask.getErrors()));
+        if (lTask.getErrors() > 0)
+            logger.warn(String.format("Cannot set LAU2Class attribute for %s persons.", lTask.getErrors()));
 
 		/*
 		Setup analyzer and analyze reference population
@@ -141,17 +141,13 @@ public class Simulator {
         final String output = config.getParam(MODULE_NAME, "output");
         FileIOContext ioContext = new FileIOContext(output);
 
-        Map<String, Predicate<Segment>> predicates = new HashMap<>();
-        predicates.put(CommonValues.LEG_MODE_CAR, new ModePredicate(CommonValues.LEG_MODE_CAR));
+        //Map<String, Predicate<Segment>> predicates = new HashMap<>();
+        //predicates.put(CommonValues.LEG_MODE_CAR, new ModePredicate(CommonValues.LEG_MODE_CAR));
 
         final ConcurrentAnalyzerTask<Collection<? extends Person>> task = new ConcurrentAnalyzerTask<>();
-        HistogramWriter histogramWriter = new HistogramWriter(ioContext, new PassThroughDiscretizerBuilder(new LinearDiscretizer(50000), "linear"));
-        histogramWriter.addBuilder(new StratifiedDiscretizerBuilder(100, 100));
-        GeoDistanceBuilder geoDistanceBuilder = new GeoDistanceBuilder(histogramWriter);
-        geoDistanceBuilder.setPredicates(predicates);
-        task.addComponent(geoDistanceBuilder.build());
-        task.addComponent(buildLAU2DistAnalyzers(predicates, ioContext));
-        task.addComponent(new GeoDistLau2ClassTask(ioContext));
+
+        task.addComponent(buildGeoDistanceAnalyzer(ioContext));
+        //task.addComponent(new GeoDistLau2ClassTask(ioContext));
         task.addComponent(zoneMobilityRate);
         logger.info("Analyzing reference population...");
         ioContext.append("ref");
@@ -180,12 +176,12 @@ public class Simulator {
         /*
         Setup matrix calibrator
          */
-        KeyMatrix refMatrix = new KeyMatrix();
-        KeyMatrixTxtIO.read(refMatrix, config.getParam(MODULE_NAME, "calibrationMatrix"));
+        NumericMatrix refMatrix = new NumericMatrix();
+        NumericMatrixTxtIO.read(refMatrix, config.getParam(MODULE_NAME, "calibrationMatrix"));
         String layerName = config.getParam(MODULE_NAME, "calibrationLayerName");
 //        ODDistribution odDistribution = new ODDistribution(simPersons, refMatrix, dataPool, layerName, "NO", 100000);
-        ODCalibrator odDistribution = new ODCalibratorBuilder().build(refMatrix, dataPool, layerName, "NO", 100000);
-        long delay = (long)Double.parseDouble(config.getParam(MODULE_NAME, "calibrationDelay"));
+        ODCalibrator odDistribution = new ODCalibratorBuilder().build(refMatrix, dataPool, layerName, "NO", 100000, new CachedModePredicate(CommonKeys.LEG_MODE, CommonValues.LEG_MODE_CAR));
+        long delay = (long) Double.parseDouble(config.getParam(MODULE_NAME, "calibrationDelay"));
         DelayedHamiltonian odDistributionDelayed = new DelayedHamiltonian(odDistribution, delay);
         hamiltonian.addComponent(odDistributionDelayed, Double.parseDouble(config.getParam(MODULE_NAME,
                 "theta_matrix")));
@@ -201,7 +197,7 @@ public class Simulator {
         FacilityMutatorBuilder mutatorBuilder = new FacilityMutatorBuilder(dataPool, random);
         mutatorBuilder.addToBlacklist(ActivityTypes.HOME);
         GeoDistanceUpdater geoDistanceUpdater = new GeoDistanceUpdater(geoDistListeners);
-        geoDistanceUpdater.setPredicate(new ModePredicate(CommonValues.LEG_MODE_CAR));
+        geoDistanceUpdater.setPredicate(new CachedModePredicate(CommonKeys.LEG_MODE, CommonValues.LEG_MODE_CAR));
         AttributeChangeListenerComposite mutatorListenerComposite = new AttributeChangeListenerComposite();
         mutatorListenerComposite.addComponent(geoDistanceUpdater);
         mutatorListenerComposite.addComponent(odDistribution);
@@ -254,8 +250,8 @@ public class Simulator {
         Set<Attributable> legs = new HashSet<>();
         for (Person p : persons) {
             Episode e = p.getEpisodes().get(0);
-            for(Segment leg : e.getLegs()) {
-                if(carPredicate.test(leg)) legs.add(leg);
+            for (Segment leg : e.getLegs()) {
+                if (carPredicate.test(leg)) legs.add(leg);
             }
         }
 
@@ -287,32 +283,7 @@ public class Simulator {
         }
     }
 
-    private static AnalyzerTask<Collection<? extends Person>> buildLAU2DistAnalyzers(Map<String, Predicate<Segment>>
-                                                                                             predicates,
-                                                                                     FileIOContext ioContext) {
-//        ConcurrentAnalyzerTask<Collection<? extends Person>> task = new ConcurrentAnalyzerTask<>();
-        AnalyzerTaskComposite task = new AnalyzerTaskComposite();
-        for(int idx = 0; idx < 6; idx++) {
-            Predicate<Segment> lauClassPred = new LegPersonAttributePredicate(MiDKeys.PERSON_LAU2_CLASS, String.valueOf
-                    (idx));
 
-            Map<String, Predicate<Segment>> newPredicates = new HashMap<>();
-            for(Map.Entry<String, Predicate<Segment>> entry : predicates.entrySet()) {
-                PredicateAndComposite<Segment> predicateAnd = new PredicateAndComposite<>();
-                predicateAnd.addComponent(entry.getValue());
-                predicateAnd.addComponent(lauClassPred);
-
-                newPredicates.put(String.format("%s.lau%s", entry.getKey(), idx), predicateAnd);
-            }
-
-            HistogramWriter hWriter = new HistogramWriter(ioContext, new PassThroughDiscretizerBuilder(new LinearDiscretizer(50000), "linear"));
-            hWriter.addBuilder(new StratifiedDiscretizerBuilder(100, 100));
-            GeoDistanceBuilder geoDistanceBuilder = new GeoDistanceBuilder(hWriter);
-            geoDistanceBuilder.setPredicates(newPredicates);
-            task.addComponent(geoDistanceBuilder.build());
-        }
-        return task;
-    }
 
     public static class Route2GeoDistFunction implements UnivariateRealFunction {
 
@@ -322,5 +293,26 @@ public class Simulator {
             double factor = 0.77 - Math.exp(-0.17 * Math.max(20, routDist) - 1.48);
             return routDist * factor * 1000;
         }
+    }
+
+    private static AnalyzerTask<Collection<? extends Person>> buildGeoDistanceAnalyzer(FileIOContext ioContext) {
+        Predicate<Segment> modePred = new ModePredicate(CommonValues.LEG_MODE_CAR);
+
+        Map<String, Predicate<Segment>> predicates = new HashMap<>();
+        predicates.put(CommonValues.LEG_MODE_CAR, modePred);
+
+        for (int klass = 0; klass < 6; klass++) {
+            Predicate<Segment> lauPred = new LegPersonAttributePredicate(MiDKeys.PERSON_LAU2_CLASS, String.valueOf(klass));
+            PredicateAndComposite<Segment> predicateAnd = PredicateAndComposite.create(modePred, lauPred);
+            predicates.put(String.format("%s.lau%s", CommonValues.LEG_MODE_CAR, klass), predicateAnd);
+        }
+
+        HistogramWriter histogramWriter = new HistogramWriter(ioContext, new PassThroughDiscretizerBuilder(new LinearDiscretizer(50000), "linear"));
+        histogramWriter.addBuilder(new StratifiedDiscretizerBuilder(100, 100));
+
+        GeoDistanceBuilder geoDistanceBuilder = new GeoDistanceBuilder(histogramWriter);
+        geoDistanceBuilder.setPredicates(predicates);
+
+        return geoDistanceBuilder.build();
     }
 }

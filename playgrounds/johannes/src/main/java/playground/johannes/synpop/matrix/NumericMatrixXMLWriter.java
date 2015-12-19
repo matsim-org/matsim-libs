@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,29 +17,51 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.matrices.io;
+package playground.johannes.synpop.matrix;
 
-import playground.johannes.gsv.zones.KeyMatrix;
-import playground.johannes.gsv.zones.MatrixOperations;
-import playground.johannes.gsv.zones.io.KeyMatrixXMLWriter;
-import playground.johannes.gsv.zones.io.VisumOMatrixReader;
+import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.io.MatsimXmlWriter;
 
-import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 /**
  * @author johannes
+ *
  */
-public class JoinMatrices {
+public class NumericMatrixXMLWriter extends MatsimXmlWriter {
 
-    public static void main(String[] args) throws IOException {
-        KeyMatrix sum = new KeyMatrix();
-        for(int i = 0; i < args.length - 1; i++) {
-            KeyMatrix m = new KeyMatrix();
-            VisumOMatrixReader.read(m, args[i]);
-            MatrixOperations.add(sum, m);
-        }
+	static final String MATRIX_TAG = "matrix";
+	static final String CELL_TAG = "cell";
+	static final String ROW_KEY = "row";
+	static final String COL_KEY = "col";
+	static final String VALUE_KEY = "value";
 
-        KeyMatrixXMLWriter writer = new KeyMatrixXMLWriter();
-        writer.write(sum, args[args.length - 1]);
-    }
+	public void write(NumericMatrix m, String file) {
+		openFile(file);
+		writeXmlHead();
+		writeStartTag("matrix", null);
+		writeEntries(m);
+		writeEndTag("matrix");
+		close();
+	}
+	
+	
+	
+	protected void writeEntries(NumericMatrix m) {
+		Set<String> keys = m.keys();
+		for(String i : keys) {
+			for(String j : keys) {
+				Double val = m.get(i, j);
+				if(val != null) {
+					List<Tuple<String, String>> atts = new ArrayList<>(3);
+					atts.add(createTuple("row", i));
+					atts.add(createTuple("col", j));
+					atts.add(createTuple("value", val));
+					writeStartTag("cell", atts, true);
+				}
+			}
+		}
+	}
 }

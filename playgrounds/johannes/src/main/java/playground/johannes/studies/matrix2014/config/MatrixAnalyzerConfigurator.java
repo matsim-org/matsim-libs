@@ -21,13 +21,11 @@ package playground.johannes.studies.matrix2014.config;
 
 import org.matsim.core.config.ConfigGroup;
 import playground.johannes.studies.matrix2014.analysis.MatrixAnalyzer;
-import playground.johannes.gsv.zones.KeyMatrix;
-import playground.johannes.gsv.zones.io.KeyMatrixTxtIO;
-import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
 import playground.johannes.synpop.analysis.FileIOContext;
 import playground.johannes.synpop.gis.*;
+import playground.johannes.synpop.matrix.NumericMatrix;
+import playground.johannes.synpop.matrix.NumericMatrixIO;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -65,28 +63,13 @@ public class MatrixAnalyzerConfigurator implements DataLoader {
         ZoneData zoneData = (ZoneData)dataPool.get(ZoneDataLoader.KEY);
         ZoneCollection zones = zoneData.getLayer(zoneLayerName);
 
-        Map<String, KeyMatrix> referenceMatrices = new HashMap<>();
+        Map<String, NumericMatrix> referenceMatrices = new HashMap<>();
         Collection<? extends ConfigGroup> modules = config.getParameterSets(PARAM_SET_KEY);
         for(ConfigGroup paramset : modules) {
             String name = paramset.getValue(MATRIX_NAME);
             String path = paramset.getValue(MATRIX_FILE);
 
-            KeyMatrix m;
-            if(path.endsWith(".xml") || path.endsWith(".xml.gz")) {
-                KeyMatrixXMLReader reader = new KeyMatrixXMLReader();
-                reader.setValidating(false);
-                reader.parse(path);
-                m = reader.getMatrix();
-            } else {
-                m = new KeyMatrix();
-                try {
-                    KeyMatrixTxtIO.read(m, path);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            referenceMatrices.put(name, m);
+            referenceMatrices.put(name, NumericMatrixIO.read(path));
         }
 
         return new MatrixAnalyzer(facilityData, zones, referenceMatrices, ioContext);

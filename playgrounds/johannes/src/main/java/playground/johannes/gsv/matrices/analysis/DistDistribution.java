@@ -27,11 +27,11 @@ import org.matsim.contrib.common.stats.DescriptivePiStatistics;
 import org.matsim.contrib.common.stats.Histogram;
 import org.matsim.contrib.common.stats.LinearDiscretizer;
 import org.matsim.contrib.common.stats.StatsWriter;
-import playground.johannes.gsv.zones.KeyMatrix;
-import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
 import playground.johannes.synpop.gis.Zone;
 import playground.johannes.synpop.gis.ZoneCollection;
 import playground.johannes.synpop.gis.ZoneGeoJsonIO;
+import playground.johannes.synpop.matrix.NumericMatrix;
+import playground.johannes.synpop.matrix.NumericMatrixXMLReader;
 
 import java.io.IOException;
 import java.util.Set;
@@ -47,10 +47,10 @@ public class DistDistribution {
 	 * @throws IOException
 	 */
 	public static void main(String[] args) throws IOException {
-		KeyMatrixXMLReader reader = new KeyMatrixXMLReader();
+		NumericMatrixXMLReader reader = new NumericMatrixXMLReader();
 		reader.setValidating(false);
 		reader.parse("/home/johannes/gsv/miv-matrix/refmatrices/tomtom.de.xml");
-		KeyMatrix m = reader.getMatrix();
+		NumericMatrix m = reader.getMatrix();
 
 		ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON("/home/johannes/gsv/gis/nuts/ger/geojson/psmobility.geojson", "NO");
 		DistanceCalculator dCalc = new WGS84DistanceCalculator();

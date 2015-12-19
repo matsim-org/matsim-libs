@@ -27,12 +27,12 @@ import org.matsim.contrib.common.gis.DistanceCalculator;
 import org.matsim.contrib.common.stats.Correlations;
 import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
 import org.matsim.contrib.common.stats.StatsWriter;
-import playground.johannes.gsv.zones.KeyMatrix;
-import playground.johannes.gsv.zones.MatrixOperations;
-import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
 import playground.johannes.synpop.gis.Zone;
 import playground.johannes.synpop.gis.ZoneCollection;
 import playground.johannes.synpop.gis.ZoneGeoJsonIO;
+import playground.johannes.synpop.matrix.MatrixOperations;
+import playground.johannes.synpop.matrix.NumericMatrix;
+import playground.johannes.synpop.matrix.NumericMatrixXMLReader;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -51,23 +51,24 @@ public class ShareCorrelation {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-		KeyMatrixXMLReader reader = new KeyMatrixXMLReader();
+		NumericMatrixXMLReader reader = new NumericMatrixXMLReader();
 		reader.setValidating(false);
 		
 		reader.parse("/home/johannes/gsv/matrices/refmatrices/itp.xml");
 //		reader.parse("/home/johannes/gsv/matrices/simmatrices/miv.798.xml");
-		KeyMatrix sim = reader.getMatrix();
-//		MatrixOperations.applyFactor(sim, 1/365.0);
+		NumericMatrix sim = reader.getMatrix();
+//		MatrixOperations.multiply(sim, 1/365.0);
 		
 		reader.parse("/home/johannes/gsv/matrices/refmatrices/tomtom.de.xml");
-		KeyMatrix ref = reader.getMatrix();
+		NumericMatrix ref = reader.getMatrix();
 		MatrixOperations.applyFactor(ref, 1/16.0);
 		removeLowVolumeEntries(ref, 100);
 		
 		reader.parse("/home/johannes/gsv/matrices/refmatrices/itp.miv-share.xml");
-		KeyMatrix share = reader.getMatrix();
+		NumericMatrix share = reader.getMatrix();
 		
-		KeyMatrix err = MatrixOperations.errorMatrix(ref, sim);
+		NumericMatrix err = new NumericMatrix();
+		MatrixOperations.errorMatrix(ref, sim, err);
 		
 		ZoneCollection zones = new ZoneCollection();
 		String data = new String(Files.readAllBytes(Paths.get("/home/johannes/gsv/gis/nuts/de.nuts3.gk3.geojson")));
@@ -104,7 +105,7 @@ public class ShareCorrelation {
 		StatsWriter.writeHistogram(values, "volume", "error", "/home/johannes/gsv/matrices/analysis/marketShares/volCorrelation.txt");
 	}
 	
-	private static void removeEntries(KeyMatrix m, ZoneCollection zones, double distThreshold) {
+	private static void removeEntries(NumericMatrix m, ZoneCollection zones, double distThreshold) {
 		DistanceCalculator dCalc = new CartesianDistanceCalculator();
 		Set<String> keys = m.keys();
 		int cnt = 0;
@@ -133,7 +134,7 @@ public class ShareCorrelation {
 //		logger.info(String.format("Removed %s trips with less than %s KM.", cnt, distThreshold));
 	}
 
-	private static void removeLowVolumeEntries(KeyMatrix m, double threshold) {
+	private static void removeLowVolumeEntries(NumericMatrix m, double threshold) {
 		int cnt = 0;
 		Set<String> keys = m.keys();
 		for(String i : keys) {

@@ -24,12 +24,12 @@ import gnu.trove.map.hash.TDoubleDoubleHashMap;
 import org.matsim.contrib.common.gis.CartesianDistanceCalculator;
 import org.matsim.contrib.common.gis.DistanceCalculator;
 import org.matsim.contrib.common.stats.*;
-import playground.johannes.gsv.zones.KeyMatrix;
-import playground.johannes.gsv.zones.MatrixOperations;
-import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
 import playground.johannes.synpop.gis.Zone;
 import playground.johannes.synpop.gis.ZoneCollection;
 import playground.johannes.synpop.gis.ZoneGeoJsonIO;
+import playground.johannes.synpop.matrix.MatrixOperations;
+import playground.johannes.synpop.matrix.NumericMatrix;
+import playground.johannes.synpop.matrix.NumericMatrixXMLReader;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -49,24 +49,24 @@ public class Compare {
 	 * @throws IOException
 	 */
 	public static void main(String[] args) throws IOException {
-		KeyMatrixXMLReader reader = new KeyMatrixXMLReader();
+		NumericMatrixXMLReader reader = new NumericMatrixXMLReader();
 		reader.setValidating(false);
 
 		String suffix = "v2";
 		double threshold = 0;
 
 		reader.parse(String.format("/home/johannes/gsv/fpd/telefonica/matrix%s/avr.xml", suffix));
-		KeyMatrix iais = reader.getMatrix();
+		NumericMatrix iais = reader.getMatrix();
 		MatrixOperations.applyFactor(iais, 2.0);
 
 		reader.parse("/home/johannes/gsv/miv-matrix/refmatrices/tomtom.xml");
-		KeyMatrix tomtom = reader.getMatrix();
+		NumericMatrix tomtom = reader.getMatrix();
 
 		reader.parse("/home/johannes/sge/prj/synpop/run/902/output/nuts3/modena.miv.xml");
-		KeyMatrix model = reader.getMatrix();
+		NumericMatrix model = reader.getMatrix();
 
 		reader.parse("/home/johannes/sge/prj/matsim/run/874/output/nuts3/miv.xml");
-		KeyMatrix sim = reader.getMatrix();
+		NumericMatrix sim = reader.getMatrix();
 
 		BufferedWriter writer = new BufferedWriter(new FileWriter
 				(String.format("/home/johannes/gsv/fpd/telefonica/analysis%s/compare.txt", suffix)));
@@ -132,7 +132,7 @@ public class Compare {
 				".dist.txt", suffix));
 	}
 
-	private static TDoubleDoubleHashMap calcDistDistribution(ZoneCollection zones, KeyMatrix m, KeyMatrix relations,
+	private static TDoubleDoubleHashMap calcDistDistribution(ZoneCollection zones, NumericMatrix m, NumericMatrix relations,
 															 double thrshold) {
 		DistanceCalculator dCalc = new CartesianDistanceCalculator();
 		DescriptivePiStatistics stats = new DescriptivePiStatistics();

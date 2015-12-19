@@ -45,11 +45,12 @@ import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import playground.johannes.coopsim.utils.MatsimCoordUtils;
-import playground.johannes.gsv.zones.KeyMatrix;
-import playground.johannes.gsv.zones.MatrixOperations;
 import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.gis.Zone;
 import playground.johannes.synpop.gis.ZoneCollection;
+import playground.johannes.synpop.matrix.MatrixOperations;
+import playground.johannes.synpop.matrix.NumericMatrix;
+import playground.johannes.synpop.matrix.ODMatrixOperations;
 
 import java.util.*;
 import java.util.Map.Entry;
@@ -89,7 +90,7 @@ public class ODCalibrator implements PersonDepartureEventHandler, PersonArrivalE
 	
 	private final Population population;
 
-	public ODCalibrator(Scenario scenario, CadytsContext cadytsContext, KeyMatrix odMatrix, ZoneCollection zones, double distThreshold, double countThreshold, String aggKey) {
+	public ODCalibrator(Scenario scenario, CadytsContext cadytsContext, NumericMatrix odMatrix, ZoneCollection zones, double distThreshold, double countThreshold, String aggKey) {
 		this.network = scenario.getNetwork();
 		this.p2p = (PlanToPlanStepBasedOnEvents) cadytsContext.getPlansTranslator();
 		this.adaptor = cadytsContext.getSimResultsAdaptor();
@@ -106,7 +107,7 @@ public class ODCalibrator implements PersonDepartureEventHandler, PersonArrivalE
 		determineCandidates(zones, scenario.getPopulation(), distThreshold);
 	}
 
-	private void buildVirtualNetwork(KeyMatrix odMartix, Counts counts, ActivityFacilities facilities) {
+	private void buildVirtualNetwork(NumericMatrix odMartix, Counts counts, ActivityFacilities facilities) {
 		logger.info("Building virutal network...");
 		
 		Set<String> keys = odMartix.keys();
@@ -245,7 +246,7 @@ public class ODCalibrator implements PersonDepartureEventHandler, PersonArrivalE
 //		}
 	}
 	
-	private KeyMatrix buildCalibrationMatrix(KeyMatrix refMatrix, Scenario scenario, double distThreshold, double countThreshold, String aggKey) {
+	private NumericMatrix buildCalibrationMatrix(NumericMatrix refMatrix, Scenario scenario, double distThreshold, double countThreshold, String aggKey) {
 		/*
 		 * remove reference relations below distance threshold
 		 */
@@ -255,14 +256,14 @@ public class ODCalibrator implements PersonDepartureEventHandler, PersonArrivalE
 		 * aggregated if specified
 		 */
 		if(aggKey != null) {
-			refMatrix = MatrixOperations.aggregate(refMatrix, zones, aggKey);
+			refMatrix = ODMatrixOperations.aggregate(refMatrix, zones, aggKey);
 			zones = aggregateZones(zones, aggKey);
 		}
 		/*
 		 * build matrix from simulated plans
 		 */
 		logger.info("Building matrix from simulated plans...");
-		KeyMatrix simMatrix = plans2Matrix(scenario.getPopulation(), zones, scenario.getActivityFacilities(), distThreshold);
+		NumericMatrix simMatrix = plans2Matrix(scenario.getPopulation(), zones, scenario.getActivityFacilities(), distThreshold);
 		/*
 		 * calculate normalization
 		 */
@@ -309,7 +310,7 @@ public class ODCalibrator implements PersonDepartureEventHandler, PersonArrivalE
 		return refMatrix;
 	}
 	
-	private void removeEntries(KeyMatrix m, ZoneCollection zones, double distThreshold) {
+	private void removeEntries(NumericMatrix m, ZoneCollection zones, double distThreshold) {
 		DistanceCalculator dCalc = new CartesianDistanceCalculator();
 		Set<String> keys = m.keys();
 		int cnt = 0;
@@ -338,8 +339,8 @@ public class ODCalibrator implements PersonDepartureEventHandler, PersonArrivalE
 		logger.info(String.format("Removed %s trips with less than %s KM.", cnt, distThreshold/1000.0));
 	}
 	
-	private KeyMatrix plans2Matrix(Population pop, ZoneCollection zones, ActivityFacilities facilities, double distThreshold) {
-		KeyMatrix m = new KeyMatrix();
+	private NumericMatrix plans2Matrix(Population pop, ZoneCollection zones, ActivityFacilities facilities, double distThreshold) {
+		NumericMatrix m = new NumericMatrix();
 		DistanceCalculator dCalc = new CartesianDistanceCalculator();
 //		candidates = new LinkedHashSet<>();
 		

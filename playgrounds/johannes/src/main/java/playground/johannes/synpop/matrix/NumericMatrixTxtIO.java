@@ -17,10 +17,9 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.zones.io;
+package playground.johannes.synpop.matrix;
 
 import org.matsim.core.utils.io.IOUtils;
-import playground.johannes.gsv.zones.KeyMatrix;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -30,13 +29,13 @@ import java.util.Set;
 /**
  * @author johannes
  */
-public class KeyMatrixTxtIO {
+public class NumericMatrixTxtIO {
 
     private static final String HEADER = "from\tto\tvalue";
 
     private static final String TAB = "\t";
 
-    public static void write(KeyMatrix m, String file) throws IOException {
+    public static void write(NumericMatrix m, String file) throws IOException {
         BufferedWriter writer = IOUtils.getBufferedWriter(file);
 
         writer.write(HEADER);
@@ -59,7 +58,7 @@ public class KeyMatrixTxtIO {
         writer.close();
     }
 
-    public static void read(KeyMatrix m, String file) throws IOException {
+    public static void read(NumericMatrix m, String file) throws IOException {
         BufferedReader reader = IOUtils.getBufferedReader(file);
 
         String line = reader.readLine();

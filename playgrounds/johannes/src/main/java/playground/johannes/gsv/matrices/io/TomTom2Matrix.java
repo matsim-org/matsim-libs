@@ -23,11 +23,11 @@ import org.matsim.contrib.common.util.ProgressLogger;
 import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrix;
 import org.matsim.visum.VisumMatrixReader;
-import playground.johannes.gsv.zones.KeyMatrix;
-import playground.johannes.gsv.zones.io.KeyMatrixXMLWriter;
 import playground.johannes.synpop.gis.Zone;
 import playground.johannes.synpop.gis.ZoneCollection;
 import playground.johannes.synpop.gis.ZoneGeoJsonIO;
+import playground.johannes.synpop.matrix.NumericMatrix;
+import playground.johannes.synpop.matrix.NumericMatrixXMLWriter;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -67,7 +67,7 @@ public class TomTom2Matrix {
 			all.addAll(entries);
 		}
 
-		KeyMatrix km = new KeyMatrix();
+		NumericMatrix km = new NumericMatrix();
 
 		ProgressLogger.init(all.size(), 2, 10);
 		for (Entry e : all) {
@@ -79,7 +79,7 @@ public class TomTom2Matrix {
 			}
 		}
 
-		KeyMatrixXMLWriter writer = new KeyMatrixXMLWriter();
+		NumericMatrixXMLWriter writer = new NumericMatrixXMLWriter();
 		writer.write(km, args[2]);
 	}
 

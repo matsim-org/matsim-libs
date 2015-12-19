@@ -17,67 +17,57 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.zones;
+package playground.johannes.synpop.matrix;
 
+
+import java.util.Collection;
+import java.util.Set;
 
 /**
  * @author johannes
  * 
  */
-public class KeyMatrix extends ObjectKeyMatrix<Double> {
+public class NumericMatrix implements Matrix<String, Double> {
 
-//	private Map<String, Map<String, Double>> matrix;
-	
-//	public KeyMatrix() {
-//		matrix = new HashMap<>();
-//	}
-	
-//	public Double set(String key1, String key2, Double value) {
-//		Map<String, Double> col = matrix.get(key1);
-//		if(col == null) {
-//			col = new HashMap<String, Double>();
-//			matrix.put(key1, col);
-//		}
-//		
-//		return col.put(key2, value);
-//	}
-	
+	private final Matrix<String, Double> matrix;
+
+	public NumericMatrix() {
+		matrix = new HashMatrix<>();
+	}
+
 	public Double add(String key1, String key2, double value) {
-		Double val = get(key1, key2);
+		Double val = matrix.get(key1, key2);
 		if(val == null) {
-			return set(key1, key2, value);
+			return matrix.set(key1, key2, value);
 		} else {
-			return set(key1, key2, val + value);
+			return matrix.set(key1, key2, val + value);
 		}
 	}
 
-//	public Double get(String key1, String key2) {
-////		Map<String, Double> row = matrix.get(key1);
-//		Map<String, Double> row = getRow(key1);
-//		if(row == null) {
-//			return null;
-//		} else {
-//			return row.get(key2);
-//		}
-//	}
-	
-//	public Map<String, Double> getRow(String key) {
-//		return matrix.get(key);
-//	}
-	
-	public void applyFactor(String i, String j, double factor) {
-		Double val = get(i, j);
+	public void multiply(String i, String j, double factor) {
+		Double val = matrix.get(i, j);
 		if(val != null) {
-			set(i, j, val * factor);
+			matrix.set(i, j, val * factor);
 		}
 	}
-	
-//	public Set<String> keys() {
-//		Set<String> keys = new HashSet<>(matrix.keySet());
-//		for(Entry<String, Map<String, Double>> entry : matrix.entrySet()) {
-//			keys.addAll(entry.getValue().keySet());
-//		}
-//		
-//		return keys;
-//	}
+
+    @Override
+    public Double set(String row, String column, Double value) {
+        return matrix.set(row, column, value);
+    }
+
+    @Override
+    public Double get(String row, String column) {
+        return matrix.get(row, column);
+    }
+
+    @Override
+    public Set<String> keys() {
+        return matrix.keys();
+    }
+
+    @Override
+    public Collection<Double> values() {
+        return matrix.values();
+    }
 }

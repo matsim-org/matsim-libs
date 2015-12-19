@@ -32,12 +32,12 @@ import org.matsim.contrib.common.gis.CartesianDistanceCalculator;
 import org.matsim.contrib.common.gis.DistanceCalculator;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
-import playground.johannes.gsv.zones.KeyMatrix;
 import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.Episode;
 import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.data.Segment;
 import playground.johannes.synpop.gis.*;
+import playground.johannes.synpop.matrix.NumericMatrix;
 import playground.johannes.synpop.sim.AttributeChangeListener;
 import playground.johannes.synpop.sim.Hamiltonian;
 import playground.johannes.synpop.sim.data.CachedElement;
@@ -92,7 +92,7 @@ public class ODDistribution implements AttributeChangeListener, Hamiltonian {
 
     private final double refSum;
 
-    public ODDistribution(Collection<? extends Person> simPersons, KeyMatrix refKeyMatrix, DataPool dataPool, String
+    public ODDistribution(Collection<? extends Person> simPersons, NumericMatrix refKeyMatrix, DataPool dataPool, String
             layerName, String primaryKey, double threshold) {
         this.primaryKey = primaryKey;
         this.threshold = threshold;
@@ -120,7 +120,7 @@ public class ODDistribution implements AttributeChangeListener, Hamiltonian {
         }
     }
 
-    private TIntObjectHashMap<TIntDoubleHashMap> initRefMatrix(KeyMatrix keyMatrix) {
+    private TIntObjectHashMap<TIntDoubleHashMap> initRefMatrix(NumericMatrix keyMatrix) {
         TIntObjectHashMap<TIntDoubleHashMap> matrix = new TIntObjectHashMap<>();
         Set<String> keys = keyMatrix.keys();
         for(String i : keys) {

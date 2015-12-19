@@ -27,10 +27,16 @@ import playground.johannes.synpop.data.Attributable;
  */
 public class PredicateAndComposite<T extends Attributable> extends Composite<Predicate<T>> implements Predicate<T> {
 
+    public static <T extends Attributable> PredicateAndComposite<T> create(Predicate<T>... predicates) {
+        PredicateAndComposite<T> composite = new PredicateAndComposite();
+        for (Predicate p : predicates) composite.addComponent(p);
+        return composite;
+    }
+
     @Override
     public boolean test(T attributable) {
-        for(Predicate<T> p : components) {
-            if(!p.test(attributable)) {
+        for (Predicate<T> p : components) {
+            if (!p.test(attributable)) {
                 return false;
             }
         }

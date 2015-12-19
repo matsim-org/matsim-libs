@@ -23,9 +23,9 @@ import com.vividsolutions.jts.geom.Point;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.common.gis.CartesianDistanceCalculator;
 import org.matsim.contrib.common.gis.DistanceCalculator;
-import playground.johannes.gsv.zones.KeyMatrix;
 import playground.johannes.synpop.gis.Zone;
 import playground.johannes.synpop.gis.ZoneCollection;
+import playground.johannes.synpop.matrix.NumericMatrix;
 
 import java.util.Set;
 
@@ -37,7 +37,7 @@ public class ODUtils {
 
 	private final static Logger logger = Logger.getLogger(ODUtils.class);
 	
-	public static void cleanDistances(KeyMatrix m, ZoneCollection zones, double distThreshold, DistanceCalculator dCalc) {
+	public static void cleanDistances(NumericMatrix m, ZoneCollection zones, double distThreshold, DistanceCalculator dCalc) {
 		/*
 		 * remove entries below distance threshold
 		 */
@@ -69,12 +69,12 @@ public class ODUtils {
 
 	}
 	
-	public static void cleanDistances(KeyMatrix m, ZoneCollection zones, double distThreshold) {
+	public static void cleanDistances(NumericMatrix m, ZoneCollection zones, double distThreshold) {
 		DistanceCalculator dCalc = new CartesianDistanceCalculator();
 		cleanDistances(m, zones, distThreshold, dCalc);
 	}
 	
-	public static void cleanVolumes(KeyMatrix m, ZoneCollection zones, double countThreshold) {
+	public static void cleanVolumes(NumericMatrix m, ZoneCollection zones, double countThreshold) {
 		/*
 		 * remove reference relations below count threshold
 		 */
@@ -92,7 +92,7 @@ public class ODUtils {
 		logger.info(String.format("Removed %s relations with less than %s trips.", cnt, countThreshold));
 	}
 	
-	public static double calcNormalization(KeyMatrix m1, KeyMatrix m2) {
+	public static double calcNormalization(NumericMatrix m1, NumericMatrix m2) {
 		Set<String> keys = m1.keys();
 		
 		double sum1 = 0;
