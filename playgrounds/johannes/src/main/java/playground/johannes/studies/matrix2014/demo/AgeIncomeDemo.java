@@ -24,7 +24,6 @@ import org.matsim.contrib.common.stats.InterpolatingDiscretizer;
 import org.matsim.contrib.common.stats.LinearDiscretizer;
 import org.matsim.contrib.common.util.XORShiftRandom;
 import playground.johannes.studies.matrix2014.analysis.AgeIncomeCorrelation;
-import playground.johannes.synpop.analysis.PassThroughDiscretizerBuilder;
 import playground.johannes.synpop.analysis.*;
 import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.Person;
@@ -51,7 +50,7 @@ public class AgeIncomeDemo {
 //        String refPopFile = "/home/johannes/gsv/matrix2014/popgen/demo/mid2008.midtrips.validated.xml";
         String refPopFile = "/Users/jillenberger/work/mid2008.midtrips.valid.xml";
         int simPopSize = 100000;
-        long iterations = (long)1e7;
+        long iterations = (long)1e8;
         int logInterval = (int)1e6;
         int dumpInterval = (int)2e6;
 //        String outputRoot = "/home/johannes/gsv/matrix2014/popgen/demo/output/";
@@ -154,6 +153,7 @@ public class AgeIncomeDemo {
         listeners.addComponent(new HamiltonianLogger(ageTerm, logInterval, "AgeDistribution"));
         listeners.addComponent(new HamiltonianLogger(incomeTerm, logInterval, "IncomeDistribution"));
         listeners.addComponent(new HamiltonianLogger(ageIncomeTerm, logInterval, "AgeMeanIncome"));
+        listeners.addComponent(new TransitionLogger(logInterval));
         /*
         Setup markov engine...
          */

@@ -27,10 +27,10 @@ import org.apache.log4j.Logger;
 import org.geotools.geometry.jts.JTSFactoryFinder;
 import org.matsim.contrib.common.gis.DistanceCalculator;
 import org.matsim.contrib.common.gis.WGS84DistanceCalculator;
-import playground.johannes.gsv.zones.KeyMatrix;
 import playground.johannes.synpop.gis.Zone;
 import playground.johannes.synpop.gis.ZoneCollection;
 import playground.johannes.synpop.gis.ZoneEsriShapeIO;
+import playground.johannes.synpop.matrix.NumericMatrix;
 
 import java.io.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -57,8 +57,8 @@ public class GenerateODAttributes {
         writer.write("from;to;id;distance");
         writer.newLine();
 
-        KeyMatrix idMatrix = new KeyMatrix();
-        KeyMatrix distMatrix = new KeyMatrix();
+        NumericMatrix idMatrix = new NumericMatrix();
+        NumericMatrix distMatrix = new NumericMatrix();
         AtomicInteger idCounter = new AtomicInteger(0);
         DistanceCalculator dCalc = WGS84DistanceCalculator.getInstance();
 
@@ -76,8 +76,8 @@ public class GenerateODAttributes {
         logger.info("Done.");
     }
 
-    private static void read(BufferedReader reader, BufferedWriter writer, AtomicInteger idCounter, KeyMatrix
-            idMatrix, KeyMatrix distMatrix, ZoneCollection zones, DistanceCalculator dCalc) throws IOException {
+    private static void read(BufferedReader reader, BufferedWriter writer, AtomicInteger idCounter, NumericMatrix
+            idMatrix, NumericMatrix distMatrix, ZoneCollection zones, DistanceCalculator dCalc) throws IOException {
 
         GeometryFactory geometryFactory = JTSFactoryFinder.getGeometryFactory();
         String line = reader.readLine();

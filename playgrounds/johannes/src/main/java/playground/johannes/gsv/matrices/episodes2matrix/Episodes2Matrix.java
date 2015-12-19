@@ -22,11 +22,11 @@ package playground.johannes.gsv.matrices.episodes2matrix;
 import org.apache.log4j.Logger;
 import playground.johannes.gsv.matrices.plans2matrix.ReplaceMiscType;
 import playground.johannes.gsv.synPop.sim3.RestoreActTypes;
-import playground.johannes.gsv.zones.KeyMatrix;
-import playground.johannes.gsv.zones.io.KeyMatrixTxtIO;
 import playground.johannes.synpop.data.*;
 import playground.johannes.synpop.data.io.XMLHandler;
 import playground.johannes.synpop.data.io.XMLWriter;
+import playground.johannes.synpop.matrix.NumericMatrix;
+import playground.johannes.synpop.matrix.NumericMatrixTxtIO;
 import playground.johannes.synpop.processing.TaskRunner;
 import playground.johannes.synpop.source.mid2008.MiDKeys;
 import playground.johannes.synpop.source.mid2008.MiDValues;
@@ -137,7 +137,7 @@ public class Episodes2Matrix {
         directionPreds.put(DirectionPredicate.INTERMEDIATE, new DirectionPredicate(DirectionPredicate.INTERMEDIATE));
 
         logger.info("Extracting full matrix...");
-        KeyMatrixTxtIO.write(getMatrix(persons, modePreds.get("car")), String.format("%s/car.txt.gz", rootDir));
+        NumericMatrixTxtIO.write(getMatrix(persons, modePreds.get("car")), String.format("%s/car.txt.gz", rootDir));
 
         for (Map.Entry<String, LegPredicate> mode : modePreds.entrySet()) {
             for (Map.Entry<String, LegPredicate> purpose : purposePreds.entrySet()) {
@@ -164,10 +164,10 @@ public class Episodes2Matrix {
                             builder.append(direction.getKey());
 
                             logger.info(String.format("Extracting matrix %s...", builder.toString()));
-                            KeyMatrix m = getMatrix(persons, comp);
+                            NumericMatrix m = getMatrix(persons, comp);
 
                             String out = String.format("%s/%s.txt.gz", rootDir, builder.toString());
-                            KeyMatrixTxtIO.write(m, out);
+                            NumericMatrixTxtIO.write(m, out);
                         }
                     }
                 }
@@ -193,8 +193,8 @@ public class Episodes2Matrix {
         logger.info("Done.");
     }
 
-    private static KeyMatrix getMatrix(Collection<PlainPerson> persons, LegPredicate pred) {
-        KeyMatrix m = new KeyMatrix();
+    private static NumericMatrix getMatrix(Collection<PlainPerson> persons, LegPredicate pred) {
+        NumericMatrix m = new NumericMatrix();
 
         for (Person person : persons) {
             for (Episode episode : person.getEpisodes()) {

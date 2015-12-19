@@ -25,7 +25,7 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
-import org.matsim.api.core.v01.events.Wait2LinkEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
@@ -56,8 +56,8 @@ public class GeospatialLinkVehicleEventFilter implements EventFilter {
 	public boolean doProcessEvent(Event event) {
 		Id linkId = null;
 		Id vehId = null;
-		if (event instanceof Wait2LinkEvent ) {
-			Wait2LinkEvent e = (Wait2LinkEvent) event;
+		if (event instanceof VehicleEntersTrafficEvent ) {
+			VehicleEntersTrafficEvent e = (VehicleEntersTrafficEvent) event;
 			linkId = e.getLinkId();
 			vehId = e.getVehicleId();
 		}

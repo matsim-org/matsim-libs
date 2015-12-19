@@ -40,10 +40,10 @@ import org.matsim.counts.Counts;
 import org.matsim.counts.MatsimCountsReader;
 import playground.johannes.gsv.sim.LinkOccupancyCalculator;
 import playground.johannes.gsv.sim.Simulator;
-import playground.johannes.gsv.zones.KeyMatrix;
-import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
 import playground.johannes.synpop.gis.ZoneCollection;
 import playground.johannes.synpop.gis.ZoneGeoJsonIO;
+import playground.johannes.synpop.matrix.NumericMatrix;
+import playground.johannes.synpop.matrix.NumericMatrixXMLReader;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -136,10 +136,10 @@ public class CadytsContext implements CadytsContextI<Link>, StartupListener, Ite
 		event.getControler().getEvents().addHandler(ptStep);
 
 		if(Boolean.parseBoolean(config.getParam(Simulator.GSV_CONFIG_MODULE_NAME, "odCalibration"))) {
-			KeyMatrixXMLReader reader = new KeyMatrixXMLReader();
+			NumericMatrixXMLReader reader = new NumericMatrixXMLReader();
 			reader.setValidating(false);
 			reader.parse(config.getParam(Simulator.GSV_CONFIG_MODULE_NAME, "odMatrixFile"));
-			KeyMatrix m = reader.getMatrix();
+			NumericMatrix m = reader.getMatrix();
 			
 			double distThreshold = Double.parseDouble(config.getParam(Simulator.GSV_CONFIG_MODULE_NAME, "odDistThreshold"));
 			double countThreshold = Double.parseDouble(config.getParam(Simulator.GSV_CONFIG_MODULE_NAME, "odCountThreshold"));

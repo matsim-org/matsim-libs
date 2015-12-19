@@ -31,8 +31,12 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -43,6 +47,7 @@ import org.matsim.contrib.parking.lib.obj.SortableMapObject;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.utils.collections.QuadTree;
@@ -236,7 +241,9 @@ public class LinkVolumeAnalyzer {
 		return null;
 	}
 
-	public static class PeakHourAgents implements LinkEnterEventHandler, ActivityStartEventHandler {
+	public static class PeakHourAgents implements LinkEnterEventHandler, ActivityStartEventHandler ,
+	VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
+		private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler() ;
 
 		// linkId,personIds
 		public LinkedListValueHashMap<Id, Id> peakHourTravellingAgentLinkIds = new LinkedListValueHashMap<Id, Id>();
@@ -252,14 +259,13 @@ public class LinkVolumeAnalyzer {
 
 		@Override
 		public void reset(int iteration) {
-			// TODO Auto-generated method stub
-
+			delegate.reset(iteration);
 		}
 
 		@Override
 		public void handleEvent(LinkEnterEvent event) {
 			if (GeneralLib.isInZHCityRectangle(network.getLinks().get(event.getLinkId()).getCoord())) {
-				Id personId = event.getDriverId();
+				Id personId = delegate.getDriverOfVehicle( event.getVehicleId() ) ;
 				if (!stopFollowingAgent.containsKey(personId) && ParkingManager.considerForParking(personId)) {
 					if ((event.getTime() > 16 * 3600 && event.getTime() < 19 * 3600)) {
 						this.peakHourTravellingAgentLinkIds.put(event.getLinkId(), personId);
@@ -272,6 +278,14 @@ public class LinkVolumeAnalyzer {
 		@Override
 		public void handleEvent(ActivityStartEvent event) {
 			lastFacilityVisited.put(event.getPersonId(), event.getFacilityId());
+		}
+
+		public void handleEvent(VehicleEntersTrafficEvent event) {
+			this.delegate.handleEvent(event);
+		}
+
+		public void handleEvent(VehicleLeavesTrafficEvent event) {
+			this.delegate.handleEvent(event);
 		}
 
 	}

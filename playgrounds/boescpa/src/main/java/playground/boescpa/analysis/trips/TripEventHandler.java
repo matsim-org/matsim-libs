@@ -56,7 +56,7 @@ public class TripEventHandler implements PersonDepartureEventHandler, PersonArri
 	private BoxedHashMap<Id<Person>,Double> startTime;
 	private BoxedHashMap<Id<Person>,String> mode;
 	private BoxedHashMap<Id<Person>,String> purpose;
-	private BoxedHashMap<Id<Person>,List<Id<Link>>> path;
+	private BoxedHashMap<String,List<Id<Link>>> path;
 	private BoxedHashMap<Id<Person>,Id<Link>> endLink;
 	private BoxedHashMap<Id<Person>,Double> endTime;
 
@@ -115,7 +115,7 @@ public class TripEventHandler implements PersonDepartureEventHandler, PersonArri
             startLink.put(personId, event.getLinkId());
 			startTime.put(personId, event.getTime());
 			mode.put(personId, event.getLegMode());
-			path.put(personId, new LinkedList<Id<Link>>());
+			path.put(personId.toString(), new LinkedList<Id<Link>>());
 			// set endLink and endTime to null (in case an agent is stuck in the end)
 			endLink.put(personId, null);
 			endTime.put(personId, null);
@@ -150,9 +150,11 @@ public class TripEventHandler implements PersonDepartureEventHandler, PersonArri
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		List<List<Id<Link>>> al = path.getValues(event.getDriverId());
-		List<Id<Link>> currentPath = al.get(al.size()-1);
-		currentPath.add(event.getLinkId());
+		List<List<Id<Link>>> al = path.getValues(event.getVehicleId().toString());
+		if (al != null) {
+			List<Id<Link>> currentPath = al.get(al.size() - 1);
+			currentPath.add(event.getLinkId());
+		}
 	}
 
     private void handleTripEnd(Id<Person> personId, Id<Link> linkId, double time, String purpose) {
@@ -189,7 +191,7 @@ public class TripEventHandler implements PersonDepartureEventHandler, PersonArri
                 List<Double> startTimes = this.startTime.getValues(personId);
                 List<Id<Link>> endLinks = this.endLink.getValues(personId);
                 List<Double> endTimes = this.endTime.getValues(personId);
-                List<List<Id<Link>>> pathList = this.path.getValues(personId);
+                List<List<Id<Link>>> pathList = this.path.getValues(personId.toString());
                 Id<Person> tripPerson = anonymizeTrips ? Id.createPersonId(incognitoPersonId++) : personId;
 
                 for (int i = 0; i < startLinks.size(); i++) {

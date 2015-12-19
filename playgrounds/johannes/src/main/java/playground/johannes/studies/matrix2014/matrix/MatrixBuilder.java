@@ -23,8 +23,6 @@ import com.vividsolutions.jts.geom.Coordinate;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.facilities.ActivityFacility;
-import playground.johannes.gsv.zones.KeyMatrix;
-import playground.johannes.gsv.zones.MatrixOperations;
 import playground.johannes.synpop.analysis.Predicate;
 import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.Episode;
@@ -33,12 +31,11 @@ import playground.johannes.synpop.data.Segment;
 import playground.johannes.synpop.gis.FacilityData;
 import playground.johannes.synpop.gis.Zone;
 import playground.johannes.synpop.gis.ZoneCollection;
+import playground.johannes.synpop.matrix.MatrixOperations;
+import playground.johannes.synpop.matrix.NumericMatrix;
 import playground.johannes.synpop.util.Executor;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -60,7 +57,7 @@ public class MatrixBuilder {
         zoneIds = new ConcurrentHashMap<>();
     }
 
-    public KeyMatrix build(Collection<? extends Person> persons, Predicate<Segment> predicate) {
+    public NumericMatrix build(Collection<? extends Person> persons, Predicate<Segment> predicate) {
         int n = persons.size() / 10000;
         n = Math.min(n, Executor.getFreePoolSize());
         n = Math.max(2, n);
@@ -73,13 +70,14 @@ public class MatrixBuilder {
 
         Executor.submitAndWait(runnables);
 
-        KeyMatrix m = new KeyMatrix();
         int errors = 0;
+        Set<NumericMatrix> matrices = new HashSet<>();
         for(RunThread runnable : runnables) {
-            KeyMatrix m_dash = runnable.getMatrix();
-            MatrixOperations.add(m, m_dash);
+            matrices.add(runnable.getMatrix());
             errors += runnable.getErrors();
         }
+        NumericMatrix m = new NumericMatrix();
+        MatrixOperations.accumulate(matrices, m);
 
         if(errors > 0) {
             logger.warn(String.format("%s facilities cannot be located in a zone.", errors));
@@ -111,17 +109,17 @@ public class MatrixBuilder {
 
         private final Predicate<Segment> predicate;
 
-        private final KeyMatrix m;
+        private final NumericMatrix m;
 
         private int errors;
 
         public RunThread(Collection<? extends Person> persons, Predicate<Segment> predicate) {
             this.persons = persons;
             this.predicate = predicate;
-            m = new KeyMatrix();
+            m = new NumericMatrix();
         }
 
-        public KeyMatrix getMatrix() {
+        public NumericMatrix getMatrix() {
             return m;
         }
 

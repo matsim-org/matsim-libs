@@ -19,13 +19,13 @@
 
 package playground.johannes.gsv.matrices.postprocess;
 
-import playground.johannes.gsv.zones.KeyMatrix;
-import playground.johannes.gsv.zones.MatrixOperations;
-import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
-import playground.johannes.gsv.zones.io.KeyMatrixXMLWriter;
 import playground.johannes.synpop.gis.Zone;
 import playground.johannes.synpop.gis.ZoneCollection;
 import playground.johannes.synpop.gis.ZoneGeoJsonIO;
+import playground.johannes.synpop.matrix.NumericMatrix;
+import playground.johannes.synpop.matrix.NumericMatrixXMLReader;
+import playground.johannes.synpop.matrix.NumericMatrixXMLWriter;
+import playground.johannes.synpop.matrix.ODMatrixOperations;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -56,10 +56,10 @@ public class Aggregate2Nuts3 {
 		String idMappingsFile = args[2];
 		String outFile = args[3];
 
-		KeyMatrixXMLReader reader = new KeyMatrixXMLReader();
+		NumericMatrixXMLReader reader = new NumericMatrixXMLReader();
 		reader.setValidating(false);
 		reader.parse(matrixFile);
-		KeyMatrix m = reader.getMatrix();
+		NumericMatrix m = reader.getMatrix();
 
 		ZoneCollection modenaZones = new ZoneCollection();
 		String data = new String(Files.readAllBytes(Paths.get(zonesFile)));
@@ -81,10 +81,10 @@ public class Aggregate2Nuts3 {
 		}
 
 
-		m = MatrixOperations.aggregate(m, modenaZones, TEMP_ID);
+		m = ODMatrixOperations.aggregate(m, modenaZones, TEMP_ID);
 
-//		MatrixOperations.symetrize(m);
-		KeyMatrixXMLWriter writer = new KeyMatrixXMLWriter();
+//		MatrixOperations.symmetrize(m);
+		NumericMatrixXMLWriter writer = new NumericMatrixXMLWriter();
 		writer.write(m, outFile);
 	}
 

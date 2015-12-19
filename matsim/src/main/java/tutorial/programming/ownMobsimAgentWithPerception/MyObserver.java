@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.Wait2LinkEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.events.handler.BasicEventHandler;
 
@@ -51,8 +51,8 @@ class MyObserver implements BasicEventHandler {
 
 		if ( event instanceof LinkEnterEvent ) {
 			linkId = ((LinkEnterEvent) event).getLinkId() ;
-		} else if ( event instanceof Wait2LinkEvent ) {
-			linkId = ((Wait2LinkEvent) event).getLinkId() ;
+		} else if ( event instanceof VehicleEntersTrafficEvent ) {
+			linkId = ((VehicleEntersTrafficEvent) event).getLinkId() ;
 		}
 		if ( nVehs.get( linkId ) != null ) {
 			double val = nVehs.get( linkId ) ;

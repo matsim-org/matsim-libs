@@ -23,11 +23,11 @@ import com.vividsolutions.jts.geom.Point;
 import org.matsim.contrib.common.gis.CartesianDistanceCalculator;
 import org.matsim.contrib.common.gis.DistanceCalculator;
 import org.matsim.contrib.common.util.ProgressLogger;
-import playground.johannes.gsv.zones.KeyMatrix;
-import playground.johannes.gsv.zones.io.VisumOMatrixReader;
+import playground.johannes.gsv.matrices.io.VisumOMatrixReader;
 import playground.johannes.synpop.gis.Zone;
 import playground.johannes.synpop.gis.ZoneCollection;
 import playground.johannes.synpop.gis.ZoneGeoJsonIO;
+import playground.johannes.synpop.matrix.NumericMatrix;
 
 import java.io.IOException;
 import java.util.Set;
@@ -38,7 +38,7 @@ import java.util.Set;
 public class CalcMileage {
 
     public static void main(String args[]) throws IOException {
-        KeyMatrix m = new KeyMatrix();
+        NumericMatrix m = new NumericMatrix();
         VisumOMatrixReader.read(m, "/home/johannes/gsv/miv-matrix/deploy/r33883/modena/miv.txt");
         ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON("/home/johannes/gsv/gis/modena/geojson/zones.de.gk3.geojson",
                 "NO");

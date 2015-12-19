@@ -20,11 +20,7 @@
 package playground.johannes.gsv.matrices.postprocess;
 
 import org.apache.log4j.Logger;
-import playground.johannes.gsv.zones.KeyMatrix;
-import playground.johannes.gsv.zones.MatrixOperations;
-import playground.johannes.gsv.zones.io.KeyMatrixTxtIO;
-import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
-import playground.johannes.gsv.zones.io.KeyMatrixXMLWriter;
+import playground.johannes.synpop.matrix.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -50,12 +46,12 @@ public class AverageMatrices {
 
 		for (String fileName : fileNames) {
 			if(fileName.startsWith("car")) {
-				Set<KeyMatrix> matrices = new HashSet<>();
+				Set<NumericMatrix> matrices = new HashSet<>();
 				for (String dir : dirs) {
 					String file = String.format("%s/%s", dir, fileName);
 					logger.info(String.format("Loading matrix %s...", file));
 					if(new File(file).exists()) {
-						KeyMatrix m = loadMatrix(file);
+						NumericMatrix m = loadMatrix(file);
 						matrices.add(m);
 					} else {
 						logger.info("File not found.");
@@ -63,20 +59,21 @@ public class AverageMatrices {
 				}
 
 				logger.info(String.format("Averaging matrix %s...", fileName));
-				KeyMatrix avr = MatrixOperations.average(matrices);
+				NumericMatrix avr = new NumericMatrix();
+				MatrixOperations.average(matrices, avr);
 				logger.info(String.format("Writing matrix %s...", fileName));
 				writeMatrix(avr, String.format("%s/%s", outDir, fileName));
 			}
 		}
 	}
 
-	private static KeyMatrix loadMatrix(String file) throws IOException {
+	private static NumericMatrix loadMatrix(String file) throws IOException {
 		if(file.endsWith(".txt") || file.endsWith("txt.gz")) {
-			KeyMatrix m = new KeyMatrix();
-			KeyMatrixTxtIO.read(m, file);
+			NumericMatrix m = new NumericMatrix();
+			NumericMatrixTxtIO.read(m, file);
 			return m;
 		} else if(file.endsWith("xml") || file.endsWith("xml.gz")) {
-			KeyMatrixXMLReader reader = new KeyMatrixXMLReader();
+			NumericMatrixXMLReader reader = new NumericMatrixXMLReader();
 			reader.setValidating(false);
 			reader.parse(file);
 			return reader.getMatrix();
@@ -85,12 +82,12 @@ public class AverageMatrices {
 		}
 	}
 
-	private static void writeMatrix(KeyMatrix m, String file) throws IOException {
+	private static void writeMatrix(NumericMatrix m, String file) throws IOException {
 		if(file.endsWith(".xml") || file.endsWith(".xml.gz")) {
-			KeyMatrixXMLWriter writer = new KeyMatrixXMLWriter();
+			NumericMatrixXMLWriter writer = new NumericMatrixXMLWriter();
 			writer.write(m, file);
 		} else if(file.endsWith(".txt") || file.endsWith(".txt.gz")) {
-			KeyMatrixTxtIO.write(m, file);
+			NumericMatrixTxtIO.write(m, file);
 		} else {
 			throw new RuntimeException("Unknown file format.");
 		}

@@ -26,7 +26,6 @@ import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.vehicles.Vehicle;
@@ -66,10 +65,10 @@ public class CalculateLinkTravelTimesFromVehTrajectories implements VehicleTraje
 					break;
 				}
 				double linkTime = times[i];
-				Id<Person> id = Id.create(trajectory.getVehNr(), Person.class);
-				this.ttcalc.handleEvent(new LinkEnterEvent(time, id, link.getId(), Id.create(id, Vehicle.class)));
+				Id<Vehicle> id = Id.create(trajectory.getVehNr(), Vehicle.class);
+				this.ttcalc.handleEvent(new LinkEnterEvent(time, id, link.getId()));
 				time += linkTime;
-				this.ttcalc.handleEvent(new LinkLeaveEvent(time, id, link.getId(), Id.create(id, Vehicle.class)));
+				this.ttcalc.handleEvent(new LinkLeaveEvent(time, id, link.getId()));
 			}
 			prevNode = node;
 		}

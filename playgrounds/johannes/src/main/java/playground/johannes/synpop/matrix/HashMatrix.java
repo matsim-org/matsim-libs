@@ -17,41 +17,59 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.zones.io;
+package playground.johannes.synpop.matrix;
 
-import org.matsim.core.utils.io.MatsimXmlParser;
-import org.xml.sax.Attributes;
-import playground.johannes.gsv.zones.KeyMatrix;
-
-import java.util.Stack;
+import java.util.*;
 
 /**
  * @author johannes
- *
  */
-public class KeyMatrixXMLReader extends MatsimXmlParser {
+public class HashMatrix<K, V> implements Matrix<K, V> {
 
-	private KeyMatrix m;
-	
-	public KeyMatrix getMatrix() {
-		return m;
-	}
-	
-	@Override
-	public void startTag(String name, Attributes atts, Stack<String> context) {
-		if(name.equalsIgnoreCase(KeyMatrixXMLWriter.MATRIX_TAG)) {
-			m = new KeyMatrix();
-		} else if(name.equalsIgnoreCase(KeyMatrixXMLWriter.CELL_TAG)) {
-			String row = atts.getValue(KeyMatrixXMLWriter.ROW_KEY);
-			String col = atts.getValue(KeyMatrixXMLWriter.COL_KEY);
-			String val = atts.getValue(KeyMatrixXMLWriter.VALUE_KEY);
-			
-			m.set(row, col, new Double(val));
-		}
+    private Map<K, Map<K, V>> matrix;
 
-	}
+    public HashMatrix() {
+        matrix = new HashMap<>();
+    }
 
-	@Override
-	public void endTag(String name, String content, Stack<String> context) {
-	}
+    public V set(K row, K column, V value) {
+        Map<K, V> rowCells = matrix.get(row);
+        if (rowCells == null) {
+            rowCells = new HashMap<>();
+            matrix.put(row, rowCells);
+        }
+
+        return rowCells.put(column, value);
+    }
+
+    public V get(K row, K column) {
+        Map<K, V> rowCells = getRow(row);
+        if (rowCells == null) {
+            return null;
+        } else {
+            return rowCells.get(column);
+        }
+    }
+
+    public Map<K, V> getRow(K row) {
+        return matrix.get(row);
+    }
+
+
+    public Set<K> keys() {
+        Set<K> keys = new HashSet<>(matrix.keySet());
+        for (Map.Entry<K, Map<K, V>> entry : matrix.entrySet()) {
+            keys.addAll(entry.getValue().keySet());
+        }
+
+        return keys;
+    }
+
+    public Collection<V> values() {
+        List<V> values = new ArrayList<>();
+        for (Map.Entry<K, Map<K, V>> entry : matrix.entrySet()) {
+            values.addAll(entry.getValue().values());
+        }
+        return values;
+    }
 }

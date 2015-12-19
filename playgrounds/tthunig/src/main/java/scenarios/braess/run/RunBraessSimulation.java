@@ -238,7 +238,7 @@ public final class RunBraessSimulation {
 		Config config = ConfigUtils.createConfig();
 
 		// set number of iterations
-		config.controler().setLastIteration( 100 );
+		config.controler().setLastIteration( 50 );
 
 		// able or enable signals and lanes
 		config.qsim().setUseLanes( LANE_TYPE.equals(LaneType.NONE)? false : true );

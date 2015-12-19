@@ -27,20 +27,23 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.vehicles.Vehicle;
 
 public class OutFlowInfoCollectorWithPt extends AbstractFlowAccumulator implements LinkLeaveEventHandler,
-		LinkEnterEventHandler, PersonArrivalEventHandler {
+		LinkEnterEventHandler, VehicleLeavesTrafficEventHandler {
 
 	private int binSizeInSeconds; // set the length of interval
 	public HashMap<Id<Link>, int[]> linkOutFlow; // define
 	private Map<Id<Link>, ? extends Link> filteredEquilNetLinks; // define
 
 	// personId, linkId
-	private HashMap<Id, Id> lastEnteredLink = new HashMap<Id, Id>(); // define
+	private HashMap<Id<Vehicle>, Id<Link>> lastEnteredLink = new HashMap<>(); // define
 
 	public OutFlowInfoCollectorWithPt(
 			Map<Id<Link>, ? extends Link> filteredEquilNetLinks,
@@ -119,13 +122,13 @@ public class OutFlowInfoCollectorWithPt extends AbstractFlowAccumulator implemen
 	}
 
 	@Override
-	public void handleEvent(PersonArrivalEvent event) {
-		if (lastEnteredLink.containsKey(event.getPersonId())
-				&& lastEnteredLink.get(event.getPersonId()) != null) {
-			if (lastEnteredLink.get(event.getPersonId()).equals(
+	public void handleEvent(VehicleLeavesTrafficEvent event) {
+		if (lastEnteredLink.containsKey(event.getVehicleId())
+				&& lastEnteredLink.get(event.getVehicleId()) != null) {
+			if (lastEnteredLink.get(event.getVehicleId()).equals(
 					event.getLinkId())) {
 				linkLeave(event.getLinkId(), event.getTime());
-				lastEnteredLink.put(event.getPersonId(), null); // reset value
+				lastEnteredLink.put(event.getVehicleId(), null); // reset value
 			}
 
 		}
@@ -133,7 +136,7 @@ public class OutFlowInfoCollectorWithPt extends AbstractFlowAccumulator implemen
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		lastEnteredLink.put(event.getDriverId(), event.getLinkId());
+		lastEnteredLink.put(event.getVehicleId(), event.getLinkId());
 	}
 	
 	@Override

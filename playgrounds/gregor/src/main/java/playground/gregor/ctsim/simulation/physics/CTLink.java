@@ -6,7 +6,7 @@ import com.vividsolutions.jts.geom.*;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
-import org.matsim.api.core.v01.events.Wait2LinkEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.Gbl;
@@ -498,11 +498,11 @@ public class CTLink implements CTNetworkEntity {
 			}
 		}
 		CTPed p = new CTPed(cell, agent);
-		Wait2LinkEvent e = new Wait2LinkEvent(Math.ceil(now), p.getDriver().getId(), p.getDriver().getCurrentLinkId(), Id.create(p.getDriver().getId(), Vehicle.class), "walkct", 0);
+		VehicleEntersTrafficEvent e = new VehicleEntersTrafficEvent(Math.ceil(now), p.getDriver().getId(), p.getDriver().getCurrentLinkId(), Id.create(p.getDriver().getId(), Vehicle.class), "walkct", 0);
 		this.em.processEvent(e);
 		cell.jumpOnPed(p, now);
 		//TODO move following to jumpoff method in cell; create pseudo cell class for that purpose
-		LinkEnterEvent le = new LinkEnterEvent(Math.ceil(now), p.getDriver().getId(), p.getDriver().getCurrentLinkId(), Id.create(p.getDriver().getId(), Vehicle.class));
+		LinkEnterEvent le = new LinkEnterEvent(Math.ceil(now), Id.create(p.getDriver().getId(), Vehicle.class), p.getDriver().getCurrentLinkId());
 		this.em.processEvent(le);
 		cell.updateIntendedCellJumpTimeAndChooseNextJumper(now);
 	}

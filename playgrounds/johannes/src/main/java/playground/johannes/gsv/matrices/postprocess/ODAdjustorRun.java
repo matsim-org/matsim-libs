@@ -39,10 +39,10 @@ import org.matsim.facilities.ActivityFacilityImpl;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import playground.johannes.gsv.sim.cadyts.ODAdjustor;
 import playground.johannes.gsv.sim.cadyts.ODUtils;
-import playground.johannes.gsv.zones.KeyMatrix;
-import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
 import playground.johannes.synpop.gis.ZoneCollection;
 import playground.johannes.synpop.gis.ZoneGeoJsonIO;
+import playground.johannes.synpop.matrix.NumericMatrix;
+import playground.johannes.synpop.matrix.NumericMatrixXMLReader;
 
 import javax.inject.Provider;
 import java.io.IOException;
@@ -88,13 +88,13 @@ public class ODAdjustorRun {
 		Provider<TripRouter> factory = builder.build(scenario);
 		TripRouter router = factory.get();
 
-		KeyMatrixXMLReader reader = new KeyMatrixXMLReader();
+		NumericMatrixXMLReader reader = new NumericMatrixXMLReader();
 		reader.setValidating(false);
 //		reader.parse("/home/johannes/gsv/matrices/refmatrices/tomtom.de.xml");
 		reader.parse(args[3]);
-		KeyMatrix refMatrix = reader.getMatrix();
-//		MatrixOperations.applyFactor(refMatrix, 1 / 16.0);
-//		MatrixOperations.applyFactor(refMatrix, 1 / (4 * 11.8));
+		NumericMatrix refMatrix = reader.getMatrix();
+//		MatrixOperations.multiply(refMatrix, 1 / 16.0);
+//		MatrixOperations.multiply(refMatrix, 1 / (4 * 11.8));
 
 		ZoneCollection zones = new ZoneCollection();
 //		String data = new String(Files.readAllBytes(Paths.get("/home/johannes/gsv/gis/nuts/de.nuts3.gk3.geojson")));

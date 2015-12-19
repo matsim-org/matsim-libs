@@ -26,6 +26,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.*;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -40,6 +42,7 @@ import org.matsim.contrib.parking.lib.obj.Pair;
 import org.matsim.core.controler.corelisteners.PlansScoring;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
+import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
@@ -79,7 +82,8 @@ import java.util.*;
  */
 
 public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements MobsimInitializedListener,
-		MobsimAfterSimStepListener, AfterMobsimListener {
+		MobsimAfterSimStepListener, AfterMobsimListener, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
+	private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler() ;
 
 	protected static final Logger log = Logger.getLogger(ParkingAgentsTracker.class);
 	private final Scenario scenario;
@@ -370,8 +374,9 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
 		super.handleEvent(event);
-
-		Id personId = event.getDriverId();
+		
+//		Id personId = event.getDriverId();
+		Id personId = delegate.getDriverOfVehicle( event.getVehicleId() ) ;
 
 		Integer currentPlanElementIndex = WithinDayAgentUtils.getCurrentPlanElementIndex(agents.get(personId)) ;
 		
@@ -465,6 +470,8 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 	@Override
 	public void reset(int iteration) {
 		super.reset(iteration);
+		
+		delegate.reset(iteration);
 
 		agents.clear();
 		carLegAgents.clear();
@@ -960,6 +967,14 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 
 	public void setParkingAnalysisHandler(ParkingAnalysisHandler parkingAnalysisHandler) {
 		this.parkingAnalysisHandler = parkingAnalysisHandler;
+	}
+
+	public void handleEvent(VehicleEntersTrafficEvent event) {
+		this.delegate.handleEvent(event);
+	}
+
+	public void handleEvent(VehicleLeavesTrafficEvent event) {
+		this.delegate.handleEvent(event);
 	}
 	
 	

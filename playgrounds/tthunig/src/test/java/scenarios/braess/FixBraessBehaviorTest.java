@@ -72,12 +72,12 @@ public final class FixBraessBehaviorTest{
 	
 	@Test
 	public void testBraessWoPricing() {
-		fixRouteDistributionAndTT(RunBraessSimulation.PricingType.NONE, 11, 1978, 11, 3949870);
+		fixRouteDistributionAndTT(RunBraessSimulation.PricingType.NONE, 19, 1916, 29, 3796032);
 	}
 
 	@Test
 	public void testV3() {
-		fixRouteDistributionAndTT(RunBraessSimulation.PricingType.V3, 455, 1126, 419, 3153112);
+		fixRouteDistributionAndTT(RunBraessSimulation.PricingType.V3, 484, 1107, 409, 3163691);
 	}
 	
 	/* V4 throws a runtime exception: 
@@ -87,17 +87,18 @@ public final class FixBraessBehaviorTest{
 	@Test
 	@Ignore
 	public void testV4() {
-		fixRouteDistributionAndTT(RunBraessSimulation.PricingType.V4, 445, 1021, 534, 2985780);
+		Assert.fail("Not yet tested.");
+//		fixRouteDistributionAndTT(RunBraessSimulation.PricingType.V4, , , , );
 	}
 
 	@Test
 	public void testV8() {
-		fixRouteDistributionAndTT(RunBraessSimulation.PricingType.V8, 566, 945, 489, 2825445);
+		fixRouteDistributionAndTT(RunBraessSimulation.PricingType.V8, 564, 937, 499, 2787718);
 	}
 	
 	@Test
 	public void testV9() {
-		fixRouteDistributionAndTT(RunBraessSimulation.PricingType.V9, 619, 843, 538, 2830500);
+		fixRouteDistributionAndTT(RunBraessSimulation.PricingType.V9, 616, 849, 535, 2864047);
 	}
 	
 	@Test
@@ -174,7 +175,7 @@ public final class FixBraessBehaviorTest{
 
 		config.network().setInputFile(testUtils.getClassInputDirectory() + "network_cap2000-1000.xml");
 
-		config.controler().setLastIteration(100);
+		config.controler().setLastIteration(50);
 
 		// set brain exp beta
 		config.planCalcScore().setBrainExpBeta(20);
@@ -191,11 +192,11 @@ public final class FixBraessBehaviorTest{
 		// choose maximal number of plans per agent. 0 means unlimited
 		config.strategy().setMaxAgentPlanMemorySize(3);
 
-		config.qsim().setStuckTime(3600 * 10.);
+		config.qsim().setStuckTime(3600 * 0.5);
 
 		// set end time to 12 am (4 hours after simulation start) to
 		// shorten simulation run time
-		config.qsim().setEndTime(3600 * 12);
+		config.qsim().setEndTime(3600 * 10);
 
 		config.controler().setOutputDirectory(testUtils.getOutputDirectory());
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);

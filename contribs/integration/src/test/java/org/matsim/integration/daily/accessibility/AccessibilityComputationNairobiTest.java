@@ -43,7 +43,7 @@ public class AccessibilityComputationNairobiTest {
 //		String folderStructure = "../../../"; // local on dz's computer
 		String folderStructure = "../../"; // server
 		
-		String networkFile = "matsimExamples/countries/ke/nairobi/2015-10-15_network.xml ";
+		String networkFile = "matsimExamples/countries/ke/nairobi/2015-10-15_network.xml";
 
 		folderStructure = PathUtils.tryANumberOfFolderStructures(folderStructure, networkFile);
 			

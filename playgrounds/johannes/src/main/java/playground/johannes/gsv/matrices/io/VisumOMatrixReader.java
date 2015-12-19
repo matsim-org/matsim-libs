@@ -17,9 +17,9 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.zones.io;
+package playground.johannes.gsv.matrices.io;
 
-import playground.johannes.gsv.zones.KeyMatrix;
+import playground.johannes.synpop.matrix.NumericMatrix;
 
 import java.io.*;
 import java.util.Set;
@@ -30,7 +30,7 @@ import java.util.Set;
  */
 public class VisumOMatrixReader {
 
-	public static KeyMatrix read(KeyMatrix m, String filename) throws IOException {
+	public static NumericMatrix read(NumericMatrix m, String filename) throws IOException {
 		BufferedReader reader = new BufferedReader(new FileReader(filename));
 
 		String line = reader.readLine();
@@ -67,7 +67,7 @@ public class VisumOMatrixReader {
 		return m;
 	}
 
-	public static void write(KeyMatrix m, String file) throws IOException {
+	public static void write(NumericMatrix m, String file) throws IOException {
 		BufferedWriter writer = new BufferedWriter(new FileWriter(file));
 		writer.write("$O;D3");
 		writer.newLine();

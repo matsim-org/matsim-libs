@@ -34,13 +34,18 @@ import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.misc.Time;
@@ -53,7 +58,7 @@ import org.matsim.core.utils.misc.Time;
  * @author cdobler
  */
 public class EarliestLinkExitTimeProvider implements LinkEnterEventHandler, LinkLeaveEventHandler, PersonArrivalEventHandler,
-		PersonDepartureEventHandler, PersonStuckEventHandler {
+		PersonDepartureEventHandler, PersonStuckEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 
 	private static final Logger log = Logger.getLogger(EarliestLinkExitTimeProvider.class);
 
@@ -72,6 +77,8 @@ public class EarliestLinkExitTimeProvider implements LinkEnterEventHandler, Link
 	private final Map<Id<Person>, Double> earliestLinkExitTimes = new ConcurrentHashMap<>();
 	private final Map<Double, Set<Id<Person>>> earliestLinkExitTimesPerTimeStep = new ConcurrentHashMap<>();
 
+	private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
+	
 	public EarliestLinkExitTimeProvider(Scenario scenario) {
 		this(scenario, null);
 		log.info("Note: no map containing TravelTime objects for all simulated modes is given. Therefore use free speed " +
@@ -125,20 +132,21 @@ public class EarliestLinkExitTimeProvider implements LinkEnterEventHandler, Link
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-
-		String transportMode = this.transportModeProvider.getTransportMode(event.getDriverId());
+		Id<Person> driverId = delegate.getDriverOfVehicle(event.getVehicleId());
+		String transportMode = this.transportModeProvider.getTransportMode(driverId);
 		double now = event.getTime();
 		Link link = this.scenario.getNetwork().getLinks().get(event.getLinkId());
-		Person person = this.scenario.getPopulation().getPersons().get(event.getDriverId());
-
+		Person person = this.scenario.getPopulation().getPersons().get(driverId);
 		double earliestExitTime = Time.UNDEFINED_TIME;
 		if (this.multiModalTravelTimes != null) {
 			if (transportMode == null) {
-				throw new RuntimeException("Agent " + event.getDriverId().toString() + " is currently not performing a leg. Aborting!");
+				throw new RuntimeException(
+						"Agent " + driverId.toString() + " is currently not performing a leg. Aborting!");
 			} else {
 				TravelTime travelTime = this.multiModalTravelTimes.get(transportMode);
 				if (travelTime == null) {
-					throw new RuntimeException("No TravelTime object was found for mode " + transportMode + ". Aborting!");
+					throw new RuntimeException(
+							"No TravelTime object was found for mode " + transportMode + ". Aborting!");
 				}
 
 				earliestExitTime = Math.floor(now + travelTime.getLinkTravelTime(link, now, person, null));
@@ -146,13 +154,12 @@ public class EarliestLinkExitTimeProvider implements LinkEnterEventHandler, Link
 		} else {
 			earliestExitTime = Math.floor(now + this.freeSpeedTravelTime.getLinkTravelTime(link, now, person, null));
 		}
-
-		this.handleAddEarliestLinkExitTime(event.getDriverId(), earliestExitTime);
+		this.handleAddEarliestLinkExitTime(driverId, earliestExitTime);
 	}
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		this.removeEarliestLinkExitTimesAtTime(event.getDriverId());
+		this.removeEarliestLinkExitTimesAtTime(delegate.getDriverOfVehicle(event.getVehicleId()));
 	}
 	
 	@Override
@@ -192,5 +199,15 @@ public class EarliestLinkExitTimeProvider implements LinkEnterEventHandler, Link
 				}
 			}
 		}
+	}
+
+	@Override
+	public void handleEvent(VehicleLeavesTrafficEvent event) {
+		delegate.handleEvent(event);
+	}
+
+	@Override
+	public void handleEvent(VehicleEntersTrafficEvent event) {
+		delegate.handleEvent(event);
 	}
 }

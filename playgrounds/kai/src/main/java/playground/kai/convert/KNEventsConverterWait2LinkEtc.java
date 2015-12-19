@@ -1,10 +1,9 @@
 /* *********************************************************************** *
- * project: kai
- * KaiControler.java
+ * project: org.matsim.*												   *
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,49 +16,38 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.kai.convert;
 
-package playground.kai.usecases.ownmobsim;
-
-import com.google.inject.Provider;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.mobsim.framework.MobsimFactory;
+import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.algorithms.EventWriterXML;
 
-public class Main {
+import tutorial.converter.completeEventFilesRegardingVehicleInformation.EventsConverterXML;
+
+/**
+ * @author nagel
+ *
+ */
+public class KNEventsConverterWait2LinkEtc {
+	// select the event file you want to convert
+	private static String inputFile = "/Users/nagel/git/matsim/playgrounds/wrashid/test/input/playground/wrashid/PSF2/pluggable/0.events.xml";
+	private static String outputFile = "/Users/nagel/git/matsim/playgrounds/wrashid/test/input/playground/wrashid/PSF2/pluggable/output.events.xml";
 
 	public static void main(String[] args) {
-		
-		final Controler controler = new Controler( "examples/config/hybrid-config.xml" ) ;
-		controler.getConfig().controler().setOverwriteFileSetting(
-				true ?
-						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 
-		final MobsimFactory mobsimFactory = new MobsimFactory() {
-			@Override
-			public Mobsim createMobsim(Scenario sc, EventsManager events) {
-				return new MyMobsim(sc,events) ;
-			}
-			
-		} ;
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				bindMobsim().toProvider(new Provider<Mobsim>() {
-					@Override
-					public Mobsim get() {
-						return mobsimFactory.createMobsim(controler.getScenario(), controler.getEvents());
-					}
-				});
-			}
-		});
+		if (args != null && args.length !=  0){
+			inputFile = args[0];
+		}
 
-		controler.run();
-	
+		EventsManager em = EventsUtils.createEventsManager();
+		EventWriterXML eventWriter = new EventWriterXML(outputFile);
+		em.addHandler(eventWriter);
+
+		EventsConverterXML converter = new EventsConverterXML(em);
+		converter.readFile(inputFile);
+
+		eventWriter.closeFile();
 	}
+
 
 }

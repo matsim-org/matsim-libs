@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,48 +17,51 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.kai.usecases.ownmobsim;
+package playground.johannes.synpop.matrix;
 
-import java.util.PriorityQueue;
-import java.util.Queue;
+import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.io.MatsimXmlWriter;
 
-import org.matsim.api.core.v01.network.Link;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
-class MobsimLink {
+/**
+ * @author johannes
+ *
+ */
+public class NumericMatrixXMLWriter extends MatsimXmlWriter {
+
+	static final String MATRIX_TAG = "matrix";
+	static final String CELL_TAG = "cell";
+	static final String ROW_KEY = "row";
+	static final String COL_KEY = "col";
+	static final String VALUE_KEY = "value";
+
+	public void write(NumericMatrix m, String file) {
+		openFile(file);
+		writeXmlHead();
+		writeStartTag("matrix", null);
+		writeEntries(m);
+		writeEndTag("matrix");
+		close();
+	}
 	
-	Queue<DriverVehicleUnit> driveway = new PriorityQueue<DriverVehicleUnit>() ;
 	
-	MobsimLink(Link link) {
-		// TODO Auto-generated constructor stub
+	
+	protected void writeEntries(NumericMatrix m) {
+		Set<String> keys = m.keys();
+		for(String i : keys) {
+			for(String j : keys) {
+				Double val = m.get(i, j);
+				if(val != null) {
+					List<Tuple<String, String>> atts = new ArrayList<>(3);
+					atts.add(createTuple("row", i));
+					atts.add(createTuple("col", j));
+					atts.add(createTuple("value", val));
+					writeStartTag("cell", atts, true);
+				}
+			}
+		}
 	}
-
-	public void addToParking(DriverVehicleUnit mp) {
-		
-	}
-
-	public void doSimStep() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public DriverVehicleUnit peek() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public boolean hasSpace() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	public void remove() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void addFromIntersection(DriverVehicleUnit vehicle) {
-		// TODO Auto-generated method stub
-		
-	}
-
 }

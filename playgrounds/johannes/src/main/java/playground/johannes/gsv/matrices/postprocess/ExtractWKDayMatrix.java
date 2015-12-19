@@ -22,9 +22,9 @@ package playground.johannes.gsv.matrices.postprocess;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.io.IOUtils;
-import playground.johannes.gsv.zones.KeyMatrix;
-import playground.johannes.gsv.zones.MatrixOperations;
-import playground.johannes.gsv.zones.io.VisumOMatrixReader;
+import playground.johannes.gsv.matrices.io.VisumOMatrixReader;
+import playground.johannes.synpop.matrix.MatrixOperations;
+import playground.johannes.synpop.matrix.NumericMatrix;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -45,7 +45,7 @@ public class ExtractWKDayMatrix {
         BufferedReader reader = IOUtils.getBufferedReader("/home/johannes/gsv/miv-matrix/deploy/12102015/miv.2013.txt");
         String output = "/home/johannes/gsv/miv-matrix/deploy/12102015/wkday";
 
-        Map<String, KeyMatrix> matrices = new HashMap<>();
+        Map<String, NumericMatrix> matrices = new HashMap<>();
 
         logger.info("Loading file...");
         String line = reader.readLine();
@@ -59,9 +59,9 @@ public class ExtractWKDayMatrix {
             Double volume = new Double(tokens[8]);
 
             if(!day.equalsIgnoreCase("6") && !day.equalsIgnoreCase("7")) {
-                KeyMatrix m = matrices.get(purpose);
+                NumericMatrix m = matrices.get(purpose);
                 if(m == null) {
-                    m = new KeyMatrix();
+                    m = new NumericMatrix();
                     matrices.put(purpose, m);
                 }
 
@@ -81,8 +81,8 @@ public class ExtractWKDayMatrix {
         labels.put("WE", "wecommuter");
 
         logger.info("Writing matrices...");
-        for(Map.Entry<String, KeyMatrix> entry : matrices.entrySet()) {
-            KeyMatrix m = entry.getValue();
+        for(Map.Entry<String, NumericMatrix> entry : matrices.entrySet()) {
+            NumericMatrix m = entry.getValue();
             MatrixOperations.applyFactor(m, 1/10.0);
 
             String path = String.format("%s/miv.wkday.%s.txt", output, labels.get(entry.getKey()));

@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,       *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,53 +16,33 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.johannes.studies.matrix2014.sim;
 
-package playground.johannes.gsv.zones.io;
-
-import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.io.MatsimXmlWriter;
-import playground.johannes.gsv.zones.KeyMatrix;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import playground.johannes.synpop.analysis.Predicate;
+import playground.johannes.synpop.sim.data.CachedSegment;
 
 /**
- * @author johannes
- *
+ * @author jillenberger
  */
-public class KeyMatrixXMLWriter extends MatsimXmlWriter {
+public class CachedModePredicate implements Predicate<CachedSegment> {
 
-	static final String MATRIX_TAG = "matrix";
-	static final String CELL_TAG = "cell";
-	static final String ROW_KEY = "row";
-	static final String COL_KEY = "col";
-	static final String VALUE_KEY = "value";
+    private static Object dataKey = new Object();
 
-	public void write(KeyMatrix m, String file) {
-		openFile(file);
-		writeXmlHead();
-		writeStartTag("matrix", null);
-		writeEntries(m);
-		writeEndTag("matrix");
-		close();
-	}
-	
-	
-	
-	protected void writeEntries(KeyMatrix m) {
-		Set<String> keys = m.keys();
-		for(String i : keys) {
-			for(String j : keys) {
-				Double val = m.get(i, j);
-				if(val != null) {
-					List<Tuple<String, String>> atts = new ArrayList<>(3);
-					atts.add(createTuple("row", i));
-					atts.add(createTuple("col", j));
-					atts.add(createTuple("value", val));
-					writeStartTag("cell", atts, true);
-				}
-			}
-		}
-	}
+    private final String key;
+
+    private final String value;
+
+    public CachedModePredicate(String key, String value) {
+        this.key = key;
+        this.value = value;
+    }
+    @Override
+    public boolean test(CachedSegment cachedSegment) {
+        Boolean isMode = (Boolean) cachedSegment.getData(dataKey);
+        if(isMode == null) {
+            isMode = value.equals(cachedSegment.getAttribute(key));
+            cachedSegment.setData(dataKey, isMode);
+        }
+        return isMode;
+    }
 }

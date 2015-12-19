@@ -35,8 +35,6 @@ public class GeoDistanceBuilder {
 
     private final HistogramWriter histogramWriter;
 
-//    private final List<DiscretizerBuilder> builders;
-
     public GeoDistanceBuilder(HistogramWriter histogramWriter) {
         this(histogramWriter, null);
     }
@@ -44,7 +42,6 @@ public class GeoDistanceBuilder {
     public GeoDistanceBuilder(HistogramWriter histogramWriter, Map<String, Predicate<Segment>> predicates) {
         this.histogramWriter = histogramWriter;
         this.setPredicates(predicates);
-//        this.builders = new ArrayList<>();
     }
 
     public void setPredicates(Map<String, Predicate<Segment>> predicates) {
@@ -56,14 +53,12 @@ public class GeoDistanceBuilder {
 
         if (predicates == null || predicates.isEmpty()) {
             NumericAnalyzer analyzer = buildWithPredicate(null, null);
-//            setDiscretizers(histogramWriter);
             task = analyzer;
         } else {
-            ConcurrentAnalyzerTask<Collection<? extends Person>> composite = new ConcurrentAnalyzerTask<>();
-
+            //ConcurrentAnalyzerTask<Collection<? extends Person>> composite = new ConcurrentAnalyzerTask<>();
+            AnalyzerTaskComposite<Collection<? extends Person>> composite = new AnalyzerTaskComposite<>();
             for (Map.Entry<String, Predicate<Segment>> entry : predicates.entrySet()) {
                 NumericAnalyzer analyzer = buildWithPredicate(entry.getValue(), entry.getKey());
-//                setDiscretizers(histogramWriter);
                 composite.addComponent(analyzer);
             }
 
@@ -86,10 +81,4 @@ public class GeoDistanceBuilder {
 
         return new NumericAnalyzer(collector, name, histogramWriter);
     }
-
-//    private void setDiscretizers(HistogramWriter writer) {
-//        for(DiscretizerBuilder builder : builders) {
-//            writer.addBuilder(builder);
-//        }
-//    }
 }

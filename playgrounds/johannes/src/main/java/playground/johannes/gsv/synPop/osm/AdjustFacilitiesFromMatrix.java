@@ -32,12 +32,12 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.*;
 import playground.johannes.coopsim.utils.MatsimCoordUtils;
-import playground.johannes.gsv.zones.KeyMatrix;
-import playground.johannes.gsv.zones.MatrixOperations;
-import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
 import playground.johannes.synpop.gis.Zone;
 import playground.johannes.synpop.gis.ZoneCollection;
 import playground.johannes.synpop.gis.ZoneGeoJsonIO;
+import playground.johannes.synpop.matrix.MatrixOperations;
+import playground.johannes.synpop.matrix.NumericMatrix;
+import playground.johannes.synpop.matrix.NumericMatrixXMLReader;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -61,10 +61,10 @@ public class AdjustFacilitiesFromMatrix {
 		 * load matrix
 		 */
 		logger.info("Loading matrix...");
-		KeyMatrixXMLReader mReader = new KeyMatrixXMLReader();
+		NumericMatrixXMLReader mReader = new NumericMatrixXMLReader();
 		mReader.setValidating(false);
 		mReader.parse(matrixFile);
-		KeyMatrix m = mReader.getMatrix();
+		NumericMatrix m = mReader.getMatrix();
 		/*
 		 * load zones
 		 */

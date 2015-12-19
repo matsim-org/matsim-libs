@@ -38,6 +38,8 @@ public class TransitionLogger implements MarkovEngineListener {
 
     private long interval;
 
+    private long time;
+
     public TransitionLogger(long interval) {
         this.interval = interval;
     }
@@ -48,10 +50,13 @@ public class TransitionLogger implements MarkovEngineListener {
         else rejectedIterations++;
 
         if((acceptedIterations + rejectedIterations) % interval == 0) {
-            logger.info(String.format("Steps accepted %s, rejected %s, accepted ratio %.4f.", acceptedIterations,
-                    rejectedIterations, acceptedIterations/(double)(acceptedIterations + rejectedIterations)));
+            double stepsPerSec = (acceptedIterations + rejectedIterations)/ (System.currentTimeMillis() - time);
+            double ratio = acceptedIterations/(double)(acceptedIterations + rejectedIterations);
+            logger.info(String.format("Steps accepted %s, rejected %s, ratio %.4f, steps per msec %s.", acceptedIterations,
+                    rejectedIterations, ratio, stepsPerSec));
             acceptedIterations = 0;
             rejectedIterations = 0;
+            time = System.currentTimeMillis();
         }
     }
 }

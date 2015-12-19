@@ -21,10 +21,10 @@ package playground.johannes.gsv.matrices.postprocess;
 
 import org.apache.log4j.Logger;
 import playground.johannes.gsv.matrices.episodes2matrix.Episodes2Matrix;
-import playground.johannes.gsv.zones.KeyMatrix;
-import playground.johannes.gsv.zones.MatrixOperations;
-import playground.johannes.gsv.zones.io.KeyMatrixTxtIO;
 import playground.johannes.synpop.data.CommonValues;
+import playground.johannes.synpop.matrix.MatrixOperations;
+import playground.johannes.synpop.matrix.NumericMatrix;
+import playground.johannes.synpop.matrix.NumericMatrixTxtIO;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -78,19 +78,19 @@ public class ScaleMatrices {
         for(File file : rootDir.listFiles()) {
             if(file.getName().startsWith("car")) {
                 logger.info(String.format("Loading matrix %s...", file.getName()));
-                KeyMatrix m = new KeyMatrix();
-                KeyMatrixTxtIO.read(m, file.getAbsolutePath());
+                NumericMatrix m = new NumericMatrix();
+                NumericMatrixTxtIO.read(m, file.getAbsolutePath());
 
                 double factor = getFactor(file.getName(), upscaleFactors, dayFactors);
 
-//                MatrixOperations.symetrize(m);
+//                MatrixOperations.symmetrize(m);
 
                 MatrixOperations.applyFactor(m, SCALE_FACTOR);
                 MatrixOperations.applyDiagonalFactor(m, DIAGONAL_FACTOR);
                 MatrixOperations.applyFactor(m, factor);
 
                 logger.info(String.format("Writing scaled matrix %s...", file.getName()));
-                KeyMatrixTxtIO.write(m, String.format("%s/%s", outDir, file.getName()));
+                NumericMatrixTxtIO.write(m, String.format("%s/%s", outDir, file.getName()));
             }
         }
     }

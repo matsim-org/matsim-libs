@@ -49,7 +49,7 @@ import java.util.Set;
  * Created by laemmel on 13/10/15.
  */
 public class PadangDeadEndLinkDepartures2CT {
-	private static final String PDG_INPUT = "/Users/laemmel/svn/runs-svn/run1010/output/";
+	private static final String PDG_INPUT = "/Volumes/data/svn/runs-svn/run1010/output/";
 	private static final String OUT_DIR = "/Users/laemmel/devel/padang/";
 	private static final int NR_AGENTS = 1000;
 
@@ -122,7 +122,7 @@ public class PadangDeadEndLinkDepartures2CT {
 
 
 		Set<Id<Link>> validLinks = loadPopulation(sc, deadEndLinks);
-		reviseNetwork(sc, validLinks);
+//		reviseNetwork(sc, validLinks);
 		new NetworkWriter(sc.getNetwork()).write(c.network().getInputFile());
 		revisePopulation(sc);
 		Population pop = sc.getPopulation();
@@ -186,32 +186,6 @@ public class PadangDeadEndLinkDepartures2CT {
 		for (Person a : add) {
 			sc.getPopulation().addPerson(a);
 		}
-	}
-
-	private static void reviseNetwork(Scenario sc, Set<Id<Link>> validLinks) {
-		//sc.getNetwork().getLinks() returns an unmodifiyable map
-		List<Link> rm = new ArrayList<>();
-		for (Link l : sc.getNetwork().getLinks().values()) {
-			if (!validLinks.contains(l.getId())) {
-				rm.add(l);
-			}
-		}
-		for (Link l : rm) {
-			sc.getNetwork().removeLink(l.getId());
-		}
-
-		List<Node> rn = new ArrayList<>();
-		for (Node n : sc.getNetwork().getNodes().values()) {
-			if (n.getInLinks().size() == 0 && n.getOutLinks().size() == 0) {
-				rn.add(n);
-			}
-		}
-		for (Node n : rn) {
-			sc.getNetwork().removeNode(n.getId());
-		}
-
-//		new NetworkCleaner().run(sc.getNetwork());
-
 	}
 
 	private static Set<Id<Link>> loadAndModifyNetwork(Scenario sc) {
@@ -298,6 +272,32 @@ public class PadangDeadEndLinkDepartures2CT {
 		}
 
 		return validLinks;
+	}
+
+	private static void reviseNetwork(Scenario sc, Set<Id<Link>> validLinks) {
+		//sc.getNetwork().getLinks() returns an unmodifiyable map
+		List<Link> rm = new ArrayList<>();
+		for (Link l : sc.getNetwork().getLinks().values()) {
+			if (!validLinks.contains(l.getId())) {
+				rm.add(l);
+			}
+		}
+		for (Link l : rm) {
+			sc.getNetwork().removeLink(l.getId());
+		}
+
+		List<Node> rn = new ArrayList<>();
+		for (Node n : sc.getNetwork().getNodes().values()) {
+			if (n.getInLinks().size() == 0 && n.getOutLinks().size() == 0) {
+				rn.add(n);
+			}
+		}
+		for (Node n : rn) {
+			sc.getNetwork().removeNode(n.getId());
+		}
+
+//		new NetworkCleaner().run(sc.getNetwork());
+
 	}
 
 

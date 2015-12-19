@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AgentWait2LinkEventHandler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,       *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,12 +16,39 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.johannes.synpop.matrix;
 
-package org.matsim.api.core.v01.events.handler;
+import playground.johannes.synpop.gis.Zone;
+import playground.johannes.synpop.gis.ZoneCollection;
 
-import org.matsim.api.core.v01.events.Wait2LinkEvent;
-import org.matsim.core.events.handler.EventHandler;
+import java.util.Set;
 
-public interface Wait2LinkEventHandler extends EventHandler {
-	public void handleEvent (Wait2LinkEvent event);
+/**
+ * @author jillenberger
+ */
+public class ODMatrixOperations {
+
+    public static NumericMatrix aggregate(NumericMatrix m, ZoneCollection zones, String key) {
+        NumericMatrix newM = new NumericMatrix();
+
+        Set<String> keys = m.keys();
+        for (String i : keys) {
+            for (String j : keys) {
+                Double val = m.get(i, j);
+                if (val != null) {
+                    Zone zone_i = zones.get(i);
+                    Zone zone_j = zones.get(j);
+
+                    if (zone_i != null && zone_j != null) {
+                        String att_i = zone_i.getAttribute(key);
+                        String att_j = zone_j.getAttribute(key);
+
+                        newM.add(att_i, att_j, val);
+                    }
+                }
+            }
+        }
+
+        return newM;
+    }
 }

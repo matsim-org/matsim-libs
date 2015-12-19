@@ -28,7 +28,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.GenericEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
@@ -52,8 +51,8 @@ public class EventWriterXMLTest {
 		String filename = this.utils.getOutputDirectory() + "testEvents.xml";
 		EventWriterXML writer = new EventWriterXML(filename);
 		
-		writer.handleEvent(new LinkLeaveEvent(3600.0, Id.create("agent 1", Person.class), Id.create("link<2", Link.class), Id.create("vehicle>3", Vehicle.class)));
-		writer.handleEvent(new LinkLeaveEvent(3601.0, Id.create("agent 2", Person.class), Id.create("link'3", Link.class), Id.create("vehicle\"4", Vehicle.class)));
+		writer.handleEvent(new LinkLeaveEvent(3600.0, Id.create("vehicle>3", Vehicle.class), Id.create("link<2", Link.class)));
+		writer.handleEvent(new LinkLeaveEvent(3601.0, Id.create("vehicle\"4", Vehicle.class), Id.create("link'3", Link.class)));
 		writer.closeFile();
 		Assert.assertTrue(new File(filename).exists());
 
@@ -67,11 +66,9 @@ public class EventWriterXMLTest {
 		LinkLeaveEvent event1 = (LinkLeaveEvent) collector.getEvents().get(0);
 		LinkLeaveEvent event2 = (LinkLeaveEvent) collector.getEvents().get(1);
 
-		Assert.assertEquals("agent 1", event1.getDriverId().toString());
 		Assert.assertEquals("link<2", event1.getLinkId().toString());
 		Assert.assertEquals("vehicle>3", event1.getVehicleId().toString());
 
-		Assert.assertEquals("agent 2", event2.getDriverId().toString());
 		Assert.assertEquals("link'3", event2.getLinkId().toString());
 		Assert.assertEquals("vehicle\"4", event2.getVehicleId().toString());
 	}

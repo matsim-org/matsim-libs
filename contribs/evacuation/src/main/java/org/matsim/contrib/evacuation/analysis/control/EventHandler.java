@@ -35,10 +35,14 @@ import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
@@ -48,11 +52,14 @@ import org.matsim.contrib.evacuation.analysis.control.vis.UtilizationVisualizer;
 import org.matsim.contrib.evacuation.analysis.data.Cell;
 import org.matsim.contrib.evacuation.analysis.data.ColorationMode;
 import org.matsim.contrib.evacuation.analysis.data.EventData;
+import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.QuadTree.Rect;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.vehicles.Vehicle;
 
-public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandler, PersonArrivalEventHandler, PersonDepartureEventHandler, Runnable {
+public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandler, PersonArrivalEventHandler, PersonDepartureEventHandler, 
+Runnable, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 
 	private HashMap<Integer, int[]> networkLinks = null;
 
@@ -92,6 +99,8 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 	
 	private boolean useCellCount = true;
 	private double sampleSize = 0.1;
+
+	private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
 
 	public EventHandler(boolean useCellCount, String eventFilename, Scenario sc, double cellSize, Thread readerThread) {
 		this.useCellCount = useCellCount;
@@ -190,7 +199,7 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 
 	@Override
 	public void reset(int iteration) {
-
+		delegate.reset(iteration);
 	}
 
 	@Override
@@ -261,13 +270,14 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		if (event.getDriverId().toString().contains("veh"))
+		Id<Person> personId = delegate.getDriverOfVehicle(event.getVehicleId());
+		
+		if (personId.toString().contains("veh"))
 			return;
 
 		// get link id
 		Id<Link> linkId = event.getLinkId();
-		Id<Person> personId = event.getDriverId();
-
+		
 		// get cell from person id
 		Link link = this.network.getLinks().get(linkId);
 		Coord c = link.getCoord();
@@ -301,7 +311,7 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 
 		// get link id
 		Id<Link> linkId = event.getLinkId();
-		Id<Person> personId = event.getDriverId();
+		Id<Person> personId = delegate.getDriverOfVehicle(event.getVehicleId());
 
 		// get cell from person id
 		Link link = this.network.getLinks().get(linkId);
@@ -409,6 +419,16 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 	public void setTransparency(float cellTransparency) {
 		this.cellTransparency = cellTransparency;
 
+	}
+
+	@Override
+	public void handleEvent(VehicleLeavesTrafficEvent event) {
+		delegate.handleEvent(event);
+	}
+
+	@Override
+	public void handleEvent(VehicleEntersTrafficEvent event) {
+		delegate.handleEvent(event);
 	}
 
 }

@@ -26,22 +26,29 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 
 /**
  * Computes average departure delay on a link in a given time slot.
  *
  * @author meisterk
  */
-public class DepartureDelayAverageCalculator implements PersonDepartureEventHandler, LinkLeaveEventHandler {
+public class DepartureDelayAverageCalculator implements PersonDepartureEventHandler, LinkLeaveEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 
 	private Network network;
 	private int timeBinSize;
 	private HashMap<DepartureEvent, Double> departureEventsTimes = new HashMap<DepartureEvent, Double>();
 	private final HashMap<Id<Link>, DepartureDelayData> linkData;
+	
+	private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
 	
 	private static final Logger log = Logger.getLogger(DepartureDelayAverageCalculator.class);
 
@@ -139,7 +146,7 @@ public class DepartureDelayAverageCalculator implements PersonDepartureEventHand
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		DepartureEvent removeMe = new DepartureEvent(event.getDriverId());
+		DepartureEvent removeMe = new DepartureEvent(delegate.getDriverOfVehicle(event.getVehicleId()));
 		Double departureTime = departureEventsTimes.remove(removeMe);
 		if (departureTime != null) {
 			double departureDelay = event.getTime() - departureTime.intValue();
@@ -164,11 +171,22 @@ public class DepartureDelayAverageCalculator implements PersonDepartureEventHand
 	@Override
 	public void reset(int iteration) {
 		resetDepartureDelays();
+		delegate.reset(iteration);
 	}
 
 	@Override
 	public String toString() {
 		return this.getClass().getSimpleName();
+	}
+
+	@Override
+	public void handleEvent(VehicleLeavesTrafficEvent event) {
+		delegate.handleEvent(event);
+	}
+
+	@Override
+	public void handleEvent(VehicleEntersTrafficEvent event) {
+		delegate.handleEvent(event);
 	}
 
 }

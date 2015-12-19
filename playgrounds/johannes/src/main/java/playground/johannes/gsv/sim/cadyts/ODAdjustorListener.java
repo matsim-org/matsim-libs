@@ -25,10 +25,10 @@ import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.router.TripRouter;
 import org.matsim.facilities.ActivityFacilities;
 import playground.johannes.gsv.sim.Simulator;
-import playground.johannes.gsv.zones.KeyMatrix;
-import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
 import playground.johannes.synpop.gis.ZoneCollection;
 import playground.johannes.synpop.gis.ZoneGeoJsonIO;
+import playground.johannes.synpop.matrix.NumericMatrix;
+import playground.johannes.synpop.matrix.NumericMatrixXMLReader;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -51,7 +51,7 @@ public class ODAdjustorListener implements IterationStartsListener {
 		TripRouter router = controler.getTripRouterProvider().get();
 		ActivityFacilities facilities = controler.getScenario().getActivityFacilities();
 
-		KeyMatrix refMatrix = loadRefMatrix(controler.getConfig().getParam(Simulator.GSV_CONFIG_MODULE_NAME, "odMatrixFile"));
+		NumericMatrix refMatrix = loadRefMatrix(controler.getConfig().getParam(Simulator.GSV_CONFIG_MODULE_NAME, "odMatrixFile"));
 		ZoneCollection zones = loadZones(controler.getConfig().getParam(Simulator.GSV_CONFIG_MODULE_NAME, "zonesFile"));
 
 		double distThreshold = Double.parseDouble(controler.getConfig().getParam(Simulator.GSV_CONFIG_MODULE_NAME, "odDistThreshold"));
@@ -64,8 +64,8 @@ public class ODAdjustorListener implements IterationStartsListener {
 		interval = Integer.parseInt(controler.getConfig().getParam(Simulator.GSV_CONFIG_MODULE_NAME, "odAdjustorInterval"));
 	}
 
-	private KeyMatrix loadRefMatrix(String filename) {
-		KeyMatrixXMLReader reader = new KeyMatrixXMLReader();
+	private NumericMatrix loadRefMatrix(String filename) {
+		NumericMatrixXMLReader reader = new NumericMatrixXMLReader();
 		reader.setValidating(false);
 		reader.parse(filename);
 		return reader.getMatrix();

@@ -52,7 +52,7 @@ public class ZoneTracker implements LinkEnterEventHandler {
 
     @Override
     public void handleEvent(LinkEnterEvent event) {
-        Id<Zone> oldZoneId = personInZone.get(event.getDriverId());
+        Id<Zone> oldZoneId = personInZone.get(Id.createPersonId(event.getVehicleId()));
         Id<Zone> newZoneId = linkToZoneResolver.resolveLinkToZone(event.getLinkId());
         if (oldZoneId != null) {
             if (!oldZoneId.equals(newZoneId)) {
@@ -60,14 +60,14 @@ public class ZoneTracker implements LinkEnterEventHandler {
             }
             if (newZoneId != null) {
                 // this.eventsManager.processEvent(new ZoneEnterEvent(event.getTime(), event.getDriverId(), newZoneId));
-                personInZone.put(event.getDriverId(), newZoneId);
+                personInZone.put(Id.createPersonId(event.getVehicleId()), newZoneId);
             } else {
-                personInZone.remove(event.getDriverId());
+                personInZone.remove(Id.createPersonId(event.getVehicleId()));
             }
         } else {
             if (newZoneId != null) {
                 // this.eventsManager.processEvent(new ZoneEnterEvent(event.getTime(), event.getDriverId(), newZoneId));
-                personInZone.put(event.getDriverId(), newZoneId);
+                personInZone.put(Id.createPersonId(event.getVehicleId()), newZoneId);
             }
         }
 

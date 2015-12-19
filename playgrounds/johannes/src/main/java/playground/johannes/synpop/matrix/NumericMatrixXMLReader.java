@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,29 +17,40 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.matrices.io;
+package playground.johannes.synpop.matrix;
 
-import playground.johannes.gsv.zones.KeyMatrix;
-import playground.johannes.gsv.zones.MatrixOperations;
-import playground.johannes.gsv.zones.io.KeyMatrixXMLWriter;
-import playground.johannes.gsv.zones.io.VisumOMatrixReader;
+import org.matsim.core.utils.io.MatsimXmlParser;
+import org.xml.sax.Attributes;
 
-import java.io.IOException;
+import java.util.Stack;
 
 /**
  * @author johannes
+ *
  */
-public class JoinMatrices {
+public class NumericMatrixXMLReader extends MatsimXmlParser {
 
-    public static void main(String[] args) throws IOException {
-        KeyMatrix sum = new KeyMatrix();
-        for(int i = 0; i < args.length - 1; i++) {
-            KeyMatrix m = new KeyMatrix();
-            VisumOMatrixReader.read(m, args[i]);
-            MatrixOperations.add(sum, m);
-        }
+	private NumericMatrix m;
+	
+	public NumericMatrix getMatrix() {
+		return m;
+	}
+	
+	@Override
+	public void startTag(String name, Attributes atts, Stack<String> context) {
+		if(name.equalsIgnoreCase(NumericMatrixXMLWriter.MATRIX_TAG)) {
+			m = new NumericMatrix();
+		} else if(name.equalsIgnoreCase(NumericMatrixXMLWriter.CELL_TAG)) {
+			String row = atts.getValue(NumericMatrixXMLWriter.ROW_KEY);
+			String col = atts.getValue(NumericMatrixXMLWriter.COL_KEY);
+			String val = atts.getValue(NumericMatrixXMLWriter.VALUE_KEY);
+			
+			m.set(row, col, new Double(val));
+		}
 
-        KeyMatrixXMLWriter writer = new KeyMatrixXMLWriter();
-        writer.write(sum, args[args.length - 1]);
-    }
+	}
+
+	@Override
+	public void endTag(String name, String content, Stack<String> context) {
+	}
 }

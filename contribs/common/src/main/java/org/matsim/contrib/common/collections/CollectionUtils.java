@@ -123,7 +123,7 @@ public class CollectionUtils {
      * @param values a list of double objects
      * @return a native double array
      */
-    public static double[] toNativeArray(List<Double> values) {
+    public static double[] toNativeArray(Collection<Double> values) {
         return toNativeArray(values, true, true, true);
     }
 
@@ -137,7 +137,7 @@ public class CollectionUtils {
      *                   Double#POSITIVE_INFINITY} of {@link Double#NEGATIVE_INFINITY} respectively
      * @return a native double array
      */
-    public static double[] toNativeArray(List<Double> values, boolean ignoreNull, boolean ignoreNAN, boolean
+    public static double[] toNativeArray(Collection<Double> values, boolean ignoreNull, boolean ignoreNAN, boolean
             ignoreInf) {
         double[] nativeVals = new double[values.size()];
         int cnt = 0;

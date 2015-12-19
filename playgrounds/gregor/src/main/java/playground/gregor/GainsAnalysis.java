@@ -20,13 +20,6 @@
 
 package playground.gregor;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
@@ -34,20 +27,19 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderXMLv1;
 
+import java.util.*;
+
 public class GainsAnalysis implements LinkLeaveEventHandler{
-	
+
+	private final Id<Link> link = Id.create("car141205", Link.class);
 	public Map<Id,AgentInfo> infos = new HashMap<Id,AgentInfo>();
 	private Strategy strategy;
-	
-	private final Id<Link> link = Id.create("car141205", Link.class);
-	
-	private enum Strategy {sp,ne,so};
 	
 	public static void main(String [] args) {
 		String sp = "/Users/laemmel/devel/hhw_hybrid/output_NE/ITERS/it.0/0.events.xml.gz";
 		String ne = "/Users/laemmel/devel/hhw_hybrid/output_NE/ITERS/it.100/100.events.xml.gz";
 		String so = "/Users/laemmel/devel/hhw_hybrid/output_SO/ITERS/it.100/100.events.xml.gz";
-		
+
 		GainsAnalysis gains = new GainsAnalysis();
 		EventsManagerImpl e = new EventsManagerImpl();
 		e.addHandler(gains);
@@ -57,47 +49,30 @@ public class GainsAnalysis implements LinkLeaveEventHandler{
 		new EventsReaderXMLv1(e).parse(ne);
 		gains.setStrategy(Strategy.so);
 		new EventsReaderXMLv1(e).parse(so);
-		
+
 		AgentInfo ai = gains.getMax();
 		System.out.println(ai);
 	}
-	
-	
+
 	private AgentInfo getMax() {
-		
-		
+
+
 		Comp c = new Comp();
 		List<AgentInfo> ais = new ArrayList<AgentInfo>(this.infos.values());
 		Collections.sort(ais, c);
 		return (ais.get(ais.size()-1));
 	}
 
-
 	private void setStrategy(Strategy sp) {
 		this.strategy = sp;
-		
+
 	}
-
-
-	public static class AgentInfo {
-		double soTime = -1;
-		double neTime = -1;
-		double spTime = -1;
-		public Id id;
-		
-		@Override
-		public String toString() {
-			return this.id + " sp:" + this.spTime + " ne:" + this.neTime + " so:" + this.soTime;
-		}
-	}
-
 
 	@Override
 	public void reset(int iteration) {
 		// TODO Auto-generated method stub
-		
-	}
 
+	}
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
@@ -105,28 +80,46 @@ public class GainsAnalysis implements LinkLeaveEventHandler{
 			if (this.strategy == Strategy.sp) {
 				AgentInfo ai = new AgentInfo();
 				ai.spTime = event.getTime();
-				ai.id = event.getDriverId();
+				ai.id = event.getVehicleId();
 				this.infos.put(ai.id, ai);
-			} else {
-				AgentInfo ai = this.infos.get(event.getDriverId());
+			}
+			else {
+				AgentInfo ai = this.infos.get(event.getVehicleId());
 				if (ai == null) {
 					return;
 				}
 				if (this.strategy == Strategy.ne) {
 					ai.neTime = event.getTime();
-				} else if (this.strategy == Strategy.so) {
-					if (ai.neTime == -1){// || ai.neTime < event.getTime()) {
-						this.infos.remove(event.getDriverId());
-						return;
+				}
+				else {
+					if (this.strategy == Strategy.so) {
+						if (ai.neTime == -1) {// || ai.neTime < event.getTime()) {
+							this.infos.remove(event.getVehicleId());
+							return;
+						}
+						ai.soTime = event.getTime();
 					}
-					ai.soTime = event.getTime();
 				}
 			}
 		}
-		
+
 	}
 
-	
+
+	private enum Strategy {sp, ne, so}
+
+	public static class AgentInfo {
+		public Id id;
+		double soTime = -1;
+		double neTime = -1;
+		double spTime = -1;
+
+		@Override
+		public String toString() {
+			return this.id + " sp:" + this.spTime + " ne:" + this.neTime + " so:" + this.soTime;
+		}
+	}
+
 	private final class Comp implements Comparator<AgentInfo> {
 
 		@Override

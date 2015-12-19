@@ -50,12 +50,12 @@ public class ZoneTrackerTest {
 		
 		linkEvents.addHandler(testee);
 		
-		linkEvents.processEvent(new LinkLeaveEvent(1.0, person, link1, vehicle));
-		linkEvents.processEvent(new LinkEnterEvent(1.0, person, Id.create("l2", Link.class), vehicle));
-		linkEvents.processEvent(new LinkLeaveEvent(1.0, person, Id.create("l2", Link.class), vehicle));
-		linkEvents.processEvent(new LinkEnterEvent(1.0, person, Id.create("l3", Link.class), vehicle));
-		linkEvents.processEvent(new LinkLeaveEvent(1.0, person, Id.create("l3", Link.class), vehicle));
-		linkEvents.processEvent(new LinkEnterEvent(1.0, person, Id.create("l4", Link.class), vehicle));
+		linkEvents.processEvent(new LinkLeaveEvent(1.0, vehicle, link1));
+		linkEvents.processEvent(new LinkEnterEvent(1.0, vehicle, Id.create("l2", Link.class)));
+		linkEvents.processEvent(new LinkLeaveEvent(1.0, vehicle, Id.create("l2", Link.class)));
+		linkEvents.processEvent(new LinkEnterEvent(1.0, vehicle, Id.create("l3", Link.class)));
+		linkEvents.processEvent(new LinkLeaveEvent(1.0, vehicle, Id.create("l3", Link.class)));
+		linkEvents.processEvent(new LinkEnterEvent(1.0, vehicle, Id.create("l4", Link.class)));
 		linkEvents.finishProcessing();
 	}
 	
@@ -90,12 +90,12 @@ public class ZoneTrackerTest {
 		
 		linkEvents.addHandler(testee);
 		
-		linkEvents.processEvent(new LinkLeaveEvent(1.0, person, link1, vehicle));
-		linkEvents.processEvent(new LinkEnterEvent(1.0, person, Id.create("l2", Link.class), vehicle));
-		linkEvents.processEvent(new LinkLeaveEvent(2.0, person, Id.create("l2", Link.class), vehicle));
-		linkEvents.processEvent(new LinkEnterEvent(2.0, person, Id.create("l3", Link.class), vehicle));
-		linkEvents.processEvent(new LinkLeaveEvent(3.0, person, Id.create("l3", Link.class), vehicle));
-		linkEvents.processEvent(new LinkEnterEvent(3.0, person, link4, vehicle));
+		linkEvents.processEvent(new LinkLeaveEvent(1.0, vehicle, link1));
+		linkEvents.processEvent(new LinkEnterEvent(1.0, vehicle, Id.create("l2", Link.class)));
+		linkEvents.processEvent(new LinkLeaveEvent(2.0, vehicle, Id.create("l2", Link.class)));
+		linkEvents.processEvent(new LinkEnterEvent(2.0, vehicle, Id.create("l3", Link.class)));
+		linkEvents.processEvent(new LinkLeaveEvent(3.0, vehicle, Id.create("l3", Link.class)));
+		linkEvents.processEvent(new LinkEnterEvent(3.0, vehicle, link4));
 		linkEvents.finishProcessing();
 	}
 
