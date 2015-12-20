@@ -35,7 +35,6 @@ import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.replanning.PlanStrategy;
-import org.matsim.core.replanning.StrategyManagerConfigLoader;
 import org.matsim.core.replanning.StrategyManagerModule;
 import org.matsim.core.replanning.selectors.GenericPlanSelector;
 import org.matsim.core.router.RoutingModule;
@@ -133,7 +132,7 @@ public abstract class AbstractModule implements Module {
 	/**
 	 * See {@link tutorial.programming.planStrategyForRemoval.RunPlanSelectorForRemovalExample} for an example.
 	 * 
-	 * @see {@link StrategyManagerModule}, {@link StrategyManagerConfigLoader}
+	 * @see {@link StrategyManagerModule}
 	 */
 	protected final com.google.inject.binder.LinkedBindingBuilder<GenericPlanSelector<Plan, Person>> bindPlanSelectorForRemoval() {
 		return bind(new TypeLiteral<GenericPlanSelector<Plan, Person>>(){});

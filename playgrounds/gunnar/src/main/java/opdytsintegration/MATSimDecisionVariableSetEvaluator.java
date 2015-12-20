@@ -19,6 +19,9 @@ import org.matsim.core.controler.listener.StartupListener;
 import com.google.inject.Inject;
 
 import floetteroed.opdyts.DecisionVariable;
+import floetteroed.opdyts.logging.EquilibriumGap;
+import floetteroed.opdyts.logging.TransientObjectiveFunctionValue;
+import floetteroed.opdyts.logging.UniformityGap;
 import floetteroed.opdyts.trajectorysampling.TrajectorySampler;
 import floetteroed.utilities.math.Vector;
 
@@ -123,10 +126,15 @@ public class MATSimDecisionVariableSetEvaluator<U extends DecisionVariable>
 	}
 
 	/**
-	 * Where to write logging information.
+	 * Where to write standard logging information.
 	 */
 	public void setStandardLogFileName(final String logFileName) {
-		throw new UnsupportedOperationException();
+		this.trajectorySampler.addStatistic(logFileName,
+				new TransientObjectiveFunctionValue<U>());
+		this.trajectorySampler.addStatistic(logFileName,
+				new EquilibriumGap<U>());
+		this.trajectorySampler
+				.addStatistic(logFileName, new UniformityGap<U>());
 	}
 
 	public MATSimState getFinalState() {

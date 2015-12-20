@@ -12,7 +12,7 @@ import floetteroed.opdyts.trajectorysampling.TrajectorySampler;
 /**
  * Created by michaelzilske on 08/10/15.
  * 
- * Slightly modified by Gunnar in December 2015.
+ * Modified by Gunnar in December 2015.
  */
 public class MATSimSimulator<U extends DecisionVariable> implements
 		Simulator<U> {
@@ -59,6 +59,8 @@ public class MATSimSimulator<U extends DecisionVariable> implements
 		final MATSimDecisionVariableSetEvaluator<U> matsimDecisionVariableEvaluator = new MATSimDecisionVariableSetEvaluator<U>(
 				trajectorySampler, this.stateFactory, this.timeDiscretization);
 		matsimDecisionVariableEvaluator.setMemory(1); // TODO make configurable
+		matsimDecisionVariableEvaluator.setStandardLogFileName(outputDirectory
+				+ "/optimization.log");
 		// predictor.setStartTime_s(this.startTime_s);
 		// predictor.setBinSize_s(this.binSize_s);
 		// predictor.setBinCnt(this.binCnt);
@@ -101,10 +103,10 @@ public class MATSimSimulator<U extends DecisionVariable> implements
 	public SimulatorState run(final TrajectorySampler<U> evaluator,
 			final SimulatorState initialState) {
 		if (initialState != null) {
-			((MATSimState) initialState).setPopulation(this.scenario
-					.getPopulation());
+			// ((MATSimState) initialState).setPopulation(this.scenario
+			// .getPopulation());
 			initialState.implementInSimulation();
 		}
-		return run(evaluator);
+		return this.run(evaluator);
 	}
 }

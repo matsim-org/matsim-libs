@@ -47,7 +47,7 @@ public class CreateMatrixBasedPtInputs {
 //		String transitScheduleFile = "../../../../Workspace/shared-svn/projects/bvg_3_bln_inputdata/rev554B-bvg00-0.1sample/network/transitSchedule.xml.gz";
 //		String transitScheduleFile = "../../../../Workspace/runs-svn/nmbm_minibuses/nmbm/output/jtlu14i/ITERS/it.300/jtlu14i.300.transitScheduleScored.xml.gz";
 //		String transitScheduleFile = "../../../../Workspace/runs-svn/nmbm_minibuses/nmbm/output/jtlu14d/ITERS/it.300/jtlu14d.300.transitScheduleScored.xml.gz";
-		String transitScheduleFile = "../../../../Workspace/shared-svn/projects/accessibility_berlin/otp/GTFS/transitschedule.xml";
+		String transitScheduleFile = "../../../../Workspace/shared-svn/projects/accessibility_berlin/gtfs/2015-07-03/transitschedule.xml";
 		
 //		String outputRoot = "../../../../Workspace/data/accessibility/nmb/matrix/04/";
 		String outputRoot = "../../../../Workspace/shared-svn/projects/accessibility_berlin/travel_matrix/2015-05-26/";

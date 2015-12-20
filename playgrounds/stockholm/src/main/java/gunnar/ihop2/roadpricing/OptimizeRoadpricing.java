@@ -55,7 +55,7 @@ class OptimizeRoadpricing {
 		boolean interpolate = true;
 		int maxIterations = 10;
 		int maxTransitions = Integer.MAX_VALUE;
-		int populationSize = 25;
+		int populationSize = 2;
 
 		final TimeDiscretization timeDiscretization = new TimeDiscretization(0,
 				3600, 24);

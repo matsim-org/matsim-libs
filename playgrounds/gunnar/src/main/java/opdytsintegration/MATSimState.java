@@ -49,9 +49,7 @@ public class MATSimState implements SimulatorState {
 
 	private final Vector vectorRepresentation;
 
-	// Michael, ich glaube, dass dies von Dir kommt. Warum brauchen wir hier die
-	// Population?
-	private Population population;
+	private final Population population;
 
 	// -------------------- CONSTRUCTION --------------------
 
@@ -146,8 +144,7 @@ public class MATSimState implements SimulatorState {
 		}
 	}
 
-	// TODO What for?
-	public void setPopulation(Population population) {
-		this.population = population;
-	}
+	// public void setPopulation(Population population) {
+	// this.population = population;
+	// }
 }

@@ -112,6 +112,7 @@ public class ParallelTrajectorySampler<U extends DecisionVariable> implements
 		return this.maxMemoryLength;
 	}
 
+	@Override
 	public void addStatistic(final String logFileName,
 			final Statistic<SamplingStage<U>> statistic) {
 		this.statisticsWriter.addStatistic(logFileName, statistic);

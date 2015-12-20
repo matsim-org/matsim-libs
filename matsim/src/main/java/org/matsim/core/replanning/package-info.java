@@ -24,9 +24,6 @@ plan will not be duplicated. If a strategy contains multiple strategy modules,
 the plan will be modified by one strategy module after the other, in the order
 the strategy modules were added to the strategy.</p>
 
-<p>A class {@link org.matsim.core.replanning.StrategyManagerConfigLoader}
-is available to configure a given StrategyManager based on the information from
-a configuration file.</p>
 
 <h2>Example</h2>
 <p>The strategy manager contains the following 5 strategies:
@@ -50,7 +47,7 @@ StrategyManager
     |          |_ ReRoute
     |
     +--- 8% -- RandomPlanSelector
-    |          |_ TimeAllocationMuator
+    |          |_ TimeAllocationMutator
     |          |_ ReRoute
     |
     +-- 75% -- BestScoreSelector
