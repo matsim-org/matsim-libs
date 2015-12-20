@@ -141,7 +141,7 @@ public class PatnaExternalDemandGenerator {
 						Activity destinationAct = pf.createActivityFromLinkId( "E2I_Start", destinationActLink.getId());
 						
 						if((middleActEndTime > 20*3600 && middleActEndTime <24*3600) && (countingStationNumber.equals("OC3") || countingStationNumber.equals("OC6")) ) {
-							middleActEndTime = middleActEndTime - (2*3600+random.nextDouble()*3*3600); // to push higher counts aroung mid night
+							middleActEndTime = middleActEndTime - (3*3600+random.nextDouble()*3*3600); //pushing departure time of higher counts aroung mid night
 						}
 
 						if(middleActEndTime >= 24*3600 ) { // midAct - startAct - midAct ==> this will give count in both time bins for desired counting station
