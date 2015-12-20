@@ -139,10 +139,14 @@ public class PatnaExternalDemandGenerator {
 						//ZZ_TODO : here the act duration is assigned randomly between 6 to 8 hours. This means, the agent will be counted in reverse direction of the same counting station.
 						double middleActEndTime = originAct.getEndTime() + 6*3600 + random.nextDouble() * 7200;
 						Activity destinationAct = pf.createActivityFromLinkId( "E2I_Start", destinationActLink.getId());
+						
+						if((middleActEndTime > 20*3600 && middleActEndTime <24*3600) && (countingStationNumber.equals("OC3") || countingStationNumber.equals("OC6")) ) {
+							middleActEndTime = middleActEndTime - (2*3600+random.nextDouble()*3*3600); // to push higher counts aroung mid night
+						}
 
-						if(middleActEndTime > 24*3600 ) { // midAct - startAct - midAct ==> this will give count in both time bins for desired counting station
+						if(middleActEndTime >= 24*3600 ) { // midAct - startAct - midAct ==> this will give count in both time bins for desired counting station
 							if(countingStationNumber.equals("OC3") || countingStationNumber.equals("OC6")) {
-								middleActEndTime =  middleActEndTime - 20*3600;//trying to delay end of the midact to get lesser vehicles in early hours of the counting stations.
+								middleActEndTime =  middleActEndTime - (16*3600 + random.nextDouble()*3600*4);//trying to delay end of the midact to get lesser vehicles in early hours of the counting stations.
 							}
 							else middleActEndTime =  middleActEndTime - 24*3600; 
 							middleAct.setEndTime( middleActEndTime );
