@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.controler.corelisteners;
+package org.matsim.core.scoring;
 
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -26,16 +26,15 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.controler.corelisteners.PlansScoring;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ScoringEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ScoringListener;
-import org.matsim.core.scoring.EventsToScore;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
-import javax.inject.Provider;
 
 /**
  * A {@link org.matsim.core.controler.listener.ControlerListener} that manages the
@@ -50,13 +49,15 @@ final class PlansScoringImpl implements PlansScoring, ScoringListener, Iteration
 
 	@Inject private PlanCalcScoreConfigGroup planCalcScoreConfigGroup;
 	@Inject private ControlerConfigGroup controlerConfigGroup;
-	@Inject private EventsToScore eventsToScore;
 	@Inject private Population population;
 	@Inject private OutputDirectoryHierarchy controlerIO;
+	@Inject private ScoringFunctionsForPopulation scoringFunctionsForPopulation;
 
 	@Override
 	public void notifyScoring(final ScoringEvent event) {
-		this.eventsToScore.finish();
+		scoringFunctionsForPopulation.finishScoringFunctions();
+		NewScoreAssignerImpl newScoreAssigner = new NewScoreAssignerImpl(this.planCalcScoreConfigGroup, this.controlerConfigGroup);
+		newScoreAssigner.assignNewScores(event.getIteration(), this.scoringFunctionsForPopulation, this.population);
 	}
 
 	@Override
@@ -64,12 +65,12 @@ final class PlansScoringImpl implements PlansScoring, ScoringListener, Iteration
 		if(planCalcScoreConfigGroup.isWriteExperiencedPlans()) {
 			final int writePlansInterval = controlerConfigGroup.getWritePlansInterval();
 			if (writePlansInterval > 0 && event.getIteration() % writePlansInterval == 0) {
-				this.eventsToScore.writeExperiencedPlans(controlerIO.getIterationFilename(event.getIteration(), "experienced_plans"));
+				this.scoringFunctionsForPopulation.writeExperiencedPlans(controlerIO.getIterationFilename(event.getIteration(), "experienced_plans"));
 			}
 		}
 		if (planCalcScoreConfigGroup.isMemorizingExperiencedPlans() ) {
 			for ( Person person : this.population.getPersons().values() ) {
-				Plan experiencedPlan = eventsToScore.getAgentRecords().get( person.getId() ) ;
+				Plan experiencedPlan = this.scoringFunctionsForPopulation.getAgentRecords().get( person.getId() ) ;
 				if ( experiencedPlan==null ) {
 					throw new RuntimeException("experienced plan is null; I don't think this should happen") ;
 				}

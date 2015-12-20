@@ -32,8 +32,10 @@ import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.scoring.EventsToScore;
@@ -56,10 +58,12 @@ class TravelDisutilityUtils {
 		final int N_TESTS = 3 ;
 		
 		EffectiveMarginalUtilitiesContainer muc = new EffectiveMarginalUtilitiesContainer() ;
-		
+		List<EventsManager> es = new ArrayList<>();
 		List<EventsToScore> e2s = new ArrayList<EventsToScore>() ;
 		for ( int ii=0 ; ii<N_TESTS+1 ; ii++ ) {
-			e2s.add(EventsToScore.createWithoutScoreUpdating(scenario, scoringFunctionFactory)) ;
+			EventsManager eventsManager = EventsUtils.createEventsManager();
+			es.add(eventsManager);
+			e2s.add(EventsToScore.createWithoutScoreUpdating(scenario, scoringFunctionFactory, eventsManager)) ;
 		}
 		
 		double effMargUtlTTimeMAX = Double.NEGATIVE_INFINITY ;
@@ -106,20 +110,20 @@ class TravelDisutilityUtils {
 					triptime = DELTA_TRIPTIME ; distance = DELTA_DISTANCE ;
 				}
 				double now = DEPARTURE ;
-				e2s.get(ii).handleEvent( new ActivityEndEvent(now, person.getId(), null, null, firstAct.getType() ) ) ;
-				e2s.get(ii).handleEvent( new PersonDepartureEvent(now, person.getId(), null, TransportMode.car ) );
+				es.get(ii).processEvent(new ActivityEndEvent(now, person.getId(), null, null, firstAct.getType())); ;
+				es.get(ii).processEvent(new PersonDepartureEvent(now, person.getId(), null, TransportMode.car));
 				now = DEPARTURE + triptime ;
-				e2s.get(ii).handleEvent( new TeleportationArrivalEvent( now, person.getId(), distance ) ) ;
-				e2s.get(ii).handleEvent( new PersonArrivalEvent( now, person.getId(), null, TransportMode.car ) );
-				e2s.get(ii).handleEvent( new ActivityStartEvent(now, person.getId(), null, null, firstAct.getType() ) ) ;
+				es.get(ii).processEvent(new TeleportationArrivalEvent(now, person.getId(), distance)) ;
+				es.get(ii).processEvent(new PersonArrivalEvent(now, person.getId(), null, TransportMode.car));
+				es.get(ii).processEvent(new ActivityStartEvent(now, person.getId(), null, null, firstAct.getType())) ;
 				now = DEPARTURE + typicalDuration + 0.5*DELTA_TRIPTIME ;
-				e2s.get(ii).handleEvent( new ActivityEndEvent(now, person.getId(), null, null, firstAct.getType() ) ) ;
-				e2s.get(ii).handleEvent( new PersonDepartureEvent(now, person.getId(), null, TransportMode.car ) );
-				e2s.get(ii).handleEvent( new TeleportationArrivalEvent( now, person.getId(), 0. ) ) ;
-				e2s.get(ii).handleEvent( new PersonArrivalEvent( now, person.getId(), null, TransportMode.car ) );
-				e2s.get(ii).handleEvent( new ActivityStartEvent(now, person.getId(), null, null, firstAct.getType() ) ) ;
+				es.get(ii).processEvent(new ActivityEndEvent(now, person.getId(), null, null, firstAct.getType())) ;
+				es.get(ii).processEvent(new PersonDepartureEvent(now, person.getId(), null, TransportMode.car));
+				es.get(ii).processEvent(new TeleportationArrivalEvent(now, person.getId(), 0.)) ;
+				es.get(ii).processEvent(new PersonArrivalEvent(now, person.getId(), null, TransportMode.car));
+				es.get(ii).processEvent(new ActivityStartEvent(now, person.getId(), null, null, firstAct.getType())) ;
 			}
-			e2s.get(N_TESTS).handleEvent( new PersonMoneyEvent( 33.*3600., person.getId(), 1. ) ) ;
+			es.get(N_TESTS).processEvent( new PersonMoneyEvent( 33.*3600., person.getId(), 1. ) ) ;
 		}
 		for ( EventsToScore eee : e2s ) {
 			eee.finish();

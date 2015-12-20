@@ -20,6 +20,8 @@
 
 package org.matsim.core.scoring;
 
+import com.google.common.eventbus.Subscribe;
+import com.google.inject.Inject;
 import gnu.trove.TDoubleCollection;
 import gnu.trove.iterator.TDoubleIterator;
 import gnu.trove.list.array.TDoubleArrayList;
@@ -43,14 +45,12 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.internal.HasPersonId;
-import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.scoring.EventsToActivities.ActivityHandler;
-import org.matsim.core.scoring.EventsToLegs.LegHandler;
 import org.matsim.core.utils.io.IOUtils;
 
 /**
@@ -61,10 +61,12 @@ import org.matsim.core.utils.io.IOUtils;
  * @author michaz
  *
  */
-class ScoringFunctionsForPopulation implements ActivityHandler, LegHandler {
+class ScoringFunctionsForPopulation implements BasicEventHandler, ExperiencedPlansService {
 
 	private final static Logger log = Logger.getLogger(ScoringFunctionsForPopulation.class);
 	private final PlansConfigGroup plansConfigGroup;
+	private final Population population;
+	private final ScoringFunctionFactory scoringFunctionFactory;
 	private Network network;
 
 	/*
@@ -81,10 +83,18 @@ class ScoringFunctionsForPopulation implements ActivityHandler, LegHandler {
 	private final Map<Id<Person>, Plan> agentRecords = new HashMap<>();
 	private final Map<Id<Person>, TDoubleCollection> partialScores = new LinkedHashMap<>();
 
-
-	ScoringFunctionsForPopulation(PlansConfigGroup plansConfigGroup, Network network, Population population, ScoringFunctionFactory scoringFunctionFactory) {
+	@Inject
+	ScoringFunctionsForPopulation(EventsManager eventsManager, ExperiencedPlanElementsService experiencedPlanElementsService, PlansConfigGroup plansConfigGroup, Network network, Population population, ScoringFunctionFactory scoringFunctionFactory) {
 		this.plansConfigGroup = plansConfigGroup;
 		this.network = network;
+		this.population = population;
+		this.scoringFunctionFactory = scoringFunctionFactory;
+		reset();
+		eventsManager.addHandler(this);
+		experiencedPlanElementsService.register(this);
+	}
+
+	private void reset() {
 		for (Person person : population.getPersons().values()) {
 			ScoringFunction data = scoringFunctionFactory.createNewScoringFunction(person);
 			this.agentScorers.put(person.getId(), data);
@@ -111,8 +121,10 @@ class ScoringFunctionsForPopulation implements ActivityHandler, LegHandler {
 		return this.agentRecords;
 	}
 
-	@Override
-	public void handleActivity(Id<Person> agentId, Activity activity) {
+	@Subscribe
+	public void handleActivity(PersonExperiencedActivity event) {
+		Id<Person> agentId = event.getAgentId();
+		Activity activity = event.getActivity();
 		ScoringFunction scoringFunctionForAgent = this.getScoringFunctionForAgent(agentId);
 		if (scoringFunctionForAgent != null) {
 			scoringFunctionForAgent.handleActivity(activity);
@@ -122,8 +134,10 @@ class ScoringFunctionsForPopulation implements ActivityHandler, LegHandler {
 		}
 	}
 
-	@Override
-	public void handleLeg(Id<Person> agentId, Leg leg) {
+	@Subscribe
+	public void handleLeg(PersonExperiencedLeg event) {
+		Id<Person> agentId = event.getAgentId();
+		Leg leg = event.getLeg();
 		ScoringFunction scoringFunctionForAgent = this.getScoringFunctionForAgent(agentId);
 		if (scoringFunctionForAgent != null) {
 			scoringFunctionForAgent.handleLeg(leg);
@@ -172,6 +186,7 @@ class ScoringFunctionsForPopulation implements ActivityHandler, LegHandler {
 		}
 	}
 
+	@Override
 	public void handleEvent(Event event) {
 		// this is for the stuff that is directly based on events.
 		// note that this passes on _all_ person events, even those already passed above.
@@ -192,4 +207,8 @@ class ScoringFunctionsForPopulation implements ActivityHandler, LegHandler {
 		}
 	}
 
+	@Override
+	public void reset(int iteration) {
+		reset();
+	}
 }

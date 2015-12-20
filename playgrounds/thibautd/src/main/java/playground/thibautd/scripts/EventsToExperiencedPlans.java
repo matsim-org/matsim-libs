@@ -26,14 +26,22 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.Injector;
+import org.matsim.core.controler.ReplayEvents;
+import org.matsim.core.events.EventsManagerModule;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
+import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.scoring.ExperiencedPlanElementsModule;
+import org.matsim.core.scoring.ExperiencedPlanElementsService;
+import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionModule;
 import playground.thibautd.utils.EventsToPlans;
 
 import java.util.Collection;
@@ -44,14 +52,22 @@ import java.util.Iterator;
  */
 public class EventsToExperiencedPlans {
 	public static void main(final String[] args) {
+		Config config = ConfigUtils.createConfig();
+		final Scenario inputSc = ScenarioUtils.createScenario(config);
+
+		Injector injector = Injector.createInjector(config,
+				new ScenarioByInstanceModule(inputSc),
+				new ExperiencedPlanElementsModule(),
+				new CharyparNagelScoringFunctionModule(),
+				new EventsManagerModule(),
+				new ReplayEvents.Module());
+
 		final String eventsFile = args[ 0 ];
 		final String inPopFile = args[ 1 ];
 		final String outputPlansFile = args[ 2 ];
 
-		final Scenario inputSc = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
 		new MatsimPopulationReader( inputSc ).parse( inPopFile );
 
-		final EventsManager events = EventsUtils.createEventsManager();
 		final EventsToPlans eventsToPlans =
 			new EventsToPlans(
 					new EventsToPlans.IdFilter() {
@@ -60,9 +76,11 @@ public class EventsToExperiencedPlans {
 							return inputSc.getPopulation().getPersons().containsKey( id );
 						}
 					});
-		events.addHandler( eventsToPlans );
 
-		new MatsimEventsReader( events ).readFile( eventsFile );
+		ExperiencedPlanElementsService epeService = injector.getInstance(ExperiencedPlanElementsService.class);
+		epeService.register(eventsToPlans);
+
+		injector.getInstance(ReplayEvents.class).playEventsFile( eventsFile );
 
 		final Scenario sc = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
 

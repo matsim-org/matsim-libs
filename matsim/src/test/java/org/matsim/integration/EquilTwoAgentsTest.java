@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
@@ -41,6 +42,8 @@ import org.matsim.core.scoring.EventsToScore;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestCase;
+
+import javax.inject.Inject;
 
 /**
  * This test uses the org.matsim.examples equil scenario with two agents
@@ -102,12 +105,15 @@ public class EquilTwoAgentsTest extends MatsimTestCase {
 		controler.getConfig().controler().setCreateGraphs(false);
         controler.getConfig().controler().setWriteEventsInterval(0);
 		controler.addControlerListener(new StartupListener() {
+			@Inject
+			EventsManager eventsManager;
+
 			@Override
 			public void notifyStartup(final StartupEvent event) {
                 double agent1LeaveHomeTime = ((PlanImpl) controler.getScenario().getPopulation().getPersons().get(personId1).getPlans().get(0)).getFirstActivity().getEndTime();
                 double agent2LeaveHomeTime = ((PlanImpl) controler.getScenario().getPopulation().getPersons().get(personId2).getPlans().get(0)).getFirstActivity().getEndTime();
 				handler = new TestSingleIterationEventHandler(agent1LeaveHomeTime, agent2LeaveHomeTime);
-				controler.getEvents().addHandler(handler);
+				eventsManager.addHandler(handler);
 				
 				
 				// Construct a scoring function which does not score the home activity. Because the analytical calculations against which 
@@ -125,9 +131,8 @@ public class EquilTwoAgentsTest extends MatsimTestCase {
 //				params.utilParams.put("h", activityUtilityParameters);
 				EquilTwoAgentsTest.this.planScorer = EventsToScore.createWithScoreUpdating(controler.getScenario(),
 //						new CharyparNagelScoringFunctionFactory(params, controler.getScenario().getNetwork()));
-						new CharyparNagelScoringFunctionFactory(controler.getScenario()));
+						new CharyparNagelScoringFunctionFactory(controler.getScenario()), eventsManager);
 				
-				controler.getEvents().addHandler(EquilTwoAgentsTest.this.planScorer);
 			}
 		});
 

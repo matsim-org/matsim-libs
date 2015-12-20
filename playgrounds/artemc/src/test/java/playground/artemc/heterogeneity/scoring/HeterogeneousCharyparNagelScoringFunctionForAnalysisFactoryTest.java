@@ -9,10 +9,12 @@ import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.*;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonUtils;
@@ -69,8 +71,9 @@ public class HeterogeneousCharyparNagelScoringFunctionForAnalysisFactoryTest {
 		}
 		testee.finish();
 		double score = testee.getScore();
-		EventsToScore eventsToScore = EventsToScore.createWithScoreUpdating(f.scenario, heterogeneousCharyparNagelScoringFunctionForAnalysisFactory);
-		double scoreFromEvents = calcScoreFromEvents(eventsToScore, f);
+		EventsManager eventsManager = EventsUtils.createEventsManager();
+		EventsToScore eventsToScore = EventsToScore.createWithScoreUpdating(f.scenario, heterogeneousCharyparNagelScoringFunctionForAnalysisFactory, eventsManager);
+		double scoreFromEvents = calcScoreFromEvents(eventsManager, eventsToScore, f);
 		assertEquals("Score computed from the plan elements should be the same as score computed from stream of events constructed from plan elements.", score, scoreFromEvents, EPSILON);
 		return score;
 	}
@@ -88,60 +91,61 @@ public class HeterogeneousCharyparNagelScoringFunctionForAnalysisFactoryTest {
 		}
 		testee.finish();
 		double score = testee.getScore();
-		EventsToScore eventsToScore = EventsToScore.createWithScoreUpdating(f.scenario, heterogeneousCharyparNagelScoringFunctionForAnalysisFactory);
-		double scoreFromEvents = calcScoreFromEvents(eventsToScore, f);
+		EventsManager eventsManager = EventsUtils.createEventsManager();
+		EventsToScore eventsToScore = EventsToScore.createWithScoreUpdating(f.scenario, heterogeneousCharyparNagelScoringFunctionForAnalysisFactory, eventsManager);
+		double scoreFromEvents = calcScoreFromEvents(eventsManager, eventsToScore, f);
 		assertEquals("Score computed from the plan elements should be the same as score computed from stream of events constructed from plan elements.", score, scoreFromEvents, EPSILON);
 		return score;
 	}
 
-	private double calcScoreFromEvents(EventsToScore eventsToScore, final Fixture f) {
-		handleFirstActivity(eventsToScore, f, (Activity) f.plan.getPlanElements().get(0));
-		handleLeg(eventsToScore, f, (Leg) f.plan.getPlanElements().get(1));
-		handleActivity(eventsToScore, f, (Activity) f.plan.getPlanElements().get(2));
-		handleLeg(eventsToScore, f, (Leg) f.plan.getPlanElements().get(3));
-		handleActivity(eventsToScore, f, (Activity) f.plan.getPlanElements().get(4));
-		handleLeg(eventsToScore, f, (Leg) f.plan.getPlanElements().get(5));
-		handleActivity(eventsToScore, f, (Activity) f.plan.getPlanElements().get(6));
-		handleLeg(eventsToScore, f, (Leg) f.plan.getPlanElements().get(7));
-		handleLastActivity(eventsToScore, f, (Activity) f.plan.getPlanElements().get(8));
+	private double calcScoreFromEvents(EventsManager eventsManager, EventsToScore eventsToScore, final Fixture f) {
+		handleFirstActivity(eventsManager, f, (Activity) f.plan.getPlanElements().get(0));
+		handleLeg(eventsManager, f, (Leg) f.plan.getPlanElements().get(1));
+		handleActivity(eventsManager, f, (Activity) f.plan.getPlanElements().get(2));
+		handleLeg(eventsManager, f, (Leg) f.plan.getPlanElements().get(3));
+		handleActivity(eventsManager, f, (Activity) f.plan.getPlanElements().get(4));
+		handleLeg(eventsManager, f, (Leg) f.plan.getPlanElements().get(5));
+		handleActivity(eventsManager, f, (Activity) f.plan.getPlanElements().get(6));
+		handleLeg(eventsManager, f, (Leg) f.plan.getPlanElements().get(7));
+		handleLastActivity(eventsManager, f, (Activity) f.plan.getPlanElements().get(8));
 		eventsToScore.finish();
 		return f.plan.getScore();
 	}
 
-	private void handleFirstActivity(EventsToScore eventsToScore, Fixture f, Activity activity) {
-		eventsToScore.handleEvent(new ActivityEndEvent(activity.getEndTime(), f.person.getId(), activity.getLinkId(), activity.getFacilityId(), activity.getType()));
+	private void handleFirstActivity(EventsManager eventsToScore, Fixture f, Activity activity) {
+		eventsToScore.processEvent(new ActivityEndEvent(activity.getEndTime(), f.person.getId(), activity.getLinkId(), activity.getFacilityId(), activity.getType()));
 	}
 
-	private void handleLastActivity(EventsToScore eventsToScore, Fixture f, Activity activity) {
-		eventsToScore.handleEvent(new ActivityStartEvent(activity.getStartTime(), f.person.getId(), activity.getLinkId(), activity.getFacilityId(), activity.getType()));
+	private void handleLastActivity(EventsManager eventsToScore, Fixture f, Activity activity) {
+		eventsToScore.processEvent(new ActivityStartEvent(activity.getStartTime(), f.person.getId(), activity.getLinkId(), activity.getFacilityId(), activity.getType()));
 	}
 
-	private void handleLeg(EventsToScore eventsToScore, Fixture f, Leg leg) {
+	private void handleLeg(EventsManager eventsToScore, Fixture f, Leg leg) {
 		final double time = leg.getDepartureTime();
 		final Id<Person> driverId = f.person.getId();
 		final String networkMode = leg.getMode();
-		eventsToScore.handleEvent(new PersonDepartureEvent(time, driverId, leg.getRoute().getStartLinkId(), networkMode));
+		eventsToScore.processEvent(new PersonDepartureEvent(time, driverId, leg.getRoute().getStartLinkId(), networkMode));
 		if (leg.getRoute() instanceof NetworkRoute) {
 			NetworkRoute networkRoute = (NetworkRoute) leg.getRoute();
 			final Id<Vehicle> vehicleId = networkRoute.getVehicleId();
 			double relativePositionOnLink = 1.0 ;
-			eventsToScore.handleEvent( new VehicleEntersTrafficEvent(time, driverId, leg.getRoute().getStartLinkId(), vehicleId, networkMode, relativePositionOnLink));
-			eventsToScore.handleEvent(new LinkLeaveEvent(time, vehicleId, leg.getRoute().getStartLinkId()));
+			eventsToScore.processEvent(new VehicleEntersTrafficEvent(time, driverId, leg.getRoute().getStartLinkId(), vehicleId, networkMode, relativePositionOnLink));
+			eventsToScore.processEvent(new LinkLeaveEvent(time, vehicleId, leg.getRoute().getStartLinkId()));
 			for (Id<Link> linkId : networkRoute.getLinkIds()) {
-				eventsToScore.handleEvent(new LinkEnterEvent(time, vehicleId, linkId));
-				eventsToScore.handleEvent(new LinkLeaveEvent(time, vehicleId, linkId));
+				eventsToScore.processEvent(new LinkEnterEvent(time, vehicleId, linkId));
+				eventsToScore.processEvent(new LinkLeaveEvent(time, vehicleId, linkId));
 			}
-			eventsToScore.handleEvent(new LinkEnterEvent(time + leg.getTravelTime(), vehicleId, leg.getRoute().getEndLinkId()));
-			eventsToScore.handleEvent( new VehicleLeavesTrafficEvent(time + leg.getTravelTime() + 1, driverId, leg.getRoute().getEndLinkId(), vehicleId, networkMode, relativePositionOnLink));
+			eventsToScore.processEvent(new LinkEnterEvent(time + leg.getTravelTime(), vehicleId, leg.getRoute().getEndLinkId()));
+			eventsToScore.processEvent(new VehicleLeavesTrafficEvent(time + leg.getTravelTime() + 1, driverId, leg.getRoute().getEndLinkId(), vehicleId, networkMode, relativePositionOnLink));
 		} else {
-			eventsToScore.handleEvent(new TeleportationArrivalEvent(time + leg.getTravelTime(), driverId, leg.getRoute().getDistance()));
+			eventsToScore.processEvent(new TeleportationArrivalEvent(time + leg.getTravelTime(), driverId, leg.getRoute().getDistance()));
 		}
-		eventsToScore.handleEvent(new PersonArrivalEvent(time + leg.getTravelTime(), driverId, leg.getRoute().getEndLinkId(), networkMode));
+		eventsToScore.processEvent(new PersonArrivalEvent(time + leg.getTravelTime(), driverId, leg.getRoute().getEndLinkId(), networkMode));
 	}
 
-	private void handleActivity(EventsToScore eventsToScore, Fixture f, Activity activity) {
-		eventsToScore.handleEvent(new ActivityStartEvent(activity.getStartTime(), f.person.getId(), activity.getLinkId(), activity.getFacilityId(), activity.getType()));
-		eventsToScore.handleEvent(new ActivityEndEvent(activity.getEndTime(), f.person.getId(), activity.getLinkId(), activity.getFacilityId(), activity.getType()));
+	private void handleActivity(EventsManager eventsToScore, Fixture f, Activity activity) {
+		eventsToScore.processEvent(new ActivityStartEvent(activity.getStartTime(), f.person.getId(), activity.getLinkId(), activity.getFacilityId(), activity.getType()));
+		eventsToScore.processEvent(new ActivityEndEvent(activity.getEndTime(), f.person.getId(), activity.getLinkId(), activity.getFacilityId(), activity.getType()));
 	}
 
 	/**

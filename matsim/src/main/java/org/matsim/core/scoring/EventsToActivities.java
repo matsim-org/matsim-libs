@@ -30,7 +30,10 @@ import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.population.ActivityImpl;
+
+import javax.inject.Inject;
 
 /**
  * 
@@ -53,6 +56,15 @@ public class EventsToActivities implements ActivityStartEventHandler, ActivityEn
 
     private Map<Id<Person>, ActivityImpl> activities = new HashMap<Id<Person>, ActivityImpl>();
     private ActivityHandler activityHandler = null;
+
+    public EventsToActivities() {
+
+    }
+
+    @Inject
+    EventsToActivities(EventsManager eventsManager) {
+        eventsManager.addHandler(this);
+    }
 
     @Override
     public void handleEvent(ActivityEndEvent event) {

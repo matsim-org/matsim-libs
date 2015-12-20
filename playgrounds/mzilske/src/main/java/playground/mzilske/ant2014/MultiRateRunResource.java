@@ -30,12 +30,14 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.ReplayEvents;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
+import org.matsim.core.events.EventsManagerModule;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.util.DijkstraFactory;
+import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils.ScenarioBuilder;
 
 import playground.mzilske.cdr.CallBehavior;
@@ -171,7 +173,6 @@ class MultiRateRunResource {
     }
 
     private void runPhoneOnActivityStartEnd(Scenario baseScenario) {
-        EventsManager events = EventsUtils.createEventsManager();
         LinkIsZone linkIsZone = new LinkIsZone();
         AbstractModule phoneModule = new CallBehaviorModule(new CallBehavior() {
 
@@ -192,9 +193,10 @@ class MultiRateRunResource {
 
         }, linkIsZone);
         ReplayEvents.Results results = ReplayEvents.run(
-                baseScenario,
+                baseScenario.getConfig(),
                 getBaseRun().getLastIteration().getEventsFileName(),
-                new CollectSightingsModule(),
+                new CollectSightingsModule(), new ScenarioByInstanceModule(baseScenario),
+                new EventsManagerModule(),
                 phoneModule);
 
 
@@ -234,9 +236,10 @@ class MultiRateRunResource {
 
         ZoneTracker.LinkToZoneResolver linkToZoneResolver = new LinkIsZone();
         ReplayEvents.Results results = ReplayEvents.run(
-                baseScenario,
+                baseScenario.getConfig(),
                 getBaseRun().getLastIteration().getEventsFileName(),
-                new VolumesAnalyzerModule(),
+                new VolumesAnalyzerModule(), new ScenarioByInstanceModule(baseScenario),
+                new EventsManagerModule(),
                 new CollectSightingsModule(),
                 new CallBehaviorModule(callBehavior, linkToZoneResolver));
 
