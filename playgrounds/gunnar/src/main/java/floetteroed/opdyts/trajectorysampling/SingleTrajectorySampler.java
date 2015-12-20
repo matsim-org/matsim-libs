@@ -31,6 +31,7 @@ import floetteroed.opdyts.DecisionVariable;
 import floetteroed.opdyts.ObjectiveFunction;
 import floetteroed.opdyts.SimulatorState;
 import floetteroed.opdyts.convergencecriteria.ConvergenceCriterion;
+import floetteroed.utilities.statisticslogging.Statistic;
 
 /**
  * 
@@ -113,5 +114,11 @@ public class SingleTrajectorySampler<U extends DecisionVariable> implements
 		} else {
 			return 0;
 		}
+	}
+
+	@Override
+	public void addStatistic(final String logFileName,
+			final Statistic<SamplingStage<U>> statistic) {
+		throw new UnsupportedOperationException();
 	}
 }
