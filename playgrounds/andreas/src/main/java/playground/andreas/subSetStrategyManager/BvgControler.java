@@ -18,25 +18,13 @@
  * *********************************************************************** */
 package playground.andreas.subSetStrategyManager;
 
-import java.util.Set;
-
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.replanning.PlanStrategy;
-import org.matsim.core.replanning.PlanStrategyImpl;
-import org.matsim.core.replanning.StrategyManager;
-import org.matsim.core.replanning.StrategyManagerConfigLoader;
-import org.matsim.core.replanning.modules.ReRoute;
-import org.matsim.core.replanning.modules.TripTimeAllocationMutator;
-import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
-import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.PtConstants;
 
@@ -73,28 +61,28 @@ public class BvgControler extends Controler {
 //		simulation.run();
 //	}
 
-	private StrategyManager myLoadStrategyManager() {
-		SubSetStrategyManager manager = new SubSetStrategyManager();
-		StrategyManagerConfigLoader.load(this, manager); // load defaults
-
-		// load special groups
-		{
-			Set<Id> ids = ReadSingleTripPersons.readStopNameMap(singleTripPersonsFile);
-			StrategyManager mgr = new StrategyManager();
-
-			PlanStrategy strategy1 = new PlanStrategyImpl(new ExpBetaPlanSelector(this.getConfig().planCalcScore()));
-			mgr.addStrategyForDefaultSubpopulation(strategy1, 0.9);
-
-			PlanStrategyImpl strategy2 = new PlanStrategyImpl(new RandomPlanSelector());
-			strategy2.addStrategyModule(new TripTimeAllocationMutator(this.getConfig(), getTripRouterProvider(), 7200, true));
-			strategy2.addStrategyModule(new ReRoute(getScenario(), getTripRouterProvider()));
-			mgr.addStrategyForDefaultSubpopulation(strategy2, 0.1);
-			mgr.addChangeRequestForDefaultSubpopulation(90,strategy2,0.0);
-
-			manager.addSubset(ids, mgr);
-		}
-		return manager;
-	}
+//	private StrategyManager myLoadStrategyManager() {
+//		SubSetStrategyManager manager = new SubSetStrategyManager();
+//		StrategyManagerConfigLoader.load(this, manager); // load defaults
+//
+//		// load special groups
+//		{
+//			Set<Id> ids = ReadSingleTripPersons.readStopNameMap(singleTripPersonsFile);
+//			StrategyManager mgr = new StrategyManager();
+//
+//			PlanStrategy strategy1 = new PlanStrategyImpl(new ExpBetaPlanSelector(this.getConfig().planCalcScore()));
+//			mgr.addStrategyForDefaultSubpopulation(strategy1, 0.9);
+//
+//			PlanStrategyImpl strategy2 = new PlanStrategyImpl(new RandomPlanSelector());
+//			strategy2.addStrategyModule(new TripTimeAllocationMutator(this.getConfig(), getTripRouterProvider(), 7200, true));
+//			strategy2.addStrategyModule(new ReRoute(getScenario(), getTripRouterProvider()));
+//			mgr.addStrategyForDefaultSubpopulation(strategy2, 0.1);
+//			mgr.addChangeRequestForDefaultSubpopulation(90,strategy2,0.0);
+//
+//			manager.addSubset(ids, mgr);
+//		}
+//		return manager;
+//	}
 
 	public static void main(final String[] args) {
 
@@ -125,14 +113,14 @@ public class BvgControler extends Controler {
 //		TransitRouterConfig routerConfig = new TransitRouterConfig(config.planCalcScore(), config.plansCalcRoute(), config.transitRouter(), config.vspExperimental());
 		final BvgControler c = new BvgControler(sc);
         c.setScoringFunctionFactory(new BvgScoringFunctionFactory( sc , new BvgScoringFunctionConfigGroup(config) ) );
-        AbstractModule myStrategyManagerModule = new AbstractModule() {
-
-            @Override
-            public void install() {
-				bind(StrategyManager.class).toInstance(c.myLoadStrategyManager());
-			}
-        };
-        c.addOverridingModule(myStrategyManagerModule);
+//        AbstractModule myStrategyManagerModule = new AbstractModule() {
+//
+//            @Override
+//            public void install() {
+//				bind(StrategyManager.class).toInstance(c.myLoadStrategyManager());
+//			}
+//        };
+//        c.addOverridingModule(myStrategyManagerModule);
         c.run();
 	}
 }

@@ -53,8 +53,6 @@ public class StrategyManager implements MatsimManager {
 
 	private static final Logger log = Logger.getLogger(StrategyManager.class);
 
-	private static int externalCounter = 0;
-
 	private final GenericStrategyManager<Plan, Person> delegate;
 
 	@Inject
@@ -94,10 +92,6 @@ public class StrategyManager implements MatsimManager {
 
 	public StrategyManager() {
 		this.delegate = new GenericStrategyManager<>();
-	}
-
-	public StrategyManager(GenericStrategyManager<Plan, Person> delegate) {
-		this.delegate = delegate;
 	}
 
 	/**
