@@ -59,10 +59,7 @@ class TravelDisutilityUtils {
 		
 		List<EventsToScore> e2s = new ArrayList<EventsToScore>() ;
 		for ( int ii=0 ; ii<N_TESTS+1 ; ii++ ) {
-			e2s.add( new EventsToScore(scenario, scoringFunctionFactory,0.0 ) ) ;
-			// EventsToScore does not only compute scores, but also updates the plan score (taken from scenario).  Setting the 
-			// learning rate to 0.0 will hopefully not do anything there.
-			// yyyy still dangerous.  assume someone counts how often a plan is scored ...
+			e2s.add(EventsToScore.createWithoutScoreUpdating(scenario, scoringFunctionFactory)) ;
 		}
 		
 		double effMargUtlTTimeMAX = Double.NEGATIVE_INFINITY ;

@@ -80,7 +80,7 @@ public class CrowdingToSQLWriter {
 				((LoadFactor60ScoringFunctionFactory) sfFactory).setScenario(scenario);
 				((LoadFactor60ScoringFunctionFactory) sfFactory).setScoreTracker(scoreTracker);
 
-				events2Score = new EventsToScore(scenario, sfFactory);
+				events2Score = EventsToScore.createWithScoreUpdating(scenario, sfFactory);
 
 
 				//ScoringFunctionFactory sfFactory = new LoadFactor60ScoringFunctionFactory(new CharyparNagelScoringFunctionFactory(scenario), events2Score, scoreTracker, scenario);

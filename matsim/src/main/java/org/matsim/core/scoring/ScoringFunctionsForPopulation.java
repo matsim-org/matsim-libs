@@ -33,6 +33,9 @@ import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.PersonMoneyEvent;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -40,8 +43,10 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.core.api.internal.HasPersonId;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansConfigGroup;
+import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scoring.EventsToActivities.ActivityHandler;
@@ -166,4 +171,25 @@ class ScoringFunctionsForPopulation implements ActivityHandler, LegHandler {
 			throw new RuntimeException(e);
 		}
 	}
+
+	public void handleEvent(Event event) {
+		// this is for the stuff that is directly based on events.
+		// note that this passes on _all_ person events, even those already passed above.
+		// for the time being, not all PersonEvents may "implement HasPersonId".
+		// link enter/leave events are NOT passed on, for performance reasons.
+		// kai/dominik, dec'12
+		if ( event instanceof HasPersonId) {
+			ScoringFunction sf = getScoringFunctionForAgent( ((HasPersonId)event).getPersonId());
+			if (sf != null) {
+				if ( event instanceof PersonStuckEvent) {
+					sf.agentStuck( event.getTime() ) ;
+				} else if ( event instanceof PersonMoneyEvent) {
+					sf.addMoney( ((PersonMoneyEvent)event).getAmount() ) ;
+				} else {
+					sf.handleEvent( event ) ;
+				}
+			}
+		}
+	}
+
 }

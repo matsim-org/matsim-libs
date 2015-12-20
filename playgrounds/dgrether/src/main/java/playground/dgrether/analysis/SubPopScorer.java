@@ -79,13 +79,13 @@ public class SubPopScorer {
   	PersonEventFilter filter = new PersonEventFilter(idSet);
   	events.addFilter(filter);
   	//add the handler to score
-  	EventsToScore scorer = new EventsToScore(this.scenario, new CharyparNagelScoringFunctionFactory( scenario ) );
+  	EventsToScore scorer = EventsToScore.createWithScoreUpdating(this.scenario, new CharyparNagelScoringFunctionFactory(scenario));
   	events.addHandler(scorer);
 
   	reader.readFile(eventsFilePath);
   	scorer.finish();
   	log.info("Size of subpopulation: " + idSet.size());
-  	log.info("Score of subpopulation: " + scorer.getAveragePlanPerformance());
+//  	log.info("Score of subpopulation: " + scorer.getAveragePlanPerformance());
 	}
 
 	private Set<Id<Person>> filterPlans(Population plans) {

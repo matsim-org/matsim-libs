@@ -75,7 +75,7 @@ public class InternalizingPlansScoring implements PlansScoring, ScoringListener,
 
 	@Override
 	public void notifyIterationStarts(final IterationStartsEvent event) {
-		this.eventsToScore = new EventsToScore( this.sc, this.scoringFunctionFactory, this.sc.getConfig().planCalcScore().getLearningRate() );
+		this.eventsToScore = EventsToScore.createWithScoreUpdating(this.sc, this.scoringFunctionFactory);
 		this.events.addHandler(this.eventsToScore);
 	}
 

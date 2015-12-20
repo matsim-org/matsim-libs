@@ -53,7 +53,7 @@ public class EventsToScoreTest extends MatsimTestCase {
 		Person person = PopulationUtils.createPerson(Id.create(1, Person.class));
 		population.addPerson(person);
 		MockScoringFunctionFactory sfFactory = new MockScoringFunctionFactory();
-		EventsToScore e2s = new EventsToScore(scenario, sfFactory, 1.0);
+		EventsToScore e2s = EventsToScore.createWithScoreUpdating(scenario, sfFactory);
 		EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(e2s);
 
@@ -88,7 +88,7 @@ public class EventsToScoreTest extends MatsimTestCase {
 		person.addPlan(plan);
 		
 		ScoringFunctionFactory sfFactory = new CharyparNagelScoringFunctionFactory( scenario );
-		EventsToScore e2s = new EventsToScore(scenario, sfFactory, 1.0);
+		EventsToScore e2s = EventsToScore.createWithScoreUpdating(scenario, sfFactory);
 		EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(e2s);
 		

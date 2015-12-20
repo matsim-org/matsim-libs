@@ -45,7 +45,7 @@ public class SinglePlanScoring {
 		Config dummyConfig = ConfigUtils.createConfig() ;
 		Scenario dummyScenario = ScenarioUtils.createScenario(dummyConfig) ;
 	
-		EventsToScore ev2score = new EventsToScore( dummyScenario, scoringFunctionFactory) ;
+		EventsToScore ev2score = EventsToScore.createWithScoreUpdating(dummyScenario, scoringFunctionFactory);
 		
 		int idx = -1 ;
 		double prevActEndTime = Time.UNDEFINED_TIME ;

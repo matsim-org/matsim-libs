@@ -69,7 +69,7 @@ public class HeterogeneousCharyparNagelScoringFunctionForAnalysisFactoryTest {
 		}
 		testee.finish();
 		double score = testee.getScore();
-		EventsToScore eventsToScore = new EventsToScore(f.scenario, heterogeneousCharyparNagelScoringFunctionForAnalysisFactory);
+		EventsToScore eventsToScore = EventsToScore.createWithScoreUpdating(f.scenario, heterogeneousCharyparNagelScoringFunctionForAnalysisFactory);
 		double scoreFromEvents = calcScoreFromEvents(eventsToScore, f);
 		assertEquals("Score computed from the plan elements should be the same as score computed from stream of events constructed from plan elements.", score, scoreFromEvents, EPSILON);
 		return score;
@@ -88,7 +88,7 @@ public class HeterogeneousCharyparNagelScoringFunctionForAnalysisFactoryTest {
 		}
 		testee.finish();
 		double score = testee.getScore();
-		EventsToScore eventsToScore = new EventsToScore(f.scenario, heterogeneousCharyparNagelScoringFunctionForAnalysisFactory);
+		EventsToScore eventsToScore = EventsToScore.createWithScoreUpdating(f.scenario, heterogeneousCharyparNagelScoringFunctionForAnalysisFactory);
 		double scoreFromEvents = calcScoreFromEvents(eventsToScore, f);
 		assertEquals("Score computed from the plan elements should be the same as score computed from stream of events constructed from plan elements.", score, scoreFromEvents, EPSILON);
 		return score;

@@ -123,9 +123,9 @@ public class EquilTwoAgentsTest extends MatsimTestCase {
 //				ActivityUtilityParameters activityUtilityParameters = factory.create() ;
 //
 //				params.utilParams.put("h", activityUtilityParameters);
-				EquilTwoAgentsTest.this.planScorer = new EventsToScore(controler.getScenario(), 
+				EquilTwoAgentsTest.this.planScorer = EventsToScore.createWithScoreUpdating(controler.getScenario(),
 //						new CharyparNagelScoringFunctionFactory(params, controler.getScenario().getNetwork()));
-						new CharyparNagelScoringFunctionFactory( controler.getScenario() ) );
+						new CharyparNagelScoringFunctionFactory(controler.getScenario()));
 				
 				controler.getEvents().addHandler(EquilTwoAgentsTest.this.planScorer);
 			}

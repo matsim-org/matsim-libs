@@ -75,7 +75,7 @@ public class UtilityByPartsAnalyzer extends AbstractAnalysisModule {
 		int lastIt = sc.getConfig().controler().getLastIteration();
 		this.eventsFile = outputDir+"/ITERS/it."+lastIt+"/"+lastIt+".events.xml.gz";
 		ScoringFunctionFactory sfFactory = getScoringFunctionFactory(sc);
-		this.events2Score = new EventsToScore(sc, sfFactory);
+		this.events2Score = EventsToScore.createWithScoreUpdating(sc, sfFactory);
 		preProcessData();
 		postProcessData();
 	}
