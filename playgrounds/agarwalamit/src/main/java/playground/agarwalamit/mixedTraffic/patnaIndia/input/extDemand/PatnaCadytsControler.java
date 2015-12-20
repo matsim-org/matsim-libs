@@ -175,10 +175,12 @@ public class PatnaCadytsControler {
 		act3.setTypicalDuration(12*60*60);
 		config.planCalcScore().addActivityParams(act3);
 
-		ActivityParams act4 = new ActivityParams("E2I_mid");
-		act4.setTypicalDuration(8*60*60);
-		config.planCalcScore().addActivityParams(act4);
-
+		for(String area : OuterCordonUtils.getAreaType2ZoneIds().keySet()){
+			ActivityParams act4 = new ActivityParams("E2I_mid_"+area.substring(0,3));
+			act4.setTypicalDuration(8*60*60);
+			config.planCalcScore().addActivityParams(act4);			
+		}
+		
 		config.plans().setRemovingUnneccessaryPlanAttributes(true);
 		config.vspExperimental().addParam("vspDefaultsCheckingLevel", "abort");
 		config.vspExperimental().setWritingOutputEvents(true);
