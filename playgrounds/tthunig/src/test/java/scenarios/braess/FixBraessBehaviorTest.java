@@ -152,7 +152,7 @@ public final class FixBraessBehaviorTest{
 					
 		// add a controller listener to analyze results
 		TtAbstractAnalysisTool handler = new TtAnalyzeBraess();
-		controler.addControlerListener(new TtListenerToBindAndWriteAnalysis(scenario, handler));
+		controler.addControlerListener(new TtListenerToBindAndWriteAnalysis(scenario, handler, false));
 			
 		controler.run();		
 		

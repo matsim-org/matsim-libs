@@ -46,10 +46,13 @@ public class TtListenerToBindAndWriteAnalysis implements StartupListener, Iterat
 	private Scenario scenario;
 	private TtAbstractAnalysisTool handler;
 	private TtAnalyzedResultsWriter writer;
+	// flag to switch writing off and on
+	private boolean write;
 	
-	public TtListenerToBindAndWriteAnalysis(Scenario scenario, TtAbstractAnalysisTool handler) {
+	public TtListenerToBindAndWriteAnalysis(Scenario scenario, TtAbstractAnalysisTool handler, boolean write) {
 		this.scenario = scenario;
 		this.handler = handler;
+		this.write = write;
 	}
 
 	@Override
@@ -57,23 +60,26 @@ public class TtListenerToBindAndWriteAnalysis implements StartupListener, Iterat
 		// add the analysis tool as events handler to the events manager
 		event.getControler().getEvents().addHandler(handler);
 		
-		// prepare the results writer
-		this.writer = new TtAnalyzedResultsWriter(handler, scenario.getConfig().controler().getOutputDirectory(), 
-				scenario.getConfig().controler().getLastIteration());
+		if (write) {
+			// prepare the results writer
+			this.writer = new TtAnalyzedResultsWriter(handler, scenario.getConfig().controler().getOutputDirectory(), scenario.getConfig().controler().getLastIteration());
+		}
 	}
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
-		// write analyzed data
-		writer.writeIterationResults(event.getIteration());
-		runGnuplotScript("plot_routeDistribution", event.getIteration());
-				
-		// handle last iteration
-		if (event.getIteration() == scenario.getConfig().controler().getLastIteration()){
-			// close overall writing stream
-			writer.closeAllStreams();
-			// plot overall iteration results
-			runGnuplotScript("plot_routesAndTTs", event.getIteration());
+		if (write) {
+			// write analyzed data
+			writer.writeIterationResults(event.getIteration());
+			runGnuplotScript("plot_routeDistribution", event.getIteration());
+
+			// handle last iteration
+			if (event.getIteration() == scenario.getConfig().controler().getLastIteration()) {
+				// close overall writing stream
+				writer.closeAllStreams();
+				// plot overall iteration results
+				runGnuplotScript("plot_routesAndTTs", event.getIteration());
+			}
 		}
 	}
 	

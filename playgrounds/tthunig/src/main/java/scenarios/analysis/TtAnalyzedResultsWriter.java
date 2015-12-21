@@ -57,7 +57,9 @@ public class TtAnalyzedResultsWriter {
 
 	private void prepareOverallItWriting() {
 		// create output dir for overall iteration analysis
-		String lastItOutputDir = this.outputDirBase + "ITERS/it." + this.lastIteration + "/analysis/";
+		String lastItDir = this.outputDirBase + "ITERS/it." + this.lastIteration + "/";
+		new File(lastItDir).mkdir();
+		String lastItOutputDir = lastItDir + "analysis/";
 		new File(lastItOutputDir).mkdir();
 		
 		// create writing stream
