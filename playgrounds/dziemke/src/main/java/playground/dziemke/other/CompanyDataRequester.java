@@ -1,10 +1,8 @@
-package playground.gthunig.berlinCompanyData;
+package playground.dziemke.other;
+
+import playground.dziemke.accessibility.ptmatrix.InputsCSVWriter;
 
 import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
@@ -28,85 +26,55 @@ public class CompanyDataRequester {
             "-nach-unternehmensdaten/suchergebnisse.html?tx_s4afreekmu_pi1%5Bfilter%5D=postcode&tx_s4afreekmu" +
             "_pi1%5Bvalue%5D=1&tx_s4afreekmu_pi1%5Border%5D=name&tx_s4afreekmu_pi1%5Bdirection%5D=asc&tx_s4af" +
             "reekmu_pi1%5Blimit%5D=10&tx_s4afreekmu_pi1%5Bpage%5D=";
-    private static final String SEPERATOR = "%";
 
     public static void main(String[] args) {
         long time = System.currentTimeMillis();
         List<CompanyData> companyData = getCompanyData();
-        writeCompanyData(companyData, new File("companyData.txt"));
+        writeCompanyData(companyData, "companyData.csv");
         System.out.println(System.currentTimeMillis() - time);
     }
 
-    public static void writeCompanyData(List<CompanyData> companyData, File outputFile) {
+    public static void writeCompanyData(List<CompanyData> companyData, String outputPath) {
 
-        FileOutputStream fileOutputStream = null;
-        try {
-            fileOutputStream = new FileOutputStream(outputFile);
-        } catch (FileNotFoundException e1) {
-            e1.printStackTrace();
-        }
-        DataOutputStream dataOutputStream = new DataOutputStream(fileOutputStream);
+        InputsCSVWriter writer = new InputsCSVWriter(outputPath, ";");
 
-        try {
-            writeInitialLine(dataOutputStream);
-            for (int i = 0; i < companyData.size(); i++) {
-                dataOutputStream.writeBytes(Integer.toString(i+1));
-                dataOutputStream.writeBytes(SEPERATOR);
-                System.out.println("i = " + i + " " + companyData.get(i));
-                writeCompanyData(dataOutputStream, companyData.get(i));
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+        writeInitialLine(writer);
+        for (CompanyData currentData : companyData) {
+            writeCompanyData(writer, currentData);
         }
-        try {
-            dataOutputStream.close();
-            fileOutputStream.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        writer.close();
+    }
+
+    private static void writeInitialLine(InputsCSVWriter writer) {
+        writer.writeField("Firmenname");
+        writer.writeField("PLZ");
+        writer.writeField("Ort");
+        writer.writeField("Gesellschaftsform");
+        writer.writeField("Handelsregisternummer");
+        writer.writeField("Branche(n)");
+        writer.writeField("Latitude");
+        writer.writeField("Longitude");
+        writer.writeNewLine();
     }
 
     private static void writeCompanyData
-            (DataOutputStream dataOutputStream, CompanyData companyData) throws  IOException {
-        dataOutputStream.writeBytes(companyData.getCompanyName());
-        dataOutputStream.writeBytes(SEPERATOR);
-        dataOutputStream.writeBytes(companyData.getZipCode());
-        dataOutputStream.writeBytes(SEPERATOR);
-        dataOutputStream.writeBytes(companyData.getPlace());
-        dataOutputStream.writeBytes(SEPERATOR);
-        dataOutputStream.writeBytes(companyData.getCorporateForm());
-        dataOutputStream.writeBytes(SEPERATOR);
-        dataOutputStream.writeBytes(companyData.getCommercialRegisterNumber());
-        dataOutputStream.writeBytes(SEPERATOR);
-        for (String s : companyData.getSector()) {
-            dataOutputStream.writeBytes(s);
-            dataOutputStream.writeBytes(SEPERATOR);
+            (InputsCSVWriter writer, CompanyData companyData) {
+        writer.writeField(companyData.getCompanyName());
+        writer.writeField(companyData.getZipCode());
+        writer.writeField(companyData.getPlace());
+        writer.writeField(companyData.getCorporateForm());
+        writer.writeField(companyData.getCommercialRegisterNumber());
+        String sector = "";
+        for (int i = 0; i < companyData.getSector().size(); i++) {
+            sector += companyData.getSector().get(i);
+            if (i != companyData.getSector().size()-1) {
+                sector += "/";
+            }
         }
-        dataOutputStream.writeBytes(companyData.getxCoordinate());
-        dataOutputStream.writeBytes(SEPERATOR);
-        dataOutputStream.writeBytes(companyData.getyCoordinate());
-        dataOutputStream.writeBytes("\n");
-    }
-
-    private static void writeInitialLine(DataOutputStream dataOutputStream) throws IOException {
-        dataOutputStream.writeBytes("Nr");
-        dataOutputStream.writeBytes(SEPERATOR);
-        dataOutputStream.writeBytes("Firmenname");
-        dataOutputStream.writeBytes(SEPERATOR);
-        dataOutputStream.writeBytes("PLZ");
-        dataOutputStream.writeBytes(SEPERATOR);
-        dataOutputStream.writeBytes("Ort");
-        dataOutputStream.writeBytes(SEPERATOR);
-        dataOutputStream.writeBytes("Gesellschaftsform");
-        dataOutputStream.writeBytes(SEPERATOR);
-        dataOutputStream.writeBytes("Handelsregisternummer");
-        dataOutputStream.writeBytes(SEPERATOR);
-        dataOutputStream.writeBytes("Branche(n)");
-        dataOutputStream.writeBytes(SEPERATOR);
-        dataOutputStream.writeBytes("x Koordinate");
-        dataOutputStream.writeBytes(SEPERATOR);
-        dataOutputStream.writeBytes("y Koordinate");
-        dataOutputStream.writeBytes("\n");
+        writer.writeField(sector);
+        writer.writeField(companyData.getxCoordinate());
+        writer.writeField(companyData.getyCoordinate());
+        writer.writeNewLine();
     }
 
     private static List<CompanyData> getCompanyData() {
@@ -129,12 +97,17 @@ public class CompanyDataRequester {
                                 String[] splitString = line.split("%");
                                 String id = splitString[splitString.length-1].split("\"")[0];
                                 bufferedReader.readLine();
-                                bufferedReader.readLine();
                                 line = bufferedReader.readLine();
-                                String corporateForm = removeTagFromContent(formatContent(line), "td");
-                                CompanyData currentCompanyData = getCompanyDataFromIdAndPageIndex(id, i);
-                                currentCompanyData.setCorporateForm(corporateForm);
-                                companyData.add(currentCompanyData);
+                                if (line.contains("<td>Berlin</td>")) {
+                                    line = bufferedReader.readLine();
+                                    String corporateForm = removeTagFromContent(formatContent(line), "td");
+                                    CompanyData currentCompanyData = getCompanyDataFromIdAndPageIndex(id, i);
+                                    currentCompanyData.setCorporateForm(removeTapsAndSpacesBeforeLine(corporateForm));
+                                    companyData.add(currentCompanyData);
+                                }
+                            }
+                            if (line.contains("Ihre Suche ergab leider keine Treffer.")) {
+                                continueReading = false;
                             }
                         }
                     } catch (IOException e2) {
@@ -144,10 +117,7 @@ public class CompanyDataRequester {
                     e1.printStackTrace();
                 }
             } catch (MalformedURLException e) {
-                continueReading = false;
-            }
-            if (i > 1) {
-                continueReading = false;
+                e.printStackTrace();
             }
         } while(continueReading);
         return companyData;
@@ -178,23 +148,26 @@ public class CompanyDataRequester {
                     while ((line = bufferedReader.readLine()) != null) {
                         if (line.contains("s4a_freekmu_single_content")) {
                             line = bufferedReader.readLine();
-                            data.setCompanyName(removeTagFromContent(formatContent(line), "h1"));
+                            data.setCompanyName(removeTapsAndSpacesBeforeLine(
+                                    removeTagFromContent(formatContent(line), "h1")));
                         }
                         if (line.contains("<h5>Ort</h5>")) {
                             line = bufferedReader.readLine();
-                            String[] site = removeTagFromContent(removeSpacesBeforeLine(line), "p").split(" ");
-                            data.setZipCode(site[0]);
-                            data.setPlace(site[1]);
+                            String[] site = removeTagFromContent(removeTapsAndSpacesBeforeLine(line), "p").split(" ");
+                            data.setZipCode(removeTapsAndSpacesBeforeLine(site[0]));
+                            data.setPlace(removeTapsAndSpacesBeforeLine(site[1]));
                         }
                         if (line.contains("<h5>Register</h5>")) {
                             line = bufferedReader.readLine();
-                            data.setCommercialRegisterNumber(removeTagFromContent(removeSpacesBeforeLine(line), "p"));
+                            data.setCommercialRegisterNumber(removeTapsAndSpacesBeforeLine(
+                                    removeTagFromContent(removeTapsAndSpacesBeforeLine(line), "p")));
                         }
-                        if (line.contains("<h5>Branche(n):</h5>") && (line = bufferedReader.readLine()).contains("<ul>")) {
+                        if (line.contains("<h5>Branche(n):</h5>") &&
+                                (line = bufferedReader.readLine()).contains("<ul>")) {
                             ArrayList<String> sector = new ArrayList<>();
                             while (!(line = bufferedReader.readLine()).contains("</ul>")) {
                                 if (line.contains("<li>")) {
-                                    sector.add(removeTagFromContent(formatContent(line), "li"));
+                                    sector.add(removeTapsAndSpacesBeforeLine(removeTagFromContent(formatContent(line), "li")));
                                 }
                             }
                             data.setSector(sector);
@@ -202,8 +175,8 @@ public class CompanyDataRequester {
                         if (line.contains("LatLng")) {
                             String[] coordinates = line.split("LatLng")[1].
                                     replace("(", "").replace(")", "").replace(";", "").split(", ");
-                            data.setxCoordinate(coordinates[0]);
-                            data.setyCoordinate(coordinates[1]);
+                            data.setxCoordinate(removeTapsAndSpacesBeforeLine(coordinates[0]));
+                            data.setyCoordinate(removeTapsAndSpacesBeforeLine(coordinates[1]));
                         }
                     }
                 } catch (IOException e2) {
@@ -217,10 +190,11 @@ public class CompanyDataRequester {
     }
 
     private static String formatContent(String content) {
-        return removeTagFromContent(removeSpacesBeforeLine(content).replace("&nbsp;", " "), "strong");
+        return removeTagFromContent(removeTapsAndSpacesBeforeLine(content).replace("&nbsp;", " ").replace(";", ""), "strong");
     }
 
-    private static String removeSpacesBeforeLine(String line) {
+    private static String removeTapsAndSpacesBeforeLine(String line) {
+        line = line.replaceAll("\t", "");
         while (line.startsWith(" ")) {
             line = line.replaceFirst(" ", "");
         }
