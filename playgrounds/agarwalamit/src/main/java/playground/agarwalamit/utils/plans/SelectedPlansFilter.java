@@ -38,12 +38,12 @@ public class SelectedPlansFilter {
 
 	public static Logger log = Logger.getLogger(SelectedPlansFilter.class);
 
-	private final String runDir = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/output/run22/";
-	private final String inputPlans = runDir + "/output_plans.xml.gz";
+	private final static String runDir = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/output/run22/";
+	private final static String inputPlans = runDir + "/output_plans.xml.gz";
 
-	private String outputPlans = runDir + "selectedPlansOnly.xml.gz"; 
+	private final static String outputPlans = runDir + "selectedPlansOnly.xml.gz"; 
 
-	private void run (){
+	public void run (final String inputPlans, final String outputPlans){
 		Scenario sc = LoadMyScenarios.loadScenarioFromPlans(inputPlans);
 		Scenario scOut = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Population popOut = scOut.getPopulation();
@@ -60,6 +60,6 @@ public class SelectedPlansFilter {
 	}
 
 	public static void main(String[] args) {
-		new SelectedPlansFilter().run();
+		new SelectedPlansFilter().run(inputPlans, outputPlans);
 	}
 }
