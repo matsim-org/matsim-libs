@@ -95,8 +95,7 @@ public class EventsToScore implements BasicEventHandler {
 						bind(EventsToScore.class).asEagerSingleton();
 						bind(EventsManager.class).toInstance(eventsManager);
 					}
-				},
-				new EventsManagerModule());
+				});
 		return injector.getInstance(EventsToScore.class);
 	}
 
