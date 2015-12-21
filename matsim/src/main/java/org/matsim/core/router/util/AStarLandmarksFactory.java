@@ -23,6 +23,8 @@ package org.matsim.core.router.util;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.GlobalConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.router.AStarLandmarks;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 
@@ -39,9 +41,9 @@ public class AStarLandmarksFactory implements LeastCostPathCalculatorFactory {
 	private PreProcessLandmarks preProcessData;
 
 	@Inject
-	AStarLandmarksFactory(Config config, Network network, Map<String, TravelTime> travelTime, Map<String, TravelDisutilityFactory> travelDisutilityFactory) {
+	AStarLandmarksFactory(PlanCalcScoreConfigGroup planCalcScoreConfigGroup, GlobalConfigGroup globalConfigGroup, Network network, Map<String, TravelTime> travelTime, Map<String, TravelDisutilityFactory> travelDisutilityFactory) {
 		//TODO: No guarantee that these are the same travel times for which the router is later requested.
-		this(network, travelDisutilityFactory.get(TransportMode.car).createTravelDisutility(travelTime.get(TransportMode.car), config.planCalcScore()), config.global().getNumberOfThreads());
+		this(network, travelDisutilityFactory.get(TransportMode.car).createTravelDisutility(travelTime.get(TransportMode.car), planCalcScoreConfigGroup), globalConfigGroup.getNumberOfThreads());
 	}
 
 	public AStarLandmarksFactory(Network network, final TravelDisutility fsttc) {
