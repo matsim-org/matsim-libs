@@ -227,6 +227,7 @@ public class ParallelTrajectorySampler<U extends DecisionVariable> implements
 				this.fromState.implementInSimulation();
 			}
 			this.currentDecisionVariable.implementInSimulation();
+			this.statisticsWriter.writeToFile(null);
 
 		} else {
 

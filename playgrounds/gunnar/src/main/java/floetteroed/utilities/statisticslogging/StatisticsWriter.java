@@ -16,7 +16,7 @@
  *
  * contact: gunnar.floetteroed@abe.kth.se
  *
- */ 
+ */
 package floetteroed.utilities.statisticslogging;
 
 import java.io.BufferedWriter;
@@ -75,7 +75,7 @@ public class StatisticsWriter<D extends Object> {
 				writer = new BufferedWriter(new FileWriter(this.fileName, true));
 			}
 			for (Statistic<D> stat : this.statistics) {
-				writer.write(stat.value(data) + "\t");
+				writer.write(((data == null) ? "--" : stat.value(data)) + "\t");
 			}
 			writer.newLine();
 			writer.flush();
