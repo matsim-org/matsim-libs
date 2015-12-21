@@ -46,7 +46,8 @@ import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Point;
 
-import playground.agarwalamit.mixedTraffic.patnaIndia.PatnaUtils;
+import playground.agarwalamit.mixedTraffic.patnaIndia.utils.OuterCordonUtils;
+import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
 import playground.agarwalamit.utils.GeometryUtils;
 import playground.agarwalamit.utils.LoadMyScenarios;
 

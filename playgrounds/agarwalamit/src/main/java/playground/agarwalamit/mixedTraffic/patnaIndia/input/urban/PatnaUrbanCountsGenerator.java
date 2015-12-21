@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.mixedTraffic.patnaIndia.input;
+package playground.agarwalamit.mixedTraffic.patnaIndia.input.urban;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -31,7 +31,7 @@ import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.CountsWriter;
 
-import playground.agarwalamit.mixedTraffic.patnaIndia.PatnaUtils;
+import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
 
 /**
  * @author amit

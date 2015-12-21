@@ -31,7 +31,8 @@ import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.CountsWriter;
 
-import playground.agarwalamit.mixedTraffic.patnaIndia.PatnaUtils;
+import playground.agarwalamit.mixedTraffic.patnaIndia.utils.OuterCordonUtils;
+import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
 
 /**
  * @author amit

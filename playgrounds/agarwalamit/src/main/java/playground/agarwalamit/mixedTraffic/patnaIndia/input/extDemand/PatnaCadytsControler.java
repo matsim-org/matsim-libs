@@ -52,8 +52,9 @@ import org.matsim.core.scoring.functions.SubpopulationCharyparNagelScoringParame
 import org.matsim.vehicles.VehicleWriterV1;
 
 import playground.agarwalamit.mixedTraffic.patnaIndia.FreeSpeedTravelTimeForBike;
-import playground.agarwalamit.mixedTraffic.patnaIndia.PatnaUtils;
 import playground.agarwalamit.mixedTraffic.patnaIndia.input.PatnaVehiclesGenerator;
+import playground.agarwalamit.mixedTraffic.patnaIndia.utils.OuterCordonUtils;
+import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
 import playground.agarwalamit.utils.plans.SelectedPlansFilter;
 
 /**

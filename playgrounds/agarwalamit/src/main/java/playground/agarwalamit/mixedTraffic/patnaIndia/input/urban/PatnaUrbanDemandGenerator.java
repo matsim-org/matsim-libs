@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.mixedTraffic.patnaIndia.input;
+package playground.agarwalamit.mixedTraffic.patnaIndia.input.urban;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -44,8 +44,8 @@ import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Point;
 
-import playground.agarwalamit.mixedTraffic.patnaIndia.PatnaUtils;
-import playground.agarwalamit.mixedTraffic.patnaIndia.PatnaUtils.PatnaActivityTypes;
+import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
+import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils.PatnaUrbanActivityTypes;
 import playground.agarwalamit.utils.GeometryUtils;
 /**
  * @author amit
@@ -218,38 +218,38 @@ public class PatnaUrbanDemandGenerator {
 		case "1" : {//work act starts between 8 to 9:30 and duration is 8 hours
 			homeActEndTime = 8.0*3600. + random.nextInt(91)*60.; 
 			secondActEndTimeLeaveTime = homeActEndTime + 8*3600.; 
-			secondActType = PatnaActivityTypes.valueOf("work").toString();
+			secondActType = PatnaUrbanActivityTypes.valueOf("work").toString();
 			break; 
 		}  
 		case "2" : { // educational act starts between between 6:30 to 8:30 hours and duration is assumed about 7 hours
 			homeActEndTime = 6.5*3600. + random.nextInt(121)*60.; 
 			secondActEndTimeLeaveTime = homeActEndTime + 7*3600.;
-			secondActType = PatnaActivityTypes.valueOf("educational").toString();
+			secondActType = PatnaUrbanActivityTypes.valueOf("educational").toString();
 			break;
 		}  
 		case "3" : {// social duration between 5 to 7 hours
 			homeActEndTime= 10.*3600. ; 
 			secondActEndTimeLeaveTime = homeActEndTime+ 5.*3600. + random.nextInt(121)*60.; 
-			secondActType = PatnaActivityTypes.valueOf("social").toString();
+			secondActType = PatnaUrbanActivityTypes.valueOf("social").toString();
 			break;
 		}  
 		case "4" : { // other act duration between 5 to 7 hours
 			homeActEndTime = 8.*3600 ; 
 			secondActEndTimeLeaveTime= homeActEndTime + 5.*3600. + random.nextInt(121)*60.; 
-			secondActType = PatnaActivityTypes.valueOf("other").toString();
+			secondActType = PatnaUrbanActivityTypes.valueOf("other").toString();
 			break;
 		} 
 		case "9999" : { // no data
 			homeActEndTime = 8.*3600. + random.nextInt(121)*60.; 
 			secondActEndTimeLeaveTime= homeActEndTime + 7*3600.; 
-			secondActType = PatnaActivityTypes.valueOf("unknown").toString();
+			secondActType = PatnaUrbanActivityTypes.valueOf("unknown").toString();
 			break;
 		} 
 		default : throw new RuntimeException("Trip purpose input code is not recognized. Aborting ...");
 		}
 
 
-		Activity homeAct = populationFactory.createActivityFromCoord(PatnaActivityTypes.valueOf("home").toString(), fromZoneFeatureCoord);
+		Activity homeAct = populationFactory.createActivityFromCoord(PatnaUrbanActivityTypes.valueOf("home").toString(), fromZoneFeatureCoord);
 		homeAct.setEndTime(homeActEndTime); 								
 		plan.addActivity(homeAct);
 		plan.addLeg(populationFactory.createLeg(mode));
