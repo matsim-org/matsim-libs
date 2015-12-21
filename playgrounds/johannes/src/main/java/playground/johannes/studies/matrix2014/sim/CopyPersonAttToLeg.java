@@ -16,29 +16,31 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.synpop.analysis;
+package playground.johannes.studies.matrix2014.sim;
 
-import playground.johannes.synpop.data.Attributable;
+import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.data.Person;
+import playground.johannes.synpop.data.Segment;
+import playground.johannes.synpop.processing.PersonTask;
 
 /**
  * @author jillenberger
  */
-public abstract class AbstractCollector<T, A extends Attributable, P extends Attributable> implements Collector<T> {
+public class CopyPersonAttToLeg implements PersonTask {
 
-    protected Predicate<P> predicate;
+    private final String key;
 
-    protected final ValueProvider<T, A> provider;
-
-    public AbstractCollector(ValueProvider<T, A> provider) {
-        this.provider = provider;
+    public CopyPersonAttToLeg(String key) {
+        this.key = key;
     }
 
-    public void setPredicate(Predicate<P> predicate) {
-        this.predicate = predicate;
+    @Override
+    public void apply(Person person) {
+        String value = person.getAttribute(key);
+        for(Episode e : person.getEpisodes()) {
+            for(Segment leg : e.getLegs()) {
+                leg.setAttribute(key, value);
+            }
+        }
     }
-
-    public Predicate<P> getPredicate() {
-        return predicate;
-    }
-
 }

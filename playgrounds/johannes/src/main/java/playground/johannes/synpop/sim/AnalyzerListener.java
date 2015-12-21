@@ -19,6 +19,7 @@
 
 package playground.johannes.synpop.sim;
 
+import org.apache.log4j.Logger;
 import playground.johannes.synpop.analysis.AnalyzerTask;
 import playground.johannes.synpop.analysis.AnalyzerTaskRunner;
 import playground.johannes.synpop.analysis.FileIOContext;
@@ -35,6 +36,8 @@ import java.util.concurrent.atomic.AtomicLong;
  * @author johannes
  */
 public class AnalyzerListener implements MarkovEngineListener {
+
+    private static final Logger logger = Logger.getLogger(AnalyzerListener.class);
 
     private final AnalyzerTask task;
 
@@ -57,9 +60,10 @@ public class AnalyzerListener implements MarkovEngineListener {
     @Override
     public void afterStep(Collection<CachedPerson> population, Collection<? extends Attributable> mutations, boolean accepted) {
         if (iters.get() % interval == 0) {
+            logger.debug("Analyzing simulation population...");
             ioContext.append(df.format(iters.get()));
             AnalyzerTaskRunner.run(population, task, ioContext);
-
+            logger.debug("Done.");
         }
         iters.incrementAndGet();
     }

@@ -26,6 +26,7 @@ import playground.johannes.synpop.analysis.AnalyzerTask;
 import playground.johannes.synpop.analysis.FileIOContext;
 import playground.johannes.synpop.analysis.Predicate;
 import playground.johannes.synpop.analysis.StatsContainer;
+import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.Episode;
 import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.data.Segment;
@@ -105,8 +106,9 @@ public class ZoneMobilityRate implements AnalyzerTask<Collection<? extends Perso
 
         for (Person person : persons) {
             String category = person.getAttribute(categoryKey);
+            Double weight = Double.parseDouble(person.getAttribute(CommonKeys.PERSON_WEIGHT));
             if (category != null) {
-                int personTrips = 0;
+                double personTrips = 0;
                 for (Episode episode : person.getEpisodes()) {
                     int episodeTrips = 0;
                     for (Segment leg : episode.getLegs()) {
@@ -118,10 +120,12 @@ public class ZoneMobilityRate implements AnalyzerTask<Collection<? extends Perso
                     personTrips += episodeTrips;
 
                     if (episodeTrips > 0) {
-                        categoryPersons.adjustOrPutValue(category, 1, 1);
+//                        categoryPersons.adjustOrPutValue(category, 1, 1);
+                        categoryPersons.adjustOrPutValue(category, weight, weight);
                     }
                 }
 
+                personTrips = personTrips * weight;
                 categoryTrips.adjustOrPutValue(category, personTrips, personTrips);
             }
         }
