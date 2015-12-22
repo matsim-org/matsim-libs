@@ -55,7 +55,7 @@ public class EventsToExperiencedPlans {
 		Config config = ConfigUtils.createConfig();
 		final Scenario inputSc = ScenarioUtils.createScenario(config);
 
-		Injector injector = Injector.createInjector(config,
+		com.google.inject.Injector injector = Injector.createInjector(config,
 				new ScenarioByInstanceModule(inputSc),
 				new ExperiencedPlanElementsModule(),
 				new CharyparNagelScoringFunctionModule(),

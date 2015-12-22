@@ -68,7 +68,7 @@ public class EventsToScore implements BasicEventHandler {
 	}
 
 	public static EventsToScore createWithScoreUpdating(final Scenario scenario, final ScoringFunctionFactory scoringFunctionFactory, final EventsManager eventsManager) {
-		Injector injector = Injector.createInjector(scenario.getConfig(),
+		com.google.inject.Injector injector = Injector.createInjector(scenario.getConfig(),
 				new ScenarioByInstanceModule(scenario),
 				new ExperiencedPlanElementsModule(),
 				new AbstractModule() {
@@ -84,7 +84,7 @@ public class EventsToScore implements BasicEventHandler {
 	}
 
 	public static EventsToScore createWithoutScoreUpdating(Scenario scenario, final ScoringFunctionFactory scoringFunctionFactory, final EventsManager eventsManager) {
-		Injector injector = Injector.createInjector(scenario.getConfig(),
+		com.google.inject.Injector injector = Injector.createInjector(scenario.getConfig(),
 				new ScenarioByInstanceModule(scenario),
 				new ExperiencedPlanElementsModule(),
 				new AbstractModule() {
