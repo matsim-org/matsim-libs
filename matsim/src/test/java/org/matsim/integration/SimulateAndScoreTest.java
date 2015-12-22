@@ -195,11 +195,10 @@ public class SimulateAndScoreTest extends MatsimTestCase {
 		EventsManager events = EventsUtils.createEventsManager();
 		Netsim sim = QSimUtils.createDefaultQSim(scenario, events);
 		EventsToScore scorer =
-				new EventsToScore(
+				EventsToScore.createWithScoreUpdating(
 						scenario,
 						new CharyparNagelScoringFunctionFactory(
-								scenario ) );
-		events.addHandler(scorer);
+								scenario), events);
 		EventsCollector handler = new EventsCollector();
 		events.addHandler(handler);
 
@@ -262,8 +261,7 @@ public class SimulateAndScoreTest extends MatsimTestCase {
 		scenario.getConfig().planCalcScore().getModes().get(TransportMode.pt).setMonetaryDistanceRate(monetaryDistanceRatePt);
 		scenario.getConfig().planCalcScore().addActivityParams(h);
 		scenario.getConfig().planCalcScore().addActivityParams(w);
-		EventsToScore scorer = new EventsToScore(scenario, new CharyparNagelScoringFunctionFactory( scenario ) );
-		events.addHandler(scorer);
+		EventsToScore scorer = EventsToScore.createWithScoreUpdating(scenario, new CharyparNagelScoringFunctionFactory(scenario), events);
 		EventsCollector handler = new EventsCollector();
 		events.addHandler(handler);
 

@@ -20,6 +20,7 @@
 
 package playground.artemc.heterogeneity.scoring;
 
+import com.google.inject.Inject;
 import org.apache.commons.math.MathException;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -32,7 +33,6 @@ import playground.artemc.heterogeneity.IncomeHeterogeneity;
 import playground.artemc.heterogeneity.scoring.functions.*;
 import playground.artemc.heterogeneity.scoring.functions.PersonalScoringParameters.Mode;
 
-import javax.inject.Inject;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
@@ -72,7 +72,7 @@ public class HeterogeneousCharyparNagelScoringFunctionForAnalysisFactory impleme
 	}
 
 	//setter method injector
-	@Inject
+	@Inject(optional=true)
 	public void setIncomeHeterogeneity(IncomeHeterogeneity incomeHeterogeneity){
 		this.incomeHeterogeneity = incomeHeterogeneity;
 	}

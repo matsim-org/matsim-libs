@@ -5,21 +5,21 @@ import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
-import org.matsim.core.scoring.EventsToScore;
+import org.matsim.core.scoring.ExperiencedPlansService;
 
 import javax.inject.Inject;
 
 class TravelDistanceStatsControlerListener implements IterationEndsListener, ShutdownListener {
 
 	@Inject
-	private EventsToScore eventsToScore;
+	private ExperiencedPlansService experiencedPlansService;
 
 	@Inject
 	private TravelDistanceStats travelDistanceStats;
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
-		travelDistanceStats.addIteration(event.getIteration(), eventsToScore.getAgentRecords());
+		travelDistanceStats.addIteration(event.getIteration(), experiencedPlansService.getAgentRecords());
 	}
 
 	@Override

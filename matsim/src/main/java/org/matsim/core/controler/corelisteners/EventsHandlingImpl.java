@@ -64,15 +64,11 @@ final class EventsHandlingImpl implements EventsHandling, BeforeMobsimListener,
 	EventsHandlingImpl(
 			final EventsManager eventsManager,
 			final ControlerConfigGroup config,
-			final OutputDirectoryHierarchy controlerIO,
-			final Set<EventHandler> eventHandlersDeclaredByModules) {
+			final OutputDirectoryHierarchy controlerIO) {
 		this.eventsManager = eventsManager;
 		this.writeEventsInterval = config.getWriteEventsInterval();
 		this.eventsFileFormats = config.getEventsFileFormats();
 		this.controlerIO = controlerIO;
-		for (EventHandler eventHandler : eventHandlersDeclaredByModules) {
-			this.eventsManager.addHandler(eventHandler);
-		}
 	}
 
     @Override

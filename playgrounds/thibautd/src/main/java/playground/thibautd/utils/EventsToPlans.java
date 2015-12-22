@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package playground.thibautd.utils;
 
+import com.google.common.eventbus.Subscribe;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
@@ -33,9 +34,8 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.scoring.EventsToActivities;
+import org.matsim.core.scoring.*;
 import org.matsim.core.scoring.EventsToActivities.ActivityHandler;
-import org.matsim.core.scoring.EventsToLegs;
 import org.matsim.core.scoring.EventsToLegs.LegHandler;
 import org.matsim.core.utils.collections.MapUtils;
 
@@ -45,9 +45,9 @@ import java.util.Map;
 /**
  * @author thibautd
  */
-public class EventsToPlans implements ActivityStartEventHandler, ActivityEndEventHandler, PersonDepartureEventHandler, PersonArrivalEventHandler {
-	private final EventsToActivities eventsToActivities = new EventsToActivities();
-	private final EventsToLegs eventsToLegs = new EventsToLegs(null);
+public class EventsToPlans {
+
+	private final IdFilter filter;
 
 	private boolean locked = false;
 	private final Map<Id, Plan> agentsPlans = new HashMap<Id, Plan>();
@@ -65,88 +65,51 @@ public class EventsToPlans implements ActivityStartEventHandler, ActivityEndEven
 		});
 	}
 
-	public EventsToPlans(final IdFilter filter) {
-		eventsToActivities.setActivityHandler(
-				new ActivityHandler() {
-					@Override
-					public void handleActivity(
-							final Id agentId,
-							final Activity activity) {
-						if ( !filter.accept( agentId ) ) return;
-						final Plan plan =
-							MapUtils.getArbitraryObject(
-								agentId,
-								agentsPlans,
-								new MapUtils.Factory<Plan>() {
-									@Override
-									public Plan create() {
-										return new PlanImpl(PopulationUtils.createPerson(agentId));
-									}
-								});
-						plan.addActivity( activity );
-					}
-				});
-		eventsToLegs.setLegHandler(
-				new LegHandler() {
-					@Override
-					public void handleLeg(
-							final Id agentId,
-							final Leg leg) {
-						if ( !filter.accept( agentId ) ) return;
-						final Plan plan =
-							MapUtils.getArbitraryObject(
-								agentId,
-								agentsPlans,
-								new MapUtils.Factory<Plan>() {
-									@Override
-									public Plan create() {
-										return new PlanImpl(PopulationUtils.createPerson(agentId));
-									}
-								});
-							plan.addLeg( leg );
-					}
-				});
+	@Subscribe
+	private void handleActivity(final PersonExperiencedActivity event) {
+		if ( !filter.accept( event.getAgentId()) ) return;
+		final Plan plan =
+				MapUtils.getArbitraryObject(
+						event.getAgentId(),
+						agentsPlans,
+						new MapUtils.Factory<Plan>() {
+							@Override
+							public Plan create() {
+								return new PlanImpl(PopulationUtils.createPerson(event.getAgentId()));
+							}
+						});
+		plan.addActivity( event.getActivity());
 
+	}
+
+	@Subscribe
+	private void handleLeg(final PersonExperiencedLeg event) {
+		if ( !filter.accept( event.getAgentId()) ) return;
+		final Plan plan =
+				MapUtils.getArbitraryObject(
+						event.getAgentId(),
+						agentsPlans,
+						new MapUtils.Factory<Plan>() {
+							@Override
+							public Plan create() {
+								return new PlanImpl(PopulationUtils.createPerson(event.getAgentId()));
+							}
+						});
+		plan.addLeg( event.getLeg() );
+
+	}
+	public EventsToPlans(final IdFilter filter) {
+		this.filter = filter;
 	}
 
 	public Map<Id, Plan> getPlans() {
 		if ( !locked ) {
-			eventsToActivities.finish();
 			locked = true;
 		}
 		return agentsPlans;
 	}
 
-	@Override
-	public void reset(final int iteration) {
-		eventsToActivities.reset( iteration );
-		eventsToLegs.reset( iteration );
-		agentsPlans.clear();
-		locked = false;
-	}
 
-	@Override
-	public void handleEvent(final PersonArrivalEvent event) {
-		if ( locked ) throw new IllegalStateException();
-		eventsToLegs.handleEvent( event );
-	}
 
-	@Override
-	public void handleEvent(final PersonDepartureEvent event) {
-		if ( locked ) throw new IllegalStateException();
-		eventsToLegs.handleEvent( event );
-	}
-
-	@Override
-	public void handleEvent(final ActivityEndEvent event) {
-		if ( locked ) throw new IllegalStateException();
-		eventsToActivities.handleEvent( event );
-	}
-
-	@Override
-	public void handleEvent(final ActivityStartEvent event) {
-		if ( locked ) throw new IllegalStateException();
-		eventsToActivities.handleEvent( event );
-	}
 }
 
