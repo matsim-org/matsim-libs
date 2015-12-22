@@ -19,8 +19,8 @@
 
 package playground.johannes.gsv.fpd;
 
-import playground.johannes.gsv.zones.KeyMatrix;
-import playground.johannes.gsv.zones.io.KeyMatrixXMLWriter;
+import playground.johannes.synpop.matrix.NumericMatrix;
+import playground.johannes.synpop.matrix.NumericMatrixXMLWriter;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -40,7 +40,7 @@ public class Iais2matrix {
 		BufferedReader reader = new BufferedReader(new FileReader("/home/johannes/gsv/fpd/fraunhofer/study/data/raw/24-04-2015/AggregatedTrajectories_all_noTransit_min3D_Flows_daily.csv"));
 		String line = reader.readLine();
 		
-		KeyMatrix m = new KeyMatrix();
+		NumericMatrix m = new NumericMatrix();
 		
 		while((line = reader.readLine()) != null) {
 			String tokens[] = line.split(",");
@@ -53,7 +53,7 @@ public class Iais2matrix {
 		}
 		reader.close();
 		
-		KeyMatrixXMLWriter writer = new KeyMatrixXMLWriter();
+		NumericMatrixXMLWriter writer = new NumericMatrixXMLWriter();
 		writer.write(m, "/home/johannes/gsv/fpd/fraunhofer/study/data/matrix/24-04-2015/iais.3d.xml");
 	}
 

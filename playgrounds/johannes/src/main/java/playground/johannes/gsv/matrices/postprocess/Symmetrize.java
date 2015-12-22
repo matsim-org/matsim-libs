@@ -21,7 +21,7 @@ package playground.johannes.gsv.matrices.postprocess;
 
 import org.apache.log4j.Logger;
 import org.matsim.contrib.common.util.ProgressLogger;
-import playground.johannes.gsv.zones.ObjectKeyMatrix;
+import playground.johannes.synpop.matrix.HashMatrix;
 
 import java.io.*;
 import java.util.*;
@@ -48,7 +48,7 @@ public class Symmetrize {
         BufferedWriter writer = new BufferedWriter(new FileWriter(args[1]));
 
         Set<String> ids = new HashSet<>();
-        ObjectKeyMatrix<Boolean> matrix = new ObjectKeyMatrix<>();
+        HashMatrix<String, Boolean> matrix = new HashMatrix<>();
         Set<String> subkeys = new HashSet<>();
 
         Map<String, Double> volumes = new HashMap<>();

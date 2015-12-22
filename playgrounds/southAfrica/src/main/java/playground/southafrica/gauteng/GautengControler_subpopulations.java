@@ -22,6 +22,7 @@
  */
 package playground.southafrica.gauteng;
 
+import com.google.inject.Provider;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -52,6 +53,7 @@ import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
+import org.matsim.core.router.TripRouter;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
@@ -237,11 +239,12 @@ public class GautengControler_subpopulations {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
+				final Provider<TripRouter> tripRouterProvider = binder().getProvider(TripRouter.class);
 				addPlanStrategyBinding(RE_ROUTE_AND_SET_VEHICLE).toProvider(new javax.inject.Provider<PlanStrategy>() {
 					@Override
 					public PlanStrategy get() {
 						final PlanStrategyImpl planStrategy = new PlanStrategyImpl(new RandomPlanSelector<Plan, Person>());
-						planStrategy.addStrategyModule(new ReRoute(sc));
+						planStrategy.addStrategyModule(new ReRoute(sc, tripRouterProvider));
 						planStrategy.addStrategyModule(new SetVehicleInAllNetworkRoutes(sc));
 						return planStrategy;
 					}
@@ -268,7 +271,9 @@ public class GautengControler_subpopulations {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				addPlanSelectorForRemovalBinding(DIVERSITY_GENERATING_PLANS_REMOVER).toProvider(builder);
+				if (getConfig().strategy().getPlanSelectorForRemoval().equals(DIVERSITY_GENERATING_PLANS_REMOVER)) {
+					bindPlanSelectorForRemoval().toProvider(builder);
+				}
 			}
 		});
 		// yyyy needs to be tested.  But in current runs, all plans of an agent are exactly identical at end of 1000it.  kai, mar'13

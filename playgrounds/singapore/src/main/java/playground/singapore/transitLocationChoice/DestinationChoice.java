@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.TreeMap;
 import java.util.Vector;
 
+import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.locationchoice.random.RandomLocationMutator;
@@ -35,13 +36,18 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
+import org.matsim.core.router.TripRouter;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
+import javax.inject.Provider;
+
 public class DestinationChoice extends AbstractMultithreadedModule {
+
+	private final Provider<TripRouter> tripRouterProvider;
 
 	/**
 	 * yyyy It is unclear to me why we need this as a collection and not just as a variable.  kai, dec'12
@@ -56,8 +62,9 @@ public class DestinationChoice extends AbstractMultithreadedModule {
 	protected TreeMap<String, ActivityFacilityImpl []> facilitiesOfType = new TreeMap<String, ActivityFacilityImpl []>();
 	private final Scenario scenario;
 
-	public DestinationChoice(Scenario scenario) {
+	public DestinationChoice(Provider<TripRouter> tripRouterProvider, Scenario scenario) {
 		super(scenario.getConfig().global());
+		this.tripRouterProvider = tripRouterProvider;
 		if ( DestinationChoiceConfigGroup.Algotype.bestResponse.equals(
 				((DestinationChoiceConfigGroup)scenario.getConfig().getModule("locationchoice")).getAlgorithm())) {
 			throw new RuntimeException("best response location choice not supported as part of LocationChoice. " +
@@ -128,7 +135,7 @@ public class DestinationChoice extends AbstractMultithreadedModule {
 					this.quadTreesOfType, this.facilitiesOfType, MatsimRandom.getLocalInstance()));
 			break ;
 		case localSearchRecursive:
-			this.planAlgoInstances.add(new RecursiveLocationMutator(this.scenario, this.getReplanningContext().getTripRouter(),  
+			this.planAlgoInstances.add(new RecursiveLocationMutator(this.scenario, this.tripRouterProvider.get(),
 					this.quadTreesOfType, this.facilitiesOfType, MatsimRandom.getLocalInstance()));
 			break ;
 		case localSearchSingleAct:

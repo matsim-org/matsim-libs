@@ -20,12 +20,7 @@
 
 package org.matsim.core.controler;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import org.apache.log4j.Layout;
 import org.apache.log4j.Logger;
@@ -36,6 +31,7 @@ import org.matsim.analysis.ScoreStats;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
@@ -50,7 +46,6 @@ import org.matsim.core.controler.corelisteners.PlansDumping;
 import org.matsim.core.controler.corelisteners.PlansReplanning;
 import org.matsim.core.controler.corelisteners.PlansScoring;
 import org.matsim.core.controler.listener.ControlerListener;
-import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.mobsim.external.ExternalMobsim;
 import org.matsim.core.mobsim.framework.Mobsim;
@@ -67,6 +62,7 @@ import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.MutableScenario;
+import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -112,10 +108,17 @@ public class Controler extends AbstractController implements ControlerI {
 	public static final Layout DEFAULTLOG4JLAYOUT = new PatternLayout(
 			"%d{ISO8601} %5p %C{1}:%L %m%n");
 
-	private final Config config; 
-	private final Scenario scenario ;
+	private final Config config;
+	private Scenario scenario;
 
-	private final EventsManager events;
+	@Inject private EventsHandling eventsHandling;
+	@Inject private PlansDumping plansDumping;
+	@Inject private PlansReplanning plansReplanning;
+	@Inject private Provider<Mobsim> mobsimProvider;
+	@Inject private PlansScoring plansScoring;
+	@Inject private DumpDataAtEnd dumpDataAtEnd;
+
+	@Inject private Set<ControlerListener> controlerListenersDeclaredByModules;
 
 	private Injector injector;
 	private boolean injectorCreated = false;
@@ -141,7 +144,7 @@ public class Controler extends AbstractController implements ControlerI {
     // DefaultControlerModule includes submodules. If you want less than what the Controler does
     // by default, you can leave ControlerDefaultsModule out, look at what it does,
     // and only include what you want.
-    private List<AbstractModule> modules = Arrays.<AbstractModule>asList(new ControlerDefaultsModule());
+    private List<AbstractModule> modules = new ArrayList<>(Arrays.<AbstractModule>asList(new ControlerDefaultsModule()));
     // this defines the core of the process, and is mandatory: thus it is not in the "ControlerDefaultsModule",
     // which is more for default facultative stuff (analysis etc.)
     // One can override selected sub-modules by adding an overriding module.
@@ -151,6 +154,8 @@ public class Controler extends AbstractController implements ControlerI {
     private AbstractModule overrides = AbstractModule.emptyModule();
 
 	private final List<MobsimListener> simulationListeners = new ArrayList<>();
+	@Inject Collection<Provider<MobsimListener>> mobsimListeners = new HashSet<>(); // added by modules
+	@Inject Collection<Provider<SnapshotWriter>> snapshotWriters = new HashSet<>(); // added by modules
 
     public static void main(final String[] args) {
 		if ((args == null) || (args.length == 0)) {
@@ -165,17 +170,13 @@ public class Controler extends AbstractController implements ControlerI {
 	}
 
 	@Inject
-	Controler(com.google.inject.Injector injector, Config config, Scenario scenario, EventsManager events, IterationStopWatch stopWatch) {
+	Controler(com.google.inject.Injector injector, Config config, IterationStopWatch stopWatch) {
 		super(stopWatch);
-		this.scenario  = scenario;
-		this.config = scenario.getConfig();
+		this.config = config;
 		this.config.addConfigConsistencyChecker(new ConfigConsistencyCheckerImpl());
-		this.events = events;
 		this.controlerListenerManager.setControler(this);
-		this.config.parallelEventHandling().makeLocked();
 		this.injector = Injector.fromGuiceInjector(injector);
 		this.injectorCreated = true;
-		injectSelf();
 	}
 
 	/**
@@ -204,10 +205,9 @@ public class Controler extends AbstractController implements ControlerI {
 		this((String) null, null, scenario);
 	}
 
-	private Controler(final String configFileName, final Config config, final Scenario scenario) {
+	private Controler(final String configFileName, final Config config, Scenario scenario) {
 		if (scenario != null) {
 			// scenario already loaded (recommended):
-			this.scenario  = scenario;
 			this.config = scenario.getConfig();
 			this.config.addConfigConsistencyChecker(new ConfigConsistencyCheckerImpl());
 		} else {
@@ -224,12 +224,13 @@ public class Controler extends AbstractController implements ControlerI {
 			this.config.addConfigConsistencyChecker(new ConfigConsistencyCheckerImpl());
 
 			// load scenario:
-			this.scenario  = ScenarioUtils.createScenario(this.config);
-			ScenarioUtils.loadScenario(this.scenario );
+			scenario  = ScenarioUtils.createScenario(this.config);
+			ScenarioUtils.loadScenario(scenario) ;
 		}
-		this.events = EventsUtils.createEventsManager(this.config);
 		this.controlerListenerManager.setControler(this);
 		this.config.parallelEventHandling().makeLocked();
+		this.scenario = scenario;
+		this.overrides = new ScenarioByInstanceModule(this.scenario);
 	}
 
 	/**
@@ -239,7 +240,7 @@ public class Controler extends AbstractController implements ControlerI {
 		if (injectorCreated) {
 			setupOutputDirectory(injector.getInstance(OutputDirectoryHierarchy.class));
 		} else {
-			setupOutputDirectory(new OutputDirectoryHierarchy(config));
+			setupOutputDirectory(new OutputDirectoryHierarchy(config.controler()));
 		}
 		if (this.config.transit().isUseTransit()) {
 			setupTransitSimulation();
@@ -296,18 +297,27 @@ public class Controler extends AbstractController implements ControlerI {
 							// other setters on this Controler.
 							install(AbstractModule.override(baseModules, overrides));
 
-							bind(Scenario.class).toInstance(scenario);
-							bind(EventsManager.class).toInstance(events);
 							bind(OutputDirectoryHierarchy.class).toInstance(getControlerIO());
 							bind(IterationStopWatch.class).toInstance(getStopwatch());
-							bind(ControlerI.class).toInstance(Controler.this);
+							bind(ControlerI.class).toInstance(new ControlerI() {
+								@Override
+								public void run() {
+									throw new RuntimeException("Already running.");
+								}
+
+								@Override
+								public Integer getIterationNumber() {
+									return Controler.this.getIterationNumber();
+								}
+							});
 						}
 					});
-			injectSelf();
+			this.injector.getInstance(com.google.inject.Injector.class).injectMembers(this);
 		}
+		addListenersToSelf();
 	}
 
-	private void injectSelf() {
+	private void addListenersToSelf() {
 		/*
 		 * The order how the listeners are added is very important! As
 		 * dependencies between different listeners exist or listeners may read
@@ -317,21 +327,16 @@ public class Controler extends AbstractController implements ControlerI {
 		 * are added to the list.
 		 */
 		if (getConfig().controler().getDumpDataAtEnd()) {
-			this.addCoreControlerListener(injector.getInstance(DumpDataAtEnd.class));
+			this.addCoreControlerListener(this.dumpDataAtEnd);
 		}
 
-		this.addCoreControlerListener(injector.getInstance(PlansScoring.class));
-		this.addCoreControlerListener(injector.getInstance(PlansReplanning.class));
-		this.addCoreControlerListener(injector.getInstance(PlansDumping.class));
-		this.addCoreControlerListener(injector.getInstance(EventsHandling.class));
+		this.addCoreControlerListener(this.plansScoring);
+		this.addCoreControlerListener(this.plansReplanning);
+		this.addCoreControlerListener(this.plansDumping);
+		this.addCoreControlerListener(this.eventsHandling);
 		// must be last being added (=first being executed)
 
-		Set<EventHandler> eventHandlersDeclaredByModules = this.injector.getEventHandlersDeclaredByModules();
-		for (EventHandler eventHandler : eventHandlersDeclaredByModules) {
-			this.getEvents().addHandler(eventHandler);
-		}
-		Set<ControlerListener> controlerListenersDeclaredByModules = this.injector.getControlerListenersDeclaredByModules();
-		for (ControlerListener controlerListener : controlerListenersDeclaredByModules) {
+		for (ControlerListener controlerListener : this.controlerListenersDeclaredByModules) {
 			this.addControlerListener(controlerListener);
 		}
 	}
@@ -339,8 +344,8 @@ public class Controler extends AbstractController implements ControlerI {
 	@Override
 	protected final void prepareForSim() {
 
-		if ( scenario  instanceof MutableScenario ) {
-			((MutableScenario)scenario ).setLocked();
+		if (getScenario() instanceof MutableScenario ) {
+			((MutableScenario)getScenario()).setLocked();
 			// see comment in ScenarioImpl. kai, sep'14
 		}
 
@@ -350,14 +355,14 @@ public class Controler extends AbstractController implements ControlerI {
 		 * be probably adapted in a way that other main modes are possible as well. cdobler, oct'15.
 		 */
 		final Network net;
-		if (NetworkUtils.isMultimodal(this.scenario.getNetwork())) {
+		if (NetworkUtils.isMultimodal(this.getScenario().getNetwork())) {
 			log.info("Network seems to be multimodal. Create car-only network which is handed over to PersonPrepareForSim.");
-			TransportModeNetworkFilter filter = new TransportModeNetworkFilter(this.scenario.getNetwork());
+			TransportModeNetworkFilter filter = new TransportModeNetworkFilter(this.getScenario().getNetwork());
 			net = NetworkUtils.createNetwork();
 			HashSet<String> modes = new HashSet<String>();
 			modes.add(TransportMode.car);
 			filter.filter(net, modes);
-		} else net = this.scenario.getNetwork();
+		} else net = this.getScenario().getNetwork();
 		
 		// make sure all routes are calculated.
         ParallelPersonAlgorithmRunner.run(getScenario().getPopulation(), this.config.global().getNumberOfThreads(),
@@ -365,11 +370,11 @@ public class Controler extends AbstractController implements ControlerI {
 					@Override
 					public AbstractPersonAlgorithm getPersonAlgorithm() {
 						return new PersonPrepareForSim(new PlanRouter(getTripRouterProvider().get(), getScenario().getActivityFacilities()),
-								Controler.this.scenario, net);
+								Controler.this.getScenario(), net);
 			}
 		});
-        if ( scenario.getPopulation() instanceof PopulationImpl ) {
-      	  ((PopulationImpl) scenario.getPopulation()).setLocked();
+        if (getScenario().getPopulation() instanceof PopulationImpl) {
+      	  ((PopulationImpl) getScenario().getPopulation()).setLocked();
         }
         
 	}
@@ -388,12 +393,12 @@ public class Controler extends AbstractController implements ControlerI {
 	private Mobsim getNewMobsim() {
 		if (this.config.getModule(SimulationConfigGroup.GROUP_NAME) != null &&
 				((SimulationConfigGroup) this.config.getModule(SimulationConfigGroup.GROUP_NAME)).getExternalExe() != null ) {
-			ExternalMobsim simulation = new ExternalMobsim(this.scenario , this.events);
+			ExternalMobsim simulation = new ExternalMobsim(getScenario(), getEvents());
 			simulation.setControlerIO(this.getControlerIO());
 			simulation.setIterationNumber(this.getIterationNumber());
 			return simulation;
 		} else {
-			Mobsim simulation = injector.getInstance(Mobsim.class);
+			Mobsim simulation = this.mobsimProvider.get();
 			enrichSimulation(simulation);
 			return simulation;
 		}
@@ -401,8 +406,8 @@ public class Controler extends AbstractController implements ControlerI {
 
 	private void enrichSimulation(final Mobsim simulation) {
 		if (simulation instanceof ObservableMobsim) {
-			for (MobsimListener l : this.injector.getMobsimListeners()) {
-				((ObservableMobsim) simulation).addQueueSimulationListeners(l);
+			for (Provider<MobsimListener> l : this.mobsimListeners) {
+				((ObservableMobsim) simulation).addQueueSimulationListeners(l.get());
 			}
 			for (MobsimListener l : this.getMobsimListeners()) {
 				((ObservableMobsim) simulation).addQueueSimulationListeners(l);
@@ -410,8 +415,8 @@ public class Controler extends AbstractController implements ControlerI {
 
 			if (config.controler().getWriteSnapshotsInterval() != 0 && this.getIterationNumber() % config.controler().getWriteSnapshotsInterval() == 0) {
 				SnapshotWriterManager manager = new SnapshotWriterManager(config);
-				for (SnapshotWriter snapshotWriter : this.injector.getSnapshotWriters()) {
-					manager.addSnapshotWriter(snapshotWriter);
+				for (Provider<SnapshotWriter> snapshotWriter : this.snapshotWriters) {
+					manager.addSnapshotWriter(snapshotWriter.get());
 				}
 				((ObservableMobsim) simulation).addQueueSimulationListeners(manager);
 			}
@@ -473,20 +478,68 @@ public class Controler extends AbstractController implements ControlerI {
 	}
 
     public final Scenario getScenario() {
-	    return scenario;
+		if (this.injectorCreated) {
+			return this.injector.getInstance(Scenario.class);
+		} else {
+			return this.scenario;
+		}
     }
 
-    	/**
-    	 * @deprecated -- preferably use "@Inject EventsManager events" or "addEventHandlerBinding().toInstance(...) from AbstractModule". kai/mz, nov'15
-    	 */
-    	@Deprecated // preferably use "@Inject EventsManager events" or "addEventHandlerBinding().toInstance(...) from AbstractModule". kai/mz, nov'15
-    	public final EventsManager getEvents() {
-    		return events;
-    	}
-    	
-    	public final Injector getInjector() {
-    		return this.injector;
-    	}
+	/**
+	 * @deprecated -- preferably use "@Inject EventsManager events" or "addEventHandlerBinding().toInstance(...) from AbstractModule". kai/mz, nov'15
+	 */
+	@Deprecated // preferably use "@Inject EventsManager events" or "addEventHandlerBinding().toInstance(...) from AbstractModule". kai/mz, nov'15
+	public final EventsManager getEvents() {
+		if (this.injector != null) {
+			return this.injector.getInstance(EventsManager.class);
+		} else {
+			return new EventsManager() {
+				@Override
+				public void processEvent(Event event) {
+					Controler.this.injector.getInstance(EventsManager.class).processEvent(event);
+				}
+
+				@Override
+				public void addHandler(final EventHandler handler) {
+					addOverridingModule(new AbstractModule() {
+						@Override
+						public void install() {
+							addEventHandlerBinding().toInstance(handler);
+						}
+					});
+				}
+
+				@Override
+				public void removeHandler(EventHandler handler) {
+					throw new UnsupportedOperationException();
+				}
+
+				@Override
+				public void resetHandlers(int iteration) {
+					throw new UnsupportedOperationException();
+				}
+
+				@Override
+				public void initProcessing() {
+					throw new UnsupportedOperationException();
+				}
+
+				@Override
+				public void afterSimStep(double time) {
+					throw new UnsupportedOperationException();
+				}
+
+				@Override
+				public void finishProcessing() {
+					throw new UnsupportedOperationException();
+				}
+			};
+		}
+	}
+
+	public final Injector getInjector() {
+		return this.injector;
+	}
 
 	/**
 	 * @deprecated Do not use this, as it may not contain values in every

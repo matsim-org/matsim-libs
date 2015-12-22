@@ -91,20 +91,24 @@ public final class PopulationUtils {
      * @return the new Population instance
      */
 	public static Population createPopulation(Config config, Network network) {
-        ModeRouteFactory routeFactory = new ModeRouteFactory();
-        String networkRouteType = config.plans().getNetworkRouteType();
-        RouteFactory factory;
-        if (PlansConfigGroup.NetworkRouteType.LinkNetworkRoute.equals(networkRouteType)) {
-            factory = new LinkNetworkRouteFactory();
-        } else if (PlansConfigGroup.NetworkRouteType.CompressedNetworkRoute.equals(networkRouteType) && network != null) {
-            factory = new CompressedNetworkRouteFactory(network);
-        } else {
-            throw new IllegalArgumentException("The type \"" + networkRouteType + "\" is not a supported type for network routes.");
-        }
-        routeFactory.setRouteFactory(NetworkRoute.class, factory);
-        return new PopulationImpl(new PopulationFactoryImpl(routeFactory));
+		return createPopulation(config.plans(), network);
 	}
-	
+
+	public static Population createPopulation(PlansConfigGroup plansConfigGroup, Network network) {
+		ModeRouteFactory routeFactory = new ModeRouteFactory();
+		String networkRouteType = plansConfigGroup.getNetworkRouteType();
+		RouteFactory factory;
+		if (PlansConfigGroup.NetworkRouteType.LinkNetworkRoute.equals(networkRouteType)) {
+			factory = new LinkNetworkRouteFactory();
+		} else if (PlansConfigGroup.NetworkRouteType.CompressedNetworkRoute.equals(networkRouteType) && network != null) {
+			factory = new CompressedNetworkRouteFactory(network);
+		} else {
+			throw new IllegalArgumentException("The type \"" + networkRouteType + "\" is not a supported type for network routes.");
+		}
+		routeFactory.setRouteFactory(NetworkRoute.class, factory);
+		return new PopulationImpl(new PopulationFactoryImpl(routeFactory));
+	}
+
 	public static Leg unmodifiableLeg( Leg leg ) {
 		return new UnmodifiableLeg( leg ) ;
 	}

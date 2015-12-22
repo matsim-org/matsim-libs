@@ -35,8 +35,6 @@ public class GeoDistanceBuilder {
 
     private final HistogramWriter histogramWriter;
 
-//    private final List<DiscretizerBuilder> builders;
-
     public GeoDistanceBuilder(HistogramWriter histogramWriter) {
         this(histogramWriter, null);
     }
@@ -44,7 +42,6 @@ public class GeoDistanceBuilder {
     public GeoDistanceBuilder(HistogramWriter histogramWriter, Map<String, Predicate<Segment>> predicates) {
         this.histogramWriter = histogramWriter;
         this.setPredicates(predicates);
-//        this.builders = new ArrayList<>();
     }
 
     public void setPredicates(Map<String, Predicate<Segment>> predicates) {
@@ -56,14 +53,12 @@ public class GeoDistanceBuilder {
 
         if (predicates == null || predicates.isEmpty()) {
             NumericAnalyzer analyzer = buildWithPredicate(null, null);
-//            setDiscretizers(histogramWriter);
             task = analyzer;
         } else {
-            ConcurrentAnalyzerTask<Collection<? extends Person>> composite = new ConcurrentAnalyzerTask<>();
-
+            //ConcurrentAnalyzerTask<Collection<? extends Person>> composite = new ConcurrentAnalyzerTask<>();
+            AnalyzerTaskComposite<Collection<? extends Person>> composite = new AnalyzerTaskComposite<>();
             for (Map.Entry<String, Predicate<Segment>> entry : predicates.entrySet()) {
                 NumericAnalyzer analyzer = buildWithPredicate(entry.getValue(), entry.getKey());
-//                setDiscretizers(histogramWriter);
                 composite.addComponent(analyzer);
             }
 
@@ -75,21 +70,20 @@ public class GeoDistanceBuilder {
 
     private NumericAnalyzer buildWithPredicate(Predicate<Segment> predicate, String predicateName) {
         ValueProvider<Double, Segment> getter = new NumericAttributeProvider(CommonKeys.LEG_GEO_DISTANCE);
+        ValueProvider<Double, Person> weightGetter = new NumericAttributeProvider(CommonKeys.PERSON_WEIGHT);
 
         LegCollector<Double> collector = new LegCollector<>(getter);
-        if (predicate != null)
+        LegPersonCollector<Double> weightCollector = new LegPersonCollector<>(weightGetter);
+
+        if (predicate != null) {
             collector.setPredicate(predicate);
+            weightCollector.setPredicate(predicate);
+        }
 
         String name = CommonKeys.LEG_GEO_DISTANCE;
         if (predicateName != null)
             name = String.format("%s.%s", CommonKeys.LEG_GEO_DISTANCE, predicateName);
 
-        return new NumericAnalyzer(collector, name, histogramWriter);
+        return new NumericAnalyzer(collector, weightCollector, name, histogramWriter);
     }
-
-//    private void setDiscretizers(HistogramWriter writer) {
-//        for(DiscretizerBuilder builder : builders) {
-//            writer.addBuilder(builder);
-//        }
-//    }
 }

@@ -822,7 +822,7 @@ public class TransitQueueSimulationTest {
         assertTrue(allEvents.get(++idx) instanceof TransitDriverStartsEvent);
         assertTrue(allEvents.get(++idx) instanceof PersonDepartureEvent); // pt-driver
         assertTrue(allEvents.get(++idx) instanceof PersonEntersVehicleEvent); // pt-driver
-        assertTrue(allEvents.get(++idx) instanceof Wait2LinkEvent); // pt-vehicle
+        assertTrue(allEvents.get(++idx) instanceof VehicleEntersTrafficEvent); // pt-vehicle
         assertTrue(allEvents.get(++idx) instanceof VehicleArrivesAtFacilityEvent);
         assertTrue(allEvents.get(++idx) instanceof PersonEntersVehicleEvent);
         assertTrue(allEvents.get(++idx) instanceof VehicleDepartsAtFacilityEvent);

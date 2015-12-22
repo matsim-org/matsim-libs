@@ -30,6 +30,7 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
 import org.matsim.contrib.cadyts.general.CadytsCostOffsetsXMLFileIO;
@@ -71,6 +72,8 @@ import com.google.inject.Provider;
 import cadyts.measurements.SingleLinkMeasurement;
 import cadyts.utilities.io.tabularFileParser.TabularFileParser;
 import cadyts.utilities.misc.DynamicData;
+
+import javax.inject.Inject;
 
 public class CadytsIntegrationTest {
 
@@ -165,9 +168,11 @@ public class CadytsIntegrationTest {
 			@Override
 			public void install() {
 				addPlanStrategyBinding("ccc").toProvider(new javax.inject.Provider<PlanStrategy>() {
+					@Inject
+					Scenario scenario;
 					@Override
 					public PlanStrategy get() {
-						final CadytsPlanChanger<TransitStopFacility> planSelector = new CadytsPlanChanger<TransitStopFacility>(controler.getScenario(), cContext);
+						final CadytsPlanChanger<TransitStopFacility> planSelector = new CadytsPlanChanger<TransitStopFacility>(scenario, cContext);
 						planSelector.setCadytsWeight(0.);
 						// weight 0 is correct: this is only in order to use getCalibrator().addToDemand.
 						// would certainly be cleaner (and less confusing) to write a separate method for this.  (But how?)
@@ -180,14 +185,16 @@ public class CadytsIntegrationTest {
 		});
 
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
-			private final CharyparNagelScoringParametersForPerson parameters = new SubpopulationCharyparNagelScoringParameters( controler.getScenario() );
-
+			@Inject
+			private CharyparNagelScoringParametersForPerson parameters;
+			@Inject
+			private Network network;
 			@Override
 			public ScoringFunction createNewScoringFunction(Person person) {
 				final CharyparNagelScoringParameters params = parameters.getScoringParameters(person);
 
 				SumScoringFunction scoringFunctionAccumulator = new SumScoringFunction();
-				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(params, controler.getScenario().getNetwork()));
+				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(params, network));
 				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelActivityScoring(params)) ;
 				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
 
@@ -488,9 +495,11 @@ public class CadytsIntegrationTest {
 			@Override
 			public void install() {
 				addPlanStrategyBinding("ccc").toProvider(new javax.inject.Provider<PlanStrategy>() {
+					@Inject
+					Scenario scenario;
 					@Override
 					public PlanStrategy get() {
-						final CadytsPlanChanger<TransitStopFacility> planSelector = new CadytsPlanChanger<TransitStopFacility>(controler.getScenario(), context);
+						final CadytsPlanChanger<TransitStopFacility> planSelector = new CadytsPlanChanger<TransitStopFacility>(scenario, context);
 						planSelector.setCadytsWeight(beta * 30.);
 						return new PlanStrategyImpl(planSelector);
 					}

@@ -22,7 +22,7 @@ package org.matsim.core.controler;
 import java.io.File;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.utils.io.IOUtils;
 
 import javax.inject.Inject;
@@ -49,10 +49,10 @@ public class OutputDirectoryHierarchy {
 	private OverwriteFileSetting overwriteFiles = OverwriteFileSetting.failIfDirectoryExists;
 
 	@Inject
-	OutputDirectoryHierarchy(Config config) {
-		this(config.controler().getOutputDirectory(),
-				config.controler().getRunId(),
-				config.controler().getOverwriteFileSetting());
+	OutputDirectoryHierarchy(ControlerConfigGroup config) {
+		this(config.getOutputDirectory(),
+				config.getRunId(),
+				config.getOverwriteFileSetting());
 	}
 
 	public OutputDirectoryHierarchy(String outputPath, OverwriteFileSetting overwriteFiles) {

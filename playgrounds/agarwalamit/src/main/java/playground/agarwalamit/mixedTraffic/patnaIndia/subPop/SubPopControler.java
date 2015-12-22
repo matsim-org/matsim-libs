@@ -35,11 +35,13 @@ import org.matsim.core.replanning.PlanStrategyImpl.Builder;
 import org.matsim.core.replanning.modules.ChangeLegMode;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
+import org.matsim.core.router.TripRouter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
+import javax.inject.Provider;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -143,13 +145,14 @@ public class SubPopControler {
 			@Override
 			public void install() {
 				addPlanStrategyBinding("ChangeLegMode_slum").toProvider(new javax.inject.Provider<PlanStrategy>() {
+					final Provider<TripRouter> tripRouterProvider = binder().getProvider(TripRouter.class);
 					String[] availableModesSlum = {"slum_bike", "slum_motorbike", "slum_pt", "slum_walk"};
 
 					@Override
 					public PlanStrategy get() {
 						final Builder builder = new Builder(new RandomPlanSelector<Plan, Person>());
 						builder.addStrategyModule(new ChangeLegMode(controler.getConfig().global().getNumberOfThreads(), availableModesSlum, true));
-						builder.addStrategyModule(new ReRoute(controler.getScenario()));
+						builder.addStrategyModule(new ReRoute(controler.getScenario(), tripRouterProvider));
 						return builder.build();
 					}
 				});
@@ -160,13 +163,14 @@ public class SubPopControler {
 			@Override
 			public void install() {
 				addPlanStrategyBinding("ChangeLegMode_nonSlum").toProvider(new javax.inject.Provider<PlanStrategy>() {
+					final Provider<TripRouter> tripRouterProvider = binder().getProvider(TripRouter.class);
 					String[] availableModeNonSlum = {"nonSlum_car", "nonSlum_bike", "nonSlum_motorbike", "nonSlum_pt", "nonSlum_walk"};
 
 					@Override
 					public PlanStrategy get() {
 						final Builder builder = new Builder(new RandomPlanSelector<Plan, Person>());
 						builder.addStrategyModule(new ChangeLegMode(controler.getConfig().global().getNumberOfThreads(), availableModeNonSlum, true));
-						builder.addStrategyModule(new ReRoute(controler.getScenario()));
+						builder.addStrategyModule(new ReRoute(controler.getScenario(), tripRouterProvider));
 						return builder.build();
 					}
 				});

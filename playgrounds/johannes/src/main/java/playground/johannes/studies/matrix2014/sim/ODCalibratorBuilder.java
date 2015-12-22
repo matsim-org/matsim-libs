@@ -26,8 +26,10 @@ import gnu.trove.map.hash.TIntObjectHashMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
-import playground.johannes.gsv.zones.KeyMatrix;
+import playground.johannes.synpop.analysis.Predicate;
 import playground.johannes.synpop.gis.*;
+import playground.johannes.synpop.matrix.NumericMatrix;
+import playground.johannes.synpop.sim.data.CachedSegment;
 
 import java.util.Set;
 
@@ -36,8 +38,8 @@ import java.util.Set;
  */
 public class ODCalibratorBuilder {
 
-    public ODCalibrator build(KeyMatrix refKeyMatrix, DataPool dataPool, String layerName, String primaryKey, int
-            threshold) {
+    public ODCalibrator build(NumericMatrix refKeyMatrix, DataPool dataPool, String layerName, String primaryKey, int
+            threshold, Predicate<CachedSegment> predicate) {
         FacilityData fData = (FacilityData) dataPool.get(FacilityDataLoader.KEY);
         ActivityFacilities facilities = fData.getAll();
         ZoneData zoneData = (ZoneData) dataPool.get(ZoneDataLoader.KEY);
@@ -63,10 +65,10 @@ public class ODCalibratorBuilder {
             facility2Index.put(fac, idx);
         }
 
-        return new ODCalibrator(refMatrix, facility2Index, index2Point, threshold);
+        return new ODCalibrator(refMatrix, facility2Index, index2Point, threshold, predicate);
     }
 
-    private TIntObjectHashMap<TIntDoubleHashMap> initRefMatrix(KeyMatrix keyMatrix, TObjectIntHashMap<String> id2Idx) {
+    private TIntObjectHashMap<TIntDoubleHashMap> initRefMatrix(NumericMatrix keyMatrix, TObjectIntHashMap<String> id2Idx) {
         TIntObjectHashMap<TIntDoubleHashMap> matrix = new TIntObjectHashMap<>();
         Set<String> keys = keyMatrix.keys();
         for(String i : keys) {

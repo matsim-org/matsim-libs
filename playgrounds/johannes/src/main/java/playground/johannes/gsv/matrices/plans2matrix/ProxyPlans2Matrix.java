@@ -36,13 +36,13 @@ import org.matsim.facilities.MatsimFacilitiesReader;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.MathTransform;
 import playground.johannes.gsv.synPop.sim3.RestoreActTypes;
-import playground.johannes.gsv.zones.KeyMatrix;
-import playground.johannes.gsv.zones.io.KeyMatrixXMLWriter;
 import playground.johannes.synpop.data.*;
 import playground.johannes.synpop.data.io.XMLHandler;
 import playground.johannes.synpop.gis.Zone;
 import playground.johannes.synpop.gis.ZoneCollection;
 import playground.johannes.synpop.gis.ZoneGeoJsonIO;
+import playground.johannes.synpop.matrix.NumericMatrix;
+import playground.johannes.synpop.matrix.NumericMatrixXMLWriter;
 import playground.johannes.synpop.processing.TaskRunner;
 import playground.johannes.synpop.source.mid2008.MiDValues;
 
@@ -78,9 +78,9 @@ public class ProxyPlans2Matrix {
 		this.predicate = predicate;
 	}
 
-	public KeyMatrix run(Collection<PlainPerson> persons, ZoneCollection zones, ActivityFacilities facilities, String key) {
+	public NumericMatrix run(Collection<PlainPerson> persons, ZoneCollection zones, ActivityFacilities facilities, String key) {
 
-		KeyMatrix m = new KeyMatrix();
+		NumericMatrix m = new NumericMatrix();
 
 		int noZones = 0;
 
@@ -196,8 +196,8 @@ public class ProxyPlans2Matrix {
 		 * all car
 		 */
 		logger.info("Extracting total matrix...");
-		KeyMatrix m = p2m.run(persons, zones, scenario.getActivityFacilities(), key);
-		KeyMatrixXMLWriter writer = new KeyMatrixXMLWriter();
+		NumericMatrix m = p2m.run(persons, zones, scenario.getActivityFacilities(), key);
+		NumericMatrixXMLWriter writer = new NumericMatrixXMLWriter();
 		writer.write(m, String.format("%s/miv.xml", outdir));
 		/*
 		 * types

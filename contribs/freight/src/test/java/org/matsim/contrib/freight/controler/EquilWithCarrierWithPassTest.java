@@ -26,15 +26,18 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.freight.carrier.Carrier;
+import org.matsim.contrib.freight.carrier.CarrierPlanXmlReaderV2;
 import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.mobsim.DistanceScoringFunctionFactoryForTests;
 import org.matsim.contrib.freight.mobsim.StrategyManagerFactoryForTests;
+import org.matsim.contrib.freight.replanning.CarrierPlanStrategyManagerFactory;
+import org.matsim.contrib.freight.scoring.CarrierScoringFunctionFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.MatsimTestUtils;
 
 public class EquilWithCarrierWithPassTest {
@@ -83,9 +86,16 @@ public class EquilWithCarrierWithPassTest {
 
 	@Test
 	public void testScoringInMeters(){
-        CarrierModule carrierControler = new CarrierModule(planFile,new StrategyManagerFactoryForTests(controler),new DistanceScoringFunctionFactoryForTests(controler.getScenario().getNetwork()));
-		
-		controler.addOverridingModule(carrierControler);
+		Carriers carriers = new Carriers();
+		new CarrierPlanXmlReaderV2(carriers).read(planFile);
+		controler.addOverridingModule(new CarrierModule(carriers));
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bind(CarrierPlanStrategyManagerFactory.class).to(StrategyManagerFactoryForTests.class).asEagerSingleton();
+				bind(CarrierScoringFunctionFactory.class).to(DistanceScoringFunctionFactoryForTests.class).asEagerSingleton();
+			}
+		});
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		controler.run();
 

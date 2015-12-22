@@ -24,8 +24,8 @@ import org.joda.time.LocalDateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.matsim.contrib.common.stats.StatsWriter;
-import playground.johannes.gsv.zones.KeyMatrix;
-import playground.johannes.gsv.zones.io.KeyMatrixXMLWriter;
+import playground.johannes.synpop.matrix.NumericMatrix;
+import playground.johannes.synpop.matrix.NumericMatrixXMLWriter;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -45,7 +45,7 @@ public class Terralytics2Matrix {
         DateTimeFormatter dayformatter = DateTimeFormat.forPattern("dd");
         DateTimeFormatter hourFormatter = DateTimeFormat.forPattern("HH");
 
-        Map<String, KeyMatrix> map = new HashMap<String, KeyMatrix>();
+        Map<String, NumericMatrix> map = new HashMap<String, NumericMatrix>();
 //        BufferedReader reader = new BufferedReader(new FileReader("/mnt/cifs/B-drive/C_Vertrieb/2013_01_01_Floating Phone Data/04 Telefonica/Matrizen/od_start_daily.csv"));
         BufferedReader reader = new BufferedReader(new FileReader("/mnt/cifs/B-drive/C_Vertrieb/2013_01_01_Floating " +
                 "Phone Data/04 Telefonica/Matrizen/od_start_hourly.csv"));
@@ -70,9 +70,9 @@ public class Terralytics2Matrix {
 
                 hourHist.adjustOrPutValue(hour, volume, volume);
 
-                KeyMatrix m = map.get(day);
+                NumericMatrix m = map.get(day);
                 if (m == null) {
-                    m = new KeyMatrix();
+                    m = new NumericMatrix();
                     map.put(day, m);
                 }
 
@@ -80,8 +80,8 @@ public class Terralytics2Matrix {
             }
         }
 
-        KeyMatrixXMLWriter writer = new KeyMatrixXMLWriter();
-        for(Map.Entry<String, KeyMatrix> entry : map.entrySet()) {
+        NumericMatrixXMLWriter writer = new NumericMatrixXMLWriter();
+        for(Map.Entry<String, NumericMatrix> entry : map.entrySet()) {
 //            writer.write(entry.getValue(), String.format("%s/%s.xml", outdir, entry.getKey()));
         }
 

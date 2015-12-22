@@ -53,11 +53,11 @@ import org.wololo.geojson.LineString;
 import org.wololo.jts2geojson.GeoJSONWriter;
 import playground.johannes.coopsim.utils.MatsimCoordUtils;
 import playground.johannes.gsv.sim.cadyts.ODCalibrator;
-import playground.johannes.gsv.zones.KeyMatrix;
-import playground.johannes.gsv.zones.MatrixOperations;
-import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
 import playground.johannes.synpop.gis.ZoneCollection;
 import playground.johannes.synpop.gis.ZoneGeoJsonIO;
+import playground.johannes.synpop.matrix.MatrixOperations;
+import playground.johannes.synpop.matrix.NumericMatrix;
+import playground.johannes.synpop.matrix.NumericMatrixXMLReader;
 
 import java.awt.*;
 import java.io.BufferedWriter;
@@ -86,10 +86,10 @@ public class NetLoad {
 		/*
 		 * load matrix
 		 */
-		KeyMatrixXMLReader mReader = new KeyMatrixXMLReader();
+		NumericMatrixXMLReader mReader = new NumericMatrixXMLReader();
 		mReader.setValidating(false);
 		mReader.parse(matrixFile);
-		KeyMatrix m = mReader.getMatrix();
+		NumericMatrix m = mReader.getMatrix();
 
 		MatrixOperations.applyFactor(m, 1.952898582487276);
 		/*

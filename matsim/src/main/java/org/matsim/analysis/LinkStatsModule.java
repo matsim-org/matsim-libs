@@ -34,31 +34,18 @@ public final class LinkStatsModule extends AbstractModule {
 
     @Override
     public void install() {
-        Config config = getConfig();
-        if (config.linkStats().getWriteLinkStatsInterval() > 0) {
-
+        bind(CalcLinkStats.class).asEagerSingleton();
+        if (getConfig().linkStats().getWriteLinkStatsInterval() > 0) {
             // "Do not use this, as it may not contain values in every iteration."
             // says the original comment on the getter in the Controler.
             // I assume this is still true.
-            bind(CalcLinkStats.class).toProvider(CalcLinkStatsProvider.class).in(Singleton.class);
-            addControlerListenerBinding().to(LinkStatsControlerListener.class);
-        }
-    }
-
-    static class CalcLinkStatsProvider implements Provider<CalcLinkStats> {
-
-        @Inject
-        Scenario scenario;
-
-        @Override
-        public CalcLinkStats get() {
             /*TODO [MR] linkStats uses ttcalc and volumes, but ttcalc has
 		    15min-steps, while volumes uses 60min-steps! It works a.t.m., but the
 		    traveltimes in linkStats are the avg. traveltimes between xx.00 and
 		    xx.15, and not between xx.00 and xx.59*/
-            return new CalcLinkStats(scenario.getNetwork());
+            bind(LinkStatsControlerListener.class).asEagerSingleton();
+            addControlerListenerBinding().to(LinkStatsControlerListener.class);
         }
-
     }
 
 }

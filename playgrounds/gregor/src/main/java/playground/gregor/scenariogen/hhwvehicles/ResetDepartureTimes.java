@@ -27,6 +27,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -39,7 +40,7 @@ import java.io.IOException;
 public class ResetDepartureTimes {
 
 	private static final String RAW_INPUT = "/Users/laemmel/arbeit/papers/2015/TRBwFZJ/hybridsim_trb2016/analysis/vehicles/output/";
-	private static final String NEW_DIR = "/Users/laemmel/arbeit/papers/2015/TRBwFZJ/hybridsim_trb2016/analysis/dirac-delta-vehicles/";
+	private static final String NEW_DIR = "/Users/laemmel/arbeit/papers/2015/TRBwFZJ/hybridsim_trb2016/analysis/sens-vehicles/";
 
 	public static void main(String[] args) throws IOException {
 
@@ -66,7 +67,7 @@ public class ResetDepartureTimes {
 		cntr.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		cntr.run();
 
-		Analyzer.main(new String[]{"/Users/laemmel/arbeit/papers/2015/TRBwFZJ/hybridsim_trb2016/analysis/dirac-delta-vehicles/output/ITERS/it.100/100.events.xml.gz", "/Users/laemmel/arbeit/papers/2015/TRBwFZJ/hybridsim_trb2016/analysis/dirac-delta-vehicles_plot_data"});
+		Analyzer.main(new String[]{"/Users/laemmel/arbeit/papers/2015/TRBwFZJ/hybridsim_trb2016/analysis/sens-vehicles/output/ITERS/it.100/100.events.xml.gz", "/Users/laemmel/arbeit/papers/2015/TRBwFZJ/hybridsim_trb2016/analysis/sens-vehicles_plot_data"});
 
 
 	}
@@ -74,10 +75,32 @@ public class ResetDepartureTimes {
 	private static void dropDepTimes(Population population) {
 		for (Person pers : population.getPersons().values()) {
 			for (Plan p : pers.getPlans()) {
-				((Activity) p.getPlanElements().get(0)).setEndTime(0);
+				double depTime = getDepTime();
+				((Activity) p.getPlanElements().get(0)).setEndTime(depTime);
 			}
 		}
 	}
+
+	public static double getDepTime() {
+		final double Ex = 0.5;
+		final double varEx = 0.25;
+		final double sigma = Math.sqrt(Math.log(1 + varEx / Math.pow(Ex, 2)));
+		final double mu = Math.log(Ex - 1 / 2 * Math.pow(sigma, 2));
+		double rnd = MatsimRandom.getRandom().nextGaussian() * sigma + mu;
+		double dpTm = Math.exp(rnd) * 3600;
+		while (dpTm < 0 || dpTm > 3600) {
+			rnd = MatsimRandom.getRandom().nextGaussian() * sigma + mu;
+			dpTm = Math.exp(rnd) * 3600;
+		}
+		return dpTm;
+	}
+//	private static void dropDepTimes(Population population) {
+//		for (Person pers : population.getPersons().values()) {
+//			for (Plan p : pers.getPlans()) {
+//				((Activity) p.getPlanElements().get(0)).setEndTime(0);
+//			}
+//		}
+//	}
 
 
 }

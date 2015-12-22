@@ -37,6 +37,7 @@ import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.core.gbl.Gbl;
 
 /**
@@ -55,6 +56,7 @@ implements PersonDepartureEventHandler, PersonArrivalEventHandler, LinkLeaveEven
 	private SortedMap<Id<Person>,Double> personId2TripDepartTimeBin = new TreeMap<>();
 	private SortedMap<Double, Map<Id<Person>,Integer>> timeBin2Person2TripsCount = new TreeMap<>();
 	private SortedMap<Double, Map<Id<Person>,List<Double>>> timeBin2Person2TripsDistance = new TreeMap<>();
+	private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
 
 	private static final Logger log = Logger.getLogger(TripDistanceHandler.class);
 	private Network network;
@@ -66,13 +68,14 @@ implements PersonDepartureEventHandler, PersonArrivalEventHandler, LinkLeaveEven
 		this.timeBin2Person2TripsCount.clear();
 		this.timeBin2Person2TripsDistance.clear();
 		this.personId2TripDepartTimeBin.clear();
+		this.delegate.reset(iteration);
 	}
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
 		Id<Link> linkId = event.getLinkId();
 		double linkLength = network.getLinks().get(linkId).getLength();
-		Id<Person> driverId = event.getDriverId();
+		Id<Person> driverId = this.delegate.getDriverOfVehicle(event.getVehicleId());
 		
 		double timebin = this.personId2TripDepartTimeBin.get(driverId);
 		

@@ -10,6 +10,7 @@ import jsprit.core.problem.job.Shipment;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.freight.carrier.Tour.Leg;
 import org.matsim.contrib.freight.carrier.Tour.ServiceActivity;
 import org.matsim.contrib.freight.carrier.Tour.ShipmentBasedActivity;
@@ -33,9 +34,9 @@ public class CarrierPlanXmlWriterV2 extends MatsimXmlWriter {
 
 	private int idCounter = 0;
 
-	private Map<CarrierShipment, Id> registeredShipments = new HashMap<CarrierShipment, Id>();
+	private Map<CarrierShipment, Id<Shipment>> registeredShipments = new HashMap<>();
 	
-	private Map<CarrierService, Id> serviceMap = new HashMap<CarrierService, Id>();
+	private Map<CarrierService, Id<CarrierService>> serviceMap = new HashMap<>();
 
 	/**
 	 * Constructs the writer with the carriers to be written.
@@ -208,7 +209,7 @@ public class CarrierPlanXmlWriterV2 extends MatsimXmlWriter {
 							writer.write("\n");
 							writer.write("\t\t\t\t\t\t<route>");
 							boolean firstLink = true;
-							for (Id id : ((NetworkRoute) leg.getRoute())
+							for (Id<Link> id : ((NetworkRoute) leg.getRoute())
 									.getLinkIds()) {
 								if (firstLink) {
 									writer.write(id.toString());

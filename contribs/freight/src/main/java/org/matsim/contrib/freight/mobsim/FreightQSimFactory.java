@@ -71,8 +71,6 @@ public class FreightQSimFactory implements Provider<Mobsim> {
 		if (carrierConfig.getPhysicallyEnforceTimeWindowBeginnings()) {
 			WithinDayActivityReScheduling withinDayActivityRescheduling = new WithinDayActivityReScheduling(agentSource, carrierAgentTracker);
 			sim.addQueueSimulationListeners(withinDayActivityRescheduling);
-//			sim.addMobsimEngine(withinDayActivityRescheduling);
-			// no longer needed (I think).  kai, apr'15
 		}
 		return sim;
 	}

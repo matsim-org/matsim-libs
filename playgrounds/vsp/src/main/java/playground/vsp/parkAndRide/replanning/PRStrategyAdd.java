@@ -31,11 +31,14 @@ import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
+import org.matsim.core.router.TripRouter;
 import org.matsim.pt.replanning.TransitActsRemoverStrategy;
 
 import playground.vsp.parkAndRide.PRConfigGroup;
 import playground.vsp.parkAndRide.PRFacility;
 import playground.vsp.parkAndRide.PRFileReader;
+
+import javax.inject.Provider;
 
 /**
  * A way of plugging park-and-ride strategy modules together. Via config file: <param name="Module_#" value="playground.vsp.parkAndRide.replanning.PRStrategyAdd" />
@@ -47,7 +50,7 @@ public class PRStrategyAdd implements PlanStrategy {
 
 	PlanStrategyImpl planStrategyDelegate = null ;
 	
-	public PRStrategyAdd(Controler controler) {
+	public PRStrategyAdd(Controler controler, Provider<TripRouter> tripRouterProvider) {
 		
 		PRConfigGroup prSettings = (PRConfigGroup) controler.getConfig().getModule(PRConfigGroup.GROUP_NAME);
 		PRFileReader prReader = new PRFileReader(prSettings.getInputFile());
@@ -62,7 +65,7 @@ public class PRStrategyAdd implements PlanStrategy {
 		PRAddStrategyMod prAddStrategyMod = new PRAddStrategyMod(controler, id2prFacility, prSettings.getGravity(), prSettings.getTypicalDuration());
 		planStrategyDelegate.addStrategyModule(prAddStrategyMod);
 		
-		ReRoute reRouteModule = new ReRoute( controler.getScenario() ) ;
+		ReRoute reRouteModule = new ReRoute( controler.getScenario(), tripRouterProvider) ;
 		planStrategyDelegate.addStrategyModule(reRouteModule) ;
 		
 	}

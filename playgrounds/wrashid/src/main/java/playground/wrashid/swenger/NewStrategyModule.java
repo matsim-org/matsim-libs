@@ -31,7 +31,9 @@ import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.modules.TimeAllocationMutator;
 import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
+import org.matsim.core.router.TripRouter;
 
+import javax.inject.Provider;
 import java.util.HashMap;
 import java.util.Random;
 
@@ -72,10 +74,10 @@ public class NewStrategyModule implements PlanStrategyModule {
 	double lambdaParameter;
 	private ReplanningContext replanningContext; 
 
-	public NewStrategyModule() {
-		this.timeAllocationMutator = new TimeAllocationMutator(controler.getConfig(), 7200, true);
+	public NewStrategyModule(Provider<TripRouter> tripRouterProvider) {
+		this.timeAllocationMutator = new TimeAllocationMutator(controler.getConfig(), tripRouterProvider, 7200, true);
 		this.betaExp = new ExpBetaPlanChanger(controler.getConfig().planCalcScore().getBrainExpBeta());
-		this.reRoute = new ReRoute(controler.getScenario());
+		this.reRoute = new ReRoute(controler.getScenario(), tripRouterProvider);
 		this.randomSelector = new RandomPlanSelector();
 
 		Config config = controler.getScenario().getConfig();

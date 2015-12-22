@@ -36,12 +36,12 @@ import org.wololo.geojson.GeoJSONFactory;
 import org.wololo.geojson.Geometry;
 import org.wololo.jts2geojson.GeoJSONWriter;
 import playground.johannes.gsv.sim.cadyts.ODUtils;
-import playground.johannes.gsv.zones.KeyMatrix;
-import playground.johannes.gsv.zones.MatrixOperations;
-import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
 import playground.johannes.synpop.gis.Zone;
 import playground.johannes.synpop.gis.ZoneCollection;
 import playground.johannes.synpop.gis.ZoneGeoJsonIO;
+import playground.johannes.synpop.matrix.MatrixOperations;
+import playground.johannes.synpop.matrix.NumericMatrix;
+import playground.johannes.synpop.matrix.NumericMatrixXMLReader;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -68,18 +68,18 @@ public class RelationsDiffPlot {
 		/*
 		 * load ref matrix
 		 */
-		KeyMatrixXMLReader reader = new KeyMatrixXMLReader();
+		NumericMatrixXMLReader reader = new NumericMatrixXMLReader();
 		reader.setValidating(false);
 		reader.parse(itpFile);
-		KeyMatrix itp = reader.getMatrix();
+		NumericMatrix itp = reader.getMatrix();
 
 		reader.parse(tomtomFile);
-		KeyMatrix tomtom = reader.getMatrix();
+		NumericMatrix tomtom = reader.getMatrix();
 
 		reader.parse(simFile);
-		KeyMatrix simulation = reader.getMatrix();
-//		MatrixOperations.symetrize(simulation);
-//		MatrixOperations.applyFactor(simulation, 11.8);
+		NumericMatrix simulation = reader.getMatrix();
+//		MatrixOperations.symmetrize(simulation);
+//		MatrixOperations.multiply(simulation, 11.8);
 		/*
 		 * load zones
 		 */
@@ -95,7 +95,7 @@ public class RelationsDiffPlot {
 		ODUtils.cleanVolumes(tomtom, zones, 1000);
 		double c = ODUtils.calcNormalization(tomtom, simulation);
 		MatrixOperations.applyFactor(tomtom, c);
-		MatrixOperations.symetrize(tomtom);
+		MatrixOperations.symmetrize(tomtom);
 
 		/*
 		 * compare
@@ -126,7 +126,7 @@ public class RelationsDiffPlot {
 		return jsonWriter.write(features).toString();
 	}
 	
-	private static String writeGeoJSON(ZoneCollection zones, Collection<Zone> relationZones, KeyMatrix m1, KeyMatrix m2, KeyMatrix m3) {
+	private static String writeGeoJSON(ZoneCollection zones, Collection<Zone> relationZones, NumericMatrix m1, NumericMatrix m2, NumericMatrix m3) {
 		StringBuilder builder = new StringBuilder();
 		/*
 		 * write zone polygons

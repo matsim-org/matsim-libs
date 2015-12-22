@@ -30,6 +30,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.*;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -83,8 +84,7 @@ public class ListenersInjectionTest {
                         // put dummy dependencies to get the listenners happy
 						bind(OutputDirectoryHierarchy.class).toInstance( new OutputDirectoryHierarchy( outputDir , OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists ) );
 						bind(IterationStopWatch.class).toInstance( new IterationStopWatch() );
-						bind(Scenario.class).toInstance( ScenarioUtils.createScenario( config ) );
-						bind(EventsManager.class).toInstance( new EventsManagerImpl() );
+						install(new ScenarioByInstanceModule(ScenarioUtils.createScenario(config)));
 						bind(ControlerI.class).toInstance(new ControlerI() {
 
 							@Override

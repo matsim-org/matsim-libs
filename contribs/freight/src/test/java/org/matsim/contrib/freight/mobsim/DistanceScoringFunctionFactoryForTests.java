@@ -20,6 +20,8 @@ import org.matsim.core.scoring.ScoringFunctionAccumulator.ActivityScoring;
 import org.matsim.core.scoring.ScoringFunctionAccumulator.BasicScoring;
 import org.matsim.core.scoring.ScoringFunctionAccumulator.LegScoring;
 
+import javax.inject.Inject;
+
 @Ignore
 public class DistanceScoringFunctionFactoryForTests implements CarrierScoringFunctionFactory{
 
@@ -207,13 +209,8 @@ public class DistanceScoringFunctionFactoryForTests implements CarrierScoringFun
 		
 	}
 	 
-	 private Network network;
+	@Inject private Network network;
 	
-	public DistanceScoringFunctionFactoryForTests(Network network) {
-		super();
-		this.network = network;
-	}
-
 	@Override
 	public ScoringFunction createScoringFunction(Carrier carrier) {
 		ScoringFunctionAccumulator sf = new ScoringFunctionAccumulator();

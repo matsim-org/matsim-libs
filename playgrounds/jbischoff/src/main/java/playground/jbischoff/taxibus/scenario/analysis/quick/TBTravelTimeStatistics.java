@@ -30,7 +30,7 @@ import org.matsim.core.events.MatsimEventsReader;
 public class TBTravelTimeStatistics {
 
 	public static void main(String[] args) {
-		String inputFile = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/input/output/tb/ITERS/it.0/tb.0.events.xml.gz";
+		String inputFile = "D:/runs-svn/vw_rufbus/vwTB01/vwTB01.output_events.xml.gz";
 
 		EventsManager events = EventsUtils.createEventsManager();
 		TaxiBusTravelTimesAnalyzer a = new TaxiBusTravelTimesAnalyzer();

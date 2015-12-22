@@ -23,6 +23,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.modules.SubtourModeChoice;
+import org.matsim.core.router.TripRouter;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -30,18 +31,20 @@ import javax.inject.Provider;
 public class TripSubtourModeChoiceStrategyFactory implements Provider<PlanStrategy> {
 
     private Scenario scenario;
+	private Provider<TripRouter> tripRouterProvider;
 
-    @Inject
-    public TripSubtourModeChoiceStrategyFactory(Scenario scenario) {
+	@Inject
+    public TripSubtourModeChoiceStrategyFactory(Scenario scenario, Provider<TripRouter> tripRouterProvider) {
         this.scenario = scenario;
-    }
+		this.tripRouterProvider = tripRouterProvider;
+	}
 
     @Override
 	public PlanStrategy get() {
 		BasePlanModulesStrategy strategy = new BasePlanModulesStrategy(scenario);
 		strategy.addStrategyModule(new TransitActsRemoverModule(scenario.getConfig().global()));
-		strategy.addStrategyModule(new SubtourModeChoice(scenario.getConfig()));
-		strategy.addStrategyModule(new ReRoute(scenario));
+		strategy.addStrategyModule(new SubtourModeChoice(tripRouterProvider, scenario.getConfig().global(), scenario.getConfig().subtourModeChoice()));
+		strategy.addStrategyModule(new ReRoute(scenario, tripRouterProvider));
 		return strategy;
 	}
 

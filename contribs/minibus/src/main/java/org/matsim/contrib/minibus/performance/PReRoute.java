@@ -29,6 +29,9 @@ import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 
 import com.google.inject.Inject;
+import org.matsim.core.router.TripRouter;
+
+import javax.inject.Provider;
 
 /**
  * 
@@ -41,9 +44,9 @@ public final class PReRoute implements PlanStrategy {
 	private PlanStrategyImpl strategy = null ;
 
 	@Inject
-	public PReRoute(Scenario scenario) {
+	public PReRoute(Scenario scenario, Provider<TripRouter> tripRouterProvider) {
 		this.strategy = new PlanStrategyImpl(new RandomPlanSelector());
-		this.strategy.addStrategyModule(new PReRouteStrategyModule(scenario)) ;
+		this.strategy.addStrategyModule(new PReRouteStrategyModule(tripRouterProvider, scenario)) ;
 	}
 
 	@Override

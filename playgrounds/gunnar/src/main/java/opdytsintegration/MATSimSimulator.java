@@ -11,78 +11,102 @@ import floetteroed.opdyts.trajectorysampling.TrajectorySampler;
 
 /**
  * Created by michaelzilske on 08/10/15.
+ * 
+ * Modified by Gunnar in December 2015.
  */
-public class MATSimSimulator<U extends DecisionVariable> implements Simulator<U> {
+public class MATSimSimulator<U extends DecisionVariable> implements
+		Simulator<U> {
 
-	// private final Set<? extends DecisionVariable> decisionVariables;
-    private final MATSimStateFactory stateFactory;
-    private final Scenario scenario;
+	// -------------------- MEMBERS --------------------
+
+	private final MATSimStateFactory<U> stateFactory;
+
+	private final Scenario scenario;
+
+	private AbstractModule[] modules = null;
 
 	private int nextControlerRun = 0;
 
-	private final AbstractModule[] modules;
-	
-	private boolean modulesHaveBeenSet = false;
-	
-    public MATSimSimulator(// Set<? extends DecisionVariable> decisionVariables, 
-    		MATSimStateFactory stateFactory, Scenario scenario, AbstractModule... modules) {
-        // this.decisionVariables = decisionVariables;
-        this.stateFactory = stateFactory;
-        this.scenario = scenario;
-		String outputDirectory = this.scenario.getConfig().controler().getOutputDirectory();
-		this.scenario.getConfig().controler().setOutputDirectory(outputDirectory + "_0");
+	private final TimeDiscretization timeDiscretization;
+
+	// -------------------- CONSTRUCTOR --------------------
+
+	public MATSimSimulator(final MATSimStateFactory<U> stateFactory,
+			final Scenario scenario,
+			final TimeDiscretization timeDiscretization,
+			final AbstractModule... modules) {
+		this.stateFactory = stateFactory;
+		this.scenario = scenario;
+		this.timeDiscretization = timeDiscretization;
+		String outputDirectory = this.scenario.getConfig().controler()
+				.getOutputDirectory();
+		this.scenario.getConfig().controler()
+				.setOutputDirectory(outputDirectory + "_0");
 		this.modules = modules;
-    }
+	}
 
-    @Override
-	public SimulatorState run(TrajectorySampler<U> evaluator) {
-//				evaluator.addStatistic("./mylog.txt", new InterpolatedObjectiveFunctionValue());
-//				evaluator.addStatistic("./mylog.txt", new AlphaStatistic(decisionVariables));
-		String outputDirectory = this.scenario.getConfig().controler().getOutputDirectory();
-		outputDirectory = outputDirectory.substring(0, outputDirectory.lastIndexOf("_")) + "_" + nextControlerRun;
-		this.scenario.getConfig().controler().setOutputDirectory(outputDirectory);
-		final MATSimDecisionVariableSetEvaluator predictor
-				= new MATSimDecisionVariableSetEvaluator(evaluator, 
-						// decisionVariables, 
-						stateFactory);
-		predictor.setMemory(1);
-		predictor.setBinSize_s(10 * 60);
-		predictor.setStartBin(6 * 5);
-		predictor.setBinCnt(6 * 20);
+	// --------------- IMPLEMENTATION OF Simulator INTERFACE ---------------
 
-		final Controler controler = new Controler(scenario);
+	@Override
+	public SimulatorState run(final TrajectorySampler<U> trajectorySampler) {
+		String outputDirectory = this.scenario.getConfig().controler()
+				.getOutputDirectory();
+		outputDirectory = outputDirectory.substring(0,
+				outputDirectory.lastIndexOf("_"))
+				+ "_" + this.nextControlerRun;
+		this.scenario.getConfig().controler()
+				.setOutputDirectory(outputDirectory);
+		final MATSimDecisionVariableSetEvaluator<U> matsimDecisionVariableEvaluator = new MATSimDecisionVariableSetEvaluator<U>(
+				trajectorySampler, this.stateFactory, this.timeDiscretization);
+		matsimDecisionVariableEvaluator.setMemory(1); // TODO make configurable
+		matsimDecisionVariableEvaluator.setStandardLogFileName(outputDirectory
+				+ "/optimization.log");
+		// predictor.setStartTime_s(this.startTime_s);
+		// predictor.setBinSize_s(this.binSize_s);
+		// predictor.setBinCnt(this.binCnt);
 
-		// Michael, ich weiss nicht ob das hier ideal ist, aber ich brauchte es, um irgendwie das
-		// roadpricing-modul einzusetzen. Gunnar 2015-12-12
-		if (this.modules != null && !this.modulesHaveBeenSet) {
+		final Controler controler = new Controler(this.scenario);
+
+		// Michael, ich weiss nicht ob das hier so richtig ist. Ich brauche
+		// etwas in der Art, um das roadpricing-modul einzusetzen.
+		// Gunnar 2015-12-12
+		if (this.modules != null) {
 			controler.setModules(this.modules);
-			this.modulesHaveBeenSet = true;
+			this.modules = null;
 		}
-        
-		controler.addControlerListener(predictor);
+
+		controler.addControlerListener(matsimDecisionVariableEvaluator);
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				binder().requestInjection(stateFactory);
 			}
 		});
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				binder().requestInjection(matsimDecisionVariableEvaluator);
+			}
+		});
 		controler.setTerminationCriterion(new Controler.TerminationCriterion() {
 			@Override
 			public boolean continueIterations(int iteration) {
-				return !predictor.foundSolution();
+				return !matsimDecisionVariableEvaluator.foundSolution();
 			}
 		});
 		controler.run();
-		nextControlerRun++;
-		return predictor.getFinalState();
+		this.nextControlerRun++;
+		return matsimDecisionVariableEvaluator.getFinalState();
 	}
 
-    @Override
-	public SimulatorState run(TrajectorySampler<U> evaluator, SimulatorState initialState) {
+	@Override
+	public SimulatorState run(final TrajectorySampler<U> evaluator,
+			final SimulatorState initialState) {
 		if (initialState != null) {
-			((MATSimState) initialState).setPopulation(scenario.getPopulation());
+			// ((MATSimState) initialState).setPopulation(this.scenario
+			// .getPopulation());
 			initialState.implementInSimulation();
 		}
-		return run(evaluator);
+		return this.run(evaluator);
 	}
 }

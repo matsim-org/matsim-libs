@@ -29,6 +29,7 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import playground.ivt.utils.MoreIOUtils;
+import playground.ivt.utils.PassengerTracker;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,12 +47,12 @@ public class RunExtractData {
 
 	public static void main(final String[] args) {
 		String configFile = args[0];
-		Config config = ConfigUtils.loadConfig(configFile);
-		Scenario scenario = ScenarioUtils.createScenario(config);
+		Config config = ConfigUtils.loadConfig( configFile );
+		Scenario scenario = ScenarioUtils.createScenario( config );
 		ScenarioUtils.loadScenario(scenario);
 		Network network = scenario.getNetwork();
 
-		ConfigGroup module = config.getModule(MODULE);
+		ConfigGroup module = config.getModule( MODULE );
 		String eventFile = module.getValue(EVENTS);
 		String outputDir = module.getValue(DIR);
 
@@ -71,7 +72,9 @@ public class RunExtractData {
 		}
 
 		EventsManager eventsManager = EventsUtils.createEventsManager();
-		TripReconstructor trips = new TripReconstructor(network);
+		PassengerTracker tracker = new PassengerTracker();
+		TripReconstructor trips = new TripReconstructor( tracker, network);
+		eventsManager.addHandler(tracker);
 		eventsManager.addHandler(trips);
 
 		(new MatsimEventsReader(eventsManager)).readFile(eventFile);

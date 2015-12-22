@@ -209,33 +209,15 @@ public class PopulationCreator {
 		Config config = scenario.getConfig();
 		
 		config.global().setNumberOfThreads(8);
-		TimeAllocationMutator timeAllocationMutator = new TimeAllocationMutator(config, timeMutationRange, true);
+		TimeAllocationMutator timeAllocationMutator = new TimeAllocationMutator(config, null, timeMutationRange, true);
 		
 		final TravelTime travelTime = new FreeSpeedTravelTime();
 		TravelDisutilityFactory travelDisutilityFactory = new Builder( TransportMode.car );
 		final TravelDisutility travelDisutility = travelDisutilityFactory.createTravelDisutility(travelTime, scenario.getConfig().planCalcScore());
-		final ScoringFunctionFactory scoringFunctionFactory = new CharyparNagelOpenTimesScoringFunctionFactory( scenario );
-		final Provider<TripRouter> tripRouterFactory = TripRouterFactoryBuilderWithDefaults.createTripRouterProvider(scenario, new DijkstraFactory(), null);
 		ReplanningContext context = new ReplanningContext() {
-			@Override
-			public TravelDisutility getTravelDisutility() {
-				return travelDisutility;
-			}
-			@Override
-			public TravelTime getTravelTime() {
-				return travelTime;
-			}
-			@Override
-			public ScoringFunctionFactory getScoringFunctionFactory() {
-				return scoringFunctionFactory;
-			}
 			@Override
 			public int getIteration() {
 				return 0;
-			}
-			@Override
-			public TripRouter getTripRouter() {
-				return tripRouterFactory.get();
 			}
 		};
 		timeAllocationMutator.prepareReplanning(context);

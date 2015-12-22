@@ -19,8 +19,8 @@
 
 package playground.johannes.gsv.matrices.io;
 
-import playground.johannes.gsv.zones.KeyMatrix;
-import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
+import playground.johannes.synpop.matrix.NumericMatrix;
+import playground.johannes.synpop.matrix.NumericMatrixXMLReader;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -38,10 +38,10 @@ public class KeyMatrix2Txt {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-		KeyMatrixXMLReader reader = new KeyMatrixXMLReader();
+		NumericMatrixXMLReader reader = new NumericMatrixXMLReader();
 		reader.setValidating(false);
 		reader.parse(args[0]);
-		KeyMatrix m = reader.getMatrix();
+		NumericMatrix m = reader.getMatrix();
 
 		int odId = 0;
 		BufferedWriter writer = new BufferedWriter(new FileWriter(args[1]));

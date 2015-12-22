@@ -31,10 +31,7 @@ public class ChangeableNetworkCreator {
 	private final String NETWORKFILE = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/input/networkptcc.xml";
 	private final String EVENTSFILE =  "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/input/output/vw028.100pct/ITERS/it.210/vw028.100pct.210.events.xml.gz";
 	private final String CHANGEFILE = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/input/changeevents.xml";
-//	 private final String NETWORKFILE = "C:/local_jb/cottbus/network.xml.gz";
-//	 private final String EVENTSFILE =  "C:/local_jb/cottbus/1212.0.events_nosig.xml.gz";
-//	 private final String CHANGEFILE = "C:/local_jb/cottbus/changeevents.xml";
-	
+
 	private final double MINIMUMFREESPEED = 3;
 
 	public ChangeableNetworkCreator(){

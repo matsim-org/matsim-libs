@@ -84,7 +84,8 @@ public class AverageSpeedCalculator implements LinkEnterEventHandler,
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
 		Id linkId = event.getLinkId();
-		Id personId = event.getDriverId();
+//		Id personId = event.getDriverId();
+		Id personId = event.getVehicleId();
 		if (filteredLinks.containsKey(linkId)) {
 			if (linkEnterTime.containsKeyTwo(linkId,
 					personId)) {
@@ -102,7 +103,8 @@ public class AverageSpeedCalculator implements LinkEnterEventHandler,
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
 		if (filteredLinks.containsKey(event.getLinkId())) {
-				linkEnterTime.put(event.getLinkId(), event.getDriverId(),
+//			linkEnterTime.put(event.getLinkId(), event.getDriverId(),
+			linkEnterTime.put(event.getLinkId(), event.getVehicleId(),
 						event.getTime());
 		}
 	}

@@ -18,7 +18,10 @@
  * *********************************************************************** */
 package playground.agarwalamit.mixedTraffic.patnaIndia.input.extDemand;
 
+import javax.inject.Inject;
+
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.cadyts.car.CadytsContext;
 import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
@@ -35,6 +38,7 @@ import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.replanning.DefaultPlanStrategiesModule;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -48,8 +52,10 @@ import org.matsim.core.scoring.functions.SubpopulationCharyparNagelScoringParame
 import org.matsim.vehicles.VehicleWriterV1;
 
 import playground.agarwalamit.mixedTraffic.patnaIndia.FreeSpeedTravelTimeForBike;
-import playground.agarwalamit.mixedTraffic.patnaIndia.PatnaUtils;
 import playground.agarwalamit.mixedTraffic.patnaIndia.input.PatnaVehiclesGenerator;
+import playground.agarwalamit.mixedTraffic.patnaIndia.utils.OuterCordonUtils;
+import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
+import playground.agarwalamit.utils.plans.SelectedPlansFilter;
 
 /**
  * @author amit
@@ -57,22 +63,36 @@ import playground.agarwalamit.mixedTraffic.patnaIndia.input.PatnaVehiclesGenerat
 
 public class PatnaCadytsControler {
 
+	private static String plansFile = "../../../../repos/runs-svn/patnaIndia/run108/input/outerCordonDemand_10pct.xml.gz";
+	private static String outputDir = "../../../../repos/runs-svn/patnaIndia/run108/outerCordonOutput_10pct/";
+
+	private static final boolean stabilityCheckAfterCadyts = false;
+	
 	public static void main(String[] args) {
+		String patnaVehicles = "../../../../repos/runs-svn/patnaIndia/run108/input/patnaVehicles_outerCordon.xml.gz";
+		
+		if( stabilityCheckAfterCadyts) {
+			String inPlans = outputDir+"/output_plans.xml.gz";	
+			plansFile = "../../../../repos/runs-svn/patnaIndia/run108/input/cordonOutput_plans_10pct_selected.xml.gz";
+			
+			SelectedPlansFilter spf = new SelectedPlansFilter();
+			spf.run(inPlans, plansFile);
+			
+			outputDir = "../../../../repos/runs-svn/patnaIndia/run108/outerCordonOutput_10pct_ctd/";
+			patnaVehicles = "../../../../repos/runs-svn/patnaIndia/run108/input/patnaVehicles_outerCordon_ctd.xml.gz";
+		}
+		
 		PatnaCadytsControler pcc = new PatnaCadytsControler();
 		final Config config = pcc.getConfig();
 
-		PatnaVehiclesGenerator pvg = new PatnaVehiclesGenerator("../../../../repos/runs-svn/patnaIndia/run108/input/outerCordonDemand.xml.gz");
+		PatnaVehiclesGenerator pvg = new PatnaVehiclesGenerator(plansFile);
 		pvg.createVehicles();
-		String patnaVehicles = PatnaUtils.INPUT_FILES_DIR+"/patnaVehicles.xml.gz";
+		
 		new VehicleWriterV1(pvg.getPatnaVehicles()).writeFile(patnaVehicles);
 		config.vehicles().setVehiclesFile(patnaVehicles);
 
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		
-		CadytsConfigGroup cadytsConfigGroup = ConfigUtils.addOrGetModule(config, CadytsConfigGroup.GROUP_NAME, CadytsConfigGroup.class);
-		cadytsConfigGroup.setStartTime(06*3600);
-		cadytsConfigGroup.setEndTime(18*3600-1);
-		
+
 		final Controler controler = new Controler(config);
 		controler.setDumpDataAtEnd(true);
 
@@ -90,22 +110,32 @@ public class PatnaCadytsControler {
 			}
 		});
 
+		if(!stabilityCheckAfterCadyts) pcc.addCadytsSetting(controler, config);
+
+		controler.run();
+	}
+
+	private void addCadytsSetting(final Controler controler, final Config config){
 		final CadytsContext cContext = new CadytsContext(controler.getConfig());
 		controler.addControlerListener(cContext);
 
+		CadytsConfigGroup cadytsConfigGroup = ConfigUtils.addOrGetModule(config, CadytsConfigGroup.GROUP_NAME, CadytsConfigGroup.class);
+		cadytsConfigGroup.setStartTime(0);
+		cadytsConfigGroup.setEndTime(24*3600-1);
+		
 		// scoring function
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
 			final CharyparNagelScoringParametersForPerson parameters = new SubpopulationCharyparNagelScoringParameters( controler.getScenario() );
-
+			@Inject Network network;
 			@Override
 			public ScoringFunction createNewScoringFunction(Person person) {
 				final CharyparNagelScoringParameters params = parameters.getScoringParameters( person );
 
 				SumScoringFunction sumScoringFunction = new SumScoringFunction();
-				sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(params, controler.getScenario().getNetwork()));
+				sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(params, network));
 				sumScoringFunction.addScoringFunction(new CharyparNagelActivityScoring(params)) ;
 				sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
-				
+
 				final CadytsScoring<Link> scoringFunction = new CadytsScoring<Link>(person.getSelectedPlan(), config, cContext);
 				final double cadytsScoringWeight = 15.0;
 				scoringFunction.setWeightOfCadytsCorrection(cadytsScoringWeight) ;
@@ -114,20 +144,17 @@ public class PatnaCadytsControler {
 				return sumScoringFunction;
 			}
 		}) ;
-
-		controler.run();
 	}
 
 	private Config getConfig(){
 		Config config = ConfigUtils.createConfig();
-		
-		config.global().setCoordinateSystem("EPSG:24345");
+		config.global().setCoordinateSystem(PatnaUtils.EPSG);
 
-		config.plans().setInputFile("../../../../repos/runs-svn/patnaIndia/run108/input/outerCordonDemand.xml.gz");
+		config.plans().setInputFile(plansFile);
 		config.network().setInputFile("../../../../repos/runs-svn/patnaIndia/run108/input/network_diff_linkSpeed.xml.gz");
 
-		config.qsim().setFlowCapFactor(0.01);
-		config.qsim().setStorageCapFactor(0.03);
+		config.qsim().setFlowCapFactor(OuterCordonUtils.SAMPLE_SIZE);
+		config.qsim().setStorageCapFactor(3*OuterCordonUtils.SAMPLE_SIZE);
 		config.qsim().setMainModes(PatnaUtils.ALL_MAIN_MODES);
 		config.qsim().setLinkDynamics(LinkDynamics.PassingQ.name());
 		config.qsim().setEndTime(36*3600);
@@ -135,26 +162,26 @@ public class PatnaCadytsControler {
 		config.qsim().setVehiclesSource(VehiclesSource.fromVehiclesData);
 
 		config.counts().setCountsFileName("../../../../repos/runs-svn/patnaIndia/run108/input/outerCordonCounts.xml.gz");
-		config.counts().setWriteCountsInterval(20);
-		config.counts().setCountsScaleFactor(100);
+		config.counts().setWriteCountsInterval(5);
+		config.counts().setCountsScaleFactor(1/OuterCordonUtils.SAMPLE_SIZE);
 		config.counts().setOutputFormat("all");
 
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(100);
-		config.controler().setOutputDirectory("../../../../repos/runs-svn/patnaIndia/run108/outerCordonOutput/");
-		config.controler().setWritePlansInterval(100);
-		config.controler().setWriteEventsInterval(100);
+		config.controler().setOutputDirectory(outputDir);
+		config.controler().setWritePlansInterval(50);
+		config.controler().setWriteEventsInterval(50);
 
 		StrategySettings reRoute = new StrategySettings();
-		reRoute.setStrategyName("ReRoute");
+		reRoute.setStrategyName(DefaultPlanStrategiesModule.DefaultStrategy.ReRoute.name());
 		reRoute.setWeight(0.3);
 		config.strategy().addStrategySettings(reRoute);
-		
+
 		StrategySettings expChangeBeta = new StrategySettings();
-		expChangeBeta.setStrategyName("ChangeExpBeta");
+		expChangeBeta.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta.name());
 		expChangeBeta.setWeight(0.7);
 		config.strategy().addStrategySettings(expChangeBeta);
-		
+
 		config.strategy().setFractionOfIterationsToDisableInnovation(0.8);
 		config.strategy().setMaxAgentPlanMemorySize(6);
 
@@ -170,14 +197,16 @@ public class PatnaCadytsControler {
 		act3.setTypicalDuration(12*60*60);
 		config.planCalcScore().addActivityParams(act3);
 
-		ActivityParams act4 = new ActivityParams("E2I_mid");
-		act4.setTypicalDuration(8*60*60);
-		config.planCalcScore().addActivityParams(act4);
+		for(String area : OuterCordonUtils.getAreaType2ZoneIds().keySet()){
+			ActivityParams act4 = new ActivityParams("E2I_mid_"+area.substring(0,3));
+			act4.setTypicalDuration(8*60*60);
+			config.planCalcScore().addActivityParams(act4);			
+		}
 
 		config.plans().setRemovingUnneccessaryPlanAttributes(true);
 		config.vspExperimental().addParam("vspDefaultsCheckingLevel", "abort");
 		config.vspExperimental().setWritingOutputEvents(true);
-		
+
 		config.planCalcScore().setMarginalUtlOfWaiting_utils_hr(0);
 		config.planCalcScore().setPerforming_utils_hr(6.0);
 
@@ -208,7 +237,6 @@ public class PatnaCadytsControler {
 		mrp.setTeleportedModeSpeed(20./3.6);
 		mrp.setBeelineDistanceFactor(1.5);
 		config.plansCalcRoute().addModeRoutingParams(mrp);
-
 		return config;
 	}
 }

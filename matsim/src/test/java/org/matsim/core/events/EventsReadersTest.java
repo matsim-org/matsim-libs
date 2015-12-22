@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
-import org.matsim.api.core.v01.events.Wait2LinkEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
@@ -40,7 +40,7 @@ import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
-import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.testcases.MatsimTestCase;
@@ -49,7 +49,7 @@ import org.xml.sax.SAXException;
 public class EventsReadersTest extends MatsimTestCase {
 
 
-	static class TestHandler implements ActivityEndEventHandler, PersonDepartureEventHandler, Wait2LinkEventHandler,
+	static class TestHandler implements ActivityEndEventHandler, PersonDepartureEventHandler, VehicleEntersTrafficEventHandler,
 			LinkLeaveEventHandler, LinkEnterEventHandler, PersonArrivalEventHandler, ActivityStartEventHandler,
 			PersonStuckEventHandler {
 
@@ -79,7 +79,7 @@ public class EventsReadersTest extends MatsimTestCase {
 		}
 
 		@Override
-		public void handleEvent(final Wait2LinkEvent event) {
+		public void handleEvent(final VehicleEntersTrafficEvent event) {
 			this.eventCounter++;
 			assertEquals("expected wait2link-Event to be event #3", 3, this.eventCounter);
 			assertEquals(21630.0, event.getTime(), 0.0);
@@ -92,7 +92,7 @@ public class EventsReadersTest extends MatsimTestCase {
 			this.eventCounter++;
 			assertEquals("expected linkleave-Event to be event #4", 4, this.eventCounter);
 			assertEquals(21640.0, event.getTime(), 0.0);
-			assertEquals("4", event.getDriverId().toString());
+			assertEquals("4", event.getVehicleId().toString());
 			assertEquals("5", event.getLinkId().toString());
 		}
 
@@ -101,7 +101,7 @@ public class EventsReadersTest extends MatsimTestCase {
 			this.eventCounter++;
 			assertEquals("expected linkleave-Event to be event #5", 5, this.eventCounter);
 			assertEquals(21650.0, event.getTime(), 0.0);
-			assertEquals("5", event.getDriverId().toString());
+			assertEquals("5", event.getVehicleId().toString());
 			assertEquals("6", event.getLinkId().toString());
 		}
 

@@ -30,7 +30,7 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.agarwalamit.mixedTraffic.patnaIndia.PatnaUtils;
+import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
 import playground.ikaddoura.analysis.welfare.WelfareAnalysisControlerListener;
 import playground.vsp.congestion.handlers.TollHandler;
 import playground.vsp.congestion.routing.TollDisutilityCalculatorFactory;

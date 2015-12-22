@@ -22,11 +22,11 @@ package playground.johannes.gsv.matrices.io;
 import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrix;
 import org.matsim.visum.VisumMatrixReader;
-import playground.johannes.gsv.zones.KeyMatrix;
-import playground.johannes.gsv.zones.io.KeyMatrixXMLWriter;
 import playground.johannes.synpop.gis.Zone;
 import playground.johannes.synpop.gis.ZoneCollection;
 import playground.johannes.synpop.gis.ZoneGeoJsonIO;
+import playground.johannes.synpop.matrix.NumericMatrix;
+import playground.johannes.synpop.matrix.NumericMatrixXMLWriter;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -64,7 +64,7 @@ public class BVWP2Matrix {
 		zones.addAll(ZoneGeoJsonIO.parseFeatureCollection(data));
 		zones.setPrimaryKey("gsvId");
 		
-		KeyMatrix m = new KeyMatrix();
+		NumericMatrix m = new NumericMatrix();
 		
 		for(Zone i : zones.getZones()) {
 			for(Zone j : zones.getZones()) {
@@ -98,7 +98,7 @@ public class BVWP2Matrix {
 			
 		}
 		
-		KeyMatrixXMLWriter writer = new KeyMatrixXMLWriter();
+		NumericMatrixXMLWriter writer = new NumericMatrixXMLWriter();
 		writer.write(m, "/home/johannes/gsv/matrices/bmbv2010.xml");
 	}
 

@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
-import org.matsim.api.core.v01.events.Wait2LinkEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.network.Network;
 
 import playground.dgrether.events.filters.EventFilter;
@@ -60,8 +60,8 @@ public class GeospatialLeavesEntersVehicleEventFilter implements EventFilter {
 	public boolean doProcessEvent(Event event) {
 		Id linkId = null;
 		Id vehId = null;
-		if (event instanceof Wait2LinkEvent ) {
-			Wait2LinkEvent e = (Wait2LinkEvent) event;
+		if (event instanceof VehicleEntersTrafficEvent ) {
+			VehicleEntersTrafficEvent e = (VehicleEntersTrafficEvent) event;
 			linkId = e.getLinkId();
 			vehId = e.getVehicleId();
 		}

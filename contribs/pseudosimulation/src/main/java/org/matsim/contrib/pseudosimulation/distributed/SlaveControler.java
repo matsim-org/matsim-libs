@@ -9,15 +9,17 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.common.diversitygeneration.planselectors.DiversityGeneratingPlansRemover;
+import org.matsim.contrib.common.randomizedtransitrouter.RandomizedTransitRouterModule;
+import org.matsim.contrib.eventsBasedPTRouter.TransitRouterEventsWSFactory;
 import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTime;
 import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTimeCalculatorSerializable;
 import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTime;
 import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTimeCalculatorSerializable;
-import org.matsim.contrib.pseudosimulation.replanning.PlanCatcher;
 import org.matsim.contrib.pseudosimulation.distributed.instrumentation.scorestats.SlaveScoreStatsCalculator;
-import org.matsim.contrib.pseudosimulation.replanning.DistributedPlanStrategyTranslationAndRegistration;
+import org.matsim.contrib.pseudosimulation.distributed.listeners.events.transit.TransitPerformance;
 import org.matsim.contrib.pseudosimulation.mobsim.PSimFactory;
-import org.matsim.contrib.common.randomizedtransitrouter.RandomizedTransitRouterModule;
+import org.matsim.contrib.pseudosimulation.replanning.DistributedPlanStrategyTranslationAndRegistration;
+import org.matsim.contrib.pseudosimulation.replanning.PlanCatcher;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
@@ -37,16 +39,12 @@ import org.matsim.core.router.TripRouterModule;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility.Builder;
 import org.matsim.core.router.costcalculators.TravelDisutilityModule;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.scenario.ScenarioElementsModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionModule;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.vehicles.Vehicle;
-
-import org.matsim.contrib.pseudosimulation.distributed.listeners.events.transit.TransitPerformance;
-import org.matsim.contrib.eventsBasedPTRouter.*;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -227,7 +225,6 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
                 install(new DefaultMobsimModule());
                 install(new TripRouterModule());
                 install(new CharyparNagelScoringFunctionModule());
-                install(new ScenarioElementsModule());
                 install(new StrategyManagerModule());
                 if (IntelligentRouters)
                     install(new TravelDisutilityModule());
@@ -244,7 +241,9 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
 
                 }
                 bind(TravelTime.class).toInstance(travelTime);
-                addPlanSelectorForRemovalBinding("DiversityGeneratingPlansRemover").toProvider(DiversityGeneratingPlansRemover.Builder.class);
+                if (getConfig().strategy().getPlanSelectorForRemoval().equals("DiversityGeneratingPlansRemover")) {
+                    bindPlanSelectorForRemoval().toProvider(DiversityGeneratingPlansRemover.Builder.class);
+                }
             }
         });
 //        new Thread(new TimesReceiver()).start();

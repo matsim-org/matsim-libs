@@ -29,45 +29,43 @@ import com.vividsolutions.jts.geom.Point;
  */
 public class TripAnalyzer {
 	public static void main(String[] args) {
-	    // Parameters
-		Integer planningAreaId = 11000000;
-		
-		boolean onlyCar = false; //car; new, should be used for runs with ChangeLedModes enabled
-		
-		boolean onlyInterior = false; // int
-		boolean onlyBerlinBased = true; // ber; usually varied for analysis
-		
-		boolean distanceFilter = true; // dist; usually varied for analysis
-		//double minDistance = 0;
-		double maxDistance = 100;
-		
-		boolean onlyWorkTrips = false; // NEW
-				
-		// --------------------------------------------------------------------------------------------------
-		boolean ageFilter = false;
-		Integer minAge = 80;
-		Integer maxAge = 119;	
-		// --------------------------------------------------------------------------------------------------
-		
+	    
+		// Parameters
 		String runId = "run_168a";
 //		String runId = "run791";
 		String usedIteration = "300"; // most frequently used value: 150
 //		String usedIteration = "600";
-	    
-	    int maxBinDuration = 120;
+		
+		// TODO why was that necessary?
+		Integer planningAreaId = 11000000;
+		
+		boolean onlyCar = false; // "car"; new, should be used for runs with ChangeLedModes enabled
+		
+		boolean onlyInterior = false; // "int"
+		
+		boolean onlyBerlinBased = true; // "ber"; usually varied for analysis
+		
+		boolean distanceFilter = true; // "dist"; usually varied for analysis
+		//double minDistance = 0;
+		double maxDistance = 100;
+		
+		boolean onlyWorkTrips = false; // "work"
+				
+		boolean ageFilter = false; // "age"
+		Integer minAge = 80;
+		Integer maxAge = 119;	
+		
+		int maxBinDuration = 120;
 	    int binWidthDuration = 1;
-	    //int binWidthDuration = 5;
 	    
 	    int maxBinTime = 23;
 	    int binWidthTime = 1;
 	    
 	    int maxBinDistance = 60;
 	    int binWidthDistance = 1;
-	    //int binWidthDistance = 5;
 	    	    
 	    int maxBinSpeed = 60;
 	    int binWidthSpeed = 1;
-	    //int binWidthSpeed = 5;
 	    
 	    
 	    // Input and output files
@@ -110,17 +108,15 @@ public class TripAnalyzer {
 	    Geometry berlinGeometry = zoneGeometries.get(planningAreaId);
 	    
 	       
-	    // Output naming
+	    // Systematic output naming
 	    Integer iteration4Analysis = Integer.parseInt(usedIteration);
 	    if (!iteration4Analysis.equals(150)) {
 	    	outputDirectory = outputDirectory + "_" + usedIteration;
 	    }
 	    
-	    // --------------------------------------------------------------------------------------------------
 	    if (onlyCar == true) {
 			outputDirectory = outputDirectory + "_car";
 		}
-	    // --------------------------------------------------------------------------------------------------
 	    
 	    if (onlyInterior == true) {
 			outputDirectory = outputDirectory + "_int";
@@ -134,18 +130,14 @@ public class TripAnalyzer {
 			outputDirectory = outputDirectory + "_dist";
 		}
 		
-		// --------------------------------------------------------------------------------------------------
-	    if (onlyWorkTrips == true) {
+		if (onlyWorkTrips == true) {
 			outputDirectory = outputDirectory + "_work";
 		}
-	    // --------------------------------------------------------------------------------------------------
-		
-		// --------------------------------------------------------------------------------------------------
+	    
 		if (ageFilter == true) {
-			outputDirectory = outputDirectory + "_" + minAge.toString();
+			outputDirectory = outputDirectory + "_age_" + minAge.toString();
 			outputDirectory = outputDirectory + "_" + maxAge.toString();
 		}
-		// --------------------------------------------------------------------------------------------------
 		
 		
 		// new 2015-12-09 for doublecheck
@@ -469,7 +461,7 @@ public class TripAnalyzer {
 		// Math.ceil returns the higher integer number (but as a double value)
 		int ceilOfValue = (int)Math.ceil(inputValueBin);
 		if (ceilOfValue < 0) {
-			System.err.println("Lower end of bin may not be smaller than zero!");
+			new RuntimeException("Lower end of bin may not be smaller than zero!");
 		}
 				
 		if (ceilOfValue >= ceilOfLastBin) {

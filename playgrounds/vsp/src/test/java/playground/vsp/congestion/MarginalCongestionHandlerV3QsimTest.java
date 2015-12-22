@@ -43,6 +43,7 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationStartsEvent;
+import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
@@ -68,6 +69,8 @@ import playground.vsp.congestion.handlers.CongestionHandlerImplV9;
 import playground.vsp.congestion.handlers.TollHandler;
 import playground.vsp.congestion.routing.TollDisutilityCalculatorFactory;
 
+import javax.inject.Inject;
+import javax.inject.Provider;
 import java.util.*;
 
 /**
@@ -302,11 +305,17 @@ public class MarginalCongestionHandlerV3QsimTest {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
+				addControlerListenerBinding().toProvider(new Provider<ControlerListener>() {
+					@Inject Scenario scenario;
+					@Inject EventsManager eventsManager;
+					@Override
+					public ControlerListener get() {
+						return new MarginalCongestionPricingContolerListener(scenario, tollHandler, new CongestionHandlerImplV3(eventsManager, scenario));
+					}
+				});
 				bindCarTravelDisutilityFactory().toInstance(tollDisutilityCalculatorFactory);
 			}
 		});
-		controler.addControlerListener(new MarginalCongestionPricingContolerListener(controler.getScenario(), tollHandler, new CongestionHandlerImplV3(controler.getEvents(), (MutableScenario) controler.getScenario())) );
-	
 		final String timeBin1 = "08:00-08:15";
 		final String timeBin2 = "08:15-08:30";
 			

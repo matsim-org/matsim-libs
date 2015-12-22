@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.jointtrips;
 
+import com.google.inject.Inject;
 import com.google.inject.Scopes;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -40,6 +41,8 @@ import org.matsim.contrib.socnetsim.jointtrips.qsim.JointQSimFactory;
 import org.matsim.contrib.socnetsim.jointtrips.router.JointPlanRouterFactory;
 import org.matsim.contrib.socnetsim.jointtrips.scoring.CharyparNagelWithJointModesScoringFunctionFactory;
 
+import javax.inject.Provider;
+
 /**
  * @author thibautd
  */
@@ -48,7 +51,8 @@ public class JointTripsModule extends AbstractModule {
 
 	@Override
 	public void install() {
-		bind( PlanRoutingAlgorithmFactory.class ).to( JointPlanRouterFactory.class ).in( Scopes.SINGLETON );
+		final com.google.inject.Provider<TripRouter> tripRouterProvider = binder().getProvider(TripRouter.class);
+		bind(PlanRoutingAlgorithmFactory.class).to( JointPlanRouterFactory.class ).in( Scopes.SINGLETON );
 		bind(Mobsim.class).toProvider(JointQSimFactory.class);
 
 		bind( ScoringFunctionFactory.class ).to(CharyparNagelWithJointModesScoringFunctionFactory.class);
@@ -60,9 +64,9 @@ public class JointTripsModule extends AbstractModule {
 					public GenericPlanAlgorithm<ReplanningGroup> createAlgorithm(final ReplanningContext replanningContext) {
 						final PlanAlgorithm routingAlgorithm =
 									routingAlgoFactory.createPlanRoutingAlgorithm(
-										replanningContext.getTripRouter() );
+											tripRouterProvider.get());
 						final PlanAlgorithm checkJointRoutes =
-							new ImportedJointRoutesChecker( replanningContext.getTripRouter() );
+							new ImportedJointRoutesChecker(tripRouterProvider.get());
 						final PlanAlgorithm xy2link = new XY2Links( sc.getNetwork() );
 						return new GenericPlanAlgorithm<ReplanningGroup>() {
 							@Override

@@ -22,16 +22,15 @@ package playground.johannes.studies.matrix2014.analysis;
 import gnu.trove.list.array.TDoubleArrayList;
 import org.matsim.contrib.common.stats.LinearDiscretizer;
 import org.matsim.contrib.common.stats.StatsWriter;
-import playground.johannes.synpop.analysis.PassThroughDiscretizerBuilder;
 import playground.johannes.studies.matrix2014.matrix.MatrixBuilder;
-import playground.johannes.gsv.zones.KeyMatrix;
-import playground.johannes.gsv.zones.MatrixOperations;
-import playground.johannes.gsv.zones.io.KeyMatrixTxtIO;
 import playground.johannes.synpop.analysis.*;
 import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.data.Segment;
 import playground.johannes.synpop.gis.FacilityData;
 import playground.johannes.synpop.gis.ZoneCollection;
+import playground.johannes.synpop.matrix.MatrixOperations;
+import playground.johannes.synpop.matrix.NumericMatrix;
+import playground.johannes.synpop.matrix.NumericMatrixTxtIO;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -46,7 +45,7 @@ public class MatrixAnalyzer implements AnalyzerTask<Collection<? extends Person>
 
     private static final String KEY = "matrix";
 
-    private Map<String, KeyMatrix> refMatrices;
+    private Map<String, NumericMatrix> refMatrices;
 
     private MatrixBuilder matrixBuilder;
 
@@ -56,11 +55,11 @@ public class MatrixAnalyzer implements AnalyzerTask<Collection<? extends Person>
 
     private final HistogramWriter histogramWriter;
 
-    public MatrixAnalyzer(FacilityData facilityData, ZoneCollection zones, Map<String, KeyMatrix> refMatrices) {
+    public MatrixAnalyzer(FacilityData facilityData, ZoneCollection zones, Map<String, NumericMatrix> refMatrices) {
         this(facilityData, zones, refMatrices, null);
     }
 
-    public MatrixAnalyzer(FacilityData facilityData, ZoneCollection zones, Map<String, KeyMatrix> refMatrices, FileIOContext ioContext) {
+    public MatrixAnalyzer(FacilityData facilityData, ZoneCollection zones, Map<String, NumericMatrix> refMatrices, FileIOContext ioContext) {
         this.refMatrices = refMatrices;
         this.ioContext = ioContext;
 
@@ -78,18 +77,19 @@ public class MatrixAnalyzer implements AnalyzerTask<Collection<? extends Person>
 
     @Override
     public void analyze(Collection<? extends Person> persons, List<StatsContainer> containers) {
-        KeyMatrix simMatrix = matrixBuilder.build(persons, predicate);
+        NumericMatrix simMatrix = matrixBuilder.build(persons, predicate);
 
         double simTotal = MatrixOperations.sum(simMatrix);
 
-        for(Map.Entry<String, KeyMatrix> entry : refMatrices.entrySet()) {
+        for(Map.Entry<String, NumericMatrix> entry : refMatrices.entrySet()) {
             String matrixName = entry.getKey();
-            KeyMatrix refMatrix = entry.getValue();
+            NumericMatrix refMatrix = entry.getValue();
 
             double refTotal = MatrixOperations.sum(refMatrix);
             MatrixOperations.applyFactor(refMatrix, simTotal/refTotal);
 
-            KeyMatrix errMatrix = MatrixOperations.errorMatrix(refMatrix, simMatrix);
+            NumericMatrix errMatrix = new NumericMatrix();
+            MatrixOperations.errorMatrix(refMatrix, simMatrix, errMatrix);
 
             double[] errors = org.matsim.contrib.common.collections.CollectionUtils.toNativeArray(errMatrix.values());
 
@@ -147,7 +147,7 @@ public class MatrixAnalyzer implements AnalyzerTask<Collection<? extends Person>
                     }
 
                     StatsWriter.writeScatterPlot(refVals, simVals, entry.getKey(), "simulation", String.format
-                            ("%s/matrix.scatter.%s.txt", ioContext.getPath(), matrixName));
+                            ("%s/matrix.%s.scatter.txt", ioContext.getPath(), matrixName));
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -156,7 +156,7 @@ public class MatrixAnalyzer implements AnalyzerTask<Collection<? extends Person>
 
         if(ioContext != null) {
             try {
-                KeyMatrixTxtIO.write(simMatrix, String.format("%s/matrix.txt.gz", ioContext.getPath()));
+                NumericMatrixTxtIO.write(simMatrix, String.format("%s/matrix.txt.gz", ioContext.getPath()));
             } catch (IOException e) {
                 e.printStackTrace();
             }

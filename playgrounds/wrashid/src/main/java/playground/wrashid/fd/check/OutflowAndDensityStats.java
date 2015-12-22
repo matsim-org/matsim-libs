@@ -4,12 +4,12 @@ import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
-import org.matsim.api.core.v01.events.Wait2LinkEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
-import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
@@ -33,7 +33,7 @@ public class OutflowAndDensityStats {
 
 	static class CountNumberOfAgents implements LinkLeaveEventHandler,
 	LinkEnterEventHandler, PersonArrivalEventHandler,
-	Wait2LinkEventHandler, PersonDepartureEventHandler {
+	VehicleEntersTrafficEventHandler, PersonDepartureEventHandler {
 		int wait2Link;
 		int arrival;
 		int departure;
@@ -54,7 +54,7 @@ public class OutflowAndDensityStats {
 		}
 
 		@Override
-		public void handleEvent(Wait2LinkEvent event) {
+		public void handleEvent(VehicleEntersTrafficEvent event) {
 			wait2Link++;			
 		}
 

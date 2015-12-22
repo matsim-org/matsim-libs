@@ -30,18 +30,20 @@ import org.matsim.vehicles.Vehicle;
 public class LinkLeaveEvent extends Event {
 
 	public static final String EVENT_TYPE = "left link";
-	public static final String ATTRIBUTE_PERSON = "person";
 	public static final String ATTRIBUTE_LINK = "link";
 	public static final String ATTRIBUTE_VEHICLE = "vehicle";
 	
-	private final Id<Person> driverId;
 	private final Id<Link> linkId;
 	private final Id<Vehicle> vehicleId;
 
-	public LinkLeaveEvent(final double time, final Id<Person> driverId, final Id<Link> linkId, Id<Vehicle> vehicleId) {
+	final static String missingDriverIdMessage = "driver (or person) id does no longer exist in LinkEnter/LeaveEvent; use vehicle ID instead.  See Vehicle2DriverEventHandler for an approach to reconstruct the driver id.";
+
+	public LinkLeaveEvent(final double time, final Id<Vehicle> vehicleId, final Id<Link> linkId) {
 		super(time);
-		this.driverId = driverId;
 		this.linkId = linkId;
+		if ( vehicleId==null ) {
+			throw new RuntimeException( LinkEnterEvent.missingVehicleIdMessage ) ;
+		}
 		this.vehicleId = vehicleId;
 	}
 
@@ -50,8 +52,13 @@ public class LinkLeaveEvent extends Event {
 		return EVENT_TYPE;
 	}
 
+	/**
+	 * Please use getVehicleId() instead. 
+	 * Vehicle-driver relations can be made by Wait2Link (now: VehicleEntersTraffic) and VehicleLeavesTraffic Events.
+	 */
+	@Deprecated
 	public Id<Person> getDriverId() {
-		return this.driverId;
+		throw new RuntimeException(missingDriverIdMessage ) ;
 	}
 
 	public Id<Link> getLinkId() {
@@ -65,11 +72,8 @@ public class LinkLeaveEvent extends Event {
 	@Override
 	public Map<String, String> getAttributes() {
 		Map<String, String> attr = super.getAttributes();
-		attr.put(ATTRIBUTE_PERSON, this.driverId.toString());
+		attr.put(ATTRIBUTE_VEHICLE, this.vehicleId.toString());
 		attr.put(ATTRIBUTE_LINK, this.linkId.toString());
-		if (this.vehicleId != null) {
-			attr.put(ATTRIBUTE_VEHICLE, this.vehicleId.toString());
-		}
 		return attr;
 	}
 }

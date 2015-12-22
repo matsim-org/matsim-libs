@@ -11,23 +11,26 @@ import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
+import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.collections.QuadTree;
+
+import javax.inject.Provider;
 
 public class InsertRandomActivityStrategy implements PlanStrategy {
 	private final PlanStrategy planStrategyDelegate;
 
-		
+
 	@Inject
-	public  InsertRandomActivityStrategy(final Scenario scenario, 
-			@Named("shopQuadTree") QuadTree shopFacilityQuadTree,
-			@Named("leisureQuadTree") QuadTree leisureFacilityQuadTree) {
-		
-	    PlanStrategyImpl.Builder builder = new PlanStrategyImpl.Builder(new RandomPlanSelector<Plan, Person>() );
+	public  InsertRandomActivityStrategy(final Scenario scenario,
+										 @Named("shopQuadTree") QuadTree shopFacilityQuadTree,
+										 @Named("leisureQuadTree") QuadTree leisureFacilityQuadTree, Provider<TripRouter> tripRouterProvider) {
+
+		PlanStrategyImpl.Builder builder = new PlanStrategyImpl.Builder(new RandomPlanSelector<Plan, Person>() );
 	    InsertRandomActivity ira = new InsertRandomActivity(scenario, shopFacilityQuadTree,
-	    		leisureFacilityQuadTree);
+	    		leisureFacilityQuadTree, tripRouterProvider);
 	    
 		builder.addStrategyModule(ira);
-		builder.addStrategyModule(new ReRoute(scenario));
+		builder.addStrategyModule(new ReRoute(scenario, tripRouterProvider));
 		
 		planStrategyDelegate = builder.build();		
 	}	

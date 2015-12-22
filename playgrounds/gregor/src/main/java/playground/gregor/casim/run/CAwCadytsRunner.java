@@ -49,7 +49,6 @@ import playground.gregor.casim.simulation.CAMobsimFactory;
 import playground.gregor.casim.simulation.physics.AbstractCANetwork;
 import playground.gregor.casim.simulation.physics.CASingleLaneNetworkFactory;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.QSimDensityDrawer;
-import playground.gregor.sim2d_v4.scenario.TransportMode;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -67,17 +66,17 @@ public class CAwCadytsRunner implements IterationStartsListener {
 		String qsimConf = args[0];
 		final Config c = ConfigUtils.loadConfig(qsimConf);
 
-		c.plans().setInputFile("/Users/laemmel/devel/nyc/gct_vicinity/calibrated_plans.xml.gz");
+//		c.plans().setInputFile("/Users/laemmel/devel/nyc/gct_vicinity/calibrated_plans.xml.gz");
 		
 		c.controler().setWriteEventsInterval(1);
 		c.controler().setMobsim("casim");
-		c.controler().setLastIteration(0);
-		c.controler().setOutputDirectory("/Users/laemmel/devel/nyc/output_measurements/");
+//		c.controler().setLastIteration(0);
+//		c.controler().setOutputDirectory("/Users/laemmel/devel/nyc/output_measurements/");
 		Scenario sc = ScenarioUtils.loadScenario(c);
 		
 		CALinInfos infos = null;
 		try {
-			FileInputStream str = new FileInputStream("/Users/laemmel/devel/nyc/gct_vicinity/ca_link_infos");
+			FileInputStream str = new FileInputStream(args[2]);
 			infos = CALinInfos.parseFrom(str);
 			str.close();
 		} catch (IOException e) {
@@ -92,8 +91,29 @@ public class CAwCadytsRunner implements IterationStartsListener {
 		// c.qsim().setEndTime(41*60);//+30*60);
 
 		final Controler controller = new Controler(sc);
-		
-		
+
+//		boolean vis = Boolean.parseBoolean(args[2]);
+//		if (vis) {
+//			AbstractCANetwork.EMIT_VIS_EVENTS = true;
+//			Sim2DConfig conf2d = Sim2DConfigUtils.createConfig();
+//			Sim2DScenario sc2d = Sim2DScenarioUtils.createSim2dScenario(conf2d);
+//
+//
+//			sc.addScenarioElement(Sim2DScenario.ELEMENT_NAME, sc2d);
+//			EventBasedVisDebuggerEngine dbg = new EventBasedVisDebuggerEngine(sc);
+//			InfoBox iBox = new InfoBox(dbg, sc);
+//			dbg.addAdditionalDrawer(iBox);
+//			dbg.addAdditionalDrawer(new Branding());
+////			QSimDensityDrawer qDbg = new QSimDensityDrawer(sc);
+////			dbg.addAdditionalDrawer(qDbg);
+//
+//			EventsManager em = controller.getEvents();
+////			em.addHandler(qDbg);
+//			em.addHandler(dbg);
+//		}
+
+
+
 		// create the cadyts context and add it to the control(l)er:
 		final CadytsContext cContext = new CadytsContext(c);
 		controller.addControlerListener(cContext);
@@ -102,12 +122,12 @@ public class CAwCadytsRunner implements IterationStartsListener {
 		controller.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 
 
-		controller.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				addRoutingModuleBinding(TransportMode.walkca).toProvider(CARoutingModule.class);
-			}
-		});
+//		controller.addOverridingModule(new AbstractModule() {
+//			@Override
+//			public void install() {
+//				addRoutingModuleBinding(TransportMode.walkca).toProvider(CARoutingModule.class);
+//			}
+//		});
 
 		final CAMobsimFactory factory = new CAMobsimFactory();
 		if (args[1].equals("false")) {
@@ -169,17 +189,18 @@ public class CAwCadytsRunner implements IterationStartsListener {
 
 	protected static void printUsage() {
 		System.out.println();
-		System.out.println("CARunner");
+		System.out.println("CAwCadytsRunner");
 		System.out.println("Controller for ca (pedestrian) simulations.");
 		System.out.println();
-		System.out.println("usage : CARunner config multilane_mode visualize");
+		System.out.println("usage : CAwCadytsRunner config multilane_mode ca_link_infos");
 		System.out.println();
-		System.out.println("config:   A MATSim config file.");
+		System.out.println("config:   path to MATSim config file.");
 		System.out.println("multilane_mode:   one of {true,false}.");
-		System.out.println("visualize:   one of {true,false}.");
+//		System.out.println("visualize:   one of {true,false}.");
+		System.out.println("ca_link_infos:   path to ca_link_infos file.");
 		System.out.println();
 		System.out.println("---------------------");
-		System.out.println("2014, matsim.org");
+		System.out.println("2015, matsim.org");
 		System.out.println();
 	}
 

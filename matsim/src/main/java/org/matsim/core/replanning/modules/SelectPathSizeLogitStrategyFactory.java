@@ -19,7 +19,8 @@
 
 package org.matsim.core.replanning.modules;
 
-import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.selectors.PathSizeLogitSelector;
@@ -29,17 +30,12 @@ import javax.inject.Provider;
 
 public class SelectPathSizeLogitStrategyFactory implements Provider<PlanStrategy> {
 
-    private Scenario scenario;
-
-    @Inject
-    SelectPathSizeLogitStrategyFactory(Scenario scenario) {
-        this.scenario = scenario;
-    }
+    @Inject private PlanCalcScoreConfigGroup config;
+    @Inject private Network network;
 
     @Override
 	public PlanStrategy get() {
-		PlanStrategy strategy = new PlanStrategyImpl(new PathSizeLogitSelector(scenario.getConfig().planCalcScore(), scenario.getNetwork()));
-		return strategy;
+        return new PlanStrategyImpl(new PathSizeLogitSelector(config, network));
 	}
 	
 }

@@ -32,9 +32,7 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.replanning.StrategyManager;
-import org.matsim.core.replanning.StrategyManagerConfigLoader;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.scoring.functions.CharyparNagelOpenTimesScoringFunctionFactory;
 
 import playground.christoph.energyflows.replanning.TransitStrategyManager;
 
@@ -54,7 +52,7 @@ public class EnergyFlowsController extends Controler {
 	private StrategyManager myLoadStrategyManager() {
 		log.info("loading TransitStrategyManager - using rerouting share of " + reroutingShare);
 		StrategyManager manager = new TransitStrategyManager(this, reroutingShare);
-		StrategyManagerConfigLoader.load(this, manager);
+//		StrategyManagerConfigLoader.load(this, manager);
 		return manager;
 	}
 	

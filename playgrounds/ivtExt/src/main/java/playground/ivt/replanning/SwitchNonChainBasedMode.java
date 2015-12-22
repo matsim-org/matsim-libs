@@ -29,6 +29,9 @@ import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
+import org.matsim.core.router.TripRouter;
+
+import javax.inject.Provider;
 
 /**
  * @author thibautd
@@ -37,11 +40,11 @@ public class SwitchNonChainBasedMode implements PlanStrategy {
 	final PlanStrategyImpl delegate;
 
 	@Inject
-	public SwitchNonChainBasedMode(final Scenario sc) {
+	public SwitchNonChainBasedMode(final Scenario sc, Provider<TripRouter> tripRouterProvider) {
 		delegate = new PlanStrategyImpl( new RandomPlanSelector<Plan, Person>() );
 
-		delegate.addStrategyModule( new SwitchNonChainBasedModeModule( sc.getConfig() ) );
-		delegate.addStrategyModule( new ReRoute( sc ) );
+		delegate.addStrategyModule( new SwitchNonChainBasedModeModule( sc.getConfig(), tripRouterProvider) );
+		delegate.addStrategyModule( new ReRoute( sc, tripRouterProvider) );
 	}
 
 	@Override

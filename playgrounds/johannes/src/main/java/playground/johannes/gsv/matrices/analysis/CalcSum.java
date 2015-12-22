@@ -20,9 +20,9 @@
 package playground.johannes.gsv.matrices.analysis;
 
 import org.apache.log4j.Logger;
-import playground.johannes.gsv.zones.KeyMatrix;
-import playground.johannes.gsv.zones.MatrixOperations;
-import playground.johannes.gsv.zones.io.VisumOMatrixReader;
+import playground.johannes.gsv.matrices.io.VisumOMatrixReader;
+import playground.johannes.synpop.matrix.MatrixOperations;
+import playground.johannes.synpop.matrix.NumericMatrix;
 
 import java.io.IOException;
 
@@ -100,7 +100,7 @@ public class CalcSum {
 //    }
 
     public static void main(String args[]) throws IOException {
-        KeyMatrix m = new KeyMatrix();
+        NumericMatrix m = new NumericMatrix();
         VisumOMatrixReader.read(m, "/home/johannes/gsv/miv-matrix/deploy/12102015/wkday/miv.wkday.edu.txt");
 
         System.out.println(MatrixOperations.sum(m));

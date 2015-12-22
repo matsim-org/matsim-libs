@@ -5,18 +5,25 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.TripRouter;
 import org.matsim.population.algorithms.PlanAlgorithm;
+
+import javax.inject.Inject;
+import javax.inject.Provider;
+
 /**
  * @author balacm
  */
 public class CarsharingWithTaxiTripModeChoice extends AbstractMultithreadedModule{
+
+	private final Provider<TripRouter> tripRouterProvider;
 
 	private String[] availableModes = null;
 	private boolean ignoreCarAvailability = true;
 	
 	private final Scenario scenario;
 
-	public CarsharingWithTaxiTripModeChoice(final Scenario scenario) {
+	public CarsharingWithTaxiTripModeChoice(Provider<TripRouter> tripRouterProvider, final Scenario scenario) {
 		super(scenario.getConfig().global().getNumberOfThreads());
+		this.tripRouterProvider = tripRouterProvider;
 
 		// try to get the modes from the "changeLegMode" module of the config file
 
@@ -53,7 +60,7 @@ public class CarsharingWithTaxiTripModeChoice extends AbstractMultithreadedModul
 	
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
-		final TripRouter tripRouter = getReplanningContext().getTripRouter();
+		final TripRouter tripRouter = tripRouterProvider.get();
 		ChooseRandomTripModeWithTaxi algo = new ChooseRandomTripModeWithTaxi(this.scenario, this.availableModes, MatsimRandom.getLocalInstance(), tripRouter.getStageActivityTypes());
 		algo.setIgnoreCarAvailability(this.ignoreCarAvailability);
 		return algo;

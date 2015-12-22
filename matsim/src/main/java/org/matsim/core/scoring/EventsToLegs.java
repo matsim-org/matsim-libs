@@ -32,13 +32,18 @@ import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Route;
@@ -46,6 +51,7 @@ import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.handler.TeleportationArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityEventHandler;
+import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -53,9 +59,11 @@ import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 
+import javax.inject.Inject;
 
 
 /**
@@ -71,7 +79,10 @@ import org.matsim.vehicles.Vehicle;
  * @author michaz
  *
  */
-public final class EventsToLegs implements PersonDepartureEventHandler, PersonArrivalEventHandler, LinkLeaveEventHandler, LinkEnterEventHandler, TeleportationArrivalEventHandler, TransitDriverStartsEventHandler, PersonEntersVehicleEventHandler, VehicleArrivesAtFacilityEventHandler {
+public final class EventsToLegs implements PersonDepartureEventHandler, PersonArrivalEventHandler, LinkLeaveEventHandler, LinkEnterEventHandler, 
+TeleportationArrivalEventHandler, TransitDriverStartsEventHandler, PersonEntersVehicleEventHandler, VehicleArrivesAtFacilityEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
+	
+	private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
 	
 	private class PendingTransitTravel {
 
@@ -103,16 +114,26 @@ public final class EventsToLegs implements PersonDepartureEventHandler, PersonAr
 	public interface LegHandler {
 	    void handleLeg(Id<Person> agentId, Leg leg);
 	}
-	
-	private Scenario scenario;
+
+	private Network network;
+	private TransitSchedule transitSchedule;
 	private Map<Id<Person>, LegImpl> legs = new HashMap<>();
 	private Map<Id<Person>, List<Id<Link>>> experiencedRoutes = new HashMap<>();
 	private Map<Id<Person>, TeleportationArrivalEvent> routelessTravels = new HashMap<>();
 	private Map<Id<Person>, PendingTransitTravel> transitTravels = new HashMap<>();
 	private Map<Id<Vehicle>, LineAndRoute> transitVehicle2currentRoute = new HashMap<>();
 	private LegHandler legHandler;
+	
+
+	@Inject
+	EventsToLegs(Network network, TransitSchedule transitSchedule) {
+		this.network = network;
+		this.transitSchedule = transitSchedule;
+	}
+
 	public EventsToLegs(Scenario scenario) {
-		this.scenario = scenario;
+		this.network = scenario.getNetwork();
+		this.transitSchedule = scenario.getTransitSchedule();
 	}
 
 	@Override
@@ -120,6 +141,7 @@ public final class EventsToLegs implements PersonDepartureEventHandler, PersonAr
 	    LegImpl leg = new LegImpl(event.getLegMode());
 	    leg.setDepartureTime(event.getTime());
 	    legs.put(event.getPersonId(), leg);
+	    
 	    List<Id<Link>> route = new ArrayList<>();
 	    route.add(event.getLinkId());
 	    experiencedRoutes.put(event.getPersonId(), route);
@@ -149,8 +171,8 @@ public final class EventsToLegs implements PersonDepartureEventHandler, PersonAr
 
 	@Override
     public void handleEvent(LinkEnterEvent event) {
-        List<Id<Link>> route = experiencedRoutes.get(event.getDriverId());
-        route.add(event.getLinkId());
+		List<Id<Link>> route = experiencedRoutes.get(delegate.getDriverOfVehicle(event.getVehicleId()));
+	    route.add(event.getLinkId());
     }
 
     @Override
@@ -164,14 +186,14 @@ public final class EventsToLegs implements PersonDepartureEventHandler, PersonAr
 	    leg.setArrivalTime(event.getTime());
 	    double travelTime = leg.getArrivalTime() - leg.getDepartureTime();
 	    leg.setTravelTime(travelTime);
-	    List<Id<Link>> experiencedRoute = experiencedRoutes.remove(event.getPersonId());
+	    List<Id<Link>> experiencedRoute = experiencedRoutes.get(event.getPersonId());
 	    assert experiencedRoute.size() >= 1;
 	    PendingTransitTravel pendingTransitTravel;
-	    if (experiencedRoute.size() > 1) {
+	    if (experiencedRoute != null && experiencedRoute.size() > 1) {
 	        NetworkRoute networkRoute = RouteUtils.createNetworkRoute(experiencedRoute, null);
 	        networkRoute.setTravelTime(travelTime);
 
-	        networkRoute.setDistance(RouteUtils.calcDistance(networkRoute, scenario.getNetwork()));
+	        networkRoute.setDistance(RouteUtils.calcDistance(networkRoute, network));
 	        // TODO MATSIM-227: replace the above by taking distance from List<Id<Link>> experiencedRoute (minus first/last link)
 	        // and add manually distance on first/last link.  Newly based on VehicleEnters/LeavesTrafficEvents, which should (newly)
 	        // contain this information.  kai/mz, sep'15
@@ -179,14 +201,14 @@ public final class EventsToLegs implements PersonDepartureEventHandler, PersonAr
 	        leg.setRoute(networkRoute);
 	    } else if ((pendingTransitTravel = transitTravels.remove(event.getPersonId())) != null) {
 	    	LineAndRoute lineAndRoute = transitVehicle2currentRoute.get(pendingTransitTravel.vehicleId);
-			TransitLine line = scenario.getTransitSchedule().getTransitLines().get(lineAndRoute.transitLineId);
+			TransitLine line = transitSchedule.getTransitLines().get(lineAndRoute.transitLineId);
 			ExperimentalTransitRoute experimentalTransitRoute = new ExperimentalTransitRoute(
-					scenario.getTransitSchedule().getFacilities().get(pendingTransitTravel.accessStop),
+					transitSchedule.getFacilities().get(pendingTransitTravel.accessStop),
 					line, 
-					line.getRoutes().get(lineAndRoute.transitRouteId), 
-					scenario.getTransitSchedule().getFacilities().get(lineAndRoute.lastFacilityId));
+					line.getRoutes().get(lineAndRoute.transitRouteId),
+					transitSchedule.getFacilities().get(lineAndRoute.lastFacilityId));
 			experimentalTransitRoute.setTravelTime(travelTime);
-			experimentalTransitRoute.setDistance(RouteUtils.calcDistance(experimentalTransitRoute, scenario.getTransitSchedule(), scenario.getNetwork()));
+			experimentalTransitRoute.setDistance(RouteUtils.calcDistance(experimentalTransitRoute, transitSchedule, network));
 			leg.setRoute(experimentalTransitRoute);
 	    } else {
 	    	TeleportationArrivalEvent travelEvent = routelessTravels.remove(event.getPersonId());
@@ -212,10 +234,22 @@ public final class EventsToLegs implements PersonDepartureEventHandler, PersonAr
 	public void reset(int iteration) {
 	    legs.clear();
 	    experiencedRoutes.clear();
+	    
+	    delegate.reset(iteration);
 	}
 
 	public void setLegHandler(LegHandler legHandler) {
 	    this.legHandler = legHandler;
+	}
+
+	@Override
+	public void handleEvent(VehicleEntersTrafficEvent event) {
+		delegate.handleEvent(event);
+	}
+
+	@Override
+	public void handleEvent(VehicleLeavesTrafficEvent event) {
+		delegate.handleEvent(event);
 	}
 
 }

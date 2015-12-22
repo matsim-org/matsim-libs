@@ -70,7 +70,7 @@ public class JointPrismMinStandardDeviationLocationChoiceStrategyFactory extends
 
 		strategy.addStrategyModule(
 				new PrismicLocationChoiceModule(
-					sc ) );
+					sc, tripRouterFactory) );
 
 		strategy.addStrategyModule(
 				GroupPlanStrategyFactoryUtils.createJointTripAwareTourModeUnifierModule(
@@ -106,9 +106,12 @@ public class JointPrismMinStandardDeviationLocationChoiceStrategyFactory extends
 	private static class PrismicLocationChoiceModule  extends AbstractMultithreadedGenericStrategyModule<GroupPlans> {
 		private final Scenario scenario;
 
-		public PrismicLocationChoiceModule(final Scenario sc) {
+		private javax.inject.Provider<TripRouter> tripRouterProvider;
+
+		public PrismicLocationChoiceModule(final Scenario sc, javax.inject.Provider<TripRouter> tripRouterProvider) {
 			super( sc.getConfig().global() );
 			this.scenario = sc;
+			this.tripRouterProvider = tripRouterProvider;
 		}
 
 		@Override
@@ -119,7 +122,7 @@ public class JointPrismMinStandardDeviationLocationChoiceStrategyFactory extends
 					scenario.getActivityFacilities(),
 					(SocialNetwork) scenario.getScenarioElement( SocialNetwork.ELEMENT_NAME ),
 					new CompositeStageActivityTypes(
-							replanningContext.getTripRouter().getStageActivityTypes(),
+							tripRouterProvider.get().getStageActivityTypes(),
 							JointActingTypes.JOINT_STAGE_ACTS ) );
 		}
 	}

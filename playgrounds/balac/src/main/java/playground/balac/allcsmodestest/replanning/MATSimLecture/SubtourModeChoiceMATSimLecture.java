@@ -12,6 +12,8 @@ import org.matsim.population.algorithms.PermissibleModesCalculator;
 import org.matsim.population.algorithms.PermissibleModesCalculatorImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
+import javax.inject.Provider;
+
 /**
  * Changes the transportation mode of all legs of one randomly chosen subtour in a plan to a randomly chosen
  * different mode given a list of possible modes.
@@ -34,17 +36,18 @@ import org.matsim.population.algorithms.PlanAlgorithm;
  */
 public class SubtourModeChoiceMATSimLecture extends AbstractMultithreadedModule {
 	private PermissibleModesCalculator permissibleModesCalculator;
-	
+	private final Provider<TripRouter> tripRouterProvider;
+
 	private final String[] chainBasedModes;
 	private final String[] modes;
 	private final CharyparNagelScoringParameters params;
 	
-	public SubtourModeChoiceMATSimLecture(final Config config) {
+	public SubtourModeChoiceMATSimLecture(final Config config, Provider<TripRouter> tripRouterProvider) {
 		this( config.global().getNumberOfThreads(),
 				config.subtourModeChoice().getModes(),
 				config.subtourModeChoice().getChainBasedModes(),
 				config.subtourModeChoice().considerCarAvailability(),
-				CharyparNagelScoringParameters.getBuilder(config.planCalcScore(), config.planCalcScore().getScoringParameters( null ), config.scenario()).create()
+				tripRouterProvider, CharyparNagelScoringParameters.getBuilder(config.planCalcScore(), config.planCalcScore().getScoringParameters( null ), config.scenario()).create()
 		);
 	}
 
@@ -53,9 +56,10 @@ public class SubtourModeChoiceMATSimLecture extends AbstractMultithreadedModule 
 			final String[] modes,
 			final String[] chainBasedModes,
 			final boolean considerCarAvailability,
-			final CharyparNagelScoringParameters params
-			) {
+			Provider<TripRouter> tripRouterProvider, final CharyparNagelScoringParameters params
+	) {
 		super(numberOfThreads);
+		this.tripRouterProvider = tripRouterProvider;
 		this.modes = modes.clone();
 		this.chainBasedModes = chainBasedModes.clone();
 		this.params = params;
@@ -72,7 +76,7 @@ public class SubtourModeChoiceMATSimLecture extends AbstractMultithreadedModule 
 
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
-		final TripRouter tripRouter = getReplanningContext().getTripRouter();
+		final TripRouter tripRouter = tripRouterProvider.get();
 		final ChooseRandomLegModeForSubtourMATSimLecture chooseRandomLegMode =
 				new ChooseRandomLegModeForSubtourMATSimLecture(
 						tripRouter.getStageActivityTypes(),

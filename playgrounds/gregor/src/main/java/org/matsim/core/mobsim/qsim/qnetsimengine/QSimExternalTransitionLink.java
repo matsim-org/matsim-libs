@@ -19,8 +19,6 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import java.util.Collection;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.network.Link;
@@ -29,8 +27,9 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.vis.snapshotwriters.VisData;
-
 import playground.gregor.hybridsim.simulation.ExternalEngine;
+
+import java.util.Collection;
 
 public class QSimExternalTransitionLink extends AbstractQLink {
 
@@ -57,9 +56,34 @@ public class QSimExternalTransitionLink extends AbstractQLink {
 		Id<Node> leaveId = this.net.getLinks().get(nextL).getToNode().getId();
 		this.e.addFromUpstream(this.link.getFromNode().getId(), leaveId, veh);
 		double now = this.e.getMobsim().getSimTimer().getTimeOfDay();
-		this.em.processEvent(new LinkEnterEvent(now, veh.getDriver().getId(), this.link
-				.getId(), veh.getId()));
+		this.em.processEvent(new LinkEnterEvent(now, veh.getId(), this.link
+				.getId()));
 
+	}
+
+	@Override
+	boolean isNotOfferingVehicle() {
+		return true;
+	}
+
+	@Override
+	QVehicle popFirstVehicle() {
+		throw new RuntimeException("not yet implemented");
+	}
+
+	@Override
+	QVehicle getFirstVehicle() {
+		throw new RuntimeException("not yet implemented");
+	}
+
+	@Override
+	double getLastMovementTimeOfFirstVehicle() {
+		throw new RuntimeException("not yet implemented");
+	}
+
+	@Override
+	boolean hasGreenForToLink(Id<Link> toLinkId) {
+		throw new RuntimeException("not yet implemented");
 	}
 
 	@Override
@@ -89,31 +113,6 @@ public class QSimExternalTransitionLink extends AbstractQLink {
 
 	@Override
 	QNode getToNode() {
-		throw new RuntimeException("not yet implemented");
-	}
-
-	@Override
-	boolean isNotOfferingVehicle() {
-		return true;
-	}
-
-	@Override
-	QVehicle popFirstVehicle() {
-		throw new RuntimeException("not yet implemented");
-	}
-
-	@Override
-	QVehicle getFirstVehicle() {
-		throw new RuntimeException("not yet implemented");
-	}
-
-	@Override
-	double getLastMovementTimeOfFirstVehicle() {
-		throw new RuntimeException("not yet implemented");
-	}
-
-	@Override
-	boolean hasGreenForToLink(Id<Link> toLinkId) {
 		throw new RuntimeException("not yet implemented");
 	}
 

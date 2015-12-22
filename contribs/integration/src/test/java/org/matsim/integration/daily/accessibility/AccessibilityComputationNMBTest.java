@@ -39,7 +39,7 @@ public class AccessibilityComputationNMBTest {
 	public static final Logger log = Logger.getLogger( AccessibilityComputationNMBTest.class ) ;
 
 //	private static final double cellSize = 1000.;
-//	private static final double cellSize = 10000.;
+//	private static final Double cellSize = 10000.;
 	private static final Double cellSize = 1000.;
 
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
@@ -175,7 +175,7 @@ public class AccessibilityComputationNMBTest {
 		modes.add( Modes4Accessibility.car ) ;
 		modes.add( Modes4Accessibility.walk ) ;
 		modes.add( Modes4Accessibility.bike ) ;
-		modes.add( Modes4Accessibility.pt ) ;
+//		modes.add( Modes4Accessibility.pt ) ;
 		
 		// loop over activity types to add one GridBasedAccessibilityControlerListenerV3 for each combination
 		for ( String actType : activityTypes ) {
@@ -197,7 +197,7 @@ public class AccessibilityComputationNMBTest {
 			listener.setComputingAccessibilityForMode(Modes4Accessibility.car, true);
 			listener.setComputingAccessibilityForMode(Modes4Accessibility.walk, true);
 			listener.setComputingAccessibilityForMode(Modes4Accessibility.bike, true);
-			listener.setComputingAccessibilityForMode(Modes4Accessibility.pt, true);
+//			listener.setComputingAccessibilityForMode(Modes4Accessibility.pt, true);
 			// yyyy replace by "set .... ModeS( modes ) " 
 			
 			listener.addAdditionalFacilityData(homes) ;

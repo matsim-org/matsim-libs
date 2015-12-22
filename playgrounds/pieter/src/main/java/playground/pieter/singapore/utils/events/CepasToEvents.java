@@ -1322,7 +1322,7 @@ public class CepasToEvents {
                         TransportMode.car);
                 Event personEntersVehicle = new PersonEntersVehicleEvent(
                         (double) cluster.orderedDwellEvents.firstKey() - 0.002, driverId, busRegNum);
-                Event wait2Link = new Wait2LinkEvent((double) cluster.orderedDwellEvents.firstKey() - 0.001, driverId,
+                Event wait2Link = new VehicleEntersTrafficEvent((double) cluster.orderedDwellEvents.firstKey() - 0.001, driverId,
                         departureLinkId, busRegNum, PtConstants.NETWORK_MODE, 1.0);
                 this.eventQueue.addLast(driverStarts);
                 this.eventQueue.addLast(transitDriverDeparture);
@@ -1355,20 +1355,20 @@ public class CepasToEvents {
 
                         double availableTime = dwellEvent.arrivalTime - lastDwellEvent.departureTime;
                         double lastTime = lastDwellEvent.departureTime;
-                        Event linkLeave = new LinkLeaveEvent(lastTime += 0.001, driverId, fromLinkId, busRegNum);
+                        Event linkLeave = new LinkLeaveEvent(lastTime += 0.001, busRegNum, fromLinkId);
                         Event linkEnter = null;
 
                         this.eventQueue.addLast(linkLeave);
                         List<Id<Link>> linkIds = subRoute.getLinkIds();
                         for (int i = 0; i < linkIds.size(); i++) {
-                            linkEnter = new LinkEnterEvent(lastTime += 0.001, driverId, linkIds.get(i), busRegNum);
+                            linkEnter = new LinkEnterEvent(lastTime += 0.001, busRegNum, linkIds.get(i));
                             linkLeave = new LinkLeaveEvent(
                                     lastTime += (availableTime * linkTravelTimes.get(i) / totalExpectedtravelTime),
-                                    driverId, linkIds.get(i), busRegNum);
+                                    busRegNum, linkIds.get(i));
                             this.eventQueue.addLast(linkEnter);
                             this.eventQueue.addLast(linkLeave);
                         }
-                        linkEnter = new LinkEnterEvent(lastTime += 0.001, driverId, toLinkId, busRegNum);
+                        linkEnter = new LinkEnterEvent(lastTime += 0.001, busRegNum, toLinkId);
                         this.eventQueue.addLast(linkEnter);
                     }
                     vehArrival = new VehicleArrivesAtFacilityEvent(dwellEvent.arrivalTime, busRegNum,

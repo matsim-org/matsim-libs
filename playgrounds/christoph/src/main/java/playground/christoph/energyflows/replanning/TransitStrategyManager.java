@@ -56,7 +56,7 @@ public class TransitStrategyManager extends StrategyManager {
 	
 	public TransitStrategyManager(Controler controler, double replanningShare) {
 		reroutingStrategy = new PlanStrategyImpl(new RandomPlanSelector());
-		reroutingStrategy.addStrategyModule(new ReRoute(controler.getScenario()));
+		reroutingStrategy.addStrategyModule(new ReRoute(controler.getScenario(), tripRouterProvider));
 		
 		expBetaSelectorStrategy = new PlanStrategyImpl(new ExpBetaPlanSelector(controler.getConfig().planCalcScore()));
 		

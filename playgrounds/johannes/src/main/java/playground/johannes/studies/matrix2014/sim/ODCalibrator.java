@@ -29,6 +29,7 @@ import org.apache.log4j.Logger;
 import org.matsim.contrib.common.gis.CartesianDistanceCalculator;
 import org.matsim.contrib.common.gis.DistanceCalculator;
 import org.matsim.facilities.ActivityFacility;
+import playground.johannes.synpop.analysis.Predicate;
 import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.Episode;
 import playground.johannes.synpop.data.Person;
@@ -64,18 +65,21 @@ public class ODCalibrator implements Hamiltonian, AttributeChangeListener {
 
     private long changeCounter;
 
-    private final long rescaleInterval = (long)1e7;
+    private final long rescaleInterval = (long) 1e7;
 
     private final double threshold;
+
+    private final Predicate<CachedSegment> predicate;
 
     private final double refSum;
 
     public ODCalibrator(TIntObjectHashMap<TIntDoubleHashMap> refMatrix, TObjectIntHashMap<ActivityFacility>
-            facility2Index, TIntObjectHashMap<Point> index2Point, double threshold) {
+            facility2Index, TIntObjectHashMap<Point> index2Point, double threshold, Predicate<CachedSegment> predicate) {
         this.refMatrix = refMatrix;
         this.facility2Index = facility2Index;
         this.index2Point = index2Point;
         this.threshold = threshold;
+        this.predicate = predicate;
 
         refSum = calculateSum(refMatrix, threshold);
     }
@@ -90,42 +94,55 @@ public class ODCalibrator implements Hamiltonian, AttributeChangeListener {
     private void initHamiltonian() {
         hamiltonianValue = 0;
         int[] indices = index2Point.keys();
-        for(int i : indices) {
-            for(int j : indices) {
-                double simVal = getCellValue(i, j, simMatrix);
-                double refVal = getCellValue(i, j, refMatrix);
-                hamiltonianValue += calculateError(simVal, refVal);
-            }
-        }
-    }
-
-    private void initSimMatrix(Collection<? extends CachedPerson> persons) {
-        if (this.facilityDataKey == null)
-            this.facilityDataKey = Converters.getObjectKey(CommonKeys.ACTIVITY_FACILITY);
-
-        simMatrix = new TIntObjectHashMap<>();
-
-        for(Person person : persons) {
-            for (Episode episode : person.getEpisodes()) {
-                for (int i = 1; i < episode.getActivities().size(); i++) {
-                    CachedSegment origin = (CachedSegment) episode.getActivities().get(i - 1);
-                    CachedSegment destination = (CachedSegment) episode.getActivities().get(i);
-
-                    ActivityFacility originFac = (ActivityFacility) origin.getData(facilityDataKey);
-                    ActivityFacility destinationFac = (ActivityFacility) destination.getData(facilityDataKey);
-
-                    int idx_i = facility2Index.get(originFac);
-                    int idx_j = facility2Index.get(destinationFac);
-
-                    adjustCellValue(idx_i, idx_j, 1.0, simMatrix);
+        for (int i : indices) {
+            Point p_i = index2Point.get(i);
+            for (int j : indices) {
+                Point p_j = index2Point.get(j);
+                if (CartesianDistanceCalculator.getInstance().distance(p_i, p_j) >= threshold) {
+                    double simVal = getCellValue(i, j, simMatrix);
+                    double refVal = getCellValue(i, j, refMatrix);
+                    hamiltonianValue += calculateError(simVal, refVal);
                 }
             }
         }
     }
 
+    private void initSimMatrix(Collection<? extends CachedPerson> persons) {
+        logger.debug("Initializing simulation matrix...");
+
+        if (this.facilityDataKey == null)
+            this.facilityDataKey = Converters.getObjectKey(CommonKeys.ACTIVITY_FACILITY);
+
+        simMatrix = new TIntObjectHashMap<>();
+
+        for (Person person : persons) {
+            for (Episode episode : person.getEpisodes()) {
+                for (int i = 1; i < episode.getActivities().size(); i++) {
+
+                    CachedSegment leg = (CachedSegment) episode.getLegs().get(i - 1);
+                    if (predicate == null || predicate.test(leg)) {
+
+                        CachedSegment origin = (CachedSegment) episode.getActivities().get(i - 1);
+                        CachedSegment destination = (CachedSegment) episode.getActivities().get(i);
+
+                        ActivityFacility originFac = (ActivityFacility) origin.getData(facilityDataKey);
+                        ActivityFacility destinationFac = (ActivityFacility) destination.getData(facilityDataKey);
+
+                        int idx_i = facility2Index.get(originFac);
+                        int idx_j = facility2Index.get(destinationFac);
+
+                        adjustCellValue(idx_i, idx_j, 1.0, simMatrix);
+                    }
+                }
+            }
+        }
+
+        logger.debug("Done.");
+    }
+
     @Override
     public void onChange(Object dataKey, Object oldValue, Object newValue, CachedElement element) {
-        if(simMatrix != null) {
+        if (simMatrix != null) {
             if (this.facilityDataKey == null)
                 this.facilityDataKey = Converters.getObjectKey(CommonKeys.ACTIVITY_FACILITY);
 
@@ -142,16 +159,28 @@ public class ODCalibrator implements Hamiltonian, AttributeChangeListener {
             if there is a preceding trip...
              */
                 CachedSegment toLeg = (CachedSegment) act.previous();
-                if (toLeg != null) {
+                if (toLeg != null && predicate.test(toLeg)) {
                     CachedSegment prevAct = (CachedSegment) toLeg.previous();
                     ActivityFacility prevFac = (ActivityFacility) prevAct.getData(facilityDataKey);
 
                     int i = facility2Index.get(prevFac);
                     int j = oldIdx;
+
+                    Point p_i = index2Point.get(i);
+                    Point p_j = index2Point.get(j);
+
                     double diff1 = changeCellContent(i, j, -1.0);
+                    if (CartesianDistanceCalculator.getInstance().distance(p_i, p_j) < threshold) {
+                        diff1 = 0;
+                    }
 
                     j = newIdx;
+                    p_j = index2Point.get(j);
+
                     double diff2 = changeCellContent(i, j, 1.0);
+                    if (CartesianDistanceCalculator.getInstance().distance(p_i, p_j) < threshold) {
+                        diff2 = 0;
+                    }
 
                     hamiltonianValue += diff1 + diff2;
                 }
@@ -159,16 +188,28 @@ public class ODCalibrator implements Hamiltonian, AttributeChangeListener {
             if there is a succeeding trip...
              */
                 CachedSegment fromLeg = (CachedSegment) act.next();
-                if (fromLeg != null) {
+                if (fromLeg != null && predicate.test(fromLeg)) {
                     CachedSegment nextAct = (CachedSegment) fromLeg.next();
                     ActivityFacility nextFac = (ActivityFacility) nextAct.getData(facilityDataKey);
 
                     int i = oldIdx;
                     int j = facility2Index.get(nextFac);
+
+                    Point p_i = index2Point.get(i);
+                    Point p_j = index2Point.get(j);
+
                     double diff1 = changeCellContent(i, j, -1.0);
+                    if (CartesianDistanceCalculator.getInstance().distance(p_i, p_j) < threshold) {
+                        diff1 = 0;
+                    }
 
                     i = newIdx;
+                    p_i = index2Point.get(i);
+
                     double diff2 = changeCellContent(i, j, 1.0);
+                    if (CartesianDistanceCalculator.getInstance().distance(p_i, p_j) < threshold) {
+                        diff2 = 0;
+                    }
 
                     hamiltonianValue += diff1 + diff2;
                 }
@@ -178,7 +219,7 @@ public class ODCalibrator implements Hamiltonian, AttributeChangeListener {
 
     @Override
     public double evaluate(Collection<CachedPerson> population) {
-        if(simMatrix == null) {
+        if (simMatrix == null) {
             initSimMatrix(population);
             calculateScaleFactor();
             initHamiltonian();
@@ -202,7 +243,7 @@ public class ODCalibrator implements Hamiltonian, AttributeChangeListener {
 
     private void adjustCellValue(int i, int j, double amount, TIntObjectHashMap<TIntDoubleHashMap> matrix) {
         TIntDoubleHashMap row = matrix.get(i);
-        if(row == null) {
+        if (row == null) {
             row = new TIntDoubleHashMap();
             matrix.put(i, row);
         }
@@ -211,12 +252,12 @@ public class ODCalibrator implements Hamiltonian, AttributeChangeListener {
 
     private double getCellValue(int i, int j, TIntObjectHashMap<TIntDoubleHashMap> matrix) {
         TIntDoubleHashMap row = matrix.get(i);
-        if(row == null) return 0.0;
+        if (row == null) return 0.0;
         else return row.get(j);
     }
 
     private double calculateError(double simVal, double refVal) {
-        simVal = simVal/scaleFactor;
+        simVal = simVal / scaleFactor;
         if (refVal > 0) {
             return Math.abs(simVal - refVal) / refVal;
         } else {
@@ -232,20 +273,20 @@ public class ODCalibrator implements Hamiltonian, AttributeChangeListener {
         DistanceCalculator dCalc = CartesianDistanceCalculator.getInstance();
 
         TIntObjectIterator<TIntDoubleHashMap> rowIt = matrix.iterator();
-        for(int i = 0; i < matrix.size(); i++) {
+        for (int i = 0; i < matrix.size(); i++) {
             rowIt.advance();
             TIntDoubleHashMap row = rowIt.value();
             int idx_i = rowIt.key();
             Point p_i = index2Point.get(idx_i);
 
             TIntDoubleIterator colIt = row.iterator();
-            for(int j = 0; j < row.size(); j++) {
+            for (int j = 0; j < row.size(); j++) {
                 colIt.advance();
                 int idx_j = colIt.key();
                 Point p_j = index2Point.get(idx_j);
 
                 double d = dCalc.distance(p_i, p_j);
-                if(d >= threshold) {
+                if (d >= threshold) {
                     sum += colIt.value();
                 }
             }

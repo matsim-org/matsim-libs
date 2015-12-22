@@ -26,15 +26,18 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.freight.carrier.Carrier;
+import org.matsim.contrib.freight.carrier.CarrierPlanXmlReaderV2;
 import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.mobsim.DistanceScoringFunctionFactoryForTests;
 import org.matsim.contrib.freight.mobsim.StrategyManagerFactoryForTests;
 import org.matsim.contrib.freight.mobsim.TimeScoringFunctionFactoryForTests;
+import org.matsim.contrib.freight.replanning.CarrierPlanStrategyManagerFactory;
+import org.matsim.contrib.freight.scoring.CarrierScoringFunctionFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.MatsimTestUtils;
 
 public class EquilWithCarrierWithoutPassTest {
@@ -73,16 +76,32 @@ public class EquilWithCarrierWithoutPassTest {
 
 	@Test
 	public void testMobsimWithCarrierRunsWithoutException() {
-		CarrierModule carrierControler = new CarrierModule(planFile,new StrategyManagerFactoryForTests(controler), new DistanceScoringFunctionFactoryForTests(controler.getScenario().getNetwork()));
-		controler.addOverridingModule(carrierControler);
+		Carriers carriers = new Carriers();
+		new CarrierPlanXmlReaderV2(carriers).read(planFile);
+		controler.addOverridingModule(new CarrierModule(carriers));
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bind(CarrierPlanStrategyManagerFactory.class).to(StrategyManagerFactoryForTests.class).asEagerSingleton();
+				bind(CarrierScoringFunctionFactory.class).to(DistanceScoringFunctionFactoryForTests.class).asEagerSingleton();
+			}
+		});
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		controler.run();
 	}
 
 	@Test
 	public void testScoringInMeters(){
-		CarrierModule carrierControler = new CarrierModule(planFile,new StrategyManagerFactoryForTests(controler), new DistanceScoringFunctionFactoryForTests(controler.getScenario().getNetwork()));
-		controler.addOverridingModule(carrierControler);
+		Carriers carriers = new Carriers();
+		new CarrierPlanXmlReaderV2(carriers).read(planFile);
+		controler.addOverridingModule(new CarrierModule(carriers));
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bind(CarrierPlanStrategyManagerFactory.class).to(StrategyManagerFactoryForTests.class).asEagerSingleton();
+				bind(CarrierScoringFunctionFactory.class).to(DistanceScoringFunctionFactoryForTests.class).asEagerSingleton();
+			}
+		});
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		controler.run();
 
@@ -95,10 +114,16 @@ public class EquilWithCarrierWithoutPassTest {
 
 	@Test
 	public void testScoringInSeconds(){
-
-		CarrierModule carrierControler = new CarrierModule(planFile,new StrategyManagerFactoryForTests(controler), new TimeScoringFunctionFactoryForTests(controler.getScenario().getNetwork()));
-
-		controler.addOverridingModule(carrierControler);
+		Carriers carriers = new Carriers();
+		new CarrierPlanXmlReaderV2(carriers).read(planFile);
+		controler.addOverridingModule(new CarrierModule(carriers));
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bind(CarrierPlanStrategyManagerFactory.class).to(StrategyManagerFactoryForTests.class).asEagerSingleton();
+				bind(CarrierScoringFunctionFactory.class).to(TimeScoringFunctionFactoryForTests.class).asEagerSingleton();
+			}
+		});
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		controler.run();
 
@@ -112,9 +137,18 @@ public class EquilWithCarrierWithoutPassTest {
 
 	@Test
 	public void testScoringInSecondsWithWithinDayRescheduling(){
-        CarrierModule carrierControler = new CarrierModule(planFile,new StrategyManagerFactoryForTests(controler), new TimeScoringFunctionFactoryForTests(controler.getScenario().getNetwork()));
+		Carriers carriers = new Carriers();
+		new CarrierPlanXmlReaderV2(carriers).read(planFile);
+		CarrierModule carrierControler = new CarrierModule(carriers);
 		carrierControler.setPhysicallyEnforceTimeWindowBeginnings(true);
 		controler.addOverridingModule(carrierControler);
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bind(CarrierPlanStrategyManagerFactory.class).to(StrategyManagerFactoryForTests.class).asEagerSingleton();
+				bind(CarrierScoringFunctionFactory.class).to(TimeScoringFunctionFactoryForTests.class).asEagerSingleton();
+			}
+		});
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		controler.run();
 

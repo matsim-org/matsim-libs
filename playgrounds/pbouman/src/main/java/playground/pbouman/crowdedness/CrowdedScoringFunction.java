@@ -48,12 +48,7 @@ public class CrowdedScoringFunction implements ScoringFunction {
 
 
 	private EventsManager events;
-	
-	public CrowdedScoringFunction(ScoringFunction delegate) {
 
-		this.delegate = delegate;
-	}
-	
 	public CrowdedScoringFunction(ScoringFunction delegate, EventsManager events) {
 
 		this.delegate = delegate;

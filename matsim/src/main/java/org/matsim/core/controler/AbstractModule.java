@@ -22,37 +22,35 @@
 
 package org.matsim.core.controler;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.replanning.PlanStrategy;
-import org.matsim.core.replanning.StrategyManagerConfigLoader;
 import org.matsim.core.replanning.StrategyManagerModule;
 import org.matsim.core.replanning.selectors.GenericPlanSelector;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.vis.snapshotwriters.SnapshotWriter;
 
 import com.google.inject.Binder;
-import com.google.inject.BindingAnnotation;
 import com.google.inject.Inject;
 import com.google.inject.Key;
 import com.google.inject.Module;
 import com.google.inject.TypeLiteral;
 import com.google.inject.binder.AnnotatedBindingBuilder;
 import com.google.inject.binder.LinkedBindingBuilder;
-import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Names;
 import com.google.inject.util.Modules;
@@ -79,8 +77,6 @@ public abstract class AbstractModule implements Module {
 	private Multibinder<ControlerListener> controlerListenerMultibinder;
 	private Multibinder<MobsimListener> mobsimListenerMultibinder;
 	private Multibinder<SnapshotWriter> snapshotWriterMultibinder;
-	private MapBinder<String, GenericPlanSelector<Plan, Person>> planSelectorForRemovalMultibinder;
-	private MapBinder<String, PlanStrategy> planStrategyMultibinder;
 
 	@Inject
 	com.google.inject.Injector bootstrapInjector;
@@ -106,8 +102,6 @@ public abstract class AbstractModule implements Module {
 		this.snapshotWriterMultibinder = Multibinder.newSetBinder(this.binder, SnapshotWriter.class);
 		this.eventHandlerMultibinder = Multibinder.newSetBinder(this.binder, EventHandler.class);
 		this.controlerListenerMultibinder = Multibinder.newSetBinder(this.binder, ControlerListener.class);
-		this.planStrategyMultibinder = MapBinder.newMapBinder(this.binder, String.class, PlanStrategy.class);
-		this.planSelectorForRemovalMultibinder = MapBinder.newMapBinder(this.binder, new TypeLiteral<String>(){}, new TypeLiteral<GenericPlanSelector<Plan, Person>>(){});
 		this.install();
 	}
 
@@ -138,18 +132,22 @@ public abstract class AbstractModule implements Module {
 	/**
 	 * See {@link tutorial.programming.planStrategyForRemoval.RunPlanSelectorForRemovalExample} for an example.
 	 * 
-	 * @see {@link StrategyManagerModule}, {@link StrategyManagerConfigLoader}
+	 * @see {@link StrategyManagerModule}
 	 */
-	protected final com.google.inject.binder.LinkedBindingBuilder<GenericPlanSelector<Plan, Person>> addPlanSelectorForRemovalBinding(String selectorName) {
-		return planSelectorForRemovalMultibinder.addBinding(selectorName);
+	protected final com.google.inject.binder.LinkedBindingBuilder<GenericPlanSelector<Plan, Person>> bindPlanSelectorForRemoval() {
+		return bind(new TypeLiteral<GenericPlanSelector<Plan, Person>>(){});
 	}
 
 	protected final com.google.inject.binder.LinkedBindingBuilder<PlanStrategy> addPlanStrategyBinding(String selectorName) {
-		return planStrategyMultibinder.addBinding(selectorName);
+		return binder().bind(PlanStrategy.class).annotatedWith(Names.named(selectorName));
 	}
 
 	protected final com.google.inject.binder.LinkedBindingBuilder<Mobsim> bindMobsim() {
 		return bind(Mobsim.class);
+	}
+
+	protected final com.google.inject.binder.LinkedBindingBuilder<ScoringFunctionFactory> bindScoringFunctionFactory() {
+		return bind(ScoringFunctionFactory.class);
 	}
 
 	protected final com.google.inject.binder.LinkedBindingBuilder<MobsimListener> addMobsimListenerBinding() {
@@ -166,7 +164,7 @@ public abstract class AbstractModule implements Module {
 
 	@SuppressWarnings("static-method")
 	protected final Key<TravelDisutilityFactory> carTravelDisutilityFactoryKey() {
-		return Key.get(TravelDisutilityFactory.class, ForCar.class);
+		return Key.get(TravelDisutilityFactory.class, Names.named(TransportMode.car));
 	}
 
 	protected final com.google.inject.binder.LinkedBindingBuilder<TravelDisutilityFactory> addTravelDisutilityFactoryBinding(String mode) {
@@ -185,13 +183,17 @@ public abstract class AbstractModule implements Module {
 		return binder().bind(RoutingModule.class).annotatedWith(Names.named(mode));
 	}
 
+	protected final com.google.inject.binder.LinkedBindingBuilder<EventsManager> bindEventsManager() {
+		return binder().bind(EventsManager.class);
+	}
+
 	protected final LinkedBindingBuilder<TravelTime> bindNetworkTravelTime() {
 		return bind(networkTravelTime());
 	}
 
 	@SuppressWarnings("static-method")
 	protected final Key<TravelTime> networkTravelTime() {
-		return Key.get(TravelTime.class, ForCar.class);
+		return Key.get(TravelTime.class, Names.named(TransportMode.car));
 	}
 
 	protected <T> AnnotatedBindingBuilder<T> bind(Class<T> aClass) {
@@ -234,10 +236,5 @@ public abstract class AbstractModule implements Module {
 			@Override
 			public void install() {}
 		};
-	}
-
-	@BindingAnnotation
-	@Retention(RetentionPolicy.RUNTIME)
-	@interface ForCar {
 	}
 }

@@ -45,7 +45,7 @@ public class PersonBlurTimes extends AbstractPersonAlgorithm implements PlanAlgo
 
 	public PersonBlurTimes(Config config, int mutationRange) {
 		System.out.println("    init " + this.getClass().getName() + " module...");
-		TimeAllocationMutator tam = new TimeAllocationMutator(config, mutationRange, true);
+		TimeAllocationMutator tam = new TimeAllocationMutator(config, null, mutationRange, true);
 		tam.prepareReplanning(null);
 		pa = tam.getPlanAlgoInstance();
 		System.out.println("    done.");

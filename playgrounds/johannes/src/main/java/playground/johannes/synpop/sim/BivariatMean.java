@@ -21,14 +21,13 @@ package playground.johannes.synpop.sim;
 
 import gnu.trove.iterator.TIntDoubleIterator;
 import gnu.trove.map.hash.TIntDoubleHashMap;
-import gnu.trove.map.hash.TIntIntHashMap;
 import org.matsim.contrib.common.stats.Discretizer;
 import playground.johannes.synpop.data.Attributable;
+import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.sim.data.CachedElement;
 import playground.johannes.synpop.sim.data.CachedPerson;
 import playground.johannes.synpop.sim.data.Converters;
 import playground.johannes.synpop.sim.util.DynamicDoubleArray;
-import playground.johannes.synpop.sim.util.DynamicIntArray;
 
 import java.util.Collection;
 import java.util.Set;
@@ -52,17 +51,23 @@ public class BivariatMean implements Hamiltonian, AttributeChangeListener {
 
     private DynamicDoubleArray bucketSums;
 
-    private DynamicIntArray bucketCounts;
+    private DynamicDoubleArray bucketCounts;
 
     private double hamiltonianValue;
 
     public BivariatMean(Set<? extends Attributable> refElements, Set<? extends Attributable> simElements, String
             xAttrKey, String yAttrKey, Discretizer xDataDiscr) {
+        this(refElements, simElements, xAttrKey, yAttrKey, xDataDiscr, false);
+
+    }
+
+    public BivariatMean(Set<? extends Attributable> refElements, Set<? extends Attributable> simElements, String
+            xAttrKey, String yAttrKey, Discretizer xDataDiscr, boolean useWeights) {
         this.xAttrKey = xAttrKey;
         this.yAttrKey = yAttrKey;
         this.xDataDiscr = xDataDiscr;
 
-        initReferenceValues(refElements, xAttrKey, yAttrKey);
+        initReferenceValues(refElements, xAttrKey, yAttrKey, useWeights);
         initSimulationValues(simElements, xAttrKey, yAttrKey);
 
         // Calculate the initial hamiltonian value.
@@ -73,17 +78,17 @@ public class BivariatMean implements Hamiltonian, AttributeChangeListener {
         }
     }
 
-    private void initReferenceValues(Set<? extends Attributable> elements, String xAttrKey, String yAttrKey) {
+    private void initReferenceValues(Set<? extends Attributable> elements, String xAttrKey, String yAttrKey, boolean useWeigths) {
         referenceValues = new DynamicDoubleArray(100, Double.NaN);
 
         DynamicDoubleArray sums = new DynamicDoubleArray(100, Double.NaN);
-        DynamicIntArray counts = new DynamicIntArray(100, -1);
+        DynamicDoubleArray counts = new DynamicDoubleArray(100, -1);
 
-        calculateBuckets(elements, sums, counts, xAttrKey, yAttrKey);
+        calculateBuckets(elements, sums, counts, xAttrKey, yAttrKey, useWeigths);
 
         for(int i = 0; i < sums.size(); i++) {
             double sum = sums.get(i);
-            int cnt = counts.get(i);
+            double cnt = counts.get(i);
             if(!Double.isNaN(sum) && cnt > 0) {
                 referenceValues.set(i, sum/(double)cnt);
             }
@@ -92,15 +97,15 @@ public class BivariatMean implements Hamiltonian, AttributeChangeListener {
 
     private void initSimulationValues(Set<? extends Attributable> elements, String xAttrKey, String yAttrKey) {
         bucketSums = new DynamicDoubleArray(100, Double.NaN);
-        bucketCounts = new DynamicIntArray(100, -1);
+        bucketCounts = new DynamicDoubleArray(100, -1);
 
-        calculateBuckets(elements, bucketSums, bucketCounts, xAttrKey, yAttrKey);
+        calculateBuckets(elements, bucketSums, bucketCounts, xAttrKey, yAttrKey, false); //TODO: no sim weighting for now
     }
 
-    private void calculateBuckets(Set<? extends Attributable> elements, DynamicDoubleArray sums, DynamicIntArray counts,
-                                  String xAttrKey, String yAttrKey) {
+    private void calculateBuckets(Set<? extends Attributable> elements, DynamicDoubleArray sums, DynamicDoubleArray counts,
+                                  String xAttrKey, String yAttrKey, boolean useWeights) {
         TIntDoubleHashMap sumBuckets = new TIntDoubleHashMap();
-        TIntIntHashMap countBuckets = new TIntIntHashMap();
+        TIntDoubleHashMap countBuckets = new TIntDoubleHashMap();
 
         for(Attributable element : elements) {
             String xValStr = element.getAttribute(xAttrKey);
@@ -113,7 +118,12 @@ public class BivariatMean implements Hamiltonian, AttributeChangeListener {
                 int bucketIdx = xDataDiscr.index(xVal);
 
                 sumBuckets.adjustOrPutValue(bucketIdx, yVal, yVal);
-                countBuckets.adjustOrPutValue(bucketIdx, 1, 1);
+
+                double weight = 1.0;
+                if(useWeights) {
+                    weight = Double.parseDouble(element.getAttribute(CommonKeys.PERSON_WEIGHT));
+                }
+                countBuckets.adjustOrPutValue(bucketIdx, weight, weight);
             }
         }
 
@@ -122,7 +132,7 @@ public class BivariatMean implements Hamiltonian, AttributeChangeListener {
             it.advance();
             int bucketIndex = it.key();
             double sum = it.value();
-            int cnt = countBuckets.get(bucketIndex);
+            double cnt = countBuckets.get(bucketIndex);
 
             sums.set(bucketIndex, sum);
             counts.set(bucketIndex, cnt);
@@ -156,7 +166,7 @@ public class BivariatMean implements Hamiltonian, AttributeChangeListener {
         double oldDiff = calculateDiff(bucketIndex);
 
         double sum = bucketSums.get(bucketIndex);
-        int count = bucketCounts.get(bucketIndex);
+        double count = bucketCounts.get(bucketIndex);
 
         if(add) {
             bucketSums.set(bucketIndex, sum + value);
@@ -198,7 +208,7 @@ public class BivariatMean implements Hamiltonian, AttributeChangeListener {
             return 0.0;
         } else {
             double sum = bucketSums.get(bucketIndex);
-            int cnt = bucketCounts.get(bucketIndex);
+            double cnt = bucketCounts.get(bucketIndex);
 
             if(!Double.isNaN(sum) && cnt > 0) {
                 double simValue = sum/(double)cnt;

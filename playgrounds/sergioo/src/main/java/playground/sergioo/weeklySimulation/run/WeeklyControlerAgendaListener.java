@@ -123,19 +123,22 @@ public class WeeklyControlerAgendaListener implements StartupListener, Iteration
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				addPlanStrategyBinding("ReRouteBase").toProvider(new ReRoutePlanStrategyFactory(scenario));
+				Provider<TripRouter> tripRouterProvider = binder().getProvider(TripRouter.class);
+				addPlanStrategyBinding("ReRouteBase").toProvider(new ReRoutePlanStrategyFactory(scenario, tripRouterProvider));
 			}
 		});
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				addPlanStrategyBinding("TimeAllocationBase").toProvider(new TimeAllocationMutatorPlanStrategyFactory(scenario));
+				Provider<TripRouter> tripRouterProvider = binder().getProvider(TripRouter.class);
+				addPlanStrategyBinding("TimeAllocationBase").toProvider(new TimeAllocationMutatorPlanStrategyFactory(scenario, tripRouterProvider));
 			}
 		});
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				addPlanStrategyBinding("TripSubtourModeChoiceBase").toProvider(new TripSubtourModeChoiceStrategyFactory(scenario));
+				Provider<TripRouter> tripRouterProvider = binder().getProvider(TripRouter.class);
+				addPlanStrategyBinding("TripSubtourModeChoiceBase").toProvider(new TripSubtourModeChoiceStrategyFactory(scenario, tripRouterProvider));
 			}
 		});
 	/*WaitTimeCalculator waitTimeCalculator = new WaitTimeCalculator(controler.getScenario().getTransitSchedule(), controler.getConfig().travelTimeCalculator().getTraveltimeBinSize(), (int) (controler.getConfig().qsim().getEndTime()-controler.getConfig().qsim().getStartTime()));

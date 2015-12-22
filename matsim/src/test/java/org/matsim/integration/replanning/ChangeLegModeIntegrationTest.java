@@ -36,6 +36,7 @@ import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.ControlerI;
 import org.matsim.core.controler.Injector;
+import org.matsim.core.events.EventsManagerModule;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.*;
@@ -45,6 +46,7 @@ import org.matsim.core.replanning.StrategyManagerModule;
 import org.matsim.core.router.TripRouterModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityModule;
 import org.matsim.core.scenario.MutableScenario;
+import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionModule;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorModule;
@@ -97,8 +99,8 @@ public class ChangeLegModeIntegrationTest extends MatsimTestCase {
 
 					}
 				});
-                bind(Scenario.class).toInstance(scenario);
-                bind(EventsManager.class).toInstance(EventsUtils.createEventsManager());
+                install(new ScenarioByInstanceModule(scenario));
+                install(new EventsManagerModule());
                 install(new StrategyManagerModule());
 				install(new CharyparNagelScoringFunctionModule());
                 install(new TripRouterModule());

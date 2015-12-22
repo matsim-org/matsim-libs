@@ -20,9 +20,9 @@
 package playground.johannes.gsv.qlik;
 
 import playground.johannes.gsv.matrices.episodes2matrix.SetZones;
-import playground.johannes.gsv.zones.KeyMatrix;
 import playground.johannes.synpop.data.*;
 import playground.johannes.synpop.data.io.XMLHandler;
+import playground.johannes.synpop.matrix.NumericMatrix;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -42,7 +42,7 @@ public class ODTabelGenerator {
 
         Collection<PlainPerson> persons = (Set<PlainPerson>)reader.getPersons();
 
-        KeyMatrix m = new KeyMatrix();
+        NumericMatrix m = new NumericMatrix();
 
         for(Person person : persons) {
             for(Episode episode : person.getEpisodes()) {

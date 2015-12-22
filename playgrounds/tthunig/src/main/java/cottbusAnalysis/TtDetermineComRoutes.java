@@ -8,10 +8,10 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
-import org.matsim.api.core.v01.events.Wait2LinkEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
-import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.vehicles.Vehicle;
@@ -21,7 +21,7 @@ import org.matsim.vehicles.Vehicle;
  * @author tthunig
  * @deprecated
  */
-public class TtDetermineComRoutes implements PersonEntersVehicleEventHandler, Wait2LinkEventHandler, LinkEnterEventHandler{
+public class TtDetermineComRoutes implements PersonEntersVehicleEventHandler, VehicleEntersTrafficEventHandler, LinkEnterEventHandler{
 
 	private Map<Id<Vehicle>, List<Id<Link>>> vehRoutes = new HashMap<>();
 	private Map<Id<Person>, Id<Vehicle>> passengerId2VehId = new HashMap<>();
@@ -37,7 +37,7 @@ public class TtDetermineComRoutes implements PersonEntersVehicleEventHandler, Wa
 	}
 
 	@Override
-	public void handleEvent(Wait2LinkEvent event) {
+	public void handleEvent(VehicleEntersTrafficEvent event) {
 		// every vehicle departures only once in this scenario
 		List<Id<Link>> route = new ArrayList<>();
 		route.add(event.getLinkId());

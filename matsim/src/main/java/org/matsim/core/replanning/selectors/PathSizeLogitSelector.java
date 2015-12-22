@@ -31,9 +31,12 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
+
+import javax.inject.Inject;
 
 /**
  * select an existing Plan according to the Path Size Logit (e.g. Frejinger, E. and Bierlaire, M.: Capturing Correlation
@@ -47,7 +50,7 @@ public final class PathSizeLogitSelector extends AbstractPlanSelector {
 	private final double pathSizeLogitExponent;
 	private final double logitScaleFactor;
 	private Network network;
-	
+
 	public PathSizeLogitSelector( final double pathSizeLogitExponent, final double logitScaleFactor, final Network network ) {
 		this.pathSizeLogitExponent = pathSizeLogitExponent ;
 		this.logitScaleFactor = logitScaleFactor ;

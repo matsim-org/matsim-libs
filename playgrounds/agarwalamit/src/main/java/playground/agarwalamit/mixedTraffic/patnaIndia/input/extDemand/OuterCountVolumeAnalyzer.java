@@ -35,8 +35,8 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.vehicles.Vehicle;
 
 import playground.agarwalamit.analysis.LinkVolumeHandler;
-import playground.agarwalamit.mixedTraffic.patnaIndia.PatnaUtils;
-import playground.agarwalamit.mixedTraffic.patnaIndia.input.extDemand.OuterCordonUtils.OuterCordonLinks;
+import playground.agarwalamit.mixedTraffic.patnaIndia.utils.OuterCordonUtils;
+import playground.agarwalamit.mixedTraffic.patnaIndia.utils.OuterCordonUtils.OuterCordonLinks;
 
 /**
  * @author amit
@@ -46,6 +46,7 @@ public class OuterCountVolumeAnalyzer {
 
 	private LinkVolumeHandler handler = new LinkVolumeHandler();
 	private SortedMap<Id<Link>, Tuple<Integer,Integer>> link2totalCounts = new TreeMap<>();
+	private static final int countScaleFactor = 10;
 
 	public static void main(String[] args) {
 		String outputFolder ="../../../../repos/runs-svn/patnaIndia/run108/outerCordonOutput/";
@@ -68,11 +69,11 @@ public class OuterCountVolumeAnalyzer {
 		try {
 			writer.write("OuterCountStationNumber \t linkId \t ext-intCount \t ext-extCount \n");
 			for(Id<Link> linkId : OuterCordonUtils.getExternalToInternalCountStationLinkIds()){
-				writer.write(OuterCordonLinks.getOuterCordonNumberFromLink(linkId.toString())+"\t"+linkId+"\t"+link2totalCounts.get(linkId).getSecond()*PatnaUtils.COUNT_SCALE_FACTOR+"\t"+link2totalCounts.get(linkId).getFirst()*PatnaUtils.COUNT_SCALE_FACTOR+"\n");
+				writer.write(OuterCordonLinks.getOuterCordonNumberFromLink(linkId.toString())+"\t"+linkId+"\t"+link2totalCounts.get(linkId).getSecond()*countScaleFactor+"\t"+link2totalCounts.get(linkId).getFirst()*countScaleFactor+"\n");
 			}
 			writer.newLine();
 			for(Id<Link> linkId : OuterCordonUtils.getInternalToExternalCountStationLinkIds()){
-				writer.write(OuterCordonLinks.getOuterCordonNumberFromLink(linkId.toString())+"\t"+linkId+"\t"+link2totalCounts.get(linkId).getSecond()*PatnaUtils.COUNT_SCALE_FACTOR+"\t"+link2totalCounts.get(linkId).getFirst()*PatnaUtils.COUNT_SCALE_FACTOR+"\n");
+				writer.write(OuterCordonLinks.getOuterCordonNumberFromLink(linkId.toString())+"\t"+linkId+"\t"+link2totalCounts.get(linkId).getSecond()*countScaleFactor+"\t"+link2totalCounts.get(linkId).getFirst()*countScaleFactor+"\n");
 			}
 			writer.close();
 		} catch (Exception e) {

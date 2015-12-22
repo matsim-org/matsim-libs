@@ -32,7 +32,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.replanning.StrategyManager;
-import org.matsim.core.replanning.StrategyManagerConfigLoader;
+import org.matsim.core.router.TripRouter;
 
 import javax.inject.Provider;
 
@@ -119,8 +119,8 @@ public class HerbieControler extends Controler {
 	  */
 	 private StrategyManager myLoadStrategyManager() {
 	  log.info("loading TransitStrategyManager - using rerouting share of " + reroutingShare);
-	  StrategyManager manager = new TransitStrategyManager(this, reroutingShare);
-	  StrategyManagerConfigLoader.load(this, manager);
+	  StrategyManager manager = new TransitStrategyManager(this, reroutingShare, getInjector().getProvider(TripRouter.class));
+//	  StrategyManagerConfigLoader.load(this, manager);
 	  return manager;
 	 }
 

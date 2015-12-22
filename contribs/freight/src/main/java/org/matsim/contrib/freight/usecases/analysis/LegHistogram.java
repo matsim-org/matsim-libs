@@ -50,6 +50,8 @@ import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.utils.misc.Time;
 
+import javax.inject.Inject;
+
 /**
  * It is a copy of {@link org.matsim.analysis.LegHistogram}. It is modified to include or exclude persons.
  * 
@@ -86,6 +88,7 @@ public class LegHistogram implements PersonDepartureEventHandler, PersonArrivalE
 	 * 
 	 * @param population the population to set
 	 */
+	@Inject
 	public void setPopulation(Population population) {
 		this.population = population;
 	}

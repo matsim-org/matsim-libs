@@ -89,21 +89,17 @@ public class RunTaxibusPolicyCase {
 				return sum ;
 			}
 		});
-		final TaxiBusTravelTimesAnalyzer a = new TaxiBusTravelTimesAnalyzer();
-		final TTEventHandler b = new TTEventHandler();
+		final TaxiBusTravelTimesAnalyzer taxibusTravelTimesAnalyzer = new TaxiBusTravelTimesAnalyzer();
 		controler.addOverridingModule(new AbstractModule() {
 			
 			@Override
 			public void install() {
-			addEventHandlerBinding().toInstance(a);				
-			addEventHandlerBinding().toInstance(b);				
+			addEventHandlerBinding().toInstance(taxibusTravelTimesAnalyzer);				
 			}
 		});
 		
 		
 		controler.run();
-		a.printOutput();
-		b.printOutput();
 	}
 
 	static class MyLegScoring extends CharyparNagelLegScoring {

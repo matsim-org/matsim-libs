@@ -19,11 +19,11 @@
 
 package playground.johannes.gsv.matrices.io;
 
-import playground.johannes.gsv.zones.KeyMatrix;
-import playground.johannes.gsv.zones.io.KeyMatrixXMLWriter;
 import playground.johannes.synpop.gis.Zone;
 import playground.johannes.synpop.gis.ZoneCollection;
 import playground.johannes.synpop.gis.ZoneGeoJsonIO;
+import playground.johannes.synpop.matrix.NumericMatrix;
+import playground.johannes.synpop.matrix.NumericMatrixXMLWriter;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -47,7 +47,7 @@ public class IVV2Matrix {
 		zones.addAll(ZoneGeoJsonIO.parseFeatureCollection(data));
 		zones.setPrimaryKey("gsvId");
 		
-		KeyMatrix m = new KeyMatrix();
+		NumericMatrix m = new NumericMatrix();
 		
 		BufferedReader reader = new BufferedReader(new FileReader("/home/johannes/gsv/matrices/raw/ivv/Matrix2005_PS_Mobility.txt"));
 		
@@ -81,7 +81,7 @@ public class IVV2Matrix {
 		
 		reader.close();
 		
-		KeyMatrixXMLWriter writer = new KeyMatrixXMLWriter();
+		NumericMatrixXMLWriter writer = new NumericMatrixXMLWriter();
 		writer.write(m, "/home/johannes/gsv/matrices/raw/ivv/ivv.xml");
 	}
 

@@ -35,7 +35,10 @@ import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
@@ -61,6 +64,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.EventsToScore;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * Test the correct working of the CharyparNagelScoringFunction according to the formulas in:
@@ -130,12 +134,15 @@ public class CharyparNagelScoringFunctionTest {
 		eventsToScore.handleEvent(new PersonDepartureEvent(leg.getDepartureTime(), f.person.getId(), leg.getRoute().getStartLinkId(), leg.getMode()));
 		if (leg.getRoute() instanceof NetworkRoute) {
 			NetworkRoute networkRoute = (NetworkRoute) leg.getRoute();
-			eventsToScore.handleEvent(new LinkLeaveEvent(leg.getDepartureTime(), f.person.getId(), leg.getRoute().getStartLinkId(), networkRoute.getVehicleId()));
+			eventsToScore.handleEvent(new PersonEntersVehicleEvent(leg.getDepartureTime(), f.person.getId(), networkRoute.getVehicleId()));
+			eventsToScore.handleEvent(new VehicleEntersTrafficEvent(leg.getDepartureTime(), f.person.getId(), leg.getRoute().getStartLinkId(), networkRoute.getVehicleId(), leg.getMode(), 1.0));
+			eventsToScore.handleEvent(new LinkLeaveEvent(leg.getDepartureTime(), networkRoute.getVehicleId(), leg.getRoute().getStartLinkId()));
 			for (Id<Link> linkId : networkRoute.getLinkIds()) {
-				eventsToScore.handleEvent(new LinkEnterEvent(leg.getDepartureTime(), f.person.getId(), linkId, networkRoute.getVehicleId()));
-				eventsToScore.handleEvent(new LinkLeaveEvent(leg.getDepartureTime(), f.person.getId(), linkId, networkRoute.getVehicleId()));
+				eventsToScore.handleEvent(new LinkEnterEvent(leg.getDepartureTime(), networkRoute.getVehicleId(), linkId));
+				eventsToScore.handleEvent(new LinkLeaveEvent(leg.getDepartureTime(), networkRoute.getVehicleId(), linkId));
 			}
-			eventsToScore.handleEvent(new LinkEnterEvent(leg.getDepartureTime() + leg.getTravelTime(), f.person.getId(), leg.getRoute().getEndLinkId(), null));
+			eventsToScore.handleEvent(new LinkEnterEvent(leg.getDepartureTime() + leg.getTravelTime(), networkRoute.getVehicleId(), leg.getRoute().getEndLinkId()));
+			eventsToScore.handleEvent(new VehicleLeavesTrafficEvent(leg.getDepartureTime() + leg.getTravelTime(), f.person.getId(), leg.getRoute().getStartLinkId(), networkRoute.getVehicleId(), leg.getMode(), 1.0));
 		} else {
 			eventsToScore.handleEvent(new TeleportationArrivalEvent(leg.getDepartureTime() + leg.getTravelTime(), f.person.getId(), leg.getRoute().getDistance()));
 		}
@@ -733,6 +740,7 @@ public class CharyparNagelScoringFunctionTest {
 			route1.setLinkIds(link1.getId(), Arrays.asList(link2.getId()), link3.getId());
 			route1.setTravelTime(firstLegTravelTime);
 			route1.setDistance(RouteUtils.calcDistance(route1, this.network));
+			route1.setVehicleId( Id.create( "dummy1Vehicle", Vehicle.class) );
 			leg.setRoute(route1);
 
 			ActivityImpl secondActivity = this.plan.createAndAddActivity("w", link3.getId());

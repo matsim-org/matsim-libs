@@ -99,26 +99,6 @@ public class ExternalModuleTest {
     private void replanPopulation(Population population, PlanStrategyModule testee) {
         testee.prepareReplanning(new ReplanningContext() {
             @Override
-            public TravelDisutility getTravelDisutility() {
-                return null;
-            }
-
-            @Override
-            public TravelTime getTravelTime() {
-                return null;
-            }
-
-            @Override
-            public TripRouter getTripRouter() {
-                return null;
-            }
-
-            @Override
-            public ScoringFunctionFactory getScoringFunctionFactory() {
-                return null;
-            }
-
-            @Override
             public int getIteration() {
                 return 0;
             }

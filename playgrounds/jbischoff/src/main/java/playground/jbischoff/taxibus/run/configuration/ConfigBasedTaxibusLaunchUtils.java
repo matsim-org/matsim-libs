@@ -29,6 +29,7 @@ import org.matsim.population.algorithms.PermissibleModesCalculator;
 
 import playground.jbischoff.taxibus.algorithm.optimizer.fifo.Lines.LineDispatcher;
 import playground.jbischoff.taxibus.algorithm.optimizer.fifo.Lines.LinesUtils;
+import playground.jbischoff.taxibus.algorithm.passenger.TaxibusPassengerOrderManager;
 import playground.jbischoff.taxibus.run.sim.TaxibusPermissibleModesCalculatorImpl;
 import playground.jbischoff.taxibus.run.sim.TaxibusQSimProvider;
 import playground.jbischoff.taxibus.run.sim.TaxibusServiceRoutingModule;
@@ -61,8 +62,11 @@ public class ConfigBasedTaxibusLaunchUtils {
 		final PermissibleModesCalculator taxibusPermissibleModesCalculator;
 		
 		final LineDispatcher dispatcher = LinesUtils.createLineDispatcher(tbcg.getLinesFile(), tbcg.getZonesXmlFile(), tbcg.getZonesShpFile(),context,tbcg);	
+		final TaxibusPassengerOrderManager orderManager = new TaxibusPassengerOrderManager();
+		
 		final String[] availableModes = controler.getScenario().getConfig().subtourModeChoice().getModes();
 		final String[] chainBasedModes = controler.getScenario().getConfig().subtourModeChoice().getChainBasedModes();
+		
 		if (wobCase){
 			taxibusPermissibleModesCalculator = new TaxibusAndWOBScenarioPermissibleModesCalculator(availableModes, dispatcher, controler.getScenario());
 		}
@@ -89,9 +93,10 @@ public class ConfigBasedTaxibusLaunchUtils {
 //					}
 //				});
 				addEventHandlerBinding().toInstance(dispatcher);
+				addEventHandlerBinding().toInstance(orderManager);
 				bindMobsim().toProvider(TaxibusQSimProvider.class);
 				addRoutingModuleBinding("taxibus").toInstance(new TaxibusServiceRoutingModule(controler));
-
+				bind(TaxibusPassengerOrderManager.class).toInstance(orderManager);
 				bind(MatsimVrpContext.class).toInstance(context);
 				bind(LineDispatcher.class).toInstance(dispatcher);
 

@@ -29,6 +29,9 @@ import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
+import org.matsim.core.router.TripRouter;
+
+import javax.inject.Provider;
 
 /**
  * @author thibautd
@@ -36,10 +39,10 @@ import org.matsim.core.replanning.selectors.RandomPlanSelector;
 public class ParkAndRideModeStrategy implements PlanStrategy {
 	private final PlanStrategyImpl delegate;
 
-	public ParkAndRideModeStrategy(final Controler controler) {
+	public ParkAndRideModeStrategy(final Controler controler, Provider<TripRouter> tripRouterProvider) {
 		delegate = new PlanStrategyImpl( new RandomPlanSelector() );
 		addStrategyModule( new ParkAndRideChooseModeForSubtourModule(controler) );
-		addStrategyModule( new ReRoute(controler.getScenario()) );
+		addStrategyModule( new ReRoute(controler.getScenario(), tripRouterProvider) );
 		addStrategyModule( new ParkAndRideInvalidateStartTimes( controler ) );
 	}
 

@@ -22,7 +22,11 @@
 
 package org.matsim.roadpricing;
 
-import com.google.inject.Singleton;
+import java.util.Arrays;
+
+import javax.inject.Inject;
+import javax.inject.Provider;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -31,9 +35,7 @@ import org.matsim.core.controler.ControlerDefaults;
 import org.matsim.core.controler.ControlerDefaultsModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
-import java.util.Arrays;
+import com.google.inject.Singleton;
 
 public class ControlerDefaultsWithRoadPricingModule extends AbstractModule {
 
@@ -56,7 +58,7 @@ public class ControlerDefaultsWithRoadPricingModule extends AbstractModule {
         } else {
             bind(RoadPricingScheme.class).toProvider(RoadPricingSchemeProvider.class).in(Singleton.class);
         }
-
+        
         bind(PlansCalcRouteWithTollOrNot.class);
         addPlanStrategyBinding("ReRouteAreaToll").toProvider(ReRouteAreaToll.class);
 

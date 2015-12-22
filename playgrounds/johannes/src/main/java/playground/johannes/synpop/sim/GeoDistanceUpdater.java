@@ -22,7 +22,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.facilities.ActivityFacility;
 import playground.johannes.synpop.analysis.Predicate;
 import playground.johannes.synpop.data.CommonKeys;
-import playground.johannes.synpop.data.Segment;
 import playground.johannes.synpop.sim.data.CachedElement;
 import playground.johannes.synpop.sim.data.CachedSegment;
 import playground.johannes.synpop.sim.data.Converters;
@@ -39,7 +38,7 @@ public class GeoDistanceUpdater implements AttributeChangeListener {
 
     private AttributeChangeListener listener;
 
-    private Predicate<Segment> predicate;
+    private Predicate<CachedSegment> predicate;
 
     public GeoDistanceUpdater() {
         this.listener = null;
@@ -49,7 +48,7 @@ public class GeoDistanceUpdater implements AttributeChangeListener {
         setListener(listener);
     }
 
-    public void setPredicate(Predicate<Segment> predicate) {
+    public void setPredicate(Predicate<CachedSegment> predicate) {
         this.predicate = predicate;
     }
 

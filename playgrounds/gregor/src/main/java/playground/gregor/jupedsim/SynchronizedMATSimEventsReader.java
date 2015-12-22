@@ -64,6 +64,10 @@ public class SynchronizedMATSimEventsReader extends MatsimXmlParser {
 	}
 
 	@Override
+	public void endTag(final String name, final String content, final Stack<String> context) {
+	}
+
+	@Override
 	public void characters(char[] ch, int start, int length) throws SAXException {
 		// ignore characters to prevent OutOfMemoryExceptions
 		/* the events-file only contains empty tags with attributes,
@@ -71,10 +75,6 @@ public class SynchronizedMATSimEventsReader extends MatsimXmlParser {
 		 * by characters and added up by super.characters, consuming huge
 		 * amount of memory when large events-files are read in.
 		 */
-	}
-
-	@Override
-	public void endTag(final String name, final String content, final Stack<String> context) {
 	}
 
 	private void startEvent(final Attributes atts) {
@@ -87,9 +87,9 @@ public class SynchronizedMATSimEventsReader extends MatsimXmlParser {
 		if (XYVxVyEventImpl.EVENT_TYPE.equals(eventType)) {
 			this.q.offer(new XYVxVyEventImpl(Id.create(atts.getValue(XYVxVyEventImpl.ATTRIBUTE_PERSON), Person.class), Double.parseDouble(atts.getValue(XYVxVyEventImpl.ATTRIBUTE_X)), Double.parseDouble(atts.getValue(XYVxVyEventImpl.ATTRIBUTE_Y)), Double.parseDouble(atts.getValue(XYVxVyEventImpl.ATTRIBUTE_VX)), Double.parseDouble(atts.getValue(XYVxVyEventImpl.ATTRIBUTE_VY)), time));
 		}else if (LinkLeaveEvent.EVENT_TYPE.equals(eventType)) {
-			this.q.offer(new LinkLeaveEvent(time, Id.create(atts.getValue(LinkLeaveEvent.ATTRIBUTE_PERSON), Person.class), Id.create(atts.getValue(LinkLeaveEvent.ATTRIBUTE_LINK), Link.class), atts.getValue(LinkLeaveEvent.ATTRIBUTE_VEHICLE) == null ? null : Id.create(atts.getValue(LinkLeaveEvent.ATTRIBUTE_VEHICLE), Vehicle.class)));
+			this.q.offer(new LinkLeaveEvent(time, atts.getValue(LinkLeaveEvent.ATTRIBUTE_VEHICLE) == null ? null : Id.create(atts.getValue(LinkLeaveEvent.ATTRIBUTE_VEHICLE), Vehicle.class), Id.create(atts.getValue(LinkLeaveEvent.ATTRIBUTE_LINK), Link.class)));
 		} else if (LinkEnterEvent.EVENT_TYPE.equals(eventType)) {
-			this.q.offer(new LinkEnterEvent(time, Id.create(atts.getValue(LinkEnterEvent.ATTRIBUTE_PERSON), Person.class), Id.create(atts.getValue(LinkEnterEvent.ATTRIBUTE_LINK), Link.class), atts.getValue(LinkEnterEvent.ATTRIBUTE_VEHICLE) == null ? null : Id.create(atts.getValue(LinkEnterEvent.ATTRIBUTE_VEHICLE), Vehicle.class)));
+			this.q.offer(new LinkEnterEvent(time, atts.getValue(LinkEnterEvent.ATTRIBUTE_VEHICLE) == null ? null : Id.create(atts.getValue(LinkEnterEvent.ATTRIBUTE_VEHICLE), Vehicle.class), Id.create(atts.getValue(LinkEnterEvent.ATTRIBUTE_LINK), Link.class)));
 		} else if (ActivityEndEvent.EVENT_TYPE.equals(eventType)) {
 			this.q.offer(new ActivityEndEvent(time, Id.create(atts.getValue(ActivityEndEvent.ATTRIBUTE_PERSON), Person.class), Id.create(atts.getValue(ActivityEndEvent.ATTRIBUTE_LINK), Link.class), atts.getValue(ActivityEndEvent.ATTRIBUTE_FACILITY) == null ? null : Id.create(atts.getValue(ActivityEndEvent.ATTRIBUTE_FACILITY), ActivityFacility.class), atts.getValue(ActivityEndEvent.ATTRIBUTE_ACTTYPE)));
 		} else if (ActivityStartEvent.EVENT_TYPE.equals(eventType)) {
@@ -102,8 +102,8 @@ public class SynchronizedMATSimEventsReader extends MatsimXmlParser {
 			String legMode = atts.getValue(PersonDepartureEvent.ATTRIBUTE_LEGMODE);
 			String mode = legMode == null ? null : legMode.intern();
 			this.q.offer(new PersonDepartureEvent(time, Id.create(atts.getValue(PersonDepartureEvent.ATTRIBUTE_PERSON), Person.class), Id.create(atts.getValue(PersonDepartureEvent.ATTRIBUTE_LINK), Link.class), mode));
-		} else if (Wait2LinkEvent.EVENT_TYPE.equals(eventType)) {
-			this.q.offer(new Wait2LinkEvent(time, Id.create(atts.getValue(Wait2LinkEvent.ATTRIBUTE_DRIVER), Person.class), Id.create(atts.getValue(Wait2LinkEvent.ATTRIBUTE_LINK), Link.class), atts.getValue(Wait2LinkEvent.ATTRIBUTE_VEHICLE) == null ? null : Id.create(atts.getValue(Wait2LinkEvent.ATTRIBUTE_VEHICLE), Vehicle.class), atts.getValue(Wait2LinkEvent.ATTRIBUTE_NETWORKMODE), 1.0));
+		} else if (VehicleEntersTrafficEvent.EVENT_TYPE.equals(eventType)) {
+			this.q.offer(new VehicleEntersTrafficEvent(time, Id.create(atts.getValue(VehicleEntersTrafficEvent.ATTRIBUTE_DRIVER), Person.class), Id.create(atts.getValue(VehicleEntersTrafficEvent.ATTRIBUTE_LINK), Link.class), atts.getValue(VehicleEntersTrafficEvent.ATTRIBUTE_VEHICLE) == null ? null : Id.create(atts.getValue(VehicleEntersTrafficEvent.ATTRIBUTE_VEHICLE), Vehicle.class), atts.getValue(VehicleEntersTrafficEvent.ATTRIBUTE_NETWORKMODE), 1.0));
 		} else if (PersonStuckEvent.EVENT_TYPE.equals(eventType)) {
 			String legMode = atts.getValue(PersonStuckEvent.ATTRIBUTE_LEGMODE);
 			String mode = legMode == null ? null : legMode.intern();

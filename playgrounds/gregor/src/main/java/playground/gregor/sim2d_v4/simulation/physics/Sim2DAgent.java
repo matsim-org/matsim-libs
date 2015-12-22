@@ -30,7 +30,6 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.core.mobsim.qsim.qnetsimengine.Sim2DQAdapterLink;
-
 import playground.gregor.sim2d_v4.cgal.TwoDObject;
 import playground.gregor.sim2d_v4.cgal.VoronoiCell;
 import playground.gregor.sim2d_v4.cgal.VoronoiCenter;
@@ -45,44 +44,26 @@ public class Sim2DAgent implements VoronoiCenter, TwoDObject {
 	private final double vCoeff = 1;//1+Math.min(Math.max(-0.25, MatsimRandom.getRandom().nextGaussian()*.1),.25);
 	
 //	private final double vStd
-	
-	private double v0 = 1.34*this.vCoeff;
-	
-	
 	private final double [] pos = {0,0};
-	
 	private final double [] v = {0,0};
-	
 	private final QVehicle veh;
 	private final MobsimDriverAgent driver;
-	
-
 	private final double r;
-	
 	private final double height = 1.72 + MatsimRandom.getRandom().nextGaussian()*0.1; //TODO find a meaningful value here [gl April '13]
+							private final Scenario sc;
 	
 //	private Id currentLinkId;
 //
 //	private LinkInfo cachedLi;
-
-	private final Scenario sc;
-
 	private final LinkSwitcher ls;
-
 	private final PhysicalSim2DEnvironment pEnv;
-
+							private final Id<Person> id;
+							/*package*/ int ttl; //workaround - think about this [gl August '13]
+							private double v0 = 1.34 * this.vCoeff;
 	private boolean hasLeft2DSim = false;
-
 	private VelocityUpdater vu;
-
 	private boolean emitPosEvents = true;
-
-	/*package*/ int ttl; //workaround - think about this [gl August '13]
-
 	private VoronoiCell voronoiCell;
-
-	private final Id<Person> id;
-
 	private PhysicalSim2DSection currentPSec;
 	
 	
@@ -132,10 +113,6 @@ public class Sim2DAgent implements VoronoiCenter, TwoDObject {
 		this.vu = vu;
 	}
 	
-	public QVehicle getQVehicle() {
-		return this.veh;
-	}
-
 	public void updateVelocity() {
 //		if (this.getId().toString().equals("a118") && this.getPos()[1] > 3.8) {
 //			System.out.println("stop");
@@ -143,22 +120,21 @@ public class Sim2DAgent implements VoronoiCenter, TwoDObject {
 		this.vu.updateVelocity();
 	}
 
+							public void setSec(PhysicalSim2DSection pSec) {
+								this.currentPSec = pSec;
+							}
+
 
 
 //	public void setPSec(PhysicalSim2DSection physicalSim2DSection) {
 //		this.currentPSec = physicalSim2DSection;
 //	}
 	
-	public void setSec(PhysicalSim2DSection pSec) {
-		this.currentPSec = pSec;
-	}
-
-
 	public boolean move(double dx, double dy, double time) {
 		if (this.ls.isSwitchLink(this.pos, dx, dy, this.getCurrentLinkId())) {
 			Id<Link> nextLinkId = this.chooseNextLinkId();
 			Sim2DQAdapterLink loResLink = this.pEnv.getLowResLink(nextLinkId);
-			if (loResLink != null) { //HACK? we are in the agent's mental model but perform a physical sim2D --> qSim transition 
+			if (loResLink != null) { //HACK? we are in the agent's mental model but perform a physical sim2D --> qSim transition
 				// this should be handled in the link's corresponding PhysicalSim2DSection [gl April '13]
 				if (loResLink.isAcceptingFromUpstream()) {
 					QVehicle veh = this.getQVehicle();
@@ -166,19 +142,19 @@ public class Sim2DAgent implements VoronoiCenter, TwoDObject {
 					loResLink.addFromUpstream(veh);
 					this.hasLeft2DSim = true;
 					this.ttl = 100;
-					this.pEnv.getEventsManager().processEvent(new LinkLeaveEvent(time, this.id, this.getCurrentLinkId(), this.veh.getId()));
+					this.pEnv.getEventsManager().processEvent(new LinkLeaveEvent(time, this.veh.getId(), this.getCurrentLinkId()));
 					this.notifyMoveOverNode(nextLinkId);
 				} else {
 					return false;
 				}
 			} else {
-				this.pEnv.getEventsManager().processEvent(new LinkLeaveEvent(time, this.id, this.getCurrentLinkId(), this.veh.getId()));
+				this.pEnv.getEventsManager().processEvent(new LinkLeaveEvent(time, this.veh.getId(), this.getCurrentLinkId()));
 				this.notifyMoveOverNode(nextLinkId);
-				this.pEnv.getEventsManager().processEvent(new LinkEnterEvent(time, this.id, nextLinkId, this.veh.getId()));
+				this.pEnv.getEventsManager().processEvent(new LinkEnterEvent(time, this.veh.getId(), nextLinkId));
 			}
 		}
-		
-		
+
+
 		this.pos[0] += dx;
 		this.pos[1] += dy;
 		if (this.emitPosEvents) {
@@ -186,10 +162,29 @@ public class Sim2DAgent implements VoronoiCenter, TwoDObject {
 			XYVxVyEventImpl e = new XYVxVyEventImpl(this.id, this.pos[0], this.pos[1], this.v[0], this.v[1],time);
 			this.pEnv.getEventsManager().processEvent(e);
 		}
-		
+
 		return true;
 	}
-	
+
+							public QVehicle getQVehicle() {
+								return this.veh;
+							}
+
+							public Id<Link> getCurrentLinkId() {
+								return this.driver.getCurrentLinkId();
+							}
+
+							public Id<Link> chooseNextLinkId() {
+								Id<Link> id = this.driver.chooseNextLinkId();
+								return id;
+							}
+
+							public void notifyMoveOverNode(Id<Link> nextLinkId) {
+								this.driver.notifyMoveOverNode(nextLinkId);
+//		this.v0 = this.sc.getNetwork().getLinks().get(nextLinkId).getFreespeed()+(MatsimRandom.getRandom().nextDouble()*.1)-.05;
+								this.setDesiredSpeed(this.sc.getNetwork().getLinks().get(nextLinkId).getFreespeed());
+							}
+
 	public void moveGhost(double dx, double dy, double time) {
 		this.pos[0] += dx;
 		this.pos[1] += dy;
@@ -204,27 +199,12 @@ public class Sim2DAgent implements VoronoiCenter, TwoDObject {
 		return this.v;
 	}
 
-	public Id<Link> getCurrentLinkId() {
-		return this.driver.getCurrentLinkId();
-	}
-
 	public double[] getPos() {
 		return this.pos;
 	}
 
-	public Id<Link> chooseNextLinkId() {
-		Id<Link> id = this.driver.chooseNextLinkId();
-		return id;
-	}
-
 	public Id<Person> getId() {
 		return this.id;
-	}
-
-	public void notifyMoveOverNode(Id<Link> nextLinkId) {
-		this.driver.notifyMoveOverNode(nextLinkId);
-//		this.v0 = this.sc.getNetwork().getLinks().get(nextLinkId).getFreespeed()+(MatsimRandom.getRandom().nextDouble()*.1)-.05;
-		this.setDesiredSpeed(this.sc.getNetwork().getLinks().get(nextLinkId).getFreespeed());
 	}
 
 	public PhysicalSim2DSection getPSec() {
@@ -245,14 +225,14 @@ public class Sim2DAgent implements VoronoiCenter, TwoDObject {
 		return this.pos[1];
 	}
 
+							public double getDesiredSpeed() {
+								return this.v0;
+							}
+	
 	public void setDesiredSpeed(double v) {
 //		System.out.println(v);
 		this.v0 = v*this.vCoeff;
-		
-	}
-	
-	public double getDesiredSpeed() {
-		return this.v0;
+
 	}
 
 	public boolean hasLeft2DSim() {
@@ -268,6 +248,11 @@ public class Sim2DAgent implements VoronoiCenter, TwoDObject {
 		return false;
 	}
 
+							@Override
+							public String toString() {
+								return "id: " + this.driver.getId() + " sec:" + this.currentPSec.getId() + " link:" + this.getCurrentLinkId() + " pos:" + ((int) (this.pos[0] * 100 + .5)) / 100. + ":" + ((int) (this.pos[1] * 100 + .5)) / 100.;
+							}
+	
 	public double getV0() {
 		return this.v0;
 	}
@@ -278,11 +263,6 @@ public class Sim2DAgent implements VoronoiCenter, TwoDObject {
 	
 	public void setFocusOnAgent(boolean focus) {
 		this.emitPosEvents = focus;
-	}
-	
-	@Override
-	public String toString() {
-		return "id: " + this.driver.getId() + " sec:" + this.currentPSec.getId() + " link:" + this.getCurrentLinkId() + " pos:" + ((int)(this.pos[0]*100+.5))/100. + ":" + ((int)(this.pos[1]*100+.5))/100. ;
 	}
 	
 	//DEBUG

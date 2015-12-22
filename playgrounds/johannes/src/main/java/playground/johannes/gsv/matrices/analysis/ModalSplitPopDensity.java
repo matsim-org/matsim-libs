@@ -24,11 +24,11 @@ import org.apache.log4j.Logger;
 import org.matsim.contrib.common.stats.Discretizer;
 import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
 import org.matsim.contrib.common.util.ProgressLogger;
-import playground.johannes.gsv.zones.KeyMatrix;
-import playground.johannes.gsv.zones.io.KeyMatrixTxtIO;
 import playground.johannes.synpop.gis.Zone;
 import playground.johannes.synpop.gis.ZoneCollection;
 import playground.johannes.synpop.gis.ZoneGeoJsonIO;
+import playground.johannes.synpop.matrix.NumericMatrix;
+import playground.johannes.synpop.matrix.NumericMatrixTxtIO;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -48,9 +48,9 @@ public class ModalSplitPopDensity {
         String zoneFile = "/home/johannes/gsv/gis/zones/geojson/nuts3.psm.gk3.geojson";
         String inhabFile = "/home/johannes/gsv/miv-matrix/qs2013/inhabitants.csv";
 
-        final KeyMatrix carVol = new KeyMatrix();
-        final KeyMatrix railVol = new KeyMatrix();
-        final KeyMatrix airVol = new KeyMatrix();
+        final NumericMatrix carVol = new NumericMatrix();
+        final NumericMatrix railVol = new NumericMatrix();
+        final NumericMatrix airVol = new NumericMatrix();
 
         logger.info("Loading zones...");
         ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON(zoneFile, "NO");
@@ -72,10 +72,10 @@ public class ModalSplitPopDensity {
         });
 
         logger.info("Calculating shares per od-pair...");
-        KeyMatrix carShare = new KeyMatrix();
-        KeyMatrix railShare = new KeyMatrix();
-        KeyMatrix airShare = new KeyMatrix();
-        KeyMatrix odCounts = new KeyMatrix();
+        NumericMatrix carShare = new NumericMatrix();
+        NumericMatrix railShare = new NumericMatrix();
+        NumericMatrix airShare = new NumericMatrix();
+        NumericMatrix odCounts = new NumericMatrix();
 
         Discretizer discr = FixedSampleSizeDiscretizer.create(zoneRho.values(), 1, 20);
 //        Discretizer discr = new DummyDiscretizer();
@@ -124,17 +124,17 @@ public class ModalSplitPopDensity {
             for (String to : keys) {
                 Double count = odCounts.get(from, to);
                 if(count != null) {
-                    carShare.applyFactor(from, to, 1/count);
-                    railShare.applyFactor(from, to, 1/count);
-                    airShare.applyFactor(from, to, 1/count);
+                    carShare.multiply(from, to, 1/count);
+                    railShare.multiply(from, to, 1/count);
+                    airShare.multiply(from, to, 1/count);
                 }
             }
         }
 
         logger.info("Writing matrices...");
-        KeyMatrixTxtIO.write(carShare, String.format("%s/carShare.txt", outdir));
-        KeyMatrixTxtIO.write(railShare, String.format("%s/railShare.txt", outdir));
-        KeyMatrixTxtIO.write(airShare, String.format("%s/airShare.txt", outdir));
+        NumericMatrixTxtIO.write(carShare, String.format("%s/carShare.txt", outdir));
+        NumericMatrixTxtIO.write(railShare, String.format("%s/railShare.txt", outdir));
+        NumericMatrixTxtIO.write(airShare, String.format("%s/airShare.txt", outdir));
         logger.info("Done.");
     }
 

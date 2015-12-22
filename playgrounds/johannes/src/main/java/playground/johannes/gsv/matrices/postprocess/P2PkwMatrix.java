@@ -19,10 +19,10 @@
 
 package playground.johannes.gsv.matrices.postprocess;
 
-import playground.johannes.gsv.zones.KeyMatrix;
-import playground.johannes.gsv.zones.MatrixOperations;
-import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
-import playground.johannes.gsv.zones.io.KeyMatrixXMLWriter;
+import playground.johannes.synpop.matrix.MatrixOperations;
+import playground.johannes.synpop.matrix.NumericMatrix;
+import playground.johannes.synpop.matrix.NumericMatrixXMLReader;
+import playground.johannes.synpop.matrix.NumericMatrixXMLWriter;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -39,28 +39,28 @@ public class P2PkwMatrix {
 	public static void main(String[] args) {
 		String baseDir = "/home/johannes/sge/prj/synpop/run/791/output/scaled";
 		
-		KeyMatrix buisiness = loadMatrix(String.format("%s/miv.buisiness.xml", baseDir));
+		NumericMatrix buisiness = loadMatrix(String.format("%s/miv.buisiness.xml", baseDir));
 		MatrixOperations.applyFactor(buisiness, 1/1.2);
 
-		KeyMatrix edu = loadMatrix(String.format("%s/miv.edu.xml", baseDir));
+		NumericMatrix edu = loadMatrix(String.format("%s/miv.edu.xml", baseDir));
 		MatrixOperations.applyFactor(edu, 1/1.7);
 		
-		KeyMatrix leisure = loadMatrix(String.format("%s/miv.leisure.xml", baseDir));
+		NumericMatrix leisure = loadMatrix(String.format("%s/miv.leisure.xml", baseDir));
 		MatrixOperations.applyFactor(leisure, 1/1.9);
 		
-		KeyMatrix shop = loadMatrix(String.format("%s/miv.shop.xml", baseDir));
+		NumericMatrix shop = loadMatrix(String.format("%s/miv.shop.xml", baseDir));
 		MatrixOperations.applyFactor(shop, 1/1.5);
 		
-		KeyMatrix vacationsLong = loadMatrix(String.format("%s/miv.vacations_long.xml", baseDir));
+		NumericMatrix vacationsLong = loadMatrix(String.format("%s/miv.vacations_long.xml", baseDir));
 		MatrixOperations.applyFactor(vacationsLong, 1/1.9);
 		
-		KeyMatrix vacationsShort = loadMatrix(String.format("%s/miv.vacations_short.xml", baseDir));
+		NumericMatrix vacationsShort = loadMatrix(String.format("%s/miv.vacations_short.xml", baseDir));
 		MatrixOperations.applyFactor(vacationsShort, 1/1.9);
 		
-		KeyMatrix work = loadMatrix(String.format("%s/miv.work.xml", baseDir));
+		NumericMatrix work = loadMatrix(String.format("%s/miv.work.xml", baseDir));
 		MatrixOperations.applyFactor(work, 1/1.2);
 		
-		Set<KeyMatrix> matrices = new HashSet<>();
+		Set<NumericMatrix> matrices = new HashSet<>();
 		matrices.add(buisiness);
 		matrices.add(edu);
 		matrices.add(leisure);
@@ -69,19 +69,20 @@ public class P2PkwMatrix {
 		matrices.add(vacationsLong);
 		matrices.add(work);
 		
-		KeyMatrix sum = MatrixOperations.merge(matrices);
+		NumericMatrix sum = new NumericMatrix();
+		MatrixOperations.accumulate(matrices, sum);
 		writeMatrix(sum, String.format("%s/pkw.xml", baseDir));
 	}
 
-	private static KeyMatrix loadMatrix(String file) {
-		KeyMatrixXMLReader reader = new KeyMatrixXMLReader();
+	private static NumericMatrix loadMatrix(String file) {
+		NumericMatrixXMLReader reader = new NumericMatrixXMLReader();
 		reader.setValidating(false);
 		reader.parse(file);
 		return reader.getMatrix();
 	}
 	
-	private static void writeMatrix(KeyMatrix m, String file) {
-		KeyMatrixXMLWriter writer = new KeyMatrixXMLWriter();
+	private static void writeMatrix(NumericMatrix m, String file) {
+		NumericMatrixXMLWriter writer = new NumericMatrixXMLWriter();
 		writer.write(m, file);
 	}
 }

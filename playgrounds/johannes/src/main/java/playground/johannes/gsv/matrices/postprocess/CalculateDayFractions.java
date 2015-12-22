@@ -21,10 +21,10 @@ package playground.johannes.gsv.matrices.postprocess;
 
 import org.apache.log4j.Logger;
 import playground.johannes.gsv.matrices.episodes2matrix.Episodes2Matrix;
-import playground.johannes.gsv.zones.KeyMatrix;
-import playground.johannes.gsv.zones.MatrixOperations;
-import playground.johannes.gsv.zones.io.KeyMatrixTxtIO;
 import playground.johannes.synpop.data.CommonValues;
+import playground.johannes.synpop.matrix.MatrixOperations;
+import playground.johannes.synpop.matrix.NumericMatrix;
+import playground.johannes.synpop.matrix.NumericMatrixTxtIO;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -46,8 +46,8 @@ public class CalculateDayFractions {
         writer.write("day\tseason\tvolume");
         writer.newLine();
 
-        KeyMatrix m = new KeyMatrix();
-        KeyMatrixTxtIO.read(m, String.format("%s/car.txt.gz", root));
+        NumericMatrix m = new NumericMatrix();
+        NumericMatrixTxtIO.read(m, String.format("%s/car.txt.gz", root));
         writer.write("all\tall\t");
         writer.write(String.valueOf(MatrixOperations.sum(m)));
         writer.newLine();
@@ -66,8 +66,8 @@ public class CalculateDayFractions {
 
                     if(file.getName().matches(pattern)) {
                         logger.info(String.format("Loading matrix %s...", file.getName()));
-                        m = new KeyMatrix();
-                        KeyMatrixTxtIO.read(m, file.getAbsolutePath());
+                        m = new NumericMatrix();
+                        NumericMatrixTxtIO.read(m, file.getAbsolutePath());
                         sum += MatrixOperations.sum(m);
 
                         count++;

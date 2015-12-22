@@ -31,6 +31,9 @@ import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
+import org.matsim.core.router.TripRouter;
+
+import javax.inject.Provider;
 
 /**
  * Uses a TripsToLegModule to simplify trips before running subtour
@@ -40,16 +43,16 @@ import org.matsim.core.replanning.selectors.RandomPlanSelector;
 public class SubtourModeChoiceStrategyMATSimLecture implements PlanStrategy {
 	private final PlanStrategyImpl strategy;
 
-	public SubtourModeChoiceStrategyMATSimLecture(final Scenario scenario) {
+	public SubtourModeChoiceStrategyMATSimLecture(final Scenario scenario, Provider<TripRouter> tripRouterProvider) {
 		this.strategy = new PlanStrategyImpl( new RandomPlanSelector<Plan, Person>() );
 
 		//addStrategyModule( new TripsToLegsModule(controler.getConfig() ) );   
-		SubtourModeChoiceMATSimLecture smc = new SubtourModeChoiceMATSimLecture(scenario.getConfig());
+		SubtourModeChoiceMATSimLecture smc = new SubtourModeChoiceMATSimLecture(scenario.getConfig(), tripRouterProvider);
 		SubTourPermissableModecCalculatorMATSimLecture cpmc = new SubTourPermissableModecCalculatorMATSimLecture(scenario);
 		smc.setPermissibleModesCalculator(cpmc);
 		
 		addStrategyModule(smc );
-		addStrategyModule( new ReRoute(scenario) );
+		addStrategyModule( new ReRoute(scenario, tripRouterProvider) );
 	}
 
 	public void addStrategyModule(final PlanStrategyModule module) {

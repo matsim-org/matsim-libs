@@ -30,45 +30,48 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.roadpricing.RoadPricingScheme;
+import org.matsim.vehicles.Vehicle;
 
 import playground.jjoubert.roadpricing.senozon.SanralTollFactor;
 
 public class MyTollPotentialEventHandler implements LinkEnterEventHandler{
 
 	private Logger log = Logger.getLogger(MyPatronLinkEntryHandler.class);
-	private List<Id<Person>> breaks;
+	private List<Id<Vehicle>> breaks;
 	private List<Id<Link>> linkIds;
-	private List<Map<Id,Double>> valueMaps;
-	private List<Map<Id,Integer>> countMaps;
+	private List<Map<Id<Vehicle>,Double>> valueMaps;
+	private List<Map<Id<Vehicle>,Integer>> countMaps;
 	private RoadPricingScheme scheme;
 
-	public MyTollPotentialEventHandler(List<Id<Link>> linkIds, List<Id<Person>> breaks, RoadPricingScheme scheme) {
+	private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
+
+	public MyTollPotentialEventHandler(List<Id<Link>> linkIds, List<Id<Vehicle>> breaks, RoadPricingScheme scheme) {
 		this.linkIds = linkIds;
 		this.breaks = breaks;
-		valueMaps = new ArrayList<Map<Id,Double>>(breaks.size());
-		countMaps = new ArrayList<Map<Id,Integer>>(breaks.size());
+		valueMaps = new ArrayList<Map<Id<Vehicle>,Double>>(breaks.size());
+		countMaps = new ArrayList<Map<Id<Vehicle>,Integer>>(breaks.size());
 		for(int i = 0; i < breaks.size(); i++){
-			valueMaps.add(new HashMap<Id, Double>());
-			countMaps.add(new HashMap<Id, Integer>());
+			valueMaps.add(new HashMap<Id<Vehicle>, Double>());
+			countMaps.add(new HashMap<Id<Vehicle>, Integer>());
 		}
 		this.scheme = scheme;
 	}
 	
-	public List<Map<Id, Double>> getValueMaps(){
+	public List<Map<Id<Vehicle>, Double>> getValueMaps(){
 		return valueMaps;
 	}
 	
-	public List<Map<Id,Integer>> getCountMaps(){
+	public List<Map<Id<Vehicle>,Integer>> getCountMaps(){
 		return countMaps;
 	}
 	
 	
 	@Override
 	public void reset(int iteration) {
-		valueMaps = new ArrayList<Map<Id,Double>>(this.breaks.size());
-		countMaps = new ArrayList<Map<Id,Integer>>(this.breaks.size());
+		valueMaps = new ArrayList<Map<Id<Vehicle>,Double>>(this.breaks.size());
+		countMaps = new ArrayList<Map<Id<Vehicle>,Integer>>(this.breaks.size());
 	}
 
 	@Override
@@ -83,27 +86,27 @@ public class MyTollPotentialEventHandler implements LinkEnterEventHandler{
 			boolean found = false;
 			int breakIndex = 0;
 			while(!found && breakIndex < breaks.size()){
-				if(Long.parseLong(event.getDriverId().toString()) < Long.parseLong(breaks.get(breakIndex).toString())){
+				if(Long.parseLong(event.getVehicleId().toString()) < Long.parseLong(breaks.get(breakIndex).toString())){
 					found = true;
 					/* Check if the person entering the link is already contained
 					 * in the map. If so, increment its toll tally. If not, add 
 					 * it to the map with first toll value.
 					 */
-					double tollFactor = SanralTollFactor.getTollFactor(event.getDriverId(), event.getLinkId(), event.getTime());
-					double toll = tollFactor * this.scheme.getLinkCostInfo(event.getLinkId(), event.getTime(), event.getDriverId(), event.getVehicleId() ).amount;
-					if(valueMaps.get(breakIndex).containsKey(event.getDriverId())){
-						valueMaps.get(breakIndex).put(event.getDriverId(), valueMaps.get(breakIndex).get(event.getDriverId()) + toll);
-						countMaps.get(breakIndex).put(event.getDriverId(), countMaps.get(breakIndex).get(event.getDriverId()) + 1);
+					double tollFactor = SanralTollFactor.getTollFactor(event.getVehicleId(), event.getLinkId(), event.getTime());
+					double toll = tollFactor * this.scheme.getLinkCostInfo(event.getLinkId(), event.getTime(), delegate.getDriverOfVehicle(event.getVehicleId()), event.getVehicleId() ).amount;
+					if(valueMaps.get(breakIndex).containsKey(event.getVehicleId())){
+						valueMaps.get(breakIndex).put(event.getVehicleId(), valueMaps.get(breakIndex).get(event.getVehicleId()) + toll);
+						countMaps.get(breakIndex).put(event.getVehicleId(), countMaps.get(breakIndex).get(event.getVehicleId()) + 1);
 					} else{
-						valueMaps.get(breakIndex).put(event.getDriverId(), new Double(toll));
-						countMaps.get(breakIndex).put(event.getDriverId(), new Integer(1));
+						valueMaps.get(breakIndex).put(event.getVehicleId(), new Double(toll));
+						countMaps.get(breakIndex).put(event.getVehicleId(), new Integer(1));
 					}
 				} else{
 					breakIndex++;
 				}
 			}
 			if(!found){
-				log.warn("Could not identify a category (bracket) for agent " + event.getDriverId().toString());
+				log.warn("Could not identify a category (bracket) for agent " + event.getVehicleId().toString());
 			}
 		}
 	}

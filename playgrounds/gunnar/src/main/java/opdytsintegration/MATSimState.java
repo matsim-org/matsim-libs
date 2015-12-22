@@ -48,7 +48,8 @@ public class MATSimState implements SimulatorState {
 	private final Map<Id<Person>, Integer> person2selectedPlanIndex = new LinkedHashMap<>();
 
 	private final Vector vectorRepresentation;
-	private Population population;
+
+	private final Population population;
 
 	// -------------------- CONSTRUCTION --------------------
 
@@ -107,7 +108,7 @@ public class MATSimState implements SimulatorState {
 			return plans.get(index);
 		}
 	}
-	
+
 	public Set<Id<Person>> getPersonIdView() {
 		return Collections.unmodifiableSet(this.person2planList.keySet());
 	}
@@ -143,7 +144,7 @@ public class MATSimState implements SimulatorState {
 		}
 	}
 
-	public void setPopulation(Population population) {
-		this.population = population;
-	}
+	// public void setPopulation(Population population) {
+	// this.population = population;
+	// }
 }

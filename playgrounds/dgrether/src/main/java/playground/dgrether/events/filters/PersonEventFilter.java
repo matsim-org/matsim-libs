@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
-import org.matsim.api.core.v01.events.Wait2LinkEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.population.Person;
 
 
@@ -48,16 +48,8 @@ public class PersonEventFilter implements EventFilter {
 	
 	@Override
 	public boolean doProcessEvent(Event event) {
-		if (event instanceof LinkEnterEvent) {
-			LinkEnterEvent e = (LinkEnterEvent) event;
-			Id<Person> personId = e.getDriverId();
-			this.personIds.contains(personId);
-		} else if (event instanceof LinkLeaveEvent) {
-			LinkLeaveEvent e = (LinkLeaveEvent) event;
-			Id<Person> personId = e.getDriverId();
-			this.personIds.contains(personId);
-		} else if (event instanceof Wait2LinkEvent) {
-			Wait2LinkEvent e = (Wait2LinkEvent) event;
+		if (event instanceof VehicleEntersTrafficEvent) {
+			VehicleEntersTrafficEvent e = (VehicleEntersTrafficEvent) event;
 			Id<Person> personId = e.getPersonId();
 			this.personIds.contains(personId);
 		} else if (event instanceof PersonDepartureEvent) {
@@ -80,6 +72,16 @@ public class PersonEventFilter implements EventFilter {
 			PersonStuckEvent e = (PersonStuckEvent) event;
 			Id<Person> personId = e.getPersonId();
 			this.personIds.contains(personId);
+		/* the following was here until we removed the person from link enter and leave events.
+		   seems that it works without... Theresa oct'2015 */
+//		} else if (event instanceof LinkEnterEvent) {
+//			LinkEnterEvent e = (LinkEnterEvent) event;
+//			Id<Person> personId = e.getDriverId();
+//			this.personIds.contains(personId);
+//		} else if (event instanceof LinkLeaveEvent) {
+//			LinkLeaveEvent e = (LinkLeaveEvent) event;
+//			Id<Person> personId = e.getDriverId();
+//			this.personIds.contains(personId);
 		} else {
 			return false;
 		}
