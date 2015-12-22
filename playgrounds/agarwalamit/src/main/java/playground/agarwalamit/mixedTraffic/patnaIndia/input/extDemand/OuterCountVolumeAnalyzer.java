@@ -35,8 +35,8 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.vehicles.Vehicle;
 
 import playground.agarwalamit.analysis.LinkVolumeHandler;
-import playground.agarwalamit.mixedTraffic.patnaIndia.PatnaUtils;
-import playground.agarwalamit.mixedTraffic.patnaIndia.input.extDemand.OuterCordonUtils.OuterCordonLinks;
+import playground.agarwalamit.mixedTraffic.patnaIndia.utils.OuterCordonUtils;
+import playground.agarwalamit.mixedTraffic.patnaIndia.utils.OuterCordonUtils.OuterCordonLinks;
 
 /**
  * @author amit

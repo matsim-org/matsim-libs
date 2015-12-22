@@ -32,7 +32,7 @@ import java.util.List;
 /**
  * @author johannes
  */
-public class LegNextCollector<T> extends AbstractCollector<T, Segment> {
+public class LegNextCollector<T> extends AbstractCollector<T, Segment, Segment> {
 
     public LegNextCollector(ValueProvider<T, Segment> provider) {
         super(provider);

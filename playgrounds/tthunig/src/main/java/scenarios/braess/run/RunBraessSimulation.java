@@ -229,7 +229,7 @@ public final class RunBraessSimulation {
 		}
 		
 		// add a controller listener to analyze results
-		controler.addControlerListener(new TtListenerToBindAndWriteAnalysis(scenario, new TtAnalyzeBraess()));
+		controler.addControlerListener(new TtListenerToBindAndWriteAnalysis(scenario, new TtAnalyzeBraess(), true));
 		
 		return controler;
 	}
@@ -238,7 +238,7 @@ public final class RunBraessSimulation {
 		Config config = ConfigUtils.createConfig();
 
 		// set number of iterations
-		config.controler().setLastIteration( 50 );
+		config.controler().setLastIteration( 200 );
 
 		// able or enable signals and lanes
 		config.qsim().setUseLanes( LANE_TYPE.equals(LaneType.NONE)? false : true );
@@ -303,7 +303,7 @@ public final class RunBraessSimulation {
 		}
 
 		// choose maximal number of plans per agent. 0 means unlimited
-		config.strategy().setMaxAgentPlanMemorySize( 3 );
+		config.strategy().setMaxAgentPlanMemorySize( 2 );
 		
 		config.qsim().setStuckTime(3600 * 10.);
 		
@@ -332,7 +332,7 @@ public final class RunBraessSimulation {
 		dummyAct.setTypicalDuration(12 * 3600);
 		config.planCalcScore().addActivityParams(dummyAct);
 		
-		config.controler().setCreateGraphs( false );
+		config.controler().setCreateGraphs( true );
 		
 		return config;
 	}

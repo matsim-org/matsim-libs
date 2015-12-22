@@ -46,7 +46,8 @@ import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Point;
 
-import playground.agarwalamit.mixedTraffic.patnaIndia.PatnaUtils;
+import playground.agarwalamit.mixedTraffic.patnaIndia.utils.OuterCordonUtils;
+import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
 import playground.agarwalamit.utils.GeometryUtils;
 import playground.agarwalamit.utils.LoadMyScenarios;
 
@@ -205,8 +206,8 @@ public class PatnaExternalDemandGenerator {
 
 						if(countingStationNumber.equalsIgnoreCase("OC"+jj)) continue; // excluding same origin- destination
 
-						if(countingStationNumber.equalsIgnoreCase("OC1")&&jj==3) {
-							continue; // excluding ext-ext trip between OCt1 to OC3
+						if(countingStationNumber.equalsIgnoreCase("OC1") && jj==3 || countingStationNumber.equals("OC3") && jj==1 ) {
+							continue; // excluding ext-ext trip between OC1 -- OC3 and OC3 -- OC1
 						}
 
 						double actEndTime ;

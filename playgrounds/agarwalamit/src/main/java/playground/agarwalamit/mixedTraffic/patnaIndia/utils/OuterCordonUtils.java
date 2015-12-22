@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.mixedTraffic.patnaIndia.input.extDemand;
+package playground.agarwalamit.mixedTraffic.patnaIndia.utils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -40,7 +40,7 @@ public class OuterCordonUtils {
 		Map<String, List<Integer>> areas2zones = new HashMap<>();
 		areas2zones.put("Institutional", Arrays.asList(8,9,20));
 		areas2zones.put("Industrial", Arrays.asList(61,62));
-		areas2zones.put("CBD and Railway Station", Arrays.asList(21));
+		areas2zones.put("CBD and Railway Station", Arrays.asList(19,21,28));
 		areas2zones.put("Educational", Arrays.asList(37,38,39,40,41,42));
 		areas2zones.put("Old city and market area", Arrays.asList(54,57));
 		return areas2zones;

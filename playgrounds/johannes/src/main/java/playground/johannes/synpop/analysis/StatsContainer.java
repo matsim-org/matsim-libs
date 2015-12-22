@@ -19,6 +19,7 @@
 package playground.johannes.synpop.analysis;
 
 import org.apache.commons.math.stat.StatUtils;
+import org.matsim.contrib.common.collections.CollectionUtils;
 import org.matsim.contrib.common.stats.WeightedSampleMean;
 
 import java.util.List;
@@ -50,6 +51,36 @@ public class StatsContainer {
 
     public StatsContainer(String name, double[] values) {
         this(name);
+        init(values);
+    }
+
+    public StatsContainer(String name, double[] values, double[] weights) {
+        this(name);
+        init(values, weights);
+    }
+
+    public StatsContainer(String name, List<Double> values) {
+        this(name);
+        init(CollectionUtils.toNativeArray(values));
+
+        nullValues = new Integer(0);
+        for(Double value : values) {
+            if(value == null) nullValues++;
+        }
+    }
+
+    public StatsContainer(String name, List<Double> values, List<Double> weitghs) {
+        this(name);
+        List<double[]> valuesList = playground.johannes.studies.matrix2014.analysis.CollectionUtils.toNativeArray(values, weitghs);
+        init(valuesList.get(0), valuesList.get(1));
+
+        nullValues = new Integer(0);
+        for(Double value : values) {
+            if(value == null) nullValues++;
+        }
+    }
+
+    private void init(double[] values) {
         mean = StatUtils.mean(values);
         median = StatUtils.percentile(values, 50);
         min = StatUtils.min(values);
@@ -58,8 +89,7 @@ public class StatsContainer {
         variance = StatUtils.variance(values);
     }
 
-    public StatsContainer(String name, double[] values, double[] weights) {
-        this(name);
+    private void init(double[] values, double[] weights) {
         WeightedSampleMean wsm = new WeightedSampleMean();
         for(int i = 0; i < weights.length; i++) weights[i] = 1/weights[i];
         wsm.setPiValues(weights);
@@ -68,22 +98,6 @@ public class StatsContainer {
         min = StatUtils.min(values);
         max = StatUtils.max(values);
         N = values.length;
-    }
-
-    public StatsContainer(String name, List<Double> values) {
-        this(name);
-        nullValues = new Integer(0);
-        for(Double value : values) {
-            if(value == null) nullValues++;
-        }
-
-        double[] nativeValues = org.matsim.contrib.common.collections.CollectionUtils.toNativeArray(values);
-        mean = StatUtils.mean(nativeValues);
-        median = StatUtils.percentile(nativeValues, 50);
-        min = StatUtils.min(nativeValues);
-        max = StatUtils.max(nativeValues);
-        N = nativeValues.length;
-        variance = StatUtils.variance(nativeValues);
     }
 
     public String getName() {

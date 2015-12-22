@@ -43,10 +43,7 @@ import playground.johannes.synpop.data.io.PopulationIO;
 import playground.johannes.synpop.gis.*;
 import playground.johannes.synpop.matrix.NumericMatrix;
 import playground.johannes.synpop.matrix.NumericMatrixTxtIO;
-import playground.johannes.synpop.processing.CalculateGeoDistance;
-import playground.johannes.synpop.processing.GuessMissingActTypes;
-import playground.johannes.synpop.processing.LegAttributeRemover;
-import playground.johannes.synpop.processing.TaskRunner;
+import playground.johannes.synpop.processing.*;
 import playground.johannes.synpop.sim.*;
 import playground.johannes.synpop.sim.data.Converters;
 import playground.johannes.synpop.sim.data.DoubleConverter;
@@ -83,14 +80,15 @@ public class Simulator {
         Prepare population for simulation.
 		 */
         logger.info("Preparing reference simulation...");
+        TaskRunner.validatePersons(new ValidateMissingAttribute(CommonKeys.PERSON_WEIGHT), refPersons);
         TaskRunner.run(new ReplaceActTypes(), refPersons);
         new GuessMissingActTypes(random).apply(refPersons);
         TaskRunner.run(new Route2GeoDistance(new Route2GeoDistFunction()), refPersons);
-        logger.info("Cloning ref persons...");
+//        logger.info("Cloning ref persons...");
         int size = (int) Double.parseDouble(config.getParam(MODULE_NAME, "populationSize"));
-        refPersons = (Set<PlainPerson>) PersonUtils.weightedCopy(refPersons, new PlainFactory(), size,
-                random);
-		/*
+//        refPersons = (Set<PlainPerson>) PersonUtils.weightedCopy(refPersons, new PlainFactory(), size,
+//                random);
+        /*
 		Setting up data loaders.
 		 */
         logger.info("Registering data loaders...");
@@ -101,6 +99,30 @@ public class Simulator {
         ValidateFacilities.validate(dataPool, "modena");
         ValidateFacilities.validate(dataPool, "lau2");
         ValidateFacilities.validate(dataPool, "nuts3");
+        /*
+		Setup analyzer and analyze reference population
+		 */
+        final String output = config.getParam(MODULE_NAME, "output");
+        FileIOContext ioContext = new FileIOContext(output);
+
+        //Map<String, Predicate<Segment>> predicates = new HashMap<>();
+        //predicates.put(CommonValues.LEG_MODE_CAR, new ModePredicate(CommonValues.LEG_MODE_CAR));
+
+        final ConcurrentAnalyzerTask<Collection<? extends Person>> task = new ConcurrentAnalyzerTask<>();
+
+        task.addComponent(buildGeoDistanceAnalyzer(ioContext));
+        //task.addComponent(new GeoDistLau2ClassTask(ioContext));
+        ZoneCollection lau2Zones = ((ZoneData) dataPool.get(ZoneDataLoader.KEY)).getLayer("lau2");
+
+        new ZoneSetLAU2Class().apply(lau2Zones);
+        ZoneMobilityRate zoneMobilityRate = new ZoneMobilityRate(MiDKeys.PERSON_LAU2_CLASS, lau2Zones, new
+                ModePredicate(CommonValues.LEG_MODE_CAR), ioContext);
+        task.addComponent(zoneMobilityRate);
+        task.addComponent(new NumericAnalyzer(new PersonCollector<Double>(new NumericAttributeProvider<Person>(CommonKeys.PERSON_WEIGHT)), "weights", new HistogramWriter(ioContext, new StratifiedDiscretizerBuilder(50, 1))));
+        logger.info("Analyzing reference population...");
+        ioContext.append("ref");
+        AnalyzerTaskRunner.run(refPersons, task, ioContext);
+
 		/*
 		Generating simulation population...
 		 */
@@ -113,13 +135,10 @@ public class Simulator {
         Initializing simulation population...
          */
         logger.info("Assigning home locations...");
-        ZoneCollection lau2Zones = ((ZoneData) dataPool.get(ZoneDataLoader.KEY)).getLayer("lau2");
-        ZoneCollection modenaZones = ((ZoneData) dataPool.get(ZoneDataLoader.KEY)).getLayer("modena");
-        new ZoneSetLAU2Class().apply(lau2Zones);
-        ZoneMobilityRate zoneMobilityRate = new ZoneMobilityRate(MiDKeys.PERSON_LAU2_CLASS, lau2Zones, new
-                ModePredicate(CommonValues.LEG_MODE_CAR));
-        zoneMobilityRate.analyze(refPersons, null);
 
+
+        zoneMobilityRate.analyze(refPersons, null);
+        ZoneCollection modenaZones = ((ZoneData) dataPool.get(ZoneDataLoader.KEY)).getLayer("modena");
         new TransferZoneAttribute().apply(lau2Zones, modenaZones, MiDKeys.PERSON_LAU2_CLASS);
         SetHomeFacilities setHomeFacilities = new SetHomeFacilities(dataPool, "modena", random);
         setHomeFacilities.setZoneWeights(zoneMobilityRate.getMobilityRatePerZone(modenaZones));
@@ -135,23 +154,7 @@ public class Simulator {
         if (lTask.getErrors() > 0)
             logger.warn(String.format("Cannot set LAU2Class attribute for %s persons.", lTask.getErrors()));
 
-		/*
-		Setup analyzer and analyze reference population
-		 */
-        final String output = config.getParam(MODULE_NAME, "output");
-        FileIOContext ioContext = new FileIOContext(output);
 
-        //Map<String, Predicate<Segment>> predicates = new HashMap<>();
-        //predicates.put(CommonValues.LEG_MODE_CAR, new ModePredicate(CommonValues.LEG_MODE_CAR));
-
-        final ConcurrentAnalyzerTask<Collection<? extends Person>> task = new ConcurrentAnalyzerTask<>();
-
-        task.addComponent(buildGeoDistanceAnalyzer(ioContext));
-        //task.addComponent(new GeoDistLau2ClassTask(ioContext));
-        task.addComponent(zoneMobilityRate);
-        logger.info("Analyzing reference population...");
-        ioContext.append("ref");
-        AnalyzerTaskRunner.run(refPersons, task, ioContext);
 
         MatrixAnalyzer mAnalyzer = (MatrixAnalyzer) new MatrixAnalyzerConfigurator(config.getModule("matrixAnalyzer")
                 , dataPool, ioContext).load();
@@ -163,6 +166,7 @@ public class Simulator {
 		Setup hamiltonian
 		 */
         final HamiltonianComposite hamiltonian = new HamiltonianComposite();
+        TaskRunner.run(new CopyPersonAttToLeg(CommonKeys.PERSON_WEIGHT), refPersons);
 		/*
 		Setup distance distribution hamiltonian.
 		 */
@@ -240,7 +244,7 @@ public class Simulator {
         double[] nativeValues = org.matsim.contrib.common.collections.CollectionUtils.toNativeArray(values);
         Discretizer disc = FixedSampleSizeDiscretizer.create(nativeValues, 50, 100);
 
-        UnivariatFrequency f = new UnivariatFrequency(refLegs, simLegs, CommonKeys.LEG_GEO_DISTANCE, disc);
+        UnivariatFrequency f = new UnivariatFrequency(refLegs, simLegs, CommonKeys.LEG_GEO_DISTANCE, disc, true);
 
         return f;
     }
@@ -259,15 +263,18 @@ public class Simulator {
     }
 
     private static BivariatMean buildMeanDistLau2Term(Set<PlainPerson> refPersons, Set<PlainPerson> simPersons) {
-        copyLau2ClassAttribute(refPersons);
-        copyLau2ClassAttribute(simPersons);
+        TaskRunner.run(new CopyPersonAttToLeg(MiDKeys.PERSON_LAU2_CLASS), refPersons);
+        TaskRunner.run(new CopyPersonAttToLeg(MiDKeys.PERSON_LAU2_CLASS), simPersons);
+
+//        copyLau2ClassAttribute(refPersons);
+//        copyLau2ClassAttribute(simPersons);
 
         Set<Attributable> refLegs = getCarLegs(refPersons);
         Set<Attributable> simLegs = getCarLegs(simPersons);
 
         Converters.register(MiDKeys.PERSON_LAU2_CLASS, DoubleConverter.getInstance());
         BivariatMean bm = new BivariatMean(refLegs, simLegs, MiDKeys.PERSON_LAU2_CLASS, CommonKeys.LEG_GEO_DISTANCE,
-                new LinearDiscretizer(1.0));
+                new LinearDiscretizer(1.0), true);
 
         return bm;
     }
@@ -282,7 +289,6 @@ public class Simulator {
             }
         }
     }
-
 
 
     public static class Route2GeoDistFunction implements UnivariateRealFunction {
@@ -309,6 +315,7 @@ public class Simulator {
 
         HistogramWriter histogramWriter = new HistogramWriter(ioContext, new PassThroughDiscretizerBuilder(new LinearDiscretizer(50000), "linear"));
         histogramWriter.addBuilder(new StratifiedDiscretizerBuilder(100, 100));
+//        histogramWriter.addBuilder(new PassThroughDiscretizerBuilder(new DummyDiscretizer(), "dummy"));
 
         GeoDistanceBuilder geoDistanceBuilder = new GeoDistanceBuilder(histogramWriter);
         geoDistanceBuilder.setPredicates(predicates);

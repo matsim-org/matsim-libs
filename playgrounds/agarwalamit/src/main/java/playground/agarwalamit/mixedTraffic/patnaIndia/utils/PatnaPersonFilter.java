@@ -16,44 +16,40 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.agarwalamit.mixedTraffic.patnaIndia.utils;
 
-package playground.johannes.studies.matrix2014.analysis;
-
-import playground.johannes.synpop.analysis.AbstractCollector;
-import playground.johannes.synpop.analysis.ValueProvider;
-import playground.johannes.synpop.data.Episode;
-import playground.johannes.synpop.data.Person;
-import playground.johannes.synpop.data.Segment;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 
 /**
- * @author johannes
+ * @author amit
  */
-public class LegPersonCollector<T> extends AbstractCollector<T, Person, Segment> {
 
-    public LegPersonCollector(ValueProvider<T, Person> provider) {
-        super(provider);
-    }
+public class PatnaPersonFilter{
+	
+	public enum PatnaUserGroup {
+		urban, commuter, through;
+	}
+	
+	public static boolean isPersonBelongsToUrban(Id<Person> personId){
+		if ( personId.toString().startsWith("slum") || personId.toString().startsWith("nonSlum") ) return true;
+		else return false;
+	}
 
-    @Override
-    public List<T> collect(Collection<? extends Person> persons) {
-        ArrayList<T> values = new ArrayList<>(persons.size() * 10);
-
-        for (Person p : persons) {
-            for (Episode e : p.getEpisodes()) {
-                for (Segment leg : e.getLegs()) {
-                    if (predicate == null || predicate.test(leg)) {
-                        values.add(provider.get(p));
-                    }
-                }
-            }
-        }
-
-        values.trimToSize();
-
-        return values;
-    }
+	public static boolean isPersonBelongsToCommuter(Id<Person> personId){
+		if( (personId.toString().split("_")[1]).equals("E2I") ) return true;
+		else return false;
+	}
+	
+	public static boolean isPersonBelongsToThroughTraffic(Id<Person> personId){
+		if( (personId.toString().split("_")[1]).equals("E2E") ) return true;
+		else return false;
+	}
+	
+	public static PatnaUserGroup getUserGroup(Id<Person> personId){
+		if(isPersonBelongsToUrban(personId)) return PatnaUserGroup.urban;
+		else if(isPersonBelongsToCommuter(personId)) return PatnaUserGroup.commuter;
+		else if (isPersonBelongsToThroughTraffic(personId)) return PatnaUserGroup.through;
+		else throw new RuntimeException("Person id "+personId+" do not belong to any of the predefined user group. Aborting ...");
+	}
 }

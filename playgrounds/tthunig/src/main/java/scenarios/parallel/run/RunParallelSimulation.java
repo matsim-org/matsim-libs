@@ -211,7 +211,7 @@ public final class RunParallelSimulation {
 //		}
 		
 		// add a controller listener to analyze results
-		controler.addControlerListener(new TtListenerToBindAndWriteAnalysis(scenario, new TtAnalyzeParallel()));
+		controler.addControlerListener(new TtListenerToBindAndWriteAnalysis(scenario, new TtAnalyzeParallel(), true));
 		
 		return controler;
 	}

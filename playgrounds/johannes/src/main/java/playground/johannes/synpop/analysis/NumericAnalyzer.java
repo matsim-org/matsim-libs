@@ -18,8 +18,10 @@
  * *********************************************************************** */
 package playground.johannes.synpop.analysis;
 
+import org.matsim.contrib.common.collections.CollectionUtils;
 import playground.johannes.synpop.data.Person;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -30,29 +32,48 @@ public class NumericAnalyzer implements AnalyzerTask<Collection<? extends Person
 
     private final Collector<Double> collector;
 
+    private final Collector<Double> weightsCollector;
+
     private final String dimension;
 
     private final HistogramWriter histogramWriter;
 
-    public NumericAnalyzer(Collector<Double> collector, String dimension) {
-        this(collector, dimension, null);
+    public NumericAnalyzer(Collector<Double> collector, String dimension, HistogramWriter histogramWriter) {
+        this(collector, null, dimension, histogramWriter);
     }
 
-    public NumericAnalyzer(Collector<Double> collector, String dimension, HistogramWriter histogramWriter) {
+    public NumericAnalyzer(Collector<Double> collector, Collector<Double> weightsCollector, String dimension, HistogramWriter histogramWriter) {
         this.collector = collector;
+        this.weightsCollector = weightsCollector;
         this.dimension = dimension;
         this.histogramWriter = histogramWriter;
-
     }
 
     @Override
     public void analyze(Collection<? extends Person> persons, List<StatsContainer> containers) {
-        List<Double> values = collector.collect(persons);
-        containers.add(new StatsContainer(dimension, values));
+        if (weightsCollector == null) {
+            List<Double> values = collector.collect(persons);
+            containers.add(new StatsContainer(dimension, values));
 
-        if (histogramWriter != null) {
-            double[] doubleValues = org.matsim.contrib.common.collections.CollectionUtils.toNativeArray(values);
-            histogramWriter.writeHistograms(doubleValues, dimension);
+            if (histogramWriter != null) {
+                double[] doubleValues = CollectionUtils.toNativeArray(values);
+                histogramWriter.writeHistograms(doubleValues, dimension);
+            }
+        } else {
+            Collection<? extends Person> personsList = persons;
+            if (!(persons instanceof List)) {
+                personsList = new ArrayList<>(persons);
+            }
+
+            List<Double> values = collector.collect(personsList);
+            List<Double> weights = weightsCollector.collect(personsList);
+
+            containers.add(new StatsContainer(dimension, values, weights));
+
+            if (histogramWriter != null) {
+                List<double[]> valuesList = playground.johannes.studies.matrix2014.analysis.CollectionUtils.toNativeArray(values, weights);
+                histogramWriter.writeHistograms(valuesList.get(0), valuesList.get(1), dimension);
+            }
         }
 
     }

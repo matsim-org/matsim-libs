@@ -16,29 +16,25 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.synpop.analysis;
+package playground.johannes.synpop.processing;
 
-import playground.johannes.synpop.data.Attributable;
+import playground.johannes.synpop.data.CommonKeys;
+import playground.johannes.synpop.data.CommonValues;
+import playground.johannes.synpop.data.Person;
 
 /**
  * @author jillenberger
  */
-public abstract class AbstractCollector<T, A extends Attributable, P extends Attributable> implements Collector<T> {
+public class ValidateMissingAttribute implements PersonTask {
 
-    protected Predicate<P> predicate;
+    private final String key;
 
-    protected final ValueProvider<T, A> provider;
-
-    public AbstractCollector(ValueProvider<T, A> provider) {
-        this.provider = provider;
+    public ValidateMissingAttribute(String key) {
+        this.key = key;
     }
 
-    public void setPredicate(Predicate<P> predicate) {
-        this.predicate = predicate;
+    @Override
+    public void apply(Person person) {
+        if(person.getAttribute(key) == null) person.setAttribute(CommonKeys.DELETE, CommonValues.TRUE);
     }
-
-    public Predicate<P> getPredicate() {
-        return predicate;
-    }
-
 }

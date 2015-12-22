@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.mixedTraffic.patnaIndia;
+package playground.agarwalamit.mixedTraffic.patnaIndia.utils;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -44,27 +44,27 @@ public final class PatnaUtils {
 
 	public static final String EPSG = "EPSG:24345";
 	public static final CoordinateTransformation COORDINATE_TRANSFORMATION = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, PatnaUtils.EPSG);
-	
+
 	public static final String INPUT_FILES_DIR = "../../../../repos/shared-svn/projects/patnaIndia/inputs/";
 	public static final String ZONE_FILE = PatnaUtils.INPUT_FILES_DIR+"/wardFile/Wards.shp";
-	
-	public enum PatnaActivityTypes {
+
+	public enum PatnaUrbanActivityTypes {
 		home, work, educational, social, other, unknown;
 	}
 	
 	public static final Collection <String> URBAN_MAIN_MODES = Arrays.asList("car","motorbike","bike");
 	public static final Collection <String> ALL_MAIN_MODES = Arrays.asList("car","motorbike","bike","truck");
 	public static final Collection <String> ALL_MODES = Arrays.asList("car","motorbike","truck","bike","pt","walk");
-	
+
 	private PatnaUtils(){} 
-	
+
 	/**
 	 * @param scenario
 	 * It creates first vehicle types and add them to scenario and then create and add vehicles to the scenario.
 	 */
 	public static void createAndAddVehiclesToScenario(final Scenario scenario){
 		final Map<String, VehicleType> modesType = new HashMap<String, VehicleType>(); 
-		
+
 		for (String mode : PatnaUtils.ALL_MODES){
 			VehicleType vehicle = VehicleUtils.getFactory().createVehicleType(Id.create(mode,VehicleType.class));
 			vehicle.setMaximumVelocity(MixedTrafficVehiclesUtils.getSpeed(mode));

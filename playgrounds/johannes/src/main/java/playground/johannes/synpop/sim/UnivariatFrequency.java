@@ -21,10 +21,11 @@ package playground.johannes.synpop.sim;
 
 import org.matsim.contrib.common.stats.Discretizer;
 import playground.johannes.synpop.data.Attributable;
+import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.sim.data.CachedElement;
 import playground.johannes.synpop.sim.data.CachedPerson;
 import playground.johannes.synpop.sim.data.Converters;
-import playground.johannes.synpop.sim.util.DynamicIntArray;
+import playground.johannes.synpop.sim.util.DynamicDoubleArray;
 
 import java.util.Collection;
 import java.util.Set;
@@ -34,9 +35,9 @@ import java.util.Set;
  */
 public class UnivariatFrequency implements Hamiltonian, AttributeChangeListener {
 
-    private final DynamicIntArray refFreq;
+    private final DynamicDoubleArray refFreq;
 
-    private final DynamicIntArray simFreq;
+    private final DynamicDoubleArray simFreq;
 
     private final double scaleFactor;
 
@@ -54,17 +55,22 @@ public class UnivariatFrequency implements Hamiltonian, AttributeChangeListener 
 
     public UnivariatFrequency(Set<? extends Attributable> refElements, Set<? extends Attributable> simElements,
                               String attrKey, Discretizer discretizer) {
-        this(refElements, simElements, attrKey, discretizer, false);
+        this(refElements, simElements, attrKey, discretizer, false, false);
     }
 
     public UnivariatFrequency(Set<? extends Attributable> refElements, Set<? extends Attributable> simElements,
-                              String attrKey, Discretizer discretizer, boolean absoluteMode) {
+                              String attrKey, Discretizer discretizer, boolean useWeights) {
+        this(refElements, simElements, attrKey, discretizer, useWeights, false);
+    }
+
+    public UnivariatFrequency(Set<? extends Attributable> refElements, Set<? extends Attributable> simElements,
+                              String attrKey, Discretizer discretizer, boolean useWeights, boolean absoluteMode) {
         this.discretizer = discretizer;
         this.attrKey = attrKey;
         this.absoluteMode = absoluteMode;
 
-        refFreq = initHistogram(refElements, attrKey);
-        simFreq = initHistogram(simElements, attrKey);
+        refFreq = initHistogram(refElements, attrKey, useWeights);
+        simFreq = initHistogram(simElements, attrKey, false); // TODO: no sim weighting for now
 
         scaleFactor = simElements.size() / (double) refElements.size();
         normFactor = 1;//simElements.size(); //TODO: do we need this for the absolute mode?
@@ -78,15 +84,23 @@ public class UnivariatFrequency implements Hamiltonian, AttributeChangeListener 
         }
     }
 
-    private DynamicIntArray initHistogram(Set<? extends Attributable> elements, String key) {
-        DynamicIntArray array = new DynamicIntArray(12, 0);
+    private DynamicDoubleArray initHistogram(Set<? extends Attributable> elements, String key, boolean useWeights) {
+        DynamicDoubleArray array = new DynamicDoubleArray(12, 0);
 
         for (Attributable element : elements) {
             String strVal = element.getAttribute(key);
+
             if (strVal != null) {
                 double value = Double.parseDouble(strVal);
                 int bucket = discretizer.index(value);
-                array.set(bucket, array.get(bucket) + 1);
+                double weight = 1.0;
+
+                if(useWeights) {
+                    String strWeight = element.getAttribute(CommonKeys.PERSON_WEIGHT);
+                    weight = Double.parseDouble(strWeight);
+                }
+
+                array.set(bucket, array.get(bucket) + weight);
             }
         }
 
