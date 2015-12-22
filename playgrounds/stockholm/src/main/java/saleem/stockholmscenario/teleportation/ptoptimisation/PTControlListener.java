@@ -20,15 +20,9 @@ public class PTControlListener implements StartupListener, IterationStartsListen
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
 		if(event.getIteration()==1){
-			adapter.removeVehicles(0.5);
-			adapter.writeSchedule("SparseSchedule.xml");
-			adapter.writeVehicles("SparseVehicles.xml");
-		}
-		if(event.getIteration()==1){
-//			adapter.addVehicles(0.5);
-//			adapter.writeSchedule("DenseSchedule.xml");
-//			adapter.writeVehicles("DenseVehicles.xml");
-			
+			//adapter.updateSchedule();
+//			adapter.writeSchedule("UpdatedSchedule1.xml");
+//			adapter.writeVehicles("UpdatedVehicles1.xml");
 		}
 	}
 

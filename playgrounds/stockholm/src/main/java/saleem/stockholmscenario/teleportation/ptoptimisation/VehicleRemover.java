@@ -18,22 +18,25 @@ import saleem.stockholmscenario.utils.CollectionUtil;
 
 public class VehicleRemover {
 	Scenario scenario;
+	Vehicles vehicles;
 	public VehicleRemover(Scenario scenario){
 		this.scenario=scenario;
+		this.vehicles=scenario.getTransitVehicles();
 	}
+	//Remove sample percent vehicles and the corresponding departures from transit schedule
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public void removeVehicles(double sample) {//sample represents percentage of vehicles to remove, ranges from 0 to 1
 		CollectionUtil cutil = new CollectionUtil();
 		ArrayList<Id<Vehicle>> removed = new ArrayList<Id<Vehicle>>();
-		Vehicles vehicles = scenario.getTransitVehicles();
 		ArrayList<Id<Vehicle>> vehids = cutil.toArrayList(vehicles.getVehicles().keySet().iterator());
 		int totalveh = vehids.size();
 		int numvehrem = (int)Math.ceil(sample * vehids.size()); 
 		for(int i=0;i<numvehrem;i++) {
 			int index = (int)Math.floor(totalveh * Math.random());//Randomly remove vehilces
-			if (!removed.contains(vehids.get(index))){//Try to remove if not removed already
-				removed.add(vehids.get(index));
-				vehicles.removeVehicle(vehids.get(index));
+			Id<Vehicle> vehid = vehids.get(index);
+			if (!removed.contains(vehid)){//Try to remove if not removed already
+				removed.add(vehid);
+				this.vehicles.removeVehicle(vehids.get(index));
 			}else{
 				i--;
 			}
@@ -41,6 +44,29 @@ public class VehicleRemover {
 		} 
 				int a =0;
 
+	}
+	/*Removes departures to a certain line. Slightly different logic than removing vehicles from transit schedule randomly.
+	 *  Here all the route in the line are traversed, and departures are decreased by a fraction of 10. 
+	 *  Corresponding vehicles are also removed.
+	 *  */	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public void removeDeparturesFromLine(TransitLine tline, double fraction){
+		CollectionUtil cutil = new CollectionUtil();
+		ArrayList<Id<Departure>> removed = new ArrayList<Id<Departure>>();
+		Map<Id<TransitRoute>, TransitRoute> routes = tline.getRoutes();
+		Iterator<Id<TransitRoute>> routeids = routes.keySet().iterator();
+		while(routeids.hasNext()){
+			TransitRoute troute = routes.get(routeids.next());
+			ArrayList<Id<Departure>> departures = cutil.toArrayList(troute.getDepartures().keySet().iterator());
+			int size = departures.size();
+			for(int i=0;i<size;i++) {
+				if(Math.random()<=fraction){
+					Departure departure = troute.getDepartures().get(departures.get(i));
+					troute.removeDeparture(departure);
+					this.vehicles.removeVehicle(departure.getVehicleId());
+					System.out.println("Removed Departure: (RouteID, DepID, VehID) : " + troute.getId() + " : " + departure.getId() + " : " + departure.getVehicleId());
+				}
+			}
+		}
 	}
 	/*
 	 * This function removes all departures whose vehicle have been deleted.
@@ -82,25 +108,7 @@ public class VehicleRemover {
 					System.out.println(count + ": Departure Removed: " + departure.getId() + " : " + departure.getDepartureTime());
 					troute.removeDeparture(departure);
 				}
-//				if(troute.getDepartures().size()==0){
-//					routestodelete.add(troute);
-//				}
 			}
-//			Iterator<TransitRoute> rtstodltitr = routestodelete.iterator();
-//			while(rtstodltitr.hasNext()){
-//				TransitRoute troute = rtstodltitr.next();
-//				System.out.println("Transit Route Removed: " + troute.getId());
-////				tline.removeRoute(troute);
-//			}
-//			if(tline.getRoutes().size()==0){
-//				linestodelete.add(tline);
-//			}
 		}
-//		Iterator<TransitLine> lnstodltitr = linestodelete.iterator();
-//		while(lnstodltitr.hasNext()){
-//			TransitLine tline = lnstodltitr.next();
-//			System.out.println("Transit Line Removed: " + tline.getId());
-////			schedule.removeTransitLine(tline);
-//		}
 	}
 }
