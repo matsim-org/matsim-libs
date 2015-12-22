@@ -4,11 +4,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.analysis.IterationStopWatch;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.corelisteners.ControlerDefaultCoreListenersModule;
-import org.matsim.core.events.EventsManagerModule;
-import org.matsim.core.events.EventsUtils;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
@@ -24,7 +21,7 @@ public class InjectionBeforeControlerTest {
 		config.controler().setLastIteration(1);
 		config.controler().setOutputDirectory(testUtils.getOutputDirectory());
 		final Scenario scenario = ScenarioUtils.createScenario(config);
-		Injector injector = Injector.createInjector(config, new AbstractModule() {
+		com.google.inject.Injector injector = Injector.createInjector(config, new AbstractModule() {
 			@Override
 			public void install() {
 				install(new ControlerDefaultsModule());

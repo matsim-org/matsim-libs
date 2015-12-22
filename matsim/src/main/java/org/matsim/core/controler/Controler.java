@@ -120,7 +120,7 @@ public class Controler extends AbstractController implements ControlerI {
 
 	@Inject private Set<ControlerListener> controlerListenersDeclaredByModules;
 
-	private Injector injector;
+	private com.google.inject.Injector injector;
 	private boolean injectorCreated = false;
 
 	@Override
@@ -175,7 +175,7 @@ public class Controler extends AbstractController implements ControlerI {
 		this.config = config;
 		this.config.addConfigConsistencyChecker(new ConfigConsistencyCheckerImpl());
 		this.controlerListenerManager.setControler(this);
-		this.injector = Injector.fromGuiceInjector(injector);
+		this.injector = injector;
 		this.injectorCreated = true;
 	}
 
@@ -299,17 +299,6 @@ public class Controler extends AbstractController implements ControlerI {
 
 							bind(OutputDirectoryHierarchy.class).toInstance(getControlerIO());
 							bind(IterationStopWatch.class).toInstance(getStopwatch());
-							bind(ControlerI.class).toInstance(new ControlerI() {
-								@Override
-								public void run() {
-									throw new RuntimeException("Already running.");
-								}
-
-								@Override
-								public Integer getIterationNumber() {
-									return Controler.this.getIterationNumber();
-								}
-							});
 						}
 					});
 			this.injector.getInstance(com.google.inject.Injector.class).injectMembers(this);
@@ -537,7 +526,7 @@ public class Controler extends AbstractController implements ControlerI {
 		}
 	}
 
-	public final Injector getInjector() {
+	public final com.google.inject.Injector getInjector() {
 		return this.injector;
 	}
 

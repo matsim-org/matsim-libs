@@ -167,7 +167,7 @@ public class SimulateAndScoreTest extends MatsimTestCase {
 		Leg leg = populationFactory.createLeg(TransportMode.pt);
 		plan.addLeg(leg);
 
-		final Injector injector = Injector.createInjector(scenario.getConfig(), new AbstractModule() {
+		final com.google.inject.Injector injector = Injector.createInjector(scenario.getConfig(), new AbstractModule() {
 			@Override
 			public void install() {
 				install(new ScenarioByInstanceModule(scenario));

@@ -356,7 +356,7 @@ public class EditRoutesTest extends MatsimTestCase {
 	 * @author cdobler
 	 */
 	private void createTripRouter() {
-		Injector injector = Injector.createInjector(scenario.getConfig(), new AbstractModule() {
+		com.google.inject.Injector injector = Injector.createInjector(scenario.getConfig(), new AbstractModule() {
 			@Override
 			public void install() {
 				install(AbstractModule.override(Arrays.asList(new TripRouterModule()), new AbstractModule() {

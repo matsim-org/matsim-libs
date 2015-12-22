@@ -23,18 +23,15 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.analysis.IterationStopWatch;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.*;
+import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.Injector;
 import org.matsim.core.controler.listener.ControlerListener;
-import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
-
-import com.google.inject.name.Names;
 
 
 /**
@@ -74,7 +71,7 @@ public class ListenersInjectionTest {
 		final String outputDir = utils.getOutputDirectory();
 		config.controler().setOutputDirectory( outputDir );
 
-        final Injector injector = Injector.createInjector(
+        final com.google.inject.Injector injector = Injector.createInjector(
                 config,
 				// defaults needed as listeners depend on some stuff there
 				new ControlerDefaultsModule(),
@@ -85,18 +82,6 @@ public class ListenersInjectionTest {
 						bind(OutputDirectoryHierarchy.class).toInstance( new OutputDirectoryHierarchy( outputDir , OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists ) );
 						bind(IterationStopWatch.class).toInstance( new IterationStopWatch() );
 						install(new ScenarioByInstanceModule(ScenarioUtils.createScenario(config)));
-						bind(ControlerI.class).toInstance(new ControlerI() {
-
-							@Override
-							public void run() {
-
-							}
-
-							@Override
-							public Integer getIterationNumber() {
-								return 1;
-							}
-						});
                     }
                 },
 				new ControlerDefaultCoreListenersModule());

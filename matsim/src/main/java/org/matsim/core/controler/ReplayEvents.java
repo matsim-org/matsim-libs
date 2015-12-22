@@ -22,6 +22,8 @@
 
 package org.matsim.core.controler;
 
+import com.google.inject.Key;
+import com.google.inject.TypeLiteral;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -49,7 +51,7 @@ public class ReplayEvents {
     }
 
     public static Results run(final Scenario scenario, final String eventsFilename, final AbstractModule... modules) {
-        final Injector injector = Injector.createInjector(
+        final com.google.inject.Injector injector = Injector.createInjector(
                 scenario.getConfig(),
                 new AbstractModule() {
                     @Override
@@ -61,10 +63,16 @@ public class ReplayEvents {
                     }
                 });
         final EventsManager eventsManager = EventsUtils.createEventsManager(scenario.getConfig());
-        for (EventHandler eventHandler : injector.getEventHandlersDeclaredByModules()) {
+        for (EventHandler eventHandler : injector.getInstance(Key.get(
+                new TypeLiteral<Set<EventHandler>>() {
+                }
+        ))) {
             eventsManager.addHandler(eventHandler);
         }
-        Set<ControlerListener> controlerListenersDeclaredByModules = injector.getControlerListenersDeclaredByModules();
+        Set<ControlerListener> controlerListenersDeclaredByModules = injector.getInstance(Key.get(
+                new TypeLiteral<Set<ControlerListener>>() {
+                }
+        ));
         for (ControlerListener controlerListener : controlerListenersDeclaredByModules) {
             if (controlerListener instanceof StartupListener) {
                 ((StartupListener) controlerListener).notifyStartup(new StartupEvent(null));
