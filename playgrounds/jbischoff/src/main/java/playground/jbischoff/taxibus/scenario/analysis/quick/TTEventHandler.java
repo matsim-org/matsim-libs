@@ -46,7 +46,10 @@ public class TTEventHandler implements ActivityStartEventHandler, PersonDepartur
 	Map<Id<Person>, Double> lastDeparture = new HashMap<>();
 	Map<String, Double> ttToActivity = new TreeMap<>();
 	Map<String, Integer> legsToActivity = new HashMap<>();
-	ArrayList<String> monitoredModes = new ArrayList<>(Arrays.asList(new String[] { "car"}));
+//	ArrayList<String> monitoredModes = new ArrayList<>(Arrays.asList(new String[] { "taxibus"}));
+//	ArrayList<String> monitoredModes = new ArrayList<>(Arrays.asList(new String[] { "car"}));
+	ArrayList<String> monitoredModes = new ArrayList<>(Arrays.asList(new String[] { "pt","taxibus","car"}));
+//	ArrayList<String> monitoredModes = new ArrayList<>(Arrays.asList(new String[] { "tpt" }));
 	
 
 	public TTEventHandler() {
@@ -88,7 +91,9 @@ public class TTEventHandler implements ActivityStartEventHandler, PersonDepartur
 
 	boolean isRelevantPerson(Id<Person> personId) {
 //		return (personId.toString().endsWith("vw") ? true : false);
-		return (personId.toString().startsWith("BS_WB") ? true : false);
+		return ((personId.toString().startsWith("BS_WB")||(personId.toString().startsWith("WB_BS"))) ? true : false);
+//		return (personId.toString().startsWith("BS_WB") ? true : false);
+
 //		return true;
 	}
 
