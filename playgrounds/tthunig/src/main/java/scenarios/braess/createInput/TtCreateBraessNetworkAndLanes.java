@@ -411,7 +411,7 @@ public final class TtCreateBraessNetworkAndLanes {
 		if (!laneType.equals(LaneType.NONE)) new LaneDefinitionsWriter20(scenario.getLanes()).write(directory + "lanes.xml");
 	}
 
-	public void setNumberOfPersons(int numberOfPersons) {
+	public void setNumberOfPersonsPerHour(int numberOfPersons) {
 		this.numberOfPersons = numberOfPersons;
 	}
 
