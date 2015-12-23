@@ -28,19 +28,22 @@ import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.population.PlanImpl;
-import org.matsim.core.scoring.EventsToScore;
-import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestCase;
+
+import javax.inject.Inject;
 
 /**
  * This test uses the org.matsim.examples equil scenario with two agents
@@ -59,8 +62,6 @@ public class EquilTwoAgentsTest extends MatsimTestCase {
 
 	/*package*/ final static Logger log = Logger.getLogger(EquilTwoAgentsTest.class);
 
-	private EventsToScore planScorer = null;
-
 	/*package*/ final static Id<Person> personId1 = Id.create("1", Person.class);
 	/*package*/ final static Id<Person> personId2 = Id.create("2", Person.class);
 	/*package*/ final static Id<Link> id1 = Id.create("1", Link.class);
@@ -76,7 +77,6 @@ public class EquilTwoAgentsTest extends MatsimTestCase {
 
 	@Override
 	protected void tearDown() throws Exception {
-		this.planScorer = null;
 		super.tearDown();
 	}
 
@@ -95,47 +95,33 @@ public class EquilTwoAgentsTest extends MatsimTestCase {
 		pcsConfig.addActivityParams(params) ;
 		
 		final Controler controler = new Controler(config);
-		controler.getConfig().controler().setOverwriteFileSetting(
-				true ?
-						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		controler.getConfig().controler().setCreateGraphs(false);
         controler.getConfig().controler().setWriteEventsInterval(0);
-		controler.addControlerListener(new StartupListener() {
+		controler.addOverridingModule(new AbstractModule() {
 			@Override
-			public void notifyStartup(final StartupEvent event) {
-                double agent1LeaveHomeTime = ((PlanImpl) controler.getScenario().getPopulation().getPersons().get(personId1).getPlans().get(0)).getFirstActivity().getEndTime();
-                double agent2LeaveHomeTime = ((PlanImpl) controler.getScenario().getPopulation().getPersons().get(personId2).getPlans().get(0)).getFirstActivity().getEndTime();
-				handler = new TestSingleIterationEventHandler(agent1LeaveHomeTime, agent2LeaveHomeTime);
-				controler.getEvents().addHandler(handler);
-				
-				
-				// Construct a scoring function which does not score the home activity. Because the analytical calculations against which 
-				// we are testing here are based on that.
-//				CharyparNagelScoringParameters params = new CharyparNagelScoringParameters(config.planCalcScore());
-//				ActivityUtilityParameters activityUtilityParameters = new ActivityUtilityParameters("h", 1.0, 123456789.0);
-//				activityUtilityParameters.setScoreAtAll(false);
+			public void install() {
+				addControlerListenerBinding().toInstance(new StartupListener() {
+					@Inject
+					EventsManager eventsManager;
 
-//				ActivityUtilityParameters.Factory factory = new ActivityUtilityParameters.Factory() ;
-//				factory.setScoreAtAll(false) ;
-//				factory.setType("h") ;
-//				factory.setTypicalDuration_s(123456789.0) ;
-//				ActivityUtilityParameters activityUtilityParameters = factory.create() ;
-//
-//				params.utilParams.put("h", activityUtilityParameters);
-				EquilTwoAgentsTest.this.planScorer = new EventsToScore(controler.getScenario(), 
-//						new CharyparNagelScoringFunctionFactory(params, controler.getScenario().getNetwork()));
-						new CharyparNagelScoringFunctionFactory( controler.getScenario() ) );
-				
-				controler.getEvents().addHandler(EquilTwoAgentsTest.this.planScorer);
+					@Inject
+					Population population;
+
+					@Override
+					public void notifyStartup(final StartupEvent event) {
+						double agent1LeaveHomeTime = ((Activity) population.getPersons().get(personId1).getPlans().get(0).getPlanElements().get(0)).getEndTime();
+						double agent2LeaveHomeTime = ((Activity) population.getPersons().get(personId2).getPlans().get(0).getPlanElements().get(0)).getEndTime();
+						handler = new TestSingleIterationEventHandler(agent1LeaveHomeTime, agent2LeaveHomeTime);
+						eventsManager.addHandler(handler);
+					}
+				});
 			}
 		});
-
 		controler.run();
-		this.planScorer.finish();
 
-		assertEquals(handler.agentOneScore, EquilTwoAgentsTest.this.planScorer.getAgentScore(personId1), EPSILON);
-		assertEquals(handler.agentTwoScore, EquilTwoAgentsTest.this.planScorer.getAgentScore(personId2), EPSILON);
+		assertEquals(handler.agentOneScore, controler.getScenario().getPopulation().getPersons().get(personId1).getSelectedPlan().getScore(), EPSILON);
+		assertEquals(handler.agentTwoScore, controler.getScenario().getPopulation().getPersons().get(personId2).getSelectedPlan().getScore(), EPSILON);
 	}
 
 

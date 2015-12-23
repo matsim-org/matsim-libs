@@ -38,9 +38,11 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.PopulationWriterHandlerImplV4;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ExeRunner;
 
+import javax.inject.Inject;
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -63,7 +65,7 @@ public class ExternalMobsim implements Mobsim {
 	private Integer iterationNumber = null;
 	protected OutputDirectoryHierarchy controlerIO;
 
-
+	@Inject
 	public ExternalMobsim(final Scenario scenario, final EventsManager events) {
 		this.scenario = scenario;
 		this.events = events;
@@ -196,9 +198,14 @@ public class ExternalMobsim implements Mobsim {
 		this.iterationNumber = iterationNumber;
 	}
 
+	@Inject
 	public void setControlerIO(OutputDirectoryHierarchy controlerIO) {
 		this.controlerIO = controlerIO;
 	}
 
+	@Inject
+	void setIterationNumberFrom(ReplanningContext replanningContext) {
+		this.iterationNumber = replanningContext.getIteration();
+	}
 
 }

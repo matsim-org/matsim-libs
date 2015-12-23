@@ -21,7 +21,7 @@ package playground.anhorni.surprice;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.Controler.TerminationCriterion;
+import org.matsim.core.controler.TerminationCriterion;
 
 public class TerminationCriterionScoreBased implements TerminationCriterion {
 	

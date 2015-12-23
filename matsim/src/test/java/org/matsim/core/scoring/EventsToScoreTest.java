@@ -53,9 +53,9 @@ public class EventsToScoreTest extends MatsimTestCase {
 		Person person = PopulationUtils.createPerson(Id.create(1, Person.class));
 		population.addPerson(person);
 		MockScoringFunctionFactory sfFactory = new MockScoringFunctionFactory();
-		EventsToScore e2s = new EventsToScore(scenario, sfFactory, 1.0);
 		EventsManager events = EventsUtils.createEventsManager();
-		events.addHandler(e2s);
+
+		EventsToScore e2s = EventsToScore.createWithScoreUpdating(scenario, sfFactory, events);
 
 		events.processEvent(new PersonMoneyEvent(3600.0, person.getId(), 3.4));
 
@@ -88,10 +88,9 @@ public class EventsToScoreTest extends MatsimTestCase {
 		person.addPlan(plan);
 		
 		ScoringFunctionFactory sfFactory = new CharyparNagelScoringFunctionFactory( scenario );
-		EventsToScore e2s = new EventsToScore(scenario, sfFactory, 1.0);
 		EventsManager events = EventsUtils.createEventsManager();
-		events.addHandler(e2s);
-		
+		EventsToScore e2s = EventsToScore.createWithScoreUpdating(scenario, sfFactory, events);
+
 		for ( int mockIteration = config.controler().getFirstIteration() ; mockIteration <= config.controler().getLastIteration() ; mockIteration++ ) {
 
 			events.resetHandlers(mockIteration) ;

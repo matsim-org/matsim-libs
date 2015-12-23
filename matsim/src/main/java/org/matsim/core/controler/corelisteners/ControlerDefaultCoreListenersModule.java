@@ -20,7 +20,7 @@
 package org.matsim.core.controler.corelisteners;
 
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.scoring.EventsToScore;
+import org.matsim.core.scoring.PlansScoringModule;
 
 /**
  * Defines the default core listeners.
@@ -34,8 +34,7 @@ public class ControlerDefaultCoreListenersModule extends AbstractModule {
 
 	@Override
 	public void install() {
-		bind( PlansScoring.class ).to( PlansScoringImpl.class );
-		bind(EventsToScore.class).asEagerSingleton();
+		install(new PlansScoringModule());
 		bind( PlansReplanning.class ).to( PlansReplanningImpl.class );
 		bind( PlansDumping.class ).to( PlansDumpingImpl.class );
 		bind( EventsHandling.class ).to( EventsHandlingImpl.class );

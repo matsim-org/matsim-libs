@@ -48,7 +48,7 @@ import java.util.Map;
 /**
  * @author thibautd
  */
-public class InternalizingPlansScoring implements PlansScoring, ScoringListener, IterationStartsListener, IterationEndsListener {
+public class InternalizingPlansScoring implements PlansScoring, ScoringListener {
 	private static final Logger log =
 		Logger.getLogger(InternalizingPlansScoring.class);
 
@@ -57,7 +57,6 @@ public class InternalizingPlansScoring implements PlansScoring, ScoringListener,
 
 	private final Scenario sc;
 	private final EventsManager events;
-	private final ScoringFunctionFactory scoringFunctionFactory;
 
 	private final InternalizationSettings ratioCalculator;
 
@@ -70,14 +69,10 @@ public class InternalizingPlansScoring implements PlansScoring, ScoringListener,
 		this.ratioCalculator = ratio;
 		this.sc = sc ;
 		this.events = events ;
-		this.scoringFunctionFactory = scoringFunctionFactory ;
+		this.eventsToScore = EventsToScore.createWithScoreUpdating(this.sc, scoringFunctionFactory, events);
+
 	}
 
-	@Override
-	public void notifyIterationStarts(final IterationStartsEvent event) {
-		this.eventsToScore = new EventsToScore( this.sc, this.scoringFunctionFactory, this.sc.getConfig().planCalcScore().getLearningRate() );
-		this.events.addHandler(this.eventsToScore);
-	}
 
 	@Override
 	public void notifyScoring(final ScoringEvent event) {
@@ -148,11 +143,6 @@ public class InternalizingPlansScoring implements PlansScoring, ScoringListener,
 		if ( score.isNaN() ) throw new RuntimeException( "got NaN score for person "+p );
 
 		return score.doubleValue();
-	}
-
-	@Override
-	public void notifyIterationEnds(final IterationEndsEvent event) {
-		this.events.removeHandler(this.eventsToScore);
 	}
 
 	public interface InternalizationSettings {

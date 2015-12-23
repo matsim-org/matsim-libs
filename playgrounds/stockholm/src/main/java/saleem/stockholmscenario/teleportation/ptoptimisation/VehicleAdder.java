@@ -10,12 +10,12 @@ import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleImpl;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.Vehicles;
 
+import saleem.stockholmscenario.teleportation.ptoptimisation.utils.OptimisationUtils;
 import saleem.stockholmscenario.utils.CollectionUtil;
 
 public class VehicleAdder {
@@ -29,9 +29,9 @@ public class VehicleAdder {
 		this.vehicles = scenario.getTransitVehicles();
 		this.vehicleinstances=this.vehicles.getVehicles();
 	}
-	//To add vehicles, one must actually add a departure and assign it the vehicle, and then ad vehicle to the fleet of vehicles.
+	//This function adds 50% additional transit traffic. To add vehicles, one must actually add a departure and assign it the vehicle, and then ad vehicle to the fleet of vehicles.
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public void addVehicles(double sample) {//sample represents percentage of vehicles to remove, ranges from 0 to 1
+	public void addVehicles(double sample) {//sample represents percentage of vehicles to remove, ranges from 0 to 1, departure times not rearranged
 		CollectionUtil cutil = new CollectionUtil();
 		ArrayList<Id<Vehicle>> vehids = cutil.toArrayList(vehicles.getVehicles().keySet().iterator());
 		int numvehadd = (int)Math.ceil(sample * vehids.size());//How many vehicles to add 
@@ -47,6 +47,42 @@ public class VehicleAdder {
 			}
 		} 
 		vehicles.getVehicleTypes().get(Id.create("BUS", VehicleType.class));
+	}
+	/*Adds departures to a certain line. Slightly different logic than adding vehicles to transit schedule randomly.
+	 *  Here all the route in the line are traversed, and departures are increased by a fraction of 10. 
+	 *  Corresponding vehicles are also added.
+	 *  */
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public void addDeparturesToLine(TransitLine tline, double fraction){
+		OptimisationUtils outils = new OptimisationUtils();
+		CollectionUtil cutil = new CollectionUtil();
+		DepartureTimesManager dtm = new DepartureTimesManager();
+		Map<Id<TransitRoute>, TransitRoute> routes = tline.getRoutes();
+		Iterator<Id<TransitRoute>> routeids = routes.keySet().iterator();
+		while(routeids.hasNext()){
+			TransitRoute troute = routes.get(routeids.next());
+			ArrayList<Id<Departure>> departures = cutil.toArrayList(troute.getDepartures().keySet().iterator());
+			ArrayList<Double> origtimes = dtm.getDepartureTimes(troute.getDepartures().values().iterator());//Sorted list of times
+			int size = departures.size();
+			for(int i=0;i<size;i++) {//For each departure, there is a "fraction" percent chance to add a new departure
+				if(Math.random()<=fraction){
+					Id<Vehicle> vehid= Id.create("VehAdded"+(int)Math.floor(1000000 * Math.random()), Vehicle.class);
+					if(!(vehicles.getVehicles().containsKey(vehid))){//If same vehicle has not been added before
+						double time = Math.ceil(86400 * Math.random());//Random time with in 24 hours
+						Departure departure = schedule.getFactory().createDeparture(Id.create("DepAdded"+(int)Math.floor(1000000 * Math.random()), Departure.class), time);
+						departure.setVehicleId(vehid);
+						troute.addDeparture(departure);
+						VehicleType vtype = vehicleinstances.get(troute.getDepartures().get(troute.getDepartures().keySet().iterator().next()).getVehicleId()).getType();
+						Vehicle veh = new VehicleImpl(vehid, vtype);
+						vehicles.addVehicle(veh);
+					}
+				}
+			}
+			ArrayList<Double> changedtimes = dtm.getDepartureTimes(troute.getDepartures().values().iterator());//After departures were added
+			ArrayList<Double> updatedtimes = outils.rearrangeTimes(origtimes, changedtimes);//Rearrange according to ratios of the orignal ratios
+			dtm.updateDepartures(schedule,troute, updatedtimes);//Update times of departures
+				
+		}
 	}
 	//Adds vehicle id to departure and returns type of departure, i.e. bus, train etc.
 	public VehicleType addVehicleToDeparture(Id<Vehicle>  vehid){

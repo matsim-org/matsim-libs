@@ -54,7 +54,7 @@ public class PlanRouterTest {
         final Config config = ConfigUtils.loadConfig("test/scenarios/equil/config.xml");
         config.plans().setInputFile("test/scenarios/equil/plans1.xml");
         final Scenario scenario = ScenarioUtils.loadScenario(config);
-        Injector injector = Injector.createInjector(scenario.getConfig(), new AbstractModule() {
+        com.google.inject.Injector injector = Injector.createInjector(scenario.getConfig(), new AbstractModule() {
             @Override
             public void install() {
                 install(new TripRouterModule());
@@ -87,7 +87,7 @@ public class PlanRouterTest {
 
         // A trip router which provides vehicle ids by itself.
         final Id<Vehicle> newVehicleId = Id.create(2, Vehicle.class);
-        Injector injector = Injector.createInjector(scenario.getConfig(), new AbstractModule() {
+        com.google.inject.Injector injector = Injector.createInjector(scenario.getConfig(), new AbstractModule() {
             @Override
             public void install() {
                 install(new ScenarioByInstanceModule(scenario));

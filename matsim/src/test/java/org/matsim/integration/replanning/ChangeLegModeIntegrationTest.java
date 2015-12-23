@@ -20,24 +20,20 @@
 
 package org.matsim.integration.replanning;
 
-import com.google.inject.name.Names;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.ControlerI;
 import org.matsim.core.controler.Injector;
 import org.matsim.core.events.EventsManagerModule;
-import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.*;
 import org.matsim.core.replanning.ReplanningContext;
@@ -85,20 +81,9 @@ public class ChangeLegModeIntegrationTest extends MatsimTestCase {
         act = plan.createAndAddActivity("work", new Coord((double) 0, (double) 500));
 		act.setLinkId(link.getId());
 
-        Injector injector = Injector.createInjector(config, new AbstractModule() {
+        com.google.inject.Injector injector = Injector.createInjector(config, new AbstractModule() {
             @Override
             public void install() {
-				bind(ControlerI.class).toInstance(new ControlerI() {
-					@Override
-					public Integer getIterationNumber() {
-						return 0;
-					}
-
-					@Override
-					public void run() {
-
-					}
-				});
                 install(new ScenarioByInstanceModule(scenario));
                 install(new EventsManagerModule());
                 install(new StrategyManagerModule());

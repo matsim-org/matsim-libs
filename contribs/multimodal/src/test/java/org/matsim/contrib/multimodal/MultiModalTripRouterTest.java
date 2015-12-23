@@ -97,7 +97,7 @@ public class MultiModalTripRouterTest {
 
 		MultiModalModule multiModalModule = new MultiModalModule();
 		multiModalModule.setLinkSlopes(linkSlopes);
-		Injector injector = Injector.createInjector(
+		com.google.inject.Injector injector = Injector.createInjector(
 				config,
 				AbstractModule.override(Collections.singleton(new AbstractModule() {
 					@Override

@@ -23,7 +23,9 @@
 package org.matsim.core.mobsim;
 
 import org.matsim.core.config.groups.ControlerConfigGroup;
+import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.mobsim.external.ExternalMobsim;
 import org.matsim.core.mobsim.jdeqsim.JDEQSimulation;
 import org.matsim.core.mobsim.qsim.QSimModule;
 
@@ -34,6 +36,9 @@ public class DefaultMobsimModule extends AbstractModule {
             install(new QSimModule());
         } else if (getConfig().controler().getMobsim().equals(ControlerConfigGroup.MobsimType.JDEQSim.toString())) {
             bindMobsim().to(JDEQSimulation.class);
+        } else if (getConfig().getModule(SimulationConfigGroup.GROUP_NAME) != null &&
+                ((SimulationConfigGroup) getConfig().getModule(SimulationConfigGroup.GROUP_NAME)).getExternalExe() != null) {
+            bindMobsim().to(ExternalMobsim.class);
         }
     }
 }

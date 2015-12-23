@@ -69,13 +69,15 @@ public class UtilityByPartsAnalyzer extends AbstractAnalysisModule {
 	private Scenario sc;
 	private String eventsFile;
 	private Map<Id<Person>, Double> person2Score = new HashMap<>();
+	private EventsManager events = EventsUtils.createEventsManager();
+
 
 	public void run(final Scenario sc, String outputDir){
 		this.sc = sc;
 		int lastIt = sc.getConfig().controler().getLastIteration();
 		this.eventsFile = outputDir+"/ITERS/it."+lastIt+"/"+lastIt+".events.xml.gz";
 		ScoringFunctionFactory sfFactory = getScoringFunctionFactory(sc);
-		this.events2Score = new EventsToScore(sc, sfFactory);
+		this.events2Score = EventsToScore.createWithScoreUpdating(sc, sfFactory, events);
 		preProcessData();
 		postProcessData();
 	}
@@ -87,9 +89,7 @@ public class UtilityByPartsAnalyzer extends AbstractAnalysisModule {
 
 	@Override
 	public void preProcessData() {
-		EventsManager events = EventsUtils.createEventsManager();
 		MatsimEventsReader reader = new MatsimEventsReader(events);
-		events.addHandler(events2Score);
 		reader.readFile(eventsFile);
 	}
 
