@@ -9,12 +9,25 @@ import playground.michalm.util.ParameterFileReader;
 
 class TaxiLauncherParams
 {
-    static TaxiLauncherParams readParams(String paramFile, String inputDir, String outputDir)
+    static TaxiLauncherParams readParams(String paramDir, String specificParamSubDir)
     {
-        Map<String, String> params = ParameterFileReader.readParametersToMap(paramFile);
-        params.put("inputDir", inputDir);
-        params.put("outputDir", outputDir);
-        return new TaxiLauncherParams(params);
+        String paramFile = paramDir + "/params.in";
+        String specificParamFile = paramDir + "/" + specificParamSubDir + "/params.in";
+        String outputDir = paramDir + "/" + specificParamSubDir + "/";
+
+        Map<String, String> specificParams = ParameterFileReader
+                .readParametersToMap(specificParamFile);
+        specificParams.put("outputDir", outputDir);
+
+        Map<String, String> generalParams = ParameterFileReader.readParametersToMap(paramFile);
+        generalParams.putAll(specificParams);//side effect: overriding params with the specific ones
+        return new TaxiLauncherParams(generalParams);
+    }
+
+
+    static TaxiLauncherParams readParams(String paramFile)
+    {
+        return new TaxiLauncherParams(ParameterFileReader.readParametersToMap(paramFile));
     }
 
 

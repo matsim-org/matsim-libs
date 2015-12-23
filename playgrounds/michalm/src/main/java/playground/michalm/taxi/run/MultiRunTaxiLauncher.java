@@ -211,27 +211,4 @@ class MultiRunTaxiLauncher
 
         multiLauncher.closeOutputFiles();
     }
-
-
-    public static void main(String... args)
-    {
-        int runs = Integer.valueOf(args[0]);
-        String paramFile = args[1];
-        TaxiLauncherParams params;
-
-        if (args.length == 4) {
-            String inputDir = args[2];
-            String outputDir = args[3];
-            params = TaxiLauncherParams.readParams(paramFile, inputDir, outputDir);
-        }
-        else if (args.length == 2) {
-            String dir = new File(paramFile).getParent() + '/';
-            params = TaxiLauncherParams.readParams(paramFile, dir, dir);
-        }
-        else {
-            throw new IllegalArgumentException();
-        }
-
-        run(runs, params);
-    }
 }

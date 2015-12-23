@@ -1,3 +1,9 @@
+#dir where input files are read from
+inputDir            ./src/main/resources/mielec_2014_02/
+
+#dir where output files will be stored
+outputDir           ./src/main/resources/mielec_2014_02/
+
 #file with the network
 netFile            network.xml
 
@@ -22,7 +28,7 @@ ranksFile              taxi_ranks-0.xml
 #type of the available dispatching algorithms
 algorithmConfig        RULE_DSE_FF
 
-#limit Dijkstra algorithm to the n nearest requests relative to a given vehicle (based on straight-line distance)
+#limit Dijkstra algorithm to the n nearest requests relatie to a given vehicle (based on straight-line distance)
 nearestRequestsLimit    25
 
 #limit Dijkstra algorithm to the n nearest vehicles relative to a given request (based on straight-line distance)

@@ -64,22 +64,20 @@ class KNTaxiLauncher
     {
         TaxiLauncherParams params = new TaxiLauncherParams();
 
-        params.inputDir =
-                "/Users/nagel/shared-svn/projects/maciejewski/Mielec/2014_02_base_scenario/";
-                //"d:/svn-vsp/maciejewski/Mielec/2014_02_base_scenario/";
+        params.inputDir = "../../../shared-svn/projects/maciejewski/Mielec/2014_02_base_scenario/";
 
         params.netFile = params.inputDir + "network.xml";
         params.plansFile = params.inputDir + "output/ITERS/it.20/20.plans.xml.gz";
 
         //demand: 10, 15, 20, 25, 30, 35, 40
         params.taxiCustomersFile = params.inputDir + "taxiCustomers_40_pc.txt";
-        
+
         //supply: 25, 50
         params.taxisFile = params.inputDir + "taxis-25.xml";
-        
+
         params.ranksFile = params.inputDir + "taxi_ranks-0.xml";
 
-//        params.eventsFile = params.inputDir + "output/ITERS/it.20/20.events.xml.gz";
+        //        params.eventsFile = params.inputDir + "output/ITERS/it.20/20.events.xml.gz";
         params.changeEventsFile = null;
 
         params.algorithmConfig = AlgorithmConfig.RULE_DSE_FF;
@@ -103,7 +101,7 @@ class KNTaxiLauncher
         params.vrpOutDir = null;
         params.histogramOutDir = null;
         params.eventsOutFile = null;
-        
+
         params.validate();
 
         return params;
