@@ -84,8 +84,9 @@ public class OsmNetworkReader implements MatsimSomeReader {
 	private final static String TAG_HIGHWAY = "highway";
 	private final static String TAG_MAXSPEED = "maxspeed";
 	private final static String TAG_JUNCTION = "junction";
-	private final static String TAG_ONEWAY = "oneway";
-	private final static String[] ALL_TAGS = new String[] {TAG_LANES, TAG_HIGHWAY, TAG_MAXSPEED, TAG_JUNCTION, TAG_ONEWAY};
+    private final static String TAG_ONEWAY = "oneway";
+    private final static String TAG_ACCESS = "access";
+	private final static String[] ALL_TAGS = new String[] {TAG_LANES, TAG_HIGHWAY, TAG_MAXSPEED, TAG_JUNCTION, TAG_ONEWAY, TAG_ACCESS};
 
 	private final Map<Long, OsmNode> nodes = new HashMap<Long, OsmNode>();
 	private final Map<Long, OsmWay> ways = new HashMap<Long, OsmWay>();
@@ -440,6 +441,10 @@ public class OsmNetworkReader implements MatsimSomeReader {
 	private void createLink(final Network network, final OsmWay way, final OsmNode fromNode, final OsmNode toNode, final double length) {
 		String highway = way.tags.get(TAG_HIGHWAY);
 
+        if ("no".equals(way.tags.get(TAG_ACCESS))) {
+             return;
+        }
+		
 		// load defaults
 		OsmHighwayDefaults defaults = this.highwayDefaults.get(highway);
 		if (defaults == null) {
@@ -475,6 +480,11 @@ public class OsmNetworkReader implements MatsimSomeReader {
 				oneway = false;
 			} else if ("no".equals(onewayTag)) {
 				oneway = false; // may be used to overwrite defaults
+			} else if ("alternating".equals(onewayTag)){
+                oneway = false;
+            }
+			else {
+			    throw new RuntimeException(onewayTag); //or print warning
 			}
 		}
 
@@ -485,6 +495,12 @@ public class OsmNetworkReader implements MatsimSomeReader {
 				nofLanes = 2.0;
 			}
 		}
+		
+        if(highway.equalsIgnoreCase("tertiary")){
+            if(oneway && nofLanes == 1.0){
+                nofLanes = 2.0;
+            }
+        }
 
 		String maxspeedTag = way.tags.get(TAG_MAXSPEED);
 		if (maxspeedTag != null) {
@@ -527,6 +543,10 @@ public class OsmNetworkReader implements MatsimSomeReader {
 		if(network.getNodes().get(fromId) != null && network.getNodes().get(toId) != null){
 			String origId = Long.toString(way.id);
 
+			if (!oneway && !onewayReverse && lanesTag != null) {
+                nofLanes /= 2;
+			}
+			
 			if (!onewayReverse) {
 				Link l = network.getFactory().createLink(Id.create(this.id, Link.class), network.getNodes().get(fromId), network.getNodes().get(toId));
 				l.setLength(length);
