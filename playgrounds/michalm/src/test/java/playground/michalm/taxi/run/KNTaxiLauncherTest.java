@@ -27,9 +27,8 @@ public class KNTaxiLauncherTest
     @Test
     public void test()
     {
-        String dir = "./src/main/resources/mielec-2-peaks_2014_02/";
-        String paramFile = dir + "params.in";
-        TaxiLauncherParams params = TaxiLauncherParams.readParams(paramFile, dir, dir);
+        String paramFile = "./src/main/resources/mielec_2014_02/params.in";
+        TaxiLauncherParams params = TaxiLauncherParams.readParams(paramFile);
         KNTaxiLauncher.run(params, false, false, false);//equivalent to (file, false, true)        
         KNTaxiLauncher.run(params, true, false, false);
         KNTaxiLauncher.run(params, true, true, false);
