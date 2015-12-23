@@ -21,14 +21,15 @@
 package org.matsim.core.network;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.network.*;
 
-public class FixedIntervalTimeVariantLinkFactory implements LinkFactory {
 
+public class FixedIntervalTimeVariantLinkFactory
+    implements LinkFactory
+{
     private final int interval;
     private final int intervalCount;
+
 
     public FixedIntervalTimeVariantLinkFactory(int interval, int intervalCount)
     {
@@ -36,11 +37,12 @@ public class FixedIntervalTimeVariantLinkFactory implements LinkFactory {
         this.intervalCount = intervalCount;
     }
 
-    
-	@Override
-	public Link createLink(Id<Link> id, Node from, Node to, Network network, double length, double freespeed,
-			double capacity, double nOfLanes) {
-		return new TimeVariantLinkImpl(id, from, to, network, length, freespeed, capacity, nOfLanes,
-		        interval, intervalCount);
-	}
+
+    @Override
+    public Link createLink(Id<Link> id, Node from, Node to, Network network, double length,
+            double freespeed, double capacity, double nOfLanes)
+    {
+        return TimeVariantLinkImpl.createLinkWithFixedIntervalAttributes(id, from, to, network,
+                length, freespeed, capacity, nOfLanes, interval, intervalCount);
+    }
 }

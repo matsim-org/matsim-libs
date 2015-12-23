@@ -120,6 +120,7 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 			new FacilitiesWriter(activityFacilities).write(controlerIO.getOutputFilename("output_facilities.xml.gz"));
 		} catch ( Exception ee ) {}
 		if (((NetworkFactoryImpl) network.getFactory()).isTimeVariant()) {
+		//if (config.network().isTimeVariantNetwork()) { //maybe this instead of the above if statement
 			new NetworkChangeEventsWriter().write(controlerIO.getOutputFilename("output_change_events.xml.gz"),
 					((NetworkImpl) network).getNetworkChangeEvents());
 		}

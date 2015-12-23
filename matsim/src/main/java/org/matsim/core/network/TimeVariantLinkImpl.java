@@ -46,19 +46,35 @@ class TimeVariantLinkImpl extends LinkImpl {
 	// constructor
 	//////////////////////////////////////////////////////////////////////
 
-	TimeVariantLinkImpl(final Id<Link> id, final Node from, final Node to, final Network network, final double length, final double freespeed, final double capacity, final double lanes) {
-		super(id, from, to, network, length, freespeed, capacity, lanes);
-		this.variableFreespeed = new VariableIntervalTimeVariantAttribute();
-		this.variableFlowCapacity = new VariableIntervalTimeVariantAttribute();
-		this.variableLanes = new VariableIntervalTimeVariantAttribute();
-	}
+    public static TimeVariantLinkImpl createLinkWithVariableIntervalAttributes(final Id<Link> id,
+            final Node from, final Node to, final Network network, final double length,
+            final double freespeed, final double capacity, final double lanes) {
+        return new TimeVariantLinkImpl(id, from, to, network, length, freespeed, capacity, lanes,
+                new VariableIntervalTimeVariantAttribute(),
+                new VariableIntervalTimeVariantAttribute(),
+                new VariableIntervalTimeVariantAttribute());
+    }
 
-   TimeVariantLinkImpl(final Id<Link> id, final Node from, final Node to, final Network network, final double length, final double freespeed, final double capacity, final double lanes,
-           final int interval, final int intervalCount) {
+
+    public static TimeVariantLinkImpl createLinkWithFixedIntervalAttributes(final Id<Link> id,
+            final Node from, final Node to, final Network network, final double length,
+            final double freespeed, final double capacity, final double lanes, final int interval,
+            final int intervalCount) {
+        return new TimeVariantLinkImpl(id, from, to, network, length, freespeed, capacity, lanes,
+                new FixedIntervalTimeVariantAttribute(interval, intervalCount),
+                new FixedIntervalTimeVariantAttribute(interval, intervalCount),
+                new FixedIntervalTimeVariantAttribute(interval, intervalCount));
+    }
+
+   
+    TimeVariantLinkImpl(final Id<Link> id, final Node from, final Node to, final Network network,
+            final double length, final double freespeed, final double capacity, final double lanes,
+            TimeVariantAttribute variableFreespeed, TimeVariantAttribute variableFlowCapacity,
+            TimeVariantAttribute variableLanes) {
         super(id, from, to, network, length, freespeed, capacity, lanes);
-        this.variableFreespeed = new FixedIntervalTimeVariantAttribute(interval, intervalCount);
-        this.variableFlowCapacity = new FixedIntervalTimeVariantAttribute(interval, intervalCount);
-        this.variableLanes = new FixedIntervalTimeVariantAttribute(interval, intervalCount);
+        this.variableFreespeed = variableFreespeed;
+        this.variableFlowCapacity = variableFlowCapacity;
+        this.variableLanes = variableLanes;
     }
 
 

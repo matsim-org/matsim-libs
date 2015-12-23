@@ -25,12 +25,17 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 
-public class VariableIntervalTimeVariantLinkFactory implements LinkFactory {
 
-	@Override
-	public Link createLink(Id<Link> id, Node from, Node to, Network network, double length, double freespeed,
-			double capacity, double nOfLanes) {
-		return new TimeVariantLinkImpl(id, from, to, network, length, freespeed, capacity, nOfLanes);
-	}
+public class VariableIntervalTimeVariantLinkFactory
+    implements LinkFactory
+{
+
+    @Override
+    public Link createLink(Id<Link> id, Node from, Node to, Network network, double length,
+            double freespeed, double capacity, double nOfLanes)
+    {
+        return TimeVariantLinkImpl.createLinkWithVariableIntervalAttributes(id, from, to, network,
+                length, freespeed, capacity, nOfLanes);
+    }
 
 }
