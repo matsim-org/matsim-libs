@@ -19,7 +19,7 @@
 
 package org.matsim.analysis;
 
-import com.google.inject.Provider;
+import com.google.inject.*;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -29,13 +29,13 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.LinkStatsConfigGroup;
 import org.matsim.core.controler.*;
-import org.matsim.core.controler.corelisteners.ControlerDefaultCoreListenersModule;
+import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.Injector;
 import org.matsim.core.events.EventsManagerModule;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
@@ -62,7 +62,7 @@ public class LinkStatsControlerListenerTest {
 		Config config = ConfigUtils.createConfig();
 		config.controler().setOutputDirectory(util.getOutputDirectory());
 		final Scenario scenario = ScenarioUtils.createScenario(config);
-		Injector injector = Injector.createInjector(config, new AbstractModule() {
+		com.google.inject.Injector injector = Injector.createInjector(config, new AbstractModule() {
 			@Override
 			public void install() {
 				install(new LinkStatsModule());

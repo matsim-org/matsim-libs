@@ -28,9 +28,9 @@ public class ChangeableNetworkCreator {
 	private List<NetworkChangeEvent> networkChangeEvents;
 	private final int ENDTIME = 30*3600;
 	private final int TIMESTEP = 15*60;
-	private final String NETWORKFILE = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/input/networkptcc.xml";
-	private final String EVENTSFILE =  "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/input/output/vw028.100pct/ITERS/it.210/vw028.100pct.210.events.xml.gz";
-	private final String CHANGEFILE = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/input/changeevents.xml";
+	private final String NETWORKFILE = "C:/Users/Joschka/Documents/runs-svn/bvg.run132.25pct/bvg.run132.25pct.output_network.xml.gz";
+	private final String EVENTSFILE =  "C:/Users/Joschka/Documents/runs-svn/bvg.run189.10pct/ITERS/it.100/bvg.run189.10pct.100.events.xml.gz";
+	private final String CHANGEFILE = "test.xml";
 
 	private final double MINIMUMFREESPEED = 3;
 

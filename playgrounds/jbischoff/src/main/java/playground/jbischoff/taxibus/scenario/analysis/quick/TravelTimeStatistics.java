@@ -44,7 +44,10 @@ public class TravelTimeStatistics   {
 //		String inputFile = "D:/runs-svn/vw_rufbus/vw038/ITERS/it.0/vw038.0.events.xml.gz";
 //		String inputFile = "D:/runs-svn/vw_rufbus/vw040/ITERS/it.180/vw040.180.events.xml.gz";
 //		String inputFile = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/input/output/vw042/ITERS/it.0/vw042.0.events.xml.gz";
-		String inputFile = "D:/runs-svn/vw_rufbus/vwTB02/vwTB02.output_events.xml.gz";
+//		String inputFile = "D:/runs-svn/vw_rufbus/vwTB04/vwTB04.output_events.xml.gz";
+//		String inputFile = "D:/runs-svn/vw_rufbus/vw054/vw054.output_events.xml.gz";
+//		String inputFile = "D:/runs-svn/vw_rufbus/vw057/vw056.output_events.xml.gz";
+		String inputFile = "D:/runs-svn/vw_rufbus/vw061TBa/vw061TBa.output_events.xml.gz";
 		
 				EventsManager events = EventsUtils.createEventsManager();
 

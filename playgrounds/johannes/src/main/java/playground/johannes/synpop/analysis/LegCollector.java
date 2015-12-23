@@ -30,7 +30,7 @@ import java.util.List;
 /**
  * @author johannes
  */
-public class LegCollector<T> extends AbstractCollector<T, Segment> {
+public class LegCollector<T> extends AbstractCollector<T, Segment, Segment> {
 
     public LegCollector(ValueProvider<T, Segment> provider) {
         super(provider);

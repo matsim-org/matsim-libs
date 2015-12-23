@@ -20,6 +20,8 @@
 
 package playground.sergioo.typesPopulation2013.replanning;
 
+import com.google.inject.Key;
+import com.google.inject.TypeLiteral;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -39,6 +41,7 @@ import playground.sergioo.typesPopulation2013.config.groups.StrategyPopsConfigGr
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Map;
 
 /**
  * Loads the strategy modules specified in the config-file. This class offers
@@ -158,7 +161,10 @@ public final class StrategyManagerPopsConfigLoader {
 			PlanStrategy strategy = tryToLoadPlanStrategyByName(controler, name);
 			return strategy;
 		} else {
-			PlanStrategy strategy = controler.getInjector().getPlanStrategies().get(name);
+			PlanStrategy strategy = controler.getInjector().getInstance(Key.get(
+					new TypeLiteral<Map<String, PlanStrategy>>() {
+					}
+			)).get(name);
 			return strategy;
 		} 
 	} 

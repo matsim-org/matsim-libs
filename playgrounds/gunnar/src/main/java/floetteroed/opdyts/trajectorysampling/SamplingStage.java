@@ -84,11 +84,11 @@ public class SamplingStage<U extends DecisionVariable> {
 		return this.alphas.euclNorm();
 	}
 
-	public double getEquilbriumGapWeight() {
+	public double getEquilibriumGapWeight() {
 		return this.equilibriumGapWeight;
 	}
 
-	public double getUniformityWeight() {
+	public double getUniformityGapWeight() {
 		return this.uniformityWeight;
 	}
 

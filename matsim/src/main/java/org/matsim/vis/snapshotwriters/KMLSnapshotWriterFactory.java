@@ -23,6 +23,7 @@ package org.matsim.vis.snapshotwriters;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.controler.ControlerI;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
 import javax.inject.Inject;
@@ -36,10 +37,10 @@ class KMLSnapshotWriterFactory implements Provider<SnapshotWriter> {
 	private final int iteration;
 
 	@Inject
-	KMLSnapshotWriterFactory(Scenario scenario, OutputDirectoryHierarchy controlerIO, ControlerI controler) {
+	KMLSnapshotWriterFactory(Scenario scenario, OutputDirectoryHierarchy controlerIO, ReplanningContext replanningContext) {
 		this.scenario = scenario;
 		this.controlerIO = controlerIO;
-		this.iteration = controler.getIterationNumber();
+		this.iteration = replanningContext.getIteration();
 	}
 
 	public SnapshotWriter get() {

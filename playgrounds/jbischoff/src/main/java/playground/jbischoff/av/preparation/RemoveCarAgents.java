@@ -37,7 +37,7 @@ public class RemoveCarAgents {
 	public static void main(String[] args) {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Scenario scenario2 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimPopulationReader(scenario).readFile("C:/Users/Joschka/Documents/shared-svn/projects/audi_av/scenario/subscenarios/tenpercentpt/plansWithCarsR0.10.xml.gz");
+		new MatsimPopulationReader(scenario).readFile("C:/Users/Joschka/Documents/shared-svn/projects/audi_av/scenario/subscenarios/rainyday/plansWithCarsR0.10.xml.gz");
 		for (Person p : scenario.getPopulation().getPersons().values()){
 			Plan plan = p.getSelectedPlan();
 			Leg leg = (Leg) plan.getPlanElements().get(1);
@@ -45,7 +45,7 @@ public class RemoveCarAgents {
 				scenario2.getPopulation().addPerson(p);
 			}
 		}
-		new PopulationWriter(scenario.getPopulation()).write("C:/Users/Joschka/Documents/shared-svn/projects/audi_av/scenario/subscenarios/tenpercentpt/plans0.10.xml.gz");
+		new PopulationWriter(scenario2.getPopulation()).write("C:/Users/Joschka/Documents/shared-svn/projects/audi_av/scenario/subscenarios/rainyday/plans0.10.xml.gz");
 		
 	}
 

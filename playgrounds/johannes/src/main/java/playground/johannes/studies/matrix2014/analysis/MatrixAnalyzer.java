@@ -147,7 +147,7 @@ public class MatrixAnalyzer implements AnalyzerTask<Collection<? extends Person>
                     }
 
                     StatsWriter.writeScatterPlot(refVals, simVals, entry.getKey(), "simulation", String.format
-                            ("%s/matrix.scatter.%s.txt", ioContext.getPath(), matrixName));
+                            ("%s/matrix.%s.scatter.txt", ioContext.getPath(), matrixName));
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.gbl.Gbl;
@@ -51,6 +52,8 @@ import org.matsim.core.scoring.functions.CharyparNagelScoringParameters.Mode;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
+
+import com.google.inject.Binder;
 
 import playground.jbischoff.taxibus.run.configuration.ConfigBasedTaxibusLaunchUtils;
 import playground.jbischoff.taxibus.run.configuration.TaxibusConfigGroup;
@@ -73,13 +76,20 @@ public class KNTaxibusExample {
 		Controler controler = new Controler(scenario);
 		new ConfigBasedTaxibusLaunchUtils(controler).initiateTaxibusses(true);
 
-		TaxiBusTravelTimesAnalyzer a = new TaxiBusTravelTimesAnalyzer();
-		TTEventHandler b = new TTEventHandler();
-		controler.getEvents().addHandler(a);
-		controler.getEvents().addHandler(b);
+		final TaxiBusTravelTimesAnalyzer taxibusTravelTimesAnalyzer = new TaxiBusTravelTimesAnalyzer();
+		final TTEventHandler ttEventHandler = new TTEventHandler();
+		controler.addOverridingModule(new AbstractModule() {
+			
+			@Override
+			public void install() {
+				addEventHandlerBinding().toInstance(taxibusTravelTimesAnalyzer);
+				addEventHandlerBinding().toInstance(ttEventHandler);
+			}
+		});
+		
 		controler.run();
-		a.printOutput();
-		b.printOutput();
+		taxibusTravelTimesAnalyzer.printOutput();
+		ttEventHandler.printOutput();
 	}
 
 	

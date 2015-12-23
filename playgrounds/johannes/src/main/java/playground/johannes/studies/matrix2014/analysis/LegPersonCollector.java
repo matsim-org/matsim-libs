@@ -32,7 +32,7 @@ import java.util.List;
 /**
  * @author johannes
  */
-public class LegPersonCollector<T> extends AbstractCollector<T, Person> {
+public class LegPersonCollector<T> extends AbstractCollector<T, Person, Segment> {
 
     public LegPersonCollector(ValueProvider<T, Person> provider) {
         super(provider);
@@ -45,7 +45,7 @@ public class LegPersonCollector<T> extends AbstractCollector<T, Person> {
         for (Person p : persons) {
             for (Episode e : p.getEpisodes()) {
                 for (Segment leg : e.getLegs()) {
-                    if (predicate == null || predicate.test(p)) {
+                    if (predicate == null || predicate.test(leg)) {
                         values.add(provider.get(p));
                     }
                 }

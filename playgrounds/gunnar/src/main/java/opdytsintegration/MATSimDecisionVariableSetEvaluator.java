@@ -20,8 +20,11 @@ import com.google.inject.Inject;
 
 import floetteroed.opdyts.DecisionVariable;
 import floetteroed.opdyts.logging.EquilibriumGap;
+import floetteroed.opdyts.logging.EquilibriumGapWeight;
+import floetteroed.opdyts.logging.SurrogateObjectiveFunctionValue;
 import floetteroed.opdyts.logging.TransientObjectiveFunctionValue;
 import floetteroed.opdyts.logging.UniformityGap;
+import floetteroed.opdyts.logging.UniformityGapWeight;
 import floetteroed.opdyts.trajectorysampling.TrajectorySampler;
 import floetteroed.utilities.math.Vector;
 
@@ -132,9 +135,15 @@ public class MATSimDecisionVariableSetEvaluator<U extends DecisionVariable>
 		this.trajectorySampler.addStatistic(logFileName,
 				new TransientObjectiveFunctionValue<U>());
 		this.trajectorySampler.addStatistic(logFileName,
+				new EquilibriumGapWeight<U>());
+		this.trajectorySampler.addStatistic(logFileName,
 				new EquilibriumGap<U>());
+		this.trajectorySampler.addStatistic(logFileName,
+				new UniformityGapWeight<U>());
 		this.trajectorySampler
 				.addStatistic(logFileName, new UniformityGap<U>());
+		this.trajectorySampler.addStatistic(logFileName,
+				new SurrogateObjectiveFunctionValue<U>());
 	}
 
 	public MATSimState getFinalState() {

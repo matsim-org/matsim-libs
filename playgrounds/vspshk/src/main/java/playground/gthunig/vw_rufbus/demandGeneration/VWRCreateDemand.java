@@ -127,9 +127,9 @@ public class VWRCreateDemand {
 		
 		String wb = "zones/wb.shp";
 //		double scalefactor = 0.05;
-//		double scalefactor = 0.1;
+		double scalefactor = 0.1;
 //		double scalefactor = 1.0;
-		double scalefactor = 0.01;
+//		double scalefactor = 0.01;
 		String plansOutputComplete = basedir + "../../input/initial_plans"+scalefactor+".xml.gz";
 		String objectAttributesFile = basedir + "../../input/initial_plans_oA"+scalefactor+".xml.gz";
 		String transitSchedule = basedir+"../../input/transitschedule.xml";
@@ -166,43 +166,41 @@ public class VWRCreateDemand {
 		// Osterode am Harz - OR
 
 		// Braunschweig, Stadt - Braunschweig, Stadt | work
-		createWorkers("BS", "BS", 62158 * config.getScalefactor(), 0.35, 0.2, 0.2, "03101", "03101");
+		createWorkers("BS", "BS", 62158 * config.getScalefactor(), 0.45, 0.2, 0.2, "03101", "03101");
 
 		// Braunschweig, Stadt - Braunschweig, Stadt | school
-		createPupils("BS", "BS", 15000 * config.getScalefactor(), 0.01, 0.13, 0.22, "03101", "03101");
+		createPupils("BS", "BS", 15000 * config.getScalefactor(), 0.45, 0.2, 0.2, "03101", "03101");
 
 		// Braunschweig, Stadt - Braunschweig, Stadt | university
-		createStudents("BS", "BS", 15000 * config.getScalefactor(), 0.01, 0.13, 0.22, "03101", "03101");
+		createStudents("BS", "BS", 15000 * config.getScalefactor(), 0.45, 0.2, 0.2, "03101", "03101");
 
 		// Wolfsburg, Stadt - Wolfsburg, Stadt | work
-		createWorkers("WB", "WB", (41470-18313) * config.getScalefactor(), 0.4, 0.2, 0.2, "03103", "03103");
-		createVWWorkers("WB", "03103", 11207, 1260+5328, 658, 0.4, 0.2, 0.2);
+		createWorkers("WB", "WB", (41470-18313) * config.getScalefactor(), 0.55, 0.2, 0.12, "03103", "03103");
+		createVWWorkers("WB", "03103", 11207, 1260+5328, 658, 0.55, 0.2, 0.12);
 		//		3103	11207	1260	5328	518	18313
 
 		
 		// Wolfsburg, Stadt - Wolfsburg, Stadt | school
 		createPupils("WB", "WB", 13867 * config.getScalefactor(), 0.05, 0.13, 0.27, "03103", "03103");
 
-		// Wolfsburg, Stadt - Wolfsburg, Stadt | university
-		createStudents("WB", "WB", 8823 * config.getScalefactor(), 0.01, 0.25, 0.35, "03103", "03103");
-
+	
 		// Gifhorn - Wolfsburg, Stadt | work
-		createWorkers("GH", "WB", (26484-15152-3000) * config.getScalefactor(), 0.75, 0.0, 0.0, "03151", "03103");
-		createVWWorkers("GH", "03151", 9156, 1050+4758, 518, 0.75, 0.0, 0.0);
+		createWorkers("GH", "WB", (26484-15152-3000) * config.getScalefactor(), 0.65, 0.0, 0.0, "03151", "03103");
+		createVWWorkers("GH", "03151", 9156, 1050+4758, 518, 0.65, 0.0, 0.0);
 		//3151	9156	1050	4758	188	15152
 
 		// Gifhorn - Gifhorn | work
-		createWorkers("GH", "GH", 10000 * config.getScalefactor(), 0.63, 0.1, 0.1, "03151", "03151");
+		createWorkers("GH", "GH", 10000 * config.getScalefactor(), 0.65, 0.1, 0.1, "03151", "03151");
 
 		// Gifhorn - Gifhorn | school
 //		createPupils("GH", "GH", 15000 * config.getScalefactor(), 0.05, 0.3, 0.2, "03151", "03151");
 
 		// Wolfenbüttel - Braunschweig, Stadt | work
-		createWorkers("WL", "BS", 6907 * config.getScalefactor(), 0.85, 0.0, 0.0, "03158", "03101");
+//		createWorkers("WL", "BS", 6907 * config.getScalefactor(), 0.85, 0.0, 0.0, "03158", "03101");
 
 		// Helmstedt - Wolfsburg, Stadt | work
-		createWorkers("HS", "WB", (12731-7908) * config.getScalefactor(), 0.85, 0.0, 0.0, "03154", "03103");
-		createVWWorkers("HS", "03154", 4704, 536+2668, 188, 0.85, 0.0, 0.0);
+		createWorkers("HS", "WB", (12731-7908) * config.getScalefactor(), 0.65, 0.0, 0.0, "03154", "03103");
+		createVWWorkers("HS", "03154", 4704, 536+2668, 188, 0.65, 0.0, 0.0);
 //		3154	4704	536	2668	0	7908
 
 		
@@ -212,146 +210,142 @@ public class VWRCreateDemand {
 		//3101	4085	127	693	101	8107
 
 		
-		// Peine - Braunschweig, Stadt | work
-		createWorkers("PE", "BS", 9089 * config.getScalefactor(), 0.85, 0.0, 0.0, "03157", "03101");
+//		// Peine - Braunschweig, Stadt | work
+//		createWorkers("PE", "BS", 9089 * config.getScalefactor(), 0.85, 0.0, 0.0, "03157", "03101");
 
 		// Gifhorn - Braunschweig, Stadt | work
-		createWorkers("GH", "BS", 7586 * config.getScalefactor(), 0.85, 0.0, 0.0, "03151", "03101");
+		createWorkers("GH", "BS", 7586 * config.getScalefactor(), 0.65, 0.0, 0.0, "03151", "03101");
 
 		// Salzgitter, Stadt - Braunschweig, Stadt | work
-		createWorkers("SG", "BS", 5572 * config.getScalefactor(), 0.85, 0.0, 0.0, "03102", "03101");
+		createWorkers("SG", "BS", 5572 * config.getScalefactor(), 0.65, 0.0, 0.0, "03102", "03101");
 
-		// Helmstedt - Braunschweig, Stadt | work
-		createWorkers("HS", "BS", 4618 * config.getScalefactor(), 0.85, 0.0, 0.0, "03154", "03101");
+//		// Helmstedt - Braunschweig, Stadt | work
+//		createWorkers("HS", "BS", 4618 * config.getScalefactor(), 0.85, 0.0, 0.0, "03154", "03101");
 
 		// Börde - Wolfsburg, Stadt | work
-		createWorkers("BR", "WB", (3685-856) * config.getScalefactor(), 0.85, 0.0, 0.0, "15085", "03103");
-		createVWWorkers("BR", "15085", 396, 460, 0, 0.8, 0.0, 0.0);
+		createWorkers("BR", "WB", (3685-856) * config.getScalefactor(), 0.65, 0.0, 0.0, "15085", "03103");
+		createVWWorkers("BR", "15085", 396, 460, 0, 0.65, 0.0, 0.0);
 		//		15362	396	0	460	0	856
 
 		// Altmarkkreis Salzwedel - Wolfsburg, Stadt | work
-		createWorkers("AS", "WB", (3305-740) * config.getScalefactor(), 0.85, 0.0, 0.0, "15081", "03103");
-		createVWWorkers("AS", "15081", 290, 450, 0, .85, .0, .0);
+		createWorkers("AS", "WB", (3305-740) * config.getScalefactor(), 0.65, 0.0, 0.0, "15081", "03103");
+		createVWWorkers("AS", "15081", 290, 450, 0, .65, .0, .0);
 		//		15370	290	0	450	0	740
 
 		// Region Hannover - Wolfsburg, Stadt | work
-		createWorkers("RH", "WB", (2850-1148) * config.getScalefactor(), 0.8, 0.0, 0.0, "03241", "03103");
-		createVWWorkers("RH", "03241", 1004, 144, 0, 0.8, 0.0, .0);
+		createWorkers("RH", "WB", (2850-1148) * config.getScalefactor(), 0.65, 0.0, 0.0, "03241", "03103");
+		createVWWorkers("RH", "03241", 1004, 144, 0, 0.65, 0.0, .0);
 //		3241	1004	0	144	0	1148
 
 		
 		// Region Hannover - Braunschweig, Stadt | work
-		createWorkers("RH", "BS", 2833 * config.getScalefactor(), 0.8, 0.0, 0.0, "03241", "03101");
+//		createWorkers("RH", "BS", 2833 * config.getScalefactor(), 0.8, 0.0, 0.0, "03241", "03101");
 
 		// Wolfenbüttel - Wolfsburg, Stadt | work
-		createWorkers("WL", "WB", (2676-1191) * config.getScalefactor(), 0.85, 0.0, 0.0, "03158", "03103");
-		createVWWorkers("WL", "03158", 943, 248, 0 , .85, .0, .0);
+		createWorkers("WL", "WB", (2676-1191) * config.getScalefactor(), 0.65, 0.0, 0.0, "03158", "03103");
+		createVWWorkers("WL", "03158", 943, 248, 0 , .65, .0, .0);
 //		3158	943	0	248	0	1191
 
 		// Braunschweig, Stadt - Gifhorn | work
-		createWorkers("BS", "GH", 2635 * config.getScalefactor(), 0.85, 0.0, 0.0, "03101", "03151");
+		createWorkers("BS", "GH", 2635 * config.getScalefactor(), 0.65, 0.0, 0.0, "03101", "03151");
 
-		// Braunschweig, Stadt - Wolfburg, Stadt | work
-		createWorkers("BS", "WB", 2310 * config.getScalefactor(), 0.85, 0.0, 0.0, "03101", "03103");
 
 		// Braunschweig, Stadt - Goslar | work
-		createWorkers("BS", "GL", 1960 * config.getScalefactor(), 0.85, 0.0, 0.0, "03101", "03153");
+		createWorkers("BS", "GL", 1960 * config.getScalefactor(), 0.65, 0.0, 0.0, "03101", "03153");
 
 		// Wolfsburg, Stadt - Gifhorn | work
-		createWorkers("WB", "GH", 1844 * config.getScalefactor(), 0.85, 0.0, 0.0, "03103", "03151");
+		createWorkers("WB", "GH", 1844 * config.getScalefactor(), 0.65, 0.0, 0.0, "03103", "03151");
 
 		// Peine - Wolfburg, Stadt | work
-		createWorkers("PE", "WB", (1756-782) * config.getScalefactor(), 0.85, 0.0, 0.0, "03157", "03103");
-		createVWWorkers("PE", "03157", 551, 231, 0, .85, .0, .0);
+		createWorkers("PE", "WB", (1756-782) * config.getScalefactor(), 0.65, 0.0, 0.0, "03157", "03103");
+		createVWWorkers("PE", "03157", 551, 231, 0, .65, .0, .0);
 		//		3157	551	0	231	0	782
 
 		
 		// Altmarkkreis Salzwedel - Gifhorn | work
-		createWorkers("AS", "GH", 1649 * config.getScalefactor(), 0.85, 0.0, 0.0, "15081", "03151");
+		createWorkers("AS", "GH", 1649 * config.getScalefactor(), 0.65, 0.0, 0.0, "15081", "03151");
 
 		// Börde - Braunschweig, Stadt | work
-		createWorkers("BR", "BS", 1260 * config.getScalefactor(), 0.85, 0.0, 0.0, "15085", "03101");
+//		createWorkers("BR", "BS", 1260 * config.getScalefactor(), 0.85, 0.0, 0.0, "15085", "03101");
 
 		// Hildesheim - Braunschweig, Stadt | work
 //		createWorkers("HH", "BS", 1195 * config.getScalefactor(), 0.8, 0.0, 0.0, "03254", "03101");
 
 		// Salzgitter, Stadt - Wolfburg, Stadt | work
-		createWorkers("SG", "WB", 0 * config.getScalefactor(), 0.85, 0.0, 0.0, "03102", "03103");
-		createVWWorkers("SG", "03102", 180, 106, 0, .8, .0, .0);
+		createWorkers("SG", "WB", 0 * config.getScalefactor(), 0.65, 0.0, 0.0, "03102", "03103");
+		createVWWorkers("SG", "03102", 180, 106, 0, .65, .0, .0);
 		//3102	180	0	106	658	944
 
 		// Magdeburg, Landeshauptstadt - Wolfburg, Stadt | work
-		createWorkers("MB", "WB", 847 * config.getScalefactor(), 0.85, 0.0, 0.0, "15003", "03103");
-		createVWWorkers("MB", "15003", 256, 140, 0, .8, .0, .0);
+		createWorkers("MB", "WB", 847 * config.getScalefactor(), 0.65, 0.0, 0.0, "15003", "03103");
+		createVWWorkers("MB", "15003", 256, 140, 0, .65, .0, .0);
 	
 		//15003	256	0	140	0	396
-		createWorkers("HS", "GH", 735 * config.getScalefactor(), 0.8, 0.0, 0.0, "03154", "03151");
+		createWorkers("HS", "GH", 735 * config.getScalefactor(), 0.65, 0.0, 0.0, "03154", "03151");
 
 		// Region Hannover - Gifhorn | work
-		createWorkers("RH", "GH", 680 * config.getScalefactor(), 0.8, 0.0, 0.0, "03241", "03151");
+		createWorkers("RH", "GH", 680 * config.getScalefactor(), 0.65, 0.0, 0.0, "03241", "03151");
 
 		// Celle - Wolfburg, Stadt | work
-		createWorkers("CL", "WB", (607-315) * config.getScalefactor(), 0.8, 0.0, 0.0, "03351", "03103");
-		createVWWorkers("CL", "03351", 155, 160, 0, .8, .0, .0);
+		createWorkers("CL", "WB", (607-315) * config.getScalefactor(), 0.65, 0.0, 0.0, "03351", "03103");
+		createVWWorkers("CL", "03351", 155, 160, 0, .65, .0, .0);
 		//		3351	155	0	160	0	315
 
 		// Magdeburg, Landeshauptstadt - Braunschweig, Stadt | work
-		createWorkers("MB", "BS", 511 * config.getScalefactor(), 0.8, 0.0, 0.0, "15003", "03101");
+		createWorkers("MB", "BS", 511 * config.getScalefactor(), 0.65, 0.0, 0.0, "15003", "03101");
 
 		// Wolfenbüttel - Gifhorn | work
-		createWorkers("WB", "GH", 496 * config.getScalefactor(), 0.8, 0.0, 0.0, "03158", "03151");
+		createWorkers("WB", "GH", 496 * config.getScalefactor(), 0.65, 0.0, 0.0, "03158", "03151");
 
 		// Harz - Wolfburg, Stadt | work
-		createWorkers("HZ", "WB", 476 * config.getScalefactor(), 0.8, 0.0, 0.0, "15085", "03103");
+		createWorkers("HZ", "WB", 476 * config.getScalefactor(), 0.65, 0.0, 0.0, "15085", "03103");
 
 		// Stendal - Wolfburg, Stadt | work
-		createWorkers("SD", "WB", 456 * config.getScalefactor(), 0.8, 0.0, 0.0, "15090", "03103");
+		createWorkers("SD", "WB", 456 * config.getScalefactor(), 0.65, 0.0, 0.0, "15090", "03103");
 
 		// Celle - Braunschweig, Stadt | work
-		createWorkers("CL", "BS", 440 * config.getScalefactor(), 0.8, 0.0, 0.0, "03351", "03101");
+//		createWorkers("CL", "BS", 440 * config.getScalefactor(), 0.8, 0.0, 0.0, "03351", "03101");
 
 		// Börde - Gifhorn | work
-		createWorkers("BR", "GH", 400 * config.getScalefactor(), 0.8, 0.0, 0.0, "15083", "03151");
+//		createWorkers("BR", "GH", 400 * config.getScalefactor(), 0.8, 0.0, 0.0, "15083", "03151");
 
 
 		// Goslar - Wolfburg, Stadt | work
-		createWorkers("GL", "WB", 384 * config.getScalefactor(), 0.8, 0.0, 0.0, "03153", "03103");
+		createWorkers("GL", "WB", 384 * config.getScalefactor(), 0.65, 0.0, 0.0, "03153", "03103");
 
 
 		// Altmarkkreis Salzwedel - Braunschweig, Stadt | work
-		createWorkers("AS", "BS", 245 * config.getScalefactor(), 0.8, 0.0, 0.0, "15081", "03101");
+//		createWorkers("AS", "BS", 245 * config.getScalefactor(), 0.8, 0.0, 0.0, "15081", "03101");
 
 		// Salzlandkreis - Wolfburg, Stadt | work
-		createWorkers("SL", "WB", 214 * config.getScalefactor(), 0.8, 0.0, 0.0, "15089", "03103");
+		createWorkers("SL", "WB", 214 * config.getScalefactor(), 0.65, 0.0, 0.0, "15089", "03103");
 
 		// Salzlandkreis - Braunschweig, Stadt | work
-		createWorkers("SL", "BS", 185 * config.getScalefactor(), 0.8, 0.0, 0.0, "15089", "03101");
+		createWorkers("SL", "BS", 185 * config.getScalefactor(), 0.65, 0.0, 0.0, "15089", "03101");
 
 		// Salzgitter, Stadt - Gifhorn | work
-		createWorkers("SG", "GH", 174 * config.getScalefactor(), 0.8, 0.0, 0.0, "03102", "03151");
+		createWorkers("SG", "GH", 174 * config.getScalefactor(), 0.65, 0.0, 0.0, "03102", "03151");
 
 
 		// Jerichower Land - Braunschweig, Stadt | work
-		createWorkers("JL", "BS", 117 * config.getScalefactor(), 0.8, 0.0, 0.0, "15086", "03101");
+//		createWorkers("JL", "BS", 117 * config.getScalefactor(), 0.8, 0.0, 0.0, "15086", "03101");
 
 		// Magdeburg, Landeshauptstadt - Gifhorn | work
-		createWorkers("MB", "GH", 114 * config.getScalefactor(), 0.8, 0.0, 0.0, "15003", "03151");
+		createWorkers("MB", "GH", 114 * config.getScalefactor(), 0.65, 0.0, 0.0, "15003", "03151");
 
 		// Stendal - Braunschweig, Stadt | work
-		createWorkers("SD", "BS", 108 * config.getScalefactor(), 0.8, 0.0, 0.0, "15090", "03101");
+		createWorkers("SD", "BS", 108 * config.getScalefactor(), 0.65, 0.0, 0.0, "15090", "03101");
 
-		// Goslar - Gifhorn | work
-		createWorkers("GL", "GH", 101 * config.getScalefactor(), 0.8, 0.0, 0.0, "03153", "03151");
-
+	
 		createA2TransitTruckers(Math.round(10000 * config.getScalefactor()));
 		createVWTruckers(Math.round(900* config.getScalefactor()));
-		replaceDoubtfulLegsByOtherMode();
+//		replaceDoubtfulLegsByOtherMode();
 		
 		System.out.println("generated Agents: " + commuterCounter);
 		System.out.println("VW Workers: " + vwWorkerCounter);
 		System.out.println("Workers: " + workerCounter);
-		createAgentGroupNearTransitstrops(scenario, 1500,config.getTransitSchedule() );
-		replaceSptByPtp();
+//		createAgentGroupNearTransitstrops(scenario, 1500,config.getTransitSchedule() );
+//		replaceSptByPtp();
 		PopulationWriter pw = new PopulationWriter(scenario.getPopulation(), scenario.getNetwork());
 		pw.write(config.getPlansOutputString());
 		new ObjectAttributesXmlWriter(scenario.getPopulation().getPersonAttributes()).writeFile(config.getObjectAttributes());

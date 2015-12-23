@@ -22,6 +22,4 @@ package org.matsim.core.controler;
 
 public interface ControlerI extends Runnable {
 
-	Integer getIterationNumber();
-
 }

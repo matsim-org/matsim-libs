@@ -70,15 +70,20 @@ public class GeoDistanceBuilder {
 
     private NumericAnalyzer buildWithPredicate(Predicate<Segment> predicate, String predicateName) {
         ValueProvider<Double, Segment> getter = new NumericAttributeProvider(CommonKeys.LEG_GEO_DISTANCE);
+        ValueProvider<Double, Person> weightGetter = new NumericAttributeProvider(CommonKeys.PERSON_WEIGHT);
 
         LegCollector<Double> collector = new LegCollector<>(getter);
-        if (predicate != null)
+        LegPersonCollector<Double> weightCollector = new LegPersonCollector<>(weightGetter);
+
+        if (predicate != null) {
             collector.setPredicate(predicate);
+            weightCollector.setPredicate(predicate);
+        }
 
         String name = CommonKeys.LEG_GEO_DISTANCE;
         if (predicateName != null)
             name = String.format("%s.%s", CommonKeys.LEG_GEO_DISTANCE, predicateName);
 
-        return new NumericAnalyzer(collector, name, histogramWriter);
+        return new NumericAnalyzer(collector, weightCollector, name, histogramWriter);
     }
 }

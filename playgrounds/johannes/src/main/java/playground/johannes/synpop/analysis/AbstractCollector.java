@@ -23,9 +23,9 @@ import playground.johannes.synpop.data.Attributable;
 /**
  * @author jillenberger
  */
-public abstract class AbstractCollector<T, A extends Attributable> implements Collector<T> {
+public abstract class AbstractCollector<T, A extends Attributable, P extends Attributable> implements Collector<T> {
 
-    protected Predicate<A> predicate;
+    protected Predicate<P> predicate;
 
     protected final ValueProvider<T, A> provider;
 
@@ -33,11 +33,11 @@ public abstract class AbstractCollector<T, A extends Attributable> implements Co
         this.provider = provider;
     }
 
-    public void setPredicate(Predicate<A> predicate) {
+    public void setPredicate(Predicate<P> predicate) {
         this.predicate = predicate;
     }
 
-    public Predicate<A> getPredicate() {
+    public Predicate<P> getPredicate() {
         return predicate;
     }
 

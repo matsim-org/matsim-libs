@@ -42,7 +42,7 @@ public class AdjustNetworkCapacities {
 		if (link.getId().toString().startsWith("pt")) continue;
 		if (decideToAdjust(link.getCoord())){
 			link.setCapacity(link.getCapacity()*2);
-			if (link.getCapacity()<1200) link.setCapacity(1200);
+			if (link.getCapacity()<2000) link.setCapacity(2000);
 		}else 
 		{
 //			link.setCapacity(link.getCapacity()*1.1);
