@@ -45,11 +45,11 @@ public class OuterCordonCountsGenerator {
 
 	public static void main(String[] args) {
 
-		String outCountsFile = PatnaUtils.INPUT_FILES_DIR+"/outerCordonCounts.xml.gz";
+		String outCountsFile = "../../../../repos/runs-svn/patnaIndia/run108/input/"+"/outerCordonCounts_OC1Excluded.xml.gz";
 
 		OuterCordonCountsGenerator pcg = new OuterCordonCountsGenerator();
 	
-		pcg.processCountingStation("OC1", inputFilesDir+"/oc1_fatua2Patna.txt", inputFilesDir+"/oc1_patna2Fatua.txt");
+//		pcg.processCountingStation("OC1", inputFilesDir+"/oc1_fatua2Patna.txt", inputFilesDir+"/oc1_patna2Fatua.txt");
 		pcg.processCountingStation("OC2", inputFilesDir+"/oc2_fatua2Patna.txt", inputFilesDir+"/oc2_patna2Fatua.txt");
 		pcg.processCountingStation("OC3", inputFilesDir+"/oc3_punpun2Patna.txt", inputFilesDir+"/oc3_patna2punpun.txt");
 		pcg.processCountingStation("OC4", inputFilesDir+"/oc4_muz2Patna.txt", inputFilesDir+"/oc4_patna2Muz.txt");

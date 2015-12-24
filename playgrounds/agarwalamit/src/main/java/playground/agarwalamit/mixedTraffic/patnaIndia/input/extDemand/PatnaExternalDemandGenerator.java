@@ -196,28 +196,25 @@ public class PatnaExternalDemandGenerator {
 		for(double timebin : timebin2mode2count.keySet()){
 			for(String mode : timebin2mode2count.get(timebin).keySet()){
 				double directionSplitFactor = OuterCordonUtils.getDirectionalFactorFromOuterCordonKey(countingStationKey, "E2E");
-				double count = Math.round(timebin2mode2count.get(timebin).get(mode)* directionSplitFactor * OuterCordonUtils.SAMPLE_SIZE);
-				for(int ii=0; ii< count; ii++){ // create person
-					String prefix = countingStationKey+"_E2E_";
-					Id<Person> personId = Id.createPersonId(prefix+ population.getPersons().size());
-					Person p = pf.createPerson(personId);
-
-					for (int jj =1;jj<=7;jj++){ // 6 plans for each outer cordon location
-
-						if(countingStationNumber.equalsIgnoreCase("OC"+jj)) continue; // excluding same origin- destination
-
-						if(countingStationNumber.equalsIgnoreCase("OC1") && jj==3 || countingStationNumber.equals("OC3") && jj==1 ) {
-							continue; // excluding ext-ext trip between OC1 -- OC3 and OC3 -- OC1
-						}
-
-						double actEndTime ;
-						Link destinationActLink = null;
-						if(countingDirection.equalsIgnoreCase("In")){// --> trip originates at given counting stationNumber
-							destinationActLink = getLinkFromOuterCordonKey("OC"+jj, false );
-							actEndTime = (timebin-1)*3600+random.nextDouble()*3600;
-						} else {// --> trip terminates at given counting stationNumber
-							throw new RuntimeException("For external to external counts use other counting direction, i.e. the "+countingStationNumber+ "should be assumed as origin and not destination.");
-						}
+				double personCount = Math.round(timebin2mode2count.get(timebin).get(mode)* directionSplitFactor * OuterCordonUtils.SAMPLE_SIZE);
+				
+				for (int jj =1;jj<=7;jj++){ // for other outer cordon locations
+					String destinationCountingStation = "OC".concat(String.valueOf(jj));
+					double destinationPersonCount =  Math.round( OuterCordonUtils.getExtExtTripShareBetweenCountingStations(countingStationNumber, destinationCountingStation) * personCount );
+					
+					Link destinationActLink = null;
+					if(countingDirection.equalsIgnoreCase("In")){ // --> trip originates at given counting stationNumber
+						destinationActLink = getLinkFromOuterCordonKey(destinationCountingStation, false );
+					} else {// --> trip terminates at given counting stationNumber
+						throw new RuntimeException("For external to external counts use other counting direction, i.e. the "+countingStationNumber+ "should be assumed as origin and not destination.");
+					}
+					
+					for(int ii = 0; ii< destinationPersonCount; ii++){ //persons
+						String prefix = countingStationKey+"_E2E_";
+						Id<Person> personId = Id.createPersonId(prefix+ population.getPersons().size());
+						Person p = pf.createPerson(personId);
+						
+						double actEndTime = (timebin-1)*3600 + random.nextDouble()*3600;
 
 						Plan plan = pf.createPlan();
 						Activity firstAct = pf.createActivityFromLinkId("E2E_Start", originActLink.getId());
@@ -228,9 +225,10 @@ public class PatnaExternalDemandGenerator {
 						Activity lastAct = pf.createActivityFromLinkId("E2E_End", destinationActLink.getId());
 						plan.addActivity(lastAct);
 						p.addPlan(plan);
+						
+						population.addPerson(p);
+						noOfPersonsAdded++;
 					}
-					population.addPerson(p);
-					noOfPersonsAdded++;
 				}
 			}
 		}
@@ -269,25 +267,6 @@ public class PatnaExternalDemandGenerator {
 		}
 		Id<Link> linkId = Id.createLinkId(link);
 		return scenario.getNetwork().getLinks().get(linkId);
-		
-		//		Id<Link> linkId = OuterCordonUtils.getCountStationLinkId(countingStationKey);
-		//
-		//		Link inLink = scenario.getNetwork().getLinks().get(linkId);
-		//		Link reverlseLink = NetworkUtils.getConnectingLink(inLink.getToNode(), inLink.getFromNode());
-		//		if(isOrigin) {
-		//		 Iterator<? extends Link> it = inLink.getFromNode().getInLinks().values().iterator();
-		//			while(it.hasNext() ){
-		//				Link l = it.next();
-		//				if(! l.equals(reverlseLink) ) return l;
-		//			}
-		//		} else {
-		//			Iterator<? extends Link> it = inLink.getToNode().getOutLinks().values().iterator();
-		//			while(it.hasNext() ){
-		//				Link l = it.next();
-		//				if(! l.equals(reverlseLink) ) return l;
-		//			}
-		//		}
-		//		throw new RuntimeException("A connecting link in the desired direction is not found. Aborting ...");
 	}
 
 	private Map<String, List<SimpleFeature>> getInternalZoneFeaturesForExtInternalTrips(){

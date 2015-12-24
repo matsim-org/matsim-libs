@@ -95,25 +95,91 @@ public class OuterCordonUtils {
 			return null;
 		}
 	}
+	
+	/**
+	 * See, table 3-13 in Patna CMP for the ext-ext trip shares.
+	 */
+	public static double getExtExtTripShareBetweenCountingStations(String originCountingStation, String destinationCountingStation){
+		double factor = 0;
+		if(originCountingStation.equals(destinationCountingStation)) return 0.;
+		else if(originCountingStation.equals("OC1") ) {
+			switch(destinationCountingStation) {
+			case "OC2" : factor = 0.0; break;
+			case "OC3" : factor = 0.02; break;//.01-->.02 (to make total 1.0)
+			case "OC4" : factor = 0.49; break;
+			case "OC5" : factor = 0.15; break;
+			case "OC6" : factor = 0.03; break;
+			case "OC7" : factor = 0.31; break;
+			}
+		} else if(originCountingStation.equals("OC2") ) {
+			switch(destinationCountingStation) {
+			case "OC1" : factor = 0.01; break;
+			case "OC3" : factor = 0.0; break;
+			case "OC4" : factor = 0.84; break;
+			case "OC5" : factor = 0.05; break;
+			case "OC6" : factor = 0.0; break;
+			case "OC7" : factor = 0.10; break;
+			}
+		} else if(originCountingStation.equals("OC3") ) {
+			switch(destinationCountingStation) {
+			case "OC1" : factor = 0.19; break;
+			case "OC2" : factor = 0.04; break;
+			case "OC4" : factor = 0.04; break;
+			case "OC5" : factor = 0.17; break;
+			case "OC6" : factor = 0.23; break;
+			case "OC7" : factor = 0.33; break;
+			}
+		} else if(originCountingStation.equals("OC4") ) {
+			switch(destinationCountingStation) {
+			case "OC1" : factor = 0.76; break;
+			case "OC2" : factor = 0.16; break;
+			case "OC3" : factor = 0.0; break;
+			case "OC5" : factor = 0.03; break;
+			case "OC6" : factor = 0.0; break;
+			case "OC7" : factor = 0.05; break;
+			}
+		} else if(originCountingStation.equals("OC5") ) {
+			switch(destinationCountingStation) {
+			case "OC1" : factor = 0.35; break;
+			case "OC2" : factor = 0.07; break;
+			case "OC3" : factor = 0.04; break;
+			case "OC4" : factor = 0.38; break;
+			case "OC6" : factor = 0.08; break;
+			case "OC7" : factor = 0.08; break;
+			}
+		} else if(originCountingStation.equals("OC6") ) {
+			switch(destinationCountingStation) {
+			case "OC1" : factor = 0.30; break;
+			case "OC2" : factor = 0.07; break;//.06-->.07 (to make total 1.0)
+			case "OC3" : factor = 0.23; break;
+			case "OC4" : factor = 0.0; break;
+			case "OC5" : factor = 0.13; break;
+			case "OC7" : factor = 0.27; break;
+			}
+		} else if(originCountingStation.equals("OC7") ) {
+			switch(destinationCountingStation) {
+			case "OC1" : factor = 0.34; break;
+			case "OC2" : factor = 0.07; break;
+			case "OC3" : factor = 0.0; break;
+			case "OC4" : factor = 0.09; break;
+			case "OC5" : factor = 0.5; break;
+			case "OC6" : factor = 0.0; break;
+			}
+		}
+		return factor;
+	}
 
 	public enum OuterCordonDirectionalFactors{
 		/*
 		 * E -- external
 		 * I -- internal
 		 */
-//		OC1_P2X_I2E (0.50), OC1_P2X_E2E (0.50),
 		OC1_X2P_E2I (0.70), OC1_X2P_E2E (0.30),
-//		OC2_P2X_I2E (0.51), OC2_P2X_E2E (0.49),
 		OC2_X2P_E2I (0.58), OC2_X2P_E2E (0.42),
-//		OC3_P2X_I2E (0.99), OC3_P2X_E2E (0.01),
 		OC3_X2P_E2I (0.94), OC3_X2P_E2E (0.06),//(0.20), with 0.06 and 1% sample, ext-ext trips are zero in all time bin and for all modes
-//		OC4_P2X_I2E (0.87), OC4_P2X_E2E (0.13),
 		OC4_X2P_E2I (0.66), OC4_X2P_E2E (0.34),
-//		OC5_P2X_I2E (0.65), OC5_P2X_E2E (0.35),
 		OC5_X2P_E2I (0.76), OC5_X2P_E2E (0.24),
 		OC6_X2P_E2I (0.86), OC6_X2P_E2E (0.14),
-//		OC6_P2X_I2E (0.67), OC6_P2X_E2E (0.33), 
-//		OC7_P2X_I2E (0.62), OC7_P2X_E2E (0.38),
 		OC7_X2P_E2I (0.95), OC7_X2P_E2E (0.05);//(0.25); with 0.05 and 1% sample, ext-ext trips are zero in all time bin and for all modes
 
 		private final double factor;

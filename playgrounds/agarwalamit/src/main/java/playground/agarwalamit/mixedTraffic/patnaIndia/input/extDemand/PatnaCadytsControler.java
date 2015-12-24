@@ -64,7 +64,7 @@ import playground.agarwalamit.utils.plans.SelectedPlansFilter;
 public class PatnaCadytsControler {
 
 	private static String plansFile = "../../../../repos/runs-svn/patnaIndia/run108/input/outerCordonDemand_10pct.xml.gz";
-	private static String outputDir = "../../../../repos/runs-svn/patnaIndia/run108/outerCordonOutput_10pct/";
+	private static String outputDir = "../../../../repos/runs-svn/patnaIndia/run108/outerCordonOutput_10pct_OC1Excluded/";
 
 	private static final boolean stabilityCheckAfterCadyts = false;
 	
@@ -161,7 +161,7 @@ public class PatnaCadytsControler {
 		config.qsim().setSnapshotStyle(SnapshotStyle.queue);
 		config.qsim().setVehiclesSource(VehiclesSource.fromVehiclesData);
 
-		config.counts().setCountsFileName("../../../../repos/runs-svn/patnaIndia/run108/input/outerCordonCounts.xml.gz");
+		config.counts().setCountsFileName("../../../../repos/runs-svn/patnaIndia/run108/input/outerCordonCounts_OC1Excluded.xml.gz");
 		config.counts().setWriteCountsInterval(5);
 		config.counts().setCountsScaleFactor(1/OuterCordonUtils.SAMPLE_SIZE);
 		config.counts().setOutputFormat("all");
@@ -169,8 +169,8 @@ public class PatnaCadytsControler {
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(100);
 		config.controler().setOutputDirectory(outputDir);
-		config.controler().setWritePlansInterval(50);
-		config.controler().setWriteEventsInterval(50);
+		config.controler().setWritePlansInterval(100);
+		config.controler().setWriteEventsInterval(2);
 
 		StrategySettings reRoute = new StrategySettings();
 		reRoute.setStrategyName(DefaultPlanStrategiesModule.DefaultStrategy.ReRoute.name());
