@@ -89,12 +89,14 @@ public class MATSimSimulator<U extends DecisionVariable> implements
 				binder().requestInjection(matsimDecisionVariableEvaluator);
 			}
 		});
-		// controler.setTerminationCriterion(new TerminationCriterion() {
-		// @Override
-		// public boolean continueIterations(int iteration) {
-		// return !matsimDecisionVariableEvaluator.foundSolution();
-		// }
-		// });
+		// TODO >>> THIS DOES NOT WORK >>>
+		controler.setTerminationCriterion(new TerminationCriterion() {
+			@Override
+			public boolean continueIterations(int iteration) {
+				return !matsimDecisionVariableEvaluator.foundSolution();
+			}
+		});
+		// TODO <<< THIS DOES NOT WORK <<<
 		controler.run();
 		this.nextControlerRun++;
 		return matsimDecisionVariableEvaluator.getFinalState();
