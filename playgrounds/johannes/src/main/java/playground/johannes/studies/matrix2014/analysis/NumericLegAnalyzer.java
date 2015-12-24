@@ -16,41 +16,35 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.synpop.analysis;
+package playground.johannes.studies.matrix2014.analysis;
 
-import org.apache.log4j.Logger;
-import playground.johannes.synpop.util.Executor;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
+import playground.johannes.synpop.analysis.*;
+import playground.johannes.synpop.data.CommonKeys;
+import playground.johannes.synpop.data.Person;
+import playground.johannes.synpop.data.Segment;
 
 /**
  * @author jillenberger
  */
-public class ConcurrentAnalyzerTask<T> extends AnalyzerTaskComposite<T> {
+public class NumericLegAnalyzer {
 
-    private static final Logger logger = Logger.getLogger(ConcurrentAnalyzerTask.class);
+    public static NumericAnalyzer create(String key, boolean useWeights, Predicate<Segment> predicate, String predicateName, HistogramWriter writer) {
+        String dimension = key;
+        ValueProvider<Double, Segment> provider = new NumericAttributeProvider<>(key);
 
-    @Override
-    public void analyze(final T object, final List<StatsContainer> containers) {
-        final List<StatsContainer> concurrentContainers = new CopyOnWriteArrayList<>();
-
-        List<Runnable> runnables = new ArrayList<>(components.size());
-        for (final AnalyzerTask<T> task : components) {
-            runnables.add(new Runnable() {
-                @Override
-                public void run() {
-                    task.analyze(object, concurrentContainers);
-                }
-            });
-            logger.debug(String.format("Submitting analyzer task %s...", task.getClass().getSimpleName()));
+        LegCollector<Double> collector = new LegCollector<>(provider);
+        if (predicate != null) {
+            collector.setPredicate(predicate);
+            dimension = String.format("%s.%s", key, predicateName);
         }
 
-        Executor.submitAndWait(runnables);
+        LegPersonCollector<Double> weightCollector = null;
+        if (useWeights) {
+            ValueProvider<Double, Person> weightProvider = new NumericAttributeProvider<>(CommonKeys.PERSON_WEIGHT);
+            weightCollector = new LegPersonCollector<>(weightProvider);
+            if (predicate != null) weightCollector.setPredicate(predicate);
+        }
 
-        containers.addAll(concurrentContainers);
-
-        logger.debug("Tasks done.");
+        return new NumericAnalyzer(collector, weightCollector, dimension, writer);
     }
 }

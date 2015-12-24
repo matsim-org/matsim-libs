@@ -18,39 +18,24 @@
  * *********************************************************************** */
 package playground.johannes.synpop.analysis;
 
-import org.apache.log4j.Logger;
-import playground.johannes.synpop.util.Executor;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
+import playground.johannes.synpop.data.Segment;
 
 /**
  * @author jillenberger
  */
-public class ConcurrentAnalyzerTask<T> extends AnalyzerTaskComposite<T> {
+public class LegAttributePredicate implements Predicate<Segment> {
 
-    private static final Logger logger = Logger.getLogger(ConcurrentAnalyzerTask.class);
+    private final String key;
+
+    private final String value;
+
+    public LegAttributePredicate(String key, String value) {
+        this.key = key;
+        this.value = value;
+    }
 
     @Override
-    public void analyze(final T object, final List<StatsContainer> containers) {
-        final List<StatsContainer> concurrentContainers = new CopyOnWriteArrayList<>();
-
-        List<Runnable> runnables = new ArrayList<>(components.size());
-        for (final AnalyzerTask<T> task : components) {
-            runnables.add(new Runnable() {
-                @Override
-                public void run() {
-                    task.analyze(object, concurrentContainers);
-                }
-            });
-            logger.debug(String.format("Submitting analyzer task %s...", task.getClass().getSimpleName()));
-        }
-
-        Executor.submitAndWait(runnables);
-
-        containers.addAll(concurrentContainers);
-
-        logger.debug("Tasks done.");
+    public boolean test(Segment segment) {
+        return value.equals(segment.getAttribute(key));
     }
 }
