@@ -140,7 +140,6 @@ public class HourlyTaxiStatsCalculator
             }
         }
 
-        //        validateHourlyVehicleStats(stats);
         updateHourlyStats(stats);
     }
 
@@ -185,17 +184,6 @@ public class HourlyTaxiStatsCalculator
 
             default:
                 throw new RuntimeException();
-        }
-    }
-
-
-    //temp validation - only for audi
-    private void validateHourlyVehicleStats(HourlyVehicleStats[] stats)
-    {
-        for (HourlyVehicleStats s : stats) {
-            if (s.total() != 3600) {
-                throw new RuntimeException("Vehicle must be always on duty");
-            }
         }
     }
 

@@ -200,7 +200,7 @@ public class ResultsPostProcessor
     public static void processMielec()
     {
         String dir = "d:/PP-rad/mielec/2014_02/";
-        String subDirPrefix = "mielec-2-peaks-new-";
+        String subDirPrefix = "";
 
         new ResultsPostProcessor(//
                 "10-50", //
@@ -353,11 +353,11 @@ public class ResultsPostProcessor
 
     public static void main(String[] args)
     {
-        //processMielec();
+        processMielec();
         //processBerlin();
         //processBarcelonaVariableDemand();
         //processBarcelonaVariableSupply();
-        processAudiAV_10();
+        //processAudiAV_10();
         //processAudiAV_100();
     }
 }
