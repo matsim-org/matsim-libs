@@ -120,7 +120,7 @@ public class PatnaExternalDemandGenerator {
 		for(double timebin : timebin2mode2count.keySet()){
 			for(String mode : timebin2mode2count.get(timebin).keySet()){
 				double directionSplitFactor = OuterCordonUtils.getDirectionalFactorFromOuterCordonKey(countingStationKey, "E2I");
-				double count = Math.round(timebin2mode2count.get(timebin).get(mode)* directionSplitFactor * OuterCordonUtils.SAMPLE_SIZE);
+				double count = Math.round( timebin2mode2count.get(timebin).get(mode) * directionSplitFactor * OuterCordonUtils.SAMPLE_SIZE * OuterCordonUtils.E2I_TRIP_REDUCTION_FACTOR );
 
 				for(int ii=0; ii< count; ii++){ // create person
 					String prefix = countingStationKey+"_E2I_";
@@ -196,7 +196,7 @@ public class PatnaExternalDemandGenerator {
 		for(double timebin : timebin2mode2count.keySet()){
 			for(String mode : timebin2mode2count.get(timebin).keySet()){
 				double directionSplitFactor = OuterCordonUtils.getDirectionalFactorFromOuterCordonKey(countingStationKey, "E2E");
-				double personCount = Math.round(timebin2mode2count.get(timebin).get(mode)* directionSplitFactor * OuterCordonUtils.SAMPLE_SIZE);
+				double personCount = Math.round( timebin2mode2count.get(timebin).get(mode) * directionSplitFactor * OuterCordonUtils.SAMPLE_SIZE * OuterCordonUtils.E2I_TRIP_REDUCTION_FACTOR );
 				
 				for (int jj =1;jj<=7;jj++){ // for other outer cordon locations
 					String destinationCountingStation = "OC".concat(String.valueOf(jj));

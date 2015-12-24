@@ -36,6 +36,8 @@ public class OuterCordonUtils {
 	
 	public static final double SAMPLE_SIZE = 0.1;
 	
+	public static final double E2I_TRIP_REDUCTION_FACTOR = 0.894;
+	
 	public static Map<String, List<Integer>> getAreaType2ZoneIds(){//(from Fig.4-9 in PatnaReport)
 		Map<String, List<Integer>> areas2zones = new HashMap<>();
 		areas2zones.put("Institutional", Arrays.asList(8,9,20));
