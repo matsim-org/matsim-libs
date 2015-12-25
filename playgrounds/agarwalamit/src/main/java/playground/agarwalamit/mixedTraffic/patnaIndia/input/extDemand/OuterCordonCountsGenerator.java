@@ -62,7 +62,6 @@ public class OuterCordonCountsGenerator {
 	}
 
 	private void writeCountsDataToFile(final String outCountsFile){
-
 		Counts<Link> counts = new Counts<Link>();
 		counts.setYear(2008);
 		counts.setName("Patna_counts");
@@ -70,19 +69,17 @@ public class OuterCordonCountsGenerator {
 		for (Tuple<Id<Link>,String> mcs : countStation2time2countInfo_in.keySet()){
 			Count<Link> c = counts.createAndAddCount(mcs.getFirst(), mcs.getSecond());
 			for(Integer i : countStation2time2countInfo_in.get(mcs).keySet()){
-				double vol = Math.round(countStation2time2countInfo_in.get(mcs).get(i) * OuterCordonUtils.E2I_TRIP_REDUCTION_FACTOR);
+				double vol = countStation2time2countInfo_in.get(mcs).get(i) ;
 				c.createVolume(i, vol );
 			}
 		}
 		for (Tuple<Id<Link>,String> mcs : countStation2time2countInfo_out.keySet()){
 			Count<Link> c = counts.createAndAddCount(mcs.getFirst(), mcs.getSecond());
 			for(Integer i : countStation2time2countInfo_out.get(mcs).keySet()){
-				double vol = countStation2time2countInfo_out.get(mcs).get(i) ;
+				double vol = Math.round(countStation2time2countInfo_out.get(mcs).get(i) * OuterCordonUtils.E2I_TRIP_REDUCTION_FACTOR);
 				c.createVolume(i, vol );
 			}
 		}
-		
-		
 		new CountsWriter(counts).write(outCountsFile);
 	}
 
