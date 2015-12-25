@@ -119,8 +119,14 @@ public class PatnaExternalDemandGenerator {
 
 		for(double timebin : timebin2mode2count.keySet()){
 			for(String mode : timebin2mode2count.get(timebin).keySet()){
-				double directionSplitFactor = OuterCordonUtils.getDirectionalFactorFromOuterCordonKey(countingStationKey, "E2I");
-				double count = Math.round( timebin2mode2count.get(timebin).get(mode) * directionSplitFactor * OuterCordonUtils.SAMPLE_SIZE * OuterCordonUtils.E2I_TRIP_REDUCTION_FACTOR );
+				double commutersTrafficShare = OuterCordonUtils.getDirectionalFactorFromOuterCordonKey(countingStationKey, "E2I");
+
+				// the total numer of persons are increased to get almost same number of persons as in external to internal counts.
+				if ( countingStationNumber.equals("OC3") || countingStationNumber.equals("OC7") ) commutersTrafficShare = 1.25 * commutersTrafficShare;
+				else if ( countingStationNumber.equals("OC6") ) commutersTrafficShare = 1. * commutersTrafficShare;
+				else commutersTrafficShare = 1.2 * commutersTrafficShare;
+
+				double count = Math.round( timebin2mode2count.get(timebin).get(mode) * commutersTrafficShare * OuterCordonUtils.SAMPLE_SIZE );
 
 				for(int ii=0; ii< count; ii++){ // create person
 					String prefix = countingStationKey+"_E2I_";
@@ -173,7 +179,7 @@ public class PatnaExternalDemandGenerator {
 		LOG.info(noOfPersonsAdded+" external to internal presons are added to the population for counting station "+countingStationNumber);
 		if(noOfPersonsAdded==0)LOG.warn("No external to internal presons are added to the population for counting station "+countingStationNumber);
 	}
-	
+
 	/**
 	 * @param countingDirection "In" for outside to Patna, "Out" for Patna to outside.
 	 */
@@ -195,25 +201,32 @@ public class PatnaExternalDemandGenerator {
 
 		for(double timebin : timebin2mode2count.keySet()){
 			for(String mode : timebin2mode2count.get(timebin).keySet()){
-				double directionSplitFactor = OuterCordonUtils.getDirectionalFactorFromOuterCordonKey(countingStationKey, "E2E");
-				double personCount = Math.round( timebin2mode2count.get(timebin).get(mode) * directionSplitFactor * OuterCordonUtils.SAMPLE_SIZE * OuterCordonUtils.E2I_TRIP_REDUCTION_FACTOR );
-				
+
+				double throughTrafficShare = OuterCordonUtils.getDirectionalFactorFromOuterCordonKey(countingStationKey, "E2E");
+
+				// the total numer of persons are increased to get almost same number of persons as in external to internal counts.
+				if ( countingStationNumber.equals("OC3") || countingStationNumber.equals("OC7") ) throughTrafficShare = 1.25 * throughTrafficShare;
+				else if ( countingStationNumber.equals("OC6") ) throughTrafficShare = 1. * throughTrafficShare;
+				else throughTrafficShare = 1.2 * throughTrafficShare;
+
+				double personCount = Math.round( timebin2mode2count.get(timebin).get(mode) * throughTrafficShare * OuterCordonUtils.SAMPLE_SIZE );
+
 				for (int jj =1;jj<=7;jj++){ // for other outer cordon locations
 					String destinationCountingStation = "OC".concat(String.valueOf(jj));
 					double destinationPersonCount =  Math.round( OuterCordonUtils.getExtExtTripShareBetweenCountingStations(countingStationNumber, destinationCountingStation) * personCount );
-					
+
 					Link destinationActLink = null;
 					if(countingDirection.equalsIgnoreCase("In")){ // --> trip originates at given counting stationNumber
 						destinationActLink = getLinkFromOuterCordonKey(destinationCountingStation, false );
 					} else {// --> trip terminates at given counting stationNumber
 						throw new RuntimeException("For external to external counts use other counting direction, i.e. the "+countingStationNumber+ "should be assumed as origin and not destination.");
 					}
-					
+
 					for(int ii = 0; ii< destinationPersonCount; ii++){ //persons
 						String prefix = countingStationKey+"_E2E_";
 						Id<Person> personId = Id.createPersonId(prefix+ population.getPersons().size());
 						Person p = pf.createPerson(personId);
-						
+
 						double actEndTime = (timebin-1)*3600 + random.nextDouble()*3600;
 
 						Plan plan = pf.createPlan();
@@ -225,7 +238,7 @@ public class PatnaExternalDemandGenerator {
 						Activity lastAct = pf.createActivityFromLinkId("E2E_End", destinationActLink.getId());
 						plan.addActivity(lastAct);
 						p.addPlan(plan);
-						
+
 						population.addPerson(p);
 						noOfPersonsAdded++;
 					}
