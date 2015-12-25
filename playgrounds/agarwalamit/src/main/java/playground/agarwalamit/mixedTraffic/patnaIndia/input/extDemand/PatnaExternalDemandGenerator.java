@@ -122,7 +122,7 @@ public class PatnaExternalDemandGenerator {
 				double commutersTrafficShare = OuterCordonUtils.getDirectionalFactorFromOuterCordonKey(countingStationKey, "E2I");
 
 				// the total numer of persons are increased to get almost same number of persons as in external to internal counts.
-				if ( countingStationNumber.equals("OC3") || countingStationNumber.equals("OC7") ) commutersTrafficShare = 1.25 * commutersTrafficShare;
+				if ( countingStationNumber.equals("OC7") ) commutersTrafficShare = 1.25 * commutersTrafficShare;
 				else if ( countingStationNumber.equals("OC6") ) commutersTrafficShare = 1. * commutersTrafficShare;
 				else commutersTrafficShare = 1.2 * commutersTrafficShare;
 
@@ -131,6 +131,7 @@ public class PatnaExternalDemandGenerator {
 				for(int ii=0; ii< count; ii++){ // create person
 					String prefix = countingStationKey+"_E2I_";
 					Id<Person> personId = Id.createPersonId(prefix+ population.getPersons().size());
+					
 					Person p = pf.createPerson(personId);
 					population.addPerson(p);
 					noOfPersonsAdded++;
@@ -146,16 +147,23 @@ public class PatnaExternalDemandGenerator {
 						//ZZ_TODO : here the act duration is assigned randomly between 6 to 8 hours. This means, the agent will be counted in reverse direction of the same counting station.
 						double middleActEndTime = originAct.getEndTime() + 6*3600 + random.nextDouble() * 7200;
 						Activity destinationAct = pf.createActivityFromLinkId( "E2I_Start", destinationActLink.getId());
-						
-						if((middleActEndTime > 20*3600 && middleActEndTime <24*3600) && (countingStationNumber.equals("OC3") || countingStationNumber.equals("OC6")) ) {
-							middleActEndTime = middleActEndTime - (3*3600+random.nextDouble()*3*3600); //pushing departure time of higher counts aroung mid night
+
+						if((middleActEndTime > 20*3600 && middleActEndTime <24*3600)  ) {
+							if ( countingStationNumber.equals("OC3") ) {
+								middleActEndTime = middleActEndTime - (3*3600+random.nextDouble()*3*3600); //preponding departure time of higher counts aroung mid night
+							} else if ( countingStationNumber.equals("OC6")){
+								middleActEndTime = middleActEndTime - (6*3600+random.nextDouble()*3*3600); //preponding departure time of higher counts aroung mid night
+							}
 						}
 
 						if(middleActEndTime >= 24*3600 ) { // midAct - startAct - midAct ==> this will give count in both time bins for desired counting station
-							if(countingStationNumber.equals("OC3") || countingStationNumber.equals("OC6")) {
-								middleActEndTime =  middleActEndTime - (16*3600 + random.nextDouble()*3600*4);//trying to delay end of the midact to get lesser vehicles in early hours of the counting stations.
-							}
-							else middleActEndTime =  middleActEndTime - 24*3600; 
+
+							if(countingStationNumber.equals("OC3") ) {
+								middleActEndTime =  middleActEndTime - (16*3600 + random.nextDouble()*3600*4);
+							} else if(countingStationNumber.equals("OC6")) {
+								middleActEndTime = 6*3600 + random.nextDouble()*3600*7;
+							} else middleActEndTime =  middleActEndTime - 24*3600; 
+
 							middleAct.setEndTime( middleActEndTime );
 							plan.addActivity(middleAct);
 							plan.addLeg(pf.createLeg(mode));
@@ -205,7 +213,7 @@ public class PatnaExternalDemandGenerator {
 				double throughTrafficShare = OuterCordonUtils.getDirectionalFactorFromOuterCordonKey(countingStationKey, "E2E");
 
 				// the total numer of persons are increased to get almost same number of persons as in external to internal counts.
-				if ( countingStationNumber.equals("OC3") || countingStationNumber.equals("OC7") ) throughTrafficShare = 1.25 * throughTrafficShare;
+				if ( countingStationNumber.equals("OC7") ) throughTrafficShare = 1.25 * throughTrafficShare;
 				else if ( countingStationNumber.equals("OC6") ) throughTrafficShare = 1. * throughTrafficShare;
 				else throughTrafficShare = 1.2 * throughTrafficShare;
 
