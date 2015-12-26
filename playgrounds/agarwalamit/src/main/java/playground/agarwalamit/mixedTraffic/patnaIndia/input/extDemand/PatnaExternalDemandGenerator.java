@@ -122,8 +122,8 @@ public class PatnaExternalDemandGenerator {
 				double commutersTrafficShare = OuterCordonUtils.getDirectionalFactorFromOuterCordonKey(countingStationKey, "E2I");
 
 				// the total numer of persons are increased to get almost same number of persons as in external to internal counts.
-				if ( countingStationNumber.equals("OC2") || countingStationNumber.equals("OC3") || countingStationNumber.equals("OC4")) commutersTrafficShare = 1.1 * commutersTrafficShare;
-				else if ( countingStationNumber.equals("OC6") ) commutersTrafficShare = 1. * commutersTrafficShare;
+				if ( countingStationNumber.equals("OC2") || countingStationNumber.equals("OC3") || countingStationNumber.equals("OC6")) commutersTrafficShare = 1.1 * commutersTrafficShare;
+				else if ( countingStationNumber.equals("OC4") ) commutersTrafficShare = 1. * commutersTrafficShare;
 				else if ( countingStationNumber.equals("OC7") ) commutersTrafficShare = 1.25 * commutersTrafficShare;
 				else commutersTrafficShare = 1.2 * commutersTrafficShare;
 
@@ -162,7 +162,7 @@ public class PatnaExternalDemandGenerator {
 							if(countingStationNumber.equals("OC3") ) {
 								middleActEndTime =  middleActEndTime - (16*3600 + random.nextDouble()*3600*4);
 							} else if(countingStationNumber.equals("OC6")) {
-								middleActEndTime = 6*3600 + random.nextDouble()*3600*8;
+								middleActEndTime = 6.5*3600 + random.nextDouble()*3600*8;
 							} else middleActEndTime =  middleActEndTime - 24*3600; 
 
 							middleAct.setEndTime( middleActEndTime );
@@ -214,8 +214,8 @@ public class PatnaExternalDemandGenerator {
 				double throughTrafficShare = OuterCordonUtils.getDirectionalFactorFromOuterCordonKey(countingStationKey, "E2E");
 
 				// the total numer of persons are increased to get almost same number of persons as in external to internal counts.
-				if ( countingStationNumber.equals("OC2") || countingStationNumber.equals("OC3") || countingStationNumber.equals("OC4") ) throughTrafficShare = 1.1 * throughTrafficShare;
-				else if ( countingStationNumber.equals("OC6") ) throughTrafficShare = 1. * throughTrafficShare;
+				if ( countingStationNumber.equals("OC2") || countingStationNumber.equals("OC3") || countingStationNumber.equals("OC6")  ) throughTrafficShare = 1.1 * throughTrafficShare;
+				else if ( countingStationNumber.equals("OC4") ) throughTrafficShare = 1. * throughTrafficShare;
 				else if ( countingStationNumber.equals("OC7") ) throughTrafficShare = 1.25 * throughTrafficShare;
 				else throughTrafficShare = 1.2 * throughTrafficShare;
 
