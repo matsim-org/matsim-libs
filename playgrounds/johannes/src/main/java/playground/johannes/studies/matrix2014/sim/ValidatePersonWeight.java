@@ -16,41 +16,28 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.synpop.analysis;
+package playground.johannes.studies.matrix2014.sim;
 
-import org.apache.log4j.Logger;
-import playground.johannes.synpop.util.Executor;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
+import playground.johannes.synpop.data.CommonKeys;
+import playground.johannes.synpop.data.CommonValues;
+import playground.johannes.synpop.data.Person;
+import playground.johannes.synpop.processing.PersonTask;
 
 /**
  * @author jillenberger
  */
-public class ConcurrentAnalyzerTask<T> extends AnalyzerTaskComposite<T> {
-
-    private static final Logger logger = Logger.getLogger(ConcurrentAnalyzerTask.class);
+public class ValidatePersonWeight implements PersonTask {
 
     @Override
-    public void analyze(final T object, final List<StatsContainer> containers) {
-        final List<StatsContainer> concurrentContainers = new CopyOnWriteArrayList<>();
+    public void apply(Person person) {
+        double w = Double.parseDouble(person.getAttribute(CommonKeys.PERSON_WEIGHT));
+        boolean valid = true;
+        if(Double.isInfinite(w)) valid = false;
+        else if(Double.isNaN(w)) valid = false;
+        else if(w == 0) valid = false;
 
-        List<Runnable> runnables = new ArrayList<>(components.size());
-        for (final AnalyzerTask<T> task : components) {
-            runnables.add(new Runnable() {
-                @Override
-                public void run() {
-                    task.analyze(object, concurrentContainers);
-                }
-            });
-            logger.debug(String.format("Submitting analyzer task %s...", task.getClass().getSimpleName()));
+        if(!valid) {
+            person.setAttribute(CommonKeys.DELETE, CommonValues.TRUE);
         }
-
-        Executor.submitAndWait(runnables);
-
-        containers.addAll(concurrentContainers);
-
-        logger.debug("Tasks done.");
     }
 }

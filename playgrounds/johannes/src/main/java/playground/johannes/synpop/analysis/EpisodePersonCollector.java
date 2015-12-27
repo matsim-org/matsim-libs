@@ -18,39 +18,33 @@
  * *********************************************************************** */
 package playground.johannes.synpop.analysis;
 
-import org.apache.log4j.Logger;
-import playground.johannes.synpop.util.Executor;
+import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.data.Person;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * @author jillenberger
  */
-public class ConcurrentAnalyzerTask<T> extends AnalyzerTaskComposite<T> {
+public class EpisodePersonCollector<T> extends AbstractCollector<T, Person, Episode> {
 
-    private static final Logger logger = Logger.getLogger(ConcurrentAnalyzerTask.class);
+    public EpisodePersonCollector(ValueProvider<T, Person> provider) {
+        super(provider);
+    }
 
     @Override
-    public void analyze(final T object, final List<StatsContainer> containers) {
-        final List<StatsContainer> concurrentContainers = new CopyOnWriteArrayList<>();
-
-        List<Runnable> runnables = new ArrayList<>(components.size());
-        for (final AnalyzerTask<T> task : components) {
-            runnables.add(new Runnable() {
-                @Override
-                public void run() {
-                    task.analyze(object, concurrentContainers);
+    public List<T> collect(Collection<? extends Person> persons) {
+        List<T> values = new ArrayList<>(persons.size() * 2);
+        for(Person p : persons) {
+            for(Episode e : p.getEpisodes()) {
+                if(predicate == null || predicate.test(e)) {
+                    values.add(provider.get(p));
                 }
-            });
-            logger.debug(String.format("Submitting analyzer task %s...", task.getClass().getSimpleName()));
+            }
         }
 
-        Executor.submitAndWait(runnables);
-
-        containers.addAll(concurrentContainers);
-
-        logger.debug("Tasks done.");
+        return values;
     }
 }

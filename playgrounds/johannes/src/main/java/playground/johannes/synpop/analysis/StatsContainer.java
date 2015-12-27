@@ -18,11 +18,16 @@
  * *********************************************************************** */
 package playground.johannes.synpop.analysis;
 
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.math.stat.StatUtils;
 import org.matsim.contrib.common.collections.CollectionUtils;
 import org.matsim.contrib.common.stats.WeightedSampleMean;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * @author jillenberger
@@ -69,9 +74,9 @@ public class StatsContainer {
         }
     }
 
-    public StatsContainer(String name, List<Double> values, List<Double> weitghs) {
+    public StatsContainer(String name, List<Double> values, List<Double> weights) {
         this(name);
-        List<double[]> valuesList = playground.johannes.studies.matrix2014.analysis.CollectionUtils.toNativeArray(values, weitghs);
+        List<double[]> valuesList = playground.johannes.studies.matrix2014.analysis.CollectionUtils.toNativeArray(values, weights);
         init(valuesList.get(0), valuesList.get(1));
 
         nullValues = new Integer(0);
@@ -91,9 +96,12 @@ public class StatsContainer {
 
     private void init(double[] values, double[] weights) {
         WeightedSampleMean wsm = new WeightedSampleMean();
+        median = calculateWeightedMedian(values, weights);
+
         for(int i = 0; i < weights.length; i++) weights[i] = 1/weights[i];
         wsm.setPiValues(weights);
         mean = wsm.evaluate(values);
+
 
         min = StatUtils.min(values);
         max = StatUtils.max(values);
@@ -130,5 +138,39 @@ public class StatsContainer {
 
     public Double getVariance() {
         return variance;
+    }
+
+    private double calculateWeightedMedian(double[] values, double[] weights) {
+        Set<Pair<Double, Double>> set = new TreeSet<>(new Comparator() {
+            @Override
+            public int compare(Object o1, Object o2) {
+                Pair<Double, Double> p1 = (Pair)o1;
+                Pair<Double, Double> p2 = (Pair)o2;
+
+                int result = p1.getLeft().compareTo(p2.getLeft());
+                if(result == 0) {
+                    if(p1 == p2) result = 0;
+                    else result = 1;
+                }
+                return result;
+            }
+        });
+
+        double wsum = 0;
+        for(int i = 0; i < values.length; i++) {
+            set.add(new ImmutablePair<>(values[i], weights[i]));
+            wsum += weights[i];
+        }
+
+        double middle = wsum/2.0;
+        wsum = 0;
+        for(Pair<Double, Double> pair : set) {
+            wsum += pair.getRight();
+            if(wsum >= middle) {
+                return pair.getLeft();
+            }
+        }
+
+        return Double.NaN;
     }
 }
