@@ -54,7 +54,7 @@ import playground.agarwalamit.utils.LoadMyScenarios;
 
 public class AgentPositionWriter {
 
-	private final static double snapshotPeriod = 2;
+	private final static double snapshotPeriod = 10;
 	private final double trackLength = 3000;
 
 	public static void main(String[] args) 
@@ -62,7 +62,9 @@ public class AgentPositionWriter {
 		final String dir = "../../../../repos/shared-svn/projects/mixedTraffic/triangularNetwork/run313/xtPlots/holes/car/";
 		final String networkFile = dir+"/network.xml";
 		final String configFile = dir+"/config.xml";
-		final String eventsFile = dir+"/events/events[5].xml";
+		final String prefix = "events[400]";
+		final String eventsFile = dir+"/events/"+prefix+".xml";
+		
 		Scenario sc = LoadMyScenarios.loadScenarioFromNetworkAndConfig(networkFile, configFile);
 
 		//sc.getConfig().qsim().setSnapshotStyle(SnapshotStyle.withHoles);// not supported
@@ -70,7 +72,7 @@ public class AgentPositionWriter {
 		sc.getConfig().qsim().setSnapshotPeriod(snapshotPeriod);
 		sc.getConfig().controler().setSnapshotFormat(Arrays.asList("transims"));
 
-		AgentPositionWriter apw = new AgentPositionWriter(dir+"rDataPersonPosition.txt", sc, eventsFile); 
+		AgentPositionWriter apw = new AgentPositionWriter(dir+"rDataPersonPosition_"+prefix+".txt", sc, eventsFile); 
 		apw.run();
 	}
 
@@ -142,16 +144,24 @@ public class AgentPositionWriter {
 					double time = Double.parseDouble( strs.get( labels.indexOf( Labels.TIME.toString() ) ) ) ;
 					double easting = Double.parseDouble( strs.get( labels.indexOf( Labels.EASTING.toString() ) ) ) ;
 					double northing = Double.parseDouble( strs.get( labels.indexOf( Labels.NORTHING.toString() ) ) ) ;
-					double velocity = Double.parseDouble( strs.get( labels.indexOf( Labels.VELOCITY.toString() ) ) ) ;
+//					double velocity = Double.parseDouble( strs.get( labels.indexOf( Labels.VELOCITY.toString() ) ) ) ;
 					Id<Person> agentId = Id.createPersonId( strs.get( labels.indexOf( Labels.VEHICLE.toString() ) ) ) ;
+					if(agentId.toString().equals("268") && time == 2440.0) {
+						System.out.println(strs);
+					}
 					try {
 						if( prevEasting.containsKey(agentId) ){
-							double dist = prevPosition.get(agentId) + Math.sqrt( (easting - prevEasting.get(agentId))*(easting - prevEasting.get(agentId)) 
+							double currentDist = Math.sqrt( (easting - prevEasting.get(agentId))*(easting - prevEasting.get(agentId)) 
 									+ (northing- prevNorthing.get(agentId))*(northing- prevNorthing.get(agentId)) );
-							dist = dist>=trackLength ? dist-trackLength : dist;
-							writer.write(agentId+"\t"+person2mode.get(agentId)+"\t"+dist+"\t"+time+"\t"+velocity+"\n");
-							prevPosition.put(agentId, dist);
+							
+							double velocity = currentDist / (snapshotPeriod); // denominator should be equal to snapshot period.
+							
+							double postion = prevPosition.get(agentId) + currentDist ;
+							postion = postion >= trackLength ? postion-trackLength : postion;
+							writer.write(agentId+"\t"+person2mode.get(agentId)+"\t"+postion+"\t"+time+"\t"+velocity+"\n");
+							prevPosition.put(agentId, postion);
 						}  else {
+							double velocity = 16.67;
 							writer.write(agentId+"\t"+person2mode.get(agentId)+"\t"+0.+"\t"+time+"\t"+velocity+"\n");
 							prevPosition.put(agentId, 0.);
 						}
