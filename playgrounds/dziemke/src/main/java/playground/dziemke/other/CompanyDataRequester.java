@@ -34,7 +34,7 @@ public class CompanyDataRequester {
 
     public static void main(String[] args) {
         long time = System.currentTimeMillis();
-        int dif = 10;
+        int dif = 1000;
         boolean continueWriting = true;
         int e = 1;
         do {
@@ -108,7 +108,7 @@ public class CompanyDataRequester {
                     InputStreamReader inputStreamReader = new InputStreamReader(url.openStream());
                     BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
 
-                    //log.error("Reading companyData page " + i);
+                    log.error("Reading companyData page " + i);
 
                     String line;
                     try {
