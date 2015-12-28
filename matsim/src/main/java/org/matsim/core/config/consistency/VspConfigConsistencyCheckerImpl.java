@@ -79,8 +79,8 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 		case withHoles:
 			break;
 		default:
-			log.log( lvl,  " found 'qsim.trafficDynamics==" + config.qsim().getTrafficDynamics() + "'; vsp should try out `" 
-					+ TrafficDynamics.withHoles + "' and report." ) ;
+			log.log( lvl,  " found 'qsim.trafficDynamics==" + config.qsim().getTrafficDynamics() + "'; vsp standard is`" 
+					+ TrafficDynamics.withHoles + "'." ) ;
 			break;
 		}
 		
