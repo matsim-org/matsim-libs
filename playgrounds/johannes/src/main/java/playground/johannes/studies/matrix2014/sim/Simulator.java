@@ -36,6 +36,7 @@ import playground.johannes.studies.matrix2014.analysis.MatrixWriter;
 import playground.johannes.studies.matrix2014.analysis.NumericLegAnalyzer;
 import playground.johannes.studies.matrix2014.analysis.ZoneMobilityRate;
 import playground.johannes.studies.matrix2014.config.MatrixAnalyzerConfigurator;
+import playground.johannes.studies.matrix2014.config.ODCalibratorConfigurator;
 import playground.johannes.studies.matrix2014.gis.TransferZoneAttribute;
 import playground.johannes.studies.matrix2014.gis.ValidateFacilities;
 import playground.johannes.studies.matrix2014.gis.ZoneSetLAU2Class;
@@ -44,8 +45,6 @@ import playground.johannes.synpop.analysis.*;
 import playground.johannes.synpop.data.*;
 import playground.johannes.synpop.data.io.PopulationIO;
 import playground.johannes.synpop.gis.*;
-import playground.johannes.synpop.matrix.NumericMatrix;
-import playground.johannes.synpop.matrix.NumericMatrixTxtIO;
 import playground.johannes.synpop.processing.*;
 import playground.johannes.synpop.sim.*;
 import playground.johannes.synpop.sim.data.Converters;
@@ -95,7 +94,7 @@ public class Simulator {
         logger.info("Analyzing reference population...");
         ioContext.append("ref");
         AnalyzerTaskRunner.run(refPersons, task, ioContext);
-		/*
+        /*
 		Generating simulation population...
 		 */
         Set<Person> simPersons = generateSimPopulation(refPersons, dataPool, config, random);
@@ -122,13 +121,10 @@ public class Simulator {
         /*
         Setup matrix calibrator
          */
-        NumericMatrix refMatrix = new NumericMatrix();
-        NumericMatrixTxtIO.read(refMatrix, config.getParam(MODULE_NAME, "calibrationMatrix"));
-        String layerName = config.getParam(MODULE_NAME, "calibrationLayerName");
-//        ODDistribution odDistribution = new ODDistribution(simPersons, refMatrix, dataPool, layerName, "NO", 100000);
-        ODCalibrator odDistribution = new ODCalibratorBuilder().build(refMatrix, dataPool, layerName, "NO", 100000, new CachedModePredicate(CommonKeys.LEG_MODE, CommonValues.LEG_MODE_CAR));
-        long delay = (long) Double.parseDouble(config.getParam(MODULE_NAME, "calibrationDelay"));
-        DelayedHamiltonian odDistributionDelayed = new DelayedHamiltonian(odDistribution, delay);
+        ODCalibrator odDistribution = new ODCalibratorConfigurator(dataPool).configure(config.getModule("tomtomCalibrator"));
+        odDistribution.setUseWeights(true);
+        odDistribution.setPredicate(new CachedModePredicate(CommonKeys.LEG_MODE, CommonValues.LEG_MODE_CAR));
+        DelayedHamiltonian odDistributionDelayed = new DelayedHamiltonian(odDistribution, Integer.parseInt(config.getParam(MODULE_NAME, "delay_matrix")));
         hamiltonian.addComponent(odDistributionDelayed, Double.parseDouble(config.getParam(MODULE_NAME,
                 "theta_matrix")));
 		/*
@@ -276,7 +272,7 @@ public class Simulator {
         mAnalyzer.setUseWeights(true);
         task.addComponent(mAnalyzer);
 
-        ActivityFacilities facilities = ((FacilityData)dataPool.get(FacilityDataLoader.KEY)).getAll();
+        ActivityFacilities facilities = ((FacilityData) dataPool.get(FacilityDataLoader.KEY)).getAll();
         MatrixWriter matrixWriter = new MatrixWriter(facilities, zones, ioContext);
         matrixWriter.setPredicate(modePredicate);
         matrixWriter.setUseWeights(true);
@@ -338,7 +334,7 @@ public class Simulator {
 
     private static AnalyzerTask<Collection<? extends Person>> buildGeoDistanceAnalyzer(AnalyzerTaskComposite<Collection<? extends Person>> tasks, FileIOContext ioContext, Collection<Person> persons) {
         HistogramWriter histogramWriter = new HistogramWriter(ioContext, new StratifiedDiscretizerBuilder(100, 100));
-        histogramWriter.addBuilder( new PassThroughDiscretizerBuilder(new LinearDiscretizer(50000), "linear"));
+        histogramWriter.addBuilder(new PassThroughDiscretizerBuilder(new LinearDiscretizer(50000), "linear"));
 
         Predicate<Segment> modePredicate = new ModePredicate(CommonValues.LEG_MODE_CAR);
 
@@ -361,10 +357,10 @@ public class Simulator {
         purposeCollector.setPredicate(modePredicate);
         Set<String> purposes = new HashSet<>(purposeCollector.collect(persons));
         purposes.remove(null);
-        for(String purpose : purposes) {
+        for (String purpose : purposes) {
             Predicate<Segment> purposePredicate = new LegAttributePredicate(CommonKeys.LEG_PURPOSE, purpose);
             predicate = PredicateAndComposite.create(modePredicate, purposePredicate);
-            tasks.addComponent(NumericLegAnalyzer.create(CommonKeys.LEG_GEO_DISTANCE, true, predicate, "car."+purpose, histogramWriter));
+            tasks.addComponent(NumericLegAnalyzer.create(CommonKeys.LEG_GEO_DISTANCE, true, predicate, "car." + purpose, histogramWriter));
         }
 
         return tasks;
@@ -378,9 +374,9 @@ public class Simulator {
         Set<Person> persons2 = new HashSet<>();
 
         TripsCounter counter = new TripsCounter(new ModePredicate(CommonValues.LEG_MODE_CAR));
-        for(Person p : refPersons) {
+        for (Person p : refPersons) {
             double w = Double.parseDouble(p.getAttribute(CommonKeys.PERSON_WEIGHT));
-            if(counter.get(p.getEpisodes().get(0)) == 1) {
+            if (counter.get(p.getEpisodes().get(0)) == 1) {
                 wsum2 += w;
                 persons2.add(p);
             } else {
@@ -389,16 +385,16 @@ public class Simulator {
             }
         }
 
-        int n1 = size/2;
+        int n1 = size / 2;
         int n2 = size - n1;
         Set<? extends Person> simPersons1 = PersonUtils.weightedCopy(persons1, new PlainFactory(), n1, random);
         Set<? extends Person> simPersons2 = PersonUtils.weightedCopy(persons2, new PlainFactory(), n2, random);
 
-        double w1 = (wsum1 * n2) /(wsum2 * n1);
+        double w1 = (wsum1 * n2) / (wsum2 * n1);
         double w2 = 1.0;
 
-        for(Person p : simPersons1) p.setAttribute(CommonKeys.PERSON_WEIGHT, String.valueOf(w1));
-        for(Person p : simPersons2) p.setAttribute(CommonKeys.PERSON_WEIGHT, String.valueOf(w2));
+        for (Person p : simPersons1) p.setAttribute(CommonKeys.PERSON_WEIGHT, String.valueOf(w1));
+        for (Person p : simPersons2) p.setAttribute(CommonKeys.PERSON_WEIGHT, String.valueOf(w2));
 
         Set<Person> all = new HashSet<>();
         all.addAll(simPersons1);

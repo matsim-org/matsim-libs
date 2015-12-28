@@ -19,6 +19,7 @@
 
 package playground.johannes.studies.matrix2014.sim;
 
+import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Point;
 import gnu.trove.iterator.TIntDoubleIterator;
 import gnu.trove.iterator.TIntObjectIterator;
@@ -28,16 +29,21 @@ import gnu.trove.map.hash.TObjectIntHashMap;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.common.gis.CartesianDistanceCalculator;
 import org.matsim.contrib.common.gis.DistanceCalculator;
+import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import playground.johannes.synpop.analysis.Predicate;
 import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.Episode;
 import playground.johannes.synpop.data.Person;
+import playground.johannes.synpop.gis.Zone;
+import playground.johannes.synpop.gis.ZoneCollection;
+import playground.johannes.synpop.matrix.NumericMatrix;
 import playground.johannes.synpop.sim.AttributeChangeListener;
 import playground.johannes.synpop.sim.Hamiltonian;
 import playground.johannes.synpop.sim.data.*;
 
 import java.util.Collection;
+import java.util.Set;
 
 /**
  * @author johannes
@@ -64,29 +70,40 @@ public class ODCalibrator implements Hamiltonian, AttributeChangeListener {
 
     private final long rescaleInterval = (long) 1e7;
 
-    private final double distanceThreshold;
+    private double distanceThreshold;
 
-    private final double volumeThreshold;
+    private double volumeThreshold;
 
-    private final Predicate<CachedSegment> predicate;
+    private Predicate<CachedSegment> predicate;
 
-    private final double refSum;
+    private double refSum;
 
-    private final boolean useWeights;
+    private boolean useWeights;
 
     private Object weightDataKey;
 
     public ODCalibrator(TIntObjectHashMap<TIntDoubleHashMap> refMatrix, TObjectIntHashMap<ActivityFacility>
-            facility2Index, TIntObjectHashMap<Point> index2Point, double threshold, double volumeThreshold, Predicate<CachedSegment> predicate, boolean useWeights) {
+            facility2Index, TIntObjectHashMap<Point> index2Point) {
         this.refMatrix = refMatrix;
         this.facility2Index = facility2Index;
         this.index2Point = index2Point;
-        this.distanceThreshold = threshold;
-        this.volumeThreshold = volumeThreshold;
-        this.predicate = predicate;
-        this.useWeights = useWeights;
+        this.distanceThreshold = 0;
+    }
 
-        refSum = calculateSum(refMatrix, threshold);
+    public void setPredicate(Predicate<CachedSegment> predicate) {
+        this.predicate = predicate;
+    }
+
+    public void setUseWeights(boolean useWeights) {
+        this.useWeights = useWeights;
+    }
+
+    public void setDistanceThreshold(double threshold) {
+        this.distanceThreshold = threshold;
+    }
+
+    public void setVolumeThreshold(double threshold) {
+        this.volumeThreshold = threshold;
     }
 
     private void calculateScaleFactor() {
@@ -176,7 +193,7 @@ public class ODCalibrator implements Hamiltonian, AttributeChangeListener {
             if there is a preceding trip...
              */
                 CachedSegment toLeg = (CachedSegment) act.previous();
-                if (toLeg != null && predicate.test(toLeg)) {
+                if (toLeg != null && (predicate == null || predicate.test(toLeg))) {
                     CachedSegment prevAct = (CachedSegment) toLeg.previous();
                     ActivityFacility prevFac = (ActivityFacility) prevAct.getData(facilityDataKey);
 
@@ -208,7 +225,7 @@ public class ODCalibrator implements Hamiltonian, AttributeChangeListener {
             if there is a succeeding trip...
              */
                 CachedSegment fromLeg = (CachedSegment) act.next();
-                if (fromLeg != null && predicate.test(fromLeg)) {
+                if (fromLeg != null && (predicate == null || predicate.test(fromLeg))) {
                     CachedSegment nextAct = (CachedSegment) fromLeg.next();
                     ActivityFacility nextFac = (ActivityFacility) nextAct.getData(facilityDataKey);
 
@@ -243,6 +260,7 @@ public class ODCalibrator implements Hamiltonian, AttributeChangeListener {
     @Override
     public double evaluate(Collection<CachedPerson> population) {
         if (simMatrix == null) {
+            refSum = calculateSum(refMatrix, distanceThreshold);
             initSimMatrix(population);
             calculateScaleFactor();
             initHamiltonian();
@@ -324,5 +342,66 @@ public class ODCalibrator implements Hamiltonian, AttributeChangeListener {
         }
 
         return sum;
+    }
+
+    public static class Builder {
+
+        private final TIntObjectHashMap<TIntDoubleHashMap> refMatrix;
+
+        private final TObjectIntHashMap<ActivityFacility> facility2Index;
+
+        private final TIntObjectHashMap<Point> index2Point;
+
+        public Builder(NumericMatrix refKeyMatrix, ZoneCollection zones, ActivityFacilities facilities) {
+            Set<Zone> zoneSet = zones.getZones();
+            TObjectIntHashMap<String> id2Index = new TObjectIntHashMap<>(zoneSet.size());
+            index2Point = new TIntObjectHashMap<>();
+
+            int index = 0;
+            for(Zone zone : zoneSet) {
+                id2Index.put(zone.getAttribute(zones.getPrimaryKey()), index);
+                index2Point.put(index, zone.getGeometry().getCentroid());
+
+                index++;
+            }
+
+            facility2Index = new TObjectIntHashMap<>();
+
+            for(ActivityFacility fac : facilities.getFacilities().values()) {
+                Zone zone = zones.get(new Coordinate(fac.getCoord().getX(), fac.getCoord().getY()));
+                int idx = id2Index.get(zone.getAttribute(zones.getPrimaryKey()));
+                facility2Index.put(fac, idx);
+            }
+
+
+            refMatrix = new TIntObjectHashMap<>();
+            Set<String> keys = refKeyMatrix.keys();
+            for(String i : keys) {
+                int idx_i = id2Index.get(i);
+                for(String j : keys) {
+                    Double val = refKeyMatrix.get(i, j);
+                    if(val != null) {
+                        int idx_j = id2Index.get(j);
+                        adjustCellValue(idx_i, idx_j, val, refMatrix);
+                    }
+                }
+            }
+        }
+
+
+        public ODCalibrator build() {
+            return new ODCalibrator(refMatrix, facility2Index, index2Point);
+        }
+
+
+
+        private void adjustCellValue(int i, int j, double amount, TIntObjectHashMap<TIntDoubleHashMap> matrix) {
+            TIntDoubleHashMap row = matrix.get(i);
+            if(row == null) {
+                row = new TIntDoubleHashMap();
+                matrix.put(i, row);
+            }
+            row.adjustOrPutValue(j, amount, amount);
+        }
     }
 }
