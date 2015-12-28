@@ -35,10 +35,7 @@ import playground.johannes.synpop.data.Episode;
 import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.sim.AttributeChangeListener;
 import playground.johannes.synpop.sim.Hamiltonian;
-import playground.johannes.synpop.sim.data.CachedElement;
-import playground.johannes.synpop.sim.data.CachedPerson;
-import playground.johannes.synpop.sim.data.CachedSegment;
-import playground.johannes.synpop.sim.data.Converters;
+import playground.johannes.synpop.sim.data.*;
 
 import java.util.Collection;
 
@@ -67,25 +64,33 @@ public class ODCalibrator implements Hamiltonian, AttributeChangeListener {
 
     private final long rescaleInterval = (long) 1e7;
 
-    private final double threshold;
+    private final double distanceThreshold;
+
+    private final double volumeThreshold;
 
     private final Predicate<CachedSegment> predicate;
 
     private final double refSum;
 
+    private final boolean useWeights;
+
+    private Object weightDataKey;
+
     public ODCalibrator(TIntObjectHashMap<TIntDoubleHashMap> refMatrix, TObjectIntHashMap<ActivityFacility>
-            facility2Index, TIntObjectHashMap<Point> index2Point, double threshold, Predicate<CachedSegment> predicate) {
+            facility2Index, TIntObjectHashMap<Point> index2Point, double threshold, double volumeThreshold, Predicate<CachedSegment> predicate, boolean useWeights) {
         this.refMatrix = refMatrix;
         this.facility2Index = facility2Index;
         this.index2Point = index2Point;
-        this.threshold = threshold;
+        this.distanceThreshold = threshold;
+        this.volumeThreshold = volumeThreshold;
         this.predicate = predicate;
+        this.useWeights = useWeights;
 
         refSum = calculateSum(refMatrix, threshold);
     }
 
     private void calculateScaleFactor() {
-        double simSum = calculateSum(simMatrix, threshold);
+        double simSum = calculateSum(simMatrix, distanceThreshold);
         scaleFactor = simSum / refSum;
 
         logger.debug(String.format("Recalculated scale factor: %s.", scaleFactor));
@@ -93,18 +98,24 @@ public class ODCalibrator implements Hamiltonian, AttributeChangeListener {
 
     private void initHamiltonian() {
         hamiltonianValue = 0;
+        long cnt = 0;
         int[] indices = index2Point.keys();
         for (int i : indices) {
             Point p_i = index2Point.get(i);
             for (int j : indices) {
                 Point p_j = index2Point.get(j);
-                if (CartesianDistanceCalculator.getInstance().distance(p_i, p_j) >= threshold) {
-                    double simVal = getCellValue(i, j, simMatrix);
+                if (CartesianDistanceCalculator.getInstance().distance(p_i, p_j) >= distanceThreshold) {
                     double refVal = getCellValue(i, j, refMatrix);
-                    hamiltonianValue += calculateError(simVal, refVal);
+                    if(refVal >= volumeThreshold) {
+                        double simVal = getCellValue(i, j, simMatrix);
+                        hamiltonianValue += calculateError(simVal, refVal);
+                        cnt++;
+                    }
                 }
             }
         }
+
+        logger.debug(String.format("Calibrating against %s OD pairs.", cnt));
     }
 
     private void initSimMatrix(Collection<? extends CachedPerson> persons) {
@@ -116,6 +127,9 @@ public class ODCalibrator implements Hamiltonian, AttributeChangeListener {
         simMatrix = new TIntObjectHashMap<>();
 
         for (Person person : persons) {
+            double weight = 1.0;
+            if(useWeights) weight = Double.parseDouble(person.getAttribute(CommonKeys.PERSON_WEIGHT));
+
             for (Episode episode : person.getEpisodes()) {
                 for (int i = 1; i < episode.getActivities().size(); i++) {
 
@@ -131,7 +145,7 @@ public class ODCalibrator implements Hamiltonian, AttributeChangeListener {
                         int idx_i = facility2Index.get(originFac);
                         int idx_j = facility2Index.get(destinationFac);
 
-                        adjustCellValue(idx_i, idx_j, 1.0, simMatrix);
+                        adjustCellValue(idx_i, idx_j, weight, simMatrix);
                     }
                 }
             }
@@ -143,10 +157,13 @@ public class ODCalibrator implements Hamiltonian, AttributeChangeListener {
     @Override
     public void onChange(Object dataKey, Object oldValue, Object newValue, CachedElement element) {
         if (simMatrix != null) {
-            if (this.facilityDataKey == null)
-                this.facilityDataKey = Converters.getObjectKey(CommonKeys.ACTIVITY_FACILITY);
-
             if (this.facilityDataKey.equals(dataKey)) {
+                if (this.facilityDataKey == null)
+                    this.facilityDataKey = Converters.getObjectKey(CommonKeys.ACTIVITY_FACILITY);
+
+                if(weightDataKey == null)
+                    weightDataKey = Converters.register(CommonKeys.PERSON_WEIGHT, DoubleConverter.getInstance());
+
                 changeCounter++;
                 if (changeCounter % rescaleInterval == 0) {
                     calculateScaleFactor();
@@ -166,21 +183,24 @@ public class ODCalibrator implements Hamiltonian, AttributeChangeListener {
                     int i = facility2Index.get(prevFac);
                     int j = oldIdx;
 
-                    Point p_i = index2Point.get(i);
-                    Point p_j = index2Point.get(j);
+                    //Point p_i = index2Point.get(i);
+                    //Point p_j = index2Point.get(j);
 
-                    double diff1 = changeCellContent(i, j, -1.0);
-                    if (CartesianDistanceCalculator.getInstance().distance(p_i, p_j) < threshold) {
-                        diff1 = 0;
-                    }
+                    double w = 1.0;
+                    if(useWeights) w = (Double)toLeg.getData(weightDataKey);
+
+                    double diff1 = changeCellContent(i, j, -w);
+                    //if (CartesianDistanceCalculator.getInstance().distance(p_i, p_j) < distanceThreshold) {
+                    //    diff1 = 0;
+                   // }
 
                     j = newIdx;
-                    p_j = index2Point.get(j);
+                    //p_j = index2Point.get(j);
 
-                    double diff2 = changeCellContent(i, j, 1.0);
-                    if (CartesianDistanceCalculator.getInstance().distance(p_i, p_j) < threshold) {
-                        diff2 = 0;
-                    }
+                    double diff2 = changeCellContent(i, j, w);
+                    //if (CartesianDistanceCalculator.getInstance().distance(p_i, p_j) < distanceThreshold) {
+                    //    diff2 = 0;
+                    //}
 
                     hamiltonianValue += diff1 + diff2;
                 }
@@ -195,21 +215,24 @@ public class ODCalibrator implements Hamiltonian, AttributeChangeListener {
                     int i = oldIdx;
                     int j = facility2Index.get(nextFac);
 
-                    Point p_i = index2Point.get(i);
-                    Point p_j = index2Point.get(j);
+                    //Point p_i = index2Point.get(i);
+                    //Point p_j = index2Point.get(j);
 
-                    double diff1 = changeCellContent(i, j, -1.0);
-                    if (CartesianDistanceCalculator.getInstance().distance(p_i, p_j) < threshold) {
-                        diff1 = 0;
-                    }
+                    double w = 1.0;
+                    if(useWeights) w = (Double)fromLeg.getData(weightDataKey);
+
+                    double diff1 = changeCellContent(i, j, -w);
+                    //if (CartesianDistanceCalculator.getInstance().distance(p_i, p_j) < distanceThreshold) {
+                    //    diff1 = 0;
+                    //}
 
                     i = newIdx;
-                    p_i = index2Point.get(i);
+                    //p_i = index2Point.get(i);
 
-                    double diff2 = changeCellContent(i, j, 1.0);
-                    if (CartesianDistanceCalculator.getInstance().distance(p_i, p_j) < threshold) {
-                        diff2 = 0;
-                    }
+                    double diff2 = changeCellContent(i, j, w);
+                    //if (CartesianDistanceCalculator.getInstance().distance(p_i, p_j) < distanceThreshold) {
+                    //    diff2 = 0;
+                    //}
 
                     hamiltonianValue += diff1 + diff2;
                 }
@@ -228,17 +251,25 @@ public class ODCalibrator implements Hamiltonian, AttributeChangeListener {
     }
 
     private double changeCellContent(int i, int j, double amount) {
-        double simVal = getCellValue(i, j, simMatrix);
+        Point p_i = index2Point.get(i);
+        Point p_j = index2Point.get(j);
+
         double refVal = getCellValue(i, j, refMatrix);
-        double oldDiff = calculateError(simVal, refVal);
 
-        adjustCellValue(i, j, amount, simMatrix);
+        if(refVal >= volumeThreshold && CartesianDistanceCalculator.getInstance().distance(p_i, p_j) >= distanceThreshold) {
+            double simVal = getCellValue(i, j, simMatrix);
+            double oldDiff = calculateError(simVal, refVal);
 
-        simVal = getCellValue(i, j, simMatrix);
-        refVal = getCellValue(i, j, refMatrix);
-        double newDiff = calculateError(simVal, refVal);
+            adjustCellValue(i, j, amount, simMatrix);
 
-        return newDiff - oldDiff;
+            simVal = getCellValue(i, j, simMatrix);
+            double newDiff = calculateError(simVal, refVal);
+
+            return newDiff - oldDiff;
+        } else {
+            adjustCellValue(i, j, amount, simMatrix);
+            return 0.0;
+        }
     }
 
     private void adjustCellValue(int i, int j, double amount, TIntObjectHashMap<TIntDoubleHashMap> matrix) {

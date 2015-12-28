@@ -20,21 +20,13 @@
 package playground.johannes.synpop.analysis;
 
 import playground.johannes.synpop.data.CommonKeys;
-import playground.johannes.synpop.data.Segment;
 
 /**
  * @author johannes
  */
-public class ModePredicate implements Predicate<Segment> {
-
-    private final String mode;
+public class ModePredicate extends LegAttributePredicate {
 
     public ModePredicate(String mode) {
-        this.mode = mode;
-    }
-
-    @Override
-    public boolean test(Segment segment) {
-        return mode.equalsIgnoreCase(segment.getAttribute(CommonKeys.LEG_MODE));
+        super(CommonKeys.LEG_MODE, mode);
     }
 }

@@ -65,7 +65,7 @@ public class ODCalibratorBuilder {
             facility2Index.put(fac, idx);
         }
 
-        return new ODCalibrator(refMatrix, facility2Index, index2Point, threshold, predicate);
+        return new ODCalibrator(refMatrix, facility2Index, index2Point, threshold, 100, predicate, true);
     }
 
     private TIntObjectHashMap<TIntDoubleHashMap> initRefMatrix(NumericMatrix keyMatrix, TObjectIntHashMap<String> id2Idx) {

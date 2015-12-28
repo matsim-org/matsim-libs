@@ -34,6 +34,14 @@ public class LegAttributePredicate implements Predicate<Segment> {
         this.value = value;
     }
 
+    public String getKey() {
+        return key;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
     @Override
     public boolean test(Segment segment) {
         return value.equals(segment.getAttribute(key));

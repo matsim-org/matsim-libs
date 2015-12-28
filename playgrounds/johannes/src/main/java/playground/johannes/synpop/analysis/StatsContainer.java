@@ -44,7 +44,7 @@ public class StatsContainer {
 
     private Double max;
 
-    private Integer N;
+    private Double N;
 
     private Integer nullValues;
 
@@ -90,7 +90,7 @@ public class StatsContainer {
         median = StatUtils.percentile(values, 50);
         min = StatUtils.min(values);
         max = StatUtils.max(values);
-        N = values.length;
+        N = new Double(values.length);
         variance = StatUtils.variance(values);
     }
 
@@ -105,7 +105,7 @@ public class StatsContainer {
 
         min = StatUtils.min(values);
         max = StatUtils.max(values);
-        N = values.length;
+        N = StatUtils.sum(weights);
     }
 
     public String getName() {
@@ -128,7 +128,7 @@ public class StatsContainer {
         return max;
     }
 
-    public Integer getN() {
+    public Double getN() {
         return N;
     }
 

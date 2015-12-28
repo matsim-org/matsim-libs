@@ -18,30 +18,28 @@
  * *********************************************************************** */
 package playground.johannes.synpop.analysis;
 
-import org.matsim.contrib.common.stats.LinearDiscretizer;
-import playground.johannes.synpop.data.CommonKeys;
-import playground.johannes.synpop.data.CommonValues;
 import playground.johannes.synpop.data.Episode;
-import playground.johannes.synpop.data.Person;
+import playground.johannes.synpop.data.Segment;
 
 /**
  * @author jillenberger
  */
-public class TripsPerPersonTask {
+public class TripsCounter implements ValueProvider<Double, Episode> {
 
-    public NumericAnalyzer build(FileIOContext ioContext) {
-        ValueProvider<Double, Episode> provider = new TripsCounter(new ModePredicate(CommonValues.LEG_MODE_CAR));
-        EpisodeCollector<Double> collector = new EpisodeCollector<>(provider);
+    private Predicate<Segment> predicate;
 
-        DiscretizerBuilder builder = new PassThroughDiscretizerBuilder(new LinearDiscretizer(1.0), "linear");
-        HistogramWriter writer = new HistogramWriter(ioContext, builder);
-
-        ValueProvider<Double, Person> weightsProvider = new NumericAttributeProvider<>(CommonKeys.PERSON_WEIGHT);
-        EpisodePersonCollector<Double> weightsCollector = new EpisodePersonCollector<>(weightsProvider);
-        //weightsCollector.setPredicate(new ModePredicate(CommonValues.LEG_MODE_CAR));
-        NumericAnalyzer analyzer = new NumericAnalyzer(collector, weightsCollector, "nTrips", writer);
-
-        return analyzer;
+    public TripsCounter(Predicate<Segment> predicate) {
+        this.predicate = predicate;
     }
 
+    @Override
+    public Double get(Episode attributable) {
+        int count = 0;
+        for (Segment leg : attributable.getLegs()) {
+            if (predicate == null || predicate.test(leg)) {
+                count++;
+            }
+        }
+        return new Double(count);
+    }
 }
