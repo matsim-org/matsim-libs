@@ -30,13 +30,13 @@ public class CompanyDataRequester {
             "_pi1%5Bvalue%5D=1&tx_s4afreekmu_pi1%5Border%5D=name&tx_s4afreekmu_pi1%5Bdirection%5D=asc&tx_s4af" +
             "reekmu_pi1%5Blimit%5D=10&tx_s4afreekmu_pi1%5Bpage%5D=";
 
-    private static int i = 0;
+    private static int i = 2000;
 
     public static void main(String[] args) {
         long time = System.currentTimeMillis();
         int dif = 1000;
         boolean continueWriting = true;
-        int e = 1;
+        int e = 3;
         do {
             List<CompanyData> companyData = getCompanyData(dif*e);
             if (companyData.size() != 0) {
