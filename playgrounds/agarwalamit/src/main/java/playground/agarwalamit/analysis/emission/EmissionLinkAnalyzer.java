@@ -19,7 +19,6 @@
 package playground.agarwalamit.analysis.emission;
 
 import java.io.BufferedWriter;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -42,8 +41,8 @@ import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.analysis.emission.sorting.FilteredColdEmissionPerLinkHandler;
 import playground.agarwalamit.analysis.emission.sorting.FilteredWarmEmissionPerLinkHandler;
-import playground.agarwalamit.analysis.spatial.SpatialDataInputs;
 import playground.agarwalamit.utils.LoadMyScenarios;
+import playground.agarwalamit.utils.MapUtils;
 import playground.vsp.analysis.modules.AbstractAnalysisModule;
 
 /**
@@ -59,6 +58,7 @@ public class EmissionLinkAnalyzer extends AbstractAnalysisModule {
 	private Map<Double, Map<Id<Link>, Map<WarmPollutant, Double>>> link2WarmEmissions;
 	private Map<Double, Map<Id<Link>, Map<ColdPollutant, Double>>> link2ColdEmissions;
 	private SortedMap<Double, Map<Id<Link>, SortedMap<String, Double>>> link2TotalEmissions;
+	private SortedMap<String,Double> totalEmissions = new TreeMap<>();
 
 	/**
 	 * This will compute the emissions only from links falling inside the given shape.
@@ -84,33 +84,27 @@ public class EmissionLinkAnalyzer extends AbstractAnalysisModule {
 	public static void main(String[] args) {
 		String dir = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/hEART/output/";
 		String [] runCases =  {"bau","ei","5ei","10ei","15ei","20ei","25ei"};
-		String shapeFile = "/Users/amit/Documents/repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
+		String shapeFile_city = "/Users/amit/Documents/repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
+		String shapeFile_mma = "/Users/amit/Documents/repos/shared-svn/projects/detailedEval/Net/boundaryArea/munichMetroArea_correctedCRS.shp";
+		
 		Scenario sc = LoadMyScenarios.loadScenarioFromNetwork(dir+"/bau/output_network.xml.gz");
-		BufferedWriter writer = IOUtils.getBufferedWriter(dir+"/analysis/totalEmissionCosts_cityArea.txt");
+		BufferedWriter writer = IOUtils.getBufferedWriter(dir+"/analysis/totalEmissionCosts_metroArea.txt");
 		try{
 			writer.write("scenario \t totalCostEUR \n");
-		} catch (Exception e){
-			throw new RuntimeException("Data is not written in the file. Reason - "+e);
-		}
-		for(String str : runCases){
-			String emissionEventFile = dir+str+"/ITERS/it.1500/1500.emission.events.xml.gz";
+			for(String str : runCases){
+				String emissionEventFile = dir+str+"/ITERS/it.1500/1500.emission.events.xml.gz";
 
-			EmissionLinkAnalyzer ela = new EmissionLinkAnalyzer(30*3600, emissionEventFile, 30, shapeFile, sc.getNetwork());
-			ela.preProcessData();
-			ela.postProcessData();
+				EmissionLinkAnalyzer ela = new EmissionLinkAnalyzer(30*3600, emissionEventFile, 1, shapeFile_mma, sc.getNetwork());
+				ela.preProcessData();
+				ela.postProcessData();
 
-			SortedMap<Double,Double> time2cost = ela.getTotalEmissionCosts();
-			double totalEmissionCost =0. ;
-			for(double timebin : time2cost.keySet()){
-				totalEmissionCost += time2cost.get(timebin);
-			}
-			try{
+				SortedMap<Double,Double> time2cost = ela.getTimebinToEmissionsCosts();
+				double totalEmissionCost =0. ;
+				for(double timebin : time2cost.keySet()){
+					totalEmissionCost += time2cost.get(timebin);
+				}
 				writer.write(str+"\t"+totalEmissionCost+"\n");
-			} catch (Exception e){
-				throw new RuntimeException("Data is not written in the file. Reason - "+e);
 			}
-		}
-		try{
 			writer.close();
 		} catch (Exception e){
 			throw new RuntimeException("Data is not written in the file. Reason - "+e);
@@ -144,7 +138,7 @@ public class EmissionLinkAnalyzer extends AbstractAnalysisModule {
 
 	@Override
 	public void writeResults(String outputFolder) {
-		SortedMap<Double,Double> time2cost = getTotalEmissionCosts();
+		SortedMap<Double,Double> time2cost = getTimebinToEmissionsCosts();
 		BufferedWriter writer = IOUtils.getBufferedWriter(outputFolder+"/time2totalEmissionCosts.txt");
 		try{
 			writer.write("timebin \t totalCostEUR \n");
@@ -168,18 +162,12 @@ public class EmissionLinkAnalyzer extends AbstractAnalysisModule {
 
 		for(double endOfTimeInterval: time2warmEmissionsTotal.keySet()){
 			Map<Id<Link>, Map<WarmPollutant, Double>> warmEmissions = time2warmEmissionsTotal.get(endOfTimeInterval);
-
-			Map<Id<Link>, SortedMap<String, Double>> totalEmissions = new HashMap<>();
-			if(time2coldEmissionsTotal.get(endOfTimeInterval) == null){
-				for(Id<Link> id : warmEmissions.keySet()){
-					SortedMap<String, Double> warmEmissionsOfLink = this.emissionUtils.convertWarmPollutantMap2String(warmEmissions.get(id));
-					totalEmissions.put(id, warmEmissionsOfLink);
-				}
-			} else {
-				Map<Id<Link>, Map<ColdPollutant, Double>> coldEmissions = time2coldEmissionsTotal.get(endOfTimeInterval);
-				totalEmissions = this.emissionUtils.sumUpEmissionsPerId(warmEmissions, coldEmissions);
-			}
+			Map<Id<Link>, Map<ColdPollutant, Double>> coldEmissions = time2coldEmissionsTotal.get(endOfTimeInterval);
+			
+			Map<Id<Link>, SortedMap<String, Double>> totalEmissions = this.emissionUtils.sumUpEmissionsPerId(warmEmissions, coldEmissions);
 			time2totalEmissions.put(endOfTimeInterval, totalEmissions);
+		
+			this.totalEmissions = MapUtils.addMaps(this.totalEmissions, this.emissionUtils.getTotalEmissions(totalEmissions));
 		}
 		return time2totalEmissions;
 	}
@@ -196,8 +184,8 @@ public class EmissionLinkAnalyzer extends AbstractAnalysisModule {
 		return link2ColdEmissions;
 	}
 
-	public SortedMap<Double,Double> getTotalEmissionCosts(){
-		SortedMap<Double,Double> time2cost = new TreeMap<>();
+	public SortedMap<Double,Double> getTimebinToEmissionsCosts(){
+		SortedMap<Double, Double> time2cost = new TreeMap<>();
 		for(double time : this.link2TotalEmissions.keySet()){
 			double cost = 0.;
 			for (Id<Link> linkid : this.link2TotalEmissions.get(time).keySet()){
@@ -211,5 +199,17 @@ public class EmissionLinkAnalyzer extends AbstractAnalysisModule {
 			time2cost.put(time, cost);
 		}
 		return time2cost;
+	}
+	
+	public double getTotalEmissionsCosts(){
+		double totalEmissionCosts = 0;
+		for(EmissionCostFactors ecf:EmissionCostFactors.values()){
+			totalEmissionCosts += ecf.getCostFactor() * this.totalEmissions.get(ecf.toString());
+		}
+		return totalEmissionCosts;
+	}
+	
+	public SortedMap<String, Double> getTotalEmissions(){
+		return this.totalEmissions;
 	}
 }

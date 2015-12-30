@@ -22,9 +22,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
+import org.apache.poi.ss.formula.functions.T;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Person;
 
 /**
  * @author amit
@@ -55,14 +57,29 @@ public final class MapUtils {
 	 * @return m1-m2
 	 * <p> if key does not exist in either of map, value for that is assumed as <b>zero.
 	 */
-	public static Map<Id<Person>, Double> subtractMaps(final Map<Id<Person>, Double> m1, final Map<Id<Person>, Double> m2){
-		Set<Id<Person>> keys = new HashSet<>(m1.keySet());
+	public static <T> Map<Id<T>, Double> subtractMaps(final Map<Id<T>, Double> m1, final Map<Id<T>, Double> m2){
+		if(m1==null || m2 ==null) throw new NullPointerException("Either of the maps is null. Aborting ...");
+		Set<Id<T>> keys = new HashSet<>(m1.keySet());
 		keys.addAll(m2.keySet());
-		Map<Id<Person>, Double> outMap = new HashMap<Id<Person>, Double>();
-		for(Id<Person> id : keys){
+		Map<Id<T>, Double> outMap = new HashMap<Id<T>, Double>();
+		for(Id<T> id : keys){
 			double v1 = m1.containsKey(id) ? m1.get(id) : 0;
 			double v2 = m2.containsKey(id) ? m2.get(id) : 0;
 			outMap.put(id, v2-v1);
+		}
+		return outMap;
+	}
+	
+	/**
+	 * @return m1+m2
+	 * <p> if key does not exist in either of map, value for that is assumed as <b>zero.
+	 */
+	public static SortedMap<String, Double> addMaps (final Map<String, Double> m1, final Map<String, Double> m2) {
+		if(m1==null || m2 ==null) throw new NullPointerException("Either of the maps is null. Aborting ...");
+		SortedMap<String, Double> outMap = new TreeMap<>(m1);
+		for (String str : m2.keySet()){
+			double existingValue = outMap.containsKey(str) ? outMap.get(str) : 0.;
+			outMap.put(str, m2.get(str)+existingValue);
 		}
 		return outMap;
 	}
