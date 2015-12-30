@@ -270,14 +270,19 @@ public class Controler extends AbstractController implements ControlerI {
 						public void install() {
 							final List<AbstractModule> baseModules = new ArrayList<>();
 							baseModules.add(coreListenersModule);
+							baseModules.add(new AbstractModule() {
+								@Override
+								public void install() {
+									bind(PrepareForSim.class).to(PrepareForSimImpl.class);
+									bind(OutputDirectoryHierarchy.class).toInstance(getControlerIO());
+									bind(IterationStopWatch.class).toInstance(getStopwatch());
+									bind(TerminationCriterion.class).to(TerminateAtFixedIterationNumber.class);
+								}
+							});
 							baseModules.addAll(modules);
 							// Use all the modules set with setModules, but overriding them with things set with
 							// other setters on this Controler.
 							install(AbstractModule.override(baseModules, overrides));
-							bind(PrepareForSim.class).to(PrepareForSimImpl.class);
-							bind(OutputDirectoryHierarchy.class).toInstance(getControlerIO());
-							bind(IterationStopWatch.class).toInstance(getStopwatch());
-							bind(TerminationCriterion.class).to(TerminateAtFixedIterationNumber.class);
 						}
 					});
 			this.injector.getInstance(com.google.inject.Injector.class).injectMembers(this);
