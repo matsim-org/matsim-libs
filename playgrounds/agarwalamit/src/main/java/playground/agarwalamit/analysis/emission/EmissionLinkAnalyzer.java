@@ -85,10 +85,10 @@ public class EmissionLinkAnalyzer extends AbstractAnalysisModule {
 		String dir = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/hEART/output/";
 		String [] runCases =  {"bau","ei","5ei","10ei","15ei","20ei","25ei"};
 		String shapeFile_city = "/Users/amit/Documents/repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
-		String shapeFile_mma = "/Users/amit/Documents/repos/shared-svn/projects/detailedEval/Net/boundaryArea/munichMetroArea_correctedCRS.shp";
+		String shapeFile_mma = "/Users/amit/Documents/repos/shared-svn/projects/detailedEval/Net/boundaryArea/munichMetroArea_correctedCRS_simplified.shp";
 		
 		Scenario sc = LoadMyScenarios.loadScenarioFromNetwork(dir+"/bau/output_network.xml.gz");
-		BufferedWriter writer = IOUtils.getBufferedWriter(dir+"/analysis/totalEmissionCosts_completeArea.txt");
+		BufferedWriter writer = IOUtils.getBufferedWriter(dir+"/analysis/totalEmissionCosts_metroArea.txt");
 		try{
 			writer.write("scenario \t totalCostEUR \n");
 			for(String str : runCases){
