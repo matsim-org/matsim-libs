@@ -88,7 +88,7 @@ public class EmissionLinkAnalyzer extends AbstractAnalysisModule {
 		String shapeFile_mma = "/Users/amit/Documents/repos/shared-svn/projects/detailedEval/Net/boundaryArea/munichMetroArea_correctedCRS.shp";
 		
 		Scenario sc = LoadMyScenarios.loadScenarioFromNetwork(dir+"/bau/output_network.xml.gz");
-		BufferedWriter writer = IOUtils.getBufferedWriter(dir+"/analysis/totalEmissionCosts_metroArea.txt");
+		BufferedWriter writer = IOUtils.getBufferedWriter(dir+"/analysis/totalEmissionCosts_completeArea.txt");
 		try{
 			writer.write("scenario \t totalCostEUR \n");
 			for(String str : runCases){
@@ -98,12 +98,7 @@ public class EmissionLinkAnalyzer extends AbstractAnalysisModule {
 				ela.preProcessData();
 				ela.postProcessData();
 
-				SortedMap<Double,Double> time2cost = ela.getTimebinToEmissionsCosts();
-				double totalEmissionCost =0. ;
-				for(double timebin : time2cost.keySet()){
-					totalEmissionCost += time2cost.get(timebin);
-				}
-				writer.write(str+"\t"+totalEmissionCost+"\n");
+				writer.write(str+"\t"+ela.getTotalEmissionsCosts()+"\n");
 			}
 			writer.close();
 		} catch (Exception e){
@@ -121,11 +116,8 @@ public class EmissionLinkAnalyzer extends AbstractAnalysisModule {
 	public void preProcessData() {
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		EmissionEventsReader emissionReader = new EmissionEventsReader(eventsManager);
-
 		eventsManager.addHandler(this.warmHandler);
 		eventsManager.addHandler(this.coldHandler);
-		eventsManager.addHandler(new FilteredColdEmissionPerLinkHandler(30., 9));
-
 		emissionReader.parse(this.emissionEventsFile);
 	}
 
