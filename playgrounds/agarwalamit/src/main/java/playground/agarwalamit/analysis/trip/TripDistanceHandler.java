@@ -111,6 +111,7 @@ implements PersonDepartureEventHandler, PersonArrivalEventHandler, LinkLeaveEven
 		Id<Person> personId = event.getPersonId();
 		double time = this.personId2TripDepartTimeBin.remove(personId);
 
+		//ZZ_TODO : probably instantiate distance maps during trip departure to avoid the following problem.
 		// following is required because, sometimes agent depart and arrive on the same link, therefore, for such trips, distance =0.
 		int totalTrips = timeBin2Person2TripsCount.get(time).get(personId);
 		int distancesStored ;
