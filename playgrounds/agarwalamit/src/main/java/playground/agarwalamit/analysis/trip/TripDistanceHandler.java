@@ -56,21 +56,21 @@ public class TripDistanceHandler
 implements PersonDepartureEventHandler, PersonArrivalEventHandler, LinkLeaveEventHandler,
 VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 
+	private static final Logger LOG = Logger.getLogger(TripDistanceHandler.class);
+	private final SortedMap<Id<Person>,Double> personId2TripDepartTimeBin = new TreeMap<>();
+	private final SortedMap<Double, Map<Id<Person>,Integer>> timeBin2Person2TripsCount = new TreeMap<>();
+	private final SortedMap<Double, Map<Id<Person>,List<Double>>> timeBin2Person2TripsDistance = new TreeMap<>();
+	private final Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
+
+	private Network network;
+	private final double timeBinSize;
+	private int nonCarWarning= 0;
+	
 	public TripDistanceHandler(Network network, double simulationEndTime, int noOfTimeBins) {
-		log.info("A trip starts with departure event and ends with arrival events.");
+		LOG.info("A trip starts with departure event and ends with arrival events.");
 		this.network = network;
 		this.timeBinSize = simulationEndTime / noOfTimeBins;
 	}
-
-	private SortedMap<Id<Person>,Double> personId2TripDepartTimeBin = new TreeMap<>();
-	private SortedMap<Double, Map<Id<Person>,Integer>> timeBin2Person2TripsCount = new TreeMap<>();
-	private SortedMap<Double, Map<Id<Person>,List<Double>>> timeBin2Person2TripsDistance = new TreeMap<>();
-	private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
-
-	private static final Logger log = Logger.getLogger(TripDistanceHandler.class);
-	private Network network;
-	private double timeBinSize;
-	private int nonCarWarning= 0;
 
 	@Override
 	public void reset(int iteration) {
@@ -116,8 +116,8 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 	public void handleEvent(PersonDepartureEvent event) {
 		if ( ! event.getLegMode().equals(TransportMode.car) ) { // excluding non car trips
 			if(nonCarWarning<1){
-				log.warn(TripDistanceHandler.class.getSimpleName()+" calculates trip info only for car mode.");
-				log.warn( Gbl.ONLYONCE );
+				LOG.warn(TripDistanceHandler.class.getSimpleName()+" calculates trip info only for car mode.");
+				LOG.warn( Gbl.ONLYONCE );
 				nonCarWarning++;
 			}
 			return ;

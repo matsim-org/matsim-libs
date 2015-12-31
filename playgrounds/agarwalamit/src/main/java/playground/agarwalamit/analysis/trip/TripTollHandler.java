@@ -43,20 +43,19 @@ import org.matsim.core.gbl.Gbl;
  */
 
 public class TripTollHandler implements PersonMoneyEventHandler, PersonDepartureEventHandler, PersonArrivalEventHandler {
+	private static final Logger LOG = Logger.getLogger(TripTollHandler.class);
+	private final double timeBinSize;
+	private int nonCarWarning= 0;
 
-	public TripTollHandler(double simulationEndTime, int noOfTimeBins) {
-		log.info("A trip starts with departure event and ends with arrival events. ");
+	private final SortedMap<Double, Map<Id<Person>,Integer>> timeBin2Person2TripsCount = new TreeMap<>();
+	private final SortedMap<Double, Map<Id<Person>,List<Double>>> timeBin2Person2TripToll = new TreeMap<>();
+	private final SortedMap<Id<Person>,Double> personId2TripDepartTimeBin = new TreeMap<>();
+
+	public TripTollHandler(final double simulationEndTime, final int noOfTimeBins) {
+		LOG.info("A trip starts with departure event and ends with arrival events. ");
 		this.timeBinSize = simulationEndTime / noOfTimeBins;
 	}
-
-	private double timeBinSize;
-	private int nonCarWarning= 0;
-	private static final Logger log = Logger.getLogger(TripTollHandler.class);
-
-	private SortedMap<Double, Map<Id<Person>,Integer>> timeBin2Person2TripsCount = new TreeMap<>();
-	private SortedMap<Double, Map<Id<Person>,List<Double>>> timeBin2Person2TripToll = new TreeMap<>();
-	private SortedMap<Id<Person>,Double> personId2TripDepartTimeBin = new TreeMap<>();
-
+	
 	@Override
 	public void reset(int iteration) {
 		this.timeBin2Person2TripsCount.clear();
@@ -67,8 +66,8 @@ public class TripTollHandler implements PersonMoneyEventHandler, PersonDeparture
 	public void handleEvent(PersonDepartureEvent event) {
 		if ( ! event.getLegMode().equals(TransportMode.car) ) { // excluding non car trips
 			if(nonCarWarning<1){
-				log.warn(TripTollHandler.class.getSimpleName()+" calculates trip info only for car mode.");
-				log.warn( Gbl.ONLYONCE );
+				LOG.warn(TripTollHandler.class.getSimpleName()+" calculates trip info only for car mode.");
+				LOG.warn( Gbl.ONLYONCE );
 				nonCarWarning++;
 			}
 			return ;
