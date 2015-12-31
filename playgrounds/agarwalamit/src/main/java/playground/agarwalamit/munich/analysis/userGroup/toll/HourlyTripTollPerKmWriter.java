@@ -57,12 +57,12 @@ public class HourlyTripTollPerKmWriter {
 	private final ExtendedPersonFilter pf = new ExtendedPersonFilter();
 
 	public static void main(String[] args) {
-		String [] pricingSchemes = new String [] {"eci"};
-//		String [] pricingSchemes = new String [] {"ei","ci","eci"};
+//		String [] pricingSchemes = new String [] {"eci"};
+		String [] pricingSchemes = new String [] {"ei","ci","eci"};
 		for (String str :pricingSchemes) {
 			String dir = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/iatbr/output/";
-//			String eventsFile = dir+str+"/ITERS/it.1500/1500.events.xml.gz";
-			String eventsFile = dir+str+"/ITERS/it.1500/1500.events_congestionAndMoneyEvent.xml.gz";
+			String eventsFile = dir+str+"/ITERS/it.1500/1500.events.xml.gz";
+//			String eventsFile = dir+str+"/ITERS/it.1500/1500.events_congestionAndMoneyEvent.xml.gz";
 			String networkFile = dir+str+"/output_network.xml.gz";
 			String configFile = dir+str+"/output_config.xml.gz";
 			Scenario sc = LoadMyScenarios.loadScenarioFromNetworkAndConfig(networkFile, configFile);
@@ -111,8 +111,8 @@ public class HourlyTripTollPerKmWriter {
 			}
 		}
 
-//		BufferedWriter writer = IOUtils.getBufferedWriter(outputFolder+"/timeBin2TripTollPerKm_"+pricingScheme+".txt");
-		BufferedWriter writer = IOUtils.getBufferedWriter(outputFolder+"/timeBin2TripTollPerKm_"+pricingScheme+"_onlyCongestionMoneyEvents.txt");
+		BufferedWriter writer = IOUtils.getBufferedWriter(outputFolder+"/timeBin2TripTollPerKm_"+pricingScheme+".txt");
+//		BufferedWriter writer = IOUtils.getBufferedWriter(outputFolder+"/timeBin2TripTollPerKm_"+pricingScheme+"_onlyCongestionMoneyEvents.txt");
 		try {
 			writer.write("pricingScheme \t userGroup \t timeBin \t totalToll_EURCtPerKm \t avgTripToll_EURCtPerKm \n");
 			for(double d : userGroup2timebin2tolls.keySet()){

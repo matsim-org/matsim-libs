@@ -19,6 +19,7 @@
 package playground.agarwalamit.analysis.trip;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -54,7 +55,6 @@ public class TripTollHandler implements PersonMoneyEventHandler, PersonDeparture
 
 	private SortedMap<Double, Map<Id<Person>,Integer>> timeBin2Person2TripsCount = new TreeMap<>();
 	private SortedMap<Double, Map<Id<Person>,List<Double>>> timeBin2Person2TripToll = new TreeMap<>();
-
 	private SortedMap<Id<Person>,Double> personId2TripDepartTimeBin = new TreeMap<>();
 
 	@Override
@@ -82,15 +82,23 @@ public class TripTollHandler implements PersonMoneyEventHandler, PersonDeparture
 
 		if(timeBin2Person2TripsCount.containsKey(time)) {
 			Map<Id<Person>,Integer> personId2TripCount = timeBin2Person2TripsCount.get(time);
+			Map<Id<Person>,List<Double>> personId2TripToll = timeBin2Person2TripToll.get(time);
 			if(personId2TripCount.containsKey(personId)) { //multiple trips
 				personId2TripCount.put(personId, personId2TripCount.get(personId) +1 );
+				List<Double> tolls = personId2TripToll.get(personId);
+				tolls.add(0.);
 			} else {//first trip
 				personId2TripCount.put(personId, 1);
+				personId2TripToll.put(personId, new ArrayList<>(Arrays.asList(new Double [] {0.0})) );
 			}
 		} else {//first person and first trip
 			Map<Id<Person>,Integer> personId2TripCount = new HashMap<>();
 			personId2TripCount.put(personId, 1);
 			timeBin2Person2TripsCount.put(time, personId2TripCount);
+
+			Map<Id<Person>,List<Double>> personId2TripToll =  new HashMap<>();
+			personId2TripToll.put(personId, new ArrayList<>(Arrays.asList(new Double [] {0.0})) );
+			timeBin2Person2TripToll.put(time, personId2TripToll);
 		}
 	}
 
@@ -99,29 +107,14 @@ public class TripTollHandler implements PersonMoneyEventHandler, PersonDeparture
 		Id<Person> personId = event.getPersonId();
 
 		double timebin = this.personId2TripDepartTimeBin.get(personId);
-		if(timeBin2Person2TripToll.containsKey(timebin)){
-			Map<Id<Person>,List<Double>> person2TripsTolls = timeBin2Person2TripToll.get(timebin);
-			if ( person2TripsTolls.containsKey(personId) ) {
-				List<Double> tolls = person2TripsTolls.get(personId);
-				int tripNr = timeBin2Person2TripsCount.get(timebin).get(personId);
-				if (tolls.size() == tripNr) { //existing trip
-					double prevCollectedToll = tolls.remove(tripNr-1);
-					tolls.add(tripNr -1, prevCollectedToll + (-event.getAmount()) );
-				} else if(tripNr - tolls.size() == 1) { //new trip
-					tolls.add(-event.getAmount());
-				} else throw new RuntimeException("This is trip nr "+tripNr+" and tolls stored in the list are "+tolls.size()+".  This should not happen. Aborting ...");
-			} else {
-				List<Double> tolls = new ArrayList<>();
-				tolls.add(-event.getAmount());	
-				person2TripsTolls.put(personId, tolls);
-			}
-		} else {
-			List<Double> tolls = new ArrayList<>();
-			tolls.add(-event.getAmount());	
-			Map<Id<Person>,List<Double>> person2TripsTolls = new HashMap<>();
-			person2TripsTolls.put(personId, tolls);
-			timeBin2Person2TripToll.put(timebin, person2TripsTolls);
-		}
+		Map<Id<Person>,List<Double>> person2TripsTolls = timeBin2Person2TripToll.get(timebin);
+		List<Double> tolls = person2TripsTolls.get(personId);
+		int tripNr = timeBin2Person2TripsCount.get(timebin).get(personId);
+		if (tolls.size() == tripNr) { //existing trip
+			double prevCollectedToll = tolls.remove(tripNr-1);
+			tolls.add(tripNr -1, prevCollectedToll + (-event.getAmount()) );
+		} else throw new RuntimeException("Trip count and trip dist maps are initiated at departure events, thus, tripNr should be equal to "
+				+ "number of distances stored in trip dist map. Aborting ...");
 	}
 
 	@Override
@@ -131,34 +124,16 @@ public class TripTollHandler implements PersonMoneyEventHandler, PersonDeparture
 		Id<Person> personId = event.getPersonId();
 		double time = this.personId2TripDepartTimeBin.get(personId);
 
-		// following is required because, sometimes congestion event is thrown after arrival of the agent, thus removing the agent in the next departure event.
+		// following is required because, sometimes congestion event is thrown after arrival of the agent, 
+		//thus removing the agent in the next departure event.
 		int totalTrips = timeBin2Person2TripsCount.get(time).get(personId);
-		
+
 		//departure and arrival without any money event.
-		if(timeBin2Person2TripToll.containsKey(time)){
-			int tollsStored ;
-			if (timeBin2Person2TripToll.get(time).containsKey(personId)) {
-				tollsStored = timeBin2Person2TripToll.get(time).get(personId).size();
-			} else tollsStored = 0;
-			
-			if(totalTrips == tollsStored) return;
-			else if(totalTrips - tollsStored == 1) {
-				Map<Id<Person>,List<Double>> person2Tolls = this.timeBin2Person2TripToll.get(time);
-				List<Double> tolls ;
-				if ( person2Tolls.containsKey(personId)) {
-					tolls = person2Tolls.get(personId);
-				}
-				else tolls = new ArrayList<>();
-				tolls.add(0.);
-				person2Tolls.put(personId, tolls);
-			} else throw new RuntimeException("This should not happen. Aborting...");
-		} else {
-			List<Double> tolls = new ArrayList<>();
-			tolls.add(0.);
-			Map<Id<Person>,List<Double>> person2Tolls = new HashMap<>();
-			person2Tolls.put(personId, tolls);
-			this.timeBin2Person2TripToll.put(time, person2Tolls);
-		}
+		int tollsStored = timeBin2Person2TripToll.get(time).get(personId).size();
+
+		if(totalTrips == tollsStored) return;
+		else throw new RuntimeException("Trip count and trip dist maps are initiated at departure events, thus, tripNr should be equal to "
+				+ "number of distances stored in trip dist map. Aborting ...");
 	}
 
 	public SortedMap<Double, Map<Id<Person>, Integer>> getTimeBin2Person2TripsCount() {
@@ -168,5 +143,4 @@ public class TripTollHandler implements PersonMoneyEventHandler, PersonDeparture
 	public SortedMap<Double, Map<Id<Person>, List<Double>>> getTimeBin2Person2TripToll() {
 		return timeBin2Person2TripToll;
 	}
-	
 }
