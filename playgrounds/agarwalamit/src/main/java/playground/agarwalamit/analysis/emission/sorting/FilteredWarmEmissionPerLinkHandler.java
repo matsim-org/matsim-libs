@@ -42,16 +42,16 @@ public class FilteredWarmEmissionPerLinkHandler implements WarmEmissionEventHand
 	private final EmissionsPerLinkWarmEventHandler delegate;
 	private final Collection<SimpleFeature> features ;
 	private Network network;
-	private boolean isSorting;
+	private final boolean isSorting;
 
-	public FilteredWarmEmissionPerLinkHandler (double simulationEndTime, int noOfTimeBins, String shapeFile, Network network){
+	public FilteredWarmEmissionPerLinkHandler (final double simulationEndTime, final int noOfTimeBins, final String shapeFile, final Network network){
 		delegate = new EmissionsPerLinkWarmEventHandler(simulationEndTime,noOfTimeBins);
 		features = new ShapeFileReader().readFileAndInitialize(shapeFile);
 		this.network = network;
 		isSorting = true;
 	}
 	
-	public FilteredWarmEmissionPerLinkHandler (double simulationEndTime, int noOfTimeBins){
+	public FilteredWarmEmissionPerLinkHandler (final double simulationEndTime, final int noOfTimeBins){
 		delegate = new EmissionsPerLinkWarmEventHandler(simulationEndTime,noOfTimeBins);
 		features = new ArrayList<>();
 		isSorting = false;

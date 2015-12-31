@@ -31,11 +31,10 @@ import org.matsim.core.utils.collections.Tuple;
 public class PersonActivityInfo  {
 
 	private Id<Person> personId;
-	private List<Tuple<String,Double>> actType2StartTimes; 
-	private List<Tuple<String,Double>> actType2EndTimes; 
+	private final List<Tuple<String,Double>> actType2StartTimes; 
+	private final List<Tuple<String,Double>> actType2EndTimes; 
 	
-	
-	public PersonActivityInfo(Id<Person> personId) {
+	public PersonActivityInfo(final Id<Person> personId) {
 		this.personId = personId;
 		actType2EndTimes = new ArrayList<Tuple<String,Double>>();
 		actType2StartTimes = new ArrayList<Tuple<String,Double>>();
@@ -45,7 +44,7 @@ public class PersonActivityInfo  {
 		return personId;
 	}
 
-	public void setPersonId(Id<Person> personId) {
+	public void setPersonId(final Id<Person> personId) {
 		this.personId = personId;
 	}
 

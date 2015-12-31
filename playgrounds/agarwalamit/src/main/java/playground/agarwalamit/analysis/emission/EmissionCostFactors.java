@@ -34,7 +34,7 @@ public enum EmissionCostFactors {
 	public double getCostFactor(){
 		return costFactors;
 	}
-	private EmissionCostFactors(double costFactor){
+	private EmissionCostFactors(final double costFactor){
 		this.costFactors = costFactor;
 	}
 }

@@ -43,12 +43,12 @@ import playground.vsp.analysis.modules.userBenefits.WelfareMeasure;
  */
 public class UserBenefitsAndTotalWelfare {
 
-	public static final Logger logger = Logger.getLogger(UserBenefitsAndTotalWelfare.class);
-	private String outputDir;
-	private final WelfareMeasure welfareMeasure = WelfareMeasure.SELECTED;
+	public static final Logger LOGGER = Logger.getLogger(UserBenefitsAndTotalWelfare.class);
+	private final String outputDir;
+	private static final WelfareMeasure WM = WelfareMeasure.SELECTED;
 	private MutableScenario sc;
 	
-	public UserBenefitsAndTotalWelfare(String outputDir) {
+	public UserBenefitsAndTotalWelfare(final String outputDir) {
 		this.outputDir = outputDir;
 	}
 
@@ -59,7 +59,7 @@ public class UserBenefitsAndTotalWelfare {
 		 new UserBenefitsAndTotalWelfare(clusterPathDesktop).runAndWrite(runCases);
 	}
 
-	public void runAndWrite(String [] runCases){
+	public void runAndWrite(final String [] runCases){
 
 		double [] userBenefits_money = new double [runCases.length];
 		double [] monetaryPayments = new double [runCases.length];
@@ -67,13 +67,13 @@ public class UserBenefitsAndTotalWelfare {
 		
 		for(int i=0; i< runCases.length;i++){
 			loadScenario(runCases[i]);
-			userBenefits_money[i] = getAllUserBenefits(runCases[i], welfareMeasure);
+			userBenefits_money[i] = getAllUserBenefits(runCases[i], WM);
 			double tollInfo [] = getMonetaryPayment(runCases[i], false);
 			monetaryPayments[i] = tollInfo[0];
 			excludedToll[i] = tollInfo[1];
 		}
 		
-		String fileName = outputDir+"/analysis/absoluteUserBenefits"+welfareMeasure+".txt";
+		String fileName = outputDir+"/analysis/absoluteUserBenefits"+WM+".txt";
 		BufferedWriter writer = IOUtils.getBufferedWriter(fileName);
 		try {
 			writer.write("runCase \t userBenefits_money \t tollPayments \t excludedTollIfAny \n");
@@ -84,10 +84,10 @@ public class UserBenefitsAndTotalWelfare {
 		} catch (IOException e) {
 			throw new RuntimeException("Data is not written into a File. Reason : "+e);
 		}
-		logger.info("Data is written to "+fileName);
+		LOGGER.info("Data is written to "+fileName);
 	}
 
-	private void loadScenario(String runCase) {
+	private void loadScenario(final String runCase) {
 		String runPath = outputDir + runCase;
 		String configFile = runPath+"/output_config.xml";
 		String plansFile = outputDir+runCase+"/output_plans.xml.gz";
@@ -95,7 +95,7 @@ public class UserBenefitsAndTotalWelfare {
 		sc = (MutableScenario) scenario;
 	}
 
-	public double getAllUserBenefits(String runCase, WelfareMeasure welfareMeasure){
+	public double getAllUserBenefits(final String runCase, final WelfareMeasure welfareMeasure){
 		MyUserBenefitsAnalyzer userBenefitsAnalyzer = new MyUserBenefitsAnalyzer();
 		userBenefitsAnalyzer.init(sc, welfareMeasure, false);
 		userBenefitsAnalyzer.preProcessData();
@@ -109,7 +109,7 @@ public class UserBenefitsAndTotalWelfare {
 	 * @param considerAllPersonsInSumOfTolls persons having negative score will be excluded from sum to tolls
 	 * @return returns total toll excluding persons with negative score (currently person will be excluded if score is negative)
 	 */
-	public double [] getMonetaryPayment(String runCase, boolean considerAllPersonsInSumOfTolls){
+	public double [] getMonetaryPayment(final String runCase, final boolean considerAllPersonsInSumOfTolls){
 		double totalToll =0;
 		double excludedToll =0;
 
@@ -142,13 +142,13 @@ public class UserBenefitsAndTotalWelfare {
 			}
 		} else totalToll = paymentsAnalyzer.getAllUsersAmount();
 
-		if(!considerAllPersonsInSumOfTolls) logger.warn("Person having negative score in their executed plans are excluded in the calculation."
+		if(!considerAllPersonsInSumOfTolls) LOGGER.warn("Person having negative score in their executed plans are excluded in the calculation."
 				+ " \n and thus toll payments which is excluded is " +excludedToll);
 		double [] tollInfo = new double [] {totalToll, excludedToll};
 		return tollInfo;
 	}
 
-	private boolean isPersonIncluded(Id<Person> personId){
+	private boolean isPersonIncluded(final Id<Person> personId){
 		Id<Person> id = Id.createPersonId(personId.toString());
 		double score = sc.getPopulation().getPersons().get(id).getSelectedPlan().getScore();
 		if (score < 0 ) return false;

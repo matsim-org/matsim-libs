@@ -66,7 +66,7 @@ public class MyUserBenefitsAnalyzer extends AbstractAnalysisModule{
 	 * @param welfareMeasure user welfare or logsum
 	 * @param considerAllPlans include plans with negative or null score or not
 	 */
-	public void init(MutableScenario scenario, WelfareMeasure welfareMeasure, boolean considerAllPlans) {
+	public void init(final MutableScenario scenario, final WelfareMeasure welfareMeasure, final boolean considerAllPlans) {
 		this.scenario = scenario;
 		this.welfareMeasure = welfareMeasure;
 		this.userWelfareCalculator = new UserBenefitsCalculator(this.scenario.getConfig(), this.welfareMeasure, considerAllPlans);
@@ -94,7 +94,7 @@ public class MyUserBenefitsAnalyzer extends AbstractAnalysisModule{
 	}
 
 	@Override
-	public void writeResults(String outputFolder) {
+	public void writeResults(final String outputFolder) {
 		String fileName = outputFolder + "userBenefits"+this.welfareMeasure+".txt";
 		File file = new File(fileName);
 				

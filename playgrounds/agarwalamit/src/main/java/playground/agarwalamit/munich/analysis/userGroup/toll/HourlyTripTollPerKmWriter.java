@@ -46,16 +46,16 @@ import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
  */
 
 public class HourlyTripTollPerKmWriter {
-
-	public HourlyTripTollPerKmWriter(Network network, double simulationEndTime, int noOfTimeBins) {
+	
+	private final TripTollHandler tollHandler ;
+	private final TripDistanceHandler distHandler;
+	private final ExtendedPersonFilter pf = new ExtendedPersonFilter();
+	
+	public HourlyTripTollPerKmWriter(final Network network, final double simulationEndTime, final int noOfTimeBins) {
 		this.tollHandler = new TripTollHandler( simulationEndTime, noOfTimeBins );
 		this.distHandler = new TripDistanceHandler(network, simulationEndTime, noOfTimeBins);
 	}
-
-	private TripTollHandler tollHandler ;
-	private TripDistanceHandler distHandler;
-	private final ExtendedPersonFilter pf = new ExtendedPersonFilter();
-
+	
 	public static void main(String[] args) {
 //		String [] pricingSchemes = new String [] {"eci"};
 		String [] pricingSchemes = new String [] {"ei","ci","eci"};
@@ -73,7 +73,7 @@ public class HourlyTripTollPerKmWriter {
 		}
 	}
 
-	public void run(String eventsFile) {
+	public void run(final String eventsFile) {
 		EventsManager events = EventsUtils.createEventsManager();
 		MatsimEventsReader reader = new MatsimEventsReader(events);
 		events.addHandler(this.tollHandler);
@@ -81,7 +81,7 @@ public class HourlyTripTollPerKmWriter {
 		reader.readFile(eventsFile);
 	}
 
-	private void writeUserGroupTollValuesOverTime(String outputFolder, String pricingScheme){
+	private void writeUserGroupTollValuesOverTime(final String outputFolder, final String pricingScheme){
 		SortedMap<Double, Map<Id<Person>, List<Double>>> timebin2persontoll = tollHandler.getTimeBin2Person2TripToll();
 		SortedMap<Double, Map<Id<Person>, List<Double>>> timebin2persondist = distHandler.getTimeBin2Person2TripsDistance();
 

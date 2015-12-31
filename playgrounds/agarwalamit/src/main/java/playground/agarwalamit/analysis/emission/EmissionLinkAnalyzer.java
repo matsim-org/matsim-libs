@@ -50,11 +50,11 @@ import playground.vsp.analysis.modules.AbstractAnalysisModule;
  *
  */
 public class EmissionLinkAnalyzer extends AbstractAnalysisModule {
-	private static final Logger logger = Logger.getLogger(EmissionLinkAnalyzer.class);
+	private static final Logger LOG = Logger.getLogger(EmissionLinkAnalyzer.class);
 	private final String emissionEventsFile;
-	private EmissionUtils emissionUtils;
-	private FilteredWarmEmissionPerLinkHandler warmHandler;
-	private FilteredColdEmissionPerLinkHandler coldHandler;
+	private final EmissionUtils emissionUtils = new EmissionUtils();;
+	private final FilteredWarmEmissionPerLinkHandler warmHandler;
+	private final FilteredColdEmissionPerLinkHandler coldHandler;
 	private Map<Double, Map<Id<Link>, Map<WarmPollutant, Double>>> link2WarmEmissions;
 	private Map<Double, Map<Id<Link>, Map<ColdPollutant, Double>>> link2ColdEmissions;
 	private SortedMap<Double, Map<Id<Link>, SortedMap<String, Double>>> link2TotalEmissions;
@@ -63,20 +63,18 @@ public class EmissionLinkAnalyzer extends AbstractAnalysisModule {
 	/**
 	 * This will compute the emissions only from links falling inside the given shape.
 	 */
-	public EmissionLinkAnalyzer(double simulationEndTime, String emissionEventFile, int noOfTimeBins, String shapeFile, Network network ) {
+	public EmissionLinkAnalyzer(final double simulationEndTime, final String emissionEventFile, final int noOfTimeBins, final String shapeFile, final Network network ) {
 		super(EmissionLinkAnalyzer.class.getSimpleName());
 		this.emissionEventsFile = emissionEventFile;
-		logger.info("Aggregating emissions for each "+simulationEndTime/noOfTimeBins+" sec time bin.");
-		this.emissionUtils = new EmissionUtils();
+		LOG.info("Aggregating emissions for each "+simulationEndTime/noOfTimeBins+" sec time bin.");
 		this.warmHandler = new FilteredWarmEmissionPerLinkHandler(simulationEndTime, noOfTimeBins, shapeFile, network);
 		this.coldHandler = new FilteredColdEmissionPerLinkHandler(simulationEndTime, noOfTimeBins, shapeFile, network);
 	}
 
-	public EmissionLinkAnalyzer(double simulationEndTime, String emissionEventFile, int noOfTimeBins) {
+	public EmissionLinkAnalyzer(final double simulationEndTime, final String emissionEventFile, final int noOfTimeBins) {
 		super(EmissionLinkAnalyzer.class.getSimpleName());
 		this.emissionEventsFile = emissionEventFile;
-		logger.info("Aggregating emissions for each "+simulationEndTime/noOfTimeBins+" sec time bin.");
-		this.emissionUtils = new EmissionUtils();
+		LOG.info("Aggregating emissions for each "+simulationEndTime/noOfTimeBins+" sec time bin.");
 		this.warmHandler = new FilteredWarmEmissionPerLinkHandler(simulationEndTime, noOfTimeBins);
 		this.coldHandler = new FilteredColdEmissionPerLinkHandler(simulationEndTime, noOfTimeBins);
 	}
@@ -147,8 +145,8 @@ public class EmissionLinkAnalyzer extends AbstractAnalysisModule {
 	}
 
 	private SortedMap<Double, Map<Id<Link>, SortedMap<String, Double>>> sumUpEmissionsPerTimeInterval(
-			Map<Double, Map<Id<Link>, Map<WarmPollutant, Double>>> time2warmEmissionsTotal,
-			Map<Double, Map<Id<Link>, Map<ColdPollutant, Double>>> time2coldEmissionsTotal) {
+			final Map<Double, Map<Id<Link>, Map<WarmPollutant, Double>>> time2warmEmissionsTotal,
+			final Map<Double, Map<Id<Link>, Map<ColdPollutant, Double>>> time2coldEmissionsTotal) {
 
 		SortedMap<Double, Map<Id<Link>, SortedMap<String, Double>>> time2totalEmissions = new TreeMap<>();
 

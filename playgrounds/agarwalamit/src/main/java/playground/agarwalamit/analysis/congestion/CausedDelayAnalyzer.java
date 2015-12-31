@@ -39,25 +39,22 @@ import playground.vsp.congestion.events.CongestionEventsReader;
  */
 
 public class CausedDelayAnalyzer {
-
-	public CausedDelayAnalyzer(String eventsFile, Scenario scenario, int noOfTimeBin) {
+	private final CausedDelayHandler handler;
+	private final String eventsFile;
+	
+	public CausedDelayAnalyzer(final String eventsFile, final Scenario scenario, final int noOfTimeBin) {
 		this.eventsFile = eventsFile;
-		handler = new CausedDelayHandler(scenario, noOfTimeBin);
+		this.handler = new CausedDelayHandler(scenario, noOfTimeBin);
 	}
 
-	public CausedDelayAnalyzer(String eventsFile, Scenario scenario, int noOfTimeBin,boolean sortingForInsideMunich) {
+	public CausedDelayAnalyzer(final String eventsFile, final Scenario scenario,final  int noOfTimeBin, final boolean sortingForInsideMunich) {
 		this.eventsFile = eventsFile;
-		handler = new CausedDelayHandler(scenario, noOfTimeBin, sortingForInsideMunich);
+		this.handler = new CausedDelayHandler(scenario, noOfTimeBin, sortingForInsideMunich);
 	}
-
-	private CongestionEventsReader reader;
-	private CausedDelayHandler handler;
-	private String eventsFile;
 
 	public void run(){
-
 		EventsManager eventsManager = EventsUtils.createEventsManager();
-		reader = new CongestionEventsReader(eventsManager);
+		CongestionEventsReader reader = new CongestionEventsReader(eventsManager);
 
 		eventsManager.addHandler(handler);
 		reader.parse(this.eventsFile);
@@ -92,7 +89,6 @@ public class CausedDelayAnalyzer {
 			}
 			if(sum != timeBin2ListOfTollPayers.get(d).size()) throw new RuntimeException("Number of toll payers in each time bin are not equal from two maps. Aborting ....");
 		}
-
 		return timeBin2ListOfTollPayers;
 	}
 }

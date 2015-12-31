@@ -66,7 +66,7 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 	private final double timeBinSize;
 	private int nonCarWarning= 0;
 	
-	public TripDistanceHandler(Network network, double simulationEndTime, int noOfTimeBins) {
+	public TripDistanceHandler(final Network network, final double simulationEndTime, final int noOfTimeBins) {
 		LOG.info("A trip starts with departure event and ends with arrival events.");
 		this.network = network;
 		this.timeBinSize = simulationEndTime / noOfTimeBins;
