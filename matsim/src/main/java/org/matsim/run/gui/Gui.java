@@ -384,10 +384,17 @@ public class Gui extends JFrame {
 	
 	public void loadConfigFile(final File configFile) {
 		String configFilename = configFile.getAbsolutePath();
-		txtConfigfilename.setText(configFilename);
 		
 		Config config = ConfigUtils.createConfig();
-		ConfigUtils.loadConfig(config, configFilename);
+		try {
+			ConfigUtils.loadConfig(config, configFilename);
+		} catch (Exception e) {
+			Gui.this.textStdOut.setText("");
+			Gui.this.textStdOut.append("The configuration file could not be loaded. Error message:\n");
+			Gui.this.textStdOut.append(e.getMessage());
+			return;
+		}
+		txtConfigfilename.setText(configFilename);
 		
 		File par = configFile.getParentFile();
 		File outputDir = new File(par, config.controler().getOutputDirectory());
