@@ -26,6 +26,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
@@ -45,7 +46,7 @@ public class CTRunner implements IterationStartsListener {
 
 	public static boolean DEBUG = false;
 
-	private Controler controller;
+	private MatsimServices controller;
 	private QSimDensityDrawer qSimDrawer;
 
 	public static void main(String[] args) {

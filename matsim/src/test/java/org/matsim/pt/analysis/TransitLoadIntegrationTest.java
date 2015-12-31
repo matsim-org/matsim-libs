@@ -60,7 +60,7 @@ public class TransitLoadIntegrationTest {
 		cfg.controler().setWritePlansInterval(0);
         c.getConfig().controler().setCreateGraphs(false);
         c.getConfig().controler().setWriteEventsInterval(0);
-		c.setDumpDataAtEnd(false);
+		c.getConfig().controler().setDumpDataAtEnd(false);
 		c.run();
 
 		TransitLine line = s.getTransitSchedule().getTransitLines().get(Id.create("Blue Line", TransitLine.class));

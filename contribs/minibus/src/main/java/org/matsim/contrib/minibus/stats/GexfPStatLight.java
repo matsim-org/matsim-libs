@@ -114,13 +114,13 @@ final class GexfPStatLight extends MatsimJaxbXmlWriter implements StartupListene
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		if (this.getWriteGexfStatsInterval > 0) {
-            this.addNetworkAsLayer(event.getControler().getScenario().getNetwork(), 0);
+            this.addNetworkAsLayer(event.getServices().getScenario().getNetwork(), 0);
 			this.createAttValues();
 			this.globalPaxHandler = new CountPPaxHandler(this.pIdentifier);
-			event.getControler().getEvents().addHandler(this.globalPaxHandler);
+			event.getServices().getEvents().addHandler(this.globalPaxHandler);
 			this.linkId2TotalCountsFromLastIteration = new HashMap<>();			
 			this.vehHandler = new CountPVehHandler(this.pIdentifier);
-			event.getControler().getEvents().addHandler(this.vehHandler);
+			event.getServices().getEvents().addHandler(this.vehHandler);
 			this.linkId2VehCountsFromLastIteration = new HashMap<>();
 		}
 	}
@@ -130,7 +130,7 @@ final class GexfPStatLight extends MatsimJaxbXmlWriter implements StartupListene
 		if (this.getWriteGexfStatsInterval > 0) {
 			this.addValuesToGexf(event.getIteration());
 			if ((event.getIteration() % this.getWriteGexfStatsInterval == 0) ) {
-				this.write(event.getControler().getControlerIO().getIterationFilename(event.getIteration(), GexfPStatLight.FILENAME));
+				this.write(event.getServices().getControlerIO().getIterationFilename(event.getIteration(), GexfPStatLight.FILENAME));
 			}			
 		}		
 	}
@@ -138,7 +138,7 @@ final class GexfPStatLight extends MatsimJaxbXmlWriter implements StartupListene
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {
 		if (this.getWriteGexfStatsInterval > 0) {
-			this.write(event.getControler().getControlerIO().getOutputFilename(GexfPStatLight.FILENAME));
+			this.write(event.getServices().getControlerIO().getOutputFilename(GexfPStatLight.FILENAME));
 		}		
 	}
 

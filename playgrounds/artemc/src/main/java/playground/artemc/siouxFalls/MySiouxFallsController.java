@@ -11,6 +11,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
@@ -38,7 +39,7 @@ public class MySiouxFallsController {
 		 * This cannot be moved to the initializer since the scoring functions
 		 * are created even before the startup event is created.
 		 */ 
-	//	controler.setScoringFunctionFactory(new TimeAndMoneyDependentScoringFunctionFactory());
+	//	services.setScoringFunctionFactory(new TimeAndMoneyDependentScoringFunctionFactory());
 		
 		Initializer initializer = new Initializer();
 		controler.addControlerListener(initializer);
@@ -55,8 +56,8 @@ public class MySiouxFallsController {
 	private static Scenario initSampleScenario() {
 
 		Config config = ConfigUtils.loadConfig("C:/Workspace/roadpricingSingapore/scenarios/siouxFalls/config.xml");
-		//config.controler().setOutputDirectory("./outpout_SiouxFalls/pt_UE_7200_calibration_PT_6min_600m");
-		//config.controler().setOutputDirectory("./outpout_SiouxFalls/SiouxFalls_5PT_Lines");
+		//config.services().setOutputDirectory("./outpout_SiouxFalls/pt_UE_7200_calibration_PT_6min_600m");
+		//config.services().setOutputDirectory("./outpout_SiouxFalls/SiouxFalls_5PT_Lines");
 		config.controler().setOutputDirectory("C:/Workspace/roadpricingSingapore/output_SiouxFalls/sf_10it_withPT");
 		config.controler().setLastIteration(10);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -68,7 +69,7 @@ public class MySiouxFallsController {
 
 		@Override
 		public void notifyStartup(StartupEvent event) {
-			Controler controler = event.getControler();
+			MatsimServices controler = event.getServices();
 			// create a plot containing the mean travel times
 			Set<String> transportModes = new HashSet<String>();
 			transportModes.add(TransportMode.car);

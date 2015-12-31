@@ -22,6 +22,7 @@ package playground.jbischoff.taxibus.scenario;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.cadyts.car.CadytsCarModule;
 import org.matsim.contrib.cadyts.car.CadytsContext;
 import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
 import org.matsim.contrib.cadyts.general.CadytsScoring;
@@ -59,6 +60,8 @@ import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson
 import org.matsim.core.scoring.functions.SubpopulationCharyparNagelScoringParameters;
 import org.matsim.core.utils.collections.CollectionUtils;
 
+import javax.inject.Inject;
+
 /**
  * @author  jbischoff
  *
@@ -67,7 +70,6 @@ public class CreateBasecase {
 
 	public static void main(String[] args) {
 		boolean useCadyts = true;
-		final CadytsContext cContext;
 		final Config config;
 		final Scenario scenario;
 		if (args.length>0){
@@ -75,17 +77,13 @@ public class CreateBasecase {
 			boolean useCadytsConf= Boolean.parseBoolean(args[1]);
 			useCadyts=useCadytsConf;
 			System.out.println("using cadyts: "+useCadyts);
-			cContext = new CadytsContext(config);
 			scenario = ScenarioUtils.loadScenario(config);
 		}
 		else
 		{
 			config = ConfigUtils.createConfig();
 			System.out.println("using cadyts: "+useCadyts);
-			cContext =	prepareConfig(config, useCadyts);
 			scenario = ScenarioUtils.loadScenario(config);
-
-		
 		}
 		
 		
@@ -96,11 +94,12 @@ public class CreateBasecase {
 		if (useCadyts){
 		// create the cadyts context and add it to the control(l)er:
 
-				controler.addControlerListener(cContext);
+				controler.addOverridingModule(new CadytsCarModule());
 
 				// include cadyts into the plan scoring (this will add the cadyts corrections to the scores):
 				controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
 					private final CharyparNagelScoringParametersForPerson parameters = new SubpopulationCharyparNagelScoringParameters( scenario );
+					@Inject CadytsContext cContext;
 					@Override
 					public ScoringFunction createNewScoringFunction(Person person) {
 
@@ -124,7 +123,7 @@ public class CreateBasecase {
 		controler.run();
 		
 	}
-static CadytsContext prepareConfig(Config config, boolean useCadyts){
+static void prepareConfig(Config config, boolean useCadyts){
 	String basedir = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/input/";
 //	String basedir = "/net/ils4/jbischoff/input/";
 	double scale = 0.01;
@@ -172,7 +171,6 @@ static CadytsContext prepareConfig(Config config, boolean useCadyts){
 	counts.setCountsFileName(basedir+"counts.xml");
 	counts.setCountsScaleFactor(1.0/scale);
 	
-	CadytsContext context = new CadytsContext(config);
 	if (useCadyts){
 	CadytsConfigGroup cadyts = (CadytsConfigGroup) config.getModule("cadytsCar");
 	cadyts.setStartTime(6*3600);
@@ -464,7 +462,6 @@ static CadytsContext prepareConfig(Config config, boolean useCadyts){
 	source.setActivityType("source");
 	pcs.addActivityParams(source);
 	
-	return context;
 
 	
 }

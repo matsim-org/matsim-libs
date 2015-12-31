@@ -39,12 +39,13 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 import java.util.LinkedList;
 
-public class PlansGeneratorControler extends Controler {
+public class PlansGeneratorControler {
 
 	final private static Logger log = Logger.getLogger(PlansGeneratorControler.class);
+	private final Controler controler;
 
 	public PlansGeneratorControler(final Config config) {
-		super(config);
+		this.controler = new Controler(config);
 	}
 
 
@@ -63,55 +64,55 @@ public class PlansGeneratorControler extends Controler {
 		log.info("  generating plans... ");
 
 		for (int i = 0; i < 314; i++) {
-            generatePerson(numberOfPlans, getScenario().getNetwork().getLinks().get(Id.create(20, Link.class)), getScenario().getNetwork().getLinks().get(Id.create(9, Link.class)), pop);
+            generatePerson(numberOfPlans, controler.getScenario().getNetwork().getLinks().get(Id.create(20, Link.class)), controler.getScenario().getNetwork().getLinks().get(Id.create(9, Link.class)), pop);
 			numberOfPlans++;
 		}
 		for (int i = 0; i < 948; i++) {
-            generatePerson(numberOfPlans, getScenario().getNetwork().getLinks().get(Id.create(20, Link.class)), getScenario().getNetwork().getLinks().get(Id.create(7, Link.class)), pop);
+            generatePerson(numberOfPlans, controler.getScenario().getNetwork().getLinks().get(Id.create(20, Link.class)), controler.getScenario().getNetwork().getLinks().get(Id.create(7, Link.class)), pop);
 			numberOfPlans++;
 		}
 
 		for (int i = 0; i < 196; i++) {
-            generatePerson(numberOfPlans, getScenario().getNetwork().getLinks().get(Id.create(20, Link.class)), getScenario().getNetwork().getLinks().get(Id.create(5, Link.class)), pop);
+            generatePerson(numberOfPlans, controler.getScenario().getNetwork().getLinks().get(Id.create(20, Link.class)), controler.getScenario().getNetwork().getLinks().get(Id.create(5, Link.class)), pop);
 			numberOfPlans++;
 		}
 
 		for (int i = 0; i < 56; i++) {
-            generatePerson(numberOfPlans, getScenario().getNetwork().getLinks().get(Id.create(40, Link.class)), getScenario().getNetwork().getLinks().get(Id.create(3, Link.class)), pop);
+            generatePerson(numberOfPlans, controler.getScenario().getNetwork().getLinks().get(Id.create(40, Link.class)), controler.getScenario().getNetwork().getLinks().get(Id.create(3, Link.class)), pop);
 			numberOfPlans++;
 		}
 		for (int i = 0; i < 192; i++) {
-            generatePerson(numberOfPlans, getScenario().getNetwork().getLinks().get(Id.create(40, Link.class)), getScenario().getNetwork().getLinks().get(Id.create(9, Link.class)), pop);
+            generatePerson(numberOfPlans, controler.getScenario().getNetwork().getLinks().get(Id.create(40, Link.class)), controler.getScenario().getNetwork().getLinks().get(Id.create(9, Link.class)), pop);
 			numberOfPlans++;
 		}
 		for (int i = 0; i < 185; i++) {
-            generatePerson(numberOfPlans, getScenario().getNetwork().getLinks().get(Id.create(40, Link.class)), getScenario().getNetwork().getLinks().get(Id.create(7, Link.class)), pop);
+            generatePerson(numberOfPlans, controler.getScenario().getNetwork().getLinks().get(Id.create(40, Link.class)), controler.getScenario().getNetwork().getLinks().get(Id.create(7, Link.class)), pop);
 			numberOfPlans++;
 		}
 
 		for (int i = 0; i < 170; i++) {
-            generatePerson(numberOfPlans, getScenario().getNetwork().getLinks().get(Id.create(60, Link.class)), getScenario().getNetwork().getLinks().get(Id.create(5, Link.class)), pop);
+            generatePerson(numberOfPlans, controler.getScenario().getNetwork().getLinks().get(Id.create(60, Link.class)), controler.getScenario().getNetwork().getLinks().get(Id.create(5, Link.class)), pop);
 			numberOfPlans++;
 		}
 		for (int i = 0; i < 799; i++) {
-            generatePerson(numberOfPlans, getScenario().getNetwork().getLinks().get(Id.create(60, Link.class)), getScenario().getNetwork().getLinks().get(Id.create(3, Link.class)), pop);
+            generatePerson(numberOfPlans, controler.getScenario().getNetwork().getLinks().get(Id.create(60, Link.class)), controler.getScenario().getNetwork().getLinks().get(Id.create(3, Link.class)), pop);
 			numberOfPlans++;
 		}
 		for (int i = 0; i < 147; i++) {
-            generatePerson(numberOfPlans, getScenario().getNetwork().getLinks().get(Id.create(60, Link.class)), getScenario().getNetwork().getLinks().get(Id.create(9, Link.class)), pop);
+            generatePerson(numberOfPlans, controler.getScenario().getNetwork().getLinks().get(Id.create(60, Link.class)), controler.getScenario().getNetwork().getLinks().get(Id.create(9, Link.class)), pop);
 			numberOfPlans++;
 		}
 
 		for (int i = 0; i < 150; i++) {
-            generatePerson(numberOfPlans, getScenario().getNetwork().getLinks().get(Id.create(80, Link.class)), getScenario().getNetwork().getLinks().get(Id.create(7, Link.class)), pop);
+            generatePerson(numberOfPlans, controler.getScenario().getNetwork().getLinks().get(Id.create(80, Link.class)), controler.getScenario().getNetwork().getLinks().get(Id.create(7, Link.class)), pop);
 			numberOfPlans++;
 		}
 		for (int i = 0; i < 166; i++) {
-            generatePerson(numberOfPlans, getScenario().getNetwork().getLinks().get(Id.create(80, Link.class)), getScenario().getNetwork().getLinks().get(Id.create(5, Link.class)), pop);
+            generatePerson(numberOfPlans, controler.getScenario().getNetwork().getLinks().get(Id.create(80, Link.class)), controler.getScenario().getNetwork().getLinks().get(Id.create(5, Link.class)), pop);
 			numberOfPlans++;
 		}
 		for (int i = 0; i < 341; i++) {
-            generatePerson(numberOfPlans, getScenario().getNetwork().getLinks().get(Id.create(80, Link.class)), getScenario().getNetwork().getLinks().get(Id.create(3, Link.class)), pop);
+            generatePerson(numberOfPlans, controler.getScenario().getNetwork().getLinks().get(Id.create(80, Link.class)), controler.getScenario().getNetwork().getLinks().get(Id.create(3, Link.class)), pop);
 			numberOfPlans++;
 		}
 
@@ -129,10 +130,10 @@ public class PlansGeneratorControler extends Controler {
 		LinkedList <Link> fromLinks = new LinkedList<Link>();
 		LinkedList <Link> toLinks = new LinkedList<Link>();
 
-        fromLinks.add(getScenario().getNetwork().getLinks().get(Id.create("1", Link.class)));
-        fromLinks.add(getScenario().getNetwork().getLinks().get(Id.create("2", Link.class)));
+        fromLinks.add(controler.getScenario().getNetwork().getLinks().get(Id.create("1", Link.class)));
+        fromLinks.add(controler.getScenario().getNetwork().getLinks().get(Id.create("2", Link.class)));
 
-        toLinks.add(getScenario().getNetwork().getLinks().get(Id.create("6", Link.class)));
+        toLinks.add(controler.getScenario().getNetwork().getLinks().get(Id.create("6", Link.class)));
 
 
 		for(int i=0; i < 1000; i++){
@@ -184,14 +185,13 @@ public class PlansGeneratorControler extends Controler {
 		Config config;
 		config = ConfigUtils.loadConfig("./src/playground/andreas/intersection/test/data/bottleneck/config.xml");
 		final PlansGeneratorControler controler = new PlansGeneratorControler(config);
-		controler.getConfig().controler().setOverwriteFileSetting(
-				true ?
-						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
-		controler.getConfig().controler().setWriteEventsInterval(1);
 
 		controler.run();
 
+	}
+
+	private void run() {
+		controler.run();
 	}
 
 }

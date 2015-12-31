@@ -24,6 +24,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -289,7 +290,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
             matsimControler.getConfig().strategy().setPlanSelectorForRemoval("DiversityGeneratingPlansRemover");
         //no use for this, if you don't exactly know the communicationsMode of population when something goes wrong.
         // better to have plans written out every n successful iterations, specified in the config
-        matsimControler.setDumpDataAtEnd(false);
+        matsimControler.getConfig().controler().setDumpDataAtEnd(false);
     }
 
     public static void main(String[] args) throws IOException, ClassNotFoundException, ParseException, InterruptedException {
@@ -356,10 +357,11 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
             pSimFactory.setStopStopTime(stopStopTimes);
             pSimFactory.setWaitTime(waitTimes);
             pSimFactory.setTransitPerformance(transitPerformance);
-            if (matsimControler.getTransitRouterFactory() instanceof TransitRouterEventsWSFactory) {
-                ((TransitRouterEventsWSFactory) matsimControler.getTransitRouterFactory()).setStopStopTime(stopStopTimes);
-                ((TransitRouterEventsWSFactory) matsimControler.getTransitRouterFactory()).setWaitTime(waitTimes);
-            }
+//            if (matsimControler.getTransitRouterFactory() instanceof TransitRouterEventsWSFactory) {
+//                ((TransitRouterEventsWSFactory) matsimControler.getTransitRouterFactory()).setStopStopTime(stopStopTimes);
+//                ((TransitRouterEventsWSFactory) matsimControler.getTransitRouterFactory()).setWaitTime(waitTimes);
+//            }
+            throw new RuntimeException();
         }
         plancatcher.init();
         numberOfIterations++;
@@ -564,7 +566,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         communications();
     }
 
-    public Controler getMATSimControler() {
+    public MatsimServices getMATSimControler() {
         return matsimControler;
     }
 

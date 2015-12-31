@@ -19,22 +19,22 @@
 
 package playground.meisterk.kti.controler;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.locationchoice.facilityload.FacilitiesLoadCalculator;
 import org.matsim.contrib.locationchoice.facilityload.FacilityPenalties;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.population.routes.NetworkRoute;
 import playground.meisterk.kti.config.KtiConfigGroup;
 import playground.meisterk.kti.controler.listeners.CalcLegTimesKTIListener;
 import playground.meisterk.kti.controler.listeners.KtiPopulationPreparation;
 import playground.meisterk.kti.controler.listeners.LegDistanceDistributionWriter;
 import playground.meisterk.kti.controler.listeners.ScoreElements;
-import playground.meisterk.kti.router.KtiLinkNetworkRouteFactory;
-import playground.meisterk.kti.router.KtiPtRoute;
-import playground.meisterk.kti.router.KtiPtRouteFactory;
 import playground.meisterk.kti.router.PlansCalcRouteKtiInfo;
-import playground.meisterk.org.matsim.config.PlanomatConfigGroup;
+
+import javax.inject.Inject;
+import javax.inject.Provider;
 
 /**
  * A special controler for the KTI-Project.
@@ -44,7 +44,7 @@ import playground.meisterk.org.matsim.config.PlanomatConfigGroup;
  * @author wrashid
  *
  */
-public class KTIControler extends Controler {
+public class KTIModule extends AbstractModule {
 
 	protected static final String SCORE_ELEMENTS_FILE_NAME = "scoreElementsAverages.txt";
 	protected static final String CALC_LEG_TIMES_KTI_FILE_NAME = "calcLegTimesKTI.txt";
@@ -54,14 +54,14 @@ public class KTIControler extends Controler {
 	private final KtiConfigGroup ktiConfigGroup = new KtiConfigGroup();
 	private final PlansCalcRouteKtiInfo plansCalcRouteKtiInfo = new PlansCalcRouteKtiInfo(ktiConfigGroup);
 
-	public KTIControler(String[] args) {
-		super(args);
-
-		super.getConfig().addModule(this.ktiConfigGroup);
-
-        ((PopulationFactoryImpl) getScenario().getPopulation().getFactory()).setRouteFactory(NetworkRoute.class, new KtiLinkNetworkRouteFactory(getScenario().getNetwork(), new PlanomatConfigGroup()));
-        ((PopulationFactoryImpl) getScenario().getPopulation().getFactory()).setRouteFactory(KtiPtRoute.class, new KtiPtRouteFactory(this.plansCalcRouteKtiInfo));
-        this.loadMyControlerListeners();
+	public KTIModule() {
+//		super(args);
+//
+//		super.getConfig().addModule(this.ktiConfigGroup);
+//
+//        ((PopulationFactoryImpl) getScenario().getPopulation().getFactory()).setRouteFactory(NetworkRoute.class, new KtiLinkNetworkRouteFactory(getScenario().getNetwork(), new PlanomatConfigGroup()));
+//        ((PopulationFactoryImpl) getScenario().getPopulation().getFactory()).setRouteFactory(KtiPtRoute.class, new KtiPtRouteFactory(this.plansCalcRouteKtiInfo));
+//        this.loadMyControlerListeners();
 		throw new RuntimeException(Gbl.CREATE_ROUTING_ALGORITHM_WARNING_MESSAGE + Gbl.SET_UP_IS_NOW_FINAL
 				+ Gbl.LOAD_DATA_IS_NOW_FINAL ) ;
 	}
@@ -97,16 +97,14 @@ public class KTIControler extends Controler {
 //	}
 
 
-	private void loadMyControlerListeners() {
-
-//		super.loadControlerListeners();
-
+	@Override
+	public void install() {
 		// the scoring function processes facility loads
-		this.addControlerListener(new FacilitiesLoadCalculator(((FacilityPenalties) this.getScenario().getScenarioElement(FacilityPenalties.ELEMENT_NAME)).getFacilityPenalties()));
-		this.addControlerListener(new ScoreElements(SCORE_ELEMENTS_FILE_NAME));
-		this.addControlerListener(new CalcLegTimesKTIListener(CALC_LEG_TIMES_KTI_FILE_NAME, LEG_TRAVEL_TIME_DISTRIBUTION_FILE_NAME));
-		this.addControlerListener(new LegDistanceDistributionWriter(LEG_DISTANCE_DISTRIBUTION_FILE_NAME));
-		this.addControlerListener(new KtiPopulationPreparation(this.ktiConfigGroup));
+		addControlerListenerBinding().toProvider(FacilitiesLoadCalculatorProvider.class);
+		addControlerListenerBinding().toInstance(new ScoreElements(SCORE_ELEMENTS_FILE_NAME));
+		addControlerListenerBinding().toInstance(new CalcLegTimesKTIListener(CALC_LEG_TIMES_KTI_FILE_NAME, LEG_TRAVEL_TIME_DISTRIBUTION_FILE_NAME));
+		addControlerListenerBinding().toInstance(new LegDistanceDistributionWriter(LEG_DISTANCE_DISTRIBUTION_FILE_NAME));
+		addControlerListenerBinding().toInstance(new KtiPopulationPreparation(this.ktiConfigGroup));
 	}
 
 //	@Override
@@ -138,11 +136,19 @@ public class KTIControler extends Controler {
 			System.out.println("Usage: KtiControler config-file [dtd-file]");
 			System.out.println();
 		} else {
-			final Controler controler = new KTIControler(args);
+			final Controler controler = new Controler(args);
+			controler.addOverridingModule(new KTIModule());
 			controler.run();
 		}
 		System.exit(0);
 	}
 
 
+	private class FacilitiesLoadCalculatorProvider implements Provider<ControlerListener> {
+		@Inject Scenario scenario;
+		@Override
+		public ControlerListener get() {
+			return new FacilitiesLoadCalculator(((FacilityPenalties) scenario.getScenarioElement(FacilityPenalties.ELEMENT_NAME)).getFacilityPenalties());
+		}
+	}
 }

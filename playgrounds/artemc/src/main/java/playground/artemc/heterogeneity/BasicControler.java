@@ -6,6 +6,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.ControlerDefaultsModule;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
@@ -69,7 +70,7 @@ public class BasicControler {
             config.controler().setOutputDirectory(output);
         }
 
-        //config.controler().setLastIteration(10);
+        //config.services().setLastIteration(10);
         Scenario scenario = ScenarioUtils.loadScenario(config);
 
         return scenario;
@@ -81,7 +82,7 @@ public class BasicControler {
         @Override
         public void notifyStartup(StartupEvent event) {
 
-            Controler controler = event.getControler();
+            MatsimServices controler = event.getServices();
 
             // create a plot containing the mean travel times
             Set<String> transportModes = new HashSet<String>();

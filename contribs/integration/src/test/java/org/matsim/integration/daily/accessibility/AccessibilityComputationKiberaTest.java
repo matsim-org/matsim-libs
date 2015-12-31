@@ -120,37 +120,7 @@ public class AccessibilityComputationKiberaTest {
 		Map<String, ActivityFacilities> activityFacilitiesMap = new HashMap<String, ActivityFacilities>();
 		
 		Controler controler = new Controler(scenario) ;
-
-		
-		// loop over activity types to add one GridBasedAccessibilityControlerListenerV3 for each combination
-		for ( String actType : activityTypes ) {
-			ActivityFacilities opportunities = AccessibilityRunUtils.collectActivityFacilitiesOfType(scenario, actType);
-
-			activityFacilitiesMap.put(actType, opportunities);
-
-			GridBasedAccessibilityControlerListenerV3 listener = 
-					new GridBasedAccessibilityControlerListenerV3(activityFacilitiesMap.get(actType), 
-							config, scenario.getNetwork());
-			listener.setComputingAccessibilityForMode(Modes4Accessibility.freeSpeed, true);
-			listener.setComputingAccessibilityForMode(Modes4Accessibility.car, true);
-			listener.setComputingAccessibilityForMode(Modes4Accessibility.walk, true);
-			listener.setComputingAccessibilityForMode(Modes4Accessibility.bike, true);
-//			listener.setComputingAccessibilityForMode(Modes4Accessibility.pt, true);
-			
-//			listener.addAdditionalFacilityData(homes) ;
-			listener.generateGridsAndMeasuringPointsByNetwork(cellSize);
-			
-			listener.writeToSubdirectoryWithName(actType);
-			
-			// for push to geoserver
-			listener.addFacilityDataExchangeListener(new GeoserverUpdater(crs, name));
-			
-			listener.setUrbansimMode(false); // avoid writing some (eventually: all) files that related to matsim4urbansim
-
-			controler.addControlerListener(listener);
-		}
-
-
+		controler.addOverridingModule(new AccessibilityComputationTestModule(activityTypes, null, crs, name, cellSize));
 		controler.run();
 
 

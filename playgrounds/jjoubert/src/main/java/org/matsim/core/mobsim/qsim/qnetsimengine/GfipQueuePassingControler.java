@@ -134,11 +134,16 @@ public class GfipQueuePassingControler {
 			}
 		});
 
-		LinkCounter linkCounter = new LinkCounter(sc, queueType, linkIdIn, linkIdOut);
+		final LinkCounter linkCounter = new LinkCounter(sc, queueType, linkIdIn, linkIdOut);
 		controler.getEvents().addHandler(linkCounter);
 		controler.addControlerListener(linkCounter);
 		controler.addControlerListener(new AssignVehiclesToAllRoutes());
-		controler.getMobsimListeners().add(linkCounter);
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				addMobsimListenerBinding().toInstance(linkCounter);
+			}
+		});
 		controler.run();
 
 		Header.printFooter();
@@ -526,7 +531,7 @@ public class GfipQueuePassingControler {
 
 			/* Write the load for each link. */
 			for(Id<Link> linkId : this.countMap.keySet()){
-				String filename = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "link_" + linkId.toString() + ".csv");
+				String filename = event.getServices().getControlerIO().getIterationFilename(event.getIteration(), "link_" + linkId.toString() + ".csv");
 				log.info("Writing link counts to " + filename);
 
 				BufferedWriter bw = IOUtils.getBufferedWriter(filename);
@@ -566,7 +571,7 @@ public class GfipQueuePassingControler {
 			}
 
 			/* Write the space-time observations. */
-			String spaceTimeFilename = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "spaceTime.csv");
+			String spaceTimeFilename = event.getServices().getControlerIO().getIterationFilename(event.getIteration(), "spaceTime.csv");
 			log.info("Writing space-time observations to " + spaceTimeFilename);
 
 			BufferedWriter bw = IOUtils.getBufferedWriter(spaceTimeFilename);
@@ -591,7 +596,7 @@ public class GfipQueuePassingControler {
 			}
 
 			/* Write the rho observations. */
-			String rhoFilename = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "rho.csv");
+			String rhoFilename = event.getServices().getControlerIO().getIterationFilename(event.getIteration(), "rho.csv");
 			log.info("Writing space-time observations to " + rhoFilename);
 
 			BufferedWriter bwRho = IOUtils.getBufferedWriter(rhoFilename);
@@ -616,7 +621,7 @@ public class GfipQueuePassingControler {
 			}
 			
 			/* Write the estimated versus actual times to file. */
-			String timeFilename = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "timeDiscrepancy.csv");
+			String timeFilename = event.getServices().getControlerIO().getIterationFilename(event.getIteration(), "timeDiscrepancy.csv");
 			log.info("Writing space-time observations to " + timeFilename);
 			
 			BufferedWriter bwTime = IOUtils.getBufferedWriter(timeFilename);
@@ -670,8 +675,8 @@ public class GfipQueuePassingControler {
 		@Override
 		public void notifyIterationStarts(IterationStartsEvent event) {
 			log.info(" ====> Assigning vehicles to routes.");
-			if(event.getIteration() ==  event.getControler().getConfig().controler().getFirstIteration()){
-				for(Person p : event.getControler().getScenario().getPopulation().getPersons().values()){
+			if(event.getIteration() ==  event.getServices().getConfig().controler().getFirstIteration()){
+				for(Person p : event.getServices().getScenario().getPopulation().getPersons().values()){
 					for(Plan plan : p. getPlans()){
 						new SetVehicleInAllNetworkRoutes().handlePlan(plan);
 					}

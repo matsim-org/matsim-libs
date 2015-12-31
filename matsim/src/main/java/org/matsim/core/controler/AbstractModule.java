@@ -65,7 +65,7 @@ import com.google.inject.util.Modules;
  * AbstractModule is a custom version of com.google.inject.Module, with the following differences:<ul>
  * <li> AbstractModule is a bit more restrictive.
  * <li> AbstractModule already has the config (as getConfig() ), which is helpful since the config contains material that
- * has to be used to configure the controler.
+ * has to be used to configure the services.
  * </ul>
  *
  * @author michaz

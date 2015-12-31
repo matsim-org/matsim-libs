@@ -38,6 +38,7 @@ import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceInitializ
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.gbl.MatsimRandom;
@@ -392,7 +393,7 @@ public class Matsim2030Utils {
 		return subNetwork;
 	}
 
-	public static void initializeLocationChoice( final Controler controler ) {
+	public static void initializeLocationChoice( final MatsimServices controler ) {
 		final Scenario scenario = controler.getScenario();
 		final DestinationChoiceBestResponseContext lcContext =
 			new DestinationChoiceBestResponseContext( scenario );
@@ -447,7 +448,7 @@ public class Matsim2030Utils {
 		return builder.build( scenario );
 	}
 
-	public static void loadControlerListeners( final Controler controler ) {
+	public static void loadControlerListeners( final MatsimServices controler ) {
 		controler.addControlerListener(
 				new CalcLegTimesHerbieListener(
 					CALC_LEG_TIMES_FILE_NAME,

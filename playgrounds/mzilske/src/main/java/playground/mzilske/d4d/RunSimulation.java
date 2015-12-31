@@ -80,7 +80,7 @@ public class RunSimulation {
 
 		@Override
 		public void notifyStartup(StartupEvent event) {
-			String filename = event.getControler().getControlerIO().getOutputFilename("modeshare.txt");
+			String filename = event.getServices().getControlerIO().getOutputFilename("modeshare.txt");
 			this.out = IOUtils.getBufferedWriter(filename);
 			try {
 				this.out.write("ITERATION\tcar\tother\tnone\n");
@@ -149,14 +149,14 @@ public class RunSimulation {
 		
 		config.planCalcScore().setWriteExperiencedPlans(true);
 		
-	//	config.controler().setLastIteration(180);
+	//	config.services().setLastIteration(180);
 		config.controler().setLastIteration(1);
 		config.controler().setMobsim(MobsimType.qsim.toString());
 		config.controler().setOutputDirectory(outputDirectory);
-		// config.controler().setMobsim("DoNothing");
+		// config.services().setMobsim("DoNothing");
 		config.global().setCoordinateSystem("EPSG:3395");
 		config.global().setNumberOfThreads(8);
-		// config.controler().setWriteSnapshotsInterval(5);
+		// config.services().setWriteSnapshotsInterval(5);
 		config.qsim().setStorageCapFactor(0.01);
 		config.qsim().setFlowCapFactor(0.01);
 		config.qsim().setSnapshotStyle(QSimConfigGroup.SnapshotStyle.queue);

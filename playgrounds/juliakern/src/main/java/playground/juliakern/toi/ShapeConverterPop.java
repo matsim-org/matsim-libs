@@ -38,6 +38,7 @@ import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -61,7 +62,7 @@ public class ShapeConverterPop {
 		
 		Config config = new Config();
 		config.addCoreModules();
-		Controler controler = new Controler(config);
+		MatsimServices controler = new Controler(config);
 		controler.getConfig().controler().setOverwriteFileSetting(
 				true ?
 						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :

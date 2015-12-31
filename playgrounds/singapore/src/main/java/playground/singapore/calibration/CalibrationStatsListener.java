@@ -106,12 +106,12 @@ public class CalibrationStatsListener implements IterationEndsListener {
 	public void notifyIterationEnds(final IterationEndsEvent event) {
 		if(event.getIteration()%interval==0) {
 			try {
-                DistanceDistributionTrip distanceDistribution = new DistanceDistributionTrip(event.getControler().getScenario().getPopulation(), event.getControler().getScenario().getNetwork(), event.getControler().getScenario().getTransitSchedule(),this.pIdsToExclude);
+                DistanceDistributionTrip distanceDistribution = new DistanceDistributionTrip(event.getServices().getScenario().getPopulation(), event.getServices().getScenario().getNetwork(), event.getServices().getScenario().getTransitSchedule(),this.pIdsToExclude);
 				distanceDistribution.saveChains();
 				SortedMap<Integer, Integer[]>  distanceTripsMap = distanceDistribution.getDistribution(categoriesDistanceDataset, modesDistanceDataset);
-				distanceDistribution.printDistribution(distanceTripsMap, event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "tripDistanceHistogramByMode.csv"));
+				distanceDistribution.printDistribution(distanceTripsMap, event.getServices().getControlerIO().getIterationFilename(event.getIteration(), "tripDistanceHistogramByMode.csv"));
 				SortedMap<Integer, Integer[]>  travelTimeTripsMap = timeJourneyHandler.getDistribution(categoriesTTDataset, modesTTDataset);
-				timeJourneyHandler.printDistribution(travelTimeTripsMap, event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "tripTravelTimeHistogramByMode.csv"));
+				timeJourneyHandler.printDistribution(travelTimeTripsMap, event.getServices().getControlerIO().getIterationFilename(event.getIteration(), "tripTravelTimeHistogramByMode.csv"));
 				Integer[] totals = new Integer[modesDistanceDataset.length];
 
 				for(int i=0; i<totals.length; i++)
@@ -121,7 +121,7 @@ public class CalibrationStatsListener implements IterationEndsListener {
 						totals[i] += journeys[i]==null?0:journeys[i];
 				
 				numberTripsPerMode.put(event.getIteration(), totals);		
-				String path = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "");
+				String path = event.getServices().getControlerIO().getIterationFilename(event.getIteration(), "");
 				(new File(path.substring(0,path.lastIndexOf("/"))+"/calibration")).mkdir();
 				generator.createCalibrationCharts(colorScheme, distanceTripsMap, travelTimeTripsMap, numberTripsPerMode, path, surveyName);
 				timeJourneyHandler.reset(event.getIteration());

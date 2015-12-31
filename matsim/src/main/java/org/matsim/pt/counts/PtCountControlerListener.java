@@ -21,11 +21,12 @@
 package org.matsim.pt.counts;
 
 import org.apache.log4j.Logger;
+import org.matsim.analysis.IterationStopWatch;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PtCountsConfigGroup;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
@@ -42,6 +43,7 @@ import org.matsim.counts.MatsimCountsReader;
 import org.matsim.counts.algorithms.CountsComparisonAlgorithm;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
+import javax.inject.Inject;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,6 +51,11 @@ import java.util.Map.Entry;
 
 public class PtCountControlerListener implements StartupListener, IterationEndsListener,
 BeforeMobsimListener, AfterMobsimListener  {
+
+	private EventsManager eventsManager;
+	private OutputDirectoryHierarchy controlerIO;
+	private IterationStopWatch iterationStopWatch;
+	private Network network;
 
 	private static enum CountType { Boarding, Alighting, Occupancy }
 
@@ -66,7 +73,12 @@ BeforeMobsimListener, AfterMobsimListener  {
 	private final Counts boardCounts, alightCounts,occupancyCounts;
 	private final OccupancyAnalyzer occupancyAnalyzer;
 
-	public PtCountControlerListener(final Config config) {
+	@Inject
+	PtCountControlerListener(final Config config, EventsManager eventsManager, OutputDirectoryHierarchy controlerIO, IterationStopWatch iterationStopWatch, Network network) {
+		this.eventsManager = eventsManager;
+		this.controlerIO = controlerIO;
+		this.iterationStopWatch = iterationStopWatch;
+		this.network = network;
 		log.info("Using pt counts.");
 		this.config = config;
 		this.boardCounts = new Counts();
@@ -94,7 +106,7 @@ BeforeMobsimListener, AfterMobsimListener  {
 		int iter = event.getIteration();
 		if ( isActiveInThisIteration( iter ) ) {
 			occupancyAnalyzer.reset(iter);
-			event.getControler().getEvents().addHandler(occupancyAnalyzer);
+			eventsManager.addHandler(occupancyAnalyzer);
 		}
 	}
 
@@ -102,9 +114,8 @@ BeforeMobsimListener, AfterMobsimListener  {
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
 		int it = event.getIteration();
 		if ( isActiveInThisIteration( it ) ) {
-			event.getControler().getEvents().removeHandler(occupancyAnalyzer);
-			occupancyAnalyzer.write(event.getControler().getControlerIO()
-					.getIterationFilename(it, "occupancyAnalysis.txt"));
+			eventsManager.removeHandler(occupancyAnalyzer);
+			occupancyAnalyzer.write(controlerIO.getIterationFilename(it, "occupancyAnalysis.txt"));
 		}
 	}
 
@@ -114,14 +125,12 @@ BeforeMobsimListener, AfterMobsimListener  {
 
 	@Override
 	public void notifyIterationEnds(final IterationEndsEvent event) {
-		final Controler controler = event.getControler();
 		int iter = event.getIteration();
 		if ( isActiveInThisIteration( iter ) ) {
 
-			controler.getStopwatch().beginOperation(OPERATION_COMPAREPTCOUNTS);
+			iterationStopWatch.beginOperation(OPERATION_COMPAREPTCOUNTS);
 
 			double countsScaleFactor = Double.parseDouble(this.config.getParam(MODULE_NAME, "countsScaleFactor"));
-            Network network = controler.getScenario().getNetwork();
 
 			Map<CountType,CountsComparisonAlgorithm> cca = new HashMap<CountType,CountsComparisonAlgorithm>();
 			cca.put( CountType.Boarding, new CountsComparisonAlgorithm(new CountsComparisonAlgorithm.VolumesForId() {
@@ -163,9 +172,8 @@ BeforeMobsimListener, AfterMobsimListener  {
 
 			String outputFormat = this.config.findParam(MODULE_NAME, "outputformat");
 			if (outputFormat.contains("kml") || outputFormat.contains("all")) {
-				OutputDirectoryHierarchy ctlIO=controler.getControlerIO();
 
-				String filename = ctlIO.getIterationFilename(iter, "ptcountscompare.kmz");
+				String filename = controlerIO.getIterationFilename(iter, "ptcountscompare.kmz");
 
 				// yy would be good to also just pass a collection/a map but we ain't there. kai, dec'13
 				Map< CountType, List<CountSimComparison> > comparisons = new HashMap< CountType, List<CountSimComparison> > () ;
@@ -185,15 +193,13 @@ BeforeMobsimListener, AfterMobsimListener  {
 				kmlWriter.writeFile(filename);
 			}
 			if (outputFormat.contains("txt") || outputFormat.contains("all")) {
-				OutputDirectoryHierarchy ctlIO=controler.getControlerIO();
-
 				for ( Entry<CountType,CountsComparisonAlgorithm> entry : cca.entrySet() ) {
 					CountsComparisonAlgorithm algo = entry.getValue() ;
-					new PtCountSimComparisonTableWriter(algo.getComparison()).write(ctlIO.getIterationFilename(iter, "simCountCompare" + entry.getKey().toString() + ".txt"));
+					new PtCountSimComparisonTableWriter(algo.getComparison()).write(controlerIO.getIterationFilename(iter, "simCountCompare" + entry.getKey().toString() + ".txt"));
 				}
 			}
 
-			event.getControler().getStopwatch().endOperation(OPERATION_COMPAREPTCOUNTS);
+			iterationStopWatch.endOperation(OPERATION_COMPAREPTCOUNTS);
 		}
 	}
 

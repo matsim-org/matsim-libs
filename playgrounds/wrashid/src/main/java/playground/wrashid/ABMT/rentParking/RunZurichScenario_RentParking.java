@@ -25,10 +25,10 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceInitializer;
-import org.matsim.contrib.parking.PC2.GeneralParkingModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.network.NetworkImpl;
@@ -41,7 +41,6 @@ import org.matsim.pt.PtConstants;
 
 import playground.ivt.kticompatibility.KtiLikeScoringConfigGroup;
 import playground.ivt.matsim2030.scoring.MATSim2010ScoringFunctionFactory;
-import playground.wrashid.parkingChoice.freeFloatingCarSharing.ParkingModuleWithFFCarSharingZH;
 
 import java.io.File;
 
@@ -101,7 +100,7 @@ public class RunZurichScenario_RentParking {
 		controler.run();
 	}
 
-	private static void connectFacilitiesWithNetwork(Controler controler) {
+	private static void connectFacilitiesWithNetwork(MatsimServices controler) {
         ActivityFacilities facilities = controler.getScenario().getActivityFacilities();
 		//log.warn("number of facilities: " +facilities.getFacilities().size());
         NetworkImpl network = (NetworkImpl) controler.getScenario().getNetwork();
@@ -111,7 +110,7 @@ public class RunZurichScenario_RentParking {
 		wcl.connectFacilitiesWithLinks(facilities, network);
 	}
 
-	private static void initializeLocationChoice( final Controler controler ) {
+	private static void initializeLocationChoice( final MatsimServices controler ) {
 		final Scenario scenario = controler.getScenario();
 		final DestinationChoiceBestResponseContext lcContext =
 			new DestinationChoiceBestResponseContext( scenario );

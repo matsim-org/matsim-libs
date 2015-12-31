@@ -130,21 +130,21 @@ public class DecisionModelRunner implements BeforeMobsimListener, MobsimBeforeSi
 		this.latestAcceptedLeaveTimeModel.printStatistics();
 		this.departureDelayModel.printStatistics();
 		
-		String panicModelFile = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), PanicModel.panicModelFile);
+		String panicModelFile = event.getServices().getControlerIO().getIterationFilename(event.getIteration(), PanicModel.panicModelFile);
 		this.panicModel.writeDecisionsToFile(panicModelFile);
 		
-		String pickupModelFile = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), PickupModel.pickupModelFile);
+		String pickupModelFile = event.getServices().getControlerIO().getIterationFilename(event.getIteration(), PickupModel.pickupModelFile);
 		this.pickupModel.writeDecisionsToFile(pickupModelFile);
 		
-		String evacuationDecisionModelFile = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), 
+		String evacuationDecisionModelFile = event.getServices().getControlerIO().getIterationFilename(event.getIteration(),
 				EvacuationDecisionModel.evacuationDecisionModelFile);
 		this.evacuationDecisionModel.writeDecisionsToFile(evacuationDecisionModelFile);
 		
-		String latestAcceptedLeaveTimeModelFile = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), 
+		String latestAcceptedLeaveTimeModelFile = event.getServices().getControlerIO().getIterationFilename(event.getIteration(),
 				LatestAcceptedLeaveTimeModel.latestAcceptedLeaveTimeFile);
 		this.latestAcceptedLeaveTimeModel.writeDecisionsToFile(latestAcceptedLeaveTimeModelFile);
 		
-		String departureDelayModelFile = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), 
+		String departureDelayModelFile = event.getServices().getControlerIO().getIterationFilename(event.getIteration(),
 				DepartureDelayModel.departureDelayModelFile);
 		this.departureDelayModel.writeDecisionsToFile(departureDelayModelFile);
 	}

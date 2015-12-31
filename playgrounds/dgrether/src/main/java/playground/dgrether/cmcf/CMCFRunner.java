@@ -62,12 +62,12 @@ public class CMCFRunner {
 					true ?
 							OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
 							OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
-			//			controler.addControlerListener(new StartupListener() {
+			//			services.addControlerListener(new StartupListener() {
 //				public void notifyStartup(StartupEvent e) {
-//					e.getControler().getEvents().addHandler(lsm);
-//					LinkTravelTimeCounter.init(e.getControler().getEvents(), e.getControler().getNetwork().getLinks().size());
+//					e.getServices().getEvents().addHandler(lsm);
+//					LinkTravelTimeCounter.init(e.getServices().getEvents(), e.getServices().getNetwork().getLinks().size());
 //					
-////					e.getControler().getEvents().addHandler(myHandler);
+////					e.getServices().getEvents().addHandler(myHandler);
 //				}});
 			
 			
@@ -80,10 +80,10 @@ public class CMCFRunner {
 			controler.addControlerListener(new StartupListener() {
 				@Override
 				public void notifyStartup(StartupEvent e) {
-					e.getControler().getEvents().addHandler(handler3);
-					e.getControler().getEvents().addHandler(handler4);
+					e.getServices().getEvents().addHandler(handler3);
+					e.getServices().getEvents().addHandler(handler4);
 					
-//					e.getControler().getEvents().addHandler(myHandler);
+//					e.getServices().getEvents().addHandler(myHandler);
 				}});
 			
 			 
@@ -94,11 +94,11 @@ public class CMCFRunner {
 					TTGraphWriter ttWriter = new TTGraphWriter();
 					ttWriter.addTTEventHandler(handler3);
 					ttWriter.addTTEventHandler(handler4);
-					ttWriter.writeTTChart(event.getControler().getControlerIO().getIterationPath(event.getIteration()), event.getIteration());
+					ttWriter.writeTTChart(event.getServices().getControlerIO().getIterationPath(event.getIteration()), event.getIteration());
 					InOutGraphWriter inoutWriter = new InOutGraphWriter();
 					inoutWriter.addInOutEventHandler(handler3);
 					inoutWriter.addInOutEventHandler(handler4);
-					inoutWriter.writeInOutChart(event.getControler().getControlerIO().getIterationPath(event.getIteration()), event.getIteration());
+					inoutWriter.writeInOutChart(event.getServices().getControlerIO().getIterationPath(event.getIteration()), event.getIteration());
 				}
 				
 			});
@@ -111,9 +111,9 @@ public class CMCFRunner {
 			Link link4 = net.getLinks().get(Id.create("4", Link.class));
 			Link link5 = net.getLinks().get(Id.create("5", Link.class));
 
-//			double tt2 = controler.getTravelTimeCalculator().getLinkTravelTime(link2, 7.0 * 3600.0);
-//			double tt3 = controler.getTravelTimeCalculator().getLinkTravelTime(link3, 7.0 * 3600.0);
-//			double tt4 = controler.getTravelTimeCalculator().getLinkTravelTime(link4, 7.0 * 3600.0);
+//			double tt2 = services.getTravelTimeCalculator().getLinkTravelTime(link2, 7.0 * 3600.0);
+//			double tt3 = services.getTravelTimeCalculator().getLinkTravelTime(link3, 7.0 * 3600.0);
+//			double tt4 = services.getTravelTimeCalculator().getLinkTravelTime(link4, 7.0 * 3600.0);
 //			
 //			log.info("avg tt on link 2 at 7:00: " + tt2);
 //			log.info("avg tt on link 3 at 7:00: " + tt3);
@@ -138,7 +138,7 @@ public class CMCFRunner {
 			
 			config = controler.getConfig();
 		  
-//			writeGraphs(myHandler, config.controler().getOutputDirectory());
+//			writeGraphs(myHandler, config.services().getOutputDirectory());
 		}
 		if (config == null) {
 			config = new Config();

@@ -21,14 +21,8 @@ package playground.agarwalamit.mixedTraffic.simTime;
 import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
@@ -45,11 +39,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
-import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.VehicleUtils;
 
-import playground.agarwalamit.mixedTraffic.MixedTrafficVehiclesUtils;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
 import playground.agarwalamit.utils.plans.BackwardCompatibilityForOldPlansType;
 
@@ -147,7 +137,7 @@ public class PatnaSimulationTimeWriter {
 
 		final Controler controler = new Controler(sc);
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
-		controler.setDumpDataAtEnd(false);
+		controler.getConfig().controler().setDumpDataAtEnd(false);
 
 		final RandomizingTimeDistanceTravelDisutility.Builder builder = new RandomizingTimeDistanceTravelDisutility.Builder("bike");
 		

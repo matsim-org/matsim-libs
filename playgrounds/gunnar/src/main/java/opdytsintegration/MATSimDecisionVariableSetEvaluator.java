@@ -175,7 +175,7 @@ public class MATSimDecisionVariableSetEvaluator<U extends DecisionVariable>
 	public void notifyStartup(final StartupEvent event) {
 
 		this.sortedLinkIds = new TreeSet<Id<Link>>(
-		// event.getControler().getScenario().getNetwork().
+		// event.getServices().getScenario().getNetwork().
 				this.network.getLinks().keySet());
 		this.stateList = new LinkedList<Vector>();
 
@@ -184,8 +184,8 @@ public class MATSimDecisionVariableSetEvaluator<U extends DecisionVariable>
 		//
 		// this.volumesAnalyzer = new VolumesAnalyzer(this.binSize_s,
 		// this.binSize_s * (this.startBin + this.binCnt), event
-		// .getControler().getScenario().getNetwork());
-		// event.getControler().getEvents().addHandler(this.volumesAnalyzer);
+		// .getServices().getScenario().getNetwork());
+		// event.getServices().getEvents().addHandler(this.volumesAnalyzer);
 		this.occupancyAnalyzer = new OccupancyAnalyzer(this.timeDiscretization);
 		this.eventsManager.addHandler(this.occupancyAnalyzer);
 
@@ -240,7 +240,7 @@ public class MATSimDecisionVariableSetEvaluator<U extends DecisionVariable>
 
 		{
 			final MATSimState newState = createState(
-			// event.getControler().getScenario().getPopulation()
+			// event.getServices().getScenario().getPopulation()
 			this.population);
 			this.trajectorySampler.afterIteration(newState);
 		}
@@ -249,7 +249,7 @@ public class MATSimDecisionVariableSetEvaluator<U extends DecisionVariable>
 	@Override
 	public void notifyShutdown(final ShutdownEvent event) {
 		this.finalState = createState(
-		// event.getControler().getScenario().getPopulation()
+		// event.getServices().getScenario().getPopulation()
 		this.population);
 	}
 }

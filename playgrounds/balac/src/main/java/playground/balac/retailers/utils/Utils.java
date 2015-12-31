@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PlanImpl;
@@ -122,7 +122,7 @@ public abstract class Utils
     return facilityQuadTree;
   }
 
-  public static final QuadTree<ActivityFacility> createFacilityQuadTree(Controler controler) {
+  public static final QuadTree<ActivityFacility> createFacilityQuadTree(MatsimServices controler) {
     double minx = (1.0D / 0.0D);
     double miny = (1.0D / 0.0D);
     double maxx = (-1.0D / 0.0D);
@@ -145,7 +145,7 @@ public abstract class Utils
     return facilityQuadTree;
   }
 
-  public static final QuadTree<Person> createPersonQuadTree(Controler controler) {
+  public static final QuadTree<Person> createPersonQuadTree(MatsimServices controler) {
     double minx = (1.0D / 0.0D);
     double miny = (1.0D / 0.0D);
     double maxx = (-1.0D / 0.0D);
@@ -166,7 +166,7 @@ public abstract class Utils
     log.info("PersonQuadTree has been created");
     return personQuadTree; }
 
-  public static final QuadTree<ActivityFacility> createShopsQuadTree(Controler controler) {
+  public static final QuadTree<ActivityFacility> createShopsQuadTree(MatsimServices controler) {
     double minx = (1.0D / 0.0D);
     double miny = (1.0D / 0.0D);
     double maxx = (-1.0D / 0.0D);
@@ -191,7 +191,7 @@ public abstract class Utils
 
     return shopsQuadTree;
   }
-  public static final QuadTree<ActivityFacility> createShopsQuadTreeWithoutRetailers(Controler controler, Map<Id<ActivityFacility>, ActivityFacilityImpl> retailerFacilities) {
+  public static final QuadTree<ActivityFacility> createShopsQuadTreeWithoutRetailers(MatsimServices controler, Map<Id<ActivityFacility>, ActivityFacilityImpl> retailerFacilities) {
 	    double minx = (1.0D / 0.0D);
 	    double miny = (1.0D / 0.0D);
 	    double maxx = (-1.0D / 0.0D);
@@ -231,7 +231,7 @@ public abstract class Utils
 	  
   }
   
-  public static final QuadTree<ActivityFacility> createInsideShopsQuadTreeWIthoutRetailers(Controler controler, Map<Id<ActivityFacility>, ActivityFacilityImpl> retailerFacilities) {
+  public static final QuadTree<ActivityFacility> createInsideShopsQuadTreeWIthoutRetailers(MatsimServices controler, Map<Id<ActivityFacility>, ActivityFacilityImpl> retailerFacilities) {
 	    double minx = (1.0D / 0.0D);
 	    double miny = (1.0D / 0.0D);
 	    double maxx = (-1.0D / 0.0D);
@@ -274,7 +274,7 @@ public static final boolean removeInsideShopFromShopsQuadTree(double x, double y
 }
 
 
-public static final QuadTree<ActivityFacility> createOutsideShopsQuadTreeWIthoutRetailers(Controler controler, Map<Id<ActivityFacility>, ActivityFacilityImpl> retailerFacilities) {
+public static final QuadTree<ActivityFacility> createOutsideShopsQuadTreeWIthoutRetailers(MatsimServices controler, Map<Id<ActivityFacility>, ActivityFacilityImpl> retailerFacilities) {
     double minx = (1.0D / 0.0D);
     double miny = (1.0D / 0.0D);
     double maxx = (-1.0D / 0.0D);
@@ -320,7 +320,7 @@ public static final boolean removeOutsideShopFromShopsQuadTree(double x, double 
   
   
 //changed check for activity types to reflect different education and work activities
-  public static final QuadTree<PersonPrimaryActivity> createPersonPrimaryActivityQuadTree(Controler controler)
+  public static final QuadTree<PersonPrimaryActivity> createPersonPrimaryActivityQuadTree(MatsimServices controler)
   {
     int i;
     double minx = (1.0D / 0.0D);
@@ -406,7 +406,7 @@ public static final boolean removeOutsideShopFromShopsQuadTree(double x, double 
    * Getting all the activities that are fixed in the simulation 
    * and that are not included in the location choice.
    */  
-  public static final QuadTree<PersonPrimaryActivity> createPersonFixedActivityQuadTree(Controler controler) {
+  public static final QuadTree<PersonPrimaryActivity> createPersonFixedActivityQuadTree(MatsimServices controler) {
 	  
    
 	  //controler.getConfig().getModule("locationchoice").getParams().get("flexible_types")

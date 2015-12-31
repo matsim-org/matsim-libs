@@ -58,11 +58,11 @@ public class AverageCongestionPricingControlerListener implements StartupListene
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		
-		EventsManager eventsManager = event.getControler().getEvents();
+		EventsManager eventsManager = event.getServices().getEvents();
 		congestionHandler = new CongestionHandlerImplV3(eventsManager, scenario);
 		
-		event.getControler().getEvents().addHandler(congestionHandler);		
-		event.getControler().getEvents().addHandler(tollHandler);
+		event.getServices().getEvents().addHandler(congestionHandler);
+		event.getServices().getEvents().addHandler(tollHandler);
 
 	}
 
@@ -79,7 +79,7 @@ public class AverageCongestionPricingControlerListener implements StartupListene
 		congestionHandler.writeCongestionStats(this.scenario.getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/congestionStats.csv");
 		
 		log.info("Throwing agent money events based on calculated average marginal cost for each link and time bin.");
-		EventsManager events = event.getControler().getEvents();
+		EventsManager events = event.getServices().getEvents();
 		
 		for (LinkEnterEvent enterEvent : this.tollHandler.getLinkEnterEvents()) {
 			double amount = tollHandler.getAvgToll(enterEvent.getLinkId(), enterEvent.getTime());

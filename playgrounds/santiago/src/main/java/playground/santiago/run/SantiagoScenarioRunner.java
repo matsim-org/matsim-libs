@@ -37,6 +37,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
@@ -153,14 +154,14 @@ public class SantiagoScenarioRunner {
 		});
 	}
 
-	private static void setBasicStrategiesForSubpopulations(Controler controler) {
+	private static void setBasicStrategiesForSubpopulations(MatsimServices controler) {
 		setReroute("carAvail", controler);
 		setChangeExp("carAvail", controler);
 		setReroute(null, controler);
 		setChangeExp(null, controler);
 	}
 
-	private static void setChangeExp(String subpopName, Controler controler) {
+	private static void setChangeExp(String subpopName, MatsimServices controler) {
 		StrategySettings changeExpSettings = new StrategySettings();
 		changeExpSettings.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta.toString());
 		changeExpSettings.setSubpopulation(subpopName);
@@ -168,7 +169,7 @@ public class SantiagoScenarioRunner {
 		controler.getConfig().strategy().addStrategySettings(changeExpSettings);
 	}
 
-	private static void setReroute(String subpopName, Controler controler) {
+	private static void setReroute(String subpopName, MatsimServices controler) {
 		StrategySettings reRouteSettings = new StrategySettings();
 		reRouteSettings.setStrategyName(DefaultPlanStrategiesModule.DefaultStrategy.ReRoute.toString());
 		reRouteSettings.setSubpopulation(subpopName);

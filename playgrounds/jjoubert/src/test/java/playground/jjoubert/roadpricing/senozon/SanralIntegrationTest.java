@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.testcases.MatsimTestUtils;
@@ -48,9 +49,11 @@ public class SanralIntegrationTest {
 	@Test
 	@Ignore
 	public void testVehicleIdBasedTollCosts_distance() {
-		SanralControler c = new SanralControler(utils.loadConfig(utils.getInputDirectory() + "config.xml"));
+		final org.matsim.core.config.Config config = utils.loadConfig(utils.getInputDirectory() + "config.xml");
+		Controler c = new Controler(config);
         c.getConfig().controler().setCreateGraphs(false);
-        c.run();
+		c.addControlerListener(new SanralRoadPricing());
+		c.run();
 
 		EventsManager em = (EventsManager) EventsUtils.createEventsManager();
 		EventsCollector ec = new EventsCollector();

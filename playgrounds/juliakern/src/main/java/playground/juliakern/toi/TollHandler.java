@@ -30,18 +30,18 @@ import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 
 
 public class TollHandler implements LinkEnterEventHandler{
 
 	Population pop;
 	private ArrayList<Id<Link>> toll10Links;
-	private Controler controler;
+	private MatsimServices controler;
 	private ArrayList<Id<Link>> toll8Links;
 	private Double kreu =0.12;
 	
-	public TollHandler(Population population, Controler controler, Scenario scenario){
+	public TollHandler(Population population, MatsimServices controler, Scenario scenario){
 		this.controler = controler;
 		this.pop=population;
 //		tollLinks.add(Id.create("[x=244645.0][y=7032064.1]_[x=244619.01][y=7032045.42] [x=244619.01][y=7032045.42]_[x=244645.0][y=7032064.1]"));

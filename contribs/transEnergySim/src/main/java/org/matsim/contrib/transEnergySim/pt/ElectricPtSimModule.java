@@ -36,7 +36,7 @@ import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityEventHandler;
 import org.matsim.core.api.experimental.events.handler.VehicleDepartsAtFacilityEventHandler;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 
@@ -51,7 +51,7 @@ public class ElectricPtSimModule implements VehicleArrivesAtFacilityEventHandler
 	// vehicleId, linkId
 	private TwoKeyHashMapWithDouble<Id, Id> linkEnterTime = new TwoKeyHashMapWithDouble<Id, Id>();
 
-	public ElectricPtSimModule(Controler controler, HashMap<Id<Vehicle>, PtVehicleEnergyState> ptEnergyMangementModels,
+	public ElectricPtSimModule(MatsimServices controler, HashMap<Id<Vehicle>, PtVehicleEnergyState> ptEnergyMangementModels,
 			PtVehicleEnergyControl ptVehicleEnergyControl) {
 		this.ptEnergyMangementModels = ptEnergyMangementModels;
 //		this.chargingPowerAtStops = chargingPowerAtStops;

@@ -127,10 +127,6 @@ public class ElectricBerlinMain {
 	public void run(){
 //		c.addOverridingModule(new OTFVisModule());
 
-		c.getConfig().controler().setOverwriteFileSetting(
-				true ?
-						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		c.run();
 		
 		c.writeStatisticsToFile(ESTATS);
@@ -181,11 +177,15 @@ public class ElectricBerlinMain {
 		
 		
 		this.sc = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(configFile));
-		
+		sc.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+
 		this.c = new DisChargingControler(sc.getConfig(), vehicles);
 
 		for (Person p : this.emobagents){
-			c.getScenario().getPopulation().addPerson(p);
+			sc.getPopulation().addPerson(p);
 			log.info("Added emob agent: "+p.getId());
 		}
 		

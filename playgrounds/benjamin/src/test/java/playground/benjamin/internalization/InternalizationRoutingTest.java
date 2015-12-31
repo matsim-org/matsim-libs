@@ -96,7 +96,7 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 		StartupListener startupListener = new StartupListener() {
 			@Override
 			public void notifyStartup(StartupEvent event) {
-				event.getControler().getEvents().addHandler(handler);
+				event.getServices().getEvents().addHandler(handler);
 			}
 		};
 
@@ -132,7 +132,7 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 		StartupListener startupListener = new StartupListener() {
 			@Override
 			public void notifyStartup(StartupEvent event) {
-				event.getControler().getEvents().addHandler(handler);
+				event.getServices().getEvents().addHandler(handler);
 			}
 		};
 
@@ -168,7 +168,7 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 		StartupListener startupListener = new StartupListener() {
 			@Override
 			public void notifyStartup(StartupEvent event) {
-				event.getControler().getEvents().addHandler(handler);
+				event.getServices().getEvents().addHandler(handler);
 			}
 		};
 
@@ -212,7 +212,7 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 		StartupListener startupListener = new StartupListener() {
 			@Override
 			public void notifyStartup(StartupEvent event) {
-				event.getControler().getEvents().addHandler(handler);
+				event.getServices().getEvents().addHandler(handler);
 			}
 		};
 
@@ -237,7 +237,7 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 	}
 
 	private void specifyControler() {
-		// controler settings	
+		// services settings
 		controler.getConfig().controler().setOverwriteFileSetting(
 				true ?
 						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
@@ -277,7 +277,7 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 		pcs.setBrainExpBeta(1.0);
 
 		// strategyConfigGroup
-		//		StrategyConfigGroup scg = controler.getConfig().strategy();
+		//		StrategyConfigGroup scg = services.getConfig().strategy();
 		//
 		//		StrategySettings changePlan = new StrategySettings(Id.create("1", StrategySettings.class));
 		//		changePlan.setStrategyName("BestScore");
@@ -298,7 +298,7 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 		ecg.setAverageWarmEmissionFactorsFile(this.getClassInputDirectory() + "EFA_HOT_vehcat_2005average.txt");
 		ecg.setAverageColdEmissionFactorsFile(this.getClassInputDirectory() + "EFA_ColdStart_vehcat_2005average.txt");
 
-		// TODO: the following does not work yet. Need to force controler to always write events in the last iteration.
+		// TODO: the following does not work yet. Need to force services to always write events in the last iteration.
 		VspExperimentalConfigGroup vcg = controler.getConfig().vspExperimental() ;
 		vcg.setWritingOutputEvents(false) ;
 	}

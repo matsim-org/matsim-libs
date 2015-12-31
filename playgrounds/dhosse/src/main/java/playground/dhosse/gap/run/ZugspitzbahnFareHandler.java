@@ -11,19 +11,19 @@ import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.vehicles.Vehicle;
 
 public class ZugspitzbahnFareHandler implements PersonArrivalEventHandler, PersonEntersVehicleEventHandler {
 
 	private final double amount = -30.5;
-	private final Controler controler;
+	private final MatsimServices controler;
 	
 	private Set<Id<Person>> passengers = new HashSet<>();
 	
 	private Set<Id<Vehicle>> vehicleIds = new HashSet<>();
 	
-	public ZugspitzbahnFareHandler(final Controler controler){
+	public ZugspitzbahnFareHandler(final MatsimServices controler){
 		
 		this.controler = controler;
 		

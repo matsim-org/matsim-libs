@@ -54,15 +54,15 @@ public class DgRoederGershensonControllerListener implements SignalsControllerLi
 
 	@Override
 	public void notifyStartup(StartupEvent event) {
-		MutableScenario scenario = (MutableScenario) event.getControler().getScenario();
+		MutableScenario scenario = (MutableScenario) event.getServices().getScenario();
 		
-		FromDataBuilder modelBuilder = new FromDataBuilder(scenario, new DgGershensonRoederSignalModelFactory(new DefaultSignalModelFactory()) , event.getControler().getEvents());
+		FromDataBuilder modelBuilder = new FromDataBuilder(scenario, new DgGershensonRoederSignalModelFactory(new DefaultSignalModelFactory()) , event.getServices().getEvents());
 		this.signalManager = modelBuilder.createAndInitializeSignalSystemsManager();
 
 		
 		//TODO init gershenson controller and sensor manager here
 		DgSensorManager sensorManager = new DgSensorManager(scenario.getNetwork());
-		event.getControler().getEvents().addHandler(sensorManager);
+		event.getServices().getEvents().addHandler(sensorManager);
 		for (SignalSystem ss : this.signalManager.getSignalSystems().values()){
 			if (ss.getSignalController() instanceof DgRoederGershensonController){
 				((DgRoederGershensonController)ss.getSignalController()).initSignalGroupMetadata(scenario.getNetwork(), (Lanes) scenario.getScenarioElement(Lanes.ELEMENT_NAME));
@@ -74,7 +74,8 @@ public class DgRoederGershensonControllerListener implements SignalsControllerLi
 		
 		
 		this.signalEngie = new QSimSignalEngine(this.signalManager);
-		event.getControler().getMobsimListeners().add(this.signalEngie);
+//		event.getServices().getMobsimListeners().add(this.signalEngie);
+		throw new RuntimeException();
 	}
 
 	
@@ -85,8 +86,8 @@ public class DgRoederGershensonControllerListener implements SignalsControllerLi
 
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {
-		SignalsData data = (SignalsData) event.getControler().getScenario().getScenarioElement(SignalsData.ELEMENT_NAME);
-		new SignalsScenarioWriter(event.getControler().getControlerIO()).writeSignalsData(data);
+		SignalsData data = (SignalsData) event.getServices().getScenario().getScenarioElement(SignalsData.ELEMENT_NAME);
+		new SignalsScenarioWriter(event.getServices().getControlerIO()).writeSignalsData(data);
 	}
 
 

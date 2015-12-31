@@ -122,7 +122,7 @@ class CongestionPricingTestExample {
 				controler.addControlerListener(new MarginalCongestionPricingContolerListener(sc, tollHandler, new CongestionHandlerImplV4(controler.getEvents(),  sc)));
 				break;
 			case "implV6":
-//				controler.addControlerListener(new MarginalCongestionPricingContolerListener(sc, tollHandler, new CongestionHandlerImplV6(controler.getEvents(),  sc)));
+//				services.addControlerListener(new MarginalCongestionPricingContolerListener(sc, tollHandler, new CongestionHandlerImplV6(services.getEvents(),  sc)));
 				break;
 			default:
 				break;

@@ -24,25 +24,21 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.pt.PtConstants;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.Vehicles;
 
 import playground.santiago.SantiagoScenarioConstants;
-import playground.santiago.population.SantiagoScenarioBuilder;
 
 /**
  * Calculates public transport fares for the Santiago scenario.
@@ -76,14 +72,14 @@ public class PTFareHandler implements ActivityStartEventHandler, PersonDeparture
 	private final double startPeakTimeEvening = 18.0 * 3600;
 	private final double endPeakTimeEvening = (20.0 * 3600) - 1;
 
-	private final Controler controler;
+	private final MatsimServices controler;
 	private boolean doModeChoice;
 	private Vehicles transitVehicles;
 	private Population population;
 	private Set<String> ptModes;
 	private Set<Id<Person>> personsOnPtTrip = new HashSet<Id<Person>>();
 	
-	public PTFareHandler(final Controler controler, boolean doModeChoice, Population population){
+	public PTFareHandler(final MatsimServices controler, boolean doModeChoice, Population population){
 		this.controler = controler;
 		this.doModeChoice = doModeChoice;
 		if(this.doModeChoice){

@@ -1,7 +1,5 @@
 package playground.dziemke.accessibility;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -20,16 +18,20 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.controler.listener.ControlerListener;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.facilities.ActivityFacilities;
-import org.matsim.facilities.ActivityFacility;
-import org.matsim.facilities.ActivityOption;
-import org.matsim.facilities.FacilitiesUtils;
 
 import playground.dziemke.utils.LogToOutputSaver;
+
+import javax.inject.Inject;
+import javax.inject.Provider;
 
 public class AccessibilityComputationBerlin {
 	public static final Logger log = Logger.getLogger( AccessibilityComputationBerlin.class ) ;
@@ -84,7 +86,7 @@ public class AccessibilityComputationBerlin {
 				
 				
 		// config and scenario
-		Config config = ConfigUtils.createConfig(new AccessibilityConfigGroup(), new MatrixBasedPtRouterConfigGroup()) ;
+		final Config config = ConfigUtils.createConfig(new AccessibilityConfigGroup(), new MatrixBasedPtRouterConfigGroup()) ;
 		config.network().setInputFile(networkFile);
 		config.facilities().setInputFile(facilitiesFile);
 		config.controler().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
@@ -92,7 +94,7 @@ public class AccessibilityComputationBerlin {
 		config.controler().setLastIteration(0);
 
 
-		Scenario scenario = ScenarioUtils.loadScenario( config ) ;
+		final Scenario scenario = ScenarioUtils.loadScenario( config ) ;
 
 
 		// matrix-based pt
@@ -127,57 +129,63 @@ public class AccessibilityComputationBerlin {
 
 		// pt matrix
 		BoundingBox boundingBox = BoundingBox.createBoundingBox(scenario.getNetwork());
-		PtMatrix ptMatrix = PtMatrix.createPtMatrix(plansCalcRoute, boundingBox, mbpcg);
+		final PtMatrix ptMatrix = PtMatrix.createPtMatrix(plansCalcRoute, boundingBox, mbpcg);
 
 
 		// collect activity types
-		List<String> activityTypes = AccessibilityRunUtils.collectAllFacilityTypes(scenario);
+		final List<String> activityTypes = AccessibilityRunUtils.collectAllFacilityTypes(scenario);
 		log.warn( "found activity types: " + activityTypes );
 		// yyyy there is some problem with activity types: in some algorithms, only the first letter is interpreted, in some
 		// other algorithms, the whole string.  BEWARE!  This is not good software design and should be changed.  kai, feb'14
 
 		// collect homes
 		String activityFacilityType = FacilityTypes.HOME;
-		ActivityFacilities homes = AccessibilityRunUtils.collectActivityFacilitiesOfType(scenario, activityFacilityType);
+		final ActivityFacilities homes = AccessibilityRunUtils.collectActivityFacilitiesOfType(scenario, activityFacilityType);
 
 		
-		Map<String, ActivityFacilities> activityFacilitiesMap = new HashMap<String, ActivityFacilities>();
-		
-		
-		Controler controler = new Controler(scenario) ;
-
-		
-		// loop over activity types to add one GridBasedAccessibilityControlerListenerV3 for each combination
-		for ( String actType : activityTypes ) {
+		final Controler controler = new Controler(scenario) ;
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				// loop over activity types to add one GridBasedAccessibilityControlerListenerV3 for each combination
+				for ( final String actType : activityTypes ) {
 //			if ( !actType.equals("s") ) {
 //				log.error("skipping everything except work for debugging purposes; remove in production code. kai, feb'14") ;
 //				continue ;
 //			}
 
-			ActivityFacilities opportunities = AccessibilityRunUtils.collectActivityFacilitiesOfType(scenario, actType);
-			
-			activityFacilitiesMap.put(actType, opportunities);
+					addControlerListenerBinding().toProvider(new Provider<ControlerListener>() {
+						@Inject Scenario scenario;
+						@Inject Map<String, TravelTime> travelTimes;
+						@Inject Map<String, TravelDisutilityFactory> travelDisutilityFactories;
 
-			GridBasedAccessibilityControlerListenerV3 listener = 
-					new GridBasedAccessibilityControlerListenerV3(activityFacilitiesMap.get(actType), ptMatrix, config, scenario.getNetwork());
-			listener.setComputingAccessibilityForMode(Modes4Accessibility.freeSpeed, true);
-			listener.setComputingAccessibilityForMode(Modes4Accessibility.car, true);
-			listener.setComputingAccessibilityForMode(Modes4Accessibility.walk, true);
-			listener.setComputingAccessibilityForMode(Modes4Accessibility.bike, true);
-			listener.setComputingAccessibilityForMode(Modes4Accessibility.pt, true);
-				
-			listener.addAdditionalFacilityData(homes) ;
+						@Override
+						public ControlerListener get() {
+							GridBasedAccessibilityControlerListenerV3 listener =
+									new GridBasedAccessibilityControlerListenerV3(AccessibilityRunUtils.collectActivityFacilitiesOfType(scenario, actType), ptMatrix, config, scenario, travelTimes, travelDisutilityFactories);
+							listener.setComputingAccessibilityForMode(Modes4Accessibility.freeSpeed, true);
+							listener.setComputingAccessibilityForMode(Modes4Accessibility.car, true);
+							listener.setComputingAccessibilityForMode(Modes4Accessibility.walk, true);
+							listener.setComputingAccessibilityForMode(Modes4Accessibility.bike, true);
+							listener.setComputingAccessibilityForMode(Modes4Accessibility.pt, true);
+
+							listener.addAdditionalFacilityData(homes) ;
 //			listener.generateGridsAndMeasuringPointsByNetwork(cellSize);
-			// Boundaries of Berlin are approx.: 4570000, 4613000, 5836000, 5806000
-			listener.generateGridsAndMeasuringPointsByCustomBoundary(4574000, 5802000, 4620000, 5839000, cellSize);
+							// Boundaries of Berlin are approx.: 4570000, 4613000, 5836000, 5806000
+							listener.generateGridsAndMeasuringPointsByCustomBoundary(4574000, 5802000, 4620000, 5839000, cellSize);
 //			listener.generateGridsAndMeasuringPointsByCustomBoundary(4590000, 5815000, 4595000, 5820000, cellSize);
-			
-			listener.writeToSubdirectoryWithName(actType);
-				
-			listener.setUrbansimMode(false); // avoid writing some (eventually: all) files that related to matsim4urbansim
 
-			controler.addControlerListener(listener);
-		}
+							listener.writeToSubdirectoryWithName(actType);
+
+							listener.setUrbansimMode(false); // avoid writing some (eventually: all) files that related to matsim4urbansim
+							return listener;
+						}
+					});
+				}
+
+			}
+		});
+		
 
 		controler.run();
 			

@@ -24,7 +24,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.core.config.Config;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
@@ -171,8 +171,8 @@ public class FrequentationSpotWeighter implements SpotWeighter, PersonDepartureE
 
 	@Override
 	public void notifyStartup(final StartupEvent event) {
-		event.getControler().getEvents().addHandler( this );
-		statsWriter = new StatsWriter( event.getControler() );
+		event.getServices().getEvents().addHandler( this );
+		statsWriter = new StatsWriter( event.getServices() );
 	}
 	// /////////////////////////////////////////////////////////////////////////
 	// helpers
@@ -218,7 +218,7 @@ public class FrequentationSpotWeighter implements SpotWeighter, PersonDepartureE
 	private class StatsWriter {
 		private final OutputDirectoryHierarchy io;
 
-		public StatsWriter(final Controler c)  {
+		public StatsWriter(final MatsimServices c)  {
 			io = c.getControlerIO();
 		}
 

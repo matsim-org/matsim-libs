@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.ReplanningContext;
@@ -48,7 +48,7 @@ public class ExtendedLocationChoiceReRoutePlanStrategy implements PlanStrategy {
 
 	private PlanStrategyImpl planStrategyDelegate = null;
 	
-	public ExtendedLocationChoiceReRoutePlanStrategy(Controler controler, Provider<TripRouter> tripRouterProvider) {
+	public ExtendedLocationChoiceReRoutePlanStrategy(MatsimServices controler, Provider<TripRouter> tripRouterProvider) {
 		
 		Scenario scenario = controler.getScenario();
 		TravelTime travelTimeCalc = controler.getLinkTravelTimes();

@@ -74,16 +74,16 @@ public final class WagonSimVehicleLoadListener implements StartupListener, Itera
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		this.handler = new VehicleLoadHandler(wagonAttribs);
-		handler.vehicleLoad = new VehicleLoad(event.getControler().getScenario().getTransitSchedule());
+		handler.vehicleLoad = new VehicleLoad(event.getServices().getScenario().getTransitSchedule());
 		handler.reset(-1);
 		lastLoad = handler.vehicleLoad;
-		event.getControler().getEvents().addHandler(handler);
+		event.getServices().getEvents().addHandler(handler);
 	}
 
 
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
-		handler.vehicleLoad = new VehicleLoad(event.getControler().getScenario().getTransitSchedule());
+		handler.vehicleLoad = new VehicleLoad(event.getServices().getScenario().getTransitSchedule());
 		handler.reset(event.getIteration());
 	}
 	
@@ -91,7 +91,7 @@ public final class WagonSimVehicleLoadListener implements StartupListener, Itera
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		this.lastLoad = handler.vehicleLoad;
 		BufferedWriter w = IOUtils.getBufferedWriter(
-				event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "locomotiveLoadPerDepartureAndStop.txt"));
+				event.getServices().getControlerIO().getIterationFilename(event.getIteration(), "locomotiveLoadPerDepartureAndStop.txt"));
 		try {
 			w.write(this.lastLoad.toString());
 			w.flush();

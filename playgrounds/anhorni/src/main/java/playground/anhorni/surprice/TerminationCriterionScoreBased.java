@@ -20,18 +20,18 @@
 package playground.anhorni.surprice;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.TerminationCriterion;
 
 public class TerminationCriterionScoreBased implements TerminationCriterion {
 	
 	private double stoppingCriterionVal = 0.1;
 	final private static int INDEX_BEST = 1;
-	private Controler controler;
+	private MatsimServices controler;
 	private final static Logger log = Logger.getLogger(TerminationCriterionScoreBased.class);
 	private int finalIteration = 0;
 	
-	public TerminationCriterionScoreBased(double stoppingCriterionVal, Controler controler) {
+	public TerminationCriterionScoreBased(double stoppingCriterionVal, MatsimServices controler) {
 		this.stoppingCriterionVal = stoppingCriterionVal;
 		this.controler = controler;
 		this.finalIteration = this.controler.getConfig().controler().getLastIteration();

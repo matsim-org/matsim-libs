@@ -24,7 +24,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.config.groups.PlansConfigGroup;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.HasPerson;
 import org.matsim.core.mobsim.framework.MobsimAgent;
@@ -87,7 +87,7 @@ public class TwoWayCSPersonDriverAgentImpl implements MobsimDriverAgent, MobsimP
 	
 	private Scenario scenario;	
 	
-	private Controler controler;
+	private MatsimServices controler;
 	
 	private Link startLink;
 	
@@ -108,7 +108,7 @@ public class TwoWayCSPersonDriverAgentImpl implements MobsimDriverAgent, MobsimP
 	// ============================================================================================================================
 	// c'tor
 
-	public TwoWayCSPersonDriverAgentImpl(final Person person, final Plan plan, final Netsim simulation, final Scenario scenario, final Controler controler, TwoWayCSVehicleLocation twvehiclesLocation) {
+	public TwoWayCSPersonDriverAgentImpl(final Person person, final Plan plan, final Netsim simulation, final Scenario scenario, final MatsimServices controler, TwoWayCSVehicleLocation twvehiclesLocation) {
 		this.person = person;
 		this.simulation = simulation;
 		this.controler = controler;

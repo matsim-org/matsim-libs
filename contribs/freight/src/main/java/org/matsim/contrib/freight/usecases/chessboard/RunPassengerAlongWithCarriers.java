@@ -12,6 +12,7 @@ import org.matsim.contrib.freight.usecases.chessboard.CarrierScoringFunctionFact
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.replanning.GenericPlanStrategy;
@@ -62,7 +63,7 @@ public class RunPassengerAlongWithCarriers {
         }
     }
 
-    private static void prepareFreightOutputDataAndStats(Controler controler, final Carriers carriers) {
+    private static void prepareFreightOutputDataAndStats(MatsimServices controler, final Carriers carriers) {
         final LegHistogram freightOnly = new LegHistogram(900);
         freightOnly.setPopulation(controler.getScenario().getPopulation());
         freightOnly.setInclPop(false);
@@ -79,7 +80,7 @@ public class RunPassengerAlongWithCarriers {
             @Override
             public void notifyIterationEnds(IterationEndsEvent event) {
                 //write plans
-                String dir = event.getControler().getControlerIO().getIterationPath(event.getIteration());
+                String dir = event.getServices().getControlerIO().getIterationPath(event.getIteration());
                 new CarrierPlanXmlWriterV2(carriers).write(dir + "/" + event.getIteration() + ".carrierPlans.xml");
 
                 //write stats
@@ -110,7 +111,7 @@ public class RunPassengerAlongWithCarriers {
     }
 
 
-    private static CarrierPlanStrategyManagerFactory createStrategyManagerFactory(final CarrierVehicleTypes types, final Controler controler) {
+    private static CarrierPlanStrategyManagerFactory createStrategyManagerFactory(final CarrierVehicleTypes types, final MatsimServices controler) {
         return new CarrierPlanStrategyManagerFactory() {
 
             @Override

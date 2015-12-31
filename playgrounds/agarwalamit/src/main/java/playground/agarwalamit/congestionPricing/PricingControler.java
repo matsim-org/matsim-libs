@@ -81,7 +81,7 @@ class PricingControler {
 		final Controler controler = new Controler(sc);
 		controler.getConfig().controler().setOverwriteFileSetting(
 				OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
-		controler.setDumpDataAtEnd(true);
+		controler.getConfig().controler().setDumpDataAtEnd(true);
 		controler.addOverridingModule(new OTFVisFileWriterModule());
 		
 		TollHandler tollHandler = new TollHandler(sc);
@@ -120,7 +120,7 @@ class PricingControler {
 //					bindCarTravelDisutilityFactory().toInstance(fact);
 //				}
 //			});
-//			controler.addControlerListener(new MarginalCongestionPricingContolerListener(sc, tollHandler, new CongestionHandlerImplV6(controler.getEvents(), sc)));
+//			services.addControlerListener(new MarginalCongestionPricingContolerListener(sc, tollHandler, new CongestionHandlerImplV6(services.getEvents(), sc)));
 //			Logger.getLogger(PricingControler.class).info("Using congestion pricing implementation version 6.");
 //		}
 		break;

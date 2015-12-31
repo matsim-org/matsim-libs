@@ -61,7 +61,7 @@ public class ControlerMobsimIntegrationTest {
 			}
 		});
 		c.getConfig().controler().setCreateGraphs(false);
-        c.setDumpDataAtEnd(false);
+		c.getConfig().controler().setDumpDataAtEnd(false);
 		c.getConfig().controler().setWriteEventsInterval(0);
 		c.run();
 		Assert.assertEquals(1, mf.callCount);
@@ -75,7 +75,7 @@ public class ControlerMobsimIntegrationTest {
 		cfg.controler().setWritePlansInterval(0);
 		Controler c = new Controler(cfg);
         c.getConfig().controler().setCreateGraphs(false);
-        c.setDumpDataAtEnd(false);
+		c.getConfig().controler().setDumpDataAtEnd(false);
 		c.getConfig().controler().setWriteEventsInterval(0);
 		c.run();
 	}

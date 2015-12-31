@@ -22,7 +22,7 @@ package playground.vsp.parkAndRide.replanning;
 import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.ReplanningContext;
@@ -43,7 +43,7 @@ public class PRStrategyRemove implements PlanStrategy {
 
 	PlanStrategyImpl planStrategyDelegate = null ;
 	
-	public PRStrategyRemove(Controler controler, Provider<TripRouter> tripRouterProvider) {
+	public PRStrategyRemove(MatsimServices controler, Provider<TripRouter> tripRouterProvider) {
 		
 		RandomPlanSelector planSelector = new RandomPlanSelector();
 		planStrategyDelegate = new PlanStrategyImpl( planSelector );

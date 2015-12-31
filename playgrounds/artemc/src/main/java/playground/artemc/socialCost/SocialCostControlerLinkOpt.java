@@ -7,8 +7,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
@@ -36,7 +36,7 @@ public class SocialCostControlerLinkOpt {
 		 * This cannot be moved to the initializer since the scoring functions
 		 * are created even before the startup event is created.
 		 */
-		//controler.setScoringFunctionFactory(new TimeAndMoneyDependentScoringFunctionFactory());
+		//services.setScoringFunctionFactory(new TimeAndMoneyDependentScoringFunctionFactory());
 
 		InitializerLinkOpt initializer = new InitializerLinkOpt(0.1);
 		controler.addControlerListener(initializer);
@@ -78,7 +78,7 @@ public class SocialCostControlerLinkOpt {
 		@Override
 		public void notifyIterationStarts(IterationStartsEvent event) {
 			if(event.getIteration()==0){
-				Controler controler = event.getControler();
+				MatsimServices controler = event.getServices();
 
 				// initialize the social costs calculator
                 SocialCostCalculatorLinkOpt scc = new SocialCostCalculatorLinkOpt(controler.getScenario().getNetwork(), controler.getEvents(), controler.getLinkTravelTimes(), controler, blendFactor);
@@ -87,13 +87,13 @@ public class SocialCostControlerLinkOpt {
 				controler.getEvents().addHandler(scc);
 
 				// initialize the social costs disutility calculator
-				final SocialCostTravelDisutilityFactory factory = new SocialCostTravelDisutilityFactory(scc);
-				controler.addOverridingModule(new AbstractModule() {
-					@Override
-					public void install() {
-						bindCarTravelDisutilityFactory().toInstance(factory);
-					}
-				});
+//				final SocialCostTravelDisutilityFactory factory = new SocialCostTravelDisutilityFactory(scc);
+//				services.addOverridingModule(new AbstractModule() {
+//					@Override
+//					public void install() {
+//						bindCarTravelDisutilityFactory().toInstance(factory);
+//					}
+//				});
 
 				// create a plot containing the mean travel times
 				Set<String> transportModes = new HashSet<String>();
@@ -103,6 +103,7 @@ public class SocialCostControlerLinkOpt {
 				MeanTravelTimeCalculator mttc = new MeanTravelTimeCalculator(controler.getScenario(), transportModes);
 				controler.addControlerListener(mttc);
 				controler.getEvents().addHandler(mttc);
+				throw new RuntimeException();
 			}
 		}
 	}

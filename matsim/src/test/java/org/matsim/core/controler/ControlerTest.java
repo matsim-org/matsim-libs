@@ -72,7 +72,7 @@ public class ControlerTest {
 
 	@Test
 	public void testConstructor() {
-		Controler controler = new Controler(new String[]{"test/scenarios/equil/config.xml"});
+		MatsimServices controler = new Controler(new String[]{"test/scenarios/equil/config.xml"});
         assertNotNull(controler.getScenario().getNetwork()); // is required, e.g. for changing the factories
         assertNotNull(controler.getScenario().getPopulation());
         assertEquals(23, controler.getScenario().getNetwork().getLinks().size());
@@ -97,7 +97,7 @@ public class ControlerTest {
 
 	@Test
 	public void testConstructor_EventsManagerTypeImmutable() {
-		Controler controler = new Controler(new String[]{"test/scenarios/equil/config.xml"});
+		MatsimServices controler = new Controler(new String[]{"test/scenarios/equil/config.xml"});
 		try {
 			controler.getConfig().setParam("parallelEventHandling", "numberOfThreads", "2");
 			Assert.fail("Expected exception");
@@ -173,7 +173,7 @@ public class ControlerTest {
 		Controler controler = new Controler(f.scenario);
         controler.getConfig().controler().setCreateGraphs(false);
         controler.getConfig().controler().setWriteEventsInterval(0);
-		controler.setDumpDataAtEnd(false);
+		controler.getConfig().controler().setDumpDataAtEnd(false);
 		controler.run();
 
 		// test if we got the right result
@@ -239,7 +239,7 @@ public class ControlerTest {
 				});
 			}
 		});
-		controler.setDumpDataAtEnd(false);
+		controler.getConfig().controler().setDumpDataAtEnd(false);
 		controler.run();
 
 		assertTrue("Custom ScoringFunctionFactory was not set.",
@@ -313,7 +313,7 @@ public class ControlerTest {
 				});
 			}
 		});
-		controler.setDumpDataAtEnd(false);
+		controler.getConfig().controler().setDumpDataAtEnd(false);
 		controler.run();
 		/* if something goes wrong, there will be an exception we don't catch and the test fails,
 		 * otherwise, everything is fine. */
@@ -409,7 +409,7 @@ public class ControlerTest {
 				});
 			}
 		});
-		controler.setDumpDataAtEnd(false);
+		controler.getConfig().controler().setDumpDataAtEnd(false);
 		controler.run();
 		/* if something goes wrong, there will be an exception we don't catch and the test fails,
 		 * otherwise, everything is fine. */
@@ -461,7 +461,7 @@ public class ControlerTest {
 				});
 			}
 		});
-		controler.setDumpDataAtEnd(false);
+		controler.getConfig().controler().setDumpDataAtEnd(false);
 		controler.run();
 
 		assertTrue(new File(controler.getControlerIO().getIterationFilename(0, Controler.FILENAME_EVENTS_XML)).exists());
@@ -501,7 +501,7 @@ public class ControlerTest {
 				});
 			}
 		});
-		controler.setDumpDataAtEnd(false);
+		controler.getConfig().controler().setDumpDataAtEnd(false);
 		controler.run();
 		assertEquals(4, controler.getConfig().controler().getWriteEventsInterval());
 
@@ -544,7 +544,7 @@ public class ControlerTest {
 				});
 			}
 		});
-		controler.setDumpDataAtEnd(false);
+		controler.getConfig().controler().setDumpDataAtEnd(false);
 		controler.run();
 
 		assertFalse(new File(controler.getControlerIO().getIterationFilename(0, Controler.FILENAME_EVENTS_XML)).exists());
@@ -575,7 +575,7 @@ public class ControlerTest {
 				});
 			}
 		});
-		controler.setDumpDataAtEnd(false);
+		controler.getConfig().controler().setDumpDataAtEnd(false);
 		controler.run();
 
 		assertTrue(new File(controler.getControlerIO().getIterationFilename(0, Controler.FILENAME_EVENTS_XML)).exists());
@@ -607,7 +607,7 @@ public class ControlerTest {
 				});
 			}
 		});
-		controler.setDumpDataAtEnd(false);
+		controler.getConfig().controler().setDumpDataAtEnd(false);
 		controler.run();
 
 		assertTrue(new File(controler.getControlerIO().getIterationFilename(0, Controler.FILENAME_EVENTS_XML)).exists());
@@ -637,7 +637,7 @@ public class ControlerTest {
 			}
 		});
 
-		controler.setDumpDataAtEnd(true);
+		controler.getConfig().controler().setDumpDataAtEnd(true);
 		controler.run();
 
 		assertTrue(new File(controler.getControlerIO().getOutputFilename(Controler.FILENAME_POPULATION)).exists());
@@ -667,7 +667,7 @@ public class ControlerTest {
 			}
 		});
 
-		controler.setDumpDataAtEnd(false);
+		controler.getConfig().controler().setDumpDataAtEnd(false);
 		controler.run();
 
 
@@ -687,7 +687,7 @@ public class ControlerTest {
 			}
 		});
 		controler.getConfig().controler().setCreateGraphs(false);
-		controler.setDumpDataAtEnd(false);
+		controler.getConfig().controler().setDumpDataAtEnd(false);
 		controler.run();
 	}
 
@@ -713,7 +713,7 @@ public class ControlerTest {
 				}
 			});
 			controler.getConfig().controler().setCreateGraphs(false);
-			controler.setDumpDataAtEnd(false);
+			controler.getConfig().controler().setDumpDataAtEnd(false);
 			controler.run();
 			Assert.fail("expected exception, got none.");
 			
@@ -748,7 +748,7 @@ public class ControlerTest {
 				}
 			});
 			controler.getConfig().controler().setCreateGraphs(false);
-        controler.setDumpDataAtEnd(false);
+			controler.getConfig().controler().setDumpDataAtEnd(false);
 			controler.run();
 			Assert.fail("expected exception, got none.");
 			
@@ -783,7 +783,7 @@ public class ControlerTest {
 				}
 			});
 			controler.getConfig().controler().setCreateGraphs(false);
-        controler.setDumpDataAtEnd(false);
+			controler.getConfig().controler().setDumpDataAtEnd(false);
 			controler.run();
 			Assert.fail("expected exception, got none.");
 			
@@ -809,7 +809,7 @@ public class ControlerTest {
 
 		final Controler controler = new Controler(config);
         controler.getConfig().controler().setCreateGraphs(false);
-        controler.setDumpDataAtEnd(false);
+		controler.getConfig().controler().setDumpDataAtEnd(false);
 		controler.run();
 
 		assertTrue(new File(controler.getControlerIO().getIterationFilename(0, "googleearth.kmz")).exists());
@@ -828,7 +828,7 @@ public class ControlerTest {
 
 		final Controler controler = new Controler(config);
         controler.getConfig().controler().setCreateGraphs(false);
-        controler.setDumpDataAtEnd(false);
+		controler.getConfig().controler().setDumpDataAtEnd(false);
 		controler.run();
 
 		assertTrue(new File(controler.getControlerIO().getIterationFilename(0, "T.veh.gz")).exists());
@@ -847,7 +847,7 @@ public class ControlerTest {
 
 		final Controler controler = new Controler(config);
         controler.getConfig().controler().setCreateGraphs(false);
-        controler.setDumpDataAtEnd(false);
+		controler.getConfig().controler().setDumpDataAtEnd(false);
 		controler.run();
 
 		assertTrue(new File(controler.getControlerIO().getIterationFilename(0, "T.veh.gz")).exists());

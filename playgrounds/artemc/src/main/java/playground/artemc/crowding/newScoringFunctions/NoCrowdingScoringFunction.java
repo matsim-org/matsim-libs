@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.scoring.ScoringFunction;
 
 import playground.artemc.crowding.events.CrowdedPenaltyEvent;
@@ -63,7 +63,7 @@ public class NoCrowdingScoringFunction implements ScoringFunction {
 		this.delegate = delegate;
 	}
 
-	public NoCrowdingScoringFunction(ScoringFunction delegate, EventsManager events, ScoreTracker scoreTracker, Controler controler) {
+	public NoCrowdingScoringFunction(ScoringFunction delegate, EventsManager events, ScoreTracker scoreTracker, MatsimServices controler) {
 		this.delegate = delegate;
 		this.events = events;
 		this.scoreTracker = scoreTracker;

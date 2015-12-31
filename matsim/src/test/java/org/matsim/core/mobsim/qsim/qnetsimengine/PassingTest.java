@@ -60,6 +60,7 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
+import javax.inject.Inject;
 import java.util.*;
 
 
@@ -181,12 +182,10 @@ public class PassingTest {
 		
 		Controler cntrlr = new Controler(net.scenario);
 		cntrlr.getConfig().controler().setOverwriteFileSetting(
-				true ?
-						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+				OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		cntrlr.getConfig().controler().setCreateGraphs(false);
-        cntrlr.setDumpDataAtEnd(false);
-		
+		cntrlr.getConfig().controler().setDumpDataAtEnd(false);
+
 		TravelTimeControlerListner travelTimeCntrlrListner = new TravelTimeControlerListner();
 
 		cntrlr.addControlerListener(travelTimeCntrlrListner); 
@@ -211,11 +210,11 @@ public class PassingTest {
 
 		Map<Id<Person>, Map<Id<Link>, Double>> personLinkTravelTimes = new HashMap<Id<Person>, Map<Id<Link>,Double>>();
 		PersonLinkTravelTimeEventHandler hand;
+		@Inject EventsManager eventsManager;
 
 		@Override
 		public void notifyStartup(StartupEvent event) {
 
-			EventsManager eventsManager = event.getControler().getEvents();
 			hand = new PersonLinkTravelTimeEventHandler();
 			eventsManager.addHandler(hand);
 		}

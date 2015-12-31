@@ -30,7 +30,6 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.vis.otfvis.OTFFileWriterFactory;
 
 import playground.vsp.energy.trafficstate.TrafficStateControlerListener;
 
@@ -82,8 +81,8 @@ public class ERunner {
 		c.addOverridingModule(new OTFVisFileWriterModule());
 		TrafficStateControlerListener trafficState = new TrafficStateControlerListener();
 		c.addControlerListener(trafficState);
-		
-		c.setDumpDataAtEnd(true);
+
+		c.getConfig().controler().setDumpDataAtEnd(true);
 		c.getConfig().controler().setOverwriteFileSetting(
 				true ?
 						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :

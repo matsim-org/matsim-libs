@@ -23,9 +23,9 @@ package org.matsim.withinday.trafficmonitoring;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
@@ -37,68 +37,59 @@ import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestCase;
 
+/**
+ * @author cdobler
+ */
 public class TravelTimeCollectorTest extends MatsimTestCase {
 
-	/**
-	 * @author cdobler
-	 */
 	public void testGetLinkTravelTime() {
 		Config config = loadConfig("test/scenarios/equil/config.xml");
 		QSimConfigGroup qSimConfig = config.qsim();
 		qSimConfig.setNumberOfThreads(2);
 		config.controler().setLastIteration(0);
-		
-		Controler controler = new Controler(config);
-		ControlerListenerForTests listener = new ControlerListenerForTests();
-		controler.addControlerListener(listener);
 
+		final Scenario scenario = ScenarioUtils.loadScenario(config);
+		final TravelTimeCollector travelTime = new TravelTimeCollector(scenario, null);
+		MobsimListenerForTests listener = new MobsimListenerForTests(scenario, travelTime);
+		final FixedOrderSimulationListener fosl = new FixedOrderSimulationListener();
+		fosl.addSimulationListener(travelTime);
+		fosl.addSimulationListener(listener);
+
+		Controler controler = new Controler(scenario);
+		controler.getEvents().addHandler(travelTime);
+		controler.addControlerListener(new StartupListener() {
+			@Override
+			public void notifyStartup(StartupEvent event) {
+				double t1 = 0.0;
+				double t2 = 8.0;
+				double t3 = 18.0;
+
+				Id<Link> id = Id.create("6", Link.class);
+				Link link = scenario.getNetwork().getLinks().get(id);
+				link.setCapacity(500.0);	// reduce capacity
+
+				// check free speed travel times - they should not be initialized yet
+				assertEquals(Double.MAX_VALUE, travelTime.getLinkTravelTime(link, t1, null, null));
+				assertEquals(Double.MAX_VALUE, travelTime.getLinkTravelTime(link, t2, null, null));
+				assertEquals(Double.MAX_VALUE, travelTime.getLinkTravelTime(link, t3, null, null));
+			}
+		});
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				addMobsimListenerBinding().toInstance(fosl);
+			}
+		});
         controler.getConfig().controler().setCreateGraphs(false);
-        controler.setDumpDataAtEnd(false);
+		controler.getConfig().controler().setDumpDataAtEnd(false);
 		controler.getConfig().controler().setWriteEventsInterval(0);
 		controler.getConfig().controler().setWritePlansInterval(0);
-		
 		controler.run();
 	}
-	
-	/**
-	 * A ControllerListener that creates and registers a TravelTimeCollector
-	 * and a MobsimListenerForTests which executes the test cases.
-	 * 
-	 * @author cdobler
-	 */
-	private static class ControlerListenerForTests implements StartupListener {
-		
-		private double t1 = 0.0;
-		private double t2 = 8.0;
-		private double t3 = 18.0;
-		
-		@Override
-		public void notifyStartup(StartupEvent event) {
-			Controler controler = event.getControler();
-			Scenario scenario = controler.getScenario();
-			EventsManager eventsManager = controler.getEvents();
 
-			TravelTimeCollector travelTime = new TravelTimeCollector(scenario, null);
-			MobsimListenerForTests listener = new MobsimListenerForTests(scenario, travelTime);
-			eventsManager.addHandler(travelTime);
-			FixedOrderSimulationListener fosl = new FixedOrderSimulationListener();
-			fosl.addSimulationListener(travelTime);
-			fosl.addSimulationListener(listener);
-			controler.getMobsimListeners().add(fosl);
-			
-			Id<Link> id = Id.create("6", Link.class);
-			Link link = scenario.getNetwork().getLinks().get(id);
-			link.setCapacity(500.0);	// reduce capacity
-			
-			// check free speed travel times - they should not be initialized yet
-			assertEquals(Double.MAX_VALUE, travelTime.getLinkTravelTime(link, t1, null, null));
-			assertEquals(Double.MAX_VALUE, travelTime.getLinkTravelTime(link, t2, null, null));
-			assertEquals(Double.MAX_VALUE, travelTime.getLinkTravelTime(link, t3, null, null));
-		}
-	}
-	
 	/**
 	 * Check travel times before and after a time step.
 	 * 

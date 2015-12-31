@@ -346,7 +346,7 @@ public class SelectHouseholdMeetingPoint implements MobsimBeforeSimStepListener,
 		initThreads();
 		
 		int iter = event.getIteration();
-		OutputDirectoryHierarchy outputDirectoryHierarchy = event.getControler().getControlerIO();
+		OutputDirectoryHierarchy outputDirectoryHierarchy = event.getServices().getControlerIO();
 		this.subScenarioNetworkFile = outputDirectoryHierarchy.getIterationFilename(iter, "EvacuationAreaSubScenarioNetwork.xml.gz");
 		this.toHomePlansFile = outputDirectoryHierarchy.getIterationFilename(iter, "SelectHouseholdMeetingPointToHomePlans.xml.gz");
 		this.directEvacuationPlansFile = outputDirectoryHierarchy.getIterationFilename(iter, "SelectHouseholdMeetingPointDirectEvacuationPlans.xml.gz");

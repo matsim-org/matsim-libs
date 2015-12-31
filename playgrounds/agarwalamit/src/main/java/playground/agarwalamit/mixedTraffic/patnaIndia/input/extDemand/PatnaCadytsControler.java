@@ -23,6 +23,7 @@ import javax.inject.Inject;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.cadyts.car.CadytsCarModule;
 import org.matsim.contrib.cadyts.car.CadytsContext;
 import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
 import org.matsim.contrib.cadyts.general.CadytsScoring;
@@ -94,7 +95,7 @@ public class PatnaCadytsControler {
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 
 		final Controler controler = new Controler(config);
-		controler.setDumpDataAtEnd(true);
+		controler.getConfig().controler().setDumpDataAtEnd(true);
 
 		final RandomizingTimeDistanceTravelDisutility.Builder builder =  new RandomizingTimeDistanceTravelDisutility.Builder("bike");
 
@@ -116,8 +117,7 @@ public class PatnaCadytsControler {
 	}
 
 	private void addCadytsSetting(final Controler controler, final Config config){
-		final CadytsContext cContext = new CadytsContext(controler.getConfig());
-		controler.addControlerListener(cContext);
+		controler.addOverridingModule(new CadytsCarModule());
 
 		CadytsConfigGroup cadytsConfigGroup = ConfigUtils.addOrGetModule(config, CadytsConfigGroup.GROUP_NAME, CadytsConfigGroup.class);
 		cadytsConfigGroup.setStartTime(0);
@@ -127,6 +127,7 @@ public class PatnaCadytsControler {
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
 			final CharyparNagelScoringParametersForPerson parameters = new SubpopulationCharyparNagelScoringParameters( controler.getScenario() );
 			@Inject Network network;
+			@Inject CadytsContext cContext;
 			@Override
 			public ScoringFunction createNewScoringFunction(Person person) {
 				final CharyparNagelScoringParameters params = parameters.getScoringParameters( person );

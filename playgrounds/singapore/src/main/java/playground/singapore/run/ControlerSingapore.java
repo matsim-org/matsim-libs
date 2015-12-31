@@ -45,7 +45,7 @@ public class ControlerSingapore {
 		final Controler controler = new Controler(ScenarioUtils.loadScenario(config));
         Logger logger = Logger.getLogger("SINGAPORECONTROLER");
         /*logger.warn("Doing the workaround to associate facilities with car links...");
-		for(Link link:controler.getScenario().getNetwork().getLinks().values()) {
+		for(Link link:services.getScenario().getNetwork().getLinks().values()) {
 			Set<String> modes = new HashSet<String>(link.getAllowedModes());
 			modes.add("pt");
 			link.setAllowedModes(modes);
@@ -53,18 +53,18 @@ public class ControlerSingapore {
 		Set<String> carMode = new HashSet<String>();
 		carMode.add("car");
 		NetworkImpl justCarNetwork = NetworkImpl.createNetwork();
-		new TransportModeNetworkFilter(controler.getScenario().getNetwork()).filter(justCarNetwork, carMode);
-		for(Person person:controler.getScenario().getPopulation().getPersons().values())
+		new TransportModeNetworkFilter(services.getScenario().getNetwork()).filter(justCarNetwork, carMode);
+		for(Person person:services.getScenario().getPopulation().getPersons().values())
 			for(PlanElement planElement:person.getSelectedPlan().getPlanElements())
 				if(planElement instanceof Activity)
 					((ActivityImpl)planElement).setLinkId(justCarNetwork.getNearestLinkExactly(((ActivityImpl)planElement).getCoord()).getId());
-		for(ActivityFacility facility:controler.getScenario().getActivityFacilities().getFacilities().values())
+		for(ActivityFacility facility:services.getScenario().getActivityFacilities().getFacilities().values())
 			((ActivityFacilityImpl)facility).setLinkId(justCarNetwork.getNearestLinkExactly(facility.getCoord()).getId());
-		controler.getConfig().controler().setOverwriteFileSetting(
+		services.getConfig().services().setOverwriteFileSetting(
 				true ?
 						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
 						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
-		// controler.addControlerListener(new CalibrationStatsListener(controler.getEvents(), new String[]{args[1], args[2]}, 1, "Travel Survey (Benchmark)", "Red_Scheme", new HashSet<Id<Person>>()));*/
+		// services.addControlerListener(new CalibrationStatsListener(services.getEvents(), new String[]{args[1], args[2]}, 1, "Travel Survey (Benchmark)", "Red_Scheme", new HashSet<Id<Person>>()));*/
         WaitTimeStuckCalculator waitTimeCalculator = new WaitTimeStuckCalculator(controler.getScenario().getPopulation(), controler.getScenario().getTransitSchedule(), controler.getConfig().travelTimeCalculator().getTraveltimeBinSize(), (int) (controler.getConfig().qsim().getEndTime()-controler.getConfig().qsim().getStartTime()));
 		controler.getEvents().addHandler(waitTimeCalculator);
         logger.warn("About to init StopStopTimeCalculator...");
@@ -72,17 +72,17 @@ public class ControlerSingapore {
 		controler.getEvents().addHandler(stopStopTimeCalculator);
         logger.warn("About to init TransitRouterWSImplFactory...");
         controler.addOverridingModule(new TransitRouterEventsWSModule(waitTimeCalculator.getWaitTimes(), stopStopTimeCalculator.getStopStopTimes()));
-        //controler.setTransitRouterFactory(new TransitRouterEventsWSFactory(controler.getScenario(), waitTimeCalculator.getWaitTimes(), stopStopTimeCalculator.getStopStopTimes()));
-		//controler.setScoringFunctionFactory(new CharyparNagelOpenTimesScoringFunctionFactory(controler.getConfig().planCalcScore(), controler.getScenario()));
+        //services.setTransitRouterFactory(new TransitRouterEventsWSFactory(services.getScenario(), waitTimeCalculator.getWaitTimes(), stopStopTimeCalculator.getStopStopTimes()));
+		//services.setScoringFunctionFactory(new CharyparNagelOpenTimesScoringFunctionFactory(services.getConfig().planCalcScore(), services.getScenario()));
 		// comment: I would argue that when you add waitTime/stopTime to the router, you also need to adapt the scoring function accordingly.
 		// kai, sep'13
-		/*controler.addOverridingModule(new AbstractModule() {
+		/*services.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				addPlanStrategyBinding("TransitLocationChoice").toProvider(new javax.inject.Provider<PlanStrategy>() {
 					@Override
 					public PlanStrategy get() {
-						return new TransitLocationChoiceStrategy(controler.getScenario());
+						return new TransitLocationChoiceStrategy(services.getScenario());
 					}
 				});
 			}
@@ -98,12 +98,12 @@ public class ControlerSingapore {
 				});
 			}
 		});
-	/*dcContext = new DestinationChoiceBestResponseContext(controler.getScenario());
+	/*dcContext = new DestinationChoiceBestResponseContext(services.getScenario());
 		dcContext.init();
-		controler.addControlerListener(new DestinationChoiceInitializer(dcContext));
-		if (Double.parseDouble(controler.getConfig().findParam("locationchoice", "restraintFcnExp")) > 0.0 &&
-				Double.parseDouble(controler.getConfig().findParam("locationchoice", "restraintFcnFactor")) > 0.0) {		
-					controler.addControlerListener(new FacilitiesLoadCalculator(dcContext.getFacilityPenalties()));
+		services.addControlerListener(new DestinationChoiceInitializer(dcContext));
+		if (Double.parseDouble(services.getConfig().findParam("locationchoice", "restraintFcnExp")) > 0.0 &&
+				Double.parseDouble(services.getConfig().findParam("locationchoice", "restraintFcnFactor")) > 0.0) {
+					services.addControlerListener(new FacilitiesLoadCalculator(dcContext.getFacilityPenalties()));
 		}*/
 		controler.run();
 	}

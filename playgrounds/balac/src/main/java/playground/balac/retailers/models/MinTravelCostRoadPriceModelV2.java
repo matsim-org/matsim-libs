@@ -17,7 +17,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.LegImpl;
@@ -43,7 +43,7 @@ public class MinTravelCostRoadPriceModelV2 extends RetailerModelImpl
 
   private TreeMap<Id<Link>, LinkRetailersImpl> availableLinks = new TreeMap<Id<Link>, LinkRetailersImpl>();
 
-  public MinTravelCostRoadPriceModelV2(Controler controler, Map<Id<ActivityFacility>, ActivityFacilityImpl> retailerFacilities)
+  public MinTravelCostRoadPriceModelV2(MatsimServices controler, Map<Id<ActivityFacility>, ActivityFacilityImpl> retailerFacilities)
   {
     this.controler = controler;
     this.retailerFacilities = retailerFacilities;

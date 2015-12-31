@@ -19,7 +19,7 @@
 
 package playground.johannes.gsv.sim.cadyts;
 
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.router.TripRouter;
@@ -47,7 +47,7 @@ public class ODAdjustorListener implements IterationStartsListener {
 
 	private final ODAdjustor adjustor;
 
-	public ODAdjustorListener(Controler controler) {
+	public ODAdjustorListener(MatsimServices controler) {
 		TripRouter router = controler.getTripRouterProvider().get();
 		ActivityFacilities facilities = controler.getScenario().getActivityFacilities();
 
@@ -88,7 +88,7 @@ public class ODAdjustorListener implements IterationStartsListener {
 	public void notifyIterationStarts(IterationStartsEvent event) {
 		if (interval > 0) {
 			if (event.getIteration() % interval == 0) {
-				adjustor.run(event.getControler().getScenario().getPopulation());
+				adjustor.run(event.getServices().getScenario().getPopulation());
 			}
 		}
 	}

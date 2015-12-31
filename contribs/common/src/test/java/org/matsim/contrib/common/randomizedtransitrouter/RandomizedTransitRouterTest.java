@@ -143,7 +143,7 @@ public class RandomizedTransitRouterTest {
 		// ---
 		
 		Controler controler = new Controler( scenario ) ;
-		controler.setDirtyShutdown(true);
+//		controler.setDirtyShutdown(true);
 		
 		controler.addOverridingModule( new RandomizedTransitRouterModule() );
 

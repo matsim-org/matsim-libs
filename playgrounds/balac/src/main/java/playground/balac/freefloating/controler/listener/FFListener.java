@@ -4,7 +4,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -18,9 +18,9 @@ import playground.balac.freefloating.controler.listener.FFParkingEventsHandler.R
 
 public class FFListener implements StartupListener, IterationEndsListener, IterationStartsListener{
 	FFParkingEventsHandler ffhandler;
-	Controler controler;	
+	MatsimServices controler;
 	
-	public FFListener( Controler controler) {
+	public FFListener( MatsimServices controler) {
 		
 		this.controler = controler;
 		
@@ -51,21 +51,21 @@ public class FFListener implements StartupListener, IterationEndsListener, Itera
 		}
 		
 				
-		event.getControler().getEvents().removeHandler(ffhandler);
+		event.getServices().getEvents().removeHandler(ffhandler);
 
 	}
 
 	@Override
 	public void notifyStartup(StartupEvent event) {
         
-		ffhandler = new FFParkingEventsHandler(event.getControler().getScenario().getNetwork());
+		ffhandler = new FFParkingEventsHandler(event.getServices().getScenario().getNetwork());
 		
 	}
 
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
 			
-		event.getControler().getEvents().addHandler(ffhandler);
+		event.getServices().getEvents().addHandler(ffhandler);
 			
 	}
 	

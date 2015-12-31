@@ -64,7 +64,7 @@ public class PTCountsIVTBaseline implements StartupListener, IterationEndsListen
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
 		int countsInterval = this.config.ptCounts().getPtCountsInterval();
-		//int countsInterval = event.getControler().getConfig().ptCounts().getPtCountsInterval();
+		//int countsInterval = event.getServices().getConfig().ptCounts().getPtCountsInterval();
 		if (event.getIteration() % countsInterval == 0) {
 			this.recordCounts = true;
 			this.events.addHandler(this.eventHandler);

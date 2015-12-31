@@ -209,8 +209,8 @@ public class FareHandler implements
 	@Override
 	public void notifyStartup(StartupEvent event)
 	{
-		event.getControler().getEvents().addHandler(this);
-		MutableScenario scenario = (MutableScenario) event.getControler().getScenario();
+		event.getServices().getEvents().addHandler(this);
+		MutableScenario scenario = (MutableScenario) event.getServices().getScenario();
 		policies = new FarePolicies(scenario);
 		scenario.addScenarioElement(FarePolicies.ELEMENT_NAME, policies);
 	}
@@ -232,7 +232,7 @@ public class FareHandler implements
 			
 			PersonMoneyEvent ame =  new PersonMoneyEvent(24*3600, p, -(fare*factor));
 			rev += fare;
-			event.getControler().getEvents().processEvent(ame);
+			event.getServices().getEvents().processEvent(ame);
 		}
 		if (output != null)
 		{

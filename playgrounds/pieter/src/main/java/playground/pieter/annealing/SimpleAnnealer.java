@@ -6,7 +6,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
@@ -42,7 +42,7 @@ class SimpleAnnealer implements IterationStartsListener,
 
     @Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
-        Controler controler = event.getControler();
+        MatsimServices controler = event.getServices();
         Config config = controler.getConfig();
 
 		if (!annealSwitch) {
@@ -132,7 +132,7 @@ class SimpleAnnealer implements IterationStartsListener,
 	 * @throws InterruptedException
 	 */
 	private static void anneal(IterationStartsEvent event, double proportion) {
-		StrategyManager stratMan = event.getControler().getStrategyManager();
+		StrategyManager stratMan = event.getServices().getStrategyManager();
 		List<GenericPlanStrategy<Plan, Person>> strategies = stratMan.getStrategiesOfDefaultSubpopulation();
 		double totalWeights = 0.0;
 		double totalSelectorWeights = 0.0;

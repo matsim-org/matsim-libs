@@ -28,7 +28,7 @@ import org.apache.log4j.Logger;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierPlan;
 import org.matsim.contrib.freight.carrier.Carriers;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -100,7 +100,7 @@ public class CarrierScoreStats implements StartupListener, IterationEndsListener
 
 	@Override
 	public void notifyStartup(final StartupEvent event) {
-		Controler controler = event.getControler();
+		MatsimServices controler = event.getServices();
 		this.minIteration = controler.getConfig().controler().getFirstIteration();
 		int maxIter = controler.getConfig().controler().getLastIteration();
 		int iterations = maxIter - this.minIteration;

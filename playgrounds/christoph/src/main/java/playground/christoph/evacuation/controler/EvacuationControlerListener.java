@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.analysis.christoph.TravelTimesWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.mobsim.framework.Mobsim;
@@ -189,36 +189,36 @@ public class EvacuationControlerListener implements StartupListener {
 	public void notifyStartup(final StartupEvent event) {
 		
 		// register FixedOrderControlerListener
-		event.getControler().addControlerListener(this.fixedOrderControlerListener);
+		event.getServices().addControlerListener(this.fixedOrderControlerListener);
 		
-		this.initGeographyStuff(event.getControler().getScenario());
+		this.initGeographyStuff(event.getServices().getScenario());
 		
-		this.initDataGrabbersAndProviders(event.getControler());
+		this.initDataGrabbersAndProviders(event.getServices());
 		
-		this.initAnalysisStuff(event.getControler());
+		this.initAnalysisStuff(event.getServices());
 		
-		this.initReplanningStuff(event.getControler());
+		this.initReplanningStuff(event.getServices());
 		
 		/*
 		 * Use a MobsimFactory which creates vehicles according to available vehicles per
 		 * household and adds the replanning Manager as mobsim engine.
 		 */
-		final Scenario scenario = event.getControler().getScenario();
+		final Scenario scenario = event.getServices().getScenario();
 		final EvacuationQSimFactory mobsimFactory = new EvacuationQSimFactory(this.withinDayControlerListener.getWithinDayEngine(),
 				scenario.getHouseholds().getHouseholdAttributes(), this.jointDepartureOrganizer,
 				this.multiModalControlerListener.get());
-		event.getControler().addOverridingModule(new AbstractModule() {
+		event.getServices().addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				bindMobsim().toProvider(new com.google.inject.Provider<Mobsim>() {
 					@Override
 					public Mobsim get() {
-						return mobsimFactory.createMobsim(scenario, event.getControler().getEvents());
+						return mobsimFactory.createMobsim(scenario, event.getServices().getEvents());
 					}
 				});
 			}
 		});
-		event.getControler().addControlerListener(mobsimFactory);	// only to write some files for debugging
+		event.getServices().addControlerListener(mobsimFactory);	// only to write some files for debugging
 	}
 
 	private void initGeographyStuff(Scenario scenario) {
@@ -237,7 +237,7 @@ public class EvacuationControlerListener implements StartupListener {
 		this.coordAnalyzer = new CoordAnalyzer(affectedArea);
 	}
 	
-	private void initDataGrabbersAndProviders(Controler controler) {
+	private void initDataGrabbersAndProviders(MatsimServices controler) {
 		
 		Scenario scenario = controler.getScenario();
 		
@@ -298,7 +298,7 @@ public class EvacuationControlerListener implements StartupListener {
 		this.withinDayControlerListener.getFixedOrderSimulationListener().addSimulationListener(this.householdDepartureManager);
 	}
 	
-	private void initAnalysisStuff(Controler controler) {
+	private void initAnalysisStuff(MatsimServices controler) {
 		
 		Scenario scenario = controler.getScenario();
 		
@@ -365,7 +365,7 @@ public class EvacuationControlerListener implements StartupListener {
 		this.fixedOrderControlerListener.addControlerListener(this.travelTimesWriter);
 	}
 	
-	private void initWithinDayTravelTimes(Controler controler) {
+	private void initWithinDayTravelTimes(MatsimServices controler) {
 		
 		Scenario scenario = controler.getScenario();
 		
@@ -397,18 +397,18 @@ public class EvacuationControlerListener implements StartupListener {
 		}
 	}
 	
-	private void initReplanningStuff(Controler controler) {
+	private void initReplanningStuff(MatsimServices controler) {
 		
 		this.initialReplanningRemover = new InitialReplanningRemover(this.withinDayControlerListener.getWithinDayEngine(), 
 				this.replanningTracker);
 		this.withinDayControlerListener.getFixedOrderSimulationListener().addSimulationListener(this.initialReplanningRemover);
 		
-//		this.initWithinDayTripRouterFactory(controler);
+//		this.initWithinDayTripRouterFactory(services);
 		this.initIdentifiers(controler);
 		this.initReplanners(controler);
 	}
 
-	private void initWithinDayTripRouterFactory(Controler controler) {
+	private void initWithinDayTripRouterFactory(MatsimServices controler) {
 		
 		Config config = controler.getConfig();
 		Scenario scenario = controler.getScenario();
@@ -442,7 +442,7 @@ public class EvacuationControlerListener implements StartupListener {
 				this.withinDayTravelDisutilityFactory, this.withinDayLeastCostPathCalculatorFactory, evacuationTransitRouterFactory);
 	}
 	
-	private void initIdentifiers(Controler controler) {
+	private void initIdentifiers(MatsimServices controler) {
 		
 		Scenario scenario = controler.getScenario();
 		MobsimDataProvider mobsimDataProvider = this.withinDayControlerListener.getMobsimDataProvider();
@@ -529,10 +529,10 @@ public class EvacuationControlerListener implements StartupListener {
 	}
 	
 	/*
-	 * New Routers for the Replanning are used instead of using the controler's.
+	 * New Routers for the Replanning are used instead of using the services's.
 	 * By doing this every person can use a personalized Router.
 	 */
-	private void initReplanners(Controler controler) {
+	private void initReplanners(MatsimServices controler) {
 		
 		Scenario scenario = controler.getScenario();
 		WithinDayEngine withinDayEngine = this.withinDayControlerListener.getWithinDayEngine();

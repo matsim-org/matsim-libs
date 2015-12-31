@@ -31,8 +31,7 @@ import org.matsim.contrib.emissions.events.ColdEmissionEventHandler;
 import org.matsim.contrib.emissions.events.WarmEmissionEvent;
 import org.matsim.contrib.emissions.events.WarmEmissionEventHandler;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.controler.Controler;
-
+import org.matsim.core.controler.MatsimServices;
 
 
 /**
@@ -45,7 +44,7 @@ public class EmissionInternalizationHandler implements WarmEmissionEventHandler,
 	EmissionCostModule emissionCostModule;
 	Set<Id<Link>> hotspotLinks;
 
-	public EmissionInternalizationHandler(Controler controler, EmissionCostModule emissionCostModule, Set<Id<Link>> hotspotLinks) {
+	public EmissionInternalizationHandler(MatsimServices controler, EmissionCostModule emissionCostModule, Set<Id<Link>> hotspotLinks) {
 		this.eventsManager = controler.getEvents();
 		this.emissionCostModule = emissionCostModule;
 		this.hotspotLinks = hotspotLinks;

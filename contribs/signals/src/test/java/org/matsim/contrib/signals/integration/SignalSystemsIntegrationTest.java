@@ -19,12 +19,10 @@
  * *********************************************************************** */
 package org.matsim.contrib.signals.integration;
 
-import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.contrib.signals.router.InvertedNetworkRoutingModuleModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -83,7 +81,7 @@ public class SignalSystemsIntegrationTest {
 		Controler c = new Controler(scenario);
 		c.addOverridingModule(new SignalsModule());
 		c.addOverridingModule(new InvertedNetworkRoutingModuleModule());
-		c.setDumpDataAtEnd(false);
+		c.getConfig().controler().setDumpDataAtEnd(false);
 		c.run();
 
 		String inputDirectory = testUtils.getInputDirectory();
@@ -156,7 +154,7 @@ public class SignalSystemsIntegrationTest {
 		c.addOverridingModule(new InvertedNetworkRoutingModuleModule());
 		c.getConfig().controler().setOutputDirectory(controlerOutputDir);
 		c.getConfig().controler().setCreateGraphs(false);
-		c.setDumpDataAtEnd(false);
+		c.getConfig().controler().setDumpDataAtEnd(false);
 		c.run();
 
 

@@ -43,7 +43,7 @@ import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 
 /**
- * The controler calls registered controler listeners in reverse order,
+ * The services calls registered services listeners in reverse order,
  * which is confusing at some points. Therefore, this class can be used
  * to call listeners in a pre-defined order. 
  */

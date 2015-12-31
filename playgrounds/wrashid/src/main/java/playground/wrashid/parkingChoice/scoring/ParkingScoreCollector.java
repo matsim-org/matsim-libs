@@ -10,7 +10,7 @@ import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 import org.matsim.contrib.parking.lib.obj.LinkedListValueHashMap;
 import org.matsim.contrib.parking.lib.obj.list.Lists;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.facilities.ActivityFacility;
 
 import playground.wrashid.parkingChoice.events.ParkingArrivalEvent;
@@ -47,9 +47,9 @@ public class ParkingScoreCollector implements ParkingArrivalEventHandler, Parkin
 	private LinkedListValueHashMap<Id<Person>, Double> walkingTimesAtParkingArrival;
 	private LinkedListValueHashMap<Id<Person>, Double> walkingTimesAtParkingDeparture;
 
-	private final Controler controler;
+	private final MatsimServices controler;
 
-	public ParkingScoreCollector(Controler controler) {
+	public ParkingScoreCollector(MatsimServices controler) {
 		this.controler = controler;
 		reset(0);
 	}

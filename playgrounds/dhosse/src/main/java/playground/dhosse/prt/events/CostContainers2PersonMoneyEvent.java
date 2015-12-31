@@ -8,9 +8,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.AfterMobsimEvent;
-import org.matsim.core.controler.listener.AfterMobsimListener;
 
 
 public class CostContainers2PersonMoneyEvent {
@@ -21,7 +20,7 @@ public class CostContainers2PersonMoneyEvent {
 	private final double mobsimEndTime;
 	private CostContainerHandler handler;
 	
-	public CostContainers2PersonMoneyEvent(Controler controler, CostContainerHandler handler){
+	public CostContainers2PersonMoneyEvent(MatsimServices controler, CostContainerHandler handler){
 		
 		this.events = controler.getEvents();
 		this.mobsimEndTime = controler.getConfig().qsim().getEndTime();

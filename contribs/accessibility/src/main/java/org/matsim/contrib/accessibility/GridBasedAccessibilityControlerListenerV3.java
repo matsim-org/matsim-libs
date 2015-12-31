@@ -22,10 +22,14 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.facilities.ActivityFacilities;
 
 import com.vividsolutions.jts.geom.Geometry;
+
+import javax.inject.Inject;
 
 /**
  * improvements sep'11:
@@ -117,10 +121,10 @@ import com.vividsolutions.jts.geom.Geometry;
  */
 public final class GridBasedAccessibilityControlerListenerV3 implements ShutdownListener {
 	private static final Logger log = Logger.getLogger(GridBasedAccessibilityControlerListenerV3.class);
-	private final AccessibilityCalculator delegate = new AccessibilityCalculator();
+	private final AccessibilityCalculator delegate;
 	private final List<SpatialGridDataExchangeInterface> spatialGridDataExchangeListener = new ArrayList<>();
 
-	private Network network;
+	private Scenario scenario;
 	private Config config;
 	// for consideration of different activity types or different modes (or both) subdirectories are
 	// required in order not to confuse the output
@@ -135,47 +139,32 @@ public final class GridBasedAccessibilityControlerListenerV3 implements Shutdown
 	
 	private SpatialGridAggregator spatialGridAggregator;
 
-
-	// ////////////////////////////////////////////////////////////////////
-	// constructors
-	// ////////////////////////////////////////////////////////////////////
-
-	public GridBasedAccessibilityControlerListenerV3(ActivityFacilities opportunities, Config config, Network network){
-		this(opportunities, null, config, network); // PtMatrix is optional and in a different contrib
-	}
-	
-	
 	/**
 	 * constructor
-	 * 
-	 * @param opportunities represented by ActivityFacilitiesImpl 
+	 * @param opportunities represented by ActivityFacilitiesImpl
 	 * @param ptMatrix matrix with travel times and distances for any pair of pt stops
 	 * @param config MATSim Config object
-	 * @param network MATSim road network
+	 * @param scenario MATSim scenario
 	 */
-	public GridBasedAccessibilityControlerListenerV3(ActivityFacilities opportunities, PtMatrix ptMatrix, Config config, Network network){
+	public GridBasedAccessibilityControlerListenerV3(ActivityFacilities opportunities, PtMatrix ptMatrix, Config config, Scenario scenario, Map<String, TravelTime> travelTimes, Map<String, TravelDisutilityFactory> travelDisutilityFactories) {
 		// I thought about changing the type of opportunities to Map<Id,Facility> or even Collection<Facility>, but in the end
 		// one can also use FacilitiesUtils.createActivitiesFacilities(), put everything in there, and give that to this constructor. kai, feb'14
 
 		log.info("Initializing  ...");
 		spatialGridAggregator = new SpatialGridAggregator();
+		delegate = new AccessibilityCalculator(travelTimes, travelDisutilityFactories, scenario);
 		delegate.addFacilityDataExchangeListener(spatialGridAggregator);
 
 		delegate.setPtMatrix(ptMatrix);	// this could be zero if no input files for pseudo pt are given ...
 		assert (config != null);
 		this.config = config ;
-		assert (network != null);
-
+		this.scenario = scenario;
 		delegate.initAccessibilityParameters(config);
 
 		// aggregating facilities to their nearest node on the road network
-		delegate.aggregateOpportunities(opportunities, network);
+		delegate.aggregateOpportunities(opportunities, scenario.getNetwork());
 		// yyyy ignores the "capacities" of the facilities.  kai, mar'14
 		
-		
-		// use network as global variable, otherwise another network might be used during 
-		// notifyShutDown(...) (network may be preprocessed, e.g. only car-links.)
-		this.network = network;
 		log.info(".. done initializing CellBasedAccessibilityControlerListenerV3");
 	}
 
@@ -209,7 +198,7 @@ public final class GridBasedAccessibilityControlerListenerV3 implements Shutdown
 			delegate.addFacilityDataExchangeListener(urbansimAccessibilityWriter);
 		}
 		
-		delegate.initDefaultContributionCalculators(event.getControler());
+		delegate.initDefaultContributionCalculators();
 
 		// make sure that measuring points are set.
 		if(delegate.getMeasuringPoints() == null){
@@ -232,8 +221,6 @@ public final class GridBasedAccessibilityControlerListenerV3 implements Shutdown
 		log.info("Computing and writing cell based accessibility measures ...");
 		// printParameterSettings(); // use only for debugging (settings are printed as part of config dump)
 		log.info(delegate.getMeasuringPoints().getFacilities().values().size() + " measurement points are now processing ...");
-		
-		final Scenario scenario = event.getControler().getScenario();
 
 		AccessibilityConfigGroup moduleAPCM =
 		ConfigUtils.addOrGetModule(
@@ -435,7 +422,7 @@ public final class GridBasedAccessibilityControlerListenerV3 implements Shutdown
 		if (cellSize <= 0) {
 			throw new RuntimeException("Cell Size needs to be assigned a value greater than zero.");
 		}
-		BoundingBox bb = BoundingBox.createBoundingBox(network);
+		BoundingBox bb = BoundingBox.createBoundingBox(scenario.getNetwork());
 		generateGridsAndMeasuringPoints(bb.getXMin(), bb.getYMin(), bb.getXMax(), bb.getYMax(), cellSize);
 	}
 	

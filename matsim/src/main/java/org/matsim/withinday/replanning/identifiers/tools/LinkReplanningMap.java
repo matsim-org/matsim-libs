@@ -34,9 +34,12 @@ import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 import org.matsim.withinday.trafficmonitoring.EarliestLinkExitTimeProvider;
+
+import javax.inject.Inject;
 
 /**
  * This Module is used by a CurrentLegReplanner. It calculates the time
@@ -77,9 +80,11 @@ public class LinkReplanningMap implements PersonStuckEventHandler, ActivityStart
 
 	private final Set<Id<Person>> legJustStartedAgents;
 	private double currentTime = 0.0;
-	
-	public LinkReplanningMap(EarliestLinkExitTimeProvider earliestLinkExitTimeProvider) {
 
+	@Inject
+	public LinkReplanningMap(EarliestLinkExitTimeProvider earliestLinkExitTimeProvider, EventsManager eventsManager) {
+
+		eventsManager.addHandler(this);
 		log.info("Note that the LinkReplanningMap has to be registered as an EventHandler and a SimulationListener!");
 		this. earliestLinkExitTimeProvider = earliestLinkExitTimeProvider;
 		

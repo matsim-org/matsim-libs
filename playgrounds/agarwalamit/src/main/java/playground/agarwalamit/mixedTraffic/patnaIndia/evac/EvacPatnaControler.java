@@ -86,7 +86,7 @@ public class EvacPatnaControler {
 
 		final Controler controler = new Controler(sc);
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
-		controler.setDumpDataAtEnd(true);
+		controler.getConfig().controler().setDumpDataAtEnd(true);
 
 		if(isUsingSeepage){
 			Logger.getLogger(EvacPatnaControler.class).error("Removed seepage network factory. Should work without it if not, check is passing is allowed.");
@@ -101,7 +101,7 @@ public class EvacPatnaControler {
 					bindCarTravelDisutilityFactory().toInstance(tollDisutilityCalculatorFactory);
 				}
 			});
-//			controler.addControlerListener(new MarginalCongestionPricingContolerListener(controler.getScenario(),tollHandler, new CongestionHandlerImplV6(controler.getEvents(), (ScenarioImpl)controler.getScenario()) ));
+//			services.addControlerListener(new MarginalCongestionPricingContolerListener(services.getScenario(),tollHandler, new CongestionHandlerImplV6(services.getEvents(), (ScenarioImpl)services.getScenario()) ));
 		}
 		
 		controler.addControlerListener(new WelfareAnalysisControlerListener((MutableScenario)controler.getScenario()));

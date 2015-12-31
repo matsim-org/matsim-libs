@@ -83,7 +83,7 @@ public class PControlerTest implements TabularFileHandler{
         // manipulate config
 		PModule builder = new PModule() ;
 		builder.configureControler(controler);
-		//		controler.setScoringFunctionFactory(new BvgScoringFunctionFactory(controler.getConfig().planCalcScore(), new BvgScoringFunctionConfigGroup(controler.getConfig()), controler.getNetwork()));
+		//		services.setScoringFunctionFactory(new BvgScoringFunctionFactory(services.getConfig().planCalcScore(), new BvgScoringFunctionConfigGroup(services.getConfig()), services.getNetwork()));
 		// looks like the above was removed in head but I had a merge conflict.  kai, sep'14
 
 		controler.run();
