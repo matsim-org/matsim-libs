@@ -47,7 +47,7 @@ import playground.vsp.analysis.modules.userBenefits.WelfareMeasure;
  */
 public class MyUserBenefitsAnalyzer extends AbstractAnalysisModule{
 	
-	private final Logger log = Logger.getLogger(UserBenefitsAnalyzer.class);
+	private static final Logger LOG = Logger.getLogger(UserBenefitsAnalyzer.class);
 	private MutableScenario scenario;
 	private UserBenefitsCalculator userWelfareCalculator;
 	
@@ -83,7 +83,7 @@ public class MyUserBenefitsAnalyzer extends AbstractAnalysisModule{
 		this.allUsersLogSum = this.userWelfareCalculator.calculateUtility_money(this.scenario.getPopulation());
 		this.personWithNoValidPlanCnt = this.userWelfareCalculator.getPersonsWithoutValidPlanCnt();
 		
-		this.log.warn("users with no valid plan (all scores ``== null'' or ``<= 0.0''): " + this.personWithNoValidPlanCnt);
+		LOG.warn("users with no valid plan (all scores ``== null'' or ``<= 0.0''): " + this.personWithNoValidPlanCnt);
 		
 		this.personId2MonetarizedUserWelfare = this.userWelfareCalculator.getPersonId2MonetizedUtility();
 		this.personId2UserWelfare = this.userWelfareCalculator.getPersonId2Utility();
@@ -116,18 +116,18 @@ public class MyUserBenefitsAnalyzer extends AbstractAnalysisModule{
 			}
 			
 			bw.close();
-			this.log.info("Output written to " + fileName);
+			LOG.info("Output written to " + fileName);
 			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 
-	public double getTotalUserWelfare_money() {
+	public double getTotalUserWelfareMoney() {
 		return this.allUsersLogSum;
 	}
 
-	public Map<Id<Person>, Double> getPersonId2UserWelfare_utils() {
+	public Map<Id<Person>, Double> getPersonId2UserWelfareUtils() {
 		return personId2UserWelfare;
 	}
 	

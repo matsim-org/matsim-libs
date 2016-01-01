@@ -101,7 +101,7 @@ public class UserBenefitsAndTotalWelfare {
 		userBenefitsAnalyzer.preProcessData();
 		userBenefitsAnalyzer.postProcessData();
 		userBenefitsAnalyzer.writeResults(outputDir+runCase+"/analysis/");
-		return userBenefitsAnalyzer.getTotalUserWelfare_money();
+		return userBenefitsAnalyzer.getTotalUserWelfareMoney();
 	}
 
 	/**

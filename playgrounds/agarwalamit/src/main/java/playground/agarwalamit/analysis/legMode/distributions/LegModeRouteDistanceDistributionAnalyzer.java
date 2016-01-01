@@ -46,20 +46,19 @@ import playground.vsp.analysis.modules.AbstractAnalysisModule;
  */
 public class LegModeRouteDistanceDistributionAnalyzer extends AbstractAnalysisModule {
 
-	private Scenario scenario;
 	private final List<Integer> distanceClasses;
 	private SortedSet<String> usedModes;
-	private final Logger log = Logger.getLogger(LegModeRouteDistanceDistributionAnalyzer.class);
+	private final static Logger LOG = Logger.getLogger(LegModeRouteDistanceDistributionAnalyzer.class);
 
-	private SortedMap<String, SortedMap<Integer, Integer>> mode2DistanceClass2LegCount ;
+	private final SortedMap<String, SortedMap<Integer, Integer>> mode2DistanceClass2LegCount ;
 	private SortedMap<String, Map<Id<Person>, List<Double>>> mode2PersonId2dist;
 	private LegModeRouteDistanceDistributionHandler lmrdh;
 	private String eventsFile;
 	private UserGroup userGroup = null;
 
-	public LegModeRouteDistanceDistributionAnalyzer(UserGroup userGroup) {
+	public LegModeRouteDistanceDistributionAnalyzer(final UserGroup userGroup) {
 		super(LegModeRouteDistanceDistributionAnalyzer.class.getSimpleName());
-		this.log.info("enabled");
+		LOG.info("enabled");
 		this.userGroup = userGroup;
 
 		this.distanceClasses = new ArrayList<Integer>();
@@ -69,20 +68,11 @@ public class LegModeRouteDistanceDistributionAnalyzer extends AbstractAnalysisMo
 	}
 	
 	public LegModeRouteDistanceDistributionAnalyzer() {
-		super(LegModeRouteDistanceDistributionAnalyzer.class.getSimpleName());
-		this.log.info("enabled");
-
-		this.distanceClasses = new ArrayList<Integer>();
-		this.usedModes = new TreeSet<String>();
-		this.mode2PersonId2dist = new TreeMap<String, Map<Id<Person>,List<Double>>>();
-		this.mode2DistanceClass2LegCount = new TreeMap<String, SortedMap<Integer,Integer>>();
+		this(null);
 	}
 
-
-
-	public void init(Scenario sc, String eventsFile){
-		this.scenario = sc;
-		this.lmrdh = new LegModeRouteDistanceDistributionHandler(scenario);
+	public void init(final Scenario sc, final String eventsFile){
+		this.lmrdh = new LegModeRouteDistanceDistributionHandler(sc);
 		this.eventsFile = eventsFile;
 	}
 
@@ -99,7 +89,7 @@ public class LegModeRouteDistanceDistributionAnalyzer extends AbstractAnalysisMo
 		reader.readFile(eventsFile);
 
 		this.usedModes = lmrdh.getUsedModes();
-		this.log.info("The following transport modes are considered: " + this.usedModes);
+		LOG.info("The following transport modes are considered: " + this.usedModes);
 		initializeDistanceClasses();
 		this.mode2PersonId2dist = lmrdh.getMode2PersonId2TravelDistances();
 
@@ -177,15 +167,15 @@ public class LegModeRouteDistanceDistributionAnalyzer extends AbstractAnalysisMo
 				writer1.write("\n");
 			}
 			writer1.close();
-			this.log.info("Finished writing output to " + outFile);
+			LOG.info("Finished writing output to " + outFile);
 		}catch (Exception e){
-			this.log.error("Data is not written. Reason " + e.getMessage());
+			LOG.error("Data is not written. Reason " + e.getMessage());
 		}
 	}
 
 	private void initializeDistanceClasses() {
 		double longestDistance = lmrdh.getLongestDistance();
-		this.log.info("The longest distance is found to be: " + longestDistance);
+		LOG.info("The longest distance is found to be: " + longestDistance);
 		int endOfDistanceClass = 0;
 		int classCounter = 0;
 		this.distanceClasses.add(endOfDistanceClass);
@@ -195,7 +185,7 @@ public class LegModeRouteDistanceDistributionAnalyzer extends AbstractAnalysisMo
 			classCounter++;
 			this.distanceClasses.add(endOfDistanceClass);
 		}
-		this.log.info("The following distance classes were defined: " + this.distanceClasses);
+		LOG.info("The following distance classes were defined: " + this.distanceClasses);
 	}
 
 	public SortedMap<String, SortedMap<Integer, Integer>> getMode2DistanceClass2LegCount() {

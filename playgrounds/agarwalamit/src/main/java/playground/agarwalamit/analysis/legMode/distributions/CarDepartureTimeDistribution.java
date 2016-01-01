@@ -44,8 +44,10 @@ import playground.vsp.analysis.modules.AbstractAnalysisModule;
  */
 
 public class CarDepartureTimeDistribution extends AbstractAnalysisModule{
-
-	public CarDepartureTimeDistribution (String eventsFile, double simulationEndTime, int noOfTimeBins){
+	private final CarDepartureTimeHandler handler;
+	private final String eventsFile ;
+	
+	public CarDepartureTimeDistribution (final String eventsFile, final double simulationEndTime, final int noOfTimeBins){
 		super(CarDepartureTimeDistribution.class.getSimpleName());
 		this.handler = new CarDepartureTimeHandler(simulationEndTime, noOfTimeBins);
 		this.eventsFile = eventsFile;
@@ -63,9 +65,6 @@ public class CarDepartureTimeDistribution extends AbstractAnalysisModule{
 		lmtdd.postProcessData();
 		lmtdd.writeResults(outDir+"/analysis/");
 	}
-
-	private CarDepartureTimeHandler handler;
-	private String eventsFile ; 
 
 	@Override
 	public List<EventHandler> getEventHandler() {
@@ -101,7 +100,7 @@ public class CarDepartureTimeDistribution extends AbstractAnalysisModule{
 
 				for(UserGroup ug :UserGroup.values() ) {
 					int count = 0;
-					if ( this.handler.userGrp2TimeBin2Count.get(ug).containsKey( d*3600.0) ) count = this.handler.userGrp2TimeBin2Count.get(ug).get(d*3600.0);;
+					if ( this.handler.userGrp2TimeBin2Count.get(ug).containsKey( d*3600.0) ) count = this.handler.userGrp2TimeBin2Count.get(ug).get(d*3600.0);
 					
 					writer.write(count + "\t"); 
 				}
@@ -119,9 +118,8 @@ public class CarDepartureTimeDistribution extends AbstractAnalysisModule{
 		private final ExtendedPersonFilter pf = new ExtendedPersonFilter();
 		private final SortedMap<UserGroup, SortedMap<Double, Integer>> userGrp2TimeBin2Count = new TreeMap<UserGroup, SortedMap<Double,Integer>>();
 
-		private CarDepartureTimeHandler(double simulationEndTime, int noOfTimeBins) {
+		private CarDepartureTimeHandler(final double simulationEndTime, final int noOfTimeBins) {
 			this.timeBinSize = simulationEndTime/noOfTimeBins;
-
 			initializeMap();
 		}
 

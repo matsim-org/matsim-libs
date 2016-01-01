@@ -82,8 +82,8 @@ public class EmissionLinkAnalyzer extends AbstractAnalysisModule {
 	public static void main(String[] args) {
 		String dir = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/hEART/output/";
 		String [] runCases =  {"bau","ei","5ei","10ei","15ei","20ei","25ei"};
-		String shapeFile_city = "../../../../repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
-		String shapeFile_mma = "../../../../repos/shared-svn/projects/detailedEval/Net/boundaryArea/munichMetroArea_correctedCRS_simplified.shp";
+		String shapeFileCity = "../../../../repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
+		String shapeFileMMA = "../../../../repos/shared-svn/projects/detailedEval/Net/boundaryArea/munichMetroArea_correctedCRS_simplified.shp";
 		
 		Scenario sc = LoadMyScenarios.loadScenarioFromNetwork(dir+"/bau/output_network.xml.gz");
 		BufferedWriter writer = IOUtils.getBufferedWriter(dir+"/analysis/totalEmissionCosts_cityArea.txt");
@@ -92,7 +92,7 @@ public class EmissionLinkAnalyzer extends AbstractAnalysisModule {
 			for(String str : runCases){
 				String emissionEventFile = dir+str+"/ITERS/it.1500/1500.emission.events.xml.gz";
 
-				EmissionLinkAnalyzer ela = new EmissionLinkAnalyzer(30*3600, emissionEventFile, 1, shapeFile_city, sc.getNetwork());
+				EmissionLinkAnalyzer ela = new EmissionLinkAnalyzer(30*3600, emissionEventFile, 1, shapeFileCity, sc.getNetwork());
 				ela.preProcessData();
 				ela.postProcessData();
 

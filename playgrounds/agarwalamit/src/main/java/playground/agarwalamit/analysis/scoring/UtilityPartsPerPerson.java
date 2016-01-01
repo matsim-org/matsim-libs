@@ -44,8 +44,7 @@ public class UtilityPartsPerPerson {
 		new UtilityPartsPerPerson().run(sc, runDir+runCase);
 	}
 
-	private void run(Scenario sc, String outputDir){
-
+	private void run(final Scenario sc, final String outputDir){
 		BufferedWriter writer = IOUtils.getBufferedWriter(outputDir+"/analysis/person2Scote.txt");
 
 		UtilityByPartsAnalyzer util_perf = new UtilityByPartsAnalyzer(true, false, false, false);
@@ -78,8 +77,7 @@ public class UtilityPartsPerPerson {
 			}
 			writer.close();
 		} catch (Exception e) {
-			throw new RuntimeException("Data is not written in file. Reason: "
-					+ e);
+			throw new RuntimeException("Data is not written in file. Reason: "+ e);
 		}
 	}
 }

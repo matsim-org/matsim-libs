@@ -56,18 +56,18 @@ import playground.vsp.analysis.modules.AbstractAnalysisModule;
  * @author amit
  */
 public class LegModeRouteDistanceDistributionFromPlansHandler extends AbstractAnalysisModule{
-	private final Logger log = Logger.getLogger(LegModeRouteDistanceDistributionFromPlansHandler.class);
+	private final static Logger LOG = Logger.getLogger(LegModeRouteDistanceDistributionFromPlansHandler.class);
 
 	private Scenario scenario;
 	private final List<Integer> distanceClasses;
 	private final SortedSet<String> usedModes;
 
-	private SortedMap<String, SortedMap<Integer, Integer>> mode2DistanceClass2LegCount ;
-	private SortedMap<String, Map<Id<Person>, List<Double>>> mode2PersonId2dist;
+	private final SortedMap<String, SortedMap<Integer, Integer>> mode2DistanceClass2LegCount ;
+	private final SortedMap<String, Map<Id<Person>, List<Double>>> mode2PersonId2dist;
 
 	public LegModeRouteDistanceDistributionFromPlansHandler(){
 		super(LegModeRouteDistanceDistributionFromPlansHandler.class.getSimpleName());
-		this.log.info("enabled");
+		LOG.info("enabled");
 
 		this.distanceClasses = new ArrayList<Integer>();
 		this.usedModes = new TreeSet<String>();
@@ -75,7 +75,7 @@ public class LegModeRouteDistanceDistributionFromPlansHandler extends AbstractAn
 		this.mode2DistanceClass2LegCount = new TreeMap<String, SortedMap<Integer,Integer>>();
 	}
 
-	public void init(Scenario sc){
+	public void init(final Scenario sc){
 		this.scenario = sc;
 		initializeDistanceClasses(this.scenario.getPopulation());
 		initializeUsedModes(this.scenario.getPopulation());
@@ -98,8 +98,8 @@ public class LegModeRouteDistanceDistributionFromPlansHandler extends AbstractAn
 	@Override
 	public void preProcessData() {
 
-		this.log.info("Checking if the plans file that will be analyzed is based on a run with simulated public transport.");
-		this.log.info("Transit activities and belonging transit walk legs will be removed from the plan.");
+		LOG.info("Checking if the plans file that will be analyzed is based on a run with simulated public transport.");
+		LOG.info("Transit activities and belonging transit walk legs will be removed from the plan.");
 
 		for (Person person : this.scenario.getPopulation().getPersons().values()){
 			for (Plan plan : person.getPlans()){
@@ -158,9 +158,9 @@ public class LegModeRouteDistanceDistributionFromPlansHandler extends AbstractAn
 				writer1.write("\n");
 			}
 			writer1.close();
-			this.log.info("Finished writing output to " + outFile);
+			LOG.info("Finished writing output to " + outFile);
 		}catch (Exception e){
-			this.log.error("Data is not written. Reason " + e.getMessage());
+			LOG.error("Data is not written. Reason " + e.getMessage());
 		}
 	}
 
@@ -212,7 +212,7 @@ public class LegModeRouteDistanceDistributionFromPlansHandler extends AbstractAn
 		}
 	}
 
-	private double getLongestDistance(Population pop){
+	private double getLongestDistance(final Population pop){
 		double longestDistance = 0.0;
 		for(Person person : pop.getPersons().values()){
 			PlanImpl plan = (PlanImpl) person.getSelectedPlan();
@@ -227,11 +227,11 @@ public class LegModeRouteDistanceDistributionFromPlansHandler extends AbstractAn
 				}
 			}
 		}
-		this.log.info("The longest distance is found to be: " + longestDistance);
+		LOG.info("The longest distance is found to be: " + longestDistance);
 		return longestDistance;
 	}
 
-	private void initializeDistanceClasses(Population pop) {
+	private void initializeDistanceClasses(final Population pop) {
 		double longestDistance = getLongestDistance(pop);
 		int endOfDistanceClass = 0;
 		int classCounter = 0;
@@ -242,10 +242,10 @@ public class LegModeRouteDistanceDistributionFromPlansHandler extends AbstractAn
 			classCounter++;
 			this.distanceClasses.add(endOfDistanceClass);
 		}
-		this.log.info("The following distance classes were defined: " + this.distanceClasses);
+		LOG.info("The following distance classes were defined: " + this.distanceClasses);
 	}
 
-	private void initializeUsedModes(Population pop) {
+	private void initializeUsedModes(final Population pop) {
 		for(Person person : pop.getPersons().values()){
 			for(PlanElement pe : person.getSelectedPlan().getPlanElements()){
 				if(pe instanceof Leg){
@@ -254,7 +254,7 @@ public class LegModeRouteDistanceDistributionFromPlansHandler extends AbstractAn
 				}
 			}
 		}
-		this.log.info("The following transport modes are considered: " + this.usedModes);
+		LOG.info("The following transport modes are considered: " + this.usedModes);
 	}
 
 	public SortedMap<String, SortedMap<Integer, Integer>> getMode2DistanceClass2LegCount() {

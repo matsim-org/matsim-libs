@@ -42,9 +42,12 @@ import playground.vsp.analysis.modules.AbstractAnalysisModule;
  */
 
 public class AverageTollAnalyzer extends AbstractAnalysisModule {
-
-	private static final Logger log = Logger.getLogger(AverageTollAnalyzer.class);
-
+	private static final Logger LOG = Logger.getLogger(AverageTollAnalyzer.class);
+	private final String eventsFile;
+	private final String configFile;
+	private TollInfoHandler handler;
+	private int noOfTimeBin;
+	
 	public static void main(String[] args) {
 		String scenario = "eci";
 		String eventsFile = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/iatbr/output/"+scenario+"/ITERS/it.1500/1500.events.xml.gz";
@@ -58,25 +61,16 @@ public class AverageTollAnalyzer extends AbstractAnalysisModule {
 		ata.writeUserGroupTollValuesOverTime(outputFolder,scenario);
 	}
 
-	public AverageTollAnalyzer (String eventsFile, String configFile) {
-		super(AverageTollAnalyzer.class.getSimpleName());
-		this.eventsFile = eventsFile;
-		this.configFile = configFile;
-		this.noOfTimeBin = 1;
+	public AverageTollAnalyzer (final String eventsFile, final String configFile) {
+		this(eventsFile,configFile,1);
 	}
 	
-	public AverageTollAnalyzer (String eventsFile, String configFile, int noOfTimeBins) {
+	public AverageTollAnalyzer (final String eventsFile, final String configFile, final int noOfTimeBins) {
 		super(AverageTollAnalyzer.class.getSimpleName());
 		this.eventsFile = eventsFile;
 		this.configFile = configFile;
 		this.noOfTimeBin = noOfTimeBins;
 	}
-
-	private String eventsFile;
-	private String configFile;
-	private TollInfoHandler handler;
-	private double simulationEndTime;
-	private int noOfTimeBin;
 
 	@Override
 	public List<EventHandler> getEventHandler() {
@@ -86,8 +80,8 @@ public class AverageTollAnalyzer extends AbstractAnalysisModule {
 	@Override
 	public void preProcessData() {
 
-		this.simulationEndTime = LoadMyScenarios.getSimulationEndTime(this.configFile);
-		this.handler = new TollInfoHandler(this.simulationEndTime, noOfTimeBin);
+		double simulationEndTime = LoadMyScenarios.getSimulationEndTime(this.configFile);
+		this.handler = new TollInfoHandler(simulationEndTime, noOfTimeBin);
 
 		EventsManager events = EventsUtils.createEventsManager();
 		MatsimEventsReader reader = new MatsimEventsReader(events);
@@ -116,9 +110,8 @@ public class AverageTollAnalyzer extends AbstractAnalysisModule {
 		}
 	}
 
-	public void writeUserGroupTollValuesOverTime(String outputFolder, String pricingScheme){
+	public void writeUserGroupTollValuesOverTime(final String outputFolder, final String pricingScheme){
 		SortedMap<String, SortedMap<Double, Map<Id<Person>,Double>>> userGrp2PersonToll = handler.getUserGrp2TimeBin2Person2Toll();
-		
 		BufferedWriter writer = IOUtils.getBufferedWriter(outputFolder+"/timeBin2TollValues_onlyCongestionMoneyEvents_userGroup.txt");
 		try {
 			writer.write("pricingScheme \t userGroup \t timeBin \t toll[EUR] \n");
@@ -133,7 +126,7 @@ public class AverageTollAnalyzer extends AbstractAnalysisModule {
 		}
 	}
 	
-	public void writeRDataForBoxPlot(String outputFolder, boolean isWritingDataForEachTimeInterval){
+	public void writeRDataForBoxPlot(final String outputFolder, final boolean isWritingDataForEachTimeInterval){
 		if( ! new File(outputFolder+"/boxPlot/").exists()) new File(outputFolder+"/boxPlot/").mkdirs();
 
 		SortedMap<String, SortedMap<Double, Map<Id<Person>,Double>>> userGrp2PersonToll = handler.getUserGrp2TimeBin2Person2Toll();
@@ -141,7 +134,7 @@ public class AverageTollAnalyzer extends AbstractAnalysisModule {
 		for(String ug : userGrp2PersonToll.keySet()){
 
 			if(! isWritingDataForEachTimeInterval) {
-				log.info("Writing toll/trip for whole day for each user group. This data is likely to be suitable for box plot in R.");
+				LOG.info("Writing toll/trip for whole day for each user group. This data is likely to be suitable for box plot in R.");
 				BufferedWriter writer = IOUtils.getBufferedWriter(outputFolder+"/boxPlot/toll_"+ug.toString()+".txt");
 				try {
 					// sum all the values for different time bins
@@ -161,7 +154,7 @@ public class AverageTollAnalyzer extends AbstractAnalysisModule {
 					throw new RuntimeException("Data is not written in file. Reason: " + e);
 				}
 			} else {
-				log.warn("Writing toll/trip for each time bin and for each user group. Thus, this will write many files for each user group. This data is likely to be suitable for box plot in R. ");
+				LOG.warn("Writing toll/trip for each time bin and for each user group. Thus, this will write many files for each user group. This data is likely to be suitable for box plot in R. ");
 				try {
 					for (double d : userGrp2PersonToll.get(ug).keySet()){
 						BufferedWriter writer = IOUtils.getBufferedWriter(outputFolder+"/boxPlot/toll_"+ug.toString()+"_"+((int) d/3600 +1)+"h.txt");
