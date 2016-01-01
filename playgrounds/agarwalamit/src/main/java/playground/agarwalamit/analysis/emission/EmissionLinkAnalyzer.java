@@ -92,10 +92,10 @@ public class EmissionLinkAnalyzer extends AbstractAnalysisModule {
 			for(String str : runCases){
 				String emissionEventFile = dir+str+"/ITERS/it.1500/1500.emission.events.xml.gz";
 
-				EmissionLinkAnalyzer ela = new EmissionLinkAnalyzer(30*3600, emissionEventFile, 1, shapeFileCity, sc.getNetwork());
+				EmissionLinkAnalyzer ela = new EmissionLinkAnalyzer(30*3600, emissionEventFile, 1, shapeFileMMA, sc.getNetwork());
 				ela.preProcessData();
 				ela.postProcessData();
-
+				ela.writeTotalEmissions(dir+str+"/analysis/","MMA");
 				writer.write(str+"\t"+ela.getTotalEmissionsCosts()+"\n");
 			}
 			writer.close();
@@ -138,6 +138,20 @@ public class EmissionLinkAnalyzer extends AbstractAnalysisModule {
 				totalEmissionCost += time2cost.get(timebin);
 			}
 			writer.write("totalCost \t"+totalEmissionCost+"\n");
+			writer.close();
+		} catch (Exception e){
+			throw new RuntimeException("Data is not written in the file. Reason - "+e);
+		}
+	}
+	
+	public void writeTotalEmissions(String outputFolder, String suffix) {
+		SortedMap<String,Double> emissions = getTotalEmissions();
+		BufferedWriter writer = IOUtils.getBufferedWriter(outputFolder+"/totalEmissions_"+suffix+".txt");
+		try{
+			writer.write("pollutant \t emissionsInGm \n");
+			for(String emiss : emissions.keySet()){
+				writer.write(emiss+"\t"+emissions.get(emiss)+"\n");
+			}
 			writer.close();
 		} catch (Exception e){
 			throw new RuntimeException("Data is not written in the file. Reason - "+e);
