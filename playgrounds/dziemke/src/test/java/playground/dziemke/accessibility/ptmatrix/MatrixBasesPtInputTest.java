@@ -59,8 +59,9 @@ public class MatrixBasesPtInputTest {
 		String transitScheduleFile = "../../matsim/examples/pt-tutorial/transitschedule.xml";
 		String networkFile = "../../matsim/examples/pt-tutorial/multimodalnetwork.xml";
 		String outputRoot = utils.getOutputDirectory();
-		
-		double departureTime = 8. * 60 * 60;
+        System.out.println("outputRoot = " + outputRoot);
+
+        double departureTime = 8. * 60 * 60;
 
 		
 		Config config = ConfigUtils.createConfig();
