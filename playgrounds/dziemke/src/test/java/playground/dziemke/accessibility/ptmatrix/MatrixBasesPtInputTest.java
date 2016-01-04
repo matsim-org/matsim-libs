@@ -87,28 +87,16 @@ public class MatrixBasesPtInputTest {
 		
 		// The locationFacilitiesMap is passed twice: Once for origins and once for destinations.
 		// In other uses the two maps may be different -- thus the duplication here.
+        log.info("Start matrix-computation...");
 		ThreadedMatrixCreator tmc = new ThreadedMatrixCreator(scenario, ptMatrixLocationsMap, 
 				ptMatrixLocationsMap, departureTime, outputRoot, " ", 1);
-		
-		// TODO starting the thread is actually already contained within the ThreadedMatrixCreator
-		// In normal classed it works starting it like that. Here (in a test), however, it seems that
-		// it must be started here
 
-		log.info("Start matrix-computation...");
-		Thread thread = new Thread(tmc);
-		thread.start();
-
-//		try {
-//			Thread.sleep(1000);
-//		} catch (InterruptedException e1) {
-//			e1.printStackTrace();
-//		}
-		try {
-			thread.join();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-        log.info("Matrix-computation finished.");
+        //waiting for the output to be written
+        try {
+            tmc.getThread().join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
         //ptStops
         log.info("Read and check ptStops.csv...");
