@@ -65,6 +65,7 @@ import java.util.concurrent.TimeUnit;
  *     <li>overdo 1, 64 degree landmarks:  10% faster</li>
  *     <li>overdo 1.1, 32 degree landmarks:  20% faster</li>
  *     <li>overdo 1.25, 32 degree landmarks:  30% faster</li>
+ *     <li>overdo 1.25, 16 pie slice landmarks:  8% faster</li>
  * </ul>
  *
  * @author thibautd

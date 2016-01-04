@@ -47,6 +47,7 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
+import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -106,7 +107,7 @@ public class TransitRouterAStar implements TransitRouter {
 			case degree:
 				return new DegreeBasedLandmarker();
 			case pieSlice:
-				return new PieSlicesLandmarker( null );
+				return new PieSlicesLandmarker( new Rectangle2D.Double() );
 		}
 		throw new RuntimeException( "unknown landmarker "+astarConfig.getLandmarkComputation() );
 	}
