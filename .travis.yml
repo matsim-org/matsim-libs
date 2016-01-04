@@ -1,6 +1,6 @@
 language: java
 script:
-  - cd ${TRAVIS_BUILD_DIR}/playgrounds/blakeks && mvn test -B -Dmaven.test.redirectTestOutputToFile
+  - cd ${TRAVIS_BUILD_DIR}/playgrounds/dziemke && mvn test -B -Dmaven.test.redirectTestOutputToFile
 env:
   global:
     - MAVEN_OPTS="-XX:MaxPermSize=1g -Xmx2g"
