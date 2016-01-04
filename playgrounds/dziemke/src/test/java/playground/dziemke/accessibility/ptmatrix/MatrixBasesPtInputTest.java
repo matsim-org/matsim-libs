@@ -102,6 +102,9 @@ public class MatrixBasesPtInputTest {
         //ptStops
         log.info("Read and check ptStops.csv...");
         ArrayList<String[]> ptStops = readCSVLine(outputRoot + "ptStops.csv", ",");
+        if (ptStops.size() < 3) {
+            Assert.fail();
+        }
         Assert.assertTrue(Arrays.equals(ptStops.get(1), new String[]{"2b", "2050.0", "2960.0"}));
         Assert.assertTrue(Arrays.equals(ptStops.get(2), new String[]{"1", "1050.0", "1050.0"}));
         Assert.assertTrue(Arrays.equals(ptStops.get(3), new String[]{"3", "3950.0", "1050.0"}));
