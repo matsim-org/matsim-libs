@@ -20,6 +20,7 @@
 package playground.johannes.studies.matrix2014.analysis;
 
 import gnu.trove.list.array.TDoubleArrayList;
+import org.apache.log4j.Logger;
 import org.matsim.contrib.common.stats.LinearDiscretizer;
 import org.matsim.contrib.common.stats.StatsWriter;
 import org.matsim.facilities.ActivityFacilities;
@@ -43,6 +44,8 @@ import java.util.Set;
  */
 public class MatrixAnalyzer implements AnalyzerTask<Collection<? extends Person>> {
 
+    private static final Logger logger = Logger.getLogger(MatrixAnalyzer.class);
+
     private static final String KEY = "matrix";
 
     private NumericMatrix refMatrix;
@@ -59,6 +62,8 @@ public class MatrixAnalyzer implements AnalyzerTask<Collection<? extends Person>
 
     private ODPredicate<String, Double> odPredicate;
 
+    private double volumeThreshold = 0;
+
     private boolean useWeights;
 
     public MatrixAnalyzer(ActivityFacilities facilities, ZoneCollection zones, NumericMatrix refMatrix, String name) {
@@ -73,6 +78,10 @@ public class MatrixAnalyzer implements AnalyzerTask<Collection<? extends Person>
 
     public void setODPredicate(ODPredicate<String, Double> odPredicate) {
         this.odPredicate = odPredicate;
+    }
+
+    public void setVolumeThreshold(double threshold) {
+        this.volumeThreshold = threshold;
     }
 
     public void setUseWeights(boolean useWeights) {
@@ -106,6 +115,13 @@ public class MatrixAnalyzer implements AnalyzerTask<Collection<? extends Person>
         }
 
         double refTotal = MatrixOperations.sum(refMatrix);
+
+        if(volumeThreshold > 0) {
+            ODPredicate volPredicate = new VolumePredicate(volumeThreshold);
+            refMatrix = (NumericMatrix) MatrixOperations.subMatrix(volPredicate, refMatrix, new NumericMatrix());
+        }
+
+        logger.debug(String.format("Normalization factor (%s): %s.", matrixName, simTotal/refTotal));
         MatrixOperations.applyFactor(refMatrix, simTotal / refTotal);
 
         NumericMatrix errMatrix = new NumericMatrix();
@@ -154,15 +170,16 @@ public class MatrixAnalyzer implements AnalyzerTask<Collection<? extends Person>
         /*
         min 1 trip in reference matrix
          */
-        refMatrix = (NumericMatrix) MatrixOperations.subMatrix(new VolumePredicate(1.0), refMatrix, new NumericMatrix());
-        //simMatrix = (NumericMatrix) MatrixOperations.subMatrix(new VolumePredicate(1.0), simMatrix, new NumericMatrix());
-
-        errMatrix = new NumericMatrix();
-        MatrixOperations.errorMatrix(refMatrix, simMatrix, errMatrix);
-
-        errors = org.matsim.contrib.common.collections.CollectionUtils.toNativeArray(errMatrix.values(), true, true, true);
-
-        name = String.format("%s.%s.min1.err", KEY, matrixName);
+//        refMatrix = (NumericMatrix) MatrixOperations.subMatrix(new VolumePredicate(volumeThreshold), refMatrix, new NumericMatrix
+//                ());
+//        //simMatrix = (NumericMatrix) MatrixOperations.subMatrix(new VolumePredicate(1.0), simMatrix, new NumericMatrix());
+//
+//        errMatrix = new NumericMatrix();
+//        MatrixOperations.errorMatrix(refMatrix, simMatrix, errMatrix);
+//
+//        errors = org.matsim.contrib.common.collections.CollectionUtils.toNativeArray(errMatrix.values(), true, true, true);
+//
+//        name = String.format("%s.%s.min1.err", KEY, matrixName);
         container = new StatsContainer(name, errors);
         containers.add(container);
     }

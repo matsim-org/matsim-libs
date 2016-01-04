@@ -40,6 +40,7 @@ import playground.johannes.studies.matrix2014.config.ODCalibratorConfigurator;
 import playground.johannes.studies.matrix2014.gis.TransferZoneAttribute;
 import playground.johannes.studies.matrix2014.gis.ValidateFacilities;
 import playground.johannes.studies.matrix2014.gis.ZoneSetLAU2Class;
+import playground.johannes.studies.matrix2014.matrix.ODPredicate;
 import playground.johannes.studies.matrix2014.matrix.ZoneDistancePredicate;
 import playground.johannes.synpop.analysis.*;
 import playground.johannes.synpop.data.*;
@@ -124,7 +125,8 @@ public class Simulator {
         ODCalibrator odDistribution = new ODCalibratorConfigurator(dataPool).configure(config.getModule("tomtomCalibrator"));
         odDistribution.setUseWeights(true);
         odDistribution.setPredicate(new CachedModePredicate(CommonKeys.LEG_MODE, CommonValues.LEG_MODE_CAR));
-        DelayedHamiltonian odDistributionDelayed = new DelayedHamiltonian(odDistribution, Integer.parseInt(config.getParam(MODULE_NAME, "delay_matrix")));
+        DelayedHamiltonian odDistributionDelayed = new DelayedHamiltonian(odDistribution, (long) Double.parseDouble(config.getParam
+                (MODULE_NAME, "delay_matrix")));
         hamiltonian.addComponent(odDistributionDelayed, Double.parseDouble(config.getParam(MODULE_NAME,
                 "theta_matrix")));
 		/*
@@ -263,14 +265,28 @@ public class Simulator {
         mAnalyzer.setUseWeights(true);
         task.addComponent(mAnalyzer);
 
+//        mAnalyzer = (MatrixAnalyzer) new MatrixAnalyzerConfigurator(config.getModule("matrixAnalyzerITP-2")
+//                , dataPool, ioContext).load();
+//        mAnalyzer.setPredicate(modePredicate);
+//        mAnalyzer.setUseWeights(true);
+//        task.addComponent(mAnalyzer);
+
         mAnalyzer = (MatrixAnalyzer) new MatrixAnalyzerConfigurator(config.getModule("matrixAnalyzerTomTom")
                 , dataPool, ioContext).load();
         mAnalyzer.setPredicate(modePredicate);
         ZoneData zoneData = (ZoneData) dataPool.get(ZoneDataLoader.KEY);
         ZoneCollection zones = zoneData.getLayer("nuts3");
-        mAnalyzer.setODPredicate(new ZoneDistancePredicate(zones, 100000));
+        ODPredicate distPredicate = new ZoneDistancePredicate(zones, 100000);
+        mAnalyzer.setODPredicate(distPredicate);
         mAnalyzer.setUseWeights(true);
         task.addComponent(mAnalyzer);
+
+//        mAnalyzer = (MatrixAnalyzer) new MatrixAnalyzerConfigurator(config.getModule("matrixAnalyzerTomTom-2")
+//                , dataPool, ioContext).load();
+//        mAnalyzer.setPredicate(modePredicate);
+//        mAnalyzer.setODPredicate(distPredicate);
+//        mAnalyzer.setUseWeights(true);
+//        task.addComponent(mAnalyzer);
 
         ActivityFacilities facilities = ((FacilityData) dataPool.get(FacilityDataLoader.KEY)).getAll();
         MatrixWriter matrixWriter = new MatrixWriter(facilities, zones, ioContext);
@@ -337,6 +353,8 @@ public class Simulator {
         histogramWriter.addBuilder(new PassThroughDiscretizerBuilder(new LinearDiscretizer(50000), "linear"));
 
         Predicate<Segment> modePredicate = new ModePredicate(CommonValues.LEG_MODE_CAR);
+
+        tasks.addComponent(NumericLegAnalyzer.create(CommonKeys.LEG_GEO_DISTANCE, true, modePredicate, "car", histogramWriter));
 
         for (int klass = 0; klass < 6; klass++) {
             Predicate<Segment> lauPred = new LegPersonAttributePredicate(MiDKeys.PERSON_LAU2_CLASS, String.valueOf(klass));
