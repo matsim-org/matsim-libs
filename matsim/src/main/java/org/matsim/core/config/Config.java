@@ -27,6 +27,7 @@ import org.matsim.core.config.consistency.VspConfigConsistencyCheckerImpl;
 import org.matsim.core.config.groups.*;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.config.TransitRouterConfigGroup;
+import org.matsim.run.CreateFullConfig;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +37,8 @@ import java.util.TreeMap;
 /**
  * Stores all configuration settings specified in a configuration file and
  * provides access to the settings at runtime.
+ * 
+ * @see CreateFullConfig
  *
  * @author mrieser
  */
