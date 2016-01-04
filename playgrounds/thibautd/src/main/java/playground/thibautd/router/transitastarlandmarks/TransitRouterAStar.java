@@ -108,6 +108,8 @@ public class TransitRouterAStar implements TransitRouter {
 				return new DegreeBasedLandmarker();
 			case pieSlice:
 				return new PieSlicesLandmarker( new Rectangle2D.Double() );
+			case centrality:
+				return new CentralityBasedLandmarker( travelDisutility );
 		}
 		throw new RuntimeException( "unknown landmarker "+astarConfig.getLandmarkComputation() );
 	}

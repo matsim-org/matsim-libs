@@ -28,7 +28,7 @@ public class TransitRouterAStarConfigGroup extends ReflectiveConfigGroup {
 	private static final Logger log = Logger.getLogger( TransitRouterAStarConfigGroup.class );
 	public static final String GROUP_NAME = "transitRouterAStar";
 
-	public enum LandmarkComputation { degree, pieSlice; }
+	public enum LandmarkComputation { degree, pieSlice, centrality; }
 
 	private int nLandmarks = 16;
 	private int initiallyActiveLandmarks = 2;
