@@ -99,6 +99,7 @@ public class MatrixBasesPtInputTest {
             e.printStackTrace();
         }
 
+        /*
         //ptStops
         log.info("Read and check ptStops.csv...");
         ArrayList<String[]> ptStops = readCSVLine(outputRoot + "ptStops.csv", ",");
@@ -110,6 +111,7 @@ public class MatrixBasesPtInputTest {
         Assert.assertTrue(Arrays.equals(ptStops.get(3), new String[]{"3", "3950.0", "1050.0"}));
         Assert.assertTrue(Arrays.equals(ptStops.get(4), new String[]{"2a", "2050.0", "2940.0"}));
         log.info("Reading and checking ptStops.csv finished.");
+        */
 
         //travelDistanceMatrix
         log.info("Read and check travelDistanceMatrix_1.csv...");
@@ -169,7 +171,7 @@ public class MatrixBasesPtInputTest {
             String dataRow = CSVFile.readLine();
 			ArrayList<String[]> lineList = new ArrayList<>();
 			while (dataRow != null){
-				lineList.add(dataRow.substring(0, dataRow.length()).split(splitString));
+				lineList.add(dataRow.split(splitString));
 				dataRow = CSVFile.readLine();
 			}
 			return lineList;
