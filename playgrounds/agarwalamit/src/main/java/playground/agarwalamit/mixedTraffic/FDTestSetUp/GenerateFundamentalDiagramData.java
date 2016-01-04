@@ -470,7 +470,7 @@ public class GenerateFundamentalDiagramData {
 		LOG.info("Mobsim agents' are directly added to AgentSource.");
 		LOG.info("=======================");
 
-		if (sc.getConfig().network().isTimeVariantNetwork()) {
+		if (this.inputs.isTimeDependentNetwork()) {
 			qSim.addMobsimEngine(new NetworkChangeEventsEngine());		
 		}
 

@@ -67,7 +67,7 @@ public class InputsForFDTestSetUp {
 	private String [] travelModes;
 	private Double[] modalSplitInPCU;
 	private Scenario scenario;
-	private boolean isTimeDependentNetwork = false;
+	private boolean isTimeDependentNetwork ;
 
 	private Map<Id<VehicleType>, TravelModesFlowDynamicsUpdator> vehicle2TravelModesData;
 
@@ -257,6 +257,10 @@ public class InputsForFDTestSetUp {
 
 	public void setTimeDependentNetwork(boolean isTimeDependentNetwork) {
 		this.isTimeDependentNetwork = isTimeDependentNetwork;
+	}
+
+	public boolean isTimeDependentNetwork() {
+		return isTimeDependentNetwork;
 	}
 
 	public void setModalSplit(String [] modalSplit) {
