@@ -112,7 +112,7 @@ public class MatrixBasesPtInputTest {
 
         //ptStops
         log.info("Read and check ptStops.csv...");
-        ArrayList<String[]> ptStops = readCSVLine(outputRoot + "/ptStops.csv", ",");
+        ArrayList<String[]> ptStops = readCSVLine(outputRoot + "ptStops.csv", ",");
         assert ptStops != null;
         Assert.assertTrue(Arrays.equals(ptStops.get(1), new String[]{"2b", "2050.0", "2960.0"}));
         Assert.assertTrue(Arrays.equals(ptStops.get(2), new String[]{"1", "1050.0", "1050.0"}));
@@ -122,7 +122,7 @@ public class MatrixBasesPtInputTest {
 
         //travelDistanceMatrix
         log.info("Read and check travelDistanceMatrix_1.csv...");
-        ArrayList<String[]> tdm = readCSVLine(outputRoot + "/travelDistanceMatrix_1.csv", " ");
+        ArrayList<String[]> tdm = readCSVLine(outputRoot + "travelDistanceMatrix_1.csv", " ");
         assert tdm != null;
         Assert.assertTrue(Arrays.equals(tdm.get(0), new String[]{"2b", "2b", "0.0"}));
         Assert.assertTrue(Arrays.equals(tdm.get(1), new String[]{"2b", "1", "2410.0"}));
@@ -144,7 +144,7 @@ public class MatrixBasesPtInputTest {
 
         //travelTimeMatrix
         log.info("Read and check travelTimeMatrix_1.csv...");
-        ArrayList<String[]> ttm = readCSVLine(outputRoot + "/travelTimeMatrix_1.csv", " ");
+        ArrayList<String[]> ttm = readCSVLine(outputRoot + "travelTimeMatrix_1.csv", " ");
         assert ttm != null;
         Assert.assertTrue(Arrays.equals(ttm.get(0), new String[]{"2b", "2b", "0.0"}));
         Assert.assertTrue(Arrays.equals(ttm.get(1), new String[]{"2b", "1", "540.0"}));
