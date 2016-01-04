@@ -37,7 +37,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 public class ShochwaveExperiment {
 	
-	private static final String runDir = "../../../../repos/shared-svn/projects/mixedTraffic/triangularNetwork/run313/singleModes/holes/car_SW/";
+	private static final String runDir = "../../../../repos/shared-svn/projects/mixedTraffic/triangularNetwork/run313/singleModes/withoutHoles/car_SW/";
 
 	public static void main(String[] args) {
 
@@ -47,7 +47,7 @@ public class ShochwaveExperiment {
 		inputs.setTrafficDynamics(TrafficDynamics.queue);
 		inputs.setLinkDynamics(LinkDynamics.FIFO);
 		inputs.setTimeDependentNetwork(true);
-
+		
 		GenerateFundamentalDiagramData generateFDData = new GenerateFundamentalDiagramData(inputs);
 		generateFDData.setRunDirectory(runDir);
 		generateFDData.setReduceDataPointsByFactor(Integer.valueOf(40));
@@ -57,12 +57,13 @@ public class ShochwaveExperiment {
 		
 		//set flow capacity of the base link to zero for 1 min.
 		Scenario sc = generateFDData.getScenario();
+		sc.getConfig().qsim().setStuckTime(10*3600);
 		
 		ScenarioUtils.loadScenario(sc);
 		Link baseLink = sc.getNetwork().getLinks().get(Id.createLinkId(0));
 		
 		
-		double flowCapNow = baseLink.getCapacity();
+		double flowCapBefore = baseLink.getCapacity();
 		NetworkChangeEventFactory cef = new NetworkChangeEventFactoryImpl() ;
 		{
 			NetworkChangeEvent event = cef.createNetworkChangeEvent(20.*60.) ;
@@ -71,8 +72,8 @@ public class ShochwaveExperiment {
 			((NetworkImpl)sc.getNetwork()).addNetworkChangeEvent(event);
 		}
 		{
-			NetworkChangeEvent event = cef.createNetworkChangeEvent(20.*60.+60) ;
-			event.setFlowCapacityChange(new ChangeValue(ChangeType.ABSOLUTE, flowCapNow));
+			NetworkChangeEvent event = cef.createNetworkChangeEvent(20.*60.+60*5) ;
+			event.setFlowCapacityChange(new ChangeValue(ChangeType.ABSOLUTE, flowCapBefore/3600.)); // value should be in pcu/s
 			event.addLink(baseLink);
 			((NetworkImpl)sc.getNetwork()).addNetworkChangeEvent(event);
 		}
