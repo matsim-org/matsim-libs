@@ -54,7 +54,7 @@ class KNBerlinControler {
 		config.controler().setOutputDirectory("/Users/nagel/kairuns/a100/output/");
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 
-		config.controler().setFirstIteration(90); // with something like "9" we don't get output events! 
+		config.controler().setFirstIteration(100); // with something like "9" we don't get output events! 
 		config.controler().setLastIteration(100); // with something like "9" we don't get output events! 
 		config.controler().setWriteSnapshotsInterval(100);
 		config.controler().setWritePlansInterval(200);
@@ -73,7 +73,7 @@ class KNBerlinControler {
 		config.qsim().setTrafficDynamics( TrafficDynamics.withHoles );
 		config.qsim().setUsingFastCapacityUpdate(false);
 		config.qsim().setNumberOfThreads(6);
-		
+
 		//		config.controler().setMobsim(MobsimType.JDEQSim.toString());
 		//		config.setParam(JDEQSimulation.JDEQ_SIM, JDEQSimulation.END_TIME, "36:00:00") ;
 		//		config.setParam(JDEQSimulation.JDEQ_SIM, JDEQSimulation.FLOW_CAPACITY_FACTOR, Double.toString(sampleFactor) ) ;
@@ -142,7 +142,7 @@ class KNBerlinControler {
 		// prepare the control(l)er:
 		Controler controler = new Controler( scenario ) ;
 		controler.getConfig().controler().setOverwriteFileSetting( OverwriteFileSetting.overwriteExistingFiles ) ;
-		controler.addControlerListener(new KaiAnalysisListener()) ;
+//		controler.addControlerListener(new KaiAnalysisListener()) ;
 		//		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
 		//		controler.setMobsimFactory(new OldMobsimFactory()) ;
 
@@ -158,7 +158,7 @@ class KNBerlinControler {
 		String[] consideredActivitiesForReceiverPointGrid = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
 		gridParameters.setConsideredActivitiesForReceiverPointGrid(consideredActivitiesForReceiverPointGrid);
 
-		gridParameters.setReceiverPointGap(200.);
+		gridParameters.setReceiverPointGap(2000.);
 
 		String[] consideredActivitiesForDamages = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
 		gridParameters.setConsideredActivitiesForSpatialFunctionality(consideredActivitiesForDamages);
@@ -259,32 +259,19 @@ class KNBerlinControler {
 
 		// yyyy would be even better to load everything into one file: x, y, t, imissions, damages, ...
 		// this should be possible now by adding working directory and label arrays, see example at the very end of NoiseCalculationOffline... ik 'dec 15
-		
-		{
-			final String label = "immission" ;
-			final String workingDirectory = outputFilePath + "/immissions/" ;
+
+		final String[] labels = { "immission", "consideredAgentUnits" };
+		final String[] workingDirectories = { outputFilePath + "/immissions/" , outputFilePath + "/consideredAgentUnits/" };
 
 
-			MergeNoiseCSVFile merger = new MergeNoiseCSVFile() ;
-			merger.setWorkingDirectory(workingDirectory);
-			merger.setReceiverPointsFile(receiverPointsFile);
-			merger.setLabel(label);
-			merger.setOutputFormat(OutputFormat.xyt);
-			merger.setThreshold(1.);
-			merger.run();
-		}
-		{
-			final String label = "damages_receiverPoint" ;
-			final String workingDirectory = outputFilePath + "/damages_receiverPoint/" ;
-
-			MergeNoiseCSVFile merger = new MergeNoiseCSVFile() ;
-			merger.setWorkingDirectory(workingDirectory);
-			merger.setReceiverPointsFile(receiverPointsFile);
-			merger.setLabel(label);
-			merger.setOutputFormat(OutputFormat.xyt);
-			merger.setThreshold(1.);
-			merger.run();
-		}
+		MergeNoiseCSVFile merger = new MergeNoiseCSVFile() ;
+		merger.setWorkingDirectory(workingDirectories);
+		merger.setReceiverPointsFile(receiverPointsFile);
+		merger.setLabel(labels);
+		merger.setOutputFormat(OutputFormat.xyt);
+		merger.setThreshold(1.);
+		merger.setOutputDirectory(outputFilePath);
+		merger.run();
 
 	}
 
