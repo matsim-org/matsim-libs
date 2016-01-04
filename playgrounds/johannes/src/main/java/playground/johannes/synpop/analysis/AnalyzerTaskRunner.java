@@ -60,7 +60,7 @@ public class AnalyzerTaskRunner {
                 writer.write(TAB);
                 writer.write(doubleToString(container.getMax()));
                 writer.write(TAB);
-                writer.write(intToString(container.getN()));
+                writer.write(doubleToString(container.getN()));
                 writer.write(TAB);
                 writer.write(doubleToString(container.getMedian()));
                 writer.write(TAB);

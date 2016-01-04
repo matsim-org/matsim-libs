@@ -23,13 +23,9 @@
 package org.matsim.core.mobsim.qsim;
 
 import com.google.inject.*;
-import com.google.inject.AbstractModule;
 import com.google.inject.Injector;
-import com.google.inject.util.Modules;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.Config;
-import org.matsim.core.controler.*;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 
@@ -44,12 +40,12 @@ public class QSimUtils {
 	private QSimUtils() {}
 
 	public static QSim createDefaultQSim(final Scenario scenario, final EventsManager eventsManager) {
-		org.matsim.core.controler.Injector injector = org.matsim.core.controler.Injector.createInjector(scenario.getConfig(), new StandaloneQSimModule(scenario, eventsManager));
+		Injector injector = org.matsim.core.controler.Injector.createInjector(scenario.getConfig(), new StandaloneQSimModule(scenario, eventsManager));
 		return (QSim) injector.getInstance(Mobsim.class);
 	}
 
 	public static QSim createQSim(final Scenario scenario, final EventsManager eventsManager, final Collection<AbstractQSimPlugin> plugins) {
-		org.matsim.core.controler.Injector injector = org.matsim.core.controler.Injector.createInjector(scenario.getConfig(),
+		Injector injector = org.matsim.core.controler.Injector.createInjector(scenario.getConfig(),
 				org.matsim.core.controler.AbstractModule.override(Collections.singleton(new StandaloneQSimModule(scenario, eventsManager)),
 				new org.matsim.core.controler.AbstractModule() {
 					@Override

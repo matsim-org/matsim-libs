@@ -2,18 +2,14 @@ package org.matsim.core.controler;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.analysis.IterationStopWatch;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.corelisteners.ControlerDefaultCoreListenersModule;
-import org.matsim.core.events.EventsManagerModule;
-import org.matsim.core.events.EventsUtils;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
-public class InjectionBeforeControlerTest {
+public class NewControlerTest {
 
 	@Rule
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
@@ -24,15 +20,13 @@ public class InjectionBeforeControlerTest {
 		config.controler().setLastIteration(1);
 		config.controler().setOutputDirectory(testUtils.getOutputDirectory());
 		final Scenario scenario = ScenarioUtils.createScenario(config);
-		Injector injector = Injector.createInjector(config, new AbstractModule() {
+		com.google.inject.Injector injector = Injector.createInjector(config, new AbstractModule() {
 			@Override
 			public void install() {
-				install(new ControlerDefaultsModule());
+				install(new NewControlerModule());
 				install(new ControlerDefaultCoreListenersModule());
+				install(new ControlerDefaultsModule());
 				install(new ScenarioByInstanceModule(scenario));
-				bind(OutputDirectoryHierarchy.class).asEagerSingleton();
-				bind(IterationStopWatch.class).asEagerSingleton();
-				bind(ControlerI.class).to(Controler.class).asEagerSingleton();
 			}
 		});
 		ControlerI controler = injector.getInstance(ControlerI.class);

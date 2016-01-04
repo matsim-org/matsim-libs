@@ -23,9 +23,11 @@ package org.matsim.counts;
 import org.matsim.analysis.IterationStopWatch;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.CountsConfigGroup;
+import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -57,10 +59,12 @@ class CountsControlerListener implements StartupListener, IterationEndsListener 
 	 * String used to identify the operation in the IterationStopWatch.
 	 */
 	public static final String OPERATION_COMPARECOUNTS = "compare with counts";
-	
-	private final CountsConfigGroup config;
+
+    private GlobalConfigGroup globalConfigGroup;
+    private Network network;
+    private ControlerConfigGroup controlerConfigGroup;
+    private final CountsConfigGroup config;
     private final Set<String> analyzedModes;
-    private final Scenario scenario;
     private final VolumesAnalyzer volumesAnalyzer;
     private final IterationStopWatch iterationStopwatch;
     private final OutputDirectoryHierarchy controlerIO;
@@ -72,9 +76,11 @@ class CountsControlerListener implements StartupListener, IterationEndsListener 
     private int iterationsUsed = 0;
 
     @Inject
-    CountsControlerListener(CountsConfigGroup countsConfigGroup, final Scenario scenario, VolumesAnalyzer volumesAnalyzer, IterationStopWatch iterationStopwatch, OutputDirectoryHierarchy controlerIO) {
+    CountsControlerListener(GlobalConfigGroup globalConfigGroup, Network network, ControlerConfigGroup controlerConfigGroup, CountsConfigGroup countsConfigGroup, VolumesAnalyzer volumesAnalyzer, IterationStopWatch iterationStopwatch, OutputDirectoryHierarchy controlerIO) {
+        this.globalConfigGroup = globalConfigGroup;
+        this.network = network;
+        this.controlerConfigGroup = controlerConfigGroup;
         this.config = countsConfigGroup;
-		this.scenario = scenario;
         this.volumesAnalyzer = volumesAnalyzer;
 		this.analyzedModes = CollectionUtils.stringToSet(this.config.getAnalyzedModes());
         this.iterationStopwatch = iterationStopwatch;
@@ -93,7 +99,7 @@ class CountsControlerListener implements StartupListener, IterationEndsListener 
     @Override
 	public void notifyIterationEnds(final IterationEndsEvent event) {
 		if (counts != null && this.config.getWriteCountsInterval() > 0) {
-            if (useVolumesOfIteration(event.getIteration(), scenario.getConfig().controler().getFirstIteration())) {
+            if (useVolumesOfIteration(event.getIteration(), controlerConfigGroup.getFirstIteration())) {
                 addVolumes(volumesAnalyzer);
             }
 
@@ -114,7 +120,7 @@ class CountsControlerListener implements StartupListener, IterationEndsListener 
                 } else {
                     averages = this.linkStats;
                 }
-                CountsComparisonAlgorithm cca = new CountsComparisonAlgorithm(averages, counts, scenario.getNetwork(), config.getCountsScaleFactor());
+                CountsComparisonAlgorithm cca = new CountsComparisonAlgorithm(averages, counts, network, config.getCountsScaleFactor());
                 if ((this.config.getDistanceFilter() != null) && (this.config.getDistanceFilterCenterNode() != null)) {
                     cca.setDistanceFilter(this.config.getDistanceFilter(), this.config.getDistanceFilterCenterNode());
                 }
@@ -134,7 +140,7 @@ class CountsControlerListener implements StartupListener, IterationEndsListener 
                         this.config.getOutputFormat().contains("all")) {
                     String filename = controlerIO.getIterationFilename(event.getIteration(), "countscompare.kmz");
                     CountSimComparisonKMLWriter kmlWriter = new CountSimComparisonKMLWriter(
-                            cca.getComparison(), scenario.getNetwork(), TransformationFactory.getCoordinateTransformation(scenario.getConfig().global().getCoordinateSystem(), TransformationFactory.WGS84));
+                            cca.getComparison(), network, TransformationFactory.getCoordinateTransformation(globalConfigGroup.getCoordinateSystem(), TransformationFactory.WGS84));
                     kmlWriter.setIterationNumber(event.getIteration());
                     kmlWriter.writeFile(filename);
                 }

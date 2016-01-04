@@ -20,6 +20,7 @@
 package playground.johannes.synpop.matrix;
 
 import gnu.trove.map.hash.TObjectDoubleHashMap;
+import playground.johannes.studies.matrix2014.matrix.ODPredicate;
 
 import java.util.*;
 
@@ -37,21 +38,20 @@ public class MatrixOperations {
                 Double refVal = reference.get(i, j);
                 Double compVal = compare.get(i, j);
 
-                if (refVal == null)
-                    refVal = new Double(0);
+                if(refVal != null || compVal != null) {
+                    if (refVal == null) refVal = new Double(0);
+                    if (compVal == null) compVal = new Double(0);
 
-                if (compVal == null)
-                    compVal = new Double(0);
-
-                if (refVal == 0 && compVal == 0)
-                    target.set(i, j, 0.0);
-                else if (refVal == 0) {
-                    // TODO: deliberately think about what do here
-                } else {
-                    Double err = (compVal - refVal) / refVal;
-                    target.set(i, j, err);
+                    if (refVal == 0 && compVal == 0)
+                        target.set(i, j, 0.0);
+                    else if (refVal == 0) {
+                        target.set(i, j, Double.POSITIVE_INFINITY);
+                        // TODO: deliberately think about what to do here
+                    } else {
+                        Double err = (compVal - refVal) / refVal;
+                        target.set(i, j, err);
+                    }
                 }
-
             }
         }
 
@@ -218,5 +218,18 @@ public class MatrixOperations {
         for (K i : keys) {
             m.set(i, i, null);
         }
+    }
+
+    public static <K, V> Matrix<K, V> subMatrix(ODPredicate<K, V> predicate, Matrix<K, V> source, Matrix<K, V> target) {
+        Set<K> keys = source.keys();
+        for(K row : keys) {
+            for(K col : keys) {
+                V value = source.get(row, col);
+                if(value != null && predicate.test(row, col, source)) {
+                    target.set(row, col, value);
+                }
+            }
+        }
+        return target;
     }
 }

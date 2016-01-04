@@ -149,7 +149,7 @@ public class JointTripRouterFactoryTest {
 	}
 
 	private static Provider<TripRouter> createFactory(final Scenario scenario) {
-		Injector injector = Injector.createInjector(
+		com.google.inject.Injector injector = Injector.createInjector(
 				scenario.getConfig(),
 				AbstractModule.override(Collections.singleton(new AbstractModule() {
 					@Override

@@ -22,13 +22,13 @@ package playground.johannes.studies.matrix2014.matrix;
 import com.vividsolutions.jts.geom.Coordinate;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import playground.johannes.synpop.analysis.Predicate;
 import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.Episode;
 import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.data.Segment;
-import playground.johannes.synpop.gis.FacilityData;
 import playground.johannes.synpop.gis.Zone;
 import playground.johannes.synpop.gis.ZoneCollection;
 import playground.johannes.synpop.matrix.MatrixOperations;
@@ -45,19 +45,19 @@ public class MatrixBuilder {
 
     private static final Logger logger = Logger.getLogger(MatrixBuilder.class);
 
-    private final FacilityData fData;
+    private final ActivityFacilities facilities;
 
     private final ZoneCollection zones;
 
     private final Map<String, String> zoneIds;
 
-    public MatrixBuilder(FacilityData fData, ZoneCollection zones) {
-        this.fData = fData;
+    public MatrixBuilder(ActivityFacilities facilities, ZoneCollection zones) {
+        this.facilities = facilities;
         this.zones = zones;
         zoneIds = new ConcurrentHashMap<>();
     }
 
-    public NumericMatrix build(Collection<? extends Person> persons, Predicate<Segment> predicate) {
+    public NumericMatrix build(Collection<? extends Person> persons, Predicate<Segment> predicate, boolean useWeights) {
         int n = persons.size() / 10000;
         n = Math.min(n, Executor.getFreePoolSize());
         n = Math.max(2, n);
@@ -65,7 +65,7 @@ public class MatrixBuilder {
 
         List<RunThread> runnables = new ArrayList<>(n);
         for(List<? extends Person> segment : segments) {
-            runnables.add(new RunThread(segment, predicate));
+            runnables.add(new RunThread(segment, predicate, useWeights));
         }
 
         Executor.submitAndWait(runnables);
@@ -90,7 +90,7 @@ public class MatrixBuilder {
 
         if(zoneId == null) {
             Id<ActivityFacility> facilityObjId = Id.create(facilityId, ActivityFacility.class);
-            ActivityFacility facility = fData.getAll().getFacilities().get(facilityObjId);
+            ActivityFacility facility = facilities.getFacilities().get(facilityObjId);
             Coordinate c = new Coordinate(facility.getCoord().getX(), facility.getCoord().getY());
 
             Zone zone = zones.get(c);
@@ -111,11 +111,15 @@ public class MatrixBuilder {
 
         private final NumericMatrix m;
 
+        private final boolean useWeights;
+
         private int errors;
 
-        public RunThread(Collection<? extends Person> persons, Predicate<Segment> predicate) {
+        public RunThread(Collection<? extends Person> persons, Predicate<Segment> predicate, boolean useWeights) {
             this.persons = persons;
             this.predicate = predicate;
+            this.useWeights = useWeights;
+
             m = new NumericMatrix();
         }
 
@@ -144,7 +148,9 @@ public class MatrixBuilder {
                             String dest = getZoneId(destFacId);
 
                             if (origin != null && dest != null) {
-                                m.add(origin, dest, 1);
+                                double w = 1.0;
+                                if(useWeights) w = Double.parseDouble(person.getAttribute(CommonKeys.PERSON_WEIGHT));
+                                m.add(origin, dest, w);
                             } else {
                                 errors++;
                             }

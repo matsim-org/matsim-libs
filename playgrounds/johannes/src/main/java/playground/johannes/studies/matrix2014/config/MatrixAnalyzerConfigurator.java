@@ -26,10 +26,6 @@ import playground.johannes.synpop.gis.*;
 import playground.johannes.synpop.matrix.NumericMatrix;
 import playground.johannes.synpop.matrix.NumericMatrixIO;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * @author johannes
  */
@@ -37,7 +33,7 @@ public class MatrixAnalyzerConfigurator implements DataLoader {
 
     public static final String ZONE_LAYER_NAME = "zoneLayer";
 
-    public static final String PARAM_SET_KEY = "referenceMatrix";
+    //public static final String PARAM_SET_KEY = "referenceMatrix";
 
     public static final String MATRIX_NAME = "name";
 
@@ -63,15 +59,19 @@ public class MatrixAnalyzerConfigurator implements DataLoader {
         ZoneData zoneData = (ZoneData)dataPool.get(ZoneDataLoader.KEY);
         ZoneCollection zones = zoneData.getLayer(zoneLayerName);
 
-        Map<String, NumericMatrix> referenceMatrices = new HashMap<>();
-        Collection<? extends ConfigGroup> modules = config.getParameterSets(PARAM_SET_KEY);
-        for(ConfigGroup paramset : modules) {
-            String name = paramset.getValue(MATRIX_NAME);
-            String path = paramset.getValue(MATRIX_FILE);
+        //Map<String, NumericMatrix> referenceMatrices = new HashMap<>();
+        //Collection<? extends ConfigGroup> modules = config.getParameterSets(PARAM_SET_KEY);
+        //for(ConfigGroup paramset : modules) {
+            String name = config.getValue(MATRIX_NAME);
+            String path = config.getValue(MATRIX_FILE);
 
-            referenceMatrices.put(name, NumericMatrixIO.read(path));
-        }
+            //referenceMatrices.put(name, NumericMatrixIO.read(path));
+        //}
 
-        return new MatrixAnalyzer(facilityData, zones, referenceMatrices, ioContext);
+        NumericMatrix m = NumericMatrixIO.read(path);
+
+        MatrixAnalyzer analyzer = new MatrixAnalyzer(facilityData.getAll(), zones, m, name);
+        analyzer.setFileIOContext(ioContext);
+        return analyzer;
     }
 }

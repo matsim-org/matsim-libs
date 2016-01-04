@@ -40,12 +40,13 @@ import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
 
 public class OuterCordonCountsGenerator {
 
-	private final Map<Tuple<Id<Link>,String>, Map<Integer, Double>> countStation2time2countInfo = new HashMap<>();
+	private final Map<Tuple<Id<Link>,String>, Map<Integer, Double>> countStation2time2countInfo_in = new HashMap<>();
+	private final Map<Tuple<Id<Link>,String>, Map<Integer, Double>> countStation2time2countInfo_out = new HashMap<>();
 	private static final String inputFilesDir = PatnaUtils.INPUT_FILES_DIR+"/externalDemandInputFiles/";
 
 	public static void main(String[] args) {
 
-		String outCountsFile = PatnaUtils.INPUT_FILES_DIR+"/outerCordonCounts.xml.gz";
+		String outCountsFile = "../../../../repos/runs-svn/patnaIndia/run108/input/"+"/outerCordonCounts_10pct.xml.gz";
 
 		OuterCordonCountsGenerator pcg = new OuterCordonCountsGenerator();
 	
@@ -61,15 +62,22 @@ public class OuterCordonCountsGenerator {
 	}
 
 	private void writeCountsDataToFile(final String outCountsFile){
-
 		Counts<Link> counts = new Counts<Link>();
 		counts.setYear(2008);
 		counts.setName("Patna_counts");
 		counts.setDescription("OnlyOuterCordonCountsCarMotorbikeBikeTruck");
-		for (Tuple<Id<Link>,String> mcs : countStation2time2countInfo.keySet()){
+		for (Tuple<Id<Link>,String> mcs : countStation2time2countInfo_in.keySet()){
 			Count<Link> c = counts.createAndAddCount(mcs.getFirst(), mcs.getSecond());
-			for(Integer i : countStation2time2countInfo.get(mcs).keySet()){
-				c.createVolume(i, countStation2time2countInfo.get(mcs).get(i));
+			for(Integer i : countStation2time2countInfo_in.get(mcs).keySet()){
+				double vol = countStation2time2countInfo_in.get(mcs).get(i) ;
+				c.createVolume(i, vol );
+			}
+		}
+		for (Tuple<Id<Link>,String> mcs : countStation2time2countInfo_out.keySet()){
+			Count<Link> c = counts.createAndAddCount(mcs.getFirst(), mcs.getSecond());
+			for(Integer i : countStation2time2countInfo_out.get(mcs).keySet()){
+				double vol = Math.round(countStation2time2countInfo_out.get(mcs).get(i) * OuterCordonUtils.E2I_TRIP_REDUCTION_FACTOR);
+				c.createVolume(i, vol );
 			}
 		}
 		new CountsWriter(counts).write(outCountsFile);
@@ -79,12 +87,12 @@ public class OuterCordonCountsGenerator {
 		{
 			Map<Integer, Double> hourlyCounts = readFileAndReturnHourlyCounts(inDirectionFile);
 			Id<Link> linkId = OuterCordonUtils.getCountStationLinkId(OuterCordonUtils.getCountingStationKey(countingStationNumber, "in"));
-			countStation2time2countInfo.put(new Tuple<Id<Link>, String>(linkId, countingStationNumber), hourlyCounts);
+			countStation2time2countInfo_in.put(new Tuple<Id<Link>, String>(linkId, countingStationNumber), hourlyCounts);
 		}
 		{
 			Map<Integer, Double> hourlyCounts = readFileAndReturnHourlyCounts(outDirectionFile);
 			Id<Link> linkId = OuterCordonUtils.getCountStationLinkId(OuterCordonUtils.getCountingStationKey(countingStationNumber, "out"));
-			countStation2time2countInfo.put(new Tuple<Id<Link>, String>(linkId, countingStationNumber), hourlyCounts);
+			countStation2time2countInfo_out.put(new Tuple<Id<Link>, String>(linkId, countingStationNumber), hourlyCounts);
 		}
 	}
 

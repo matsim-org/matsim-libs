@@ -303,7 +303,7 @@ public final class RunBraessSimulation {
 		}
 
 		// choose maximal number of plans per agent. 0 means unlimited
-		config.strategy().setMaxAgentPlanMemorySize( 2 );
+		config.strategy().setMaxAgentPlanMemorySize( 3 );
 		
 		config.qsim().setStuckTime(3600 * 10.);
 		
@@ -341,10 +341,10 @@ public final class RunBraessSimulation {
 		
 		TtCreateBraessNetworkAndLanes netCreator = new TtCreateBraessNetworkAndLanes(scenario);
 		netCreator.setUseBTUProperties( false );
-		netCreator.setSimulateInflowCap( true );
+		netCreator.setSimulateInflowCap( false );
 		netCreator.setMiddleLinkExists( false );
 		netCreator.setLaneType(LANE_TYPE);
-		netCreator.setNumberOfPersons(NUMBER_OF_PERSONS);
+		netCreator.setNumberOfPersonsPerHour(NUMBER_OF_PERSONS);
 		netCreator.createNetworkAndLanes();
 	}
 

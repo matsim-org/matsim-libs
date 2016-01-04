@@ -11,13 +11,14 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.*;
+import org.matsim.core.controler.corelisteners.ControlerDefaultCoreListenersModule;
 import org.matsim.core.events.EventsManagerModule;
 import org.matsim.core.mobsim.qsim.QSimModule;
 import org.matsim.core.replanning.StrategyManagerModule;
 import org.matsim.core.router.TripRouterModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityModule;
+import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionModule;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorModule;
 import org.matsim.counts.Counts;
@@ -59,9 +60,12 @@ public class CDREquilTest {
 	 */
 	@Test
 	public void testOneWorkplace() {
-        Controler controler = new Controler(new OneWorkplace().run(utils.getOutputDirectory()));
+        Scenario scenario = new OneWorkplace().run(utils.getOutputDirectory());
         LinkIsZone linkIsZone = new LinkIsZone();
-        controler.setModules(
+        com.google.inject.Injector injector = Injector.createInjector(scenario.getConfig(),
+                new NewControlerModule(),
+                new ControlerDefaultCoreListenersModule(),
+                new ScenarioByInstanceModule(scenario),
                 new EventsManagerModule(),
                 new TravelDistanceStatsModule(),
                 new CharyparNagelScoringFunctionModule(),
@@ -69,18 +73,18 @@ public class CDREquilTest {
                 new TravelDisutilityModule(),
                 new TravelTimeCalculatorModule(),
                 new StrategyManagerModule(),
-                new VolumesAnalyzerModule(),
-                new CollectSightingsModule(),
-                new CallBehaviorModule(new AtStartOrEnd(), linkIsZone),
                 new AbstractModule() {
                     @Override
                     public void install() {
                         install(new QSimModule());
                     }
-                });
+                },
+                new VolumesAnalyzerModule(),
+                new CollectSightingsModule(),
+                new CallBehaviorModule(new AtStartOrEnd(), linkIsZone));
+        ControlerI controler = injector.getInstance(ControlerI.class);
         controler.run();
-        Scenario scenario = controler.getScenario();
-        VolumesAnalyzer groundTruthVolumes = controler.getVolumes();
+        VolumesAnalyzer groundTruthVolumes = injector.getInstance(VolumesAnalyzer.class);
         VolumesAnalyzer cdrVolumes = runWithCadyts(scenario, linkIsZone, (Sightings) scenario.getScenarioElement("sightings"), groundTruthVolumes);
         Assert.assertEquals("All-day squares", 0.0, CompareMain.compareAllDay(scenario, cdrVolumes, groundTruthVolumes), 0.0);
 		Assert.assertEquals("Timebin squares", 0.0, CompareMain.compareTimebins(scenario, cdrVolumes, groundTruthVolumes), 0.0);
@@ -89,28 +93,31 @@ public class CDREquilTest {
 
     @Test
     public void testTwoWorkplaces() {
-        Controler controler = new Controler(new TwoWorkplaces().run(utils.getOutputDirectory()));
+        Scenario scenario = new TwoWorkplaces().run(utils.getOutputDirectory());
         LinkIsZone linkIsZone = new LinkIsZone();
-        controler.setModules(
+        com.google.inject.Injector injector = Injector.createInjector(scenario.getConfig(),
+                new NewControlerModule(),
+                new ControlerDefaultCoreListenersModule(),
+                new ScenarioByInstanceModule(scenario),
                 new EventsManagerModule(),
                 new TravelDistanceStatsModule(),
                 new CharyparNagelScoringFunctionModule(),
                 new TripRouterModule(),
-                new TravelTimeCalculatorModule(),
                 new TravelDisutilityModule(),
-                new VolumesAnalyzerModule(),
-                new CollectSightingsModule(),
+                new TravelTimeCalculatorModule(),
                 new StrategyManagerModule(),
-                new CallBehaviorModule(new AtStartOrEnd(), linkIsZone),
                 new AbstractModule() {
                     @Override
                     public void install() {
                         install(new QSimModule());
                     }
-                });
+                },
+                new VolumesAnalyzerModule(),
+                new CollectSightingsModule(),
+                new CallBehaviorModule(new AtStartOrEnd(), linkIsZone));
+        ControlerI controler = injector.getInstance(ControlerI.class);
         controler.run();
-        Scenario scenario = controler.getScenario();
-        VolumesAnalyzer groundTruthVolumes = controler.getVolumes();
+        VolumesAnalyzer groundTruthVolumes = injector.getInstance(VolumesAnalyzer.class);
         VolumesAnalyzer cdrVolumes = runWithCadyts(scenario, linkIsZone, (Sightings) scenario.getScenarioElement("sightings"), groundTruthVolumes);
         Assert.assertEquals("All-day squares", 0.0, CompareMain.compareAllDay(scenario, cdrVolumes, groundTruthVolumes), 0.0);
         Assert.assertEquals("Timebin squares", 0.0, CompareMain.compareTimebins(scenario, cdrVolumes, groundTruthVolumes), 0.0);

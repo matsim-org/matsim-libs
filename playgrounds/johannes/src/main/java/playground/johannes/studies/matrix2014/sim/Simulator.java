@@ -28,26 +28,29 @@ import org.matsim.contrib.common.stats.LinearDiscretizer;
 import org.matsim.contrib.common.util.XORShiftRandom;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.facilities.ActivityFacilities;
 import playground.johannes.gsv.synPop.mid.Route2GeoDistance;
 import playground.johannes.gsv.synPop.sim3.ReplaceActTypes;
-import playground.johannes.studies.matrix2014.analysis.GeoDistanceBuilder;
 import playground.johannes.studies.matrix2014.analysis.MatrixAnalyzer;
+import playground.johannes.studies.matrix2014.analysis.MatrixWriter;
+import playground.johannes.studies.matrix2014.analysis.NumericLegAnalyzer;
 import playground.johannes.studies.matrix2014.analysis.ZoneMobilityRate;
 import playground.johannes.studies.matrix2014.config.MatrixAnalyzerConfigurator;
+import playground.johannes.studies.matrix2014.config.ODCalibratorConfigurator;
 import playground.johannes.studies.matrix2014.gis.TransferZoneAttribute;
 import playground.johannes.studies.matrix2014.gis.ValidateFacilities;
 import playground.johannes.studies.matrix2014.gis.ZoneSetLAU2Class;
+import playground.johannes.studies.matrix2014.matrix.ZoneDistancePredicate;
 import playground.johannes.synpop.analysis.*;
 import playground.johannes.synpop.data.*;
 import playground.johannes.synpop.data.io.PopulationIO;
 import playground.johannes.synpop.gis.*;
-import playground.johannes.synpop.matrix.NumericMatrix;
-import playground.johannes.synpop.matrix.NumericMatrixTxtIO;
 import playground.johannes.synpop.processing.*;
 import playground.johannes.synpop.sim.*;
 import playground.johannes.synpop.sim.data.Converters;
 import playground.johannes.synpop.sim.data.DoubleConverter;
 import playground.johannes.synpop.source.mid2008.MiDKeys;
+import playground.johannes.synpop.source.mid2008.MiDValues;
 import playground.johannes.synpop.util.Executor;
 
 import java.io.IOException;
@@ -70,103 +73,41 @@ public class Simulator {
         final Config config = new Config();
         ConfigUtils.loadConfig(config, args[0]);
 
-        logger.info("Loading persons...");
-        Set<PlainPerson> refPersons = (Set<PlainPerson>) PopulationIO.loadFromXML(config.findParam(MODULE_NAME,
-                "popInputFile"), new PlainFactory());
-        logger.info(String.format("Loaded %s persons.", refPersons.size()));
-
         Random random = new XORShiftRandom(Long.parseLong(config.getParam("global", "randomSeed")));
         /*
-        Prepare population for simulation.
-		 */
-        logger.info("Preparing reference simulation...");
-        TaskRunner.validatePersons(new ValidateMissingAttribute(CommonKeys.PERSON_WEIGHT), refPersons);
-        TaskRunner.run(new ReplaceActTypes(), refPersons);
-        new GuessMissingActTypes(random).apply(refPersons);
-        TaskRunner.run(new Route2GeoDistance(new Route2GeoDistFunction()), refPersons);
-//        logger.info("Cloning ref persons...");
-        int size = (int) Double.parseDouble(config.getParam(MODULE_NAME, "populationSize"));
-//        refPersons = (Set<PlainPerson>) PersonUtils.weightedCopy(refPersons, new PlainFactory(), size,
-//                random);
+        Load and validate reference population
+         */
+        Set<Person> refPersons = loadRefPopulation(config, random);
         /*
-		Setting up data loaders.
-		 */
-        logger.info("Registering data loaders...");
+        Load and validate GIS data
+         */
         DataPool dataPool = new DataPool();
-        dataPool.register(new FacilityDataLoader(config.getParam(MODULE_NAME, "facilities"), random), FacilityDataLoader.KEY);
-        dataPool.register(new ZoneDataLoader(config.getModule(MODULE_NAME)), ZoneDataLoader.KEY);
-
-        ValidateFacilities.validate(dataPool, "modena");
-        ValidateFacilities.validate(dataPool, "lau2");
-        ValidateFacilities.validate(dataPool, "nuts3");
+        loadGISData(dataPool, config, random);
         /*
-		Setup analyzer and analyze reference population
+        Setup analyzer and analyze reference population
 		 */
         final String output = config.getParam(MODULE_NAME, "output");
         FileIOContext ioContext = new FileIOContext(output);
 
-        //Map<String, Predicate<Segment>> predicates = new HashMap<>();
-        //predicates.put(CommonValues.LEG_MODE_CAR, new ModePredicate(CommonValues.LEG_MODE_CAR));
+        AnalyzerTaskComposite<Collection<? extends Person>> task = buildAnalyzer(dataPool, ioContext, refPersons);
 
-        final ConcurrentAnalyzerTask<Collection<? extends Person>> task = new ConcurrentAnalyzerTask<>();
-
-        task.addComponent(buildGeoDistanceAnalyzer(ioContext));
-        //task.addComponent(new GeoDistLau2ClassTask(ioContext));
-        ZoneCollection lau2Zones = ((ZoneData) dataPool.get(ZoneDataLoader.KEY)).getLayer("lau2");
-
-        new ZoneSetLAU2Class().apply(lau2Zones);
-        ZoneMobilityRate zoneMobilityRate = new ZoneMobilityRate(MiDKeys.PERSON_LAU2_CLASS, lau2Zones, new
-                ModePredicate(CommonValues.LEG_MODE_CAR), ioContext);
-        task.addComponent(zoneMobilityRate);
-        task.addComponent(new NumericAnalyzer(new PersonCollector<Double>(new NumericAttributeProvider<Person>(CommonKeys.PERSON_WEIGHT)), "weights", new HistogramWriter(ioContext, new StratifiedDiscretizerBuilder(50, 1))));
         logger.info("Analyzing reference population...");
         ioContext.append("ref");
         AnalyzerTaskRunner.run(refPersons, task, ioContext);
-
-		/*
+        /*
 		Generating simulation population...
 		 */
-        logger.info("Cloning sim persons...");
-//        int size = (int) Double.parseDouble(config.getParam(MODULE_NAME, "populationSize"));
-        Set<PlainPerson> simPersons = (Set<PlainPerson>) PersonUtils.weightedCopy(refPersons, new PlainFactory(), size,
-                random);
-        logger.info(String.format("Generated %s persons.", simPersons.size()));
+        Set<Person> simPersons = generateSimPopulation(refPersons, dataPool, config, random);
         /*
-        Initializing simulation population...
+        Append further analyzers
          */
-        logger.info("Assigning home locations...");
-
-
-        zoneMobilityRate.analyze(refPersons, null);
-        ZoneCollection modenaZones = ((ZoneData) dataPool.get(ZoneDataLoader.KEY)).getLayer("modena");
-        new TransferZoneAttribute().apply(lau2Zones, modenaZones, MiDKeys.PERSON_LAU2_CLASS);
-        SetHomeFacilities setHomeFacilities = new SetHomeFacilities(dataPool, "modena", random);
-        setHomeFacilities.setZoneWeights(zoneMobilityRate.getMobilityRatePerZone(modenaZones));
-        setHomeFacilities.apply(simPersons);
-        logger.info("Assigning random activity locations...");
-        TaskRunner.run(new SetActivityFacilities((FacilityData) dataPool.get(FacilityDataLoader.KEY)), simPersons);
-        logger.info("Recalculate geo distances...");
-        TaskRunner.run(new LegAttributeRemover(CommonKeys.LEG_GEO_DISTANCE), simPersons);
-        TaskRunner.run(new CalculateGeoDistance((FacilityData) dataPool.get(FacilityDataLoader.KEY)), simPersons);
-        logger.info("Resetting LAU2Class attributes...");
-        SetLAU2Attribute lTask = new SetLAU2Attribute(dataPool, "lau2");
-        TaskRunner.run(lTask, simPersons);
-        if (lTask.getErrors() > 0)
-            logger.warn(String.format("Cannot set LAU2Class attribute for %s persons.", lTask.getErrors()));
-
-
-
-        MatrixAnalyzer mAnalyzer = (MatrixAnalyzer) new MatrixAnalyzerConfigurator(config.getModule("matrixAnalyzer")
-                , dataPool, ioContext).load();
-        mAnalyzer.setPredicate(new ModePredicate(CommonValues.LEG_MODE_CAR));
-        task.addComponent(mAnalyzer);
-
-        task.addComponent(new PopulationWriter(ioContext));
+        extendAnalyzer(task, dataPool, ioContext, config);
 		/*
 		Setup hamiltonian
 		 */
         final HamiltonianComposite hamiltonian = new HamiltonianComposite();
         TaskRunner.run(new CopyPersonAttToLeg(CommonKeys.PERSON_WEIGHT), refPersons);
+        TaskRunner.run(new CopyPersonAttToLeg(CommonKeys.PERSON_WEIGHT), simPersons);
 		/*
 		Setup distance distribution hamiltonian.
 		 */
@@ -180,13 +121,10 @@ public class Simulator {
         /*
         Setup matrix calibrator
          */
-        NumericMatrix refMatrix = new NumericMatrix();
-        NumericMatrixTxtIO.read(refMatrix, config.getParam(MODULE_NAME, "calibrationMatrix"));
-        String layerName = config.getParam(MODULE_NAME, "calibrationLayerName");
-//        ODDistribution odDistribution = new ODDistribution(simPersons, refMatrix, dataPool, layerName, "NO", 100000);
-        ODCalibrator odDistribution = new ODCalibratorBuilder().build(refMatrix, dataPool, layerName, "NO", 100000, new CachedModePredicate(CommonKeys.LEG_MODE, CommonValues.LEG_MODE_CAR));
-        long delay = (long) Double.parseDouble(config.getParam(MODULE_NAME, "calibrationDelay"));
-        DelayedHamiltonian odDistributionDelayed = new DelayedHamiltonian(odDistribution, delay);
+        ODCalibrator odDistribution = new ODCalibratorConfigurator(dataPool).configure(config.getModule("tomtomCalibrator"));
+        odDistribution.setUseWeights(true);
+        odDistribution.setPredicate(new CachedModePredicate(CommonKeys.LEG_MODE, CommonValues.LEG_MODE_CAR));
+        DelayedHamiltonian odDistributionDelayed = new DelayedHamiltonian(odDistribution, Integer.parseInt(config.getParam(MODULE_NAME, "delay_matrix")));
         hamiltonian.addComponent(odDistributionDelayed, Double.parseDouble(config.getParam(MODULE_NAME,
                 "theta_matrix")));
 		/*
@@ -235,7 +173,115 @@ public class Simulator {
         Executor.shutdown();
     }
 
-    private static UnivariatFrequency buildDistDistrTerm(Set<PlainPerson> refPersons, Set<PlainPerson>
+    private static Set<Person> loadRefPopulation(Config config, Random random) {
+        logger.info("Loading persons...");
+        Set<Person> refPersons = PopulationIO.loadFromXML(config.findParam(MODULE_NAME, "popInputFile"), new PlainFactory());
+        logger.info(String.format("Loaded %s persons.", refPersons.size()));
+
+        logger.info("Preparing reference simulation...");
+        TaskRunner.validatePersons(new ValidateMissingAttribute(CommonKeys.PERSON_WEIGHT), refPersons);
+        TaskRunner.validatePersons(new ValidatePersonWeight(), refPersons);
+        TaskRunner.run(new ReplaceActTypes(), refPersons);
+        new GuessMissingActTypes(random).apply(refPersons);
+        TaskRunner.run(new Route2GeoDistance(new Route2GeoDistFunction()), refPersons);
+
+        return refPersons;
+    }
+
+    private static void loadGISData(DataPool dataPool, Config config, Random random) {
+        logger.info("Registering data loaders...");
+        dataPool.register(new FacilityDataLoader(config.getParam(MODULE_NAME, "facilities"), random), FacilityDataLoader.KEY);
+        dataPool.register(new ZoneDataLoader(config.getModule(MODULE_NAME)), ZoneDataLoader.KEY);
+
+        ValidateFacilities.validate(dataPool, "modena");
+        ValidateFacilities.validate(dataPool, "lau2");
+        ValidateFacilities.validate(dataPool, "nuts3");
+
+        ZoneCollection lau2Zones = ((ZoneData) dataPool.get(ZoneDataLoader.KEY)).getLayer("lau2");
+        new ZoneSetLAU2Class().apply(lau2Zones);
+    }
+
+    private static AnalyzerTaskComposite<Collection<? extends Person>> buildAnalyzer(DataPool dataPool, FileIOContext ioContext, Collection<Person> persons) {
+        final ConcurrentAnalyzerTask<Collection<? extends Person>> task = new ConcurrentAnalyzerTask<>();
+
+        buildGeoDistanceAnalyzer(task, ioContext, persons);
+
+        ZoneCollection lau2Zones = ((ZoneData) dataPool.get(ZoneDataLoader.KEY)).getLayer("lau2");
+
+        ZoneMobilityRate zoneMobilityRate = new ZoneMobilityRate(MiDKeys.PERSON_LAU2_CLASS, lau2Zones, new
+                ModePredicate(CommonValues.LEG_MODE_CAR), ioContext);
+        task.addComponent(zoneMobilityRate);
+//        task.addComponent(new NumericAnalyzer(new PersonCollector<Double>(new NumericAttributeProvider<Person>(CommonKeys.PERSON_WEIGHT)), "weights", new HistogramWriter(ioContext, new StratifiedDiscretizerBuilder(50, 1))));
+
+        task.addComponent(new GeoDistNumTripsTask(ioContext, new ModePredicate(CommonValues.LEG_MODE_CAR)));
+        task.addComponent(new TripsPerPersonTask().build(ioContext));
+        return task;
+    }
+
+    private static Set<Person> generateSimPopulation(Set<Person> refPersons, DataPool dataPool, Config config, Random random) {
+        logger.info("Cloning sim persons...");
+        int size = (int) Double.parseDouble(config.getParam(MODULE_NAME, "populationSize"));
+        Set<Person> simPersons = (Set<Person>) clonePersons(refPersons, size, random);
+        logger.info(String.format("Generated %s persons.", simPersons.size()));
+        /*
+        Initializing simulation population...
+         */
+        logger.info("Assigning home locations...");
+        ZoneCollection lau2Zones = ((ZoneData) dataPool.get(ZoneDataLoader.KEY)).getLayer("lau2");
+        ZoneCollection modenaZones = ((ZoneData) dataPool.get(ZoneDataLoader.KEY)).getLayer("modena");
+
+        ZoneMobilityRate zoneMobilityRate = new ZoneMobilityRate(MiDKeys.PERSON_LAU2_CLASS, lau2Zones, new ModePredicate(CommonValues.LEG_MODE_CAR));
+        zoneMobilityRate.analyze(refPersons, null);
+
+        new TransferZoneAttribute().apply(lau2Zones, modenaZones, MiDKeys.PERSON_LAU2_CLASS);
+
+        SetHomeFacilities setHomeFacilities = new SetHomeFacilities(dataPool, "modena", random);
+        setHomeFacilities.setZoneWeights(zoneMobilityRate.getMobilityRatePerZone(modenaZones));
+        setHomeFacilities.apply(simPersons);
+
+        logger.info("Assigning random activity locations...");
+        TaskRunner.run(new SetActivityFacilities((FacilityData) dataPool.get(FacilityDataLoader.KEY)), simPersons);
+
+        logger.info("Recalculate geo distances...");
+        TaskRunner.run(new LegAttributeRemover(CommonKeys.LEG_GEO_DISTANCE), simPersons);
+        TaskRunner.run(new CalculateGeoDistance((FacilityData) dataPool.get(FacilityDataLoader.KEY)), simPersons);
+
+        logger.info("Resetting LAU2Class attributes...");
+        SetLAU2Attribute lTask = new SetLAU2Attribute(dataPool, "lau2");
+        TaskRunner.run(lTask, simPersons);
+        if (lTask.getErrors() > 0)
+            logger.warn(String.format("Cannot set LAU2Class attribute for %s persons.", lTask.getErrors()));
+
+        return simPersons;
+    }
+
+    private static void extendAnalyzer(AnalyzerTaskComposite<Collection<? extends Person>> task, DataPool dataPool, FileIOContext ioContext, Config config) {
+        ModePredicate modePredicate = new ModePredicate(CommonValues.LEG_MODE_CAR);
+        MatrixAnalyzer mAnalyzer = (MatrixAnalyzer) new MatrixAnalyzerConfigurator(config.getModule("matrixAnalyzerITP")
+                , dataPool, ioContext).load();
+        mAnalyzer.setPredicate(modePredicate);
+        mAnalyzer.setUseWeights(true);
+        task.addComponent(mAnalyzer);
+
+        mAnalyzer = (MatrixAnalyzer) new MatrixAnalyzerConfigurator(config.getModule("matrixAnalyzerTomTom")
+                , dataPool, ioContext).load();
+        mAnalyzer.setPredicate(modePredicate);
+        ZoneData zoneData = (ZoneData) dataPool.get(ZoneDataLoader.KEY);
+        ZoneCollection zones = zoneData.getLayer("nuts3");
+        mAnalyzer.setODPredicate(new ZoneDistancePredicate(zones, 100000));
+        mAnalyzer.setUseWeights(true);
+        task.addComponent(mAnalyzer);
+
+        ActivityFacilities facilities = ((FacilityData) dataPool.get(FacilityDataLoader.KEY)).getAll();
+        MatrixWriter matrixWriter = new MatrixWriter(facilities, zones, ioContext);
+        matrixWriter.setPredicate(modePredicate);
+        matrixWriter.setUseWeights(true);
+        task.addComponent(matrixWriter);
+
+        task.addComponent(new PopulationWriter(ioContext));
+    }
+
+    private static UnivariatFrequency buildDistDistrTerm(Set<Person> refPersons, Set<Person>
             simPersons) {
         Set<Attributable> refLegs = getCarLegs(refPersons);
         Set<Attributable> simLegs = getCarLegs(simPersons);
@@ -262,12 +308,9 @@ public class Simulator {
         return legs;
     }
 
-    private static BivariatMean buildMeanDistLau2Term(Set<PlainPerson> refPersons, Set<PlainPerson> simPersons) {
+    private static BivariatMean buildMeanDistLau2Term(Set<Person> refPersons, Set<Person> simPersons) {
         TaskRunner.run(new CopyPersonAttToLeg(MiDKeys.PERSON_LAU2_CLASS), refPersons);
         TaskRunner.run(new CopyPersonAttToLeg(MiDKeys.PERSON_LAU2_CLASS), simPersons);
-
-//        copyLau2ClassAttribute(refPersons);
-//        copyLau2ClassAttribute(simPersons);
 
         Set<Attributable> refLegs = getCarLegs(refPersons);
         Set<Attributable> simLegs = getCarLegs(simPersons);
@@ -279,18 +322,6 @@ public class Simulator {
         return bm;
     }
 
-    private static void copyLau2ClassAttribute(Set<PlainPerson> persons) {
-        for (Person p : persons) {
-            String lau2Class = p.getAttribute(MiDKeys.PERSON_LAU2_CLASS);
-            for (Episode e : p.getEpisodes()) {
-                for (Segment leg : e.getLegs()) {
-                    leg.setAttribute(MiDKeys.PERSON_LAU2_CLASS, lau2Class);
-                }
-            }
-        }
-    }
-
-
     public static class Route2GeoDistFunction implements UnivariateRealFunction {
 
         @Override
@@ -301,25 +332,74 @@ public class Simulator {
         }
     }
 
-    private static AnalyzerTask<Collection<? extends Person>> buildGeoDistanceAnalyzer(FileIOContext ioContext) {
-        Predicate<Segment> modePred = new ModePredicate(CommonValues.LEG_MODE_CAR);
+    private static AnalyzerTask<Collection<? extends Person>> buildGeoDistanceAnalyzer(AnalyzerTaskComposite<Collection<? extends Person>> tasks, FileIOContext ioContext, Collection<Person> persons) {
+        HistogramWriter histogramWriter = new HistogramWriter(ioContext, new StratifiedDiscretizerBuilder(100, 100));
+        histogramWriter.addBuilder(new PassThroughDiscretizerBuilder(new LinearDiscretizer(50000), "linear"));
 
-        Map<String, Predicate<Segment>> predicates = new HashMap<>();
-        predicates.put(CommonValues.LEG_MODE_CAR, modePred);
+        Predicate<Segment> modePredicate = new ModePredicate(CommonValues.LEG_MODE_CAR);
 
         for (int klass = 0; klass < 6; klass++) {
             Predicate<Segment> lauPred = new LegPersonAttributePredicate(MiDKeys.PERSON_LAU2_CLASS, String.valueOf(klass));
-            PredicateAndComposite<Segment> predicateAnd = PredicateAndComposite.create(modePred, lauPred);
-            predicates.put(String.format("%s.lau%s", CommonValues.LEG_MODE_CAR, klass), predicateAnd);
+            Predicate<Segment> predicate = PredicateAndComposite.create(modePredicate, lauPred);
+            String label = String.format("car.lau%s", klass);
+            tasks.addComponent(NumericLegAnalyzer.create(CommonKeys.LEG_GEO_DISTANCE, true, predicate, label, histogramWriter));
         }
 
-        HistogramWriter histogramWriter = new HistogramWriter(ioContext, new PassThroughDiscretizerBuilder(new LinearDiscretizer(50000), "linear"));
-        histogramWriter.addBuilder(new StratifiedDiscretizerBuilder(100, 100));
-//        histogramWriter.addBuilder(new PassThroughDiscretizerBuilder(new DummyDiscretizer(), "dummy"));
+        Predicate<Segment> inTown = new LegAttributePredicate(MiDKeys.LEG_DESTINATION, MiDValues.IN_TOWN);
+        Predicate<Segment> predicate = PredicateAndComposite.create(modePredicate, inTown);
+        tasks.addComponent(NumericLegAnalyzer.create(CommonKeys.LEG_GEO_DISTANCE, true, predicate, "car.inTown", histogramWriter));
 
-        GeoDistanceBuilder geoDistanceBuilder = new GeoDistanceBuilder(histogramWriter);
-        geoDistanceBuilder.setPredicates(predicates);
+        Predicate<Segment> outOfTown = new LegAttributePredicate(MiDKeys.LEG_DESTINATION, MiDValues.OUT_OF_TOWN);
+        predicate = PredicateAndComposite.create(modePredicate, outOfTown);
+        tasks.addComponent(NumericLegAnalyzer.create(CommonKeys.LEG_GEO_DISTANCE, true, predicate, "car.outOfTown", histogramWriter));
 
-        return geoDistanceBuilder.build();
+        LegCollector<String> purposeCollector = new LegCollector<>(new AttributeProvider<Segment>(CommonKeys.LEG_PURPOSE));
+        purposeCollector.setPredicate(modePredicate);
+        Set<String> purposes = new HashSet<>(purposeCollector.collect(persons));
+        purposes.remove(null);
+        for (String purpose : purposes) {
+            Predicate<Segment> purposePredicate = new LegAttributePredicate(CommonKeys.LEG_PURPOSE, purpose);
+            predicate = PredicateAndComposite.create(modePredicate, purposePredicate);
+            tasks.addComponent(NumericLegAnalyzer.create(CommonKeys.LEG_GEO_DISTANCE, true, predicate, "car." + purpose, histogramWriter));
+        }
+
+        return tasks;
+    }
+
+    private static Collection<Person> clonePersons(Collection<? extends Person> refPersons, int size, Random random) {
+        double wsum1 = 0;
+        double wsum2 = 0;
+
+        Set<Person> persons1 = new HashSet<>();
+        Set<Person> persons2 = new HashSet<>();
+
+        TripsCounter counter = new TripsCounter(new ModePredicate(CommonValues.LEG_MODE_CAR));
+        for (Person p : refPersons) {
+            double w = Double.parseDouble(p.getAttribute(CommonKeys.PERSON_WEIGHT));
+            if (counter.get(p.getEpisodes().get(0)) == 1) {
+                wsum2 += w;
+                persons2.add(p);
+            } else {
+                wsum1 += w;
+                persons1.add(p);
+            }
+        }
+
+        int n1 = size / 2;
+        int n2 = size - n1;
+        Set<? extends Person> simPersons1 = PersonUtils.weightedCopy(persons1, new PlainFactory(), n1, random);
+        Set<? extends Person> simPersons2 = PersonUtils.weightedCopy(persons2, new PlainFactory(), n2, random);
+
+        double w1 = (wsum1 * n2) / (wsum2 * n1);
+        double w2 = 1.0;
+
+        for (Person p : simPersons1) p.setAttribute(CommonKeys.PERSON_WEIGHT, String.valueOf(w1));
+        for (Person p : simPersons2) p.setAttribute(CommonKeys.PERSON_WEIGHT, String.valueOf(w2));
+
+        Set<Person> all = new HashSet<>();
+        all.addAll(simPersons1);
+        all.addAll(simPersons2);
+
+        return all;
     }
 }

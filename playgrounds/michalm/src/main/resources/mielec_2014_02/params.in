@@ -1,3 +1,9 @@
+#dir where input files are read from
+inputDir            ./src/main/resources/mielec_2014_02/
+
+#dir where output files will be stored
+outputDir           ./src/main/resources/mielec_2014_02/
+
 #file with the network
 netFile            network.xml
 

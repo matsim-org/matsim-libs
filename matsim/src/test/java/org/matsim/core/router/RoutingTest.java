@@ -209,7 +209,7 @@ public class RoutingTest  {
 				scenario.getNetwork(),
 				calculator,
 				calculator);
-		Injector injector = Injector.createInjector(scenario.getConfig(), new AbstractModule() {
+		com.google.inject.Injector injector = Injector.createInjector(scenario.getConfig(), new AbstractModule() {
 			@Override
 			public void install() {
 				install(AbstractModule.override(Arrays.asList(new TripRouterModule()), new AbstractModule() {

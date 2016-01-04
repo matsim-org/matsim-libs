@@ -139,7 +139,7 @@ public class InitRoutes {
 		final PopulationWriter plansWriter = new PopulationWriter(plans, network);
 		plansWriter.startStreaming(this.plansfile);
 		final FreespeedTravelTimeAndDisutility timeCostCalc = new FreespeedTravelTimeAndDisutility(config.planCalcScore());
-		Injector injector = Injector.createInjector(scenario.getConfig(), new AbstractModule() {
+		com.google.inject.Injector injector = Injector.createInjector(scenario.getConfig(), new AbstractModule() {
 			@Override
 			public void install() {
 			install(AbstractModule.override(Arrays.asList(new TripRouterModule()), new AbstractModule() {

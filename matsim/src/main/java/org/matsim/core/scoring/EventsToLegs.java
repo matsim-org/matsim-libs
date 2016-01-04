@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.google.inject.Inject;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
@@ -47,6 +48,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.handler.TeleportationArrivalEventHandler;
@@ -63,7 +65,6 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 
-import javax.inject.Inject;
 
 
 /**
@@ -116,7 +117,12 @@ TeleportationArrivalEventHandler, TransitDriverStartsEventHandler, PersonEntersV
 	}
 
 	private Network network;
-	private TransitSchedule transitSchedule;
+	private TransitSchedule transitSchedule = null;
+
+	@Inject(optional=true)
+	public void setTransitSchedule(TransitSchedule transitSchedule) {
+		this.transitSchedule = transitSchedule;
+	}
 	private Map<Id<Person>, LegImpl> legs = new HashMap<>();
 	private Map<Id<Person>, List<Id<Link>>> experiencedRoutes = new HashMap<>();
 	private Map<Id<Person>, TeleportationArrivalEvent> routelessTravels = new HashMap<>();
@@ -126,14 +132,18 @@ TeleportationArrivalEventHandler, TransitDriverStartsEventHandler, PersonEntersV
 	
 
 	@Inject
-	EventsToLegs(Network network, TransitSchedule transitSchedule) {
+	EventsToLegs(Network network, EventsManager eventsManager) {
 		this.network = network;
-		this.transitSchedule = transitSchedule;
+		eventsManager.addHandler(this);
 	}
+
+
 
 	public EventsToLegs(Scenario scenario) {
 		this.network = scenario.getNetwork();
-		this.transitSchedule = scenario.getTransitSchedule();
+		if (scenario.getConfig().transit().isUseTransit()) {
+			this.transitSchedule = scenario.getTransitSchedule();
+		}
 	}
 
 	@Override

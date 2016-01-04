@@ -46,9 +46,15 @@ class OptimizeRoadpricing {
 		final double changeCostProba = 2.0 / decisionVariableCnt;
 		final double deltaTime_s = 1800;
 		final double deltaCost_money = 10.0;
+
+		final TollLevels initialTollLevels = new TollLevels(6 * 3600 + 1800,
+				7 * 3600, 7 * 3600 + 1800, 8 * 3600 + 1800, 9 * 3600,
+				15 * 3600 + 1800, 16 * 3600, 17 * 3600 + 1800, 18 * 3600,
+				18 * 3600 + 1800, 10.0, 15.0, 20.0, scenario);
+
 		final DecisionVariableRandomizer<TollLevels> decisionVariableRandomizer = new TollLevelsRandomizer(
-				changeTimeProba, changeCostProba, deltaTime_s, deltaCost_money,
-				MatsimRandom.getRandom(), scenario);
+				initialTollLevels, changeTimeProba, changeCostProba,
+				deltaTime_s, deltaCost_money, MatsimRandom.getRandom());
 
 		int maxMemoryLength = 1;
 		boolean keepBestSolution = true;

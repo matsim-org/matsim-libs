@@ -3,6 +3,7 @@ package opdytsintegration;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.TerminationCriterion;
 
 import floetteroed.opdyts.DecisionVariable;
 import floetteroed.opdyts.SimulatorState;
@@ -88,12 +89,14 @@ public class MATSimSimulator<U extends DecisionVariable> implements
 				binder().requestInjection(matsimDecisionVariableEvaluator);
 			}
 		});
-		controler.setTerminationCriterion(new Controler.TerminationCriterion() {
+		// TODO >>> THIS DOES NOT WORK >>>
+		controler.setTerminationCriterion(new TerminationCriterion() {
 			@Override
 			public boolean continueIterations(int iteration) {
 				return !matsimDecisionVariableEvaluator.foundSolution();
 			}
 		});
+		// TODO <<< THIS DOES NOT WORK <<<
 		controler.run();
 		this.nextControlerRun++;
 		return matsimDecisionVariableEvaluator.getFinalState();

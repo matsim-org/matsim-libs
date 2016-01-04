@@ -42,6 +42,7 @@ public final class GeometryUtils {
 
 	private GeometryUtils(){}
 	private static final Random random = MatsimRandom.getRandom(); // matsim random will return same coord.
+	private static final GeometryFactory gf = new GeometryFactory();
 
 	public static Point getRandomPointsInsideFeature (SimpleFeature feature) {
 		Point p = null;
@@ -55,16 +56,13 @@ public final class GeometryUtils {
 	}
 
 	public static boolean isLinkInsideCity(Collection<SimpleFeature> features, Link link) {
-		boolean isLinkInsideMunich = false;
-		GeometryFactory gf = new GeometryFactory();
 		Geometry geo = gf.createPoint(new Coordinate(link.getCoord().getX(), link.getCoord().getY()));
 		for(SimpleFeature sf : features){
 			if ( ((Geometry) sf.getDefaultGeometry()).contains(geo) ) {
-				isLinkInsideMunich = true;
-				break;
+				return true;
 			}
 		}
-		return isLinkInsideMunich;
+		return false;
 	}
 
 	public static Point getRandomPointsInsideFeatures (List<SimpleFeature> features) {

@@ -49,11 +49,12 @@ public class OuterCountVolumeAnalyzer {
 	private static final int countScaleFactor = 10;
 
 	public static void main(String[] args) {
-		String outputFolder ="../../../../repos/runs-svn/patnaIndia/run108/outerCordonOutput/";
+		String outputFolder ="../../../../repos/runs-svn/patnaIndia/run108/outerCordonOutput_10pct/";
 		String eventsFile = outputFolder+"/output_events.xml.gz";
 		OuterCountVolumeAnalyzer ocva =	new OuterCountVolumeAnalyzer();
 		ocva.run(eventsFile);
 		ocva.writeData(outputFolder);
+		ocva.writeHourlyLinkCounts(outputFolder);
 	}
 
 	public void run(String eventsFile){
@@ -74,6 +75,33 @@ public class OuterCountVolumeAnalyzer {
 			writer.newLine();
 			for(Id<Link> linkId : OuterCordonUtils.getInternalToExternalCountStationLinkIds()){
 				writer.write(OuterCordonLinks.getOuterCordonNumberFromLink(linkId.toString())+"\t"+linkId+"\t"+link2totalCounts.get(linkId).getSecond()*countScaleFactor+"\t"+link2totalCounts.get(linkId).getFirst()*countScaleFactor+"\n");
+			}
+			writer.close();
+		} catch (Exception e) {
+			throw new RuntimeException("Data is not written to file. Reason - "+e);
+		}
+	}
+	
+	public void writeHourlyLinkCounts(String outputFolder){
+		BufferedWriter writer = IOUtils.getBufferedWriter(outputFolder+"/hourlyLinkCounts.txt");
+		List<Id<Link>> allCountStationLinks = new ArrayList<>();
+		allCountStationLinks.addAll(OuterCordonUtils.getExternalToInternalCountStationLinkIds());
+		allCountStationLinks.addAll(OuterCordonUtils.getInternalToExternalCountStationLinkIds());
+		
+		Map<Id<Link>, Map<Integer, Double>> link2time2volume = handler.getLinkId2TimeSlot2LinkVolume();
+		try {
+			writer.write("timebin \t");
+			for(Id<Link> linkId : allCountStationLinks){
+				writer.write(OuterCordonLinks.getOuterCordonNumberFromLink(linkId.toString())+"\t");
+			}
+			writer.newLine();
+			for (int ii = 1; ii<=30;ii++){
+				writer.write(ii+"\t");
+				for(Id<Link> linkId : allCountStationLinks){
+					double count = link2time2volume.get(linkId).containsKey(ii) ? link2time2volume.get(linkId).get(ii) : 0.;
+					writer.write(  count * countScaleFactor + "\t" );
+				}	
+				writer.newLine();
 			}
 			writer.close();
 		} catch (Exception e) {

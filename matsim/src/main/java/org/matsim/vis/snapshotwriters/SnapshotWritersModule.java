@@ -22,7 +22,15 @@
 
 package org.matsim.vis.snapshotwriters;
 
+import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.mobsim.framework.listeners.MobsimListener;
+import org.matsim.core.replanning.ReplanningContext;
+
+import javax.inject.Inject;
+import javax.inject.Provider;
+import java.util.Collection;
 
 public class SnapshotWritersModule extends AbstractModule {
 	@Override
@@ -33,5 +41,40 @@ public class SnapshotWritersModule extends AbstractModule {
 		if (getConfig().controler().getSnapshotFormat().contains("transims")) {
 			addSnapshotWriterBinding().toProvider(TransimsSnapshotWriterFactory.class);
 		}
+		if (getConfig().controler().getWriteSnapshotsInterval() != 0) {
+			addMobsimListenerBinding().toProvider(SnapshotWriterManagerProvider.class);
+
+		}
 	}
-}
+
+	private static class SnapshotWriterManagerProvider implements Provider<MobsimListener> {
+
+		private final Config config;
+		private final ControlerConfigGroup controlerConfigGroup;
+		private final ReplanningContext iterationContext;
+		private final Collection<com.google.inject.Provider<SnapshotWriter>> snapshotWriters;
+
+		@Inject
+		private SnapshotWriterManagerProvider(Config config, ControlerConfigGroup controlerConfigGroup, ReplanningContext iterationContext, Collection<com.google.inject.Provider<SnapshotWriter>> snapshotWriters) {
+			this.config = config;
+			this.controlerConfigGroup = controlerConfigGroup;
+			this.iterationContext = iterationContext;
+			this.snapshotWriters = snapshotWriters;
+		}
+
+		@Override
+		public MobsimListener get() {
+			if (iterationContext.getIteration() % controlerConfigGroup.getWriteSnapshotsInterval() == 0) {
+				SnapshotWriterManager manager = new SnapshotWriterManager(config);
+				for (com.google.inject.Provider<SnapshotWriter> snapshotWriter : this.snapshotWriters) {
+					manager.addSnapshotWriter(snapshotWriter.get());
+				}
+				return manager;
+			} else {
+				return new NoopMobsimListener();
+			}
+		}
+
+		private class NoopMobsimListener implements MobsimListener {
+		}
+	}}
