@@ -83,6 +83,10 @@ public class CentralityBasedLandmarker implements Landmarker {
 			computeCloseness( sector );
 			final NodeInfo best = Collections.min( sector.values() , centralityComparator );
 			landmarks.add( best.node );
+
+			if ( log.isDebugEnabled() ) {
+				log.debug( "Node "+best.node+" at "+best.node.getCoord()+" was chosen as a landmark" );
+			}
 		}
 		counter.printCounter();
 
