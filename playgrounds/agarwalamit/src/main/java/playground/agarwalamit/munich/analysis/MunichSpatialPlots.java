@@ -18,6 +18,7 @@
  * *********************************************************************** */
 package playground.agarwalamit.munich.analysis;
 
+import java.io.BufferedWriter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,7 +37,10 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.io.IOUtils;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+
+import com.vividsolutions.jts.geom.Point;
 
 import playground.agarwalamit.analysis.congestion.ExperiencedDelayAnalyzer;
 import playground.agarwalamit.analysis.emission.EmissionLinkAnalyzer;
@@ -49,38 +53,36 @@ import playground.agarwalamit.utils.LoadMyScenarios;
 import playground.vsp.analysis.modules.monetaryTransferPayments.MonetaryPaymentsAnalyzer;
 import playground.vsp.analysis.modules.userBenefits.WelfareMeasure;
 
-import com.vividsolutions.jts.geom.Point;
-
 /**
  * @author amit
  */
 
 public class MunichSpatialPlots {
 
-	String runDir = "../../../repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run12/policies/";
+	String runDir = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/hEART/output/";
 	String bau = runDir+"/bau";
-	String policyName = "implV6";
+	String policyName = "ei";
 	String policyCase = runDir+"/"+policyName;
 	private final double countScaleFactor = 100;
 	private final double gridSize = 500;
 	private boolean isWritingGGPLOTData = true;
-	private int noOfBins = 1;
-	
+	private int noOfBins = 30;
+
 	private final double xMin=4452550.25;
 	private final double xMax=4479483.33;
 	private final double yMin=5324955.00;
 	private final double yMax=5345696.81;
-	
+
 	private final CoordinateReferenceSystem targetCRS = MGC.getCRS("EPSG:20004");
 
-	private final String shapeFile = "/Users/amit/Documents/repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
-	
+	private final String shapeFile = "../../../../repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
+
 	public static void main(String[] args) {
 		MunichSpatialPlots plots = new MunichSpatialPlots();
-//		plots.writeCongestionToCells();
+		//		plots.writeCongestionToCells();
 		plots.writeEmissionToCells();
 		//		plots.writeUserWelfareToCells();
-		plots.writePopulationDensityCountToCells();
+		//		plots.writePopulationDensityCountToCells();
 		plots.writePersonTollToCells();
 		//		plots.writeLinkTollToCells();
 	}
@@ -108,7 +110,7 @@ public class MunichSpatialPlots {
 				}
 			}
 			plot.processLocationForDensityCount(act,countScaleFactor);
-//			plot.processHomeLocation(act, 1*countScaleFactor); // if want to interpolate
+			//			plot.processHomeLocation(act, 1*countScaleFactor); // if want to interpolate
 		}
 
 		plot.writeRData("popDensity_interpolate",isWritingGGPLOTData);
@@ -341,7 +343,7 @@ public class MunichSpatialPlots {
 
 		// set bounding box, smoothing radius and targetCRS if different.
 		//		inputs.setTargetCRS(MGC.getCRS("EPSG:20004"));
-				inputs.setBoundingBox(4452550.25, 4479483.33, 5324955.00, 5345696.81);
+		inputs.setBoundingBox(4452550.25, 4479483.33, 5324955.00, 5345696.81);
 		//		inputs.setSmoothingRadius(500.);
 
 		SpatialInterpolation plot = new SpatialInterpolation(inputs,runDir+"/analysis/spatialPlots/"+noOfBins+"timeBins/");
@@ -358,9 +360,11 @@ public class MunichSpatialPlots {
 			linkEmissionsPolicy = emsLnkAna.getLink2TotalEmissions();
 		}
 
-
 		Scenario sc = LoadMyScenarios.loadScenarioFromNetwork(inputs.initialCaseNetworkFile);
 		double sumEmission =0;
+
+		EmissionTimebinDataWriter writer = new EmissionTimebinDataWriter();
+		writer.openWriter(runDir+"/analysis/spatialPlots/"+noOfBins+"timeBins/"+"viaData_NO2_"+GridType.HEX+"_"+gridSize+"_line_"+policyName+"_diff.txt");
 
 		for(double time :linkEmissionsBau.keySet()){
 			for(Link l : sc.getNetwork().getLinks().values()){
@@ -395,7 +399,8 @@ public class MunichSpatialPlots {
 					sumEmission += (emiss);
 				}
 			}
-			plot.writeRData("NO2_"+(int)time/3600+"h",isWritingGGPLOTData);
+			writer.writeData(time, plot.getCellWeights());
+			//			plot.writeRData("NO2_"+(int)time/3600+"h",isWritingGGPLOTData);
 			SpatialDataInputs.LOG.info("Total NO2 emissions from link emission map is "+sumEmission);
 
 			double cellWeights =0;
@@ -406,6 +411,8 @@ public class MunichSpatialPlots {
 			plot.clear();
 			sumEmission=0;
 		}
+
+		writer.closeWriter();
 	}
 
 	private Map<Id<Person>, Double> getPersonIdToTollPayments (Scenario sc){
@@ -430,4 +437,34 @@ public class MunichSpatialPlots {
 		return paymentsAnalzer.getPersonId2amount();
 	}
 
+	private class EmissionTimebinDataWriter{
+
+		BufferedWriter writer;
+		public void openWriter (String outputFile){
+			writer = IOUtils.getBufferedWriter(outputFile);
+			try {
+				writer.write("timebin\t centroidX \t centroidY \t weight \n");
+			} catch (Exception e) {
+				throw new RuntimeException("Data is not written to file. Reason "+e);
+			}
+		}
+
+		public void writeData(double timebin, Map<Point,Double> cellWeights){
+			try {
+				for(Point p : cellWeights.keySet()){
+					writer.write(timebin+"\t"+p.getCentroid().getX()+"\t"+p.getCentroid().getY()+"\t"+cellWeights.get(p)+"\n");
+				}
+			} catch (Exception e) {
+				throw new RuntimeException("Data is not written to file. Reason "+e);
+			}
+		}
+
+		public void closeWriter (){
+			try {
+				writer.close();	
+			} catch (Exception e) {
+				throw new RuntimeException("Data is not written to file. Reason "+e);
+			}
+		}
+	}
 }

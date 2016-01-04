@@ -50,9 +50,9 @@ public class ShochwaveExperiment {
 
 		GenerateFundamentalDiagramData generateFDData = new GenerateFundamentalDiagramData(inputs);
 		generateFDData.setRunDirectory(runDir);
-		generateFDData.setReduceDataPointsByFactor(Integer.valueOf(5));
+		generateFDData.setReduceDataPointsByFactor(Integer.valueOf(40));
 		generateFDData.setIsPlottingDistribution(false);
-		generateFDData.setIsUsingLiveOTFVis(true);
+		generateFDData.setIsUsingLiveOTFVis(false);
 		generateFDData.setIsWritingEventsFileForEachIteration(true);
 		
 		//set flow capacity of the base link to zero for 1 min.
@@ -65,13 +65,13 @@ public class ShochwaveExperiment {
 		double flowCapNow = baseLink.getCapacity();
 		NetworkChangeEventFactory cef = new NetworkChangeEventFactoryImpl() ;
 		{
-			NetworkChangeEvent event = cef.createNetworkChangeEvent(7.*3600.) ;
+			NetworkChangeEvent event = cef.createNetworkChangeEvent(20.*60.) ;
 			event.setFlowCapacityChange(new ChangeValue(ChangeType.ABSOLUTE, 0.0));
 			event.addLink(baseLink);
 			((NetworkImpl)sc.getNetwork()).addNetworkChangeEvent(event);
 		}
 		{
-			NetworkChangeEvent event = cef.createNetworkChangeEvent(7.*3600.+60) ;
+			NetworkChangeEvent event = cef.createNetworkChangeEvent(20.*60.+60) ;
 			event.setFlowCapacityChange(new ChangeValue(ChangeType.ABSOLUTE, flowCapNow));
 			event.addLink(baseLink);
 			((NetworkImpl)sc.getNetwork()).addNetworkChangeEvent(event);
