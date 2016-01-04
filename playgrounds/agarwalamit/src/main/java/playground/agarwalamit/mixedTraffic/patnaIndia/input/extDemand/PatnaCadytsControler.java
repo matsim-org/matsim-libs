@@ -161,7 +161,7 @@ public class PatnaCadytsControler {
 		config.qsim().setSnapshotStyle(SnapshotStyle.queue);
 		config.qsim().setVehiclesSource(VehiclesSource.fromVehiclesData);
 
-		config.counts().setCountsFileName("../../../../repos/runs-svn/patnaIndia/run108/input/outerCordonCounts.xml.gz");
+		config.counts().setCountsFileName("../../../../repos/runs-svn/patnaIndia/run108/input/outerCordonCounts_10pct.xml.gz");
 		config.counts().setWriteCountsInterval(5);
 		config.counts().setCountsScaleFactor(1/OuterCordonUtils.SAMPLE_SIZE);
 		config.counts().setOutputFormat("all");
@@ -169,8 +169,8 @@ public class PatnaCadytsControler {
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(100);
 		config.controler().setOutputDirectory(outputDir);
-		config.controler().setWritePlansInterval(50);
-		config.controler().setWriteEventsInterval(50);
+		config.controler().setWritePlansInterval(100);
+		config.controler().setWriteEventsInterval(2);
 
 		StrategySettings reRoute = new StrategySettings();
 		reRoute.setStrategyName(DefaultPlanStrategiesModule.DefaultStrategy.ReRoute.name());

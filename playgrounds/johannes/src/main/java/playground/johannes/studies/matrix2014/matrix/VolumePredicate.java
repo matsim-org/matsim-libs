@@ -16,32 +16,27 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.synpop.analysis;
+package playground.johannes.studies.matrix2014.matrix;
 
-import org.matsim.contrib.common.stats.LinearDiscretizer;
-import playground.johannes.synpop.data.CommonKeys;
-import playground.johannes.synpop.data.CommonValues;
-import playground.johannes.synpop.data.Episode;
-import playground.johannes.synpop.data.Person;
+import playground.johannes.synpop.matrix.Matrix;
 
 /**
  * @author jillenberger
  */
-public class TripsPerPersonTask {
+public class VolumePredicate implements ODPredicate<String, Double> {
 
-    public NumericAnalyzer build(FileIOContext ioContext) {
-        ValueProvider<Double, Episode> provider = new TripsCounter(new ModePredicate(CommonValues.LEG_MODE_CAR));
-        EpisodeCollector<Double> collector = new EpisodeCollector<>(provider);
+    private final double threshold;
 
-        DiscretizerBuilder builder = new PassThroughDiscretizerBuilder(new LinearDiscretizer(1.0), "linear");
-        HistogramWriter writer = new HistogramWriter(ioContext, builder);
-
-        ValueProvider<Double, Person> weightsProvider = new NumericAttributeProvider<>(CommonKeys.PERSON_WEIGHT);
-        EpisodePersonCollector<Double> weightsCollector = new EpisodePersonCollector<>(weightsProvider);
-        //weightsCollector.setPredicate(new ModePredicate(CommonValues.LEG_MODE_CAR));
-        NumericAnalyzer analyzer = new NumericAnalyzer(collector, weightsCollector, "nTrips", writer);
-
-        return analyzer;
+    public VolumePredicate(double threshold) {
+        this.threshold = threshold;
     }
 
+    @Override
+    public boolean test(String row, String col, Matrix<String, Double> matrix) {
+        Double vol = matrix.get(row, col);
+        if(vol == null)
+            return false;
+        else
+            return (vol >= threshold);
+    }
 }

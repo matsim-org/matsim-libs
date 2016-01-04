@@ -16,32 +16,41 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.synpop.analysis;
+package playground.johannes.studies.matrix2014.matrix;
 
-import org.matsim.contrib.common.stats.LinearDiscretizer;
-import playground.johannes.synpop.data.CommonKeys;
-import playground.johannes.synpop.data.CommonValues;
-import playground.johannes.synpop.data.Episode;
-import playground.johannes.synpop.data.Person;
+import com.vividsolutions.jts.geom.Point;
+import org.matsim.contrib.common.gis.DistanceCalculator;
+import org.matsim.contrib.common.gis.OrthodromicDistanceCalculator;
+import playground.johannes.synpop.gis.ZoneCollection;
+import playground.johannes.synpop.matrix.Matrix;
 
 /**
  * @author jillenberger
  */
-public class TripsPerPersonTask {
+public class ZoneDistancePredicate implements ODPredicate<String, Double> {
 
-    public NumericAnalyzer build(FileIOContext ioContext) {
-        ValueProvider<Double, Episode> provider = new TripsCounter(new ModePredicate(CommonValues.LEG_MODE_CAR));
-        EpisodeCollector<Double> collector = new EpisodeCollector<>(provider);
+    private final ZoneCollection zones;
 
-        DiscretizerBuilder builder = new PassThroughDiscretizerBuilder(new LinearDiscretizer(1.0), "linear");
-        HistogramWriter writer = new HistogramWriter(ioContext, builder);
+    private final DistanceCalculator calculator;
 
-        ValueProvider<Double, Person> weightsProvider = new NumericAttributeProvider<>(CommonKeys.PERSON_WEIGHT);
-        EpisodePersonCollector<Double> weightsCollector = new EpisodePersonCollector<>(weightsProvider);
-        //weightsCollector.setPredicate(new ModePredicate(CommonValues.LEG_MODE_CAR));
-        NumericAnalyzer analyzer = new NumericAnalyzer(collector, weightsCollector, "nTrips", writer);
+    private final double threshold;
 
-        return analyzer;
+    public ZoneDistancePredicate(ZoneCollection zones, double threshold) {
+        this(zones, threshold, new OrthodromicDistanceCalculator());
     }
 
+    public ZoneDistancePredicate(ZoneCollection zones, double threshold, DistanceCalculator calculator) {
+        this.zones = zones;
+        this.threshold = threshold;
+        this.calculator = calculator;
+    }
+
+    @Override
+    public boolean test(String row, String col, Matrix<String, Double> matrix) {
+        Point p_i = zones.get(row).getGeometry().getCentroid();
+        Point p_j = zones.get(col).getGeometry().getCentroid();
+        double d = calculator.distance(p_i, p_j);
+
+        return (d >= threshold);
+    }
 }

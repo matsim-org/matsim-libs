@@ -25,6 +25,7 @@ import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.sim.data.CachedElement;
 import playground.johannes.synpop.sim.data.CachedPerson;
 import playground.johannes.synpop.sim.data.Converters;
+import playground.johannes.synpop.sim.data.DoubleConverter;
 import playground.johannes.synpop.sim.util.DynamicDoubleArray;
 
 import java.util.Collection;
@@ -53,6 +54,10 @@ public class UnivariatFrequency implements Hamiltonian, AttributeChangeListener 
 
     private final boolean absoluteMode;
 
+    private boolean useWeights;
+
+    private Object weightKey;
+
     public UnivariatFrequency(Set<? extends Attributable> refElements, Set<? extends Attributable> simElements,
                               String attrKey, Discretizer discretizer) {
         this(refElements, simElements, attrKey, discretizer, false, false);
@@ -68,14 +73,26 @@ public class UnivariatFrequency implements Hamiltonian, AttributeChangeListener 
         this.discretizer = discretizer;
         this.attrKey = attrKey;
         this.absoluteMode = absoluteMode;
+        this.useWeights = useWeights;
+
+        if(useWeights) weightKey = Converters.register(CommonKeys.PERSON_WEIGHT, DoubleConverter.getInstance());
 
         refFreq = initHistogram(refElements, attrKey, useWeights);
-        simFreq = initHistogram(simElements, attrKey, false); // TODO: no sim weighting for now
-
-        scaleFactor = simElements.size() / (double) refElements.size();
-        normFactor = 1;//simElements.size(); //TODO: do we need this for the absolute mode?
+        simFreq = initHistogram(simElements, attrKey, useWeights);
 
         int size = Math.max(simFreq.size(), refFreq.size());
+
+        double refSum = 0;
+        double simSum = 0;
+
+        for (int i = 0; i < size; i++) {
+            simSum += simFreq.get(i);
+            refSum += refFreq.get(i);
+        }
+
+        scaleFactor = simSum/refSum;
+        normFactor = 1;//simElements.size(); //TODO: do we need this for the absolute mode?
+
         for (int i = 0; i < size; i++) {
             double simVal = simFreq.get(i);
             double refVal = refFreq.get(i) * scaleFactor;
@@ -108,21 +125,24 @@ public class UnivariatFrequency implements Hamiltonian, AttributeChangeListener 
     }
 
     @Override
-    public void onChange(Object dataKey, Object oldValue, Object newValue, CachedElement person) {
+    public void onChange(Object dataKey, Object oldValue, Object newValue, CachedElement element) {
         if (this.dataKey == null) this.dataKey = Converters.getObjectKey(attrKey);
 
         if (this.dataKey.equals(dataKey)) {
+            double delta = 1.0;
+            if(useWeights) delta = (Double)element.getData(weightKey);
+
             int bucket = discretizer.index((Double) oldValue);
-            double diff1 = changeBucketContent(bucket, -1);
+            double diff1 = changeBucketContent(bucket, -delta);
 
             bucket = discretizer.index((Double) newValue);
-            double diff2 = changeBucketContent(bucket, 1);
+            double diff2 = changeBucketContent(bucket, delta);
 
             hamiltonianValue += (diff1 + diff2) / normFactor;
         }
     }
 
-    private double changeBucketContent(int bucketIndex, int value) {
+    private double changeBucketContent(int bucketIndex, double value) {
         double simVal = simFreq.get(bucketIndex);
         double refVal = refFreq.get(bucketIndex) * scaleFactor;
         double oldDiff = calculateError(simVal, refVal);

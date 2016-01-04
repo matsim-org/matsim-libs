@@ -1,5 +1,6 @@
 package playground.dziemke.other;
 
+import org.apache.log4j.Logger;
 import playground.dziemke.accessibility.ptmatrix.InputsCSVWriter;
 
 import java.io.BufferedReader;
@@ -16,6 +17,8 @@ import java.util.List;
  */
 public class CompanyDataRequester {
 
+    private static final Logger log = Logger.getLogger(CompanyDataRequester.class);
+
     private static final String WEBSITE_URL = "http://www.bundesanzeiger-verlag.de/";
     private static final String COMPANY_URL = "/betrifft-unternehmen/unternehmensdaten/deutsche-unternehmensdaten/" +
             "suche-nach-unternehmensdaten/firmen-details.html?tx_s4afreekmu_pi1%5Bfilter%5D=postcode&tx_s4afr" +
@@ -27,14 +30,30 @@ public class CompanyDataRequester {
             "_pi1%5Bvalue%5D=1&tx_s4afreekmu_pi1%5Border%5D=name&tx_s4afreekmu_pi1%5Bdirection%5D=asc&tx_s4af" +
             "reekmu_pi1%5Blimit%5D=10&tx_s4afreekmu_pi1%5Bpage%5D=";
 
+    private static int i = 2000;
+
     public static void main(String[] args) {
         long time = System.currentTimeMillis();
-        List<CompanyData> companyData = getCompanyData();
-        writeCompanyData(companyData, "companyData.csv");
-        System.out.println(System.currentTimeMillis() - time);
+        int dif = 1000;
+        boolean continueWriting = true;
+        int e = 3;
+        do {
+            List<CompanyData> companyData = getCompanyData(dif*e);
+            if (companyData.size() != 0) {
+                writeCompanyData(companyData, "companyData" + e + ".csv");
+                e++;
+                companyData.clear();
+                System.out.println(System.currentTimeMillis() - time);
+            } else {
+                continueWriting = false;
+            }
+        } while(continueWriting);
+
     }
 
     public static void writeCompanyData(List<CompanyData> companyData, String outputPath) {
+
+        log.error("Writing company data to " + outputPath);
 
         InputsCSVWriter writer = new InputsCSVWriter(outputPath, ";");
 
@@ -65,9 +84,9 @@ public class CompanyDataRequester {
         writer.writeField(companyData.getCorporateForm());
         writer.writeField(companyData.getCommercialRegisterNumber());
         String sector = "";
-        for (int i = 0; i < companyData.getSector().size(); i++) {
-            sector += companyData.getSector().get(i);
-            if (i != companyData.getSector().size()-1) {
+        for (int e = 0; e < companyData.getSector().size(); e++) {
+            sector += companyData.getSector().get(e);
+            if (e != companyData.getSector().size()-1) {
                 sector += "/";
             }
         }
@@ -77,10 +96,9 @@ public class CompanyDataRequester {
         writer.writeNewLine();
     }
 
-    private static List<CompanyData> getCompanyData() {
+    private static List<CompanyData> getCompanyData(int endInt) {
 
         List<CompanyData> companyData = new ArrayList<>();
-        int i = 0;
         boolean continueReading = true;
         do {
             i++;
@@ -89,6 +107,8 @@ public class CompanyDataRequester {
                 try {
                     InputStreamReader inputStreamReader = new InputStreamReader(url.openStream());
                     BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+
+                    log.error("Reading companyData page " + i);
 
                     String line;
                     try {
@@ -106,7 +126,7 @@ public class CompanyDataRequester {
                                     companyData.add(currentCompanyData);
                                 }
                             }
-                            if (line.contains("Ihre Suche ergab leider keine Treffer.")) {
+                            if (i >= endInt || line.contains("Ihre Suche ergab leider keine Treffer.")) {
                                 continueReading = false;
                             }
                         }
