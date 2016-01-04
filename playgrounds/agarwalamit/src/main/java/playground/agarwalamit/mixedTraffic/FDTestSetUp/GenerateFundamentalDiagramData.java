@@ -103,6 +103,8 @@ public class GenerateFundamentalDiagramData {
 	
 	public GenerateFundamentalDiagramData (final InputsForFDTestSetUp inputs){
 		this.inputs = inputs;
+		this.inputs.run();
+		scenario = this.inputs.getScenario();
 	}
 
 	public static void main(String[] args) {
@@ -115,7 +117,7 @@ public class GenerateFundamentalDiagramData {
 			
 			args = new String [8];
 			
-			String myDir = "../../../../repos/shared-svn/projects/mixedTraffic/triangularNetwork/run313/singleModes/holes/2lanes_3600/";
+			String myDir = "../../../../repos/shared-svn/projects/mixedTraffic/triangularNetwork/run313/singleModes/holes/car_SW/";
 			String outFolder ="/car/";
 			
 			args[0] = myDir + outFolder ;
@@ -162,12 +164,11 @@ public class GenerateFundamentalDiagramData {
 
 	public void run(){
 		consistencyCheckAndInitialize();
-		inputs.run();
 		travelModes = inputs.getTravelModes();
 		modalSplitInPCU = inputs.getModalSplit();
 		if(isDumpingInputFiles) inputs.dumpInputFiles(runDir);
 		
-		scenario = inputs.getScenario();
+		
 
 		mode2FlowData = inputs.getTravelMode2FlowDynamicsData();
 		flowUnstableWarnCount = new int [travelModes.length];
@@ -207,6 +208,13 @@ public class GenerateFundamentalDiagramData {
 		this.isDumpingInputFiles = isDumpingInputFiles;
 	}
 	
+	/**
+	 * @return the scenario
+	 */
+	public Scenario getScenario() {
+		return scenario;
+	}
+
 	private void parametricRunAccordingToGivenModalSplit(){
 
 		//	Creating minimal configuration respecting modal split in PCU and integer agent numbers
