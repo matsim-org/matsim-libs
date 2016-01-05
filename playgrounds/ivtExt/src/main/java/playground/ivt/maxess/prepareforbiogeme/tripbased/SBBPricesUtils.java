@@ -49,13 +49,11 @@ public class SBBPricesUtils {
 
 		if ( log.isTraceEnabled() ) log.trace( "roundedDistance_km="+roundedDistance_km );
 
-		final double rate_km = getCostRate( roundedDistance_km );
+		final double unroundedPrice = calcUnroundedPrice( roundedDistance_km );
 
-		if ( log.isTraceEnabled() ) log.trace( "rate_km="+rate_km );
+		if ( log.isTraceEnabled() ) log.trace( "roundedPrice="+unroundedPrice );
 
-		if ( log.isTraceEnabled() ) log.trace( "unroundedPrice="+(roundedDistance_km * rate_km) );
-
-		final double basePrice = roundPrice( roundedDistance_km , roundedDistance_km * rate_km );
+		final double basePrice = roundPrice( roundedDistance_km , unroundedPrice );
 
 		if ( log.isTraceEnabled() ) log.trace( "basePrice="+basePrice );
 
@@ -103,17 +101,24 @@ public class SBBPricesUtils {
 		return bin * binSize;
 	}
 
-	private static double getCostRate( double distance ) {
-		//if ( true ) return 0.4342;
-		if ( distance <= 4 ) return 0.4451;
-		if ( distance <= 14 ) return 0.4230;
-		if ( distance <= 48 ) return 0.3564;
-		if ( distance <= 150 ) return 0.2581;
-		if ( distance <= 200 ) return 0.2508;
-		if ( distance <= 250 ) return 0.2229;
-		if ( distance <= 300 ) return 0.2013;
-		if ( distance <= 480 ) return 0.1960;
-		return 0.1936;
+	private static double calcUnroundedPrice( double distance ) {
+		double p = 0;
+		p += calcPriceInterval( 0 , 4 , distance , 0.4451 );
+		p += calcPriceInterval( 4 , 14 , distance , 0.4230 );
+		p += calcPriceInterval( 14 , 48 , distance , 0.3564 );
+		p += calcPriceInterval( 48 , 150 , distance , 0.2581 );
+		p += calcPriceInterval( 150 , 200 , distance , 0.2508 );
+		p += calcPriceInterval( 200 , 250 , distance , 0.2229 );
+		p += calcPriceInterval( 250 , 300 , distance , 0.2013 );
+		p += calcPriceInterval( 300 , 480 , distance , 0.1960 );
+		p += calcPriceInterval( 480 , 1500 , distance , 0.1936 );
+		return p;
+	}
+
+	private static double calcPriceInterval( double min, double max, double distance, double rate ) {
+		if ( distance <= min ) return 0;
+		if ( distance > max ) return (max - min) * rate;
+		return (distance - min) * rate;
 	}
 
 	public static double getDistance( Trip trip ) {
