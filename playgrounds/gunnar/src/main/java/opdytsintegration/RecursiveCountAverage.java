@@ -1,7 +1,6 @@
 package opdytsintegration;
 
 /**
- * TODO This is a general-purpose utility; move it somewhere else.
  * 
  * @author Gunnar Flötteröd
  *

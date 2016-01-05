@@ -32,6 +32,8 @@ import floetteroed.utilities.math.Vector;
  * Identifies the approximately best out of a set of decision variables.
  * 
  * @author Gunnar Flötteröd
+ * 
+ * @see DecisionVariable
  *
  */
 public class MATSimDecisionVariableSetEvaluator<U extends DecisionVariable>
@@ -44,12 +46,6 @@ public class MATSimDecisionVariableSetEvaluator<U extends DecisionVariable>
 	private final MATSimStateFactory<U> stateFactory;
 
 	private final TimeDiscretization timeDiscretization;
-
-	// private int startTime_s = 0;
-	//
-	// private int binSize_s = 3600;
-	//
-	// private int binCnt = 24;
 
 	private int memory = 1;
 
@@ -66,7 +62,6 @@ public class MATSimDecisionVariableSetEvaluator<U extends DecisionVariable>
 	@Inject
 	private Network network;
 
-	// private VolumesAnalyzer volumesAnalyzer = null;
 	private OccupancyAnalyzer occupancyAnalyzer = null;
 
 	private SortedSet<Id<Link>> sortedLinkIds = null;
@@ -152,12 +147,13 @@ public class MATSimDecisionVariableSetEvaluator<U extends DecisionVariable>
 
 	// -------------------- INTERNALS --------------------
 
-	private MATSimState createState(final Population population) {
+	private MATSimState newState(final Population population) {
 		final Vector newSummaryStateVector;
 		if (this.averageMemory) {
 			// average state vectors
 			newSummaryStateVector = this.stateList.getFirst().copy();
 			for (int i = 1; i < this.memory; i++) {
+				// TODO Why iterate up to memory and not up to stateList.size()?
 				newSummaryStateVector.add(this.stateList.get(i));
 			}
 			newSummaryStateVector.mult(1.0 / this.memory);
@@ -174,18 +170,10 @@ public class MATSimDecisionVariableSetEvaluator<U extends DecisionVariable>
 	@Override
 	public void notifyStartup(final StartupEvent event) {
 
-		this.sortedLinkIds = new TreeSet<Id<Link>>(
-		// event.getControler().getScenario().getNetwork().
-				this.network.getLinks().keySet());
+		this.sortedLinkIds = new TreeSet<Id<Link>>(this.network.getLinks()
+				.keySet());
 		this.stateList = new LinkedList<Vector>();
 
-		// Replaced volumes by occupancies based on the assumption that the
-		// latter are better state variables. Gunnar, 2015-12-17
-		//
-		// this.volumesAnalyzer = new VolumesAnalyzer(this.binSize_s,
-		// this.binSize_s * (this.startBin + this.binCnt), event
-		// .getControler().getScenario().getNetwork());
-		// event.getControler().getEvents().addHandler(this.volumesAnalyzer);
 		this.occupancyAnalyzer = new OccupancyAnalyzer(this.timeDiscretization);
 		this.eventsManager.addHandler(this.occupancyAnalyzer);
 
@@ -195,61 +183,41 @@ public class MATSimDecisionVariableSetEvaluator<U extends DecisionVariable>
 	@Override
 	public void notifyIterationEnds(final IterationEndsEvent event) {
 
-		{
-			/*
-			 * (1) Extract the instantaneous state vector.
-			 */
-			final Vector newInstantaneousStateVector = new Vector(
-					this.sortedLinkIds.size()
-							* this.timeDiscretization.getBinCnt());
-			int i = 0;
-			// for (Id<Link> linkId : this.sortedLinkIds) {
-			// final int[] volumes = this.volumesAnalyzer
-			// .getVolumesForLink(linkId);
-			// if (volumes == null) {
-			// for (int j = 0; j < this.binCnt; j++) {
-			// newInstantaneousStateVector.set(i++, 0.0);
-			// }
-			// } else {
-			// for (int j = this.startBin; j < (this.startBin + this.binCnt);
-			// j++) {
-			// newInstantaneousStateVector.set(i++, volumes[j]);
-			// }
-			// }
-			// }
-			for (Id<Link> linkId : this.sortedLinkIds) {
-				for (int bin = 0; bin < this.timeDiscretization.getBinCnt(); bin++) {
-					newInstantaneousStateVector.set(i++, this.occupancyAnalyzer
-							.getOccupancy_veh(linkId, bin));
-				}
+		/*
+		 * (1) Extract the instantaneous state vector.
+		 */
+		final Vector newInstantaneousStateVector = new Vector(
+				this.sortedLinkIds.size() * this.timeDiscretization.getBinCnt());
+		int i = 0;
+		for (Id<Link> linkId : this.sortedLinkIds) {
+			for (int bin = 0; bin < this.timeDiscretization.getBinCnt(); bin++) {
+				newInstantaneousStateVector.set(i++,
+						this.occupancyAnalyzer.getOccupancy_veh(linkId, bin));
 			}
+		}
 
-			/*
-			 * (2) Add instantaneous state vector to the list of past state
-			 * vectors and ensure that the size of this list is equal to what
-			 * the memory parameter prescribes.
-			 */
+		/*
+		 * (2) Add instantaneous state vector to the list of past state vectors
+		 * and ensure that the size of this list is equal to what the memory
+		 * parameter prescribes.
+		 */
+		this.stateList.addFirst(newInstantaneousStateVector);
+		while (this.stateList.size() < this.memory) {
 			this.stateList.addFirst(newInstantaneousStateVector);
-			while (this.stateList.size() < this.memory) {
-				this.stateList.addFirst(newInstantaneousStateVector);
-			}
-			while (this.stateList.size() > this.memory) {
-				this.stateList.removeLast();
-			}
+		}
+		while (this.stateList.size() > this.memory) {
+			this.stateList.removeLast();
 		}
 
-		{
-			final MATSimState newState = createState(
-			// event.getControler().getScenario().getPopulation()
-			this.population);
-			this.trajectorySampler.afterIteration(newState);
-		}
+		/*
+		 * (3) Inform the TrajectorySampler that one iteration has been
+		 * completed and provide the resulting state.
+		 */
+		this.trajectorySampler.afterIteration(this.newState(this.population));
 	}
 
 	@Override
 	public void notifyShutdown(final ShutdownEvent event) {
-		this.finalState = createState(
-		// event.getControler().getScenario().getPopulation()
-		this.population);
+		this.finalState = this.newState(this.population);
 	}
 }

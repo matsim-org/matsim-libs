@@ -32,7 +32,7 @@ public class MATSimState implements SimulatorState {
 
 	/**
 	 * A map of persons on lists of (deep copies of) all plans of the respective
-	 * person. The plan order in the lists matters. Contains an empty list but
+	 * person. The plan order in the lists matters. Contains an empty but
 	 * non-null list for every person that does not have any plans.
 	 */
 	private final Map<Id<Person>, List<? extends Plan>> person2planList = new LinkedHashMap<>();
@@ -40,10 +40,8 @@ public class MATSimState implements SimulatorState {
 	/**
 	 * A map of indices pointing to the currently selected plan of every person.
 	 * Contains a null value for every person that does not have a selected
-	 * plan.
-	 * <p>
-	 * Uses an index instead of a reference because references do not survive
-	 * deep copies and we want to be robust here.
+	 * plan. Uses an index instead of a reference because references do not
+	 * survive deep copies.
 	 */
 	private final Map<Id<Person>, Integer> person2selectedPlanIndex = new LinkedHashMap<>();
 
@@ -54,8 +52,8 @@ public class MATSimState implements SimulatorState {
 	// -------------------- CONSTRUCTION --------------------
 
 	/**
-	 * Takes over a <em>deep copy</em> of the population and a
-	 * <em>reference</em> to vectorRepresentation.
+	 * Takes over a <em>deep copy</em> of the population's plans and a
+	 * <em>reference</em> to the vector representation.
 	 * 
 	 * @param population
 	 *            the current MATSim population
@@ -132,7 +130,7 @@ public class MATSimState implements SimulatorState {
 	@Override
 	public void implementInSimulation() {
 		for (Id<Person> personId : this.person2planList.keySet()) {
-			Person person = population.getPersons().get(personId);
+			final Person person = this.population.getPersons().get(personId);
 			person.getPlans().clear();
 			final List<? extends Plan> copiedPlans = newDeepCopy(this.person2planList
 					.get(personId));
@@ -143,8 +141,4 @@ public class MATSimState implements SimulatorState {
 					this.person2selectedPlanIndex.get(personId)));
 		}
 	}
-
-	// public void setPopulation(Population population) {
-	// this.population = population;
-	// }
 }
