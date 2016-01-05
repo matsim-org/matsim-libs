@@ -49,27 +49,20 @@ public class SBBPricesUtils {
 
 		if ( log.isTraceEnabled() ) log.trace( "roundedDistance_km="+roundedDistance_km );
 
-		final double unroundedPrice = calcUnroundedPrice( roundedDistance_km );
+		final double unroundedPrice = (klasse == SBBClass.first ? 1.75 : 1 ) * calcUnroundedPrice( roundedDistance_km );
 
-		if ( log.isTraceEnabled() ) log.trace( "roundedPrice="+unroundedPrice );
+		if ( log.isTraceEnabled() ) log.trace( "unroundedPrice="+unroundedPrice );
 
-		final double basePrice = roundPrice( roundedDistance_km , unroundedPrice );
+		final double basePrice =
+				roundPrice(
+						roundedDistance_km,
+						unroundedPrice );
 
 		if ( log.isTraceEnabled() ) log.trace( "basePrice="+basePrice );
 
-		final double multiplicator = getMultiplicator( klasse , halbTax );
 		final double minimumPrice = getMinimumPrice( klasse , halbTax );
 
-		return Math.max( multiplicator * basePrice , minimumPrice );
-	}
-
-	private static double getMultiplicator( SBBClass klasse, boolean halbTax ) {
-		double m = 1;
-
-		if ( klasse == SBBClass.first ) m *= 1.75;
-		if ( halbTax ) m /= 2;
-
-		return m;
+		return Math.max( halbTax ? basePrice / 2 : basePrice , minimumPrice );
 	}
 
 	private static double getMinimumPrice( SBBClass klasse, boolean halbTax ) {
@@ -116,6 +109,7 @@ public class SBBPricesUtils {
 	}
 
 	private static double calcPriceInterval( double min, double max, double distance, double rate ) {
+		assert min < max;
 		if ( distance <= min ) return 0;
 		if ( distance > max ) return (max - min) * rate;
 		return (distance - min) * rate;
