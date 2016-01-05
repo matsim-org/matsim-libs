@@ -48,6 +48,7 @@ import playground.agarwalamit.analysis.emission.EmissionLinkAnalyzer;
 import playground.agarwalamit.analysis.spatial.GeneralGrid.GridType;
 import playground.agarwalamit.analysis.spatial.SpatialDataInputs;
 import playground.agarwalamit.analysis.spatial.SpatialDataInputs.LinkWeightMethod;
+import playground.agarwalamit.analysis.spatial.SpatialInterpolation.CellFilter;
 import playground.agarwalamit.analysis.spatial.SpatialInterpolation;
 import playground.agarwalamit.analysis.userBenefits.MyUserBenefitsAnalyzer;
 import playground.agarwalamit.utils.GeometryUtils;
@@ -100,8 +101,8 @@ public class MunichSpatialPlots {
 			xMax = re.getMaxX();
 			yMin = re.getMinY();
 			yMax = re.getMaxY();
-			gridSize = 500;
-			smoothingRadius = 500;
+			gridSize = 1500;
+			smoothingRadius = 2000;
 		}
 		MunichSpatialPlots plots = new MunichSpatialPlots();
 		//		plots.writeCongestionToCells();
@@ -306,7 +307,6 @@ public class MunichSpatialPlots {
 			delayAnalyzer.postProcessData();
 			linkDelaysPolicy = delayAnalyzer.getTimeBin2LinkId2Delay();
 		}
-		double sumDelays =0;
 
 		for(double time :linkDelaysBau.keySet()){
 			for(Link l : sc.getNetwork().getLinks().values()){
@@ -338,19 +338,10 @@ public class MunichSpatialPlots {
 					}
 
 					plot.processLink(l,  delays);
-					sumDelays += (delays);
 				}
 			}
 			plot.writeRData("delays_"+(int)time/3600+"h", isWritingGGPLOTData);
-			SpatialDataInputs.LOG.info("Total delays from link emission map is "+sumDelays);
-
-			double cellWeights =0;
-			for(Point p: plot.getCellWeights().keySet()){
-				cellWeights += plot.getCellWeights().get(p);
-			}
-			SpatialDataInputs.LOG.info("Total delays from cell weights  is "+cellWeights);
 			plot.clear();
-			sumDelays=0;
 		}
 	}
 
@@ -365,8 +356,10 @@ public class MunichSpatialPlots {
 		inputs.setTargetCRS(targetCRS);
 		inputs.setGridInfo(GridType.HEX, gridSize);
 		inputs.setSmoothingRadius(smoothingRadius);
+		inputs.setShapeFile(shapeFileMMA);
 
-		SpatialInterpolation plot = new SpatialInterpolation(inputs,runDir+"/analysis/spatialPlots/"+noOfBins+"timeBins/");
+//		SpatialInterpolation plot = new SpatialInterpolation(inputs,runDir+"/analysis/spatialPlots/"+noOfBins+"timeBins/");
+		SpatialInterpolation plot = new SpatialInterpolation(inputs,runDir+"/analysis/spatialPlots/"+noOfBins+"timeBins/", CellFilter.ShapePolygon);
 
 		EmissionLinkAnalyzer emsLnkAna = new EmissionLinkAnalyzer(LoadMyScenarios.getSimulationEndTime(inputs.initialCaseConfig), inputs.initialCaseEmissionEventsFile, noOfBins);
 		emsLnkAna.preProcessData();
@@ -381,21 +374,17 @@ public class MunichSpatialPlots {
 		}
 
 		Scenario sc = LoadMyScenarios.loadScenarioFromNetwork(inputs.initialCaseNetworkFile);
-		double sumEmission =0;
 
 		EmissionTimebinDataWriter writer = new EmissionTimebinDataWriter();
-		writer.openWriter(runDir+"/analysis/spatialPlots/"+noOfBins+"timeBins/"+"viaData_NO2_"+GridType.HEX+"_"+gridSize+"_line_"+policyName+"_diff.txt");
+		writer.openWriter(runDir+"/analysis/spatialPlots/"+noOfBins+"timeBins/"+"viaData_NO2_"+GridType.HEX+"_"+gridSize+"_"+smoothingRadius+"_line_"+policyName+"_diff.txt");
 
 		for(double time :linkEmissionsBau.keySet()){
 			for(Link l : sc.getNetwork().getLinks().values()){
 				Id<Link> id = l.getId();
 
 				if(plot.isInResearchArea(l)){
-
 					double emiss = 0;
-
 					if(inputs.isComparing){
-
 						double linkEmissionBau =0;
 						double linkEmissionPolicy =0;
 
@@ -416,20 +405,12 @@ public class MunichSpatialPlots {
 					}
 
 					plot.processLink(l,  emiss);
-					sumEmission += (emiss);
 				}
 			}
 			writer.writeData(time, plot.getCellWeights());
 			//			plot.writeRData("NO2_"+(int)time/3600+"h",isWritingGGPLOTData);
-			SpatialDataInputs.LOG.info("Total NO2 emissions from link emission map is "+sumEmission);
 
-			double cellWeights =0;
-			for(Point p: plot.getCellWeights().keySet()){
-				cellWeights += plot.getCellWeights().get(p);
-			}
-			SpatialDataInputs.LOG.info("Total NO2 emissions from cell weights  is "+cellWeights);
 			plot.clear();
-			sumEmission=0;
 		}
 
 		writer.closeWriter();

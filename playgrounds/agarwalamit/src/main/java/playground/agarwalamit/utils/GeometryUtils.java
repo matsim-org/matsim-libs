@@ -66,6 +66,16 @@ public final class GeometryUtils {
 		}
 		return false;
 	}
+	
+	public static boolean isPointInsideCity(Collection<SimpleFeature> features, Point point) {
+		Geometry geo = gf.createPoint(new Coordinate(point.getX(), point.getY()));
+		for(SimpleFeature sf : features){
+			if ( ((Geometry) sf.getDefaultGeometry()).contains(geo) ) {
+				return true;
+			}
+		}
+		return false;
+	}
 
 	public static Point getRandomPointsInsideFeatures (List<SimpleFeature> features) {
 		Tuple<Double,Double> xs = getMaxMinXFromFeatures(features);

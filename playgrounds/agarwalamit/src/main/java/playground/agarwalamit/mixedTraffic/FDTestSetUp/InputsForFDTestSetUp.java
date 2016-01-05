@@ -97,6 +97,8 @@ public class InputsForFDTestSetUp {
 		config.qsim().setTrafficDynamics(trafficDynamics);
 		GenerateFundamentalDiagramData.LOG.info("==========The chosen traffic dynamics is "+trafficDynamics+". ==========");
 
+		config.qsim().setSnapshotStyle(SnapshotStyle.queue);
+		
 		if(trafficDynamics.equals(TrafficDynamics.withHoles)) {
 			config.qsim().setSnapshotStyle(SnapshotStyle.withHoles); // to see holes in OTFVis
 			config.setParam("WITH_HOLE", "HOLE_SPEED", HOLE_SPEED);

@@ -21,6 +21,7 @@ package playground.agarwalamit.analysis.spatial;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,7 +29,9 @@ import org.apache.commons.math.MathException;
 import org.apache.commons.math.special.Erf;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.IOUtils;
+import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -37,6 +40,7 @@ import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
 import playground.agarwalamit.analysis.spatial.GeneralGrid.GridType;
+import playground.agarwalamit.utils.GeometryUtils;
 
 /**
  * A class to interpolate effect of emissions (or ...) on each link on other parts of study area.
@@ -44,6 +48,10 @@ import playground.agarwalamit.analysis.spatial.GeneralGrid.GridType;
  */
 
 public class SpatialInterpolation {
+	
+	public enum CellFilter {
+		BoundingBox, ShapePolygon;
+	}
 
 	private GeometryFactory gf;
 	private GeneralGrid grid ;
@@ -52,18 +60,31 @@ public class SpatialInterpolation {
 
 	private Map<Point, Double> cellWeights;
 	private final String outputFolder ;
+	private final CellFilter cf;
+	private Collection<SimpleFeature> features;
 	
 	public SpatialInterpolation(final SpatialDataInputs inputs, final String outputFolder) {
+		this(inputs, outputFolder, CellFilter.BoundingBox);
+	}
+	
+	public SpatialInterpolation(final SpatialDataInputs inputs, final String outputFolder, final CellFilter cf) {
 		this.inputs = inputs;
 		SpatialDataInputs.LOG.info("Creating grids inside polygon of bounding box.");
 		createGridFromBoundingBox();
 		
 		this.outputFolder = outputFolder;
 		if(!new File(this.outputFolder).exists()) new File(this.outputFolder).mkdirs();
-		
+
+		this.cf = cf;
+		if(this.cf.equals(CellFilter.ShapePolygon) ){
+			if(inputs.shapeFile!=null)
+			features = new ShapeFileReader().readFileAndInitialize(inputs.shapeFile);
+			else throw new RuntimeException("Cell filter "+this.cf+" is chosen but no shape file is provided. Aborting ...");
+		}
 		this.grid.writeGrid(outputFolder, inputs.targetCRS.toString());
 		clear();
 	}
+	
 	/**
 	 * Used to clear the cell weights map.
 	 */
@@ -101,7 +122,8 @@ public class SpatialInterpolation {
 
 		Coordinate linkCentroid = new Coordinate(link.getCoord().getX(), link.getCoord().getY());
 		Point linkcentroidPoint = gf.createPoint(linkCentroid);
-		if(!boundingBoxPolygon.covers(linkcentroidPoint)) return;
+		
+		if(!isConsiderPoint(linkcentroidPoint)) return;
 
 		Coordinate fromNodeCoord = new Coordinate(link.getFromNode().getCoord().getX(),link.getFromNode().getCoord().getY());
 		Coordinate toNodeCoord = new Coordinate(link.getToNode().getCoord().getX(),link.getToNode().getCoord().getY());
@@ -138,7 +160,7 @@ public class SpatialInterpolation {
 		Coordinate actCoordinate = new Coordinate (act.getCoord().getX(),act.getCoord().getY());
 		Point actLocation = gf.createPoint(actCoordinate);
 
-		if(!boundingBoxPolygon.covers(actLocation)) return;
+		if(!isConsiderPoint(actLocation)) return;
 
 		for(Point p: this.cellWeights.keySet()){
 
@@ -168,7 +190,7 @@ public class SpatialInterpolation {
 		Coordinate actCoordinate = new Coordinate (act.getCoord().getX(),act.getCoord().getY());
 		Point actLocation = gf.createPoint(actCoordinate);
 
-		if(!boundingBoxPolygon.covers(actLocation)) return;
+		if(!isConsiderPoint(actLocation)) return;
 
 		for(Point p: this.cellWeights.keySet()){
 			if(this.grid.getCellGeometry(p).covers(actLocation)){
@@ -297,7 +319,17 @@ public class SpatialInterpolation {
 	public boolean isInResearchArea(final Link link) {
 		Coordinate linkCentroid = new Coordinate(link.getCoord().getX(), link.getCoord().getY());
 		Point linkcentroidPoint = gf.createPoint(linkCentroid);
-
 		return boundingBoxPolygon.covers(linkcentroidPoint);
+	}
+	
+	private boolean isConsiderPoint(final Point point) {
+		switch (this.cf) {
+		case BoundingBox:
+			return boundingBoxPolygon.covers(point);
+		case ShapePolygon:
+			return GeometryUtils.isPointInsideCity(this.features, point);
+		default:
+			throw new RuntimeException("Unknown cell filtering criteria. Aborting ...");
+		}
 	}
 }
