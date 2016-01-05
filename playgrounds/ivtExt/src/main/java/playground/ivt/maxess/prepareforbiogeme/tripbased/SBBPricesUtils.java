@@ -49,14 +49,24 @@ public class SBBPricesUtils {
 
 		if ( log.isTraceEnabled() ) log.trace( "roundedDistance_km="+roundedDistance_km );
 
-		final double unroundedPrice = (klasse == SBBClass.first ? 1.75 : 1 ) * calcUnroundedPrice( roundedDistance_km );
+		final double unroundedPrice = calcUnroundedPrice( roundedDistance_km );
 
 		if ( log.isTraceEnabled() ) log.trace( "unroundedPrice="+unroundedPrice );
 
-		final double basePrice =
+		final double secondClassPrice =
 				roundPrice(
 						roundedDistance_km,
 						unroundedPrice );
+
+		// This does not correspond to what is said in the norm (where the factor is on the kilometer price), but this
+		// way the results fit the table: apply the factor on the rounded second class price, and round again.
+		// without this, differences go up to two rounding factors.
+		final double basePrice =
+				SBBClass.first == klasse ?
+						roundPrice(
+								roundedDistance_km,
+								secondClassPrice * 1.75 ) :
+						secondClassPrice;
 
 		if ( log.isTraceEnabled() ) log.trace( "basePrice="+basePrice );
 
@@ -90,7 +100,7 @@ public class SBBPricesUtils {
 	}
 
 	private static double round( double d , double binSize ) {
-		final double bin = Math.ceil( d / binSize );
+		final int bin = (int) Math.ceil( d / binSize );
 		return bin * binSize;
 	}
 

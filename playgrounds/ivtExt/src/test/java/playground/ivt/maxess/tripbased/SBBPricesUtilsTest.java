@@ -31,11 +31,10 @@ public class SBBPricesUtilsTest {
 	private static final Logger log = Logger.getLogger( SBBPricesUtilsTest.class );
 
 	private static final double TOLERANCE_SECOND = 1E-9;
-	// this is really strange, but I cannot get the prices for first class right.
-	// I assume there might be something done by SBB that does not appear in the norm.
-	// difference is always at most twice the rounding interval (20 cents below 70 km, 1CHF above),
-	// which remains reasonable.
-	private static final double TOLERANCE_FIRST = 2;
+	// for second class, there is a double rounding. for one of the test distances (23km),
+	// this results in an error of one rounding factor (20 cents), probably due to floating point
+	// rounding error. Do not care.
+	private static final double TOLERANCE_FIRST = .2;
 	/**
 	 * Tests consistency with the price table p 70 of http://voev.ch/T600_f
 	 */
