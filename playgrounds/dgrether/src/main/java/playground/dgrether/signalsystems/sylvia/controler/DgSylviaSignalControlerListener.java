@@ -108,8 +108,7 @@ public class DgSylviaSignalControlerListener implements SignalsControllerListene
 	}
 	
 	public void writeData(Scenario sc, OutputDirectoryHierarchy controlerIO){
-		SignalsData data = (SignalsData) sc.getScenarioElement(SignalsData.ELEMENT_NAME);
-		new SignalsScenarioWriter(controlerIO).writeSignalsData(data);
+		new SignalsScenarioWriter(controlerIO).writeSignalsData(sc);
 	}
 	
 	

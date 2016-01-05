@@ -54,7 +54,7 @@ public class TtCreateAllDayGreenFromSignalControl {
 		// write all day green signal control
 		SignalsScenarioWriter writer = new SignalsScenarioWriter();
 		writer.setSignalControlOutputFilename(outputSignalControl);
-		writer.writeSignalsData(signals);
+		writer.writeSignalsData(readSignalControl);
 	}
 
 }
