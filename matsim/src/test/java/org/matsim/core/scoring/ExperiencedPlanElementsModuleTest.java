@@ -1,5 +1,6 @@
 package org.matsim.core.scoring;
 
+import com.google.common.eventbus.Subscribe;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.core.config.Config;
@@ -26,10 +27,18 @@ public class ExperiencedPlanElementsModuleTest {
 				new CharyparNagelScoringFunctionModule(),
 				new ScenarioByInstanceModule(ScenarioUtils.createScenario(config)),
 				new ReplayEvents.Module());
+		injector.getInstance(ExperiencedPlanElementsService.class).register(new ThrowingSubscriber());
 		ReplayEvents instance = injector.getInstance(ReplayEvents.class);
-		instance.playEventsFile(matsimTestUtils.getClassInputDirectory()+"/events.xml");
-
+		instance.playEventsFile(matsimTestUtils.getClassInputDirectory() + "/events.xml");
 	}
 
+
+	private static class ThrowingSubscriber {
+		@Subscribe
+		public void throwException(PersonExperiencedActivity activity) {
+			System.out.println(activity);
+			throw new RuntimeException("Wurst");
+		}
+	}
 
 }
