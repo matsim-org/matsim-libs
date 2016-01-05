@@ -72,7 +72,7 @@ public class SignalSystemsIntegrationTest {
 		config.controler().setCreateGraphs(false);
 		
 		config.qsim().setStartTime(1.5*3600);
-		config.qsim().setEndTime(5*3600);
+		config.qsim().setEndTime(5.5*3600);
 		
 		// ---
 		
@@ -119,6 +119,7 @@ public class SignalSystemsIntegrationTest {
 			Scenario expectedPopulation = ScenarioUtils.createScenario(c.getConfig());
 			new MatsimNetworkReader(expectedPopulation).readFile(c.getConfig().network().getInputFile());
 			new MatsimPopulationReader(expectedPopulation).readFile(testUtils.getInputDirectory() + "10.plans.xml.gz");
+			
 			Scenario actualPopulation = ScenarioUtils.createScenario(c.getConfig());
 			new MatsimPopulationReader(actualPopulation).readFile(iterationOutput + "10.plans.xml.gz");
 			
