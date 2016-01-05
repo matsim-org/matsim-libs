@@ -23,10 +23,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -57,6 +59,16 @@ public final class GeometryUtils {
 
 	public static boolean isLinkInsideCity(Collection<SimpleFeature> features, Link link) {
 		Geometry geo = gf.createPoint(new Coordinate(link.getCoord().getX(), link.getCoord().getY()));
+		for(SimpleFeature sf : features){
+			if ( ((Geometry) sf.getDefaultGeometry()).contains(geo) ) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public static boolean isPointInsideCity(Collection<SimpleFeature> features, Point point) {
+		Geometry geo = gf.createPoint(new Coordinate(point.getX(), point.getY()));
 		for(SimpleFeature sf : features){
 			if ( ((Geometry) sf.getDefaultGeometry()).contains(geo) ) {
 				return true;
@@ -118,5 +130,11 @@ public final class GeometryUtils {
 			}
 		}
 		return geom;
+	}
+	
+	public static ReferencedEnvelope getBoundingBox(String shapeFile){
+		ShapeFileReader shapeFileReader = new ShapeFileReader();
+		shapeFileReader.readFileAndInitialize(shapeFile);
+		return shapeFileReader.getBounds();
 	}
 }

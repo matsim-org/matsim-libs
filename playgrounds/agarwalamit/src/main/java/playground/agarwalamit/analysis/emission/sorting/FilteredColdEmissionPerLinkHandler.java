@@ -39,18 +39,18 @@ import playground.benjamin.scenarios.munich.analysis.nectar.EmissionsPerLinkCold
  */
 
 public class FilteredColdEmissionPerLinkHandler implements ColdEmissionEventHandler{
-	private EmissionsPerLinkColdEventHandler delegate;
-	private Collection<SimpleFeature> features ;
+	private final EmissionsPerLinkColdEventHandler delegate;
+	private final Collection<SimpleFeature> features ;
 	private Network network;
-	private boolean isSorting;
+	private final boolean isSorting;
 
-	public FilteredColdEmissionPerLinkHandler(double simulationEndTime, int noOfTimeBins) {
+	public FilteredColdEmissionPerLinkHandler(final double simulationEndTime, final int noOfTimeBins) {
 		delegate = new EmissionsPerLinkColdEventHandler(simulationEndTime, noOfTimeBins);
 		features = new ArrayList<>();
 		isSorting = false;
 	}
 
-	public FilteredColdEmissionPerLinkHandler(double simulationEndTime, int noOfTimeBins,String shapeFile, Network network) {
+	public FilteredColdEmissionPerLinkHandler(final double simulationEndTime, final int noOfTimeBins, final String shapeFile, final Network network) {
 		delegate = new EmissionsPerLinkColdEventHandler(simulationEndTime, noOfTimeBins);
 		features = new ShapeFileReader().readFileAndInitialize(shapeFile);
 		this.network = network;

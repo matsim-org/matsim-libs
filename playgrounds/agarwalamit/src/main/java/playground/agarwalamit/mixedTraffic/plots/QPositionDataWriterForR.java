@@ -40,8 +40,7 @@ import playground.agarwalamit.utils.LoadMyScenarios;
  */
 public class QPositionDataWriterForR {
 
-	private static String outputDir ="../../../../repos/shared-svn/projects/mixedTraffic/triangularNetwork/"
-			+ "run313/xtPlots/withoutHoles/car/";
+	private static String outputDir ="../../../../repos/shared-svn/projects/mixedTraffic/triangularNetwork/run313/singleModes/withoutHoles/car_SW//";
 	private static final String suffix = "events[120]";
 	private static String eventFile = outputDir+"/events/"+suffix+".xml";
 	private static String networkFile=outputDir+"/network.xml";
@@ -51,7 +50,7 @@ public class QPositionDataWriterForR {
 	private Map<Id<Person>,SortedMap<Double,String>> person2startTime2data;
 	private Map<Id<Person>, SortedMap<Double, String>> person2StartTime2AccumulatedPos;
 	private Tuple<Id<Person>, Double> lastDepartedPerson = new Tuple<Id<Person>, Double>(null, 0.);
-	private final boolean isWritingDataAfterDepartureOfLastPerson = true;
+	private final boolean isWritingDataAfterDepartureOfLastPerson = false;
 	
 	private final static Logger LOG = Logger.getLogger(QPositionDataWriterForR.class);
 

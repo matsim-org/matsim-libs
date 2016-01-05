@@ -148,6 +148,8 @@ public class OccupancyAnalyzer implements LinkLeaveEventHandler,
 		this.registerExit(event.getLinkId(), (int) event.getTime());
 	}
 
+	// -------------------- MAIN-FUNCTION, ONLY FOR TESTING --------------------
+
 	// TODO make this a unit test
 	public static void main(String[] args) {
 

@@ -34,21 +34,19 @@ import playground.vsp.analysis.modules.emissionsAnalyzer.EmissionsAnalyzer;
  * @author amit
  */
 public class AbsoluteEmissions {
+	private final String outputDir;
 
-	private String outputDir;
-
-	public AbsoluteEmissions(String outputDir) {
+	public AbsoluteEmissions(final String outputDir) {
 		this.outputDir = outputDir;
 	}
 
 	public static void main(String[] args) {
 		String clusterPathDesktop = "/Users/amit/Documents/repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run9/";
 		String [] runCases =  {"baseCaseCtd","ei","ci","eci","ei_10"};
-		
 		new AbsoluteEmissions(clusterPathDesktop).runAndWrite(runCases);
 	}
 
-	public void runAndWrite(String [] runCases){
+	public void runAndWrite(final String [] runCases){
 		BufferedWriter writer = IOUtils.getBufferedWriter(outputDir+"/analysis/absoluteEmissions.txt");
 
 		SortedMap<String, SortedMap<String, Double>> emissions = new TreeMap<>();
@@ -82,7 +80,7 @@ public class AbsoluteEmissions {
 		}
 	}
 	
-	public double getEmissionCost(SortedMap<String, Double> em){
+	public double getEmissionCost(final SortedMap<String, Double> em){
 		double cost = 0;
 		for (EmissionCostFactors ecf : EmissionCostFactors.values()){
 			cost += em.get(ecf.toString()) * ecf.getCostFactor();
@@ -90,7 +88,7 @@ public class AbsoluteEmissions {
 		return cost;
 	}
 	
-	private SortedMap<String,Double> calculateTotalEmissions (String runCase){
+	private SortedMap<String,Double> calculateTotalEmissions (final String runCase){
 		String configFile = outputDir+runCase+"/output_config.xml";
 		int lastIt = LoadMyScenarios.getLastIteration(configFile);
 		String emissionEventFile = outputDir+runCase+"/ITERS/it."+lastIt+"/"+lastIt+".emission.events.xml.gz";	

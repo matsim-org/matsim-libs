@@ -37,8 +37,8 @@ import org.matsim.api.core.v01.population.Person;
  */
 public class LegModeDepartureArrivalTimeHandler implements PersonDepartureEventHandler, PersonArrivalEventHandler {
 
-	private Map<String, Map<Id<Person>, List<Double>>> mode2PersonId2ArrivalTime = new HashMap<>();
-	private Map<String, Map<Id<Person>, List<Double>>> mode2PersonId2DepartureTime = new HashMap<>();
+	private final Map<String, Map<Id<Person>, List<Double>>> mode2PersonId2ArrivalTime = new HashMap<>();
+	private final Map<String, Map<Id<Person>, List<Double>>> mode2PersonId2DepartureTime = new HashMap<>();
 
 	@Override
 	public void reset(int iteration) {

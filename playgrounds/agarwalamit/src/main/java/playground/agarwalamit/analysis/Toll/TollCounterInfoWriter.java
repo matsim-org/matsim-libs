@@ -43,31 +43,21 @@ import playground.vsp.analysis.modules.AbstractAnalysisModule;
  */
 
 public class TollCounterInfoWriter extends AbstractAnalysisModule {
-
-	public TollCounterInfoWriter(String eventsFile, Scenario sc, int noOfTimeBins, boolean isSortingForMunich) {
-		super(TollCounterInfoWriter.class.getSimpleName());
-		this.eventsFile = eventsFile;
-		this.sc = sc;
-		this.noOfTimeBins = noOfTimeBins;
-		this.isSortingForMunich = isSortingForMunich;
-		if(isSortingForMunich) pf = new ExtendedPersonFilter(isSortingForMunich);
-		else pf = new ExtendedPersonFilter();
-	}
-
-	private String eventsFile;
-	private Scenario sc;
-	private int noOfTimeBins;
-	private boolean isSortingForMunich;
-	private CausedDelayAnalyzer cda;
-	private ExtendedPersonFilter pf ;
+	private final CausedDelayAnalyzer cda;
+	private final ExtendedPersonFilter pf ;
 	private final String suffixForSoring = "_sorted";
 
-	private SortedMap<Double, SortedMap<UserGroup, Integer>> userGroup2TollPayers = new TreeMap<Double, SortedMap<UserGroup,Integer>>();
-	private SortedMap<Double,SortedMap<UserGroup, Integer>> userGroup2TolledTrips = new TreeMap<Double, SortedMap<UserGroup,Integer>>();
-	private SortedMap<Double,Integer> timeBin2TolledLinks = new TreeMap<Double,Integer>();
+	private final SortedMap<Double, SortedMap<UserGroup, Integer>> userGroup2TollPayers = new TreeMap<Double, SortedMap<UserGroup,Integer>>();
+	private final SortedMap<Double,SortedMap<UserGroup, Integer>> userGroup2TolledTrips = new TreeMap<Double, SortedMap<UserGroup,Integer>>();
+	private final SortedMap<Double,Integer> timeBin2TolledLinks = new TreeMap<Double,Integer>();
+	
+	public TollCounterInfoWriter(final String eventsFile, final Scenario sc, final int noOfTimeBins, final boolean isSortingForMunich) {
+		super(TollCounterInfoWriter.class.getSimpleName());
+		pf = new ExtendedPersonFilter(isSortingForMunich);
+		this.cda = new CausedDelayAnalyzer(eventsFile, sc, noOfTimeBins, isSortingForMunich);
+	}
 
 	public static void main(String[] args) {
-		
 		String congestionImpl = "implV4";
 		String outDir = "../../../repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run12/policies/"+congestionImpl+"/";
 		String eventsFile = outDir+"/ITERS/it.1500/1500.events.xml.gz";
@@ -76,9 +66,7 @@ public class TollCounterInfoWriter extends AbstractAnalysisModule {
 		tcia.preProcessData();
 		tcia.postProcessData();
 		tcia.writeResults(outDir+"/analysis/");
-		
 	}
-	
 	
 	@Override
 	public List<EventHandler> getEventHandler() {
@@ -87,7 +75,6 @@ public class TollCounterInfoWriter extends AbstractAnalysisModule {
 
 	@Override
 	public void preProcessData() {
-		this.cda = new CausedDelayAnalyzer(this.eventsFile, this.sc, this.noOfTimeBins,this.isSortingForMunich);
 		this.cda.run();
 	}
 
@@ -168,5 +155,4 @@ public class TollCounterInfoWriter extends AbstractAnalysisModule {
 					+ e);
 		}
 	}
-
 }

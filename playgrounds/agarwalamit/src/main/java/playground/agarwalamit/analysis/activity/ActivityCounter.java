@@ -39,27 +39,38 @@ import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
  */
 
 public class ActivityCounter {
+	private static final ExtendedPersonFilter PF = new ExtendedPersonFilter();
+	private final String inputPlansFile ;
+	private final UserGroup ug;
+	private final SortedMap<String, Integer> actTyp2Count = new TreeMap<String, Integer>();
+	private final boolean isSorting;
 
-	private final ExtendedPersonFilter pf = new ExtendedPersonFilter();
+	public ActivityCounter(final String inputPlansFile, final UserGroup ug){
+		this.inputPlansFile = inputPlansFile;
+		this.ug = ug;
+		this.isSorting = true;
+	}
+
+	public ActivityCounter(final String inputPlansFile){
+		this.inputPlansFile = inputPlansFile;
+		this.isSorting = false;
+		this.ug = null;
+	}
 
 	public static void main(String[] args) {
 		String outputFilesDir = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run0/baseCaseCtd/";		
-		new ActivityCounter().run(outputFilesDir, UserGroup.URBAN);
+		ActivityCounter ac = new ActivityCounter(outputFilesDir+"/output_plans.xml.gz",UserGroup.URBAN);
+		ac.count(outputFilesDir);
+		ac.writeData(outputFilesDir+"/analysis/");
 	}
 
-	private void run(String filesDir, UserGroup ug) {
-		String outputPlans = filesDir+"/output_plans.xml.gz";
-		Scenario sc = LoadMyScenarios.loadScenarioFromPlans(outputPlans);
+	public void count(final String filesDir) {
+		Scenario sc = LoadMyScenarios.loadScenarioFromPlans(this.inputPlansFile);
 
-		SortedMap<String, Integer> actTyp2Count = new TreeMap<String, Integer>();
-		
 		for(Person p : sc.getPopulation().getPersons().values()){
-			if( pf.isPersonIdFromUserGroup(p.getId(), ug) ){
-
+			if( isSorting && PF.isPersonIdFromUserGroup(p.getId(), ug) ){
 				List<PlanElement> pes = p.getSelectedPlan().getPlanElements();
-
 				for (PlanElement pe : pes){
-					
 					if(pe instanceof Activity){
 						String actTyp = ((Activity) pe).getType();
 						if(actTyp2Count.containsKey(actTyp)){
@@ -68,14 +79,13 @@ public class ActivityCounter {
 							actTyp2Count.put(actTyp, 1);
 						}
 					}
-					
 				}
-				
 			}
-			
 		}
-		
-		BufferedWriter writer = IOUtils.getBufferedWriter(filesDir+"/analysis/actTyp2Count.txt");
+	}
+
+	public void writeData(final String outputFolder){
+		BufferedWriter writer = IOUtils.getBufferedWriter(outputFolder+"/actTyp2Count.txt");
 		try {
 			writer.write("actType \t count \n");
 			int sum = 0;
@@ -89,7 +99,4 @@ public class ActivityCounter {
 			throw new RuntimeException("Data is not written. Reason "+e);
 		}
 	}
-
 }
-
-

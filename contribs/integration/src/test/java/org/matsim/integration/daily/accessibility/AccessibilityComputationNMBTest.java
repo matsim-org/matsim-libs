@@ -41,6 +41,7 @@ public class AccessibilityComputationNMBTest {
 //	private static final double cellSize = 1000.;
 //	private static final Double cellSize = 10000.;
 	private static final Double cellSize = 1000.;
+	private static final double time = 8.*60*60;
 
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
 
@@ -48,8 +49,8 @@ public class AccessibilityComputationNMBTest {
 	@Test
 	public void doAccessibilityTest() throws IOException {
 //		public static void main( String[] args ) {
-//		String folderStructure = "../../../"; // local on dz's computer
-		String folderStructure = "../../"; // server
+		String folderStructure = "../../../"; // local on dz's computer
+//		String folderStructure = "../../"; // server
 			
 		String networkFile = "matsimExamples/countries/za/nmb/network/NMBM_Network_CleanV7.xml.gz";
 
@@ -179,10 +180,10 @@ public class AccessibilityComputationNMBTest {
 		
 		// loop over activity types to add one GridBasedAccessibilityControlerListenerV3 for each combination
 		for ( String actType : activityTypes ) {
-//			if ( !actType.equals("w") ) {
-//				log.error("skipping everything except work for debugging purposes; remove in production code. kai, feb'14") ;
-//				continue ;
-//			}
+			if ( !actType.equals("s") ) {
+				log.error("skipping everything except work for debugging purposes; remove in production code. kai, feb'14") ;
+				continue ;
+			}
 
 			ActivityFacilities opportunities = AccessibilityRunUtils.collectActivityFacilitiesOfType(scenario, actType);
 
@@ -198,7 +199,9 @@ public class AccessibilityComputationNMBTest {
 			listener.setComputingAccessibilityForMode(Modes4Accessibility.walk, true);
 			listener.setComputingAccessibilityForMode(Modes4Accessibility.bike, true);
 //			listener.setComputingAccessibilityForMode(Modes4Accessibility.pt, true);
-			// yyyy replace by "set .... ModeS( modes ) " 
+			// yyyy replace by "set .... ModeS( modes ) "
+			
+			listener.setTime(time);
 			
 			listener.addAdditionalFacilityData(homes) ;
 			listener.generateGridsAndMeasuringPointsByNetwork(cellSize);
@@ -226,10 +229,10 @@ public class AccessibilityComputationNMBTest {
 				String actSpecificWorkingDirectory = workingDirectory + actType + "/";
 
 				for ( Modes4Accessibility mode : Modes4Accessibility.values()) {
-//					if ( !actType.equals("w") ) {
-//						log.error("skipping everything except work for debugging purposes; remove in production code. kai, feb'14") ;
-//						continue ;
-//					}
+					if ( !actType.equals("s") ) {
+						log.error("skipping everything except work for debugging purposes; remove in production code. kai, feb'14") ;
+						continue ;
+					}
 					VisualizationUtils.createQGisOutput(actType, mode, mapViewExtent, workingDirectory, crs, includeDensityLayer,
 							lowerBound, upperBound, range, symbolSize, populationThreshold);
 					VisualizationUtils.createSnapshot(actSpecificWorkingDirectory, mode, osName);

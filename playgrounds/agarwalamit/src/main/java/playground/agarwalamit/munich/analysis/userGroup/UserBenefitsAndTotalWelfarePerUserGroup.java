@@ -179,7 +179,7 @@ public class UserBenefitsAndTotalWelfarePerUserGroup {
 
 		userBenefitsAnalyzer.writeResults(this.outputDir+runCase+"/analysis/");
 
-		this.personId2UserWelfare_utils = userBenefitsAnalyzer.getPersonId2UserWelfare_utils();
+		this.personId2UserWelfare_utils = userBenefitsAnalyzer.getPersonId2UserWelfareUtils();
 		this.personId2MonetarizedUserWelfare = userBenefitsAnalyzer.getPersonId2MonetarizedUserWelfare();
 	}
 

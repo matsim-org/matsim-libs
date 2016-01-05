@@ -45,20 +45,16 @@ import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
  */
 public class ExperiencedDelayAnalyzer extends AbstractAnalysisModule {
 	
-	private final Logger logger = Logger.getLogger(ExperiencedDelayAnalyzer.class);
+	private final static Logger LOGGER = Logger.getLogger(ExperiencedDelayAnalyzer.class);
 	private final String eventsFile;
-	private ExperiencedDelayHandler congestionHandler;
-	private EventsManager eventsManager;
-	private Scenario scenario;
+	private final ExperiencedDelayHandler congestionHandler;
+	private final Scenario scenario;
 
-	public ExperiencedDelayAnalyzer(String eventFile, Scenario scenario, int noOfTimeBins) {
-		super(ExperiencedDelayAnalyzer.class.getSimpleName());
-		this.scenario = scenario;
-		this.eventsFile = eventFile;
-		this.congestionHandler = new ExperiencedDelayHandler(this.scenario, noOfTimeBins);
+	public ExperiencedDelayAnalyzer(final String eventFile, final Scenario scenario, final int noOfTimeBins) {
+		this(eventFile, scenario, noOfTimeBins, false);
 	}
 	
-	public ExperiencedDelayAnalyzer(String eventFile, Scenario scenario, int noOfTimeBins, boolean isSortingForInsideMunich) {
+	public ExperiencedDelayAnalyzer(final String eventFile, final Scenario scenario, final int noOfTimeBins, final boolean isSortingForInsideMunich) {
 		super(ExperiencedDelayAnalyzer.class.getSimpleName());
 		this.eventsFile = eventFile;
 		this.scenario = scenario;
@@ -73,15 +69,14 @@ public class ExperiencedDelayAnalyzer extends AbstractAnalysisModule {
 	
 	@Override
 	public List<EventHandler> getEventHandler() {
-		List<EventHandler> handler = new LinkedList<EventHandler>();
-		return handler;
+		return new LinkedList<EventHandler>();
 	}
 
 	@Override
 	public void preProcessData() {
-		this.eventsManager = EventsUtils.createEventsManager();
-		MatsimEventsReader eventsReader = new MatsimEventsReader(this.eventsManager);
-		this.eventsManager.addHandler(this.congestionHandler);
+		EventsManager eventsManager = EventsUtils.createEventsManager();
+		MatsimEventsReader eventsReader = new MatsimEventsReader(eventsManager);
+		eventsManager.addHandler(this.congestionHandler);
 		eventsReader.readFile(this.eventsFile);
 	}
 
@@ -91,7 +86,7 @@ public class ExperiencedDelayAnalyzer extends AbstractAnalysisModule {
 
 	@Override
 	public void writeResults(String outputFolder) {
-		logger.error("Not implemented yet.");
+		LOGGER.error("Not implemented yet.");
 	}
 
 	public double getTotalDelaysInHours (){

@@ -35,12 +35,12 @@ import org.matsim.vehicles.Vehicle;
  */
 public class LinkVolumeHandler implements LinkLeaveEventHandler {
 
-	private final Logger logger = Logger.getLogger(LinkVolumeHandler.class);
-	private Map<Id<Link>, Map<Integer,Double>> linkId2Time2Volume = new HashMap<Id<Link>, Map<Integer,Double>>();
-	private Map<Id<Link>, Map<Integer,List<Id<Vehicle>>>> linkId2Time2Persons = new HashMap<Id<Link>, Map<Integer,List<Id<Vehicle>>>>();
+	private static final Logger LOG = Logger.getLogger(LinkVolumeHandler.class);
+	private final Map<Id<Link>, Map<Integer,Double>> linkId2Time2Volume = new HashMap<Id<Link>, Map<Integer,Double>>();
+	private final Map<Id<Link>, Map<Integer,List<Id<Vehicle>>>> linkId2Time2Persons = new HashMap<Id<Link>, Map<Integer,List<Id<Vehicle>>>>();
 
 	public LinkVolumeHandler () {
-		this.logger.info("Starting volume count on links.");
+		LOG.info("Starting volume count on links.");
 		reset(0);
 	}
 	@Override
@@ -49,7 +49,7 @@ public class LinkVolumeHandler implements LinkLeaveEventHandler {
 		this.linkId2Time2Persons.clear();
 	}
 
-	private int getSlot(double time){
+	private int getSlot(final double time){
 		return (int)time/3600;
 	}
 	@Override
@@ -70,7 +70,7 @@ public class LinkVolumeHandler implements LinkLeaveEventHandler {
 				vehicles = time2persons.get(slotInt);
 				vehicles.add(event.getVehicleId());
 				
-				double counter = (volsTime.get(slotInt));
+				double counter = volsTime.get(slotInt);
 				double newCounter = counter+1;
 				volsTime.put(slotInt, newCounter);
 				this.linkId2Time2Volume.put(linkId, volsTime);

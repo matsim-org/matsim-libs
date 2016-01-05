@@ -39,23 +39,24 @@ import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 import playground.vsp.analysis.modules.AbstractAnalysisModule;
 
 /**
- * 
  * @author amit
  */
 
 public class LegModeTimeOfDayDistribution extends AbstractAnalysisModule{
-
-	public LegModeTimeOfDayDistribution (UserGroup ug, String eventsFile, double simulationEndTime, int noOfTimeBins){
+	public static final Logger LOG = Logger.getLogger(LegModeTimeOfDayDistribution.class);
+	private final LegModeTimeOfDayHandler lmtdh;
+	private final String eventsFile ; 
+	private String outFilePrefix= "";
+	
+	public LegModeTimeOfDayDistribution (final UserGroup ug, final String eventsFile, final double simulationEndTime, final int noOfTimeBins){
 		super(LegModeTimeOfDayDistribution.class.getSimpleName());
 		this.lmtdh = new LegModeTimeOfDayHandler(simulationEndTime, noOfTimeBins, ug);
 		this.eventsFile = eventsFile;
-		this.outFilePrefix = ug.toString()+"_";
+		this.outFilePrefix = ug!=null ? ug.toString()+"_" : "";
 	}
 
-	public LegModeTimeOfDayDistribution (String eventsFile, double simulationEndTime, int noOfTimeBins){
-		super(LegModeTimeOfDayDistribution.class.getSimpleName());
-		this.lmtdh = new LegModeTimeOfDayHandler(simulationEndTime, noOfTimeBins);
-		this.eventsFile = eventsFile;
+	public LegModeTimeOfDayDistribution (final String eventsFile, final double simulationEndTime, final int noOfTimeBins){
+		this(null, eventsFile, simulationEndTime, noOfTimeBins);
 	}
 
 	public static void main(String[] args) {
@@ -66,10 +67,6 @@ public class LegModeTimeOfDayDistribution extends AbstractAnalysisModule{
 		lmtdd.postProcessData();
 		lmtdd.writeResults(outDir+"/analysis/");
 	}
-
-	private LegModeTimeOfDayHandler lmtdh;
-	private String eventsFile ; 
-	private String outFilePrefix= "";
 
 	@Override
 	public List<EventHandler> getEventHandler() {
@@ -106,7 +103,6 @@ public class LegModeTimeOfDayDistribution extends AbstractAnalysisModule{
 		} catch (Exception e) {
 			throw new RuntimeException("Data is not written to the file. Reason "+e);
 		}
-
 	}
 
 	public SortedMap<Double, SortedMap<String, Integer>> getLegModeToTimeOfDayCount (){
@@ -126,23 +122,18 @@ public class LegModeTimeOfDayDistribution extends AbstractAnalysisModule{
 	}
 
 	public class LegModeTimeOfDayHandler implements PersonDepartureEventHandler {
-
-		private final Logger log = Logger.getLogger(LegModeTimeOfDayDistribution.class);
-
 		private final double timeBinSize;
 		private final ExtendedPersonFilter pf = new ExtendedPersonFilter();
 		private final SortedMap<Double, SortedMap<String, Integer>> timeBin2Mode2Count = new TreeMap<Double, SortedMap<String,Integer>>();
 		private final UserGroup ug;
 		private final List<String> modes = new ArrayList<String>();
 
-		private LegModeTimeOfDayHandler(double simulationEndTime, int noOfTimeBins) {
-			log.info("The output will contain data from whole population.");
-			this.timeBinSize = simulationEndTime/noOfTimeBins;
-			this.ug  = null;
+		private LegModeTimeOfDayHandler(final double simulationEndTime, final int noOfTimeBins) {
+			this(simulationEndTime, noOfTimeBins, null);
 		}
 
-		private LegModeTimeOfDayHandler(double simulationEndTime, int noOfTimeBins, UserGroup ug) {
-			log.info("The output will contain data only from the user group "+ug);
+		private LegModeTimeOfDayHandler(final double simulationEndTime, final int noOfTimeBins, final UserGroup ug) {
+			LOG.info("The output will contain data only from the user group "+ug);
 			this.timeBinSize = simulationEndTime/noOfTimeBins;
 			this.ug = ug;
 		}
@@ -181,5 +172,3 @@ public class LegModeTimeOfDayDistribution extends AbstractAnalysisModule{
 		}
 	}
 }
-
-

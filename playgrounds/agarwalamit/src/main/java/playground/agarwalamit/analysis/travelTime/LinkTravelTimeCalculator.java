@@ -42,15 +42,14 @@ import playground.vsp.analysis.modules.AbstractAnalysisModule;
  */
 
 public class LinkTravelTimeCalculator extends AbstractAnalysisModule {
+	private final String eventsFile;
+	private LinkTravelTimeHandler ltth ;
 
-	public LinkTravelTimeCalculator(String eventsFile){
+	public LinkTravelTimeCalculator(final String eventsFile){
 		super(LinkTravelTimeCalculator.class.getSimpleName());
 		this.eventsFile = eventsFile;
 	}
-
-	private String eventsFile;
-	private LinkTravelTimeHandler ltth ;
-
+	
 	@Override
 	public List<EventHandler> getEventHandler() {
 		return null;
@@ -80,8 +79,8 @@ public class LinkTravelTimeCalculator extends AbstractAnalysisModule {
 	}
 
 	public class LinkTravelTimeHandler implements LinkEnterEventHandler, LinkLeaveEventHandler {
-		private Map<Id<Link>,Map<Id<Person>,Double>> link2PersonEnterTime = new HashMap<>();
-		private Map<Id<Link>,Map<Id<Person>,List<Double>>> link2PersonTravelTime = new HashMap<>();
+		private final  Map<Id<Link>,Map<Id<Person>,Double>> link2PersonEnterTime = new HashMap<>();
+		private final Map<Id<Link>,Map<Id<Person>,List<Double>>> link2PersonTravelTime = new HashMap<>();
 
 		@Override
 		public void reset(int iteration) {

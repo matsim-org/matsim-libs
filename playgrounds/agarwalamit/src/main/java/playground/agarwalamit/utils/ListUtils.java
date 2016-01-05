@@ -41,6 +41,7 @@ public final class ListUtils {
 	}
 	
 	public static int intMean(final List<Integer> intList){
+		if(intList.isEmpty()) return 0;
 		int sum =ListUtils.intSum(intList);
 		return sum/intList.size();
 	}
@@ -56,6 +57,7 @@ public final class ListUtils {
 	}
 
 	public static double doubleMean(final List<Double> doubleList){
+		if(doubleList.isEmpty()) return 0.;
 		double sum = ListUtils.doubleSum(doubleList);
 		return sum/doubleList.size();
 	}

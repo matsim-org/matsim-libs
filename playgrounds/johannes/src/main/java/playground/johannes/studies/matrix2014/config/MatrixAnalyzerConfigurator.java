@@ -39,6 +39,8 @@ public class MatrixAnalyzerConfigurator implements DataLoader {
 
     public static final String MATRIX_FILE = "file";
 
+    public static final String THRESHOLD = "volumeThreshold";
+
     private final ConfigGroup config;
 
     private final DataPool dataPool;
@@ -56,22 +58,22 @@ public class MatrixAnalyzerConfigurator implements DataLoader {
         String zoneLayerName = config.getValue(ZONE_LAYER_NAME);
 
         FacilityData facilityData = (FacilityData) dataPool.get(FacilityDataLoader.KEY);
-        ZoneData zoneData = (ZoneData)dataPool.get(ZoneDataLoader.KEY);
+        ZoneData zoneData = (ZoneData) dataPool.get(ZoneDataLoader.KEY);
         ZoneCollection zones = zoneData.getLayer(zoneLayerName);
 
-        //Map<String, NumericMatrix> referenceMatrices = new HashMap<>();
-        //Collection<? extends ConfigGroup> modules = config.getParameterSets(PARAM_SET_KEY);
-        //for(ConfigGroup paramset : modules) {
-            String name = config.getValue(MATRIX_NAME);
-            String path = config.getValue(MATRIX_FILE);
-
-            //referenceMatrices.put(name, NumericMatrixIO.read(path));
-        //}
+        String name = config.getValue(MATRIX_NAME);
+        String path = config.getValue(MATRIX_FILE);
+        String strThreshold = config.getValue(THRESHOLD);
+        double threshold = 0;
+        if(strThreshold != null)
+         threshold = Double.parseDouble(strThreshold);
 
         NumericMatrix m = NumericMatrixIO.read(path);
 
         MatrixAnalyzer analyzer = new MatrixAnalyzer(facilityData.getAll(), zones, m, name);
         analyzer.setFileIOContext(ioContext);
+        analyzer.setVolumeThreshold(threshold);
+
         return analyzer;
     }
 }

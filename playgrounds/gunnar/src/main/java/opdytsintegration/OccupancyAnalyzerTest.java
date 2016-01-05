@@ -15,6 +15,8 @@ public class OccupancyAnalyzerTest {
 
 	private static void smallTest() {
 
+		System.out.println("STARTED SMALL TEST");
+		
 		final int startTime_s = 0;
 		final int binSize_s = 10;
 		final int binCnt = 5;
@@ -79,11 +81,13 @@ public class OccupancyAnalyzerTest {
 					+ (startTime_s + (bin + 1) * binSize_s) + "): "
 					+ analyzer.getOccupancy_veh(id1, bin));
 		}
+		
+		System.out.println("DONE");
 	}
 
 	private static void largeTest() {
 
-		System.out.println("STARTED");
+		System.out.println("STARTED LARGE TEST");
 
 		final int startTime_s = 0;
 		final int binSize_s = 3600;

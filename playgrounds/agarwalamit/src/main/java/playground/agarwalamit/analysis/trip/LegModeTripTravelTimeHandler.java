@@ -46,13 +46,13 @@ import org.matsim.core.gbl.Gbl;
 
 public class LegModeTripTravelTimeHandler implements PersonDepartureEventHandler, PersonArrivalEventHandler, PersonStuckEventHandler {
 
-	private final Logger logger = Logger.getLogger(LegModeTripTravelTimeHandler.class);
-	private SortedMap<String, Map<Id<Person>, List<Double>>> mode2PersonId2TravelTimes;
-	private Map<Id<Person>, Double> personId2DepartureTime;
-	private final int maxStuckAndAbortWarnCount=5;
+	private static final Logger LOGGER = Logger.getLogger(LegModeTripTravelTimeHandler.class);
+	private static final int MAX_STUCK_AND_ABORT_WARNINGS = 5;
+	private final SortedMap<String, Map<Id<Person>, List<Double>>> mode2PersonId2TravelTimes;
+	private final Map<Id<Person>, Double> personId2DepartureTime;
 	private int warnCount = 0;
-	private Set<Id<Person>> stuckPersons;
-	private SortedMap<String, Double> mode2NumberOfLegs ;
+	private final Set<Id<Person>> stuckPersons;
+	private final SortedMap<String, Double> mode2NumberOfLegs ;
 
 	public LegModeTripTravelTimeHandler() {
 		this.mode2PersonId2TravelTimes = new TreeMap<String, Map<Id<Person>,List<Double>>>();
@@ -145,10 +145,10 @@ public class LegModeTripTravelTimeHandler implements PersonDepartureEventHandler
 	public void handleEvent(PersonStuckEvent event) {
 		this.stuckPersons.add(event.getPersonId());
 		this.warnCount++;
-		if(this.warnCount<=this.maxStuckAndAbortWarnCount){
-		this.logger.warn("'StuckAndAbort' event is thrown for person "+event.getPersonId()+" on link "+event.getLinkId()+" at time "+event.getTime()+
+		if(this.warnCount <= MAX_STUCK_AND_ABORT_WARNINGS){
+		LOGGER.warn("'StuckAndAbort' event is thrown for person "+event.getPersonId()+" on link "+event.getLinkId()+" at time "+event.getTime()+
 				". \n Correctness of travel time for such persons can not be guaranteed.");
-		if(this.warnCount==this.maxStuckAndAbortWarnCount) this.logger.warn(Gbl.FUTURE_SUPPRESSED);
+		if(this.warnCount== MAX_STUCK_AND_ABORT_WARNINGS) LOGGER.warn(Gbl.FUTURE_SUPPRESSED);
 		}
 	}
 }

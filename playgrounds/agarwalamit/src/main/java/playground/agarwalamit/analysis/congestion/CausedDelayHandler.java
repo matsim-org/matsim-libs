@@ -41,26 +41,35 @@ import playground.vsp.congestion.handlers.CongestionEventHandler;
  */
 
 public class CausedDelayHandler implements CongestionEventHandler {
-
-	public CausedDelayHandler(Scenario scenario, int noOfTimeBin) {
-		double simulatioEndTime = scenario.getConfig().qsim().getEndTime();
-		this.timeBinSize = simulatioEndTime /noOfTimeBin;
-		this.network = scenario.getNetwork();
-		pf = new ExtendedPersonFilter();
-		initialize(noOfTimeBin, scenario);
+	
+	private boolean isSortingForInsideMunich;
+	private final double timeBinSize;
+	private final SortedMap<Double,Map<Id<Link>,Double>> timeBin2Link2DelayCaused = new TreeMap<Double, Map<Id<Link>,Double>>();
+	private final SortedMap<Double,Map<Id<Link>,Set<Id<Person>>>> timeBin2Link2Persons = new TreeMap<Double, Map<Id<Link>,Set<Id<Person>>>>();
+	private final SortedMap<Double,Map<Id<Person>,Double>> timeBin2Person2DelayCaused = new TreeMap<Double, Map<Id<Person>,Double>>();
+	
+	/**
+	 * Required to get timeBin2 userGroup2 tolledTrips
+	 */
+	private final SortedMap<Double,Set<Id<Person>>> timeBin2ListOfTollPayers = new TreeMap<>();
+	
+	private final Network network;
+	private final ExtendedPersonFilter pf;
+	
+	public CausedDelayHandler(final Scenario scenario, final int noOfTimeBin) {
+		this(scenario, noOfTimeBin, false);
 	}
 	
-	public CausedDelayHandler(Scenario scenario, int noOfTimeBin, boolean sortingForInsideMunich) {
+	public CausedDelayHandler(final Scenario scenario, final int noOfTimeBin, final boolean sortingForInsideMunich) {
 		double simulatioEndTime = scenario.getConfig().qsim().getEndTime();
 		this.timeBinSize = simulatioEndTime /noOfTimeBin;
 		this.network = scenario.getNetwork();
 		this.isSortingForInsideMunich = sortingForInsideMunich;
 		pf  = new ExtendedPersonFilter(isSortingForInsideMunich);
-		
 		initialize(noOfTimeBin, scenario);
 	}
 	
-	private void initialize(int noOfTimeBin, Scenario scenario) {
+	private void initialize(final int noOfTimeBin, final Scenario scenario) {
 		for (int i=0;i<noOfTimeBin;i++){
 			this.timeBin2Link2DelayCaused.put(this.timeBinSize*(i+1), new HashMap<Id<Link>,Double>());
 			this.timeBin2Person2DelayCaused.put(this.timeBinSize*(i+1), new HashMap<Id<Person>,Double>());
@@ -80,20 +89,6 @@ public class CausedDelayHandler implements CongestionEventHandler {
 			}
 		}
 	}
-
-	private boolean isSortingForInsideMunich = false;
-	private final double timeBinSize;
-	private SortedMap<Double,Map<Id<Link>,Double>> timeBin2Link2DelayCaused = new TreeMap<Double, Map<Id<Link>,Double>>();
-	private SortedMap<Double,Map<Id<Link>,Set<Id<Person>>>> timeBin2Link2Persons = new TreeMap<Double, Map<Id<Link>,Set<Id<Person>>>>();
-	private SortedMap<Double,Map<Id<Person>,Double>> timeBin2Person2DelayCaused = new TreeMap<Double, Map<Id<Person>,Double>>();
-	
-	/**
-	 * Required to get timeBin2 userGroup2 tolledTrips
-	 */
-	private SortedMap<Double,Set<Id<Person>>> timeBin2ListOfTollPayers = new TreeMap<>();
-	
-	private Network network;
-	private final ExtendedPersonFilter pf;
 	
 	@Override
 	public void reset(int iteration) {
@@ -115,7 +110,7 @@ public class CausedDelayHandler implements CongestionEventHandler {
 		Id<Link> linkId = event.getLinkId();
 		
 		Coord linkCoord = this.network.getLinks().get(linkId).getCoord();
-		if(isSortingForInsideMunich && (!pf.isCellInsideMunichCityArea(linkCoord))) return;
+		if(isSortingForInsideMunich && !pf.isCellInsideMunichCityArea(linkCoord) ) return;
 		
 		Id<Person> causingAgentId = event.getCausingAgentId();
 

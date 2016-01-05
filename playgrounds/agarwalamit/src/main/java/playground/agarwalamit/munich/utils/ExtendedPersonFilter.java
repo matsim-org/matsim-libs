@@ -31,6 +31,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 
+import playground.agarwalamit.analysis.spatial.SpatialDataInputs;
 import playground.benjamin.scenarios.munich.analysis.filter.PersonFilter;
 import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 
@@ -40,33 +41,37 @@ import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 
 public class ExtendedPersonFilter extends PersonFilter {
 
+	private final static String munichShapeFile  = "../../../repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
 	private PersonFilter pf = new PersonFilter();
 	private Collection<SimpleFeature> munichFeatures;
-	private String shapeFile ;
+	private boolean isSortingForShapeFile = false;
 
 	/**
 	 * Use this if do not want to load shape file.
 	 */
 	public ExtendedPersonFilter (){};
-	
+
 	/**
 	 * @param shapeFile person will be soreted based on this shape file. In general this should be a polygon shape.
 	 */
 	public ExtendedPersonFilter (String shapeFile){
-		this.shapeFile = shapeFile;
-		this.munichFeatures = ShapeFileReader.getAllFeatures(this.shapeFile);
+		this.isSortingForShapeFile = true;
+		this.munichFeatures = ShapeFileReader.getAllFeatures(shapeFile);
 	}
 
 	/**
 	 * @param isSortingForInsideMunich true if want to sort person for Munich city area.
 	 */
-	public ExtendedPersonFilter (boolean isSortingForInsideMunich){
-		this.shapeFile = "../../../repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
-		Logger.getLogger(ExtendedPersonFilter.class).info("Reading Munich city area shape file...");
-		this.munichFeatures = ShapeFileReader.getAllFeatures(this.shapeFile);
+	public ExtendedPersonFilter (final boolean isFilteringForInsideMunichCity){
+		if(isFilteringForInsideMunichCity) {
+			this.munichFeatures = ShapeFileReader.getAllFeatures(munichShapeFile);
+			this.isSortingForShapeFile = true;
+			Logger.getLogger(ExtendedPersonFilter.class).info("Reading Munich city area shape file...");
+		}
 	}
 
 	public boolean isCellInsideMunichCityArea(Coord cellCentroid) {
+		if(! this.isSortingForShapeFile) throw new RuntimeException("No shape file is assigned to check if the centroid falls inside it. Aborting ...");
 		boolean isInsideMunich = false;
 		GeometryFactory factory = new GeometryFactory();
 		Geometry geo = factory.createPoint(new Coordinate(cellCentroid.getX(), cellCentroid.getY()));
@@ -79,7 +84,7 @@ public class ExtendedPersonFilter extends PersonFilter {
 		return isInsideMunich;
 	}
 
-	public UserGroup getUserGroupFromPersonId (Id<Person> personId) {
+	public UserGroup getUserGroupFromPersonId (final Id<Person> personId) {
 		UserGroup outUG = UserGroup.URBAN;
 		for(UserGroup ug : UserGroup.values()){
 			if(pf.isPersonIdFromUserGroup(personId, ug)) {
@@ -89,20 +94,20 @@ public class ExtendedPersonFilter extends PersonFilter {
 		}
 		return outUG;
 	}
-	
+
 	/**
 	 * @param personId
 	 * @return Urban or (Rev) commuter or Freight from person id.
 	 */
-	public String getMyUserGroupFromPersonId(Id<Person> personId) {
+	public String getMyUserGroupFromPersonId(final Id<Person> personId) {
 		return getMyUserGroup(getUserGroupFromPersonId(personId));
 	}
-	
+
 	/**
 	 * @param ug
 	 * Helpful for writing data to files.
 	 */
-	public String getMyUserGroup(UserGroup ug){
+	public String getMyUserGroup(final UserGroup ug){
 		if(ug.equals(UserGroup.URBAN)) return "Urban";
 		else if(ug.equals(UserGroup.COMMUTER)) return "(Rev)commuter";
 		else if(ug.equals(UserGroup.REV_COMMUTER)) return "(Rev)commuter";
