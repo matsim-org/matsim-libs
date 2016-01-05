@@ -96,6 +96,7 @@ public class TestRunIVTBaselineCalibration {
 		// Set counts interval to 5:
 		config.setParam("counts", "writeCountsInterval", "5");
 		config.setParam("ptCounts", "ptCountsInterval", "5");
+		config.ptCounts().setCountsScaleFactor(10);
 		new ConfigWriter(config).write(pathToConfig);
 
 		String[] argsSim = {pathToConfig, pathToPTLinksToMonitor};

@@ -34,6 +34,7 @@ import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.config.Config;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.vehicles.Vehicle;
@@ -59,6 +60,8 @@ public class PTCountsEventHandler implements LinkEnterEventHandler, TransitDrive
 	private final Set<Id<Person>> transitDrivers = new HashSet<>();
 	private final Set<Id<Vehicle>> transitVehicles = new HashSet<>();
 	private final HashMap<String, Integer> ptCounts = new HashMap<>();
+	@Inject
+	public Config config;
 
 	private final Map<String, Tuple<String, Double>> linksToMonitor = new HashMap<>();
 
@@ -154,12 +157,12 @@ public class PTCountsEventHandler implements LinkEnterEventHandler, TransitDrive
 			writer.newLine();
 			// write content
 			for (String linkId : ptCounts.keySet()) {
-				int matsimVolume = ptCounts.get(linkId);
+				double matsimVolume = ptCounts.get(linkId)*config.ptCounts().getCountsScaleFactor();
 				double countVolume = linksToMonitor.get(linkId).getSecond();
 				double relError = matsimVolume/countVolume;
 				writer.write(linkId + "\t");
 				writer.write(linksToMonitor.get(linkId).getFirst() + "\t");
-				writer.write(Integer.toString(matsimVolume) + "\t");
+				writer.write(Long.toString((long)matsimVolume) + "\t");
 				writer.write(Long.toString((long)countVolume) + "\t");
 				writer.write(Double.toString(relError));
 				writer.newLine();
