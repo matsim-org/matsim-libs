@@ -18,12 +18,14 @@
  * *********************************************************************** */
 package playground.ivt.maxess.prepareforbiogeme.tripbased;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Leg;
 
 /**
  * @author thibautd
  */
 public class SBBPricesUtils {
+	private static final Logger log = Logger.getLogger( SBBPricesUtils.class );
 	public enum SBBClass {first, second;}
 
 	/**
@@ -34,12 +36,28 @@ public class SBBPricesUtils {
 			final SBBClass klasse,
 			final boolean halbTax,
 			final Trip trip ) {
-		final double distance = getDistance( trip );
-		final double roundedDistance_km = roundDistance( distance * 1000 );
+		return computeSBBTripPrice( klasse , halbTax , getDistance( trip ) );
+	}
+
+	public static double computeSBBTripPrice(
+			final SBBClass klasse,
+			final boolean halbTax,
+			final double distance_m ) {
+		if ( log.isTraceEnabled() ) log.trace( "start calculation" );
+		if ( log.isTraceEnabled() ) log.trace( "distance_m="+distance_m );
+		final double roundedDistance_km = roundDistance( distance_m / 1000 );
+
+		if ( log.isTraceEnabled() ) log.trace( "roundedDistance_km="+roundedDistance_km );
 
 		final double rate_km = getCostRate( roundedDistance_km );
 
+		if ( log.isTraceEnabled() ) log.trace( "rate_km="+rate_km );
+
+		if ( log.isTraceEnabled() ) log.trace( "unroundedPrice="+(roundedDistance_km * rate_km) );
+
 		final double basePrice = roundPrice( roundedDistance_km , roundedDistance_km * rate_km );
+
+		if ( log.isTraceEnabled() ) log.trace( "basePrice="+basePrice );
 
 		final double multiplicator = getMultiplicator( klasse , halbTax );
 		final double minimumPrice = getMinimumPrice( klasse , halbTax );
@@ -86,6 +104,7 @@ public class SBBPricesUtils {
 	}
 
 	private static double getCostRate( double distance ) {
+		//if ( true ) return 0.4342;
 		if ( distance <= 4 ) return 0.4451;
 		if ( distance <= 14 ) return 0.4230;
 		if ( distance <= 48 ) return 0.3564;
@@ -94,7 +113,7 @@ public class SBBPricesUtils {
 		if ( distance <= 250 ) return 0.2229;
 		if ( distance <= 300 ) return 0.2013;
 		if ( distance <= 480 ) return 0.1960;
-		return 19.36;
+		return 0.1936;
 	}
 
 	public static double getDistance( Trip trip ) {
