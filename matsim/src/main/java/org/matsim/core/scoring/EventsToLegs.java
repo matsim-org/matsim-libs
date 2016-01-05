@@ -182,7 +182,8 @@ TeleportationArrivalEventHandler, TransitDriverStartsEventHandler, PersonEntersV
 
 	@Override
     public void handleEvent(LinkEnterEvent event) {
-		List<Id<Link>> route = experiencedRoutes.get(delegate.getDriverOfVehicle(event.getVehicleId()));
+		Id<Person> driverOfVehicle = delegate.getDriverOfVehicle(event.getVehicleId());
+		List<Id<Link>> route = experiencedRoutes.get(driverOfVehicle);
 	    route.add(event.getLinkId());
     }
 
