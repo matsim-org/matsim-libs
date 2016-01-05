@@ -42,14 +42,18 @@ public class FixedSampleSizeDiscretizer {
 	 * remaining samples are sorted into the last bin. That is, the last bin is
 	 * the only bin that may contain more than <tt>size</tt> samples.
 	 * 
-	 * @param samples
+	 * @param values
 	 *            an array with samples.
 	 * @param size
 	 *            the number of samples per bin.
 	 * @return a new discretizer.
 	 */
-	public static FixedBordersDiscretizer create(double[] samples, int size) {
+	public static FixedBordersDiscretizer create(double[] values, int size) {
 		TDoubleArrayList borders;
+		/*
+		 Better make a copy of the array, otherwise the passed array is sorted without notice of the caller.
+		*/
+		double[] samples = Arrays.copyOf(values, values.length);
 		Arrays.sort(samples); // I think it is sufficient to get the min and max
 								// value.
 		TDoubleIntHashMap hist = new TDoubleIntHashMap(samples.length);
