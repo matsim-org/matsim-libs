@@ -86,11 +86,11 @@ public class MZ2010ExportChoiceSetRecordFiller  implements ChoiceDataSetWriter.C
 			values.put("A_" + name + "_TD_M", distance_m );
 
 			if ( name.endsWith( TransportMode.pt ) ) {
-				values.put("A_" + name + "_PRICE_FIRSTCLASS", SBBPricesUtils.computeSBBTripPrice( SBBPricesUtils.SBBClass.first , false , trip ));
-				values.put("A_" + name + "_PRICE_FIRSTCLASS_HT", SBBPricesUtils.computeSBBTripPrice( SBBPricesUtils.SBBClass.first , true , trip ));
+				values.put("A_" + name + "_PRICE_FIRSTCLASS", SBBPricesUtils.computeSBBTripPrice( SBBPricesUtils.SBBClass.first , false , distance_m ));
+				values.put("A_" + name + "_PRICE_FIRSTCLASS_HT", SBBPricesUtils.computeSBBTripPrice( SBBPricesUtils.SBBClass.first , true , distance_m ));
 
-				values.put("A_" + name + "_PRICE_SECONDCLASS", SBBPricesUtils.computeSBBTripPrice( SBBPricesUtils.SBBClass.second , false , trip ));
-				values.put("A_" + name + "_PRICE_SECONDCLASS_HT", SBBPricesUtils.computeSBBTripPrice( SBBPricesUtils.SBBClass.second , true , trip ));
+				values.put("A_" + name + "_PRICE_SECONDCLASS", SBBPricesUtils.computeSBBTripPrice( SBBPricesUtils.SBBClass.second , false , distance_m ));
+				values.put("A_" + name + "_PRICE_SECONDCLASS_HT", SBBPricesUtils.computeSBBTripPrice( SBBPricesUtils.SBBClass.second , true , distance_m ));
 			}
 
 			if ( name.endsWith( TransportMode.car ) ) {
