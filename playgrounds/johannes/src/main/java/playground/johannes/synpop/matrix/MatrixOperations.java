@@ -38,8 +38,8 @@ public class MatrixOperations {
                 Double refVal = reference.get(i, j);
                 Double compVal = compare.get(i, j);
 
-                if(refVal != null || compVal != null) {
-                    if (refVal == null) refVal = new Double(0);
+                if(refVal != null) { // a null ref value is not treated as zero!
+//                    if (refVal == null) refVal = new Double(0);
                     if (compVal == null) compVal = new Double(0);
 
                     if (refVal == 0 && compVal == 0)

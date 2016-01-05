@@ -24,7 +24,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.google.inject.Inject;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
@@ -33,16 +32,16 @@ import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
-import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
-import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
@@ -64,6 +63,8 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
+
+import com.google.inject.Inject;
 
 
 
@@ -197,9 +198,11 @@ TeleportationArrivalEventHandler, TransitDriverStartsEventHandler, PersonEntersV
 	    double travelTime = leg.getArrivalTime() - leg.getDepartureTime();
 	    leg.setTravelTime(travelTime);
 	    List<Id<Link>> experiencedRoute = experiencedRoutes.get(event.getPersonId());
-	    assert experiencedRoute.size() >= 1;
+	    assert experiencedRoute.size() >= 1  ;
 	    PendingTransitTravel pendingTransitTravel;
 	    if (experiencedRoute != null && experiencedRoute.size() > 1) {
+		    // yy first condition always fulfilled?  (since otherwise the above assert would fail)?? kai, jan'16
+		    
 	        NetworkRoute networkRoute = RouteUtils.createNetworkRoute(experiencedRoute, null);
 	        networkRoute.setTravelTime(travelTime);
 
@@ -210,6 +213,8 @@ TeleportationArrivalEventHandler, TransitDriverStartsEventHandler, PersonEntersV
 	        
 	        leg.setRoute(networkRoute);
 	    } else if ((pendingTransitTravel = transitTravels.remove(event.getPersonId())) != null) {
+		    // i.e. experiencedRoute.size()==0 && pending transit travel (= person has entered a vehicle)
+		    
 	    	LineAndRoute lineAndRoute = transitVehicle2currentRoute.get(pendingTransitTravel.vehicleId);
 			TransitLine line = transitSchedule.getTransitLines().get(lineAndRoute.transitLineId);
 			ExperimentalTransitRoute experimentalTransitRoute = new ExperimentalTransitRoute(
@@ -221,6 +226,8 @@ TeleportationArrivalEventHandler, TransitDriverStartsEventHandler, PersonEntersV
 			experimentalTransitRoute.setDistance(RouteUtils.calcDistance(experimentalTransitRoute, transitSchedule, network));
 			leg.setRoute(experimentalTransitRoute);
 	    } else {
+		    // i.e. experiencedRoute.size()==1 (since otherwise the above assert would fail--??) and no pendingTransitTravel
+		    
 	    	TeleportationArrivalEvent travelEvent = routelessTravels.remove(event.getPersonId());
 	    	Route genericRoute = new GenericRouteImpl(experiencedRoute.get(0), event.getLinkId());
 	    	genericRoute.setTravelTime(travelTime);

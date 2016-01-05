@@ -27,6 +27,8 @@ import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.vehicles.VehicleType;
@@ -99,6 +101,14 @@ class TravelModesFlowDynamicsUpdator {
 		}
 	}
 
+	public void handle(VehicleEntersTrafficEvent event) {
+		this.delegate.handleEvent(event);
+	}
+
+	public void handle(VehicleLeavesTrafficEvent event) {
+		this.delegate.handleEvent(event);
+	}
+	
 	void updateFlow900(double nowTime, double pcuPerson){
 		if (nowTime == this.flowTime.doubleValue()){//Still measuring the flow of the same second
 			Double nowFlow = this.flowTable900.get(0);

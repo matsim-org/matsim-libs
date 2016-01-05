@@ -41,13 +41,13 @@ import com.vividsolutions.jts.geom.Polygon;
 
 public class MatrixToPolygons {
 	
-	private final int xBins = 160;
-	private final int yBins = 120;
+	private final static int xBins = 160;
+	private final static int yBins = 120;
 	
-	private final double xMin=4452550.25;
-	private final double xMax=4479483.33;
-	private final double yMin=5324955.00;
-	private final double yMax=5345696.81;
+	private final static double xMin=4452550.25;
+	private final static double xMax=4479483.33;
+	private final static double yMin=5324955.00;
+	private final static double yMax=5345696.81;
 	
 	
 	private final double xWidth = (xMax - xMin)/xBins;

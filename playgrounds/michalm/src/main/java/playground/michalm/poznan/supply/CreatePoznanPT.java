@@ -23,7 +23,6 @@ public class CreatePoznanPT
     {
         Config config = ConfigUtils.createConfig();
         config.transit().setUseTransit(true);
-        config.scenario().setUseVehicles(true);
         Scenario scenario = ScenarioUtils.createScenario(config);
 
         final VisumNetwork vNetwork = new VisumNetwork();
@@ -104,7 +103,7 @@ public class CreatePoznanPT
 
     public static void main(String[] args)
     {
-        //String visumFile = "d:/Google Drive/Poznan/Visum_2014/network/network_ver.4.net";
+        //String visumFile = "d:/GoogleDrive/Poznan/Visum_2014/network/network_ver.4.net";
         //String visumFile = "d:/GoogleDrive/Poznan/Visum_2014/network/network_ver.5_(33N).net";
         String visumFile = "d:/GoogleDrive/Poznan/Visum_2014/network/A ZTM.net";
         String outDir = "d:/PP-rad/poznan/test/";

@@ -50,11 +50,11 @@ import playground.vsp.analysis.modules.AbstractAnalysisModule;
  *
  */
 public class EmissionLinkAnalyzer extends AbstractAnalysisModule {
-	private static final Logger logger = Logger.getLogger(EmissionLinkAnalyzer.class);
+	private static final Logger LOG = Logger.getLogger(EmissionLinkAnalyzer.class);
 	private final String emissionEventsFile;
-	private EmissionUtils emissionUtils;
-	private FilteredWarmEmissionPerLinkHandler warmHandler;
-	private FilteredColdEmissionPerLinkHandler coldHandler;
+	private final EmissionUtils emissionUtils = new EmissionUtils();;
+	private final FilteredWarmEmissionPerLinkHandler warmHandler;
+	private final FilteredColdEmissionPerLinkHandler coldHandler;
 	private Map<Double, Map<Id<Link>, Map<WarmPollutant, Double>>> link2WarmEmissions;
 	private Map<Double, Map<Id<Link>, Map<ColdPollutant, Double>>> link2ColdEmissions;
 	private SortedMap<Double, Map<Id<Link>, SortedMap<String, Double>>> link2TotalEmissions;
@@ -63,20 +63,18 @@ public class EmissionLinkAnalyzer extends AbstractAnalysisModule {
 	/**
 	 * This will compute the emissions only from links falling inside the given shape.
 	 */
-	public EmissionLinkAnalyzer(double simulationEndTime, String emissionEventFile, int noOfTimeBins, String shapeFile, Network network ) {
+	public EmissionLinkAnalyzer(final double simulationEndTime, final String emissionEventFile, final int noOfTimeBins, final String shapeFile, final Network network ) {
 		super(EmissionLinkAnalyzer.class.getSimpleName());
 		this.emissionEventsFile = emissionEventFile;
-		logger.info("Aggregating emissions for each "+simulationEndTime/noOfTimeBins+" sec time bin.");
-		this.emissionUtils = new EmissionUtils();
+		LOG.info("Aggregating emissions for each "+simulationEndTime/noOfTimeBins+" sec time bin.");
 		this.warmHandler = new FilteredWarmEmissionPerLinkHandler(simulationEndTime, noOfTimeBins, shapeFile, network);
 		this.coldHandler = new FilteredColdEmissionPerLinkHandler(simulationEndTime, noOfTimeBins, shapeFile, network);
 	}
 
-	public EmissionLinkAnalyzer(double simulationEndTime, String emissionEventFile, int noOfTimeBins) {
+	public EmissionLinkAnalyzer(final double simulationEndTime, final String emissionEventFile, final int noOfTimeBins) {
 		super(EmissionLinkAnalyzer.class.getSimpleName());
 		this.emissionEventsFile = emissionEventFile;
-		logger.info("Aggregating emissions for each "+simulationEndTime/noOfTimeBins+" sec time bin.");
-		this.emissionUtils = new EmissionUtils();
+		LOG.info("Aggregating emissions for each "+simulationEndTime/noOfTimeBins+" sec time bin.");
 		this.warmHandler = new FilteredWarmEmissionPerLinkHandler(simulationEndTime, noOfTimeBins);
 		this.coldHandler = new FilteredColdEmissionPerLinkHandler(simulationEndTime, noOfTimeBins);
 	}
@@ -84,8 +82,8 @@ public class EmissionLinkAnalyzer extends AbstractAnalysisModule {
 	public static void main(String[] args) {
 		String dir = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/hEART/output/";
 		String [] runCases =  {"bau","ei","5ei","10ei","15ei","20ei","25ei"};
-		String shapeFile_city = "../../../../repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
-		String shapeFile_mma = "../../../../repos/shared-svn/projects/detailedEval/Net/boundaryArea/munichMetroArea_correctedCRS_simplified.shp";
+		String shapeFileCity = "../../../../repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
+		String shapeFileMMA = "../../../../repos/shared-svn/projects/detailedEval/Net/boundaryArea/munichMetroArea_correctedCRS_simplified.shp";
 		
 		Scenario sc = LoadMyScenarios.loadScenarioFromNetwork(dir+"/bau/output_network.xml.gz");
 		BufferedWriter writer = IOUtils.getBufferedWriter(dir+"/analysis/totalEmissionCosts_cityArea.txt");
@@ -94,10 +92,10 @@ public class EmissionLinkAnalyzer extends AbstractAnalysisModule {
 			for(String str : runCases){
 				String emissionEventFile = dir+str+"/ITERS/it.1500/1500.emission.events.xml.gz";
 
-				EmissionLinkAnalyzer ela = new EmissionLinkAnalyzer(30*3600, emissionEventFile, 1, shapeFile_city, sc.getNetwork());
+				EmissionLinkAnalyzer ela = new EmissionLinkAnalyzer(30*3600, emissionEventFile, 1, shapeFileMMA, sc.getNetwork());
 				ela.preProcessData();
 				ela.postProcessData();
-
+				ela.writeTotalEmissions(dir+str+"/analysis/","MMA");
 				writer.write(str+"\t"+ela.getTotalEmissionsCosts()+"\n");
 			}
 			writer.close();
@@ -145,10 +143,24 @@ public class EmissionLinkAnalyzer extends AbstractAnalysisModule {
 			throw new RuntimeException("Data is not written in the file. Reason - "+e);
 		}
 	}
+	
+	public void writeTotalEmissions(String outputFolder, String suffix) {
+		SortedMap<String,Double> emissions = getTotalEmissions();
+		BufferedWriter writer = IOUtils.getBufferedWriter(outputFolder+"/totalEmissions_"+suffix+".txt");
+		try{
+			writer.write("pollutant \t emissionsInGm \n");
+			for(String emiss : emissions.keySet()){
+				writer.write(emiss+"\t"+emissions.get(emiss)+"\n");
+			}
+			writer.close();
+		} catch (Exception e){
+			throw new RuntimeException("Data is not written in the file. Reason - "+e);
+		}
+	}
 
 	private SortedMap<Double, Map<Id<Link>, SortedMap<String, Double>>> sumUpEmissionsPerTimeInterval(
-			Map<Double, Map<Id<Link>, Map<WarmPollutant, Double>>> time2warmEmissionsTotal,
-			Map<Double, Map<Id<Link>, Map<ColdPollutant, Double>>> time2coldEmissionsTotal) {
+			final Map<Double, Map<Id<Link>, Map<WarmPollutant, Double>>> time2warmEmissionsTotal,
+			final Map<Double, Map<Id<Link>, Map<ColdPollutant, Double>>> time2coldEmissionsTotal) {
 
 		SortedMap<Double, Map<Id<Link>, SortedMap<String, Double>>> time2totalEmissions = new TreeMap<>();
 

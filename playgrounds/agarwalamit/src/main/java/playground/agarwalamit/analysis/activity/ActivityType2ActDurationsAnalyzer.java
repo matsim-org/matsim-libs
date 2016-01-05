@@ -41,17 +41,16 @@ import playground.vsp.analysis.modules.AbstractAnalysisModule;
  * @author amit
  */
 public class ActivityType2ActDurationsAnalyzer extends AbstractAnalysisModule {
-
-	public ActivityType2ActDurationsAnalyzer(String outputDir) {
+	private final ActivityType2DurationHandler actDurHandler;
+	private final String eventsFile;
+	
+	public ActivityType2ActDurationsAnalyzer(final String outputDir) {
 		super(ActivityType2ActDurationsAnalyzer.class.getSimpleName());
 		String configFile = outputDir+"/output_config.xml";
 		int lastIt = LoadMyScenarios.getLastIteration(configFile);
 		this.eventsFile = outputDir+"/ITERS/it."+lastIt+"/"+lastIt+".events.xml.gz";
 		this.actDurHandler = new ActivityType2DurationHandler(24*3600);
 	}
-	
-	private ActivityType2DurationHandler actDurHandler;
-	private String eventsFile;
 	
 	@Override
 	public void preProcessData() {

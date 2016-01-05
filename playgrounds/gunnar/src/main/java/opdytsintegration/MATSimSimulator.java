@@ -48,6 +48,8 @@ public class MATSimSimulator<U extends DecisionVariable> implements
 
 	// --------------- IMPLEMENTATION OF Simulator INTERFACE ---------------
 
+	private MATSimDecisionVariableSetEvaluator<U> matsimDecisionVariableEvaluator = null;
+
 	@Override
 	public SimulatorState run(final TrajectorySampler<U> trajectorySampler) {
 		String outputDirectory = this.scenario.getConfig().controler()
@@ -57,7 +59,9 @@ public class MATSimSimulator<U extends DecisionVariable> implements
 				+ "_" + this.nextControlerRun;
 		this.scenario.getConfig().controler()
 				.setOutputDirectory(outputDirectory);
-		final MATSimDecisionVariableSetEvaluator<U> matsimDecisionVariableEvaluator = new MATSimDecisionVariableSetEvaluator<U>(
+		// this.scenario.getConfig().controler()
+		// .setLastIteration(Integer.MAX_VALUE);
+		matsimDecisionVariableEvaluator = new MATSimDecisionVariableSetEvaluator<U>(
 				trajectorySampler, this.stateFactory, this.timeDiscretization);
 		matsimDecisionVariableEvaluator.setMemory(1); // TODO make configurable
 		matsimDecisionVariableEvaluator.setStandardLogFileName(outputDirectory
@@ -89,14 +93,13 @@ public class MATSimSimulator<U extends DecisionVariable> implements
 				binder().requestInjection(matsimDecisionVariableEvaluator);
 			}
 		});
-		// TODO >>> THIS DOES NOT WORK >>>
 		controler.setTerminationCriterion(new TerminationCriterion() {
 			@Override
 			public boolean continueIterations(int iteration) {
+				System.out.println(">>> continueIterations == " + (!matsimDecisionVariableEvaluator.foundSolution()));
 				return !matsimDecisionVariableEvaluator.foundSolution();
 			}
 		});
-		// TODO <<< THIS DOES NOT WORK <<<
 		controler.run();
 		this.nextControlerRun++;
 		return matsimDecisionVariableEvaluator.getFinalState();
@@ -112,4 +115,5 @@ public class MATSimSimulator<U extends DecisionVariable> implements
 		}
 		return this.run(evaluator);
 	}
+
 }

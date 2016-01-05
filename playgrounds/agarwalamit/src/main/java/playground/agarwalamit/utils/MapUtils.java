@@ -25,7 +25,6 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import org.apache.poi.ss.formula.functions.T;
 import org.matsim.api.core.v01.Id;
 
 /**

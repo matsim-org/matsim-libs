@@ -26,8 +26,12 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
@@ -43,7 +47,7 @@ import org.matsim.vehicles.VehicleType;
  * velocity for each velocity group.
  */
 
-class GlobalFlowDynamicsUpdator implements LinkEnterEventHandler, PersonDepartureEventHandler {
+class GlobalFlowDynamicsUpdator implements LinkEnterEventHandler, PersonDepartureEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 	
 	private Map<Id<VehicleType>, TravelModesFlowDynamicsUpdator> travelModesFlowData;
 	private TravelModesFlowDynamicsUpdator globalFlowData;
@@ -87,8 +91,8 @@ class GlobalFlowDynamicsUpdator implements LinkEnterEventHandler, PersonDepartur
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		Id<Person> personId = this.delegate.getDriverOfVehicle(event.getVehicleId());
 		if (!(permanentRegime)){
+			Id<Person> personId = this.delegate.getDriverOfVehicle(event.getVehicleId());
 			String travelMode = person2Mode.get(personId);
 
 			Id<VehicleType> transportMode = Id.create(travelMode, VehicleType.class);
@@ -99,7 +103,7 @@ class GlobalFlowDynamicsUpdator implements LinkEnterEventHandler, PersonDepartur
 			double nowTime = event.getTime();
 			if (event.getLinkId().equals(FLOW_DYNAMICS_UPDATE_LINK)){				
 				this.globalFlowData.updateFlow900(nowTime, pcuPerson);
-				this.globalFlowData.updateSpeedTable(nowTime, Id.createPersonId(personId));
+				this.globalFlowData.updateSpeedTable(nowTime,personId);
 				//Waiting for all agents to be on the track before studying stability
 				if ((this.globalFlowData.getNumberOfDrivingAgents() == this.globalFlowData.numberOfAgents) && (nowTime > InputsForFDTestSetUp.MAX_ACT_END_TIME * 2)){	
 					/*//Taking speed check out, as it is not reliable on the global speed table
@@ -147,6 +151,20 @@ class GlobalFlowDynamicsUpdator implements LinkEnterEventHandler, PersonDepartur
 		}
 	}
 
+	@Override
+	public void handleEvent(VehicleEntersTrafficEvent event) {
+		this.delegate.handleEvent(event);
+		Id<VehicleType> transportMode = Id.create(person2Mode.get(event.getPersonId()), VehicleType.class);
+		this.travelModesFlowData.get(transportMode).handle(event);
+	}
+
+	@Override
+	public void handleEvent(VehicleLeavesTrafficEvent event) {
+		this.delegate.handleEvent(event);
+		Id<VehicleType> transportMode = Id.create(person2Mode.get(event.getPersonId()), VehicleType.class);
+		this.travelModesFlowData.get(transportMode).handle(event);
+	}
+	
 	boolean isPermanent(){
 		return permanentRegime;
 	}

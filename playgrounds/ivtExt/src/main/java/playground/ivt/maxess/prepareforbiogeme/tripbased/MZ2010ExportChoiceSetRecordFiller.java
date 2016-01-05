@@ -22,6 +22,7 @@ import gnu.trove.map.TLongObjectMap;
 import gnu.trove.map.hash.TLongObjectHashMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.utils.collections.MapUtils;
@@ -78,10 +79,31 @@ public class MZ2010ExportChoiceSetRecordFiller  implements ChoiceDataSetWriter.C
 		values.put("C_CHOICE", getChoice(cs));
 
 		for ( Map.Entry<String,Trip> alt : cs.getNamedAlternatives().entrySet() ) {
-			values.put("A_" + alt.getKey() + "_TT", getTravelTime( alt.getValue() ));
+			final String name = alt.getKey();
+			final Trip trip = alt.getValue();
+			final double distance_m = SBBPricesUtils.getDistance( trip );
+			values.put("A_" + name + "_TT", getTravelTime( trip ));
+			values.put("A_" + name + "_TD_M", distance_m );
+
+			if ( name.endsWith( TransportMode.pt ) ) {
+				values.put("A_" + name + "_PRICE_FIRSTCLASS", SBBPricesUtils.computeSBBTripPrice( SBBPricesUtils.SBBClass.first , false , distance_m ));
+				values.put("A_" + name + "_PRICE_FIRSTCLASS_HT", SBBPricesUtils.computeSBBTripPrice( SBBPricesUtils.SBBClass.first , true , distance_m ));
+
+				values.put("A_" + name + "_PRICE_SECONDCLASS", SBBPricesUtils.computeSBBTripPrice( SBBPricesUtils.SBBClass.second , false , distance_m ));
+				values.put("A_" + name + "_PRICE_SECONDCLASS_HT", SBBPricesUtils.computeSBBTripPrice( SBBPricesUtils.SBBClass.second , true , distance_m ));
+			}
+
+			if ( name.endsWith( TransportMode.car ) ) {
+				values.put("A_" + name + "_PRICE", calcPriceAuto( distance_m ));
+			}
 		}
 
 		return values;
+	}
+
+	private double calcPriceAuto( final double distance_m ) {
+		// value of 0.13 CHF per km gotten from S. Schmutz master thesis
+		return 0.13 * distance_m / 1000;
 	}
 
 	private void put( final String name , final Number value, Map<String,Number> map ) {

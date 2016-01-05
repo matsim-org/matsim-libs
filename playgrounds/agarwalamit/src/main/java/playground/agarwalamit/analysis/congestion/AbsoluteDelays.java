@@ -35,10 +35,9 @@ import playground.agarwalamit.utils.LoadMyScenarios;
  * @author amit
  */
 public class AbsoluteDelays  {
+	private final String outputDir;
 
-	private String outputDir;
-
-	public AbsoluteDelays(String outputDir) {
+	public AbsoluteDelays(final String outputDir) {
 		this.outputDir = outputDir;
 	}
 
@@ -49,14 +48,14 @@ public class AbsoluteDelays  {
 		new AbsoluteDelays(clusterPathDesktop).runAndWrite(runCases);
 	}
 
-	public void runAndWrite(String [] runCases){
+	public void runAndWrite(final String [] runCases){
 		BufferedWriter writer =IOUtils.getBufferedWriter(outputDir+"/analysis/absoluteDelays.txt");
 
 		try {
 			writer.write("runCase \t absoluteDelaysInHr \t delaysCost \n");
 			for(String runCase : runCases){
 				double delayInHr = totalDelayInHoursFromEventsFile(runCase);
-				writer.write(runCase+"\t"+delayInHr+"\t"+delayInHr*3600*getVTTS_car(runCase)+"\n");
+				writer.write(runCase+"\t"+delayInHr+"\t"+delayInHr * 3600 * getVTTSCar(runCase)+"\n");
 			}
 			writer.close();
 		} catch (IOException e) {
@@ -64,21 +63,20 @@ public class AbsoluteDelays  {
 		}
 	}
 
-	private double getVTTS_car(String runCase){
+	private double getVTTSCar(final String runCase){
 		String configFile = outputDir+runCase+"/output_config.xml";
 		Config config = new Config();
 		config.addCoreModules();
 		ConfigReader reader = new ConfigReader(config);
 		reader.readFile(configFile);
 
-		double vtts_car = ((config.planCalcScore().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() /3600) +
+		double vttsCar = ((config.planCalcScore().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() /3600) +
 				(config.planCalcScore().getPerforming_utils_hr()/3600)) 
 				/ (config.planCalcScore().getMarginalUtilityOfMoney());
-		return vtts_car;
+		return vttsCar;
 	}
 	
-	private  double totalDelayInHoursFromEventsFile(String runCase) {
-
+	private  double totalDelayInHoursFromEventsFile(final String runCase) {
 		String configFile = outputDir+runCase+"/output_config.xml";
 		String networkFile = outputDir+runCase+"/output_network.xml.gz";
 		String plansFile = outputDir+runCase+"/output_plans.xml.gz";

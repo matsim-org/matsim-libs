@@ -59,10 +59,10 @@ public class AgentPositionWriter {
 
 	public static void main(String[] args) 
 	{
-		final String dir = "../../../../repos/shared-svn/projects/mixedTraffic/triangularNetwork/run313/xtPlots/holes/car/";
+		final String dir = "../../../../repos/shared-svn/projects/mixedTraffic/triangularNetwork/run313/singleModes/withoutHoles/car_SW//";
 		final String networkFile = dir+"/network.xml";
 		final String configFile = dir+"/config.xml";
-		final String prefix = "events[400]";
+		final String prefix = "events[240]";
 		final String eventsFile = dir+"/events/"+prefix+".xml";
 		
 		Scenario sc = LoadMyScenarios.loadScenarioFromNetworkAndConfig(networkFile, configFile);

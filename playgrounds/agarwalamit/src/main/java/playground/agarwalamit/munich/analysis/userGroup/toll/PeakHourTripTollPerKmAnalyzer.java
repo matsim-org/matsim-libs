@@ -51,25 +51,25 @@ import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
  */
 
 public class PeakHourTripTollPerKmAnalyzer {
-
-	public PeakHourTripTollPerKmAnalyzer(Network network, double simulationEndTime, int noOfTimeBins) {
-		log.warn("Peak hours are assumed as 07:00-10:00 and 15:00-18:00 by looking on the travel demand for BAU scenario.");
-		this.tollHandler = new TripTollHandler( simulationEndTime, noOfTimeBins );
-		this.distHandler = new TripDistanceHandler(network, simulationEndTime, noOfTimeBins);
-	} 
-
-	private static final Logger log = Logger.getLogger(PeakHourTripTollPerKmAnalyzer.class);
-	private TripTollHandler tollHandler ;
-	private TripDistanceHandler distHandler;
+	
+	private static final Logger LOG = Logger.getLogger(PeakHourTripTollPerKmAnalyzer.class);
+	private final TripTollHandler tollHandler ;
+	private final TripDistanceHandler distHandler;
 
 	private final List<Double> pkHrs = new ArrayList<>(Arrays.asList(new Double []{8., 9., 10., 16., 17., 18.,})); // => 7-10 and 15-18
 	private final ExtendedPersonFilter pf = new ExtendedPersonFilter();
-	private Map<Id<Person>,List<Double>> person2TollsPerKm_pkHr = new HashMap<>();
-	private Map<Id<Person>,List<Double>> person2TollsPerKm_offPkHr = new HashMap<>();
-	private Map<Id<Person>,Integer> person2TripCounts_pkHr = new HashMap<>();
-	private Map<Id<Person>,Integer> person2TripCounts_offPkHr = new HashMap<>();
-	private SortedMap<String, Tuple<Double,Double>> usrGrp2TollsPerKm = new TreeMap<>();
-	private SortedMap<String, Tuple<Integer,Integer>> usrGrp2TripCounts = new TreeMap<>();
+	private final Map<Id<Person>,List<Double>> person2TollsPerKm_pkHr = new HashMap<>();
+	private final Map<Id<Person>,List<Double>> person2TollsPerKm_offPkHr = new HashMap<>();
+	private final Map<Id<Person>,Integer> person2TripCounts_pkHr = new HashMap<>();
+	private final Map<Id<Person>,Integer> person2TripCounts_offPkHr = new HashMap<>();
+	private final SortedMap<String, Tuple<Double,Double>> usrGrp2TollsPerKm = new TreeMap<>();
+	private final SortedMap<String, Tuple<Integer,Integer>> usrGrp2TripCounts = new TreeMap<>();
+
+	public PeakHourTripTollPerKmAnalyzer(final Network network, final double simulationEndTime, final int noOfTimeBins) {
+		LOG.warn("Peak hours are assumed as 07:00-10:00 and 15:00-18:00 by looking on the travel demand for BAU scenario.");
+		this.tollHandler = new TripTollHandler( simulationEndTime, noOfTimeBins );
+		this.distHandler = new TripDistanceHandler(network, simulationEndTime, noOfTimeBins);
+	} 
 
 	public static void main(String[] args) {
 		String [] pricingSchemes = new String [] {"ei","ci","eci"};
@@ -86,7 +86,7 @@ public class PeakHourTripTollPerKmAnalyzer {
 		}
 	}
 
-	public void run(String eventsFile) {
+	public void run(final String eventsFile) {
 		EventsManager events = EventsUtils.createEventsManager();
 		MatsimEventsReader reader = new MatsimEventsReader(events);
 		events.addHandler(this.tollHandler);
@@ -96,7 +96,7 @@ public class PeakHourTripTollPerKmAnalyzer {
 		storeUserGroupData();
 	}
 
-	public void writeRBoxPlotData(String outputFolder, String pricingScheme) {
+	public void writeRBoxPlotData(final String outputFolder, final String pricingScheme) {
 		if( ! new File(outputFolder+"/boxPlot/").exists()) new File(outputFolder+"/boxPlot/").mkdirs();
 
 		BufferedWriter writer = IOUtils.getBufferedWriter(outputFolder+"/boxPlot/tripTollInEurCtPerKm_"+pricingScheme+"_pkHr"+".txt");

@@ -49,29 +49,22 @@ import org.matsim.core.api.experimental.events.handler.TeleportationArrivalEvent
  * @author amit
  */
 public class LegModeRouteDistanceDistributionHandler implements PersonDepartureEventHandler, LinkLeaveEventHandler, PersonArrivalEventHandler, TeleportationArrivalEventHandler {
-	private final Logger log = Logger.getLogger(LegModeRouteDistanceDistributionHandler.class);
+	private final static Logger LOG = Logger.getLogger(LegModeRouteDistanceDistributionHandler.class);
 
-	private Network network;
-	private Scenario scenario;
-	private SortedMap<String, Map<Id<Person>, List<Double>>> mode2PersonId2distances;
-	private SortedMap<String, Map<Id<Person>, Double>> mode2PersonId2OneTripdist;
-	private SortedMap<String, Map<Id<Person>, Double>> mode2PersonId2TeleportDist;
-	private List<String> mainModes = new ArrayList<String>();
-	private Map<Id<Person>, String> personId2LegModes;
+	private final Network network;
+	private final SortedMap<String, Map<Id<Person>, List<Double>>> mode2PersonId2distances = new TreeMap<>();
+	private final SortedMap<String, Map<Id<Person>, Double>> mode2PersonId2OneTripdist = new TreeMap<>();
+	private final SortedMap<String, Map<Id<Person>, Double>> mode2PersonId2TeleportDist = new TreeMap<>();
+	private final List<String> mainModes = new ArrayList<String>();
+	private final Map<Id<Person>, String> personId2LegModes = new HashMap<>();
 	private double maxDist = Double.NEGATIVE_INFINITY;
-	private SortedMap<String, Double> mode2NumberOfLegs ;
+	private final SortedMap<String, Double> mode2NumberOfLegs = new TreeMap<String, Double>();
 
-	public LegModeRouteDistanceDistributionHandler(Scenario scenario){
-		this.log.info("Route distance will be calculated based on events.");
-		this.log.warn("During distance calculation, link from which person is departed or arrived will not be considered.");
-		this.scenario = scenario;
-		this.mainModes.addAll(this.scenario.getConfig().qsim().getMainModes());
+	public LegModeRouteDistanceDistributionHandler(final Scenario scenario){
+		LOG.info("Route distance will be calculated based on events.");
+		LOG.warn("During distance calculation, link from which person is departed or arrived will not be considered.");
+		this.mainModes.addAll(scenario.getConfig().qsim().getMainModes());
 		this.network = scenario.getNetwork();
-		this.mode2PersonId2distances = new TreeMap<>();
-		this.mode2PersonId2OneTripdist = new TreeMap<>();
-		this.mode2PersonId2TeleportDist = new TreeMap<>();
-		this.personId2LegModes = new HashMap<>();
-		this.mode2NumberOfLegs = new TreeMap<String, Double>();
 	}
 
 	@Override
@@ -88,7 +81,7 @@ public class LegModeRouteDistanceDistributionHandler implements PersonDepartureE
 	public void handleEvent(LinkLeaveEvent event) {
 		Id<Person> personId = Id.createPersonId(event.getVehicleId().toString());
 		Id<Link> linkId = event.getLinkId();
-		// [AA] if a person is in more than two groups, then which one is correct mode ?
+		// ZZ_TODO if a person is in more than two groups, then which one is correct mode ?
 		String mode = this.personId2LegModes.get(personId);
 		Map<Id<Person>, Double> person2Dist = mode2PersonId2OneTripdist.get(mode);
 		double distSoFar = person2Dist.get(personId);
@@ -109,7 +102,7 @@ public class LegModeRouteDistanceDistributionHandler implements PersonDepartureE
 				if(!personId2Dist.containsKey(personId)){
 					personId2Dist.put(personId, 0.0);
 				} else {
-					log.warn("Person is departing again.");
+					LOG.warn("Person is departing again.");
 				}
 			} else {
 				Map<Id<Person>, Double> personId2Dist = new TreeMap<>();
@@ -123,7 +116,7 @@ public class LegModeRouteDistanceDistributionHandler implements PersonDepartureE
 				if(!personId2Dist.containsKey(personId)){
 					personId2Dist.put(personId, 0.0);
 				} else {
-					log.warn("Person is departing again.");
+					LOG.warn("Person is departing again.");
 				}
 			} else {
 				Map<Id<Person>, Double> personId2Dist = new TreeMap<>();
