@@ -144,7 +144,7 @@ public final class GridBasedAccessibilityControlerListenerV3 implements Shutdown
 	// ////////////////////////////////////////////////////////////////////
 
 	public GridBasedAccessibilityControlerListenerV3(ActivityFacilities opportunities, Config config, Network network){
-		this(opportunities, null, config, network, 0); // PtMatrix is optional and in a different contrib
+		this(opportunities, null, config, network); // PtMatrix is optional and in a different contrib
 	}
 	
 	
@@ -156,7 +156,7 @@ public final class GridBasedAccessibilityControlerListenerV3 implements Shutdown
 	 * @param config MATSim Config object
 	 * @param network MATSim road network
 	 */
-	public GridBasedAccessibilityControlerListenerV3(ActivityFacilities opportunities, PtMatrix ptMatrix, Config config, Network network, double time){
+	public GridBasedAccessibilityControlerListenerV3(ActivityFacilities opportunities, PtMatrix ptMatrix, Config config, Network network){
 		// I thought about changing the type of opportunities to Map<Id,Facility> or even Collection<Facility>, but in the end
 		// one can also use FacilitiesUtils.createActivitiesFacilities(), put everything in there, and give that to this constructor. kai, feb'14
 
@@ -168,8 +168,6 @@ public final class GridBasedAccessibilityControlerListenerV3 implements Shutdown
 		assert (config != null);
 		this.config = config ;
 		assert (network != null);
-		
-		this.time = time;
 
 		delegate.initAccessibilityParameters(config);
 
@@ -532,6 +530,11 @@ public final class GridBasedAccessibilityControlerListenerV3 implements Shutdown
 	
 	public void setUrbansimMode(boolean urbansimMode) {
 		this.urbanSimMode = urbansimMode;
+	}
+	
+	
+	public void setTime(double time) {
+		this.time = time;
 	}
 	
 	

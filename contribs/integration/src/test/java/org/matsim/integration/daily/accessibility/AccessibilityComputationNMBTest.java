@@ -193,13 +193,15 @@ public class AccessibilityComputationNMBTest {
 
 			GridBasedAccessibilityControlerListenerV3 listener = 
 					new GridBasedAccessibilityControlerListenerV3(activityFacilitiesMap.get(actType), 
-							ptMatrix, config, scenario.getNetwork(), time);
+							ptMatrix, config, scenario.getNetwork());
 			listener.setComputingAccessibilityForMode(Modes4Accessibility.freeSpeed, true);
 			listener.setComputingAccessibilityForMode(Modes4Accessibility.car, true);
 			listener.setComputingAccessibilityForMode(Modes4Accessibility.walk, true);
 			listener.setComputingAccessibilityForMode(Modes4Accessibility.bike, true);
 //			listener.setComputingAccessibilityForMode(Modes4Accessibility.pt, true);
-			// yyyy replace by "set .... ModeS( modes ) " 
+			// yyyy replace by "set .... ModeS( modes ) "
+			
+			listener.setTime(time);
 			
 			listener.addAdditionalFacilityData(homes) ;
 			listener.generateGridsAndMeasuringPointsByNetwork(cellSize);
