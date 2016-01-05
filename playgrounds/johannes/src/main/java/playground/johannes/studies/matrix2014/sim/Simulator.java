@@ -23,11 +23,13 @@ import org.apache.commons.math.FunctionEvaluationException;
 import org.apache.commons.math.analysis.UnivariateRealFunction;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.common.stats.Discretizer;
+import org.matsim.contrib.common.stats.DummyDiscretizer;
 import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
 import org.matsim.contrib.common.stats.LinearDiscretizer;
 import org.matsim.contrib.common.util.XORShiftRandom;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.facilities.ActivityFacilities;
 import playground.johannes.gsv.synPop.mid.Route2GeoDistance;
 import playground.johannes.gsv.synPop.sim3.ReplaceActTypes;
@@ -183,6 +185,7 @@ public class Simulator {
         logger.info("Preparing reference simulation...");
         TaskRunner.validatePersons(new ValidateMissingAttribute(CommonKeys.PERSON_WEIGHT), refPersons);
         TaskRunner.validatePersons(new ValidatePersonWeight(), refPersons);
+
         TaskRunner.run(new ReplaceActTypes(), refPersons);
         new GuessMissingActTypes(random).apply(refPersons);
         TaskRunner.run(new Route2GeoDistance(new Route2GeoDistFunction()), refPersons);
@@ -213,7 +216,10 @@ public class Simulator {
         ZoneMobilityRate zoneMobilityRate = new ZoneMobilityRate(MiDKeys.PERSON_LAU2_CLASS, lau2Zones, new
                 ModePredicate(CommonValues.LEG_MODE_CAR), ioContext);
         task.addComponent(zoneMobilityRate);
-//        task.addComponent(new NumericAnalyzer(new PersonCollector<Double>(new NumericAttributeProvider<Person>(CommonKeys.PERSON_WEIGHT)), "weights", new HistogramWriter(ioContext, new StratifiedDiscretizerBuilder(50, 1))));
+        task.addComponent(new NumericAnalyzer(new PersonCollector<>(
+                new NumericAttributeProvider<Person>(CommonKeys.PERSON_WEIGHT)),
+                "weights",
+                new HistogramWriter(ioContext, new PassThroughDiscretizerBuilder(new LinearDiscretizer(1), "linear"))));
 
         task.addComponent(new GeoDistNumTripsTask(ioContext, new ModePredicate(CommonValues.LEG_MODE_CAR)));
         task.addComponent(new TripsPerPersonTask().build(ioContext));
@@ -353,8 +359,10 @@ public class Simulator {
         histogramWriter.addBuilder(new PassThroughDiscretizerBuilder(new LinearDiscretizer(50000), "linear"));
 
         Predicate<Segment> modePredicate = new ModePredicate(CommonValues.LEG_MODE_CAR);
-
-        tasks.addComponent(NumericLegAnalyzer.create(CommonKeys.LEG_GEO_DISTANCE, true, modePredicate, "car", histogramWriter));
+        tasks.addComponent(NumericLegAnalyzer.create(CommonKeys.LEG_ROUTE_DISTANCE, true, modePredicate, "car",
+                histogramWriter));
+        tasks.addComponent(NumericLegAnalyzer.create(CommonKeys.LEG_GEO_DISTANCE, true, modePredicate, "car",
+                histogramWriter));
 
         for (int klass = 0; klass < 6; klass++) {
             Predicate<Segment> lauPred = new LegPersonAttributePredicate(MiDKeys.PERSON_LAU2_CLASS, String.valueOf(klass));
