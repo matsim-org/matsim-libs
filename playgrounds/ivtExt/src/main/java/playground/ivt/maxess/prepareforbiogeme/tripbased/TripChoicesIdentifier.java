@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.facilities.ActivityFacilities;
@@ -43,6 +44,7 @@ public class TripChoicesIdentifier implements ChoicesIdentifier<TripChoiceSituat
 	private static final Logger log = Logger.getLogger( TripChoicesIdentifier.class );
 	private final ActivityFacilities facilities;
 	private final StageActivityTypes stages;
+	private final MainModeIdentifier modeIdentifier;
 	private final String destinationType;
 
 	// incompatible with prism approach. Make configurable
@@ -51,7 +53,9 @@ public class TripChoicesIdentifier implements ChoicesIdentifier<TripChoiceSituat
 	public TripChoicesIdentifier(
 			final String destinationType,
 			final ActivityFacilities facilities,
-			final StageActivityTypes stages) {
+			final StageActivityTypes stages,
+			final MainModeIdentifier modeIdentifier) {
+		this.modeIdentifier = modeIdentifier;
 		this.destinationType = destinationType;
 		this.facilities = facilities;
 		this.stages = stages;
@@ -65,7 +69,8 @@ public class TripChoicesIdentifier implements ChoicesIdentifier<TripChoiceSituat
 
 		int i=0;
 		for ( TripStructureUtils.Trip t : trips ) {
-			if ( t.getDestinationActivity().getType().equals( destinationType ) ) {
+			if ( t.getDestinationActivity().getType().equals( destinationType ) &&
+					!modeIdentifier.identifyMainMode( t.getTripElements() ).equals( "other" ) ) {
 				if ( !ignoreLastTrip || i < trips.size() - 1 ) {
 					final Trip choice =
 							new Trip(

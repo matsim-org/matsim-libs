@@ -19,6 +19,8 @@
 package playground.ivt.maxess.prepareforbiogeme.tripbased;
 
 import com.google.inject.Provider;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
@@ -28,6 +30,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
+import org.matsim.core.router.MainModeIdentifierImpl;
 import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
@@ -38,6 +41,7 @@ import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
 import org.matsim.population.algorithms.XY2Links;
 import org.matsim.pt.PtConstants;
+import org.matsim.pt.router.MultiNodeDijkstra;
 import playground.ivt.maxess.prepareforbiogeme.framework.ChoiceSetSampler;
 import playground.ivt.maxess.prepareforbiogeme.framework.ChoicesIdentifier;
 import playground.ivt.maxess.prepareforbiogeme.framework.Converter;
@@ -62,6 +66,8 @@ public class RunMzTripChoiceSetConversion {
 		// random generators are obtained from MatsimRandom.getLocalInstance().
 		// Allow varying the seed from the config file
 		MatsimRandom.reset( config.global().getRandomSeed() );
+
+		Logger.getLogger( MultiNodeDijkstra.class ).setLevel( Level.ERROR );
 
 		if ( new File( group.getOutputPath() ).exists() ) throw new RuntimeException( group.getOutputPath()+" exists" );
 		MoreIOUtils.initOut( group.getOutputPath() );
@@ -106,7 +112,8 @@ public class RunMzTripChoiceSetConversion {
 											group.getActivityType(),
 											sc.getActivityFacilities(),
 											new StageActivityTypesImpl(
-													PtConstants.TRANSIT_ACTIVITY_TYPE));
+													PtConstants.TRANSIT_ACTIVITY_TYPE),
+											new MainModeIdentifierImpl());
 								}
 							})
 					.withNumberOfThreads(
