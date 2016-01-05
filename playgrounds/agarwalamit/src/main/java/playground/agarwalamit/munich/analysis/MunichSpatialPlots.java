@@ -48,7 +48,6 @@ import playground.agarwalamit.analysis.emission.EmissionLinkAnalyzer;
 import playground.agarwalamit.analysis.spatial.GeneralGrid.GridType;
 import playground.agarwalamit.analysis.spatial.SpatialDataInputs;
 import playground.agarwalamit.analysis.spatial.SpatialDataInputs.LinkWeightMethod;
-import playground.agarwalamit.analysis.spatial.SpatialInterpolation.CellFilter;
 import playground.agarwalamit.analysis.spatial.SpatialInterpolation;
 import playground.agarwalamit.analysis.userBenefits.MyUserBenefitsAnalyzer;
 import playground.agarwalamit.utils.GeometryUtils;
@@ -359,7 +358,7 @@ public class MunichSpatialPlots {
 		inputs.setShapeFile(shapeFileMMA);
 
 //		SpatialInterpolation plot = new SpatialInterpolation(inputs,runDir+"/analysis/spatialPlots/"+noOfBins+"timeBins/");
-		SpatialInterpolation plot = new SpatialInterpolation(inputs,runDir+"/analysis/spatialPlots/"+noOfBins+"timeBins/", CellFilter.ShapePolygon);
+		SpatialInterpolation plot = new SpatialInterpolation(inputs,runDir+"/analysis/spatialPlots/"+noOfBins+"timeBins/", true);
 
 		EmissionLinkAnalyzer emsLnkAna = new EmissionLinkAnalyzer(LoadMyScenarios.getSimulationEndTime(inputs.initialCaseConfig), inputs.initialCaseEmissionEventsFile, noOfBins);
 		emsLnkAna.preProcessData();
