@@ -51,13 +51,13 @@ public class SpatialInterpolation {
 
 	private GeometryFactory gf;
 	private GeneralGrid grid ;
-	public Polygon boundingBoxPolygon;
+	private Polygon boundingBoxPolygon;
 	private final SpatialDataInputs inputs;
 
 	private Map<Point, Double> cellWeights;
 	private final String outputFolder ;
 	private final boolean isFilteringCellForShape;
-	private Collection<SimpleFeature> features;
+	private Collection<Geometry> geoms;
 
 	public SpatialInterpolation(final SpatialDataInputs inputs, final String outputFolder) {
 		this(inputs, outputFolder, false);
@@ -73,22 +73,24 @@ public class SpatialInterpolation {
 
 		this.isFilteringCellForShape = isFilteringCellForShape;
 		if( this.isFilteringCellForShape ){
-			if(inputs.shapeFile!=null)
-				features = new ShapeFileReader().readFileAndInitialize(inputs.shapeFile);
-			else throw new RuntimeException("Cell filtering is on but no shape file is provided. Aborting ...");
+			if(inputs.shapeFile!=null){
+				Collection<SimpleFeature> sfs = new ShapeFileReader().readFileAndInitialize(inputs.shapeFile);
+				geoms = GeometryUtils.getSimplifiedGeometries(sfs);
+			} else throw new RuntimeException("Cell filtering is on but no shape file is provided. Aborting ...");
 		}
 		this.grid.writeGrid(outputFolder, inputs.targetCRS.toString());
-		clear();
+		reset();
 	}
 
 	/**
 	 * Used to clear the cell weights map.
 	 */
-	public void clear(){
+	public void reset(){
 		this.cellWeights = new HashMap<Point, Double>();
 		for(Point p :this.grid.getGrid().values()){
-			this.cellWeights.put(p, 0.);
+			if ( isCellIncludedForInterpolation(p) ) this.cellWeights.put(p, 0.);
 		}
+		if (isFilteringCellForShape) SpatialDataInputs.LOG.warn(this.grid.getGrid().size() - this.cellWeights.size() + " cells are removed from bounding box.");
 	}
 
 	/**
@@ -107,7 +109,7 @@ public class SpatialInterpolation {
 		this.grid = new GeneralGrid(inputs.getCellWidth(), inputs.getGridType());
 		this.grid.generateGrid(boundingBoxPolygon);
 
-		SpatialDataInputs.LOG.info("Total number of cells in the grid are "+this.grid.getGrid().size());
+		SpatialDataInputs.LOG.warn("Total number of cells in the grid are "+this.grid.getGrid().size());
 	}
 
 	/**
@@ -117,17 +119,10 @@ public class SpatialInterpolation {
 	public void processLink(final Link link, final double intensityOnLink){
 
 		Coordinate linkCentroid = new Coordinate(link.getCoord().getX(), link.getCoord().getY());
-		Point linkcentroidPoint = gf.createPoint(linkCentroid);
-
-		if(! boundingBoxPolygon.covers(linkcentroidPoint))	return;
-		
-
 		Coordinate fromNodeCoord = new Coordinate(link.getFromNode().getCoord().getX(),link.getFromNode().getCoord().getY());
 		Coordinate toNodeCoord = new Coordinate(link.getToNode().getCoord().getX(),link.getToNode().getCoord().getY());
 
 		for(Point p: this.cellWeights.keySet()){
-			
-			if (! isCellIncludedForInterpolation(p)) return;
 			
 			double cellArea = this.grid.getCellGeometry(p).getArea();
 			double areaSmoothingCircle = Math.PI * inputs.getSmoothingRadius() * inputs.getSmoothingRadius();
@@ -157,14 +152,8 @@ public class SpatialInterpolation {
 	public void processHomeLocation(final Activity act, final double intensityOfPoint){
 
 		Coordinate actCoordinate = new Coordinate (act.getCoord().getX(),act.getCoord().getY());
-		Point actLocation = gf.createPoint(actCoordinate);
-
-		if(! boundingBoxPolygon.covers(actLocation))	return;
 
 		for(Point p: this.cellWeights.keySet()){
-			
-			if (! isCellIncludedForInterpolation(p)) return;
-			
 			double cellArea = this.grid.getCellGeometry(p).getArea();
 			double areaSmoothingCircle = Math.PI * inputs.getSmoothingRadius() *inputs.getSmoothingRadius();
 			double normalizationFactor = cellArea/areaSmoothingCircle;
@@ -191,12 +180,7 @@ public class SpatialInterpolation {
 		Coordinate actCoordinate = new Coordinate (act.getCoord().getX(),act.getCoord().getY());
 		Point actLocation = gf.createPoint(actCoordinate);
 
-		if(! boundingBoxPolygon.covers(actLocation))	return;
-
 		for(Point p: this.cellWeights.keySet()){
-			
-			if (! isCellIncludedForInterpolation(p)) return;
-			
 			if(this.grid.getCellGeometry(p).covers(actLocation)){
 				double weightSoFar = this.cellWeights.get(p);
 				this.cellWeights.put(p, weightSoFar+1*countScaleFactor);
@@ -327,9 +311,13 @@ public class SpatialInterpolation {
 	}
 	
 	private boolean isCellIncludedForInterpolation(final Point point){
+		boolean isInside = false;
 		if( this.isFilteringCellForShape ) {
-			if( GeometryUtils.isPointInsideCity(features, point)) return true ;
-			else return false;
-		} else return true;
+			for(Geometry g : geoms){
+				Geometry pointGeom =  gf.createPoint( new Coordinate( point.getCoordinate() ) );
+				if(g.contains(pointGeom)) return isInside = true;
+			}
+		} else isInside = true;
+		return isInside;
 	}
 }

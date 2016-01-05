@@ -35,6 +35,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.simplify.TopologyPreservingSimplifier;
 
 /**
  * @author amit
@@ -60,21 +61,54 @@ public final class GeometryUtils {
 	public static boolean isLinkInsideCity(Collection<SimpleFeature> features, Link link) {
 		Geometry geo = gf.createPoint(new Coordinate(link.getCoord().getX(), link.getCoord().getY()));
 		for(SimpleFeature sf : features){
-			if ( ((Geometry) sf.getDefaultGeometry()).contains(geo) ) {
+			if ( ( getSimplifiedGeom( (Geometry) sf.getDefaultGeometry() ) ).contains(geo) ) {
 				return true;
 			}
 		}
 		return false;
 	}
-	
+
 	public static boolean isPointInsideCity(Collection<SimpleFeature> features, Point point) {
-		Geometry geo = gf.createPoint(new Coordinate(point.getX(), point.getY()));
+		Geometry geo = gf.createPoint( new Coordinate( point.getCoordinate() ) );
 		for(SimpleFeature sf : features){
-			if ( ((Geometry) sf.getDefaultGeometry()).contains(geo) ) {
+			if ( ( getSimplifiedGeom( (Geometry) sf.getDefaultGeometry() ) ).contains(geo) ) {
 				return true;
 			}
 		}
 		return false;
+	}
+
+	public static Collection<Geometry> getSimplifiedGeometries(Collection<SimpleFeature> features){
+		Collection<Geometry> geoms = new ArrayList<>();
+		for(SimpleFeature sf:features){
+			geoms.add(getSimplifiedGeom( (Geometry) sf.getDefaultGeometry()));
+		}
+		return geoms;
+	}
+
+	/**
+	 * @param geom
+	 * @return A simplified geometry by increasing tolerance until number of vertices are less than 1000.
+	 */
+	public static Geometry getSimplifiedGeom(final Geometry geom){
+		Geometry outGeom = geom;
+		double distanceTolerance = 1;
+		int numberOfVertices = getNumberOfVertices(geom);
+		while (numberOfVertices > 1000){
+			outGeom = getSimplifiedGeom(outGeom, distanceTolerance);
+			numberOfVertices = getNumberOfVertices(outGeom);
+			distanceTolerance *= 10;
+		}
+		return outGeom;
+	}
+
+
+	public static Geometry getSimplifiedGeom(final Geometry geom, final double distanceTolerance){
+		return TopologyPreservingSimplifier.simplify(geom, distanceTolerance);
+	}
+
+	public static int getNumberOfVertices(final Geometry geom){
+		return geom.getNumPoints();
 	}
 
 	public static Point getRandomPointsInsideFeatures (List<SimpleFeature> features) {
@@ -131,7 +165,7 @@ public final class GeometryUtils {
 		}
 		return geom;
 	}
-	
+
 	public static ReferencedEnvelope getBoundingBox(String shapeFile){
 		ShapeFileReader shapeFileReader = new ShapeFileReader();
 		shapeFileReader.readFileAndInitialize(shapeFile);
