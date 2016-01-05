@@ -167,8 +167,6 @@ public class GenerateFundamentalDiagramData {
 		travelModes = inputs.getTravelModes();
 		modalSplitInPCU = inputs.getModalSplit();
 		if(isDumpingInputFiles) inputs.dumpInputFiles(runDir);
-		
-		
 
 		mode2FlowData = inputs.getTravelMode2FlowDynamicsData();
 		flowUnstableWarnCount = new int [travelModes.length];
@@ -208,9 +206,6 @@ public class GenerateFundamentalDiagramData {
 		this.isDumpingInputFiles = isDumpingInputFiles;
 	}
 	
-	/**
-	 * @return the scenario
-	 */
 	public Scenario getScenario() {
 		return scenario;
 	}

@@ -23,10 +23,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -118,5 +120,11 @@ public final class GeometryUtils {
 			}
 		}
 		return geom;
+	}
+	
+	public static ReferencedEnvelope getBoundingBox(String shapeFile){
+		ShapeFileReader shapeFileReader = new ShapeFileReader();
+		shapeFileReader.readFileAndInitialize(shapeFile);
+		return shapeFileReader.getBounds();
 	}
 }

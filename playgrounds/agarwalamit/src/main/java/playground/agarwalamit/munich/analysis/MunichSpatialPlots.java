@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -49,6 +50,7 @@ import playground.agarwalamit.analysis.spatial.SpatialDataInputs;
 import playground.agarwalamit.analysis.spatial.SpatialDataInputs.LinkWeightMethod;
 import playground.agarwalamit.analysis.spatial.SpatialInterpolation;
 import playground.agarwalamit.analysis.userBenefits.MyUserBenefitsAnalyzer;
+import playground.agarwalamit.utils.GeometryUtils;
 import playground.agarwalamit.utils.LoadMyScenarios;
 import playground.vsp.analysis.modules.monetaryTransferPayments.MonetaryPaymentsAnalyzer;
 import playground.vsp.analysis.modules.userBenefits.WelfareMeasure;
@@ -64,26 +66,49 @@ public class MunichSpatialPlots {
 	String policyName = "ei";
 	String policyCase = runDir+"/"+policyName;
 	private final double countScaleFactor = 100;
-	private final double gridSize = 500;
+	private static double gridSize ;
+	private static double smoothingRadius ;
 	private boolean isWritingGGPLOTData = true;
-	private int noOfBins = 30;
+	private int noOfBins = 1;
 
-	private final double xMin=4452550.25;
-	private final double xMax=4479483.33;
-	private final double yMin=5324955.00;
-	private final double yMax=5345696.81;
+	private static double xMin=4452550.25;
+	private static double xMax=4479483.33;
+	private static double yMin=5324955.00;
+	private static double yMax=5345696.81;
 
 	private final CoordinateReferenceSystem targetCRS = MGC.getCRS("EPSG:20004");
 
-	private final String shapeFile = "../../../../repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
+	private static final String shapeFileCity = "../../../../repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
+	private static String shapeFileMMA = "../../../../repos/shared-svn/projects/detailedEval/Net/boundaryArea/munichMetroArea_correctedCRS_simplified.shp";
+	private static boolean isCityArea = false;
 
 	public static void main(String[] args) {
+		//city area only
+		if(isCityArea)
+		{
+			ReferencedEnvelope re = GeometryUtils.getBoundingBox(shapeFileCity);
+			xMin = re.getMinX();
+			xMax = re.getMaxX();
+			yMin = re.getMinY();
+			yMax = re.getMaxY();
+			gridSize = 500;
+			smoothingRadius = 500;
+		} else 
+		{//metropolitan area
+			ReferencedEnvelope re = GeometryUtils.getBoundingBox(shapeFileMMA);
+			xMin = re.getMinX();
+			xMax = re.getMaxX();
+			yMin = re.getMinY();
+			yMax = re.getMaxY();
+			gridSize = 500;
+			smoothingRadius = 500;
+		}
 		MunichSpatialPlots plots = new MunichSpatialPlots();
 		//		plots.writeCongestionToCells();
 		plots.writeEmissionToCells();
 		//		plots.writeUserWelfareToCells();
 		//		plots.writePopulationDensityCountToCells();
-		plots.writePersonTollToCells();
+//		plots.writePersonTollToCells();
 		//		plots.writeLinkTollToCells();
 	}
 
@@ -339,12 +364,7 @@ public class MunichSpatialPlots {
 		inputs.setBoundingBox(xMin, xMax, yMin, yMax);
 		inputs.setTargetCRS(targetCRS);
 		inputs.setGridInfo(GridType.HEX, gridSize);
-		inputs.setShapeFile("../../../repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp");
-
-		// set bounding box, smoothing radius and targetCRS if different.
-		//		inputs.setTargetCRS(MGC.getCRS("EPSG:20004"));
-		inputs.setBoundingBox(4452550.25, 4479483.33, 5324955.00, 5345696.81);
-		//		inputs.setSmoothingRadius(500.);
+		inputs.setSmoothingRadius(smoothingRadius);
 
 		SpatialInterpolation plot = new SpatialInterpolation(inputs,runDir+"/analysis/spatialPlots/"+noOfBins+"timeBins/");
 
