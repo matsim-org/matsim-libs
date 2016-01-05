@@ -122,10 +122,13 @@ public final class GridBasedAccessibilityControlerListenerV3 implements Shutdown
 
 	private Network network;
 	private Config config;
+	private double time;
+	
 	// for consideration of different activity types or different modes (or both) subdirectories are
 	// required in order not to confuse the output
 	private String outputSubdirectory;
 	private boolean urbanSimMode;
+	
 	
 	//
 	private boolean	calculateAggregateValues;
@@ -141,7 +144,7 @@ public final class GridBasedAccessibilityControlerListenerV3 implements Shutdown
 	// ////////////////////////////////////////////////////////////////////
 
 	public GridBasedAccessibilityControlerListenerV3(ActivityFacilities opportunities, Config config, Network network){
-		this(opportunities, null, config, network); // PtMatrix is optional and in a different contrib
+		this(opportunities, null, config, network, 0); // PtMatrix is optional and in a different contrib
 	}
 	
 	
@@ -153,7 +156,7 @@ public final class GridBasedAccessibilityControlerListenerV3 implements Shutdown
 	 * @param config MATSim Config object
 	 * @param network MATSim road network
 	 */
-	public GridBasedAccessibilityControlerListenerV3(ActivityFacilities opportunities, PtMatrix ptMatrix, Config config, Network network){
+	public GridBasedAccessibilityControlerListenerV3(ActivityFacilities opportunities, PtMatrix ptMatrix, Config config, Network network, double time){
 		// I thought about changing the type of opportunities to Map<Id,Facility> or even Collection<Facility>, but in the end
 		// one can also use FacilitiesUtils.createActivitiesFacilities(), put everything in there, and give that to this constructor. kai, feb'14
 
@@ -165,6 +168,8 @@ public final class GridBasedAccessibilityControlerListenerV3 implements Shutdown
 		assert (config != null);
 		this.config = config ;
 		assert (network != null);
+		
+		this.time = time;
 
 		delegate.initAccessibilityParameters(config);
 
@@ -312,7 +317,7 @@ public final class GridBasedAccessibilityControlerListenerV3 implements Shutdown
 				writer.writeField( x + 0.5*spatialGrid.getResolution());
 				writer.writeField( y + 0.5*spatialGrid.getResolution());
 				
-//				writer.writeField(time);
+				writer.writeField(time);
 				
 				for (Modes4Accessibility mode : Modes4Accessibility.values()) {
 					if ( delegate.getIsComputingMode().get(mode) ) {
