@@ -59,7 +59,7 @@ public class PTCountsEventHandler implements LinkEnterEventHandler, TransitDrive
 	private final Set<Id<Vehicle>> transitVehicles = new HashSet<>();
 	private final HashMap<String, Integer> ptCounts = new HashMap<>();
 
-	private final Set<String> linksToMonitor = new HashSet<>();
+	private final Map<String, Double> linksToMonitor = new HashMap<>();
 
 	@Inject
 	private PTCountsEventHandler(@Named("pathToPTLinksToMonitor") final String pathToLinksList) {
@@ -70,9 +70,11 @@ public class PTCountsEventHandler implements LinkEnterEventHandler, TransitDrive
 		this.linksToMonitor.clear();
 		BufferedReader linkReader = IOUtils.getBufferedReader(pathToLinksList);
 		try {
+			linkReader.readLine(); // read header
 			String line = linkReader.readLine();
 			while (line != null) {
-				this.linksToMonitor.add(line);
+				String[] lineElements = line.split(";");
+				this.linksToMonitor.put(lineElements[0].trim(), Double.parseDouble(lineElements[1]));
 				line = linkReader.readLine();
 			}
 			linkReader.close();
@@ -84,7 +86,7 @@ public class PTCountsEventHandler implements LinkEnterEventHandler, TransitDrive
 	@Override
 	public void reset(int iteration) {
 		ptCounts.clear();
-		for (String linkId : linksToMonitor) {
+		for (String linkId : linksToMonitor.keySet()) {
 			ptCounts.put(linkId, 0);
 		}
 		vehPassengers.clear();
@@ -146,12 +148,17 @@ public class PTCountsEventHandler implements LinkEnterEventHandler, TransitDrive
 		try {
 			BufferedWriter writer = IOUtils.getBufferedWriter(filename);
 			// write file head
-			writer.write("linkId\tnumberOfPassengers");
+			writer.write("linkId\tmatsimVolumes\tcountVolumes\trelativeError");
 			writer.newLine();
 			// write content
 			for (String linkId : ptCounts.keySet()) {
+				int matsimVolume = ptCounts.get(linkId);
+				double countVolume = linksToMonitor.get(linkId);
+				double relError = matsimVolume/countVolume;
 				writer.write(linkId + "\t");
-				writer.write(ptCounts.get(linkId).toString());
+				writer.write(Integer.toString(matsimVolume) + "\t");
+				writer.write(Long.toString((long)countVolume) + "\t");
+				writer.write(Double.toString(relError));
 				writer.newLine();
 			}
 			writer.close();

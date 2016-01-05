@@ -1,2 +1,3 @@
-12
-21
+linkId;	countVolume
+32;	40
+23;	60
