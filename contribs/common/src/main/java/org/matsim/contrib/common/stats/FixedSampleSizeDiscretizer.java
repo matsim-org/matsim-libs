@@ -21,6 +21,7 @@ package org.matsim.contrib.common.stats;
 
 import gnu.trove.list.array.TDoubleArrayList;
 import gnu.trove.map.hash.TDoubleIntHashMap;
+import org.apache.commons.math.stat.StatUtils;
 
 import java.util.Arrays;
 
@@ -42,30 +43,30 @@ public class FixedSampleSizeDiscretizer {
 	 * remaining samples are sorted into the last bin. That is, the last bin is
 	 * the only bin that may contain more than <tt>size</tt> samples.
 	 * 
-	 * @param values
+	 * @param samples
 	 *            an array with samples.
 	 * @param size
 	 *            the number of samples per bin.
 	 * @return a new discretizer.
 	 */
-	public static FixedBordersDiscretizer create(double[] values, int size) {
+	public static FixedBordersDiscretizer create(double[] samples, int size) {
 		TDoubleArrayList borders;
-		/*
-		 Better make a copy of the array, otherwise the passed array is sorted without notice of the caller.
-		*/
-		double[] samples = Arrays.copyOf(values, values.length);
-		Arrays.sort(samples); // I think it is sufficient to get the min and max
-								// value.
+
+		double min = Double.MAX_VALUE;
+		double max = - Double.MAX_VALUE;
+
 		TDoubleIntHashMap hist = new TDoubleIntHashMap(samples.length);
 		for (int i = 0; i < samples.length; i++) {
 			hist.adjustOrPutValue(samples[i], 1, 1);
+			min = Math.min(min, samples[i]);
+			max = Math.max(max, samples[i]);
 		}
 
 		double keys[] = hist.keys();
 		Arrays.sort(keys);
 		borders = new TDoubleArrayList(keys.length);
 
-		borders.add(samples[0] - 1E-10);
+		borders.add(min - 1E-10);
 
 		int binsize = 0;
 		int n = 0;
@@ -85,7 +86,7 @@ public class FixedSampleSizeDiscretizer {
 		}
 
 		if (binsize > 0)
-			borders.add(samples[samples.length - 1]);
+			borders.add(max);
 
 		return new FixedBordersDiscretizer(borders.toArray());
 	}
