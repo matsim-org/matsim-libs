@@ -364,7 +364,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 		if (!this.keepPaths) {
 			// marked nodes as unused where only one way leads through
 			for (OsmNode node : this.nodes.values()) {
-				if ((node.ways == 1) && (!this.keepPaths)) {
+				if (node.ways == 1) {
 					node.used = false;
 				}
 			}
