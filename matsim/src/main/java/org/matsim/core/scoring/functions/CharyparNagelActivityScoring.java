@@ -207,13 +207,13 @@ public class CharyparNagelActivityScoring implements ActivityScoring, org.matsim
 					// also removing the "wait" alternative scoring.
 					tmpScore += utilPerf ;
 				} else {
-					if ( wrnCnt < 1 ) {
-						wrnCnt++ ;
-						log.warn("encountering duration < zeroUtilityDuration; the logic for this was changed around mid-nov 2013.") ;
-						log.warn( "your final score thus will be different from earlier runs; set usingOldScoringBelowZeroUtilityDuration to true if you "
-								+ "absolutely need the old version.  See https://matsim.atlassian.net/browse/MATSIM-191." );
-						log.warn( Gbl.ONLYONCE ) ;
-					}
+//					if ( wrnCnt < 1 ) {
+//						wrnCnt++ ;
+//						log.warn("encountering duration < zeroUtilityDuration; the logic for this was changed around mid-nov 2013.") ;
+//						log.warn( "your final score thus will be different from earlier runs; set usingOldScoringBelowZeroUtilityDuration to true if you "
+//								+ "absolutely need the old version.  See https://matsim.atlassian.net/browse/MATSIM-191." );
+//						log.warn( Gbl.ONLYONCE ) ;
+//					}
 					
 					// below zeroUtilityDuration, we linearly extend the slope ...:
 					double slopeAtZeroUtility = this.params.marginalUtilityOfPerforming_s * typicalDuration / ( 3600.*actParams.getZeroUtilityDuration_h() ) ;
