@@ -137,7 +137,7 @@ public class MZ2010ExportChoiceSetRecordFiller  implements ChoiceDataSetWriter.C
 
 	private int getChoice(final ChoiceSet<Trip> cs) {
 		// Assuming the chosen destination is the first listed one, the choice index will always be between
-		// 0 and n_modes. So linear search sould actually not be that bad for large number of alternatives,
+		// 0 and n_modes. So linear search should actually not be that bad for large number of alternatives,
 		// and actually scale BETTER than "smart" methods such as binary search...
 		int index = 0;
 		for ( String alt : cs.getNamedAlternatives().keySet() ) {

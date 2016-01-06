@@ -50,7 +50,7 @@ public class ShockwaveExperiment {
 		
 		GenerateFundamentalDiagramData generateFDData = new GenerateFundamentalDiagramData(inputs);
 		generateFDData.setRunDirectory(runDir);
-		generateFDData.setReduceDataPointsByFactor(10);
+		generateFDData.setReduceDataPointsByFactor(20);
 		generateFDData.setIsPlottingDistribution(false);
 		generateFDData.setIsUsingLiveOTFVis(false);
 		generateFDData.setIsWritingEventsFileForEachIteration(true);
@@ -60,21 +60,21 @@ public class ShockwaveExperiment {
 		sc.getConfig().qsim().setStuckTime(10*3600);
 		
 		ScenarioUtils.loadScenario(sc);
-		Link baseLink = sc.getNetwork().getLinks().get(Id.createLinkId(0));
+		Link desiredLink = sc.getNetwork().getLinks().get(Id.createLinkId(1));//baseLink is not chosen to observe some spillover
 		
 		
-		double flowCapBefore = baseLink.getCapacity();
+		double flowCapBefore = desiredLink.getCapacity();
 		NetworkChangeEventFactory cef = new NetworkChangeEventFactoryImpl() ;
 		{
-			NetworkChangeEvent event = cef.createNetworkChangeEvent(20.*60.) ;
-			event.setFlowCapacityChange(new ChangeValue(ChangeType.ABSOLUTE, 0.0));
-			event.addLink(baseLink);
+			NetworkChangeEvent event = cef.createNetworkChangeEvent(10.*60.) ;
+			event.setFlowCapacityChange(new ChangeValue(ChangeType.ABSOLUTE, 0.0)); 
+			event.addLink(desiredLink);
 			((NetworkImpl)sc.getNetwork()).addNetworkChangeEvent(event);
 		}
 		{
-			NetworkChangeEvent event = cef.createNetworkChangeEvent(20.*60.+60*5) ;
+			NetworkChangeEvent event = cef.createNetworkChangeEvent(10.*60.+60*5) ;
 			event.setFlowCapacityChange(new ChangeValue(ChangeType.ABSOLUTE, flowCapBefore/3600.)); // value should be in pcu/s
-			event.addLink(baseLink);
+			event.addLink(desiredLink);
 			((NetworkImpl)sc.getNetwork()).addNetworkChangeEvent(event);
 		}
 		generateFDData.run();

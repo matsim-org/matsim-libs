@@ -19,31 +19,29 @@
  * *********************************************************************** */
 package org.matsim.contrib.signals.integration;
 
-import org.apache.log4j.Logger;
+import java.io.File;
+
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.contrib.signals.SignalSystemsConfigGroup;
+import org.matsim.contrib.signals.controler.SignalsModule;
+import org.matsim.contrib.signals.data.SignalsData;
+import org.matsim.contrib.signals.data.SignalsScenarioLoader;
+import org.matsim.contrib.signals.data.SignalsScenarioWriter;
 import org.matsim.contrib.signals.router.InvertedNetworkRoutingModuleModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlansConfigGroup;
-import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.data.v11.LaneDefinitonsV11ToV20Converter;
-import org.matsim.contrib.signals.controler.SignalsModule;
-import org.matsim.contrib.signals.data.SignalsScenarioLoader;
-import org.matsim.contrib.signals.data.SignalsScenarioWriter;
-import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
-
-import java.io.File;
 
 
 /**
@@ -73,6 +71,9 @@ public class SignalSystemsIntegrationTest {
 		config.controler().setOutputDirectory(controlerOutputDir);
 		config.controler().setCreateGraphs(false);
 		
+		config.qsim().setStartTime(1.5*3600);
+		config.qsim().setEndTime(5.5*3600);
+		
 		// ---
 		
 		Scenario scenario = ScenarioUtils.loadScenario(config) ;
@@ -100,8 +101,8 @@ public class SignalSystemsIntegrationTest {
 			Scenario actualPopulation = ScenarioUtils.createScenario(c.getConfig());
 			new MatsimPopulationReader(actualPopulation).readFile(iterationOutput + "0.plans.xml.gz");
 
-			new org.matsim.core.population.PopulationWriter(expectedPopulation.getPopulation()).write(testUtils.getOutputDirectory()+"/expected_plans.xml.gz");
-			new org.matsim.core.population.PopulationWriter(actualPopulation.getPopulation()).write(testUtils.getOutputDirectory()+"/actual_plans.xml.gz");
+			new org.matsim.core.population.PopulationWriter(expectedPopulation.getPopulation()).write(testUtils.getOutputDirectory()+"/expected_plans_it0.xml.gz");
+			new org.matsim.core.population.PopulationWriter(actualPopulation.getPopulation()).write(testUtils.getOutputDirectory()+"/actual_plans_it0.xml.gz");
 
 			Assert.assertTrue("different population files after iteration 0 ", 
 					PopulationUtils.equalPopulation(expectedPopulation.getPopulation(), actualPopulation.getPopulation()));
@@ -118,8 +119,12 @@ public class SignalSystemsIntegrationTest {
 			Scenario expectedPopulation = ScenarioUtils.createScenario(c.getConfig());
 			new MatsimNetworkReader(expectedPopulation).readFile(c.getConfig().network().getInputFile());
 			new MatsimPopulationReader(expectedPopulation).readFile(testUtils.getInputDirectory() + "10.plans.xml.gz");
+			
 			Scenario actualPopulation = ScenarioUtils.createScenario(c.getConfig());
 			new MatsimPopulationReader(actualPopulation).readFile(iterationOutput + "10.plans.xml.gz");
+			
+			new org.matsim.core.population.PopulationWriter(expectedPopulation.getPopulation()).write(testUtils.getOutputDirectory()+"/expected_plans_it10.xml.gz");
+			new org.matsim.core.population.PopulationWriter(actualPopulation.getPopulation()).write(testUtils.getOutputDirectory()+"/actual_plans_it10.xml.gz");
 
 			Assert.assertTrue("different population files after iteration 10 ", 
 					PopulationUtils.equalPopulation(expectedPopulation.getPopulation(), actualPopulation.getPopulation()));
@@ -148,6 +153,9 @@ public class SignalSystemsIntegrationTest {
 
 		config.network().setLaneDefinitionsFile(lanes20);
 
+		config.qsim().setStartTime(1.5*3600);
+		config.qsim().setEndTime(5*3600);
+		
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsScenarioLoader(ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class)).loadSignalsData());
 

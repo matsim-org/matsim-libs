@@ -3,7 +3,6 @@ package opdytsintegration;
 import org.matsim.api.core.v01.population.Population;
 
 import floetteroed.opdyts.DecisionVariable;
-import floetteroed.opdyts.SimulatorState;
 import floetteroed.utilities.math.Vector;
 
 /**
@@ -11,7 +10,7 @@ import floetteroed.utilities.math.Vector;
  * 
  * @author Gunnar Flötteröd
  *
- * @see SimulatorState
+ * @see MATSimState
  * @see DecisionVariable
  */
 public interface MATSimStateFactory<U extends DecisionVariable> {

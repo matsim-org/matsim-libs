@@ -81,11 +81,11 @@ public class MunichSpatialPlots {
 	private static final String shapeFileCity = "../../../../repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
 	private static String shapeFileMMA = "../../../../repos/shared-svn/projects/detailedEval/Net/boundaryArea/munichMetroArea_correctedCRS_simplified.shp";
 	private static boolean isCityArea = false;
+	private static String shapeFile;
 
 	public static void main(String[] args) {
 		//city area only
-		if(isCityArea)
-		{
+		if(isCityArea) {
 			ReferencedEnvelope re = GeometryUtils.getBoundingBox(shapeFileCity);
 			xMin = re.getMinX();
 			xMax = re.getMaxX();
@@ -93,15 +93,16 @@ public class MunichSpatialPlots {
 			yMax = re.getMaxY();
 			gridSize = 500;
 			smoothingRadius = 500;
-		} else 
-		{//metropolitan area
+			shapeFile = shapeFileCity;
+		} else {//metropolitan area
 			ReferencedEnvelope re = GeometryUtils.getBoundingBox(shapeFileMMA);
 			xMin = re.getMinX();
 			xMax = re.getMaxX();
 			yMin = re.getMinY();
 			yMax = re.getMaxY();
-			gridSize = 500;
-			smoothingRadius = 500;
+			gridSize = 1500;
+			smoothingRadius = 2000;
+			shapeFile = shapeFileMMA;
 		}
 		MunichSpatialPlots plots = new MunichSpatialPlots();
 		//		plots.writeCongestionToCells();
@@ -176,7 +177,6 @@ public class MunichSpatialPlots {
 
 		for(Person p : sc.getPopulation().getPersons().values()){
 			Id<Person> id = p.getId();
-
 
 			Activity act  = sc.getPopulation().getFactory().createActivityFromLinkId("NA", Id.createLinkId("NA"));
 			for (PlanElement pe : p.getSelectedPlan().getPlanElements()){
@@ -306,7 +306,6 @@ public class MunichSpatialPlots {
 			delayAnalyzer.postProcessData();
 			linkDelaysPolicy = delayAnalyzer.getTimeBin2LinkId2Delay();
 		}
-		double sumDelays =0;
 
 		for(double time :linkDelaysBau.keySet()){
 			for(Link l : sc.getNetwork().getLinks().values()){
@@ -338,19 +337,10 @@ public class MunichSpatialPlots {
 					}
 
 					plot.processLink(l,  delays);
-					sumDelays += (delays);
 				}
 			}
 			plot.writeRData("delays_"+(int)time/3600+"h", isWritingGGPLOTData);
-			SpatialDataInputs.LOG.info("Total delays from link emission map is "+sumDelays);
-
-			double cellWeights =0;
-			for(Point p: plot.getCellWeights().keySet()){
-				cellWeights += plot.getCellWeights().get(p);
-			}
-			SpatialDataInputs.LOG.info("Total delays from cell weights  is "+cellWeights);
-			plot.clear();
-			sumDelays=0;
+			plot.reset();
 		}
 	}
 
@@ -365,8 +355,10 @@ public class MunichSpatialPlots {
 		inputs.setTargetCRS(targetCRS);
 		inputs.setGridInfo(GridType.HEX, gridSize);
 		inputs.setSmoothingRadius(smoothingRadius);
+		inputs.setShapeFile(shapeFile);
 
-		SpatialInterpolation plot = new SpatialInterpolation(inputs,runDir+"/analysis/spatialPlots/"+noOfBins+"timeBins/");
+//		SpatialInterpolation plot = new SpatialInterpolation(inputs,runDir+"/analysis/spatialPlots/"+noOfBins+"timeBins/");
+		SpatialInterpolation plot = new SpatialInterpolation(inputs,runDir+"/analysis/spatialPlots/"+noOfBins+"timeBins/", true);
 
 		EmissionLinkAnalyzer emsLnkAna = new EmissionLinkAnalyzer(LoadMyScenarios.getSimulationEndTime(inputs.initialCaseConfig), inputs.initialCaseEmissionEventsFile, noOfBins);
 		emsLnkAna.preProcessData();
@@ -381,21 +373,17 @@ public class MunichSpatialPlots {
 		}
 
 		Scenario sc = LoadMyScenarios.loadScenarioFromNetwork(inputs.initialCaseNetworkFile);
-		double sumEmission =0;
 
 		EmissionTimebinDataWriter writer = new EmissionTimebinDataWriter();
-		writer.openWriter(runDir+"/analysis/spatialPlots/"+noOfBins+"timeBins/"+"viaData_NO2_"+GridType.HEX+"_"+gridSize+"_line_"+policyName+"_diff.txt");
+		writer.openWriter(runDir+"/analysis/spatialPlots/"+noOfBins+"timeBins/"+"viaData_NO2_"+GridType.HEX+"_"+gridSize+"_"+smoothingRadius+"_line_"+policyName+"_diff.txt");
 
 		for(double time :linkEmissionsBau.keySet()){
 			for(Link l : sc.getNetwork().getLinks().values()){
 				Id<Link> id = l.getId();
 
 				if(plot.isInResearchArea(l)){
-
 					double emiss = 0;
-
 					if(inputs.isComparing){
-
 						double linkEmissionBau =0;
 						double linkEmissionPolicy =0;
 
@@ -410,28 +398,18 @@ public class MunichSpatialPlots {
 						emiss = linkEmissionPolicy - linkEmissionBau;
 
 					} else {
-
 						if(linkEmissionsBau.get(time).containsKey(id)) emiss = countScaleFactor * linkEmissionsBau.get(time).get(id).get(WarmPollutant.NO2.toString());
 						else emiss =0;
 					}
 
 					plot.processLink(l,  emiss);
-					sumEmission += (emiss);
+					
 				}
 			}
 			writer.writeData(time, plot.getCellWeights());
 			//			plot.writeRData("NO2_"+(int)time/3600+"h",isWritingGGPLOTData);
-			SpatialDataInputs.LOG.info("Total NO2 emissions from link emission map is "+sumEmission);
-
-			double cellWeights =0;
-			for(Point p: plot.getCellWeights().keySet()){
-				cellWeights += plot.getCellWeights().get(p);
-			}
-			SpatialDataInputs.LOG.info("Total NO2 emissions from cell weights  is "+cellWeights);
-			plot.clear();
-			sumEmission=0;
+			plot.reset();
 		}
-
 		writer.closeWriter();
 	}
 

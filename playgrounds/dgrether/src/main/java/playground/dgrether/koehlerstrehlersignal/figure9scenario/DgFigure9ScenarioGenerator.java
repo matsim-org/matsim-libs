@@ -135,7 +135,7 @@ public class DgFigure9ScenarioGenerator {
 		signalsWriter.setSignalGroupsOutputFilename(baseDir + "signal_groups.xml");
 		signalsWriter.setAmberTimesOutputFilename(baseDir + "amber_times.xml");
 		signalsWriter.setSignalControlOutputFilename(baseDir + "signal_control.xml");
-		signalsWriter.writeSignalsData(signalsData);
+		signalsWriter.writeSignalsData(scenario);
 	}
 	
 	

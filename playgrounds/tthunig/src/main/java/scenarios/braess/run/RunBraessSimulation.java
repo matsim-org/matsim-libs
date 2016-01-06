@@ -87,16 +87,16 @@ public final class RunBraessSimulation {
 	/* population parameter */
 	
 	private static final int NUMBER_OF_PERSONS = 2000; // per hour
-	private static final int SIMULATION_PERIOD = 3; // in hours
+	private static final int SIMULATION_PERIOD = 1; // in hours
 	
-	private static final InitRoutes INIT_ROUTES_TYPE = InitRoutes.ONLY_OUTER;
+	private static final InitRoutes INIT_ROUTES_TYPE = InitRoutes.ALL;
 	// initial score for all initial plans
 	private static final Double INIT_PLAN_SCORE = 110.;
 
 	/// defines which kind of signals should be used
-	private static final SignalControlType SIGNAL_TYPE = SignalControlType.NONE;
+	private static final SignalControlType SIGNAL_TYPE = SignalControlType.GREEN_WAVE_Z;
 	// defines which kind of lanes should be used
-	private static final LaneType LANE_TYPE = LaneType.NONE;
+	private static final LaneType LANE_TYPE = LaneType.REALISTIC;
 	
 	// defines which kind of pricing should be used
 	private static final PricingType PRICING_TYPE = PricingType.NONE;
@@ -238,7 +238,7 @@ public final class RunBraessSimulation {
 		Config config = ConfigUtils.createConfig();
 
 		// set number of iterations
-		config.controler().setLastIteration( 200 );
+		config.controler().setLastIteration( 10 );
 
 		// able or enable signals and lanes
 		config.qsim().setUseLanes( LANE_TYPE.equals(LaneType.NONE)? false : true );
@@ -307,6 +307,7 @@ public final class RunBraessSimulation {
 		
 		config.qsim().setStuckTime(3600 * 10.);
 		
+		config.qsim().setStartTime(3600 * 8);
 		// set end time to shorten simulation run time. (set it to 2 hours after the last agent departs)
 		config.qsim().setEndTime(3600 * (8 + SIMULATION_PERIOD + 2));
 		
@@ -341,8 +342,8 @@ public final class RunBraessSimulation {
 		
 		TtCreateBraessNetworkAndLanes netCreator = new TtCreateBraessNetworkAndLanes(scenario);
 		netCreator.setUseBTUProperties( false );
-		netCreator.setSimulateInflowCap( false );
-		netCreator.setMiddleLinkExists( false );
+		netCreator.setSimulateInflowCap( true );
+		netCreator.setMiddleLinkExists( true );
 		netCreator.setLaneType(LANE_TYPE);
 		netCreator.setNumberOfPersonsPerHour(NUMBER_OF_PERSONS);
 		netCreator.createNetworkAndLanes();

@@ -58,7 +58,7 @@ public class FixedIterationNumberConvergenceCriterion implements
 
 	@Override
 	public void evaluate(final TransitionSequence<?> transitionSequence) {
-		if ((transitionSequence.size() < this.iterationsToConvergence)) {
+		if ((transitionSequence.iterations() < this.iterationsToConvergence)) {
 			this.finalObjectiveFunctionValue = null;
 		} else {
 			final List<Double> objectiveFunctionValues = transitionSequence

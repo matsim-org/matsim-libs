@@ -122,10 +122,13 @@ public final class GridBasedAccessibilityControlerListenerV3 implements Shutdown
 
 	private Network network;
 	private Config config;
+	private double time;
+	
 	// for consideration of different activity types or different modes (or both) subdirectories are
 	// required in order not to confuse the output
 	private String outputSubdirectory;
 	private boolean urbanSimMode;
+	
 	
 	//
 	private boolean	calculateAggregateValues;
@@ -312,7 +315,7 @@ public final class GridBasedAccessibilityControlerListenerV3 implements Shutdown
 				writer.writeField( x + 0.5*spatialGrid.getResolution());
 				writer.writeField( y + 0.5*spatialGrid.getResolution());
 				
-//				writer.writeField(time);
+				writer.writeField(time);
 				
 				for (Modes4Accessibility mode : Modes4Accessibility.values()) {
 					if ( delegate.getIsComputingMode().get(mode) ) {
@@ -527,6 +530,11 @@ public final class GridBasedAccessibilityControlerListenerV3 implements Shutdown
 	
 	public void setUrbansimMode(boolean urbansimMode) {
 		this.urbanSimMode = urbansimMode;
+	}
+	
+	
+	public void setTime(double time) {
+		this.time = time;
 	}
 	
 	

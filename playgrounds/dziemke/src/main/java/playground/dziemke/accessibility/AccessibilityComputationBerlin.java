@@ -158,7 +158,7 @@ public class AccessibilityComputationBerlin {
 			
 			activityFacilitiesMap.put(actType, opportunities);
 
-			GridBasedAccessibilityControlerListenerV3 listener = 
+			GridBasedAccessibilityControlerListenerV3 listener =
 					new GridBasedAccessibilityControlerListenerV3(activityFacilitiesMap.get(actType), ptMatrix, config, scenario.getNetwork());
 			listener.setComputingAccessibilityForMode(Modes4Accessibility.freeSpeed, true);
 			listener.setComputingAccessibilityForMode(Modes4Accessibility.car, true);

@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
@@ -108,7 +109,16 @@ TeleportationArrivalEventHandler, TransitDriverStartsEventHandler, PersonEntersV
 		LineAndRoute(Id<TransitLine> transitLineId, Id<TransitRoute> transitRouteId, Id<Person> driverId) {
 			this.transitLineId = transitLineId;
 			this.transitRouteId = transitRouteId;
-            this.driverId = driverId;
+			this.driverId = driverId;
+		}
+		
+		@Override
+		public String toString() {
+			return "[" + super.toString() + 
+					" transitLineId=" + transitLineId +
+					" transitRouteId=" + transitRouteId +
+					" driverId=" + driverId +
+					" lastFacilityId=" + lastFacilityId + "]" ;
 		}
 		
 	}
@@ -146,6 +156,19 @@ TeleportationArrivalEventHandler, TransitDriverStartsEventHandler, PersonEntersV
 			this.transitSchedule = scenario.getTransitSchedule();
 		}
 	}
+	
+	@Override
+	public void reset(int iteration) {
+	    legs.clear();
+	    experiencedRoutes.clear();
+	    transitTravels.clear();
+	    routelessTravels.clear();
+	    transitVehicle2currentRoute.clear();
+
+	    delegate.reset(iteration);
+	}
+
+
 
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
@@ -158,14 +181,6 @@ TeleportationArrivalEventHandler, TransitDriverStartsEventHandler, PersonEntersV
 	    experiencedRoutes.put(event.getPersonId(), route);
 	}
 
-	@Override
-	public void handleEvent(VehicleArrivesAtFacilityEvent event) {
-		LineAndRoute lineAndRoute = transitVehicle2currentRoute.get(event.getVehicleId());
-		if (lineAndRoute != null) {
-			lineAndRoute.lastFacilityId = event.getFacilityId();
-		}
-	}
-	
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
 		LineAndRoute lineAndRoute = transitVehicle2currentRoute.get(event.getVehicleId());
@@ -182,7 +197,8 @@ TeleportationArrivalEventHandler, TransitDriverStartsEventHandler, PersonEntersV
 
 	@Override
     public void handleEvent(LinkEnterEvent event) {
-		List<Id<Link>> route = experiencedRoutes.get(delegate.getDriverOfVehicle(event.getVehicleId()));
+		Id<Person> driverOfVehicle = delegate.getDriverOfVehicle(event.getVehicleId());
+		List<Id<Link>> route = experiencedRoutes.get(driverOfVehicle);
 	    route.add(event.getLinkId());
     }
 
@@ -191,6 +207,14 @@ TeleportationArrivalEventHandler, TransitDriverStartsEventHandler, PersonEntersV
         routelessTravels.put(travelEvent.getPersonId(), travelEvent);
     }
 
+    @Override
+    public void handleEvent(VehicleArrivesAtFacilityEvent event) {
+	    LineAndRoute lineAndRoute = transitVehicle2currentRoute.get(event.getVehicleId());
+	    if (lineAndRoute != null) {
+		    lineAndRoute.lastFacilityId = event.getFacilityId();
+	    }
+    }
+    
 	@Override
 	public void handleEvent(PersonArrivalEvent event) {
 	    LegImpl leg = legs.get(event.getPersonId());
@@ -213,20 +237,39 @@ TeleportationArrivalEventHandler, TransitDriverStartsEventHandler, PersonEntersV
 	        
 	        leg.setRoute(networkRoute);
 	    } else if ((pendingTransitTravel = transitTravels.remove(event.getPersonId())) != null) {
-		    // i.e. experiencedRoute.size()==0 && pending transit travel (= person has entered a vehicle)
+		    // i.e. experiencedRoute.size()==1 && pending transit travel (= person has entered a vehicle)
 		    
-	    	LineAndRoute lineAndRoute = transitVehicle2currentRoute.get(pendingTransitTravel.vehicleId);
-			TransitLine line = transitSchedule.getTransitLines().get(lineAndRoute.transitLineId);
+		    final LineAndRoute lineAndRoute = transitVehicle2currentRoute.get(pendingTransitTravel.vehicleId);
+		    assert lineAndRoute!=null ;
+		    
+		    final TransitStopFacility accessFacility = transitSchedule.getFacilities().get(pendingTransitTravel.accessStop);
+		    assert accessFacility!=null ;
+
+		    final TransitLine line = transitSchedule.getTransitLines().get(lineAndRoute.transitLineId);
+		    assert line!=null ;
+
+		    final TransitRoute route = line.getRoutes().get(lineAndRoute.transitRouteId);
+		    assert route!=null ;
+
+		    final Id<TransitStopFacility> lastFacilityId = lineAndRoute.lastFacilityId;
+		    if ( lastFacilityId==null ) {
+			    Logger.getLogger(this.getClass()).warn("breakpoint");
+		    }
+		    assert lastFacilityId!=null ;
+		    
+		    final TransitStopFacility egressFacility = transitSchedule.getFacilities().get(lastFacilityId);
+		    assert egressFacility!=null ;
+
 			ExperimentalTransitRoute experimentalTransitRoute = new ExperimentalTransitRoute(
-					transitSchedule.getFacilities().get(pendingTransitTravel.accessStop),
+					accessFacility,
 					line, 
-					line.getRoutes().get(lineAndRoute.transitRouteId),
-					transitSchedule.getFacilities().get(lineAndRoute.lastFacilityId));
+					route,
+					egressFacility);
 			experimentalTransitRoute.setTravelTime(travelTime);
 			experimentalTransitRoute.setDistance(RouteUtils.calcDistance(experimentalTransitRoute, transitSchedule, network));
 			leg.setRoute(experimentalTransitRoute);
 	    } else {
-		    // i.e. experiencedRoute.size()==1 (since otherwise the above assert would fail--??) and no pendingTransitTravel
+		    // i.e. experiencedRoute.size()==1 and no pendingTransitTravel
 		    
 	    	TeleportationArrivalEvent travelEvent = routelessTravels.remove(event.getPersonId());
 	    	Route genericRoute = new GenericRouteImpl(experiencedRoute.get(0), event.getLinkId());
@@ -245,14 +288,6 @@ TeleportationArrivalEventHandler, TransitDriverStartsEventHandler, PersonEntersV
 	public void handleEvent(TransitDriverStartsEvent event) {
 		LineAndRoute lineAndRoute = new LineAndRoute(event.getTransitLineId(), event.getTransitRouteId(), event.getDriverId());
 		transitVehicle2currentRoute.put(event.getVehicleId(), lineAndRoute);
-	}
-
-	@Override
-	public void reset(int iteration) {
-	    legs.clear();
-	    experiencedRoutes.clear();
-	    
-	    delegate.reset(iteration);
 	}
 
 	public void setLegHandler(LegHandler legHandler) {

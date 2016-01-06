@@ -89,9 +89,9 @@ public class NoiseCalculationOffline {
 			
 			runDirectory = "/Users/ihab/Documents/workspace/runs-svn/cn2/output/cn1/";
 			outputDirectory = "/Users/ihab/Documents/workspace/runs-svn/cn2/output/cn1/noiseAnalysisVia/";
-			receiverPointGap = 100.;
+			receiverPointGap = 25.;
 			lastIteration = 100;
-			timeBinSize = 3600.;
+			timeBinSize = 900.;
 		}
 		
 		NoiseCalculationOffline noiseCalculation = new NoiseCalculationOffline();
@@ -130,12 +130,24 @@ public class NoiseCalculationOffline {
 //		double xMax = 4600279.;
 //		double yMax = 5818768.;
 				
-      // Berlin Coordinates: Area of Berlin
+//      // Berlin Coordinates: Greater Berlin area
 //		double xMin = 4573258.;
 //		double yMin = 5801225.;
 //		double xMax = 4620323.;
 //		double yMax = 5839639.;
+
+//      // Berlin Coordinates: Berlin area
+//		double xMin = 4575415.;
+//		double yMin = 5809450.;
+//		double xMax = 4615918.;
+//		double yMax = 5832532.;
 		
+//      // Berlin Coordinates: Hundekopf
+//		double xMin = 4583187.;
+//		double yMin = 5813643.;
+//		double xMax = 4605520.;
+//		double yMax = 5827098.;
+
 //		// Berlin Coordinates: Manteuffelstrasse
 //		double xMin = 4595288.82;
 //		double yMin = 5817859.97;
@@ -167,7 +179,7 @@ public class NoiseCalculationOffline {
 		noiseParameters.setAllowForSpeedsOutsideTheValidRange(false);
 		noiseParameters.setScaleFactor(10.);
 		noiseParameters.setComputePopulationUnits(true);
-		noiseParameters.setComputeNoiseDamages(false);
+		noiseParameters.setComputeNoiseDamages(true);
 		noiseParameters.setInternalizeNoiseDamages(false);
 		noiseParameters.setComputeCausingAgents(false);
 		noiseParameters.setThrowNoiseEventsAffected(false);
@@ -282,8 +294,8 @@ public class NoiseCalculationOffline {
 		
 		log.info("Merging other information to one file...");
 		
-		final String[] labels = { "immission", "consideredAgentUnits" };
-		final String[] workingDirectories = { outputFilePath + "/immissions/" , outputFilePath + "/consideredAgentUnits/" };
+		final String[] labels = { "immission", "consideredAgentUnits" , "damages_receiverPoint" };
+		final String[] workingDirectories = { outputFilePath + "/immissions/" , outputFilePath + "/consideredAgentUnits/" , outputFilePath + "/damages_receiverPoint/" };
 
 		MergeNoiseCSVFile merger = new MergeNoiseCSVFile() ;
 		merger.setReceiverPointsFile(outputFilePath + "receiverPoints/receiverPoints.csv");

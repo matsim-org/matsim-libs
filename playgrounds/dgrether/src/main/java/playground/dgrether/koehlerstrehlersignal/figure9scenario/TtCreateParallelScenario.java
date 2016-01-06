@@ -139,7 +139,7 @@ public class TtCreateParallelScenario {
 		signalsWriter.setSignalSystemsOutputFilename(signalSystemsOutfile);
 		signalsWriter.setSignalGroupsOutputFilename(signalGroupsOutfile);
 		signalsWriter.setSignalControlOutputFilename(signalControlOutfileBC);
-		signalsWriter.writeSignalsData(signalsData);
+		signalsWriter.writeSignalsData(scenario);
 	}
 
 	private SignalControlData createSignalControl(SignalsData sd) {
