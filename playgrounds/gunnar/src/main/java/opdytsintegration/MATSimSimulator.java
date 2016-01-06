@@ -79,11 +79,12 @@ public class MATSimSimulator<U extends DecisionVariable> implements
 		/*
 		 * (3) Create, configure, and run a new MATSim Controler.
 		 * 
-		 * TODO Check if this is done correctly.
+		 * TODO Is this done correctly?
 		 */
 		final Controler controler = new Controler(this.scenario);
 		if (this.modules != null) {
 			controler.setModules(this.modules);
+			this.modules = null; // ???
 		}
 		controler.addControlerListener(matsimDecisionVariableEvaluator);
 		controler.addOverridingModule(new AbstractModule() {
