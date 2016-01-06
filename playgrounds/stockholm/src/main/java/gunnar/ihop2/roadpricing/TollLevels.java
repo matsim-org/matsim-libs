@@ -52,8 +52,8 @@ class TollLevels implements DecisionVariable {
 			final double morningLevel2end_s, final double eveningLevel2start_s,
 			final double eveningLevel3start_s, final double eveningLevel3end_s,
 			final double eveningLevel2end_s, final double level1end_s,
-			final double level1cost_sek, final double level2cost_sek,
-			final double level3cost_sek, final Scenario scenario) {
+			final double level1cost_money, final double level2cost_money,
+			final double level3cost_money, final Scenario scenario) {
 		this.level1start_s = level1start_s;
 		this.morningLevel2start_s = morningLevel2start_s;
 		this.morningLevel3start_s = morningLevel3start_s;
@@ -64,9 +64,9 @@ class TollLevels implements DecisionVariable {
 		this.eveningLevel3end_s = eveningLevel3end_s;
 		this.eveningLevel2end_s = eveningLevel2end_s;
 		this.level1end_s = level1end_s;
-		this.level1cost_money = level1cost_sek;
-		this.level2cost_money = level2cost_sek;
-		this.level3cost_money = level3cost_sek;
+		this.level1cost_money = level1cost_money;
+		this.level2cost_money = level2cost_money;
+		this.level3cost_money = level3cost_money;
 
 		this.scenario = scenario;
 	}
@@ -100,10 +100,8 @@ class TollLevels implements DecisionVariable {
 
 	@Override
 	public void implementInSimulation() {
-
 		final RoadPricingScheme roadPricingScheme = (RoadPricingScheme) this.scenario
 				.getScenarioElement(RoadPricingScheme.ELEMENT_NAME);
-
 		for (List<RoadPricingSchemeImpl.Cost> costList : roadPricingScheme
 				.getTypicalCostsForLink().values()) {
 			costList.clear();
