@@ -19,15 +19,6 @@
 
 package playground.dziemke.accessibility.ptmatrix;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
@@ -44,6 +35,15 @@ import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.testcases.MatsimTestUtils;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * @author dziemke
  */
@@ -59,8 +59,9 @@ public class MatrixBasesPtInputTest {
 		String transitScheduleFile = "../../matsim/examples/pt-tutorial/transitschedule.xml";
 		String networkFile = "../../matsim/examples/pt-tutorial/multimodalnetwork.xml";
 		String outputRoot = utils.getOutputDirectory();
-		
-		double departureTime = 8. * 60 * 60;
+        System.out.println("outputRoot = " + outputRoot);
+
+        double departureTime = 8. * 60 * 60;
 
 		
 		Config config = ConfigUtils.createConfig();
@@ -72,7 +73,7 @@ public class MatrixBasesPtInputTest {
 		TransitScheduleReader transitScheduleReader = new TransitScheduleReader(scenario);
 		transitScheduleReader.readFile(transitScheduleFile);
 		
-		Map<Id<Coord>, Coord> ptMatrixLocationsMap = new HashMap<Id<Coord>, Coord>();
+		Map<Id<Coord>, Coord> ptMatrixLocationsMap = new HashMap<>();
 		
 		for (TransitStopFacility transitStopFacility: scenario.getTransitSchedule().getFacilities().values()) {
 			Id<Coord> id = Id.create(transitStopFacility.getId(), Coord.class);
@@ -87,74 +88,90 @@ public class MatrixBasesPtInputTest {
 		
 		// The locationFacilitiesMap is passed twice: Once for origins and once for destinations.
 		// In other uses the two maps may be different -- thus the duplication here.
+        log.info("Start matrix-computation...");
 		ThreadedMatrixCreator tmc = new ThreadedMatrixCreator(scenario, ptMatrixLocationsMap, 
 				ptMatrixLocationsMap, departureTime, outputRoot, " ", 1);
-		
-		// TODO starting the thread is actually already contained within the ThreadedMatrixCreator
-		// In normal classed it works starting it like that. Here (in a test), however, it seems that
-		// it must be started here
-		Thread thread = new Thread(tmc);
-		thread.start();
 
-//		try {
-//			Thread.sleep(1000);
-//		} catch (InterruptedException e1) {
-//			e1.printStackTrace();
-//		}
-		try {
-			thread.join();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+        //waiting for the output to be written
+        try {
+            tmc.getThread().join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
 
         //ptStops
-//        ArrayList<String[]> ptStops = readCSVLine(outputRoot + "/ptStops.csv", ",");
-//        assert ptStops != null;
-//        Assert.assertTrue(Arrays.equals(ptStops.get(1), new String[]{"2b", "2050.0", "2960.0"}));
-//        Assert.assertTrue(Arrays.equals(ptStops.get(2), new String[]{"1", "1050.0", "1050.0"}));
-//        Assert.assertTrue(Arrays.equals(ptStops.get(3), new String[]{"3", "3950.0", "1050.0"}));
-//        Assert.assertTrue(Arrays.equals(ptStops.get(4), new String[]{"2a", "2050.0", "2940.0"}));
-//
-//        //travelDistanceMatrix
-//        ArrayList<String[]> tdm = readCSVLine(outputRoot + "/travelDistanceMatrix_1.csv", " ");
-//        assert tdm != null;
-//        Assert.assertTrue(Arrays.equals(tdm.get(0), new String[]{"2b", "2b", "0.0"}));
-//        Assert.assertTrue(Arrays.equals(tdm.get(1), new String[]{"2b", "1", "2410.0"}));
-//        Assert.assertTrue(Arrays.equals(tdm.get(2), new String[]{"2b", "3", "3630.0"}));
-//        Assert.assertTrue(Arrays.equals(tdm.get(3), new String[]{"2b", "2a", "20.0"}));
-//        Assert.assertTrue(Arrays.equals(tdm.get(4), new String[]{"1", "2b", "2158.2469455140113"}));
-//        Assert.assertTrue(Arrays.equals(tdm.get(5), new String[]{"1", "1", "0.0"}));
-//        Assert.assertTrue(Arrays.equals(tdm.get(6), new String[]{"1", "3", "6000.0"}));
-//        Assert.assertTrue(Arrays.equals(tdm.get(7), new String[]{"1", "2a", "2138.2469455140113"}));
-//        Assert.assertTrue(Arrays.equals(tdm.get(8), new String[]{"3", "2b", "2694.0861159213155"}));
-//        Assert.assertTrue(Arrays.equals(tdm.get(9), new String[]{"3", "1", "6000.0"}));
-//        Assert.assertTrue(Arrays.equals(tdm.get(10), new String[]{"3", "3", "0.0"}));
-//        Assert.assertTrue(Arrays.equals(tdm.get(11), new String[]{"3", "2a", "2714.0861159213155"}));
-//        Assert.assertTrue(Arrays.equals(tdm.get(12), new String[]{"2a", "2b", "20.0"}));
-//        Assert.assertTrue(Arrays.equals(tdm.get(13), new String[]{"2a", "1", "2430.0"}));
-//        Assert.assertTrue(Arrays.equals(tdm.get(14), new String[]{"2a", "3", "3610.0"}));
-//        Assert.assertTrue(Arrays.equals(tdm.get(15), new String[]{"2a", "2a", "0.0"}));
-//
-//        //travelTimeMatrix
-//        ArrayList<String[]> ttm = readCSVLine(outputRoot + "/travelTimeMatrix_1.csv", " ");
-//        assert ttm != null;
-//        Assert.assertTrue(Arrays.equals(ttm.get(0), new String[]{"2b", "2b", "0.0"}));
-//        Assert.assertTrue(Arrays.equals(ttm.get(1), new String[]{"2b", "1", "540.0"}));
-//        Assert.assertTrue(Arrays.equals(ttm.get(2), new String[]{"2b", "3", "539.9999999999993"}));
-//        Assert.assertTrue(Arrays.equals(ttm.get(3), new String[]{"2b", "2a", "31.200000000000003"}));
-//        Assert.assertTrue(Arrays.equals(ttm.get(4), new String[]{"1", "2b", "231.2"}));
-//        Assert.assertTrue(Arrays.equals(ttm.get(5), new String[]{"1", "1", "0.0"}));
-//        Assert.assertTrue(Arrays.equals(ttm.get(6), new String[]{"1", "3", "540.0"}));
-//        Assert.assertTrue(Arrays.equals(ttm.get(7), new String[]{"1", "2a", "200.0"}));
-//        Assert.assertTrue(Arrays.equals(ttm.get(8), new String[]{"3", "2b", "300.0"}));
-//        Assert.assertTrue(Arrays.equals(ttm.get(9), new String[]{"3", "1", "540.0"}));
-//        Assert.assertTrue(Arrays.equals(ttm.get(10), new String[]{"3", "3", "0.0"}));
-//        Assert.assertTrue(Arrays.equals(ttm.get(11), new String[]{"3", "2a", "331.2"}));
-//        Assert.assertTrue(Arrays.equals(ttm.get(12), new String[]{"2a", "2b", "31.200000000000003"}));
-//        Assert.assertTrue(Arrays.equals(ttm.get(13), new String[]{"2a", "1", "539.9999999999993"}));
-//        Assert.assertTrue(Arrays.equals(ttm.get(14), new String[]{"2a", "3", "540.0"}));
-//        Assert.assertTrue(Arrays.equals(ttm.get(15), new String[]{"2a", "2a", "0.0"}));
+        ArrayList<String[]> ptStops = readCSVLine(outputRoot + "/ptStops.csv", ",");
+        ArrayList<String[]> ptStopsCompare = new ArrayList<>();
+        ptStopsCompare.add(new String[]{"id", "x", "y"});
+        ptStopsCompare.add(new String[]{"2b", "2050.0", "2960.0"});
+        ptStopsCompare.add(new String[]{"1", "1050.0", "1050.0"});
+        ptStopsCompare.add(new String[]{"3", "3950.0", "1050.0"});
+        ptStopsCompare.add(new String[]{"2a", "2050.0", "2940.0"});
+        Assert.assertNotNull(ptStops);
+        for (String[] line : ptStops) {
+            boolean contained = false;
+            for (String[] compareLine : ptStopsCompare) {
+                if (Arrays.equals(line, compareLine)) contained = true;
+            }
+            Assert.assertTrue(Arrays.asList(line) + " was not expected", contained);
+        }
 
+        //travelDistanceMatrix
+        ArrayList<String[]> tdm = readCSVLine(outputRoot + "/travelDistanceMatrix_1.csv", " ");
+        ArrayList<String[]> tdmCompare = new ArrayList<>();
+        tdmCompare.add(new String[]{"2b", "2b", "0.0"});
+        tdmCompare.add(new String[]{"2b", "1", "2410.0"});
+        tdmCompare.add(new String[]{"2b", "3", "3630.0"});
+        tdmCompare.add(new String[]{"2b", "2a", "20.0"});
+        tdmCompare.add(new String[]{"1", "2b", "2158.2469455140113"});
+        tdmCompare.add(new String[]{"1", "1", "0.0"});
+        tdmCompare.add(new String[]{"1", "3", "6000.0"});
+        tdmCompare.add(new String[]{"1", "2a", "2138.2469455140113"});
+        tdmCompare.add(new String[]{"3", "2b", "2694.0861159213155"});
+        tdmCompare.add(new String[]{"3", "1", "6000.0"});
+        tdmCompare.add(new String[]{"3", "3", "0.0"});
+        tdmCompare.add(new String[]{"3", "2a", "2714.0861159213155"});
+        tdmCompare.add(new String[]{"2a", "2b", "20.0"});
+        tdmCompare.add(new String[]{"2a", "1", "2430.0"});
+        tdmCompare.add(new String[]{"2a", "3", "3610.0"});
+        tdmCompare.add(new String[]{"2a", "2a", "0.0"});
+        Assert.assertNotNull(tdm);
+        for (String[] line : tdm) {
+            boolean contained = false;
+            for (String[] compareLine : tdmCompare) {
+                if (Arrays.equals(line, compareLine)) contained = true;
+            }
+            Assert.assertTrue(Arrays.asList(line) + " was not expected", contained);
+        }
+
+        //travelTimeMatrix
+        ArrayList<String[]> ttm = readCSVLine(outputRoot + "/travelTimeMatrix_1.csv", " ");
+        ArrayList<String[]> ttmCompare = new ArrayList<>();
+        ttmCompare.add(new String[]{"2b", "2b", "0.0"});
+        ttmCompare.add(new String[]{"2b", "1", "540.0"});
+        ttmCompare.add(new String[]{"2b", "3", "539.9999999999993"});
+        ttmCompare.add(new String[]{"2b", "2a", "31.200000000000003"});
+        ttmCompare.add(new String[]{"1", "2b", "231.2"});
+        ttmCompare.add(new String[]{"1", "1", "0.0"});
+        ttmCompare.add(new String[]{"1", "3", "540.0"});
+        ttmCompare.add(new String[]{"1", "2a", "200.0"});
+        ttmCompare.add(new String[]{"3", "2b", "300.0"});
+        ttmCompare.add(new String[]{"3", "1", "540.0"});
+        ttmCompare.add(new String[]{"3", "3", "0.0"});
+        ttmCompare.add(new String[]{"3", "2a", "331.2"});
+        ttmCompare.add(new String[]{"2a", "2b", "31.200000000000003"});
+        ttmCompare.add(new String[]{"2a", "1", "539.9999999999993"});
+        ttmCompare.add(new String[]{"2a", "3", "540.0"});
+        ttmCompare.add(new String[]{"2a", "2a", "0.0"});
+        Assert.assertNotNull(ttm);
+        for (String[] line : ttm) {
+            boolean contained = false;
+            for (String[] compareLine : ttmCompare) {
+                if (Arrays.equals(line, compareLine)) contained = true;
+            }
+            Assert.assertTrue(Arrays.asList(line) + " was not expected", contained);
+        }
     }
 
 	public static ArrayList<String[]> readCSVLine(String filePath, String splitString) {
@@ -165,16 +182,16 @@ public class MatrixBasesPtInputTest {
 			e.printStackTrace();
 		}
 		try {
-			String dataRow = CSVFile.readLine();
-			ArrayList<String[]> lineList = new ArrayList<String[]>();
+            assert CSVFile != null;
+            String dataRow = CSVFile.readLine();
+			ArrayList<String[]> lineList = new ArrayList<>();
 			while (dataRow != null){
-				lineList.add(dataRow.substring(0, dataRow.length()).split(splitString));
+				lineList.add(dataRow.split(splitString));
 				dataRow = CSVFile.readLine();
 			}
 			return lineList;
 		} catch (IOException e) {
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
-		return null;
 	}
 }
