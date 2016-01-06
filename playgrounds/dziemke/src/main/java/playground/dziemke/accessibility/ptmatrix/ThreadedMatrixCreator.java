@@ -27,15 +27,15 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
  */
 class ThreadedMatrixCreator implements Runnable {
 	private static final Logger log = Logger.getLogger(ThreadedMatrixCreator.class);
-	
-	Thread thread;
-	Integer threadName;
-	Scenario scenario;
-	Map<Id<Coord>, Coord> locationFacilitiesFromMap;
-	Map<Id<Coord>, Coord> locationFacilitiesToMap;
-	double departureTime;
-	String outputRoot;
-	String separator;
+
+	private Thread thread;
+	private Integer threadName;
+	private Scenario scenario;
+	private Map<Id<Coord>, Coord> locationFacilitiesFromMap;
+	private Map<Id<Coord>, Coord> locationFacilitiesToMap;
+	private double departureTime;
+	private String outputRoot;
+	private String separator;
 	
 	
 	ThreadedMatrixCreator(Scenario scenario, Map<Id<Coord>, Coord> locationFacilitiesFromMap,
@@ -48,7 +48,7 @@ class ThreadedMatrixCreator implements Runnable {
 		this.outputRoot = outputRoot;
 		this.separator = separator;
 		this.threadName = threadName;
-		
+
 		thread = new Thread (this, this.threadName.toString());
 		thread.start ();
 	}
@@ -228,5 +228,9 @@ class ThreadedMatrixCreator implements Runnable {
 		}
 		log.info("Finish generating transitRouteNetworkLinksMap -- thread = " + threadName);
 		return transitRouteNetworkLinksMap;
+	}
+
+	public Thread getThread() {
+		return thread;
 	}
 }
