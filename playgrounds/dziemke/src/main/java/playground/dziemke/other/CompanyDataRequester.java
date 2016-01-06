@@ -20,28 +20,29 @@ public class CompanyDataRequester {
     private static final Logger log = Logger.getLogger(CompanyDataRequester.class);
 
     private static final String WEBSITE_URL = "http://www.bundesanzeiger-verlag.de/";
-    private static final String COMPANY_URL = "/betrifft-unternehmen/unternehmensdaten/deutsche-unternehmensdaten/" +
+    private static final String COMPANY_URL = "betrifft-unternehmen/unternehmensdaten/deutsche-unternehmensdaten/" +
             "suche-nach-unternehmensdaten/firmen-details.html?tx_s4afreekmu_pi1%5Bfilter%5D=postcode&tx_s4afr" +
             "eekmu_pi1%5Bvalue%5D=1&tx_s4afreekmu_pi1%5Border%5D=name&tx_s4afreekmu_pi1%5Bdirection%5D=asc&tx" +
             "_s4afreekmu_pi1%5Blimit%5D=10&tx_s4afreekmu_pi1%5Bpage%5D=";
     private static final String ID_URL = "&tx_s4afreekmu_pi1%5Bcompany_id%";
-    private static final String PAGE_URL = "/betrifft-unternehmen/unternehmensdaten/deutsche-unternehmensdaten/suche" +
+    private static final String PAGE_URL = "betrifft-unternehmen/unternehmensdaten/deutsche-unternehmensdaten/suche" +
             "-nach-unternehmensdaten/suchergebnisse.html?tx_s4afreekmu_pi1%5Bfilter%5D=postcode&tx_s4afreekmu" +
             "_pi1%5Bvalue%5D=1&tx_s4afreekmu_pi1%5Border%5D=name&tx_s4afreekmu_pi1%5Bdirection%5D=asc&tx_s4af" +
             "reekmu_pi1%5Blimit%5D=10&tx_s4afreekmu_pi1%5Bpage%5D=";
 
-    private static int i = 2000;
+    private static int webPageIndex = 5000;
+    private static int numberOfWebpagesPerFile = 1000;
 
     public static void main(String[] args) {
         long time = System.currentTimeMillis();
-        int dif = 1000;
+        
         boolean continueWriting = true;
-        int e = 3;
+        int fileNumber = webPageIndex/numberOfWebpagesPerFile + 1;
         do {
-            List<CompanyData> companyData = getCompanyData(dif*e);
+            List<CompanyData> companyData = getCompanyData(numberOfWebpagesPerFile*fileNumber);
             if (companyData.size() != 0) {
-                writeCompanyData(companyData, "companyData" + e + ".csv");
-                e++;
+                writeCompanyData(companyData, "companyData" + fileNumber + ".csv");
+                fileNumber++;
                 companyData.clear();
                 System.out.println(System.currentTimeMillis() - time);
             } else {
@@ -101,14 +102,14 @@ public class CompanyDataRequester {
         List<CompanyData> companyData = new ArrayList<>();
         boolean continueReading = true;
         do {
-            i++;
+            webPageIndex++;
             try {
-                URL url = new URL(WEBSITE_URL + PAGE_URL + i);
+                URL url = new URL(WEBSITE_URL + PAGE_URL + webPageIndex);
                 try {
                     InputStreamReader inputStreamReader = new InputStreamReader(url.openStream());
                     BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
 
-                    log.error("Reading companyData page " + i);
+                    log.info("Reading companyData page " + webPageIndex);
 
                     String line;
                     try {
@@ -121,12 +122,12 @@ public class CompanyDataRequester {
                                 if (line.contains("<td>Berlin</td>")) {
                                     line = bufferedReader.readLine();
                                     String corporateForm = removeTagFromContent(formatContent(line), "td");
-                                    CompanyData currentCompanyData = getCompanyDataFromIdAndPageIndex(id, i);
+                                    CompanyData currentCompanyData = getCompanyDataFromIdAndPageIndex(id, webPageIndex);
                                     currentCompanyData.setCorporateForm(removeTapsAndSpacesBeforeLine(corporateForm));
                                     companyData.add(currentCompanyData);
                                 }
                             }
-                            if (i >= endInt || line.contains("Ihre Suche ergab leider keine Treffer.")) {
+                            if (webPageIndex >= endInt || line.contains("Ihre Suche ergab leider keine Treffer.")) {
                                 continueReading = false;
                             }
                         }
