@@ -107,7 +107,7 @@ public class MatrixBasesPtInputTest {
             Assert.fail();
         }
         System.out.println("ptStops.get(1) = " + Arrays.asList(ptStops.get(1)));
-        Assert.assertEquals(ptStops.get(1)[0], "2b");
+        Assert.assertEquals(ptStops.get(1)[0], "3");//"2b");
         Assert.assertEquals(ptStops.get(1)[1], "2050.0");
         Assert.assertEquals(ptStops.get(1)[2], "2960.0");
         Assert.assertEquals(ptStops.get(2)[0], "1");
