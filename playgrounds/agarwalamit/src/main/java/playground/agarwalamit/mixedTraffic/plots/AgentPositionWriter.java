@@ -54,7 +54,7 @@ import playground.agarwalamit.utils.LoadMyScenarios;
 
 public class AgentPositionWriter {
 
-	private final static double snapshotPeriod = 10;
+	private final static double snapshotPeriod = 1;
 	private final double trackLength = 3000;
 
 	public static void main(String[] args) 
@@ -62,7 +62,7 @@ public class AgentPositionWriter {
 		final String dir = "../../../../repos/shared-svn/projects/mixedTraffic/triangularNetwork/run313/singleModes/withoutHoles/car_SW//";
 		final String networkFile = dir+"/network.xml";
 		final String configFile = dir+"/config.xml";
-		final String prefix = "events[240]";
+		final String prefix = "events[140]";
 		final String eventsFile = dir+"/events/"+prefix+".xml";
 		
 		Scenario sc = LoadMyScenarios.loadScenarioFromNetworkAndConfig(networkFile, configFile);
@@ -84,7 +84,7 @@ public class AgentPositionWriter {
 	{
 		writer = IOUtils.getBufferedWriter(outFile);
 		try {
-			writer.write("personId \t legMode \t postionOnLink \t time \t speed \n");
+			writer.write("personId \t legMode \t positionOnLink \t time \t speed  \t cycleNumber \n");
 		} catch (Exception e) {
 			throw new RuntimeException("Data is not written to the file. Reason :"+e);
 		}
@@ -123,6 +123,7 @@ public class AgentPositionWriter {
 	private Map<Id<Person>,Double> prevEasting = new HashMap<>();
 	private Map<Id<Person>,Double> prevNorthing = new HashMap<>();
 	private Map<Id<Person>,Double> prevPosition = new HashMap<>();
+	private Map<Id<Person>,Integer> prevCycle = new HashMap<>();
 
 	public void run()
 	{
@@ -146,9 +147,6 @@ public class AgentPositionWriter {
 					double northing = Double.parseDouble( strs.get( labels.indexOf( Labels.NORTHING.toString() ) ) ) ;
 //					double velocity = Double.parseDouble( strs.get( labels.indexOf( Labels.VELOCITY.toString() ) ) ) ;
 					Id<Person> agentId = Id.createPersonId( strs.get( labels.indexOf( Labels.VEHICLE.toString() ) ) ) ;
-					if(agentId.toString().equals("268") && time == 2440.0) {
-						System.out.println(strs);
-					}
 					try {
 						if( prevEasting.containsKey(agentId) ){
 							double currentDist = Math.sqrt( (easting - prevEasting.get(agentId))*(easting - prevEasting.get(agentId)) 
@@ -156,14 +154,20 @@ public class AgentPositionWriter {
 							
 							double velocity = currentDist / (snapshotPeriod); // denominator should be equal to snapshot period.
 							
-							double postion = prevPosition.get(agentId) + currentDist ;
-							postion = postion >= trackLength ? postion-trackLength : postion;
-							writer.write(agentId+"\t"+person2mode.get(agentId)+"\t"+postion+"\t"+time+"\t"+velocity+"\n");
-							prevPosition.put(agentId, postion);
+							double position = prevPosition.get(agentId) + currentDist ;
+							
+							if(position > trackLength) {
+								position = position-trackLength;
+								prevCycle.put(agentId, prevCycle.get(agentId)+1);
+							}
+							
+							writer.write(agentId+"\t"+person2mode.get(agentId)+"\t"+position+"\t"+time+"\t"+velocity+"\t"+prevCycle.get(agentId)+"\n");
+							prevPosition.put(agentId, position);
 						}  else {
 							double velocity = 16.67;
-							writer.write(agentId+"\t"+person2mode.get(agentId)+"\t"+0.+"\t"+time+"\t"+velocity+"\n");
+							writer.write(agentId+"\t"+person2mode.get(agentId)+"\t"+0.+"\t"+time+"\t"+velocity+"\t"+"1"+"\n");
 							prevPosition.put(agentId, 0.);
+							prevCycle.put(agentId, 1);
 						}
 						prevEasting.put(agentId, easting);
 						prevNorthing.put(agentId, northing);
