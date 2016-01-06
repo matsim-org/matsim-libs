@@ -99,19 +99,20 @@ public class MatrixBasesPtInputTest {
             e.printStackTrace();
         }
 
-        /*
+
         //ptStops
         log.info("Read and check ptStops.csv...");
         ArrayList<String[]> ptStops = readCSVLine(outputRoot + "ptStops.csv", ",");
         if (ptStops.size() < 3) {
             Assert.fail();
         }
-        Assert.assertTrue(Arrays.equals(ptStops.get(1), new String[]{"2b", "2050.0", "2960.0"}));
-        Assert.assertTrue(Arrays.equals(ptStops.get(2), new String[]{"1", "1050.0", "1050.0"}));
-        Assert.assertTrue(Arrays.equals(ptStops.get(3), new String[]{"3", "3950.0", "1050.0"}));
-        Assert.assertTrue(Arrays.equals(ptStops.get(4), new String[]{"2a", "2050.0", "2940.0"}));
+        System.out.println("ptStops.get(1) = " + Arrays.asList(ptStops.get(1)));
+        Assert.assertEquals(true, Arrays.equals(ptStops.get(1), new String[]{"2b", "2050.0", "2960.0"}));
+        Assert.assertEquals(true, Arrays.equals(ptStops.get(2), new String[]{"1", "1050.0", "1050.0"}));
+        Assert.assertEquals(true, Arrays.equals(ptStops.get(3), new String[]{"3", "3950.0", "1050.0"}));
+        Assert.assertEquals(true, Arrays.equals(ptStops.get(4), new String[]{"2a", "2050.0", "2940.0"}));
         log.info("Reading and checking ptStops.csv finished.");
-        */
+
 
         //travelDistanceMatrix
         log.info("Read and check travelDistanceMatrix_1.csv...");
