@@ -32,7 +32,7 @@ import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.PtConstants;
-import playground.boescpa.ivtBaseline.counts.PTCountsEventHandler;
+import playground.boescpa.ivtBaseline.counts.PTLinkCountsEventHandler;
 import playground.boescpa.ivtBaseline.counts.PTCountsIVTBaseline;
 import playground.ivt.replanning.BlackListedTimeAllocationMutatorConfigGroup;
 import playground.ivt.replanning.BlackListedTimeAllocationMutatorStrategyModule;
@@ -80,7 +80,7 @@ public class RunIVTBaselineCalibration {
 			@Override
 			public void install() {
 				this.addControlerListenerBinding().to(PTCountsIVTBaseline.class);
-				this.bind(PTCountsEventHandler.class);
+				this.bind(PTLinkCountsEventHandler.class);
 				bind(String.class)
 						.annotatedWith(Names.named("pathToPTLinksToMonitor"))
 						.toInstance(pathToPTLinksMonitorList);

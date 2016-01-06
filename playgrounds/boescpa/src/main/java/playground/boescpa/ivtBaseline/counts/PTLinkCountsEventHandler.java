@@ -52,9 +52,9 @@ import java.util.Set;
  *
  * @author boescpa
  */
-public class PTCountsEventHandler implements LinkEnterEventHandler, TransitDriverStartsEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler {
+public class PTLinkCountsEventHandler implements LinkEnterEventHandler, TransitDriverStartsEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler {
 
-	private static final Logger log = Logger.getLogger(PTCountsEventHandler.class);
+	private static final Logger log = Logger.getLogger(PTLinkCountsEventHandler.class);
 
 	private final Map<Id<Vehicle>, Integer> vehPassengers = new HashMap<>();
 	private final Set<Id<Person>> transitDrivers = new HashSet<>();
@@ -66,7 +66,7 @@ public class PTCountsEventHandler implements LinkEnterEventHandler, TransitDrive
 	private final Map<String, Tuple<String, Double>> linksToMonitor = new HashMap<>();
 
 	@Inject
-	private PTCountsEventHandler(@Named("pathToPTLinksToMonitor") final String pathToLinksList) {
+	private PTLinkCountsEventHandler(@Named("pathToPTLinksToMonitor") final String pathToLinksList) {
 		setLinksToMonitor(pathToLinksList);
 	}
 
