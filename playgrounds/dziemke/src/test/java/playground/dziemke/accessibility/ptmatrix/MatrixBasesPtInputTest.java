@@ -107,10 +107,10 @@ public class MatrixBasesPtInputTest {
             Assert.fail();
         }
         System.out.println("ptStops.get(1) = " + Arrays.asList(ptStops.get(1)));
-        Assert.assertEquals(true, Arrays.equals(ptStops.get(1), new String[]{"2b", "2050.0", "2960.0"}));
-        Assert.assertEquals(true, Arrays.equals(ptStops.get(2), new String[]{"1", "1050.0", "1050.0"}));
-        Assert.assertEquals(true, Arrays.equals(ptStops.get(3), new String[]{"3", "3950.0", "1050.0"}));
-        Assert.assertEquals(true, Arrays.equals(ptStops.get(4), new String[]{"2a", "2050.0", "2940.0"}));
+        Assert.assertArrayEquals(ptStops.get(1), new String[]{"2b", "2050.0", "2960.0"});
+        Assert.assertArrayEquals(ptStops.get(2), new String[]{"1", "1050.0", "1050.0"});
+        Assert.assertArrayEquals(ptStops.get(3), new String[]{"3", "3950.0", "1050.0"});
+        Assert.assertArrayEquals(ptStops.get(4), new String[]{"2a", "2050.0", "2940.0"});
         log.info("Reading and checking ptStops.csv finished.");
 
 
@@ -118,9 +118,9 @@ public class MatrixBasesPtInputTest {
         log.info("Read and check travelDistanceMatrix_1.csv...");
         ArrayList<String[]> tdm = readCSVLine(outputRoot + "travelDistanceMatrix_1.csv", " ");
         assert tdm != null;
-        Assert.assertEquals(true, Arrays.equals(tdm.get(0), new String[]{"2b", "2b", "0.0"}));
-        Assert.assertEquals(true, Arrays.equals(tdm.get(1), new String[]{"2b", "1", "2410.0"}));
-        Assert.assertEquals(true, Arrays.equals(tdm.get(2), new String[]{"2b", "3", "3630.0"}));
+        Assert.assertTrue(Arrays.equals(tdm.get(0), new String[]{"2b", "2b", "0.0"}));
+        Assert.assertTrue(Arrays.equals(tdm.get(1), new String[]{"2b", "1", "2410.0"}));
+        Assert.assertTrue(Arrays.equals(tdm.get(2), new String[]{"2b", "3", "3630.0"}));
         Assert.assertTrue(Arrays.equals(tdm.get(3), new String[]{"2b", "2a", "20.0"}));
         Assert.assertTrue(Arrays.equals(tdm.get(4), new String[]{"1", "2b", "2158.2469455140113"}));
         Assert.assertTrue(Arrays.equals(tdm.get(5), new String[]{"1", "1", "0.0"}));
