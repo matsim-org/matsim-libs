@@ -46,7 +46,7 @@ public class ConnectionScanData {
 	public static ConnectionScanData createData( final TransitSchedule schedule ) {
 		for ( TransitLine line : schedule.getTransitLines().values() ) {
 			for ( TransitRoute route : line.getRoutes().values() ) {
-				for ( Departure d : route.getDepartures() ) {
+				for ( Departure d : route.getDepartures().values() ) {
 					// create connection
 				}
 			}
