@@ -1,12 +1,16 @@
 package gunnar.ihop2.roadpricing;
 
+import java.util.Set;
+import java.util.logging.Logger;
+
+import opdytsintegration.DistanceBasedFilter;
 import opdytsintegration.MATSimSimulator;
-import opdytsintegration.MATSimState;
-import opdytsintegration.MATSimStateFactory;
+import opdytsintegration.MATSimStateFactoryImpl;
 import opdytsintegration.TimeDiscretization;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
@@ -19,7 +23,6 @@ import floetteroed.opdyts.ObjectiveFunction;
 import floetteroed.opdyts.convergencecriteria.ConvergenceCriterion;
 import floetteroed.opdyts.convergencecriteria.FixedIterationNumberConvergenceCriterion;
 import floetteroed.opdyts.searchalgorithms.RandomSearch;
-import floetteroed.utilities.math.Vector;
 
 /**
  * 
@@ -47,9 +50,8 @@ class OptimizeRoadpricing {
 				7 * 3600, 7 * 3600 + 1800, 8 * 3600 + 1800, 9 * 3600,
 				15 * 3600 + 1800, 16 * 3600, 17 * 3600 + 1800, 18 * 3600,
 				18 * 3600 + 1800, 10.0, 15.0, 20.0, scenario);
-		final int decisionVariableCnt = 10 + 3;
-		final double changeTimeProba = 3.0 / decisionVariableCnt;
-		final double changeCostProba = 3.0 / decisionVariableCnt;
+		final double changeTimeProba = 2.0 / 3.0;
+		final double changeCostProba = 2.0 / 3.0;
 		final double deltaTime_s = 1800;
 		final double deltaCost_money = 10.0;
 		final DecisionVariableRandomizer<TollLevels> decisionVariableRandomizer = new TollLevelsRandomizer(
@@ -61,18 +63,18 @@ class OptimizeRoadpricing {
 		 */
 		final TimeDiscretization timeDiscretization = new TimeDiscretization(0,
 				3600, 24);
+		final Set<Id<Link>> relevantLinkIds = (new DistanceBasedFilter(674000,
+				6581000, 6000)).allAcceptedLinkIds(scenario.getNetwork()
+				.getLinks().values());
+		Logger.getLogger(OptimizeRoadpricing.class.getName()).info(
+				"Selected " + relevantLinkIds.size() + " out of "
+						+ scenario.getNetwork().getLinks().size() + " links.");
 		final ObjectiveFunction objectiveFunction = new TotalScoreObjectiveFunction();
 		final ConvergenceCriterion convergenceCriterion = new FixedIterationNumberConvergenceCriterion(
-				3, 1);
+				2, 1);
 		final MATSimSimulator<TollLevels> matsimSimulator = new MATSimSimulator<>(
-				new MATSimStateFactory<TollLevels>() {
-					@Override
-					public MATSimState newState(final Population population,
-							final Vector stateVector,
-							final TollLevels decisionVariable) {
-						return new MATSimState(population, stateVector);
-					}
-				}, scenario, timeDiscretization,
+				new MATSimStateFactoryImpl<TollLevels>(), scenario,
+				timeDiscretization, relevantLinkIds,
 				new ControlerDefaultsWithRoadPricingModule());
 
 		/*
@@ -81,9 +83,9 @@ class OptimizeRoadpricing {
 		final int maxMemorizedTrajectoryLength = 1;
 		final boolean keepBestSolution = true;
 		final boolean interpolate = true;
-		final int maxRandomSearchIterations = 2;
+		final int maxRandomSearchIterations = 5;
 		final int maxRandomSearchTransitions = Integer.MAX_VALUE;
-		final int randomSearchPopulationSize = 1;
+		final int randomSearchPopulationSize = 3;
 		final RandomSearch<TollLevels> randomSearch = new RandomSearch<>(
 				matsimSimulator, decisionVariableRandomizer,
 				convergenceCriterion, maxRandomSearchIterations,
@@ -93,7 +95,7 @@ class OptimizeRoadpricing {
 		randomSearch.setLogFileName(scenario.getConfig().controler()
 				.getOutputDirectory()
 				+ "optimization.log");
-		
+
 		/*
 		 * Run it.
 		 */

@@ -133,4 +133,30 @@ class TollLevels implements DecisionVariable {
 					this.level1cost_money));
 		}
 	}
+
+	// -------------------- OVERRIDING OF Object --------------------
+
+	@Override
+	public int hashCode() {
+		return this.getTimeStructure().hashCode()
+				+ this.getCostStructure().hashCode();
+	}
+
+	@Override
+	public boolean equals(final Object other) {
+		if (other instanceof TollLevels) {
+			final TollLevels otherTollLevels = (TollLevels) other;
+			return ((this.getTimeStructure().equals(otherTollLevels
+					.getTimeStructure())) && (this.getCostStructure()
+					.equals(otherTollLevels.getCostStructure())));
+		} else {
+			return false;
+		}
+	}
+
+	@Override
+	public String toString() {
+		return "Time Structure = " + this.getTimeStructure()
+				+ "; Cost Structure = " + this.getCostStructure();
+	}
 }
