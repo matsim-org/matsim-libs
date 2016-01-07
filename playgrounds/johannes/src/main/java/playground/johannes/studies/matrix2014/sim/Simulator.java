@@ -201,6 +201,7 @@ public class Simulator {
         ValidateFacilities.validate(dataPool, "modena");
         ValidateFacilities.validate(dataPool, "lau2");
         ValidateFacilities.validate(dataPool, "nuts3");
+        ValidateFacilities.validate(dataPool, "tomtom");
 
         ZoneCollection lau2Zones = ((ZoneData) dataPool.get(ZoneDataLoader.KEY)).getLayer("lau2");
         new ZoneSetLAU2Class().apply(lau2Zones);
@@ -281,7 +282,7 @@ public class Simulator {
                 , dataPool, ioContext).load();
         mAnalyzer.setPredicate(modePredicate);
         ZoneData zoneData = (ZoneData) dataPool.get(ZoneDataLoader.KEY);
-        ZoneCollection zones = zoneData.getLayer("nuts3");
+        ZoneCollection zones = zoneData.getLayer("tomtom");
         ODPredicate distPredicate = new ZoneDistancePredicate(zones, 100000);
         mAnalyzer.setODPredicate(distPredicate);
         mAnalyzer.setUseWeights(true);

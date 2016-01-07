@@ -82,6 +82,8 @@ public class ODCalibrator implements Hamiltonian, AttributeChangeListener {
 
     private Object weightDataKey;
 
+    private int odCount;
+
     public ODCalibrator(TIntObjectHashMap<TIntDoubleHashMap> refMatrix, TObjectIntHashMap<ActivityFacility>
             facility2Index, TIntObjectHashMap<Point> index2Point) {
         this.refMatrix = refMatrix;
@@ -115,7 +117,7 @@ public class ODCalibrator implements Hamiltonian, AttributeChangeListener {
 
     private void initHamiltonian() {
         hamiltonianValue = 0;
-        long cnt = 0;
+        odCount = 0;
         int[] indices = index2Point.keys();
         for (int i : indices) {
             Point p_i = index2Point.get(i);
@@ -126,13 +128,13 @@ public class ODCalibrator implements Hamiltonian, AttributeChangeListener {
                     if(refVal >= volumeThreshold) {
                         double simVal = getCellValue(i, j, simMatrix);
                         hamiltonianValue += calculateError(simVal, refVal);
-                        cnt++;
+                        odCount++;
                     }
                 }
             }
         }
 
-        logger.debug(String.format("Calibrating against %s OD pairs.", cnt));
+        logger.debug(String.format("Calibrating against %s OD pairs.", odCount));
     }
 
     private void initSimMatrix(Collection<? extends CachedPerson> persons) {
@@ -184,6 +186,11 @@ public class ODCalibrator implements Hamiltonian, AttributeChangeListener {
                 changeCounter++;
                 if (changeCounter % rescaleInterval == 0) {
                     calculateScaleFactor();
+                    // we need to recalculate the full hamiltonian if the scale factor changes
+                    double h_before = hamiltonianValue/(double)odCount;
+                    initHamiltonian();
+                    double h_after = hamiltonianValue/(double)odCount;
+                    logger.debug(String.format("Hamiltonian reset: before: %s, after: %s", h_before, h_after));
                 }
 
                 CachedSegment act = (CachedSegment) element;
@@ -265,7 +272,7 @@ public class ODCalibrator implements Hamiltonian, AttributeChangeListener {
             calculateScaleFactor();
             initHamiltonian();
         }
-        return hamiltonianValue;
+        return hamiltonianValue/(double)odCount;
     }
 
     private double changeCellContent(int i, int j, double amount) {

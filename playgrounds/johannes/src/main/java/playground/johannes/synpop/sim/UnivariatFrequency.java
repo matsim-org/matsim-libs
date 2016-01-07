@@ -42,7 +42,7 @@ public class UnivariatFrequency implements Hamiltonian, AttributeChangeListener 
 
     private final double scaleFactor;
 
-    private final double normFactor;
+    private final double binCount;
 
     private Object dataKey;
 
@@ -80,24 +80,24 @@ public class UnivariatFrequency implements Hamiltonian, AttributeChangeListener 
         refFreq = initHistogram(refElements, attrKey, useWeights);
         simFreq = initHistogram(simElements, attrKey, useWeights);
 
-        int size = Math.max(simFreq.size(), refFreq.size());
-
         double refSum = 0;
         double simSum = 0;
 
-        for (int i = 0; i < size; i++) {
+        binCount = Math.max(simFreq.size(), refFreq.size());
+
+        for (int i = 0; i < binCount; i++) {
             simSum += simFreq.get(i);
             refSum += refFreq.get(i);
         }
 
         scaleFactor = simSum/refSum;
-        normFactor = 1;//simElements.size(); //TODO: do we need this for the absolute mode?
 
-        for (int i = 0; i < size; i++) {
+
+        for (int i = 0; i < binCount; i++) {
             double simVal = simFreq.get(i);
             double refVal = refFreq.get(i) * scaleFactor;
 
-            hamiltonianValue += calculateError(simVal, refVal) / normFactor;
+            hamiltonianValue += calculateError(simVal, refVal) / binCount;
         }
     }
 
@@ -138,7 +138,7 @@ public class UnivariatFrequency implements Hamiltonian, AttributeChangeListener 
             bucket = discretizer.index((Double) newValue);
             double diff2 = changeBucketContent(bucket, delta);
 
-            hamiltonianValue += (diff1 + diff2) / normFactor;
+            hamiltonianValue += (diff1 + diff2) / binCount;
         }
     }
 

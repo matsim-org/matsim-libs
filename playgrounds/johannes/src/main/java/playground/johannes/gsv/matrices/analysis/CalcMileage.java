@@ -23,7 +23,7 @@ import com.vividsolutions.jts.geom.Point;
 import org.matsim.contrib.common.gis.CartesianDistanceCalculator;
 import org.matsim.contrib.common.gis.DistanceCalculator;
 import org.matsim.contrib.common.util.ProgressLogger;
-import playground.johannes.gsv.matrices.io.VisumOMatrixReader;
+import playground.johannes.studies.matrix2014.matrix.io.VisumOMatrixReader;
 import playground.johannes.synpop.gis.Zone;
 import playground.johannes.synpop.gis.ZoneCollection;
 import playground.johannes.synpop.gis.ZoneGeoJsonIO;

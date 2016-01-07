@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.matrices.io;
+package playground.johannes.studies.matrix2014.matrix.io;
 
 import playground.johannes.synpop.matrix.NumericMatrix;
 

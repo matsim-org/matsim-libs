@@ -108,24 +108,23 @@ public class MatrixAnalyzer implements AnalyzerTask<Collection<? extends Person>
 
         double simTotal = MatrixOperations.sum(simMatrix);
 
+        NumericMatrix tmpRefMatrix = refMatrix;
         if (odPredicate != null) {
-            NumericMatrix tmpMatrix = new NumericMatrix();
-            MatrixOperations.subMatrix(odPredicate, refMatrix, tmpMatrix);
-            refMatrix = tmpMatrix;
+            tmpRefMatrix = (NumericMatrix) MatrixOperations.subMatrix(odPredicate, tmpRefMatrix, new NumericMatrix());
         }
 
-        double refTotal = MatrixOperations.sum(refMatrix);
+        double refTotal = MatrixOperations.sum(tmpRefMatrix);
 
         if(volumeThreshold > 0) {
             ODPredicate volPredicate = new VolumePredicate(volumeThreshold);
-            refMatrix = (NumericMatrix) MatrixOperations.subMatrix(volPredicate, refMatrix, new NumericMatrix());
+            tmpRefMatrix = (NumericMatrix) MatrixOperations.subMatrix(volPredicate, tmpRefMatrix, new NumericMatrix());
         }
 
         logger.debug(String.format("Normalization factor (%s): %s.", matrixName, simTotal/refTotal));
-        MatrixOperations.applyFactor(refMatrix, simTotal / refTotal);
+        MatrixOperations.applyFactor(tmpRefMatrix, simTotal / refTotal);
 
         NumericMatrix errMatrix = new NumericMatrix();
-        MatrixOperations.errorMatrix(refMatrix, simMatrix, errMatrix);
+        MatrixOperations.errorMatrix(tmpRefMatrix, simMatrix, errMatrix);
 
         double[] errors = org.matsim.contrib.common.collections.CollectionUtils.toNativeArray(errMatrix.values(), true, true, true);
 
@@ -141,14 +140,14 @@ public class MatrixAnalyzer implements AnalyzerTask<Collection<? extends Person>
                 /*
                 write scatter plot
                 */
-                Set<String> keys = refMatrix.keys();
+                Set<String> keys = tmpRefMatrix.keys();
                 keys.addAll(simMatrix.keys());
 
                 TDoubleArrayList refVals = new TDoubleArrayList();
                 TDoubleArrayList simVals = new TDoubleArrayList();
                 for (String i : keys) {
                     for (String j : keys) {
-                        Double refVol = refMatrix.get(i, j);
+                        Double refVol = tmpRefMatrix.get(i, j);
                         Double simVol = simMatrix.get(i, j);
 
                         if (refVol != null || simVol != null) {
@@ -167,19 +166,6 @@ public class MatrixAnalyzer implements AnalyzerTask<Collection<? extends Person>
             }
         }
 
-        /*
-        min 1 trip in reference matrix
-         */
-//        refMatrix = (NumericMatrix) MatrixOperations.subMatrix(new VolumePredicate(volumeThreshold), refMatrix, new NumericMatrix
-//                ());
-//        //simMatrix = (NumericMatrix) MatrixOperations.subMatrix(new VolumePredicate(1.0), simMatrix, new NumericMatrix());
-//
-//        errMatrix = new NumericMatrix();
-//        MatrixOperations.errorMatrix(refMatrix, simMatrix, errMatrix);
-//
-//        errors = org.matsim.contrib.common.collections.CollectionUtils.toNativeArray(errMatrix.values(), true, true, true);
-//
-//        name = String.format("%s.%s.min1.err", KEY, matrixName);
         container = new StatsContainer(name, errors);
         containers.add(container);
     }
