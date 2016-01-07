@@ -102,7 +102,7 @@ public class UnivariatFrequency implements Hamiltonian, AttributeChangeListener 
     }
 
     private DynamicDoubleArray initHistogram(Set<? extends Attributable> elements, String key, boolean useWeights) {
-        DynamicDoubleArray array = new DynamicDoubleArray(12, 0);
+        DynamicDoubleArray array = new DynamicDoubleArray(1, 0);
 
         for (Attributable element : elements) {
             String strVal = element.getAttribute(key);

@@ -73,15 +73,16 @@ public class UnivariatFrequencyTest extends TestCase {
         UnivariatFrequency uf = new UnivariatFrequency(refPersons, cachedPersons, "attribute", new LinearDiscretizer
                 (1.0));
 
-        Assert.assertEquals(3.0, uf.evaluate(null), 0.0);
+        double binCount = 4;
+        Assert.assertEquals(3.0/binCount, uf.evaluate(null), 0.0);
 
         c1.setData(dataKey, 1.0);
         uf.onChange(dataKey, 2.0, 1.0, c1);
-        Assert.assertEquals(1.5, uf.evaluate(null), 0.0);
+        Assert.assertEquals(1.5/binCount, uf.evaluate(null), 0.0);
 
         c3.setData(dataKey, 1.0);
         uf.onChange(dataKey, 3.0, 1.0, c3);
-        Assert.assertEquals(0.0, uf.evaluate(null), 0.0);
+        Assert.assertEquals(0.0/binCount, uf.evaluate(null), 0.0);
 
     }
 }
