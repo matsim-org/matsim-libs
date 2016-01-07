@@ -1,8 +1,8 @@
 package opdytsintegration;
 
+import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -21,6 +21,7 @@ import com.google.inject.Inject;
 import floetteroed.opdyts.DecisionVariable;
 import floetteroed.opdyts.logging.EquilibriumGap;
 import floetteroed.opdyts.logging.EquilibriumGapWeight;
+import floetteroed.opdyts.logging.ExecutedDecisionVariable;
 import floetteroed.opdyts.logging.SurrogateObjectiveFunctionValue;
 import floetteroed.opdyts.logging.TransientObjectiveFunctionValue;
 import floetteroed.opdyts.logging.UniformityGap;
@@ -47,6 +48,9 @@ public class MATSimDecisionVariableSetEvaluator<U extends DecisionVariable>
 
 	private final TimeDiscretization timeDiscretization;
 
+	// must be linked to ensure a unique iteration ordering
+	private LinkedHashSet<Id<Link>> relevantLinkIds = null;
+
 	private int memory = 1;
 
 	private boolean averageMemory = false;
@@ -64,7 +68,7 @@ public class MATSimDecisionVariableSetEvaluator<U extends DecisionVariable>
 
 	private OccupancyAnalyzer occupancyAnalyzer = null;
 
-	private SortedSet<Id<Link>> sortedLinkIds = null;
+	// private SortedSet<Id<Link>> sortedLinkIds = null;
 
 	private LinkedList<Vector> stateList = null;
 
@@ -78,10 +82,16 @@ public class MATSimDecisionVariableSetEvaluator<U extends DecisionVariable>
 	public MATSimDecisionVariableSetEvaluator(
 			final TrajectorySampler<U> trajectorySampler,
 			final MATSimStateFactory<U> stateFactory,
-			final TimeDiscretization timeDiscretization) {
+			final TimeDiscretization timeDiscretization,
+			final Collection<Id<Link>> relevantLinkIds) {
 		this.trajectorySampler = trajectorySampler;
 		this.stateFactory = stateFactory;
 		this.timeDiscretization = timeDiscretization;
+		if (relevantLinkIds == null) {
+			this.relevantLinkIds = null;
+		} else {
+			this.relevantLinkIds = new LinkedHashSet<>(relevantLinkIds);
+		}
 	}
 
 	// -------------------- SETTERS AND GETTERS --------------------
@@ -139,6 +149,8 @@ public class MATSimDecisionVariableSetEvaluator<U extends DecisionVariable>
 				.addStatistic(logFileName, new UniformityGap<U>());
 		this.trajectorySampler.addStatistic(logFileName,
 				new SurrogateObjectiveFunctionValue<U>());
+		this.trajectorySampler.addStatistic(logFileName,
+				new ExecutedDecisionVariable<U>());
 	}
 
 	public MATSimState getFinalState() {
@@ -170,11 +182,16 @@ public class MATSimDecisionVariableSetEvaluator<U extends DecisionVariable>
 	@Override
 	public void notifyStartup(final StartupEvent event) {
 
-		this.sortedLinkIds = new TreeSet<Id<Link>>(this.network.getLinks()
-				.keySet());
+		// this.sortedLinkIds = new TreeSet<Id<Link>>(this.network.getLinks()
+		// .keySet());
+		if (this.relevantLinkIds == null) {
+			this.relevantLinkIds = new LinkedHashSet<>(this.network.getLinks()
+					.keySet());
+		}
 		this.stateList = new LinkedList<Vector>();
 
-		this.occupancyAnalyzer = new OccupancyAnalyzer(this.timeDiscretization);
+		this.occupancyAnalyzer = new OccupancyAnalyzer(this.timeDiscretization,
+				this.relevantLinkIds);
 		this.eventsManager.addHandler(this.occupancyAnalyzer);
 
 		this.trajectorySampler.initialize();
@@ -187,9 +204,10 @@ public class MATSimDecisionVariableSetEvaluator<U extends DecisionVariable>
 		 * (1) Extract the instantaneous state vector.
 		 */
 		final Vector newInstantaneousStateVector = new Vector(
-				this.sortedLinkIds.size() * this.timeDiscretization.getBinCnt());
+				this.relevantLinkIds.size()
+						* this.timeDiscretization.getBinCnt());
 		int i = 0;
-		for (Id<Link> linkId : this.sortedLinkIds) {
+		for (Id<Link> linkId : this.relevantLinkIds) {
 			for (int bin = 0; bin < this.timeDiscretization.getBinCnt(); bin++) {
 				newInstantaneousStateVector.set(i++,
 						this.occupancyAnalyzer.getOccupancy_veh(linkId, bin));

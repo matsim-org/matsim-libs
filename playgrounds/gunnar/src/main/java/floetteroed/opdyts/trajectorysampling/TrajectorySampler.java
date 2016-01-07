@@ -27,6 +27,7 @@ package floetteroed.opdyts.trajectorysampling;
 import java.util.Map;
 
 import floetteroed.opdyts.DecisionVariable;
+import floetteroed.opdyts.ObjectiveFunction;
 import floetteroed.opdyts.SimulatorState;
 import floetteroed.utilities.statisticslogging.Statistic;
 
@@ -70,5 +71,8 @@ public interface TrajectorySampler<U extends DecisionVariable> {
 	 *            the newly reached simulator state
 	 */
 	public void afterIteration(SimulatorState newState);
+	
+	// TODO NEW
+	public ObjectiveFunction getObjectiveFunction();
 
 }

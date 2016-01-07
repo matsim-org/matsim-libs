@@ -23,7 +23,9 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 
@@ -60,7 +62,20 @@ public class StatisticsWriter<D extends Object> {
 
 	private boolean wroteHeader = false;
 
-	public void writeToFile(final D data) {
+	public void writeToFile(final D data,
+			final String... labelOverrideValueSequence) {
+		final Map<String, String> label2overrideValue = new LinkedHashMap<>();
+		if (labelOverrideValueSequence != null) {
+			for (int i = 0; i < labelOverrideValueSequence.length; i += 2) {
+				label2overrideValue.put(labelOverrideValueSequence[i],
+						labelOverrideValueSequence[i + 1]);
+			}
+		}
+		writeToFile(data, label2overrideValue);
+	}
+
+	public void writeToFile(final D data,
+			final Map<String, String> label2overrideValue) {
 		try {
 			final BufferedWriter writer;
 			if (!this.wroteHeader) {
@@ -75,7 +90,12 @@ public class StatisticsWriter<D extends Object> {
 				writer = new BufferedWriter(new FileWriter(this.fileName, true));
 			}
 			for (Statistic<D> stat : this.statistics) {
-				writer.write(((data == null) ? "--" : stat.value(data)) + "\t");
+				if (label2overrideValue.containsKey(stat.label())) {
+					writer.write(label2overrideValue.get(stat.label()));
+				} else {
+					writer.write(((data == null) ? "--" : stat.value(data)));
+				}
+				writer.write("\t");
 			}
 			writer.newLine();
 			writer.flush();

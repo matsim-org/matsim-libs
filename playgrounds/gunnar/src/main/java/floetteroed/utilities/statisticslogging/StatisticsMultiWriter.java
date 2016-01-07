@@ -55,10 +55,10 @@ public class StatisticsMultiWriter<D extends Object> {
 
 	// -------------------- FILE WRITING --------------------
 
-	public void writeToFile(final D data) {
+	public void writeToFile(final D data, final String... labelOverrideValueSequence) {
 		for (StatisticsWriter<D> statsWriter : this.fileName2statsWriter
 				.values()) {
-			statsWriter.writeToFile(data);
+			statsWriter.writeToFile(data, labelOverrideValueSequence);
 		}
 	}
 

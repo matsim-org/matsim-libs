@@ -39,6 +39,8 @@ import floetteroed.opdyts.DecisionVariable;
 import floetteroed.opdyts.ObjectiveFunction;
 import floetteroed.opdyts.SimulatorState;
 import floetteroed.opdyts.convergencecriteria.ConvergenceCriterion;
+import floetteroed.opdyts.logging.ExecutedDecisionVariable;
+import floetteroed.opdyts.logging.TransientObjectiveFunctionValue;
 import floetteroed.utilities.math.MathHelpers;
 import floetteroed.utilities.statisticslogging.Statistic;
 import floetteroed.utilities.statisticslogging.StatisticsMultiWriter;
@@ -147,6 +149,11 @@ public class ParallelTrajectorySampler<U extends DecisionVariable> implements
 		return this.samplingStages;
 	}
 
+	@Override
+	public ObjectiveFunction getObjectiveFunction() {
+		return this.objectiveFunction;
+	}
+
 	// -------------------- IMPLEMENTATION --------------------
 
 	public void initialize() {
@@ -210,6 +217,9 @@ public class ParallelTrajectorySampler<U extends DecisionVariable> implements
 		 */
 		if (this.decisionVariablesToBeTriedOut.size() > 0) {
 
+			// TODO log the current decision variable before overwriting it.
+			final U executedDecisionVariable = this.currentDecisionVariable;
+
 			/*
 			 * There still are untried decision variables, pick one.
 			 */
@@ -227,7 +237,11 @@ public class ParallelTrajectorySampler<U extends DecisionVariable> implements
 				this.fromState.implementInSimulation();
 			}
 			this.currentDecisionVariable.implementInSimulation();
-			this.statisticsWriter.writeToFile(null);
+			this.statisticsWriter.writeToFile(null,
+					TransientObjectiveFunctionValue.LABEL,
+					Double.toString(this.objectiveFunction.value(newState)),
+					ExecutedDecisionVariable.LABEL,
+					executedDecisionVariable.toString());
 
 		} else {
 
@@ -239,7 +253,9 @@ public class ParallelTrajectorySampler<U extends DecisionVariable> implements
 					this.equilibriumWeight, this.uniformityWeight);
 			final SamplingStage<U> samplingStage = samplingStageEvaluator
 					.newOptimalSamplingStage();
-			this.statisticsWriter.writeToFile(samplingStage);
+			this.statisticsWriter.writeToFile(samplingStage,
+					ExecutedDecisionVariable.LABEL,
+					this.currentDecisionVariable.toString());
 			this.samplingStages.add(samplingStage);
 
 			/*
