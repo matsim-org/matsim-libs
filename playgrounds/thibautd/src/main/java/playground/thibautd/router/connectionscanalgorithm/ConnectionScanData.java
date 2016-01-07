@@ -18,8 +18,6 @@
  * *********************************************************************** */
 package playground.thibautd.router.connectionscanalgorithm;
 
-import gnu.trove.map.TObjectIntMap;
-import gnu.trove.map.hash.TObjectIntHashMap;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.socnetsim.utils.QuadTreeRebuilder;
 import org.matsim.core.utils.collections.QuadTree;
@@ -34,10 +32,12 @@ import java.util.*;
 public class ConnectionScanData {
 	private final ContigousConnections connections;
 	private final Footpaths footpaths;
+	private final StopFacilityIndexer indexer;
 
-	public ConnectionScanData( ContigousConnections connections, Footpaths footpaths ) {
+	public ConnectionScanData(ContigousConnections connections, Footpaths footpaths, StopFacilityIndexer indexer) {
 		this.connections = connections;
 		this.footpaths = footpaths;
+		this.indexer = indexer;
 	}
 
 	public ContigousConnections getConnections() {
@@ -51,9 +51,7 @@ public class ConnectionScanData {
 	public static ConnectionScanData createData(
 			final TransitSchedule schedule,
 			final double maxBeelineWalkConnectionDistance ) {
-		final TObjectIntMap<Id<TransitStopFacility>> stopNumericalIds =
-				getNumericalIds(
-						schedule );
+		final StopFacilityIndexer stopNumericalIds = new StopFacilityIndexer( schedule );
 		final ContigousConnections connections =
 				createConnections(
 						stopNumericalIds,
@@ -64,24 +62,11 @@ public class ConnectionScanData {
 						schedule,
 						maxBeelineWalkConnectionDistance );
 
-		return new ConnectionScanData( connections , footpaths );
-	}
-
-	private static TObjectIntMap<Id<TransitStopFacility>> getNumericalIds(
-			final TransitSchedule schedule) {
-		final Set<Id<TransitStopFacility>> set = new TreeSet<>();
-		for ( Id<TransitStopFacility> stop : schedule.getFacilities().keySet() ) {
-			set.add( stop );
-		}
-
-		final TObjectIntMap<Id<TransitStopFacility>> map = new TObjectIntHashMap<>();
-		int i = 0;
-		for ( Id<TransitStopFacility> id : set ) map.put( id , i++ );
-		return map;
+		return new ConnectionScanData( connections , footpaths, stopNumericalIds);
 	}
 
 	private static Footpaths createFootpaths(
-			final TObjectIntMap<Id<TransitStopFacility>> stopNumericalIds,
+			final StopFacilityIndexer stopNumericalIds,
 			final TransitSchedule schedule,
 			final double maxBeelineWalkConnectionDistance) {
 		final QuadTreeRebuilder<Id<TransitStopFacility>> quadTreeRebuilder = new QuadTreeRebuilder<>();
@@ -97,7 +82,7 @@ public class ConnectionScanData {
 			final Collection<Id<TransitStopFacility>> close = quadTree.getDisk( s.getCoord().getX() , s.getCoord().getY() , maxBeelineWalkConnectionDistance );
 
 			if ( !close.isEmpty() ) {
-				final int id = stopNumericalIds.get( s.getId() );
+				final int id = stopNumericalIds.getIndex( s.getId() );
 				for ( Id<TransitStopFacility> other : close ) {
 					final double distance =
 							CoordUtils.calcDistance(
@@ -107,7 +92,7 @@ public class ConnectionScanData {
 							id,
 							new Footpaths.Footpath(
 									id,
-									stopNumericalIds.get( other ),
+									stopNumericalIds.getIndex( other ),
 									distance ));
 				}
 			}
@@ -116,7 +101,7 @@ public class ConnectionScanData {
 	}
 
 	private static ContigousConnections createConnections(
-			final TObjectIntMap<Id<TransitStopFacility>> stopNumericalIds,
+			final StopFacilityIndexer stopNumericalIds,
 			final TransitSchedule schedule) {
 		final List<Connection> connections = new ArrayList<>();
 		int tripId = 0;
@@ -153,8 +138,8 @@ public class ConnectionScanData {
 		for ( Connection c : connections ) {
 			container.setConnection(
 					i++,
-					stopNumericalIds.get( c.getDepartureStation() ),
-					stopNumericalIds.get( c.getArrivalStation() ),
+					stopNumericalIds.getIndex( c.getDepartureStation() ),
+					stopNumericalIds.getIndex( c.getArrivalStation() ),
 					tripId,
 					c.getDepartureTime(),
 					c.getArrivalTime() );
