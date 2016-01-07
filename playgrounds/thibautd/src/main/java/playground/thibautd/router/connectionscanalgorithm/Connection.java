@@ -18,8 +18,52 @@
  * *********************************************************************** */
 package playground.thibautd.router.connectionscanalgorithm;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+
 /**
  * @author thibautd
  */
-public class Connection {
+public class Connection implements Comparable<Connection> {
+	private final int tripId;
+	private final double departureTime, arrivalTime;
+	private final Id<TransitStopFacility> departureStation, arrivalStation;
+
+	public Connection(
+			final int tripId,
+			final double departureTime,
+			final double arrivalTime,
+			final Id<TransitStopFacility> departureStation,
+			final Id<TransitStopFacility> arrivalStation) {
+		this.tripId = tripId;
+		this.departureTime = departureTime;
+		this.arrivalTime = arrivalTime;
+		this.departureStation = departureStation;
+		this.arrivalStation = arrivalStation;
+	}
+
+	public int getTripId() {
+		return tripId;
+	}
+
+	public double getDepartureTime() {
+		return departureTime;
+	}
+
+	public double getArrivalTime() {
+		return arrivalTime;
+	}
+
+	public Id<TransitStopFacility> getDepartureStation() {
+		return departureStation;
+	}
+
+	public Id<TransitStopFacility> getArrivalStation() {
+		return arrivalStation;
+	}
+
+	@Override
+	public int compareTo(Connection o) {
+		return Double.compare( departureTime , o.departureTime );
+	}
 }

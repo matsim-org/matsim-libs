@@ -47,12 +47,12 @@ public class Footpaths {
 
 	public static class Footpath {
 		private final int originStation, destinationStation;
-		private final double walkTime;
+		private final double walkDistance;
 
-		public Footpath( int originStation, int destinationStation, double walkTime ) {
+		public Footpath( int originStation, int destinationStation, double walkDistance ) {
 			this.originStation = originStation;
 			this.destinationStation = destinationStation;
-			this.walkTime = walkTime;
+			this.walkDistance = walkDistance;
 		}
 
 		public int getDestinationStation() {
@@ -63,8 +63,8 @@ public class Footpaths {
 			return originStation;
 		}
 
-		public double getWalkTime() {
-			return walkTime;
+		public double getWalkDistance() {
+			return walkDistance;
 		}
 	}
 }
