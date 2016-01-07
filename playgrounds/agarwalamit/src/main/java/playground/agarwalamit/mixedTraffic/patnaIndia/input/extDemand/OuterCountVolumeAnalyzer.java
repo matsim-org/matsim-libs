@@ -49,7 +49,7 @@ public class OuterCountVolumeAnalyzer {
 	private static final int countScaleFactor = 10;
 
 	public static void main(String[] args) {
-		String outputFolder ="../../../../repos/runs-svn/patnaIndia/run108/outerCordonOutput_10pct/";
+		String outputFolder ="../../../../repos/runs-svn/patnaIndia/run108/outerCordonOutput_10pct_OC1Excluded/";
 		String eventsFile = outputFolder+"/output_events.xml.gz";
 		OuterCountVolumeAnalyzer ocva =	new OuterCountVolumeAnalyzer();
 		ocva.run(eventsFile);

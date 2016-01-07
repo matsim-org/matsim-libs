@@ -68,7 +68,7 @@ public class PatnaExternalDemandGenerator {
 	private void run(){
 		scenario = LoadMyScenarios.loadScenarioFromNetwork(networkFile);
 		createDemandForAllStations();
-		new PopulationWriter(scenario.getPopulation()).write("../../../../repos/runs-svn/patnaIndia/run108/input/outerCordonDemand_10pct.xml.gz");
+		new PopulationWriter(scenario.getPopulation()).write("../../../../repos/runs-svn/patnaIndia/run108/input/outerCordonDemand_10pct_2.xml.gz");
 		System.out.println("Number of persons in the population are "+scenario.getPopulation().getPersons().size());
 	}
 
@@ -76,35 +76,35 @@ public class PatnaExternalDemandGenerator {
 		//for ext-int-ext trips only one of the input files is taken, because (at least) the total count multiply by directional split will give same from both files.
 
 		//OC1
-		createExternalToExternalPlans(inputFilesDir+"/oc1_fatua2Patna.txt", "OC1", "In" );
-		createExternalToInternalPlans(inputFilesDir+"/oc1_fatua2Patna.txt","OC1");
+		createExternalToExternalDemand(inputFilesDir+"/oc1_fatua2Patna.txt", "OC1", "In" );
+		createExternalToInternalDemand(inputFilesDir+"/oc1_fatua2Patna.txt","OC1");
 
 		//OC2
-		createExternalToExternalPlans(inputFilesDir+"/oc2_fatua2Patna.txt", "OC2", "In");
-		createExternalToInternalPlans(inputFilesDir+"/oc2_fatua2Patna.txt", "OC2");
+		createExternalToExternalDemand(inputFilesDir+"/oc2_fatua2Patna.txt", "OC2", "In");
+		createExternalToInternalDemand(inputFilesDir+"/oc2_fatua2Patna.txt", "OC2");
 
 		//OC3
-		createExternalToExternalPlans(inputFilesDir+"/oc3_punpun2Patna.txt", "OC3", "In");
-		createExternalToInternalPlans(inputFilesDir+"/oc3_punpun2Patna.txt", "OC3");
+		createExternalToExternalDemand(inputFilesDir+"/oc3_punpun2Patna.txt", "OC3", "In");
+		createExternalToInternalDemand(inputFilesDir+"/oc3_punpun2Patna.txt", "OC3");
 
 		//OC4
-		createExternalToExternalPlans(inputFilesDir+"/oc4_muz2Patna.txt", "OC4", "In");
-		createExternalToInternalPlans(inputFilesDir+"/oc4_muz2Patna.txt", "OC4");
+		createExternalToExternalDemand(inputFilesDir+"/oc4_muz2Patna.txt", "OC4", "In");
+		createExternalToInternalDemand(inputFilesDir+"/oc4_muz2Patna.txt", "OC4");
 
 		//OC5
-		createExternalToExternalPlans(inputFilesDir+"/oc5_danapur2Patna.txt", "OC5", "In");
-		createExternalToInternalPlans(inputFilesDir+"/oc5_danapur2Patna.txt", "OC5");
+		createExternalToExternalDemand(inputFilesDir+"/oc5_danapur2Patna.txt", "OC5", "In");
+		createExternalToInternalDemand(inputFilesDir+"/oc5_danapur2Patna.txt", "OC5");
 
 		//OC6
-		createExternalToExternalPlans(inputFilesDir+"/oc6_fatua2Noera.txt", "OC6", "In");
-		createExternalToInternalPlans(inputFilesDir+"/oc6_fatua2Noera.txt", "OC6");
+		createExternalToExternalDemand(inputFilesDir+"/oc6_fatua2Noera.txt", "OC6", "In");
+		createExternalToInternalDemand(inputFilesDir+"/oc6_fatua2Noera.txt", "OC6");
 
 		//OC7
-		createExternalToExternalPlans(inputFilesDir+"/oc7_danapur2Patna.txt", "OC7", "In");
-		createExternalToInternalPlans(inputFilesDir+"/oc7_danapur2Patna.txt", "OC7");
+		createExternalToExternalDemand(inputFilesDir+"/oc7_danapur2Patna.txt", "OC7", "In");
+		createExternalToInternalDemand(inputFilesDir+"/oc7_danapur2Patna.txt", "OC7");
 	}
 
-	private void createExternalToInternalPlans(final String file, final String countingStationNumber){
+	private void createExternalToInternalDemand(final String file, final String countingStationNumber){
 		int noOfPersonsAdded = 0;
 
 		Population population = scenario.getPopulation();
@@ -120,12 +120,7 @@ public class PatnaExternalDemandGenerator {
 		for(double timebin : timebin2mode2count.keySet()){
 			for(String mode : timebin2mode2count.get(timebin).keySet()){
 				double commutersTrafficShare = OuterCordonUtils.getDirectionalFactorFromOuterCordonKey(countingStationKey, "E2I");
-
-				// the total numer of persons are increased to get almost same number of persons as in external to internal counts.
-				if ( countingStationNumber.equals("OC2") || countingStationNumber.equals("OC3") || countingStationNumber.equals("OC6")) commutersTrafficShare = 1.1 * commutersTrafficShare;
-				else if ( countingStationNumber.equals("OC4") ) commutersTrafficShare = 1. * commutersTrafficShare;
-				else if ( countingStationNumber.equals("OC7") ) commutersTrafficShare = 1.25 * commutersTrafficShare;
-				else commutersTrafficShare = 1.2 * commutersTrafficShare;
+				// this share result in more or less same number of persons as from the aggregated counts data.
 
 				double count = Math.round( timebin2mode2count.get(timebin).get(mode) * commutersTrafficShare * OuterCordonUtils.SAMPLE_SIZE );
 
@@ -136,51 +131,56 @@ public class PatnaExternalDemandGenerator {
 					Person p = pf.createPerson(personId);
 					population.addPerson(p);
 					noOfPersonsAdded++;
-					for( String area : area2ZonesLists.keySet() ){ // create a plan for each zone (ext-int-ext)
-						Plan plan = pf.createPlan();
-						Activity originAct = pf.createActivityFromLinkId( "E2I_Start", originActLink.getId());
-						originAct.setEndTime( (timebin-1)*3600 + random.nextDouble()*3600);
 
+					List<Activity> zonalActs = new ArrayList<>(); // get the coordinates of the all possible zonal activity locations
+					for( String area : area2ZonesLists.keySet() ){ 
 						Point randomPointInZone = GeometryUtils.getRandomPointsInsideFeatures(area2ZonesLists.get(area));
 						Coord middleActCoord = PatnaUtils.COORDINATE_TRANSFORMATION.transform( new Coord(randomPointInZone.getX(),randomPointInZone.getY()) );
+						Activity act = pf.createActivityFromCoord("E2I_mid_"+area.substring(0, 3), middleActCoord);
+						zonalActs.add(act);
+					}
 
-						Activity middleAct = pf.createActivityFromCoord("E2I_mid_"+area.substring(0, 3), middleActCoord);
-						//ZZ_TODO : here the act duration is assigned randomly between 6 to 8 hours. This means, the agent will be counted in reverse direction of the same counting station.
-						double middleActEndTime = originAct.getEndTime() + 6*3600 + random.nextDouble() * 7200;
+
+					// fix activity duration such that, all plans are differntiated based on ONLY zonal activity locations.
+					double firstActEndTime = (timebin-1)*3600. + random.nextDouble()*3600.;
+					double secondActEndTime = firstActEndTime + 5*3600. + random.nextDouble() * 3. *3600.;
+
+					if((secondActEndTime > 21*3600. && secondActEndTime <24*3600.)  ) {
+						if ( countingStationNumber.equals("OC3") ) {
+							secondActEndTime = secondActEndTime - (1*3600.+random.nextDouble()* 3 *3600.); //preponding departure time of higher counts aroung mid night
+						} else if ( countingStationNumber.equals("OC6")){
+//							secondActEndTime = secondActEndTime - (3*3600+random.nextDouble()*4*3600);
+							secondActEndTime = 9*3600.+random.nextDouble()*6*3600.; 
+							//after 22:00 counts are zero, thus pushing all agents after 20:00 to non-peak hours (where demand is too less). After simulation, there will be some traffic between 20:00- 22:00 to balance counts
+						}
+					}
+
+					if(secondActEndTime >= 24*3600 ) { // midAct - startAct - midAct ==> this will give count in both time bins for desired counting station
+						if(countingStationNumber.equals("OC3") ) {
+							secondActEndTime =  secondActEndTime - (16*3600 + random.nextDouble()*3600*4);
+						} else if(countingStationNumber.equals("OC6")) {
+							secondActEndTime = 6.5*3600 + random.nextDouble()*3600*8;
+						} else secondActEndTime =  secondActEndTime - 24*3600; 
+
+						Activity midAct = pf.createActivityFromLinkId( "E2I_Start", destinationActLink.getId());
+						midAct.setEndTime( (timebin-1)*3600 + random.nextDouble()*3600 ); // end this act in the current timebin
+
+						for (Activity originAct : zonalActs) {
+							originAct.setEndTime(secondActEndTime);
+							Activity destinationAct = pf.createActivityFromCoord(originAct.getType(), originAct.getCoord());
+							Plan plan = createPlan(originAct, midAct, destinationAct, mode);
+							p.addPlan(plan);
+						}
+					} else { // startAct - midAct - startAct
+						Activity originAct = pf.createActivityFromLinkId( "E2I_Start", originActLink.getId());
+						originAct.setEndTime( firstActEndTime );
 						Activity destinationAct = pf.createActivityFromLinkId( "E2I_Start", destinationActLink.getId());
 
-						if((middleActEndTime > 20*3600 && middleActEndTime <24*3600)  ) {
-							if ( countingStationNumber.equals("OC3") ) {
-								middleActEndTime = middleActEndTime - (1*3600+random.nextDouble()*3*3600); //preponding departure time of higher counts aroung mid night
-							} else if ( countingStationNumber.equals("OC6")){
-								middleActEndTime = middleActEndTime - (3*3600+random.nextDouble()*4*3600); //preponding departure time of higher counts aroung mid night
-							}
+						for (Activity midAct : zonalActs) {
+							midAct.setEndTime(secondActEndTime);
+							Plan plan = createPlan(originAct, midAct, destinationAct, mode);
+							p.addPlan(plan);
 						}
-
-						if(middleActEndTime >= 24*3600 ) { // midAct - startAct - midAct ==> this will give count in both time bins for desired counting station
-
-							if(countingStationNumber.equals("OC3") ) {
-								middleActEndTime =  middleActEndTime - (16*3600 + random.nextDouble()*3600*4);
-							} else if(countingStationNumber.equals("OC6")) {
-								middleActEndTime = 6.5*3600 + random.nextDouble()*3600*8;
-							} else middleActEndTime =  middleActEndTime - 24*3600; 
-
-							middleAct.setEndTime( middleActEndTime );
-							plan.addActivity(middleAct);
-							plan.addLeg(pf.createLeg(mode));
-							destinationAct.setEndTime( (timebin-1)*3600 + random.nextDouble()*3600 ); // end this in the current timebin
-							plan.addActivity(destinationAct);
-							plan.addLeg(pf.createLeg(mode));
-							plan.addActivity( pf.createActivityFromCoord(middleAct.getType(), middleActCoord) );
-						} else { // startAct - midAct - startAct
-							plan.addActivity(originAct);
-							plan.addLeg(pf.createLeg(mode));
-							middleAct.setEndTime( middleActEndTime );
-							plan.addActivity(middleAct);
-							plan.addLeg(pf.createLeg(mode));
-							plan.addActivity(destinationAct);	
-						}
-						p.addPlan(plan);
 					}
 				}
 			}
@@ -189,10 +189,21 @@ public class PatnaExternalDemandGenerator {
 		if(noOfPersonsAdded==0)LOG.warn("No external to internal presons are added to the population for counting station "+countingStationNumber);
 	}
 
+	private Plan createPlan(final Activity firstAct, final Activity middleAct, final Activity lastAct, final String legMode ){
+		PopulationFactory pf = scenario.getPopulation().getFactory();
+		Plan plan = pf.createPlan();
+		plan.addActivity(firstAct);
+		plan.addLeg(pf.createLeg(legMode));
+		plan.addActivity(middleAct);
+		plan.addLeg(pf.createLeg(legMode));
+		plan.addActivity(lastAct);
+		return plan;
+	}
+
 	/**
 	 * @param countingDirection "In" for outside to Patna, "Out" for Patna to outside.
 	 */
-	private void createExternalToExternalPlans(final String file, final String countingStationNumber, final String countingDirection){
+	private void createExternalToExternalDemand(final String file, final String countingStationNumber, final String countingDirection){
 		int noOfPersonsAdded = 0;
 
 		Population population = scenario.getPopulation();
@@ -213,11 +224,8 @@ public class PatnaExternalDemandGenerator {
 
 				double throughTrafficShare = OuterCordonUtils.getDirectionalFactorFromOuterCordonKey(countingStationKey, "E2E");
 
-				// the total numer of persons are increased to get almost same number of persons as in external to internal counts.
-				if ( countingStationNumber.equals("OC2") || countingStationNumber.equals("OC3") || countingStationNumber.equals("OC6")  ) throughTrafficShare = 1.1 * throughTrafficShare;
-				else if ( countingStationNumber.equals("OC4") ) throughTrafficShare = 1. * throughTrafficShare;
-				else if ( countingStationNumber.equals("OC7") ) throughTrafficShare = 1.25 * throughTrafficShare;
-				else throughTrafficShare = 1.2 * throughTrafficShare;
+				// the through traffic share is increased by 10% because total persons generated were about 10% short. This is not uniform for all counting stations.
+				throughTrafficShare = 1.1 * throughTrafficShare;
 
 				double personCount = Math.round( timebin2mode2count.get(timebin).get(mode) * throughTrafficShare * OuterCordonUtils.SAMPLE_SIZE );
 

@@ -64,7 +64,7 @@ import playground.agarwalamit.utils.plans.SelectedPlansFilter;
 public class PatnaCadytsControler {
 
 	private static String plansFile = "../../../../repos/runs-svn/patnaIndia/run108/input/outerCordonDemand_10pct.xml.gz";
-	private static String outputDir = "../../../../repos/runs-svn/patnaIndia/run108/outerCordonOutput_10pct/";
+	private static String outputDir = "../../../../repos/runs-svn/patnaIndia/run108/outerCordonOutput_10pct_OC1Excluded/";
 
 	private static final boolean stabilityCheckAfterCadyts = false;
 	
@@ -96,13 +96,13 @@ public class PatnaCadytsControler {
 		final Controler controler = new Controler(config);
 		controler.setDumpDataAtEnd(true);
 
-		final RandomizingTimeDistanceTravelDisutility.Builder builder =  new RandomizingTimeDistanceTravelDisutility.Builder("bike");
-
+		final RandomizingTimeDistanceTravelDisutility.Builder builder_bike =  new RandomizingTimeDistanceTravelDisutility.Builder("bike");
+		
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				addTravelTimeBinding("bike").to(FreeSpeedTravelTimeForBike.class);
-				addTravelDisutilityFactoryBinding("bike").toInstance(builder);
+				addTravelDisutilityFactoryBinding("bike").toInstance(builder_bike);
 				addTravelTimeBinding("motorbike").to(networkTravelTime());
 				addTravelDisutilityFactoryBinding("motorbike").to(carTravelDisutilityFactoryKey());
 				addTravelTimeBinding("truck").to(networkTravelTime());
@@ -161,7 +161,7 @@ public class PatnaCadytsControler {
 		config.qsim().setSnapshotStyle(SnapshotStyle.queue);
 		config.qsim().setVehiclesSource(VehiclesSource.fromVehiclesData);
 
-		config.counts().setCountsFileName("../../../../repos/runs-svn/patnaIndia/run108/input/outerCordonCounts_10pct.xml.gz");
+		config.counts().setCountsFileName("../../../../repos/runs-svn/patnaIndia/run108/input/outerCordonCounts_10pct_OC1Excluded.xml.gz");
 		config.counts().setWriteCountsInterval(5);
 		config.counts().setCountsScaleFactor(1/OuterCordonUtils.SAMPLE_SIZE);
 		config.counts().setOutputFormat("all");
