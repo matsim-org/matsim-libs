@@ -102,8 +102,6 @@ public class OsmNetworkReader implements MatsimSomeReader {
 
 	private boolean slowButLowMemory = false;
 	
-	private boolean laneTagSumOfBothDirections = false;
-
 	/*package*/ final List<OsmFilter> hierarchyLayers = new ArrayList<OsmFilter>();
 
 	/**
@@ -303,19 +301,6 @@ public class OsmNetworkReader implements MatsimSomeReader {
 		this.slowButLowMemory = memoryEnabled;
 	}
 	
-	/**
-	 * Defines if the number of lanes specified by the <code>lanes</code> tag pertains to one (false) or both directions (true).
-	 * For example, if <code>false</code> then "lanes=2" means 2 lanes in each direction (e.g. in Berlin); otherwise, we have 1 lane in each direction (e.g. in Poznan).
-     * 
-     * This switch influences only two-way roads.
-     * 
-     * Defaults to <code>false</code>.
-	 */
-	public void setLaneTagSumOfBothDirections(boolean laneTagSumOfBothDirections)
-    {
-        this.laneTagSumOfBothDirections = laneTagSumOfBothDirections;
-    }
-
 	private void convert() {
 		if (this.network instanceof NetworkImpl) {
 			((NetworkImpl) this.network).setCapacityPeriod(3600);
@@ -496,8 +481,6 @@ public class OsmNetworkReader implements MatsimSomeReader {
 				oneway = false;
 			} else if ("no".equals(onewayTag)) {
 				oneway = false; // may be used to overwrite defaults
-			} else if ("alternating".equals(onewayTag)){
-                oneway = false;
             }
 			else {
                 log.warn("Could not interpret oneway tag:" + onewayTag + ". Ignoring it.");
@@ -532,7 +515,10 @@ public class OsmNetworkReader implements MatsimSomeReader {
 				if (tmp > 0) {
 					nofLanes = tmp;
 
-		            if (laneTagSumOfBothDirections && !(oneway || onewayReverse)) {
+					//By default, the OSM lanes tag specifies the total number of lanes in both directions.
+					//So if the road is not oneway (onewayReverse), let's distribute them between both directions
+					//michalm, jan'16
+		            if (!oneway && !onewayReverse) {
 		                nofLanes /= 2;
 		            }
 				}
