@@ -129,7 +129,9 @@ public class SBBPricesUtils {
 		double d = 0;
 
 		for ( Leg l : trip.getLegsOnly() ) {
-			// defined?
+			if ( Double.isNaN( l.getRoute().getDistance() ) ) {
+				throw new IllegalArgumentException( "undefined distance in "+trip );
+			}
 			d += l.getRoute().getDistance();
 		}
 

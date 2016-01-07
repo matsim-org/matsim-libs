@@ -40,7 +40,7 @@ import org.matsim.core.controler.listener.StartupListener;
  */
 public class PTCountsIVTBaseline implements StartupListener, IterationEndsListener, IterationStartsListener {
 
-	private final PTCountsEventHandler eventHandler;
+	private final PTLinkCountsEventHandler eventHandler;
 	private final EventsManager events;
 	private final OutputDirectoryHierarchy controlerIO;
 	private final Config config;
@@ -48,9 +48,9 @@ public class PTCountsIVTBaseline implements StartupListener, IterationEndsListen
 	private boolean recordCounts;
 
 	@Inject
-	private PTCountsIVTBaseline(PTCountsEventHandler ptCountsEventHandler, EventsManager events,
-							   OutputDirectoryHierarchy controlerIO, Config config) {
-		this.eventHandler = ptCountsEventHandler;
+	private PTCountsIVTBaseline(PTLinkCountsEventHandler ptLinkCountsEventHandler, EventsManager events,
+								OutputDirectoryHierarchy controlerIO, Config config) {
+		this.eventHandler = ptLinkCountsEventHandler;
 		this.events = events;
 		this.controlerIO = controlerIO;
 		this.config = config;

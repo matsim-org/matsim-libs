@@ -18,8 +18,8 @@ import playground.dziemke.utils.LogToOutputSaver;
 /**
  * @author dziemke
  */
-public class MatrixBasesPtInputUtils {
-	private static final Logger log = Logger.getLogger(MatrixBasesPtInputUtils.class);
+public class MatrixBasedPtInputUtils {
+	private static final Logger log = Logger.getLogger(MatrixBasedPtInputUtils.class);
 
 	public static void main(String[] args) {
 		String transitScheduleFile = "../../matsim/examples/pt-tutorial/transitschedule.xml";

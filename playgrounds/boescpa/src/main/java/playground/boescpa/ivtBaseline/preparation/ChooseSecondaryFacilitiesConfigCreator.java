@@ -43,17 +43,18 @@ public class ChooseSecondaryFacilitiesConfigCreator extends IVTConfigCreator {
 		new ChooseSecondaryFacilitiesConfigCreator().makeConfigIVT(config, prctScenario);
 
 		// Reduce to one replanning phase
-		config.setParam("controler", "lastIteration", "1");
+		config.controler().setLastIteration(1);
 
 		// Set location choice activities
-		config.setParam("locationchoice", "flexible_types", "remote_work, leisure, shop, escort_kids, escort_other");
-		config.setParam("locationchoice", "epsilonScaleFactors", "0.3, 0.1, 0.1, 0.1, 0.2");
+		((DestinationChoiceConfigGroup)config.getModule("locationchoice")).setFlexibleTypes("remote_work, leisure, shop, escort_kids, escort_other");
+		((DestinationChoiceConfigGroup)config.getModule("locationchoice")).setEpsilonScaleFactors("0.3, 0.1, 0.1, 0.1, 0.2");
 
 		// Change travel time calculation
-		config.setParam("locationchoice", "tt_approximationLevel","2");
+		((DestinationChoiceConfigGroup)config.getModule("locationchoice"))
+				.setTravelTimeApproximationLevel(DestinationChoiceConfigGroup.ApproximationLevel.noRouting);
 
 		// Add files
-		config.setParam("locationchoice", "prefsFile", INBASE_FILES + POPULATION_ATTRIBUTES);
+		((DestinationChoiceConfigGroup)config.getModule("locationchoice")).setPrefsFile(INBASE_FILES + POPULATION_ATTRIBUTES);
 
 		new ConfigWriter(config).write(args[0]);
 	}

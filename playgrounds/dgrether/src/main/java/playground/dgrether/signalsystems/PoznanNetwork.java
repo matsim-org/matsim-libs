@@ -616,7 +616,7 @@ public class PoznanNetwork
         String amberTimesFile = baseDir + "amber_times.xml";
         signalsWriter.setAmberTimesOutputFilename(amberTimesFile);
         ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setAmberTimesFile(amberTimesFile);
-        signalsWriter.writeSignalsData((SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME));
+        signalsWriter.writeSignalsData(scenario);
 
         String lanesOutputFile = baseDir + "lanes.xml";
         // String lanesOutputFile = "d:\\PP-dyplomy\\2010_11-inz\\MATSim\\lanes.xml";

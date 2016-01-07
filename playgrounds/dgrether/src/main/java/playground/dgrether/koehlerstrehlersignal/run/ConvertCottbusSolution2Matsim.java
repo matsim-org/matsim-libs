@@ -142,7 +142,9 @@ public class ConvertCottbusSolution2Matsim {
 				+ "signal_groups_" + basefilename + ".xml");
 		writer.setSignalControlOutputFilename(directoryPath + subdirectory
 				+ "signal_control_" + basefilename + ".xml");
-		writer.writeSignalsData(signalsData);
+		writer.writeSignalSystemsData(signalsData.getSignalSystemsData());
+		writer.writeSignalGroupsData(signalsData.getSignalGroupsData());
+		writer.writeSignalControlData(signalsData.getSignalControlData());
 	}
 	
 	/**
@@ -174,7 +176,9 @@ public class ConvertCottbusSolution2Matsim {
 				+ "signal_groups_" + substring + "_" + basefilename + ".xml");
 		writer.setSignalControlOutputFilename(directoryPath + subdirectory
 				+ "signal_control_" + substring + "_" + basefilename + ".xml");
-		writer.writeSignalsData(signalsData);
+		writer.writeSignalSystemsData(signalsData.getSignalSystemsData());
+		writer.writeSignalGroupsData(signalsData.getSignalGroupsData());
+		writer.writeSignalControlData(signalsData.getSignalControlData());
 	}
 	
 	/**

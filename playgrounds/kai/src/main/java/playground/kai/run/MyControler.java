@@ -6,14 +6,19 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.events.Event;
 import org.matsim.contrib.analysis.kai.KaiAnalysisListener;
 import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.api.internal.HasPersonId;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.events.handler.BasicEventHandler;
+import org.matsim.core.mobsim.framework.HasPerson;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
@@ -53,6 +58,26 @@ class MyControler {
 //		controler.addControlerListener(new KaiAnalysisListener()) ;
 //		controler.addOverridingModule(new OTFVisModule());
 //		controler.setMobsimFactory(new OldMobsimFactory()) ;
+		
+		controler.addOverridingModule(new AbstractModule(){
+			@Override
+			public void install() {
+				this.addEventHandlerBinding().toInstance(new BasicEventHandler(){
+					@Override
+					public void reset(int iteration) {
+					}
+
+					@Override
+					public void handleEvent(Event event) {
+						if ( event instanceof HasPersonId ) {
+							if ( ((HasPersonId)event).getPersonId().equals( Id.createPersonId("5441604") ) ) {
+								Logger.getLogger(getClass()).warn( event );
+							}
+						}
+					}});
+			}
+		});
+		
 
 		// run everything:
 		controler.run();

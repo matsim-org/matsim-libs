@@ -13,6 +13,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterImpl;
@@ -27,15 +28,15 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
  */
 class ThreadedMatrixCreator implements Runnable {
 	private static final Logger log = Logger.getLogger(ThreadedMatrixCreator.class);
-	
-	Thread thread;
-	Integer threadName;
-	Scenario scenario;
-	Map<Id<Coord>, Coord> locationFacilitiesFromMap;
-	Map<Id<Coord>, Coord> locationFacilitiesToMap;
-	double departureTime;
-	String outputRoot;
-	String separator;
+
+	private Thread thread;
+	private Integer threadName;
+	private Scenario scenario;
+	private Map<Id<Coord>, Coord> locationFacilitiesFromMap;
+	private Map<Id<Coord>, Coord> locationFacilitiesToMap;
+	private double departureTime;
+	private String outputRoot;
+	private String separator;
 	
 	
 	ThreadedMatrixCreator(Scenario scenario, Map<Id<Coord>, Coord> locationFacilitiesFromMap,
@@ -48,7 +49,7 @@ class ThreadedMatrixCreator implements Runnable {
 		this.outputRoot = outputRoot;
 		this.separator = separator;
 		this.threadName = threadName;
-		
+
 		thread = new Thread (this, this.threadName.toString());
 		thread.start ();
 	}
@@ -57,7 +58,15 @@ class ThreadedMatrixCreator implements Runnable {
 	public void run() {
 		TransitSchedule transitSchedule = this.scenario.getTransitSchedule();
 		
+		// constructor of TransitRouterImpl needs TransitRouterConfig. This is why it is instantiated here.
 		TransitRouterConfig transitRouterConfig = new TransitRouterConfig(scenario.getConfig());
+		
+		// TODO check if it is worth setting the following paramters to something other than their defaults
+//		transitRouterConfig.setBeelineWalkConnectionDistance(beelineWalkConnectionDistance);
+//		transitRouterConfig.setBeelineWalkSpeed(beelineWalkSpeed);
+//		transitRouterConfig.setExtensionRadius(extensionRadius);
+//		transitRouterConfig.setSearchRadius(searchRadius);
+		
 		TransitRouter transitRouter = new TransitRouterImpl(transitRouterConfig, transitSchedule);
 	    
 	    final InputsCSVWriter travelTimeMatrixWriter = new InputsCSVWriter(
@@ -67,67 +76,80 @@ class ThreadedMatrixCreator implements Runnable {
 	    
 		Network network = scenario.getNetwork();
 		
+		double beelineDistanceFactor = scenario.getConfig().plansCalcRoute().getModeRoutingParams().get( TransportMode.walk ).getBeelineDistanceFactor();
 		
-		// Create a map with all transit routes and a list holding their network links
+		// create a map with all transit routes and a list for each route holding their network links
 		Map<Id<TransitRoute>, List<Id<Link>>> transitRouteNetworkLinksMap = createRoutesNetworkLinksMap(
 				transitSchedule);
-	
+		
+		// initialize counters for statistics
+		int counterLegListNull = 0;
+		int counterLegListNotNull = 0;
+		int counterMoreThan3TransitLegs = 0;
+		int counterNoTransitLeg = 0;
 
+		
+		// actual computation for each OD relation
 		for (Id<Coord> fromLocation : locationFacilitiesFromMap.keySet()) {
 			for (Id<Coord> toLocation : locationFacilitiesToMap.keySet()) {
+				int counterTransitLegs = 0;				
+				
 				Coord fromCoord = locationFacilitiesFromMap.get(fromLocation);
 				Coord toCoord = locationFacilitiesToMap.get(toLocation);
 				
+				// legList = list of legs sequentially travelled on a OD relation, e.g. transit_walk ...  pt ... transit_walk
 				List<Leg> legList = transitRouter.calcRoute(fromCoord, toCoord, departureTime, null);
-//				Path path = transitRouterDistanceRouter.calcPath(fromCoord, toCoord, departureTime, null);
 				
 				double travelTime = 0.;
 				double travelDistance = 0.;
 				
-//				int counterRouteNull = 0;
-//				int counterRoutePt = 0;
-//				int counterRouteWalk = 0;
-								
 				if (legList == null) {
-					//throw new RuntimeException
-					log.error("The leg list is null! This should not happen, because -- even if the "
-							+ "origin and destination are the same -- there should be one (transit) walk leg with zero "
-							+ "travel time. FromLocation = " + fromLocation + " -- ToLocation = " + toLocation);
+					counterLegListNull++;
+					
+					// if origin == destination, there is one (transit) walk leg with zero travel time, which is
+					// correctly picked up below
+					log.warn("Leg list is null! Origin = " + fromLocation + " -- Destination = " + toLocation
+							+ " Setting time and distance to infinity.");
+					// TODO check if a very high value is better than positive infinity
+					travelTime = Float.MAX_VALUE;
+					travelDistance = Float.MAX_VALUE;
 				
-				} else { // i.e. leg list is NOT null
+				} else { // i.e. leg list is not null
+					counterLegListNotNull++;
+					
 					for(Leg leg : legList) {
 						if(leg == null) {
 							throw new RuntimeException("Leg is null.");
 						}
 						travelTime = travelTime + leg.getTravelTime();
-						ExperimentalTransitRoute legRoute = (ExperimentalTransitRoute) leg.getRoute();
-						
+						Route legRoute = leg.getRoute();
 						String mode = leg.getMode();
+						
 						if (legRoute == null) {
 							if (mode != TransportMode.transit_walk) {
-								throw new RuntimeException("The only route that can be null is a route that belongs to a transit walk.");
-							} else { // i.e. mode == TransportMode.transit_walk)
-								// This (route = null and mode = transit_walk) is the case for network access and egress)
-								// Apparently, the beelineWalkSpeed is used to calculate the walk time that we have. So, we need to use this
-								// beelineWalkSpeed here, too, in order to come from given walk time (bqck) to walk distance
-								double beelineWalkSpeed = transitRouterConfig.getBeelineWalkSpeed();
-								double transitWalkDistance = beelineWalkSpeed * leg.getTravelTime();
+								throw new RuntimeException("The only route that can be null is a \"route\" that belongs to a transit walk.");
+							} else { // i.e. mode == TransportMode.transit_walk; this is the case for network access and egress
 								
-//								log.info("access/egress walk = " + legRoute);
-//								counterRouteNull++;
+								// the beelineWalkSpeed is used to calculate the (non-beeline or "real") walk time which is returned by leg.getTravelTime()
+								double beelineWalkSpeed = transitRouterConfig.getBeelineWalkSpeed();
+								
+								// beelineWalkSpeed * beelineDistanceFactor = (non-beeline or "real") walk speed
+								double transitWalkDistance = beelineWalkSpeed * beelineDistanceFactor * leg.getTravelTime();
 								
 								travelDistance = travelDistance + transitWalkDistance;
 							}			
-						} else { // route != null
+						} else { // i.e. route != null
 							if (mode == TransportMode.pt) {
-								// Have to cast it to ExperimenalTransitRoute since otherwise the method getRouteId will not be available
+								counterTransitLegs++;
+								
+								// have to cast the route to ExperimenalTransitRoute since otherwise the method getRouteId will not be available
 								ExperimentalTransitRoute transitRoute = (ExperimentalTransitRoute) leg.getRoute();
 								
 								Id<TransitRoute> transitRouteId = transitRoute.getRouteId();
 								
 								List<Id<Link>> linkIdList = transitRouteNetworkLinksMap.get(transitRouteId);
 								
-								boolean considerLink = false;
+								
 								
 								Id<TransitStopFacility> accessStopId = transitRoute.getAccessStopId();
 								Coord currentLocation = transitSchedule.getFacilities().get(accessStopId).getCoord();
@@ -135,54 +157,54 @@ class ThreadedMatrixCreator implements Runnable {
 								Id<TransitStopFacility> egressStopId = transitRoute.getEgressStopId();
 								Coord egressStopLocation = transitSchedule.getFacilities().get(egressStopId).getCoord();
 								
+								// create a marker that is false until the start link is reached
+								boolean considerLink = false;
+								
 								for (Id<Link> linkId : linkIdList) {
+									
 									Link link = network.getLinks().get(linkId);
 									if (link == null) {
-										System.err.println("Link is null!");
-										// TODO log error?
+										throw new RuntimeException("Link is null!");
 									}
 									Coord fromNodeCoord = link.getFromNode().getCoord();
 									Coord toNodeCoord = link.getToNode().getCoord();
 									
 									if (linkId == transitRoute.getStartLinkId()) {
 										considerLink = true;
-										continue; // so that start link does NOT get counted
-										// I think this was because it is not always correct to count the full link
-										// this is solved by a t least considering the beeline distance, see below
+										continue; // the start link itself is not counted because it may not be part
+										// of the route in its full extend. Instead, the beeline distance from the
+										// access stop to the from node of the next link is added, see below
 									}
 									
 									if (linkId == transitRoute.getEndLinkId()) {
-										considerLink = false;
-										
-										// Dependent on the link the stop facility is mapped to, there may be a gap between the LAST considered link and the
-										// stop facility. To prevent neglecting this gap, it is considered as beeline distance.
+										considerLink = false; // the end link itself is not counted anymore because
+										// it may not be part of the route in its full extend. Instead, the beeline
+										// distance from its from node to the egress stop is added
 										double egressGap = Math.sqrt( Math.pow(egressStopLocation.getX() - fromNodeCoord.getX(), 2) + 
 												Math.pow(egressStopLocation.getY() - fromNodeCoord.getY(), 2) );
-										travelDistance = travelDistance + egressGap;
+										travelDistance = travelDistance + beelineDistanceFactor * egressGap;
 									}
 									
 									if (considerLink == true) {
-										// Dependent on the link the stop facility is mapped to, there may be a gap between the FIRST considered link and the
-										// stop facility. To prevent neglecting this gap, it is considered as beeline distance.
-										double accessGap = Math.sqrt( Math.pow(currentLocation.getX() - fromNodeCoord.getX(), 2) + 
-												Math.pow(currentLocation.getY() - fromNodeCoord.getY(), 2) );
-										double linkLength = link.getLength();
-										travelDistance = travelDistance + linkLength + accessGap;
+										// accessGap = beeline distance b/w currentLocation=accessStopCoord and fromNode
+										// of the next link
+										double accessGap = Math.sqrt(Math.pow(currentLocation.getX() - fromNodeCoord.getX(), 2) + 
+												Math.pow(currentLocation.getY() - fromNodeCoord.getY(), 2));
 										
-										// Set the current location to the end of the link, so that the access gap should be zero for intermediate links.
+										// linkLength added for all links except start- and endLink
+										double linkLength = link.getLength();
+										travelDistance = travelDistance + linkLength + beelineDistanceFactor * accessGap;
+										
+										// set current location to the end of the current link. This makes the access gap
+										// zero for intermediate links.
 										currentLocation =  toNodeCoord;
 									}
 								}
-//								log.info("pt = " + legRoute);
-//								counterRoutePt++;
 								
 							} else if (mode == TransportMode.transit_walk) {
 								// This (route != null and mode = transit_walk) is the case for intermediate transit walks between stops)
 								double beelineWalkSpeed = transitRouterConfig.getBeelineWalkSpeed();
-								double transitWalkDistance = beelineWalkSpeed * leg.getTravelTime();
-								
-//								log.info("intermediate transit walk = " + legRoute);
-//								counterRouteWalk++;
+								double transitWalkDistance = beelineWalkSpeed * beelineDistanceFactor * leg.getTravelTime();
 
 								travelDistance = travelDistance + transitWalkDistance;
 							} else { // i.e. mode is neither pt nor transit_walk
@@ -202,11 +224,25 @@ class ThreadedMatrixCreator implements Runnable {
 				travelDistanceMatrixWriter.writeField(travelDistance);
 				travelDistanceMatrixWriter.writeNewLine();
 				
-//				log.info("counterRouteNull = " + counterRouteNull + " -- counterRoutePt = " + counterRoutePt + " -- counterRouteWalk = " + counterRouteWalk);
+				if (counterTransitLegs >= 3) {
+					counterMoreThan3TransitLegs++;
+				}
+				
+				if (counterTransitLegs == 0) {
+					counterNoTransitLeg++;
+				}
 			}
 		}
+		
 		travelTimeMatrixWriter.close();
 		travelDistanceMatrixWriter.close();
+		
+		log.info("Thread = " + threadName + " -- counterLegListNull = " + counterLegListNull);
+		log.info("Thread = " + threadName + " -- counterLegListNotNull = " + counterLegListNotNull);
+		log.info("Thread = " + threadName + " -- counterMoreThan3TransitLegs = " + counterMoreThan3TransitLegs);
+		log.info("Thread = " + threadName + " -- counterNoTransitLeg = " + counterNoTransitLeg);
+		
+		log.info("Finishing thread = " + threadName);
 	}
 
 
@@ -228,5 +264,9 @@ class ThreadedMatrixCreator implements Runnable {
 		}
 		log.info("Finish generating transitRouteNetworkLinksMap -- thread = " + threadName);
 		return transitRouteNetworkLinksMap;
+	}
+
+	public Thread getThread() {
+		return thread;
 	}
 }

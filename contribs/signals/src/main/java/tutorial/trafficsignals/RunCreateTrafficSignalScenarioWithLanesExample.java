@@ -274,7 +274,7 @@ public class RunCreateTrafficSignalScenarioWithLanesExample {
 				.getSignalGroupsFile());
 		signalsWriter.setSignalControlOutputFilename(ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class)
 				.getSignalControlFile());
-		signalsWriter.writeSignalsData(signalsData);
+		signalsWriter.writeSignalsData(scenario);
 
 		log.info("Config of traffic light scenario with lanes is written to "
 				+ configFile);

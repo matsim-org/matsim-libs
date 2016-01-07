@@ -17,6 +17,8 @@ import playground.boescpa.analysis.ActivityAnalyzer;
 
 import java.util.Random;
 
+import static playground.boescpa.ivtBaseline.preparation.IVTConfigCreator.*;
+
 /**
  * Creates preferences for a given population.
  *
@@ -112,16 +114,16 @@ public class PrefsCreator {
                         actEndTime = (act.getEndTime() > 0) ? act.getEndTime() : 30*3600;
                         actDuration = actEndTime - actStartTime;
                         switch (act.getType()) {
-                            case "home":
+                            case HOME:
 								h = (h < 0) ? actDuration : h + actDuration; numH++; break;
-                            case "remote_home": rh = (rh < 0) ? actDuration : rh + actDuration; numRH++; break;
-                            case "work": w = (w < 0) ? actDuration : w + actDuration; numW++; break;
-                            case "remote_work": rw = (rw < 0) ? actDuration : rw + actDuration; numRW++; break;
-                            case "education": e = (e < 0) ? actDuration : e + actDuration; numE++; break;
-                            case "leisure": l = (l < 0) ? actDuration : l + actDuration; numL++; break;
-                            case "shop": s = (s < 0) ? actDuration : s + actDuration; numS++; break;
-                            case "escort_kids": k = (k < 0) ? actDuration : k + actDuration; numK++; break;
-                            case "escort_other": o = (o < 0) ? actDuration : o + actDuration; numO++; break;
+                            case REMOTE_HOME: rh = (rh < 0) ? actDuration : rh + actDuration; numRH++; break;
+                            case WORK: w = (w < 0) ? actDuration : w + actDuration; numW++; break;
+                            case REMOTE_WORK: rw = (rw < 0) ? actDuration : rw + actDuration; numRW++; break;
+                            case EDUCATION: e = (e < 0) ? actDuration : e + actDuration; numE++; break;
+                            case LEISURE: l = (l < 0) ? actDuration : l + actDuration; numL++; break;
+                            case SHOP: s = (s < 0) ? actDuration : s + actDuration; numS++; break;
+                            case ESCORT_KIDS: k = (k < 0) ? actDuration : k + actDuration; numK++; break;
+                            case ESCORT_OTHER: o = (o < 0) ? actDuration : o + actDuration; numO++; break;
                             default: log.error(
 									"For act type " + act.getType() + " of person " + personID + " no information available.");
                         }
@@ -129,15 +131,15 @@ public class PrefsCreator {
                     activityAnalyzer.addActChain(actChain);
                 }
                 // assign durations
-                if (h > -1) setDurations(prefs, "home", h/numH, personID);
-                if (rh > -1) setDurations(prefs, "remote_home", rh/numRH, personID);
-                if (w > -1) setDurations(prefs, "work", w/numW, personID);
-                if (rw > -1) setDurations(prefs, "remote_work", rw/numRW, personID);
-                if (e > -1) setDurations(prefs, "education", e/numE, personID);
-                if (l > -1) setDurations(prefs, "leisure", l/numL, personID);
-                if (s > -1) setDurations(prefs, "shop", s/numS, personID);
-                if (k > -1) setDurations(prefs, "escort_kids", k/numK, personID);
-                if (o > -1) setDurations(prefs, "escort_other", o/numO, personID);
+                if (h > -1) setDurations(prefs, HOME, h/numH, personID);
+                if (rh > -1) setDurations(prefs, REMOTE_HOME, rh/numRH, personID);
+                if (w > -1) setDurations(prefs, WORK, w/numW, personID);
+                if (rw > -1) setDurations(prefs, REMOTE_WORK, rw/numRW, personID);
+                if (e > -1) setDurations(prefs, EDUCATION, e/numE, personID);
+                if (l > -1) setDurations(prefs, LEISURE, l/numL, personID);
+                if (s > -1) setDurations(prefs, SHOP, s/numS, personID);
+                if (k > -1) setDurations(prefs, ESCORT_KIDS, k/numK, personID);
+                if (o > -1) setDurations(prefs, ESCORT_OTHER, o/numO, personID);
             } else {
                 log.warn("Person " + personID + " has no plan defined.");
             }
@@ -193,16 +195,16 @@ public class PrefsCreator {
                         ActivityImpl act = (ActivityImpl) pe;
                         actChain = actChain.concat(act.getType().substring(0, 1));
                         switch (act.getType()) {
-                            case "work":
+                            case WORK:
                                 nrWorkActs += 1;
                                 break;
-                            case "education":
+                            case EDUCATION:
                                 education = true;
                                 break;
-                            case "shop":
+                            case SHOP:
                                 shop = true;
                                 break;
-                            case "leisure":
+                            case LEISURE:
                                 leisure = true;
                                 break;
                         }

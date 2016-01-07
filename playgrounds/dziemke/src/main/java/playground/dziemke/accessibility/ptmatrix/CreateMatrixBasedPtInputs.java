@@ -37,32 +37,32 @@ public class CreateMatrixBasedPtInputs {
 		
 		// ... for local use
 		// Input and Output
-//		String networkFile = "../../../../Workspace/data/accessibility/nmb/scenario/NMBM_PT_V1.xml.gz";
+		String networkFile = "../../../../Workspace/data/accessibility/nmb/scenario/NMBM_PT_V1.xml.gz";
 //		String networkFile = "../../../../Workspace/shared-svn/projects/bvg_3_bln_inputdata/rev554B-bvg00-0.1sample/network/network.final.xml.gz";
 //		String networkFile = "../../../../Workspace/runs-svn/nmbm_minibuses/nmbm/output/jtlu14i/jtlu14i.output_network.xml.gz";
 //		String networkFile = "../../../../Workspace/runs-svn/nmbm_minibuses/nmbm/output/jtlu14d/jtlu14d.output_network.xml.gz";
-		String networkFile = "../../../../Workspace/shared-svn/projects/accessibility_berlin/otp/2015-05-26/network.xml";
+//		String networkFile = "../../../../Workspace/shared-svn/projects/accessibility_berlin/network/2015-05-26/network.xml";
 		
-//		String transitScheduleFile = "../../../../Workspace/data/accessibility/nmb/scenario/Transitschedule_PT_V1_WithVehicles.xml.gz";
+		String transitScheduleFile = "../../../../Workspace/data/accessibility/nmb/scenario/Transitschedule_PT_V1_WithVehicles.xml.gz";
 //		String transitScheduleFile = "../../../../Workspace/shared-svn/projects/bvg_3_bln_inputdata/rev554B-bvg00-0.1sample/network/transitSchedule.xml.gz";
 //		String transitScheduleFile = "../../../../Workspace/runs-svn/nmbm_minibuses/nmbm/output/jtlu14i/ITERS/it.300/jtlu14i.300.transitScheduleScored.xml.gz";
 //		String transitScheduleFile = "../../../../Workspace/runs-svn/nmbm_minibuses/nmbm/output/jtlu14d/ITERS/it.300/jtlu14d.300.transitScheduleScored.xml.gz";
-		String transitScheduleFile = "../../../../Workspace/shared-svn/projects/accessibility_berlin/gtfs/2015-07-03/transitschedule.xml";
+//		String transitScheduleFile = "../../../../Workspace/shared-svn/projects/accessibility_berlin/gtfs/2015-07-03/transitschedule.xml";
 		
-//		String outputRoot = "../../../../Workspace/data/accessibility/nmb/matrix/04/";
-		String outputRoot = "../../../../Workspace/shared-svn/projects/accessibility_berlin/travel_matrix/2015-05-26/";
+		String outputRoot = "../../../../Workspace/data/accessibility/nmb/matrix/06/";
+//		String outputRoot = "../../../../Workspace/shared-svn/projects/accessibility_berlin/travel_matrix/2016-01-05/";
 		
 //		String outputFileRoot = "../../data/accessibility/be_002/";
 		LogToOutputSaver.setOutputDirectory(outputRoot);
 		
 		// Parameters
 		Boolean measuringPointsAsPTStops = false;
-		Double cellSize = 1000.;
+		Double cellSize = 1000.; // only relevant if "meauringPointsAsPTStops = true"
 		Double departureTime = 8. * 60 * 60;
-		Integer numberOfThreads = 4;
+		Integer numberOfThreads = 1;
 //		Integer numberOfThreads = 20;
 //		String bounds = "4550000,5790000,4630000,5850000";
-		String bounds = "network";
+		String bounds = "network"; // set bounds = "network" to compute bounds automatically based on the spatial extent of the network
 		
 		
 		// ... for server use
@@ -129,7 +129,7 @@ public class CreateMatrixBasedPtInputs {
 			}
 
 			// Create pt stops file
-			MatrixBasesPtInputUtils.createStopsFile(ptMatrixLocationsMap, outputRoot + "ptStops.csv", ",");
+			MatrixBasedPtInputUtils.createStopsFile(ptMatrixLocationsMap, outputRoot + "ptStops.csv", ",");
 			
 		} else { // i.e. measuringPointsAsPTStops == false, i.e. use actual pt stops from schedule
 			
@@ -141,7 +141,7 @@ public class CreateMatrixBasedPtInputs {
 			}
 
 			// Create pt stops file
-			MatrixBasesPtInputUtils.createStopsFile(ptMatrixLocationsMap, outputRoot + "ptStops.csv", ",");
+			MatrixBasedPtInputUtils.createStopsFile(ptMatrixLocationsMap, outputRoot + "ptStops.csv", ",");
 		}
 
 

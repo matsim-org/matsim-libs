@@ -153,6 +153,7 @@ public class TransitRouterImpl implements TransitRouter {
 	    TransitStopFacility accessStop = null;
 	    TransitRouteStop transitRouteStart = null;
 	    TransitRouterNetworkLink prevLink = null;
+		double currentDistance = 0;
 	    int transitLegCnt = 0;
 	    for (Link ll : path.links) {
 		    TransitRouterNetworkLink link = (TransitRouterNetworkLink) ll;
@@ -165,6 +166,7 @@ public class TransitRouterImpl implements TransitRouter {
 				    double arrivalOffset = (link.getFromNode().stop.getArrivalOffset() != Time.UNDEFINED_TIME) ? link.fromNode.stop.getArrivalOffset() : link.fromNode.stop.getDepartureOffset();
 				    double arrivalTime = this.preparedTransitSchedule.getNextDepartureTime(route, transitRouteStart, time) + (arrivalOffset - transitRouteStart.getDepartureOffset());
 				    ptRoute.setTravelTime(arrivalTime - time);
+					ptRoute.setDistance( currentDistance );
 				    leg.setRoute(ptRoute);
 				    leg.setTravelTime(arrivalTime - time);
 				    time = arrivalTime;
@@ -175,8 +177,10 @@ public class TransitRouterImpl implements TransitRouter {
 			    line = null;
 			    route = null;
 			    transitRouteStart = null;
+				currentDistance = link.getLength();
 		    } else {
 			    // (a real pt link)
+				currentDistance += link.getLength();
 			    if (link.route != route) {
 				    // the line changed
 				    TransitStopFacility egressStop = link.fromNode.stop.getStopFacility();
@@ -189,18 +193,24 @@ public class TransitRouterImpl implements TransitRouter {
 							    double walkTime = getWalkTime(person, accessStop.getCoord(), egressStop.getCoord());
 							    Route walkRoute = new GenericRouteImpl(accessStop.getLinkId(), egressStop.getLinkId());
 							    walkRoute.setTravelTime(walkTime);
+								walkRoute.setDistance( currentDistance );
 							    leg.setRoute(walkRoute);
 							    leg.setTravelTime(walkTime);
 							    time += walkTime;
 							    legs.add(leg);
 						    } else { // accessStop == null, so it must be the first walk-leg
-								    leg = new LegImpl(TransportMode.transit_walk);
-						    double walkTime = getWalkTime(person, fromCoord, egressStop.getCoord());
-						    leg.setTravelTime(walkTime);
-						    time += walkTime;
-						    legs.add(leg);
+								leg = new LegImpl(TransportMode.transit_walk);
+								double walkTime = getWalkTime(person, fromCoord, egressStop.getCoord());
+								Route walkRoute = new GenericRouteImpl(null, egressStop.getLinkId());
+							    walkRoute.setTravelTime(walkTime);
+								walkRoute.setDistance( currentDistance );
+							    leg.setRoute(walkRoute);
+								leg.setTravelTime(walkTime);
+								time += walkTime;
+								legs.add(leg);
 						    }
 					    }
+						currentDistance = 0;
 				    }
 				    line = link.line;
 				    route = link.route;
@@ -214,15 +224,17 @@ public class TransitRouterImpl implements TransitRouter {
 		    leg = new LegImpl(TransportMode.pt);
 		    TransitStopFacility egressStop = prevLink.toNode.stop.getStopFacility();
 		    ExperimentalTransitRoute ptRoute = new ExperimentalTransitRoute(accessStop, line, route, egressStop);
+			ptRoute.setDistance( currentDistance );
 		    leg.setRoute(ptRoute);
 		    double arrivalOffset = ((prevLink).toNode.stop.getArrivalOffset() != Time.UNDEFINED_TIME) ?
 				    (prevLink).toNode.stop.getArrivalOffset()
 				    : (prevLink).toNode.stop.getDepartureOffset();
-				    double arrivalTime = this.preparedTransitSchedule.getNextDepartureTime(route, transitRouteStart, time) + (arrivalOffset - transitRouteStart.getDepartureOffset());
-				    leg.setTravelTime(arrivalTime - time);
-				    legs.add(leg);
-				    transitLegCnt++;
-				    accessStop = egressStop;
+			double arrivalTime = this.preparedTransitSchedule.getNextDepartureTime(route, transitRouteStart, time) + (arrivalOffset - transitRouteStart.getDepartureOffset());
+			leg.setTravelTime(arrivalTime - time);
+			ptRoute.setTravelTime( arrivalTime - time );
+			legs.add(leg);
+			transitLegCnt++;
+			accessStop = egressStop;
 	    }
 	    if (prevLink != null) {
 		    leg = new LegImpl(TransportMode.transit_walk);

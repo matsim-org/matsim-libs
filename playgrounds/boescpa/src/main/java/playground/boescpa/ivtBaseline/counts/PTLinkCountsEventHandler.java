@@ -34,6 +34,8 @@ import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.config.Config;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.vehicles.Vehicle;
 
@@ -50,19 +52,21 @@ import java.util.Set;
  *
  * @author boescpa
  */
-public class PTCountsEventHandler implements LinkEnterEventHandler, TransitDriverStartsEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler {
+public class PTLinkCountsEventHandler implements LinkEnterEventHandler, TransitDriverStartsEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler {
 
-	private static final Logger log = Logger.getLogger(PTCountsEventHandler.class);
+	private static final Logger log = Logger.getLogger(PTLinkCountsEventHandler.class);
 
 	private final Map<Id<Vehicle>, Integer> vehPassengers = new HashMap<>();
 	private final Set<Id<Person>> transitDrivers = new HashSet<>();
 	private final Set<Id<Vehicle>> transitVehicles = new HashSet<>();
 	private final HashMap<String, Integer> ptCounts = new HashMap<>();
+	@Inject
+	public Config config;
 
-	private final Set<String> linksToMonitor = new HashSet<>();
+	private final Map<String, Tuple<String, Double>> linksToMonitor = new HashMap<>();
 
 	@Inject
-	private PTCountsEventHandler(@Named("pathToPTLinksToMonitor") final String pathToLinksList) {
+	private PTLinkCountsEventHandler(@Named("pathToPTLinksToMonitor") final String pathToLinksList) {
 		setLinksToMonitor(pathToLinksList);
 	}
 
@@ -70,9 +74,12 @@ public class PTCountsEventHandler implements LinkEnterEventHandler, TransitDrive
 		this.linksToMonitor.clear();
 		BufferedReader linkReader = IOUtils.getBufferedReader(pathToLinksList);
 		try {
+			linkReader.readLine(); // read header: linkId, linkDescr, countVolumes
 			String line = linkReader.readLine();
 			while (line != null) {
-				this.linksToMonitor.add(line);
+				String[] lineElements = line.split(";");
+				this.linksToMonitor.put(lineElements[0].trim(),
+						new Tuple<>(lineElements[1].trim(), Double.parseDouble(lineElements[2])));
 				line = linkReader.readLine();
 			}
 			linkReader.close();
@@ -84,7 +91,7 @@ public class PTCountsEventHandler implements LinkEnterEventHandler, TransitDrive
 	@Override
 	public void reset(int iteration) {
 		ptCounts.clear();
-		for (String linkId : linksToMonitor) {
+		for (String linkId : linksToMonitor.keySet()) {
 			ptCounts.put(linkId, 0);
 		}
 		vehPassengers.clear();
@@ -146,12 +153,18 @@ public class PTCountsEventHandler implements LinkEnterEventHandler, TransitDrive
 		try {
 			BufferedWriter writer = IOUtils.getBufferedWriter(filename);
 			// write file head
-			writer.write("linkId\tnumberOfPassengers");
+			writer.write("linkId\tlinkDescr\tmatsimVolumes\tcountVolumes\trelativeError");
 			writer.newLine();
 			// write content
 			for (String linkId : ptCounts.keySet()) {
+				double matsimVolume = ptCounts.get(linkId)*config.ptCounts().getCountsScaleFactor();
+				double countVolume = linksToMonitor.get(linkId).getSecond();
+				double relError = matsimVolume/countVolume;
 				writer.write(linkId + "\t");
-				writer.write(ptCounts.get(linkId).toString());
+				writer.write(linksToMonitor.get(linkId).getFirst() + "\t");
+				writer.write(Long.toString((long)matsimVolume) + "\t");
+				writer.write(Long.toString((long)countVolume) + "\t");
+				writer.write(Double.toString(relError));
 				writer.newLine();
 			}
 			writer.close();

@@ -27,6 +27,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
+import org.matsim.core.router.MainModeIdentifierImpl;
 import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
@@ -110,7 +111,8 @@ public class RunPrismicTripChoiceSetConversion {
 											group.getActivityType(),
 											sc.getActivityFacilities(),
 											new StageActivityTypesImpl(
-													PtConstants.TRANSIT_ACTIVITY_TYPE));
+													PtConstants.TRANSIT_ACTIVITY_TYPE),
+											new MainModeIdentifierImpl() );
 								}
 							})
 					.withNumberOfThreads(

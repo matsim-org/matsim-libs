@@ -1,2 +1,3 @@
-12
-21
+linkId;	linkDescr; countVolume
+32;	linkFrom3To2; 40
+23;	linkFrom2To3; 60

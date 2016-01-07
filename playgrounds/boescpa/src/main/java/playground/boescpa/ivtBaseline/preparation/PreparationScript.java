@@ -168,10 +168,10 @@ public class PreparationScript {
 
     private static void renameActivitiesToIVTStandard() throws IOException {
         log.info(" ------- Rename Activities to IVT Standard ------- ");
-        replaceInFile(pathFacilities, "shopping", "shop");
-        replaceInFile(pathPopulation, "shopping", "shop");
-        replaceInFile(pathFacilities, "primary_work", "work");
-        replaceInFile(pathPopulation, "primary_work", "work");
+        replaceInFile(pathFacilities, "shopping", IVTConfigCreator.SHOP);
+        replaceInFile(pathPopulation, "shopping", IVTConfigCreator.SHOP);
+        replaceInFile(pathFacilities, "primary_work", IVTConfigCreator.WORK);
+        replaceInFile(pathPopulation, "primary_work", IVTConfigCreator.WORK);
     }
 
     private static void replaceInFile(String pathFile, String stringToReplace, String replacingString) throws IOException {

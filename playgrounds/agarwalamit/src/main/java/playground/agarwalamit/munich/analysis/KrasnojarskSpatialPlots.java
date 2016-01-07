@@ -304,7 +304,7 @@ public class KrasnojarskSpatialPlots {
 				cellWeights += plot.getCellWeights().get(p);
 			}
 			SpatialDataInputs.LOG.info("Total delays from cell weights  is "+cellWeights);
-			plot.clear();
+			plot.reset();
 			sumDelays=0;
 		}
 	}
@@ -390,7 +390,7 @@ public class KrasnojarskSpatialPlots {
 				cellWeights += plot.getCellWeights().get(p);
 			}
 			SpatialDataInputs.LOG.info("Total NO2 emissions from cell weights  is "+cellWeights);
-			plot.clear();
+			plot.reset();
 			sumEmission=0;
 		}
 	}

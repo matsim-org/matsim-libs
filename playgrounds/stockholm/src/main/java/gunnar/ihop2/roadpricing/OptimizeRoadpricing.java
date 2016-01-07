@@ -28,66 +28,75 @@ import floetteroed.utilities.math.Vector;
  */
 class OptimizeRoadpricing {
 
-	OptimizeRoadpricing() {
-	}
-
 	public static void main(String[] args) {
 
 		System.out.println("STARTED ...");
 
+		/*
+		 * Create the MATSim scenario.
+		 */
 		final String configFileName = "./input/matsim-config.xml";
-
 		final Config config = ConfigUtils.loadConfig(configFileName,
 				new RoadPricingConfigGroup());
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
 
-		final int decisionVariableCnt = 10 + 3;
-		final double changeTimeProba = 2.0 / decisionVariableCnt;
-		final double changeCostProba = 2.0 / decisionVariableCnt;
-		final double deltaTime_s = 1800;
-		final double deltaCost_money = 10.0;
-
+		/*
+		 * Create initial toll levels and their randomization.
+		 */
 		final TollLevels initialTollLevels = new TollLevels(6 * 3600 + 1800,
 				7 * 3600, 7 * 3600 + 1800, 8 * 3600 + 1800, 9 * 3600,
 				15 * 3600 + 1800, 16 * 3600, 17 * 3600 + 1800, 18 * 3600,
 				18 * 3600 + 1800, 10.0, 15.0, 20.0, scenario);
-
+		final int decisionVariableCnt = 10 + 3;
+		final double changeTimeProba = 3.0 / decisionVariableCnt;
+		final double changeCostProba = 3.0 / decisionVariableCnt;
+		final double deltaTime_s = 1800;
+		final double deltaCost_money = 10.0;
 		final DecisionVariableRandomizer<TollLevels> decisionVariableRandomizer = new TollLevelsRandomizer(
 				initialTollLevels, changeTimeProba, changeCostProba,
-				deltaTime_s, deltaCost_money, MatsimRandom.getRandom());
+				deltaTime_s, deltaCost_money);
 
-		int maxMemoryLength = 10;
-		boolean keepBestSolution = true;
-		boolean interpolate = true;
-		int maxIterations = 2;
-		int maxTransitions = Integer.MAX_VALUE;
-		int populationSize = 2;
-
+		/*
+		 * Problem specification.
+		 */
 		final TimeDiscretization timeDiscretization = new TimeDiscretization(0,
 				3600, 24);
-
 		final ObjectiveFunction objectiveFunction = new TotalScoreObjectiveFunction();
 		final ConvergenceCriterion convergenceCriterion = new FixedIterationNumberConvergenceCriterion(
-				2, 1);
+				3, 1);
+		final MATSimSimulator<TollLevels> matsimSimulator = new MATSimSimulator<>(
+				new MATSimStateFactory<TollLevels>() {
+					@Override
+					public MATSimState newState(final Population population,
+							final Vector stateVector,
+							final TollLevels decisionVariable) {
+						return new MATSimState(population, stateVector);
+					}
+				}, scenario, timeDiscretization,
+				new ControlerDefaultsWithRoadPricingModule());
+
+		/*
+		 * RandomSearch specification.
+		 */
+		final int maxMemorizedTrajectoryLength = 1;
+		final boolean keepBestSolution = true;
+		final boolean interpolate = true;
+		final int maxRandomSearchIterations = 2;
+		final int maxRandomSearchTransitions = Integer.MAX_VALUE;
+		final int randomSearchPopulationSize = 1;
 		final RandomSearch<TollLevels> randomSearch = new RandomSearch<>(
-				new MATSimSimulator<TollLevels>(
-						new MATSimStateFactory<TollLevels>() {
-							@Override
-							public MATSimState newState(
-									final Population population,
-									final Vector stateVector,
-									final TollLevels decisionVariable) {
-								return new MATSimState(population, stateVector);
-							}
-						}, scenario, timeDiscretization,
-						new ControlerDefaultsWithRoadPricingModule()),
-				decisionVariableRandomizer, convergenceCriterion,
-				maxIterations, maxTransitions, populationSize,
+				matsimSimulator, decisionVariableRandomizer,
+				convergenceCriterion, maxRandomSearchIterations,
+				maxRandomSearchTransitions, randomSearchPopulationSize,
 				MatsimRandom.getRandom(), interpolate, keepBestSolution,
-				objectiveFunction, maxMemoryLength);
+				objectiveFunction, maxMemorizedTrajectoryLength);
 		randomSearch.setLogFileName(scenario.getConfig().controler()
 				.getOutputDirectory()
 				+ "optimization.log");
+		
+		/*
+		 * Run it.
+		 */
 		randomSearch.run();
 
 		System.out.println("... DONE.");

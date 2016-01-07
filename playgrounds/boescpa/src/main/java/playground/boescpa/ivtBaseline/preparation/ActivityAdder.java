@@ -6,6 +6,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.*;
 
 import static playground.boescpa.ivtBaseline.preparation.secondaryFacilityCreation.FacilitiesFromBZ12.testFacilities;
+import static playground.boescpa.ivtBaseline.preparation.IVTConfigCreator.*;
 
 /**
  * Adds activities to existing facilities.
@@ -32,13 +33,13 @@ public class ActivityAdder {
         ActivityAdder adder = new ActivityAdder(scenario.getActivityFacilities());
 
         // Add activities
-        adder.addActivityToFacilities("remote_work", "work", 5, 0, 24*60*60);
-        adder.addActivityToFacilities("remote_work", "primary_work", 5, 0, 24*60*60);
-        adder.addActivityToFacilities("escort_kids", "education", 10, 7*60*60, 18*60*60);
-        adder.addActivityToFacilities("escort_kids", "leisure", 5, 7*60*60, 22*60*60);
-        adder.addActivityToFacilities("escort_other", "leisure", 5, 5*60*60, 24*60*60);
-        adder.addActivityToFacilities("escort_other", "shop", 5, 5*60*60, 24*60*60);
-        adder.addActivityToFacilities("remote_home", "home", 1, 0, 24*60*60);
+        adder.addActivityToFacilities(REMOTE_WORK, WORK, 5, 0, 24*60*60);
+        //adder.addActivityToFacilities(REMOTE_WORK, "primary_work", 5, 0, 24*60*60);
+        adder.addActivityToFacilities(ESCORT_KIDS, EDUCATION, 10, 7*60*60, 18*60*60);
+        adder.addActivityToFacilities(ESCORT_KIDS, LEISURE, 5, 7*60*60, 22*60*60);
+        adder.addActivityToFacilities(ESCORT_OTHER, LEISURE, 5, 5*60*60, 24*60*60);
+        adder.addActivityToFacilities(ESCORT_OTHER, SHOP, 5, 5*60*60, 24*60*60);
+        adder.addActivityToFacilities(REMOTE_HOME, HOME, 1, 0, 24*60*60);
 
         // Write facilities
         FacilitiesWriter facilitiesWriter = new FacilitiesWriter(scenario.getActivityFacilities());

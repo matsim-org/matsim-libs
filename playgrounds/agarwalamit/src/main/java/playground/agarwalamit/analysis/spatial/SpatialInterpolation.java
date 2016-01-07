@@ -48,51 +48,49 @@ import playground.agarwalamit.utils.GeometryUtils;
  */
 
 public class SpatialInterpolation {
-	
-	public enum CellFilter {
-		BoundingBox, ShapePolygon;
-	}
 
 	private GeometryFactory gf;
 	private GeneralGrid grid ;
-	public Polygon boundingBoxPolygon;
+	private Polygon boundingBoxPolygon;
 	private final SpatialDataInputs inputs;
 
 	private Map<Point, Double> cellWeights;
 	private final String outputFolder ;
-	private final CellFilter cf;
-	private Collection<SimpleFeature> features;
-	
+	private final boolean isFilteringCellForShape;
+	private Collection<Geometry> geoms;
+
 	public SpatialInterpolation(final SpatialDataInputs inputs, final String outputFolder) {
-		this(inputs, outputFolder, CellFilter.BoundingBox);
+		this(inputs, outputFolder, false);
 	}
-	
-	public SpatialInterpolation(final SpatialDataInputs inputs, final String outputFolder, final CellFilter cf) {
+
+	public SpatialInterpolation(final SpatialDataInputs inputs, final String outputFolder, final boolean isFilteringCellForShape) {
 		this.inputs = inputs;
 		SpatialDataInputs.LOG.info("Creating grids inside polygon of bounding box.");
 		createGridFromBoundingBox();
-		
+
 		this.outputFolder = outputFolder;
 		if(!new File(this.outputFolder).exists()) new File(this.outputFolder).mkdirs();
 
-		this.cf = cf;
-		if(this.cf.equals(CellFilter.ShapePolygon) ){
-			if(inputs.shapeFile!=null)
-			features = new ShapeFileReader().readFileAndInitialize(inputs.shapeFile);
-			else throw new RuntimeException("Cell filter "+this.cf+" is chosen but no shape file is provided. Aborting ...");
+		this.isFilteringCellForShape = isFilteringCellForShape;
+		if( this.isFilteringCellForShape ){
+			if(inputs.shapeFile!=null){
+				Collection<SimpleFeature> sfs = new ShapeFileReader().readFileAndInitialize(inputs.shapeFile);
+				geoms = GeometryUtils.getSimplifiedGeometries(sfs);
+			} else throw new RuntimeException("Cell filtering is on but no shape file is provided. Aborting ...");
 		}
 		this.grid.writeGrid(outputFolder, inputs.targetCRS.toString());
-		clear();
+		reset();
 	}
-	
+
 	/**
 	 * Used to clear the cell weights map.
 	 */
-	public void clear(){
+	public void reset(){
 		this.cellWeights = new HashMap<Point, Double>();
 		for(Point p :this.grid.getGrid().values()){
-			this.cellWeights.put(p, 0.);
+			if ( isCellIncludedForInterpolation(p) ) this.cellWeights.put(p, 0.);
 		}
+		if (isFilteringCellForShape) SpatialDataInputs.LOG.warn(this.grid.getGrid().size() - this.cellWeights.size() + " cells are removed from bounding box.");
 	}
 
 	/**
@@ -111,7 +109,7 @@ public class SpatialInterpolation {
 		this.grid = new GeneralGrid(inputs.getCellWidth(), inputs.getGridType());
 		this.grid.generateGrid(boundingBoxPolygon);
 
-		SpatialDataInputs.LOG.info("Total number of cells in the grid are "+this.grid.getGrid().size());
+		SpatialDataInputs.LOG.warn("Total number of cells in the grid are "+this.grid.getGrid().size());
 	}
 
 	/**
@@ -121,22 +119,18 @@ public class SpatialInterpolation {
 	public void processLink(final Link link, final double intensityOnLink){
 
 		Coordinate linkCentroid = new Coordinate(link.getCoord().getX(), link.getCoord().getY());
-		Point linkcentroidPoint = gf.createPoint(linkCentroid);
-		
-		if(!isConsiderPoint(linkcentroidPoint)) return;
-
 		Coordinate fromNodeCoord = new Coordinate(link.getFromNode().getCoord().getX(),link.getFromNode().getCoord().getY());
 		Coordinate toNodeCoord = new Coordinate(link.getToNode().getCoord().getX(),link.getToNode().getCoord().getY());
-		
-		for(Point p: this.cellWeights.keySet()){
 
+		for(Point p: this.cellWeights.keySet()){
+			
 			double cellArea = this.grid.getCellGeometry(p).getArea();
 			double areaSmoothingCircle = Math.PI * inputs.getSmoothingRadius() * inputs.getSmoothingRadius();
 			double normalizationFactor = cellArea/areaSmoothingCircle;
 			double weightNow = 0;
 
 			switch (inputs.getLinkWeigthMethod()) {
-			
+
 			case line :
 				weightNow = intensityOnLink * calculateWeightFromLine(fromNodeCoord,toNodeCoord, p.getCoordinate()) * normalizationFactor;
 				break;
@@ -158,12 +152,8 @@ public class SpatialInterpolation {
 	public void processHomeLocation(final Activity act, final double intensityOfPoint){
 
 		Coordinate actCoordinate = new Coordinate (act.getCoord().getX(),act.getCoord().getY());
-		Point actLocation = gf.createPoint(actCoordinate);
-
-		if(!isConsiderPoint(actLocation)) return;
 
 		for(Point p: this.cellWeights.keySet()){
-
 			double cellArea = this.grid.getCellGeometry(p).getArea();
 			double areaSmoothingCircle = Math.PI * inputs.getSmoothingRadius() *inputs.getSmoothingRadius();
 			double normalizationFactor = cellArea/areaSmoothingCircle;
@@ -189,8 +179,6 @@ public class SpatialInterpolation {
 
 		Coordinate actCoordinate = new Coordinate (act.getCoord().getX(),act.getCoord().getY());
 		Point actLocation = gf.createPoint(actCoordinate);
-
-		if(!isConsiderPoint(actLocation)) return;
 
 		for(Point p: this.cellWeights.keySet()){
 			if(this.grid.getCellGeometry(p).covers(actLocation)){
@@ -279,7 +267,7 @@ public class SpatialInterpolation {
 		if(type.equals(GridType.SQUARE)) noOfSidesOfPolygon = 4;
 		else if(type.equals(GridType.HEX)) noOfSidesOfPolygon = 6;
 		else throw new RuntimeException(type +" is not a valid grid type.");
-		
+
 		BufferedWriter writer = IOUtils.getBufferedWriter(fileName);
 		try {
 			if(writingGGPLOTData){
@@ -322,14 +310,14 @@ public class SpatialInterpolation {
 		return boundingBoxPolygon.covers(linkcentroidPoint);
 	}
 	
-	private boolean isConsiderPoint(final Point point) {
-		switch (this.cf) {
-		case BoundingBox:
-			return boundingBoxPolygon.covers(point);
-		case ShapePolygon:
-			return GeometryUtils.isPointInsideCity(this.features, point);
-		default:
-			throw new RuntimeException("Unknown cell filtering criteria. Aborting ...");
-		}
+	private boolean isCellIncludedForInterpolation(final Point point){
+		boolean isInside = false;
+		if( this.isFilteringCellForShape ) {
+			for(Geometry g : geoms){
+				Geometry pointGeom =  gf.createPoint( new Coordinate( point.getCoordinate() ) );
+				if(g.contains(pointGeom)) return isInside = true;
+			}
+		} else isInside = true;
+		return isInside;
 	}
 }

@@ -157,7 +157,7 @@ public class NetLanesSignalsShrinker {
 		lanesWriter.write(outputDirectory + simplifiedLanesFilename);
 		
 		SignalsScenarioWriter signalsWriter = new SignalsScenarioWriter(outputDirectory);
-		signalsWriter.writeSignalsData((SignalsData) this.fullScenario.getScenarioElement(SignalsData.ELEMENT_NAME));
+		signalsWriter.writeSignalsData(this.fullScenario);
 		
 	}
 		

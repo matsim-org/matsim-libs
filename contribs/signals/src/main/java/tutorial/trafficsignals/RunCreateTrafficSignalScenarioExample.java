@@ -206,7 +206,7 @@ public class RunCreateTrafficSignalScenarioExample {
 		signalsWriter.setSignalSystemsOutputFilename(signalSystemsFile);
 		signalsWriter.setSignalGroupsOutputFilename(signalGroupsFile);
 		signalsWriter.setSignalControlOutputFilename(signalControlFile);
-		signalsWriter.writeSignalsData(signalsData);
+		signalsWriter.writeSignalsData(scenario);
 
 		ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalSystemFile(signalSystemsFile);
 		ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalGroupsFile(signalGroupsFile);
