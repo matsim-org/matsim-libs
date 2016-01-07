@@ -10,10 +10,9 @@ import org.matsim.core.utils.io.IOUtils;
 /**
  * @author dziemke
  */
-public final class InputsCSVWriter {
-	private static final Logger log = Logger.getLogger(InputsCSVWriter.class);
+public final class CSVFileWriter {
+	private static final Logger log = Logger.getLogger(CSVFileWriter.class);
 
-//	private static final String SEPARATOR = ",";
 	private String separator;
 	private BufferedWriter writer ;
 
@@ -21,30 +20,29 @@ public final class InputsCSVWriter {
 	/**
 	 * writes the header
 	 */
-	public InputsCSVWriter(String path, String separator){
-		log.info("Initializing  ...");
+	public CSVFileWriter(String path, String separator){
+		log.info("Initializing the writer.");
 		
 		this.separator = separator;
 		
 		try {
-		writer = IOUtils.getBufferedWriter( path );
-		} catch ( Exception ee ) {
+		writer = IOUtils.getBufferedWriter(path);
+		} catch (Exception ee) {
 			ee.printStackTrace();
-			throw new RuntimeException("writer could not be instantiated") ;
+			throw new RuntimeException("writer could not be instantiated");
 		}
 
-		if ( writer==null ) {
-			throw new RuntimeException( "writer is null") ;
+		if (writer==null) {
+			throw new RuntimeException("writer is null");
 		}
 
 		log.info("... done!");
 	}
 
 	
-	public final void writeField( double val ) {
+	public final void writeField(double value) {
 		try {
-//			writer.write( val + SEPARATOR ) ;
-			writer.write( val + this.separator ) ;
+			writer.write(value + this.separator);
 		} catch (IOException e) {
 			e.printStackTrace();
 			throw new RuntimeException("could not write");
@@ -52,10 +50,9 @@ public final class InputsCSVWriter {
 	}
 
 	
-	public final void writeField( int val ) {
+	public final void writeField(int value) {
 		try {
-//			writer.write( val + SEPARATOR ) ;
-			writer.write( val + this.separator ) ;
+			writer.write(value + this.separator);
 		} catch (IOException e) {
 			e.printStackTrace();
 			throw new RuntimeException("could not write");
@@ -63,20 +60,19 @@ public final class InputsCSVWriter {
 	}
 
 	
-	public final void writeField( Id<?> val ) {
+	public final void writeField(Id<?> value) {
 		try {
-//			writer.write( val + SEPARATOR ) ;
-			writer.write( val + this.separator ) ;
+			writer.write(value + this.separator);
 		} catch (IOException e) {
 			e.printStackTrace();
 			throw new RuntimeException("could not write");
 		}
 	}
 	
-	public final void writeField( String val ) {
+	
+	public final void writeField(String value) {
 		try {
-//			writer.write( val + SEPARATOR ) ;
-			writer.write( val + this.separator ) ;
+			writer.write(value + this.separator);
 		} catch (IOException e) {
 			e.printStackTrace();
 			throw new RuntimeException("could not write");
@@ -108,5 +104,4 @@ public final class InputsCSVWriter {
 			e.printStackTrace();
 		}	
 	}
-	
 }

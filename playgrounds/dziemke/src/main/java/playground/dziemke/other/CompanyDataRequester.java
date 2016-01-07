@@ -1,7 +1,8 @@
 package playground.dziemke.other;
 
 import org.apache.log4j.Logger;
-import playground.dziemke.accessibility.ptmatrix.InputsCSVWriter;
+import playground.dziemke.accessibility.ptmatrix.CSVFileWriter;
+import playground.dziemke.utils.LogToOutputSaver;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -12,51 +13,64 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by gthunig on 16.12.15.
- * This class searches for company data at the bundesanzeiger-verlag.de website and writes them out in an output file.
+ * @author gthunig
+ * 
+ * This class searches for company data on the bundesanzeiger-verlag.de website and writes them into an output file.
  */
 public class CompanyDataRequester {
 
     private static final Logger log = Logger.getLogger(CompanyDataRequester.class);
 
-    private static final String WEBSITE_URL = "http://www.bundesanzeiger-verlag.de/";
-    private static final String COMPANY_URL = "betrifft-unternehmen/unternehmensdaten/deutsche-unternehmensdaten/" +
+    private static final String WEBSITE_URL = "http://www.bundesanzeiger-verlag.de";
+    private static final String COMPANY_URL = "/betrifft-unternehmen/unternehmensdaten/deutsche-unternehmensdaten/" +
             "suche-nach-unternehmensdaten/firmen-details.html?tx_s4afreekmu_pi1%5Bfilter%5D=postcode&tx_s4afr" +
             "eekmu_pi1%5Bvalue%5D=1&tx_s4afreekmu_pi1%5Border%5D=name&tx_s4afreekmu_pi1%5Bdirection%5D=asc&tx" +
             "_s4afreekmu_pi1%5Blimit%5D=10&tx_s4afreekmu_pi1%5Bpage%5D=";
     private static final String ID_URL = "&tx_s4afreekmu_pi1%5Bcompany_id%";
-    private static final String PAGE_URL = "betrifft-unternehmen/unternehmensdaten/deutsche-unternehmensdaten/suche" +
+    private static final String PAGE_URL = "/betrifft-unternehmen/unternehmensdaten/deutsche-unternehmensdaten/suche" +
             "-nach-unternehmensdaten/suchergebnisse.html?tx_s4afreekmu_pi1%5Bfilter%5D=postcode&tx_s4afreekmu" +
             "_pi1%5Bvalue%5D=1&tx_s4afreekmu_pi1%5Border%5D=name&tx_s4afreekmu_pi1%5Bdirection%5D=asc&tx_s4af" +
             "reekmu_pi1%5Blimit%5D=10&tx_s4afreekmu_pi1%5Bpage%5D=";
 
-    private static int webPageIndex = 5000;
-    private static int numberOfWebpagesPerFile = 1000;
-
+    // Set the webPageIndex to "1" if starting on the first webpage to be requested OR
+    // to a value (n * numberOfWebpagesPerFile) + 1) for following companyData files
+    private static int webPageIndex = 5001; 
+    private static int numberOfWebpagesPerFile = 5;
+    private static String outputDirectory = "../../../../Workspace/data/accessibility/berlin/companyData/";
+    
     public static void main(String[] args) {
-        long time = System.currentTimeMillis();
-        
+    	if (webPageIndex != 1 && (webPageIndex - 1) % numberOfWebpagesPerFile != 0) {
+    		throw new RuntimeException("For consecutive files (i.e. files that do not start with "
+    				+ "the first webpage, the numberOfWebpagesPerFile should be a divisor of webPageIndex "
+    				+ "without rest. Otherwise collected data will most probably be incomplete.");
+    	}
+    	LogToOutputSaver.setOutputDirectory(outputDirectory);
+    	
+    	int fileNumber = (webPageIndex - 1) / numberOfWebpagesPerFile + 1;
+        long startTime = System.currentTimeMillis();
         boolean continueWriting = true;
-        int fileNumber = webPageIndex/numberOfWebpagesPerFile + 1;
+        
         do {
-            List<CompanyData> companyData = getCompanyData(numberOfWebpagesPerFile*fileNumber);
+        	String outputFile = outputDirectory + "companyData_" + fileNumber + ".csv";
+        	List<CompanyData> companyData = getCompanyData(numberOfWebpagesPerFile * fileNumber);
+            log.info("Number of companies to be added to file " + outputFile + " is " + companyData.size());
             if (companyData.size() != 0) {
-                writeCompanyData(companyData, "companyData" + fileNumber + ".csv");
+				writeCompanyData(companyData, outputFile);
                 fileNumber++;
                 companyData.clear();
-                System.out.println(System.currentTimeMillis() - time);
+                long timePeriod = System.currentTimeMillis() - startTime;
+                startTime = System.currentTimeMillis();
+				log.info("Creating file " + outputFile + " (incl. webpage readout etc.) took " + timePeriod + " ms.");
             } else {
                 continueWriting = false;
             }
         } while(continueWriting);
-
     }
 
-    public static void writeCompanyData(List<CompanyData> companyData, String outputPath) {
+    public static void writeCompanyData(List<CompanyData> companyData, String outputFile) {
+        log.info("Writing company data to " + outputFile);
 
-        log.error("Writing company data to " + outputPath);
-
-        InputsCSVWriter writer = new InputsCSVWriter(outputPath, ";");
+        CSVFileWriter writer = new CSVFileWriter(outputFile, ";");
 
         writeInitialLine(writer);
         for (CompanyData currentData : companyData) {
@@ -65,7 +79,7 @@ public class CompanyDataRequester {
         writer.close();
     }
 
-    private static void writeInitialLine(InputsCSVWriter writer) {
+    private static void writeInitialLine(CSVFileWriter writer) {
         writer.writeField("Firmenname");
         writer.writeField("PLZ");
         writer.writeField("Ort");
@@ -78,7 +92,7 @@ public class CompanyDataRequester {
     }
 
     private static void writeCompanyData
-            (InputsCSVWriter writer, CompanyData companyData) {
+            (CSVFileWriter writer, CompanyData companyData) {
         writer.writeField(companyData.getCompanyName());
         writer.writeField(companyData.getZipCode());
         writer.writeField(companyData.getPlace());
@@ -102,7 +116,6 @@ public class CompanyDataRequester {
         List<CompanyData> companyData = new ArrayList<>();
         boolean continueReading = true;
         do {
-            webPageIndex++;
             try {
                 URL url = new URL(WEBSITE_URL + PAGE_URL + webPageIndex);
                 try {
@@ -140,6 +153,7 @@ public class CompanyDataRequester {
             } catch (MalformedURLException e) {
                 e.printStackTrace();
             }
+            webPageIndex++;
         } while(continueReading);
         return companyData;
     }

@@ -59,7 +59,7 @@ public class MatrixBasedPtInputUtils {
 	 * Creates a csv file containing the public transport stops or measure points
 	 */
 	public static void createStopsFile(Map<Id<Coord>, Coord> locationFacilitiesMap, String outputFileStops, String separator) {
-		final InputsCSVWriter stopsWriter = new InputsCSVWriter(outputFileStops, separator);
+		final CSVFileWriter stopsWriter = new CSVFileWriter(outputFileStops, separator);
 		
 		stopsWriter.writeField("id");
 		stopsWriter.writeField("x");
