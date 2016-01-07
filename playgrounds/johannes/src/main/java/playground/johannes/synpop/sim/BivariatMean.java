@@ -60,7 +60,7 @@ public class BivariatMean implements Hamiltonian, AttributeChangeListener {
 
     private Object weightKey;
 
-    private final int binCount;
+    private int binCount;
 
     public BivariatMean(Set<? extends Attributable> refElements, Set<? extends Attributable> simElements, String
             xAttrKey, String yAttrKey, Discretizer xDataDiscr) {
@@ -81,12 +81,16 @@ public class BivariatMean implements Hamiltonian, AttributeChangeListener {
         initSimulationValues(simElements, xAttrKey, yAttrKey, useWeights);
 
         // Calculate the initial hamiltonian value.
+        initHamiltonian();
+
+    }
+
+    private void initHamiltonian() {
         hamiltonianValue = 0;
         binCount = Math.max(referenceValues.size(), bucketCounts.size());
         for(int i = 0; i < binCount; i++) {
             hamiltonianValue += calculateDiff(i);
         }
-
     }
 
     private void initReferenceValues(Set<? extends Attributable> elements, String xAttrKey, String yAttrKey, boolean useWeigths) {
@@ -167,13 +171,14 @@ public class BivariatMean implements Hamiltonian, AttributeChangeListener {
         Double yVal = (Double)person.getData(yDataKey);
         int oldBucketIndex = xDataDiscr.index(oldValue);
 
-        double delta = 1.0;
-        if(useWeights) delta = (Double)person.getData(weightKey);
+        double weight = 1.0;
+        if(useWeights) weight = (Double)person.getData(weightKey);
+        yVal = yVal * weight;
 
-        double hValue1 = changeBucketContent(oldBucketIndex, yVal, -delta);
+        double hValue1 = changeBucketContent(oldBucketIndex, yVal, -weight);
 
         int newBucketIndex = xDataDiscr.index(newValue);
-        double hValue2 = changeBucketContent(newBucketIndex, yVal, delta);
+        double hValue2 = changeBucketContent(newBucketIndex, yVal, weight);
 
         hamiltonianValue += (hValue1 + hValue2);
     }
@@ -197,13 +202,17 @@ public class BivariatMean implements Hamiltonian, AttributeChangeListener {
         return newDiff - oldDiff;
     }
 
-    private void onYValueChange(double oldValue, double newValue, CachedElement person) {
-        Double xVal = (Double)person.getData(xDataKey);
+    private void onYValueChange(double oldValue, double newValue, CachedElement element) {
+        Double xVal = (Double)element.getData(xDataKey);
         int bucketIndex = xDataDiscr.index(xVal);
 
         double oldDiff = calculateDiff(bucketIndex);
 
-        double delta = newValue - oldValue;
+        double weight = 1.0;
+        if(useWeights) weight = (Double)element.getData(weightKey);
+
+        double delta = (newValue - oldValue) * weight;
+
         double sum = bucketSums.get(bucketIndex);
         bucketSums.set(bucketIndex, sum + delta);
 
@@ -212,8 +221,17 @@ public class BivariatMean implements Hamiltonian, AttributeChangeListener {
         hamiltonianValue += newDiff - oldDiff;
     }
 
+//    private long evalCount = 0;
     @Override
     public double evaluate(Collection<CachedPerson> population) {
+//        evalCount++;
+//        if(evalCount % 10000000 == 0) {
+//            double h_before = hamiltonianValue;
+//            initHamiltonian();
+//            double h_after = hamiltonianValue;
+//            System.out.println(String.format("Reset hamiltonian: before = %s, after = %s", h_before/(double)
+//                    binCount, h_after/(double)binCount));
+//        }
         return hamiltonianValue/(double)binCount;
     }
 
@@ -233,7 +251,7 @@ public class BivariatMean implements Hamiltonian, AttributeChangeListener {
                     if(simValue == 0) return 0;
                     else return Math.abs(simValue);
                 else {
-                    return Math.abs(refValue - simValue)/Math.abs(refValue);
+                    return Math.abs(simValue - refValue)/Math.abs(refValue);
                 }
             } else {
                 return 0.0;
