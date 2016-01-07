@@ -223,7 +223,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 	 *
 	 * @param hierarchy The hierarchy layer the highway appears.
 	 * @param highwayType The type of highway these defaults are for.
-	 * @param lanes number of lanes on that road type (in each direction)
+	 * @param lanes number of lanes on that road type (<em>in each direction</em>)
 	 * @param freespeed the free speed vehicles can drive on that road type [meters/second]
 	 * @param freespeedFactor the factor the freespeed is scaled
 	 * @param laneCapacity_vehPerHour the capacity per lane [veh/h]
@@ -239,7 +239,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 	 *
 	 * @param hierarchy The hierarchy layer the highway appears in.
 	 * @param highwayType The type of highway these defaults are for.
-	 * @param lanes number of lanes on that road type (in each direction)
+	 * @param lanes number of lanes on that road type (<em>in each direction</em>)
 	 * @param freespeed the free speed vehicles can drive on that road type [meters/second]
 	 * @param freespeedFactor the factor the freespeed is scaled
 	 * @param laneCapacity_vehPerHour the capacity per lane [veh/h]
@@ -533,7 +533,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 					nofLanes = tmp;
 
 		            if (laneTagSumOfBothDirections && !(oneway || onewayReverse)) {
-		                nofLanes /= 2; 
+		                nofLanes /= 2;
 		            }
 				}
 			} catch (Exception e) {
