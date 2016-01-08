@@ -35,6 +35,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
@@ -71,7 +72,9 @@ public class AgentPositionWriter {
 		//sc.getConfig().qsim().setSnapshotStyle(SnapshotStyle.withHoles);// not supported
 		sc.getConfig().qsim().setSnapshotStyle(SnapshotStyle.queue);
 		sc.getConfig().qsim().setSnapshotPeriod(snapshotPeriod);
-		sc.getConfig().qsim().setLinkWidthForVis(0);
+		sc.getConfig().qsim().setLinkWidthForVis((float)0);
+		((NetworkImpl)sc.getNetwork()).setEffectiveLaneWidth(0.);
+		
 		sc.getConfig().controler().setSnapshotFormat(Arrays.asList("transims"));
 		
 		AgentPositionWriter apw = new AgentPositionWriter(dir+"rDataPersonPosition_"+prefix+".txt", sc, eventsFile); 

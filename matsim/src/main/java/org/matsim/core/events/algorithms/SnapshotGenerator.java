@@ -87,8 +87,9 @@ public class SnapshotGenerator implements PersonDepartureEventHandler, PersonArr
 		this.snapshotStyle = config.getSnapshotStyle();
 		
 		if (config instanceof QSimConfigGroup  && ! Double.isNaN( ((QSimConfigGroup) config ).getLinkWidthForVis() )  ){
-				this.linkWidthCalculator.setLaneWidth( ((QSimConfigGroup) config ).getLinkWidthForVis() );
-		} else if (! Double.isNaN(network.getEffectiveLaneWidth())){
+			this.linkWidthCalculator.setLinkWidthForVis( ((QSimConfigGroup) config ).getLinkWidthForVis() );
+		} 
+		if (! Double.isNaN(network.getEffectiveLaneWidth())){
 			this.linkWidthCalculator.setLaneWidth(network.getEffectiveLaneWidth());
 		}
 
