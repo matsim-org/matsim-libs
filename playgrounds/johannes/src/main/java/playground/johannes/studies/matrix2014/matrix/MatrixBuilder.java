@@ -58,10 +58,10 @@ public class MatrixBuilder {
     }
 
     public NumericMatrix build(Collection<? extends Person> persons, Predicate<Segment> predicate, boolean useWeights) {
-        int n = 4;
-//        int n = persons.size() / 10000;
-//        n = Math.min(n, Executor.getFreePoolSize());
-//        n = Math.max(2, n);
+//        int n = 4;
+        int n = persons.size() / 10000;
+        n = Math.min(n, Executor.getFreePoolSize());
+        n = Math.max(2, n);
         List<? extends Person>[] segments = org.matsim.contrib.common.collections.CollectionUtils.split(persons, n);
 
         List<RunThread> runnables = new ArrayList<>(n);

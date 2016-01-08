@@ -20,41 +20,45 @@
 package playground.johannes.studies.matrix2014.matrix.io;
 
 import org.apache.log4j.Logger;
+import playground.johannes.studies.matrix2014.matrix.ODPredicate;
+import playground.johannes.synpop.gis.Zone;
 import playground.johannes.synpop.gis.ZoneCollection;
-import playground.johannes.synpop.gis.ZoneGeoJsonIO;
-import playground.johannes.synpop.matrix.MatrixOperations;
-import playground.johannes.synpop.matrix.NumericMatrix;
-import playground.johannes.synpop.matrix.NumericMatrixIO;
-
-import java.io.IOException;
+import playground.johannes.synpop.matrix.Matrix;
 
 /**
  * @author johannes
  */
-public class PrepareTomTom {
+public class ZoneAttributePredicate implements ODPredicate<String, Double> {
 
-    private static final Logger logger = Logger.getLogger(PrepareTomTom.class);
+    private static final Logger logger = Logger.getLogger(ZoneAttributePredicate.class);
 
-    public static void main(String args[]) throws IOException {
-        String inFile = "/home/johannes/gsv/miv-matrix/raw/TomTom/TTgrob_gesamt_aus_zeitunabhängig.txt";
-        String outFile = "/home/johannes/gsv/matrix2014/sim/data/matrices/tomtom.de.txt";
-        String zonesFile = "/home/johannes/gsv/gis/zones/geojson/tomtom.gk3.geojson";
-        String primaryKey = "NO";
+    private final ZoneCollection zones;
 
-        logger.info("Loading matrix...");
-        NumericMatrix m = new NumericMatrix();
-        VisumOMatrixReader.read(m, inFile);
+    private final String key;
 
-        logger.info("Loading zones...");
-        ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON(zonesFile, primaryKey);
+    private final String value;
 
-        logger.info("Extracting DE matrix...");
-        ZoneAttributePredicate p = new ZoneAttributePredicate("NUTS0_CODE", "DE", zones);
-        m = (NumericMatrix) MatrixOperations.subMatrix(p, m, new NumericMatrix());
-
-        logger.info("Writing matrix...");
-        NumericMatrixIO.write(m, outFile);
-        logger.info("Done.");
+    public ZoneAttributePredicate(String key, String value, ZoneCollection zones) {
+        this.key = key;
+        this.value = value;
+        this.zones = zones;
     }
 
+    @Override
+    public boolean test(String row, String col, Matrix<String, Double> matrix) {
+        Zone zone_i = zones.get(row);
+        Zone zone_j = zones.get(col);
+
+        if (zone_i != null && zone_j != null) {
+            return (value.equals(zone_i.getAttribute(key)) && value.equals(zone_j.getAttribute(key)));
+        } else {
+            if (zone_i == null)
+                logger.warn(String.format("Zone not found: %s", row));
+
+            if (zone_j == null)
+                logger.warn(String.format("Zone not found: %s", col));
+
+            return false;
+        }
+    }
 }

@@ -34,7 +34,10 @@ public class VisumOMatrixReader {
 		BufferedReader reader = new BufferedReader(new FileReader(filename));
 
 		String line = reader.readLine();
-		if(!line.equals("$O;D3")) throw new RuntimeException("Unknown matrix format.");
+		int startSection;
+		if(line.equals("$O;D3")) startSection = 3;
+		else if(line.equals("$OM;D3")) startSection = 4;
+		else throw new RuntimeException("Unknown matrix format.");
 
 		boolean comment = false;
 		int sectionCount = 0;
@@ -46,7 +49,7 @@ public class VisumOMatrixReader {
 				if(comment) sectionCount++;
 				comment = false;
 
-				if(sectionCount == 3) {
+				if(sectionCount == startSection) {
 					line = line.trim();
 					String[] tokens = line.split("\\s+");
 					String i = tokens[0];

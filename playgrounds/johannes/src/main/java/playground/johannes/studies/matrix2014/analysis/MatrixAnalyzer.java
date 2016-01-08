@@ -143,6 +143,8 @@ public class MatrixAnalyzer implements AnalyzerTask<Collection<? extends Person>
                 Set<String> keys = tmpRefMatrix.keys();
                 keys.addAll(simMatrix.keys());
 
+                logger.debug(String.format("Compared %s od relations.", keys.size()));
+
                 TDoubleArrayList refVals = new TDoubleArrayList();
                 TDoubleArrayList simVals = new TDoubleArrayList();
                 for (String i : keys) {
