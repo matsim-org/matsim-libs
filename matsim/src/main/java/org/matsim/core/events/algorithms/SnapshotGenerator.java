@@ -242,7 +242,7 @@ public class SnapshotGenerator implements PersonDepartureEventHandler, PersonArr
 		private final List<EventAgent> buffer;
 
 		private final double euklideanDist;
-		private  double freespeedTravelTime;
+		private final double freespeedTravelTime;
 		private final double spaceCap;
 		private final double timeCap;
 		private final double storageCapFactor;
