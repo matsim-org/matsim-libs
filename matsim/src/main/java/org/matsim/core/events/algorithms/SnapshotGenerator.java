@@ -258,7 +258,7 @@ public class SnapshotGenerator implements PersonDepartureEventHandler, PersonArr
 			this.waitingQueue = new ArrayList<EventAgent>();
 			this.buffer = new ArrayList<EventAgent>();
 			this.euklideanDist = CoordUtils.calcDistance(link2.getFromNode().getCoord(), link2.getToNode().getCoord());
-			this.freespeedTravelTime = this.link.getLength() / this.link.getFreespeed();
+			this.freespeedTravelTime = Math.ceil( this.link.getLength() / this.link.getFreespeed() ) + 1; 
 			this.timeCap = this.link.getCapacity() * capCorrectionFactor;
 			this.storageCapFactor = storageCapFactor;
 			this.inverseTimeCap = 1.0 / this.timeCap;
