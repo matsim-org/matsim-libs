@@ -84,8 +84,9 @@ public class OsmNetworkReader implements MatsimSomeReader {
 	private final static String TAG_HIGHWAY = "highway";
 	private final static String TAG_MAXSPEED = "maxspeed";
 	private final static String TAG_JUNCTION = "junction";
-	private final static String TAG_ONEWAY = "oneway";
-	private final static String[] ALL_TAGS = new String[] {TAG_LANES, TAG_HIGHWAY, TAG_MAXSPEED, TAG_JUNCTION, TAG_ONEWAY};
+    private final static String TAG_ONEWAY = "oneway";
+    private final static String TAG_ACCESS = "access";
+	private final static String[] ALL_TAGS = new String[] {TAG_LANES, TAG_HIGHWAY, TAG_MAXSPEED, TAG_JUNCTION, TAG_ONEWAY, TAG_ACCESS};
 
 	private final Map<Long, OsmNode> nodes = new HashMap<Long, OsmNode>();
 	private final Map<Long, OsmWay> ways = new HashMap<Long, OsmWay>();
@@ -100,7 +101,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 	private boolean scaleMaxSpeed = false;
 
 	private boolean slowButLowMemory = false;
-
+	
 	/*package*/ final List<OsmFilter> hierarchyLayers = new ArrayList<OsmFilter>();
 
 	/**
@@ -220,7 +221,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 	 *
 	 * @param hierarchy The hierarchy layer the highway appears.
 	 * @param highwayType The type of highway these defaults are for.
-	 * @param lanes number of lanes on that road type
+	 * @param lanes number of lanes on that road type (<em>in each direction</em>)
 	 * @param freespeed the free speed vehicles can drive on that road type [meters/second]
 	 * @param freespeedFactor the factor the freespeed is scaled
 	 * @param laneCapacity_vehPerHour the capacity per lane [veh/h]
@@ -236,7 +237,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 	 *
 	 * @param hierarchy The hierarchy layer the highway appears in.
 	 * @param highwayType The type of highway these defaults are for.
-	 * @param lanes number of lanes on that road type
+	 * @param lanes number of lanes on that road type (<em>in each direction</em>)
 	 * @param freespeed the free speed vehicles can drive on that road type [meters/second]
 	 * @param freespeedFactor the factor the freespeed is scaled
 	 * @param laneCapacity_vehPerHour the capacity per lane [veh/h]
@@ -244,8 +245,9 @@ public class OsmNetworkReader implements MatsimSomeReader {
 	 */
 	public void setHighwayDefaults(final int hierarchy, final String highwayType, final double lanes, final double freespeed,
 			final double freespeedFactor, final double laneCapacity_vehPerHour, final boolean oneway) {
-		this.highwayDefaults.put(highwayType, new OsmHighwayDefaults(hierarchy, lanes, freespeed, freespeedFactor, laneCapacity_vehPerHour, oneway));
-	}
+        this.highwayDefaults.put(highwayType, new OsmHighwayDefaults(hierarchy, lanes, freespeed, freespeedFactor, laneCapacity_vehPerHour, oneway));
+    }
+
 
 	/**
 	 * Sets whether the detailed geometry of the roads should be retained in the conversion or not.
@@ -298,7 +300,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 	public void setMemoryOptimization(final boolean memoryEnabled) {
 		this.slowButLowMemory = memoryEnabled;
 	}
-
+	
 	private void convert() {
 		if (this.network instanceof NetworkImpl) {
 			((NetworkImpl) this.network).setCapacityPeriod(3600);
@@ -347,7 +349,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 		if (!this.keepPaths) {
 			// marked nodes as unused where only one way leads through
 			for (OsmNode node : this.nodes.values()) {
-				if ((node.ways == 1) && (!this.keepPaths)) {
+				if (node.ways == 1) {
 					node.used = false;
 				}
 			}
@@ -440,6 +442,10 @@ public class OsmNetworkReader implements MatsimSomeReader {
 	private void createLink(final Network network, final OsmWay way, final OsmNode fromNode, final OsmNode toNode, final double length) {
 		String highway = way.tags.get(TAG_HIGHWAY);
 
+        if ("no".equals(way.tags.get(TAG_ACCESS))) {
+             return;
+        }
+		
 		// load defaults
 		OsmHighwayDefaults defaults = this.highwayDefaults.get(highway);
 		if (defaults == null) {
@@ -475,15 +481,18 @@ public class OsmNetworkReader implements MatsimSomeReader {
 				oneway = false;
 			} else if ("no".equals(onewayTag)) {
 				oneway = false; // may be used to overwrite defaults
+            }
+			else {
+                log.warn("Could not interpret oneway tag:" + onewayTag + ". Ignoring it.");
 			}
 		}
 
-		// In case trunks, primary and secondary roads are marked as oneway,
-		// the default number of lanes should be two instead of one.
-		if(highway.equalsIgnoreCase("trunk") || highway.equalsIgnoreCase("primary") || highway.equalsIgnoreCase("secondary")){
-			if(oneway && nofLanes == 1.0){
-				nofLanes = 2.0;
-			}
+        // In case trunks, primary and secondary roads are marked as oneway,
+        // the default number of lanes should be two instead of one.
+        if(highway.equalsIgnoreCase("trunk") || highway.equalsIgnoreCase("primary") || highway.equalsIgnoreCase("secondary")){
+            if((oneway || onewayReverse) && nofLanes == 1.0){
+                nofLanes = 2.0;
+            }
 		}
 
 		String maxspeedTag = way.tags.get(TAG_MAXSPEED);
@@ -505,6 +514,13 @@ public class OsmNetworkReader implements MatsimSomeReader {
 				double tmp = Double.parseDouble(lanesTag);
 				if (tmp > 0) {
 					nofLanes = tmp;
+
+					//By default, the OSM lanes tag specifies the total number of lanes in both directions.
+					//So if the road is not oneway (onewayReverse), let's distribute them between both directions
+					//michalm, jan'16
+		            if (!oneway && !onewayReverse) {
+		                nofLanes /= 2;
+		            }
 				}
 			} catch (Exception e) {
 				if (!this.unknownLanesTags.contains(lanesTag)) {
