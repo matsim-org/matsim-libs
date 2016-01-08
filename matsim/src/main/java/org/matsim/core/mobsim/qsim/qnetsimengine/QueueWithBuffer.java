@@ -252,6 +252,10 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		}
 		this.calculateFlowCapacity();
 		this.calculateStorageCapacity();
+		
+		if ( QueueWithBuffer.HOLES ) {
+			remainingHolesStorageCapacity = this.storageCapacity;
+		}
 
 		if(fastCapacityUpdate){
 			flowcap_accumulate.setValue(flowCapacityPerTimeStep);
@@ -403,10 +407,6 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 				QueueWithBuffer.spaceCapWarningCount++;
 			}
 			storageCapacity = tempStorageCapacity;
-		}
-
-		if ( QueueWithBuffer.HOLES ) {
-			remainingHolesStorageCapacity = this.storageCapacity;
 		}
 	}
 
