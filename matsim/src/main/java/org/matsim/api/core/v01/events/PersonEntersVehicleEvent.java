@@ -39,7 +39,7 @@ public class PersonEntersVehicleEvent extends Event implements HasPersonId {
 	private final Id<Person> personId;
 	private final Id<Vehicle> vehicleId;
 
-	/*package*/ public PersonEntersVehicleEvent(final double time, final Id<Person> personId, final Id<Vehicle> vehicleId) {
+	public PersonEntersVehicleEvent(final double time, final Id<Person> personId, final Id<Vehicle> vehicleId) {
 		super(time);
 		this.personId = personId;
 		this.vehicleId = vehicleId;
@@ -49,6 +49,7 @@ public class PersonEntersVehicleEvent extends Event implements HasPersonId {
 		return this.vehicleId;
 	}
 	
+	@Override
 	public Id<Person> getPersonId() {
 		return this.personId;
 	}	
