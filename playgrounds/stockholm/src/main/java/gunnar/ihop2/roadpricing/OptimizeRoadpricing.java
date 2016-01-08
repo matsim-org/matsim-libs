@@ -13,10 +13,13 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
 import org.matsim.roadpricing.RoadPricingConfigGroup;
+import org.matsim.roadpricing.RoadPricingReaderXMLv1;
+import org.matsim.roadpricing.RoadPricingSchemeImpl;
 
 import floetteroed.opdyts.DecisionVariableRandomizer;
 import floetteroed.opdyts.ObjectiveFunction;
@@ -42,6 +45,17 @@ class OptimizeRoadpricing {
 		final Config config = ConfigUtils.loadConfig(configFileName,
 				new RoadPricingConfigGroup());
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
+
+		// >>>>> NEW >>>>>
+		final RoadPricingConfigGroup roadPricingConfigGroup = ConfigUtils
+				.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME,
+						RoadPricingConfigGroup.class);
+		final RoadPricingSchemeImpl roadPricingScheme = new RoadPricingSchemeImpl();
+		new RoadPricingReaderXMLv1(roadPricingScheme)
+				.parse(roadPricingConfigGroup.getTollLinksFile());
+		final AbstractModule roadpricingModule = new ControlerDefaultsWithRoadPricingModule(
+				roadPricingScheme);
+		// <<<<< NEW <<<<<
 
 		/*
 		 * Create initial toll levels and their randomization.
@@ -74,8 +88,8 @@ class OptimizeRoadpricing {
 				2, 1);
 		final MATSimSimulator<TollLevels> matsimSimulator = new MATSimSimulator<>(
 				new MATSimStateFactoryImpl<TollLevels>(), scenario,
-				timeDiscretization, relevantLinkIds,
-				new ControlerDefaultsWithRoadPricingModule());
+				timeDiscretization, relevantLinkIds, roadpricingModule);
+		// new ControlerDefaultsWithRoadPricingModule());
 
 		/*
 		 * RandomSearch specification.

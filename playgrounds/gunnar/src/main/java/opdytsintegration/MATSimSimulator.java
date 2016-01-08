@@ -8,7 +8,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.TerminationCriterion;
-import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
 
 import floetteroed.opdyts.DecisionVariable;
 import floetteroed.opdyts.SimulatorState;
@@ -93,9 +92,10 @@ public class MATSimSimulator<U extends DecisionVariable> implements
 		 */
 		final Controler controler = new Controler(this.scenario);
 		if (this.modules != null) {
-//			controler.setModules(new ControlerDefaultsWithRoadPricingModule());
+			// controler.setModules(new
+			// ControlerDefaultsWithRoadPricingModule());
 			controler.setModules(this.modules);
-//			this.modules = null; // ???
+			// this.modules = null; // ???
 		}
 		controler.addControlerListener(matsimDecisionVariableEvaluator);
 		controler.addOverridingModule(new AbstractModule() {
