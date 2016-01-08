@@ -25,8 +25,11 @@ package org.matsim.roadpricing;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 public class ModuleTest {
@@ -50,6 +53,35 @@ public class ModuleTest {
         Controler controler = new Controler(config);
         controler.setModules(new ControlerDefaultsWithRoadPricingModule());
         controler.run();
+    }
+
+    @Test
+    public void testControlerWithRoadPricingByScenarioWorks() {
+        Config config = utils.loadConfig(utils.getClassInputDirectory() + "/config.xml");
+        Scenario scenario = ScenarioUtils.loadScenario(config);
+        Controler controler = new Controler(scenario);
+        controler.setModules(new ControlerDefaultsWithRoadPricingModule());
+        controler.run();
+    }
+
+
+    @Test
+    public void testControlerWithRoadPricingByScenarioWorksTwice() {
+        Config config = utils.loadConfig(utils.getClassInputDirectory() + "/config.xml");
+        config.controler().setOutputDirectory(utils.getOutputDirectory()+"/1");
+        Scenario scenario = ScenarioUtils.loadScenario(config);
+        RoadPricingConfigGroup roadPricingConfigGroup = ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class);
+        RoadPricingSchemeImpl roadPricingScheme = new RoadPricingSchemeImpl() ;
+        new RoadPricingReaderXMLv1(roadPricingScheme).parse(roadPricingConfigGroup.getTollLinksFile());
+
+
+        Controler controler1 = new Controler(scenario);
+        controler1.setModules(new ControlerDefaultsWithRoadPricingModule(roadPricingScheme));
+        controler1.run();
+        config.controler().setOutputDirectory(utils.getOutputDirectory()+"/2");
+        Controler controler2 = new Controler(scenario);
+        controler2.setModules(new ControlerDefaultsWithRoadPricingModule(roadPricingScheme));
+        controler2.run();
     }
 
 }

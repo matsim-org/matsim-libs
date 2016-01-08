@@ -67,10 +67,7 @@ IterationEndsListener, ShutdownListener {
 	}
 
     @Override
-    public void notifyStartup(final StartupEvent event) {
-        // add scheme as top level container into scenario:
-        event.getControler().getScenario().addScenarioElement( RoadPricingScheme.ELEMENT_NAME, scheme);
-    }
+    public void notifyStartup(final StartupEvent event) {}
 
 	@Override
 	public void notifyAfterMobsim(final AfterMobsimEvent event) {
