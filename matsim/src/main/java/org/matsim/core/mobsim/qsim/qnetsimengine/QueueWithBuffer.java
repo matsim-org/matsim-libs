@@ -698,9 +698,9 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 
 		// compute and set earliest link exit time:
 		double linkTravelTime = this.length / this.network.simEngine.getLinkSpeedCalculator().getMaximumVelocity(veh, link, now);
+		linkTravelTime = timeStepSize * Math.floor( linkTravelTime / timeStepSize );
+		
 		double earliestExitTime = now + linkTravelTime ;
-
-		earliestExitTime = timeStepSize * Math.floor(earliestExitTime/timeStepSize );
 
 		veh.setEarliestLinkExitTime(earliestExitTime);
 
