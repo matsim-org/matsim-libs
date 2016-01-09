@@ -89,7 +89,7 @@ class OptimizeRoadpricing {
 						+ scenario.getNetwork().getLinks().size() + " links.");
 		final ObjectiveFunction objectiveFunction = new TotalScoreObjectiveFunction();
 		final ConvergenceCriterion convergenceCriterion = new FixedIterationNumberConvergenceCriterion(
-				2, 1);
+				100, 10);
 		final MATSimSimulator<TollLevels> matsimSimulator = new MATSimSimulator<>(
 				new MATSimStateFactoryImpl<TollLevels>(), scenario,
 				timeDiscretization, relevantLinkIds, roadpricingModule);
@@ -98,12 +98,12 @@ class OptimizeRoadpricing {
 		/*
 		 * RandomSearch specification.
 		 */
-		final int maxMemorizedTrajectoryLength = 1;
+		final int maxMemorizedTrajectoryLength = 10;
 		final boolean keepBestSolution = true;
 		final boolean interpolate = true;
-		final int maxRandomSearchIterations = 2;
+		final int maxRandomSearchIterations = 1000;
 		final int maxRandomSearchTransitions = Integer.MAX_VALUE;
-		final int randomSearchPopulationSize = 3;
+		final int randomSearchPopulationSize = 15;
 		final RandomSearch<TollLevels> randomSearch = new RandomSearch<>(
 				matsimSimulator, decisionVariableRandomizer,
 				convergenceCriterion, maxRandomSearchIterations,

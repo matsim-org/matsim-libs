@@ -16,7 +16,7 @@
  *
  * contact: gunnar.floetteroed@abe.kth.se
  *
- */ 
+ */
 package floetteroed.utilities.math;
 
 import java.io.Serializable;
@@ -561,12 +561,12 @@ public class Vector implements Serializable {
 	}
 
 	// TODO NEW
-//	public static Vector concat(final Vector a, final Vector b) {
-//		final double[] resultData = new double[a.size() + b.size()];
-//		System.arraycopy(a.data, 0, resultData, 0, a.size());
-//		System.arraycopy(b.data, 0, resultData, a.size(), b.size());
-//		return new Vector(resultData);
-//	}
+	// public static Vector concat(final Vector a, final Vector b) {
+	// final double[] resultData = new double[a.size() + b.size()];
+	// System.arraycopy(a.data, 0, resultData, 0, a.size());
+	// System.arraycopy(b.data, 0, resultData, a.size(), b.size());
+	// return new Vector(resultData);
+	// }
 
 	// TODO NEW
 	public static Vector newUniformDistr(final int dim) {
@@ -583,16 +583,16 @@ public class Vector implements Serializable {
 				this.size() - (leaveOutIndex + 1));
 		return new Vector(newData);
 	}
-	
+
 	// TODO NEW
 	public static Vector concat(final List<Vector> elements) {
-		
+
 		int size = 0;
 		for (Vector element : elements) {
 			size += element.size();
 		}
 		final double[] newData = new double[size];
-		
+
 		int i = 0;
 		for (Vector element : elements) {
 			System.arraycopy(element.data, 0, newData, i, element.size());
@@ -601,15 +601,31 @@ public class Vector implements Serializable {
 
 		return new Vector(newData);
 	}
-	
+
 	// TODO NEW
-	public static Vector concat(final Vector... elements) {		
+	public static Vector concat(final Vector... elements) {
 		return concat(Arrays.asList(elements));
 	}
-	
+
 	// TODO NEW
 	public double mean() {
 		return this.sum() / this.size();
+	}
+
+	// TODO NEW
+	public static Vector sum(final Vector... addends) {
+		final Vector result = addends[0].copy();
+		for (int i = 1; i < addends.length; i++) {
+			result.add(addends[i]);
+		}
+		return result;
+	}
+
+	// TODO NEW
+	public static Vector diff(final Vector a, final Vector b) {
+		final Vector result = a.copy();
+		result.add(b, -1.0);
+		return result;
 	}
 
 }
