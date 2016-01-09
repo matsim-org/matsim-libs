@@ -104,25 +104,25 @@ public class SubPopInputs4Munich {
 		String usrGrps [] = {"OTHERS","COMMUTER_REV_COMMUTER"};
 
 		// once subPop attribute is set, strategy for all sub pop groups neet to set seprately.
-		StrategySettings reroute = new StrategySettings(ConfigUtils.createAvailableStrategyId(config));
+		StrategySettings reroute = new StrategySettings();
 		reroute.setStrategyName(DefaultPlanStrategiesModule.DefaultStrategy.ReRoute.name());
 		reroute.setSubpopulation(usrGrps[1]);
 		reroute.setDisableAfter(800);
 		reroute.setWeight(0.15);
 		config.strategy().addStrategySettings(reroute);
 
-		StrategySettings expBeta = new StrategySettings(ConfigUtils.createAvailableStrategyId(config));
+		StrategySettings expBeta = new StrategySettings();
 		expBeta.setStrategyName("ChangeExpBeta");
 		expBeta.setSubpopulation(usrGrps[1]);
 		expBeta.setWeight(0.7);
 		config.strategy().addStrategySettings(expBeta);
 
-		StrategySettings modeChoice_comm = new StrategySettings(ConfigUtils.createAvailableStrategyId(config));
-		modeChoice_comm.setStrategyName("SubtourModeChoice_".concat(usrGrps[1]));
-		modeChoice_comm.setDisableAfter(800);
-		modeChoice_comm.setWeight(0.15);
-		modeChoice_comm.setSubpopulation(usrGrps[1]);
-		config.strategy().addStrategySettings(modeChoice_comm);
+		StrategySettings modeChoiceComm = new StrategySettings();
+		modeChoiceComm.setStrategyName("SubtourModeChoice_".concat(usrGrps[1]));
+		modeChoiceComm.setDisableAfter(800);
+		modeChoiceComm.setWeight(0.15);
+		modeChoiceComm.setSubpopulation(usrGrps[1]);
+		config.strategy().addStrategySettings(modeChoiceComm);
 
 		// first use existing pt mode parameters and set them as new pt mode parameters
 		ModeParams ptParams = config.planCalcScore().getModes().get(TransportMode.pt);

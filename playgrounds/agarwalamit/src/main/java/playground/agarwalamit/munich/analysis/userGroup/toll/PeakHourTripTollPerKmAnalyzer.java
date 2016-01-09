@@ -58,10 +58,10 @@ public class PeakHourTripTollPerKmAnalyzer {
 
 	private final List<Double> pkHrs = new ArrayList<>(Arrays.asList(new Double []{8., 9., 10., 16., 17., 18.,})); // => 7-10 and 15-18
 	private final ExtendedPersonFilter pf = new ExtendedPersonFilter();
-	private final Map<Id<Person>,List<Double>> person2TollsPerKm_pkHr = new HashMap<>();
-	private final Map<Id<Person>,List<Double>> person2TollsPerKm_offPkHr = new HashMap<>();
-	private final Map<Id<Person>,Integer> person2TripCounts_pkHr = new HashMap<>();
-	private final Map<Id<Person>,Integer> person2TripCounts_offPkHr = new HashMap<>();
+	private final Map<Id<Person>,List<Double>> person2TollsPerKmPkHr = new HashMap<>();
+	private final Map<Id<Person>,List<Double>> person2TollsPerKmOffPkHr = new HashMap<>();
+	private final Map<Id<Person>,Integer> person2TripCountsPkHr = new HashMap<>();
+	private final Map<Id<Person>,Integer> person2TripCountsOffPkHr = new HashMap<>();
 	private final SortedMap<String, Tuple<Double,Double>> usrGrp2TollsPerKm = new TreeMap<>();
 	private final SortedMap<String, Tuple<Integer,Integer>> usrGrp2TripCounts = new TreeMap<>();
 
@@ -101,9 +101,9 @@ public class PeakHourTripTollPerKmAnalyzer {
 
 		BufferedWriter writer = IOUtils.getBufferedWriter(outputFolder+"/boxPlot/tripTollInEurCtPerKm_"+pricingScheme+"_pkHr"+".txt");
 		try {
-			for(Id<Person> p : person2TollsPerKm_pkHr.keySet()){
+			for(Id<Person> p : person2TollsPerKmPkHr.keySet()){
 				String ug = pf.getMyUserGroupFromPersonId(p);
-				for(double d: person2TollsPerKm_pkHr.get(p)){
+				for(double d: person2TollsPerKmPkHr.get(p)){
 					writer.write(pricingScheme.toUpperCase()+"\t"+ ug+"\t"+d*100+"\n");
 				}
 			}
@@ -115,9 +115,9 @@ public class PeakHourTripTollPerKmAnalyzer {
 		//write off peak hour toll/trip
 		writer = IOUtils.getBufferedWriter(outputFolder+"/boxPlot/tripTollInEurCtPerKm_"+pricingScheme+"_offPkHr"+".txt");
 		try {
-			for(Id<Person> p : person2TollsPerKm_offPkHr.keySet()){
+			for(Id<Person> p : person2TollsPerKmOffPkHr.keySet()){
 				String ug = pf.getMyUserGroupFromPersonId(p);
-				for(double d: person2TollsPerKm_offPkHr.get(p)){
+				for(double d: person2TollsPerKmOffPkHr.get(p)){
 					writer.write(pricingScheme.toUpperCase()+"\t"+ ug+"\t"+d*100+"\n");
 				}
 			}
@@ -133,21 +133,21 @@ public class PeakHourTripTollPerKmAnalyzer {
 			usrGrp2TripCounts.put(pf.getMyUserGroup(ug), new Tuple<Integer, Integer>(0, 0));
 		}
 		//first store peak hour data
-		for (Id<Person> personId : this.person2TollsPerKm_pkHr.keySet()) {
+		for (Id<Person> personId : this.person2TollsPerKmPkHr.keySet()) {
 			String ug = pf.getMyUserGroupFromPersonId(personId);
-			double tollInMeter = ListUtils.doubleSum(this.person2TollsPerKm_pkHr.get(personId));
+			double tollInMeter = ListUtils.doubleSum(this.person2TollsPerKmPkHr.get(personId));
 			double pkTollInKm = usrGrp2TollsPerKm.get(ug).getFirst() + 1000*tollInMeter;
-			int pkTripCount = usrGrp2TripCounts.get(ug).getFirst() + this.person2TripCounts_pkHr.get(personId);
+			int pkTripCount = usrGrp2TripCounts.get(ug).getFirst() + this.person2TripCountsPkHr.get(personId);
 			usrGrp2TollsPerKm.put(ug, new Tuple<Double, Double>(pkTollInKm, 0.));
 			usrGrp2TripCounts.put(ug, new Tuple<Integer,Integer>(pkTripCount,0) );
 		}
 
 		//now store off-peak hour data
-		for (Id<Person> personId : this.person2TollsPerKm_offPkHr.keySet()) {
+		for (Id<Person> personId : this.person2TollsPerKmOffPkHr.keySet()) {
 			String ug = pf.getMyUserGroupFromPersonId(personId);
-			double tollInMeter = ListUtils.doubleSum(this.person2TollsPerKm_offPkHr.get(personId));
+			double tollInMeter = ListUtils.doubleSum(this.person2TollsPerKmOffPkHr.get(personId));
 			double offpkToll = usrGrp2TollsPerKm.get(ug).getSecond() + 1000*tollInMeter;
-			int offpkTripCount = usrGrp2TripCounts.get(ug).getSecond() + this.person2TripCounts_offPkHr.get(personId);
+			int offpkTripCount = usrGrp2TripCounts.get(ug).getSecond() + this.person2TripCountsOffPkHr.get(personId);
 			usrGrp2TollsPerKm.put(ug, new Tuple<Double, Double>(usrGrp2TollsPerKm.get(ug).getFirst(), offpkToll));
 			usrGrp2TripCounts.put(ug, new Tuple<Integer,Integer>(usrGrp2TripCounts.get(ug).getFirst(),offpkTripCount) );
 		}
@@ -163,46 +163,46 @@ public class PeakHourTripTollPerKmAnalyzer {
 		for(double d :timebin2person2tripTolls.keySet()) {
 			for (Id<Person> person : timebin2person2tripTolls.get(d).keySet()) {
 				if(pkHrs.contains(d)) {
-					if (person2TollsPerKm_pkHr.containsKey(person) ) {
-						List<Double> existing_tollsPerMeter = person2TollsPerKm_pkHr.get(person);
-						List<Double> additional_tollsPerMeter = ListUtils.divide(timebin2person2tripTolls.get(d).get(person), timebin2person2tripDists.get(d).get(person));
-						existing_tollsPerMeter.addAll(additional_tollsPerMeter);
+					if (person2TollsPerKmPkHr.containsKey(person) ) {
+						List<Double> existingTollsPerMeter = person2TollsPerKmPkHr.get(person);
+						List<Double> additionalTollsPerMeter = ListUtils.divide(timebin2person2tripTolls.get(d).get(person), timebin2person2tripDists.get(d).get(person));
+						existingTollsPerMeter.addAll(additionalTollsPerMeter);
 						if(! (timebin2person2tripCounts.get(d).get(person)).equals(timebin2person2tripDistCounts.get(d).get(person)) ) {
 							throw new RuntimeException("Trip count should be equal in both lists. Aborting ...");
 						}
-						person2TripCounts_pkHr.put(person, timebin2person2tripCounts.get(d).get(person) + person2TripCounts_pkHr.get(person));
+						person2TripCountsPkHr.put(person, timebin2person2tripCounts.get(d).get(person) + person2TripCountsPkHr.get(person));
 					} else {
 						List<Double> tolls =  timebin2person2tripTolls.get(d).get(person);
 						List<Double> dists = timebin2person2tripDists.get(d).get(person);
 						List<Double> tollsPerMeter = ListUtils.divide(tolls, dists); 
-						person2TollsPerKm_pkHr.put(person, tollsPerMeter);
+						person2TollsPerKmPkHr.put(person, tollsPerMeter);
 						// just a check
 						if(! (timebin2person2tripCounts.get(d).get(person)).equals(timebin2person2tripDistCounts.get(d).get(person)) ) {
 							throw new RuntimeException("Trip count should be equal in both lists. Aborting ...");
 						}
-						person2TripCounts_pkHr.put(person, timebin2person2tripCounts.get(d).get(person));
+						person2TripCountsPkHr.put(person, timebin2person2tripCounts.get(d).get(person));
 					}
 				} else {
-					if (person2TollsPerKm_offPkHr.containsKey(person) ) {
-						List<Double> existing_tollsPerMeter = person2TollsPerKm_offPkHr.get(person);
-						List<Double> additional_tollsPerMeter = ListUtils.divide(timebin2person2tripTolls.get(d).get(person), timebin2person2tripDists.get(d).get(person));
-						if(additional_tollsPerMeter==null){
+					if (person2TollsPerKmOffPkHr.containsKey(person) ) {
+						List<Double> existingTollsPerMeter = person2TollsPerKmOffPkHr.get(person);
+						List<Double> additionalTollsPerMeter = ListUtils.divide(timebin2person2tripTolls.get(d).get(person), timebin2person2tripDists.get(d).get(person));
+						if(additionalTollsPerMeter==null){
 							System.out.println("problem.");
 						}
-						existing_tollsPerMeter.addAll(additional_tollsPerMeter);
+						existingTollsPerMeter.addAll(additionalTollsPerMeter);
 						if(! (timebin2person2tripCounts.get(d).get(person)).equals(timebin2person2tripDistCounts.get(d).get(person)) ) {
 							throw new RuntimeException("Trip count should be equal in both lists. Aborting ...");
 						}
-						person2TripCounts_offPkHr.put(person, timebin2person2tripCounts.get(d).get(person) + person2TripCounts_offPkHr.get(person));
+						person2TripCountsOffPkHr.put(person, timebin2person2tripCounts.get(d).get(person) + person2TripCountsOffPkHr.get(person));
 					} else {
 						List<Double> tolls =  timebin2person2tripTolls.get(d).get(person);
 						List<Double> dists = timebin2person2tripDists.get(d).get(person);
 						List<Double> tollsPerMeter = ListUtils.divide(tolls, dists); 
-						person2TollsPerKm_offPkHr.put(person,  tollsPerMeter);
+						person2TollsPerKmOffPkHr.put(person,  tollsPerMeter);
 						if(! (timebin2person2tripCounts.get(d).get(person)).equals(timebin2person2tripDistCounts.get(d).get(person)) ) {
 							throw new RuntimeException("Trip count should be equal in both lists. Aborting ...");
 						}
-						person2TripCounts_offPkHr.put(person, timebin2person2tripCounts.get(d).get(person));
+						person2TripCountsOffPkHr.put(person, timebin2person2tripCounts.get(d).get(person));
 					}
 				}
 			}

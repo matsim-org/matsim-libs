@@ -197,30 +197,30 @@ public class PatnaNetworkGenerator {
 		Network network = scenario.getNetwork();
 		// Adding links near to the counting station links (necessary for external demand)
 		//OC4 -- using existing node (14653)
-		Node oc4_nearestNode = network.getNodes().get(Id.createNodeId("14653"));
-		Coord oc4NodeCoord = new Coord(oc4_nearestNode.getCoord().getX() + 500, oc4_nearestNode.getCoord().getY() + 500);
+		Node oc4NearestNode = network.getNodes().get(Id.createNodeId("14653"));
+		Coord oc4NodeCoord = new Coord(oc4NearestNode.getCoord().getX() + 500, oc4NearestNode.getCoord().getY() + 500);
 		Node oc4Node = network.getFactory().createNode(Id.createNodeId("OC4_node"), oc4NodeCoord); network.addNode(oc4Node);
-		((NetworkImpl)network).createAndAddLink(Id.createLinkId("OC4_in"), oc4Node, oc4_nearestNode, 500., 60., 1500., 2);
-		((NetworkImpl)network).createAndAddLink(Id.createLinkId("OC4_out"), oc4_nearestNode, oc4Node, 500., 60., 1500., 2);
+		((NetworkImpl)network).createAndAddLink(Id.createLinkId("OC4_in"), oc4Node, oc4NearestNode, 500., 60., 1500., 2);
+		((NetworkImpl)network).createAndAddLink(Id.createLinkId("OC4_out"), oc4NearestNode, oc4Node, 500., 60., 1500., 2);
 		network.getLinks().get(Id.createLinkId("OC4_in")).setAllowedModes(new HashSet<>(PatnaUtils.ALL_MAIN_MODES));
 		network.getLinks().get(Id.createLinkId("OC4_out")).setAllowedModes(new HashSet<>(PatnaUtils.ALL_MAIN_MODES));
 		
 		
 		//OC2 -- using existing node 16224
-		Node oc2_nearestNode = network.getNodes().get(Id.createNodeId("16224"));
-		Coord oc2NodeCoord = new Coord(oc2_nearestNode.getCoord().getX() + 500, oc2_nearestNode.getCoord().getY() - 500);
+		Node oc2NearestNode = network.getNodes().get(Id.createNodeId("16224"));
+		Coord oc2NodeCoord = new Coord(oc2NearestNode.getCoord().getX() + 500, oc2NearestNode.getCoord().getY() - 500);
 		Node oc2Node = network.getFactory().createNode(Id.createNodeId("OC2_node"), oc2NodeCoord); network.addNode(oc2Node);
-		((NetworkImpl)network).createAndAddLink(Id.createLinkId("OC2_in"), oc2Node, oc2_nearestNode, 500., 60., 1500., 2);
-		((NetworkImpl)network).createAndAddLink(Id.createLinkId("OC2_out"), oc2_nearestNode, oc2Node, 500., 60., 1500., 2);
+		((NetworkImpl)network).createAndAddLink(Id.createLinkId("OC2_in"), oc2Node, oc2NearestNode, 500., 60., 1500., 2);
+		((NetworkImpl)network).createAndAddLink(Id.createLinkId("OC2_out"), oc2NearestNode, oc2Node, 500., 60., 1500., 2);
 		network.getLinks().get(Id.createLinkId("OC2_in")).setAllowedModes(new HashSet<>(PatnaUtils.ALL_MAIN_MODES));
 		network.getLinks().get(Id.createLinkId("OC2_out")).setAllowedModes(new HashSet<>(PatnaUtils.ALL_MAIN_MODES));
 		
 		//OC5
-		Node oc5_nearestNode = network.getNodes().get(Id.createNodeId("2426"));
-		Coord oc5NodeCoord = new Coord(oc5_nearestNode.getCoord().getX() - 500, oc5_nearestNode.getCoord().getY() + 100);
+		Node oc5NearestNode = network.getNodes().get(Id.createNodeId("2426"));
+		Coord oc5NodeCoord = new Coord(oc5NearestNode.getCoord().getX() - 500, oc5NearestNode.getCoord().getY() + 100);
 		Node oc5Node = network.getFactory().createNode(Id.createNodeId("OC5_node"), oc5NodeCoord); network.addNode(oc5Node);
-		((NetworkImpl)network).createAndAddLink(Id.createLinkId("OC5_in"), oc5Node, oc5_nearestNode, 500., 60., 1500., 2);
-		((NetworkImpl)network).createAndAddLink(Id.createLinkId("OC5_out"), oc5_nearestNode, oc5Node, 500., 60., 1500., 2);
+		((NetworkImpl)network).createAndAddLink(Id.createLinkId("OC5_in"), oc5Node, oc5NearestNode, 500., 60., 1500., 2);
+		((NetworkImpl)network).createAndAddLink(Id.createLinkId("OC5_out"), oc5NearestNode, oc5Node, 500., 60., 1500., 2);
 		network.getLinks().get(Id.createLinkId("OC5_in")).setAllowedModes(new HashSet<>(PatnaUtils.ALL_MAIN_MODES));
 		network.getLinks().get(Id.createLinkId("OC5_out")).setAllowedModes(new HashSet<>(PatnaUtils.ALL_MAIN_MODES));
 	}

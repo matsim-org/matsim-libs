@@ -55,7 +55,7 @@ import playground.agarwalamit.utils.LoadMyScenarios;
 
 public class AgentPositionWriter {
 
-	private final static double snapshotPeriod = 1;
+	private final static double SANPSOHOT_PERIOD = 1;
 	private final double trackLength = 3000;
 	private final double maxSpeed = 60/3.6;
 
@@ -71,7 +71,7 @@ public class AgentPositionWriter {
 
 		//sc.getConfig().qsim().setSnapshotStyle(SnapshotStyle.withHoles);// not supported
 		sc.getConfig().qsim().setSnapshotStyle(SnapshotStyle.queue);
-		sc.getConfig().qsim().setSnapshotPeriod(snapshotPeriod);
+		sc.getConfig().qsim().setSnapshotPeriod(SANPSOHOT_PERIOD);
 		sc.getConfig().qsim().setLinkWidthForVis((float)0);
 		((NetworkImpl)sc.getNetwork()).setEffectiveLaneWidth(0.);
 		
@@ -157,7 +157,7 @@ public class AgentPositionWriter {
 							double currentDist = Math.sqrt( (easting - prevEasting.get(agentId))*(easting - prevEasting.get(agentId)) 
 									+ (northing- prevNorthing.get(agentId))*(northing- prevNorthing.get(agentId)) );
 							
-							double velocity = currentDist / (snapshotPeriod); // denominator should be equal to snapshot period.
+							double velocity = currentDist / (SANPSOHOT_PERIOD); // denominator should be equal to snapshot period.
 							if(velocity > maxSpeed ) { // person arriving (vehicle leaving traffic) are falling in this category
 								return;
 							}else if (velocity < 0.0) throw new RuntimeException("Speed can not be negative. Aborting ...");

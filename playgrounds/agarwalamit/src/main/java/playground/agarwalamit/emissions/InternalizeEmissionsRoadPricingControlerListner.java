@@ -46,7 +46,7 @@ import playground.benjamin.internalization.EmissionInternalizationHandler;
  * @author amit after benjamin
  */
 public class InternalizeEmissionsRoadPricingControlerListner implements StartupListener, IterationStartsListener, IterationEndsListener, ShutdownListener {
-	public static final Logger logger = Logger.getLogger(InternalizeEmissionsRoadPricingControlerListner.class);
+	public static final Logger LOGGER = Logger.getLogger(InternalizeEmissionsRoadPricingControlerListner.class);
 
 	Controler controler;
 	EmissionModule emissionModule;
@@ -96,16 +96,16 @@ public class InternalizeEmissionsRoadPricingControlerListner implements StartupL
 	public void notifyIterationStarts(IterationStartsEvent event) {
 		iteration = event.getIteration();
 		
-		logger.info("creating new emission internalization handler...");
+		LOGGER.info("creating new emission internalization handler...");
 		emissionInternalizationHandler = new EmissionInternalizationHandler(controler, emissionCostModule, hotspotLinks);
-		logger.info("adding emission internalization module to emission events stream...");
+		LOGGER.info("adding emission internalization module to emission events stream...");
 		emissionModule.getEmissionEventsManager().addHandler(emissionInternalizationHandler);
 
 		if(iteration == firstIt || iteration == lastIt){
 			emissionEventOutputFile = controler.getControlerIO().getIterationFilename(iteration, "emission.events.xml.gz");
-			logger.info("creating new emission events writer...");
+			LOGGER.info("creating new emission events writer...");
 			emissionEventWriter = new EventWriterXML(emissionEventOutputFile);
-			logger.info("adding emission events writer to emission events stream...");
+			LOGGER.info("adding emission events writer to emission events stream...");
 			emissionModule.getEmissionEventsManager().addHandler(emissionEventWriter);
 		}
 	}
@@ -113,13 +113,13 @@ public class InternalizeEmissionsRoadPricingControlerListner implements StartupL
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
 
-		logger.info("removing emission internalization module from emission events stream...");
+		LOGGER.info("removing emission internalization module from emission events stream...");
 		emissionModule.getEmissionEventsManager().removeHandler(emissionInternalizationHandler);
 
 		if(iteration == firstIt || iteration == lastIt){
-			logger.info("removing emission events writer from emission events stream...");
+			LOGGER.info("removing emission events writer from emission events stream...");
 			emissionModule.getEmissionEventsManager().removeHandler(emissionEventWriter);
-			logger.info("closing emission events file...");
+			LOGGER.info("closing emission events file...");
 			emissionEventWriter.closeFile();
 		}
 	}

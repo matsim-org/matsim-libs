@@ -43,11 +43,11 @@ import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
  */
 public class ExperiencedDelaysUserGroup {
 
-	private  double marginal_Utl_money;
-	private  double marginal_Utl_performing_sec;
-	private  double marginal_Utl_traveling_car_sec;
+	private  double marginalUtlMoney;
+	private  double marginalUtlPerformingSec;
+	private  double marginalUtlTravelingCarSec;
 	private  double marginalUtlOfTravelTime ;
-	private  double vtts_car ;
+	private  double vttsCar ;
 
 	public ExperiencedDelaysUserGroup(String outputDir) {
 		this.outputDir = outputDir;
@@ -69,7 +69,7 @@ public class ExperiencedDelaysUserGroup {
 		new ExperiencedDelaysUserGroup(outputDir).run(runCases);
 	}
 
-	private void init(String runCase){
+	private void init(final String runCase){
 		this.userGroupToDelays  = new TreeMap<UserGroup, Double>();
 		this.time2linkIdDelays = new HashMap<Double, Map<Id<Person>,Double>>();
 		for (UserGroup ug:UserGroup.values()) {
@@ -80,14 +80,14 @@ public class ExperiencedDelaysUserGroup {
 		
 		this.lastIteration = scenario.getConfig().controler().getLastIteration();
 
-		this.marginal_Utl_money = scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney();
-		this.marginal_Utl_performing_sec = scenario.getConfig().planCalcScore().getPerforming_utils_hr()/3600;
-		this.marginal_Utl_traveling_car_sec = scenario.getConfig().planCalcScore().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() /3600;
-		this.marginalUtlOfTravelTime = this.marginal_Utl_traveling_car_sec + this.marginal_Utl_performing_sec;
-		this.vtts_car = this.marginalUtlOfTravelTime / this.marginal_Utl_money;
+		this.marginalUtlMoney = scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney();
+		this.marginalUtlPerformingSec = scenario.getConfig().planCalcScore().getPerforming_utils_hr()/3600;
+		this.marginalUtlTravelingCarSec = scenario.getConfig().planCalcScore().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() /3600;
+		this.marginalUtlOfTravelTime = this.marginalUtlTravelingCarSec + this.marginalUtlPerformingSec;
+		this.vttsCar = this.marginalUtlOfTravelTime / this.marginalUtlMoney;
 	}
 
-	public void run(String [] runCases){
+	public void run(final String [] runCases){
 		for(String runCase:runCases){
 			init(runCase);
 			String eventFile = this.outputDir+runCase+"/ITERS/it."+this.lastIteration+"/"+this.lastIteration+".events.xml.gz";//"/events.xml";//
@@ -102,12 +102,12 @@ public class ExperiencedDelaysUserGroup {
 		}
 	}
 
-	private void writeTotalDelaysPerUserGroup(String outputFile){
+	private void writeTotalDelaysPerUserGroup(final String outputFile){
 		BufferedWriter writer = IOUtils.getBufferedWriter(outputFile);
 		try{
 			writer.write("userGroup \t delaySeconds \t delaysMoney \n");
 			for(UserGroup ug:this.userGroupToDelays.keySet()){
-				writer.write(ug+"\t"+this.userGroupToDelays.get(ug)+"\t"+this.userGroupToDelays.get(ug)*this.vtts_car+"\n");
+				writer.write(ug+"\t"+this.userGroupToDelays.get(ug)+"\t"+this.userGroupToDelays.get(ug)*this.vttsCar+"\n");
 			}
 			writer.close();
 		} catch (Exception e){
@@ -116,7 +116,7 @@ public class ExperiencedDelaysUserGroup {
 		logger.info("Finished Writing data to file "+outputFile);
 	}
 
-	private void getTotalDelayPerUserGroup(Map<Double, Map<Id<Person>, Double>> delaysPerPersonPerTimeBin){
+	private void getTotalDelayPerUserGroup(final Map<Double, Map<Id<Person>, Double>> delaysPerPersonPerTimeBin){
 		for(double d:delaysPerPersonPerTimeBin.keySet()){
 			for(Id<Person> personId : delaysPerPersonPerTimeBin.get(d).keySet()){
 				UserGroup ug = pf.getUserGroupFromPersonId(personId);

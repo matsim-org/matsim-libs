@@ -60,7 +60,7 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup.ColoringScheme;
  */
 public class HolesInOTFVisTest {
 
-	private static final boolean useOTFVis = true;
+	private static final boolean IS_USING_OTFVIS = true;
 	
 	public static void main(String[] args) {
 
@@ -105,7 +105,7 @@ public class HolesInOTFVisTest {
 		
 		QSim qSim = QSimUtils.createDefaultQSim(sc, manager);
 		
-		if ( useOTFVis ) {
+		if ( IS_USING_OTFVIS ) {
 			// otfvis configuration.  There is more you can do here than via file!
 			final OTFVisConfigGroup otfVisConfig = ConfigUtils.addOrGetModule(qSim.getScenario().getConfig(), OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class);
 			otfVisConfig.setDrawTransitFacilities(false) ; // this DOES work

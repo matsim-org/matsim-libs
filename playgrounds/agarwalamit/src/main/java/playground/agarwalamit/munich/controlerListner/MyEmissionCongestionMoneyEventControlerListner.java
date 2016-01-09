@@ -43,12 +43,6 @@ import playground.vsp.analysis.modules.monetaryTransferPayments.MoneyEventHandle
  */
 
 public class MyEmissionCongestionMoneyEventControlerListner implements StartupListener, IterationEndsListener{
-
-	public MyEmissionCongestionMoneyEventControlerListner(EmissionCostModule emissionCostModule, EmissionModule emissionModule) {
-		this.emissionCostModule = emissionCostModule;
-		this.emissionModule = emissionModule;
-	}
-
 	public static Logger log =Logger.getLogger(MyEmissionCongestionMoneyEventControlerListner.class);
 
 	private Map<Id<Person>, Double> pId2ColdEmissionsCosts = new HashMap<>();
@@ -62,12 +56,17 @@ public class MyEmissionCongestionMoneyEventControlerListner implements StartupLi
 	private ExperiencedDelayHandler congestionCostHandler;
 	private EmissionModule emissionModule;
 	private EmissionCostsCollector emissCostHandler;
-	private double vtts_car;
+	private double vttsCar;
+	
+	public MyEmissionCongestionMoneyEventControlerListner(EmissionCostModule emissionCostModule, EmissionModule emissionModule) {
+		this.emissionCostModule = emissionCostModule;
+		this.emissionModule = emissionModule;
+	}
 
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		this.scenario = (MutableScenario) event.getControler().getScenario();
-		this.vtts_car = (this.scenario.getConfig().planCalcScore().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() - this.scenario.getConfig().planCalcScore().getPerforming_utils_hr()) / this.scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney();
+		this.vttsCar = (this.scenario.getConfig().planCalcScore().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() - this.scenario.getConfig().planCalcScore().getPerforming_utils_hr()) / this.scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney();
 
 		this.emissCostHandler = new EmissionCostsCollector(emissionCostModule);
 		this.moneyHandler = new MoneyEventHandler();
@@ -105,7 +104,7 @@ public class MyEmissionCongestionMoneyEventControlerListner implements StartupLi
 				double toll;
 
 				if(!this.pId2CongestionCosts.containsKey(personId)) delaysCosts =0;
-				else delaysCosts = 	this.pId2CongestionCosts.get(personId) / 3600 * vtts_car;
+				else delaysCosts = 	this.pId2CongestionCosts.get(personId) / 3600 * vttsCar;
 
 				if(!this.pId2ColdEmissionsCosts.containsKey(personId)) coldEmissCosts=0;
 				else coldEmissCosts = this.pId2ColdEmissionsCosts.get(personId);

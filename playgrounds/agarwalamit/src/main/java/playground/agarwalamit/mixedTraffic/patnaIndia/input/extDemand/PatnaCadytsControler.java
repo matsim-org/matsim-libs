@@ -66,12 +66,12 @@ public class PatnaCadytsControler {
 	private static String plansFile = "../../../../repos/runs-svn/patnaIndia/run108/input/outerCordonDemand_10pct.xml.gz";
 	private static String outputDir = "../../../../repos/runs-svn/patnaIndia/run108/outerCordonOutput_10pct_OC1Excluded/";
 
-	private static final boolean stabilityCheckAfterCadyts = false;
+	private static final boolean STABILITY_CHECK_AFTER_CADYTS = false;
 	
 	public static void main(String[] args) {
 		String patnaVehicles = "../../../../repos/runs-svn/patnaIndia/run108/input/patnaVehicles_outerCordon.xml.gz";
 		
-		if( stabilityCheckAfterCadyts) {
+		if( STABILITY_CHECK_AFTER_CADYTS) {
 			String inPlans = outputDir+"/output_plans.xml.gz";	
 			plansFile = "../../../../repos/runs-svn/patnaIndia/run108/input/cordonOutput_plans_10pct_selected.xml.gz";
 			
@@ -110,7 +110,7 @@ public class PatnaCadytsControler {
 			}
 		});
 
-		if(!stabilityCheckAfterCadyts) pcc.addCadytsSetting(controler, config);
+		if(!STABILITY_CHECK_AFTER_CADYTS) pcc.addCadytsSetting(controler, config);
 
 		controler.run();
 	}

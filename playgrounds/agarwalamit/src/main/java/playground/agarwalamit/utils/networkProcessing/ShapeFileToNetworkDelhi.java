@@ -43,11 +43,11 @@ import java.util.Map;
 /**
  * @author amit
  */
-public class shapeFileToNetworkDelhi {
+public class ShapeFileToNetworkDelhi {
 
-	private final static String networkShapeFile = "./input/sarojini/abc.shp";
-	private final static String matsimNetwork = "./input/sarojini/matsimNetwork.xml";
-	final  static CoordinateTransformation ct =TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84,"EPSG:24378");
+	private final static String NETWORK_SHAPE_FILE = "./input/sarojini/abc.shp";
+	private final static String MATSIM_NETWORK = "./input/sarojini/matsimNetwork.xml";
+	private final static CoordinateTransformation CT =TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84,"EPSG:24378");
 	private static Map<Coord, String> coordId = new HashMap<Coord, String>();
 
 	public static void main(String[] args) {
@@ -55,7 +55,7 @@ public class shapeFileToNetworkDelhi {
 		Scenario scenario = ScenarioUtils.createScenario(config);
 
 		ShapeFileReader reader = new ShapeFileReader();
-		Collection<SimpleFeature> features = reader.readFileAndInitialize(networkShapeFile);
+		Collection<SimpleFeature> features = reader.readFileAndInitialize(NETWORK_SHAPE_FILE);
 
 		Network network = scenario.getNetwork();
 
@@ -79,7 +79,7 @@ public class shapeFileToNetworkDelhi {
 				Node node1;
 
 				if(!network.getNodes().containsKey((fromNodeId))){
-					node1 = ((NetworkImpl) network).createAndAddNode(fromNodeId, ct.transform(fromCoord));
+					node1 = ((NetworkImpl) network).createAndAddNode(fromNodeId, CT.transform(fromCoord));
 				}else{
 					node1=network.getNodes().get((fromNodeId));
 				}
@@ -103,7 +103,7 @@ public class shapeFileToNetworkDelhi {
 				Node node2;
 
 				if(!network.getNodes().containsKey((toNodeId))){
-					node2 = ((NetworkImpl) network).createAndAddNode(toNodeId, ct.transform(toCoord));
+					node2 = ((NetworkImpl) network).createAndAddNode(toNodeId, CT.transform(toCoord));
 				}else{
 					node2 = network.getNodes().get((toNodeId));
 				}
@@ -135,6 +135,6 @@ public class shapeFileToNetworkDelhi {
 		// write network to a file
 		new NetworkCleaner().run(network);
 		NetworkWriter writer = new NetworkWriter(network);
-		writer.write(matsimNetwork);
+		writer.write(MATSIM_NETWORK);
 	}
 }

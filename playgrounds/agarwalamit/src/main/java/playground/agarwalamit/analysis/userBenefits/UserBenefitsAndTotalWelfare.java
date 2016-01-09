@@ -61,13 +61,13 @@ public class UserBenefitsAndTotalWelfare {
 
 	public void runAndWrite(final String [] runCases){
 
-		double [] userBenefits_money = new double [runCases.length];
+		double [] userBenefitsMoney = new double [runCases.length];
 		double [] monetaryPayments = new double [runCases.length];
 		double [] excludedToll = new double [runCases.length];
 		
 		for(int i=0; i< runCases.length;i++){
 			loadScenario(runCases[i]);
-			userBenefits_money[i] = getAllUserBenefits(runCases[i], WM);
+			userBenefitsMoney[i] = getAllUserBenefits(runCases[i], WM);
 			double tollInfo [] = getMonetaryPayment(runCases[i], false);
 			monetaryPayments[i] = tollInfo[0];
 			excludedToll[i] = tollInfo[1];
@@ -78,7 +78,7 @@ public class UserBenefitsAndTotalWelfare {
 		try {
 			writer.write("runCase \t userBenefits_money \t tollPayments \t excludedTollIfAny \n");
 			for(int i=0; i< runCases.length;i++){
-				writer.write(runCases[i]+"\t"+userBenefits_money[i]+"\t"+monetaryPayments[i]+"\t"+excludedToll[i]+"\n");
+				writer.write(runCases[i]+"\t"+userBenefitsMoney[i]+"\t"+monetaryPayments[i]+"\t"+excludedToll[i]+"\n");
 			}
 			writer.close();
 		} catch (IOException e) {

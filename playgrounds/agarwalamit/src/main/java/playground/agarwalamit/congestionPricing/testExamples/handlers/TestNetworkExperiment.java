@@ -106,15 +106,15 @@ class TestNetworkExperiment {
 
 
 	void printData(){
-		Map<Id<Person>, Double> personId2AffectedDelays_v3 = generatePersonId2Delays("v3", "affected");
-		Map<Id<Person>, Double> personId2AffectedDelays_v4 = generatePersonId2Delays("v4", "affected");
-		Map<Id<Person>, Double> personId2AffectedDelays_v5 = generatePersonId2Delays("v5", "affected");
-		Map<Id<Person>, Double> personId2AffectedDelays_v6 = generatePersonId2Delays("v6", "affected");
+		Map<Id<Person>, Double> personId2AffectedDelaysV3 = generatePersonId2Delays("v3", "affected");
+		Map<Id<Person>, Double> personId2AffectedDelaysV4 = generatePersonId2Delays("v4", "affected");
+		Map<Id<Person>, Double> personId2AffectedDelaysV5 = generatePersonId2Delays("v5", "affected");
+		Map<Id<Person>, Double> personId2AffectedDelaysV6 = generatePersonId2Delays("v6", "affected");
 
-		Map<Id<Person>, Double> personId2CausingDelays_v3 = generatePersonId2Delays("v3", "causing");
-		Map<Id<Person>, Double> personId2CausingDelays_v4 = generatePersonId2Delays("v4", "causing");
-		Map<Id<Person>, Double> personId2CausingDelays_v5 = generatePersonId2Delays("v5", "causing");
-		Map<Id<Person>, Double> personId2CausingDelays_v6 = generatePersonId2Delays("v6", "causing");
+		Map<Id<Person>, Double> personId2CausingDelaysV3 = generatePersonId2Delays("v3", "causing");
+		Map<Id<Person>, Double> personId2CausingDelaysV4 = generatePersonId2Delays("v4", "causing");
+		Map<Id<Person>, Double> personId2CausingDelaysV5 = generatePersonId2Delays("v5", "causing");
+		Map<Id<Person>, Double> personId2CausingDelaysV6 = generatePersonId2Delays("v6", "causing");
 
 		BufferedWriter  writer = IOUtils.getBufferedWriter("./output/comparisonOfPricingImpls.txt");
 		try {
@@ -126,20 +126,20 @@ class TestNetworkExperiment {
 		//		System.out.println("PersonID \t Delay affected(V4) \t Delay affected (V5) \t Delay affected (V6) \t Delay caused (V4) \t Delay caused (V5) \t Delay caused (V6) ");
 
 		Set<Id<Person>> personIds = new HashSet<Id<Person>>();
-		personIds.addAll(personId2AffectedDelays_v4.keySet());
-		personIds.addAll(personId2CausingDelays_v4.keySet());
-		personIds.addAll(personId2AffectedDelays_v5.keySet());
-		personIds.addAll(personId2CausingDelays_v5.keySet());
-		personIds.addAll(personId2AffectedDelays_v3.keySet());
-		personIds.addAll(personId2CausingDelays_v3.keySet());
+		personIds.addAll(personId2AffectedDelaysV4.keySet());
+		personIds.addAll(personId2CausingDelaysV4.keySet());
+		personIds.addAll(personId2AffectedDelaysV5.keySet());
+		personIds.addAll(personId2CausingDelaysV5.keySet());
+		personIds.addAll(personId2AffectedDelaysV3.keySet());
+		personIds.addAll(personId2CausingDelaysV3.keySet());
 		// yy why is v6 not added? kai, aug'15
 
 
 		try {
 			for(Id<Person> personId : personIds){
-				writer.write(personId + "\t" + personId2AffectedDelays_v3.get(personId) + "\t"+ personId2AffectedDelays_v4.get(personId) + 
-						"\t" + personId2AffectedDelays_v5.get(personId) + "\t"+ personId2AffectedDelays_v6.get(personId) + "\t"  + personId2CausingDelays_v3.get(personId) + "\t" + 
-						personId2CausingDelays_v4.get(personId) + "\t" +personId2CausingDelays_v5.get(personId) + "\t" + personId2CausingDelays_v6.get(personId)+"\n");
+				writer.write(personId + "\t" + personId2AffectedDelaysV3.get(personId) + "\t"+ personId2AffectedDelaysV4.get(personId) + 
+						"\t" + personId2AffectedDelaysV5.get(personId) + "\t"+ personId2AffectedDelaysV6.get(personId) + "\t"  + personId2CausingDelaysV3.get(personId) + "\t" + 
+						personId2CausingDelaysV4.get(personId) + "\t" +personId2CausingDelaysV5.get(personId) + "\t" + personId2CausingDelaysV6.get(personId)+"\n");
 			}
 			writer.close();
 		} catch (Exception e) {

@@ -45,8 +45,8 @@ import playground.vsp.congestion.handlers.CongestionEventHandler;
 
 public class CompareCongestionEvents  {
 
-	private String eventsFile_v3 = "/Users/amit/Documents/repos/runs-svn/siouxFalls/run203/implV3/ITERS/it.1000/1000.events.xml.gz";
-	private String eventsFile_v4 = "/Users/amit/Documents/repos/runs-svn/siouxFalls/run203/implV3/ITERS/it.1000/1000.events_implV4.xml.gz";
+	private String eventsFileV3 = "/Users/amit/Documents/repos/runs-svn/siouxFalls/run203/implV3/ITERS/it.1000/1000.events.xml.gz";
+	private String eventsFileV4 = "/Users/amit/Documents/repos/runs-svn/siouxFalls/run203/implV3/ITERS/it.1000/1000.events_implV4.xml.gz";
 
 	private List<CongestionEvent>  getCongestionEvents (String eventsFile){
 
@@ -80,7 +80,7 @@ public class CompareCongestionEvents  {
 	
 	private void compareTwoImplForSameRun(){
 
-		List<String> eventsImpl3_list = eventList2StringList(getCongestionEvents(eventsFile_v3));
+		List<String> eventsImpl3List = eventList2StringList(getCongestionEvents(eventsFileV3));
 		
 		String runDir = "/Users/amit/Documents/repos/runs-svn/siouxFalls/run203/implV3/";
 		Scenario scenario = LoadMyScenarios.loadScenarioFromOutputDir(runDir);
@@ -88,16 +88,16 @@ public class CompareCongestionEvents  {
 		CrossMarginalCongestionEventsWriter w =	new CrossMarginalCongestionEventsWriter(scenario);
 		w.readAndWrite("implV4");
 		
-		List<String> eventsImpl4_list = eventList2StringList(w.getCongestionEventsList());
+		List<String> eventsImpl4List = eventList2StringList(w.getCongestionEventsList());
 
-		System.out.println("V3 list size"+eventsImpl3_list.size());
-		System.out.println("V4 list size"+eventsImpl4_list.size());
+		System.out.println("V3 list size"+eventsImpl3List.size());
+		System.out.println("V4 list size"+eventsImpl4List.size());
 
 		Set<String> eventsImpl3 = new LinkedHashSet<String>();
-		eventsImpl3.addAll(eventsImpl3_list);
+		eventsImpl3.addAll(eventsImpl3List);
 
 		Set<String> eventsImpl4 = new LinkedHashSet<String>();
-		eventsImpl4.addAll(eventsImpl4_list);
+		eventsImpl4.addAll(eventsImpl4List);
 
 		System.out.println("V3 set size"+eventsImpl3.size());
 		System.out.println("V4 set size"+eventsImpl4.size());
@@ -125,9 +125,9 @@ public class CompareCongestionEvents  {
 		
 		for(String e:wronglyChargedEventsList){
 			
-			String CausingPerson = e.split(" ")[4];
+			String causingPerson = e.split(" ")[4];
 			String affectedPerson = e.split(" ")[5];
-			causingPersons.add(CausingPerson);
+			causingPersons.add(causingPerson);
 			affectedPersons.add(affectedPerson);
 			
 			String delay = (e.split(" ")[6]);
@@ -154,8 +154,8 @@ public class CompareCongestionEvents  {
 
 	private void run(String outputFolder){
 
-		List<CongestionEvent> eventsImpl3 = getCongestionEvents(eventsFile_v3);
-		List<CongestionEvent> eventsImpl4 = getCongestionEvents(eventsFile_v4);
+		List<CongestionEvent> eventsImpl3 = getCongestionEvents(eventsFileV3);
+		List<CongestionEvent> eventsImpl4 = getCongestionEvents(eventsFileV4);
 
 		BufferedWriter writer = IOUtils.getBufferedWriter(outputFolder+"/congestionEventsInfo.txt");
 		try {

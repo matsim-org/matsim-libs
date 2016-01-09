@@ -44,6 +44,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.config.groups.QSimConfigGroup.VehiclesSource;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -78,13 +79,13 @@ public class VehicleType2ScenarioTest {
 	public VehicleType2ScenarioTest() {
 		scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		
-		if(! useModifiedMobsimFactory){
-			scenario.getConfig().qsim().setUseDefaultVehicles(false);
+		if(! IS_USING_MODIFIED_MOBSIM){
+			scenario.getConfig().qsim().setVehiclesSource(VehiclesSource.fromVehiclesData);
 		}
 	}
 
 
-	private static final boolean useModifiedMobsimFactory = false;
+	private static final boolean IS_USING_MODIFIED_MOBSIM = false;
 	private Scenario scenario ;
 	static String transportModes [] = new String [] {"bike","car"};
 	Link link1;
@@ -104,7 +105,7 @@ public class VehicleType2ScenarioTest {
 						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
 						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 
-		if(useModifiedMobsimFactory){
+		if(IS_USING_MODIFIED_MOBSIM){
 			cont.addOverridingModule(new AbstractModule() {
 				@Override
 				public void install() {
@@ -171,7 +172,7 @@ public class VehicleType2ScenarioTest {
 			plan.addActivity(a2);
 			population.addPerson(p);
 
-			if(! useModifiedMobsimFactory){
+			if(! IS_USING_MODIFIED_MOBSIM){
 				Id<Vehicle> vId = Id.create(p.getId(),Vehicle.class);
 				Vehicle v = VehicleUtils.getFactory().createVehicle(vId, vehTypes[i]);
 			

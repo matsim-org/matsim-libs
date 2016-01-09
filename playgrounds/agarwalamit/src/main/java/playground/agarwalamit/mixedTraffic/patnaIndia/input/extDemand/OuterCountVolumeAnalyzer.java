@@ -46,7 +46,7 @@ public class OuterCountVolumeAnalyzer {
 
 	private LinkVolumeHandler handler = new LinkVolumeHandler();
 	private SortedMap<Id<Link>, Tuple<Integer,Integer>> link2totalCounts = new TreeMap<>();
-	private static final int countScaleFactor = 10;
+	private static final int COUNT_SCALE_FACTOR = 10;
 
 	public static void main(String[] args) {
 		String outputFolder ="../../../../repos/runs-svn/patnaIndia/run108/outerCordonOutput_10pct_OC1Excluded/";
@@ -70,11 +70,11 @@ public class OuterCountVolumeAnalyzer {
 		try {
 			writer.write("OuterCountStationNumber \t linkId \t ext-intCount \t ext-extCount \n");
 			for(Id<Link> linkId : OuterCordonUtils.getExternalToInternalCountStationLinkIds()){
-				writer.write(OuterCordonLinks.getOuterCordonNumberFromLink(linkId.toString())+"\t"+linkId+"\t"+link2totalCounts.get(linkId).getSecond()*countScaleFactor+"\t"+link2totalCounts.get(linkId).getFirst()*countScaleFactor+"\n");
+				writer.write(OuterCordonLinks.getOuterCordonNumberFromLink(linkId.toString())+"\t"+linkId+"\t"+link2totalCounts.get(linkId).getSecond()*COUNT_SCALE_FACTOR+"\t"+link2totalCounts.get(linkId).getFirst()*COUNT_SCALE_FACTOR+"\n");
 			}
 			writer.newLine();
 			for(Id<Link> linkId : OuterCordonUtils.getInternalToExternalCountStationLinkIds()){
-				writer.write(OuterCordonLinks.getOuterCordonNumberFromLink(linkId.toString())+"\t"+linkId+"\t"+link2totalCounts.get(linkId).getSecond()*countScaleFactor+"\t"+link2totalCounts.get(linkId).getFirst()*countScaleFactor+"\n");
+				writer.write(OuterCordonLinks.getOuterCordonNumberFromLink(linkId.toString())+"\t"+linkId+"\t"+link2totalCounts.get(linkId).getSecond()*COUNT_SCALE_FACTOR+"\t"+link2totalCounts.get(linkId).getFirst()*COUNT_SCALE_FACTOR+"\n");
 			}
 			writer.close();
 		} catch (Exception e) {
@@ -99,7 +99,7 @@ public class OuterCountVolumeAnalyzer {
 				writer.write(ii+"\t");
 				for(Id<Link> linkId : allCountStationLinks){
 					double count = link2time2volume.get(linkId).containsKey(ii) ? link2time2volume.get(linkId).get(ii) : 0.;
-					writer.write(  count * countScaleFactor + "\t" );
+					writer.write(  count * COUNT_SCALE_FACTOR + "\t" );
 				}	
 				writer.newLine();
 			}
@@ -116,17 +116,17 @@ public class OuterCountVolumeAnalyzer {
 		allCountStationLinks.addAll(OuterCordonUtils.getInternalToExternalCountStationLinkIds());
 		for (Id<Link> linkId : allCountStationLinks){
 			Map<Integer, List<Id<Vehicle>>> time2vehicles = link2time2vehicles.get(linkId);
-			int E2ECount = 0;
-			int E2ICount = 0;
+			int e2eCount = 0;
+			int e2iCount = 0;
 			if(time2vehicles != null) {
 				for(int t : time2vehicles.keySet() ){
 					for (Id<Vehicle> veh : time2vehicles.get(t)){
-						if ( OuterCordonUtils.isVehicleFromThroughTraffic(veh) ) E2ECount++;
-						else E2ICount++;
+						if ( OuterCordonUtils.isVehicleFromThroughTraffic(veh) ) e2eCount++;
+						else e2iCount++;
 					}
 				}
 			}
-			link2totalCounts.put(linkId, new Tuple<Integer, Integer>(E2ECount, E2ICount));
+			link2totalCounts.put(linkId, new Tuple<Integer, Integer>(e2eCount, e2iCount));
 		}
 	}
 }

@@ -52,15 +52,15 @@ import java.util.TreeMap;
  */
 public class TestingPricing4SamplePopulation {
 
-	private static final Logger log = Logger.getLogger(TestingPricing4SamplePopulation.class);
-	private static final boolean considerCO2Costs=true;
-	private static final double emissionCostFacotr=1.0;
+	private static final Logger LOG = Logger.getLogger(TestingPricing4SamplePopulation.class);
+	private static final boolean CONSIDER_CO2_COSTS=true;
+	private static final double EMISS_COST_FACTOR=1.0;
 
-	private static final double marginal_Utl_money=0.062;
-	private static final double marginal_Utl_performing_sec=0.96/3600;
-	private static final double marginal_Utl_traveling_car_sec=-0.0/3600;
-	private static final double marginalUtlOfTravelTime = marginal_Utl_traveling_car_sec+marginal_Utl_performing_sec;
-	private static final double vtts_car = marginalUtlOfTravelTime/marginal_Utl_money;
+	private static final double MARGINAL_UTIL_MONEY=0.062;
+	private static final double MARGINAL_UTIL_PERF_SEC=0.96/3600;
+	private static final double MARGINAL_UTIL_TRAV_CAR_SEC=-0.0/3600;
+	private static final double MARGINAL_UTIL_TRAVEL_TIME = MARGINAL_UTIL_TRAV_CAR_SEC+MARGINAL_UTIL_PERF_SEC;
+	private static final double VTTS_CAR = MARGINAL_UTIL_TRAVEL_TIME/MARGINAL_UTIL_MONEY;
 
 	public static void main(String[] args) {
 
@@ -87,7 +87,7 @@ public class TestingPricing4SamplePopulation {
 		SortedMap<Double, Integer > flowCap2NoOfCarPersons = new TreeMap<Double, Integer>();
 
 		for(double d:samplePopulation){
-			log.info("Running sample Population "+d+".");
+			LOG.info("Running sample Population "+d+".");
 			String outputDir = outputFolder+"/f/f"+d+"/";
 			new File(outputDir).mkdir();
 			String samplePlansFile = outputDir+"/plans"+d+".xml";
@@ -137,8 +137,8 @@ public class TestingPricing4SamplePopulation {
 			flowCap2NoOfCarPersons.put(d, carCounter);
 			flowCap2DelaysCosts.put(d, delaysCosts);
 			flowCap2EmissionsCosts.put(d,emissionsCosts);
-			log.info(d+"\t"+flowCap2NoOfPersons.get(d)+"\t"+flowCap2NoOfCarPersons.get(d)+"\t"+flowCap2EmissionsCosts.get(d)+"\t"+flowCap2DelaysCosts.get(d)+"\n");
-			log.info("Run for sample population "+d+" is finished. :-) :-) :-)");
+			LOG.info(d+"\t"+flowCap2NoOfPersons.get(d)+"\t"+flowCap2NoOfCarPersons.get(d)+"\t"+flowCap2EmissionsCosts.get(d)+"\t"+flowCap2DelaysCosts.get(d)+"\n");
+			LOG.info("Run for sample population "+d+" is finished. :-) :-) :-)");
 		}
 
 		BufferedWriter writer = IOUtils.getBufferedWriter(outputFolder+"/f/flowCapFactorVsEmissionsAndTotalDelaysCosts.txt");
@@ -164,14 +164,14 @@ public class TestingPricing4SamplePopulation {
 
 		for(EmissionCostFactors ecf:EmissionCostFactors.values()) {
 			String str = ecf.toString();			
-			if(str.equals("CO2_TOTAL") && !considerCO2Costs){
+			if(str.equals("CO2_TOTAL") && !CONSIDER_CO2_COSTS){
 				// do not include CO2_TOTAL costs.
 			} else {
 				double emissionsCosts = EmissionCostFactors.valueOf(str).getCostFactor() * totalEmissions.get(str);
 				totalEmissionCost += emissionsCosts;
 			}
 		}
-		return emissionCostFacotr*totalEmissionCost;
+		return EMISS_COST_FACTOR*totalEmissionCost;
 	}
 	//	private static double[] getDelaysFromEvents(String outputDir, ScenarioImpl sc){
 	//		EventsManager eventManager = EventsUtils.createEventsManager();
@@ -195,7 +195,7 @@ public class TestingPricing4SamplePopulation {
 		MatsimEventsReader eventsReader = new MatsimEventsReader(eventManager);
 		String inputEventsFile = outputDir+"/ITERS/it.500/500.events.xml.gz";
 		eventsReader.readFile(inputEventsFile);
-		double flowAndStorageDelays = congestionHandlerImplV3.getTotalInternalizedDelay()*vtts_car; 
+		double flowAndStorageDelays = congestionHandlerImplV3.getTotalInternalizedDelay()*VTTS_CAR; 
 		return flowAndStorageDelays;
 	}
 }

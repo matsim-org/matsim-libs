@@ -20,7 +20,6 @@ package playground.agarwalamit;
 
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Set;
 
 import org.junit.Assert;
 import org.junit.Rule;
@@ -62,11 +61,10 @@ public class NetworkRouteForUncongestedModeTest {
 
 		Scenario sc = createSceanrio();
 		sc.getConfig().controler().setOutputDirectory(helper.getOutputDirectory());
-
+		
 		// set allowed modes on each link
 		for (Link l : sc.getNetwork().getLinks().values()) {
-			Set<String> modes = new HashSet<>(Arrays.asList("car","ride"));
-			l.setAllowedModes(modes);
+			l.setAllowedModes(new HashSet<>(Arrays.asList("car","ride")));
 		}
 		
 		Controler controler = new Controler(sc);
