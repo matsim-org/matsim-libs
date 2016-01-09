@@ -39,7 +39,6 @@ import floetteroed.opdyts.DecisionVariable;
 import floetteroed.opdyts.ObjectiveFunction;
 import floetteroed.opdyts.SimulatorState;
 import floetteroed.opdyts.convergencecriteria.ConvergenceCriterion;
-import floetteroed.opdyts.logging.ExecutedDecisionVariable;
 import floetteroed.opdyts.logging.TransientObjectiveFunctionValue;
 import floetteroed.utilities.math.MathHelpers;
 import floetteroed.utilities.statisticslogging.Statistic;
@@ -217,9 +216,6 @@ public class ParallelTrajectorySampler<U extends DecisionVariable> implements
 		 */
 		if (this.decisionVariablesToBeTriedOut.size() > 0) {
 
-			// TODO log the current decision variable before overwriting it.
-			final U executedDecisionVariable = this.currentDecisionVariable;
-
 			/*
 			 * There still are untried decision variables, pick one.
 			 */
@@ -239,9 +235,7 @@ public class ParallelTrajectorySampler<U extends DecisionVariable> implements
 			this.currentDecisionVariable.implementInSimulation();
 			this.statisticsWriter.writeToFile(null,
 					TransientObjectiveFunctionValue.LABEL,
-					Double.toString(this.objectiveFunction.value(newState)),
-					ExecutedDecisionVariable.LABEL,
-					executedDecisionVariable.toString());
+					Double.toString(this.objectiveFunction.value(newState)));
 
 		} else {
 
@@ -251,11 +245,13 @@ public class ParallelTrajectorySampler<U extends DecisionVariable> implements
 			final TransitionSequencesAnalyzer<U> samplingStageEvaluator = new TransitionSequencesAnalyzer<U>(
 					decisionVariable2transitionSequence,
 					this.equilibriumWeight, this.uniformityWeight);
+
 			final SamplingStage<U> samplingStage = samplingStageEvaluator
-					.newOptimalSamplingStage();
-			this.statisticsWriter.writeToFile(samplingStage,
-					ExecutedDecisionVariable.LABEL,
-					this.currentDecisionVariable.toString());
+					.newOptimalSamplingStage(this.decisionVariable2transitionSequence
+							.get(this.currentDecisionVariable)
+							.getLastTransition());
+
+			this.statisticsWriter.writeToFile(samplingStage);
 			this.samplingStages.add(samplingStage);
 
 			/*

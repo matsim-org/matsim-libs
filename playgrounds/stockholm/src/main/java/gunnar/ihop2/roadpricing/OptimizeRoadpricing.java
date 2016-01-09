@@ -46,7 +46,6 @@ class OptimizeRoadpricing {
 				new RoadPricingConfigGroup());
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
 
-		// >>>>> NEW >>>>>
 		final RoadPricingConfigGroup roadPricingConfigGroup = ConfigUtils
 				.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME,
 						RoadPricingConfigGroup.class);
@@ -55,19 +54,24 @@ class OptimizeRoadpricing {
 				.parse(roadPricingConfigGroup.getTollLinksFile());
 		final AbstractModule roadpricingModule = new ControlerDefaultsWithRoadPricingModule(
 				roadPricingScheme);
-		// <<<<< NEW <<<<<
 
 		/*
 		 * Create initial toll levels and their randomization.
 		 */
+		// THE ORIGINAL
 		final TollLevels initialTollLevels = new TollLevels(6 * 3600 + 1800,
 				7 * 3600, 7 * 3600 + 1800, 8 * 3600 + 1800, 9 * 3600,
 				15 * 3600 + 1800, 16 * 3600, 17 * 3600 + 1800, 18 * 3600,
 				18 * 3600 + 1800, 10.0, 15.0, 20.0, scenario);
+		// OPTIMIZED
+		// final TollLevels initialTollLevels = new TollLevels(25200.0, 25200.0,
+		// 28800.0, 30600.0, 32400.0, 55800.0, 59400.0, 59400.0, 61200.0,
+		// 63000.0, 0.0, 10.0, 30.0, scenario);
+
 		final double changeTimeProba = 2.0 / 3.0;
 		final double changeCostProba = 2.0 / 3.0;
 		final double deltaTime_s = 1800;
-		final double deltaCost_money = 10.0;
+		final double deltaCost_money = 5.0;
 		final DecisionVariableRandomizer<TollLevels> decisionVariableRandomizer = new TollLevelsRandomizer(
 				initialTollLevels, changeTimeProba, changeCostProba,
 				deltaTime_s, deltaCost_money);
@@ -97,7 +101,7 @@ class OptimizeRoadpricing {
 		final int maxMemorizedTrajectoryLength = 1;
 		final boolean keepBestSolution = true;
 		final boolean interpolate = true;
-		final int maxRandomSearchIterations = 5;
+		final int maxRandomSearchIterations = 2;
 		final int maxRandomSearchTransitions = Integer.MAX_VALUE;
 		final int randomSearchPopulationSize = 3;
 		final RandomSearch<TollLevels> randomSearch = new RandomSearch<>(

@@ -5,26 +5,22 @@ import floetteroed.opdyts.trajectorysampling.SamplingStage;
 import floetteroed.utilities.statisticslogging.Statistic;
 
 /**
+ * TODO This should become general-purpose.
  * 
  * @author Gunnar Flötteröd
  *
  */
-public class ExecutedDecisionVariable<U extends DecisionVariable> implements
+public class FreeMemory<U extends DecisionVariable> implements
 		Statistic<SamplingStage<U>> {
-
-	public static final String LABEL = "Executed Decision Variable";
-	
-	public ExecutedDecisionVariable() {
-	}
 
 	@Override
 	public String label() {
-		return LABEL;
+		return "Free Memory";
 	}
 
 	@Override
 	public String value(final SamplingStage<U> samplingStage) {
-		return "[override this]";
+		return Long.toString(Runtime.getRuntime().freeMemory());
 	}
 
 }

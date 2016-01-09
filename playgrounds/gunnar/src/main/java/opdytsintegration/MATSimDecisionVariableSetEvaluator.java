@@ -21,8 +21,13 @@ import com.google.inject.Inject;
 import floetteroed.opdyts.DecisionVariable;
 import floetteroed.opdyts.logging.EquilibriumGap;
 import floetteroed.opdyts.logging.EquilibriumGapWeight;
-import floetteroed.opdyts.logging.ExecutedDecisionVariable;
+import floetteroed.opdyts.logging.FreeMemory;
+import floetteroed.opdyts.logging.LastDecisionVariable;
+import floetteroed.opdyts.logging.LastEquilibriumGap;
+import floetteroed.opdyts.logging.LastObjectiveFunctionValue;
+import floetteroed.opdyts.logging.MaxMemory;
 import floetteroed.opdyts.logging.SurrogateObjectiveFunctionValue;
+import floetteroed.opdyts.logging.TotalMemory;
 import floetteroed.opdyts.logging.TransientObjectiveFunctionValue;
 import floetteroed.opdyts.logging.UniformityGap;
 import floetteroed.opdyts.logging.UniformityGapWeight;
@@ -150,7 +155,14 @@ public class MATSimDecisionVariableSetEvaluator<U extends DecisionVariable>
 		this.trajectorySampler.addStatistic(logFileName,
 				new SurrogateObjectiveFunctionValue<U>());
 		this.trajectorySampler.addStatistic(logFileName,
-				new ExecutedDecisionVariable<U>());
+				new LastObjectiveFunctionValue<U>());
+		this.trajectorySampler.addStatistic(logFileName,
+				new LastEquilibriumGap<U>());
+		this.trajectorySampler.addStatistic(logFileName, new TotalMemory<U>());
+		this.trajectorySampler.addStatistic(logFileName, new FreeMemory<U>());
+		this.trajectorySampler.addStatistic(logFileName, new MaxMemory<U>());
+		this.trajectorySampler.addStatistic(logFileName,
+				new LastDecisionVariable<U>());
 	}
 
 	public MATSimState getFinalState() {

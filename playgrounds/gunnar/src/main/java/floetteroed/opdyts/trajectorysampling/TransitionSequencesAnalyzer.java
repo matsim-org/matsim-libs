@@ -128,11 +128,23 @@ public class TransitionSequencesAnalyzer<U extends DecisionVariable> {
 		return result;
 	}
 
+	// TODO not sure about the transition ordering
+	//
+	// public double lastObjectiveFunctionValue() {
+	// return this.transitions.get(this.transitions.size() - 1)
+	// .getToStateObjectiveFunctionValue();
+	// }
+	//
+	// public double lastEquilibriuGap() {
+	// return this.transitions.get(this.transitions.size() - 1).getDelta()
+	// .euclNorm();
+	// }
+
 	// -------------------- OPTIMIZATION --------------------
 
-	public SamplingStage<U> newOptimalSamplingStage() {
+	public SamplingStage<U> newOptimalSamplingStage(final Transition<U> lastTransition) {
 		final Vector alphas = this.optimalAlphas();
-		return new SamplingStage<>(alphas, this);
+		return new SamplingStage<>(alphas, this, lastTransition);
 	}
 
 	public Vector optimalAlphas() {
