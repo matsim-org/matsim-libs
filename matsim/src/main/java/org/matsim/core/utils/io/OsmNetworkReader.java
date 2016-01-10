@@ -221,15 +221,15 @@ public class OsmNetworkReader implements MatsimSomeReader {
 	 *
 	 * @param hierarchy The hierarchy layer the highway appears.
 	 * @param highwayType The type of highway these defaults are for.
-	 * @param lanes number of lanes on that road type (<em>in each direction</em>)
+	 * @param lanesPerDirection number of lanes on that road type <em>in each direction</em>
 	 * @param freespeed the free speed vehicles can drive on that road type [meters/second]
 	 * @param freespeedFactor the factor the freespeed is scaled
 	 * @param laneCapacity_vehPerHour the capacity per lane [veh/h]
 	 *
 	 * @see <a href="http://wiki.openstreetmap.org/wiki/Map_Features#Highway">http://wiki.openstreetmap.org/wiki/Map_Features#Highway</a>
 	 */
-	public void setHighwayDefaults(final int hierarchy , final String highwayType, final double lanes, final double freespeed, final double freespeedFactor, final double laneCapacity_vehPerHour) {
-		setHighwayDefaults(hierarchy, highwayType, lanes, freespeed, freespeedFactor, laneCapacity_vehPerHour, false);
+	public void setHighwayDefaults(final int hierarchy , final String highwayType, final double lanesPerDirection, final double freespeed, final double freespeedFactor, final double laneCapacity_vehPerHour) {
+		setHighwayDefaults(hierarchy, highwayType, lanesPerDirection, freespeed, freespeedFactor, laneCapacity_vehPerHour, false);
 	}
 
 	/**
@@ -237,15 +237,15 @@ public class OsmNetworkReader implements MatsimSomeReader {
 	 *
 	 * @param hierarchy The hierarchy layer the highway appears in.
 	 * @param highwayType The type of highway these defaults are for.
-	 * @param lanes number of lanes on that road type (<em>in each direction</em>)
+	 * @param lanesPerDirection number of lanes on that road type <em>in each direction</em>
 	 * @param freespeed the free speed vehicles can drive on that road type [meters/second]
 	 * @param freespeedFactor the factor the freespeed is scaled
 	 * @param laneCapacity_vehPerHour the capacity per lane [veh/h]
 	 * @param oneway <code>true</code> to say that this road is a oneway road
 	 */
-	public void setHighwayDefaults(final int hierarchy, final String highwayType, final double lanes, final double freespeed,
+	public void setHighwayDefaults(final int hierarchy, final String highwayType, final double lanesPerDirection, final double freespeed,
 			final double freespeedFactor, final double laneCapacity_vehPerHour, final boolean oneway) {
-        this.highwayDefaults.put(highwayType, new OsmHighwayDefaults(hierarchy, lanes, freespeed, freespeedFactor, laneCapacity_vehPerHour, oneway));
+        this.highwayDefaults.put(highwayType, new OsmHighwayDefaults(hierarchy, lanesPerDirection, freespeed, freespeedFactor, laneCapacity_vehPerHour, oneway));
     }
 
 
@@ -453,7 +453,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 			return;
 		}
 
-		double nofLanes = defaults.lanes;
+		double nofLanes = defaults.lanesPerDirection;
 		double laneCapacity = defaults.laneCapacity;
 		double freespeed = defaults.freespeed;
 		double freespeedFactor = defaults.freespeedFactor;
@@ -511,15 +511,15 @@ public class OsmNetworkReader implements MatsimSomeReader {
 		String lanesTag = way.tags.get(TAG_LANES);
 		if (lanesTag != null) {
 			try {
-				double tmp = Double.parseDouble(lanesTag);
-				if (tmp > 0) {
-					nofLanes = tmp;
+				double totalNofLanes = Double.parseDouble(lanesTag);
+				if (totalNofLanes > 0) {
+					nofLanes = totalNofLanes;
 
 					//By default, the OSM lanes tag specifies the total number of lanes in both directions.
 					//So if the road is not oneway (onewayReverse), let's distribute them between both directions
 					//michalm, jan'16
 		            if (!oneway && !onewayReverse) {
-		                nofLanes /= 2;
+		                nofLanes /= 2.;
 		            }
 				}
 			} catch (Exception e) {
@@ -618,15 +618,15 @@ public class OsmNetworkReader implements MatsimSomeReader {
 	private static class OsmHighwayDefaults {
 
 		public final int hierarchy;
-		public final double lanes;
+		public final double lanesPerDirection;
 		public final double freespeed;
 		public final double freespeedFactor;
 		public final double laneCapacity;
 		public final boolean oneway;
 
-		public OsmHighwayDefaults(final int hierarchy, final double lanes, final double freespeed, final double freespeedFactor, final double laneCapacity, final boolean oneway) {
+		public OsmHighwayDefaults(final int hierarchy, final double lanesPerDirection, final double freespeed, final double freespeedFactor, final double laneCapacity, final boolean oneway) {
 			this.hierarchy = hierarchy;
-			this.lanes = lanes;
+			this.lanesPerDirection = lanesPerDirection;
 			this.freespeed = freespeed;
 			this.freespeedFactor = freespeedFactor;
 			this.laneCapacity = laneCapacity;
