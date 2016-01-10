@@ -59,7 +59,7 @@ public class TestRunLocationChoice {
 		final String pathToVehicles = "test/scenarios/pt-tutorial/transitVehicles.xml";
 
 		Scenario tempScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(tempScenario).readFile(pathToOnlyStreetNetwork);
+		new MatsimNetworkReader(tempScenario.getNetwork()).readFile(pathToOnlyStreetNetwork);
 		new MatsimPopulationReader(tempScenario).readFile(pathToInitialPopulation);
 		TestRunBaseline.createPrefs(tempScenario, pathToPrefs);
 		TestRunBaseline.createFacilities(tempScenario, pathToFacilities);

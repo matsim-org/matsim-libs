@@ -37,7 +37,6 @@ import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
@@ -83,7 +82,7 @@ public class GfipTravelAnalyser {
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimPopulationReader(sc).parse(populationFile);
 		new ObjectAttributesXmlReader(sc.getPopulation().getPersonAttributes()).parse(populationAttributesFile);
-		new MatsimNetworkReader(sc).parse(networkFile);
+		new MatsimNetworkReader(sc.getNetwork()).parse(networkFile);
 		new VehicleReaderV1(sc.getVehicles()).parse(vehiclesFile);
 		
 		calculateGfipTravel(sc, eventsFile);

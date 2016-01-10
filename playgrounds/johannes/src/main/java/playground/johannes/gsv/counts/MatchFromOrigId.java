@@ -50,7 +50,7 @@ public class MatchFromOrigId {
 
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
-		NetworkReaderMatsimV1 nReader = new NetworkReaderMatsimV1(scenario);
+		NetworkReaderMatsimV1 nReader = new NetworkReaderMatsimV1(scenario.getNetwork());
 		nReader.parse("/home/johannes/gsv/osm/network/germany-20140909.5.xml");
 
 		Network network = scenario.getNetwork();

@@ -29,7 +29,7 @@ public class ScenarioCreator {
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		Population pop = scenario.getPopulation();
-		new MatsimNetworkReader(scenario).readFile(pathToExampleScenario + "input/network.xml");
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(pathToExampleScenario + "input/network.xml");
 		MatsimRandom.reset(4711);
 		Random rnd = MatsimRandom.getLocalInstance();
 		int nPersonsBase = 32;

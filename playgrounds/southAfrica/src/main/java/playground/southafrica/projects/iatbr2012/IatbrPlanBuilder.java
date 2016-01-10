@@ -107,7 +107,7 @@ public class IatbrPlanBuilder {
 		processAmenities(scAmenities);
 		
 		/* Read network */
-		NetworkReaderMatsimV1 nr = new NetworkReaderMatsimV1(sc);
+		NetworkReaderMatsimV1 nr = new NetworkReaderMatsimV1(sc.getNetwork());
 		nr.parse(sc.getConfig().network().getInputFile());
 		LOG.info("Number of links: " + sc.getNetwork().getLinks().size());
 		LOG.info("Number of nodes: " + sc.getNetwork().getNodes().size());

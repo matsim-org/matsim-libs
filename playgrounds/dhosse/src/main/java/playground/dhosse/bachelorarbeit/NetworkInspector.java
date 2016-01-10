@@ -78,7 +78,7 @@ public class NetworkInspector {//TODO pfade ändern
 		
 		NetworkInspector.scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig()); 
 		
-		new MatsimNetworkReader(NetworkInspector.scenario).readFile(args[0]);
+		new MatsimNetworkReader(NetworkInspector.scenario.getNetwork()).readFile(args[0]);
 		
 		new NetworkInspector().run();
 		

@@ -54,7 +54,7 @@ public class CleanNetwork {
 		}
 
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenario).readFile(args[0]);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(args[0]);
 		
 //		NetworkImpl subNetwork = new ScenarioImpl().getNetwork();
 //		Set<String> modes = new HashSet<String>();

@@ -92,7 +92,7 @@ public class AnalyzeMicrocensus {
 		populationReader.readFile(plansFilePath);
 		
 		scenarioZH = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenarioZH).readFile(networkfilePath);
+		new MatsimNetworkReader(scenarioZH.getNetwork()).readFile(networkfilePath);
 	}
 	
 	private void dilutedZH() {

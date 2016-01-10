@@ -90,7 +90,7 @@ public class ShapeConverterPopRandom {
 		comm.setTypicalDuration(1*3600);
 		
 		scenario = ScenarioUtils.createScenario(config);
-		new MatsimNetworkReader(scenario).readFile(networkFile);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
 		Population pop = fillScenario();
 		new PopulationWriter(pop, scenario.getNetwork()).write(plansFile);
 

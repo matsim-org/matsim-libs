@@ -46,7 +46,7 @@ public class MatsimPopulationReaderTest {
 	public void testReadFile_v4() {
 		Scenario s = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Assert.assertEquals(0, s.getPopulation().getPersons().size());
-		new MatsimNetworkReader(s).readFile("test/scenarios/equil/network.xml");
+		new MatsimNetworkReader(s.getNetwork()).readFile("test/scenarios/equil/network.xml");
 		new MatsimPopulationReader(s).readFile("test/scenarios/equil/plans1.xml");
 		Assert.assertEquals(1, s.getPopulation().getPersons().size());
 	}

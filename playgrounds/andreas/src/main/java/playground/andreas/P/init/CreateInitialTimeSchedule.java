@@ -80,7 +80,7 @@ public class CreateInitialTimeSchedule {
 
 	public CreateInitialTimeSchedule(String networkInFile, double gridDistance, Coord minXY, Coord maxXY, int numberOfAgents) {
 		MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		MatsimNetworkReader netReader = new MatsimNetworkReader(sc);
+		MatsimNetworkReader netReader = new MatsimNetworkReader(sc.getNetwork());
 		netReader.readFile(networkInFile);		
 		this.net = (NetworkImpl) sc.getNetwork();
 		

@@ -48,7 +48,7 @@ public class ScenarioCut {
 		config.transit().setUseTransit(true);
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		
-		MatsimNetworkReader netReader = new MatsimNetworkReader(scenario);
+		MatsimNetworkReader netReader = new MatsimNetworkReader(scenario.getNetwork());
 		netReader.readFile(netFile);
 		
 		TransitScheduleReader schedReader = new TransitScheduleReader(scenario);

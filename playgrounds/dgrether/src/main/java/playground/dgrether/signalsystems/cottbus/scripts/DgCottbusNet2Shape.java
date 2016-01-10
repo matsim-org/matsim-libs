@@ -60,7 +60,7 @@ public class DgCottbusNet2Shape {
 		String netFile = "/media/data/work/repos/shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/network_wgs84_utm33n.xml.gz";
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario).readFile(netFile);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(netFile);
 
 //		NetworkCleaner nc = new NetworkCleaner();
 //		nc.run(net);

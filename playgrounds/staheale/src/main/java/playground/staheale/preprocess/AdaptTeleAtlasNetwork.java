@@ -42,7 +42,7 @@ public class AdaptTeleAtlasNetwork {
 
 		// read network
 		log.info("Reading teleatlas network xml file...");
-	    new MatsimNetworkReader(sc).parse("./input/teleatlas2010network.xml.gz");
+	    new MatsimNetworkReader(sc.getNetwork()).parse("./input/teleatlas2010network.xml.gz");
 	    this.network = sc.getNetwork();
 		log.info("Reading teleatlas network xml file...done");
 		log.info("Initial network contains " +this.network.getLinks().size()+ " links.");

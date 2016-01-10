@@ -223,7 +223,7 @@ public class MainWorkplaceCapacities {
 		new ClustersWindow("Work times cluster PCA back: "+getClustersDeviations(clusters)+" "+getWeightedClustersDeviations(clusters), clusters).setVisible(true);
 		System.out.println("Clustering done!");
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenario).readFile(NETWORK_FILE);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(NETWORK_FILE);
 		network = scenario.getNetwork();
 		setMPAreas();
 		setWorkerAreas();

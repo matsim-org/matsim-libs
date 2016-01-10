@@ -39,7 +39,6 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.vis.otfvis.OTFFileWriterFactory;
 
 import playground.jbischoff.energy.consumption.EnergyConsumptionModelBerlinHigh;
 import playground.jbischoff.energy.consumption.EnergyConsumptionModelBerlinLow;
@@ -72,7 +71,7 @@ public class ElectricBerlinMain {
 		this.emobagents = new ArrayList<Person>();
 		this.eagentsWithBehaviour = new HashMap<Id<Person>,String>();
 		PopulationFactory f = s.getPopulation().getFactory();
-		new MatsimNetworkReader(s).readFile(s.getConfig().getParam(NetworkConfigGroup.GROUP_NAME, "inputNetworkFile"));
+		new MatsimNetworkReader(s.getNetwork()).readFile(s.getConfig().getParam(NetworkConfigGroup.GROUP_NAME, "inputNetworkFile"));
 		new MatsimPopulationReader(s).readFile(additionalPlansFile);
 		
 		Person newPerson;

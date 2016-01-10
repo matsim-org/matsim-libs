@@ -159,7 +159,7 @@ public class GAPScenarioRunner {
 		// in order to map agents on car links
 		Scenario scenario2 = ScenarioUtils.createScenario(ConfigUtils
 				.createConfig());
-		new MatsimNetworkReader(scenario2).readFile(config.network()
+		new MatsimNetworkReader(scenario2.getNetwork()).readFile(config.network()
 				.getInputFile());
 		Set<Id<Link>> linkIds = new HashSet<>();
 		for (Link link : scenario2.getNetwork().getLinks().values()) {

@@ -188,7 +188,7 @@ public class Matsim2030Utils {
 
 			if ( mergingGroup.getPtSubnetworkFile() != null ) {
 				log.info( "reading pt network from "+mergingGroup.getPtSubnetworkFile() );
-				new MatsimNetworkReader( scenario ).readFile( mergingGroup.getPtSubnetworkFile() );
+				new MatsimNetworkReader(scenario.getNetwork()).readFile( mergingGroup.getPtSubnetworkFile() );
 			}
 		}
 		else {

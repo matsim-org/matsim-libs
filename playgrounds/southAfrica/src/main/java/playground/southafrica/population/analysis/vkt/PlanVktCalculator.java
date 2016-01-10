@@ -37,7 +37,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -81,7 +80,7 @@ public class PlanVktCalculator {
 		
 		/* Read and update the network. */
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		MatsimNetworkReader mnr = new MatsimNetworkReader(scenario);
+		MatsimNetworkReader mnr = new MatsimNetworkReader(scenario.getNetwork());
 		mnr.parse(networkFile);		
 		LOG.info("Updating road types... (" + scenario.getNetwork().getLinks().size() + " links)");
 		Counter linkCounter = new Counter("  links # ");

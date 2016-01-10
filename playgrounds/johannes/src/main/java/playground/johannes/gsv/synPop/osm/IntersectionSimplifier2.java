@@ -58,7 +58,7 @@ public class IntersectionSimplifier2 {
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		
-		NetworkReaderMatsimV1 reader = new NetworkReaderMatsimV1(scenario);
+		NetworkReaderMatsimV1 reader = new NetworkReaderMatsimV1(scenario.getNetwork());
 		reader.parse("/home/johannes/gsv/osm/network/germany-20140909.3.xml");
 		
 		IntersectionSimplifier2 simplifier = new IntersectionSimplifier2();

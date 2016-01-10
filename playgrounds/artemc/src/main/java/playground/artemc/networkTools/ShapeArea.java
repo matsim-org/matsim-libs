@@ -1,23 +1,16 @@
 package playground.artemc.networkTools;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.geotools.data.simple.SimpleFeatureSource;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
 
@@ -44,7 +37,7 @@ public class ShapeArea {
 		Scenario sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network net = sc.getNetwork();
 
-		new MatsimNetworkReader(sc).readFile(network);
+		new MatsimNetworkReader(sc.getNetwork()).readFile(network);
 		log.info("Generating evacuation area links file.");
 
 		Collection<SimpleFeature> fts = new ShapeFileReader().readFileAndInitialize(areaShape);

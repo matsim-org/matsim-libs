@@ -72,7 +72,7 @@ public class CopyOfCreatePlans {
 			
 			Scenario scenario = ScenarioUtils.createScenario(config);
 			
-			new MatsimNetworkReader(scenario).readFile("input/oslo/trondheim.xml");
+			new MatsimNetworkReader(scenario.getNetwork()).readFile("input/oslo/trondheim.xml");
 			Population pop = fillScenario(scenario);
 			
 			Controler controler = new Controler(scenario);

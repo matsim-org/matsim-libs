@@ -93,7 +93,7 @@ public class RunLegModeDistanceDistribution {
 		}
 		
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenario).readFile(networkFile);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
 		logger.info("Setting network to " + networkFile);
 		new MatsimPopulationReader(scenario).readFile(popFile);
 		logger.info("Setting population to " + popFile);

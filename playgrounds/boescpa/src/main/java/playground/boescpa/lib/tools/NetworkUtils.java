@@ -42,7 +42,7 @@ public class NetworkUtils {
 	 */
 	public static Network readNetwork(String path2Network) {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenario).readFile(path2Network);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(path2Network);
 		return scenario.getNetwork();
 	}
 

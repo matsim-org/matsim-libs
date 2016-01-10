@@ -85,7 +85,7 @@ public class FacilitiesFileGenerator {
 		facilitiesResult.close();
 		dataBaseFacilities.close();
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenario).readFile(NETWORK_FILE);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(NETWORK_FILE);
 		new WorldConnectLocations(scenario.getConfig()).connectFacilitiesWithLinks(facilities, (NetworkImpl)scenario.getNetwork());
 		new FacilitiesWriter(facilities).write(FACILITIES_FILE);
 	}

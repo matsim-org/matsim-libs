@@ -196,7 +196,7 @@ public class StopFacilityGenerator {
 	public StopFacilityGenerator(String network, Integer distanceBetweenStops){
 		this.sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		prepareConfig();
-		new MatsimNetworkReader(sc).readFile(network);
+		new MatsimNetworkReader(sc.getNetwork()).readFile(network);
 		this.network = (NetworkImpl) sc.getNetwork();
 		this.stopDistance = distanceBetweenStops;	
 		this.allowedModes.add("car");

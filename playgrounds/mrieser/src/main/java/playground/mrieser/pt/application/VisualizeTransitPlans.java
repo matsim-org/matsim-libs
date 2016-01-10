@@ -82,7 +82,7 @@ public class VisualizeTransitPlans {
 
 	private void loadRealScenario() {
 		if (NETWORK_FILE != "") {
-			new MatsimNetworkReader(this.realScenario).readFile(NETWORK_FILE);
+			new MatsimNetworkReader(this.realScenario.getNetwork()).readFile(NETWORK_FILE);
 		}
 		new TransitScheduleReader(this.realScenario).readFile(TRANSIT_SCHEDULE_FILE);
 		new MatsimPopulationReader(this.realScenario).readFile(POPULATION_FILE);

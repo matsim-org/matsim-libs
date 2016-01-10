@@ -78,7 +78,7 @@ public class CreatePlans {
 			
 			
 			Scenario scenario = ScenarioUtils.createScenario(config);
-			new MatsimNetworkReader(scenario).readFile(networkFile);
+			new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
 			Population pop = fillScenario(scenario);
 			
 			Controler controler = new Controler(scenario);

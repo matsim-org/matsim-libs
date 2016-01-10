@@ -107,7 +107,7 @@ public class ReRoutingTest extends MatsimTestCase {
 		final String revisedFileName = getOutputDirectory() + "ITERS/it.1/1.plans.xml.gz";
 		
 		Scenario expectedPopulation = ScenarioUtils.createScenario(config);
-		new MatsimNetworkReader(expectedPopulation).readFile(config.network().getInputFile());
+		new MatsimNetworkReader(expectedPopulation.getNetwork()).readFile(config.network().getInputFile());
 		new MatsimPopulationReader(expectedPopulation).readFile(originalFileName);
 		Scenario actualPopulation = ScenarioUtils.createScenario(config);
 	

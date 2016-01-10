@@ -30,7 +30,6 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.vis.otfvis.OTFFileWriterFactory;
 
 import playground.vsp.energy.trafficstate.TrafficStateControlerListener;
 
@@ -65,7 +64,7 @@ public class ERunner {
 		if(!(additionalPlansFile == null)){
 			PopulationFactory f = this.sc.getPopulation().getFactory();
 			Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-			new MatsimNetworkReader(sc).readFile(this.sc.getConfig().getParam(NetworkConfigGroup.GROUP_NAME, "inputNetworkFile"));
+			new MatsimNetworkReader(sc.getNetwork()).readFile(this.sc.getConfig().getParam(NetworkConfigGroup.GROUP_NAME, "inputNetworkFile"));
 			new MatsimPopulationReader(sc).readFile(additionalPlansFile);
 			Person newPerson;
 			for(Person p: sc.getPopulation().getPersons().values()){

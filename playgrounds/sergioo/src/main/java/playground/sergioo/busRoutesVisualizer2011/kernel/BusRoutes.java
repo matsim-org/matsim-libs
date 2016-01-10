@@ -108,7 +108,7 @@ public class BusRoutes {
 	 */
 	public static void main(String[] args) throws IOException {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		MatsimNetworkReader matsimNetworkReader = new MatsimNetworkReader(scenario);
+		MatsimNetworkReader matsimNetworkReader = new MatsimNetworkReader(scenario.getNetwork());
 		matsimNetworkReader.readFile(args[0]);
 		Network network = scenario.getNetwork();
 		BusRoutes busRoutes = new BusRoutes(network);

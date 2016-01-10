@@ -36,7 +36,7 @@ public class ReadTransitSchedule {
 	
 	public static TransitSchedule readTransitSchedule(String networkFile, String transitScheduleFile) {
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		MatsimNetworkReader matsimNetReader = new MatsimNetworkReader(scenario);
+		MatsimNetworkReader matsimNetReader = new MatsimNetworkReader(scenario.getNetwork());
 		matsimNetReader.readFile(networkFile);
 		
 		return ReadTransitSchedule.readTransitSchedule(scenario.getNetwork(), transitScheduleFile);

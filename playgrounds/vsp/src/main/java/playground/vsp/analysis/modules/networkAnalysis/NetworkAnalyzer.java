@@ -115,7 +115,7 @@ public class NetworkAnalyzer extends AbstractAnalysisModule{
 		this.targetCoordinateSystem = targetCoordinateSystem;
 		
 		if(networkInputFile!=null){
-			new MatsimNetworkReader(this.scenario).readFile(networkInputFile);
+			new MatsimNetworkReader(this.scenario.getNetwork()).readFile(networkInputFile);
 			this.network = this.scenario.getNetwork();
 		}
 		

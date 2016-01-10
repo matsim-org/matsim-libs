@@ -116,7 +116,7 @@ public class DgOsmBBNetBezirkFilter {
 	public static void main(String[] args){
 		DgOsmBBNetBezirkFilter filter = new DgOsmBBNetBezirkFilter(DgOsmBBPaths.BASE_OUT_DIR + "berliner_bezirke/berliner_bezirke.shp");
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		MatsimNetworkReader reader = new MatsimNetworkReader(sc);
+		MatsimNetworkReader reader = new MatsimNetworkReader(sc.getNetwork());
 		reader.readFile(DgOsmBBPaths.NETWORK_GENERATED);
 //		filter.addBezirkFilter("Reinickendorf");
 //		filter.addBezirkFilter("Spandau");

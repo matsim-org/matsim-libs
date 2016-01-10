@@ -16,7 +16,7 @@ public class NetworkBusLinkChanger {
 		Scenario scenario;
 		MatsimRandom.reset(123);
 		scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenario).readFile(args[0]);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(args[0]);
 		ArrayList<String> linkChangeList = new ArrayList<>();
 		int busLinkCount = 0;
 		double originalCapacity = 0d;

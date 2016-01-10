@@ -31,7 +31,7 @@ public class BuslaneGenerator_fullPriority {
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario.getConfig().transit().setUseTransit(true);
 
-		new NetworkReaderMatsimV1(scenario).parse(networkPath);
+		new NetworkReaderMatsimV1(scenario.getNetwork()).parse(networkPath);
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 
 		new TransitScheduleReader(scenario).readFile(transitSchedulePath);

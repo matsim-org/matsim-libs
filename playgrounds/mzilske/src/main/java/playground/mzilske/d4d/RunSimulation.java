@@ -106,7 +106,7 @@ public class RunSimulation {
 
 	private static void run(Config config) {
 		final Scenario scenario = ScenarioUtils.createScenario(config);
-		new MatsimNetworkReader(scenario).readFile(D4DConsts.WORK_DIR + "network-simplified.xml");
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(D4DConsts.WORK_DIR + "network-simplified.xml");
 		AltPopulationReaderMatsimV5 altPopulationReaderMatsimV5 = new AltPopulationReaderMatsimV5(scenario);
 		//	altPopulationReaderMatsimV5.readFile("/Users/zilske/d4d/output/population.xml");
 		altPopulationReaderMatsimV5.readFile(D4DConsts.WORK_DIR + "population-capital-only.xml");

@@ -156,7 +156,7 @@ public class Sim2DEnvironmentV02ToV03 {
 			if (netPath != null) {
 				Config c = ConfigUtils.createConfig();
 				Scenario sc = ScenarioUtils.createScenario(c);
-				new MatsimNetworkReader(sc).readFile(netPath);
+				new MatsimNetworkReader(sc.getNetwork()).readFile(netPath);
 				Network net = sc.getNetwork();
 				env.setNetwork(net);
 			}

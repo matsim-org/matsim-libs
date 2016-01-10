@@ -34,7 +34,7 @@ public class ConnectFacilities2Links {
 		/////////////////////////////////////////////////////////////////////
 		//read in network
 		log.info("Reading network...");	
-		MatsimNetworkReader NetworkReader = new MatsimNetworkReader(sc); 
+		MatsimNetworkReader NetworkReader = new MatsimNetworkReader(sc.getNetwork());
 		NetworkReader.readFile("./input/teleatlas2030networkSingleMode_Cleaned.xml.gz"); //teleatlas2010networkSingleMode.xml.gz
 		log.info("Reading network...done.");
 		log.info("Network contains " +network.getLinks().size()+ " links and " +network.getNodes().size()+ " nodes.");

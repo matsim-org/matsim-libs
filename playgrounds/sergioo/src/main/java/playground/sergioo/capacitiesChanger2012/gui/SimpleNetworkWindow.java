@@ -115,7 +115,7 @@ public class SimpleNetworkWindow extends LayersWindow implements ActionListener 
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		File file = fileChooser.getSelectedFile();
 		setTitle("Capacities changer: "+file.getName());
-		new MatsimNetworkReader(scenario).readFile(file.getAbsolutePath());
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(file.getAbsolutePath());
 		layersPanels.put(PanelIds.ONE, new NetworkPanel(this, new SimpleSelectionNetworkPainter(scenario.getNetwork())));
 		this.add(layersPanels.get(PanelIds.ONE), BorderLayout.CENTER);
 		option = Options.ZOOM;

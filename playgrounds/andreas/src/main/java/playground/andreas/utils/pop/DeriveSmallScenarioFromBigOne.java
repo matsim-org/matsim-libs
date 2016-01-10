@@ -59,12 +59,12 @@ public class DeriveSmallScenarioFromBigOne {
 		MutableScenario bigNetScenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		log.info("Reading network " + bigNetworkFile);
 		Network bigNet = bigNetScenario.getNetwork();
-		new MatsimNetworkReader(bigNetScenario).readFile(bigNetworkFile);
+		new MatsimNetworkReader(bigNetScenario.getNetwork()).readFile(bigNetworkFile);
 
 		MutableScenario smallNetScenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		log.info("Reading network " + smallNetworkFile);
 		Network smallNet = smallNetScenario.getNetwork();
-		new MatsimNetworkReader(smallNetScenario).readFile(smallNetworkFile);
+		new MatsimNetworkReader(smallNetScenario.getNetwork()).readFile(smallNetworkFile);
 
 		log.info("Reading routed population: " + wholeRoutedPlansFile);
 		Population wholeRoutedPop = ((MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
@@ -109,7 +109,7 @@ public class DeriveSmallScenarioFromBigOne {
 
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		Network network = NetworkUtils.createNetwork();
-		new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(config.network().getInputFile());
 
 		final PopulationImpl plans = (PopulationImpl) scenario.getPopulation();
 		plans.setIsStreaming(true);

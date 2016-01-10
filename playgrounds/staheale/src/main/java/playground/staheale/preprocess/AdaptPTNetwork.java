@@ -80,7 +80,7 @@ public class AdaptPTNetwork {
 
 		// ------------------- read in pt network ----------------------------
 		log.info("Reading pt network xml file...");
-		new MatsimNetworkReader(sc).parse("./input/uvek2030network_anbindungen_routes.xml"); //uvek2005network_anbindungen_routes.xml
+		new MatsimNetworkReader(sc.getNetwork()).parse("./input/uvek2030network_anbindungen_routes.xml"); //uvek2005network_anbindungen_routes.xml
 		this.network = sc.getNetwork();
 		log.info("Reading pt network xml file...done");
 		log.info("Initial network contains " +this.network.getLinks().size()+ " links.");

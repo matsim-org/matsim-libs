@@ -57,7 +57,7 @@ public class CreateTimetableForStopTest {
 
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario).readFile(inputDir + INPUT_TEST_FILE_NETWORK);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(inputDir + INPUT_TEST_FILE_NETWORK);
 
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
 		TransitSchedule schedule = builder.createTransitSchedule();

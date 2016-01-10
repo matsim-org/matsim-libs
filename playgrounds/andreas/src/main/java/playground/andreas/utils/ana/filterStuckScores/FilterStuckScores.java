@@ -91,7 +91,7 @@ public class FilterStuckScores implements PersonStuckEventHandler{
 				RecursiveStatsContainer statsNotStuck = new RecursiveStatsContainer();
 
 				Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-				new MatsimNetworkReader(sc).readFile(networkFile);
+				new MatsimNetworkReader(sc.getNetwork()).readFile(networkFile);
 				new MatsimPopulationReader(sc).readFile(planFile);
 
 				for (Person person : sc.getPopulation().getPersons().values()) {

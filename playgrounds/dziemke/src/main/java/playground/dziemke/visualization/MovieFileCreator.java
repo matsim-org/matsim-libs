@@ -28,7 +28,7 @@ public class MovieFileCreator {
 		// Initiating conversion				
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		//scenario.getConfig().addQSimConfigGroup(new QSimConfigGroup());
-		new MatsimNetworkReader(scenario).readFile(networkFile);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
 		OTFEvent2MVI.convert(scenario, eventFile, mviFile, snapshotPeriod);
 		
 		log.info("Movie file " + mviFile + " created.");

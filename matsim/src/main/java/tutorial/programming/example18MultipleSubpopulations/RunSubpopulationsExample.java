@@ -80,7 +80,7 @@ public class RunSubpopulationsExample {
 			Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 			/* Set up network and plans. */
-			MatsimNetworkReader mnr = new MatsimNetworkReader(sc);
+			MatsimNetworkReader mnr = new MatsimNetworkReader(sc.getNetwork());
 			mnr.parse(EQUIL_NETWORK);
 			createPopulation(sc, SUBPOP1_NAME, 100);
 			createPopulation(sc, SUBPOP2_NAME, 100);

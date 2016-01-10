@@ -46,7 +46,7 @@ public class ComparePerformanceMultimodalRoutingWithAndWithoutSubnetworks {
 		final String netFile = args[ 0 ];
 
 		final Scenario sc = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
-		new MatsimNetworkReader( sc ).readFile( netFile );
+		new MatsimNetworkReader(sc.getNetwork()).readFile( netFile );
 
 		final List<Tuple<Node,Node>> ods = sampleOds( sc.getNetwork() );
 

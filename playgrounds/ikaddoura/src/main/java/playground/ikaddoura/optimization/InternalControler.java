@@ -103,7 +103,7 @@ public class InternalControler {
 	
 	public void run() {
 
-		new MatsimNetworkReader(scenario).readFile(scenario.getConfig().network().getInputFile());
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(scenario.getConfig().network().getInputFile());
 		new TransitScheduleReaderV1(scenario).readFile(this.scenario.getConfig().transit().getTransitScheduleFile());
 		Logger.getLogger(this.getClass()).fatal("cannot say if the following should be vehicles or transit vehicles; aborting ... .  kai, feb'15");
 		System.exit(-1); 

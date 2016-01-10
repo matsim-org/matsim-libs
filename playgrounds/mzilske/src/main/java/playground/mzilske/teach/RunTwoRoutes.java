@@ -64,7 +64,7 @@ public class RunTwoRoutes {
             config.strategy().addStrategySettings(stratSets);
         }
         final Scenario scenario = ScenarioUtils.createScenario(config);
-        new MatsimNetworkReader(scenario).parse(this.getClass().getResourceAsStream("two-routes.xml"));
+        new MatsimNetworkReader(scenario.getNetwork()).parse(this.getClass().getResourceAsStream("two-routes.xml"));
         new MatsimPopulationReader(scenario).parse(this.getClass().getResourceAsStream("thirty.xml"));
         Controler controler = new Controler(scenario);
         controler.setScoringFunctionFactory(new ScoringFunctionFactory() {

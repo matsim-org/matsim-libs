@@ -78,7 +78,7 @@ public class Create3TownsScenario {
 		
 		this.expenditureAssigner = new ExpenditureAssigner(this.mu, this.sigma, path, this.randomNumberGenerator, this.personAttributes);
 
-		new MatsimNetworkReader(scenarioWriteOut).readFile(networkfilePath);
+		new MatsimNetworkReader(scenarioWriteOut.getNetwork()).readFile(networkfilePath);
 		new FacilitiesReaderMatsimV1(scenarioWriteOut).readFile(facilitiesfilePath);
 	}
 	// ====================================================================================

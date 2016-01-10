@@ -135,7 +135,7 @@ public class ChooseRandomLegModeForSubtourTest {
 		Config config = utils.loadConfig(CONFIGFILE);
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		Network network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(config.network().getInputFile());
 		this.testSubTourMutationToCar((NetworkImpl) network);
 		this.testSubTourMutationToPt((NetworkImpl) network);
 		this.testUnknownModeDoesntMutate((NetworkImpl) network);
@@ -157,7 +157,7 @@ public class ChooseRandomLegModeForSubtourTest {
 		Config config = utils.loadConfig(CONFIGFILE);
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		Network network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(config.network().getInputFile());
 		testCarDoesntTeleport((NetworkImpl) network, TransportMode.car, TransportMode.pt);
 		testCarDoesntTeleport((NetworkImpl) network, TransportMode.pt, TransportMode.car);
 	}

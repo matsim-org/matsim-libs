@@ -123,7 +123,7 @@ final class TrbAna implements PersonEntersVehicleEventHandler, PersonLeavesVehic
 		String resultsFile = "F:/p_runs/txl/" + scenarioId + "/" + scenarioId + "_it." + iteration + "_key_figures.txt";
 		
 		Scenario sc = ScenarioUtils.createScenario(c);
-		new MatsimNetworkReader(sc).readFile("F:/p_runs/txl/network.final.xml.gz");
+		new MatsimNetworkReader(sc.getNetwork()).readFile("F:/p_runs/txl/network.final.xml.gz");
 		new TransitScheduleReaderV1(sc).readFile(transitSchedule);
 		
 		TrbAna ana = new TrbAna("para_", "tr_", sc.getNetwork(), sc.getTransitSchedule(), c);

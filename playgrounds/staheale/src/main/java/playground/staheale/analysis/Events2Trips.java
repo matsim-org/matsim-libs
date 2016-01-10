@@ -43,7 +43,7 @@ public class Events2Trips {
 		scenario.getConfig().scenario().setUseVehicles(true);
 
 		log.info("Reading network xml file...");
-		MatsimNetworkReader NetworkReader = new MatsimNetworkReader(scenario);
+		MatsimNetworkReader NetworkReader = new MatsimNetworkReader(scenario.getNetwork());
 		NetworkReader.readFile(networkFile);
 		Network network = scenario.getNetwork();
 		log.info("Reading network xml file...done.");

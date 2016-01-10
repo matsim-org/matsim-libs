@@ -41,7 +41,7 @@ public class JXMapMain {
 		ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).setMaximumZoom(17);
 		config.global().setCoordinateSystem("EPSG:32710");
 		Scenario scenario = ScenarioUtils.createScenario(config);
-		new MatsimNetworkReader(scenario).readFile(filename);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(filename);
 		EventsManager events = EventsUtils.createEventsManager();
 		QSim qSim = (QSim) QSimUtils.createDefaultQSim(scenario, events);
 		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, qSim);

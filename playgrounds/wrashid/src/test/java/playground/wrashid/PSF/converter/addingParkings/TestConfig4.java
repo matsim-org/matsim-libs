@@ -37,7 +37,7 @@ public class TestConfig4 extends MatsimTestCase {
 		Config config = loadConfig(configFilePath);
 
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
-		new MatsimNetworkReader(scenario).readFile(networkFile);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
 		new MatsimPopulationReader(scenario).readFile(basePathOfTestData + "plans2.xml");
 
 		// generate parking facilities

@@ -76,7 +76,7 @@ public class Fcd {
 	
 	public static Set<String> readFcdReturningLinkIdsUsed(String fcdNetInFile, String fcdEventsInFile, String outDir, String matsimNetwork, double minDistanceBetweenTwoActs){
 		MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		NetworkReaderMatsimV1 reader = new NetworkReaderMatsimV1(sc);
+		NetworkReaderMatsimV1 reader = new NetworkReaderMatsimV1(sc.getNetwork());
 		reader.parse(matsimNetwork);
 		
 		Fcd fcd = new Fcd(fcdNetInFile, fcdEventsInFile, minDistanceBetweenTwoActs);
@@ -99,7 +99,7 @@ public class Fcd {
 		String linksUsed = "D:\\Berlin\\DLR_FCD\\20110207_Analysis\\linksUsed.txt";
 		
 		MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		NetworkReaderMatsimV1 reader = new NetworkReaderMatsimV1(sc);
+		NetworkReaderMatsimV1 reader = new NetworkReaderMatsimV1(sc.getNetwork());
 		reader.parse(matsimNetwork);
 		
 		Fcd fcd = new Fcd(netInFile, fcdEventsInFile, 0.0);

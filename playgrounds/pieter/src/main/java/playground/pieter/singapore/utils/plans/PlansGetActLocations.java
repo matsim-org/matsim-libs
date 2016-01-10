@@ -68,7 +68,7 @@ public class PlansGetActLocations {
 		MatsimRandom.reset(123);
 		scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
-		new MatsimNetworkReader(scenario).readFile("data/singapore6.xml");
+		new MatsimNetworkReader(scenario.getNetwork()).readFile("data/singapore6.xml");
 		new MatsimPopulationReader(scenario)
 				.readFile("data/sing2PlansFilteredUnroutedReduced.xml");
 //		.readFile("data/short_plans.xml");

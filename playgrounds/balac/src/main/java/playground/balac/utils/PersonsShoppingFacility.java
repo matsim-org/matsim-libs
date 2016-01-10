@@ -27,7 +27,7 @@ public class PersonsShoppingFacility {
 	public void run(String plansFilePath, String networkFilePath, String facilitiesfilePath ) {
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		PopulationReader populationReader = new MatsimPopulationReader(scenario);
-		MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario);
+		MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario.getNetwork());
 		networkReader.readFile(networkFilePath);
 		new FacilitiesReaderMatsimV1(scenario).readFile(facilitiesfilePath);
 		populationReader.readFile(plansFilePath);

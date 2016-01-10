@@ -76,7 +76,7 @@ public class PopGenerator {
 	
 	private static void createPopTut(String networkFilename, int nPersonsPerHour, String outFilename) {
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(sc).readFile(networkFilename);
+		new MatsimNetworkReader(sc.getNetwork()).readFile(networkFilename);
 		Population pop = sc.getPopulation();
 		
 		MatsimRandom.reset(4711);
@@ -116,7 +116,7 @@ public class PopGenerator {
 
 	private static void createPopCross(String networkFilename, int nPersonsPerHour, String outFilename) {
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(sc).readFile(networkFilename);
+		new MatsimNetworkReader(sc.getNetwork()).readFile(networkFilename);
 		Population pop = sc.getPopulation();
 		
 		MatsimRandom.reset(4711);
@@ -145,7 +145,7 @@ public class PopGenerator {
 
 	private static void createPopT1(String networkFilename, int nPersonsPerHour, String outFilename) {
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(sc).readFile(networkFilename);
+		new MatsimNetworkReader(sc.getNetwork()).readFile(networkFilename);
 		Population pop = sc.getPopulation();
 		
 		MatsimRandom.reset(4711);
@@ -163,7 +163,7 @@ public class PopGenerator {
 	
 	private static void createPopT2(String networkFilename, int nPersonsPerHour, String outFilename) {
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(sc).readFile(networkFilename);
+		new MatsimNetworkReader(sc.getNetwork()).readFile(networkFilename);
 		Population pop = sc.getPopulation();
 		
 		MatsimRandom.reset(4711);
@@ -185,7 +185,7 @@ public class PopGenerator {
 	
 	private static void createPopT3(String networkFilename, int nPersonsPerHour, String outFilename) {
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(sc).readFile(networkFilename);
+		new MatsimNetworkReader(sc.getNetwork()).readFile(networkFilename);
 		Population pop = sc.getPopulation();
 		
 		MatsimRandom.reset(4711);
@@ -211,7 +211,7 @@ public class PopGenerator {
 	
 	private static void createPopT4(String networkFilename, int nPersonsPerHour, String outFilename) {
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(sc).readFile(networkFilename);
+		new MatsimNetworkReader(sc.getNetwork()).readFile(networkFilename);
 		Population pop = sc.getPopulation();
 		
 		MatsimRandom.reset(4711);
@@ -237,7 +237,7 @@ public class PopGenerator {
 	
 	private static void createPopS1(String networkFilename, int nPersonsPerHour, String outFilename) {
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(sc).readFile(networkFilename);
+		new MatsimNetworkReader(sc.getNetwork()).readFile(networkFilename);
 		Population pop = sc.getPopulation();
 		
 		MatsimRandom.reset(4711);
@@ -255,7 +255,7 @@ public class PopGenerator {
 	
 	private static void createPopS2(String networkFilename, int nPersonsPerHour, String outFilename) {
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(sc).readFile(networkFilename);
+		new MatsimNetworkReader(sc.getNetwork()).readFile(networkFilename);
 		Population pop = sc.getPopulation();
 		
 		MatsimRandom.reset(4711);
@@ -279,7 +279,7 @@ public class PopGenerator {
 	
 	private static void createPopS3(String networkFilename, int nPersonsPerHour, String outFilename) {
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(sc).readFile(networkFilename);
+		new MatsimNetworkReader(sc.getNetwork()).readFile(networkFilename);
 		Population pop = sc.getPopulation();
 		
 		MatsimRandom.reset(4711);
@@ -307,7 +307,7 @@ public class PopGenerator {
 	
 	private static void createPopS4(String networkFilename, int nPersonsPerHour, String outFilename) {
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(sc).readFile(networkFilename);
+		new MatsimNetworkReader(sc.getNetwork()).readFile(networkFilename);
 		Population pop = sc.getPopulation();
 		
 		MatsimRandom.reset(4711);
@@ -335,7 +335,7 @@ public class PopGenerator {
 	
 	private static void createPopVirginiaCorridor(String networkFilename, int nPersonsPerHour, String outFilename, int departureIntervalStart, int departureIntervalEnd) {
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(sc).readFile(networkFilename);
+		new MatsimNetworkReader(sc.getNetwork()).readFile(networkFilename);
 		Population pop = sc.getPopulation();
 		
 		MatsimRandom.reset(4711);

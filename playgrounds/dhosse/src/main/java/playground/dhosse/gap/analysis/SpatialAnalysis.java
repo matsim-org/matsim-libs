@@ -1,16 +1,11 @@
 package playground.dhosse.gap.analysis;
 
-import java.io.BufferedReader;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -27,7 +22,6 @@ import org.matsim.core.utils.gis.PointFeatureFactory;
 import org.matsim.core.utils.gis.PointFeatureFactory.Builder;
 import org.matsim.core.utils.gis.PolylineFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
-import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
@@ -43,7 +37,7 @@ public class SpatialAnalysis {
 	public static void createODPairsForCsUsers(String plansFile, String csUsersFile, String networkFile, String outputShapefile){
 		
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenario).readFile(networkFile);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
 		new MatsimPopulationReader(scenario).parse(plansFile);
 		
 		org.matsim.core.utils.gis.PolylineFeatureFactory.Builder builder = new org.matsim.core.utils.gis.PolylineFeatureFactory.Builder();
@@ -161,7 +155,7 @@ public class SpatialAnalysis {
 		
 		Network network = scenario.getNetwork();
 		
-		new MatsimNetworkReader(scenario).readFile(networkFile);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
 		
 		org.matsim.core.utils.gis.PolylineFeatureFactory.Builder builder = new PolylineFeatureFactory.Builder();
 		builder.setCrs(MGC.getCRS(Global.toCrs));

@@ -23,7 +23,7 @@ public class MyTimeDependentNetworkGenerator {
 		
 		Config config = ConfigUtils.createConfig();
 		Scenario sc = ScenarioUtils.createScenario(config);
-		new MatsimNetworkReader(sc).readFile(networkFile);
+		new MatsimNetworkReader(sc.getNetwork()).readFile(networkFile);
 		sc.getConfig().network().setTimeVariantNetwork(true);
 		
 		NetworkChangeEventsWriter ncer = new NetworkChangeEventsWriter();

@@ -64,7 +64,7 @@ public class NonAlternativingPlanElementsIntegrationTest {
 
 
 		Scenario scenario = ScenarioUtils.createScenario(config);
-		new MatsimNetworkReader(scenario).readFile("test/scenarios/equil/network.xml");
+		new MatsimNetworkReader(scenario.getNetwork()).readFile("test/scenarios/equil/network.xml");
 
 		addSimpleTransitServices(scenario);
 
@@ -91,7 +91,7 @@ public class NonAlternativingPlanElementsIntegrationTest {
 		config.transit().setUseTransit(true);
 
 		Scenario scenario = ScenarioUtils.createScenario(config);
-		new MatsimNetworkReader(scenario).readFile("test/scenarios/equil/network.xml");
+		new MatsimNetworkReader(scenario.getNetwork()).readFile("test/scenarios/equil/network.xml");
 
 		addSimpleTransitServices(scenario);
 

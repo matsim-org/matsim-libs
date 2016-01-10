@@ -63,7 +63,7 @@ public class PlansActs2Txt extends MatsimJaxbXmlWriter{
 		String inPlansFile = "f:/p/output/corr_t_2/ITERS/it.0/corr_t_2.0.plans.xml.gz";
 		String outputDir = "f:/p/output/corr_t_2/ITERS/it.0/";
 		
-		new MatsimNetworkReader(sc).readFile(networkFile);
+		new MatsimNetworkReader(sc.getNetwork()).readFile(networkFile);
 	
 		Population inPop = sc.getPopulation();
 		PopulationReader popReader = new MatsimPopulationReader(sc);

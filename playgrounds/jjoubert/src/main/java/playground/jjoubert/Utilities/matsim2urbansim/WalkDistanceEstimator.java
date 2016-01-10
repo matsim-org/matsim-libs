@@ -120,7 +120,7 @@ public class WalkDistanceEstimator {
 		// Read network.
 		sAll = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		sPt = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		MatsimNetworkReader nr = new MatsimNetworkReader(sAll);
+		MatsimNetworkReader nr = new MatsimNetworkReader(sAll.getNetwork());
 		nr.readFile(sb.getEmmeNetworkFilename());		
 		
 		/*----------------------------------------------------------------------

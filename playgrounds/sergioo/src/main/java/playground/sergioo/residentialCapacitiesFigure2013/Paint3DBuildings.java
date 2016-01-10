@@ -37,7 +37,7 @@ public class Paint3DBuildings {
 	public static void main(String[] args) throws IOException {
 		String[] schedules = {"home"};
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenario).readFile(args[0]);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(args[0]);
 		CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.WGS84_UTM48N);
 		ActivityFacilitiesFactory factory = new ActivityFacilitiesFactoryImpl();
 		BufferedReader reader = new BufferedReader(new FileReader(args[1]));

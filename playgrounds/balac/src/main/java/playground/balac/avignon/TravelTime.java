@@ -18,7 +18,7 @@ public class TravelTime {
 	MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 	PopulationReader populationReader = new MatsimPopulationReader(scenario);
-	MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario);
+	MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario.getNetwork());
 	public void run(String plansFilePath, String networkFilePath) throws IOException {
 		populationReader.readFile(plansFilePath);
 		networkReader.readFile(networkFilePath);

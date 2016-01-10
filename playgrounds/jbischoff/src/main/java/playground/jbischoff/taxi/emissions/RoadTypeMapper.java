@@ -46,7 +46,7 @@ public class RoadTypeMapper {
 
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
-		new MatsimNetworkReader(scenario).readFile(dir+"berlin_brb.xml");
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(dir+"berlin_brb.xml");
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 		NetworkImpl net2 = (NetworkImpl) NetworkUtils.createNetwork();
 		

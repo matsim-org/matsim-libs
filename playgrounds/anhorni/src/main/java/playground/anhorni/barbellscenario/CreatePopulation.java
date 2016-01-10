@@ -48,7 +48,7 @@ public class CreatePopulation {
 	
 	private void init(final String networkfilePath, final String facilitiesfilePath, String pathStub) {
 		this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(this.scenario).readFile(networkfilePath);
+		new MatsimNetworkReader(this.scenario.getNetwork()).readFile(networkfilePath);
 		new FacilitiesReaderMatsimV1(this.scenario).readFile(facilitiesfilePath);
 		this.pathStub = pathStub;
 	}

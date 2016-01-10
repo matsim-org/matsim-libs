@@ -87,7 +87,7 @@ public class Test {
 		List<LineString> openings = new ArrayList<LineString>();
 		Config c = ConfigUtils.createConfig();
 		Scenario sc = ScenarioUtils.createScenario(c);
-		new MatsimNetworkReader(sc).readFile(network);
+		new MatsimNetworkReader(sc.getNetwork()).readFile(network);
 		
 		for (Link  l : sc.getNetwork().getLinks().values()) {
 //			if (l.getFromNode().getInLinks().size() <= 2 ||l.getToNode().getInLinks().size() <= 2){

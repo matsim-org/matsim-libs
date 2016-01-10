@@ -38,7 +38,7 @@ public class SimplifyBarcelonaNetwork
         String simplifiedNetworkFile = dir + "barcelona_simplified_network.xml";
 
         Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-        new MatsimNetworkReader(scenario).readFile(networkFile);
+        new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
 
         NetworkSimplifier simplifier = new NetworkSimplifier();
         simplifier.setNodesToMerge(Sets.newHashSet(4, 5));

@@ -47,7 +47,7 @@ public class ModifyTaxiPlans {
 		// TODO Auto-generated method stub
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Scenario scenario2 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenario).readFile("C:/Users/Joschka/Documents/runs-svn/bvg.run132.25pct/bvg.run132.25pct.output_network.xml.gz");
+		new MatsimNetworkReader(scenario.getNetwork()).readFile("C:/Users/Joschka/Documents/runs-svn/bvg.run132.25pct/bvg.run132.25pct.output_network.xml.gz");
 		new MatsimPopulationReader(scenario).readFile("C:/Users/Joschka/Documents/shared-svn/projects/audi_av/scenario/plansWithCarsR0.10.xml.gz");
 		
 		for (Person person : scenario.getPopulation().getPersons().values()){

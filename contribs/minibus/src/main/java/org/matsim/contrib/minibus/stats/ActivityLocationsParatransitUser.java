@@ -190,7 +190,7 @@ final class ActivityLocationsParatransitUser implements IterationEndsListener {
 		String inPlansFile = "f:/p_runs/txl/run71/it.380/run71.380.plans.xml.gz";
 		String outFilename = "f:/p_runs/txl/run71/it.380/actsFromParatransitUsers.txt";
 		
-		new MatsimNetworkReader(sc).readFile(networkFile);
+		new MatsimNetworkReader(sc.getNetwork()).readFile(networkFile);
 		
 		Population inPop = sc.getPopulation();
 		PopulationReader popReader = new MatsimPopulationReader(sc);

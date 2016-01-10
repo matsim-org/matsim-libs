@@ -161,7 +161,7 @@ public class SrVTripAnalyzer {
 		Population population = scenario.getPopulation();
 		PopulationFactory populationFactory = population.getFactory();
 		
-		NetworkReaderMatsimV1 networkReader = new NetworkReaderMatsimV1(scenario);
+		NetworkReaderMatsimV1 networkReader = new NetworkReaderMatsimV1(scenario.getNetwork());
 		networkReader.parse(networkFile);
 		
 		List<Event> events = new ArrayList<Event>();

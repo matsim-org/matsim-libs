@@ -46,7 +46,7 @@ public class PopulationGeneratorV2 {
 		PopulationWriter popWriter = new PopulationWriter(population, scenario.getNetwork());
 		popWriter.startStreaming(populationPath);
 		
-		new NetworkReaderMatsimV1(scenario).parse(networkPath); 
+		new NetworkReaderMatsimV1(scenario.getNetwork()).parse(networkPath);
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 		
 		NodeDistances nodeDistances = new NodeDistances(networkPath);

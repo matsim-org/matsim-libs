@@ -64,7 +64,7 @@ public class Plansgenerator {
 	private void init() {
 		this.scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		this.network = this.scenario.getNetwork();
-		new MatsimNetworkReader(this.scenario).readFile(networkFilename);
+		new MatsimNetworkReader(this.scenario.getNetwork()).readFile(networkFilename);
 	}
 
 	private void createPlans() throws Exception {

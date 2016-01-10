@@ -61,7 +61,7 @@ public class ExtractNonPnrParkingDurations {
 		final String outFile = args[ 2 ];
 
 		Scenario sc = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
-		new MatsimNetworkReader( sc ).readFile( networkFile );
+		new MatsimNetworkReader(sc.getNetwork()).readFile( networkFile );
 
 		Handler handler = new Handler( sc.getNetwork() , outFile );
 		EventsManager events = EventsUtils.createEventsManager();

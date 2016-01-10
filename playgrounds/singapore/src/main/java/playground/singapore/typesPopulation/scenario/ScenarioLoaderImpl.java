@@ -172,7 +172,7 @@ public class ScenarioLoaderImpl {
 				log.info("use TimeVariantLinks in NetworkFactory.");
 				network.getFactory().setLinkFactory(new TimeVariantLinkFactory());
 			}
-			new MatsimNetworkReader(this.scenario).parse(networkFileName);
+			new MatsimNetworkReader(this.scenario.getNetwork()).parse(networkFileName);
 			if ((config.network().getChangeEventsInputFile() != null) && config.network().isTimeVariantNetwork()) {
 				log.info("loading network change events from " + config.network().getChangeEventsInputFile());
 				NetworkChangeEventsParser parser = new NetworkChangeEventsParser(network);

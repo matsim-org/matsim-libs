@@ -19,7 +19,7 @@ public class AnalyseShoppingDistance {
 		
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		PopulationReader populationReader = new MatsimPopulationReader(scenario);
-		MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario);
+		MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario.getNetwork());
 		networkReader.readFile(args[0]);
 		new FacilitiesReaderMatsimV1(scenario).readFile(args[1]);
 		populationReader.readFile(args[2]);

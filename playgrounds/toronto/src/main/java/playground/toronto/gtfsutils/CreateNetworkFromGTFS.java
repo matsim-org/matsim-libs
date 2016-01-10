@@ -37,7 +37,7 @@ public class CreateNetworkFromGTFS{
         
         MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
         NetworkImpl network = (NetworkImpl) scenario.getNetwork();
-		new MatsimNetworkReader(scenario).readFile(NetworkFile);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(NetworkFile);
 		
 		/*read the stops file
 		 * create nodes for each stop

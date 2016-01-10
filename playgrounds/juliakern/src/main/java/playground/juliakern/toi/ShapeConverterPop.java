@@ -81,7 +81,7 @@ public class ShapeConverterPop {
 		config.planCalcScore().addActivityParams(other);
 		
 		Scenario scenario = ScenarioUtils.createScenario(config);
-		new MatsimNetworkReader(scenario).readFile(networkFile);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
 		Population pop = fillScenario(scenario);
 		new PopulationWriter(pop, scenario.getNetwork()).write(plansFile);
 

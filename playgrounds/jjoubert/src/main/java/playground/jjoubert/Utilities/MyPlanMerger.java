@@ -109,7 +109,7 @@ public class MyPlanMerger {
 	public void preparePlanMerger(){
 		sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		MatsimPopulationReader mpr = new MatsimPopulationReader(sc);
-		NetworkReaderMatsimV1 nr = new NetworkReaderMatsimV1(sc);
+		NetworkReaderMatsimV1 nr = new NetworkReaderMatsimV1(sc.getNetwork());
 		mpr.parse(baseFile);
 		nr.parse(networkFile);
 		log.info("Successfully created the base scenario with plans and network.");

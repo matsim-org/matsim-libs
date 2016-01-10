@@ -19,12 +19,7 @@
 
 package playground.jbischoff.av.preparation;
 
-import java.util.Iterator;
-import java.util.Map.Entry;
-import java.util.Random;
-
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkWriter;
@@ -34,11 +29,9 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -81,7 +74,7 @@ public class TinyScenarioPreparator {
 	public void run(String networkFile, String popFile, String newpopFile, String newNetworkFile) {
 		this.geometry = readShapeFileAndExtractGeometry("C:/Users/Joschka/Documents/shared-svn/projects/audi_av/shp/untersuchungsraumAll.shp");
 		scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenario).readFile(networkFile);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
 		new MatsimPopulationReader(scenario).readFile(popFile);
 		convertNetwork(scenario.getNetwork());
 		

@@ -84,7 +84,7 @@ public class BarcelonaTaxiGenerator
         double maxWorkTime = 12.0 * 3600;
 
         Scenario scenario = ScenarioUtils.createScenario(VrpConfigUtils.createConfig());
-        new MatsimNetworkReader(scenario).readFile(networkFile);
+        new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
 
         for (int i = 45; i <= 45; i += 2) {
             BarcelonaTaxiCreator btc = new BarcelonaTaxiCreator(scenario);

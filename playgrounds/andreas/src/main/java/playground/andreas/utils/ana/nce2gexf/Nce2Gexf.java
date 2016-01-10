@@ -93,7 +93,7 @@ public class Nce2Gexf extends MatsimJaxbXmlWriter{
 		String nceDiffFile = "f:/stab/diff.txt";
 		String outFilename = "f:/stab/diff.gexf.gz";
 		
-		new MatsimNetworkReader(sc).readFile(networkFile);
+		new MatsimNetworkReader(sc.getNetwork()).readFile(networkFile);
 		
 		Nce2Gexf p2g = new Nce2Gexf();
 		p2g.init(nceDiffFile, sc.getNetwork().getNodes());

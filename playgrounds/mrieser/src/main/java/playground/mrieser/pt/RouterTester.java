@@ -71,7 +71,7 @@ public class RouterTester {
 		TransitSchedule ts = s.getTransitSchedule();
 		PopulationImpl p = (PopulationImpl) s.getPopulation();
 
-		new MatsimNetworkReader(s).readFile(NETWORK);
+		new MatsimNetworkReader(s.getNetwork()).readFile(NETWORK);
 		new VehicleReaderV1(v).readFile(VEHICLES);
 		new TransitScheduleReader(s).readFile(SCHEDULE);
 		log.info("build transit router...");

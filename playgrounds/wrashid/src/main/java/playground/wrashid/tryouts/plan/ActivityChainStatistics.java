@@ -45,7 +45,7 @@ public class ActivityChainStatistics extends NewPopulation {
 		Population inPop = sc.getPopulation();
 
 		Network net = sc.getNetwork();
-		new MatsimNetworkReader(sc).readFile(networkFile);
+		new MatsimNetworkReader(sc.getNetwork()).readFile(networkFile);
 
 		PopulationReader popReader = new MatsimPopulationReader(sc);
 		popReader.readFile(inputPlansFile);

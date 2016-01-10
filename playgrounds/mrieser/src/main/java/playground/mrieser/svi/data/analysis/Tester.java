@@ -41,7 +41,7 @@ public class Tester {
 		String vehTrajectoryFilename = "/Users/cello/Desktop/VehTrajectory.dat";
 
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenario).readFile(networkFilename);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFilename);
 		
 		ZoneIdToIndexMapping zoneMapping = new ZoneIdToIndexMapping();
 		new ZoneIdToIndexMappingReader(zoneMapping).readFile(zoneMappingFilename);

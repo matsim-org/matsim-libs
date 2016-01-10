@@ -120,7 +120,7 @@ public class EventsToPlanElementsSingapore implements TransitDriverStartsEventHa
 				.createScenario(ConfigUtils.loadConfig(args[3]));
 		scenario.getConfig().transit().setUseTransit(true);
 		new TransitScheduleReader(scenario).readFile(args[0]);
-		new MatsimNetworkReader(scenario).readFile(args[1]);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(args[1]);
 
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		File properties = new File("f:/data/matsim2postgres.properties");

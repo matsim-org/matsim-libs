@@ -21,7 +21,6 @@ package playground.jbischoff.taxi.emissions;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dvrp.data.VrpData;
 import org.matsim.contrib.dvrp.data.VrpDataImpl;
 import org.matsim.contrib.dvrp.data.file.VehicleReader;
@@ -30,7 +29,6 @@ import org.matsim.contrib.emissions.types.HbefaVehicleCategory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
@@ -48,7 +46,7 @@ public class TaxiToEmissionVehicleConverter {
 		String dir = "C:/Users/Joschka/Documents/shared-svn/projects/sustainability-w-michal-and-dlr/data/";
         Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
-		new MatsimNetworkReader(scenario).readFile(dir+"scenarios/2014_10_basic_scenario_v4/berlin_brb.xml");
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(dir+"scenarios/2014_10_basic_scenario_v4/berlin_brb.xml");
 		VrpData vrpData = new VrpDataImpl();
         new VehicleReader(scenario, vrpData).parse(dir+"/scenarios/2014_10_basic_scenario_v4/taxis4to4_EV0.0.xml");
         new TaxiToEmissionVehicleConverter().convert(vrpData,dir+"/scenarios/2014_10_basic_scenario_v4/+emissionVehicles.xml"); 

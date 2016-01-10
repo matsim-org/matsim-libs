@@ -67,7 +67,7 @@ public class OnePercentBerlin10sTest extends MatsimTestCase {
 
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		
-		new MatsimNetworkReader(scenario).readFile(netFileName);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(netFileName);
 		new MatsimPopulationReader(scenario).readFile(popFileName);
 
 		EventsManager events = EventsUtils.createEventsManager();
@@ -120,7 +120,7 @@ public class OnePercentBerlin10sTest extends MatsimTestCase {
 
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		
-		new MatsimNetworkReader(scenario).readFile(netFileName);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(netFileName);
 		new MatsimPopulationReader(scenario).readFile(popFileName);
 
 		EventsManager eventsManager = EventsUtils.createEventsManager();

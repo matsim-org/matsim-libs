@@ -36,7 +36,7 @@ public class WriteEmmePlans_eThekwini {
 	 */
 	public static void main(String[] args) {
 		Scenario s = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		MatsimNetworkReader nr = new MatsimNetworkReader(s);
+		MatsimNetworkReader nr = new MatsimNetworkReader(s.getNetwork());
 		nr.readFile("/Users/johanwjoubert/MATSim/workspace/MATSimData/eThekwini/2005/Input/output_network_100_Emme.xml.gz");
 		MatsimPopulationReader pr = new MatsimPopulationReader(s);
 		pr.readFile("/Users/johanwjoubert/MATSim/workspace/MATSimData/eThekwini/2005/Input/output_plans_100.xml.gz");

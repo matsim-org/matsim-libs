@@ -33,7 +33,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 public class CleanNetwork {
 public static void main(String[] args) {
 	Scenario s = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-	new MatsimNetworkReader(s).readFile("C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/input/network.xml");
+	new MatsimNetworkReader(s.getNetwork()).readFile("C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/input/network.xml");
 	new NetworkCleaner().run(s.getNetwork());
 	new NetworkWriter(s.getNetwork()).write("C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/input/networkc.xml");
 	

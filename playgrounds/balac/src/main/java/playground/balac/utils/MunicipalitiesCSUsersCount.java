@@ -18,7 +18,7 @@ public class MunicipalitiesCSUsersCount {
 	public static void main(String[] args) throws IOException {
 		// TODO Auto-generated method stub
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario);
+		MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario.getNetwork());
 		networkReader.readFile(args[0]);
 		final BufferedReader readLink1 = IOUtils.getBufferedReader(args[1]);
 		final BufferedWriter outLink = IOUtils.getBufferedWriter("C:/Users/balacm/Desktop/" + "matrix_interval_peak.txt");
