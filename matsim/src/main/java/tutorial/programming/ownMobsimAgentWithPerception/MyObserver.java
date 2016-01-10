@@ -27,8 +27,8 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.events.handler.BasicEventHandler;
 
@@ -64,9 +64,9 @@ class MyObserver implements BasicEventHandler {
 		String arrivalMode = TransportMode.car ;
 		if ( event instanceof LinkLeaveEvent ) {
 			linkId = ((LinkLeaveEvent) event).getLinkId() ;
-		} else if ( event instanceof PersonArrivalEvent ) {		// yyyyyy there is _still_ no clean vehicle arrival event ?!?!?!
-			linkId = ((PersonArrivalEvent)event).getLinkId() ;
-			arrivalMode = ((PersonArrivalEvent)event).getLegMode() ;
+		} else if ( event instanceof VehicleLeavesTrafficEvent ) {		
+			linkId = ((VehicleLeavesTrafficEvent)event).getLinkId() ;
+			arrivalMode = ((VehicleLeavesTrafficEvent)event).getNetworkMode() ;
 		}
 		if ( arrivalMode.equals( TransportMode.car ) ) {
 			if ( nVehs.get( linkId ) != null ) {
