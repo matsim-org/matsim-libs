@@ -19,6 +19,7 @@
 
 package org.matsim.core.mobsim.qsim.agents;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.*;
@@ -34,12 +35,14 @@ import javax.inject.Inject;
 import java.util.*;
 
 public final class PopulationAgentSource implements AgentSource {
+	private static final Logger log = Logger.getLogger( PopulationAgentSource.class );
 
 	private final Population population;
 	private final AgentFactory agentFactory;
 	private final QSim qsim;
 	private Map<String, VehicleType> modeVehicleTypes;
 	private final Collection<String> mainModes;
+	private Map<Id<Vehicle>,Id<Link>> seenVehicleIds = new HashMap<>() ;
 
 	@Inject
 	public PopulationAgentSource(Population population, AgentFactory agentFactory, QSim qsim) {
@@ -70,17 +73,13 @@ public final class PopulationAgentSource implements AgentSource {
 		Set<String> seenModes = new HashSet<>();
 		for (PlanElement planElement : plan.getPlanElements()) {
 			if (planElement instanceof Leg) {
-
-				// to through all legs:
 				Leg leg = (Leg) planElement;
 				if (this.mainModes.contains(leg.getMode())) { // only simulated modes get vehicles
 					if (!seenModes.contains(leg.getMode())) { // create one vehicle per simulated mode, put it on the home location
 						NetworkRoute route = (NetworkRoute) leg.getRoute();
-						Id<Vehicle> vehicleId;
+						Id<Vehicle> vehicleId = null ;
 						if (route != null) {
 							vehicleId = route.getVehicleId(); // may be null!
-						} else {
-							vehicleId = null;
 						}
 						if (vehicleId == null) {
 							if (qsim.getScenario().getConfig().qsim().getUsePersonIdForMissingVehicleId()) {
@@ -103,18 +102,21 @@ public final class PopulationAgentSource implements AgentSource {
 						default:
 							throw new RuntimeException("not implemented") ;
 						}
-						Id<Link> vehicleLink = findVehicleLink(p);
-						// yyyy First intuition: why not just put the vehicle where the leg starts?  Since each mode is only treated once,
-						// this would just put the vehicle where it is needed.
-						// Yet at second glance: Vehicles may be shared between persons, one person leaving it somewhere where
-						// the second person picks it up.  This really does not work here; the above will just
-						// generate multiple copies of the same vehicle.  Initial positions of vehicles either
-						// need to be given by vehicles file, or auto-placed. kai, jun'15
-						// yyyyyy The reason why it may work anyways is that vehicles with the same id that are placed on the same
-						// link over-write each other.  So as long as the code places the vehicles at home, it probably works.  But doing the above
-						// idea of placing them at the leg would not work here any more.
+						Id<Link> vehicleLinkId = findVehicleLink(p, leg);
 						
-						qsim.createAndParkVehicleOnLink(vehicle, vehicleLink);
+						// Checking if the vehicle has been seen before:
+						Id<Link> result = this.seenVehicleIds.get( vehicleId ) ;
+						if ( result != null ) {
+							// if seen before, but placed on same link, then it is ok:
+							log.info( "have seen vehicle with id " + vehicleId + " before; not placing it again." );
+							if ( result != vehicleLinkId ) {
+								throw new RuntimeException("vehicle placement error: vehicleId=" + vehicleId + 
+										"; previous placement link=" + vehicleLinkId + "; current placement link=" + result ) ; 
+							}
+						} else {
+							this.seenVehicleIds.put( vehicleId, vehicleLinkId ) ;
+							qsim.createAndParkVehicleOnLink(vehicle, vehicleLinkId);
+						}
 						seenModes.add(leg.getMode());
 					}
 				}
@@ -125,21 +127,26 @@ public final class PopulationAgentSource implements AgentSource {
 	/**
 	 *	A more careful way to decide where this agent should have its vehicles created
 	 *  than to ask agent.getCurrentLinkId() after creation.
+	 * @param leg TODO
 	 */
-	private static Id<Link> findVehicleLink(Person p) {
-
-		for (PlanElement planElement : p.getSelectedPlan().getPlanElements()) {
-			if (planElement instanceof Activity) {
-				Activity activity = (Activity) planElement;
-				if (activity.getLinkId() != null) {
-					return activity.getLinkId();
-				}
-			} else if (planElement instanceof Leg) {
-				Leg leg = (Leg) planElement;
-				if (leg.getRoute().getStartLinkId() != null) {
-					return leg.getRoute().getStartLinkId();
-				}
-			}
+	private static Id<Link> findVehicleLink(Person p, Leg currentLeg ) {
+//		for (PlanElement planElement : p.getSelectedPlan().getPlanElements()) {
+//			if (planElement instanceof Activity) {
+//				Activity activity = (Activity) planElement;
+//				if (activity.getLinkId() != null) {
+//					return activity.getLinkId();
+//				}
+//			} else if (planElement instanceof Leg) {
+//				Leg leg = (Leg) planElement;
+//				if (leg.getRoute().getStartLinkId() != null) {
+//					return leg.getRoute().getStartLinkId();
+//				}
+//			}
+//		}
+		// why not just place it at the beginning of the current leg?  (Will NOT be placed multiple times
+		// since there is only one vehicle per mode).  Doing this here:
+		if (currentLeg.getRoute().getStartLinkId() != null) {
+			return currentLeg.getRoute().getStartLinkId();
 		}
 		throw new RuntimeException("Don't know where to put a vehicle for this agent.");
 	}
