@@ -25,7 +25,7 @@ import processing.core.PApplet;
  *
  */
 public class RotatingCircle extends PApplet {
-	private final int xsize=500, ysize=500 ;
+	private final int xsize=600, ysize=600 ;
 
 	private int ii =0 ;
 
@@ -35,26 +35,18 @@ public class RotatingCircle extends PApplet {
 
 	@Override
 	public void draw() {
-		this.strokeWeight(10) ;
+		this.strokeWeight(20) ;
 		this.stroke( 255, 0, 0, 111) ; // R G B transparency
 		
 		this.background(255) ; // "clears" the background
 
 		ii++ ;
-		float xx = xsize/2 + ( xsize/2*(float) Math.sin(ii/360.) );
-		float yy = ysize/2 + ( ysize/2*(float) Math.cos(ii/360.) );
-		this.point( xx,yy ) ;
+		float xx = xsize/2 + ( xsize/2*(float) Math.sin(ii/90.) );
+		float yy = ysize/2 + ( ysize/2*(float) Math.cos(ii/90.) );
+		this.point( xx, yy ) ;
+		
 	}
 	
-//	@Override public void draw() {
-//		if (mousePressed) {
-//			this.fill(0);
-//		} else {
-//			this.fill(255);
-//		}
-//		ellipse(mouseX, mouseY, 80, 80);
-//	}
-
 	@Override
 	public void settings() { // setup does not work here when not using the PDE
 		size(xsize,ysize );
