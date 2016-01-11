@@ -131,7 +131,7 @@ public class KNBangBang {
 		
 		final Controler controler = new Controler( scenario ) ;
 		controler.getConfig().controler().setOverwriteFileSetting( OverwriteFileSetting.overwriteExistingFiles ) ;
-		controler.setDirtyShutdown(true);
+//		controler.setDirtyShutdown(true);
 		
 		Set<String> analyzedModes = new HashSet<>() ;
 		analyzedModes.add( TransportMode.car ) ;

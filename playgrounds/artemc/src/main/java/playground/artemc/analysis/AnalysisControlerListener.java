@@ -110,10 +110,10 @@ public class AnalysisControlerListener implements StartupListener, IterationEnds
 
 	@Override
 	public void notifyStartup(StartupEvent event) {
-		event.getControler().getEvents().addHandler(moneyHandler);
-		event.getControler().getEvents().addHandler(tripAnalysisHandler);
-		this.scheduleDelayCostHandler.setControler(event.getControler());
-		event.getControler().getEvents().addHandler(scheduleDelayCostHandler);
+		event.getServices().getEvents().addHandler(moneyHandler);
+		event.getServices().getEvents().addHandler(tripAnalysisHandler);
+		this.scheduleDelayCostHandler.setControler(event.getServices());
+		event.getServices().getEvents().addHandler(scheduleDelayCostHandler);
 	}
 
 	@Override
@@ -127,29 +127,29 @@ public class AnalysisControlerListener implements StartupListener, IterationEnds
 	}
 
 	private void addMonetaryExpensesToPlanAttributes(IterationEndsEvent event){
-		for(Person person:event.getControler().getScenario().getPopulation().getPersons().values()){
+		for(Person person:event.getServices().getScenario().getPopulation().getPersons().values()){
 			Double monetaryPayments = moneyHandler.getPersonId2amount().get(person.getId());
 			if(monetaryPayments==null) {
 				monetaryPayments=0.0;
 			}
 			person.getSelectedPlan().getCustomAttributes().put("toll",monetaryPayments.toString());
-			event.getControler().getScenario().getPopulation().getPersonAttributes().putAttribute(person.getId().toString(),"selectedPlanToll",monetaryPayments.toString());
+			event.getServices().getScenario().getPopulation().getPersonAttributes().putAttribute(person.getId().toString(),"selectedPlanToll",monetaryPayments.toString());
 		}
 	}
 
 	private void runCalculation(IterationEndsEvent  event){
 		UserBenefitsCalculatorMod userBenefitsCalculator_logsum = new UserBenefitsCalculatorMod(this.scenario.getConfig(), WelfareMeasure.LOGSUM, false);
-		this.it2userBenefits_logsum.put(event.getIteration(), userBenefitsCalculator_logsum.calculateUtility_money(event.getControler().getScenario().getPopulation()));
+		this.it2userBenefits_logsum.put(event.getIteration(), userBenefitsCalculator_logsum.calculateUtility_money(event.getServices().getScenario().getPopulation()));
 		this.it2invalidPersons_logsum.put(event.getIteration(), userBenefitsCalculator_logsum.getPersonsWithoutValidPlanCnt());
 		this.it2invalidPlans_logsum.put(event.getIteration(), userBenefitsCalculator_logsum.getInvalidPlans());
 
 		UserBenefitsCalculatorMod userBenefitsCalculator_selected = new UserBenefitsCalculatorMod(this.scenario.getConfig(), WelfareMeasure.SELECTED, false);
-		this.it2userBenefits_selected.put(event.getIteration(), userBenefitsCalculator_selected.calculateUtility_money(event.getControler().getScenario().getPopulation()));
+		this.it2userBenefits_selected.put(event.getIteration(), userBenefitsCalculator_selected.calculateUtility_money(event.getServices().getScenario().getPopulation()));
 		this.it2invalidPersons_selected.put(event.getIteration(), userBenefitsCalculator_selected.getPersonsWithoutValidPlanCnt());
 		this.it2invalidPlans_selected.put(event.getIteration(), userBenefitsCalculator_selected.getInvalidPlans());
 
 		double tollSum = 0.0;
-		for(Person person:event.getControler().getScenario().getPopulation().getPersons().values()){
+		for(Person person:event.getServices().getScenario().getPopulation().getPersons().values()){
 			Double monetaryPayments = moneyHandler.getPersonId2amount().get(person.getId());
 			if(monetaryPayments==null) {
 				monetaryPayments=0.0;
@@ -190,7 +190,7 @@ public class AnalysisControlerListener implements StartupListener, IterationEnds
 			sdcEveningByMode.put(mode, new ArrayList<Double>());
 		}
 
-		for(Id<Person> id: event.getControler().getScenario().getPopulation().getPersons().keySet()){
+		for(Id<Person> id: event.getServices().getScenario().getPopulation().getPersons().keySet()){
 
 			if(!this.scheduleDelayCostHandler.getStuckedAgents().contains(id)){
 				ttcMorningByMode.get(this.scheduleDelayCostHandler.getModes().get(id).get(0)).add(this.scheduleDelayCostHandler.getTTC_morning().get(id));
@@ -350,7 +350,7 @@ public class AnalysisControlerListener implements StartupListener, IterationEnds
 
 
 			//Write Time Cost Summary File for the Last Iteration		
-			if(event.getIteration()==event.getControler().getScenario().getConfig().controler().getLastIteration()){
+			if(event.getIteration()==event.getServices().getScenario().getConfig().controler().getLastIteration()){
 				String timeCostSummaryFilePath = this.scenario.getConfig().controler().getOutputDirectory() + "/timeCostSummary.it"+event.getIteration()+".csv";
 				File timeCostSummaryFile = new File( timeCostSummaryFilePath);
 
@@ -398,7 +398,7 @@ public class AnalysisControlerListener implements StartupListener, IterationEnds
 
 
 			//Write Person Time Cost File for the last Iteration
-			if(event.getIteration()==event.getControler().getScenario().getConfig().controler().getLastIteration()){
+			if(event.getIteration()==event.getServices().getScenario().getConfig().controler().getLastIteration()){
 				String timeCostPersonFilePath = this.scenario.getConfig().controler().getOutputDirectory() + "/timeCostPerPerson.it"+event.getIteration()+".csv";
 				File timeCostPersonFile = new File(timeCostPersonFilePath);
 
@@ -409,7 +409,7 @@ public class AnalysisControlerListener implements StartupListener, IterationEnds
 				double sumTTCTotal =0.0;
 				double sumSDCTotal = 0.0;
 
-				for(Id<Person> id: event.getControler().getScenario().getPopulation().getPersons().keySet()){
+				for(Id<Person> id: event.getServices().getScenario().getPopulation().getPersons().keySet()){
 					if(!this.scheduleDelayCostHandler.getStuckedAgents().contains(id)){
 						sumTTCTotal = this.scheduleDelayCostHandler.getTTC_morning().get(id) + this.scheduleDelayCostHandler.getTTC_evening().get(id);
 						sumSDCTotal = this.scheduleDelayCostHandler.getSDC_morning().get(id) + this.scheduleDelayCostHandler.getSDC_evening().get(id);

@@ -5,7 +5,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.ControlerListener;
@@ -59,7 +59,7 @@ public class UpdateSocialCostPricingSchemeWithSpillAndOffSwitch extends Abstract
 		@Override
 		public void notifyIterationStarts(IterationStartsEvent event) {
 			if(event.getIteration()==0) {
-				Controler controler = event.getControler();
+				MatsimServices controler = event.getServices();
 				this.timeslice = controler.getConfig().travelTimeCalculator().getTraveltimeBinSize();
 				this.scc = new SocialCostCalculator(controler.getScenario().getNetwork(), timeslice, controler.getEvents(), controler.getLinkTravelTimes(), controler, blendFactor);
 				controler.addControlerListener(scc);
@@ -75,13 +75,13 @@ public class UpdateSocialCostPricingSchemeWithSpillAndOffSwitch extends Abstract
 		@Override
 		public void notifyIterationEnds(final IterationEndsEvent event) {
 
-			Controler controler = event.getControler();
+			MatsimServices controler = event.getServices();
 
 			log.info("Updating tolls according to social cost imposed...");
 
 			// initialize the social costs calculator
 
-			for (Id<Link> link : event.getControler().getScenario().getNetwork().getLinks().keySet()) {
+			for (Id<Link> link : event.getServices().getScenario().getNetwork().getLinks().keySet()) {
 
 				Link networkLink = controler.getScenario().getNetwork().getLinks().get(link);
 

@@ -21,7 +21,7 @@ package playground.wrashid.parkingSearch.planLevel.linkFacilityMapping;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.facilities.ActivityFacilities;
@@ -45,7 +45,7 @@ public class LinkFacilityAssociation {
 
 	}
 
-	public LinkFacilityAssociation(Controler controler) {
+	public LinkFacilityAssociation(MatsimServices controler) {
         ActivityFacilitiesImpl facilities = (ActivityFacilitiesImpl) controler.getScenario().getActivityFacilities();
 
         this.network = (NetworkImpl) controler.getScenario().getNetwork();

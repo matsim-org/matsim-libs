@@ -31,12 +31,12 @@ public class GenomeAnalysis implements IterationEndsListener {
 
     @Override
     public void notifyIterationEnds(IterationEndsEvent event) {
-        outputPath = event.getControler().getControlerIO().getOutputPath();
+        outputPath = event.getServices().getControlerIO().getOutputPath();
         Map<String, Integer> fullGeneCount = new HashMap<>();
         Map<String, Double> fullGeneScore = new HashMap<>();
         Map<String, Double> fullGeneAltScore = new HashMap<>();
-        Map<Id<Person>, ? extends Person> persons = event.getControler().getScenario().getPopulation().getPersons();
-        boolean append = event.getIteration() != event.getControler().getConfig().controler().getFirstIteration();
+        Map<Id<Person>, ? extends Person> persons = event.getServices().getScenario().getPopulation().getPersons();
+        boolean append = event.getIteration() != event.getServices().getConfig().controler().getFirstIteration();
         try {
             PrintWriter writer = null;
             PrintWriter scoreComponentWriter = null;
@@ -108,7 +108,7 @@ public class GenomeAnalysis implements IterationEndsListener {
 //            for(String key:keys){
 //                edges.add(new SimpleLink(key, fullGeneCount.get(key),fullGeneScore.get(key),fullGeneAltScore.get(key)));
 //            }
-//            writer = new PrintWriter(new BufferedWriter(new FileWriter(event.getControler().getControlerIO().getOutputPath() + "/planEvoEdges.csv", false)));
+//            writer = new PrintWriter(new BufferedWriter(new FileWriter(event.getServices().getControlerIO().getOutputPath() + "/planEvoEdges.csv", false)));
 //                writer.println(String.format("Id,Source,Target,Type,Label,Count,Score,altscore"));
 //            for (SimpleLink edge : edges) {
 //                writer.println(String.format("%s,%s,%s,Undirected,%s,%d,%.3f,%.3f", edge.to,edge.from,edge.to,edge.type, edge.count,edge.score,edge.altscore));

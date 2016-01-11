@@ -17,19 +17,32 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.replanning.modules;
+package org.matsim.core.replanning.strategies;
 
+import org.matsim.core.config.groups.GlobalConfigGroup;
+import org.matsim.core.config.groups.PlansConfigGroup;
+import org.matsim.core.config.groups.TimeAllocationMutatorConfigGroup;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
-import org.matsim.core.replanning.selectors.KeepSelected;
+import org.matsim.core.replanning.modules.TimeAllocationMutator;
+import org.matsim.core.replanning.selectors.RandomPlanSelector;
 
+import javax.inject.Inject;
 import javax.inject.Provider;
 
-public class KeepLastSelectedPlanStrategyFactory implements Provider<PlanStrategy> {
+public class TimeAllocationMutatorPlanStrategyProvider implements
+		Provider<PlanStrategy> {
 
-	@Override
+	@Inject private GlobalConfigGroup globalConfigGroup;
+	@Inject private TimeAllocationMutatorConfigGroup timeAllocationMutatorConfigGroup;
+	@Inject private PlansConfigGroup plansConfigGroup;
+	@Inject private Provider<org.matsim.core.router.TripRouter> tripRouterProvider;
+
+    @Override
 	public PlanStrategy get() {
-		PlanStrategy strategy = new PlanStrategyImpl(new KeepSelected());
+		PlanStrategyImpl strategy = new PlanStrategyImpl(new RandomPlanSelector());
+		TimeAllocationMutator tam = new TimeAllocationMutator(tripRouterProvider, plansConfigGroup, timeAllocationMutatorConfigGroup, globalConfigGroup);
+		strategy.addStrategyModule(tam);
 		return strategy;
 	}
 

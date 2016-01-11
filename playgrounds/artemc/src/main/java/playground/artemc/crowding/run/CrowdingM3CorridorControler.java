@@ -9,6 +9,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -58,7 +59,7 @@ public class CrowdingM3CorridorControler {
 			controler = new Controler(scenario);
 		} else controler = new Controler(args);
 
-		//CrowdednessObserver observer = new CrowdednessObserver(scenario, controler.getEvents(), new StochasticRule());
+		//CrowdednessObserver observer = new CrowdednessObserver(scenario, services.getEvents(), new StochasticRule());
 		observer = new CrowdednessObserver(scenario, controler.getEvents(), new SimpleRule());
 		controler.getEvents().addHandler(observer);
 		scoreTracker = new ScoreTracker();
@@ -70,9 +71,9 @@ public class CrowdingM3CorridorControler {
 				controler.getEvents(), scoreTracker, controler));
 		
 		// Set the Second-Best pricing function
-//		controler.setScoringFunctionFactory(new SecondBestScoringFunctionFactory(
+//		services.setScoringFunctionFactory(new SecondBestScoringFunctionFactory(
 //				new CharyparNagelScoringFunctionFactory(scenario.getConfig().planCalcScore(), scenario.getNetwork()),
-//				controler.getEvents(), scoreTracker, controler));
+//				services.getEvents(), scoreTracker, services));
 
 
 		Initializer initializer = new Initializer();
@@ -87,7 +88,7 @@ public class CrowdingM3CorridorControler {
 		controler.addControlerListener(new InternalizationPtControlerListener( (MutableScenario) controler.getScenario(), scoreTracker));
 		
 		// L. Sun's Dwell Time
-		//controler.setMobsimFactory(new QSimFactory());
+		//services.setMobsimFactory(new QSimFactory());
 		
 		controler.run();
 	}
@@ -154,7 +155,7 @@ public class CrowdingM3CorridorControler {
 
 		@Override
 		public void notifyStartup(StartupEvent event) {
-			Controler controler = event.getControler();
+			MatsimServices controler = event.getServices();
 			// create a plot containing the mean travel times
 			Set<String> transportModes = new HashSet<String>();
 			transportModes.add(TransportMode.car);

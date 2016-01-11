@@ -90,7 +90,7 @@ public class RunControlerMATSim2030 extends Controler {
 		
 		
 		/*
-		 * Cannot get the factory from the controler, therefore create a new one as the controler does. 
+		 * Cannot get the factory from the services, therefore create a new one as the services does.
 		 */
 		TripRouterFactoryBuilderWithDefaults builder = new TripRouterFactoryBuilderWithDefaults();
 		LeastCostPathCalculatorFactory leastCostPathCalculatorFactory = builder.createDefaultLeastCostPathCalculatorFactory(this.getScenario());

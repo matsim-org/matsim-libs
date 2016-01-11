@@ -84,7 +84,7 @@ public class SignalSystemsIntegrationTest {
 		Controler c = new Controler(scenario);
 		c.addOverridingModule(new SignalsModule());
 		c.addOverridingModule(new InvertedNetworkRoutingModuleModule());
-		c.setDumpDataAtEnd(false);
+		c.getConfig().controler().setDumpDataAtEnd(false);
 		c.run();
 
 		String inputDirectory = testUtils.getInputDirectory();
@@ -164,7 +164,7 @@ public class SignalSystemsIntegrationTest {
 		c.addOverridingModule(new InvertedNetworkRoutingModuleModule());
 		c.getConfig().controler().setOutputDirectory(controlerOutputDir);
 		c.getConfig().controler().setCreateGraphs(false);
-		c.setDumpDataAtEnd(false);
+		c.getConfig().controler().setDumpDataAtEnd(false);
 		c.run();
 
 

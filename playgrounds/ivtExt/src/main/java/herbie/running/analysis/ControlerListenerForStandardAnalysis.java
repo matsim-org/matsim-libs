@@ -7,7 +7,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -61,9 +61,9 @@ public class ControlerListenerForStandardAnalysis implements StartupListener, It
 
 	@Override
 	public void notifyStartup(StartupEvent event) {
-		// after the controler is started create and add the event handler for events of the mobility simulation
+		// after the services is started create and add the event handler for events of the mobility simulation
 		this.eventHandler = new StandardAnalysisEventHandler();
-		event.getControler().getEvents().addHandler(this.eventHandler);
+		event.getServices().getEvents().addHandler(this.eventHandler);
 	}
 
 
@@ -74,18 +74,18 @@ public class ControlerListenerForStandardAnalysis implements StartupListener, It
 		this.timePerIterationMap.put(event.getIteration(), this.eventHandler.getAverageOverallTripDuration());
 		
 		if(event.getIteration() % 10 == 0 && event.getIteration() > 0) {
-			this.currentOutputPath = event.getControler().getControlerIO().getIterationPath(event.getIteration());
-			generateStandardAnalysis(event.getControler());
+			this.currentOutputPath = event.getServices().getControlerIO().getIterationPath(event.getIteration());
+			generateStandardAnalysis(event.getServices());
 		}
 	}
 	
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {
-		this.currentOutputPath = event.getControler().getControlerIO().getOutputPath()+"/";
-		generateStandardAnalysis(event.getControler());
+		this.currentOutputPath = event.getServices().getControlerIO().getOutputPath()+"/";
+		generateStandardAnalysis(event.getServices());
 	}
 
-	private void generateStandardAnalysis(Controler controler) {
+	private void generateStandardAnalysis(MatsimServices controler) {
 		
 		compareCounts(controler);
 		
@@ -97,19 +97,19 @@ public class ControlerListenerForStandardAnalysis implements StartupListener, It
 		createBinsCharts(travelDistanceDistributionByMode, "travel distance", "km");
 	}
 	
-	private void compareCounts(Controler controler) {
+	private void compareCounts(MatsimServices controler) {
 //		
-//		readCountsParameters(controler);
+//		readCountsParameters(services);
 //		
 //		// reading counts
 //		this.counts = new Counts();
 //		MatsimCountsReader countsParser = new MatsimCountsReader(this.counts);
 //		countsParser.readFile(this.inputCountsFile);
 //		
-//		this.network = controler.getNetwork();
+//		this.network = services.getNetwork();
 //		VolumesAnalyzer analyzer = new VolumesAnalyzer(3600, 24 * 3600 - 1, this.network);
 //		
-//		controler.getEvents().addHandler(analyzer);
+//		services.getEvents().addHandler(analyzer);
 //		
 //		CountsComparisonAlgorithm comparator = new CountsComparisonAlgorithm(analyzer, this.counts, this.network, countsScaleFactor);
 //		
@@ -118,7 +118,7 @@ public class ControlerListenerForStandardAnalysis implements StartupListener, It
 //		}
 //		comparator.run();
 //		
-//		int iterationNumber = controler.getIterationNumber();
+//		int iterationNumber = services.getIterationNumber();
 //		if (this.outputFormat.contains("html") || this.outputFormat.contains("all")) {
 //				CountsHtmlAndGraphsWriter cgw = new CountsHtmlAndGraphsWriter(this.currentOutputPath, comparator.getComparison(), iterationNumber);
 //				cgw.addGraphsCreator(new CountsSimRealPerHourGraphCreator("sim and real volumes"));
@@ -143,7 +143,7 @@ public class ControlerListenerForStandardAnalysis implements StartupListener, It
 	}
 	
 	
-	private void readCountsParameters(Controler controler) {
+	private void readCountsParameters(MatsimServices controler) {
 		this.countsScaleFactor = controler.getConfig().counts().getCountsScaleFactor();
 		this.distanceFilter = controler.getConfig().counts().getDistanceFilter();
 		this.distanceFilterCenterNode = controler.getConfig().counts().getDistanceFilterCenterNode();
@@ -207,7 +207,7 @@ public class ControlerListenerForStandardAnalysis implements StartupListener, It
 	 *  
 	 * @param controler
 	 */
-	private void calculateTravelDistanceDistributionByMode(Controler controler) {
+	private void calculateTravelDistanceDistributionByMode(MatsimServices controler) {
         this.network = controler.getScenario().getNetwork();
 		
 		travelDistanceDistributionByMode = new TreeMap<String, Bins>();

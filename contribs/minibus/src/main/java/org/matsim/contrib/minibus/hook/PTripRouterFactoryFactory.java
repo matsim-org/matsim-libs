@@ -21,6 +21,7 @@ package org.matsim.contrib.minibus.hook;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.router.TripRouter;
 
 import javax.inject.Provider;
@@ -37,7 +38,7 @@ class PTripRouterFactoryFactory {
 
 	private final static Logger log = Logger.getLogger(PTripRouterFactoryFactory.class);
 
-	public static Provider<TripRouter> getTripRouterFactoryInstance(Controler controler, Class<? extends Provider<TripRouter>> tripRouterFactory, PTransitRouterFactory pTransitRouterFactory){
+	public static Provider<TripRouter> getTripRouterFactoryInstance(MatsimServices controler, Class<? extends Provider<TripRouter>> tripRouterFactory, PTransitRouterFactory pTransitRouterFactory){
 
 		if(tripRouterFactory == null){
 			// standard case

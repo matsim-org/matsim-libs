@@ -35,7 +35,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.ActivityEndRescheduler;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
@@ -53,10 +53,10 @@ public class CurrentLegMicroReplanner extends WithinDayDuringLegReplanner {
 	private final TripRouter tripRouter;
 	private static final Logger logger = Logger.getLogger(CurrentLegMicroReplanner.class);
 	private Random random = new Random();
-	private Controler controler;
+	private MatsimServices controler;
 	
 	
-	/*package*/ CurrentLegMicroReplanner(Id<WithinDayReplanner> id, Scenario scenario, ActivityEndRescheduler internalInterface, TripRouter tripRouter, Controler controler) {
+	/*package*/ CurrentLegMicroReplanner(Id<WithinDayReplanner> id, Scenario scenario, ActivityEndRescheduler internalInterface, TripRouter tripRouter, MatsimServices controler) {
 		super(id, scenario, internalInterface);
 		this.tripRouter = tripRouter;
 		this.controler = controler;

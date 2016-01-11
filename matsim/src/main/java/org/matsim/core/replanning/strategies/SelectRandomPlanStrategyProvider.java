@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DefaultSignalsControllerListenerFactory
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,23 +16,21 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.signals.controler;
 
-import org.apache.log4j.Logger;
+package org.matsim.core.replanning.strategies;
 
+import org.matsim.core.replanning.PlanStrategy;
+import org.matsim.core.replanning.PlanStrategyImpl;
+import org.matsim.core.replanning.selectors.RandomPlanSelector;
 
-/**
- * Factory implementation for the MATSim default, data driven signal model
- * @author dgrether
- */
-public class DefaultSignalsControllerListenerFactory implements SignalsControllerListenerFactory {
-	
-	private static final Logger log = Logger.getLogger(DefaultSignalsControllerListenerFactory.class);
-	
+import javax.inject.Provider;
+
+public class SelectRandomPlanStrategyProvider implements Provider<PlanStrategy> {
+
 	@Override
-	public SignalsControllerListener createSignalsControllerListener() {
-		log.info("using MATSim default signal model...");
-		return new DefaultSignalsControllerListener();
+	public PlanStrategy get() {
+		PlanStrategy strategy = new PlanStrategyImpl(new RandomPlanSelector());
+		return strategy;
 	}
 
 }

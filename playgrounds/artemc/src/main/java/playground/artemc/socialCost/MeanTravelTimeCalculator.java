@@ -159,7 +159,7 @@ PersonStuckEventHandler, IterationEndsListener, ShutdownListener  {
 			}
 			double[] data = new double[dataLength];
 			for (int i = 0; i < data.length; i++) data[i] = meanTravelTimes.get(i);
-			fileName = event.getControler().getControlerIO().getOutputFilename("meanTravelTime_" + transportMode + ".png");
+			fileName = event.getServices().getControlerIO().getOutputFilename("meanTravelTime_" + transportMode + ".png");
 			writer.writeGraphic(fileName, transportMode, data);
 		}
 		
@@ -195,7 +195,7 @@ PersonStuckEventHandler, IterationEndsListener, ShutdownListener  {
 			i++;
 		}
 
-		fileName = event.getControler().getControlerIO().getOutputFilename("meanTravelTime_comparison.png");
+		fileName = event.getServices().getControlerIO().getOutputFilename("meanTravelTime_comparison.png");
 		writer.writeGraphic(fileName, names, data);
 	}
 	

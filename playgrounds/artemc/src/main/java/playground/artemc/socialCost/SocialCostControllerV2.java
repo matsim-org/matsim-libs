@@ -7,8 +7,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
@@ -36,7 +36,7 @@ public class SocialCostControllerV2 {
 		 * This cannot be moved to the initializer since the scoring functions
 		 * are created even before the startup event is created.
 		 */
-		//controler.setScoringFunctionFactory(new TimeAndMoneyDependentScoringFunctionFactory());
+		//services.setScoringFunctionFactory(new TimeAndMoneyDependentScoringFunctionFactory());
 
 		InitializerV2 initializer = new InitializerV2(0.1);
 		controler.addControlerListener(initializer);
@@ -51,8 +51,8 @@ public class SocialCostControllerV2 {
 	private static Scenario initSampleScenario() {
 
 		Config config = ConfigUtils.loadConfig("C:/Workspace/roadpricingSingapore/scenarios/siouxFalls/config.xml");
-		//config.controler().setOutputDirectory("./outpout_SiouxFalls/pt_UE_7200_calibration_PT_6min_600m");
-		//config.controler().setOutputDirectory("./outpout_SiouxFalls/SiouxFalls_5PT_Lines");
+		//config.services().setOutputDirectory("./outpout_SiouxFalls/pt_UE_7200_calibration_PT_6min_600m");
+		//config.services().setOutputDirectory("./outpout_SiouxFalls/SiouxFalls_5PT_Lines");
 		config.controler().setOutputDirectory("C:/Workspace/roadpricingSingapore/output_SiouxFalls/sf_10it_withPT");
 		config.controler().setLastIteration(10);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -75,7 +75,7 @@ public class SocialCostControllerV2 {
 		@Override
 		public void notifyIterationStarts(IterationStartsEvent event) {
 			if(event.getIteration()==0){
-				Controler controler = event.getControler();
+				MatsimServices controler = event.getServices();
 
 				// initialize the social costs calculator
                 SocialCostCalculatorV2 scc = new SocialCostCalculatorV2(controler.getScenario().getNetwork(), controler.getEvents(), controler.getLinkTravelTimes(), controler, blendFactor);
@@ -85,12 +85,12 @@ public class SocialCostControllerV2 {
 
 				// initialize the social costs disutility calculator
 				final SocialCostTravelDisutilityFactory factory = new SocialCostTravelDisutilityFactory(scc);
-				controler.addOverridingModule(new AbstractModule() {
-					@Override
-					public void install() {
-						bindCarTravelDisutilityFactory().toInstance(factory);
-					}
-				});
+//				services.addOverridingModule(new AbstractModule() {
+//					@Override
+//					public void install() {
+//						bindCarTravelDisutilityFactory().toInstance(factory);
+//					}
+//				});
 
 				// create a plot containing the mean travel times
 				Set<String> transportModes = new HashSet<String>();
@@ -100,6 +100,7 @@ public class SocialCostControllerV2 {
 				MeanTravelTimeCalculator mttc = new MeanTravelTimeCalculator(controler.getScenario(), transportModes);
 				controler.addControlerListener(mttc);
 				controler.getEvents().addHandler(mttc);
+				throw new RuntimeException();
 			}
 		}
 	}

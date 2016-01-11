@@ -20,7 +20,7 @@
 
 package org.matsim.core.controler.events;
 
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 
 /**
  * ControlerEvent class to notify all observers of the Controler that it is shutdown
@@ -34,7 +34,7 @@ public final class ShutdownEvent extends ControlerEvent {
 	 */
 	private final boolean unexpected;
 
-	public ShutdownEvent(final Controler controler, final boolean unexpected) {
+	public ShutdownEvent(final MatsimServices controler, final boolean unexpected) {
 		super(controler);
 		this.unexpected = unexpected;
 	}

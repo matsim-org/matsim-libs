@@ -58,7 +58,7 @@ public class TtListenerToBindAndWriteAnalysis implements StartupListener, Iterat
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		// add the analysis tool as events handler to the events manager
-		event.getControler().getEvents().addHandler(handler);
+		event.getServices().getEvents().addHandler(handler);
 		
 		if (write) {
 			// prepare the results writer

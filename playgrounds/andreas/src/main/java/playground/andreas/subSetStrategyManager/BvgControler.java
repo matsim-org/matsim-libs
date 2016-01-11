@@ -32,16 +32,12 @@ import playground.andreas.bvgScoringFunction.BvgScoringFunctionConfigGroup;
 import playground.andreas.bvgScoringFunction.BvgScoringFunctionFactory;
 
 
-public class BvgControler extends Controler {
+public class BvgControler {
 
 	private final static Logger log = Logger.getLogger(BvgControler.class);
 
 	private static String singleTripPersonsFile;
 
-    public BvgControler(final Scenario scenario) {
-		super(scenario);
-		throw new RuntimeException( Gbl.RUN_MOB_SIM_NO_LONGER_POSSIBLE ) ;
-	}
 
 //	@Override
 //	protected void runMobSim() {
@@ -111,7 +107,7 @@ public class BvgControler extends Controler {
 		Scenario sc = ScenarioUtils.loadScenario(config);
 
 //		TransitRouterConfig routerConfig = new TransitRouterConfig(config.planCalcScore(), config.plansCalcRoute(), config.transitRouter(), config.vspExperimental());
-		final BvgControler c = new BvgControler(sc);
+		final Controler c = new Controler(sc);
         c.setScoringFunctionFactory(new BvgScoringFunctionFactory( sc , new BvgScoringFunctionConfigGroup(config) ) );
 //        AbstractModule myStrategyManagerModule = new AbstractModule() {
 //

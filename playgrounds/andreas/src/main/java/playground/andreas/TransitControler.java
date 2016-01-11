@@ -10,14 +10,15 @@ import org.matsim.core.gbl.Gbl;
 /**
  * @author aneumann
  */
-public class TransitControler extends Controler {
+public class TransitControler {
 	private final static Logger log = Logger.getLogger(TransitControler.class);
+	private final Controler controler;
 
 	private boolean useOTFVis = true;
 	private boolean useHeadwayControler = false;
 	
 	public TransitControler(Config config) {
-		super(config);
+		controler = new Controler(config);
 		throw new RuntimeException(Gbl.RUN_MOB_SIM_NO_LONGER_POSSIBLE ) ;
 	}
 	
@@ -85,11 +86,11 @@ public class TransitControler extends Controler {
 		if(args.length > 1 && args[1].equalsIgnoreCase("true")){
 			tc.setUseOTFVis(true);
 		}
-		tc.getConfig().controler().setOverwriteFileSetting(
+		tc.controler.getConfig().controler().setOverwriteFileSetting(
 				true ?
 						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
 						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		//		tc.setCreateGraphs(false);
-		tc.run();
+		tc.controler.run();
 	}
 }

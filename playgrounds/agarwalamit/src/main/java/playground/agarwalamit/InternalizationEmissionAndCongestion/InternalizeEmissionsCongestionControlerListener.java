@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.EmissionModule;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -49,7 +49,7 @@ import playground.vsp.congestion.handlers.TollHandler;
 public class InternalizeEmissionsCongestionControlerListener implements StartupListener, IterationStartsListener, IterationEndsListener, ShutdownListener {
 	private final Logger logger = Logger.getLogger(InternalizeEmissionsCongestionControlerListener.class);
 
-	private Controler controler;
+	private MatsimServices controler;
 	private EmissionModule emissionModule;
 	private EmissionCostModule emissionCostModule;
 	private String emissionEventOutputFile;
@@ -75,7 +75,7 @@ public class InternalizeEmissionsCongestionControlerListener implements StartupL
 
 	@Override
 	public void notifyStartup(StartupEvent event) {
-		this.controler = event.getControler();
+		this.controler = event.getServices();
 
 		EventsManager eventsManager = this.controler.getEvents();
 		this.congestionHandler = new CongestionHandlerImplV3(eventsManager, this.scenario);

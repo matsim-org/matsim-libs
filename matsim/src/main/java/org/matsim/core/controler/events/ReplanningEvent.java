@@ -20,7 +20,7 @@
 
 package org.matsim.core.controler.events;
 
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.replanning.ReplanningContext;
 
 /**
@@ -35,7 +35,7 @@ public final class ReplanningEvent extends ControlerEvent {
 	 */
 	private final int iteration;
 
-	public ReplanningEvent(final Controler controler, final int iteration) {
+	public ReplanningEvent(final MatsimServices controler, final int iteration) {
 		super(controler);
 		this.iteration = iteration;
 	}
@@ -48,7 +48,7 @@ public final class ReplanningEvent extends ControlerEvent {
 	}
 
 	public ReplanningContext getReplanningContext() {
-        return controler.getInjector().getInstance(ReplanningContext.class);
+        return services.getInjector().getInstance(ReplanningContext.class);
     }
 
 }

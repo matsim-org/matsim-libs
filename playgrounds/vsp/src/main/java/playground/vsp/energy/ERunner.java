@@ -81,8 +81,8 @@ public class ERunner {
 		c.addOverridingModule(new OTFVisFileWriterModule());
 		TrafficStateControlerListener trafficState = new TrafficStateControlerListener();
 		c.addControlerListener(trafficState);
-		
-		c.setDumpDataAtEnd(true);
+
+		c.getConfig().controler().setDumpDataAtEnd(true);
 		c.getConfig().controler().setOverwriteFileSetting(
 				true ?
 						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :

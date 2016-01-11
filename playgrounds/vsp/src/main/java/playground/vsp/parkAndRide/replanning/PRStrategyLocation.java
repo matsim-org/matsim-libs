@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.ReplanningContext;
@@ -50,7 +50,7 @@ public class PRStrategyLocation implements PlanStrategy {
 
 	PlanStrategyImpl planStrategyDelegate = null ;
 	
-	public PRStrategyLocation(Controler controler, Provider<TripRouter> tripRouterProvider) {
+	public PRStrategyLocation(MatsimServices controler, Provider<TripRouter> tripRouterProvider) {
 		
 		PRConfigGroup prSettings = (PRConfigGroup) controler.getConfig().getModule(PRConfigGroup.GROUP_NAME);
 		PRFileReader prReader = new PRFileReader(prSettings.getInputFile());

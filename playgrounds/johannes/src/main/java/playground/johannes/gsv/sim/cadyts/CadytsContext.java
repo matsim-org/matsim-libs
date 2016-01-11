@@ -30,7 +30,7 @@ import org.matsim.contrib.cadyts.general.CadytsContextI;
 import org.matsim.contrib.cadyts.general.CadytsCostOffsetsXMLFileIO;
 import org.matsim.contrib.cadyts.general.PlansTranslator;
 import org.matsim.core.config.Config;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
@@ -124,16 +124,16 @@ public class CadytsContext implements CadytsContextI<Link>, StartupListener, Ite
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		
-		Scenario scenario = event.getControler().getScenario();
+		Scenario scenario = event.getServices().getScenario();
 		
-//		VolumesAnalyzer volumesAnalyzer = event.getControler().getVolumes();
+//		VolumesAnalyzer volumesAnalyzer = event.getServices().getVolumes();
 		
 //		this.simResults = new SimResultsContainerImpl(volumesAnalyzer, this.countsScaleFactor);
 		this.simResults = new SimResultsAdaptor(occupancy, scale);
 		
 		// this collects events and generates cadyts plans from it
 		this.ptStep = new PlanToPlanStepBasedOnEvents(scenario, cadytsConfig.getCalibratedItems());
-		event.getControler().getEvents().addHandler(ptStep);
+		event.getServices().getEvents().addHandler(ptStep);
 
 		if(Boolean.parseBoolean(config.getParam(Simulator.GSV_CONFIG_MODULE_NAME, "odCalibration"))) {
 			NumericMatrixXMLReader reader = new NumericMatrixXMLReader();
@@ -150,11 +150,11 @@ public class CadytsContext implements CadytsContextI<Link>, StartupListener, Ite
 				ZoneCollection zones = new ZoneCollection();
 				zones.addAll(ZoneGeoJsonIO.parseFeatureCollection(data));
 				
-				odCalibrator = new ODCalibrator(event.getControler().getScenario(), this, m, zones, distThreshold, countThreshold, aggKey);
-				event.getControler().getEvents().addHandler(odCalibrator);
+				odCalibrator = new ODCalibrator(event.getServices().getScenario(), this, m, zones, distThreshold, countThreshold, aggKey);
+				event.getServices().getEvents().addHandler(odCalibrator);
 				
 				ODCountsAnalyzer odAnalyzer = new ODCountsAnalyzer(counts, simResults);
-				event.getControler().addControlerListener(odAnalyzer);
+				event.getServices().addControlerListener(odAnalyzer);
 				
 //				log.info(String.format("Setting %s candidates for simulation.", odCalibrator.getCandidates().size()));
 				
@@ -175,8 +175,8 @@ public class CadytsContext implements CadytsContextI<Link>, StartupListener, Ite
 	public void notifyIterationEnds(final IterationEndsEvent event) {
 		if (this.writeAnalysisFile) {
 			String analysisFilepath = null;
-			if (isActiveInThisIteration(event.getIteration(), event.getControler())) {
-				analysisFilepath = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), FLOWANALYSIS_FILENAME);
+			if (isActiveInThisIteration(event.getIteration(), event.getServices())) {
+				analysisFilepath = event.getServices().getControlerIO().getIterationFilename(event.getIteration(), FLOWANALYSIS_FILENAME);
 			}
 			this.calibrator.setFlowAnalysisFile(analysisFilepath);
 		}
@@ -184,10 +184,10 @@ public class CadytsContext implements CadytsContextI<Link>, StartupListener, Ite
 		this.calibrator.afterNetworkLoading(this.simResults);
 
 		// write some output
-		String filename = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), LINKOFFSET_FILENAME);
+		String filename = event.getServices().getControlerIO().getIterationFilename(event.getIteration(), LINKOFFSET_FILENAME);
 		try {
-//			new CadytsLinkCostOffsetsXMLFileIO(event.getControler().getScenario().getNetwork())
-			new CadytsCostOffsetsXMLFileIO<Link>(new LinkLookUp(event.getControler().getScenario()), Link.class)
+//			new CadytsLinkCostOffsetsXMLFileIO(event.getServices().getScenario().getNetwork())
+			new CadytsCostOffsetsXMLFileIO<Link>(new LinkLookUp(event.getServices().getScenario()), Link.class)
    			   .write(filename, this.calibrator.getLinkCostOffsets());
 		} catch (IOException e) {
 			log.error("Could not write link cost offsets!", e);
@@ -221,9 +221,9 @@ public class CadytsContext implements CadytsContextI<Link>, StartupListener, Ite
 	// private methods & pure delegate methods only below this line
 
 	@SuppressWarnings("static-method")
-	private boolean isActiveInThisIteration(final int iter, final Controler controler) {
+	private boolean isActiveInThisIteration(final int iter, final MatsimServices controler) {
 		return (iter > 0 && iter % controler.getConfig().counts().getWriteCountsInterval() == 0);
-//		return (iter % controler.getConfig().counts().getWriteCountsInterval() == 0);
+//		return (iter % services.getConfig().counts().getWriteCountsInterval() == 0);
 	}
 	
 //	/*package*/ static class SimResultsContainerImpl implements SimResults<Link> {

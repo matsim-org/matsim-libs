@@ -17,8 +17,12 @@ import org.matsim.contrib.accessibility.utils.AccessibilityRunUtils;
 import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtRouterConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.controler.listener.ControlerListener;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacilitiesFactory;
@@ -27,6 +31,9 @@ import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityOption;
 
 import playground.dziemke.utils.LogToOutputSaver;
+
+import javax.inject.Inject;
+import javax.inject.Provider;
 
 /**
  * @author dziemke
@@ -54,21 +61,21 @@ public class AccessibilityBasedLocationOptimizer {
 
 
 		// config and scenario
-		Config config = ConfigUtils.createConfig(new AccessibilityConfigGroup(), new MatrixBasedPtRouterConfigGroup());
+		final Config config = ConfigUtils.createConfig(new AccessibilityConfigGroup(), new MatrixBasedPtRouterConfigGroup());
 		config.network().setInputFile(networkFile);
 		config.facilities().setInputFile(facilitiesFile);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setOutputDirectory(outputDirectory);
 		config.controler().setLastIteration(0);
 
-		Scenario scenario = ScenarioUtils.loadScenario(config);
+		final Scenario scenario = ScenarioUtils.loadScenario(config);
 
 
 		Controler controler = new Controler(scenario) ;
 
 
 		// for optimization
-		ActivityFacilities analysisPoints = 
+		ActivityFacilities analysisPoints =
 				AccessibilityRunUtils.createMeasuringPointsFromNetwork(scenario.getNetwork(), cellSize);
 
 		ActivityFacilitiesFactory activityFacilityFactory = new ActivityFacilitiesFactoryImpl();
@@ -76,19 +83,19 @@ public class AccessibilityBasedLocationOptimizer {
 
 		// create listener for various analysis/measuring points
 		int i = 1;
-		Map<Id<ActivityFacility>, GridBasedAccessibilityControlerListenerV3> listenerMap = 
-				new HashMap<Id<ActivityFacility>, GridBasedAccessibilityControlerListenerV3>(); 
-		for (Id<ActivityFacility> measuringPointId : analysisPoints.getFacilities().keySet()) {
+		final Map<Id<ActivityFacility>, GridBasedAccessibilityControlerListenerV3> listenerMap =
+				new HashMap<Id<ActivityFacility>, GridBasedAccessibilityControlerListenerV3>();
+		for (final Id<ActivityFacility> measuringPointId : analysisPoints.getFacilities().keySet()) {
 			log.info("i = " + i + " -- i % searchInterval = " + i % searchInterval);
 
 			if ((i % searchInterval) == 0) { // if e.g. searchInterval = 7, only look at 7th measurePoint
 
-				ActivityFacilities activityFacilites = AccessibilityRunUtils.collectActivityFacilitiesOfType(scenario, actType);
+				final ActivityFacilities activityFacilites = AccessibilityRunUtils.collectActivityFacilitiesOfType(scenario, actType);
 
 				ActivityOption activityOption = activityFacilityFactory.createActivityOption(actType);
 
 				Coord addedFacilityCoord = analysisPoints.getFacilities().get(measuringPointId).getCoord();
-				Id<ActivityFacility> addedFacilityId = Id.create("analysis_" + measuringPointId, ActivityFacility.class);
+				final Id<ActivityFacility> addedFacilityId = Id.create("analysis_" + measuringPointId, ActivityFacility.class);
 
 //				log.info("The coordinates of the facility added for analysis are " + addedFacilityCoord);
 				ActivityFacility activityFacility = activityFacilityFactory.createActivityFacility(addedFacilityId, addedFacilityCoord);
@@ -96,29 +103,39 @@ public class AccessibilityBasedLocationOptimizer {
 				activityFacility.addActivityOption(activityOption);
 				activityFacilites.addActivityFacility(activityFacility);
 
-				GridBasedAccessibilityControlerListenerV3 listener = listenerMap.get(measuringPointId);
-				listener = new GridBasedAccessibilityControlerListenerV3(activityFacilites, config, scenario.getNetwork());
+				controler.addOverridingModule(new AbstractModule() {
+					@Override
+					public void install() {
+						addControlerListenerBinding().toProvider(new Provider<ControlerListener>() {
+							@Inject Map<String, TravelTime> travelTimes;
+							@Inject Map<String, TravelDisutilityFactory> travelDisutilityFactories;
+
+							@Override
+							public ControlerListener get() {
+								GridBasedAccessibilityControlerListenerV3 listener = new GridBasedAccessibilityControlerListenerV3(activityFacilites, null, config, scenario, travelTimes, travelDisutilityFactories);
 //				log.warn("listener = " + listener);
 
-				listener.setComputingAccessibilityForMode(Modes4Accessibility.freeSpeed, true);
-				//				listener.setComputingAccessibilityForMode(Modes4Accessibility.car, true);
-				listener.setComputingAccessibilityForMode(Modes4Accessibility.walk, true);
-				listener.setComputingAccessibilityForMode(Modes4Accessibility.bike, true);
-				//				listener.setComputingAccessibilityForMode(Modes4Accessibility.pt, true);
+								listener.setComputingAccessibilityForMode(Modes4Accessibility.freeSpeed, true);
+								//				listener.setComputingAccessibilityForMode(Modes4Accessibility.car, true);
+								listener.setComputingAccessibilityForMode(Modes4Accessibility.walk, true);
+								listener.setComputingAccessibilityForMode(Modes4Accessibility.bike, true);
+								//				listener.setComputingAccessibilityForMode(Modes4Accessibility.pt, true);
 
-				//				listener.addAdditionalFacilityData(homes) ;
-				listener.generateGridsAndMeasuringPointsByNetwork(cellSize);
+								//				listener.addAdditionalFacilityData(homes) ;
+								listener.generateGridsAndMeasuringPointsByNetwork(cellSize);
 
-				listener.writeToSubdirectoryWithName(addedFacilityId.toString());
+								listener.writeToSubdirectoryWithName(addedFacilityId.toString());
 
-				listener.setUrbansimMode(false); // avoid writing some (eventually: all) files that related to matsim4urbansim
+								listener.setUrbansimMode(false); // avoid writing some (eventually: all) files that related to matsim4urbansim
 
-				//
-				listener.setCalculateAggregateValues(true);
-				listenerMap.put(measuringPointId, listener);
-				//
-
-				controler.addControlerListener(listener);
+								//
+								listener.setCalculateAggregateValues(true);
+								listenerMap.put(measuringPointId, listener);
+								return listener;
+							}
+						});
+					}
+				});
 			}
 			i++;
 		}

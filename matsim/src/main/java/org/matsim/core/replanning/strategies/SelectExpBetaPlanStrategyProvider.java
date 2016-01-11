@@ -17,20 +17,23 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.replanning.modules;
+package org.matsim.core.replanning.strategies;
 
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
-import org.matsim.core.replanning.selectors.BestPlanSelector;
+import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 
+import javax.inject.Inject;
 import javax.inject.Provider;
 
-public class SelectBestPlanStrategyFactory implements Provider<PlanStrategy> {
+public class SelectExpBetaPlanStrategyProvider implements Provider<PlanStrategy> {
 
-	@Override
+    @Inject private PlanCalcScoreConfigGroup config;
+
+    @Override
 	public PlanStrategy get() {
-		PlanStrategy strategy = new PlanStrategyImpl(new BestPlanSelector());
-		return strategy;
+        return new PlanStrategyImpl(new ExpBetaPlanSelector(config));
 	}
 
 }

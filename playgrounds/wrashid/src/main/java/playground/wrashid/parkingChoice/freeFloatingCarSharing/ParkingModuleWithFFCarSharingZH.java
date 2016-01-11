@@ -1,6 +1,5 @@
 package playground.wrashid.parkingChoice.freeFloatingCarSharing;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.parking.PC2.GeneralParkingModule;
@@ -23,7 +22,6 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.collections.QuadTree;
 
-import playground.ivt.analysis.scoretracking.ScoreTrackingListener;
 import playground.wrashid.parkingChoice.freeFloatingCarSharing.analysis.AverageWalkDistanceStatsZH;
 import playground.wrashid.parkingChoice.freeFloatingCarSharing.analysis.ParkingGroupOccupanciesZH;
 
@@ -153,11 +151,11 @@ public class ParkingModuleWithFFCarSharingZH extends GeneralParkingModule implem
 		// already called by free floating code
 		
 		eventsManager = EventsUtils.createEventsManager();
-		eventsWriter = new EventWriterXML(event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "parkingEvents.xml.gz"));
+		eventsWriter = new EventWriterXML(event.getServices().getControlerIO().getIterationFilename(event.getIteration(), "parkingEvents.xml.gz"));
 		eventsManager.addHandler(eventsWriter);
 		
 		eventsManager.resetHandlers(0);
-		eventsWriter.init(event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "parkingEvents.xml.gz"));
+		eventsWriter.init(event.getServices().getControlerIO().getIterationFilename(event.getIteration(), "parkingEvents.xml.gz"));
 		
 		getParkingInfrastructure().setEventsManager(eventsManager);
 	}
@@ -181,7 +179,7 @@ public class ParkingModuleWithFFCarSharingZH extends GeneralParkingModule implem
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		super.notifyIterationEnds(event);
 		
-		parkingGroupOccupanciesZH.savePlot(event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "parkingGroupOccupancy.png"));
+		parkingGroupOccupanciesZH.savePlot(event.getServices().getControlerIO().getIterationFilename(event.getIteration(), "parkingGroupOccupancy.png"));
 		averageWalkDistanceStatsZH.printStatistics();
 		
 		eventsManager.finishProcessing();

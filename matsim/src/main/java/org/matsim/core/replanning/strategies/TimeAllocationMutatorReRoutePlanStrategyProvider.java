@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * TimeAllocationMutatorReRoutePlanStategyFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,13 +17,15 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package org.matsim.core.replanning.strategies;
 
-package org.matsim.core.replanning.modules;
-
-import org.matsim.core.config.groups.ChangeLegModeConfigGroup;
 import org.matsim.core.config.groups.GlobalConfigGroup;
+import org.matsim.core.config.groups.PlansConfigGroup;
+import org.matsim.core.config.groups.TimeAllocationMutatorConfigGroup;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
+import org.matsim.core.replanning.modules.ReRoute;
+import org.matsim.core.replanning.modules.TimeAllocationMutator;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.TripRouter;
 import org.matsim.facilities.ActivityFacilities;
@@ -30,28 +33,22 @@ import org.matsim.facilities.ActivityFacilities;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-public class ChangeSingleTripModeStrategyFactory implements Provider<PlanStrategy> {
-
-	private final GlobalConfigGroup globalConfigGroup;
-	private final ChangeLegModeConfigGroup changeLegModeConfigGroup;
-	private Provider<TripRouter> tripRouterProvider;
-	private ActivityFacilities activityFacilities;
-
-	@Inject
-    ChangeSingleTripModeStrategyFactory(GlobalConfigGroup globalConfigGroup, ChangeLegModeConfigGroup changeLegModeConfigGroup, ActivityFacilities activityFacilities, Provider<TripRouter> tripRouterProvider) {
-		this.globalConfigGroup = globalConfigGroup;
-		this.changeLegModeConfigGroup = changeLegModeConfigGroup;
-		this.activityFacilities = activityFacilities;
-		this.tripRouterProvider = tripRouterProvider;
-	}
+/**
+ * @author thibautd
+ */
+public class TimeAllocationMutatorReRoutePlanStrategyProvider implements Provider<PlanStrategy> {
+	@Inject private Provider<TripRouter> tripRouterProvider;
+	@Inject private GlobalConfigGroup globalConfigGroup;
+	@Inject private TimeAllocationMutatorConfigGroup timeAllocationMutatorConfigGroup;
+	@Inject private PlansConfigGroup plansConfigGroup;
+	@Inject private ActivityFacilities activityFacilities;
 
     @Override
 	public PlanStrategy get() {
-		PlanStrategyImpl strategy = new PlanStrategyImpl(new RandomPlanSelector());
-		strategy.addStrategyModule(new TripsToLegsModule(tripRouterProvider, globalConfigGroup));
-		strategy.addStrategyModule(new ChangeSingleLegMode(globalConfigGroup, changeLegModeConfigGroup));
-		strategy.addStrategyModule(new ReRoute(activityFacilities, tripRouterProvider, globalConfigGroup));
+		final PlanStrategyImpl strategy = new PlanStrategyImpl(new RandomPlanSelector());
+		strategy.addStrategyModule( new TimeAllocationMutator(tripRouterProvider, plansConfigGroup, timeAllocationMutatorConfigGroup, globalConfigGroup) );
+		strategy.addStrategyModule( new ReRoute(activityFacilities, tripRouterProvider, globalConfigGroup));
 		return strategy;
 	}
-
 }
+

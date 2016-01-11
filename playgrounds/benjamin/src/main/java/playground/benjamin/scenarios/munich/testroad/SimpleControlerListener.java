@@ -60,7 +60,7 @@ public class SimpleControlerListener implements StartupListener, ShutdownListene
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		this.eventHandler = new TravelTimeEventHandler(personId2travelTimes, personId2enterTimes, enterLinkId, leaveLinkId);
-		event.getControler().getEvents().addHandler(this.eventHandler);
+		event.getServices().getEvents().addHandler(this.eventHandler);
 		
 		Link link = scenario.getNetwork().getLinks().get(this.leaveLinkId);
 		link.setCapacity(leaveLinkCapacity);

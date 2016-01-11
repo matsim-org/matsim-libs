@@ -71,13 +71,13 @@ public class DanielAnalysisListenerEvents implements StartupListener, IterationS
 
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
-		if (0 == event.getIteration() % event.getControler().getConfig().controler().getWriteEventsInterval()){
+		if (0 == event.getIteration() % event.getServices().getConfig().controler().getWriteEventsInterval()){
 			this.traveltimes = new ArrayList<CalcMacroZoneTravelTimes>();
 			CalcMacroZoneTravelTimes traveltimes;
 			for(Tuple<Integer, Integer> t: this.timeslots){
 				traveltimes = new CalcMacroZoneTravelTimes(this.parcels.getFacilities(), this.micro2MacroZone, t.getFirst(), t.getSecond());
 				this.traveltimes.add(traveltimes);
-				event.getControler().getEvents().addHandler(traveltimes);
+				event.getServices().getEvents().addHandler(traveltimes);
 			}
 		}
 	}
@@ -86,7 +86,7 @@ public class DanielAnalysisListenerEvents implements StartupListener, IterationS
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		if (!(traveltimes == null)){
 			for(CalcMacroZoneTravelTimes tt: this.traveltimes){
-				tt.writeOutput(event.getControler().getControlerIO().getIterationPath(event.getIteration()));
+				tt.writeOutput(event.getServices().getControlerIO().getIterationPath(event.getIteration()));
 			}
 		}
 	}

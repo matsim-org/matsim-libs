@@ -39,7 +39,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.events.ScoringEvent;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -197,7 +196,7 @@ public class WelfareAnalyzer {
 		String delimiter = ";";
 		
 		// agent stats (agent id, benefits of this iteration, pplan ids the agent used in this iteration)
-		BufferedWriter personStatsWriter = IOUtils.getBufferedWriter(event.getControler().getControlerIO().getIterationPath(event.getIteration()) + "/welfarePersonStats." + Integer.toString(event.getIteration()) + ".txt");
+		BufferedWriter personStatsWriter = IOUtils.getBufferedWriter(event.getServices().getControlerIO().getIterationPath(event.getIteration()) + "/welfarePersonStats." + Integer.toString(event.getIteration()) + ".txt");
 		
 		Map<Id<PPlan>,Set<Id<Person>>> usedPlans = new HashMap<>();
 		
@@ -243,7 +242,7 @@ public class WelfareAnalyzer {
 		}
 		
 		//pplan stats (id, revenues from subsidies, agent ids that used the pplan in this iteration)
-		BufferedWriter planStatsWriter = IOUtils.getBufferedWriter(event.getControler().getControlerIO().getIterationPath(event.getIteration()) + "/welfarePPlanStats." + Integer.toString(event.getIteration()) + ".txt");
+		BufferedWriter planStatsWriter = IOUtils.getBufferedWriter(event.getServices().getControlerIO().getIterationPath(event.getIteration()) + "/welfarePPlanStats." + Integer.toString(event.getIteration()) + ".txt");
 		
 		try {
 			

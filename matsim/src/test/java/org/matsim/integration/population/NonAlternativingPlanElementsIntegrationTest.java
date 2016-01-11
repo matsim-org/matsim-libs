@@ -74,8 +74,8 @@ public class NonAlternativingPlanElementsIntegrationTest {
 		scenario.getPopulation().addPerson(person);
 
 		Controler controler = new Controler(scenario);
-		controler.setDumpDataAtEnd(false);
-        controler.getConfig().controler().setCreateGraphs(false);
+		controler.getConfig().controler().setDumpDataAtEnd(false);
+		controler.getConfig().controler().setCreateGraphs(false);
         controler.run();
 
 		Assert.assertTrue(person.getPlans().size() > 1); // ensure there was some replanning
@@ -101,8 +101,8 @@ public class NonAlternativingPlanElementsIntegrationTest {
 		scenario.getPopulation().addPerson(person);
 
 		Controler controler = new Controler(scenario);
-		controler.setDumpDataAtEnd(false);
-        controler.getConfig().controler().setCreateGraphs(false);
+		controler.getConfig().controler().setDumpDataAtEnd(false);
+		controler.getConfig().controler().setCreateGraphs(false);
         controler.run();
 
 		Assert.assertTrue(person.getPlans().size() > 1); // ensure there was some replanning

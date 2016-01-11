@@ -26,8 +26,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.IntegerValueHashMap;
-import org.matsim.core.controler.Controler;
 
+import org.matsim.core.controler.MatsimServices;
 import playground.wrashid.parkingSearch.planLevel.occupancy.ParkingOccupancyBins;
 
 public class ParkingOccupancyStats {
@@ -53,7 +53,7 @@ public class ParkingOccupancyStats {
 	}
 	
 	
-	public void writeOutParkingOccupanciesTxt(Controler controler, IntegerValueHashMap<Id> facilityCapacities, int iteration) {
+	public void writeOutParkingOccupanciesTxt(MatsimServices controler, IntegerValueHashMap<Id> facilityCapacities, int iteration) {
 		String iterationFilename = controler.getControlerIO().getIterationFilename(iteration,
 				"parkingOccupancy.txt");
 
@@ -89,7 +89,7 @@ public class ParkingOccupancyStats {
 		GeneralLib.writeList(list, iterationFilename);
 	}
 	
-	public void writeOutParkingOccupancySumPng(Controler controler, int iteration) {
+	public void writeOutParkingOccupancySumPng(MatsimServices controler, int iteration) {
 		String fileName = controler.getControlerIO().getIterationFilename(iteration,
 		"parkingOccupancyAllParking.png");
 		

@@ -61,7 +61,7 @@ public class ResumableRunsTest extends MatsimTestCase {
 		PopulationUtils.sortPersons(scenario1.getPopulation());
 		Controler controler1 = new Controler(scenario1);
         controler1.getConfig().controler().setCreateGraphs(false);
-        controler1.setDumpDataAtEnd(false);
+		controler1.getConfig().controler().setDumpDataAtEnd(false);
 		controler1.run();
 
 		// run2
@@ -70,7 +70,7 @@ public class ResumableRunsTest extends MatsimTestCase {
 		config.plans().setInputFile(getOutputDirectory() + "/run1/ITERS/it.10/10.plans.xml.gz");
 		Controler controler2 = new Controler(config);
         controler2.getConfig().controler().setCreateGraphs(false);
-        controler2.setDumpDataAtEnd(false);
+		controler2.getConfig().controler().setDumpDataAtEnd(false);
 		controler2.run();
 
 		// comparison

@@ -128,7 +128,7 @@ public class MunichControler {
 			// this is essentially the syntax to use the randomizing router instead; needs "scheme" (which implements RoadPricingScheme); needs
 			// a way to insert a new scheme in every iteration (because emissions costs change by iteration).
 			//			TravelDisutilityIncludingToll.Builder travelDisutilityFactory = new TravelDisutilityIncludingToll.Builder(
-			//					controler.getTravelDisutilityFactory(), scheme, controler.getConfig().planCalcScore().getMarginalUtilityOfMoney()
+			//					services.getTravelDisutilityFactory(), scheme, services.getConfig().planCalcScore().getMarginalUtilityOfMoney()
 			//					) ;
 			//			travelDisutilityFactory.setSigma( 3. );
 			//			controler.setTravelDisutilityFactory(travelDisutilityFactory);
@@ -168,7 +168,7 @@ public class MunichControler {
 						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
 						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		controler.getConfig().controler().setCreateGraphs(true);
-        controler.setDumpDataAtEnd(true);
+		controler.getConfig().controler().setDumpDataAtEnd(true);
 		controler.addOverridingModule(new OTFVisFileWriterModule());
 		controler.addControlerListener(new WelfareAnalysisControlerListener((MutableScenario) controler.getScenario()));
 

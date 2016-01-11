@@ -22,7 +22,7 @@ package playground.wrashid.parkingSearch.planLevel.replanning;
 
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
@@ -156,7 +156,7 @@ public class ParkingPlanAlgorithm implements PlanAlgorithm {
 	 * @param network
 	 */
 	public static void replaceParking(final Plan plan, ActivityImpl targetActivity, ActivityFacilityImpl newParking,
-			Controler controler, NetworkImpl network) {
+			MatsimServices controler, NetworkImpl network) {
 		// make new parking activity activity
 
 		ActivityImpl newParkingActivity = createNewParkingActivity(newParking, network, ParkingRoot.getParkingActivityDuration()
@@ -231,7 +231,7 @@ public class ParkingPlanAlgorithm implements PlanAlgorithm {
 		return newParkingActivity;
 	}
 
-	private static PlanAlgorithm getRoutingAlgorithm(Controler controler) {
+	private static PlanAlgorithm getRoutingAlgorithm(MatsimServices controler) {
 		return new PlanRouter( controler.getTripRouterProvider().get() );
 	}
 

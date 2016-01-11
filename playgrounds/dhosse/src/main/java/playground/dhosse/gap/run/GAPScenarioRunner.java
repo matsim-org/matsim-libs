@@ -13,6 +13,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.contrib.cadyts.car.CadytsCarModule;
 import org.matsim.contrib.cadyts.car.CadytsContext;
 import org.matsim.contrib.cadyts.general.CadytsScoring;
 import org.matsim.contrib.carsharing.config.CarsharingConfigGroup;
@@ -40,6 +41,7 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.replanning.PlanStrategy;
@@ -73,6 +75,7 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import playground.dhosse.gap.Global;
 import playground.dhosse.gap.analysis.SpatialAnalysis;
 
+import javax.inject.Inject;
 import javax.inject.Provider;
 
 /**
@@ -301,14 +304,14 @@ public class GAPScenarioRunner {
 		// Counts<Link> counts = new Counts<>();
 		// new
 		// CountsReaderMatsimV1(counts).parse("/home/dhosse/run11/input/counts.xml");
-		final CadytsContext cContext = new CadytsContext(controler.getConfig());
-		controler.addControlerListener(cContext);
 
+		controler.addOverridingModule(new CadytsCarModule());
 		// include cadyts into the plan scoring (this will add the cadyts
 		// corrections to the scores):
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
 			private final CharyparNagelScoringParametersForPerson parameters = new SubpopulationCharyparNagelScoringParameters(
 					controler.getScenario());
+			@Inject private CadytsContext cContext;
 
 			@Override
 			public ScoringFunction createNewScoringFunction(Person person) {
@@ -344,7 +347,7 @@ public class GAPScenarioRunner {
 
 	private static void addMultimodal(final Controler controler) {
 
-		// controler.getConfig().controler().setMobsim("myMobsim");
+		// services.getConfig().services().setMobsim("myMobsim");
 		controler.getConfig().travelTimeCalculator().setFilterModes(true);
 
 		final MultiModalConfigGroup mm = new MultiModalConfigGroup();
@@ -408,7 +411,7 @@ public class GAPScenarioRunner {
 	 * 
 	 * @param controler
 	 */
-	private static void addTimeChoice(final Controler controler) {
+	private static void addTimeChoice(final MatsimServices controler) {
 
 		// New strategy settings are created
 		// Specify a name, a subpopulation and a weight for the new strategy and

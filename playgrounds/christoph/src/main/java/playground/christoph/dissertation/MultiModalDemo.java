@@ -215,8 +215,8 @@ public class MultiModalDemo {
 				 */
 				String tripsFileName = "tripCounts";
 				String durationsFileName = "tripDurations";
-				String outputTripsFileName = event.getControler().getControlerIO().getOutputFilename(tripsFileName);
-				String outputDurationsFileName = event.getControler().getControlerIO().getOutputFilename(durationsFileName);
+				String outputTripsFileName = event.getServices().getControlerIO().getOutputFilename(tripsFileName);
+				String outputDurationsFileName = event.getServices().getControlerIO().getOutputFilename(durationsFileName);
 				Set<String> modes = new HashSet<String>();
 				modes.add(TransportMode.bike);
 				modes.add(TransportMode.car);
@@ -226,18 +226,18 @@ public class MultiModalDemo {
 				
 				// create TripsAnalyzer and register it as ControlerListener and EventsHandler
 				TripsAnalyzer tripsAnalyzer = new TripsAnalyzer(outputTripsFileName, outputDurationsFileName, modes, true);
-				event.getControler().addControlerListener(tripsAnalyzer);
-				event.getControler().getEvents().addHandler(tripsAnalyzer);
+				event.getServices().addControlerListener(tripsAnalyzer);
+				event.getServices().getEvents().addHandler(tripsAnalyzer);
 				
 				// TripsAnalyzer is a StartupEventListener, therefore pass event over to it.
 				tripsAnalyzer.notifyStartup(event);
 				
 				// create ActivitiesAnalyzer and register it as ControlerListener and EventsHandler
 				String activitiesFileName = "activityCounts";
-				Set<String> activityTypes = new TreeSet<String>(event.getControler().getConfig().planCalcScore().getActivityTypes());
+				Set<String> activityTypes = new TreeSet<String>(event.getServices().getConfig().planCalcScore().getActivityTypes());
 				ActivitiesAnalyzer activitiesAnalyzer = new ActivitiesAnalyzer(activitiesFileName, activityTypes, true);
-				event.getControler().addControlerListener(activitiesAnalyzer);
-				event.getControler().getEvents().addHandler(activitiesAnalyzer);
+				event.getServices().addControlerListener(activitiesAnalyzer);
+				event.getServices().getEvents().addHandler(activitiesAnalyzer);
 			}
 		});
 		
@@ -806,7 +806,7 @@ public class MultiModalDemo {
 			}
 			
 			try {
-				OutputDirectoryHierarchy outputDirectoryHierarchy = event.getControler().getControlerIO();
+				OutputDirectoryHierarchy outputDirectoryHierarchy = event.getServices().getControlerIO();
 				String travelTimesFileName = outputDirectoryHierarchy.getIterationFilename(event.getIteration(), "travelTimes.txt");
 				BufferedWriter writer = IOUtils.getBufferedWriter(travelTimesFileName);
 				

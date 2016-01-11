@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,47 +17,20 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.transEnergySim.controllers;
+package org.matsim.core.replanning.strategies;
 
-import java.util.LinkedList;
+import org.matsim.core.replanning.PlanStrategy;
+import org.matsim.core.replanning.PlanStrategyImpl;
+import org.matsim.core.replanning.selectors.BestPlanSelector;
 
-import org.matsim.core.config.Config;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.events.StartupEvent;
-import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.events.handler.EventHandler;
+import javax.inject.Provider;
 
-/**
- * @author wrashid
- *
- */
-public class AddHandlerAtStartupControler extends Controler {
+public class SelectBestPlanStrategyProvider implements Provider<PlanStrategy> {
 
-	protected LinkedList<EventHandler> handler = new LinkedList<EventHandler>();
-
-	public AddHandlerAtStartupControler(Config config) {
-		super(config);
-		addControlerListener(new EventHandlerAdder());
-	}
-
-	public AddHandlerAtStartupControler(String[] args) {
-		super(args);
-		addControlerListener(new EventHandlerAdder());
-	}
-
-	public void addHandler(EventHandler handler) {
-		this.handler.add(handler);
-	}
-
-	private class EventHandlerAdder implements StartupListener {
-
-		@Override
-		public void notifyStartup(StartupEvent event) {
-			for (EventHandler h : handler) {
-				getEvents().addHandler(h);
-			}
-		}
-
+	@Override
+	public PlanStrategy get() {
+		PlanStrategy strategy = new PlanStrategyImpl(new BestPlanSelector());
+		return strategy;
 	}
 
 }

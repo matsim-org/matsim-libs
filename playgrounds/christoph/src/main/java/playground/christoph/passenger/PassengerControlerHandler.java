@@ -65,39 +65,39 @@ public class PassengerControlerHandler implements StartupListener {
 		
 		JointDepartureOrganizer jointDepartureOrganizer = new JointDepartureOrganizer();
 		MissedJointDepartureWriter jointDepartureWriter = new MissedJointDepartureWriter(jointDepartureOrganizer);
-		event.getControler().addControlerListener(jointDepartureWriter);
+		event.getServices().addControlerListener(jointDepartureWriter);
 		
 		RideToRidePassengerContextProvider rideToRidePassengerContextProvider = new RideToRidePassengerContextProvider();
 
         RideToRidePassengerAgentIdentifierFactory identifierFactory =
-				new RideToRidePassengerAgentIdentifierFactory(event.getControler().getScenario().getNetwork(),
+				new RideToRidePassengerAgentIdentifierFactory(event.getServices().getScenario().getNetwork(),
 						this.withinDayControlerListener.getMobsimDataProvider(), 
 						rideToRidePassengerContextProvider, jointDepartureOrganizer);
 		InitialIdentifier identifier = identifierFactory.createIdentifier();
 		
-//		RoutingContext routingContext = new RoutingContextImpl(event.getControler().createTravelDisutilityCalculator(), 
-//				event.getControler().getLinkTravelTimes());
+//		RoutingContext routingContext = new RoutingContextImpl(event.getServices().createTravelDisutilityCalculator(),
+//				event.getServices().getLinkTravelTimes());
 //		TravelTime travelTime = new FreeSpeedTravelTime();
-//		TravelDisutility travelDisutility = event.getControler().getTravelDisutilityFactory().createTravelDisutility(travelTime, 
-//				event.getControler().getConfig().planCalcScore());
+//		TravelDisutility travelDisutility = event.getServices().getTravelDisutilityFactory().createTravelDisutility(travelTime,
+//				event.getServices().getConfig().planCalcScore());
 //		RoutingContext routingContext = new RoutingContextImpl(travelDisutility, travelTime);
 		
 		RideToRidePassengerReplannerFactory replannerFactory = new RideToRidePassengerReplannerFactory(
-				event.getControler().getScenario(), this.withinDayControlerListener.getWithinDayEngine(), 
-				event.getControler().getTripRouterProvider(), rideToRidePassengerContextProvider, jointDepartureOrganizer);
+				event.getServices().getScenario(), this.withinDayControlerListener.getWithinDayEngine(),
+				event.getServices().getTripRouterProvider(), rideToRidePassengerContextProvider, jointDepartureOrganizer);
 		replannerFactory.addIdentifier(identifier);
 		
 		this.withinDayControlerListener.getWithinDayEngine().addIntialReplannerFactory(replannerFactory);
 		
 		final MobsimFactory mobsimFactory = new PassengerQSimFactory(this.multiModalTravelTimes.get(),
 				this.withinDayControlerListener.getWithinDayEngine(), jointDepartureOrganizer);
-		event.getControler().addOverridingModule(new AbstractModule() {
+		event.getServices().addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				bindMobsim().toProvider(new com.google.inject.Provider<Mobsim>() {
 					@Override
 					public Mobsim get() {
-						return mobsimFactory.createMobsim(event.getControler().getScenario(), event.getControler().getEvents());
+						return mobsimFactory.createMobsim(event.getServices().getScenario(), event.getServices().getEvents());
 					}
 				});
 			}

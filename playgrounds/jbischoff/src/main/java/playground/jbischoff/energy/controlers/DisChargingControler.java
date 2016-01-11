@@ -20,41 +20,41 @@
 package playground.jbischoff.energy.controlers;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.transEnergySim.controllers.AddHandlerAtStartupControler;
 import org.matsim.contrib.transEnergySim.controllers.EventHandlerGroup;
 import org.matsim.contrib.transEnergySim.vehicles.api.Vehicle;
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.EnergyConsumptionTracker;
 import org.matsim.core.config.Config;
+import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.Controler;
 
 import java.util.HashMap;
 
-public class DisChargingControler extends AddHandlerAtStartupControler {
+public class DisChargingControler  {
 
-	
+
+	private final Controler controler;
 	private HashMap<Id<Vehicle>, Vehicle> vehicles;
 	private EnergyConsumptionTracker energyConsumptionTracker;
 
 
 	
 	public DisChargingControler(Config config,  HashMap<Id<Vehicle>, Vehicle> vehicles) {
-		super(config);
+		this.controler = new Controler(config);
 		init(vehicles);
 		
 	}
-
-	public DisChargingControler(String[] args,  HashMap<Id<Vehicle>, Vehicle> vehicles) {
-		super(args);
-		init(vehicles);
-	}
-	
-		
 
 	private void init(HashMap<Id<Vehicle>, Vehicle> vehicles2) {
 		this.vehicles = vehicles2;
-		EventHandlerGroup handlerGroup = new EventHandlerGroup();
-        setEnergyConsumptionTracker(new EnergyConsumptionTracker(vehicles, getScenario().getNetwork()));
+		final EventHandlerGroup handlerGroup = new EventHandlerGroup();
+        setEnergyConsumptionTracker(new EnergyConsumptionTracker(vehicles, controler.getScenario().getNetwork()));
 		handlerGroup.addHandler(getEnergyConsumptionTracker());
-		addHandler(handlerGroup);		
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				addEventHandlerBinding().toInstance(handlerGroup);
+			}
+		});
 	}
 	
 	
@@ -82,5 +82,8 @@ public class DisChargingControler extends AddHandlerAtStartupControler {
 	private void setEnergyConsumptionTracker(EnergyConsumptionTracker energyConsumptionTracker) {
 		this.energyConsumptionTracker = energyConsumptionTracker;
 	}
-	
+
+	public void run() {
+		controler.run();
+	}
 }

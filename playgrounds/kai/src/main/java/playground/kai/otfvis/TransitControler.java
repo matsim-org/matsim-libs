@@ -68,7 +68,7 @@ public class TransitControler {
 
 		final Controler controler = new Controler(config) ;
 		controler.getConfig().controler().setOverwriteFileSetting( OverwriteFileSetting.overwriteExistingFiles ) ;
-		controler.setDirtyShutdown(true);
+//		controler.setDirtyShutdown(true);
 
 		//		Logger.getLogger("main").warn("warning: using randomized pt router!!!!") ;
 		//		tc.addOverridingModule(new RandomizedTransitRouterModule());

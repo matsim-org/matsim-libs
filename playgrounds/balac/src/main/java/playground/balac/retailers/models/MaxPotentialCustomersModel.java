@@ -15,7 +15,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.router.TripRouter;
@@ -32,7 +32,7 @@ public class MaxPotentialCustomersModel extends RetailerModelImpl {
 	  private TreeMap<Id<Link>, LinkRetailersImpl> availableLinks = new TreeMap<>();
 	  private static final Logger log = Logger.getLogger(MaxPotentialCustomersModel.class);
 
-	public MaxPotentialCustomersModel(Controler controler, Map<Id<ActivityFacility>, ActivityFacilityImpl> retailerFacilities)
+	public MaxPotentialCustomersModel(MatsimServices controler, Map<Id<ActivityFacility>, ActivityFacilityImpl> retailerFacilities)
 	  {
 	    this.controler = controler;
 	    this.retailerFacilities = retailerFacilities;

@@ -89,7 +89,7 @@ public class PathSizeLogitControlerANIK {
 			controler.addControlerListener(new StartupListener(){
 				@Override
 				public void notifyStartup(StartupEvent event) {
-					event.getControler().getStrategyManager().setPlanSelectorForRemoval(remover);
+					event.getServices().getStrategyManager().setPlanSelectorForRemoval(remover);
 				}
 			});
 		}

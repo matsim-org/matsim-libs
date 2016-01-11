@@ -1,10 +1,8 @@
 package saleem.stockholmscenario.teleportation;
 
 import org.matsim.core.controler.events.IterationEndsEvent;
-import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
-import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
 
 public class StockholmControlListener implements StartupListener, IterationEndsListener{
@@ -20,7 +18,7 @@ public class StockholmControlListener implements StartupListener, IterationEndsL
 	public void notifyStartup(StartupEvent event) {
 		// TODO Auto-generated method stub
 		handler = new HandleStuckVehicles();
-		event.getControler().getEvents().addHandler(handler);		
+		event.getServices().getEvents().addHandler(handler);
 		
 	}
 

@@ -51,7 +51,7 @@ public class CongestionAnalysisControlerListener implements StartupListener {
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		
-		EventsManager eventsManager = event.getControler().getEvents();		
+		EventsManager eventsManager = event.getServices().getEvents();
 		eventsManager.addHandler(this.congestionHandler);
 	}
 }

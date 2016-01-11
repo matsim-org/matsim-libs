@@ -37,7 +37,7 @@ import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.utils.geometry.CoordUtils;
 import utils.Utils;
 
@@ -70,7 +70,7 @@ public class ModeSharesEventHandler extends AbstractClassifiedFrequencyAnalysis 
 	private String xy;
 		
 
-	public ModeSharesEventHandler(final Controler controler, String xy) {
+	public ModeSharesEventHandler(final MatsimServices controler, String xy) {
         this.network = controler.getScenario().getNetwork();
 		this.xy = xy;
 		

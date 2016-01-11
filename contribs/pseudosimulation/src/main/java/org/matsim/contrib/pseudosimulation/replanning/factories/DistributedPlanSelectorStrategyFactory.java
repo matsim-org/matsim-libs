@@ -22,7 +22,7 @@ package org.matsim.contrib.pseudosimulation.replanning.factories;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.pseudosimulation.replanning.PlanCatcher;
 import org.matsim.contrib.pseudosimulation.replanning.selectors.DistributedPlanSelector;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 
@@ -37,13 +37,13 @@ import javax.inject.Provider;
 public class DistributedPlanSelectorStrategyFactory implements Provider<PlanStrategy> {
 
     private final String strategyName;
-    private final Controler controler;
+    private final MatsimServices controler;
     boolean quickReplanning;
     int selectionInflationFactor;
     private PlanCatcher slave;
     private Scenario scenario;
 
-    public DistributedPlanSelectorStrategyFactory(PlanCatcher slave, boolean quickReplanning, int selectionInflationFactor, Controler controler, String strategyName) {
+    public DistributedPlanSelectorStrategyFactory(PlanCatcher slave, boolean quickReplanning, int selectionInflationFactor, MatsimServices controler, String strategyName) {
         this.slave = slave;
         this.quickReplanning = quickReplanning;
         this.selectionInflationFactor = selectionInflationFactor;

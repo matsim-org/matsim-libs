@@ -84,7 +84,7 @@ public class RunCarsharingTest {
 		// ---
 
 		final Controler controler = new Controler( scenario );
-		controler.setDirtyShutdown(true);
+//		controler.setDirtyShutdown(true);
 		
 		RunCarsharing.installCarSharing(controler);
 

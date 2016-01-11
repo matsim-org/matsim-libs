@@ -37,9 +37,9 @@ final class ControlerListenerManager implements MatsimManager {
 
 	private final static Logger log = Logger.getLogger(ControlerListenerManager.class);
 
-    private Controler controler = null;
+    private MatsimServices controler = null;
 
-    void setControler(Controler controler) {
+	void setControler(MatsimServices controler) {
         this.controler = controler;
     }
 

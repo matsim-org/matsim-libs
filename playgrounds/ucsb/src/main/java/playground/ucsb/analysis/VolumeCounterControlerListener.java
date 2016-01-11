@@ -45,19 +45,19 @@ public class VolumeCounterControlerListener implements IterationEndsListener,
 	}
 
 	/* (non-Javadoc)
-	 * @see org.matsim.core.controler.listener.StartupListener#notifyStartup(org.matsim.core.controler.events.StartupEvent)
+	 * @see org.matsim.core.services.listener.StartupListener#notifyStartup(org.matsim.core.services.events.StartupEvent)
 	 */
 	@Override
 	public void notifyStartup(StartupEvent event) {
-		volumeCounter = new VolumeCounter(event.getControler().getScenario().getNetwork());
-		event.getControler().getEvents().addHandler(volumeCounter);
+		volumeCounter = new VolumeCounter(event.getServices().getScenario().getNetwork());
+		event.getServices().getEvents().addHandler(volumeCounter);
 	}
 
 	/* (non-Javadoc)
-	 * @see org.matsim.core.controler.listener.IterationEndsListener#notifyIterationEnds(org.matsim.core.controler.events.IterationEndsEvent)
+	 * @see org.matsim.core.services.listener.IterationEndsListener#notifyIterationEnds(org.matsim.core.services.events.IterationEndsEvent)
 	 */
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
-		volumeCounter.writeVolumes(event.getControler().getControlerIO().getIterationFilename(event.getIteration(),"linkVolumes.txt.gz"));
+		volumeCounter.writeVolumes(event.getServices().getControlerIO().getIterationFilename(event.getIteration(),"linkVolumes.txt.gz"));
 	}
 }

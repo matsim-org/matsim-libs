@@ -41,7 +41,7 @@ import org.matsim.pt.PtConstants;
 import org.matsim.pt.ReconstructingUmlaufBuilder;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.counts.OccupancyAnalyzer;
-import org.matsim.pt.counts.PtCountControlerListener;
+import org.matsim.pt.counts.PtCountsModule;
 import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.vehicles.VehicleReaderV1;
 
@@ -49,18 +49,19 @@ import org.matsim.vehicles.VehicleReaderV1;
 /**
  * @author mrieser
  */
-public final class TransitControler extends Controler {
+public final class TransitControler {
 
 	private final static Logger logger = Logger.getLogger(TransitControler.class);
 
 	private final static String COUNTS_MODULE_NAME = "ptCounts";
 
 	private final TransitConfigGroup transitConfig;
+	private final Controler controler;
 
 	private boolean useOTFVis = true;
 
 	public TransitControler(final String[] args) {
-		super(args);
+		controler = new Controler(args);
 		this.transitConfig = new TransitConfigGroup();
 		init();
 		throw new RuntimeException(Gbl.CREATE_ROUTING_ALGORITHM_WARNING_MESSAGE 
@@ -68,30 +69,30 @@ public final class TransitControler extends Controler {
 	}
 
 	public TransitControler(final MutableScenario scenario) {
-		super(scenario);
+		controler = new Controler(scenario);
 		this.transitConfig = new TransitConfigGroup();
 		init();
 		throw new RuntimeException(Gbl.CREATE_ROUTING_ALGORITHM_WARNING_MESSAGE) ;
 	}
 
 	private final void init() {
-		if (this.getConfig().getModule(TransitConfigGroup.GROUP_NAME) == null) {
-			this.getConfig().addModule(this.transitConfig);
+		if (controler.getConfig().getModule(TransitConfigGroup.GROUP_NAME) == null) {
+			controler.getConfig().addModule(this.transitConfig);
 		} else {
 			// this would not be necessary if TransitConfigGroup is part of core config
-			ConfigGroup oldModule = this.getConfig().getModule(TransitConfigGroup.GROUP_NAME);
-			this.getConfig().removeModule(TransitConfigGroup.GROUP_NAME);
+			ConfigGroup oldModule = controler.getConfig().getModule(TransitConfigGroup.GROUP_NAME);
+			controler.getConfig().removeModule(TransitConfigGroup.GROUP_NAME);
 			this.transitConfig.addParam("transitScheduleFile", oldModule.getValue("transitScheduleFile"));
 			this.transitConfig.addParam("vehiclesFile", oldModule.getValue("vehiclesFile"));
 			this.transitConfig.addParam("transitModes", oldModule.getValue("transitModes"));
 		}
-		this.getConfig().transit().setUseTransit(true);
-		Set<EventsFileFormat> formats = EnumSet.copyOf(this.getConfig().controler().getEventsFileFormats());
+		controler.getConfig().transit().setUseTransit(true);
+		Set<EventsFileFormat> formats = EnumSet.copyOf(controler.getConfig().controler().getEventsFileFormats());
 		formats.add(EventsFileFormat.xml);
-		this.getConfig().controler().setEventsFileFormats(formats);
+		controler.getConfig().controler().setEventsFileFormats(formats);
 		ActivityParams transitActivityParams = new ActivityParams(PtConstants.TRANSIT_ACTIVITY_TYPE);
 		transitActivityParams.setTypicalDuration(120.0);
-		this.getConfig().planCalcScore().addActivityParams(transitActivityParams);
+		controler.getConfig().planCalcScore().addActivityParams(transitActivityParams);
         
 		this.loadMyControlerListeners();
 	}
@@ -99,7 +100,7 @@ public final class TransitControler extends Controler {
 	private void loadMyControlerListeners() {
 //		super.loadControlerListeners();
 		addTransitControlerListener();
-		if (getConfig().getModule(COUNTS_MODULE_NAME) != null) {
+		if (controler.getConfig().getModule(COUNTS_MODULE_NAME) != null) {
 			addPtCountControlerListener();
 		}
 	}
@@ -110,15 +111,15 @@ public final class TransitControler extends Controler {
 //		OccupancyAnalyzer occupancyAnalyzer = new OccupancyAnalyzer(3600, 24 * 3600 - 1);
 //		addControlerListener(new OccupancyAnalyzerListener(occupancyAnalyzer));
 //		addControlerListener(new PtCountControlerListener(config, occupancyAnalyzer));
-		addControlerListener(new PtCountControlerListener(getConfig()) );
+		controler.addOverridingModule(new PtCountsModule());
 		// the PtCountControlerListener now has its own OccupancyAnalyzer.  kai, oct'10
 
-        this.getConfig().controler().setCreateGraphs(false);
+        controler.getConfig().controler().setCreateGraphs(false);
     }
 
 	private void addTransitControlerListener() {
 		TransitControlerListener cl = new TransitControlerListener(this.transitConfig);
-		addControlerListener(cl);
+		controler.addControlerListener(cl);
 	}
 
 //	@Override
@@ -152,17 +153,17 @@ public final class TransitControler extends Controler {
 		@Override
 		public void notifyStartup(final StartupEvent event) {
 			if (this.config.getTransitScheduleFile() != null) {
-				new TransitScheduleReaderV1(event.getControler().getScenario().getTransitSchedule(), event.getControler().getScenario().getNetwork()).readFile(this.config.getTransitScheduleFile());
+				new TransitScheduleReaderV1(event.getServices().getScenario().getTransitSchedule(), event.getServices().getScenario().getNetwork()).readFile(this.config.getTransitScheduleFile());
 			}
 			if (this.config.getVehiclesFile() != null) {
-				new VehicleReaderV1(((MutableScenario) event.getControler().getScenario()).getTransitVehicles()).parse(this.config.getVehiclesFile());
+				new VehicleReaderV1(((MutableScenario) event.getServices().getScenario()).getTransitVehicles()).parse(this.config.getVehiclesFile());
 			}
 			ReconstructingUmlaufBuilder reconstructingUmlaufBuilder = new ReconstructingUmlaufBuilder(
-					event.getControler().getScenario().getNetwork(), event
-							.getControler().getScenario()
+					event.getServices().getScenario().getNetwork(), event
+							.getServices().getScenario()
 							.getTransitSchedule().getTransitLines().values(),
-					((MutableScenario) event.getControler().getScenario()).getTransitVehicles(),
-					event.getControler().getScenario().getConfig().planCalcScore());
+					((MutableScenario) event.getServices().getScenario()).getTransitVehicles(),
+					event.getServices().getScenario().getConfig().planCalcScore());
 			reconstructingUmlaufBuilder.build();
 		}
 
@@ -170,12 +171,12 @@ public final class TransitControler extends Controler {
 
 	public static void main(final String[] args) {
 		TransitControler tc = new TransitControler(args);
-		tc.getConfig().controler().setOverwriteFileSetting(
+		tc.controler.getConfig().controler().setOverwriteFileSetting(
 				true ?
 						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
 						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		//		tc.setCreateGraphs(false);
-		tc.run();
+		tc.controler.run();
 	}
 
 	public static class OccupancyAnalyzerListener implements
@@ -190,18 +191,18 @@ public final class TransitControler extends Controler {
 		@Override
 		public void notifyBeforeMobsim(BeforeMobsimEvent event) {
 			int iter = event.getIteration();
-			if (iter % 10 == 0&& iter > event.getControler().getConfig().controler().getFirstIteration()) {
+			if (iter % 10 == 0&& iter > event.getServices().getConfig().controler().getFirstIteration()) {
 				occupancyAnalyzer.reset(iter);
-				event.getControler().getEvents().addHandler(occupancyAnalyzer);
+				event.getServices().getEvents().addHandler(occupancyAnalyzer);
 			}
 		}
 
 		@Override
 		public void notifyAfterMobsim(AfterMobsimEvent event) {
 			int it = event.getIteration();
-			if (it % 10 == 0 && it > event.getControler().getConfig().controler().getFirstIteration()) {
-				event.getControler().getEvents().removeHandler(occupancyAnalyzer);
-				occupancyAnalyzer.write(event.getControler().getControlerIO()
+			if (it % 10 == 0 && it > event.getServices().getConfig().controler().getFirstIteration()) {
+				event.getServices().getEvents().removeHandler(occupancyAnalyzer);
+				occupancyAnalyzer.write(event.getServices().getControlerIO()
 						.getIterationFilename(it, "occupancyAnalysis.txt"));
 			}
 		}
@@ -215,6 +216,5 @@ public final class TransitControler extends Controler {
 	protected void setUseOTFVis(boolean useOTFVis) {
 		this.useOTFVis = useOTFVis;
 	}
-
 
 }

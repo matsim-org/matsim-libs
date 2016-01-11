@@ -140,7 +140,7 @@ public class WithinDayParkingControlerListener implements StartupListener, Repla
 	}
 	
 	/*
-	 * New Routers for the Replanning are used instead of using the controler's.
+	 * New Routers for the Replanning are used instead of using the services's.
 	 * By doing this every person can use a personalized Router.
 	 */
 	private void initReplanners() {
@@ -156,17 +156,17 @@ public class WithinDayParkingControlerListener implements StartupListener, Repla
 	public void notifyStartup(final StartupEvent event) {
 		
 		// connect facilities to links
-		new WorldConnectLocations(event.getControler().getConfig()).connectFacilitiesWithLinks(scenario.getActivityFacilities(), 
+		new WorldConnectLocations(event.getServices().getConfig()).connectFacilitiesWithLinks(scenario.getActivityFacilities(),
 				(NetworkImpl) scenario.getNetwork());
 		
-//		this.checkModeChains(event.getControler(), this.multiModalControlerListener.getMultiModalTravelTimes());
+//		this.checkModeChains(event.getServices(), this.multiModalControlerListener.getMultiModalTravelTimes());
 		
 		LeastCostPathCalculatorFactory leastCostPathCalculatorFactory = 
-				new TripRouterFactoryBuilderWithDefaults().createDefaultLeastCostPathCalculatorFactory(event.getControler().getScenario());
+				new TripRouterFactoryBuilderWithDefaults().createDefaultLeastCostPathCalculatorFactory(event.getServices().getScenario());
 		
-		// This is a workaround since the controler does not return its TripRouterFactory
-		javax.inject.Provider<TripRouter> tripRouterFactoryWrapper = new TripRouterFactoryWrapper(event.getControler().getScenario(),
-				event.getControler().getTripRouterProvider(), leastCostPathCalculatorFactory);
+		// This is a workaround since the services does not return its TripRouterFactory
+		javax.inject.Provider<TripRouter> tripRouterFactoryWrapper = new TripRouterFactoryWrapper(event.getServices().getScenario(),
+				event.getServices().getTripRouterProvider(), leastCostPathCalculatorFactory);
 		
 		// we can use the TripRouterFactory that has been initialized by the MultiModalControlerListener
 		this.withinDayControlerListener.setWithinDayTripRouterFactory(tripRouterFactoryWrapper);
@@ -187,7 +187,7 @@ public class WithinDayParkingControlerListener implements StartupListener, Repla
 		 * After the withinDayControlerListener has been initialized, also the experiencedPlansWriter can be created.
 		 */
 		this.experiencedPlansWriter = new ExperiencedPlansWriter(this.withinDayControlerListener.getMobsimDataProvider());
-		event.getControler().addControlerListener(this.experiencedPlansWriter);
+		event.getServices().addControlerListener(this.experiencedPlansWriter);
 		
 		/*
 		 * The ParkingRouter is used to create on-the-fly routes, therefore use the TravelTimeCollector
@@ -200,10 +200,10 @@ public class WithinDayParkingControlerListener implements StartupListener, Repla
 
 		if (this.multiModalTravelTimes != null && this.multiModalTravelTimes.containsKey(TransportMode.walk)) {
 			walkTravelTime = this.multiModalTravelTimes.get(TransportMode.walk);
-		} else walkTravelTime = new WalkTravelTimeFactory(event.getControler().getConfig().plansCalcRoute()).get();
+		} else walkTravelTime = new WalkTravelTimeFactory(event.getServices().getConfig().plansCalcRoute()).get();
 		
 		this.parkingRouterFactory = new ParkingRouterFactory(this.scenario, carTravelTime, walkTravelTime, 
-				event.getControler().getTravelDisutilityFactory(), tripRouterFactoryWrapper, nodesToCheck);
+				event.getServices().getTravelDisutilityFactory(), tripRouterFactoryWrapper, nodesToCheck);
 		
 		parkingCostCalculator = new ParkingCostCalculatorImpl(this.initParkingTypes());
 		this.parkingInfrastructure = new ParkingInfrastructure(this.scenario, parkingCostCalculator, this.allParkingTypes, this.capacityFactor);
@@ -211,7 +211,7 @@ public class WithinDayParkingControlerListener implements StartupListener, Repla
 		this.parkingAgentsTracker = new ParkingAgentsTracker(this.scenario, this.parkingInfrastructure, 
 				this.withinDayControlerListener.getMobsimDataProvider() , searchRadius);
 		this.withinDayControlerListener.getFixedOrderSimulationListener().addSimulationListener(this.parkingAgentsTracker);
-		event.getControler().getEvents().addHandler(this.parkingAgentsTracker);
+		event.getServices().getEvents().addHandler(this.parkingAgentsTracker);
 		
 		
 		/*
@@ -241,14 +241,14 @@ public class WithinDayParkingControlerListener implements StartupListener, Repla
 		 * to also use the multi-modal simulation.
 		 */
 
-		event.getControler().addOverridingModule(new AbstractModule() {
+		event.getServices().addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				bindMobsim().toProvider(new Provider<Mobsim>() {
 					@Override
 					public Mobsim get() {
 						final MobsimFactory mobsimFactory = new ParkingQSimFactory(parkingInfrastructure, parkingRouterFactory, withinDayControlerListener.getWithinDayEngine(), parkingAgentsTracker);
-						final Mobsim mobsim = mobsimFactory.createMobsim(scenario, event.getControler().getEvents());
+						final Mobsim mobsim = mobsimFactory.createMobsim(scenario, event.getServices().getEvents());
 						if (multiModalTravelTimes != null) {
 							new MultiModalQSimModule(scenario.getConfig(), multiModalTravelTimes).configure((QSim) mobsim);
 						}

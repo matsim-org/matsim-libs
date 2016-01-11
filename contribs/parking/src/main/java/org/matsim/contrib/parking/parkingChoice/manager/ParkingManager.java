@@ -25,7 +25,7 @@ import org.matsim.contrib.parking.lib.obj.SortableMapObject;
 import org.matsim.contrib.parking.lib.obj.network.EnclosingRectangle;
 import org.matsim.contrib.parking.lib.obj.network.QuadTreeInitializer;
 import org.matsim.contrib.parking.parkingChoice.infrastructure.Parking;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.utils.collections.QuadTree;
 
 import java.util.Collection;
@@ -45,7 +45,7 @@ public class ParkingManager {
 	private QuadTree<Parking> parkings;
 	private HashSet<Parking> fullParking;
 	private double initialParkingSearchRadiusInMeter;
-	private Controler controller;
+	private MatsimServices controller;
 	
 	public ParkingManager(Collection<Parking> parkingCollection) {
 		EnclosingRectangle rect=new EnclosingRectangle();

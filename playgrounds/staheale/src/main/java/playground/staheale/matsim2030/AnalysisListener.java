@@ -16,7 +16,7 @@ public class AnalysisListener implements StartupListener, IterationEndsListener 
 
 	@Override
 	public void notifyStartup(StartupEvent event) { 
-		event.getControler().getEvents().addHandler(legTimes);
+		event.getServices().getEvents().addHandler(legTimes);
 		this.legTimes.writeStats(filename);
 	}
 

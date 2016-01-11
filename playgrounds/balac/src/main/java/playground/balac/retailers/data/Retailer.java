@@ -6,7 +6,7 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
 
@@ -45,7 +45,7 @@ public class Retailer
     return true;
   }
 
-  public final boolean addStrategy(Controler controler, String strategyName)
+  public final boolean addStrategy(MatsimServices controler, String strategyName)
   {
     if (strategyName.contains("randomRetailerStrategy")) {
       this.strategy = new RandomRetailerStrategy(controler);

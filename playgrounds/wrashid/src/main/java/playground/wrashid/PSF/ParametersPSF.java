@@ -2,8 +2,8 @@ package playground.wrashid.PSF;
 
 import org.apache.log4j.Logger;
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.core.controler.Controler;
 
+import org.matsim.core.controler.MatsimServices;
 import playground.wrashid.PSF.data.HubLinkMapping;
 import playground.wrashid.PSF.data.HubPriceInfo;
 import playground.wrashid.PSF.data.energyConsumption.AverageEnergyConsumptionBins;
@@ -203,7 +203,7 @@ public class ParametersPSF {
 		return mainChargingMode;
 	}
 
-	public static void readConfigParamters(Controler controler) {
+	public static void readConfigParamters(MatsimServices controler) {
 		
 		// reset simulation parameters
 		reset();

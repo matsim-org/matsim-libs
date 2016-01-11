@@ -472,7 +472,7 @@ public class SocialCostCalculator implements TravelDisutility,
 			quantil75Data[i] = quantil75PctSocialCosts.get(i);
 		}
 		
-		fileName = event.getControler().getControlerIO().getOutputFilename("socialCosts");
+		fileName = event.getServices().getControlerIO().getOutputFilename("socialCosts");
 		writer.writeGraphic(fileName + ".png", "social costs (per leg)", meanData, medianData, quantil25Data, quantil75Data);
 		writer.writeTable(fileName + ".txt", meanData, medianData, quantil25Data, quantil75Data);
 		
@@ -483,7 +483,7 @@ public class SocialCostCalculator implements TravelDisutility,
 			quantil75Data[i] = quantil75PctNormalizedSocialCosts.get(i);
 		}
 		
-		fileName = event.getControler().getControlerIO().getOutputFilename("normalizedSocialCosts");
+		fileName = event.getServices().getControlerIO().getOutputFilename("normalizedSocialCosts");
 		writer.writeGraphic(fileName + ".png", "social costs (per leg, normalized)", meanData, medianData, quantil25Data, quantil75Data);
 		writer.writeTable(fileName + ".txt", meanData, medianData, quantil25Data, quantil75Data);
 	}

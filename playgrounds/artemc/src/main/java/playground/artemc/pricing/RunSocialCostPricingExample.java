@@ -24,6 +24,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.ControlerDefaultsModule;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
@@ -62,14 +63,14 @@ public final class RunSocialCostPricingExample {
 		// load the scenario:
 		Scenario scenario = initSampleScenario();
 
-		// instantiate the controler:
+		// instantiate the services:
 		Controler controler = new Controler(scenario) ;
 
 		// use the road pricing module.
         // (loads the road pricing scheme, uses custom travel disutility including tolls, etc.)
 
 		controler.setModules(new ControlerDefaultsModule(), new RoadPricingWithoutTravelDisutilityModule(), new LinkOccupancyAnalyzerModule(), new UpdateSocialCostPricingSchemeWithSpillOverModule());
-//		controler.addOverridingModule( new AbstractModule() {
+//		services.addOverridingModule( new AbstractModule() {
 //			@Override
 //			public void install() {
 //				bindToProvider(TravelDisutilityFactory.class, TravelDisutilityTollAndIncomeHeterogeneityProviderWrapper.TravelDisutilityWithPricingAndHeterogeneityProvider.class);
@@ -79,7 +80,7 @@ public final class RunSocialCostPricingExample {
 		controler.addControlerListener(initializer);
 
 		controler.setScoringFunctionFactory(new CharyparNagelScoringFunctionForAnalysisFactory(controler.getConfig().planCalcScore(), controler.getScenario().getNetwork()));
-//		controler.addControlerListener(new SimpleAnnealer());
+//		services.addControlerListener(new SimpleAnnealer());
 		// Additional analysis
 		AnalysisControlerListener analysisControlerListener = new AnalysisControlerListener((MutableScenario) controler.getScenario());
 		controler.addControlerListener(analysisControlerListener);
@@ -89,7 +90,7 @@ public final class RunSocialCostPricingExample {
 				true ?
 						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
 						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
-		// run the controler:
+		// run the services:
 		controler.run() ;
 	}
 
@@ -98,7 +99,7 @@ public final class RunSocialCostPricingExample {
 		@Override
 		public void notifyStartup(StartupEvent event) {
 
-			Controler controler = event.getControler();
+			MatsimServices controler = event.getServices();
 			// create a plot containing the mean travel times
 			Set<String> transportModes = new HashSet<String>();
 			transportModes.add(TransportMode.car);
@@ -134,7 +135,7 @@ public final class RunSocialCostPricingExample {
 		                           RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).setTollLinksFile(input+"roadpricing.xml");
 
 
-		//config.controler().setLastIteration(10);
+		//config.services().setLastIteration(10);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		return scenario;

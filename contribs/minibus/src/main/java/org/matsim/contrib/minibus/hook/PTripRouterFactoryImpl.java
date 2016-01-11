@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
@@ -60,10 +60,10 @@ class PTripRouterFactoryImpl implements Provider<TripRouter> {
 	private static final Logger log =
 		Logger.getLogger(PTripRouterFactoryImpl.class);
 
-	private final Controler controler;
+	private final MatsimServices controler;
     private final Provider<TransitRouter> transitRouterFactory;
 
-    public PTripRouterFactoryImpl(final Controler controler, Provider<TransitRouter> transitRouterFactory) {
+    public PTripRouterFactoryImpl(final MatsimServices controler, Provider<TransitRouter> transitRouterFactory) {
 		this.controler = controler;
 		this.transitRouterFactory = transitRouterFactory;
 	}

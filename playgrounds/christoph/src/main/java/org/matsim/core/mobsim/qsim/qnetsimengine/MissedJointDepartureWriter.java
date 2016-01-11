@@ -48,7 +48,7 @@ public class MissedJointDepartureWriter implements AfterMobsimListener {
 		// Write file containing all departures which have not been processed.
 		Map<Id, JointDeparture> missedDepartures = new TreeMap<Id, JointDeparture>(this.jointDepartureOrganizer.scheduledDepartures);
 		try {
-			String file = event.getControler().getControlerIO().getIterationFilename(event.getIteration(),
+			String file = event.getServices().getControlerIO().getIterationFilename(event.getIteration(),
 					missedJointDeparturesFile);
 			bufferedWriter = IOUtils.getBufferedWriter(file);
 			for(JointDeparture jointDeparture : missedDepartures.values()) {

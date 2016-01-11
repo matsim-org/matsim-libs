@@ -37,6 +37,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -95,8 +96,8 @@ public class Simulator {
 				true ?
 						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
 						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
-		controler.setDumpDataAtEnd(false);
-		
+		controler.getConfig().controler().setDumpDataAtEnd(false);
+
 		boolean replanCandidates = Boolean.parseBoolean(controler.getConfig().getParam(GSV_CONFIG_MODULE_NAME, "replanCandidates"));
 		final MobsimConnectorFactory mobSimFac = new MobsimConnectorFactory(replanCandidates);
 		controler.addOverridingModule(new AbstractModule() {
@@ -186,7 +187,7 @@ public class Simulator {
 
 		controler.addControlerListener(new CountsCompareAnalyzer(calculator, countsFile, factor));
 
-		logger.info("Setting up controler modules...");
+		logger.info("Setting up services modules...");
 		controler.setModules(new AbstractModule() {
 			@Override
 			public void install() {
@@ -211,7 +212,7 @@ public class Simulator {
 			}
 		});
 
-		// controler.addOverridingModule(abstractModule);
+		// services.addOverridingModule(abstractModule);
 		/*
 		 * load person attributes
 		 */
@@ -228,7 +229,7 @@ public class Simulator {
 
 		@Override
 		public void notifyStartup(StartupEvent event) {
-			Controler controler = event.getControler();
+			MatsimServices controler = event.getServices();
 			/*
 			 * connect facilities to links
 			 */
@@ -246,12 +247,12 @@ public class Simulator {
 			logger.info("Setting up analysis modules...");
 			TrajectoryAnalyzerTaskComposite task = new TrajectoryAnalyzerTaskComposite();
 			task.addTask(new TripGeoDistanceTask(controler.getScenario().getActivityFacilities()));
-//			task.addTask(new SpeedFactorTask(controler.getScenario().getActivityFacilities()));
+//			task.addTask(new SpeedFactorTask(services.getScenario().getActivityFacilities()));
 //			task.addTask(new ScoreTask());
 			task.addTask(new PkmGeoTask(controler.getScenario().getActivityFacilities()));
-			task.addTask(new PkmRouteTask(event.getControler().getScenario().getNetwork(), 0));
-			task.addTask(new PkmRouteTask(event.getControler().getScenario().getNetwork(), 0.5));
-			task.addTask(new PkmRouteTask(event.getControler().getScenario().getNetwork(), 1));
+			task.addTask(new PkmRouteTask(event.getServices().getScenario().getNetwork(), 0));
+			task.addTask(new PkmRouteTask(event.getServices().getScenario().getNetwork(), 0.5));
+			task.addTask(new PkmRouteTask(event.getServices().getScenario().getNetwork(), 1));
 			// task.addTask(new ModeShareTask());
 			// task.addTask(new ActivityDurationTask());
 			// task.addTask(new ActivityLoadTask());
@@ -288,7 +289,7 @@ public class Simulator {
 
 		@Override
 		public void notifyAfterMobsim(AfterMobsimEvent event) {
-			Population population = event.getControler().getScenario().getPopulation();
+			Population population = event.getServices().getScenario().getPopulation();
 			for (Person person : population.getPersons().values()) {
 				context.getCalibrator().addToDemand(context.getPlansTranslator().getPlanSteps(person.getSelectedPlan()));
 			}
@@ -322,7 +323,7 @@ public class Simulator {
 
 	private static class AnalyzerListiner implements IterationEndsListener, IterationStartsListener, StartupListener {
 
-		private Controler controler;
+		private MatsimServices controler;
 
 		private TrajectoryAnalyzerTask task;
 

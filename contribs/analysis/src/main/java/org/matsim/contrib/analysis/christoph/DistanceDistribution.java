@@ -132,7 +132,7 @@ public class DistanceDistribution implements IterationEndsListener {
 		this.analyzePlans(plans);
 		
 		for (DistributionClass distributionClass : classes) {
-			writeDistanceDistributionClass(distributionClass, event.getIteration(), event.getControler().getControlerIO());			
+			writeDistanceDistributionClass(distributionClass, event.getIteration(), event.getServices().getControlerIO());
 		}
 	}
 	

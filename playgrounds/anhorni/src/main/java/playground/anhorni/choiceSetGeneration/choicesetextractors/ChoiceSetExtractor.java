@@ -25,8 +25,8 @@ import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.controler.Controler;
 
+import org.matsim.core.controler.MatsimServices;
 import playground.anhorni.choiceSetGeneration.helper.ChoiceSet;
 import playground.anhorni.choiceSetGeneration.helper.SpanningTree;
 import playground.anhorni.choiceSetGeneration.helper.ZHFacilities;
@@ -34,13 +34,13 @@ import playground.anhorni.choiceSetGeneration.helper.ZHFacilities;
 public abstract class ChoiceSetExtractor {
 		
 	protected ZHFacilities facilities;
-	protected Controler controler;
+	protected MatsimServices controler;
 	private List<ChoiceSet> choiceSets;
 	private int tt;
 	
 	private final static Logger log = Logger.getLogger(ChoiceSetExtractor.class);
 	
-	public ChoiceSetExtractor(Controler controler, List<ChoiceSet> choiceSets, int tt) {
+	public ChoiceSetExtractor(MatsimServices controler, List<ChoiceSet> choiceSets, int tt) {
 		this.controler = controler;
 		this.choiceSets = choiceSets;
 		this.tt = tt;
@@ -106,7 +106,7 @@ public abstract class ChoiceSetExtractor {
 	}
 		
 	protected abstract void computeChoiceSet(ChoiceSet choiceSet, SpanningTree spanningTree, String type,
-			Controler controler, int tt);
+			MatsimServices controler, int tt);
 		
 	public List<ChoiceSet> getChoiceSets() {
 		return choiceSets;

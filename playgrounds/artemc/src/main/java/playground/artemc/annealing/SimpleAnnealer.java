@@ -5,12 +5,12 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.StrategyConfigGroup;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
-import org.matsim.core.replanning.DefaultPlanStrategiesModule;
-import org.matsim.core.replanning.DefaultPlanStrategiesModule.DefaultSelector;
+import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
+import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultSelector;
 import org.matsim.core.replanning.GenericPlanStrategy;
 import org.matsim.core.replanning.StrategyManager;
 
@@ -49,14 +49,14 @@ ControlerListener {
 	static boolean isExponential;
 	static boolean annealSwitch = true;
 	Logger log = Logger.getLogger(getClass());
-	private Controler controler;
+	private MatsimServices controler;
 	private Config config;
 
 	private static Map<Integer, ArrayList<Double>> replaningRates= new HashMap<Integer, ArrayList<Double>>();
 
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
-		controler = event.getControler();
+		controler = event.getServices();
 		config = controler.getConfig();
 		replaningRates.put(event.getIteration(), new ArrayList<Double>());
 
@@ -147,9 +147,9 @@ ControlerListener {
 	 * @throws InterruptedException
 	 */
 	public void anneal(IterationStartsEvent event, double proportion) {
-		StrategyManager stratMan = event.getControler().getStrategyManager();
+		StrategyManager stratMan = event.getServices().getStrategyManager();
 
-		StrategyConfigGroup strategyConfig = (StrategyConfigGroup) event.getControler().getConfig().getModules().get(StrategyConfigGroup.GROUP_NAME);
+		StrategyConfigGroup strategyConfig = (StrategyConfigGroup) event.getServices().getConfig().getModules().get(StrategyConfigGroup.GROUP_NAME);
 
 		//List<GenericPlanStrategy<Plan>> strategies = stratMan.getStrategiesOfDefaultSubpopulation();
 
