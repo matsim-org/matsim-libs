@@ -1,8 +1,6 @@
-package playground.dziemke.other;
+package playground.vsp.demandde.unternehmen;
 
 import org.apache.log4j.Logger;
-import playground.dziemke.accessibility.ptmatrix.CSVFileWriter;
-import playground.dziemke.utils.LogToOutputSaver;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -56,7 +54,6 @@ public class CompanyDataRetriever {
     				+ "the first webpage, the numberOfWebpagesPerFile should be a divisor of webPageIndex "
     				+ "without rest. Otherwise collected data will most probably be incomplete.");
     	}
-    	LogToOutputSaver.setOutputDirectory(outputDirectory);
     	
     	int fileNumber = (webPageIndex - 1) / numberOfWebpagesPerFile + 1;
         long startTime = System.currentTimeMillis();
