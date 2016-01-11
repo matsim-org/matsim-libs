@@ -86,7 +86,7 @@ public class DgRoederGershensonControllerListener implements SignalsControllerLi
 
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {
-		new SignalsScenarioWriter(event.getServices().getControlerIO()).writeSignalsData(event.getControler().getScenario());
+		new SignalsScenarioWriter(event.getServices().getControlerIO()).writeSignalsData(event.getServices().getScenario());
 	}
 
 
