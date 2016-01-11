@@ -102,7 +102,7 @@ public final class PopulationAgentSource implements AgentSource {
 						default:
 							throw new RuntimeException("not implemented") ;
 						}
-						Id<Link> vehicleLinkId = findVehicleLink(p, leg);
+						Id<Link> vehicleLinkId = findVehicleLink(p);
 						
 						// Checking if the vehicle has been seen before:
 						Id<Link> result = this.seenVehicleIds.get( vehicleId ) ;
@@ -129,24 +129,26 @@ public final class PopulationAgentSource implements AgentSource {
 	 *  than to ask agent.getCurrentLinkId() after creation.
 	 * @param leg TODO
 	 */
-	private static Id<Link> findVehicleLink(Person p, Leg currentLeg ) {
-//		for (PlanElement planElement : p.getSelectedPlan().getPlanElements()) {
-//			if (planElement instanceof Activity) {
-//				Activity activity = (Activity) planElement;
-//				if (activity.getLinkId() != null) {
-//					return activity.getLinkId();
-//				}
-//			} else if (planElement instanceof Leg) {
-//				Leg leg = (Leg) planElement;
-//				if (leg.getRoute().getStartLinkId() != null) {
-//					return leg.getRoute().getStartLinkId();
-//				}
-//			}
-//		}
-		// why not just place it at the beginning of the current leg?  (Will NOT be placed multiple times
-		// since there is only one vehicle per mode).  Doing this here:
-		if (currentLeg.getRoute().getStartLinkId() != null) {
-			return currentLeg.getRoute().getStartLinkId();
+	private static Id<Link> findVehicleLink(Person p ) {
+		/* Cases that come to mind:
+		 * (1) multiple persons share car located at home, but possibly brought to different place by someone else.  
+		 *      This is treated by the following algo.
+		 * (2) person starts day with non-car leg and has car parked somewhere else.  This is NOT treated by the following algo.
+		 *      It could be treated by placing the vehicle at the beginning of the first link where it is needed, but this would not
+		 *      be compatible with variant (1).
+		 */
+		for (PlanElement planElement : p.getSelectedPlan().getPlanElements()) {
+			if (planElement instanceof Activity) {
+				Activity activity = (Activity) planElement;
+				if (activity.getLinkId() != null) {
+					return activity.getLinkId();
+				}
+			} else if (planElement instanceof Leg) {
+				Leg leg = (Leg) planElement;
+				if (leg.getRoute().getStartLinkId() != null) {
+					return leg.getRoute().getStartLinkId();
+				}
+			}
 		}
 		throw new RuntimeException("Don't know where to put a vehicle for this agent.");
 	}

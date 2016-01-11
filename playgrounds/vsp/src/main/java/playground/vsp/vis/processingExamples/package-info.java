@@ -20,4 +20,4 @@
  * @author nagel
  *
  */
-package playground.kai.usecases.processing;
+package playground.vsp.vis.processingExamples;
