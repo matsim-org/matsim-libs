@@ -15,10 +15,8 @@ import floetteroed.utilities.math.Matrix;
  */
 public class RunPathologicalExample {
 
-	private RunPathologicalExample() {
-	}
-
 	public static void main(String[] args) {
+
 		System.out.println("STARTED ...");
 
 		/*
@@ -29,22 +27,23 @@ public class RunPathologicalExample {
 		_A.getRow(0).set(1, 0.9);
 		_A.getRow(1).set(0, 0.9);
 		_A.getRow(1).set(1, 0.0);
-
 		final Matrix _B = new Matrix(2, 2);
 		_B.getRow(0).set(0, 1.0);
 		_B.getRow(0).set(1, 0.0);
 		_B.getRow(1).set(0, -3.2);
 		_B.getRow(1).set(1, 1.0);
-
-		final ObjectiveFunction objFct = new LinearSystemObjectiveFunction();
-		final ConvergenceCriterion convergenceCriterion = new FixedIterationNumberConvergenceCriterion(
-				1000, 1);
 		final LinearSystemSimulator system = new LinearSystemSimulator(_A, _B);
+
+		final int maxSimulationIterations = 100;
+		final ConvergenceCriterion convergenceCriterion = new FixedIterationNumberConvergenceCriterion(
+				maxSimulationIterations, 1);
+		
+		final ObjectiveFunction objFct = new LinearSystemObjectiveFunction();
 
 		/*
 		 * RandomSearch specification.
 		 */
-		final int maxMemorizedTrajectoryLength = 1000;
+		final int maxMemorizedTrajectoryLength = maxSimulationIterations;
 		final boolean keepBestSolution = true;
 		final boolean interpolate = true;
 		final int maxRandomSearchIterations = 1000;

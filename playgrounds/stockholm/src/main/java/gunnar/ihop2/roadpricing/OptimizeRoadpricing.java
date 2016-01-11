@@ -58,6 +58,11 @@ class OptimizeRoadpricing {
 		/*
 		 * Create initial toll levels and their randomization.
 		 */
+		// NO TOLL
+		// final TollLevels initialTollLevels = new TollLevels(6 * 3600 + 1800,
+		// 7 * 3600, 7 * 3600 + 1800, 8 * 3600 + 1800, 9 * 3600,
+		// 15 * 3600 + 1800, 16 * 3600, 17 * 3600 + 1800, 18 * 3600,
+		// 18 * 3600 + 1800, 0.0, 0.0, 0.0, scenario);
 		// THE ORIGINAL
 		final TollLevels initialTollLevels = new TollLevels(6 * 3600 + 1800,
 				7 * 3600, 7 * 3600 + 1800, 8 * 3600 + 1800, 9 * 3600,
@@ -89,21 +94,20 @@ class OptimizeRoadpricing {
 						+ scenario.getNetwork().getLinks().size() + " links.");
 		final ObjectiveFunction objectiveFunction = new TotalScoreObjectiveFunction();
 		final ConvergenceCriterion convergenceCriterion = new FixedIterationNumberConvergenceCriterion(
-				100, 10);
+				1000, 1);
 		final MATSimSimulator<TollLevels> matsimSimulator = new MATSimSimulator<>(
 				new MATSimStateFactoryImpl<TollLevels>(), scenario,
 				timeDiscretization, relevantLinkIds, roadpricingModule);
-		// new ControlerDefaultsWithRoadPricingModule());
 
 		/*
 		 * RandomSearch specification.
 		 */
-		final int maxMemorizedTrajectoryLength = 10;
+		final int maxMemorizedTrajectoryLength = 1;
 		final boolean keepBestSolution = true;
 		final boolean interpolate = true;
-		final int maxRandomSearchIterations = 1000;
+		final int maxRandomSearchIterations = 1;
 		final int maxRandomSearchTransitions = Integer.MAX_VALUE;
-		final int randomSearchPopulationSize = 15;
+		final int randomSearchPopulationSize = 1;
 		final RandomSearch<TollLevels> randomSearch = new RandomSearch<>(
 				matsimSimulator, decisionVariableRandomizer,
 				convergenceCriterion, maxRandomSearchIterations,

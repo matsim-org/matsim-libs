@@ -24,6 +24,9 @@ public class LinearSystemSimulator implements Simulator<VectorDecisionVariable> 
 	public LinearSystemSimulator(final Matrix _A, final Matrix _B) {
 		this._A = _A.copy();
 		this._B = _B.copy();
+		// the initial stationary point is all-zeros:
+		this.x = new Vector(this._A.columnSize());
+		this.u = new Vector(this._B.columnSize());
 	}
 
 	void setState(final Vector x) {
@@ -46,15 +49,13 @@ public class LinearSystemSimulator implements Simulator<VectorDecisionVariable> 
 			final SimulatorState initialState) {
 		if (initialState != null) {
 			this.x = ((VectorState) initialState).getX().copy();
-		} else {
-			this.x = new Vector(this._A.columnSize()); // x=0 is stat. for u=0
 		}
-		evaluator.initialize(); // sets this.u
+		evaluator.initialize();
 		do {
 			this.x = this._A.timesVectorFromRight(this.x);
 			this.x.add(this._B.timesVectorFromRight(this.u));
-			evaluator.afterIteration(new VectorState(this.x, this.u, this));
+			evaluator.afterIteration(new VectorState(this.x, this));
 		} while (!evaluator.foundSolution());
-		return new VectorState(this.x, this.u, this);
+		return new VectorState(this.x, this);
 	}
 }

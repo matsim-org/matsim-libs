@@ -20,7 +20,7 @@ public class VectorDecisionVariable implements DecisionVariable {
 		this.system = system;
 	}
 
-	public Vector getVector() {
+	public Vector getU() {
 		return this.u;
 	}
 

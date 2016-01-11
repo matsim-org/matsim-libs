@@ -37,7 +37,7 @@ public class VectorDecisionVariableRandomizer implements
 
 	@Override
 	public VectorDecisionVariable newRandomDecisionVariable() {
-		// TODO not random, and should not be
+		// TODO returns all-zeros: not random, and should not be
 		return new VectorDecisionVariable(new Vector(this.dim), this.system);
 	}
 
@@ -47,9 +47,9 @@ public class VectorDecisionVariableRandomizer implements
 		final Vector delta = newGaussian(this.dim, this.rnd);
 		delta.mult(this.sigma);
 		final VectorDecisionVariable result1 = new VectorDecisionVariable(sum(
-				decisionVariable.getVector(), delta), this.system);
+				decisionVariable.getU(), delta), this.system);
 		final VectorDecisionVariable result2 = new VectorDecisionVariable(diff(
-				decisionVariable.getVector(), delta), this.system);
+				decisionVariable.getU(), delta), this.system);
 		return Arrays.asList(result1, result2);
 	}
 }

@@ -15,9 +15,11 @@ public class LinearSystemObjectiveFunction implements ObjectiveFunction {
 	}
 
 	@Override
-	public double value(SimulatorState state) {
+	public double value(final SimulatorState state) {
 		final Vector x = ((VectorState) state).getX();
-		final Vector u = ((VectorState) state).getPrevU();
-		return -x.get(0) + 0.1 * u.innerProd(u);
+		final Vector dx = Vector.diff(x, new Vector(10.0, 10.0, 0));
+		final double _Q = dx.innerProd(dx);
+		System.out.println("x = " + x + ";\tQ = " + _Q);
+		return _Q;
 	}
 }
