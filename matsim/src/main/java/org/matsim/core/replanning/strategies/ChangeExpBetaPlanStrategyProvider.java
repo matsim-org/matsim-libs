@@ -17,32 +17,23 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.replanning.modules;
+package org.matsim.core.replanning.strategies;
 
-import org.matsim.core.config.groups.GlobalConfigGroup;
-import org.matsim.core.config.groups.SubtourModeChoiceConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
-import org.matsim.core.replanning.selectors.RandomPlanSelector;
-import org.matsim.core.router.TripRouter;
-import org.matsim.facilities.ActivityFacilities;
+import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-public class SubtourModeChoiceStrategyFactory implements Provider<PlanStrategy> {
+public class ChangeExpBetaPlanStrategyProvider implements Provider<PlanStrategy> {
 
-	@Inject private Provider<TripRouter> tripRouterProvider;
-	@Inject private GlobalConfigGroup globalConfigGroup;
-	@Inject private SubtourModeChoiceConfigGroup subtourModeChoiceConfigGroup;
-	@Inject private ActivityFacilities facilities;
+    @Inject private PlanCalcScoreConfigGroup config;
 
     @Override
 	public PlanStrategy get() {
-		PlanStrategyImpl strategy = new PlanStrategyImpl(new RandomPlanSelector());
-		strategy.addStrategyModule(new SubtourModeChoice(tripRouterProvider, globalConfigGroup, subtourModeChoiceConfigGroup));
-		strategy.addStrategyModule(new ReRoute(facilities, tripRouterProvider, globalConfigGroup));
-		return strategy;
+        return new PlanStrategyImpl(new ExpBetaPlanChanger(config.getBrainExpBeta()));
 	}
 
 }

@@ -20,7 +20,7 @@
  *  * ***********************************************************************
  */
 
-package org.matsim.core.replanning;
+package org.matsim.core.replanning.strategies;
 
 import com.google.inject.TypeLiteral;
 import org.matsim.api.core.v01.network.Network;
@@ -29,7 +29,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.replanning.modules.*;
 import org.matsim.core.replanning.selectors.*;
 
 import javax.inject.Inject;
@@ -72,53 +71,53 @@ public class DefaultPlanStrategiesModule extends AbstractModule {
 
         // strategy packages that only select:
         if (usedStrategyNames.contains(DefaultSelector.KeepLastSelected.toString())) {
-            addPlanStrategyBinding(DefaultSelector.KeepLastSelected.toString()).toProvider(KeepLastSelectedPlanStrategyFactory.class);
+            addPlanStrategyBinding(DefaultSelector.KeepLastSelected.toString()).toProvider(KeepLastSelectedPlanStrategyProvider.class);
         }
         if (usedStrategyNames.contains(DefaultSelector.BestScore.toString())) {
-            addPlanStrategyBinding(DefaultSelector.BestScore.toString()).toProvider(SelectBestPlanStrategyFactory.class);
+            addPlanStrategyBinding(DefaultSelector.BestScore.toString()).toProvider(SelectBestPlanStrategyProvider.class);
         }
         if (usedStrategyNames.contains(DefaultSelector.SelectExpBeta.toString())) {
-            addPlanStrategyBinding(DefaultSelector.SelectExpBeta.toString()).toProvider(SelectExpBetaPlanStrategyFactory.class);
+            addPlanStrategyBinding(DefaultSelector.SelectExpBeta.toString()).toProvider(SelectExpBetaPlanStrategyProvider.class);
         }
         if (usedStrategyNames.contains(DefaultSelector.ChangeExpBeta.toString())) {
-            addPlanStrategyBinding(DefaultSelector.ChangeExpBeta.toString()).toProvider(ChangeExpBetaPlanStrategyFactory.class);
+            addPlanStrategyBinding(DefaultSelector.ChangeExpBeta.toString()).toProvider(ChangeExpBetaPlanStrategyProvider.class);
         }
         if (usedStrategyNames.contains(DefaultSelector.SelectRandom.toString())) {
-            addPlanStrategyBinding(DefaultSelector.SelectRandom.toString()).toProvider(SelectRandomStrategyFactory.class);
+            addPlanStrategyBinding(DefaultSelector.SelectRandom.toString()).toProvider(SelectRandomPlanStrategyProvider.class);
         }
         if (usedStrategyNames.contains(DefaultSelector.SelectPathSizeLogit.toString())) {
-            addPlanStrategyBinding(DefaultSelector.SelectPathSizeLogit.toString()).toProvider(SelectPathSizeLogitStrategyFactory.class);
+            addPlanStrategyBinding(DefaultSelector.SelectPathSizeLogit.toString()).toProvider(SelectPathSizeLogitPlanStrategyProvider.class);
         }
 
         // strategy packages that select, copy, and modify.  (The copying is done implicitly as soon as "addStrategyModule" is called
         // at least once).
 
         if (usedStrategyNames.contains(DefaultStrategy.ReRoute.toString())) {
-            addPlanStrategyBinding(DefaultStrategy.ReRoute.toString()).toProvider(ReRoutePlanStrategyFactory.class);
+            addPlanStrategyBinding(DefaultStrategy.ReRoute.toString()).toProvider(ReRoutePlanStrategyProvider.class);
         }
         if (usedStrategyNames.contains(DefaultStrategy.TimeAllocationMutator.toString())) {
-            addPlanStrategyBinding(DefaultStrategy.TimeAllocationMutator.toString()).toProvider(TimeAllocationMutatorPlanStrategyFactory.class);
+            addPlanStrategyBinding(DefaultStrategy.TimeAllocationMutator.toString()).toProvider(TimeAllocationMutatorPlanStrategyProvider.class);
         }
         if (usedStrategyNames.contains(DefaultStrategy.TimeAllocationMutator_ReRoute.toString())) {
-            addPlanStrategyBinding(DefaultStrategy.TimeAllocationMutator_ReRoute.toString()).toProvider(TimeAllocationMutatorReRoutePlanStrategyFactory.class);
+            addPlanStrategyBinding(DefaultStrategy.TimeAllocationMutator_ReRoute.toString()).toProvider(TimeAllocationMutatorReRoutePlanStrategyProvider.class);
         }
         if (usedStrategyNames.contains(DefaultStrategy.ChangeSingleLegMode.toString())) {
-            addPlanStrategyBinding(DefaultStrategy.ChangeSingleLegMode.toString()).toProvider(ChangeSingleLegModeStrategyFactory.class);
+            addPlanStrategyBinding(DefaultStrategy.ChangeSingleLegMode.toString()).toProvider(ChangeSingleLegModePlanStrategyProvider.class);
         }
         if (usedStrategyNames.contains(DefaultStrategy.ChangeLegMode.toString())) {
-            addPlanStrategyBinding(DefaultStrategy.ChangeLegMode.toString()).toProvider(ChangeLegModeStrategyFactory.class);
+            addPlanStrategyBinding(DefaultStrategy.ChangeLegMode.toString()).toProvider(ChangeLegModePlanStrategyProvider.class);
         }
         if (usedStrategyNames.contains(DefaultStrategy.SubtourModeChoice.toString())) {
-            addPlanStrategyBinding(DefaultStrategy.SubtourModeChoice.toString()).toProvider(SubtourModeChoiceStrategyFactory.class);
+            addPlanStrategyBinding(DefaultStrategy.SubtourModeChoice.toString()).toProvider(SubtourModeChoicePlanStrategyProvider.class);
         }
         if (usedStrategyNames.contains(DefaultStrategy.ChangeTripMode.toString())) {
-            addPlanStrategyBinding(DefaultStrategy.ChangeTripMode.toString()).toProvider(ChangeTripModeStrategyFactory.class);
+            addPlanStrategyBinding(DefaultStrategy.ChangeTripMode.toString()).toProvider(ChangeTripModePlanStrategyProvider.class);
         }
         if (usedStrategyNames.contains(DefaultStrategy.ChangeSingleTripMode.toString())) {
-            addPlanStrategyBinding(DefaultStrategy.ChangeSingleTripMode.toString()).toProvider(ChangeSingleTripModeStrategyFactory.class);
+            addPlanStrategyBinding(DefaultStrategy.ChangeSingleTripMode.toString()).toProvider(ChangeSingleTripModePlanStrategyProvider.class);
         }
         if (usedStrategyNames.contains(DefaultStrategy.TripSubtourModeChoice.toString())) {
-            addPlanStrategyBinding(DefaultStrategy.TripSubtourModeChoice.toString()).toProvider(TripSubtourModeChoiceStrategyFactory.class);
+            addPlanStrategyBinding(DefaultStrategy.TripSubtourModeChoice.toString()).toProvider(TripSubtourModeChoicePlanStrategyProvider.class);
         }
     }
 

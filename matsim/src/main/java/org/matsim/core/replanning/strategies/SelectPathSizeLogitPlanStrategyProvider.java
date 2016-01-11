@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.replanning.modules;
+package org.matsim.core.replanning.strategies;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
@@ -28,7 +28,7 @@ import org.matsim.core.replanning.selectors.PathSizeLogitSelector;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-public class SelectPathSizeLogitStrategyFactory implements Provider<PlanStrategy> {
+public class SelectPathSizeLogitPlanStrategyProvider implements Provider<PlanStrategy> {
 
     @Inject private PlanCalcScoreConfigGroup config;
     @Inject private Network network;

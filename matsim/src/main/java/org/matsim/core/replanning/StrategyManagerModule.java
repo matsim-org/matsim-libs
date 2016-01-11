@@ -34,6 +34,7 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.replanning.modules.ExternalModule;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
+import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 
 import javax.inject.Inject;
 import javax.inject.Provider;

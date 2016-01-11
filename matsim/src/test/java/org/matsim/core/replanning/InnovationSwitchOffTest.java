@@ -41,8 +41,8 @@ import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.modules.TimeAllocationMutator;
+import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.scenario.ScenarioByConfigModule;
-import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.testcases.MatsimTestUtils;
 
 import java.util.Collections;

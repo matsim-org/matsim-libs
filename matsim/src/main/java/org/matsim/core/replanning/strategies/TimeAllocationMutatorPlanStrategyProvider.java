@@ -17,40 +17,32 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.replanning.modules;
+package org.matsim.core.replanning.strategies;
 
-import org.matsim.core.config.groups.ChangeLegModeConfigGroup;
 import org.matsim.core.config.groups.GlobalConfigGroup;
+import org.matsim.core.config.groups.PlansConfigGroup;
+import org.matsim.core.config.groups.TimeAllocationMutatorConfigGroup;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
+import org.matsim.core.replanning.modules.TimeAllocationMutator;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
-import org.matsim.core.router.TripRouter;
-import org.matsim.facilities.ActivityFacilities;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-public class ChangeTripModeStrategyFactory implements Provider<PlanStrategy> {
+public class TimeAllocationMutatorPlanStrategyProvider implements
+		Provider<PlanStrategy> {
 
-	private final GlobalConfigGroup globalConfigGroup;
-	private final ChangeLegModeConfigGroup changeLegModeConfigGroup;
-	private Provider<TripRouter> tripRouterProvider;
-	private ActivityFacilities activityFacilities;
-
-	@Inject
-    protected ChangeTripModeStrategyFactory(GlobalConfigGroup globalConfigGroup, ChangeLegModeConfigGroup changeLegModeConfigGroup, ActivityFacilities activityFacilities, Provider<TripRouter> tripRouterProvider) {
-		this.globalConfigGroup = globalConfigGroup;
-		this.changeLegModeConfigGroup = changeLegModeConfigGroup;
-		this.activityFacilities = activityFacilities;
-		this.tripRouterProvider = tripRouterProvider;
-	}
+	@Inject private GlobalConfigGroup globalConfigGroup;
+	@Inject private TimeAllocationMutatorConfigGroup timeAllocationMutatorConfigGroup;
+	@Inject private PlansConfigGroup plansConfigGroup;
+	@Inject private Provider<org.matsim.core.router.TripRouter> tripRouterProvider;
 
     @Override
 	public PlanStrategy get() {
 		PlanStrategyImpl strategy = new PlanStrategyImpl(new RandomPlanSelector());
-		strategy.addStrategyModule(new TripsToLegsModule(tripRouterProvider, globalConfigGroup));
-		strategy.addStrategyModule(new ChangeLegMode(globalConfigGroup, changeLegModeConfigGroup));
-		strategy.addStrategyModule(new ReRoute(activityFacilities, tripRouterProvider, globalConfigGroup));
+		TimeAllocationMutator tam = new TimeAllocationMutator(tripRouterProvider, plansConfigGroup, timeAllocationMutatorConfigGroup, globalConfigGroup);
+		strategy.addStrategyModule(tam);
 		return strategy;
 	}
 

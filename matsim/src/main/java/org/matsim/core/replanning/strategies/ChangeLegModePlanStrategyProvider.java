@@ -17,13 +17,15 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.replanning.modules;
+package org.matsim.core.replanning.strategies;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ChangeLegModeConfigGroup;
 import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
+import org.matsim.core.replanning.modules.ChangeLegMode;
+import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.TripRouter;
 import org.matsim.facilities.ActivityFacilities;
@@ -31,7 +33,7 @@ import org.matsim.facilities.ActivityFacilities;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-public class ChangeLegModeStrategyFactory implements Provider<PlanStrategy> {
+public class ChangeLegModePlanStrategyProvider implements Provider<PlanStrategy> {
 
 	private final GlobalConfigGroup globalConfigGroup;
 	private final ChangeLegModeConfigGroup changeLegModeConfigGroup;
@@ -39,7 +41,7 @@ public class ChangeLegModeStrategyFactory implements Provider<PlanStrategy> {
 	private ActivityFacilities activityFacilities;
 
 	@Inject
-    ChangeLegModeStrategyFactory(GlobalConfigGroup globalConfigGroup, ChangeLegModeConfigGroup changeLegModeConfigGroup, ActivityFacilities activityFacilities, Provider<TripRouter> tripRouterProvider) {
+	ChangeLegModePlanStrategyProvider(GlobalConfigGroup globalConfigGroup, ChangeLegModeConfigGroup changeLegModeConfigGroup, ActivityFacilities activityFacilities, Provider<TripRouter> tripRouterProvider) {
 		this.globalConfigGroup = globalConfigGroup;
 		this.changeLegModeConfigGroup = changeLegModeConfigGroup;
 		this.activityFacilities = activityFacilities;

@@ -28,9 +28,9 @@ import org.matsim.core.api.internal.MatsimParameters;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.replanning.DefaultPlanStrategiesModule.DefaultPlansRemover;
-import org.matsim.core.replanning.DefaultPlanStrategiesModule.DefaultSelector;
-import org.matsim.core.replanning.DefaultPlanStrategiesModule.DefaultStrategy;
+import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultPlansRemover;
+import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultSelector;
+import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultStrategy;
 
 /**
  * Configuration group for specifying the plans-replanning to be used.
