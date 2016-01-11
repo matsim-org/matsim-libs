@@ -13,13 +13,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @author gthunig
+ * @author gthunig, dziemke
  * 
  * This class searches for company data on the bundesanzeiger-verlag.de website and writes them into an output file.
  */
-public class CompanyDataRequester {
+public class CompanyDataRetriever {
 
-    private static final Logger log = Logger.getLogger(CompanyDataRequester.class);
+    private static final Logger log = Logger.getLogger(CompanyDataRetriever.class);
 
     private static final String WEBSITE_URL = "http://www.bundesanzeiger-verlag.de";
     private static final String COMPANY_URL = "/betrifft-unternehmen/unternehmensdaten/deutsche-unternehmensdaten/" +
@@ -32,13 +32,25 @@ public class CompanyDataRequester {
             "_pi1%5Bvalue%5D=1&tx_s4afreekmu_pi1%5Border%5D=name&tx_s4afreekmu_pi1%5Bdirection%5D=asc&tx_s4af" +
             "reekmu_pi1%5Blimit%5D=10&tx_s4afreekmu_pi1%5Bpage%5D=";
 
-    // Set the webPageIndex to "1" if starting on the first webpage to be requested OR
-    // to a value (n * numberOfWebpagesPerFile) + 1) for following companyData files
-    private static int webPageIndex = 5001; 
-    private static int numberOfWebpagesPerFile = 5;
+    /*
+     * Set the webPageIndex to "1" if starting on the first webpage to be requested OR
+     * to a value (n * numberOfWebpagesPerFile) + 1) for subsequent files. The reason for
+     * having the latter is mainly that the readout may get interrupted due to internet
+     * connectivity problems.
+     */
+    private static int webPageIndex = 13001;
+    
+    /* States how many webpages (each containing 10 companies) are requested until a
+     * file is written.
+     */
+    private static int numberOfWebpagesPerFile = 1000;
+    
     private static String outputDirectory = "../../../../Workspace/data/accessibility/berlin/companyData/";
     
     public static void main(String[] args) {
+    	if (webPageIndex < 1) {
+    		throw new RuntimeException("webPageIndex may only be a natural number (except zero).");
+    	}
     	if (webPageIndex != 1 && (webPageIndex - 1) % numberOfWebpagesPerFile != 0) {
     		throw new RuntimeException("For consecutive files (i.e. files that do not start with "
     				+ "the first webpage, the numberOfWebpagesPerFile should be a divisor of webPageIndex "
