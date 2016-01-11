@@ -41,7 +41,5 @@ same as the name of the `*.proto` file.  The package is given inside the `*.prot
 matsim scenario into the network part of the proto scenario.  That scenario is public, thus it can be used from the outside; 
 it seems to be used in `BlockingVisServiceImpl`.
 
-`update_from_local_build.sh` is just there for Gregor to maintain the pieces.  Those pieces are commited into the MATSim 
-repository, so they are there when you try to use this.
 
 
