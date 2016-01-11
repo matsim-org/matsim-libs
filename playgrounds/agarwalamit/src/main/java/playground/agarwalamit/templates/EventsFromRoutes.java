@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.utils.templates;
+package playground.agarwalamit.templates;
 
 import java.util.HashMap;
 import java.util.Map;
