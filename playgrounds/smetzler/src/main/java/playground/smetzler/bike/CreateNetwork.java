@@ -31,6 +31,7 @@ public class CreateNetwork {
 				TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, DHDN);
 
 
+		//wie kann ich die bike-Interfaces einbringen??
 		OsmNetworkReader onr = new OsmNetworkReader(net, ct);
 		onr.parse(inputOSM); 
 		
