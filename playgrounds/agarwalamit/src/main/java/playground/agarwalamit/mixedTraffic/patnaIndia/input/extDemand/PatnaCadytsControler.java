@@ -77,7 +77,8 @@ public class PatnaCadytsControler {
 			plansFile = "../../../../repos/runs-svn/patnaIndia/run108/input/cordonOutput_plans_10pct_selected.xml.gz";
 			
 			SelectedPlansFilter spf = new SelectedPlansFilter();
-			spf.run(inPlans, plansFile);
+			spf.run(inPlans);
+			spf.writePlans(plansFile);
 			
 			outputDir = "../../../../repos/runs-svn/patnaIndia/run108/outerCordonOutput_10pct_ctd/";
 			patnaVehicles = "../../../../repos/runs-svn/patnaIndia/run108/input/patnaVehicles_outerCordon_ctd.xml.gz";
