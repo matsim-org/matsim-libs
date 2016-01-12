@@ -52,14 +52,15 @@ public class PatnaVehiclesGenerator {
 	
 	public void createVehicles (final Collection <String> modes) {
 
-		vehicles = VehicleUtils.createVehiclesContainer();
+ 		vehicles = VehicleUtils.createVehiclesContainer();
 
 		Map<String, VehicleType> modesType = new HashMap<String, VehicleType>();
 		
 		for (String vehicleType : modes) {
 			VehicleType veh = VehicleUtils.getFactory().createVehicleType(Id.create(vehicleType,VehicleType.class));
-			veh.setMaximumVelocity( MixedTrafficVehiclesUtils.getSpeed(vehicleType) );
-			veh.setPcuEquivalents( MixedTrafficVehiclesUtils.getPCU(vehicleType) );
+			veh.setMaximumVelocity( MixedTrafficVehiclesUtils.getSpeed( vehicleType.split("_")[0] ) );// this should not harm other use cases.
+			veh.setPcuEquivalents( MixedTrafficVehiclesUtils.getPCU( vehicleType.split("_")[0] ) );
+			
 			modesType.put(vehicleType, veh);
 			vehicles.addVehicleType(veh);
 		}
