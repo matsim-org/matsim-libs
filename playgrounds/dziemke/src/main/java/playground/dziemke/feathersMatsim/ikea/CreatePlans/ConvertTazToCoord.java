@@ -13,76 +13,76 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
 public class ConvertTazToCoord {
 
-// path of nodeCoord2zone_mapping
-private String dataFile ="./input/nodeCoord2zone_mappingRectifiedTAZ.csv";
+	// path of nodeCoord2zone_mapping
+	private String dataFile ="./input/nodeCoord2zone_mappingRectifiedTAZ.csv";
 
-//Coordinates expected to be in 'WGS84' as Hasselt used this coordinate system for their network creation aswell. (-> CreateNetwork.java)
-private CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84,  "EPSG:32631");
+	//Coordinates expected to be in 'WGS84' as Hasselt used this coordinate system for their network creation aswell. (-> CreateNetwork.java)
+	private CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84,  "EPSG:32631");
 
-private HashMap<Integer,List<Coord>>CoordMap = new HashMap<Integer, List<Coord>>(4000);
+	private HashMap<Integer,List<Coord>>CoordMap = new HashMap<Integer, List<Coord>>(4000);
 
-// set indices
-private int index_tazId = 0;
-private int index_x = 1;
-private int index_y = 2;
- 
-private Random random = new Random();
+	// set indices
+	private int index_tazId = 0;
+	private int index_x = 1;
+	private int index_y = 2;
 
-public void convertCoordinates() throws IOException{
+	private Random random = new Random();
 
-// load data-file
-BufferedReader bufferedReader = new BufferedReader(new FileReader(this.dataFile));
+	public void convertCoordinates() throws IOException{
 
-// skip header
-	String line = bufferedReader.readLine();
-// read file
-	while((line=bufferedReader.readLine()) != null){
-		String parts[] = line.split(";");
+		// load data-file
+		BufferedReader bufferedReader = new BufferedReader(new FileReader(this.dataFile));
 
-// read Coordinates
-		Coord CoordReadFromFile = new Coord(
-				Double.parseDouble(parts[index_x]),
-				Double.parseDouble(parts[index_y]));
-	// Transform Coordinates
-		CoordReadFromFile=ct.transform(CoordReadFromFile);
-	// declare TazID as key for HashMap
-		int key=Integer.parseInt(parts[index_tazId].trim());
+		// skip header
+		String line = bufferedReader.readLine();
+		// read file
+		while((line=bufferedReader.readLine()) != null){
+			String parts[] = line.split(";");
 
-		// populate CoordMap
-		if(CoordMap.containsKey(key)){
-			List<Coord> CoordsInTaz = CoordMap.get(key);
-			CoordsInTaz.add(CoordReadFromFile);
-			CoordMap.put(key, CoordsInTaz);
-		}
-		else{
-			List<Coord> CoordsInTaz = new ArrayList<Coord>();
-			CoordsInTaz.add(CoordReadFromFile);
-			CoordMap.put(key, CoordsInTaz);
+			// read Coordinates
+			Coord CoordReadFromFile = new Coord(
+					Double.parseDouble(parts[index_x]),
+					Double.parseDouble(parts[index_y]));
+			// Transform Coordinates
+			CoordReadFromFile=ct.transform(CoordReadFromFile);
+			// declare TazID as key for HashMap
+			int key=Integer.parseInt(parts[index_tazId].trim());
+
+			// populate CoordMap
+			if(CoordMap.containsKey(key)){
+				List<Coord> CoordsInTaz = CoordMap.get(key);
+				CoordsInTaz.add(CoordReadFromFile);
+				CoordMap.put(key, CoordsInTaz);
+			}
+			else{
+				List<Coord> CoordsInTaz = new ArrayList<Coord>();
+				CoordsInTaz.add(CoordReadFromFile);
+				CoordMap.put(key, CoordsInTaz);
+			}
 		}
 	}
-}
 
-public Coord randomCoordinates(int tazId){
-	//apparently no nodes in TAZ 1841. subzone 1841 seems to mainly consist of docks from the harbor of Antwerpen. The TAZ is substituted by neighbouring TAZ 1845
-	if(tazId==1841){tazId=1845;}
-//the same goes for subzone 1821 et cet.
-	if(tazId==1821){tazId=1820;}
-	if(tazId==1819){tazId=1820;}
-	if(tazId==1817){tazId=1820;}
-	if(tazId==1836){tazId=1837;}
-	if(tazId==1528){tazId=1526;}
-	List<Coord> CoordListForTazId = CoordMap.get(tazId);
-	Coord SelectedCoordinates = CoordListForTazId.get((random.nextInt(CoordListForTazId.size())));
-	return SelectedCoordinates;
-}
-
-public Boolean homeInIkeaTAZ(Coord coord){
-	Boolean isResident=false;
-	if(CoordMap.get(1954).contains(coord)){
-		System.out.println("Agent is a resident. Slagboom opens.");
-		isResident=true;
+	public Coord randomCoordinates(int tazId){
+		//apparently no nodes in TAZ 1841. subzone 1841 seems to mainly consist of docks from the harbor of Antwerpen. The TAZ is substituted by neighbouring TAZ 1845
+		if(tazId==1841){tazId=1845;}
+		//the same goes for subzone 1821 et cet.
+		if(tazId==1821){tazId=1820;}
+		if(tazId==1819){tazId=1820;}
+		if(tazId==1817){tazId=1820;}
+		if(tazId==1836){tazId=1837;}
+		if(tazId==1528){tazId=1526;}
+		List<Coord> CoordListForTazId = CoordMap.get(tazId);
+		Coord SelectedCoordinates = CoordListForTazId.get((random.nextInt(CoordListForTazId.size())));
+		return SelectedCoordinates;
 	}
-	return isResident;
-}
+
+	public Boolean homeInIkeaTAZ(Coord coord){
+		Boolean isResident=false;
+		if(CoordMap.get(1954).contains(coord)){
+			System.out.println("Agent is a resident. Slagboom opens.");
+			isResident=true;
+		}
+		return isResident;
+	}
 
 }

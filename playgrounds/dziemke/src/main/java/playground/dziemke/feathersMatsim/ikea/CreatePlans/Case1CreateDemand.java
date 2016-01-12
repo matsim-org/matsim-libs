@@ -15,185 +15,183 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.core.utils.geometry.CoordinateTransformation;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
 public class Case1CreateDemand {
-	
-private double beelineFactor=1.3;
-	
-private Scenario scenario;
-private String dataFile;
 
-private	ConvertTazToCoord coordTazManager = new ConvertTazToCoord();
+	private double beelineFactor=1.3;
 
-//IKEA Coordinates
-private Double xIKEA = 662741.5;
-private Double yIKEA = 5643343.5366;
+	private Scenario scenario;
+	private String dataFile;
 
-private Random random = new Random();
-private ObjectAttributes homeLocations = new ObjectAttributes();
+	private	ConvertTazToCoord coordTazManager = new ConvertTazToCoord();
 
-private String[] activityTypeStrings = {"home","work","n.a.","brinGet","dailyShopping","nonDailyShopping","services","socialVisit","leisure","touring","other"} ;
-private String[] modeStrings = {"n.a.","car","n.a.","slow","pt","n.a.","ride"};
+	//IKEA Coordinates
+	private Double xIKEA = 662741.5;
+	private Double yIKEA = 5643343.5366;
 
-public void run(Scenario scenario, ObjectAttributes homeLocations, String dataFile){
-	this.scenario = scenario;
-	this.homeLocations = homeLocations;
-	this.dataFile=dataFile;
-	this.createPlans();
-}
+	private Random random = new Random();
+	private ObjectAttributes homeLocations = new ObjectAttributes();
 
-private void createPlans() {
-Population population = this.scenario.getPopulation();
-PopulationFactory populationFactory = population.getFactory();
+	private String[] activityTypeStrings = {"home","work","n.a.","brinGet","dailyShopping","nonDailyShopping","services","socialVisit","leisure","touring","other"} ;
+	private String[] modeStrings = {"n.a.","car","n.a.","slow","pt","n.a.","ride"};
 
-try{
-	coordTazManager.convertCoordinates();
-	// load data-file
-BufferedReader bufferedReader = new BufferedReader(new FileReader(this.dataFile));
-// skip header
-String line = bufferedReader.readLine();
+	public void run(Scenario scenario, ObjectAttributes homeLocations, String dataFile){
+		this.scenario = scenario;
+		this.homeLocations = homeLocations;
+		this.dataFile=dataFile;
+		this.createPlans();
+	}
 
-int originTAZ=0;
+	private void createPlans() {
+		Population population = this.scenario.getPopulation();
+		PopulationFactory populationFactory = population.getFactory();
 
-// set indices
-int index_personId = 7;
-int index_activityId = 12;
-int index_activityType = 14;
-int index_homeLocation=1;
-int index_activityLocation=17;
-int index_beginningTime = 15;
-int index_activityDuration = 16;
-int index_journeyDuration = 18;
-int index_mode=19;
-int index_journeyDistance=20;
+		try{
+			coordTazManager.convertCoordinates();
+			// load data-file
+			BufferedReader bufferedReader = new BufferedReader(new FileReader(this.dataFile));
+			// skip header
+			String line = bufferedReader.readLine();
 
-Id previousPerson = null;
-double departureTimeBuffer = 0.0;
-Coord coordOrigin=new Coord(0,0);
+			int originTAZ=0;
 
- while((line=bufferedReader.readLine()) != null){
-		String parts[] = line.split(";");
+			// set indices
+			int index_personId = 7;
+			int index_activityId = 12;
+			int index_activityType = 14;
+			int index_homeLocation=1;
+			int index_activityLocation=17;
+			int index_beginningTime = 15;
+			int index_activityDuration = 16;
+			int index_journeyDuration = 18;
+			int index_mode=19;
+			int index_journeyDistance=20;
 
-		Id personId=Id.createPersonId(parts[index_personId]);
-		Person person = population.getPersons().get(personId);
-	
-		// check if person exists in population
-		if(!population.getPersons().containsKey(personId)){
-			continue;
-		}
-			
-		Plan plan = person.getSelectedPlan();
+			Id previousPerson = null;
+			double departureTimeBuffer = 0.0;
+			Coord coordOrigin=new Coord(0,0);
 
-		// activity start time in [s]:
+			while((line=bufferedReader.readLine()) != null){
+				String parts[] = line.split(";");
+
+				Id personId=Id.createPersonId(parts[index_personId]);
+				Person person = population.getPersons().get(personId);
+
+				// check if person exists in population
+				if(!population.getPersons().containsKey(personId)){
+					continue;
+				}
+
+				Plan plan = person.getSelectedPlan();
+
+				// activity start time in [s]:
 				double activityStartTime = (((Integer.parseInt(parts[index_beginningTime]))/100)*60
-										+Integer.parseInt(parts[index_beginningTime])%100)
-										*60;
-		// activity duration in [s]:
+						+Integer.parseInt(parts[index_beginningTime])%100)
+						*60;
+				// activity duration in [s]:
 				double activityDuration = (Double.parseDouble(parts[index_activityDuration]))*60;
 
-		// journey duration in [s]:
+				// journey duration in [s]:
 				double journeyDuration = (Double.parseDouble(parts[index_journeyDuration]))*60;
 
-			//Add first activity
-if(!personId.equals(previousPerson)){
-				// Check if activity is a home-activity -> home Coord
-	if (parts[index_activityType].equals("0")){
-		coordOrigin = (Coord) homeLocations.getAttribute(String.valueOf(personId),"home");
-		originTAZ=Integer.parseInt(parts[index_homeLocation]);
-		Activity activity = populationFactory.createActivityFromCoord("home", coordOrigin);
-		activity.setEndTime(activityStartTime+activityDuration);
-		plan.addActivity(activity);
-	}
+				//Add first activity
+				if(!personId.equals(previousPerson)){
+					// Check if activity is a home-activity -> home Coord
+					if (parts[index_activityType].equals("0")){
+						coordOrigin = (Coord) homeLocations.getAttribute(String.valueOf(personId),"home");
+						originTAZ=Integer.parseInt(parts[index_homeLocation]);
+						Activity activity = populationFactory.createActivityFromCoord("home", coordOrigin);
+						activity.setEndTime(activityStartTime+activityDuration);
+						plan.addActivity(activity);
+					}
 
-	// else -> add activity with random Coord
-	else {
-		coordOrigin = coordTazManager.randomCoordinates(Integer.parseInt(parts[index_activityLocation]));
-		Activity activity = populationFactory.createActivityFromCoord(activityTypeStrings[Integer.parseInt(parts[index_activityType])], coordOrigin);
-		activity.setEndTime(activityStartTime+activityDuration);
-		plan.addActivity(activity);
-	}
-departureTimeBuffer=activityStartTime+activityDuration;
-}
-
-//Add a leg to next activity
-	else {
-		Coord coordDestination;
-		String mode = parts[index_mode];
-		Leg leg = populationFactory.createLeg(modeStrings[Integer.parseInt(mode)]);
-		leg.setDepartureTime(departureTimeBuffer);
-		leg.setTravelTime(journeyDuration);
-		plan.addLeg(leg);
-
-		//Add (random or home) destination Coord
-		if (parts[index_activityType].equals("0")){
-			coordDestination = (Coord) homeLocations.getAttribute(String.valueOf(personId),"home");}
-		
-		else if(parts[index_activityLocation].equals("1955")&&parts[index_activityType].equals("4")&&parts[index_mode].equals("1"))
-
-		{coordDestination = new Coord(xIKEA,yIKEA);}
-		
-		
-		else{
-			coordDestination = coordTazManager.randomCoordinates(Integer.parseInt(parts[index_activityLocation]));
-
-			double distance=Math.sqrt(
-					Math.pow(coordDestination.getX()-coordOrigin.getX(),2)
-					+Math.pow(coordDestination.getY()-coordOrigin.getY(), 2)
-					);
-
-			
-			// Set allowed margin depending on travel mode and route distance
-			double margin=999999;
-			// Slow mode (bike or walking): route distance close to beeline
-			if(Integer.parseInt(parts[index_mode])==3){margin=3000;}
-			//car or Passenger
-			if(Integer.parseInt(parts[index_mode])==1||Integer.parseInt(parts[index_mode])==6){
-				// set margin to 20% of travel distance with a min of 25000
-				distance=distance*beelineFactor;
-				margin=0.2*Double.parseDouble(parts[index_journeyDistance])*1000;
-				if(margin<25000){margin=25000;}
+					// else -> add activity with random Coord
+					else {
+						coordOrigin = coordTazManager.randomCoordinates(Integer.parseInt(parts[index_activityLocation]));
+						Activity activity = populationFactory.createActivityFromCoord(activityTypeStrings[Integer.parseInt(parts[index_activityType])], coordOrigin);
+						activity.setEndTime(activityStartTime+activityDuration);
+						plan.addActivity(activity);
+					}
+					departureTimeBuffer=activityStartTime+activityDuration;
 				}
-			
-			double diff=Math.abs(distance-((Double.parseDouble(parts[index_journeyDistance])*1000)));
 
-			System.out.println("Agent: "+personId+" Activity ID: "+Integer.parseInt(parts[index_activityId])+" Distance: "+diff+" TAZ: "+parts[index_activityLocation]);
+				//Add a leg to next activity
+				else {
+					Coord coordDestination;
+					String mode = parts[index_mode];
+					Leg leg = populationFactory.createLeg(modeStrings[Integer.parseInt(mode)]);
+					leg.setDepartureTime(departureTimeBuffer);
+					leg.setTravelTime(journeyDuration);
+					plan.addLeg(leg);
 
-			
-			while (diff>=margin
-					){
-				coordDestination = coordTazManager.randomCoordinates(Integer.parseInt(parts[index_activityLocation]));
-				distance=Math.sqrt(
-						Math.pow(coordDestination.getX()-coordOrigin.getX(),2)
-						+Math.pow(coordDestination.getY()-coordOrigin.getY(), 2)
-						);
-				
-				if(Integer.parseInt(parts[index_mode])==1||Integer.parseInt(parts[index_mode])==6){
-				distance=distance*beelineFactor;
-				}	
-				
-				diff=Math.abs(distance-((Double.parseDouble(parts[index_journeyDistance])*1000)));	
-				System.out.println("Agent: "+personId+" Activity ID: "+Integer.parseInt(parts[index_activityId])+" Travel Mode: "+parts[index_mode]+" Distance: "+distance+" difference: "+diff+" allowed margin: "+margin+" Journey_distance: "+Double.parseDouble(parts[index_journeyDistance])+" TAZ: "+Integer.parseInt(parts[index_activityLocation])+" OriginTAZ: "+originTAZ+" CoordOrigin: "+coordOrigin+" CoordDestination: "+coordDestination);
+					//Add (random or home) destination Coord
+					if (parts[index_activityType].equals("0")){
+						coordDestination = (Coord) homeLocations.getAttribute(String.valueOf(personId),"home");}
+
+					else if(parts[index_activityLocation].equals("1955")&&parts[index_activityType].equals("4")&&parts[index_mode].equals("1"))
+
+					{coordDestination = new Coord(xIKEA,yIKEA);}
+
+
+					else{
+						coordDestination = coordTazManager.randomCoordinates(Integer.parseInt(parts[index_activityLocation]));
+
+						double distance=Math.sqrt(
+								Math.pow(coordDestination.getX()-coordOrigin.getX(),2)
+								+Math.pow(coordDestination.getY()-coordOrigin.getY(), 2)
+								);
+
+
+						// Set allowed margin depending on travel mode and route distance
+						double margin=999999;
+						// Slow mode (bike or walking): route distance close to beeline
+						if(Integer.parseInt(parts[index_mode])==3){margin=3000;}
+						//car or Passenger
+						if(Integer.parseInt(parts[index_mode])==1||Integer.parseInt(parts[index_mode])==6){
+							// set margin to 20% of travel distance with a min of 25000
+							distance=distance*beelineFactor;
+							margin=0.2*Double.parseDouble(parts[index_journeyDistance])*1000;
+							if(margin<25000){margin=25000;}
+						}
+
+						double diff=Math.abs(distance-((Double.parseDouble(parts[index_journeyDistance])*1000)));
+
+						System.out.println("Agent: "+personId+" Activity ID: "+Integer.parseInt(parts[index_activityId])+" Distance: "+diff+" TAZ: "+parts[index_activityLocation]);
+
+
+						while (diff>=margin
+								){
+							coordDestination = coordTazManager.randomCoordinates(Integer.parseInt(parts[index_activityLocation]));
+							distance=Math.sqrt(
+									Math.pow(coordDestination.getX()-coordOrigin.getX(),2)
+									+Math.pow(coordDestination.getY()-coordOrigin.getY(), 2)
+									);
+
+							if(Integer.parseInt(parts[index_mode])==1||Integer.parseInt(parts[index_mode])==6){
+								distance=distance*beelineFactor;
+							}	
+
+							diff=Math.abs(distance-((Double.parseDouble(parts[index_journeyDistance])*1000)));	
+							System.out.println("Agent: "+personId+" Activity ID: "+Integer.parseInt(parts[index_activityId])+" Travel Mode: "+parts[index_mode]+" Distance: "+distance+" difference: "+diff+" allowed margin: "+margin+" Journey_distance: "+Double.parseDouble(parts[index_journeyDistance])+" TAZ: "+Integer.parseInt(parts[index_activityLocation])+" OriginTAZ: "+originTAZ+" CoordOrigin: "+coordOrigin+" CoordDestination: "+coordDestination);
+						}
+
+					}
+					// Add activity
+					Activity activity = populationFactory.createActivityFromCoord(activityTypeStrings[Integer.parseInt(parts[index_activityType])], coordDestination);
+					activity.setEndTime(activityStartTime+activityDuration);
+					plan.addActivity(activity);
+					departureTimeBuffer=activityStartTime+activityDuration;
+					coordOrigin=coordDestination;
+					originTAZ=Integer.parseInt(parts[index_activityLocation]);
+				}
+				previousPerson = personId;
 			}
-			
-		}
-		// Add activity
-		Activity activity = populationFactory.createActivityFromCoord(activityTypeStrings[Integer.parseInt(parts[index_activityType])], coordDestination);
-		activity.setEndTime(activityStartTime+activityDuration);
-		plan.addActivity(activity);
-		departureTimeBuffer=activityStartTime+activityDuration;
-		coordOrigin=coordDestination;
-		originTAZ=Integer.parseInt(parts[index_activityLocation]);
-	}
-previousPerson = personId;
-	}
-	bufferedReader.close();
+			bufferedReader.close();
 
-} // end try
-catch (IOException e) {
-	e.printStackTrace();
-}
-}
+		} // end try
+		catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 }
