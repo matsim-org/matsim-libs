@@ -18,6 +18,7 @@
  * *********************************************************************** */
 package playground.agarwalamit.mixedTraffic.patnaIndia.input;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,7 +33,6 @@ import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
 
 import playground.agarwalamit.mixedTraffic.MixedTrafficVehiclesUtils;
-import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
 import playground.agarwalamit.utils.LoadMyScenarios;
 
 /**
@@ -50,13 +50,13 @@ public class PatnaVehiclesGenerator {
 		this.scenario = LoadMyScenarios.loadScenarioFromPlans(plansFile);
 	}
 	
-	public void createVehicles () {
+	public void createVehicles (final Collection <String> modes) {
 
 		vehicles = VehicleUtils.createVehiclesContainer();
 
 		Map<String, VehicleType> modesType = new HashMap<String, VehicleType>();
 		
-		for (String vehicleType :PatnaUtils.ALL_MODES) {
+		for (String vehicleType : modes) {
 			VehicleType veh = VehicleUtils.getFactory().createVehicleType(Id.create(vehicleType,VehicleType.class));
 			veh.setMaximumVelocity( MixedTrafficVehiclesUtils.getSpeed(vehicleType) );
 			veh.setPcuEquivalents( MixedTrafficVehiclesUtils.getPCU(vehicleType) );

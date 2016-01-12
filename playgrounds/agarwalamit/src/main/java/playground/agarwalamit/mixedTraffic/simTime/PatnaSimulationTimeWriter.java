@@ -22,6 +22,7 @@ import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -40,6 +41,7 @@ import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisut
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 
+import playground.agarwalamit.mixedTraffic.patnaIndia.evac.EvacPatnaControler;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
 import playground.agarwalamit.utils.plans.BackwardCompatibilityForOldPlansType;
 
@@ -133,7 +135,8 @@ public class PatnaSimulationTimeWriter {
 		config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.fromVehiclesData);
 		Scenario sc = ScenarioUtils.loadScenario(config);
 
-		PatnaUtils.createAndAddVehiclesToScenario(sc);
+		Logger.getLogger(PatnaSimulationTimeWriter.class).error("Check the modes in the following call first. jan 16");
+//		PatnaUtils.createAndAddVehiclesToScenario(sc);
 
 		final Controler controler = new Controler(sc);
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);

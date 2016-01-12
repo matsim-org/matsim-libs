@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.mixedTraffic.patnaIndia;
+package playground.agarwalamit.mixedTraffic.patnaIndia.input.urban;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup.VehiclesSource;
@@ -26,7 +26,7 @@ import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
 import org.matsim.vehicles.VehicleWriterV1;
 
-import playground.agarwalamit.mixedTraffic.patnaIndia.input.PatnaConfigGenerator;
+import playground.agarwalamit.mixedTraffic.patnaIndia.FreeSpeedTravelTimeForBike;
 import playground.agarwalamit.mixedTraffic.patnaIndia.input.PatnaVehiclesGenerator;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
 import playground.agarwalamit.utils.plans.BackwardCompatibilityForOldPlansType;
@@ -35,13 +35,13 @@ import playground.agarwalamit.utils.plans.BackwardCompatibilityForOldPlansType;
  * @author amit
  */
 
-public class PatnaControler {
+public class PatnaUrbanControler {
 
 	private static final String INPUT_FILE_DIR = "../../../../repos/runs-svn/patnaIndia/run108/input/";
 	private static final String OUTPUT_DIR = "../../../../repos/runs-svn/patnaIndia/run108/output/t3/";
 
 	public static void main(String[] args) {
-		PatnaConfigGenerator configGenerator = new PatnaConfigGenerator();
+		PatnaUrbanConfigGenerator configGenerator = new PatnaUrbanConfigGenerator();
 		configGenerator.createBasicConfigSettings();
 		Config config = configGenerator.getPatnaConfig();
 
@@ -55,7 +55,7 @@ public class PatnaControler {
 		config.qsim().setVehiclesSource(VehiclesSource.fromVehiclesData);
 
 		PatnaVehiclesGenerator pvg = new PatnaVehiclesGenerator(plansFile);
-		pvg.createVehicles();
+		pvg.createVehicles(PatnaUtils.URBAN_MAIN_MODES);
 		String patnaVehicles = INPUT_FILE_DIR+"/patnaVehicles.xml.gz";
 		new VehicleWriterV1(pvg.getPatnaVehicles()).writeFile(patnaVehicles);
 

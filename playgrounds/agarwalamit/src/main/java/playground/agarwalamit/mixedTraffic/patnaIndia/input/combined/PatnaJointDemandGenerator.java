@@ -18,15 +18,22 @@
  * *********************************************************************** */
 package playground.agarwalamit.mixedTraffic.patnaIndia.input.combined;
 
+import java.util.List;
+
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.agarwalamit.mixedTraffic.patnaIndia.input.urban.PatnaUrbanDemandGenerator;
-import playground.agarwalamit.utils.plans.SelectedPlansFilter;
+import playground.agarwalamit.utils.LoadMyScenarios;
 
 /**
  * Combines the Cadyts calibrated commuters and through traffic with urban demand.
@@ -68,9 +75,30 @@ public class PatnaJointDemandGenerator {
 		return pudg.getPopulation();
 	}
 	
-	private Population getExternalPlans(){
-		SelectedPlansFilter spf = new SelectedPlansFilter();
-		spf.run(EXT_PLANS);
-		return spf.getPopulation();
+	private Population getExternalPlans(){ // take only selected plans, add 'ext' suffix to leg mode so that mode choice is enabled for sub population.
+		Population popIn = LoadMyScenarios.loadScenarioFromPlans(EXT_PLANS).getPopulation();
+		
+		Scenario scOut = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Population popOut = scOut.getPopulation();
+		PopulationFactory pf = popOut.getFactory();
+		
+		for(Person p : popIn.getPersons().values() ){
+			Plan plan = p.getSelectedPlan();
+			Person pOut = pf.createPerson(p.getId());
+			Plan planOut = pf.createPlan();
+			pOut.addPlan(planOut);
+			
+			List<PlanElement> pes = plan.getPlanElements();
+			for(PlanElement pe : pes){
+				if(pe instanceof Leg) {
+					String mode = ((Leg) pe).getMode();
+					planOut.addLeg(pf.createLeg(mode.concat("_ext")));
+				} else {
+					planOut.addActivity((Activity)pe);
+				}
+			}
+			popOut.addPerson(pOut);
+		}
+		return popOut;
 	}
 }

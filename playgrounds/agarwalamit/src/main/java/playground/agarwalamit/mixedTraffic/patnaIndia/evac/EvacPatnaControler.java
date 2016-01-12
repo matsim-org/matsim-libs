@@ -81,8 +81,9 @@ public class EvacPatnaControler {
 		Scenario sc = ScenarioUtils.loadScenario(config); 
 
 		sc.getConfig().qsim().setVehiclesSource(VehiclesSource.fromVehiclesData);
-
-		PatnaUtils.createAndAddVehiclesToScenario(sc);
+		
+		Logger.getLogger(EvacPatnaControler.class).error("Check the modes in the following call first. jan 16");
+//		PatnaUtils.createAndAddVehiclesToScenario(sc);
 
 		final Controler controler = new Controler(sc);
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);

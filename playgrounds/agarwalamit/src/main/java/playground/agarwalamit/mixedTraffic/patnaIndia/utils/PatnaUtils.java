@@ -53,8 +53,12 @@ public final class PatnaUtils {
 	}
 	
 	public static final Collection <String> URBAN_MAIN_MODES = Arrays.asList("car","motorbike","bike");
-	public static final Collection <String> ALL_MAIN_MODES = Arrays.asList("car","motorbike","bike","truck");
-	public static final Collection <String> ALL_MODES = Arrays.asList("car","motorbike","truck","bike","pt","walk");
+	public static final Collection <String> URBAN_ALL_MODES = Arrays.asList("car","motorbike","bike","pt","walk");
+	
+	public static final Collection <String> EXT_MAIN_MODES = Arrays.asList("car","motorbike","bike","truck");
+	
+	public static final Collection <String> ALL_MAIN_MODES = Arrays.asList("car","motorbike","bike","truck_ext","car_ext","motorbike_ext","bike_ext");
+	public static final Collection <String> ALL_MODES = Arrays.asList("car_ext","motorbike_ext","truck_ext","bike_ext","pt","walk","car","motorbike","bike");
 
 	private PatnaUtils(){} 
 
@@ -62,10 +66,10 @@ public final class PatnaUtils {
 	 * @param scenario
 	 * It creates first vehicle types and add them to scenario and then create and add vehicles to the scenario.
 	 */
-	public static void createAndAddVehiclesToScenario(final Scenario scenario){
+	public static void createAndAddVehiclesToScenario(final Scenario scenario, final Collection <String> modes){
 		final Map<String, VehicleType> modesType = new HashMap<String, VehicleType>(); 
 
-		for (String mode : PatnaUtils.ALL_MODES){
+		for (String mode : modes){
 			VehicleType vehicle = VehicleUtils.getFactory().createVehicleType(Id.create(mode,VehicleType.class));
 			vehicle.setMaximumVelocity(MixedTrafficVehiclesUtils.getSpeed(mode));
 			vehicle.setPcuEquivalents( MixedTrafficVehiclesUtils.getPCU(mode) );
