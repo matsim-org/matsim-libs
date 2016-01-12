@@ -139,7 +139,7 @@ public class PatnaJointCalibrationControler {
 			StrategySettings reRoute = new StrategySettings();
 			reRoute.setStrategyName(DefaultStrategy.ReRoute.name());
 			reRoute.setSubpopulation(PatnaUserGroup.urban.name());
-			reRoute.setWeight(0.5);
+			reRoute.setWeight(0.15);
 			config.strategy().addStrategySettings(reRoute);
 
 			StrategySettings timeAllocationMutator	= new StrategySettings();
