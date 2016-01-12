@@ -32,9 +32,12 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
+import org.matsim.vehicles.VehicleWriterV1;
 
+import playground.agarwalamit.mixedTraffic.patnaIndia.input.PatnaVehiclesGenerator;
 import playground.agarwalamit.mixedTraffic.patnaIndia.input.urban.PatnaUrbanDemandGenerator;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaPersonFilter;
+import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
 import playground.agarwalamit.utils.LoadMyScenarios;
 
 /**
@@ -49,6 +52,7 @@ public class PatnaJointDemandGenerator {
 	private static final String EXT_PLANS = "../../../../repos/runs-svn/patnaIndia/run108/outerCordonOutput_10pct_OC1Excluded_ctd/output_plans.xml.gz"; // calibrated from cadyts.
 	private static final String JOINT_PLANS_10PCT = "../../../../repos/shared-svn/projects/patnaIndia/inputs/simulationInputs/joint_plans_10pct.xml.gz"; //
 	private static final String JOINT_PERSONS_ATTRIBUTE_10PCT = "../../../../repos/shared-svn/projects/patnaIndia/inputs/simulationInputs/joint_personAttributes_10pct.xml.gz"; //
+	private static final String JOINT_VEHICLES_10PCT = "../../../../repos/shared-svn/projects/patnaIndia/inputs/simulationInputs/joint_vehicles_10pct.xml.gz";
 	private static Scenario sc;
 	private final static String subPopAttributeName = "userGroup";
 
@@ -59,6 +63,13 @@ public class PatnaJointDemandGenerator {
 		new PopulationWriter(sc.getPopulation()).write(JOINT_PLANS_10PCT);
 		sc.getPopulation().getPersonAttributes().getAttribute("nonSlum_15", subPopAttributeName);
 		new ObjectAttributesXmlWriter(sc.getPopulation().getPersonAttributes()).writeFile(JOINT_PERSONS_ATTRIBUTE_10PCT);
+		pjdg.createAndWriteVehiclesFile();
+	}
+	
+	public void createAndWriteVehiclesFile(){
+		PatnaVehiclesGenerator pvg = new PatnaVehiclesGenerator(JOINT_PLANS_10PCT);
+		pvg.createVehicles(PatnaUtils.ALL_MODES);
+		new VehicleWriterV1(pvg.getPatnaVehicles()).writeFile(JOINT_VEHICLES_10PCT);
 	}
 	
 	public void createSubpopulationAttributes(){

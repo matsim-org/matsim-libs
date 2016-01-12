@@ -27,6 +27,7 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
 import org.matsim.core.config.groups.QSimConfigGroup.LinkDynamics;
 import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
+import org.matsim.core.config.groups.QSimConfigGroup.VehiclesSource;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -34,10 +35,8 @@ import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultStrategy;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
-import org.matsim.vehicles.VehicleWriterV1;
 
 import playground.agarwalamit.mixedTraffic.patnaIndia.FreeSpeedTravelTimeForBike;
-import playground.agarwalamit.mixedTraffic.patnaIndia.input.PatnaVehiclesGenerator;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.OuterCordonUtils;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaPersonFilter.PatnaUserGroup;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
@@ -58,17 +57,15 @@ public class PatnaJointCalibrationControler {
 	private static final String OUTPUT_DIR = "../../../../repos/runs-svn/patnaIndia/run108/calibration/c1/";
 	
 	public static void main(String[] args) {
-		
+		Config config = ConfigUtils.createConfig();
 		PatnaJointCalibrationControler pjc = new PatnaJointCalibrationControler();
-		Config config = pjc.createBasicConfigSettings();
 		
-		PatnaVehiclesGenerator pvg = new PatnaVehiclesGenerator(JOINT_PLANS_10PCT);
-		pvg.createVehicles(PatnaUtils.ALL_MODES);
-		
-		new VehicleWriterV1(pvg.getPatnaVehicles()).writeFile(JOINT_VEHICLES_10PCT);
-		config.vehicles().setVehiclesFile(JOINT_VEHICLES_10PCT);
-		
-		config.controler().setOutputDirectory(OUTPUT_DIR);
+		if(args.length>0){
+			ConfigUtils.loadConfig(config, args[0]);
+		} else {
+			config = pjc.createBasicConfigSettings();
+		}
+
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		
 		final Controler controler = new Controler(config);
@@ -108,10 +105,14 @@ public class PatnaJointCalibrationControler {
 		config.plans().setInputFile(JOINT_PLANS_10PCT);
 		config.plans().setSubpopulationAttributeName(JOINT_PERSONS_ATTRIBUTE_10PCT);
 		
+		config.qsim().setVehiclesSource(VehiclesSource.fromVehiclesData);
+		config.vehicles().setVehiclesFile(JOINT_VEHICLES_10PCT);
+		
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(100);
 		config.controler().setWriteEventsInterval(50);
 		config.controler().setWritePlansInterval(50);
+		config.controler().setOutputDirectory(OUTPUT_DIR);
 
 		config.counts().setCountsFileName(JOINT_COUNTS_10PCT);
 		config.counts().setWriteCountsInterval(50);
