@@ -28,4 +28,16 @@ public class VectorDecisionVariable implements DecisionVariable {
 	public void implementInSimulation() {
 		this.system.setDecisionVariable(this.u);
 	}
+
+	@Override
+	public String toString() {
+		final StringBuffer result = new StringBuffer();
+		for (int i = 0; i < this.u.size(); i++) {
+			result.append(this.u.get(i));
+			if (i < this.u.size() - 1) {
+				result.append("\t");
+			}
+		}
+		return result.toString();
+	}
 }

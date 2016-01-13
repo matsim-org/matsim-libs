@@ -628,4 +628,35 @@ public class Vector implements Serializable {
 		return result;
 	}
 
+	// TODO NEW
+	public static Vector min(final Vector... args) {
+		final Vector result = args[0].copy();
+		for (int argIndex = 1; argIndex < args.length; argIndex++) {
+			for (int i = 0; i < result.size(); i++) {
+				result.data[i] = Math.min(result.data[i],
+						args[argIndex].data[i]);
+			}
+		}
+		return result;
+	}
+
+	// TODO NEW
+	public static Vector max(final Vector... args) {
+		final Vector result = args[0].copy();
+		for (int argIndex = 1; argIndex < args.length; argIndex++) {
+			for (int i = 0; i < result.size(); i++) {
+				result.data[i] = Math.max(result.data[i],
+						args[argIndex].data[i]);
+			}
+		}
+		return result;
+	}
+
+	// TODO NEW
+	public void constrain(final Vector min, final Vector max) {
+		for (int i = 0; i < this.size(); i++) {
+			this.data[i] = MathHelpers.projectOnInterval(this.data[i],
+					min.data[i], max.data[i]);
+		}
+	}
 }

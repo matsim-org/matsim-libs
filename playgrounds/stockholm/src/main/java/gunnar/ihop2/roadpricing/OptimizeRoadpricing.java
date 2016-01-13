@@ -45,6 +45,8 @@ class OptimizeRoadpricing {
 		final Config config = ConfigUtils.loadConfig(configFileName,
 				new RoadPricingConfigGroup());
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
+		final String originalOutputDirectory = scenario.getConfig().controler()
+				.getOutputDirectory(); // gets otherwise overwritten in config
 
 		final RoadPricingConfigGroup roadPricingConfigGroup = ConfigUtils
 				.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME,
@@ -94,7 +96,7 @@ class OptimizeRoadpricing {
 						+ scenario.getNetwork().getLinks().size() + " links.");
 		final ObjectiveFunction objectiveFunction = new TotalScoreObjectiveFunction();
 		final ConvergenceCriterion convergenceCriterion = new FixedIterationNumberConvergenceCriterion(
-				1000, 1);
+				2, 1);
 		final MATSimSimulator<TollLevels> matsimSimulator = new MATSimSimulator<>(
 				new MATSimStateFactoryImpl<TollLevels>(), scenario,
 				timeDiscretization, relevantLinkIds, roadpricingModule);
@@ -107,16 +109,15 @@ class OptimizeRoadpricing {
 		final boolean interpolate = true;
 		final int maxRandomSearchIterations = 1;
 		final int maxRandomSearchTransitions = Integer.MAX_VALUE;
-		final int randomSearchPopulationSize = 1;
+		final int randomSearchPopulationSize = 2;
+		final double inertia = 0.95;
 		final RandomSearch<TollLevels> randomSearch = new RandomSearch<>(
 				matsimSimulator, decisionVariableRandomizer,
 				convergenceCriterion, maxRandomSearchIterations,
 				maxRandomSearchTransitions, randomSearchPopulationSize,
 				MatsimRandom.getRandom(), interpolate, keepBestSolution,
-				objectiveFunction, maxMemorizedTrajectoryLength);
-		randomSearch.setLogFileName(scenario.getConfig().controler()
-				.getOutputDirectory()
-				+ "optimization.log");
+				objectiveFunction, maxMemorizedTrajectoryLength, inertia);
+		randomSearch.setLogFileName(originalOutputDirectory + "opdyts.log");
 
 		/*
 		 * Run it.

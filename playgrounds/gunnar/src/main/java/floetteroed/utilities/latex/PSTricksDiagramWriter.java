@@ -32,7 +32,9 @@ import static java.lang.Math.floor;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 
+import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -377,6 +379,19 @@ public class PSTricksDiagramWriter {
 		out.println("\\end{pspicture}\n");
 	}
 
+	@Override
+	public String toString() {
+		final ByteArrayOutputStream os = new ByteArrayOutputStream();
+		final PrintStream ps = new PrintStream(os);
+		this.printAll(ps);
+		try {
+			return os.toString("UTF8");
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
 	// MAIN FUNCTION, ONLY FOR TESTING
 
 	public static void main(String[] args) {

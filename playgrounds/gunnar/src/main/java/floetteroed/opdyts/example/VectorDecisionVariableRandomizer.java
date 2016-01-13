@@ -27,12 +27,19 @@ public class VectorDecisionVariableRandomizer implements
 
 	private final LinearSystemSimulator system;
 
+	private final Vector min;
+
+	private final Vector max;
+
 	public VectorDecisionVariableRandomizer(final int dim, final double sigma,
-			final Random rnd, final LinearSystemSimulator system) {
+			final Random rnd, final LinearSystemSimulator system,
+			final Vector min, final Vector max) {
 		this.dim = dim;
 		this.sigma = sigma;
 		this.rnd = rnd;
 		this.system = system;
+		this.min = min;
+		this.max = max;
 	}
 
 	@Override
@@ -46,10 +53,17 @@ public class VectorDecisionVariableRandomizer implements
 			final VectorDecisionVariable decisionVariable) {
 		final Vector delta = newGaussian(this.dim, this.rnd);
 		delta.mult(this.sigma);
-		final VectorDecisionVariable result1 = new VectorDecisionVariable(sum(
-				decisionVariable.getU(), delta), this.system);
-		final VectorDecisionVariable result2 = new VectorDecisionVariable(diff(
-				decisionVariable.getU(), delta), this.system);
+
+		final Vector u1 = sum(decisionVariable.getU(), delta);
+		u1.constrain(this.min, this.max);
+		final VectorDecisionVariable result1 = new VectorDecisionVariable(u1,
+				this.system);
+
+		final Vector u2 = diff(decisionVariable.getU(), delta);
+		u2.constrain(this.min, this.max);
+		final VectorDecisionVariable result2 = new VectorDecisionVariable(u2,
+				this.system);
+
 		return Arrays.asList(result1, result2);
 	}
 }

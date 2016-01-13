@@ -54,6 +54,8 @@ public interface TrajectorySampler<U extends DecisionVariable> {
 	public void addStatistic(final String logFileName,
 			final Statistic<SamplingStage<U>> statistic);
 
+	public void setStandardLogFileName(String logFileName);
+	
 	/**
 	 * Call once before the simulation is started. This implements a randomly
 	 * selected decision variable in the simulation, with the objective to

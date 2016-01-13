@@ -39,7 +39,18 @@ import floetteroed.opdyts.DecisionVariable;
 import floetteroed.opdyts.ObjectiveFunction;
 import floetteroed.opdyts.SimulatorState;
 import floetteroed.opdyts.convergencecriteria.ConvergenceCriterion;
+import floetteroed.opdyts.logging.EquilibriumGap;
+import floetteroed.opdyts.logging.EquilibriumGapWeight;
+import floetteroed.opdyts.logging.FreeMemory;
+import floetteroed.opdyts.logging.LastDecisionVariable;
+import floetteroed.opdyts.logging.LastEquilibriumGap;
+import floetteroed.opdyts.logging.LastObjectiveFunctionValue;
+import floetteroed.opdyts.logging.MaxMemory;
+import floetteroed.opdyts.logging.SurrogateObjectiveFunctionValue;
+import floetteroed.opdyts.logging.TotalMemory;
 import floetteroed.opdyts.logging.TransientObjectiveFunctionValue;
+import floetteroed.opdyts.logging.UniformityGap;
+import floetteroed.opdyts.logging.UniformityGapWeight;
 import floetteroed.utilities.math.MathHelpers;
 import floetteroed.utilities.statisticslogging.Statistic;
 import floetteroed.utilities.statisticslogging.StatisticsMultiWriter;
@@ -72,7 +83,7 @@ public class ParallelTrajectorySampler<U extends DecisionVariable> implements
 
 	private int maxMemoryLength = Integer.MAX_VALUE;
 
-	private final StatisticsMultiWriter<SamplingStage<U>> statisticsWriter = new StatisticsMultiWriter<>();
+	private final StatisticsMultiWriter<SamplingStage<U>> statisticsWriter;
 
 	// runtime variables
 
@@ -93,7 +104,8 @@ public class ParallelTrajectorySampler<U extends DecisionVariable> implements
 	public ParallelTrajectorySampler(final Set<? extends U> decisionVariables,
 			final ObjectiveFunction objectBasedObjectiveFunction,
 			final ConvergenceCriterion convergenceCriterion, final Random rnd,
-			final double equilibriumWeight, final double uniformityWeight) {
+			final double equilibriumWeight, final double uniformityWeight,
+			final boolean appendToLogFile) {
 		this.decisionVariablesToBeTriedOut = new LinkedHashSet<U>(
 				decisionVariables);
 		this.objectiveFunction = objectBasedObjectiveFunction;
@@ -101,6 +113,7 @@ public class ParallelTrajectorySampler<U extends DecisionVariable> implements
 		this.rnd = rnd;
 		this.equilibriumWeight = equilibriumWeight;
 		this.uniformityWeight = uniformityWeight;
+		this.statisticsWriter = new StatisticsMultiWriter<>(appendToLogFile);
 	}
 
 	// -------------------- SETTERS AND GETTERS --------------------
@@ -117,6 +130,22 @@ public class ParallelTrajectorySampler<U extends DecisionVariable> implements
 	public void addStatistic(final String logFileName,
 			final Statistic<SamplingStage<U>> statistic) {
 		this.statisticsWriter.addStatistic(logFileName, statistic);
+	}
+
+	@Override
+	public void setStandardLogFileName(final String logFileName) {
+		this.addStatistic(logFileName, new TransientObjectiveFunctionValue<U>());
+		this.addStatistic(logFileName, new SurrogateObjectiveFunctionValue<U>());
+		this.addStatistic(logFileName, new LastObjectiveFunctionValue<U>());
+		this.addStatistic(logFileName, new EquilibriumGapWeight<U>());
+		this.addStatistic(logFileName, new EquilibriumGap<U>());
+		this.addStatistic(logFileName, new LastEquilibriumGap<U>());
+		this.addStatistic(logFileName, new UniformityGapWeight<U>());
+		this.addStatistic(logFileName, new UniformityGap<U>());
+		this.addStatistic(logFileName, new TotalMemory<U>());
+		this.addStatistic(logFileName, new FreeMemory<U>());
+		this.addStatistic(logFileName, new MaxMemory<U>());
+		this.addStatistic(logFileName, new LastDecisionVariable<U>());
 	}
 
 	@Override

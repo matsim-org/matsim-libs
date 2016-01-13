@@ -31,6 +31,7 @@ import java.util.Map;
 
 import org.apache.commons.math3.analysis.MultivariateFunction;
 import org.apache.commons.math3.analysis.MultivariateVectorFunction;
+import org.apache.commons.math3.exception.TooManyEvaluationsException;
 import org.apache.commons.math3.optim.InitialGuess;
 import org.apache.commons.math3.optim.MaxEval;
 import org.apache.commons.math3.optim.MaxIter;
@@ -142,7 +143,8 @@ public class TransitionSequencesAnalyzer<U extends DecisionVariable> {
 
 	// -------------------- OPTIMIZATION --------------------
 
-	public SamplingStage<U> newOptimalSamplingStage(final Transition<U> lastTransition) {
+	public SamplingStage<U> newOptimalSamplingStage(
+			final Transition<U> lastTransition) {
 		final Vector alphas = this.optimalAlphas();
 		return new SamplingStage<>(alphas, this, lastTransition);
 	}
@@ -153,16 +155,34 @@ public class TransitionSequencesAnalyzer<U extends DecisionVariable> {
 		} else {
 			final Vector initialAlphas = new Vector(this.transitions.size());
 			initialAlphas.fill(1.0 / initialAlphas.size());
-			final NonLinearConjugateGradientOptimizer solver = new NonLinearConjugateGradientOptimizer(
-					NonLinearConjugateGradientOptimizer.Formula.POLAK_RIBIERE, // FLETCHER_REEVES,
-					new SimpleValueChecker(1e-8, 1e-8));
-			final PointValuePair result = solver.optimize(
-					new ObjectiveFunction(new MyObjectiveFunction()),
-					new ObjectiveFunctionGradient(new MyGradient()),
-					GoalType.MINIMIZE, new InitialGuess(
-							new double[this.transitions.size() - 1]),
-					new MaxEval(Integer.MAX_VALUE), new MaxIter(
-							this.maxIterations));
+
+			// final NonLinearConjugateGradientOptimizer solver = new
+			// NonLinearConjugateGradientOptimizer(
+			// NonLinearConjugateGradientOptimizer.Formula.POLAK_RIBIERE, //
+			// FLETCHER_REEVES,
+			// new SimpleValueChecker(1e-8, 1e-8));
+
+			PointValuePair result = null;
+			double initialBracketingRange = 1e-8;
+			do {
+				try {
+					final NonLinearConjugateGradientOptimizer solver = new NonLinearConjugateGradientOptimizer(
+							NonLinearConjugateGradientOptimizer.Formula.POLAK_RIBIERE, // FLETCHER_REEVES,
+							new SimpleValueChecker(1e-8, 1e-8), 1e-8, 1e-8,
+							initialBracketingRange);
+					result = solver.optimize(new ObjectiveFunction(
+							new MyObjectiveFunction()),
+							new ObjectiveFunctionGradient(new MyGradient()),
+							GoalType.MINIMIZE, new InitialGuess(
+									new double[this.transitions.size() - 1]),
+							new MaxEval(Integer.MAX_VALUE), new MaxIter(
+									this.maxIterations));
+				} catch (TooManyEvaluationsException e) {
+					initialBracketingRange *= 10.0;
+					result = null;
+				}
+			} while (result == null);
+
 			return proba(newVectPlusOneZero(result.getPoint()));
 		}
 	}

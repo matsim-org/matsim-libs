@@ -139,7 +139,7 @@ public class RunRoadClassification {
 		RandomSearch<RoadClassificationDecisionVariable> randomSearch = new RandomSearch<>(new MATSimSimulator<RoadClassificationDecisionVariable>(stateFactory, scenario, timeDiscretization, null), randomizer, convergenceCriterion, 
 				// selfTuner, 
 				maxIterations, maxTransitions, populationSize,
-				MatsimRandom.getRandom(), interpolate, keepBestSolution, objectiveFunction, maxMemoryLength);
+				MatsimRandom.getRandom(), interpolate, keepBestSolution, objectiveFunction, maxMemoryLength, 0.95);
 		randomSearch.setLogFileName(scenario.getConfig().controler().getOutputDirectory() + "optimization.log");
 		randomSearch.run();
 		for (DecisionVariable decisionVariable : randomSearch.getBestDecisionVariablesView()) {

@@ -82,8 +82,7 @@ public class MATSimSimulator<U extends DecisionVariable> implements
 				trajectorySampler, this.stateFactory, this.timeDiscretization,
 				this.relevantLinkIds);
 		matsimDecisionVariableEvaluator.setMemory(1); // TODO make configurable
-		matsimDecisionVariableEvaluator.setStandardLogFileName(outputDirectory
-				+ "/opdyts.log");
+//		matsimDecisionVariableEvaluator.setStandardLogFileName("./opdyts.log");
 
 		/*
 		 * (3) Create, configure, and run a new MATSim Controler.
