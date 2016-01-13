@@ -48,6 +48,8 @@ import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
 public class PatnaJointCalibrationControler {
 
 	private final static double SAMPLE_SIZE = 0.10;
+	private final static String subPopAttributeName = "userGroup";
+	
 	private static final String NET_FILE = "../../../../repos/shared-svn/projects/patnaIndia/inputs/simulationInputs/network_diff_linkSpeed.xml.gz"; //
 	private static final String JOINT_PLANS_10PCT = "../../../../repos/shared-svn/projects/patnaIndia/inputs/simulationInputs/joint_plans_10pct.xml.gz"; //
 	private static final String JOINT_PERSONS_ATTRIBUTE_10PCT = "../../../../repos/shared-svn/projects/patnaIndia/inputs/simulationInputs/joint_personAttributes_10pct.xml.gz"; //
@@ -103,7 +105,8 @@ public class PatnaJointCalibrationControler {
 		config.network().setInputFile(NET_FILE);
 		
 		config.plans().setInputFile(JOINT_PLANS_10PCT);
-		config.plans().setSubpopulationAttributeName(JOINT_PERSONS_ATTRIBUTE_10PCT);
+		config.plans().setSubpopulationAttributeName(subPopAttributeName);
+		config.plans().setInputPersonAttributeFile(JOINT_PERSONS_ATTRIBUTE_10PCT);
 		
 		config.qsim().setVehiclesSource(VehiclesSource.fromVehiclesData);
 		config.vehicles().setVehiclesFile(JOINT_VEHICLES_10PCT);
