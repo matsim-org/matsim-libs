@@ -7,7 +7,9 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.LinkImpl;
 //import playground.smetzler.bike.BikeLink;
 
-public class BikeLinkImpl extends LinkImpl {
+public class BikeLinkImpl extends LinkImpl 
+implements BikeLink 
+{
 	private String cycleway;
 	private String cyclewaySurface;
 
@@ -21,22 +23,35 @@ public class BikeLinkImpl extends LinkImpl {
 	}
 	
 	
-//	@Override
-//	public String toString() {
-//		return super.toString() +
-//		"[id=" + this.getId() + "]" +
-//		"[from_id=" + this.from.getId() + "]" +
-//		"[to_id=" + this.to.getId() + "]" +
-//		"[length=" + this.length + "]" +
-//		"[freespeed=" + this.freespeed + "]" +
-//		"[capacity=" + this.capacity + "]" +
-//		"[permlanes=" + this.nofLanes + "]" +
-//		"[origid=" + this.origid + "]" +
-//		"[type=" + this.type + "]";
-//		"[cycleway=" + this.cycleway + "]";
-//		"[cyclewaySurface=" + this.cyclewaySurface + "]";
-//		
-//	}
+	@Override
+	public String toString() {
+		return super.toString() +
+		"[cycleway=" + this.cycleway + "]" +
+		"[cyclewaySurface=" + this.cyclewaySurface + "]";
+		
+	}
 
+
+	@Override
+	public String getcycleway() {
+		return this.cycleway;
+	}
+
+
+	@Override
+	public void setcycleway(String cycleway) {
+		this.cycleway = cycleway;
+	}
+
+
+	@Override
+	public String getcyclewaySurface() {
+		return this.cyclewaySurface;
+	}
+
+
+	@Override
+	public void getcyclewaySurface(String cyclewaySurface) {
+		this.cyclewaySurface = cyclewaySurface;
+	}
 }
-
