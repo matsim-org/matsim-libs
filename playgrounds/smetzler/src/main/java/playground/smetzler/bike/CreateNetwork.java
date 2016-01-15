@@ -32,8 +32,8 @@ public class CreateNetwork {
 
 
 		//wie kann ich die bike-Interfaces einbringen??
-		OsmNetworkReader onr = new OsmNetworkReader(net, ct);
-		onr.parse(inputOSM); 
+		BikeCustomizedOsmNetworkReader bikeNetworkReader = new BikeCustomizedOsmNetworkReader(net, ct);
+		bikeNetworkReader.parse(inputOSM); 
 		
 		System.out.println(net.getLinks());
 		
