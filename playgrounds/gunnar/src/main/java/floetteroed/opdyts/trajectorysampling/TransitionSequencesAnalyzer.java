@@ -42,6 +42,7 @@ import org.apache.commons.math3.optim.nonlinear.scalar.ObjectiveFunction;
 import org.apache.commons.math3.optim.nonlinear.scalar.ObjectiveFunctionGradient;
 import org.apache.commons.math3.optim.nonlinear.scalar.gradient.NonLinearConjugateGradientOptimizer;
 import org.apache.commons.math3.util.FastMath;
+import org.apache.log4j.Logger;
 
 import floetteroed.opdyts.DecisionVariable;
 import floetteroed.utilities.math.Matrix;
@@ -102,6 +103,11 @@ public class TransitionSequencesAnalyzer<U extends DecisionVariable> {
 		return this.surrogateObjectiveFunction.getUniformityWeight();
 	}
 
+	// TODO NEW
+	SurrogateObjectiveFunction<U> getSurrogateObjectiveFunction() {
+		return this.surrogateObjectiveFunction;
+	}
+	
 	// -------------------- GENERAL STATISTICS --------------------
 
 	public double originalObjectiveFunctionValue(final Vector alphas) {
@@ -143,10 +149,16 @@ public class TransitionSequencesAnalyzer<U extends DecisionVariable> {
 
 	// -------------------- OPTIMIZATION --------------------
 
+	// TODO NEW
+	Vector lastAlphas = null;
+	
 	public SamplingStage<U> newOptimalSamplingStage(
-			final Transition<U> lastTransition) {
+			final Transition<U> lastTransition,
+			final Double convergedObjectiveFunctionValue) {
 		final Vector alphas = this.optimalAlphas();
-		return new SamplingStage<>(alphas, this, lastTransition);
+		this.lastAlphas = alphas.copy();
+		return new SamplingStage<>(alphas, this, lastTransition,
+				convergedObjectiveFunctionValue);
 	}
 
 	public Vector optimalAlphas() {
@@ -179,6 +191,9 @@ public class TransitionSequencesAnalyzer<U extends DecisionVariable> {
 									this.maxIterations));
 				} catch (TooManyEvaluationsException e) {
 					initialBracketingRange *= 10.0;
+					Logger.getLogger(this.getClass().getName()).info(
+							"Extending initial bracketing range to "
+									+ initialBracketingRange);
 					result = null;
 				}
 			} while (result == null);

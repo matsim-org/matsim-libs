@@ -49,6 +49,7 @@ class TollLevelsRandomizer implements DecisionVariableRandomizer<TollLevels> {
 					@Override
 					public double constrain(double originalValue) {
 						// TODO Could also re-center this at the value grid.
+						//return originalValue; // TODO experimental
 						return Math.max(0, Math.min(24 * 3600, originalValue));
 					}
 				});
