@@ -55,14 +55,17 @@ public class HereMapsTrafficItemXMLReader {
 		return trafficItems;
 	}
 
-	public void readStream(String outputFileXML) throws FileNotFoundException, XMLStreamException, FactoryConfigurationError {
+	public void readStream(String trafficItemXMLFile) throws FileNotFoundException, XMLStreamException, FactoryConfigurationError {
 		
-		log.info("Reading stream from: " + outputFileXML);
+		log.info("Reading stream from: " + trafficItemXMLFile);
 		
-		FileInputStream stream = new FileInputStream(new File(outputFileXML));
+		FileInputStream stream = new FileInputStream(new File(trafficItemXMLFile));
 		XMLStreamReader in = XMLInputFactory.newInstance().createXMLStreamReader(stream);
 
-		this.readStream(in);
+		String[] fileNameData = trafficItemXMLFile.split("_");
+		long downloadTime = Long.valueOf(fileNameData[2]);
+		
+		this.readStream(in, downloadTime);
 	}
 	
 	public void readStream(URL url) throws XMLStreamException, IOException {
@@ -70,10 +73,10 @@ public class HereMapsTrafficItemXMLReader {
 		log.info("Reading stream from: " + url);
 
 		XMLStreamReader in = XMLInputFactory.newInstance().createXMLStreamReader(url.openStream());
-		this.readStream(in);		
+		this.readStream(in, System.currentTimeMillis());		
 	}
 	
-	public void readStream(XMLStreamReader in) throws XMLStreamException, FactoryConfigurationError {
+	public void readStream(XMLStreamReader in, Long downloadTime) throws XMLStreamException, FactoryConfigurationError {
 				
 		TrafficItem trafficItem = null;
 		boolean inLevelTrafficItem = false;
@@ -91,7 +94,7 @@ public class HereMapsTrafficItemXMLReader {
 
 				// set the level information
 				if (in.getLocalName().equals("TRAFFIC_ITEM")) {
-					trafficItem = new TrafficItem();
+					trafficItem = new TrafficItem(downloadTime);
 					inLevelTrafficItem = true;
 				} else if (in.getLocalName().equals("ORIGIN")) {
 					inLevelOrigin = true;
