@@ -83,13 +83,4 @@ public class NetworkFactoryImpl implements NetworkFactory {
 	public void setNetworkChangeEventFactory(NetworkChangeEventFactory networkChangeEventFactory) {
 		this.networkChangeEventFactory = networkChangeEventFactory;
 	}
-	
-	public boolean isTimeVariant() {
-	    //isTimeVariant() is called only by DumpDataAtEndImpl
-	    //maybe that call could be replaced by config.network().isTimeVariantNetwork() and then this ugly method is gone
-	    //michalm dec'15
-		return (this.linkFactory instanceof VariableIntervalTimeVariantLinkFactory || //
-		        this.linkFactory instanceof FixedIntervalTimeVariantLinkFactory);
-	}
-
 }
