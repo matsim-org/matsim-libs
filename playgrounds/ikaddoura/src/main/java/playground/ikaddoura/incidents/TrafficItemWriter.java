@@ -38,7 +38,7 @@ public class TrafficItemWriter {
 	public void writeCSVFile(Collection<TrafficItem> collection, String outputFile) throws IOException {
 		try ( BufferedWriter bw = new BufferedWriter(new FileWriter(outputFile)) ) {
 			
-			bw.write("Traffic Item ID;Original Traffic Item ID;"
+			bw.write("Traffic Item ID;Original Traffic Item ID;Download Time;"
 					+ "Origin Location ID;Origin X;Origin Y;Origin Description; Origin Country Code;"
 					+ "To Location ID;To X;To Y;To Description;To Country Code;"
 					+ "Start Time;End Time;Status;"
@@ -48,6 +48,7 @@ public class TrafficItemWriter {
 			for (TrafficItem item : collection) {
 				bw.write(item.getId() + ";"
 						+ item.getOriginalId() + ";"
+						+ item.getDownloadTime() + ";"
 						+ item.getOrigin().getLocationId() + ";"
 						+ item.getOrigin().getLongitude() + ";"
 						+ item.getOrigin().getLatitude() + ";"

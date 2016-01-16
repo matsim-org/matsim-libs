@@ -105,7 +105,6 @@ class OptimizeRoadpricing {
 		 * RandomSearch specification.
 		 */
 		final int maxMemorizedTrajectoryLength = 1;
-		final boolean keepBestSolution = true;
 		final boolean interpolate = true;
 		final int maxRandomSearchIterations = 1;
 		final int maxRandomSearchTransitions = Integer.MAX_VALUE;
@@ -115,8 +114,8 @@ class OptimizeRoadpricing {
 				matsimSimulator, decisionVariableRandomizer,
 				convergenceCriterion, maxRandomSearchIterations,
 				maxRandomSearchTransitions, randomSearchPopulationSize,
-				MatsimRandom.getRandom(), interpolate, keepBestSolution,
-				objectiveFunction, maxMemorizedTrajectoryLength, inertia);
+				MatsimRandom.getRandom(), interpolate, objectiveFunction,
+				maxMemorizedTrajectoryLength, inertia);
 		randomSearch.setLogFileName(originalOutputDirectory + "opdyts.log");
 
 		/*

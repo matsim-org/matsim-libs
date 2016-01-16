@@ -5,9 +5,9 @@ import static gunnar.ihop2.transmodeler.networktransformation.Transmodeler2MATSi
 import static gunnar.ihop2.transmodeler.networktransformation.Transmodeler2MATSimNetwork.unquote;
 import static java.lang.Double.parseDouble;
 import static java.lang.Integer.parseInt;
+import floetteroed.utilities.tabularfileparser.AbstractTabularFileHandlerWithHeaderLine;
 import floetteroed.utilities.tabularfileparser.TabularFileParser;
 import gunnar.ihop2.transmodeler.networktransformation.Transmodeler2MATSimNetwork.DIR;
-import gunnar.ihop2.utils.AbstractTabularFileHandler;
 
 import java.io.IOException;
 import java.util.LinkedHashMap;
@@ -18,7 +18,7 @@ import java.util.Map;
  * @author Gunnar Flötteröd
  *
  */
-class TransmodelerSegmentsReader extends AbstractTabularFileHandler {
+class TransmodelerSegmentsReader extends AbstractTabularFileHandlerWithHeaderLine {
 
 	// -------------------- CONSTANTS --------------------
 
