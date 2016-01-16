@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2016 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -19,33 +19,7 @@
 
 package playground.michalm.taxi.optimizer;
 
-import com.google.common.collect.Iterables;
-
-import playground.michalm.taxi.data.*;
-import playground.michalm.taxi.data.TaxiRequest.TaxiRequestStatus;
-import playground.michalm.taxi.scheduler.TaxiSchedulerUtils;
-
-
-public class TaxiOptimizationValidation
+public interface TaxiOptimizerParams
 {
-    public static void assertNoUnplannedRequestsWhenIdleVehicles(
-            TaxiOptimizerContext optimContext)
-    {
-        ETaxiData taxiData = (ETaxiData)optimContext.context.getVrpData();
-
-        int vehCount = Iterables.size(Iterables.filter(taxiData.getVehicles().values(),
-                TaxiSchedulerUtils.createIsIdle(optimContext.scheduler)));
-
-        if (vehCount == 0) {
-            return;//OK
-        }
-
-        if (TaxiRequests.countRequestsWithStatus(taxiData.getTaxiRequests().values(),
-                TaxiRequestStatus.UNPLANNED) == 0) {
-            return; //OK
-        }
-
-        //idle vehicles and unplanned requests
-        throw new IllegalStateException();
-    }
+    TaxiOptimizer createTaxiOptimizer(TaxiOptimizerContext optimContext);
 }

@@ -23,6 +23,8 @@ import playground.dhosse.prt.passenger.PrtRequestCreator;
 import playground.dhosse.prt.router.PrtTripRouterFactoryImpl;
 import playground.michalm.taxi.data.ETaxiData;
 import playground.michalm.taxi.data.file.*;
+import playground.michalm.taxi.optimizer.AbstractTaxiOptimizerParams.*;
+import playground.michalm.taxi.optimizer.TaxiOptimizers;
 
 public class PrtModule {
 	
@@ -41,7 +43,6 @@ public class PrtModule {
 		algorithmConfig = AlgorithmConfig.valueOf(prtConfig.getAlgorithmConfig());
 		
 		TravelTimeSource ttimeSource = algorithmConfig.getTravelTimeSource();
-		TravelDisutilitySource tdisSource = algorithmConfig.getTravelDisutilitySource();
 		
 		ttime = null;
 		if(ttimeSource.equals(TravelTimeSource.FREE_FLOW_SPEED)){
@@ -54,7 +55,7 @@ public class PrtModule {
 			
 		}
 		
-		tdis = VrpLauncherUtils.initTravelDisutility(tdisSource, ttime);
+		tdis = new TimeAsTravelDisutility(ttime);
 		
 		ModeRoutingParams pars = new ModeRoutingParams();
 		pars.setMode(PrtRequestCreator.MODE);

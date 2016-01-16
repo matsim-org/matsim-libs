@@ -1,28 +1,10 @@
 package playground.dhosse.prt.launch;
 
-import static org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelDisutilitySource.DISTANCE;
-import static org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelDisutilitySource.TIME;
-import static org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelTimeSource.EVENTS;
-import static org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelTimeSource.FREE_FLOW_SPEED;
-import static playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration.Goal.DEMAND_SUPPLY_EQUIL;
-import static playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration.Goal.MIN_PICKUP_TIME;
-import static playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration.Goal.MIN_WAIT_TIME;
+import static playground.michalm.taxi.optimizer.AbstractTaxiOptimizerParams.TravelTimeSource.*;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-
-import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelDisutilitySource;
-import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelTimeSource;
-import org.matsim.core.utils.io.IOUtils;
-
-import playground.dhosse.prt.launch.PrtParameters.AlgorithmConfig.AlgorithmType;
 import playground.dhosse.prt.optimizer.PrtNPersonsOptimizer;
-import playground.dhosse.prt.optimizer.PrtOptimizer;
-import playground.michalm.taxi.optimizer.AbstractTaxiOptimizer;
-import playground.michalm.taxi.optimizer.TaxiOptimizer;
-import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration;
-import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration.Goal;
+import playground.michalm.taxi.optimizer.*;
+import playground.michalm.taxi.optimizer.AbstractTaxiOptimizerParams.*;
 import playground.michalm.taxi.optimizer.assignment.AssignmentTaxiOptimizer;
 import playground.michalm.taxi.optimizer.fifo.FifoTaxiOptimizer;
 import playground.michalm.taxi.optimizer.mip.MIPTaxiOptimizer;
@@ -133,58 +115,58 @@ public class PrtParameters {
 //		}
 //		
 //	}
-	
+    public enum Goal
+    {
+        MIN_WAIT_TIME, MIN_PICKUP_TIME, DEMAND_SUPPLY_EQUIL;
+    };
+
+
+
 	public enum AlgorithmConfig
 	{
-	    NOS_TW_TD(AlgorithmType.NO_SCHEDULING, MIN_WAIT_TIME, FREE_FLOW_SPEED, DISTANCE),
+	    NOS_TW_FF(AlgorithmType.NO_SCHEDULING, Goal.MIN_WAIT_TIME, FREE_FLOW_SPEED),
 
-	    NOS_TW_FF(AlgorithmType.NO_SCHEDULING, MIN_WAIT_TIME, FREE_FLOW_SPEED, TIME),
+	    NOS_TW_15M(AlgorithmType.NO_SCHEDULING, Goal.MIN_WAIT_TIME, EVENTS),
 
-	    NOS_TW_15M(AlgorithmType.NO_SCHEDULING, MIN_WAIT_TIME, EVENTS, TIME),
+	    NOS_TP_FF(AlgorithmType.NO_SCHEDULING, Goal.MIN_PICKUP_TIME, FREE_FLOW_SPEED),
 
-	    NOS_TP_TD(AlgorithmType.NO_SCHEDULING, MIN_PICKUP_TIME, FREE_FLOW_SPEED, DISTANCE),
+//	    NOS_TP_15M(AlgorithmType.NO_SCHEDULING, MIN_PICKUP_TIME, EVENTS),
 
-	    NOS_TP_FF(AlgorithmType.NO_SCHEDULING, MIN_PICKUP_TIME, FREE_FLOW_SPEED, TIME),
+	    NOS_DSE_FF(AlgorithmType.NO_SCHEDULING, Goal.DEMAND_SUPPLY_EQUIL, FREE_FLOW_SPEED),
 
-//	    NOS_TP_15M(AlgorithmType.NO_SCHEDULING, MIN_PICKUP_TIME, EVENTS, TIME),
+//	    NOS_DSE_15M(AlgorithmType.NO_SCHEDULING, DEMAND_SUPPLY_EQUIL, EVENTS),
 
-	    NOS_DSE_TD(AlgorithmType.NO_SCHEDULING, DEMAND_SUPPLY_EQUIL, FREE_FLOW_SPEED, DISTANCE),
+//	    OTS_TW_15M(AlgorithmType.ONE_TIME_SCHEDULING, MIN_WAIT_TIME, EVENTS),
 
-	    NOS_DSE_FF(AlgorithmType.NO_SCHEDULING, DEMAND_SUPPLY_EQUIL, FREE_FLOW_SPEED, TIME),
+//	    OTS_TP_15M(AlgorithmType.ONE_TIME_SCHEDULING, MIN_PICKUP_TIME, EVENTS),
 
-//	    NOS_DSE_15M(AlgorithmType.NO_SCHEDULING, DEMAND_SUPPLY_EQUIL, EVENTS, TIME),
+	    RES_TW_FF(AlgorithmType.RE_SCHEDULING, Goal.MIN_WAIT_TIME, FREE_FLOW_SPEED),
 
-//	    OTS_TW_15M(AlgorithmType.ONE_TIME_SCHEDULING, MIN_WAIT_TIME, EVENTS, TIME),
+//	    RES_TW_15M(AlgorithmType.RE_SCHEDULING, MIN_WAIT_TIME, EVENTS),
 
-//	    OTS_TP_15M(AlgorithmType.ONE_TIME_SCHEDULING, MIN_PICKUP_TIME, EVENTS, TIME),
+//	    RES_TP_FF(AlgorithmType.RE_SCHEDULING, MIN_PICKUP_TIME, FREE_FLOW_SPEED),
 
-	    RES_TW_FF(AlgorithmType.RE_SCHEDULING, MIN_WAIT_TIME, FREE_FLOW_SPEED, TIME),
+//	    RES_TP_15M(AlgorithmType.RE_SCHEDULING, MIN_PICKUP_TIME, EVENTS),
 
-//	    RES_TW_15M(AlgorithmType.RE_SCHEDULING, MIN_WAIT_TIME, EVENTS, TIME),
+	    APS_TW_FF(AlgorithmType.AP_SCHEDULING, Goal.MIN_WAIT_TIME, FREE_FLOW_SPEED),
 
-//	    RES_TP_FF(AlgorithmType.RE_SCHEDULING, MIN_PICKUP_TIME, FREE_FLOW_SPEED, TIME),
+//	    APS_TW_15M(AlgorithmType.AP_SCHEDULING, MIN_WAIT_TIME, EVENTS),
 
-//	    RES_TP_15M(AlgorithmType.RE_SCHEDULING, MIN_PICKUP_TIME, EVENTS, TIME),
+	    APS_TP_FF(AlgorithmType.AP_SCHEDULING, Goal.MIN_PICKUP_TIME, FREE_FLOW_SPEED),
 
-	    APS_TW_FF(AlgorithmType.AP_SCHEDULING, MIN_WAIT_TIME, FREE_FLOW_SPEED, TIME),
+//	    APS_TP_15M(AlgorithmType.AP_SCHEDULING, MIN_PICKUP_TIME, EVENTS),
 
-//	    APS_TW_15M(AlgorithmType.AP_SCHEDULING, MIN_WAIT_TIME, EVENTS, TIME),
+	    APS_DSE_FF(AlgorithmType.AP_SCHEDULING, Goal.DEMAND_SUPPLY_EQUIL, FREE_FLOW_SPEED),
 
-	    APS_TP_FF(AlgorithmType.AP_SCHEDULING, MIN_PICKUP_TIME, FREE_FLOW_SPEED, TIME),
+//	    APS_DSE_15M(AlgorithmType.AP_SCHEDULING, DEMAND_SUPPLY_EQUIL, EVENTS),
 
-//	    APS_TP_15M(AlgorithmType.AP_SCHEDULING, MIN_PICKUP_TIME, EVENTS, TIME),
-
-	    APS_DSE_FF(AlgorithmType.AP_SCHEDULING, DEMAND_SUPPLY_EQUIL, FREE_FLOW_SPEED, TIME),
-
-//	    APS_DSE_15M(AlgorithmType.AP_SCHEDULING, DEMAND_SUPPLY_EQUIL, EVENTS, TIME),
-
-	    MIP_TW_FF(AlgorithmType.MIP_SCHEDULING, MIN_WAIT_TIME, FREE_FLOW_SPEED, TIME),
+	    MIP_TW_FF(AlgorithmType.MIP_SCHEDULING, Goal.MIN_WAIT_TIME, FREE_FLOW_SPEED),
 	    
-	    NP_TW_FF(AlgorithmType.N_PERSONS, MIN_WAIT_TIME, FREE_FLOW_SPEED, TIME),
+	    NP_TW_FF(AlgorithmType.N_PERSONS, Goal.MIN_WAIT_TIME, FREE_FLOW_SPEED),
 	    
-	    NP_TW_15M(AlgorithmType.N_PERSONS, MIN_WAIT_TIME, EVENTS, TIME),
+	    NP_TW_15M(AlgorithmType.N_PERSONS, Goal.MIN_WAIT_TIME, EVENTS),
 	    
-	    NP_TP_FF(AlgorithmType.N_PERSONS, MIN_PICKUP_TIME, FREE_FLOW_SPEED, TIME);
+	    NP_TP_FF(AlgorithmType.N_PERSONS, Goal.MIN_PICKUP_TIME, FREE_FLOW_SPEED);
 
 	    static enum AlgorithmType
 	    {
@@ -199,19 +181,16 @@ public class PrtParameters {
 	    final AlgorithmType algorithmType;
 	    final Goal goal;
 	    final TravelTimeSource ttimeSource;
-	    final TravelDisutilitySource tdisSource;
 	    
-	    AlgorithmConfig(AlgorithmType algorithmType, Goal goal, TravelTimeSource ttimeSource,
-	            TravelDisutilitySource tdisSource)
+	    AlgorithmConfig(AlgorithmType algorithmType, Goal goal, TravelTimeSource ttimeSource)
 	    {
 	        this.algorithmType = algorithmType;
 	        this.goal = goal;
 	        this.ttimeSource = ttimeSource;
-	        this.tdisSource = tdisSource;
 	    }
 
 
-	    public TaxiOptimizer createTaxiOptimizer(TaxiOptimizerConfiguration optimConfig)
+	    public TaxiOptimizer createTaxiOptimizer(TaxiOptimizerContext optimConfig)
 	    {
 	        switch (algorithmType) {
 	            case NO_SCHEDULING:
@@ -245,11 +224,6 @@ public class PrtParameters {
 	    public TravelTimeSource getTravelTimeSource(){
 	    	return this.ttimeSource;
 	    }
-	    
-	    public TravelDisutilitySource getTravelDisutilitySource(){
-	    	return this.tdisSource;
-	    }
-	    
 	}
 	
 }

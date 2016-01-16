@@ -25,7 +25,9 @@ import org.matsim.contrib.dvrp.data.VrpData;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 
-import playground.michalm.taxi.run.TaxiLauncherUtils;
+import playground.michalm.taxi.data.ETaxiData;
+import playground.michalm.taxi.data.file.*;
+import playground.michalm.taxi.ev.ETaxiUtils;
 
 /**
  * @author jbischoff
@@ -47,7 +49,9 @@ public class ConfigBasedTaxiLaunchUtils {
 		final TaxiConfigGroup tcg = (TaxiConfigGroup) controler.getScenario().getConfig().getModule("taxiConfig");
       	context = new MatsimVrpContextImpl();
 		context.setScenario(controler.getScenario());
-		VrpData vrpData = TaxiLauncherUtils.initTaxiData(context.getScenario(), tcg.getVehiclesFile(), tcg.getRanksFile());
+        ETaxiData vrpData = new ETaxiData();
+        new ETaxiReader(context.getScenario(), vrpData).parse(tcg.getVehiclesFile());
+        new TaxiRankReader(context.getScenario(), vrpData).parse(tcg.getRanksFile());
 		context.setVrpData(vrpData);	 
 		TaxiStatsControlerListener tscl = new TaxiStatsControlerListener(context,tcg);
 		controler.addControlerListener(tscl);

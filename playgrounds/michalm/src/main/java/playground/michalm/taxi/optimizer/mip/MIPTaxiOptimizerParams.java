@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2016 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,35 +17,37 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.optimizer;
+package playground.michalm.taxi.optimizer.mip;
 
-import com.google.common.collect.Iterables;
+import org.apache.commons.configuration.Configuration;
 
-import playground.michalm.taxi.data.*;
-import playground.michalm.taxi.data.TaxiRequest.TaxiRequestStatus;
-import playground.michalm.taxi.scheduler.TaxiSchedulerUtils;
+import playground.michalm.taxi.optimizer.AbstractTaxiOptimizerParams;
+import playground.michalm.taxi.optimizer.rules.RuleBasedTaxiOptimizer.Goal;
 
 
-public class TaxiOptimizationValidation
+public class MIPTaxiOptimizerParams
+//    extends TaxiOptimizerParams
 {
-    public static void assertNoUnplannedRequestsWhenIdleVehicles(
-            TaxiOptimizerContext optimContext)
-    {
-        ETaxiData taxiData = (ETaxiData)optimContext.context.getVrpData();
-
-        int vehCount = Iterables.size(Iterables.filter(taxiData.getVehicles().values(),
-                TaxiSchedulerUtils.createIsIdle(optimContext.scheduler)));
-
-        if (vehCount == 0) {
-            return;//OK
-        }
-
-        if (TaxiRequests.countRequestsWithStatus(taxiData.getTaxiRequests().values(),
-                TaxiRequestStatus.UNPLANNED) == 0) {
-            return; //OK
-        }
-
-        //idle vehicles and unplanned requests
-        throw new IllegalStateException();
-    }
+//    public static final String FIND_START_SOLUTION = "findStartSolution";
+//    public static final String OPTIMIZE = "optimize";
+//    public static final String LOAD = "load";
+//    public static final String REQ_PER_VEH_PLANNING_HORIZON = "reqPerVehPlanningHorizon";
+//
+//    public final int nearestRequestsLimit;
+//    public final int nearestVehiclesLimit;
+//
+//    public final double cellSize;
+//
+//
+//    public MIPTaxiOptimizerParams(Configuration optimizerConfig)
+//    {
+//        super(optimizerConfig);
+//
+//        goal = Goal.valueOf(optimizerConfig.getString(GOAL));
+//
+//        nearestRequestsLimit = optimizerConfig.getInt(NEAREST_REQUESTS_LIMIT);
+//        nearestVehiclesLimit = optimizerConfig.getInt(NEAREST_VEHICLES_LIMIT);
+//
+//        cellSize = optimizerConfig.getDouble(CELL_SIZE);//1000 m tested for Berlin
+//    }
 }

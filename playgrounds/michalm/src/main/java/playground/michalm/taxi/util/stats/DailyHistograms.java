@@ -19,7 +19,7 @@
 
 package playground.michalm.taxi.util.stats;
 
-import java.io.PrintWriter;
+import java.io.*;
 
 
 public class DailyHistograms
@@ -40,10 +40,23 @@ public class DailyHistograms
     }
 
 
-    public void printStats(PrintWriter pw)
+    public void printHistograms(PrintWriter pw)
     {
         pw.print(emptyDriveRatio.countsToString());
         pw.print(stayRatio.countsToString());
         pw.println();
+    }
+
+
+    public void printHistograms(String file)
+    {
+        try (PrintWriter dailyHistogramsWriter = new PrintWriter(file)) {
+            dailyHistogramsWriter.println(DailyHistograms.MAIN_HEADER);
+            printSubHeaders(dailyHistogramsWriter);
+            printHistograms(dailyHistogramsWriter);
+        }
+        catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

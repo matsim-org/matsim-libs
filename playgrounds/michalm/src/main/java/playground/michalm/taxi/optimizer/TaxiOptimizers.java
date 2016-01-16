@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2016 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -19,33 +19,23 @@
 
 package playground.michalm.taxi.optimizer;
 
-import com.google.common.collect.Iterables;
+import org.matsim.contrib.dvrp.MatsimVrpContext;
+import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
+import org.matsim.core.router.util.*;
 
-import playground.michalm.taxi.data.*;
-import playground.michalm.taxi.data.TaxiRequest.TaxiRequestStatus;
-import playground.michalm.taxi.scheduler.TaxiSchedulerUtils;
+import playground.michalm.taxi.scheduler.*;
 
 
-public class TaxiOptimizationValidation
+public class TaxiOptimizers
 {
-    public static void assertNoUnplannedRequestsWhenIdleVehicles(
-            TaxiOptimizerContext optimContext)
+    public static TaxiOptimizer createOptimizer(MatsimVrpContext context, TravelTime travelTime,
+            AbstractTaxiOptimizerParams optimizerParams, TaxiSchedulerParams schedulerParams)
     {
-        ETaxiData taxiData = (ETaxiData)optimContext.context.getVrpData();
-
-        int vehCount = Iterables.size(Iterables.filter(taxiData.getVehicles().values(),
-                TaxiSchedulerUtils.createIsIdle(optimContext.scheduler)));
-
-        if (vehCount == 0) {
-            return;//OK
-        }
-
-        if (TaxiRequests.countRequestsWithStatus(taxiData.getTaxiRequests().values(),
-                TaxiRequestStatus.UNPLANNED) == 0) {
-            return; //OK
-        }
-
-        //idle vehicles and unplanned requests
-        throw new IllegalStateException();
+        TravelDisutility travelDisutility = new TimeAsTravelDisutility(travelTime);
+        TaxiScheduler scheduler = new TaxiScheduler(context, schedulerParams, travelTime,
+                travelDisutility);
+        TaxiOptimizerContext optimContext = new TaxiOptimizerContext(context, travelTime,
+                travelDisutility, optimizerParams, scheduler);
+        return optimizerParams.createTaxiOptimizer(optimContext);
     }
 }

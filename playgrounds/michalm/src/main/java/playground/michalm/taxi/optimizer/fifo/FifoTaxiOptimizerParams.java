@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2016 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,35 +17,26 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.optimizer;
+package playground.michalm.taxi.optimizer.fifo;
 
-import com.google.common.collect.Iterables;
+import org.apache.commons.configuration.Configuration;
 
-import playground.michalm.taxi.data.*;
-import playground.michalm.taxi.data.TaxiRequest.TaxiRequestStatus;
-import playground.michalm.taxi.scheduler.TaxiSchedulerUtils;
+import playground.michalm.taxi.optimizer.*;
 
 
-public class TaxiOptimizationValidation
+public class FifoTaxiOptimizerParams
+    extends AbstractTaxiOptimizerParams
 {
-    public static void assertNoUnplannedRequestsWhenIdleVehicles(
-            TaxiOptimizerContext optimContext)
+    public FifoTaxiOptimizerParams(Configuration optimizerConfig)
     {
-        ETaxiData taxiData = (ETaxiData)optimContext.context.getVrpData();
-
-        int vehCount = Iterables.size(Iterables.filter(taxiData.getVehicles().values(),
-                TaxiSchedulerUtils.createIsIdle(optimContext.scheduler)));
-
-        if (vehCount == 0) {
-            return;//OK
-        }
-
-        if (TaxiRequests.countRequestsWithStatus(taxiData.getTaxiRequests().values(),
-                TaxiRequestStatus.UNPLANNED) == 0) {
-            return; //OK
-        }
-
-        //idle vehicles and unplanned requests
-        throw new IllegalStateException();
+        super(optimizerConfig);
     }
+
+
+    @Override
+    public FifoTaxiOptimizer createTaxiOptimizer(TaxiOptimizerContext optimContext)
+    {
+        return new FifoTaxiOptimizer(optimContext);
+    }
+
 }
