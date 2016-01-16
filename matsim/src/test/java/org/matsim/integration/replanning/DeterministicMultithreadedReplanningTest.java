@@ -277,7 +277,7 @@ public class DeterministicMultithreadedReplanningTest {
 			controler = new Controler( config ) ;
 			controler.getConfig().controler().setCreateGraphs(false);
 			controler.getConfig().controler().setWriteEventsInterval(1);
-			controler.setDumpDataAtEnd(false);
+			controler.getConfig().controler().setDumpDataAtEnd(false);
 			this.manager = manager ;
 			controler.addOverridingModule(new AbstractModule() {
                 @Override

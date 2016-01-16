@@ -61,7 +61,7 @@ public class StructuresToFacilities {
 		dba = new DataBaseAdmin(new File("./data/dataBases/SiouxFalls_DataBase.properties"));
 
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new NetworkReaderMatsimV1(scenario).parse(networkPath); 
+		new NetworkReaderMatsimV1(scenario.getNetwork()).parse(networkPath);
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 
 		Double x = 0.0;

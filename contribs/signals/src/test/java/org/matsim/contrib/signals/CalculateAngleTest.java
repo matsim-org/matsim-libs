@@ -40,7 +40,7 @@ public class CalculateAngleTest {
 	public void testGetLeftLane() {
 		Config conf = utils.loadConfig(utils.getClassInputDirectory() + "config.xml");
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(conf);
-		new MatsimNetworkReader(scenario).readFile(conf.network().getInputFile());
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(conf.network().getInputFile());
 
 		Assert.assertEquals("Has to be 'null', since there is no other way back but Link 11.",
 				null, NetworkUtils.getLeftLane(scenario.getNetwork().getLinks().get(Id.create("1", Link.class))));

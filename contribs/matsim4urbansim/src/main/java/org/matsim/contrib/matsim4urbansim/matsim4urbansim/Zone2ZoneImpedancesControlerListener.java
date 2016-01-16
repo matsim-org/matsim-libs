@@ -38,7 +38,7 @@ import org.matsim.contrib.matsim4urbansim.matsim4urbansim.costcalculators.Travel
 import org.matsim.contrib.matsim4urbansim.utils.helperobjects.Benchmark;
 import org.matsim.contrib.matsim4urbansim.utils.helperobjects.ZoneObject;
 import org.matsim.contrib.matsim4urbansim.utils.io.misc.ProgressBar;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.network.NetworkImpl;
@@ -64,7 +64,7 @@ import java.util.Map;
  * This controller version is designed for the sustaincity mile stone (Month 18).
  * 
  * improvements / changes march'12
- * - This controler works for UrbanSim Zone and Parcel Applications
+ * - This services works for UrbanSim Zone and Parcel Applications
  * 
  * improvements / changes aug'12
  * - added calculation of free speed car and bike travel times
@@ -78,7 +78,7 @@ import java.util.Map;
  * 
  * improvements april'13
  * - trips are scaled up to 100%
- * - taking disutilites directly from MATSim (controler.createTravelCostCalculator()), this 
+ * - taking disutilites directly from MATSim (services.createTravelCostCalculator()), this
  * also activates road pricing ...
  * 
  * @author nagel
@@ -125,7 +125,7 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 		int benchmarkID = this.benchmark.addMeasure("zone-to-zone impedances");
 		
 		// get the controller and scenario
-		Controler controler = event.getControler();
+		MatsimServices controler = event.getServices();
 		Scenario sc = controler.getScenario();
 		
 		double samplingRate = ConfigurationUtils.getUrbanSimParameterConfigModule(sc).getPopulationSampleRate();
@@ -155,7 +155,7 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 		
 		try {
 			// creating zone-to-zone impedance matrix with header
-			UrbanSimParameterConfigModuleV3 module = (UrbanSimParameterConfigModuleV3) event.getControler().
+			UrbanSimParameterConfigModuleV3 module = (UrbanSimParameterConfigModuleV3) event.getServices().
 					getConfig().getModule(UrbanSimParameterConfigModuleV3.GROUP_NAME);
 			BufferedWriter travelDataWriter = initZone2ZoneImpedaceWriter(module.getMATSim4OpusTemp() + FILE_NAME); 
 			

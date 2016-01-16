@@ -54,7 +54,7 @@ public class LinkFrequencyCalculator {
 		System.out.println("analysis output directory: "+outDir);
 
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenario).readFile(net.getPath());
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(net.getPath());
 		
 		Set<Id<Link>> linkIds = null;
 		if (args.length == 4) {

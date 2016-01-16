@@ -67,7 +67,7 @@ public class TimeOverDist {
 		creader.readFile("/Users/jillenberger/Work/socialnets/locationChoice/config.xml");
 
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
-		MatsimNetworkReader netReader = new MatsimNetworkReader(scenario);
+		MatsimNetworkReader netReader = new MatsimNetworkReader(scenario.getNetwork());
 		netReader.readFile(config.getParam("network", "inputNetworkFile"));
 		Network network = scenario.getNetwork();
 

@@ -89,7 +89,7 @@ public class TransitSchedule2Shape {
 
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario).readFile(NETWORKFILE);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(NETWORKFILE);
 		new TransitScheduleReaderV1(transitSchedule, network).readFile(SCHEDULEFILE);
 	
 		Map<Id, SortedMap<String, Object>> lineAttributesMap = TransitSchedule2Shape.getAttributesForLines(transitSchedule, pIdentifier);

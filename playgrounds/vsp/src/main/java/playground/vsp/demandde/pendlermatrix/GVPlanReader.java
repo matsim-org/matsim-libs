@@ -66,9 +66,9 @@ public class GVPlanReader {
 	
 	public static void main(String[] args) {
 		Scenario gvNetwork = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(gvNetwork).readFile(GV_NETWORK_FILENAME);
+		new MatsimNetworkReader(gvNetwork.getNetwork()).readFile(GV_NETWORK_FILENAME);
 		Scenario osmNetwork = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(osmNetwork).readFile(NETWORK_FILENAME);
+		new MatsimNetworkReader(osmNetwork.getNetwork()).readFile(NETWORK_FILENAME);
 		Collection<SimpleFeature> featuresInShape;
 		featuresInShape = new ShapeFileReader().readFileAndInitialize(FILTER_FILENAME);
 		

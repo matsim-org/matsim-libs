@@ -36,8 +36,8 @@ public static void main(String[] args) {
 	Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 	Scenario scenario2 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 	
-	new MatsimNetworkReader(scenario).readFile("C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/network/versions/networkptcg.xml");
-	new MatsimNetworkReader(scenario2).readFile("C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/network/trains/net32N.xml");
+	new MatsimNetworkReader(scenario.getNetwork()).readFile("C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/network/versions/networkptcg.xml");
+	new MatsimNetworkReader(scenario2.getNetwork()).readFile("C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/network/trains/net32N.xml");
 	MergeNetworks.merge(scenario.getNetwork(), "", scenario2.getNetwork());
 	
 	new NetworkWriter(scenario.getNetwork()).write("C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/network/versions/networkptcgt.xml");

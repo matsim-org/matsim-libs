@@ -37,9 +37,9 @@ import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 import org.matsim.contrib.transEnergySim.analysis.charging.ChargingLogRowFacilityLevel;
 import org.matsim.contrib.transEnergySim.analysis.charging.ChargingOutputLog;
 import org.matsim.contrib.transEnergySim.analysis.charging.StationaryChargingOutputLog;
-import org.matsim.contrib.transEnergySim.controllers.AddHandlerAtStartupControler;
 import org.matsim.contrib.transEnergySim.vehicles.api.AbstractVehicleWithBattery;
 import org.matsim.contrib.transEnergySim.vehicles.api.Vehicle;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
@@ -102,9 +102,9 @@ public class ChargingUponArrival implements ActivityStartEventHandler, PersonArr
 
 	private boolean loggingEnabled;
 
-	private AddHandlerAtStartupControler controller;
+	private MatsimServices controller;
 
-	public ChargingUponArrival(HashMap<Id<Vehicle>, Vehicle> vehicles, AddHandlerAtStartupControler controller) {
+	public ChargingUponArrival(HashMap<Id<Vehicle>, Vehicle> vehicles, MatsimServices controller) {
 		this.vehicles = vehicles;
 		this.controller = controller;
 		this.setDefaultValues(chargablePowerAtActivityTypes);

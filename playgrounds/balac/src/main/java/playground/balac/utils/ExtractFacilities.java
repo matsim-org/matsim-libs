@@ -29,7 +29,7 @@ public class ExtractFacilities {
 	//String outputPath = "C:/Users/balacm/Desktop/Retailers/OldFrancescosResults/facilities_extraceted_retailers_old.xml";
 	private int numberOfFirstRetailer = 28;
 	private int numberOfSecondRetailer = 18;
-	MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario);
+	MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario.getNetwork());
 	
 	
 	public void extractFacilities(String facilitiesPath, String networkFilePath) throws IOException {

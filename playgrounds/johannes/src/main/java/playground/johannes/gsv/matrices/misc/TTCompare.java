@@ -19,7 +19,7 @@
 
 package playground.johannes.gsv.matrices.misc;
 
-import playground.johannes.gsv.matrices.io.VisumOMatrixReader;
+import playground.johannes.studies.matrix2014.matrix.io.VisumOMatrixReader;
 import playground.johannes.synpop.matrix.MatrixOperations;
 import playground.johannes.synpop.matrix.NumericMatrix;
 

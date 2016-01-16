@@ -74,10 +74,10 @@ public class NetworkMatsim2Shape {
 		Network net;
 		if(!filterLinks){
 			net = scenario.getNetwork();
-			new MatsimNetworkReader(scenario).readFile(netFile);
+			new MatsimNetworkReader(scenario.getNetwork()).readFile(netFile);
 		} else {
 			Network network = scenario.getNetwork();
-			new MatsimNetworkReader(scenario).readFile(netFile);
+			new MatsimNetworkReader(scenario.getNetwork()).readFile(netFile);
 			net = filterNetwork(network);
 		}
 //		new Links2ESRIShape(net, filePath + networkName + outFileType, TransformationFactory.WGS84).write();

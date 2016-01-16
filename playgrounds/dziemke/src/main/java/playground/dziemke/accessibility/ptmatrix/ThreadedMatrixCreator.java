@@ -69,9 +69,9 @@ class ThreadedMatrixCreator implements Runnable {
 		
 		TransitRouter transitRouter = new TransitRouterImpl(transitRouterConfig, transitSchedule);
 	    
-	    final InputsCSVWriter travelTimeMatrixWriter = new InputsCSVWriter(
+	    final CSVFileWriter travelTimeMatrixWriter = new CSVFileWriter(
 	    		this.outputRoot + "travelTimeMatrix_" + this.threadName + ".csv", this.separator);
-	    final InputsCSVWriter travelDistanceMatrixWriter = new InputsCSVWriter(
+	    final CSVFileWriter travelDistanceMatrixWriter = new CSVFileWriter(
 	    		this.outputRoot + "travelDistanceMatrix_" + this.threadName + ".csv", this.separator);
 	    
 		Network network = scenario.getNetwork();

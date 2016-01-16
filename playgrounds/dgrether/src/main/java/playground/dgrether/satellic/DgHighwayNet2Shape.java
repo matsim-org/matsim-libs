@@ -47,7 +47,7 @@ public class DgHighwayNet2Shape {
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario.getConfig().network().setInputFile(net);
 		Network network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario).readFile(net);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(net);
 		CoordinateReferenceSystem crs = MGC.getCRS(TransformationFactory.WGS84);
 		new DgNet2Shape().write(network, out, crs);
 	}

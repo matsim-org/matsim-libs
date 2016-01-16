@@ -37,7 +37,7 @@ class OneWorkplace {
 		config.qsim().setRemoveStuckVehicles(false);
 		config.qsim().setEndTime(30 * 60 * 60);
 		scenario = ScenarioUtils.createScenario(config);
-		new MatsimNetworkReader(scenario).parse(this.getClass().getResourceAsStream("one-workplace.xml"));
+		new MatsimNetworkReader(scenario.getNetwork()).parse(this.getClass().getResourceAsStream("one-workplace.xml"));
 		Population population = scenario.getPopulation();
 		for (int i=0; i<quantity; i++) {
 			Person person = population.getFactory().createPerson(Id.create(i, Person.class));

@@ -37,7 +37,7 @@ import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -189,7 +189,7 @@ public class TripsAnalyzer implements PersonDepartureEventHandler, PersonArrival
 	@Override
 	public void notifyStartup(final StartupEvent event) {
 
-		Controler controler = event.getControler();	
+		MatsimServices controler = event.getServices();
 		this.minIteration = controler.getConfig().controler().getFirstIteration();
 		int maxIter = controler.getConfig().controler().getLastIteration();
 		int iterations = maxIter - this.minIteration;
@@ -198,8 +198,8 @@ public class TripsAnalyzer implements PersonDepartureEventHandler, PersonArrival
 		this.distanceHistory = new double[this.sortedModes.size() + 1][iterations + 1];	
 		
 		if (autoConfig) {
-			this.tripsFileName = event.getControler().getControlerIO().getOutputFilename(defaultTripsFileName);
-			this.durationsFileName = event.getControler().getControlerIO().getOutputFilename(defaultDurationsFileName);
+			this.tripsFileName = event.getServices().getControlerIO().getOutputFilename(defaultTripsFileName);
+			this.durationsFileName = event.getServices().getControlerIO().getOutputFilename(defaultDurationsFileName);
 			
 					}
 		controler.getEvents().addHandler(this);

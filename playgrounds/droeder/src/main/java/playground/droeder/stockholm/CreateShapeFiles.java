@@ -56,7 +56,7 @@ public class CreateShapeFiles {
 	String networkfile = "C:\\Users\\Daniel\\Desktop\\_Ablage\\Stockholm\\osm\\network.xml.gz";
 
 	Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-	new MatsimNetworkReader(sc).readFile(networkfile);
+	new MatsimNetworkReader(sc.getNetwork()).readFile(networkfile);
 	
 	Collection<SimpleFeature> features = new HashSet<SimpleFeature>();
 	LinkFeatureBuilder builder = new LinkFeatureBuilder(MGC.getCRS("EPSG:3006"));

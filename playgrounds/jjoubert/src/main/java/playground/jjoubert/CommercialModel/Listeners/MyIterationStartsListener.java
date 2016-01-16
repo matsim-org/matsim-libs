@@ -29,7 +29,7 @@ public class MyIterationStartsListener implements IterationStartsListener {
 	private final Logger log = Logger.getLogger(MyIterationStartsListener.class);
 	
 	public void notifyIterationStarts(IterationStartsEvent event) {
-		log.info("  --> Start of iteration " + event.getIteration() + "/" + event.getControler().getConfig().controler().getLastIteration() );
+		log.info("  --> Start of iteration " + event.getIteration() + "/" + event.getServices().getConfig().controler().getLastIteration() );
 		
 	}
 

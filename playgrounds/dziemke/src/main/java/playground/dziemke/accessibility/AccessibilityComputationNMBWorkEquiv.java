@@ -2,6 +2,7 @@ package playground.dziemke.accessibility;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
@@ -10,14 +11,21 @@ import org.matsim.contrib.accessibility.GridBasedAccessibilityControlerListenerV
 import org.matsim.contrib.accessibility.Modes4Accessibility;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.controler.listener.ControlerListener;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityOption;
 import org.matsim.facilities.FacilitiesUtils;
+
+import javax.inject.Inject;
+import javax.inject.Provider;
 
 
 public class AccessibilityComputationNMBWorkEquiv {
@@ -48,7 +56,7 @@ public class AccessibilityComputationNMBWorkEquiv {
 		int populationThreshold = (int) (200 / (1000/cellSize * 1000/cellSize));
 		
 
-		Config config = ConfigUtils.createConfig( new AccessibilityConfigGroup() ) ;
+		final Config config = ConfigUtils.createConfig( new AccessibilityConfigGroup() ) ;
 		config.controler().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
 		config.controler().setOutputDirectory(outputDirectory);
 		config.network().setInputFile(networkFile);
@@ -56,14 +64,14 @@ public class AccessibilityComputationNMBWorkEquiv {
 
 		config.controler().setLastIteration(0);
 
-		Scenario scenario = ScenarioUtils.loadScenario(config) ;
+		final Scenario scenario = ScenarioUtils.loadScenario(config) ;
 
 		String typeWEQ = "w-eq";
-		List<String> activityTypes = new ArrayList<String>() ;
+		List<String> activityTypes = new ArrayList<>() ;
 		activityTypes.add(typeWEQ);
 
-		ActivityFacilities homes = FacilitiesUtils.createActivityFacilities("homes") ;
-		ActivityFacilities amenities = FacilitiesUtils.createActivityFacilities("amenities") ;
+		final ActivityFacilities homes = FacilitiesUtils.createActivityFacilities("homes") ;
+		final ActivityFacilities amenities = FacilitiesUtils.createActivityFacilities("amenities") ;
 		for ( ActivityFacility fac : scenario.getActivityFacilities().getFacilities().values()  ) {
 			for ( ActivityOption option : fac.getActivityOptions().values() ) {
 				// figure out all activity types
@@ -92,18 +100,27 @@ public class AccessibilityComputationNMBWorkEquiv {
 		double[] mapViewExtent = {115000,-3718000,161000,-3679000}; // what actually needs to be drawn
 
 		Controler controler = new Controler(scenario);
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				addControlerListenerBinding().toProvider(new Provider<ControlerListener>() {
+					@Inject Scenario scenario;
+					@Inject Map<String, TravelTime> travelTimes;
+					@Inject Map<String, TravelDisutilityFactory> travelDisutilityFactories;
 
-		GridBasedAccessibilityControlerListenerV3 listener = 
-				new GridBasedAccessibilityControlerListenerV3(amenities, config, scenario.getNetwork());
-
-		listener.setComputingAccessibilityForMode(Modes4Accessibility.freeSpeed, true);
-		listener.addAdditionalFacilityData(homes) ;
-		listener.generateGridsAndMeasuringPointsByNetwork(cellSize);
-		listener.writeToSubdirectoryWithName("w-eq");
-		listener.setUrbansimMode(false); // avoid writing some (eventually: all) files that related to matsim4urbansim
-
-		controler.addControlerListener(listener);
-
+					@Override
+					public ControlerListener get() {
+						GridBasedAccessibilityControlerListenerV3 listener = new GridBasedAccessibilityControlerListenerV3(amenities, null, config, scenario, travelTimes, travelDisutilityFactories);
+						listener.setComputingAccessibilityForMode(Modes4Accessibility.freeSpeed, true);
+						listener.addAdditionalFacilityData(homes) ;
+						listener.generateGridsAndMeasuringPointsByNetwork(cellSize);
+						listener.writeToSubdirectoryWithName("w-eq");
+						listener.setUrbansimMode(false); // avoid writing some (eventually: all) files that related to matsim4urbansim
+						return listener;
+					}
+				});
+			}
+		});
 		controler.run();
 
 		String workingDirectory =  config.controler().getOutputDirectory();

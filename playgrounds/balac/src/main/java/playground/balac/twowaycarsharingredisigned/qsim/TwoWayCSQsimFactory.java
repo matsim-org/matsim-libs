@@ -7,7 +7,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -33,10 +33,10 @@ public class TwoWayCSQsimFactory implements MobsimFactory{
 
 
 	private final Scenario scenario;
-	private final Controler controler;
+	private final MatsimServices controler;
 	private final ArrayList<TwoWayCSStation> twvehiclesLocation;
 
-	public TwoWayCSQsimFactory(final Scenario scenario, final Controler controler) {
+	public TwoWayCSQsimFactory(final Scenario scenario, final MatsimServices controler) {
 		
 		this.scenario = scenario;
 		this.controler = controler;

@@ -33,13 +33,13 @@ public class RentPrivateParkingModel extends GeneralParkingModule {
 		// already called by free floating code
 		
 		eventsManager = EventsUtils.createEventsManager();
-		eventsWriter = new EventWriterXML(event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "parkingEvents.xml.gz"));
+		eventsWriter = new EventWriterXML(event.getServices().getControlerIO().getIterationFilename(event.getIteration(), "parkingEvents.xml.gz"));
 		eventsManager.addHandler(eventsWriter);
 		rentableParkingHandler = new RentableParkingHandler();
 		eventsManager.addHandler(rentableParkingHandler);
 		
 		eventsManager.resetHandlers(0);
-		eventsWriter.init(event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "parkingEvents.xml.gz"));
+		eventsWriter.init(event.getServices().getControlerIO().getIterationFilename(event.getIteration(), "parkingEvents.xml.gz"));
 		
 		getParkingInfrastructure().setEventsManager(eventsManager);
 	}
@@ -48,7 +48,7 @@ public class RentPrivateParkingModel extends GeneralParkingModule {
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		super.notifyIterationEnds(event);
 		
-		parkingGroupOccupanciesZH.savePlot(event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "parkingGroupOccupancy.png"));
+		parkingGroupOccupanciesZH.savePlot(event.getServices().getControlerIO().getIterationFilename(event.getIteration(), "parkingGroupOccupancy.png"));
 		averageWalkDistanceStatsZH.printStatistics();
 		
 		eventsManager.finishProcessing();

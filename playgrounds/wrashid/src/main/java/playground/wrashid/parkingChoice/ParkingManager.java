@@ -7,7 +7,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.obj.network.EnclosingRectangle;
 import org.matsim.contrib.parking.lib.obj.network.QuadTreeInitializer;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.utils.collections.QuadTree;
@@ -62,7 +62,7 @@ public class ParkingManager implements StartupListener {
 		this.parkingSelectionManager = parkingSelectionManager;
 	}
 
-	private final Controler controler;
+	private final MatsimServices controler;
 
 	
 	private Collection<PParking> parkingCollection;
@@ -73,7 +73,7 @@ public class ParkingManager implements StartupListener {
 		return parkingSelectionManager;
 	}
 	
-	public Controler getControler() {
+	public MatsimServices getControler() {
 		return controler;
 	}
 
@@ -121,7 +121,7 @@ public class ParkingManager implements StartupListener {
 		parkingsHashMap.put(parking.getId(), parking);
 	}
 
-	public ParkingManager(Controler controler, Collection<PParking> parkingCollection) {
+	public ParkingManager(MatsimServices controler, Collection<PParking> parkingCollection) {
 		this.controler = controler;
 		this.parkingCollection = parkingCollection;
 		currentParkingLocation = new HashMap<Id, PParking>();

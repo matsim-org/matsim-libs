@@ -82,7 +82,7 @@ public class CreateZoneConnectors {
 	public CreateZoneConnectors() throws Exception {
 		
 		this.scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenario).readFile(networkInFile);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkInFile);
 		CoordinateTransformation coordinateTransformation = new IdentityTransformation();
 						
 		this.createMapping(coordinateTransformation);

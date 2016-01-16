@@ -25,7 +25,9 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.events.EventsUtils;
@@ -33,6 +35,7 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
+import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.util.TravelDisutility;
@@ -51,6 +54,7 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.Override;
 import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.HashSet;
@@ -120,7 +124,7 @@ public class PaperRunner implements StartupListener, MobsimBeforeSimStepListener
 	protected WithinDayControlerListener withinDayControlerListener;
 	protected SelectHandledAgentsByProbability selector;
 
-	public PaperRunner(Controler controler) {
+	public PaperRunner(MatsimServices controler) {
 
 		this.scenario = controler.getScenario();
 		this.withinDayControlerListener = new WithinDayControlerListener();
@@ -130,7 +134,7 @@ public class PaperRunner implements StartupListener, MobsimBeforeSimStepListener
 	}
 
 	/*
-	 * New Routers for the Replanning are used instead of using the controler's.
+	 * New Routers for the Replanning are used instead of using the services's.
 	 * By doing this every person can use a personalized Router.
 	 */
 	protected void initReplanners() {
@@ -195,17 +199,17 @@ public class PaperRunner implements StartupListener, MobsimBeforeSimStepListener
 		
 		// Module to analyze the travel times
 		AnalyzeTravelTimes analyzeTravelTimes = new AnalyzeTravelTimes(this.scenario, cityZurichSHPFile, cantonZurichSHPFile, affectedAgents, replanningAgents);
-		event.getControler().addControlerListener(analyzeTravelTimes);
-		event.getControler().getEvents().addHandler(analyzeTravelTimes);
+		event.getServices().addControlerListener(analyzeTravelTimes);
+		event.getServices().getEvents().addHandler(analyzeTravelTimes);
 
 		// Module to analyze expected travel time on a single link
 		Collection<Link> changedLinks = new HashSet<Link>();
-        for (NetworkChangeEvent networkChangeEvent : ((NetworkImpl) event.getControler().getScenario().getNetwork()).getNetworkChangeEvents()) {
+        for (NetworkChangeEvent networkChangeEvent : ((NetworkImpl) event.getServices().getScenario().getNetwork()).getNetworkChangeEvents()) {
 			changedLinks.addAll(networkChangeEvent.getLinks());
 		}
 		LogLinkTravelTime logLinkTravelTime = new LogLinkTravelTime(changedLinks, 
 				this.withinDayControlerListener.getTravelTimeCollector());
-		event.getControler().addControlerListener(logLinkTravelTime);
+		event.getServices().addControlerListener(logLinkTravelTime);
 		this.withinDayControlerListener.getFixedOrderSimulationListener().addSimulationListener(logLinkTravelTime);			
 	}
 
@@ -366,10 +370,15 @@ public class PaperRunner implements StartupListener, MobsimBeforeSimStepListener
 			final Controler controler = new Controler(args[0]);
 
 			// create a PaperRunner and register it as a Controller and Simulation Listener
-			PaperRunner paperRunner = new PaperRunner(controler);
+			final PaperRunner paperRunner = new PaperRunner(controler);
 			controler.addControlerListener(paperRunner);
-			controler.getMobsimListeners().add(paperRunner);
-			
+			controler.addOverridingModule(new AbstractModule() {
+				@Override
+				public void install() {
+					addMobsimListenerBinding().toInstance(paperRunner);
+				}
+			});
+
 			// do not dump plans, network and facilities and the end
 //			controller.setDumpDataAtEnd(false);
 			

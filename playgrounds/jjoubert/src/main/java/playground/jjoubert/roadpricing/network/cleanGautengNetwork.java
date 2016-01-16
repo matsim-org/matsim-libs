@@ -125,7 +125,7 @@ public class cleanGautengNetwork {
 	private void updateLaneDefinitions(String networkToRead, String networkToWrite){
 		this.log.info("Updating lane definitions...");
 		sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		NetworkReaderMatsimV1 nwr = new NetworkReaderMatsimV1(sc);
+		NetworkReaderMatsimV1 nwr = new NetworkReaderMatsimV1(sc.getNetwork());
 		nwr.parse(networkToRead);
 
 		File folder = new File(this.laneDefinitionFolder);
@@ -186,7 +186,7 @@ public class cleanGautengNetwork {
 		this.log.info("Reading cleaned network from " + networkToRead);
 		sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		
-		new NetworkReaderMatsimV1(sc).parse(networkToRead);
+		new NetworkReaderMatsimV1(sc.getNetwork()).parse(networkToRead);
 		this.log.info("Network read successfully.");
 	}
 	

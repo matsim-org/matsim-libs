@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.emissions.EmissionModule;
 import org.matsim.contrib.emissions.events.EmissionEventsReader;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.ScoringEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -55,7 +55,7 @@ import java.util.Map;
 public class EmissionControlerListener implements StartupListener, IterationStartsListener, ShutdownListener, ScoringListener{
 	private static final Logger logger = Logger.getLogger(EmissionControlerListener.class);
 	
-	Controler controler;
+	MatsimServices controler;
 	String emissionEventOutputFile;
 	Integer lastIteration;
 	EmissionModule emissionModule;
@@ -93,7 +93,7 @@ public class EmissionControlerListener implements StartupListener, IterationStar
 	private Map<Double, ArrayList<EmPerCell>> emissionsPerCell;
 
 
-	public EmissionControlerListener(Controler controler) {
+	public EmissionControlerListener(MatsimServices controler) {
 		this.controler = controler;
         setMinMax(controler.getScenario().getNetwork());
         this.gt = new GridTools(controler.getScenario().getNetwork().getLinks(), xMin, xMax, yMin, yMax);
@@ -105,7 +105,7 @@ public class EmissionControlerListener implements StartupListener, IterationStar
 		this.emissionFile1="./output/emissionFile.txt";
 	}
 	
-	public EmissionControlerListener(Controler controler, Network network, String eventsFile, String emissionFile){
+	public EmissionControlerListener(MatsimServices controler, Network network, String eventsFile, String emissionFile){
 		this.controler = controler;
 		setMinMax(network);
 		this.gt = new GridTools(network.getLinks(), xMin, xMax, yMin, yMax);
@@ -134,7 +134,7 @@ public class EmissionControlerListener implements StartupListener, IterationStar
 
 	@Override
 	public void notifyStartup(StartupEvent event) {
-		controler = event.getControler();
+		controler = event.getServices();
 		lastIteration = controler.getConfig().controler().getLastIteration();
 		logger.info("emissions will be calculated for iteration " + lastIteration);
 		
@@ -146,7 +146,7 @@ public class EmissionControlerListener implements StartupListener, IterationStar
 			logger.warn("Something went wrong while mapping links to cells.");
 		}
 		
-//		Scenario scenario = controler.getScenario() ;
+//		Scenario scenario = services.getScenario() ;
 //		emissionModule = new EmissionModule(scenario);
 //		emissionModule.createLookupTables();
 //		emissionModule.createEmissionHandler();

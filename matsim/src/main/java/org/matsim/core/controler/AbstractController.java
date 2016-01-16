@@ -51,15 +51,16 @@ public abstract class AbstractController {
     private boolean dirtyShutdown = false;
 
     protected AbstractController() {
-        this(new IterationStopWatch());
+        this(new IterationStopWatch(), null);
     }
 
-    AbstractController(IterationStopWatch stopWatch) {
+    AbstractController(IterationStopWatch stopWatch, MatsimServices matsimServices) {
         OutputDirectoryLogging.catchLogEntries();
         Gbl.printSystemInfo();
         Gbl.printBuildInfo();
         log.info("Used Controler-Class: " + this.getClass().getCanonicalName());
         this.controlerListenerManager = new ControlerListenerManager();
+        this.controlerListenerManager.setControler(matsimServices);
         this.stopwatch = stopWatch;
     }
 

@@ -58,7 +58,7 @@ public class AssignTypePopulation {
 			population = getPopulationTypesSocial(scenario, args);
 			break;
 		}
-		(new MatsimNetworkReader(scenario)).readFile(args[2]);
+		(new MatsimNetworkReader(scenario.getNetwork())).readFile(args[2]);
 		(new PopulationWriter(population)).write(args[3]);
 	}
 	private static Population getPopulationTypesSocial(Scenario scenario, String[] args) {

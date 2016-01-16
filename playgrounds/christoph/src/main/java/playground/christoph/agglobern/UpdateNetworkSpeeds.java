@@ -147,7 +147,7 @@ public class UpdateNetworkSpeeds {
 	}
 	
 	private void readNetworkFile(Scenario scenario) {
-		new MatsimNetworkReader(scenario).readFile(networkFile);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
 	}
 	
 	private void cleanNetwork(Network network) {

@@ -1,10 +1,6 @@
 package playground.tschlenther.analysis.modules.taxiTrips;
 
-import java.io.File;
-import java.io.IOException;
-
 import org.apache.log4j.Logger;
-import org.jfree.util.Log;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
@@ -17,8 +13,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.jbischoff.taxi.evaluation.TaxiCustomerWaitTimeAnalyser;
 import playground.jbischoff.taxi.evaluation.TravelDistanceTimeEvaluator;
-import playground.vsp.analysis.VspAnalyzer;
-import playground.vsp.demandde.counts.TSBASt2Count;
 
 public class TaxiAnalysisTest {
 
@@ -31,7 +25,7 @@ public class TaxiAnalysisTest {
 	public static void main(String[] args){
 		Config config = ConfigUtils.createConfig();
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
-		MatsimNetworkReader netReader = new MatsimNetworkReader(scenario);
+		MatsimNetworkReader netReader = new MatsimNetworkReader(scenario.getNetwork());
 		netReader.readFile(networkFile);
 		Network net = scenario.getNetwork();
 //		VspAnalyzer analyzer = new VspAnalyzer(outputDir,eventsFile);

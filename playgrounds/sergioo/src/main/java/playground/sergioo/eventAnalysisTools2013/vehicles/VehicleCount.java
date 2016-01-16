@@ -199,7 +199,7 @@ public class VehicleCount implements VehicleEntersTrafficEventHandler, PersonArr
 	
 	public static void main(String[] args) throws FileNotFoundException {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenario).readFile(args[0]);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(args[0]);
 		EventsManager events = EventsUtils.createEventsManager();
 		int totalTime = new Integer(args[3]), timeInterval = new Integer(args[4]);
 		events.addHandler(new VehicleCount(totalTime, timeInterval));

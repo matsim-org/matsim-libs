@@ -22,11 +22,24 @@
 
 package org.matsim.withinday.controller;
 
+import com.google.inject.Provides;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.mobsim.framework.listeners.FixedOrderSimulationListener;
+import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
+import org.matsim.withinday.mobsim.MobsimDataProvider;
 import org.matsim.withinday.mobsim.WithinDayEngine;
 import org.matsim.withinday.mobsim.WithinDayQSimFactory;
+import org.matsim.withinday.replanning.identifiers.tools.ActivityReplanningMap;
+import org.matsim.withinday.replanning.identifiers.tools.LinkReplanningMap;
+import org.matsim.withinday.trafficmonitoring.EarliestLinkExitTimeProvider;
 import org.matsim.withinday.trafficmonitoring.TravelTimeCollector;
+
+import javax.inject.Named;
+import java.util.HashMap;
+import java.util.Map;
 
 public class WithinDayModule extends AbstractModule {
     @Override
@@ -35,5 +48,21 @@ public class WithinDayModule extends AbstractModule {
         bindNetworkTravelTime().to(TravelTimeCollector.class);
         binder().bind(WithinDayEngine.class);
         bind(Mobsim.class).toProvider(WithinDayQSimFactory.class);
+        bind(FixedOrderSimulationListener.class).asEagerSingleton();
+        addMobsimListenerBinding().to(FixedOrderSimulationListener.class);
+        bind(WithinDayControlerListener.class).asEagerSingleton();
+        addControlerListenerBinding().to(WithinDayControlerListener.class);
+        bind(MobsimDataProvider.class).asEagerSingleton();
+        bind(ActivityReplanningMap.class).asEagerSingleton();
+        bind(LinkReplanningMap.class).asEagerSingleton();
+        bind(EarliestLinkExitTimeProvider.class).asEagerSingleton();
     }
+
+    @Provides @Named("lowerBound") Map<String, TravelTime> provideEarliestLinkExitTravelTimes(Map<String, TravelTime> travelTimes) {
+        Map<String, TravelTime> earliestLinkExitTravelTimes = new HashMap<String, TravelTime>();
+        earliestLinkExitTravelTimes.putAll(travelTimes);
+        earliestLinkExitTravelTimes.put(TransportMode.car, new FreeSpeedTravelTime());
+        return earliestLinkExitTravelTimes;
+    }
+
 }

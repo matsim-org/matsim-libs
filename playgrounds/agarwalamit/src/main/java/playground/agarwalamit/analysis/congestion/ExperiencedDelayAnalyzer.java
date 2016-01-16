@@ -111,7 +111,7 @@ public class ExperiencedDelayAnalyzer extends AbstractAnalysisModule {
 		MatsimEventsReader eventsReader = new MatsimEventsReader(em);
 		em.addHandler(implV3);
 		eventsReader.readFile(this.eventsFile);
-		if(implV3.getTotalDelay()/3600!=this.congestionHandler.getTotalDelayInHours())
+		if(implV3.getTotalDelay()/3600. !=this.congestionHandler.getTotalDelayInHours())
 			throw new RuntimeException("Total Delays are not equal using two methods; values are "+implV3.getTotalDelay()/3600+","+this.congestionHandler.getTotalDelayInHours());
 	}
 }

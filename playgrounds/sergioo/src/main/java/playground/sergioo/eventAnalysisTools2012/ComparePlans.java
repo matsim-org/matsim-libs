@@ -31,7 +31,7 @@ public class ComparePlans {
 	//Constructors
 	public ComparePlans(String networkFile, String plansFile, String outFile) throws Exception {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new NetworkReaderMatsimV1(scenario).parse(networkFile);
+		new NetworkReaderMatsimV1(scenario.getNetwork()).parse(networkFile);
 		new MatsimPopulationReader(scenario).parse(plansFile);
 		writeModeChoice(scenario.getPopulation(), outFile, scenario.getNetwork());
 	}

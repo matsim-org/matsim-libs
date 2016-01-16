@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.network.NetworkChangeEvent;
@@ -71,7 +72,7 @@ public class WithindayListener implements StartupListener {
 	public void notifyStartup(StartupEvent event) {
 		log.info("doing within day replanning ...");
 		
-		this.addNetworkChange(event.getControler(), links);
+		this.addNetworkChange(event.getServices(), links);
 		
 		this.withinDayControlerListener.notifyStartup(event);
 		
@@ -97,7 +98,7 @@ public class WithindayListener implements StartupListener {
 		withinDayControlerListener.getWithinDayEngine().addTimedDuringLegReplannerFactory(duringLegReplannerFactory, 15.5*3600.0, Double.MAX_VALUE);
 	}
 	
-	public void addNetworkChange(Controler controler, Set<Id<Link>> links) {
+	public void addNetworkChange(MatsimServices controler, Set<Id<Link>> links) {
         NetworkImpl network = (NetworkImpl) controler.getScenario().getNetwork();
 		NetworkChangeEvent networkChangeEvent0;
 		networkChangeEvent0 = network.getFactory().createNetworkChangeEvent(15.49 * 3600.0);		

@@ -7,8 +7,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
@@ -36,7 +36,7 @@ public class SocialCostControllerWithPT {
 		 * This cannot be moved to the initializer since the scoring functions
 		 * are created even before the startup event is created.
 		 */
-		//controler.setScoringFunctionFactory(new TimeAndMoneyDependentScoringFunctionFactory());
+		//services.setScoringFunctionFactory(new TimeAndMoneyDependentScoringFunctionFactory());
 
 		InitializerPT initializer = new InitializerPT();
 		controler.addControlerListener(initializer);
@@ -79,7 +79,7 @@ public class SocialCostControllerWithPT {
 		@Override
 		public void notifyIterationStarts(IterationStartsEvent event) {
 			if(event.getIteration()==0){
-				Controler controler = event.getControler();
+				MatsimServices controler = event.getServices();
 
 				VehicleOccupancyObserver vehicleObserver = new VehicleOccupancyObserver();
 				
@@ -93,12 +93,12 @@ public class SocialCostControllerWithPT {
 
 				// initialize the social costs disutility calculator
 				final SocialCostTravelDisutilityFactory factory = new SocialCostTravelDisutilityFactory(scc);
-				controler.addOverridingModule(new AbstractModule() {
-					@Override
-					public void install() {
-						bindCarTravelDisutilityFactory().toInstance(factory);
-					}
-				});
+//				services.addOverridingModule(new AbstractModule() {
+//					@Override
+//					public void install() {
+//						bindCarTravelDisutilityFactory().toInstance(factory);
+//					}
+//				});
 
 				// create a plot containing the mean travel times
 				Set<String> transportModes = new HashSet<String>();
@@ -108,6 +108,7 @@ public class SocialCostControllerWithPT {
 				MeanTravelTimeCalculator mttc = new MeanTravelTimeCalculator(controler.getScenario(), transportModes);
 				controler.addControlerListener(mttc);
 				controler.getEvents().addHandler(mttc);
+				throw new RuntimeException();
 			}
 		}
 	}

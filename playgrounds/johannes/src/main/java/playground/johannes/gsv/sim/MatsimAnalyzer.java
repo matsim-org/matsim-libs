@@ -63,7 +63,7 @@ public class MatsimAnalyzer {
 		PopulationReader reader = new PopulationReaderMatsimV5(scenario);
 		reader.readFile(popFile);
 		
-		MatsimNetworkReader netReader = new MatsimNetworkReader(scenario);
+		MatsimNetworkReader netReader = new MatsimNetworkReader(scenario.getNetwork());
 		netReader.readFile(netFile);
 
 		MatsimFacilitiesReader facReader = new MatsimFacilitiesReader(scenario);

@@ -28,17 +28,15 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PersonUtils;
-import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
+
+import playground.agarwalamit.utils.LoadMyScenarios;
 
 /**
  * @author amit
@@ -46,21 +44,21 @@ import org.matsim.core.utils.io.IOUtils;
 
 public class PlansChoiceSetDistributions {
 
-	private static final String absolutePath = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/";
-	private static final String plansAt0Iter = absolutePath+"/outputMCOff/run33/output_plans.xml.gz";
-	private static final String plansAtStopReplannig = absolutePath+"outputMCOff/run105_2/ITERS/it.80/80.plans.xml.gz";
-	private static final String plansAtLastIter =  absolutePath+"outputMCOff/run105_2/ITERS/it.100/100.plans.xml.gz";
+	private static final String ABS_PATH = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/";
+	private static final String PLANS_0_ITS = ABS_PATH+"/outputMCOff/run33/output_plans.xml.gz";
+	private static final String PLANS_STOP_REPLANNING = ABS_PATH+"outputMCOff/run105_2/ITERS/it.80/80.plans.xml.gz";
+	private static final String PLANS_LAST_IT =  ABS_PATH+"outputMCOff/run105_2/ITERS/it.100/100.plans.xml.gz";
 	private final Logger log = Logger.getLogger(PlansChoiceSetDistributions.class);
 	
 	public static void main(String[] args) {
 		PlansChoiceSetDistributions pc =  new PlansChoiceSetDistributions();
-		pc.writeLegsDistributionWRTSelectedPlan(plansAt0Iter, absolutePath+"/outputMCOff/run105_2/analysis/it.0.selectedLeg2OtherLegsDistribution.txt");
-		pc.writeLegsDistributionWRTSelectedPlan(plansAtStopReplannig, absolutePath+"/outputMCOff/run105_2/analysis/it.80.selectedLeg2OtherLegsDistribution.txt");
-		pc.writeLegsDistributionWRTSelectedPlan(plansAtLastIter, absolutePath+"/outputMCOff/run105_2/analysis/it.100.selectedLeg2OtherLegsDistribution.txt");
+		pc.writeLegsDistributionWRTSelectedPlan(PLANS_0_ITS, ABS_PATH+"/outputMCOff/run105_2/analysis/it.0.selectedLeg2OtherLegsDistribution.txt");
+		pc.writeLegsDistributionWRTSelectedPlan(PLANS_STOP_REPLANNING, ABS_PATH+"/outputMCOff/run105_2/analysis/it.80.selectedLeg2OtherLegsDistribution.txt");
+		pc.writeLegsDistributionWRTSelectedPlan(PLANS_LAST_IT, ABS_PATH+"/outputMCOff/run105_2/analysis/it.100.selectedLeg2OtherLegsDistribution.txt");
 
-		pc.writeLegsDistribution(plansAt0Iter, absolutePath+"/outputMCOff/run105_2/analysis/it.0.personId2TravelLegsDistribution.txt");
-		pc.writeLegsDistribution(plansAtStopReplannig, absolutePath+"/outputMCOff/run105_2/analysis/it.80.personId2TravelLegsDistribution.txt");
-		pc.writeLegsDistribution(plansAtLastIter, absolutePath+"/outputMCOff/run105_2/analysis/it.100.personId2TravelLegsDistribution.txt");
+		pc.writeLegsDistribution(PLANS_0_ITS, ABS_PATH+"/outputMCOff/run105_2/analysis/it.0.personId2TravelLegsDistribution.txt");
+		pc.writeLegsDistribution(PLANS_STOP_REPLANNING, ABS_PATH+"/outputMCOff/run105_2/analysis/it.80.personId2TravelLegsDistribution.txt");
+		pc.writeLegsDistribution(PLANS_LAST_IT, ABS_PATH+"/outputMCOff/run105_2/analysis/it.100.personId2TravelLegsDistribution.txt");
 		//		Map<Id, List<String>> personId2legs =  pc.getLegsForAllPlansInChoiceSet(plansAtStopReplannig);
 		//		pc.writeMap2TxtFile(personId2legs, absolutePath+"/outputMC/run101_2/analysis/personId2TravelLegsForChoiceSet.txt");
 
@@ -77,7 +75,7 @@ public class PlansChoiceSetDistributions {
 	 *  37 persons have more than 0% and less than or equal to 20% cars in their choice set and car is leg in selected plan and
 	 *  similarly 153 persons have more than 0% and less than or equal to 20% cars in their choice set and pt is leg in selected plan.
 	 */
-	private void writeLegsDistributionWRTSelectedPlan(String plansFile, String outputFile){
+	private void writeLegsDistributionWRTSelectedPlan(final String plansFile, final String outputFile){
 		SortedMap<Id<Person>, List<String>> personId2legs = getLegsForAllPlansInChoiceSet(plansFile);
 		SortedMap<Double, Double> selectedCar2OtherLegs = new TreeMap<Double, Double>();
 		SortedMap<Double, Double> selectedPt2OtherLegs = new TreeMap<Double, Double>();;
@@ -88,7 +86,6 @@ public class PlansChoiceSetDistributions {
 			selectedCar2OtherLegs.put(d, 0.);
 			selectedPt2OtherLegs.put(d, 0.);
 		}
-
 
 		for(Id<Person> pId: personId2legs.keySet()){
 			List<String> legs = personId2legs.get(pId);
@@ -143,7 +140,7 @@ public class PlansChoiceSetDistributions {
 	 * write "how many persons have 0/1/2/...6/7 car/pt in their plans choice set?". For e.g. ==0	16699.0		66564.0== 
 	 * indicates that 16699 persons have 0 car in their choice set and 66564 persons have 0 pt in their choice set.
 	 */
-	private void writeLegsDistribution(String plansFile, String outputFile){
+	private void writeLegsDistribution(final String plansFile, final String outputFile){
 		Map<Id<Person>, List<String>> personId2legs = getLegsForAllPlansInChoiceSet(plansFile);
 		Map<Id<Person>, double[]> personId2LegsCounts = getPersonId2LegsCountInChoiceSet(personId2legs);
 
@@ -191,7 +188,7 @@ public class PlansChoiceSetDistributions {
 		log.info("Data has written to "+ outputFile);
 	}
 
-	private void writeDifferenceInCarsDistributionData(SortedMap<Double, Double> inputMap, String outputFile){
+	private void writeDifferenceInCarsDistributionData(final SortedMap<Double, Double> inputMap, final String outputFile){
 		BufferedWriter writer = IOUtils.getBufferedWriter(outputFile);
 		try {
 			for(double d : inputMap.keySet()){
@@ -203,7 +200,7 @@ public class PlansChoiceSetDistributions {
 		}
 	}
 
-	private SortedMap<Double, Double> plansFile2DifferenceClassCounts(String initialPlans, String laterPlans){
+	private SortedMap<Double, Double> plansFile2DifferenceClassCounts(final String initialPlans, final String laterPlans){
 
 		Map<Id<Person>, List<String>> personId2legsInitial = getLegsForAllPlansInChoiceSet(initialPlans);
 		Map<Id<Person>, List<String>> personId2legsLater = getLegsForAllPlansInChoiceSet(laterPlans);
@@ -218,9 +215,9 @@ public class PlansChoiceSetDistributions {
 		return changeInCarsDistribution;
 	}
 
-	private Map<Id<Person>, List<String>> getScoresForAllPlansInChoiceSet(String plansFile){
+	private Map<Id<Person>, List<String>> getScoresForAllPlansInChoiceSet(final String plansFile){
 		Map<Id<Person>, List<String>> personId2ScoresInChoiceSet = new HashMap<Id<Person>, List<String>>();
-		Population population = loadPopulation(plansFile);
+		Population population = LoadMyScenarios.loadScenarioFromPlans(plansFile).getPopulation();
 		for(Person p : population.getPersons().values()){
 			List<String> scoresChoiceSet = new ArrayList<String>();
 
@@ -244,9 +241,9 @@ public class PlansChoiceSetDistributions {
 	/**
 	 * read plan file and return list of travel legs for complete choice set for each person
 	 */
-	private SortedMap<Id<Person>, List<String>> getLegsForAllPlansInChoiceSet (String plansFile){
+	private SortedMap<Id<Person>, List<String>> getLegsForAllPlansInChoiceSet (final String plansFile){
 		SortedMap<Id<Person>, List<String>> personId2LegsInChoiceSet = new TreeMap<Id<Person>, List<String>>();
-		Population population = loadPopulation(plansFile);
+		Population population = LoadMyScenarios.loadScenarioFromPlans(plansFile).getPopulation();
 		for(Person p : population.getPersons().values()){
 			List<String> legsChoiceSet = new ArrayList<String>();
 
@@ -272,7 +269,7 @@ public class PlansChoiceSetDistributions {
 		return personId2LegsInChoiceSet;
 	}
 
-	private void writeMap2TxtFile (Map<Id<Person>, List<String>> personId2legs, String outputFile){
+	private void writeMap2TxtFile (final Map<Id<Person>, List<String>> personId2legs, final String outputFile){
 		BufferedWriter writer = IOUtils.getBufferedWriter(outputFile);
 		try {
 			for(Id<Person> id : personId2legs.keySet()){
@@ -288,17 +285,10 @@ public class PlansChoiceSetDistributions {
 		}
 	}
 
-	private Population loadPopulation (String inputPlansFile){
-		Config config = ConfigUtils.createConfig();
-		config.plans().setInputFile(inputPlansFile);
-		Scenario sc = ScenarioUtils.loadScenario(config);
-		return sc.getPopulation();
-	}
-
 	/**
 	 * return number of car/pt in choice set for each person
 	 */
-	private Map<Id<Person>, double[]> getPersonId2LegsCountInChoiceSet (Map<Id<Person>, List<String>> personId2legs){
+	private Map<Id<Person>, double[]> getPersonId2LegsCountInChoiceSet (final Map<Id<Person>, List<String>> personId2legs){
 
 		Map<Id<Person>, double[]> personId2LegsInChoiceSet = new HashMap<Id<Person>, double[]>();
 		for(Id<Person> personId : personId2legs.keySet()){
@@ -314,7 +304,7 @@ public class PlansChoiceSetDistributions {
 		return personId2LegsInChoiceSet;
 	}
 
-	private Map<Id<Person>, Double> getChangeInLegs(Map<Id<Person>, double[]> personId2legsInitialPlans, Map<Id<Person>, double[]> personId2LegsLaterPlans){
+	private Map<Id<Person>, Double> getChangeInLegs(final Map<Id<Person>, double[]> personId2legsInitialPlans, final Map<Id<Person>, double[]> personId2LegsLaterPlans){
 		//  change = number of legs as car in later choice set - number of legs as car in former ChoiceSet
 		Map<Id<Person>, Double> personId2ChangeInCars = new HashMap<Id<Person>, Double>();
 
@@ -329,7 +319,7 @@ public class PlansChoiceSetDistributions {
 		return personId2ChangeInCars;
 	}
 
-	private SortedMap<Double, Double> getChangeInCarDistribution (Map<Id<Person>, Double> personId2ChangeInCars){
+	private SortedMap<Double, Double> getChangeInCarDistribution (final Map<Id<Person>, Double> personId2ChangeInCars){
 
 		double min=999;
 		double max=-999;

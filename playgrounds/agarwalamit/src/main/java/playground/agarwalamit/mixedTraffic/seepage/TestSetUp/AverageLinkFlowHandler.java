@@ -24,12 +24,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.MatsimEventsReader;
 
 
 /**
@@ -39,7 +43,27 @@ public class AverageLinkFlowHandler implements LinkEnterEventHandler, LinkLeaveE
 
 	private Map<Id<Link>,List<Double>> enterTimes = new HashMap<Id<Link>, List<Double>>();
 	private Map<Id<Link>,List<Double>> leaveTimes = new HashMap<Id<Link>, List<Double>>();
-
+	public static final Logger LOG = Logger.getLogger(AverageLinkFlowHandler.class);
+	
+	public static void main(String[] args) {
+		String outputDir =  "/Users/amit/Documents/repos/shared-svn/projects/mixedTraffic/seepage/xt_1Link/seepage/";
+		String eventsFile = outputDir+"ITERS/it.0/0.events.xml.gz";
+		
+		AverageLinkFlowHandler ana = new AverageLinkFlowHandler();
+		ana.startProcessingEventsFile(eventsFile);
+	}
+	
+	private void startProcessingEventsFile(String eventsFile){
+		EventsManager events = EventsUtils.createEventsManager();
+		AverageLinkFlowHandler linkFlow = new AverageLinkFlowHandler();
+		MatsimEventsReader reader = new MatsimEventsReader(events);
+		events.addHandler(linkFlow);
+		reader.readFile(eventsFile);
+		
+		LOG.info("Inflow : - "+linkFlow.getInflow().toString());
+		LOG.info("Outflow : - "+linkFlow.getOutflow().toString());
+	}
+	
 	@Override
 	public void reset(int iteration) {
 		enterTimes.clear();

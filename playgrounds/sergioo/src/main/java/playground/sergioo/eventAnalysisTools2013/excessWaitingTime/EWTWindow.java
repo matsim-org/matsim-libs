@@ -62,7 +62,7 @@ public class EWTWindow extends LayersWindow {
 	
 	public static void main(String[] args) throws IOException, ClassNotFoundException {
 		final Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenario).readFile(args[0]);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(args[0]);
 		scenario.getConfig().transit().setUseTransit(true);
 		final StationsPainter stationsPainter = new StationsPainter(new Color[]{new Color(255,255,0,100),new Color(0,0,255,100),new Color(255,0,0,100)}, scale);
 		new TransitScheduleReader(scenario).readFile(args[1]);

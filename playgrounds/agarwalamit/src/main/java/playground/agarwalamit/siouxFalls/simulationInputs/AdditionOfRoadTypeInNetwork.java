@@ -44,7 +44,7 @@ public class AdditionOfRoadTypeInNetwork {
 	public static void main(String[] args) {
 		Scenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		final Network network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario).readFile("./input/output_network.xml.gz");
+		new MatsimNetworkReader(scenario.getNetwork()).readFile("./input/output_network.xml.gz");
 		writer = IOUtils.getBufferedWriter("./input/baseCase/roadTypeMapping.txt");
 
 		for (Link link : network.getLinks().values()) {

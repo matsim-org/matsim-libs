@@ -184,7 +184,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		String eventsFile = getClassInputDirectory() + "link10_events.xml";
 
 		Network network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario).readFile(networkFile);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
 
 		EventsManagerImpl events = (EventsManagerImpl) EventsUtils.createEventsManager();
 		EventsCollector collector = new EventsCollector();
@@ -307,7 +307,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Config config = scenario.getConfig();
 		Network network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario).parse(networkFile);
+		new MatsimNetworkReader(scenario.getNetwork()).parse(networkFile);
 
 		EventsManager events = EventsUtils.createEventsManager(); // DO NOT USE EventsBuilderImpl() here, as we do not have a population!
 

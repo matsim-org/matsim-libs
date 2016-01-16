@@ -67,7 +67,7 @@ public class MembershipMain
     new FacilitiesReaderMatsimV1(this.scenario).readFile(this.facilitiesfilePath);
 
     log.info("reading the network ...");
-    new MatsimNetworkReader(this.scenario).readFile(this.networkfilePath);
+    new MatsimNetworkReader(this.scenario.getNetwork()).readFile(this.networkfilePath);
 
     log.info("  reading file " + this.plansfilePath);
     PopulationReader plansReader = new MatsimPopulationReader(this.scenario);

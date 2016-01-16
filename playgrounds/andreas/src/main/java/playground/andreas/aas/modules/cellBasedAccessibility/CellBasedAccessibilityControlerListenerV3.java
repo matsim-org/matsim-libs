@@ -4,7 +4,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.network.NetworkImpl;
@@ -155,7 +155,7 @@ public class CellBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 		int benchmarkID = this.benchmark.addMeasure("cell-based accessibility computation");
 		
 		// get the controller and scenario
-		Controler controler = event.getControler();
+		MatsimServices controler = event.getServices();
 		
 		TravelTime ttc = controler.getLinkTravelTimes();
 		// get the free-speed car travel times (in seconds)

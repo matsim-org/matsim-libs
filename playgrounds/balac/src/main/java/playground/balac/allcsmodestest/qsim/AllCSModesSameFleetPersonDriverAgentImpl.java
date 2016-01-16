@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.HasPerson;
 import org.matsim.core.mobsim.framework.MobsimAgent;
@@ -102,7 +102,7 @@ public class AllCSModesSameFleetPersonDriverAgentImpl implements MobsimDriverAge
 	
 	private Scenario scenario;	
 	
-	private Controler controler;
+	private MatsimServices controler;
 	
 	private Link startLinkFF;
 	
@@ -136,7 +136,7 @@ public class AllCSModesSameFleetPersonDriverAgentImpl implements MobsimDriverAge
 	// ============================================================================================================================
 	// c'tor
 
-	public AllCSModesSameFleetPersonDriverAgentImpl(final Person person, final Plan plan, final Netsim simulation, final Scenario scenario, final Controler controler, FreeFloatingVehiclesLocation ffvehiclesLocation, OneWayCarsharingRDWithParkingVehicleLocation owvehiclesLocation, TwoWayCSVehicleLocation twvehiclesLocation) {
+	public AllCSModesSameFleetPersonDriverAgentImpl(final Person person, final Plan plan, final Netsim simulation, final Scenario scenario, final MatsimServices controler, FreeFloatingVehiclesLocation ffvehiclesLocation, OneWayCarsharingRDWithParkingVehicleLocation owvehiclesLocation, TwoWayCSVehicleLocation twvehiclesLocation) {
 		this.person = person;
 		this.simulation = simulation;
 		this.controler = controler;

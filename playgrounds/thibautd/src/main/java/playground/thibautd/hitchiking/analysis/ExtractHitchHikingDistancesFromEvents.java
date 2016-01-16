@@ -37,7 +37,7 @@ public class ExtractHitchHikingDistancesFromEvents {
 		final String outfile = args[ 2 ];
 
 		Scenario sc = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
-		new MatsimNetworkReader( sc ).readFile( networkFile );
+		new MatsimNetworkReader(sc.getNetwork()).readFile( networkFile );
 		HitchHikingDistancesEventHandler handler =
 			new HitchHikingDistancesEventHandler(
 					sc.getNetwork(),

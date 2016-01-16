@@ -193,7 +193,7 @@ public class PrtRankAndPassengerStatsHandler implements ActivityStartEventHandle
 	public void finalize(IterationEndsEvent event){
 		
 		//finishes unprocessed waiting time entries and set waiting time to simEndTime - beginWaitingTime
-		double endTime = event.getControler().getConfig().qsim().getEndTime();
+		double endTime = event.getServices().getConfig().qsim().getEndTime();
 
 		for(Entry<Id<TaxiRank>, List<Id<Person>>> entry : this.rankId2WaitingPassengersList.entrySet()){
 			

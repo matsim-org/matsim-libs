@@ -61,7 +61,6 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
-import org.matsim.core.replanning.modules.TimeAllocationMutator;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -142,7 +141,7 @@ public class BetaTravelTest extends MatsimTestCase {
 		});
 		controler.addControlerListener(new TestControlerListener());
 		controler.getConfig().controler().setCreateGraphs(false);
-		controler.setDumpDataAtEnd(false);
+		controler.getConfig().controler().setDumpDataAtEnd(false);
 		controler.getConfig().controler().setWriteEventsInterval(0);
 		controler.run();
 	}
@@ -173,7 +172,7 @@ public class BetaTravelTest extends MatsimTestCase {
 		});
 		controler.addControlerListener(new TestControlerListener());
 		controler.getConfig().controler().setCreateGraphs(false);
-		controler.setDumpDataAtEnd(false);
+		controler.getConfig().controler().setDumpDataAtEnd(false);
 		controler.getConfig().controler().setWriteEventsInterval(0);
 		controler.run();
 	}
@@ -335,19 +334,19 @@ public class BetaTravelTest extends MatsimTestCase {
 		@Override
 		public void notifyStartup(final StartupEvent event) {
             // do some test to ensure the scenario is correct
-			double beta_travel = event.getControler().getConfig().planCalcScore().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling();
+			double beta_travel = event.getServices().getConfig().planCalcScore().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling();
             if ((beta_travel != -6.0) && (beta_travel != -66.0)) {
                 throw new IllegalArgumentException("Unexpected value for beta_travel. Expected -6.0 or -66.0, actual value is " + beta_travel);
             }
 
-            int lastIter = event.getControler().getConfig().controler().getLastIteration();
+            int lastIter = event.getServices().getConfig().controler().getLastIteration();
             if (lastIter < 100) {
                 throw new IllegalArgumentException("Controler.lastIteration must be at least 100. Current value is " + lastIter);
             }
             if (lastIter > 100) {
                 System.err.println("Controler.lastIteration is currently set to " + lastIter + ". Only the first 100 iterations will be analyzed.");
             }
-            this.ttAnalyzer = new BottleneckTravelTimeAnalyzer(event.getControler().getScenario().getPopulation().getPersons().size());
+            this.ttAnalyzer = new BottleneckTravelTimeAnalyzer(event.getServices().getScenario().getPopulation().getPersons().size());
 		}
 
 		@Override
@@ -355,12 +354,12 @@ public class BetaTravelTest extends MatsimTestCase {
 			int iteration = event.getIteration();
 			if (iteration % 10 == 0) {
 				this.la.reset(iteration);
-				event.getControler().getEvents().addHandler(this.la);
+				event.getServices().getEvents().addHandler(this.la);
 			}
 
 			if (iteration % 50 == 0) {
 				this.ttAnalyzer.reset(iteration);
-				event.getControler().getEvents().addHandler(this.ttAnalyzer);
+				event.getServices().getEvents().addHandler(this.ttAnalyzer);
 			}
 		}
 
@@ -368,17 +367,17 @@ public class BetaTravelTest extends MatsimTestCase {
 		public void notifyIterationEnds(final IterationEndsEvent event) {
 			int iteration = event.getIteration();
 			if (iteration % 10 == 0) {
-				event.getControler().getEvents().removeHandler(this.la);
+				event.getServices().getEvents().removeHandler(this.la);
 				this.la.calcMaxCars();
 				this.la.printInfo();
 			}
 
 			if (iteration % 50 == 0) {
-				this.ttAnalyzer.plot(event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "bottleneck_times.png"));
-				event.getControler().getEvents().removeHandler(this.ttAnalyzer);
+				this.ttAnalyzer.plot(event.getServices().getControlerIO().getIterationFilename(event.getIteration(), "bottleneck_times.png"));
+				event.getServices().getEvents().removeHandler(this.ttAnalyzer);
 			}
 			if (iteration == 100) {
-				double beta_travel = event.getControler().getConfig().planCalcScore().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling();
+				double beta_travel = event.getServices().getConfig().planCalcScore().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling();
 				/* ***************************************************************
 				 * AUTOMATIC VERIFICATION OF THE TESTS:
 				 *

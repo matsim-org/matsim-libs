@@ -143,7 +143,7 @@ public class MsRouteConverter extends AbstractRouteConverter {
 		private GeographicEventAnalyzer(String path2MATSimNetwork, String path2VissimZoneShp) {
 			// read network
 			MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-			MatsimNetworkReader NetworkReader = new MatsimNetworkReader(scenario);
+			MatsimNetworkReader NetworkReader = new MatsimNetworkReader(scenario.getNetwork());
 			NetworkReader.readFile(path2MATSimNetwork);
 			this.network = scenario.getNetwork();
 			// read zones

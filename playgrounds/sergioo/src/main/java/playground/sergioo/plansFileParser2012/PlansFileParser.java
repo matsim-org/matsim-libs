@@ -25,7 +25,7 @@ public class PlansFileParser {
 	 */
 	public static void main(String[] args) throws FileNotFoundException {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		final MatsimNetworkReader matsimNetworkReader = new MatsimNetworkReader(scenario);
+		final MatsimNetworkReader matsimNetworkReader = new MatsimNetworkReader(scenario.getNetwork());
 		matsimNetworkReader.readFile(args[0]);
 		final Population plans = scenario.getPopulation();
 		final PopulationReader matsimPlansReader = new MatsimPopulationReader(scenario);

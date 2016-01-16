@@ -35,7 +35,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -115,7 +115,7 @@ public class TravelDistanceStats implements StartupListener, IterationEndsListen
 	@Override
 	public void notifyStartup(final StartupEvent event) {
 		if (this.createPNG) {
-			Controler controler = event.getControler();
+			MatsimServices controler = event.getServices();
 			this.minIteration = controler.getConfig().controler().getFirstIteration();
 			int maxIter = controler.getConfig().controler().getLastIteration();
 			int iterations = maxIter - this.minIteration;
@@ -129,7 +129,7 @@ public class TravelDistanceStats implements StartupListener, IterationEndsListen
 	@Override
 	public void notifyIterationEnds(final IterationEndsEvent event) {
 
-		int numOfThreads = event.getControler().getConfig().global().getNumberOfThreads();
+		int numOfThreads = event.getServices().getConfig().global().getNumberOfThreads();
 		if (numOfThreads < 1) numOfThreads = 1;
 
 		initThreads(numOfThreads);

@@ -172,7 +172,7 @@ public class NetVisualizerPanel extends javax.swing.JPanel {
 		Config config = ConfigUtils.createConfig();
 		Scenario sc = ScenarioUtils.createScenario(config);
 		try {
-			new MatsimNetworkReader(sc).readFile(path);
+			new MatsimNetworkReader(sc.getNetwork()).readFile(path);
 			board.setNetwork((NetworkImpl)sc.getNetwork());
 			board.repaint();
 		} catch (Exception e) {

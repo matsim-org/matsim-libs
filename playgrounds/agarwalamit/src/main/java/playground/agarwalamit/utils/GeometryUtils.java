@@ -44,22 +44,22 @@ import com.vividsolutions.jts.simplify.TopologyPreservingSimplifier;
 public final class GeometryUtils {
 
 	private GeometryUtils(){}
-	private static final Random random = MatsimRandom.getRandom(); // matsim random will return same coord.
-	private static final GeometryFactory gf = new GeometryFactory();
+	private static final Random RAND = MatsimRandom.getRandom(); // matsim random will return same coord.
+	private static final GeometryFactory GF = new GeometryFactory();
 
 	public static Point getRandomPointsInsideFeature (SimpleFeature feature) {
 		Point p = null;
 		double x,y;
 		do {
-			x = feature.getBounds().getMinX()+random.nextDouble()*(feature.getBounds().getMaxX()-feature.getBounds().getMinX());
-			y = feature.getBounds().getMinY()+random.nextDouble()*(feature.getBounds().getMaxY()-feature.getBounds().getMinY());
+			x = feature.getBounds().getMinX()+RAND.nextDouble()*(feature.getBounds().getMaxX()-feature.getBounds().getMinX());
+			y = feature.getBounds().getMinY()+RAND.nextDouble()*(feature.getBounds().getMaxY()-feature.getBounds().getMinY());
 			p= MGC.xy2Point(x, y);
 		} while (!((Geometry) feature.getDefaultGeometry()).contains(p));
 		return p;
 	}
 
 	public static boolean isLinkInsideCity(Collection<SimpleFeature> features, Link link) {
-		Geometry geo = gf.createPoint(new Coordinate(link.getCoord().getX(), link.getCoord().getY()));
+		Geometry geo = GF.createPoint(new Coordinate(link.getCoord().getX(), link.getCoord().getY()));
 		for(SimpleFeature sf : features){
 			if ( ( getSimplifiedGeom( (Geometry) sf.getDefaultGeometry() ) ).contains(geo) ) {
 				return true;
@@ -69,7 +69,7 @@ public final class GeometryUtils {
 	}
 
 	public static boolean isPointInsideCity(Collection<SimpleFeature> features, Point point) {
-		Geometry geo = gf.createPoint( new Coordinate( point.getCoordinate() ) );
+		Geometry geo = GF.createPoint( new Coordinate( point.getCoordinate() ) );
 		for(SimpleFeature sf : features){
 			if ( ( getSimplifiedGeom( (Geometry) sf.getDefaultGeometry() ) ).contains(geo) ) {
 				return true;
@@ -118,8 +118,8 @@ public final class GeometryUtils {
 		Point p = null;
 		double x,y;
 		do {
-			x = xs.getFirst()+random.nextDouble()*(xs.getSecond() - xs.getFirst());
-			y = ys.getFirst()+random.nextDouble()*(ys.getSecond() - ys.getFirst());
+			x = xs.getFirst()+RAND.nextDouble()*(xs.getSecond() - xs.getFirst());
+			y = ys.getFirst()+RAND.nextDouble()*(ys.getSecond() - ys.getFirst());
 			p= MGC.xy2Point(x, y);
 		} while (! (combinedGeometry).contains(p) );
 		return p;

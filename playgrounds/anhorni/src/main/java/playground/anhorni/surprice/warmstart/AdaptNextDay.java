@@ -40,7 +40,7 @@ public class AdaptNextDay implements StartupListener {
 		if (this.populationPreviousDay == null) return;
 		log.info("Adapting plans of next day ... ");
 
-        Population population = event.getControler().getScenario().getPopulation();
+        Population population = event.getServices().getScenario().getPopulation();
 		int cntTime = 0;
 		int cntRouteMode = 0;
 		int cntActs = 0;

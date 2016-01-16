@@ -14,7 +14,7 @@ public class TaxiNetwork {
 
 	public static void main(String[] args) {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenario).readFile(args[0]);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(args[0]);
 		for(Link link:scenario.getNetwork().getLinks().values())
 			if(link.getAllowedModes().contains("car")) {
 				Set<String> modes = new HashSet<>(link.getAllowedModes());

@@ -19,11 +19,11 @@
 
 package playground.wrashid.lib;
 
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 
 public class GlobalRegistry {
 
-	public static Controler controler = null;
+	public static MatsimServices controler = null;
 	public static boolean isTestingMode = false;
 
 	public static boolean doPrintGraficDataToConsole = false;

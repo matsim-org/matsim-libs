@@ -21,7 +21,7 @@ package org.matsim.contrib.pseudosimulation.replanning.factories;
 
 import org.matsim.contrib.pseudosimulation.replanning.DistributedPlanMutatorStrategy;
 import org.matsim.contrib.pseudosimulation.replanning.PlanCatcher;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.replanning.PlanStrategy;
 
 import javax.inject.Provider;
@@ -38,7 +38,7 @@ public class DistributedPlanMutatorStrategyFactory implements
     private final PlanCatcher slave;
     private final char gene;
     private final boolean trackGenome;
-    private final Controler controler;
+    private final MatsimServices controler;
 
     public DistributedPlanMutatorStrategy getTarget() {
         return target;
@@ -46,7 +46,7 @@ public class DistributedPlanMutatorStrategyFactory implements
 
     private DistributedPlanMutatorStrategy target;
 
-    public DistributedPlanMutatorStrategyFactory(PlanCatcher slave, char gene, boolean trackGenome, Controler controler, String strategyName) {
+    public DistributedPlanMutatorStrategyFactory(PlanCatcher slave, char gene, boolean trackGenome, MatsimServices controler, String strategyName) {
         this.slave = slave;
         this.gene = gene;
         this.trackGenome = trackGenome;

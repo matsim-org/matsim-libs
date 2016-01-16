@@ -22,6 +22,7 @@ package playground.benjamin.scoring.income.old;
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
@@ -30,7 +31,6 @@ import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.households.PersonHouseholdMapping;
 import org.matsim.roadpricing.RoadPricingScheme;
 
-import playground.benjamin.BkControler;
 import playground.benjamin.BkPaths;
 
 /**
@@ -40,24 +40,10 @@ import playground.benjamin.BkPaths;
  */
 @Deprecated // it is no longer necessary to use inheritance here.  kai, oct'11
             // for a better use case of personalizable travel costs and personalizable scoring, please refer to {@link BkRouterTest} and {@link BkScoringTest}. benjamin, oct'11
-public class BkControlerIncome extends BkControler {
+public class BkControlerIncome {
 
 	private PersonHouseholdMapping personHouseholdMapping;
 
-	public BkControlerIncome(String arg) {
-		super(arg);
-		throw new RuntimeException( Gbl.SET_UP_IS_NOW_FINAL ) ;
-	}
-	
-	public BkControlerIncome(String[] args) {
-		super(args);
-		throw new RuntimeException( Gbl.SET_UP_IS_NOW_FINAL ) ;
-	}
-
-	public BkControlerIncome(Config config) {
-		super(config);
-		throw new RuntimeException( Gbl.SET_UP_IS_NOW_FINAL ) ;
-	}
 
 //	@Override
 //	@Deprecated // it is no longer necessary to use inheritance here.  kai, oct'11
@@ -77,7 +63,7 @@ public class BkControlerIncome extends BkControler {
 //		super.setUp();
 //	}
 
-	private void installTravelCostCalculatorFactory() {
+	private void installTravelCostCalculatorFactory(Controler controler) {
 		//returns null, if there is no road pricing
 //        if (ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).isUsingRoadpricing()){
 		Logger.getLogger(this.getClass()).fatal("the above functionality does no longer exist.  please talk to me if needed. kai, sep'14") ;
@@ -85,12 +71,12 @@ public class BkControlerIncome extends BkControler {
 		if ( true ) {
 
         	
-        	RoadPricingScheme roadPricingScheme = (RoadPricingScheme) this.getScenario().getScenarioElement(RoadPricingScheme.ELEMENT_NAME);
+        	RoadPricingScheme roadPricingScheme = (RoadPricingScheme) controler.getScenario().getScenarioElement(RoadPricingScheme.ELEMENT_NAME);
 			
 			/*		Setting travel cost calculator for the router.
 			Remark: parameters must be set in several classes and independently for scoring and router!*/
-			final TravelDisutilityFactory travelCostCalculatorFactory = new IncomeTollTravelCostCalculatorFactory(personHouseholdMapping, roadPricingScheme, getConfig());
-			this.addOverridingModule(new AbstractModule() {
+			final TravelDisutilityFactory travelCostCalculatorFactory = new IncomeTollTravelCostCalculatorFactory(personHouseholdMapping, roadPricingScheme, controler.getConfig());
+			controler.addOverridingModule(new AbstractModule() {
 				@Override
 				public void install() {
 					bindCarTravelDisutilityFactory().toInstance(travelCostCalculatorFactory);
@@ -101,7 +87,7 @@ public class BkControlerIncome extends BkControler {
 			/*		Setting travel cost calculator for the router.
 			Remark: parameters must be set in several classes and independently for scoring and router!*/
 			final TravelDisutilityFactory travelCostCalculatorFactory = new IncomeTravelCostCalculatorFactory(personHouseholdMapping);
-			this.addOverridingModule(new AbstractModule() {
+			controler.addOverridingModule(new AbstractModule() {
 				@Override
 				public void install() {
 					bindCarTravelDisutilityFactory().toInstance(travelCostCalculatorFactory);
@@ -110,14 +96,14 @@ public class BkControlerIncome extends BkControler {
 		}
 	}
 	
-	private void addInstallTravelCostCalculatorFactoryControlerListener() {
-		addControlerListener(new StartupListener() {
+	private void addInstallTravelCostCalculatorFactoryControlerListener(final Controler controler) {
+		controler.addControlerListener(new StartupListener() {
 
 			@Override
 			public void notifyStartup(StartupEvent event) {
-				installTravelCostCalculatorFactory();
+				installTravelCostCalculatorFactory(controler);
 			}
-			
+
 		});
 	}
 	
@@ -133,12 +119,10 @@ public class BkControlerIncome extends BkControler {
 			System.out.println("Usage: Controler config-file [dtd-file]");
 			System.out.println();
 		} else {
-			final BkControlerIncome controler = new BkControlerIncome(args);
+			final Controler controler = new Controler(args);
 
 			controler.getConfig().controler().setOverwriteFileSetting(
-					true ?
-							OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-							OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+					OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 			controler.run();
 		}
 	}

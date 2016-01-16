@@ -389,7 +389,7 @@ public class LinkVolumesWriter implements IterationEndsListener {
 	 */
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
-		OutputDirectoryHierarchy outputDirectoryHierarchy = event.getControler().getControlerIO();
+		OutputDirectoryHierarchy outputDirectoryHierarchy = event.getServices().getControlerIO();
 		
 		log.info("Writing results to files...");
 		String absoluteVolumesFileName = outputDirectoryHierarchy.getIterationFilename(0, linkVolumesAbsoluteFile);

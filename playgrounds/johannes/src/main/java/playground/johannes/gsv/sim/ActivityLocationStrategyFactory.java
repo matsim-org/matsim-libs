@@ -24,7 +24,7 @@ import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.replanning.PlanStrategy;
@@ -56,7 +56,7 @@ public class ActivityLocationStrategyFactory implements Provider<PlanStrategy> {
 
 	private final int numThreads;
 
-	private final Controler controler;
+	private final MatsimServices controler;
 
 	private final double mutationError;
 
@@ -65,7 +65,7 @@ public class ActivityLocationStrategyFactory implements Provider<PlanStrategy> {
 	private final double threshold;
 	private final Provider<TripRouter> tripRouterProvider;
 
-	public ActivityLocationStrategyFactory(Random random, int numThreads, String blacklist, Controler controler, double mutationError,
+	public ActivityLocationStrategyFactory(Random random, int numThreads, String blacklist, MatsimServices controler, double mutationError,
 										   double threshold, Provider<TripRouter> tripRouterProvider) {
 		this.random = random;
 		this.numThreads = numThreads;
@@ -170,9 +170,9 @@ public class ActivityLocationStrategyFactory implements Provider<PlanStrategy> {
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see org.matsim.core.controler.listener.IterationStartsListener#
+		 * @see org.matsim.core.services.listener.IterationStartsListener#
 		 * notifyIterationStarts
-		 * (org.matsim.core.controler.events.IterationStartsEvent)
+		 * (org.matsim.core.services.events.IterationStartsEvent)
 		 */
 		@Override
 		public void notifyIterationStarts(IterationStartsEvent event) {

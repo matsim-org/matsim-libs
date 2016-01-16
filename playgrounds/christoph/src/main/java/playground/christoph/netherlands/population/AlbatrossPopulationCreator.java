@@ -72,7 +72,7 @@ public class AlbatrossPopulationCreator {
 	public AlbatrossPopulationCreator(Scenario scenario) throws Exception {
 		this.scenario = scenario;
 		log.info("Read Network File...");
-		new MatsimNetworkReader(scenario).readFile(networkFile);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
 		log.info("done.");
 		
 		log.info("Getting Connector Links...");

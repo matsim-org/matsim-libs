@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.config.Config;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.modules.TimeAllocationMutator;
@@ -46,7 +46,7 @@ public class NewStrategyModule implements PlanStrategyModule {
 
 	private int counterPlanMutator = 0;
 
-	public static Controler controler;
+	public static MatsimServices controler;
 
 	private TimeAllocationMutator timeAllocationMutator;
 

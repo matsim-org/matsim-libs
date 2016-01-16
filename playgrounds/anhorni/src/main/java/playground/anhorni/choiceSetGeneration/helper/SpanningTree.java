@@ -179,7 +179,7 @@ public class SpanningTree {
 	public static void main(String[] args) {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario).readFile("../../input/network.xml");
+		new MatsimNetworkReader(scenario.getNetwork()).readFile("../../input/network.xml");
 		Config conf = scenario.getConfig();
 		TravelTime ttc = new TravelTimeCalculator(network,60,30*3600, conf.travelTimeCalculator()).getLinkTravelTimes();
 		SpanningTree st = new SpanningTree(ttc, new RandomizingTimeDistanceTravelDisutility.Builder( TransportMode.car ).createTravelDisutility(ttc, conf.planCalcScore()));

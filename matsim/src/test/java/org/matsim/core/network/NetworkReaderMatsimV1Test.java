@@ -104,7 +104,7 @@ public class NetworkReaderMatsimV1Test extends MatsimTestCase {
 		network.addNode(network.getFactory().createNode(Id.create("1", Node.class), new Coord((double) 0, (double) 0)));
 		network.addNode(network.getFactory().createNode(Id.create("2", Node.class), new Coord((double) 1000, (double) 0)));
 
-		NetworkReaderMatsimV1 reader = new NetworkReaderMatsimV1(scenario);
+		NetworkReaderMatsimV1 reader = new NetworkReaderMatsimV1(scenario.getNetwork());
 		Stack<String> context = new Stack<String>();
 		Attributes atts = new AttributesBuilder().
 				add("id", "1").

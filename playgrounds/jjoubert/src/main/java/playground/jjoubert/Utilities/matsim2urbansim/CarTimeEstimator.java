@@ -177,7 +177,7 @@ public class CarTimeEstimator {
 		// 1b. Create new scenario.
 		Scenario s = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		// 1c. Read the network.
-		MatsimNetworkReader nr = new MatsimNetworkReader(s);
+		MatsimNetworkReader nr = new MatsimNetworkReader(s.getNetwork());
 		nr.readFile(networkFilename);
 		// 1d. Read plans file.
 		MatsimPopulationReader mpr = new MatsimPopulationReader(s);

@@ -103,7 +103,7 @@ public class PopulationSplitter {
 	{
 		network = scenario.getNetwork();
 
-		new MatsimNetworkReader(scenario).readFile(networkFile);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
 
 		log.info("Loading Network ... done");
 	}

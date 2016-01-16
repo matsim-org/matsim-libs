@@ -54,7 +54,7 @@ public class CalcLegTimesListenerDetailed implements StartupListener, AfterMobsi
 	public void notifyStartup(StartupEvent event) {
 
 		try {
-			this.out = IOUtils.getBufferedWriter(event.getControler().getControlerIO().getOutputFilename(this.filename));
+			this.out = IOUtils.getBufferedWriter(event.getServices().getControlerIO().getOutputFilename(this.filename));
 			this.out.write("#iteration");
 
 			for (int i = 0; i < actTypes.length; i++) {
@@ -68,8 +68,8 @@ public class CalcLegTimesListenerDetailed implements StartupListener, AfterMobsi
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-        this.calcLegTimesKTI = new CalcLegTimes(event.getControler().getScenario().getPopulation(), this.wayThere);
-		event.getControler().getEvents().addHandler(this.calcLegTimesKTI);
+        this.calcLegTimesKTI = new CalcLegTimes(event.getServices().getScenario().getPopulation(), this.wayThere);
+		event.getServices().getEvents().addHandler(this.calcLegTimesKTI);
 
 	}
 

@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -93,8 +93,8 @@ public class ScoreStats implements StartupListener, IterationEndsListener, Shutd
 
 	@Override
 	public void notifyStartup(final StartupEvent event) {
-		fileName =  event.getControler().getControlerIO().getOutputFilename(fileName);
-		Controler controler = event.getControler();
+		fileName =  event.getServices().getControlerIO().getOutputFilename(fileName);
+		MatsimServices controler = event.getServices();
 		this.minIteration = controler.getConfig().controler().getFirstIteration();
 		int maxIter = controler.getConfig().controler().getLastIteration();
 		int iterations = maxIter - this.minIteration;

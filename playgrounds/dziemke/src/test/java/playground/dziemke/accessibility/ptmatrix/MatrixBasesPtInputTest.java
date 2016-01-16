@@ -81,7 +81,7 @@ public class MatrixBasesPtInputTest {
 			ptMatrixLocationsMap.put(id, coord);
 		}
 				
-		MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario);
+		MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario.getNetwork());
 		networkReader.readFile(networkFile);
 
 		MatrixBasedPtInputUtils.createStopsFile(ptMatrixLocationsMap, outputRoot + "ptStops.csv", ",");

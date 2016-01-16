@@ -33,7 +33,7 @@ public class NetworkStructureSolver {
 	public static void main(String[] args) throws Exception {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario.getConfig().transit().setUseTransit(true);
-		(new MatsimNetworkReader(scenario)).readFile(args[0]);
+		(new MatsimNetworkReader(scenario.getNetwork())).readFile(args[0]);
 		(new TransitScheduleReader(scenario)).readFile(args[1]);
 		List<List<Link>> paths = new ArrayList<List<Link>>();
 		Set<Link> links = new HashSet<Link>();

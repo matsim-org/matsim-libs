@@ -36,16 +36,17 @@ import playground.agarwalamit.utils.LoadMyScenarios;
  */
 public class SelectedPlansFilter {
 
-	public static Logger log = Logger.getLogger(SelectedPlansFilter.class);
+	public static final Logger LOG = Logger.getLogger(SelectedPlansFilter.class);
 
-	private final static String runDir = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/output/run22/";
-	private final static String inputPlans = runDir + "/output_plans.xml.gz";
+	private final static String RUN_DIR = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/output/run22/";
+	private final static String INPUT_PLANS = RUN_DIR + "/output_plans.xml.gz";
+	private final static String OUTPUT_PLANS = RUN_DIR + "selectedPlansOnly.xml.gz"; 
+	
+	private Scenario scOut;
 
-	private final static String outputPlans = runDir + "selectedPlansOnly.xml.gz"; 
-
-	public void run (final String inputPlans, final String outputPlans){
+	public void run (final String inputPlans){
 		Scenario sc = LoadMyScenarios.loadScenarioFromPlans(inputPlans);
-		Scenario scOut = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		scOut = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Population popOut = scOut.getPopulation();
 		
 		for (Person p :sc.getPopulation().getPersons().values()){
@@ -55,11 +56,20 @@ public class SelectedPlansFilter {
 			popOut.addPerson(newP);
 			newP.addPlan(selectedPlan);
 		}
-		new PopulationWriter(popOut).write(outputPlans);
-		log.info("Writing selected plans only successful.");
+	}
+	
+	public Population getPopulation(){
+		return scOut.getPopulation();
+	}
+	
+	public void writePlans(final String outputPlans){
+		new PopulationWriter(scOut.getPopulation()).write(outputPlans);
+		LOG.info("Writing selected plans only successful.");		
 	}
 
 	public static void main(String[] args) {
-		new SelectedPlansFilter().run(inputPlans, outputPlans);
+		SelectedPlansFilter spf = new SelectedPlansFilter();
+		spf.run(INPUT_PLANS);
+		spf.writePlans(OUTPUT_PLANS);
 	}
 }

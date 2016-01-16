@@ -14,7 +14,6 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
-import org.matsim.contrib.accessibility.GridBasedAccessibilityControlerListenerV3;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
 import org.matsim.contrib.accessibility.utils.AccessibilityRunUtils;
 import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtRouterConfigGroup;
@@ -29,7 +28,7 @@ import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspDefaultsCheckingLevel;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
-import org.matsim.core.replanning.DefaultPlanStrategiesModule;
+import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.facilities.ActivityFacilities;
@@ -49,8 +48,8 @@ public class AccessibilityComputationNMBTest {
 	@Test
 	public void doAccessibilityTest() throws IOException {
 //		public static void main( String[] args ) {
-		String folderStructure = "../../../"; // local on dz's computer
-//		String folderStructure = "../../"; // server
+//		String folderStructure = "../../../"; // local on dz's computer
+		String folderStructure = "../../"; // server
 			
 		String networkFile = "matsimExamples/countries/za/nmb/network/NMBM_Network_CleanV7.xml.gz";
 
@@ -177,45 +176,8 @@ public class AccessibilityComputationNMBTest {
 		modes.add( Modes4Accessibility.walk ) ;
 		modes.add( Modes4Accessibility.bike ) ;
 //		modes.add( Modes4Accessibility.pt ) ;
-		
-		// loop over activity types to add one GridBasedAccessibilityControlerListenerV3 for each combination
-		for ( String actType : activityTypes ) {
-			if ( !actType.equals("s") ) {
-				log.error("skipping everything except work for debugging purposes; remove in production code. kai, feb'14") ;
-				continue ;
-			}
 
-			ActivityFacilities opportunities = AccessibilityRunUtils.collectActivityFacilitiesOfType(scenario, actType);
-
-			activityFacilitiesMap.put(actType, opportunities);
-			
-			
-
-			GridBasedAccessibilityControlerListenerV3 listener = 
-					new GridBasedAccessibilityControlerListenerV3(activityFacilitiesMap.get(actType), 
-							ptMatrix, config, scenario.getNetwork());
-			listener.setComputingAccessibilityForMode(Modes4Accessibility.freeSpeed, true);
-			listener.setComputingAccessibilityForMode(Modes4Accessibility.car, true);
-			listener.setComputingAccessibilityForMode(Modes4Accessibility.walk, true);
-			listener.setComputingAccessibilityForMode(Modes4Accessibility.bike, true);
-//			listener.setComputingAccessibilityForMode(Modes4Accessibility.pt, true);
-			// yyyy replace by "set .... ModeS( modes ) "
-			
-			listener.setTime(time);
-			
-			listener.addAdditionalFacilityData(homes) ;
-			listener.generateGridsAndMeasuringPointsByNetwork(cellSize);
-			
-			listener.writeToSubdirectoryWithName(actType);
-			
-			// for push to geoserver
-			listener.addFacilityDataExchangeListener(geoserverUpdater);
-			
-			listener.setUrbansimMode(false); // avoid writing some (eventually: all) files that related to matsim4urbansim
-
-			controler.addControlerListener(listener);
-		}
-
+		controler.addOverridingModule(new AccessibilityComputationTestModule(activityTypes, homes, crs, name, cellSize));
 		controler.run();
 		
 		geoserverUpdater.setAndProcessSpatialGrids( modes ) ;

@@ -98,7 +98,7 @@ public class EventsToTravelDiaries implements
                     .readFile(properties.get("transitScheduleFile").toString());
             isTransit = true;
         }
-        new MatsimNetworkReader(scenario).readFile(properties.get("networkFile").toString());
+        new MatsimNetworkReader(scenario.getNetwork()).readFile(properties.get("networkFile").toString());
 
         EventsManager eventsManager = EventsUtils.createEventsManager();
         EventsToTravelDiaries test;

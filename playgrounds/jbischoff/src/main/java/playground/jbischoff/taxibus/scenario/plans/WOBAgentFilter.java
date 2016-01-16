@@ -34,12 +34,10 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.population.routes.GenericRouteFactory;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 
-import playground.andreas.intersection.zuerich.GenerateZuerrichOutput;
 import playground.michalm.zone.Zone;
 import playground.michalm.zone.Zones;
 
@@ -59,7 +57,7 @@ private void run()
 	Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 	
 	new MatsimPopulationReader(scenario).readFile("../../../shared-svn/projects/vw_rufbus/scenario/input/tb.output_plans.xml.gz");
-	new MatsimNetworkReader(scenario).readFile("../../../shared-svn/projects/vw_rufbus/scenario/input/networkptcc.xml");
+	new MatsimNetworkReader(scenario.getNetwork()).readFile("../../../shared-svn/projects/vw_rufbus/scenario/input/networkptcc.xml");
 	zones = Zones.readZones("../../../shared-svn/projects/vw_rufbus/scenario/input/zones/wob.xml", "../../../shared-svn/projects/vw_rufbus/scenario/input/zones/wob.shp");
 	
 	Scenario scenario2 = ScenarioUtils.createScenario(ConfigUtils.createConfig());

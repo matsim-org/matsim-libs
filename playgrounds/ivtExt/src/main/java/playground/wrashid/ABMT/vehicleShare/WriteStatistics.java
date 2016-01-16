@@ -17,7 +17,7 @@ public class WriteStatistics implements IterationEndsListener {
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		ArrayList<String> list=new ArrayList<String>();
 		
-		String fileName = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "statistics.txt");
+		String fileName = event.getServices().getControlerIO().getIterationFilename(event.getIteration(), "statistics.txt");
 
 		list.add("Person \t hasEV \t distTrav \t toll \t tollEntry \t tollExit");
 		

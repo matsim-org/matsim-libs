@@ -1565,7 +1565,7 @@ public class CepasToEvents {
         this.errorTracker = new ErrorTracker();
         this.dba = new DataBaseAdmin(new File(databaseProperties));
         this.scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-        MatsimNetworkReader nwr = new MatsimNetworkReader(scenario);
+        MatsimNetworkReader nwr = new MatsimNetworkReader(scenario.getNetwork());
         nwr.readFile(networkFile);
         scenario.getConfig().transit().setUseTransit(true);
         scenario.getConfig().scenario().setUseVehicles(true);

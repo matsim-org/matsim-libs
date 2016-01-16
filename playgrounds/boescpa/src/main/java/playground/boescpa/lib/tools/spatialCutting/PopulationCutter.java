@@ -71,7 +71,7 @@ public class PopulationCutter {
 
         Config config = ConfigUtils.loadConfig(args[0]);
         Scenario scenario = ScenarioUtils.createScenario(config);
-        new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
+        new MatsimNetworkReader(scenario.getNetwork()).readFile(config.network().getInputFile());
 
         Coord center = new Coord(Double.parseDouble(args[1]), Double.parseDouble(args[2]));
         int radius = Integer.parseInt(args[3]);

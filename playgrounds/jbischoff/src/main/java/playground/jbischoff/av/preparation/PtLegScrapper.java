@@ -55,7 +55,7 @@ public class PtLegScrapper {
 
 	public void run(String networkFile, String popFile, String newpopFile) {
 		scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenario).readFile(networkFile);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
 		new MatsimPopulationReader(scenario).readFile(popFile);
 		Scenario s2 = replacePTLegs(scenario);
 		removeTaxiLegsAfterMidnight(s2.getPopulation());

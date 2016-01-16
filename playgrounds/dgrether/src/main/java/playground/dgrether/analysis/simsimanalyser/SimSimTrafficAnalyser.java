@@ -58,7 +58,7 @@ public class SimSimTrafficAnalyser {
 	private Network loadNetwork(String networkFile){
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		
-		new MatsimNetworkReader(scenario).readFile(networkFile);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
 		return scenario.getNetwork();
 	}
 	

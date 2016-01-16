@@ -542,7 +542,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 				visLink = visModelBuilder.createVisLinkLanes(transformation, QLinkLanesImpl.this,
 						nodeOffset, lanes);
 				SnapshotLinkWidthCalculator linkWidthCalculator = QLinkLanesImpl.this.network
-						.getLinkWidthCalculator();
+						.getLinkWidthCalculatorForVis();
 				visModelBuilder.recalculatePositions(visLink, linkWidthCalculator);
 			}
 		}

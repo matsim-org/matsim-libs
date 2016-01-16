@@ -1,6 +1,10 @@
 package opdytsintegration;
 
+import java.util.Set;
+
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.TerminationCriterion;
@@ -26,6 +30,8 @@ public class MATSimSimulator<U extends DecisionVariable> implements
 
 	private final TimeDiscretization timeDiscretization;
 
+	private final Set<Id<Link>> relevantLinkIds;
+
 	private AbstractModule[] modules = null;
 
 	private int nextControlerRun = 0;
@@ -35,10 +41,12 @@ public class MATSimSimulator<U extends DecisionVariable> implements
 	public MATSimSimulator(final MATSimStateFactory<U> stateFactory,
 			final Scenario scenario,
 			final TimeDiscretization timeDiscretization,
+			final Set<Id<Link>> relevantLinkIds,
 			final AbstractModule... modules) {
 		this.stateFactory = stateFactory;
 		this.scenario = scenario;
 		this.timeDiscretization = timeDiscretization;
+		this.relevantLinkIds = relevantLinkIds;
 		this.modules = modules;
 
 		final String outputDirectory = this.scenario.getConfig().controler()
@@ -71,10 +79,10 @@ public class MATSimSimulator<U extends DecisionVariable> implements
 		 * "optimize along" the MATSim run of this iteration.
 		 */
 		final MATSimDecisionVariableSetEvaluator<U> matsimDecisionVariableEvaluator = new MATSimDecisionVariableSetEvaluator<>(
-				trajectorySampler, this.stateFactory, this.timeDiscretization);
+				trajectorySampler, this.stateFactory, this.timeDiscretization,
+				this.relevantLinkIds);
 		matsimDecisionVariableEvaluator.setMemory(1); // TODO make configurable
-		matsimDecisionVariableEvaluator.setStandardLogFileName(outputDirectory
-				+ "/opdyts.log");
+//		matsimDecisionVariableEvaluator.setStandardLogFileName("./opdyts.log");
 
 		/*
 		 * (3) Create, configure, and run a new MATSim Controler.
@@ -83,8 +91,10 @@ public class MATSimSimulator<U extends DecisionVariable> implements
 		 */
 		final Controler controler = new Controler(this.scenario);
 		if (this.modules != null) {
+			// controler.setModules(new
+			// ControlerDefaultsWithRoadPricingModule());
 			controler.setModules(this.modules);
-			this.modules = null; // ???
+			// this.modules = null; // ???
 		}
 		controler.addControlerListener(matsimDecisionVariableEvaluator);
 		controler.addOverridingModule(new AbstractModule() {
@@ -97,6 +107,13 @@ public class MATSimSimulator<U extends DecisionVariable> implements
 			@Override
 			public void install() {
 				binder().requestInjection(matsimDecisionVariableEvaluator);
+			}
+		});
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				binder().requestInjection(
+						trajectorySampler.getObjectiveFunction());
 			}
 		});
 		controler.setTerminationCriterion(new TerminationCriterion() {

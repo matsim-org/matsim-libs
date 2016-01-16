@@ -53,7 +53,7 @@ public class Facilities2Links {
 		facReader.readFile(args[0]);
 		
 		logger.info("Loading network...");
-		NetworkReaderMatsimV1 netReader = new NetworkReaderMatsimV1(scenario);
+		NetworkReaderMatsimV1 netReader = new NetworkReaderMatsimV1(scenario.getNetwork());
 		netReader.parse(args[1]);
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 		

@@ -49,7 +49,7 @@ public class ReadingEventsFile {
 			try{
 				Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 				Network nl = scenario.getNetwork();
-				MatsimNetworkReader nr = new MatsimNetworkReader(scenario);
+				MatsimNetworkReader nr = new MatsimNetworkReader(scenario.getNetwork());
 				nr.readFile(networkFilename);
 				
 				String input = root + "/Output/Run06/it.100-7699/100.events.txt.gz";

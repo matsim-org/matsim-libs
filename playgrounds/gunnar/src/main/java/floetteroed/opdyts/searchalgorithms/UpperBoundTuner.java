@@ -76,6 +76,11 @@ public class UpperBoundTuner {
 			avgEquilGap += stage.getEquilibriumGap();
 			avgUnifGap += stage.getAlphaSquareNorm();
 		}
+		// {
+		// SamplingStage<U> stage = samplingStages.get(0);
+		// avgEquilGap += stage.getEquilibriumGap();
+		// avgUnifGap += stage.getAlphaSquareNorm();
+		// }
 		avgEquilGap /= samplingStages.size();
 		avgUnifGap /= samplingStages.size();
 		final LinearObjectiveFunction objectiveFunction = new LinearObjectiveFunction(
@@ -96,6 +101,15 @@ public class UpperBoundTuner {
 					GEQ, finalObjectiveFunctionValue
 							- stage.getOriginalObjectiveFunctionValue()));
 		}
+		// {
+		// // final SamplingStage<U> stage = samplingStages.get(0);
+		// final SamplingStage<U> stage = samplingStages.get(samplingStages
+		// .size() - 1);
+		// constraints.add(new LinearConstraint(new double[] {
+		// stage.getEquilibriumGap(), stage.getAlphaSquareNorm() },
+		// GEQ, finalObjectiveFunctionValue
+		// - stage.getOriginalObjectiveFunctionValue()));
+		// }
 		final LinearConstraintSet allConstraints = new LinearConstraintSet(
 				constraints);
 
@@ -109,7 +123,8 @@ public class UpperBoundTuner {
 		this.equilGapWeight = result.getPoint()[0];
 		this.unifGapWeight = result.getPoint()[1];
 
-		System.out.println("ONE-SHOT-OPTIMIZATION: v = " + result.getPoint()[0]
-				+ " w = " + result.getPoint()[1]);
+		// System.out.println("ONE-SHOT-OPTIMIZATION: v = " +
+		// result.getPoint()[0]
+		// + " w = " + result.getPoint()[1]);
 	}
 }

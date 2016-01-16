@@ -47,7 +47,7 @@ import playground.agarwalamit.utils.LoadMyScenarios;
 
 public class ModeSwitchersTripDistance {
 
-	private Logger log = Logger.getLogger(ModeSwitchersTripDistance.class);
+	private static final Logger LOG = Logger.getLogger(ModeSwitchersTripDistance.class);
 
 	private ModeSwitcherInfoCollector modeSwitchInfo;
 
@@ -67,56 +67,54 @@ public class ModeSwitchersTripDistance {
 		modeSwitchInfo = new ModeSwitcherInfoCollector();
 	}
 
-	private void run (String runCase){
-
+	private void run (final String runCase){
 		// data from event files
-		String eventsFile_it_first = runCase+"/ITERS/it.1000/1000.events.xml.gz";
-		String eventsFile_it_last = runCase+"/ITERS/it.1500/1500.events.xml.gz";
+		String eventsFileItFirst = runCase+"/ITERS/it.1000/1000.events.xml.gz";
+		String eventsFileItLast = runCase+"/ITERS/it.1500/1500.events.xml.gz";
 		Scenario sc = LoadMyScenarios.loadScenarioFromNetworkAndConfig(runCase+"/output_network.xml.gz", runCase+"/output_config.xml");
 
-		Map<Id<Person>, List<Tuple<String, Double>>> person2ModeTravelDists_it_first = getPerson2mode2TripDistances(eventsFile_it_first,sc);
-		Map<Id<Person>, List<Tuple<String, Double>>> person2ModeTravelDists_it_last = getPerson2mode2TripDistances(eventsFile_it_last,sc);
+		Map<Id<Person>, List<Tuple<String, Double>>> person2ModeTravelDistsItFirst = getPerson2mode2TripDistances(eventsFileItFirst,sc);
+		Map<Id<Person>, List<Tuple<String, Double>>> person2ModeTravelDistsTtLast = getPerson2mode2TripDistances(eventsFileItLast,sc);
 
-		for(Id<Person> pId : person2ModeTravelDists_it_first.keySet()){
+		for(Id<Person> pId : person2ModeTravelDistsItFirst.keySet()){
 
-			if(person2ModeTravelDists_it_last.containsKey(pId) ) {
+			if(person2ModeTravelDistsTtLast.containsKey(pId) ) {
 
 				int numberOfLegs = 0;
-				if(person2ModeTravelDists_it_last.get(pId).size() != person2ModeTravelDists_it_first.get(pId).size()){
+				if(person2ModeTravelDistsTtLast.get(pId).size() != person2ModeTravelDistsItFirst.get(pId).size()){
 					//	if person does not have same number of trips as in first iteration
 
-					this.log.warn("Person "+pId+" do not have the same number of trip legs in the two maps. This could be due to stuck and abort event. "
+					LOG.warn("Person "+pId+" do not have the same number of trip legs in the two maps. This could be due to stuck and abort event. "
 							+ "\n Thus including only minimum legs (removing the common trups) for that person.");
-					numberOfLegs = Math.min(person2ModeTravelDists_it_last.get(pId).size(),person2ModeTravelDists_it_first.get(pId).size());
-				} else numberOfLegs = person2ModeTravelDists_it_first.get(pId).size();
+					numberOfLegs = Math.min(person2ModeTravelDistsTtLast.get(pId).size(),person2ModeTravelDistsItFirst.get(pId).size());
+				} else numberOfLegs = person2ModeTravelDistsItFirst.get(pId).size();
 
 				for(int ii=0; ii<numberOfLegs;ii++){
-					Tuple<String, Double> first_it_mode = person2ModeTravelDists_it_first.get(pId).get(ii);
-					Tuple<String, Double> last_it_mode = person2ModeTravelDists_it_last.get(pId).get(ii);
+					Tuple<String, Double> firstItMode = person2ModeTravelDistsItFirst.get(pId).get(ii);
+					Tuple<String, Double> lastItMode = person2ModeTravelDistsTtLast.get(pId).get(ii);
 
-					String firstMode = getTravelMode(first_it_mode.getFirst());
-					String lastMode = getTravelMode(last_it_mode.getFirst());
+					String firstMode = getTravelMode(firstItMode.getFirst());
+					String lastMode = getTravelMode(lastItMode.getFirst());
 
 					String switchTyp = firstMode.concat("2").concat(lastMode);
 					ModeSwitcherType modeSwitchType = ModeSwitcherType.valueOf(switchTyp);
-					this.modeSwitchInfo.storeTripDistanceInfo(pId, modeSwitchType, new Tuple<Double, Double>(first_it_mode.getSecond(), last_it_mode.getSecond()));
+					this.modeSwitchInfo.storeTripDistanceInfo(pId, modeSwitchType, new Tuple<Double, Double>(firstItMode.getSecond(), lastItMode.getSecond()));
 				} 
 
-			} else if(!person2ModeTravelDists_it_last.containsKey(pId)) {
+			} else if(!person2ModeTravelDistsTtLast.containsKey(pId)) {
 
-				log.warn("Person "+pId+ "is not present in the last iteration map. This person is thus not included in the results. Probably due to stuck and abort event.");
+				LOG.warn("Person "+pId+ "is not present in the last iteration map. This person is thus not included in the results. Probably due to stuck and abort event.");
 
 			} 
 		}
 	}
 
-
-	private String getTravelMode(String mode){
+	private String getTravelMode(final String mode){
 		if(mode.equals(TransportMode.car)) return "car";
 		else return "nonCar";
 	}
 
-	private Map<Id<Person>, List<Tuple<String, Double>>> getPerson2mode2TripDistances(String eventsFile, Scenario sc){
+	private Map<Id<Person>, List<Tuple<String, Double>>> getPerson2mode2TripDistances(final String eventsFile, final Scenario sc){
 
 		EventsManager events = EventsUtils.createEventsManager();
 		MatsimEventsReader reader = new MatsimEventsReader(events);

@@ -34,11 +34,11 @@ public class LinkStopsToNearestNode {
 		//Create base network
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
-		new MatsimNetworkReader(scenario).readFile(networkInFile);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkInFile);
 		
 		MutableScenario scenario2 = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		NetworkImpl noHighways = (NetworkImpl) scenario.getNetwork();
-		new MatsimNetworkReader(scenario2).readFile(networkInFile);
+		new MatsimNetworkReader(scenario2.getNetwork()).readFile(networkInFile);
 		
 		//Remove highways and on/off ramps. Should not affect routes which travel on highways since transit lines don't stop ON highways.	
 		ArrayList<Id<Link>> linksToRemove = new ArrayList<>();

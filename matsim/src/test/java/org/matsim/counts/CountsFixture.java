@@ -57,7 +57,7 @@ public class CountsFixture {
 		counts_parser.readFile(config.counts().getCountsFileName());
 
 		this.network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(config.network().getInputFile());
 	}
 
 	public CountsComparisonAlgorithm getCCA() {

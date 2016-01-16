@@ -22,7 +22,7 @@ package playground.anhorni.surprice.scoring;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
@@ -32,14 +32,14 @@ import playground.anhorni.surprice.Surprice;
 
 public class SurpriceScoringFunctionFactory extends org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory{
 	
-	private final Controler controler;
+	private final MatsimServices controler;
 	private AgentMemories memories = new AgentMemories();
 	private String day;
 	private PlanCalcScoreConfigGroup config;
 	private ObjectAttributes preferences;
 
 
-	public SurpriceScoringFunctionFactory(Controler controler, PlanCalcScoreConfigGroup configGroup, Network network, 
+	public SurpriceScoringFunctionFactory(MatsimServices controler, PlanCalcScoreConfigGroup configGroup, Network network,
 			AgentMemories memories, String day, ObjectAttributes preferences) {
 		super(configGroup, scConfig, network);
 		this.controler = controler;

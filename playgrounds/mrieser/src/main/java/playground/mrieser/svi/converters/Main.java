@@ -50,7 +50,7 @@ public class Main {
 
 	private static void convertNetwork(final String networkFilename, final String targetDirectory) {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenario).readFile(networkFilename);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFilename);
 
 		DynusTNetworkWriter writer = new DynusTNetworkWriter(scenario.getNetwork());
 		writer.writeToDirectory(targetDirectory);

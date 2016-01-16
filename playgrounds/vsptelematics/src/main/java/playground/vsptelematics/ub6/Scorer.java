@@ -25,26 +25,33 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.config.Config;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 
-public class Scorer implements  IterationEndsListener {
+import javax.inject.Inject;
+
+public class Scorer implements IterationEndsListener {
 
 	private static final Logger log = Logger.getLogger(Scorer.class);
 
 	private RouteTTObserver observer;
+	private Population population;
+	private Config config;
 
-	public Scorer(RouteTTObserver observer2) {
-		this.observer = observer2;
+	@Inject
+	public Scorer(RouteTTObserver observer, Population population, Config config) {
+		this.observer = observer;
+		this.population = population;
+		this.config = config;
 	}
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
-		double alpha = event.getControler().getConfig().planCalcScore().getLearningRate();
-		Population pop = event.getControler().getScenario().getPopulation();
-		for (Person person : pop.getPersons().values()){
+		double alpha = config.planCalcScore().getLearningRate();
+		for (Person person : population.getPersons().values()){
 			for(Plan plan : person.getPlans()) {
 				double tt = 0;
 				LegImpl leg = (LegImpl) plan.getPlanElements().get(1);

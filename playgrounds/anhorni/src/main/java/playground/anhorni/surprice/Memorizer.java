@@ -23,7 +23,7 @@ package playground.anhorni.surprice;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
 
@@ -41,7 +41,7 @@ public class Memorizer implements ShutdownListener {
 
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {
-		Controler controler = event.getControler();
+		MatsimServices controler = event.getServices();
         Population population = controler.getScenario().getPopulation();
 		for (Person person : population.getPersons().values()) {
 			Plan plan = person.getSelectedPlan();

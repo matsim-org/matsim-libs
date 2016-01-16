@@ -88,11 +88,11 @@
 //	@Override
 //	public void notifyStartup(StartupEvent event) {
 //
-//		this.controler = event.getControler();
+//		this.controler = event.getServices();
 //		this.controlerFacilities = controler.getFacilities().getFacilities();
 //		FreespeedTravelTimeAndDisutility timeCostCalc = new FreespeedTravelTimeAndDisutility(controler.getConfig().planCalcScore());
 //		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) this.controler.getPopulation().getFactory()).getModeRouteFactory();
-//		pcrl = new PlansCalcRoute(controler.getConfig().plansCalcRoute(), controler.getNetwork(),timeCostCalc, timeCostCalc, new AStarLandmarksFactory(controler.getNetwork(), timeCostCalc), routeFactory);
+//		pcrl = new PlansCalcRoute(services.getConfig().plansCalcRoute(), services.getNetwork(),timeCostCalc, timeCostCalc, new AStarLandmarksFactory(services.getNetwork(), timeCostCalc), routeFactory);
 //		
 //		// Make a table with all shop activities listed  
 //		/*String popOutFile = controler.getConfig().findParam(CONFIG_GROUP,CONFIG_POP_SUM_TABLE);
@@ -151,7 +151,7 @@
 //	
 //	@Override
 //	public void notifyIterationEnds(IterationEndsEvent event) {
-//		Controler controler = event.getControler();
+//		Controler controler = event.getServices();
 //		Map<Id,ActivityFacility> movedFacilities = new TreeMap<Id,ActivityFacility>();
 //		ArrayList<ActivityFacility> retailersFacilities = new ArrayList<ActivityFacility>();
 //		// works, but it is not nicely programmed. shouldn't be a global container, should be
@@ -164,7 +164,7 @@
 //			// be computed, the second is 0...k, where k is the number of iterations needed 
 //			// in order to obtain a relaxed state, or maybe use a while.
 //			//int iter = controler.getIteration();
-//			//if (controler.getIteration()>0 & controler.getIteration()%5==0){
+//			//if (services.getIteration()>0 & services.getIteration()%5==0){
 //			for (Retailer r:retailers.getRetailers().values()) {
 //				retailersFacilities.addAll(r.getFacilities().values());
 //				log.info("The retailer " + r.getId().toString() + " owns " + r.getFacilities().values().size() + " facilities");

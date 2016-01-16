@@ -83,7 +83,7 @@ public class MeanQueueLengthCalculator implements LinkEnterEventHandler, LinkLea
 	
 	public MeanQueueLengthCalculator() throws Exception {
 		scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenario).readFile(networkFile);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
 		
 		linkInfos = new HashMap<Id, LinkInfo>();
 		

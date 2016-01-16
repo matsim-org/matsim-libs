@@ -25,12 +25,14 @@ package playground.christoph.evacuation.controler;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.FixedOrderSimulationListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
+import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.router.*;
 import org.matsim.core.router.util.TravelDisutility;
@@ -43,6 +45,7 @@ import org.matsim.withinday.trafficmonitoring.EarliestLinkExitTimeProvider;
 import org.matsim.withinday.trafficmonitoring.TravelTimeCollector;
 
 import javax.inject.Provider;
+import java.lang.Override;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
@@ -192,7 +195,6 @@ public abstract class WithinDayController extends Controler implements StartupLi
 	public void initWithinDayEngine(int numOfThreads) {
 		if (!withinDayEngineInitialized) {
 			log.info("Initialize ReplanningManager");
-			withinDayEngine.initializeReplanningModules(numOfThreads);
 			withinDayEngineInitialized = true;
 		}
 	}
@@ -232,9 +234,15 @@ public abstract class WithinDayController extends Controler implements StartupLi
 	 */
 
 	private void init() {
-		
-		super.getMobsimListeners().add(fosl);
-		
+
+		final MobsimListener mobsimListener = fosl;
+		addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				addMobsimListenerBinding().toInstance(fosl);
+			}
+		});
+
 		// initialize a withinDayEngine and set WithinDayQSimFactory as MobsimFactory
 //		this.withinDayEngine = new WithinDayEngine(this.getEvents());
 //		WithinDayQSimFactory mobsimFactory = new WithinDayQSimFactory(withinDayEngine);

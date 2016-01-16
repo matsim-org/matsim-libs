@@ -61,7 +61,7 @@ public class InitRoutes {
 		MatsimPopulationReader popReader = new MatsimPopulationReader(scenario);
 		popReader.readFile(args[0]);
 		
-		MatsimNetworkReader netReader = new MatsimNetworkReader(scenario);
+		MatsimNetworkReader netReader = new MatsimNetworkReader(scenario.getNetwork());
 		netReader.readFile(args[1]);
 		
 		int numThreads = Integer.parseInt(args[3]);

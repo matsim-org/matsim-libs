@@ -106,10 +106,10 @@ final class GexfPPaxCount extends MatsimJaxbXmlWriter implements StartupListener
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		if (this.getWriteGexfStatsInterval > 0) {
-            this.addNetworkAsLayer(event.getControler().getScenario().getNetwork(), 0);
+            this.addNetworkAsLayer(event.getServices().getScenario().getNetwork(), 0);
 			this.createAttValues();
 			this.eventsHandler = new CountPPaxHandler(this.pIdentifier);
-			event.getControler().getEvents().addHandler(this.eventsHandler);
+			event.getServices().getEvents().addHandler(this.eventsHandler);
 			this.linkId2CountsFromLastIteration = new HashMap<>();
 		}
 	}
@@ -119,7 +119,7 @@ final class GexfPPaxCount extends MatsimJaxbXmlWriter implements StartupListener
 		if (this.getWriteGexfStatsInterval > 0) {
 			this.addValuesToGexf(event.getIteration(), this.eventsHandler);
 			if ((event.getIteration() % this.getWriteGexfStatsInterval == 0) ) {
-				this.write(event.getControler().getControlerIO().getIterationFilename(event.getIteration(), GexfPPaxCount.FILENAME));
+				this.write(event.getServices().getControlerIO().getIterationFilename(event.getIteration(), GexfPPaxCount.FILENAME));
 			}			
 		}		
 	}
@@ -127,7 +127,7 @@ final class GexfPPaxCount extends MatsimJaxbXmlWriter implements StartupListener
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {
 		if (this.getWriteGexfStatsInterval > 0) {
-			this.write(event.getControler().getControlerIO().getOutputFilename(GexfPPaxCount.FILENAME));
+			this.write(event.getServices().getControlerIO().getOutputFilename(GexfPPaxCount.FILENAME));
 		}		
 	}
 

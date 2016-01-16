@@ -18,6 +18,7 @@
  * *********************************************************************** */
 package playground.johannes.studies.matrix2014.analysis;
 
+import javax.management.RuntimeErrorException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -28,6 +29,10 @@ import java.util.List;
 public class CollectionUtils {
 
     public static List<double[]> toNativeArray(List<Double> values1, List<Double> values2) {
+        if(values1.size() != values2.size()) {
+            throw new RuntimeException("Values and weights have to have equal length.");
+        }
+
         double[] nativeValues1 = new double[values1.size()];
         double[] nativeValues2 = new double[values2.size()];
 

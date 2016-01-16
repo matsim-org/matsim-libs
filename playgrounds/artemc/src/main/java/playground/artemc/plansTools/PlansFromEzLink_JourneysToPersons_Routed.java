@@ -102,7 +102,7 @@ public class PlansFromEzLink_JourneysToPersons_Routed extends MatsimXmlWriter{
 
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
-		new NetworkReaderMatsimV1(scenario).parse("C:/Work/MATSim/inputMATSimSingapore2.2/network/network100.xml.gz");
+		new NetworkReaderMatsimV1(scenario.getNetwork()).parse("C:/Work/MATSim/inputMATSimSingapore2.2/network/network100.xml.gz");
 		scenario.getConfig().transit().setUseTransit(true);
 		new TransitScheduleReader(scenario).readFile("C:/Work/MATSim/inputMATSimSingapore2.2/transit/transitSchedule.xml.gz");		
 

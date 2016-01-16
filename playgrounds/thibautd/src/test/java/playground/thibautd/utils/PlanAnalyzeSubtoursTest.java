@@ -81,7 +81,7 @@ public class PlanAnalyzeSubtoursTest extends MatsimTestCase {
 		Config config = loadConfig(PlanAnalyzeSubtoursTest.CONFIGFILE);
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		Network network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(config.network().getInputFile());
 		this.runDemo((NetworkImpl) network);
 	}
 	

@@ -6,7 +6,7 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.facilities.ActivityFacility;
@@ -20,9 +20,9 @@ public class RetailerStrategyImpl
 {
 	  private static final Logger log = Logger.getLogger(RetailerStrategyImpl.class);
 	  protected Map<Id<ActivityFacility>, ActivityFacilityImpl> retailerFacilities;
-	  protected Controler controler;
+	  protected MatsimServices controler;
 	
-	  public RetailerStrategyImpl(Controler controler)
+	  public RetailerStrategyImpl(MatsimServices controler)
 	  {
 	    this.controler = controler;
 	    log.info("Controler" + this.controler);

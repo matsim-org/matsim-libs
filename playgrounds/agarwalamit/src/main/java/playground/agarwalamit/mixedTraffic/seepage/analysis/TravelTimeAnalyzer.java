@@ -27,7 +27,7 @@ import playground.agarwalamit.mixedTraffic.seepage.TestSetUp.SeepageControler;
 public class TravelTimeAnalyzer  {
 
 	public static void main(String[] args) {
-		String outputDir = SeepageControler.outputDir;
+		String outputDir = SeepageControler.OUTPUT_DIR;
 		ModalTravelTimeAnalyzer ptta = new ModalTravelTimeAnalyzer(outputDir+"/events.xml");
 		ptta.preProcessData();
 		ptta.postProcessData();

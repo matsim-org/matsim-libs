@@ -1,8 +1,6 @@
 package saleem.p0;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
 
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
@@ -30,7 +28,7 @@ public class P0ControlListener implements StartupListener, IterationStartsListen
 		handler.initialise(event.getIteration());//To avoid creating objects every time, to save memory
 	    network.setNetworkChangeEvents(P0ControlHandler.events);
 	    P0ControlHandler.events.removeAll(P0ControlHandler.events);
-	    //event.getControler().getEvents().addHandler(handler);
+	    //event.getServices().getEvents().addHandler(handler);
 		
 	}
 	public void populateInitialAbsolutePressureDifference(){
@@ -70,7 +68,7 @@ public class P0ControlListener implements StartupListener, IterationStartsListen
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		handler = new P0ControlHandler(network);
-	    event.getControler().getEvents().addHandler(handler);
+	    event.getServices().getEvents().addHandler(handler);
 		// TODO Auto-generated method stub
 		populateInitialAbsolutePressureDifference();
 	}

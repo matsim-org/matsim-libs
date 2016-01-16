@@ -57,7 +57,7 @@ public class CottbusTramLinkCreator {
 
 		String netfile = "\\\\vsp-nas\\jbischoff\\WinHome\\Docs\\cottbus\\cottbus_feb_fix\\network_wgs84_utm33n.xml.gz";
 		Network network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario).readFile(netfile);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(netfile);
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84,
 				TransformationFactory.WGS84_UTM33N);
 		

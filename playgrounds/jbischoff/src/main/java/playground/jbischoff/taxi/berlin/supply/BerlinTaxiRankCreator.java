@@ -39,7 +39,7 @@ public class BerlinTaxiRankCreator
     {
         BerlinTaxiRankCreator btrc = new BerlinTaxiRankCreator();
         Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-        new MatsimNetworkReader(sc).readFile(NETWORKFILE);
+        new MatsimNetworkReader(sc.getNetwork()).readFile(NETWORKFILE);
         List<TaxiRank> rankList = btrc.read(sc.getNetwork(), RANKFILE);
         btrc.writeRanks(rankList, OUTPUTFILE);
         btrc.WriteRanksText(rankList, OUTPUTFILETXT);

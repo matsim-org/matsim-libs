@@ -32,7 +32,7 @@ public final class LoadMyScenarios {
 	
 	private LoadMyScenarios(){}
 	
-	private final static Logger logger = Logger.getLogger(LoadMyScenarios.class);
+	private final static Logger LOG = Logger.getLogger(LoadMyScenarios.class);
 	
 	/**
 	 * Returns scenario specified plans, network and config file.
@@ -146,7 +146,7 @@ public final class LoadMyScenarios {
 		ConfigReader configReader = new ConfigReader(config);
 		configReader.readFile(configfile);
 		Double endTime = config.qsim().getEndTime();
-		logger.info("Simulation end time is: " + endTime / 3600 + " hours.");
+		LOG.info("Simulation end time is: " + endTime / 3600 + " hours.");
 		return endTime;
 	}
 	

@@ -85,7 +85,6 @@ public class TravelTimeCollector implements TravelTime,
 	 */
 	private CyclicBarrier startBarrier;
 	private CyclicBarrier endBarrier;
-	private Thread[] threads;
 	private UpdateMeanTravelTimesRunnable[] updateMeanTravelTimesRunnables;
 	private final int numOfThreads;
 
@@ -95,8 +94,7 @@ public class TravelTimeCollector implements TravelTime,
 	private Set<Id<Vehicle>> vehiclesToFilter;
 	private final Set<String> analyzedModes;
 	private final boolean filterModes;
-	
-	private int resetCnt = 0 ;
+
 	boolean problem = true ;
 
 	@Inject
@@ -116,7 +114,7 @@ public class TravelTimeCollector implements TravelTime,
 			this.filterModes = false;
 			this.analyzedModes = null;
 		} else {
-			this.analyzedModes = new HashSet<String>(analyzedModes);
+			this.analyzedModes = new HashSet<>(analyzedModes);
 			filterModes = true;
 		}
 
@@ -126,7 +124,7 @@ public class TravelTimeCollector implements TravelTime,
 	private void init() {
 		this.regularActiveTrips = new HashMap<>();
 		this.travelTimeInfos = new ConcurrentHashMap<>();
-		this.changedLinks = new HashMap<Double, Collection<Link>>();
+		this.changedLinks = new HashMap<>();
 		this.vehiclesToFilter = new HashSet<>();
 				
 		for (Link link : this.network.getLinks().values()) {
@@ -154,7 +152,7 @@ public class TravelTimeCollector implements TravelTime,
 						double startTime = networkChangeEvent.getStartTime();
 						Collection<Link> links = changedLinks.get(startTime);
 						if (links == null) {
-							links = new HashSet<Link>();
+							links = new HashSet<>();
 							changedLinks.put(startTime, links);
 						}
 						links.addAll(networkChangeEvent.getLinks());
@@ -164,14 +162,6 @@ public class TravelTimeCollector implements TravelTime,
 		}		
 	}
 
-	public void setTravelTimeInfoProvider(TravelTimeInfoProvider travelTimeInfoProvider) {
-		this.travelTimeInfoProvider = travelTimeInfoProvider;
-	}
-	
-	public TravelTimeInfoProvider getTravelTimeInfoProvider() {
-		return this.travelTimeInfoProvider;
-	}
-	
 	@Override
 	public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
 		return this.travelTimeInfoProvider.getTravelTimeData(link).travelTime;
@@ -180,6 +170,7 @@ public class TravelTimeCollector implements TravelTime,
 	@Override
 	public void reset(int iteration) {
 		init();
+		int resetCnt = 0;
 		if ( resetCnt >=1 ) {
 			if ( problem ) {
 				throw new RuntimeException("using TravelTimeCollector, but mobsim notifications not called between two resets.  "
@@ -340,9 +331,7 @@ public class TravelTimeCollector implements TravelTime,
 		 */
 		try {
 			this.startBarrier.await();
-		} catch (InterruptedException ex) {
-			throw new RuntimeException(ex);
-		} catch (BrokenBarrierException ex) {
+		} catch (InterruptedException | BrokenBarrierException ex) {
 			throw new RuntimeException(ex);
 		}
 	}
@@ -368,7 +357,7 @@ public class TravelTimeCollector implements TravelTime,
 	/*package*/ static class TravelTimeInfo {
 
 		UpdateMeanTravelTimesRunnable runnable;
-		List<TripBin> tripBins = new ArrayList<TripBin>();
+		List<TripBin> tripBins = new ArrayList<>();
 
 		boolean isActive = false;
 		// int numActiveTrips = 0;
@@ -432,9 +421,7 @@ public class TravelTimeCollector implements TravelTime,
 			this.startBarrier.await();
 
 			this.endBarrier.await();
-		} catch (InterruptedException e) {
-			throw new RuntimeException(e);
-		} catch (BrokenBarrierException e) {
+		} catch (InterruptedException | BrokenBarrierException e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -444,7 +431,7 @@ public class TravelTimeCollector implements TravelTime,
 		this.startBarrier = new CyclicBarrier(numOfThreads + 1);
 		this.endBarrier = new CyclicBarrier(numOfThreads + 1);
 
-		this.threads = new Thread[numOfThreads];
+		Thread[] threads = new Thread[numOfThreads];
 		this.updateMeanTravelTimesRunnables = new UpdateMeanTravelTimesRunnable[numOfThreads];
 
 		// setup threads
@@ -457,7 +444,7 @@ public class TravelTimeCollector implements TravelTime,
 			Thread thread = new Thread(updateMeanTravelTimesRunnable);
 			thread.setName("UpdateMeanTravelTimes" + i);
 			thread.setDaemon(true); // make the Thread demons so they will terminate automatically
-			this.threads[i] = thread;
+			threads[i] = thread;
 			
 			thread.start();
 		}
@@ -478,9 +465,7 @@ public class TravelTimeCollector implements TravelTime,
 		 */
 		try {
 			this.endBarrier.await();
-		} catch (InterruptedException e) {
-			throw new RuntimeException(e);
-		} catch (BrokenBarrierException e) {
+		} catch (InterruptedException | BrokenBarrierException e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -499,7 +484,7 @@ public class TravelTimeCollector implements TravelTime,
 		private Collection<TravelTimeInfo> activeTravelTimeInfos;
 
 		public UpdateMeanTravelTimesRunnable() {
-			activeTravelTimeInfos = new ArrayList<TravelTimeInfo>();
+			activeTravelTimeInfos = new ArrayList<>();
 		}
 
 		public void setStartBarrier(CyclicBarrier cyclicBarrier) {
@@ -570,9 +555,7 @@ public class TravelTimeCollector implements TravelTime,
 						}
 					}
 
-				} catch (InterruptedException e) {
-					throw new RuntimeException(e);
-				} catch (BrokenBarrierException e) {
+				} catch (InterruptedException | BrokenBarrierException e) {
 					throw new RuntimeException(e);
 				}
 			}

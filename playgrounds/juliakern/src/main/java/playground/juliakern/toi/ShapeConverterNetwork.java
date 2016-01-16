@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCleaner;
@@ -53,7 +54,7 @@ public class ShapeConverterNetwork {
 		
 		Config config = new Config();
 		config.addCoreModules();
-		Controler controler = new Controler(config);
+		MatsimServices controler = new Controler(config);
 		Scenario scenario = controler.getScenario();
 
 		ShapeFileReader sfr = new ShapeFileReader();

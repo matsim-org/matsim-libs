@@ -31,7 +31,7 @@ import playground.agarwalamit.utils.LoadMyScenarios;
 
 public class LinkCapacityModifier {
 
-	private static final Logger log = Logger.getLogger(LinkCapacityModifier.class);
+	private static final Logger LOG = Logger.getLogger(LinkCapacityModifier.class);
 
 	private Network network;
 
@@ -45,14 +45,14 @@ public class LinkCapacityModifier {
 		new LinkCapacityModifier(sc.getNetwork()).processNetwork(1.);
 	}
 
-	public void processNetwork(double linkCap_modificationFactor){
-		log.info("Link capacity of each link in network will be modified by a factor of "+ linkCap_modificationFactor);
+	public void processNetwork(final double linkCapModificationFactor){
+		LOG.info("Link capacity of each link in network will be modified by a factor of "+ linkCapModificationFactor);
 
 		for (Link l : this.network.getLinks().values()){
-			l.setCapacity(l.getCapacity()*linkCap_modificationFactor);
+			l.setCapacity(l.getCapacity()*linkCapModificationFactor);
 			this.network.addLink(l);
 		}
-		log.info("Ignore the warning for duplicacy of link.");
+		LOG.info("Ignore the warning for duplicacy of link.");
 	}
 
 	public void writeNetwork(String outputFile){

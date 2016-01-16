@@ -39,6 +39,7 @@ import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
@@ -225,7 +226,7 @@ public final class MarathonRunner implements StartupListener,
 		controler.run();
 	}
 
-	public MarathonRunner(Controler controler) {
+	public MarathonRunner(MatsimServices controler) {
 		
 		this.scenario = controler.getScenario();
 		
@@ -384,8 +385,8 @@ public final class MarathonRunner implements StartupListener,
 		this.withinDayControlerListener.notifyStartup(event);
 
 //		XYDataWriter xyDataWriter = new XYDataWriter();
-//		event.getControler().getEvents().addHandler(xyDataWriter);
-//		event.getControler().addControlerListener(xyDataWriter);
+//		event.getServices().getEvents().addHandler(xyDataWriter);
+//		event.getServices().addControlerListener(xyDataWriter);
 //		this.withinDayControlerListener.getFixedOrderSimulationListener().addSimulationListener(xyDataWriter);
 		
 		readAffectedArea();
@@ -394,18 +395,18 @@ public final class MarathonRunner implements StartupListener,
 		
 		createPreAndPostRunFacilities();
 		
-		createExitLinks(event.getControler());
+		createExitLinks(event.getServices());
 		
 		this.informedHouseholdsTracker = new InformedHouseholdsTracker(this.scenario.getPopulation(), ((ScenarioImpl) this.scenario).getHouseholds());
 		this.withinDayControlerListener.getFixedOrderSimulationListener().addSimulationListener(informedHouseholdsTracker);
-		event.getControler().getEvents().addHandler(this.informedHouseholdsTracker);
+		event.getServices().getEvents().addHandler(this.informedHouseholdsTracker);
 		
 		this.agentsTracker = new AgentsTracker(this.scenario);
-		event.getControler().getEvents().addHandler(agentsTracker);
-		event.getControler().addControlerListener(agentsTracker);
+		event.getServices().getEvents().addHandler(agentsTracker);
+		event.getServices().addControlerListener(agentsTracker);
 		
 		this.replanningTracker = new ReplanningTracker(this.informedHouseholdsTracker);
-		event.getControler().getEvents().addHandler(this.replanningTracker);
+		event.getServices().getEvents().addHandler(this.replanningTracker);
 		
 		// we do not use vehicles so far
 //		this.vehiclesTracker = new VehiclesTracker(this.getEvents());
@@ -435,8 +436,8 @@ public final class MarathonRunner implements StartupListener,
 		agentsInEvacuationAreaCounter = new AgentsInEvacuationAreaCounter(this.scenario, transportModes, coordAnalyzer.createInstance(), 
 				decisionDataProvider, scaleFactor);
 
-		event.getControler().addControlerListener(agentsInEvacuationAreaCounter);
-		event.getControler().getEvents().addHandler(agentsInEvacuationAreaCounter);
+		event.getServices().addControlerListener(agentsInEvacuationAreaCounter);
+		event.getServices().getEvents().addHandler(agentsInEvacuationAreaCounter);
 		this.withinDayControlerListener.getFixedOrderSimulationListener().addSimulationListener(agentsInEvacuationAreaCounter);
 		
 		this.initReplanners();
@@ -551,7 +552,7 @@ public final class MarathonRunner implements StartupListener,
 		activityOption.setCapacity(Double.MAX_VALUE);
 	}
 	
-	private void createExitLinks(Controler controler) {
+	private void createExitLinks(MatsimServices controler) {
 		Geometry innerBuffer = affectedArea.buffer(this.innerBuffer);
 		Geometry outerBuffer = affectedArea.buffer(this.outerBuffer);
 		
@@ -761,7 +762,7 @@ public final class MarathonRunner implements StartupListener,
 	}
 	
 	/*
-	 * New Routers for the Replanning are used instead of using the controler's.
+	 * New Routers for the Replanning are used instead of using the services's.
 	 * By doing this every person can use a personalized Router.
 	 */
 	protected void initReplanners() {

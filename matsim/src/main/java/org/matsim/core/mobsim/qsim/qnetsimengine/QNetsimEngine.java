@@ -207,7 +207,7 @@ public class QNetsimEngine implements MobsimEngine {
 		} else {
 			network = new QNetwork(sim.getScenario().getNetwork(), new DefaultQNetworkFactory());
 		}
-		network.getLinkWidthCalculator().setLinkWidth(qsimConfigGroup.getLinkWidth());
+		network.getLinkWidthCalculatorForVis().setLinkWidthForVis(qsimConfigGroup.getLinkWidthForVis());
 		network.initialize(this);
 
 		this.positionInfoBuilder = this.createAgentSnapshotInfoBuilder( sim.getScenario() );

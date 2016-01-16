@@ -100,7 +100,7 @@ public class NetLoad {
 		/*
 		 * lead network
 		 */
-		MatsimNetworkReader netReader = new MatsimNetworkReader(scenario);
+		MatsimNetworkReader netReader = new MatsimNetworkReader(scenario.getNetwork());
 		netReader.readFile(netFile);
 		Network network = scenario.getNetwork();
 		/*

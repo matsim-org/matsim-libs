@@ -8,7 +8,7 @@ import org.jfree.util.Log;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -43,7 +43,7 @@ public class FreeFloatingVehiclesLocation {
 	   
 	  }
 	
-	public FreeFloatingVehiclesLocation(String inputFilePath, Controler controler) throws IOException {
+	public FreeFloatingVehiclesLocation(String inputFilePath, MatsimServices controler) throws IOException {
 	    double minx = (1.0D / 0.0D);
 	    double miny = (1.0D / 0.0D);
 	    double maxx = (-1.0D / 0.0D);

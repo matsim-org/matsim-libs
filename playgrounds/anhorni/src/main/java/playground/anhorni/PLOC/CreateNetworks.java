@@ -33,7 +33,7 @@ public class CreateNetworks {
 	public void create(int populationSize, boolean sup) {
 		configReader.read();
 		String networkfilePath = configReader.getPath() + "/input/PLOC/3towns/network.xml";
-		new MatsimNetworkReader(scenario).readFile(networkfilePath);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkfilePath);
 		
 		this.scaleNetwork(populationSize);
 		this.write(populationSize, sup);	

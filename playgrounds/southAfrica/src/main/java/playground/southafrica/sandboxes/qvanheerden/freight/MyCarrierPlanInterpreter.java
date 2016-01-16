@@ -52,7 +52,7 @@ public class MyCarrierPlanInterpreter {
 		String networkFile = args[2];
 
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		MatsimNetworkReader reader = new MatsimNetworkReader(scenario);
+		MatsimNetworkReader reader = new MatsimNetworkReader(scenario.getNetwork());
 		reader.readFile(networkFile);
 		network = scenario.getNetwork();
 

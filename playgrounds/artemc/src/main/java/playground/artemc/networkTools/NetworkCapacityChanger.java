@@ -37,7 +37,7 @@ public class NetworkCapacityChanger {
 				"../roadpricingSingapore/scenarios/siouxFalls/networkCapacityChanges.csv"));
 
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new NetworkReaderMatsimV1(scenario).parse(networkPath);
+		new NetworkReaderMatsimV1(scenario.getNetwork()).parse(networkPath);
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 
 		network.setCapacityPeriod(3600.0);

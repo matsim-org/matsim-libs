@@ -25,7 +25,7 @@ import herbie.running.population.algorithms.AbstractClassifiedFrequencyAnalysis.
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -89,7 +89,7 @@ public class CalcLegTimesHerbieListener implements StartupListener, AfterMobsimL
 	public void notifyStartup(StartupEvent event) {
 
 		try {
-			this.iterationSummaryOut = new PrintStream(event.getControler().getControlerIO().getOutputFilename(this.averagesSummaryFilename));
+			this.iterationSummaryOut = new PrintStream(event.getServices().getControlerIO().getOutputFilename(this.averagesSummaryFilename));
 			this.iterationSummaryOut.print("#iteration\tall");
 			for (String mode : modes) {
 				this.iterationSummaryOut.print("\t" + mode);
@@ -101,12 +101,12 @@ public class CalcLegTimesHerbieListener implements StartupListener, AfterMobsimL
 
 		Population pop;
 		if (this.subPopulation == null) {
-			Controler c = event.getControler();
+			MatsimServices c = event.getServices();
             pop = c.getScenario().getPopulation();
 		} else pop = this.subPopulation;
 		
 		this.calcLegTimesKTI = new CalcLegTimesKTI(pop, iterationSummaryOut);
-		event.getControler().getEvents().addHandler(this.calcLegTimesKTI);
+		event.getServices().getEvents().addHandler(this.calcLegTimesKTI);
 
 	}
 
@@ -137,7 +137,7 @@ public class CalcLegTimesHerbieListener implements StartupListener, AfterMobsimL
 
 			PrintStream out = null;
 			try {
-				out = new PrintStream(event.getControler().getControlerIO().getIterationFilename(event.getIteration(), travelTimeDistributionFilename));
+				out = new PrintStream(event.getServices().getControlerIO().getIterationFilename(event.getIteration(), travelTimeDistributionFilename));
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			}

@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -83,21 +84,21 @@ public class Daganzo2012SimpleAdaptiveRun {
 		controler.run();
 	}
 
-	private void addControlerListener(Controler c, final SimpleAdaptiveControl adaptiveControl) {
+	private void addControlerListener(MatsimServices c, final SimpleAdaptiveControl adaptiveControl) {
 		handler3 = new TTInOutflowEventHandler(Id.create("3", Link.class), Id.create("5", Link.class));
 		handler4 = new TTInOutflowEventHandler(Id.create("4", Link.class));
 		
 		c.addControlerListener(new StartupListener() {
 			@Override
 			public void notifyStartup(StartupEvent e) {
-				String initialRedString = e.getControler().getConfig().getParam("daganzo2012", "initialRedOn4");
+				String initialRedString = e.getServices().getConfig().getParam("daganzo2012", "initialRedOn4");
 				log.debug("using initial red of " + initialRedString + " s");
 				double initialRed = Double.parseDouble(initialRedString);
 				adaptiveControl.setInitialRedOn4(initialRed);
-				e.getControler().getEvents().addHandler(adaptiveControl);
-				e.getControler().getEvents().addHandler(handler3);
-				e.getControler().getEvents().addHandler(handler4);
-				outfile = e.getControler().getControlerIO().getOutputFilename("stats.txt");
+				e.getServices().getEvents().addHandler(adaptiveControl);
+				e.getServices().getEvents().addHandler(handler3);
+				e.getServices().getEvents().addHandler(handler4);
+				outfile = e.getServices().getControlerIO().getOutputFilename("stats.txt");
 				writer = IOUtils.getBufferedWriter(outfile);
 				String header = "Iteration \t  number_veh_link_4  \t number_veh_link_3_5";
 				try {

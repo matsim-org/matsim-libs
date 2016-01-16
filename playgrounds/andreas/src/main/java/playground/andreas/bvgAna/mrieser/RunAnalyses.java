@@ -91,7 +91,7 @@ public class RunAnalyses {
 	private final Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 	public void readNetwork() {
-		new MatsimNetworkReader(this.scenario).readFile(networkFilename);
+		new MatsimNetworkReader(this.scenario.getNetwork()).readFile(networkFilename);
 	}
 
 	public void readPopulation() {
@@ -100,7 +100,7 @@ public class RunAnalyses {
 
 	public void extractSelectedPlansOnly() {
 		Scenario s = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(s).readFile(networkFilename);
+		new MatsimNetworkReader(s.getNetwork()).readFile(networkFilename);
 		PopulationImpl pop = (PopulationImpl) s.getPopulation();
 		pop.setIsStreaming(true);
 

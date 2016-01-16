@@ -63,7 +63,7 @@ public class GeneralParkingModule implements StartupListener, IterationStartsLis
 	}
 
 //	public void setControler(Controler controler) {
-//		this.controler = controler;
+//		this.services = services;
 //	}
 	// lower level objects may keep back pointers to higher level objects if they have to, but we prefer that they do not provide them
 	// as a service. kai, apr'15

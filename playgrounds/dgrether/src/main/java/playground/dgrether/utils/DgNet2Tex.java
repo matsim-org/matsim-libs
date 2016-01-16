@@ -197,7 +197,7 @@ public class DgNet2Tex {
 	public void convert(String net, String texnet) {
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();
-		MatsimNetworkReader reader = new MatsimNetworkReader(scenario);
+		MatsimNetworkReader reader = new MatsimNetworkReader(scenario.getNetwork());
 		reader.readFile(net);
 		this.convert(network, texnet);
 	}

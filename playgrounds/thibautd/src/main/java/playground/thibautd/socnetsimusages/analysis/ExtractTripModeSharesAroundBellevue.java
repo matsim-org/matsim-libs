@@ -147,7 +147,7 @@ public class ExtractTripModeSharesAroundBellevue {
 
 		final Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
 		if ( facilitiesFile != null ) new MatsimFacilitiesReader( scenario ).parse( facilitiesFile );
-		if ( networkFile != null ) new MatsimNetworkReader( scenario ).parse( networkFile );
+		if ( networkFile != null ) new MatsimNetworkReader(scenario.getNetwork()).parse( networkFile );
 
 		final PopulationImpl pop = (PopulationImpl) scenario.getPopulation();
 

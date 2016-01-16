@@ -14,7 +14,7 @@ public class ScalingThePopulation {
 	public void run(String plansFilePath, String networkFilePath, String outputFilePath) {
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		PopulationReader populationReader = new MatsimPopulationReader(scenario);
-		MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario);
+		MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario.getNetwork());
 		networkReader.readFile(networkFilePath);
 		populationReader.readFile(plansFilePath);
 		

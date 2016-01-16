@@ -232,7 +232,7 @@ class BuildingEnergyMATSimDataReader {
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
         MutableScenario sc1 = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
         plansAna.setPopulation(PopulationUtils.createPopulation(sc1.getConfig(), sc1.getNetwork()));
-		new MatsimNetworkReader(sc).readFile(networkFile);
+		new MatsimNetworkReader(sc.getNetwork()).readFile(networkFile);
 		if(links == null){
 			this.links = new ArrayList<Id>(sc.getNetwork().getLinks().keySet());
 		}

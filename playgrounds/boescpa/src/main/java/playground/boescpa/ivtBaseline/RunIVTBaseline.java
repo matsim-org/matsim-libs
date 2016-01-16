@@ -4,6 +4,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.network.NetworkImpl;
@@ -52,7 +53,7 @@ public class RunIVTBaseline {
         controler.run();
     }
 
-    public static void connectFacilitiesWithNetwork(Controler controler) {
+    public static void connectFacilitiesWithNetwork(MatsimServices controler) {
         ActivityFacilities facilities = controler.getScenario().getActivityFacilities();
         NetworkImpl network = (NetworkImpl) controler.getScenario().getNetwork();
         WorldConnectLocations wcl = new WorldConnectLocations(controler.getConfig());

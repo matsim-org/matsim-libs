@@ -82,7 +82,7 @@ public class StrategyManager implements MatsimManager {
 				if (maxIter >= controlerConfigGroup.getFirstIteration()) {
 					addChangeRequest(maxIter + 1, strategy, settings.getSubpopulation(), 0.0);
 				} else {
-					/* The controler starts at a later iteration than this change request is scheduled for.
+					/* The services starts at a later iteration than this change request is scheduled for.
 					 * make the change right now.					 */
 					changeWeightOfStrategy(strategy, settings.getSubpopulation(), 0.0);
 				}

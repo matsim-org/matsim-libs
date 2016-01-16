@@ -71,7 +71,7 @@ import com.vividsolutions.jts.io.WKTReader;
 		
 		public CreateDemand (Config config){
 			this.scenario = ScenarioUtils.createScenario(config);
-			new MatsimNetworkReader(scenario).readFile(NETWORKFILE);
+			new MatsimNetworkReader(scenario.getNetwork()).readFile(NETWORKFILE);
 			this.run();
 		}
 		

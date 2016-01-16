@@ -57,7 +57,7 @@ public class GenerateDemand {
 
 		System.out.println("Reading network...");
 		Network networkLayer = scenario.getNetwork();
-		new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(config.network().getInputFile());
 		System.out.println("Reading network...done.");
 
 		System.out.println("Reading facilities...");

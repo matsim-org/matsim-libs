@@ -10,10 +10,7 @@ import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTimeCalculat
 import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTimeStuckCalculator;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.ControlerDefaultsModule;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.controler.*;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.mobsim.framework.Mobsim;
@@ -23,7 +20,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.roadpricing.RoadPricingConfigGroup;
 import playground.artemc.analysis.AnalysisControlerListener;
 import playground.artemc.annealing.SimpleAnnealer;
-import playground.artemc.crowding.internalization.InternalizationPtControlerListener;
 import playground.artemc.dwellTimeModel.QSimFactory;
 import playground.artemc.heterogeneity.eventsBasedPTRouter.TransitRouterEventsAndHeterogeneityBasedWSModule;
 import playground.artemc.heterogeneity.routing.TimeDistanceAndHeterogeneityBasedTravelDisutilityFactory;
@@ -33,7 +29,6 @@ import playground.artemc.heterogeneity.scoring.HeterogeneousCharyparNagelScoring
 import playground.artemc.pricing.LinkOccupancyAnalyzerModule;
 import playground.artemc.pricing.RoadPricingWithoutTravelDisutilityModule;
 import playground.artemc.pricing.UpdateSocialCostPricingSchemeWithSpillAndOffSwitch;
-import playground.artemc.pricing.UpdateSocialCostPricingSchemeWithSpillOverModule;
 import playground.artemc.socialCost.MeanTravelTimeCalculator;
 
 import java.io.File;
@@ -99,7 +94,7 @@ public class ControlerWithHeteroAndToll {
 
 		if(roadpricing==true) {
 			log.info("First-best roadpricing enabled!");
-//			controler.setModules(new ControlerDefaultsModule(), new IncomeHeterogeneityWithoutTravelDisutilityModule(), new RoadPricingWithoutTravelDisutilityModule(),new UpdateSocialCostPricingSchemeModule());
+//			services.setModules(new ControlerDefaultsModule(), new IncomeHeterogeneityWithoutTravelDisutilityModule(), new RoadPricingWithoutTravelDisutilityModule(),new UpdateSocialCostPricingSchemeModule());
 			controler.setModules(new ControlerDefaultsModule(), new IncomeHeterogeneityModule(), new RoadPricingWithoutTravelDisutilityModule(), new LinkOccupancyAnalyzerModule(), new UpdateSocialCostPricingSchemeWithSpillAndOffSwitch());
 			controler.addOverridingModule(new AbstractModule() {
 				@Override
@@ -209,7 +204,7 @@ public class ControlerWithHeteroAndToll {
 		@Override
 		public void notifyStartup(StartupEvent event) {
 
-			Controler controler = event.getControler();
+			MatsimServices controler = event.getServices();
 
 			// create a plot containing the mean travel times
 			Set<String> transportModes = new HashSet<String>();

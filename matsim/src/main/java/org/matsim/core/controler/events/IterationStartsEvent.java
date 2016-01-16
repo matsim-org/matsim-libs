@@ -20,7 +20,7 @@
 
 package org.matsim.core.controler.events;
 
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 
 
 /**
@@ -35,7 +35,7 @@ public final class IterationStartsEvent extends ControlerEvent {
 	 */
 	private final int iteration;
 
-	public IterationStartsEvent(final Controler controler, final int iteration) {
+	public IterationStartsEvent(final MatsimServices controler, final int iteration) {
 		super(controler);
 		this.iteration = iteration;
 	}

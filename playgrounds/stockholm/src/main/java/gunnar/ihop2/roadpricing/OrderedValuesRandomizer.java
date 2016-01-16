@@ -35,17 +35,17 @@ public class OrderedValuesRandomizer {
 	public List<List<Double>> newRandomizedPair(final List<Double> values) {
 		List<Double> result1 = null;
 		List<Double> result2 = null;
-		do {
-			result1 = new ArrayList<>(values.size());
-			result2 = new ArrayList<>(values.size());
-			for (double value : values) {
-				final double delta = this.valueRandomizer
-						.newUnconstrained(value) - value;
-				result1.add(this.valueRandomizer.constrain(value + delta));
-				result2.add(this.valueRandomizer.constrain(value - delta));
-			}
-		} while ((result1.size() != values.size())
-				|| (result2.size() != values.size()));
+		// do {
+		result1 = new ArrayList<>(values.size());
+		result2 = new ArrayList<>(values.size());
+		for (double value : values) {
+			final double delta = this.valueRandomizer.newUnconstrained(value)
+					- value;
+			result1.add(this.valueRandomizer.constrain(value + delta));
+			result2.add(this.valueRandomizer.constrain(value - delta));
+		}
+		// } while ((result1.size() != values.size())
+		// || (result2.size() != values.size()));
 
 		Collections.sort(result1);
 		Collections.sort(result2);

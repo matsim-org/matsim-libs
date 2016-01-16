@@ -22,7 +22,7 @@ public class ConvertMATSimNetworkToShapeFile {
 		scenario.getConfig().global().setCoordinateSystem("CH1903_LV03_GT");
 
 		final Network network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario).readFile(netFileName);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(netFileName);
 
 		FeatureGeneratorBuilderImpl builder = new FeatureGeneratorBuilderImpl(network, "CH1903_LV03_GT");
 		CoordinateReferenceSystem crs = MGC.getCRS("CH1903_LV03_GT");

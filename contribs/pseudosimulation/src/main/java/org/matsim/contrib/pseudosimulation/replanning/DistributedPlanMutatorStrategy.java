@@ -5,7 +5,7 @@ import com.google.inject.TypeLiteral;
 import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.ReplanningContext;
 
@@ -19,10 +19,10 @@ public class DistributedPlanMutatorStrategy implements PlanStrategy {
     private final char gene;
     String delegateName;
     PlanCatcher slave;
-    Controler controler;
+    MatsimServices controler;
     private PlanStrategy delegate;
 
-    public DistributedPlanMutatorStrategy(String delegateName, PlanCatcher slave, Controler controler, char gene) {
+    public DistributedPlanMutatorStrategy(String delegateName, PlanCatcher slave, MatsimServices controler, char gene) {
         this.delegateName = delegateName;
         this.slave = slave;
         this.controler = controler;

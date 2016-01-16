@@ -36,7 +36,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.common.gis.CRSUtils;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
@@ -65,7 +65,7 @@ public class DTVAnalyzer implements IterationEndsListener, IterationStartsListen
 	
 	private final double factor;
 	
-	public DTVAnalyzer(Network network, Controler controler, EventsManager events, String countsfile, LinkOccupancyCalculator calculator, double factor) {
+	public DTVAnalyzer(Network network, MatsimServices controler, EventsManager events, String countsfile, LinkOccupancyCalculator calculator, double factor) {
 		obsCounts = new Counts();
 		CountsReaderMatsimV1 reader = new CountsReaderMatsimV1(obsCounts);
 		reader.parse(countsfile);
@@ -74,20 +74,20 @@ public class DTVAnalyzer implements IterationEndsListener, IterationStartsListen
 		this.factor = factor;
 	}
 	/* (non-Javadoc)
-	 * @see org.matsim.core.controler.listener.IterationStartsListener#notifyIterationStarts(org.matsim.core.controler.events.IterationStartsEvent)
+	 * @see org.matsim.core.services.listener.IterationStartsListener#notifyIterationStarts(org.matsim.core.services.events.IterationStartsEvent)
 	 */
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
-//		simCounts = new VolumesAnalyzer(30*60*60, 30*60*60, event.getControler().getNetwork());
-//		event.getControler().getEvents().addHandler(simCounts);
+//		simCounts = new VolumesAnalyzer(30*60*60, 30*60*60, event.getServices().getNetwork());
+//		event.getServices().getEvents().addHandler(simCounts);
 	}
 	/* (non-Javadoc)
-	 * @see org.matsim.core.controler.listener.IterationEndsListener#notifyIterationEnds(org.matsim.core.controler.events.IterationEndsEvent)
+	 * @see org.matsim.core.services.listener.IterationEndsListener#notifyIterationEnds(org.matsim.core.services.events.IterationEndsEvent)
 	 */
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
-		String outdir = event.getControler().getControlerIO().getIterationPath(event.getIteration());
-//		simCounts = event.getControler().getVolumes();
+		String outdir = event.getServices().getControlerIO().getIterationPath(event.getIteration());
+//		simCounts = event.getServices().getVolumes();
 		
 		TObjectDoubleHashMap<Count> countsMap = new TObjectDoubleHashMap<Count>();
 		try {
@@ -123,7 +123,7 @@ public class DTVAnalyzer implements IterationEndsListener, IterationStartsListen
 //			writeShape(countsMap, outdir + "/counts.relerror.shp");
 			
 //			LinkSHPWriter shpWriter = new LinkSHPWriter();
-//			shpWriter.write(event.getControler().getNetwork().getLinks().values(), simCounts, outdir + "/linkflow.shp", factor);
+//			shpWriter.write(event.getServices().getNetwork().getLinks().values(), simCounts, outdir + "/linkflow.shp", factor);
 			
 			simCounts.writeValues(outdir + "/linkoccup.txt");
 		} catch (IOException e) {

@@ -14,7 +14,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 
 import java.util.HashMap;
 
@@ -29,9 +29,9 @@ public class TollsManager implements LinkEnterEventHandler, PersonArrivalEventHa
 
 	private Network network;
 
-	private Controler controler;
+	private MatsimServices controler;
 
-	public TollsManager(Controler controler) {
+	public TollsManager(MatsimServices controler) {
         this.network = controler.getScenario().getNetwork();
 		this.controler = controler;
 	}

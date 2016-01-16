@@ -60,7 +60,7 @@ public class DgTeleportationVisEquil {
 	public DgTeleportationVisEquil(){
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario.getConfig().network().setInputFile("../matsim/examples/equil/network.xml");
-		new MatsimNetworkReader(scenario).readFile(scenario.getConfig().network().getInputFile());
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(scenario.getConfig().network().getInputFile());
 
 		createPopulation(scenario);
 		EventsManager events = EventsUtils.createEventsManager();

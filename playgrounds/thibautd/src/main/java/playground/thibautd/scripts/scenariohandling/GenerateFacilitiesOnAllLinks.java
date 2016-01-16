@@ -46,7 +46,7 @@ public class GenerateFacilitiesOnAllLinks {
 		final String[] acttypes = Arrays.copyOfRange( args , 3 , args.length );
 
 		final Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
-		new MatsimNetworkReader( scenario ).readFile( netfile );
+		new MatsimNetworkReader(scenario.getNetwork()).readFile( netfile );
 		final BufferedWriter f2l = IOUtils.getBufferedWriter( outf2l );
 		f2l.write( "fid\tlid" );
 

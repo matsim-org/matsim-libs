@@ -29,7 +29,7 @@ public class IncomeCarSharing {
 		final BufferedReader readLink = IOUtils.getBufferedReader(args[0]);
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		PopulationReader populationReader = new MatsimPopulationReader(scenario);
-		MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario);
+		MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario.getNetwork());
 		Config config = scenario.getConfig();
 		final BufferedWriter outLink = IOUtils.getBufferedWriter(args[3]);
 		

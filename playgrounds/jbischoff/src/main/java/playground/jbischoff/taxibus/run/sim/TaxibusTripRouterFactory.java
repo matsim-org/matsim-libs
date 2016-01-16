@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package playground.jbischoff.taxibus.run.sim;
 
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.router.*;
 
 import javax.inject.Provider;
@@ -30,9 +30,9 @@ import javax.inject.Provider;
  */
 public class TaxibusTripRouterFactory implements Provider<TripRouter> {
 
-	private Controler controler; 
+	private MatsimServices controler;
 	
-	public TaxibusTripRouterFactory(Controler controler) {
+	public TaxibusTripRouterFactory(MatsimServices controler) {
 		this.controler = controler;
 	}
 	

@@ -43,7 +43,7 @@ public class TransitScheduleCut {
 		MathTransform transform = CRS.findMathTransform(CRSUtils.getCRS(31467), DefaultGeographicCRS.WGS84);
 		GeometryFactory geoFactory = new GeometryFactory();
 		
-		MatsimNetworkReader netReader = new MatsimNetworkReader(scenario);
+		MatsimNetworkReader netReader = new MatsimNetworkReader(scenario.getNetwork());
 		netReader.readFile("/home/johannes/gsv/matsim/studies/netz2030/data/network.gk3.xml");
 		
 		TransitScheduleReader reader = new TransitScheduleReader(scenario);

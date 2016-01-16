@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.population.ActivityImpl;
@@ -49,7 +49,7 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 	private final static Logger log = Logger.getLogger(ExtractChoiceSetsRouting.class);
 	private final String mode;
 
-	public ExtractChoiceSetsRouting(Controler controler, ZHFacilities facilities,
+	public ExtractChoiceSetsRouting(MatsimServices controler, ZHFacilities facilities,
 			List<ChoiceSet> choiceSets, String mode, int tt) {
 
 		super(controler, choiceSets, tt);
@@ -60,7 +60,7 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 	@Override
 	public void notifyAfterMobsim(final AfterMobsimEvent event) {
 
-		if (event.getIteration() < event.getControler().getConfig().controler().getLastIteration()) {
+		if (event.getIteration() < event.getServices().getConfig().controler().getLastIteration()) {
 			return;
 		}
 		log.info("Number of ZH facilities " + this.facilities.getNumberOfFacilities());
@@ -70,7 +70,7 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 
 	@Override
 	protected void computeChoiceSet(ChoiceSet choiceSet, SpanningTree spanningTree, String type,
-			Controler controler, int tt) {
+			MatsimServices controler, int tt) {
 
 		// first add chosen facility and compute tt etc.
 		ZHFacility chosenFacility = super.facilities.getZhFacilities().get(choiceSet.getChosenFacilityId());
@@ -89,7 +89,7 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 	 * 			2: use computed travel time budget to chosen facility
 	 */
 
-	private void handleFacility(ZHFacility facility, ChoiceSet choiceSet, Controler controler, int tt) {
+	private void handleFacility(ZHFacility facility, ChoiceSet choiceSet, MatsimServices controler, int tt) {
         Network network = controler.getScenario().getNetwork();
 
 		Id<Link> linkId = facility.getLinkId();
@@ -167,7 +167,7 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 	}
 
 
-	private LegImpl computeLeg(ActivityImpl fromAct, ActivityImpl toAct, Controler controler) {
+	private LegImpl computeLeg(ActivityImpl fromAct, ActivityImpl toAct, MatsimServices controler) {
 		Person person = PersonImpl.createPerson(Id.create("1", Person.class));
 		LegImpl leg = new org.matsim.core.population.LegImpl(TransportMode.car);
 		PlanRouterAdapter router = new PlanRouterAdapter( controler );
@@ -181,9 +181,9 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 /* not using spanning tree at the moment:
  *
  * protected void computeChoiceSet(ChoiceSet choiceSet, SpanningTree spanningTree, String type,
-			Controler controler) {
+			Controler services) {
 
-		NetworkLayer network = controler.getNetwork();
+		NetworkLayer network = services.getNetwork();
 
 		spanningTree.setOrigin(network.getNearestNode(choiceSet.getTrip().getBeforeShoppingAct().getCoord()));
 		spanningTree.setDepartureTime(choiceSet.getTrip().getBeforeShoppingAct().getEndTime());
@@ -209,7 +209,7 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 
 					// calculate travel time to after shopping location
 					double travelTime2AfterShopingAct = this.getTravelTime(link, nodesTravelTimesList.get(index),
-							controler, choiceSet);
+							services, choiceSet);
 
 					double totalTravelTime = nodesTravelTimesList.get(index) + travelTime2AfterShopingAct;
 

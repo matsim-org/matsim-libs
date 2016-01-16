@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
@@ -97,7 +98,7 @@ public class BurgdorfRunner implements StartupListener {
 		System.exit(0);
 	}
 	
-	public BurgdorfRunner(Controler controler) {
+	public BurgdorfRunner(MatsimServices controler) {
 		
 		this.withinDayControlerListener = new WithinDayControlerListener();
 		
@@ -117,15 +118,15 @@ public class BurgdorfRunner implements StartupListener {
 			// initialze within-day module
 			this.withinDayControlerListener.notifyStartup(event);
 			
-			this.initIdentifiers(event.getControler().getScenario());
-			this.initReplanners(event.getControler().getScenario());
+			this.initIdentifiers(event.getServices().getScenario());
+			this.initReplanners(event.getServices().getScenario());
 		}
 		
 		/*
 		 * If network capacities have to be adapted.
 		 */
 		if(reduceUpstreamCapacity) {
-            NetworkImpl network = (NetworkImpl) event.getControler().getScenario().getNetwork();
+            NetworkImpl network = (NetworkImpl) event.getServices().getScenario().getNetwork();
 			ChangeValue changeValue;
 			NetworkChangeEvent networkChangeEvent;
 

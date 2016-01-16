@@ -52,7 +52,7 @@ public class TWListener implements StartupListener, IterationEndsListener, Itera
 		}
 		
 		
-		event.getControler().getEvents().removeHandler(twhandler);
+		event.getServices().getEvents().removeHandler(twhandler);
 
 		
 		}
@@ -63,7 +63,7 @@ public class TWListener implements StartupListener, IterationEndsListener, Itera
 	public void notifyStartup(StartupEvent event) {
 		// TODO Auto-generated method stub
 
-        twhandler = new TWEventsHandler(event.getControler().getScenario().getNetwork());
+        twhandler = new TWEventsHandler(event.getServices().getScenario().getNetwork());
 		
 		
 	}
@@ -72,7 +72,7 @@ public class TWListener implements StartupListener, IterationEndsListener, Itera
 	public void notifyIterationStarts(IterationStartsEvent event) {
 		// TODO Auto-generated method stub
 		if (event.getIteration() % 2 == 0) {
-			event.getControler().getEvents().addHandler(twhandler);
+			event.getServices().getEvents().addHandler(twhandler);
 			
 		}
 		

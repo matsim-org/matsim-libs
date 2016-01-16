@@ -22,7 +22,7 @@ public class SelectedCarplansToESRIShape {
 			System.exit(0);
 		}
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenario).readFile(args[1]);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(args[1]);
 		new MatsimPopulationReader(scenario).readFile(args[0]);
 		CoordinateReferenceSystem crs = MGC.getCRS(args[2]);
 		Population pop = scenario.getPopulation();

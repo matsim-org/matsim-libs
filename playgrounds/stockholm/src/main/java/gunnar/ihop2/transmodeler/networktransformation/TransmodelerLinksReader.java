@@ -1,9 +1,9 @@
 package gunnar.ihop2.transmodeler.networktransformation;
 
 import static gunnar.ihop2.transmodeler.networktransformation.Transmodeler2MATSimNetwork.unquote;
+import floetteroed.utilities.tabularfileparser.AbstractTabularFileHandlerWithHeaderLine;
 import floetteroed.utilities.tabularfileparser.TabularFileParser;
 import gunnar.ihop2.transmodeler.networktransformation.Transmodeler2MATSimNetwork.DIR;
-import gunnar.ihop2.utils.AbstractTabularFileHandler;
 
 import java.io.IOException;
 import java.util.LinkedHashMap;
@@ -15,7 +15,7 @@ import java.util.logging.Logger;
  * @author Gunnar Flötteröd
  *
  */
-class TransmodelerLinksReader extends AbstractTabularFileHandler {
+class TransmodelerLinksReader extends AbstractTabularFileHandlerWithHeaderLine {
 
 	// -------------------- CONSTANTS --------------------
 

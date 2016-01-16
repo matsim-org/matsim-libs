@@ -138,8 +138,8 @@ public class SubPopControler {
 		final Controler controler = new Controler(sc);
 		
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
-		controler.setDumpDataAtEnd(true);
-        controler.getConfig().controler().setCreateGraphs(true);
+		controler.getConfig().controler().setDumpDataAtEnd(true);
+		controler.getConfig().controler().setCreateGraphs(true);
 
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
@@ -177,7 +177,7 @@ public class SubPopControler {
 			}
 		});
 
-//		controler.setScoringFunctionFactory(new SubPopulationScoringFactory(controler.getScenario()));
+//		services.setScoringFunctionFactory(new SubPopulationScoringFactory(services.getScenario()));
 		controler.run();
 	}
 }

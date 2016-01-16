@@ -35,12 +35,6 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.geotools.MGC;
-
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.Point;
-
-import playground.jbischoff.taxi.berlin.demand.TaxiDemandWriter;
 
 /**
  * @author  jbischoff
@@ -75,7 +69,7 @@ public class TaxibusVehicleCreator
 	public TaxibusVehicleCreator() {
 				
 		this.scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenario).readFile(networkFile);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
 	}
 	private void run(int amount) {
 	    

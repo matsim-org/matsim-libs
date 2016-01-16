@@ -22,6 +22,7 @@ package org.matsim.withinday.mobsim;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.mobsim.qsim.ActivityEndRescheduler;
 import org.matsim.core.mobsim.qsim.ActivityEndReschedulerProvider;
 import org.matsim.core.mobsim.qsim.InternalInterface;
@@ -46,7 +47,7 @@ import java.util.Map.Entry;
  * QSim, the QSim's internals ensure that WithinDayEngine.doSimStep(...)
  * is performed before the other MobsimEngines.
  *
- * Also, it lives as long as the Controler, as opposed to all other party of the QSim,
+ * Also, it lives as long as the Controler, as opposed to all other parts of the QSim,
  * and is added to each new QSim instance in turn.
  *
  * @author cdobler
@@ -78,29 +79,23 @@ public class WithinDayEngine implements MobsimEngine, ActivityEndReschedulerProv
 	private InternalInterface internalInterface;
 
 	@Inject
-	public WithinDayEngine(EventsManager eventsManager) {
+	public WithinDayEngine(EventsManager eventsManager, GlobalConfigGroup globalConfigGroup) {
 		this.eventsManager = eventsManager;
 		
 		this.duringActivityReplannerFactory = new LinkedHashMap<>();
 		this.duringLegReplannerFactory = new LinkedHashMap<>();
-	}
-	
-	/*
-	 * TODO: Create a config group and get number of threads from there.
-	 */
-	public void initializeReplanningModules(int numOfThreads) {
-		
+
 		log.info("Initialize Parallel Replanning Modules");
-		this.parallelInitialReplanner = new ParallelInitialReplanner(numOfThreads, eventsManager);
-		this.parallelDuringActivityReplanner = new ParallelDuringActivityReplanner(numOfThreads, eventsManager);
-		this.parallelDuringLegReplanner = new ParallelDuringLegReplanner(numOfThreads, eventsManager);
+		this.parallelInitialReplanner = new ParallelInitialReplanner(globalConfigGroup.getNumberOfThreads(), eventsManager);
+		this.parallelDuringActivityReplanner = new ParallelDuringActivityReplanner(globalConfigGroup.getNumberOfThreads(), eventsManager);
+		this.parallelDuringLegReplanner = new ParallelDuringLegReplanner(globalConfigGroup.getNumberOfThreads(), eventsManager);
 
 		log.info("Initialize Replanning Modules");
 		this.initialReplanningModule = new InitialReplanningModule(parallelInitialReplanner);
 		this.duringActivityReplanningModule = new DuringActivityReplanningModule(parallelDuringActivityReplanner);
 		this.duringLegReplanningModule = new DuringLegReplanningModule(parallelDuringLegReplanner);
 	}
-	
+
 	public void doInitialReplanning(boolean value) {
 		initialReplanning = value;
 	}

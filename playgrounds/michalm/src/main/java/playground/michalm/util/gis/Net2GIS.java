@@ -62,7 +62,7 @@ public class Net2GIS
         scenario.getConfig().global().setCoordinateSystem(coordSystem);
 
         Network network = scenario.getNetwork();
-        new MatsimNetworkReader(scenario).readFile(netFile);
+        new MatsimNetworkReader(scenario.getNetwork()).readFile(netFile);
 
         // links as lines
         FeatureGeneratorBuilderImpl builder = new FeatureGeneratorBuilderImpl(network, coordSystem);

@@ -76,7 +76,7 @@ public class OSM2MATSimNetworkV2 {
 				+ "_clean.xml.gz");
 		Scenario scenario = (MutableScenario) ScenarioUtils
 				.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenario).readFile(OUTFILE.split(".xml")[0]
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(OUTFILE.split(".xml")[0]
 				+ "_clean.xml.gz");
 		network = (NetworkImpl) scenario.getNetwork();
 

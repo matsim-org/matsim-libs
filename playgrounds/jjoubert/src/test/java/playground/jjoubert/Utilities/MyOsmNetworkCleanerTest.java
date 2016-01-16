@@ -57,7 +57,7 @@ public class MyOsmNetworkCleanerTest extends MatsimTestCase{
 		assertEquals("Polygon is not a square.", 5, mp.getNumPoints());
 
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		MatsimNetworkReader nr = new MatsimNetworkReader(sc);
+		MatsimNetworkReader nr = new MatsimNetworkReader(sc.getNetwork());
 		nr.parse(getOutputDirectory() + "network.xml.gz");
 
 		assertEquals("Network must have 8 links.", 8, sc.getNetwork().getLinks().size());
@@ -92,7 +92,7 @@ public class MyOsmNetworkCleanerTest extends MatsimTestCase{
 		MultiPolygon mp = msr.readMultiPolygon();
 
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		MatsimNetworkReader nr = new MatsimNetworkReader(sc);
+		MatsimNetworkReader nr = new MatsimNetworkReader(sc.getNetwork());
 		nr.parse(getOutputDirectory() + "network.xml.gz");
 
 		monc.cleanNetwork(sc.getNetwork(), mp);

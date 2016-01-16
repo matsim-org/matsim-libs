@@ -61,10 +61,10 @@ import playground.vsp.analysis.modules.userBenefits.WelfareMeasure;
 
 public class MunichSpatialPlots {
 
-	String runDir = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/hEART/output/";
-	String bau = runDir+"/bau";
-	String policyName = "ei";
-	String policyCase = runDir+"/"+policyName;
+	private String runDir = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/hEART/output/";
+	private String bau = runDir+"/bau";
+	private String policyName = "ei";
+	private String policyCase = runDir+"/"+policyName;
 	private final double countScaleFactor = 100;
 	private static double gridSize ;
 	private static double smoothingRadius ;
@@ -78,31 +78,31 @@ public class MunichSpatialPlots {
 
 	private final CoordinateReferenceSystem targetCRS = MGC.getCRS("EPSG:20004");
 
-	private static final String shapeFileCity = "../../../../repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
-	private static String shapeFileMMA = "../../../../repos/shared-svn/projects/detailedEval/Net/boundaryArea/munichMetroArea_correctedCRS_simplified.shp";
+	private static final String SHAPE_FILE_CITY = "../../../../repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
+	private static final String SHAPE_FILE_MMA = "../../../../repos/shared-svn/projects/detailedEval/Net/boundaryArea/munichMetroArea_correctedCRS_simplified.shp";
 	private static boolean isCityArea = false;
 	private static String shapeFile;
 
 	public static void main(String[] args) {
 		//city area only
 		if(isCityArea) {
-			ReferencedEnvelope re = GeometryUtils.getBoundingBox(shapeFileCity);
+			ReferencedEnvelope re = GeometryUtils.getBoundingBox(SHAPE_FILE_CITY);
 			xMin = re.getMinX();
 			xMax = re.getMaxX();
 			yMin = re.getMinY();
 			yMax = re.getMaxY();
 			gridSize = 500;
 			smoothingRadius = 500;
-			shapeFile = shapeFileCity;
+			shapeFile = SHAPE_FILE_CITY;
 		} else {//metropolitan area
-			ReferencedEnvelope re = GeometryUtils.getBoundingBox(shapeFileMMA);
+			ReferencedEnvelope re = GeometryUtils.getBoundingBox(SHAPE_FILE_MMA);
 			xMin = re.getMinX();
 			xMax = re.getMaxX();
 			yMin = re.getMinY();
 			yMax = re.getMaxY();
 			gridSize = 1500;
 			smoothingRadius = 2000;
-			shapeFile = shapeFileMMA;
+			shapeFile = SHAPE_FILE_MMA;
 		}
 		MunichSpatialPlots plots = new MunichSpatialPlots();
 		//		plots.writeCongestionToCells();
@@ -145,8 +145,8 @@ public class MunichSpatialPlots {
 
 	public void writeUserWelfareToCells(){
 
-		Map<Id<Person>, Double> person_userWElfare_money_Bau = new HashMap<>();
-		Map<Id<Person>, Double> person_userWElfare_money_policy = new HashMap<>();
+		Map<Id<Person>, Double> personUserWelfareMoneyBau = new HashMap<>();
+		Map<Id<Person>, Double> personUserWelfareMoneyPolicy = new HashMap<>();
 
 		// setting of input data
 		SpatialDataInputs inputs = new SpatialDataInputs(LinkWeightMethod.point,bau,policyCase);
@@ -164,15 +164,15 @@ public class MunichSpatialPlots {
 		userBenefitsAnalyzer.preProcessData();
 		userBenefitsAnalyzer.postProcessData();
 
-		person_userWElfare_money_Bau = userBenefitsAnalyzer.getPersonId2MonetarizedUserWelfare();
+		personUserWelfareMoneyBau = userBenefitsAnalyzer.getPersonId2MonetarizedUserWelfare();
 
 		if(inputs.isComparing){
 			userBenefitsAnalyzer = new MyUserBenefitsAnalyzer();
-			Scenario sc_policy = LoadMyScenarios.loadScenarioFromPlansAndNetwork(inputs.compareToCasePlans,inputs.compareToCaseNetwork);
-			userBenefitsAnalyzer.init((MutableScenario)sc_policy, WelfareMeasure.SELECTED, false);
+			Scenario scPolicy = LoadMyScenarios.loadScenarioFromPlansAndNetwork(inputs.compareToCasePlans,inputs.compareToCaseNetwork);
+			userBenefitsAnalyzer.init((MutableScenario)scPolicy, WelfareMeasure.SELECTED, false);
 			userBenefitsAnalyzer.preProcessData();
 			userBenefitsAnalyzer.postProcessData();
-			person_userWElfare_money_policy = userBenefitsAnalyzer.getPersonId2MonetarizedUserWelfare();
+			personUserWelfareMoneyPolicy = userBenefitsAnalyzer.getPersonId2MonetarizedUserWelfare();
 		}
 
 		for(Person p : sc.getPopulation().getPersons().values()){
@@ -187,12 +187,12 @@ public class MunichSpatialPlots {
 			}
 
 			if(inputs.isComparing){
-				double userWelfare_diff ;
-				userWelfare_diff = person_userWElfare_money_policy.get(id) - person_userWElfare_money_Bau.get(id);
-				plot.processHomeLocation(act, userWelfare_diff*countScaleFactor);
+				double userWelfareDiff ;
+				userWelfareDiff = personUserWelfareMoneyPolicy.get(id) - personUserWelfareMoneyBau.get(id);
+				plot.processHomeLocation(act, userWelfareDiff*countScaleFactor);
 
 			} else {
-				plot.processHomeLocation(act, countScaleFactor * person_userWElfare_money_Bau.get(id));
+				plot.processHomeLocation(act, countScaleFactor * personUserWelfareMoneyBau.get(id));
 			}
 		}
 
@@ -413,7 +413,7 @@ public class MunichSpatialPlots {
 		writer.closeWriter();
 	}
 
-	private Map<Id<Person>, Double> getPersonIdToTollPayments (Scenario sc){
+	private Map<Id<Person>, Double> getPersonIdToTollPayments (final Scenario sc){
 
 		MonetaryPaymentsAnalyzer paymentsAnalzer = new MonetaryPaymentsAnalyzer();
 		paymentsAnalzer.init((MutableScenario)sc);
@@ -438,7 +438,7 @@ public class MunichSpatialPlots {
 	private class EmissionTimebinDataWriter{
 
 		BufferedWriter writer;
-		public void openWriter (String outputFile){
+		public void openWriter (final String outputFile){
 			writer = IOUtils.getBufferedWriter(outputFile);
 			try {
 				writer.write("timebin\t centroidX \t centroidY \t weight \n");
@@ -447,7 +447,7 @@ public class MunichSpatialPlots {
 			}
 		}
 
-		public void writeData(double timebin, Map<Point,Double> cellWeights){
+		public void writeData(final double timebin, final Map<Point,Double> cellWeights){
 			try {
 				for(Point p : cellWeights.keySet()){
 					writer.write(timebin+"\t"+p.getCentroid().getX()+"\t"+p.getCentroid().getY()+"\t"+cellWeights.get(p)+"\n");

@@ -53,7 +53,7 @@ public class HUPCControllerChessBoard extends WithinDayParkingController  {
 	@Override
 	protected void startUpFinishing() {
 		
-		ParkingPersonalBetas parkingPersonalBetas = new ParkingPersonalBetas(this.getScenario(), null);
+		ParkingPersonalBetas parkingPersonalBetas = new ParkingPersonalBetas(controler.getScenario(), null);
 
 		ParkingStrategyActivityMapperFW parkingStrategyActivityMapperFW = new ParkingStrategyActivityMapperFW();
 		Collection<ParkingStrategy> parkingStrategies = new LinkedList<ParkingStrategy>();
@@ -65,18 +65,18 @@ public class HUPCControllerChessBoard extends WithinDayParkingController  {
 		// TravelTimeCollector for car mode
 
 		Map<String, TravelTime> travelTimes = new HashMap<String, TravelTime>();
-		travelTimes.put(TransportMode.walk, new WalkTravelTime(this.getConfig().plansCalcRoute()));
-		travelTimes.put(TransportMode.bike, new BikeTravelTime(this.getConfig().plansCalcRoute()));
-		travelTimes.put(TransportMode.ride, new UnknownTravelTime(TransportMode.ride, this.getConfig().plansCalcRoute()));
-		travelTimes.put(TransportMode.pt, new UnknownTravelTime(TransportMode.pt, this.getConfig().plansCalcRoute()));
+		travelTimes.put(TransportMode.walk, new WalkTravelTime(controler.getConfig().plansCalcRoute()));
+		travelTimes.put(TransportMode.bike, new BikeTravelTime(controler.getConfig().plansCalcRoute()));
+		travelTimes.put(TransportMode.ride, new UnknownTravelTime(TransportMode.ride, controler.getConfig().plansCalcRoute()));
+		travelTimes.put(TransportMode.pt, new UnknownTravelTime(TransportMode.pt, controler.getConfig().plansCalcRoute()));
 		travelTimes.put(TransportMode.car, super.getTravelTimeCollector());
 
 		TravelDisutilityFactory costFactory = new OnlyTimeDependentTravelDisutilityFactory();
 
 		// adding hight utility parking choice algo
-		HUPCReplannerFactory hupcReplannerFactory = new HUPCReplannerFactory(this.getWithinDayEngine(), this.getScenario(), parkingAgentsTracker,
+		HUPCReplannerFactory hupcReplannerFactory = new HUPCReplannerFactory(this.getWithinDayEngine(), controler.getScenario(), parkingAgentsTracker,
 				this.getWithinDayTripRouterFactory());
-		HUPCIdentifier hupcSearchIdentifier = new HUPCIdentifier(parkingAgentsTracker, parkingInfrastructure, this.getScenario() );
+		HUPCIdentifier hupcSearchIdentifier = new HUPCIdentifier(parkingAgentsTracker, parkingInfrastructure, controler.getScenario() );
 		this.getFixedOrderSimulationListener().addSimulationListener(hupcSearchIdentifier);
 		hupcReplannerFactory.addIdentifier(hupcSearchIdentifier);
 		ParkingStrategy parkingStrategy = new ParkingStrategy(hupcSearchIdentifier);
@@ -87,7 +87,7 @@ public class HUPCControllerChessBoard extends WithinDayParkingController  {
 		parkingStrategyActivityMapperFW.addSearchStrategy(null, "shopping", parkingStrategy);
 		parkingStrategyActivityMapperFW.addSearchStrategy(null, "leisure", parkingStrategy);
 
-		this.addControlerListener(parkingStrategyManager);
+		controler.addControlerListener(parkingStrategyManager);
 		this.getFixedOrderSimulationListener().addSimulationListener(parkingStrategyManager);
 	
 		initParkingFacilityCapacities();
@@ -114,12 +114,12 @@ public class HUPCControllerChessBoard extends WithinDayParkingController  {
 		}
 		final HUPCControllerChessBoard controller = new HUPCControllerChessBoard(args);
 
-		controller.getConfig().controler().setOverwriteFileSetting(
+		controller.controler.getConfig().controler().setOverwriteFileSetting(
 				true ?
 						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
 						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 
-		controller.run();
+		controller.controler.run();
 
 		
 		System.exit(0);

@@ -99,7 +99,7 @@ public class GeoDistanceUpdater implements AttributeChangeListener {
         Coord c2 = fac2.getCoord();
 
         double dx = c1.getX() - c2.getX();
-        double dy = c1.getY() - c1.getY();
+        double dy = c1.getY() - c2.getY();
         return Math.sqrt(dx * dx + dy * dy);
     }
 }

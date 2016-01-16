@@ -12,7 +12,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
-import org.matsim.contrib.accessibility.GridBasedAccessibilityControlerListenerV3;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
 import org.matsim.contrib.accessibility.utils.AccessibilityRunUtils;
 import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtRouterConfigGroup;
@@ -24,7 +23,7 @@ import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspDefaultsCheckingLevel;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
-import org.matsim.core.replanning.DefaultPlanStrategiesModule;
+import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.testcases.MatsimTestUtils;
@@ -120,37 +119,7 @@ public class AccessibilityComputationKiberaTest {
 		Map<String, ActivityFacilities> activityFacilitiesMap = new HashMap<String, ActivityFacilities>();
 		
 		Controler controler = new Controler(scenario) ;
-
-		
-		// loop over activity types to add one GridBasedAccessibilityControlerListenerV3 for each combination
-		for ( String actType : activityTypes ) {
-			ActivityFacilities opportunities = AccessibilityRunUtils.collectActivityFacilitiesOfType(scenario, actType);
-
-			activityFacilitiesMap.put(actType, opportunities);
-
-			GridBasedAccessibilityControlerListenerV3 listener = 
-					new GridBasedAccessibilityControlerListenerV3(activityFacilitiesMap.get(actType), 
-							config, scenario.getNetwork());
-			listener.setComputingAccessibilityForMode(Modes4Accessibility.freeSpeed, true);
-			listener.setComputingAccessibilityForMode(Modes4Accessibility.car, true);
-			listener.setComputingAccessibilityForMode(Modes4Accessibility.walk, true);
-			listener.setComputingAccessibilityForMode(Modes4Accessibility.bike, true);
-//			listener.setComputingAccessibilityForMode(Modes4Accessibility.pt, true);
-			
-//			listener.addAdditionalFacilityData(homes) ;
-			listener.generateGridsAndMeasuringPointsByNetwork(cellSize);
-			
-			listener.writeToSubdirectoryWithName(actType);
-			
-			// for push to geoserver
-			listener.addFacilityDataExchangeListener(new GeoserverUpdater(crs, name));
-			
-			listener.setUrbansimMode(false); // avoid writing some (eventually: all) files that related to matsim4urbansim
-
-			controler.addControlerListener(listener);
-		}
-
-
+		controler.addOverridingModule(new AccessibilityComputationTestModule(activityTypes, null, crs, name, cellSize));
 		controler.run();
 
 

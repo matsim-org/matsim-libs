@@ -50,7 +50,7 @@ public class AssociateFacilitiesToCarLinks {
 		final Scenario sc = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
 		final NetworkImpl network = (NetworkImpl) sc.getNetwork();
 
-		new MatsimNetworkReader( sc ).readFile( netFile );
+		new MatsimNetworkReader(sc.getNetwork()).readFile( netFile );
 		new MatsimFacilitiesReader( sc ).readFile( facFile );
 
 		removeNonCarLinks( network );

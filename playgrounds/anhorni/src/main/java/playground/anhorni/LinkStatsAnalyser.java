@@ -218,7 +218,7 @@ public class LinkStatsAnalyser {
 		printNote("", "  done");
 
 		printNote("", "  reading network xml file... ");
-		new MatsimNetworkReader(scenario).readFile(this.networkFilename);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(this.networkFilename);
 		printNote("", "  done");
 
 		return network;

@@ -4,7 +4,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.parking.PC2.infrastructure.PC2Parking;
 import org.matsim.contrib.parking.lib.DebugLib;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 
@@ -14,10 +14,10 @@ import java.util.LinkedList;
 public class DummyParkingModuleWithFreeFloatingCarSharing implements
 		ParkingModuleWithFreeFloatingCarSharing {
 
-	private Controler controler;
+	private MatsimServices controler;
 	private LinkedList<Id> availableVehicles;
 
-	public DummyParkingModuleWithFreeFloatingCarSharing(Controler controler,
+	public DummyParkingModuleWithFreeFloatingCarSharing(MatsimServices controler,
 			Collection<ParkingCoordInfo> initialDesiredVehicleCoordinates) {
 		this.controler = controler;
 

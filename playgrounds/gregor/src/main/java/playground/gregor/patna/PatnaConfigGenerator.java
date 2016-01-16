@@ -53,7 +53,7 @@ public class PatnaConfigGenerator {
 		Scenario scenario = ScenarioUtils.createScenario(c);
 		
 		Network net = scenario.getNetwork();
-		MatsimNetworkReader nr = new MatsimNetworkReader(scenario);
+		MatsimNetworkReader nr = new MatsimNetworkReader(scenario.getNetwork());
 		nr.readFile(networkFile);
 		MatsimPopulationReader pr = new MatsimPopulationReader(scenario);
 		pr.readFile(plansFile);

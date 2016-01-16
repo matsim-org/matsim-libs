@@ -23,7 +23,6 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
@@ -34,21 +33,18 @@ import org.matsim.contrib.parking.PC2.infrastructure.PublicParking;
 import org.matsim.contrib.parking.PC2.scoring.ParkingBetas;
 import org.matsim.contrib.parking.PC2.scoring.ParkingCostModel;
 import org.matsim.contrib.parking.PC2.scoring.ParkingScoreManager;
-import org.matsim.contrib.parking.PC2.scoring.ParkingScoringFunctionFactory;
 import org.matsim.contrib.parking.PC2.scoring.RandomErrorTermManager;
 import org.matsim.contrib.parking.PC2.simulation.ParkingInfrastructureManager;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.Injector;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
 import playground.balac.freefloating.scoring.FreeFloatingParkingScoringFunctionFactory;
-import playground.ivt.analysis.scoretracking.ScoreTrackingListener;
 import playground.wrashid.parkingChoice.infrastructure.PrivateParking;
 import playground.wrashid.parkingChoice.infrastructure.api.PParking;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.ParkingLoader;
@@ -56,7 +52,7 @@ import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.ParkingLoader;
 public class SetupParkingForZHScenario {
 
 
-	public static void prepare(ParkingModuleWithFFCarSharingZH parkingModule, Controler controler){
+	public static void prepare(ParkingModuleWithFFCarSharingZH parkingModule, MatsimServices controler){
 		
 		
 		Config config = controler.getConfig();
@@ -126,7 +122,7 @@ public class SetupParkingForZHScenario {
 	}
 	
 	public static ParkingScoreManager prepareParkingScoreManager(ParkingModuleWithFFCarSharingZH parkingModule, LinkedList<PParking> parkings) {
-		Controler controler=parkingModule.getControler();
+		MatsimServices controler=parkingModule.getControler();
 		ParkingScoreManager parkingScoreManager = new ParkingScoreManager(getWalkTravelTime(parkingModule.getControler()), controler.getScenario() );
 
 
@@ -187,7 +183,7 @@ public class SetupParkingForZHScenario {
 	
 	
 	
-	private static WalkTravelTime getWalkTravelTime(Controler controler){
+	private static WalkTravelTime getWalkTravelTime(MatsimServices controler){
 		Map<Id<Link>, Double> linkSlopes=new HashMap<>();
 		String linkSlopeAttributeFile = controler.getConfig().getParam("parkingChoice.ZH", "networkLinkSlopes");
 		ObjectAttributes lp = new ObjectAttributes();

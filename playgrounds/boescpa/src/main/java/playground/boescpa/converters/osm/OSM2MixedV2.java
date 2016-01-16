@@ -127,7 +127,7 @@ public class OSM2MixedV2 {
 		new ScheduleCutter(mixedSchedule, null, cutCenter, cutRadius).cutSchedule();
 
 		// **************** Route Schedule ****************
-		new NetworkReaderMatsimV1(mixedScenario).parse(networkPath);
+		new NetworkReaderMatsimV1(mixedScenario.getNetwork()).parse(networkPath);
 		final Network mixedNetwork = mixedScenario.getNetwork();
 		new PTMapperOnlyBusses(mixedSchedule).routePTLines(mixedNetwork);
 		final String path_MixedSchedule = outbase + "MixedSchedule.xml.gz";

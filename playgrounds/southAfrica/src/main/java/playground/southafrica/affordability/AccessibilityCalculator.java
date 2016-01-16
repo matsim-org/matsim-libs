@@ -173,7 +173,7 @@ public class AccessibilityCalculator {
 		
 		/* Read network */
 		String networkFile = args[4];
-		MatsimNetworkReader mnr = new MatsimNetworkReader(sc);
+		MatsimNetworkReader mnr = new MatsimNetworkReader(sc.getNetwork());
 		mnr.readFile(networkFile);
 		
 		
@@ -182,7 +182,7 @@ public class AccessibilityCalculator {
 		TransitScheduleReader tsr = new TransitScheduleReader(sc);
 		tsr.readFile(transitFile);
 		Scenario scTransit = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		MatsimNetworkReader transitNetworkReader = new MatsimNetworkReader(scTransit);
+		MatsimNetworkReader transitNetworkReader = new MatsimNetworkReader(scTransit.getNetwork());
 		transitNetworkReader.readFile(args[6]);
 		
 		AccessibilityCalculator ac = new AccessibilityCalculator(sc, hhs, scTransit.getNetwork());

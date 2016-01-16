@@ -122,7 +122,7 @@ public class RunChargerLocationOptimization
         //String taxiRanksFile = dir + "scenarios/2015_02_basic_scenario_v6/berlin_ranks.xml";
 
         Scenario scenario = ScenarioUtils.createScenario(VrpConfigUtils.createConfig());
-        new MatsimNetworkReader(scenario).readFile(networkFile);
+        new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
 
         //        DistanceCalculator calculator = DistanceCalculators
         //                .crateFreespeedDistanceCalculator(scenario.getNetwork());

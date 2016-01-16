@@ -24,7 +24,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -97,7 +97,7 @@ public class TravelStats implements StartupListener, IterationEndsListener, Shut
 
 	public void notifyStartup(final StartupEvent event) {
 		if (this.createPNG) {
-			Controler controler = event.getControler();
+			MatsimServices controler = event.getServices();
 			this.minIteration = controler.getConfig().controler().getFirstIteration();
 			int maxIter = controler.getConfig().controler().getLastIteration();
 			int iterations = maxIter - this.minIteration;
@@ -106,7 +106,7 @@ public class TravelStats implements StartupListener, IterationEndsListener, Shut
 			}
 			this.history = new double[5][iterations+1];
 		}
-        this.population = event.getControler().getScenario().getPopulation();
+        this.population = event.getServices().getScenario().getPopulation();
 	}
 
 	public void notifyIterationEnds(final IterationEndsEvent event) {
@@ -211,12 +211,12 @@ public class TravelStats implements StartupListener, IterationEndsListener, Shut
 				System.arraycopy(this.history[INDEX_EXECUTED], 0, values, 0, index + 1);
 				chart.addSeries("executed plan", iterations, values);
 				chart.addMatsimLogo();
-				chart.saveAsPng(event.getControler().getControlerIO().getOutputFilename("travelstats_" + this.measure + "_" + calculator.getMode() + "_" +
+				chart.saveAsPng(event.getServices().getControlerIO().getOutputFilename("travelstats_" + this.measure + "_" + calculator.getMode() + "_" +
 						calculator.getActType() + "_" + "crowfly=" + calculator.isCrowFly() + "_way there =" + this.wayThere + ".png"), 800, 600);
 				
 				try {	
 					BufferedWriter out = IOUtils.getBufferedWriter(
-					    event.getControler().getControlerIO().getOutputFilename(
+					    event.getServices().getControlerIO().getOutputFilename(
 									"travelstats_" + this.measure + "_" + calculator.getMode() + "_" +
 									calculator.getActType() + "_crowfly=" + calculator.isCrowFly() + "_way there =" + this.wayThere +".txt"));
 					out.write("ITERATION\tavg. EXECUTED\tavg. WORST\tavg. AVG\tavg. BEST\tmedian EXECUTED\n");

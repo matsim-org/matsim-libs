@@ -12,7 +12,7 @@ import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 
 import java.util.HashMap;
@@ -28,7 +28,7 @@ public class LogEnergyConsumption implements LinkEnterEventHandler, LinkLeaveEve
 VehicleLeavesTrafficEventHandler {
 
 	private static final Logger log = Logger.getLogger(LogEnergyConsumption.class);
-	Controler controler;
+	MatsimServices controler;
 	HashMap<Id<Person>, EnergyConsumption> energyConsumption = new HashMap<>();
 	
 	private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler() ;	
@@ -71,7 +71,7 @@ VehicleLeavesTrafficEventHandler {
 
 	}
 
-	public LogEnergyConsumption(Controler controler) {
+	public LogEnergyConsumption(MatsimServices controler) {
 		super();
 		this.controler = controler;
 	}

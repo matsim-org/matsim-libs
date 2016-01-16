@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.mobsim.framework.MobsimAgent;
@@ -35,24 +36,19 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.withinday.mobsim.MobsimDataProvider;
 
+import javax.inject.Inject;
+
 public class ExperiencedPlansWriter implements AfterMobsimListener {
 
 	public static String EXPERIENCEDPLANSFILE = "experiencedPlans.xml.gz";
-	
-	private final MobsimDataProvider mobsimDataProvider;
-	
-	public ExperiencedPlansWriter(MobsimDataProvider mobsimDataProvider) {
-		this.mobsimDataProvider = mobsimDataProvider;
-	}
-	
+
+	@Inject private Scenario scenario;
+	@Inject private MobsimDataProvider mobsimDataProvider;
+	@Inject private OutputDirectoryHierarchy controlerIO;
+
 	@Override
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
-		
-		Controler controler = event.getControler();
-		Scenario scenario = controler.getScenario();
-		
-		
-		Scenario experiencedScenario = ScenarioUtils.createScenario(controler.getConfig());
+		Scenario experiencedScenario = ScenarioUtils.createScenario(scenario.getConfig());
 		Population experiencedPopulation = experiencedScenario.getPopulation(); 
 				
 		for (Person person : scenario.getPopulation().getPersons().values()) {
@@ -79,7 +75,7 @@ public class ExperiencedPlansWriter implements AfterMobsimListener {
 			}
 		}
 
-		String outputFile = controler.getControlerIO().getIterationFilename(event.getIteration(), EXPERIENCEDPLANSFILE);
+		String outputFile = controlerIO.getIterationFilename(event.getIteration(), EXPERIENCEDPLANSFILE);
 		new PopulationWriter(experiencedPopulation, scenario.getNetwork()).write(outputFile);
 	}
 }

@@ -34,7 +34,7 @@ import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.replanning.DefaultPlanStrategiesModule;
+import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.modules.TimeAllocationMutator;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -80,7 +80,7 @@ public class RunSubpopulationsExample {
 			Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 			/* Set up network and plans. */
-			MatsimNetworkReader mnr = new MatsimNetworkReader(sc);
+			MatsimNetworkReader mnr = new MatsimNetworkReader(sc.getNetwork());
 			mnr.parse(EQUIL_NETWORK);
 			createPopulation(sc, SUBPOP1_NAME, 100);
 			createPopulation(sc, SUBPOP2_NAME, 100);

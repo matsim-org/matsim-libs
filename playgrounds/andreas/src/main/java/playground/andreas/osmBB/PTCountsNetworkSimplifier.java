@@ -134,7 +134,7 @@ public class PTCountsNetworkSimplifier {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		this.network = scenario.getNetwork();
 		log.info("Reading " + this.netInFile);
-		new MatsimNetworkReader(scenario).readFile(this.netInFile);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(this.netInFile);
 
 		MutableScenario osmScenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Config osmConfig = osmScenario.getConfig();

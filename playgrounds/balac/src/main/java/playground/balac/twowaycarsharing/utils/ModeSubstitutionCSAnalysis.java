@@ -22,13 +22,13 @@ public class ModeSubstitutionCSAnalysis {
 	public void run(String[] args) {
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		PopulationReader populationReader = new MatsimPopulationReader(scenario);
-		MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario);
+		MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario.getNetwork());
 		networkReader.readFile(args[1]);
 		populationReader.readFile(args[0]);	
 		
 		MutableScenario scenario2 = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		PopulationReader populationReader2 = new MatsimPopulationReader(scenario2);
-		MatsimNetworkReader networkReader2 = new MatsimNetworkReader(scenario2);
+		MatsimNetworkReader networkReader2 = new MatsimNetworkReader(scenario2.getNetwork());
 		networkReader2.readFile(args[1]);
 		populationReader2.readFile(args[2]);	
 		

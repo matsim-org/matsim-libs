@@ -87,7 +87,7 @@ public class VWRCreateDemand {
 		this.config = config;
 		this.scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
-		new MatsimNetworkReader(scenario).readFile(config.getNetworkFileString());
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(config.getNetworkFileString());
 
 		this.counties = readShapeFile(config.getCountiesFileString(), "RS");
 

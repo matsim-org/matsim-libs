@@ -35,10 +35,6 @@ import org.matsim.testcases.MatsimTestCase;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import com.vividsolutions.jts.geom.MultiLineString;
-import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.Point;
-
 public class Network2ESRIShapeTest extends MatsimTestCase  {
 
 	public void testPolygonCapacityShape() {
@@ -49,7 +45,7 @@ public class Network2ESRIShapeTest extends MatsimTestCase  {
 		scenario.getConfig().global().setCoordinateSystem("DHDN_GK4");
 
 		final Network network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario).readFile(netFileName);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(netFileName);
 
 		FeatureGeneratorBuilderImpl builder = new FeatureGeneratorBuilderImpl(network, "DHDN_GK4");
 		CoordinateReferenceSystem crs = MGC.getCRS("DHDN_GK4");
@@ -71,7 +67,7 @@ public class Network2ESRIShapeTest extends MatsimTestCase  {
 		scenario.getConfig().global().setCoordinateSystem("DHDN_GK4");
 
 		final Network network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario).readFile(netFileName);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(netFileName);
 
 		FeatureGeneratorBuilderImpl builder = new FeatureGeneratorBuilderImpl(network, "DHDN_GK4");
 		CoordinateReferenceSystem crs = MGC.getCRS("DHDN_GK4");
@@ -93,7 +89,7 @@ public class Network2ESRIShapeTest extends MatsimTestCase  {
 		scenario.getConfig().global().setCoordinateSystem("DHDN_GK4");
 
 		final Network network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario).readFile(netFileName);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(netFileName);
 
 		FeatureGeneratorBuilderImpl builder = new FeatureGeneratorBuilderImpl(network, "DHDN_GK4");
 		CoordinateReferenceSystem crs = MGC.getCRS("DHDN_GK4");
@@ -115,7 +111,7 @@ public class Network2ESRIShapeTest extends MatsimTestCase  {
 		scenario.getConfig().global().setCoordinateSystem("DHDN_GK4");
 
 		final Network network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario).readFile(netFileName);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(netFileName);
 
 		FeatureGeneratorBuilderImpl builder = new FeatureGeneratorBuilderImpl(network, "DHDN_GK4");
 		CoordinateReferenceSystem crs = MGC.getCRS("DHDN_GK4");
@@ -136,7 +132,7 @@ public class Network2ESRIShapeTest extends MatsimTestCase  {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		final Network network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario).readFile(netFileName);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(netFileName);
 
 		new Nodes2ESRIShape(network,outputFileShp, "DHDN_GK4").write();
 		

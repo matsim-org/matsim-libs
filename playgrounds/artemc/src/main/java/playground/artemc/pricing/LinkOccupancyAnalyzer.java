@@ -138,7 +138,7 @@ public class LinkOccupancyAnalyzer implements LinkEnterEventHandler, LinkLeaveEv
 			}
 		}
 
-		writeToFileLinkOccupancy(event.getControler().getConfig().controler().getOutputDirectory());
+		writeToFileLinkOccupancy(event.getServices().getConfig().controler().getOutputDirectory());
 	}
 
 	private void writeToFileLinkOccupancy(String outputDirectory){

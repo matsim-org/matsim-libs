@@ -317,7 +317,7 @@ public class GTFS2MATSimTransitSchedule {
 			splitStopLinks(publicSystemNumber);
 			new NetworkWriter(network).write(RoutesPathsGenerator.NEW_NETWORK_FOLDER+"nTemp.xml");
 			Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-			(new MatsimNetworkReader(scenario)).readFile(RoutesPathsGenerator.NEW_NETWORK_FOLDER+"nTemp.xml");
+			(new MatsimNetworkReader(scenario.getNetwork())).readFile(RoutesPathsGenerator.NEW_NETWORK_FOLDER+"nTemp.xml");
 			network = scenario.getNetwork();
 		}
 	}
@@ -456,7 +456,7 @@ public class GTFS2MATSimTransitSchedule {
 	 */
 	public static void main(String[] args) throws Exception {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		(new MatsimNetworkReader(scenario)).readFile(args[1]);
+		(new MatsimNetworkReader(scenario.getNetwork())).readFile(args[1]);
 		Network network = scenario.getNetwork();
 		//Convert lengths of the link from km to m and speeds from km/h to m/s
 		for(Link link:network.getLinks().values()) {

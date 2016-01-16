@@ -63,13 +63,13 @@ import com.vividsolutions.jts.geom.Geometry;
 public class CarEventsToTaxiPlans {
 	public static void main(String[] args) {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenario)
+		new MatsimNetworkReader(scenario.getNetwork())
 				.readFile("C:/Users/Joschka/Documents/shared-svn/projects/audi_av/scenario/networkc.xml.gz");
 		Geometry geometry = ScenarioPreparator.readShapeFileAndExtractGeometry(
 				"C:/Users/Joschka/Documents/shared-svn/projects/audi_av/shp/UntersuchungsraumAll.shp");
 
 		Scenario scenario2 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenario2)
+		new MatsimNetworkReader(scenario2.getNetwork())
 				.readFile("C:/Users/Joschka/Documents/runs-svn/bvg.run132.25pct/bvg.run132.25pct.output_network.xml.gz");
 
 		

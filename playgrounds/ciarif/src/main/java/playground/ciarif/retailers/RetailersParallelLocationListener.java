@@ -92,10 +92,10 @@
 //	@Override
 //	public void notifyStartup(StartupEvent event) {
 //
-//		Controler controler = event.getControler();
+//		Controler controler = event.getServices();
 //		this.controlerFacilities = controler.getFacilities().getFacilities();
 //		FreespeedTravelTimeAndDisutility timeCostCalc = new FreespeedTravelTimeAndDisutility(controler.getConfig().planCalcScore());
-//		pcrl = new PlansCalcRoute(controler.getConfig().plansCalcRoute(), controler.getNetwork(),timeCostCalc, timeCostCalc, new AStarLandmarksFactory(controler.getNetwork(), timeCostCalc), ((PopulationFactoryImpl) controler.getPopulation().getFactory()).getModeRouteFactory());
+//		pcrl = new PlansCalcRoute(services.getConfig().plansCalcRoute(), services.getNetwork(),timeCostCalc, timeCostCalc, new AStarLandmarksFactory(services.getNetwork(), timeCostCalc), ((PopulationFactoryImpl) services.getPopulation().getFactory()).getModeRouteFactory());
 //		String popOutFile = controler.getConfig().findParam(CONFIG_GROUP,CONFIG_POP_SUM_TABLE);
 //		if (popOutFile == null) { throw new RuntimeException("In config file, param = "+CONFIG_POP_SUM_TABLE+" in module = "+CONFIG_GROUP+" not defined!"); }
 //		this.pst = new PlansSummaryTable (popOutFile);
@@ -158,8 +158,8 @@
 //	public void notifyBeforeMobsim(final BeforeMobsimEvent event) {
 //		
 //		
-//		Controler controler = event.getControler();
-//		if (event.getIteration()%1==0 & event.getIteration()>0){ // & controler.getLastIteration()-controler.getIteration()>=50) {
+//		Controler controler = event.getServices();
+//		if (event.getIteration()%1==0 & event.getIteration()>0){ // & services.getLastIteration()-services.getIteration()>=50) {
 //			
 //
 //			
@@ -197,7 +197,7 @@
 //			
 //			Utils.setFacilityQuadTree(this.createFacilityQuadTree(controler));
 //			
-//			controler.getLinkStats().addData(controler.getVolumes(), controler.getLinkTravelTimes());
+//			services.getLinkStats().addData(services.getVolumes(), services.getLinkTravelTimes());
 ////			int retailers_count = 0;
 //			for (Retailer r : this.retailers.getRetailers().values()) {
 //				log.info("THE RETAILER " + r.getId() + " WILL TRY TO RELOCATE ITS FACILITIES");

@@ -118,6 +118,17 @@ public class MatrixOperations {
         return sum;
     }
 
+    public static <K> double diagonalSum(Matrix<K, Double> m) {
+        double sum = 0;
+        Set<K> keys = m.keys();
+        for(K key : keys) {
+            Double val = m.get(key, key);
+            if(val != null) sum += val;
+        }
+
+        return sum;
+    }
+
     public static <K> TObjectDoubleHashMap<K> marginalsCol(Matrix<K, Double> m) {
         TObjectDoubleHashMap<K> marginals = new TObjectDoubleHashMap<>();
         Set<K> keys = m.keys();

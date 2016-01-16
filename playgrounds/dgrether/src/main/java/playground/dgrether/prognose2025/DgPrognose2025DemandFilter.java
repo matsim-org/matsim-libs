@@ -91,7 +91,7 @@ public abstract class DgPrognose2025DemandFilter {
 		this.featuesInShape = ShapeFileReader.getAllFeatures(filterShapeFileName);
 		//read scenario
 		this.scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		MatsimNetworkReader netReader	= new MatsimNetworkReader(scenario);
+		MatsimNetworkReader netReader	= new MatsimNetworkReader(scenario.getNetwork());
 		netReader.readFile(networkFilename);
 		this.net = scenario.getNetwork();
 		this.linkIdsInShapefile = this.detectLinkIdsInShape(this.net);

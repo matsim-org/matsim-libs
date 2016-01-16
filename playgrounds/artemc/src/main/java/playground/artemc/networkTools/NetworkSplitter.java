@@ -42,7 +42,7 @@ public class NetworkSplitter {
 
 		BufferedWriter linkMapWrtiter = new BufferedWriter(new FileWriter(linkMapPath));
 
-		new NetworkReaderMatsimV1(scenario).parse(networkPath);
+		new NetworkReaderMatsimV1(scenario.getNetwork()).parse(networkPath);
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 
 		Set<Id> allLinks = new HashSet<Id>();

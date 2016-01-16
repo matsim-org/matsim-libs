@@ -112,7 +112,7 @@ public class RunHotspotPricingMunich {
 		Set<Id<Link>> hotspotLinksMerged = new HashSet<>();
 		
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.loadConfig(fileName));
-		new MatsimNetworkReader(sc).readFile(sc.getConfig().network().getInputFile());
+		new MatsimNetworkReader(sc.getNetwork()).readFile(sc.getConfig().network().getInputFile());
 		Network network = sc.getNetwork();
 		
 		for(Link link : network.getLinks().values()){

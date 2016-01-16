@@ -5,7 +5,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import playground.artemc.utils.CSVReader;
 
 import java.io.File;
@@ -25,7 +25,7 @@ public class DisaggregatedScoreReader{
 
 	HashMap<String, ArrayList<String>> scores;
 
-	private Controler controler;
+	private MatsimServices controler;
 	private Population population;
 	private HashMap<Id<Person>, Plan> initialPlans = new HashMap<Id<Person>, Plan>();
 	static Integer departureTimeChoices = 3;

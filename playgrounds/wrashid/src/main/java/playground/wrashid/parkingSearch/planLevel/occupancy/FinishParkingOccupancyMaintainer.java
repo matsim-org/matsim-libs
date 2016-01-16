@@ -47,20 +47,20 @@ public class FinishParkingOccupancyMaintainer implements AfterMobsimListener {
 		// TODO: refactor methods out of this!
 		ParkingOccupancyAnalysis poaWriter = new ParkingOccupancyAnalysis(ParkingRoot.getParkingOccupancyMaintainer()
 				.getParkingOccupancyBins(), ParkingRoot.getParkingCapacity());
-		String fileName = event.getControler().getControlerIO()
+		String fileName = event.getServices().getControlerIO()
 				.getIterationFilename(event.getIteration(), "parkingOccupancyStatistics.txt");
 		poaWriter.writeTxtFile(fileName);
-		fileName = event.getControler().getControlerIO()
+		fileName = event.getServices().getControlerIO()
 				.getIterationFilename(event.getIteration(), "parkingOccupancyCoordinates.txt");
 		poaWriter.writeFakeKMLFile(fileName);
 		
 		writeOccupancyViolationStatisticsGraph(event.getIteration(), poaWriter);
 
-		fileName = event.getControler().getControlerIO()
+		fileName = event.getServices().getControlerIO()
 				.getIterationFilename(event.getIteration(), "parkingWalkingTimes.txt");
 		new ParkingWalkingDistanceAnalysis(ParkingRoot.getParkingOccupancyMaintainer().getParkingRelatedWalkDistance())
 				.writeTxtFile(fileName);
-		fileName = event.getControler().getControlerIO()
+		fileName = event.getServices().getControlerIO()
 		.getIterationFilename(event.getIteration(), "parkingLog.txt");
 		GeneralLib.writeList(ParkingRoot.getParkingLog(),fileName);
 		

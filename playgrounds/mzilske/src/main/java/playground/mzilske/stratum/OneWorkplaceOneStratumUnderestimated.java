@@ -43,7 +43,7 @@ class OneWorkplaceOneStratumUnderestimated implements Provider<Scenario> {
 		public Scenario get() {
         int quantity = 1000;
         scenario = ScenarioUtils.createScenario(new ConfigProvider().get());
-        new MatsimNetworkReader(scenario).parse(this.getClass().getResourceAsStream("one-workplace.xml"));
+        new MatsimNetworkReader(scenario.getNetwork()).parse(this.getClass().getResourceAsStream("one-workplace.xml"));
         Population population = scenario.getPopulation();
         for (int i=0; i<quantity; i++) {
             Person person = population.getFactory().createPerson(Id.create("9h_"+Integer.toString(i), Person.class));
