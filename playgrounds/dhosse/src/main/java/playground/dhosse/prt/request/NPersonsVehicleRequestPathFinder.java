@@ -19,14 +19,14 @@ import playground.michalm.taxi.scheduler.TaxiScheduler;
 
 public class NPersonsVehicleRequestPathFinder
 {
-    private final TaxiOptimizerConfiguration optimConfig;
+    private final TaxiOptimizerContext optimConfig;
 
     private final TaxiScheduler scheduler;
     private final int vehicleCapacity;
     private final LeastCostPathCalculator router;
 
 
-    public NPersonsVehicleRequestPathFinder(TaxiOptimizerConfiguration optimConfig,
+    public NPersonsVehicleRequestPathFinder(TaxiOptimizerContext optimConfig,
             int vehicleCapacity)
     {
         this.optimConfig = optimConfig;

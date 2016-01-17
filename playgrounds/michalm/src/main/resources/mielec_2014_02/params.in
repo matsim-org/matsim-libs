@@ -1,65 +1,27 @@
-#dir where input files are read from
-inputDir            ./src/main/resources/mielec_2014_02/
-
-#dir where output files will be stored
-outputDir           ./src/main/resources/mielec_2014_02/
-
-#file with the network
-netFile            network.xml
-
-#population
-plansFile          20.plans.xml.gz
+inputDir                ./src/main/resources/mielec_2014_02/
+netFile                  ${inputDir}/network.xml
+plansFile                ${inputDir}/20.plans.xml.gz
 
 #agents who will call a taxi instead of travelling by car (from 1% to 4% of the population)
-taxiCustomersFile      taxiCustomers_4.0.txt
+taxiCustomersFile        ${inputDir}/taxiCustomers_4.0.txt
 
 #taxicabs (25 of 50)
-taxisFile              taxis-25.xml
+taxisFile                ${inputDir}/taxis-25.xml
 
-#taxiranks (currently 0)
-ranksFile              taxi_ranks-0.xml
+onlineVehicleTracker     false
 
-#used for calculating travel times based on earlier iterations (simulations)
-#eventsFile             ------
 
-#used for setting free-flow speeds; in the case of using empty time-variant networks (instead of normal network + normal traffic)
-#changeEventsFile       ------
 
-#type of the available dispatching algorithms
-algorithmConfig        RULE_DSE_FF
+optimizer.paramsClass               playground.michalm.taxi.optimizer.rules.RuleBasedTaxiOptimizerParams
+optimizer.id                        RULE_DSE_FF
+optimizer.travelTimeSource          FREE_FLOW_SPEED
+optimizer.goal                      DEMAND_SUPPLY_EQUIL
+optimizer.nearestRequestsLimit      999
+optimizer.nearestVehiclesLimit      999
+optimizer.cellSize                  1000
 
-#limit Dijkstra algorithm to the n nearest requests relatie to a given vehicle (based on straight-line distance)
-nearestRequestsLimit    25
+scheduler.destinationKnown          false
+scheduler.vehicleDiversion          false
+scheduler.pickupDuration            120
+scheduler.dropoffDuration           60
 
-#limit Dijkstra algorithm to the n nearest vehicles relative to a given request (based on straight-line distance)
-nearestVehiclesLimit    25
-
-#(on/off) track vehicle online (as if they were equipped with GPS) to improve accuracy of travel time prediction
-#onlineVehicleTracker
-
-#(on/off) submission of all requests before simulation starts
-#advanceRequestSubmission
-
-#(on/off) destination is provided on request submission
-#destinationKnown
-
-#duration of a pickup
-pickupDuration         120
-
-#duration of a dropoff
-dropoffDuration        60
-
-#simulate battery charging and discharging
-#batteryChargingDischarging
-
-#(on/off) visualization
-#otfVis
-
-#directory where various output info is stored
-#vrpOutDir              vrp_output
-
-#file with output histograms
-#histogramOutDir        histograms
-
-#file with output events
-#eventsOutFile          events.out.xml.gz

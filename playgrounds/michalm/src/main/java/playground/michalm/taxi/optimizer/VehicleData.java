@@ -55,22 +55,22 @@ public class VehicleData
     public final int dimension;
 
 
-    public VehicleData(TaxiOptimizerConfiguration optimConfig)
+    public VehicleData(TaxiOptimizerContext optimContext)
     {
-        this(optimConfig, 2 * 24 * 3600);//max 48 hours of departure delay (== not a real constraint)
+        this(optimContext, 2 * 24 * 3600);//max 48 hours of departure delay (== not a real constraint)
     }
 
 
     //skipping vehicles with departure.time > curr_time + maxDepartureDelay
-    public VehicleData(TaxiOptimizerConfiguration optimConfig, double planningHorizon)
+    public VehicleData(TaxiOptimizerContext optimContext, double planningHorizon)
     {
-        double currTime = optimConfig.context.getTime();
+        double currTime = optimContext.context.getTime();
         double maxDepartureTime = currTime + planningHorizon;
-        TaxiScheduler scheduler = optimConfig.scheduler;
+        TaxiScheduler scheduler = optimContext.scheduler;
 
         int idx = 0;
         int idleCounter = 0;
-        for (Vehicle v : optimConfig.context.getVrpData().getVehicles().values()) {
+        for (Vehicle v : optimContext.context.getVrpData().getVehicles().values()) {
             LinkTimePair departure = scheduler.getImmediateDiversionOrEarliestIdleness(v);
 
             if (departure != null && departure.time <= maxDepartureTime) {

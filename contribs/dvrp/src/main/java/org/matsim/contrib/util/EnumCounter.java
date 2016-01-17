@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TimeVariantLinkFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2016 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,19 +17,35 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.network;
+package org.matsim.contrib.util;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.Node;
+import java.util.*;
 
-public class TimeVariantLinkFactory implements LinkFactory {
+import org.apache.commons.lang3.mutable.MutableInt;
 
-	@Override
-	public Link createLink(Id<Link> id, Node from, Node to, Network network, double length, double freespeed,
-			double capacity, double nOfLanes) {
-		return new TimeVariantLinkImpl(id, from, to, network, length, freespeed, capacity, nOfLanes);
-	}
 
+public class EnumCounter<K extends Enum<K>>
+{
+    private final EnumMap<K, MutableInt> counts;
+
+
+    public EnumCounter(Class<K> clazz)
+    {
+        counts = new EnumMap<>(clazz);
+        for (K e : clazz.getEnumConstants()) {
+            counts.put(e, new MutableInt());
+        }
+    }
+
+
+    public void increment(K e)
+    {
+        counts.get(e).increment();
+    }
+
+
+    public int getCount(K e)
+    {
+        return counts.get(e).intValue();
+    }
 }

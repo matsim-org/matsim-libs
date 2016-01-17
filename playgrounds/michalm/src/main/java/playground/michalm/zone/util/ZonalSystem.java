@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,40 +17,24 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.optimizer.filter;
+package playground.michalm.zone.util;
 
-import playground.michalm.taxi.scheduler.TaxiScheduler;
+import org.matsim.api.core.v01.network.Node;
 
 
-public class DefaultFilterFactory
-    implements FilterFactory
+public interface ZonalSystem<Z extends ZonalSystem.Zone>
 {
-    private final TaxiScheduler scheduler;
-    private final int nearestRequestsLimit;
-    private final int nearestVehiclesLimit;
-
-
-    public DefaultFilterFactory(TaxiScheduler scheduler, int nearestRequestsLimit,
-            int nearestVehiclesLimit)
+    public interface Zone
     {
-        this.scheduler = scheduler;
-        this.nearestRequestsLimit = nearestRequestsLimit;
-        this.nearestVehiclesLimit = nearestVehiclesLimit;
+        int getIdx();
     }
 
 
-    @Override
-    public VehicleFilter createVehicleFilter()
-    {
-        return nearestVehiclesLimit <= 0 ? VehicleFilter.NO_FILTER
-                : new KStraightLineNearestVehicleFilter(scheduler, nearestVehiclesLimit);
-    }
+    Z getZone(Node node);
 
 
-    @Override
-    public RequestFilter createRequestFilter()
-    {
-        return nearestRequestsLimit <= 0 ? RequestFilter.NO_FILTER
-                : new KStraightLineNearestRequestFilter(scheduler, nearestRequestsLimit);
-    }
+    int getZoneCount();
+
+
+    Iterable<Z> getZonesByDistance(Node node);
 }

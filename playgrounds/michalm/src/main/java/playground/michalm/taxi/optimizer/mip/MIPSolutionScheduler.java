@@ -13,7 +13,7 @@ import playground.michalm.taxi.optimizer.mip.MIPProblem.MIPSolution;
 
 class MIPSolutionScheduler
 {
-    private final TaxiOptimizerConfiguration optimConfig;
+    private final TaxiOptimizerContext optimContext;
     private final MIPRequestData rData;
     private final VehicleData vData;
     private final int m;
@@ -25,17 +25,17 @@ class MIPSolutionScheduler
     private Vehicle currentVeh;
 
 
-    MIPSolutionScheduler(TaxiOptimizerConfiguration optimConfig, MIPRequestData rData,
+    MIPSolutionScheduler(TaxiOptimizerContext optimContext, MIPRequestData rData,
             VehicleData vData)
     {
-        this.optimConfig = optimConfig;
+        this.optimContext = optimContext;
         this.rData = rData;
         this.vData = vData;
         this.m = vData.dimension;
         this.n = rData.dimension;
         
-        router = new DijkstraWithThinPath(optimConfig.context.getScenario().getNetwork(),
-                optimConfig.travelDisutility, optimConfig.travelTime);
+        router = new DijkstraWithThinPath(optimContext.context.getScenario().getNetwork(),
+                optimContext.travelDisutility, optimContext.travelTime);
     }
 
 
@@ -65,7 +65,7 @@ class MIPSolutionScheduler
 
     private void appendRequestToCurrentVehicle(int i)
     {
-        LinkTimePair earliestDeparture = optimConfig.scheduler.getEarliestIdleness(currentVeh);
+        LinkTimePair earliestDeparture = optimContext.scheduler.getEarliestIdleness(currentVeh);
         TaxiRequest req = rData.requests[i];
 
         //use earliestDeparture.time instead of w[i]-tt (latest departure time) due to:
@@ -75,8 +75,8 @@ class MIPSolutionScheduler
         //   (because tt in MIP are based on the free flow speed estimates, while the actual
         //   times are usually longer hence the vehicle is likely to arrive after w[i])
         VrpPathWithTravelData path = VrpPaths.calcAndCreatePath(earliestDeparture.link,
-                req.getFromLink(), earliestDeparture.time, router, optimConfig.travelTime);
+                req.getFromLink(), earliestDeparture.time, router, optimContext.travelTime);
 
-        optimConfig.scheduler.scheduleRequest(currentVeh, req, path);
+        optimContext.scheduler.scheduleRequest(currentVeh, req, path);
     }
 }

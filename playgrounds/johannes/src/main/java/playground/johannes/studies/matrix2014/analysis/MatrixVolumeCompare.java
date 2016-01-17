@@ -40,15 +40,16 @@ public class MatrixVolumeCompare implements AnalyzerTask<NumericMatrix> {
 
     private static final Logger logger = Logger.getLogger(MatrixVolumeCompare.class);
 
+    private final NumericMatrix refMatrix;
+
     private final String dimension;
 
     private FileIOContext ioContext;
 
     private HistogramWriter histogramWriter;
 
-    private NumericMatrix refMatrix;
-
-    public MatrixVolumeCompare(String dimension) {
+    public MatrixVolumeCompare(NumericMatrix refMatrix, String dimension) {
+        this.refMatrix = refMatrix;
         this.dimension = dimension;
     }
 
@@ -60,9 +61,6 @@ public class MatrixVolumeCompare implements AnalyzerTask<NumericMatrix> {
         this.histogramWriter = histogramWriter;
     }
 
-    public void setReferenceMatrix(NumericMatrix refMatrix) {
-        this.refMatrix = refMatrix;
-    }
 
     @Override
     public void analyze(NumericMatrix simMatrix, List<StatsContainer> containers) {

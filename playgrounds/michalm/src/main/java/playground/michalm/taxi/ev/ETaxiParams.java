@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2016 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,23 +17,31 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.optimizer.filter;
+package playground.michalm.taxi.ev;
 
-import org.matsim.contrib.dvrp.data.Vehicle;
-
-import playground.michalm.taxi.data.TaxiRequest;
+import org.apache.commons.configuration.Configuration;
 
 
-public interface VehicleFilter
+public class ETaxiParams
 {
-    VehicleFilter NO_FILTER = new VehicleFilter() {
-        public Iterable<Vehicle> filterVehiclesForRequest(Iterable<Vehicle> vehicles,
-                TaxiRequest request)
-        {
-            return vehicles;
-        }
-    };
+    public static String CHARGE_TIME_STEP = "chargeTimeStep";
+    public static String AUX_DISCHARGE_TIME_STEP = "auxDischargeTimeStep";
+
+    public final int chargeTimeStep;
+    public final int auxDischargeTimeStep;
+
+    public ETaxiParams(Configuration config)
+    {
+        chargeTimeStep = config.getInt(CHARGE_TIME_STEP);
+        auxDischargeTimeStep = config.getInt(AUX_DISCHARGE_TIME_STEP);
+    }
 
 
-    Iterable<Vehicle> filterVehiclesForRequest(Iterable<Vehicle> vehicles, TaxiRequest request);
+    //just an example
+    public ETaxiParams()
+    {
+        //no need to simulate with 1-second time step
+        chargeTimeStep = 5; //5 s ==> 0.35% SOC (fast charging, 50 kW)
+        auxDischargeTimeStep = 60; //1 min ==> 0.25% SOC (3 kW aux power)
+    }
 }

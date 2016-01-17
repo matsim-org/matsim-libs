@@ -46,7 +46,7 @@ public class PassengerEngine
     protected final PassengerRequestCreator requestCreator;
     protected final VrpOptimizer optimizer;
 
-    protected final AdvancedRequestStorage advancedRequestStorage;
+    protected final AdvanceRequestStorage advanceRequestStorage;
     protected final AwaitingPickupStorage awaitingPickupStorage;
 
 
@@ -60,7 +60,7 @@ public class PassengerEngine
         this.optimizer = optimizer;
         this.context = context;
 
-        advancedRequestStorage = new AdvancedRequestStorage(context);
+        advanceRequestStorage = new AdvanceRequestStorage(context);
         awaitingPickupStorage = new AwaitingPickupStorage();
     }
 
@@ -121,9 +121,12 @@ public class PassengerEngine
 
         PassengerRequest request = createRequest(passenger, fromLinkId, toLinkId, departureTime,
                 now);
-        advancedRequestStorage.storeAdvancedRequest(request);
-
         optimizer.requestSubmitted(request);
+
+        if (!request.isRejected()) {
+            advanceRequestStorage.storeAdvanceRequest(request);
+        }
+
         return !request.isRejected();
     }
 
@@ -142,7 +145,7 @@ public class PassengerEngine
 
         internalInterface.registerAdditionalAgentOnLink(passenger);
 
-        PassengerRequest request = advancedRequestStorage.retrieveAdvancedRequest(passenger,
+        PassengerRequest request = advanceRequestStorage.retrieveAdvanceRequest(passenger,
                 fromLinkId, toLinkId);
 
         if (request == null) {//this is an immediate request

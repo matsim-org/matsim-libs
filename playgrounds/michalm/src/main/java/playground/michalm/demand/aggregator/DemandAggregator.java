@@ -19,10 +19,10 @@
 
 package playground.michalm.demand.aggregator;
 
-import java.util.*;
+import java.util.Date;
 
-import org.apache.commons.lang3.mutable.MutableInt;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.contrib.util.EnumCounter;
 import org.matsim.matrices.*;
 
 import playground.michalm.util.matrices.MatrixUtils;
@@ -41,17 +41,13 @@ public class DemandAggregator
     private final DateDiscretizer dateDiscretizer;
     private final Matrices matrices = new Matrices();
 
-    private final Map<TripType, MutableInt> counters = new EnumMap<>(TripType.class);
+    private final EnumCounter<TripType> counter = new EnumCounter<>(TripType.class);
 
 
     public DemandAggregator(ZoneFinder zoneFinder, DateDiscretizer dateDiscretizer)
     {
         this.zoneFinder = zoneFinder;
         this.dateDiscretizer = dateDiscretizer;
-
-        for (TripType type : TripType.values()) {
-            counters.put(type, new MutableInt());
-        }
     }
 
 
@@ -60,7 +56,7 @@ public class DemandAggregator
         Zone fromZone = zoneFinder.findZone(fromCoord);
         Zone toZone = zoneFinder.findZone(toCoord);
         TripType type = getTripType(fromZone, toZone);
-        counters.get(type).increment();
+        counter.increment(type);
 
         if (type == TripType.INTERNAL) {
             addTrip(dateDiscretizer.discretize(date), fromZone.getId().toString(),
@@ -90,7 +86,7 @@ public class DemandAggregator
     public void printCounters()
     {
         for (TripType type : TripType.values()) {
-            System.out.println(type.name() + " trips:\t" + counters.get(type).getValue());
+            System.out.println(type.name() + " trips:\t" + counter.getCount(type));
         }
     }
 

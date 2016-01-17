@@ -33,38 +33,46 @@ import playground.michalm.taxi.schedule.TaxiTask.TaxiTaskType;
 public abstract class AbstractTaxiOptimizer
     implements TaxiOptimizer
 {
-    protected final TaxiOptimizerConfiguration optimConfig;
+    protected final TaxiOptimizerContext optimContext;
     protected final Collection<TaxiRequest> unplannedRequests;
 
     private final boolean doUnscheduleAwaitingRequests;//PLANNED or TAXI_DISPATCHED
     private final boolean destinationKnown;
     private final boolean vehicleDiversion;
+    private final int reoptimizationTimeStep;
 
     protected boolean requiresReoptimization = false;
 
 
-    public AbstractTaxiOptimizer(TaxiOptimizerConfiguration optimConfig,
+    public AbstractTaxiOptimizer(TaxiOptimizerContext optimContext,
             Collection<TaxiRequest> unplannedRequests, boolean doUnscheduleAwaitingRequests)
     {
-        this.optimConfig = optimConfig;
+        this.optimContext = optimContext;
         this.unplannedRequests = unplannedRequests;
         this.doUnscheduleAwaitingRequests = doUnscheduleAwaitingRequests;
 
-        destinationKnown = optimConfig.scheduler.getParams().destinationKnown;
-        vehicleDiversion = optimConfig.scheduler.getParams().vehicleDiversion;
+        destinationKnown = optimContext.scheduler.getParams().destinationKnown;
+        vehicleDiversion = optimContext.scheduler.getParams().vehicleDiversion;
+        reoptimizationTimeStep = optimContext.optimizerParams.reoptimizationTimeStep;
     }
 
 
     @Override
     public void notifyMobsimBeforeSimStep(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent e)
     {
-        if (requiresReoptimization) {
+        if (requiresReoptimization && (e.getSimulationTime() % reoptimizationTimeStep == 0)) {
             if (doUnscheduleAwaitingRequests) {
                 unscheduleAwaitingRequests();
             }
 
-            for (Vehicle v : optimConfig.context.getVrpData().getVehicles().values()) {
-                optimConfig.scheduler.updateTimeline(TaxiSchedules.asTaxiSchedule(v.getSchedule()));
+            //TODO (1) use a seperate variable to decide upon updating the timeline??
+            //TODO (2) update timeline only if the algo really wants to reschedule in this time step,
+            //perhaps by checking if there are any unplanned requests??
+            if (doUnscheduleAwaitingRequests) {
+                for (Vehicle v : optimContext.context.getVrpData().getVehicles().values()) {
+                    optimContext.scheduler
+                            .updateTimeline(TaxiSchedules.asTaxiSchedule(v.getSchedule()));
+                }
             }
 
             scheduleUnplannedRequests();
@@ -80,7 +88,7 @@ public abstract class AbstractTaxiOptimizer
 
     protected void unscheduleAwaitingRequests()
     {
-        List<TaxiRequest> removedRequests = optimConfig.scheduler
+        List<TaxiRequest> removedRequests = optimContext.scheduler
                 .removeAwaitingRequestsFromAllSchedules();
         unplannedRequests.addAll(removedRequests);
     }
@@ -91,7 +99,7 @@ public abstract class AbstractTaxiOptimizer
 
     protected void handleAimlessDriveTasks()
     {
-        optimConfig.scheduler.stopAllAimlessDriveTasks();
+        optimContext.scheduler.stopAllAimlessDriveTasks();
     }
 
 
@@ -107,7 +115,7 @@ public abstract class AbstractTaxiOptimizer
     public void nextTask(Schedule<? extends Task> schedule)
     {
         Schedule<TaxiTask> taxiSchedule = TaxiSchedules.asTaxiSchedule(schedule);
-        optimConfig.scheduler.updateBeforeNextTask(taxiSchedule);
+        optimContext.scheduler.updateBeforeNextTask(taxiSchedule);
 
         TaxiTask newCurrentTask = taxiSchedule.nextTask();
 
@@ -119,17 +127,24 @@ public abstract class AbstractTaxiOptimizer
 
     protected boolean doReoptimizeAfterNextTask(TaxiTask newCurrentTask)
     {
-        return !destinationKnown
-                && newCurrentTask.getTaxiTaskType() == TaxiTaskType.DRIVE_WITH_PASSENGER;
+        return !destinationKnown && newCurrentTask.getTaxiTaskType() == TaxiTaskType.DRIVE_OCCUPIED;
     }
 
 
     @Override
     public void nextLinkEntered(DriveTask driveTask)
     {
-        optimConfig.scheduler.updateTimeline(TaxiSchedules.asTaxiSchedule(driveTask.getSchedule()));
+        optimContext.scheduler
+                .updateTimeline(TaxiSchedules.asTaxiSchedule(driveTask.getSchedule()));
 
         //TODO we may here possibly decide whether or not to reoptimize
         //if (delays/speedups encountered) {requiresReoptimization = true;}
+    }
+
+
+    @Override
+    public TaxiOptimizerContext getOptimizerContext()
+    {
+        return optimContext;
     }
 }

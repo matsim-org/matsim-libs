@@ -29,12 +29,12 @@ import playground.michalm.taxi.scheduler.TaxiSchedulerUtils;
 public class TaxiOptimizationValidation
 {
     public static void assertNoUnplannedRequestsWhenIdleVehicles(
-            TaxiOptimizerConfiguration optimConfig)
+            TaxiOptimizerContext optimContext)
     {
-        ETaxiData taxiData = (ETaxiData)optimConfig.context.getVrpData();
+        ETaxiData taxiData = (ETaxiData)optimContext.context.getVrpData();
 
         int vehCount = Iterables.size(Iterables.filter(taxiData.getVehicles().values(),
-                TaxiSchedulerUtils.createIsIdle(optimConfig.scheduler)));
+                TaxiSchedulerUtils.createIsIdle(optimContext.scheduler)));
 
         if (vehCount == 0) {
             return;//OK

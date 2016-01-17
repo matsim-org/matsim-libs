@@ -1,183 +1,85 @@
 package playground.michalm.taxi.run;
 
-import java.util.Map;
-
-import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelTimeSource;
-
-import playground.michalm.util.ParameterFileReader;
+import org.apache.commons.configuration.Configuration;
 
 
 class TaxiLauncherParams
 {
-    static TaxiLauncherParams readParams(String paramDir, String specificParamSubDir)
+    static final String NET_FILE = "netFile";
+    static final String PLANS_FILE = "plansFile";
+
+    static final String TAXI_CUSTOMERS_FILE = "taxiCustomersFile";
+    static final String TAXIS_FILE = "taxisFile";
+    static final String RANKS_FILE = "ranksFile";
+
+    static final String EVENTS_FILE = "eventsFile";
+    static final String CHANGE_EVENTS_FILE = "changeEventsFile";
+
+    static final String ONLINE_VEHICLE_TRACKER = "onlineVehicleTracker";
+    static final String PREBOOK_TRIPS_BEFORE_SIMULATION = "prebookTripsBeforeSimulation";
+
+    static final String STORAGE_CAP_FACTOR = "storageCapFactor";
+    static final String FLOW_CAP_FACTOR = "flowCapFactor";
+
+    static final String OTF_VIS = "otfVis";
+    static final String DEBUG_MODE = "debugMode";
+
+    static final String EVENTS_OUT_FILE = "eventsOutFile";
+    static final String TAXI_STATS_FILE = "taxiStatsFile";
+    static final String DETAILED_TAXI_STATS_DIR = "detailedTaxiStatsDir";
+    static final String E_TAXI_STATS_FILE = "eTaxiStatsFile";
+    static final String MULTI_RUN_STATS_DIR = "multiRunStats";
+
+    final String netFile;
+    final String plansFile;
+
+    final String taxiCustomersFile;
+    final String taxisFile;
+    final String ranksFile;
+
+    final String eventsFile;
+    final String changeEventsFile;
+
+    final boolean onlineVehicleTracker;
+    final boolean prebookTripsBeforeSimulation;
+    final double storageCapFactor;
+    final double flowCapFactor;
+
+    final boolean otfVis;
+    final boolean debugMode;
+
+    final String eventsOutFile;
+    final String taxiStatsFile;
+    final String detailedTaxiStatsDir;
+    final String eTaxiStatsFile;
+    final String multiRunStatsDir;
+
+
+    TaxiLauncherParams(Configuration config)
     {
-        String paramFile = paramDir + "/params.in";
-        String specificParamFile = paramDir + "/" + specificParamSubDir + "/params.in";
-        String outputDir = paramDir + "/" + specificParamSubDir + "/";
+        netFile = config.getString(NET_FILE);
+        plansFile = config.getString(PLANS_FILE);
 
-        Map<String, String> specificParams = ParameterFileReader
-                .readParametersToMap(specificParamFile);
-        specificParams.put("outputDir", outputDir);
+        taxiCustomersFile = config.getString(TAXI_CUSTOMERS_FILE, null);
+        taxisFile = config.getString(TAXIS_FILE);
+        ranksFile = config.getString(RANKS_FILE, null);
 
-        Map<String, String> generalParams = ParameterFileReader.readParametersToMap(paramFile);
-        generalParams.putAll(specificParams);//side effect: overriding params with the specific ones
-        return new TaxiLauncherParams(generalParams);
-    }
+        eventsFile = config.getString(EVENTS_FILE);
+        changeEventsFile = config.getString(CHANGE_EVENTS_FILE);
 
+        //these params influence the simulation
+        onlineVehicleTracker = config.getBoolean(ONLINE_VEHICLE_TRACKER);
+        prebookTripsBeforeSimulation = config.getBoolean(PREBOOK_TRIPS_BEFORE_SIMULATION, false);
+        storageCapFactor = config.getDouble(STORAGE_CAP_FACTOR, 1.);
+        flowCapFactor = config.getDouble(FLOW_CAP_FACTOR, 1.);
 
-    static TaxiLauncherParams readParams(String paramFile)
-    {
-        return new TaxiLauncherParams(ParameterFileReader.readParametersToMap(paramFile));
-    }
+        otfVis = config.getBoolean(OTF_VIS, false);
+        debugMode = config.getBoolean(DEBUG_MODE, false);
 
-
-    private Map<String, String> params;
-
-    String inputDir;
-
-    String netFile;
-    String plansFile;
-
-    String taxiCustomersFile;
-    String taxisFile;
-    String ranksFile;
-
-    String zonesXmlFile;
-    String zonesShpFile;
-
-    String eventsFile;
-    String changeEventsFile;
-    AlgorithmConfig algorithmConfig;
-
-    Integer nearestRequestsLimit;
-    Integer nearestVehiclesLimit;
-
-    Boolean onlineVehicleTracker;
-    Boolean advanceRequestSubmission;
-    Boolean destinationKnown;
-    Boolean vehicleDiversion;
-
-    Double pickupDuration;
-    Double dropoffDuration;
-
-    Boolean batteryChargingDischarging;
-
-    Boolean otfVis;
-
-    String outputDir;
-    String vrpOutDir;
-    String histogramOutDir;
-    String eventsOutFile;
-
-    public static final String INPUT_DIR = "inputDir";
-    public static final String NET_FILE = "netFile";
-    public static final String PLANS_FILE = "plansFile";
-
-    public static final String TAXI_CUSTOMERS_FILE = "taxiCustomersFile";
-
-
-    TaxiLauncherParams()
-    {}
-
-
-    TaxiLauncherParams(Map<String, String> params)
-    {
-        this.params = params;
-
-        inputDir = params.get(INPUT_DIR);
-        netFile = getInputPath(NET_FILE);
-        plansFile = getInputPath(PLANS_FILE);
-
-        taxiCustomersFile = getInputPath(TAXI_CUSTOMERS_FILE);
-        ranksFile = getInputPath("ranksFile");
-        taxisFile = getInputPath("taxisFile");
-
-        zonesXmlFile = getInputPath("zonesXmlFile");
-        zonesShpFile = getInputPath("zonesShpFile");
-
-        eventsFile = getInputPath("eventsFile");
-        changeEventsFile = getInputPath("changeEventsFile");
-
-        algorithmConfig = AlgorithmConfig.valueOf(params.get("algorithmConfig"));
-
-        nearestRequestsLimit = getInteger("nearestRequestsLimit");
-        nearestVehiclesLimit = getInteger("nearestVehiclesLimit");
-
-        onlineVehicleTracker = getBoolean("onlineVehicleTracker");
-        advanceRequestSubmission = getBoolean("advanceRequestSubmission");
-        destinationKnown = getBoolean("destinationKnown");
-        vehicleDiversion = getBoolean("vehicleDiversion");
-
-        pickupDuration = getDouble("pickupDuration");
-        dropoffDuration = getDouble("dropoffDuration");
-
-        batteryChargingDischarging = getBoolean("batteryChargingDischarging");
-
-        otfVis = getBoolean("otfVis");
-
-        outputDir = params.get("outputDir");
-        vrpOutDir = getOutputPath("vrpOutDir");
-        histogramOutDir = getOutputPath("histogramOutDir");
-        eventsOutFile = getOutputPath("eventsOutFile");
-
-        validate();
-    }
-
-
-    public void validate()
-    {
-        if (algorithmConfig.ttimeSource == TravelTimeSource.FREE_FLOW_SPEED) {
-            if (eventsFile != null) {
-                throw new IllegalStateException(
-                        "eventsFile works only for TravelTimeSource.EVENTS");
-            }
-        }
-        else {//TravelTimeSource.EVENTS
-            if (changeEventsFile != null) {
-                throw new IllegalStateException(
-                        "changeEventsFile works only for TravelTimeSource.FREE_FLOW_SPEED");
-            }
-        }
-
-        if (vehicleDiversion && !onlineVehicleTracker) {
-            throw new IllegalStateException("Diversion requires online tracking");
-        }
-    }
-
-
-    private String getInputPath(String key)
-    {
-        return getPath(inputDir, key);
-    }
-
-
-    private String getOutputPath(String key)
-    {
-        return getPath(outputDir, key);
-    }
-
-
-    private String getPath(String dir, String key)
-    {
-        String file = params.get(key);
-        return file == null ? null : dir + file;
-    }
-
-
-    private Boolean getBoolean(String key)
-    {
-        return params.containsKey(key);
-    }
-
-
-    private Integer getInteger(String key)
-    {
-        return Integer.valueOf(params.get(key));
-    }
-
-
-    private Double getDouble(String key)
-    {
-        return Double.valueOf(params.get(key));
+        eventsOutFile = config.getString(EVENTS_OUT_FILE, null);
+        taxiStatsFile = config.getString(TAXI_STATS_FILE, null);
+        detailedTaxiStatsDir = config.getString(DETAILED_TAXI_STATS_DIR, null);
+        eTaxiStatsFile = config.getString(E_TAXI_STATS_FILE, null);
+        multiRunStatsDir = config.getString(MULTI_RUN_STATS_DIR, null);
     }
 }

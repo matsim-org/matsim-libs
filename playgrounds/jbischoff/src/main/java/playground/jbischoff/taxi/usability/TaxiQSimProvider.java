@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package playground.jbischoff.taxi.usability;
 
-
 import java.util.Map;
 
 import org.matsim.api.core.v01.Scenario;
@@ -36,96 +35,101 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.router.util.*;
-import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 
 import com.google.inject.*;
 
 import playground.michalm.taxi.*;
-import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration;
-import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration.Goal;
-import playground.michalm.taxi.optimizer.filter.*;
-import playground.michalm.taxi.optimizer.rules.RuleBasedTaxiOptimizer;
+import playground.michalm.taxi.optimizer.TaxiOptimizerContext;
+import playground.michalm.taxi.optimizer.rules.*;
 import playground.michalm.taxi.scheduler.*;
+
 
 /**
  * @author jbischoff
- *
  */
 
-public class TaxiQSimProvider implements Provider<QSim> {
-	private TaxiConfigGroup tcg;
-	private MatsimVrpContextImpl context;
-	private RuleBasedTaxiOptimizer optimizer;
-	private EventsManager events;
-	private TravelTime travelTime;
+public class TaxiQSimProvider
+    implements Provider<QSim>
+{
+    private TaxiConfigGroup tcg;
+    private MatsimVrpContextImpl context;
+    private RuleBasedTaxiOptimizer optimizer;
+    private EventsManager events;
+    private TravelTime travelTime;
 
-//	@Inject
-//	TaxiQSimProvider(Config config, MatsimVrpContext context , EventsManager events, TravelTime travelTime) {
-//		this.tcg = (TaxiConfigGroup) config.getModule("taxiConfig");
-//		this.context = (MatsimVrpContextImpl) context;
-//		this.events=events;
-//		this.travelTime = travelTime;
-//
-//	}
-	@Inject
-	TaxiQSimProvider(Config config, MatsimVrpContext context , EventsManager events, Map<String,TravelTime> travelTimes) {
-		this.tcg = (TaxiConfigGroup) config.getModule("taxiConfig");
-		this.context = (MatsimVrpContextImpl) context;
-		this.events=events;
-		this.travelTime = travelTimes.get("car");
 
-		
-	}
+    //	@Inject
+    //	TaxiQSimProvider(Config config, MatsimVrpContext context , EventsManager events, TravelTime travelTime) {
+    //		this.tcg = (TaxiConfigGroup) config.getModule("taxiConfig");
+    //		this.context = (MatsimVrpContextImpl) context;
+    //		this.events=events;
+    //		this.travelTime = travelTime;
+    //
+    //	}
+    @Inject
+    TaxiQSimProvider(Config config, MatsimVrpContext context, EventsManager events,
+            Map<String, TravelTime> travelTimes)
+    {
+        this.tcg = (TaxiConfigGroup)config.getModule("taxiConfig");
+        this.context = (MatsimVrpContextImpl)context;
+        this.events = events;
+        this.travelTime = travelTimes.get("car");
 
-	private QSim createMobsim(Scenario sc, EventsManager eventsManager) {
-		initiate();
-		QSim qSim = DynAgentLauncherUtils.initQSim(sc, eventsManager);
-		qSim.addQueueSimulationListeners(optimizer);
-		context.setMobsimTimer(qSim.getSimTimer());
-		PassengerEngine passengerEngine = VrpLauncherUtils.initPassengerEngine(
-				TaxiUtils.TAXI_MODE, new TaxiRequestCreator(), optimizer,
-				context, qSim);
-		LegCreator legCreator = VrpLegs.createLegWithOfflineTrackerCreator(qSim
-				.getSimTimer());
-		TaxiActionCreator actionCreator = new TaxiActionCreator(
-				passengerEngine, legCreator, tcg.getPickupDuration());
-		VrpLauncherUtils.initAgentSources(qSim, context, optimizer,
-				actionCreator);
-		return qSim;
-	}
+    }
 
-	void initiate() {
-		//this initiation takes place upon creating qsim for each iteration
-		TravelDisutility travelDisutility = new DistanceAsTravelDisutility();
-		
-		TaxiSchedulerParams params = new TaxiSchedulerParams(tcg.isDestinationKnown(), tcg.isVehicleDiversion(),
-				tcg.getPickupDuration(), tcg.getDropoffDuration());
-		
-		resetSchedules(context.getVrpData().getVehicles().values());
-		
-		TaxiScheduler scheduler = new TaxiScheduler(context, params, travelTime, travelDisutility);
 
-		FilterFactory filterFactory = new DefaultFilterFactory(scheduler, tcg.getNearestRequestsLimit(), tcg.getNearestVehiclesLimit());
+    private QSim createMobsim(Scenario sc, EventsManager eventsManager)
+    {
+        initiate();
+        QSim qSim = DynAgentLauncherUtils.initQSim(sc, eventsManager);
+        qSim.addQueueSimulationListeners(optimizer);
+        context.setMobsimTimer(qSim.getSimTimer());
+        PassengerEngine passengerEngine = VrpLauncherUtils.initPassengerEngine(TaxiUtils.TAXI_MODE,
+                new TaxiRequestCreator(), optimizer, context, qSim);
+        LegCreator legCreator = VrpLegs.createLegWithOfflineTrackerCreator(qSim.getSimTimer());
+        TaxiActionCreator actionCreator = new TaxiActionCreator(passengerEngine, legCreator,
+                tcg.getPickupDuration());
+        VrpLauncherUtils.initAgentSources(qSim, context, optimizer, actionCreator);
+        return qSim;
+    }
 
-		TaxiOptimizerConfiguration optimConfig = new TaxiOptimizerConfiguration(
-				context, travelTime, travelDisutility, scheduler, filterFactory,
-				Goal.DEMAND_SUPPLY_EQUIL, tcg.getOutputDir(), null);
-		optimizer = new RuleBasedTaxiOptimizer(optimConfig);
 
-	}
-	
-	private void resetSchedules(Iterable<Vehicle> vehicles) {
+    void initiate()
+    {
+        //this initiation takes place upon creating qsim for each iteration
+        TravelDisutility travelDisutility = new DistanceAsTravelDisutility();
 
-    	for (Vehicle v : vehicles){
-    		VehicleImpl vi = (VehicleImpl) v;
-    		vi.resetSchedule();
-    		
-    	}
-	}
+        TaxiSchedulerParams params = new TaxiSchedulerParams(tcg.isDestinationKnown(),
+                tcg.isVehicleDiversion(), tcg.getPickupDuration(), tcg.getDropoffDuration(), 1.);
 
-	@Override
-	public QSim get() {
-		return createMobsim(context.getScenario(), this.events);
-	}
+        resetSchedules(context.getVrpData().getVehicles().values());
+
+        TaxiScheduler scheduler = new TaxiScheduler(context, params, travelTime, travelDisutility);
+
+        RuleBasedTaxiOptimizerParams optimParams = new RuleBasedTaxiOptimizerParams(null);
+
+        TaxiOptimizerContext optimContext = new TaxiOptimizerContext(context, travelTime,
+                travelDisutility, optimParams, scheduler);
+        optimizer = new RuleBasedTaxiOptimizer(optimContext);
+
+    }
+
+
+    private void resetSchedules(Iterable<Vehicle> vehicles)
+    {
+
+        for (Vehicle v : vehicles) {
+            VehicleImpl vi = (VehicleImpl)v;
+            vi.resetSchedule();
+
+        }
+    }
+
+
+    @Override
+    public QSim get()
+    {
+        return createMobsim(context.getScenario(), this.events);
+    }
 
 }

@@ -42,7 +42,7 @@ public class TaxiScheduleChartUtils
         }
     };
 
-    private static final Color DRIVE_WITH_PASSENGER_COLOR = new Color(200, 0, 0);
+    private static final Color DRIVE_OCCUPIED_COLOR = new Color(200, 0, 0);
     private static final Color PICKUP_DROPOFF_COLOR = new Color(0, 0, 200);
 
     private static final Color DRIVE_EMPTY_COLOR = new Color(100, 0, 0);
@@ -56,8 +56,8 @@ public class TaxiScheduleChartUtils
                 case DROPOFF:
                     return PICKUP_DROPOFF_COLOR;
 
-                case DRIVE_WITH_PASSENGER:
-                    return DRIVE_WITH_PASSENGER_COLOR;
+                case DRIVE_OCCUPIED:
+                    return DRIVE_OCCUPIED_COLOR;
 
                 case DRIVE_EMPTY:
                     return DRIVE_EMPTY_COLOR;

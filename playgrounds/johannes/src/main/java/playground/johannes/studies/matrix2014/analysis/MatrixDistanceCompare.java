@@ -59,7 +59,8 @@ public class MatrixDistanceCompare implements AnalyzerTask<NumericMatrix> {
 
     private NumericMatrix refMatrix;
 
-    public MatrixDistanceCompare(String dimension, ZoneCollection zones) {
+    public MatrixDistanceCompare(NumericMatrix refMatrix, String dimension, ZoneCollection zones) {
+        this.refMatrix = refMatrix;
         this.dimension = dimension;
         this.distanceMatrix = new NumericMatrix();
         this.zones = zones;
@@ -70,10 +71,6 @@ public class MatrixDistanceCompare implements AnalyzerTask<NumericMatrix> {
 
     public void setFileIoContext(FileIOContext ioContext) {
         this.ioContext = ioContext;
-    }
-
-    public void setReferenceMatrix(NumericMatrix refMatrix) {
-        this.refMatrix = refMatrix;
     }
 
     @Override
@@ -134,7 +131,7 @@ public class MatrixDistanceCompare implements AnalyzerTask<NumericMatrix> {
                 }
             }
         }
-        System.out.println("Total=" + sum);
+//        System.out.println("Total=" + sum);
         return Histogram.createHistogram(values.toArray(), weights.toArray(), discretizer, true);
     }
 
