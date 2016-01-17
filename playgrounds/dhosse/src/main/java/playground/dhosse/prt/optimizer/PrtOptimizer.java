@@ -27,18 +27,18 @@ public class PrtOptimizer implements VrpOptimizerWithOnlineTracking, MobsimBefor
 	
 	private final MatsimVrpContext context;
 	private final TaxiScheduler scheduler;
-	private TaxiOptimizerConfiguration optimizerConfig;
+	private TaxiOptimizerContext optimizerConfig;
 	
 	private final NPersonsVehicleRequestPathFinder vrpFinder;
 	
-	public PrtOptimizer(TaxiOptimizerConfiguration optimizerConfig){
+	public PrtOptimizer(TaxiOptimizerContext optimizerConfig){
 		
 		this(optimizerConfig.context, optimizerConfig, optimizerConfig.scheduler, new IdleRankVehicleFinder(optimizerConfig.context,
 						optimizerConfig.scheduler));
 		
 	}
 	
-	protected PrtOptimizer(MatsimVrpContext context, TaxiOptimizerConfiguration optimizerConfig, TaxiScheduler scheduler, IdleRankVehicleFinder vehicleFinder){
+	protected PrtOptimizer(MatsimVrpContext context, TaxiOptimizerContext optimizerConfig, TaxiScheduler scheduler, IdleRankVehicleFinder vehicleFinder){
 		
 		this.optimizerConfig = optimizerConfig;
 		this.context = context;

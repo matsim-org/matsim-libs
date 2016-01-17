@@ -22,33 +22,26 @@ package playground.jbischoff.taxi.launch;
 import java.io.*;
 import java.util.*;
 
-import org.matsim.analysis.LegHistogram;
 import org.matsim.api.core.v01.*;
 import org.matsim.contrib.dvrp.*;
 import org.matsim.contrib.dvrp.data.Request;
 import org.matsim.contrib.dvrp.extensions.taxi.TaxiUtils;
 import org.matsim.contrib.dvrp.passenger.PassengerEngine;
-import org.matsim.contrib.dvrp.path.*;
 import org.matsim.contrib.dvrp.router.*;
 import org.matsim.contrib.dvrp.run.*;
-import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelDisutilitySource;
-import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelTimeSource;
-import org.matsim.contrib.dvrp.util.*;
 import org.matsim.contrib.dvrp.vrpagent.VrpLegs;
 import org.matsim.contrib.dynagent.run.DynAgentLauncherUtils;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.algorithms.*;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.*;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.vis.otfvis.OTFVisConfigGroup.ColoringScheme;
 
 import playground.jbischoff.taxi.optimizer.rank.NOSRankTaxiOptimizer;
 import playground.michalm.taxi.*;
 import playground.michalm.taxi.data.*;
 import playground.michalm.taxi.data.TaxiRequest.TaxiRequestStatus;
-import playground.michalm.taxi.run.TaxiLauncherUtils;
+import playground.michalm.taxi.data.file.*;
 import playground.michalm.taxi.scheduler.*;
 import playground.michalm.taxi.util.stats.*;
 import playground.michalm.util.MovingAgentsRegister;
@@ -72,8 +65,6 @@ import playground.michalm.util.MovingAgentsRegister;
     /*package*/final boolean vrpOutFiles;
     /*package*/final String vrpOutDirName;
 
-    /*package*/final boolean outHistogram;
-    /*package*/final String histogramOutDirName;
 
     /*package*/final boolean otfVis;
 
@@ -83,7 +74,6 @@ import playground.michalm.util.MovingAgentsRegister;
     /*package*/final Scenario scenario;
 
     /*package*/MatsimVrpContext context;
-    /*package*/LegHistogram legHistogram;
 
     private String electricStatsDir;
     /*package*/List<String> waitList;
@@ -124,9 +114,6 @@ import playground.michalm.util.MovingAgentsRegister;
         vrpOutFiles = !true;
         vrpOutDirName = dirName + "vrp_output";
 
-        outHistogram = true;
-        histogramOutDirName = electricStatsDir + "histograms";
-
         writeSimEvents = true;
         waitList = new ArrayList<String>();
 
@@ -152,17 +139,8 @@ import playground.michalm.util.MovingAgentsRegister;
         File f = new File(electricStatsDir);
         f.mkdirs();
 
-        //        TravelTimeSource ttimeSource = TravelTimeSource.FREE_FLOW_SPEED;
-        TravelTimeSource ttimeSource = TravelTimeSource.EVENTS;
-
-        TravelDisutilitySource tdisSource = TravelDisutilitySource.TIME;
-
         if (scenario == null)
             System.out.println("scen");
-        if (ttimeSource == null)
-            System.out.println("ttsource");
-        if (tdisSource == null)
-            System.out.println("tcostSource");
         if (eventsFileName == null)
             System.out.println("eventsFileName");
         if (ranksFileName == null)
@@ -171,10 +149,12 @@ import playground.michalm.util.MovingAgentsRegister;
         TravelTime travelTime = VrpLauncherUtils.initTravelTimeCalculatorFromEvents(scenario,
                 eventsFileName, 900).getLinkTravelTimes();
 
-        TravelDisutility travelDisutility = VrpLauncherUtils.initTravelDisutility(tdisSource,
-                travelTime);
+        TravelDisutility travelDisutility = new TimeAsTravelDisutility(travelTime);
 
-        ETaxiData vrpData = TaxiLauncherUtils.initTaxiData(scenario, taxisFileName, ranksFileName);
+        ETaxiData vrpData = new ETaxiData();
+        new ETaxiReader(scenario, vrpData).parse(taxisFileName);
+        new TaxiRankReader(scenario, vrpData).parse(ranksFileName);
+
         contextImpl.setVrpData(vrpData);
 
         double pickupDuration = 120;
@@ -214,10 +194,6 @@ import playground.michalm.util.MovingAgentsRegister;
             DynAgentLauncherUtils.runOTFVis(qSim, false, ColoringScheme.taxicab);
         }
 
-        if (outHistogram) {
-            events.addHandler(legHistogram = new LegHistogram(300));
-        }
-        //        qSim.getScenario().getConfig().simulation().setEndTime(86399);
         qSim.run();
         System.out.println("taxiless agents: ");
         for (Id<?> id : rvr.getMovingAgentIds()) {
@@ -248,27 +224,6 @@ import playground.michalm.util.MovingAgentsRegister;
         TaxiStats stats = new TaxiStatsCalculator(context.getVrpData().getVehicles().values()).getStats();
         pw.println(stats);
         pw.flush();
-
-        if (vrpOutFiles) {
-            new Schedules2GIS(context.getVrpData().getVehicles().values(),
-                    TransformationFactory.WGS84_UTM33N).write(vrpOutDirName);
-        }
-
-        // ChartUtils.showFrame(RouteChartUtils.chartRoutesByStatus(data.getVrpData()));
-        //        ChartUtils.showFrame(ScheduleChartUtils.chartSchedule(data.getVrpData()));
-
-        //        try {
-        ////            ChartUtils.saveAsPDF(
-        ////                    ScheduleChartUtils.chartSchedule(context.getVrpData().getVehicles()),
-        ////                    electricStatsDir + "taxiSchedules", 2048, 1546);
-        //        }
-        //        catch (IOException e) {
-        //            // TODO Auto-generated catch block
-        //            e.printStackTrace();
-        //        }
-        if (outHistogram) {
-            VrpLauncherUtils.writeHistograms(legHistogram, histogramOutDirName);
-        }
     }
 
 

@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2016 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,45 +17,49 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.optimizer.fifo;
+package playground.michalm.taxi.optimizer.rules;
 
-import java.util.Queue;
+import org.apache.commons.configuration.Configuration;
 
-import playground.michalm.taxi.data.TaxiRequest;
 import playground.michalm.taxi.optimizer.*;
+import playground.michalm.taxi.optimizer.rules.RuleBasedTaxiOptimizer.Goal;
 
 
-public class FifoSchedulingProblem
+public class RuleBasedTaxiOptimizerParams
+    extends AbstractTaxiOptimizerParams
 {
-    private final TaxiOptimizerContext optimContext;
-    private final BestDispatchFinder dispatchFinder;
+    public static final String GOAL = "goal";
+
+    public static final String NEAREST_REQUESTS_LIMIT = "nearestRequestsLimit";
+    public static final String NEAREST_VEHICLES_LIMIT = "nearestVehiclesLimit";
+
+    public static final String CELL_SIZE = "cellSize";
+
+    public final Goal goal;
+
+    public final int nearestRequestsLimit;
+    public final int nearestVehiclesLimit;
+
+    public final double cellSize;
 
 
-    public FifoSchedulingProblem(TaxiOptimizerContext optimContext,
-            BestDispatchFinder vrpFinder)
+    public RuleBasedTaxiOptimizerParams(Configuration optimizerConfig)
     {
-        this.optimContext = optimContext;
-        this.dispatchFinder = vrpFinder;
+        super(optimizerConfig);
+
+        goal = Goal.valueOf(optimizerConfig.getString(GOAL));
+
+        nearestRequestsLimit = optimizerConfig.getInt(NEAREST_REQUESTS_LIMIT);
+        nearestVehiclesLimit = optimizerConfig.getInt(NEAREST_VEHICLES_LIMIT);
+
+        cellSize = optimizerConfig.getDouble(CELL_SIZE);//1000 m tested for Berlin
     }
 
 
-    public void scheduleUnplannedRequests(Queue<TaxiRequest> unplannedRequests)
+    @Override
+    public RuleBasedTaxiOptimizer createTaxiOptimizer(TaxiOptimizerContext optimContext)
     {
-        while (!unplannedRequests.isEmpty()) {
-            TaxiRequest req = unplannedRequests.peek();
-
-            BestDispatchFinder.Dispatch best = dispatchFinder.findBestVehicleForRequest(req,
-                    optimContext.context.getVrpData().getVehicles().values());
-            
-            //TODO search only through available vehicles
-            //TODO what about k-nearstvehicle filtering?
-
-            if (best == null) {//TODO won't work with req filtering; use VehicleData to find out when to exit???
-                return;
-            }
-
-            optimContext.scheduler.scheduleRequest(best.vehicle, best.request, best.path);
-            unplannedRequests.poll();
-        }
+        return new RuleBasedTaxiOptimizer(optimContext);
     }
+
 }

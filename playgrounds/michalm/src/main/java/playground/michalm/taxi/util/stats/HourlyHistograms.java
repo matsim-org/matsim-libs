@@ -19,7 +19,7 @@
 
 package playground.michalm.taxi.util.stats;
 
-import java.io.PrintWriter;
+import java.io.*;
 
 
 public class HourlyHistograms
@@ -81,7 +81,7 @@ public class HourlyHistograms
     }
 
 
-    public void printStats(PrintWriter pw)
+    public void printHistograms(PrintWriter pw)
     {
         pw.print(hour + "\t");
         pw.print(passengerWaitTime.countsToString());
@@ -96,5 +96,21 @@ public class HourlyHistograms
         pw.print(hour + "\t");
         pw.print(stayRatio.countsToString());
         pw.println();
+    }
+
+
+    public static void printAllHistograms(HourlyHistograms[] hourlyHistograms, String file)
+    {
+        try (PrintWriter hourlyHistogramsWriter = new PrintWriter(file)) {
+            hourlyHistogramsWriter.println(HourlyHistograms.MAIN_HEADER);
+            hourlyHistograms[0].printSubHeaders(hourlyHistogramsWriter);
+
+            for (HourlyHistograms hh : hourlyHistograms) {
+                hh.printHistograms(hourlyHistogramsWriter);
+            }
+        }
+        catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

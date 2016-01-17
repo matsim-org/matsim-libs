@@ -17,38 +17,23 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.run;
+package playground.michalm.taxi.ev;
 
 import java.util.*;
 
-import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.dvrp.run.VrpLauncherUtils.*;
-import org.matsim.contrib.dvrp.util.TimeDiscretizer;
-import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
 
 import playground.michalm.ev.*;
 import playground.michalm.taxi.data.*;
-import playground.michalm.taxi.data.file.*;
-import playground.michalm.taxi.util.stats.*;
+import playground.michalm.taxi.util.stats.StatsCalculators;
 import playground.michalm.taxi.util.stats.StatsCollector.StatsCalculator;
 
 
-public class TaxiLauncherUtils
+public class ETaxiUtils
 {
-    public static ETaxiData initTaxiData(Scenario scenario, String taxisFile, String ranksFile)
-    {
-        ETaxiData taxiData = new ETaxiData();
-
-        new ETaxiReader(scenario, taxiData).parse(taxisFile);
-        new TaxiRankReader(scenario, taxiData).parse(ranksFile);
-
-        return taxiData;
-    }
-
-
     public static void initChargersAndVehicles(ETaxiData taxiData)
     {
         // TODO reduce charging speed in winter
@@ -70,34 +55,33 @@ public class TaxiLauncherUtils
     }
 
 
-    //no need to simulate with 1-second time step
-    private static final int CHARGE_TIME_STEP = 5; //5 s ==> 0.35% SOC (fast charging, 50 kW) 
-    private static final int AUX_DISCHARGE_TIME_STEP = 60;// 1 min ==> 0.25% SOC (3 kW aux power)
-
-
-    public static void initChargingAndDischargingHandlers(ETaxiData taxiData, Network network,
-            QSim qSim, TravelTime travelTime)
+    public static DriveDischargingHandler createDriveDischargingHandler(ETaxiData taxiData,
+            Network network, TravelTime travelTime, ETaxiParams eTaxiParams)
     {
         Map<Id<Vehicle>, ETaxi> vehicleToTaxi = new HashMap<>();
         for (ETaxi t : taxiData.getETaxis().values()) {
-            vehicleToTaxi.put(Id.create(t.getId(), Vehicle.class ), t);
+            //we assume: dvrp's vehicle.id == matsim's vehicle.id
+            //see: VrpAgentSource.insertAgentsIntoMobsim() 
+            vehicleToTaxi.put(Id.create(t.getId(), Vehicle.class), t);
         }
 
-        qSim.getEventsManager()
-                .addHandler(new DriveDischargingHandler(vehicleToTaxi, network, travelTime));
-
-        qSim.addQueueSimulationListeners(
-                new ChargingAuxDischargingHandler(taxiData.getChargers().values(), CHARGE_TIME_STEP,
-                        taxiData.getETaxis().values(), AUX_DISCHARGE_TIME_STEP));
+        return new DriveDischargingHandler(vehicleToTaxi, network, travelTime);
     }
 
 
-    public static void initStatsCollection(ETaxiData taxiData, QSim qSim, String output)
+    public static ChargingAuxDischargingHandler createChargingAuxDischargingHandler(
+            ETaxiData taxiData, Network network, TravelTime travelTime, ETaxiParams eTaxiParams)
     {
-        StatsCalculator<String> socStatsCalc = StatsCalculators.combineStatsCalculators(
+        return new ChargingAuxDischargingHandler(taxiData.getChargers().values(),
+                eTaxiParams.chargeTimeStep, taxiData.getETaxis().values(),
+                eTaxiParams.auxDischargeTimeStep);
+    }
+
+
+    public static StatsCalculator<String> createStatsCollection(ETaxiData taxiData)
+    {
+        return StatsCalculators.combineStatsCalculators(
                 StatsCalculators.createMeanSocCalculator(taxiData),
                 StatsCalculators.createDischargedVehiclesCounter(taxiData));
-        qSim.addQueueSimulationListeners(
-                new StatsCollector<>(socStatsCalc, 600, "mean [kWh]\tdischarged", output));
     }
 }

@@ -39,9 +39,8 @@ import org.matsim.core.router.util.*;
 import com.google.inject.*;
 
 import playground.michalm.taxi.*;
-import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration;
-import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration.Goal;
-import playground.michalm.taxi.optimizer.rules.RuleBasedTaxiOptimizer;
+import playground.michalm.taxi.optimizer.TaxiOptimizerContext;
+import playground.michalm.taxi.optimizer.rules.*;
 import playground.michalm.taxi.scheduler.*;
 
 
@@ -101,16 +100,17 @@ public class TaxiQSimProvider
         TravelDisutility travelDisutility = new DistanceAsTravelDisutility();
 
         TaxiSchedulerParams params = new TaxiSchedulerParams(tcg.isDestinationKnown(),
-                tcg.isVehicleDiversion(), tcg.getPickupDuration(), tcg.getDropoffDuration(), 1);
+                tcg.isVehicleDiversion(), tcg.getPickupDuration(), tcg.getDropoffDuration(), 1.);
 
         resetSchedules(context.getVrpData().getVehicles().values());
 
         TaxiScheduler scheduler = new TaxiScheduler(context, params, travelTime, travelDisutility);
 
-        TaxiOptimizerConfiguration optimConfig = new TaxiOptimizerConfiguration(context, travelTime,
-                travelDisutility, scheduler, tcg.getNearestRequestsLimit(),
-                tcg.getNearestVehiclesLimit(), Goal.DEMAND_SUPPLY_EQUIL, tcg.getOutputDir(), null);
-        optimizer = new RuleBasedTaxiOptimizer(optimConfig);
+        RuleBasedTaxiOptimizerParams optimParams = new RuleBasedTaxiOptimizerParams(null);
+
+        TaxiOptimizerContext optimContext = new TaxiOptimizerContext(context, travelTime,
+                travelDisutility, optimParams, scheduler);
+        optimizer = new RuleBasedTaxiOptimizer(optimContext);
 
     }
 

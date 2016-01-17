@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2016 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,35 +17,39 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.optimizer;
+package playground.michalm.taxi.optimizer.zonal;
 
-import com.google.common.collect.Iterables;
+import org.apache.commons.configuration.Configuration;
 
-import playground.michalm.taxi.data.*;
-import playground.michalm.taxi.data.TaxiRequest.TaxiRequestStatus;
-import playground.michalm.taxi.scheduler.TaxiSchedulerUtils;
+import playground.michalm.taxi.optimizer.TaxiOptimizerContext;
+import playground.michalm.taxi.optimizer.rules.*;
 
 
-public class TaxiOptimizationValidation
+public class ZonalTaxiOptimizerParams
+    extends RuleBasedTaxiOptimizerParams
 {
-    public static void assertNoUnplannedRequestsWhenIdleVehicles(
-            TaxiOptimizerContext optimContext)
+    public static final String ZONES_XML_FILE = "zonesXmlFile";
+    public static final String ZONES_SHP_FILE = "zonesShpFile";
+    public static final String EXPANSION_DISTANCE = "expansionDistance";
+
+    public final String zonesXmlFile;
+    public final String zonesShpFile;
+    public final double expansionDistance;
+
+
+    public ZonalTaxiOptimizerParams(Configuration optimizerConfig)
     {
-        ETaxiData taxiData = (ETaxiData)optimContext.context.getVrpData();
+        super(optimizerConfig);
 
-        int vehCount = Iterables.size(Iterables.filter(taxiData.getVehicles().values(),
-                TaxiSchedulerUtils.createIsIdle(optimContext.scheduler)));
-
-        if (vehCount == 0) {
-            return;//OK
-        }
-
-        if (TaxiRequests.countRequestsWithStatus(taxiData.getTaxiRequests().values(),
-                TaxiRequestStatus.UNPLANNED) == 0) {
-            return; //OK
-        }
-
-        //idle vehicles and unplanned requests
-        throw new IllegalStateException();
+        zonesXmlFile = optimizerConfig.getString(ZONES_XML_FILE);
+        zonesShpFile = optimizerConfig.getString(ZONES_SHP_FILE);
+        expansionDistance = optimizerConfig.getDouble(EXPANSION_DISTANCE);
+    }
+    
+    
+    @Override
+    public ZonalTaxiOptimizer createTaxiOptimizer(TaxiOptimizerContext optimContext)
+    {
+        return new ZonalTaxiOptimizer(optimContext);
     }
 }

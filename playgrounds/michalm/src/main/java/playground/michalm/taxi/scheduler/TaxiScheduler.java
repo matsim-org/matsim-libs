@@ -56,7 +56,7 @@ public class TaxiScheduler
 
         PreProcessEuclidean preProcessEuclidean = new PreProcessEuclidean(travelDisutility);
         preProcessEuclidean.run(context.getScenario().getNetwork());
-        
+
         FastRouterDelegateFactory fastRouterFactory = new ArrayFastRouterDelegateFactory();
         RoutingNetwork routingNetwork = new ArrayRoutingNetworkFactory(preProcessEuclidean)
                 .createRoutingNetwork(context.getScenario().getNetwork());
@@ -138,7 +138,8 @@ public class TaxiScheduler
                         //otherwise: IllegalStateException -- the schedule should end with STAY (or PICKUP if unfinished)
 
                     default:
-                        throw new IllegalStateException("Type of the last task is wrong: " + lastTask.getTaxiTaskType());
+                        throw new IllegalStateException(
+                                "Type of the last task is wrong: " + lastTask.getTaxiTaskType());
                 }
 
             case COMPLETED:

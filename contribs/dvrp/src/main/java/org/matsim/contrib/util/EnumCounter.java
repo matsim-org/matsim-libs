@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2016 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,35 +17,35 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.optimizer;
+package org.matsim.contrib.util;
 
-import com.google.common.collect.Iterables;
+import java.util.*;
 
-import playground.michalm.taxi.data.*;
-import playground.michalm.taxi.data.TaxiRequest.TaxiRequestStatus;
-import playground.michalm.taxi.scheduler.TaxiSchedulerUtils;
+import org.apache.commons.lang3.mutable.MutableInt;
 
 
-public class TaxiOptimizationValidation
+public class EnumCounter<K extends Enum<K>>
 {
-    public static void assertNoUnplannedRequestsWhenIdleVehicles(
-            TaxiOptimizerContext optimContext)
+    private final EnumMap<K, MutableInt> counts;
+
+
+    public EnumCounter(Class<K> clazz)
     {
-        ETaxiData taxiData = (ETaxiData)optimContext.context.getVrpData();
-
-        int vehCount = Iterables.size(Iterables.filter(taxiData.getVehicles().values(),
-                TaxiSchedulerUtils.createIsIdle(optimContext.scheduler)));
-
-        if (vehCount == 0) {
-            return;//OK
+        counts = new EnumMap<>(clazz);
+        for (K e : clazz.getEnumConstants()) {
+            counts.put(e, new MutableInt());
         }
+    }
 
-        if (TaxiRequests.countRequestsWithStatus(taxiData.getTaxiRequests().values(),
-                TaxiRequestStatus.UNPLANNED) == 0) {
-            return; //OK
-        }
 
-        //idle vehicles and unplanned requests
-        throw new IllegalStateException();
+    public void increment(K e)
+    {
+        counts.get(e).increment();
+    }
+
+
+    public int getCount(K e)
+    {
+        return counts.get(e).intValue();
     }
 }

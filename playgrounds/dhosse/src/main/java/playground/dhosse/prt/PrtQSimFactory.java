@@ -49,7 +49,7 @@ public class PrtQSimFactory implements MobsimFactory{
 	@Override
 	public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
 		
-		TaxiOptimizerConfiguration taxiConfig = initOptimizerConfiguration(prtConfig, context, travelTime, travelDisutility, algorithmConfig);
+		TaxiOptimizerContext taxiConfig = initOptimizerConfiguration(prtConfig, context, travelTime, travelDisutility, algorithmConfig);
 		TaxiOptimizer optimizer = algorithmConfig.createTaxiOptimizer(taxiConfig);
 
 		QSimConfigGroup conf = sc.getConfig().qsim();
@@ -110,7 +110,7 @@ public class PrtQSimFactory implements MobsimFactory{
 		
 	}
 	
-	private TaxiOptimizerConfiguration initOptimizerConfiguration(PrtConfigGroup prtConfig, MatsimVrpContext context,
+	private TaxiOptimizerContext initOptimizerConfiguration(PrtConfigGroup prtConfig, MatsimVrpContext context,
 			TravelTime travelTime, TravelDisutility travelDisutility, AlgorithmConfig algorithmConfig){
 		
 		TaxiSchedulerParams taxiParams = new TaxiSchedulerParams(prtConfig.getDestinationKnown(), false, prtConfig.getPickupDuration(), prtConfig.getDropoffDuration(), 1);
@@ -119,15 +119,13 @@ public class PrtQSimFactory implements MobsimFactory{
 			
 			PrtScheduler scheduler = new PrtScheduler(context, taxiParams, travelTime, travelDisutility);
 			
-			return new PrtOptimizerConfiguration(context, travelTime, travelDisutility, scheduler, 0, 0,
-					algorithmConfig.getGoal(), prtConfig.getPrtOutputDirectory(), prtConfig);
+			return new PrtOptimizerConfiguration(context, travelTime, travelDisutility, null, scheduler, prtConfig);
 			
 		}
 		
 		TaxiScheduler scheduler = new TaxiScheduler(context, taxiParams, travelTime, travelDisutility);
 		
-		return new TaxiOptimizerConfiguration(context, travelTime, travelDisutility, scheduler, 0, 0,
-				algorithmConfig.getGoal(), prtConfig.getPrtOutputDirectory(), null);
+		return new TaxiOptimizerContext(context, travelTime, travelDisutility, null, scheduler);
 		
 	}
 	

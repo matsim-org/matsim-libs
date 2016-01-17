@@ -47,7 +47,7 @@ class MIPGurobiSolver
     private static final double TW_MAX = 1.5 * 60 * 60;// 1.5 hours (Mielec) 
     private static final double TP_MAX = 20 * 60;// 20 minutes (Mielec)
 
-    private final TaxiOptimizerConfiguration optimConfig;
+    private final TaxiOptimizerContext optimContext;
     private final PathTreeBasedTravelTimeCalculator pathTravelTimeCalc;
     private final MIPRequestData rData;
     private final VehicleData vData;
@@ -62,11 +62,11 @@ class MIPGurobiSolver
     private final Mode mode = Mode.ONLINE;
 
 
-    MIPGurobiSolver(TaxiOptimizerConfiguration optimConfig,
+    MIPGurobiSolver(TaxiOptimizerContext optimContext,
             PathTreeBasedTravelTimeCalculator pathTravelTimeCalc, MIPRequestData rData,
             VehicleData vData)
     {
-        this.optimConfig = optimConfig;
+        this.optimContext = optimContext;
         this.pathTravelTimeCalc = pathTravelTimeCalc;
         this.rData = rData;
         this.vData = vData;
@@ -117,7 +117,7 @@ class MIPGurobiSolver
     //            model.optimize();
     //
     //            if (mode.output) {
-    //                model.write(optimConfig.workingDirectory + "gurobi_solution.sol");
+    //                model.write(optimContext.workingDirectory + "gurobi_solution.sol");
     //            }
     //
     //            MIPSolution solution = extractSolution();
@@ -255,7 +255,7 @@ class MIPGurobiSolver
     //    private void addReqToReqLinConstraint()
     //        throws GRBException
     //    {
-    //        TaxiSchedulerParams schedParams = optimConfig.scheduler.getParams();
+    //        TaxiSchedulerParams schedParams = optimContext.scheduler.getParams();
     //        double t_P = schedParams.pickupDuration;
     //        double t_D = schedParams.dropoffDuration;
     //

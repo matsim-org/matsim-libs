@@ -19,7 +19,7 @@
 
 package playground.michalm.taxi.util.stats;
 
-import java.io.PrintWriter;
+import java.io.*;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
@@ -47,13 +47,13 @@ public class HourlyTaxiStats
 
 
     public static final String MAIN_HEADER = // 
-            "\tPassenger_Wait_Time [min]\t\t\t\t\t\t\t\t\t\t" + //
+    "\tPassenger_Wait_Time [min]\t\t\t\t\t\t\t\t\t\t" + //
             "\tEmpty_Drive_Ratio [%]\t\t\t\t\t\t\t\t\t\t" + //
             "\tVehicle_Wait_Ratio [%]\t\t\t\t\t\t\t\t\t\t" + //
             "\tNum_Vehicle_Wait_Ratio [%]\t\t\t\t\t";
 
     public static final String SUB_HEADER = //
-            "hour\tmean\tmin\tpc_2\tpc_5\tpc_25\tpc_50\tpc_75\tpc_95\tpc_98\tmax\t" + //
+    "hour\tmean\tmin\tpc_2\tpc_5\tpc_25\tpc_50\tpc_75\tpc_95\tpc_98\tmax\t" + //
             "hour\tmean\tmin\tpc_2\tpc_5\tpc_25\tpc_50\tpc_75\tpc_95\tpc_98\tmax\t" + //
             "hour\tmean\tmin\tpc_2\tpc_5\tpc_25\tpc_50\tpc_75\tpc_95\tpc_98\tmax\t" + //
             "hour\t<1%\t<25%\t<50%\t<75%\t<100%\t<=100%\t";
@@ -109,5 +109,21 @@ public class HourlyTaxiStats
                 stayLt75PctCount, //
                 stayLt100PctCount, //
                 allCount);
+    }
+
+
+    public static void printAllStats(HourlyTaxiStats[] hourlyStats, String file)
+    {
+        try (PrintWriter hourlyStatsWriter = new PrintWriter(file)) {
+            hourlyStatsWriter.println(HourlyTaxiStats.MAIN_HEADER);
+            hourlyStatsWriter.println(HourlyTaxiStats.SUB_HEADER);
+
+            for (HourlyTaxiStats hs : hourlyStats) {
+                hs.printStats(hourlyStatsWriter);
+            }
+        }
+        catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

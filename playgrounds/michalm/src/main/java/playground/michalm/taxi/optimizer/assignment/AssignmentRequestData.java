@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.dvrp.data.Request;
 
 import playground.michalm.taxi.data.TaxiRequest;
-import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration;
+import playground.michalm.taxi.optimizer.TaxiOptimizerContext;
 
 
 class AssignmentRequestData
@@ -36,10 +36,10 @@ class AssignmentRequestData
     final int dimension;
 
 
-    AssignmentRequestData(TaxiOptimizerConfiguration optimConfig,
+    AssignmentRequestData(TaxiOptimizerContext optimContext,
             SortedSet<TaxiRequest> unplannedRequests, double planningHorizon)
     {
-        double currTime = optimConfig.context.getTime();
+        double currTime = optimContext.context.getTime();
         double maxT0 = currTime + planningHorizon;
         int urgentReqCounter = 0;
         int idx = 0;

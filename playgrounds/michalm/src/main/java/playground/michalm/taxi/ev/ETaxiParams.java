@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2016 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,35 +17,31 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.optimizer;
+package playground.michalm.taxi.ev;
 
-import com.google.common.collect.Iterables;
-
-import playground.michalm.taxi.data.*;
-import playground.michalm.taxi.data.TaxiRequest.TaxiRequestStatus;
-import playground.michalm.taxi.scheduler.TaxiSchedulerUtils;
+import org.apache.commons.configuration.Configuration;
 
 
-public class TaxiOptimizationValidation
+public class ETaxiParams
 {
-    public static void assertNoUnplannedRequestsWhenIdleVehicles(
-            TaxiOptimizerContext optimContext)
+    public static String CHARGE_TIME_STEP = "chargeTimeStep";
+    public static String AUX_DISCHARGE_TIME_STEP = "auxDischargeTimeStep";
+
+    public final int chargeTimeStep;
+    public final int auxDischargeTimeStep;
+
+    public ETaxiParams(Configuration config)
     {
-        ETaxiData taxiData = (ETaxiData)optimContext.context.getVrpData();
+        chargeTimeStep = config.getInt(CHARGE_TIME_STEP);
+        auxDischargeTimeStep = config.getInt(AUX_DISCHARGE_TIME_STEP);
+    }
 
-        int vehCount = Iterables.size(Iterables.filter(taxiData.getVehicles().values(),
-                TaxiSchedulerUtils.createIsIdle(optimContext.scheduler)));
 
-        if (vehCount == 0) {
-            return;//OK
-        }
-
-        if (TaxiRequests.countRequestsWithStatus(taxiData.getTaxiRequests().values(),
-                TaxiRequestStatus.UNPLANNED) == 0) {
-            return; //OK
-        }
-
-        //idle vehicles and unplanned requests
-        throw new IllegalStateException();
+    //just an example
+    public ETaxiParams()
+    {
+        //no need to simulate with 1-second time step
+        chargeTimeStep = 5; //5 s ==> 0.35% SOC (fast charging, 50 kW)
+        auxDischargeTimeStep = 60; //1 min ==> 0.25% SOC (3 kW aux power)
     }
 }
