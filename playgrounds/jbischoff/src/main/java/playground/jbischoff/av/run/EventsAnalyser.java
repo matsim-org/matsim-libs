@@ -43,7 +43,7 @@ public class EventsAnalyser {
 		String inputFile = pre+"runs/xx_with_events/21_jb/nullevents21.out.xml.gz";
 		EventsManager events = EventsUtils.createEventsManager();
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenario).readFile(pre+"scenario/networkc.xml.gz");
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(pre+"scenario/networkc.xml.gz");
 		
 		TravelDistanceTimeEvaluator tdtc = new TravelDistanceTimeEvaluator(scenario.getNetwork(), 24*3600);
 		TaxiCustomerWaitTimeAnalyser twc = new TaxiCustomerWaitTimeAnalyser(scenario, Double.MAX_VALUE);

@@ -43,10 +43,10 @@ import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 import org.matsim.contrib.transEnergySim.analysis.charging.ChargingLogRowLinkLevel;
 import org.matsim.contrib.transEnergySim.analysis.charging.ChargingOutputLog;
 import org.matsim.contrib.transEnergySim.analysis.charging.InductiveChargingAtRoadOutputLog;
-import org.matsim.contrib.transEnergySim.controllers.AddHandlerAtStartupControler;
 import org.matsim.contrib.transEnergySim.vehicles.api.InductivlyChargable;
 import org.matsim.contrib.transEnergySim.vehicles.api.Vehicle;
 import org.matsim.contrib.transEnergySim.vehicles.api.AbstractVehicleWithBattery;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
@@ -73,7 +73,7 @@ public class InductiveStreetCharger implements PersonDepartureEventHandler, Link
 	
 	private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
 
-	public InductiveStreetCharger(HashMap<Id<Vehicle>, Vehicle> vehicles, Network network, AddHandlerAtStartupControler controller) {
+	public InductiveStreetCharger(HashMap<Id<Vehicle>, Vehicle> vehicles, Network network, MatsimServices controller) {
 		this.setVehicles(vehicles);
 		controller.addControlerListener(this);
 		enableLogging();

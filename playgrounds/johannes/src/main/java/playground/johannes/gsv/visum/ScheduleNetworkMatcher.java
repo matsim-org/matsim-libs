@@ -57,7 +57,7 @@ public class ScheduleNetworkMatcher {
 		
 		config.transit().setUseTransit(true);
 		
-		MatsimNetworkReader netReader = new MatsimNetworkReader(scenario);
+		MatsimNetworkReader netReader = new MatsimNetworkReader(scenario.getNetwork());
 		netReader.readFile("/home/johannes/gsv/matsim/studies/netz2030/data/network.rail.xml");
 		
 		

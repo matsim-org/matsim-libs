@@ -30,7 +30,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -80,7 +79,7 @@ public class AnalyzePlansActivities {
 		new FacilitiesReaderMatsimV1(this.scenario).readFile(facilitiesFile);
 
 		log.info("reading the network ...");
-		new MatsimNetworkReader(this.scenario).readFile(networkFile);
+		new MatsimNetworkReader(this.scenario.getNetwork()).readFile(networkFile);
 
 		log.info("reading the plans file " + plansFile);
 		final PopulationReader plansReader = new MatsimPopulationReader(this.scenario);

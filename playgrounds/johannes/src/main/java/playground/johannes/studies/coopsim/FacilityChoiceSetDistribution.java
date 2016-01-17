@@ -60,7 +60,7 @@ public class FacilityChoiceSetDistribution {
 		config.addCoreModules();
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 
-		MatsimNetworkReader netReader = new MatsimNetworkReader(scenario);
+		MatsimNetworkReader netReader = new MatsimNetworkReader(scenario.getNetwork());
 		netReader.readFile("/Users/jillenberger/Work/shared-svn/studies/schweiz-ivtch/baseCase/network/ivtch.xml");
 
 		MatsimFacilitiesReader facReader = new MatsimFacilitiesReader(scenario);

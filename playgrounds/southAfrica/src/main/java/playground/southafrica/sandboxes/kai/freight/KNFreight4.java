@@ -50,10 +50,7 @@ import org.matsim.core.config.consistency.VspConfigConsistencyCheckerImpl;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspDefaultsCheckingLevel;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.ControlerDefaults;
-import org.matsim.core.controler.ControlerUtils;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.controler.*;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
@@ -290,7 +287,7 @@ public class KNFreight4 {
 	}
 
 
-	private static CarrierPlanStrategyManagerFactory createMyStrategyManager(final Scenario scenario, final Controler controler) {
+	private static CarrierPlanStrategyManagerFactory createMyStrategyManager(final Scenario scenario, final MatsimServices controler) {
 		return new CarrierPlanStrategyManagerFactory() {
 			@Override
 			public GenericStrategyManager<CarrierPlan, Carrier> createStrategyManager() {

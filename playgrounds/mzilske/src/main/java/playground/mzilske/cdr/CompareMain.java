@@ -13,6 +13,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.contrib.cadyts.car.CadytsCarModule;
 import org.matsim.contrib.cadyts.car.CadytsContext;
 import org.matsim.contrib.cadyts.general.CadytsPlanChanger;
 import org.matsim.core.config.Config;
@@ -188,7 +189,7 @@ public class CompareMain {
 		return signature;
 	}
 
-	public static VolumesAnalyzer runWithTwoPlansAndCadyts(String outputDirectory, Network network, final LinkToZoneResolver linkToZoneResolver, Sightings allSightings, Counts counts) {
+	public static VolumesAnalyzer runWithTwoPlansAndCadyts(String outputDirectory, Network network, final LinkToZoneResolver linkToZoneResolver, Sightings allSightings, Counts<Link> counts) {
 		Config config = ConfigUtils.createConfig();
 		ActivityParams sightingParam = new ActivityParams("sighting");
 		// sighting.setOpeningTime(0.0);
@@ -220,13 +221,13 @@ public class CompareMain {
 		PopulationFromSightings.createPopulationWithTwoPlansEach(scenario2, linkToZoneResolver, allSightings);
 //		PopulationFromSightings.preparePopulation(scenario2, linkToZoneResolver, allSightings);
 
-		final CadytsContext context = new CadytsContext(config, counts) ;
 		Controler controler = new Controler(scenario2);
-		controler.addControlerListener(context);
+		controler.addOverridingModule(new CadytsCarModule(counts));
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				addPlanStrategyBinding("ccc").toProvider(new javax.inject.Provider<PlanStrategy>() {
+					@Inject CadytsContext context;
 					@Override
 					public PlanStrategy get() {
 						final CadytsPlanChanger planSelector = new CadytsPlanChanger(scenario2, context);
@@ -241,7 +242,7 @@ public class CompareMain {
 		double sum=0.0;
 		for (Person person : scenario2.getPopulation().getPersons().values()) {
 			Plan plan = person.getSelectedPlan();
-			double currentPlanCadytsCorrection = calcCadytsScore(context, plan);
+			double currentPlanCadytsCorrection = calcCadytsScore(controler.getInjector().getInstance(CadytsContext.class), plan);
 			sum += Math.abs(currentPlanCadytsCorrection);
 		}
 		System.out.println(sum);

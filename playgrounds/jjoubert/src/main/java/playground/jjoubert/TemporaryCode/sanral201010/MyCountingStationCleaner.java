@@ -81,7 +81,7 @@ public class MyCountingStationCleaner {
 		MyCountingStationCleaner ccs = new MyCountingStationCleaner();
 		
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		NetworkReaderMatsimV1 nr = new NetworkReaderMatsimV1(sc);
+		NetworkReaderMatsimV1 nr = new NetworkReaderMatsimV1(sc.getNetwork());
 		nr.parse(networkFilename);
 		
 		ccs.readLinkIds(linkFilename);

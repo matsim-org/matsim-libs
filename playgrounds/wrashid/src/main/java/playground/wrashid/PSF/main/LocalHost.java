@@ -11,22 +11,22 @@ public class LocalHost implements ParametersPSFMutator {
 		pssControler.runMATSimIterations();
 		
 		/*
-		Controler controler = new Controler("a:\\data\\matsim\\input\\runRW1002\\config.xml");
-		controler.addControlerListener(new AddEnergyScoreListener());
-		controler.setOverwriteFiles(true);
+		Controler services = new Controler("a:\\data\\matsim\\input\\runRW1002\\config.xml");
+		services.addControlerListener(new AddEnergyScoreListener());
+		services.setOverwriteFiles(true);
 
 		LogEnergyConsumption logEnergyConsumption = new LogEnergyConsumption(
-				controler);
-		LogParkingTimes logParkingTimes = new LogParkingTimes(controler);
+				services);
+		LogParkingTimes logParkingTimes = new LogParkingTimes(services);
 		SimulationStartupListener simulationStartupListener = new SimulationStartupListener(
-				controler);
-		controler.addControlerListener(simulationStartupListener);
+				services);
+		services.addControlerListener(simulationStartupListener);
 
 		simulationStartupListener.addEventHandler(logEnergyConsumption);
 		simulationStartupListener.addEventHandler(logParkingTimes);
 		simulationStartupListener.addParameterPSFMutator(new Berlin());
 
-		controler.run();
+		services.run();
 		
 		OptimizedCharger optimizedCharger= new OptimizedCharger(logEnergyConsumption.getEnergyConsumption(),logParkingTimes.getParkingTimes());
 		HashMap<Id, ChargingTimes> chargingTimes=optimizedCharger.getChargingTimes();

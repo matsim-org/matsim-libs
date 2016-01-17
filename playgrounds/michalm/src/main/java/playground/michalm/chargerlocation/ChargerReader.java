@@ -92,7 +92,7 @@ public class ChargerReader
         double power = 50_000;//50kW 
 
         Scenario scenario = ScenarioUtils.createScenario(VrpConfigUtils.createConfig());
-        new MatsimNetworkReader(scenario).readFile(networkFile);
+        new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
 
         Map<Id<Zone>, Zone> zones = BerlinZoneUtils.readZones(zonesXmlFile, zonesShpFile);
 

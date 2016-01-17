@@ -45,7 +45,7 @@ public class TransitionSequence<U extends DecisionVariable> {
 	private final LinkedList<Transition<U>> transitions = new LinkedList<Transition<U>>();
 
 	private SimulatorState lastState = null;
-	
+
 	private int iterations = 0;
 
 	// -------------------- CONSTRUCTION --------------------
@@ -89,7 +89,7 @@ public class TransitionSequence<U extends DecisionVariable> {
 		this.transitions.add(new Transition<>(decisionVariable, delta, toState
 				.getReferenceToVectorRepresentation(), objectiveFunctionValue));
 		this.lastState = toState;
-		
+
 		this.iterations++;
 	}
 
@@ -114,10 +114,16 @@ public class TransitionSequence<U extends DecisionVariable> {
 		return this.transitions;
 	}
 
+	// TODO NEW
+	// remember: transitions are added at the end (and removed from the front)
+	Transition<U> getLastTransition() {
+		return this.transitions.getLast();
+	}
+
 	public int iterations() {
 		return this.iterations;
 	}
-	
+
 	public int size() {
 		return this.transitions.size();
 	}

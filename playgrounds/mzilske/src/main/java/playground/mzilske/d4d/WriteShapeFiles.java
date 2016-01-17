@@ -15,7 +15,7 @@ public class WriteShapeFiles {
 	public static void main(String[] args) {
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
-		new MatsimNetworkReader(scenario).readFile(D4DConsts.WORK_DIR + "network-simplified.xml");
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(D4DConsts.WORK_DIR + "network-simplified.xml");
 		new MatsimPopulationReader(scenario).readFile(D4DConsts.WORK_DIR + "population.xml");
 		SelectedPlans2ESRIShape s1 = new SelectedPlans2ESRIShape(scenario.getPopulation(), scenario.getNetwork(), MGC.getCRS(D4DConsts.TARGET_CRS), D4DConsts.WORK_DIR);
 		s1.write();

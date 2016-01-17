@@ -9,6 +9,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutility;
@@ -29,7 +30,7 @@ public class TryOutTTCalculation {
 
 		// load the scenario ...
 
-		final Controler controler = new Controler(
+		final MatsimServices controler = new Controler(
 				"test/input/zurich/config_base-case.xml");
 		final Scenario scenario = controler.getScenario();
 

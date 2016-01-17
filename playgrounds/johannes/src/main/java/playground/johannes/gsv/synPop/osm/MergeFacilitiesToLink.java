@@ -82,7 +82,7 @@ public class MergeFacilitiesToLink {
 		logger.info("Loading network...");
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
-		MatsimNetworkReader netReader = new MatsimNetworkReader(scenario);
+		MatsimNetworkReader netReader = new MatsimNetworkReader(scenario.getNetwork());
 		netReader.readFile(args[args.length - 2]);
 		Network network = scenario.getNetwork();
 		

@@ -36,9 +36,11 @@ import floetteroed.utilities.statisticslogging.Statistic;
 public class TransientObjectiveFunctionValue<U extends DecisionVariable>
 		implements Statistic<SamplingStage<U>> {
 
+	public static final String LABEL = "Q_interpol(alpha)";
+	
 	@Override
 	public String label() {
-		return "Q_interpol(alpha)";
+		return LABEL;
 	}
 
 	@Override

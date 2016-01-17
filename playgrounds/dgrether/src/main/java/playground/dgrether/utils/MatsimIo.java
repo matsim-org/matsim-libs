@@ -30,8 +30,6 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.scenario.MutableScenario;
-import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scenario.ScenarioUtils.ScenarioBuilder;
 
 
@@ -55,7 +53,7 @@ public class MatsimIo {
 	}
 
 	public static void loadNetwork(final String filename, final Scenario scenario) {
-		new MatsimNetworkReader(scenario).readFile(filename);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(filename);
 	}
 
 

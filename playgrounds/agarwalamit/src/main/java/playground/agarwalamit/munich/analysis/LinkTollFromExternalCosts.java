@@ -38,15 +38,15 @@ import playground.agarwalamit.analysis.emission.EmissionLinkAnalyzer;
 
 public class LinkTollFromExternalCosts {
 
-	private int noOfTimeBin;
-	private boolean considerCO2Costs = true;
+	private final int noOfTimeBin;
+	private final boolean considerCO2Costs ;
 
 	public LinkTollFromExternalCosts (){
-		noOfTimeBin = 1;
+		this(1,true);
 	}
 
 	public LinkTollFromExternalCosts (int noOfTimeBin){
-		this.noOfTimeBin = noOfTimeBin;
+		this(noOfTimeBin,true);
 	}
 
 	public LinkTollFromExternalCosts (int noOfTimeBin, boolean considerCO2Costs){
@@ -58,7 +58,7 @@ public class LinkTollFromExternalCosts {
 	 * @param internalizeEmissionOrCongestion emission congestion or both
 	 * Total external costs includes only emission and caused congestion costs. This is basically toll on each link 
 	 */
-	public Map<Id<Link>, Double> getLinkToTotalExternalCost(Scenario sc, String internalizeEmissionOrCongestion){
+	public Map<Id<Link>, Double> getLinkToTotalExternalCost(final Scenario sc, final String internalizeEmissionOrCongestion){
 
 		if(noOfTimeBin!=1) throw new RuntimeException("This method is not yet adapted to more than 1 time bin. Aborting ....");
 		double simEndTime = 30*2400;
@@ -90,13 +90,13 @@ public class LinkTollFromExternalCosts {
 	 * @param sc 
 	 * @return link to caused congestion costs which is basically equal to the toll.
 	 */
-	public Map<Double,Map<Id<Link>, Double>> getLink2CongestionToll(Scenario sc){
+	public Map<Double,Map<Id<Link>, Double>> getLink2CongestionToll(final Scenario sc){
 
 		Map<Double, Map<Id<Link>, Double>>  linkTolls = new HashMap<>();
 
 		Config config = sc.getConfig();
 
-		double vtts_car = ((config.planCalcScore().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() /3600) +
+		double vttsCar = ((config.planCalcScore().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() /3600) +
 				(config.planCalcScore().getPerforming_utils_hr()/3600)) 
 				/ (config.planCalcScore().getMarginalUtilityOfMoney());
 
@@ -110,14 +110,14 @@ public class LinkTollFromExternalCosts {
 		for (double d :  linkDelays.keySet()){
 			Map<Id<Link>,Double > tolls = new HashMap<>();
 			for (Id<Link> linkid : linkDelays.get(d).keySet()){
-				tolls.put(linkid, linkDelays.get(d).get(linkid) * vtts_car);
+				tolls.put(linkid, linkDelays.get(d).get(linkid) * vttsCar);
 			}
 			linkTolls.put(d,tolls);
 		}
 		return linkTolls;
 	}
 
-	public Map<Id<Link>, Double> getLink2EmissionToll(Scenario sc){
+	public Map<Id<Link>, Double> getLink2EmissionToll(final Scenario sc){
 		int lastIt = sc.getConfig().controler().getLastIteration();
 		String emissionEventsFile = sc.getConfig().controler().getOutputDirectory()+"/ITERS/it."+lastIt+"/"+lastIt+".emission.events.xml.gz";
 		EmissionLinkAnalyzer emissionAnalyzer = new EmissionLinkAnalyzer(sc.getConfig().qsim().getEndTime(), emissionEventsFile, noOfTimeBin);

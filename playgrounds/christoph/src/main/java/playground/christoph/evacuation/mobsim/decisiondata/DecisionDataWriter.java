@@ -44,10 +44,10 @@ public class DecisionDataWriter implements AfterMobsimListener {
 	@Override
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
 		
-		String personFile = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), personDecisionDataFile);
+		String personFile = event.getServices().getControlerIO().getIterationFilename(event.getIteration(), personDecisionDataFile);
 		this.writePersonDecisionsToFile(personFile);
 		
-		String householdFile = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), householdDecisionDataFile);
+		String householdFile = event.getServices().getControlerIO().getIterationFilename(event.getIteration(), householdDecisionDataFile);
 		this.writeHouseholdDecisionsToFile(householdFile);
 	}
 

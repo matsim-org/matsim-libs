@@ -23,7 +23,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -60,7 +60,7 @@ public class RetailersLocationListener
   private final boolean parallel = false;
   private String facilityIdFile = null;
   private Retailers retailers;
-  private Controler controler;
+  private MatsimServices controler;
   private LinksRetailerReaderV2 lrr;
   private RetailersSummaryWriter rsw;
   private CountFacilityCustomers cfc;
@@ -68,7 +68,7 @@ public class RetailersLocationListener
   @Override
 	public void notifyStartup(StartupEvent event)
   {
-    this.controler = event.getControler();
+    this.controler = event.getServices();
     FreespeedTravelTimeAndDisutility timeCostCalc = new FreespeedTravelTimeAndDisutility(this.controler.getConfig().planCalcScore());
       ModeRouteFactory routeFactory = ((PopulationFactoryImpl) this.controler.getScenario().getPopulation().getFactory()).getModeRouteFactory();
 
@@ -124,7 +124,7 @@ public class RetailersLocationListener
         this.lrr.init();
         final PersonAlgorithm router =
     		  new PlanRouter(
-    				  event.getControler().getTripRouterProvider().get() );
+    				  event.getServices().getTripRouterProvider().get() );
         for (Iterator<Retailer> localIterator = this.retailers.getRetailers().values().iterator(); localIterator.hasNext(); ) {
         	r = localIterator.next();
         	this.rsw.write(r, event.getIteration(), this.cfc);

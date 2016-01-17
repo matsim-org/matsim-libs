@@ -44,14 +44,13 @@ import com.vividsolutions.jts.geom.Coordinate;
  */
 public class MatsimNetwork2Shape {
 
-	private static final String clusterPathDesktop = "/Users/aagarwal/Desktop/ils/agarwal/siouxFalls/";
-	
-	private static final String matsimNetwork = clusterPathDesktop+"/output/run0/output_network.xml.gz";
-	private static final String outShapeLocation = "./clusterOutput/networkShape/";
+	private static final String CLUTER_DESKTOP_LOCATION = "/Users/aagarwal/Desktop/ils/agarwal/siouxFalls/";
+	private static final String MATSIM_NETWORK = CLUTER_DESKTOP_LOCATION+"/output/run0/output_network.xml.gz";
+	private static final String OUT_SHAPE_LOCATION = "./clusterOutput/networkShape/";
 	
 	public static void main(String[] args) {
 		Config config = ConfigUtils.createConfig();
-        config.network().setInputFile(matsimNetwork);
+        config.network().setInputFile(MATSIM_NETWORK);
         Scenario scenario = ScenarioUtils.loadScenario(config);
         Network network = scenario.getNetwork();
         
@@ -76,7 +75,7 @@ public class MatsimNetwork2Shape {
 			features.add(ft);
         }
        new File("./clusterOutput/networkShape/").mkdir();
-        ShapeFileWriter.writeGeometries(features, outShapeLocation+"network_links.shp");
+        ShapeFileWriter.writeGeometries(features, OUT_SHAPE_LOCATION+"network_links.shp");
         features = new ArrayList<SimpleFeature>();
 		PointFeatureFactory nodeFactory = new PointFeatureFactory.Builder().
 				setCrs(crs).
@@ -88,6 +87,6 @@ public class MatsimNetwork2Shape {
 			SimpleFeature ft = nodeFactory.createPoint(node.getCoord(), new Object[] {node.getId().toString()}, null);
 			features.add(ft);
 		}
-		ShapeFileWriter.writeGeometries(features, outShapeLocation+"network_nodes.shp");
+		ShapeFileWriter.writeGeometries(features, OUT_SHAPE_LOCATION+"network_nodes.shp");
 	}
 }

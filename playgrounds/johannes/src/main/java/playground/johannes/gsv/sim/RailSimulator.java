@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
@@ -71,7 +72,7 @@ public class RailSimulator {
 				true ?
 						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
 						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
-		//		generateFacilities(controler);
+		//		generateFacilities(services);
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
@@ -106,7 +107,7 @@ public class RailSimulator {
 		
 	}
 
-	private static void generateFacilities(Controler controler) {
+	private static void generateFacilities(MatsimServices controler) {
 		Population pop = controler.getScenario().getPopulation();
         ActivityFacilities facilities = controler.getScenario().getActivityFacilities();
 		
@@ -127,7 +128,7 @@ public class RailSimulator {
 	
 	private static class AnalyzerListiner implements IterationEndsListener, IterationStartsListener, StartupListener {
 
-		private Controler controler;
+		private MatsimServices controler;
 		
 		private TrajectoryAnalyzerTask task;
 		
@@ -146,7 +147,7 @@ public class RailSimulator {
 //		private TObjectDoubleHashMap<Link> counts;
 		
 		/* (non-Javadoc)
-		 * @see org.matsim.core.controler.listener.IterationEndsListener#notifyIterationEnds(org.matsim.core.controler.events.IterationEndsEvent)
+		 * @see org.matsim.core.services.listener.IterationEndsListener#notifyIterationEnds(org.matsim.core.services.events.IterationEndsEvent)
 		 */
 		@Override
 		public void notifyIterationEnds(IterationEndsEvent event) {
@@ -156,10 +157,10 @@ public class RailSimulator {
 //				KMLCountsDiffPlot kmlplot = new KMLCountsDiffPlot();
 				KMLRailCountsWriter railCountsWriter = new KMLRailCountsWriter();
 				String file = controler.getControlerIO().getIterationPath(event.getIteration()) + "/counts.kmz";
-//				kmlplot.write(volAnalyzer, counts, 1.0, file, controler.getNetwork());
+//				kmlplot.write(volAnalyzer, counts, 1.0, file, services.getNetwork());
 				RailCounts simCounts = countsCollector.getRailCounts();
 
-                railCountsWriter.write(simCounts, obsCounts, event.getControler().getScenario().getNetwork(), event.getControler().getScenario().getTransitSchedule(), lineAttribs, file, 5);
+                railCountsWriter.write(simCounts, obsCounts, event.getServices().getScenario().getNetwork(), event.getServices().getScenario().getTransitSchedule(), lineAttribs, file, 5);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -168,7 +169,7 @@ public class RailSimulator {
 		}
 
 		/* (non-Javadoc)
-		 * @see org.matsim.core.controler.listener.IterationStartsListener#notifyIterationStarts(org.matsim.core.controler.events.IterationStartsEvent)
+		 * @see org.matsim.core.services.listener.IterationStartsListener#notifyIterationStarts(org.matsim.core.services.events.IterationStartsEvent)
 		 */
 		@Override
 		public void notifyIterationStarts(IterationStartsEvent event) {
@@ -176,7 +177,7 @@ public class RailSimulator {
 		}
 
 		/* (non-Javadoc)
-		 * @see org.matsim.core.controler.listener.StartupListener#notifyStartup(org.matsim.core.controler.events.StartupEvent)
+		 * @see org.matsim.core.services.listener.StartupListener#notifyStartup(org.matsim.core.services.events.StartupEvent)
 		 */
 		@Override
 		public void notifyStartup(StartupEvent event) {
@@ -188,20 +189,20 @@ public class RailSimulator {
 			
 			countsCollector = new RailCountsCollector(lineAttribs);
 			controler.getEvents().addHandler(countsCollector);
-//			volAnalyzer = new VolumesAnalyzer(Integer.MAX_VALUE, Integer.MAX_VALUE, controler.getNetwork());
-//			controler.getEvents().addHandler(volAnalyzer);
+//			volAnalyzer = new VolumesAnalyzer(Integer.MAX_VALUE, Integer.MAX_VALUE, services.getNetwork());
+//			services.getEvents().addHandler(volAnalyzer);
 			
-			String file = event.getControler().getConfig().getParam("gsv", "counts");
-            obsCounts = RailCounts.createFromFile(file, lineAttribs, event.getControler().getScenario().getNetwork(), event.getControler().getScenario().getTransitSchedule());
+			String file = event.getServices().getConfig().getParam("gsv", "counts");
+            obsCounts = RailCounts.createFromFile(file, lineAttribs, event.getServices().getScenario().getNetwork(), event.getServices().getScenario().getTransitSchedule());
 			
 //			Map<String, TableHandler> tableHandlers = new HashMap<String, NetFileReader.TableHandler>();
-//			LineRouteCountsHandler countsHandler = new LineRouteCountsHandler(controler.getNetwork());
+//			LineRouteCountsHandler countsHandler = new LineRouteCountsHandler(services.getNetwork());
 //			tableHandlers.put("LINIENROUTENELEMENT", countsHandler);
 //			NetFileReader netReader = new NetFileReader(tableHandlers);
 //			NetFileReader.FIELD_SEPARATOR = "\t";
 //			
 //			try {
-//				netReader.read(event.getControler().getConfig().getParam("gsv", "counts"));
+//				netReader.read(event.getServices().getConfig().getParam("gsv", "counts"));
 //			} catch (IOException e) {
 //				// TODO Auto-generated catch block
 //				e.printStackTrace();

@@ -39,7 +39,6 @@ import org.matsim.counts.MatsimCountsReader;
 import org.matsim.counts.algorithms.CountSimComparisonKMLWriter;
 import org.matsim.counts.algorithms.CountSimComparisonTableWriter;
 import org.matsim.counts.algorithms.CountsComparisonAlgorithm;
-import org.matsim.counts.algorithms.CountsComparisonAlgorithm.VolumesForId;
 import org.matsim.counts.algorithms.CountsHtmlAndGraphsWriter;
 import org.matsim.counts.algorithms.graphs.CountsErrorGraphCreator;
 import org.matsim.counts.algorithms.graphs.CountsLoadCurveGraphCreator;
@@ -194,7 +193,7 @@ public class CountsAnalyser {
 
 	protected NetworkImpl loadNetwork() {
 		printNote("", "  reading network xml file... ");
-		new MatsimNetworkReader(scenario).readFile(this.scenario.getConfig().network().getInputFile());
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(this.scenario.getConfig().network().getInputFile());
 		printNote("", "  done");
 		return (NetworkImpl) scenario.getNetwork();
 	}

@@ -14,8 +14,8 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
-import org.matsim.core.replanning.DefaultPlanStrategiesModule.DefaultSelector;
-import org.matsim.core.replanning.DefaultPlanStrategiesModule.DefaultStrategy;
+import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultSelector;
+import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultStrategy;
 
 public class CarSharingConfigCreator {
 	

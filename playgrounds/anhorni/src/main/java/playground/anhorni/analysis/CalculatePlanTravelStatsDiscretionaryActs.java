@@ -58,7 +58,7 @@ public class CalculatePlanTravelStatsDiscretionaryActs {
 	}
 	
 	private void init(final String plansFilePath, final String networkFilePath) {
-		new MatsimNetworkReader(scenario).readFile(networkFilePath);		
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFilePath);
 		MatsimPopulationReader populationReader = new MatsimPopulationReader(this.scenario);
 		populationReader.readFile(plansFilePath);
 	}

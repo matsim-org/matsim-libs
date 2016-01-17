@@ -34,7 +34,7 @@ public class NetworkWriterReaderV1Test extends AbstractNetworkWriterReaderTest {
 	
 	@Override
 	protected void readNetwork(final Scenario scenario, final String filename) {
-		NetworkReaderMatsimV1 reader = new NetworkReaderMatsimV1(scenario);
+		NetworkReaderMatsimV1 reader = new NetworkReaderMatsimV1(scenario.getNetwork());
 		reader.parse(filename);
 	}
 	

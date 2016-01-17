@@ -132,7 +132,7 @@ public class Analyzer {
 	}
 		
 	public void analyze() {		
-		new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());		
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(config.network().getInputFile());
 		new FacilitiesReaderMatsimV1(scenario).readFile(config.facilities().getInputFile());
 		
 		ArrayList<Double> utilitiesRelative = new ArrayList<Double>();

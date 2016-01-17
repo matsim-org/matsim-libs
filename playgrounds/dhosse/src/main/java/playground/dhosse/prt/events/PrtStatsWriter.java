@@ -77,7 +77,7 @@ public class PrtStatsWriter {
 	private void writeAppendedVehicleStats(IterationEndsEvent event) {
 		
 		BufferedWriter writer = null;
-		String path = event.getControler().getControlerIO().getOutputPath() + "/vehicleStats.txt";
+		String path = event.getServices().getControlerIO().getOutputPath() + "/vehicleStats.txt";
 		
 			try {
 				
@@ -116,7 +116,7 @@ public class PrtStatsWriter {
 	private void writeAppendedPassengerStats(IterationEndsEvent event) {
 
 		BufferedWriter writer = null;
-		String path = event.getControler().getControlerIO().getOutputPath() + "/passengerStats.txt";
+		String path = event.getServices().getControlerIO().getOutputPath() + "/passengerStats.txt";
 		
 			try {
 				if(event.getIteration() == 0){
@@ -215,7 +215,7 @@ public class PrtStatsWriter {
 	private void writePrtStats(IterationEndsEvent event) {
 		
 		BufferedWriter writer = null;
-		String path = event.getControler().getControlerIO().getOutputPath() + "/prtStats.txt";
+		String path = event.getServices().getControlerIO().getOutputPath() + "/prtStats.txt";
 		
 		try {
 			

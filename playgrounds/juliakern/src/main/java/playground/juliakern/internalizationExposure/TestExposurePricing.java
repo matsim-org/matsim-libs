@@ -238,7 +238,7 @@ public class TestExposurePricing {
 //		
 //		EmissionControlerListener ecl = new EmissionControlerListener(controler);
 //		controler.addControlerListener(ecl);
-//		controler.setScoringFunctionFactory(new ResponsibilityScoringFunctionFactory(config, controler.getNetwork(), ecl));
+//		services.setScoringFunctionFactory(new ResponsibilityScoringFunctionFactory(config, services.getNetwork(), ecl));
 		//controler.setTravelDisutilityFactory(new ResDisFactory(ecl, ecl.emissionModule, new EmissionCostModule(1.0)));
 		
 		EmissionModule emissionModule = new EmissionModule(scenario);

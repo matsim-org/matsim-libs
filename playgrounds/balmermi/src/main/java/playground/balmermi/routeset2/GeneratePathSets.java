@@ -157,7 +157,7 @@ public class GeneratePathSets {
 
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario).readFile(inputNetworkFile);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(inputNetworkFile);
 
 		Gbl.printMemoryUsage();
 

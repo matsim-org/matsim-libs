@@ -51,18 +51,19 @@ public class LaemmerSignalControlerListener implements SignalsControllerListener
 	
 	@Override
 	public void notifyStartup(StartupEvent event) {
-		MutableScenario scenario = (MutableScenario) event.getControler().getScenario();
+		MutableScenario scenario = (MutableScenario) event.getServices().getScenario();
 		
-		this.sensorManager = new DgSensorManager(event.getControler().getScenario().getNetwork());
+		this.sensorManager = new DgSensorManager(event.getServices().getScenario().getNetwork());
 		this.sensorManager.setLaneDefinitions((Lanes) scenario.getScenarioElement(Lanes.ELEMENT_NAME));
-		event.getControler().getEvents().addHandler(sensorManager);
+		event.getServices().getEvents().addHandler(sensorManager);
 		
 		FromDataBuilder modelBuilder = new FromDataBuilder(scenario, 
-				new LaemmerSignalModelFactory(new DefaultSignalModelFactory(), sensorManager) , event.getControler().getEvents());
+				new LaemmerSignalModelFactory(new DefaultSignalModelFactory(), sensorManager) , event.getServices().getEvents());
 		this.signalManager = modelBuilder.createAndInitializeSignalSystemsManager();
 		
 		SignalEngine engine = new QSimSignalEngine(this.signalManager);
-		event.getControler().getMobsimListeners().add(engine);
+//		event.getServices().getMobsimListeners().add(engine);
+		throw new RuntimeException();
 	}
 
 

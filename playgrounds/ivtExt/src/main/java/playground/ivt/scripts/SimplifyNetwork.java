@@ -36,7 +36,7 @@ public class SimplifyNetwork {
 		final String outputNetworkFile = args[ 1 ];
 
 		final Scenario sc = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
-		new MatsimNetworkReader( sc ).readFile( inputNetworkFile );
+		new MatsimNetworkReader(sc.getNetwork()).readFile( inputNetworkFile );
 
 		final NetworkSimplifier simplifier = new NetworkSimplifier();
 		simplifier.setMergeLinkStats( true );

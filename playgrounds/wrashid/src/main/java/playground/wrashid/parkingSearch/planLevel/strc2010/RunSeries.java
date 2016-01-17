@@ -3,6 +3,7 @@ package playground.wrashid.parkingSearch.planLevel.strc2010;
 import java.io.File;
 
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
@@ -35,7 +36,7 @@ public class RunSeries {
 		return controler;
 	}
 	
-	private static void addOutputFolderPathToControler(Controler controler){
+	private static void addOutputFolderPathToControler(MatsimServices controler){
 		String outputFolder=getOutputFolderFullPath(GlobalRegistry.runNumber);
 		new File(outputFolder).mkdir();
 		String iterationFoler=getOutputFolderFullPath(GlobalRegistry.runNumber)+"ITERS/";
@@ -46,7 +47,7 @@ public class RunSeries {
 			@Override
 			public void notifyStartup(StartupEvent event) {
 				String outputFolder=getOutputFolderFullPath(GlobalRegistry.runNumber);
-				Controler controler= event.getControler();
+				MatsimServices controler= event.getServices();
 				OutputDirectoryHierarchy controlerIO=new OutputDirectoryHierarchy(
 						outputFolder,
 								false ? OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles : OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
@@ -54,7 +55,7 @@ public class RunSeries {
 				//TODO: write tests for this, which fail when the variable or method names change (and as such can be easily adapted).
 				
 				// TODO: This can be avoided: load first the config file and change the outputDirectory variable and give that to
-				// controler constructor as parameter.
+				// services constructor as parameter.
 				
 				
 				// TODO: perhaps config files are really not needed => just set all parameters in code.

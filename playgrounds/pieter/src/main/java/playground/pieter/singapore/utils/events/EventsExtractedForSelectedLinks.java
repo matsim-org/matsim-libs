@@ -33,7 +33,7 @@ public class EventsExtractedForSelectedLinks {
 
 	private void populateList(String idFile, String networkFile)
 			throws IOException {
-		new MatsimNetworkReader(scenario).readFile(networkFile);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
 		BufferedReader reader = new BufferedReader(new FileReader(idFile));
 		String line = reader.readLine();
 		line = reader.readLine();

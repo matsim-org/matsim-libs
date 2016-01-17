@@ -75,7 +75,7 @@ public class ScheduleCutter {
         Config config = ConfigUtils.loadConfig(args[0]);
         Scenario scenario = ScenarioUtils.createScenario(config);
         scenario.getConfig().transit().setUseTransit(true);
-        new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
+        new MatsimNetworkReader(scenario.getNetwork()).readFile(config.network().getInputFile());
         new TransitScheduleReader(scenario).readFile(config.transit().getTransitScheduleFile());
 		Vehicles vehicles = VehicleUtils.createVehiclesContainer();
 		new VehicleReaderV1(vehicles).readFile(config.transit().getVehiclesFile());

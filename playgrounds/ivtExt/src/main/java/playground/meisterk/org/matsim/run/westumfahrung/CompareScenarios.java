@@ -346,7 +346,7 @@ public class CompareScenarios {
 
 			MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 			Network network = scenario.getNetwork();
-			new MatsimNetworkReader(scenario).readFile(this.networkInputFilenames.get(scenarioName));
+			new MatsimNetworkReader(scenario.getNetwork()).readFile(this.networkInputFilenames.get(scenarioName));
 			scenarioNetworks.put(scenarioName, network);
 
 			//Plans plans = playground.meisterk.MyRuns.initMatsimAgentPopulation(plansInputFilenames.get(scenarioName), false, null, network);

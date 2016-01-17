@@ -74,7 +74,7 @@ public class LogLinkTravelTime implements MobsimBeforeSimStepListener, BeforeMob
 	@Override
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
 		
-		this.measuredTravelTime = event.getControler().getLinkTravelTimes();
+		this.measuredTravelTime = event.getServices().getLinkTravelTimes();
 //		data = new HashMap<Id, StringBuffer>();
 //		
 //		for (Link link : links) {
@@ -111,7 +111,7 @@ public class LogLinkTravelTime implements MobsimBeforeSimStepListener, BeforeMob
 			log.info("Writing expected travel time files...");
 			Counter counter = new Counter("Writing expected travel time files: "); 
 			for (Link link : links) {
-				String file = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "expectedLinkTravelTimes_" + link.getId() + ".txt");
+				String file = event.getServices().getControlerIO().getIterationFilename(event.getIteration(), "expectedLinkTravelTimes_" + link.getId() + ".txt");
 		
 				FileOutputStream fos = new FileOutputStream(file);
 				OutputStreamWriter osw = new OutputStreamWriter(fos, charset);
@@ -132,7 +132,7 @@ public class LogLinkTravelTime implements MobsimBeforeSimStepListener, BeforeMob
 				osw.close();
 				fos.close();
 				
-				String chartFile = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "expectedLinkTravelTimes_" + link.getId() + ".png");
+				String chartFile = event.getServices().getControlerIO().getIterationFilename(event.getIteration(), "expectedLinkTravelTimes_" + link.getId() + ".png");
 				createChart(link, chartFile);
 				counter.incCounter();
 			}

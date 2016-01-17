@@ -141,7 +141,7 @@ public class StochasticRouter implements LeastCostPathCalculator {
 		Scenario scenario;
 		MatsimRandom.reset(123);
 		scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenario)
+		new MatsimNetworkReader(scenario.getNetwork())
 				.readFile("data/zurich/altnet_CLEAN.xml");
 		Network network = scenario.getNetwork();
 		StochasticRouter stochasticRouter = new StochasticRouter(network,

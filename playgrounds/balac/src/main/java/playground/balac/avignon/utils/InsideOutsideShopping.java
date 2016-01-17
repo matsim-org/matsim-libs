@@ -17,7 +17,7 @@ public class InsideOutsideShopping {
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		PopulationReader populationReader = new MatsimPopulationReader(scenario);
-		MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario);
+		MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario.getNetwork());
 		
 			populationReader.readFile(args[0]);
 			networkReader.readFile(args[1]);

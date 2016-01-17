@@ -20,7 +20,7 @@ public class VisualizeCarrierPlans {
         Config config = new Config();
 		config.addCoreModules();
 		Scenario scenario = ScenarioUtils.createScenario(config);
-		new MatsimNetworkReader(scenario).readFile("input/usecases/chessboard/network/grid9x9_cap15.xml");
+		new MatsimNetworkReader(scenario.getNetwork()).readFile("input/usecases/chessboard/network/grid9x9_cap15.xml");
 		
 		Carriers carriers = new Carriers();
 		new CarrierPlanXmlReaderV2(carriers).read("output/0.run/ITERS/it."+iteration+"/"+iteration+".carrierPlans.xml");

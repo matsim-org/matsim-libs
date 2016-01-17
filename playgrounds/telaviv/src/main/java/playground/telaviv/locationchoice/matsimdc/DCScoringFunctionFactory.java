@@ -30,8 +30,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
 import org.matsim.core.config.Config;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.population.PlanImpl;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -47,7 +46,7 @@ import playground.telaviv.facilities.FacilitiesCreator;
 import playground.telaviv.locationchoice.CalculateDestinationChoice;
 
 public class DCScoringFunctionFactory implements ScoringFunctionFactory {
-	private final Controler controler;
+	private final MatsimServices controler;
 	private DestinationChoiceBestResponseContext dcContext;
 	private Config config;	
 //	private int iteration = -1;
@@ -58,7 +57,7 @@ public class DCScoringFunctionFactory implements ScoringFunctionFactory {
 
 	private CharyparNagelScoringParameters params = null;
 	
-	public DCScoringFunctionFactory(Config config, Controler controler, DestinationChoiceBestResponseContext dcContext) {
+	public DCScoringFunctionFactory(Config config, MatsimServices controler, DestinationChoiceBestResponseContext dcContext) {
 		this.controler = controler;
 		this.dcContext = dcContext;
 		this.config = config;

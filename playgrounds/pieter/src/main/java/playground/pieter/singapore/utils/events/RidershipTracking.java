@@ -69,7 +69,7 @@ public class RidershipTracking implements Runnable {
     private RidershipTracking( String loResNetwork, String loResSchedule, String loResEvents, String path, String suffix) {
         scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
         scenario.getConfig().transit().setUseTransit(true);
-        new MatsimNetworkReader(scenario).readFile(loResNetwork);
+        new MatsimNetworkReader(scenario.getNetwork()).readFile(loResNetwork);
         new TransitScheduleReader(scenario).readFile(loResSchedule);
         File outpath = new File(new File(loResEvents).getParent() + "/temp");
         outpath.mkdir();

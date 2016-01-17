@@ -278,7 +278,7 @@ public class BusLaneAdderWindow extends LayersWindow implements ActionListener {
 	//Main
 	public static final void main(String[] args) throws NumberFormatException, IOException {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenario).readFile(args[0]);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(args[0]);
 		CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.WGS84_UTM48N);
 		Coord c1 = coordinateTransformation.transform(new Coord(Double.parseDouble(args[2]), Double.parseDouble(args[3])));
 		Coord c2 = coordinateTransformation.transform(new Coord(Double.parseDouble(args[4]), Double.parseDouble(args[5])));

@@ -27,7 +27,8 @@ public class InductiveCharging {
 		// TODO Auto-generated method stub
 		
 		Config config= ConfigUtils.loadConfig("C:/tmp/Inductive charging data/input files/config_Mini_Playground.xml");
-	
+		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+
 		EnergyConsumptionModel ecm=new EnergyConsumptionModelGalus();
 		
 		HashMap<Id<Vehicle>, Vehicle> vehicles=new HashMap<>();
@@ -67,10 +68,6 @@ public class InductiveCharging {
 		chargingUponArrival.getChargablePowerAtActivityTypes().put("w", 3312.0);
 
 
-		controller.getConfig().controler().setOverwriteFileSetting(
-				true ?
-						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		controller.run();
 		controller.printStatisticsToConsole();
 		

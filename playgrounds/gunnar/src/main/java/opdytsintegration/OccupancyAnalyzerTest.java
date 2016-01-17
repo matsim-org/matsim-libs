@@ -16,12 +16,12 @@ public class OccupancyAnalyzerTest {
 	private static void smallTest() {
 
 		System.out.println("STARTED SMALL TEST");
-		
+
 		final int startTime_s = 0;
 		final int binSize_s = 10;
 		final int binCnt = 5;
 		final OccupancyAnalyzer analyzer = new OccupancyAnalyzer(startTime_s,
-				binSize_s, binCnt);
+				binSize_s, binCnt, null);
 
 		final Id<Link> id1 = Id.createLinkId("1");
 
@@ -81,7 +81,7 @@ public class OccupancyAnalyzerTest {
 					+ (startTime_s + (bin + 1) * binSize_s) + "): "
 					+ analyzer.getOccupancy_veh(id1, bin));
 		}
-		
+
 		System.out.println("DONE");
 	}
 
@@ -93,7 +93,7 @@ public class OccupancyAnalyzerTest {
 		final int binSize_s = 3600;
 		final int binCnt = 24;
 		final OccupancyAnalyzer analyzer = new OccupancyAnalyzer(startTime_s,
-				binSize_s, binCnt);
+				binSize_s, binCnt, null);
 
 		final EventsManager events = EventsUtils
 				.createEventsManager(ConfigUtils.createConfig());
@@ -105,7 +105,7 @@ public class OccupancyAnalyzerTest {
 
 		for (int bin = 0; bin < binCnt; bin++) {
 			double sum = 0.0;
-			for (Id<Link> link : analyzer.linkSet()) {
+			for (Id<Link> link : analyzer.observedLinkSetView()) {
 				sum += analyzer.getOccupancy_veh(link, bin);
 			}
 			System.out.println(bin + "\t" + sum);

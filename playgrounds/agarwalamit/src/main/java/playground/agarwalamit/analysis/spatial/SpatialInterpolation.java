@@ -85,7 +85,7 @@ public class SpatialInterpolation {
 	/**
 	 * Used to clear the cell weights map.
 	 */
-	public void reset(){
+	public final void reset(){
 		this.cellWeights = new HashMap<Point, Double>();
 		for(Point p :this.grid.getGrid().values()){
 			if ( isCellIncludedForInterpolation(p) ) this.cellWeights.put(p, 0.);
@@ -315,7 +315,7 @@ public class SpatialInterpolation {
 		if( this.isFilteringCellForShape ) {
 			for(Geometry g : geoms){
 				Geometry pointGeom =  gf.createPoint( new Coordinate( point.getCoordinate() ) );
-				if(g.contains(pointGeom)) return isInside = true;
+				if(g.contains(pointGeom)) isInside = true;
 			}
 		} else isInside = true;
 		return isInside;

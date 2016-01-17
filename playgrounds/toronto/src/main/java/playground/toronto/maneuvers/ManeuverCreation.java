@@ -63,7 +63,7 @@ public class ManeuverCreation {
 		
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario).readFile(networkfile);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkfile);
 		naemr.run(network);
 		new NetworkCleaner().run(network);
 

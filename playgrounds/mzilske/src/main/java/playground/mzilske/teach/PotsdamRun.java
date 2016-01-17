@@ -59,7 +59,7 @@ public class PotsdamRun implements Runnable {
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		
 		config.global().setRandomSeed(37);
-		new MatsimNetworkReader(scenario).readFile("input/potsdam/network.xml");
+		new MatsimNetworkReader(scenario.getNetwork()).readFile("input/potsdam/network.xml");
 		PotsdamPop potsdamPop = new PotsdamPop(scenario, config.global().getRandomSeed());
 		potsdamPop.run();
 		

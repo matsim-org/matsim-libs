@@ -39,7 +39,6 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.vehicles.Vehicle;
 
 import playground.jjoubert.CommercialModel.Listeners.MyPrivateVehicleSpeedAnalyser;
 import playground.jjoubert.CommercialTraffic.SAZone;
@@ -91,7 +90,7 @@ public class PrivateVehicleSpeedEvaluator {
 		String networkFile = root + "Commercial/Input/network" + province + ".xml";
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network nl = scenario.getNetwork();
-		MatsimNetworkReader nr = new MatsimNetworkReader(scenario);
+		MatsimNetworkReader nr = new MatsimNetworkReader(scenario.getNetwork());
 		nr.readFile(networkFile);
 
 		log.info("Building a (Hash)Map of the mesozones associated with each link, this may take a while.");

@@ -32,7 +32,7 @@ public class RunPCreateDrivingAgents {
 
 		Scenario scenario = ScenarioUtils.createScenario(config);
 
-		new MatsimNetworkReader(scenario).readFile("input/network.xml");
+		new MatsimNetworkReader(scenario.getNetwork()).readFile("input/network.xml");
 
 		fillScenario(scenario);
 

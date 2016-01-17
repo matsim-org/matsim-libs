@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReader;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
@@ -64,7 +65,7 @@ public class PSSControlerDumbCharging extends PSSControler {
 	}
 
 	
-	public Controler getControler(){
+	public MatsimServices getControler(){
 		return controler;
 	}
 	
@@ -81,7 +82,7 @@ public class PSSControlerDumbCharging extends PSSControler {
 			// handlers...
 			//
 			// (As far as I can tell, the above lines come from Rashid, in 2011. kai, sep'2015) 
-			controler = new EventReadControler(configFilePath, tempStringValue);
+			controler = new EventReadControler(configFilePath, tempStringValue).getControler();
 			ParametersPSF2.isEventsFileBasedControler=true;
 			
 			setDumbScoringFunctionFactory(controler);
@@ -101,8 +102,8 @@ public class PSSControlerDumbCharging extends PSSControler {
 		controler.addControlerListener(new ShutdownListener() {
 			@Override
 			public void notifyShutdown(ShutdownEvent event) {
-//				ParametersPSF2.getPSFGeneralLog().writeFileAndCloseStream(event.getControler().getConfig().controler().getLastIteration() + 1);
-				ParametersPSF2.getPSFGeneralLog().writeFileAndCloseStream(event.getControler().getConfig().controler().getLastIteration() );
+//				ParametersPSF2.getPSFGeneralLog().writeFileAndCloseStream(event.getServices().getConfig().services().getLastIteration() + 1);
+				ParametersPSF2.getPSFGeneralLog().writeFileAndCloseStream(event.getServices().getConfig().controler().getLastIteration() );
 				// not clear to me how the "iteration + 1" can ever have worked. kai, sep'15
 			}
 		});
@@ -125,24 +126,24 @@ public class PSSControlerDumbCharging extends PSSControler {
 
 
 
-	private void addAfterSimulationListener(Controler controler) {
+	private void addAfterSimulationListener(MatsimServices controler) {
 		controler.addControlerListener(new IterationEndsListener() {
 
 			@Override
 			public void notifyIterationEnds(IterationEndsEvent event) {
-				ChargingTimes.writeChargingTimes(ParametersPSF2.chargingTimes, event.getControler().getControlerIO()
+				ChargingTimes.writeChargingTimes(ParametersPSF2.chargingTimes, event.getServices().getControlerIO()
 						.getIterationFilename(event.getIteration(), "chargingLog.txt"));
-				ChargingTimes.writeChargingTimes(ParametersPSF2.chargingTimes, event.getControler().getControlerIO()
+				ChargingTimes.writeChargingTimes(ParametersPSF2.chargingTimes, event.getServices().getControlerIO()
 						.getOutputFilename("chargingLog.txt"));
 
 				double[][] energyUsageStatistics = ChargingTimes.getEnergyUsageStatistics(ParametersPSF2.chargingTimes,
 						ParametersPSF.getHubLinkMapping());
 
 				ChargingTimes.writeEnergyUsageStatisticsData(
-						event.getControler().getControlerIO()
+						event.getServices().getControlerIO()
 								.getIterationFilename(event.getIteration(), "vehicleEnergyConsumption.txt"),
 						energyUsageStatistics);
-				ChargingTimes.writeVehicleEnergyConsumptionStatisticsGraphic(event.getControler().getControlerIO()
+				ChargingTimes.writeVehicleEnergyConsumptionStatisticsGraphic(event.getServices().getControlerIO()
 						.getIterationFilename(event.getIteration(), "vehicleEnergyConsumption.png"),
 						energyUsageStatistics);
 			}
@@ -150,7 +151,7 @@ public class PSSControlerDumbCharging extends PSSControler {
 
 	}
 
-	private static void addSimulationStartupListener(Controler controler, ParametersPSFMutator parameterPSFMutator) {
+	private static void addSimulationStartupListener(MatsimServices controler, ParametersPSFMutator parameterPSFMutator) {
 		SimulationStartupListener simulationStartupListener = new SimulationStartupListener(controler);
 		controler.addControlerListener(simulationStartupListener);
 		simulationStartupListener.addParameterPSFMutator(parameterPSFMutator);
@@ -159,7 +160,7 @@ public class PSSControlerDumbCharging extends PSSControler {
 		controler.addControlerListener(new ChargingAfterSimListener());
 	}
 
-	private static void initializeParametersPSF2(Controler controler) {
+	private static void initializeParametersPSF2(MatsimServices controler) {
 		ParametersPSF2.fleetInitializer = new ChargingFleetInitializer();
 		
 		
@@ -172,9 +173,9 @@ public class PSSControlerDumbCharging extends PSSControler {
 			@Override
 			public void notifyStartup(StartupEvent event) {
 				
-				ParametersPSF2.setPSFGeneralLog(new GeneralLogObject(event.getControler(),"PSFGeneralLog.txt"));
+				ParametersPSF2.setPSFGeneralLog(new GeneralLogObject(event.getServices(),"PSFGeneralLog.txt"));
 				
-				String pathToEnergyConsumptionTable = event.getControler().getConfig().getParam("PSF", "pathToEnergyConsumptionTable");
+				String pathToEnergyConsumptionTable = event.getServices().getConfig().getParam("PSF", "pathToEnergyConsumptionTable");
 				
 				if (pathToEnergyConsumptionTable!=null){
 					ParametersPSF2.pathToEnergyConsumptionTable=pathToEnergyConsumptionTable;
@@ -185,14 +186,14 @@ public class PSSControlerDumbCharging extends PSSControler {
 				ParametersPSF2.energyStateMaintainer = new ARTEMISEnergyStateMaintainer_StartChargingUponArrival(
 						ParametersPSF2.energyConsumptionTable);
 				
-				ParametersPSF2.initVehicleFleet(event.getControler());
+				ParametersPSF2.initVehicleFleet(event.getServices());
 			}
 		});
 
 		controler.addControlerListener(new BeforeMobsimListener() {
 			@Override
 			public void notifyBeforeMobsim(BeforeMobsimEvent event) {
-				GeneralLogObject iterationLog = new GeneralLogObject(event.getControler(), "PSFIterationLog.txt");
+				GeneralLogObject iterationLog = new GeneralLogObject(event.getServices(), "PSFIterationLog.txt");
 				ParametersPSF2.setPSFIterationLog(iterationLog);
 			}
 		});

@@ -130,7 +130,7 @@ public class Padang2CT {
 	}
 
 	private static void loadAndModifyNetwork(Scenario sc) {
-		new MatsimNetworkReader(sc).readFile(PDG_INPUT + "/output_network.xml.gz");
+		new MatsimNetworkReader(sc.getNetwork()).readFile(PDG_INPUT + "/output_network.xml.gz");
 		Set<String> mode = new HashSet<>();
 		mode.add("walkct");
 		for (Link l : sc.getNetwork().getLinks().values()) {

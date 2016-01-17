@@ -30,7 +30,7 @@ import org.matsim.contrib.locationchoice.bestresponse.scoring.ScaleEpsilon;
 import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
@@ -53,7 +53,7 @@ public class AgentInteractionScoringFunctionFactory extends CharyparNagelScoring
 	private Network network1;
 	private double scaleNumberOfPersons;
 
-	private final Controler controler;
+	private final MatsimServices controler;
 	private ObjectAttributes facilitiesKValues;
 	private ObjectAttributes personsKValues;
 	private ScaleEpsilon scaleEpsilon;
@@ -61,7 +61,7 @@ public class AgentInteractionScoringFunctionFactory extends CharyparNagelScoring
 	private HashSet<String> flexibleTypes;
 	private Config config2;
 
-	public AgentInteractionScoringFunctionFactory(final Controler controler,
+	public AgentInteractionScoringFunctionFactory(final MatsimServices controler,
 			final Config config2, final PlanCalcScoreConfigGroup config,
 			final ActivityFacilities facilities, Network network,
 			double scaleNumberOfPersons,TreeMap<Id, FacilityOccupancy> facilityOccupancies,

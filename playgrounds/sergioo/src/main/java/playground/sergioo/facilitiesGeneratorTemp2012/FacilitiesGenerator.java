@@ -79,7 +79,7 @@ public class FacilitiesGenerator {
 		CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.WGS84_UTM48N);
 		ActivityFacilitiesImpl facilities = (ActivityFacilitiesImpl) FacilitiesUtils.createActivityFacilities();
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.loadConfig(args[1]));
-		MatsimNetworkReader matsimNetworkReader = new MatsimNetworkReader(scenario);
+		MatsimNetworkReader matsimNetworkReader = new MatsimNetworkReader(scenario.getNetwork());
 		matsimNetworkReader.readFile(args[2]);
 		DataBaseAdmin dataBaseBuildings  = new DataBaseAdmin(new File("./data/facilities/DataBase.properties"));
 		Map<String, Id<ActivityFacility>> postCodes = new HashMap<String, Id<ActivityFacility>>();

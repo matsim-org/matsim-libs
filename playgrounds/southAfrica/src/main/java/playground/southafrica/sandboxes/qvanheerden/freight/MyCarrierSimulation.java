@@ -35,6 +35,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.ControlerDefaults;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
@@ -184,7 +185,7 @@ public class MyCarrierSimulation {
 
 	}
 
-	public CarrierPlanStrategyManagerFactory createReplanStrategyFactory(final CarrierVehicleTypes types, final Controler controler){
+	public CarrierPlanStrategyManagerFactory createReplanStrategyFactory(final CarrierVehicleTypes types, final MatsimServices controler){
 		// From KnFreight
 		CarrierPlanStrategyManagerFactory stratManFactory = new CarrierPlanStrategyManagerFactory() {
 			@Override
@@ -211,9 +212,9 @@ public class MyCarrierSimulation {
 				}
 				{
 //					GenericPlanStrategy<CarrierPlan> strategy = 
-//							new SelectBestPlanAndOptimizeItsVehicleRouteFactory(scenario.getNetwork(), types, controler.getLinkTravelTimes()).createStrategy() ;
+//							new SelectBestPlanAndOptimizeItsVehicleRouteFactory(scenario.getNetwork(), types, services.getLinkTravelTimes()).createStrategy() ;
 //					mgr.addStrategy( strategy, null, 0.3 );
-//					mgr.addChangeRequest((int)(0.8*scenario.getConfig().controler().getLastIteration()), strategy, null, 0. );
+//					mgr.addChangeRequest((int)(0.8*scenario.getConfig().services().getLastIteration()), strategy, null, 0. );
 				}
 				{				
 					// the strategy to solve the pickup-and-delivery problem during the iterations is gone for the time being.  enough other
@@ -251,7 +252,7 @@ public class MyCarrierSimulation {
 	}
 
 	//freight part from sschroeder/usecases/chessboard/RunPassengerAlongWithCarrier
-	public void prepareFreightOutput(Controler controler, final Carriers carriers) {
+	public void prepareFreightOutput(MatsimServices controler, final Carriers carriers) {
 		final LegHistogram freightOnly = new LegHistogram(900);
         freightOnly.setPopulation(controler.getScenario().getPopulation());
 		freightOnly.setInclPop(false);
@@ -265,7 +266,7 @@ public class MyCarrierSimulation {
 			@Override
 			public void notifyIterationEnds(IterationEndsEvent event) {
 				//write plans
-				String dir = event.getControler().getControlerIO().getIterationPath(event.getIteration());
+				String dir = event.getServices().getControlerIO().getIterationPath(event.getIteration());
 				new CarrierPlanXmlWriterV2(carriers).write(dir + "/" + event.getIteration() + ".carrierPlans.xml");
 
 				//write stats

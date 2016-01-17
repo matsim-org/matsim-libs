@@ -100,7 +100,7 @@ public class CreateNewZHScenario {
 		this.readConfig(configFile);
 		
 		log.info("\tReading network, facilities and plans .............................");
-		new MatsimNetworkReader(scenario).readFile(networkfilePath);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkfilePath);
 		new FacilitiesReaderMatsimV1(scenario).readFile(facilitiesfilePath);
 		MatsimPopulationReader populationReader = new MatsimPopulationReader(this.scenario);
 		populationReader.readFile(plansV2filePath);
@@ -133,7 +133,7 @@ public class CreateNewZHScenario {
 		MutableScenario sTmp = (MutableScenario) ScenarioUtils.createScenario(
 				ConfigUtils.createConfig());
 		
-		new MatsimNetworkReader(sTmp).readFile(networkfilePath);
+		new MatsimNetworkReader(sTmp.getNetwork()).readFile(networkfilePath);
 		MatsimPopulationReader populationReader = new MatsimPopulationReader(sTmp);
 		populationReader.readFile(plansFilePath);
 		

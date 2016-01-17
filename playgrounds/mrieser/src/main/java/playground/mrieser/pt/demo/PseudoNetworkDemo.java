@@ -74,7 +74,7 @@ public class PseudoNetworkDemo {
 		Network network = scenario.getNetwork();
 //		network.setCapacityPeriod(3600.0);
 		if (networkFile != null) {
-			new MatsimNetworkReader(scenario).parse(networkFile);
+			new MatsimNetworkReader(scenario.getNetwork()).parse(networkFile);
 		}
 
 		TransitSchedule schedule = scenario.getTransitSchedule();

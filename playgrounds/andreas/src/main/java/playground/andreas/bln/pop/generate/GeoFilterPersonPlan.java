@@ -114,11 +114,11 @@ public class GeoFilterPersonPlan extends NewPopulation {
 		String inPlansFile = "./0.plans.xml.gz";
 		String outPlansFile = "./plan_hundekopf2.xml.gz";
 
-		new MatsimNetworkReader(bigNetScenario).readFile(bigNetworkFile);
+		new MatsimNetworkReader(bigNetScenario.getNetwork()).readFile(bigNetworkFile);
 
 		Scenario targetScenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network targetNet = targetScenario.getNetwork();
-		new MatsimNetworkReader(targetScenario).readFile(targetNetworkFile);
+		new MatsimNetworkReader(targetScenario.getNetwork()).readFile(targetNetworkFile);
 
 		Population inPop = ((MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
 		PopulationReader popReader = new MatsimPopulationReader(new SharedNetScenario(bigNetScenario, inPop));

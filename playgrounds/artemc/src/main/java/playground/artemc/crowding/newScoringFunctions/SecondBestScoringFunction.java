@@ -19,26 +19,20 @@
 
 package playground.artemc.crowding.newScoringFunctions;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
-import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.scoring.ScoringFunction;
 
-import playground.artemc.crowding.BusFacilityInteractionEvent;
 import playground.artemc.crowding.events.CrowdedPenaltyEvent;
 import playground.artemc.crowding.events.PersonCrowdednessEvent;
 
@@ -64,7 +58,7 @@ public class SecondBestScoringFunction implements ScoringFunction {
 		this.delegate = delegate;
 	}
 	
-	public SecondBestScoringFunction(ScoringFunction delegate, EventsManager events, ScoreTracker scoreTracker, Controler controler) {
+	public SecondBestScoringFunction(ScoringFunction delegate, EventsManager events, ScoreTracker scoreTracker, MatsimServices controler) {
 
 		this.delegate = delegate;
 		this.events = events;

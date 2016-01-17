@@ -57,7 +57,7 @@ public class XY2LinksTest extends MatsimTestCase {
 		// prepare data like world and network
 		MutableScenario scenario =  (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario).parse(NETWORK_FILE);
+		new MatsimNetworkReader(scenario.getNetwork()).parse(NETWORK_FILE);
 
 		// create one person with missing link in act
 		Population population = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation();

@@ -192,7 +192,7 @@ public final class LinkActivityCalculationFromEventsMain {
 	private static Scenario prepareScenario(String plansFile, String networkFile) {
 		log.info("load scenario-data.");
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(sc).readFile(networkFile);
+		new MatsimNetworkReader(sc.getNetwork()).readFile(networkFile);
 		((PopulationImpl) sc.getPopulation()).addAlgorithm(new PersonAlgorithm() {
 			
 			@Override

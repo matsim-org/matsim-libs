@@ -82,8 +82,8 @@ public class WelfareAnalysisControlerListener implements StartupListener, Iterat
 	
 	@Override
 	public void notifyStartup(StartupEvent event) {
-		event.getControler().getEvents().addHandler(moneyHandler);
-		event.getControler().getEvents().addHandler(tripAnalysisHandler);
+		event.getServices().getEvents().addHandler(moneyHandler);
+		event.getServices().getEvents().addHandler(tripAnalysisHandler);
 	}
 
 	@Override
@@ -94,12 +94,12 @@ public class WelfareAnalysisControlerListener implements StartupListener, Iterat
 	private void writeAnalysis(IterationEndsEvent event) {
 		
 		UserBenefitsCalculator userBenefitsCalculator_logsum = new UserBenefitsCalculator(this.scenario.getConfig(), WelfareMeasure.LOGSUM, true);
-        this.it2userBenefits_logsum.put(event.getIteration(), userBenefitsCalculator_logsum.calculateUtility_money(event.getControler().getScenario().getPopulation()));
+        this.it2userBenefits_logsum.put(event.getIteration(), userBenefitsCalculator_logsum.calculateUtility_money(event.getServices().getScenario().getPopulation()));
 		this.it2invalidPersons_logsum.put(event.getIteration(), userBenefitsCalculator_logsum.getPersonsWithoutValidPlanCnt());
 		this.it2invalidPlans_logsum.put(event.getIteration(), userBenefitsCalculator_logsum.getInvalidPlans());
 
 		UserBenefitsCalculator userBenefitsCalculator_selected = new UserBenefitsCalculator(this.scenario.getConfig(), WelfareMeasure.SELECTED, true);
-        this.it2userBenefits_selected.put(event.getIteration(), userBenefitsCalculator_selected.calculateUtility_money(event.getControler().getScenario().getPopulation()));
+        this.it2userBenefits_selected.put(event.getIteration(), userBenefitsCalculator_selected.calculateUtility_money(event.getServices().getScenario().getPopulation()));
 		this.it2invalidPersons_selected.put(event.getIteration(), userBenefitsCalculator_selected.getPersonsWithoutValidPlanCnt());
 		this.it2invalidPlans_selected.put(event.getIteration(), userBenefitsCalculator_selected.getInvalidPlans());
 

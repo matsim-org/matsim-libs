@@ -81,7 +81,7 @@ public class ActivityDurationAnalyser {
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(this.config);
 		//reading network
 //		NetworkLayer net = scenario.getNetwork();
-		MatsimNetworkReader reader = new MatsimNetworkReader(scenario);
+		MatsimNetworkReader reader = new MatsimNetworkReader(scenario.getNetwork());
 		reader.readFile(network);
 
 		//reading road pricing scheme for filtering

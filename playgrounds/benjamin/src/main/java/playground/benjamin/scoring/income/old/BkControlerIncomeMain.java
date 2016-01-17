@@ -30,7 +30,7 @@ public class BkControlerIncomeMain {
 //		new BKickIncomeControler(config).run();
 		
 		String config = BkPaths.RUNSSVN + "run734/resumeConfig.xml";
-		new BkControlerIncome(config).run();
+//		new BkControlerIncome(config).run();
 	}
 
 }

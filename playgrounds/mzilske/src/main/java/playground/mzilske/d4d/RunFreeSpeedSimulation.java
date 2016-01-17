@@ -52,7 +52,7 @@ public class RunFreeSpeedSimulation {
 		config.setParam("JDEQSim", "endTime", Double.toString(endTime));
 		
 		Scenario scenario = ScenarioUtils.createScenario(config);
-		new MatsimNetworkReader(scenario).readFile("/Users/zilske/d4d/output/network.xml");
+		new MatsimNetworkReader(scenario.getNetwork()).readFile("/Users/zilske/d4d/output/network.xml");
 		AltPopulationReaderMatsimV5 altPopulationReaderMatsimV5 = new AltPopulationReaderMatsimV5(scenario);
 		//	altPopulationReaderMatsimV5.readFile("/Users/zilske/d4d/output/population.xml");
 		altPopulationReaderMatsimV5.readFile("/Users/zilske/d4d/output/population-capital-only.xml");

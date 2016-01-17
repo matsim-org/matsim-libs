@@ -44,7 +44,7 @@ public class Ganglinie {
 		
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		
-		new MatsimNetworkReader(scenario).readFile(networkFilename);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFilename);
 		new MatsimPopulationReader(scenario).readFile(populationFilename);
 		
 		Map<String, int[]> countsPerActGroup = new HashMap<String, int[]>();

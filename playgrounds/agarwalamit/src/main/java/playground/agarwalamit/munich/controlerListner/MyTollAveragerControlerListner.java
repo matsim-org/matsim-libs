@@ -26,7 +26,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -56,14 +56,14 @@ public class MyTollAveragerControlerListner implements StartupListener, Iteratio
 	private Map<Id<Person>, Double> pId2NowTolls= new HashMap<>();
 	private MutableScenario scenario;
 	private BufferedWriter writer;
-	private Controler controler;
+	private MatsimServices controler;
 	private int counter;
 	private MoneyEventHandler moneyHandler;
 	private int averagingStartIteration;
 
 	@Override
 	public void notifyStartup(StartupEvent event) {
-		this.controler = event.getControler();
+		this.controler = event.getServices();
 		this.scenario = (MutableScenario) controler.getScenario();
 
 		int firstIt = this.scenario.getConfig().controler().getFirstIteration();
@@ -93,7 +93,7 @@ public class MyTollAveragerControlerListner implements StartupListener, Iteratio
 
 		if(event.getIteration() >= averagingStartIteration){
 			this.moneyHandler = new MoneyEventHandler();
-			event.getControler().getEvents().addHandler(moneyHandler);
+			event.getServices().getEvents().addHandler(moneyHandler);
 		}
 	}
 

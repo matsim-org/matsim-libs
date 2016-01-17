@@ -53,7 +53,7 @@ import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
  * @author amit
  */
 public class InitialPlansConsistencyCheck {
-	public static final Logger log = Logger.getLogger(InitialPlansConsistencyCheck.class);
+	public static final Logger LOG = Logger.getLogger(InitialPlansConsistencyCheck.class);
 	private Scenario sc;
 	private Map<Person, List<String>> person2ActivityType = new HashMap<Person, List<String>>();
 	private Map<Person, List<String>> person2Legs = new HashMap<Person, List<String>>();
@@ -158,7 +158,7 @@ public class InitialPlansConsistencyCheck {
 				if (pe instanceof Activity ) {
 					double actEndTime = ((Activity)pe).getEndTime();
 					if(actEndTime > simEndTime){
-						log.error("Activity end time is "+actEndTime+" whereas simulation end time is "+simEndTime);
+						LOG.error("Activity end time is "+actEndTime+" whereas simulation end time is "+simEndTime);
 							writer.write(p.getId()+"\t"+((Activity)pe).getType()+"\t"+actEndTime+"\n");
 					}
 				}
@@ -177,7 +177,7 @@ public class InitialPlansConsistencyCheck {
 	 */
 	private void checkForActivityDurationLessThanZeroUtilityDuration(){
 
-		log.info("Consistency check for zero activity duration.");
+		LOG.info("Consistency check for zero activity duration.");
 		BufferedWriter writer = IOUtils.getBufferedWriter(this.outputDir+"analysis/negativeUtil_perfActivities.txt");
 		int zeroUtilDurCount =0;
 		SortedMap<String, Double> actType2ZeroUtilDuration = getZeroUtilDuration();
@@ -190,9 +190,9 @@ public class InitialPlansConsistencyCheck {
 						double zeroUtilDur = actType2ZeroUtilDuration.get(((Activity)pe).getType());
 						if(dur<=zeroUtilDur){
 							if(zeroUtilDurCount<1){
-								log.warn("Activity duration of person "+p.toString()+" for activity "+
+								LOG.warn("Activity duration of person "+p.toString()+" for activity "+
 										((Activity)pe).getType()+" is "+dur+". Utility of performing is zero at (=zero utility duration)"+zeroUtilDur+" sec. Any duration less than this will result in lesser score.");
-								log.warn(Gbl.ONLYONCE);
+								LOG.warn(Gbl.ONLYONCE);
 							}
 							zeroUtilDurCount ++;
 							writer.write(p.getId()+"\t"+((Activity)pe).getType()+"\t"+((Activity)pe).getStartTime()+
@@ -207,7 +207,7 @@ public class InitialPlansConsistencyCheck {
 			throw new RuntimeException(
 					"Data is not written. Reason - " + e);
 		}
-		if (zeroUtilDurCount>0) log.warn("There are "+zeroUtilDurCount+" instances where person have activity duration equal to or less than zero utility duration. Check for written file for detailed discription.");
+		if (zeroUtilDurCount>0) LOG.warn("There are "+zeroUtilDurCount+" instances where person have activity duration equal to or less than zero utility duration. Check for written file for detailed discription.");
 	}
 
 	private SortedMap<String, Double> getZeroUtilDuration(){
@@ -222,15 +222,15 @@ public class InitialPlansConsistencyCheck {
 		for(String actType : params.getActivityTypes()){
 			ActivityUtilityParameters.Builder builder = new ActivityUtilityParameters.Builder( params.getActivityParams( actType ) ) ;
 			ActivityUtilityParameters ppp = builder.create() ;
-			double zeroUtilDur_sec = ppp.getZeroUtilityDuration_h() * 3600. ;
+			double zeroUtilDurSec = ppp.getZeroUtilityDuration_h() * 3600. ;
 
-			actType2ZeroUtilDuration.put(actType, zeroUtilDur_sec);
+			actType2ZeroUtilDuration.put(actType, zeroUtilDurSec);
 		}
 		return actType2ZeroUtilDuration;
 	}
 
 	private void checkForZeroActivitDuration(){
-		log.info("Consistency check for zero activity duration.");
+		LOG.info("Consistency check for zero activity duration.");
 		BufferedWriter writer = IOUtils.getBufferedWriter(this.outputDir+"analysis/zeroActivityDurationPersons.txt");
 		int zeroDurCount =0;
 		try {
@@ -241,9 +241,9 @@ public class InitialPlansConsistencyCheck {
 						double dur = ((Activity)pe).getEndTime() - ((Activity)pe).getStartTime();
 						if(dur==0){
 							if(zeroDurCount<1){
-								log.warn("Activity duration of person "+p.toString()+" for activity "+
+								LOG.warn("Activity duration of person "+p.toString()+" for activity "+
 										((Activity)pe).getType()+" is zero, it may result in higher utility loss.");
-								log.warn(Gbl.ONLYONCE);
+								LOG.warn(Gbl.ONLYONCE);
 							}
 							zeroDurCount ++;
 							writer.write(p.getId()+"\t"+((Activity)pe).getType()+"\t"+((Activity)pe).getStartTime()+
@@ -258,11 +258,11 @@ public class InitialPlansConsistencyCheck {
 			throw new RuntimeException(
 					"Data is not written. Reason - " + e);
 		}
-		log.warn("There are "+zeroDurCount+" instances where person have activity duration zero. Check for written file for detailed discription.");
+		LOG.warn("There are "+zeroDurCount+" instances where person have activity duration zero. Check for written file for detailed discription.");
 	}
 
 	private void checkFor1stAndLastActivity(){
-		log.info("Consistency check for equality of first and last activity in a plan.");
+		LOG.info("Consistency check for equality of first and last activity in a plan.");
 		SortedMap<String, Integer> actSeq2Count = new TreeMap<>();
 		int warnCount =0;
 		int urbanPersons =0;
@@ -296,7 +296,7 @@ public class InitialPlansConsistencyCheck {
 		} catch (Exception e) {
 			throw new RuntimeException("Data is not written to file. Reason "+e);
 		}
-		log.warn(warnCount+" number of persons do not have first and last activites same."
+		LOG.warn(warnCount+" number of persons do not have first and last activites same."
 				+ "Out of them "+urbanPersons+" persons belong to urban user group."
 				+ "\n The total number of person in populatino are "+person2ActivityType.size());
 	}

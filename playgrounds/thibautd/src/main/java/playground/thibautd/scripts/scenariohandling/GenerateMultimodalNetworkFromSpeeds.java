@@ -46,7 +46,7 @@ public class GenerateMultimodalNetworkFromSpeeds {
 		final String outputNetwork = args[ 1 ];
 
 		final Scenario sc = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
-		new MatsimNetworkReader( sc ).readFile( inputNetwork );
+		new MatsimNetworkReader(sc.getNetwork()).readFile( inputNetwork );
 
 		final MultiModalConfigGroup conf = new MultiModalConfigGroup();
 		conf.setCreateMultiModalNetwork( true );

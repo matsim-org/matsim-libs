@@ -114,7 +114,7 @@ public class createDemandFromSaturnMatrix {
 		mdm.parseMatrix(matrixFilename, "Saturn", "Saturn model received for Sanral project");
 		Scenario sc = mdm.generateDemand(list, new Random(5463), populationFraction, "car");
 		
-		NetworkReaderMatsimV1 nr = new NetworkReaderMatsimV1(sc);
+		NetworkReaderMatsimV1 nr = new NetworkReaderMatsimV1(sc.getNetwork());
 		nr.parse(networkFilename);
 		
 		XY2Links xy = new XY2Links(sc.getNetwork());

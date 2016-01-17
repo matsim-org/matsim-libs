@@ -58,7 +58,7 @@ public class GenerateRandomBikeSharingFacilities {
 		final int maxCapacity = args.getIntegerValue( "-m" );
 
 		final Scenario sc = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
-		new MatsimNetworkReader( sc ).parse( networkFile );
+		new MatsimNetworkReader(sc.getNetwork()).parse( networkFile );
 
 		final BikeSharingFacilities facilities = new BikeSharingFacilities();
 

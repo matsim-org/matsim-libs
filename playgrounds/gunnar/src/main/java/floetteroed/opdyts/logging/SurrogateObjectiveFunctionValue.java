@@ -12,9 +12,11 @@ import floetteroed.utilities.statisticslogging.Statistic;
 public class SurrogateObjectiveFunctionValue<U extends DecisionVariable>
 		implements Statistic<SamplingStage<U>> {
 
+	public static final String LABEL = "Surrogate Objective Function Value";
+
 	@Override
 	public String label() {
-		return "Surrogate Objective Function Value";
+		return LABEL;
 	}
 
 	@Override

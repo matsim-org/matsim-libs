@@ -201,7 +201,7 @@ public class NetworkSimplifier {
 
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		final Network network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario).readFile( inNetworkFile );
+		new MatsimNetworkReader(scenario.getNetwork()).readFile( inNetworkFile );
 
 		NetworkSimplifier nsimply = new NetworkSimplifier();
 		nsimply.setNodesToMerge(nodeTypesToMerge);

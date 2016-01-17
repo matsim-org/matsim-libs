@@ -48,9 +48,9 @@ public class FlatPricingControlerListener implements StartupListener {
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		
-		EventsManager eventsManager = event.getControler().getEvents();
+		EventsManager eventsManager = event.getServices().getEvents();
 		this.flatPricingHandler = new PricingHandler(eventsManager, scenario, toll);
-		event.getControler().getEvents().addHandler(flatPricingHandler);		
+		event.getServices().getEvents().addHandler(flatPricingHandler);
 	}
 
 }

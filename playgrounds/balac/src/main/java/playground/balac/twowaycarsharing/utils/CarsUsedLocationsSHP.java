@@ -26,7 +26,7 @@ public class CarsUsedLocationsSHP {
 
 	public static void main(String[] args) throws IOException {
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario);
+		MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario.getNetwork());
 		networkReader.readFile(args[0]);
 	        
 		Set<String> a1 = new TreeSet<String>();

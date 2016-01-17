@@ -20,6 +20,7 @@
 
 package herbie.running.replanning;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
@@ -54,11 +55,11 @@ public class TransitStrategyManager extends StrategyManager {
 	private PlanStrategyImpl expBetaSelectorStrategy;
 	private double reroutingShare;
 	
-	public TransitStrategyManager(Controler controler, double replanningShare, Provider<TripRouter> tripRouterProvider) {
+	public TransitStrategyManager(Scenario scenario, double replanningShare, Provider<TripRouter> tripRouterProvider) {
 		reroutingStrategy = new PlanStrategyImpl(new RandomPlanSelector());
-		reroutingStrategy.addStrategyModule(new ReRoute(controler.getScenario(), tripRouterProvider));
+		reroutingStrategy.addStrategyModule(new ReRoute(scenario, tripRouterProvider));
 		
-		expBetaSelectorStrategy = new PlanStrategyImpl(new ExpBetaPlanSelector(controler.getConfig().planCalcScore()));
+		expBetaSelectorStrategy = new PlanStrategyImpl(new ExpBetaPlanSelector(scenario.getConfig().planCalcScore()));
 		
 		this.reroutingShare = replanningShare;
 	}

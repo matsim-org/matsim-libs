@@ -37,8 +37,8 @@ import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspDefaultsCheckingLevel;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.replanning.DefaultPlanStrategiesModule.DefaultSelector;
-import org.matsim.core.replanning.DefaultPlanStrategiesModule.DefaultStrategy;
+import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultSelector;
+import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultStrategy;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
@@ -143,7 +143,7 @@ public class RandomizedTransitRouterTest {
 		// ---
 		
 		Controler controler = new Controler( scenario ) ;
-		controler.setDirtyShutdown(true);
+//		controler.setDirtyShutdown(true);
 		
 		controler.addOverridingModule( new RandomizedTransitRouterModule() );
 

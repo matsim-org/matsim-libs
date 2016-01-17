@@ -82,7 +82,7 @@ public class ZurichFromSwitzerland {
 
 		log.info("  reading the network xml file...");
 		Network network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(config.network().getInputFile());
 		log.info("  done.");
 
 		//////////////////////////////////////////////////////////////////////

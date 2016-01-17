@@ -41,8 +41,8 @@ public class KtiPopulationPreparation implements StartupListener {
 
 	public void notifyStartup(StartupEvent event) {
 
-        Population pop = event.getControler().getScenario().getPopulation();
-		Config config = event.getControler().getConfig();
+        Population pop = event.getServices().getScenario().getPopulation();
+		Config config = event.getServices().getConfig();
 		
 		/*
 		 * make sure every pt leg has a kti pt route when the kti pt router is used

@@ -63,7 +63,7 @@ public class Connections2PTNetwork {
 
 		// ------------------- read in PTnetwork ----------------------------
 		log.info("Reading pt network...");	
-		MatsimNetworkReader NetworkReader = new MatsimNetworkReader(sc); 
+		MatsimNetworkReader NetworkReader = new MatsimNetworkReader(sc.getNetwork());
 		NetworkReader.readFile("./input/02-OeV_2030+_DWV_Ref_Mit_IterationGerman_adapted.xml");
 		log.info("Reading pt network...done.");
 		log.info("Network contains " +PTnetwork.getLinks().size()+ " links and " +PTnetwork.getNodes().size()+ " nodes.");

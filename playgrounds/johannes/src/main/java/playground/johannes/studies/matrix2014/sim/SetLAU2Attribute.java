@@ -78,7 +78,9 @@ public class SetLAU2Attribute implements PersonTask {
                     String lau2Class = ZoneSetLAU2Class.inhabitants2Class(inhabs);
                     person.setAttribute(MiDKeys.PERSON_LAU2_CLASS, lau2Class);
                 }
-            }
-        } else errors++;
+            } else errors++;
+        } else {
+            errors++;
+        }
     }
 }

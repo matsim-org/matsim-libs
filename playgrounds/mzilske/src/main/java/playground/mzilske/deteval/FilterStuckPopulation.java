@@ -28,8 +28,8 @@ public class FilterStuckPopulation {
 		final MutableScenario targetsc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		
 		String networkFileName = "../../run951/951.output_network.xml.gz";
-		new MatsimNetworkReader(targetsc).readFile(networkFileName);
-		new MatsimNetworkReader(filtersc).readFile(networkFileName);
+		new MatsimNetworkReader(targetsc.getNetwork()).readFile(networkFileName);
+		new MatsimNetworkReader(filtersc.getNetwork()).readFile(networkFileName);
 		String eventsFileName = "../../run951/it.100/951.100.events.txt.gz";
 		final Set<Id> personIds = new HashSet<Id>();
 		

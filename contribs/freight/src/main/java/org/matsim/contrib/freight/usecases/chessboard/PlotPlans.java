@@ -23,7 +23,7 @@ public class PlotPlans {
         Config config = new Config();
         config.addCoreModules();
         Scenario scenario = ScenarioUtils.createScenario(config);
-        new MatsimNetworkReader(scenario).readFile("input/usecases/chessboard/network/grid9x9.xml");
+        new MatsimNetworkReader(scenario.getNetwork()).readFile("input/usecases/chessboard/network/grid9x9.xml");
 
 
         final Carriers carriers = new Carriers();

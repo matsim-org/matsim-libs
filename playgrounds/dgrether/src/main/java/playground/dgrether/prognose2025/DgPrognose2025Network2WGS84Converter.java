@@ -49,7 +49,7 @@ public class DgPrognose2025Network2WGS84Converter {
 		String netOut = netbase + "_wgs84.xml.gz";
 
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		MatsimNetworkReader reader = new MatsimNetworkReader(sc);
+		MatsimNetworkReader reader = new MatsimNetworkReader(sc.getNetwork());
 		reader.readFile(net);
 
 		Coord c = null;

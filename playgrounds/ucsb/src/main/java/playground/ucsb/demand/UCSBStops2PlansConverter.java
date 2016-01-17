@@ -109,7 +109,7 @@ public class UCSBStops2PlansConverter {
 		ObjectAttributes personObjectAttributes = new ObjectAttributes();
 
 		log.info("parsing network data...");
-		new NetworkReaderMatsimV1(scenario).parse(networkFile);
+		new NetworkReaderMatsimV1(scenario.getNetwork()).parse(networkFile);
 		ObjectAttributes linkObjectAttributes = new ObjectAttributes();
 		new ObjectAttributesXmlReader(linkObjectAttributes).parse(linkObjectAttributeFile);
 		log.info("done. (parsing)");

@@ -24,10 +24,7 @@ import org.apache.commons.math.stat.StatUtils;
 import org.matsim.contrib.common.collections.CollectionUtils;
 import org.matsim.contrib.common.stats.WeightedSampleMean;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 /**
  * @author jillenberger
@@ -87,7 +84,8 @@ public class StatsContainer {
 
     private void init(double[] values) {
         mean = StatUtils.mean(values);
-        median = StatUtils.percentile(values, 50);
+//        median = StatUtils.percentile(values, 50);
+        median = calculateMedian(values);
         min = StatUtils.min(values);
         max = StatUtils.max(values);
         N = new Double(values.length);
@@ -138,6 +136,16 @@ public class StatsContainer {
 
     public Double getVariance() {
         return variance;
+    }
+
+    /*
+    This is not a precise calculation of the median, yet should be ok for large samples sizes.
+     */
+    private double calculateMedian(double[] values) {
+        double[] tempValues = Arrays.copyOf(values, values.length);
+        Arrays.sort(tempValues);
+
+        return tempValues[tempValues.length / 2];
     }
 
     private double calculateWeightedMedian(double[] values, double[] weights) {

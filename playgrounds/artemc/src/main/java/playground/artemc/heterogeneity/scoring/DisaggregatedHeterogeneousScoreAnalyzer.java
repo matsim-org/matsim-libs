@@ -63,9 +63,9 @@ public class DisaggregatedHeterogeneousScoreAnalyzer implements IterationEndsLis
 		this.stuckUtility2it.put(event.getIteration(),0.0);
 		this.sumUtility2it.put(event.getIteration(),0.0);
 
-        for(Person person: event.getControler().getScenario().getPopulation().getPersons().values()) {
-			//DisaggregatedSumScoringFunction sf = (DisaggregatedSumScoringFunction) event.getControler().getPlansScoring().getScoringFunctionForAgent(person.getId());
-			HeterogeneousCharyparNagelScoringFunctionForAnalysisFactory disScoringFactory = (HeterogeneousCharyparNagelScoringFunctionForAnalysisFactory) event.getControler().getScoringFunctionFactory();
+        for(Person person: event.getServices().getScenario().getPopulation().getPersons().values()) {
+			//DisaggregatedSumScoringFunction sf = (DisaggregatedSumScoringFunction) event.getServices().getPlansScoring().getScoringFunctionForAgent(person.getId());
+			HeterogeneousCharyparNagelScoringFunctionForAnalysisFactory disScoringFactory = (HeterogeneousCharyparNagelScoringFunctionForAnalysisFactory) event.getServices().getScoringFunctionFactory();
 			DisaggregatedSumScoringFunction sf = (DisaggregatedSumScoringFunction) disScoringFactory.getPersonScoringFunctions().get(person.getId());
 
 			disaggregatedScores.put(person.getId(), new DisaggregatedScore(sf.getActivityTotalScore(), sf.getLegScores(), sf.getMoneyTotalScore(), sf.getStuckScore()));
@@ -87,7 +87,7 @@ public class DisaggregatedHeterogeneousScoreAnalyzer implements IterationEndsLis
 
 		String fileName = this.scenario.getConfig().controler().getOutputDirectory() + "/disaggregatedScore.csv";
 		File file = new File(fileName);
-        Integer persons = event.getControler().getScenario().getPopulation().getPersons().size();
+        Integer persons = event.getServices().getScenario().getPopulation().getPersons().size();
 
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(file));

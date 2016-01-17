@@ -330,7 +330,7 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 				visModelBuilder = new VisLaneModelBuilder();
 				CoordinateTransformation transformation = new IdentityTransformation();
 				visLink = visModelBuilder.createVisLinkLanes(transformation, QLinkImpl.this, nodeOffset, null);
-				SnapshotLinkWidthCalculator linkWidthCalculator = QLinkImpl.this.network.getLinkWidthCalculator();
+				SnapshotLinkWidthCalculator linkWidthCalculator = QLinkImpl.this.network.getLinkWidthCalculatorForVis();
 				visModelBuilder.recalculatePositions(visLink, linkWidthCalculator);
 			}
 		}

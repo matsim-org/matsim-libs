@@ -35,7 +35,7 @@ public class WolfsburgGTFSConvert {
 		
 		
 		
-		new MatsimNetworkReader(scenario1).readFile("C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/input/network.xml");
+		new MatsimNetworkReader(scenario1.getNetwork()).readFile("C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/input/network.xml");
 		
 		MergeNetworks.merge(scenario1.getNetwork(), "pt",scenario0.getNetwork());
 		

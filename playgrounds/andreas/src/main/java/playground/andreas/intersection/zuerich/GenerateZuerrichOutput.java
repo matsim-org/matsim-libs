@@ -58,7 +58,7 @@ public class GenerateZuerrichOutput {
 		ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setUseSignalSystems(generateSignalSystems);
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		Network net = scenario.getNetwork();
-		MatsimNetworkReader netReader = new MatsimNetworkReader(scenario);
+		MatsimNetworkReader netReader = new MatsimNetworkReader(scenario.getNetwork());
 		netReader.readFile(DgPaths.IVTCHNET);
 		
 		Map<Integer, Map<Integer,  List<Integer>>> knotenVonSpurNachSpurMap = null;

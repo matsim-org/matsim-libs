@@ -179,8 +179,8 @@ public class OutputDirectoryHierarchy {
 								"The output directory " + outputPath
 								+ " already exists and is not empty!"
 								+ " Please either delete or empty the directory or"
-								+ " configure the controler via setOverwriteFileSetting()"
-								+ " or the \"overwriteFiles\" parameter of the \"controler\" config group.");
+								+ " configure the services via setOverwriteFileSetting()"
+								+ " or the \"overwriteFiles\" parameter of the \"services\" config group.");
 					case overwriteExistingFiles:
 						System.out.flush();
 						log.warn("###########################################################");

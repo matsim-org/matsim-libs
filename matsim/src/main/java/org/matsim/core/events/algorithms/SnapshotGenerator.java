@@ -45,6 +45,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.MobsimConfigGroupI;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
@@ -84,6 +85,10 @@ public class SnapshotGenerator implements PersonDepartureEventHandler, PersonArr
 		this.capCorrectionFactor = config.getFlowCapFactor() / network.getCapacityPeriod();
 		this.storageCapFactor = config.getStorageCapFactor();
 		this.snapshotStyle = config.getSnapshotStyle();
+		
+		if (config instanceof QSimConfigGroup  && ! Double.isNaN( ((QSimConfigGroup) config ).getLinkWidthForVis() )  ){
+			this.linkWidthCalculator.setLinkWidthForVis( ((QSimConfigGroup) config ).getLinkWidthForVis() );
+		} 
 		if (! Double.isNaN(network.getEffectiveLaneWidth())){
 			this.linkWidthCalculator.setLaneWidth(network.getEffectiveLaneWidth());
 		}
@@ -253,7 +258,7 @@ public class SnapshotGenerator implements PersonDepartureEventHandler, PersonArr
 			this.waitingQueue = new ArrayList<EventAgent>();
 			this.buffer = new ArrayList<EventAgent>();
 			this.euklideanDist = CoordUtils.calcDistance(link2.getFromNode().getCoord(), link2.getToNode().getCoord());
-			this.freespeedTravelTime = this.link.getLength() / this.link.getFreespeed();
+			this.freespeedTravelTime = Math.ceil( this.link.getLength() / this.link.getFreespeed() ) + 1; 
 			this.timeCap = this.link.getCapacity() * capCorrectionFactor;
 			this.storageCapFactor = storageCapFactor;
 			this.inverseTimeCap = 1.0 / this.timeCap;

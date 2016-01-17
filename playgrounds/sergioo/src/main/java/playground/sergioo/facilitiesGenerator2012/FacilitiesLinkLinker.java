@@ -24,7 +24,7 @@ public class FacilitiesLinkLinker {
 	public static void main(String[] args) {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimFacilitiesReader((MutableScenario) scenario).readFile(args[0]);
-		new MatsimNetworkReader(scenario).readFile(args[1]);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(args[1]);
 		TransportModeNetworkFilter filter = new TransportModeNetworkFilter(scenario.getNetwork());
 		NetworkImpl net = NetworkImpl.createNetwork();
 		HashSet<String> modes = new HashSet<String>();

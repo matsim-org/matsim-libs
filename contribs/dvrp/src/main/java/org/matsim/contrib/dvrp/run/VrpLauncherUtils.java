@@ -60,7 +60,7 @@ public class VrpLauncherUtils
             network.getFactory().setLinkFactory(new FixedIntervalTimeVariantLinkFactory(interval, intervalCount));
         }
 
-        new MatsimNetworkReader(scenario).readFile(netFile);
+        new MatsimNetworkReader(scenario.getNetwork()).readFile(netFile);
 
         if (changeEventsFile != null) {
             NetworkChangeEventsParser parser = new NetworkChangeEventsParser(network);

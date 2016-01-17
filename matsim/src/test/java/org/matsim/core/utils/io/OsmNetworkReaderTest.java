@@ -56,7 +56,7 @@ public class OsmNetworkReaderTest {
 		new OsmNetworkReader(net,ct).parse(filename);
 
 		Assert.assertEquals("number of nodes is wrong.", 399, net.getNodes().size());
-		Assert.assertEquals("number of links is wrong.", 874, net.getLinks().size());
+		Assert.assertEquals("number of links is wrong.", 872, net.getLinks().size());
 
 		new NetworkCleaner().run(net);
 		Assert.assertEquals("number of nodes is wrong.", 344, net.getNodes().size());
@@ -77,7 +77,7 @@ public class OsmNetworkReaderTest {
 		reader.parse(filename);
 
 		Assert.assertEquals("number of nodes is wrong.", 1844, net.getNodes().size());
-		Assert.assertEquals("number of links is wrong.", 3537, net.getLinks().size());
+		Assert.assertEquals("number of links is wrong.", 3535, net.getLinks().size());
 
 		new NetworkCleaner().run(net);
 		Assert.assertEquals("number of nodes is wrong.", 1561, net.getNodes().size());
@@ -99,7 +99,7 @@ public class OsmNetworkReaderTest {
 		reader.parse(filename);
 
 		Assert.assertEquals("number of nodes is wrong.", 1844, net.getNodes().size());
-		Assert.assertEquals("number of links is wrong.", 3537, net.getLinks().size());
+		Assert.assertEquals("number of links is wrong.", 3535, net.getLinks().size());
 
 		new NetworkCleaner().run(net);
 		Assert.assertEquals("number of nodes is wrong.", 1561, net.getNodes().size());

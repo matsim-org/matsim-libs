@@ -2,6 +2,7 @@ package opdytsintegration;
 
 import static java.lang.Math.min;
 
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
@@ -35,20 +36,24 @@ public class OccupancyAnalyzer implements LinkLeaveEventHandler,
 
 	private final DynamicData<Id<Link>> occupancies_veh;
 
+	private final Set<Id<Link>> relevantLinks;
+
 	private final Map<Id<Link>, RecursiveCountAverage> link2avg = new LinkedHashMap<>();
 
 	private int lastCompletedBin = -1;
 
 	// -------------------- CONSTRUCTION --------------------
 
-	public OccupancyAnalyzer(final TimeDiscretization timeDiscretization) {
+	public OccupancyAnalyzer(final TimeDiscretization timeDiscretization,
+			final Set<Id<Link>> relevantLinks) {
 		this(timeDiscretization.getStartTime_s(), timeDiscretization
-				.getBinSize_s(), timeDiscretization.getBinCnt());
+				.getBinSize_s(), timeDiscretization.getBinCnt(), relevantLinks);
 	}
 
 	public OccupancyAnalyzer(final int startTime_s, final int binSize_s,
-			final int binCnt) {
+			final int binCnt, final Set<Id<Link>> relevantLinks) {
 		this.occupancies_veh = new DynamicData<>(startTime_s, binSize_s, binCnt);
+		this.relevantLinks = relevantLinks;
 		this.reset(-1);
 	}
 
@@ -90,6 +95,11 @@ public class OccupancyAnalyzer implements LinkLeaveEventHandler,
 		return avg;
 	}
 
+	private boolean relevant(Id<Link> link) {
+		return ((this.relevantLinks == null) || this.relevantLinks
+				.contains(link));
+	}
+
 	private void registerEntry(final Id<Link> link, final int time_s) {
 		this.advanceToTime(time_s);
 		this.avg(link).inc(time_s);
@@ -104,9 +114,9 @@ public class OccupancyAnalyzer implements LinkLeaveEventHandler,
 		this.completeBins(this.occupancies_veh.getBinCnt() - 1);
 	}
 
-	public Set<Id<Link>> linkSet() {
-		return this.occupancies_veh.keySet();
-	}
+	 public Set<Id<Link>> observedLinkSetView() {
+	 return Collections.unmodifiableSet(this.occupancies_veh.keySet());
+	 }
 
 	// -------------------- CONTENT ACCESS --------------------
 
@@ -125,27 +135,37 @@ public class OccupancyAnalyzer implements LinkLeaveEventHandler,
 
 	@Override
 	public void handleEvent(final VehicleLeavesTrafficEvent event) {
-		this.registerExit(event.getLinkId(), (int) event.getTime());
+		if (this.relevant(event.getLinkId())) {
+			this.registerExit(event.getLinkId(), (int) event.getTime());
+		}
 	}
 
 	@Override
 	public void handleEvent(final VehicleEntersTrafficEvent event) {
-		this.registerEntry(event.getLinkId(), (int) event.getTime());
+		if (this.relevant(event.getLinkId())) {
+			this.registerEntry(event.getLinkId(), (int) event.getTime());
+		}
 	}
 
 	@Override
 	public void handleEvent(final LinkEnterEvent event) {
-		this.registerEntry(event.getLinkId(), (int) event.getTime());
+		if (this.relevant(event.getLinkId())) {
+			this.registerEntry(event.getLinkId(), (int) event.getTime());
+		}
 	}
 
 	@Override
 	public void handleEvent(final LinkLeaveEvent event) {
-		this.registerExit(event.getLinkId(), (int) event.getTime());
+		if (this.relevant(event.getLinkId())) {
+			this.registerExit(event.getLinkId(), (int) event.getTime());
+		}
 	}
 
 	@Override
 	public void handleEvent(final VehicleAbortsEvent event) {
-		this.registerExit(event.getLinkId(), (int) event.getTime());
+		if (this.relevant(event.getLinkId())) {
+			this.registerExit(event.getLinkId(), (int) event.getTime());
+		}
 	}
 
 	// -------------------- MAIN-FUNCTION, ONLY FOR TESTING --------------------
@@ -157,7 +177,7 @@ public class OccupancyAnalyzer implements LinkLeaveEventHandler,
 		final int binSize_s = 10;
 		final int binCnt = 5;
 		final OccupancyAnalyzer analyzer = new OccupancyAnalyzer(startTime_s,
-				binSize_s, binCnt);
+				binSize_s, binCnt, null);
 
 		final Id<Link> id1 = Id.createLinkId("1");
 		final Id<Vehicle> veh1 = Id.createVehicleId("1");

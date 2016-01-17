@@ -319,7 +319,7 @@ public class StopStopCalculator extends Thread{
 	 */
 	public static void main(String[] args) throws IOException {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.loadConfig(args[0]));
-		(new MatsimNetworkReader(scenario)).readFile(args[1]);
+		(new MatsimNetworkReader(scenario.getNetwork())).readFile(args[1]);
 		(new MatsimPopulationReader(scenario)).readFile(args[2]);
 		(new TransitScheduleReader(scenario)).readFile(args[3]);
 		double startTime = new Double(args[5]), endTime = new Double(args[6]), binSize = new Double(args[7]);

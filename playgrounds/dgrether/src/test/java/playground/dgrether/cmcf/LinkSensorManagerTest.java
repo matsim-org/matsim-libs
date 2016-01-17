@@ -74,7 +74,7 @@ public class LinkSensorManagerTest extends MatsimTestCase implements IterationSt
 	@Override
 	public void notifyIterationStarts(final IterationStartsEvent event) {
 		if (event.getIteration() == 1) {
-			event.getControler().getEvents().addHandler(this.manager);
+			event.getServices().getEvents().addHandler(this.manager);
 		}
 	}
 

@@ -79,7 +79,7 @@ public class GenerateRandomFacilities {
 		if ( types.size() != numbers.size() ) throw new IllegalArgumentException();
 
 		final Scenario sc = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
-		new MatsimNetworkReader( sc ).readFile( inNet );
+		new MatsimNetworkReader(sc.getNetwork()).readFile( inNet );
 
 		final Random random = new Random( 20140224 );
 

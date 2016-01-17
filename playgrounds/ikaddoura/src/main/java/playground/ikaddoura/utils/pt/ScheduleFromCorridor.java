@@ -71,7 +71,7 @@ public class ScheduleFromCorridor {
 
 	public ScheduleFromCorridor(String networkFile) {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenario).readFile(networkFile);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
 		this.network = scenario.getNetwork();
 	}
 

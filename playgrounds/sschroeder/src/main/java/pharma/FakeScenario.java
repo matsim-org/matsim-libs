@@ -38,7 +38,7 @@ public class FakeScenario {
         Scenario scenario = ScenarioUtils.createScenario(config);
         new MatsimFacilitiesReader(scenario).readFile("out/dcs.xml");
         new MatsimFacilitiesReader(scenario).readFile("out/pharmacies.xml");
-        new NetworkReaderMatsimV1(scenario).parse("/Users/schroeder/DLR/Pharma/data/network.xml");
+        new NetworkReaderMatsimV1(scenario.getNetwork()).parse("/Users/schroeder/DLR/Pharma/data/network.xml");
         ActivityFacilities facilities = scenario.getActivityFacilities();
 
         new WorldConnectLocations(config).connectFacilitiesWithLinks(facilities, (NetworkImpl) scenario.getNetwork());

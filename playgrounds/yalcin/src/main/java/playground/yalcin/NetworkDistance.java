@@ -68,7 +68,7 @@ public class NetworkDistance {
 	public static void exportNetwork() {
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario).readFile(networkFilename);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFilename);
 
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.DHDN_GK4, TransformationFactory.WGS84);
 
@@ -103,7 +103,7 @@ public class NetworkDistance {
 	public static void convertNetwork() {
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario).readFile(networkFilename);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFilename);
 
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.DHDN_GK4, TransformationFactory.WGS84);
 		new NetworkTransform(ct).run(network);
@@ -113,7 +113,7 @@ public class NetworkDistance {
 	public static void findDistances() {
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
-		new MatsimNetworkReader(scenario).readFile(wgs84NetworkFilename);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(wgs84NetworkFilename);
 
 		// set the config to only look at distance costs, not travel time costs
 		Config config = new Config();

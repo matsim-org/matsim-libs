@@ -1,28 +1,17 @@
 package saleem.stockholmscenario.teleportation.ptoptimisation;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
-import org.matsim.pt.transitSchedule.api.Departure;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
-import org.matsim.pt.utils.CreatePseudoNetwork;
-import org.matsim.vehicles.VehicleCapacity;
-import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleWriterV1;
-import org.matsim.vehicles.Vehicles;
-
-import saleem.stockholmscenario.utils.CollectionUtil;
 
 public class TransitScheduleAdapter {
 	Scenario scenario;
@@ -71,7 +60,7 @@ public class TransitScheduleAdapter {
 	public static void main(String[] args){
 		String path = "H:\\Matsim\\Stockholm Scenario\\teleportation\\input\\config.xml";
         Config config = ConfigUtils.loadConfig(path);
-        Controler controler = new Controler(config);
+        MatsimServices controler = new Controler(config);
         TransitScheduleAdapter adapter = new TransitScheduleAdapter(controler.getScenario());
 		adapter.updateSchedule();
 		adapter.writeSchedule("UpdatedSchedule.xml");

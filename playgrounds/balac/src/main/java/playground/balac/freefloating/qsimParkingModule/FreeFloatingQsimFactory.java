@@ -5,7 +5,7 @@ import org.matsim.contrib.parking.parkingChoice.carsharing.ParkingCoordInfo;
 import org.matsim.contrib.parking.parkingChoice.carsharing.ParkingModuleWithFreeFloatingCarSharing;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -20,7 +20,6 @@ import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineModule;
 import playground.balac.freefloating.config.FreeFloatingConfigGroup;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -29,11 +28,11 @@ public class FreeFloatingQsimFactory implements MobsimFactory{
 
 
 	private final Scenario scenario;
-	private final Controler controler;
+	private final MatsimServices controler;
 	private Collection<ParkingCoordInfo> freefloatingCars;
 
 	private ParkingModuleWithFreeFloatingCarSharing parkingModule;
-	public FreeFloatingQsimFactory(final Scenario scenario, final Controler controler,
+	public FreeFloatingQsimFactory(final Scenario scenario, final MatsimServices controler,
 			ParkingModuleWithFreeFloatingCarSharing parkingModule,
 			ArrayList<ParkingCoordInfo> freefloatingCars) {
 

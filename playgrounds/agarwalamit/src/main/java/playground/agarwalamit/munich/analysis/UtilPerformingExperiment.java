@@ -48,10 +48,10 @@ public class UtilPerformingExperiment extends AbstractAnalysisModule {
 	private LegModeActivityEndTimeAndActDurationHandler actDurationUtilHandler;
 	private String eventsFile;
 	private String outputDir;
-	private static final Logger log = Logger.getLogger(UtilPerformingExperiment.class);
+	private static final Logger LOG = Logger.getLogger(UtilPerformingExperiment.class);
 
 	private Map<String, Double> actType2TypicalDuration ;
-	private double marginalUtil_performing_sec ;
+	private double marginalUtilPerformingSec ;
 	private SortedMap<String, Double> actType2UnderPerformUtils;
 	private SortedMap<String, Double> actType2OverPerformUtils;
 	private SortedMap<String, Double> actType2EqualPerformUtils;
@@ -93,7 +93,7 @@ public class UtilPerformingExperiment extends AbstractAnalysisModule {
 				double actDur = personId2ActType2ActDurations.get(personId).get(actType);
 				if(actDur==typActDuration) {
 					double utilSoFar = actType2EqualPerformUtils.get(actType);
-					double utilNow = utilSoFar+10*marginalUtil_performing_sec;
+					double utilNow = utilSoFar+10*marginalUtilPerformingSec;
 					actType2EqualPerformUtils.put(actType,utilNow);
 				} else if(actDur<typActDuration) {
 					double utilSoFar = actType2UnderPerformUtils.get(actType);
@@ -126,7 +126,7 @@ public class UtilPerformingExperiment extends AbstractAnalysisModule {
 	}
 
 	private void initializeActType2DurationsMaps(Config config){
-		log.info("Storing activity type and typical durations.");
+		LOG.info("Storing activity type and typical durations.");
 
 		for(String actType :config.planCalcScore().getActivityTypes()){
 			actType2TypicalDuration.put(actType, config.planCalcScore().getActivityParams(actType).getTypicalDuration());
@@ -134,14 +134,14 @@ public class UtilPerformingExperiment extends AbstractAnalysisModule {
 			actType2OverPerformUtils.put(actType, 0.0);
 			actType2EqualPerformUtils.put(actType, 0.0);
 		}
-		marginalUtil_performing_sec = config.planCalcScore().getPerforming_utils_hr() / 3600 ;
+		marginalUtilPerformingSec = config.planCalcScore().getPerforming_utils_hr() / 3600 ;
 	}
 
 	/**
 	 * Only true if all activities have same priority
 	 */
-	private double calcUtil4Performing(double typDuration, double actualDuration){
-		return 10 * marginalUtil_performing_sec + marginalUtil_performing_sec * typDuration * Math.log(actualDuration/typDuration);
+	private double calcUtil4Performing(final double typDuration, final double actualDuration){
+		return 10 * marginalUtilPerformingSec + marginalUtilPerformingSec * typDuration * Math.log(actualDuration/typDuration);
 	}
 
 	private void run(){

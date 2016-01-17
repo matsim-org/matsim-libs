@@ -21,11 +21,9 @@ package playground.thibautd.parknride.scoring;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.facilities.ActivityFacilities;
@@ -65,7 +63,7 @@ public class ParkAndRideScoringFunctionFactory implements ScoringFunctionFactory
 	 * controler just before the iterations start, taking the registered ScoringFunctionFactory
 	 * as a delegate.
 	 * @param penalties the factory to use to create penalties
-	 * @return a controler listener, to add to the controler before running the iterations.
+	 * @return a services listener, to add to the services before running the iterations.
 	 */
 	public static ControlerListener createFactoryListener(
 			final ParkingPenaltyFactory penalties) {
@@ -85,13 +83,14 @@ public class ParkAndRideScoringFunctionFactory implements ScoringFunctionFactory
 
 		@Override
 		public void notifyStartup(final StartupEvent event) {
-			Controler controler = event.getControler();
-            controler.setScoringFunctionFactory(
-					new ParkAndRideScoringFunctionFactory(
-						controler.getScoringFunctionFactory(),
-						parkingPenaltyFactory,
-						((MutableScenario) controler.getScenario()).getActivityFacilities(),
-                            controler.getScenario().getNetwork()) );
+			throw new RuntimeException();
+//			ControlerInjectorGetters controler = event.getServices();
+//            controler.setScoringFunctionFactory(
+//					new ParkAndRideScoringFunctionFactory(
+//						controler.getScoringFunctionFactory(),
+//						parkingPenaltyFactory,
+//						((MutableScenario) controler.getScenario()).getActivityFacilities(),
+//                            controler.getScenario().getNetwork()) );
 		}
 	}
 }

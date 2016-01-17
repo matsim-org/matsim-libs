@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.router.*;
@@ -59,14 +59,14 @@ public class PtSubModeTripRouterFactory implements javax.inject.Provider<TripRou
 	private Provider<TransitRouter> transitRouterFactory;
 	private TransitSchedule transitSchedule;
 
-	private Controler controler;
+	private MatsimServices controler;
 
 	/**
 	 * based on {@link TripRouterFactoryBuilderWithDefaults.TripRouterProviderImpl}. Own Implementation is just necessary to add pt-submodes.
 	 * @param controler
 	 * @param transitRouterFactory 
 	 */
-	public PtSubModeTripRouterFactory(final Controler controler, Provider<TransitRouter> transitRouterFactory) {
+	public PtSubModeTripRouterFactory(final MatsimServices controler, Provider<TransitRouter> transitRouterFactory) {
 		this.controler = controler;
 		this.transitRouterFactory = transitRouterFactory;
 //		this.config = controler.getScenario().getConfig();

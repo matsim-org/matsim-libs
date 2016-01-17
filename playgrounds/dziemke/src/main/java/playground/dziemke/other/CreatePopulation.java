@@ -25,7 +25,7 @@ public class CreatePopulation {
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		Population population = scenario.getPopulation();   
-		new MatsimNetworkReader(scenario).readFile("D:/Workspace/container/examples/equil/input/network.xml");
+		new MatsimNetworkReader(scenario.getNetwork()).readFile("D:/Workspace/container/examples/equil/input/network.xml");
 		Network network = scenario.getNetwork();
 		
 		for(Integer i = 1; i <= 5; i++) {

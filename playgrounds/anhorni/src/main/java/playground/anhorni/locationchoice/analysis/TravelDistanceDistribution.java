@@ -43,7 +43,7 @@ public class TravelDistanceDistribution implements StartupListener, IterationEnd
 
 	@Override
 	public void notifyStartup(final StartupEvent event) {
-        this.population = event.getControler().getScenario().getPopulation();
+        this.population = event.getServices().getScenario().getPopulation();
 	}
 
 	@Override
@@ -78,8 +78,8 @@ public class TravelDistanceDistribution implements StartupListener, IterationEnd
 				}
 			}
 		}
-		this.shopDistanceBins.plotDistribution(event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "shopDistanceDistributions"), "");
-		this.leisureDistanceBins.plotDistribution(event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "leisureDistanceDistributions"), "");
+		this.shopDistanceBins.plotDistribution(event.getServices().getControlerIO().getIterationFilename(event.getIteration(), "shopDistanceDistributions"), "");
+		this.leisureDistanceBins.plotDistribution(event.getServices().getControlerIO().getIterationFilename(event.getIteration(), "leisureDistanceDistributions"), "");
 	}
 
 	@Override

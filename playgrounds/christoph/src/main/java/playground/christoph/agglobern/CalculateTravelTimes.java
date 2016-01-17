@@ -106,7 +106,7 @@ public class CalculateTravelTimes {
 	}
 	
 	private void readNetworkFile(Scenario scenario) {
-		new MatsimNetworkReader(scenario).readFile(networkFile);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
 	}
 	
 	private void doCalculation() {

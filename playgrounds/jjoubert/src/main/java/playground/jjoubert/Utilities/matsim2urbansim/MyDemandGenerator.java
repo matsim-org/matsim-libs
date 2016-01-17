@@ -102,7 +102,7 @@ public class MyDemandGenerator {
 		scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Population p = scenario.getPopulation();
 		
-		NetworkReaderMatsimV1 nr = new NetworkReaderMatsimV1(scenario);
+		NetworkReaderMatsimV1 nr = new NetworkReaderMatsimV1(scenario.getNetwork());
 		nr.parse(networkFile.getAbsolutePath());
 		NetworkImpl ni = (NetworkImpl) scenario.getNetwork(); 
 		

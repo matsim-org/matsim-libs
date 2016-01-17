@@ -35,6 +35,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
@@ -54,24 +55,28 @@ import playground.agarwalamit.utils.LoadMyScenarios;
 
 public class AgentPositionWriter {
 
-	private final static double snapshotPeriod = 1;
+	private final static double SANPSOHOT_PERIOD = 1;
 	private final double trackLength = 3000;
+	private final double maxSpeed = 60/3.6;
 
 	public static void main(String[] args) 
 	{
-		final String dir = "../../../../repos/shared-svn/projects/mixedTraffic/triangularNetwork/run313/singleModes/withoutHoles/car_SW//";
+		final String dir = "../../../../repos/shared-svn/projects/mixedTraffic/triangularNetwork/run313/singleModes/holes/car/";
 		final String networkFile = dir+"/network.xml";
 		final String configFile = dir+"/config.xml";
-		final String prefix = "events[140]";
+		final String prefix = "events[40]";
 		final String eventsFile = dir+"/events/"+prefix+".xml";
 		
 		Scenario sc = LoadMyScenarios.loadScenarioFromNetworkAndConfig(networkFile, configFile);
 
 		//sc.getConfig().qsim().setSnapshotStyle(SnapshotStyle.withHoles);// not supported
 		sc.getConfig().qsim().setSnapshotStyle(SnapshotStyle.queue);
-		sc.getConfig().qsim().setSnapshotPeriod(snapshotPeriod);
+		sc.getConfig().qsim().setSnapshotPeriod(SANPSOHOT_PERIOD);
+		sc.getConfig().qsim().setLinkWidthForVis((float)0);
+		((NetworkImpl)sc.getNetwork()).setEffectiveLaneWidth(0.);
+		
 		sc.getConfig().controler().setSnapshotFormat(Arrays.asList("transims"));
-
+		
 		AgentPositionWriter apw = new AgentPositionWriter(dir+"rDataPersonPosition_"+prefix+".txt", sc, eventsFile); 
 		apw.run();
 	}
@@ -152,10 +157,12 @@ public class AgentPositionWriter {
 							double currentDist = Math.sqrt( (easting - prevEasting.get(agentId))*(easting - prevEasting.get(agentId)) 
 									+ (northing- prevNorthing.get(agentId))*(northing- prevNorthing.get(agentId)) );
 							
-							double velocity = currentDist / (snapshotPeriod); // denominator should be equal to snapshot period.
-							
+							double velocity = currentDist / (SANPSOHOT_PERIOD); // denominator should be equal to snapshot period.
+							if(velocity > maxSpeed ) { // person arriving (vehicle leaving traffic) are falling in this category
+								return;
+							}else if (velocity < 0.0) throw new RuntimeException("Speed can not be negative. Aborting ...");
+						
 							double position = prevPosition.get(agentId) + currentDist ;
-							
 							if(position > trackLength) {
 								position = position-trackLength;
 								prevCycle.put(agentId, prevCycle.get(agentId)+1);
@@ -164,8 +171,7 @@ public class AgentPositionWriter {
 							writer.write(agentId+"\t"+person2mode.get(agentId)+"\t"+position+"\t"+time+"\t"+velocity+"\t"+prevCycle.get(agentId)+"\n");
 							prevPosition.put(agentId, position);
 						}  else {
-							double velocity = 16.67;
-							writer.write(agentId+"\t"+person2mode.get(agentId)+"\t"+0.+"\t"+time+"\t"+velocity+"\t"+"1"+"\n");
+							writer.write(agentId+"\t"+person2mode.get(agentId)+"\t"+0.+"\t"+time+"\t"+maxSpeed+"\t"+"1"+"\n");
 							prevPosition.put(agentId, 0.);
 							prevCycle.put(agentId, 1);
 						}

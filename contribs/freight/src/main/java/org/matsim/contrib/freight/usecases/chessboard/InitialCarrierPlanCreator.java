@@ -4,7 +4,6 @@ import java.util.Collection;
 
 import jsprit.core.algorithm.VehicleRoutingAlgorithm;
 import jsprit.core.algorithm.VehicleRoutingAlgorithmBuilder;
-import jsprit.core.algorithm.io.VehicleRoutingAlgorithms;
 import jsprit.core.algorithm.state.StateManager;
 import jsprit.core.problem.VehicleRoutingProblem;
 import jsprit.core.problem.constraint.ConstraintManager;
@@ -137,7 +136,7 @@ public class InitialCarrierPlanCreator {
         Config config = new Config();
         config.addCoreModules();
         Scenario scenario = ScenarioUtils.createScenario(config);
-        new MatsimNetworkReader(scenario).readFile("input/usecases/chessboard/network/grid9x9_cap20.xml");
+        new MatsimNetworkReader(scenario.getNetwork()).readFile("input/usecases/chessboard/network/grid9x9_cap20.xml");
 
         Carriers carriers = new Carriers();
         new CarrierPlanXmlReaderV2(carriers).read("input/usecases/chessboard/freight/carrierPlansWithoutRoutes_10minTW.xml");

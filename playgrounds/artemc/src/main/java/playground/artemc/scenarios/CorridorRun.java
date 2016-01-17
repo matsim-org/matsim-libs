@@ -11,6 +11,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
@@ -88,7 +89,7 @@ public class CorridorRun {
 		controler.addControlerListener(new DisaggregatedHeterogeneousScoreAnalyzer((MutableScenario) controler.getScenario(),analysisControlerListener.getTripAnalysisHandler()));
 		controler.run();
 
-		final Controler finalControler = controler;
+		final MatsimServices finalControler = controler;
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
@@ -133,7 +134,7 @@ public class CorridorRun {
 		config.transit().setVehiclesFile(input+"vehicles.xml");
 		config.controler().setOutputDirectory(output);
 		
-		//		config.controler().setLastIteration(10);
+		//		config.services().setLastIteration(10);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		return scenario;
@@ -143,7 +144,7 @@ public class CorridorRun {
 
 		@Override
 		public void notifyStartup(StartupEvent event) {
-			Controler controler = event.getControler();
+			MatsimServices controler = event.getServices();
 			// create a plot containing the mean travel times
 			Set<String> transportModes = new HashSet<String>();
 			transportModes.add(TransportMode.car);
@@ -156,11 +157,11 @@ public class CorridorRun {
 
 			// initialize the social costs disutility calculator
 			//TravelTimeAndDistanceBasedIncomeTravelDisutilityFactory factory = new TravelTimeAndDistanceBasedIncomeTravelDisutilityFactory(factorMap);
-			//controler.setTravelDisutilityFactory(factory);
+			//services.setTravelDisutilityFactory(factory);
 			
-			//	ScoringFunctionFactoryExtended scoringFunctionFactoryExtended = new ScoringFunctionFactoryExtended(controler.getConfig().planCalcScore(), controler.getNetwork());
-			//	PlansScoringExtended plansScoringExtended = new PlansScoringExtended(controler.getScenario(), controler.getEvents(), controler.getControlerIO(), scoringFunctionFactoryExtended);
-			//	controler.addControlerListener(plansScoringExtended);
+			//	ScoringFunctionFactoryExtended scoringFunctionFactoryExtended = new ScoringFunctionFactoryExtended(services.getConfig().planCalcScore(), services.getNetwork());
+			//	PlansScoringExtended plansScoringExtended = new PlansScoringExtended(services.getScenario(), services.getEvents(), services.getControlerIO(), scoringFunctionFactoryExtended);
+			//	services.addControlerListener(plansScoringExtended);
 		}
 	}
 

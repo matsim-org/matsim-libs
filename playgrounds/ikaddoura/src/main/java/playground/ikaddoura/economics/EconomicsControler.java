@@ -107,7 +107,7 @@ public class EconomicsControler {
 
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		
-		new MatsimNetworkReader(scenario).readFile(scenario.getConfig().network().getInputFile());
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(scenario.getConfig().network().getInputFile());
 		new MatsimPopulationReader(scenario).readFile(scenario.getConfig().plans().getInputFile());
 
 		Controler controler = new Controler(scenario);
@@ -153,7 +153,7 @@ public class EconomicsControler {
 
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		
-		new MatsimNetworkReader(scenario).readFile(scenario.getConfig().network().getInputFile());
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(scenario.getConfig().network().getInputFile());
 		new MatsimPopulationReader(scenario).readFile(scenario.getConfig().plans().getInputFile());
 
 		Controler controler = new Controler(scenario);
@@ -189,7 +189,7 @@ public class EconomicsControler {
 
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		
-		new MatsimNetworkReader(scenario).readFile(scenario.getConfig().network().getInputFile());
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(scenario.getConfig().network().getInputFile());
 		new MatsimPopulationReader(scenario).readFile(scenario.getConfig().plans().getInputFile());
 
 		Controler controler = new Controler(scenario);
@@ -223,7 +223,7 @@ public class EconomicsControler {
 			
 			MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 			
-			new MatsimNetworkReader(scenario).readFile(scenario.getConfig().network().getInputFile());
+			new MatsimNetworkReader(scenario.getNetwork()).readFile(scenario.getConfig().network().getInputFile());
 			new MatsimPopulationReader(scenario).readFile(scenario.getConfig().plans().getInputFile());
 			
 			Controler controler = new Controler(scenario);
@@ -281,7 +281,7 @@ public class EconomicsControler {
 			population = generatePopulation(population, demand);
 			
 			MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
-			new MatsimNetworkReader(scenario).readFile(scenario.getConfig().network().getInputFile());
+			new MatsimNetworkReader(scenario.getNetwork()).readFile(scenario.getConfig().network().getInputFile());
 			scenario.setPopulation(population);
 			
 			if (demand == maxDemand) {

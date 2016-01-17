@@ -22,7 +22,7 @@ package org.matsim.contrib.locationchoice.facilityload;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -58,7 +58,7 @@ public class FacilitiesLoadCalculator implements StartupListener, BeforeMobsimLi
 
 	@Override
 	public void notifyStartup(final StartupEvent event) {
-		Controler controler = event.getControler();
+		MatsimServices controler = event.getServices();
 		/*
 		 * Scales the load of the facilities (for e.g. 10 % runs), assuming that only integers
 		 * can be used to scale a  x% scenario ((100 MOD x == 0) runs e.g. x=10%)
@@ -71,7 +71,7 @@ public class FacilitiesLoadCalculator implements StartupListener, BeforeMobsimLi
 				this.facilityPenalties, 
 				((DestinationChoiceConfigGroup)controler.getConfig().getModule("locationchoice"))
 				);
-		event.getControler().getEvents().addHandler(this.eventsToFacilityLoad);
+		event.getServices().getEvents().addHandler(this.eventsToFacilityLoad);
 	}
 
 	@Override
@@ -90,11 +90,11 @@ public class FacilitiesLoadCalculator implements StartupListener, BeforeMobsimLi
 	 */
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
-		Controler controler = event.getControler();
+		MatsimServices controler = event.getServices();
         ActivityFacilities facilities = controler.getScenario().getActivityFacilities();
 
 		if (event.getIteration() % 2 == 0) {
-			printStatistics(facilities, event.getControler().getControlerIO().getIterationPath(event.getIteration()), event.getIteration(),
+			printStatistics(facilities, event.getServices().getControlerIO().getIterationPath(event.getIteration()), event.getIteration(),
 					this.eventsToFacilityLoad.getFacilityPenalties());
 		}
 	}

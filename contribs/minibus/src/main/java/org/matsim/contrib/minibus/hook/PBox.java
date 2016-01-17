@@ -98,40 +98,40 @@ final class PBox implements Operators {
 	void notifyStartup(StartupEvent event) {
 		// This is the first iteration
 
-        TimeProvider timeProvider = new TimeProvider(this.pConfig, event.getControler().getControlerIO().getOutputPath());
-		event.getControler().getEvents().addHandler(timeProvider);
+        TimeProvider timeProvider = new TimeProvider(this.pConfig, event.getServices().getControlerIO().getOutputPath());
+		event.getServices().getEvents().addHandler(timeProvider);
 		
 		// initialize strategy manager
 		this.strategyManager.init(this.pConfig, this.stageCollectorHandler, this.ticketMachine, timeProvider);
 		
 		// init fare collector
-        this.stageCollectorHandler.init(event.getControler().getScenario().getNetwork());
-		event.getControler().getEvents().addHandler(this.stageCollectorHandler);
-		event.getControler().addControlerListener(this.stageCollectorHandler);
+        this.stageCollectorHandler.init(event.getServices().getScenario().getNetwork());
+		event.getServices().getEvents().addHandler(this.stageCollectorHandler);
+		event.getServices().addControlerListener(this.stageCollectorHandler);
 		this.stageCollectorHandler.addStageContainerHandler(this.scorePlansHandler);
 		
 		// init operator cost collector
-        this.operatorCostCollectorHandler.init(event.getControler().getScenario().getNetwork());
-		event.getControler().getEvents().addHandler(this.operatorCostCollectorHandler);
-		event.getControler().addControlerListener(this.operatorCostCollectorHandler);
+        this.operatorCostCollectorHandler.init(event.getServices().getScenario().getNetwork());
+		event.getServices().getEvents().addHandler(this.operatorCostCollectorHandler);
+		event.getServices().addControlerListener(this.operatorCostCollectorHandler);
 		this.operatorCostCollectorHandler.addOperatorCostContainerHandler(this.scorePlansHandler);
 		
 		// init fare2moneyEvent
-		StageContainer2AgentMoneyEvent fare2AgentMoney = new StageContainer2AgentMoneyEvent(event.getControler(), this.ticketMachine);
+		StageContainer2AgentMoneyEvent fare2AgentMoney = new StageContainer2AgentMoneyEvent(event.getServices(), this.ticketMachine);
 		this.stageCollectorHandler.addStageContainerHandler(fare2AgentMoney);
 		
 		// init possible paratransit stops
-        this.pStopsOnly = PStopsFactory.createPStops(event.getControler().getScenario().getNetwork(), this.pConfig, event.getControler().getScenario().getTransitSchedule());
+        this.pStopsOnly = PStopsFactory.createPStops(event.getServices().getScenario().getNetwork(), this.pConfig, event.getServices().getScenario().getTransitSchedule());
 		
 		this.operators = new LinkedList<>();
-		this.operatorInitializer = new OperatorInitializer(this.pConfig, this.franchise, this.pStopsOnly, event.getControler(), timeProvider, this.welfareAnalyzer);
+		this.operatorInitializer = new OperatorInitializer(this.pConfig, this.franchise, this.pStopsOnly, event.getServices(), timeProvider, this.welfareAnalyzer);
 		
 		// init additional operators from a given transit schedule file
-		LinkedList<Operator> operatorsFromSchedule = this.operatorInitializer.createOperatorsFromSchedule(event.getControler().getScenario().getTransitSchedule());
+		LinkedList<Operator> operatorsFromSchedule = this.operatorInitializer.createOperatorsFromSchedule(event.getServices().getScenario().getTransitSchedule());
 		this.operators.addAll(operatorsFromSchedule);
 		
 		// init initial set of operators - reduced by the number of preset operators
-		LinkedList<Operator> initialOperators = this.operatorInitializer.createAdditionalOperators(this.strategyManager, event.getControler().getConfig().controler().getFirstIteration(), (this.pConfig.getNumberOfOperators() - operatorsFromSchedule.size()));
+		LinkedList<Operator> initialOperators = this.operatorInitializer.createAdditionalOperators(this.strategyManager, event.getServices().getConfig().controler().getFirstIteration(), (this.pConfig.getNumberOfOperators() - operatorsFromSchedule.size()));
 		this.operators.addAll(initialOperators);
 		
 		// collect the transit schedules from all operators
@@ -176,7 +176,7 @@ final class PBox implements Operators {
 	void notifyScoring(ScoringEvent event) {
 		
 		if (this.pConfig.getWelfareMaximization()) {
-			welfareAnalyzer.computeWelfare(event.getControler().getScenario());
+			welfareAnalyzer.computeWelfare(event.getServices().getScenario());
 			welfareAnalyzer.writeToFile(event);
 		}
 		
@@ -196,7 +196,7 @@ final class PBox implements Operators {
 			this.pTransitSchedule.addTransitLine(operator.getCurrentTransitLine());
 		}
 		
-		writeScheduleToFile(this.pTransitSchedule, event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "transitScheduleScored.xml.gz"));		
+		writeScheduleToFile(this.pTransitSchedule, event.getServices().getControlerIO().getIterationFilename(event.getIteration(), "transitScheduleScored.xml.gz"));
 	}
 
 	private void handleBankruptOperators(int iteration) {

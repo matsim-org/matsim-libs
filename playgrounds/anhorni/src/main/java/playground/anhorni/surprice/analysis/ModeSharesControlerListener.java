@@ -19,7 +19,7 @@
 package playground.anhorni.surprice.analysis;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
@@ -37,14 +37,14 @@ public class ModeSharesControlerListener implements StartupListener, IterationEn
 
 	@Override
 	public void notifyStartup(StartupEvent event) {
-		Controler controler = event.getControler();
+		MatsimServices controler = event.getServices();
 		handler = new ModeSharesEventHandler(controler, this.xy);
 		controler.getEvents().addHandler(handler);
 	}
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
-		String path = event.getControler().getControlerIO()
+		String path = event.getServices().getControlerIO()
 			.getIterationPath(event.getIteration());
 		handler.printInfo(event.getIteration());
 		handler.writeXYsGraphic(path+"/" + this.xy + "ByMode.png", 20);

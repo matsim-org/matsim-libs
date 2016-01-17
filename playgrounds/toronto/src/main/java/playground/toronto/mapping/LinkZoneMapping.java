@@ -51,7 +51,7 @@ public class LinkZoneMapping {
 	public void run(final String inputNetworkFile, final String outputMappingFile) {
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario).readFile(inputNetworkFile);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(inputNetworkFile);
 		new Link2ZoneMap().run(network);
 	}
 	

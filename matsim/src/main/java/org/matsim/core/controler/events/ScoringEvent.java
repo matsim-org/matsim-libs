@@ -20,7 +20,7 @@
 
 package org.matsim.core.controler.events;
 
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 
 /**
  * Event class to notify observers that scoring should happen
@@ -34,7 +34,7 @@ public final class ScoringEvent extends ControlerEvent {
 	 */
 	private final int iteration;
 
-	public ScoringEvent(final Controler controler, final int iteration) {
+	public ScoringEvent(final MatsimServices controler, final int iteration) {
 		super(controler);
 		this.iteration = iteration;
 	}

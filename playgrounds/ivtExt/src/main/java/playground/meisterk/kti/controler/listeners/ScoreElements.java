@@ -21,7 +21,7 @@
 package playground.meisterk.kti.controler.listeners;
 
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.corelisteners.PlansScoring;
 import org.matsim.core.controler.events.ScoringEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -54,7 +54,7 @@ public class ScoreElements implements StartupListener, ScoringListener, Shutdown
 
 		try {
 			
-			this.out = IOUtils.getBufferedWriter(event.getControler().getControlerIO().getOutputFilename(this.filename));
+			this.out = IOUtils.getBufferedWriter(event.getServices().getControlerIO().getOutputFilename(this.filename));
 			this.out.write("#iteration");
 			for (String str : ScoreElements.SCORE_ELEMENT_NAMES) {
 				this.out.write("\t" + str);
@@ -77,7 +77,7 @@ public class ScoreElements implements StartupListener, ScoringListener, Shutdown
 		}
 		double d;
 
-		Controler c = event.getControler();
+		MatsimServices c = event.getServices();
 
         for (Person p : c.getScenario().getPopulation().getPersons().values()) {
 

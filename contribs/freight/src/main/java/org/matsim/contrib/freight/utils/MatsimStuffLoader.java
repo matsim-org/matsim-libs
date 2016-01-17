@@ -59,7 +59,7 @@ public class MatsimStuffLoader {
 		Config config = new Config();
 		config.addCoreModules();
 		Scenario scenario = ScenarioUtils.createScenario(config);
-		new MatsimNetworkReader(scenario).readFile(networkFilename);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFilename);
 		return new MatsimStuff(config, scenario);
 	}
 

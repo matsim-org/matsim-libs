@@ -45,7 +45,7 @@ public class QuickfixLegDistanceDistributionWriter {
 		Config config = ConfigUtils.loadConfig(configFile);
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		
-		new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(config.network().getInputFile());
 		
 		PopulationImpl pop = (PopulationImpl) scenario.getPopulation();
 		pop.setIsStreaming(true);

@@ -23,7 +23,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
@@ -38,18 +38,18 @@ import org.matsim.withinday.replanning.identifiers.LeaveLinkIdentifierFactory;
 public class WithindayListener implements StartupListener, IterationStartsListener {
 	
 	protected Scenario scenario;
-	private Controler controler;
+	private MatsimServices controler;
 	protected WithinDayControlerListener withinDayControlerListener;
 	private static final Logger log = Logger.getLogger(WithindayListener.class);
 
-	public WithindayListener(Controler controler) {		
+	public WithindayListener(MatsimServices controler) {
 		this.scenario = controler.getScenario();
 		this.withinDayControlerListener = new WithinDayControlerListener();
 		this.controler = controler;
 		
 		// Use a Scoring Function, that only scores the travel times!
-		//controler.setScoringFunctionFactory(new OnlyTravelTimeDependentScoringFunctionFactory());
-		//controler.setTravelDisutilityFactory(new OnlyTimeDependentTravelDisutilityFactory());
+		//services.setScoringFunctionFactory(new OnlyTravelTimeDependentScoringFunctionFactory());
+		//services.setTravelDisutilityFactory(new OnlyTimeDependentTravelDisutilityFactory());
 		
 		// workaround
 		this.withinDayControlerListener.setLeastCostPathCalculatorFactory(new DijkstraFactory());
@@ -85,7 +85,7 @@ public class WithindayListener implements StartupListener, IterationStartsListen
 
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
-		Population pop = event.getControler().getScenario().getPopulation();
+		Population pop = event.getServices().getScenario().getPopulation();
 		for (Person p : pop.getPersons().values()) {
 			PersonUtils.setAge(p, 100);
 		}	

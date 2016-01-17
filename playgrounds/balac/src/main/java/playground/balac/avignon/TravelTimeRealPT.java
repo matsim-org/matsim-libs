@@ -27,7 +27,7 @@ ObjectAttributes bla = new ObjectAttributes();
 			MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 			PopulationReader populationReader = new MatsimPopulationReader(scenario);
-			MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario);
+			MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario.getNetwork());
 		populationReader.readFile(input);
 	//	networkReader.readFile(networkFilePath);
 		double travelTimeCar = 0.0;

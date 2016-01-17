@@ -102,25 +102,13 @@ public class TollLinkAnalyzer implements LinkEnterEventHandler {
 		events.addHandler(withoutToll);
 		MatsimEventsReader reader = new MatsimEventsReader(events);
 		reader.readFile(path
-				+ "2015-12-11_LARGE-2_RegentMATSim/no-toll/summary/iteration-3/it.500/500.events.xml.gz"
-		// "./ihop2-data/matsim-output/ITERS/it.200/200.events.xml.gz"
-		// "./ihop2-data/regent-matsim/matsim-output.1/ITERS/it.0/0.events.xml.gz"
-		// path
-		// +
-		// "2015-11-23ab_LARGE_RegentMATSim/2015-11-23a_No_Toll_large/summary/iteration-3/it.400/400.events.xml.gz"
-		);
+				+ "2015-12-11_LARGE-2_RegentMATSim/no-toll/summary/iteration-3/it.500/500.events.xml.gz");
 
 		config.getModule("plans")
 				.addParam(
 						"inputPlansFile",
 						path
-								+ "2015-12-11_LARGE-2_RegentMATSim/no-toll/summary/iteration-3/it.500/500.plans.xml.gz"
-				// "./ihop2-data/matsim-output/ITERS/it.200/200.plans.xml.gz"
-				// "./ihop2-data/regent-matsim/matsim-output.1/ITERS/it.0/0.plans.xml.gz"
-				// path
-				// +
-				// "2015-11-23ab_LARGE_RegentMATSim/2015-11-23a_No_Toll_large/summary/iteration-3/it.400/400.plans.xml.gz"
-				);
+								+ "2015-12-11_LARGE-2_RegentMATSim/no-toll/summary/iteration-3/it.500/500.plans.xml.gz");
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		DepartureTimeHistogram hist = new DepartureTimeHistogram(0, 3600, 24);
 		for (Id<Person> personId : withoutToll.maxTollPayers) {

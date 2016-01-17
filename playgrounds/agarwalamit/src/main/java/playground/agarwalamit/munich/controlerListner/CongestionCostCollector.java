@@ -35,18 +35,18 @@ import playground.vsp.congestion.handlers.CongestionEventHandler;
  */
 
 public class CongestionCostCollector implements CongestionEventHandler {
-	private final static Logger log = Logger.getLogger(CongestionCostCollector.class);
+	private final static Logger LOG = Logger.getLogger(CongestionCostCollector.class);
 
 	private final MutableScenario scenario;
-	private final double vtts_car;
+	private final double vttsCar;
 	private double amountSum = 0.;
 	private Map<Id<Person>, Double> causingPerson2Cost = new HashMap<>();
 
 	public CongestionCostCollector(MutableScenario scenario) {
 		this.scenario = scenario;
-		this.vtts_car = (this.scenario.getConfig().planCalcScore().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() - this.scenario.getConfig().planCalcScore().getPerforming_utils_hr()) / this.scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney();
+		this.vttsCar = (this.scenario.getConfig().planCalcScore().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() - this.scenario.getConfig().planCalcScore().getPerforming_utils_hr()) / this.scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney();
 
-		log.info("VTTS_car: " + vtts_car);
+		LOG.info("VTTS_car: " + vttsCar);
 	}
 
 	@Override
@@ -58,7 +58,7 @@ public class CongestionCostCollector implements CongestionEventHandler {
 	@Override
 	public void handleEvent(CongestionEvent event) {
 
-		double amount = event.getDelay() / 3600 * this.vtts_car;
+		double amount = event.getDelay() / 3600 * this.vttsCar;
 		this.amountSum = this.amountSum + amount;
 		Id<Person> causingPerson = Id.createPersonId(event.getCausingAgentId().toString()); 
 

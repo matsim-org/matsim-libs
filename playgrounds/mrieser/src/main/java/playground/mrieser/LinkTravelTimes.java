@@ -46,7 +46,7 @@ public class LinkTravelTimes {
 
 		System.out.println("Loading network " + networkFilename);
 		
-		new MatsimNetworkReader(scenario).readFile(networkFilename);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFilename);
 		
 		int binSize = 30*60; // 30 minutes
 		int maxTime = 24 * 3600; // 24 hours

@@ -89,7 +89,6 @@ public class RunRoadClassification {
 		almostRealLinkSettings.add(addNoise(new LinkSettings(25.0, 4000.0, 2.5)));
 
 		int maxMemoryLength = 100;
-		boolean keepBestSolution = false;
 		boolean interpolate = false;
 		int maxIterations = 100;
 		int maxTransitions = 1000;
@@ -136,10 +135,10 @@ public class RunRoadClassification {
 		// Discretizize the day into 24 one-hour time bins, starting at midnight.
 		final TimeDiscretization timeDiscretization = new TimeDiscretization(0, 3600, 24);
 		
-		RandomSearch<RoadClassificationDecisionVariable> randomSearch = new RandomSearch<>(new MATSimSimulator<RoadClassificationDecisionVariable>(stateFactory, scenario, timeDiscretization), randomizer, convergenceCriterion, 
+		RandomSearch<RoadClassificationDecisionVariable> randomSearch = new RandomSearch<>(new MATSimSimulator<RoadClassificationDecisionVariable>(stateFactory, scenario, timeDiscretization, null), randomizer, convergenceCriterion, 
 				// selfTuner, 
 				maxIterations, maxTransitions, populationSize,
-				MatsimRandom.getRandom(), interpolate, keepBestSolution, objectiveFunction, maxMemoryLength);
+				MatsimRandom.getRandom(), interpolate, objectiveFunction, maxMemoryLength, 0.95);
 		randomSearch.setLogFileName(scenario.getConfig().controler().getOutputDirectory() + "optimization.log");
 		randomSearch.run();
 		for (DecisionVariable decisionVariable : randomSearch.getBestDecisionVariablesView()) {

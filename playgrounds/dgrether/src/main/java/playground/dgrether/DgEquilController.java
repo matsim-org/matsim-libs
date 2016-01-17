@@ -68,7 +68,7 @@ public class DgEquilController {
 		  controler.getConfig().qsim().setSnapshotStyle(SnapshotStyle.queue);
 		}
 		else {
-//		  ((SimulationConfigGroup) controler.getConfig().getModule(SimulationConfigGroup.GROUP_NAME)).setSnapshotPeriod(1.0);
+//		  ((SimulationConfigGroup) services.getConfig().getModule(SimulationConfigGroup.GROUP_NAME)).setSnapshotPeriod(1.0);
 			throw new RuntimeException("no longer supported") ;
 		}
 
@@ -79,7 +79,7 @@ public class DgEquilController {
 
 		controler.addControlerListener(new StartupListener(){
 			public void notifyStartup(final StartupEvent event) {
-				event.getControler().getConfig().controler().setLastIteration(iteration);
+				event.getServices().getConfig().controler().setLastIteration(iteration);
 			}
 		});
 		

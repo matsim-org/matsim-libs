@@ -88,7 +88,7 @@ public class FilterPersonPlan extends NewPopulation {
 		String outPlansFile = "./baseplan_car_pt_only.xml.gz";
 
 		Network net = sc.getNetwork();
-		new MatsimNetworkReader(sc).readFile(networkFile);
+		new MatsimNetworkReader(sc.getNetwork()).readFile(networkFile);
 
 		Population inPop = sc.getPopulation();
 		PopulationReader popReader = new MatsimPopulationReader(sc);

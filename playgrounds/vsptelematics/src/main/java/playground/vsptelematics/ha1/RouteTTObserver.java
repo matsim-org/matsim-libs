@@ -32,6 +32,8 @@ import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
@@ -40,6 +42,7 @@ import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 
 import playground.vsptelematics.common.ListUtils;
 
+import javax.inject.Inject;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.*;
@@ -69,8 +72,10 @@ public class RouteTTObserver implements PersonDepartureEventHandler, PersonArriv
 	
 	Vehicle2DriverEventHandler vehicle2driver = new Vehicle2DriverEventHandler();
 
-	public RouteTTObserver(String filename) {
-		this.filename = filename;
+	@Inject
+	RouteTTObserver(OutputDirectoryHierarchy controlerIO, EventsManager eventsManager) {
+		this.filename = controlerIO.getOutputFilename("routeTravelTimes.txt");
+		eventsManager.addHandler(this);
 		this.reset(0);
 	}
 
@@ -172,14 +177,14 @@ public class RouteTTObserver implements PersonDepartureEventHandler, PersonArriv
 		avr_route2TTs = StatUtils.mean(ListUtils.toArray(route2TTs));
 
 		if (Double.isNaN(avr_route1TTs)) {
-            avr_route1TTs = getFreespeedTravelTime(event.getControler().getScenario().getNetwork().getLinks().get(Id.create("2", Link.class)));
-            avr_route1TTs += getFreespeedTravelTime(event.getControler().getScenario().getNetwork().getLinks().get(Id.create("4", Link.class)));
-            avr_route1TTs += getFreespeedTravelTime(event.getControler().getScenario().getNetwork().getLinks().get(Id.create("6", Link.class)));
+            avr_route1TTs = getFreespeedTravelTime(event.getServices().getScenario().getNetwork().getLinks().get(Id.create("2", Link.class)));
+            avr_route1TTs += getFreespeedTravelTime(event.getServices().getScenario().getNetwork().getLinks().get(Id.create("4", Link.class)));
+            avr_route1TTs += getFreespeedTravelTime(event.getServices().getScenario().getNetwork().getLinks().get(Id.create("6", Link.class)));
 		}
 		if (Double.isNaN(avr_route2TTs)) {
-            avr_route2TTs = getFreespeedTravelTime(event.getControler().getScenario().getNetwork().getLinks().get(Id.create("3", Link.class)));
-            avr_route2TTs += getFreespeedTravelTime(event.getControler().getScenario().getNetwork().getLinks().get(Id.create("5", Link.class)));
-            avr_route2TTs += getFreespeedTravelTime(event.getControler().getScenario().getNetwork().getLinks().get(Id.create("6", Link.class)));
+            avr_route2TTs = getFreespeedTravelTime(event.getServices().getScenario().getNetwork().getLinks().get(Id.create("3", Link.class)));
+            avr_route2TTs += getFreespeedTravelTime(event.getServices().getScenario().getNetwork().getLinks().get(Id.create("5", Link.class)));
+            avr_route2TTs += getFreespeedTravelTime(event.getServices().getScenario().getNetwork().getLinks().get(Id.create("6", Link.class)));
 		}
 	}
 

@@ -31,7 +31,6 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 
-import playground.agarwalamit.analysis.spatial.SpatialDataInputs;
 import playground.benjamin.scenarios.munich.analysis.filter.PersonFilter;
 import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 
@@ -41,7 +40,7 @@ import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 
 public class ExtendedPersonFilter extends PersonFilter {
 
-	private final static String munichShapeFile  = "../../../repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
+	private final static String MUNICH_SHAPE_FILE  = "../../../repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
 	private PersonFilter pf = new PersonFilter();
 	private Collection<SimpleFeature> munichFeatures;
 	private boolean isSortingForShapeFile = false;
@@ -64,7 +63,7 @@ public class ExtendedPersonFilter extends PersonFilter {
 	 */
 	public ExtendedPersonFilter (final boolean isFilteringForInsideMunichCity){
 		if(isFilteringForInsideMunichCity) {
-			this.munichFeatures = ShapeFileReader.getAllFeatures(munichShapeFile);
+			this.munichFeatures = ShapeFileReader.getAllFeatures(MUNICH_SHAPE_FILE);
 			this.isSortingForShapeFile = true;
 			Logger.getLogger(ExtendedPersonFilter.class).info("Reading Munich city area shape file...");
 		}

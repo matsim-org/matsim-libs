@@ -48,10 +48,10 @@ public class CostFunctionsControlerListener implements StartupListener {
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		
-		EventsManager eventsManager = event.getControler().getEvents();
+		EventsManager eventsManager = event.getServices().getEvents();
 		
 		this.congestionHandler = new CongestionHandlerImplV3(eventsManager, scenario);
-		event.getControler().getEvents().addHandler(congestionHandler);		
+		event.getServices().getEvents().addHandler(congestionHandler);
 	}
 
 	public CongestionHandlerImplV3 getCongestionHandler() {

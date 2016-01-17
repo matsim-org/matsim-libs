@@ -1,6 +1,5 @@
 package playground.sergioo.scheduling2013;
 
-import java.awt.Toolkit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -815,7 +814,7 @@ public class SchedulingNetwork implements Network {
 		long time = System.currentTimeMillis();
 		List<SchedulingLink> path = network.createNetwork(new CurrentTime(), scenario.getActivityFacilities(), originId, destinationId, Integer.parseInt(args[5]), new HashSet<String>(Arrays.asList("car", "pt", "walk")), placeSharer, agenda, previousActivities, followingActivities, new MobsimStatus());
 		System.out.println(System.currentTimeMillis()-time);
-		new MatsimNetworkReader(scenario).readFile(args[7]);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(args[7]);
 		JFrame frame = new JFrame();
         frame.setUndecorated(true);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

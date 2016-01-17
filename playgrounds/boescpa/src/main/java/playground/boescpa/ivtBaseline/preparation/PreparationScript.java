@@ -200,7 +200,7 @@ public class PreparationScript {
         Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
         MatsimFacilitiesReader facilitiesReader = new MatsimFacilitiesReader(scenario);
         facilitiesReader.readFile(pathFacilities);
-        MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario);
+        MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario.getNetwork());
         networkReader.readFile(pathResources + NETWORK_ONLYCAR);
         F2LCreator.createF2L(scenario, pathScenario + FACILITIES2LINKS);
     }

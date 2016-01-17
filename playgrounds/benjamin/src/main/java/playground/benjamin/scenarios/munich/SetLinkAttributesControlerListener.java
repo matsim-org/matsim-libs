@@ -57,7 +57,7 @@ public class SetLinkAttributesControlerListener implements StartupListener {
 
 	@Override
 	public void notifyStartup(StartupEvent event) {
-        Network network = event.getControler().getScenario().getNetwork();
+        Network network = event.getServices().getScenario().getNetwork();
 		
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		NetworkImpl zone30Links = (NetworkImpl) sc.getNetwork();

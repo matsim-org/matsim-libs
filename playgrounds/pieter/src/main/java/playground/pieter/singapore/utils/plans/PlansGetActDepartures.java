@@ -69,7 +69,7 @@ public class PlansGetActDepartures {
 		MatsimRandom.reset(123);
 		scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
-		new MatsimNetworkReader(scenario).readFile("data/plans/singapore6.xml.gz");
+		new MatsimNetworkReader(scenario.getNetwork()).readFile("data/plans/singapore6.xml.gz");
 		new MatsimPopulationReader(scenario)
 				.readFile("data/plans/matsimSG2plans.xml.gz");
 //		.readFile("data/short_plans.xml");

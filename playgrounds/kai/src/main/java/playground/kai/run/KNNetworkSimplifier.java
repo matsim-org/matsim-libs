@@ -66,7 +66,7 @@ public class KNNetworkSimplifier {
 	public static void run(final String inputNetworkFile, final String outputNetworkFile) {
 		final Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		final Network network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario).readFile(inputNetworkFile);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(inputNetworkFile);
 
 		NetworkCleaner cleaner = new org.matsim.core.network.algorithms.NetworkCleaner() ;
 		cleaner.run( network) ;

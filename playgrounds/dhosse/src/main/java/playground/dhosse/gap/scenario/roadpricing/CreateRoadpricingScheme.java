@@ -24,7 +24,7 @@ public class CreateRoadpricingScheme {
 	public static void main(String args[]){
 		
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenario).readFile(Global.runInputDir + "merged-networkV2_20150929.xml");
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(Global.runInputDir + "merged-networkV2_20150929.xml");
 		
 		CreateRoadpricingScheme.run(scenario);
 		

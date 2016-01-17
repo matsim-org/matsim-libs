@@ -23,7 +23,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.network.LinkImpl;
@@ -37,7 +37,7 @@ import playground.ciarif.flexibletransports.router.CarSharingStation;
 import playground.ciarif.flexibletransports.router.PlansCalcRouteFtInfo;
 
 public class CarSharingListener implements IterationEndsListener {
-  private Controler controler;
+  private MatsimServices controler;
   //private CarSharingSummaryWriter csw = new CarSharingSummaryWriter("/data/matsim/ciarif/output/zurich_10pc/CarSharing/CarSharingSummary");
   //private PersonsSummaryWriter psw = new PersonsSummaryWriter("/data/matsim/ciarif/output/zurich_10pc/CarSharing/PersonsSummary");
   private CarSharingSummaryWriter csw;
@@ -55,7 +55,7 @@ public class CarSharingListener implements IterationEndsListener {
 
   public void notifyIterationEnds(IterationEndsEvent event)
   {
-    this.controler = event.getControler();
+    this.controler = event.getServices();
     if (event.getIteration() != this.controler.getConfig().controler().getLastIteration())
       return;
       Network network = this.controler.getScenario().getNetwork();

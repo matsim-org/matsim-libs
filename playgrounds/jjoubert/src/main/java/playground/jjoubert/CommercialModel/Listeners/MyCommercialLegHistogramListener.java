@@ -40,12 +40,12 @@ public class MyCommercialLegHistogramListener implements IterationStartsListener
 		// Create an instance of the eventsHandler to convert events to a histogram table
 		MyCommercialLegHistogramBuilder clhb = new MyCommercialLegHistogramBuilder();
 		// Add the eventsHandler to the controller
-		event.getControler().getEvents().addHandler(clhb);
+		event.getServices().getEvents().addHandler(clhb);
 	}
 
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		// Remove the eventsHandler
-		event.getControler().getEvents().removeHandler(this.hb);
+		event.getServices().getEvents().removeHandler(this.hb);
 		
 		// TODO Close all files
 		

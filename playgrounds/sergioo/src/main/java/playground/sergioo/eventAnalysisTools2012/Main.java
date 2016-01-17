@@ -57,7 +57,7 @@ public class Main {
 	public static void main(String[] args) throws IOException {
 		CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84_SVY21, TransformationFactory.WGS84_UTM48N);
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenario).parse("./data/MATSim-Sin-2.0/input/network/singapore7.xml");
+		new MatsimNetworkReader(scenario.getNetwork()).parse("./data/MATSim-Sin-2.0/input/network/singapore7.xml");
 		new NetworkCleaner().run(scenario.getNetwork());
 		TravelDisutility travelMinCost =  new TravelDisutility() {
 			

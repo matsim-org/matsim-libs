@@ -65,7 +65,7 @@ public class NetworkCleaner {
 	public void run(final String inputNetworkFile, final String outputNetworkFile) {
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario).readFile(inputNetworkFile);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(inputNetworkFile);
 
 		new org.matsim.core.network.algorithms.NetworkCleaner().run(network);
 

@@ -114,7 +114,7 @@ public class IdentifySpotsAtPtRough {
 	private static NetworkImpl getCarNetwork( final String netFile ) {
 		log.info( "read network from "+netFile );
 		Scenario sc = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
-		new MatsimNetworkReader( sc ).readFile( netFile );
+		new MatsimNetworkReader(sc.getNetwork()).readFile( netFile );
 		NetworkImpl net = NetworkImpl.createNetwork();
 
 		log.info( "filter network" );

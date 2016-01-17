@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.EmissionModule;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -46,7 +46,7 @@ import org.matsim.core.events.algorithms.EventWriterXML;
 public class InternalizeEmissionResponsibilityControlerListener implements StartupListener, IterationStartsListener, IterationEndsListener, ShutdownListener {
 	private static final Logger logger = Logger.getLogger(InternalizeEmissionResponsibilityControlerListener.class);
 
-	Controler controler;
+	MatsimServices controler;
 	EmissionModule emissionModule;
 	EmissionResponsibilityCostModule emissionCostModule;
 	String emissionEventOutputFile;
@@ -98,7 +98,7 @@ public class InternalizeEmissionResponsibilityControlerListener implements Start
 
 	@Override
 	public void notifyStartup(StartupEvent event) {
-		controler = event.getControler();
+		controler = event.getServices();
 
 		EventsManager eventsManager = controler.getEvents();
 		eventsManager.addHandler(emissionModule.getWarmEmissionHandler());

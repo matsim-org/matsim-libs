@@ -45,7 +45,7 @@ public class RoadPricingScheme {
 		double centerY = 247300.0;
 		Coord coord = new Coord(centerX, centerY);
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario);
+		MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario.getNetwork());
 		networkReader.readFile(args[0]);
 		
 		for(Link l : scenario.getNetwork().getLinks().values()) {

@@ -130,7 +130,7 @@ public class CountsCreator {
 
 	protected void loadNetwork(final String networkFile, Scenario scenario) {
 		log.info("    reading network xml file... ");
-		new MatsimNetworkReader(scenario).readFile(networkFile);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
 		log.info("   done");
 	}
 

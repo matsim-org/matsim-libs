@@ -44,7 +44,7 @@ public class MatrixBasedPtInputUtils {
 			ptMatrixLocationsMap.put(id, coord);
 		}
 				
-		MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario);
+		MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario.getNetwork());
 		networkReader.readFile(networkFile);
 
 		createStopsFile(ptMatrixLocationsMap, outputRoot + "ptStops.csv", ",");
@@ -59,7 +59,7 @@ public class MatrixBasedPtInputUtils {
 	 * Creates a csv file containing the public transport stops or measure points
 	 */
 	public static void createStopsFile(Map<Id<Coord>, Coord> locationFacilitiesMap, String outputFileStops, String separator) {
-		final InputsCSVWriter stopsWriter = new InputsCSVWriter(outputFileStops, separator);
+		final CSVFileWriter stopsWriter = new CSVFileWriter(outputFileStops, separator);
 		
 		stopsWriter.writeField("id");
 		stopsWriter.writeField("x");

@@ -31,7 +31,7 @@ public class CalculateCarsharingTripDistance {
 	public CalculateCarsharingTripDistance(String networkFilePath) {
 		
 		scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario);
+		MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario.getNetwork());
 		networkReader.readFile(networkFilePath);
 	}
 	 public void run(String s) throws IOException{

@@ -20,18 +20,22 @@
 package playground.johannes.studies.matrix2014.source.mid2008;
 
 import org.apache.log4j.Logger;
+import org.matsim.contrib.common.stats.LinearDiscretizer;
 import org.matsim.contrib.common.util.XORShiftRandom;
 import playground.johannes.gsv.synPop.analysis.LegGeoDistanceTask;
 import playground.johannes.gsv.synPop.analysis.ProxyAnalyzer;
 import playground.johannes.gsv.synPop.mid.PersonCloner;
 import playground.johannes.gsv.synPop.mid.Route2GeoDistance;
 import playground.johannes.studies.matrix2014.analysis.ActTypeDistanceTask;
+import playground.johannes.studies.matrix2014.analysis.NumericLegAnalyzer;
 import playground.johannes.studies.matrix2014.sim.Simulator;
-import playground.johannes.synpop.data.Person;
-import playground.johannes.synpop.data.PlainFactory;
-import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.studies.matrix2014.sim.ValidatePersonWeight;
+import playground.johannes.synpop.analysis.*;
+import playground.johannes.synpop.data.*;
+import playground.johannes.synpop.data.io.PopulationIO;
 import playground.johannes.synpop.data.io.XMLHandler;
 import playground.johannes.synpop.processing.TaskRunner;
+import playground.johannes.synpop.processing.ValidateMissingAttribute;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -53,48 +57,29 @@ public class Analyzer {
 	
 		String output = "/home/johannes/gsv/matrix2014/popgen/mid-fusion";
 
+
 		String personFile = "/home/johannes/gsv/matrix2014/popgen/pop/mid2008.merged.xml";
 //		String personFile = "/home/johannes/gsv/germany-scenario/mid2008/pop/mid2008.midjourneys.validated.xml";
 //		String personFile = "/home/johannes/gsv/germany-scenario/mid2008/pop/mid2008.midtrips.validated.xml";
 		
-		XMLHandler parser = new XMLHandler(new PlainFactory());
-		parser.setValidating(false);
-		
-		parser.parse(personFile);
+		Set<? extends Person> persons = PopulationIO.loadFromXML(personFile, new PlainFactory());
 
-		Set<? extends Person> persons = parser.getPersons();
-		
-		
-		logger.info("Cloning persons...");
-		Random random = new XORShiftRandom();
-		persons = PersonCloner.weightedClones((Collection<PlainPerson>) persons, 1000000, random);
-//		new ApplySampleProbas(82000000).apply(persons);
-		logger.info(String.format("Generated %s persons.", persons.size()));
+//		logger.info("Cloning persons...");
+//		Random random = new XORShiftRandom();
+//		persons = PersonCloner.weightedClones((Collection<PlainPerson>) persons, 1000000, random);
+//		logger.info(String.format("Generated %s persons.", persons.size()));
 
+		TaskRunner.validatePersons(new ValidateMissingAttribute(CommonKeys.PERSON_WEIGHT), persons);
+		TaskRunner.validatePersons(new ValidatePersonWeight(), persons);
 		TaskRunner.run(new Route2GeoDistance(new Simulator.Route2GeoDistFunction()), persons);
 
-		playground.johannes.gsv.synPop.analysis.AnalyzerTaskComposite task = new playground.johannes.gsv.synPop.analysis.AnalyzerTaskComposite();
-		task.setOutputDirectory(output);
-//		task.addTask(new AgeIncomeCorrelation());
-		task.addTask(new ActTypeDistanceTask());
-		task.addTask(new LegGeoDistanceTask("car"));
-//		task.addTask(new DaySeasonTask());
-		task.setOutputDirectory(output);
-		
-		ProxyAnalyzer.analyze(persons, task);
-//		final Config config = new Config();
-//		ConfigUtils.loadConfig(config, "/home/johannes/gsv/germany-scenario/sim/config/simulator.xml");
-//		DataPool dataPool = new DataPool();
-//		dataPool.register(new ZoneDataLoader(config.getModule("synPopSim")), ZoneDataLoader.KEY);
-//		ZoneData zoneData = (ZoneData) dataPool.get(ZoneDataLoader.KEY);
-//		FileIOContext ioContext = new FileIOContext(output);
-//
-//		ZoneCollection zones = zoneData.getLayer("lau2");
-//		new ZoneSetLAU2Class().apply(zones);
-//		ZoneMobilityRate task = new ZoneMobilityRate(MiDKeys.PERSON_LAU2_CLASS, zones, new ModePredicate(CommonValues
-//				.LEG_MODE_CAR));
-//		task.setIoContext(ioContext);
-//		AnalyzerTaskRunner.run(persons, task, ioContext);
+		FileIOContext ioContext = new FileIOContext(output);
+		Predicate predicate = new ModePredicate(CommonValues.LEG_MODE_CAR);
+		HistogramWriter hWriter = new HistogramWriter(ioContext, new PassThroughDiscretizerBuilder(new
+				LinearDiscretizer(50000), "linear"));
+
+		AnalyzerTask task = NumericLegAnalyzer.create(CommonKeys.LEG_GEO_DISTANCE, true, predicate, "car", hWriter);
+		AnalyzerTaskRunner.run(persons, task, ioContext);
 	}
 
 }

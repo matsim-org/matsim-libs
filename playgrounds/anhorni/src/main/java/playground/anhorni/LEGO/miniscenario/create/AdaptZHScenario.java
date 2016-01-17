@@ -63,7 +63,7 @@ public class AdaptZHScenario {
 	}
 		
 	private void init(final String plansFilePath, final String networkFilePath, final String facilitiesFilePath) {
-		new MatsimNetworkReader(scenario).readFile(networkFilePath);		
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFilePath);
 		new FacilitiesReaderMatsimV1(scenario).readFile(facilitiesFilePath);
 		MatsimPopulationReader populationReader = new MatsimPopulationReader(this.scenario);
 		populationReader.readFile(plansFilePath);

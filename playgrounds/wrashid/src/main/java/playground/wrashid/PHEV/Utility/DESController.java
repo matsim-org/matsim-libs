@@ -1,5 +1,6 @@
 package playground.wrashid.PHEV.Utility;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.EnergyConsumption;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.Controler;
@@ -9,9 +10,15 @@ import org.matsim.core.mobsim.jdeqsim.util.Timer;
 
 
 
-class DESController extends Controler {
+class DESController {
+	private final Controler controler;
+
+	public Scenario getScenario() {
+		return controler.getScenario();
+	}
+
 	public DESController(final String[] args) {
-	    super(args);
+	    controler = new Controler(args);
 	    
 	    throw new RuntimeException( Gbl.RUN_MOB_SIM_NO_LONGER_POSSIBLE ) ;
 	  }
@@ -26,18 +33,18 @@ class DESController extends Controler {
 		Timer t=new Timer();
 		t.startTimer();
 		final DESController controler = new DESController(args);
-		controler.getConfig().controler().setOverwriteFileSetting(
+		controler.controler.getConfig().controler().setOverwriteFileSetting(
 				true ?
 						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
 						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
-		EventsManager events=controler.getEvents();
+		EventsManager events= controler.controler.getEvents();
 
 
 		ElectricCostHandler ecHandler=new ElectricCostHandler(controler,getEnergyConsumptionSamples(),events,"0");
 		events.addHandler(ecHandler);
 
 
-		controler.run();
+		controler.controler.run();
 		t.endTimer();
 		t.printMeasuredTime("Time needed for MobSimController run: ");
 //		controler.events.printEventsCount();
@@ -71,4 +78,5 @@ class DESController extends Controler {
 
 		return ecs;
 	}
+
 }

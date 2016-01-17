@@ -49,6 +49,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.*;
 import org.matsim.core.controler.listener.*;
@@ -59,7 +60,6 @@ import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.pt.router.TransitRouter;
-import tutorial.programming.planStrategyForRemoval.MyExpBetaPlanChangerForRemovalProvider;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -273,7 +273,7 @@ public class RunPSim {
         formatter.printHelp("PSimControler", header, options, footer, true);
     }
 
-    public Controler getMatsimControler() {
+    public MatsimServices getMatsimControler() {
         return matsimControler;
     }
 
@@ -550,10 +550,10 @@ public class RunPSim {
         final private static int INDEX_BEST = 1;
         final private static int INDEX_AVERAGE = 2;
         final private static int INDEX_EXECUTED = 3;
-        private final Controler controler;
+        private final MatsimServices controler;
         private BufferedWriter out;
 
-        public QSimScoreWriter(Controler controler) {
+        public QSimScoreWriter(MatsimServices controler) {
             super();
             this.controler = controler;
 

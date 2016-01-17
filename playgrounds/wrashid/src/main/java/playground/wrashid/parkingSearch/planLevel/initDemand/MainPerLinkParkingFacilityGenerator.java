@@ -52,7 +52,7 @@ public class MainPerLinkParkingFacilityGenerator {
 		String networkFile = "C:\\data\\workspace\\playgrounds\\wrashid\\test\\scenarios\\berlin\\network.xml.gz";
 		String facilitiesPath = "C:\\data\\workspace\\playgrounds\\wrashid\\test\\scenarios\\berlin\\parkingFacilities.xml.gz";
 
-		new MatsimNetworkReader(sc).readFile(networkFile);
+		new MatsimNetworkReader(sc.getNetwork()).readFile(networkFile);
 		Network net = sc.getNetwork();
 
 		ActivityFacilitiesImpl activityFacilities = new ActivityFacilitiesImpl();

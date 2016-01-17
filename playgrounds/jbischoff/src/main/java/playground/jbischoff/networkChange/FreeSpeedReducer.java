@@ -43,7 +43,7 @@ public class FreeSpeedReducer
     {
     
         Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-        new MatsimNetworkReader(sc).readFile("\\\\vsp-nas\\jbischoff\\WinHome\\Docs\\svn-checkouts\\L013_matsim\\2014_ss\\ue\\ue6\\network.xml");
+        new MatsimNetworkReader(sc.getNetwork()).readFile("\\\\vsp-nas\\jbischoff\\WinHome\\Docs\\svn-checkouts\\L013_matsim\\2014_ss\\ue\\ue6\\network.xml");
         NetworkImpl net1 = (NetworkImpl)sc.getNetwork();
         
         NetworkImpl net2 = (NetworkImpl)NetworkUtils.createNetwork();

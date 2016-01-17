@@ -40,7 +40,7 @@ public class LCControler extends Controler {
 		this.addControlerListener(new FacilitiesLoadCalculator(this.facilityPenalties));		
 		
 		throw new RuntimeException(Gbl.SET_UP_IS_NOW_FINAL) ;
-		// in case below, could set scoring function factory between controler constructor and controler run. kai, may'15
+		// in case below, could set scoring function factory between services constructor and services run. kai, may'15
 	}
 
 //    @Override

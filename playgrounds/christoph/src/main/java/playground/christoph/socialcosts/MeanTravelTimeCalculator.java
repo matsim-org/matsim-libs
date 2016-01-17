@@ -129,7 +129,7 @@ public class MeanTravelTimeCalculator implements PersonArrivalEventHandler, Pers
 			List<Double> meanTravelTimes = previousTravelTimes.get(transportMode);
 			double[] data = new double[dataLength];
 			for (int i = 0; i < data.length; i++) data[i] = meanTravelTimes.get(i);
-			fileName = event.getControler().getControlerIO().getOutputFilename("meanTravelTime_" + transportMode + ".png");
+			fileName = event.getServices().getControlerIO().getOutputFilename("meanTravelTime_" + transportMode + ".png");
 			writer.writeGraphic(fileName, transportMode, data);
 		}
 
@@ -159,7 +159,7 @@ public class MeanTravelTimeCalculator implements PersonArrivalEventHandler, Pers
 			i++;
 		}
 
-		fileName = event.getControler().getControlerIO().getOutputFilename("meanTravelTime_comparison.png");
+		fileName = event.getServices().getControlerIO().getOutputFilename("meanTravelTime_comparison.png");
 		writer.writeGraphic(fileName, names, data);
 	}
 }

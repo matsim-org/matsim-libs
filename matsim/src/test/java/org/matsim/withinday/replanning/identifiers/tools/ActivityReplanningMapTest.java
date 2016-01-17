@@ -25,32 +25,29 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.events.StartupEvent;
-import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
-import org.matsim.core.mobsim.framework.listeners.FixedOrderSimulationListener;
-import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
-import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
-import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
+import org.matsim.core.mobsim.framework.listeners.*;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.withinday.controller.WithinDayModule;
 import org.matsim.withinday.events.ReplanningEvent;
-import org.matsim.withinday.mobsim.MobsimDataProvider;
 import org.matsim.withinday.mobsim.WithinDayEngine;
 
+import javax.inject.Inject;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class ActivityReplanningMapTest extends MatsimTestCase {
 
 	public void testGetTimeBin() {
-		ActivityReplanningMap arp = new ActivityReplanningMap(null);
+		ActivityReplanningMap arp = new ActivityReplanningMap(null, EventsUtils.createEventsManager());
 		
 		// test default setting with start time = 0.0 and time step size = 1.0
 		arp.simStartTime = 0.0;
@@ -101,36 +98,17 @@ public class ActivityReplanningMapTest extends MatsimTestCase {
 
 		Controler controler = new Controler(config);
 		controler.addOverridingModule(new WithinDayModule());
-		ControlerListenerForTests listener = new ControlerListenerForTests();
-		controler.addControlerListener(listener);
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				addMobsimListenerBinding().to(MobsimListenerForTests.class);
+			}
+		});
         controler.getConfig().controler().setCreateGraphs(false);
-        controler.setDumpDataAtEnd(false);
+		controler.getConfig().controler().setDumpDataAtEnd(false);
 		controler.getConfig().controler().setWriteEventsInterval(0);
 		controler.getConfig().controler().setWritePlansInterval(0);
 		controler.run();
-	}
-
-	/**
-	 * A ControllerListener that creates and registers an ActivityReplanningMap
-	 * and a MobsimListenerForTests which executes the test cases.
-	 *
-	 * @author cdobler
-	 */
-	private static class ControlerListenerForTests implements StartupListener {
-
-		@Override
-		public void notifyStartup(final StartupEvent event) {
-			event.getControler().getInjector().getInstance(WithinDayEngine.class).initializeReplanningModules(2);
-			MobsimDataProvider mobsimDataProvider = new MobsimDataProvider();
-			ActivityReplanningMap arp = new ActivityReplanningMap(mobsimDataProvider);
-			event.getControler().getEvents().addHandler(arp);
-			MobsimListenerForTests listener = new MobsimListenerForTests(arp, event.getControler().getInjector().getInstance(WithinDayEngine.class));
-			FixedOrderSimulationListener fosl = new FixedOrderSimulationListener();
-			fosl.addSimulationListener(mobsimDataProvider);
-			fosl.addSimulationListener(arp);
-			fosl.addSimulationListener(listener);
-			event.getControler().getMobsimListeners().add(fosl);
-		}
 	}
 
 	/**
@@ -151,7 +129,8 @@ public class ActivityReplanningMapTest extends MatsimTestCase {
 		private static final int t5 = 6*3600 + 60;
 		private static final int t6 = 6*3600 + 120;
 		
-		public MobsimListenerForTests(final ActivityReplanningMap arp, WithinDayEngine withinDayEngine) {
+		@Inject
+		MobsimListenerForTests(final ActivityReplanningMap arp, WithinDayEngine withinDayEngine) {
 			this.arp = arp;
 			this.withinDayEngine = withinDayEngine;
 			this.agents = new LinkedHashMap<Id<Person>, MobsimAgent>();

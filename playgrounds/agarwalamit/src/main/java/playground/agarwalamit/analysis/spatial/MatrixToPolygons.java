@@ -41,21 +41,22 @@ import com.vividsolutions.jts.geom.Polygon;
 
 public class MatrixToPolygons {
 	
-	private final static int xBins = 160;
-	private final static int yBins = 120;
+	private final static int X_BINS = 160;
+	private final static int Y_BINS = 120;
 	
-	private final static double xMin=4452550.25;
-	private final static double xMax=4479483.33;
-	private final static double yMin=5324955.00;
-	private final static double yMax=5345696.81;
+	private final static double X_MIN=4452550.25;
+	private final static double X_MAX=4479483.33;
+	private final static double Y_MIN=5324955.00;
+	private final static double Y_MAX=5345696.81;
 	
 	
-	private final double xWidth = (xMax - xMin)/xBins;
-	private final double yWidth = (yMax - yMin)/yBins;
+	private final double xWidth = (X_MAX - X_MIN)/X_BINS;
+	private final double yWidth = (Y_MAX - Y_MIN)/Y_BINS;
 	
-	private final String outFile =  "/Users/amit/Downloads/bk/poly_centroid_toll_weight.txt";
-	private final String inputFileToll = "/Users/amit/Downloads/bk/pricing.1500-baseCase.1500.absoluteDelta.Routput.AvgUserBenefitsDifferencesNoRefund.txt";
-	private final String inputFileWeight = "/Users/amit/Downloads/bk/baseCase.1500.Routput.UserBenefitsWeights.txt";
+	private final static String OUT_FILE =  "/Users/amit/Downloads/bk/poly_centroid_toll_weight.txt";
+	private final static String INPUT_FILE_TOLL = "/Users/amit/Downloads/bk/pricing.1500-baseCase.1500.absoluteDelta.Routput.AvgUserBenefitsDifferencesNoRefund.txt";
+	private final static String INPUT_FILE_WEIGHT = "/Users/amit/Downloads/bk/baseCase.1500.Routput.UserBenefitsWeights.txt";
+	
 
 	public static void main(String[] args) {
 		new MatrixToPolygons().writeRData();
@@ -69,12 +70,12 @@ public class MatrixToPolygons {
 		Map<Polygon, Double> poly2weight = new HashMap<>();
 		Map<Polygon, Coordinate> poly2Centroid = new HashMap<>();
 		
-		String [] [] arrayToll = readInputFile(inputFileToll);
-		String [] [] arrayWeight = readInputFile(inputFileWeight);
+		String [] [] arrayToll = readInputFile(INPUT_FILE_TOLL);
+		String [] [] arrayWeight = readInputFile(INPUT_FILE_WEIGHT);
 		
 		//get xs and ys
 		
-		String xCoords [] = new String [xBins];
+		String xCoords [] = new String [X_BINS];
 		for (int xIndex =1; xIndex < arrayToll[0].length;xIndex++){
 			xCoords[xIndex-1] = arrayToll[0][xIndex];
 		}
@@ -100,7 +101,7 @@ public class MatrixToPolygons {
  			}
  		}
  		
- 		BufferedWriter writer = IOUtils.getBufferedWriter(outFile);
+ 		BufferedWriter writer = IOUtils.getBufferedWriter(OUT_FILE);
  		
  		int noOfSidesOfPolygon = 4;
  		try {
@@ -124,7 +125,7 @@ public class MatrixToPolygons {
 
 	private String [] [] readInputFile(final String inputFile){
 		BufferedReader reader = IOUtils.getBufferedReader(inputFile);
-		String [] [] array = new String [yBins+1][xBins];
+		String [] [] array = new String [Y_BINS+1][X_BINS];
 		try {
 			String line = reader.readLine();
 			int xCount = 0;

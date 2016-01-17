@@ -91,7 +91,7 @@ public class PublicTranportTeleportAnalizer implements PersonDepartureEventHandl
 	 */
 	public static void main(String[] args) throws IOException {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenario).parse("./data/MATSim-Sin-2.0/input/network/singapore7.xml");
+		new MatsimNetworkReader(scenario.getNetwork()).parse("./data/MATSim-Sin-2.0/input/network/singapore7.xml");
 		PublicTranportTeleportAnalizer publicTranportTeleportAnalizer = new PublicTranportTeleportAnalizer();
 		EventsManager events = (EventsManager)EventsUtils.createEventsManager();
 		events.addHandler(publicTranportTeleportAnalizer);
