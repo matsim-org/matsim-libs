@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,23 +17,24 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.optimizer.filter;
+package playground.michalm.zone.util;
 
-import org.matsim.contrib.dvrp.data.Vehicle;
-
-import playground.michalm.taxi.data.TaxiRequest;
+import org.matsim.api.core.v01.network.Node;
 
 
-public interface RequestFilter
+public interface ZonalSystem<Z extends ZonalSystem.Zone>
 {
-    RequestFilter NO_FILTER = new RequestFilter() {
-        public Iterable<TaxiRequest> filterRequestsForVehicle(Iterable<TaxiRequest> requests,
-                Vehicle vehicle)
-        {
-            return requests;
-        }
-    };
+    public interface Zone
+    {
+        int getIdx();
+    }
 
 
-    Iterable<TaxiRequest> filterRequestsForVehicle(Iterable<TaxiRequest> requests, Vehicle vehicle);
+    Z getZone(Node node);
+
+
+    int getZoneCount();
+
+
+    Iterable<Z> getZonesByDistance(Node node);
 }

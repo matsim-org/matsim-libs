@@ -74,25 +74,28 @@ public class NOSRankTaxiOptimizer
         final IdleRankVehicleFinder idleVehicleFinder = new IdleRankVehicleFinder(context,
                 scheduler);
 
-        FilterFactory filterFactory = new FilterFactory() {
-            @Override
-            public RequestFilter createRequestFilter()
-            {
-                return RequestFilter.NO_FILTER;
-            }
-
-
-            @Override
-            public VehicleFilter createVehicleFilter()
-            {
-                return idleVehicleFinder;
-            }
-        };
+//        FilterFactory filterFactory = new FilterFactory() {
+//            @Override
+//            public RequestFilter createRequestFilter()
+//            {
+//                return RequestFilter.NO_FILTER;
+//            }
+//
+//
+//            @Override
+//            public VehicleFilter createVehicleFilter()
+//            {
+//                return idleVehicleFinder;
+//            }
+//        };
 
         TaxiOptimizerConfiguration optimConfig = new TaxiOptimizerConfiguration(context, travelTime,
-                travelDisutility, scheduler, filterFactory, Goal.MIN_WAIT_TIME, workingDir, null);
+                travelDisutility, scheduler, 0, 0, Goal.MIN_WAIT_TIME, workingDir, null);
+        
+        throw new RuntimeException("vehicle filtering has changed and uses IdleVehicleRegistry\n"
+                + "some changes are neccessary to use idleVehicleFinder for filtering");
 
-        return new NOSRankTaxiOptimizer(optimConfig, idleVehicleFinder);
+        //return new NOSRankTaxiOptimizer(optimConfig, idleVehicleFinder);
     }
 
 

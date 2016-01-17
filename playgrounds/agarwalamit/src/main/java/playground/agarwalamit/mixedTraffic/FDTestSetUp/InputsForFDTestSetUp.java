@@ -39,7 +39,7 @@ import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspDefaultsCheckingLevel;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.network.TimeVariantLinkFactory;
+import org.matsim.core.network.VariableIntervalTimeVariantLinkFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
@@ -125,7 +125,7 @@ public class InputsForFDTestSetUp {
 		if(isTimeDependentNetwork) {
 			scenario.getConfig().network().setTimeVariantNetwork(true);
 			NetworkImpl netImpl = (NetworkImpl) scenario.getNetwork();
-			netImpl.getFactory().setLinkFactory( new TimeVariantLinkFactory() );
+			netImpl.getFactory().setLinkFactory( new VariableIntervalTimeVariantLinkFactory() );
 		}
 
 		//nodes of the equilateral triangle base starting, left node at (0,0)

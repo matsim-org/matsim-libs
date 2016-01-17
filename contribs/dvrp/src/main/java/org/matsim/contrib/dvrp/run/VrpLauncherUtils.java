@@ -31,7 +31,7 @@ import org.matsim.contrib.dvrp.passenger.*;
 import org.matsim.contrib.dvrp.router.*;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentSource;
-import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup;
+import org.matsim.core.config.groups.*;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.*;
 import org.matsim.core.network.*;
@@ -43,8 +43,6 @@ import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 
 public class VrpLauncherUtils
 {
-    public static final int MAX_TIME = 36 * 60 * 60;
-
     //to avoid congestion; only the free-flow speed should decide on the movement of vehicles
     public static final double VARIANT_NETWORK_FLOW_CAP_FACTOR = 100;
 
@@ -63,11 +61,11 @@ public class VrpLauncherUtils
 
     public static Scenario initScenario(String netFile, String plansFile)
     {
-        return initScenario(netFile, plansFile, null);
+        return initScenario(netFile, plansFile, null, -1, -1);
     }
 
 
-    public static Scenario initScenario(String netFile, String plansFile, String changeEventsFile)
+    public static Scenario initScenario(String netFile, String plansFile, String changeEventsFile, int interval, int intervalCount)
     {
         Scenario scenario = ScenarioUtils.createScenario(VrpConfigUtils.createConfig());
         NetworkImpl network = (NetworkImpl)scenario.getNetwork();
@@ -75,7 +73,7 @@ public class VrpLauncherUtils
         if (changeEventsFile != null) {
             scenario.getConfig().network().setTimeVariantNetwork(true);
             scenario.getConfig().qsim().setFlowCapFactor(VARIANT_NETWORK_FLOW_CAP_FACTOR);
-            network.getFactory().setLinkFactory(new TimeVariantLinkFactory());
+            network.getFactory().setLinkFactory(new FixedIntervalTimeVariantLinkFactory(interval, intervalCount));
         }
 
         new MatsimNetworkReader(scenario.getNetwork()).readFile(netFile);

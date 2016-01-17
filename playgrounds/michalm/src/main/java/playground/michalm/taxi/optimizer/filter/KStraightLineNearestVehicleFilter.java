@@ -29,7 +29,6 @@ import playground.michalm.util.PartialSort;
 
 
 public class KStraightLineNearestVehicleFilter
-    implements VehicleFilter
 {
     private final TaxiScheduler scheduler;
     private final int k;
@@ -42,7 +41,6 @@ public class KStraightLineNearestVehicleFilter
     }
 
 
-    @Override
     public Iterable<Vehicle> filterVehiclesForRequest(Iterable<Vehicle> vehicles,
             TaxiRequest request)
     {

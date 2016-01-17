@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,40 +17,33 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.optimizer.filter;
+package playground.michalm.taxi.util.stats;
 
-import playground.michalm.taxi.scheduler.TaxiScheduler;
+import java.io.PrintWriter;
 
 
-public class DefaultFilterFactory
-    implements FilterFactory
+public class DailyHistograms
 {
-    private final TaxiScheduler scheduler;
-    private final int nearestRequestsLimit;
-    private final int nearestVehiclesLimit;
+    public final Histogram emptyDriveRatio = new Histogram(0.05, 20);
+    public final Histogram stayRatio = new Histogram(0.05, 20);
+
+    public static final String MAIN_HEADER = // 
+    "Empty_Drive_Ratio [%]" + HourlyHistograms.tabs(20) + //
+            "Vehicle_Wait_Ratio [%]" + HourlyHistograms.tabs(20); //
 
 
-    public DefaultFilterFactory(TaxiScheduler scheduler, int nearestRequestsLimit,
-            int nearestVehiclesLimit)
+    public void printSubHeaders(PrintWriter pw)
     {
-        this.scheduler = scheduler;
-        this.nearestRequestsLimit = nearestRequestsLimit;
-        this.nearestVehiclesLimit = nearestVehiclesLimit;
+        pw.print(emptyDriveRatio.binsToString(100));
+        pw.print(stayRatio.binsToString(100));
+        pw.println();
     }
 
 
-    @Override
-    public VehicleFilter createVehicleFilter()
+    public void printStats(PrintWriter pw)
     {
-        return nearestVehiclesLimit <= 0 ? VehicleFilter.NO_FILTER
-                : new KStraightLineNearestVehicleFilter(scheduler, nearestVehiclesLimit);
-    }
-
-
-    @Override
-    public RequestFilter createRequestFilter()
-    {
-        return nearestRequestsLimit <= 0 ? RequestFilter.NO_FILTER
-                : new KStraightLineNearestRequestFilter(scheduler, nearestRequestsLimit);
+        pw.print(emptyDriveRatio.countsToString());
+        pw.print(stayRatio.countsToString());
+        pw.println();
     }
 }

@@ -113,22 +113,20 @@ public class PrtQSimFactory implements MobsimFactory{
 	private TaxiOptimizerConfiguration initOptimizerConfiguration(PrtConfigGroup prtConfig, MatsimVrpContext context,
 			TravelTime travelTime, TravelDisutility travelDisutility, AlgorithmConfig algorithmConfig){
 		
-		TaxiSchedulerParams taxiParams = new TaxiSchedulerParams(prtConfig.getDestinationKnown(), false, prtConfig.getPickupDuration(), prtConfig.getDropoffDuration());
+		TaxiSchedulerParams taxiParams = new TaxiSchedulerParams(prtConfig.getDestinationKnown(), false, prtConfig.getPickupDuration(), prtConfig.getDropoffDuration(), 1);
 		
 		if(prtConfig.getVehicleCapacity() > 1){
 			
 			PrtScheduler scheduler = new PrtScheduler(context, taxiParams, travelTime, travelDisutility);
-			FilterFactory filterFactory = new DefaultFilterFactory(scheduler, 0, 0);
 			
-			return new PrtOptimizerConfiguration(context, travelTime, travelDisutility, scheduler, filterFactory,
+			return new PrtOptimizerConfiguration(context, travelTime, travelDisutility, scheduler, 0, 0,
 					algorithmConfig.getGoal(), prtConfig.getPrtOutputDirectory(), prtConfig);
 			
 		}
 		
 		TaxiScheduler scheduler = new TaxiScheduler(context, taxiParams, travelTime, travelDisutility);
-		FilterFactory filterFactory = new DefaultFilterFactory(scheduler, 0, 0);
 		
-		return new TaxiOptimizerConfiguration(context, travelTime, travelDisutility, scheduler, filterFactory,
+		return new TaxiOptimizerConfiguration(context, travelTime, travelDisutility, scheduler, 0, 0,
 				algorithmConfig.getGoal(), prtConfig.getPrtOutputDirectory(), null);
 		
 	}

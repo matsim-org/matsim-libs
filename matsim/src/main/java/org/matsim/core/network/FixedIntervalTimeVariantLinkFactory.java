@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * TimeVariantLinkFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,12 +18,31 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.optimizer.filter;
+package org.matsim.core.network;
 
-public interface FilterFactory
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.*;
+
+
+public class FixedIntervalTimeVariantLinkFactory
+    implements LinkFactory
 {
-    VehicleFilter createVehicleFilter();
+    private final int interval;
+    private final int intervalCount;
 
 
-    RequestFilter createRequestFilter();
+    public FixedIntervalTimeVariantLinkFactory(int interval, int intervalCount)
+    {
+        this.interval = interval;
+        this.intervalCount = intervalCount;
+    }
+
+
+    @Override
+    public Link createLink(Id<Link> id, Node from, Node to, Network network, double length,
+            double freespeed, double capacity, double nOfLanes)
+    {
+        return TimeVariantLinkImpl.createLinkWithFixedIntervalAttributes(id, from, to, network,
+                length, freespeed, capacity, nOfLanes, interval, intervalCount);
+    }
 }

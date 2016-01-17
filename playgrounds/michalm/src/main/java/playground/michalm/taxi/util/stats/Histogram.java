@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,23 +17,66 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.optimizer.filter;
+package playground.michalm.taxi.util.stats;
 
-import org.matsim.contrib.dvrp.data.Vehicle;
-
-import playground.michalm.taxi.data.TaxiRequest;
+import java.text.DecimalFormat;
 
 
-public interface VehicleFilter
+public class Histogram
 {
-    VehicleFilter NO_FILTER = new VehicleFilter() {
-        public Iterable<Vehicle> filterVehiclesForRequest(Iterable<Vehicle> vehicles,
-                TaxiRequest request)
-        {
-            return vehicles;
+    private final int[] counts;
+    private final double binSize;
+
+
+    public Histogram(double binSize, int binCount)
+    {
+        this.binSize = binSize;
+        counts = new int[binCount];
+    }
+
+
+    public void addValue(double value)
+    {
+        int bin = Math.min((int) (value / binSize), counts.length - 1);
+        counts[bin]++;
+    }
+
+
+    public double getBinSize()
+    {
+        return binSize;
+    }
+
+
+    public int[] getCounts()
+    {
+        return counts;
+    }
+
+
+    public String binsToString()
+    {
+        return binsToString(1.0);
+    }
+
+
+    public String binsToString(double scaleFactor)
+    {
+        DecimalFormat df = new DecimalFormat("#.##");
+        String str = "";
+        for (int i = 0; i < counts.length; i++) {
+            str += df.format(i * binSize * scaleFactor) + "+\t";
         }
-    };
+        return str;
+    }
 
 
-    Iterable<Vehicle> filterVehiclesForRequest(Iterable<Vehicle> vehicles, TaxiRequest request);
+    public String countsToString()
+    {
+        String str = "";
+        for (int i = 0; i < counts.length; i++) {
+            str += String.format("%d\t", counts[i]);
+        }
+        return str;
+    }
 }

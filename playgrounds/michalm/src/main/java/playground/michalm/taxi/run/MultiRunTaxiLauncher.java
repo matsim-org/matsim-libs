@@ -28,8 +28,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 
-import playground.michalm.taxi.util.stats.TaxiStatsCalculator;
-import playground.michalm.taxi.util.stats.TaxiStatsCalculator.TaxiStats;
+import playground.michalm.taxi.util.stats.*;
 
 
 class MultiRunTaxiLauncher
@@ -85,11 +84,14 @@ class MultiRunTaxiLauncher
         for (int i = 0; i < runs; i += 4) {
             MatsimRandom.reset(RANDOM_SEEDS[i]);
             initTravelTimeAndDisutility();
-            simulateIteration();
+            simulateIteration("warmup" + i);
         }
 
         warmup = false;
     }
+
+
+    private static final int STATS_HOURS = 25;
 
 
     void run(int runs)
@@ -104,24 +106,73 @@ class MultiRunTaxiLauncher
             runWarmupConditionally(runs);
         }
 
-        MultiRunStats multipleRunStats = new MultiRunStats();
+        MultiRunStats multiRunStats = new MultiRunStats();
         initTravelTimeAndDisutility();//the same for all runs
 
         for (int i = 0; i < runs; i++) {
             long t0 = System.currentTimeMillis();
             MatsimRandom.reset(RANDOM_SEEDS[i]);
-            simulateIteration();
-            TaxiStats evaluation = new TaxiStatsCalculator(
-                    context.getVrpData().getVehicles().values()).getStats();
+            simulateIteration(i + "");
+
+            TaxiStats stats = new TaxiStatsCalculator(context.getVrpData().getVehicles().values())
+                    .getStats();
             long t1 = System.currentTimeMillis();
-            multipleRunStats.updateStats(evaluation, t1 - t0);
+            multiRunStats.updateStats(stats, t1 - t0);
+            
+            produceDetailedStats(i);
         }
 
         VrpData data = context.getVrpData();
         String cfg = params.algorithmConfig.name();
 
-        multipleRunStats.printStats(pw, cfg, data);
+        multiRunStats.printStats(pw, cfg, data);
         pw.flush();
+    }
+
+
+    private void produceDetailedStats(int run)
+    {
+        HourlyTaxiStatsCalculator calculator = new HourlyTaxiStatsCalculator(
+                context.getVrpData().getVehicles().values(), STATS_HOURS);
+
+        HourlyTaxiStats[] hourlyStats = calculator.getStats();
+        try (PrintWriter hourlyStatsWriter = new PrintWriter(
+                params.outputDir + "hourly_stats_run_" + run)) {
+            hourlyStatsWriter.println(HourlyTaxiStats.MAIN_HEADER);
+            hourlyStatsWriter.println(HourlyTaxiStats.SUB_HEADER);
+
+            for (int h = 0; h < STATS_HOURS; h++) {
+                hourlyStats[h].printStats(hourlyStatsWriter);
+            }
+        }
+        catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+
+        HourlyHistograms[] hourlyHistograms = calculator.getHourlyHistograms();
+        try (PrintWriter hourlyHistogramsWriter = new PrintWriter(
+                params.outputDir + "hourly_histograms_run_" + run)) {
+            hourlyHistogramsWriter.println(HourlyHistograms.MAIN_HEADER);
+            hourlyHistograms[0].printSubHeaders(hourlyHistogramsWriter);
+
+            for (int h = 0; h < STATS_HOURS; h++) {
+                hourlyHistograms[h].printStats(hourlyHistogramsWriter);
+            }
+        }
+        catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+
+        DailyHistograms dailyHistograms = calculator.getDailyHistograms();
+        try (PrintWriter dailyHistogramsWriter = new PrintWriter(
+                params.outputDir + "daily_histograms_run_" + run)) {
+            dailyHistogramsWriter.println(DailyHistograms.MAIN_HEADER);
+            dailyHistograms.printSubHeaders(dailyHistogramsWriter);
+            dailyHistograms.printStats(dailyHistogramsWriter);
+        }
+        catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 

@@ -46,7 +46,7 @@ public class AssignmentProblem
 
     private final BackwardFastMultiNodeDijkstra backwardRouter;
 
-    private final RequestFilter requestFilter;
+    private final KStraightLineNearestRequestFilter requestFilter;
     private final KStraightLineNearestVehicleDepartureFilter vehicleFilter;
 
     //1800: default
@@ -67,8 +67,8 @@ public class AssignmentProblem
     {
         this.optimConfig = optimConfig;
         this.router = router;
-        this.requestFilter = optimConfig.filterFactory.createRequestFilter();
-        this.vehicleFilter = new KStraightLineNearestVehicleDepartureFilter(40);
+        this.requestFilter = new KStraightLineNearestRequestFilter(optimConfig.scheduler, optimConfig.nearestRequestsLimit);
+        this.vehicleFilter = new KStraightLineNearestVehicleDepartureFilter(optimConfig.nearestVehiclesLimit);
 
         this.backwardRouter = backwardRouter;
     }

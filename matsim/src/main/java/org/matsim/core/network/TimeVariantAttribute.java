@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TimeVariantLinkFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -20,17 +19,53 @@
 
 package org.matsim.core.network;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.Node;
+import java.util.TreeMap;
 
-public class TimeVariantLinkFactory implements LinkFactory {
+import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 
-	@Override
-	public Link createLink(Id<Link> id, Node from, Node to, Network network, double length, double freespeed,
-			double capacity, double nOfLanes) {
-		return new TimeVariantLinkImpl(id, from, to, network, length, freespeed, capacity, nOfLanes);
-	}
 
+public interface TimeVariantAttribute
+{
+    interface ChangeValueGetter
+    {
+        ChangeValue getChangeValue(NetworkChangeEvent event);
+    }
+
+
+    static ChangeValueGetter FREESPEED_GETTER = new ChangeValueGetter() {
+        public ChangeValue getChangeValue(NetworkChangeEvent event)
+        {
+            return event.getFreespeedChange();
+        }
+    };
+
+    static ChangeValueGetter FLOW_CAPACITY_GETTER = new ChangeValueGetter() {
+        public ChangeValue getChangeValue(NetworkChangeEvent event)
+        {
+            return event.getFlowCapacityChange();
+        }
+    };
+
+    static ChangeValueGetter LANES_GETTER = new ChangeValueGetter() {
+        public ChangeValue getChangeValue(NetworkChangeEvent event)
+        {
+            return event.getLanesChange();
+        }
+    };
+
+
+    double getValue(final double time);
+
+
+    boolean isRecalcRequired();
+
+
+    void recalc(TreeMap<Double, NetworkChangeEvent> changeEvents, ChangeValueGetter valueGetter,
+            double baseValue);
+
+
+    void incChangeEvents();
+
+
+    void clearEvents();
 }

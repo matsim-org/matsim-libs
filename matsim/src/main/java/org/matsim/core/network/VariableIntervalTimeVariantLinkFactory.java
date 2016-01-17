@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * TimeVariantLinkFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,58 +18,24 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.schedule;
+package org.matsim.core.network;
 
-import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
-import org.matsim.contrib.dvrp.schedule.DriveTaskImpl;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 
-import playground.michalm.taxi.data.TaxiRequest;
 
-
-public class TaxiDriveWithPassengerTask
-    extends DriveTaskImpl
-    implements TaxiTaskWithRequest
+public class VariableIntervalTimeVariantLinkFactory
+    implements LinkFactory
 {
-    private TaxiRequest request;//non-final due to vehicle diversion
-
-
-    public TaxiDriveWithPassengerTask(VrpPathWithTravelData path, TaxiRequest request)
-    {
-        super(path);
-
-        if (request.getFromLink() != path.getFromLink()
-                && request.getToLink() != path.getToLink()) {
-            throw new IllegalArgumentException();
-        }
-
-        this.request = request;
-        request.setDriveWithPassengerTask(this);
-    }
-
 
     @Override
-    public void removeFromRequest()
+    public Link createLink(Id<Link> id, Node from, Node to, Network network, double length,
+            double freespeed, double capacity, double nOfLanes)
     {
-        request.setDriveWithPassengerTask(null);
+        return TimeVariantLinkImpl.createLinkWithVariableIntervalAttributes(id, from, to, network,
+                length, freespeed, capacity, nOfLanes);
     }
 
-
-    @Override
-    public TaxiTaskType getTaxiTaskType()
-    {
-        return TaxiTaskType.DRIVE_OCCUPIED;
-    }
-
-
-    public TaxiRequest getRequest()
-    {
-        return request;
-    }
-
-
-    @Override
-    protected String commonToString()
-    {
-        return "[" + getTaxiTaskType().name() + "]" + super.commonToString();
-    }
 }

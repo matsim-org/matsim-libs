@@ -115,10 +115,10 @@ public class PrtOptimizer implements VrpOptimizerWithOnlineTracking, MobsimBefor
         while (reqIter.hasNext() && !idleVehicles.isEmpty()) {
             TaxiRequest req = reqIter.next();
 
-            Iterable<Vehicle> filteredVehs = idleVehicleFinder.filterVehiclesForRequest(idleVehicles,
-                    req);
+//            Iterable<Vehicle> filteredVehs = idleVehicleFinder.filterVehiclesForRequest(idleVehicles,
+//                    req);
             BestDispatchFinder.Dispatch best = vrpFinder.findBestVehicleForRequest(req,
-                    filteredVehs);
+                    idleVehicles);
 
             if (best != null) {
                 this.scheduler.scheduleRequest(best.vehicle, best.request, best.path);

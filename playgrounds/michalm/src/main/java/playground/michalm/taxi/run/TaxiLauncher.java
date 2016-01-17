@@ -27,10 +27,10 @@ import org.matsim.contrib.dvrp.extensions.taxi.TaxiUtils;
 import org.matsim.contrib.dvrp.passenger.*;
 import org.matsim.contrib.dvrp.run.*;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelTimeSource;
-import org.matsim.contrib.dvrp.util.TimeDiscretizer;
 import org.matsim.contrib.dvrp.vrpagent.VrpLegs;
 import org.matsim.contrib.dvrp.vrpagent.VrpLegs.LegCreator;
 import org.matsim.contrib.dynagent.run.DynAgentLauncherUtils;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.router.util.*;
 import org.matsim.core.trafficmonitoring.*;
@@ -40,8 +40,10 @@ import playground.michalm.taxi.*;
 import playground.michalm.taxi.data.*;
 import playground.michalm.taxi.data.TaxiRequest.TaxiRequestStatus;
 import playground.michalm.taxi.optimizer.*;
-import playground.michalm.taxi.optimizer.filter.*;
+import playground.michalm.taxi.schedule.TaxiTask.TaxiTaskType;
 import playground.michalm.taxi.scheduler.*;
+import playground.michalm.taxi.util.stats.*;
+import playground.michalm.taxi.util.stats.StatsCollector.StatsCalculator;
 import playground.michalm.zone.*;
 
 
@@ -56,14 +58,21 @@ class TaxiLauncher
 
     private TravelTime travelTime;
     private TravelDisutility travelDisutility;
+    public static final int TIME_INTERVAL = 15 * 60; //15 minutes
 
 
     TaxiLauncher(TaxiLauncherParams params)
     {
         this.params = params;
 
+        int hours = 30;//migrate to TaxiParams??
         scenario = VrpLauncherUtils.initScenario(params.netFile, params.plansFile,
-                params.changeEventsFile);
+                params.changeEventsFile, TIME_INTERVAL, hours * 3600 / TIME_INTERVAL);
+
+        //overwrites the values set by VrpLauncherUtils.initScenario()
+        QSimConfigGroup qsc = scenario.getConfig().qsim();
+        qsc.setStorageCapFactor(params.storageCapFactor);
+        qsc.setFlowCapFactor(params.flowCapFactor);
 
         if (params.taxiCustomersFile != null) {
             List<String> passengerIds = PersonCreatorWithRandomTaxiMode
@@ -92,7 +101,7 @@ class TaxiLauncher
         else {// TravelTimeSource.EVENTS
             if (travelTimeCalculator == null) {
                 travelTimeCalculator = VrpLauncherUtils.initTravelTimeCalculatorFromEvents(scenario,
-                        params.eventsFile, TimeDiscretizer.CYCLIC_15_MIN.getTimeInterval());
+                        params.eventsFile, 15 * 60);
             }
 
             travelTime = travelTimeCalculator.getLinkTravelTimes();
@@ -106,7 +115,7 @@ class TaxiLauncher
     /**
      * Can be called several times (1 call == 1 simulation)
      */
-    void simulateIteration()
+    void simulateIteration(String simId)
     {
         MatsimVrpContextImpl contextImpl = new MatsimVrpContextImpl();
         this.context = contextImpl;
@@ -132,7 +141,7 @@ class TaxiLauncher
             // yy to my ears, this is not completely clear.  I don't think that it enables advance request submission
             // for arbitrary times, but rather requests all trips before the simulation starts.  Doesn't it?  kai, jul'14
 
-            //Yes. For a fully-featured advanced request submission process, use TripPrebookingManager, michalm, sept'14
+            //Yes. For a fully-featured advance request submission process, use TripPrebookingManager, michalm, sept'14
             qSim.addQueueSimulationListeners(new BeforeSimulationTripPrebooker(passengerEngine));
         }
 
@@ -149,7 +158,36 @@ class TaxiLauncher
             TaxiLauncherUtils.initChargersAndVehicles(taxiData);
             TaxiLauncherUtils.initChargingAndDischargingHandlers(taxiData, scenario.getNetwork(),
                     qSim, travelTime);
-            TaxiLauncherUtils.initStatsCollection(taxiData, qSim, null);
+            
+            if (params.outputDir != null) {
+                TaxiLauncherUtils.initStatsCollection(taxiData, qSim, params.outputDir + "eStats" + simId);
+            }
+        }
+
+        if (params.outputDir != null) {
+            StatsCalculator<String> dispatchStatsCalc = StatsCalculators.combineStatsCalculators(
+                    StatsCalculators.createCurrentTaxiTaskOfTypeCounter(optimizerConfig,
+                            TaxiTaskType.DRIVE_EMPTY), //
+                    StatsCalculators.createCurrentTaxiTaskOfTypeCounter(optimizerConfig,
+                            TaxiTaskType.PICKUP), //
+                    StatsCalculators.createCurrentTaxiTaskOfTypeCounter(optimizerConfig,
+                            TaxiTaskType.DRIVE_OCCUPIED), //
+                    StatsCalculators.createCurrentTaxiTaskOfTypeCounter(optimizerConfig,
+                            TaxiTaskType.DROPOFF), //
+                    StatsCalculators.createCurrentTaxiTaskOfTypeCounter(optimizerConfig,
+                            TaxiTaskType.STAY), //
+                    StatsCalculators.createIdleVehicleCounter(optimizerConfig), //
+                    StatsCalculators.createRequestsWithStatusCounter(taxiData,
+                            TaxiRequestStatus.UNPLANNED));
+            qSim.addQueueSimulationListeners(new StatsCollector<>(dispatchStatsCalc, 300,
+                    "DRIVE_EMPTY\t" + //
+                            "PICKUP\t" + //
+                            "DRIVE_OCCUPIED\t" + //
+                            "DROPOFF\t" + //
+                            "STAY\t" + //
+                            "IDLE\t" + //
+                            "UNPLANNED", //
+                    params.outputDir + "simStats" + simId));
         }
 
         beforeQSim(qSim);
@@ -163,14 +201,15 @@ class TaxiLauncher
     TaxiOptimizerConfiguration createOptimizerConfiguration()
     {
         TaxiSchedulerParams schedulerParams = new TaxiSchedulerParams(params.destinationKnown,
-                params.vehicleDiversion, params.pickupDuration, params.dropoffDuration);
+                params.vehicleDiversion, params.pickupDuration, params.dropoffDuration,
+                params.AStarEuclideanOverdoFactor);
+
         TaxiScheduler scheduler = new TaxiScheduler(context, schedulerParams, travelTime,
                 travelDisutility);
-        FilterFactory filterFactory = new DefaultFilterFactory(scheduler,
-                params.nearestRequestsLimit, params.nearestVehiclesLimit);
 
         return new TaxiOptimizerConfiguration(context, travelTime, travelDisutility, scheduler,
-                filterFactory, params.algorithmConfig.goal, params.outputDir, zones);
+                params.nearestRequestsLimit, params.nearestVehiclesLimit,
+                params.algorithmConfig.goal, params.outputDir, zones);
     }
 
 

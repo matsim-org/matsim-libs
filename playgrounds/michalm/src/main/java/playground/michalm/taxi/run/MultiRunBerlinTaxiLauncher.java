@@ -4,7 +4,7 @@ public class MultiRunBerlinTaxiLauncher
 {
     public static void main(String... args)
     {
-        int runs = 20;
+        int runs = 1;
         String paramDir = args[0];
         String specificParamDir = args[0] + "/" + args[1];
 

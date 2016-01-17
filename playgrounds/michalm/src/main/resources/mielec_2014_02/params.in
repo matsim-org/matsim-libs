@@ -29,10 +29,10 @@ ranksFile              taxi_ranks-0.xml
 algorithmConfig        RULE_DSE_FF
 
 #limit Dijkstra algorithm to the n nearest requests relatie to a given vehicle (based on straight-line distance)
-nearestRequestsLimit    25
+nearestRequestsLimit    999
 
 #limit Dijkstra algorithm to the n nearest vehicles relative to a given request (based on straight-line distance)
-nearestVehiclesLimit    25
+nearestVehiclesLimit    999
 
 #(on/off) track vehicle online (as if they were equipped with GPS) to improve accuracy of travel time prediction
 #onlineVehicleTracker
@@ -48,6 +48,13 @@ pickupDuration         120
 
 #duration of a dropoff
 dropoffDuration        60
+
+#for trips with passengers
+AStarEuclideanOverdoFactor 1.0
+
+#QSim config
+storageCapFactor 1.0
+flowCapFactor 1.0
 
 #simulate battery charging and discharging
 #batteryChargingDischarging

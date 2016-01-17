@@ -5,18 +5,13 @@ import java.util.Map;
 
 import org.matsim.analysis.LegHistogram;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils;
-import org.matsim.contrib.dvrp.util.Schedules2GIS;
 import org.matsim.contrib.dynagent.run.DynAgentLauncherUtils;
-import org.matsim.contrib.util.chart.ChartWindowUtils;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.algorithms.*;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.vis.otfvis.OTFVisConfigGroup.ColoringScheme;
 
-import playground.michalm.taxi.util.chart.TaxiScheduleChartUtils;
-import playground.michalm.taxi.util.stats.TaxiStatsCalculator;
-import playground.michalm.taxi.util.stats.TaxiStatsCalculator.TaxiStats;
+import playground.michalm.taxi.util.stats.*;
 import playground.michalm.util.*;
 
 
@@ -69,7 +64,7 @@ class SingleRunTaxiLauncher
     void run()
     {
         initTravelTimeAndDisutility();
-        simulateIteration();
+        simulateIteration("");
         generateOutput();
     }
 
@@ -86,14 +81,14 @@ class SingleRunTaxiLauncher
         pw.println(stats);
         pw.flush();
 
-        if (params.vrpOutDir != null) {
-            new Schedules2GIS(context.getVrpData().getVehicles().values(),
-                    TransformationFactory.WGS84_UTM33N).write(params.vrpOutDir);
-        }
+        // if (params.vrpOutDir != null) {
+        //     new Schedules2GIS(context.getVrpData().getVehicles().values(),
+        //             TransformationFactory.WGS84_UTM33N).write(params.vrpOutDir);
+        // }
 
         // ChartUtils.showFrame(RouteChartUtils.chartRoutesByStatus(data.getVrpData()));
-        ChartWindowUtils.showFrame(
-                TaxiScheduleChartUtils.chartSchedule(context.getVrpData().getVehicles().values()));
+        // ChartWindowUtils.showFrame(
+        //        TaxiScheduleChartUtils.chartSchedule(context.getVrpData().getVehicles().values()));
 
         if (params.histogramOutDir != null) {
             VrpLauncherUtils.writeHistograms(legHistogram, params.histogramOutDir);
