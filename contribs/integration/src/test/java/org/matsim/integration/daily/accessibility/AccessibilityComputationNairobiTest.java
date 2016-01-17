@@ -30,15 +30,16 @@ import org.matsim.testcases.MatsimTestUtils;
 public class AccessibilityComputationNairobiTest {
 	public static final Logger log = Logger.getLogger( AccessibilityComputationNairobiTest.class ) ;
 
-	private static final Double cellSize = 1000.;
+	private static final Double cellSize = 10000.;
 
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
 
 
 	@Test
 	public void doAccessibilityTest() throws IOException {
-//		String folderStructure = "../../../"; // local on dz's computer
-		String folderStructure = "../../"; // server
+		// Input and output
+		String folderStructure = "../../../"; // local on dz's computer
+//		String folderStructure = "../../"; // server
 		
 		String networkFile = "matsimExamples/countries/ke/nairobi/2015-10-15_network.xml";
 
@@ -66,7 +67,7 @@ public class AccessibilityComputationNairobiTest {
 		
 		Double lowerBound = 2.;
 		Double upperBound = 5.5;
-		Integer range = 9;
+		Integer range = 9; // in the current implementation, this need always be 9
 		int symbolSize = 1010;
 		int populationThreshold = (int) (200 / (1000/cellSize * 1000/cellSize));
 
@@ -143,8 +144,8 @@ public class AccessibilityComputationNairobiTest {
 				String actSpecificWorkingDirectory = workingDirectory + actType + "/";
 
 				for ( Modes4Accessibility mode : Modes4Accessibility.values()) {
-//					if ( !actType.equals("w") ) {
-					if ( !actType.equals(FacilityTypes.WORK) ) {
+//					if (!actType.equals("w")) {
+					if (!actType.equals(FacilityTypes.WORK)) {
 						log.error("skipping everything except work for debugging purposes; remove in production code. kai, feb'14") ;
 						continue ;
 					}
