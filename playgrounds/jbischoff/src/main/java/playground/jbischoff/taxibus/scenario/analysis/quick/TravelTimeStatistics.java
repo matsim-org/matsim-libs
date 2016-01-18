@@ -61,7 +61,7 @@ public class TravelTimeStatistics   {
 		TTEventHandler allTT = new TTEventHandler();
 		TTEventHandler tbTT = new TTEventHandler();
 		TTEventHandler ptTT = new TTEventHandler();
-		TaxibusDriveAnalyser analyser = new TaxibusDriveAnalyser();
+		TaxibusRideTimeAnalyser analyser = new TaxibusRideTimeAnalyser();
 
 		carTT.addMode("car");
 
