@@ -37,16 +37,16 @@ public class AccessibilityComputationNairobiTest {
 
 	@Test
 	public void doAccessibilityTest() throws IOException {
-		// Input and output
-		String folderStructure = "../../../"; // local on dz's computer
-//		String folderStructure = "../../"; // server
-		
+		// Input
+		String folderStructure = "../../";
 		String networkFile = "matsimExamples/countries/ke/nairobi/2015-10-15_network.xml";
 
+		// adapt folder structure that may be different on different machines, esp. on server
 		folderStructure = PathUtils.tryANumberOfFolderStructures(folderStructure, networkFile);
-			
+
 		networkFile = folderStructure + networkFile ;
 		String facilitiesFile = folderStructure + "matsimExamples/countries/ke/nairobi/2015-10-15_facilities.xml";
+
 		
 		// minibus-pt
 //		String travelTimeMatrix = folderStructure + "matsimExamples/countries/za/nmbm/minibus-pt/JTLU_14i/travelTimeMatrix.csv.gz";

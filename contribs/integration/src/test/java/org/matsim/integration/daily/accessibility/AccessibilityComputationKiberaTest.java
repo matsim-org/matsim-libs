@@ -37,18 +37,18 @@ public class AccessibilityComputationKiberaTest {
 
 	@Test
 	public void doAccessibilityTest() throws IOException {
-		// Input and output
-		String folderStructure = "../../../"; // local on dz's computer
-//		String folderStructure = "../../"; // server
-		
+		// Input
+		String folderStructure = "../../";
 		String networkFile = "matsimExamples/countries/ke/kibera/2015-11-05_network_paths_detailed.xml";
 
+		// adapt folder structure that may be different on different machines, esp. on server
 		folderStructure = PathUtils.tryANumberOfFolderStructures(folderStructure, networkFile);
 
 		networkFile = folderStructure + networkFile ;
 		String facilitiesFile = folderStructure + "matsimExamples/countries/ke/kibera/2015-11-05_facilities.xml";
-		
+
 		// no pt input
+		
 		
 		// Parameters
 		boolean createQGisOutput = false;

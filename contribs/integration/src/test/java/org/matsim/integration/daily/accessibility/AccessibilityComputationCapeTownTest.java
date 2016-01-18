@@ -34,8 +34,8 @@ public class AccessibilityComputationCapeTownTest {
 	public static final Logger log = Logger.getLogger( AccessibilityComputationCapeTownTest.class ) ;
 
 //	private static final double cellSize = 1000.;
-//	private static final Double cellSize = 10000.;
-	private static final Double cellSize = 1000.;
+	private static final Double cellSize = 10000.;
+//	private static final Double cellSize = 1000.;
 	private static final double timeOfDay = 8.*60*60;
 
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
@@ -43,16 +43,16 @@ public class AccessibilityComputationCapeTownTest {
 
 	@Test
 	public void doAccessibilityTest() throws IOException {
-//		public static void main( String[] args ) {
-		String folderStructure = "../../"; // arbitrary
-			
+		// Input
+		String folderStructure = "../../";
 		String networkFile = "matsimExamples/countries/za/capetown/2015-10-15_network.xml";
-		
+
+		// adapt folder structure that may be different on different machines, esp. on server
 		folderStructure = PathUtils.tryANumberOfFolderStructures(folderStructure, networkFile);
-		
-		networkFile = folderStructure + networkFile ; 
+
+		networkFile = folderStructure + networkFile ;
 		String facilitiesFile = folderStructure + "matsimExamples/countries/za/capetown/2015-10-15_facilities.xml";
- 
+		 
 		// minibus-pt
 //		String travelTimeMatrix = folderStructure + "matsimExamples/countries/za/nmbm/minibus-pt/JTLU_14i/travelTimeMatrix.csv.gz";
 //		String travelDistanceMatrix = folderStructure + "matsimExamples/countries/za/nmbm/minibus-pt/JTLU_14i/travelDistanceMatrix.csv.gz";
