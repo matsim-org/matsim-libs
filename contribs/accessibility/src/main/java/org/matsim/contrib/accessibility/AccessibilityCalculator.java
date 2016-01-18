@@ -67,7 +67,6 @@ import java.util.concurrent.ConcurrentHashMap;
 	// destinations, opportunities like jobs etc ...
 	private AggregationObject[] aggregatedOpportunities;
 
-	private Map<Modes4Accessibility,Boolean> isComputingMode = new HashMap<>() ;
 	private Map<Modes4Accessibility, AccessibilityContributionCalculator> calculators = new HashMap<>();
 
 	private PtMatrix ptMatrix;
@@ -88,15 +87,14 @@ import java.util.concurrent.ConcurrentHashMap;
 	private Map<String, TravelTime> travelTimes;
 	private Map<String, TravelDisutilityFactory> travelDisutilityFactories;
 	private Scenario scenario;
+	private AccessibilityConfigGroup config;
 
 	@Inject
-	AccessibilityCalculator(Map<String, TravelTime> travelTimes, Map<String, TravelDisutilityFactory> travelDisutilityFactories, Scenario scenario) {
+	AccessibilityCalculator(Map<String, TravelTime> travelTimes, Map<String, TravelDisutilityFactory> travelDisutilityFactories, Scenario scenario, AccessibilityConfigGroup config) {
 		this.travelTimes = travelTimes;
 		this.travelDisutilityFactories = travelDisutilityFactories;
 		this.scenario = scenario;
-		for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
-			this.isComputingMode.put( mode, false ) ;
-		}
+		this.config = config;
 	}
 
 	public void addFacilityDataExchangeListener(FacilityDataExchangeInterface l){
@@ -318,7 +316,7 @@ import java.util.concurrent.ConcurrentHashMap;
 				Map< Modes4Accessibility, Double> accessibilities  = new HashMap<>() ;
 
 				for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
-					if ( this.isComputingMode.get(mode) ) {
+					if ( this.config.getIsComputingMode().get(mode) ) {
 						if(!useRawSum){ 	// get log sum
 							accessibilities.put( mode, inverseOfLogitScaleParameter * Math.log( gcs[mode.ordinal()].getSum() ) ) ;
 						} else {
@@ -346,18 +344,18 @@ import java.util.concurrent.ConcurrentHashMap;
 	private void computeAndAddExpUtilContributions( SumOfExpUtils[] gcs, ActivityFacility origin, 
 			final AggregationObject aggregatedFacility, Double departureTime) {
 		for ( Map.Entry<Modes4Accessibility, AccessibilityContributionCalculator> calculatorEntry : calculators.entrySet() ) {
-			if ( !isComputingMode.get( calculatorEntry.getKey() ) ) continue; // XXX should be configured by adding only the relevant calculators
+			if ( !this.config.getIsComputingMode().get( calculatorEntry.getKey() ) ) continue; // XXX should be configured by adding only the relevant calculators
 			final double expVhk = calculatorEntry.getValue().computeContributionOfOpportunity( origin , aggregatedFacility, departureTime );
 			gcs[ calculatorEntry.getKey().ordinal() ].addExpUtils( expVhk );
 		}
 	}
 
 	public void setComputingAccessibilityForMode( Modes4Accessibility mode, boolean val ) {
-		this.isComputingMode.put(mode, val) ;
+		this.config.setComputingAccessibilityForMode(mode, val);
 	}
 
 	public Map<Modes4Accessibility, Boolean> getIsComputingMode() {
-		return isComputingMode;
+		return this.config.getIsComputingMode();
 	}
 
 	/**

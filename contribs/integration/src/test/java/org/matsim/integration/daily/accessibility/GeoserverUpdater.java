@@ -59,7 +59,7 @@ class GeoserverUpdater implements FacilityDataExchangeInterface {
 	}
 
 
-	public final void setAndProcessSpatialGrids(List<Modes4Accessibility> modes ) { 
+	public final void setAndProcessSpatialGrids(Collection<Modes4Accessibility> modes ) { 
 		// lockedForAdditionalFacilityData = true;
 		
 //		log.info("starting setAndProcessSpatialGrids ...");

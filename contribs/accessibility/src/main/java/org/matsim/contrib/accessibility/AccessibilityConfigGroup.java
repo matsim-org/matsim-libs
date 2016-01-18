@@ -19,6 +19,7 @@
 
 package org.matsim.contrib.accessibility;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -54,7 +55,9 @@ public final class AccessibilityConfigGroup extends ReflectiveConfigGroup{
 	private static final String AREA_OF_ACC_COMP = "areaOfAccessibilityComputation" ; 
 	public static enum AreaOfAccesssibilityComputation{ fromNetwork, fromBoundingBox, fromShapeFile } 
 	private AreaOfAccesssibilityComputation areaOfAccessibilityComputation = AreaOfAccesssibilityComputation.fromNetwork ;
+	private Map<Modes4Accessibility, Boolean> isComputingMode = new HashMap<>() ;
 
+	
 	// ===
 
 	public static final String TIME_OF_DAY = "timeOfDay";
@@ -62,8 +65,6 @@ public final class AccessibilityConfigGroup extends ReflectiveConfigGroup{
 
 	public AccessibilityConfigGroup() {
 		super(GROUP_NAME);
-		// this class feels quite dangerous to me; one can have inconsistent entries between the Map and the typed values. kai, apr'13
-		// no longer.  kai, may'13
 	}
 	
 	@Override
@@ -91,6 +92,14 @@ public final class AccessibilityConfigGroup extends ReflectiveConfigGroup{
 		return map ;
 	}
 	
+	public void setComputingAccessibilityForMode(Modes4Accessibility mode, boolean val) {
+		this.isComputingMode.put(mode, val);
+	}
+
+	public Map<Modes4Accessibility, Boolean> getIsComputingMode() {
+		return isComputingMode;
+	}
+
 	
 	// NOTE: It seems ok to have the string constants immediately here since having them separately really does not help
 	// keeping the code compact

@@ -155,7 +155,7 @@ public final class GridBasedAccessibilityControlerListenerV3 implements Shutdown
 
 		log.info("Initializing  ...");
 		spatialGridAggregator = new SpatialGridAggregator();
-		delegate = new AccessibilityCalculator(travelTimes, travelDisutilityFactories, scenario);
+		delegate = new AccessibilityCalculator(travelTimes, travelDisutilityFactories, scenario, ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class));
 		delegate.addFacilityDataExchangeListener(spatialGridAggregator);
 
 		delegate.setPtMatrix(ptMatrix);	// this could be zero if no input files for pseudo pt are given ...
