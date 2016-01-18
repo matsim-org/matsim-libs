@@ -441,8 +441,8 @@ public class EvacuationTimePicture implements PersonDepartureEventHandler, Perso
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
-		String kmzFileName = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), kmzFile);
-		String txtFileName = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), txtFile);
+		String kmzFileName = event.getServices().getControlerIO().getIterationFilename(event.getIteration(), kmzFile);
+		String txtFileName = event.getServices().getControlerIO().getIterationFilename(event.getIteration(), txtFile);
 		this.createFiles(kmzFileName, txtFileName);
 	}
 

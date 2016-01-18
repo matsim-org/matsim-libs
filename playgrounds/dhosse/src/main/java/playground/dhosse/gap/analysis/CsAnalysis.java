@@ -50,7 +50,7 @@ public class CsAnalysis {
 //		SpatialAnalysis.writePopulationToShape(Global.runInputDir + "output_plans.xml.gz", "/home/danielhosse/population.shp");
 
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenario).readFile(Global.runInputDir + "networkMultimodal.xml");
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(Global.runInputDir + "networkMultimodal.xml");
 		ObjectAttributes attributes = new ObjectAttributes();
 		new ObjectAttributesXmlReader(attributes).parse(Global.runInputDir + "subpopulationAtts.xml");
 		

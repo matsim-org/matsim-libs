@@ -131,9 +131,9 @@ public class EvacuationQSimFactory implements MobsimFactory, IterationStartsList
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
 		int iteration = event.getIteration();
-		this.agentsVehiclesFile = event.getControler().getControlerIO().getIterationFilename(iteration, 
+		this.agentsVehiclesFile = event.getServices().getControlerIO().getIterationFilename(iteration,
 				EvacuationPopulationAgentSource.agentsVehiclesFileName);
-		this.parkedVehiclesFile = event.getControler().getControlerIO().getIterationFilename(iteration, 
+		this.parkedVehiclesFile = event.getServices().getControlerIO().getIterationFilename(iteration,
 				EvacuationPopulationAgentSource.parkedVehiclesFileName);
 	}
 

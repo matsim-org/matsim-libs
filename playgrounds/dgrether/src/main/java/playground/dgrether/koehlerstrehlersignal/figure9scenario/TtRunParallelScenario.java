@@ -25,6 +25,7 @@ import java.util.List;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -84,9 +85,9 @@ public class TtRunParallelScenario {
 	}
 
 
-	private void addControlerListener(Controler c) {
+	private void addControlerListener(MatsimServices c) {
 		
-		//add some EventHandler to the EventsManager after the controler is started
+		//add some EventHandler to the EventsManager after the services is started
 		handler23 = new TTInOutflowEventHandler(Id.create("23", Link.class));
 		handler27 = new TTInOutflowEventHandler(Id.create("27", Link.class));
 		handler54 = new TTInOutflowEventHandler(Id.create("54", Link.class));
@@ -96,13 +97,13 @@ public class TtRunParallelScenario {
 		c.addControlerListener(new StartupListener() {
 			@Override
 			public void notifyStartup(StartupEvent e) {
-				mfdHandler = new DgMfd(e.getControler().getScenario().getNetwork(), 1.0);
-				e.getControler().getEvents().addHandler(handler23);
-				e.getControler().getEvents().addHandler(handler27);
-				e.getControler().getEvents().addHandler(handler54);
-				e.getControler().getEvents().addHandler(handler58);
+				mfdHandler = new DgMfd(e.getServices().getScenario().getNetwork(), 1.0);
+				e.getServices().getEvents().addHandler(handler23);
+				e.getServices().getEvents().addHandler(handler27);
+				e.getServices().getEvents().addHandler(handler54);
+				e.getServices().getEvents().addHandler(handler58);
 				
-				e.getControler().getEvents().addHandler(mfdHandler);
+				e.getServices().getEvents().addHandler(mfdHandler);
 			}
 		});
 
@@ -116,7 +117,7 @@ public class TtRunParallelScenario {
 				handler58.iterationsEnds(e.getIteration());
 
 				if ( e.getIteration() % 10 == 0 ) {
-					DgTravelTimeCalculatorChart ttcalcChart = new DgTravelTimeCalculatorChart((TravelTimeCalculator)e.getControler().getLinkTravelTimes());
+					DgTravelTimeCalculatorChart ttcalcChart = new DgTravelTimeCalculatorChart((TravelTimeCalculator)e.getServices().getLinkTravelTimes());
 					ttcalcChart.setStartTime(0.0);
 					ttcalcChart.setEndTime(3600.0 * 1.5);
 					List<Id<Link>> list = new ArrayList<>();
@@ -139,18 +140,18 @@ public class TtRunParallelScenario {
 					list.add(Id.create("87", Link.class));
 					list.add(Id.create("72", Link.class));
 					ttcalcChart.addLinkId(list);
-					DgChartWriter.writeChart(e.getControler().getControlerIO().getIterationFilename(e.getIteration(), "ttcalculator"), 
+					DgChartWriter.writeChart(e.getServices().getControlerIO().getIterationFilename(e.getIteration(), "ttcalculator"),
 							ttcalcChart.createChart());
 
-					DgCountPerIterationGraph chart = new DgCountPerIterationGraph(e.getControler().getConfig().controler());
+					DgCountPerIterationGraph chart = new DgCountPerIterationGraph(e.getServices().getConfig().controler());
 					chart.addCountEventHandler(handler23);
 					chart.addCountEventHandler(handler27);
 					chart.addCountEventHandler(handler54);
 					chart.addCountEventHandler(handler58);
-					DgChartWriter.writeChart(e.getControler().getControlerIO().getOutputFilename("countPerIteration"), chart.createChart());
+					DgChartWriter.writeChart(e.getServices().getControlerIO().getOutputFilename("countPerIteration"), chart.createChart());
 				
 				
-					mfdHandler.writeFile(e.getControler().getControlerIO().getIterationFilename(e.getIteration(), "mfd.txt"));
+					mfdHandler.writeFile(e.getServices().getControlerIO().getIterationFilename(e.getIteration(), "mfd.txt"));
 				}
 			}
 		});
@@ -158,12 +159,12 @@ public class TtRunParallelScenario {
 		c.addControlerListener(new ShutdownListener() {
 			@Override
 			public void notifyShutdown(ShutdownEvent e) {
-				DgCountPerIterationGraph chart = new DgCountPerIterationGraph(e.getControler().getConfig().controler());
+				DgCountPerIterationGraph chart = new DgCountPerIterationGraph(e.getServices().getConfig().controler());
 				chart.addCountEventHandler(handler23, "Number of cars on link 23");
 				chart.addCountEventHandler(handler27, "Number of cars on link 27");
 				chart.addCountEventHandler(handler54, "Number of cars on link 54");
 				chart.addCountEventHandler(handler58, "Number of cars on link 58");
-				DgChartWriter.writeChart(e.getControler().getControlerIO().getOutputFilename("countPerIteration"), chart.createChart());
+				DgChartWriter.writeChart(e.getServices().getControlerIO().getOutputFilename("countPerIteration"), chart.createChart());
 			}
 		});
 

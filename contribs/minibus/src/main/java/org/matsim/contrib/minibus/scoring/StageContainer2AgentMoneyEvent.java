@@ -26,7 +26,7 @@ import org.matsim.contrib.minibus.fare.StageContainer;
 import org.matsim.contrib.minibus.fare.StageContainerHandler;
 import org.matsim.contrib.minibus.fare.TicketMachine;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 
@@ -48,7 +48,7 @@ public final class StageContainer2AgentMoneyEvent implements StageContainerHandl
 	private HashMap<Id<Person>, List<StageContainer>> agentId2stageContainerListMap = new HashMap<>();
 	private final TicketMachine ticketMachine;
 
-	public StageContainer2AgentMoneyEvent(Controler controler, TicketMachine ticketMachine) {
+	public StageContainer2AgentMoneyEvent(MatsimServices controler, TicketMachine ticketMachine) {
 		controler.addControlerListener(this);
 		this.eventsManager = controler.getEvents();
 		this.mobsimShutdownTime = controler.getConfig().qsim().getEndTime();

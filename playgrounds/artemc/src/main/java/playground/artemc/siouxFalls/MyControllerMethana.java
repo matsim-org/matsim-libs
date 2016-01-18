@@ -9,6 +9,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
@@ -41,11 +42,11 @@ public class MyControllerMethana {
 		 * This cannot be moved to the initializer since the scoring functions
 		 * are created even before the startup event is created.
 		 */ 
-	//	controler.setScoringFunctionFactory(new TimeAndMoneyDependentScoringFunctionFactory());
+	//	services.setScoringFunctionFactory(new TimeAndMoneyDependentScoringFunctionFactory());
 		
 		Initializer initializer = new Initializer();
 		controler.addControlerListener(initializer);
-		//controler.addControlerListener(new CalibrationStatsListener(controler.getEvents(), SURVEY_FILES,1, "HITS 2008", "Red_Scheme"));
+		//services.addControlerListener(new CalibrationStatsListener(services.getEvents(), SURVEY_FILES,1, "HITS 2008", "Red_Scheme"));
 		controler.getConfig().controler().setOverwriteFileSetting(
 				true ?
 						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
@@ -58,10 +59,10 @@ public class MyControllerMethana {
 //
 //		Config config = ConfigUtils.loadConfig("scenarios/siouxFalls/config_car.xml");
 //		//Config config = ConfigUtils.loadConfig("scenarios/siouxFalls/config_car.xml");
-//		//config.controler().setOutputDirectory("./outpout_SiouxFalls/pt_UE_7200_calibration_PT_6min_600m");
-//		//config.controler().setOutputDirectory("./outpout_SiouxFalls/SiouxFalls_5PT_Lines");
-//		//config.controler().setOutputDirectory("H:/SiouxFallsOutput_OnlyCar_40848_500it");
-//		//config.controler().setLastIteration(500);
+//		//config.services().setOutputDirectory("./outpout_SiouxFalls/pt_UE_7200_calibration_PT_6min_600m");
+//		//config.services().setOutputDirectory("./outpout_SiouxFalls/SiouxFalls_5PT_Lines");
+//		//config.services().setOutputDirectory("H:/SiouxFallsOutput_OnlyCar_40848_500it");
+//		//config.services().setLastIteration(500);
 //		Scenario scenario = ScenarioUtils.loadScenario(config);
 //		
 //		return scenario;
@@ -78,7 +79,7 @@ public class MyControllerMethana {
 		config.transit().setVehiclesFile(input+"vehicles.xml");
 		config.controler().setOutputDirectory(output);
 		
-		//		config.controler().setLastIteration(10);
+		//		config.services().setLastIteration(10);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		return scenario;
@@ -88,7 +89,7 @@ public class MyControllerMethana {
 
 		@Override
 		public void notifyStartup(StartupEvent event) {
-			Controler controler = event.getControler();
+			MatsimServices controler = event.getServices();
 			// create a plot containing the mean travel times
 			Set<String> transportModes = new HashSet<String>();
 			transportModes.add(TransportMode.car);

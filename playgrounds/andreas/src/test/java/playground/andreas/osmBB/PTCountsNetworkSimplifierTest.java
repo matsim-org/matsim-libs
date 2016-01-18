@@ -69,7 +69,7 @@ public class PTCountsNetworkSimplifierTest extends MatsimTestCase{
 		
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario).readFile(outNetwork);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(outNetwork);
 		
 		Assert.assertEquals(21, network.getLinks().size());
 		Assert.assertEquals(10, network.getNodes().size());
@@ -108,7 +108,7 @@ public class PTCountsNetworkSimplifierTest extends MatsimTestCase{
 		
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario).readFile(outNetwork);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(outNetwork);
 		
 		Assert.assertEquals(26, network.getLinks().size());
 		Assert.assertEquals(14, network.getNodes().size());
@@ -155,7 +155,7 @@ public class PTCountsNetworkSimplifierTest extends MatsimTestCase{
 		
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario).readFile(outNetwork);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(outNetwork);
 		
 		Assert.assertEquals(23, network.getLinks().size());
 		Assert.assertEquals(12, network.getNodes().size());
@@ -200,7 +200,7 @@ public class PTCountsNetworkSimplifierTest extends MatsimTestCase{
 		
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario).readFile(outNetwork);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(outNetwork);
 		
 		Assert.assertEquals(28, network.getLinks().size());
 		Assert.assertEquals(16, network.getNodes().size());
@@ -250,7 +250,7 @@ public class PTCountsNetworkSimplifierTest extends MatsimTestCase{
 		
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario).readFile(outNetwork);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(outNetwork);
 		
 		Assert.assertEquals(29, network.getLinks().size());
 		Assert.assertEquals(16, network.getNodes().size());
@@ -305,7 +305,7 @@ public class PTCountsNetworkSimplifierTest extends MatsimTestCase{
 		
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario).readFile(outNetwork);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(outNetwork);
 		
 		Assert.assertEquals(32, network.getLinks().size());
 		Assert.assertEquals(18, network.getNodes().size());

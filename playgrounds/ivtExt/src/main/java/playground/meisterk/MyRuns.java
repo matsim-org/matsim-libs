@@ -223,7 +223,7 @@ public class MyRuns {
 
 		// ... but I think we can just give the existing scenario to the reader, so I am changing this.  There is so much commented out in this
 		// code that it is probably no longer used anyways. kai, sep'15
-		new MatsimNetworkReader(scenario).parse(config.getParam(MeisterkConfigGroup.GROUP_NAME, "inputSecondNetworkFile"));
+		new MatsimNetworkReader(scenario.getNetwork()).parse(config.getParam(MeisterkConfigGroup.GROUP_NAME, "inputSecondNetworkFile"));
 
 		// run XY2Links
 		XY2Links xY2Links = new XY2Links();
@@ -360,7 +360,7 @@ public class MyRuns {
 		// - network
 		logger.info("Reading network xml file...");
 		Network network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(config.network().getInputFile());
 		logger.info("Reading network xml file...done.");
 
 		// - facilities
@@ -510,7 +510,7 @@ public class MyRuns {
 		// initialize scenario with events from a given events file
 		// - network
 		logger.info("Reading network xml file...");
-		new MatsimNetworkReader(scenario).readFile(scenario.getConfig().network().getInputFile());
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(scenario.getConfig().network().getInputFile());
 		logger.info("Reading network xml file...done.");
 		// - population
 		PersonAlgorithm pa = new PersonAnalyseTimesByActivityType(TIME_BIN_SIZE);

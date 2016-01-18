@@ -109,7 +109,7 @@ public class TransitScheduleModifier {
 		config.transit().setUseTransit(true);
 		config.scenario().setUseVehicles(true);
 
-		new MatsimNetworkReader(sc).readFile(networkFile);
+		new MatsimNetworkReader(sc.getNetwork()).readFile(networkFile);
 		this.network = (NetworkImpl) sc.getNetwork();
 
 		this.transitSchedule = readTransitSchedule(this.network, transitScheduleFile);

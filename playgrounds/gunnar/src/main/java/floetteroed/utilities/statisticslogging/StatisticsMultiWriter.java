@@ -35,9 +35,12 @@ public class StatisticsMultiWriter<D extends Object> {
 
 	private Map<String, StatisticsWriter<D>> fileName2statsWriter = new LinkedHashMap<String, StatisticsWriter<D>>();
 
+	private final boolean append;
+
 	// -------------------- CONSTRUCTION AND INITIALIZATION --------------------
 
-	public StatisticsMultiWriter() {
+	public StatisticsMultiWriter(final boolean append) {
+		this.append = append;
 	}
 
 	// -------------------- SETTERS & GETTERS --------------------
@@ -47,7 +50,7 @@ public class StatisticsMultiWriter<D extends Object> {
 		StatisticsWriter<D> statsWriter = this.fileName2statsWriter
 				.get(logFileName);
 		if (statsWriter == null) {
-			statsWriter = new StatisticsWriter<D>(logFileName);
+			statsWriter = new StatisticsWriter<D>(logFileName, this.append);
 			this.fileName2statsWriter.put(logFileName, statsWriter);
 		}
 		statsWriter.addSearchStatistic(statistic);
@@ -55,7 +58,8 @@ public class StatisticsMultiWriter<D extends Object> {
 
 	// -------------------- FILE WRITING --------------------
 
-	public void writeToFile(final D data, final String... labelOverrideValueSequence) {
+	public void writeToFile(final D data,
+			final String... labelOverrideValueSequence) {
 		for (StatisticsWriter<D> statsWriter : this.fileName2statsWriter
 				.values()) {
 			statsWriter.writeToFile(data, labelOverrideValueSequence);

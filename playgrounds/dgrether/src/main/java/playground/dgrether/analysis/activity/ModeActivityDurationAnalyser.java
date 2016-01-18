@@ -70,7 +70,7 @@ public class ModeActivityDurationAnalyser {
 		File f = new File("test.txt");
 		System.out.println(f.getAbsolutePath());
 
-		MatsimNetworkReader reader = new MatsimNetworkReader(scenario);
+		MatsimNetworkReader reader = new MatsimNetworkReader(scenario.getNetwork());
 		reader.readFile(NETWORK);
 
 		Population plans = scenario.getPopulation();

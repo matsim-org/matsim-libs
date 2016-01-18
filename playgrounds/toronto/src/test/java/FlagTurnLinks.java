@@ -20,7 +20,7 @@ public class FlagTurnLinks {
 		
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
-		new MatsimNetworkReader(scenario).readFile(networkInfile);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkInfile);
 		
 		for (Link l : network.getLinks().values()){
 			LinkImpl L = (LinkImpl) l;

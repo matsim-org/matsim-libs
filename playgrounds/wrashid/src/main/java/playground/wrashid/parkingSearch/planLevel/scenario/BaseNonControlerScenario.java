@@ -24,7 +24,7 @@ public class BaseNonControlerScenario {
 		PopulationReader popReader = new MatsimPopulationReader(sc);
 		popReader.readFile(inputPlansFile);
 	
-		new MatsimNetworkReader(sc).readFile(networkFile);
+		new MatsimNetworkReader(sc.getNetwork()).readFile(networkFile);
 	
 		return sc.getNetwork();
 	}

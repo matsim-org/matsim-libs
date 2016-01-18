@@ -77,7 +77,7 @@ public class UtilityAnalyzer {
 	public void analyze(Config config, String outPath, double sideLength) {
 		this.initZones(sideLength);
 		
-		new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());		
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(config.network().getInputFile());
 		new FacilitiesReaderMatsimV1(scenario).readFile(config.facilities().getInputFile());
 		
 		TreeMap<String, Utilities> utilitiesPerZone = new TreeMap<String, Utilities>();

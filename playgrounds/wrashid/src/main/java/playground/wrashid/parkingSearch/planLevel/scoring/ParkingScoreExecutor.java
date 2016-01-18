@@ -43,7 +43,7 @@ public class ParkingScoreExecutor {
 	}
 
 	public void performScoring(AfterMobsimEvent event) {
-        for (Person person : event.getControler().getScenario().getPopulation().getPersons()
+        for (Person person : event.getServices().getScenario().getPopulation().getPersons()
 				.values()) {
 			double score = 0.0;
 
@@ -61,7 +61,7 @@ public class ParkingScoreExecutor {
 
 			scoreHashMap.put(person.getId(), score);
 
-			event.getControler()
+			event.getServices()
 					.getEvents()
 					.processEvent(
 							new PersonMoneyEvent(0.0, person.getId(), score));

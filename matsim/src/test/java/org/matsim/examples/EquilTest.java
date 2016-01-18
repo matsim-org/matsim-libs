@@ -47,7 +47,7 @@ public class EquilTest extends MatsimTestCase {
 
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(c);
 
-		new MatsimNetworkReader(scenario).readFile(netFileName);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(netFileName);
 
 		PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		plansReader.readFile(popFileName);

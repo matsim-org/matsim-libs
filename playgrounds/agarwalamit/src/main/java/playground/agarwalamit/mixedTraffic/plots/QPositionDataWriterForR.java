@@ -41,8 +41,8 @@ import playground.agarwalamit.utils.LoadMyScenarios;
 public class QPositionDataWriterForR {
 
 	private static String outputDir ="../../../../repos/shared-svn/projects/mixedTraffic/triangularNetwork/run313/singleModes/withoutHoles/car_SW//";
-	private static final String suffix = "events[120]";
-	private static String eventFile = outputDir+"/events/"+suffix+".xml";
+	private static final String SUFFIX = "events[120]";
+	private static String eventFile = outputDir+"/events/"+SUFFIX+".xml";
 	private static String networkFile=outputDir+"/network.xml";
 	
 	private static Scenario scenario;
@@ -65,8 +65,8 @@ public class QPositionDataWriterForR {
 		this.person2startTime2data = calculationHandler.getPerson2StartTime2PersonQPosition();
 		this.person2StartTime2AccumulatedPos = calculationHandler.getPerson2StartTime2AccumulatedPosition();
 		this.lastDepartedPerson = calculationHandler.getLastDepartedPersonAndTime();
-		writeData(outputDir+"rData_QueuePositions_"+suffix+".txt", this.person2startTime2data);
-		writeData(outputDir+"rData_AccumulatedPositions_"+suffix+".txt", this.person2StartTime2AccumulatedPos);
+		writeData(outputDir+"rData_QueuePositions_"+SUFFIX+".txt", this.person2startTime2data);
+		writeData(outputDir+"rData_AccumulatedPositions_"+SUFFIX+".txt", this.person2StartTime2AccumulatedPos);
 		
 		LOG.info("Writing file(s) is finished.");
 	}

@@ -27,10 +27,7 @@ import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestRespo
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceInitializer;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.controler.OutputDirectoryLogging;
+import org.matsim.core.controler.*;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -44,10 +41,8 @@ import org.matsim.contrib.carsharing.qsim.CarsharingQsimFactory;
 import org.matsim.contrib.carsharing.replanning.CarsharingSubtourModeChoiceStrategy;
 import org.matsim.contrib.carsharing.replanning.RandomTripToCarsharingStrategy;
 import org.matsim.contrib.carsharing.runExample.CarsharingUtils;
-import org.matsim.contrib.carsharing.scoring.CarsharingScoringFunctionFactory;
 
 import playground.ivt.kticompatibility.KtiLikeScoringConfigGroup;
-import playground.ivt.matsim2030.scoring.MATSim2010ScoringFunctionFactory;
 
 import java.io.File;
 
@@ -107,7 +102,7 @@ public class RunZurichScenario {
 	}
 	
 
-	private static void connectFacilitiesWithNetwork(Controler controler) {
+	private static void connectFacilitiesWithNetwork(MatsimServices controler) {
         ActivityFacilities facilities = controler.getScenario().getActivityFacilities();
 		//log.warn("number of facilities: " +facilities.getFacilities().size());
         NetworkImpl network = (NetworkImpl) controler.getScenario().getNetwork();
@@ -117,7 +112,7 @@ public class RunZurichScenario {
 		wcl.connectFacilitiesWithLinks(facilities, network);
 	}
 
-	private static void initializeLocationChoice( final Controler controler ) {
+	private static void initializeLocationChoice( final MatsimServices controler ) {
 		final Scenario scenario = controler.getScenario();
 		final DestinationChoiceBestResponseContext lcContext =
 			new DestinationChoiceBestResponseContext( scenario );

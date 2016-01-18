@@ -55,7 +55,7 @@ public class MsNetworkMapper extends AbstractNetworkMapper {
 	protected Network providePreparedNetwork(String path2MATSimNetwork, String path2VissimZoneShp) {
 		// Read network
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		MatsimNetworkReader NetworkReader = new MatsimNetworkReader(scenario);
+		MatsimNetworkReader NetworkReader = new MatsimNetworkReader(scenario.getNetwork());
 		NetworkReader.readFile(path2MATSimNetwork);
 		Network network = scenario.getNetwork();
 		// Prepare zones and identifier.

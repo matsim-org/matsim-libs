@@ -25,7 +25,7 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
@@ -98,7 +98,7 @@ public class WithinDayInitialRoutesControlerListener implements StartupListener,
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		
-		Controler controler = event.getControler();
+		MatsimServices controler = event.getServices();
 		
 		/*
 		 * The withinDayControlerListener is also a StartupListener. Its notifyStartup(...)
@@ -125,7 +125,7 @@ public class WithinDayInitialRoutesControlerListener implements StartupListener,
 			this.withinDayControlerListener.getWithinDayEngine().doDuringLegReplanning(false);
 			this.withinDayControlerListener.getWithinDayEngine().doDuringActivityReplanning(false);
 			
-			event.getControler().getEvents().removeHandler(this.withinDayControlerListener.getTravelTimeCollector());
+			event.getServices().getEvents().removeHandler(this.withinDayControlerListener.getTravelTimeCollector());
 			this.withinDayControlerListener.getFixedOrderSimulationListener().removeSimulationListener(
 					this.withinDayControlerListener.getTravelTimeCollector());
 		}

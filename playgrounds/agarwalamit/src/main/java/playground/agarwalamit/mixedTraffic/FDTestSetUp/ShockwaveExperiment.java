@@ -37,7 +37,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 public class ShockwaveExperiment {
 	
-	private static final String runDir = "../../../../repos/shared-svn/projects/mixedTraffic/triangularNetwork/run313/singleModes/withoutHoles/car_SW/";
+	private static final String RUN_DIR = "../../../../repos/shared-svn/projects/mixedTraffic/triangularNetwork/run313/singleModes/withoutHoles/car_SW/";
 
 	public static void main(String[] args) {
 
@@ -49,7 +49,7 @@ public class ShockwaveExperiment {
 		inputs.setTimeDependentNetwork(true);
 		
 		GenerateFundamentalDiagramData generateFDData = new GenerateFundamentalDiagramData(inputs);
-		generateFDData.setRunDirectory(runDir);
+		generateFDData.setRunDirectory(RUN_DIR);
 		generateFDData.setReduceDataPointsByFactor(20);
 		generateFDData.setIsPlottingDistribution(false);
 		generateFDData.setIsUsingLiveOTFVis(false);

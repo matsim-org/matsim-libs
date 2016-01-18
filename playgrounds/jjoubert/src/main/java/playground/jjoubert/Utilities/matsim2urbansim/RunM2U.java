@@ -80,7 +80,7 @@ public class RunM2U {
 		 * Next, get the public transport network.
 		 */
 		Scenario sPt = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		MatsimNetworkReader nr = new MatsimNetworkReader(sPt);
+		MatsimNetworkReader nr = new MatsimNetworkReader(sPt.getNetwork());
 //TODO		nr.readFile(cte.sb.getPtNetworkFilename());
 		
 		/*

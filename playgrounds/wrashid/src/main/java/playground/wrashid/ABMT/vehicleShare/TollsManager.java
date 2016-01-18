@@ -18,7 +18,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 
 import java.util.HashMap;
@@ -35,11 +35,11 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 
 	private Network network;
 
-	private Controler controler;
+	private MatsimServices controler;
 	
 	private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler() ;
 
-	public TollsManager(Controler controler) {
+	public TollsManager(MatsimServices controler) {
         this.network = controler.getScenario().getNetwork();
 		this.controler = controler;
 	}

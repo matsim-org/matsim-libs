@@ -17,7 +17,7 @@ public class NetworkCarLinkRules {
 		Scenario scenario;
 		MatsimRandom.reset(123);
 		scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenario).readFile(args[0]);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(args[0]);
 		ArrayList<String> normalLinkLaneCountChangeList = new ArrayList<>();
 		ArrayList<String> clLinkLaneCountChangeList = new ArrayList<>();
 		int carLinkCount = 0;

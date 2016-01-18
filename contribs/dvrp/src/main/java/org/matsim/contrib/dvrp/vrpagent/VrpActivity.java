@@ -26,8 +26,8 @@ import org.matsim.contrib.dynagent.DynActivity;
 public class VrpActivity
     implements DynActivity
 {
-    private StayTask stayTask;
-    private String activityType;
+    private final StayTask stayTask;
+    private final String activityType;
 
 
     public VrpActivity(String activityType, StayTask stayTask)

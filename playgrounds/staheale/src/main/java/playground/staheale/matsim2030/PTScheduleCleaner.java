@@ -43,7 +43,7 @@ public class PTScheduleCleaner {
 
 		// ------------------- read in PTnetwork ----------------------------
 		log.info("Reading pt network...");	
-		MatsimNetworkReader NetworkReader = new MatsimNetworkReader(sc); 
+		MatsimNetworkReader NetworkReader = new MatsimNetworkReader(sc.getNetwork());
 		NetworkReader.readFile("./input/02-OEV_DWV_2005-HAFAS_adaptedV2_ohne644.xml");
 		log.info("Reading pt network...done.");
 		log.info("Network contains " +PTnetwork.getLinks().size()+ " links and " +PTnetwork.getNodes().size()+ " nodes.");

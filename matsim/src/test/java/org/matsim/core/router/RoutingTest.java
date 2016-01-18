@@ -177,7 +177,7 @@ public class RoutingTest  {
 //		final Config config = loadConfig("test/input/" + this.getClass().getCanonicalName().replace('.', '/') + "/config.xml");
 		final Config config = ConfigUtils.loadConfig( utils.getClassInputDirectory() + "/config.xml" );
 		final Scenario scenario = ScenarioUtils.createScenario(config);
-		new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(config.network().getInputFile());
 //		final String inPlansName = "test/input/" + this.getClass().getCanonicalName().replace('.', '/') + "/plans.xml.gz";
 		final String inPlansName = utils.getClassInputDirectory() + "/plans.xml.gz" ;
 		new MatsimPopulationReader(scenario).readFile(inPlansName);
@@ -185,7 +185,7 @@ public class RoutingTest  {
 		calcRoute(provider, scenario);
 
 		final Scenario referenceScenario = ScenarioUtils.createScenario(config);
-		new MatsimNetworkReader(referenceScenario).readFile(config.network().getInputFile());
+		new MatsimNetworkReader(referenceScenario.getNetwork()).readFile(config.network().getInputFile());
 		new MatsimPopulationReader(referenceScenario).readFile(inPlansName);
 		
 		final boolean isEqual = PopulationUtils.equalPopulation(referenceScenario.getPopulation(), scenario.getPopulation());

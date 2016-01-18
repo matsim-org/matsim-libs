@@ -19,13 +19,20 @@
 
 package playground.michalm.taxi.run;
 
-import java.util.Map;
+import java.util.*;
 
+import org.apache.commons.configuration.*;
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.dvrp.extensions.taxi.TaxiUtils;
 import org.matsim.contrib.dvrp.run.VrpPopulationUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
+
+import playground.michalm.taxi.optimizer.AbstractTaxiOptimizerParams;
+import playground.michalm.taxi.optimizer.AbstractTaxiOptimizerParams.TravelTimeSource;
+import playground.michalm.taxi.optimizer.rules.RuleBasedTaxiOptimizerParams;
+import playground.michalm.taxi.optimizer.rules.RuleBasedTaxiOptimizer.Goal;
+import playground.michalm.taxi.scheduler.TaxiSchedulerParams;
 
 
 class KNTaxiLauncher
@@ -36,10 +43,10 @@ class KNTaxiLauncher
      * @param useOTFVis TODO
      * @param file path to the configuration file (e.g. param.in)
      */
-    public static void run(TaxiLauncherParams params, boolean removeNonPassengers,
+    public static void run(Configuration config, boolean removeNonPassengers,
             boolean endActivitiesAtTimeZero, boolean useOTFVis)
     {
-        SingleRunTaxiLauncher launcher = new SingleRunTaxiLauncher(params);
+        SingleRunTaxiLauncher launcher = new SingleRunTaxiLauncher(config);
 
         if (removeNonPassengers) {
             VrpPopulationUtils.removePersonsNotUsingMode(TaxiUtils.TAXI_MODE, launcher.scenario);
@@ -56,55 +63,44 @@ class KNTaxiLauncher
         }
 
         launcher.initTravelTimeAndDisutility();
-        launcher.simulateIteration();
+        launcher.simulateIteration("");
     }
 
 
-    static TaxiLauncherParams createParams()
+    private static Configuration createConfig()
     {
-        TaxiLauncherParams params = new TaxiLauncherParams();
+        String inputDir = "../../../shared-svn/projects/maciejewski/Mielec/2014_02_base_scenario/";
+        Map<String, Object> map = new HashMap<>();
 
-        params.inputDir = "../../../shared-svn/projects/maciejewski/Mielec/2014_02_base_scenario/";
-
-        params.netFile = params.inputDir + "network.xml";
-        params.plansFile = params.inputDir + "output/ITERS/it.20/20.plans.xml.gz";
+        map.put(TaxiLauncherParams.NET_FILE, inputDir + "network.xml");
+        map.put(TaxiLauncherParams.PLANS_FILE, inputDir + "output/ITERS/it.20/20.plans.xml.gz");
+        map.put(TaxiLauncherParams.ONLINE_VEHICLE_TRACKER, Boolean.FALSE);
 
         //demand: 10, 15, 20, 25, 30, 35, 40
-        params.taxiCustomersFile = params.inputDir + "taxiCustomers_40_pc.txt";
-
+        map.put(TaxiLauncherParams.TAXI_CUSTOMERS_FILE, inputDir + "taxiCustomers_40_pc.txt");
         //supply: 25, 50
-        params.taxisFile = params.inputDir + "taxis-25.xml";
+        map.put(TaxiLauncherParams.TAXIS_FILE, inputDir + "taxis-25.xml");
 
-        params.ranksFile = params.inputDir + "taxi_ranks-0.xml";
+        map.put(TaxiLauncherParams.OTF_VIS, "true");
 
-        //        params.eventsFile = params.inputDir + "output/ITERS/it.20/20.events.xml.gz";
-        params.changeEventsFile = null;
+        String sPrefix = TaxiConfigUtils.SCHEDULER + TaxiConfigUtils.DELIMITER;
+        map.put(sPrefix + TaxiSchedulerParams.DESTINATION_KNOWN, Boolean.FALSE);
+        map.put(sPrefix + TaxiSchedulerParams.VEHICLE_DIVERSION, Boolean.FALSE);
+        map.put(sPrefix + TaxiSchedulerParams.PICKUP_DURATION, 1.);
+        map.put(sPrefix + TaxiSchedulerParams.DROPOFF_DURATION, 1.);
 
-        params.algorithmConfig = AlgorithmConfig.RULE_DSE_FF;
+        String oPrefix = TaxiConfigUtils.OPTIMIZER + TaxiConfigUtils.DELIMITER;
+        map.put(oPrefix + AbstractTaxiOptimizerParams.PARAMS_CLASS,
+                RuleBasedTaxiOptimizerParams.class.getName());
+        map.put(oPrefix + AbstractTaxiOptimizerParams.ID, "KN");
+        map.put(oPrefix + AbstractTaxiOptimizerParams.TRAVEL_TIME_SOURCE,
+                TravelTimeSource.FREE_FLOW_SPEED.name());
+        map.put(oPrefix + RuleBasedTaxiOptimizerParams.GOAL, Goal.DEMAND_SUPPLY_EQUIL.name());
+        map.put(oPrefix + RuleBasedTaxiOptimizerParams.NEAREST_REQUESTS_LIMIT, 99999);
+        map.put(oPrefix + RuleBasedTaxiOptimizerParams.NEAREST_VEHICLES_LIMIT, 99999);
+        map.put(oPrefix + RuleBasedTaxiOptimizerParams.CELL_SIZE, 1000);
 
-        params.nearestRequestsLimit = 0;
-        params.nearestVehiclesLimit = 0;
-
-        params.onlineVehicleTracker = Boolean.FALSE;
-        params.advanceRequestSubmission = Boolean.FALSE;
-        params.destinationKnown = Boolean.FALSE;
-        params.vehicleDiversion = Boolean.FALSE;
-
-        params.pickupDuration = 1.;
-        params.dropoffDuration = 1.;
-
-        params.batteryChargingDischarging = Boolean.FALSE;
-
-        params.otfVis = Boolean.TRUE;
-
-        params.outputDir = null;
-        params.vrpOutDir = null;
-        params.histogramOutDir = null;
-        params.eventsOutFile = null;
-
-        params.validate();
-
-        return params;
+        return new MapConfiguration(map);
     }
 
 
@@ -120,7 +116,6 @@ class KNTaxiLauncher
 
     public static void main(String... args)
     {
-        TaxiLauncherParams params = createParams();
-        run(params, true, false, true);
+        run(createConfig(), true, false, true);
     }
 }

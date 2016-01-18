@@ -20,8 +20,10 @@
 
 package org.matsim.withinday.replanning.identifiers.tools;
 
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
@@ -34,8 +36,9 @@ import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.withinday.controller.WithinDayModule;
-import org.matsim.withinday.mobsim.WithinDayEngine;
 import org.matsim.withinday.trafficmonitoring.EarliestLinkExitTimeProvider;
+
+import javax.inject.Inject;
 
 public class LinkReplanningMapTest extends MatsimTestCase {
 
@@ -55,34 +58,13 @@ public class LinkReplanningMapTest extends MatsimTestCase {
 
 		Controler controler = new Controler(config);
 		controler.addOverridingModule(new WithinDayModule());
-		ControlerListenerForTests listener = new ControlerListenerForTests();
-		controler.addControlerListener(listener);
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				addMobsimListenerBinding().to(MobsimListenerForTests.class);
+			}
+		});
 		controler.run();
-	}
-
-	/**
-	 * A ControllerListener that creates and registers a LinkReplanningMap
-	 * and a MobsimListenerForTests which executes the test cases.
-	 *
-	 * @author cdobler
-	 */
-	private static class ControlerListenerForTests implements StartupListener {
-
-		@Override
-		public void notifyStartup(final StartupEvent event) {
-			event.getControler().getInjector().getInstance(WithinDayEngine.class).initializeReplanningModules(2);
-			EarliestLinkExitTimeProvider earliestLinkExitTimeProvider = new EarliestLinkExitTimeProvider(
-					event.getControler().getScenario());
-			event.getControler().getEvents().addHandler(earliestLinkExitTimeProvider);
-			
-			LinkReplanningMap lrp = new LinkReplanningMap(earliestLinkExitTimeProvider);
-			event.getControler().getEvents().addHandler(lrp);
-			MobsimListenerForTests listener = new MobsimListenerForTests(lrp);
-			FixedOrderSimulationListener fosl = new FixedOrderSimulationListener();
-			fosl.addSimulationListener(lrp);
-			fosl.addSimulationListener(listener);
-			event.getControler().getMobsimListeners().add(fosl);
-		}
 	}
 
 	/**
@@ -100,7 +82,8 @@ public class LinkReplanningMapTest extends MatsimTestCase {
 		private static final int t4 = 6*3600;
 		private static final int linkTravelTime = 360;
 
-		public MobsimListenerForTests(final LinkReplanningMap lrp) {
+		@Inject
+		MobsimListenerForTests(final LinkReplanningMap lrp) {
 			this.lrp = lrp;
 		}
 

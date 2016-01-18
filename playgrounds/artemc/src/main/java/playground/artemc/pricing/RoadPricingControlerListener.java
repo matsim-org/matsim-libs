@@ -73,13 +73,13 @@ IterationEndsListener, ShutdownListener {
     @Override
     public void notifyStartup(final StartupEvent event) {
         // add scheme as top level container into scenario:
-        event.getControler().getScenario().addScenarioElement( RoadPricingScheme.ELEMENT_NAME, scheme);
+        event.getServices().getScenario().addScenarioElement( RoadPricingScheme.ELEMENT_NAME, scheme);
     }
 
 	@Override
 	public void notifyAfterMobsim(final AfterMobsimEvent event) {
 		// evaluate the final tolls paid by the agents and add them to their scores
-		this.calcPaidToll.sendMoneyEvents(Time.MIDNIGHT, event.getControler().getEvents());
+		this.calcPaidToll.sendMoneyEvents(Time.MIDNIGHT, event.getServices().getEvents());
 	}
 
 	@Override
@@ -91,7 +91,7 @@ IterationEndsListener, ShutdownListener {
 
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {
-		String filename = event.getControler().getControlerIO().getOutputFilename("output_toll.xml.gz") ;
+		String filename = event.getServices().getControlerIO().getOutputFilename("output_toll.xml.gz") ;
 		new RoadPricingWriterXMLv1(this.scheme).writeFile(filename);
 	}
 

@@ -29,8 +29,8 @@ public class FilterSample {
 		final MutableScenario targetsc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		
 		String networkFileName = "../../run951/951.output_network.xml.gz";
-		new MatsimNetworkReader(targetsc).readFile(networkFileName);
-		new MatsimNetworkReader(filtersc).readFile(networkFileName);
+		new MatsimNetworkReader(targetsc.getNetwork()).readFile(networkFileName);
+		new MatsimNetworkReader(filtersc.getNetwork()).readFile(networkFileName);
 		final Set<Id> personIds = new HashSet<Id>();
 		
 		String inputPlansFile = "../../run951/951.output_plans.xml.gz";

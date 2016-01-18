@@ -3,7 +3,6 @@ package playground.dhosse.prt.analysis;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dvrp.data.Vehicle;
@@ -42,7 +41,7 @@ public class PrtAnalyzer {
 		int nVeh = i;
 		
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		MatsimNetworkReader netReader = new MatsimNetworkReader(scenario);
+		MatsimNetworkReader netReader = new MatsimNetworkReader(scenario.getNetwork());
 		netReader.readFile("C:/Users/Daniel/Desktop/dvrp/cottbus_scenario/network_prt.xml");
 		PopulationReader popReader = new MatsimPopulationReader(scenario);
 		popReader.readFile("C:/Users/Daniel/Desktop/dvrp/cottbus_scenario/population_prt_final2.xml");

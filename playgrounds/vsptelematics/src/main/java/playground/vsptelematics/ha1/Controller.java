@@ -19,10 +19,9 @@
  * *********************************************************************** */
 package playground.vsptelematics.ha1;
 
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.controler.events.StartupEvent;
-import org.matsim.core.controler.listener.StartupListener;
 
 
 /**
@@ -36,25 +35,15 @@ public class Controller {
 	 */
 	public static void main(String[] args) {
 		Controler c = new Controler(args);
-		c.getConfig().controler().setOverwriteFileSetting(
-				true ?
-						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+		c.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		c.getConfig().controler().setCreateGraphs(false);
-        addListener(c);
+		c.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				addControlerListenerBinding().to(RouteTTObserver.class);
+			}
+		});
 		c.run();
 	}
 
-	private static void addListener(Controler c){
-		c.addControlerListener(new StartupListener(){
-			@Override
-			public void notifyStartup(StartupEvent event) {
-				Controler con = event.getControler();
-				final RouteTTObserver observer = new RouteTTObserver(con.getControlerIO().getOutputFilename("routeTravelTimes.txt"));
-				con.addControlerListener(observer);
-				con.getEvents().addHandler(observer);
-			}});
-	}
-
-	
 }

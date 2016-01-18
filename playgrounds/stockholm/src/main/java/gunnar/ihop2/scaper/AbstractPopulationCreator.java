@@ -4,7 +4,6 @@ import static gunnar.ihop2.regent.demandreading.ShapeUtils.drawPointFromGeometry
 import gunnar.ihop2.regent.demandreading.ZonalSystem;
 import gunnar.ihop2.regent.demandreading.Zone;
 
-import java.io.File;
 import java.util.logging.Logger;
 
 import org.matsim.api.core.v01.Coord;
@@ -13,8 +12,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
-import org.matsim.utils.objectattributes.ObjectAttributeUtils2;
-import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.xml.sax.helpers.DefaultHandler;
 
 import saleem.stockholmscenario.utils.StockholmTransformationFactory;
@@ -39,7 +36,7 @@ public class AbstractPopulationCreator extends DefaultHandler {
 			final String zoneShapeFileName, final String zonalCoordinateSystem) {
 		this.scenario = ScenarioUtils
 				.createScenario(ConfigUtils.createConfig());
-		(new MatsimNetworkReader(this.scenario)).readFile(networkFileName);
+		(new MatsimNetworkReader(this.scenario.getNetwork())).readFile(networkFileName);
 		this.zonalSystem = new ZonalSystem(zoneShapeFileName,
 				zonalCoordinateSystem);
 		this.zonalSystem.addNetwork(this.scenario.getNetwork(),

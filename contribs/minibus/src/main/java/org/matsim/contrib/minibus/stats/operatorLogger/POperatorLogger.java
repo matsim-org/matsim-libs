@@ -31,7 +31,7 @@ import org.matsim.contrib.minibus.PConfigGroup;
 import org.matsim.contrib.minibus.operator.Operator;
 import org.matsim.contrib.minibus.operator.Operators;
 import org.matsim.contrib.minibus.operator.PPlan;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -76,7 +76,7 @@ public final class POperatorLogger implements StartupListener, IterationEndsList
 
 	@Override
 	public void notifyStartup(final StartupEvent event) {
-		Controler controler = event.getControler();
+		MatsimServices controler = event.getServices();
 		
 		if(this.pConfig.getLogOperators()){
 			log.info("enabled");

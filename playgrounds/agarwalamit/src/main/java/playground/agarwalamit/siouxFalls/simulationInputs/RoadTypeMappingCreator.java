@@ -61,7 +61,7 @@ public class RoadTypeMappingCreator {
 		Scenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		final Network network = scenario.getNetwork();
 
-		new MatsimNetworkReader(scenario).readFile("./input/baseCase/SiouxFalls_network_fromOSM.xml");
+		new MatsimNetworkReader(scenario.getNetwork()).readFile("./input/baseCase/SiouxFalls_network_fromOSM.xml");
 		writer = IOUtils.getBufferedWriter("./input/emissionFiles/SiouxFalls_roadTypeMapping.txt");
 
 		for (Link link : network.getLinks().values()) {

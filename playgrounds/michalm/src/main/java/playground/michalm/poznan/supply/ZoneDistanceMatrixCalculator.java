@@ -62,7 +62,7 @@ public class ZoneDistanceMatrixCalculator
         };
 
         Scenario scenario = ScenarioUtils.createScenario(VrpConfigUtils.createConfig());
-        new MatsimNetworkReader(scenario).readFile(networkFile);
+        new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
 
         DistanceCalculator calculator = DistanceCalculators.//
         //        BEELINE_DISTANCE_CALCULATOR;

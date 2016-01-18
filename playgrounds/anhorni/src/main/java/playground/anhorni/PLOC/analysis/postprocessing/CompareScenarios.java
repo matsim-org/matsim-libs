@@ -71,7 +71,7 @@ public class CompareScenarios {
 	private void init(String configFile) {
 		this.readConfig(configFile);
 		new File(outpath).mkdirs();
-		new MatsimNetworkReader(baseScenario).readFile(networkFilePath);
+		new MatsimNetworkReader(baseScenario.getNetwork()).readFile(networkFilePath);
 		new FacilitiesReaderMatsimV1(baseScenario).readFile(facilitiesFilePath);
 	}
 		

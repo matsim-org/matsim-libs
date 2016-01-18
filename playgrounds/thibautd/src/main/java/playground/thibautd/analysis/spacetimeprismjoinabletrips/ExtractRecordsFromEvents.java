@@ -111,7 +111,7 @@ public class ExtractRecordsFromEvents {
 
 	private static Network getNetwork(final String networkFile) {
 		final Scenario sc = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
-		(new MatsimNetworkReader( sc )).readFile( networkFile );
+		(new MatsimNetworkReader(sc.getNetwork())).readFile( networkFile );
 		return sc.getNetwork();
 	}
 

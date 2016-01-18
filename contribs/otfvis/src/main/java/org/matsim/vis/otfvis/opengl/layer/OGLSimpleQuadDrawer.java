@@ -30,7 +30,7 @@ public class OGLSimpleQuadDrawer extends OTFGLAbstractDrawableReceiver {
 	@Override
 	public void onDraw( GL2 gl) {
 		linkWidthCalculator.setLaneWidth(OTFClientControl.getInstance().getOTFVisConfig().getEffectiveLaneWidth());
-		linkWidthCalculator.setLinkWidth(OTFClientControl.getInstance().getOTFVisConfig().getLinkWidth());
+		linkWidthCalculator.setLinkWidthForVis(OTFClientControl.getInstance().getOTFVisConfig().getLinkWidth());
 		float width = (float) linkWidthCalculator.calculateLinkWidth(this.nrLanes);
 		final Point2D.Float ortho = calcOrtho(this.quad[0].x, this.quad[0].y, this.quad[1].x, this.quad[1].y, 
 				width);

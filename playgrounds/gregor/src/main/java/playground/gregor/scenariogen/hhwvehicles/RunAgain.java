@@ -48,7 +48,7 @@ public class RunAgain {
 
 		Scenario sc = ScenarioUtils.createScenario(c);
 //		Network net = sc.getNetwork();
-		new MatsimNetworkReader(sc).readFile(RAW_INPUT + "/output_network.xml.gz");
+		new MatsimNetworkReader(sc.getNetwork()).readFile(RAW_INPUT + "/output_network.xml.gz");
 		new MatsimPopulationReader(sc).readFile(RAW_INPUT + "output_plans.xml.gz");
 //		dropDepTimes(sc.getPopulation());
 

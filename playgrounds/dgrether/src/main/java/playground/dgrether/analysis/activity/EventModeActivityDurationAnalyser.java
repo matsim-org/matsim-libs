@@ -88,7 +88,7 @@ public class EventModeActivityDurationAnalyser {
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 
 		Network net = scenario.getNetwork();
-		MatsimNetworkReader reader = new MatsimNetworkReader(scenario);
+		MatsimNetworkReader reader = new MatsimNetworkReader(scenario.getNetwork());
 		reader.readFile(NETWORK);
 
 		Population plans = scenario.getPopulation();

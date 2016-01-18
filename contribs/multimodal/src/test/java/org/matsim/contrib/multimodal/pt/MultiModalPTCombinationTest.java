@@ -114,7 +114,7 @@ public class MultiModalPTCombinationTest {
 
 		Controler controler = new Controler(scenario);
         controler.getConfig().controler().setCreateGraphs(false);
-        controler.setDumpDataAtEnd(false);
+		controler.getConfig().controler().setDumpDataAtEnd(false);
 		controler.getConfig().controler().setWriteEventsInterval(0);
 //		controler.setOverwriteFiles(true);
 		

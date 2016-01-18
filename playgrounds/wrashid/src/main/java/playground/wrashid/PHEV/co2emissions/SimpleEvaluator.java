@@ -21,7 +21,7 @@ public class SimpleEvaluator {
 		Config config = ConfigUtils.loadConfig(args[0]);
 		MatsimRandom.reset(config.global().getRandomSeed());
 		Scenario scenario = ScenarioUtils.createScenario(config);
-		new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(config.network().getInputFile());
 		Network network = scenario.getNetwork();
 		
 		EventsManager events = EventsUtils.createEventsManager();

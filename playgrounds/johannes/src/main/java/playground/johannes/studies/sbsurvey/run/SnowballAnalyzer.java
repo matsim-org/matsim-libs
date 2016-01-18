@@ -89,7 +89,7 @@ public class SnowballAnalyzer {
 		graph = GraphReaderFacade.read(config.getParam(MODULE_NAME, "graphfile"));
 		
 		Scenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		MatsimNetworkReader netReader = new MatsimNetworkReader(scenario);
+		MatsimNetworkReader netReader = new MatsimNetworkReader(scenario.getNetwork());
 //		netReader.readFile(config.getParam(MODULE_NAME, "networkfile"));
 	
 		ZoneLayer zones = ZoneLayerSHP.read(config.getParam(MODULE_NAME, "zonesfile"));

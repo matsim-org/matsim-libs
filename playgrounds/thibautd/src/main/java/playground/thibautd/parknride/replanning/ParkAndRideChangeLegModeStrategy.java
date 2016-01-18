@@ -23,7 +23,7 @@ import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.ReplanningContext;
@@ -46,7 +46,7 @@ import javax.inject.Provider;
 public class ParkAndRideChangeLegModeStrategy implements PlanStrategy {
 	private final PlanStrategyImpl strategy = new PlanStrategyImpl( new RandomPlanSelector() );
 
-	public ParkAndRideChangeLegModeStrategy(final Controler controler, Provider<TripRouter> tripRouterProvider) {
+	public ParkAndRideChangeLegModeStrategy(final MatsimServices controler, Provider<TripRouter> tripRouterProvider) {
 		StageActivityTypes pnrList = ParkAndRideConstants.PARKING_ACT_TYPE;
 
 		addStrategyModule( new TripsToLegsModule(pnrList, tripRouterProvider, controler.getConfig().global()) );

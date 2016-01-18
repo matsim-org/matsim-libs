@@ -20,7 +20,7 @@
 
 package org.matsim.core.controler.events;
 
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 
 /**
  * Event class to notify observers that a iteration is finished
@@ -34,7 +34,7 @@ public final class IterationEndsEvent extends ControlerEvent {
 	 */
 	private final int iteration;
 
-	public IterationEndsEvent(final Controler controler, final int iteration) {
+	public IterationEndsEvent(final MatsimServices controler, final int iteration) {
 		super(controler);
 		this.iteration = iteration;
 	}

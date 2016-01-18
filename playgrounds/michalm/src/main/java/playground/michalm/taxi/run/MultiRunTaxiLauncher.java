@@ -20,16 +20,17 @@
 package playground.michalm.taxi.run;
 
 import java.io.*;
-import java.util.EnumSet;
+import java.util.List;
 
+import org.apache.commons.configuration.Configuration;
 import org.matsim.contrib.dvrp.data.VrpData;
-import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelTimeSource;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 
-import playground.michalm.taxi.util.stats.TaxiStatsCalculator;
-import playground.michalm.taxi.util.stats.TaxiStatsCalculator.TaxiStats;
+import playground.michalm.taxi.optimizer.AbstractTaxiOptimizerParams;
+import playground.michalm.taxi.optimizer.AbstractTaxiOptimizerParams.TravelTimeSource;
+import playground.michalm.taxi.util.stats.*;
 
 
 class MultiRunTaxiLauncher
@@ -43,16 +44,16 @@ class MultiRunTaxiLauncher
     private PrintWriter pw;
 
 
-    MultiRunTaxiLauncher(TaxiLauncherParams params)
+    MultiRunTaxiLauncher(Configuration config)
     {
-        super(params);
+        super(config);
     }
 
 
     void initOutputFiles(String outputFileSuffix)
     {
         try {
-            pw = new PrintWriter(params.outputDir + "stats" + outputFileSuffix);
+            pw = new PrintWriter(launcherParams.multiRunStatsDir + "/stats" + outputFileSuffix);
             pw.println(MultiRunStats.HEADER);
         }
         catch (IOException e) {
@@ -85,79 +86,85 @@ class MultiRunTaxiLauncher
         for (int i = 0; i < runs; i += 4) {
             MatsimRandom.reset(RANDOM_SEEDS[i]);
             initTravelTimeAndDisutility();
-            simulateIteration();
+            simulateIteration("warmup" + i);
         }
 
         warmup = false;
     }
 
 
-    void run(int runs)
+    private static final int STATS_HOURS = 25;
+
+
+    void run(int runs, Configuration optimConfig)
     {
         if (runs < 0 || runs > RANDOM_SEEDS.length) {
             throw new RuntimeException();
         }
 
+        optimParams = AbstractTaxiOptimizerParams.createParams(optimConfig);
+
         travelTimeCalculator = null;
 
-        if (params.algorithmConfig.ttimeSource == TravelTimeSource.EVENTS) {
+        if (optimParams.travelTimeSource == TravelTimeSource.EVENTS) {
             runWarmupConditionally(runs);
         }
 
-        MultiRunStats multipleRunStats = new MultiRunStats();
+        MultiRunStats multiRunStats = new MultiRunStats();
         initTravelTimeAndDisutility();//the same for all runs
 
         for (int i = 0; i < runs; i++) {
             long t0 = System.currentTimeMillis();
             MatsimRandom.reset(RANDOM_SEEDS[i]);
-            simulateIteration();
-            TaxiStats evaluation = new TaxiStatsCalculator(
-                    context.getVrpData().getVehicles().values()).getStats();
+            simulateIteration(i + "");
+
+            TaxiStats stats = new TaxiStatsCalculator(context.getVrpData().getVehicles().values())
+                    .getStats();
             long t1 = System.currentTimeMillis();
-            multipleRunStats.updateStats(evaluation, t1 - t0);
+            multiRunStats.updateStats(stats, t1 - t0);
+
+            produceDetailedStats(i);
         }
 
         VrpData data = context.getVrpData();
-        String cfg = params.algorithmConfig.name();
+        String cfgId = optimParams.id;
 
-        multipleRunStats.printStats(pw, cfg, data);
+        multiRunStats.printStats(pw, cfgId, data);
         pw.flush();
     }
 
 
-    void runConfig(AlgorithmConfig config, int runs)
+    private void produceDetailedStats(int run)
     {
-        params.algorithmConfig = config;
-        params.validate();
-        run(runs);
+        HourlyTaxiStatsCalculator calculator = new HourlyTaxiStatsCalculator(
+                context.getVrpData().getVehicles().values(), STATS_HOURS);
+        HourlyTaxiStats.printAllStats(calculator.getStats(),
+                launcherParams.detailedTaxiStatsDir + "/hourly_stats_run_" + run);
+        HourlyHistograms.printAllHistograms(calculator.getHourlyHistograms(),
+                launcherParams.detailedTaxiStatsDir + "/hourly_histograms_run_" + run);
+        calculator.getDailyHistograms().printHistograms(
+                launcherParams.detailedTaxiStatsDir + "/daily_histograms_run_" + run);
     }
 
 
-    static void run(int runs, TaxiLauncherParams params)
+    static void runAll(int runs, Configuration config)
     {
-        MultiRunTaxiLauncher multiLauncher = new MultiRunTaxiLauncher(params);
-        multiLauncher.initOutputFiles("");
-        multiLauncher.run(runs);
-        multiLauncher.closeOutputFiles();
-    }
+        List<Configuration> optimConfigs = TaxiConfigUtils.getOptimizerConfigs(config);
 
-
-    /**
-     * One may call this method with the following params overridden: params.destinationKnown =
-     * false; params.onlineVehicleTracker = false; params.advanceRequestSubmission = false;
-     */
-    @SafeVarargs
-    static void runAll(int runs, TaxiLauncherParams params, EnumSet<AlgorithmConfig>... configSets)
-    {
-        MultiRunTaxiLauncher multiLauncher = new MultiRunTaxiLauncher(params);
+        MultiRunTaxiLauncher multiLauncher = new MultiRunTaxiLauncher(config);
         multiLauncher.initOutputFiles("");
 
-        for (EnumSet<AlgorithmConfig> cfgSet : configSets) {
-            for (AlgorithmConfig cfg : cfgSet) {
-                multiLauncher.runConfig(cfg, runs);
-            }
+        for (Configuration optimCfg : optimConfigs) {
+            multiLauncher.run(runs, optimCfg);
         }
 
         multiLauncher.closeOutputFiles();
+    }
+
+
+    public static void main(String[] args)
+    {
+        int runs = 1;
+        MultiRunTaxiLauncher.runAll(runs, TaxiConfigUtils.loadConfig(args[0]));
     }
 }

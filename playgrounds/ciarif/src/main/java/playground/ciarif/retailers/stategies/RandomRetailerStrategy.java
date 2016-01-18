@@ -22,7 +22,7 @@ package playground.ciarif.retailers.stategies;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
@@ -39,7 +39,7 @@ public class RandomRetailerStrategy extends RetailerStrategyImpl
 
 	private TreeMap<Id<ActivityFacility>, ActivityFacility> movedFacilities = new TreeMap<>();
 
-	public RandomRetailerStrategy(Controler controler) {
+	public RandomRetailerStrategy(MatsimServices controler) {
 		super(controler);
 	}
 

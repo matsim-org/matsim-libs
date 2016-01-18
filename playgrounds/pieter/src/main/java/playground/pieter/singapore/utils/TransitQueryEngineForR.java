@@ -415,7 +415,7 @@ public class TransitQueryEngineForR implements Serializable {
     }
 
     public void loadNetwork(String networkFile) {
-        new MatsimNetworkReader(scenario).readFile(networkFile);
+        new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
         this.interSections = NetworkAngleUtils.getInterSections(scenario.getNetwork());
     }
 

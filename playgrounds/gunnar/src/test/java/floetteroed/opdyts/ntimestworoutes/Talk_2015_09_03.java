@@ -180,8 +180,8 @@ class Talk_2015_09_03 {
 							convergenceCriterion,
 							// selfTuner,
 							maxIterations, maxTransitions, populationSize, rnd,
-							interpolate, keepBestSolution, objectiveFunction,
-							maxMemoryLength);
+							interpolate, objectiveFunction,
+							maxMemoryLength, 0.95);
 
 					search.run();
 

@@ -38,7 +38,7 @@ public class VTTScomputation implements StartupListener, AfterMobsimListener {
 
 	@Override
 	public void notifyStartup(StartupEvent event) {
-		event.getControler().getEvents().addHandler(vttsHandler);	
+		event.getServices().getEvents().addHandler(vttsHandler);
 	}
 
 	@Override

@@ -159,7 +159,7 @@ public class TaxiDemandWriter
     {
         scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
         ;
-        new MatsimNetworkReader(scenario).readFile(NETWORKFILE);
+        new MatsimNetworkReader(scenario.getNetwork()).readFile(NETWORKFILE);
         this.network = (NetworkImpl)scenario.getNetwork();
     }
 

@@ -84,7 +84,7 @@ public class PopulationLinksToStopLinks implements PersonAlgorithm {
 
 	public static void main(String[] args) {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		(new MatsimNetworkReader(scenario)).readFile(args[1]);
+		(new MatsimNetworkReader(scenario.getNetwork())).readFile(args[1]);
 		((PopulationImpl) scenario.getPopulation()).setIsStreaming(true);
 		PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		PopulationWriter plansWriter = new PopulationWriter(scenario.getPopulation(), scenario.getNetwork());

@@ -52,7 +52,7 @@ public class FilterSelectedPlan {
 		MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		
 		log.info("Reading network from " + networkFile);
-		new MatsimNetworkReader(sc).readFile(networkFile);
+		new MatsimNetworkReader(sc.getNetwork()).readFile(networkFile);
 
 		final PopulationImpl plans = (PopulationImpl) sc.getPopulation();
 		plans.setIsStreaming(true);

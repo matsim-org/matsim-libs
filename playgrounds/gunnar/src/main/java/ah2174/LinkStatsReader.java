@@ -98,7 +98,7 @@ public class LinkStatsReader implements TabularFileHandler {
 		final String networkName = config.getParam("network",
 				"inputNetworkFile");
 		Scenario scenario = ScenarioUtils.createScenario(config);
-		NetworkReaderMatsimV1 reader = new NetworkReaderMatsimV1(scenario);
+		NetworkReaderMatsimV1 reader = new NetworkReaderMatsimV1(scenario.getNetwork());
 		reader.parse(networkName);
 		return scenario.getNetwork();
 	}

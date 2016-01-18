@@ -49,7 +49,7 @@ public class SouthAfricaLinks2EsriShapefile {
 		
 		/* Read the network. */
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		MatsimNetworkReader mnr = new MatsimNetworkReader(sc);
+		MatsimNetworkReader mnr = new MatsimNetworkReader(sc.getNetwork());
 		mnr.parse(input);
 		
 		/* Set up the ESRI conversion. */

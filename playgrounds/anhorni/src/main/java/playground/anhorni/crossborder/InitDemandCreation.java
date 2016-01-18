@@ -92,7 +92,7 @@ public class InitDemandCreation {
 	private void readNetwork() {
 		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		this.network = (NetworkImpl) scenario.getNetwork();
-		new MatsimNetworkReader(scenario).readFile(Config.networkFile);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(Config.networkFile);
 
 		// running Network adaptation algorithms
 		new NetworkSummary().run(this.network);

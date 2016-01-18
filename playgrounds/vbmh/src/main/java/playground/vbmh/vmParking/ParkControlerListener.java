@@ -57,7 +57,7 @@ public class ParkControlerListener implements StartupListener, IterationEndsList
 		
 		//Verzeichnisse erstellen
 		try{
-			File dir = new File(getParkHandler().getParkControl().controller.getConfig().getModule("controler").getValue("outputDirectory")+"/Charts/"+getParkHandler().getParkControl().controller.getIterationNumber());
+			File dir = new File(getParkHandler().getParkControl().controller.getConfig().getModule("services").getValue("outputDirectory")+"/Charts/"+getParkHandler().getParkControl().controller.getIterationNumber());
 			dir.mkdir();
 		}catch(Exception e){
 			System.out.println("Verzeichniss wurde nicht angelegt");
@@ -65,7 +65,7 @@ public class ParkControlerListener implements StartupListener, IterationEndsList
 		//-----
 		
 		
-		VMCharts.printCharts(getParkHandler().getParkControl().controller.getConfig().getModule("controler").getValue("outputDirectory")+"/Charts/"+getParkHandler().getParkControl().controller.getIterationNumber(), getParkHandler().getParkControl().controller.getIterationNumber());
+		VMCharts.printCharts(getParkHandler().getParkControl().controller.getConfig().getModule("services").getValue("outputDirectory")+"/Charts/"+getParkHandler().getParkControl().controller.getIterationNumber(), getParkHandler().getParkControl().controller.getIterationNumber());
 		VMCharts.clear();
 		
 		
@@ -77,7 +77,7 @@ public class ParkControlerListener implements StartupListener, IterationEndsList
 	public void notifyStartup(StartupEvent event) {
 		// TODO Auto-generated method stub
 		
-		event.getControler().getEvents().addHandler(getParkHandler());
+		event.getServices().getEvents().addHandler(getParkHandler());
 	}
 
 	@Override
@@ -132,7 +132,7 @@ public class ParkControlerListener implements StartupListener, IterationEndsList
 		
 		
 		//VM_Score_Keeper Zuruecksetzen:
-        Map<Id<Person>, ? extends Person> population = event.getControler().getScenario().getPopulation().getPersons();
+        Map<Id<Person>, ? extends Person> population = event.getServices().getScenario().getPopulation().getPersons();
 		for (Person person : population.values()){
 			//person.getCustomAttributes().put("VMScoreKeeper", null);
 			person.getCustomAttributes().remove("VMScoreKeeper");

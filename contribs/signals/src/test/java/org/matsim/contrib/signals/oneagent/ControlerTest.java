@@ -72,7 +72,7 @@ public class ControlerTest {
 
 			@Override
 			public void notifyAfterMobsim(AfterMobsimEvent event) {
-				Scenario scenario = event.getControler().getScenario();
+				Scenario scenario = event.getServices().getScenario();
 				int dropping = 0;
 				int onset = 100;
 				for (SignalSystemControllerData intersectionSignal :
@@ -95,7 +95,7 @@ public class ControlerTest {
 			
 			@Override
 			public void notifyIterationStarts(IterationStartsEvent event) {
-				event.getControler().getEvents().addHandler(new EventsLogger());
+				event.getServices().getEvents().addHandler(new EventsLogger());
 
 				TestLink2EnterEventHandler enterHandler = new TestLink2EnterEventHandler();
 				if (0 == event.getIteration()) {
@@ -105,7 +105,7 @@ public class ControlerTest {
 				if (1 == event.getIteration()) {
 					enterHandler.link2EnterTime = 100.0;
 					SignalGroupStateChangedEventHandler signalsHandler0 = new TestSignalGroupStateChangedHandler();
-					event.getControler().getEvents().addHandler(signalsHandler0);
+					event.getServices().getEvents().addHandler(signalsHandler0);
 				}
 			}
 		});

@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
@@ -101,7 +102,7 @@ public class CostNavigationRouteRunner implements MobsimInitializedListener, Aft
 	
 	private static final Logger log = Logger.getLogger(CostNavigationRouteRunner.class);
 
-	public CostNavigationRouteRunner(Controler controler) {
+	public CostNavigationRouteRunner(MatsimServices controler) {
 	
 		this.scenario = controler.getScenario();
 		
@@ -110,7 +111,7 @@ public class CostNavigationRouteRunner implements MobsimInitializedListener, Aft
 	}
 
 	/*
-	 * New Routers for the Replanning are used instead of using the controler's.
+	 * New Routers for the Replanning are used instead of using the services's.
 	 * By doing this every person can use a personalized Router.
 	 */
 	protected void initReplanners() {
@@ -158,7 +159,7 @@ public class CostNavigationRouteRunner implements MobsimInitializedListener, Aft
 		costNavigationTravelTimeLogger.toleranceFaster = tauplus;
 		costNavigationTravelTimeLogger.toleranceAlternativeRoute = tau;
 		
-		event.getControler().getEvents().addHandler(costNavigationTravelTimeLogger);
+		event.getServices().getEvents().addHandler(costNavigationTravelTimeLogger);
 		
 		this.selector = new SelectHandledAgentsByProbability();
 		
@@ -311,8 +312,8 @@ public class CostNavigationRouteRunner implements MobsimInitializedListener, Aft
 			controler.addControlerListener(costNavigationRouteRunner);
 			
 			// do not dump plans, network and facilities and the end
-			controler.setDumpDataAtEnd(false);
-						
+			controler.getConfig().controler().setDumpDataAtEnd(false);
+
 			// set parameter from command line
 			for (int i = 1; i < args.length; i++) {
 				if (args[i].equalsIgnoreCase(NUMOFTHREADS)) {

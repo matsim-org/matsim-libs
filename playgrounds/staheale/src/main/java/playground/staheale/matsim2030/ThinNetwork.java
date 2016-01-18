@@ -56,7 +56,7 @@ private static Logger log = Logger.getLogger(ThinNetwork.class);
 		// read in PTnetwork
 		
 		log.info("Reading pt network...");	
-		MatsimNetworkReader NetworkReader = new MatsimNetworkReader(sc); 
+		MatsimNetworkReader NetworkReader = new MatsimNetworkReader(sc.getNetwork());
 		NetworkReader.readFile("./input/uvek2005network_adjusted.xml.gz");
 		log.info("Reading pt network...done.");
 		log.info("Network contains " +PTnetwork.getLinks().size()+ " links and " +PTnetwork.getNodes().size()+ " nodes.");

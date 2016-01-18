@@ -42,7 +42,7 @@ public class OuterCordonCountsGenerator {
 
 	private final Map<Tuple<Id<Link>,String>, Map<Integer, Double>> countStation2time2countInfo_in = new HashMap<>();
 	private final Map<Tuple<Id<Link>,String>, Map<Integer, Double>> countStation2time2countInfo_out = new HashMap<>();
-	private static final String inputFilesDir = PatnaUtils.INPUT_FILES_DIR+"/externalDemandInputFiles/";
+	private static final String INPUT_FILES_DIR = PatnaUtils.INPUT_FILES_DIR+"/externalDemandInputFiles/";
 
 	public static void main(String[] args) {
 
@@ -51,12 +51,12 @@ public class OuterCordonCountsGenerator {
 		OuterCordonCountsGenerator pcg = new OuterCordonCountsGenerator();
 	
 //		pcg.processCountingStation("OC1", inputFilesDir+"/oc1_fatua2Patna.txt", inputFilesDir+"/oc1_patna2Fatua.txt");
-		pcg.processCountingStation("OC2", inputFilesDir+"/oc2_fatua2Patna.txt", inputFilesDir+"/oc2_patna2Fatua.txt");
-		pcg.processCountingStation("OC3", inputFilesDir+"/oc3_punpun2Patna.txt", inputFilesDir+"/oc3_patna2punpun.txt");
-		pcg.processCountingStation("OC4", inputFilesDir+"/oc4_muz2Patna.txt", inputFilesDir+"/oc4_patna2Muz.txt");
-		pcg.processCountingStation("OC5", inputFilesDir+"/oc5_danapur2Patna.txt", inputFilesDir+"/oc5_patna2Danapur.txt");
-		pcg.processCountingStation("OC6", inputFilesDir+"/oc6_fatua2Noera.txt", inputFilesDir+"/oc6_noera2Fatua.txt");
-		pcg.processCountingStation("OC7", inputFilesDir+"/oc7_danapur2Patna.txt", inputFilesDir+"/oc7_patna2Danapur.txt");
+		pcg.processCountingStation("OC2", INPUT_FILES_DIR+"/oc2_fatua2Patna.txt", INPUT_FILES_DIR+"/oc2_patna2Fatua.txt");
+		pcg.processCountingStation("OC3", INPUT_FILES_DIR+"/oc3_punpun2Patna.txt", INPUT_FILES_DIR+"/oc3_patna2punpun.txt");
+		pcg.processCountingStation("OC4", INPUT_FILES_DIR+"/oc4_muz2Patna.txt", INPUT_FILES_DIR+"/oc4_patna2Muz.txt");
+		pcg.processCountingStation("OC5", INPUT_FILES_DIR+"/oc5_danapur2Patna.txt", INPUT_FILES_DIR+"/oc5_patna2Danapur.txt");
+		pcg.processCountingStation("OC6", INPUT_FILES_DIR+"/oc6_fatua2Noera.txt", INPUT_FILES_DIR+"/oc6_noera2Fatua.txt");
+		pcg.processCountingStation("OC7", INPUT_FILES_DIR+"/oc7_danapur2Patna.txt", INPUT_FILES_DIR+"/oc7_patna2Danapur.txt");
 		
 		pcg.writeCountsDataToFile(outCountsFile);
 	}

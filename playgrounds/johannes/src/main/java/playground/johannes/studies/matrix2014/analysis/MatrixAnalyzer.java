@@ -66,6 +66,8 @@ public class MatrixAnalyzer implements AnalyzerTask<Collection<? extends Person>
 
     private boolean useWeights;
 
+//    private
+
     public MatrixAnalyzer(ActivityFacilities facilities, ZoneCollection zones, NumericMatrix refMatrix, String name) {
         this.refMatrix = refMatrix;
         this.matrixName = name;
@@ -142,6 +144,8 @@ public class MatrixAnalyzer implements AnalyzerTask<Collection<? extends Person>
                 */
                 Set<String> keys = tmpRefMatrix.keys();
                 keys.addAll(simMatrix.keys());
+
+                logger.debug(String.format("Compared %s od relations.", keys.size()));
 
                 TDoubleArrayList refVals = new TDoubleArrayList();
                 TDoubleArrayList simVals = new TDoubleArrayList();

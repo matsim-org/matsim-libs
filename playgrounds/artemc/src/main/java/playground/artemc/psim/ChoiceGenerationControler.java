@@ -13,6 +13,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.ControlerDefaultsModule;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.events.EventsManagerImpl;
@@ -57,7 +58,7 @@ public class ChoiceGenerationControler implements BeforeMobsimListener {
 		this.controler = controler;
 	}
 
-	public Controler getControler() {
+	public MatsimServices getControler() {
 		return controler;
 	}
 
@@ -127,7 +128,7 @@ public class ChoiceGenerationControler implements BeforeMobsimListener {
 
 		controler.getScenario().getConfig().controler().setLastIteration(0);
 
-//		controler.setTransitRouterFactory(new TransitRouterEventsWSFactory(controler.getScenario(), waitTimeCalculator.getWaitTimes(), stopStopTimeCalculator.getStopStopTimes()));
+//		services.setTransitRouterFactory(new TransitRouterEventsWSFactory(services.getScenario(), waitTimeCalculator.getWaitTimes(), stopStopTimeCalculator.getStopStopTimes()));
 //      controler.setScoringFunctionFactory(
 //            new CharyparNagelOpenTimesScoringFunctionFactory(controler.getConfig().planCalcScore(),
 //                    controler.getScenario()));

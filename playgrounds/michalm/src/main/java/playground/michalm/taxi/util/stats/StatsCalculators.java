@@ -20,20 +20,26 @@
 package playground.michalm.taxi.util.stats;
 
 import org.apache.commons.math3.stat.descriptive.moment.Mean;
+import org.matsim.contrib.dvrp.data.*;
+import org.matsim.contrib.dvrp.schedule.Schedule;
+import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
+import org.matsim.contrib.util.EnumCounter;
 
 import com.google.common.collect.Iterables;
 
 import playground.michalm.ev.UnitConversionRatios;
 import playground.michalm.taxi.data.*;
 import playground.michalm.taxi.data.TaxiRequest.TaxiRequestStatus;
-import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration;
+import playground.michalm.taxi.optimizer.TaxiOptimizerContext;
+import playground.michalm.taxi.schedule.*;
+import playground.michalm.taxi.schedule.TaxiTask.TaxiTaskType;
 import playground.michalm.taxi.scheduler.TaxiSchedulerUtils;
 import playground.michalm.taxi.util.stats.StatsCollector.StatsCalculator;
 
 
 public class StatsCalculators
 {
-    public static StatsCalculator<String> combineStatsCalculator(
+    public static StatsCalculator<String> combineStatsCalculators(
             final StatsCalculator<?>... calculators)
     {
         return new StatsCalculator<String>() {
@@ -44,7 +50,6 @@ public class StatsCalculators
                 for (StatsCalculator<?> sc : calculators) {
                     s += sc.calculateStat() + "\t";
                 }
-
                 return s;
             }
         };
@@ -52,17 +57,57 @@ public class StatsCalculators
 
 
     public static StatsCalculator<Integer> createIdleVehicleCounter(
-            final TaxiOptimizerConfiguration optimConfig)
+            final TaxiOptimizerContext optimContext)
     {
         return new StatsCalculator<Integer>() {
             @Override
             public Integer calculateStat()
             {
-                return Iterables
-                        .size(Iterables.filter(optimConfig.context.getVrpData().getVehicles().values(),
-                                TaxiSchedulerUtils.createIsIdle(optimConfig.scheduler)));
+                return Iterables.size(
+                        Iterables.filter(optimContext.context.getVrpData().getVehicles().values(),
+                                TaxiSchedulerUtils.createIsIdle(optimContext.scheduler)));
             }
         };
+    }
+
+    
+    public static final String TAXI_TASK_TYPES_HEADER = combineValues(TaxiTaskType.values());
+    
+
+    public static StatsCalculator<String> createCurrentTaxiTaskOfTypeCounter(
+            final VrpData taxiData)
+    {
+        return new StatsCalculator<String>() {
+            @Override
+            public String calculateStat()
+            {
+                EnumCounter<TaxiTaskType> counter = new EnumCounter<>(TaxiTaskType.class);
+
+                for (Vehicle veh : taxiData.getVehicles().values()) {
+                    if (veh.getSchedule().getStatus() == ScheduleStatus.STARTED) {
+                        Schedule<TaxiTask> schedule = TaxiSchedules
+                                .asTaxiSchedule(veh.getSchedule());
+                        counter.increment(schedule.getCurrentTask().getTaxiTaskType());
+                    }
+                }
+
+                String s = "";
+                for (TaxiTaskType e : TaxiTaskType.values()) {
+                    s += counter.getCount(e) + "\t";
+                }
+                return s;
+            }
+        };
+    }
+
+
+    public static String combineValues(Object[] values)
+    {
+        String s = "";
+        for (Object v : values) {
+            s += v.toString() + "\t";
+        }
+        return s;
     }
 
 

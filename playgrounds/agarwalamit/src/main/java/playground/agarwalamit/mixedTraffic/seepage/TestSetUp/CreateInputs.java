@@ -59,8 +59,8 @@ public class CreateInputs {
 	private Link link1;
 	private Link link2;
 	private Link link3;
-	private String outputDir = SeepageControler.outputDir;
-	private List<String> mainModes = SeepageControler.mainModes;
+	private String outputDir = SeepageControler.OUTPUT_DIR;
+	private List<String> mainModes = SeepageControler.MAIN_MODES;
 	
 	private void createConfig(){
 		Config config = scenario.getConfig();
@@ -69,8 +69,8 @@ public class CreateInputs {
 		config.qsim().setMainModes(mainModes);
 
 		config.setParam("seepage", "isSeepageAllowed", "true");
-		config.setParam("seepage", "seepMode", SeepageControler.seepMode);
-		config.setParam("seepage","isSeepModeStorageFree", SeepageControler.isSeepModeStorageFree);
+		config.setParam("seepage", "seepMode", SeepageControler.SEEP_MODE);
+		config.setParam("seepage","isSeepModeStorageFree", SeepageControler.IS_SEEP_MODE_STORAGE_FREEE);
 		
 		config.qsim().setStuckTime(50*3600);
 		config.qsim().setEndTime(18*3600);

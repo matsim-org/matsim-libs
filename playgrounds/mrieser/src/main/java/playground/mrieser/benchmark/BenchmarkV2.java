@@ -75,7 +75,7 @@ public class BenchmarkV2 {
 	}
 
 	public void loadNetwork() {
-		new MatsimNetworkReader(this.scenario).readFile("network.xml.gz");
+		new MatsimNetworkReader(this.scenario.getNetwork()).readFile("network.xml.gz");
 	}
 
 	public void createPopulation(final int count, final String outputDir) {

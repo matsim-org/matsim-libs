@@ -37,7 +37,7 @@ public class AnalyseEquil {
 		File f = new File("src/main/java/playground/jjoubert/TemporaryCode/equilNetwork.xml");
 		log.info("Network: " + f.getAbsolutePath());
 		Scenario s = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		MatsimNetworkReader nr = new MatsimNetworkReader(s);
+		MatsimNetworkReader nr = new MatsimNetworkReader(s.getNetwork());
 		nr.readFile(f.getAbsolutePath());
 		double minX = Double.POSITIVE_INFINITY;
 		double maxX = Double.NEGATIVE_INFINITY;

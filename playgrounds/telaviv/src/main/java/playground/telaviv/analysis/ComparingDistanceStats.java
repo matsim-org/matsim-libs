@@ -68,7 +68,7 @@ public class ComparingDistanceStats implements IterationEndsListener {
 	public void notifyIterationEnds(final IterationEndsEvent event) {	
 		this.bins.clear();
 
-        for (Person p : event.getControler().getScenario().getPopulation().getPersons().values()) {
+        for (Person p : event.getServices().getScenario().getPopulation().getPersons().values()) {
 			
 			// continue if person is in the analysis population or if the id is not numeric
 			if (!this.isInteger(p.getId().toString()) ||
@@ -99,7 +99,7 @@ public class ComparingDistanceStats implements IterationEndsListener {
 						Route route = previousLeg.getRoute();
 						if (route instanceof NetworkRoute) {
 							if (route.getDistance() != Double.NaN) distance = route.getDistance();
-							else distance = RouteUtils.calcDistance((NetworkRoute) route, event.getControler().getScenario().getNetwork());
+							else distance = RouteUtils.calcDistance((NetworkRoute) route, event.getServices().getScenario().getNetwork());
 						} else {
 							if (route.getDistance() != Double.NaN) distance = route.getDistance();
 							else distance = CoordUtils.calcDistance(((Activity) pe).getCoord(), plan.getPreviousActivity(plan.getPreviousLeg((Activity)pe)).getCoord());
@@ -110,7 +110,7 @@ public class ComparingDistanceStats implements IterationEndsListener {
 			}
 		}
 		
-		String path = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "comparing,plan=" + this.bestOrSelected + 
+		String path = event.getServices().getControlerIO().getIterationFilename(event.getIteration(), "comparing,plan=" + this.bestOrSelected +
 				",analysisBinSize=" + this.analysisBinSize + ",analysisBoundary=" + this.analysisBoundary + ",activityType=" + type + 
 				",mode=" + mode);
 		this.bins.plotBinnedDistribution(path, "#", "m");

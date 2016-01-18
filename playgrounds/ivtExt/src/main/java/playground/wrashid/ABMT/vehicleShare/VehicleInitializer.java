@@ -66,7 +66,7 @@ public class VehicleInitializer implements IterationStartsListener {
 		int existingKeyUsed = 0;
 		int numberOfPlansRemovedFromHM = 0;
 		HashSet<Plan> allCurrentPlans = new HashSet<Plan>();
-        for (Person person : event.getControler().getScenario().getPopulation().getPersons()
+        for (Person person : event.getServices().getScenario().getPopulation().getPersons()
 				.values()) {
 			
 			if (person.getId().toString().equalsIgnoreCase("111106347")){

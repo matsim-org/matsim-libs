@@ -110,6 +110,10 @@ public class StatsContainer {
         return name;
     }
 
+    public void setMean(double mean) {
+        this.mean = mean;
+    }
+
     public Double getMean() {
         return mean;
     }

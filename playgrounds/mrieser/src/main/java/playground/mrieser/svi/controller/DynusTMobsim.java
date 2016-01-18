@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.collections.Tuple;
@@ -64,11 +64,11 @@ public class DynusTMobsim implements Mobsim {
 	private final Scenario scenario;
 	private final DynamicTravelTimeMatrix ttMatrix;
 	private final Network dynusTnet;
-	private final Controler controler;
+	private final MatsimServices controler;
 	private final int iteration;
 
 	public DynusTMobsim(final DynusTConfig dc, final DynamicTravelTimeMatrix ttMatrix, final Scenario sc, final EventsManager eventsManager,
-			final Network dynusTnet, final Controler controler, final int iteration) {
+			final Network dynusTnet, final MatsimServices controler, final int iteration) {
 		this.dc = dc;
 		this.scenario = sc;
 		this.ttMatrix = ttMatrix;

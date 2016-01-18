@@ -31,6 +31,7 @@ import java.util.Map;
 
 import org.apache.commons.math3.analysis.MultivariateFunction;
 import org.apache.commons.math3.analysis.MultivariateVectorFunction;
+import org.apache.commons.math3.exception.TooManyEvaluationsException;
 import org.apache.commons.math3.optim.InitialGuess;
 import org.apache.commons.math3.optim.MaxEval;
 import org.apache.commons.math3.optim.MaxIter;
@@ -41,6 +42,7 @@ import org.apache.commons.math3.optim.nonlinear.scalar.ObjectiveFunction;
 import org.apache.commons.math3.optim.nonlinear.scalar.ObjectiveFunctionGradient;
 import org.apache.commons.math3.optim.nonlinear.scalar.gradient.NonLinearConjugateGradientOptimizer;
 import org.apache.commons.math3.util.FastMath;
+import org.apache.log4j.Logger;
 
 import floetteroed.opdyts.DecisionVariable;
 import floetteroed.utilities.math.Matrix;
@@ -101,6 +103,11 @@ public class TransitionSequencesAnalyzer<U extends DecisionVariable> {
 		return this.surrogateObjectiveFunction.getUniformityWeight();
 	}
 
+	// TODO NEW
+	SurrogateObjectiveFunction<U> getSurrogateObjectiveFunction() {
+		return this.surrogateObjectiveFunction;
+	}
+	
 	// -------------------- GENERAL STATISTICS --------------------
 
 	public double originalObjectiveFunctionValue(final Vector alphas) {
@@ -128,11 +135,30 @@ public class TransitionSequencesAnalyzer<U extends DecisionVariable> {
 		return result;
 	}
 
+	// TODO not sure about the transition ordering
+	//
+	// public double lastObjectiveFunctionValue() {
+	// return this.transitions.get(this.transitions.size() - 1)
+	// .getToStateObjectiveFunctionValue();
+	// }
+	//
+	// public double lastEquilibriuGap() {
+	// return this.transitions.get(this.transitions.size() - 1).getDelta()
+	// .euclNorm();
+	// }
+
 	// -------------------- OPTIMIZATION --------------------
 
-	public SamplingStage<U> newOptimalSamplingStage() {
+	// TODO NEW
+	Vector lastAlphas = null;
+	
+	public SamplingStage<U> newOptimalSamplingStage(
+			final Transition<U> lastTransition,
+			final Double convergedObjectiveFunctionValue) {
 		final Vector alphas = this.optimalAlphas();
-		return new SamplingStage<>(alphas, this);
+		this.lastAlphas = alphas.copy();
+		return new SamplingStage<>(alphas, this, lastTransition,
+				convergedObjectiveFunctionValue);
 	}
 
 	public Vector optimalAlphas() {
@@ -141,16 +167,37 @@ public class TransitionSequencesAnalyzer<U extends DecisionVariable> {
 		} else {
 			final Vector initialAlphas = new Vector(this.transitions.size());
 			initialAlphas.fill(1.0 / initialAlphas.size());
-			final NonLinearConjugateGradientOptimizer solver = new NonLinearConjugateGradientOptimizer(
-					NonLinearConjugateGradientOptimizer.Formula.POLAK_RIBIERE, // FLETCHER_REEVES,
-					new SimpleValueChecker(1e-8, 1e-8));
-			final PointValuePair result = solver.optimize(
-					new ObjectiveFunction(new MyObjectiveFunction()),
-					new ObjectiveFunctionGradient(new MyGradient()),
-					GoalType.MINIMIZE, new InitialGuess(
-							new double[this.transitions.size() - 1]),
-					new MaxEval(Integer.MAX_VALUE), new MaxIter(
-							this.maxIterations));
+
+			// final NonLinearConjugateGradientOptimizer solver = new
+			// NonLinearConjugateGradientOptimizer(
+			// NonLinearConjugateGradientOptimizer.Formula.POLAK_RIBIERE, //
+			// FLETCHER_REEVES,
+			// new SimpleValueChecker(1e-8, 1e-8));
+
+			PointValuePair result = null;
+			double initialBracketingRange = 1e-8;
+			do {
+				try {
+					final NonLinearConjugateGradientOptimizer solver = new NonLinearConjugateGradientOptimizer(
+							NonLinearConjugateGradientOptimizer.Formula.POLAK_RIBIERE, // FLETCHER_REEVES,
+							new SimpleValueChecker(1e-8, 1e-8), 1e-8, 1e-8,
+							initialBracketingRange);
+					result = solver.optimize(new ObjectiveFunction(
+							new MyObjectiveFunction()),
+							new ObjectiveFunctionGradient(new MyGradient()),
+							GoalType.MINIMIZE, new InitialGuess(
+									new double[this.transitions.size() - 1]),
+							new MaxEval(Integer.MAX_VALUE), new MaxIter(
+									this.maxIterations));
+				} catch (TooManyEvaluationsException e) {
+					initialBracketingRange *= 10.0;
+					Logger.getLogger(this.getClass().getName()).info(
+							"Extending initial bracketing range to "
+									+ initialBracketingRange);
+					result = null;
+				}
+			} while (result == null);
+
 			return proba(newVectPlusOneZero(result.getPoint()));
 		}
 	}

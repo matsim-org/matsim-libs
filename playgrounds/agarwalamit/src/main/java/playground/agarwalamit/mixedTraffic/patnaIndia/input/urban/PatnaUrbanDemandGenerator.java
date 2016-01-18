@@ -55,18 +55,24 @@ public class PatnaUrbanDemandGenerator {
 	private static final Logger LOG = Logger.getLogger(PatnaUrbanDemandGenerator.class);
 
 	private Scenario scenario;
-	private final String outputDir;
 	private Collection<SimpleFeature> features ;
+	private final int cloningFactor ;
 
-	public PatnaUrbanDemandGenerator(final String outputDir) {
-		this.outputDir = outputDir;
+	public PatnaUrbanDemandGenerator() {
+		this(1);
+	}
+
+	public PatnaUrbanDemandGenerator(final int cloningFactor) {
+		this.cloningFactor = cloningFactor;
 	}
 
 	public static void main (String []args) {
-		new PatnaUrbanDemandGenerator(PatnaUtils.INPUT_FILES_DIR).startProcessingAndWritePlans();
+		PatnaUrbanDemandGenerator pudg = new PatnaUrbanDemandGenerator();
+		pudg.startProcessing();
+		pudg.writePlans(PatnaUtils.INPUT_FILES_DIR);
 	}
 
-	public void startProcessingAndWritePlans() {
+	public void startProcessing() {
 		this.features = readZoneFilesAndReturnFeatures();
 
 		String planFile1 = PatnaUtils.INPUT_FILES_DIR+"/Urban_PlanFile.CSV"; // urban plans for all zones except 27 to 42.
@@ -79,9 +85,15 @@ public class PatnaUrbanDemandGenerator {
 		filesReader(planFile1, "nonSlum_");
 		filesReader(planFile2, "nonSlum_");
 		filesReader(planFile3, "slum_");
-
-		new PopulationWriter(scenario.getPopulation()).write(this.outputDir+"/initial_plans.xml.gz");
+	}
+	
+	public void writePlans(final String outputDir){
+		new PopulationWriter(scenario.getPopulation()).write(outputDir+"/initial_urban_plans_"+cloningFactor+"pct.xml.gz");
 		LOG.info("Writing Plan file is finished.");
+	}
+	
+	public Population getPopulation(){
+		return scenario.getPopulation();
 	}
 
 	private Collection<SimpleFeature> readZoneFilesAndReturnFeatures() {
@@ -112,46 +124,49 @@ public class PatnaUrbanDemandGenerator {
 
 				toZoneId = getCorrectZoneNumber(toZoneId);
 
-				if (fromZoneId.equals(toZoneId)) {
-					// intraZonal trips
-					while (iterator.hasNext()){
+				for (int ii = 0; ii< cloningFactor; ii++){ // this will give random points for activities in the plan of every cloned person
 
-						SimpleFeature feature = iterator.next();
+					if (fromZoneId.equals(toZoneId)) {
+						// intraZonal trips
+						while (iterator.hasNext()){
 
-						p = GeometryUtils.getRandomPointsInsideFeature(feature);
-						Coord fromZoneCoord = new Coord(p.getX(), p.getY());
-						homeZoneCoordTransform = PatnaUtils.COORDINATE_TRANSFORMATION.transform(fromZoneCoord);
+							SimpleFeature feature = iterator.next();
 
-						q = GeometryUtils.getRandomPointsInsideFeature(feature);
-						Coord toZoneCoord = new Coord(q.getX(), q.getY());
-						workZoneCoordTransform= PatnaUtils.COORDINATE_TRANSFORMATION.transform(toZoneCoord);
-					}
-				} else {														
-					while (iterator.hasNext()){
-						SimpleFeature feature = iterator.next();
-						int id = (Integer) feature.getAttribute("ID1");
-						String zoneId  = String.valueOf(id);
-
-						if(fromZoneId.equals(zoneId) ) {
 							p = GeometryUtils.getRandomPointsInsideFeature(feature);
 							Coord fromZoneCoord = new Coord(p.getX(), p.getY());
 							homeZoneCoordTransform = PatnaUtils.COORDINATE_TRANSFORMATION.transform(fromZoneCoord);
-						}
-						else if (toZoneId.equals(zoneId)){
+
 							q = GeometryUtils.getRandomPointsInsideFeature(feature);
 							Coord toZoneCoord = new Coord(q.getX(), q.getY());
 							workZoneCoordTransform= PatnaUtils.COORDINATE_TRANSFORMATION.transform(toZoneCoord);
 						}
-					}
-				}  
+					} else {														
+						while (iterator.hasNext()){
+							SimpleFeature feature = iterator.next();
+							int id = (Integer) feature.getAttribute("ID1");
+							String zoneId  = String.valueOf(id);
 
-				Person person = factory.createPerson(Id.createPersonId(idPrefix+population.getPersons().size()));
-				population.addPerson(person);
+							if(fromZoneId.equals(zoneId) ) {
+								p = GeometryUtils.getRandomPointsInsideFeature(feature);
+								Coord fromZoneCoord = new Coord(p.getX(), p.getY());
+								homeZoneCoordTransform = PatnaUtils.COORDINATE_TRANSFORMATION.transform(fromZoneCoord);
+							}
+							else if (toZoneId.equals(zoneId)){
+								q = GeometryUtils.getRandomPointsInsideFeature(feature);
+								Coord toZoneCoord = new Coord(q.getX(), q.getY());
+								workZoneCoordTransform= PatnaUtils.COORDINATE_TRANSFORMATION.transform(toZoneCoord);
+							}
+						}
+					}  
 
-				String travelMode = getTravelMode(parts [8]);
+					Person person = factory.createPerson(Id.createPersonId(idPrefix+population.getPersons().size()));
+					population.addPerson(person);
 
-				Plan plan = createPlan( workZoneCoordTransform, homeZoneCoordTransform, travelMode, tripPurpose);
-				person.addPlan(plan);
+					String travelMode = getTravelMode(parts [8]);
+
+					Plan plan = createPlan( workZoneCoordTransform, homeZoneCoordTransform, travelMode, tripPurpose);
+					person.addPlan(plan);
+				}
 
 				line = bufferedReader.readLine();
 				iterator = features.iterator();

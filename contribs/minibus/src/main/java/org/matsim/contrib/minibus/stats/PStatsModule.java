@@ -25,7 +25,7 @@ import org.matsim.contrib.minibus.operator.Operators;
 import org.matsim.contrib.minibus.stats.abtractPAnalysisModules.PAnalysisManager;
 import org.matsim.contrib.minibus.stats.abtractPAnalysisModules.PtMode2LineSetter;
 import org.matsim.contrib.minibus.stats.operatorLogger.POperatorLogger;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 
@@ -40,7 +40,7 @@ import java.io.File;
  */
 public final class PStatsModule {
 
-    public static void configureControler(Controler controler, PConfigGroup pConfig, Operators pBox, PtMode2LineSetter lineSetter) {
+    public static void configureControler(MatsimServices controler, PConfigGroup pConfig, Operators pBox, PtMode2LineSetter lineSetter) {
         controler.addControlerListener(new PStatsOverview(pBox, pConfig));
         controler.addControlerListener(new POperatorLogger(pBox, pConfig));
         controler.addControlerListener(new GexfPStat(pConfig, false));
@@ -53,7 +53,7 @@ public final class PStatsModule {
         controler.addControlerListener(new StartupListener() {
             @Override
             public void notifyStartup(StartupEvent event) {
-                String outFilename = event.getControler().getControlerIO().getOutputPath() + PConstants.statsOutputFolder;
+                String outFilename = event.getServices().getControlerIO().getOutputPath() + PConstants.statsOutputFolder;
                 new File(outFilename).mkdir();
             }
         });

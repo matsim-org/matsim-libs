@@ -425,7 +425,7 @@ public class ODBruteForceCalibrator {
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 
-		MatsimNetworkReader netReader = new MatsimNetworkReader(scenario);
+		MatsimNetworkReader netReader = new MatsimNetworkReader(scenario.getNetwork());
 		netReader.readFile("/home/johannes/gsv/ger/data/network.xml.gz");
 
 		MatsimFacilitiesReader facReader = new MatsimFacilitiesReader(scenario);

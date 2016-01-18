@@ -65,7 +65,7 @@ public class MarginalCongestionPricingContolerListener implements StartupListene
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		
-		EventsManager eventsManager = event.getControler().getEvents();
+		EventsManager eventsManager = event.getServices().getEvents();
 		
 		this.pricingHandler = new MarginalCongestionPricingHandler(eventsManager, this.scenario);
 //		this.extCostHandler = new CongestionAnalysisEventHandler(this.scenario, false);
@@ -85,8 +85,8 @@ public class MarginalCongestionPricingContolerListener implements StartupListene
 		
 		// write out analysis every iteration
 		this.tollHandler.writeTollStats(this.scenario.getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/tollStats.csv");
-//		this.congestionHandler.writeCongestionStats(this.scenario.getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/congestionStats.csv");
-//		CongestionAnalysisWriter writerCar = new CongestionAnalysisWriter(this.extCostHandler, event.getControler().getControlerIO().getIterationPath(event.getIteration()));
+//		this.congestionHandler.writeCongestionStats(this.scenario.getConfig().services().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/congestionStats.csv");
+//		CongestionAnalysisWriter writerCar = new CongestionAnalysisWriter(this.extCostHandler, event.getServices().getControlerIO().getIterationPath(event.getIteration()));
 //		writerCar.writeDetailedResults(TransportMode.car);
 //		writerCar.writeAvgTollPerDistance(TransportMode.car);
 //		writerCar.writeAvgTollPerTimeBin(TransportMode.car);

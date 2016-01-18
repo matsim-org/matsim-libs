@@ -61,26 +61,26 @@ public class NoiseCalculationOnline implements BeforeMobsimListener, AfterMobsim
 		log.info("Initialization...");
 		
 		this.noiseContext.initialize();
-		NoiseWriter.writeReceiverPoints(noiseContext, event.getControler().getConfig().controler().getOutputDirectory() + "/receiverPoints/");
+		NoiseWriter.writeReceiverPoints(noiseContext, event.getServices().getConfig().controler().getOutputDirectory() + "/receiverPoints/");
 		
 		log.info("Initialization... Done.");
 	
-		this.timeTracker = new NoiseTimeTracker(noiseContext, event.getControler().getEvents(), event.getControler().getConfig().controler().getOutputDirectory() + "/ITERS/");			
-		event.getControler().getEvents().addHandler(this.timeTracker);
+		this.timeTracker = new NoiseTimeTracker(noiseContext, event.getServices().getEvents(), event.getServices().getConfig().controler().getOutputDirectory() + "/ITERS/");
+		event.getServices().getEvents().addHandler(this.timeTracker);
 	
 		if (this.noiseContext.getNoiseParams().isUseActualSpeedLevel()) {
 			LinkSpeedCalculation linkSpeedCalculator = new LinkSpeedCalculation(noiseContext);
-			event.getControler().getEvents().addHandler(linkSpeedCalculator);	
+			event.getServices().getEvents().addHandler(linkSpeedCalculator);
 		}
 		
 		if (this.noiseContext.getNoiseParams().isComputePopulationUnits()) {
 			this.actTracker = new PersonActivityTracker(noiseContext);
-			event.getControler().getEvents().addHandler(this.actTracker);
+			event.getServices().getEvents().addHandler(this.actTracker);
 		}
 			
 		if (this.noiseContext.getNoiseParams().isInternalizeNoiseDamages()) {
-			this.pricing = new NoisePricingHandler(event.getControler().getEvents());
-			event.getControler().getEvents().addHandler(this.pricing);
+			this.pricing = new NoisePricingHandler(event.getServices().getEvents());
+			event.getServices().getEvents().addHandler(this.pricing);
 		}		
 	}
 	

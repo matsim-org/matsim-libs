@@ -25,6 +25,9 @@
 package floetteroed.opdyts.convergencecriteria;
 
 import static java.lang.Math.abs;
+
+import java.util.List;
+
 import floetteroed.opdyts.trajectorysampling.TransitionSequence;
 import floetteroed.utilities.math.Vector;
 
@@ -101,4 +104,9 @@ public class ObjectiveFunctionChangeConvergenceCriterion implements
 		this.finalObjectiveFunctionValue = null;
 	}
 
+	@Override
+	public List<Double> getFinalWeights() {
+		throw new UnsupportedOperationException();
+	}
+	
 }

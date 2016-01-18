@@ -108,7 +108,7 @@ public class QuickLegAnalysisPtPlanbased {
 		
     	this.scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		
-		new MatsimNetworkReader(scenario).readFile(NETWORKFILE);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(NETWORKFILE);
 		
 		pop = scenario.getPopulation();
 		

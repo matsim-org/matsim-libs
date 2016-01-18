@@ -89,7 +89,7 @@ public class CountsCreatorFromEvents {
 		counts_parser.readFile(this.inputCountsFile);
 		
 		log.info("reading the network: " + this.networkFile);
-		new MatsimNetworkReader(scenario).readFile(this.networkFile);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(this.networkFile);
 		this.network = scenario.getNetwork();
 		
 		this.events = EventsUtils.createEventsManager();

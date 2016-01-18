@@ -20,62 +20,32 @@
 
 package herbie.running.controler;
 
-import com.google.inject.Singleton;
 import herbie.running.config.HerbieConfigGroup;
-import herbie.running.controler.listeners.CalcLegTimesHerbieListener;
 import herbie.running.controler.listeners.LegDistanceDistributionWriter;
-import herbie.running.controler.listeners.ScoreElements;
 import herbie.running.replanning.TransitStrategyManager;
 import org.apache.log4j.Logger;
-import org.matsim.core.controler.AbstractModule;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.gbl.Gbl;
+import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.router.TripRouter;
 
+import javax.inject.Inject;
 import javax.inject.Provider;
 
 /**
  * Controler for the Herbie project.
  */
-public class HerbieControler extends Controler {
+public class HerbieControler {
 
 	protected static final String SCORE_ELEMENTS_FILE_NAME = "scoreElementsAverages.txt";
 	protected static final String CALC_LEG_TIMES_FILE_NAME = "calcLegTimes.txt";
-	protected static final String LEG_DISTANCE_DISTRIBUTION_FILE_NAME = "legDistanceDistribution.txt";
 	protected static final String LEG_TRAVEL_TIME_DISTRIBUTION_FILE_NAME = "legTravelTimeDistribution.txt";
 
-	private final HerbieConfigGroup herbieConfigGroup = new HerbieConfigGroup();
-
 	private static final Logger log = Logger.getLogger(Controler.class);
-	
-	public HerbieControler(String[] args) {
-		super(args);
-		super.getConfig().addModule(this.herbieConfigGroup);
-		this.getConfig().controler().setOverwriteFileSetting(
-				true ?
-						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
-		addOverridingModule(new AbstractModule() {
-            @Override
-            public void install() {
-				bind(StrategyManager.class).toProvider(new com.google.inject.Provider<StrategyManager>() {
-                    @Override
-                    public StrategyManager get() {
-                        return new Provider<StrategyManager>() {
-                            @Override
-                            public StrategyManager get() {
-                                return myLoadStrategyManager();
-                            }
-                        }.get();
-                    }
-                }).in(Singleton.class);
-			}
-        });
-        this.loadMyControlerListeners();
-        throw new RuntimeException(Gbl.SET_UP_IS_NOW_FINAL + Gbl.LOAD_DATA_IS_NOW_FINAL ) ;
-	}
+
 
 //	@Override
 //	protected void loadData() {
@@ -111,25 +81,9 @@ public class HerbieControler extends Controler {
 //	}
 	
 	
-	private double reroutingShare = 0.05;
-	 /**
-	  * Create and return a TransitStrategyManager which filters transit agents
-	  * during the replanning phase. They either keep their selected plan or
-	  * replan it.
-	  */
-	 private StrategyManager myLoadStrategyManager() {
-	  log.info("loading TransitStrategyManager - using rerouting share of " + reroutingShare);
-	  StrategyManager manager = new TransitStrategyManager(this, reroutingShare, getInjector().getProvider(TripRouter.class));
-//	  StrategyManagerConfigLoader.load(this, manager);
-	  return manager;
-	 }
 
-	private void loadMyControlerListeners() {
-//		super.loadControlerListeners();
-		this.addControlerListener(new ScoreElements(SCORE_ELEMENTS_FILE_NAME));
-		this.addControlerListener(new CalcLegTimesHerbieListener(CALC_LEG_TIMES_FILE_NAME, LEG_TRAVEL_TIME_DISTRIBUTION_FILE_NAME));
-		this.addControlerListener(new LegDistanceDistributionWriter(LEG_DISTANCE_DISTRIBUTION_FILE_NAME, this.getScenario().getNetwork()));
-//		this.addControlerListener(new KtiPopulationPreparation(this.ktiConfigGroup));
+	public HerbieControler(String[] args) {
+
 	}
 
 	/**
@@ -141,9 +95,12 @@ public class HerbieControler extends Controler {
 			System.out.println("Usage: Controler config-file [dtd-file]");
 			System.out.println();
 		} else {
-			final Controler controler = new HerbieControler(args);
+			final Controler controler = new Controler(args);
+			ConfigUtils.addOrGetModule(controler.getConfig(), HerbieConfigGroup.GROUP_NAME, HerbieConfigGroup.class);
+			controler.addOverridingModule(new HerbieModule());
 			controler.run();
 		}
 		System.exit(0);
 	}
+
 }

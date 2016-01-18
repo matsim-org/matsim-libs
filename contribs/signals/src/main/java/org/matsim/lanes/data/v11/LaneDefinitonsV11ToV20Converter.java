@@ -59,7 +59,7 @@ public class LaneDefinitonsV11ToV20Converter {
 		Config config = ConfigUtils.createConfig();
 		config.qsim().setUseLanes(true);
 		Scenario sc = ScenarioUtils.createScenario(config);
-		MatsimNetworkReader netReader = new MatsimNetworkReader(sc);
+		MatsimNetworkReader netReader = new MatsimNetworkReader(sc.getNetwork());
 		netReader.readFile(networkFilename);
 		Network net = sc.getNetwork();
 		LaneDefinitions11 lanedefs11 = new LaneDefinitions11Impl();

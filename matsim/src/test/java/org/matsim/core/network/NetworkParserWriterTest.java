@@ -86,7 +86,7 @@ public class NetworkParserWriterTest extends MatsimTestCase {
 		log.info("  reading network xml file independent of the world...");
 		Scenario scenario = ScenarioUtils.createScenario(this.config);
 		Network network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario).readFile(this.config.network().getInputFile());
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(this.config.network().getInputFile());
 		log.info("  done.");
 
 		this.runModules(network);
@@ -111,7 +111,7 @@ public class NetworkParserWriterTest extends MatsimTestCase {
 
 		log.info("  reading network xml file as a layer of the world... ");
 		Network network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario).readFile(this.config.network().getInputFile());
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(this.config.network().getInputFile());
 		log.info("  done.");
 
 		this.runModules(network);

@@ -86,14 +86,14 @@ public class CongestionTestExamples {
 	}
 	
 	public void getDelayDataForPricingImpls(Scenario sc, String networkExampleName){
-		List<CongestionEvent> congestionEvents_v3 = getCongestionEvents("v3",sc);
-		List<CongestionEvent> congestionEvents_v4 = getCongestionEvents("v4",sc); 
+		List<CongestionEvent> congestionEventsV3 = getCongestionEvents("v3",sc);
+		List<CongestionEvent> congestionEventsV4 = getCongestionEvents("v4",sc); 
 //		List<CongestionEvent> congestionEvents_v6 = getCongestionEvents("v6",sc);
 		
 		System.out.println("v3");
-		 SortedMap<String,Tuple<Double, Double>> tab_v3 = getId2CausedAndAffectedDelays(congestionEvents_v3,sc);
+		 SortedMap<String,Tuple<Double, Double>> tabV3 = getId2CausedAndAffectedDelays(congestionEventsV3,sc);
 		 System.out.println("v4");
-		 SortedMap<String,Tuple<Double, Double>> tab_v4 = getId2CausedAndAffectedDelays(congestionEvents_v4,sc);
+		 SortedMap<String,Tuple<Double, Double>> tabV4 = getId2CausedAndAffectedDelays(congestionEventsV4,sc);
 //		 System.out.println("v6");
 //		 SortedMap<String,Tuple<Double, Double>> tab_v6 = getId2CausedAndAffectedDelays(congestionEvents_v6, sc);
 //		 
@@ -120,13 +120,13 @@ public class CongestionTestExamples {
 		
 		for(CongestionEvent e : events){
 			System.out.println(e.toString());
-			Tuple<Double, Double> causingPerson_tup = id2CausingAffectedDelays.get(e.getCausingAgentId().toString());
-			causingPerson_tup = new Tuple<Double, Double>(causingPerson_tup.getFirst()+e.getDelay(), causingPerson_tup.getSecond());
-			id2CausingAffectedDelays.put(e.getCausingAgentId().toString(), causingPerson_tup);
+			Tuple<Double, Double> causingPersonTup = id2CausingAffectedDelays.get(e.getCausingAgentId().toString());
+			causingPersonTup = new Tuple<Double, Double>(causingPersonTup.getFirst()+e.getDelay(), causingPersonTup.getSecond());
+			id2CausingAffectedDelays.put(e.getCausingAgentId().toString(), causingPersonTup);
 			
-			Tuple<Double, Double> affectedPerson_tup = id2CausingAffectedDelays.get(e.getAffectedAgentId().toString());
-			affectedPerson_tup = new Tuple<Double, Double>(affectedPerson_tup.getFirst(), affectedPerson_tup.getSecond()+e.getDelay());
-			id2CausingAffectedDelays.put(e.getAffectedAgentId().toString(), affectedPerson_tup);
+			Tuple<Double, Double> affectedPersonTup = id2CausingAffectedDelays.get(e.getAffectedAgentId().toString());
+			affectedPersonTup = new Tuple<Double, Double>(affectedPersonTup.getFirst(), affectedPersonTup.getSecond()+e.getDelay());
+			id2CausingAffectedDelays.put(e.getAffectedAgentId().toString(), affectedPersonTup);
 		}
 		return id2CausingAffectedDelays;
 	}

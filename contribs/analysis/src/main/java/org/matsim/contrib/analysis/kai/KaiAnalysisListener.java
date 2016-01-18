@@ -40,8 +40,8 @@ public class KaiAnalysisListener implements StartupListener, IterationEndsListen
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		
-		this.calcLegTimes = new KNAnalysisEventsHandler( event.getControler().getScenario() ) ;
-		event.getControler().getEvents().addHandler( this.calcLegTimes ) ;
+		this.calcLegTimes = new KNAnalysisEventsHandler( event.getServices().getScenario() ) ;
+		event.getServices().getEvents().addHandler( this.calcLegTimes ) ;
 
 	}
 
@@ -51,7 +51,7 @@ public class KaiAnalysisListener implements StartupListener, IterationEndsListen
 
 		int iteration = event.getIteration() ;
 
-		this.calcLegTimes.writeStats(event.getControler().getControlerIO().getIterationFilename(iteration, "stats_"));
+		this.calcLegTimes.writeStats(event.getServices().getControlerIO().getIterationFilename(iteration, "stats_"));
 
 		// trips are from "true" activity to "true" activity.  legs may also go
 		// from/to ptInteraction activity.  This, in my opinion "legs" is the correct (matsim) term

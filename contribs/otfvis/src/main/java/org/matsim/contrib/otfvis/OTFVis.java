@@ -210,7 +210,7 @@ public class OTFVis {
 	public static void playNetwork(final String filename) {
 		Config config = ConfigUtils.createConfig();
 		final MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
-		new MatsimNetworkReader(scenario).readFile(filename);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(filename);
 		EventsManager events = EventsUtils.createEventsManager();
 		OnTheFlyServer server = OnTheFlyServer.createInstance(scenario, events);
 		final Map<Id<Link>, VisLink> visLinks = new HashMap<>();
@@ -290,7 +290,7 @@ public class OTFVis {
 			snapshotPeriod = Integer.parseInt(args[4]);
 		}
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenario).readFile(networkFile);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
 		OTFEvent2MVI.convert(scenario, eventFile, mviFile, snapshotPeriod);
 	}
 

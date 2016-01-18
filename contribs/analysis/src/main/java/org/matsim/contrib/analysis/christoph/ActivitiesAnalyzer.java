@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -174,11 +174,11 @@ public class ActivitiesAnalyzer implements ActivityStartEventHandler, ActivityEn
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		
-		Controler controler = event.getControler();	
+		MatsimServices controler = event.getServices();
 		
 		if (autoConfig) {
 			// use all activity types defined in the config
-			Set<String> activityTypes = new TreeSet<String>(event.getControler().getConfig().planCalcScore().getActivityTypes());
+			Set<String> activityTypes = new TreeSet<String>(event.getServices().getConfig().planCalcScore().getActivityTypes());
 			for (String activityType : activityTypes) {
 				this.activityCountData.put(activityType, new LinkedList<ActivityData>());
 			}
@@ -192,7 +192,7 @@ public class ActivitiesAnalyzer implements ActivityStartEventHandler, ActivityEn
 		
 		ActivityData overallActivityData = this.overallCount.getLast();
 
-        for (Person person : event.getControler().getScenario().getPopulation().getPersons().values()) {
+        for (Person person : event.getServices().getScenario().getPopulation().getPersons().values()) {
 			
 			if (this.observedAgents != null && !this.observedAgents.contains(person.getId())) continue;
 			
@@ -212,7 +212,7 @@ public class ActivitiesAnalyzer implements ActivityStartEventHandler, ActivityEn
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		
-		OutputDirectoryHierarchy outputDirectoryHierarchy = event.getControler().getControlerIO();
+		OutputDirectoryHierarchy outputDirectoryHierarchy = event.getServices().getControlerIO();
 		
 		try {
 			for (String activityType : this.activityCountData.keySet()) {

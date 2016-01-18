@@ -19,19 +19,7 @@ import playground.balac.aam.router.AAMRoutingModule;
 import playground.balac.aam.scoring.AAMScoringFunctionFactory;
 
 
-public class AAMControler extends Controler{
-
-	public AAMControler(Scenario scenario) {
-		super(scenario);
-	}
-
-	public void init(Config config, Network network, Scenario sc) {
-		AAMScoringFunctionFactory aAMScoringFunctionFactory = new AAMScoringFunctionFactory(
-				      config, 
-				      network, sc);
-	    this.setScoringFunctionFactory(aAMScoringFunctionFactory); 	
-				
-		}
+public class AAMControler {
 	
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
@@ -41,8 +29,13 @@ public class AAMControler extends Controler{
 		final Scenario sc = ScenarioUtils.loadScenario(config);
 		
 		
-		final AAMControler controler = new AAMControler( sc );
-		
+		final Controler controler = new Controler( sc );
+		AAMScoringFunctionFactory aAMScoringFunctionFactory = new AAMScoringFunctionFactory(
+				config,
+				sc.getNetwork(), sc);
+		controler.setScoringFunctionFactory(aAMScoringFunctionFactory);
+
+
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
@@ -78,8 +71,7 @@ public class AAMControler extends Controler{
 			}
 		});
 				
-		controler.init(config, sc.getNetwork(), sc);		
-			
+
 		controler.run();
 	}
 

@@ -23,7 +23,7 @@ import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.ReplanningContext;
@@ -38,7 +38,7 @@ import playground.ivt.replanning.BlackListedTimeAllocationMutatorModule;
 public class ParkAndRideTimeAllocationMutator implements PlanStrategy {
 	private final PlanStrategyImpl strategy;
 
-	public ParkAndRideTimeAllocationMutator(final Controler controler) {
+	public ParkAndRideTimeAllocationMutator(final MatsimServices controler) {
 		strategy = new PlanStrategyImpl( new RandomPlanSelector() );
 
 		addStrategyModule(
@@ -78,10 +78,10 @@ public class ParkAndRideTimeAllocationMutator implements PlanStrategy {
 	}
 
 	private static class BlackList implements StageActivityTypes {
-		private Controler controler = null;
+		private MatsimServices controler = null;
 		private StageActivityTypes blackList = null;
 
-		public BlackList(final Controler controler) {
+		public BlackList(final MatsimServices controler) {
 			this.controler = controler;
 		}
 

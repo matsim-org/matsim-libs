@@ -145,7 +145,7 @@ public class Bast2Counts {
 		
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
-		MatsimNetworkReader netReader = new MatsimNetworkReader(scenario);
+		MatsimNetworkReader netReader = new MatsimNetworkReader(scenario.getNetwork());
 		netReader.readFile(netFile);
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 		

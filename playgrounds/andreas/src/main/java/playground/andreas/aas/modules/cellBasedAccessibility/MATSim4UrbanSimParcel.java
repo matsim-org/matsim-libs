@@ -370,7 +370,7 @@
 //		
 //		// to count number of cars per h on a link
 //		// write ControlerListener that implements AfterMobsimListener (notifyAfterMobsim)
-//		// get VolumeLinkAnalyzer by "event.getControler.getVolume... and run getVolumesForLink. that returns an int array with the number of cars per hour on an specific link 
+//		// get VolumeLinkAnalyzer by "event.getServices.getVolume... and run getVolumesForLink. that returns an int array with the number of cars per hour on an specific link
 //		// see also http://matsim.org/docs/controler
 //	}
 //	

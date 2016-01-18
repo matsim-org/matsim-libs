@@ -20,29 +20,24 @@
 
 package playground.sergioo.passivePlanning2012.run;
 
-import com.google.inject.Provider;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
-import org.matsim.households.PersonHouseholdMapping;
 
-import playground.sergioo.passivePlanning2012.core.mobsim.passivePlanning.PassivePlanningSocialFactory;
 import playground.sergioo.passivePlanning2012.core.population.BasePersonImpl;
 import playground.sergioo.passivePlanning2012.core.scenario.ScenarioSimplerNetwork;
 import playground.sergioo.passivePlanning2012.population.parallelPassivePlanning.PassivePlannerManager;
@@ -68,55 +63,56 @@ public class ControlerListenerSocial implements StartupListener, IterationStarts
 	//@Override
 	@Override
 	public void notifyStartup(StartupEvent event) {
-        TransportModeNetworkFilter filter = new TransportModeNetworkFilter(event.getControler().getScenario().getNetwork());
+        TransportModeNetworkFilter filter = new TransportModeNetworkFilter(event.getServices().getScenario().getNetwork());
 		NetworkImpl net = NetworkImpl.createNetwork();
 		HashSet<String> modes = new HashSet<String>();
 		modes.add(TransportMode.car);
 		filter.filter(net, modes);
-		for(ActivityFacility facility:((MutableScenario)event.getControler().getScenario()).getActivityFacilities().getFacilities().values())
+		for(ActivityFacility facility:((MutableScenario)event.getServices().getScenario()).getActivityFacilities().getFacilities().values())
 			((ActivityFacilityImpl)facility).setLinkId(net.getNearestLinkExactly(facility.getCoord()).getId());
-        Map<Id<Person>, ? extends Person> persons = event.getControler().getScenario().getPopulation().getPersons();
+        Map<Id<Person>, ? extends Person> persons = event.getServices().getScenario().getPopulation().getPersons();
 		Collection<Person> toBeAdded = new ArrayList<Person>();
-		/*boolean fixedTypes = event.getControler().getConfig().findParam("locationchoice", "flexible_types")==null ||event.getControler().getConfig().findParam("locationchoice", "flexible_types").equals("");
-		String[] types = fixedTypes?new String[]{"home", "work"}:event.getControler().getConfig().findParam("locationchoice", "flexible_types").split(", ");
+		/*boolean fixedTypes = event.getServices().getConfig().findParam("locationchoice", "flexible_types")==null ||event.getServices().getConfig().findParam("locationchoice", "flexible_types").equals("");
+		String[] types = fixedTypes?new String[]{"home", "work"}:event.getServices().getConfig().findParam("locationchoice", "flexible_types").split(", ");
 		TransitRouterFactory transitRouterFactory = new TransitRouterImplFactory(
-				event.getControler().getScenario().getTransitSchedule(),
+				event.getServices().getScenario().getTransitSchedule(),
 				new TransitRouterConfig(
-						event.getControler().getConfig().planCalcScore(),
-						event.getControler().getConfig().plansCalcRoute(),
-						event.getControler().getConfig().transitRouter(),
-						event.getControler().getConfig().vspExperimental()));
+						event.getServices().getConfig().planCalcScore(),
+						event.getServices().getConfig().plansCalcRoute(),
+						event.getServices().getConfig().transitRouter(),
+						event.getServices().getConfig().vspExperimental()));
 		TripRouterFactory tripRouterFactory = new TripRouterFactoryImpl(
-				event.getControler().getScenario(),
-				event.getControler().getTravelDisutilityFactory(),
-				event.getControler().getTravelTimeCalculatorFactory().createTravelTimeCalculator(event.getControler().getNetwork(), event.getControler().getConfig().travelTimeCalculator()).getLinkTravelTimes(),
+				event.getServices().getScenario(),
+				event.getServices().getTravelDisutilityFactory(),
+				event.getServices().getTravelTimeCalculatorFactory().createTravelTimeCalculator(event.getServices().getNetwork(), event.getServices().getConfig().travelTimeCalculator()).getLinkTravelTimes(),
 				new FastDijkstraFactory(),
-				event.getControler().getScenario().getConfig().transit().isUseTransit() ? transitRouterFactory : null);*/
+				event.getServices().getScenario().getConfig().transit().isUseTransit() ? transitRouterFactory : null);*/
 		for(Person person: persons.values())
 			toBeAdded.add(BasePersonImpl.convertToBasePerson(person));
-			//toBeAdded.add(BasePersonImpl.getBasePerson(fixedTypes, types, (PersonImpl)person, tripRouterFactory.createTripRouter(), ((ScenarioImpl)event.getControler().getScenario()).getActivityFacilities()));
+			//toBeAdded.add(BasePersonImpl.getBasePerson(fixedTypes, types, (PersonImpl)person, tripRouterFactory.createTripRouter(), ((ScenarioImpl)event.getServices().getScenario()).getActivityFacilities()));
 		for(Person person:toBeAdded) {
-            event.getControler().getScenario().getPopulation().getPersons().remove(person.getId());
-            event.getControler().getScenario().getPopulation().addPerson(person);
+            event.getServices().getScenario().getPopulation().getPersons().remove(person.getId());
+            event.getServices().getScenario().getPopulation().addPerson(person);
 		}
 	}
 	@Override
 	public void notifyIterationStarts(final IterationStartsEvent event) {
 		if(event.getIteration() == 0)
-			if(event.getControler().getConfig().households().getInputFile()!=null) {
+			if(event.getServices().getConfig().households().getInputFile()!=null) {
 				final PassivePlannerManager passivePlannerManager = new PassivePlannerManager(1);
-				event.getControler().addControlerListener(passivePlannerManager);
-				event.getControler().addOverridingModule(new AbstractModule() {
-					@Override
-					public void install() {
-						bindMobsim().toProvider(new Provider<Mobsim>() {
-							@Override
-							public Mobsim get() {
-								return new PassivePlanningSocialFactory(passivePlannerManager, new PersonHouseholdMapping(((MutableScenario) event.getControler().getScenario()).getHouseholds()), event.getControler().getTripRouterProvider().get()).createMobsim(event.getControler().getScenario(), event.getControler().getEvents());
-							}
-						});
-					}
-				});
+				event.getServices().addControlerListener(passivePlannerManager);
+				throw new RuntimeException();
+//				event.getServices().addOverridingModule(new AbstractModule() {
+//					@Override
+//					public void install() {
+//						bindMobsim().toProvider(new Provider<Mobsim>() {
+//							@Override
+//							public Mobsim get() {
+//								return new PassivePlanningSocialFactory(passivePlannerManager, new PersonHouseholdMapping(((MutableScenario) event.getServices().getScenario()).getHouseholds()), event.getServices().getTripRouterProvider().get()).createMobsim(event.getServices().getScenario(), event.getServices().getEvents());
+//							}
+//						});
+//					}
+//				});
 			}
 			else
 				log.error("Households information is neccesary for passive planning with social");

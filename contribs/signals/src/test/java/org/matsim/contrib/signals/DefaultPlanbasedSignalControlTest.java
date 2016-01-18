@@ -76,7 +76,7 @@ public class DefaultPlanbasedSignalControlTest {
 	
 		Controler controler = new Controler(config);
         controler.getConfig().controler().setCreateGraphs(false);
-        controler.setDumpDataAtEnd(false);
+		controler.getConfig().controler().setDumpDataAtEnd(false);
 		PlanSwitchingTestListener testListener = new PlanSwitchingTestListener();
 		controler.addControlerListener(testListener);
 		controler.run();
@@ -90,7 +90,7 @@ public class DefaultPlanbasedSignalControlTest {
 		
 		@Override
 		public void notifyStartup(StartupEvent e) {
-			e.getControler().getEvents().addHandler(this);
+			e.getServices().getEvents().addHandler(this);
 		}
 
 		@Override

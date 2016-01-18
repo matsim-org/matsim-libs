@@ -83,9 +83,4 @@ public class NetworkFactoryImpl implements NetworkFactory {
 	public void setNetworkChangeEventFactory(NetworkChangeEventFactory networkChangeEventFactory) {
 		this.networkChangeEventFactory = networkChangeEventFactory;
 	}
-	
-	public boolean isTimeVariant() {
-		return (this.linkFactory instanceof TimeVariantLinkFactory);
-	}
-
 }

@@ -392,7 +392,7 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 		config.strategy().addStrategySettings(strategySettings);
 
 		ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).setEffectiveLaneWidth(1.) ;
-		config.qsim().setLinkWidth((float)1.) ;
+		config.qsim().setLinkWidthForVis((float)1.) ;
 		ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).setShowTeleportedAgents(true) ;
 		ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).setDrawNonMovingItems(true) ;
 

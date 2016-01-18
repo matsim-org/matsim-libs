@@ -28,7 +28,7 @@ import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.replanning.DefaultPlanStrategiesModule;
+import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -54,7 +54,7 @@ public class Replanning4SubPop {
 		
 		{
 			Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-			MatsimNetworkReader mnr = new MatsimNetworkReader(sc);
+			MatsimNetworkReader mnr = new MatsimNetworkReader(sc.getNetwork());
 			mnr.parse(EQUIL_NETWORK);
 		}
 		

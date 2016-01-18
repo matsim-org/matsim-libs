@@ -24,7 +24,7 @@ import java.io.File;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
@@ -66,14 +66,14 @@ public class DynusTControlerListener implements StartupListener, IterationStarts
 
 	@Override
 	public void notifyStartup(final StartupEvent event) {
-		Controler c = event.getControler();
+		MatsimServices c = event.getServices();
 		Config config = c.getConfig();
 		this.useOnlyDynusT = Boolean.parseBoolean(config.getParam("dynus-t", "useOnlyDynusT"));
 	}
 
 	@Override
 	public void notifyIterationStarts(final IterationStartsEvent event) {
-		Controler c = event.getControler();
+		MatsimServices c = event.getServices();
 		String outDir = c.getControlerIO().getIterationFilename(event.getIteration(), "DynusT");
 		new File(outDir).mkdir();
 		this.dc.setOutputDirectory(outDir);
@@ -119,7 +119,7 @@ public class DynusTControlerListener implements StartupListener, IterationStarts
 	public void notifyAfterMobsim(final AfterMobsimEvent event) {
 		if (!this.useOnlyDynusT) {
 			// run DynusT now
-			new DynusTMobsim(this.dc, this.ttMatrix, event.getControler().getScenario(), event.getControler().getEvents(), this.dynusTNetwork, event.getControler(), event.getIteration()).run();
+			new DynusTMobsim(this.dc, this.ttMatrix, event.getServices().getScenario(), event.getServices().getEvents(), this.dynusTNetwork, event.getServices(), event.getIteration()).run();
 			new ScoreAdaptor().run();
 		}
 	}
@@ -129,7 +129,7 @@ public class DynusTControlerListener implements StartupListener, IterationStarts
 		if (this.ptLines != null) {
 			log.info("dump pt statistics...");
 			new PtLinesStatistics(this.ptLines).writeStatsToFile(
-					event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "ptStats.txt"),
+					event.getServices().getControlerIO().getIterationFilename(event.getIteration(), "ptStats.txt"),
 					this.dc.getTravelTimeCalculator());
 		}
 		if (event.getIteration() % 10 != 0) {

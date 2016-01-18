@@ -178,7 +178,7 @@ public class TripAnalyzer {
 	    // get network, which is needed to calculate distances
 	    Config config = ConfigUtils.createConfig();
 	    Scenario scenario = ScenarioUtils.createScenario(config);
-	    MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario);
+	    MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario.getNetwork());
 	    networkReader.readFile(networkFile);
 	    Network network = scenario.getNetwork();
 	    

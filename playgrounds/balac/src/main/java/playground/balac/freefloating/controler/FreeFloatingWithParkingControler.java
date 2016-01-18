@@ -73,16 +73,16 @@ public class FreeFloatingWithParkingControler {
 		    	
 		    }
 		    
-		/*      final ParkingModuleWithFFCarSharingZH parkingModule = new ParkingModuleWithFFCarSharingZH(controler, freefloatingCars);
+		/*      final ParkingModuleWithFFCarSharingZH parkingModule = new ParkingModuleWithFFCarSharingZH(services, freefloatingCars);
 
-			controler.addOverridingModule(new AbstractModule() {
+			services.addOverridingModule(new AbstractModule() {
 				@Override
 				public void install() {
 					bindMobsim().toProvider(new Provider<Mobsim>() {
 						@Override
 						public Mobsim get() {
-							return new FreeFloatingQsimFactory(sc, controler,
-									parkingModule, freefloatingCars).createMobsim(controler.getScenario(), controler.getEvents());
+							return new FreeFloatingQsimFactory(sc, services,
+									parkingModule, freefloatingCars).createMobsim(services.getScenario(), services.getEvents());
 						}
 					});
 				}

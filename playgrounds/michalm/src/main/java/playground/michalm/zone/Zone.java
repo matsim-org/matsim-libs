@@ -42,6 +42,14 @@ public class Zone
     }
 
 
+    public Zone(Id<Zone> id, String type, Coord centroid)
+    {
+        this.id = id;
+        this.type = type;
+        this.centroid = centroid;
+    }
+
+
     public Zone(Id<Zone> id, String type, MultiPolygon multiPolygon)
     {
         this.id = id;

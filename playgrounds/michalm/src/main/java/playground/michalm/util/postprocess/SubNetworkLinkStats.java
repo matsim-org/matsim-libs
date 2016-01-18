@@ -51,7 +51,7 @@ public class SubNetworkLinkStats
                 .createLinkInsidePolygonPredicate(polygonGeometry, includeBorderLinks);
 
         Scenario scenario = ScenarioUtils.createScenario(VrpConfigUtils.createConfig());
-        MatsimNetworkReader nr = new MatsimNetworkReader(scenario);
+        MatsimNetworkReader nr = new MatsimNetworkReader(scenario.getNetwork());
         nr.readFile(networkFile);
 
         Map<Id<Link>, ? extends Link> linkMap = scenario.getNetwork().getLinks();

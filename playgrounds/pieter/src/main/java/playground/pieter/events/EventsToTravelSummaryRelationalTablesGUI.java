@@ -389,7 +389,7 @@ public class EventsToTravelSummaryRelationalTablesGUI extends JFrame {
 					.readFile(transitScheduleFileComponent.getText());
 			isTransit = true;
 		}
-		new MatsimNetworkReader(scenario).readFile(networkFileComponent
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFileComponent
 				.getText());
 
 		EventsManager eventsManager = EventsUtils.createEventsManager();

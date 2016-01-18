@@ -34,11 +34,11 @@ public class MergeLoopLinksToNetwork {
 		String reportOutputFile = args[3];
 		
 		MutableScenario scenario1 = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenario1).readFile(baseNetworkFile);
+		new MatsimNetworkReader(scenario1.getNetwork()).readFile(baseNetworkFile);
 		Network baseNetwork = scenario1.getNetwork();
 		
 		MutableScenario scenario2 = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenario2).readFile(updatedNetworkFile);
+		new MatsimNetworkReader(scenario2.getNetwork()).readFile(updatedNetworkFile);
 		Network updatedNetwork = scenario2.getNetwork();
 		
 		BufferedWriter bw = new BufferedWriter(new FileWriter(reportOutputFile));

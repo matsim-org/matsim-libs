@@ -236,7 +236,7 @@ public class MembershipAssigner {
 
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		PopulationReader populationReader = new MatsimPopulationReader(scenario);
-		MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario);
+		MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario.getNetwork());
 		FacilitiesReaderMatsimV1 facilitiesReader  = new FacilitiesReaderMatsimV1(scenario);
 		networkReader.readFile(args[1]);
 		facilitiesReader.readFile(args[3]);

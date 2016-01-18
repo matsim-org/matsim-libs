@@ -31,42 +31,8 @@ import playground.balac.twowaycarsharingredisigned.router.TwoWayCSRoutingModule;
 
 import javax.inject.Provider;
 
-public class CarsharingWithTaxiControler extends Controler{
+public class CarsharingWithTaxiControler {
 
-	public CarsharingWithTaxiControler(Scenario scenario) {
-		super(scenario);
-	}
-
-
-	public void init(Config config, Network network, Scenario sc) {
-		AllCSModesScoringFunctionFactory allCSModesScoringFunctionFactory = new AllCSModesScoringFunctionFactory(
-				      config, 
-				      network, sc);
-	    this.setScoringFunctionFactory(allCSModesScoringFunctionFactory); 	
-				
-	    this.loadMyControlerListeners();
-		}
-	
-	  private void loadMyControlerListeners() {  
-		  
-//	    super.loadControlerListeners();   
-	    Set<String> modes = new TreeSet<String>();
-	    modes.add("freefloating");
-	    modes.add("twowaycarsharing");
-	    modes.add("car");
-	    modes.add("walk");
-	    modes.add("pt");
-	    modes.add("bike");
-	    modes.add("taxi");
-        TripsAnalyzer tripsAnalyzer = new TripsAnalyzer(this.getConfig().getParam("controler", "outputDirectory")+ "/tripsFile",
-	    		this.getConfig().getParam("controler", "outputDirectory") + "/durationsFile",
-	    		this.getConfig().getParam("controler", "outputDirectory") + "/distancesFile",
-	    		modes, true, getScenario().getNetwork());
-	    this.addControlerListener(tripsAnalyzer);
-	    
-	    this.addControlerListener(new AllCSModesTestListener(this,
-	    		Integer.parseInt(this.getConfig().getModule("AllCSModes").getValue("statsWriterFrequency"))));
-	  }
 	public static void main(final String[] args) {
 		
     	final Config config = ConfigUtils.loadConfig(args[0]);
@@ -88,7 +54,7 @@ public class CarsharingWithTaxiControler extends Controler{
 		final Scenario sc = ScenarioUtils.loadScenario(config);
 		
 		
-		final CarsharingWithTaxiControler controler = new CarsharingWithTaxiControler( sc );
+		final Controler controler = new Controler( sc );
 
 		controler.addOverridingModule(new AbstractModule() {
             @Override
@@ -138,8 +104,30 @@ public class CarsharingWithTaxiControler extends Controler{
 			}
 			
 		});
-		
-		controler.init(config, sc.getNetwork(), sc);
+
+		AllCSModesScoringFunctionFactory allCSModesScoringFunctionFactory = new AllCSModesScoringFunctionFactory(
+				config,
+				sc.getNetwork(), sc);
+		controler.setScoringFunctionFactory(allCSModesScoringFunctionFactory);
+
+
+//	    super.loadControlerListeners();
+		Set<String> modes = new TreeSet<String>();
+		modes.add("freefloating");
+		modes.add("twowaycarsharing");
+		modes.add("car");
+		modes.add("walk");
+		modes.add("pt");
+		modes.add("bike");
+		modes.add("taxi");
+		TripsAnalyzer tripsAnalyzer = new TripsAnalyzer(controler.getConfig().getParam("controler", "outputDirectory")+ "/tripsFile",
+				controler.getConfig().getParam("controler", "outputDirectory") + "/durationsFile",
+				controler.getConfig().getParam("controler", "outputDirectory") + "/distancesFile",
+				modes, true, controler.getScenario().getNetwork());
+		controler.addControlerListener(tripsAnalyzer);
+
+		controler.addControlerListener(new AllCSModesTestListener(controler,
+				Integer.parseInt(controler.getConfig().getModule("AllCSModes").getValue("statsWriterFrequency"))));
 
 		controler.run();
 

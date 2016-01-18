@@ -1,5 +1,7 @@
 package gunnar.ihop2.roadpricing;
 
+import static cadyts.utilities.misc.Units.H_PER_S;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -7,7 +9,9 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.roadpricing.RoadPricingSchemeImpl;
 
+import cadyts.utilities.misc.Units;
 import floetteroed.opdyts.DecisionVariable;
+import floetteroed.utilities.latex.PSTricksDiagramWriter;
 
 /**
  * 
@@ -134,6 +138,49 @@ class TollLevels implements DecisionVariable {
 		}
 	}
 
+	public String toPSTricks() {
+		final PSTricksDiagramWriter writer = new PSTricksDiagramWriter(12.0, 6.0);
+		writer.setEndLine("\n");
+		
+		// writer.setPlotAttrs("toll", "plotstyle=dots");
+		
+		writer.setLabelX("time [hrs]");
+		writer.setLabelY("toll [SEK]");
+		
+		writer.setXMin(0.0);
+		writer.setXMax(25.0);
+		writer.setXDelta(2.0);
+		writer.setYMin(0.0);
+		writer.setYMax(this.level3cost_money + 10.0);
+		writer.setYDelta(5.0);
+
+		writer.add("toll", 0.0, 0.0);
+		writer.add("toll", H_PER_S * this.level1start_s, 0.0);
+		writer.add("toll", H_PER_S * this.level1start_s, this.level1cost_money);
+		writer.add("toll", H_PER_S * this.morningLevel2start_s, this.level1cost_money);
+		writer.add("toll", H_PER_S * this.morningLevel2start_s, this.level2cost_money);
+		writer.add("toll", H_PER_S * this.morningLevel3start_s, this.level2cost_money);
+		writer.add("toll", H_PER_S * this.morningLevel3start_s, this.level3cost_money);
+		writer.add("toll", H_PER_S * this.morningLevel3end_s, this.level3cost_money);
+		writer.add("toll", H_PER_S * this.morningLevel3end_s, this.level2cost_money);
+		writer.add("toll", H_PER_S * this.morningLevel2end_s, this.level2cost_money);
+		writer.add("toll", H_PER_S * this.morningLevel2end_s, this.level1cost_money);
+
+		writer.add("toll", H_PER_S * this.eveningLevel2start_s, this.level1cost_money);
+		writer.add("toll", H_PER_S * this.eveningLevel2start_s, this.level2cost_money);
+		writer.add("toll", H_PER_S * this.eveningLevel3start_s, this.level2cost_money);
+		writer.add("toll", H_PER_S * this.eveningLevel3start_s, this.level3cost_money);
+		writer.add("toll", H_PER_S * this.eveningLevel3end_s, this.level3cost_money);
+		writer.add("toll", H_PER_S * this.eveningLevel3end_s, this.level2cost_money);
+		writer.add("toll", H_PER_S * this.eveningLevel2end_s, this.level2cost_money);
+		writer.add("toll", H_PER_S * this.eveningLevel2end_s, this.level1cost_money);
+		writer.add("toll", H_PER_S * this.level1end_s, this.level1cost_money);
+		writer.add("toll", H_PER_S * this.level1end_s, 0.0);
+		writer.add("toll", 24.0, 0.0);
+
+		return writer.toString();
+	}
+
 	// -------------------- OVERRIDING OF Object --------------------
 
 	@Override
@@ -159,4 +206,16 @@ class TollLevels implements DecisionVariable {
 		return "Time Structure = " + this.getTimeStructure()
 				+ "; Cost Structure = " + this.getCostStructure();
 	}
+	
+	// -------------------- MAIN-FUNCTION, ONLY FOR TESTING --------------------
+
+	public static void main(String[] args) {
+		final TollLevels originalTollLevels = new TollLevels(6 * 3600 + 1800,
+				7 * 3600, 7 * 3600 + 1800, 8 * 3600 + 1800, 9 * 3600,
+				15 * 3600 + 1800, 16 * 3600, 17 * 3600 + 1800, 18 * 3600,
+				18 * 3600 + 1800, 10.0, 15.0, 20.0, null);
+		System.out.println(originalTollLevels.toPSTricks());
+
+	}
+	
 }

@@ -83,7 +83,7 @@ public class CausedDelayAnalyzer {
 		// to avid any errors, check the number of persons in each time bin. This needs to be removed subsequently.
 
 		for(double d : timeBin2ListOfTollPayers.keySet()){
-			double sum = 0;
+			int sum = 0;
 			for(Id<Link> linkId : getTimeBin2Link2CausingPersons().get(d).keySet()){
 				sum += getTimeBin2Link2CausingPersons().get(d).get(linkId).size();
 			}

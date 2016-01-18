@@ -26,7 +26,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.opensaml.ws.security.ServletRequestX509CredentialAdapter;
 
 /**
  * @author  jbischoff
@@ -37,7 +36,7 @@ public class AdjustNetworkCapacities {
 		
 	Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 	String basedir = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/input/";
-	new MatsimNetworkReader(scenario).readFile(basedir+"networkptcgt.xml");
+	new MatsimNetworkReader(scenario.getNetwork()).readFile(basedir+"networkptcgt.xml");
 	for (Link link : scenario.getNetwork().getLinks().values()){
 		if (link.getId().toString().startsWith("pt")) continue;
 		if (decideToAdjust(link.getCoord())){

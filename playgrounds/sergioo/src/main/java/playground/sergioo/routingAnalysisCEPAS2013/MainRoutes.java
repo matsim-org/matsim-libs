@@ -195,10 +195,10 @@ public class MainRoutes {
 			numSorted.add(numTrip);
 		final List<Entry<String, Map<Journey, Integer>>> list = new ArrayList<Map.Entry<String,Map<Journey,Integer>>>(numSorted);
 		final Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig()), scenario2 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenario).readFile(args[0]);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(args[0]);
 		for(Node node:scenario.getNetwork().getNodes().values())
 			((NodeImpl)node).setCoord(transformation.transform(node.getCoord()));
-		new MatsimNetworkReader(scenario2).readFile(args[1]);
+		new MatsimNetworkReader(scenario2.getNetwork()).readFile(args[1]);
 		for(Node node:scenario2.getNetwork().getNodes().values())
 			((NodeImpl)node).setCoord(transformation.transform(node.getCoord()));
 		LayersPanel panel = new LayersPanel() {

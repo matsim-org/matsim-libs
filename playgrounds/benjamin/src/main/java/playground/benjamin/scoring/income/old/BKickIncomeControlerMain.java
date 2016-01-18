@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package playground.benjamin.scoring.income.old;
 
+import org.matsim.core.controler.Controler;
 import playground.benjamin.BkPaths;
 
 
@@ -30,7 +31,7 @@ public class BKickIncomeControlerMain {
 //		new BKickIncomeControler(config).run();
 		
 		String config = BkPaths.RUNSSVN + "run734/resumeConfig.xml";
-		new BKickIncomeControler(config).run();
+		new Controler(config).run();
 	}
 
 }

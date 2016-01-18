@@ -20,7 +20,7 @@
 
 package org.matsim.core.controler.events;
 
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 
 /**
  * Basic event class for all Events fired by the Controler
@@ -31,15 +31,21 @@ public abstract class ControlerEvent {
 	/**
 	 * The Controler instance which fired this event
 	 */
-	protected final Controler controler;
+	protected final MatsimServices services;
 
-	public ControlerEvent(final Controler controler) {
-		this.controler = controler;
+	public ControlerEvent(final MatsimServices services) {
+		this.services = services;
 	}
 
-	@Deprecated // use injection to access central objects.  kai/mz, nov'15   
-	public Controler getControler() {
-		return this.controler;
+	/**
+	 * Returns an aggregate interface of many services which are available during a MATSim run.
+	 * Consider if you can instead only use the concrete services which you need.
+	 * Everything which this interface returns is also accessible via the @Inject annotation.
+	 *
+	 * @return the global services interface
+	 */
+	public MatsimServices getServices() {
+		return this.services;
 	}
 
 }

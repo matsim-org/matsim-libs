@@ -169,7 +169,7 @@ public class DemoScenario {
 		 * clean network from foreign links
 		 */
 		logger.info("Loading network...");
-		MatsimNetworkReader nReader = new MatsimNetworkReader(scenario);
+		MatsimNetworkReader nReader = new MatsimNetworkReader(scenario.getNetwork());
 		nReader.readFile(netFile);
 		logger.info("Done.");
 		

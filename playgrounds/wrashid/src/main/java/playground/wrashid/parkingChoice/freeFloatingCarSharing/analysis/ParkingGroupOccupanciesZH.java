@@ -20,17 +20,17 @@ package playground.wrashid.parkingChoice.freeFloatingCarSharing.analysis;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.parking.PC2.analysis.ParkingGroupOccupancies;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 
 public class ParkingGroupOccupanciesZH extends ParkingGroupOccupancies {
 	
-	private Controler controler;
+	private MatsimServices controler;
 
 	public ParkingGroupOccupanciesZH(){
 		reset(0);
 	}
 	
-	public ParkingGroupOccupanciesZH(Controler controler){
+	public ParkingGroupOccupanciesZH(MatsimServices controler){
 		this.controler = controler;
 		reset(0);
 	}

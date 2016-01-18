@@ -222,7 +222,7 @@ public class PassivePlannerManager extends Thread implements BeforeMobsimListene
 	@Override
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
 		for(int i=0; i<parallelPlanners.length; i++) {
-			parallelPlanners[i] = new ParallelPassivePlanners(counter, counterTotal, counterBad, event.getControler().getTripRouterProvider().get());
+			parallelPlanners[i] = new ParallelPassivePlanners(counter, counterTotal, counterBad, event.getServices().getTripRouterProvider().get());
 			parallelPlanners[i].setDaemon(true);
 			parallelPlanners[i].start();
 		}

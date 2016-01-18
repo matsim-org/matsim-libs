@@ -17,13 +17,13 @@ public class CompareScenarios {
 
 		MutableScenario scenario1 = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		PopulationReader populationReader1 = new MatsimPopulationReader(scenario1);
-		MatsimNetworkReader networkReader1 = new MatsimNetworkReader(scenario1);
+		MatsimNetworkReader networkReader1 = new MatsimNetworkReader(scenario1.getNetwork());
 		networkReader1.readFile(args[0]);
 		populationReader1.readFile(args[1]);
 		
 		MutableScenario scenario2 = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		PopulationReader populationReader2 = new MatsimPopulationReader(scenario2);
-		MatsimNetworkReader networkReader2 = new MatsimNetworkReader(scenario2);
+		MatsimNetworkReader networkReader2 = new MatsimNetworkReader(scenario2.getNetwork());
 		networkReader2.readFile(args[0]);
 		populationReader2.readFile(args[2]);
 		

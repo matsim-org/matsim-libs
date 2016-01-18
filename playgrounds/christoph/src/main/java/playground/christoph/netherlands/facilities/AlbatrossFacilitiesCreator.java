@@ -65,7 +65,7 @@ public class AlbatrossFacilitiesCreator {
 	
 	public static void main(String[] args) throws Exception {
 		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenario).readFile(networkFile);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
 		new AlbatrossFacilitiesCreator(scenario);	
 	}
 	

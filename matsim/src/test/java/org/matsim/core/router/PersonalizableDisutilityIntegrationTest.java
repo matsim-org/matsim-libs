@@ -143,7 +143,7 @@ public class PersonalizableDisutilityIntegrationTest {
 		
 		public Fixture() {
 			this.scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-			new MatsimNetworkReader(this.scenario).readFile("test/scenarios/equil/network.xml");
+			new MatsimNetworkReader(this.scenario.getNetwork()).readFile("test/scenarios/equil/network.xml");
 			
 			this.person = PopulationUtils.createPerson(Id.create(1, Person.class));
 			

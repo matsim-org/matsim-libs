@@ -26,8 +26,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
 
-import org.apache.poi.ss.formula.ptg.TblPtg;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -42,16 +40,8 @@ import org.matsim.contrib.util.random.WeightedRandomSelection;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.core.utils.geometry.geotools.MGC;
-
-import com.vividsolutions.jts.geom.Point;
-
-import playground.jbischoff.taxi.berlin.demand.TaxiDemandWriter;
 
 /**
  * @author jbischoff
@@ -69,7 +59,7 @@ public class LastDestinationBasedTaxiVehicleCreator {
 	void run (){
 		Random rnd = MatsimRandom.getRandom();
 		scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenario).readFile(
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(
 				"C:/Users/Joschka/Documents/runs-svn/bvg.run132.25pct/bvg.run132.25pct.output_network.xml.gz");
 		new MatsimPopulationReader(scenario)
 				.readFile("C:/Users/Joschka/Documents/shared-svn/projects/audi_av/scenario/plansWithCarsR0.10.xml.gz");

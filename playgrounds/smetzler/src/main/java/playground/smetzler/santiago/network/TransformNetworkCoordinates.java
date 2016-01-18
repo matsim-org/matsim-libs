@@ -36,7 +36,7 @@ public class TransformNetworkCoordinates {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());		
 		Network network = scenario.getNetwork();
 		
-		new MatsimNetworkReader(scenario).readFile(sourceFile);	
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(sourceFile);
 		
 		GeotoolsTransformation ct = new GeotoolsTransformation(sourceCoordSystem, targetCoordSystem);
 		

@@ -8,7 +8,7 @@ import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.PlanStrategy;
-import org.matsim.core.replanning.modules.*;
+import org.matsim.core.replanning.strategies.*;
 
 import javax.inject.Provider;
 import java.util.HashMap;
@@ -50,22 +50,22 @@ public class DistributedPlanStrategyTranslationAndRegistration {
     }
 
     static void initMaps() {
-        SupportedSelectors.put("KeepLastSelected", KeepLastSelectedPlanStrategyFactory.class);
-        SupportedSelectors.put("BestScore", SelectBestPlanStrategyFactory.class);
-        SupportedSelectors.put("ChangeExpBeta", ChangeExpBetaPlanStrategyFactory.class);
-        SupportedSelectors.put("SelectExpBeta", SelectExpBetaPlanStrategyFactory.class);
-        SupportedSelectors.put("SelectRandom", SelectRandomStrategyFactory.class);
-        SupportedSelectors.put("SelectPathSizeLogit", SelectPathSizeLogitStrategyFactory.class);
+        SupportedSelectors.put("KeepLastSelected", KeepLastSelectedPlanStrategyProvider.class);
+        SupportedSelectors.put("BestScore", SelectBestPlanStrategyProvider.class);
+        SupportedSelectors.put("ChangeExpBeta", ChangeExpBetaPlanStrategyProvider.class);
+        SupportedSelectors.put("SelectExpBeta", SelectExpBetaPlanStrategyProvider.class);
+        SupportedSelectors.put("SelectRandom", SelectRandomPlanStrategyProvider.class);
+        SupportedSelectors.put("SelectPathSizeLogit", SelectPathSizeLogitPlanStrategyProvider.class);
 
-        SupportedMutators.put("ReRoute", ReRoutePlanStrategyFactory.class);
-        SupportedMutators.put("TimeAllocationMutator", TimeAllocationMutatorPlanStrategyFactory.class);
-        SupportedMutators.put("TimeAllocationMutator_ReRoute", TimeAllocationMutatorReRoutePlanStrategyFactory.class);
-        SupportedMutators.put("ChangeLegMode", ChangeLegModeStrategyFactory.class);
-        SupportedMutators.put("ChangeSingleLegMode", ChangeSingleLegModeStrategyFactory.class);
-        SupportedMutators.put("ChangeSingleTripMode", ChangeSingleTripModeStrategyFactory.class);
-        SupportedMutators.put("SubtourModeChoice", org.matsim.core.replanning.modules.SubtourModeChoiceStrategyFactory.class);
-        SupportedMutators.put("ChangeTripMode", ChangeTripModeStrategyFactory.class);
-        SupportedMutators.put("TripSubtourModeChoice", TripSubtourModeChoiceStrategyFactory.class);
+        SupportedMutators.put("ReRoute", ReRoutePlanStrategyProvider.class);
+        SupportedMutators.put("TimeAllocationMutator", TimeAllocationMutatorPlanStrategyProvider.class);
+        SupportedMutators.put("TimeAllocationMutator_ReRoute", TimeAllocationMutatorReRoutePlanStrategyProvider.class);
+        SupportedMutators.put("ChangeLegMode", ChangeLegModePlanStrategyProvider.class);
+        SupportedMutators.put("ChangeSingleLegMode", ChangeSingleLegModePlanStrategyProvider.class);
+        SupportedMutators.put("ChangeSingleTripMode", ChangeSingleTripModePlanStrategyProvider.class);
+        SupportedMutators.put("SubtourModeChoice", SubtourModeChoicePlanStrategyProvider.class);
+        SupportedMutators.put("ChangeTripMode", ChangeTripModePlanStrategyProvider.class);
+        SupportedMutators.put("TripSubtourModeChoice", TripSubtourModeChoicePlanStrategyProvider.class);
 
         SupportedMutatorGenes.put("ReRoute", new Character('A'));
         SupportedMutatorGenes.put("TimeAllocationMutator", new Character('B'));

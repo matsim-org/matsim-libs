@@ -162,7 +162,7 @@ public class PTransitLineMerger {
 		Scenario scenario =  ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario.getConfig().transit().setUseTransit(true);
 		
-		MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario);
+		MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario.getNetwork());
 		networkReader.readFile(networkFile);
 		
 		VehicleReaderV1 vehicleReader = new VehicleReaderV1(scenario.getTransitVehicles());

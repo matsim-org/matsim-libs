@@ -120,7 +120,7 @@ public class CreateFreightTraffic {
 		this.crossBorderPlansFilePath = config.findParam("freight", "crossBorderPlansFile");
 		
 		this.scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(this.scenario).readFile(this.networkfilePath);
+		new MatsimNetworkReader(this.scenario.getNetwork()).readFile(this.networkfilePath);
 		new FacilitiesReaderMatsimV1(this.scenario).readFile(this.facilitiesfilePath);
 		
 		BuildTrees util = new BuildTrees();
@@ -385,7 +385,7 @@ public class CreateFreightTraffic {
 		
 		MutableScenario sTmp = (MutableScenario) ScenarioUtils.createScenario(
 				ConfigUtils.createConfig());
-		new MatsimNetworkReader(sTmp).readFile(networkfilePath);
+		new MatsimNetworkReader(sTmp.getNetwork()).readFile(networkfilePath);
 		MatsimPopulationReader populationReader = new MatsimPopulationReader(sTmp);
 		populationReader.readFile(crossBorderPlansFilePath);
 		

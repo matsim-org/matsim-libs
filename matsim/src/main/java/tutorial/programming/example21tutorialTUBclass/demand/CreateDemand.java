@@ -76,7 +76,7 @@ public class CreateDemand {
 	
 	CreateDemand (){
 		this.scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenario).readFile(NETWORKFILE);	
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(NETWORKFILE);
 				
 	}
 	

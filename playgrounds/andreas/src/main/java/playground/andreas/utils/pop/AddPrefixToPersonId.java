@@ -44,7 +44,7 @@ public class AddPrefixToPersonId extends NewPopulation {
 		String outPlansFile = "./plan_korridor_50x.xml.gz";
 
 		Network net = sc.getNetwork();
-		new MatsimNetworkReader(sc).readFile(networkFile);
+		new MatsimNetworkReader(sc.getNetwork()).readFile(networkFile);
 
 		Population inPop = sc.getPopulation();
 		PopulationReader popReader = new MatsimPopulationReader(sc);

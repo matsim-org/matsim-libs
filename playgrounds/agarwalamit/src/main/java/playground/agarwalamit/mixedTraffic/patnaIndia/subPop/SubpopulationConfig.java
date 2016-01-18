@@ -24,7 +24,7 @@ import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup.LinkDynamics;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
-import org.matsim.core.replanning.DefaultPlanStrategiesModule;
+import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 
 import java.util.Arrays;
 import java.util.Collection;

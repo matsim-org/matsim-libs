@@ -126,4 +126,10 @@ public class SingleTrajectorySampler<U extends DecisionVariable> implements
 			final Statistic<SamplingStage<U>> statistic) {
 		throw new UnsupportedOperationException();
 	}
+
+	@Override
+	public void setStandardLogFileName(final String logFileName) {
+		throw new UnsupportedOperationException();
+	}
+
 }

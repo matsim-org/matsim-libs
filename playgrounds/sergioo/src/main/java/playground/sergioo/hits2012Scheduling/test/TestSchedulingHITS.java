@@ -29,10 +29,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.events.EventsReaderXMLv1;
-import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
@@ -55,7 +52,6 @@ import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 
 import others.sergioo.util.probability.ContinuousRealDistribution;
-import playground.sergioo.accessibility2013.MultiDestinationDijkstra;
 import playground.sergioo.hits2012.HitsReader;
 import playground.sergioo.hits2012.Household;
 import playground.sergioo.hits2012.Location;
@@ -302,7 +298,7 @@ public class TestSchedulingHITS {
 		reader.close();
 		System.out.println("TTs done");*/
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.loadConfig("./input/config-01.xml"));
-		new MatsimNetworkReader(scenario).readFile("C:/Users/sergioo/workspace2/playgrounds/sergioo/input/network/network100.xml.gz");
+		new MatsimNetworkReader(scenario.getNetwork()).readFile("C:/Users/sergioo/workspace2/playgrounds/sergioo/input/network/network100.xml.gz");
 		new TransitScheduleReader(scenario).readFile("C:/Users/sergioo/workspace2/playgrounds/sergioo/input/transit/transitSchedule.xml");
 		TransportModeNetworkFilter filter = new TransportModeNetworkFilter(scenario.getNetwork());
 		NetworkImpl net = (NetworkImpl) NetworkUtils.createNetwork();

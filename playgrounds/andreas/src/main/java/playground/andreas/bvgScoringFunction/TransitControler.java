@@ -14,19 +14,14 @@ import org.matsim.pt.PtConstants;
 /**
  * @author aneumann
  */
-public class TransitControler extends Controler {
+public class TransitControler {
 
 	private final static Logger log = Logger.getLogger(TransitControler.class);
 
 	private boolean useOTFVis = false;
 	
-	public TransitControler(Config config) {
-		super(config);
-		throw new RuntimeException( Gbl.RUN_MOB_SIM_NO_LONGER_POSSIBLE ) ;
-	}
-	
 	public TransitControler(MutableScenario scenario) {
-		super(scenario);
+//		super(scenario);
 		// TODO Auto-generated constructor stub
 		throw new RuntimeException( Gbl.RUN_MOB_SIM_NO_LONGER_POSSIBLE ) ;
 	}
@@ -99,16 +94,16 @@ public class TransitControler extends Controler {
 		// reading the scenario (based on the config):
 		MutableScenario sc = (MutableScenario) ScenarioUtils.loadScenario(config);
 		
-		TransitControler tc = new TransitControler(sc);
+		Controler tc = new Controler(sc);
         tc.setScoringFunctionFactory(new BvgScoringFunctionFactory(sc,  new BvgScoringFunctionConfigGroup(config)));
 		
 
 
 		// Not needed to use own scoring function
 
-		if(args.length > 1 && args[1].equalsIgnoreCase("true")){
-			tc.setUseOTFVis(true);
-		}
+//		if(args.length > 1 && args[1].equalsIgnoreCase("true")){
+//			tc.setUseOTFVis(true);
+//		}
 		tc.getConfig().controler().setOverwriteFileSetting(
 				true ?
 						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :

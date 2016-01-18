@@ -22,7 +22,7 @@ public class NodeDistances {
 	public NodeDistances(String networkPath){
 	
 		scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new NetworkReaderMatsimV1(scenario).parse(networkPath); 
+		new NetworkReaderMatsimV1(scenario.getNetwork()).parse(networkPath);
 		network = scenario.getNetwork();
 		Map<Id<Node>, ? extends Node> nodes = network.getNodes();
 		

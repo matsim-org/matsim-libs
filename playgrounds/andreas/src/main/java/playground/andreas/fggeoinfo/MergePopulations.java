@@ -76,7 +76,7 @@ public class MergePopulations extends NewPopulation {
 		MutableScenario scA = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		
 		Network net = sc.getNetwork();
-		new MatsimNetworkReader(sc).readFile(network);
+		new MatsimNetworkReader(sc.getNetwork()).readFile(network);
 
 		Population inPop = sc.getPopulation();
 		PopulationReader popReader = new MatsimPopulationReader(sc);

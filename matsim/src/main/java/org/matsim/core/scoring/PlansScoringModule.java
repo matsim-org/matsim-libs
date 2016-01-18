@@ -7,7 +7,7 @@ import org.matsim.core.controler.corelisteners.PlansScoring;
 public class PlansScoringModule extends AbstractModule {
 	@Override
 	public void install() {
-		install(new ExperiencedPlanElementsModule());
+		install(new ExperiencedPlansModule());
 		bind(PlansScoring.class).to(PlansScoringImpl.class);
 	}
 }

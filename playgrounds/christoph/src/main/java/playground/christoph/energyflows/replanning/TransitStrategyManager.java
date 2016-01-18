@@ -25,7 +25,7 @@ import java.util.Random;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.GenericPlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
@@ -54,7 +54,7 @@ public class TransitStrategyManager extends StrategyManager {
 	private double reroutingShare;
 	private Random random;
 	
-	public TransitStrategyManager(Controler controler, double replanningShare) {
+	public TransitStrategyManager(MatsimServices controler, double replanningShare) {
 		reroutingStrategy = new PlanStrategyImpl(new RandomPlanSelector());
 		reroutingStrategy.addStrategyModule(new ReRoute(controler.getScenario(), tripRouterProvider));
 		

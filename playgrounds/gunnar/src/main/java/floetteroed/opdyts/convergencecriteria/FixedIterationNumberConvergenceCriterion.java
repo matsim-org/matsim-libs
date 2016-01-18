@@ -24,6 +24,7 @@
  */
 package floetteroed.opdyts.convergencecriteria;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import floetteroed.opdyts.trajectorysampling.TransitionSequence;
@@ -41,6 +42,8 @@ public class FixedIterationNumberConvergenceCriterion implements
 	private final int iterationsToConvergence;
 
 	private final int averagingIterations;
+
+	private List<Double> finalWeights = null;
 
 	// -------------------- MEMBERS --------------------
 
@@ -70,6 +73,18 @@ public class FixedIterationNumberConvergenceCriterion implements
 						.get(i);
 			}
 			this.finalObjectiveFunctionValue /= this.averagingIterations;
+
+			// TODO >>> NEW >>>
+			this.finalWeights = new ArrayList<>(transitionSequence.size());
+			for (int i = 0; i < transitionSequence.size()
+					- this.averagingIterations; i++) {
+				this.finalWeights.add(0.0);
+			}
+			for (int i = transitionSequence.size() - this.averagingIterations; i < transitionSequence
+					.size(); i++) {
+				this.finalWeights.add(1.0 / this.averagingIterations);
+			}
+			// TODO <<< NEW <<<
 		}
 	}
 
@@ -86,5 +101,10 @@ public class FixedIterationNumberConvergenceCriterion implements
 	@Override
 	public void reset() {
 		this.finalObjectiveFunctionValue = null;
+	}
+
+	@Override
+	public List<Double> getFinalWeights() {
+		return this.finalWeights;
 	}
 }

@@ -53,7 +53,7 @@ public class ModeChoiceNavteqMain {
 
 		System.out.println("  reading network xml file... ");
 		Network network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(config.network().getInputFile());
 		System.out.println("  done.");
 
 //		System.out.println();

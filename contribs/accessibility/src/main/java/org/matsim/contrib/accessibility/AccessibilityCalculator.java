@@ -13,15 +13,17 @@ import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.ActivityFacility;
 
+import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -83,8 +85,15 @@ import java.util.concurrent.ConcurrentHashMap;
 
 	// counter for warning that capacities are not used so far ... in order not to give the same warning multiple times; dz, apr'14
 	private static int cnt = 0 ;
+	private Map<String, TravelTime> travelTimes;
+	private Map<String, TravelDisutilityFactory> travelDisutilityFactories;
+	private Scenario scenario;
 
-	AccessibilityCalculator() {
+	@Inject
+	AccessibilityCalculator(Map<String, TravelTime> travelTimes, Map<String, TravelDisutilityFactory> travelDisutilityFactories, Scenario scenario) {
+		this.travelTimes = travelTimes;
+		this.travelDisutilityFactories = travelDisutilityFactories;
+		this.scenario = scenario;
 		for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
 			this.isComputingMode.put( mode, false ) ;
 		}
@@ -94,36 +103,34 @@ import java.util.concurrent.ConcurrentHashMap;
 		this.zoneDataExchangeListeners.add(l);
 	}
 
-
-	// XXX Ugly but temporary
-	final void initDefaultContributionCalculators( final Controler controler ) {
+	final void initDefaultContributionCalculators() {
 		calculators.put(
 				Modes4Accessibility.car,
 				new NetworkModeAccessibilityContributionCalculator(
-						controler.getLinkTravelTimes(),
-						controler.getTravelDisutilityFactory(),
-						controler.getScenario()));
+						travelTimes.get(TransportMode.car),
+						travelDisutilityFactories.get(TransportMode.car),
+						scenario));
 		calculators.put(
 				Modes4Accessibility.freeSpeed,
 				new NetworkModeAccessibilityContributionCalculator(
 						new FreeSpeedTravelTime(),
-						controler.getTravelDisutilityFactory(),
-						controler.getScenario() ) );
+						travelDisutilityFactories.get(TransportMode.car),
+						scenario));
 		calculators.put(
 				Modes4Accessibility.walk,
 				new ConstantSpeedAccessibilityContributionCalculator(
 						TransportMode.walk,
-						controler.getScenario() ) );
+						scenario));
 		calculators.put(
 				Modes4Accessibility.bike,
 				new ConstantSpeedAccessibilityContributionCalculator(
 						TransportMode.bike,
-						controler.getScenario()));
+						scenario));
 		calculators.put(
 				Modes4Accessibility.pt,
 				new MatrixBasedPtAccessibilityContributionCalculator(
 						ptMatrix,
-						controler.getConfig() ) );
+						scenario.getConfig()));
 	}
 	
 	/**

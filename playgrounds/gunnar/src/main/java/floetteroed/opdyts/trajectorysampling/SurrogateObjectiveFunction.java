@@ -109,6 +109,50 @@ class SurrogateObjectiveFunction<U extends DecisionVariable> {
 				+ this.uniformityWeight * alphas.innerProd(alphas);
 	}
 
+	// TODO NEW; recycle in gradient(Vector)
+	Vector dQdAlpha(final Vector alphas) {
+		final Vector result = new Vector(alphas.size());
+		for (int i = 0; i < alphas.size(); i++) {
+			result.set(i, this.transitions.get(i)
+					.getToStateObjectiveFunctionValue());
+		}
+		return result;
+	}
+
+	// TODO NEW; recycle in gradient(Vector); note that this is not weighted
+	Vector dEquilibriumGapdAlpha(final Vector alphas) {
+		final Vector result = new Vector(alphas.size());
+		final double equilibriumGap = this.equilibriumGap(alphas);
+		for (int l = 0; l < alphas.size(); l++) {
+			result.set(l, alphas.innerProd(this.deltaCovariances.getRow(l))
+					/ (equilibriumGap + 1e-8));
+		}
+		return result;
+	}
+
+	// TODO NEW; recycle in gradient(Vector); note that this is not weighted
+	Vector dUniformityGapdAlpha(final Vector alphas) {
+		final Vector result = new Vector(alphas.size());
+		for (int l = 0; l < alphas.size(); l++) {
+			result.set(l, 2.0 * alphas.get(l));
+		}
+		return result;
+	}
+
+	// TODO NEW
+	Matrix d2EquilibriumGapdAlpha2(final Vector alphas) {
+		final Matrix result = this.deltaCovariances.copy();		
+		final Vector gradient = this.dEquilibriumGapdAlpha(alphas);
+		result.addOuterProduct(gradient, gradient, -1.0);
+		result.mult(1.0 / this.equilibriumGap(alphas));
+		return result;
+	}
+	
+	// TODO NEW
+	Matrix d2UniformityGapdAlpha2(final Vector alphas) {
+		return Matrix.newDiagonal(alphas.size(), 2.0);
+	}
+	
 	// @Override
 	public Vector gradient(final Vector alphas) {
 		final Vector result = new Vector(alphas.size());

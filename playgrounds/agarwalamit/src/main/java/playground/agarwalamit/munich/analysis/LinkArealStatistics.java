@@ -44,9 +44,9 @@ import playground.agarwalamit.utils.LoadMyScenarios;
 
 public class LinkArealStatistics {
 
-	private static final String dir = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/hEART/output/";
-	private static final String networkFile = dir+"/bau/output_network.xml.gz";
-	private static final String eventsFile = dir+"/bau/ITERS/it.1500/1500.events.xml.gz";
+	private static final String DIR = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/hEART/output/";
+	private static final String NET_FILE = DIR+"/bau/output_network.xml.gz";
+	private static final String EVENTS_FILE = DIR+"/bau/ITERS/it.1500/1500.events.xml.gz";
 	private Network network ;
 
 	public static void main(String[] args) {
@@ -54,16 +54,16 @@ public class LinkArealStatistics {
 	}
 
 	private void run(){
-		network = LoadMyScenarios.loadScenarioFromNetwork(networkFile).getNetwork();
-		String shapeFile_city = "/Users/amit/Documents/repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
-		String shapeFile_mma = "/Users/amit/Documents/repos/shared-svn/projects/detailedEval/Net/boundaryArea/munichMetroArea_correctedCRS_simplified.shp";
-		BufferedWriter writer = IOUtils.getBufferedWriter(dir+"/analysis/linkArealStatistics.txt");
+		network = LoadMyScenarios.loadScenarioFromNetwork(NET_FILE).getNetwork();
+		String shapeFileCity = "/Users/amit/Documents/repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
+		String shapeFileMMA = "/Users/amit/Documents/repos/shared-svn/projects/detailedEval/Net/boundaryArea/munichMetroArea_correctedCRS_simplified.shp";
+		BufferedWriter writer = IOUtils.getBufferedWriter(DIR+"/analysis/linkArealStatistics.txt");
 		try {
 			writer.write("area \t numberOfLinks \t totalTraveledDistanceInKm \n");
 
-			writer.write("cityArea \t"+getNumberOfLinks(shapeFile_city)+"\t"+getTraveledDistance(eventsFile, shapeFile_city)/1000+"\n");
-			writer.write("metroArea \t"+getNumberOfLinks(shapeFile_mma)+"\t"+getTraveledDistance(eventsFile, shapeFile_mma)/1000+"\n");
-			writer.write("allInclusive \t "+getNumberOfLinks(null)+"\t"+getTraveledDistance(eventsFile, null)/1000+"\n");
+			writer.write("cityArea \t"+getNumberOfLinks(shapeFileCity)+"\t"+getTraveledDistance(EVENTS_FILE, shapeFileCity)/1000+"\n");
+			writer.write("metroArea \t"+getNumberOfLinks(shapeFileMMA)+"\t"+getTraveledDistance(EVENTS_FILE, shapeFileMMA)/1000+"\n");
+			writer.write("allInclusive \t "+getNumberOfLinks(null)+"\t"+getTraveledDistance(EVENTS_FILE, null)/1000+"\n");
 
 			writer.close();
 		} catch (Exception e) {

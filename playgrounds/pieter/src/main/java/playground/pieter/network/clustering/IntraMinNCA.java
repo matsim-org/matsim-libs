@@ -82,7 +82,7 @@ public class IntraMinNCA extends NodeClusteringAlgorithm {
 		String fileName = "f:/TEMP/singaporemindeltaspeedtimeslength.txt";
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils
 				.createConfig());
-		MatsimNetworkReader nwr = new MatsimNetworkReader(scenario);
+		MatsimNetworkReader nwr = new MatsimNetworkReader(scenario.getNetwork());
 		// nwr.readFile(args[0]);
 //		 nwr.readFile("F:/TEMP/network.xml");
 //		nwr.readFile("f:/matsimWorkspace/matsim/examples/siouxfalls/network-wo-dummy-node.xml");

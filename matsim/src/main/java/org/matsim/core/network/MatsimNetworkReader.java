@@ -23,7 +23,7 @@ package org.matsim.core.network;
 import java.util.Stack;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.internal.MatsimSomeReader;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
@@ -39,16 +39,16 @@ public class MatsimNetworkReader extends MatsimXmlParser implements MatsimSomeRe
 	private final static Logger log = Logger.getLogger(MatsimNetworkReader.class);
 	private final static String NETWORK_V1 = "network_v1.dtd";
 
-	private final Scenario scenario;
 	private MatsimXmlParser delegate = null;
+	private Network network;
 
 	/**
 	 * Creates a new reader for MATSim configuration files.
 	 *
-	 * @param scenario A scenario containing the network where to store the loaded data.
+	 * @param network The network where to store the loaded data.
 	 */
-	public MatsimNetworkReader(final Scenario scenario) {
-		this.scenario = scenario;
+	public MatsimNetworkReader(Network network) {
+		this.network = network;
 	}
 
 	@Override
@@ -69,8 +69,8 @@ public class MatsimNetworkReader extends MatsimXmlParser implements MatsimSomeRe
 	 */
 	public void readFile(final String filename) {
 		parse(filename);
-		if (this.scenario.getNetwork() instanceof NetworkImpl) {
-			((NetworkImpl) this.scenario.getNetwork()).connect();
+		if (this.network instanceof NetworkImpl) {
+			((NetworkImpl) network).connect();
 		}
 	}
 
@@ -79,7 +79,7 @@ public class MatsimNetworkReader extends MatsimXmlParser implements MatsimSomeRe
 		super.setDoctype(doctype);
 		// Currently the only network-type is v1
 		if (NETWORK_V1.equals(doctype)) {
-			this.delegate = new NetworkReaderMatsimV1(this.scenario);
+			this.delegate = new NetworkReaderMatsimV1(this.network);
 			log.info("using network_v1-reader.");
 		} else {
 			throw new IllegalArgumentException("Doctype \"" + doctype + "\" not known.");

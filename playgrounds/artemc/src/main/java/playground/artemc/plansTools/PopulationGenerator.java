@@ -51,7 +51,7 @@ public class PopulationGenerator {
 
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		log.info("Reading network...");
-		new MatsimNetworkReader(scenario).readFile(network);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(network);
 		NetworkImpl net = (NetworkImpl) scenario.getNetwork();
 		
 		log.info("Reading work areas...");

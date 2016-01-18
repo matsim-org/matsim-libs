@@ -13,10 +13,13 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
 import org.matsim.roadpricing.RoadPricingConfigGroup;
+import org.matsim.roadpricing.RoadPricingReaderXMLv1;
+import org.matsim.roadpricing.RoadPricingSchemeImpl;
 
 import floetteroed.opdyts.DecisionVariableRandomizer;
 import floetteroed.opdyts.ObjectiveFunction;
@@ -42,18 +45,40 @@ class OptimizeRoadpricing {
 		final Config config = ConfigUtils.loadConfig(configFileName,
 				new RoadPricingConfigGroup());
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
+		final String originalOutputDirectory = scenario.getConfig().controler()
+				.getOutputDirectory(); // gets otherwise overwritten in config
+
+		final RoadPricingConfigGroup roadPricingConfigGroup = ConfigUtils
+				.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME,
+						RoadPricingConfigGroup.class);
+		final RoadPricingSchemeImpl roadPricingScheme = new RoadPricingSchemeImpl();
+		new RoadPricingReaderXMLv1(roadPricingScheme)
+				.parse(roadPricingConfigGroup.getTollLinksFile());
+		final AbstractModule roadpricingModule = new ControlerDefaultsWithRoadPricingModule(
+				roadPricingScheme);
 
 		/*
 		 * Create initial toll levels and their randomization.
 		 */
+		// NO TOLL
+		// final TollLevels initialTollLevels = new TollLevels(6 * 3600 + 1800,
+		// 7 * 3600, 7 * 3600 + 1800, 8 * 3600 + 1800, 9 * 3600,
+		// 15 * 3600 + 1800, 16 * 3600, 17 * 3600 + 1800, 18 * 3600,
+		// 18 * 3600 + 1800, 0.0, 0.0, 0.0, scenario);
+		// THE ORIGINAL
 		final TollLevels initialTollLevels = new TollLevels(6 * 3600 + 1800,
 				7 * 3600, 7 * 3600 + 1800, 8 * 3600 + 1800, 9 * 3600,
 				15 * 3600 + 1800, 16 * 3600, 17 * 3600 + 1800, 18 * 3600,
 				18 * 3600 + 1800, 10.0, 15.0, 20.0, scenario);
+		// OPTIMIZED
+		// final TollLevels initialTollLevels = new TollLevels(25200.0, 25200.0,
+		// 28800.0, 30600.0, 32400.0, 55800.0, 59400.0, 59400.0, 61200.0,
+		// 63000.0, 0.0, 10.0, 30.0, scenario);
+
 		final double changeTimeProba = 2.0 / 3.0;
 		final double changeCostProba = 2.0 / 3.0;
 		final double deltaTime_s = 1800;
-		final double deltaCost_money = 10.0;
+		final double deltaCost_money = 5.0;
 		final DecisionVariableRandomizer<TollLevels> decisionVariableRandomizer = new TollLevelsRandomizer(
 				initialTollLevels, changeTimeProba, changeCostProba,
 				deltaTime_s, deltaCost_money);
@@ -74,27 +99,24 @@ class OptimizeRoadpricing {
 				2, 1);
 		final MATSimSimulator<TollLevels> matsimSimulator = new MATSimSimulator<>(
 				new MATSimStateFactoryImpl<TollLevels>(), scenario,
-				timeDiscretization, relevantLinkIds,
-				new ControlerDefaultsWithRoadPricingModule());
+				timeDiscretization, relevantLinkIds, roadpricingModule);
 
 		/*
 		 * RandomSearch specification.
 		 */
 		final int maxMemorizedTrajectoryLength = 1;
-		final boolean keepBestSolution = true;
 		final boolean interpolate = true;
-		final int maxRandomSearchIterations = 5;
+		final int maxRandomSearchIterations = 1;
 		final int maxRandomSearchTransitions = Integer.MAX_VALUE;
-		final int randomSearchPopulationSize = 3;
+		final int randomSearchPopulationSize = 2;
+		final double inertia = 0.95;
 		final RandomSearch<TollLevels> randomSearch = new RandomSearch<>(
 				matsimSimulator, decisionVariableRandomizer,
 				convergenceCriterion, maxRandomSearchIterations,
 				maxRandomSearchTransitions, randomSearchPopulationSize,
-				MatsimRandom.getRandom(), interpolate, keepBestSolution,
-				objectiveFunction, maxMemorizedTrajectoryLength);
-		randomSearch.setLogFileName(scenario.getConfig().controler()
-				.getOutputDirectory()
-				+ "optimization.log");
+				MatsimRandom.getRandom(), interpolate, objectiveFunction,
+				maxMemorizedTrajectoryLength, inertia);
+		randomSearch.setLogFileName(originalOutputDirectory + "opdyts.log");
 
 		/*
 		 * Run it.

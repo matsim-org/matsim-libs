@@ -39,7 +39,7 @@ public class NetworkReadExample {
 	public static Map<Id<Link>, ? extends Link> getNetworkLinks(String networkFile, Coord center, double radius){ //read network
 		MutableScenario scenanrioImpl = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig()); // create a new scenario object
 
-		new MatsimNetworkReader(scenanrioImpl).readFile(networkFile);//matsim function, need scenario object for reading
+		new MatsimNetworkReader(scenanrioImpl.getNetwork()).readFile(networkFile);//matsim function, need scenario object for reading
 		// read the network file
 		Network network=scenanrioImpl.getNetwork();
 

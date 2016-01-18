@@ -11,11 +11,8 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
-import org.matsim.contrib.accessibility.FacilityTypes;
-import org.matsim.contrib.accessibility.GridBasedAccessibilityControlerListenerV3;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
 import org.matsim.contrib.accessibility.utils.AccessibilityRunUtils;
 import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtRouterConfigGroup;
@@ -27,19 +24,18 @@ import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspDefaultsCheckingLevel;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
-import org.matsim.core.replanning.DefaultPlanStrategiesModule;
+import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.facilities.ActivityFacilities;
-import org.matsim.facilities.ActivityFacility;
 import org.matsim.testcases.MatsimTestUtils;
 
 public class AccessibilityComputationCapeTownTest {
 	public static final Logger log = Logger.getLogger( AccessibilityComputationCapeTownTest.class ) ;
 
 //	private static final double cellSize = 1000.;
-//	private static final Double cellSize = 10000.;
-	private static final Double cellSize = 1000.;
+	private static final Double cellSize = 10000.;
+//	private static final Double cellSize = 1000.;
 	private static final double timeOfDay = 8.*60*60;
 
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
@@ -47,16 +43,16 @@ public class AccessibilityComputationCapeTownTest {
 
 	@Test
 	public void doAccessibilityTest() throws IOException {
-//		public static void main( String[] args ) {
-		String folderStructure = "../../"; // arbitrary
-			
+		// Input
+		String folderStructure = "../../";
 		String networkFile = "matsimExamples/countries/za/capetown/2015-10-15_network.xml";
-		
+
+		// adapt folder structure that may be different on different machines, esp. on server
 		folderStructure = PathUtils.tryANumberOfFolderStructures(folderStructure, networkFile);
-		
-		networkFile = folderStructure + networkFile ; 
+
+		networkFile = folderStructure + networkFile ;
 		String facilitiesFile = folderStructure + "matsimExamples/countries/za/capetown/2015-10-15_facilities.xml";
- 
+		 
 		// minibus-pt
 //		String travelTimeMatrix = folderStructure + "matsimExamples/countries/za/nmbm/minibus-pt/JTLU_14i/travelTimeMatrix.csv.gz";
 //		String travelDistanceMatrix = folderStructure + "matsimExamples/countries/za/nmbm/minibus-pt/JTLU_14i/travelDistanceMatrix.csv.gz";
@@ -157,44 +153,7 @@ public class AccessibilityComputationCapeTownTest {
 		modes.add(Modes4Accessibility.bike);
 //		modes.add(Modes4Accessibility.pt);
 		
-		
-		// loop over activity types to add one GridBasedAccessibilityControlerListenerV3 for each combination
-		for (String actType : activityTypes) {
-			if (!actType.equals(FacilityTypes.MEDICAL)) {
-				log.error("skipping everything except work for debugging purposes; remove in production code. kai, feb'14");
-				continue;
-			}
-
-			ActivityFacilities opportunities = AccessibilityRunUtils.collectActivityFacilitiesOfType(scenario, actType);
-			final GeoserverUpdater geoserverUpdater = new GeoserverUpdater(crs, name + "_" + actType);
-
-			activityFacilitiesMap.put(actType, opportunities);
-			geoserverUpdaterMap.put(actType, geoserverUpdater);
-			
-			GridBasedAccessibilityControlerListenerV3 listener = 
-					new GridBasedAccessibilityControlerListenerV3(activityFacilitiesMap.get(actType), 
-							//ptMatrix, 
-							config, scenario.getNetwork());
-			
-			for (Modes4Accessibility mode : modes) {
-				listener.setComputingAccessibilityForMode(mode, true);
-			}
-			// or replace by "set .... ModeS( modes ) " 
-			
-			listener.addAdditionalFacilityData(networkDensityFacilities);
-			listener.generateGridsAndMeasuringPointsByNetwork(cellSize);
-			
-			listener.writeToSubdirectoryWithName(actType);
-			
-			// for push to geoserver
-			listener.addFacilityDataExchangeListener(geoserverUpdater);
-			
-			listener.setUrbansimMode(false); // avoid writing some (eventually: all) files that related to matsim4urbansim
-
-			controler.addControlerListener(listener);
-		}
-		
-
+		controler.addOverridingModule(new AccessibilityComputationTestModule(activityTypes, networkDensityFacilities, crs, name, cellSize));
 		controler.run();
 		
 		

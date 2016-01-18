@@ -56,10 +56,20 @@ public class SamplingStage<U extends DecisionVariable> {
 
 	private final Map<U, Double> decisionVariable2alphaSum;
 
+	private final U lastDecisionVariable;
+
+	private final double lastObjectiveFunctionValue;
+
+	private final double lastEquilibriumGap;
+
+	private final Double convergedObjectiveFunctionValue;
+
 	// -------------------- CONSTRUCTION --------------------
 
 	public SamplingStage(final Vector alphas,
-			final TransitionSequencesAnalyzer<U> evaluator) {
+			final TransitionSequencesAnalyzer<U> evaluator,
+			final Transition<U> lastTransition,
+			final Double convergedObjectiveFunctionValue) {
 
 		this.alphas = alphas.copy();
 		this.equilibriumGapWeight = evaluator.getEquilibriumGapWeight();
@@ -72,14 +82,25 @@ public class SamplingStage<U extends DecisionVariable> {
 				.surrogateObjectiveFunctionValue(alphas);
 		this.decisionVariable2alphaSum = evaluator
 				.decisionVariable2alphaSum(alphas);
+
+		this.lastDecisionVariable = lastTransition.getDecisionVariable();
+		this.lastObjectiveFunctionValue = lastTransition
+				.getToStateObjectiveFunctionValue();
+		this.lastEquilibriumGap = lastTransition.getDelta().euclNorm();
+
+		this.convergedObjectiveFunctionValue = convergedObjectiveFunctionValue;
 	}
 
 	// -------------------- CONTENT ACCESS --------------------
 
+	U drawDecisionVariable(final Random rnd) {
+		return MathHelpers.draw(this.decisionVariable2alphaSum, rnd);
+	}
+
 	public double getAlphaSquareNorm() {
 		return this.alphas.innerProd(this.alphas);
 	}
-	
+
 	public double getAlphaNorm() {
 		return this.alphas.euclNorm();
 	}
@@ -114,7 +135,23 @@ public class SamplingStage<U extends DecisionVariable> {
 				.keySet());
 	}
 
-	U drawDecisionVariable(final Random rnd) {
-		return MathHelpers.draw(this.decisionVariable2alphaSum, rnd);
+	// TODO NEW
+	public U getLastDecisionVariable() {
+		return this.lastDecisionVariable;
+	}
+
+	// TODO NEW
+	public double getLastObjectiveFunctionValue() {
+		return this.lastObjectiveFunctionValue;
+	}
+
+	// TODO NEW
+	public double getLastEquilibriumGap() {
+		return this.lastEquilibriumGap;
+	}
+
+	// TODO NEW
+	public Double getConvergedObjectiveFunctionValue() {
+		return this.convergedObjectiveFunctionValue;
 	}
 }

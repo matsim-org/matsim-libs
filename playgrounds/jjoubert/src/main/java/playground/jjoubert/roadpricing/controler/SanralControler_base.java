@@ -5,6 +5,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 
 import playground.jjoubert.Utilities.matsim2urbansim.controler.MyBasicConfig;
@@ -70,7 +71,7 @@ public class SanralControler_base {
 //		config.getQSimConfigGroup().setFlowCapFactor(0.1);
 //		config.getQSimConfigGroup().setStorageCapFactor(0.28);
 
-		Controler c = new Controler(config);
+		MatsimServices c = new Controler(config);
         c.getConfig().controler().setCreateGraphs(true);
         c.getConfig().controler().setWriteEventsInterval(20);
 		c.getConfig().controler().setOverwriteFileSetting(

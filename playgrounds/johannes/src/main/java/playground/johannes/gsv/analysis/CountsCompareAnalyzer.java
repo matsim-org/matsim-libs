@@ -66,7 +66,7 @@ public class CountsCompareAnalyzer implements AfterMobsimListener {
 
 	@Override
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
-		Network network = event.getControler().getScenario().getNetwork();
+		Network network = event.getServices().getScenario().getNetwork();
 		DescriptiveStatistics error = new DescriptiveStatistics();
 		DescriptiveStatistics errorAbs = new DescriptiveStatistics();
 		DescriptivePiStatistics errorWeighted = new WSMStatsFactory().newInstance();
@@ -108,7 +108,7 @@ public class CountsCompareAnalyzer implements AfterMobsimListener {
 				errorWeighted.getMean(), errorWeighted.getVariance(), errorWeighted.getStandardDeviation(), errorWeighted.getMin(),
 				errorWeighted.getMax()));
 
-		String outdir = event.getControler().getControlerIO().getIterationPath(event.getIteration());
+		String outdir = event.getServices().getControlerIO().getIterationPath(event.getIteration());
 
 		try {
 			TDoubleDoubleHashMap map = Correlations.mean(caps.toArray(), errorVals.toArray());
@@ -125,12 +125,12 @@ public class CountsCompareAnalyzer implements AfterMobsimListener {
 					String.format("%s/countsErrorWeighted.hist.txt", outdir));
 
 			CountsCompare2GeoJSON.write(calculator, counts, factor, network, outdir);
-			NetworkLoad2GeoJSON.write(event.getControler().getScenario().getNetwork(), calculator, factor, outdir + "/network.json");
+			NetworkLoad2GeoJSON.write(event.getServices().getScenario().getNetwork(), calculator, factor, outdir + "/network.json");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
-		String rootOutDir = event.getControler().getControlerIO().getOutputPath();
+		String rootOutDir = event.getServices().getControlerIO().getOutputPath();
 		boolean append = false;
 		if (event.getIteration() > 0) {
 			append = true;

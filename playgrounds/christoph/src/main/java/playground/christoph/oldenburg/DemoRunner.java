@@ -146,7 +146,7 @@ public class DemoRunner implements MobsimInitializedListener, StartupListener,
 				
 		// initialize the EvacuationTimeAnalyzer
 		evacuationTimeAnalyzer = new EvacuationTimeAnalyzer();
-		event.getControler().getEvents().addHandler(evacuationTimeAnalyzer);
+		event.getServices().getEvents().addHandler(evacuationTimeAnalyzer);
 		
 		this.initReplanners();
 	}

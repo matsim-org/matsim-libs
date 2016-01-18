@@ -6,6 +6,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.scenario.MutableScenario;
@@ -60,7 +61,7 @@ public class BaseControler {
 		@Override
 		public void notifyStartup(StartupEvent event) {
 
-			Controler controler = event.getControler();
+			MatsimServices controler = event.getServices();
 			// create a plot containing the mean travel times
 			Set<String> transportModes = new HashSet<String>();
 			transportModes.add(TransportMode.car);
@@ -81,7 +82,7 @@ public class BaseControler {
 		config.transit().setTransitScheduleFile(input+"transitSchedule.xml");
 		config.transit().setVehiclesFile(input+"vehicles.xml");
 
-		//config.controler().setLastIteration(10);
+		//config.services().setLastIteration(10);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		return scenario;

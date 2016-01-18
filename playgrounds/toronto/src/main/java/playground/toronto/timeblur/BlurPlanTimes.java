@@ -40,7 +40,7 @@ public class BlurPlanTimes {
 		System.out.println("  mutationRange:    "+mutationRange);
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario).readFile(inputNetworkFile);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(inputNetworkFile);
 		PopulationImpl population = (PopulationImpl) scenario.getPopulation();
 		population.setIsStreaming(true);
 		PersonBlurTimes pbt = new PersonBlurTimes(scenario.getConfig(), mutationRange);
@@ -62,7 +62,7 @@ public class BlurPlanTimes {
 		System.out.println("  binSize:          "+binSize);
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario).readFile(inputNetworkFile);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(inputNetworkFile);
 		PopulationImpl population = (PopulationImpl) scenario.getPopulation();
 		population.setIsStreaming(true);
 		PersonUniformBlurTimesPerTimeBin pubtptb = new PersonUniformBlurTimesPerTimeBin(binSize);
@@ -85,7 +85,7 @@ public class BlurPlanTimes {
 		System.out.println("  binSize:          "+binSize);
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario).readFile(inputNetworkFile);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(inputNetworkFile);
 		PopulationImpl population = (PopulationImpl) scenario.getPopulation();
 		population.setIsStreaming(true);
 		PersonBlurTimesPerTimeBin pbtptb = new PersonBlurTimesPerTimeBin(mutationRange,binSize);
