@@ -138,19 +138,31 @@ public final class TtCreateBraessPopulation {
 			Activity drainAct = population.getFactory().createActivityFromLinkId(
 					"dummy", Id.createLinkId("5_6"));
 			
-			// create a leg with or without a route
+			// create a dummy leg
 			Leg leg1 = population.getFactory().createLeg(TransportMode.car);
-			if (this.middleLinkExists && 
-					(initRouteSpecification.equals(InitRoutes.ONLY_MIDDLE)
-							|| initRouteSpecification.equals(InitRoutes.ALL))) {
-				
+			// fill the leg if necessary
+			switch (initRouteSpecification){
+			case ONLY_MIDDLE:
+			case ALL:
 				leg1 = createMiddleLeg();
+				break;
+			case ONLY_OUTER:
+				leg1 = createUpperLeg();
+				break;
+			default:
+				break;
 			}
 			
-			// create a first plan for the person
+			// create a plan for the person that contains all this information
 			Plan plan1 = createPlan(startAct, leg1, drainAct, initPlanScore);
 			// store information in population
 			person.addPlan(plan1);
+			
+			// select plan1 for every second person (with odd id) if only outer routes are initialized
+			if (initRouteSpecification.equals(InitRoutes.ONLY_OUTER) && (i % 2 == 1)){
+				person.setSelectedPlan(plan1);
+			}
+			
 			population.addPerson(person);
 
 			// create further plans if different routes should be initialized
@@ -159,7 +171,7 @@ public final class TtCreateBraessPopulation {
 				
 				// create a second plan for the person (with the same start and
 				// end activity but a different leg)
-				Leg leg2 = createUpperLeg();
+				Leg leg2 = createLowerLeg();
 				Plan plan2 = createPlan(startAct, leg2, drainAct, initPlanScore);	
 				person.addPlan(plan2);
 				
@@ -168,16 +180,19 @@ public final class TtCreateBraessPopulation {
 					person.setSelectedPlan(plan2);
 				}
 
-				// create a third plan for the person (with the same start and
-				// end activity but a different leg)
-				Leg leg3 = createLowerLeg();
-				Plan plan3 = createPlan(startAct, leg3, drainAct, initPlanScore);
-				person.addPlan(plan3);
+				if (initRouteSpecification.equals(InitRoutes.ALL)) {
+					// create a third plan for the person (with the same start
+					// and
+					// end activity but a different leg)
+					Leg leg3 = createUpperLeg();
+					Plan plan3 = createPlan(startAct, leg3, drainAct, initPlanScore);
+					person.addPlan(plan3);
 
-				// select plan3 for every second person (with odd id)
-				if (i % 2 == 1) {
-					person.setSelectedPlan(plan3);
-				}				
+					// select plan3 for every second person (with odd id)
+					if (i % 2 == 1) {
+						person.setSelectedPlan(plan3);
+					}
+				}
 			}
 		}
 		
