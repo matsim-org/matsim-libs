@@ -18,13 +18,16 @@
  * *********************************************************************** */
 package playground.johannes.studies.matrix2014.analysis;
 
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
-import org.matsim.contrib.common.stats.LinearDiscretizer;
 import org.matsim.facilities.ActivityFacilities;
 import playground.johannes.studies.matrix2014.matrix.MatrixBuilder;
 import playground.johannes.studies.matrix2014.matrix.ODPredicate;
 import playground.johannes.studies.matrix2014.matrix.VolumePredicate;
-import playground.johannes.synpop.analysis.*;
+import playground.johannes.synpop.analysis.AnalyzerTask;
+import playground.johannes.synpop.analysis.Predicate;
+import playground.johannes.synpop.analysis.StatsContainer;
 import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.data.Segment;
 import playground.johannes.synpop.gis.ZoneCollection;
@@ -45,8 +48,6 @@ public class MatrixComparator implements AnalyzerTask<Collection<? extends Perso
 
     private final NumericMatrix refMatrix;
 
-    private final String refMatrixName;
-
     private Predicate<Segment> legPredicate;
 
     private ODPredicate<String, Double> normPredicate;
@@ -55,15 +56,30 @@ public class MatrixComparator implements AnalyzerTask<Collection<? extends Perso
 
     private boolean useWeights;
 
-    private FileIOContext ioContext;
+    private AnalyzerTask<Pair<NumericMatrix, NumericMatrix>> tasks;
 
-    private AnalyzerTaskComposite<NumericMatrix> tasks;
-
-    public MatrixComparator(NumericMatrix refMatrix, String refMatrixName, ActivityFacilities facilities, ZoneCollection zones) {
+    public MatrixComparator(NumericMatrix refMatrix, ActivityFacilities facilities,
+                            ZoneCollection zones, AnalyzerTask<Pair<NumericMatrix, NumericMatrix>> tasks) {
         this.refMatrix = refMatrix;
-        this.refMatrixName = refMatrixName;
         builder = new MatrixBuilder(facilities, zones);
+        this.tasks = tasks;
         volumeThreshold = 0;
+    }
+
+    public void setLegPredicate(Predicate<Segment> legPredicate) {
+        this.legPredicate = legPredicate;
+    }
+
+    public void setNormPredicate(ODPredicate<String, Double> normPredicate) {
+        this.normPredicate = normPredicate;
+    }
+
+    public void setVolumeThreshold(double threshold) {
+        this.volumeThreshold = threshold;
+    }
+
+    public void setUseWeights(boolean useWeights) {
+        this.useWeights = useWeights;
     }
 
     @Override
@@ -85,26 +101,14 @@ public class MatrixComparator implements AnalyzerTask<Collection<? extends Perso
 
         if(volumeThreshold > 0) {
             ODPredicate volPredicate = new VolumePredicate(volumeThreshold);
-            tmpRefMatrix = (NumericMatrix) MatrixOperations.subMatrix(volPredicate, refMatrix, new NumericMatrix());
+            // TODO: this requires further considerations...
+            tmpRefMatrix = (NumericMatrix) MatrixOperations.subMatrix(volPredicate, tmpRefMatrix, new NumericMatrix());
         }
 
         double normFactor = refTotal/simTotal;
         MatrixOperations.applyFactor(simMatrix, normFactor);
         logger.debug(String.format("Normalization factor: %s.", normFactor));
 
-
-        MatrixVolumeCompare volTask = new MatrixVolumeCompare(tmpRefMatrix, String.format("matrix.%s.vol", refMatrixName));
-        MatrixDistanceCompare distTask = new MatrixDistanceCompare(tmpRefMatrix, String.format("matrix.%s.dist", refMatrixName), null);
-
-        if(ioContext != null) {
-            HistogramWriter writer = new HistogramWriter(ioContext,
-                    new PassThroughDiscretizerBuilder(new LinearDiscretizer(0.5), "linear"));
-
-            volTask.setIoContext(ioContext);
-            volTask.setHistogramWriter(writer);
-        }
-
-        tasks = new AnalyzerTaskComposite<>();
-        tasks.addComponent(volTask);
+        tasks.analyze(new ImmutablePair<>(tmpRefMatrix, simMatrix), containers);
     }
 }

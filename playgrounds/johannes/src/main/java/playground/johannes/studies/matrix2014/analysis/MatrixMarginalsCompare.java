@@ -21,6 +21,7 @@ package playground.johannes.studies.matrix2014.analysis;
 
 import gnu.trove.list.array.TDoubleArrayList;
 import gnu.trove.map.TObjectDoubleMap;
+import org.apache.commons.lang3.tuple.Pair;
 import playground.johannes.synpop.analysis.AnalyzerTask;
 import playground.johannes.synpop.analysis.HistogramWriter;
 import playground.johannes.synpop.analysis.StatsContainer;
@@ -34,17 +35,14 @@ import java.util.Set;
 /**
  * @author johannes
  */
-public class MatrixMarginalsCompare implements AnalyzerTask<NumericMatrix> {
+public class MatrixMarginalsCompare implements AnalyzerTask<Pair<NumericMatrix, NumericMatrix>> {
 
-    private NumericMatrix refMatrix;
-
-    private String refMatrixName;
+    private String dimension;
 
     private HistogramWriter writer;
 
-    public void setReferenceMatrix(NumericMatrix refMatrix, String refMatrixName) {
-        this.refMatrix = refMatrix;
-        this.refMatrixName = refMatrixName;
+    public MatrixMarginalsCompare(String dimension) {
+        this.dimension = dimension;
     }
 
     public void setHistogramWriter(HistogramWriter writer) {
@@ -52,7 +50,9 @@ public class MatrixMarginalsCompare implements AnalyzerTask<NumericMatrix> {
     }
 
     @Override
-    public void analyze(NumericMatrix simMatrix, List<StatsContainer> containers) {
+    public void analyze(Pair<NumericMatrix, NumericMatrix> matrices, List<StatsContainer> containers) {
+        NumericMatrix refMatrix = matrices.getLeft();
+        NumericMatrix simMatrix = matrices.getRight();
         /*
         diagonal errors
          */
@@ -67,20 +67,20 @@ public class MatrixMarginalsCompare implements AnalyzerTask<NumericMatrix> {
             if(error != null) errors.add(error);
         }
 
-        String dimension = String.format("matrix.diagonal.err.%s", refMatrixName);
+        String dimension2 = String.format("%s.diagonal.err", this.dimension);
         double[] nativeErrors = errors.toArray();
-        StatsContainer container = new StatsContainer(dimension, nativeErrors);
+        StatsContainer container = new StatsContainer(dimension2, nativeErrors);
         containers.add(container);
 
         if(writer != null) {
-            writer.writeHistograms(nativeErrors, dimension);
+            writer.writeHistograms(nativeErrors, dimension2);
         }
         /*
         diagonal sum error
          */
         double simDia = MatrixOperations.diagonalSum(simMatrix);
         double refDia = MatrixOperations.diagonalSum(refMatrix);
-        container = new StatsContainer(String.format("matrix.diagonal.sum.err.%s", refMatrixName));
+        container = new StatsContainer(String.format("%s.diagonal.sum.err", this.dimension));
         container.setMean((simDia - refDia)/refDia);
         containers.add(container);
         /*
@@ -113,14 +113,14 @@ public class MatrixMarginalsCompare implements AnalyzerTask<NumericMatrix> {
             if(refVol != null) refRowSum += refVol;
         }
 
-        String dimension = String.format("matrix.%s.err.%s", name, refMatrixName);
+        String dimension2 = String.format("%s.%s.err", this.dimension, name);
         double[] nativeErrors = errors.toArray();
-        containers.add(new StatsContainer(dimension, nativeErrors));
+        containers.add(new StatsContainer(dimension2, nativeErrors));
 
-        if(writer != null) writer.writeHistograms(nativeErrors, dimension);
+        if(writer != null) writer.writeHistograms(nativeErrors, dimension2);
 
-        dimension = String.format("matrix.%s.sum.err.%s", name, refMatrixName);
-        StatsContainer container = new StatsContainer(dimension);
+        dimension2 = String.format("%s.%s.sum.err", this.dimension, name);
+        StatsContainer container = new StatsContainer(dimension2);
         container.setMean((simRowSum - refRowSum)/refRowSum);
         containers.add(container);
     }

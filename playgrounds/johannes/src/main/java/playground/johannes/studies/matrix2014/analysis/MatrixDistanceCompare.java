@@ -22,6 +22,8 @@ package playground.johannes.studies.matrix2014.analysis;
 import com.vividsolutions.jts.geom.Point;
 import gnu.trove.list.array.TDoubleArrayList;
 import gnu.trove.map.hash.TDoubleDoubleHashMap;
+import org.apache.commons.lang3.tuple.Pair;
+import org.apache.log4j.Logger;
 import org.matsim.contrib.common.gis.CartesianDistanceCalculator;
 import org.matsim.contrib.common.gis.DistanceCalculator;
 import org.matsim.contrib.common.stats.Discretizer;
@@ -43,7 +45,9 @@ import java.util.Set;
 /**
  * @author johannes
  */
-public class MatrixDistanceCompare implements AnalyzerTask<NumericMatrix> {
+public class MatrixDistanceCompare implements AnalyzerTask<Pair<NumericMatrix, NumericMatrix>> {
+
+    private static final Logger logger = Logger.getLogger(MatrixDistanceCompare.class);
 
     private final NumericMatrix distanceMatrix;
 
@@ -57,10 +61,7 @@ public class MatrixDistanceCompare implements AnalyzerTask<NumericMatrix> {
 
     private FileIOContext ioContext;
 
-    private NumericMatrix refMatrix;
-
-    public MatrixDistanceCompare(NumericMatrix refMatrix, String dimension, ZoneCollection zones) {
-        this.refMatrix = refMatrix;
+    public MatrixDistanceCompare(String dimension, ZoneCollection zones) {
         this.dimension = dimension;
         this.distanceMatrix = new NumericMatrix();
         this.zones = zones;
@@ -74,7 +75,10 @@ public class MatrixDistanceCompare implements AnalyzerTask<NumericMatrix> {
     }
 
     @Override
-    public void analyze(NumericMatrix simMatrix, List<StatsContainer> containers) {
+    public void analyze(Pair<NumericMatrix, NumericMatrix> matrices, List<StatsContainer> containers) {
+        NumericMatrix refMatrix = matrices.getLeft();
+        NumericMatrix simMatrix = matrices.getRight();
+
         TDoubleDoubleHashMap simHist = histogram(simMatrix);
         TDoubleDoubleHashMap refHist = histogram(refMatrix);
 
@@ -118,7 +122,6 @@ public class MatrixDistanceCompare implements AnalyzerTask<NumericMatrix> {
         TDoubleArrayList values = new TDoubleArrayList();
         TDoubleArrayList weights = new TDoubleArrayList();
 
-        double sum = 0;
         Set<String> keys = m.keys();
         for(String i : keys) {
             for(String j : keys) {
@@ -127,11 +130,10 @@ public class MatrixDistanceCompare implements AnalyzerTask<NumericMatrix> {
                     double d = getDistance(i, j);
                     values.add(d);
                     weights.add(vol);
-                    sum += vol;
                 }
             }
         }
-//        System.out.println("Total=" + sum);
+
         return Histogram.createHistogram(values.toArray(), weights.toArray(), discretizer, true);
     }
 
@@ -150,8 +152,8 @@ public class MatrixDistanceCompare implements AnalyzerTask<NumericMatrix> {
                 distanceMatrix.set(i, j, d);
             } else {
                 d = 0.0;
-                if(z_i == null) System.err.println(String.format("Zone %s not found.", i));
-                if(z_j == null) System.err.println(String.format("Zone %s not found.", j));
+                if(z_i == null) logger.warn(String.format("Zone %s not found.", i));
+                if(z_j == null) logger.warn(String.format("Zone %s not found.", j));
             }
         }
 

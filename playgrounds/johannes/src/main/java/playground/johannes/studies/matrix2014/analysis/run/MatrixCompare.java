@@ -19,11 +19,16 @@
 
 package playground.johannes.studies.matrix2014.analysis.run;
 
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
+import org.matsim.contrib.common.stats.LinearDiscretizer;
+import playground.johannes.studies.matrix2014.analysis.MatrixDistanceCompare;
+import playground.johannes.studies.matrix2014.analysis.MatrixMarginalsCompare;
+import playground.johannes.studies.matrix2014.analysis.MatrixVolumeCompare;
 import playground.johannes.studies.matrix2014.matrix.ODPredicate;
 import playground.johannes.studies.matrix2014.matrix.VolumePredicate;
-import playground.johannes.synpop.analysis.AnalyzerTaskComposite;
-import playground.johannes.synpop.analysis.FileIOContext;
+import playground.johannes.synpop.analysis.*;
 import playground.johannes.synpop.gis.ZoneCollection;
 import playground.johannes.synpop.gis.ZoneGeoJsonIO;
 import playground.johannes.synpop.matrix.MatrixOperations;
@@ -31,6 +36,7 @@ import playground.johannes.synpop.matrix.NumericMatrix;
 import playground.johannes.synpop.matrix.NumericMatrixIO;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 /**
  * @author johannes
@@ -77,23 +83,24 @@ public class MatrixCompare {
         logger.debug(String.format("Normalization factor: %s.", simTotal/refTotal));
         MatrixOperations.applyFactor(refMatrix, simTotal / refTotal);
 
-        AnalyzerTaskComposite<NumericMatrix> composite = new AnalyzerTaskComposite<>();
+        AnalyzerTaskComposite<Pair<NumericMatrix, NumericMatrix>> composite = new AnalyzerTaskComposite<>();
 
-//        MatrixVolumeCompare volTask = new MatrixVolumeCompare("matrix.vol");
-//        volTask.setReferenceMatrix(refMatrix);
-//        volTask.setIoContext(ioContext);
-//
-//        MatrixDistanceCompare distTask = new MatrixDistanceCompare("matrix.dist", zones);
-//        distTask.setReferenceMatrix(refMatrix);
-//        distTask.setFileIoContext(ioContext);
-//
-//        MatrixMarginalsCompare marTask = new MatrixMarginalsCompare();
-//        marTask.setReferenceMatrix(refMatrix, "");
-//
-//        composite.addComponent(volTask);
-//        composite.addComponent(distTask);
-//        composite.addComponent(marTask);
-//
-//        composite.analyze(simMatrix, new ArrayList<StatsContainer>());
+        HistogramWriter writer = new HistogramWriter(ioContext, new PassThroughDiscretizerBuilder(new
+                LinearDiscretizer(0.05), "linear"));
+        MatrixVolumeCompare volTask = new MatrixVolumeCompare("matrix.vol");
+        volTask.setIoContext(ioContext);
+        volTask.setHistogramWriter(writer);
+
+        MatrixDistanceCompare distTask = new MatrixDistanceCompare("matrix.dist", zones);
+        distTask.setFileIoContext(ioContext);
+
+        MatrixMarginalsCompare marTask = new MatrixMarginalsCompare("matrix");
+        marTask.setHistogramWriter(writer);
+
+        composite.addComponent(volTask);
+        composite.addComponent(distTask);
+        composite.addComponent(marTask);
+
+        composite.analyze(new ImmutablePair<>(refMatrix, simMatrix), new ArrayList<StatsContainer>());
     }
 }

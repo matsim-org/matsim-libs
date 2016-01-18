@@ -20,6 +20,7 @@
 package playground.johannes.studies.matrix2014.analysis;
 
 import gnu.trove.list.array.TDoubleArrayList;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.common.stats.StatsWriter;
 import playground.johannes.synpop.analysis.AnalyzerTask;
@@ -36,11 +37,9 @@ import java.util.Set;
 /**
  * @author johannes
  */
-public class MatrixVolumeCompare implements AnalyzerTask<NumericMatrix> {
+public class MatrixVolumeCompare implements AnalyzerTask<Pair<NumericMatrix, NumericMatrix>> {
 
     private static final Logger logger = Logger.getLogger(MatrixVolumeCompare.class);
-
-    private final NumericMatrix refMatrix;
 
     private final String dimension;
 
@@ -48,8 +47,7 @@ public class MatrixVolumeCompare implements AnalyzerTask<NumericMatrix> {
 
     private HistogramWriter histogramWriter;
 
-    public MatrixVolumeCompare(NumericMatrix refMatrix, String dimension) {
-        this.refMatrix = refMatrix;
+    public MatrixVolumeCompare(String dimension) {
         this.dimension = dimension;
     }
 
@@ -61,9 +59,11 @@ public class MatrixVolumeCompare implements AnalyzerTask<NumericMatrix> {
         this.histogramWriter = histogramWriter;
     }
 
-
     @Override
-    public void analyze(NumericMatrix simMatrix, List<StatsContainer> containers) {
+    public void analyze(Pair<NumericMatrix, NumericMatrix> matrices, List<StatsContainer> containers) {
+        NumericMatrix refMatrix = matrices.getLeft();
+        NumericMatrix simMatrix = matrices.getRight();
+
         NumericMatrix errMatrix = new NumericMatrix();
         MatrixOperations.errorMatrix(refMatrix, simMatrix, errMatrix);
 
