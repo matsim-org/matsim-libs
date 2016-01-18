@@ -19,9 +19,7 @@
 
 package org.matsim.contrib.accessibility;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.config.ReflectiveConfigGroup;
@@ -55,7 +53,7 @@ public final class AccessibilityConfigGroup extends ReflectiveConfigGroup{
 	private static final String AREA_OF_ACC_COMP = "areaOfAccessibilityComputation" ; 
 	public static enum AreaOfAccesssibilityComputation{ fromNetwork, fromBoundingBox, fromShapeFile } 
 	private AreaOfAccesssibilityComputation areaOfAccessibilityComputation = AreaOfAccesssibilityComputation.fromNetwork ;
-	private Map<Modes4Accessibility, Boolean> isComputingMode = new HashMap<>() ;
+	private Set<Modes4Accessibility> isComputingMode = EnumSet.noneOf(Modes4Accessibility.class);
 
 	
 	// ===
@@ -65,6 +63,7 @@ public final class AccessibilityConfigGroup extends ReflectiveConfigGroup{
 
 	public AccessibilityConfigGroup() {
 		super(GROUP_NAME);
+		isComputingMode.add(Modes4Accessibility.freeSpeed);
 	}
 	
 	@Override
@@ -93,10 +92,14 @@ public final class AccessibilityConfigGroup extends ReflectiveConfigGroup{
 	}
 	
 	public void setComputingAccessibilityForMode(Modes4Accessibility mode, boolean val) {
-		this.isComputingMode.put(mode, val);
+		if (val) {
+			this.isComputingMode.add(mode);
+		} else {
+			this.isComputingMode.remove(mode);
+		}
 	}
 
-	public Map<Modes4Accessibility, Boolean> getIsComputingMode() {
+	public Set<Modes4Accessibility> getIsComputingMode() {
 		return isComputingMode;
 	}
 

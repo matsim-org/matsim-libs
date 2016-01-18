@@ -29,7 +29,6 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.accessibility.FacilityTypes;
 import org.matsim.contrib.accessibility.osm.CombinedOsmReader;
-import org.matsim.contrib.accessibility.osm.LandUseBuildingReader;
 import org.matsim.facilities.Facility;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 

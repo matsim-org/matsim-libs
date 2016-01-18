@@ -64,7 +64,7 @@ public class AccessibilityComputationKiberaTest {
 
 		
 		// config and scenario
-		final Config config = ConfigUtils.createConfig(new AccessibilityConfigGroup(), new MatrixBasedPtRouterConfigGroup());
+		final Config config = ConfigUtils.createConfig(new MatrixBasedPtRouterConfigGroup());
 		config.network().setInputFile(networkFile);
 		config.facilities().setInputFile(facilitiesFile);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
@@ -80,11 +80,18 @@ public class AccessibilityComputationKiberaTest {
 		config.plans().setActivityDurationInterpretation( PlansConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration );
 
 		{
-			StrategySettings stratSets = new StrategySettings(ConfigUtils.createAvailableStrategyId(config));
+			StrategySettings stratSets = new StrategySettings();
 			stratSets.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta.toString());
 			stratSets.setWeight(1.);
 			config.strategy().addStrategySettings(stratSets);
 		}
+
+		AccessibilityConfigGroup accessibilityConfigGroup = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class);
+		accessibilityConfigGroup.setComputingAccessibilityForMode(Modes4Accessibility.freeSpeed, true);
+		accessibilityConfigGroup.setComputingAccessibilityForMode(Modes4Accessibility.car, true);
+		accessibilityConfigGroup.setComputingAccessibilityForMode(Modes4Accessibility.walk, true);
+		accessibilityConfigGroup.setComputingAccessibilityForMode(Modes4Accessibility.bike, true);
+		accessibilityConfigGroup.setComputingAccessibilityForMode(Modes4Accessibility.pt, false);
 		
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
 		

@@ -17,6 +17,7 @@ import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
 import org.matsim.contrib.accessibility.FacilityTypes;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
 import org.matsim.contrib.accessibility.utils.AccessibilityRunUtils;
+import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtModule;
 import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtRouterConfigGroup;
 import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
@@ -154,7 +155,6 @@ public class AccessibilityComputationNMBTest {
 //        BoundingBox boundingBox = BoundingBox.createBoundingBox(scenario.getNetwork());
 //		PtMatrix ptMatrix = PtMatrix.createPtMatrix(plansCalcRoute, boundingBox, mbpcg);
 
-		
 		assertNotNull(config);
 
 		
@@ -185,8 +185,7 @@ public class AccessibilityComputationNMBTest {
 //		modes.add( Modes4Accessibility.pt ) ;
 		
 		controler.addOverridingModule(new AccessibilityComputationTestModule(activityTypes, homes, crs, name, cellSize));
-
-		
+		controler.addOverridingModule(new MatrixBasedPtModule());
 		controler.run();
 		
 //		geoserverUpdater.setAndProcessSpatialGrids(modes);

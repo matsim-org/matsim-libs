@@ -38,8 +38,6 @@ import org.matsim.contrib.matrixbasedptrouter.utils.CreateTestPopulation;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.network.NetworkWriter;
@@ -118,7 +116,7 @@ public class MatrixBasedPtRouterIntegrationTest {
 		final PtMatrix ptMatrix = PtMatrix.createPtMatrix(config.plansCalcRoute(), nbb, ConfigUtils.addOrGetModule(config, MatrixBasedPtRouterConfigGroup.GROUP_NAME, MatrixBasedPtRouterConfigGroup.class));
 
 		Controler controler = new Controler(scenario) ;
-		controler.addOverridingModule(new MatrixBasedPtModule(ptMatrix));
+		controler.addOverridingModule(new MatrixBasedPtModule());
 		controler.run();
 		
 		// compute the travel time from home to work activity

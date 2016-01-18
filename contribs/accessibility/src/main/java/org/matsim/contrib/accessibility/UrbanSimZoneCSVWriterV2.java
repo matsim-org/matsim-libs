@@ -24,14 +24,16 @@ public final class UrbanSimZoneCSVWriterV2 implements FacilityDataExchangeInterf
 	private BufferedWriter zoneWriter = null;
 	public static final String FILE_NAME= "zones.csv";
 	private  String matsim4opusTempDirectory ;
-	
+	private String matsimOutputDirectory;
+
 	/**
 	 * writes the header for zones csv file
 	 */
-	public UrbanSimZoneCSVWriterV2(String matsim4opusTempDirectory){
+	public UrbanSimZoneCSVWriterV2(String matsim4opusTempDirectory, String matsimOutputDirectory){
 		
 		this.matsim4opusTempDirectory = matsim4opusTempDirectory;
-		
+		this.matsimOutputDirectory = matsimOutputDirectory;
+
 		try{
 			log.info("Initializing UrbanSimZoneCSVWriterV2 ...");
 			zoneWriter = IOUtils.getBufferedWriter( matsim4opusTempDirectory + FILE_NAME );
@@ -74,25 +76,27 @@ public final class UrbanSimZoneCSVWriterV2 implements FacilityDataExchangeInterf
 			throw new RuntimeException("io did not work") ;
 		}
 	}
-	
+
 	/**
 	 * finalize and close csv file
 	 */
-	public void close(String matsimOutputDirectory){
+	@Override
+	public void finish() {
 		try {
 			log.info("Closing UrbanSimZoneCSVWriterV2 ...");
 			assert(zoneWriter != null);
 			zoneWriter.flush();
 			zoneWriter.close();
-			
+
 			// copy the zones file to the outputfolder...
 			log.info("Copying " + matsim4opusTempDirectory + FILE_NAME + " to " + matsimOutputDirectory + FILE_NAME);
 			IOUtils.copyFile(new File( matsim4opusTempDirectory + FILE_NAME),	new File( matsimOutputDirectory + FILE_NAME));
-			
+
 			log.info("... done!");
 		} catch (IOException e) {
 			e.printStackTrace();
 			throw new RuntimeException("io did not work") ;
-		}	
+		}
 	}
+
 }

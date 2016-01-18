@@ -291,4 +291,9 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Faci
 
 	}
 
+	@Override
+	public void finish() {
+
+	}
+
 }
