@@ -58,7 +58,15 @@ public class SignalsViaCSVWriter {
 	private static final String SIGNAL_STATE_GREEN = "GREEN";
 	private static final String SIGNAL_STATE_RED = "RED";	
 		
+	/**
+	 * distance between signal (the coordinate that will be drawn) 
+	 * and node in direction of the link
+	 */
 	private static final double SIGNAL_COORD_NODE_OFFSET = 20.0;
+	/**
+	 * distance between signal (the coordinate that will be drawn) 
+	 * and link in orthogonal direction to the link
+	 */
 	private static final double SIGNAL_COORD_LINK_OFFSET = 5.0;
 
 	private SignalsData signalsData;
@@ -146,10 +154,27 @@ public class SignalsViaCSVWriter {
 			stepNumber = firstSignalLane.getAlignment();
 		}
 		
-		double m = (toNodeCoord.getY() - fromNodeCoord.getY()) / (toNodeCoord.getX() - fromNodeCoord.getX());
-		double deltaX = SIGNAL_COORD_NODE_OFFSET / (Math.sqrt(1 + m * m));
-		double deltaY = m * deltaX;
+		//calculate delta X and Y depending on the node offset
+		double deltaX = 0;
+		double deltaY = 0;
+		// handle different cases of links
+		if (toNodeCoord.getX() == fromNodeCoord.getX()){
+			// vertical link 
+			deltaX = 0;
+			if (toNodeCoord.getY() < fromNodeCoord.getY()){
+				deltaY = -SIGNAL_COORD_NODE_OFFSET;
+			} else {
+				deltaY = SIGNAL_COORD_NODE_OFFSET;
+			}
+			
+		} else {
+			// this case includes the case when the link is horizontal
+			double m = (toNodeCoord.getY() - fromNodeCoord.getY()) / (toNodeCoord.getX() - fromNodeCoord.getX());
+			deltaX = SIGNAL_COORD_NODE_OFFSET / (Math.sqrt(1 + m * m));
+			deltaY = m * deltaX;
+		}
 		
+		// calculate x and y coord where the signal should be drawn
 		double x = toNodeCoord.getX() - deltaX + stepNumber * deltaY * (SIGNAL_COORD_LINK_OFFSET / SIGNAL_COORD_NODE_OFFSET);
 		double y = toNodeCoord.getY() - deltaY - stepNumber * deltaX * (SIGNAL_COORD_LINK_OFFSET / SIGNAL_COORD_NODE_OFFSET);
 		
