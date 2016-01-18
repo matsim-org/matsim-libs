@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,45 +17,49 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.counts;
+package playground.johannes.studies.matrix2014.counts;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.CountsReaderMatsimV1;
+import org.matsim.counts.CountsWriter;
 
 /**
  * @author johannes
- *
+ * 
  */
-public class CountsCompare {
+public class ApplyFactor {
 
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		Counts<Link> countsOld = new Counts();
-		CountsReaderMatsimV1 reader = new CountsReaderMatsimV1(countsOld);
-		reader.parse("/home/johannes/gsv/counts/counts.2009.net20140909.5.24h.xml");
-		
-		Counts<Link> countsNew = new Counts();
-		reader = new CountsReaderMatsimV1(countsNew);
-		reader.parse("/home/johannes/gsv/counts/counts.2013.net20140909.5.24h.xml");
+		String inFile = "/home/johannes/gsv/matrix2014/counts/counts.2014.net20140909.5.xml";
+		String outFile = "/home/johannes/gsv/matrix2014/counts/counts.2014.net20140909.5.24h.xml";
+		double factor = 1/24.0;
 
-		double errsumAbs = 0;
-		double errsum = 0;
-		double cnt = 0;
-		for(Count countOld : countsOld.getCounts().values()) {
-			Count countNew = countsNew.getCount(countOld.getLocId());
-			if(countNew != null) {
-				double err = (countNew.getVolume(1).getValue() - countOld.getVolume(1).getValue()) / countOld.getVolume(1).getValue();
-				errsumAbs += Math.abs(err);
-				errsum += err;
-				cnt++;
+		Counts<Link> counts = new Counts();
+		CountsReaderMatsimV1 reader = new CountsReaderMatsimV1(counts);
+		reader.parse(inFile);
+
+		Counts<Link> newCounts = new Counts();
+		newCounts.setDescription(counts.getDescription());
+		newCounts.setName(counts.getName());
+		newCounts.setYear(counts.getYear());
+
+		for (Count count : counts.getCounts().values()) {
+			if (count.getVolume(1).getValue() != 0) {
+				Count newCount = newCounts.createAndAddCount(count.getLocId(), count.getCsId());
+				for (int i = 1; i < 25; i++) {
+					newCount.createVolume(i, count.getVolume(i).getValue() * factor);
+				}
+				newCount.setCoord(count.getCoord());
 			}
 		}
-		
-		System.out.println("Average error = " + errsum/cnt);
+
+		CountsWriter writer = new CountsWriter(newCounts);
+		writer.write(outFile);
 	}
 
 }

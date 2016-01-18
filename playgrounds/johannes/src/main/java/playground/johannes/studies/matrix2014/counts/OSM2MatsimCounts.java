@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.counts;
+package playground.johannes.studies.matrix2014.counts;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -37,21 +37,24 @@ import java.util.Map.Entry;
  * @author johannes
  * 
  */
-public class MatchFromOrigId {
+public class OSM2MatsimCounts {
 
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
+		String osmCountsFile = "/home/johannes/gsv/matrix2014/counts/counts.2014.osm20140909.xml";
+		String networkFile = "/home/johannes/gsv/germany-scenario/osm/network/germany-20140909.5.xml";
+		String outFile = "/home/johannes/gsv/matrix2014/counts/counts.2014.net20140909.5.xml";
 
 		Counts<Link> counts = new Counts();
 		CountsReaderMatsimV1 cReader = new CountsReaderMatsimV1(counts);
-		cReader.parse("/home/johannes/sge/prj/osm/run/678/output/counts.2013.osm20140909.xml");
+		cReader.parse(osmCountsFile);
 
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		NetworkReaderMatsimV1 nReader = new NetworkReaderMatsimV1(scenario.getNetwork());
-		nReader.parse("/home/johannes/gsv/osm/network/germany-20140909.5.xml");
+		nReader.parse(networkFile);
 
 		Network network = scenario.getNetwork();
 
@@ -59,9 +62,6 @@ public class MatchFromOrigId {
 
 		for (Link link : network.getLinks().values()) {
 			String tokens[] = ((LinkImpl) link).getOrigId().split(",");
-			// if(tokens.length > 1) {
-			// System.err.println();
-			// }
 			for (String token : tokens) {
 				mapping.put(token, link);
 			}
@@ -92,7 +92,7 @@ public class MatchFromOrigId {
 		System.out.println(String.format("Number of new counts: %s", newCounts.getCounts().size()));
 		
 		CountsWriter writer = new CountsWriter(newCounts);
-		writer.write("/home/johannes/gsv/counts/counts.2013.net20140909.5.xml");
+		writer.write(outFile);
 	}
 
 }
