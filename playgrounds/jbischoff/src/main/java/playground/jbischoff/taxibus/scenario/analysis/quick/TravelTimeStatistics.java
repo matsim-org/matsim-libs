@@ -47,24 +47,51 @@ public class TravelTimeStatistics   {
 //		String inputFile = "D:/runs-svn/vw_rufbus/vwTB04/vwTB04.output_events.xml.gz";
 //		String inputFile = "D:/runs-svn/vw_rufbus/vw054/vw054.output_events.xml.gz";
 //		String inputFile = "D:/runs-svn/vw_rufbus/vw057/vw056.output_events.xml.gz";
-		String inputFile = "D:/runs-svn/vw_rufbus/vw061TBa/vw061TBa.output_events.xml.gz";
-		
-				EventsManager events = EventsUtils.createEventsManager();
+		String run = "VW06ML";
+		String folder = "D:/runs-svn/vw_rufbus/" + run + "/";
+		String inputFile = folder + run + ".output_events.xml.gz";
+
+		EventsManager events = EventsUtils.createEventsManager();
 
 		Set<Id<Link>> links = new HashSet<>();
-		links.add(Id.createLinkId(57196)); //a39
-		links.add(Id.createLinkId(42571)); //L295
+		links.add(Id.createLinkId(57196)); // a39
+		links.add(Id.createLinkId(42571)); // L295
+
+		TTEventHandler carTT = new TTEventHandler();
+		TTEventHandler allTT = new TTEventHandler();
+		TTEventHandler tbTT = new TTEventHandler();
+		TTEventHandler ptTT = new TTEventHandler();
+		TaxibusDriveAnalyser analyser = new TaxibusDriveAnalyser();
+
+		carTT.addMode("car");
+
+		allTT.addMode("car");
+		allTT.addMode("pt");
+		allTT.addMode("taxibus");
+
+		ptTT.addMode("pt");
+
+		tbTT.addMode("taxibus");
+
+		TaxiBusTravelTimesAnalyzer a = new TaxiBusTravelTimesAnalyzer();
+
+		events.addHandler(carTT);
+		events.addHandler(ptTT);
+		events.addHandler(tbTT);
+		events.addHandler(allTT);
+		events.addHandler(analyser);
 		
-		TTEventHandler tt = new TTEventHandler();
-		TTLocationBasedEventHandler lb = new TTLocationBasedEventHandler(links);
-		
-		
-		events.addHandler(tt);
-		events.addHandler(lb);
+		events.addHandler(a);
 		new MatsimEventsReader(events).readFile(inputFile);
 		System.out.println(inputFile);
-		tt.printOutput();
-		lb.printOutput();
+
+		carTT.writeOutput(folder);
+		allTT.writeOutput(folder);
+		ptTT.writeOutput(folder);
+		tbTT.writeOutput(folder);
+		analyser.writeOutput(folder);
+
+		a.printOutput();
 	}
 	
 

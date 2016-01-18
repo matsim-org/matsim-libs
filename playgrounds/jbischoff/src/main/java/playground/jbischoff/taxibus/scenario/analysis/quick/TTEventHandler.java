@@ -19,6 +19,8 @@
 
 package playground.jbischoff.taxibus.scenario.analysis.quick;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -34,6 +36,7 @@ import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.utils.io.IOUtils;
 
 import playground.jbischoff.taxibus.scenario.analysis.WobDistanceAnalyzer;
 
@@ -46,9 +49,13 @@ public class TTEventHandler implements ActivityStartEventHandler, PersonDepartur
 	Map<Id<Person>, Double> lastDeparture = new HashMap<>();
 	Map<String, Double> ttToActivity = new TreeMap<>();
 	Map<String, Integer> legsToActivity = new HashMap<>();
+	ArrayList<String> monitoredModes = new ArrayList<>();
+	ArrayList<String> outboundLegs = new ArrayList<>(Arrays.asList(new String[] { "home--work_vw_flexitime","home--work_vw_shift1","home--work_vw_shift2", "home--work"}));
+	ArrayList<String> inboundLegs = new ArrayList<>(Arrays.asList(new String[] { "work--home" ,"work_vw_flexitime--home" ,"work_vw_shift1--home" ,"work_vw_shift2--home"}));
+	
 //	ArrayList<String> monitoredModes = new ArrayList<>(Arrays.asList(new String[] { "taxibus"}));
 //	ArrayList<String> monitoredModes = new ArrayList<>(Arrays.asList(new String[] { "car"}));
-	ArrayList<String> monitoredModes = new ArrayList<>(Arrays.asList(new String[] { "pt","taxibus","car"}));
+//	ArrayList<String> monitoredModes = new ArrayList<>(Arrays.asList(new String[] { "pt","taxibus","car"}));
 //	ArrayList<String> monitoredModes = new ArrayList<>(Arrays.asList(new String[] { "tpt" }));
 	
 
@@ -60,7 +67,10 @@ public class TTEventHandler implements ActivityStartEventHandler, PersonDepartur
 	public void reset(int iteration) {
 		
 	}
-
+	public void addMode(String monitoredMode){
+		this.monitoredModes.add(monitoredMode);
+	}
+	
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
 		if (!this.monitoredModes.contains(event.getLegMode()))
@@ -109,7 +119,6 @@ public class TTEventHandler implements ActivityStartEventHandler, PersonDepartur
 	}
 
 	private void addTTtoActivity(String activityString, double traveltime) {
-		double tt = traveltime;
 		int legs = 1;
 		if (this.ttToActivity.containsKey(activityString)) {
 			traveltime += this.ttToActivity.get(activityString);
@@ -132,5 +141,48 @@ public class TTEventHandler implements ActivityStartEventHandler, PersonDepartur
 					e.getKey() + "\t" + legs + "\t" + WobDistanceAnalyzer.prettyPrintSeconds(e.getValue() / legs));
 		}
 
+	}
+	public void writeOutput(String folder){
+		String modeString = ""; 
+		for (String mode : this.monitoredModes){
+			modeString+=mode;
+		}
+		
+		BufferedWriter writer = IOUtils.getBufferedWriter(folder+"/act_travelTimes_"+modeString+".txt");
+		int inboundLegCount = 0;
+		double inboundTravelTime = 0;
+		int outboundLegCount = 0;
+		double outboundTravelTime = 0;
+			
+		try {
+			writer.append("Modes analysed: "+this.monitoredModes.toString());
+			writer.newLine();
+			writer.append("Activity\tLegs\tAveTT\n");
+			for (Entry<String, Double> e : this.ttToActivity.entrySet()) {
+			double legs = this.legsToActivity.get(e.getKey());
+			writer.append(e.getKey() + "\t" + legs + "\t" + WobDistanceAnalyzer.prettyPrintSeconds(e.getValue() / legs)+"\n");
+			if (inboundLegs.contains(e.getKey())){
+				inboundLegCount += legs;
+				inboundTravelTime += e.getValue();
+			}
+			else if (outboundLegs.contains(e.getKey())){
+				outboundLegCount += legs;
+				outboundTravelTime += e.getValue();
+			}
+			}
+			writer.newLine();
+			writer.append("Fahrzeit Morgenspitze" + "\t" + outboundLegCount + "\t" + WobDistanceAnalyzer.prettyPrintSeconds(outboundTravelTime/outboundLegCount)+"\n");
+			writer.append("Fahrzeit Abendspitze" + "\t" + inboundLegCount + "\t" + WobDistanceAnalyzer.prettyPrintSeconds(inboundTravelTime/inboundLegCount)+"\n");
+			writer.flush();
+			writer.close();
+
+			
+			
+			
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+	
 	}
 }

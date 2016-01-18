@@ -49,17 +49,25 @@ public class TaxibusLineImpl implements TaxibusLine {
 	private Queue<Vehicle> vehiclesInHold = new LinkedList<>();
 
 	private double currentLambda = 0.;
-	private double currentTwMax = 30 * 60;
+	private double currentTwMax;
 	private double currentOccupationRate = 8;
 	private int maxVehicles = 8;
 	private double singleTripTravelTime;
 
+	/**
+	 * @param lineId the Line Id
+	 * @param holdingPosition Link Id where taxibusses stand by for line dispatch
+	 * @param departureZone Departure area
+	 * @param arrivalZone Arrival Area
+	 * @param twMax time waited between first pickup and departure towards destination in seconds
+	 */
 	public TaxibusLineImpl(Id<TaxibusLine> lineId, Id<Link> holdingPosition, MultiPolygon departureZone,
-			MultiPolygon arrivalZone) {
+			MultiPolygon arrivalZone, double twMax) {
 		this.lineId = lineId;
 		this.holdingPosition = holdingPosition;
 		this.departureZone = departureZone;
 		this.arrivalZone = arrivalZone;
+		this.currentTwMax = twMax;
 	}
 
 	@Override
