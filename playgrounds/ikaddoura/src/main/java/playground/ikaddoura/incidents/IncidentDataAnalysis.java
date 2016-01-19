@@ -88,7 +88,7 @@ public class IncidentDataAnalysis {
 		collectTrafficItems();
 		loadScenario();
 		computeCarNetwork();
-		computeBlockedPath();
+		computePath();
 		writeIncidentLinksToShapeFile();
 		
 		OutputDirectoryLogging.closeOutputDirLogging();
@@ -194,13 +194,16 @@ public class IncidentDataAnalysis {
 //				TrafficItemWriter writer = new TrafficItemWriter();
 //				writer.writeCSVFile(trafficItemReader.getTrafficItems(), outputCSVFile);
 				
-				int counter = 0;
+				int counterNew = 0;
+				int counterUpdated = 0;
+				int counterIgnored = 0;
 				for (TrafficItem item : trafficItemReader.getTrafficItems()) {
 					if (trafficItems.containsKey(item.getId())) {
 						// Item with same ID is already in the map.
 						
 						if (item.toString().equals(trafficItems.get(item.getId()).toString())) {
 							// Everything is fine. No need for adding the item to the map.
+							counterIgnored++;
 							
 						} else {
 							// The traffic item information is different.
@@ -220,17 +223,20 @@ public class IncidentDataAnalysis {
 							
 							// Adding the more recent information.
 							if  (item.getDownloadTime() > trafficItems.get(item.getId()).getDownloadTime() ) {
+								counterUpdated++;
 								trafficItems.put(item.getId(), item);
 							}
 						}
 						
 					} else {
-						counter++;
+						counterNew++;
 						trafficItems.put(item.getId(), item);
 					}
 				}
 				
-				log.info(" +++ " + counter + " new traffic items added to map.");
+				log.info(" +++ " + counterNew + " new traffic items added to map.");
+				log.info(" +++ " + counterIgnored + " traffic items ignored (already in the map).");
+				log.info(" +++ " + counterUpdated + " traffic items updated (more recent information).");
 			}
 			log.info("Collecting traffic items from all xml files in directory " + this.outputDirectory + "... Done.");
 		}
@@ -240,7 +246,7 @@ public class IncidentDataAnalysis {
 		
 	}
 	
-	private void computeBlockedPath() {
+	private void computePath() {
 		
 		log.info("Processing traffic items...");
 		
@@ -261,6 +267,9 @@ public class IncidentDataAnalysis {
 			Link linkTo = NetworkUtils.getNearestLink(carNetwork, coordToGK4);
 
 			Path path = f.createPathCalculator(scenario.getNetwork(), travelCosts, new FreeSpeedTravelTime()).calcLeastCostPath(linkOrigin.getFromNode(), linkTo.getToNode(), 0., null, null);
+			if (path == null || path.links.size() == 0) {
+				log.warn("No path identified for incident " + this.trafficItems.get(id).toString());
+			}
 			this.trafficItemId2path.put(id, path);
 		}
 		
