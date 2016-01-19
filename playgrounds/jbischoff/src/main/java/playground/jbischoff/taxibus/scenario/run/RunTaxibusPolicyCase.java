@@ -61,7 +61,11 @@ public class RunTaxibusPolicyCase {
 
 	public static void main(String[] args) {
 
-		Config config = ConfigUtils.loadConfig("../../../shared-svn/projects/vw_rufbus/scenario/input/configs/configSingleRunM.xml", new TaxibusConfigGroup());
+		String configFileName = "../../../shared-svn/projects/vw_rufbus/scenario/input/configs/configSingleRunM.xml";
+		if (args.length>0){
+			configFileName = args[0];
+		}
+		Config config = ConfigUtils.loadConfig(configFileName, new TaxibusConfigGroup());
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 		config.qsim().setSnapshotStyle(SnapshotStyle.queue);
 		final Scenario scenario = ScenarioUtils.loadScenario(config);

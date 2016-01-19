@@ -47,9 +47,17 @@ public class TravelTimeStatistics   {
 //		String inputFile = "D:/runs-svn/vw_rufbus/vwTB04/vwTB04.output_events.xml.gz";
 //		String inputFile = "D:/runs-svn/vw_rufbus/vw054/vw054.output_events.xml.gz";
 //		String inputFile = "D:/runs-svn/vw_rufbus/vw057/vw056.output_events.xml.gz";
-		String run = "VW06ML";
-		String folder = "D:/runs-svn/vw_rufbus/" + run + "/";
+		
+		
+		
+		String run = "vw058";
+//		String folder = "D:/runs-svn/vw_rufbus/" + run + "/";
+		String folder = "D:/runs-svn/vw_rufbus/delievery/20160121/runs/" + run + "/";
 		String inputFile = folder + run + ".output_events.xml.gz";
+		
+		if (args.length>0){
+		inputFile=args[0];	
+		}
 
 		EventsManager events = EventsUtils.createEventsManager();
 
