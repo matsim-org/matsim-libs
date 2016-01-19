@@ -66,10 +66,8 @@ class TaxiConfigUtils
     {
         List<Configuration> algoCfgs = new ArrayList<>();
 
-        int idx = 0;
-        while (config.containsKey(OPTIMIZER + "_" + idx)) {
-            algoCfgs.add(new SubsetConfiguration(config, OPTIMIZER + "_" + idx, DELIMITER));
-            idx++;
+        for (String o : config.getStringArray(OPTIMIZER)) {
+            algoCfgs.add(new SubsetConfiguration(config, o));
         }
 
         return algoCfgs;

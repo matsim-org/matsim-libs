@@ -28,7 +28,7 @@ class TaxiLauncherParams
     static final String TAXI_STATS_FILE = "taxiStatsFile";
     static final String DETAILED_TAXI_STATS_DIR = "detailedTaxiStatsDir";
     static final String E_TAXI_STATS_FILE = "eTaxiStatsFile";
-    static final String MULTI_RUN_STATS_DIR = "multiRunStats";
+    static final String MULTI_RUN_STATS_DIR = "multiRunStatsDir";
 
     final String netFile;
     final String plansFile;
