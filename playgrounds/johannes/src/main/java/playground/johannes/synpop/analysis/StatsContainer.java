@@ -146,10 +146,14 @@ public class StatsContainer {
     This is not a precise calculation of the median, yet should be ok for large samples sizes.
      */
     private double calculateMedian(double[] values) {
-        double[] tempValues = Arrays.copyOf(values, values.length);
-        Arrays.sort(tempValues);
+        if(values.length > 0) {
+            double[] tempValues = Arrays.copyOf(values, values.length);
+            Arrays.sort(tempValues);
 
-        return tempValues[tempValues.length / 2];
+            return tempValues[tempValues.length / 2];
+        } else {
+            return Double.NaN;
+        }
     }
 
     private double calculateWeightedMedian(double[] values, double[] weights) {

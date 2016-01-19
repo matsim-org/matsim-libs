@@ -21,6 +21,7 @@ package playground.johannes.studies.matrix2014.sim;
 
 import org.apache.commons.math.FunctionEvaluationException;
 import org.apache.commons.math.analysis.UnivariateRealFunction;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.common.stats.Discretizer;
 import org.matsim.contrib.common.stats.FixedBordersDiscretizer;
@@ -69,6 +70,8 @@ public class Simulator {
      * @throws IOException
      */
     public static void main(String[] args) throws IOException {
+        Logger.getRootLogger().setLevel(Level.TRACE);
+
         final Config config = new Config();
         ConfigUtils.loadConfig(config, args[0]);
 
@@ -211,8 +214,8 @@ public class Simulator {
     }
 
     private static AnalyzerTaskComposite<Collection<? extends Person>> buildAnalyzer(DataPool dataPool, FileIOContext ioContext, Collection<Person> persons) {
-        final ConcurrentAnalyzerTask<Collection<? extends Person>> task = new ConcurrentAnalyzerTask<>();
-
+//        final ConcurrentAnalyzerTask<Collection<? extends Person>> task = new ConcurrentAnalyzerTask<>();
+        final AnalyzerTaskComposite<Collection<? extends Person>> task = new AnalyzerTaskComposite<>();
         buildGeoDistanceAnalyzer(task, ioContext, dataPool);
 
 
@@ -269,12 +272,14 @@ public class Simulator {
     }
 
     private static void extendAnalyzer(AnalyzerTaskComposite<Collection<? extends Person>> task, DataPool dataPool, FileIOContext ioContext, Config config) {
+        ConcurrentAnalyzerTask<Collection<? extends Person>> matrixTasks = new ConcurrentAnalyzerTask<>();
+
         ModePredicate modePredicate = new ModePredicate(CommonValues.LEG_MODE_CAR);
-        MatrixAnalyzer mAnalyzer = (MatrixAnalyzer) new MatrixAnalyzerConfigurator(config.getModule("matrixAnalyzerITP")
+        MatrixComparator mAnalyzer = (MatrixComparator) new MatrixAnalyzerConfigurator(config.getModule("matrixAnalyzerITP")
                 , dataPool, ioContext).load();
-        mAnalyzer.setPredicate(modePredicate);
+        mAnalyzer.setLegPredicate(modePredicate);
         mAnalyzer.setUseWeights(true);
-        task.addComponent(mAnalyzer);
+        matrixTasks.addComponent(mAnalyzer);
 
 //        mAnalyzer = (MatrixAnalyzer) new MatrixAnalyzerConfigurator(config.getModule("matrixAnalyzerITP-2")
 //                , dataPool, ioContext).load();
@@ -282,15 +287,15 @@ public class Simulator {
 //        mAnalyzer.setUseWeights(true);
 //        task.addComponent(mAnalyzer);
 
-        mAnalyzer = (MatrixAnalyzer) new MatrixAnalyzerConfigurator(config.getModule("matrixAnalyzerTomTom")
+        mAnalyzer = (MatrixComparator) new MatrixAnalyzerConfigurator(config.getModule("matrixAnalyzerTomTom")
                 , dataPool, ioContext).load();
-        mAnalyzer.setPredicate(modePredicate);
+        mAnalyzer.setLegPredicate(modePredicate);
         ZoneData zoneData = (ZoneData) dataPool.get(ZoneDataLoader.KEY);
         ZoneCollection zones = zoneData.getLayer("tomtom");
         ODPredicate distPredicate = new ZoneDistancePredicate(zones, 100000);
-        mAnalyzer.setODPredicate(distPredicate);
+        mAnalyzer.setNormPredicate(distPredicate);
         mAnalyzer.setUseWeights(true);
-        task.addComponent(mAnalyzer);
+        matrixTasks.addComponent(mAnalyzer);
 
 //        mAnalyzer = (MatrixAnalyzer) new MatrixAnalyzerConfigurator(config.getModule("matrixAnalyzerTomTom-2")
 //                , dataPool, ioContext).load();
@@ -303,7 +308,11 @@ public class Simulator {
         MatrixWriter matrixWriter = new MatrixWriter(facilities, zones, ioContext);
         matrixWriter.setPredicate(modePredicate);
         matrixWriter.setUseWeights(true);
-        task.addComponent(matrixWriter);
+        matrixTasks.addComponent(matrixWriter);
+
+        AnalyzerTaskGroup<Collection<? extends Person>> group = new AnalyzerTaskGroup<>(matrixTasks, ioContext,
+                "matrix");
+        task.addComponent(group);
 
         task.addComponent(new PopulationWriter(ioContext));
 
@@ -388,31 +397,37 @@ public class Simulator {
 
     private static AnalyzerTask<Collection<? extends Person>> buildGeoDistanceAnalyzer
             (AnalyzerTaskComposite<Collection<? extends Person>> tasks, FileIOContext ioContext, DataPool dataPool) {
+//        AnalyzerTaskComposite<Collection<? extends Person>> composite = new AnalyzerTaskComposite<>();
+        ConcurrentAnalyzerTask<Collection<? extends Person>> composite = new ConcurrentAnalyzerTask<>();
+
         HistogramWriter histogramWriter = new HistogramWriter(ioContext, new StratifiedDiscretizerBuilder(100, 100));
         histogramWriter.addBuilder(new PassThroughDiscretizerBuilder(new LinearDiscretizer(50000), "linear"));
         histogramWriter.addBuilder(new PassThroughDiscretizerBuilder(new FixedBordersDiscretizer(new double[]{-1,
                 100000, Integer.MAX_VALUE}), "100KM"));
 
         Predicate<Segment> modePredicate = new ModePredicate(CommonValues.LEG_MODE_CAR);
-        tasks.addComponent(NumericLegAnalyzer.create(CommonKeys.LEG_ROUTE_DISTANCE, true, modePredicate, "car",
+        composite.addComponent(NumericLegAnalyzer.create(CommonKeys.LEG_ROUTE_DISTANCE, true, modePredicate, "car",
                 histogramWriter));
-        tasks.addComponent(NumericLegAnalyzer.create(CommonKeys.LEG_GEO_DISTANCE, true, modePredicate, "car",
+        composite.addComponent(NumericLegAnalyzer.create(CommonKeys.LEG_GEO_DISTANCE, true, modePredicate, "car",
                 histogramWriter));
 
         for (int klass = 0; klass < 6; klass++) {
             Predicate<Segment> lauPred = new LegPersonAttributePredicate(MiDKeys.PERSON_LAU2_CLASS, String.valueOf(klass));
             Predicate<Segment> predicate = PredicateAndComposite.create(modePredicate, lauPred);
             String label = String.format("car.lau%s", klass);
-            tasks.addComponent(NumericLegAnalyzer.create(CommonKeys.LEG_GEO_DISTANCE, true, predicate, label, histogramWriter));
+            composite.addComponent(NumericLegAnalyzer.create(CommonKeys.LEG_GEO_DISTANCE, true, predicate, label,
+                    histogramWriter));
         }
 
         Predicate<Segment> inTown = new LegAttributePredicate(MiDKeys.LEG_DESTINATION, MiDValues.IN_TOWN);
         Predicate<Segment> predicate = PredicateAndComposite.create(modePredicate, inTown);
-        tasks.addComponent(NumericLegAnalyzer.create(CommonKeys.LEG_GEO_DISTANCE, true, predicate, "car.inTown", histogramWriter));
+        composite.addComponent(NumericLegAnalyzer.create(CommonKeys.LEG_GEO_DISTANCE, true, predicate, "car.inTown",
+                histogramWriter));
 
         Predicate<Segment> outOfTown = new LegAttributePredicate(MiDKeys.LEG_DESTINATION, MiDValues.OUT_OF_TOWN);
         predicate = PredicateAndComposite.create(modePredicate, outOfTown);
-        tasks.addComponent(NumericLegAnalyzer.create(CommonKeys.LEG_GEO_DISTANCE, true, predicate, "car.outOfTown", histogramWriter));
+        composite.addComponent(NumericLegAnalyzer.create(CommonKeys.LEG_GEO_DISTANCE, true, predicate, "car.outOfTown",
+                histogramWriter));
 
 //        LegCollector<String> purposeCollector = new LegCollector<>(new AttributeProvider<Segment>(CommonKeys.LEG_PURPOSE));
 //        purposeCollector.setPredicate(modePredicate);
@@ -424,7 +439,10 @@ public class Simulator {
 //            tasks.addComponent(NumericLegAnalyzer.create(CommonKeys.LEG_GEO_DISTANCE, true, predicate, "car." + purpose, histogramWriter));
 //        }
 
+        AnalyzerTaskGroup<Collection<? extends Person>> group = new AnalyzerTaskGroup<>(composite, ioContext,
+                "geoDistance");
 
+        tasks.addComponent(group);
 
         return tasks;
     }

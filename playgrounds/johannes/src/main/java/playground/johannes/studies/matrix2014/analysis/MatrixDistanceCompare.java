@@ -24,8 +24,8 @@ import gnu.trove.list.array.TDoubleArrayList;
 import gnu.trove.map.hash.TDoubleDoubleHashMap;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
-import org.matsim.contrib.common.gis.CartesianDistanceCalculator;
 import org.matsim.contrib.common.gis.DistanceCalculator;
+import org.matsim.contrib.common.gis.OrthodromicDistanceCalculator;
 import org.matsim.contrib.common.stats.Discretizer;
 import org.matsim.contrib.common.stats.Histogram;
 import org.matsim.contrib.common.stats.LinearDiscretizer;
@@ -49,6 +49,8 @@ public class MatrixDistanceCompare implements AnalyzerTask<Pair<NumericMatrix, N
 
     private static final Logger logger = Logger.getLogger(MatrixDistanceCompare.class);
 
+    private final String dimension;
+
     private final NumericMatrix distanceMatrix;
 
     private final ZoneCollection zones;
@@ -57,8 +59,6 @@ public class MatrixDistanceCompare implements AnalyzerTask<Pair<NumericMatrix, N
 
     private Discretizer discretizer;
 
-    private final String dimension;
-
     private FileIOContext ioContext;
 
     public MatrixDistanceCompare(String dimension, ZoneCollection zones) {
@@ -66,8 +66,16 @@ public class MatrixDistanceCompare implements AnalyzerTask<Pair<NumericMatrix, N
         this.distanceMatrix = new NumericMatrix();
         this.zones = zones;
 
-        discretizer = new LinearDiscretizer(50000);
-        distanceCalculator = CartesianDistanceCalculator.getInstance();
+        setDiscretizer(new LinearDiscretizer(50000));
+        setDistanceCalculator(OrthodromicDistanceCalculator.getInstance());
+    }
+
+    public void setDistanceCalculator(DistanceCalculator calculator) {
+        this.distanceCalculator = calculator;
+    }
+
+    public void setDiscretizer(Discretizer discretizer) {
+        this.discretizer = discretizer;
     }
 
     public void setFileIoContext(FileIOContext ioContext) {
