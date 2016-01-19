@@ -1,5 +1,6 @@
 package floetteroed.opdyts.trajectorysampling;
 
+import static org.apache.commons.math3.optim.linear.Relationship.EQ;
 import static org.apache.commons.math3.optim.linear.Relationship.GEQ;
 
 import java.util.ArrayList;
@@ -15,6 +16,7 @@ import org.apache.commons.math3.optim.PointValuePair;
 import org.apache.commons.math3.optim.linear.LinearConstraint;
 import org.apache.commons.math3.optim.linear.LinearConstraintSet;
 import org.apache.commons.math3.optim.linear.LinearObjectiveFunction;
+import org.apache.commons.math3.optim.linear.NoFeasibleSolutionException;
 import org.apache.commons.math3.optim.linear.SimplexSolver;
 import org.apache.commons.math3.optim.linear.UnboundedSolutionException;
 
@@ -28,29 +30,36 @@ import floetteroed.utilities.math.Vector;
  */
 class WeightOptimizer {
 
-	private final RealVector dInterpolatedObjectiveFunctiondAlpha;
+	// -------------------- MEMBERS --------------------
 
-	private final RealVector dEquilibriumGapdAlpha;
+	private final RealVector dInterpolatedObjectiveFunction_dAlpha;
 
-	private final RealMatrix d2EquilibriumGapdAlpha2;
+	private final RealVector dEquilibriumGap_dAlpha;
 
-	private final RealVector dUniformityGapdAlpha;
+	private final RealMatrix d2EquilibriumGap_dAlpha2;
 
-	private final RealMatrix d2UniformityGapdAlpha2;
+	private final RealVector dUniformityGap_dAlpha;
+
+	private final RealMatrix d2UniformityGap_dAlpha2;
+
+	// -------------------- CONSTRUCTION --------------------
 
 	WeightOptimizer(final Vector dInterpolatedObjectiveFunctiondAlpha,
 			final Vector dEquilibriumGapdAlpha,
 			final Matrix d2EquilibriumGapdAlpha2,
 			final Vector dUniformityGapdAlpha,
 			final Matrix d2UniformityGapdAlpha2) {
-		this.dInterpolatedObjectiveFunctiondAlpha = toRealVector(dInterpolatedObjectiveFunctiondAlpha);
-		this.dEquilibriumGapdAlpha = toRealVector(dEquilibriumGapdAlpha);
-		this.d2EquilibriumGapdAlpha2 = toRealMatrix(d2EquilibriumGapdAlpha2);
-		this.dUniformityGapdAlpha = toRealVector(dUniformityGapdAlpha);
-		this.d2UniformityGapdAlpha2 = toRealMatrix(d2UniformityGapdAlpha2);
+		this.dInterpolatedObjectiveFunction_dAlpha = toRealVector(dInterpolatedObjectiveFunctiondAlpha);
+		this.dEquilibriumGap_dAlpha = toRealVector(dEquilibriumGapdAlpha);
+		this.d2EquilibriumGap_dAlpha2 = toRealMatrix(d2EquilibriumGapdAlpha2);
+		this.dUniformityGap_dAlpha = toRealVector(dUniformityGapdAlpha);
+		this.d2UniformityGap_dAlpha2 = toRealMatrix(d2UniformityGapdAlpha2);
 	}
 
-	RealVector toRealVector(final Vector vector) {
+	// -------------------- INTERNALS --------------------
+
+	// TODO move elsewhere
+	private RealVector toRealVector(final Vector vector) {
 		final RealVector result = new ArrayRealVector(vector.size());
 		for (int i = 0; i < vector.size(); i++) {
 			result.setEntry(i, vector.get(i));
@@ -58,7 +67,8 @@ class WeightOptimizer {
 		return result;
 	}
 
-	RealMatrix toRealMatrix(final Matrix matrix) {
+	// TODO move elsewhere
+	private RealMatrix toRealMatrix(final Matrix matrix) {
 		final RealMatrix result = new Array2DRowRealMatrix(matrix.rowSize(),
 				matrix.columnSize());
 		for (int i = 0; i < matrix.rowSize(); i++) {
@@ -68,110 +78,109 @@ class WeightOptimizer {
 	}
 
 	private int alphaSize() {
-		return this.dEquilibriumGapdAlpha.getDimension();
+		return this.dEquilibriumGap_dAlpha.getDimension();
 	}
 
-	// ----- serious calculations starting here -----
+	// -------------------- IMPLEMENTATION --------------------
 
-	private RealVector gradient(final double equilGapWeight,
+	private RealVector dSurrObjFct_dWeights(final double equilGapWeight,
 			final double unifGapWeight) {
-		final RealVector result = this.dInterpolatedObjectiveFunctiondAlpha
+		final RealVector result = this.dInterpolatedObjectiveFunction_dAlpha
 				.copy();
-		result.combineToSelf(1.0, equilGapWeight, this.dEquilibriumGapdAlpha);
-		result.combineToSelf(1.0, unifGapWeight, this.dUniformityGapdAlpha);
+		result.combineToSelf(1.0, equilGapWeight, this.dEquilibriumGap_dAlpha);
+		result.combineToSelf(1.0, unifGapWeight, this.dUniformityGap_dAlpha);
 		return result;
 	}
 
-	private RealMatrix hessian(final double equilGapWeight,
+	private RealMatrix d2SurrObjFct_dWeights2(final double equilGapWeight,
 			final double unifGapWeight) {
-		final RealMatrix addend1 = this.d2EquilibriumGapdAlpha2.copy();
+		final RealMatrix addend1 = this.d2EquilibriumGap_dAlpha2.copy();
 		addend1.scalarMultiply(equilGapWeight);
-		final RealMatrix addend2 = this.d2UniformityGapdAlpha2.copy();
+		final RealMatrix addend2 = this.d2UniformityGap_dAlpha2.copy();
 		addend2.scalarMultiply(unifGapWeight);
 		return addend1.add(addend2);
-	}
-
-	private Double last_dValue_dEquilGapWeight = null;
-
-	private Double last_dValue_dUnifGapWeight = null;
-
-	private void update(final double equilGapWeight, final double unifGapWeight) {
-
-		/*
-		 * Preparations.
-		 */
-		final RealVector gradient = this
-				.gradient(equilGapWeight, unifGapWeight);
-		final RealMatrix hessian = this.hessian(equilGapWeight, unifGapWeight);
-		final RealMatrix inverseHessian = new LUDecomposition(hessian)
-				.getSolver().getInverse();
-
-		/*
-		 * Value computation.
-		 */
-		// final double lastValue = this.surrogateObjectiveFunctionValue0 - 0.5
-		// * inverseHessian.preMultiply(gradient).dotProduct(gradient);
-
-		/*
-		 * Gradient computation.
-		 */
-		final RealMatrix dInverseHessian_dEquilGapWeight = inverseHessian
-				.multiply(this.d2EquilibriumGapdAlpha2)
-				.multiply(inverseHessian);
-		dInverseHessian_dEquilGapWeight.scalarMultiply(-1.0);
-
-		final RealMatrix dInverseHessian_dUnifGapWeight = inverseHessian
-				.multiply(this.d2UniformityGapdAlpha2).multiply(inverseHessian);
-		dInverseHessian_dUnifGapWeight.scalarMultiply(-1.0);
-
-		double dValue_dEquilGapWeight = 0;
-		double dValue_dUnifGapWeight = 0;
-
-		for (int i = 0; i < this.alphaSize(); i++) {
-			for (int j = 0; j < this.alphaSize(); j++) {
-				dValue_dEquilGapWeight += dEquilibriumGapdAlpha.getEntry(i)
-						* gradient.getEntry(j) * inverseHessian.getEntry(i, j)
-						+ gradient.getEntry(i)
-						* dEquilibriumGapdAlpha.getEntry(j)
-						* inverseHessian.getEntry(i, j) + gradient.getEntry(i)
-						* gradient.getEntry(j)
-						* dInverseHessian_dEquilGapWeight.getEntry(i, j);
-				dValue_dUnifGapWeight += dUniformityGapdAlpha.getEntry(i)
-						* gradient.getEntry(j) * inverseHessian.getEntry(i, j)
-						+ gradient.getEntry(i)
-						* dUniformityGapdAlpha.getEntry(j)
-						* inverseHessian.getEntry(i, j) + gradient.getEntry(i)
-						* gradient.getEntry(j)
-						* dInverseHessian_dUnifGapWeight.getEntry(i, j);
-
-			}
-		}
-		this.last_dValue_dEquilGapWeight = dValue_dEquilGapWeight;
-		this.last_dValue_dUnifGapWeight = dValue_dUnifGapWeight;
 	}
 
 	public double[] updateWeights(final double equilGapWeight,
 			final double unifGapWeight, final double equilGap,
 			final double unifGap, final double finalObjFctValue,
-			final double interpolObjFctValue) {
+			final double finalSurrogateObjectiveFunctionValue,
+			final double finalEquilGap, final double finalUnifGap) {
 
-		this.update(equilGapWeight, unifGapWeight);
+		/*
+		 * Compute gradients etc.
+		 */
+		final RealVector dSurrObjFct_dAlpha = this.dSurrObjFct_dWeights(
+				equilGapWeight, unifGapWeight);
+		final RealMatrix d2SurrObjFct_dWeights2 = this.d2SurrObjFct_dWeights2(
+				equilGapWeight, unifGapWeight);
+		final RealMatrix inverse_d2SurrObjFct_dAlpha2 = new LUDecomposition(
+				d2SurrObjFct_dWeights2).getSolver().getInverse();
 
+		final RealMatrix dInverseHessian_dEquilGapWeight = inverse_d2SurrObjFct_dAlpha2
+				.multiply(this.d2EquilibriumGap_dAlpha2).multiply(
+						inverse_d2SurrObjFct_dAlpha2);
+		dInverseHessian_dEquilGapWeight.scalarMultiply(-1.0);
+		final RealMatrix dInverseHessian_dUnifGapWeight = inverse_d2SurrObjFct_dAlpha2
+				.multiply(this.d2UniformityGap_dAlpha2).multiply(
+						inverse_d2SurrObjFct_dAlpha2);
+		dInverseHessian_dUnifGapWeight.scalarMultiply(-1.0);
+
+		double dSurrObjFct_dEquilGapWeight = 0;
+		double dSurrObjFct_dUnifGapWeight = 0;
+		for (int i = 0; i < this.alphaSize(); i++) {
+			for (int j = 0; j < this.alphaSize(); j++) {
+				dSurrObjFct_dEquilGapWeight += this.dEquilibriumGap_dAlpha
+						.getEntry(i)
+						* dSurrObjFct_dAlpha.getEntry(j)
+						* inverse_d2SurrObjFct_dAlpha2.getEntry(i, j)
+						+ dSurrObjFct_dAlpha.getEntry(i)
+						* this.dEquilibriumGap_dAlpha.getEntry(j)
+						* inverse_d2SurrObjFct_dAlpha2.getEntry(i, j)
+						+ dSurrObjFct_dAlpha.getEntry(i)
+						* dSurrObjFct_dAlpha.getEntry(j)
+						* dInverseHessian_dEquilGapWeight.getEntry(i, j);
+				dSurrObjFct_dUnifGapWeight += this.dUniformityGap_dAlpha
+						.getEntry(i)
+						* dSurrObjFct_dAlpha.getEntry(j)
+						* inverse_d2SurrObjFct_dAlpha2.getEntry(i, j)
+						+ dSurrObjFct_dAlpha.getEntry(i)
+						* this.dUniformityGap_dAlpha.getEntry(j)
+						* inverse_d2SurrObjFct_dAlpha2.getEntry(i, j)
+						+ dSurrObjFct_dAlpha.getEntry(i)
+						* dSurrObjFct_dAlpha.getEntry(j)
+						* dInverseHessian_dUnifGapWeight.getEntry(i, j);
+			}
+		}
+		dSurrObjFct_dEquilGapWeight = equilGap - 0.5
+				* dSurrObjFct_dEquilGapWeight;
+		dSurrObjFct_dUnifGapWeight = unifGap - 0.5 * dSurrObjFct_dUnifGapWeight;
+
+		/*
+		 * (Try to) solve the linear problem, otherwise fall back to previous
+		 * solution.
+		 */
 		final LinearObjectiveFunction objectiveFunction = new LinearObjectiveFunction(
-				new double[] { this.last_dValue_dEquilGapWeight,
-						this.last_dValue_dUnifGapWeight }, 0.0);
-
-		final List<LinearConstraint> constraints = new ArrayList<>(3);
+				new double[] { dSurrObjFct_dEquilGapWeight,
+						dSurrObjFct_dUnifGapWeight }, 0.0);
+		final List<LinearConstraint> constraints = new ArrayList<>(4);
 		constraints.add(new LinearConstraint(new double[] { 1.0, 0.0 }, GEQ,
 				0.0));
 		constraints.add(new LinearConstraint(new double[] { 0.0, 1.0 }, GEQ,
 				0.0));
-		constraints.add(new LinearConstraint(
-				new double[] { equilGap, unifGap }, GEQ, finalObjFctValue
-						- interpolObjFctValue));
+		constraints
+				.add(new LinearConstraint(
+						new double[] { dSurrObjFct_dEquilGapWeight,
+								dSurrObjFct_dUnifGapWeight },
+						GEQ,
+						(finalObjFctValue
+								- finalSurrogateObjectiveFunctionValue
+								+ dSurrObjFct_dEquilGapWeight * equilGap + dSurrObjFct_dUnifGapWeight
+								* unifGap)));
+		constraints.add(new LinearConstraint(new double[] { finalEquilGap,
+				-finalUnifGap }, EQ, 0.0));
 		final LinearConstraintSet allConstraints = new LinearConstraintSet(
 				constraints);
-
 		try {
 			final PointValuePair result = new SimplexSolver().optimize(
 					objectiveFunction, allConstraints);
@@ -179,6 +188,9 @@ class WeightOptimizer {
 		} catch (UnboundedSolutionException e) {
 			Logger.getLogger(this.getClass().getName()).warning(e.toString());
 			return new double[] { equilGap, unifGap };
+		} catch (NoFeasibleSolutionException e) {
+			Logger.getLogger(this.getClass().getName()).warning(e.toString());
+			return new double[] { equilGap, unifGap };			
 		}
 	}
 }

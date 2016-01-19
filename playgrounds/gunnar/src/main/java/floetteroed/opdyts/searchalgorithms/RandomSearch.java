@@ -139,7 +139,7 @@ public class RandomSearch<U extends DecisionVariable> {
 		Double bestObjectiveFunctionValue = null;
 		SimulatorState newInitialState = null;
 
-		final UpperBoundTuner2 newTuner2 = new UpperBoundTuner2();
+		// final UpperBoundTuner2 newTuner2 = new UpperBoundTuner2();
 
 		for (int it = 0; it < this.maxIterations
 				&& this.transitions < this.maxTransitions; it++) {
@@ -226,26 +226,26 @@ public class RandomSearch<U extends DecisionVariable> {
 				// newTuner.registerSamplingStageSequence(
 				// sampler.getSamplingStages(),
 				// newBestObjectiveFunctionValue);
-				newTuner2.registerSamplingStageSequence(
-						sampler.getSamplingStages(),
-						newBestObjectiveFunctionValue);
-
-				if (this.inertia != null) {
-					equilibriumGapWeight = this.inertia * equilibriumGapWeight
-							+ (1.0 - this.inertia) * newTuner2.equilGapWeight;
-					uniformityGapWeight *= this.inertia * uniformityGapWeight
-							+ (1.0 - this.inertia) * newTuner2.unifGapWeight;
-				} else {
-					// equilibriumGapWeight = Math.max(equilibriumGapWeight,
-					// newTuner.equilGapWeight);
-					// uniformityGapWeight = Math.max(uniformityGapWeight,
-					// newTuner.unifGapWeight);
-					final double msaInertia = 1.0 - 1.0 / (1.0 + it);
-					equilibriumGapWeight = msaInertia * equilibriumGapWeight
-							+ (1.0 - msaInertia) * newTuner2.equilGapWeight;
-					uniformityGapWeight *= msaInertia * uniformityGapWeight
-							+ (1.0 - msaInertia) * newTuner2.unifGapWeight;
-				}
+				// newTuner2.registerSamplingStageSequence(
+				// sampler.getSamplingStages(),
+				// newBestObjectiveFunctionValue);
+				//
+				// if (this.inertia != null) {
+				// equilibriumGapWeight = this.inertia * equilibriumGapWeight
+				// + (1.0 - this.inertia) * newTuner2.equilGapWeight;
+				// uniformityGapWeight *= this.inertia * uniformityGapWeight
+				// + (1.0 - this.inertia) * newTuner2.unifGapWeight;
+				// } else {
+				// // equilibriumGapWeight = Math.max(equilibriumGapWeight,
+				// // newTuner.equilGapWeight);
+				// // uniformityGapWeight = Math.max(uniformityGapWeight,
+				// // newTuner.unifGapWeight);
+				// final double msaInertia = 1.0 - 1.0 / (1.0 + it);
+				// equilibriumGapWeight = msaInertia * equilibriumGapWeight
+				// + (1.0 - msaInertia) * newTuner2.equilGapWeight;
+				// uniformityGapWeight *= msaInertia * uniformityGapWeight
+				// + (1.0 - msaInertia) * newTuner2.unifGapWeight;
+				// }
 
 				// TODO >>>>> NEW >>>>>
 				final double msaInertia = 1.0 - 1.0 / (1.0 + it);
@@ -253,6 +253,10 @@ public class RandomSearch<U extends DecisionVariable> {
 						+ (1.0 - msaInertia) * sampler.v;
 				uniformityGapWeight = msaInertia * uniformityGapWeight
 						+ (1.0 - msaInertia) * sampler.w;
+				// equilibriumGapWeight += (1.0 - msaInertia)
+				// * (sampler.v - equilibriumGapWeight);
+				// uniformityGapWeight += (1.0 - msaInertia)
+				// * (sampler.w - uniformityGapWeight);
 				// TODO <<<<< NEW <<<<<
 
 			} else {

@@ -39,11 +39,11 @@ public class FinalSensitivitiesAnalyzer {
 
 		final SurrogateObjectiveFunction<U> surrObjFct = new SurrogateObjectiveFunction<>(
 				transitions, Double.NaN, Double.NaN);
-		final Vector dQdAlpha = surrObjFct.dQdAlpha(new Vector(alphas));
+		final Vector dQdAlpha = surrObjFct.dInterpolObjFctVal_dAlpha(new Vector(alphas));
 		final Vector dEquilibriumGapdAlpha = surrObjFct
-				.dEquilibriumGapdAlpha(new Vector(alphas));
+				.dEquilibriumGap_dAlpha(new Vector(alphas));
 		final Vector dUniformityGapdAlpha = surrObjFct
-				.dUniformityGapdAlpha(new Vector(alphas));
+				.dUniformityGap_dAlpha(new Vector(alphas));
 
 		final LeastAbsoluteDeviations lad = new LeastAbsoluteDeviations();
 		lad.setLowerBounds(0.0, 0.0);

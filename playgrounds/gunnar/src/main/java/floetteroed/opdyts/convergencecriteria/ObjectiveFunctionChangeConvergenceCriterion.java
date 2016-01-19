@@ -108,5 +108,15 @@ public class ObjectiveFunctionChangeConvergenceCriterion implements
 	public List<Double> getFinalWeights() {
 		throw new UnsupportedOperationException();
 	}
+
+	@Override
+	public Double getFinalEquilbriumGap() {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public Double getFinalUniformityGap() {
+		throw new UnsupportedOperationException();
+	}
 	
 }

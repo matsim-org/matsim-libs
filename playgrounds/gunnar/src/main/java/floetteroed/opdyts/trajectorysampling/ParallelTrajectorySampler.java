@@ -250,38 +250,43 @@ public class ParallelTrajectorySampler<U extends DecisionVariable> implements
 
 				// >>>>> TODO NEW >>>>>
 
-				// final FinalSensitivitiesAnalyzer fsa = new
-				// FinalSensitivitiesAnalyzer(
-				// this.decisionVariable2transitionSequence,
-				// this.currentDecisionVariable,
-				// this.convergenceCriterion.getFinalWeights());
-				// System.out.println(">>>>>>>>>> v = " + fsa.vOpt + ", w = "
-				// + fsa.wOpt);
-				// this.v = fsa.vOpt;
-				// this.w = fsa.wOpt;
-
 				final SamplingStage<U> lastSamplingStage = this.samplingStages
 						.get(this.samplingStages.size() - 1);
+
+				final Vector trialAlphas = this.lastAlphas;
+				// final Vector trialAlphas = new Vector(
+				// this.lastSurrogateObjectiveFunction.transitionCnt());
+				// trialAlphas.fill(1.0 / trialAlphas.size());
 				final WeightOptimizer weightOptimizer = new WeightOptimizer(
 						this.lastSurrogateObjectiveFunction
-								.dQdAlpha(this.lastAlphas),
+								.dInterpolObjFctVal_dAlpha(trialAlphas),
 						this.lastSurrogateObjectiveFunction
-								.dEquilibriumGapdAlpha(this.lastAlphas),
+								.dEquilibriumGap_dAlpha(trialAlphas),
 						this.lastSurrogateObjectiveFunction
-								.d2EquilibriumGapdAlpha2(this.lastAlphas),
+								.d2EquilibriumGapdAlpha2(trialAlphas),
 						this.lastSurrogateObjectiveFunction
-								.dUniformityGapdAlpha(this.lastAlphas),
+								.dUniformityGap_dAlpha(trialAlphas),
 						this.lastSurrogateObjectiveFunction
-								.d2UniformityGapdAlpha2(this.lastAlphas));
+								.d2UniformityGapdAlpha2(trialAlphas));
+
+				this.v = this.equilibriumWeight;
+				this.w = this.uniformityWeight;
+
+				// for (int i = 1; i <= 10; i++) {
 				final double[] result = weightOptimizer.updateWeights(
 						this.equilibriumWeight, this.uniformityWeight,
 						lastSamplingStage.getEquilibriumGap(),
 						lastSamplingStage.getAlphaSquareNorm(),
 						this.convergenceCriterion
 								.getFinalObjectiveFunctionValue(),
-						lastSamplingStage.getOriginalObjectiveFunctionValue());
-				this.v = result[0];
-				this.w = result[1];
+						lastSamplingStage.getSurrogateObjectiveFunctionValue(),
+						this.convergenceCriterion.getFinalEquilbriumGap(),
+						this.convergenceCriterion.getFinalUniformityGap());
+				// final double inno = 1.0 / i;
+				final double inno = 1.0;
+				this.v = inno * result[0] + (1.0 - inno) * this.v;
+				this.w = inno * result[1] + (1.0 - inno) * this.w;
+				// }
 
 				// <<<<< TODO NEW <<<<<
 			}
@@ -330,9 +335,11 @@ public class ParallelTrajectorySampler<U extends DecisionVariable> implements
 							convergedObjectiveFunctionValue);
 
 			// TODO >>>>> NEW >>>>>
+
 			this.lastAlphas = samplingStageEvaluator.lastAlphas.copy();
 			this.lastSurrogateObjectiveFunction = samplingStageEvaluator
 					.getSurrogateObjectiveFunction();
+
 			// TODO <<<<< NEW <<<<<
 
 			this.statisticsWriter.writeToFile(samplingStage);

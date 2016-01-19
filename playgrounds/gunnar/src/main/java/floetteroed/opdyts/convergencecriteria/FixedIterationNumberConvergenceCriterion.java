@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import floetteroed.opdyts.trajectorysampling.TransitionSequence;
+import floetteroed.utilities.math.Vector;
 
 /**
  * 
@@ -44,6 +45,10 @@ public class FixedIterationNumberConvergenceCriterion implements
 	private final int averagingIterations;
 
 	private List<Double> finalWeights = null;
+
+	private Double finalEquilbiriumGap = null;
+
+	private Double finalUniformityGap = null;
 
 	// -------------------- MEMBERS --------------------
 
@@ -84,6 +89,22 @@ public class FixedIterationNumberConvergenceCriterion implements
 					.size(); i++) {
 				this.finalWeights.add(1.0 / this.averagingIterations);
 			}
+
+			// TODO >>> EVEN NEWER >>>
+			
+			final Vector totalDelta = transitionSequence.getTransitions()
+					.get(transitionSequence.size() - this.averagingIterations)
+					.getDelta().copy();
+			for (int i = transitionSequence.size() - this.averagingIterations
+					+ 1; i < transitionSequence.size(); i++) {
+				totalDelta.add(transitionSequence.getTransitions().get(i)
+						.getDelta());
+			}
+			final double finalWeight = 1.0 / this.averagingIterations;
+			totalDelta.mult(finalWeight);
+			this.finalEquilbiriumGap = totalDelta.euclNorm();
+			this.finalUniformityGap = finalWeight;
+			
 			// TODO <<< NEW <<<
 		}
 	}
@@ -106,5 +127,15 @@ public class FixedIterationNumberConvergenceCriterion implements
 	@Override
 	public List<Double> getFinalWeights() {
 		return this.finalWeights;
+	}
+
+	@Override
+	public Double getFinalEquilbriumGap() {
+		return this.finalEquilbiriumGap;
+	}
+
+	@Override
+	public Double getFinalUniformityGap() {
+		return this.finalUniformityGap;
 	}
 }

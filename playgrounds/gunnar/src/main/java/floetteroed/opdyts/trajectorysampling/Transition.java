@@ -33,7 +33,7 @@ import floetteroed.utilities.math.Vector;
  * @author Gunnar Flötteröd
  * 
  */
-class Transition<U extends DecisionVariable> {
+public class Transition<U extends DecisionVariable> {
 
 	// -------------------- MEMBERS --------------------
 
@@ -75,19 +75,19 @@ class Transition<U extends DecisionVariable> {
 
 	// -------------------- GETTERS --------------------
 
-	U getDecisionVariable() {
+	public U getDecisionVariable() {
 		return this.decisionVariable;
 	}
 
-	Vector getDelta() {
+	public Vector getDelta() {
 		return this.delta;
 	}
 
-	Vector getToState() {
+	public Vector getToState() {
 		return this.toState;
 	}
 
-	double getToStateObjectiveFunctionValue() {
+	public double getToStateObjectiveFunctionValue() {
 		return this.toStateObjectiveFunctionValue;
 	}
 }

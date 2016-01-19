@@ -112,7 +112,7 @@ public class TransitionSequencesAnalyzer<U extends DecisionVariable> {
 
 	public double originalObjectiveFunctionValue(final Vector alphas) {
 		return this.surrogateObjectiveFunction
-				.originalObjectiveFunctionValue(alphas);
+				.interpolatedObjectiveFunctionValue(alphas);
 	}
 
 	public double equilibriumGap(final Vector alphas) {
@@ -120,7 +120,7 @@ public class TransitionSequencesAnalyzer<U extends DecisionVariable> {
 	}
 
 	public double surrogateObjectiveFunctionValue(final Vector alphas) {
-		return this.surrogateObjectiveFunction.value(alphas);
+		return this.surrogateObjectiveFunction.surrogateObjectiveFunctionValue(alphas);
 	}
 
 	public Map<U, Double> decisionVariable2alphaSum(final Vector alphas) {
@@ -283,7 +283,7 @@ public class TransitionSequencesAnalyzer<U extends DecisionVariable> {
 			final Vector alphas = proba(v);
 			final Matrix dAlpha_dV = dProba_dV(v, alphas);
 			final Vector dQ_dAlpha = surrogateObjectiveFunction
-					.gradient(alphas);
+					.dSurrObjFctVal_dAlpha(alphas);
 
 			final double[] boundPenaltyGradient = boundPenaltyGradient(point);
 			// dQ/dV(i) = sum_j dQ/dAlpha(j) * dAlpha(j)/dV(i)
