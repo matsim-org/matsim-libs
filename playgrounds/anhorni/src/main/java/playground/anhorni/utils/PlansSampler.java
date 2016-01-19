@@ -20,18 +20,18 @@
 package playground.anhorni.utils;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReader;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.config.ConfigUtils;
 
 public class PlansSampler {
 	private final static Logger log = Logger.getLogger(PlansSampler.class);	
-	private ScenarioImpl scenario;
+	private Scenario scenario;
 	private Population sampledPopulation;
 	
 	public static void main (final String[] args) { 
@@ -44,7 +44,7 @@ public class PlansSampler {
 		Config config = new Config();
     	ConfigReader configReader = new ConfigReader(config);
     	configReader.readFile(configFile);
-		this.scenario  = (ScenarioImpl) ScenarioUtils.loadScenario(ConfigUtils.createConfig());
+		this.scenario  = ScenarioUtils.loadScenario(ConfigUtils.createConfig());
 	}
 	
 	public void sample(double sampleFraction) {
@@ -53,7 +53,7 @@ public class PlansSampler {
 
 	public Population sample(Population plans, double sampleFraction) {
 		log.info("Creating a " + sampleFraction * 100.0 + " sample");
-		Population sampledPopulation = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
+		Population sampledPopulation = (ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
 
 		for (Person person : plans.getPersons().values()) {
 			double r = MatsimRandom.getRandom().nextDouble();
