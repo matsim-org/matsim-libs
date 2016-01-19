@@ -22,7 +22,7 @@ package playground.michalm.taxi.optimizer.zonal;
 import org.apache.commons.configuration.Configuration;
 
 import playground.michalm.taxi.optimizer.TaxiOptimizerContext;
-import playground.michalm.taxi.optimizer.rules.*;
+import playground.michalm.taxi.optimizer.rules.RuleBasedTaxiOptimizerParams;
 
 
 public class ZonalTaxiOptimizerParams

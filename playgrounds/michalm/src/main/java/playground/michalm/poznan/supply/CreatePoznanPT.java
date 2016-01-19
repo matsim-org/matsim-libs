@@ -3,7 +3,8 @@ package playground.michalm.poznan.supply;
 import java.util.*;
 
 import org.matsim.api.core.v01.*;
-import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.network.*;
+import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.core.config.*;
 import org.matsim.core.network.*;
 import org.matsim.core.network.algorithms.NetworkCleaner;
@@ -78,7 +79,7 @@ public class CreatePoznanPT
                 .write(transitScheduleWithNetworkFile);
         new VehicleWriterV1(scenario.getTransitVehicles()).writeFile(vehicleFile);
 
-        NetworkImpl network = NetworkImpl.createNetwork();
+        Network network = NetworkUtils.createNetwork();
         new CreatePseudoNetwork(scenario.getTransitSchedule(), network, "tr_").createNetwork();
 
         new NetworkCleaner().run(network);

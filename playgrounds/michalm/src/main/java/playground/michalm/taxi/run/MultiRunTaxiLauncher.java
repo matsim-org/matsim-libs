@@ -123,7 +123,9 @@ class MultiRunTaxiLauncher
             long t1 = System.currentTimeMillis();
             multiRunStats.updateStats(stats, t1 - t0);
 
-            produceDetailedStats(i);
+            if (launcherParams.detailedTaxiStatsDir != null) {
+                produceDetailedStats(i);
+            }
         }
 
         VrpData data = context.getVrpData();

@@ -19,14 +19,12 @@
 
 package playground.michalm.taxi.run;
 
-import java.util.List;
-
 import org.apache.commons.configuration.Configuration;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.*;
 import org.matsim.contrib.dvrp.extensions.taxi.TaxiUtils;
 import org.matsim.contrib.dvrp.passenger.*;
-import org.matsim.contrib.dvrp.run.*;
+import org.matsim.contrib.dvrp.run.VrpLauncherUtils;
 import org.matsim.contrib.dvrp.vrpagent.VrpLegs;
 import org.matsim.contrib.dvrp.vrpagent.VrpLegs.LegCreator;
 import org.matsim.contrib.dynagent.run.DynAgentLauncherUtils;
@@ -35,7 +33,6 @@ import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.*;
 
-import playground.michalm.demand.taxi.PersonCreatorWithRandomTaxiMode;
 import playground.michalm.taxi.*;
 import playground.michalm.taxi.data.*;
 import playground.michalm.taxi.data.TaxiRequest.TaxiRequestStatus;
@@ -76,14 +73,6 @@ class TaxiLauncher
         QSimConfigGroup qsc = scenario.getConfig().qsim();
         qsc.setStorageCapFactor(launcherParams.storageCapFactor);
         qsc.setFlowCapFactor(launcherParams.flowCapFactor);
-
-        if (launcherParams.taxiCustomersFile != null) {
-            List<String> passengerIds = PersonCreatorWithRandomTaxiMode
-                    .readTaxiCustomerIds(launcherParams.taxiCustomersFile);
-            VrpPopulationUtils.convertLegModes(passengerIds, TaxiUtils.TAXI_MODE, scenario);
-        }
-
-        //TaxiDemandUtils.preprocessPlansBasedOnCoordsOnly(scenario);
     }
 
 

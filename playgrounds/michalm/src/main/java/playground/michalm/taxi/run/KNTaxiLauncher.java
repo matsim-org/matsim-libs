@@ -30,8 +30,8 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 import playground.michalm.taxi.optimizer.AbstractTaxiOptimizerParams;
 import playground.michalm.taxi.optimizer.AbstractTaxiOptimizerParams.TravelTimeSource;
-import playground.michalm.taxi.optimizer.rules.RuleBasedTaxiOptimizerParams;
 import playground.michalm.taxi.optimizer.rules.RuleBasedTaxiOptimizer.Goal;
+import playground.michalm.taxi.optimizer.rules.RuleBasedTaxiOptimizerParams;
 import playground.michalm.taxi.scheduler.TaxiSchedulerParams;
 
 
@@ -71,16 +71,14 @@ class KNTaxiLauncher
     {
         String inputDir = "../../../shared-svn/projects/maciejewski/Mielec/2014_02_base_scenario/";
         Map<String, Object> map = new HashMap<>();
-
         map.put(TaxiLauncherParams.NET_FILE, inputDir + "network.xml");
-        map.put(TaxiLauncherParams.PLANS_FILE, inputDir + "output/ITERS/it.20/20.plans.xml.gz");
-        map.put(TaxiLauncherParams.ONLINE_VEHICLE_TRACKER, Boolean.FALSE);
 
-        //demand: 10, 15, 20, 25, 30, 35, 40
-        map.put(TaxiLauncherParams.TAXI_CUSTOMERS_FILE, inputDir + "taxiCustomers_40_pc.txt");
+        //demand: 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0
+        map.put(TaxiLauncherParams.PLANS_FILE, inputDir + "plans_taxi/plans_taxi_4.0.xml.gz");
         //supply: 25, 50
         map.put(TaxiLauncherParams.TAXIS_FILE, inputDir + "taxis-25.xml");
 
+        map.put(TaxiLauncherParams.ONLINE_VEHICLE_TRACKER, Boolean.FALSE);
         map.put(TaxiLauncherParams.OTF_VIS, "true");
 
         String sPrefix = TaxiConfigUtils.SCHEDULER + TaxiConfigUtils.DELIMITER;

@@ -2,8 +2,6 @@ package playground.michalm.util;
 
 import java.util.*;
 
-import com.google.common.collect.Iterators;
-
 
 public class MapOfMapIterator<K1, K2, V>
     implements Iterator<V>
@@ -16,7 +14,7 @@ public class MapOfMapIterator<K1, K2, V>
     public MapOfMapIterator(Map<K1, Map<K2, V>> mapOfMap)
     {
         outerIter = mapOfMap.values().iterator();
-        innerIter = Iterators.emptyIterator();
+        innerIter = Collections.emptyIterator();
         updateNext();
     }
 
