@@ -189,7 +189,7 @@ public class NoiseTest {
 			
 		NoiseContext noiseContext = new NoiseContext(scenario, gridParameters, noiseParameters);
 		noiseContext.initialize();
-		NoiseWriter.writeReceiverPoints(noiseContext, outputFilePath + "/receiverPoints/");
+		NoiseWriter.writeReceiverPoints(noiseContext, outputFilePath + "/receiverPoints/", false);
 		
 		PersonActivityTracker actTracker = new PersonActivityTracker(noiseContext);
 		events.addHandler(actTracker);
@@ -947,7 +947,7 @@ public class NoiseTest {
 			
 		NoiseContext noiseContext = new NoiseContext(scenario, gridParameters, noiseParameters);
 		noiseContext.initialize();
-		NoiseWriter.writeReceiverPoints(noiseContext, outputFilePath + "/receiverPoints/");
+		NoiseWriter.writeReceiverPoints(noiseContext, outputFilePath + "/receiverPoints/", false);
 		
 		PersonActivityTracker actTracker = new PersonActivityTracker(noiseContext);
 		events.addHandler(actTracker);
@@ -1058,7 +1058,7 @@ public class NoiseTest {
 			
 		NoiseContext noiseContext = new NoiseContext(scenario, gridParameters, noiseParameters);
 		noiseContext.initialize();
-		NoiseWriter.writeReceiverPoints(noiseContext, outputFilePath + "/receiverPoints/");
+		NoiseWriter.writeReceiverPoints(noiseContext, outputFilePath + "/receiverPoints/", false);
 		
 		PersonActivityTracker actTracker = new PersonActivityTracker(noiseContext);
 		events.addHandler(actTracker);

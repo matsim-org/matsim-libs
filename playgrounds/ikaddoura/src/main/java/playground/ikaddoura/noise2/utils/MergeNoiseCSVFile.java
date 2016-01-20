@@ -24,7 +24,6 @@ package playground.ikaddoura.noise2.utils;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -50,12 +49,12 @@ public final class MergeNoiseCSVFile {
 	private double endTime = 24. * 3600.;
 
 	private String outputDirectory = "/Users/ihab/Documents/workspace/runs-svn/cn2/output/cn1/noiseAnalysisVia/analysis_it.100/";
-	
+
 	private String[] workingDirectories = { "/Users/ihab/Documents/workspace/runs-svn/cn2/output/cn1/noiseAnalysisVia/analysis_it.100/immissions/"
 			, "/Users/ihab/Documents/workspace/runs-svn/cn2/output/cn1/noiseAnalysisVia/analysis_it.100/consideredAgentUnits/"
 			, "/Users/ihab/Documents/workspace/runs-svn/cn2/output/cn1/noiseAnalysisVia/analysis_it.100/damages_receiverPoint/"};
 	private String[] labels = { "immission" , "consideredAgentUnits" , "damages_receiverPoint" };
-	
+
 	private String receiverPointsFile = "/Users/ihab/Documents/workspace/runs-svn/cn2/output/cn1/noiseAnalysisVia/analysis_it.100/receiverPoints/receiverPoints.csv";
 	private String separator = ";";
 
@@ -66,7 +65,7 @@ public final class MergeNoiseCSVFile {
 
 	private Map<String, Map<Double, Map<Id<ReceiverPoint>, Double>>> label2time2rp2value = new HashMap<>();
 	private Map<Id<ReceiverPoint>, Coord> rp2Coord = new HashMap<Id<ReceiverPoint>, Coord>();
-	
+
 	public final void setThreshold(double threshold) {
 		this.threshold = threshold;
 	}
@@ -75,7 +74,7 @@ public final class MergeNoiseCSVFile {
 		MergeNoiseCSVFile readNoiseFile = new MergeNoiseCSVFile();
 		readNoiseFile.run();
 	}
-	
+
 	public final void setLabel(String label) {
 		this.labels = null;
 		this.labels[0] = label;
@@ -84,11 +83,11 @@ public final class MergeNoiseCSVFile {
 	public void setWorkingDirectory(String workingDirectory) {
 		this.workingDirectories = null;
 		this.workingDirectories[0] = workingDirectory;
-		
+
 		// setting the output directory to the same as the working directory
 		this.outputDirectory = workingDirectory;
 	}
-	
+
 	public void setOutputDirectory(String outputFilePath) {
 		this.outputDirectory = outputFilePath;
 	}
@@ -100,7 +99,7 @@ public final class MergeNoiseCSVFile {
 	public final void setOutputFormat(OutputFormat outputFormat) {
 		this.outputFormat = outputFormat;
 	}
-	
+
 	public void setWorkingDirectory(String[] workingDirectories) {
 		this.workingDirectories = workingDirectories;
 	}
@@ -115,24 +114,25 @@ public final class MergeNoiseCSVFile {
 
 	public final void run() {
 		// lv final. kai
-		
+
 		readValues();
 		readReceiverPoints();
 		writeFile();
 	}
 
 	private void writeFile() {
+		int lineCounter = 0 ;
 
 		String outputFile = this.outputDirectory;
 
 		for (int i = 0; i < this.labels.length; i++) {
 			outputFile = outputFile + this.labels[i] + "_"; 			
 		}
-		outputFile = outputFile + "merged_" + this.outputFormat.toString() + ".csv";
-		
-		try ( BufferedWriter bw = new BufferedWriter(new FileWriter(outputFile)) ) {
+		outputFile = outputFile + "merged_" + this.outputFormat.toString() + ".csv.gz";
+
+		try ( BufferedWriter bw = IOUtils.getBufferedWriter(outputFile) ) {
 			// so-called "try-with-resources". Kai
-			
+
 			log.info(" Writing merged file to " + outputFile + "...") ;
 
 			// write headers
@@ -161,10 +161,10 @@ public final class MergeNoiseCSVFile {
 			// fill table
 			switch( this.outputFormat ) {
 			case ihab:	
-				
+
 				for (Id<ReceiverPoint> rp : this.rp2Coord.keySet()) {
 					bw.write(rp.toString() + ";" + rp2Coord.get(rp).getX() + ";" + rp2Coord.get(rp).getY());
-					
+
 					for (String label : this.label2time2rp2value.keySet()) {
 						for (double time = startTime; time <= endTime; time = time + timeBinSize) {
 							bw.write(";" + this.label2time2rp2value.get(label).get(time).get(rp));
@@ -174,14 +174,14 @@ public final class MergeNoiseCSVFile {
 				}				
 				break;
 			case xyt:
-				
+
 				for (Id<ReceiverPoint> rp : this.rp2Coord.keySet()) {
-					
+
 					for (double time = startTime; time <= endTime; time = time + timeBinSize) {
-						
+
 						boolean writeThisLine = false;
 						String lineToWrite = rp.toString() + ";" + rp2Coord.get(rp).getX() + ";" + rp2Coord.get(rp).getY() + ";" + String.valueOf(time);
-						
+
 						for (String label : this.label2time2rp2value.keySet()) {
 							double value = this.label2time2rp2value.get(label).get(time).get(rp);
 							if (value > this.threshold) {
@@ -189,11 +189,15 @@ public final class MergeNoiseCSVFile {
 							}
 							lineToWrite = lineToWrite + ";" + value;
 						}
-						
+
 						// only write the line if at least one value is larger than threshold
 						if (writeThisLine) {
 							bw.write(lineToWrite);
 							bw.newLine();
+							lineCounter ++ ;
+							if (lineCounter % 10000 == 0.) {
+								log.info("# " + lineCounter);
+							}
 						}
 					}
 				}	
@@ -204,7 +208,7 @@ public final class MergeNoiseCSVFile {
 
 			bw.close();
 			log.info("Output written to " + outputFile);
-			
+
 
 		} catch (IOException e1) {
 			e1.printStackTrace();
@@ -212,7 +216,7 @@ public final class MergeNoiseCSVFile {
 	}
 
 	private void readReceiverPoints() {
-		
+
 		BufferedReader br = IOUtils.getBufferedReader(this.receiverPointsFile);
 		String line;
 		try {
@@ -259,34 +263,30 @@ public final class MergeNoiseCSVFile {
 
 	private void readValues() {
 		for (int ll = 0; ll < this.labels.length; ll++) {
-			
+
 			Map<Double, Map<Id<ReceiverPoint>, Double>> time2rp2value = new HashMap<Double, Map<Id<ReceiverPoint>, Double>>();
-			
+
 			String workingDirectory = this.workingDirectories[ll];
 			String label = this.labels[ll];
-			
+
 			log.info("Reading " + label + "...");
-			
+
 			for (double time = startTime; time <= endTime; time = time + timeBinSize) {
 
 				log.info("Reading time bin: " + time);
 
 				// String fileName = workingDirectory + "100." + label + "_" + Double.toString(time) + ".csv";
 				String fileName = workingDirectory + label + "_" + Double.toString(time) + ".csv";
-				BufferedReader br = IOUtils.getBufferedReader(fileName);
 
-				String line = null;
-				try {
-					line = br.readLine();
-				} catch (IOException e1) {
-					e1.printStackTrace();
-				}
+				try ( BufferedReader br = IOUtils.getBufferedReader(fileName) ) {
+					// this will automagically use the *.gz version if a non-gzipped version does not exist. kai, jan'15
 
-				Map<Id<ReceiverPoint>, Double> rp2value = new HashMap<Id<ReceiverPoint>, Double>();
-				int lineCounter = 0;
-				
-				log.info("Reading lines ");
-				try {
+					String line = br.readLine();
+
+					Map<Id<ReceiverPoint>, Double> rp2value = new HashMap<Id<ReceiverPoint>, Double>();
+					int lineCounter = 0;
+
+					log.info("Reading lines ");
 					while ((line = br.readLine()) != null) {
 
 						if (lineCounter % 10000 == 0.) {
@@ -314,7 +314,7 @@ public final class MergeNoiseCSVFile {
 					e.printStackTrace();
 				}
 			}
-			
+
 			this.label2time2rp2value.put(label, time2rp2value);
 		}
 	}

@@ -45,10 +45,10 @@ import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 
 import cadyts.demand.PlanBuilder;
 
-public class PlanToPlanStepBasedOnEvents implements PlansTranslator<Link>, LinkLeaveEventHandler, 
+public class PlansTranslatorBasedOnEvents implements PlansTranslator<Link>, LinkLeaveEventHandler, 
 VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 	
-	private static final Logger log = Logger.getLogger(PlanToPlanStepBasedOnEvents.class);
+	private static final Logger log = Logger.getLogger(PlansTranslatorBasedOnEvents.class);
 
 	private final Scenario scenario;
 
@@ -65,7 +65,7 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 	private final Set<Id<Link>> calibratedLinks = new HashSet<>() ;
 
 	@Inject
-	PlanToPlanStepBasedOnEvents(final Scenario scenario) {
+	PlansTranslatorBasedOnEvents(final Scenario scenario) {
 		this.scenario = scenario;
 		Set<String> abc = ConfigUtils.addOrGetModule(scenario.getConfig(), CadytsConfigGroup.GROUP_NAME, CadytsConfigGroup.class).getCalibratedItems();
 		for ( String str : abc ) {
@@ -77,7 +77,8 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 	private long plansNotFound = 0;
 
 	@Override
-	public final cadyts.demand.Plan<Link> getPlanSteps(final Plan plan) {
+	public final cadyts.demand.Plan<Link> getCadytsPlan(final Plan plan) {
+		@SuppressWarnings("unchecked")
 		PlanBuilder<Link> planStepFactory = (PlanBuilder<Link>) plan.getCustomAttributes().get(STR_PLANSTEPFACTORY);
 		if (planStepFactory == null) {
 			this.plansNotFound++;

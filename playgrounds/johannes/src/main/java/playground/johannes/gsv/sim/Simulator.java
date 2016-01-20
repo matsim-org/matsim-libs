@@ -239,7 +239,7 @@ public class Simulator {
 		public void notifyAfterMobsim(AfterMobsimEvent event) {
 			Population population = event.getServices().getScenario().getPopulation();
 			for (Person person : population.getPersons().values()) {
-				context.getCalibrator().addToDemand(context.getPlansTranslator().getPlanSteps(person.getSelectedPlan()));
+				context.getCalibrator().addToDemand(context.getPlansTranslator().getCadytsPlan(person.getSelectedPlan()));
 			}
 
 		}

@@ -8,7 +8,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.analysis.kai.KaiAnalysisListener;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -65,14 +64,15 @@ class KNBerlinControler {
 		config.qsim().setNumberOfThreads(5);
 		config.parallelEventHandling().setNumberOfThreads(1);
 
-		double sampleFactor = 0.02 ;
+		final double sampleFactor = 0.02 ;
 		config.controler().setMobsim( MobsimType.qsim.toString() );
 		config.qsim().setFlowCapFactor( sampleFactor );
-		//		config.qsim().setStorageCapFactor( Math.pow( sampleFactor, -0.25 ) );
+		//		config.qsim().setStorageCapFactor( Math.pow( sampleFactor, -0.25 ) ); // this version certainly is completely wrong.
 		config.qsim().setStorageCapFactor(0.03);
 		config.qsim().setTrafficDynamics( TrafficDynamics.withHoles );
 		config.qsim().setUsingFastCapacityUpdate(false);
 		config.qsim().setNumberOfThreads(6);
+		config.qsim().setUsingFastCapacityUpdate(true);
 
 		//		config.controler().setMobsim(MobsimType.JDEQSim.toString());
 		//		config.setParam(JDEQSimulation.JDEQ_SIM, JDEQSimulation.END_TIME, "36:00:00") ;
@@ -124,10 +124,6 @@ class KNBerlinControler {
 		}
 		config.setParam( ChangeLegModeConfigGroup.CONFIG_MODULE, ChangeLegModeConfigGroup.CONFIG_PARAM_MODES, "walk,bike,car,pt,pt2" );
 
-		//		for ( ActivityParams params : config.planCalcScore().getActivityParams() ) {
-		//			params.setTypicalDurationScoreComputation( TypicalDurationScoreComputation.relative );
-		//		}
-
 		config.vspExperimental().setVspDefaultsCheckingLevel( VspDefaultsCheckingLevel.abort );
 		config.addConfigConsistencyChecker(new VspConfigConsistencyCheckerImpl());
 		config.checkConsistency();
@@ -141,8 +137,8 @@ class KNBerlinControler {
 
 		// prepare the control(l)er:
 		Controler controler = new Controler( scenario ) ;
-		controler.getConfig().controler().setOverwriteFileSetting( OverwriteFileSetting.overwriteExistingFiles ) ;
-//		controler.addControlerListener(new KaiAnalysisListener()) ;
+
+		//		controler.addControlerListener(new KaiAnalysisListener()) ;
 		//		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
 		//		controler.setMobsimFactory(new OldMobsimFactory()) ;
 
@@ -158,7 +154,7 @@ class KNBerlinControler {
 		String[] consideredActivitiesForReceiverPointGrid = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
 		gridParameters.setConsideredActivitiesForReceiverPointGrid(consideredActivitiesForReceiverPointGrid);
 
-		gridParameters.setReceiverPointGap(2000.);
+		gridParameters.setReceiverPointGap(200.);
 
 		String[] consideredActivitiesForDamages = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
 		gridParameters.setConsideredActivitiesForSpatialFunctionality(consideredActivitiesForDamages);
@@ -228,9 +224,10 @@ class KNBerlinControler {
 
 		NoiseContext noiseContext = new NoiseContext(scenario, gridParameters, noiseParameters);
 		noiseContext.initialize();
-		NoiseWriter.writeReceiverPoints(noiseContext, outputFilePath + "/receiverPoints/");
+		NoiseWriter.writeReceiverPoints(noiseContext, outputFilePath + "/receiverPoints/", true);
 
 		NoiseTimeTracker timeTracker = new NoiseTimeTracker(noiseContext, events, outputFilePath);
+		timeTracker.setUseCompression(true);
 		events.addHandler(timeTracker);
 
 		PersonActivityTracker actTracker = new PersonActivityTracker(noiseContext);
@@ -257,11 +254,8 @@ class KNBerlinControler {
 	static void mergeNoiseFiles(String outputFilePath) {
 		final String receiverPointsFile = outputFilePath + "/receiverPoints/receiverPoints.csv" ;
 
-		// yyyy would be even better to load everything into one file: x, y, t, imissions, damages, ...
-		// this should be possible now by adding working directory and label arrays, see example at the very end of NoiseCalculationOffline... ik 'dec 15
-
-		final String[] labels = { "immission", "consideredAgentUnits" };
-		final String[] workingDirectories = { outputFilePath + "/immissions/" , outputFilePath + "/consideredAgentUnits/" };
+		final String[] labels = { "immission", "consideredAgentUnits", "damages_receiverPoint" };
+		final String[] workingDirectories = { outputFilePath + "/immissions/" , outputFilePath + "/consideredAgentUnits/", outputFilePath + "/damages_receiverPoint/" };
 
 
 		MergeNoiseCSVFile merger = new MergeNoiseCSVFile() ;

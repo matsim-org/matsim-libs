@@ -84,7 +84,8 @@ class ScoringFunctionsForPopulation implements BasicEventHandler, ExperiencedPla
 	private final Map<Id<Person>, TDoubleCollection> partialScores = new LinkedHashMap<>();
 
 	@Inject
-	ScoringFunctionsForPopulation(EventsManager eventsManager, ExperiencedPlanElementsService experiencedPlanElementsService, PlansConfigGroup plansConfigGroup, Network network, Population population, ScoringFunctionFactory scoringFunctionFactory) {
+	ScoringFunctionsForPopulation(EventsManager eventsManager, ExperiencedPlanElementsService experiencedPlanElementsService, 
+			PlansConfigGroup plansConfigGroup, Network network, Population population, ScoringFunctionFactory scoringFunctionFactory) {
 		this.plansConfigGroup = plansConfigGroup;
 		this.network = network;
 		this.population = population;
@@ -117,6 +118,7 @@ class ScoringFunctionsForPopulation implements BasicEventHandler, ExperiencedPla
 		return this.agentScorers.get(agentId);
 	}
 
+	@Override
 	public Map<Id<Person>, Plan> getAgentRecords() {
 		return this.agentRecords;
 	}
@@ -157,21 +159,23 @@ class ScoringFunctionsForPopulation implements BasicEventHandler, ExperiencedPla
 	}
 
 	public void writeExperiencedPlans(String iterationFilename) {
-		Population population = PopulationUtils.createPopulation(plansConfigGroup, network);
+		Population tmpPop = PopulationUtils.createPopulation(plansConfigGroup, network);
 		for (Entry<Id<Person>, Plan> entry : this.agentRecords.entrySet()) {
 			Person person = PopulationUtils.createPerson(entry.getKey());
 			Plan plan = entry.getValue();
 			plan.setScore(getScoringFunctionForAgent(person.getId()).getScore());
 			person.addPlan(plan);
-			population.addPerson(person);
+			tmpPop.addPerson(person);
 			if (plan.getScore().isNaN()) {
 				log.warn("score is NaN; plan:" + plan.toString());
 			}
 		}
-		new PopulationWriter(population, network).writeV5(iterationFilename + ".xml.gz");
+		new PopulationWriter(tmpPop, network).write(iterationFilename + ".xml.gz");
+		// I removed the "V5" here in the assumption that it is better to move along with future format changes.  If this is 
+		// undesired, please change back but could you then please also add a comment why you prefer this.  Thanks.
+		// kai, jan'16
 
-		BufferedWriter out = IOUtils.getBufferedWriter(iterationFilename + "_scores.xml.gz");
-		try {
+		try ( BufferedWriter out = IOUtils.getBufferedWriter(iterationFilename + "_scores.xml.gz") ) {
 			for (Entry<Id<Person>, TDoubleCollection> entry : this.partialScores.entrySet()) {
 				out.write(entry.getKey().toString());
 				TDoubleIterator iterator = entry.getValue().iterator();

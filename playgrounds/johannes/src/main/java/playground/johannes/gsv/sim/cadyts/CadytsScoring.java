@@ -54,7 +54,7 @@ public class CadytsScoring<T> implements ArbitraryEventScoring , org.matsim.core
 	
 	@Override
 	public void finish() {
-		cadyts.demand.Plan<T> currentPlanSteps = this.ptPlanToPlanStep.getPlanSteps(plan);
+		cadyts.demand.Plan<T> currentPlanSteps = this.ptPlanToPlanStep.getCadytsPlan(plan);
 //		if(currentPlanSteps != null) {
 //			System.err.println();
 //		}

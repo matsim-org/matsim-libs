@@ -63,11 +63,11 @@ public class CadytsPlanChanger<T> implements PlanSelector {
 			return otherPlan;
 		}
 
-		cadyts.demand.Plan<T> currentPlanSteps = this.cadytsContext.getPlansTranslator().getPlanSteps(currentPlan);
+		cadyts.demand.Plan<T> currentPlanSteps = this.cadytsContext.getPlansTranslator().getCadytsPlan(currentPlan);
 		double currentPlanCadytsCorrection = this.cadytsContext.getCalibrator().calcLinearPlanEffect(currentPlanSteps) / this.beta;
 		double currentScore = currentPlan.getScore() + cadytsWeight * currentPlanCadytsCorrection;
 
-		cadyts.demand.Plan<T> otherPlanSteps = this.cadytsContext.getPlansTranslator().getPlanSteps(otherPlan);
+		cadyts.demand.Plan<T> otherPlanSteps = this.cadytsContext.getPlansTranslator().getCadytsPlan(otherPlan);
 		double otherPlanCadytsCorrection = this.cadytsContext.getCalibrator().calcLinearPlanEffect(otherPlanSteps) / this.beta;
 		double otherScore = otherPlan.getScore() + cadytsWeight * otherPlanCadytsCorrection;
 

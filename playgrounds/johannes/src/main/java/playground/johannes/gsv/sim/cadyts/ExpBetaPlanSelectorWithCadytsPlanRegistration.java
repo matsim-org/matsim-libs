@@ -28,7 +28,7 @@ public final class ExpBetaPlanSelectorWithCadytsPlanRegistration<T> implements P
 	@Override
 	public Plan selectPlan(HasPlansAndId<Plan, Person> person) {
 		Plan selectedPlan = delegate.selectPlan(person) ;
-		cadyts.demand.Plan<T> cadytsPlan = cContext.getPlansTranslator().getPlanSteps( selectedPlan ) ;
+		cadyts.demand.Plan<T> cadytsPlan = cContext.getPlansTranslator().getCadytsPlan( selectedPlan ) ;
 		cContext.getCalibrator().addToDemand(cadytsPlan) ;
 		return selectedPlan ;
 	}

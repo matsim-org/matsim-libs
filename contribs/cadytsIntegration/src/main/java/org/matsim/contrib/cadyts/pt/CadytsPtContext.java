@@ -158,7 +158,7 @@ CadytsContextI<TransitStopFacility> {
 	public void notifyBeforeMobsim(final BeforeMobsimEvent event) {
 		this.cadytsPtOccupAnalyzer.reset(event.getIteration());
 		for (Person person : scenario.getPopulation().getPersons().values()) {
-			this.calibrator.addToDemand(ptStep.getPlanSteps(person.getSelectedPlan()));
+			this.calibrator.addToDemand(ptStep.getCadytsPlan(person.getSelectedPlan()));
 		}
 	}
 

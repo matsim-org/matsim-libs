@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.cadyts.car.PlanToPlanStepBasedOnEvents;
+import org.matsim.contrib.cadyts.car.PlansTranslatorBasedOnEvents;
 import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -56,7 +56,7 @@ class CadytsControlerListener implements BeforeMobsimListener, AfterMobsimListen
 
 
     @Inject
-    PlanToPlanStepBasedOnEvents ptStep;
+    PlansTranslatorBasedOnEvents ptStep;
 
 	private final double countsScaleFactor;
     private final boolean writeAnalysisFile;
@@ -84,7 +84,7 @@ class CadytsControlerListener implements BeforeMobsimListener, AfterMobsimListen
     @Override
     public void notifyBeforeMobsim(BeforeMobsimEvent event) {
         for (Person person : scenario.getPopulation().getPersons().values()) {
-            this.calibrator.addToDemand(ptStep.getPlanSteps(person.getSelectedPlan()));
+            this.calibrator.addToDemand(ptStep.getCadytsPlan(person.getSelectedPlan()));
         }
     }
 

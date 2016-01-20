@@ -112,7 +112,7 @@ public class MeasurementCadytsContext implements CadytsContextI<Measurement>, St
 		// and Cadyts can handle this "noise". Checked this with Gunnar.
 		// mz 2015
 		for (Person person : event.getServices().getScenario().getPopulation().getPersons().values()) {
-			Plan<Measurement> planSteps = this.measurementListener.getPlanSteps(person.getSelectedPlan());
+			Plan<Measurement> planSteps = this.measurementListener.getCadytsPlan(person.getSelectedPlan());
 			this.calibrator.addToDemand(planSteps);
 		}
 	}

@@ -80,7 +80,7 @@ class CadytsFreightChainsContext implements CadytsContextI<Item>, BeforeMobsimLi
 	 */
 	private final PlansTranslator<Item> plansTranslator = new PlansTranslator<Item>() {
 		@Override
-		public cadyts.demand.Plan<Item> getPlanSteps(org.matsim.api.core.v01.population.Plan plan) {
+		public cadyts.demand.Plan<Item> getCadytsPlan(org.matsim.api.core.v01.population.Plan plan) {
 			cadyts.demand.PlanBuilder<Item> planBuilder = new cadyts.demand.PlanBuilder<Item>() ;
 			int time = 0 ; // there is no time here but we need to set something 
 			final Item item = getCorrectItemFromPlan(plan);

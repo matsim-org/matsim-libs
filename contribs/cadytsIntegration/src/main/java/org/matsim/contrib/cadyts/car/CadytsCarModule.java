@@ -33,6 +33,9 @@ public class CadytsCarModule extends AbstractModule {
 		} else {
 			bind(Key.get(new TypeLiteral<Counts<Link>>(){}, Names.named("calibration"))).toProvider(CalibrationCountsProvider.class).in(Singleton.class);
 		}
+		// In principle this is bind(Counts<Link>).to...  But it wants to keep the option of multiple counts, under different names, open.
+		// I think.  kai, jan'16
+		
 		bind(CadytsContext.class).asEagerSingleton();
 		addControlerListenerBinding().to(CadytsContext.class);
 	}
