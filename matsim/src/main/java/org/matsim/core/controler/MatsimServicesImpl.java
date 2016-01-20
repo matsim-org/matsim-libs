@@ -2,7 +2,9 @@ package org.matsim.core.controler;
 
 
 import com.google.inject.Injector;
+import com.google.inject.Key;
 import com.google.inject.Provider;
+import com.google.inject.TypeLiteral;
 import org.matsim.analysis.CalcLinkStats;
 import org.matsim.analysis.IterationStopWatch;
 import org.matsim.analysis.ScoreStats;
@@ -26,58 +28,49 @@ import java.util.Map;
 
 class MatsimServicesImpl implements MatsimServices {
 
-	@Inject IterationStopWatch iterationStopWatch;
 	@Override
 	public IterationStopWatch getStopwatch() {
-		return iterationStopWatch;
+		return injector.getInstance(IterationStopWatch.class);
 	}
 
-	@Inject Map<String, TravelTime> travelTimes;
 	@Override
-	public TravelTime getLinkTravelTimes() {
-		return travelTimes.get(TransportMode.car);
+	public final TravelTime getLinkTravelTimes() {
+		return this.injector.getInstance(com.google.inject.Injector.class).getInstance(Key.get(new TypeLiteral<Map<String, TravelTime>>() {})).get(TransportMode.car);
 	}
 
-	@Inject Provider<TripRouter> tripRouterProvider;
 	@Override
-	public Provider<TripRouter> getTripRouterProvider() {
-		return tripRouterProvider;
+	public final Provider<TripRouter> getTripRouterProvider() {
+		return this.injector.getProvider(TripRouter.class);
 	}
 
-	@Inject Map<String, TravelDisutilityFactory> travelDisutilities;
 	@Override
-	public TravelDisutility createTravelDisutilityCalculator() {
+	public final TravelDisutility createTravelDisutilityCalculator() {
 		return getTravelDisutilityFactory().createTravelDisutility(this.injector.getInstance(TravelTime.class), getConfig().planCalcScore());
 	}
 
-	@Inject LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
 	@Override
-	public LeastCostPathCalculatorFactory getLeastCostPathCalculatorFactory() {
-		return leastCostPathCalculatorFactory;
+	public final LeastCostPathCalculatorFactory getLeastCostPathCalculatorFactory() {
+		return this.injector.getInstance(LeastCostPathCalculatorFactory.class);
 	}
 
-	@Inject ScoringFunctionFactory scoringFunctionFactory;
 	@Override
-	public ScoringFunctionFactory getScoringFunctionFactory() {
-		return scoringFunctionFactory;
+	public final ScoringFunctionFactory getScoringFunctionFactory() {
+		return this.injector.getInstance(ScoringFunctionFactory.class);
 	}
 
-	@Inject Config config;
 	@Override
 	public Config getConfig() {
-		return config;
+		return this.injector.getInstance(Config.class);
 	}
 
-	@Inject Scenario scenario;
 	@Override
 	public Scenario getScenario() {
-		return scenario;
+		return this.injector.getInstance(Scenario.class);
 	}
 
-	@Inject EventsManager eventsManager;
 	@Override
 	public EventsManager getEvents() {
-		return eventsManager;
+		return this.injector.getInstance(EventsManager.class);
 	}
 
 	@Inject Injector injector;
@@ -87,37 +80,34 @@ class MatsimServicesImpl implements MatsimServices {
 	}
 
 	@Override
-	public CalcLinkStats getLinkStats() {
-		return injector.getInstance(CalcLinkStats.class);
-	}
-
-	@Inject VolumesAnalyzer volumesAnalyzer;
-	@Override
-	public VolumesAnalyzer getVolumes() {
-		return volumesAnalyzer;
+	public final CalcLinkStats getLinkStats() {
+		return this.injector.getInstance(CalcLinkStats.class);
 	}
 
 	@Override
-	public ScoreStats getScoreStats() {
-		return injector.getInstance(ScoreStats.class);
+	public final VolumesAnalyzer getVolumes() {
+		return this.injector.getInstance(VolumesAnalyzer.class);
 	}
 
 	@Override
-	public TravelDisutilityFactory getTravelDisutilityFactory() {
-		return travelDisutilities.get(TransportMode.car);
+	public final ScoreStats getScoreStats() {
+		return this.injector.getInstance(ScoreStats.class);
 	}
 
-	@Inject
-	StrategyManager strategyManager;
 	@Override
-	public StrategyManager getStrategyManager() {
-		return strategyManager;
+	public final TravelDisutilityFactory getTravelDisutilityFactory() {
+		return this.injector.getInstance(com.google.inject.Injector.class).getInstance(Key.get(new TypeLiteral<Map<String, TravelDisutilityFactory>>(){}))
+				.get(TransportMode.car);
 	}
 
-	@Inject OutputDirectoryHierarchy controlerIO;
+	@Override
+	public final StrategyManager getStrategyManager() {
+		return this.injector.getInstance(StrategyManager.class);
+	}
+
 	@Override
 	public OutputDirectoryHierarchy getControlerIO() {
-		return controlerIO;
+		return injector.getInstance(OutputDirectoryHierarchy.class);
 	}
 
 	@Override
@@ -125,9 +115,8 @@ class MatsimServicesImpl implements MatsimServices {
 		((NewControler) injector.getInstance(ControlerI.class)).addControlerListener(controlerListener);
 	}
 
-	@Inject ReplanningContext replanningContext;
 	@Override
 	public Integer getIterationNumber() {
-		return replanningContext.getIteration();
+		return injector.getInstance(ReplanningContext.class).getIteration();
 	}
 }

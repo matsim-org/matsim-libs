@@ -24,7 +24,7 @@ import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.router.TripRouter;
 import org.matsim.facilities.ActivityFacilities;
-import playground.johannes.gsv.sim.Simulator;
+import playground.johannes.gsv.sim.GsvConfigGroup;
 import playground.johannes.synpop.gis.ZoneCollection;
 import playground.johannes.synpop.gis.ZoneGeoJsonIO;
 import playground.johannes.synpop.matrix.NumericMatrix;
@@ -51,17 +51,17 @@ public class ODAdjustorListener implements IterationStartsListener {
 		TripRouter router = controler.getTripRouterProvider().get();
 		ActivityFacilities facilities = controler.getScenario().getActivityFacilities();
 
-		NumericMatrix refMatrix = loadRefMatrix(controler.getConfig().getParam(Simulator.GSV_CONFIG_MODULE_NAME, "odMatrixFile"));
-		ZoneCollection zones = loadZones(controler.getConfig().getParam(Simulator.GSV_CONFIG_MODULE_NAME, "zonesFile"));
+		NumericMatrix refMatrix = loadRefMatrix(controler.getConfig().getParam(GsvConfigGroup.GSV_CONFIG_MODULE_NAME, "odMatrixFile"));
+		ZoneCollection zones = loadZones(controler.getConfig().getParam(GsvConfigGroup.GSV_CONFIG_MODULE_NAME, "zonesFile"));
 
-		double distThreshold = Double.parseDouble(controler.getConfig().getParam(Simulator.GSV_CONFIG_MODULE_NAME, "odDistThreshold"));
-		double countThreshold = Double.parseDouble(controler.getConfig().getParam(Simulator.GSV_CONFIG_MODULE_NAME, "odCountThreshold"));
+		double distThreshold = Double.parseDouble(controler.getConfig().getParam(GsvConfigGroup.GSV_CONFIG_MODULE_NAME, "odDistThreshold"));
+		double countThreshold = Double.parseDouble(controler.getConfig().getParam(GsvConfigGroup.GSV_CONFIG_MODULE_NAME, "odCountThreshold"));
 		ODUtils.cleanDistances(refMatrix, zones, distThreshold);
 		ODUtils.cleanVolumes(refMatrix, zones, countThreshold);
 
 		adjustor = new ODAdjustor(facilities, router, zones, refMatrix, controler.getControlerIO().getOutputPath());
 
-		interval = Integer.parseInt(controler.getConfig().getParam(Simulator.GSV_CONFIG_MODULE_NAME, "odAdjustorInterval"));
+		interval = Integer.parseInt(controler.getConfig().getParam(GsvConfigGroup.GSV_CONFIG_MODULE_NAME, "odAdjustorInterval"));
 	}
 
 	private NumericMatrix loadRefMatrix(String filename) {

@@ -31,7 +31,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
-import playground.johannes.gsv.sim.Simulator;
+import playground.johannes.gsv.sim.GsvConfigGroup;
 
 import java.util.Map;
 
@@ -87,7 +87,7 @@ public final class CadytsBuilder {
 		int linkCnt = 0 ;
 		int odCount = 0;
 		
-		double odWeightFactor = Double.parseDouble(config.getParam(Simulator.GSV_CONFIG_MODULE_NAME, "odWeightFactor"));
+		double odWeightFactor = Double.parseDouble(config.getParam(GsvConfigGroup.GSV_CONFIG_MODULE_NAME, "odWeightFactor"));
 		for (Map.Entry<Id<T>, Count<T>> entry : occupCounts.getCounts().entrySet()) {
 			// (loop over all counting "items" (usually locations/stations)
 			
