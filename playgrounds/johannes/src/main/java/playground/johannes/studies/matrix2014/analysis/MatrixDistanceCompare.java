@@ -112,7 +112,7 @@ public class MatrixDistanceCompare implements AnalyzerTask<Pair<NumericMatrix, N
             try {
                 Histogram.normalize(simHist);
                 Histogram.normalize(refHist);
-                Histogram.normalize(diffHist);
+//                Histogram.normalize(diffHist);
 
                 StatsWriter.writeHistogram(simHist, "distance", "count", String.format("%s/%s.sim.txt", ioContext.getPath
                         (), dimension));

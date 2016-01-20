@@ -107,7 +107,9 @@ public class Simulator {
 		/*
 		Setup hamiltonian
 		 */
+        MarkovEngineListenerComposite engineListeners = new MarkovEngineListenerComposite();
         final HamiltonianComposite hamiltonian = new HamiltonianComposite();
+//        final MutableHamiltonianComposite hamiltonian = new MutableHamiltonianComposite();
         TaskRunner.run(new CopyPersonAttToLeg(CommonKeys.PERSON_WEIGHT), refPersons);
         TaskRunner.run(new CopyPersonAttToLeg(CommonKeys.PERSON_WEIGHT), simPersons);
 		/*
@@ -115,6 +117,10 @@ public class Simulator {
 		 */
         UnivariatFrequency distDistrTerm = buildDistDistrTerm(refPersons, simPersons);
         hamiltonian.addComponent(distDistrTerm, Double.parseDouble(config.getParam(MODULE_NAME, "theta_distDistr")));
+//        double theta = Double.parseDouble(config.getParam(MODULE_NAME, "theta_distDistr"));
+//        ThetaProvider provider = new ThetaProvider(distDistrTerm, 0.0000001, 1000000, theta, theta * 1000000000);
+//        hamiltonian.addComponent(distDistrTerm, provider);
+//        engineListeners.addComponent(provider);
 
         UnivariatFrequency distDistrTerm2 = buildDistDistrTerm2(refPersons, simPersons);
         hamiltonian.addComponent(distDistrTerm2, Double.parseDouble(config.getParam(MODULE_NAME, "theta_distDistr")));
@@ -158,7 +164,7 @@ public class Simulator {
 		 */
         MarkovEngine sampler = new MarkovEngine(simPersons, hamiltonian, mutator, random);
 
-        MarkovEngineListenerComposite engineListeners = new MarkovEngineListenerComposite();
+
 
         long dumpInterval = (long) Double.parseDouble(config.getParam(MODULE_NAME, "dumpInterval"));
         engineListeners.addComponent(new AnalyzerListener(task, ioContext, dumpInterval));
