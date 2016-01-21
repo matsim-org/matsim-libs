@@ -82,7 +82,7 @@ public class MeasurementListener implements PlansTranslator<Measurement>,
 	private long plansNotFound = 0;
 
 	@Override
-	public final cadyts.demand.Plan<Measurement> getPlanSteps(final Plan plan) {
+	public final cadyts.demand.Plan<Measurement> getCadytsPlan(final Plan plan) {
 		@SuppressWarnings("unchecked")
 		PlanBuilder<Measurement> planStepFactory = (PlanBuilder<Measurement>) plan.getCustomAttributes().get(STR_PLANSTEPFACTORY);
 		if (planStepFactory == null) {

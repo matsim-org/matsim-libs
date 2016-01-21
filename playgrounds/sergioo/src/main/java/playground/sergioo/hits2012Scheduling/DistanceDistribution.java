@@ -20,7 +20,7 @@ import playground.sergioo.hits2012.Trip;
 public class DistanceDistribution {
 
 	public static void main(String[] args) throws NumberFormatException, IOException, ParseException {
-		Map<String, Household> households = HitsReader.readHits(args[0], args[1]);
+		Map<String, Household> households = HitsReader.readHits(args[0]);
 		//Map<String, double[]> secondaryTrips = new HashMap<>();
 		PrintWriter writer = new PrintWriter(new File("./data/cepas/distance.txt"));
 		List<String> homeWork = Arrays.asList(Trip.Purpose.HOME.text, Trip.Purpose.WORK.text);

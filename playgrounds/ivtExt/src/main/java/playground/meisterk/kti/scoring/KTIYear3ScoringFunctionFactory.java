@@ -20,21 +20,6 @@
 
 package playground.meisterk.kti.scoring;
 
-import java.util.TreeMap;
-
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.locationchoice.facilityload.FacilityPenalty;
-import org.matsim.core.config.Config;
-import org.matsim.core.scoring.ScoringFunction;
-import org.matsim.core.scoring.SumScoringFunction;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
-import org.matsim.facilities.ActivityFacilities;
-
-import playground.meisterk.kti.config.KtiConfigGroup;
-
-
 //public class KTIYear3ScoringFunctionFactory extends org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory {
 //
 //    private final Scenario scenario;

@@ -30,7 +30,12 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -38,7 +43,7 @@ import org.matsim.core.utils.io.IOUtils;
  * @author dgrether
  * 
  */
-public class ReactiveGuidance extends AbstractGuidance implements Guidance {
+public class ReactiveGuidance extends AbstractGuidance implements Guidance, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 
 	private static final Logger log = Logger.getLogger(ReactiveGuidance.class);
 
@@ -52,6 +57,8 @@ public class ReactiveGuidance extends AbstractGuidance implements Guidance {
 	private List<Double> currentTravelTimesRoute2 = new ArrayList<Double>();
 
 	private BufferedWriter writer;
+	
+	Vehicle2DriverEventHandler vehicle2driver = new Vehicle2DriverEventHandler();
 
 	public ReactiveGuidance(Network network, String outfile) {
 		super(network, outfile);
@@ -94,11 +101,11 @@ public class ReactiveGuidance extends AbstractGuidance implements Guidance {
 	@Override
 	public void handleEvent(LinkEnterEvent e) {
 		if (e.getLinkId().equals(id2)) { 
-			this.personIdLinkEnterEventMap.put(e.getDriverId(), e);
+			this.personIdLinkEnterEventMap.put(vehicle2driver.getDriverOfVehicle(e.getVehicleId()), e);
 			this.vehOn1++;
 		}
 		else if (e.getLinkId().equals(id3)){
-			this.personIdLinkEnterEventMap.put(e.getDriverId(), e);
+			this.personIdLinkEnterEventMap.put(vehicle2driver.getDriverOfVehicle(e.getVehicleId()), e);
 			this.vehOn2++;
 		}
 	}
@@ -107,12 +114,12 @@ public class ReactiveGuidance extends AbstractGuidance implements Guidance {
 	public void handleEvent(LinkLeaveEvent e) {
 		LinkEnterEvent enterEvent = null;
 		if (e.getLinkId().equals(id4)){
-			enterEvent = this.personIdLinkEnterEventMap.remove(e.getDriverId());
+			enterEvent = this.personIdLinkEnterEventMap.remove(vehicle2driver.getDriverOfVehicle(e.getVehicleId()));
 			this.currentTravelTimesRoute1.add(e.getTime() - enterEvent.getTime());
 			this.vehOn1--;
 		}
 		else if (e.getLinkId().equals(id5)){
-			enterEvent = this.personIdLinkEnterEventMap.remove(e.getDriverId());
+			enterEvent = this.personIdLinkEnterEventMap.remove(vehicle2driver.getDriverOfVehicle(e.getVehicleId()));
 			this.currentTravelTimesRoute2.add(e.getTime() - enterEvent.getTime());
 			this.vehOn2--;
 		}
@@ -185,5 +192,15 @@ public class ReactiveGuidance extends AbstractGuidance implements Guidance {
 	}
 
 
+	@Override
+	public void handleEvent(VehicleEntersTrafficEvent event) {
+		vehicle2driver.handleEvent(event);
+	}
+
+
+	@Override
+	public void handleEvent(VehicleLeavesTrafficEvent event) {
+		vehicle2driver.handleEvent(event);
+	}
 
 }

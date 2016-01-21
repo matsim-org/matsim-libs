@@ -68,7 +68,7 @@ public abstract class ActivityTypeManipulator {
 		mpr.readFile(population);
 		
 		/* Read the network file. */
-		MatsimNetworkReader mnr = new MatsimNetworkReader(sc);
+		MatsimNetworkReader mnr = new MatsimNetworkReader(sc.getNetwork());
 		mnr.readFile(network);		
 		
 		LOG.info("Population: " + sc.getPopulation().getPersons().size());

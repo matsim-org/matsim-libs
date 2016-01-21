@@ -79,7 +79,7 @@ public class QNetwork implements NetsimNetwork {
 		}
 	}
 	
-	/*package*/ SnapshotLinkWidthCalculator getLinkWidthCalculator(){
+	/*package*/ SnapshotLinkWidthCalculator getLinkWidthCalculatorForVis(){
 		return this.linkWidthCalculator;
 	}
 

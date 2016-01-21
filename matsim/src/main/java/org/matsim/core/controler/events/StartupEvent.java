@@ -20,16 +20,16 @@
 
 package org.matsim.core.controler.events;
 
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 
 /**
- * ControlerEvent to notify all observers of the controler that the controler instance is setup
+ * ControlerEvent to notify all observers of the services that the services instance is setup
  *
  * @author dgrether
  */
 public final class StartupEvent extends ControlerEvent {
 
-	public StartupEvent(final Controler controler) {
+	public StartupEvent(final MatsimServices controler) {
 		super(controler);
 	}
 

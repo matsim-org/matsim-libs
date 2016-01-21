@@ -37,7 +37,7 @@ import playground.thibautd.initialdemandgeneration.socnetgen.analysis.WriteDegre
 import playground.thibautd.initialdemandgeneration.socnetgen.framework.SnaUtils;
 import playground.thibautd.initialdemandgeneration.socnetgen.framework.SocialPopulation;
 import playground.thibautd.initialdemandgeneration.socnetgen.scripts.RunTRBModel.ArentzeAgent;
-import playground.thibautd.utils.MoreIOUtils;
+import playground.ivt.utils.MoreIOUtils;
 
 import java.io.BufferedWriter;
 import java.io.IOException;

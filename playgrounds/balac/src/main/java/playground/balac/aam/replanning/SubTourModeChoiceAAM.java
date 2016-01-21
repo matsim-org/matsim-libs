@@ -12,6 +12,8 @@ import org.matsim.population.algorithms.PermissibleModesCalculator;
 import org.matsim.population.algorithms.PermissibleModesCalculatorImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
+import javax.inject.Provider;
+
 /**
  * Changes the transportation mode of all legs of one randomly chosen subtour in a plan to a randomly chosen
  * different mode given a list of possible modes.
@@ -34,7 +36,8 @@ import org.matsim.population.algorithms.PlanAlgorithm;
  */
 public class SubTourModeChoiceAAM extends AbstractMultithreadedModule {
 	private PermissibleModesCalculator permissibleModesCalculator;
-	
+	private final Provider<TripRouter> tripRouterProvider;
+
 	private final String[] chainBasedModes;
 	private final String[] modes;
 	private final CharyparNagelScoringParameters params;
@@ -42,12 +45,12 @@ public class SubTourModeChoiceAAM extends AbstractMultithreadedModule {
 	private final double walkSpeed;
 	private final double ptSpeed;
 	private Scenario scenario;
-	public SubTourModeChoiceAAM(final Scenario scenario) {
+	public SubTourModeChoiceAAM(final Scenario scenario, Provider<TripRouter> tripRouterProvider) {
 		this( scenario.getConfig().global().getNumberOfThreads(),
 				scenario.getConfig().subtourModeChoice().getModes(),
 						scenario.getConfig().subtourModeChoice().getChainBasedModes(),
 								scenario.getConfig().subtourModeChoice().considerCarAvailability(),
-				CharyparNagelScoringParameters.getBuilder(scenario.getConfig().planCalcScore(), scenario.getConfig().planCalcScore().getScoringParameters( null ), scenario.getConfig().scenario()).create(),
+				tripRouterProvider, CharyparNagelScoringParameters.getBuilder(scenario.getConfig().planCalcScore(), scenario.getConfig().planCalcScore().getScoringParameters( null ), scenario.getConfig().scenario()).create(),
 				Double.parseDouble(scenario.getConfig().getModule("planscalcroute").getParams().get("beelineDistanceFactor")),
 				Double.parseDouble(scenario.getConfig().getModule("planscalcroute").getParams().get("teleportedModeSpeed_walk")),
 				Double.parseDouble(scenario.getConfig().getModule("planscalcroute").getParams().get("teleportedModeSpeed_pt")),
@@ -60,12 +63,13 @@ public class SubTourModeChoiceAAM extends AbstractMultithreadedModule {
 			final String[] modes,
 			final String[] chainBasedModes,
 			final boolean considerCarAvailability,
-			final CharyparNagelScoringParameters params,
+			Provider<TripRouter> tripRouterProvider, final CharyparNagelScoringParameters params,
 			double beeLineFactor,
 			double walkSpeed,
 			double ptSpeed,
 			Scenario scenario) {
 		super(numberOfThreads);
+		this.tripRouterProvider = tripRouterProvider;
 		this.scenario = scenario;
 		this.modes = modes.clone();
 		this.chainBasedModes = chainBasedModes.clone();
@@ -85,7 +89,7 @@ public class SubTourModeChoiceAAM extends AbstractMultithreadedModule {
 
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
-		final TripRouter tripRouter = getReplanningContext().getTripRouter();
+		final TripRouter tripRouter = tripRouterProvider.get();
 		final ChooseRandomLegModeForSubtourAAM chooseRandomLegMode =
 				new ChooseRandomLegModeForSubtourAAM(
 						tripRouter.getStageActivityTypes(),

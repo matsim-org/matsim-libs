@@ -239,7 +239,7 @@ public class MyGantryComparatorTest extends MatsimTestCase{
 		
 		Controler c = new Controler(config);
         c.getConfig().controler().setCreateGraphs(false);
-        c.setDumpDataAtEnd(false);
+		c.getConfig().controler().setDumpDataAtEnd(false);
 		c.run();
 		
 		config.plans().setInputFile(getClassInputDirectory() + "50.plans110.xml.gz");
@@ -247,8 +247,8 @@ public class MyGantryComparatorTest extends MatsimTestCase{
 		
 		c = new Controler(config);
         c.getConfig().controler().setCreateGraphs(false);
-        c.setDumpDataAtEnd(false);
-		c.run();		
+		c.getConfig().controler().setDumpDataAtEnd(false);
+		c.run();
 	}
 
 }

@@ -77,7 +77,7 @@
 //		controler.setCreateGraphs(false);
 //		controler.setWriteEventsInterval(0);
 //
-//		controler.addControlerListener(new TestDataStartupListener(controler));
+//		services.addControlerListener(new TestDataStartupListener(services));
 //
 //		// installing the income-based scoring function and related:
 //		final PersonHouseholdMapping personHouseholdMapping = 
@@ -136,14 +136,14 @@
 //		private final Controler controler;
 //
 //		private TestDataStartupListener(Controler controler) {
-//			this.controler = controler;
+//			this.services = services;
 //		}
 //
 //		public void notifyStartup(final StartupEvent event) {
 //			//				double agent1LeaveHomeTime = controler.getPopulation().getPerson(id1).getPlans().get(0).getFirstActivity().getEndTime();
 //			//				double agent2LeaveHomeTime = controler.getPopulation().getPerson(id2).getPlans().get(0).getFirstActivity().getEndTime();
 //			//				controler.getEvents().addHandler(new TestSingleIterationEventHandler(agent1LeaveHomeTime, agent2LeaveHomeTime));
-//			planScorer = new EventsToScore(controler.getScenario(), controler.getScoringFunctionFactory(), controler.getConfig().planCalcScore().getLearningRate());
+//			planScorer = new EventsToScore(services.getScenario(), services.getScoringFunctionFactory(), services.getConfig().planCalcScore().getLearningRate());
 //			controler.getEvents().addHandler(planScorer);
 //		}
 //	}

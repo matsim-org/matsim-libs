@@ -51,7 +51,7 @@ public class AnalyzeZHScenario {
 	}
 	
 	public void run() {
-		new MatsimNetworkReader(scenario).readFile(networkfilePath);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkfilePath);
 		new FacilitiesReaderMatsimV1(scenario).readFile(facilitiesfilePath);
 		
 		this.analyzefacilities(this.scenario.getActivityFacilities().getFacilities().keySet(), "Switzerland");

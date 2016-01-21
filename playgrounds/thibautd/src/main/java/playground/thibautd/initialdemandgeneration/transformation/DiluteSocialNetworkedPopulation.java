@@ -29,7 +29,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import playground.ivt.utils.ArgParser;
-import playground.thibautd.utils.MoreIOUtils;
+import playground.ivt.utils.MoreIOUtils;
 
 /**
  * Given a population for a wide area (say Switzerland), goes through a dilution

@@ -12,6 +12,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.PointFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.facilities.ActivityFacility;
@@ -28,7 +29,8 @@ public class FacilityLocationAnalyzer {
 //	private static String inputOutputDirectory = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/osm/schlesische_str/07/";
 //	private static String inputOutputDirectory = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/osm/kreuzberg/02/";
 //	private static String inputOutputDirectory = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/osm/berlin/combined/01/";
-	private static String inputOutputDirectory = "../../../../Workspace/data/accessibility/nairobi/facilities/03/";
+//	private static String inputOutputDirectory = "../../../../Workspace/data/accessibility/nairobi/facilities/03/";
+	private static String inputOutputDirectory = "../../../../Workspace/data/accessibility/capetown/facilities/01/";
 	
 	private static String facilitiesFile = inputOutputDirectory + "facilities.xml";
 	private static String outputFileName = inputOutputDirectory + "facilities.shp";
@@ -41,8 +43,8 @@ public class FacilityLocationAnalyzer {
 //	private static String[] attributeLabel = {"FacilityId", "Type", "Name"};
 //	static String crs = TransformationFactory.DHDN_GK4;
 //	static String crs = "EPSG:31468"; // = DHDN GK4, for Berlin
-	static String crs = "EPSG:21037"; // = Arc 1960 / UTM zone 37S, for Nairobi, Kenya
-//	static String crs = TransformationFactory.WGS84_SA_Albers;
+//	static String crs = "EPSG:21037"; // = Arc 1960 / UTM zone 37S, for Nairobi, Kenya
+	static String crs = TransformationFactory.WGS84_SA_Albers;
 	
 	
 	private static PointFeatureFactory pointFeatureFactory;

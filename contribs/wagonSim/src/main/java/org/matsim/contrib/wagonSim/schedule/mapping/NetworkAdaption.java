@@ -259,7 +259,7 @@ public class NetworkAdaption {
 		MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		sc.getConfig().transit().setUseTransit(true);
 		sc.getConfig().scenario().setUseVehicles(true);
-		new MatsimNetworkReader(sc).readFile(networkFile);
+		new MatsimNetworkReader(sc.getNetwork()).readFile(networkFile);
 		new TransitScheduleReaderV1(sc).readFile(transitScheduleFile);
 		new VehicleReaderV1(sc.getTransitVehicles()).readFile(transitVehiclesFile);
 		log.info("done. (parsing)");

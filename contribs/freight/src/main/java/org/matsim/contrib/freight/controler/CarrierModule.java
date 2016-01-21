@@ -22,9 +22,8 @@
 
 package org.matsim.contrib.freight.controler;
 
-import com.google.inject.Provider;
+import com.google.inject.Provides;
 import org.matsim.contrib.freight.CarrierConfig;
-import org.matsim.contrib.freight.carrier.CarrierPlanXmlReaderV2;
 import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.mobsim.CarrierAgentTracker;
 import org.matsim.contrib.freight.mobsim.FreightQSimFactory;
@@ -41,16 +40,16 @@ public class CarrierModule extends AbstractModule {
     private CarrierPlanStrategyManagerFactory strategyManagerFactory;
     private CarrierScoringFunctionFactory scoringFunctionFactory;
 
+    /**
+     * CarrierPlanStrategyManagerFactory and CarrierScoringFunctionFactory must me bound separately
+     * when this constructor is used.
+     */
+    public CarrierModule(Carriers carriers) {
+        this.carriers = carriers;
+    }
 
     public CarrierModule(Carriers carriers, CarrierPlanStrategyManagerFactory strategyManagerFactory, CarrierScoringFunctionFactory scoringFunctionFactory) {
         this.carriers = carriers;
-        this.strategyManagerFactory = strategyManagerFactory;
-        this.scoringFunctionFactory = scoringFunctionFactory;
-    }
-
-    public CarrierModule(String carrierPlansFilename, CarrierPlanStrategyManagerFactory strategyManagerFactory, CarrierScoringFunctionFactory scoringFunctionFactory) {
-        this.carriers = new Carriers();
-        new CarrierPlanXmlReaderV2(carriers).read(carrierPlansFilename);
         this.strategyManagerFactory = strategyManagerFactory;
         this.scoringFunctionFactory = scoringFunctionFactory;
     }
@@ -60,24 +59,26 @@ public class CarrierModule extends AbstractModule {
         // We put some things under dependency injection.
         bind(CarrierConfig.class).toInstance(carrierConfig);
         bind(Carriers.class).toInstance(carriers);
-        bind(CarrierPlanStrategyManagerFactory.class).toInstance(strategyManagerFactory);
-        bind(CarrierScoringFunctionFactory.class).toInstance(scoringFunctionFactory);
+        if (strategyManagerFactory != null) {
+            bind(CarrierPlanStrategyManagerFactory.class).toInstance(strategyManagerFactory);
+        }
+        if (scoringFunctionFactory != null) {
+            bind(CarrierScoringFunctionFactory.class).toInstance(scoringFunctionFactory);
+        }
 
         // First, we need a ControlerListener.
-        final CarrierControlerListener carrierControlerListener = new CarrierControlerListener(carriers, strategyManagerFactory, scoringFunctionFactory);
-        addControlerListenerBinding().toInstance(carrierControlerListener);
-
-        // We export CarrierAgentTracker, which is kept by the ControlerListener, which happens to re-create it every iteration.
-        // The freight QSim needs it (see below).
-        bind(CarrierAgentTracker.class).toProvider(new Provider<CarrierAgentTracker>() {
-            @Override
-            public CarrierAgentTracker get() {
-                return carrierControlerListener.getCarrierAgentTracker();
-            }
-        });
+        bind(CarrierControlerListener.class).asEagerSingleton();
+        addControlerListenerBinding().to(CarrierControlerListener.class);
 
         // Set the Mobsim. The FreightQSimFactory needs the CarrierAgentTracker (see constructor).
         bindMobsim().toProvider(FreightQSimFactory.class);
+    }
+
+    // We export CarrierAgentTracker, which is kept by the ControlerListener, which happens to re-create it every iteration.
+    // The freight QSim needs it (see below).
+    @Provides
+    CarrierAgentTracker provideCarrierAgentTracker(CarrierControlerListener carrierControlerListener) {
+        return carrierControlerListener.getCarrierAgentTracker();
     }
 
     public void setPhysicallyEnforceTimeWindowBeginnings(boolean physicallyEnforceTimeWindowBeginnings) {

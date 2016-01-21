@@ -61,7 +61,7 @@ public class InternalizationPtControler {
 		Controler controler = new Controler(configFile);
 		controler.getConfig().controler().setOverwriteFileSetting(
 				OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
-	//	controler.addControlerListener(new InternalizationPtControlerListener( (ScenarioImpl) controler.getScenario()));
+	//	services.addControlerListener(new InternalizationPtControlerListener( (ScenarioImpl) services.getScenario()));
 		controler.addOverridingModule(new OTFVisFileWriterModule());
 		controler.run();
 		

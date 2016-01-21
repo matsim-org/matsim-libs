@@ -21,7 +21,7 @@ package playground.anhorni.surprice;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -55,7 +55,7 @@ public class RoadPricing implements StartupListener, AfterMobsimListener, Iterat
 	
 	@Override
 	public void notifyStartup(final StartupEvent event) {
-		final Controler controler = event.getControler();
+		final MatsimServices controler = event.getServices();
 		// read the road pricing scheme from file
 		RoadPricingReaderXMLv1 rpReader = new RoadPricingReaderXMLv1(this.scheme);
 		try {
@@ -64,7 +64,7 @@ public class RoadPricing implements StartupListener, AfterMobsimListener, Iterat
 			throw new RuntimeException(e);
 		}
 		
-		event.getControler().getScenario().addScenarioElement(RoadPricingScheme.ELEMENT_NAME, scheme);
+		event.getServices().getScenario().addScenarioElement(RoadPricingScheme.ELEMENT_NAME, scheme);
 
 		// add the events handler to calculate the tolls paid by agents
         this.tollCalc = new CalcPaidToll(controler.getScenario().getNetwork(), this.scheme);
@@ -80,7 +80,7 @@ public class RoadPricing implements StartupListener, AfterMobsimListener, Iterat
 //				RoadPricingScheme.TOLL_TYPE_AREA.equals(this.scheme.getType()) ||
 //				RoadPricingScheme.TOLL_TYPE_DISTANCE.equals(this.scheme.getType()) || 
 //				RoadPricingScheme.TOLL_TYPE_CORDON.equals(this.scheme.getType())) {
-//			final TravelDisutilityFactory previousTravelCostCalculatorFactory = controler.getTravelDisutilityFactory();
+//			final TravelDisutilityFactory previousTravelCostCalculatorFactory = services.getTravelDisutilityFactory();
 //			// area-toll requires a regular TravelCost, no toll-specific one.
 //			TravelDisutilityFactory travelCostCalculatorFactory = new TravelDisutilityFactory() {
 //
@@ -95,7 +95,7 @@ public class RoadPricing implements StartupListener, AfterMobsimListener, Iterat
 //				}
 //				
 //			};
-//			controler.setTravelDisutilityFactory(travelCostCalculatorFactory);
+//			services.setTravelDisutilityFactory(travelCostCalculatorFactory);
 //		}
 
         this.cattl = new CalcAverageTolledTripLength(controler.getScenario().getNetwork(), this.scheme);
@@ -105,7 +105,7 @@ public class RoadPricing implements StartupListener, AfterMobsimListener, Iterat
 	@Override
 	public void notifyAfterMobsim(final AfterMobsimEvent event) {
 		// evaluate the final tolls paid by the agents and add them to their scores
-		this.tollCalc.sendMoneyEvents(Time.MIDNIGHT, event.getControler().getEvents());
+		this.tollCalc.sendMoneyEvents(Time.MIDNIGHT, event.getServices().getEvents());
 	}
 
 	@Override

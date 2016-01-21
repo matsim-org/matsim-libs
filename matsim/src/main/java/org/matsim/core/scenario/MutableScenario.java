@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacilitiesImpl;
@@ -177,10 +178,10 @@ public final class MutableScenario implements Scenario {
 			throw new RuntimeException( "Scenario is locked; too late to do this.  See comments in code.") ;
 			/* The decision is roughly as follows:
 			 * - It is ok to set network, population, etc. in the Scenario during initial demand generation.
-			 * - It is NOT ok to do this once the controler is running.
-			 * - But we do not want to make a defensive copy of the whole thing at controler startup.
-			 * - We also want to be able to plug alternative Scenario implementations into the controler.
-			 * - But then the controler only gets the "Scenario" not the "MutableScenario", so it does not have to worry about setNetwork and the like
+			 * - It is NOT ok to do this once the services is running.
+			 * - But we do not want to make a defensive copy of the whole thing at services startup.
+			 * - We also want to be able to plug alternative Scenario implementations into the services.
+			 * - But then the services only gets the "Scenario" not the "MutableScenario", so it does not have to worry about setNetwork and the like
 			 * since it does not exist in the published interface.
 			 * kai, sep'14
 			 */

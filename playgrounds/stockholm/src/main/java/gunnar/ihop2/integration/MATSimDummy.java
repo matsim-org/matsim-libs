@@ -101,6 +101,9 @@ public class MATSimDummy {
 	// TODO NEW
 	public static final String USETOLL_ELEMENT = "usetoll";
 
+	// TODO NEW
+	public static final String USEEXISTINGPLANS_ELEMENT = "useexistingplans";
+
 	public static void fatal(final String msg) {
 		Logger.getLogger(MATSimDummy.class.getName()).severe(
 				"FATAL ERROR: " + msg);
@@ -365,6 +368,12 @@ public class MATSimDummy {
 		Logger.getLogger(MATSimDummy.class.getName()).info(
 				USETOLL_ELEMENT + " = " + useToll);
 
+		// TODO NEW
+		final Boolean useExistingPlans = parseBoolean(config.get(
+				IHOP2_ELEMENT, USEEXISTINGPLANS_ELEMENT));
+		Logger.getLogger(MATSimDummy.class.getName()).info(
+				USEEXISTINGPLANS_ELEMENT + " = " + useExistingPlans);
+
 		Logger.getLogger(MATSimDummy.class.getName()).info(
 				"... program parameters appear OK so far.");
 
@@ -400,47 +409,60 @@ public class MATSimDummy {
 			/*
 			 * -------------------- CREATE POPULATION --------------------
 			 */
-			Logger.getLogger(MATSimDummy.class.getName()).info(
-					"Creating MATSim population ... ");
 
-			if (DEMANDMODEL.regent.equals(demandModel)) {
+			if (useExistingPlans) {
 
-				final PopulationCreator populationCreator = new PopulationCreator(
-						matsimNetworkFileName, zoneShapeFileName,
-						StockholmTransformationFactory.WGS84_EPSG3857,
-						populationFileName);
-				populationCreator.setBuildingsFileName(buildingShapeFileName);
-				populationCreator
-						.setPopulationSampleFactor(matsimPopulationSubSample);
-				final ObjectAttributes linkAttributes = new ObjectAttributes();
-				final ObjectAttributesXmlReader reader = new ObjectAttributesXmlReader(
-						linkAttributes);
-				reader.parse(linkAttributeFileName);
 				Logger.getLogger(MATSimDummy.class.getName()).warning(
-						"Removing all expanded links. This *should* have no "
-								+ "effect if a non-expanded network is used.");
-				populationCreator.removeExpandedLinks(linkAttributes);
-				try {
-					populationCreator.run(initialPlansFileName);
-				} catch (FileNotFoundException e1) {
-					throw new RuntimeException(e1);
+						"Using the existing population " + initialPlansFileName
+								+ ". This setting is only used for debugging.");
+
+			} else {
+
+				Logger.getLogger(MATSimDummy.class.getName()).info(
+						"Creating MATSim population ... ");
+
+				if (DEMANDMODEL.regent.equals(demandModel)) {
+
+					final PopulationCreator populationCreator = new PopulationCreator(
+							matsimNetworkFileName, zoneShapeFileName,
+							StockholmTransformationFactory.WGS84_EPSG3857,
+							populationFileName);
+					populationCreator
+							.setBuildingsFileName(buildingShapeFileName);
+					populationCreator
+							.setPopulationSampleFactor(matsimPopulationSubSample);
+					final ObjectAttributes linkAttributes = new ObjectAttributes();
+					final ObjectAttributesXmlReader reader = new ObjectAttributesXmlReader(
+							linkAttributes);
+					reader.parse(linkAttributeFileName);
+					Logger.getLogger(MATSimDummy.class.getName())
+							.warning(
+									"Removing all expanded links. This *should* have no "
+											+ "effect if a non-expanded network is used.");
+					populationCreator.removeExpandedLinks(linkAttributes);
+					try {
+						populationCreator.run(initialPlansFileName);
+					} catch (FileNotFoundException e1) {
+						throw new RuntimeException(e1);
+					}
+
+				} else if (DEMANDMODEL.scaper.equals(demandModel)) {
+
+					final ScaperPopulationCreator reader = new ScaperPopulationCreator(
+							matsimNetworkFileName, zoneShapeFileName,
+							StockholmTransformationFactory.WGS84_EPSG3857,
+							populationFileName);
+					PopulationWriter popwriter = new PopulationWriter(
+							reader.scenario.getPopulation(),
+							reader.scenario.getNetwork());
+					popwriter.write(initialPlansFileName);
+
 				}
 
-			} else if (DEMANDMODEL.scaper.equals(demandModel)) {
-
-				final ScaperPopulationCreator reader = new ScaperPopulationCreator(
-						matsimNetworkFileName, zoneShapeFileName,
-						StockholmTransformationFactory.WGS84_EPSG3857,
-						populationFileName);
-				PopulationWriter popwriter = new PopulationWriter(
-						reader.scenario.getPopulation(),
-						reader.scenario.getNetwork());
-				popwriter.write(initialPlansFileName);
+				Logger.getLogger(MATSimDummy.class.getName()).info(
+						"... succeeded to create population.");
 
 			}
-
-			Logger.getLogger(MATSimDummy.class.getName()).info(
-					"... succeeded to create population.");
 
 			/*
 			 * -------------------- RUN MATSIM --------------------

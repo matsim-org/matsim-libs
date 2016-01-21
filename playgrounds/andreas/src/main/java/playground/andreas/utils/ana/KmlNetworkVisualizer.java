@@ -47,7 +47,7 @@ public class KmlNetworkVisualizer {
 	public static void convertNetwork2Kml(String netfile, String kmlfile, CoordinateTransformation coordTransform){
 		log.info("Reading network...");
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenario).readFile(netfile);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(netfile);
 		KmlNetworkVisualizer.convertNetwork2Kml(scenario.getNetwork(), kmlfile, coordTransform);		
 	}
 	

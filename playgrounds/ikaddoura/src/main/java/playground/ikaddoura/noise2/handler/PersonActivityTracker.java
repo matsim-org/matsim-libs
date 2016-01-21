@@ -104,12 +104,10 @@ public class PersonActivityTracker implements ActivityEndEventHandler , Activity
 					actInfo.setEndTime(30 * 3600.);
 					actInfo.setActivityType(firstActivity.getType());
 					
-					if (rpId == null && this.noiseContext.getNoiseParams().isComputeNoiseDamages()) {
-						throw new RuntimeException("No receiver point for " + person.getId() + ". Aborting...");
-					} else if (rpId == null) {
+					if (rpId == null) {
 						if (countWarn == 0) {
 							log.warn("Please note that population units are only calculated for a predefined area. Thus, not all agents' activities are mapped to a receiver point. "
-									+ "The boarder receiver points should not be used for analysis. "
+									+ "The border receiver points should not be used for analysis. "
 									+ "This message is only given once.");
 							countWarn++;
 						}

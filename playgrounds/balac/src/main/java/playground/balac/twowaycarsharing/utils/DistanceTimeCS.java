@@ -32,7 +32,7 @@ public class DistanceTimeCS {
 	public void run(String[] args){
 		final BufferedWriter outLink = IOUtils.getBufferedWriter(args[2]);
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario);
+		MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario.getNetwork());
 		networkReader.readFile(args[0]);
 		
 		RentalTimes rentalTimes = new RentalTimes(scenario, outLink);		
@@ -127,12 +127,12 @@ public class DistanceTimeCS {
 		public void handleEvent(LinkEnterEvent event) {
 			// TODO Auto-generated method stub
 			
-			if (startTimes.containsKey(event.getDriverId())) {
+			if (startTimes.containsKey(event.getVehicleId())) {
 				
-				double d = distance.get(event.getDriverId());
+				double d = distance.get(event.getVehicleId());
 				
 				d += scenario.getNetwork().getLinks().get(event.getLinkId()).getLength();
-				distance.put(event.getDriverId(), d);
+				distance.put(event.getVehicleId(), d);
 			}
 			
 		}

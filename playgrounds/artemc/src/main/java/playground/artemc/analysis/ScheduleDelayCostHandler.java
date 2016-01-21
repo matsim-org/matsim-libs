@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -60,7 +60,7 @@ public class ScheduleDelayCostHandler implements ActivityStartEventHandler, Acti
 	private HashMap<Id<Person>, Double> ttc_evening;
 	private HashMap<Id<Person>, LinkedList<String>> modes;
 	private HashMap<Id<Person>, PersonalScoringParameters>  scoringParameters;
-	private Controler controler;
+	private MatsimServices controler;
 	private HashSet<String> usedModes;
 	private PersonalScoringFunctionFactory disScoringFactory = null;
 	private Journey currentJourney;
@@ -458,7 +458,7 @@ public class ScheduleDelayCostHandler implements ActivityStartEventHandler, Acti
 		return modes;
 	}
 
-	public void setControler(Controler controler) {
+	public void setControler(MatsimServices controler) {
 		this.controler = controler;
 	}
 

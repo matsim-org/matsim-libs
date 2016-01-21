@@ -19,9 +19,6 @@
 
 package playground.michalm.taxi.util.stats;
 
-import java.util.EnumMap;
-
-import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
@@ -58,68 +55,13 @@ public class TaxiStatsCalculator
         }
 
         for (TaxiTask t : schedule.getTasks()) {
-            stats.addTime(t);
+            stats.addTask(t);
 
             if (t.getTaxiTaskType() == TaxiTaskType.PICKUP) {
                 Request req = ((TaxiPickupTask)t).getRequest();
                 double waitTime = Math.max(t.getBeginTime() - req.getT0(), 0);
                 stats.passengerWaitTimes.addValue(waitTime);
             }
-        }
-    }
-
-
-    public static class TaxiStats
-    {
-        public final DescriptiveStatistics passengerWaitTimes = new DescriptiveStatistics();
-        public final EnumMap<TaxiTaskType, DescriptiveStatistics> timesByTaskType;
-
-
-        public TaxiStats()
-        {
-            timesByTaskType = new EnumMap<>(TaxiTaskType.class);
-            for (TaxiTaskType t : TaxiTaskType.values()) {
-                timesByTaskType.put(t, new DescriptiveStatistics());
-            }
-        }
-
-
-        public void addTime(TaxiTask task)
-        {
-            double time = task.getEndTime() - task.getBeginTime();
-            timesByTaskType.get(task.getTaxiTaskType()).addValue(time);
-        }
-
-
-        public double getDriveEmptyRatio()
-        {
-            double empty = timesByTaskType.get(TaxiTaskType.DRIVE_EMPTY).getSum();//not mean!
-            double withPassenger = timesByTaskType.get(TaxiTaskType.DRIVE_WITH_PASSENGER).getSum();//not mean!
-            return empty / (empty + withPassenger);
-        }
-
-
-        public DescriptiveStatistics getDriveWithPassengerTimes()
-        {
-            return timesByTaskType.get(TaxiTaskType.DRIVE_WITH_PASSENGER);
-        }
-
-
-        public static final String HEADER = "WaitT\t" //
-                + "MaxWaitT"//
-                + "WithPassengerT"//
-                + "%EmptyDrive\t";
-
-
-        @Override
-        public String toString()
-        {
-            return new StringBuilder()//
-                    .append(passengerWaitTimes.getMean()).append('\t') //
-                    .append(passengerWaitTimes.getMax()).append('\t') //
-                    .append(getDriveWithPassengerTimes().getMean()).append('\t') //
-                    .append(getDriveEmptyRatio()).append('\t') //
-                    .toString();
         }
     }
 }

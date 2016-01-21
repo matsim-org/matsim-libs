@@ -54,7 +54,7 @@ public class PlanGeneratorWithParkingActivities {
 		new MatsimFacilitiesReader(scenario).readFile(facilitiesFilePath);
 
 		this.network = (NetworkImpl) scenario.getNetwork();
-		new MatsimNetworkReader(scenario).readFile(networkFilePath);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFilePath);
 
 		this.closestParkingMatrix = new ClosestParkingMatrix(scenario.getActivityFacilities(), network);
 

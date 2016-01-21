@@ -80,7 +80,7 @@ class CadytsFreightChainsContext implements CadytsContextI<Item>, BeforeMobsimLi
 	 */
 	private final PlansTranslator<Item> plansTranslator = new PlansTranslator<Item>() {
 		@Override
-		public cadyts.demand.Plan<Item> getPlanSteps(org.matsim.api.core.v01.population.Plan plan) {
+		public cadyts.demand.Plan<Item> getCadytsPlan(org.matsim.api.core.v01.population.Plan plan) {
 			cadyts.demand.PlanBuilder<Item> planBuilder = new cadyts.demand.PlanBuilder<Item>() ;
 			int time = 0 ; // there is no time here but we need to set something 
 			final Item item = getCorrectItemFromPlan(plan);
@@ -141,11 +141,11 @@ class CadytsFreightChainsContext implements CadytsContextI<Item>, BeforeMobsimLi
 	}
 	@Override
 	public void notifyIterationEnds(final IterationEndsEvent event) {
-		String analysisFilepath = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), FLOWANALYSIS_FILENAME);
+		String analysisFilepath = event.getServices().getControlerIO().getIterationFilename(event.getIteration(), FLOWANALYSIS_FILENAME);
 		this.calibrator.setFlowAnalysisFile(analysisFilepath);
 
 		// since we have not constructed the output _during_ the mobsim, we need to do it now:
-		for ( Person person : event.getControler().getScenario().getPopulation().getPersons().values() ) {
+		for ( Person person : event.getServices().getScenario().getPopulation().getPersons().values() ) {
 			Item item = getCorrectItemFromPlan( person.getSelectedPlan() ) ;
 			this.simResults.incCnt(item);
 		}
@@ -153,7 +153,7 @@ class CadytsFreightChainsContext implements CadytsContextI<Item>, BeforeMobsimLi
 		this.calibrator.afterNetworkLoading(this.simResults);
 		
 		// write some output
-		String filename = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), LINKOFFSET_FILENAME);
+		String filename = event.getServices().getControlerIO().getIterationFilename(event.getIteration(), LINKOFFSET_FILENAME);
 		try {
 			new CadytsCostOffsetsXMLFileIO<Item>( this.lookUp, Item.class ).write(filename, this.calibrator.getLinkCostOffsets());
 		} catch (IOException e) {

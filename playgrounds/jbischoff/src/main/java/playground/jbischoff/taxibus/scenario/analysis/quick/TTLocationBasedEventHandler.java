@@ -132,7 +132,8 @@ public class TTLocationBasedEventHandler implements ActivityStartEventHandler, P
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
 		if (this.monitoredLinks.contains(event.getLinkId())){
-			this.monitoredAgents.add(event.getDriverId());
+			Id<Person> personId = Id.createPersonId(event.getVehicleId().toString());
+			this.monitoredAgents.add(personId);
 		}
 	}
 }

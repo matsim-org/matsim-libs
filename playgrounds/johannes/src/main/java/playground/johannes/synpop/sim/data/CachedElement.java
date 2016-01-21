@@ -39,12 +39,19 @@ public abstract class CachedElement implements Attributable {
     }
 
     protected Attributable getDelegate() {
-        return  delegate;
+        return delegate;
     }
 
     @Override
     public String getAttribute(String key) {
         synchronize(key);
+        return delegate.getAttribute(key);
+    }
+
+    /*
+    FIXME: experimental
+     */
+    public String getAttributeDirect(String key) {
         return delegate.getAttribute(key);
     }
 
@@ -116,7 +123,7 @@ public abstract class CachedElement implements Attributable {
     }
 
     private void synchronize(String key) {
-        if(cache != null) {
+        if (cache != null) {
         /*
         Synchronize the cached data with the plain data, if there is a plain-object-key-pair. Do nothing if there is no
         data for a key, i.e. setting a data value to null does not affect the plain value.

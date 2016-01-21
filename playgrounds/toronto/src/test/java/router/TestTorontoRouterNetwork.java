@@ -57,7 +57,7 @@ public class TestTorontoRouterNetwork {
 		
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		
-		NetworkReaderMatsimV1 reader = new NetworkReaderMatsimV1(scenario);		
+		NetworkReaderMatsimV1 reader = new NetworkReaderMatsimV1(scenario.getNetwork());
 		reader.parse(new ByteArrayInputStream(writeTestNetworkToXml().getBytes("UTF-8")));
 		Network network = scenario.getNetwork();
 		Assert.isTrue(network != null, "Network is null!"); 

@@ -65,13 +65,16 @@ public interface Route extends MatsimPopulationObject {
 	
 	/** make the clone method public, but do NOT implement Cloneable
 	 * so that implementations can decide on their own if they support
-	 * clone() or not.
+	 * Cloneable or not.
 	 * <p/>
 	 * Design comments:<ul>
 	 * <li>Do we really want this?  Martin ("Clean code") argues for the difference between data objects and behavioral objects.  Data objects should
 	 * only be accessed via the interface methods.  I think that "route" is a data object.  In consequence, "copy" and/or "deepCopy" should, in 
 	 * my view, be static methods. (The argument against this is, I guess, that one might want to add Route implementations that are not
 	 * part of the standard.  Yet given that we want to be able to read/write them in xml, I am not sure how far this carries.)  kai, jan'13
+	 * <li> In our particular situation, "clone" may be considered as a useful approach to our problem (first clone the plan or its elements,
+	 * then mutate the contents).  Having clone but not Cloneable in the API leaves implementing classes the choice to implement it
+	 * via Cloneable or via other means.  kai, dec'15
 	 * </ul>
 	 */
 	public Route clone();

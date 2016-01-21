@@ -51,7 +51,7 @@ public class ExtractWaitForVehicleInfo {
 		final String outputXyFile = args[ 2 ];
 
 		final Scenario sc = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
-		new MatsimNetworkReader( sc ).readFile( inputNetworkFile );
+		new MatsimNetworkReader(sc.getNetwork()).readFile( inputNetworkFile );
 
 		final BufferedWriter writer = IOUtils.getBufferedWriter( outputXyFile );
 		final EventsManager events = EventsUtils.createEventsManager();

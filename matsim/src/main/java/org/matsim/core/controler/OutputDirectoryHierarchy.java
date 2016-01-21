@@ -22,7 +22,10 @@ package org.matsim.core.controler;
 import java.io.File;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.utils.io.IOUtils;
+
+import javax.inject.Inject;
 
 /**
  * 
@@ -44,7 +47,14 @@ public class OutputDirectoryHierarchy {
 	private final String outputPath;
 	
 	private OverwriteFileSetting overwriteFiles = OverwriteFileSetting.failIfDirectoryExists;
-	
+
+	@Inject
+	OutputDirectoryHierarchy(ControlerConfigGroup config) {
+		this(config.getOutputDirectory(),
+				config.getRunId(),
+				config.getOverwriteFileSetting());
+	}
+
 	public OutputDirectoryHierarchy(String outputPath, OverwriteFileSetting overwriteFiles) {
 		this(outputPath, null, overwriteFiles, true);
 	}
@@ -169,8 +179,8 @@ public class OutputDirectoryHierarchy {
 								"The output directory " + outputPath
 								+ " already exists and is not empty!"
 								+ " Please either delete or empty the directory or"
-								+ " configure the controler via setOverwriteFileSetting()"
-								+ " or the \"overwriteFiles\" parameter of the \"controler\" config group.");
+								+ " configure the services via setOverwriteFileSetting()"
+								+ " or the \"overwriteFiles\" parameter of the \"services\" config group.");
 					case overwriteExistingFiles:
 						System.out.flush();
 						log.warn("###########################################################");

@@ -99,63 +99,64 @@ public class TransitRouterWrapper implements RoutingModule {
      * must be filled in (distance, travel-time in routes).
      */
     private List<PlanElement> fillWithActivities(
-            final List<Leg> baseTrip,
-            final Facility fromFacility,
-            final Facility toFacility, double departureTime, Person person) {
-        List<PlanElement> trip = new ArrayList<>();
-        Coord nextCoord = null;
-        int i = 0;
-        for (Leg leg : baseTrip) {
-            if (i == 0) {
-                Facility firstToFacility;
-                if (baseTrip.size() > 1) { // at least one pt leg available
-                    ExperimentalTransitRoute tRoute = (ExperimentalTransitRoute) baseTrip.get(1).getRoute();
-                    firstToFacility = this.transitSchedule.getFacilities().get(tRoute.getAccessStopId());
-                } else {
-                    firstToFacility = toFacility;
-                }
-                Route route = new GenericRouteImpl(fromFacility.getLinkId(), firstToFacility.getLinkId());
-                final List<? extends PlanElement> walkRoute = walkRouter.calcRoute(fromFacility, firstToFacility, departureTime, person);
-                route.setDistance(((Leg) walkRoute.get(0)).getRoute().getDistance());
-                route.setTravelTime(leg.getTravelTime());
-                leg.setRoute(route);
-                trip.add(leg);
-            } else {
-                if (leg.getRoute() instanceof ExperimentalTransitRoute) {
-                    ExperimentalTransitRoute tRoute = (ExperimentalTransitRoute) leg.getRoute();
-                    tRoute.setTravelTime(leg.getTravelTime());
-                    tRoute.setDistance(RouteUtils.calcDistance(tRoute, transitSchedule, network));
-                    ActivityImpl act =
-                            new ActivityImpl(
-                                    PtConstants.TRANSIT_ACTIVITY_TYPE,
-                                    this.transitSchedule.getFacilities().get(tRoute.getAccessStopId()).getCoord(),
-                                    tRoute.getStartLinkId());
-                    act.setMaximumDuration(0.0);
-                    trip.add(act);
-                    nextCoord = this.transitSchedule.getFacilities().get(tRoute.getEgressStopId()).getCoord();
-                } else { // walk legs don't have a coord, use the coord from the last egress point
-                    if (i == baseTrip.size() - 1) {
-                        ExperimentalTransitRoute tRoute = (ExperimentalTransitRoute) baseTrip.get(baseTrip.size() - 2).getRoute();
-                        Facility lastFromFacility = this.transitSchedule.getFacilities().get(tRoute.getEgressStopId());
-                        Route route = new GenericRouteImpl(lastFromFacility.getLinkId(), toFacility.getLinkId());
-                        final List<? extends PlanElement> walkRoute = walkRouter.calcRoute(lastFromFacility, toFacility, departureTime, person);
-                        route.setDistance(((Leg) walkRoute.get(0)).getRoute().getDistance());
-                        route.setTravelTime(leg.getTravelTime());
-                        leg.setRoute(route);
-                    }
-                    ActivityImpl act =
-                            new ActivityImpl(
-                                    PtConstants.TRANSIT_ACTIVITY_TYPE,
-                                    nextCoord,
-                                    leg.getRoute().getStartLinkId());
-                    act.setMaximumDuration(0.0);
-                    trip.add(act);
-                }
-                trip.add(leg);
-            }
-            i++;
-        }
-        return trip;
+		    final List<Leg> baseTrip,
+		    final Facility fromFacility,
+		    final Facility toFacility, double departureTime, Person person) {
+	    List<PlanElement> trip = new ArrayList<>();
+	    Coord nextCoord = null;
+	    int i = 0;
+	    for (Leg leg : baseTrip) {
+		    if (i == 0) {
+			    // (access leg)
+			    Facility firstToFacility;
+			    if (baseTrip.size() > 1) { // at least one pt leg available
+				    ExperimentalTransitRoute tRoute = (ExperimentalTransitRoute) baseTrip.get(1).getRoute();
+				    firstToFacility = this.transitSchedule.getFacilities().get(tRoute.getAccessStopId());
+			    } else {
+				    firstToFacility = toFacility;
+			    }
+			    Route route = new GenericRouteImpl(fromFacility.getLinkId(), firstToFacility.getLinkId());
+			    final List<? extends PlanElement> walkRoute = walkRouter.calcRoute(fromFacility, firstToFacility, departureTime, person);
+			    route.setDistance(((Leg) walkRoute.get(0)).getRoute().getDistance());
+			    route.setTravelTime(leg.getTravelTime());
+			    leg.setRoute(route);
+			    trip.add(leg);
+		    } else {
+			    if (leg.getRoute() instanceof ExperimentalTransitRoute) {
+				    ExperimentalTransitRoute tRoute = (ExperimentalTransitRoute) leg.getRoute();
+				    tRoute.setTravelTime(leg.getTravelTime());
+				    tRoute.setDistance(RouteUtils.calcDistance(tRoute, transitSchedule, network));
+				    ActivityImpl act =
+						    new ActivityImpl(
+								    PtConstants.TRANSIT_ACTIVITY_TYPE,
+								    this.transitSchedule.getFacilities().get(tRoute.getAccessStopId()).getCoord(),
+								    tRoute.getStartLinkId());
+				    act.setMaximumDuration(0.0);
+				    trip.add(act);
+				    nextCoord = this.transitSchedule.getFacilities().get(tRoute.getEgressStopId()).getCoord();
+			    } else { // walk legs don't have a coord, use the coord from the last egress point
+				    if (i == baseTrip.size() - 1) {
+					    ExperimentalTransitRoute tRoute = (ExperimentalTransitRoute) baseTrip.get(baseTrip.size() - 2).getRoute();
+					    Facility lastFromFacility = this.transitSchedule.getFacilities().get(tRoute.getEgressStopId());
+					    Route route = new GenericRouteImpl(lastFromFacility.getLinkId(), toFacility.getLinkId());
+					    final List<? extends PlanElement> walkRoute = walkRouter.calcRoute(lastFromFacility, toFacility, departureTime, person);
+					    route.setDistance(((Leg) walkRoute.get(0)).getRoute().getDistance());
+					    route.setTravelTime(leg.getTravelTime());
+					    leg.setRoute(route);
+				    }
+				    ActivityImpl act =
+						    new ActivityImpl(
+								    PtConstants.TRANSIT_ACTIVITY_TYPE,
+								    nextCoord,
+								    leg.getRoute().getStartLinkId());
+				    act.setMaximumDuration(0.0);
+				    trip.add(act);
+			    }
+			    trip.add(leg);
+		    }
+		    i++;
+	    }
+	    return trip;
     }
 
     @Override

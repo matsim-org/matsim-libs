@@ -110,4 +110,15 @@ public final class LegImpl implements Leg {
 				"[route=" + this.route + "]";
 	}
 
+//	private boolean locked;
+//
+//	public void setLocked() {
+//		this.locked = true ;
+//	}
+//	private void testForLocked() {
+//		if ( this.locked ) {
+//			throw new RuntimeException("too late to change this") ;
+//		}
+//	}
+
 }

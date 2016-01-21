@@ -38,8 +38,6 @@ import org.matsim.contrib.matrixbasedptrouter.utils.CreateTestPopulation;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.network.NetworkWriter;
@@ -102,30 +100,23 @@ public class MatrixBasedPtRouterIntegrationTest {
 		config.controler().setMobsim("qsim");
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(0);
+		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		config.network().setInputFile(path+"network.xml");
 		config.plans().setInputFile(path+"plans.xml");
 
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-		
-		//set up controler
-		Controler controler = new Controler(scenario) ;
-		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
-
 		//add home and work activity to plansCalcScoreConfigGroup
-		PlanCalcScoreConfigGroup planCalcScore = controler.getScenario().getConfig().planCalcScore();
-		planCalcScore.addParam("activityType_0", "home");
-		planCalcScore.addParam("activityTypicalDuration_0", "43200");
-		planCalcScore.addParam("activityType_1", "work");
-		planCalcScore.addParam("activityTypicalDuration_1", "28800");
+		config.planCalcScore().addParam("activityType_0", "home");
+		config.planCalcScore().addParam("activityTypicalDuration_0", "43200");
+		config.planCalcScore().addParam("activityType_1", "work");
+		config.planCalcScore().addParam("activityTypicalDuration_1", "28800");
 
-		PlansCalcRouteConfigGroup plansCalcRoute = controler.getScenario().getConfig().plansCalcRoute();
-		
+
+		Scenario scenario = ScenarioUtils.loadScenario(config);
 		BoundingBox nbb = BoundingBox.createBoundingBox(network);
-		
-		//create new pt matrix
-		final PtMatrix ptMatrix = PtMatrix.createPtMatrix(plansCalcRoute, nbb, ConfigUtils.addOrGetModule(controler.getScenario().getConfig(), MatrixBasedPtRouterConfigGroup.GROUP_NAME, MatrixBasedPtRouterConfigGroup.class));
-		controler.addOverridingModule(new MatrixBasedPtModule(ptMatrix));
-		//execute MATSim run
+		final PtMatrix ptMatrix = PtMatrix.createPtMatrix(config.plansCalcRoute(), nbb, ConfigUtils.addOrGetModule(config, MatrixBasedPtRouterConfigGroup.GROUP_NAME, MatrixBasedPtRouterConfigGroup.class));
+
+		Controler controler = new Controler(scenario) ;
+		controler.addOverridingModule(new MatrixBasedPtModule());
 		controler.run();
 		
 		// compute the travel time from home to work activity

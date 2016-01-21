@@ -43,24 +43,63 @@ public class TravelTimeStatistics   {
 //		String inputFile = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/input/output/vw029.100pct/ITERS/it.180/vw029.100pct.180.events.xml.gz";
 //		String inputFile = "D:/runs-svn/vw_rufbus/vw038/ITERS/it.0/vw038.0.events.xml.gz";
 //		String inputFile = "D:/runs-svn/vw_rufbus/vw040/ITERS/it.180/vw040.180.events.xml.gz";
+//		String inputFile = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/input/output/vw042/ITERS/it.0/vw042.0.events.xml.gz";
+//		String inputFile = "D:/runs-svn/vw_rufbus/vwTB04/vwTB04.output_events.xml.gz";
+//		String inputFile = "D:/runs-svn/vw_rufbus/vw054/vw054.output_events.xml.gz";
+//		String inputFile = "D:/runs-svn/vw_rufbus/vw057/vw056.output_events.xml.gz";
 		
-		String inputFile = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/input/output/vw042/ITERS/it.0/vw042.0.events.xml.gz";
-				EventsManager events = EventsUtils.createEventsManager();
+		
+		
+		String run = "vw058";
+//		String folder = "D:/runs-svn/vw_rufbus/" + run + "/";
+		String folder = "D:/runs-svn/vw_rufbus/delievery/20160121/runs/" + run + "/";
+		String inputFile = folder + run + ".output_events.xml.gz";
+		
+		if (args.length>0){
+		inputFile=args[0];	
+		}
+
+		EventsManager events = EventsUtils.createEventsManager();
 
 		Set<Id<Link>> links = new HashSet<>();
-		links.add(Id.createLinkId(57196)); //a39
-		links.add(Id.createLinkId(42571)); //L295
+		links.add(Id.createLinkId(57196)); // a39
+		links.add(Id.createLinkId(42571)); // L295
+
+		TTEventHandler carTT = new TTEventHandler();
+		TTEventHandler allTT = new TTEventHandler();
+		TTEventHandler tbTT = new TTEventHandler();
+		TTEventHandler ptTT = new TTEventHandler();
+		TaxibusRideTimeAnalyser analyser = new TaxibusRideTimeAnalyser();
+
+		carTT.addMode("car");
+
+		allTT.addMode("car");
+		allTT.addMode("pt");
+		allTT.addMode("taxibus");
+
+		ptTT.addMode("pt");
+
+		tbTT.addMode("taxibus");
+
+		TaxiBusTravelTimesAnalyzer a = new TaxiBusTravelTimesAnalyzer();
+
+		events.addHandler(carTT);
+		events.addHandler(ptTT);
+		events.addHandler(tbTT);
+		events.addHandler(allTT);
+		events.addHandler(analyser);
 		
-		TTEventHandler tt = new TTEventHandler();
-		TTLocationBasedEventHandler lb = new TTLocationBasedEventHandler(links);
-		
-		
-		events.addHandler(tt);
-		events.addHandler(lb);
+		events.addHandler(a);
 		new MatsimEventsReader(events).readFile(inputFile);
 		System.out.println(inputFile);
-		tt.printOutput();
-		lb.printOutput();
+
+		carTT.writeOutput(folder);
+		allTT.writeOutput(folder);
+		ptTT.writeOutput(folder);
+		tbTT.writeOutput(folder);
+		analyser.writeOutput(folder);
+
+		a.printOutput();
 	}
 	
 

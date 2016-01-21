@@ -35,7 +35,7 @@ public class RunResource {
 	
 	public Scenario getConfigAndNetwork() {
 		Scenario baseScenario = ScenarioUtils.createScenario(getOutputConfig());
-		new MatsimNetworkReader(baseScenario).readFile(wd + "/" + runPrefix() + "output_network.xml.gz");
+		new MatsimNetworkReader(baseScenario.getNetwork()).readFile(wd + "/" + runPrefix() + "output_network.xml.gz");
 		return baseScenario;
 	}
 	

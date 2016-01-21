@@ -24,6 +24,7 @@ import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -31,7 +32,6 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityOption;
@@ -42,7 +42,7 @@ public class FacilitiesAdderAndModifier {
 	private final static Logger log = Logger.getLogger(FacilitiesAdderAndModifier.class);
 
 
-	public void add(Config config, ScenarioImpl scenario) {
+	public void add(Config config, Scenario scenario) {
 		new FacilitiesReaderMatsimV1(scenario).readFile(config.getModule("facilities").getValue("inputFacilitiesFile"));
 		this.simplifyTypes(scenario);
 
@@ -50,7 +50,7 @@ public class FacilitiesAdderAndModifier {
 		this.addfacilities2Plans(scenario);
 	}
 
-	private void simplifyTypes(ScenarioImpl scenario) {
+	private void simplifyTypes(Scenario scenario) {
 			for (ActivityFacility facility : scenario.getActivityFacilities().getFacilities().values()) {
 
 			Vector<ActivityOption> options = new Vector<ActivityOption>();
@@ -90,7 +90,7 @@ public class FacilitiesAdderAndModifier {
 		return optionNew;
 	}
 
-	private void addfacilities2Plans(ScenarioImpl scenario) {
+	private void addfacilities2Plans(Scenario scenario) {
 		TreeMap<String, QuadTree<ActivityFacility>> trees = new TreeMap<String, QuadTree<ActivityFacility>>();
 		trees.put("h", this.builFacQuadTree("h", scenario.getActivityFacilities().getFacilitiesForActivityType("h")));
 		trees.put("w", this.builFacQuadTree("w", scenario.getActivityFacilities().getFacilitiesForActivityType("w")));

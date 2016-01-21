@@ -14,13 +14,13 @@ import playground.michalm.taxi.optimizer.*;
 
 public class NPersonsProblem {
 	
-	private final TaxiOptimizerConfiguration optimConfig;
+	private final TaxiOptimizerContext optimConfig;
     private static Logger log = Logger.getLogger(NPersonsProblem.class);
     private final LeastCostPathCalculator router;
     private final BestDispatchFinder vrpFinder;
 
 
-    public NPersonsProblem(TaxiOptimizerConfiguration optimConfig)
+    public NPersonsProblem(TaxiOptimizerContext optimConfig)
     {
         this.optimConfig = optimConfig;
         router = new Dijkstra(optimConfig.context.getScenario().getNetwork(),

@@ -24,7 +24,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
 public class PlansRemoverById {
@@ -32,7 +31,7 @@ public class PlansRemoverById {
 
 	public Population remove(Population plans, Id<Person> maxId) {
 		
-		Population cleanedPopulation = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
+		Population cleanedPopulation = (ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
 		log.info("Population size before removal: " + plans.getPersons().size());
 		for (Person person : plans.getPersons().values()) {
 			// compareTo correct?

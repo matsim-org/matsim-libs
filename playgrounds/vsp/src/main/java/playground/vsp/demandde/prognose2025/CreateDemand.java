@@ -25,7 +25,7 @@ public class CreateDemand {
 
 	public static void main(String[] args) {
 		Scenario osmNetwork = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(osmNetwork).readFile(NETWORK_FILENAME);	
+		new MatsimNetworkReader(osmNetwork.getNetwork()).readFile(NETWORK_FILENAME);
 		
 		PersonVerschmiererTask personVerschmiererTask = new PersonVerschmiererTask(LANDKREISE);	
 		PopulationWriterTask populationWriter = new PopulationWriterTask(OUTPUT_POPULATION_FILENAME, osmNetwork.getNetwork());

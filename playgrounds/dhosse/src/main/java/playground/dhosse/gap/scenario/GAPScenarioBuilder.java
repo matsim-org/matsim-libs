@@ -5,7 +5,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.SortedMap;
 
 import org.apache.log4j.Logger;
@@ -24,7 +23,6 @@ import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.misc.Time;
@@ -118,9 +116,9 @@ public class GAPScenarioBuilder {
 //		//create network from osm data
 //		NetworkCreator.createAndAddNetwork(scenario, Global.networkDataDir + "survey-network.osm");
 //		new NetworkWriter(scenario.getNetwork()).write(Global.matsimInputDir + "Netzwerk/merged-networkV2.xml.gz");
-//		SpatialAnalysis.writeNetworkToShape(Global.matsimInputDir + "Netzwerk/merged-networkV2.xml.gz", "/home/danielhosse/Dokumente/net.shp");
+//		SpatialAnalysis.writeNetworkToShape(Global.matsimInputDir + "Netzwerk/merged-networkV2.xml.gz", "/home/dhosse/Dokumente/net.shp");
 		
-		new MatsimNetworkReader(scenario).readFile(Global.runInputDir + "merged-networkV2_20150929.xml");
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(Global.runInputDir + "merged-networkV2_20150929.xml");
 		new NetworkCleaner().run(scenario.getNetwork());
 		
 		//create public transport
@@ -129,7 +127,7 @@ public class GAPScenarioBuilder {
 //		//create counting stations
 		Counts<Link> counts = CountsCreator.createCountingStations(scenario.getNetwork());
 		new CountsWriter(counts).write(Global.matsimInputDir + "Counts/counts.xml.gz");
-		SpatialAnalysis.writeCountsToShape(Global.matsimInputDir + "Counts/counts.xml.gz", "/home/danielhosse/Dokumente/counts.shp");
+		SpatialAnalysis.writeCountsToShape(Global.matsimInputDir + "Counts/counts.xml.gz", "/home/dhosse/Dokumente/counts.shp");
 		
 		//init administrative boundaries
 		initMunicipalities(scenario);
@@ -172,15 +170,15 @@ public class GAPScenarioBuilder {
 		ConfigCreator.configureQSimAndCountsConfigGroups(config);
 		
 		//write population to file
-		new PopulationWriter(aaip.getOutPopulation()).write("/home/danielhosse/Dokumente/01_eGAP/plansV6.xml.gz");
+		new PopulationWriter(aaip.getOutPopulation()).write("/home/dhosse/Dokumente/01_eGAP/plansV6.xml.gz");
 		
 		//write config file
 		new ConfigWriter(config).write(Global.matsimInputDir + "configV2.xml");
 		
 		log.info("Dumping agent attributes...");
 		//write object attributes to file
-		new ObjectAttributesXmlWriter(subpopulationAttributes).writeFile("/home/danielhosse/Dokumente/01_eGAP/subpopulationAtts.xml");
-		new ObjectAttributesXmlWriter(demographicAttributes).writeFile("/home/danielhosse/Dokumente/01_eGAP/demographicAtts.xml");
+		new ObjectAttributesXmlWriter(subpopulationAttributes).writeFile("/home/dhosse/Dokumente/01_eGAP/subpopulationAtts.xml");
+		new ObjectAttributesXmlWriter(demographicAttributes).writeFile("/home/dhosse/Dokumente/01_eGAP/demographicAtts.xml");
 		
 		log.info("Done!");
 		
@@ -255,7 +253,7 @@ public class GAPScenarioBuilder {
 		
 		setBuiltAreaQT(new QuadTree<Geometry>(4070000, 5190000, 4730000, 6106925));
 		
-//		Collection<SimpleFeature> builtAreas = new ShapeFileReader().readFileAndInitialize("/home/danielhosse/stage2.shp");
+//		Collection<SimpleFeature> builtAreas = new ShapeFileReader().readFileAndInitialize("/home/dhosse/stage2.shp");
 		Collection<SimpleFeature> builtAreas = new ShapeFileReader().readFileAndInitialize(Global.adminBordersDir + "Gebietsstand_2007/gemeinden_2007_bebaut.shp");
 		
 		log.info("Processing built areas...");
@@ -288,7 +286,7 @@ public class GAPScenarioBuilder {
 		}
 		
 		//WGS84
-		Collection<SimpleFeature> regBez = new ShapeFileReader().readFileAndInitialize("/home/danielhosse/Downloads/boundaries/Lower Bavaria_AL5.shp");
+		Collection<SimpleFeature> regBez = new ShapeFileReader().readFileAndInitialize("/home/dhosse/Downloads/boundaries/Lower Bavaria_AL5.shp");
 		
 		for(SimpleFeature f : regBez){
 			
@@ -300,7 +298,7 @@ public class GAPScenarioBuilder {
 		}
 		
 		//WGS84
-		Collection<SimpleFeature> rp = new ShapeFileReader().readFileAndInitialize("/home/danielhosse/Downloads/boundaries/Rhineland-Palatinate_AL4.shp");
+		Collection<SimpleFeature> rp = new ShapeFileReader().readFileAndInitialize("/home/dhosse/Downloads/boundaries/Rhineland-Palatinate_AL4.shp");
 		
 		for(SimpleFeature f : rp){
 			
@@ -334,7 +332,7 @@ public class GAPScenarioBuilder {
 //		}
 		
 		//WGS84
-		Collection<SimpleFeature> austria = new ShapeFileReader().readFileAndInitialize("/home/danielhosse/Downloads/austria/austria.shp");
+		Collection<SimpleFeature> austria = new ShapeFileReader().readFileAndInitialize("/home/dhosse/Downloads/austria/austria.shp");
 		
 		Geometry result = null;
 		

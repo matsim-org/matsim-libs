@@ -23,14 +23,13 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.parking.lib.obj.IntegerValueHashMap;
 import org.matsim.contrib.parking.lib.obj.LinkedListValueHashMap;
 import org.matsim.contrib.parking.lib.obj.Pair;
-import org.matsim.core.controler.Controler;
 
-import playground.wrashid.parkingSearch.withindayFW.core.ParkingInfrastructure;
+import org.matsim.core.controler.MatsimServices;
 import playground.wrashid.parkingSearch.withindayFW.parkingOccupancy.ParkingOccupancyStats;
 
 public abstract class ParkingAnalysisHandler {
 
-	protected Controler controler;
+	protected MatsimServices controler;
 	
 	public void updateParkingOccupancyStatistics(ParkingOccupancyStats parkingOccupancy, IntegerValueHashMap<Id> facilityCapacities, int iteration){
 		parkingOccupancy.writeOutParkingOccupanciesTxt(controler,facilityCapacities, iteration);

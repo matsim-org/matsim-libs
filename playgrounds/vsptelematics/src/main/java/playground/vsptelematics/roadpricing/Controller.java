@@ -25,12 +25,12 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
-import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
-import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
@@ -65,27 +65,18 @@ public class Controller {
 		c.run();
 	}
 	
-	private void addListener(Controler c){
+	private void addListener(Controler c) {
         c.setModules(new ControlerDefaultsWithRoadPricingModule());
-        c.addControlerListener(new StartupListener(){
-			@Override
-			public void notifyStartup(StartupEvent event) {
-				Controler con = event.getControler();
-				final RouteTTObserver observer = new RouteTTObserver(con.getControlerIO().getOutputFilename("routeTravelTimes.txt"));
-				con.addControlerListener(observer);
-				con.getEvents().addHandler(observer);
-//                if (ConfigUtils.addOrGetModule(event.getControler().getConfig(), RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).isUsingRoadpricing()) {
-					con.addControlerListener(new TollBehaviour());
-					Logger.getLogger(this.getClass()).fatal("the toll on/off switch is no longer there.  use an empty toll file for the base case. kai, sep'14") ;
-					System.exit(-1) ;
-//				}
-				if (con.getScenario().getConfig().network().isTimeVariantNetwork()){
-					IncidentGenerator generator = new IncidentGenerator(con.getScenario().getConfig().getParam("telematics", "incidentsFile"), con.getScenario().getNetwork());
-					con.addControlerListener(generator);
-				}
-			}
-			}
-		);
+        c.addOverridingModule(new AbstractModule() {
+			  @Override
+			  public void install() {
+				  addControlerListenerBinding().to(RouteTTObserver.class);
+				  addControlerListenerBinding().toInstance(new TollBehaviour());
+				  if (getConfig().network().isTimeVariantNetwork()) {
+					  addControlerListenerBinding().to(IncidentGenerator.class);
+				  }
+			  }
+		});
 	}
 
 	
@@ -118,7 +109,7 @@ public class Controller {
 		
 		@Override
 		public void notifyBeforeMobsim(BeforeMobsimEvent event) {
-			Controler con = event.getControler();
+			MatsimServices con = event.getServices();
 			prediction1 = Double.parseDouble(con.getScenario().getConfig().getParam("telematics", "predictedTravelTimeRoute1"));
 			prediction2 = Double.parseDouble(con.getScenario().getConfig().getParam("telematics", "predictedTravelTimeRoute2"));
 

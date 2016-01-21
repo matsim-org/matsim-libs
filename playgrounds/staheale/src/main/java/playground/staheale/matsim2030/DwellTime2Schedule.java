@@ -78,7 +78,7 @@ public class DwellTime2Schedule {
 		// read in PTnetwork
 		
 		log.info("Reading pt network...");	
-		MatsimNetworkReader NetworkReader = new MatsimNetworkReader(sc); //run2010baselineDez1/uvek2005network_adjusted.xml.gz
+		MatsimNetworkReader NetworkReader = new MatsimNetworkReader(sc.getNetwork()); //run2010baselineDez1/uvek2005network_adjusted.xml.gz
 		NetworkReader.readFile("C:/Users/staha/Documents/SimulationInput/run2030baseline/uvek2030network_adjusted.xml.gz"); //run2030baseline/uvek2030network_adjusted.xml.gz
 		log.info("Reading pt network...done.");
 		log.info("Network contains " +PTnetwork.getLinks().size()+ " links and " +PTnetwork.getNodes().size()+ " nodes.");

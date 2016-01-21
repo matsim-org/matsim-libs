@@ -18,12 +18,12 @@ import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.Wait2LinkEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
-import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
@@ -37,7 +37,7 @@ import org.matsim.core.utils.charts.XYScatterChart;
 import org.matsim.core.config.ConfigUtils;
 import org.xml.sax.SAXException;
 
-public class TimeSpaceDistribution implements LinkEnterEventHandler, LinkLeaveEventHandler, Wait2LinkEventHandler, PersonArrivalEventHandler, PersonStuckEventHandler {
+public class TimeSpaceDistribution implements LinkEnterEventHandler, LinkLeaveEventHandler, VehicleEntersTrafficEventHandler, PersonArrivalEventHandler, PersonStuckEventHandler {
 	
 	public static double TIME_INTERVAL;
 	public final static long millisSingapore = 27000000;
@@ -66,7 +66,7 @@ public class TimeSpaceDistribution implements LinkEnterEventHandler, LinkLeaveEv
 	public static void main(String[] args) throws SAXException, ParserConfigurationException, IOException, ParseException {
 		TimeSpaceDistribution.TIME_INTERVAL = 60*Double.parseDouble(args[3]);
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new NetworkReaderMatsimV1(scenario).parse(args[0]);
+		new NetworkReaderMatsimV1(scenario.getNetwork()).parse(args[0]);
 		EventsManager events = EventsUtils.createEventsManager();
 		TimeSpaceDistribution tSD = new TimeSpaceDistribution(scenario.getNetwork());
 		events.addHandler(tSD);
@@ -608,7 +608,7 @@ public class TimeSpaceDistribution implements LinkEnterEventHandler, LinkLeaveEv
 		beginActivityLink(event.getTime(), event.getLinkId(), event.getPersonId());
 	}
 	@Override
-	public void handleEvent(Wait2LinkEvent event) {
+	public void handleEvent(VehicleEntersTrafficEvent event) {
 		finishActivityLink(event.getTime(), event.getLinkId(), event.getPersonId());
 	}
 	@Override

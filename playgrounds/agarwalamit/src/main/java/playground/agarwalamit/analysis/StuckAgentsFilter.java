@@ -42,19 +42,17 @@ import playground.vsp.analysis.modules.AbstractAnalysisModule;
  */
 
 public class StuckAgentsFilter extends AbstractAnalysisModule {
+	private static final Logger LOG = Logger.getLogger(StuckAgentsFilter.class);
+	private final Set<Id<Person>> stuckPersonsFromEventsFiles = new HashSet<Id<Person>>();
+	private final Set<PersonStuckEvent> stuckEventsFromEventsFiles = new HashSet<PersonStuckEvent>();
+	private final List<String> eventsFiles;
+	private final List<StuckEventsHandler> handlers;
 
-	private final Logger log = Logger.getLogger(StuckAgentsFilter.class);
-	
-	public StuckAgentsFilter(List<String> eventsFiles) {
+	public StuckAgentsFilter(final List<String> eventsFiles) {
 		super(StuckAgentsFilter.class.getSimpleName());
 		this.eventsFiles = eventsFiles;
 		this.handlers = new ArrayList<StuckEventsHandler>();
 	}
-
-	private final Set<Id<Person>> stuckPersonsFromEventsFiles = new HashSet<Id<Person>>();
-	private final Set<PersonStuckEvent> stuckEventsFromEventsFiles = new HashSet<PersonStuckEvent>();
-	private List<String> eventsFiles;
-	private List<StuckEventsHandler> handlers;
 
 	@Override
 	public List<EventHandler> getEventHandler() {
@@ -81,7 +79,7 @@ public class StuckAgentsFilter extends AbstractAnalysisModule {
 			stuckEventsFromEventsFiles.addAll(eh.getStuckEvents());
 			stuckPersonsFromEventsFiles.addAll(eh.getStuckPersons());
 		}
-		log.info(stuckPersonsFromEventsFiles.size()+" persons are stuck in "+eventsFiles.size()+" files.");
+		LOG.info(stuckPersonsFromEventsFiles.size()+" persons are stuck in "+eventsFiles.size()+" files.");
 	}
 
 	@Override

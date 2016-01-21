@@ -116,7 +116,7 @@ public class ConvertBTURoutes2Matsim {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils
 				.createConfig());
 		// save network in scenario
-		(new MatsimNetworkReader(scenario)).readFile(directory + networkFile);
+		(new MatsimNetworkReader(scenario.getNetwork())).readFile(directory + networkFile);
 		this.network = scenario.getNetwork();
 		// save former population (without routes) in scenario
 		(new MatsimPopulationReader(scenario)).readFile(directory

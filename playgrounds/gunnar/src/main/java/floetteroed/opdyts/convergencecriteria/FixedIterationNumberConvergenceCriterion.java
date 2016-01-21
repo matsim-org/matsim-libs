@@ -24,9 +24,11 @@
  */
 package floetteroed.opdyts.convergencecriteria;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import floetteroed.opdyts.trajectorysampling.TransitionSequence;
+import floetteroed.utilities.math.Vector;
 
 /**
  * 
@@ -41,6 +43,12 @@ public class FixedIterationNumberConvergenceCriterion implements
 	private final int iterationsToConvergence;
 
 	private final int averagingIterations;
+
+	private List<Double> finalWeights = null;
+
+	private Double finalEquilbiriumGap = null;
+
+	private Double finalUniformityGap = null;
 
 	// -------------------- MEMBERS --------------------
 
@@ -58,7 +66,7 @@ public class FixedIterationNumberConvergenceCriterion implements
 
 	@Override
 	public void evaluate(final TransitionSequence<?> transitionSequence) {
-		if ((transitionSequence.size() < this.iterationsToConvergence)) {
+		if ((transitionSequence.iterations() < this.iterationsToConvergence)) {
 			this.finalObjectiveFunctionValue = null;
 		} else {
 			final List<Double> objectiveFunctionValues = transitionSequence
@@ -70,6 +78,34 @@ public class FixedIterationNumberConvergenceCriterion implements
 						.get(i);
 			}
 			this.finalObjectiveFunctionValue /= this.averagingIterations;
+
+			// TODO >>> NEW >>>
+			this.finalWeights = new ArrayList<>(transitionSequence.size());
+			for (int i = 0; i < transitionSequence.size()
+					- this.averagingIterations; i++) {
+				this.finalWeights.add(0.0);
+			}
+			for (int i = transitionSequence.size() - this.averagingIterations; i < transitionSequence
+					.size(); i++) {
+				this.finalWeights.add(1.0 / this.averagingIterations);
+			}
+
+			// TODO >>> EVEN NEWER >>>
+			
+			final Vector totalDelta = transitionSequence.getTransitions()
+					.get(transitionSequence.size() - this.averagingIterations)
+					.getDelta().copy();
+			for (int i = transitionSequence.size() - this.averagingIterations
+					+ 1; i < transitionSequence.size(); i++) {
+				totalDelta.add(transitionSequence.getTransitions().get(i)
+						.getDelta());
+			}
+			final double finalWeight = 1.0 / this.averagingIterations;
+			totalDelta.mult(finalWeight);
+			this.finalEquilbiriumGap = totalDelta.euclNorm();
+			this.finalUniformityGap = finalWeight;
+			
+			// TODO <<< NEW <<<
 		}
 	}
 
@@ -86,5 +122,20 @@ public class FixedIterationNumberConvergenceCriterion implements
 	@Override
 	public void reset() {
 		this.finalObjectiveFunctionValue = null;
+	}
+
+	@Override
+	public List<Double> getFinalWeights() {
+		return this.finalWeights;
+	}
+
+	@Override
+	public Double getFinalEquilbriumGap() {
+		return this.finalEquilbiriumGap;
+	}
+
+	@Override
+	public Double getFinalUniformityGap() {
+		return this.finalUniformityGap;
 	}
 }

@@ -2,6 +2,8 @@ package org.matsim.core.events;
 
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.Injector;
 
 public class EventsUtils {
 
@@ -10,26 +12,8 @@ public class EventsUtils {
     }
 
     public static EventsManager createEventsManager(Config config) {
-        Integer numberOfThreads = config.parallelEventHandling().getNumberOfThreads();
-        Long estimatedNumberOfEvents = config.parallelEventHandling().getEstimatedNumberOfEvents();
-        Boolean synchronizeOnSimSteps = config.parallelEventHandling().getSynchronizeOnSimSteps();
-        Boolean oneThreadPerHandler = config.parallelEventHandling().getOneThreadPerHandler();
-        if (oneThreadPerHandler != null && oneThreadPerHandler) {
-        	 if (synchronizeOnSimSteps != null) return new ParallelEventsManager(synchronizeOnSimSteps);
-        	 else return new ParallelEventsManager(true);
-        }
-        if (numberOfThreads != null) {
-            if (synchronizeOnSimSteps != null && synchronizeOnSimSteps) {
-                return new SimStepParallelEventsManagerImpl(numberOfThreads);
-            } else {
-                if (estimatedNumberOfEvents != null) {
-                    return new ParallelEventsManagerImpl(numberOfThreads, estimatedNumberOfEvents);
-                } else {
-                    return new ParallelEventsManagerImpl(numberOfThreads);
-                }
-            }
-        }
-        return new SimStepParallelEventsManagerImpl();
+        return Injector.createInjector(config, new EventsManagerModule())
+                .getInstance(EventsManager.class);
     }
 
     /**

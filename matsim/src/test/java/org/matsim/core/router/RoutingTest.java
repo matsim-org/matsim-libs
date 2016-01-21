@@ -50,6 +50,7 @@ import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.PreProcessDijkstra;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.testcases.MatsimTestUtils;
@@ -176,7 +177,7 @@ public class RoutingTest  {
 //		final Config config = loadConfig("test/input/" + this.getClass().getCanonicalName().replace('.', '/') + "/config.xml");
 		final Config config = ConfigUtils.loadConfig( utils.getClassInputDirectory() + "/config.xml" );
 		final Scenario scenario = ScenarioUtils.createScenario(config);
-		new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(config.network().getInputFile());
 //		final String inPlansName = "test/input/" + this.getClass().getCanonicalName().replace('.', '/') + "/plans.xml.gz";
 		final String inPlansName = utils.getClassInputDirectory() + "/plans.xml.gz" ;
 		new MatsimPopulationReader(scenario).readFile(inPlansName);
@@ -184,7 +185,7 @@ public class RoutingTest  {
 		calcRoute(provider, scenario);
 
 		final Scenario referenceScenario = ScenarioUtils.createScenario(config);
-		new MatsimNetworkReader(referenceScenario).readFile(config.network().getInputFile());
+		new MatsimNetworkReader(referenceScenario.getNetwork()).readFile(config.network().getInputFile());
 		new MatsimPopulationReader(referenceScenario).readFile(inPlansName);
 		
 		final boolean isEqual = PopulationUtils.equalPopulation(referenceScenario.getPopulation(), scenario.getPopulation());
@@ -208,13 +209,13 @@ public class RoutingTest  {
 				scenario.getNetwork(),
 				calculator,
 				calculator);
-		Injector injector = Injector.createInjector(scenario.getConfig(), new AbstractModule() {
+		com.google.inject.Injector injector = Injector.createInjector(scenario.getConfig(), new AbstractModule() {
 			@Override
 			public void install() {
 				install(AbstractModule.override(Arrays.asList(new TripRouterModule()), new AbstractModule() {
 					@Override
 					public void install() {
-						bind(Scenario.class).toInstance(scenario);
+						install(new ScenarioByInstanceModule(scenario));
 						addTravelTimeBinding("car").toInstance(calculator);
 						addTravelDisutilityFactoryBinding("car").toInstance(new TravelDisutilityFactory() {
 							@Override

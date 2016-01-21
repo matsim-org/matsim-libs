@@ -84,7 +84,7 @@ public class DelayEvalVeh {
 	
 	private void readNetwork(String networkFile){
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		MatsimNetworkReader matsimNetReader = new MatsimNetworkReader(scenario);
+		MatsimNetworkReader matsimNetReader = new MatsimNetworkReader(scenario.getNetwork());
 		matsimNetReader.readFile(networkFile);
 		this.network =  scenario.getNetwork();
 	}

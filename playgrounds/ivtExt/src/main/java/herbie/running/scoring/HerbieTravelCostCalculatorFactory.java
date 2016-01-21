@@ -21,7 +21,6 @@
 package herbie.running.scoring;
 
 import herbie.running.config.HerbieConfigGroup;
-
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;

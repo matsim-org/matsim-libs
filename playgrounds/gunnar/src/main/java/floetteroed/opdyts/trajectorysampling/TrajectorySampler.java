@@ -27,7 +27,9 @@ package floetteroed.opdyts.trajectorysampling;
 import java.util.Map;
 
 import floetteroed.opdyts.DecisionVariable;
+import floetteroed.opdyts.ObjectiveFunction;
 import floetteroed.opdyts.SimulatorState;
+import floetteroed.utilities.statisticslogging.Statistic;
 
 /**
  * 
@@ -47,8 +49,17 @@ public interface TrajectorySampler<U extends DecisionVariable> {
 
 	public int getTotalTransitionCnt();
 
-	public Map<U, Double> getDecisionVariable2finalObjectiveFunctionValue();
+	public Map<U, Double> getDecisionVariable2finalObjectiveFunctionValueView();
 
+	public Map<U, Double> getDecisionVariable2selfTunedEquilbriumGapWeightView();
+
+	public Map<U, Double> getDecisionVariable2selfTunedUniformityGapWeightView();
+
+	public void addStatistic(final String logFileName,
+			final Statistic<SamplingStage<U>> statistic);
+
+	public void setStandardLogFileName(String logFileName);
+	
 	/**
 	 * Call once before the simulation is started. This implements a randomly
 	 * selected decision variable in the simulation, with the objective to
@@ -66,13 +77,8 @@ public interface TrajectorySampler<U extends DecisionVariable> {
 	 *            the newly reached simulator state
 	 */
 	public void afterIteration(SimulatorState newState);
-
-	// public Map<U, Integer> getDecisionVariable2evaluationCnt();
-
-	// public double getInitialObjectiveFunctionValue();
-
-	// public double getInitialEquilibriumGap();
-
-	// public double getInitialUniformityGap();
+	
+	// TODO NEW
+	public ObjectiveFunction getObjectiveFunction();
 
 }

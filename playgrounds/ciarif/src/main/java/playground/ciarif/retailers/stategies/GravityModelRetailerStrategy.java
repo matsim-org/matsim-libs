@@ -10,7 +10,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
@@ -44,7 +44,7 @@ public class GravityModelRetailerStrategy extends RetailerStrategyImpl
   private Map<Id, Integer> shops_keys;
   private Map<Id<ActivityFacility>, ActivityFacility> movedFacilities = new TreeMap<Id<ActivityFacility>, ActivityFacility>();
 
-  public GravityModelRetailerStrategy(Controler controler) {
+  public GravityModelRetailerStrategy(MatsimServices controler) {
     super(controler);
     log.info("Controler" + this.controler);
   }

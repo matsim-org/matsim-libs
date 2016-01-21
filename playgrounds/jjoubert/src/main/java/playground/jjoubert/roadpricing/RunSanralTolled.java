@@ -23,7 +23,7 @@ package playground.jjoubert.roadpricing;
 import org.apache.log4j.Logger;
 import org.matsim.core.controler.Controler;
 
-import playground.jjoubert.roadpricing.senozon.SanralControler;
+import playground.jjoubert.roadpricing.senozon.SanralRoadPricing;
 
 public class RunSanralTolled {
 	private static String configFilename;
@@ -42,8 +42,10 @@ public class RunSanralTolled {
 		log.info(" 	   Running the SANRAL project WITH the new toll.");
 		log.info("------------------------------------------------------");
 		log.info(" " + configFilename);
-				
-		SanralControler c = new SanralControler(configFilename);
+
+		final String configFileName = configFilename;
+		Controler c = new Controler(configFileName);
+		c.addControlerListener(new SanralRoadPricing());
 		c.run();
 	}
 

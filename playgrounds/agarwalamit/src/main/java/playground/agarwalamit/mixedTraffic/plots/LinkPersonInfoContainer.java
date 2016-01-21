@@ -41,19 +41,13 @@ public class LinkPersonInfoContainer {
 	private final Map<Id<Person>, PersonPositionChecker> person2PersonPositionChecker = new HashMap<>();
 	private final Queue<Id<Person>> agentsOnLink = new LinkedList<>();
 	private final Queue<Id<Person>> agentsInQueue= new LinkedList<>();
-	private double remainingLinkSpace;
+	private double availableLinkSpace ;
 
 	public LinkPersonInfoContainer(final Id<Link> linkId, final double linkLength){
 		this.linkId = linkId;
-		this.remainingLinkSpace = linkLength;
+		this.availableLinkSpace = linkLength;
 	}
 
-	public double getRemainingLinkSpace() {
-		return remainingLinkSpace;
-	}
-	public void updateRemainingLinkSpace(final double remainingLinkSpace) {
-		this.remainingLinkSpace = remainingLinkSpace;
-	}
 	public Id<Link> getLinkId() {
 		return linkId;
 	}
@@ -70,31 +64,49 @@ public class LinkPersonInfoContainer {
 		return person2EnteringPersonInfo;
 	}
 
-	public PersonPositionChecker getPersonInfoChecker(final Id<Person> personId){
-		if(! person2PersonPositionChecker.containsKey(personId) || person2PersonPositionChecker.get(personId).getLeftPersonInfo()==null ) person2PersonPositionChecker.put(personId, new PersonPositionChecker(personId));
-		return person2PersonPositionChecker.get(personId);
+	private PersonPositionChecker createAndReturnPersonPositionChecker(Id<Person> personId){
+		PersonPositionChecker checker = new PersonPositionChecker(personId);
+		this.person2PersonPositionChecker.put(personId, checker);
+		return checker;
+	}
+
+	public Map<Id<Person>, PersonPositionChecker> getPerson2PersonPositionChecker() {
+		return person2PersonPositionChecker;
+	}
+
+	public PersonPositionChecker getOrCreatePersonPositionChecker(Id<Person> personId){
+		PersonPositionChecker checker = this.person2PersonPositionChecker.get(personId);
+		if(checker == null) return createAndReturnPersonPositionChecker(personId);
+		else {
+			checker.updatePresonInfo();
+		}
+		return checker;
+	}
+
+	public double getAvailableLinkSpace() {
+		return availableLinkSpace;
+	}
+
+	public void setAvailableLinkSpace(final double availableLinkSpace) {
+		if(availableLinkSpace < 0) this.availableLinkSpace = 0.;
+		else this.availableLinkSpace = availableLinkSpace;
 	}
 
 	public class PersonPositionChecker {
-		private final EnteringPersonInfo enteredPerson;
-		private final LeavingPersonInfo leftPerson;
-		private final double linkEnterTime;
-		private final String legMode;
-		private final Link link;
-		private boolean addVehicleInQ;
-		private double availableLinkSpace = Double.NEGATIVE_INFINITY ;
+		private EnteringPersonInfo enteredPerson;
+		private LeavingPersonInfo leftPerson;
+		private final Id<Person> personId;
 		private double queuingTime;
+		private boolean isPersonQueued = false;
+		private int cycleNumer = 1;
 
-		public PersonPositionChecker(final Id<Person> personId){
-			this.enteredPerson = person2EnteringPersonInfo.get(personId);
-			this.leftPerson = person2LeavingPersonInfo.get(personId);
-			this.legMode = enteredPerson.getLegMode();
-			this.link = enteredPerson.getLink();
-			this.linkEnterTime = enteredPerson.getLinkEnterTime();
+		private PersonPositionChecker(final Id<Person> personId){
+			this.personId = personId;
+			updatePresonInfo();
 		}
-		
+
 		private double getFreeSpeedLinkTravelTime() {
-			return this.availableLinkSpace / Math.min(this.link.getFreespeed(), MixedTrafficVehiclesUtils.getSpeed(this.legMode));
+			return availableLinkSpace / Math.min(this.enteredPerson.getLink().getFreespeed(), MixedTrafficVehiclesUtils.getSpeed(this.enteredPerson.getLegMode()));
 		}
 
 		public EnteringPersonInfo getEnteredPersonInfo() {
@@ -105,36 +117,62 @@ public class LinkPersonInfoContainer {
 			return this.leftPerson;
 		}
 
-		public void checkIfVehicleWillGoInQ(final double currentTimeStep){
-			double travelTimeSincePersonHasEntered = currentTimeStep - this.linkEnterTime;
-			if(leftPerson!=null) {
-				if(currentTimeStep != this.leftPerson.getLinkLeaveTime()){
-					this.addVehicleInQ= travelTimeSincePersonHasEntered > Math.floor(getFreeSpeedLinkTravelTime()) + 1;
-				} else this.addVehicleInQ=false;
-			} else {
-				this.addVehicleInQ = travelTimeSincePersonHasEntered > Math.floor(getFreeSpeedLinkTravelTime()) + 1;
-			}
+		public boolean isAddingVehicleInQueue(final double currentTimeStep) {
+			double travelTimeSincePersonHasEntered = currentTimeStep - this.enteredPerson.getLinkEnterTime();
+			if(leftPerson!=null && currentTimeStep == this.leftPerson.getLinkLeaveTime()) this.isPersonQueued = false; 
+			else this.isPersonQueued = travelTimeSincePersonHasEntered >= Math.floor(getFreeSpeedLinkTravelTime()) + 1;
+			return this.isPersonQueued;
 		}
 
-		public boolean isAddingVehicleInQueue() {
-			return this.addVehicleInQ;
-		}
-
-		public void updateAvailableLinkSpace(final double availableLinkSpace) {
-			if(availableLinkSpace < 0) this.availableLinkSpace = 0.;
-			else this.availableLinkSpace = availableLinkSpace;
-		}
-
-		public double getQueuingTime(){
-			return this.queuingTime;
+		public boolean isPersonAlreadyQueued(){
+			return this.isPersonQueued;
 		}
 
 		/**
-		 * @param availableSpaceSoFar
-		 * This sets the actual queuing time in fraction without any rounding
+		 * @return actual queuing time i.e. time at which vehicle is queued. Also see <code>updateQueuingTime()</code>
 		 */
-		public void updateQueuingTime(final double availableSpaceSoFar){
-			this.queuingTime = this.linkEnterTime + availableSpaceSoFar / Math.min(this.link.getFreespeed(), MixedTrafficVehiclesUtils.getSpeed(this.legMode));
+		public double getQueuingTime(){
+			return this.queuingTime;
+		}
+		
+		/**
+		 * @return Probably queuing time i.e. time at which the vehicle should be queued depending on the available link space.
+		 * This is different than <code>getQueuingTime()</code> because, person is not queued during this call.
+		 */
+		public double getProbableQueuingTime(){
+			return this.enteredPerson.getLinkEnterTime() + availableLinkSpace / Math.min(this.enteredPerson.getLink().getFreespeed(), MixedTrafficVehiclesUtils.getSpeed(this.enteredPerson.getLegMode()));
+		}
+
+		/**
+		 * This sets the actual queuing time in fraction without any rounding and 
+		 * it depends on the number of vehicles queued at the end of the link.
+		 */
+		public void updateQueuingTime(){
+			this.queuingTime = this.enteredPerson.getLinkEnterTime() + availableLinkSpace / Math.min(this.enteredPerson.getLink().getFreespeed(), MixedTrafficVehiclesUtils.getSpeed(this.enteredPerson.getLegMode()));
+		}
+
+		/**
+		 * A person may re-appear on the same link.
+		 */
+		public void updatePresonInfo(){
+			this.leftPerson = person2LeavingPersonInfo.get(this.personId);
+			this.enteredPerson = person2EnteringPersonInfo.get(this.personId);
+		}
+
+		public void updateCycleNumberOfPerson(){
+			this.cycleNumer++;
+		}
+
+		public int getCycleNumber(){
+			return this.cycleNumer;
+		}
+
+		public Id<Person> getPersonId(){
+			return this.personId;
+		}
+
+		public Link getLink(){
+			return this.enteredPerson.getLink();
 		}
 	}
 }

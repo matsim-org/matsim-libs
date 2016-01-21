@@ -20,6 +20,7 @@ package playground.johannes.synpop.sim;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.facilities.ActivityFacility;
+import playground.johannes.synpop.analysis.Predicate;
 import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.sim.data.CachedElement;
 import playground.johannes.synpop.sim.data.CachedSegment;
@@ -37,12 +38,18 @@ public class GeoDistanceUpdater implements AttributeChangeListener {
 
     private AttributeChangeListener listener;
 
+    private Predicate<CachedSegment> predicate;
+
     public GeoDistanceUpdater() {
         this.listener = null;
     }
 
     public GeoDistanceUpdater(AttributeChangeListener listener) {
         setListener(listener);
+    }
+
+    public void setPredicate(Predicate<CachedSegment> predicate) {
+        this.predicate = predicate;
     }
 
     public void setListener(AttributeChangeListener listener) {
@@ -64,7 +71,10 @@ public class GeoDistanceUpdater implements AttributeChangeListener {
                 Object old = toLeg.getData(geoDistDataKey);
                 toLeg.setData(geoDistDataKey, d);
 
-                if(listener != null) listener.onChange(geoDistDataKey, old, d, toLeg);
+                if (listener != null) {
+                    if (predicate == null || predicate.test(toLeg))
+                        listener.onChange(geoDistDataKey, old, d, toLeg);
+                }
             }
 
             if (fromLeg != null) {
@@ -73,7 +83,10 @@ public class GeoDistanceUpdater implements AttributeChangeListener {
                 Object old = fromLeg.getData(geoDistDataKey);
                 fromLeg.setData(geoDistDataKey, d);
 
-                if(listener != null) listener.onChange(geoDistDataKey, old, d, fromLeg);
+                if (listener != null) {
+                    if (predicate == null || predicate.test(fromLeg))
+                        listener.onChange(geoDistDataKey, old, d, fromLeg);
+                }
             }
         }
     }
@@ -86,7 +99,7 @@ public class GeoDistanceUpdater implements AttributeChangeListener {
         Coord c2 = fac2.getCoord();
 
         double dx = c1.getX() - c2.getX();
-        double dy = c1.getY() - c1.getY();
+        double dy = c1.getY() - c2.getY();
         return Math.sqrt(dx * dx + dy * dy);
     }
 }

@@ -20,9 +20,8 @@
 package playground.artemc.crowding.newScoringFunctions;
 
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 
@@ -47,7 +46,7 @@ public class SecondBestScoringFunctionFactory implements ScoringFunctionFactory
 	private ScoringFunctionFactory delegate;
 	private EventsManager events;
 	private ScoreTracker scoreTracker;
-	private Controler controler;
+	private MatsimServices controler;
 	
 	/**
 	 * Constructs a ScoringFunctionFactory that adds disutilities for
@@ -71,7 +70,7 @@ public class SecondBestScoringFunctionFactory implements ScoringFunctionFactory
 	 * @param delegate
 	 */
 	
-	public SecondBestScoringFunctionFactory(ScoringFunctionFactory delegate, EventsManager events, ScoreTracker scoreTracker, Controler controler)
+	public SecondBestScoringFunctionFactory(ScoringFunctionFactory delegate, EventsManager events, ScoreTracker scoreTracker, MatsimServices controler)
 	{
 		this.delegate = delegate;
 		this.events = events;

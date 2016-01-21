@@ -17,12 +17,16 @@ public class TaxiConfigGroup extends ConfigGroup {
 	private static final String OUTPUT_DIRECTORY = "outputDir";
 	private static final String ALGORITHM = "algorithm";
 	private static final String VEHICLE_CAPACITY = "vehicleCapacity";
+
+	//scheduler
 	private static final String PICKUP_DURATION = "pickupDuration";
 	private static final String DROPOFF_DURATION = "dropoffDuration";
 	private static final String DESTINATION_KNOWN = "destinationKnown";
 	private static final String VEHICLE_DIVERSION = "vehicleDiversion";
-	private static final String NEAREST_REQUEST_LIM = "vehicleDiversion";
-	private static final String NEAREST_VEH_LIM= "vehicleDiversion";
+	
+	//Rule-based dispatch
+	private static final String NEAREST_REQUEST_LIM = "nearestRequestsLimit";
+	private static final String NEAREST_VEH_LIM= "nearestVehiclesLimit";
 	private static final String GOAL= "optimizerGoal";
 	
 	
@@ -33,8 +37,8 @@ public class TaxiConfigGroup extends ConfigGroup {
 	private String ranksFile = null;
 	private String outputDir = null;
 	
-	private int nearestVehiclesLimit = 0;
-	private int nearestRequestsLimit = 0;
+	private int nearestVehiclesLimit = Integer.MAX_VALUE;
+	private int nearestRequestsLimit = Integer.MAX_VALUE;
 	
 
 	private int vehicleMaximumCapacity = 4;
@@ -122,7 +126,7 @@ public class TaxiConfigGroup extends ConfigGroup {
 			map.put(VEHICLE_DIVERSION, "can taxis be re-assigned en route to customer. Default: false. Works only with some algorithms");
 			map.put(NEAREST_REQUEST_LIM, "Upper limit for request near a vehicle. Default: off (=0)");
 			map.put(NEAREST_VEH_LIM, "Upper limit for vehicles near a request. Default: off (=0)");
-			map.put(GOAL, "Optimizer goal, one of: MIN_WAIT_TIME, MIN_PICKUP_TIME, DEMAND_SUPPLY_EQUIL, NULL");
+			map.put(GOAL, "Optimizer goal, one of: MIN_WAIT_TIME, MIN_PICKUP_TIME, DEMAND_SUPPLY_EQUIL");
 			return map;
 	 }
 

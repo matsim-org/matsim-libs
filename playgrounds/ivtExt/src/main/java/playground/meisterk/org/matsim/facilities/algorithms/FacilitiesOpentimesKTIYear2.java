@@ -20,11 +20,6 @@
 
 package playground.meisterk.org.matsim.facilities.algorithms;
 
-import java.util.List;
-import java.util.Map;
-import java.util.SortedSet;
-import java.util.regex.Pattern;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Scenario;
@@ -37,11 +32,15 @@ import org.matsim.facilities.ActivityOption;
 import org.matsim.facilities.ActivityOptionImpl;
 import org.matsim.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.facilities.OpeningTime;
-import org.matsim.facilities.OpeningTimeImpl;
 import org.matsim.facilities.OpeningTime.DayType;
+import org.matsim.facilities.OpeningTimeImpl;
 import org.matsim.facilities.algorithms.AbstractFacilityAlgorithm;
-
 import playground.meisterk.org.matsim.run.facilities.FacilitiesProductionKTI;
+
+import java.util.List;
+import java.util.Map;
+import java.util.SortedSet;
+import java.util.regex.Pattern;
 
 /**
  * Assign every shop an opening time based on shopsOf2005 survey.

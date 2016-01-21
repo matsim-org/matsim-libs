@@ -38,17 +38,14 @@ import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 
 public class TollInfoHandler implements PersonMoneyEventHandler {
 
-	private SortedMap<String, SortedMap<Double,Double> > userGrp2TimeBin2Toll = new TreeMap<>();
-	private SortedMap<String, SortedMap<Double, Map<Id<Person>,Double> > > userGrp2TimeBin2Person2Toll = new TreeMap<>();
+	private final SortedMap<String, SortedMap<Double,Double> > userGrp2TimeBin2Toll = new TreeMap<>();
+	private final SortedMap<String, SortedMap<Double, Map<Id<Person>,Double> > > userGrp2TimeBin2Person2Toll = new TreeMap<>();
 
-	private ExtendedPersonFilter pf = new ExtendedPersonFilter();
-	private final int noOfTimeBins;
+	private final ExtendedPersonFilter pf = new ExtendedPersonFilter();
 	private final double timeBinSize;
 
-	public TollInfoHandler (double simulationEndTime, int numberOfTimeBins) {
-		this.noOfTimeBins = numberOfTimeBins;
-		this.timeBinSize = simulationEndTime/this.noOfTimeBins;
-
+	public TollInfoHandler (final double simulationEndTime, final int numberOfTimeBins) {
+		this.timeBinSize = simulationEndTime/numberOfTimeBins;
 		initializeMaps();
 	}
 

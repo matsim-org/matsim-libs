@@ -9,23 +9,24 @@ import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
-import org.matsim.core.utils.collections.QuadTree;
 
 import com.google.inject.Inject;
-import com.google.inject.name.Named;
+import org.matsim.core.router.TripRouter;
+
+import javax.inject.Provider;
 
 public class RemoveRandomActivityStrategy implements PlanStrategy {
 	private final PlanStrategy planStrategyDelegate;
 
 		
 	@Inject
-	public  RemoveRandomActivityStrategy(final Scenario scenario) {
+	public  RemoveRandomActivityStrategy(final Scenario scenario, Provider<TripRouter> tripRouterProvider) {
 		
 	    PlanStrategyImpl.Builder builder = new PlanStrategyImpl.Builder(new RandomPlanSelector<Plan, Person>() );
-	    RemoveRandomActivity ira = new RemoveRandomActivity(scenario);
+	    RemoveRandomActivity ira = new RemoveRandomActivity(scenario, tripRouterProvider);
 	    
 		builder.addStrategyModule(ira);
-		builder.addStrategyModule(new ReRoute(scenario));
+		builder.addStrategyModule(new ReRoute(scenario, tripRouterProvider));
 		
 		planStrategyDelegate = builder.build();		
 	}	

@@ -37,7 +37,9 @@ import org.matsim.core.config.groups.QSimConfigGroup.LinkDynamics;
 import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
 import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspDefaultsCheckingLevel;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.VariableIntervalTimeVariantLinkFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
@@ -48,34 +50,36 @@ import playground.agarwalamit.mixedTraffic.MixedTrafficVehiclesUtils;
  * @author amit
  */
 public class InputsForFDTestSetUp {
-	public static final int SUBDIVISION_FACTOR = 1; //all sides of the triangle will be divided into subdivisionFactor links
-	public static final double LINK_LENGTH = 1000;//in m, length of one the triangle sides.
-	public static final double NO_OF_LANES = 1;
-	private static final String HOLE_SPEED = "15";
-	
+	static final int SUBDIVISION_FACTOR = 1; //all sides of the triangle will be divided into subdivisionFactor links
+	static final double LINK_LENGTH = 1000;//in m, length of one the triangle sides.
+	static final double NO_OF_LANES = 1;
+	static final String HOLE_SPEED = "15";
+	static final double MAX_ACT_END_TIME = 1800.0; // agents departs randomly between 0 and MAX_ACT_END_TIME
+
 	private final double LINK_CAPACITY = 2700; //in PCU/h
 	private final double END_TIME = 24*3600;
 	private final double FREESPEED = 60.;	//in km/h, maximum authorized velocity on the track
-	private final double STUCK_TIME = 10;
-	
+	private double stuckTime = 10;
+
 	private LinkDynamics linkDynamics = LinkDynamics.FIFO;
 	private TrafficDynamics trafficDynamics = TrafficDynamics.queue;
-	
+
 	private String [] travelModes;
 	private Double[] modalSplitInPCU;
 	private Scenario scenario;
+	private boolean isTimeDependentNetwork ;
+
 	private Map<Id<VehicleType>, TravelModesFlowDynamicsUpdator> vehicle2TravelModesData;
 
 	void run(){
-		
+
 		if (travelModes.length != modalSplitInPCU.length){
 			throw new RuntimeException("Modal split for each travel mode is necessray parameter, it is not defined correctly. Check your static variable!!! \n Aborting ...");
 		}
-		
+
+		stuckTime = this.travelModes.length==1 && (this.travelModes[0]=="car" || this.travelModes[0]=="truck") ? 60 : 10;
 		setUpConfig();
 		createTriangularNetwork();
-		//Initializing modeData objects//ZZ_TODO should be initialized when instancing FundamentalDiagrams, no workaround still found
-		//Need to be currently initialized at this point to initialize output and modified QSim
 		fillTravelModeData();
 	}
 
@@ -84,20 +88,22 @@ public class InputsForFDTestSetUp {
 		Config config = ConfigUtils.createConfig();
 
 		config.qsim().setMainModes(Arrays.asList(this.travelModes));
-		config.qsim().setStuckTime(STUCK_TIME);//allows to overcome maximal density regime
+		config.qsim().setStuckTime(stuckTime);//allows to overcome maximal density regime
 		config.qsim().setEndTime(END_TIME);
 
 		config.qsim().setLinkDynamics(linkDynamics.toString());
 		GenerateFundamentalDiagramData.LOG.info("==========The chosen link dynamics is "+linkDynamics+". =========="); 
-				
+
 		config.qsim().setTrafficDynamics(trafficDynamics);
 		GenerateFundamentalDiagramData.LOG.info("==========The chosen traffic dynamics is "+trafficDynamics+". ==========");
+
+		config.qsim().setSnapshotStyle(SnapshotStyle.queue);
 		
 		if(trafficDynamics.equals(TrafficDynamics.withHoles)) {
 			config.qsim().setSnapshotStyle(SnapshotStyle.withHoles); // to see holes in OTFVis
 			config.setParam("WITH_HOLE", "HOLE_SPEED", HOLE_SPEED);
 		}
-		
+
 		if(linkDynamics.equals(LinkDynamics.SeepageQ)){
 			config.qsim().setSeepMode("bike");
 			config.qsim().setSeepModeStorageFree(false);
@@ -115,6 +121,13 @@ public class InputsForFDTestSetUp {
 	private void createTriangularNetwork(){
 		GenerateFundamentalDiagramData.LOG.info("==========Creating network=========");
 		Network network = scenario.getNetwork();
+
+		if(isTimeDependentNetwork) {
+			scenario.getConfig().network().setTimeVariantNetwork(true);
+			NetworkImpl netImpl = (NetworkImpl) scenario.getNetwork();
+			netImpl.getFactory().setLinkFactory( new VariableIntervalTimeVariantLinkFactory() );
+		}
+
 		//nodes of the equilateral triangle base starting, left node at (0,0)
 		for (int i = 0; i<SUBDIVISION_FACTOR+1; i++){
 			double x=0, y=0;
@@ -218,12 +231,12 @@ public class InputsForFDTestSetUp {
 	Map<Id<VehicleType>, TravelModesFlowDynamicsUpdator> getTravelMode2FlowDynamicsData(){
 		return vehicle2TravelModesData;
 	}
-	
+
 	void dumpInputFiles(String dir){
 		new ConfigWriter(scenario.getConfig()).write(dir+"/config.xml");
 		new NetworkWriter(scenario.getNetwork()).write(dir+"/network.xml");
 	}
-	
+
 	public void setLinkDynamics(LinkDynamics linkDynamic) {
 		linkDynamics = linkDynamic;
 	}
@@ -239,11 +252,19 @@ public class InputsForFDTestSetUp {
 	public void setTravelModes(String[] travelModes) {
 		this.travelModes = travelModes;
 	}
-	
+
 	public Double[] getModalSplit(){
 		return this.modalSplitInPCU;
 	}
-	
+
+	public void setTimeDependentNetwork(boolean isTimeDependentNetwork) {
+		this.isTimeDependentNetwork = isTimeDependentNetwork;
+	}
+
+	public boolean isTimeDependentNetwork() {
+		return isTimeDependentNetwork;
+	}
+
 	public void setModalSplit(String [] modalSplit) {
 		this.modalSplitInPCU = new Double [modalSplit.length];
 		for (int ii = 0; ii <modalSplit.length; ii ++){

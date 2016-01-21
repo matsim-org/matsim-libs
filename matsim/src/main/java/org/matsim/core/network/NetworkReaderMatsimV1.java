@@ -23,7 +23,6 @@ package org.matsim.core.network;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -52,9 +51,9 @@ public class NetworkReaderMatsimV1 extends MatsimXmlParser {
 
     private final static Logger log = Logger.getLogger(NetworkReaderMatsimV1.class);
 
-	public NetworkReaderMatsimV1(final Scenario scenario) {
+	public NetworkReaderMatsimV1(Network network) {
 		super();
-        this.network = scenario.getNetwork();
+        this.network = network;
 	}
 
 	@Override

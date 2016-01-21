@@ -55,6 +55,7 @@ public class VehicleLeavesTrafficEvent extends Event implements HasPersonId {
 
 	}
 	
+	@Override
 	public Id<Person> getPersonId() {
 		return this.driverId;
 	}	
@@ -67,6 +68,7 @@ public class VehicleLeavesTrafficEvent extends Event implements HasPersonId {
 		return vehicleId;
 	}
 	
+	@Override
 	public String getEventType() {
 		return EVENT_TYPE;
 	}

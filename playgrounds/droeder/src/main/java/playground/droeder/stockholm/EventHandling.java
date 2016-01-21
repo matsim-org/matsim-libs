@@ -54,7 +54,7 @@ public class EventHandling {
 	
 	
 	Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-	new MatsimNetworkReader(sc).readFile(networkfile);
+	new MatsimNetworkReader(sc.getNetwork()).readFile(networkfile);
 	
 	TravelTimeCalculator calculator = new TravelTimeCalculator(sc.getNetwork(), sc.getConfig().travelTimeCalculator());
 	VolumesAnalyzer volumes = new VolumesAnalyzer(3600, 24 *3600, sc.getNetwork());

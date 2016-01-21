@@ -20,14 +20,6 @@
 
 package playground.meisterk.org.matsim.facilities.algorithms;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.util.Set;
-
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-
 import net.opengis.kml._2.BasicLinkType;
 import net.opengis.kml._2.DocumentType;
 import net.opengis.kml._2.FolderType;
@@ -38,7 +30,6 @@ import net.opengis.kml._2.PlacemarkType;
 import net.opengis.kml._2.PointType;
 import net.opengis.kml._2.StyleType;
 import net.opengis.kml._2.TimeSpanType;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
@@ -46,8 +37,14 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.OpeningTime;
 import org.matsim.facilities.algorithms.AbstractFacilityAlgorithm;
-
 import playground.meisterk.org.matsim.run.facilities.ShopsOf2005ToFacilities.Day;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.util.Set;
 
 //import com.google.earth.kml._2.BasicLinkType;
 //import com.google.earth.kml._2.DocumentType;

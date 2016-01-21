@@ -24,7 +24,7 @@ public class LinkLengthChanger {
 				"../roadpricingSingapore/scenarios/siouxFalls/networkLengthChanges.csv"));
 
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new NetworkReaderMatsimV1(scenario).parse(networkPath);
+		new NetworkReaderMatsimV1(scenario.getNetwork()).parse(networkPath);
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 
 		for (Id linkId : network.getLinks().keySet()) {

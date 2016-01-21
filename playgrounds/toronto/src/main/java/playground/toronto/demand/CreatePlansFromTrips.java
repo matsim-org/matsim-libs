@@ -493,7 +493,7 @@ public class CreatePlansFromTrips {
 		
 		//Load the network
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
-		new MatsimNetworkReader(scenario).readFile(networkFileName);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFileName);
 		
 		
 		//Remove highway links and non-car links from the network. DON'T EXPORT!!!

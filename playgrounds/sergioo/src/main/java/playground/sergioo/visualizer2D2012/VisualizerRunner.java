@@ -27,7 +27,7 @@ public class VisualizerRunner {
 	 */
 	public static void main(String[] args) throws NumberFormatException, IOException {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenario).readFile(args[1]);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(args[1]);
 		LayersWindow window = null;
 		if(args.length<3)
 			window = new SimpleNetworkWindow(args[0], new SimpleSelectionNetworkPainter(scenario.getNetwork()));

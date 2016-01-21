@@ -17,6 +17,8 @@ import playground.boescpa.analysis.ActivityAnalyzer;
 
 import java.util.Random;
 
+import static playground.boescpa.ivtBaseline.preparation.IVTConfigCreator.*;
+
 /**
  * Creates preferences for a given population.
  *
@@ -80,18 +82,19 @@ public class PrefsCreator {
         attributesXmlWriterWriter.writeFile(pathToOutputPrefs);
     }
 
-    protected static ObjectAttributes createPrefsBasedOnPlans(final Population population) {
+    public static ObjectAttributes createPrefsBasedOnPlans(final Population population) {
         ObjectAttributes prefs = new ObjectAttributes();
         createPrefsBasedOnPlans(population, prefs);
         return prefs;
     }
 
-    protected static void createPrefsBasedOnPlans(final Population population, final ObjectAttributes prefs) {
+    public static void createPrefsBasedOnPlans(final Population population, final ObjectAttributes prefs) {
         Counter counter = new Counter(" person # ");
         ActivityAnalyzer activityAnalyzer = new ActivityAnalyzer();
         String actChain;
         double actStartTime, actEndTime, actDuration;
         double h, rh, w, rw, e, l, s, k, o;
+        int numH, numRH, numW, numRW, numE, numL, numS, numK, numO;
 
         for (Person p : population.getPersons().values()) {
             counter.incCounter();
@@ -101,6 +104,7 @@ public class PrefsCreator {
                 // reset person
                 actChain = "";
                 h = -1; rh = -1; w = -1; rw = -1; e = -1; l = -1; s = -1; k = -1; o = -1;
+				numH = 0; numRH = 0; numW = 0; numRW = 0; numE = 0; numL = 0; numS = 0; numK = 0; numO = 0;
                 // get number of activities and actChain
                 for (PlanElement pe : p.getSelectedPlan().getPlanElements()) {
                     if (pe instanceof ActivityImpl) {
@@ -110,30 +114,32 @@ public class PrefsCreator {
                         actEndTime = (act.getEndTime() > 0) ? act.getEndTime() : 30*3600;
                         actDuration = actEndTime - actStartTime;
                         switch (act.getType()) {
-                            case "home": h = (h < 0) ? actDuration : h + actDuration; break;
-                            case "remote_home": rh = (rh < 0) ? actDuration : rh + actDuration; break;
-                            case "work": w = (w < 0) ? actDuration : w + actDuration; break;
-                            case "remote_work": rw = (rw < 0) ? actDuration : rw + actDuration; break;
-                            case "education": e = (e < 0) ? actDuration : e + actDuration; break;
-                            case "leisure": l = (l < 0) ? actDuration : l + actDuration; break;
-                            case "shop": s = (s < 0) ? actDuration : s + actDuration; break;
-                            case "escort_kids": k = (k < 0) ? actDuration : k + actDuration; break;
-                            case "escort_other": o = (o < 0) ? actDuration : o + actDuration; break;
-                            default: log.error("For act type " + act.getType() + " of person " + personID + " no information available.");
+                            case HOME:
+								h = (h < 0) ? actDuration : h + actDuration; numH++; break;
+                            case REMOTE_HOME: rh = (rh < 0) ? actDuration : rh + actDuration; numRH++; break;
+                            case WORK: w = (w < 0) ? actDuration : w + actDuration; numW++; break;
+                            case REMOTE_WORK: rw = (rw < 0) ? actDuration : rw + actDuration; numRW++; break;
+                            case EDUCATION: e = (e < 0) ? actDuration : e + actDuration; numE++; break;
+                            case LEISURE: l = (l < 0) ? actDuration : l + actDuration; numL++; break;
+                            case SHOP: s = (s < 0) ? actDuration : s + actDuration; numS++; break;
+                            case ESCORT_KIDS: k = (k < 0) ? actDuration : k + actDuration; numK++; break;
+                            case ESCORT_OTHER: o = (o < 0) ? actDuration : o + actDuration; numO++; break;
+                            default: log.error(
+									"For act type " + act.getType() + " of person " + personID + " no information available.");
                         }
                     }
                     activityAnalyzer.addActChain(actChain);
                 }
                 // assign durations
-                if (h > -1) setDurations(prefs, "home", h, personID);
-                if (rh > -1) setDurations(prefs, "remote_home", rh, personID);
-                if (w > -1) setDurations(prefs, "work", w, personID);
-                if (rw > -1) setDurations(prefs, "remote_work", rw, personID);
-                if (e > -1) setDurations(prefs, "education", e, personID);
-                if (l > -1) setDurations(prefs, "leisure", l, personID);
-                if (s > -1) setDurations(prefs, "shop", s, personID);
-                if (k > -1) setDurations(prefs, "escort_kids", k, personID);
-                if (o > -1) setDurations(prefs, "escort_other", o, personID);
+                if (h > -1) setDurations(prefs, HOME, h/numH, personID);
+                if (rh > -1) setDurations(prefs, REMOTE_HOME, rh/numRH, personID);
+                if (w > -1) setDurations(prefs, WORK, w/numW, personID);
+                if (rw > -1) setDurations(prefs, REMOTE_WORK, rw/numRW, personID);
+                if (e > -1) setDurations(prefs, EDUCATION, e/numE, personID);
+                if (l > -1) setDurations(prefs, LEISURE, l/numL, personID);
+                if (s > -1) setDurations(prefs, SHOP, s/numS, personID);
+                if (k > -1) setDurations(prefs, ESCORT_KIDS, k/numK, personID);
+                if (o > -1) setDurations(prefs, ESCORT_OTHER, o/numO, personID);
             } else {
                 log.warn("Person " + personID + " has no plan defined.");
             }
@@ -189,16 +195,16 @@ public class PrefsCreator {
                         ActivityImpl act = (ActivityImpl) pe;
                         actChain = actChain.concat(act.getType().substring(0, 1));
                         switch (act.getType()) {
-                            case "work":
+                            case WORK:
                                 nrWorkActs += 1;
                                 break;
-                            case "education":
+                            case EDUCATION:
                                 education = true;
                                 break;
-                            case "shop":
+                            case SHOP:
                                 shop = true;
                                 break;
-                            case "leisure":
+                            case LEISURE:
                                 leisure = true;
                                 break;
                         }

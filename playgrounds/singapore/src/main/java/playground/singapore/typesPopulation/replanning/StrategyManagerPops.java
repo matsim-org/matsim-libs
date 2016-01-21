@@ -186,7 +186,7 @@ public class StrategyManagerPops extends StrategyManager implements BeforeMobsim
 	
 	@Override
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
-        for (Person person : event.getControler().getScenario().getPopulation().getPersons().values()) {
+        for (Person person : event.getServices().getScenario().getPopulation().getPersons().values()) {
 			int max = getMaxPlansPerAgent(((PersonImplPops)person).getPopulationId());
 			if (max>0 && person.getPlans().size()>max)
 				removePlans((PersonImplPops) person, max);

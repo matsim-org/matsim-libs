@@ -126,9 +126,9 @@ public class MATSimInfraOttNetworkMergerMain {
 		log.info("outputBase: "+outputBase);
 		
 		Scenario scenarioInfra = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenarioInfra).readFile(matsimInfraNetworkFile);
+		new MatsimNetworkReader(scenarioInfra.getNetwork()).readFile(matsimInfraNetworkFile);
 		Scenario scenarioOtt = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenarioOtt).readFile(matsimOttNetworkFile);
+		new MatsimNetworkReader(scenarioOtt.getNetwork()).readFile(matsimOttNetworkFile);
 		
 		MATSimInfraOttNetworkMergerMain merger = new MATSimInfraOttNetworkMergerMain();
 		merger.mergeNetworks(scenarioInfra.getNetwork(),scenarioOtt.getNetwork());

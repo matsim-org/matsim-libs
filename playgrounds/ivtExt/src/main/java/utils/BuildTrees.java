@@ -19,9 +19,6 @@
 
 package utils;
 
-import java.util.Map;
-import java.util.TreeMap;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -29,6 +26,9 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.facilities.ActivityFacility;
+
+import java.util.Map;
+import java.util.TreeMap;
 
 public class BuildTrees {
 	

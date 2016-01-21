@@ -22,9 +22,19 @@ package playground.kai.otfvis;
 
 import com.google.inject.Provider;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Map.Entry;
+
 import javax.inject.Inject;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.contrib.otfvis.OTFVisFileWriterModule;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
@@ -32,6 +42,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigReader;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -40,6 +51,7 @@ import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.OnTheFlyServer;
@@ -64,11 +76,42 @@ public class TransitControler {
 
 		config.qsim().setVehicleBehavior( QSimConfigGroup.VehicleBehavior.teleport ) ;
 		//		config.otfVis().setShowTeleportedAgents(true) ;
-
-
-		final Controler controler = new Controler(config) ;
+		
+		Scenario scenario = ScenarioUtils.loadScenario(config) ;
+		
+		final Population pop = scenario.getPopulation();
+		for ( Iterator it = pop.getPersons().entrySet().iterator() ; it.hasNext() ; ) {
+			Entry entry = (Entry) it.next() ;
+			Person person = (Person) entry.getValue() ;
+			for ( PlanElement pe : person.getSelectedPlan().getPlanElements() ) {
+				if ( pe instanceof Activity ) {
+					Activity act = (Activity) pe ;
+					if ( act.getType().equals("pickup") || act.getType().equals("dropoff") ) {
+						it.remove(); 
+						break ;
+					}
+				}
+			}
+		}
+		
+//		Collection<Id<Person>> personIdsToRemove = new ArrayList<>() ;
+//		for ( Person person : pop.getPersons().values() ) {
+//			for ( PlanElement pe : person.getSelectedPlan().getPlanElements() ) {
+//				if ( pe instanceof Activity ) {
+//					Activity act = (Activity) pe ;
+//					if ( act.getType().equals("pickup") || act.getType().equals("dropoff") ) {
+//						personIdsToRemove.add( person.getId() ) ;
+//					}
+//				}
+//			}
+//		}
+//		for ( Id<Person> pid : personIdsToRemove ) {
+//			pop.getPersons().remove( pid ) ;
+//		}
+		
+		final Controler controler = new Controler(scenario) ;
 		controler.getConfig().controler().setOverwriteFileSetting( OverwriteFileSetting.overwriteExistingFiles ) ;
-		controler.setDirtyShutdown(true);
+//		controler.setDirtyShutdown(true);
 
 		//		Logger.getLogger("main").warn("warning: using randomized pt router!!!!") ;
 		//		tc.addOverridingModule(new RandomizedTransitRouterModule());
@@ -91,6 +134,10 @@ public class TransitControler {
 
 //		controler.addOverridingModule(new OTFVisFileWriterModule());
 		//		tc.setCreateGraphs(false);
+		
+		ActivityParams params = new ActivityParams("pt interaction") ;
+		params.setScoringThisActivityAtAll(false);
+		controler.getConfig().planCalcScore().addActivityParams(params);
 
 		controler.run();
 	}

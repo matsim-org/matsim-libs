@@ -19,7 +19,6 @@
 
 package tutorial.programming.example11PluggablePlanStrategyInCode;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;

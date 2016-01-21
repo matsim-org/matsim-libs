@@ -39,8 +39,8 @@ public class ModalSplitUserGroup {
 	private SortedMap<UserGroup, SortedMap<String, Integer>> userGrp2Mode2Legs = new TreeMap<UserGroup, SortedMap<String,Integer>>();
 	private SortedMap<UserGroup, SortedMap<String, Double>> userGrp2ModalSplit = new TreeMap<UserGroup, SortedMap<String,Double>>();
 
-	private SortedMap<String, Double> wholePop_pctModalShare ;
-	private SortedMap<String, Integer> wholePop_Mode2Legs;
+	private SortedMap<String, Double> wholePopPctModalShare ;
+	private SortedMap<String, Integer> wholePopMode2Legs;
 
 	public static void main(String[] args) {
 		
@@ -60,8 +60,8 @@ public class ModalSplitUserGroup {
 		PersonFilter pf = new PersonFilter();
 		Scenario sc = LoadMyScenarios.loadScenarioFromPlans(populationFile);
 
-		wholePop_pctModalShare = msg.getMode2PctShareFromPlans(sc.getPopulation());
-		wholePop_Mode2Legs = msg.getMode2NoOfLegs(sc.getPopulation());
+		wholePopPctModalShare = msg.getMode2PctShareFromPlans(sc.getPopulation());
+		wholePopMode2Legs = msg.getMode2NoOfLegs(sc.getPopulation());
 
 		for(UserGroup ug:UserGroup.values()){
 			Population usrGrpPop = pf.getPopulation(sc.getPopulation(), ug);
@@ -76,21 +76,21 @@ public class ModalSplitUserGroup {
 		try {
 			writer.write("UserGroup \t");
 
-			for(String str:wholePop_pctModalShare.keySet()){
+			for(String str:wholePopPctModalShare.keySet()){
 				writer.write(str+"\t");
 			}
 			writer.write(" \n WholePopulation"+"\t");
-			for(String str:wholePop_Mode2Legs.keySet()){ // write Absolute No Of Legs
-				writer.write(wholePop_Mode2Legs.get(str)+"\t");
+			for(String str:wholePopMode2Legs.keySet()){ // write Absolute No Of Legs
+				writer.write(wholePopMode2Legs.get(str)+"\t");
 			}
 			writer.write(" \n WholePopulation"+"\t");
-			for(String str:wholePop_pctModalShare.keySet()){ // write percentage no of legs
-				writer.write(wholePop_pctModalShare.get(str)+"\t");
+			for(String str:wholePopPctModalShare.keySet()){ // write percentage no of legs
+				writer.write(wholePopPctModalShare.get(str)+"\t");
 			}
 			writer.newLine();
 			for(UserGroup ug:this.userGrp2Mode2Legs.keySet()){
 				writer.write(ug+"\t");
-				for(String str:wholePop_pctModalShare.keySet()){
+				for(String str:wholePopPctModalShare.keySet()){
 					if(this.userGrp2Mode2Legs.get(ug).get(str)!=null){
 						writer.write(this.userGrp2Mode2Legs.get(ug).get(str)+"\t");
 					} else
@@ -98,7 +98,7 @@ public class ModalSplitUserGroup {
 				}
 				writer.newLine();
 				writer.write(ug+"\t");
-				for(String str:wholePop_pctModalShare.keySet()){
+				for(String str:wholePopPctModalShare.keySet()){
 					if(this.userGrp2ModalSplit.get(ug).get(str)!=null){
 						writer.write(this.userGrp2ModalSplit.get(ug).get(str)+"\t");
 					} else

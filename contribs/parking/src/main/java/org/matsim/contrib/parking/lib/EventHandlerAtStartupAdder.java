@@ -27,7 +27,7 @@ import org.matsim.core.events.handler.EventHandler;
 
 /**
  * This class does not carry documentation by its author.  I suspect that Rashid programmed it because the EventsManager
- * (i.e. controler.getEvents()) used to be unavailable between new Controler and controler.run().  This is, however,
+ * (i.e. services.getEvents()) used to be unavailable between new Controler and services.run().  This is, however,
  * no longer the case, and so the present class should be deprecated. 
  * 
  * @author (of javadoc) nagel
@@ -56,7 +56,7 @@ public final class EventHandlerAtStartupAdder implements StartupListener {
 	public void notifyStartup(StartupEvent event) {
 		// add handlers
 		for (int i = 0; i < eventHandlers.size(); i++) {
-			event.getControler().getEvents().addHandler(eventHandlers.get(i));
+			event.getServices().getEvents().addHandler(eventHandlers.get(i));
 		}
 	}
 

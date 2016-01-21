@@ -68,7 +68,7 @@ public class LinkCounter {
 		this.nodeId = nodeId;
 		
 		log.info("read netork ...");
-		new MatsimNetworkReader(scenario).readFile(networkFile);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
 		
 		log.info("read counts ..."); 
 		this.counts = new Counts();

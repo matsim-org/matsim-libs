@@ -61,7 +61,7 @@ public class CadytsScoring<T> implements SumScoringFunction.BasicScoring {
 	
 	@Override
 	public void finish() {
-		cadyts.demand.Plan<T> currentPlanSteps = this.ptPlanToPlanStep.getPlanSteps(plan);
+		cadyts.demand.Plan<T> currentPlanSteps = this.ptPlanToPlanStep.getCadytsPlan(plan);
         this.score = this.matsimCalibrator.calcLinearPlanEffect(currentPlanSteps) / this.beta;
 	}
 

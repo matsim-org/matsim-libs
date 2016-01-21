@@ -22,12 +22,16 @@ package org.matsim.core.replanning.modules;
 
 
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.GlobalConfigGroup;
+import org.matsim.core.config.groups.SubtourModeChoiceConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.router.TripRouter;
 import org.matsim.population.algorithms.ChooseRandomLegModeForSubtour;
 import org.matsim.population.algorithms.PermissibleModesCalculator;
 import org.matsim.population.algorithms.PermissibleModesCalculatorImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
+
+import javax.inject.Provider;
 
 /**
  * Changes the transportation mode of all legs of one randomly chosen subtour in a plan to a randomly chosen
@@ -48,24 +52,28 @@ import org.matsim.population.algorithms.PlanAlgorithm;
  * 
  */
 public class SubtourModeChoice extends AbstractMultithreadedModule {
+
+	private final Provider<TripRouter> tripRouterProvider;
+
 	private PermissibleModesCalculator permissibleModesCalculator;
 	
 	private final String[] chainBasedModes;
 	private final String[] modes;
 	
-	public SubtourModeChoice(final Config config) {
-		this( config.global().getNumberOfThreads(),
-				config.subtourModeChoice().getModes(),
-				config.subtourModeChoice().getChainBasedModes(),
-				config.subtourModeChoice().considerCarAvailability());
+	public SubtourModeChoice(Provider<TripRouter> tripRouterProvider, GlobalConfigGroup globalConfigGroup, SubtourModeChoiceConfigGroup subtourModeChoiceConfigGroup) {
+		this(globalConfigGroup.getNumberOfThreads(),
+				subtourModeChoiceConfigGroup.getModes(),
+				subtourModeChoiceConfigGroup.getChainBasedModes(),
+				subtourModeChoiceConfigGroup.considerCarAvailability(), tripRouterProvider);
 	}
 
 	public SubtourModeChoice(
 			final int numberOfThreads,
 			final String[] modes,
 			final String[] chainBasedModes,
-			final boolean considerCarAvailability) {
+			final boolean considerCarAvailability, Provider<TripRouter> tripRouterProvider) {
 		super(numberOfThreads);
+		this.tripRouterProvider = tripRouterProvider;
 		this.modes = modes.clone();
 		this.chainBasedModes = chainBasedModes.clone();
 		this.permissibleModesCalculator =
@@ -80,7 +88,7 @@ public class SubtourModeChoice extends AbstractMultithreadedModule {
 
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
-		final TripRouter tripRouter = getReplanningContext().getTripRouter();
+		final TripRouter tripRouter = tripRouterProvider.get();
 		final ChooseRandomLegModeForSubtour chooseRandomLegMode =
 				new ChooseRandomLegModeForSubtour(
 						tripRouter.getStageActivityTypes(),

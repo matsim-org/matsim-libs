@@ -2,8 +2,8 @@ package gunnar.ihop2.transmodeler.networktransformation;
 
 import static gunnar.ihop2.transmodeler.networktransformation.Transmodeler2MATSimNetwork.unquote;
 import static java.lang.Double.parseDouble;
+import floetteroed.utilities.tabularfileparser.AbstractTabularFileHandlerWithHeaderLine;
 import floetteroed.utilities.tabularfileparser.TabularFileParser;
-import gunnar.ihop2.utils.AbstractTabularFileHandler;
 
 import java.io.IOException;
 import java.util.Map;
@@ -13,7 +13,7 @@ import java.util.Map;
  * @author Gunnar Flötteröd
  *
  */
-class TransmodelerLaneConnectorReader extends AbstractTabularFileHandler {
+class TransmodelerLaneConnectorReader extends AbstractTabularFileHandlerWithHeaderLine {
 
 	// -------------------- CONSTANTS --------------------
 

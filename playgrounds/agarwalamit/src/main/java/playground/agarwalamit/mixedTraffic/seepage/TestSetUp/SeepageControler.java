@@ -45,10 +45,10 @@ import playground.agarwalamit.mixedTraffic.MixedTrafficVehiclesUtils;
  * @author amit
  */
 public class SeepageControler {
-	 public static final String outputDir = "../../../repos/shared-svn/projects/mixedTraffic/seepage/xt_1Link/seepage/";
-	 static final List<String> mainModes = Arrays.asList(TransportMode.car,TransportMode.bike);
-	 static final String seepMode = "bike";
-	 static final String isSeepModeStorageFree = "false";
+	 public static final String OUTPUT_DIR = "../../../repos/shared-svn/projects/mixedTraffic/seepage/xt_1Link/seepage/";
+	 static final List<String> MAIN_MODES = Arrays.asList(TransportMode.car,TransportMode.bike);
+	 static final String SEEP_MODE = "bike";
+	 static final String IS_SEEP_MODE_STORAGE_FREEE="false";
 	 
 	private void run (){
 		CreateInputs inputs = new CreateInputs();
@@ -59,7 +59,7 @@ public class SeepageControler {
 
 		Map<String, VehicleType> modeVehicleTypes = new HashMap<String, VehicleType>();
 
-		for(String travelMode:mainModes){
+		for(String travelMode:MAIN_MODES){
 			VehicleType mode = VehicleUtils.getFactory().createVehicleType(Id.create(travelMode,VehicleType.class));
 			mode.setMaximumVelocity(MixedTrafficVehiclesUtils.getSpeed(travelMode));
 			mode.setPcuEquivalents(MixedTrafficVehiclesUtils.getPCU(travelMode));
@@ -81,7 +81,7 @@ public class SeepageControler {
 		}
 		
 		EventsManager manager = EventsUtils.createEventsManager();
-		EventWriterXML eventWriterXML = new EventWriterXML(outputDir+"/events.xml");
+		EventWriterXML eventWriterXML = new EventWriterXML(OUTPUT_DIR+"/events.xml");
 		manager.addHandler(eventWriterXML);
 		
 		QSim qSim = QSimUtils.createDefaultQSim(sc, manager);

@@ -60,7 +60,7 @@ import scenarios.braess.createInput.TtCreateBraessNetworkAndLanes.LaneType;
  * @author tthunig
  * 
  */
-public class TtCreateBraessSignals {
+public final class TtCreateBraessSignals {
 
 	private static final Logger log = Logger
 			.getLogger(TtCreateBraessSignals.class);

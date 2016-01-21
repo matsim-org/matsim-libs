@@ -52,12 +52,12 @@ public class ActivityClassifier {
 	public ActivityClassifier(Scenario scenario) {
 		this.sc = scenario;
 		actType2TypDur = new TreeMap<String, Double>();
-		log.info("Least integer [Math.floor()] of stated activity duration of an activity is set to typical duration.");
-		log.info("A person is skipped if first and last acitity are different and last activity starts after mid night.");
+		LOG.info("Least integer [Math.floor()] of stated activity duration of an activity is set to typical duration.");
+		LOG.info("A person is skipped if first and last acitity are different and last activity starts after mid night.");
 		//TODO : might make more sense if I check above for all intermediate activities as well.
 	}
 
-	public static final Logger log = Logger.getLogger(ActivityClassifier.class.getSimpleName());
+	public static final Logger LOG = Logger.getLogger(ActivityClassifier.class.getSimpleName());
 	private Scenario sc ;
 	private int zeroDurCount =0;
 	private SortedMap<String, Double> actType2TypDur;
@@ -123,7 +123,7 @@ public class ActivityClassifier {
 						 * If first and last act are not same, 1800 sec will be assigned to first act during "durationConsistencyCheck(...)".
 						 * else it will be clubbed with last act and thus, will be scored together.
 						 */
-						log.warn("First activity has zero end time and first and last activities are different and thus scored differently. "
+						LOG.warn("First activity has zero end time and first and last activities are different and thus scored differently. "
 								+ "Setting a minimum duration of 1800 sec for first activity.");
 					}
 					
@@ -263,7 +263,7 @@ public class ActivityClassifier {
 				popOut.addPerson(pOut);
 			} else popOut.addPerson(p); // add freight as it is.
 		}
-		log.info("Population is stored.");
+		LOG.info("Population is stored.");
 	}
 
 	private Tuple<Double, Double> durationConsistencyCheck (double duration){
@@ -275,9 +275,9 @@ public class ActivityClassifier {
 				+ "Don't know how to calculate duration in absence of them. Aborting ...");
 		else if(duration == 0) {
 			if(zeroDurCount<1){
-				log.warn("Duration of person is zero, it may result in higher utility loss if typicalDuration calaculation is set to 'Uniform'. "
+				LOG.warn("Duration of person is zero, it may result in higher utility loss if typicalDuration calaculation is set to 'Uniform'. "
 						+ "Thus setting it to minimum dur of 1800.");
-				log.warn(Gbl.ONLYONCE);
+				LOG.warn(Gbl.ONLYONCE);
 			}
 			zeroDurCount ++;
 			dur = 1800;
@@ -295,7 +295,7 @@ public class ActivityClassifier {
 
 	public void writePlans( String outplans){
 		new PopulationWriter(scOut.getPopulation()).write(outplans);
-		log.info("File is written to "+outplans);
-		log.warn("Total number of skipped persons are "+skippedPersons+". Because last activity starts after mid night.");
+		LOG.info("File is written to "+outplans);
+		LOG.warn("Total number of skipped persons are "+skippedPersons+". Because last activity starts after mid night.");
 	}
 }

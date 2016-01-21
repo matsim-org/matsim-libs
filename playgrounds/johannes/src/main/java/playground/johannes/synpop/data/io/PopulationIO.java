@@ -33,12 +33,12 @@ public class PopulationIO {
 
     private static final Logger logger = Logger.getLogger(PopulationIO.class);
 
-    public static Set<? extends Person> loadFromXML(String file, Factory factory) {
+    public static <P extends Person> Set<P> loadFromXML(String file, Factory factory) {
         XMLHandler parser = new XMLHandler(factory);
         parser.setValidating(false);
         parser.parse(file);
 
-        Set<? extends Person> persons = parser.getPersons();
+        Set<P> persons = (Set<P>) parser.getPersons();
         logger.info(String.format("Loaded %s persons.", persons.size()));
         return persons;
     }

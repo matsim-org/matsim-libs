@@ -76,7 +76,7 @@ public class GenerateRandomHouseholdScenario {
 		final boolean fixedActivitySequence = Boolean.parseBoolean( parsed.getValue( "--fixedactsequence" ) );
 
 		final Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
-		new MatsimNetworkReader( scenario ).readFile( inputNetworkFile );
+		new MatsimNetworkReader(scenario.getNetwork()).readFile( inputNetworkFile );
 
 		final Network network = scenario.getNetwork();
 		final Population population = scenario.getPopulation();

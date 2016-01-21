@@ -38,11 +38,11 @@ import java.util.Collection;
  */
 public interface DecisionVariableRandomizer<U extends DecisionVariable> {
 
-	/**
-	 * @return a completely random decision variable (uniform to the extent
-	 *         possible)
-	 */
-	public U newRandomDecisionVariable();
+	// /**
+	// * @return a completely random decision variable (uniform to the extent
+	// * possible)
+	// */
+	// public U newRandomDecisionVariable();
 
 	/**
 	 * @return two random variations of decisionVariable; these are symmetric

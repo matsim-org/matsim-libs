@@ -775,7 +775,7 @@ public class CreateDemandV2 {
 		
 		for(org.matsim.matrices.Entry entry : entries){
 			double d = GAPMatrices.getDistances().getFromLocations().get(lastMunId).get(i).getValue();
-			if(d <= distance*1000 || entry.getToLocation().equals(lastMunId)){
+			if(d <= distance || entry.getToLocation().equals(lastMunId)){
 				entriesInRange.add(entry);
 				accumulatedWeights += entry.getValue() * proba;
 			}
@@ -1338,7 +1338,7 @@ public class CreateDemandV2 {
 			
 			weight += facility.getActivityOptions().get(Global.ActType.work.name()).getCapacity();
 			
-			if(weight <= random){
+			if(weight >= random){
 				
 				return facility.getCoord();
 				

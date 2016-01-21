@@ -53,13 +53,13 @@ public class InvertedNetworksSignalsTest {
 		Controler c = new Controler(f.scenario);
 		c.addOverridingModule(new SignalsModule());
 		c.addOverridingModule(new InvertedNetworkRoutingModuleModule());
-		c.setDumpDataAtEnd(false);
-        c.getConfig().controler().setCreateGraphs(false);
+		c.getConfig().controler().setDumpDataAtEnd(false);
+		c.getConfig().controler().setCreateGraphs(false);
         final InvertedNetworkRoutingTestEventHandler testHandler = new InvertedNetworkRoutingTestEventHandler();
 		c.addControlerListener(new StartupListener(){
 			@Override
 			public void notifyStartup(StartupEvent event) {
-				event.getControler().getEvents().addHandler(testHandler);
+				event.getServices().getEvents().addHandler(testHandler);
 			}
 		});
 		c.run();
@@ -81,13 +81,13 @@ public class InvertedNetworksSignalsTest {
 		Controler c = new Controler(f.scenario);
 		c.addOverridingModule(new SignalsModule());
 		c.addOverridingModule(new InvertedNetworkRoutingModuleModule());
-		c.setDumpDataAtEnd(false);
-        c.getConfig().controler().setCreateGraphs(false);
+		c.getConfig().controler().setDumpDataAtEnd(false);
+		c.getConfig().controler().setCreateGraphs(false);
         final InvertedNetworkRoutingTestEventHandler testHandler = new InvertedNetworkRoutingTestEventHandler();
 		c.addControlerListener(new StartupListener(){
 			@Override
 			public void notifyStartup(StartupEvent event) {
-				event.getControler().getEvents().addHandler(testHandler);
+				event.getServices().getEvents().addHandler(testHandler);
 			}
 		});
 		c.run();

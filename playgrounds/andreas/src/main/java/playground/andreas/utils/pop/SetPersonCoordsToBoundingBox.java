@@ -104,7 +104,7 @@ public class SetPersonCoordsToBoundingBox extends NewPopulation {
 		Coord maxXY = new Coord(4606021.0, 5822001.0);
 
 		Network net = sc.getNetwork();
-		new MatsimNetworkReader(sc).readFile(networkFile);
+		new MatsimNetworkReader(sc.getNetwork()).readFile(networkFile);
 
 		Population inPop = sc.getPopulation();
 		PopulationReader popReader = new MatsimPopulationReader(sc);

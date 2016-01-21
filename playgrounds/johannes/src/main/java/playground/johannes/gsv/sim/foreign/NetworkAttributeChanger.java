@@ -40,7 +40,7 @@ public class NetworkAttributeChanger {
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		
-		MatsimNetworkReader reader = new MatsimNetworkReader(scenario);
+		MatsimNetworkReader reader = new MatsimNetworkReader(scenario.getNetwork());
 		reader.parse("/home/johannes/sge/prj/matsim/run/632/output/network.xml");
 		
 		for(Link link : scenario.getNetwork().getLinks().values()) {

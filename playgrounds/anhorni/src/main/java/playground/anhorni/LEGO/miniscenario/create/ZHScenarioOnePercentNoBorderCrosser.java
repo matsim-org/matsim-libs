@@ -51,7 +51,7 @@ public class ZHScenarioOnePercentNoBorderCrosser {
 	}
 		
 	private void init(final String plansFilePath, final String networkFilePath) {
-		new MatsimNetworkReader(this.scenario).readFile(networkFilePath);		
+		new MatsimNetworkReader(this.scenario.getNetwork()).readFile(networkFilePath);
 		MatsimPopulationReader populationReader = new MatsimPopulationReader(this.scenario);
 		populationReader.readFile(plansFilePath);
 	}

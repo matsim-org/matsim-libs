@@ -29,7 +29,7 @@ public class MyIterationEndsListener implements IterationEndsListener {
 	private final Logger log = Logger.getLogger(MyIterationEndsListener.class);
 
 	public void notifyIterationEnds(IterationEndsEvent event) {
-		log.info("  --> End of iteration " + event.getIteration() + "/" + event.getControler().getConfig().controler().getLastIteration() );
+		log.info("  --> End of iteration " + event.getIteration() + "/" + event.getServices().getConfig().controler().getLastIteration() );
 	}
 	
 }

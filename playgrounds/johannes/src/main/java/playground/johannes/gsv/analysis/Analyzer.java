@@ -44,7 +44,7 @@ public class Analyzer {
 		
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		
-		MatsimNetworkReader netReader = new MatsimNetworkReader(scenario);
+		MatsimNetworkReader netReader = new MatsimNetworkReader(scenario.getNetwork());
 		netReader.readFile(config.getParam("network", "inputNetworkFile"));
 		
 		TransitScheduleReader schedReader = new TransitScheduleReader(scenario);

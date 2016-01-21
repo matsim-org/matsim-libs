@@ -1,8 +1,8 @@
 package herbie.running.analysis;
 
-import java.io.FileNotFoundException;
-import java.io.PrintStream;
-
+import herbie.running.population.algorithms.AbstractClassifiedFrequencyAnalysis;
+import herbie.running.population.algorithms.AbstractClassifiedFrequencyAnalysis.CrosstabFormat;
+import herbie.running.population.algorithms.PopulationLegDistanceDistribution;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
@@ -13,9 +13,8 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import herbie.running.population.algorithms.AbstractClassifiedFrequencyAnalysis;
-import herbie.running.population.algorithms.AbstractClassifiedFrequencyAnalysis.CrosstabFormat;
-import herbie.running.population.algorithms.PopulationLegDistanceDistribution;
+import java.io.FileNotFoundException;
+import java.io.PrintStream;
 
 public class QuickfixLegDistanceDistributionWriter {
 
@@ -46,7 +45,7 @@ public class QuickfixLegDistanceDistributionWriter {
 		Config config = ConfigUtils.loadConfig(configFile);
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		
-		new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(config.network().getInputFile());
 		
 		PopulationImpl pop = (PopulationImpl) scenario.getPopulation();
 		pop.setIsStreaming(true);

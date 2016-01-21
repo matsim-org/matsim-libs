@@ -34,6 +34,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -60,13 +61,13 @@ public class CountsControlerListenerTest {
 	
 	@Test
 	public void testUseVolumesOfIteration() {
-        Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		CountsConfigGroup config = scenario.getConfig().counts();
-		CountsControlerListener ccl = new CountsControlerListener(scenario, null, null, null);
+		Config config = ConfigUtils.createConfig();
+		Scenario scenario = ScenarioUtils.createScenario(config);
+		CountsControlerListener ccl = new CountsControlerListener(config.global(), scenario.getNetwork(), config.controler(), config.counts(), null, null, null);
 		
 		// test defaults
-		Assert.assertEquals(10, config.getWriteCountsInterval());
-		Assert.assertEquals(5, config.getAverageCountsOverIterations());
+		Assert.assertEquals(10, config.counts().getWriteCountsInterval());
+		Assert.assertEquals(5, config.counts().getAverageCountsOverIterations());
 		
 		// now the real tests
 		Assert.assertFalse(ccl.useVolumesOfIteration(0, 0));
@@ -93,8 +94,8 @@ public class CountsControlerListenerTest {
 		Assert.assertFalse(ccl.useVolumesOfIteration(21, 0));
 		
 		// change some values
-		config.setWriteCountsInterval(8);
-		config.setAverageCountsOverIterations(2);
+		config.counts().setWriteCountsInterval(8);
+		config.counts().setAverageCountsOverIterations(2);
 		Assert.assertFalse(ccl.useVolumesOfIteration(0, 0));
 		Assert.assertFalse(ccl.useVolumesOfIteration(1, 0));
 		Assert.assertFalse(ccl.useVolumesOfIteration(2, 0));
@@ -119,8 +120,8 @@ public class CountsControlerListenerTest {
 		Assert.assertFalse(ccl.useVolumesOfIteration(21, 0));
 		
 		// change some values: averaging = 1
-		config.setWriteCountsInterval(5);
-		config.setAverageCountsOverIterations(1);
+		config.counts().setWriteCountsInterval(5);
+		config.counts().setAverageCountsOverIterations(1);
 		Assert.assertTrue(ccl.useVolumesOfIteration(0, 0));
 		Assert.assertFalse(ccl.useVolumesOfIteration(1, 0));
 		Assert.assertFalse(ccl.useVolumesOfIteration(2, 0));
@@ -145,8 +146,8 @@ public class CountsControlerListenerTest {
 		Assert.assertFalse(ccl.useVolumesOfIteration(21, 0));
 
 		// change some values: averaging = 0
-		config.setWriteCountsInterval(5);
-		config.setAverageCountsOverIterations(0);
+		config.counts().setWriteCountsInterval(5);
+		config.counts().setAverageCountsOverIterations(0);
 		Assert.assertTrue(ccl.useVolumesOfIteration(0, 0));
 		Assert.assertFalse(ccl.useVolumesOfIteration(1, 0));
 		Assert.assertFalse(ccl.useVolumesOfIteration(2, 0));
@@ -171,8 +172,8 @@ public class CountsControlerListenerTest {
 		Assert.assertFalse(ccl.useVolumesOfIteration(21, 0));
 
 		// change some values: interval equal averaging
-		config.setWriteCountsInterval(5);
-		config.setAverageCountsOverIterations(5);
+		config.counts().setWriteCountsInterval(5);
+		config.counts().setAverageCountsOverIterations(5);
 		Assert.assertFalse(ccl.useVolumesOfIteration(0, 0));
 		Assert.assertTrue(ccl.useVolumesOfIteration(1, 0));
 		Assert.assertTrue(ccl.useVolumesOfIteration(2, 0));
@@ -197,8 +198,8 @@ public class CountsControlerListenerTest {
 		Assert.assertTrue(ccl.useVolumesOfIteration(21, 0));
 
 		// change some values: averaging > interval
-		config.setWriteCountsInterval(5);
-		config.setAverageCountsOverIterations(6);
+		config.counts().setWriteCountsInterval(5);
+		config.counts().setAverageCountsOverIterations(6);
 		Assert.assertFalse(ccl.useVolumesOfIteration(0, 0));
 		Assert.assertTrue(ccl.useVolumesOfIteration(1, 0));
 		Assert.assertTrue(ccl.useVolumesOfIteration(2, 0));
@@ -223,8 +224,8 @@ public class CountsControlerListenerTest {
 		Assert.assertTrue(ccl.useVolumesOfIteration(21, 0));
 		
 		// change some values: different firstIteration
-		config.setWriteCountsInterval(5);
-		config.setAverageCountsOverIterations(3);
+		config.counts().setWriteCountsInterval(5);
+		config.counts().setAverageCountsOverIterations(3);
 		Assert.assertFalse(ccl.useVolumesOfIteration(4, 4));
 		Assert.assertFalse(ccl.useVolumesOfIteration(5, 4));
 		Assert.assertFalse(ccl.useVolumesOfIteration(6, 4));
@@ -266,7 +267,7 @@ public class CountsControlerListenerTest {
 		config.controler().setLastIteration(7);
 
         controler.getConfig().controler().setCreateGraphs(false);
-        controler.setDumpDataAtEnd(false);
+		controler.getConfig().controler().setDumpDataAtEnd(false);
 		controler.getConfig().controler().setWriteEventsInterval(0);
 		config.controler().setWritePlansInterval(0);
 		controler.run();
@@ -304,7 +305,7 @@ public class CountsControlerListenerTest {
 		config.controler().setLastIteration(7);
 
         controler.getConfig().controler().setCreateGraphs(false);
-        controler.setDumpDataAtEnd(false);
+		controler.getConfig().controler().setDumpDataAtEnd(false);
 		controler.getConfig().controler().setWriteEventsInterval(0);
 		config.controler().setWritePlansInterval(0);
 		controler.run();
@@ -371,11 +372,8 @@ public class CountsControlerListenerTest {
 			}
 		});
 		controler.getConfig().controler().setCreateGraphs(false);
-		controler.setDumpDataAtEnd(false);
-		controler.getConfig().controler().setOverwriteFileSetting(
-				true ?
-						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+		controler.getConfig().controler().setDumpDataAtEnd(false);
+		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		controler.getConfig().controler().setWriteEventsInterval(0);
 		config.controler().setWritePlansInterval(0);
 		controler.run();
@@ -404,7 +402,7 @@ public class CountsControlerListenerTest {
 		public void run() {
 			Id<Link> linkId = Id.create("100", Link.class);
 			for (int i = 0; i < this.nOfEvents; i++) {
-				this.eventsManager.processEvent(new LinkLeaveEvent(60.0, Id.create(i, Person.class), linkId, Id.create(i, Vehicle.class)));
+				this.eventsManager.processEvent(new LinkLeaveEvent(60.0, Id.create(i, Vehicle.class), linkId));
 			}
 		}
 	}
@@ -430,13 +428,15 @@ public class CountsControlerListenerTest {
 				Id<Person> agentId = Id.create(i, Person.class);
 				Id<Vehicle> vehId = Id.create(i, Vehicle.class);
 				this.eventsManager.processEvent(new PersonDepartureEvent(60.0, agentId, linkId, TransportMode.car));
-				this.eventsManager.processEvent(new LinkLeaveEvent(60.0, agentId, linkId, vehId));
+				this.eventsManager.processEvent(new VehicleEntersTrafficEvent(60.0, agentId, linkId, vehId, TransportMode.car, 1.0));
+				this.eventsManager.processEvent(new LinkLeaveEvent(60.0, vehId, linkId));
 			}
 			for (int i = 100; i < 150; i++) {
 				Id<Person> agentId = Id.create(i, Person.class);
 				Id<Vehicle> vehId = Id.create(i, Vehicle.class);
 				this.eventsManager.processEvent(new PersonDepartureEvent(60.0, agentId, linkId, TransportMode.walk));
-				this.eventsManager.processEvent(new LinkLeaveEvent(60.0, agentId, linkId, vehId));
+				this.eventsManager.processEvent(new VehicleEntersTrafficEvent(60.0, agentId, linkId, vehId, TransportMode.walk, 1.0));
+				this.eventsManager.processEvent(new LinkLeaveEvent(60.0, vehId, linkId));
 			}
 		}
 	}

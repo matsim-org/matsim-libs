@@ -42,7 +42,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 public class TaxibusDummyPopulationGenerator {
 public static void main(String[] args) {
 	Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-	new MatsimNetworkReader(scenario).readFile("../../../shared-svn/projects/vw_rufbus/scenario/input/networkptcc.xml");
+	new MatsimNetworkReader(scenario.getNetwork()).readFile("../../../shared-svn/projects/vw_rufbus/scenario/input/networkptcc.xml");
 	int pop = 1000;
 	Random rand = MatsimRandom.getRandom();
 	for (int i = 0; i<pop ; i++){

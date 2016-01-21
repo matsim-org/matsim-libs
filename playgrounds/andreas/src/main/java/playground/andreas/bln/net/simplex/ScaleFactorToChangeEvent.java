@@ -85,7 +85,7 @@ public class ScaleFactorToChangeEvent {
 	
 	private Network readNetwork(String networkFile){
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		MatsimNetworkReader matsimNetReader = new MatsimNetworkReader(scenario);
+		MatsimNetworkReader matsimNetReader = new MatsimNetworkReader(scenario.getNetwork());
 		matsimNetReader.readFile(networkFile);
 		return scenario.getNetwork();
 	}

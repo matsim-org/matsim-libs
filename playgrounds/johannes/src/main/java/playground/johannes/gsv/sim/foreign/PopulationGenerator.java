@@ -33,7 +33,7 @@ import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrix;
 import org.matsim.visum.VisumMatrixReader;
-import playground.johannes.coopsim.mental.choice.ChoiceSet;
+import org.matsim.contrib.common.collections.ChoiceSet;
 import playground.johannes.coopsim.utils.MatsimCoordUtils;
 import playground.johannes.synpop.data.*;
 import playground.johannes.synpop.data.io.XMLWriter;
@@ -125,35 +125,35 @@ public class PopulationGenerator {
 		 * 
 		 */
 		dayProbas = new ChoiceSet<>(random);
-		dayProbas.addChoice(CommonValues.MONDAY, 1.02);
-		dayProbas.addChoice(CommonValues.TUESDAY, 1.04);
-		dayProbas.addChoice(CommonValues.WEDNESDAY, 1.08);
-		dayProbas.addChoice(CommonValues.WEDNESDAY, 1.08);
-		dayProbas.addChoice(CommonValues.FRIDAY, 1.15);
-		dayProbas.addChoice(CommonValues.SATURDAY, 0.95);
-		dayProbas.addChoice(CommonValues.SUNDAY, 0.67);
+		dayProbas.addOption(CommonValues.MONDAY, 1.02);
+		dayProbas.addOption(CommonValues.TUESDAY, 1.04);
+		dayProbas.addOption(CommonValues.WEDNESDAY, 1.08);
+		dayProbas.addOption(CommonValues.WEDNESDAY, 1.08);
+		dayProbas.addOption(CommonValues.FRIDAY, 1.15);
+		dayProbas.addOption(CommonValues.SATURDAY, 0.95);
+		dayProbas.addOption(CommonValues.SUNDAY, 0.67);
 		/*
 		 * 
 		 */
 		monthProbas = new ChoiceSet<>(random);
-		monthProbas.addChoice(MiDValues.JANUARY, 0.083);
-		monthProbas.addChoice(MiDValues.FEBRUARY, 0.094);
-		monthProbas.addChoice(MiDValues.MARCH, 0.099);
-		monthProbas.addChoice(MiDValues.APRIL, 0.095);
-		monthProbas.addChoice(MiDValues.MAY, 0.091);
-		monthProbas.addChoice(MiDValues.JUNE, 0.085);
+		monthProbas.addOption(MiDValues.JANUARY, 0.083);
+		monthProbas.addOption(MiDValues.FEBRUARY, 0.094);
+		monthProbas.addOption(MiDValues.MARCH, 0.099);
+		monthProbas.addOption(MiDValues.APRIL, 0.095);
+		monthProbas.addOption(MiDValues.MAY, 0.091);
+		monthProbas.addOption(MiDValues.JUNE, 0.085);
 		// july is missing in mid2008
-		monthProbas.addChoice(MiDValues.AUGUST, 0.092);
-		monthProbas.addChoice(MiDValues.SEPTEMBER, 0.093);
-		monthProbas.addChoice(MiDValues.OCTOBER, 0.088);
-		monthProbas.addChoice(MiDValues.NOVEMBER, 0.092);
-		monthProbas.addChoice(MiDValues.DECEMBER, 0.088);
+		monthProbas.addOption(MiDValues.AUGUST, 0.092);
+		monthProbas.addOption(MiDValues.SEPTEMBER, 0.093);
+		monthProbas.addOption(MiDValues.OCTOBER, 0.088);
+		monthProbas.addOption(MiDValues.NOVEMBER, 0.092);
+		monthProbas.addOption(MiDValues.DECEMBER, 0.088);
 		/*
 		 * 
 		 */
 		vacationProbas = new ChoiceSet<>(random);
-		vacationProbas.addChoice("vacations_short", 0.76);
-		vacationProbas.addChoice("vacations_long", 0.24);
+		vacationProbas.addOption("vacations_short", 0.76);
+		vacationProbas.addOption("vacations_long", 0.24);
 		/*
 		 * load matrix
 		 */
@@ -202,7 +202,7 @@ public class PopulationGenerator {
 				}
 			}
 
-			ProgressLogger.termiante();
+			ProgressLogger.terminate();
 
 			for (RunThread thread : threads) {
 				origVolume += thread.origVolume;
@@ -241,7 +241,7 @@ public class PopulationGenerator {
 			}
 			ProgressLogger.step();
 		}
-		ProgressLogger.termiante();
+		ProgressLogger.terminate();
 		if (cnt > 0) {
 			logger.info(String.format("%s facilities cannot be assigned to a zone.", cnt));
 		}

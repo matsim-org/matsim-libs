@@ -285,7 +285,8 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 		private void addCoord(Coord coord, Color col) {
 			vertex.add(coord);
 			colors.add(col);
-			log.info( " east: " + coord.getX() + " north: " +coord.getY() );
+//			log.info( " east: " + coord.getX() + " north: " +coord.getY() );
+			// really slow!
 		}
 
 		@Override

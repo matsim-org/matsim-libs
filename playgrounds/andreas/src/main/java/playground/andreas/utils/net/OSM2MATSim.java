@@ -118,7 +118,7 @@ public class OSM2MATSim {
 		// Simplifier
 		Scenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		network = (NetworkImpl) scenario.getNetwork();
-		new MatsimNetworkReader(scenario).readFile(outputFile + "_cl.xml.gz");
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(outputFile + "_cl.xml.gz");
 
 		NetworkSimplifier nsimply = new NetworkSimplifier();
 		Set<Integer> nodeTypesToMerge = new TreeSet<Integer>();

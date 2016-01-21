@@ -33,7 +33,7 @@ public class LSANode2KML {
 		
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
-		new MatsimNetworkReader(scenario).readFile("/home/jbischoff/m44_344_big.xml");
+		new MatsimNetworkReader(scenario.getNetwork()).readFile("/home/jbischoff/m44_344_big.xml");
 		List<LSA> ampelliste = new ArrayList<LSA>();
 		Map<Id<Node>, Node> nodeList = new HashMap<Id<Node>, Node>();
 		nodeList=network.getNodes();

@@ -49,6 +49,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.*;
 import org.matsim.core.controler.listener.*;
@@ -239,7 +240,9 @@ public class RunPSim {
         matsimControler.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
-                addPlanSelectorForRemovalBinding("DiversityGeneratingPlansRemover").toProvider(DiversityGeneratingPlansRemover.Builder.class);
+                if (getConfig().strategy().getPlanSelectorForRemoval().equals("DiversityGeneratingPlansRemover")) {
+                    bindPlanSelectorForRemoval().toProvider(DiversityGeneratingPlansRemover.Builder.class);
+                }
             }
         });
         if (Diversity)
@@ -270,7 +273,7 @@ public class RunPSim {
         formatter.printHelp("PSimControler", header, options, footer, true);
     }
 
-    public Controler getMatsimControler() {
+    public MatsimServices getMatsimControler() {
         return matsimControler;
     }
 
@@ -547,10 +550,10 @@ public class RunPSim {
         final private static int INDEX_BEST = 1;
         final private static int INDEX_AVERAGE = 2;
         final private static int INDEX_EXECUTED = 3;
-        private final Controler controler;
+        private final MatsimServices controler;
         private BufferedWriter out;
 
-        public QSimScoreWriter(Controler controler) {
+        public QSimScoreWriter(MatsimServices controler) {
             super();
             this.controler = controler;
 

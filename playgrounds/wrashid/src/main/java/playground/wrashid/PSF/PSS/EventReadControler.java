@@ -9,21 +9,24 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.mobsim.framework.Mobsim;
 
-public class EventReadControler extends Controler {
+public class EventReadControler {
 
+	private final Controler controler;
 	private String pathToEventsFile;
 	private static ArrayList<Event> buffer;
 
 	public EventReadControler(String configFilename, String pathToEventsFile) {
 		
-		super(configFilename);
+		controler = new Controler(configFilename);
 		this.pathToEventsFile=pathToEventsFile;
 		
-		this.addOverridingModule(new AbstractModule(){
-			@Override public void install() {
-				this.bindMobsim().toInstance(new Mobsim(){
-					@Override public void run() {
-						runLocal() ;
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				this.bindMobsim().toInstance(new Mobsim() {
+					@Override
+					public void run() {
+						runLocal();
 					}
 				});
 			}
@@ -36,8 +39,8 @@ public class EventReadControler extends Controler {
 		//if (buffer == null){
 			// the processing happens during the reading process
 			buffer = new ArrayList<>();
-			MatsimEventsReader reader = new MatsimEventsReader(getEvents());
-			getEvents().addHandler(new BasicEventHandler() {
+			MatsimEventsReader reader = new MatsimEventsReader(controler.getEvents());
+			controler.getEvents().addHandler(new BasicEventHandler() {
 				@Override
 				public void reset(int iteration) {
 				}
@@ -57,9 +60,9 @@ public class EventReadControler extends Controler {
 		}
 		*/
 	}
-	
-	
 
-	
-	
+
+	public Controler getControler() {
+		return controler;
+	}
 }

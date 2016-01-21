@@ -27,9 +27,14 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
+import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 
 import playground.wrashid.PSF.ParametersPSF;
 import playground.wrashid.PSF2.ParametersPSF2;
@@ -54,7 +59,7 @@ import playground.wrashid.PSF2.vehicle.vehicleFleet.Vehicle;
  * @author wrashid
  */
 public class ActivityIntervalTracker_NonParallelizableHandler implements ActivityStartEventHandler, PersonDepartureEventHandler,
-		LinkEnterEventHandler {
+		LinkEnterEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 
 	// personId, time
 	HashMap<Id, Double> timeOfFirstCarDeparture;
@@ -70,9 +75,13 @@ public class ActivityIntervalTracker_NonParallelizableHandler implements Activit
 
 	// personId, time
 	HashMap<Id, Double> timeOfMostRecentDeparture;
+	
+	Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler() ;
 
 	@Override
 	public void reset(int iteration) {
+		delegate.reset( iteration );
+
 		timeOfFirstCarDeparture = new HashMap<Id, Double>();
 
 		mostRecentLegMode = new HashMap<Id, String>();
@@ -84,6 +93,7 @@ public class ActivityIntervalTracker_NonParallelizableHandler implements Activit
 		stillBeforeFristEnterLinkEvent = new HashMap<Id, Boolean>();
 
 		timeOfMostRecentDeparture = new HashMap<Id, Double>();
+		
 	}
 
 	public void handleLastParkingActivityOfDay() {
@@ -153,7 +163,7 @@ public class ActivityIntervalTracker_NonParallelizableHandler implements Activit
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		Id personId = event.getDriverId();
+		Id personId = delegate.getDriverOfVehicle( event.getVehicleId() ) ;
 
 		
 
@@ -168,10 +178,18 @@ public class ActivityIntervalTracker_NonParallelizableHandler implements Activit
 			} else if (isChargingPossible(activityStartEvent)) {
 				chargeVehicle(personId, departureTime);
 			}
-			stillBeforeFristEnterLinkEvent.put(event.getDriverId(), false);
+			stillBeforeFristEnterLinkEvent.put(personId, false);
 
-			mostRecentLegMode.put(event.getDriverId(), "car");
+			mostRecentLegMode.put(personId, "car");
 		}
+	}
+	@Override
+	public void handleEvent(VehicleEntersTrafficEvent event) {
+		this.delegate.handleEvent(event);
+	}
+	@Override
+	public void handleEvent(VehicleLeavesTrafficEvent event) {
+		this.delegate.handleEvent(event);
 	}
 
 	

@@ -51,7 +51,7 @@ public class PKmAnalyzer implements IterationEndsListener, StartupListener {
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		Map<String, Double> stats = calculator.statistics();
 
-		String file = event.getControler().getControlerIO()
+		String file = event.getServices().getControlerIO()
 				.getIterationFilename(event.getIteration(), "pkm.txt");
 
 		try {
@@ -72,8 +72,8 @@ public class PKmAnalyzer implements IterationEndsListener, StartupListener {
 
 	@Override
 	public void notifyStartup(StartupEvent event) {
-        calculator = new PKmCalculator(event.getControler().getScenario().getNetwork(), attributes);
-		event.getControler().getEvents().addHandler(calculator);
+        calculator = new PKmCalculator(event.getServices().getScenario().getNetwork(), attributes);
+		event.getServices().getEvents().addHandler(calculator);
 	}
 
 }

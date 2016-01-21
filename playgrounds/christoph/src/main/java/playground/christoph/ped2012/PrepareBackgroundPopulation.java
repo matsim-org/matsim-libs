@@ -55,7 +55,7 @@ private static final Logger log = Logger.getLogger(PrepareBackgroundPopulation.c
 	
 	public PrepareBackgroundPopulation(Scenario scenario) throws IOException {
 		log.info("Read Network File...");
-		new MatsimNetworkReader(scenario).readFile(networkFile);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
 		log.info("done.");
 		
 		log.info("Reading facilities file...");

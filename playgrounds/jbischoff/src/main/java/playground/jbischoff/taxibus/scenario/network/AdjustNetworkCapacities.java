@@ -26,7 +26,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.opensaml.ws.security.ServletRequestX509CredentialAdapter;
 
 /**
  * @author  jbischoff
@@ -37,7 +36,7 @@ public class AdjustNetworkCapacities {
 		
 	Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 	String basedir = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/input/";
-	new MatsimNetworkReader(scenario).readFile(basedir+"networkptcc.xml");
+	new MatsimNetworkReader(scenario.getNetwork()).readFile(basedir+"networkptcgt.xml");
 	for (Link link : scenario.getNetwork().getLinks().values()){
 		if (link.getId().toString().startsWith("pt")) continue;
 		if (decideToAdjust(link.getCoord())){
@@ -45,11 +44,11 @@ public class AdjustNetworkCapacities {
 			if (link.getCapacity()<2000) link.setCapacity(2000);
 		}else 
 		{
-			link.setCapacity(link.getCapacity()*1.1);
+//			link.setCapacity(link.getCapacity()*1.1);
 		}
 		
 	}
-	new NetworkWriter(scenario.getNetwork()).write(basedir+"networkptcg.xml");
+	new NetworkWriter(scenario.getNetwork()).write(basedir+"networkptcgt.xml");
 	
 	}
 
@@ -62,7 +61,7 @@ public class AdjustNetworkCapacities {
 //		else return false;
 //	} 
 	static boolean decideToAdjust(Coord coord){
-		if ((coord.getY()>5807061&&coord.getY()<5823872)&&(coord.getX()>597553&&coord.getX()<614025)) return true;
+		if ((coord.getY()>5785522&&coord.getY()<5800201)&&(coord.getX()>597958&&coord.getX()<610209)) return true;
 		else return false;
 		
 	} 

@@ -229,7 +229,7 @@ public class DaganzoScenarioGenerator {
 		
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		
-		new MatsimNetworkReader(scenario).readFile(NETWORKFILE);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(NETWORKFILE);
 		
 		
 		//create the plans and write them

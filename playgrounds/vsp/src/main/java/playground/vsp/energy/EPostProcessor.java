@@ -101,7 +101,7 @@ public class EPostProcessor implements LinkEnterEventHandler, LinkLeaveEventHand
 	
 	public static void main(String[] args){
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(sc).readFile(NET );
+		new MatsimNetworkReader(sc.getNetwork()).readFile(NET );
 		
 		DisChargingProfiles dp = EmobEnergyProfileReader.readDisChargingProfiles(DPROFILE);
 		ChargingProfiles cp = EmobEnergyProfileReader.readChargingProfiles(CPROFILE);

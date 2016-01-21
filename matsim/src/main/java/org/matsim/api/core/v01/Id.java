@@ -26,6 +26,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.vehicles.Vehicle;
 
 
 /**
@@ -153,6 +154,15 @@ public abstract class Id<T> implements Comparable<Id<T>> {
 	}
 	public static Id<Node> createNodeId( final String str ) {
 		return create( str, Node.class ) ;
+	}
+	public static Id<Vehicle> createVehicleId( final long key ) {
+		return create( key, Vehicle.class ) ;
+	}
+	public static Id<Vehicle> createVehicleId( final Id<?> id ) {
+		return create( id, Vehicle.class ) ;
+	}
+	public static Id<Vehicle> createVehicleId( final String str ) {
+		return create( str, Vehicle.class ) ;
 	}
 	
 }

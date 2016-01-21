@@ -38,10 +38,10 @@ public class Zones2Centroids {
     public static void main(String args[]) throws IOException {
 //        ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON("/home/johannes/gsv/gis/nuts/world/nuts3-psmobility.geojson", "NO");
         ZoneCollection zones = ZoneEsriShapeIO.read
-                ("/mnt/cifs/B-drive/C_Vertrieb/2014_03_01_Nachfragematrizen_PV/07_Qlik/nuts3.SHP");
+                ("/mnt/cifs/B-drive/U_Benutzer/JohannesIllenberger/qlik/zones.SHP");
 
         BufferedWriter writer = new BufferedWriter(new FileWriter
-                ("/mnt/cifs/B-drive/C_Vertrieb/2014_03_01_Nachfragematrizen_PV/07_Qlik/nuts3.csv"));
+                ("/mnt/cifs/B-drive/C_Vertrieb/2014_03_01_Nachfragematrizen_PV/07_Qlik/modena.csv"));
         writer.write("id;lng;lat;nuts3_name;nuts3_code;nuts2_name;nuts2_code;nuts1_name;nuts1_code;nuts0_name;" +
                         "nuts0_code");
         writer.newLine();

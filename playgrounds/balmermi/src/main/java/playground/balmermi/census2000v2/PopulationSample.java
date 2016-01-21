@@ -79,7 +79,7 @@ public class PopulationSample {
 		log.info("  done.");
 
 		System.out.println("  reading the network xml file...");
-		new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(config.network().getInputFile());
 //		world.complete(config);
 		Gbl.printMemoryUsage();
 		System.out.println("  done.");

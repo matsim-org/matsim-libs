@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
@@ -48,7 +49,7 @@ public class MobsimCheckpointing {
 		
 		Controler controler = new Controler( scenario ) ;
 		
-		MobsimBeforeSimStepListener ee = new MobsimBeforeSimStepListener() {
+		final MobsimBeforeSimStepListener ee = new MobsimBeforeSimStepListener() {
 			@Override
 			public void notifyMobsimBeforeSimStep(MobsimBeforeSimStepEvent ff) {
 				double now = ff.getSimulationTime() ;
@@ -97,7 +98,13 @@ public class MobsimCheckpointing {
 				
 			}
 		} ;
-		controler.getMobsimListeners().add(ee) ;
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				addMobsimListenerBinding().toInstance(ee);
+			}
+		});
+		;
 		
 		controler.run();
 	}

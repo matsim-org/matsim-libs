@@ -70,7 +70,7 @@ public class ExtractUsedFacilities {
 			}
 			ProgressLogger.step();
 		}
-		ProgressLogger.termiante();
+		ProgressLogger.terminate();
 		
 		for(ActivityFacility fac : facSet) newFacilities.addActivityFacility(fac);
 		

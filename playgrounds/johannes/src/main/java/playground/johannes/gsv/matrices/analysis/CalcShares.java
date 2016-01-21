@@ -23,11 +23,11 @@ import gnu.trove.list.array.TDoubleArrayList;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.core.utils.collections.Tuple;
 import playground.johannes.gsv.sim.cadyts.ODUtils;
-import playground.johannes.gsv.zones.KeyMatrix;
-import playground.johannes.gsv.zones.MatrixOperations;
-import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
 import playground.johannes.synpop.gis.ZoneCollection;
 import playground.johannes.synpop.gis.ZoneGeoJsonIO;
+import playground.johannes.synpop.matrix.MatrixOperations;
+import playground.johannes.synpop.matrix.NumericMatrix;
+import playground.johannes.synpop.matrix.NumericMatrixXMLReader;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -48,27 +48,27 @@ public class CalcShares {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-		KeyMatrixXMLReader reader = new KeyMatrixXMLReader();
+		NumericMatrixXMLReader reader = new NumericMatrixXMLReader();
 		reader.setValidating(false);
 		
 		reader.parse("/home/johannes/gsv/matrices/refmatrices/itp.xml");
-		KeyMatrix carItpMatrix = reader.getMatrix();
+		NumericMatrix carItpMatrix = reader.getMatrix();
 		MatrixOperations.applyFactor(carItpMatrix, 1/365.0);
 				
 		reader.parse("/home/johannes/gsv/matrices/simmatrices/miv.819.2.xml");
-		KeyMatrix carSimMatrix = reader.getMatrix();
-//		MatrixOperations.symetrize(carSimMatrix);
-//		MatrixOperations.applyFactor(carSimMatrix, 11.8);
+		NumericMatrix carSimMatrix = reader.getMatrix();
+//		MatrixOperations.symmetrize(carSimMatrix);
+//		MatrixOperations.multiply(carSimMatrix, 11.8);
 		
 		reader.parse("/home/johannes/gsv/matrices/refmatrices/tomtom.de.xml");
-		KeyMatrix carTomTomMatrix = reader.getMatrix();
+		NumericMatrix carTomTomMatrix = reader.getMatrix();
 		
 		reader.parse("/home/johannes/gsv/matrices/analysis/marketShares/rail.all.nuts3.xml");
-		KeyMatrix railSimMatrix = reader.getMatrix();
+		NumericMatrix railSimMatrix = reader.getMatrix();
 		MatrixOperations.applyFactor(railSimMatrix, 1/365.0);
 		
 		reader.parse("/home/johannes/gsv/matrices/analysis/marketShares/car.share.xml");
-		KeyMatrix shareRefMatrix = reader.getMatrix();
+		NumericMatrix shareRefMatrix = reader.getMatrix();
 		
 		ZoneCollection zones = new ZoneCollection();
 		String data = new String(Files.readAllBytes(Paths.get("/home/johannes/gsv/gis/nuts/de.nuts3.gk3.geojson")));
@@ -188,7 +188,7 @@ public class CalcShares {
 //		TXTWriter.writeHistogram(hist, "ref share", "itp share", "/home/johannes/gsv/matrices/analysis/marketShares/itpShareCorrel.txt");
 	}
 
-	private static List<Tuple<String, String>> getRelations(KeyMatrix m, int num) {
+	private static List<Tuple<String, String>> getRelations(NumericMatrix m, int num) {
 		Map<Double, Tuple<String, String>> map = new TreeMap<>(new Comparator<Double>() {
 
 			@Override
@@ -242,7 +242,7 @@ public class CalcShares {
 		
 		writer.close();
 	}
-	private static void removeUnknownZones(KeyMatrix m) {
+	private static void removeUnknownZones(NumericMatrix m) {
 		Set<String> keys = m.keys();
 		for(String i : keys) {
 			for(String j : keys) {

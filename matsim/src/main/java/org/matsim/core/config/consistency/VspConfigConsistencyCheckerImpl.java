@@ -33,7 +33,7 @@ import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspDefaultsCheckingLevel;
-import org.matsim.core.replanning.DefaultPlanStrategiesModule.DefaultStrategy;
+import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultStrategy;
 import org.matsim.pt.PtConstants;
 
 /**
@@ -79,8 +79,8 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 		case withHoles:
 			break;
 		default:
-			log.log( lvl,  " found 'qsim.trafficDynamics==" + config.qsim().getTrafficDynamics() + "'; vsp should try out `" 
-					+ TrafficDynamics.withHoles + "' and report." ) ;
+			log.log( lvl,  " found 'qsim.trafficDynamics==" + config.qsim().getTrafficDynamics() + "'; vsp standard is`" 
+					+ TrafficDynamics.withHoles + "'." ) ;
 			break;
 		}
 		

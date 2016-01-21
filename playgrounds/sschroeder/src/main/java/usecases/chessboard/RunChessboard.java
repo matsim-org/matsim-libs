@@ -8,9 +8,8 @@ import org.matsim.contrib.freight.scoring.CarrierScoringFunctionFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.controler.events.IterationEndsEvent;
-import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.replanning.GenericPlanStrategyImpl;
 import org.matsim.core.replanning.GenericStrategyManager;
 import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
@@ -72,7 +71,7 @@ public class RunChessboard {
         }
     }
 
-    private static void prepareFreightOutputDataAndStats(Controler controler, final Carriers carriers, String outputDir) {
+    private static void prepareFreightOutputDataAndStats(MatsimServices controler, final Carriers carriers, String outputDir) {
 //        final int statInterval = 1;
 //        final LegHistogram freightOnly = new LegHistogram(900);
 //        freightOnly.setPopulation(controler.getScenario().getPopulation());
@@ -91,7 +90,7 @@ public class RunChessboard {
 //			public void notifyIterationEnds(IterationEndsEvent event) {
 //				if(event.getIteration() % statInterval != 0) return;
 //				//write plans
-//				String dir = event.getControler().getControlerIO().getIterationPath(event.getIteration());
+//				String dir = event.getServices().getControlerIO().getIterationPath(event.getIteration());
 //				new CarrierPlanXmlWriterV2(carriers).write(dir + "/" + event.getIteration() + ".carrierPlans.xml");
 //
 ////				//write stats
@@ -126,7 +125,7 @@ public class RunChessboard {
     }
 
 
-	 private static CarrierPlanStrategyManagerFactory createStrategyManagerFactory(final CarrierVehicleTypes types, final Controler controler) {
+	 private static CarrierPlanStrategyManagerFactory createStrategyManagerFactory(final CarrierVehicleTypes types, final MatsimServices controler) {
 	        return new CarrierPlanStrategyManagerFactory() {
 
 	            @Override
@@ -140,13 +139,13 @@ public class RunChessboard {
 					strategyManager.setMaxPlansPerAgent(5);
 					{
 						GenericPlanStrategyImpl<CarrierPlan, Carrier> strategy = new GenericPlanStrategyImpl<CarrierPlan, Carrier>( new ExpBetaPlanChanger<CarrierPlan, Carrier>(1.) ) ;
-//						strategy.addStrategyModule(new ReRouter(router, controler.getNetwork(), controler.getLinkTravelTimes(), .1));
+//						strategy.addStrategyModule(new ReRouter(router, services.getNetwork(), services.getLinkTravelTimes(), .1));
 						strategyManager.addStrategy( strategy, null, 1.0 ) ;
 
 					}
 //					{
 //						GenericPlanStrategyImpl<CarrierPlan, Carrier> strategy = new GenericPlanStrategyImpl<CarrierPlan, Carrier>( new ExpBetaPlanChanger<CarrierPlan, Carrier>(1.) ) ;
-//						strategy.addStrategyModule(new ReRouter(router, controler.getNetwork(), controler.getLinkTravelTimes(), 1.));
+//						strategy.addStrategyModule(new ReRouter(router, services.getNetwork(), services.getLinkTravelTimes(), 1.));
 //						strategyManager.addStrategy( strategy, null, 0.1) ;
 //					}
 					{
@@ -157,8 +156,8 @@ public class RunChessboard {
 					}
 //					{
 //						GenericPlanStrategyImpl<CarrierPlan,Carrier> strategy = new GenericPlanStrategyImpl<CarrierPlan,Carrier>( new KeepSelected<CarrierPlan,Carrier>() ) ;
-//                        strategy.addStrategyModule(new ReScheduling(controler.getNetwork(),types,controler.getLinkTravelTimes(), "sschroeder/input/usecases/chessboard/vrpalgo/algorithm_v2.xml"));
-//                        strategy.addStrategyModule(new ReRouter(router, controler.getNetwork(), controler.getLinkTravelTimes(), 1.));
+//                        strategy.addStrategyModule(new ReScheduling(services.getNetwork(),types,services.getLinkTravelTimes(), "sschroeder/input/usecases/chessboard/vrpalgo/algorithm_v2.xml"));
+//                        strategy.addStrategyModule(new ReRouter(router, services.getNetwork(), services.getLinkTravelTimes(), 1.));
 //                        strategyManager.addStrategy( strategy, null, 0.1) ;
 //					}
                     return strategyManager ;

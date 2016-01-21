@@ -29,8 +29,8 @@ import playground.wrashid.lib.GlobalRegistry;
 public class InitializeParkings implements StartupListener {
 
 	public void notifyStartup(StartupEvent event) {
-		GlobalRegistry.controler=event.getControler();
-        ParkingRoot.init((ActivityFacilitiesImpl) event.getControler().getScenario().getActivityFacilities(), (NetworkImpl) event.getControler().getScenario().getNetwork(), event.getControler());
+		GlobalRegistry.controler=event.getServices();
+        ParkingRoot.init((ActivityFacilitiesImpl) event.getServices().getScenario().getActivityFacilities(), (NetworkImpl) event.getServices().getScenario().getNetwork(), event.getServices());
 		
 		//ParkingRoot.getParkingOccupancyMaintainer().performInitializationsAfterLoadingControlerData();
 		

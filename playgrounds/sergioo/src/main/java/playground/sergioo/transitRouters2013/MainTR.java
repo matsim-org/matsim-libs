@@ -38,7 +38,7 @@ public class MainTR {
 		int numTests = 100;
 		//saveRoutes(numTests, startTime, endTime);
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.loadConfig(args[0]));
-		(new MatsimNetworkReader(scenario)).readFile(args[1]);
+		(new MatsimNetworkReader(scenario.getNetwork())).readFile(args[1]);
 		(new MatsimPopulationReader(scenario)).readFile(args[2]);
 		(new TransitScheduleReader(scenario)).readFile(args[3]);
 		(new VehicleReaderV1(((MutableScenario)scenario).getTransitVehicles())).readFile(args[8]);

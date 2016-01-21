@@ -50,13 +50,13 @@ public class ConvertNetworkToWgs {
 		
 		/* Read the network. */
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenario ).parse(input);
+		new MatsimNetworkReader(scenario.getNetwork()).parse(input);
 		
 		/* Transform each node. */
-//		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84,"EPSG:25832");
+		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84,"EPSG:25832");
 //		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84,TransformationFactory.DHDN_GK4);
 
-		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("EPSG:25832",TransformationFactory.WGS84);
+//		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("EPSG:25832",TransformationFactory.WGS84);
 //		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.DHDN_GK4,TransformationFactory.WGS84);
 		
 		for(Node node : scenario.getNetwork().getNodes().values()){

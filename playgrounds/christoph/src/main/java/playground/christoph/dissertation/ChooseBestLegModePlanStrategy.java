@@ -54,7 +54,7 @@ public class ChooseBestLegModePlanStrategy implements PlanStrategy {
 				CollectionUtils.stringToSet(MultiModalDemo.legModes));
 		
 		planStrategyDelegate.addStrategyModule(chooseBestLegModeModule);
-		planStrategyDelegate.addStrategyModule(new ReRoute(scenario));
+		planStrategyDelegate.addStrategyModule(new ReRoute(scenario, tripRouterProvider));
 	}
 	
 	public void setTravelTimes(Map<String, TravelTime> travelTimes) {

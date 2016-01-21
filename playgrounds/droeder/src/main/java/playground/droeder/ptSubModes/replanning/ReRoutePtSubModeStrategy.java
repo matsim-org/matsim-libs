@@ -22,28 +22,33 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.PlanRouter;
+import org.matsim.core.router.TripRouter;
 import org.matsim.population.algorithms.PlanAlgorithm;
+
+import javax.inject.Inject;
+import javax.inject.Provider;
 
 /**
  * @author droeder
  *
  */
 class ReRoutePtSubModeStrategy extends AbstractMultithreadedModule{
-	
-	private ReplanningContext rc;
+
+	private final Provider<TripRouter> tripRouterProvider;
 
 	/**
 	 * <code>PlanStrategyModule</code> which reroutes pt-legs and stores pt-submodes.
 	 * Aborts if the controler is not an instance of instance of <code>PtSubModeControler</code>
 	 * @param sc
+	 * @param rc
 	 */
-	protected ReRoutePtSubModeStrategy(Scenario sc, ReplanningContext rc) {
+	protected ReRoutePtSubModeStrategy(Scenario sc, Provider<TripRouter> rc) {
 		super(sc.getConfig().global());
-		this.rc = rc;
+		this.tripRouterProvider = rc;
 	}
 
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
-		return new PlanRouter(this.rc.getTripRouter());
+		return new PlanRouter(this.tripRouterProvider.get());
 	}
 }

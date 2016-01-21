@@ -30,8 +30,7 @@ import org.matsim.core.replanning.selectors.PlanSelector;
 /**
  * @author nagel
  */
-class MyPlanSelector implements PlanSelector,
-ActivityEndEventHandler // as an example
+class MyPlanSelector implements PlanSelector 
 {
 	private static final Logger log = Logger.getLogger(MyPlanSelector.class);
 
@@ -39,16 +38,6 @@ ActivityEndEventHandler // as an example
 	public Plan selectPlan(HasPlansAndId<Plan, Person> person) {
 		log.error("calling selectPlan. Just selecting the first plan as an example.") ;
 		return person.getPlans().get(0);
-	}
-
-	@Override
-	public void handleEvent(ActivityEndEvent event) {
-		log.error("calling handleEvent for an ActivityEndEvent") ;
-	}
-
-	@Override
-	public void reset(int iteration) {
-		log.error("calling reset") ;
 	}
 
 }

@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
-import org.matsim.api.core.v01.events.Wait2LinkEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
@@ -38,11 +38,11 @@ import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
-import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.core.events.handler.EventHandler;
 
 public class EventHandlerGroup implements ActivityStartEventHandler, PersonArrivalEventHandler,
-PersonDepartureEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, Wait2LinkEventHandler, ActivityEndEventHandler {
+PersonDepartureEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, VehicleEntersTrafficEventHandler, ActivityEndEventHandler {
 	/**
 	 * All event handlers needed for electric vehicle simulation. Convenience class.
 	 * 
@@ -125,10 +125,10 @@ PersonDepartureEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler, Perso
 	}
 
 	@Override
-	public void handleEvent(Wait2LinkEvent event) {
+	public void handleEvent(VehicleEntersTrafficEvent event) {
 		for (EventHandler h : handler) {
-			if (h instanceof Wait2LinkEventHandler) {
-				((Wait2LinkEventHandler) h).handleEvent(event);
+			if (h instanceof VehicleEntersTrafficEventHandler) {
+				((VehicleEntersTrafficEventHandler) h).handleEvent(event);
 			}
 		}		
 	}

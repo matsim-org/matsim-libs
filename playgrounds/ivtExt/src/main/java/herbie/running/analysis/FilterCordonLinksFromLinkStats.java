@@ -20,13 +20,12 @@
 
 package herbie.running.analysis;
 
+import org.matsim.core.utils.io.IOUtils;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-
-import org.matsim.core.utils.io.IOUtils;
 
 public class FilterCordonLinksFromLinkStats {
 

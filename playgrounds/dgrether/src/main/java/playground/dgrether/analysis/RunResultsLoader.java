@@ -31,7 +31,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.data.v20.LaneDefinitionsReader;
 import org.matsim.lanes.data.v20.Lanes;
@@ -92,7 +91,7 @@ public class RunResultsLoader {
 		Config c = ConfigUtils.createConfig(); 
 		c.network().setInputFile(path);
 		Scenario sc = ScenarioUtils.createScenario(c);
-		MatsimNetworkReader nr = new MatsimNetworkReader(sc);
+		MatsimNetworkReader nr = new MatsimNetworkReader(sc.getNetwork());
 		nr.readFile(path);
 		return sc.getNetwork();
 	}

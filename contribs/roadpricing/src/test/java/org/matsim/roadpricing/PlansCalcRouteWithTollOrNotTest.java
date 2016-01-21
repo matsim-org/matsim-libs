@@ -22,7 +22,6 @@
 
 package org.matsim.roadpricing;
 
-import com.google.inject.Singleton;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
@@ -38,13 +37,15 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.TripRouterModule;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
-import org.matsim.core.scenario.ScenarioElementsModule;
 import org.matsim.core.scenario.MutableScenario;
+import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
 import org.matsim.testcases.MatsimTestUtils;
+
+import com.google.inject.Singleton;
 
 /**
  * Tests {@link PlansCalcRouteWithTollOrNot} as isolated as possible.
@@ -129,10 +130,9 @@ public class PlansCalcRouteWithTollOrNotTest {
 					@Override
 					public void install() {
 						bind(RoadPricingScheme.class).toInstance(toll);
-						bind(Scenario.class).toInstance(scenario);
 						addTravelTimeBinding(TransportMode.car).to(FreeSpeedTravelTime.class);
 						bind(PlansCalcRouteWithTollOrNot.class);
-						install(new ScenarioElementsModule());
+						install(new ScenarioByInstanceModule(scenario));
 						addTravelDisutilityFactoryBinding(TransportMode.car).toInstance(
 								new RandomizingTimeDistanceTravelDisutility.Builder( TransportMode.car ) );
 						install(new TripRouterModule());

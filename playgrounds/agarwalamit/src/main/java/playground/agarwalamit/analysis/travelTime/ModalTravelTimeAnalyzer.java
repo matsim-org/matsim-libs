@@ -40,22 +40,21 @@ import playground.vsp.analysis.modules.AbstractAnalysisModule;
  */
 
 public class ModalTravelTimeAnalyzer extends AbstractAnalysisModule {
+	private final SortedMap<String, Double> mode2AvgTripTime = new TreeMap<String, Double>();
+	private final SortedMap<String, Double> mode2TotalTravelTime = new TreeMap<String, Double>();
+	private final LegModeTripTravelTimeHandler travelTimeHandler = new LegModeTripTravelTimeHandler();
 
-	public ModalTravelTimeAnalyzer(String inputEventsFile) {
+	private final String inputEventsFile;
+	private static final int ITERATION_NR = 100;
+	
+	public ModalTravelTimeAnalyzer(final String inputEventsFile) {
 		super(ModalTravelTimeAnalyzer.class.getSimpleName());
 		this.inputEventsFile = inputEventsFile;
 	}
-
-	private SortedMap<String, Double> mode2AvgTripTime = new TreeMap<String, Double>();
-	private SortedMap<String, Double> mode2TotalTravelTime = new TreeMap<String, Double>();
-	private LegModeTripTravelTimeHandler travelTimeHandler = new LegModeTripTravelTimeHandler();
-
-	private String inputEventsFile;
-	private static final int iterationNr = 100;
 	
 	public static void main(String[] args) {
 		String dir = "../../../repos/runs-svn/patnaIndia/run105/1pct/evac_passing/";
-		String eventFile = dir+"/ITERS/it."+iterationNr+"/"+iterationNr+".events.xml.gz";
+		String eventFile = dir+"/ITERS/it."+ITERATION_NR+"/"+ITERATION_NR+".events.xml.gz";
 		String outputFolder = dir+"/analysis/";
 		ModalTravelTimeAnalyzer timeAnalyzer  = new ModalTravelTimeAnalyzer(eventFile);
 		timeAnalyzer.preProcessData();
@@ -95,7 +94,7 @@ public class ModalTravelTimeAnalyzer extends AbstractAnalysisModule {
 	}
 	@Override
 	public void writeResults(String outputFolder) {
-		BufferedWriter writer = IOUtils.getBufferedWriter(outputFolder+"/modalTravelTime_it."+iterationNr+".txt");
+		BufferedWriter writer = IOUtils.getBufferedWriter(outputFolder+"/modalTravelTime_it."+ITERATION_NR+".txt");
 		try {
 			writer.write("mode \t avgTripTime(min) \t totalTripTime(hr) \n");
 

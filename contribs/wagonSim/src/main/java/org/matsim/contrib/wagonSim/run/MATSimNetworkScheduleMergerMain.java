@@ -76,7 +76,7 @@ public class MATSimNetworkScheduleMergerMain {
 	
 	public final void mergeSchedule(String networkFilename, String transitScheduleFilename, String netEditsFilename) {
 		log.info("Load network " + networkFilename);
-		new MatsimNetworkReader(scenario).readFile(networkFilename);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFilename);
 		log.info("Load transit schedule " + transitScheduleFilename);
 		new TransitScheduleReader(scenario).readFile(transitScheduleFilename);
 

@@ -30,8 +30,8 @@ import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.vehicles.Vehicle;
 
 public class FrequencyAnalyser implements LinkLeaveEventHandler {
 
@@ -40,7 +40,7 @@ public class FrequencyAnalyser implements LinkLeaveEventHandler {
 	//////////////////////////////////////////////////////////////////////
 	
 	private static final Logger log = Logger.getLogger(FrequencyAnalyser.class);
-	private final Map<Id<Link>,Set<Id<Person>>> freqs;
+	private final Map<Id<Link>,Set<Id<Vehicle>>> freqs;
 	private long entryCnt = 0;
 	private long hour = -1;
 
@@ -56,7 +56,7 @@ public class FrequencyAnalyser implements LinkLeaveEventHandler {
 		log.info("init " + this.getClass().getName() + " module...");
 		if (linkIdSet == null) { throw new NullPointerException("linkIdSet cannot be null"); }
 		freqs = new HashMap<>((int)(network.getLinks().size()*1.4));
-		for (Id<Link> lid : linkIdSet) { freqs.put(lid, new HashSet<Id<Person>>()); }
+		for (Id<Link> lid : linkIdSet) { freqs.put(lid, new HashSet<Id<Vehicle>>()); }
 		log.info("=> "+freqs.size()+" sets allocated.");
 		log.info("done. (init)");
 	}
@@ -67,9 +67,9 @@ public class FrequencyAnalyser implements LinkLeaveEventHandler {
 	
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		Set<Id<Person>> pids = freqs.get(event.getLinkId());
+		Set<Id<Vehicle>> pids = freqs.get(event.getLinkId());
 		if (pids == null) { return; }
-		if (pids.add(event.getDriverId())) { entryCnt++; }
+		if (pids.add(event.getVehicleId())) { entryCnt++; }
 		// logging info
 		if ((entryCnt != 0) && (entryCnt % freqs.size() == 0)) {
 			log.info(entryCnt+" entries added to the frequency map.");
@@ -81,7 +81,7 @@ public class FrequencyAnalyser implements LinkLeaveEventHandler {
 	@Override
 	public void reset(int iteration) {
 		log.info("reset " + this.getClass().getName() + " module...");
-		for (Set<Id<Person>> idSet : freqs.values()) { idSet.clear(); }
+		for (Set<Id<Vehicle>> idSet : freqs.values()) { idSet.clear(); }
 		entryCnt = 0;
 		hour = -1;
 		log.info("done. (reset)");
@@ -98,7 +98,7 @@ public class FrequencyAnalyser implements LinkLeaveEventHandler {
 	// get methods
 	//////////////////////////////////////////////////////////////////////
 	
-	public final Map<Id<Link>,Set<Id<Person>>> getFrequencies() {
+	public final Map<Id<Link>,Set<Id<Vehicle>>> getFrequencies() {
 		return freqs;
 	}
 }

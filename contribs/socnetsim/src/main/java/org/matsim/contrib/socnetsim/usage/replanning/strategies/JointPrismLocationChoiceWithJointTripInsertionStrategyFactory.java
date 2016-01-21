@@ -52,14 +52,16 @@ public class JointPrismLocationChoiceWithJointTripInsertionStrategyFactory exten
 	private final PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory;
 	private final Provider<TripRouter> tripRouterFactory;
 	private final PlanLinkIdentifier planLinkIdentifier;
+	private javax.inject.Provider<TripRouter> tripRouterProvider;
 
 	@Inject
-	public JointPrismLocationChoiceWithJointTripInsertionStrategyFactory( Scenario sc , PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory ,
-			Provider<TripRouter> tripRouterFactory , @Strong PlanLinkIdentifier planLinkIdentifier ) {
+	public JointPrismLocationChoiceWithJointTripInsertionStrategyFactory(Scenario sc, PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory,
+																		 Provider<TripRouter> tripRouterFactory, @Strong PlanLinkIdentifier planLinkIdentifier, javax.inject.Provider<TripRouter> tripRouterProvider) {
 		this.sc = sc;
 		this.planRoutingAlgorithmFactory = planRoutingAlgorithmFactory;
 		this.tripRouterFactory = tripRouterFactory;
 		this.planLinkIdentifier = planLinkIdentifier;
+		this.tripRouterProvider = tripRouterProvider;
 	}
 
 
@@ -69,7 +71,7 @@ public class JointPrismLocationChoiceWithJointTripInsertionStrategyFactory exten
 
 		strategy.addStrategyModule(
 				new PrismicLocationChoiceModule(
-					sc ) );
+					sc, tripRouterProvider) );
 
 		strategy.addStrategyModule(
 				GroupPlanStrategyFactoryUtils.createJointTripAwareTourModeUnifierModule(

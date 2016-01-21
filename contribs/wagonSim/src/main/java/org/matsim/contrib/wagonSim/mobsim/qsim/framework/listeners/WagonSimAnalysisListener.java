@@ -61,14 +61,14 @@ public class WagonSimAnalysisListener implements BeforeMobsimListener, AfterMobs
 	@Override
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
 		stuckAgents = new HashSet<>();
-		event.getControler().getEvents().addHandler(new EventsStuckAgentsCollector(stuckAgents));
+		event.getServices().getEvents().addHandler(new EventsStuckAgentsCollector(stuckAgents));
 	}
 	
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
-		String outFile = event.getControler().getControlerIO().getIterationFilename(event.getIteration(),"stuckAgents.txt");
+		String outFile = event.getServices().getControlerIO().getIterationFilename(event.getIteration(),"stuckAgents.txt");
 		try { Utils.writeObjectIds(stuckAgents, outFile, null); }
 		catch (IOException e) { throw new RuntimeException(e); }
 	}

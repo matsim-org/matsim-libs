@@ -40,11 +40,11 @@ import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.MathTransform;
-import playground.johannes.gsv.zones.KeyMatrix;
-import playground.johannes.gsv.zones.io.KeyMatrixXMLWriter;
 import playground.johannes.synpop.gis.Zone;
 import playground.johannes.synpop.gis.ZoneCollection;
 import playground.johannes.synpop.gis.ZoneGeoJsonIO;
+import playground.johannes.synpop.matrix.NumericMatrix;
+import playground.johannes.synpop.matrix.NumericMatrixXMLWriter;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -59,8 +59,8 @@ public class Plans2Matrix {
 	
 	private static final Logger logger = Logger.getLogger(Plans2Matrix.class);
 
-	public KeyMatrix run(Collection<Plan> plans, ZoneCollection zones, ActivityFacilities facilities, String zoneIdKey) {
-		KeyMatrix m = new KeyMatrix();
+	public NumericMatrix run(Collection<Plan> plans, ZoneCollection zones, ActivityFacilities facilities, String zoneIdKey) {
+		NumericMatrix m = new NumericMatrix();
 //		Set<Zone> getZones = zones.getZones();
 //		for(Zone zone1 : getZones) {
 //			String isocode1 = zone1.getAttribute("ISO_CODE");
@@ -151,9 +151,9 @@ public class Plans2Matrix {
 			plans.add(person.getPlans().get(0));
 		}
 
-		KeyMatrix m = new Plans2Matrix().run(plans, zones, scenario.getActivityFacilities(), args[3]);
+		NumericMatrix m = new Plans2Matrix().run(plans, zones, scenario.getActivityFacilities(), args[3]);
 
-		KeyMatrixXMLWriter writer = new KeyMatrixXMLWriter();
+		NumericMatrixXMLWriter writer = new NumericMatrixXMLWriter();
 		writer.write(m, args[4]);
 	}
 }

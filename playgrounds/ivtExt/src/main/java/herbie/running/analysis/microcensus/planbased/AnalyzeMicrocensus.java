@@ -28,14 +28,13 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.analysis.filters.population.PersonIntersectAreaFilter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReader;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.config.ConfigUtils;
-
 import org.matsim.core.utils.geometry.CoordUtils;
 import utils.Bins;
 
@@ -114,7 +113,7 @@ public class AnalyzeMicrocensus {
 		populationReader.readFile(plansFilePath);
 		
 		scenarioZH = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenarioZH).readFile(networkfilePath);
+		new MatsimNetworkReader(scenarioZH.getNetwork()).readFile(networkfilePath);
 	}
 	
 	private void dilutedZH() {

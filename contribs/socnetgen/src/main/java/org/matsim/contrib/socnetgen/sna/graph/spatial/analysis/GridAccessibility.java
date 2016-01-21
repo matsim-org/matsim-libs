@@ -19,22 +19,20 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetgen.sna.graph.spatial.analysis;
 
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.Point;
 import gnu.trove.map.hash.TObjectDoubleHashMap;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
 import org.matsim.contrib.common.util.ProgressLogger;
 import org.matsim.contrib.socnetgen.sna.gis.PointUtils;
 import org.matsim.contrib.socnetgen.sna.gis.SpatialCostFunction;
 import org.matsim.contrib.socnetgen.sna.graph.Vertex;
 import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialVertex;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.Point;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 /**
  * @author illenberger
@@ -84,7 +82,7 @@ public class GridAccessibility extends Accessibility {
 				ProgressLogger.step();
 			}
 		}
-		ProgressLogger.termiante();
+		ProgressLogger.terminate();
 		
 		TObjectDoubleHashMap<Vertex> values = new TObjectDoubleHashMap<Vertex>(vertices.size());
 		for(Vertex v : vertices) {

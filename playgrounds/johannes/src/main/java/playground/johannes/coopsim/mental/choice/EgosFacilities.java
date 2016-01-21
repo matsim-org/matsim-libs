@@ -20,6 +20,7 @@
 package playground.johannes.coopsim.mental.choice;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.common.collections.ChoiceSet;
 import org.matsim.contrib.socnetgen.sna.graph.social.SocialVertex;
 import org.matsim.facilities.ActivityFacility;
 
@@ -50,7 +51,7 @@ public class EgosFacilities implements FacilityChoiceSetGenerator {
 		for(SocialVertex ego : egos) {
 			List<Id<ActivityFacility>> facilityIds = choiceSets.get(ego);
 			for(Id<ActivityFacility> id : facilityIds)
-				choiceSet.addChoice(id);
+				choiceSet.addOption(id);
 		}
 		
 		return choiceSet;

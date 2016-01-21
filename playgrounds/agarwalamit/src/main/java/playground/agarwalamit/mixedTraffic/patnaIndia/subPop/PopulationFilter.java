@@ -18,6 +18,8 @@
  * *********************************************************************** */
 package playground.agarwalamit.mixedTraffic.patnaIndia.subPop;
 
+import java.util.Arrays;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
@@ -64,10 +66,10 @@ public final class PopulationFilter {
 	}
 	
 	public static boolean isPersonFromSlum(final Person person){
-		return person.getId().toString().split("_")[1].equals("slum");
+		return Arrays.asList( person.getId().toString().split("_") ).contains("slum");
 	}
 	
 	public static boolean isPersonFromNonSlum(final Person person){
-		return person.getId().toString().split("_")[1].equals("nonSlum");
+		return Arrays.asList( person.getId().toString().split("_") ).contains("nonSlum");
 	}
 }

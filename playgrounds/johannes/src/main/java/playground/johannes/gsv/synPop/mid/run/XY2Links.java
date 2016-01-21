@@ -49,7 +49,7 @@ public class XY2Links {
 		MatsimRandom.reset();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		
-		new MatsimNetworkReader(scenario).readFile(netfile);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(netfile);
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 		
 //		NetworkCleaner cleaner = new NetworkCleaner();

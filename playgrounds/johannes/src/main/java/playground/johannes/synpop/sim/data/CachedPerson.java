@@ -30,13 +30,13 @@ import java.util.List;
  */
 public class CachedPerson extends CachedElement implements Person {
 
-    private final List<Episode> episodes;
+    private final List<CachedEpisode> episodes;
 
     public CachedPerson(Person delegate) {
         super(delegate);
         episodes = new ArrayList<>(delegate.getEpisodes().size());
         for(Episode episode : delegate.getEpisodes()) {
-            CachedEpisode cachedEpisode = new CachedEpisode(episode);
+            CachedEpisode cachedEpisode = new CachedEpisode(episode, this);
             episodes.add(cachedEpisode);
         }
     }

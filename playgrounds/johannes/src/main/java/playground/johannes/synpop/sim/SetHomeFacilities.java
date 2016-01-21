@@ -135,7 +135,7 @@ public class SetHomeFacilities implements PersonsTask {
             ProgressLogger.step();
         }
 
-        ProgressLogger.termiante();
+        ProgressLogger.terminate();
 
         if (unassigned > 0) {
             logger.warn(String.format("%s facilities are out of zone bounds.", unassigned));
@@ -176,7 +176,7 @@ public class SetHomeFacilities implements PersonsTask {
             }
         }
 
-        ProgressLogger.termiante();
+        ProgressLogger.terminate();
 
         if (total < persons.size()) {
             logger.warn("Not all persons precessed. Check facilities and zones!");

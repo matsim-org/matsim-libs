@@ -43,27 +43,25 @@ import playground.vsp.congestion.handlers.MarginalCongestionPricingHandler;
  */
 
 public class CrossMarginalCongestionEventsWriter {
-
-	public CrossMarginalCongestionEventsWriter(Scenario sc) {
+	private final String inputEventsFile ;
+	private final Scenario sc;
+	private final int lastIt;
+	private final List<CongestionEvent> conEvents = new ArrayList<CongestionEvent>();
+	
+	public CrossMarginalCongestionEventsWriter(final Scenario sc) {
 		this.sc = sc;
-		lastIt = sc.getConfig().controler().getLastIteration();
+		this.lastIt = sc.getConfig().controler().getLastIteration();
 		this.inputEventsFile = this.sc.getConfig().controler().getOutputDirectory()+"/ITERS/it."+lastIt+"/"+lastIt+".events.xml.gz";
 	}
 
-	private String inputEventsFile = "";
-	private Scenario sc;
-	private int lastIt;
-	private EventsManager manager;
-	final List<CongestionEvent> conEvents = new ArrayList<CongestionEvent>();
-	
 	/**
 	 * @param congestionImpl One for which marginal congestion events need to be evaluated.
 	 */
-	public void readAndWrite(String congestionImpl){
+	public void readAndWrite(final String congestionImpl){
 		
 		String outputEventsFile = sc.getConfig().controler().getOutputDirectory()+"/ITERS/it."+lastIt+"/"+lastIt+".events_"+congestionImpl+".xml.gz";
 
-		manager = EventsUtils.createEventsManager();
+		EventsManager manager = EventsUtils.createEventsManager();
 		MatsimEventsReader reader = new MatsimEventsReader(manager);
 		EventHandler eh = null;
 
@@ -77,12 +75,10 @@ public class CrossMarginalCongestionEventsWriter {
 //		ZZ_TODO : this is stupid, it will write multiple congestion and money events. See EventsFilterAndWriter.java
 		EventWriterXML writer = new EventWriterXML(outputEventsFile);
 		manager.addHandler(writer);
-		
 		manager.addHandler(new CongestionEventHandler() {
 			
 			@Override
 			public void reset(int iteration) {
-				
 			}
 			
 			@Override
@@ -90,12 +86,9 @@ public class CrossMarginalCongestionEventsWriter {
 				conEvents.add(event);
 			}
 		});
-
 		MarginalCongestionPricingHandler moneyEventHandler = new MarginalCongestionPricingHandler(manager,  (MutableScenario)this.sc);
 		manager.addHandler(moneyEventHandler);
-
 		reader.readFile(this.inputEventsFile);
-		
 		writer.closeFile();
 	}
 	
@@ -104,11 +97,9 @@ public class CrossMarginalCongestionEventsWriter {
 	}
 
 	public static void main(String[] args) {
-
 		String runDir = "/Users/amit/Documents/repos/runs-svn/siouxFalls/run203/implV3/";
 		Scenario scenario = LoadMyScenarios.loadScenarioFromOutputDir(runDir);
 		
-		new CrossMarginalCongestionEventsWriter(scenario).readAndWrite("implV4");;
+		new CrossMarginalCongestionEventsWriter(scenario).readAndWrite("implV4");
 	}
-
 }

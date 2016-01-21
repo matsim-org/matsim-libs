@@ -14,12 +14,15 @@ class Test {
 		int i = 0;
 
 		final BufferedReader reader = new BufferedReader(new FileReader(
-				"./ihop2/transmodeler-matsim/exchange/events.xml"));
+				"./ihop2-data/transmodeler-matsim/exchange/events.xml"));
 
 		String line;
 		while ((i++ < Integer.MAX_VALUE) && (line = reader.readLine()) != null) {
-			if (line.contains("person=\"339658\"")) {
+			if (line.contains("person=\"1773064\"")) {
 				System.out.println(line);
+				if (line.contains("actstart")) {
+					System.out.println();
+				}
 			}
 		}
 		reader.close();

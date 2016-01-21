@@ -214,8 +214,8 @@ PersonDepartureEventHandler, LinkEnterEventHandler, PersonStuckEventHandler, Per
 		if (!this.totalRouteTTsByDepartureTime.containsKey(personDepartureTime)) {
 			// this is equivalent to
 			// !this.routeUsersPerDepartureTime.containsKey(personDepartureTime)
-			this.totalRouteTTsByDepartureTime.put(personDepartureTime, new double[3]);
-			this.routeUsersByDepartureTime.put(personDepartureTime, new int[3]);
+			this.totalRouteTTsByDepartureTime.put(personDepartureTime, new double[numberOfRoutes]);
+			this.routeUsersByDepartureTime.put(personDepartureTime, new int[numberOfRoutes]);
 		}
 		this.totalRouteTTsByDepartureTime.get(personDepartureTime)[personRoute] += personTotalTT;
 		this.routeUsersByDepartureTime.get(personDepartureTime)[personRoute]++;
@@ -224,7 +224,7 @@ PersonDepartureEventHandler, LinkEnterEventHandler, PersonStuckEventHandler, Per
 		// person is traveling on it
 		for (int i = 0; i < personTotalTT; i++) {
 			if (!this.onRoutePerSecond.containsKey(personDepartureTime + i)) {
-				this.onRoutePerSecond.put(personDepartureTime + i, new double[3]);
+				this.onRoutePerSecond.put(personDepartureTime + i, new double[numberOfRoutes]);
 			}
 			this.onRoutePerSecond.get(personDepartureTime + i)[this.personRouteChoice
 					.get(event.getPersonId())]++;
@@ -232,7 +232,7 @@ PersonDepartureEventHandler, LinkEnterEventHandler, PersonStuckEventHandler, Per
 
 		// add one route start for the specific departure time
 		if (!this.routeStartsPerSecond.containsKey(personDepartureTime)) {
-			this.routeStartsPerSecond.put(personDepartureTime, new double[3]);
+			this.routeStartsPerSecond.put(personDepartureTime, new double[numberOfRoutes]);
 		}
 		this.routeStartsPerSecond.get(personDepartureTime)[personRoute]++;
 
@@ -262,8 +262,8 @@ PersonDepartureEventHandler, LinkEnterEventHandler, PersonStuckEventHandler, Per
 	 * @return average travel times
 	 */
 	public double[] calculateAvgRouteTTs() {
-		double[] avgRouteTTs = new double[3];
-		for (int i = 0; i < 3; i++) {
+		double[] avgRouteTTs = new double[numberOfRoutes];
+		for (int i = 0; i < numberOfRoutes; i++) {
 			avgRouteTTs[i] = this.totalRouteTTs[i] / this.routeUsers[i];
 		}
 		return avgRouteTTs;
@@ -298,7 +298,7 @@ PersonDepartureEventHandler, LinkEnterEventHandler, PersonStuckEventHandler, Per
 		}
 		for (long l = firstStart; l <= lastStart; l++) {
 			if (!this.routeStartsPerSecond.containsKey((double) l)) {
-				this.routeStartsPerSecond.put((double) l, new double[3]);
+				this.routeStartsPerSecond.put((double) l, new double[numberOfRoutes]);
 			}
 		}
 
@@ -318,11 +318,8 @@ PersonDepartureEventHandler, LinkEnterEventHandler, PersonStuckEventHandler, Per
 	/**
 	 * @return the average route travel times by departure time.
 	 * 
-	 * Thereby the double array in each map entry contains the following average
-	 * route travel times: 
-	 * 0 - the average route travel time on the upper route.
-	 * 1 - the average route travel time on the middle route.
-	 * 2 - the average route travel time on the lower route.
+	 * Thereby the double array in each map entry contains the average
+	 * route travel times for all different routes in the network
 	 * (always for agents with the specific departure time)
 	 */
 	public Map<Double, double[]> calculateAvgRouteTTsByDepartureTime() {
@@ -334,8 +331,8 @@ PersonDepartureEventHandler, LinkEnterEventHandler, PersonStuckEventHandler, Per
 					.get(departureTime);
 			int[] usersPerRoute = this.routeUsersByDepartureTime
 					.get(departureTime);
-			double[] avgTTsPerRoute = new double[3];
-			for (int i = 0; i < 3; i++) {
+			double[] avgTTsPerRoute = new double[numberOfRoutes];
+			for (int i = 0; i < numberOfRoutes; i++) {
 				if (usersPerRoute[i] == 0)
 					// no agent is departing for the specific route at this time
 					avgTTsPerRoute[i] = Double.NaN;
@@ -358,7 +355,10 @@ PersonDepartureEventHandler, LinkEnterEventHandler, PersonStuckEventHandler, Per
 		for (long l = firstDeparture; l <= lastDeparture; l++) {
 			if (!avgTTsPerRouteByDepartureTime.containsKey((double) l)) {
 				// add NaN-values as travel times when no agent has a departure
-				double[] nanTTsPerRoute = { Double.NaN, Double.NaN, Double.NaN };
+				double[] nanTTsPerRoute = new double[numberOfRoutes];
+				for (int i = 0; i < numberOfRoutes; i++){
+					nanTTsPerRoute[i] = Double.NaN;
+				}
 				avgTTsPerRouteByDepartureTime.put((double) l, nanTTsPerRoute);
 			}
 		}

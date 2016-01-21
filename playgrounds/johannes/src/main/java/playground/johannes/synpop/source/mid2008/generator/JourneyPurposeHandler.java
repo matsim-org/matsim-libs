@@ -19,7 +19,6 @@
 
 package playground.johannes.synpop.source.mid2008.generator;
 
-import playground.johannes.gsv.matrices.episodes2matrix.InfereWeCommuter;
 import playground.johannes.synpop.data.ActivityTypes;
 import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.Segment;
@@ -45,7 +44,7 @@ public class JourneyPurposeHandler implements LegAttributeHandler {
 		} else if(purpose.equalsIgnoreCase("4")) {
 			leg.setAttribute(CommonKeys.LEG_PURPOSE, ActivityTypes.BUSINESS);
 		} else if(purpose.equalsIgnoreCase("5")) {
-			leg.setAttribute(CommonKeys.LEG_PURPOSE, InfereWeCommuter.WECOMMUTER);
+			leg.setAttribute(CommonKeys.LEG_PURPOSE, ActivityTypes.WECOMMUTER);
 		} else {
 			leg.setAttribute(CommonKeys.LEG_PURPOSE, ActivityTypes.MISC);
 		}

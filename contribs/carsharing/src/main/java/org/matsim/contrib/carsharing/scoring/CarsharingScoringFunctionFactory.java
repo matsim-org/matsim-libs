@@ -11,12 +11,15 @@ import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
 import org.matsim.core.scoring.functions.SubpopulationCharyparNagelScoringParameters;
 
+import javax.inject.Inject;
+
 public class CarsharingScoringFunctionFactory implements ScoringFunctionFactory {
 	
 	private final Scenario scenario;
 	private final CharyparNagelScoringParametersForPerson params;
 
-	public CarsharingScoringFunctionFactory( final Scenario sc ) {
+	@Inject
+	CarsharingScoringFunctionFactory( final Scenario sc ) {
 		this.scenario = sc;
 		this.params = new SubpopulationCharyparNagelScoringParameters( sc );
 	}

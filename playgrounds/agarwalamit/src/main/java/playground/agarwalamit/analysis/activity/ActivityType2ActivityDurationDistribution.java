@@ -41,12 +41,20 @@ import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
  * @author amit
  */
 public class ActivityType2ActivityDurationDistribution {
-
+	private ActivityType2ActDurationsAnalyzer actDurAnalyzer;
+	private List<Integer> timeClasses;
+	private Map<Id<Person>, Map<String, List<Double>>> personId2ActDurations;
+	private SortedMap<String, SortedMap<Integer, Integer>> actType2ActDuration2LegCount;
+	private final String outputDir;
+	private double simEndTime;
+	private final boolean sortPersons;
+	private final String userGroup;
+	
 	/**
 	 * @param outputDir
 	 * Use this to get distribution for whole population
 	 */
-	public ActivityType2ActivityDurationDistribution(String outputDir) {
+	public ActivityType2ActivityDurationDistribution(final String outputDir) {
 		this.outputDir = outputDir;
 		this.sortPersons = false;
 		this.userGroup = "";
@@ -56,21 +64,12 @@ public class ActivityType2ActivityDurationDistribution {
 	 * @param outputDir
 	 * @param userGroup for which distribution is required
 	 */
-	public ActivityType2ActivityDurationDistribution(String outputDir, UserGroup userGroup) {
+	public ActivityType2ActivityDurationDistribution(final String outputDir, final UserGroup userGroup) {
 		this.outputDir = outputDir;
 		this.sortPersons = true;
 		this.userGroup = userGroup.toString();
-		ActivityType2DurationHandler.log.warn("Result will consider persons from "+this.userGroup+" sub population group.");
+		ActivityType2DurationHandler.LOG.warn("Result will consider persons from "+this.userGroup+" sub population group.");
 	}
-
-	private ActivityType2ActDurationsAnalyzer actDurAnalyzer;
-	private List<Integer> timeClasses;
-	private Map<Id<Person>, Map<String, List<Double>>> personId2ActDurations;
-	private SortedMap<String, SortedMap<Integer, Integer>> actType2ActDuration2LegCount;
-	private String outputDir;
-	private double simEndTime;
-	private boolean sortPersons;
-	private String userGroup;
 
 	public static void main(String[] args) {
 		String outputDir = "/Users/aagarwal/Desktop/ils4/agarwal/munich/output/1pct/";
@@ -78,13 +77,13 @@ public class ActivityType2ActivityDurationDistribution {
 		new ActivityType2ActivityDurationDistribution(outputDir,UserGroup.URBAN).run(runCases);
 	}
 
-	public void run(String [] runCases){
+	public void run(final String [] runCases){
 		for(String runCase:runCases){
 			init(runCase);
 		}
 	}
 
-	public void init(String runCase){
+	public void init(final String runCase){
 
 		actDurAnalyzer = new ActivityType2ActDurationsAnalyzer(outputDir+runCase);
 		actDurAnalyzer.preProcessData();
@@ -100,13 +99,13 @@ public class ActivityType2ActivityDurationDistribution {
 		getActType2ActDurationDistributionData();
 
 		writeResults(outputDir+runCase+"/analysis/");
-		writeTypicalAndMinimumActivityDurations(outputConfig, runCase);
+		writeTypicalAndMinimumActivityDurations(outputConfig);
 	}
 
 	/**
 	 * writes activity type to typical activity duration to file. 
 	 */
-	private void writeTypicalAndMinimumActivityDurations(String configFile,String runCase){
+	private void writeTypicalAndMinimumActivityDurations(final String configFile){
 
 		Config config = new Config();
 		config.addCoreModules();
@@ -133,10 +132,10 @@ public class ActivityType2ActivityDurationDistribution {
 		} catch (Exception e) {
 			throw new RuntimeException("Data is not written. Reason - " + e);
 		}
-		ActivityType2DurationHandler.log.info("Data is written to file "+fileName);
+		ActivityType2DurationHandler.LOG.info("Data is written to file "+fileName);
 	}
 
-	public void writeResults(String outputFolder) {
+	public void writeResults(final String outputFolder) {
 		String fileName = outputFolder+"/"+userGroup+"actTyp2ActDurDistributionDuration.txt";
 		BufferedWriter writer = IOUtils.getBufferedWriter(fileName);
 		try {
@@ -157,7 +156,7 @@ public class ActivityType2ActivityDurationDistribution {
 		} catch (Exception e) {
 			throw new RuntimeException("Data is not written. Reason - " + e);
 		}
-		ActivityType2DurationHandler.log.info("Data is written to file "+fileName);
+		ActivityType2DurationHandler.LOG.info("Data is written to file "+fileName);
 	}
 
 	private void getActType2ActDurationDistributionData(){
@@ -184,7 +183,7 @@ public class ActivityType2ActivityDurationDistribution {
 		}
 	}
 
-	private void storeData(Id<Person> id){
+	private void storeData(final Id<Person> id){
 		Map<String, List<Double>> actTyp2Dur = personId2ActDurations.get(id);
 		for(String actTyp : actTyp2Dur.keySet()){
 			List<Double> durs = actTyp2Dur.get(actTyp);
@@ -210,11 +209,10 @@ public class ActivityType2ActivityDurationDistribution {
 			classCounter++;
 			timeClasses.add(endOfTimeClass);
 		}
-		ActivityType2DurationHandler.log.info("Following activity duration classes are defined: "+timeClasses.toString());
+		ActivityType2DurationHandler.LOG.info("Following activity duration classes are defined: "+timeClasses.toString());
 	}
 
 	public Map<Id<Person>, Map<String, List<Double>>> getPersonId2ActivityType2ActivityDurations(){
 		return this.personId2ActDurations;
 	}
-
 }

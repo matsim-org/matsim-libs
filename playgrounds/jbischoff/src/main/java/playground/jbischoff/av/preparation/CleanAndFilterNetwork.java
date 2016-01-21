@@ -37,7 +37,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 public class CleanAndFilterNetwork {
 public static void main(String[] args) {
 	Scenario s = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-	new MatsimNetworkReader(s).readFile("C:/Users/Joschka/Documents/shared-svn/projects/audi_av/scenario/network.xml.gz");
+	new MatsimNetworkReader(s.getNetwork()).readFile("C:/Users/Joschka/Documents/shared-svn/projects/audi_av/scenario/network.xml.gz");
 	NetworkFilterManager nfm = new NetworkFilterManager(s.getNetwork());
 	nfm.addLinkFilter(new NetworkLinkFilter() {
 		

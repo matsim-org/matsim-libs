@@ -4,11 +4,13 @@ package org.matsim.core.mobsim.qsim;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsPlugin;
 import org.matsim.core.mobsim.qsim.messagequeueengine.MessageQueuePlugin;
 import org.matsim.core.mobsim.qsim.pt.TransitEnginePlugin;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEnginePlugin;
+import org.matsim.pt.config.TransitConfigGroup;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -20,15 +22,15 @@ public class QSimModule extends AbstractModule {
 	}
 
 	@Provides
-	Collection<AbstractQSimPlugin> provideQSimPlugins(Config config) {
+	Collection<AbstractQSimPlugin> provideQSimPlugins(TransitConfigGroup transitConfigGroup, NetworkConfigGroup networkConfigGroup, Config config) {
 		final Collection<AbstractQSimPlugin> plugins = new ArrayList<>();
 		plugins.add(new MessageQueuePlugin(config));
 		plugins.add(new ActivityEnginePlugin(config));
 		plugins.add(new QNetsimEnginePlugin(config));
-		if (config.network().isTimeVariantNetwork()) {
+		if (networkConfigGroup.isTimeVariantNetwork()) {
 			plugins.add(new NetworkChangeEventsPlugin(config));
 		}
-		if (config.transit().isUseTransit()) {
+		if (transitConfigGroup.isUseTransit()) {
 			plugins.add(new TransitEnginePlugin(config));
 		}
 		plugins.add(new TeleportationPlugin(config));

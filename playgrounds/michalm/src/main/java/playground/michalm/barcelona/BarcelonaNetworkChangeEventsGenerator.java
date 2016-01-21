@@ -76,7 +76,7 @@ public class BarcelonaNetworkChangeEventsGenerator
         String changeEventsFile = dir + "network/barcelona_change_events.xml";
 
         Scenario scenario = ScenarioUtils.createScenario(VrpConfigUtils.createConfig());
-        new MatsimNetworkReader(scenario).readFile(networkFile);
+        new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
         BarcelonaNetworkChangeEventsGenerator gen = new BarcelonaNetworkChangeEventsGenerator(
                 scenario.getNetwork());
         gen.generateChangeEvents();

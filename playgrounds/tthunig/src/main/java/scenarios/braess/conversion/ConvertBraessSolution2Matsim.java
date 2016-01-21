@@ -97,7 +97,9 @@ public class ConvertBraessSolution2Matsim {
 				+ "signal_groups_" + currentCoord + "_" + basefilename + ".xml");
 		writer.setSignalControlOutputFilename(directoryPath + subdirectory
 				+ "signal_control_" + currentCoord + "_" + basefilename + ".xml");
-		writer.writeSignalsData(signalsData);
+		writer.writeSignalSystemsData(signalsData.getSignalSystemsData());
+		writer.writeSignalGroupsData(signalsData.getSignalGroupsData());
+		writer.writeSignalControlData(signalsData.getSignalControlData());
 	}
 
 	public static void main(String[] args) {

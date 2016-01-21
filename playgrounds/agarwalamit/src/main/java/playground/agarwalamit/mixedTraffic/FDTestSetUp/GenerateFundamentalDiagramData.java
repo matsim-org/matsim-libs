@@ -103,6 +103,8 @@ public class GenerateFundamentalDiagramData {
 	
 	public GenerateFundamentalDiagramData (final InputsForFDTestSetUp inputs){
 		this.inputs = inputs;
+		this.inputs.run();
+		scenario = this.inputs.getScenario();
 	}
 
 	public static void main(String[] args) {
@@ -115,15 +117,15 @@ public class GenerateFundamentalDiagramData {
 			
 			args = new String [8];
 			
-			String myDir = "../../../../repos/shared-svn/projects/mixedTraffic/triangularNetwork/run313/";
-			String outFolder ="/carBikeHolesPassing/";
+			String myDir = "../../../../repos/shared-svn/projects/mixedTraffic/triangularNetwork/run313/singleModes/holes/car_SW/";
+			String outFolder ="/car/";
 			
 			args[0] = myDir + outFolder ;
-			args[1] = "car,bike"; // travel (main) modes
-			args[2] = "1.0,1.0"; // modal split in pcu
-			args[3] = TrafficDynamics.withHoles.toString(); // isUsingHoles
-			args[4] = LinkDynamics.PassingQ.toString(); // isPassingAllowed
-			args[5] = "5"; // reduce number of data points by this factor
+			args[1] = "car"; // travel (main) modes
+			args[2] = "5.0"; // modal split in pcu
+			args[3] = TrafficDynamics.queue.toString(); // isUsingHoles
+			args[4] = LinkDynamics.FIFO.toString(); // isPassingAllowed
+			args[5] = "1"; // reduce number of data points by this factor
 			args[6] = "false"; // is plotting modal split distribution
 		}
 		
@@ -138,7 +140,7 @@ public class GenerateFundamentalDiagramData {
 		generateFDData.setReduceDataPointsByFactor(Integer.valueOf(args[5]));
 		generateFDData.setIsPlottingDistribution(Boolean.valueOf(args[6]));
 		generateFDData.setIsUsingLiveOTFVis(false);
-		generateFDData.setIsWritingEventsFileForEachIteration(true);
+		generateFDData.setIsWritingEventsFileForEachIteration(false);
 		generateFDData.run();
 	}
 
@@ -162,12 +164,9 @@ public class GenerateFundamentalDiagramData {
 
 	public void run(){
 		consistencyCheckAndInitialize();
-		inputs.run();
 		travelModes = inputs.getTravelModes();
 		modalSplitInPCU = inputs.getModalSplit();
 		if(isDumpingInputFiles) inputs.dumpInputFiles(runDir);
-		
-		scenario = inputs.getScenario();
 
 		mode2FlowData = inputs.getTravelMode2FlowDynamicsData();
 		flowUnstableWarnCount = new int [travelModes.length];
@@ -207,6 +206,10 @@ public class GenerateFundamentalDiagramData {
 		this.isDumpingInputFiles = isDumpingInputFiles;
 	}
 	
+	public Scenario getScenario() {
+		return scenario;
+	}
+
 	private void parametricRunAccordingToGivenModalSplit(){
 
 		//	Creating minimal configuration respecting modal split in PCU and integer agent numbers
@@ -462,7 +465,7 @@ public class GenerateFundamentalDiagramData {
 		LOG.info("Mobsim agents' are directly added to AgentSource.");
 		LOG.info("=======================");
 
-		if (sc.getConfig().network().isTimeVariantNetwork()) {
+		if (this.inputs.isTimeDependentNetwork()) {
 			qSim.addMobsimEngine(new NetworkChangeEventsEngine());		
 		}
 
@@ -477,12 +480,12 @@ public class GenerateFundamentalDiagramData {
 
 			@Override
 			public void insertAgentsIntoMobsim() {
-
+				
 				for ( Id<Person> personId : person2Mode.keySet()) {
 					String travelMode = person2Mode.get(personId);
 					double randDouble = MatsimRandom.getRandom().nextDouble();
-					double actEndTime = randDouble*900;
-
+					double actEndTime = randDouble*InputsForFDTestSetUp.MAX_ACT_END_TIME;
+					
 					MobsimAgent agent = new MySimplifiedRoundAndRoundAgent(personId, actEndTime, travelMode);
 					qSim.insertAgentIntoMobsim(agent);
 

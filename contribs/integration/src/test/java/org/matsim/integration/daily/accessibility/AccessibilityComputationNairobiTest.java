@@ -3,21 +3,15 @@ package org.matsim.integration.daily.accessibility;
 import static org.junit.Assert.assertNotNull;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
 import org.matsim.contrib.accessibility.FacilityTypes;
-import org.matsim.contrib.accessibility.GridBasedAccessibilityControlerListenerV3;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
-import org.matsim.contrib.accessibility.gis.GridUtils;
 import org.matsim.contrib.accessibility.utils.AccessibilityRunUtils;
 import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtRouterConfigGroup;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
@@ -28,32 +22,31 @@ import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspDefaultsCheckingLevel;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.replanning.DefaultPlanStrategiesModule;
+import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilities;
-import org.matsim.facilities.ActivityFacilitiesFactory;
-import org.matsim.facilities.ActivityFacilitiesFactoryImpl;
-import org.matsim.facilities.ActivityFacility;
-import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 public class AccessibilityComputationNairobiTest {
 	public static final Logger log = Logger.getLogger( AccessibilityComputationNairobiTest.class ) ;
 
-	private static final double cellSize = 1000.;
+	private static final Double cellSize = 10000.;
 
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
 
 
 	@Test
 	public void doAccessibilityTest() throws IOException {
-//		String folderStructure = "../../../"; // local on dz's computer
-		String folderStructure = "../../"; // server
-			
-		String networkFile = folderStructure + "matsimExamples/countries/ke/nairobi/network/2015-10-15_nairobi.xml";
-		String facilitiesFile = folderStructure + "matsimExamples/countries/ke/nairobi/facilities/facilities.xml";
+		// Input
+		String folderStructure = "../../";
+		String networkFile = "matsimExamples/countries/ke/nairobi/2015-10-15_network.xml";
+
+		// adapt folder structure that may be different on different machines, esp. on server
+		folderStructure = PathUtils.tryANumberOfFolderStructures(folderStructure, networkFile);
+
+		networkFile = folderStructure + networkFile ;
+		String facilitiesFile = folderStructure + "matsimExamples/countries/ke/nairobi/2015-10-15_facilities.xml";
+
 		
 		// minibus-pt
 //		String travelTimeMatrix = folderStructure + "matsimExamples/countries/za/nmbm/minibus-pt/JTLU_14i/travelTimeMatrix.csv.gz";
@@ -65,22 +58,22 @@ public class AccessibilityComputationNairobiTest {
 //		String travelDistanceMatrixFile = folderStructure + "matsimExamples/countries/za/nmb/regular-pt/travelDistanceMatrix_space.csv";
 //		String ptStopsFile = folderStructure + "matsimExamples/countries/za/nmb/regular-pt/ptStops.csv";
 		
-		
+
 		// Parameters
 		boolean createQGisOutput = false;
 		boolean includeDensityLayer = true;
-		String crs = "EPSG:21037"; // = Arc 1960 / UTM zone 37S, for Nairobi, Kenya
-		String name = "ke_nairobi_work_1000";
+		final String crs = "EPSG:21037"; // = Arc 1960 / UTM zone 37S, for Nairobi, Kenya
+		final String name = "ke_nairobi_" + cellSize.toString().split("\\.")[0];
 		
 		Double lowerBound = 2.;
 		Double upperBound = 5.5;
-		Integer range = 9;
+		Integer range = 9; // in the current implementation, this need always be 9
 		int symbolSize = 1010;
 		int populationThreshold = (int) (200 / (1000/cellSize * 1000/cellSize));
 
 		
 		// config and scenario
-		Config config = ConfigUtils.createConfig(new AccessibilityConfigGroup(), new MatrixBasedPtRouterConfigGroup());
+		final Config config = ConfigUtils.createConfig(new AccessibilityConfigGroup(), new MatrixBasedPtRouterConfigGroup());
 		config.network().setInputFile(networkFile);
 		config.facilities().setInputFile(facilitiesFile);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
@@ -103,7 +96,7 @@ public class AccessibilityComputationNairobiTest {
 		}
 		
 				
-		Scenario scenario = ScenarioUtils.loadScenario(config);
+		final Scenario scenario = ScenarioUtils.loadScenario(config);
 		
 		
 		BoundingBox boundingBox = BoundingBox.createBoundingBox(scenario.getNetwork());
@@ -121,7 +114,7 @@ public class AccessibilityComputationNairobiTest {
 
 		
 		// collect activity types
-		List<String> activityTypes = AccessibilityRunUtils.collectAllFacilityTypes(scenario);
+		final List<String> activityTypes = AccessibilityRunUtils.collectAllFacilityTypes(scenario);
 		log.warn( "found activity types: " + activityTypes );
 		// yyyy there is some problem with activity types: in some algorithms, only the first letter is interpreted, in some
 		// other algorithms, the whole string.  BEWARE!  This is not good software design and should be changed.  kai, feb'14
@@ -136,55 +129,13 @@ public class AccessibilityComputationNairobiTest {
 				AccessibilityRunUtils.createMeasuringPointsFromNetwork(scenario.getNetwork(), cellSize);
 		
 		double maximumAllowedDistance = 0.5 * cellSize;
-		ActivityFacilities networkDensityFacilities = AccessibilityRunUtils.createNetworkDensityFacilities(
+		final ActivityFacilities networkDensityFacilities = AccessibilityRunUtils.createNetworkDensityFacilities(
 				scenario.getNetwork(), measuringPoints, maximumAllowedDistance);		
-		
 
-		Map<String, ActivityFacilities> activityFacilitiesMap = new HashMap<String, ActivityFacilities>();
-		
-		
-		Controler controler = new Controler(scenario) ;
-
-		
-		// loop over activity types to add one GridBasedAccessibilityControlerListenerV3 for each combination
-		for ( String actType : activityTypes ) {
-//			if ( !actType.equals("w") ) {
-			if ( !actType.equals(FacilityTypes.WORK) ) {
-				log.error("skipping everything except work for debugging purposes; remove in production code. kai, feb'14") ;
-				continue ;
-			}
-
-			ActivityFacilities opportunities = AccessibilityRunUtils.collectActivityFacilitiesOfType(scenario, actType);
-
-			activityFacilitiesMap.put(actType, opportunities);
-
-			GridBasedAccessibilityControlerListenerV3 listener = 
-					new GridBasedAccessibilityControlerListenerV3(activityFacilitiesMap.get(actType), 
-							//ptMatrix, 
-							config, scenario.getNetwork());
-			listener.setComputingAccessibilityForMode(Modes4Accessibility.freeSpeed, true);
-			listener.setComputingAccessibilityForMode(Modes4Accessibility.car, true);
-			listener.setComputingAccessibilityForMode(Modes4Accessibility.walk, true);
-			listener.setComputingAccessibilityForMode(Modes4Accessibility.bike, true);
-//			listener.setComputingAccessibilityForMode(Modes4Accessibility.pt, true);
-			
-			listener.addAdditionalFacilityData(networkDensityFacilities);
-			listener.generateGridsAndMeasuringPointsByNetwork(cellSize);
-
-			
-			listener.writeToSubdirectoryWithName(actType);
-			
-			// for push to geoserver
-			listener.addSpatialGridDataExchangeListener(new GeoserverUpdater(crs, name));
-			
-			listener.setUrbansimMode(false); // avoid writing some (eventually: all) files that related to matsim4urbansim
-
-			controler.addControlerListener(listener);
-		}
-
+		final Controler controler = new Controler(scenario) ;
+		controler.addOverridingModule(new AccessibilityComputationTestModule(activityTypes, networkDensityFacilities, crs, name, cellSize));
 		controler.run();
 
-		
 		if (createQGisOutput == true) {
 			String osName = System.getProperty("os.name");
 			String workingDirectory = config.controler().getOutputDirectory();
@@ -193,8 +144,8 @@ public class AccessibilityComputationNairobiTest {
 				String actSpecificWorkingDirectory = workingDirectory + actType + "/";
 
 				for ( Modes4Accessibility mode : Modes4Accessibility.values()) {
-//					if ( !actType.equals("w") ) {
-					if ( !actType.equals(FacilityTypes.WORK) ) {
+//					if (!actType.equals("w")) {
+					if (!actType.equals(FacilityTypes.WORK)) {
 						log.error("skipping everything except work for debugging purposes; remove in production code. kai, feb'14") ;
 						continue ;
 					}
@@ -205,4 +156,5 @@ public class AccessibilityComputationNairobiTest {
 			}  
 		}
 	}
+
 }

@@ -95,7 +95,7 @@ public class AssignGroceryShop {
 		new FacilitiesReaderMatsimV1(this.scenario).readFile(facilitiesfilePath);
 
 		log.info("reading the network ...");
-		new MatsimNetworkReader(this.scenario).readFile(networkfilePath);
+		new MatsimNetworkReader(this.scenario.getNetwork()).readFile(networkfilePath);
 
 		log.info("  reading file " + plansfilePath);
 		final PopulationReader plansReader = new MatsimPopulationReader(this.scenario);

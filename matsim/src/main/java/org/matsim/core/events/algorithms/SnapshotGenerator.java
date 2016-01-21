@@ -32,17 +32,20 @@ import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
-import org.matsim.api.core.v01.events.Wait2LinkEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
-import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.MobsimConfigGroupI;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
@@ -53,7 +56,7 @@ import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 import org.matsim.vis.snapshotwriters.SnapshotWriter;
 
 public class SnapshotGenerator implements PersonDepartureEventHandler, PersonArrivalEventHandler, LinkEnterEventHandler,
-		LinkLeaveEventHandler, Wait2LinkEventHandler, PersonStuckEventHandler {
+		LinkLeaveEventHandler, VehicleEntersTrafficEventHandler, PersonStuckEventHandler, VehicleLeavesTrafficEventHandler {
 
 	private final static Logger log = Logger.getLogger(SnapshotGenerator.class);
 	private final Network network;
@@ -68,8 +71,10 @@ public class SnapshotGenerator implements PersonDepartureEventHandler, PersonArr
 	private final SnapshotStyle snapshotStyle;
 	private double skipUntil = 0.0;
 	private final SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
-  private final AgentSnapshotInfoFactory snapshotInfoFactory = new AgentSnapshotInfoFactory(linkWidthCalculator);
-
+	private final AgentSnapshotInfoFactory snapshotInfoFactory = new AgentSnapshotInfoFactory(linkWidthCalculator);
+	
+	private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
+	
 	public SnapshotGenerator(final Network network, final double snapshotPeriod, final MobsimConfigGroupI config) {
 		this.network = network;
 		int initialCapacity = (int)(network.getLinks().size()*1.1);
@@ -80,6 +85,10 @@ public class SnapshotGenerator implements PersonDepartureEventHandler, PersonArr
 		this.capCorrectionFactor = config.getFlowCapFactor() / network.getCapacityPeriod();
 		this.storageCapFactor = config.getStorageCapFactor();
 		this.snapshotStyle = config.getSnapshotStyle();
+		
+		if (config instanceof QSimConfigGroup  && ! Double.isNaN( ((QSimConfigGroup) config ).getLinkWidthForVis() )  ){
+			this.linkWidthCalculator.setLinkWidthForVis( ((QSimConfigGroup) config ).getLinkWidthForVis() );
+		} 
 		if (! Double.isNaN(network.getEffectiveLaneWidth())){
 			this.linkWidthCalculator.setLaneWidth(network.getEffectiveLaneWidth());
 		}
@@ -110,19 +119,21 @@ public class SnapshotGenerator implements PersonDepartureEventHandler, PersonArr
 	@Override
 	public void handleEvent(final LinkEnterEvent event) {
 		testForSnapshot(event.getTime());
-		this.eventLinks.get(event.getLinkId()).enter(getEventAgent(event.getDriverId(), event.getTime()));
+		this.eventLinks.get(event.getLinkId()).enter(getEventAgent(delegate.getDriverOfVehicle(event.getVehicleId()), event.getTime()));
 	}
 
 	@Override
 	public void handleEvent(final LinkLeaveEvent event) {
 		testForSnapshot(event.getTime());
-		this.eventLinks.get(event.getLinkId()).leave(getEventAgent(event.getDriverId(), event.getTime()));
+		this.eventLinks.get(event.getLinkId()).leave(getEventAgent(delegate.getDriverOfVehicle(event.getVehicleId()), event.getTime()));
 	}
 
 	@Override
-	public void handleEvent(final Wait2LinkEvent event) {
+	public void handleEvent(final VehicleEntersTrafficEvent event) {
 		testForSnapshot(event.getTime());
 		this.eventLinks.get(event.getLinkId()).wait2link(getEventAgent(event.getPersonId(), event.getTime()));
+		
+		delegate.handleEvent(event);
 	}
 
 	@Override
@@ -149,6 +160,8 @@ public class SnapshotGenerator implements PersonDepartureEventHandler, PersonArr
 		this.linkList.addAll(eventLinks.values());
 		this.eventAgents.clear();
 		this.lastSnapshotIndex = -1;
+		
+		delegate.reset(iteration);
 	}
 
 	private EventAgent getEventAgent(final Id<Person> id, double time) {
@@ -245,7 +258,7 @@ public class SnapshotGenerator implements PersonDepartureEventHandler, PersonArr
 			this.waitingQueue = new ArrayList<EventAgent>();
 			this.buffer = new ArrayList<EventAgent>();
 			this.euklideanDist = CoordUtils.calcDistance(link2.getFromNode().getCoord(), link2.getToNode().getCoord());
-			this.freespeedTravelTime = this.link.getLength() / this.link.getFreespeed();
+			this.freespeedTravelTime = Math.ceil( this.link.getLength() / this.link.getFreespeed() ) + 1; 
 			this.timeCap = this.link.getCapacity() * capCorrectionFactor;
 			this.storageCapFactor = storageCapFactor;
 			this.inverseTimeCap = 1.0 / this.timeCap;
@@ -504,6 +517,11 @@ public class SnapshotGenerator implements PersonDepartureEventHandler, PersonArr
 			return this.id.hashCode();
 		}
 
+	}
+
+	@Override
+	public void handleEvent(VehicleLeavesTrafficEvent event) {
+		delegate.handleEvent(event);
 	}
 
 

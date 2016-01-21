@@ -96,7 +96,7 @@ public class RemoveLongTrips {
 			}
 			ProgressLogger.step();
 		}
-		ProgressLogger.termiante();
+		ProgressLogger.terminate();
 		
 		logger.info(String.format("Removing %s persons.", remove.size()));
 		

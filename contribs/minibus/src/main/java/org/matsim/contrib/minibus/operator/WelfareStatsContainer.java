@@ -38,7 +38,7 @@ public class WelfareStatsContainer {
 		this.operatorRevenues = 0.;
 		this.operatorCosts = 0.;
 		
-		this.collectWelfareInformation(operators, event.getControler().getScenario().getPopulation());
+		this.collectWelfareInformation(operators, event.getServices().getScenario().getPopulation());
 		this.writeResults(event);
 		
 	}
@@ -96,11 +96,11 @@ public class WelfareStatsContainer {
 		
 		if(this.firstTime){
 			
-			 writer = IOUtils.getBufferedWriter(event.getControler().getControlerIO().getOutputPath() + "/welfareStats.txt");
+			 writer = IOUtils.getBufferedWriter(event.getServices().getControlerIO().getOutputPath() + "/welfareStats.txt");
 			
 		} else{
 			
-			writer = IOUtils.getAppendingBufferedWriter(event.getControler().getControlerIO().getOutputPath() + "/welfareStats.txt");
+			writer = IOUtils.getAppendingBufferedWriter(event.getServices().getControlerIO().getOutputPath() + "/welfareStats.txt");
 			
 		}
 		

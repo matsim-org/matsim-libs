@@ -34,7 +34,7 @@ public class ConvertNetworkToESRIFile{
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
-		new MatsimNetworkReader(scenario).readFile(NetworkFile);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(NetworkFile);
 		
 		FeatureGeneratorBuilderImpl builder = new FeatureGeneratorBuilderImpl(network, System);
 		builder.setFeatureGeneratorPrototype(LineStringBasedFeatureGenerator.class);

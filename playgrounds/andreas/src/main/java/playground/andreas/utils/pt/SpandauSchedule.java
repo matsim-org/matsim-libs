@@ -66,7 +66,7 @@ public class SpandauSchedule {
 
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario).readFile(NETWORKFILE);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(NETWORKFILE);
 		new TransitScheduleReaderV1(baseCaseTransitSchedule, network).readFile(SCHEDULEFILE);
 	
 		TransitSchedule noSpandauTransitSchedule = TransitLineRemover.removeTransitLinesFromTransitSchedule(baseCaseTransitSchedule, linesToRemove);

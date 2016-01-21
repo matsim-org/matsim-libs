@@ -16,12 +16,17 @@ import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.FacilitiesReaderMatsimV1;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * If an activity has no facility assigned, the closest facility offering this activity will be assigned.
  *
  * @author boescpa
  */
 public class FacilityAdder {
+
+    private static Map<Coord, Map<String, ActivityFacility>> cache = new HashMap<>();
 
     public static void main(final String[] args) {
         final String pathToInputPopulation = args[0];
@@ -70,9 +75,12 @@ public class FacilityAdder {
     }
 
     private static ActivityFacility getClosestFacility(Coord actCoord, String actType, ActivityFacilities facilities) {
-        double distanceToSelectedFacility = Double.MAX_VALUE;
-        ActivityFacility selectedFacility = null;
+		if (cache.containsKey(actCoord) && cache.get(actCoord).containsKey(actType)) {
+			return cache.get(actCoord).get(actType);
+		}
 
+		ActivityFacility selectedFacility = null;
+		double distanceToSelectedFacility = Double.MAX_VALUE;
         for (ActivityFacility facility : facilities.getFacilities().values()) {
             if (facility.getActivityOptions().containsKey(actType)) {
                 double distanceToCurrentFacility = CoordUtils.calcDistance(actCoord, facility.getCoord());
@@ -80,12 +88,18 @@ public class FacilityAdder {
                     distanceToSelectedFacility = distanceToCurrentFacility;
                     selectedFacility = facility;
                     if (distanceToSelectedFacility < 1000) {
-                        break;
+						break;
                     }
                 }
             }
         }
-
+		if (cache.containsKey(actCoord)) {
+			cache.get(actCoord).put(actType, selectedFacility);
+		} else {
+			Map<String, ActivityFacility> cacheEntry = new HashMap<>();
+			cacheEntry.put(actType, selectedFacility);
+			cache.put(actCoord, cacheEntry);
+		}
         return selectedFacility;
     }
 

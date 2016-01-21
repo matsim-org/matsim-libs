@@ -20,6 +20,8 @@
 
 package playground.sergioo.typesPopulation2013.replanning;
 
+import com.google.inject.Key;
+import com.google.inject.TypeLiteral;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -27,9 +29,9 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.replanning.DefaultPlanStrategiesModule;
-import org.matsim.core.replanning.DefaultPlanStrategiesModule.DefaultSelector;
+import org.matsim.core.controler.MatsimServices;
+import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
+import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultSelector;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.modules.ExternalModule;
@@ -39,6 +41,7 @@ import playground.sergioo.typesPopulation2013.config.groups.StrategyPopsConfigGr
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Map;
 
 /**
  * Loads the strategy modules specified in the config-file. This class offers
@@ -55,7 +58,7 @@ public final class StrategyManagerPopsConfigLoader {
 
 	private static int externalCounter = 0;
 
-	public static void load(final Controler controler, final StrategyManagerPops manager) {
+	public static void load(final MatsimServices controler, final StrategyManagerPops manager) {
 		Config config = controler.getConfig();
 		StrategyPopsConfigGroup strategyPops = (StrategyPopsConfigGroup) config.getModule(StrategyPopsConfigGroup.GROUP_NAME);
 		for(String populationId:strategyPops.getPopulationIds()) {
@@ -142,7 +145,7 @@ public final class StrategyManagerPopsConfigLoader {
 		}
 	}
 
-	private static PlanStrategy loadStrategy(final Controler controler, final String name, final StrategySettings settings) {
+	private static PlanStrategy loadStrategy(final MatsimServices controler, final String name, final StrategySettings settings) {
 		// Special cases, scheduled to go away.
 		if (name.equals(LOCATION_CHOICE)) {
 			PlanStrategy strategy = tryToLoadPlanStrategyByName(controler, "org.matsim.contrib.locationchoice.LocationChoicePlanStrategy");
@@ -158,13 +161,16 @@ public final class StrategyManagerPopsConfigLoader {
 			PlanStrategy strategy = tryToLoadPlanStrategyByName(controler, name);
 			return strategy;
 		} else {
-			PlanStrategy strategy = controler.getInjector().getPlanStrategies().get(name);
+			PlanStrategy strategy = controler.getInjector().getInstance(Key.get(
+					new TypeLiteral<Map<String, PlanStrategy>>() {
+					}
+			)).get(name);
 			return strategy;
 		} 
 	} 
 
 
-	private static PlanStrategy tryToLoadPlanStrategyByName(final Controler controler, final String name) {
+	private static PlanStrategy tryToLoadPlanStrategyByName(final MatsimServices controler, final String name) {
 		PlanStrategy strategy;
 		//classes loaded by name must not be part of the matsim core
 		if (name.startsWith("org.matsim.") && !name.startsWith("org.matsim.contrib.")) {

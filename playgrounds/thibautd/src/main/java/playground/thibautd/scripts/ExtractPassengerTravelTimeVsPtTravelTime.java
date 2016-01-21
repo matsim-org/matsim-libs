@@ -63,7 +63,7 @@ public class ExtractPassengerTravelTimeVsPtTravelTime {
 		String outFile = args[ 2 ];
 
 		Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
-		(new MatsimNetworkReader( scenario )).readFile( networkFile );
+		(new MatsimNetworkReader(scenario.getNetwork())).readFile( networkFile );
 		Handler handler = new Handler( scenario.getNetwork() , outFile );
 		EventsManager manager = EventsUtils.createEventsManager();
 		manager.addHandler( handler );

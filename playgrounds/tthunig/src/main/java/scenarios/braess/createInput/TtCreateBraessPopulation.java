@@ -46,7 +46,7 @@ import org.matsim.core.population.routes.LinkNetworkRouteImpl;
  * 
  * @author tthunig
  */
-public class TtCreateBraessPopulation {
+public final class TtCreateBraessPopulation {
 
 	public enum InitRoutes{
 		ALL, ONLY_MIDDLE, ONLY_OUTER, NONE
@@ -55,7 +55,8 @@ public class TtCreateBraessPopulation {
 	private Population population;
 	private Network network;
 	
-	private int numberOfPersons;
+	private int numberOfPersons; // per hour
+	private int simulationPeriod = 1; // in hours. default is one hour.
 	
 	private boolean simulateInflowCap23 = false;
 	private boolean simulateInflowCap24 = false;
@@ -95,7 +96,7 @@ public class TtCreateBraessPopulation {
 	 * persons travel from the left to the right through the network as in
 	 * Braess's original paradox.
 	 * 
-	 * All agents start uniformly distributed between 8 and 9 am.
+	 * All agents start uniformly distributed between 8 and (8 + simulationPeriod) am.
 	 * 
 	 * If initRouteSpecification is NONE, all agents are initialized with no initial
 	 * routes. 
@@ -121,7 +122,7 @@ public class TtCreateBraessPopulation {
 					+ "with an initial middle route, although no middle link exists.");
 		}
 		
-		for (int i = 0; i < this.numberOfPersons; i++) {
+		for (int i = 0; i < this.numberOfPersons * this.simulationPeriod; i++) {
 
 			// create a person
 			Person person = population.getFactory().createPerson(
@@ -130,26 +131,38 @@ public class TtCreateBraessPopulation {
 			// create a start activity at link 0_1
 			Activity startAct = population.getFactory()
 					.createActivityFromLinkId("dummy", Id.createLinkId("0_1"));
-			// distribute agents uniformly between 8 and 9 am.
-			startAct.setEndTime(8 * 3600 + (double)(i)/numberOfPersons * 3600);
+			// distribute agents uniformly between 8 and (8 + simulationPeriod) am.
+			startAct.setEndTime(8 * 3600 + (double)(i)/(numberOfPersons * simulationPeriod) * simulationPeriod * 3600);
 		
 			// create a drain activity at link 5_6
 			Activity drainAct = population.getFactory().createActivityFromLinkId(
 					"dummy", Id.createLinkId("5_6"));
 			
-			// create a leg with or without a route
+			// create a dummy leg
 			Leg leg1 = population.getFactory().createLeg(TransportMode.car);
-			if (this.middleLinkExists && 
-					(initRouteSpecification.equals(InitRoutes.ONLY_MIDDLE)
-							|| initRouteSpecification.equals(InitRoutes.ALL))) {
-				
+			// fill the leg if necessary
+			switch (initRouteSpecification){
+			case ONLY_MIDDLE:
+			case ALL:
 				leg1 = createMiddleLeg();
+				break;
+			case ONLY_OUTER:
+				leg1 = createUpperLeg();
+				break;
+			default:
+				break;
 			}
 			
-			// create a first plan for the person
+			// create a plan for the person that contains all this information
 			Plan plan1 = createPlan(startAct, leg1, drainAct, initPlanScore);
 			// store information in population
 			person.addPlan(plan1);
+			
+			// select plan1 for every second person (with odd id) if only outer routes are initialized
+			if (initRouteSpecification.equals(InitRoutes.ONLY_OUTER) && (i % 2 == 1)){
+				person.setSelectedPlan(plan1);
+			}
+			
 			population.addPerson(person);
 
 			// create further plans if different routes should be initialized
@@ -158,7 +171,7 @@ public class TtCreateBraessPopulation {
 				
 				// create a second plan for the person (with the same start and
 				// end activity but a different leg)
-				Leg leg2 = createUpperLeg();
+				Leg leg2 = createLowerLeg();
 				Plan plan2 = createPlan(startAct, leg2, drainAct, initPlanScore);	
 				person.addPlan(plan2);
 				
@@ -167,16 +180,19 @@ public class TtCreateBraessPopulation {
 					person.setSelectedPlan(plan2);
 				}
 
-				// create a third plan for the person (with the same start and
-				// end activity but a different leg)
-				Leg leg3 = createLowerLeg();
-				Plan plan3 = createPlan(startAct, leg3, drainAct, initPlanScore);
-				person.addPlan(plan3);
+				if (initRouteSpecification.equals(InitRoutes.ALL)) {
+					// create a third plan for the person (with the same start
+					// and
+					// end activity but a different leg)
+					Leg leg3 = createUpperLeg();
+					Plan plan3 = createPlan(startAct, leg3, drainAct, initPlanScore);
+					person.addPlan(plan3);
 
-				// select plan3 for every second person (with odd id)
-				if (i % 2 == 1) {
-					person.setSelectedPlan(plan3);
-				}				
+					// select plan3 for every second person (with odd id)
+					if (i % 2 == 1) {
+						person.setSelectedPlan(plan3);
+					}
+				}
 			}
 		}
 		
@@ -293,6 +309,10 @@ public class TtCreateBraessPopulation {
 
 	public void writePopulation(String file) {
 		new PopulationWriter(population).write(file);
+	}
+
+	public void setSimulationPeriod(int simulationPeriod) {
+		this.simulationPeriod = simulationPeriod;
 	}
 
 }

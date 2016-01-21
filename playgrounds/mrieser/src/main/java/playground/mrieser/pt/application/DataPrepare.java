@@ -140,8 +140,8 @@ public class DataPrepare {
 		Network transitNetwork = transitScenario.getNetwork();
 		MutableScenario streetScenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network streetNetwork = streetScenario.getNetwork();
-		new MatsimNetworkReader(transitScenario).parse(TRANSIT_NETWORK_FILE);
-		new MatsimNetworkReader(streetScenario).parse(NETWORK_FILE);
+		new MatsimNetworkReader(transitScenario.getNetwork()).parse(TRANSIT_NETWORK_FILE);
+		new MatsimNetworkReader(streetScenario.getNetwork()).parse(NETWORK_FILE);
 		MergeNetworks.merge(streetNetwork, "", transitNetwork, "", (NetworkImpl) this.scenario.getNetwork());
 		new NetworkWriter(this.scenario.getNetwork()).write(MULTIMODAL_NETWORK_FILE);
 	}

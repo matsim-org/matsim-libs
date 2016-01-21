@@ -70,7 +70,7 @@ public class TaxiVehicleCreator
 	public TaxiVehicleCreator() {
 				
 		this.scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenario).readFile(networkFile);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
 		this.geometry = ScenarioPreparator.readShapeFileAndExtractGeometry(shapeFile);	
 	}
 	private void run(int amount) {

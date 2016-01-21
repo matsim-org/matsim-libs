@@ -27,7 +27,7 @@ import org.matsim.contrib.dvrp.data.Request;
 import com.google.common.collect.Iterables;
 
 import playground.michalm.taxi.data.TaxiRequest;
-import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration;
+import playground.michalm.taxi.optimizer.TaxiOptimizerContext;
 
 
 class MIPRequestData
@@ -37,7 +37,7 @@ class MIPRequestData
     final int dimension;
 
 
-    MIPRequestData(TaxiOptimizerConfiguration optimConfig, SortedSet<TaxiRequest> unplannedRequests,
+    MIPRequestData(TaxiOptimizerContext optimContext, SortedSet<TaxiRequest> unplannedRequests,
             int planningHorizon)
     {
         dimension = Math.min(planningHorizon, unplannedRequests.size());

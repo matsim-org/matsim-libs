@@ -28,6 +28,8 @@ import org.matsim.core.api.internal.HasPersonId;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 /**
+ * Event thrown when agent is added to stop, i.e. starts waiting.
+ * 
  * @author mrieser / senozon
  */
 public final class AgentWaitingForPtEvent extends Event implements HasPersonId {

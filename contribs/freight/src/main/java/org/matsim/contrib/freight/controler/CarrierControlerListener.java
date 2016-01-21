@@ -28,7 +28,14 @@
 
 package org.matsim.contrib.freight.controler;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Map;
+
+import javax.inject.Inject;
+
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierPlan;
@@ -36,15 +43,22 @@ import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.mobsim.CarrierAgentTracker;
 import org.matsim.contrib.freight.replanning.CarrierPlanStrategyManagerFactory;
 import org.matsim.contrib.freight.scoring.CarrierScoringFunctionFactory;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.events.*;
-import org.matsim.core.controler.listener.*;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.controler.events.AfterMobsimEvent;
+import org.matsim.core.controler.events.BeforeMobsimEvent;
+import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.events.ReplanningEvent;
+import org.matsim.core.controler.events.ScoringEvent;
+import org.matsim.core.controler.events.ShutdownEvent;
+import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.AfterMobsimListener;
+import org.matsim.core.controler.listener.BeforeMobsimListener;
+import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.controler.listener.ReplanningListener;
+import org.matsim.core.controler.listener.ScoringListener;
+import org.matsim.core.controler.listener.ShutdownListener;
+import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.replanning.GenericStrategyManager;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Map;
-
 /**
  * Controls the workflow of the simulation.
  * <p/>
@@ -56,8 +70,8 @@ import java.util.Map;
  * @author sschroeder, mzilske
  */
 
-class CarrierControlerListener implements StartupListener, ShutdownListener, BeforeMobsimListener, AfterMobsimListener, ScoringListener,
-        ReplanningListener, IterationEndsListener {
+class CarrierControlerListener implements BeforeMobsimListener, AfterMobsimListener, ScoringListener,
+        ReplanningListener {
 
     private CarrierScoringFunctionFactory carrierScoringFunctionFactory;
 
@@ -67,35 +81,32 @@ class CarrierControlerListener implements StartupListener, ShutdownListener, Bef
 
     private Carriers carriers;
 
+    @Inject EventsManager eventsManager;
+    @Inject Network network;
 
     /**
      * Constructs a controller with a set of carriers, re-planning capabilities and scoring-functions.
      */
+    @Inject
     CarrierControlerListener(Carriers carriers, CarrierPlanStrategyManagerFactory strategyManagerFactory, CarrierScoringFunctionFactory scoringFunctionFactory) {
         this.carriers = carriers;
         this.carrierPlanStrategyManagerFactory = strategyManagerFactory;
         this.carrierScoringFunctionFactory = scoringFunctionFactory;
     }
 
-    public Map<Id, Carrier> getCarriers() {
+    public Map<Id<Carrier>, Carrier> getCarriers() {
         return carriers.getCarriers();
     }
 
     @Override
-    public void notifyStartup(StartupEvent event) {
-    }
-
-    @Override
     public void notifyBeforeMobsim(BeforeMobsimEvent event) {
-        Controler controler = event.getControler();
-        carrierAgentTracker = new CarrierAgentTracker(carriers, event.getControler().getScenario().getNetwork(), carrierScoringFunctionFactory);
-        controler.getEvents().addHandler(carrierAgentTracker);
+        carrierAgentTracker = new CarrierAgentTracker(carriers, network, carrierScoringFunctionFactory);
+        eventsManager.addHandler(carrierAgentTracker);
     }
 
     @Override
     public void notifyAfterMobsim(AfterMobsimEvent event) {
-        Controler controler = event.getControler();
-        controler.getEvents().removeHandler(carrierAgentTracker);
+        eventsManager.removeHandler(carrierAgentTracker);
     }
 
     @Override
@@ -118,16 +129,6 @@ class CarrierControlerListener implements StartupListener, ShutdownListener, Bef
             collection.add(carrier);
         }
         strategyManager.run(collection, null, event.getIteration(), event.getReplanningContext());
-    }
-
-    @Override
-    public void notifyIterationEnds(IterationEndsEvent event) {
-
-    }
-
-    @Override
-    public void notifyShutdown(ShutdownEvent event) {
-
     }
 
 }

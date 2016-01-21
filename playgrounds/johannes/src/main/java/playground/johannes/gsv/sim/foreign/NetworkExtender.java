@@ -86,7 +86,7 @@ public class NetworkExtender {
 			}
 			ProgressLogger.step();
 		}
-		ProgressLogger.termiante();
+		ProgressLogger.terminate();
 		return links;
 	}
 
@@ -251,7 +251,7 @@ public class NetworkExtender {
 		Scenario scenario = ScenarioUtils.createScenario(config);
 
 		logger.info("Loading network...");
-		MatsimNetworkReader netReader = new MatsimNetworkReader(scenario);
+		MatsimNetworkReader netReader = new MatsimNetworkReader(scenario.getNetwork());
 		netReader.readFile(netFile);
 
 		logger.info("Loading facilities....");
@@ -295,7 +295,7 @@ public class NetworkExtender {
 			connectZone(p, nodes, scenario.getNetwork(), scenario.getActivityFacilities(), zone.getAttribute("NO"));
 			ProgressLogger.step();
 		}
-		ProgressLogger.termiante();
+		ProgressLogger.terminate();
 
 		logger.info("Writing network...");
 		NetworkWriter netWriter = new NetworkWriter(scenario.getNetwork());

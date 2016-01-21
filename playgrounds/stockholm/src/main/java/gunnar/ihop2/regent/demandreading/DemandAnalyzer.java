@@ -112,7 +112,7 @@ public class DemandAnalyzer {
 
 	public static void main(String[] args) {
 
-		run("./test/regentmatsim/exchange/trips.xml");
+		run("./ihop2-data/demand-input/trips.xml");
 
 	}
 

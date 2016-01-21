@@ -30,7 +30,7 @@ public class RenameLoopLinks {
 		String outputNetworkFile = args[3];
 		
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenario).readFile(networkFile);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
 		Network baseNetwork = scenario.getNetwork();
 		
 		new TransitScheduleReaderV1(scenario).readFile(scheduleFile);

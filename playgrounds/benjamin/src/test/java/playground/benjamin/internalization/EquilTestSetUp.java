@@ -96,7 +96,7 @@ public class EquilTestSetUp {
 		
 		StrategyConfigGroup scg  = config.strategy();
 
-		StrategySettings strategySettings = new StrategySettings(Id.create("1", StrategySettings.class));
+		StrategySettings strategySettings = new StrategySettings();
 		strategySettings.setStrategyName("ChangeExpBeta");
 		strategySettings.setWeight(1);
 		scg.addStrategySettings(strategySettings);

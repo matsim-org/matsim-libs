@@ -29,49 +29,48 @@ import com.vividsolutions.jts.geom.Point;
  */
 public class TripAnalyzer {
 	public static void main(String[] args) {
-	    // Parameters
-		Integer planningAreaId = 11000000;
-		
-		boolean onlyCar = false; //car; new, should be used for runs with ChangeLedModes enabled
-		
-		boolean onlyInterior = false; // int
-		boolean onlyBerlinBased = true; // ber; usually varied for analysis
-		
-		boolean distanceFilter = true; // dist; usually varied for analysis
-		//double minDistance = 0;
-		double maxDistance = 100;
-		
-		boolean onlyWorkTrips = false; // NEW
-				
-		// --------------------------------------------------------------------------------------------------
-		boolean ageFilter = false;
-		Integer minAge = 80;
-		Integer maxAge = 119;	
-		// --------------------------------------------------------------------------------------------------
-		
+	    
+		// Parameters
 		String runId = "run_168a";
 //		String runId = "run791";
 		String usedIteration = "300"; // most frequently used value: 150
 //		String usedIteration = "600";
-	    
-	    int maxBinDuration = 120;
+		
+		// TODO why was that necessary?
+		Integer planningAreaId = 11000000;
+		
+		boolean onlyCar = false; // "car"; new, should be used for runs with ChangeLedModes enabled
+		
+		boolean onlyInterior = false; // "int"
+		
+		boolean onlyBerlinBased = true; // "ber"; usually varied for analysis
+		
+		boolean distanceFilter = true; // "dist"; usually varied for analysis
+		//double minDistance = 0;
+		double maxDistance = 100;
+		
+		boolean onlyWorkTrips = false; // "work"
+				
+		boolean ageFilter = false; // "age"
+		Integer minAge = 80;
+		Integer maxAge = 119;	
+		
+		int maxBinDuration = 120;
 	    int binWidthDuration = 1;
-	    //int binWidthDuration = 5;
 	    
 	    int maxBinTime = 23;
 	    int binWidthTime = 1;
 	    
 	    int maxBinDistance = 60;
 	    int binWidthDistance = 1;
-	    //int binWidthDistance = 5;
 	    	    
 	    int maxBinSpeed = 60;
 	    int binWidthSpeed = 1;
-	    //int binWidthSpeed = 5;
 	    
 	    
 	    // Input and output files
-	    String networkFile = "/Users/dominik/Workspace/shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml";
+//	    String networkFile = "/Users/dominik/Workspace/shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml";
+	    String networkFile = "../../../../Workspace/shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml";
 //	    String networkFile = "D:/Workspace/shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml";
 //	    String networkFile = "D:/Workspace/runs-svn/"  + runId + "/counts_network_merged.xml_cl.xml.gz";
 	    
@@ -80,36 +79,44 @@ public class TripAnalyzer {
 //	    		+ runId + "." + usedIteration + ".events.txt.gz";
 //	    String eventsFile = "D:/Workspace/runs-svn/cemdapMatsimCadyts/" + runId + "/ITERS/it." + usedIteration + "/" 
 //				+ runId + "." + usedIteration + ".events.xml.gz";
-	    String eventsFile = "/Users/dominik/Workspace/runs-svn/cemdapMatsimCadyts/" + runId + "/ITERS/it." + usedIteration + "/" 
+	    String eventsFile = "../../../../Workspace/runs-svn/cemdapMatsimCadyts/" + runId + "/ITERS/it." + usedIteration + "/" 
+//	    String eventsFile = "/Users/dominik/Workspace/runs-svn/cemdapMatsimCadyts/" + runId + "/ITERS/it." + usedIteration + "/" 
 				+ runId + "." + usedIteration + ".events.xml.gz";
 
 //	    String cemdapPersonFile = "D:/Workspace/data/cemdapMatsimCadyts/input/cemdap_berlin/19/persons1.dat"; // wrong!!!
 //	    String cemdapPersonFile = "D:/Workspace/data/cemdapMatsimCadyts/input/cemdap_berlin/18/persons1.dat";
 //	    String cemdapPersonFile = "D:/Workspace/data/cemdapMatsimCadyts/input/cemdap_berlin/21/persons1.dat";
-	    String cemdapPersonFile = "/Users/dominik/Workspace/data/cemdapMatsimCadyts/input/cemdap_berlin/21/persons1.dat";
+	    
+//	    String cemdapPersonFile = "../../../../Workspace/data/cemdapMatsimCadyts/input/cemdap_berlin/21/persons1.dat";
+	    String cemdapPersonFile = "../../../../Workspace/shared-svn/projects/cemdapMatsimCadyts/scenario/cemdap_berlin/21/persons1.dat";
+	    
+//	    String cemdapPersonFile = "/Users/dominik/Workspace/data/cemdapMatsimCadyts/input/cemdap_berlin/21/persons1.dat";
 	    
 	    //String outputDirectory = "D:/Workspace/data/cemdapMatsimCadyts/output/" + runId + "/analysis";
 //	    String outputDirectory = "D:/Workspace/runs-svn/cemdapMatsimCadyts/" + runId + "/analysis";
-	    String outputDirectory = "/Users/dominik/Workspace/runs-svn/cemdapMatsimCadyts/" + runId + "/analysis";
+	    String outputDirectory = "../../../../Workspace/runs-svn/cemdapMatsimCadyts/" + runId + "/analysis";
+//	    String outputDirectory = "/Users/dominik/Workspace/runs-svn/cemdapMatsimCadyts/" + runId + "/analysis";
 //	    String outputDirectory = "D:/Workspace/runs-svn/other/" + runId + "/analysis";
 	    
 //	    String shapeFileBerlin = "D:/Workspace/data/cemdapMatsimCadyts/input/shapefiles/Berlin_DHDN_GK4.shp";
-	    String shapeFileBerlin = "/Users/dominik/Workspace/data/cemdapMatsimCadyts/input/shapefiles/Berlin_DHDN_GK4.shp";
+	    
+//	    String shapeFileBerlin = "../../../../Workspace/data/cemdapMatsimCadyts/input/shapefiles/Berlin_DHDN_GK4.shp";
+	    String shapeFileBerlin = "../../../../Workspace/shared-svn/projects/cemdapMatsimCadyts/scenario/shapefiles/Berlin_DHDN_GK4.shp";
+	    
+//	    String shapeFileBerlin = "/Users/dominik/Workspace/data/cemdapMatsimCadyts/input/shapefiles/Berlin_DHDN_GK4.shp";
 	    Map<Integer, Geometry> zoneGeometries = ShapeReader.read(shapeFileBerlin, "NR");
 	    Geometry berlinGeometry = zoneGeometries.get(planningAreaId);
 	    
 	       
-	    // Output naming
-	    Integer usedIt = Integer.parseInt(usedIteration);
-	    if (!usedIt.equals(150)) {
+	    // Systematic output naming
+	    Integer iteration4Analysis = Integer.parseInt(usedIteration);
+	    if (!iteration4Analysis.equals(150)) {
 	    	outputDirectory = outputDirectory + "_" + usedIteration;
 	    }
 	    
-	    // --------------------------------------------------------------------------------------------------
 	    if (onlyCar == true) {
 			outputDirectory = outputDirectory + "_car";
 		}
-	    // --------------------------------------------------------------------------------------------------
 	    
 	    if (onlyInterior == true) {
 			outputDirectory = outputDirectory + "_int";
@@ -123,18 +130,19 @@ public class TripAnalyzer {
 			outputDirectory = outputDirectory + "_dist";
 		}
 		
-		// --------------------------------------------------------------------------------------------------
-	    if (onlyWorkTrips == true) {
+		if (onlyWorkTrips == true) {
 			outputDirectory = outputDirectory + "_work";
 		}
-	    // --------------------------------------------------------------------------------------------------
-		
-		// --------------------------------------------------------------------------------------------------
+	    
 		if (ageFilter == true) {
-			outputDirectory = outputDirectory + "_" + minAge.toString();
+			outputDirectory = outputDirectory + "_age_" + minAge.toString();
 			outputDirectory = outputDirectory + "_" + maxAge.toString();
 		}
-		// --------------------------------------------------------------------------------------------------
+		
+		
+		// new 2015-12-09 for doublecheck
+		outputDirectory = outputDirectory + "_2";
+		// ----
 		
 		
 		// Create an EventsManager instance (MATSim infrastructure)
@@ -170,7 +178,7 @@ public class TripAnalyzer {
 	    // get network, which is needed to calculate distances
 	    Config config = ConfigUtils.createConfig();
 	    Scenario scenario = ScenarioUtils.createScenario(config);
-	    MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario);
+	    MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario.getNetwork());
 	    networkReader.readFile(networkFile);
 	    Network network = scenario.getNetwork();
 	    
@@ -453,7 +461,7 @@ public class TripAnalyzer {
 		// Math.ceil returns the higher integer number (but as a double value)
 		int ceilOfValue = (int)Math.ceil(inputValueBin);
 		if (ceilOfValue < 0) {
-			System.err.println("Lower end of bin may not be smaller than zero!");
+			new RuntimeException("Lower end of bin may not be smaller than zero!");
 		}
 				
 		if (ceilOfValue >= ceilOfLastBin) {

@@ -47,7 +47,7 @@ public class DgOTFVisConfigWriter implements ShutdownListener {
   
   @Override
   public void notifyShutdown(ShutdownEvent event) {
-    Config originalConfig = event.getControler().getConfig();
+    Config originalConfig = event.getServices().getConfig();
     String currentDir = new File("tmp").getAbsolutePath();
     currentDir = currentDir.substring(0, currentDir.length() - 3);
     String relativeOutputDir = originalConfig.controler().getOutputDirectory();
@@ -59,7 +59,7 @@ public class DgOTFVisConfigWriter implements ShutdownListener {
     props.put(POPULATION_PROPERTY, "output_plans.xml.gz");
     FileOutputStream outstream;
     try {
-      outstream = new FileOutputStream(event.getControler().getControlerIO().getOutputFilename(OTFVIS_LAST_ITERATION_CONFIG));
+      outstream = new FileOutputStream(event.getServices().getControlerIO().getOutputFilename(OTFVIS_LAST_ITERATION_CONFIG));
       props.storeToXML(outstream, "");
     } catch (FileNotFoundException e) {
       e.printStackTrace();

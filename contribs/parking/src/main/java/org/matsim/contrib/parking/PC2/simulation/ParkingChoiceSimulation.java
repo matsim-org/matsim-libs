@@ -41,18 +41,21 @@ import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 import org.matsim.contrib.parking.lib.obj.IntegerValueHashMap;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PopulationUtils;
 
-public final class ParkingChoiceSimulation implements PersonDepartureEventHandler, PersonArrivalEventHandler, 
-ActivityEndEventHandler {
+public final class ParkingChoiceSimulation
+		implements PersonDepartureEventHandler, PersonArrivalEventHandler, ActivityEndEventHandler {
 
+	
+	
 	private ParkingInfrastructureManager parkingInfrastructureManager;
 	private Scenario scenario;
 	private IntegerValueHashMap<Id<Person>> currentPlanElementIndex;
 	private HashMap<Id<Person>, ParkingOperationRequestAttributes> parkingOperationRequestAttributes;
 	private DoubleValueHashMap<Id<Person>> firstDepartureTimeOfDay;
 
-	public ParkingChoiceSimulation(Scenario scenario, ParkingInfrastructureManager parkingInfrastructureManager){
+	public ParkingChoiceSimulation(Scenario scenario, ParkingInfrastructureManager parkingInfrastructureManager) {
 		this.scenario = scenario;
 		this.parkingInfrastructureManager = parkingInfrastructureManager;
 	}
@@ -66,34 +69,42 @@ ActivityEndEventHandler {
 	public void handleEvent(ActivityEndEvent event) {
 		currentPlanElementIndex.increment(event.getPersonId());
 	}
-	
+
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
-		if (event.getLegMode().equalsIgnoreCase(TransportMode.car)){
-			if (!firstDepartureTimeOfDay.containsKey(event.getPersonId())){
-				firstDepartureTimeOfDay.put(event.getPersonId(),event.getTime());
-				// (I think that this is to remember the wrap-around activity. kai, jul'15) 
+		if (event.getLegMode().equalsIgnoreCase(TransportMode.car) && !event.getPersonId().toString().contains("pt") && isNotTransitAgent(event.getPersonId())) {
+			if (!firstDepartureTimeOfDay.containsKey(event.getPersonId())) {
+				firstDepartureTimeOfDay.put(event.getPersonId(), event.getTime());
+				// (I think that this is to remember the wrap-around activity.
+				// kai, jul'15)
 			}
 
-			if (isFirstCarDepartureOfDay(event.getPersonId())){
+			if (isFirstCarDepartureOfDay(event.getPersonId())) {
 				DebugLib.emptyFunctionForSettingBreakPoint();
 				ParkingOperationRequestAttributes parkingAttributes = new ParkingOperationRequestAttributes();
-				parkingAttributes.personId=event.getPersonId();
+				parkingAttributes.personId = event.getPersonId();
 				// this is a trick to get the correct departure time
-				parkingAttributes.arrivalTime=0;
-				parkingAttributes.parkingDurationInSeconds=GeneralLib.getIntervalDuration(0, event.getTime());
+				parkingAttributes.arrivalTime = 0;
+				parkingAttributes.parkingDurationInSeconds = GeneralLib.getIntervalDuration(0, event.getTime());
 				parkingInfrastructureManager.personCarDepartureEvent(parkingAttributes);
 			} else {
-				ParkingOperationRequestAttributes parkingAttributes = parkingOperationRequestAttributes.get(event.getPersonId());
-				parkingAttributes.parkingDurationInSeconds=GeneralLib.getIntervalDuration(parkingAttributes.arrivalTime, event.getTime());
-				if (parkingAttributes.parkingDurationInSeconds==24*3600){
+				ParkingOperationRequestAttributes parkingAttributes = parkingOperationRequestAttributes
+						.get(event.getPersonId());
+				parkingAttributes.parkingDurationInSeconds = GeneralLib
+						.getIntervalDuration(parkingAttributes.arrivalTime, event.getTime());
+				if (parkingAttributes.parkingDurationInSeconds == 24 * 3600) {
 					// (yyyy no idea what this is and why. kai, jul'15)
-					
-					parkingAttributes.parkingDurationInSeconds=1; // not zero, because this might lead to NaN
+
+					parkingAttributes.parkingDurationInSeconds = 1; // not zero,
+																	// because
+																	// this
+																	// might
+																	// lead to
+																	// NaN
 				}
 
 				PC2Parking parking = parkingInfrastructureManager.personCarDepartureEvent(parkingAttributes);
-				parkingInfrastructureManager.scoreParkingOperation(parkingAttributes,parking);
+				parkingInfrastructureManager.scoreParkingOperation(parkingAttributes, parking);
 			}
 
 		}
@@ -102,32 +113,58 @@ ActivityEndEventHandler {
 	@Override
 	public void handleEvent(PersonArrivalEvent event) {
 		Id<Person> personId = event.getPersonId();
-		if (event.getLegMode().equalsIgnoreCase(TransportMode.car)){
-			ParkingOperationRequestAttributes parkingAttributes =new ParkingOperationRequestAttributes();
+		if (event.getLegMode().equalsIgnoreCase(TransportMode.car)  && !event.getPersonId().toString().contains("pt") && isNotTransitAgent(event.getPersonId())) {
+			ParkingOperationRequestAttributes parkingAttributes = new ParkingOperationRequestAttributes();
 			Link link = scenario.getNetwork().getLinks().get(event.getLinkId());
 			Activity nextActivity = getNextActivity(personId);
 
-			parkingAttributes.destCoordinate=link.getCoord();
-			parkingAttributes.arrivalTime=event.getTime();
-			parkingAttributes.personId=personId;
-			parkingAttributes.facilityId=nextActivity.getFacilityId();
-			parkingAttributes.actType=nextActivity.getType();
+			parkingAttributes.destCoordinate = link.getCoord();
+			parkingAttributes.arrivalTime = event.getTime();
+			parkingAttributes.personId = personId;
+			parkingAttributes.facilityId = nextActivity.getFacilityId();
+			parkingAttributes.actType = nextActivity.getType();
 
-			if (isLastCarLegOfDay(personId)){
-				parkingAttributes.parkingDurationInSeconds=GeneralLib.getIntervalDuration(event.getTime(), firstDepartureTimeOfDay.get(personId));
+			if (isLastCarLegOfDay(personId)) {
+				parkingAttributes.parkingDurationInSeconds = GeneralLib.getIntervalDuration(event.getTime(),
+						firstDepartureTimeOfDay.get(personId));
 			} else {
 				Activity activityBeforeNextCarLeg = getActivityBeforeNextCarLeg(personId);
-				parkingAttributes.parkingDurationInSeconds=GeneralLib.getIntervalDuration(event.getTime(), activityBeforeNextCarLeg.getEndTime());
+				
+				double endTime=activityBeforeNextCarLeg.getEndTime();
+				double parkingDuration=0;
+				
+				if (endTime==Double.NEGATIVE_INFINITY || endTime==Double.POSITIVE_INFINITY){
+					// try to estimate parking duration
+					
+					Person person = scenario.getPopulation().getPersons().get(personId);
+					List<PlanElement> planElements = person.getSelectedPlan().getPlanElements();
+					
+					for (int i = currentPlanElementIndex.get(personId); i < planElements.size(); i++) {
+						if (planElements.get(i) instanceof Activity) {
+							parkingDuration+= ((ActivityImpl) planElements.get(i)).getMaximumDuration();
+						}
+						
+						if (planElements.get(i) == activityBeforeNextCarLeg) {
+							endTime=event.getTime()+parkingDuration;
+							break;
+						}
+					}
+				}
+				
+				parkingAttributes.parkingDurationInSeconds = GeneralLib.getIntervalDuration(event.getTime(),
+						endTime);
 			}
 
-			parkingAttributes.legIndex=currentPlanElementIndex.get(personId);
+			parkingAttributes.legIndex = currentPlanElementIndex.get(personId);
 
 			PC2Parking parking = parkingInfrastructureManager.parkVehicle(parkingAttributes);
-			// to me this looks like first the agent arrives at his/her activity.  And then the negative parking score is added after the
-			// fact, however without consuming time.  I.e. there is no physics.  kai, jul'15
+			// to me this looks like first the agent arrives at his/her
+			// activity. And then the negative parking score is added after the
+			// fact, however without consuming time. I.e. there is no physics.
+			// kai, jul'15
 
-			if (isLastCarLegOfDay(personId)){
-				parkingInfrastructureManager.scoreParkingOperation(parkingAttributes,parking);
+			if (isLastCarLegOfDay(personId)) {
+				parkingInfrastructureManager.scoreParkingOperation(parkingAttributes, parking);
 			}
 
 			parkingOperationRequestAttributes.put(personId, parkingAttributes);
@@ -136,106 +173,122 @@ ActivityEndEventHandler {
 
 		currentPlanElementIndex.increment(personId);
 	}
-
+	
+	private boolean isNotTransitAgent(Id<Person> persondId) {
+		return (Integer.parseInt(persondId.toString())< 1000000000);
+	}
 
 	public void prepareForNewIteration() {
-		currentPlanElementIndex=new IntegerValueHashMap<>();
-		parkingOperationRequestAttributes=new HashMap<>();
-		firstDepartureTimeOfDay=new DoubleValueHashMap<>();
+		currentPlanElementIndex = new IntegerValueHashMap<>();
+		parkingOperationRequestAttributes = new HashMap<>();
+		firstDepartureTimeOfDay = new DoubleValueHashMap<>();
 
-		for (Person person: scenario.getPopulation().getPersons().values()){
-			if (PopulationUtils.hasCarLeg(person.getSelectedPlan())){
+		for (Person person : scenario.getPopulation().getPersons().values()) {
+			if (PopulationUtils.hasCarLeg(person.getSelectedPlan()) && isNotTransitAgent(person.getId())) {
 				DebugLib.traceAgent(person.getId());
 				ParkingOperationRequestAttributes parkingAttributes = new ParkingOperationRequestAttributes();
 
-				Activity firstActivityOfDayBeforeDepartingWithCar = PopulationUtils.getFirstActivityOfDayBeforeDepartingWithCar(person.getSelectedPlan());
-				Activity firstActivityAfterLastCarLegOfDay = PopulationUtils.getFirstActivityAfterLastCarLegOfDay(person.getSelectedPlan());
+				Activity firstActivityOfDayBeforeDepartingWithCar = PopulationUtils
+						.getFirstActivityOfDayBeforeDepartingWithCar(person.getSelectedPlan());
+				Activity firstActivityAfterLastCarLegOfDay = PopulationUtils
+						.getFirstActivityAfterLastCarLegOfDay(person.getSelectedPlan());
 
-				parkingAttributes.destCoordinate=firstActivityAfterLastCarLegOfDay.getCoord();
-				//parkingAttributes.arrivalTime=firstActivityAfterLastCarLegOfDay.getStartTime();
-				parkingAttributes.arrivalTime=0;
+				parkingAttributes.destCoordinate = firstActivityAfterLastCarLegOfDay.getCoord();
+				// parkingAttributes.arrivalTime=firstActivityAfterLastCarLegOfDay.getStartTime();
+				parkingAttributes.arrivalTime = 0;
 
-				parkingAttributes.personId=person.getId();
-				parkingAttributes.facilityId=firstActivityAfterLastCarLegOfDay.getFacilityId();
-				parkingAttributes.actType=firstActivityAfterLastCarLegOfDay.getType();
-				parkingAttributes.parkingDurationInSeconds=GeneralLib.getIntervalDuration(firstActivityAfterLastCarLegOfDay.getStartTime(), 
-						firstActivityOfDayBeforeDepartingWithCar.getEndTime());
+				parkingAttributes.personId = person.getId();
+				parkingAttributes.facilityId = firstActivityAfterLastCarLegOfDay.getFacilityId();
+				parkingAttributes.actType = firstActivityAfterLastCarLegOfDay.getType();
 
-				parkingAttributes.legIndex=0;
+				double startTime = firstActivityAfterLastCarLegOfDay.getStartTime();
+				if (startTime == Double.NEGATIVE_INFINITY || startTime == Double.POSITIVE_INFINITY) {
+					parkingAttributes.parkingDurationInSeconds = GeneralLib.getIntervalDuration(0,
+							firstActivityOfDayBeforeDepartingWithCar.getEndTime());
+				} else {
+					parkingAttributes.parkingDurationInSeconds = GeneralLib.getIntervalDuration(startTime,
+							firstActivityOfDayBeforeDepartingWithCar.getEndTime());
+				}
+				parkingAttributes.legIndex = 0;
 
 				parkingInfrastructureManager.parkVehicle(parkingAttributes);
 			}
 		}
 	}
-	
+
 	// === only private helper functions below this line ===
 
 	private boolean isFirstCarDepartureOfDay(Id<Person> personId) {
 		Person person = scenario.getPopulation().getPersons().get(personId);
-		List<PlanElement> planElements = person.getSelectedPlan().getPlanElements();
-		for (int i=currentPlanElementIndex.get(personId)-1;i>=0;i--){
-			if (planElements.get(i) instanceof Leg){
-				Leg leg= (Leg) planElements.get(i);
-				
-				if (leg.getMode().equalsIgnoreCase(TransportMode.car)){
-					return false;
-				}
-				
-			}
-		}
-		return true;
-	}
-	// TODO: operation could be made faster through caching.
-	private boolean isLastCarLegOfDay(Id<Person> personId){
-		Person person = scenario.getPopulation().getPersons().get(personId);
-		List<PlanElement> planElements = person.getSelectedPlan().getPlanElements();
-		for (int i=currentPlanElementIndex.get(personId)+1;i<planElements.size();i++){
-			if (planElements.get(i) instanceof Leg){
-				Leg Leg= (Leg) planElements.get(i);
-				
-				if (Leg.getMode().equalsIgnoreCase(TransportMode.car)){
-					return false;
-				}
-				
-			}
-		}
-		return true;
-	}
-	
-	private Activity getActivityBeforeNextCarLeg(Id<Person> personId){
-		Person person = scenario.getPopulation().getPersons().get(personId);
-		List<PlanElement> planElements = person.getSelectedPlan().getPlanElements();
-		int indexOfNextCarLeg=-1;
-		for (int i=currentPlanElementIndex.get(personId)+1;i<planElements.size();i++){
-			if (planElements.get(i) instanceof Leg){
-				Leg Leg= (Leg) planElements.get(i);
-				
-				if (Leg.getMode().equalsIgnoreCase(TransportMode.car)){
-					indexOfNextCarLeg=i;
-					break;
-				}
-				
-			}
+		
+		if (person==null){
+			DebugLib.stopSystemAndReportInconsistency();
 		}
 		
-		for (int i=indexOfNextCarLeg-1;i>=0;i--){
-			if (planElements.get(i) instanceof Activity){
+		List<PlanElement> planElements = person.getSelectedPlan().getPlanElements();
+		for (int i = currentPlanElementIndex.get(personId) - 1; i >= 0; i--) {
+			if (planElements.get(i) instanceof Leg) {
+				Leg leg = (Leg) planElements.get(i);
+
+				if (leg.getMode().equalsIgnoreCase(TransportMode.car)) {
+					return false;
+				}
+
+			}
+		}
+		return true;
+	}
+
+	// TODO: operation could be made faster through caching.
+	private boolean isLastCarLegOfDay(Id<Person> personId) {
+		Person person = scenario.getPopulation().getPersons().get(personId);
+		List<PlanElement> planElements = person.getSelectedPlan().getPlanElements();
+		for (int i = currentPlanElementIndex.get(personId) + 1; i < planElements.size(); i++) {
+			if (planElements.get(i) instanceof Leg) {
+				Leg Leg = (Leg) planElements.get(i);
+
+				if (Leg.getMode().equalsIgnoreCase(TransportMode.car)) {
+					return false;
+				}
+
+			}
+		}
+		return true;
+	}
+
+	private Activity getActivityBeforeNextCarLeg(Id<Person> personId) {
+		Person person = scenario.getPopulation().getPersons().get(personId);
+		List<PlanElement> planElements = person.getSelectedPlan().getPlanElements();
+		int indexOfNextCarLeg = -1;
+		for (int i = currentPlanElementIndex.get(personId) + 1; i < planElements.size(); i++) {
+			if (planElements.get(i) instanceof Leg) {
+				Leg Leg = (Leg) planElements.get(i);
+
+				if (Leg.getMode().equalsIgnoreCase(TransportMode.car)) {
+					indexOfNextCarLeg = i;
+					break;
+				}
+
+			}
+		}
+
+		for (int i = indexOfNextCarLeg - 1; i >= 0; i--) {
+			if (planElements.get(i) instanceof Activity) {
 				return (Activity) planElements.get(i);
 			}
 		}
-		
+
 		return null;
 	}
-	
-	private Activity getNextActivity(Id<Person> personId){
+
+	private Activity getNextActivity(Id<Person> personId) {
 		Person person = scenario.getPopulation().getPersons().get(personId);
 		List<PlanElement> planElements = person.getSelectedPlan().getPlanElements();
-		for (int i=currentPlanElementIndex.get(personId);i<planElements.size();i++){
-			if (planElements.get(i) instanceof Activity){
+		for (int i = currentPlanElementIndex.get(personId); i < planElements.size(); i++) {
+			if (planElements.get(i) instanceof Activity) {
 				return (Activity) planElements.get(i);
 			}
 		}
 		return null;
 	}
 }
-

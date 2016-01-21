@@ -37,7 +37,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
-import org.matsim.contrib.locationchoice.bestresponse.PlanTimesAdapter.ApproximationLevel;
+import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup.ApproximationLevel;
 import org.matsim.contrib.locationchoice.router.BackwardFastMultiNodeDijkstra;
 import org.matsim.contrib.locationchoice.utils.PlanUtils;
 import org.matsim.core.network.NetworkImpl;
@@ -227,8 +227,8 @@ public class ChoiceSet {
 		// currently handled activity which should be re-located
 		Activity act = (Activity) plan.getPlanElements().get(actlegIndex);
 		
-		// We need to calculate the multi node dijkstra stuff only in case LOCAL_ROUTING is used.
-		if (this.approximationLevel == ApproximationLevel.LOCAL_ROUTING) {
+		// We need to calculate the multi node dijkstra stuff only in case localRouting is used.
+		if (this.approximationLevel == DestinationChoiceConfigGroup.ApproximationLevel.localRouting ) {
 			Node fromNode;
 			/*
 			 * Assuming that both, forward and backward Dijkstra, route to the end nodes of links where
@@ -343,11 +343,8 @@ public class ChoiceSet {
 			final double score =
 					this.adaptAndScoreTimes(
 							plan,
-							actlegIndex,
 							planTmp,
 							scoringFunction,
-							forwardMultiNodeDijkstra,
-							backwardMultiNodeDijkstra,
 							router,
 							this.approximationLevel);
 			
@@ -467,11 +464,13 @@ public class ChoiceSet {
 		return mapNormalized;
 	}
 	
-	double adaptAndScoreTimes(Plan plan, int actlegIndex, Plan planTmp, ScoringFunctionFactory scoringFunction, 
-			MultiNodeDijkstra forwardMultiNodeDijkstra, BackwardFastMultiNodeDijkstra backwardMultiNodeDijkstra, TripRouter router, 
-			ApproximationLevel approximationLevelTmp) {
-		PlanTimesAdapter adapter = new PlanTimesAdapter(approximationLevelTmp, forwardMultiNodeDijkstra, backwardMultiNodeDijkstra, 
+	double adaptAndScoreTimes( Plan plan,
+			Plan planTmp,
+			ScoringFunctionFactory scoringFunction,
+			TripRouter router,
+			ApproximationLevel approximationLevelTmp ) {
+		PlanTimesAdapter adapter = new PlanTimesAdapter(approximationLevelTmp,
 				router, this.scenario, this.teleportedModeSpeeds, this.beelineDistanceFactors);
-		return adapter.adaptTimesAndScorePlan(plan, actlegIndex, planTmp, scoringFunction);
+		return adapter.adaptTimesAndScorePlan(plan, planTmp, scoringFunction);
 	}
 }

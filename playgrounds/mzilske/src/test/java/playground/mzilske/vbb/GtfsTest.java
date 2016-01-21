@@ -32,7 +32,7 @@ public class GtfsTest extends MatsimTestCase {
 		
 		// The Conversion is done, now read the checked scenario
 		MutableScenario checkedScenario = (MutableScenario)(ScenarioUtils.createScenario(config));
-		new MatsimNetworkReader(checkedScenario).readFile(this.getPackageInputDirectory()+ "/checked/network.xml");
+		new MatsimNetworkReader(checkedScenario.getNetwork()).readFile(this.getPackageInputDirectory()+ "/checked/network.xml");
 		new VehicleReaderV1(checkedScenario.getTransitVehicles()).readFile(this.getPackageInputDirectory()+ "/checked/transitVehicles.xml");
 		new TransitScheduleReader(checkedScenario).readFile(this.getPackageInputDirectory()+ "/checked/transitSchedule.xml");
 		
@@ -51,7 +51,7 @@ public class GtfsTest extends MatsimTestCase {
 		
 		// The Conversion is done, now read the checked scenario
 		MutableScenario checkedScenario = (MutableScenario)(ScenarioUtils.createScenario(config));
-		new MatsimNetworkReader(checkedScenario).readFile(this.getPackageInputDirectory()+ "/checked/network_shaped.xml");
+		new MatsimNetworkReader(checkedScenario.getNetwork()).readFile(this.getPackageInputDirectory()+ "/checked/network_shaped.xml");
 		new VehicleReaderV1(checkedScenario.getTransitVehicles()).readFile(this.getPackageInputDirectory()+ "/checked/transitVehicles.xml");
 		new TransitScheduleReader(checkedScenario).readFile(this.getPackageInputDirectory()+ "/checked/transitSchedule_shaped.xml");
 		

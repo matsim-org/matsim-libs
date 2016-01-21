@@ -21,6 +21,9 @@
 package org.matsim.roadpricing;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -54,28 +57,31 @@ IterationEndsListener, ShutdownListener {
 
 	final static private Logger log = Logger.getLogger(RoadPricingControlerListener.class);
 
-    private final RoadPricingScheme scheme;
+	private Scenario scenario;
+	private final RoadPricingScheme scheme;
     private final CalcPaidToll calcPaidToll;
     private final CalcAverageTolledTripLength cattl;
+	private EventsManager eventsManager;
+	private OutputDirectoryHierarchy controlerIO;
 
-    @Inject
-    RoadPricingControlerListener(RoadPricingScheme scheme, CalcPaidToll calcPaidToll, CalcAverageTolledTripLength cattl) {
-        this.scheme = scheme;
+	@Inject
+    RoadPricingControlerListener(Scenario scenario, RoadPricingScheme scheme, CalcPaidToll calcPaidToll, CalcAverageTolledTripLength cattl, EventsManager eventsManager, OutputDirectoryHierarchy controlerIO) {
+		this.scenario = scenario;
+		this.scheme = scheme;
         this.calcPaidToll = calcPaidToll;
         this.cattl = cattl;
-        Gbl.printBuildInfo("RoadPricing", "/org.matsim.contrib/roadpricing/revision.txt");
+		this.eventsManager = eventsManager;
+		this.controlerIO = controlerIO;
+		Gbl.printBuildInfo("RoadPricing", "/org.matsim.contrib/roadpricing/revision.txt");
 	}
 
     @Override
-    public void notifyStartup(final StartupEvent event) {
-        // add scheme as top level container into scenario:
-        event.getControler().getScenario().addScenarioElement( RoadPricingScheme.ELEMENT_NAME, scheme);
-    }
+    public void notifyStartup(final StartupEvent event) {}
 
 	@Override
 	public void notifyAfterMobsim(final AfterMobsimEvent event) {
 		// evaluate the final tolls paid by the agents and add them to their scores
-		this.calcPaidToll.sendMoneyEvents(Time.MIDNIGHT, event.getControler().getEvents());
+		this.calcPaidToll.sendMoneyEvents(Time.MIDNIGHT, eventsManager);
 	}
 
 	@Override
@@ -87,7 +93,7 @@ IterationEndsListener, ShutdownListener {
 
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {
-		String filename = event.getControler().getControlerIO().getOutputFilename("output_toll.xml.gz") ;
+		String filename = this.controlerIO.getOutputFilename("output_toll.xml.gz") ;
 		new RoadPricingWriterXMLv1(this.scheme).writeFile(filename);
 	}
 

@@ -598,7 +598,7 @@ public class NmbmQTBuilder {
 		
 		/* Parse the network */
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		NetworkReaderMatsimV1 nr = new NetworkReaderMatsimV1(sc);
+		NetworkReaderMatsimV1 nr = new NetworkReaderMatsimV1(sc.getNetwork());
 		nr.parse(networkFile);
 
 		/* Write the population */

@@ -25,7 +25,7 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -42,7 +42,7 @@ public class ExtractWalkChoiceSetsEllipse extends ChoiceSetExtractor {
 	private QuadTree<ZHFacility> shoppingQuadTree = null;
 	private double walkingSpeed = 1.39;
 	
-	public ExtractWalkChoiceSetsEllipse(Controler controler, List<ZHFacility> zhFacilities, double walkingSpeed, 
+	public ExtractWalkChoiceSetsEllipse(MatsimServices controler, List<ZHFacility> zhFacilities, double walkingSpeed,
 			List<ChoiceSet> choiceSets, int tt) {
 		
 		super(controler, choiceSets, tt);
@@ -57,7 +57,7 @@ public class ExtractWalkChoiceSetsEllipse extends ChoiceSetExtractor {
 	
 	@Override
 	protected void computeChoiceSet(ChoiceSet choiceSet, SpanningTree spanningTree, String type,
-			Controler controler, int tt) {
+			MatsimServices controler, int tt) {
 
 /*
 		Coord referencePoint = choiceSet.getReferencePoint();			

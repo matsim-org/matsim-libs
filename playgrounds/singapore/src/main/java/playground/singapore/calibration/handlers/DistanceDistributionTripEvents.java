@@ -269,7 +269,7 @@ public class DistanceDistributionTripEvents implements TransitDriverStartsEventH
 	 */
 	public static void main(String[] args) throws IOException {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenario).parse(args[0]);
+		new MatsimNetworkReader(scenario.getNetwork()).parse(args[0]);
 		int lastIteration = new Integer(args[1]);
 		int iterationsInterval = new Integer(args[2]);
 		for(int i=0; i<=lastIteration; i+=iterationsInterval) {

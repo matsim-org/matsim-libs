@@ -16,7 +16,7 @@ public class NetworkLinkRemover {
 		Scenario scenario;
 		MatsimRandom.reset(123);
 		scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenario)
+		new MatsimNetworkReader(scenario.getNetwork())
 				.readFile(args[0]);
 		ArrayList<String> removeLinkList = new ArrayList<>();
 		for(Link l:scenario.getNetwork().getLinks().values()){

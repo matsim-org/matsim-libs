@@ -45,7 +45,7 @@ public class PopulationWorkOtherGeneratorMain {
 		directory.mkdirs();
 		
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenario).readFile(networkFile);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
 		
 		String populationFile = dir + "population" + totalDemand + ".xml";
 		PopulationWorkOtherGenerator pG = new PopulationWorkOtherGenerator(scenario);

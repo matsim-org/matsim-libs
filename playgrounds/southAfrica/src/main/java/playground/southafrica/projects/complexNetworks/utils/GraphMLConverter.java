@@ -82,7 +82,7 @@ public class GraphMLConverter {
 	public static void convertToGraphML(String networkFile, String graphMLFile){
 		/* Parse the MATSim network. */
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		MatsimNetworkReader mnr = new MatsimNetworkReader(sc);
+		MatsimNetworkReader mnr = new MatsimNetworkReader(sc.getNetwork());
 		mnr.readFile(networkFile);
 		NetworkImpl n = (NetworkImpl) sc.getNetwork();
 		LOG.info("Total number of links to add: " + sc.getNetwork().getLinks().size());

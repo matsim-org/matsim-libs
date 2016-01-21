@@ -104,7 +104,7 @@ public class BerlinTaxiVehicleCreatorV3
     private void prepareNetwork(String networkFile, String zoneShpFile, String zoneXmlFile)
     {
         scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-        new MatsimNetworkReader(scenario).readFile(networkFile);
+        new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
         zones = BerlinZoneUtils.readZones(zoneXmlFile, zoneShpFile);
     }
 

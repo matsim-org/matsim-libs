@@ -22,18 +22,19 @@
  */
 package playground.johannes.gsv.sim;
 
-import com.google.inject.Provider;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.contrib.common.util.XORShiftRandom;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -46,8 +47,7 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.mobsim.DefaultMobsimModule;
-import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.events.EventsManagerModule;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.replanning.PlanStrategy;
@@ -55,12 +55,10 @@ import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.StrategyManagerModule;
 import org.matsim.core.router.TripRouterModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityModule;
-import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.scenario.ScenarioElementsModule;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
-import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionModule;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
@@ -76,7 +74,6 @@ import playground.johannes.gsv.synPop.Proxy2Matsim;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Random;
 import java.util.Set;
 
 /**
@@ -85,113 +82,31 @@ import java.util.Set;
  */
 public class Simulator {
 
-	public static final String GSV_CONFIG_MODULE_NAME = "gsv";
-	
 	private static final Logger logger = Logger.getLogger(Simulator.class);
 	
 	public static void main(String[] args) throws IOException {
-		final Controler controler = new Controler(args);
-		controler.getConfig().controler().setOverwriteFileSetting(
-				true ?
-						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
-		controler.setDumpDataAtEnd(false);
-		
-		boolean replanCandidates = Boolean.parseBoolean(controler.getConfig().getParam(GSV_CONFIG_MODULE_NAME, "replanCandidates"));
-		final MobsimConnectorFactory mobSimFac = new MobsimConnectorFactory(replanCandidates);
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				bindMobsim().toProvider(new Provider<Mobsim>() {
-					@Override
-					public Mobsim get() {
-						return mobSimFac.createMobsim(controler.getScenario(), controler.getEvents());
-					}
-				});
-			}
-		});
-		
-		/*
-		 * setup mutation module
-		 */
-		final Random random = new XORShiftRandom(controler.getConfig().global().getRandomSeed());
-
-		logger.info("Setting up activity location strategy...");
+		final GsvConfigGroup gsvConfigGroup = new GsvConfigGroup();
+//		gsvConfigGroup.setCountsfile("examples/equil/counts100.xml");
+//		gsvConfigGroup.setAttributesFile("examples/tutorial/programming/multipleSubpopulations/personAtrributes.xml");
+		final Config config = ConfigUtils.loadConfig(args[0], gsvConfigGroup);
+		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+		config.controler().setDumpDataAtEnd(false);
 		StrategySettings settings = new StrategySettings(Id.create(1, StrategySettings.class));
 		settings.setStrategyName("activityLocations");
-		final int numThreads = controler.getConfig().global().getNumberOfThreads();
-		final double mutationError = Double.parseDouble(controler.getConfig().getParam(GSV_CONFIG_MODULE_NAME, "mutationError"));
-		final double threshold = Double.parseDouble(controler.getConfig().getParam(GSV_CONFIG_MODULE_NAME, "distThreshold"));
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				addPlanStrategyBinding("activityLocations").toProvider(new ActivityLocationStrategyFactory(random, numThreads, "home", controler,
-						mutationError, threshold));
-			}
-		});
-
+		config.strategy().addStrategySettings(settings);
 		settings = new StrategySettings(Id.create(2, StrategySettings.class));
 		settings.setStrategyName("doNothing");
+		config.strategy().addStrategySettings(settings);
 
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				addPlanStrategyBinding("doNothing").toProvider(new javax.inject.Provider<PlanStrategy>() {
+		final Scenario scenario = ScenarioUtils.loadScenario(config);
+		final Controler controler = new Controler(scenario);
 
-					@Override
-					public PlanStrategy get() {
-						return new PlanStrategy() {
-
-							@Override
-							public void run(HasPlansAndId<Plan, Person> person) {
-							}
-
-							@Override
-							public void init(ReplanningContext replanningContext) {
-							}
-
-							@Override
-							public void finish() {
-							}
-						};
-					}
-				});
-			}
-		});
-	/*
-		 * setup scoring and cadyts integration
-		 */
-		logger.info("Setting up cadyts...");
-		boolean disableCadyts = Boolean.parseBoolean(controler.getConfig().getModule(GSV_CONFIG_MODULE_NAME).getValue("disableCadyts"));
-		LinkOccupancyCalculator calculator = new LinkOccupancyCalculator(controler.getScenario().getPopulation());
-		controler.getEvents().addHandler(calculator);
-		if (!disableCadyts) {
-			CadytsContext context = new CadytsContext(controler.getScenario().getConfig(), null, calculator);
-			mobSimFac.setCadytsContext(context);
-			controler.setScoringFunctionFactory(new ScoringFactory(context, controler.getConfig(), controler.getScenario().getNetwork()));
-
-			controler.addControlerListener(context);
-			controler.addControlerListener(new CadytsRegistration(context));
-		}
-		
-		controler.addControlerListener(new ControllerSetup());
-		
-		Config config = controler.getConfig();
-		String countsFile = config.findParam(GSV_CONFIG_MODULE_NAME, "countsfile");
-		double factor = Double.parseDouble(config.findParam("counts", "countsScaleFactor"));
-
-		DTVAnalyzer dtv = new DTVAnalyzer(controler.getScenario().getNetwork(), controler, controler.getEvents(), countsFile, calculator, factor);
-		controler.addControlerListener(dtv);
-
-		controler.addControlerListener(new CountsCompareAnalyzer(calculator, countsFile, factor));
-
-		logger.info("Setting up controler modules...");
+		logger.info("Setting up services modules...");
 		controler.setModules(new AbstractModule() {
 			@Override
 			public void install() {
-			    install(new DefaultMobsimModule());
-				install(new ScenarioElementsModule());
-                install(new CharyparNagelScoringFunctionModule());
+//                install(new CharyparNagelScoringFunctionModule());
+				install(new EventsManagerModule());
 				// include(new TravelTimeCalculatorModule());
 				install(new TravelDisutilityModule());
 				install(new TripRouterModule());
@@ -206,19 +121,55 @@ public class Simulator {
 				// include(new VspPlansCleanerModule());
 				// include(new SignalsModule());
 
-				bind(TravelTime.class).toInstance(MobsimConnectorFactory.getTravelTimeCalculator(1.5));
+				/*
+		 		* setup scoring and cadyts integration
+		 		*/
+				logger.info("Setting up cadyts...");
+				LinkOccupancyCalculator calculator = new LinkOccupancyCalculator(scenario.getPopulation());
+				addEventHandlerBinding().toInstance(calculator);
+				if (!gsvConfigGroup.isDisableCadyts()) {
+					// Consider using the "official" CadytsCarModule..
+					final CadytsContext context = new CadytsContext(config, null, calculator);
+					bindScoringFunctionFactory().toInstance(new ScoringFactory(context, config, scenario.getNetwork()));
+					addControlerListenerBinding().toInstance(context);
+					addControlerListenerBinding().toInstance(new CadytsRegistration(context));
+					// Must be bound because MobsimConnectorFactory wants it
+					bind(CadytsContext.class).toInstance(context);
+				}
 
+				addControlerListenerBinding().toInstance(new ControllerSetup());
+				addControlerListenerBinding().toInstance(new DTVAnalyzer(gsvConfigGroup.getCountsfile(), calculator, config.counts().getCountsScaleFactor()));
+				addControlerListenerBinding().toInstance(new CountsCompareAnalyzer(calculator, gsvConfigGroup.getCountsfile(), config.counts().getCountsScaleFactor()));
+
+				addTravelTimeBinding(TransportMode.car).toInstance(MobsimConnectorFactory.getTravelTimeCalculator(1.5));
+				bindMobsim().toProvider(MobsimConnectorFactory.class);
+				addPlanStrategyBinding("doNothing").toInstance(new PlanStrategy() {
+
+					@Override
+					public void run(HasPlansAndId<Plan, Person> person) {
+					}
+
+					@Override
+					public void init(ReplanningContext replanningContext) {
+					}
+
+					@Override
+					public void finish() {
+					}
+				});
+				logger.info("Setting up activity location strategy...");
+				addPlanStrategyBinding("activityLocations").to(WrappedActivityLocationStrategy.class);
 			}
 		});
 
-		// controler.addOverridingModule(abstractModule);
+		// services.addOverridingModule(abstractModule);
 		/*
 		 * load person attributes
 		 */
 		logger.info("Loading person attributes...");
-		ObjectAttributesXmlReader oaReader = new ObjectAttributesXmlReader(controler.getScenario().getPopulation().getPersonAttributes());
+		ObjectAttributesXmlReader oaReader = new ObjectAttributesXmlReader(scenario.getPopulation().getPersonAttributes());
 		oaReader.putAttributeConverter(ArrayList.class, new Proxy2Matsim.Converter());
-		oaReader.parse(controler.getConfig().getParam(GSV_CONFIG_MODULE_NAME, "attributesFile"));
+		oaReader.parse(gsvConfigGroup.getAttributesFile());
 		
 		controler.run();
 
@@ -228,13 +179,12 @@ public class Simulator {
 
 		@Override
 		public void notifyStartup(StartupEvent event) {
-			Controler controler = event.getControler();
 			/*
 			 * connect facilities to links
 			 */
 			logger.info("Connecting facilities to links...");
-			NetworkImpl network = (NetworkImpl) controler.getScenario().getNetwork();
-			for (ActivityFacility facility : controler.getScenario().getActivityFacilities().getFacilities().values()) {
+			NetworkImpl network = (NetworkImpl) event.getServices().getScenario().getNetwork();
+			for (ActivityFacility facility : event.getServices().getScenario().getActivityFacilities().getFacilities().values()) {
 				Coord coord = facility.getCoord();
 				Link link = NetworkUtils.getNearestLink(network, coord);
 				((ActivityFacilityImpl) facility).setLinkId(link.getId());
@@ -245,13 +195,13 @@ public class Simulator {
 			 */
 			logger.info("Setting up analysis modules...");
 			TrajectoryAnalyzerTaskComposite task = new TrajectoryAnalyzerTaskComposite();
-			task.addTask(new TripGeoDistanceTask(controler.getScenario().getActivityFacilities()));
-//			task.addTask(new SpeedFactorTask(controler.getScenario().getActivityFacilities()));
+			task.addTask(new TripGeoDistanceTask(event.getServices().getScenario().getActivityFacilities()));
+//			task.addTask(new SpeedFactorTask(services.getScenario().getActivityFacilities()));
 //			task.addTask(new ScoreTask());
-			task.addTask(new PkmGeoTask(controler.getScenario().getActivityFacilities()));
-			task.addTask(new PkmRouteTask(event.getControler().getScenario().getNetwork(), 0));
-			task.addTask(new PkmRouteTask(event.getControler().getScenario().getNetwork(), 0.5));
-			task.addTask(new PkmRouteTask(event.getControler().getScenario().getNetwork(), 1));
+			task.addTask(new PkmGeoTask(event.getServices().getScenario().getActivityFacilities()));
+			task.addTask(new PkmRouteTask(event.getServices().getScenario().getNetwork(), 0));
+			task.addTask(new PkmRouteTask(event.getServices().getScenario().getNetwork(), 0.5));
+			task.addTask(new PkmRouteTask(event.getServices().getScenario().getNetwork(), 1));
 			// task.addTask(new ModeShareTask());
 			// task.addTask(new ActivityDurationTask());
 			// task.addTask(new ActivityLoadTask());
@@ -263,17 +213,16 @@ public class Simulator {
 
 			AnalyzerListiner listener = new AnalyzerListiner();
 			listener.task = task;
-			listener.controler = controler;
 			listener.interval = 5;
 			listener.notifyStartup(event);
 
-			controler.addControlerListener(listener);
+			event.getServices().addControlerListener(listener);
 			/*
 			 * Setup ODAdjustor
 			 */
 			logger.info("Setting up ODAdjustor...");
-			ODAdjustorListener odAdjustor = new ODAdjustorListener(controler);
-			controler.addControlerListener(odAdjustor);
+			ODAdjustorListener odAdjustor = new ODAdjustorListener(event.getServices());
+			event.getServices().addControlerListener(odAdjustor);
 		}
 
 	}
@@ -288,9 +237,9 @@ public class Simulator {
 
 		@Override
 		public void notifyAfterMobsim(AfterMobsimEvent event) {
-			Population population = event.getControler().getScenario().getPopulation();
+			Population population = event.getServices().getScenario().getPopulation();
 			for (Person person : population.getPersons().values()) {
-				context.getCalibrator().addToDemand(context.getPlansTranslator().getPlanSteps(person.getSelectedPlan()));
+				context.getCalibrator().addToDemand(context.getPlansTranslator().getCadytsPlan(person.getSelectedPlan()));
 			}
 
 		}
@@ -322,8 +271,6 @@ public class Simulator {
 
 	private static class AnalyzerListiner implements IterationEndsListener, IterationStartsListener, StartupListener {
 
-		private Controler controler;
-
 		private TrajectoryAnalyzerTask task;
 
 		private TrajectoryEventsBuilder builder;
@@ -334,7 +281,7 @@ public class Simulator {
 		public void notifyIterationEnds(IterationEndsEvent event) {
 			try {
 				if (event.getIteration() % interval == 0) {
-					TrajectoryAnalyzer.analyze(builder.trajectories(), task, controler.getControlerIO().getIterationPath(event.getIteration()));
+					TrajectoryAnalyzer.analyze(builder.trajectories(), task, event.getServices().getControlerIO().getIterationPath(event.getIteration()));
 				}
 
 			} catch (IOException e) {
@@ -351,9 +298,9 @@ public class Simulator {
 		@Override
 		public void notifyStartup(StartupEvent event) {
 
-			Set<Person> person = new HashSet<Person>(controler.getScenario().getPopulation().getPersons().values());
+			Set<Person> person = new HashSet<Person>(event.getServices().getScenario().getPopulation().getPersons().values());
 			builder = new TrajectoryEventsBuilder(person);
-			controler.getEvents().addHandler(builder);
+			event.getServices().getEvents().addHandler(builder);
 		}
 	}
 }

@@ -8,7 +8,7 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
 public class Global {
 	
-	public static final String runID = "run11";
+	public static final String runID = "run12";
 	
 	public static final Random random = MatsimRandom.getRandom();
 	
@@ -18,14 +18,15 @@ public class Global {
 	public static final int N = 86336;
 	
 	//directories
-	static final String smbDir = "/run/user/1007/gvfs/smb-share:server=innoz-dc01,share=innoz/";
+	static final String smbDir = "/run/user/1009/gvfs/smb-share:server=innoz-dc01,share=innoz/";
 	public static final String adminBordersDir = smbDir + "3_Allgemein/Geoinformation/Administrative_Grenzen/"; //gemeinden_2009.shp
 	public static final String projectDir = smbDir + "2_MediengestützteMobilität/10_Projekte/eGAP/";
 	public static final String dataDir = projectDir + "20_Datengrundlage/";
 	public static final String networkDataDir = dataDir + "Netzwerk/";
 	public static final String matsimDir = projectDir + "30_Modellierung/";
 	public static final String matsimInputDir = matsimDir + "INPUT/";
-	public static final String runInputDir = matsimDir + "OUTPUT/" + Global.runID + "/input/";
+//	public static final String runInputDir = matsimDir + "OUTPUT/" + Global.runID + "/input/";
+	public static final String runInputDir = "/home/dhosse/" + Global.runID + "/input/";
 	public static final String matsimOutputDir = matsimDir + "OUTPUT/" + Global.runID + "/output/";
 	
 	//coordinate systems and transformations

@@ -125,10 +125,10 @@ public class RailSimEngine implements LegSimEngine {
 		
 		double linkTTime = Math.ceil(legTravelTime / (double)links.size());
 		for(Link link : links) {
-			eventQueue.add(new LinkEnterEvent(time, person.getId(), link.getId(), null));
+			eventQueue.add(new LinkEnterEvent(time, null, link.getId()));
 			time += linkTTime;
 			time = Math.min(time, arrival);
-			eventQueue.add(new LinkLeaveEvent(time, person.getId(), link.getId(), null));
+			eventQueue.add(new LinkLeaveEvent(time, null, link.getId()));
 		}
 		
 		eventQueue.add(new TransitAlightEvent(arrival, person, line, troute, egressStopFac));

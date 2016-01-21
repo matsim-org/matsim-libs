@@ -32,21 +32,22 @@ import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.population.Person;
 
+import playground.agarwalamit.utils.MapUtils;
+
 /**
  * @author amit
  */
 public class TripAndPersonCounter implements PersonDepartureEventHandler, PersonArrivalEventHandler {
-
+	private static final Logger LOGGER = Logger.getLogger(TripAndPersonCounter.class);
+	private final Map<Id<Person>,Integer> personId2CarTripCounter;
+	private final Map<Id<Person>,Integer> personId2AllTripCounter;
+	private final List<Id<Person>> departureList;
+	
 	public TripAndPersonCounter() {
 		this.personId2CarTripCounter = new HashMap<Id<Person>, Integer>();
 		this.personId2AllTripCounter = new HashMap<>();
 		this.departureList = new ArrayList<Id<Person>>();
 	}
-
-	private Map<Id<Person>,Integer> personId2CarTripCounter;
-	private Map<Id<Person>,Integer> personId2AllTripCounter;
-	private List<Id<Person>> departureList;
-	private final Logger logger = Logger.getLogger(TripAndPersonCounter.class);
 
 	@Override
 	public void reset(int iteration) {
@@ -95,29 +96,21 @@ public class TripAndPersonCounter implements PersonDepartureEventHandler, Person
 	
 	public int getTotalNumberOfTrips(){
 		checkPersonNotArrived();
-		int sumTrips =0;
-		for(Id<Person> id:this.personId2AllTripCounter.keySet()){
-			sumTrips += this.personId2AllTripCounter.get(id);
-		}
-		return sumTrips;
+		return MapUtils.intSum(this.personId2AllTripCounter);
 	}
 	
 	public int getNumberOfCarTrips(){
 		checkPersonNotArrived();
-		int sumTrips =0;
-		for(Id<Person> id:this.personId2CarTripCounter.keySet()){
-			sumTrips += this.personId2CarTripCounter.get(id);
-		}
-		return sumTrips;
+		return MapUtils.intSum(this.personId2CarTripCounter);
 	}
 	
 	public double getAverageCarTripPerCarPerson(){
-		return ((double) getNumberOfCarTrips() / (double) getNumberOfCarPersons());
+		return (double) getNumberOfCarTrips() / (double) getNumberOfCarPersons();
 	}
 	
 	private void checkPersonNotArrived(){
 		if(this.departureList.size()>0){
-			logger.warn(this.departureList.size() +" persons are not arrived to activites. Reasons could be \n "
+			LOGGER.warn(this.departureList.size() +" persons are not arrived to activites. Reasons could be \n "
 					+ "1) Person is `StuckAndAbort' 2) Person is enroute at simulation end time.");
 		}
 	}

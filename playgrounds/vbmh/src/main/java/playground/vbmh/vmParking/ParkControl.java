@@ -7,7 +7,7 @@ import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -59,7 +59,7 @@ public class ParkControl {
 	HashMap<Id, Double> personalBetaSOC = new HashMap<Id, Double>();
 	
 	
-	Controler controller;
+	MatsimServices controller;
 	public ParkingMap parkingMap = new ParkingMap(); //Beinhaltet alle Parkplaetze
 	PricingModels pricing = new PricingModels(); //Behinhaltet die Preismodelle
 	ParkHistoryWriter phwriter = new ParkHistoryWriter(); //Schreibt XML Datei mit Park events
@@ -73,7 +73,7 @@ public class ParkControl {
 	
 	
 	//--------------------------- S T A R T  U P---------------------------------------------
-	public int startup(String parkingFilename, String pricingFilename, Controler controller){
+	public int startup(String parkingFilename, String pricingFilename, MatsimServices controller){
 		this.controller=controller;
 		
 		System.out.println("Start up park control");

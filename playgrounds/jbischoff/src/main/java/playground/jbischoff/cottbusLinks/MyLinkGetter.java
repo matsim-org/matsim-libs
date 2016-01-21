@@ -65,7 +65,7 @@ public class MyLinkGetter {
 	String netfile = "Z:\\WinHome\\Docs\\cottbus\\cottbus_feb_fix\\Cottbus-pt\\network_pt.xml";
 	log.info("loading network from " + netfile);
 	network = scenario.getNetwork();
-	new MatsimNetworkReader(scenario).readFile(netfile);
+	new MatsimNetworkReader(scenario.getNetwork()).readFile(netfile);
 	FreespeedTravelTimeAndDisutility fs =new FreespeedTravelTimeAndDisutility(-6, 7,-100);
 	lcp =  df.createPathCalculator(network, fs,fs);
 	

@@ -19,7 +19,7 @@
 
 package playground.johannes.synpop.sim;
 
-import playground.johannes.coopsim.mental.choice.ChoiceSet;
+import org.matsim.contrib.common.collections.ChoiceSet;
 import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.sim.data.CachedPerson;
 
@@ -40,7 +40,7 @@ public class MutatorComposite<T extends Attributable> implements Mutator<T> {
     }
 
     public void addMutator(Mutator mutator) {
-        mutators.addChoice(mutator);
+        mutators.addOption(mutator);
     }
 
     @Override

@@ -64,7 +64,7 @@ public class PreconfigureWithinDayControlerListener implements StartupListener {
 		// workaround until PT is fully implemented
 		TravelTime ptTravelTime = multiModalTravelTimes.get(TransportMode.pt);
 		if (ptTravelTime instanceof PersonalizedTravelTime) {
-            for (Id personId : event.getControler().getScenario().getPopulation().getPersons().keySet()) {
+            for (Id personId : event.getServices().getScenario().getPopulation().getPersons().keySet()) {
 				((PersonalizedTravelTime) ptTravelTime).setPersonSpeed(personId, 15.0);
 			}
 		}

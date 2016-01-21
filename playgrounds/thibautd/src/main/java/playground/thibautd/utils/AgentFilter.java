@@ -51,7 +51,7 @@ public class AgentFilter {
 
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
-		(new MatsimNetworkReader(scenario)).readFile(netFile);
+		(new MatsimNetworkReader(scenario.getNetwork())).readFile(netFile);
 		(new MatsimPopulationReader(scenario)).readFile(fileName);
 		Population population = scenario.getPopulation();
 

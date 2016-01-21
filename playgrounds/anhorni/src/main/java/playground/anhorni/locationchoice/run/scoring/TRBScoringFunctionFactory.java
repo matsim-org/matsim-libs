@@ -22,7 +22,7 @@ package playground.anhorni.locationchoice.run.scoring;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
@@ -42,12 +42,12 @@ public class TRBScoringFunctionFactory extends org.matsim.core.scoring.functions
 	private boolean densityScore = false;
 	private boolean shoppingCentersScore = false;
 	private QuadTree<ActivityFacility> shopQuadTree;
-	private final Controler controler;
+	private final MatsimServices controler;
 	private PlanCalcScoreConfigGroup config;
 
 	private final static Logger log = Logger.getLogger(TRBScoringFunctionFactory.class);
 
-	public TRBScoringFunctionFactory(PlanCalcScoreConfigGroup config, Controler controler) {
+	public TRBScoringFunctionFactory(PlanCalcScoreConfigGroup config, MatsimServices controler) {
         super(config, scConfig, controler.getScenario().getNetwork());
 		this.controler = controler;
 		this.config = config;

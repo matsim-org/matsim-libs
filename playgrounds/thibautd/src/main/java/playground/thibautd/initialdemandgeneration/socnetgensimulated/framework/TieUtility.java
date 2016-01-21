@@ -21,7 +21,7 @@ package playground.thibautd.initialdemandgeneration.socnetgensimulated.framework
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import playground.thibautd.utils.SoftCache;
+import playground.ivt.utils.SoftCache;
 
 import java.util.Random;
 

@@ -52,7 +52,7 @@ public class ShoppingCalculator implements ShutdownListener {
 	}
 	
 	private void evaluate(ShutdownEvent event) {
-//        for (Person p : event.getControler().getScenario().getPopulation().getPersons().values()) {
+//        for (Person p : event.getServices().getScenario().getPopulation().getPersons().values()) {
 //			int shopLocIndex = -1;								
 //			final List<? extends PlanElement> actslegs = p.getSelectedPlan().getPlanElements();
 //			for (int j = 0; j < actslegs.size(); j=j+2) {
@@ -73,7 +73,7 @@ public class ShoppingCalculator implements ShutdownListener {
 	}
 
 	private void printStatistics(ShutdownEvent event) {		
-//		String runId = event.getControler().getConfig().findParam("controler", "runId");
+//		String runId = event.getServices().getConfig().findParam("controler", "runId");
 //				
 //		try {
 //			String parts[] = runId.split("D");

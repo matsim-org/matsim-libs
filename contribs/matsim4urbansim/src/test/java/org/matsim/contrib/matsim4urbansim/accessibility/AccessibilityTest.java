@@ -23,16 +23,22 @@ import org.matsim.contrib.matrixbasedptrouter.utils.CreateTestPopulation;
 import org.matsim.contrib.matsim4urbansim.config.CreateTestM4UConfig;
 import org.matsim.contrib.matsim4urbansim.config.M4UConfigurationConverterV4;
 import org.matsim.core.config.Config;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.OutputDirectoryLogging;
+import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.testcases.MatsimTestUtils;
 
+import javax.inject.Inject;
+import javax.inject.Provider;
 import java.util.Map;
 
 public class AccessibilityTest implements SpatialGridDataExchangeInterface, FacilityDataExchangeInterface {
@@ -70,7 +76,7 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Faci
 		String path = utils.getOutputDirectory();
 
 		//create test network with 9 nodes and 8 links and write it into the temp directory
-		Network net = CreateTestNetwork.createTestNetwork();
+		final Network net = CreateTestNetwork.createTestNetwork();
 		new NetworkWriter(net).write(path+"network.xml");
 
 		//create matsim config file and write it into the temp director<
@@ -82,57 +88,66 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Faci
 		//get the config file and initialize it
 		M4UConfigurationConverterV4 connector = new M4UConfigurationConverterV4(configLocation);
 		connector.init();
-		Config config = connector.getConfig();
+		final Config config = connector.getConfig();
 		Assert.assertTrue(config!=null) ;
 
-		Scenario scenario = ScenarioUtils.loadScenario(config);
+		final Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		//add the generated test population to the scenario
 		((MutableScenario)scenario).setPopulation(population);
 
 		//create a new controler for the simulation
 		Controler ctrl = new Controler(scenario);
-		ctrl.getConfig().controler().setOverwriteFileSetting(
-				true ?
-						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+		ctrl.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 
 		//pt not used in this test
-		PtMatrix ptMatrix = null;
+		final PtMatrix ptMatrix = null;
 
 
 		{
 			//create a bounding box with 9 measuring points (one for each node)
 			double[] boundary = NetworkUtils.getBoundingBox(net.getNodes().values());
-			double minX = boundary[0]-resolution/2;
-			double minY = boundary[1]-resolution/2;
-			double maxX = boundary[2]+resolution/2;
-			double maxY = boundary[3]+resolution/2;
+			final double minX = boundary[0]-resolution/2;
+			final double minY = boundary[1]-resolution/2;
+			final double maxX = boundary[2]+resolution/2;
+			final double maxY = boundary[3]+resolution/2;
 
 			//initialize opportunities for accessibility computation
-			ActivityFacilitiesImpl opportunities = new ActivityFacilitiesImpl("opportunities");
+			final ActivityFacilitiesImpl opportunities = new ActivityFacilitiesImpl("opportunities");
 			opportunities.createAndAddFacility(Id.create("opp", ActivityFacility.class), new Coord((double) 200, (double) 100));
 
-			//initialize new grid based accessibility controler listener and grids for the modes we want to analyze here
-			GridBasedAccessibilityControlerListenerV3 listener = new GridBasedAccessibilityControlerListenerV3(opportunities, ptMatrix, config, net);
-			for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
-				listener.setComputingAccessibilityForMode(mode, true);
-			}
-			listener.setComputingAccessibilityForMode( Modes4Accessibility.pt, false );
-			listener.generateGridsAndMeasuringPointsByCustomBoundary(minX, minY, maxX, maxY, resolution);
+			ctrl.addOverridingModule(new AbstractModule() {
+				@Override
+				public void install() {
+					addControlerListenerBinding().toProvider(new Provider<ControlerListener>() {
+						@Inject Map<String, TravelTime> travelTimes;
+						@Inject Map<String, TravelDisutilityFactory> travelDisutilityFactories;
 
-			//add grid data exchange listener to get accessibilities
-			listener.addSpatialGridDataExchangeListener(this);
+						@Override
+						public ControlerListener get() {
+							//initialize new grid based accessibility controler listener and grids for the modes we want to analyze here
+							GridBasedAccessibilityControlerListenerV3 listener = new GridBasedAccessibilityControlerListenerV3(opportunities, ptMatrix, config, scenario, travelTimes, travelDisutilityFactories);
+							for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
+								listener.setComputingAccessibilityForMode(mode, true);
+							}
+							listener.setComputingAccessibilityForMode( Modes4Accessibility.pt, false );
+							listener.generateGridsAndMeasuringPointsByCustomBoundary(minX, minY, maxX, maxY, resolution);
 
-			//add grid based accessibility controler listener
-			ctrl.addControlerListener(listener);
+							//add grid data exchange listener to get accessibilities
+							listener.addSpatialGridDataExchangeListener(AccessibilityTest.this);
+							return listener;
+						}
+					});
+
+				}
+			});
 		}
 		ctrl.run();
 
 		//test case: verify that accessibility of measuring point 7 (200,100) is higher than all other's
 		for(int i=0;i<4;i++){
-			for(int j=0;j<accessibilities.length;j++){
-				Assert.assertTrue(accessibilities[j][i]<=accessibilities[7][i]);
+			for (double[] accessibility : accessibilities) {
+				Assert.assertTrue(accessibility[i] <= accessibilities[7][i]);
 			}
 		}
 	}
@@ -149,7 +164,7 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Faci
 	public void testZoneBasedAccessibilityMeasure(){
 
 		//create local temp directory
-		String path = utils.getOutputDirectory();
+		final String path = utils.getOutputDirectory();
 
 		//create test network with 9 nodes and 8 links and write it into the temp directory
 		Network net = CreateTestNetwork.createTestNetwork();
@@ -165,48 +180,57 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Faci
 		//get the config file and initialize it
 		M4UConfigurationConverterV4 connector = new M4UConfigurationConverterV4(configLocation);
 		connector.init();
-		Config config = connector.getConfig();
+		final Config config = connector.getConfig();
 		Assert.assertTrue(config!=null) ;
 
-		Scenario scenario = ScenarioUtils.loadScenario(config);
+		final Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		//add the generated test population to the scenario
 		((MutableScenario)scenario).setPopulation(population);
 
 		//create a new controler for the simulation
-		Controler ctrl = new Controler(scenario);
-		ctrl.getConfig().controler().setOverwriteFileSetting(
-				true ?
-						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+		final Controler ctrl = new Controler(scenario);
+		ctrl.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 
 		//create a box with 9 measuring points (one for each node)
 		double[] boundary = NetworkUtils.getBoundingBox(net.getNodes().values());
 
-		double minX = boundary[0]-resolution/2;
-		double minY = boundary[1]-resolution/2;
-		double maxX = boundary[2]+resolution/2;
-		double maxY = boundary[3]+resolution/2;
+		final double minX = boundary[0]-resolution/2;
+		final double minY = boundary[1]-resolution/2;
+		final double maxX = boundary[2]+resolution/2;
+		final double maxY = boundary[3]+resolution/2;
 
 		//initialize opportunities for accessibility computation
-		ActivityFacilitiesImpl opportunities = new ActivityFacilitiesImpl("opportunities");
+		final ActivityFacilitiesImpl opportunities = new ActivityFacilitiesImpl("opportunities");
 		opportunities.createAndAddFacility(Id.create("opp", ActivityFacility.class), new Coord((double) 200, (double) 100));
 
-		ActivityFacilitiesImpl measuringPoints = GridUtils.createGridLayerByGridSizeByBoundingBoxV2(minX, minY, maxX, maxY, resolution);
+		final ActivityFacilitiesImpl measuringPoints = GridUtils.createGridLayerByGridSizeByBoundingBoxV2(minX, minY, maxX, maxY, resolution);
+		ctrl.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				addControlerListenerBinding().toProvider(new Provider<ControlerListener>() {
+					@Inject Map<String, TravelTime> travelTimes;
+					@Inject Map<String, TravelDisutilityFactory> travelDisutilityFactories;
 
-		//initialize new zone based accessibility controler listener and grids for the modes we want to analyze here
-		ZoneBasedAccessibilityControlerListenerV3 listener = new ZoneBasedAccessibilityControlerListenerV3(measuringPoints, opportunities,
-				path, scenario);
-		for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
-			listener.setComputingAccessibilityForMode(mode, true);
-		}
-		listener.setComputingAccessibilityForMode( Modes4Accessibility.pt, false );
-		// don't know why this is not activated as a test. kai, feb'14
+					@Override
+					public ControlerListener get() {
+						//initialize new zone based accessibility controler listener and grids for the modes we want to analyze here
+						ZoneBasedAccessibilityControlerListenerV3 listener = new ZoneBasedAccessibilityControlerListenerV3(measuringPoints, opportunities, null, path, scenario, travelTimes, travelDisutilityFactories);
+						for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
+							listener.setComputingAccessibilityForMode(mode, true);
+						}
+						listener.setComputingAccessibilityForMode( Modes4Accessibility.pt, false );
+						// don't know why this is not activated as a test. kai, feb'14
 
-		listener.addZoneDataExchangeListener(this);
+						listener.addZoneDataExchangeListener(AccessibilityTest.this);
 
-		//add grid based accessibility controler listener to the controler and run the simulation
-		ctrl.addControlerListener(listener);
+						//add grid based accessibility services listener to the services and run the simulation
+						return listener;
+					}
+				});
+
+			}
+		});
 		ctrl.run();
 
 		//test case: verify that accessibility of work zone (200,100) is higher than the home zone's (0,100)
@@ -264,6 +288,11 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Faci
 		if(measurePoint.getCoord().equals(new Coord((double) 200, (double) 100))){
 			accessibilitiesWorkZone = accessibilities1 ;
 		}
+
+	}
+
+	@Override
+	public void finish() {
 
 	}
 

@@ -22,7 +22,11 @@
 
 package org.matsim.roadpricing;
 
-import com.google.inject.Singleton;
+import java.util.Arrays;
+
+import javax.inject.Inject;
+import javax.inject.Provider;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -31,9 +35,7 @@ import org.matsim.core.controler.ControlerDefaults;
 import org.matsim.core.controler.ControlerDefaultsModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
-import java.util.Arrays;
+import com.google.inject.Singleton;
 
 public class ControlerDefaultsWithRoadPricingModule extends AbstractModule {
 
@@ -56,7 +58,7 @@ public class ControlerDefaultsWithRoadPricingModule extends AbstractModule {
         } else {
             bind(RoadPricingScheme.class).toProvider(RoadPricingSchemeProvider.class).in(Singleton.class);
         }
-
+        bind(RoadPricingInitializer.class).asEagerSingleton();
         bind(PlansCalcRouteWithTollOrNot.class);
         addPlanStrategyBinding("ReRouteAreaToll").toProvider(ReRouteAreaToll.class);
 
@@ -78,27 +80,49 @@ public class ControlerDefaultsWithRoadPricingModule extends AbstractModule {
         addEventHandlerBinding().to(CalcAverageTolledTripLength.class);
     }
 
+    private static class RoadPricingInitializer {
+        @Inject
+        RoadPricingInitializer(RoadPricingScheme roadPricingScheme, Scenario scenario) {
+            RoadPricingScheme scenarioRoadPricingScheme = (RoadPricingScheme) scenario.getScenarioElement(RoadPricingScheme.ELEMENT_NAME);
+            if (scenarioRoadPricingScheme == null) {
+                scenario.addScenarioElement(RoadPricingScheme.ELEMENT_NAME, roadPricingScheme);
+            } else {
+                if (roadPricingScheme != scenarioRoadPricingScheme) {
+                    throw new RuntimeException();
+                }
+            }
+        }
+    }
+
+
     private static class RoadPricingSchemeProvider implements Provider<RoadPricingScheme> {
 
         private final Config config;
+        private Scenario scenario;
 
         @Inject
-        RoadPricingSchemeProvider(Config config) {
+        RoadPricingSchemeProvider(Config config, Scenario scenario) {
             this.config = config;
+            this.scenario = scenario;
         }
 
         @Override
         public RoadPricingScheme get() {
-            RoadPricingConfigGroup rpConfig = ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class);
-            String tollLinksFile = rpConfig.getTollLinksFile();
-            if ( tollLinksFile == null ) {
-                throw new RuntimeException("Road pricing inserted but neither toll links file nor RoadPricingScheme given.  "
-                        + "Such an execution path is not allowed.  If you want a base case without toll, "
-                        + "construct a zero toll file and insert that. ") ;
+            RoadPricingScheme scenarioRoadPricingScheme = (RoadPricingScheme) scenario.getScenarioElement(RoadPricingScheme.ELEMENT_NAME);
+            if (scenarioRoadPricingScheme != null) {
+                return scenarioRoadPricingScheme;
+            } else {
+                RoadPricingConfigGroup rpConfig = ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class);
+                String tollLinksFile = rpConfig.getTollLinksFile();
+                if ( tollLinksFile == null ) {
+                    throw new RuntimeException("Road pricing inserted but neither toll links file nor RoadPricingScheme given.  "
+                            + "Such an execution path is not allowed.  If you want a base case without toll, "
+                            + "construct a zero toll file and insert that. ") ;
+                }
+                RoadPricingSchemeImpl rpsImpl = new RoadPricingSchemeImpl() ;
+                new RoadPricingReaderXMLv1(rpsImpl).parse(tollLinksFile);
+                return rpsImpl;
             }
-            RoadPricingSchemeImpl rpsImpl = new RoadPricingSchemeImpl() ;
-            new RoadPricingReaderXMLv1(rpsImpl).parse(tollLinksFile);
-            return rpsImpl;
         }
     }
 

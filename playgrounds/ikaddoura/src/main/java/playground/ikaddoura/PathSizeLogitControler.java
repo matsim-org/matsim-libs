@@ -25,11 +25,11 @@ package playground.ikaddoura;
 
 
 import org.apache.log4j.Logger;
+import org.matsim.contrib.common.diversitygeneration.planselectors.DiversityGeneratingPlansRemover;
+import org.matsim.contrib.common.diversitygeneration.planselectors.DiversityGeneratingPlansRemover.Builder;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import playground.vsp.planselectors.DiversityGeneratingPlansRemover;
-import playground.vsp.planselectors.DiversityGeneratingPlansRemover.Builder;
 
 import java.io.IOException;
 
@@ -88,7 +88,9 @@ public class PathSizeLogitControler {
 			controler.addOverridingModule(new AbstractModule() {
 				@Override
 				public void install() {
-					addPlanSelectorForRemovalBinding("divGenPlansRemover").toProvider(builder);
+					if (getConfig().strategy().getPlanSelectorForRemoval().equals("divGenPlansRemover")) {
+						bindPlanSelectorForRemoval().toProvider(builder);
+					}
 				}
 			});
 			controler.getConfig().strategy().setPlanSelectorForRemoval("divGenPlansRemover");

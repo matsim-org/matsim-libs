@@ -2,7 +2,11 @@ package playground.sergioo.hits2012;
 
 /*import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;*/
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
@@ -14,19 +18,21 @@ import java.util.Map;
 
 
 
+
+import java.util.Map.Entry;
+
 import org.matsim.api.core.v01.Coord;
 
-import org.matsim.core.utils.io.IOUtils;
 import playground.sergioo.hits2012.Person.Day;
 import playground.sergioo.hits2012.Person.IncomeInterval;
 import playground.sergioo.hits2012.Trip.Purpose;
 import playground.sergioo.hits2012.stages.CycleStage;
+import playground.sergioo.hits2012.stages.OtherBusStage;
 import playground.sergioo.hits2012.stages.PublicBusStage;
 import playground.sergioo.hits2012.stages.MRTStage;
 import playground.sergioo.hits2012.stages.MotorDriverStage;
 import playground.sergioo.hits2012.stages.MotorStage;
-import playground.sergioo.hits2012.stages.WaitStage;
-import playground.sergioo.hits2012.stages.LRTStage;
+import playground.sergioo.hits2012.stages.StationStage;
 import playground.sergioo.hits2012.stages.TaxiStage;
 
 public class HitsReader {
@@ -36,7 +42,11 @@ public class HitsReader {
 	private final static Map<String, String> purposesMap = new HashMap<String, String>();
 	
 	public static void main(String[] args) throws IOException, ParseException {
-		Map<String, Household> households = readHits(args[0], args[1]);
+		Map<String, Household> households = readHits(args[0]);
+		PrintWriter printer = new PrintWriter("./data/locs.csv");
+		for(Entry<String, Coord> loc:Location.SINGAPORE_COORDS_MAP.entrySet())
+			printer.println(loc.getKey()+","+loc.getValue().getX()+","+loc.getValue().getY());
+		printer.close();
 		System.out.println("Households: "+households.size());
 		int numPersons = 0;
 		for(Household household:households.values())
@@ -85,7 +95,7 @@ public class HitsReader {
 		printWriter.close();
 	}*/
 	
-	private static void init(String locationsFile) {
+	private static void init() {
 		placeTypesMap.put("Place of worship", Trip.PlaceType.TEMPLE.text);
 		placeTypesMap.put("Government related buildings", Trip.PlaceType.GOVERMENT.text);
 		placeTypesMap.put("Petrol station", Trip.PlaceType.PETROL.text);
@@ -129,25 +139,25 @@ public class HitsReader {
 		purposesMap.put("Professional Driver", Trip.Purpose.DRIVE.text);
 		purposesMap.put("Religious related matters", Trip.Purpose.RELIGION.text);
 		try {
-			BufferedReader reader = IOUtils.getBufferedReader(locationsFile);
-			Location.SINGAPORE_COORDS_MAP = new HashMap<>();
-			String line = reader.readLine();
-			while(line != null){
-				String[] split = line.split(",");
-				Location.SINGAPORE_COORDS_MAP.put(split[0], new Coord(Double.parseDouble(split[1]),Double.parseDouble(split[2])));
-				line = reader.readLine();
-			}
-			reader.close();
+			BufferedReader reader = new BufferedReader(new FileReader("./data/locs.csv"));
+            Location.SINGAPORE_COORDS_MAP = new HashMap<>();
+            String line = reader.readLine();
+            while(line != null){
+                String[] split = line.split(",");
+                Location.SINGAPORE_COORDS_MAP.put(split[0],new Coord(Double.parseDouble(split[1]),Double.parseDouble(split[2])));
+                line = reader.readLine();
+            }
+            reader.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
-	public static Map<String, Household> readHits(String hitsDataFile, String locationsFile) throws IOException, NumberFormatException, ParseException {
-		init(locationsFile);
+	public static Map<String, Household> readHits(String fileName) throws IOException, NumberFormatException, ParseException {
+		init();
 		Map<String, Household> households = new HashMap<String, Household>();
-		BufferedReader reader = new BufferedReader(new FileReader(hitsDataFile));
+		BufferedReader reader = new BufferedReader(new FileReader(fileName));
 		reader.readLine();
 		String line = reader.readLine();
 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MMM-yy");
@@ -298,9 +308,9 @@ public class HitsReader {
 					else if(modeObject==Stage.Mode.LRT) {
 						String start = lineParts[Stage.Column.START.column];
 						String end = lineParts[Stage.Column.END.column];
-						LRTStage.STATIONS.add(start);
-						LRTStage.STATIONS.add(end);
-						stage = new LRTStage(lineParts[4], mode, new Double(lineParts[Stage.Column.WALK_TIME.column]),
+						StationStage.STATIONS.add(start);
+						StationStage.STATIONS.add(end);
+						stage = new StationStage(lineParts[4], mode, new Double(lineParts[Stage.Column.WALK_TIME.column]),
 								new Double(lineParts[Stage.Column.IN_VEHICLE_TIME.column]),
 								new Double(lineParts[Stage.Column.LAST_WALK_TIME.column]),
 								new Double(lineParts[Stage.Column.WAIT_TIME.column]), start, end);
@@ -314,7 +324,7 @@ public class HitsReader {
 								new Double(lineParts[Stage.Column.WAIT_TIME.column]), lineBus);
 					}
 					else if(modeObject==Stage.Mode.COMPANY_BUS || modeObject==Stage.Mode.SCHOOL_BUS || modeObject==Stage.Mode.SHUTTLE_BUS) {
-						stage = new WaitStage(lineParts[4], mode, new Double(lineParts[Stage.Column.WALK_TIME.column]),
+						stage = new OtherBusStage(lineParts[4], mode, new Double(lineParts[Stage.Column.WALK_TIME.column]),
 								new Double(lineParts[Stage.Column.IN_VEHICLE_TIME.column]),
 								new Double(lineParts[Stage.Column.LAST_WALK_TIME.column]),
 								new Double(lineParts[Stage.Column.WAIT_TIME.column]), modeObject.toString());

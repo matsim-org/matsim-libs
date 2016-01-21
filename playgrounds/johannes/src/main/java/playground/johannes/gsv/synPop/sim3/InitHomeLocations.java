@@ -142,7 +142,7 @@ public class InitHomeLocations implements PersonsTask {
 			logger.info(String.format("Assigend %s persons a random home.", cnt));
 		}
 
-		ProgressLogger.termiante();
+		ProgressLogger.terminate();
 	}
 
 }

@@ -20,11 +20,9 @@
 package playground.benjamin.scoring.income.old;
 
 import org.matsim.core.config.Config;
-import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.households.PersonHouseholdMapping;
-import playground.benjamin.BkControler;
 
 
 /**
@@ -32,24 +30,10 @@ import playground.benjamin.BkControler;
  * @author dgrether
  *
  */
-public final class BKickIncomeControler extends BkControler {
+public final class BKickIncomeControler {
 
 	private PersonHouseholdMapping hhdb;
 
-	public BKickIncomeControler(String configFileName) {
-		super(configFileName);
-		throw new RuntimeException(Gbl.CREATE_ROUTING_ALGORITHM_WARNING_MESSAGE + Gbl.SET_UP_IS_NOW_FINAL) ;
-	}
-	
-	public BKickIncomeControler(Config conf){
-		super(conf);
-		throw new RuntimeException(Gbl.CREATE_ROUTING_ALGORITHM_WARNING_MESSAGE + Gbl.SET_UP_IS_NOW_FINAL) ;
-	}
-
-	public BKickIncomeControler(String[] args) {
-		super(args);
-		throw new RuntimeException(Gbl.CREATE_ROUTING_ALGORITHM_WARNING_MESSAGE + Gbl.SET_UP_IS_NOW_FINAL) ;
-	}
 
 //	@Override
 //	protected ScoringFunctionFactory loadScoringFunctionFactory() {
@@ -95,7 +79,7 @@ public final class BKickIncomeControler extends BkControler {
 			System.out.println("Usage: Controler config-file [dtd-file]");
 			System.out.println();
 		} else {
-			final Controler controler = new BKickIncomeControler(args);
+			final Controler controler = new Controler(args);
 			
 			controler.run();
 		}

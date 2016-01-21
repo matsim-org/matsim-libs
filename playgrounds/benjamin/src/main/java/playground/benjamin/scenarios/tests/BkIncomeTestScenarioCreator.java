@@ -158,7 +158,7 @@ public class BkIncomeTestScenarioCreator {
 		String outfile = BkPaths.SHAREDSVN + "studies/bkick/oneRouteTwoModeIncomeTest/plans.xml";
 		String networkFile = BkPaths.SHAREDSVN + "studies/bkick/oneRouteTwoModeIncomeTest/network.xml";
 		Network uselessNetwork = scenario.getNetwork();
-		new MatsimNetworkReader(scenario).readFile(networkFile);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
 
 		BkIncomeTestScenarioCreator pc = new BkIncomeTestScenarioCreator(scenario);
 		Population pop = pc.createPlans();

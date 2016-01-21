@@ -16,4 +16,8 @@ public class PublicBusStage extends WaitStage {
 		this.line = line;
 	}
 
+	public String getLine() {
+		return line;
+	}
+
 }

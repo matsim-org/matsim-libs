@@ -46,7 +46,7 @@ public class TestIntegration {
 		final String carrierFilename = utils.getClassInputDirectory() + "/carrier.xml" ;
 
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig()) ;
-		new MatsimNetworkReader(scenario).readFile(networkFilename);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFilename);
 
 		CarrierVehicleTypes vehicleTypes = createVehicleTypes( vehicleTypeFilename );
 

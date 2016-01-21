@@ -103,7 +103,7 @@ public class IntraMinDeltaAvgNCA extends NodeClusteringAlgorithm {
 		String fileName = "f:/TEMP/singaporemindeltaexpectedtransactions.txt";
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils
 				.createConfig());
-		MatsimNetworkReader nwr = new MatsimNetworkReader(scenario);
+		MatsimNetworkReader nwr = new MatsimNetworkReader(scenario.getNetwork());
 		// nwr.readFile(args[0]);
 //		 nwr.readFile("F:/TEMP/network.xml");
 //		nwr.readFile("f:/matsimWorkspace/matsim/examples/siouxfalls/network-wo-dummy-node.xml");

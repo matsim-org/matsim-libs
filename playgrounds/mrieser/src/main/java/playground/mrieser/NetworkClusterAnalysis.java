@@ -193,7 +193,7 @@ public class NetworkClusterAnalysis {
 		String outDir = args[1];
 
 		Scenario sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(sc).readFile(networkFile);
+		new MatsimNetworkReader(sc.getNetwork()).readFile(networkFile);
 
 		Set<String> modes = new HashSet<String>();
 		modes.add(TransportMode.car);

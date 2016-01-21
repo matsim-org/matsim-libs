@@ -1,8 +1,5 @@
 package playground.balac.induceddemand.strategies;
 
-import java.util.List;
-import java.util.Random;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
@@ -15,6 +12,9 @@ import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.population.algorithms.PlanAlgorithm;
+
+import java.util.List;
+import java.util.Random;
 
 public class ChooseActivityToInsert implements PlanAlgorithm {
 
@@ -77,7 +77,7 @@ public class ChooseActivityToInsert implements PlanAlgorithm {
 				newActivity.setCoord(primaryActivity.getCoord());
 				newActivity.setEndTime(  t.get(randomIndex - 1).getEndTime() + 3600.0);
 
-				newActivity.setMaximumDuration(3600);
+			//	newActivity.setMaximumDuration(3600);
 				
 			}
 			

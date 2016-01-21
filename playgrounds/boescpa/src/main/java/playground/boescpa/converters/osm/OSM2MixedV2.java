@@ -124,10 +124,10 @@ public class OSM2MixedV2 {
 		new VehicleWriterV1(mixedVehicles).writeFile(outbase + "MixedVehicles.xml.gz");
 
 		// **************** Cut Schedule ****************
-		new ScheduleCutter(mixedSchedule, cutCenter, cutRadius).cutSchedule();
+		new ScheduleCutter(mixedSchedule, null, cutCenter, cutRadius).cutSchedule();
 
 		// **************** Route Schedule ****************
-		new NetworkReaderMatsimV1(mixedScenario).parse(networkPath);
+		new NetworkReaderMatsimV1(mixedScenario.getNetwork()).parse(networkPath);
 		final Network mixedNetwork = mixedScenario.getNetwork();
 		new PTMapperOnlyBusses(mixedSchedule).routePTLines(mixedNetwork);
 		final String path_MixedSchedule = outbase + "MixedSchedule.xml.gz";
@@ -159,7 +159,7 @@ public class OSM2MixedV2 {
 		new VehicleWriterV1(onlyPTVehicles).writeFile(outbase + "OnlyPTVehicles.xml.gz");
 
 		// **************** Cut Schedule ****************
-		new ScheduleCutter(onlyPTSchedule, cutCenter, cutRadius).cutSchedule();
+		new ScheduleCutter(onlyPTSchedule, null, cutCenter, cutRadius).cutSchedule();
 
 		// **************** Route Schedule ****************
 		final Network onlyPTNetwork = onlyPTScenario.getNetwork();

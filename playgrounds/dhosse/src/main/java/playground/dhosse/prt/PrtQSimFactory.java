@@ -49,7 +49,7 @@ public class PrtQSimFactory implements MobsimFactory{
 	@Override
 	public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
 		
-		TaxiOptimizerConfiguration taxiConfig = initOptimizerConfiguration(prtConfig, context, travelTime, travelDisutility, algorithmConfig);
+		TaxiOptimizerContext taxiConfig = initOptimizerConfiguration(prtConfig, context, travelTime, travelDisutility, algorithmConfig);
 		TaxiOptimizer optimizer = algorithmConfig.createTaxiOptimizer(taxiConfig);
 
 		QSimConfigGroup conf = sc.getConfig().qsim();
@@ -110,26 +110,22 @@ public class PrtQSimFactory implements MobsimFactory{
 		
 	}
 	
-	private TaxiOptimizerConfiguration initOptimizerConfiguration(PrtConfigGroup prtConfig, MatsimVrpContext context,
+	private TaxiOptimizerContext initOptimizerConfiguration(PrtConfigGroup prtConfig, MatsimVrpContext context,
 			TravelTime travelTime, TravelDisutility travelDisutility, AlgorithmConfig algorithmConfig){
 		
-		TaxiSchedulerParams taxiParams = new TaxiSchedulerParams(prtConfig.getDestinationKnown(), false, prtConfig.getPickupDuration(), prtConfig.getDropoffDuration());
+		TaxiSchedulerParams taxiParams = new TaxiSchedulerParams(prtConfig.getDestinationKnown(), false, prtConfig.getPickupDuration(), prtConfig.getDropoffDuration(), 1);
 		
 		if(prtConfig.getVehicleCapacity() > 1){
 			
 			PrtScheduler scheduler = new PrtScheduler(context, taxiParams, travelTime, travelDisutility);
-			FilterFactory filterFactory = new DefaultFilterFactory(scheduler, 0, 0);
 			
-			return new PrtOptimizerConfiguration(context, travelTime, travelDisutility, scheduler, filterFactory,
-					algorithmConfig.getGoal(), prtConfig.getPrtOutputDirectory(), prtConfig);
+			return new PrtOptimizerConfiguration(context, travelTime, travelDisutility, null, scheduler, prtConfig);
 			
 		}
 		
 		TaxiScheduler scheduler = new TaxiScheduler(context, taxiParams, travelTime, travelDisutility);
-		FilterFactory filterFactory = new DefaultFilterFactory(scheduler, 0, 0);
 		
-		return new TaxiOptimizerConfiguration(context, travelTime, travelDisutility, scheduler, filterFactory,
-				algorithmConfig.getGoal(), prtConfig.getPrtOutputDirectory(), null);
+		return new TaxiOptimizerContext(context, travelTime, travelDisutility, null, scheduler);
 		
 	}
 	

@@ -3,7 +3,8 @@ package playground.michalm.poznan.supply;
 import java.util.*;
 
 import org.matsim.api.core.v01.*;
-import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.network.*;
+import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.core.config.*;
 import org.matsim.core.network.*;
 import org.matsim.core.network.algorithms.NetworkCleaner;
@@ -23,7 +24,6 @@ public class CreatePoznanPT
     {
         Config config = ConfigUtils.createConfig();
         config.transit().setUseTransit(true);
-        config.scenario().setUseVehicles(true);
         Scenario scenario = ScenarioUtils.createScenario(config);
 
         final VisumNetwork vNetwork = new VisumNetwork();
@@ -79,7 +79,7 @@ public class CreatePoznanPT
                 .write(transitScheduleWithNetworkFile);
         new VehicleWriterV1(scenario.getTransitVehicles()).writeFile(vehicleFile);
 
-        NetworkImpl network = NetworkImpl.createNetwork();
+        Network network = NetworkUtils.createNetwork();
         new CreatePseudoNetwork(scenario.getTransitSchedule(), network, "tr_").createNetwork();
 
         new NetworkCleaner().run(network);
@@ -104,7 +104,7 @@ public class CreatePoznanPT
 
     public static void main(String[] args)
     {
-        //String visumFile = "d:/Google Drive/Poznan/Visum_2014/network/network_ver.4.net";
+        //String visumFile = "d:/GoogleDrive/Poznan/Visum_2014/network/network_ver.4.net";
         //String visumFile = "d:/GoogleDrive/Poznan/Visum_2014/network/network_ver.5_(33N).net";
         String visumFile = "d:/GoogleDrive/Poznan/Visum_2014/network/A ZTM.net";
         String outDir = "d:/PP-rad/poznan/test/";

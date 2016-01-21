@@ -2,10 +2,6 @@
 package herbie.creation.ptAnalysis;
 
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.TreeMap;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
@@ -30,8 +26,11 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.vehicles.VehicleReaderV1;
 import org.matsim.vehicles.Vehicles;
-
 import utils.Bins;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.TreeMap;
 
 public class QuickPlanAnalysisPt {
 	
@@ -178,7 +177,7 @@ public class QuickPlanAnalysisPt {
 		
     	this.scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		
-		new MatsimNetworkReader(scenario).readFile(NETWORKFILE);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(NETWORKFILE);
 		
 		pop = scenario.getPopulation();
 		

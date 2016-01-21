@@ -9,6 +9,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -57,7 +58,7 @@ public class NoCrowdingCorridorControler {
    controler = new Controler(scenario);
   } else controler = new Controler(args);
 
-  		//CrowdednessObserver observer = new CrowdednessObserver(scenario, controler.getEvents(), new StochasticRule());
+  		//CrowdednessObserver observer = new CrowdednessObserver(scenario, services.getEvents(), new StochasticRule());
 		observer = new CrowdednessObserver(scenario, controler.getEvents(), new SimpleRule());
 		controler.getEvents().addHandler(observer);
 		scoreTracker = new ScoreTracker();
@@ -79,8 +80,8 @@ public class NoCrowdingCorridorControler {
 	    // Kaddoura's externalities
 		controler.addControlerListener(new InternalizationPtControlerListener((MutableScenario) controler.getScenario(), scoreTracker));
 
-	    //controler.setOverwriteFiles(true);
-		//controler.setMobsimFactory(new QSimFactory());
+	    //services.setOverwriteFiles(true);
+		//services.setMobsimFactory(new QSimFactory());
 
 	 controler.run();
 
@@ -146,7 +147,7 @@ private static class ShutdownHandler implements ShutdownListener{
 
   @Override
   public void notifyStartup(StartupEvent event) {
-   Controler controler = event.getControler();
+   MatsimServices controler = event.getServices();
    // create a plot containing the mean travel times
    Set<String> transportModes = new HashSet<String>();
    transportModes.add(TransportMode.car);

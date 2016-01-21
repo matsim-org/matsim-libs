@@ -86,7 +86,7 @@ public class ChangeableNetworkCreator {
 	private void prepareScen() {
 		
 		sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(sc).readFile(NETWORKFILE);		
+		new MatsimNetworkReader(sc.getNetwork()).readFile(NETWORKFILE);
 	}
 
 	private TravelTimeCalculator readEvents (){

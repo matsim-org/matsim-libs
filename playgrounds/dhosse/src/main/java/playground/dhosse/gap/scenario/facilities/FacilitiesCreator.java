@@ -289,14 +289,18 @@ public class FacilitiesCreator {
 
 		OsmObjectsToFacilitiesParser reader = new OsmObjectsToFacilitiesParser(Global.dataDir + "/Netzwerk/garmisch-latest.osm", Global.ct, osmToMatsimTypeMap, keys);
 		reader.parse();
-//		reader.writeFacilities(Global.matsimInputDir + "facilities/facilities.xml");
-//		reader.writeFacilityAttributes(Global.matsimInputDir + "facilities/facilityAttribues.xml");
+		reader.writeFacilities(Global.matsimInputDir + "facilities/facilities.xml");
+		reader.writeFacilityAttributes(Global.matsimInputDir + "facilities/facilityAttribues.xml");
 		reader.writeFacilityCoordinates(Global.matsimInputDir + "facilities.csv");
+		
+		Set<Id<ActivityFacility>> facilityIds = new HashSet<>();
 		
 		log.info("Assigning activity facilities to municipalities...");
 		for(ActivityFacility facility : reader.getFacilities().getFacilities().values()){
 			
-			scenario.getActivityFacilities().addActivityFacility(facility);
+			if(!scenario.getActivityFacilities().getFacilities().containsKey(facility.getId()))
+				scenario.getActivityFacilities().addActivityFacility(facility);
+			else continue;
 			
 			for(Geometry g : geometry2MunId.keySet()){
 				
@@ -306,8 +310,8 @@ public class FacilitiesCreator {
 					
 					double d = 1/CoordUtils.calcDistance(MGC.point2Coord(g.getCentroid()), facility.getCoord());
 					for(ActivityOption ao : facility.getActivityOptions().values()){
-						if(ao.getType().equals(Global.ActType.work)) continue;
-						ao.setCapacity(ao.getCapacity() * d);
+//						if(ao.getType().equals(Global.ActType.work)) continue;
+//						ao.setCapacity(ao.getCapacity() * d);
 					}
 					
 					if(facility.getActivityOptions().containsKey(Global.ActType.education.name())){
@@ -423,6 +427,8 @@ public class FacilitiesCreator {
 						GAPScenarioBuilder.getMunId2WorkLocation().put(munId, new ArrayList<ActivityFacility>());
 					}
 					GAPScenarioBuilder.getMunId2WorkLocation().get(munId).add(facility);
+					if(!scenario.getActivityFacilities().getFacilities().containsKey(facility.getId()))
+						scenario.getActivityFacilities().addActivityFacility(facility);
 					
 //					for(String s : facility.getActivityOptions().keySet()){
 //						

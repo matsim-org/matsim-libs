@@ -29,8 +29,7 @@ public class TravelDisutilityModule extends AbstractModule {
 
     @Override
     public void install() {
-        addTravelDisutilityFactoryBinding(TransportMode.car).to(carTravelDisutilityFactoryKey());
-        bindCarTravelDisutilityFactory().toInstance(new RandomizingTimeDistanceTravelDisutility.Builder( TransportMode.car ));
+        addTravelDisutilityFactoryBinding(TransportMode.car).toInstance(new RandomizingTimeDistanceTravelDisutility.Builder(TransportMode.car));
     }
 
 }

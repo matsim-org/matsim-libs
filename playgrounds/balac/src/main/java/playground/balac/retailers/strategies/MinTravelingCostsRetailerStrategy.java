@@ -26,7 +26,7 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
 
@@ -47,7 +47,7 @@ public class MinTravelingCostsRetailerStrategy extends RetailerStrategyImpl
   private Map<Id<ActivityFacility>, ActivityFacilityImpl> retailerFacilities;
   private Map<Id<ActivityFacility>, ActivityFacilityImpl> movedFacilities = new TreeMap<>();
 
-  public MinTravelingCostsRetailerStrategy(Controler controler)
+  public MinTravelingCostsRetailerStrategy(MatsimServices controler)
   {
     super(controler);
   }

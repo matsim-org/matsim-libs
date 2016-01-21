@@ -46,6 +46,8 @@ public class TransitionSequence<U extends DecisionVariable> {
 
 	private SimulatorState lastState = null;
 
+	private int iterations = 0;
+
 	// -------------------- CONSTRUCTION --------------------
 
 	TransitionSequence(final SimulatorState fromState,
@@ -87,6 +89,8 @@ public class TransitionSequence<U extends DecisionVariable> {
 		this.transitions.add(new Transition<>(decisionVariable, delta, toState
 				.getReferenceToVectorRepresentation(), objectiveFunctionValue));
 		this.lastState = toState;
+
+		this.iterations++;
 	}
 
 	void shrinkToMaximumLength(final int maximumLength) {
@@ -106,8 +110,19 @@ public class TransitionSequence<U extends DecisionVariable> {
 		return this.lastState;
 	}
 
-	List<Transition<U>> getTransitions() {
+	// TODO is now public
+	public List<Transition<U>> getTransitions() {
 		return this.transitions;
+	}
+
+	// TODO NEW
+	// remember: transitions are added at the end (and removed from the front)
+	Transition<U> getLastTransition() {
+		return this.transitions.getLast();
+	}
+
+	public int iterations() {
+		return this.iterations;
 	}
 
 	public int size() {
@@ -117,7 +132,6 @@ public class TransitionSequence<U extends DecisionVariable> {
 	public List<Double> getObjectiveFunctionValues() {
 		final List<Double> result = new ArrayList<Double>(this.size());
 		for (Transition<U> transition : this.transitions) {
-			// result.add(objectiveFunction.value(transition.getToState()));
 			result.add(transition.getToStateObjectiveFunctionValue());
 		}
 		return result;

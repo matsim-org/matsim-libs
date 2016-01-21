@@ -20,11 +20,11 @@
 package playground.johannes.gsv.matrices.postprocess;
 
 import org.apache.log4j.Logger;
-import playground.johannes.gsv.zones.KeyMatrix;
-import playground.johannes.gsv.zones.MatrixOperations;
-import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
-import playground.johannes.gsv.zones.io.KeyMatrixXMLWriter;
 import playground.johannes.synpop.data.CommonValues;
+import playground.johannes.synpop.matrix.MatrixOperations;
+import playground.johannes.synpop.matrix.NumericMatrix;
+import playground.johannes.synpop.matrix.NumericMatrixXMLReader;
+import playground.johannes.synpop.matrix.NumericMatrixXMLWriter;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -54,7 +54,7 @@ public class ApplyFactors {
 		 * avr day all purposes
 		 */
 		String file = String.format("%s/miv.xml", baseDir);
-		KeyMatrix m = loadMatrix(file);
+		NumericMatrix m = loadMatrix(file);
 
 		MatrixOperations.applyFactor(m, scaleFactor);
 		MatrixOperations.applyDiagonalFactor(m, diagonalFactor);
@@ -63,7 +63,7 @@ public class ApplyFactors {
 
 		double sum = MatrixOperations.sum(m);
 
-		MatrixOperations.symetrize(m);
+		MatrixOperations.symmetrize(m);
 		writeMatrix(m, String.format("%s/miv.sym.xml", outDir));
 		/*
 		 * purpose matrices
@@ -84,7 +84,7 @@ public class ApplyFactors {
 			file = String.format("%s/miv.%s.xml", outDir, type);
 			writeMatrix(m, file);
 
-			MatrixOperations.symetrize(m);
+			MatrixOperations.symmetrize(m);
 			writeMatrix(m, String.format("%s/miv.%s.sym.xml", outDir, type));
 		}
 //		System.exit(-1);
@@ -122,7 +122,7 @@ public class ApplyFactors {
 			file = String.format("%s/miv.%s.xml", outDir, day);
 			writeMatrix(m, file);
 
-			MatrixOperations.symetrize(m);
+			MatrixOperations.symmetrize(m);
 			writeMatrix(m, String.format("%s/miv.%s.sym.xml", outDir, day));
 
 			if(day.equalsIgnoreCase("wkday")) {
@@ -154,7 +154,7 @@ public class ApplyFactors {
 			file = String.format("%s/miv.wkday.%s.xml", outDir, type);
 			writeMatrix(m, file);
 
-			MatrixOperations.symetrize(m);
+			MatrixOperations.symmetrize(m);
 			writeMatrix(m, String.format("%s/miv.wkday.%s.sym.xml", outDir, type));
 		}
 
@@ -185,7 +185,7 @@ public class ApplyFactors {
 			file = String.format("%s/miv.%s.xml", outDir, season);
 			writeMatrix(m, file);
 
-			MatrixOperations.symetrize(m);
+			MatrixOperations.symmetrize(m);
 			writeMatrix(m, String.format("%s/miv.%s.sym.xml", outDir, season));
 		}
 		/*
@@ -208,15 +208,15 @@ public class ApplyFactors {
 		logger.info("Done.");
 	}
 
-	private static KeyMatrix loadMatrix(String file) {
-		KeyMatrixXMLReader reader = new KeyMatrixXMLReader();
+	private static NumericMatrix loadMatrix(String file) {
+		NumericMatrixXMLReader reader = new NumericMatrixXMLReader();
 		reader.setValidating(false);
 		reader.parse(file);
 		return reader.getMatrix();
 	}
 
-	private static void writeMatrix(KeyMatrix m, String file) {
-		KeyMatrixXMLWriter writer = new KeyMatrixXMLWriter();
+	private static void writeMatrix(NumericMatrix m, String file) {
+		NumericMatrixXMLWriter writer = new NumericMatrixXMLWriter();
 		writer.write(m, file);
 	}
 

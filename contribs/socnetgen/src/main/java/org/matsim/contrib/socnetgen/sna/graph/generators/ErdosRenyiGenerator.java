@@ -136,7 +136,7 @@ public class ErdosRenyiGenerator<G extends Graph, V extends Vertex, E extends Ed
 //			if(i % 10000 == 0)
 //				logger.info(String.format("Created %1$s of %2$s edges.", i+1, m));
         }
-        ProgressLogger.termiante();
+        ProgressLogger.terminate();
         return graph;
     }
 

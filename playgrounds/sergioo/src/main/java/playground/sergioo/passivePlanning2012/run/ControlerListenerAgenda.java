@@ -20,20 +20,17 @@
 
 package playground.sergioo.passivePlanning2012.run;
 
-import com.google.inject.Provider;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.scenario.MutableScenario;
@@ -41,7 +38,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
 
-import playground.sergioo.passivePlanning2012.core.mobsim.passivePlanning.PassivePlanningAgendaFactory;
 import playground.sergioo.passivePlanning2012.core.population.AgendaBasePersonImpl;
 import playground.sergioo.passivePlanning2012.core.population.socialNetwork.SocialNetworkReader;
 import playground.sergioo.passivePlanning2012.core.scenario.ScenarioSocialNetwork;
@@ -61,7 +57,7 @@ public class ControlerListenerAgenda implements StartupListener, IterationStarts
 	//@Override
 	@Override
 	public void notifyStartup(StartupEvent event) {
-		Controler controler = event.getControler();
+		MatsimServices controler = event.getServices();
         TransportModeNetworkFilter filter = new TransportModeNetworkFilter(controler.getScenario().getNetwork());
 		NetworkImpl net = NetworkImpl.createNetwork();
 		HashSet<String> carMode = new HashSet<String>();
@@ -69,7 +65,7 @@ public class ControlerListenerAgenda implements StartupListener, IterationStarts
 		filter.filter(net, carMode);
 		for(ActivityFacility facility:((MutableScenario)controler.getScenario()).getActivityFacilities().getFacilities().values())
 			((ActivityFacilityImpl)facility).setLinkId(net.getNearestLinkExactly(facility.getCoord()).getId());
-        Map<Id<Person>, ? extends Person> persons = event.getControler().getScenario().getPopulation().getPersons();
+        Map<Id<Person>, ? extends Person> persons = event.getServices().getScenario().getPopulation().getPersons();
 		Collection<Person> toBeAdded = new ArrayList<Person>();
 		Set<String> modes = new HashSet<String>();
 		modes.addAll(controler.getConfig().plansCalcRoute().getNetworkModes());
@@ -85,19 +81,20 @@ public class ControlerListenerAgenda implements StartupListener, IterationStarts
 	@Override
 	public void notifyIterationStarts(final IterationStartsEvent event) {
 		if(event.getIteration() == 0) {
-			final PassivePlannerManager passivePlannerManager = new PassivePlannerManager(event.getControler().getConfig().global().getNumberOfThreads()-event.getControler().getConfig().qsim().getNumberOfThreads());
-			event.getControler().addControlerListener(passivePlannerManager);
-			event.getControler().addOverridingModule(new AbstractModule() {
-				@Override
-				public void install() {
-					bindMobsim().toProvider(new Provider<Mobsim>() {
-						@Override
-						public Mobsim get() {
-							return new PassivePlanningAgendaFactory(passivePlannerManager, event.getControler().getTripRouterProvider().get()).createMobsim(event.getControler().getScenario(), event.getControler().getEvents());
-						}
-					});
-				}
-			});
+			final PassivePlannerManager passivePlannerManager = new PassivePlannerManager(event.getServices().getConfig().global().getNumberOfThreads()-event.getServices().getConfig().qsim().getNumberOfThreads());
+			event.getServices().addControlerListener(passivePlannerManager);
+			throw new RuntimeException();
+//			event.getServices().addOverridingModule(new AbstractModule() {
+//				@Override
+//				public void install() {
+//					bindMobsim().toProvider(new Provider<Mobsim>() {
+//						@Override
+//						public Mobsim get() {
+//							return new PassivePlanningAgendaFactory(passivePlannerManager, event.getServices().getTripRouterProvider().get()).createMobsim(event.getServices().getScenario(), event.getServices().getEvents());
+//						}
+//					});
+//				}
+//			});
 		}
 	}
 	//Main
@@ -111,12 +108,12 @@ public class ControlerListenerAgenda implements StartupListener, IterationStarts
 				true ?
 						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
 						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
-	/*WaitTimeCalculator waitTimeCalculator = new WaitTimeCalculator(controler.getScenario().getTransitSchedule(), controler.getConfig().travelTimeCalculator().getTraveltimeBinSize(), (int) (controler.getConfig().qsim().getEndTime()-controler.getConfig().qsim().getStartTime()));
-		controler.getEvents().addHandler(waitTimeCalculator);
-		StopStopTimeCalculator stopStopTimeCalculator = new StopStopTimeCalculator(controler.getScenario().getTransitSchedule(), controler.getConfig().travelTimeCalculator().getTraveltimeBinSize(), (int) (controler.getConfig().qsim().getEndTime()-controler.getConfig().qsim().getStartTime()));
-		controler.getEvents().addHandler(stopStopTimeCalculator);
-		controler.setTransitRouterFactory(new TransitRouterWSImplFactory(controler.getScenario(), waitTimeCalculator.getWaitTimes(), stopStopTimeCalculator.getStopStopTimes()));*/
-		//controler.setScoringFunctionFactory(new CharyparNagelOpenTimesScoringFunctionFactory(controler.getConfig().planCalcScore(), controler.getScenario()));
+	/*WaitTimeCalculator waitTimeCalculator = new WaitTimeCalculator(services.getScenario().getTransitSchedule(), services.getConfig().travelTimeCalculator().getTraveltimeBinSize(), (int) (services.getConfig().qsim().getEndTime()-services.getConfig().qsim().getStartTime()));
+		services.getEvents().addHandler(waitTimeCalculator);
+		StopStopTimeCalculator stopStopTimeCalculator = new StopStopTimeCalculator(services.getScenario().getTransitSchedule(), services.getConfig().travelTimeCalculator().getTraveltimeBinSize(), (int) (services.getConfig().qsim().getEndTime()-services.getConfig().qsim().getStartTime()));
+		services.getEvents().addHandler(stopStopTimeCalculator);
+		services.setTransitRouterFactory(new TransitRouterWSImplFactory(services.getScenario(), waitTimeCalculator.getWaitTimes(), stopStopTimeCalculator.getStopStopTimes()));*/
+		//services.setScoringFunctionFactory(new CharyparNagelOpenTimesScoringFunctionFactory(services.getConfig().planCalcScore(), services.getScenario()));
 		controler.addControlerListener(new ControlerListenerAgenda());
 		controler.run();
 	}

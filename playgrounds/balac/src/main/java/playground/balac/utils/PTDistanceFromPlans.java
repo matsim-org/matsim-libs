@@ -20,7 +20,7 @@ public class PTDistanceFromPlans {
 	public static void main(String[] args) throws IOException {
 		MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		PopulationReader populationReader = new MatsimPopulationReader(sc);
-		MatsimNetworkReader networkReader = new MatsimNetworkReader(sc);
+		MatsimNetworkReader networkReader = new MatsimNetworkReader(sc.getNetwork());
 		networkReader.readFile(args[0]);
 		populationReader.readFile(args[1]);
 		

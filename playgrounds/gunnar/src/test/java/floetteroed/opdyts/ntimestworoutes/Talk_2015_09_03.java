@@ -156,7 +156,7 @@ class Talk_2015_09_03 {
 					// final DecisionVariableRandomizer randomization = new
 					// ContinuousTollRandomizer(
 					// system, linkCnt, 0.1, 1.0, rnd);
-					final DecisionVariableRandomizer<NTimesTwoRoutesDecisionVariableMixedDiscrCont> randomization = new ContinuousDiscreteTollRandomizer(
+					final ContinuousDiscreteTollRandomizer randomization = new ContinuousDiscreteTollRandomizer(
 							system, linkCnt, tollCnt, 0.1, 1.0, rnd);
 
 					// final TrajectorySamplingSelfTuner selfTuner = new
@@ -177,10 +177,11 @@ class Talk_2015_09_03 {
 					final int maxMemoryLength = Integer.MAX_VALUE; // TODO NEW
 					final RandomSearch<NTimesTwoRoutesDecisionVariableMixedDiscrCont> search = new RandomSearch<>(
 							system, randomization,
+							randomization.newRandomDecisionVariable(),
 							convergenceCriterion,
 							// selfTuner,
 							maxIterations, maxTransitions, populationSize, rnd,
-							interpolate, keepBestSolution, objectiveFunction,
+							interpolate, objectiveFunction,
 							maxMemoryLength);
 
 					search.run();

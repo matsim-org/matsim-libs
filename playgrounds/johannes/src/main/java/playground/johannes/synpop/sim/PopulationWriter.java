@@ -19,9 +19,9 @@
 
 package playground.johannes.synpop.sim;
 
-import playground.johannes.gsv.popsim.analysis.AbstractAnalyzerTask;
-import playground.johannes.gsv.popsim.analysis.FileIOContext;
-import playground.johannes.gsv.popsim.analysis.StatsContainer;
+import playground.johannes.synpop.analysis.AnalyzerTask;
+import playground.johannes.synpop.analysis.FileIOContext;
+import playground.johannes.synpop.analysis.StatsContainer;
 import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.data.io.PopulationIO;
 
@@ -31,10 +31,12 @@ import java.util.List;
 /**
  * @author johannes
  */
-public class PopulationWriter extends AbstractAnalyzerTask<Collection<? extends Person>> {
+public class PopulationWriter implements AnalyzerTask<Collection<? extends Person>> {
+
+    private final FileIOContext ioContext;
 
     public PopulationWriter(FileIOContext ioContext) {
-        this.setIoContext(ioContext);
+        this.ioContext = ioContext;
     }
 
     @Override

@@ -25,7 +25,7 @@ package playground.johannes.synpop.data;
  */
 public interface CommonKeys {
 	
-	String PERSON_WEIGHT = "weight";
+	String PERSON_WEIGHT = "weight"; //TODO: rename to "weight" only
 
 	String LEG_START_TIME = "startTime";
 	

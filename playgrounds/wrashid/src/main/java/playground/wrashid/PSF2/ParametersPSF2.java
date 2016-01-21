@@ -23,7 +23,7 @@ package playground.wrashid.PSF2;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.parking.lib.obj.LinkedListValueHashMap;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import playground.wrashid.PSF.energy.charging.ChargingTimes;
 import playground.wrashid.PSF2.chargingSchemes.ActivityIntervalTracker_NonParallelizableHandler;
 import playground.wrashid.PSF2.vehicle.energyConsumption.EnergyConsumptionTable;
@@ -56,7 +56,7 @@ public class ParametersPSF2 {
 
 
 
-	public static Controler controler;
+	public static MatsimServices controler;
 
 
 
@@ -67,7 +67,7 @@ public class ParametersPSF2 {
 
 	public static boolean isEventsFileBasedControler=false;
 	
-	public static void initVehicleFleet(Controler controler){
+	public static void initVehicleFleet(MatsimServices controler){
         ParametersPSF2.vehicles=ParametersPSF2.fleetInitializer.getVehicles(controler.getScenario().getPopulation().getPersons().keySet(), ParametersPSF2.energyStateMaintainer);
 	};
 	

@@ -8,20 +8,27 @@ import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 
-public class TripHandler implements ActivityEndEventHandler, ActivityStartEventHandler, LinkLeaveEventHandler, PersonArrivalEventHandler {
+public class TripHandler implements ActivityEndEventHandler, ActivityStartEventHandler, LinkLeaveEventHandler, PersonArrivalEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 	private Map<Id<Trip>, Trip> trips = new HashMap<>();
 	
 	private Map<Id<Person>, Integer> activityEndCount = new HashMap <Id<Person>, Integer>();
 	private Map<Id<Person>, Integer> activityStartCount = new HashMap <Id<Person>, Integer>();
 	
 	int noPreviousEndOfActivityCounter = 0;
+	
+	Vehicle2DriverEventHandler vehicle2driver = new Vehicle2DriverEventHandler();
 	
 	
 	@Override
@@ -137,7 +144,8 @@ public class TripHandler implements ActivityEndEventHandler, ActivityStartEventH
 		//String eventType = event.getEventType();
 		Id<Link> linkId = event.getLinkId();
 		//String linkShortened = linkId.toString().substring(0, 10) + "...";
-		Id<Person> personId = event.getDriverId();
+//		Id<Person> personId = event.getDriverId();
+		Id<Person> personId = vehicle2driver.getDriverOfVehicle(event.getVehicleId());
 		//double time = event.getTime();
 		//Id vehicleId = event.getVehicleId();
 		
@@ -189,5 +197,17 @@ public class TripHandler implements ActivityEndEventHandler, ActivityStartEventH
 	
 	public int getNoPreviousEndOfActivityCounter() {
 		return this.noPreviousEndOfActivityCounter;
+	}
+
+
+	@Override
+	public void handleEvent(VehicleEntersTrafficEvent event) {
+		vehicle2driver.handleEvent(event);
+	}
+
+
+	@Override
+	public void handleEvent(VehicleLeavesTrafficEvent event) {
+		vehicle2driver.handleEvent(event);
 	}
 }

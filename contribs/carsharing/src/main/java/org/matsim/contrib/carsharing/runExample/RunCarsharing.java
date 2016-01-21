@@ -39,8 +39,7 @@ public class RunCarsharing {
 	}
 
 	public static void installCarSharing(final Controler controler) {
-		Scenario sc = controler.getScenario() ;
-		
+
 		controler.addOverridingModule( new AbstractModule() {
 			@Override
 			public void install() {
@@ -53,13 +52,13 @@ public class RunCarsharing {
 			@Override
 			public void install() {
 				bindMobsim().toProvider( CarsharingQsimFactory.class );
+				//setting up the scoring function factory, inside different scoring functions are set-up
+				bindScoringFunctionFactory().to(CarsharingScoringFunctionFactory.class);
 			}
 		});
 
 		controler.addOverridingModule(CarsharingUtils.createModule());
 
-		//setting up the scoring function factory, inside different scoring functions are set-up
-		controler.setScoringFunctionFactory( new CarsharingScoringFunctionFactory( sc ) );
 
 		final CarsharingConfigGroup csConfig = (CarsharingConfigGroup) controler.getConfig().getModule(CarsharingConfigGroup.GROUP_NAME);
 		controler.addControlerListener(new CarsharingListener(controler,

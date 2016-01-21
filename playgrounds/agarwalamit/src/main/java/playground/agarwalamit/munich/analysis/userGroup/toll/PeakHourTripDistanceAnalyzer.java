@@ -49,23 +49,22 @@ import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
  */
 
 public class PeakHourTripDistanceAnalyzer  {
-
-	public PeakHourTripDistanceAnalyzer(Network network, double simulationEndTime, int noOfTimeBins) {
-		log.warn("Peak hours are assumed as 07:00-10:00 and 15:00-18:00 by looking on the travel demand for BAU scenario.");
-		this.tripDistHandler = new TripDistanceHandler(network, simulationEndTime, noOfTimeBins);
-	}
-
 	private TripDistanceHandler tripDistHandler;
 	private final List<Double> pkHrs = new ArrayList<>(Arrays.asList(new Double []{8., 9., 10., 16., 17., 18.,})); // => 7-10 and 15-18
 	private final ExtendedPersonFilter pf = new ExtendedPersonFilter();
-	private Map<Id<Person>,List<Double>> person2Dists_pkHr = new HashMap<>();
-	private Map<Id<Person>,List<Double>> person2Dists_offPkHr = new HashMap<>();
-	private Map<Id<Person>,Integer> person2TripCounts_pkHr = new HashMap<>();
-	private Map<Id<Person>,Integer> person2TripCounts_offPkHr = new HashMap<>();
+	private Map<Id<Person>,List<Double>> person2DistsPkHr = new HashMap<>();
+	private Map<Id<Person>,List<Double>> person2DistsOffPkHr = new HashMap<>();
+	private Map<Id<Person>,Integer> person2TripCountsPkHr = new HashMap<>();
+	private Map<Id<Person>,Integer> person2TripCountsOffPkHr = new HashMap<>();
 	private SortedMap<String, Tuple<Double,Double>> usrGrp2Dists = new TreeMap<>();
 	private SortedMap<String, Tuple<Integer,Integer>> usrGrp2TripCounts = new TreeMap<>();
-	private static final Logger log = Logger.getLogger(PeakHourTripDistanceAnalyzer.class);
+	private static final Logger LOG = Logger.getLogger(PeakHourTripDistanceAnalyzer.class);
 
+	public PeakHourTripDistanceAnalyzer(Network network, double simulationEndTime, int noOfTimeBins) {
+		LOG.warn("Peak hours are assumed as 07:00-10:00 and 15:00-18:00 by looking on the travel demand for BAU scenario.");
+		this.tripDistHandler = new TripDistanceHandler(network, simulationEndTime, noOfTimeBins);
+	}
+	
 	public static void main(String[] args) {
 		String [] pricingSchemes = new String [] {"ei","ci","eci"};
 		for (String str :pricingSchemes) {
@@ -111,19 +110,19 @@ public class PeakHourTripDistanceAnalyzer  {
 			usrGrp2TripCounts.put(pf.getMyUserGroup(ug), new Tuple<Integer, Integer>(0, 0));
 		}
 		//first store peak hour data
-		for (Id<Person> personId : this.person2Dists_pkHr.keySet()) {
+		for (Id<Person> personId : this.person2DistsPkHr.keySet()) {
 			String ug = pf.getMyUserGroupFromPersonId(personId);
-			double pkDist = usrGrp2Dists.get(ug).getFirst() + ListUtils.doubleSum(this.person2Dists_pkHr.get(personId));
-			int pkTripCount = usrGrp2TripCounts.get(ug).getFirst() + this.person2TripCounts_pkHr.get(personId);
+			double pkDist = usrGrp2Dists.get(ug).getFirst() + ListUtils.doubleSum(this.person2DistsPkHr.get(personId));
+			int pkTripCount = usrGrp2TripCounts.get(ug).getFirst() + this.person2TripCountsPkHr.get(personId);
 			usrGrp2Dists.put(ug, new Tuple<Double, Double>(pkDist, 0.));
 			usrGrp2TripCounts.put(ug, new Tuple<Integer,Integer>(pkTripCount,0) );
 		}
 
 		//now store off-peak hour data
-		for (Id<Person> personId : this.person2Dists_offPkHr.keySet()) {
+		for (Id<Person> personId : this.person2DistsOffPkHr.keySet()) {
 			String ug = pf.getMyUserGroupFromPersonId(personId);
-			double offpkDist = usrGrp2Dists.get(ug).getSecond() + ListUtils.doubleSum(this.person2Dists_offPkHr.get(personId));
-			int offpkTripCount = usrGrp2TripCounts.get(ug).getSecond() + this.person2TripCounts_offPkHr.get(personId);
+			double offpkDist = usrGrp2Dists.get(ug).getSecond() + ListUtils.doubleSum(this.person2DistsOffPkHr.get(personId));
+			int offpkTripCount = usrGrp2TripCounts.get(ug).getSecond() + this.person2TripCountsOffPkHr.get(personId);
 			usrGrp2Dists.put(ug, new Tuple<Double, Double>(usrGrp2Dists.get(ug).getFirst(), offpkDist));
 			usrGrp2TripCounts.put(ug, new Tuple<Integer,Integer>(usrGrp2TripCounts.get(ug).getFirst(),offpkTripCount) );
 		}
@@ -136,22 +135,22 @@ public class PeakHourTripDistanceAnalyzer  {
 		for(double d :timebin2person2tripDists.keySet()) {
 			for (Id<Person> person : timebin2person2tripDists.get(d).keySet()) {
 				if(pkHrs.contains(d)) {
-					if (person2Dists_pkHr.containsKey(person) ) {
-						List<Double> dists =  person2Dists_pkHr.get(person);
+					if (person2DistsPkHr.containsKey(person) ) {
+						List<Double> dists =  person2DistsPkHr.get(person);
 						dists.addAll(timebin2person2tripDists.get(d).get(person));
-						person2TripCounts_pkHr.put(person, timebin2person2tripCounts.get(d).get(person) + person2TripCounts_pkHr.get(person));
+						person2TripCountsPkHr.put(person, timebin2person2tripCounts.get(d).get(person) + person2TripCountsPkHr.get(person));
 					} else {
-						person2Dists_pkHr.put(person,  timebin2person2tripDists.get(d).get(person));
-						person2TripCounts_pkHr.put(person, timebin2person2tripCounts.get(d).get(person));
+						person2DistsPkHr.put(person,  timebin2person2tripDists.get(d).get(person));
+						person2TripCountsPkHr.put(person, timebin2person2tripCounts.get(d).get(person));
 					}
 				} else {
-					if (person2Dists_offPkHr.containsKey(person) ) {
-						List<Double> dists =  person2Dists_offPkHr.get(person);
+					if (person2DistsOffPkHr.containsKey(person) ) {
+						List<Double> dists =  person2DistsOffPkHr.get(person);
 						dists.addAll(timebin2person2tripDists.get(d).get(person));
-						person2TripCounts_offPkHr.put(person, timebin2person2tripCounts.get(d).get(person) + person2TripCounts_offPkHr.get(person));
+						person2TripCountsOffPkHr.put(person, timebin2person2tripCounts.get(d).get(person) + person2TripCountsOffPkHr.get(person));
 					} else {
-						person2Dists_offPkHr.put(person,  timebin2person2tripDists.get(d).get(person));
-						person2TripCounts_offPkHr.put(person, timebin2person2tripCounts.get(d).get(person));
+						person2DistsOffPkHr.put(person,  timebin2person2tripDists.get(d).get(person));
+						person2TripCountsOffPkHr.put(person, timebin2person2tripCounts.get(d).get(person));
 					}
 				}
 			}

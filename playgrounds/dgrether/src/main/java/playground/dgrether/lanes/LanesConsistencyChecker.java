@@ -161,7 +161,7 @@ public class LanesConsistencyChecker {
 
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network net = scenario.getNetwork();
-		new MatsimNetworkReader(scenario).readFile(netFile);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(netFile);
 	  log.info("read network");
 	  
 		LaneDefinitionsReader laneReader = new LaneDefinitionsReader(scenario);

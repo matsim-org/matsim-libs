@@ -10,7 +10,7 @@ import org.matsim.contrib.matsim4urbansim.config.modules.UrbanSimParameterConfig
 import org.matsim.contrib.matsim4urbansim.constants.InternalConstants;
 import org.matsim.contrib.matsim4urbansim.utils.helperobjects.Benchmark;
 import org.matsim.contrib.matsim4urbansim.utils.io.writer.UrbanSimPersonCSVWriter;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -51,7 +51,7 @@ public class AgentPerformanceControlerListener implements ShutdownListener{
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {
 		
-		int benchmarkID = this.benchmark.addMeasure("Agent performance controler");
+		int benchmarkID = this.benchmark.addMeasure("Agent performance services");
 		
 		long carModeCounter = 0;
 		long ptModeCounter  = 0;
@@ -59,7 +59,7 @@ public class AgentPerformanceControlerListener implements ShutdownListener{
 		long walkModeCounter= 0;
 		
 		// get the controller and scenario
-		Controler controler = event.getControler();
+		MatsimServices controler = event.getServices();
 		// get network
         Network network = controler.getScenario().getNetwork();
 		// get persons

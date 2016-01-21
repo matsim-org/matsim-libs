@@ -43,7 +43,7 @@ import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Point;
 
-import playground.agarwalamit.mixedTraffic.patnaIndia.PatnaUtils;
+import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
 import playground.agarwalamit.utils.GeometryUtils;
 import playground.agarwalamit.utils.LoadMyScenarios;
 
@@ -111,7 +111,7 @@ public class Patna100PctPopulation {
 					String zoneId  = String.valueOf(id);
 
 					if(fromZoneId.equals(zoneId) ) {
-						p = GeometryUtils.getRandomPointsFromWard(feature);
+						p = GeometryUtils.getRandomPointsInsideFeature(feature);
 						Coord fromZoneCoord = new Coord(p.getX(), p.getY());
 						homeZoneCoordTransform = PatnaUtils.COORDINATE_TRANSFORMATION.transform(fromZoneCoord);
 					}
@@ -120,7 +120,7 @@ public class Patna100PctPopulation {
 				for (int j=0; j<100; j++){ //run with 100% sample
 
 					String travelMode = getTravelMode(parts [8]);
-					if(PatnaUtils.MAIN_MODES.contains(travelMode)) {
+					if(PatnaUtils.URBAN_MAIN_MODES.contains(travelMode)) {
 						Population pop = scenario.getPopulation();
 						PopulationFactory populationFactory = pop.getFactory();
 

@@ -104,7 +104,7 @@ public class JointPseudoSimTest {
 	}
 
 	private com.google.inject.Provider<TripRouter> createTripRouterFactory(final Scenario scenario) {
-		Injector injector = Injector.createInjector(
+		com.google.inject.Injector injector = Injector.createInjector(
 				scenario.getConfig(),
 				AbstractModule.override(Collections.singleton(new AbstractModule() {
 					@Override

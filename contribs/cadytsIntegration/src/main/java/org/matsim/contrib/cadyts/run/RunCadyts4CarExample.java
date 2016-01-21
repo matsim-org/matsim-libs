@@ -21,6 +21,7 @@ package org.matsim.contrib.cadyts.run;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.cadyts.car.CadytsCarModule;
 import org.matsim.contrib.cadyts.car.CadytsContext;
 import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
 import org.matsim.contrib.cadyts.general.CadytsScoring;
@@ -35,8 +36,9 @@ import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
-import org.matsim.core.scoring.functions.SubpopulationCharyparNagelScoringParameters;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+
+import javax.inject.Inject;
 
 /**
  * Script-in-java to include cadyts into a matsim run.
@@ -56,27 +58,23 @@ public class RunCadyts4CarExample {
 		// ---
 
 		final Controler controler = new Controler( scenario ) ;
-		
-		// create the cadyts context and add it to the control(l)er:
-		final CadytsContext cContext = new CadytsContext(config);
-		controler.addControlerListener(cContext);
+		controler.addOverridingModule(new CadytsCarModule());
 
 		// include cadyts into the plan scoring (this will add the cadyts corrections to the scores):
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
-			private final CharyparNagelScoringParametersForPerson parameters = new SubpopulationCharyparNagelScoringParameters( scenario );
+			@Inject CadytsContext cadytsContext;
+			@Inject CharyparNagelScoringParametersForPerson parameters;
 			@Override
 			public ScoringFunction createNewScoringFunction(Person person) {
-
-				final CharyparNagelScoringParameters params = parameters.getScoringParameters( person );
+				final CharyparNagelScoringParameters params = parameters.getScoringParameters(person);
 				
 				SumScoringFunction scoringFunctionAccumulator = new SumScoringFunction();
 				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(params, controler.getScenario().getNetwork()));
 				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelActivityScoring(params)) ;
 				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
 
-				final CadytsScoring<Link> scoringFunction = new CadytsScoring<>(person.getSelectedPlan(), config, cContext);
-				final double cadytsScoringWeight = 30. * config.planCalcScore().getBrainExpBeta() ;
-				scoringFunction.setWeightOfCadytsCorrection(cadytsScoringWeight) ;
+				final CadytsScoring<Link> scoringFunction = new CadytsScoring<>(person.getSelectedPlan(), config, cadytsContext);
+				scoringFunction.setWeightOfCadytsCorrection(30. * config.planCalcScore().getBrainExpBeta()) ;
 				scoringFunctionAccumulator.addScoringFunction(scoringFunction );
 
 				return scoringFunctionAccumulator;

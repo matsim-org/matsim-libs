@@ -78,7 +78,7 @@ public class DriveDischargingHandler
             ElectricVehicle ev = vehicleToEV.get(vehicleId);
             Link link = network.getLinks().get(linkId);
 
-            boolean vehLeftTraffic = linkLeaveTime == Double.NaN;
+            boolean vehLeftTraffic = Double.isNaN(linkLeaveTime);
             double tt = vehLeftTraffic ? // 
                     travelTime.getLinkTravelTime(link, linkEnterTime, null, null)
                     : linkLeaveTime - linkEnterTime;

@@ -20,16 +20,16 @@
 
 package playground.meisterk.org.matsim.run.westumfahrung;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.regex.Pattern;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.analysis.filters.population.AbstractPlanFilter;
 import org.matsim.population.algorithms.PlanAlgorithm;
+
+import java.util.HashSet;
+import java.util.Set;
+import java.util.regex.Pattern;
 
 /**
  * Filters all plans where activities of the same type take place at the same link or set of links.

@@ -51,7 +51,7 @@ public class KmlNetworkWriterTest extends MatsimTestCase {
 		
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario).readFile("test/scenarios/equil/network.xml");
+		new MatsimNetworkReader(scenario.getNetwork()).readFile("test/scenarios/equil/network.xml");
 		
 		ObjectFactory kmlObjectFactory = new ObjectFactory();
 		KMZWriter kmzWriter = new KMZWriter(kmzFilename);

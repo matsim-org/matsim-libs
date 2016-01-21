@@ -74,7 +74,7 @@ public class PlanToPlanStepBasedOnEvents implements PlansTranslator<Link>, LinkL
 	private long plansNotFound = 0;
 
 	@Override
-	public final cadyts.demand.Plan<Link> getPlanSteps(final Plan plan) {
+	public final cadyts.demand.Plan<Link> getCadytsPlan(final Plan plan) {
 		PlanBuilder<Link> planStepFactory = (PlanBuilder<Link>) plan.getCustomAttributes().get(STR_PLANSTEPFACTORY);
 		if (planStepFactory == null) {
 			this.plansNotFound++;

@@ -66,7 +66,7 @@ public class UpdateCapacityControlerListener implements StartupListener, Iterati
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		this.eventHandler = new TravelTimeEventHandler(personId2travelTimesPerIteration, personId2enterTimesPerIteration, enterLinkId, leaveLinkId);
-		event.getControler().getEvents().addHandler(this.eventHandler);
+		event.getServices().getEvents().addHandler(this.eventHandler);
 		
 		Link link = scenario.getNetwork().getLinks().get(this.leaveLinkId);
 		link.setCapacity(this.capacity);

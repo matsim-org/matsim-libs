@@ -31,7 +31,7 @@ public class BusLines {
 	public static void main(String[] args) {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario.getConfig().transit().setUseTransit(true);
-		new MatsimNetworkReader(scenario).readFile(args[0]);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(args[0]);
 		new TransitScheduleReader(scenario).readFile(args[1]);
 		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
 		PolylineFeatureFactory.Builder b = new PolylineFeatureFactory.Builder();

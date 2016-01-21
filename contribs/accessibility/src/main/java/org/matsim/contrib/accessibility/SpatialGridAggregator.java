@@ -18,6 +18,11 @@ class SpatialGridAggregator implements FacilityDataExchangeInterface {
 		}
 	}
 
+	@Override
+	public void finish() {
+
+	}
+
 	Map<Modes4Accessibility, SpatialGrid> getAccessibilityGrids() {
 		return accessibilityGrids;
 	}

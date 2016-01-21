@@ -88,7 +88,7 @@ public class EstimateVktFromLegDistances {
 		}
 		
 		/* Parse the network */
-		new MatsimNetworkReader(sc).parse(network);
+		new MatsimNetworkReader(sc.getNetwork()).parse(network);
 		
 		/* Set up the multithreaded infrastructure. */
 		ExecutorService executor = Executors.newFixedThreadPool(nThreads);

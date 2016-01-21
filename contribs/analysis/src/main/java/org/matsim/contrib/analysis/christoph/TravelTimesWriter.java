@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
@@ -50,7 +50,7 @@ import java.util.Map.Entry;
  * relative values; txt and shp files).
  * 
  * When added as ControlerListener, car travel times are collected and written
- * based on the TravelTimeCalculator provided by the controler.
+ * based on the TravelTimeCalculator provided by the services.
  * 
  * For other modes, first call collectTravelTimes(...) and then the writer methods.
  * 
@@ -269,7 +269,7 @@ public class TravelTimesWriter implements IterationEndsListener {
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
 
-		Controler controler = event.getControler();
+		MatsimServices controler = event.getServices();
 		Config config = controler.getConfig();
 		this.travelTime = controler.getLinkTravelTimes();
         this.network = controler.getScenario().getNetwork();
@@ -279,7 +279,7 @@ public class TravelTimesWriter implements IterationEndsListener {
 		
 		this.collectTravelTimes(travelTime, network, timeSlice, numSlots);
 		
-		OutputDirectoryHierarchy controlerIO = event.getControler().getControlerIO();
+		OutputDirectoryHierarchy controlerIO = event.getServices().getControlerIO();
 		int iteration = event.getIteration();
 		
 		String absoluteFile = TravelTimesWriter.travelTimesAbsoluteFile;

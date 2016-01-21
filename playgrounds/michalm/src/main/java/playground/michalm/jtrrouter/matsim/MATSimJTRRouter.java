@@ -50,7 +50,7 @@ public class MATSimJTRRouter
     public void readNetwork(String dir, String networkFile)
     {
         Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-        new MatsimNetworkReader(scenario).readFile(dir + "\\" + networkFile);
+        new MatsimNetworkReader(scenario.getNetwork()).readFile(dir + "\\" + networkFile);
         idToLinkMap = scenario.getNetwork().getLinks();
     }
 

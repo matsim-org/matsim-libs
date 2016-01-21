@@ -130,141 +130,141 @@ public class TrajectorySamplingSelfTuner {
 
 	// -------------------- OPTIMIZATION --------------------
 
-	public <U extends DecisionVariable> void registerSamplingStageSequence(
-			final List<SamplingStage<U>> samplingStages,
-			final double finalObjectiveFunctionValue
-			,
-//			final double gradientNorm, final 
-			U finalDecisionVariable) {
-
-		final SamplingStage<U> stage = samplingStages.get(0);
-		// final double alpha = stage.getAlphaSum(finalDecisionVariable);
-		final Vector input = new Vector(4);
-		input.set(this.equilibriumGapWeightIndex,
-				// gradientNorm * 
-				stage.getEquilibriumGap()
-		// * stage.decisionVariable2singletonEquilbriumGap
-		// .get(finalDecisionVariable)
-		);
-		input.add(this.uniformityWeightIndex,
-				// gradientNorm * 
-				stage.getAlphaNorm() * stage.getAlphaNorm()
-		// * stage.decisionVariable2singletonUniformityGap
-		// .get(finalDecisionVariable)
-		);
-		input.add(this.posOffsetIndex, +1.0);
-		input.add(this.negOffsetIndex, -1.0);
-		double output = finalObjectiveFunctionValue
-				- stage.getOriginalObjectiveFunctionValue();
-
-		// TODO NEW SCALING >>>>>
-		// final double completionProba = 1.0;
-		// // this.completionProba(stage, finalDecisionVariable,
-		// // samplingStages.size());
-		// System.out.println(completionProba + "\t" + input + " -> " + output);
-		// input.mult(Math.sqrt(completionProba));
-		// output *= Math.sqrt(completionProba);
-		// TODO NEW SCALING <<<<<
-
-		this.inputs.addFirst(input);
-		this.outputs.addFirst(output);
-
-		try {
-			this.log = new PrintWriter(new BufferedWriter(new FileWriter(
-					"./predvsreal.txt", true)));
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-		this.log.println((stage.getOriginalObjectiveFunctionValue() + input
-				.innerProd(this.coeffs)) + "\t" + finalObjectiveFunctionValue);
-		this.log.close();
-
-		// final SamplingStage stage = samplingStages.get(0);
-		// final double alpha = stage.getAlphaSum(finalDecisionVariable);
-		// final Vector input = new Vector(4);
-		// input.set(
-		// this.equilibriumGapWeightIndex,
-		// gradientNorm
-		// * stage.decisionVariable2singletonEquilbriumGap
-		// .get(finalDecisionVariable));
-		// input.add(
-		// this.uniformityWeightIndex,
-		// gradientNorm
-		// * stage.decisionVariable2singletonUniformityGap
-		// .get(finalDecisionVariable));
-		// input.add(this.posOffsetIndex, +1.0);
-		// input.add(this.negOffsetIndex, -1.0);
-		// double output = finalObjectiveFunctionValue
-		// - stage.decisionVariable2singletonInterpolatedObjectiveFunction
-		// .get(finalDecisionVariable);
-		//
-		// System.out.println(alpha + "\t" + input + " -> " + output);
-		// // TODO NEW SCALING >>>>>
-		// input.mult(alpha);
-		// output *= alpha;
-		// // TODO NEW SCALING <<<<<
-		// this.inputs.addFirst(input);
-		// this.outputs.addFirst(output);
-
-		// final Vector input = new Vector(4);
-		// final SamplingStage stage = samplingStages
-		// .get(samplingStages.size() - 2); // the stage before convergence
-		// input.set(this.equilibriumGapWeightIndex,
-		// gradientNorm * stage.getEquilibriumGap());
-		// input.set(this.uniformityWeightIndex,
-		// gradientNorm * stage.getAlphaNorm());
-		// input.set(this.posOffsetIndex, +1.0);
-		// input.set(this.negOffsetIndex, -1.0);
-		// final double output = finalObjectiveFunctionValue
-		// - stage.getInterpolatedObjectiveFunctionValue();
-		// System.out.println(input + " -> " + output);
-		// this.inputs.addFirst(input);
-		// this.outputs.addFirst(output);
-
-		// final Vector input = new Vector(4);
-		// double output = 0.0; // final
-		// SamplingStage initialStage = samplingStages.get(0);
-		// for (SamplingStage stage : samplingStages) {
-		// input.add(this.equilibriumGapWeightIndex,
-		// gradientNorm * stage.getEquilibriumGap());
-		// input.add(this.uniformityWeightIndex,
-		// gradientNorm * stage.getAlphaNorm());
-		// input.add(this.posOffsetIndex, +1.0);
-		// input.add(this.negOffsetIndex, -1.0);
-		// output += finalObjectiveFunctionValue
-		// - stage.getInterpolatedObjectiveFunctionValue();
-		// }
-		// input.mult(1.0 / samplingStages.size());
-		// output /= samplingStages.size();
-		// System.out.println(input + " -> " + output);
-		// this.inputs.addFirst(input);
-		// this.outputs.addFirst(output);
-
-		// for (SamplingStage stage : samplingStages) {
-		// final Vector input = new Vector(4);
-		// double output = 0.0;
-		// input.add(this.equilibriumGapWeightIndex,
-		// gradientNorm * stage.getEquilibriumGap());
-		// input.add(this.uniformityWeightIndex,
-		// gradientNorm * stage.getAlphaNorm());
-		// input.add(this.posOffsetIndex, +1.0);
-		// input.add(this.negOffsetIndex, -1.0);
-		// output += finalObjectiveFunctionValue
-		// - stage.getInterpolatedObjectiveFunctionValue();
-		// this.inputs.addFirst(input);
-		// this.outputs.addFirst(output);
-		// }
-
-		final UpperBoundTuner myTuner = new UpperBoundTuner();
-		myTuner.registerSamplingStageSequence(samplingStages,
-				finalObjectiveFunctionValue
-				// , 
-				// gradientNorm,
-				// finalDecisionVariable
-				);
-
-		this.run();
-	}
+//	public <U extends DecisionVariable> void registerSamplingStageSequence(
+//			final List<SamplingStage<U>> samplingStages,
+//			final double finalObjectiveFunctionValue
+//			,
+////			final double gradientNorm, final 
+//			U finalDecisionVariable) {
+//
+//		final SamplingStage<U> stage = samplingStages.get(0);
+//		// final double alpha = stage.getAlphaSum(finalDecisionVariable);
+//		final Vector input = new Vector(4);
+//		input.set(this.equilibriumGapWeightIndex,
+//				// gradientNorm * 
+//				stage.getEquilibriumGap()
+//		// * stage.decisionVariable2singletonEquilbriumGap
+//		// .get(finalDecisionVariable)
+//		);
+//		input.add(this.uniformityWeightIndex,
+//				// gradientNorm * 
+//				stage.getAlphaNorm() * stage.getAlphaNorm()
+//		// * stage.decisionVariable2singletonUniformityGap
+//		// .get(finalDecisionVariable)
+//		);
+//		input.add(this.posOffsetIndex, +1.0);
+//		input.add(this.negOffsetIndex, -1.0);
+//		double output = finalObjectiveFunctionValue
+//				- stage.getOriginalObjectiveFunctionValue();
+//
+//		// TODO NEW SCALING >>>>>
+//		// final double completionProba = 1.0;
+//		// // this.completionProba(stage, finalDecisionVariable,
+//		// // samplingStages.size());
+//		// System.out.println(completionProba + "\t" + input + " -> " + output);
+//		// input.mult(Math.sqrt(completionProba));
+//		// output *= Math.sqrt(completionProba);
+//		// TODO NEW SCALING <<<<<
+//
+//		this.inputs.addFirst(input);
+//		this.outputs.addFirst(output);
+//
+//		try {
+//			this.log = new PrintWriter(new BufferedWriter(new FileWriter(
+//					"./predvsreal.txt", true)));
+//		} catch (IOException e) {
+//			throw new RuntimeException(e);
+//		}
+//		this.log.println((stage.getOriginalObjectiveFunctionValue() + input
+//				.innerProd(this.coeffs)) + "\t" + finalObjectiveFunctionValue);
+//		this.log.close();
+//
+//		// final SamplingStage stage = samplingStages.get(0);
+//		// final double alpha = stage.getAlphaSum(finalDecisionVariable);
+//		// final Vector input = new Vector(4);
+//		// input.set(
+//		// this.equilibriumGapWeightIndex,
+//		// gradientNorm
+//		// * stage.decisionVariable2singletonEquilbriumGap
+//		// .get(finalDecisionVariable));
+//		// input.add(
+//		// this.uniformityWeightIndex,
+//		// gradientNorm
+//		// * stage.decisionVariable2singletonUniformityGap
+//		// .get(finalDecisionVariable));
+//		// input.add(this.posOffsetIndex, +1.0);
+//		// input.add(this.negOffsetIndex, -1.0);
+//		// double output = finalObjectiveFunctionValue
+//		// - stage.decisionVariable2singletonInterpolatedObjectiveFunction
+//		// .get(finalDecisionVariable);
+//		//
+//		// System.out.println(alpha + "\t" + input + " -> " + output);
+//		// // TODO NEW SCALING >>>>>
+//		// input.mult(alpha);
+//		// output *= alpha;
+//		// // TODO NEW SCALING <<<<<
+//		// this.inputs.addFirst(input);
+//		// this.outputs.addFirst(output);
+//
+//		// final Vector input = new Vector(4);
+//		// final SamplingStage stage = samplingStages
+//		// .get(samplingStages.size() - 2); // the stage before convergence
+//		// input.set(this.equilibriumGapWeightIndex,
+//		// gradientNorm * stage.getEquilibriumGap());
+//		// input.set(this.uniformityWeightIndex,
+//		// gradientNorm * stage.getAlphaNorm());
+//		// input.set(this.posOffsetIndex, +1.0);
+//		// input.set(this.negOffsetIndex, -1.0);
+//		// final double output = finalObjectiveFunctionValue
+//		// - stage.getInterpolatedObjectiveFunctionValue();
+//		// System.out.println(input + " -> " + output);
+//		// this.inputs.addFirst(input);
+//		// this.outputs.addFirst(output);
+//
+//		// final Vector input = new Vector(4);
+//		// double output = 0.0; // final
+//		// SamplingStage initialStage = samplingStages.get(0);
+//		// for (SamplingStage stage : samplingStages) {
+//		// input.add(this.equilibriumGapWeightIndex,
+//		// gradientNorm * stage.getEquilibriumGap());
+//		// input.add(this.uniformityWeightIndex,
+//		// gradientNorm * stage.getAlphaNorm());
+//		// input.add(this.posOffsetIndex, +1.0);
+//		// input.add(this.negOffsetIndex, -1.0);
+//		// output += finalObjectiveFunctionValue
+//		// - stage.getInterpolatedObjectiveFunctionValue();
+//		// }
+//		// input.mult(1.0 / samplingStages.size());
+//		// output /= samplingStages.size();
+//		// System.out.println(input + " -> " + output);
+//		// this.inputs.addFirst(input);
+//		// this.outputs.addFirst(output);
+//
+//		// for (SamplingStage stage : samplingStages) {
+//		// final Vector input = new Vector(4);
+//		// double output = 0.0;
+//		// input.add(this.equilibriumGapWeightIndex,
+//		// gradientNorm * stage.getEquilibriumGap());
+//		// input.add(this.uniformityWeightIndex,
+//		// gradientNorm * stage.getAlphaNorm());
+//		// input.add(this.posOffsetIndex, +1.0);
+//		// input.add(this.negOffsetIndex, -1.0);
+//		// output += finalObjectiveFunctionValue
+//		// - stage.getInterpolatedObjectiveFunctionValue();
+//		// this.inputs.addFirst(input);
+//		// this.outputs.addFirst(output);
+//		// }
+//
+//		final UpperBoundTuner myTuner = new UpperBoundTuner();
+//		myTuner.registerSamplingStageSequence(samplingStages,
+//				finalObjectiveFunctionValue
+//				// , 
+//				// gradientNorm,
+//				// finalDecisionVariable
+//				);
+//
+//		this.run();
+//	}
 
 	public <U extends DecisionVariable> void registerSamplingStageSequence(
 			final double initialObjectiveFunctionValue,

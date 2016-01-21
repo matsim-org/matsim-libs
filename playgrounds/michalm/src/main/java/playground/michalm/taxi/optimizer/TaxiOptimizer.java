@@ -28,4 +28,6 @@ import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
  */
 public interface TaxiOptimizer
     extends VrpOptimizerWithOnlineTracking, MobsimBeforeSimStepListener
-{}
+{
+    TaxiOptimizerContext getOptimizerContext();
+}

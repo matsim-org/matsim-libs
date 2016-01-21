@@ -20,10 +20,8 @@
 
 package org.matsim.contrib.evacuation.scenariogenerator;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-
+import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
@@ -33,6 +31,7 @@ import org.matsim.contrib.evacuation.analysis.control.EventReaderThread;
 import org.matsim.contrib.evacuation.control.Controller;
 import org.matsim.contrib.evacuation.io.ConfigIO;
 import org.matsim.contrib.evacuation.model.config.EvacuationConfigModule;
+import org.matsim.contrib.evacuation.utils.NetworksComparator;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
@@ -40,10 +39,16 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.utils.misc.CRCChecksum;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 
-public class ScenarioGeneratorTest extends MatsimTestCase {
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+
+public class ScenarioGeneratorTest {
+	
+	@Rule
+	public MatsimTestUtils testUtils = new MatsimTestUtils();
 	
 	@Test
 	public void testScenarioGenerator() {
@@ -53,8 +58,8 @@ public class ScenarioGeneratorTest extends MatsimTestCase {
 		closedRoadIDs.add(Id.create(316, Link.class));
 		closedRoadIDs.add(Id.create(263, Link.class));
 		
-		String inputDir = getInputDirectory();
-		String outputDir = getOutputDirectory();
+		String inputDir = testUtils.getInputDirectory();
+		String outputDir = testUtils.getOutputDirectory();
 		
 		String gripsFileString = inputDir + "/grips_config.xml";
 		String matsimConfigFileString = outputDir + "/config.xml";
@@ -84,11 +89,11 @@ public class ScenarioGeneratorTest extends MatsimTestCase {
 		Config mc;
 		
 		//check for files
-		assertTrue("grips config file is missing", gripsConfigFile.exists());
-		assertTrue("evacuation area shape file is missing",(new File(inputDir + "/evacuation_area.shp")).exists());
-		assertTrue("population area shape file is missing",(new File(inputDir + "/population.shp")).exists());
-		assertTrue("open street map file is missing", (new File(inputDir + "/lenzen.osm")).exists());
-		assertTrue("could not open grips config.", controller.evacuationEvacuationConfig(gripsConfigFile));
+		Assert.assertTrue("grips config file is missing", gripsConfigFile.exists());
+		Assert.assertTrue("evacuation area shape file is missing", (new File(inputDir + "/evacuation_area.shp")).exists());
+		Assert.assertTrue("population area shape file is missing", (new File(inputDir + "/population.shp")).exists());
+		Assert.assertTrue("open street map file is missing", (new File(inputDir + "/lenzen.osm")).exists());
+		Assert.assertTrue("could not open grips config.", controller.evacuationEvacuationConfig(gripsConfigFile));
 		
 		gcm = controller.getEvacuationConfigModule();
 		
@@ -101,13 +106,13 @@ public class ScenarioGeneratorTest extends MatsimTestCase {
 			generateScenario = false;
 			e.printStackTrace();
 		}
-		assertTrue("scenario was not generated",generateScenario);
+		Assert.assertTrue("scenario was not generated", generateScenario);
 		
 		//check and open matsim scenario config file
 		System.out.println("string:" + matsimConfigFileString);
 		matsimConfigFile = new File(matsimConfigFileString);
-		assertTrue("scenario config file is missing",matsimConfigFile.exists());
-		assertTrue("could not open matsim config",controller.openMastimConfig(matsimConfigFile));
+		Assert.assertTrue("scenario config file is missing", matsimConfigFile.exists());
+		Assert.assertTrue("could not open matsim config", controller.openMastimConfig(matsimConfigFile));
 		
 		//open matsim config, set first and last iteration
 		mc = controller.getScenario().getConfig();
@@ -120,7 +125,7 @@ public class ScenarioGeneratorTest extends MatsimTestCase {
 		for (Id<Link> id : closedRoadIDs)
 			roadClosures.put(id, "00:00");
 		boolean saved = ConfigIO.saveRoadClosures(controller, roadClosures);
-		assertTrue("could not save road closures",saved);
+		Assert.assertTrue("could not save road closures", saved);
 		
 		//simulate and check scenario
 		boolean simulateScenario = true;
@@ -159,11 +164,14 @@ public class ScenarioGeneratorTest extends MatsimTestCase {
 		readerThread.run();
 		
 		for (Id<Link> id : closedRoadIDs)
-			assertTrue("a closed road is crossed (id: " + id.toString() + ")", !usedIDs.contains(id));
+			Assert.assertTrue("a closed road is crossed (id: " + id.toString() + ")", !usedIDs.contains(id));
 		
 //		assertEquals("different config-files.", CRCChecksum.getCRCFromFile(inputDir + "/config.xml"), CRCChecksum.getCRCFromFile(outputDir + "/config.xml"));
-		assertEquals("different network-files.", CRCChecksum.getCRCFromFile(inputDir + "/network.xml.gz"), CRCChecksum.getCRCFromFile(outputDir + "/network.xml.gz"));
+//		Assert.assertEquals("different network-files.", CRCChecksum.getCRCFromFile(inputDir + "/network.xml.gz"), CRCChecksum.getCRCFromFile(outputDir + "/network.xml.gz"));
+		boolean equalNets = new NetworksComparator().compare(inputDir + "/network.xml.gz", outputDir + "/network.xml.gz");
+		Assert.assertTrue("differnt network-files", equalNets);
 //		assertEquals("different plans-files.", CRCChecksum.getCRCFromFile(inputDir + "/population.xml.gz"), CRCChecksum.getCRCFromFile(outputDir + "/population.xml.gz"));
+//		EventsFileComparator
 	}
 
 }

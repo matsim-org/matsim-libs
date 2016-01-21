@@ -20,28 +20,6 @@
 
 package playground.meisterk.org.matsim.run.facilities;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.TreeSet;
-import java.util.Vector;
-import java.util.regex.Pattern;
-
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.PropertyException;
-import javax.xml.bind.Unmarshaller;
-
 import net.opengis.kml._2.AbstractFeatureType;
 import net.opengis.kml._2.AbstractGeometryType;
 import net.opengis.kml._2.BasicLinkType;
@@ -54,7 +32,6 @@ import net.opengis.kml._2.PlacemarkType;
 import net.opengis.kml._2.PointType;
 import net.opengis.kml._2.StyleType;
 import net.opengis.kml._2.TimeSpanType;
-
 import org.apache.commons.io.FileUtils;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -74,12 +51,32 @@ import org.matsim.facilities.ActivityOptionImpl;
 import org.matsim.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.facilities.FacilitiesWriter;
 import org.matsim.facilities.OpeningTime;
-import org.matsim.facilities.OpeningTimeImpl;
 import org.matsim.facilities.OpeningTime.DayType;
+import org.matsim.facilities.OpeningTimeImpl;
 import org.matsim.vis.kml.KMZWriter;
-
 import playground.meisterk.org.matsim.facilities.ShopId;
 import playground.meisterk.org.matsim.facilities.algorithms.FacilitiesOpentimesKTIYear2;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.PropertyException;
+import javax.xml.bind.Unmarshaller;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
+import java.util.Vector;
+import java.util.regex.Pattern;
 
 
 /**

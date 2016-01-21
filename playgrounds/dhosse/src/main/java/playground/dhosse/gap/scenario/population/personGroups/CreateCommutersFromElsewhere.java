@@ -287,7 +287,7 @@ public class CreateCommutersFromElsewhere {
 			
 			weight += facility.getActivityOptions().get(Global.ActType.work.name()).getCapacity();
 			
-			if(weight <= random){
+			if(weight >= random){
 				
 				return facility.getCoord();
 				

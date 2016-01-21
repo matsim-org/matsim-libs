@@ -51,7 +51,7 @@ public abstract class AbstractNetworkModifier {
 
 		// Read network
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario);
+		MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario.getNetwork());
 		networkReader.readFile(path2MATSimNetwork);
 		Network network = scenario.getNetwork();
 

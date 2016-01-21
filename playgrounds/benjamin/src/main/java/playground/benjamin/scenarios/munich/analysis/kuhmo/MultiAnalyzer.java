@@ -218,7 +218,7 @@ public class MultiAnalyzer {
 
 	private void calculateDistanceTimeStatisticsByUserGroup(String netFile, String eventsFile, String runName) {
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(sc).readFile(netFile);
+		new MatsimNetworkReader(sc.getNetwork()).readFile(netFile);
 
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		EventsReaderXMLv1 eventsReader = new EventsReaderXMLv1(eventsManager);

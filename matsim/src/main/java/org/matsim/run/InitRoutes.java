@@ -40,6 +40,7 @@ import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ArgumentParser;
 
@@ -129,7 +130,7 @@ public class InitRoutes {
 		MatsimRandom.reset(config.global().getRandomSeed());
 		final Scenario scenario = ScenarioUtils.createScenario(config);
 
-		new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(config.network().getInputFile());
 		Network network = scenario.getNetwork();
 
 		final PopulationImpl plans = (PopulationImpl) scenario.getPopulation();
@@ -138,13 +139,13 @@ public class InitRoutes {
 		final PopulationWriter plansWriter = new PopulationWriter(plans, network);
 		plansWriter.startStreaming(this.plansfile);
 		final FreespeedTravelTimeAndDisutility timeCostCalc = new FreespeedTravelTimeAndDisutility(config.planCalcScore());
-		Injector injector = Injector.createInjector(scenario.getConfig(), new AbstractModule() {
+		com.google.inject.Injector injector = Injector.createInjector(scenario.getConfig(), new AbstractModule() {
 			@Override
 			public void install() {
 			install(AbstractModule.override(Arrays.asList(new TripRouterModule()), new AbstractModule() {
 				@Override
 				public void install() {
-				bind(Scenario.class).toInstance(scenario);
+				install(new ScenarioByInstanceModule(scenario));
 				addTravelTimeBinding("car").toInstance(timeCostCalc);
 				addTravelDisutilityFactoryBinding("car").toInstance(new TravelDisutilityFactory() {
 					@Override

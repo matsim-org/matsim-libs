@@ -60,7 +60,7 @@ public class IKControler {
 		Controler controler = new Controler(configFile);
 		controler.getConfig().controler().setOverwriteFileSetting(
 				OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
-		//		controler.addControlerListener(new IKControlerListener(controler.getScenario()));
+		//		services.addControlerListener(new IKControlerListener(services.getScenario()));
 		controler.addOverridingModule(new OTFVisFileWriterModule());
 		controler.run();
 	}

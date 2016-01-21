@@ -21,7 +21,7 @@
 package playground.staheale.occupancy;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -91,12 +91,12 @@ public class FacilitiesOccupancyCalculator implements StartupListener, BeforeMob
 	@Override
 	public void notifyStartup(final StartupEvent event) {
         this.eventsToFacilityOccupancy = new EventsToFacilityOccupancy(
-        		event.getControler().getScenario().getActivityFacilities(), 
+        		event.getServices().getScenario().getActivityFacilities(),
         		this.numberOfTimeBins, this.scaleNumberOfPersons,
 				facilityOccupancies, 
-				((DestinationChoiceConfigGroup)event.getControler().getConfig().getModule("locationchoice"))
+				((DestinationChoiceConfigGroup)event.getServices().getConfig().getModule("locationchoice"))
 				);
-		event.getControler().getEvents().addHandler(this.eventsToFacilityOccupancy);
+		event.getServices().getEvents().addHandler(this.eventsToFacilityOccupancy);
 	}
 
 	@Override
@@ -114,11 +114,11 @@ public class FacilitiesOccupancyCalculator implements StartupListener, BeforeMob
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
-		Controler controler = event.getControler();
+		MatsimServices controler = event.getServices();
         ActivityFacilities facilities = controler.getScenario().getActivityFacilities();
 
 		if (event.getIteration() % 10 == 0) {
-			this.printStatistics(facilities, event.getControler().getControlerIO().getIterationPath(event.getIteration()), event.getIteration(),
+			this.printStatistics(facilities, event.getServices().getControlerIO().getIterationPath(event.getIteration()), event.getIteration(),
 					facilityOccupancies);
 		}
 

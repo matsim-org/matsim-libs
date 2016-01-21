@@ -164,7 +164,7 @@ public class PopulationUtilsTest {
 		Scenario s1 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		String netFileName = "test/scenarios/berlin/network.xml";
 		String popFileName = "test/scenarios/berlin/plans_hwh_1pct.xml.gz";
-		new MatsimNetworkReader(s1).readFile(netFileName);
+		new MatsimNetworkReader(s1.getNetwork()).readFile(netFileName);
 		new MatsimPopulationReader(s1).readFile(popFileName);
 		Assert.assertTrue(PopulationUtils.equalPopulation(s1.getPopulation(), s1.getPopulation()));
 	}

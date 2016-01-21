@@ -42,19 +42,19 @@ import playground.benjamin.utils.BkNumberUtils;
  */
 public class ModalShareGenerator {
 	
-	private final Logger logger = Logger.getLogger(ModalShareGenerator.class);
+	private static final Logger LOG = Logger.getLogger(ModalShareGenerator.class);
 	
 	public void getModalShareFromEvents(){
 		// ZZ_TODO should get modal share from events as well.
 		throw new RuntimeException("Not implemented yet.");
 	}
 	
-	public SortedMap<String, Double > getMode2PctShareFromPlans (Population population){
+	public SortedMap<String, Double > getMode2PctShareFromPlans (final Population population){
 		SortedMap<String , Double> mode2PctShare = new TreeMap<String, Double>();
-		this.logger.info("=====Modal split is calculated using input plans file.=====");
+		LOG.info("=====Modal split is calculated using input plans file.=====");
 		SortedSet<String> usedModes = getUsedModes(population);
 
-		this.logger.info("=====The following transport modes are used: " + usedModes+".=====");
+		LOG.info("=====The following transport modes are used: " + usedModes+".=====");
 		Map<String, Integer> mode2NoOfLegs = getMode2NoOfLegs(population);
 		int totalNoOfLegs = MapUtils.intSum(mode2NoOfLegs);
 		
@@ -66,7 +66,7 @@ public class ModalShareGenerator {
 		return mode2PctShare;
 	}
 
-	public SortedMap<String, Integer> getMode2NoOfLegs(Population pop) {
+	public SortedMap<String, Integer> getMode2NoOfLegs(final Population pop) {
 		SortedMap<String, Integer> mode2noOfLegs = new TreeMap<String, Integer>();
 		SortedSet<String> usedModes = getUsedModes(pop);
 		
@@ -91,7 +91,7 @@ public class ModalShareGenerator {
 		return mode2noOfLegs;
 	}
 
-	private SortedSet<String> getUsedModes(Population pop) {
+	private SortedSet<String> getUsedModes(final Population pop) {
 		SortedSet<String> usedModes = new TreeSet<String>();
 		for(Person person : pop.getPersons().values()){
 			PlanImpl plan = (PlanImpl) person.getSelectedPlan();

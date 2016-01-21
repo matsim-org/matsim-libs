@@ -125,7 +125,7 @@ public class Events2Snapshot {
 		}
 
 		this.network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario).readFile(this.config.network().getInputFile());
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(this.config.network().getInputFile());
 		prepare();
 
 		if (this.eventsfile == null) {

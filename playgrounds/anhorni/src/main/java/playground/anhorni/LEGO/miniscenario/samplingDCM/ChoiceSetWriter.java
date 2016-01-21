@@ -62,7 +62,7 @@ public class ChoiceSetWriter {
 		this.outPath = outPath;
 		this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		
-		new MatsimNetworkReader(this.scenario).readFile(networkFilePath);		
+		new MatsimNetworkReader(this.scenario.getNetwork()).readFile(networkFilePath);
 		new FacilitiesReaderMatsimV1(this.scenario).readFile(facilitiesFilePath);
 		
 		MatsimPopulationReader populationReader = new MatsimPopulationReader(this.scenario);

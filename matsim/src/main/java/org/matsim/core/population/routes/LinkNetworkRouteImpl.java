@@ -34,7 +34,7 @@ import org.matsim.vehicles.Vehicle;
  *
  * @author mrieser
  */
-public class LinkNetworkRouteImpl extends AbstractRoute implements NetworkRoute, Cloneable {
+public final class LinkNetworkRouteImpl extends AbstractRoute implements NetworkRoute, Cloneable {
 
 	/*package*/ final static String ROUTE_TYPE = "links";
 	

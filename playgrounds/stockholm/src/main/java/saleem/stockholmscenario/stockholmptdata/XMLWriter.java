@@ -17,7 +17,7 @@ import saleem.stockholmscenario.utils.StockholmTransformationFactory;
 
 public class XMLWriter {
 	//To convert from WGS84 into RT90, as recommended in Matsim specifications to avoid using spherical coordinates. 
-	CoordinateTransformation ct = StockholmTransformationFactory.getCoordinateTransformation(StockholmTransformationFactory.WGS84, StockholmTransformationFactory.WGS84_RT90);
+	CoordinateTransformation ct = StockholmTransformationFactory.getCoordinateTransformation(StockholmTransformationFactory.WGS84, StockholmTransformationFactory.WGS84_SWEREF99);
 	public Document createDocument(String rootname){
 		Element element = new Element(rootname);
 		Document doc = new Document();

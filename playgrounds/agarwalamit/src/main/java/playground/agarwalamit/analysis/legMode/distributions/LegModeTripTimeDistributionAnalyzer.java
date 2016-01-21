@@ -44,27 +44,22 @@ import playground.vsp.analysis.modules.AbstractAnalysisModule;
  */
 public class LegModeTripTimeDistributionAnalyzer extends AbstractAnalysisModule {
 
-	private final List<Integer> timeClasses;
-	private SortedSet<String> usedModes;
-	private final Logger log = Logger.getLogger(LegModeTripTimeDistributionAnalyzer.class);
+	private final List<Integer> timeClasses = new ArrayList<Integer>();
+	private SortedSet<String> usedModes = new TreeSet<String>();
+	private static final Logger LOG = Logger.getLogger(LegModeTripTimeDistributionAnalyzer.class);
 
-	private SortedMap<String, SortedMap<Integer, Integer>> mode2timeClass2LegCount ;
-	private SortedMap<String, Map<Id<Person>, List<Double>>> mode2PersonId2tripTimes;
-	private LegModeTripTravelTimeHandler lmtth;
+	private final SortedMap<String, SortedMap<Integer, Integer>> mode2timeClass2LegCount = new TreeMap<>();
+	private SortedMap<String, Map<Id<Person>, List<Double>>> mode2PersonId2tripTimes = new TreeMap<>();
+	private final LegModeTripTravelTimeHandler lmtth;
 	private String eventsFile;
 
 	public LegModeTripTimeDistributionAnalyzer() {
 		super(LegModeTripTimeDistributionAnalyzer.class.getSimpleName());
-		this.log.info("enabled");
-
-		this.timeClasses = new ArrayList<Integer>();
-		this.usedModes = new TreeSet<String>();
-		this.mode2PersonId2tripTimes = new TreeMap<String, Map<Id<Person>,List<Double>>>();
-		this.mode2timeClass2LegCount = new TreeMap<String, SortedMap<Integer,Integer>>();
+		this.lmtth = new LegModeTripTravelTimeHandler();
+		LOG.info("enabled");
 	}
 
-	public void init(String eventsFile){
-		this.lmtth = new LegModeTripTravelTimeHandler();
+	public void init(final String eventsFile){
 		this.eventsFile = eventsFile;
 	}
 
@@ -83,7 +78,7 @@ public class LegModeTripTimeDistributionAnalyzer extends AbstractAnalysisModule 
 		this.mode2PersonId2tripTimes = lmtth.getLegMode2PesonId2TripTimes();
 		initializeTimeClasses();
 		this.usedModes = new TreeSet<String>(this.mode2PersonId2tripTimes.keySet());
-		this.log.info("The following transport modes are considered: " + this.usedModes);
+		LOG.info("The following transport modes are considered: " + this.usedModes);
 
 		for(String mode:this.usedModes){
 			SortedMap<Integer, Integer> distClass2Legs = new TreeMap<Integer, Integer>();
@@ -140,15 +135,15 @@ public class LegModeTripTimeDistributionAnalyzer extends AbstractAnalysisModule 
 				writer1.write("\n");
 			}
 			writer1.close();
-			this.log.info("Finished writing output to " + outFile);
+			LOG.info("Finished writing output to " + outFile);
 		}catch (Exception e){
-			this.log.error("Data is not written. Reason " + e.getMessage());
+			LOG.error("Data is not written. Reason " + e.getMessage());
 		}
 	}
 
 	private void initializeTimeClasses() {
 		double longestTripTime = getHighestTravelTime();
-		this.log.info("The longest trip time is found to be: " + longestTripTime);
+		LOG.info("The longest trip time is found to be: " + longestTripTime);
 		int endOfTimeClass = 0;
 		int classCounter = 0;
 		this.timeClasses.add(endOfTimeClass);
@@ -158,7 +153,7 @@ public class LegModeTripTimeDistributionAnalyzer extends AbstractAnalysisModule 
 			classCounter++;
 			this.timeClasses.add(endOfTimeClass);
 		}
-		this.log.info("The following trip time classes were defined: " + this.timeClasses);
+		LOG.info("The following trip time classes were defined: " + this.timeClasses);
 	}
 
 	private double getHighestTravelTime(){

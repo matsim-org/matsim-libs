@@ -27,11 +27,11 @@ import org.matsim.contrib.common.gis.WGS84DistanceCalculator;
 import org.matsim.contrib.common.stats.Discretizer;
 import org.matsim.contrib.common.stats.FixedBordersDiscretizer;
 import org.matsim.contrib.common.util.ProgressLogger;
-import playground.johannes.gsv.popsim.Histogram;
-import playground.johannes.gsv.zones.KeyMatrix;
+import playground.johannes.studies.matrix2014.stats.Histogram;
 import playground.johannes.synpop.gis.Zone;
 import playground.johannes.synpop.gis.ZoneCollection;
 import playground.johannes.synpop.gis.ZoneGeoJsonIO;
+import playground.johannes.synpop.matrix.NumericMatrix;
 
 import java.io.*;
 import java.util.*;
@@ -51,7 +51,7 @@ public class AdjustDays {
         ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON(args[2], "NO");
 
         DistanceCalculator distCalc = WGS84DistanceCalculator.getInstance();
-        KeyMatrix distances = new KeyMatrix();
+        NumericMatrix distances = new NumericMatrix();
         Set<String> subkeys = new HashSet<>();
         Map<String, Double> volumes = new HashMap<>();
 
@@ -182,7 +182,7 @@ public class AdjustDays {
 
             ProgressLogger.step();
         }
-        ProgressLogger.termiante();
+        ProgressLogger.terminate();
         writer.close();
         logger.info("Done.");
 

@@ -23,14 +23,14 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.LaneEnterEvent;
 import org.matsim.core.api.experimental.events.handler.LaneEnterEventHandler;
 import org.matsim.lanes.data.v20.Lane;
+import org.matsim.vehicles.Vehicle;
 
 public class DgTimeCalcEventHandler implements LaneEnterEventHandler {
 
-	private Set<Id<Person>> carsPassed;
+	private Set<Id<Vehicle>> carsPassed;
 	private Set<Id<Lane>> wannabeadaptiveLanes;
 
 	public DgTimeCalcEventHandler() {
@@ -64,7 +64,7 @@ public class DgTimeCalcEventHandler implements LaneEnterEventHandler {
 		// actually the nicer way
 
 		if (this.wannabeadaptiveLanes.contains(event.getLaneId()))
-			this.carsPassed.add(event.getPersonId());
+			this.carsPassed.add(event.getVehicleId());
 
 	}
 
@@ -72,7 +72,7 @@ public class DgTimeCalcEventHandler implements LaneEnterEventHandler {
 		return this.carsPassed.size();
 	}
 
-	public Set<Id<Person>> getPassedCars() {
+	public Set<Id<Vehicle>> getPassedCars() {
 		return carsPassed;
 	}
 

@@ -32,7 +32,6 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ArgumentParser;
 
@@ -106,7 +105,7 @@ public class XY2Links {
 		this.config = ConfigUtils.loadConfig(this.configfile);
 		MatsimRandom.reset(this.config.global().getRandomSeed());
 		scenario = ScenarioUtils.createScenario(this.config);
-		new MatsimNetworkReader(scenario).readFile(this.config.network().getInputFile());
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(this.config.network().getInputFile());
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 		this.config = scenario.getConfig();
 

@@ -22,7 +22,7 @@ package org.matsim.contrib.socnetgen.sna.snowball.analysis;
 
 import org.matsim.contrib.common.stats.DescriptivePiStatistics;
 import org.matsim.contrib.socnetgen.sna.math.DescriptivePiStatisticsFactory;
-import org.matsim.contrib.socnetgen.sna.math.WeightedSampleMean;
+import org.matsim.contrib.common.stats.WeightedSampleMean;
 
 /**
  * @author illenberger

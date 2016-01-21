@@ -31,7 +31,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.analysis.kai.KaiAnalysisListener;
 import org.matsim.contrib.matsim4urbansim.analysis.DanielAnalysisListenerEvents;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.facilities.ActivityFacilities;
 
@@ -96,7 +96,7 @@ import org.matsim.facilities.ActivityFacilities;
 	}
 	
 	@Override
-	void addFurtherControlerListener(ActivityFacilities zones, ActivityFacilities parcels, Controler controler) {
+	void addFurtherControlerListener(ActivityFacilities zones, ActivityFacilities parcels, MatsimServices controler) {
 		controler.addControlerListener(new KaiAnalysisListener()) ;
 		// do nothing when no file is specified, otherwise check if it exists
 		if(!(cleFile == null)){

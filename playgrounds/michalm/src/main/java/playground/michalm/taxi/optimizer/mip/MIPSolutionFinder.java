@@ -35,15 +35,15 @@ import playground.michalm.taxi.schedule.*;
 
 class MIPSolutionFinder
 {
-    private final TaxiOptimizerConfiguration optimConfig;
+    private final TaxiOptimizerContext optimContext;
     private final MIPRequestData rData;
     private final VehicleData vData;
 
 
-    MIPSolutionFinder(TaxiOptimizerConfiguration optimConfig, MIPRequestData rData,
+    MIPSolutionFinder(TaxiOptimizerContext optimContext, MIPRequestData rData,
             VehicleData vData)
     {
-        this.optimConfig = optimConfig;
+        this.optimContext = optimContext;
         this.rData = rData;
         this.vData = vData;
     }
@@ -60,10 +60,10 @@ class MIPSolutionFinder
         Queue<TaxiRequest> queue = new PriorityQueue<>(n, Requests.T0_COMPARATOR);
         Collections.addAll(queue, rData.requests);
 
-        BestDispatchFinder dispatchFinder = new BestDispatchFinder(optimConfig);
-        new FifoSchedulingProblem(optimConfig, dispatchFinder).scheduleUnplannedRequests(queue);
+        BestDispatchFinder dispatchFinder = new BestDispatchFinder(optimContext);
+        new FifoSchedulingProblem(optimContext, dispatchFinder).scheduleUnplannedRequests(queue);
 
-        double t_P = optimConfig.scheduler.getParams().pickupDuration;
+        double t_P = optimContext.scheduler.getParams().pickupDuration;
 
         for (int k = 0; k < m; k++) {
             Schedule<TaxiTask> schedule = TaxiSchedules

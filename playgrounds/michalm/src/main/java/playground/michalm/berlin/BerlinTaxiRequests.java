@@ -43,7 +43,7 @@ public class BerlinTaxiRequests
                 DIR + allPlansFile);
 
         Scenario onlyBerlinScenario = ScenarioUtils.createScenario(VrpConfigUtils.createConfig());
-        new MatsimNetworkReader(onlyBerlinScenario).readFile(ONLY_BERLIN_NET_FILE);
+        new MatsimNetworkReader(onlyBerlinScenario.getNetwork()).readFile(ONLY_BERLIN_NET_FILE);
         Population onlyBerlinPop = PopulationUtils.createPopulation(onlyBerlinScenario.getConfig(),
                 onlyBerlinScenario.getNetwork());
         Map<Id<Link>, ? extends Link> onlyBerlinLinks = onlyBerlinScenario.getNetwork().getLinks();

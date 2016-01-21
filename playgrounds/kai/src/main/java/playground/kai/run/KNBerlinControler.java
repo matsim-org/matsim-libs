@@ -8,11 +8,11 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.analysis.kai.KaiAnalysisListener;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.consistency.VspConfigConsistencyCheckerImpl;
+import org.matsim.core.config.groups.ChangeLegModeConfigGroup;
 import org.matsim.core.config.groups.ControlerConfigGroup.MobsimType;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
@@ -27,8 +27,7 @@ import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.EventWriterXML;
-import org.matsim.core.replanning.DefaultPlanStrategiesModule.DefaultStrategy;
-import org.matsim.core.replanning.modules.ChangeLegMode;
+import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultStrategy;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.ikaddoura.noise2.NoiseParameters;
@@ -54,7 +53,7 @@ class KNBerlinControler {
 		config.controler().setOutputDirectory("/Users/nagel/kairuns/a100/output/");
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 
-		config.controler().setFirstIteration(90); // with something like "9" we don't get output events! 
+		config.controler().setFirstIteration(100); // with something like "9" we don't get output events! 
 		config.controler().setLastIteration(100); // with something like "9" we don't get output events! 
 		config.controler().setWriteSnapshotsInterval(100);
 		config.controler().setWritePlansInterval(200);
@@ -65,15 +64,16 @@ class KNBerlinControler {
 		config.qsim().setNumberOfThreads(5);
 		config.parallelEventHandling().setNumberOfThreads(1);
 
-		double sampleFactor = 0.02 ;
+		final double sampleFactor = 0.02 ;
 		config.controler().setMobsim( MobsimType.qsim.toString() );
 		config.qsim().setFlowCapFactor( sampleFactor );
-		//		config.qsim().setStorageCapFactor( Math.pow( sampleFactor, -0.25 ) );
+		//		config.qsim().setStorageCapFactor( Math.pow( sampleFactor, -0.25 ) ); // this version certainly is completely wrong.
 		config.qsim().setStorageCapFactor(0.03);
 		config.qsim().setTrafficDynamics( TrafficDynamics.withHoles );
 		config.qsim().setUsingFastCapacityUpdate(false);
 		config.qsim().setNumberOfThreads(6);
-		
+		config.qsim().setUsingFastCapacityUpdate(true);
+
 		//		config.controler().setMobsim(MobsimType.JDEQSim.toString());
 		//		config.setParam(JDEQSimulation.JDEQ_SIM, JDEQSimulation.END_TIME, "36:00:00") ;
 		//		config.setParam(JDEQSimulation.JDEQ_SIM, JDEQSimulation.FLOW_CAPACITY_FACTOR, Double.toString(sampleFactor) ) ;
@@ -122,11 +122,7 @@ class KNBerlinControler {
 			stratSets.setWeight(0.1);
 			config.strategy().addStrategySettings(stratSets);
 		}
-		config.setParam( ChangeLegMode.CONFIG_MODULE, ChangeLegMode.CONFIG_PARAM_MODES, "walk,bike,car,pt,pt2" );
-
-		//		for ( ActivityParams params : config.planCalcScore().getActivityParams() ) {
-		//			params.setTypicalDurationScoreComputation( TypicalDurationScoreComputation.relative );
-		//		}
+		config.setParam( ChangeLegModeConfigGroup.CONFIG_MODULE, ChangeLegModeConfigGroup.CONFIG_PARAM_MODES, "walk,bike,car,pt,pt2" );
 
 		config.vspExperimental().setVspDefaultsCheckingLevel( VspDefaultsCheckingLevel.abort );
 		config.addConfigConsistencyChecker(new VspConfigConsistencyCheckerImpl());
@@ -141,8 +137,8 @@ class KNBerlinControler {
 
 		// prepare the control(l)er:
 		Controler controler = new Controler( scenario ) ;
-		controler.getConfig().controler().setOverwriteFileSetting( OverwriteFileSetting.overwriteExistingFiles ) ;
-		controler.addControlerListener(new KaiAnalysisListener()) ;
+
+		//		controler.addControlerListener(new KaiAnalysisListener()) ;
 		//		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
 		//		controler.setMobsimFactory(new OldMobsimFactory()) ;
 
@@ -228,9 +224,10 @@ class KNBerlinControler {
 
 		NoiseContext noiseContext = new NoiseContext(scenario, gridParameters, noiseParameters);
 		noiseContext.initialize();
-		NoiseWriter.writeReceiverPoints(noiseContext, outputFilePath + "/receiverPoints/");
+		NoiseWriter.writeReceiverPoints(noiseContext, outputFilePath + "/receiverPoints/", true);
 
 		NoiseTimeTracker timeTracker = new NoiseTimeTracker(noiseContext, events, outputFilePath);
+		timeTracker.setUseCompression(true);
 		events.addHandler(timeTracker);
 
 		PersonActivityTracker actTracker = new PersonActivityTracker(noiseContext);
@@ -257,33 +254,18 @@ class KNBerlinControler {
 	static void mergeNoiseFiles(String outputFilePath) {
 		final String receiverPointsFile = outputFilePath + "/receiverPoints/receiverPoints.csv" ;
 
-		// yyyy would be even better to load everything into one file: x, y, t, imissions, damages, ...
-		
-		{
-			final String label = "immission" ;
-			final String workingDirectory = outputFilePath + "/immissions/" ;
+		final String[] labels = { "immission", "consideredAgentUnits", "damages_receiverPoint" };
+		final String[] workingDirectories = { outputFilePath + "/immissions/" , outputFilePath + "/consideredAgentUnits/", outputFilePath + "/damages_receiverPoint/" };
 
 
-			MergeNoiseCSVFile merger = new MergeNoiseCSVFile() ;
-			merger.setWorkingDirectory(workingDirectory);
-			merger.setReceiverPointsFile(receiverPointsFile);
-			merger.setLabel(label);
-			merger.setOutputFormat(OutputFormat.xyt);
-			merger.setThreshold(1.);
-			merger.run();
-		}
-		{
-			final String label = "damages_receiverPoint" ;
-			final String workingDirectory = outputFilePath + "/damages_receiverPoint/" ;
-
-			MergeNoiseCSVFile merger = new MergeNoiseCSVFile() ;
-			merger.setWorkingDirectory(workingDirectory);
-			merger.setReceiverPointsFile(receiverPointsFile);
-			merger.setLabel(label);
-			merger.setOutputFormat(OutputFormat.xyt);
-			merger.setThreshold(1.);
-			merger.run();
-		}
+		MergeNoiseCSVFile merger = new MergeNoiseCSVFile() ;
+		merger.setWorkingDirectory(workingDirectories);
+		merger.setReceiverPointsFile(receiverPointsFile);
+		merger.setLabel(labels);
+		merger.setOutputFormat(OutputFormat.xyt);
+		merger.setThreshold(1.);
+		merger.setOutputDirectory(outputFilePath);
+		merger.run();
 
 	}
 

@@ -18,11 +18,10 @@
  * *********************************************************************** */
 package playground.agarwalamit.mixedTraffic.plots;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
@@ -31,11 +30,17 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
+import org.matsim.core.utils.collections.Tuple;
 
 import playground.agarwalamit.mixedTraffic.MixedTrafficVehiclesUtils;
 import playground.agarwalamit.mixedTraffic.plots.LinkPersonInfoContainer.PersonPositionChecker;
@@ -43,14 +48,17 @@ import playground.agarwalamit.mixedTraffic.plots.LinkPersonInfoContainer.PersonP
 /**
  * @author amit
  */
-public class QueuePositionCalculationHandler implements LinkLeaveEventHandler, LinkEnterEventHandler, PersonDepartureEventHandler {
+public class QueuePositionCalculationHandler implements LinkLeaveEventHandler, LinkEnterEventHandler, PersonDepartureEventHandler, VehicleLeavesTrafficEventHandler, VehicleEntersTrafficEventHandler {
 
 	private static final Logger LOG = Logger.getLogger(QueuePositionCalculationHandler.class);
 	private final Map<Id<Link>,LinkPersonInfoContainer> linkid2Container = new HashMap<>();
-	private final List<PersonPositionChecker> person2LinkEnterLeaveTimeData = new ArrayList<PersonPositionChecker>();
-	private final List<PersonPositionChecker> personLinkEnterLeaveTimeQueuePositionData = new ArrayList<PersonPositionChecker>();
-
+	private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
+	private final Map<Id<Person>,SortedMap<Double,String>> person2startTime2PersonQPos = new HashMap<>();
+	private final Map<Id<Person>,SortedMap<Double,String>> person2startTime2PersonLinkInfo = new HashMap<>();
+	
 	private final Map<Id<Person>, String> personId2LegMode = new TreeMap<Id<Person>, String>();
+	private Tuple<Id<Person>, Double> lastDepartedPerson = new Tuple<Id<Person>, Double>(null, 0.);
+	
 	private final Scenario scenario;
 	private double lastEventTimeStep = 0;
 
@@ -58,7 +66,7 @@ public class QueuePositionCalculationHandler implements LinkLeaveEventHandler, L
 		LOG.info("Calculating queue position of vehicles in mixed traffic.");
 		this.scenario = scenario;
 		for (Link link : scenario.getNetwork().getLinks().values()) {
-			this.linkid2Container.put(link.getId(), new LinkPersonInfoContainer(link.getId(), link.getLength()));
+			this.linkid2Container.put(link.getId(), new LinkPersonInfoContainer(link.getId(),link.getLength()));
 		}
 	}
 
@@ -66,18 +74,18 @@ public class QueuePositionCalculationHandler implements LinkLeaveEventHandler, L
 	public void reset(int iteration) {
 		this.linkid2Container.clear();
 		this.personId2LegMode.clear();
-		this.personLinkEnterLeaveTimeQueuePositionData.clear();
-		this.person2LinkEnterLeaveTimeData.clear();
+		this.delegate.reset(iteration);
 	}
 
 	@Override
 	public void handleEvent(PersonDepartureEvent event){
 		this.personId2LegMode.put(event.getPersonId(), event.getLegMode());
+		this.lastDepartedPerson = new Tuple<Id<Person>, Double>(event.getPersonId(), event.getTime());
 	}
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		Id<Person> personId= event.getDriverId();
+		Id<Person> personId= this.delegate.getDriverOfVehicle(event.getVehicleId());
 		Id<Link> linkId = event.getLinkId();
 
 		//store info
@@ -88,21 +96,25 @@ public class QueuePositionCalculationHandler implements LinkLeaveEventHandler, L
 		builder.setEnterTime(event.getTime());
 		builder.setLegMode(this.personId2LegMode.get(personId));
 		builder.setLink(link);
+		PersonPositionChecker checker = container.getPerson2PersonPositionChecker().get(personId);
+
+		if( checker!=null && checker.getLink().getId().equals(linkId) ){
+			checker.updateCycleNumberOfPerson();
+		} 
 		container.getPerson2EnteringPersonInfo().put(personId, builder.build());
 
 		Queue<Id<Person>> personId2AgentPositions = container.getAgentsOnLink();
 		personId2AgentPositions.offer(personId);
-		updateVehicleOnLinkAndFillToQueue(event.getTime());
 	}
-
+	
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
 		Id<Link> linkId = event.getLinkId();
-		Id<Person> personId = event.getDriverId();
+		Id<Person> personId = this.delegate.getDriverOfVehicle(event.getVehicleId());
 
 		LinkPersonInfoContainer container = this.linkid2Container.get(linkId);
 		if( ! container.getPerson2EnteringPersonInfo().containsKey(personId) ) return; // if agent has departed on this link
-		
+
 		LeavingPersonInfo.Builder builder = new LeavingPersonInfo.Builder();
 		builder.setAgentId(personId);
 		builder.setLeaveTime(event.getTime());
@@ -110,55 +122,107 @@ public class QueuePositionCalculationHandler implements LinkLeaveEventHandler, L
 		builder.setLinkId(linkId);
 		LeavingPersonInfo leavingPersonInfo = builder.build();
 		container.getPerson2LeavingPersonInfo().put(personId, leavingPersonInfo);
+
+		PersonPositionChecker checker = container.getOrCreatePersonPositionChecker(personId);
+
+		if(person2startTime2PersonLinkInfo.containsKey(personId)){
+			SortedMap<Double,String> time2String = person2startTime2PersonLinkInfo.get(personId);
+			double initialPos = Double.valueOf( time2String.get(time2String.lastKey()).split("\t")[3] ); // this is lastPosition to keep accumulating distance
+			time2String.put(checker.getEnteredPersonInfo().getLinkEnterTime(), linkId+"\t"+initialPos+"\t"+
+					checker.getLeftPersonInfo().getLinkLeaveTime() + "\t" + String.valueOf(initialPos + checker.getLink().getLength()) +"\t" + checker.getEnteredPersonInfo().getLegMode());
+		} else {
+			double initialPos = 0.;
+			SortedMap<Double,String> time2String = new TreeMap<>();
+			time2String.put(checker.getEnteredPersonInfo().getLinkEnterTime(), linkId+"\t"+initialPos+"\t"+
+					checker.getLeftPersonInfo().getLinkLeaveTime() + "\t" + String.valueOf(initialPos + checker.getLink().getLength()) +"\t" + checker.getEnteredPersonInfo().getLegMode());
+			person2startTime2PersonLinkInfo.put(personId, time2String);
+		}
 		
-		this.person2LinkEnterLeaveTimeData.add(container.getPersonInfoChecker(personId));
 		updateVehicleOnLinkAndFillToQueue(event.getTime());
 		container.getAgentsOnLink().remove(personId);
 
-		if(container.getAgentsInQueue().contains(personId)) {
-			this.personLinkEnterLeaveTimeQueuePositionData.add(container.getPersonInfoChecker(personId));
+		if(container.getAgentsInQueue().contains(personId)) {//write info for queuing
+			double initialPos = Double.valueOf(checker.getLink().getId().toString())*checker.getLink().getLength();
+			double vehicleSpeed =  MixedTrafficVehiclesUtils.getSpeed(checker.getEnteredPersonInfo().getLegMode());
+			double qStartDistFromFNode = initialPos + (checker.getQueuingTime()- checker.getEnteredPersonInfo().getLinkEnterTime()) * vehicleSpeed;
 
+			if((qStartDistFromFNode-initialPos) > checker.getLink().getLength()){
+				qStartDistFromFNode=initialPos + checker.getLink().getLength();
+			}
+
+			if(person2startTime2PersonQPos.containsKey(personId)){
+				SortedMap<Double,String> time2String = person2startTime2PersonQPos.get(personId);
+				time2String.put(checker.getEnteredPersonInfo().getLinkEnterTime(), linkId+"\t"+initialPos+"\t"+
+						checker.getQueuingTime() + "\t" + qStartDistFromFNode +"\t" + checker.getEnteredPersonInfo().getLegMode());
+				time2String.put(checker.getQueuingTime(), linkId+"\t"+qStartDistFromFNode+"\t"+
+						checker.getLeftPersonInfo().getLinkLeaveTime() + "\t" + (1 + Double.valueOf(checker.getLink().getId().toString() ) )*checker.getLink().getLength() +"\t" + checker.getEnteredPersonInfo().getLegMode());
+			} else {
+				SortedMap<Double,String> time2String = new TreeMap<>();
+				time2String.put(checker.getEnteredPersonInfo().getLinkEnterTime(), linkId+"\t"+initialPos+"\t"+
+						checker.getQueuingTime() + "\t" + qStartDistFromFNode +"\t" + checker.getEnteredPersonInfo().getLegMode());
+				time2String.put(checker.getQueuingTime(), linkId+"\t"+qStartDistFromFNode+"\t"+
+						checker.getLeftPersonInfo().getLinkLeaveTime() + "\t" + (1 + Double.valueOf(checker.getLink().getId().toString() ) )*checker.getLink().getLength() +"\t" + checker.getEnteredPersonInfo().getLegMode());
+				person2startTime2PersonQPos.put(personId, time2String);
+			}
+			
 			container.getAgentsInQueue().remove(personId);
-			double availableSpaceSoFar = container.getRemainingLinkSpace();
-			double newAvailableSpace = availableSpaceSoFar + MixedTrafficVehiclesUtils.getCellSize(leavingPersonInfo.getLegMode());
-			container.updateRemainingLinkSpace(newAvailableSpace);
-		}
+			double newAvailableSpace = container.getAvailableLinkSpace() + MixedTrafficVehiclesUtils.getCellSize(leavingPersonInfo.getLegMode());
+			container.setAvailableLinkSpace(newAvailableSpace);
+
+		} 
+		container.getPerson2PersonPositionChecker().remove(personId);
 	}
 
-	private void updateVehicleOnLinkAndFillToQueue(final double currentTimeStep) {
-		for (Link link : this.scenario.getNetwork().getLinks().values()) {
-			Id<Link> linkId = link.getId();
+	private void updateVehicleOnLinkAndFillToQueue(final double now) {
+		for ( Id<Link> linkId : this.linkid2Container.keySet() ) {
 			LinkPersonInfoContainer container = this.linkid2Container.get(linkId);
+
 			for(Id<Person> personId :container.getAgentsOnLink()){
-				for(double time = this.lastEventTimeStep; time <= currentTimeStep; time++){
-					PersonPositionChecker checker = container.getPersonInfoChecker(personId);
-					checker.updateAvailableLinkSpace(container.getRemainingLinkSpace());
-					checker.checkIfVehicleWillGoInQ(time);
-					if(checker.isAddingVehicleInQueue()){
+				PersonPositionChecker checker = container.getOrCreatePersonPositionChecker(personId);
+				double personPositionUpdateTimeStep = Math.floor( Math.max( this.lastEventTimeStep, checker.getProbableQueuingTime()) );
+
+				for(double time = personPositionUpdateTimeStep; time <= now && !checker.isPersonAlreadyQueued(); time++){
+					if( checker.isAddingVehicleInQueue(time) ){
 						Queue<Id<Person>> queue = container.getAgentsInQueue();
-						if(! queue.contains(personId)) {
-							queue.offer(personId);
-							/*
-							 * If a person (20mps)  starts on link(1000m) at t=0, then will add to queue if time t=51 sec
-							 * time-1 is actually physically correct time at which it will add to Q.
-							 */
-							double availableSpaceSoFar = container.getRemainingLinkSpace();
-							checker.updateQueuingTime(availableSpaceSoFar);
-							double newAvailableSpace = availableSpaceSoFar - MixedTrafficVehiclesUtils.getCellSize(checker.getEnteredPersonInfo().getLegMode());
-							container.updateRemainingLinkSpace(newAvailableSpace);
-						} // else already in queue
+						queue.offer(personId);
+						checker.updateQueuingTime();
+						double newAvailableSpace = container.getAvailableLinkSpace() - MixedTrafficVehiclesUtils.getCellSize(checker.getEnteredPersonInfo().getLegMode());
+						container.setAvailableLinkSpace(newAvailableSpace);
 					} 
 				}
 			}
 		}
-		this.lastEventTimeStep=currentTimeStep;
-	}
-	
-	public List<PersonPositionChecker> getPersonLinkEnterTimeVehiclePositionDataToWrite(){
-		return this.personLinkEnterLeaveTimeQueuePositionData;
+		this.lastEventTimeStep=now;
 	}
 
-	public List<PersonPositionChecker> getPersonLinkEnterLeaveTimeDataToWrite(){
-		return this.person2LinkEnterLeaveTimeData;
+	/**
+	 * @return the person2startTime2 person position info
+	 */
+	public Map<Id<Person>, SortedMap<Double, String>> getPerson2StartTime2PersonQPosition() {
+		return person2startTime2PersonQPos;
+	}
+
+	/**
+	 * @return the person2startTime2 link enter leave time and position, this is useful to show matsim events without interpolation
+	 */
+	public Map<Id<Person>, SortedMap<Double, String>> getPerson2StartTime2AccumulatedPosition() {
+		return person2startTime2PersonLinkInfo;
+	}
+
+	/**
+	 * @return the lastDepartedPerson
+	 */
+	public Tuple<Id<Person>, Double> getLastDepartedPersonAndTime() {
+		return lastDepartedPerson;
+	}
+
+	@Override
+	public void handleEvent(VehicleEntersTrafficEvent event) {
+		delegate.handleEvent(event);
+	}
+
+	@Override
+	public void handleEvent(VehicleLeavesTrafficEvent event) {
+		delegate.handleEvent(event);
 	}
 }

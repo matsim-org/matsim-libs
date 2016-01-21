@@ -114,7 +114,8 @@ final class UrbansimCellBasedAccessibilityCSVWriterV2 implements FacilityDataExc
 	/**
 	 * finalize and close csv file
 	 */
-	public void close(){
+	@Override
+	public void finish() {
 		try {
 			log.info("Closing ...");
 			assert(accessibilityDataWriter != null);
@@ -123,6 +124,7 @@ final class UrbansimCellBasedAccessibilityCSVWriterV2 implements FacilityDataExc
 			log.info("... done!");
 		} catch (IOException e) {
 			e.printStackTrace();
-		}	
+		}
 	}
+
 }
