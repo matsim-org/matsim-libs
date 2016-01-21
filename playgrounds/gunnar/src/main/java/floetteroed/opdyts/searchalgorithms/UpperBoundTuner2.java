@@ -81,14 +81,14 @@ public class UpperBoundTuner2 {
 		 * Objective function update.
 		 */
 		 this.equilGapSum += lastStage.getEquilibriumGap();
-		 this.unifGapSum += lastStage.getAlphaSquareNorm();
+		 this.unifGapSum += lastStage.getUniformityGap();
 		 
 		/*
 		 * Constraint.
 		 */
 		this.constraints.add(new LinearConstraint(
 				new double[] { lastStage.getEquilibriumGap(),
-						lastStage.getAlphaSquareNorm() }, GEQ,
+						lastStage.getUniformityGap() }, GEQ,
 				finalObjectiveFunctionValue
 						- lastStage.getOriginalObjectiveFunctionValue()));
 

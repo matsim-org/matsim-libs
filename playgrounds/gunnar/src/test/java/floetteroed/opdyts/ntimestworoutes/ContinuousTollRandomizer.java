@@ -40,7 +40,6 @@ public class ContinuousTollRandomizer implements DecisionVariableRandomizer {
 
 	// ---------- IMPLEMENTATION OF DecisionVariableRandomizer ----------
 
-	@Override
 	public DecisionVariable newRandomDecisionVariable() {
 		final Vector tollVector = new Vector(this.roadCnt);
 		for (int i = 0; i < this.roadCnt; i++) {

@@ -22,7 +22,7 @@ public class UniformityGap<U extends DecisionVariable> implements
 
 	@Override
 	public String value(final SamplingStage<U> samplingStage) {
-		return Double.toString(samplingStage.getAlphaSquareNorm());
+		return Double.toString(samplingStage.getUniformityGap());
 	}
 
 }

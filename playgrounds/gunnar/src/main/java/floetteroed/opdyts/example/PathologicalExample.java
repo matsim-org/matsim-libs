@@ -59,16 +59,16 @@ public class PathologicalExample {
 		final boolean interpolate = true;
 		final int maxRandomSearchIterations = 50;
 		final int maxRandomSearchTransitions = Integer.MAX_VALUE;
-		final Double inertia = null; // TODO has currently no effect
 
 		final RandomSearch<VectorDecisionVariable> randomSearch = new RandomSearch<>(
 				system, new VectorDecisionVariableRandomizer(2, 0.1,
 						MatsimRandom.getRandom(), this.system, new Vector(-0.1,
 								-0.1), new Vector(0.1, 0.1)),
+				new VectorDecisionVariable(new Vector(2), this.system),
 				convergenceCriterion, maxRandomSearchIterations,
 				maxRandomSearchTransitions, this.populationSize,
 				MatsimRandom.getRandom(), interpolate, objFct,
-				maxMemorizedTrajectoryLength, inertia);
+				maxMemorizedTrajectoryLength);
 		randomSearch.setLogFileName(this.logFileName);
 
 		randomSearch.run();
