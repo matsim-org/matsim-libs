@@ -32,13 +32,13 @@ import org.matsim.vis.otfvis.interfaces.PlayPauseSimulationI;
 public class PlayPauseSimulation implements PlayPauseSimulationI {
 /*	Hallo Kai,
 
-	auch “main” läuft in einem Thread, welcher angehalten werden kann. 
+	auch “main” läuft in einem Thread, welcher angehalten werden kann.
 
-	Wenn man etwas stoppen und weiterführen will, braucht es einfach einen zweiten Thread, welcher nicht gestoppt wird, und der dann den Befehl zum weiter machen geben kann. Das bedeutet, man könnte entweder: 
+	Wenn man etwas stoppen und weiterführen will, braucht es einfach einen zweiten Thread, welcher nicht gestoppt wird, und der dann den Befehl zum weiter machen geben kann. Das bedeutet, man könnte entweder:
 
 	(1) Die QSim in einem Thread packen und aus dem Main-Thread (oder einem anderen, dritten Thread) heraus doStep()/notifyAll() aufrufen.
 
-	oder: 
+	oder:
 
 	(2) Den Steuerungs-Teil in einen Thread packen, und die QSim im Main-Thread lassen. So wird der Main-Thread angehalten. Ist technisch gesehen absolut gleichwertig, da der Main-Thread in Java auch einfach ein normaler Thread ist. (die JVM beendet normalerweise, sobald kein Thread (resp. kein Daemon-Thread) mehr läuft. Das heisst, man könnte im Main-Thread auch einfach einen anderen Thread starten und dann die ganze Arbeit da drin machen, und die main-Methode gleich wieder verlassen. Das Programm würde weiterlaufen, bis der gestartete Thread beendet).
 
@@ -84,7 +84,7 @@ public class PlayPauseSimulation implements PlayPauseSimulationI {
 					try {
 						paused.wait();
 					} catch (InterruptedException e) {
-						e.printStackTrace();
+						throw new RuntimeException(e);
 					}
 				}
 			}
@@ -114,7 +114,7 @@ public class PlayPauseSimulation implements PlayPauseSimulationI {
 			try {
 				stepDone.wait();
 			} catch (InterruptedException e) {
-				e.printStackTrace();
+				throw new RuntimeException(e);
 			}
 		}
 	}
@@ -158,10 +158,6 @@ public class PlayPauseSimulation implements PlayPauseSimulationI {
 
 	Status getStatus() {
 		return status;
-	}
-
-	void setStatus(Status status) {
-		this.status = status;
 	}
 
 }
