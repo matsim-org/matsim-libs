@@ -107,7 +107,7 @@ public class EventsBasedVisDebugger extends PApplet {
 		computeOffsets(sc);
 		this.fr = new JFrame();
 		//				this.fr.setSize(1024,788);
-		this.fr.setSize(1024,788);
+		this.fr.setSize(3840,2160);
 		//		this.fr.setSize(1280,740);
 		//		this.fr.setSize(720,740);
 		JPanel compositePanel = new JPanel();

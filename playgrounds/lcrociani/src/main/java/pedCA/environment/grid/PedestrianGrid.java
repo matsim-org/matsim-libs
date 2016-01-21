@@ -56,7 +56,9 @@ public class PedestrianGrid extends ActiveGrid<PhysicalObject>{
 	
 	private void generateShadow(Agent pedestrian) {
 		GridPoint position = pedestrian.getPosition();
-		double pedestrianDensity = this.densityGrid.getDensityAt(position);
+		//THIS IS FOR THE SHIFT OF THE DENSITY PERCEPTION
+		//GridPoint position = pedestrian.getShiftedPosition();
+		double pedestrianDensity = getPedestrianDensity(position);
 		double shadow_life = Math.pow(pedestrianDensity*.61,1.45)*0.4;//Math.pow(pedestrianDensity*.61,1.43)*0.39;
 		shadow_life = shadow_life/Constants.STEP_DURATION;
 		Shadow shadow = new Shadow(this.step, position , pedestrian.getID(), shadow_life);
@@ -92,5 +94,9 @@ public class PedestrianGrid extends ActiveGrid<PhysicalObject>{
 	
 	public boolean containsPedestrian(GridPoint gp){
 		return isOccupied(gp) && get(gp).get(0) instanceof Agent;
+	}
+
+	public boolean isWalkable(GridPoint shiftedPosition) {
+		return densityGrid.neighbourCondition(shiftedPosition.getY(),shiftedPosition.getX());
 	}
 }
