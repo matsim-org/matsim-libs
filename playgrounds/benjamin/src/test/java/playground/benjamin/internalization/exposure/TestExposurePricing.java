@@ -68,9 +68,9 @@ import playground.benjamin.scenarios.munich.exposure.ResponsibilityGridTools;
 @RunWith(Parameterized.class)
 public class TestExposurePricing {
 
-	private String inputPath = "../../../../repos/shared-svn/projects/detailedEval/emissions/testScenario/input/";
+	private String inputPath = "../../detailedEval/emissions/testScenario/input/";
 
-	private String emissionInputPath = "../../../../repos/shared-svn/projects/detailedEval/emissions/hbefaForMatsim/";
+	private String emissionInputPath = "../../detailedEval/emissions/hbefaForMatsim/";
 	private String roadTypeMappingFile = emissionInputPath + "roadTypeMapping.txt";
 	private String emissionVehicleFile = inputPath + "emissionVehicles_1pct.xml.gz";
 
