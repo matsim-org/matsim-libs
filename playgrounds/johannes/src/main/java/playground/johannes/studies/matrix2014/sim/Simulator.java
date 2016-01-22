@@ -19,12 +19,13 @@
 
 package playground.johannes.studies.matrix2014.sim;
 
+import gnu.trove.list.array.TDoubleArrayList;
 import org.apache.commons.math.FunctionEvaluationException;
 import org.apache.commons.math.analysis.UnivariateRealFunction;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.common.stats.Discretizer;
 import org.matsim.contrib.common.stats.FixedBordersDiscretizer;
-import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
 import org.matsim.contrib.common.stats.LinearDiscretizer;
 import org.matsim.contrib.common.util.XORShiftRandom;
 import org.matsim.core.config.Config;
@@ -53,7 +54,10 @@ import playground.johannes.synpop.source.mid2008.MiDValues;
 import playground.johannes.synpop.util.Executor;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Random;
+import java.util.Set;
 
 /**
  * @author johannes
@@ -64,11 +68,21 @@ public class Simulator {
 
     private static final String MODULE_NAME = "synPopSim";
 
+    private static Discretizer simDistanceDiscretizer;
+
+    public static final boolean USE_WEIGTHS = true;
+
+    public static final Predicate<Segment> DEFAULT_LEG_PREDICATE = new LegAttributePredicate(CommonKeys.LEG_MODE,
+            CommonValues.LEG_MODE_CAR);
+
+    public static final String DEFAULT_LEG_PREDICATE_NAME = CommonValues.LEG_MODE_CAR;
     /**
      * @param args
      * @throws IOException
      */
     public static void main(String[] args) throws IOException {
+        Logger.getRootLogger().setLevel(Level.TRACE);
+
         final Config config = new Config();
         ConfigUtils.loadConfig(config, args[0]);
 
@@ -88,6 +102,7 @@ public class Simulator {
         final String output = config.getParam(MODULE_NAME, "output");
         FileIOContext ioContext = new FileIOContext(output);
 
+        simDistanceDiscretizer = buildDistanceDiscretizer();
         AnalyzerTaskComposite<Collection<? extends Person>> task = buildAnalyzer(dataPool, ioContext, refPersons);
 
         logger.info("Analyzing reference population...");
@@ -104,7 +119,9 @@ public class Simulator {
 		/*
 		Setup hamiltonian
 		 */
+        MarkovEngineListenerComposite engineListeners = new MarkovEngineListenerComposite();
         final HamiltonianComposite hamiltonian = new HamiltonianComposite();
+//        final MutableHamiltonianComposite hamiltonian = new MutableHamiltonianComposite();
         TaskRunner.run(new CopyPersonAttToLeg(CommonKeys.PERSON_WEIGHT), refPersons);
         TaskRunner.run(new CopyPersonAttToLeg(CommonKeys.PERSON_WEIGHT), simPersons);
 		/*
@@ -112,6 +129,10 @@ public class Simulator {
 		 */
         UnivariatFrequency distDistrTerm = buildDistDistrTerm(refPersons, simPersons);
         hamiltonian.addComponent(distDistrTerm, Double.parseDouble(config.getParam(MODULE_NAME, "theta_distDistr")));
+//        double theta = Double.parseDouble(config.getParam(MODULE_NAME, "theta_distDistr"));
+//        ThetaProvider provider = new ThetaProvider(distDistrTerm, 0.0000001, 1000000, theta, theta * 1000000000);
+//        hamiltonian.addComponent(distDistrTerm, provider);
+//        engineListeners.addComponent(provider);
 
         UnivariatFrequency distDistrTerm2 = buildDistDistrTerm2(refPersons, simPersons);
         hamiltonian.addComponent(distDistrTerm2, Double.parseDouble(config.getParam(MODULE_NAME, "theta_distDistr")));
@@ -155,7 +176,7 @@ public class Simulator {
 		 */
         MarkovEngine sampler = new MarkovEngine(simPersons, hamiltonian, mutator, random);
 
-        MarkovEngineListenerComposite engineListeners = new MarkovEngineListenerComposite();
+
 
         long dumpInterval = (long) Double.parseDouble(config.getParam(MODULE_NAME, "dumpInterval"));
         engineListeners.addComponent(new AnalyzerListener(task, ioContext, dumpInterval));
@@ -211,49 +232,55 @@ public class Simulator {
     }
 
     private static AnalyzerTaskComposite<Collection<? extends Person>> buildAnalyzer(DataPool dataPool, FileIOContext ioContext, Collection<Person> persons) {
-        final ConcurrentAnalyzerTask<Collection<? extends Person>> task = new ConcurrentAnalyzerTask<>();
-
+//        final ConcurrentAnalyzerTask<Collection<? extends Person>> task = new ConcurrentAnalyzerTask<>();
+        final AnalyzerTaskComposite<Collection<? extends Person>> task = new AnalyzerTaskComposite<>();
         buildGeoDistanceAnalyzer(task, ioContext, dataPool);
 
 
         ZoneCollection lau2Zones = ((ZoneData) dataPool.get(ZoneDataLoader.KEY)).getLayer("lau2");
 
-        ZoneMobilityRate zoneMobilityRate = new ZoneMobilityRate(MiDKeys.PERSON_LAU2_CLASS, lau2Zones, new
-                ModePredicate(CommonValues.LEG_MODE_CAR), ioContext);
+        ZoneMobilityRate zoneMobilityRate = new ZoneMobilityRate(MiDKeys.PERSON_LAU2_CLASS, lau2Zones, DEFAULT_LEG_PREDICATE, ioContext);
         task.addComponent(zoneMobilityRate);
         task.addComponent(new NumericAnalyzer(new PersonCollector<>(
                 new NumericAttributeProvider<Person>(CommonKeys.PERSON_WEIGHT)),
                 "weights",
                 new HistogramWriter(ioContext, new PassThroughDiscretizerBuilder(new LinearDiscretizer(1), "linear"))));
 
-        task.addComponent(new GeoDistNumTripsTask(ioContext, new ModePredicate(CommonValues.LEG_MODE_CAR)));
+        task.addComponent(new GeoDistNumTripsTask(ioContext, DEFAULT_LEG_PREDICATE));
         task.addComponent(new TripsPerPersonTask().build(ioContext));
         return task;
     }
 
     private static Set<Person> generateSimPopulation(Set<Person> refPersons, DataPool dataPool, Config config, Random random) {
-        logger.info("Cloning sim persons...");
-        int size = (int) Double.parseDouble(config.getParam(MODULE_NAME, "populationSize"));
-        Set<Person> simPersons = (Set<Person>) clonePersons(refPersons, size, random);
-        logger.info(String.format("Generated %s persons.", simPersons.size()));
+        String simPopFile = config.findParam(MODULE_NAME, "simPopulation");
+        Set<Person> simPersons;
+        if(simPopFile == null) {
+            logger.info("Cloning sim persons...");
+            int size = (int) Double.parseDouble(config.getParam(MODULE_NAME, "populationSize"));
+            simPersons = (Set<Person>) clonePersons(refPersons, size, random);
+            logger.info(String.format("Generated %s persons.", simPersons.size()));
         /*
         Initializing simulation population...
          */
-        logger.info("Assigning home locations...");
-        ZoneCollection lau2Zones = ((ZoneData) dataPool.get(ZoneDataLoader.KEY)).getLayer("lau2");
-        ZoneCollection modenaZones = ((ZoneData) dataPool.get(ZoneDataLoader.KEY)).getLayer("modena");
+            logger.info("Assigning home locations...");
+            ZoneCollection lau2Zones = ((ZoneData) dataPool.get(ZoneDataLoader.KEY)).getLayer("lau2");
+            ZoneCollection modenaZones = ((ZoneData) dataPool.get(ZoneDataLoader.KEY)).getLayer("modena");
 
-        ZoneMobilityRate zoneMobilityRate = new ZoneMobilityRate(MiDKeys.PERSON_LAU2_CLASS, lau2Zones, new ModePredicate(CommonValues.LEG_MODE_CAR));
-        zoneMobilityRate.analyze(refPersons, null);
+            ZoneMobilityRate zoneMobilityRate = new ZoneMobilityRate(MiDKeys.PERSON_LAU2_CLASS, lau2Zones, DEFAULT_LEG_PREDICATE);
+            zoneMobilityRate.analyze(refPersons, null);
 
-        new TransferZoneAttribute().apply(lau2Zones, modenaZones, MiDKeys.PERSON_LAU2_CLASS);
+            new TransferZoneAttribute().apply(lau2Zones, modenaZones, MiDKeys.PERSON_LAU2_CLASS);
 
-        SetHomeFacilities setHomeFacilities = new SetHomeFacilities(dataPool, "modena", random);
-        setHomeFacilities.setZoneWeights(zoneMobilityRate.getMobilityRatePerZone(modenaZones));
-        setHomeFacilities.apply(simPersons);
+            SetHomeFacilities setHomeFacilities = new SetHomeFacilities(dataPool, "modena", random);
+            setHomeFacilities.setZoneWeights(zoneMobilityRate.getMobilityRatePerZone(modenaZones));
+            setHomeFacilities.apply(simPersons);
 
-        logger.info("Assigning random activity locations...");
-        TaskRunner.run(new SetActivityFacilities((FacilityData) dataPool.get(FacilityDataLoader.KEY)), simPersons);
+            logger.info("Assigning random activity locations...");
+            TaskRunner.run(new SetActivityFacilities((FacilityData) dataPool.get(FacilityDataLoader.KEY)), simPersons);
+        } else {
+            logger.info("Loading sim population from file...");
+            simPersons = PopulationIO.loadFromXML(simPopFile, new PlainFactory());
+        }
 
         logger.info("Recalculate geo distances...");
         TaskRunner.run(new LegAttributeRemover(CommonKeys.LEG_GEO_DISTANCE), simPersons);
@@ -269,12 +296,14 @@ public class Simulator {
     }
 
     private static void extendAnalyzer(AnalyzerTaskComposite<Collection<? extends Person>> task, DataPool dataPool, FileIOContext ioContext, Config config) {
-        ModePredicate modePredicate = new ModePredicate(CommonValues.LEG_MODE_CAR);
-        MatrixAnalyzer mAnalyzer = (MatrixAnalyzer) new MatrixAnalyzerConfigurator(config.getModule("matrixAnalyzerITP")
+        ConcurrentAnalyzerTask<Collection<? extends Person>> matrixTasks = new ConcurrentAnalyzerTask<>();
+
+//        ModePredicate modePredicate = new ModePredicate(CommonValues.LEG_MODE_CAR);
+        MatrixComparator mAnalyzer = (MatrixComparator) new MatrixAnalyzerConfigurator(config.getModule("matrixAnalyzerITP")
                 , dataPool, ioContext).load();
-        mAnalyzer.setPredicate(modePredicate);
-        mAnalyzer.setUseWeights(true);
-        task.addComponent(mAnalyzer);
+        mAnalyzer.setLegPredicate(DEFAULT_LEG_PREDICATE);
+        mAnalyzer.setUseWeights(USE_WEIGTHS);
+        matrixTasks.addComponent(mAnalyzer);
 
 //        mAnalyzer = (MatrixAnalyzer) new MatrixAnalyzerConfigurator(config.getModule("matrixAnalyzerITP-2")
 //                , dataPool, ioContext).load();
@@ -282,15 +311,15 @@ public class Simulator {
 //        mAnalyzer.setUseWeights(true);
 //        task.addComponent(mAnalyzer);
 
-        mAnalyzer = (MatrixAnalyzer) new MatrixAnalyzerConfigurator(config.getModule("matrixAnalyzerTomTom")
+        mAnalyzer = (MatrixComparator) new MatrixAnalyzerConfigurator(config.getModule("matrixAnalyzerTomTom")
                 , dataPool, ioContext).load();
-        mAnalyzer.setPredicate(modePredicate);
+        mAnalyzer.setLegPredicate(DEFAULT_LEG_PREDICATE);
         ZoneData zoneData = (ZoneData) dataPool.get(ZoneDataLoader.KEY);
         ZoneCollection zones = zoneData.getLayer("tomtom");
         ODPredicate distPredicate = new ZoneDistancePredicate(zones, 100000);
-        mAnalyzer.setODPredicate(distPredicate);
-        mAnalyzer.setUseWeights(true);
-        task.addComponent(mAnalyzer);
+        mAnalyzer.setNormPredicate(distPredicate);
+        mAnalyzer.setUseWeights(USE_WEIGTHS);
+        matrixTasks.addComponent(mAnalyzer);
 
 //        mAnalyzer = (MatrixAnalyzer) new MatrixAnalyzerConfigurator(config.getModule("matrixAnalyzerTomTom-2")
 //                , dataPool, ioContext).load();
@@ -301,9 +330,13 @@ public class Simulator {
 
         ActivityFacilities facilities = ((FacilityData) dataPool.get(FacilityDataLoader.KEY)).getAll();
         MatrixWriter matrixWriter = new MatrixWriter(facilities, zones, ioContext);
-        matrixWriter.setPredicate(modePredicate);
-        matrixWriter.setUseWeights(true);
-        task.addComponent(matrixWriter);
+        matrixWriter.setPredicate(DEFAULT_LEG_PREDICATE);
+        matrixWriter.setUseWeights(USE_WEIGTHS);
+        matrixTasks.addComponent(matrixWriter);
+
+        AnalyzerTaskGroup<Collection<? extends Person>> group = new AnalyzerTaskGroup<>(matrixTasks, ioContext,
+                "matrix");
+        task.addComponent(group);
 
         task.addComponent(new PopulationWriter(ioContext));
 
@@ -311,12 +344,13 @@ public class Simulator {
         histogramWriter.addBuilder(new PassThroughDiscretizerBuilder(new LinearDiscretizer(50000), "linear"));
         histogramWriter.addBuilder(new PassThroughDiscretizerBuilder(new FixedBordersDiscretizer(new double[]{-1,
                 100000, Integer.MAX_VALUE}), "100KM"));
+        histogramWriter.addBuilder(new PassThroughDiscretizerBuilder(simDistanceDiscretizer, "sim"));
 
         FacilityData fData = (FacilityData) dataPool.get(FacilityDataLoader.KEY);
         NumericAnalyzer actDist = new ActDistanceBuilder()
                 .setHistogramWriter(histogramWriter)
-                .setPredicate(modePredicate, "car")
-                .setUseWeights(true)
+                .setPredicate(DEFAULT_LEG_PREDICATE, DEFAULT_LEG_PREDICATE_NAME)
+                .setUseWeights(USE_WEIGTHS)
                 .build(fData.getAll());
         task.addComponent(actDist);
     }
@@ -326,11 +360,12 @@ public class Simulator {
         Set<Attributable> refLegs = getCarLegs(refPersons);
         Set<Attributable> simLegs = getCarLegs(simPersons);
 
-        List<Double> values = new LegCollector(new NumericAttributeProvider(CommonKeys.LEG_GEO_DISTANCE)).collect(refPersons);
-        double[] nativeValues = org.matsim.contrib.common.collections.CollectionUtils.toNativeArray(values);
-        Discretizer disc = FixedSampleSizeDiscretizer.create(nativeValues, 50, 100);
+//        List<Double> values = new LegCollector(new NumericAttributeProvider(CommonKeys.LEG_GEO_DISTANCE)).collect(refPersons);
+//        double[] nativeValues = org.matsim.contrib.common.collections.CollectionUtils.toNativeArray(values);
+//        Discretizer disc = FixedSampleSizeDiscretizer.create(nativeValues, 50, 100);
 
-        UnivariatFrequency f = new UnivariatFrequency(refLegs, simLegs, CommonKeys.LEG_GEO_DISTANCE, disc, true);
+        UnivariatFrequency f = new UnivariatFrequency(refLegs, simLegs, CommonKeys.LEG_GEO_DISTANCE,
+                simDistanceDiscretizer, USE_WEIGTHS);
 
         return f;
     }
@@ -344,18 +379,18 @@ public class Simulator {
 //        double[] nativeValues = org.matsim.contrib.common.collections.CollectionUtils.toNativeArray(values);
         Discretizer disc = new FixedBordersDiscretizer(new double[]{-1, 100000, Integer.MAX_VALUE});
 
-        UnivariatFrequency f = new UnivariatFrequency(refLegs, simLegs, CommonKeys.LEG_GEO_DISTANCE, disc, true);
+        UnivariatFrequency f = new UnivariatFrequency(refLegs, simLegs, CommonKeys.LEG_GEO_DISTANCE, disc, USE_WEIGTHS);
 
         return f;
     }
 
     private static Set<Attributable> getCarLegs(Set<? extends Person> persons) {
-        Predicate<Segment> carPredicate = new ModePredicate(CommonValues.LEG_MODE_CAR);
+//        Predicate<Segment> carPredicate = new ModePredicate(CommonValues.LEG_MODE_CAR);
         Set<Attributable> legs = new HashSet<>();
         for (Person p : persons) {
             Episode e = p.getEpisodes().get(0);
             for (Segment leg : e.getLegs()) {
-                if (carPredicate.test(leg)) legs.add(leg);
+                if (DEFAULT_LEG_PREDICATE.test(leg)) legs.add(leg);
             }
         }
 
@@ -371,7 +406,7 @@ public class Simulator {
 
         Converters.register(MiDKeys.PERSON_LAU2_CLASS, DoubleConverter.getInstance());
         BivariatMean bm = new BivariatMean(refLegs, simLegs, MiDKeys.PERSON_LAU2_CLASS, CommonKeys.LEG_GEO_DISTANCE,
-                new LinearDiscretizer(1.0), true);
+                new LinearDiscretizer(1.0), USE_WEIGTHS);
 
         return bm;
     }
@@ -388,31 +423,41 @@ public class Simulator {
 
     private static AnalyzerTask<Collection<? extends Person>> buildGeoDistanceAnalyzer
             (AnalyzerTaskComposite<Collection<? extends Person>> tasks, FileIOContext ioContext, DataPool dataPool) {
+//        AnalyzerTaskComposite<Collection<? extends Person>> composite = new AnalyzerTaskComposite<>();
+        ConcurrentAnalyzerTask<Collection<? extends Person>> composite = new ConcurrentAnalyzerTask<>();
+
         HistogramWriter histogramWriter = new HistogramWriter(ioContext, new StratifiedDiscretizerBuilder(100, 100));
         histogramWriter.addBuilder(new PassThroughDiscretizerBuilder(new LinearDiscretizer(50000), "linear"));
         histogramWriter.addBuilder(new PassThroughDiscretizerBuilder(new FixedBordersDiscretizer(new double[]{-1,
                 100000, Integer.MAX_VALUE}), "100KM"));
+        histogramWriter.addBuilder(new PassThroughDiscretizerBuilder(simDistanceDiscretizer, "sim"));
 
-        Predicate<Segment> modePredicate = new ModePredicate(CommonValues.LEG_MODE_CAR);
-        tasks.addComponent(NumericLegAnalyzer.create(CommonKeys.LEG_ROUTE_DISTANCE, true, modePredicate, "car",
+//        Predicate<Segment> modePredicate = new ModePredicate(CommonValues.LEG_MODE_CAR);
+        composite.addComponent(NumericLegAnalyzer.create(CommonKeys.LEG_ROUTE_DISTANCE, USE_WEIGTHS, DEFAULT_LEG_PREDICATE,
+                DEFAULT_LEG_PREDICATE_NAME,
                 histogramWriter));
-        tasks.addComponent(NumericLegAnalyzer.create(CommonKeys.LEG_GEO_DISTANCE, true, modePredicate, "car",
+        composite.addComponent(NumericLegAnalyzer.create(CommonKeys.LEG_GEO_DISTANCE, USE_WEIGTHS, DEFAULT_LEG_PREDICATE,
+                DEFAULT_LEG_PREDICATE_NAME,
                 histogramWriter));
 
         for (int klass = 0; klass < 6; klass++) {
             Predicate<Segment> lauPred = new LegPersonAttributePredicate(MiDKeys.PERSON_LAU2_CLASS, String.valueOf(klass));
-            Predicate<Segment> predicate = PredicateAndComposite.create(modePredicate, lauPred);
+            Predicate<Segment> predicate = PredicateAndComposite.create(DEFAULT_LEG_PREDICATE, lauPred);
             String label = String.format("car.lau%s", klass);
-            tasks.addComponent(NumericLegAnalyzer.create(CommonKeys.LEG_GEO_DISTANCE, true, predicate, label, histogramWriter));
+            composite.addComponent(NumericLegAnalyzer.create(CommonKeys.LEG_GEO_DISTANCE, USE_WEIGTHS, predicate, label,
+                    histogramWriter));
         }
 
         Predicate<Segment> inTown = new LegAttributePredicate(MiDKeys.LEG_DESTINATION, MiDValues.IN_TOWN);
-        Predicate<Segment> predicate = PredicateAndComposite.create(modePredicate, inTown);
-        tasks.addComponent(NumericLegAnalyzer.create(CommonKeys.LEG_GEO_DISTANCE, true, predicate, "car.inTown", histogramWriter));
+        Predicate<Segment> predicate = PredicateAndComposite.create(DEFAULT_LEG_PREDICATE, inTown);
+        composite.addComponent(NumericLegAnalyzer.create(CommonKeys.LEG_GEO_DISTANCE, USE_WEIGTHS, predicate,
+                DEFAULT_LEG_PREDICATE_NAME + ".inTown",
+                histogramWriter));
 
         Predicate<Segment> outOfTown = new LegAttributePredicate(MiDKeys.LEG_DESTINATION, MiDValues.OUT_OF_TOWN);
-        predicate = PredicateAndComposite.create(modePredicate, outOfTown);
-        tasks.addComponent(NumericLegAnalyzer.create(CommonKeys.LEG_GEO_DISTANCE, true, predicate, "car.outOfTown", histogramWriter));
+        predicate = PredicateAndComposite.create(DEFAULT_LEG_PREDICATE, outOfTown);
+        composite.addComponent(NumericLegAnalyzer.create(CommonKeys.LEG_GEO_DISTANCE, USE_WEIGTHS, predicate,
+                DEFAULT_LEG_PREDICATE_NAME + ".outOfTown", histogramWriter));
 
 //        LegCollector<String> purposeCollector = new LegCollector<>(new AttributeProvider<Segment>(CommonKeys.LEG_PURPOSE));
 //        purposeCollector.setPredicate(modePredicate);
@@ -424,7 +469,10 @@ public class Simulator {
 //            tasks.addComponent(NumericLegAnalyzer.create(CommonKeys.LEG_GEO_DISTANCE, true, predicate, "car." + purpose, histogramWriter));
 //        }
 
+        AnalyzerTaskGroup<Collection<? extends Person>> group = new AnalyzerTaskGroup<>(composite, ioContext,
+                "geoDistance");
 
+        tasks.addComponent(group);
 
         return tasks;
     }
@@ -436,7 +484,7 @@ public class Simulator {
         Set<Person> persons1 = new HashSet<>();
         Set<Person> persons2 = new HashSet<>();
 
-        TripsCounter counter = new TripsCounter(new ModePredicate(CommonValues.LEG_MODE_CAR));
+        TripsCounter counter = new TripsCounter(DEFAULT_LEG_PREDICATE);
         for (Person p : refPersons) {
             double w = Double.parseDouble(p.getAttribute(CommonKeys.PERSON_WEIGHT));
             if (counter.get(p.getEpisodes().get(0)) == 1) {
@@ -465,5 +513,16 @@ public class Simulator {
         all.addAll(simPersons2);
 
         return all;
+    }
+
+    private static Discretizer buildDistanceDiscretizer() {
+        TDoubleArrayList borders = new TDoubleArrayList();
+        borders.add(-1);
+        for(int d = 2000; d < 10000; d += 2000) borders.add(d);
+        for(int d = 10000; d < 50000; d += 10000) borders.add(d);
+        for(int d = 50000; d < 500000; d += 50000) borders.add(d);
+        for(int d = 500000; d < 1000000; d += 100000) borders.add(d);
+        borders.add(Double.MAX_VALUE);
+        return new FixedBordersDiscretizer(borders.toArray());
     }
 }

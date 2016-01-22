@@ -76,7 +76,7 @@ public class SingleTrajectorySampler<U extends DecisionVariable> implements
 	}
 
 	@Override
-	public Map<U, Double> getDecisionVariable2finalObjectiveFunctionValue() {
+	public Map<U, Double> getDecisionVariable2finalObjectiveFunctionValueView() {
 		final Map<U, Double> result = new LinkedHashMap<>();
 		if (this.convergenceCriterion.isConverged()) {
 			result.put(this.decisionVariable,
@@ -129,6 +129,16 @@ public class SingleTrajectorySampler<U extends DecisionVariable> implements
 
 	@Override
 	public void setStandardLogFileName(final String logFileName) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public Map<U, Double> getDecisionVariable2selfTunedEquilbriumGapWeightView() {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public Map<U, Double> getDecisionVariable2selfTunedUniformityGapWeightView() {
 		throw new UnsupportedOperationException();
 	}
 

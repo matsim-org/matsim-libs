@@ -1,3 +1,27 @@
+/*
+ * Opdyts - Optimization of dynamic traffic simulations
+ *
+ * Copyright 2015 Gunnar Flötteröd
+ * 
+ *
+ * This file is part of Opdyts.
+ *
+ * Opdyts is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Opdyts is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Opdyts.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * contact: gunnar.floetteroed@abe.kth.se
+ *
+ */
 package floetteroed.opdyts.trajectorysampling;
 
 import static org.apache.commons.math3.optim.linear.Relationship.EQ;
@@ -44,7 +68,22 @@ class WeightOptimizer {
 
 	// -------------------- CONSTRUCTION --------------------
 
-	WeightOptimizer(final Vector dInterpolatedObjectiveFunctiondAlpha,
+	WeightOptimizer(
+			final SurrogateObjectiveFunction<?> lastSurrogateObjectiveFunction,
+			final Vector trialAlphas) {
+		this(lastSurrogateObjectiveFunction
+				.dInterpolObjFctVal_dAlpha(trialAlphas),
+				lastSurrogateObjectiveFunction
+						.dEquilibriumGap_dAlpha(trialAlphas),
+				lastSurrogateObjectiveFunction
+						.d2EquilibriumGapdAlpha2(trialAlphas),
+				lastSurrogateObjectiveFunction
+						.dUniformityGap_dAlpha(trialAlphas),
+				lastSurrogateObjectiveFunction
+						.d2UniformityGapdAlpha2(trialAlphas));
+	}
+
+	private WeightOptimizer(final Vector dInterpolatedObjectiveFunctiondAlpha,
 			final Vector dEquilibriumGapdAlpha,
 			final Matrix d2EquilibriumGapdAlpha2,
 			final Vector dUniformityGapdAlpha,
@@ -101,7 +140,19 @@ class WeightOptimizer {
 		return addend1.add(addend2);
 	}
 
-	public double[] updateWeights(final double equilGapWeight,
+	double[] updateWeights(final double equilGapWeight,
+			final double unifGapWeight,
+			final SamplingStage<?> lastSamplingStage,
+			final double finalObjFctValue, final double finalEquilGap,
+			final double finalUnifGap) {
+		return this.updateWeights(equilGapWeight, unifGapWeight,
+				lastSamplingStage.getEquilibriumGap(),
+				lastSamplingStage.getUniformityGap(), finalObjFctValue,
+				lastSamplingStage.getSurrogateObjectiveFunctionValue(),
+				finalEquilGap, finalUnifGap);
+	}
+
+	private double[] updateWeights(final double equilGapWeight,
 			final double unifGapWeight, final double equilGap,
 			final double unifGap, final double finalObjFctValue,
 			final double finalSurrogateObjectiveFunctionValue,
@@ -190,7 +241,7 @@ class WeightOptimizer {
 			return new double[] { equilGap, unifGap };
 		} catch (NoFeasibleSolutionException e) {
 			Logger.getLogger(this.getClass().getName()).warning(e.toString());
-			return new double[] { equilGap, unifGap };			
+			return new double[] { equilGap, unifGap };
 		}
 	}
 }

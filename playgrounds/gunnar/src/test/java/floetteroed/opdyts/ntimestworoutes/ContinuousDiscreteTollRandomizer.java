@@ -47,7 +47,6 @@ public class ContinuousDiscreteTollRandomizer
 
 	// ---------- IMPLEMENTATION OF DecisionVariableRandomizer ----------
 
-	@Override
 	public NTimesTwoRoutesDecisionVariableMixedDiscrCont newRandomDecisionVariable() {
 
 		// where to put the tolls

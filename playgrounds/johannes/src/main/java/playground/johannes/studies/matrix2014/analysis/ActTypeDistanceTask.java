@@ -23,13 +23,9 @@ import gnu.trove.map.hash.TDoubleDoubleHashMap;
 import gnu.trove.map.hash.TObjectDoubleHashMap;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.common.stats.LinearDiscretizer;
-import playground.johannes.synpop.analysis.ModePredicate;
-import playground.johannes.synpop.analysis.PredicateAndComposite;
 import playground.johannes.gsv.synPop.analysis.AnalyzerTask;
 import playground.johannes.studies.matrix2014.stats.Histogram;
-import playground.johannes.synpop.analysis.LegCollector;
-import playground.johannes.synpop.analysis.NumericAttributeProvider;
-import playground.johannes.synpop.analysis.Predicate;
+import playground.johannes.synpop.analysis.*;
 import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.CommonValues;
 import playground.johannes.synpop.data.Person;
@@ -53,7 +49,7 @@ public class ActTypeDistanceTask extends AnalyzerTask {
     @Override
     public void analyze(Collection<? extends Person> persons, Map<String, DescriptiveStatistics> results) {
         Map<String, Predicate<Segment>> actTypePredicates = Predicates.actTypePredicates(persons, true);
-        ModePredicate modePredicate = new ModePredicate(CommonValues.LEG_MODE_CAR);
+        Predicate<Segment> modePredicate = new LegAttributePredicate(CommonKeys.LEG_MODE, CommonValues.LEG_MODE_CAR);
         LegCollector distColletor = new LegCollector(new NumericAttributeProvider(CommonKeys.LEG_GEO_DISTANCE));
 
         try {

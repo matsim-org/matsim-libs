@@ -49,7 +49,6 @@ class TollLevelsRandomizer implements DecisionVariableRandomizer<TollLevels> {
 					@Override
 					public double constrain(double originalValue) {
 						// TODO Could also re-center this at the value grid.
-						//return originalValue; // TODO experimental
 						return Math.max(0, Math.min(24 * 3600, originalValue));
 					}
 				});
@@ -73,18 +72,19 @@ class TollLevelsRandomizer implements DecisionVariableRandomizer<TollLevels> {
 					@Override
 					public double constrain(double originalValue) {
 						// TODO Could also re-center this at the value grid.
-						return Math.max(0, originalValue);
+						return originalValue;
+						// return Math.max(0, originalValue);
 					}
 				});
 	}
 
 	// ---------- IMPLEMENTATION OF DecisionVariableRandomizer ----------
 
-	@Override
-	public TollLevels newRandomDecisionVariable() {
-		// TODO This is not (and should not need not be) random.
-		return this.initialTollLevels;
-	}
+	// @Override
+	// public TollLevels newRandomDecisionVariable() {
+	// // TODO This is not (and should not need not be) random.
+	// return this.initialTollLevels;
+	// }
 
 	@Override
 	public Collection<TollLevels> newRandomVariations(

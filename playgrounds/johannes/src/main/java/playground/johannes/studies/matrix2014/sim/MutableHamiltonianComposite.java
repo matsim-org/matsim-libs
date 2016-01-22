@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,       *
+ * copyright       : (C) 2016 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,26 +16,55 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.synpop.analysis;
 
-import org.apache.log4j.Logger;
+package playground.johannes.studies.matrix2014.sim;
+
 import org.matsim.contrib.common.collections.Composite;
+import playground.johannes.synpop.sim.Hamiltonian;
+import playground.johannes.synpop.sim.data.CachedPerson;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
- * @author jillenberger
+ * @author johannes
  */
-public class AnalyzerTaskComposite<T> extends Composite<AnalyzerTask<T>> implements AnalyzerTask<T> {
+public class MutableHamiltonianComposite extends Composite<Hamiltonian> implements Hamiltonian {
 
-    private static final Logger logger = Logger.getLogger(AnalyzerTaskComposite.class);
+    private List<ThetaProvider> providers = new ArrayList<>();
+
+    public void addComponent(Hamiltonian h) {
+        super.addComponent(h);
+        providers.add(null);
+    }
+
+    public void addComponent(Hamiltonian h, ThetaProvider provider) {
+        super.addComponent(h);
+        providers.add(provider);
+    }
+
+    public void removeComponent(Hamiltonian h) {
+        int idx = components.indexOf(h);
+        super.removeComponent(h);
+        providers.remove(idx);
+    }
+
+//    /*
+//     * TODO: hide access?
+//     */
+//    public List<Hamiltonian> getComponents() {
+//        return components;
+//    }
 
     @Override
-    public void analyze(T object, List<StatsContainer> containers) {
-        for(AnalyzerTask<T> task : components) {
-            logger.trace(String.format("Executing task %s...", task.getClass().getSimpleName()));
-            task.analyze(object, containers);
+    public double evaluate(Collection<CachedPerson> population) {
+        double sum = 0;
+
+        for (int i = 0; i < components.size(); i++) {
+            sum += providers.get(i).getTheta() * components.get(i).evaluate(population);
         }
-        logger.trace("All tasks executed.");
+
+        return sum;
     }
 }

@@ -36,7 +36,6 @@ import playground.johannes.synpop.matrix.NumericMatrix;
 import playground.johannes.synpop.matrix.NumericMatrixIO;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
 /**
  * @author johannes
@@ -87,6 +86,7 @@ public class MatrixCompare {
 
         HistogramWriter writer = new HistogramWriter(ioContext, new PassThroughDiscretizerBuilder(new
                 LinearDiscretizer(0.05), "linear"));
+
         MatrixVolumeCompare volTask = new MatrixVolumeCompare("matrix.vol");
         volTask.setIoContext(ioContext);
         volTask.setHistogramWriter(writer);
@@ -101,6 +101,6 @@ public class MatrixCompare {
         composite.addComponent(distTask);
         composite.addComponent(marTask);
 
-        composite.analyze(new ImmutablePair<>(refMatrix, simMatrix), new ArrayList<StatsContainer>());
+        AnalyzerTaskRunner.run(new ImmutablePair<>(refMatrix, simMatrix), composite, ioContext);
     }
 }

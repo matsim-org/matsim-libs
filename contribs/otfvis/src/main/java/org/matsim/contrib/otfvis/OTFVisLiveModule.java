@@ -38,7 +38,6 @@ public class OTFVisLiveModule extends AbstractModule {
 	@Override
 	public void install() {
 		this.addMobsimListenerBinding().to( OTFVisMobsimListener.class ) ;
-		// (cannot do this as anonymous class since the listener cannot be constructed before the mobsim is there. kai, nov'15)
 	}
 
 	private static class OTFVisMobsimListener implements MobsimInitializedListener{

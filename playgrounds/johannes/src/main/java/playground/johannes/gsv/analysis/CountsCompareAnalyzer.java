@@ -126,7 +126,7 @@ public class CountsCompareAnalyzer implements AfterMobsimListener {
 
 			CountsCompare2GeoJSON.write(calculator, counts, factor, network, outdir);
 			NetworkLoad2GeoJSON.write(event.getServices().getScenario().getNetwork(), calculator, factor, outdir + "/network.json");
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 

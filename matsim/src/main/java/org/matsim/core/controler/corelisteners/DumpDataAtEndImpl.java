@@ -102,6 +102,10 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {
+		if ( event.isUnexpected() ) {
+			return ;
+		}
+		
 		// dump plans
 		new PopulationWriter(population, network).write(controlerIO.getOutputFilename(Controler.FILENAME_POPULATION));
 		final ObjectAttributes personAttributes = population.getPersonAttributes();

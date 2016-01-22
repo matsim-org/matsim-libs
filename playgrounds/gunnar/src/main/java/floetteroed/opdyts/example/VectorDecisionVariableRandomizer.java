@@ -42,11 +42,11 @@ public class VectorDecisionVariableRandomizer implements
 		this.max = max;
 	}
 
-	@Override
-	public VectorDecisionVariable newRandomDecisionVariable() {
-		// TODO returns all-zeros: not random, and should not be
-		return new VectorDecisionVariable(new Vector(this.dim), this.system);
-	}
+	// @Override
+	// public VectorDecisionVariable newRandomDecisionVariable() {
+	// // TODO returns all-zeros: not random, and should not be
+	// return new VectorDecisionVariable(new Vector(this.dim), this.system);
+	// }
 
 	@Override
 	public Collection<VectorDecisionVariable> newRandomVariations(

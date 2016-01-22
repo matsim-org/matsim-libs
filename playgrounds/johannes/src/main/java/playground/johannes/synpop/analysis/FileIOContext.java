@@ -35,6 +35,10 @@ public class FileIOContext {
         new File(fullPath).mkdirs();
     }
 
+    public String getRoot() {
+        return root;
+    }
+
     public String getPath() {
         return fullPath;
     }

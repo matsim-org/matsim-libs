@@ -21,6 +21,7 @@
 package playground.johannes.gsv.sim.cadyts;
 
 import cadyts.calibrators.analytical.AnalyticalCalibrator;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -44,11 +45,9 @@ import playground.johannes.gsv.sim.LinkOccupancyCalculator;
 import playground.johannes.synpop.gis.ZoneCollection;
 import playground.johannes.synpop.gis.ZoneGeoJsonIO;
 import playground.johannes.synpop.matrix.NumericMatrix;
-import playground.johannes.synpop.matrix.NumericMatrixXMLReader;
+import playground.johannes.synpop.matrix.NumericMatrixIO;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -135,20 +134,24 @@ public class CadytsContext implements CadytsContextI<Link>, StartupListener, Ite
 		event.getServices().getEvents().addHandler(ptStep);
 
 		if(Boolean.parseBoolean(config.getParam(GsvConfigGroup.GSV_CONFIG_MODULE_NAME, "odCalibration"))) {
-			NumericMatrixXMLReader reader = new NumericMatrixXMLReader();
-			reader.setValidating(false);
-			reader.parse(config.getParam(GsvConfigGroup.GSV_CONFIG_MODULE_NAME, "odMatrixFile"));
-			NumericMatrix m = reader.getMatrix();
+//			NumericMatrixXMLReader reader = new NumericMatrixXMLReader();
+//			reader.setValidating(false);
+//			reader.parse(config.getParam(GsvConfigGroup.GSV_CONFIG_MODULE_NAME, "odMatrixFile"));
+//			NumericMatrix m = reader.getMatrix();
+			NumericMatrix m = NumericMatrixIO.read(config.getParam(GsvConfigGroup.GSV_CONFIG_MODULE_NAME,
+					"odMatrixFile"));
 			
 			double distThreshold = Double.parseDouble(config.getParam(GsvConfigGroup.GSV_CONFIG_MODULE_NAME, "odDistThreshold"));
 			double countThreshold = Double.parseDouble(config.getParam(GsvConfigGroup.GSV_CONFIG_MODULE_NAME, "odCountThreshold"));
 			String aggKey = config.findParam(GsvConfigGroup.GSV_CONFIG_MODULE_NAME, "aggregationKey");
 			String data;
 			try {
-				data = new String(Files.readAllBytes(Paths.get(config.getParam(GsvConfigGroup.GSV_CONFIG_MODULE_NAME, "zonesFile"))));
-				ZoneCollection zones = new ZoneCollection();
-				zones.addAll(ZoneGeoJsonIO.parseFeatureCollection(data));
-				
+//				data = new String(Files.readAllBytes(Paths.get(config.getParam(GsvConfigGroup.GSV_CONFIG_MODULE_NAME, "zonesFile"))));
+//				ZoneCollection zones = new ZoneCollection();
+//				zones.addAll(ZoneGeoJsonIO.parseFeatureCollection(data));
+				ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON(config.getParam(GsvConfigGroup
+						.GSV_CONFIG_MODULE_NAME, "zonesFile"), "NO");
+
 				odCalibrator = new ODCalibrator(event.getServices().getScenario(), this, m, zones, distThreshold, countThreshold, aggKey);
 				event.getServices().getEvents().addHandler(odCalibrator);
 				
@@ -165,9 +168,9 @@ public class CadytsContext implements CadytsContextI<Link>, StartupListener, Ite
 		
 		
 		// build the calibrator. This is a static method, and in consequence has no side effects
-//		Logger.getRootLogger().setLevel(Level.INFO);
+		Logger.getRootLogger().setLevel(Level.INFO);
 		this.calibrator = CadytsBuilder.buildCalibrator(scenario.getConfig(), this.counts , new LinkLookUp(scenario) /*, cadytsConfig.getTimeBinSize()*/, Link.class);
-//		Logger.getRootLogger().setLevel(Level.DEBUG);
+		Logger.getRootLogger().setLevel(Level.DEBUG);
 	}
 	
 	@Override

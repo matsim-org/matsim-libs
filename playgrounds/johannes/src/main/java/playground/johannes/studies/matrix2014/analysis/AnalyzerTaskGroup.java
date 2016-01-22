@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,       *
+ * copyright       : (C) 2016 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,26 +16,41 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.synpop.analysis;
+
+package playground.johannes.studies.matrix2014.analysis;
 
 import org.apache.log4j.Logger;
-import org.matsim.contrib.common.collections.Composite;
+import playground.johannes.synpop.analysis.AnalyzerTask;
+import playground.johannes.synpop.analysis.FileIOContext;
+import playground.johannes.synpop.analysis.StatsContainer;
 
 import java.util.List;
 
 /**
- * @author jillenberger
+ * @author johannes
  */
-public class AnalyzerTaskComposite<T> extends Composite<AnalyzerTask<T>> implements AnalyzerTask<T> {
+public class AnalyzerTaskGroup<T> implements AnalyzerTask<T> {
 
-    private static final Logger logger = Logger.getLogger(AnalyzerTaskComposite.class);
+    private static final Logger logger = Logger.getLogger(AnalyzerTaskGroup.class);
+
+    private final FileIOContext ioContext;
+
+    private final String name;
+
+    private final AnalyzerTask<T> task;
+
+    public AnalyzerTaskGroup(AnalyzerTask<T> task, FileIOContext ioContext, String name) {
+        this.task = task;
+        this.ioContext = ioContext;
+        this.name = name;
+    }
 
     @Override
     public void analyze(T object, List<StatsContainer> containers) {
-        for(AnalyzerTask<T> task : components) {
-            logger.trace(String.format("Executing task %s...", task.getClass().getSimpleName()));
-            task.analyze(object, containers);
-        }
-        logger.trace("All tasks executed.");
+        String appendix = ioContext.getPath().substring(ioContext.getRoot().length());
+        ioContext.append(String.format("%s/%s", appendix, name));
+        logger.trace(String.format("Executing group %s...", name));
+        task.analyze(object, containers);
+        ioContext.append(appendix);
     }
 }

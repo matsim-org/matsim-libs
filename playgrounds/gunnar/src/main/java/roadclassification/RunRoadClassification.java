@@ -94,11 +94,11 @@ public class RunRoadClassification {
 		int maxTransitions = 1000;
 		int populationSize = 5;
 		DecisionVariableRandomizer<RoadClassificationDecisionVariable> randomizer = new DecisionVariableRandomizer<RoadClassificationDecisionVariable>() {
-			@Override
-			public RoadClassificationDecisionVariable newRandomDecisionVariable() {
-				ArrayList<LinkSettings> linkSettingses = new ArrayList<>(almostRealLinkSettings);
-				return new RoadClassificationDecisionVariable(scenario.getNetwork(), linkAttributes, linkSettingses);
-			}
+//			@Override
+//			public RoadClassificationDecisionVariable newRandomDecisionVariable() {
+//				ArrayList<LinkSettings> linkSettingses = new ArrayList<>(almostRealLinkSettings);
+//				return new RoadClassificationDecisionVariable(scenario.getNetwork(), linkAttributes, linkSettingses);
+//			}
 
 			@Override
 			public List<RoadClassificationDecisionVariable> newRandomVariations(RoadClassificationDecisionVariable decisionVariable) {
@@ -135,10 +135,12 @@ public class RunRoadClassification {
 		// Discretizize the day into 24 one-hour time bins, starting at midnight.
 		final TimeDiscretization timeDiscretization = new TimeDiscretization(0, 3600, 24);
 		
-		RandomSearch<RoadClassificationDecisionVariable> randomSearch = new RandomSearch<>(new MATSimSimulator<RoadClassificationDecisionVariable>(stateFactory, scenario, timeDiscretization, null), randomizer, convergenceCriterion, 
+		RandomSearch<RoadClassificationDecisionVariable> randomSearch = new RandomSearch<>(new MATSimSimulator<RoadClassificationDecisionVariable>(stateFactory, scenario, timeDiscretization, null), randomizer, 
+				new RoadClassificationDecisionVariable(scenario.getNetwork(), linkAttributes, new ArrayList<>(almostRealLinkSettings)),
+				convergenceCriterion, 
 				// selfTuner, 
 				maxIterations, maxTransitions, populationSize,
-				MatsimRandom.getRandom(), interpolate, objectiveFunction, maxMemoryLength, 0.95);
+				MatsimRandom.getRandom(), interpolate, objectiveFunction, maxMemoryLength);
 		randomSearch.setLogFileName(scenario.getConfig().controler().getOutputDirectory() + "optimization.log");
 		randomSearch.run();
 		for (DecisionVariable decisionVariable : randomSearch.getBestDecisionVariablesView()) {
