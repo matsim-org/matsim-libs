@@ -69,15 +69,18 @@ public final class TtCreateBraessNetworkAndLanes {
 	private LaneType laneType = LaneType.NONE; 
 	private boolean btuRun = false;
 	private int numberOfPersons;
+	private double capTolerance = 0.0;
 	
 	// capacity at the links that all agents have to use
-	private long capFirstLast; // [veh/h]
+	private double capFirstLast; // [veh/h]
 	// capacity at all other links
-	private long capMain; // [veh/h]
+	private double capMain; // [veh/h]
 	// link length for the inflow links
 	private double inflowLinkLength; // [m]
+	// link length for all links with big travel time
+	private int linkLengthBig; // [m]
 	// link length for all other links
-	private long linkLength; // [m]
+	private long linkLengthSmall; // [m]
 	// travel time for the middle link
 	private double linkTTMid;
 	// travel time for the middle route links
@@ -113,16 +116,17 @@ public final class TtCreateBraessNetworkAndLanes {
 			capFirstLast = numberOfPersons;
 			capMain = numberOfPersons;
 			inflowLinkLength = 7.5 * 1;
-			linkLength = 200;
+			linkLengthSmall = 200;
 			linkTTMid = 1;
 			linkTTSmall = 10;
 			linkTTBig = 20;
 			minimalLinkTT = 1;
 		} else {
 			capFirstLast = numberOfPersons;
-			capMain = numberOfPersons / 2;
+			capMain = (numberOfPersons / 2 ) * (1 + capTolerance);
 			inflowLinkLength = 7.5 * 1;
-			linkLength = 10000;
+			linkLengthSmall = 1000;
+			linkLengthBig = 10000;
 			linkTTMid = 1 * 60;
 			linkTTSmall = 1 * 60;
 			linkTTBig = 10 * 60;
@@ -163,13 +167,13 @@ public final class TtCreateBraessNetworkAndLanes {
 		Link l = fac.createLink(Id.createLinkId("0_1"),
 				net.getNodes().get(Id.createNodeId(0)),
 				net.getNodes().get(Id.createNodeId(1)));
-		setLinkAttributes(l, capFirstLast, linkLength, minimalLinkTT);
+		setLinkAttributes(l, capFirstLast, linkLengthSmall, minimalLinkTT);
 		net.addLink(l);
 		
 		l = fac.createLink(Id.createLinkId("1_2"),
 				net.getNodes().get(Id.createNodeId(1)),
 				net.getNodes().get(Id.createNodeId(2)));
-		setLinkAttributes(l, capFirstLast, linkLength, minimalLinkTT);
+		setLinkAttributes(l, capFirstLast, linkLengthSmall, minimalLinkTT);
 		net.addLink(l);
 		
 		if (simulateInflowCap){
@@ -182,13 +186,13 @@ public final class TtCreateBraessNetworkAndLanes {
 			l = fac.createLink(Id.createLinkId("23_3"),
 					net.getNodes().get(Id.createNodeId(23)),
 					net.getNodes().get(Id.createNodeId(3)));
-			setLinkAttributes(l, capMain, linkLength, linkTTSmall - minimalLinkTT);
+			setLinkAttributes(l, capMain, linkLengthSmall, linkTTSmall - minimalLinkTT);
 			net.addLink(l);
 		} else {
 			l = fac.createLink(Id.createLinkId("2_3"),
 					net.getNodes().get(Id.createNodeId(2)),
 					net.getNodes().get(Id.createNodeId(3)));
-			setLinkAttributes(l, capMain, linkLength, linkTTSmall);
+			setLinkAttributes(l, capMain, linkLengthSmall, linkTTSmall);
 			net.addLink(l);
 		}
 		
@@ -202,13 +206,13 @@ public final class TtCreateBraessNetworkAndLanes {
 			l = fac.createLink(Id.createLinkId("24_4"),
 					net.getNodes().get(Id.createNodeId(24)),
 					net.getNodes().get(Id.createNodeId(4)));
-			setLinkAttributes(l, capMain, linkLength, linkTTBig - minimalLinkTT);
+			setLinkAttributes(l, capMain, linkLengthBig, linkTTBig - minimalLinkTT);
 			net.addLink(l);
 		} else {
 			l = fac.createLink(Id.createLinkId("2_4"),
 					net.getNodes().get(Id.createNodeId(2)),
 					net.getNodes().get(Id.createNodeId(4)));
-			setLinkAttributes(l, capMain, linkLength, linkTTBig);
+			setLinkAttributes(l, capMain, linkLengthBig, linkTTBig);
 			net.addLink(l);
 		}
 		
@@ -216,14 +220,14 @@ public final class TtCreateBraessNetworkAndLanes {
 			l = fac.createLink(Id.createLinkId("3_4"),
 				net.getNodes().get(Id.createNodeId(3)),
 				net.getNodes().get(Id.createNodeId(4)));
-			setLinkAttributes(l, capMain, linkLength, linkTTMid);
+			setLinkAttributes(l, capMain, linkLengthSmall, linkTTMid);
 			net.addLink(l);
 		}
 	
 		l = fac.createLink(Id.createLinkId("3_5"),
 				net.getNodes().get(Id.createNodeId(3)),
 				net.getNodes().get(Id.createNodeId(5)));
-		setLinkAttributes(l, capMain, linkLength, linkTTBig);
+		setLinkAttributes(l, capMain, linkLengthBig, linkTTBig);
 		net.addLink(l);
 		
 		if (simulateInflowCap){
@@ -236,21 +240,21 @@ public final class TtCreateBraessNetworkAndLanes {
 			l = fac.createLink(Id.createLinkId("45_5"),
 					net.getNodes().get(Id.createNodeId(45)),
 					net.getNodes().get(Id.createNodeId(5)));
-			setLinkAttributes(l, capMain, linkLength, linkTTSmall - minimalLinkTT);
+			setLinkAttributes(l, capMain, linkLengthSmall, linkTTSmall - minimalLinkTT);
 			net.addLink(l);
 		}
 		else{
 			l = fac.createLink(Id.createLinkId("4_5"),
 					net.getNodes().get(Id.createNodeId(4)),
 					net.getNodes().get(Id.createNodeId(5)));
-			setLinkAttributes(l, capMain, linkLength, linkTTSmall);
+			setLinkAttributes(l, capMain, linkLengthSmall, linkTTSmall);
 			net.addLink(l);
 		}
 		
 		l = fac.createLink(Id.createLinkId("5_6"),
 				net.getNodes().get(Id.createNodeId(5)),
 				net.getNodes().get(Id.createNodeId(6)));
-		setLinkAttributes(l, capFirstLast, linkLength, minimalLinkTT);
+		setLinkAttributes(l, capFirstLast, linkLengthSmall, minimalLinkTT);
 		net.addLink(l);
 	}
 
@@ -305,27 +309,27 @@ public final class TtCreateBraessNetworkAndLanes {
 
 		LanesUtils.createAndAddLane20(linkAssignment, fac,
 				Id.create("1_2.ol", Lane.class), capFirstLast,
-				linkLength, 0, 1, null, 
+				linkLengthSmall, 0, 1, null, 
 				Arrays.asList(Id.create("1_2.l", Lane.class),
 				Id.create("1_2.r", Lane.class)));
 		
 		if (simulateInflowCap) {
 			LanesUtils.createAndAddLane20(linkAssignment, fac,
 					Id.create("1_2.l", Lane.class), capFirstLast,
-					linkLength / 2, -1, 1,
+					linkLengthSmall / 2, -1, 1,
 					Collections.singletonList(Id.createLinkId("2_23")),	null);
 			LanesUtils.createAndAddLane20(linkAssignment, fac,
 					Id.create("1_2.r", Lane.class), capFirstLast,
-					linkLength / 2, 1, 1,
+					linkLengthSmall / 2, 1, 1,
 					Collections.singletonList(Id.createLinkId("2_24")), null);
 		} else {
 			LanesUtils.createAndAddLane20(linkAssignment, fac,
 					Id.create("1_2.l", Lane.class), capFirstLast,
-					linkLength / 2, -1, 1,
+					linkLengthSmall / 2, -1, 1,
 					Collections.singletonList(Id.createLinkId("2_3")), null);
 			LanesUtils.createAndAddLane20(linkAssignment, fac,
 					Id.create("1_2.r", Lane.class), capFirstLast,
-					linkLength / 2, 1, 1,
+					linkLengthSmall / 2, 1, 1,
 					Collections.singletonList(Id.createLinkId("2_4")), null);
 		}	
 		
@@ -341,18 +345,18 @@ public final class TtCreateBraessNetworkAndLanes {
 
 				LanesUtils.createAndAddLane20(linkAssignment, fac,
 						Id.create("23_3.ol", Lane.class), capMain,
-						linkLength, 0,	1, null,
+						linkLengthSmall, 0,	1, null,
 						Arrays.asList(Id.create("23_3.f", Lane.class),
 								Id.create("23_3.r", Lane.class)));
 
 				LanesUtils.createAndAddLane20(linkAssignment, fac,
 						Id.create("23_3.f", Lane.class), capMain,
-						linkLength / 2, 0, 1,
+						linkLengthSmall / 2, 0, 1,
 						Collections.singletonList(Id.createLinkId("3_5")), null);
 
 				LanesUtils.createAndAddLane20(linkAssignment, fac,
 						Id.create("23_3.r", Lane.class), capMain,
-						linkLength / 2, 1, 1,
+						linkLengthSmall / 2, 1, 1,
 						Collections.singletonList(Id.createLinkId("3_4")), null);
 
 				laneDef20.addLanesToLinkAssignment(linkAssignment);
@@ -362,18 +366,18 @@ public final class TtCreateBraessNetworkAndLanes {
 
 				LanesUtils.createAndAddLane20(linkAssignment, fac,
 						Id.create("2_3.ol", Lane.class), capMain,
-						linkLength, 0,	1, null,
+						linkLengthSmall, 0,	1, null,
 						Arrays.asList(Id.create("2_3.f", Lane.class),
 								Id.create("2_3.r", Lane.class)));
 
 				LanesUtils.createAndAddLane20(linkAssignment, fac,
 						Id.create("2_3.f", Lane.class), capMain,
-						linkLength / 2, 0, 1,
+						linkLengthSmall / 2, 0, 1,
 						Collections.singletonList(Id.createLinkId("3_5")), null);
 
 				LanesUtils.createAndAddLane20(linkAssignment, fac,
 						Id.create("2_3.r", Lane.class), capMain,
-						linkLength / 2, 1, 1,
+						linkLengthSmall / 2, 1, 1,
 						Collections.singletonList(Id.createLinkId("3_4")), null);
 
 				laneDef20.addLanesToLinkAssignment(linkAssignment);
@@ -413,6 +417,10 @@ public final class TtCreateBraessNetworkAndLanes {
 
 	public void setNumberOfPersonsPerHour(int numberOfPersons) {
 		this.numberOfPersons = numberOfPersons;
+	}
+
+	public void setCapTolerance(double capTolerance) {
+		this.capTolerance = capTolerance;
 	}
 
 }

@@ -1,11 +1,9 @@
 package playground.jbischoff.av.preparation;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -14,8 +12,6 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
@@ -32,7 +28,6 @@ import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.io.ParseException;
 import com.vividsolutions.jts.io.WKTReader;
 
@@ -51,7 +46,7 @@ private void run() {
 	Config config = ConfigUtils.createConfig();	
 	scenario = ScenarioUtils.createScenario(config);
 	new  MatsimPopulationReader(scenario).readFile("C:/Users/Joschka/Documents/shared-svn/projects/audi_av/scenario/plansWithCarsR0.10.xml.gz");
-	new MatsimNetworkReader(scenario).readFile("C:/Users/Joschka/Documents/shared-svn/projects/audi_av/scenario/networkc.xml.gz");
+	new MatsimNetworkReader(scenario.getNetwork()).readFile("C:/Users/Joschka/Documents/shared-svn/projects/audi_av/scenario/networkc.xml.gz");
 	this.network = (NetworkImpl) scenario.getNetwork();
 	
 	Config config2 = ConfigUtils.createConfig();	

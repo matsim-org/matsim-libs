@@ -1,7 +1,7 @@
 package playground.dhosse.prt;
 
 import org.matsim.contrib.dvrp.MatsimVrpContextImpl;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -38,7 +38,7 @@ public class PrtControllerListener implements StartupListener, IterationStartsLi
 	private PrtRankAndPassengerStatsHandler rsh;
 	private PrtStatsWriter statsWriter;
 
-	public PrtControllerListener(PrtConfigGroup config, Controler controler, MatsimVrpContextImpl context,
+	public PrtControllerListener(PrtConfigGroup config, MatsimServices controler, MatsimVrpContextImpl context,
 			PrtData data) {
 		
 		this.cch = new CostContainerHandler(controler.getScenario().getNetwork(),
@@ -53,7 +53,7 @@ public class PrtControllerListener implements StartupListener, IterationStartsLi
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		
-		Controler controler = event.getControler();
+		MatsimServices controler = event.getServices();
 		controler.getEvents().addHandler(this.cch);
 		controler.getEvents().addHandler(this.rsh);
 		MovingAgentsRegister movingAgents = new MovingAgentsRegister();

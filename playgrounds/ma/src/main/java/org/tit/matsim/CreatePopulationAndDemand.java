@@ -42,7 +42,7 @@ public class CreatePopulationAndDemand {
 		/*
 		 * Read the network and store it in the scenario
 		 */
-		new MatsimNetworkReader(this.scenario).readFile(networkFile);
+		new MatsimNetworkReader(this.scenario.getNetwork()).readFile(networkFile);
 		/*
 		 * Read the facilities and store them in the scenario
 		 */

@@ -42,7 +42,7 @@ public class ReRoute extends AbstractMultithreadedModule {
 
 	private final Provider<TripRouter> tripRouterProvider;
 
-	ReRoute(ActivityFacilities facilities, Provider<TripRouter> tripRouterProvider, GlobalConfigGroup globalConfigGroup) {
+	public ReRoute(ActivityFacilities facilities, Provider<TripRouter> tripRouterProvider, GlobalConfigGroup globalConfigGroup) {
 		super(globalConfigGroup);
 		this.facilities = facilities;
 		this.tripRouterProvider = tripRouterProvider;

@@ -19,7 +19,8 @@ public class LinkUtility {
 		
 		//TODO FIX THE FLOW CAPACITY
 		double width = Constants.FAKE_LINK_WIDTH;
-		double cap = width*Constants.FLOPW_CAP_PER_METER_WIDTH;
+		double cap = length*Constants.FLOPW_CAP_PER_METER_WIDTH;
+		//double cap = width*Constants.FLOPW_CAP_PER_METER_WIDTH;
 		link.setCapacity(cap);
 		link.setAllowedModes(modes);
 	}

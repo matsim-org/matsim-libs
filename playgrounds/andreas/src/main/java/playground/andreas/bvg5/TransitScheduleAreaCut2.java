@@ -435,7 +435,7 @@ public class TransitScheduleAreaCut2 {
 		Scenario sc2 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		sc2.getConfig().transit().setUseTransit(true);
 		new TransitScheduleReader(sc2).readFile(dir + "cuttedSchedule.xml.gz");
-		new MatsimNetworkReader(sc2).readFile(dir + "network.final.xml.gz");
+		new MatsimNetworkReader(sc2.getNetwork()).readFile(dir + "network.final.xml.gz");
 		
 		
 		VspAnalyzer analyzer = new VspAnalyzer(dir);

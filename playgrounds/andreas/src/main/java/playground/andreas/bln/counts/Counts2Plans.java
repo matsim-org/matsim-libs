@@ -207,7 +207,7 @@ public class Counts2Plans {
 	private static TransitSchedule readTransitSchedule(String transitScheduleFile, String networkFile) {
 
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		MatsimNetworkReader matsimNetReader = new MatsimNetworkReader(scenario);
+		MatsimNetworkReader matsimNetReader = new MatsimNetworkReader(scenario.getNetwork());
 		matsimNetReader.readFile(networkFile);
 
 		TransitSchedule transitSchedule = new TransitScheduleFactoryImpl().createTransitSchedule();

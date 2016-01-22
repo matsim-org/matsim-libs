@@ -37,7 +37,7 @@ class TwoWorkplaces {
 		tmp.setStorageCapFactor(100);
 		tmp.setRemoveStuckVehicles(false);
 		scenario = ScenarioUtils.createScenario(config);
-		new MatsimNetworkReader(scenario).parse(this.getClass().getResourceAsStream("two-workplaces.xml"));
+		new MatsimNetworkReader(scenario.getNetwork()).parse(this.getClass().getResourceAsStream("two-workplaces.xml"));
 		Population population = scenario.getPopulation();
 		for (int i=0; i<quantity; i++) {
 			Person person = population.getFactory().createPerson(Id.create(i, Person.class));

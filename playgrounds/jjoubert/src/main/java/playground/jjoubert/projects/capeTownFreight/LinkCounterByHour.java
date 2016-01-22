@@ -114,7 +114,7 @@ public class LinkCounterByHour implements LinkEnterEventHandler, VehicleEntersTr
 	public SimpleFeatureCollection createFeatureCollection(String network){
 		LOG.info("Parsing network from " + network);
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenario ).parse(network);
+		new MatsimNetworkReader(scenario.getNetwork()).parse(network);
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("WGS84_SA_Albers", "WGS84");
 		GeometryFactory gf = new GeometryFactory();
 
@@ -234,7 +234,7 @@ public class LinkCounterByHour implements LinkEnterEventHandler, VehicleEntersTr
 	public void writeHourlyLinkCounts(String network, String output){
 		LOG.info("Parsing network from " + network);
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenario ).parse(network);
+		new MatsimNetworkReader(scenario.getNetwork()).parse(network);
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("WGS84_SA_Albers", "WGS84");
 		LOG.info("Writing link counts to " + output);
 		

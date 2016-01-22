@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
@@ -41,6 +42,7 @@ import org.matsim.withinday.events.ReplanningEvent;
 import org.matsim.withinday.events.handler.ReplanningEventHandler;
 import org.matsim.withinday.mobsim.MobsimDataProvider;
 
+import javax.inject.Inject;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -85,10 +87,12 @@ public class ActivityReplanningMap implements PersonStuckEventHandler,
 	// package protected to be accessible for test case
 	/*package*/ double simStartTime = Time.UNDEFINED_TIME;
 	/*package*/ double timeStepSize = Time.UNDEFINED_TIME;
-	
-	public ActivityReplanningMap(MobsimDataProvider mobsimDataProvider) {
+
+	@Inject
+	public ActivityReplanningMap(MobsimDataProvider mobsimDataProvider, EventsManager eventsManager) {
+		eventsManager.addHandler(this);
 		log.info("Note that the ActivityReplanningMap has to be registered as an EventHandler and a SimulationListener!");
-		
+
 		this.mobsimDataProvider = mobsimDataProvider;
 
 		this.startingAgents = new HashMap<>();

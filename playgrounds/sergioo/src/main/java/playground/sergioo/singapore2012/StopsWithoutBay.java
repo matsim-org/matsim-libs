@@ -18,7 +18,7 @@ public class StopsWithoutBay {
 
 	public static void main(String[] args) {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenario).readFile(args[0]);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(args[0]);
 		scenario.getConfig().transit().setUseTransit(true);
 		new TransitScheduleReader(scenario).readFile(args[1]);
 		Set<TransitStopFacility> changedStops = new HashSet<TransitStopFacility>();

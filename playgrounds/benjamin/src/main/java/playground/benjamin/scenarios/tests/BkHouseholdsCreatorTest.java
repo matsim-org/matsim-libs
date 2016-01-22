@@ -79,7 +79,7 @@ public class BkHouseholdsCreatorTest {
 		String networkFile =outdir + "../oneRouteNoModeTest/network.xml";
 
 		MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		MatsimNetworkReader netreader = new MatsimNetworkReader(sc);
+		MatsimNetworkReader netreader = new MatsimNetworkReader(sc.getNetwork());
 		netreader.readFile(networkFile);
 
     Population pop = sc.getPopulation();

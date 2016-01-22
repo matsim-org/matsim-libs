@@ -34,9 +34,7 @@ import org.matsim.contrib.util.DistanceUtils;
 import org.matsim.core.router.util.*;
 
 import playground.jbischoff.energy.charging.taxi.ElectricTaxiChargingHandler;
-import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration;
-import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration.Goal;
-import playground.michalm.taxi.optimizer.filter.*;
+import playground.michalm.taxi.optimizer.TaxiOptimizerContext;
 import playground.michalm.taxi.optimizer.rules.RuleBasedTaxiOptimizer;
 import playground.michalm.taxi.schedule.*;
 import playground.michalm.taxi.scheduler.*;
@@ -49,7 +47,7 @@ import playground.michalm.taxi.scheduler.*;
 public class NOSRankTaxiOptimizer
     extends RuleBasedTaxiOptimizer
 {
-    protected final TaxiOptimizerConfiguration optimConfig;
+    protected final TaxiOptimizerContext optimConfig;
     protected final IdleRankVehicleFinder idleVehicleFinder;
     protected final RankModeTaxiScheduler rankModeTaxiScheduler;
     protected ElectricTaxiChargingHandler ecabhandler;
@@ -74,29 +72,31 @@ public class NOSRankTaxiOptimizer
         final IdleRankVehicleFinder idleVehicleFinder = new IdleRankVehicleFinder(context,
                 scheduler);
 
-        FilterFactory filterFactory = new FilterFactory() {
-            @Override
-            public RequestFilter createRequestFilter()
-            {
-                return RequestFilter.NO_FILTER;
-            }
+        //        FilterFactory filterFactory = new FilterFactory() {
+        //            @Override
+        //            public RequestFilter createRequestFilter()
+        //            {
+        //                return RequestFilter.NO_FILTER;
+        //            }
+        //
+        //
+        //            @Override
+        //            public VehicleFilter createVehicleFilter()
+        //            {
+        //                return idleVehicleFinder;
+        //            }
+        //        };
 
+        //        TaxiOptimizerContext optimConfig = new TaxiOptimizerContext(context, travelTime,
+        //                travelDisutility, scheduler, 0, 0, Goal.MIN_WAIT_TIME, workingDir, null);
 
-            @Override
-            public VehicleFilter createVehicleFilter()
-            {
-                return idleVehicleFinder;
-            }
-        };
+        throw new RuntimeException("Lots of changes prevent this from running");
 
-        TaxiOptimizerConfiguration optimConfig = new TaxiOptimizerConfiguration(context, travelTime,
-                travelDisutility, scheduler, filterFactory, Goal.MIN_WAIT_TIME, workingDir, null);
-
-        return new NOSRankTaxiOptimizer(optimConfig, idleVehicleFinder);
+        //return new NOSRankTaxiOptimizer(optimConfig, idleVehicleFinder);
     }
 
 
-    protected NOSRankTaxiOptimizer(TaxiOptimizerConfiguration optimConfig,
+    protected NOSRankTaxiOptimizer(TaxiOptimizerContext optimConfig,
             IdleRankVehicleFinder vehicleFinder)
     {
         super(optimConfig);

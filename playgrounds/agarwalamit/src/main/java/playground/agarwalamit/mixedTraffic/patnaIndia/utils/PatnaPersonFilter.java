@@ -18,6 +18,8 @@
  * *********************************************************************** */
 package playground.agarwalamit.mixedTraffic.patnaIndia.utils;
 
+import java.util.Arrays;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 
@@ -37,12 +39,12 @@ public class PatnaPersonFilter{
 	}
 
 	public static boolean isPersonBelongsToCommuter(Id<Person> personId){
-		if( (personId.toString().split("_")[1]).equals("E2I") ) return true;
+		if( Arrays.asList( personId.toString().split("_") ).contains("E2I") ) return true;
 		else return false;
 	}
 	
 	public static boolean isPersonBelongsToThroughTraffic(Id<Person> personId){
-		if( (personId.toString().split("_")[1]).equals("E2E") ) return true;
+		if( Arrays.asList( personId.toString().split("_") ).contains("E2E") ) return true;
 		else return false;
 	}
 	

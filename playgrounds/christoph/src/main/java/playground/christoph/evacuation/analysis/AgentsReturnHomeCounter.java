@@ -170,7 +170,7 @@ public class AgentsReturnHomeCounter implements PersonDepartureEventHandler, Act
 		String fileName = null;
 		AgentsReturnHomeWriter writer = new AgentsReturnHomeWriter(this.binSize, this.nofPictureBins, event.getIteration());
 		
-		fileName = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "affectedAgentsReturnHomeDetail.txt");
+		fileName = event.getServices().getControlerIO().getIterationFilename(event.getIteration(), "affectedAgentsReturnHomeDetail.txt");
 		writer.write(fileName, map, this.lastTransportModes);
 				
 		// create aggregated data - note that data used for detailed output is deleted! 
@@ -218,7 +218,7 @@ public class AgentsReturnHomeCounter implements PersonDepartureEventHandler, Act
 		}
 		
 		// write aggregated data
-		fileName = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "affectedAgentsReturnHome.txt");
+		fileName = event.getServices().getControlerIO().getIterationFilename(event.getIteration(), "affectedAgentsReturnHome.txt");
 		writer.write(fileName, data);
 		
 		// write graphs
@@ -229,7 +229,7 @@ public class AgentsReturnHomeCounter implements PersonDepartureEventHandler, Act
 			int[] intArray = new int[array.length];
 			for (int i = 0; i < array.length; i++) intArray[i] = array[i].get();
 				
-			fileName = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "affectedAgentsReturnHomeByMode_" + mode + ".png");
+			fileName = event.getServices().getControlerIO().getIterationFilename(event.getIteration(), "affectedAgentsReturnHomeByMode_" + mode + ".png");
 			writer.writeGraphic(fileName, title, legend, mode, intArray);
 		}
 	}

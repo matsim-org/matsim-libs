@@ -84,7 +84,7 @@ public class SignalSystemsIntegrationTest {
 		Controler c = new Controler(scenario);
 		c.addOverridingModule(new SignalsModule());
 		c.addOverridingModule(new InvertedNetworkRoutingModuleModule());
-		c.setDumpDataAtEnd(false);
+		c.getConfig().controler().setDumpDataAtEnd(false);
 		c.run();
 
 		String inputDirectory = testUtils.getInputDirectory();
@@ -95,7 +95,7 @@ public class SignalSystemsIntegrationTest {
 			Assert.assertEquals("different events files after iteration 0 ", EventsFileComparator.compare(inputDirectory + "0.events.xml.gz", iterationOutput + "0.events.xml.gz"),0);
 
 			Scenario expectedPopulation = ScenarioUtils.createScenario(c.getConfig());
-			new MatsimNetworkReader(expectedPopulation).readFile(c.getConfig().network().getInputFile());
+			new MatsimNetworkReader(expectedPopulation.getNetwork()).readFile(c.getConfig().network().getInputFile());
 			new MatsimPopulationReader(expectedPopulation).readFile(testUtils.getInputDirectory() + "0.plans.xml.gz");
 
 			Scenario actualPopulation = ScenarioUtils.createScenario(c.getConfig());
@@ -117,7 +117,7 @@ public class SignalSystemsIntegrationTest {
 
 
 			Scenario expectedPopulation = ScenarioUtils.createScenario(c.getConfig());
-			new MatsimNetworkReader(expectedPopulation).readFile(c.getConfig().network().getInputFile());
+			new MatsimNetworkReader(expectedPopulation.getNetwork()).readFile(c.getConfig().network().getInputFile());
 			new MatsimPopulationReader(expectedPopulation).readFile(testUtils.getInputDirectory() + "10.plans.xml.gz");
 			
 			Scenario actualPopulation = ScenarioUtils.createScenario(c.getConfig());
@@ -164,7 +164,7 @@ public class SignalSystemsIntegrationTest {
 		c.addOverridingModule(new InvertedNetworkRoutingModuleModule());
 		c.getConfig().controler().setOutputDirectory(controlerOutputDir);
 		c.getConfig().controler().setCreateGraphs(false);
-		c.setDumpDataAtEnd(false);
+		c.getConfig().controler().setDumpDataAtEnd(false);
 		c.run();
 
 
@@ -178,7 +178,7 @@ public class SignalSystemsIntegrationTest {
 					0);
 
 			Scenario expectedPopulation = ScenarioUtils.createScenario(c.getConfig());
-			new MatsimNetworkReader(expectedPopulation).readFile(c.getConfig().network().getInputFile());
+			new MatsimNetworkReader(expectedPopulation.getNetwork()).readFile(c.getConfig().network().getInputFile());
 			new MatsimPopulationReader(expectedPopulation).readFile(testUtils.getInputDirectory() + "0.plans.xml.gz");
 			Scenario actualPopulation = ScenarioUtils.createScenario(c.getConfig());
 			new MatsimPopulationReader(actualPopulation).readFile(iterationOutput + "0.plans.xml.gz");
@@ -196,7 +196,7 @@ public class SignalSystemsIntegrationTest {
 
 
 			Scenario expectedPopulation = ScenarioUtils.createScenario(c.getConfig());
-			new MatsimNetworkReader(expectedPopulation).readFile(c.getConfig().network().getInputFile());
+			new MatsimNetworkReader(expectedPopulation.getNetwork()).readFile(c.getConfig().network().getInputFile());
 			new MatsimPopulationReader(expectedPopulation).readFile(testUtils.getInputDirectory() + "10.plans.xml.gz");
 			Scenario actualPopulation = ScenarioUtils.createScenario(c.getConfig());
 			new MatsimPopulationReader(actualPopulation).readFile(iterationOutput + "10.plans.xml.gz");

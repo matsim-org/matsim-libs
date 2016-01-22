@@ -35,7 +35,7 @@ public class NetworkConverter {
 
 	public static void main0(String[] args) throws FileNotFoundException {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenario).readFile(args[0]);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(args[0]);
 		CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84_UTM48N, TransformationFactory.WGS84);
 		writeNetwork(scenario.getNetwork(), args[1], transformation);
 	}

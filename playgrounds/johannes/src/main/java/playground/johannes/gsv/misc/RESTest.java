@@ -70,7 +70,7 @@ public class RESTest {
 		config.transit().setUseTransit(true);
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		
-		MatsimNetworkReader reader = new MatsimNetworkReader(scenario);
+		MatsimNetworkReader reader = new MatsimNetworkReader(scenario.getNetwork());
 		reader.readFile("/home/johannes/gsv/matsim/studies/netz2030/data/network.gk3.xml");
 		
 		Map<String, TableHandler> tableHandlers = new HashMap<String, NetFileReader.TableHandler>();

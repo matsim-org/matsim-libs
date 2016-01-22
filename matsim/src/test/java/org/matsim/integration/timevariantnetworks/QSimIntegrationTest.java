@@ -44,13 +44,9 @@ import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
-import org.matsim.core.network.NetworkChangeEvent;
+import org.matsim.core.network.*;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
-import org.matsim.core.network.NetworkFactoryImpl;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.network.TimeVariantLinkFactory;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -267,7 +263,7 @@ public class QSimIntegrationTest extends MatsimTestCase {
 	private NetworkImpl createNetwork(MutableScenario scenario) {
 		// create a network
 		NetworkFactoryImpl nf = (NetworkFactoryImpl) scenario.getNetwork().getFactory();
-		nf.setLinkFactory(new TimeVariantLinkFactory());
+		nf.setLinkFactory(new VariableIntervalTimeVariantLinkFactory());
 		final NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 		network.setCapacityPeriod(3600.0);
 

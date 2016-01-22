@@ -28,7 +28,7 @@ import org.matsim.contrib.minibus.replanning.PStrategy;
 import org.matsim.contrib.minibus.replanning.PStrategyManager;
 import org.matsim.contrib.minibus.routeProvider.PRouteProvider;
 import org.matsim.contrib.minibus.routeProvider.PRouteProviderFactory;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 import java.util.ArrayList;
@@ -49,7 +49,7 @@ public final class OperatorInitializer {
 	private int counter;
 	
 	
-	public OperatorInitializer(PConfigGroup pConfig, PFranchise franchise, TransitSchedule pStopsOnly, Controler controler, TimeProvider timeProvider, WelfareAnalyzer welfareAnalyzer) {
+	public OperatorInitializer(PConfigGroup pConfig, PFranchise franchise, TransitSchedule pStopsOnly, MatsimServices controler, TimeProvider timeProvider, WelfareAnalyzer welfareAnalyzer) {
 		this.pConfig = pConfig;
 		this.operatorFactory = new OperatorFactory(this.pConfig, franchise, welfareAnalyzer);
         this.routeProvider = PRouteProviderFactory.createRouteProvider(controler.getScenario().getNetwork(), controler.getScenario().getPopulation(), this.pConfig, pStopsOnly, controler.getControlerIO().getOutputPath(), controler.getEvents());

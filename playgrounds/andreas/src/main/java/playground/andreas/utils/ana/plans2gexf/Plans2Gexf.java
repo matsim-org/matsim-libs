@@ -103,7 +103,7 @@ public class Plans2Gexf extends MatsimJaxbXmlWriter{
 		Set<String> restrictToTheseLegModes = new TreeSet<String>();
 		restrictToTheseLegModes.add(TransportMode.pt);
 		
-		new MatsimNetworkReader(sc).readFile(networkFile);
+		new MatsimNetworkReader(sc.getNetwork()).readFile(networkFile);
 	
 		Population inPop = sc.getPopulation();
 		PopulationReader popReader = new MatsimPopulationReader(sc);

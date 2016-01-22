@@ -422,7 +422,7 @@ public class Transmodeler2MATSimNetwork {
 			final Config config = ConfigUtils.createConfig();
 			config.qsim().setUseLanes(true);
 			final Scenario sc = ScenarioUtils.createScenario(config);
-			final MatsimNetworkReader netReader = new MatsimNetworkReader(sc);
+			final MatsimNetworkReader netReader = new MatsimNetworkReader(sc.getNetwork());
 			netReader.readFile(this.matsimPlainNetworkFileName);
 			final Network net = sc.getNetwork();
 			final LaneDefinitions11 lanedefs11 = new LaneDefinitions11Impl();

@@ -86,7 +86,7 @@ public class TestMain {
 		MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		sc.getConfig().transit().setUseTransit(true);
 
-		new MatsimNetworkReader(sc).readFile(netFile);
+		new MatsimNetworkReader(sc.getNetwork()).readFile(netFile);
 		final Population plans = sc.getPopulation();
 		MatsimPopulationReader popReader = new MatsimPopulationReader(sc);
 		popReader.readFile(plansFile);

@@ -93,7 +93,7 @@ public class BarcelonaDemandGeneratorFromServedRequests
 
         for (int i = 2; i <= 10; i++) {
             Scenario scenario = ScenarioUtils.createScenario(VrpConfigUtils.createConfig());
-            new MatsimNetworkReader(scenario).readFile(networkFile);
+            new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
 
             BarcelonaDemandGeneratorFromServedRequests dg = new BarcelonaDemandGeneratorFromServedRequests(
                     scenario);

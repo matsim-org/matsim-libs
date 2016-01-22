@@ -136,7 +136,7 @@ public class MyZoneToZoneRouterTest extends MatsimTestCase{
 
 		scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig()); 
 		// Read plans and network.
-		MatsimNetworkReader nr = new MatsimNetworkReader(scenario);
+		MatsimNetworkReader nr = new MatsimNetworkReader(scenario.getNetwork());
 		nr.readFile(inputFolder + "/network.xml");
 	}
 }

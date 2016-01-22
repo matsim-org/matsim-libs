@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package playground.thibautd.hitchiking.replanning;
 
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -29,7 +29,7 @@ import org.matsim.population.algorithms.PlanAlgorithm;
  */
 public class HitchHikingInsertionRemovalModule extends AbstractMultithreadedModule {
 	public HitchHikingInsertionRemovalModule(
-			final Controler controler) {
+			final MatsimServices controler) {
 		super( controler.getConfig().global() );
 	}
 

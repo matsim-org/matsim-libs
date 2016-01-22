@@ -21,6 +21,7 @@
 package playground.johannes.gsv.sim.cadyts;
 
 import cadyts.calibrators.analytical.AnalyticalCalibrator;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -30,7 +31,8 @@ import org.matsim.contrib.cadyts.general.CadytsContextI;
 import org.matsim.contrib.cadyts.general.CadytsCostOffsetsXMLFileIO;
 import org.matsim.contrib.cadyts.general.PlansTranslator;
 import org.matsim.core.config.Config;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
@@ -38,16 +40,14 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.counts.Counts;
 import org.matsim.counts.MatsimCountsReader;
+import playground.johannes.gsv.sim.GsvConfigGroup;
 import playground.johannes.gsv.sim.LinkOccupancyCalculator;
-import playground.johannes.gsv.sim.Simulator;
 import playground.johannes.synpop.gis.ZoneCollection;
 import playground.johannes.synpop.gis.ZoneGeoJsonIO;
 import playground.johannes.synpop.matrix.NumericMatrix;
-import playground.johannes.synpop.matrix.NumericMatrixXMLReader;
+import playground.johannes.synpop.matrix.NumericMatrixIO;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -85,9 +85,7 @@ public class CadytsContext implements CadytsContextI<Link>, StartupListener, Ite
 		this.occupancy = occupancy;
 //		this.countsScaleFactor = config.counts().getCountsScaleFactor();
 				
-		this.cadytsConfig = new CadytsConfigGroup();
-		config.addModule(cadytsConfig);
-		// addModule() also initializes the config group with the values read from the config file
+		this.cadytsConfig = ConfigUtils.addOrGetModule(config, CadytsConfigGroup.GROUP_NAME, CadytsConfigGroup.class);
 		cadytsConfig.setWriteAnalysisFile(true);
 		
 		if ( counts==null ) {
@@ -124,37 +122,41 @@ public class CadytsContext implements CadytsContextI<Link>, StartupListener, Ite
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		
-		Scenario scenario = event.getControler().getScenario();
+		Scenario scenario = event.getServices().getScenario();
 		
-//		VolumesAnalyzer volumesAnalyzer = event.getControler().getVolumes();
+//		VolumesAnalyzer volumesAnalyzer = event.getServices().getVolumes();
 		
 //		this.simResults = new SimResultsContainerImpl(volumesAnalyzer, this.countsScaleFactor);
 		this.simResults = new SimResultsAdaptor(occupancy, scale);
 		
 		// this collects events and generates cadyts plans from it
 		this.ptStep = new PlanToPlanStepBasedOnEvents(scenario, cadytsConfig.getCalibratedItems());
-		event.getControler().getEvents().addHandler(ptStep);
+		event.getServices().getEvents().addHandler(ptStep);
 
-		if(Boolean.parseBoolean(config.getParam(Simulator.GSV_CONFIG_MODULE_NAME, "odCalibration"))) {
-			NumericMatrixXMLReader reader = new NumericMatrixXMLReader();
-			reader.setValidating(false);
-			reader.parse(config.getParam(Simulator.GSV_CONFIG_MODULE_NAME, "odMatrixFile"));
-			NumericMatrix m = reader.getMatrix();
+		if(Boolean.parseBoolean(config.getParam(GsvConfigGroup.GSV_CONFIG_MODULE_NAME, "odCalibration"))) {
+//			NumericMatrixXMLReader reader = new NumericMatrixXMLReader();
+//			reader.setValidating(false);
+//			reader.parse(config.getParam(GsvConfigGroup.GSV_CONFIG_MODULE_NAME, "odMatrixFile"));
+//			NumericMatrix m = reader.getMatrix();
+			NumericMatrix m = NumericMatrixIO.read(config.getParam(GsvConfigGroup.GSV_CONFIG_MODULE_NAME,
+					"odMatrixFile"));
 			
-			double distThreshold = Double.parseDouble(config.getParam(Simulator.GSV_CONFIG_MODULE_NAME, "odDistThreshold"));
-			double countThreshold = Double.parseDouble(config.getParam(Simulator.GSV_CONFIG_MODULE_NAME, "odCountThreshold"));
-			String aggKey = config.findParam(Simulator.GSV_CONFIG_MODULE_NAME, "aggregationKey");
+			double distThreshold = Double.parseDouble(config.getParam(GsvConfigGroup.GSV_CONFIG_MODULE_NAME, "odDistThreshold"));
+			double countThreshold = Double.parseDouble(config.getParam(GsvConfigGroup.GSV_CONFIG_MODULE_NAME, "odCountThreshold"));
+			String aggKey = config.findParam(GsvConfigGroup.GSV_CONFIG_MODULE_NAME, "aggregationKey");
 			String data;
 			try {
-				data = new String(Files.readAllBytes(Paths.get(config.getParam(Simulator.GSV_CONFIG_MODULE_NAME, "zonesFile"))));
-				ZoneCollection zones = new ZoneCollection();
-				zones.addAll(ZoneGeoJsonIO.parseFeatureCollection(data));
-				
-				odCalibrator = new ODCalibrator(event.getControler().getScenario(), this, m, zones, distThreshold, countThreshold, aggKey);
-				event.getControler().getEvents().addHandler(odCalibrator);
+//				data = new String(Files.readAllBytes(Paths.get(config.getParam(GsvConfigGroup.GSV_CONFIG_MODULE_NAME, "zonesFile"))));
+//				ZoneCollection zones = new ZoneCollection();
+//				zones.addAll(ZoneGeoJsonIO.parseFeatureCollection(data));
+				ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON(config.getParam(GsvConfigGroup
+						.GSV_CONFIG_MODULE_NAME, "zonesFile"), "NO");
+
+				odCalibrator = new ODCalibrator(event.getServices().getScenario(), this, m, zones, distThreshold, countThreshold, aggKey);
+				event.getServices().getEvents().addHandler(odCalibrator);
 				
 				ODCountsAnalyzer odAnalyzer = new ODCountsAnalyzer(counts, simResults);
-				event.getControler().addControlerListener(odAnalyzer);
+				event.getServices().addControlerListener(odAnalyzer);
 				
 //				log.info(String.format("Setting %s candidates for simulation.", odCalibrator.getCandidates().size()));
 				
@@ -166,17 +168,17 @@ public class CadytsContext implements CadytsContextI<Link>, StartupListener, Ite
 		
 		
 		// build the calibrator. This is a static method, and in consequence has no side effects
-//		Logger.getRootLogger().setLevel(Level.INFO);
+		Logger.getRootLogger().setLevel(Level.INFO);
 		this.calibrator = CadytsBuilder.buildCalibrator(scenario.getConfig(), this.counts , new LinkLookUp(scenario) /*, cadytsConfig.getTimeBinSize()*/, Link.class);
-//		Logger.getRootLogger().setLevel(Level.DEBUG);
+		Logger.getRootLogger().setLevel(Level.DEBUG);
 	}
 	
 	@Override
 	public void notifyIterationEnds(final IterationEndsEvent event) {
 		if (this.writeAnalysisFile) {
 			String analysisFilepath = null;
-			if (isActiveInThisIteration(event.getIteration(), event.getControler())) {
-				analysisFilepath = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), FLOWANALYSIS_FILENAME);
+			if (isActiveInThisIteration(event.getIteration(), event.getServices())) {
+				analysisFilepath = event.getServices().getControlerIO().getIterationFilename(event.getIteration(), FLOWANALYSIS_FILENAME);
 			}
 			this.calibrator.setFlowAnalysisFile(analysisFilepath);
 		}
@@ -184,10 +186,10 @@ public class CadytsContext implements CadytsContextI<Link>, StartupListener, Ite
 		this.calibrator.afterNetworkLoading(this.simResults);
 
 		// write some output
-		String filename = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), LINKOFFSET_FILENAME);
+		String filename = event.getServices().getControlerIO().getIterationFilename(event.getIteration(), LINKOFFSET_FILENAME);
 		try {
-//			new CadytsLinkCostOffsetsXMLFileIO(event.getControler().getScenario().getNetwork())
-			new CadytsCostOffsetsXMLFileIO<Link>(new LinkLookUp(event.getControler().getScenario()), Link.class)
+//			new CadytsLinkCostOffsetsXMLFileIO(event.getServices().getScenario().getNetwork())
+			new CadytsCostOffsetsXMLFileIO<Link>(new LinkLookUp(event.getServices().getScenario()), Link.class)
    			   .write(filename, this.calibrator.getLinkCostOffsets());
 		} catch (IOException e) {
 			log.error("Could not write link cost offsets!", e);
@@ -221,9 +223,9 @@ public class CadytsContext implements CadytsContextI<Link>, StartupListener, Ite
 	// private methods & pure delegate methods only below this line
 
 	@SuppressWarnings("static-method")
-	private boolean isActiveInThisIteration(final int iter, final Controler controler) {
+	private boolean isActiveInThisIteration(final int iter, final MatsimServices controler) {
 		return (iter > 0 && iter % controler.getConfig().counts().getWriteCountsInterval() == 0);
-//		return (iter % controler.getConfig().counts().getWriteCountsInterval() == 0);
+//		return (iter % services.getConfig().counts().getWriteCountsInterval() == 0);
 	}
 	
 //	/*package*/ static class SimResultsContainerImpl implements SimResults<Link> {

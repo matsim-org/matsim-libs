@@ -33,7 +33,7 @@ public class MatsimClassControlerListener implements StartupListener, IterationE
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		myEventHandler = new MyEventHandler(); 
-		event.getControler().getEvents().addHandler(myEventHandler);
+		event.getServices().getEvents().addHandler(myEventHandler);
 	}
 
 	@Override

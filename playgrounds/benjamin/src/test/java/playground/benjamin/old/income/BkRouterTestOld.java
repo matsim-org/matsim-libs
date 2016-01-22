@@ -60,8 +60,8 @@
 //
 //		controler.addControlerListener(new StartupListener() {
 //			public void notifyStartup(final StartupEvent event) {
-//				event.getControler().getEvents().addHandler(handler);
-////				event.getControler().getEvents().addHandler(new LogOutputEventHandler());
+//				event.getServices().getEvents().addHandler(handler);
+////				event.getServices().getEvents().addHandler(new LogOutputEventHandler());
 //			}
 //		});
 //
@@ -113,8 +113,8 @@
 //
 //		controler.addControlerListener(new StartupListener() {
 //			public void notifyStartup(final StartupEvent event) {
-//				event.getControler().getEvents().addHandler(handler);
-////				event.getControler().getEvents().addHandler(new LogOutputEventHandler());
+//				event.getServices().getEvents().addHandler(handler);
+////				event.getServices().getEvents().addHandler(new LogOutputEventHandler());
 //			}
 //		});
 //

@@ -66,17 +66,17 @@ final class Line2GexfPStat implements StartupListener, IterationEndsListener, Sh
 	public void notifyStartup(StartupEvent event) {
 		if (this.pConfig.getGexfInterval() > 0) {
 			this.globalPaxHandler = new CountPPaxHandler(this.pConfig.getPIdentifier());
-			event.getControler().getEvents().addHandler(this.globalPaxHandler);
+			event.getServices().getEvents().addHandler(this.globalPaxHandler);
 
 			this.vehHandler = new CountPVehHandler(this.pConfig.getPIdentifier());
-			event.getControler().getEvents().addHandler(this.vehHandler);
+			event.getServices().getEvents().addHandler(this.vehHandler);
 		}
 	}
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		if (this.pConfig.getGexfInterval() > 0) {
-            String gexfOutputDir = event.getControler().getControlerIO().getOutputPath() + PConstants.statsOutputFolder + Line2GexfPStat.class.getSimpleName() + "/";
+            String gexfOutputDir = event.getServices().getControlerIO().getOutputPath() + PConstants.statsOutputFolder + Line2GexfPStat.class.getSimpleName() + "/";
 			try {
 				new File(gexfOutputDir).mkdir();
 			} catch (Exception e) {
@@ -89,7 +89,7 @@ final class Line2GexfPStat implements StartupListener, IterationEndsListener, Sh
 				if (this.lineId2GexfPStat.get(lineId) == null) {
 					// new line - create new gexf
 					SimpleGexfPStat gexf = new SimpleGexfPStat(this.pConfig, lineId, gexfOutputDir);
-                    gexf.notifyStartup(event.getControler().getScenario().getNetwork(), this.globalPaxHandler, this.vehHandler);
+                    gexf.notifyStartup(event.getServices().getScenario().getNetwork(), this.globalPaxHandler, this.vehHandler);
 					this.lineId2GexfPStat.put(lineId, gexf);
 				}
 
@@ -113,7 +113,7 @@ final class Line2GexfPStat implements StartupListener, IterationEndsListener, Sh
 	public void notifyShutdown(ShutdownEvent event) {
 		// call shutdown for all remaining gexf
 		for (SimpleGexfPStat gexf : this.lineId2GexfPStat.values()) {
-			gexf.notifyShutdown(event.getControler().getConfig().controler().getLastIteration());
+			gexf.notifyShutdown(event.getServices().getConfig().controler().getLastIteration());
 		}
 		log.info("terminated the last " + this.lineId2GexfPStat.values().size() + " gexf handlers...");
 	}

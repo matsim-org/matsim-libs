@@ -85,7 +85,7 @@ public class ShoppingLegTripDurationAnalyzer implements PersonDepartureEventHand
 		Scenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		
 		// load network
-		new MatsimNetworkReader(scenario).readFile(networkFile);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
 		
 		// load population
 		new MatsimPopulationReader(scenario).readFile(populationFile);

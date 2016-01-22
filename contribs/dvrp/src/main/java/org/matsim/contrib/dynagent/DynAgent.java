@@ -69,13 +69,8 @@ public class DynAgent
 
         // initial activity
         dynActivity = this.agentLogic.computeInitialActivity(this);
-
-        if (dynActivity.getEndTime() != Time.UNDEFINED_TIME) {
-            state = MobsimAgent.State.ACTIVITY;
-        }
-        else {
-            state = MobsimAgent.State.ABORT;
-        }
+        state = dynActivity.getEndTime() != Time.UNDEFINED_TIME ? //
+                MobsimAgent.State.ACTIVITY : MobsimAgent.State.ABORT;
     }
 
 

@@ -469,7 +469,7 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		
-		this.analyzeResultsAndWriteFiles(event.getControler().getControlerIO());
+		this.analyzeResultsAndWriteFiles(event.getServices().getControlerIO());
 	}
 	
 	public void analyzeResultsAndWriteFiles(OutputDirectoryHierarchy outputDirectoryHierarchy) {

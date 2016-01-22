@@ -7,7 +7,7 @@ import org.matsim.contrib.locationchoice.bestresponse.scoring.DCActivityScoringF
 import org.matsim.contrib.locationchoice.bestresponse.scoring.DCActivityWOFacilitiesScoringFunction;
 import org.matsim.contrib.locationchoice.bestresponse.scoring.DCScoringFunctionFactory;
 import org.matsim.core.config.Config;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
@@ -22,14 +22,14 @@ import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
  */
 public class AvignonScoringFunctionFactory implements ScoringFunctionFactory {
 
-	private final Controler controler;
+	private final MatsimServices controler;
 	private DestinationChoiceBestResponseContext lcContext;
 	private Config config;
 	private final static Logger log = Logger.getLogger(DCScoringFunctionFactory.class);
 
 	private final CharyparNagelScoringParametersForPerson parametersForPerson;
 
-	public AvignonScoringFunctionFactory(Config config, Controler controler, DestinationChoiceBestResponseContext lcContext) {
+	public AvignonScoringFunctionFactory(Config config, MatsimServices controler, DestinationChoiceBestResponseContext lcContext) {
 		this.controler = controler;
 		this.lcContext = lcContext;
 		this.config = config;

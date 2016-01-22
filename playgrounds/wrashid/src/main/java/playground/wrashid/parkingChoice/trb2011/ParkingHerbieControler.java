@@ -1,20 +1,20 @@
 package playground.wrashid.parkingChoice.trb2011;
 
-import herbie.running.controler.HerbieControler;
-
 import java.util.LinkedList;
 import java.util.Random;
 
+import herbie.running.controler.HerbieModule;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 
-import playground.meisterk.kti.controler.KTIControler;
+import playground.meisterk.kti.controler.KTIModule;
 import playground.wrashid.parkingChoice.ParkingModule;
 import playground.wrashid.parkingChoice.apiDefImpl.ParkingScoringFunctionZhScenario_v1;
 import playground.wrashid.parkingChoice.apiDefImpl.PriceAndDistanceParkingSelectionManager;
@@ -33,11 +33,11 @@ public class ParkingHerbieControler {
 	public static boolean isKTIMode = true;
 
 	public static void main(String[] args) {
-		Controler controler = null;
+		Controler controler = new Controler(args);
 		if (isKTIMode) {
-			controler = new KTIControler(args);
+			controler.addOverridingModule(new KTIModule());
 		} else {
-			controler = new HerbieControler(args);
+			controler.addOverridingModule(new HerbieModule());
 		}
 
 		parkingModule = new ParkingModule(controler, null);
@@ -45,20 +45,18 @@ public class ParkingHerbieControler {
 		prepareParkingsForScenario(controler);
 
 		controler.getConfig().controler().setOverwriteFileSetting(
-				true ?
-						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+				OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 
 		controler.run();
 
 	}
 
-	private static void prepareParkingsForScenario(Controler controler) {
+	private static void prepareParkingsForScenario(MatsimServices controler) {
 		controler.addControlerListener(new StartupListener() {
 
 			@Override
 			public void notifyStartup(StartupEvent event) {
-				String isRunningOnServer = event.getControler().getConfig().findParam("parking", "isRunningOnServer");
+				String isRunningOnServer = event.getServices().getConfig().findParam("parking", "isRunningOnServer");
 				if (Boolean.parseBoolean(isRunningOnServer)) {
 					parkingDataBase = "/Network/Servers/kosrae.ethz.ch/Volumes/ivt-home/wrashid/data/experiments/TRBAug2011/parkings/flat/";
 					ParkingHerbieControler.isRunningOnServer = true;
@@ -67,16 +65,16 @@ public class ParkingHerbieControler {
 					ParkingHerbieControler.isRunningOnServer = false;
 				}
 
-				LinkedList<PParking> parkingCollection = getParkingsForScenario(event.getControler());
-				modifyParkingCollectionIfMainExperimentForTRB2011(event.getControler(), parkingCollection);
+				LinkedList<PParking> parkingCollection = getParkingsForScenario(event.getServices());
+				modifyParkingCollectionIfMainExperimentForTRB2011(event.getServices(), parkingCollection);
 				parkingModule.getParkingManager().setParkingCollection(parkingCollection);
 
-				ParkingScoreAccumulator.initializeParkingCounts(event.getControler());
+				ParkingScoreAccumulator.initializeParkingCounts(event.getServices());
 
-				initParkingSelectionManager(event.getControler());
+				initParkingSelectionManager(event.getServices());
 			}
 
-			private void modifyParkingCollectionIfMainExperimentForTRB2011(Controler controler,
+			private void modifyParkingCollectionIfMainExperimentForTRB2011(MatsimServices controler,
 					LinkedList<PParking> parkingCollection) {
 					
 				Random rand=new Random();
@@ -118,7 +116,7 @@ public class ParkingHerbieControler {
 
 			}
 
-			private void initParkingSelectionManager(Controler controler) {
+			private void initParkingSelectionManager(MatsimServices controler) {
 				String parkingSelectionManager = controler.getConfig().findParam("parking", "parkingSelectionManager");
 				if (parkingSelectionManager.equalsIgnoreCase("shortestWalkingDistance")) {
 					parkingModule.setParkingSelectionManager(new ShortestWalkingDistanceParkingSelectionManager(parkingModule
@@ -150,7 +148,7 @@ public class ParkingHerbieControler {
 
 	}
 
-	public static LinkedList<PParking> getParkingsForScenario(Controler controler) {
+	public static LinkedList<PParking> getParkingsForScenario(MatsimServices controler) {
 		double parkingsOutsideZHCityScaling = Double.parseDouble(controler.getConfig().findParam("parking",
 				"publicParkingsCalibrationFactorOutsideZHCity"));
 
@@ -167,7 +165,7 @@ public class ParkingHerbieControler {
 		return parkingCollection;
 	}
 
-	public static LinkedList<PParking> getParkingCollectionZHCity(Controler controler) {
+	public static LinkedList<PParking> getParkingCollectionZHCity(MatsimServices controler) {
 		double streetParkingCalibrationFactor = Double.parseDouble(controler.getConfig().findParam("parking",
 				"streetParkingCalibrationFactorZHCity"));
 		double garageParkingCalibrationFactor = Double.parseDouble(controler.getConfig().findParam("parking",
@@ -175,7 +173,7 @@ public class ParkingHerbieControler {
 		double privateParkingCalibrationFactorZHCity = Double.parseDouble(controler.getConfig().findParam("parking",
 				"privateParkingCalibrationFactorZHCity"));
 		// double
-		// privateParkingsOutdoorCalibrationFactor=Double.parseDouble(controler.getConfig().findParam("parking",
+		// privateParkingsOutdoorCalibrationFactor=Double.parseDouble(services.getConfig().findParam("parking",
 		// "privateParkingsOutdoorCalibrationFactorZHCity"));
 
 		LinkedList<PParking> parkingCollection = new LinkedList<PParking>();

@@ -27,18 +27,18 @@ public class PrtOptimizer implements VrpOptimizerWithOnlineTracking, MobsimBefor
 	
 	private final MatsimVrpContext context;
 	private final TaxiScheduler scheduler;
-	private TaxiOptimizerConfiguration optimizerConfig;
+	private TaxiOptimizerContext optimizerConfig;
 	
 	private final NPersonsVehicleRequestPathFinder vrpFinder;
 	
-	public PrtOptimizer(TaxiOptimizerConfiguration optimizerConfig){
+	public PrtOptimizer(TaxiOptimizerContext optimizerConfig){
 		
 		this(optimizerConfig.context, optimizerConfig, optimizerConfig.scheduler, new IdleRankVehicleFinder(optimizerConfig.context,
 						optimizerConfig.scheduler));
 		
 	}
 	
-	protected PrtOptimizer(MatsimVrpContext context, TaxiOptimizerConfiguration optimizerConfig, TaxiScheduler scheduler, IdleRankVehicleFinder vehicleFinder){
+	protected PrtOptimizer(MatsimVrpContext context, TaxiOptimizerContext optimizerConfig, TaxiScheduler scheduler, IdleRankVehicleFinder vehicleFinder){
 		
 		this.optimizerConfig = optimizerConfig;
 		this.context = context;
@@ -115,10 +115,10 @@ public class PrtOptimizer implements VrpOptimizerWithOnlineTracking, MobsimBefor
         while (reqIter.hasNext() && !idleVehicles.isEmpty()) {
             TaxiRequest req = reqIter.next();
 
-            Iterable<Vehicle> filteredVehs = idleVehicleFinder.filterVehiclesForRequest(idleVehicles,
-                    req);
+//            Iterable<Vehicle> filteredVehs = idleVehicleFinder.filterVehiclesForRequest(idleVehicles,
+//                    req);
             BestDispatchFinder.Dispatch best = vrpFinder.findBestVehicleForRequest(req,
-                    filteredVehs);
+                    idleVehicles);
 
             if (best != null) {
                 this.scheduler.scheduleRequest(best.vehicle, best.request, best.path);

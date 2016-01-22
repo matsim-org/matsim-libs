@@ -20,11 +20,13 @@
 package playground.vsptelematics.common;
 
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.config.Config;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkImpl;
 
+import javax.inject.Inject;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -33,18 +35,19 @@ public class IncidentGenerator implements BeforeMobsimListener {
 
 	private Map<Integer, List<NetworkChangeEvent>> changeEvents;
 
-	public IncidentGenerator(String filename, Network network) {
+	@Inject
+	IncidentGenerator(Config config, Network network) {
 		IncidentsReader reader = new IncidentsReader(network);
-		changeEvents = reader.read(filename);
+		changeEvents = reader.read(config.getParam("telematics", "incidentsFile"));
 	}
 
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
 		List<NetworkChangeEvent> events = changeEvents.get(event.getIteration());
 		if (events != null) {
-            ((NetworkImpl) event.getControler().getScenario().getNetwork()).setNetworkChangeEvents(events);
+            ((NetworkImpl) event.getServices().getScenario().getNetwork()).setNetworkChangeEvents(events);
 		}
 		else
-            ((NetworkImpl) event.getControler().getScenario().getNetwork())
+            ((NetworkImpl) event.getServices().getScenario().getNetwork())
                     .setNetworkChangeEvents(new LinkedList<NetworkChangeEvent>());
 	}
 

@@ -23,6 +23,7 @@ import com.google.inject.Provider;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.cadyts.car.CadytsCarModule;
 import org.matsim.contrib.cadyts.car.CadytsContext;
 import org.matsim.contrib.cadyts.general.CadytsScoring;
 import org.matsim.core.config.Config;
@@ -30,6 +31,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
@@ -50,12 +52,13 @@ import playground.gregor.casim.simulation.physics.AbstractCANetwork;
 import playground.gregor.casim.simulation.physics.CASingleLaneNetworkFactory;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.QSimDensityDrawer;
 
+import javax.inject.Inject;
 import java.io.FileInputStream;
 import java.io.IOException;
 
 public class CAwCadytsRunner implements IterationStartsListener {
 
-	private Controler controller;
+	private MatsimServices controller;
 	private QSimDensityDrawer qSimDrawer;
 
 	public static void main(String[] args) {
@@ -114,10 +117,7 @@ public class CAwCadytsRunner implements IterationStartsListener {
 
 
 
-		// create the cadyts context and add it to the control(l)er:
-		final CadytsContext cContext = new CadytsContext(c);
-		controller.addControlerListener(cContext);
-
+		controller.addOverridingModule(new CadytsCarModule());
 
 		controller.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 
@@ -163,6 +163,8 @@ public class CAwCadytsRunner implements IterationStartsListener {
 		
 		// include cadyts into the plan scoring (this will add the cadyts corrections to the scores):
 		controller.setScoringFunctionFactory(new ScoringFunctionFactory() {
+			@Inject
+			CadytsContext cContext;
 			@Override
 			public ScoringFunction createNewScoringFunction(Person person) {
 

@@ -230,7 +230,7 @@ public class Simulator {
 		
 		logger.info("Loading network data...");
 		LoggerUtils.setVerbose(false);
-		MatsimNetworkReader netReader = new MatsimNetworkReader(scenario);
+		MatsimNetworkReader netReader = new MatsimNetworkReader(scenario.getNetwork());
 		netReader.readFile(config.getParam("network", "inputNetworkFile"));
 		network = (NetworkImpl) scenario.getNetwork();
 		LoggerUtils.setVerbose(true);

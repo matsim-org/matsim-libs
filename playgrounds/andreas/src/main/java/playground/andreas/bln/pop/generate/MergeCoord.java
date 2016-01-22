@@ -182,7 +182,7 @@ public class MergeCoord {
 
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		log.info("Start reading file " + plansFilename);
-		new MatsimNetworkReader(scenario).readFile(networkFilename);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFilename);
 
 		log.info("Start reading file " + plansFilename);
 		Population population = scenario.getPopulation();
@@ -260,7 +260,7 @@ public class MergeCoord {
 
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		log.info("Start reading file " + plansFilename);
-		new MatsimNetworkReader(scenario).readFile(networkFilename);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFilename);
 
 		log.info("Start reading file " + plansFilename);
 		Population population = scenario.getPopulation();

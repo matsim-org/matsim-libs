@@ -109,7 +109,7 @@ public class MyTollPotentialCalculator {
 	}
 	
 	private void readNetwork(String filename){
-		MatsimNetworkReader mnr = new MatsimNetworkReader(sc);
+		MatsimNetworkReader mnr = new MatsimNetworkReader(sc.getNetwork());
 		mnr.parse(filename);
 	}
 	

@@ -25,21 +25,18 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Injector;
 import org.matsim.core.controler.ReplayEvents;
 import org.matsim.core.events.EventsManagerModule;
-import org.matsim.core.events.EventsUtils;
-import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.scoring.ExperiencedPlanElementsModule;
+import org.matsim.core.scoring.ExperiencedPlansModule;
 import org.matsim.core.scoring.ExperiencedPlanElementsService;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionModule;
 import playground.thibautd.utils.EventsToPlans;
@@ -57,7 +54,7 @@ public class EventsToExperiencedPlans {
 
 		com.google.inject.Injector injector = Injector.createInjector(config,
 				new ScenarioByInstanceModule(inputSc),
-				new ExperiencedPlanElementsModule(),
+				new ExperiencedPlansModule(),
 				new CharyparNagelScoringFunctionModule(),
 				new EventsManagerModule(),
 				new ReplayEvents.Module());
@@ -80,7 +77,7 @@ public class EventsToExperiencedPlans {
 		ExperiencedPlanElementsService epeService = injector.getInstance(ExperiencedPlanElementsService.class);
 		epeService.register(eventsToPlans);
 
-		injector.getInstance(ReplayEvents.class).playEventsFile( eventsFile );
+		injector.getInstance(ReplayEvents.class).playEventsFile( eventsFile, 1);
 
 		final Scenario sc = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
 

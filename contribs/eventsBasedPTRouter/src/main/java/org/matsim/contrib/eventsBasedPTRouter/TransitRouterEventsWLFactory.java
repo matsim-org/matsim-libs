@@ -21,7 +21,7 @@ package org.matsim.contrib.eventsBasedPTRouter;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTime;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.pt.router.PreparedTransitSchedule;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
@@ -41,10 +41,10 @@ public class TransitRouterEventsWLFactory implements Provider<TransitRouter> {
 	private final TransitRouterConfig config;
 	private final TransitRouterNetworkWW routerNetwork;
 	private final Network network;
-	private Controler controler;
+	private MatsimServices controler;
 	private final WaitTime waitTime;
 	
-	public TransitRouterEventsWLFactory(final Controler controler, final WaitTime waitTime) {
+	public TransitRouterEventsWLFactory(final MatsimServices controler, final WaitTime waitTime) {
 		this.config = new TransitRouterConfig(controler.getScenario().getConfig().planCalcScore(),
 				controler.getScenario().getConfig().plansCalcRoute(), controler.getScenario().getConfig().transitRouter(),
 				controler.getScenario().getConfig().vspExperimental());

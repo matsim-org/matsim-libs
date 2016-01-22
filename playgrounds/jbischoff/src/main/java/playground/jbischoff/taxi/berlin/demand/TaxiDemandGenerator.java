@@ -119,7 +119,7 @@ public class TaxiDemandGenerator
     TaxiDemandGenerator()
     {
         scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-        new MatsimNetworkReader(scenario).readFile(NETWORKFILE);
+        new MatsimNetworkReader(scenario.getNetwork()).readFile(NETWORKFILE);
         this.matrices = new Matrices();
         new MatsimMatricesReader(matrices, scenario).readFile(ODMATRIX);
         this.zones = BerlinZoneUtils.readZones(ZONESXML, ZONESSHP);

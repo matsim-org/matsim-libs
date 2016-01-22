@@ -92,7 +92,7 @@ public class PlanScoreAnalysis {
 	private void doAnalysis() {
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network net = scenario.getNetwork();
-		MatsimNetworkReader netReader = new MatsimNetworkReader(scenario);
+		MatsimNetworkReader netReader = new MatsimNetworkReader(scenario.getNetwork());
 		netReader.readFile(NETWORK);
 //		Gbl.getWorld().setNetworkLayer(net);
 //		Gbl.getWorld().complete();

@@ -10,13 +10,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 
 
-public class TestControler extends Controler {
+public class TestControler {
 	
-	
-	public TestControler(Scenario sc) {
-		super(sc);
-		// TODO Auto-generated constructor stub
-	}
 
 	/**
 	 * @param args
@@ -27,30 +22,15 @@ public class TestControler extends Controler {
     	
 		final Scenario sc = ScenarioUtils.loadScenario(config);		
 		
-		final TestControler controler = new TestControler( sc );
+		final Controler controler = new Controler( sc );
 		controler.getConfig().controler().setOverwriteFileSetting(
-				true ?
-						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
-		controler.init(config, sc.getNetwork(), sc);
-    	controler.run();		   	
+				OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+		TestScoringFunctionFactory testScoringFunctionFactory = new TestScoringFunctionFactory(
+				config,
+				sc.getNetwork(), sc);
+		controler.setScoringFunctionFactory(testScoringFunctionFactory);
+		controler.run();
     	
 	}
-//	@Override
-//	protected void loadControlerListeners() {
-//		
-//
-//		super.loadControlerListeners();
-//	}	
-	
-	public void init(Config config, Network network, Scenario sc) {
-		TestScoringFunctionFactory testScoringFunctionFactory = new TestScoringFunctionFactory(
-			      config, 
-			      network, sc);
-  this.setScoringFunctionFactory(testScoringFunctionFactory); 	
-		
-		
-	}
-
 
 }

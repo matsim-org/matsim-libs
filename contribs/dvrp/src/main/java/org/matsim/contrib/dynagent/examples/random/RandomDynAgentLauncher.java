@@ -50,7 +50,7 @@ public class RandomDynAgentLauncher
     public void go()
     {
         Scenario scenario = ScenarioUtils.createScenario(DynConfigUtils.createConfig());
-        new MatsimNetworkReader(scenario).readFile(netFile);
+        new MatsimNetworkReader(scenario.getNetwork()).readFile(netFile);
 
         QSim qSim = DynAgentLauncherUtils.initQSim(scenario);
         qSim.addAgentSource(new RandomDynAgentSource(qSim, agentCount));

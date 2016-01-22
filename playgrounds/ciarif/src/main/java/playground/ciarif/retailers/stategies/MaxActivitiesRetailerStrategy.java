@@ -22,7 +22,7 @@ package playground.ciarif.retailers.stategies;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
 
@@ -47,7 +47,7 @@ public class MaxActivitiesRetailerStrategy extends RetailerStrategyImpl
   private Map<Id<ActivityFacility>, ActivityFacility> retailerFacilities;
   private Map<Id<ActivityFacility>, ActivityFacility> movedFacilities = new TreeMap<>();
 
-  public MaxActivitiesRetailerStrategy(Controler controler)
+  public MaxActivitiesRetailerStrategy(MatsimServices controler)
   {
     super(controler);
   }

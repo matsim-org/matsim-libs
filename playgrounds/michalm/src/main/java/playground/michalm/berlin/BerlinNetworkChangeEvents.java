@@ -39,10 +39,10 @@ public class BerlinNetworkChangeEvents
             String berlinChangeEventsFile)
     {
         Scenario berlinBrbScenario = ScenarioUtils.createScenario(VrpConfigUtils.createConfig());
-        new MatsimNetworkReader(berlinBrbScenario).readFile(BERLIN_BRB_NET_FILE);
+        new MatsimNetworkReader(berlinBrbScenario.getNetwork()).readFile(BERLIN_BRB_NET_FILE);
 
         Scenario onlyBerlinScenario = ScenarioUtils.createScenario(VrpConfigUtils.createConfig());
-        new MatsimNetworkReader(onlyBerlinScenario).readFile(ONLY_BERLIN_NET_FILE);
+        new MatsimNetworkReader(onlyBerlinScenario.getNetwork()).readFile(ONLY_BERLIN_NET_FILE);
 
         List<NetworkChangeEvent> berlinBrbEvents = new NetworkChangeEventsParser(
                 berlinBrbScenario.getNetwork()).parseEvents(DIR + allChangeEventsFile);

@@ -66,7 +66,7 @@ public class PopulationReaderMatsimV4Test {
 		final MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		final Network network = scenario.getNetwork();
 		final Population population = scenario.getPopulation();
-		new MatsimNetworkReader(scenario).parse("test/scenarios/equil/network.xml");
+		new MatsimNetworkReader(scenario.getNetwork()).parse("test/scenarios/equil/network.xml");
 
 		MatsimXmlParser parser = new PopulationReaderMatsimV4(scenario);
 		XmlParserTestHelper tester = new XmlParserTestHelper(parser);

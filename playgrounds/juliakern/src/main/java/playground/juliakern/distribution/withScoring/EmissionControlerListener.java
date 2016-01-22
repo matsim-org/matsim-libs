@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.EmissionModule;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.*;
 import org.matsim.core.controler.listener.*;
 import org.matsim.core.events.algorithms.EventWriterXML;
@@ -45,7 +45,7 @@ public class EmissionControlerListener implements StartupListener, IterationStar
 ShutdownListener, ScoringListener, AfterMobsimListener{
 	private static final Logger logger = Logger.getLogger(EmissionControlerListener.class);
 	
-	Controler controler;
+	MatsimServices controler;
 	String emissionEventOutputFile;
 	Integer lastIteration;
 	EmissionModule emissionModule;
@@ -74,7 +74,7 @@ ShutdownListener, ScoringListener, AfterMobsimListener{
 	Map<Id<Link>, Integer> links2xcells;
 	Map<Id<Link>, Integer> links2ycells;
 
-	public EmissionControlerListener(Controler controler) {
+	public EmissionControlerListener(MatsimServices controler) {
 		this.controler = controler;
         this.gt = new GridTools(controler.getScenario().getNetwork().getLinks(), xMin, xMax, yMin, yMax);
 		this.intervalHandler = new IntervalHandler();
@@ -89,7 +89,7 @@ ShutdownListener, ScoringListener, AfterMobsimListener{
 	
 	@Override
 	public void notifyStartup(StartupEvent event) {
-		controler = event.getControler();
+		controler = event.getServices();
 		lastIteration = controler.getConfig().controler().getLastIteration();
 		logger.info("emissions will be calculated for iteration " + lastIteration);
 		
@@ -101,7 +101,7 @@ ShutdownListener, ScoringListener, AfterMobsimListener{
 			logger.warn("Something went wrong while mapping links to cells.");
 		}
 		
-//		Scenario scenario = controler.getScenario() ;
+//		Scenario scenario = services.getScenario() ;
 //		emissionModule = new EmissionModule(scenario);
 //		emissionModule.createLookupTables();
 //		emissionModule.createEmissionHandler();
@@ -154,7 +154,7 @@ ShutdownListener, ScoringListener, AfterMobsimListener{
 	public void notifyScoring(ScoringEvent event) {
 //		logger.info("before scoring. starting resp calc.");
 //		
-//		Double simulationEndTime = controler.getConfig().qsim().getEndTime();
+//		Double simulationEndTime = services.getConfig().qsim().getEndTime();
 //		timeBinSize = simulationEndTime/noOfTimeBins;
 //
 //		this.intervalHandler.addActivitiesToTimetables(links2xcells, links2ycells, simulationEndTime);
@@ -166,7 +166,7 @@ ShutdownListener, ScoringListener, AfterMobsimListener{
 //		
 //		if(this.geh.getEmissionsPerCell().isEmpty()) logger.warn("No emissions per cell calculated.");
 //		
-//		reut.addExposureAndResponsibilityBinwise(intervalHandler.getActivities(), geh.getEmissionsPerCell(), resp, timeBinSize, controler.getConfig().qsim().getEndTime());
+//		reut.addExposureAndResponsibilityBinwise(intervalHandler.getActivities(), geh.getEmissionsPerCell(), resp, timeBinSize, services.getConfig().qsim().getEndTime());
 //		
 	}
 

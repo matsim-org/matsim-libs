@@ -51,7 +51,7 @@ public class GenerateMultimodalNetworkWithSlopes {
 		final String outputSlopes = args[ 2 ];
 
 		final Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader( sc ).readFile(inputNetwork);
+		new MatsimNetworkReader(sc.getNetwork()).readFile(inputNetwork);
 
 		final Random random = new Random( 1234 );
 		final ObjectAttributes slopes = new ObjectAttributes();

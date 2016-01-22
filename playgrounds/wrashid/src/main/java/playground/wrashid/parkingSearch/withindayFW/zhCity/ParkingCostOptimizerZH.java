@@ -31,8 +31,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
-import org.matsim.core.controler.Controler;
 
+import org.matsim.core.controler.MatsimServices;
 import playground.wrashid.lib.obj.Collections;
 import playground.wrashid.parkingChoice.infrastructure.api.PParking;
 import playground.wrashid.parkingSearch.withindayFW.interfaces.ParkingCostCalculator;
@@ -49,7 +49,7 @@ public class ParkingCostOptimizerZH implements ParkingCostCalculator {
 	double priceIncValue;
 	double targetOccupancy;
 
-	public ParkingCostOptimizerZH(ParkingCostCalculatorZH parkingCostCalculatorZH, Controler controler) {
+	public ParkingCostOptimizerZH(ParkingCostCalculatorZH parkingCostCalculatorZH, MatsimServices controler) {
 		this.parkings = parkingCostCalculatorZH.getParkings();
 
 		String tmpString = controler.getConfig().findParam("parking", "ParkingCostOptimizerZH.priceIncValue");
@@ -86,7 +86,7 @@ public class ParkingCostOptimizerZH implements ParkingCostCalculator {
 
 	}
 
-	private HashMap<Id, Double> outputOriginalParkingCost(ParkingCostCalculatorZH parkingCostCalculatorZH, Controler controler) {
+	private HashMap<Id, Double> outputOriginalParkingCost(ParkingCostCalculatorZH parkingCostCalculatorZH, MatsimServices controler) {
 		HashMap<Id, Double> twoHourParkingCost = new HashMap<Id, Double>();
 
 		for (PParking parking : parkings) {
@@ -102,9 +102,9 @@ public class ParkingCostOptimizerZH implements ParkingCostCalculator {
 		return twoHourParkingCost;
 	}
 
-	public void logParkingPriceStats(Controler controler, int iteration) {
+	public void logParkingPriceStats(MatsimServices controler, int iteration) {
 		// String iterationFilenameTxt =
-		// controler.getControlerIO().getIterationFilename(controler.getIterationNumber(),
+		// services.getControlerIO().getIterationFilename(services.getIterationNumber(),
 		// "parkingPrices.txt");
 
 		Collection<Double> streetParkingPricesMorning = new LinkedList<Double>();
@@ -139,7 +139,7 @@ public class ParkingCostOptimizerZH implements ParkingCostCalculator {
 
 	}
 
-	private void writeoutPrices(Controler controler, int iteration) {
+	private void writeoutPrices(MatsimServices controler, int iteration) {
 		DoubleValueHashMap<Id> inputValues = publicParkingPricePerHourInTheMorning;
 		String outputFileName = "publicParkingPricePerHourInTheMorning.txt";
 		outputParkingPrices(controler, iteration, inputValues, outputFileName);
@@ -151,7 +151,7 @@ public class ParkingCostOptimizerZH implements ParkingCostCalculator {
 		printParkingPriceHistograms(controler, iteration);
 	}
 
-	private void printParkingPriceHistograms(Controler controler, int iteration) {
+	private void printParkingPriceHistograms(MatsimServices controler, int iteration) {
 		double[] values = Collections.convertDoubleCollectionToArray(filterParkingPrices(publicParkingPricePerHourInTheMorning,"stp"));
 		String timeOfDay="Morning";
 		String parkingType="street";
@@ -173,7 +173,7 @@ public class ParkingCostOptimizerZH implements ParkingCostCalculator {
 		outputPriceHistorgram(controler, iteration, values, timeOfDay, parkingType);
 	}
 
-	private void outputPriceHistorgram(Controler controler, int iteration, double[] values, String timeOfDay, String parkingType) {
+	private void outputPriceHistorgram(MatsimServices controler, int iteration, double[] values, String timeOfDay, String parkingType) {
 		String outputFileName = parkingType + "ParkingPricePerHourInThe" + timeOfDay + ".png";
 		
 		
@@ -197,7 +197,7 @@ public class ParkingCostOptimizerZH implements ParkingCostCalculator {
 		return result;
 	}
 
-	private void outputParkingPrices(Controler controler, int iteration, DoubleValueHashMap<Id> inputValues, String outputFileName) {
+	private void outputParkingPrices(MatsimServices controler, int iteration, DoubleValueHashMap<Id> inputValues, String outputFileName) {
 		ArrayList<String> list = new ArrayList<String>();
 		list.add("parkingFacilityId\tprice");
 

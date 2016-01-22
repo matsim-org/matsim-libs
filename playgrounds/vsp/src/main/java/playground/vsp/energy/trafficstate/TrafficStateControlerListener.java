@@ -47,13 +47,13 @@ public class TrafficStateControlerListener implements StartupListener, Iteration
 	private Scenario scenario;
 
 	public void notifyStartup(StartupEvent event) {
-		this.scenario = event.getControler().getScenario();
+		this.scenario = event.getServices().getScenario();
 	}
 
 	
 	public void notifyIterationStarts(IterationStartsEvent event) {
-		MutableScenario scenario = (MutableScenario) event.getControler().getScenario();
-		EventsManager events = event.getControler().getEvents();
+		MutableScenario scenario = (MutableScenario) event.getServices().getScenario();
+		EventsManager events = event.getServices().getEvents();
 		this.volumes = new VolumesAnalyzer(3600, 24 * 3600 - 1, scenario.getNetwork());
 		events.addHandler(this.volumes);
 		TravelTimeCalculatorConfigGroup ttcalcGroup = new TravelTimeCalculatorConfigGroup();
@@ -66,7 +66,7 @@ public class TrafficStateControlerListener implements StartupListener, Iteration
 
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		TrafficState ts = this.calculateTrafficState();
-		String filename = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "traffic_state.xml.gz");
+		String filename = event.getServices().getControlerIO().getIterationFilename(event.getIteration(), "traffic_state.xml.gz");
 		new TrafficStateXmlWriter(ts).writeFile(filename);
 	}
 

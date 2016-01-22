@@ -39,36 +39,29 @@ import playground.michalm.taxi.scheduler.TaxiSchedulerUtils;
 
 public class AssignmentProblem
 {
-    private static final double NULL_PATH_COST = 48 * 60 * 60; //2 days
+    private final TaxiOptimizerContext optimContext;
+    private final AssignmentTaxiOptimizerParams params;
 
-    private final TaxiOptimizerConfiguration optimConfig;
     private final MultiNodeDijkstra router;
-
     private final BackwardFastMultiNodeDijkstra backwardRouter;
 
-    private final RequestFilter requestFilter;
+    private final KStraightLineNearestRequestFilter requestFilter;
     private final KStraightLineNearestVehicleDepartureFilter vehicleFilter;
-
-    //1800: default
-    //666: avg. drive with passenger is around 10 min, all dropoffs are 1 min
-    //300: avg. pickup drive is around 5 min
-    //420: avg. pickup drive is around 5 min, all pickups are 2 min
-    private final double vehPlanningHorizonOversupply = 120;//seconds
-
-    //10: frequency of re-optimization 
-    private final double vehPlanningHorizonUndersupply = 30;//seconds
 
     private VehicleData vData;
     private AssignmentRequestData rData;
 
 
-    public AssignmentProblem(TaxiOptimizerConfiguration optimConfig, MultiNodeDijkstra router,
+    public AssignmentProblem(TaxiOptimizerContext optimContext, MultiNodeDijkstra router,
             BackwardFastMultiNodeDijkstra backwardRouter)
     {
-        this.optimConfig = optimConfig;
+        this.optimContext = optimContext;
+        this.params = (AssignmentTaxiOptimizerParams)optimContext.optimizerParams;
         this.router = router;
-        this.requestFilter = optimConfig.filterFactory.createRequestFilter();
-        this.vehicleFilter = new KStraightLineNearestVehicleDepartureFilter(40);
+        this.requestFilter = new KStraightLineNearestRequestFilter(optimContext.scheduler,
+                params.nearestRequestsLimit);
+        this.vehicleFilter = new KStraightLineNearestVehicleDepartureFilter(
+                params.nearestVehiclesLimit);
 
         this.backwardRouter = backwardRouter;
     }
@@ -87,20 +80,20 @@ public class AssignmentProblem
 
     private boolean initDataAndCheckIfSchedulingRequired(SortedSet<TaxiRequest> unplannedRequests)
     {
-        rData = new AssignmentRequestData(optimConfig, unplannedRequests, 0);//only immediate reqs
+        rData = new AssignmentRequestData(optimContext, unplannedRequests, 0);//only immediate reqs
         if (rData.dimension == 0) {
             return false;
         }
 
         int idleVehs = Iterables
-                .size(Iterables.filter(optimConfig.context.getVrpData().getVehicles().values(),
-                        TaxiSchedulerUtils.createIsIdle(optimConfig.scheduler)));
-        
+                .size(Iterables.filter(optimContext.context.getVrpData().getVehicles().values(),
+                        TaxiSchedulerUtils.createIsIdle(optimContext.scheduler)));
+
         if (idleVehs < rData.urgentReqCount) {
-            vData = new VehicleData(optimConfig, vehPlanningHorizonUndersupply);
+            vData = new VehicleData(optimContext, params.vehPlanningHorizonUndersupply);
         }
         else {
-            vData = new VehicleData(optimConfig, vehPlanningHorizonOversupply);
+            vData = new VehicleData(optimContext, params.vehPlanningHorizonOversupply);
         }
 
         return vData.dimension > 0;
@@ -115,8 +108,8 @@ public class AssignmentProblem
     }
 
 
-    static int calcPathsForVehiclesCount = 0;
-    static int calcPathsForRequestsCount = 0;
+    private static int calcPathsForVehiclesCount = 0;
+    private static int calcPathsForRequestsCount = 0;
 
 
     private RequestPathData[][] createPathDataMatrix()
@@ -204,7 +197,7 @@ public class AssignmentProblem
     //TODO does not support adv reqs
     private void calcPathsForRequests(RequestPathData[][] pathDataMatrix)
     {
-        double currTime = optimConfig.context.getTime();
+        double currTime = optimContext.context.getTime();
 
         for (int r = 0; r < rData.dimension; r++) {
             TaxiRequest req = rData.requests.get(r);
@@ -261,34 +254,33 @@ public class AssignmentProblem
     }
 
 
+    public enum Mode
+    {
+        PICKUP_TIME, //
+        //TTki
+
+        ARRIVAL_TIME, //
+        //DEPk + TTki
+        //equivalent to REMAINING_WAIT_TIME, i.e. DEPk + TTki - Tcurr // TODO check this out for dummy cases
+
+        TOTAL_WAIT_TIME, //
+        //DEPk + TTki - T0i
+
+        DSE;//
+        //balance between demand (ARRIVAL_TIME) and supply (PICKUP_TIME)
+    };
+
+
     private double[][] createCostMatrix(RequestPathData[][] pathDataMatrix)
     {
-        boolean reduceTP = doReduceTP();
+        Mode currentMode = getCurrentMode();
         double[][] costMatrix = new double[vData.dimension][rData.dimension];
 
         for (int v = 0; v < vData.dimension; v++) {
             VehicleData.Entry departure = vData.entries.get(v);
-
             for (int r = 0; r < rData.dimension; r++) {
-                RequestPathData pathData = pathDataMatrix[v][r];
-
-                double travelTime = pathData == null ? //
-                        NULL_PATH_COST : // no path (too far away)
-                        pathData.delay + pathData.path.travelTime;
-
-                double pickupBeginTime = Math.max(rData.requests.get(r).getT0(),
-                        departure.time + travelTime);
-
-                costMatrix[v][r] = reduceTP ? //
-                        //this will work different than (B) at oversupply -> will reduce T_P and fairness
-                        pickupBeginTime - departure.time : // T_P
-
-                		//(A) more fairness, lower throughput
-                		//this will work different than than (B) at undersupply -> will reduce unfairness and throughput 
-                		//pickupBeginTime - rData.requests.get(r).getT0(); // all T_W
-
-                		//(B)less fairness, higher throughput
-                		pickupBeginTime;// remaining T_W (probably win-win situation)
+                costMatrix[v][r] = calcCost(departure, rData.requests.get(r), pathDataMatrix[v][r],
+                        currentMode);
             }
         }
 
@@ -296,20 +288,43 @@ public class AssignmentProblem
     }
 
 
-    private boolean doReduceTP()
+    private double calcCost(VehicleData.Entry departure, TaxiRequest request,
+            RequestPathData pathData, Mode currentMode)
     {
-        switch (optimConfig.goal) {
-            case MIN_PICKUP_TIME:
-                return true;
+        double travelTime = pathData == null ? //
+                params.nullPathCost : // no path (too far away)
+                pathData.delay + pathData.path.travelTime;
 
-            case MIN_WAIT_TIME:
-                return false;
+        double pickupBeginTime = Math.max(request.getT0(), departure.time + travelTime);
 
-            case DEMAND_SUPPLY_EQUIL:
-                return rData.urgentReqCount > vData.idleCount;
+        switch (currentMode) {
+            case PICKUP_TIME:
+                //this will work different than ARRIVAL_TIME at oversupply -> will reduce T_P and fairness
+                return pickupBeginTime - departure.time;
+
+            case ARRIVAL_TIME:
+                //less fairness, higher throughput
+                return pickupBeginTime;
+
+            case TOTAL_WAIT_TIME:
+                //more fairness, lower throughput
+                //this will work different than than ARRIVAL_TIME at undersupply -> will reduce unfairness and throughput 
+                return pickupBeginTime - request.getT0();
 
             default:
                 throw new IllegalStateException();
+        }
+    }
+
+
+    private Mode getCurrentMode()
+    {
+        if (params.mode != Mode.DSE) {
+            return params.mode;
+        }
+        else {
+            return rData.urgentReqCount > vData.idleCount ? Mode.PICKUP_TIME : //we have too few vehicles
+                    Mode.ARRIVAL_TIME; //we have too many vehicles
         }
     }
 
@@ -331,11 +346,11 @@ public class AssignmentProblem
 
             VrpPathWithTravelData vrpPath = pathData == null ? //
                     VrpPaths.calcAndCreatePath(departure.link, req.getFromLink(), departure.time,
-                            router, optimConfig.travelTime)
+                            router, optimContext.travelTime)
                     : VrpPaths.createPath(departure.link, req.getFromLink(), departure.time,
-                            pathData.path, optimConfig.travelTime);
+                            pathData.path, optimContext.travelTime);
 
-            optimConfig.scheduler.scheduleRequest(departure.vehicle, req, vrpPath);
+            optimContext.scheduler.scheduleRequest(departure.vehicle, req, vrpPath);
             unplannedRequests.remove(req);
         }
     }

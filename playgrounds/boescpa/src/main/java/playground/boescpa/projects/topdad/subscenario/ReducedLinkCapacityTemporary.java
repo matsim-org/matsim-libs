@@ -42,7 +42,7 @@ public class ReducedLinkCapacityTemporary {
 	public static void main(String[] args) {
 		String path2MATSimNetwork = args[0];
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario);
+		MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario.getNetwork());
 		networkReader.readFile(path2MATSimNetwork);
 		Network network = scenario.getNetwork();
 		String speedFactor = args[1];

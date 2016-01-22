@@ -136,7 +136,7 @@ public abstract class BuildingEnergyRunnerMain {
 		return ids;
 	}
 
-	// static class which plug the analysis to the controler and generates some more output (distance- & tt-shares) 
+	// static class which plug the analysis to the services and generates some more output (distance- & tt-shares)
 	private static class MyControlerListener implements IterationStartsListener,
 												IterationEndsListener{
 		
@@ -148,18 +148,18 @@ public abstract class BuildingEnergyRunnerMain {
 		
 		@Override
 		public void notifyIterationStarts(IterationStartsEvent event) {
-			if(event.getIteration() == event.getControler().getConfig().controler().getLastIteration()){
+			if(event.getIteration() == event.getServices().getConfig().controler().getLastIteration()){
 				analyzer.reset(event.getIteration());
-				event.getControler().getEvents().addHandler(analyzer);
+				event.getServices().getEvents().addHandler(analyzer);
 			}
 		}
 		
 		@Override
 		public void notifyIterationEnds(IterationEndsEvent event) {
-			if(event.getIteration() == event.getControler().getConfig().controler().getLastIteration()){
-                analyzer.run(event.getControler().getScenario().getPopulation());
-				String path = event.getControler().getControlerIO().getOutputPath() + System.getProperty("file.separator");
-				String prefix = event.getControler().getConfig().controler().getRunId() + ".";
+			if(event.getIteration() == event.getServices().getConfig().controler().getLastIteration()){
+                analyzer.run(event.getServices().getScenario().getPopulation());
+				String path = event.getServices().getControlerIO().getOutputPath() + System.getProperty("file.separator");
+				String prefix = event.getServices().getConfig().controler().getRunId() + ".";
 				analyzer.dumpData(path, prefix);
 				calcWriteDistanceDistribution(analyzer.getTraveller(), path + prefix + "distanceShare.csv.gz");
 				calcAndWriteTTDistribution(analyzer.getTraveller(), path + prefix + "ttShare.csv.gz");

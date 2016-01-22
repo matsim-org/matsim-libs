@@ -260,7 +260,7 @@ public abstract class TransitScheduleValidator {
 		Network net = s.getNetwork();
 
 		if (args.length > 1) {
-			new MatsimNetworkReader(s).parse(args[1]);
+			new MatsimNetworkReader(s.getNetwork()).parse(args[1]);
 		}
 		new TransitScheduleReader(s).readFile(args[0]);
 

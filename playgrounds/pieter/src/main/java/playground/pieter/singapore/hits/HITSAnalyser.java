@@ -99,7 +99,7 @@ public class HITSAnalyser {
     private static void createRouters(String[] args, boolean freeSpeedRouting) {
 		scenario = ScenarioUtils
 				.createScenario(ConfigUtils.loadConfig(args[0]));
-		(new MatsimNetworkReader(scenario)).readFile(args[1]);
+		(new MatsimNetworkReader(scenario.getNetwork())).readFile(args[1]);
 		if (!freeSpeedRouting)
 			(new MatsimPopulationReader(scenario)).readFile(args[2]);
 		(new TransitScheduleReader(scenario)).readFile(args[3]);

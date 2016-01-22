@@ -44,7 +44,7 @@ public class MatrixBasedPtInputUtils {
 			ptMatrixLocationsMap.put(id, coord);
 		}
 				
-		MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario);
+		MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario.getNetwork());
 		networkReader.readFile(networkFile);
 
 		createStopsFile(ptMatrixLocationsMap, outputRoot + "ptStops.csv", ",");

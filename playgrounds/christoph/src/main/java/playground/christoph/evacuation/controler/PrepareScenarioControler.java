@@ -150,7 +150,7 @@ public class PrepareScenarioControler extends KTIEnergyFlowsController implement
 		/*
 		 * Assign vehicles to agent's plans.
 		 */
-		this.assignVehiclesToPlans = new AssignVehiclesToPlans(this.getScenario(), event.getControler().getTripRouterProvider().get());
+		this.assignVehiclesToPlans = new AssignVehiclesToPlans(this.getScenario(), event.getServices().getTripRouterProvider().get());
 		for (Household household : ((ScenarioImpl) getScenario()).getHouseholds().getHouseholds().values()) {
 			this.assignVehiclesToPlans.run(household);
 		}

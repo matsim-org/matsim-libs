@@ -142,7 +142,7 @@ public class CreatePopulation {
 
 	private void readNetwork() {
 		String filename = D4DConsts.WORK_DIR + "network-simplified.xml";
-		new MatsimNetworkReader(scenario).readFile(filename);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(filename);
 	}
 
 

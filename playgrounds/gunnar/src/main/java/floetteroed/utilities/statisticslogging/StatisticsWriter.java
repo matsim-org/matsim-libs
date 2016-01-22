@@ -42,10 +42,13 @@ public class StatisticsWriter<D extends Object> {
 
 	private final List<Statistic<D>> statistics = new ArrayList<Statistic<D>>();
 
+	private boolean wroteHeader = false;
+
 	// -------------------- CONSTRUCTION AND INITIALIZATION --------------------
 
-	public StatisticsWriter(final String fileName) {
+	public StatisticsWriter(final String fileName, final boolean append) {
 		this.fileName = fileName;
+		this.wroteHeader = append;
 	}
 
 	// -------------------- SETTERS & GETTERS --------------------
@@ -60,8 +63,6 @@ public class StatisticsWriter<D extends Object> {
 
 	// -------------------- FILE WRITING --------------------
 
-	private boolean wroteHeader = false;
-
 	public void writeToFile(final D data,
 			final String... labelOverrideValueSequence) {
 		final Map<String, String> label2overrideValue = new LinkedHashMap<>();
@@ -71,7 +72,7 @@ public class StatisticsWriter<D extends Object> {
 						labelOverrideValueSequence[i + 1]);
 			}
 		}
-		writeToFile(data, label2overrideValue);
+		this.writeToFile(data, label2overrideValue);
 	}
 
 	public void writeToFile(final D data,
@@ -93,7 +94,13 @@ public class StatisticsWriter<D extends Object> {
 				if (label2overrideValue.containsKey(stat.label())) {
 					writer.write(label2overrideValue.get(stat.label()));
 				} else {
-					writer.write(((data == null) ? "--" : stat.value(data)));
+					String value;
+					try {
+						value = stat.value(data);
+					} catch (Exception e) {
+						value = "";
+					}
+					writer.write(value);
 				}
 				writer.write("\t");
 			}

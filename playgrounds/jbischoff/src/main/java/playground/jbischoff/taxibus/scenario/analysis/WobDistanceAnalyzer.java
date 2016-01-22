@@ -86,7 +86,7 @@ public class WobDistanceAnalyzer {
 
 		this.scenario = ScenarioUtils.createScenario(config);
 
-		new MatsimNetworkReader(scenario).readFile(networkFile);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
 		analyzeEvents();
 		generateAndWriteOutput();
 		writeLinkDelays();

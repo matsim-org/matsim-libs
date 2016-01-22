@@ -15,7 +15,7 @@ public class EVControlerListener implements IterationEndsListener,
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		// TODO Auto-generated method stub
-		event.getControler().getEvents().addHandler(getEvHandler());
+		event.getServices().getEvents().addHandler(getEvHandler());
 
 	}
 

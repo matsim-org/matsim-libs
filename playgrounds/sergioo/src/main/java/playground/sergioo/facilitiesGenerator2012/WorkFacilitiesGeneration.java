@@ -527,7 +527,7 @@ public class WorkFacilitiesGeneration {
 	private static Tuple<Map<Tuple<Id<TransitStopFacility>, Id<ActivityFacility>>,Tuple<Boolean,Double>>, Network> calculateAreaStopWeights(Map<String, Coord> stopsBase, Map<Id<TransitStopFacility>, Double> stopsCapacities, Map<String, Double> workerAreas, SortedMap<Id<ActivityFacility>, ActivityFacility> mPAreas, Map<Id<ActivityFacility>, MPAreaData> dataMPAreas) throws BadStopException, IOException, InstantiationException, IllegalAccessException, ClassNotFoundException, SQLException, NoConnectionException {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario.getConfig().transit().setUseTransit(true);
-		new MatsimNetworkReader(scenario).readFile(NETWORK_FILE);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(NETWORK_FILE);
 		Network network = scenario.getNetwork();
 		List<Map<String, Id<Link>>> linksStops;
 		try {

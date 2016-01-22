@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.pseudosimulation.replanning.PlanCatcher;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.GenericPlanStrategyImpl;
 import org.matsim.core.replanning.PlanStrategy;
@@ -39,12 +39,12 @@ public class DistributedPlanSelector implements PlanSelector {
 
     String delegateName;
     PlanCatcher slave;
-    Controler controler;
+    MatsimServices controler;
     private double selectionFrequency;
     private GenericPlanSelector delegate;
 
 
-    public DistributedPlanSelector(Controler controler, String delegateName, PlanCatcher slave, boolean quickReplanning, int selectionInflationFactor) {
+    public DistributedPlanSelector(MatsimServices controler, String delegateName, PlanCatcher slave, boolean quickReplanning, int selectionInflationFactor) {
         this.slave = slave;
         this.delegateName = delegateName;
         this.controler = controler;

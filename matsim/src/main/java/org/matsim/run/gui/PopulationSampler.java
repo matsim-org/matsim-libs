@@ -189,7 +189,7 @@ public final class PopulationSampler extends JFrame {
 					) {
 				AsyncFileInputProgressDialog gui = new AsyncFileInputProgressDialog(fis, "Loading Network…");
 				try {
-					new MatsimNetworkReader(sc).parse(is);
+					new MatsimNetworkReader(sc.getNetwork()).parse(is);
 				} finally {
 					gui.close();
 				}

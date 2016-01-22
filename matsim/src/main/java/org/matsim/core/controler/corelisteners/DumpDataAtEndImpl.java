@@ -36,7 +36,6 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.network.NetworkChangeEventsWriter;
-import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.utils.io.IOUtils;
@@ -103,6 +102,10 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {
+		if ( event.isUnexpected() ) {
+			return ;
+		}
+		
 		// dump plans
 		new PopulationWriter(population, network).write(controlerIO.getOutputFilename(Controler.FILENAME_POPULATION));
 		final ObjectAttributes personAttributes = population.getPersonAttributes();
@@ -119,7 +122,7 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 		try {
 			new FacilitiesWriter(activityFacilities).write(controlerIO.getOutputFilename("output_facilities.xml.gz"));
 		} catch ( Exception ee ) {}
-		if (((NetworkFactoryImpl) network.getFactory()).isTimeVariant()) {
+		if (config.network().isTimeVariantNetwork()) {
 			new NetworkChangeEventsWriter().write(controlerIO.getOutputFilename("output_change_events.xml.gz"),
 					((NetworkImpl) network).getNetworkChangeEvents());
 		}

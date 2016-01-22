@@ -9,7 +9,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
@@ -41,10 +41,10 @@ public class DistanceControlerListener implements StartupListener, IterationEnds
 		// TODO Auto-generated method stub
 		numberInside = 0;
 		numberOutside = 0;
-		Controler controler = event.getControler();
+		MatsimServices controler = event.getServices();
 		Scenario scenario = (MutableScenario) controler.getScenario();
 		Population plans = scenario.getPopulation();
-		//if (Integer.toString(event.getIteration()) == scenario.getConfig().getParam("controler", "lastIteration"))
+		//if (Integer.toString(event.getIteration()) == scenario.getConfig().getParam("services", "lastIteration"))
 		for(Person p: plans.getPersons().values()) {
 			
 			for(PlanElement pe: p.getSelectedPlan().getPlanElements()) {
@@ -83,7 +83,7 @@ public class DistanceControlerListener implements StartupListener, IterationEnds
 	public void notifyStartup(StartupEvent event) {
 		// TODO Auto-generated method stub
 		
-		Controler controler = event.getControler();
+		MatsimServices controler = event.getServices();
 		/*
 		
 		String plansFilePath = "/Network/Servers/kosrae.ethz.ch/Volumes/ivt-home/balacm/MATSim/output/Avignon/plans0.xml";
@@ -108,7 +108,7 @@ public class DistanceControlerListener implements StartupListener, IterationEnds
 			ObjectAttributesXmlWriter betaWriter = new ObjectAttributesXmlWriter(prefs);
 			betaWriter.writeFile(outputFolder + "/prefs1.xml");*/
 		
-		/*for (Person p : controler.getPopulation().getPersons().values()) {
+		/*for (Person p : services.getPopulation().getPersons().values()) {
 		      PersonImpl pi = (PersonImpl)p;
 		      Plan plan = pi.getRandomPlan();
 		      for(PlanElement pe:plan.getPlanElements()) {

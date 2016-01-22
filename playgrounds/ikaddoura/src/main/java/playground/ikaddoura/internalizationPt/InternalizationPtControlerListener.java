@@ -47,12 +47,12 @@ public class InternalizationPtControlerListener implements StartupListener {
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		
-		EventsManager eventsManager = event.getControler().getEvents();
+		EventsManager eventsManager = event.getServices().getEvents();
 		
-		event.getControler().getEvents().addHandler(new TransferDelayInVehicleHandler(eventsManager, scenario));
-		event.getControler().getEvents().addHandler(new TransferDelayWaitingHandler(eventsManager, scenario));
-		event.getControler().getEvents().addHandler(new CapacityDelayHandler(eventsManager, scenario));
-		event.getControler().getEvents().addHandler(new MarginalCostPricingPtHandler(eventsManager, scenario));
+		event.getServices().getEvents().addHandler(new TransferDelayInVehicleHandler(eventsManager, scenario));
+		event.getServices().getEvents().addHandler(new TransferDelayWaitingHandler(eventsManager, scenario));
+		event.getServices().getEvents().addHandler(new CapacityDelayHandler(eventsManager, scenario));
+		event.getServices().getEvents().addHandler(new MarginalCostPricingPtHandler(eventsManager, scenario));
 	}
 
 }

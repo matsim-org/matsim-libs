@@ -32,7 +32,7 @@ public class DistanceTimeCS {
 	public void run(String[] args){
 		final BufferedWriter outLink = IOUtils.getBufferedWriter(args[2]);
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario);
+		MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario.getNetwork());
 		networkReader.readFile(args[0]);
 		
 		RentalTimes rentalTimes = new RentalTimes(scenario, outLink);		

@@ -82,7 +82,7 @@ public class ScenarioGenerator {
 		Config config = ConfigUtils.createConfig();
 		config.transit().setUseTransit(true);
 		this.baseScenario = (MutableScenario) ScenarioUtils.createScenario(config);
-		new MatsimNetworkReader(this.baseScenario).readFile(netFile);
+		new MatsimNetworkReader(this.baseScenario.getNetwork()).readFile(netFile);
 		new TransitScheduleReaderV1(this.baseScenario).readFile(scheduleFile);
 		new VehicleReaderV1(this.baseScenario.getTransitVehicles()).readFile(vehiclesFile);
 		this.outputDir = outputDir;

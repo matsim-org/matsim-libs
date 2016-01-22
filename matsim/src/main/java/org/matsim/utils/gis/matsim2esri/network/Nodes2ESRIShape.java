@@ -117,7 +117,7 @@ public class Nodes2ESRIShape {
 
 		log.info("loading network from " + netfile);
 		final Network network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario).readFile(netfile);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(netfile);
 		log.info("done.");
 
 		new Nodes2ESRIShape(network,outputFile, "DHDN_GK4").write();

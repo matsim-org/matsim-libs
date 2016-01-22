@@ -105,7 +105,7 @@ public class PopulationCreator {
 			final String populationFileName) {
 		this.scenario = ScenarioUtils
 				.createScenario(ConfigUtils.createConfig());
-		(new MatsimNetworkReader(this.scenario)).readFile(networkFileName);
+		(new MatsimNetworkReader(this.scenario.getNetwork())).readFile(networkFileName);
 		this.zonalSystem = new ZonalSystem(zoneShapeFileName,
 				zonalCoordinateSystem);
 		this.zonalSystem.addNetwork(this.scenario.getNetwork(),

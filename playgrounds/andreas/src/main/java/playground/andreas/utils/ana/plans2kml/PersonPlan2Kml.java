@@ -90,7 +90,7 @@ public class PersonPlan2Kml extends NewPopulation{
 		MutableScenario s = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		Network network = s.getNetwork();
-		new MatsimNetworkReader(s).readFile(networkFilename);
+		new MatsimNetworkReader(s.getNetwork()).readFile(networkFilename);
 
 		Population population = s.getPopulation();
 		PopulationReader plansReader = new MatsimPopulationReader(s);

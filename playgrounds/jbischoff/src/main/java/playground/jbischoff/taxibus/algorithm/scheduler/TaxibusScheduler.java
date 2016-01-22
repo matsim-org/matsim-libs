@@ -231,8 +231,8 @@ public class TaxibusScheduler
             TreeSet<TaxibusRequest> pickUpsForLink = best.getPickUpsForLink(path.getToLink());
             double lastEndTime = path.getArrivalTime();
             if (pickUpsForLink != null) {
-                lastEndTime = schedulePickups(bestSched, lastEndTime, onBoard, pickedUp,
-                        pickUpsForLink);
+                lastEndTime = schedulePickups(bestSched, lastEndTime, onBoard, 
+                        pickedUp, pickUpsForLink );
 
             }
             else {
@@ -265,16 +265,20 @@ public class TaxibusScheduler
                 }
                 pickUpsForLink = best.getPickUpsForLink(path.getToLink());
                 if (pickUpsForLink != null) {
-                    lastEndTime = schedulePickups(bestSched, lastEndTime, pickedUp, onBoard,
+                    lastEndTime = schedulePickups(bestSched, lastEndTime, onBoard, pickedUp, 
                             pickUpsForLink);
 
                 }
 
             }
             if (!onBoard.isEmpty()) {
-            	System.err.println("we forgot someone: ");
+            	log.error("we forgot someone, expected route: ");
             	for (TaxibusRequest r : onBoard){
-            		System.err.println("pax:"+r.getPassenger().getId()+" from: "+r.getFromLink().getId()+" to "+r.getToLink().getId());
+            		log.error("pax:"+r.getPassenger().getId()+" from: "+r.getFromLink().getId()+" to "+r.getToLink().getId());
+                  for (VrpPathWithTravelData  desiredPath : best.path){
+                	log.info(desiredPath.getFromLink().getId() + " to " + desiredPath.getToLink().getId());
+                }
+                log.info("End of route");
             	}
                 throw new IllegalStateException();
                 //we forgot a customer?
@@ -300,7 +304,7 @@ public class TaxibusScheduler
                 continue;
             double endTime = beginTime + params.dropoffDuration;
             bestSched.addTask(new TaxibusDropoffTask(beginTime, endTime, req));
-//            log.info("schedule dropoff" + req);
+//            log.info("schedule dropoff" + req.getPassenger().getId().toString()+ " at link "+req.getToLink().getId());
             beginTime = endTime;
             if (!onBoard.remove(req)) {
                 throw new IllegalStateException("Dropoff without pickup.");
@@ -313,7 +317,7 @@ public class TaxibusScheduler
 
 
     private double schedulePickups(Schedule<TaxibusTask> bestSched, double beginTime,
-            Set<TaxibusRequest> onBoard, Set<TaxibusRequest> pickedUp,
+            Set<TaxibusRequest> onBoard, Set<TaxibusRequest> pickedUp, 
             TreeSet<TaxibusRequest> pickUpsForLink)
     {
 
@@ -322,7 +326,7 @@ public class TaxibusScheduler
                 continue;
             double t3 = Math.max(beginTime, req.getT0()) + params.pickupDuration;
             bestSched.addTask(new TaxibusPickupTask(beginTime, t3, req));
-//            log.info("schedule pickup" + req + " at link "+req.getFromLink().getId());
+//            log.info("schedule pickup" + req.getPassenger().getId().toString() + " at link "+req.getFromLink().getId());
             onBoard.add(req);
             beginTime = t3;
             pickedUp.add(req);

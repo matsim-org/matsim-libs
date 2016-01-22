@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
@@ -41,7 +41,7 @@ public class TravelTimesControlerListener implements StartupListener, IterationE
 
 	@Override
 	public void notifyStartup(StartupEvent event) {
-		Controler controler = event.getControler();
+		MatsimServices controler = event.getServices();
 		handler = new TravelTimeEventHandler();
 		controler.getEvents().addHandler(handler);
 	}

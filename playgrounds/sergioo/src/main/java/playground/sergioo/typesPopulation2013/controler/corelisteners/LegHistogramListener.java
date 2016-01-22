@@ -75,13 +75,13 @@ public class LegHistogramListener implements IterationEndsListener, IterationSta
 	@Override
 	public void notifyIterationEnds(final IterationEndsEvent event) {
 		for(Entry<Id<Population>, LegHistogram> histogram:histograms.entrySet())
-			histogram.getValue().write(event.getControler().getControlerIO().getIterationFilename(event.getIteration(), histogram.getKey()+"_legHistogram.txt"));
+			histogram.getValue().write(event.getServices().getControlerIO().getIterationFilename(event.getIteration(), histogram.getKey()+"_legHistogram.txt"));
 		this.printStats();
 		if (this.outputGraph) {
 			for(Entry<Id<Population>, LegHistogram> histogram:histograms.entrySet()) {
-				histogram.getValue().writeGraphic(event.getControler().getControlerIO().getIterationFilename(event.getIteration(), histogram.getKey()+"_legHistogram_all.png"));
+				histogram.getValue().writeGraphic(event.getServices().getControlerIO().getIterationFilename(event.getIteration(), histogram.getKey()+"_legHistogram_all.png"));
 				for (String legMode : histogram.getValue().getLegModes())
-					histogram.getValue().writeGraphic(event.getControler().getControlerIO().getIterationFilename(event.getIteration(), histogram.getKey()+"_legHistogram_" + legMode + ".png"), legMode);
+					histogram.getValue().writeGraphic(event.getServices().getControlerIO().getIterationFilename(event.getIteration(), histogram.getKey()+"_legHistogram_" + legMode + ".png"), legMode);
 			}
 		}
 

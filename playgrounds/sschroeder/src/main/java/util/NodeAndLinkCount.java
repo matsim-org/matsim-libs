@@ -11,7 +11,7 @@ public class NodeAndLinkCount {
 		Config config = new Config();
 		config.addCoreModules();
 		Scenario scenario = ScenarioUtils.createScenario(config);
-		new MatsimNetworkReader(scenario).readFile("sensitivity/network.xml");
+		new MatsimNetworkReader(scenario.getNetwork()).readFile("sensitivity/network.xml");
 		
 		System.out.println("#nodes: " + scenario.getNetwork().getNodes().values().size());
 		System.out.println("#links: " + scenario.getNetwork().getLinks().values().size());

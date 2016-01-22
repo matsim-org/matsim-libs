@@ -15,6 +15,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
@@ -462,7 +463,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         int firstIteration = config.controler().getFirstIteration();
         if (SelectedSimulationMode.equals(SimulationMode.PARALLEL))
             startSlavesInMode(CommunicationsMode.TRANSMIT_PLANS_TO_MASTER);
-        IterationStopWatch stopwatch = event.getControler().getStopwatch();
+        IterationStopWatch stopwatch = event.getServices().getStopwatch();
         if ((writeFullPlansInterval > 0) &&
                 ((event.getIteration() % writeFullPlansInterval == 0) && event.getIteration() > 0)) {
             masterLogger.warn("Dumping plans on slaves. Can be re-assembled into monolithic plans file afterwards.");
@@ -809,7 +810,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         return config;
     }
 
-    public Controler getMATSimControler() {
+    public MatsimServices getMATSimControler() {
         return matsimControler;
     }
 

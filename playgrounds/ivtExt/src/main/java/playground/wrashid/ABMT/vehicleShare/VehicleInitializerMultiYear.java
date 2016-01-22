@@ -40,7 +40,7 @@ public class VehicleInitializerMultiYear implements IterationStartsListener, Sta
 	}
 
 	private boolean isLastIteration(IterationStartsEvent event) {
-		return event.getIteration()==Integer.parseInt(event.getControler().getConfig().getParam("controler", "lastIteration"));
+		return event.getIteration()==Integer.parseInt(event.getServices().getConfig().getParam("services", "lastIteration"));
 	}
 
 	@Override
@@ -48,7 +48,7 @@ public class VehicleInitializerMultiYear implements IterationStartsListener, Sta
 
 		if (GlobalTESFParameters.currentYear == 0) {
 			Random random = new Random(GlobalTESFParameters.tesfSeed);
-			for (Person person : event.getControler().getScenario().getPopulation().getPersons().values()) {
+			for (Person person : event.getServices().getScenario().getPopulation().getPersons().values()) {
 				if (VehicleInitializer.hasCarLeg(person.getSelectedPlan())) {
 					vehicleExpiryYear.set(person.getId(), getVehicleExpiryInYears());
 				}

@@ -20,12 +20,15 @@
 package org.matsim.contrib.transEnergySim.controllers;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.transEnergySim.charging.ChargingUponArrival;
 import org.matsim.contrib.transEnergySim.chargingInfrastructure.road.InductiveStreetCharger;
 import org.matsim.contrib.transEnergySim.vehicles.VehicleUtils;
 import org.matsim.contrib.transEnergySim.vehicles.api.Vehicle;
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.EnergyConsumptionTracker;
 import org.matsim.core.config.Config;
+import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.Controler;
 
 import java.util.HashMap;
 
@@ -35,37 +38,38 @@ import java.util.HashMap;
  * 
  * @author rashid_waraich
  */
-public class InductiveChargingController extends AddHandlerAtStartupControler {
+public class InductiveChargingController {
 
+	private final Controler controler;
 	private InductiveStreetCharger inductiveCharger;
 	private ChargingUponArrival chargingUponArrival;
 	private EnergyConsumptionTracker energyConsumptionTracker;
 	private HashMap<Id<Vehicle>, Vehicle> vehicles;
 
-	public InductiveChargingController(String[] args, HashMap<Id<Vehicle>, Vehicle> vehicles) {
-		super(args);
-		init(vehicles);
-	}
-
 	public InductiveChargingController(Config config, HashMap<Id<Vehicle>, Vehicle> vehicles) {
-		super(config);
+		this.controler = new Controler(config);
 		init(vehicles);
 	}
 
 	private void init(HashMap<Id<Vehicle>, Vehicle> vehicles) {
 		this.vehicles = vehicles;
 
-		EventHandlerGroup handlerGroup = new EventHandlerGroup();
+		final EventHandlerGroup handlerGroup = new EventHandlerGroup();
 
-        setEnergyConsumptionTracker(new EnergyConsumptionTracker(vehicles, getScenario().getNetwork()));
-        setInductiveCharger(new InductiveStreetCharger(vehicles, getScenario().getNetwork(), this));
-		setChargingUponArrival(new ChargingUponArrival(vehicles, this));
+        setEnergyConsumptionTracker(new EnergyConsumptionTracker(vehicles, controler.getScenario().getNetwork()));
+        setInductiveCharger(new InductiveStreetCharger(vehicles, controler.getScenario().getNetwork(), controler));
+		setChargingUponArrival(new ChargingUponArrival(vehicles, controler));
 
 		handlerGroup.addHandler(getEnergyConsumptionTracker());
 		handlerGroup.addHandler(getInductiveCharger());
 		handlerGroup.addHandler(getChargingUponArrival());
 
-		addHandler(handlerGroup);
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				addEventHandlerBinding().toInstance(handlerGroup);
+			}
+		});
 	}
 
 	/**
@@ -113,5 +117,11 @@ public class InductiveChargingController extends AddHandlerAtStartupControler {
 	}
 
 
+	public void run() {
+		controler.run();
+	}
 
+	public Scenario getScenario() {
+		return controler.getScenario();
+	}
 }

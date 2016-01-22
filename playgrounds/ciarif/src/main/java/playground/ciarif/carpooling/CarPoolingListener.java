@@ -2,7 +2,7 @@ package playground.ciarif.carpooling;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.*;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.population.PlanImpl;
@@ -13,7 +13,7 @@ public class CarPoolingListener implements IterationEndsListener {
 	public final static String CONFIG_GROUP = "carpooling";
 	public final static String CONFIG_TRIPS_FILE = "workHomeTripsSummary";
 	public final static String CONFIG_ANALYSIS_ITER = "TripsAnalysisIteration";
-	private Controler controler;
+	private MatsimServices controler;
 	private final static Logger log = Logger.getLogger(GravityModelRetailerStrategy.class);
 	private WorkTrips workTrips = new WorkTrips();
 	private String outputTripsFile = new String();
@@ -22,7 +22,7 @@ public class CarPoolingListener implements IterationEndsListener {
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
 
-		this.controler = event.getControler();
+		this.controler = event.getServices();
 		this.outputTripsFile = controler.getConfig().findParam(CONFIG_GROUP,CONFIG_TRIPS_FILE);
 		if (this.outputTripsFile == null) {throw new RuntimeException("In config file, param = "+CONFIG_TRIPS_FILE+" in module = "+CONFIG_GROUP+" not defined!");}
 		this.tripsAnalysisIter = Integer.parseInt(controler.getConfig().findParam(CONFIG_GROUP,CONFIG_ANALYSIS_ITER));

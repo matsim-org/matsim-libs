@@ -45,10 +45,14 @@ import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.misc.Time;
+
+import javax.inject.Inject;
+import javax.inject.Named;
 
 /**
  * Returns the time when an agent could leave a link if he can travel
@@ -78,15 +82,17 @@ public class EarliestLinkExitTimeProvider implements LinkEnterEventHandler, Link
 	private final Map<Double, Set<Id<Person>>> earliestLinkExitTimesPerTimeStep = new ConcurrentHashMap<>();
 
 	private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
-	
-	public EarliestLinkExitTimeProvider(Scenario scenario) {
-		this(scenario, null);
+
+	public EarliestLinkExitTimeProvider(Scenario scenario, EventsManager eventsManager) {
+		this(scenario, null, eventsManager);
 		log.info("Note: no map containing TravelTime objects for all simulated modes is given. Therefore use free speed " +
 				"car travel time as minimal link travel time for all modes.");
 	}
 
-	public EarliestLinkExitTimeProvider(Scenario scenario, Map<String, TravelTime> multiModalTravelTimes) {
+	@Inject
+	public EarliestLinkExitTimeProvider(Scenario scenario, @Named("lowerBound") Map<String, TravelTime> multiModalTravelTimes, EventsManager eventsManager) {
 		this.scenario = scenario;
+		eventsManager.addHandler(this);
 		this.multiModalTravelTimes = multiModalTravelTimes;
 		this.transportModeProvider = new TransportModeProvider();
 		this.freeSpeedTravelTime = new FreeSpeedTravelTime();

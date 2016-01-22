@@ -23,7 +23,7 @@ public class RouterTester {
 		Config config = ConfigUtils.createConfig();
 		ConfigUtils.loadConfig(config, args[0]);
 		Scenario scenario = ScenarioUtils.createScenario(config);
-		new MatsimNetworkReader(scenario).readFile(args[1]);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(args[1]);
 		TravelTimeCalculator travelTimeCalculator = new TravelTimeCalculator(scenario.getNetwork(), scenario.getConfig().travelTimeCalculator());
 		EventsManager eventsManager = EventsUtils.createEventsManager(scenario.getConfig());
 		eventsManager.addHandler(travelTimeCalculator);

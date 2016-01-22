@@ -8,13 +8,13 @@ import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.contrib.parking.lib.DebugLib;
-import org.matsim.core.controler.Controler;
 
+import org.matsim.core.controler.MatsimServices;
 import playground.wrashid.parkingSearch.planLevel.init.ParkingRoot;
 
 public class ParkingBookKeeper implements ActivityStartEventHandler, ActivityEndEventHandler {
 
-	private Controler controler;
+	private MatsimServices controler;
 	private ParkingOccupancyMaintainer parkingOccupancyMaintainer;
 
 	// id: personId
@@ -29,7 +29,7 @@ public class ParkingBookKeeper implements ActivityStartEventHandler, ActivityEnd
 		return parkingOccupancyMaintainer;
 	}
 
-	public ParkingBookKeeper(Controler controler) {
+	public ParkingBookKeeper(MatsimServices controler) {
 		this.controler = controler;
 		//parkingOccupancyMaintainer=new ParkingOccupancyMaintainer(controler);
 		

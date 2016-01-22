@@ -51,7 +51,6 @@ import com.vividsolutions.jts.io.ParseException;
 import com.vividsolutions.jts.io.WKTReader;
 
 import playground.jbischoff.taxi.berlin.demand.TaxiDemandWriter;
-import playground.michalm.zone.Zone;
 
 /**
  * @author  jbischoff
@@ -84,7 +83,7 @@ public class PopulationBasedTaxiVehicleCreator
 	public PopulationBasedTaxiVehicleCreator() {
 				
 		this.scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenario).readFile(networkFile);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
 		this.geometry = readShapeFileAndExtractGeometry(shapeFile);	
 		this.wrs = new WeightedRandomSelection<>();
         readPopulationData();

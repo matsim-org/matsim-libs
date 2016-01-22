@@ -344,7 +344,7 @@ class ExternalControler {
 		directory.mkdirs();
 		
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.loadConfig(configFile));
-		new MatsimNetworkReader(scenario).readFile(scenario.getConfig().network().getInputFile());
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(scenario.getConfig().network().getInputFile());
 		
 		if (startDemand == 0 && incrDemand == 0 && stepsDemand == 0){
 			if (usePopulationPathsFile){

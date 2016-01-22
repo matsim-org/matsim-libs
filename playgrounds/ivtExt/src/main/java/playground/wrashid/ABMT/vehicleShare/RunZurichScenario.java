@@ -28,6 +28,7 @@ import org.matsim.contrib.parking.lib.EventHandlerAtStartupAdder;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.network.NetworkImpl;
@@ -127,7 +128,7 @@ public class RunZurichScenario {
 		
 	}
 
-	private static void connectFacilitiesWithNetwork(Controler controler) {
+	private static void connectFacilitiesWithNetwork(MatsimServices controler) {
 		ActivityFacilities facilities = controler.getScenario().getActivityFacilities();
 		// log.warn("number of facilities: "
 		// +facilities.getFacilities().size());
@@ -138,7 +139,7 @@ public class RunZurichScenario {
 		wcl.connectFacilitiesWithLinks(facilities, network);
 	}
 
-	private static void initializeLocationChoice(final Controler controler) {
+	private static void initializeLocationChoice(final MatsimServices controler) {
 		final Scenario scenario = controler.getScenario();
 		final DestinationChoiceBestResponseContext lcContext = new DestinationChoiceBestResponseContext(scenario);
 		lcContext.init();

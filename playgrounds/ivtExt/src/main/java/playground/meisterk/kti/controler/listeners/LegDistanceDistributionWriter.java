@@ -22,7 +22,7 @@ package playground.meisterk.kti.controler.listeners;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import playground.meisterk.org.matsim.population.algorithms.AbstractClassifiedFrequencyAnalysis;
@@ -55,12 +55,12 @@ public class LegDistanceDistributionWriter implements IterationEndsListener {
 		
 		if (event.getIteration() % 10 == 0) {
 
-			Controler c = event.getControler();
+			MatsimServices c = event.getServices();
             Population pop = c.getScenario().getPopulation();
 			
 			PrintStream out = null;
 			try {
-				out = new PrintStream(event.getControler().getControlerIO().getIterationFilename(event.getIteration(), filename));
+				out = new PrintStream(event.getServices().getControlerIO().getIterationFilename(event.getIteration(), filename));
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			}

@@ -20,8 +20,9 @@
 
 package org.matsim.core.controler;
 
-import java.util.*;
-
+import com.google.inject.Key;
+import com.google.inject.Provider;
+import com.google.inject.TypeLiteral;
 import org.apache.log4j.Layout;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
@@ -36,18 +37,10 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.consistency.ConfigConsistencyCheckerImpl;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.controler.corelisteners.ControlerDefaultCoreListenersModule;
-import org.matsim.core.controler.corelisteners.DumpDataAtEnd;
-import org.matsim.core.controler.corelisteners.EventsHandling;
-import org.matsim.core.controler.corelisteners.PlansDumping;
-import org.matsim.core.controler.corelisteners.PlansReplanning;
-import org.matsim.core.controler.corelisteners.PlansScoring;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.events.handler.EventHandler;
-import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.mobsim.framework.ObservableMobsim;
-import org.matsim.core.mobsim.framework.listeners.MobsimListener;
+import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
@@ -57,14 +50,8 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.pt.PtConstants;
-import org.matsim.pt.router.TransitRouter;
 
-import com.google.inject.Key;
-import com.google.inject.Provider;
-import com.google.inject.TypeLiteral;
-
-import javax.inject.Inject;
+import java.util.*;
 
 /**
  * The Controler is responsible for complete simulation runs, including the
@@ -73,7 +60,7 @@ import javax.inject.Inject;
  *
  * @author mrieser
  */
-public class Controler extends AbstractController implements ControlerI {
+public final class Controler implements ControlerI, MatsimServices {
 	// yyyy Design thoughts:
 	// * Seems to me that we should try to get everything here final.  Flexibility is provided by the ability to set or add factories.  If this is
 	// not sufficient, people should use AbstractController.  kai, jan'13
@@ -98,43 +85,23 @@ public class Controler extends AbstractController implements ControlerI {
 	private final Config config;
 	private Scenario scenario;
 
-	@Inject private PrepareForSim prepareForSim;
-	@Inject private EventsHandling eventsHandling;
-	@Inject private PlansDumping plansDumping;
-	@Inject private PlansReplanning plansReplanning;
-	@Inject private Provider<Mobsim> mobsimProvider;
-	@Inject private PlansScoring plansScoring;
-	@Inject private DumpDataAtEnd dumpDataAtEnd;
-
-	@Inject private Set<ControlerListener> controlerListenersDeclaredByModules;
-
 	private com.google.inject.Injector injector;
 	private boolean injectorCreated = false;
 
 	@Override
 	public IterationStopWatch getStopwatch() {
-		return super.getStopwatch();
+		return injector.getInstance(IterationStopWatch.class);
 	}
 
-	@Inject
-	private TerminationCriterion terminationCriterion;
-
-    // DefaultControlerModule includes submodules. If you want less than what the Controler does
+	// DefaultControlerModule includes submodules. If you want less than what the Controler does
     // by default, you can leave ControlerDefaultsModule out, look at what it does,
     // and only include what you want.
     private List<AbstractModule> modules = new ArrayList<>(Arrays.<AbstractModule>asList(new ControlerDefaultsModule()));
-    // this defines the core of the process, and is mandatory: thus it is not in the "ControlerDefaultsModule",
-    // which is more for default facultative stuff (analysis etc.)
-    // One can override selected sub-modules by adding an overriding module.
-    private final AbstractModule coreListenersModule = new ControlerDefaultCoreListenersModule();
 
-    // The module which is currently defined by the sum of the setXX methods called on this Controler.
+	// The module which is currently defined by the sum of the setXX methods called on this Controler.
     private AbstractModule overrides = AbstractModule.emptyModule();
 
-	private final List<MobsimListener> simulationListeners = new ArrayList<>();
-	@Inject private Collection<Provider<MobsimListener>> mobsimListeners = new HashSet<>(); // added by modules
-
-    public static void main(final String[] args) {
+	public static void main(final String[] args) {
 		if ((args == null) || (args.length == 0)) {
 			System.out.println("No argument given!");
 			System.out.println("Usage: Controler config-file [dtd-file]");
@@ -146,21 +113,11 @@ public class Controler extends AbstractController implements ControlerI {
 		System.exit(0);
 	}
 
-	@Inject
-	Controler(com.google.inject.Injector injector, Config config, IterationStopWatch stopWatch) {
-		super(stopWatch);
-		this.config = config;
-		this.config.addConfigConsistencyChecker(new ConfigConsistencyCheckerImpl());
-		this.controlerListenerManager.setControler(this);
-		this.injector = injector;
-		this.injectorCreated = true;
-	}
-
 	/**
 	 * Initializes a new instance of Controler with the given arguments.
 	 *
 	 * @param args
-	 *            The arguments to initialize the controler with.
+	 *            The arguments to initialize the services with.
 	 *            <code>args[0]</code> is expected to contain the path to a
 	 *            configuration file, <code>args[1]</code>, if set, is expected
 	 *            to contain the path to a local copy of the DTD file used in
@@ -175,11 +132,11 @@ public class Controler extends AbstractController implements ControlerI {
 	}
 
 	public Controler(final Config config) {
-		this((String) null, config, null);
+		this(null, config, null);
 	}
 
 	public Controler(final Scenario scenario) {
-		this((String) null, null, scenario);
+		this(null, null, scenario);
 	}
 
 	private Controler(final String configFileName, final Config config, Scenario scenario) {
@@ -204,7 +161,6 @@ public class Controler extends AbstractController implements ControlerI {
 			scenario  = ScenarioUtils.createScenario(this.config);
 			ScenarioUtils.loadScenario(scenario) ;
 		}
-		this.controlerListenerManager.setControler(this);
 		this.config.parallelEventHandling().makeLocked();
 		this.scenario = scenario;
 		this.overrides = new ScenarioByInstanceModule(this.scenario);
@@ -214,157 +170,29 @@ public class Controler extends AbstractController implements ControlerI {
 	 * Starts the iterations.
 	 */
 	public final void run() {
-		if (injectorCreated) {
-			setupOutputDirectory(injector.getInstance(OutputDirectoryHierarchy.class));
-		} else {
-			setupOutputDirectory(new OutputDirectoryHierarchy(config.controler()));
-		}
-		Config myConfig = this.config;
-		preprocessConfig(myConfig);
-
-		run(config);
-	}
-
-	static void preprocessConfig(Config config) {
-		if (config.transit().isUseTransit()) {
-			// yyyy this should go away somehow. :-)
-
-			log.info("setting up transit simulation");
-//		if (!this.config.scenario().isUseVehicles()) {
-			if ( config.transit().getVehiclesFile()==null ) {
-				log.warn("Your are using Transit but have not provided a transit vehicles file. This most likely won't work.");
+		this.injectorCreated = true;
+		this.injector = Injector.createInjector(config, AbstractModule.override(Collections.singleton(new AbstractModule() {
+			@Override
+			public void install() {
+				install(new NewControlerModule());
+				install(new ControlerDefaultCoreListenersModule());
+				for (AbstractModule module : modules) {
+					install(module);
+				}
+				install(new ScenarioByInstanceModule(scenario));
 			}
-
-			ActivityParams transitActivityParams = new ActivityParams(PtConstants.TRANSIT_ACTIVITY_TYPE);
-			transitActivityParams.setTypicalDuration(120.0);
-
-			// The following two lines were introduced in nov/12.  _In addition_, the conversion of ActivityParams to
-			// ActivityUtilityParameters will set the scoreAtAll flag to false (also introduced in nov/12).  kai, nov'12
-			transitActivityParams.setOpeningTime(0.) ;
-			transitActivityParams.setClosingTime(0.) ;
-
-			config.planCalcScore().addActivityParams(transitActivityParams);
-			// yy would this overwrite user-defined definitions of "pt interaction"?
-			// No, I think that the user-defined parameters are set later, in fact overwriting this setting here.
-			// kai, nov'12
-
-			// the QSim reads the config by itself, and configures itself as a
-			// transit-enabled mobsim. kai, nov'11
-		}
+		}), overrides));
+		ControlerI controler = injector.getInstance(ControlerI.class);
+		controler.run();
 	}
 
-	/**
-	 * Loads a default set of {@link org.matsim.core.controler.listener
-	 * ControlerListener} to provide basic functionality. 
-	 * <p/>
-	 * Method is final now.  If you think that you need to over-write this method, start from AbstractController instead.
-	 */
-	@Override
-	protected final void loadCoreListeners() {
-		if (!injectorCreated) {
-			this.injectorCreated = true;
-			this.injector = Injector.createInjector(
-					config,
-					new AbstractModule() {
-						@Override
-						public void install() {
-							final List<AbstractModule> baseModules = new ArrayList<>();
-							baseModules.add(coreListenersModule);
-							baseModules.add(new AbstractModule() {
-								@Override
-								public void install() {
-									bind(PrepareForSim.class).to(PrepareForSimImpl.class);
-									bind(OutputDirectoryHierarchy.class).toInstance(getControlerIO());
-									bind(IterationStopWatch.class).toInstance(getStopwatch());
-									bind(TerminationCriterion.class).to(TerminateAtFixedIterationNumber.class);
-								}
-							});
-							baseModules.addAll(modules);
-							// Use all the modules set with setModules, but overriding them with things set with
-							// other setters on this Controler.
-							install(AbstractModule.override(baseModules, overrides));
-						}
-					});
-			this.injector.getInstance(com.google.inject.Injector.class).injectMembers(this);
-		}
-		addListenersToSelf();
-	}
-
-	private void addListenersToSelf() {
-		/*
-		 * The order how the listeners are added is very important! As
-		 * dependencies between different listeners exist or listeners may read
-		 * and write to common variables, the order is important.
-		 *
-		 * IMPORTANT: The execution order is reverse to the order the listeners
-		 * are added to the list.
-		 */
-		if (getConfig().controler().getDumpDataAtEnd()) {
-			this.addCoreControlerListener(this.dumpDataAtEnd);
-		}
-
-		this.addCoreControlerListener(this.plansScoring);
-		this.addCoreControlerListener(this.plansReplanning);
-		this.addCoreControlerListener(this.plansDumping);
-		this.addCoreControlerListener(this.eventsHandling);
-		// must be last being added (=first being executed)
-
-		for (ControlerListener controlerListener : this.controlerListenersDeclaredByModules) {
-			this.addControlerListener(controlerListener);
-		}
-	}
-
-	@Override
-	protected final void prepareForSim() {
-		this.prepareForSim.run();
-	}
-
-	@Override
-	protected final boolean continueIterations(int it) {
-		return terminationCriterion.continueIterations(it);
-	}
-
-	@Override
-	protected final void runMobSim() {
-		Mobsim sim = getNewMobsim();
-		sim.run();
-	}
-
-	private Mobsim getNewMobsim() {
-		Mobsim simulation = this.mobsimProvider.get();
-		enrichSimulation(simulation);
-		return simulation;
-	}
-
-	private void enrichSimulation(final Mobsim simulation) {
-		if (simulation instanceof ObservableMobsim) {
-			for (Provider<MobsimListener> l : this.mobsimListeners) {
-				((ObservableMobsim) simulation).addQueueSimulationListeners(l.get());
-			}
-			for (MobsimListener l : this.getMobsimListeners()) {
-				((ObservableMobsim) simulation).addQueueSimulationListeners(l);
-			}
-		}
-
-	}
 
 	// ******** --------- *******
 	// The following is the internal interface of the Controler, which
-	// is meant to be called while the Controler is running (not before),
-	// meaning mostly from ControlerListeners, except possibly the StartupListener,
-	// as the TravelTimeCalculator and the TripRouterFactory aren't available there yet.
-	//
-	// These, or some of these, would probably go on the ControlerEvents,
-	// when they could stop passing the whole Controler.
-	// 
-	// Please try and do not use them for cascaded setting from the outside,
-	// i.e. get something, look if it is instance of something,
-	// and then change something on it. Or wrap it in something else and set it again.
-	// These things are basically made to be
-	// used, not changed. Send me (michaz) a mail if you need to do it.
-	// I really want to sort this out.
+	// is meant to be called while the Controler is running (not before)..
 	// ******** --------- *******
 
+	@Override
 	public final TravelTime getLinkTravelTimes() {
 		return this.injector.getInstance(com.google.inject.Injector.class).getInstance(Key.get(new TypeLiteral<Map<String, TravelTime>>() {}))
 				.get(TransportMode.car);
@@ -381,27 +209,33 @@ public class Controler extends AbstractController implements ControlerI {
      *
      * See {@link org.matsim.core.router.TripRouter} for more information and pointers to examples.
      */
-    public final Provider<TripRouter> getTripRouterProvider() {
+    @Override
+	public final Provider<TripRouter> getTripRouterProvider() {
 		return this.injector.getProvider(TripRouter.class);
 	}
 	
+	@Override
 	public final TravelDisutility createTravelDisutilityCalculator() {
         return getTravelDisutilityFactory().createTravelDisutility(this.injector.getInstance(TravelTime.class), getConfig().planCalcScore());
 	}
 
+	@Override
 	public final LeastCostPathCalculatorFactory getLeastCostPathCalculatorFactory() {
 		return this.injector.getInstance(LeastCostPathCalculatorFactory.class);
 	}
 
+	@Override
 	public final ScoringFunctionFactory getScoringFunctionFactory() {
 		return this.injector.getInstance(ScoringFunctionFactory.class);
 	}
 
-    public final Config getConfig() {
+    @Override
+	public final Config getConfig() {
 		return config;
 	}
 
-    public final Scenario getScenario() {
+    @Override
+	public final Scenario getScenario() {
 		if (this.injectorCreated) {
 			return this.injector.getInstance(Scenario.class);
 		} else {
@@ -412,6 +246,7 @@ public class Controler extends AbstractController implements ControlerI {
 	/**
 	 * @deprecated -- preferably use "@Inject EventsManager events" or "addEventHandlerBinding().toInstance(...) from AbstractModule". kai/mz, nov'15
 	 */
+	@Override
 	@Deprecated // preferably use "@Inject EventsManager events" or "addEventHandlerBinding().toInstance(...) from AbstractModule". kai/mz, nov'15
 	public final EventsManager getEvents() {
 		if (this.injector != null) {
@@ -461,6 +296,7 @@ public class Controler extends AbstractController implements ControlerI {
 		}
 	}
 
+	@Override
 	public final com.google.inject.Injector getInjector() {
 		return this.injector;
 	}
@@ -469,46 +305,64 @@ public class Controler extends AbstractController implements ControlerI {
 	 * @deprecated Do not use this, as it may not contain values in every
 	 *             iteration
 	 */
+	@Override
 	@Deprecated
 	public final CalcLinkStats getLinkStats() {
 		return this.injector.getInstance(CalcLinkStats.class);
 	}
 
+	@Override
 	public final VolumesAnalyzer getVolumes() {
 		return this.injector.getInstance(VolumesAnalyzer.class);
 	}
 
+	@Override
 	public final ScoreStats getScoreStats() {
 		return this.injector.getInstance(ScoreStats.class);
 	}
 
-    public final TravelDisutilityFactory getTravelDisutilityFactory() {
+    @Override
+	public final TravelDisutilityFactory getTravelDisutilityFactory() {
 		return this.injector.getInstance(com.google.inject.Injector.class).getInstance(Key.get(new TypeLiteral<Map<String, TravelDisutilityFactory>>(){}))
 				.get(TransportMode.car);
 	}
 
-	public final javax.inject.Provider<TransitRouter> getTransitRouterFactory() {
-        return this.injector.getProvider(TransitRouter.class);
+	/**
+	 * @return Returns the {@link org.matsim.core.replanning.StrategyManager}
+	 *         used for the replanning of plans.
+	 * @deprecated -- try to use services.addPlanStrategyFactory or services.addPlanSelectoryFactory.
+	 * There are cases when this does not work, which is in particular necessary if you need to re-configure the StrategyManager
+	 * during the iterations, <i>and</i> you cannot do this before the iterations start.  In such cases, using this
+	 * method may be ok. kai/mzilske, aug'14
+	 */
+	@Override
+	@Deprecated // see javadoc above
+	public final StrategyManager getStrategyManager() {
+		return this.injector.getInstance(StrategyManager.class);
 	}
 
+	@Override
+	public OutputDirectoryHierarchy getControlerIO() {
+		return injector.getInstance(OutputDirectoryHierarchy.class);
+	}
 
+	@Override
+	public Integer getIterationNumber() {
+		return injector.getInstance(ReplanningContext.class).getIteration();
+	}
 	// ******** --------- *******
 	// The following methods are the outer interface of the Controler. They are used
 	// to set up infrastructure from the outside, before calling run().
-	// Some of them may also work from the StartupListeners, I haven't sorted that out yet.
-	// Contrast to the outermost interface, see below.
 	// ******** --------- *******
 
-	/**
-	 * It should be possible to add or remove MobsimListeners between iterations, no problem.
-	 */
-	public final List<MobsimListener> getMobsimListeners() {
-		return this.simulationListeners;
-	}
-
-	public final void removeControlerListener(final ControlerListener l) {
-		// Not sure if necessary or when this is allowed to be called.
-		this.controlerListenerManager.removeControlerListener(l);
+	@Override
+	public void addControlerListener(final ControlerListener controlerListener) {
+		addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				addControlerListenerBinding().toInstance(controlerListener);
+			}
+		});
 	}
 
 	public final void setScoringFunctionFactory(
@@ -552,52 +406,11 @@ public class Controler extends AbstractController implements ControlerI {
         this.overrides = AbstractModule.override(Arrays.asList(this.overrides), abstractModule);
     }
 
-
-	/**
-	 * @param dumpData
-	 *            <code>true</code> if at the end of a run, plans, network,
-	 *            config etc should be dumped to a file.
-	 */
-	public final void setDumpDataAtEnd(final boolean dumpData) {
-		this.getConfig().controler().setDumpDataAtEnd(dumpData);
-	}
-	
-	
-	// ******** --------- *******
-	// The following methods are the outermost interface of the Controler. They are used
-	// to register infrastructure provided by components, which may or may not be used
-	// then, depending on what is in the Config file.
-	// This is the point at which a component loader would operate - it would 
-	// create this thing, go through the components to see what they provide, and put them
-	// here.
-	// These methods in principle be factored out to a Controller or OuterController or
-	// something, which then creates and configures a Controler based on the config,
-	// using the methods above.
-	// ******** --------- *******
-
     public final void setModules(AbstractModule... modules) {
         if (this.injectorCreated) {
             throw new RuntimeException("Too late for configuring the Controler. This can only be done before calling run.");
         }
         this.modules = Arrays.asList(modules);
     }
-
-
-	// ******** --------- *******
-	// The following are methods which should not be used at all,
-	// or where I am not sure when it is allowed to call them.
-	// ******** --------- *******
-	/**
-	 * @return Returns the {@link org.matsim.core.replanning.StrategyManager}
-	 *         used for the replanning of plans.
-	 * @deprecated -- try to use controler.addPlanStrategyFactory or controler.addPlanSelectoryFactory.
-	 * There are cases when this does not work, which is in particular necessary if you need to re-configure the StrategyManager
-	 * during the iterations, <i>and</i> you cannot do this before the iterations start.  In such cases, using this
-	 * method may be ok. kai/mzilske, aug'14
-	 */
-	@Deprecated // see javadoc above
-	public final StrategyManager getStrategyManager() {
-		return this.injector.getInstance(StrategyManager.class);
-	}
 
 }

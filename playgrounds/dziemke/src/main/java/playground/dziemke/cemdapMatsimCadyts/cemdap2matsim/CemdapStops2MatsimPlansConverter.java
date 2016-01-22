@@ -80,7 +80,7 @@ public class CemdapStops2MatsimPlansConverter {
 		}
 		
 		// read in network
-		new NetworkReaderMatsimV1(scenario).parse(networkFile);
+		new NetworkReaderMatsimV1(scenario.getNetwork()).parse(networkFile);
 		
 		// write all (geographic) features of planning area to a map
 		Map<String,SimpleFeature> combinedFeatures = new HashMap<String, SimpleFeature>();

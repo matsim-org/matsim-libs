@@ -3,6 +3,7 @@ package matsimConnector.engine;
 import java.util.HashMap;
 import java.util.Map;
 
+import matsimConnector.events.CAEngineStepPerformedEvent;
 import matsimConnector.scenario.CAEnvironment;
 import matsimConnector.scenario.CAScenario;
 import matsimConnector.utility.Constants;
@@ -55,10 +56,15 @@ public class CAEngine implements MobsimEngine{
 	@Override
 	public void doSimStep(double time) {
 		double stepDuration = Constants.CA_STEP_DURATION;
-//		Log.log("------> BEGINNING STEPS AT "+time);
-		for (; this.simCATime < time; this.simCATime+=stepDuration) 
-			for (SimulationEngine engine : this.enginesCA.values()) 
+		//Log.log("------> BEGINNING STEPS AT "+time);
+		for (; this.simCATime < time; this.simCATime+=stepDuration) {
+			for (SimulationEngine engine : this.enginesCA.values()) {
+				double currentTime = System.currentTimeMillis();
 				engine.doSimStep(this.simCATime);		
+				double afterTime = System.currentTimeMillis();
+				qSim.getEventsManager().processEvent(new CAEngineStepPerformedEvent(this.simCATime, (float)(afterTime-currentTime), engine.getAgentGenerator().getContext().getPopulation().size()));
+			}
+		}
 	}
 
 	@Override

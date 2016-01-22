@@ -116,7 +116,6 @@ public class NetworkRoutingModuleTest {
 		{
 			double monetaryDistanceRateCar = -1.;
 			f.s.getConfig().planCalcScore().getModes().get(TransportMode.car).setMonetaryDistanceRate(monetaryDistanceRateCar);
-			// yyyyyy the above should be positive
 
 			TravelDisutility costObject = new RandomizingTimeDistanceTravelDisutility.Builder( TransportMode.car ).createTravelDisutility(timeObject, f.s.getConfig().planCalcScore());
 

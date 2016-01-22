@@ -185,7 +185,7 @@ public class SubPopMunichControler {
 						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
 						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		controler.getConfig().controler().setCreateGraphs(true);
-		controler.setDumpDataAtEnd(true);
+		controler.getConfig().controler().setDumpDataAtEnd(true);
 		controler.addControlerListener(new WelfareAnalysisControlerListener((MutableScenario) controler.getScenario()));
 
 		if(internalizeEmission==false && internalizeBoth ==false){

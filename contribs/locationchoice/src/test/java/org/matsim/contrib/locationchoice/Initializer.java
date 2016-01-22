@@ -22,6 +22,7 @@ package org.matsim.contrib.locationchoice;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -47,7 +48,7 @@ public class Initializer {
 		this.controler.run();
 	}
 
-	public Controler getControler() {
+	public MatsimServices getControler() {
 		return controler;
 	}
 

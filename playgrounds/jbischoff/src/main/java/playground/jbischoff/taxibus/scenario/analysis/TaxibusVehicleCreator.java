@@ -35,12 +35,6 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.geotools.MGC;
-
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.Point;
-
-import playground.jbischoff.taxi.berlin.demand.TaxiDemandWriter;
 
 /**
  * @author  jbischoff
@@ -51,7 +45,7 @@ public class TaxibusVehicleCreator
 
 
 	private String networkFile = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/network/versions/network_nopt.xml";
-	private String vehiclesFilePrefix = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/input/taxibus_vehicles_";
+	private String vehiclesFilePrefix = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/input/taxibus_vehicles_woblines";
 	
 	private Scenario scenario ;
 	private int ii = 0;
@@ -61,10 +55,19 @@ public class TaxibusVehicleCreator
 	
 	public static void main(String[] args) {
 		TaxibusVehicleCreator tvc = new TaxibusVehicleCreator();
-		tvc.run(10, Id.createLinkId("vw131"));
-		tvc.run(10, Id.createLinkId("53690"));
+		int i = 50;
+		tvc.run(i, Id.createLinkId("vw222"));
+		tvc.run(i, Id.createLinkId("vw12"));
+		tvc.run(i, Id.createLinkId("vw14"));
+		tvc.run(i, Id.createLinkId("64653"));
+		tvc.run(i, Id.createLinkId("40590"));
+		tvc.run(i, Id.createLinkId("6422"));
+		tvc.run(i, Id.createLinkId("41185"));
+		tvc.run(i, Id.createLinkId("41181"));
+		
+		
 
-		new VehicleWriter(tvc.vehicles).write(tvc.vehiclesFilePrefix+"l10.xml.gz");
+		new VehicleWriter(tvc.vehicles).write(tvc.vehiclesFilePrefix+i+".xml.gz");
 
 //		for (int i = 10; i<150 ; i=i+10 ){
 //			System.out.println(i);
@@ -75,7 +78,7 @@ public class TaxibusVehicleCreator
 	public TaxibusVehicleCreator() {
 				
 		this.scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenario).readFile(networkFile);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
 	}
 	private void run(int amount) {
 	    

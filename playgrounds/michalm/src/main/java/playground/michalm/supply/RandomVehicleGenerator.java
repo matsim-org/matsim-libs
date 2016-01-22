@@ -36,7 +36,7 @@ public class RandomVehicleGenerator
     public static void generateVehicles(String networkFile, String vehiclesFile, int count, int t1)
     {
         Scenario scenario = ScenarioUtils.createScenario(VrpConfigUtils.createConfig());
-        MatsimNetworkReader nr = new MatsimNetworkReader(scenario);
+        MatsimNetworkReader nr = new MatsimNetworkReader(scenario.getNetwork());
         nr.readFile(networkFile);
 
         Collection<? extends Link> linkCollection = scenario.getNetwork().getLinks().values();

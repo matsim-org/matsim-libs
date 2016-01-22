@@ -107,7 +107,7 @@ public class CreateLegHistogramForSubpopulation {
 		if ( f == null ) return null;
 
 		final Scenario sc = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
-		new MatsimNetworkReader( sc ).readFile( f );
+		new MatsimNetworkReader(sc.getNetwork()).readFile( f );
 		return sc.getNetwork();
 	}
 

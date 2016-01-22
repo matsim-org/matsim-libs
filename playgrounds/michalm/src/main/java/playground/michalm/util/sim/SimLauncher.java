@@ -47,10 +47,8 @@ public class SimLauncher
         }
 
         Controler controler = new Controler(new String[] { dir + cfgFile });
-        controler.getConfig().controler()
-                .setOverwriteFileSetting(true
-                        ? OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles
-                        : OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists);
+        controler.getConfig().controler().setOverwriteFileSetting(//OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles
+                OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists);
         controler.run();
     }
 }

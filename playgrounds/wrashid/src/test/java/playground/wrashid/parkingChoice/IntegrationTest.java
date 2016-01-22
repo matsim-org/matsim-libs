@@ -41,7 +41,7 @@ public class IntegrationTest  extends TestCase {
 			
 			@Override
 			public void notifyAfterMobsim(AfterMobsimEvent event) {
-                for (Person p: event.getControler().getScenario().getPopulation().getPersons().values()){
+                for (Person p: event.getServices().getScenario().getPopulation().getPersons().values()){
 					Plan plan=p.getSelectedPlan();
 					if (isPlanCarTripFree(plan)){
 						if (parkingModule.getParkingManager().getNumberOfParkedVehicles()>0){

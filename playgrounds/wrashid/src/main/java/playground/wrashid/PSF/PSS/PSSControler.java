@@ -182,7 +182,7 @@ public class PSSControler {
 			// event file is null and this causes some probelems in my handlers...
 			//
 			// (I think that the above is a statement by Rashid from 2011. kai, sep'2015)
-			controler = new EventReadControler(configFilePath,tempStringValue);
+			controler = new EventReadControler(configFilePath,tempStringValue).getControler();
 		} else {
 			controler = new Controler(configFilePath);
 		}

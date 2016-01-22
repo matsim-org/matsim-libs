@@ -130,7 +130,7 @@ public class InitRoutes {
 		MatsimRandom.reset(config.global().getRandomSeed());
 		final Scenario scenario = ScenarioUtils.createScenario(config);
 
-		new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(config.network().getInputFile());
 		Network network = scenario.getNetwork();
 
 		final PopulationImpl plans = (PopulationImpl) scenario.getPopulation();

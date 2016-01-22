@@ -44,8 +44,8 @@ public class IKControlerListener implements StartupListener {
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		
-//		EventsManager eventsManager = event.getControler().getEvents();
-//		event.getControler().getEvents().addHandler(new MarginalCongestionHandlerV1(eventsManager, scenario));		
+//		EventsManager eventsManager = event.getServices().getEvents();
+//		event.getServices().getEvents().addHandler(new MarginalCongestionHandlerV1(eventsManager, scenario));
 	}
 
 }

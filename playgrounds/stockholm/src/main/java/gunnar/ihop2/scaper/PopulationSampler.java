@@ -1,16 +1,12 @@
 package gunnar.ihop2.scaper;
 
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Locale;
 import java.util.zip.GZIPInputStream;
-
-import javax.swing.JOptionPane;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.ConfigUtils;
@@ -56,7 +52,7 @@ public final class PopulationSampler{
 						new BufferedInputStream(new UnicodeInputStream(fis))
 				) {
 				try {
-					new MatsimNetworkReader(sc).parse(is);
+					new MatsimNetworkReader(sc.getNetwork()).parse(is);
 				}finally {
 					;
 				} 

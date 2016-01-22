@@ -65,7 +65,7 @@ public class ControlerPTW {
 						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		controler.addControlerListener(new LegHistogramListener(controler.getEvents(), true, controler.getScenario().getPopulation()));
         controler.addControlerListener(new ScoreStats(controler.getScenario().getPopulation(), ScoreStatsControlerListener.FILENAME_SCORESTATS, true));
-		//controler.addControlerListener(new CalibrationStatsListener(controler.getEvents(), new String[]{args[1], args[2]}, 1, "Travel Survey (Benchmark)", "Red_Scheme", new HashSet<Id<Person>>()));
+		//services.addControlerListener(new CalibrationStatsListener(services.getEvents(), new String[]{args[1], args[2]}, 1, "Travel Survey (Benchmark)", "Red_Scheme", new HashSet<Id<Person>>()));
 		controler.setScoringFunctionFactory(new CharyparNagelOpenTimesScoringFunctionFactory(controler.getConfig().planCalcScore(), controler.getScenario()));
         AbstractModule myStrategyManagerModule = new AbstractModule() {
 

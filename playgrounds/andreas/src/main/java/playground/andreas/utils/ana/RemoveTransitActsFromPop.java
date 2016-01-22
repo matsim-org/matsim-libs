@@ -49,7 +49,7 @@ public class RemoveTransitActsFromPop{
 		TransitActsRemover remover = new TransitActsRemover();
 		
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(sc).readFile(networkFile);
+		new MatsimNetworkReader(sc.getNetwork()).readFile(networkFile);
 		new MatsimPopulationReader(sc).readFile(popFile);
 		
 		for (Person person : sc.getPopulation().getPersons().values()) {

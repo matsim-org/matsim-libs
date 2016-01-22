@@ -19,14 +19,16 @@
 
 package playground.johannes.studies.matrix2014.analysis.run;
 
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
-import org.matsim.contrib.common.gis.CartesianDistanceCalculator;
+import org.matsim.contrib.common.stats.LinearDiscretizer;
+import playground.johannes.studies.matrix2014.analysis.MatrixDistanceCompare;
+import playground.johannes.studies.matrix2014.analysis.MatrixMarginalsCompare;
 import playground.johannes.studies.matrix2014.analysis.MatrixVolumeCompare;
 import playground.johannes.studies.matrix2014.matrix.ODPredicate;
 import playground.johannes.studies.matrix2014.matrix.VolumePredicate;
-import playground.johannes.studies.matrix2014.matrix.ZoneDistancePredicate;
-import playground.johannes.synpop.analysis.FileIOContext;
-import playground.johannes.synpop.analysis.StatsContainer;
+import playground.johannes.synpop.analysis.*;
 import playground.johannes.synpop.gis.ZoneCollection;
 import playground.johannes.synpop.gis.ZoneGeoJsonIO;
 import playground.johannes.synpop.matrix.MatrixOperations;
@@ -34,7 +36,6 @@ import playground.johannes.synpop.matrix.NumericMatrix;
 import playground.johannes.synpop.matrix.NumericMatrixIO;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
 /**
  * @author johannes
@@ -44,7 +45,7 @@ public class MatrixCompare {
     private static final Logger logger = Logger.getLogger(MatrixCompare.class);
 
     public static void main(String args[]) throws IOException {
-        String simFile = "/home/johannes/sge/prj/matrix2014/runs/1016/output/8E9/matrix.txt.gz";
+        String simFile = "/home/johannes/gsv/matrix2014/sim/output/1E8/matrix.txt.gz";
         String refFile = "/home/johannes/gsv/matrix2014/sim/data/matrices/itp.de.txt";
         String outDir = "/home/johannes/gsv/matrix2014/matrix-compare/";
         double volumeThreshold = 1;
@@ -54,24 +55,24 @@ public class MatrixCompare {
 
         FileIOContext ioContext = new FileIOContext(outDir);
 
-        ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON("/home/johannes/gsv/gis/zones/geojson/tomtom.de.gk3.geojson", "NO");
-        ODPredicate<String, Double> odPredicate = new ZoneDistancePredicate(zones, 100000,
-                CartesianDistanceCalculator.getInstance());
+//        ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON("/home/johannes/gsv/gis/zones/geojson/tomtom.de.gk3.geojson", "NO");
+        ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON("/home/johannes/gsv/gis/zones/geojson/nuts3.psm.airports.gk3.geojson", "NO");
+        ODPredicate<String, Double> odPredicate = null;//new ZoneDistancePredicate(zones, 100000,
+//                CartesianDistanceCalculator.getInstance());
 
+        NumericMatrix tmpSimMatrix = simMatrix;
         if (odPredicate != null) {
-            NumericMatrix tmpMatrix = new NumericMatrix();
-            MatrixOperations.subMatrix(odPredicate, simMatrix, tmpMatrix);
-            simMatrix = tmpMatrix;
+            tmpSimMatrix = (NumericMatrix) MatrixOperations.subMatrix(odPredicate, simMatrix, new NumericMatrix());
         }
 
-        double simTotal = MatrixOperations.sum(simMatrix);
+        double simTotal = MatrixOperations.sum(tmpSimMatrix);
 
-//        NumericMatrix tmpRefMatrix = refMatrix;
+        NumericMatrix tmpRefMatrix = refMatrix;
         if (odPredicate != null) {
-            refMatrix = (NumericMatrix) MatrixOperations.subMatrix(odPredicate, refMatrix, new NumericMatrix());
+            tmpRefMatrix = (NumericMatrix) MatrixOperations.subMatrix(odPredicate, refMatrix, new NumericMatrix());
         }
 
-        double refTotal = MatrixOperations.sum(refMatrix);
+        double refTotal = MatrixOperations.sum(tmpRefMatrix);
 
         if(volumeThreshold > 0) {
             ODPredicate volPredicate = new VolumePredicate(volumeThreshold);
@@ -81,10 +82,25 @@ public class MatrixCompare {
         logger.debug(String.format("Normalization factor: %s.", simTotal/refTotal));
         MatrixOperations.applyFactor(refMatrix, simTotal / refTotal);
 
-        MatrixVolumeCompare task = new MatrixVolumeCompare("matrix");
-        task.setReferenceMatrix(refMatrix);
-        task.setIoContext(ioContext);
+        AnalyzerTaskComposite<Pair<NumericMatrix, NumericMatrix>> composite = new AnalyzerTaskComposite<>();
 
-        task.analyze(simMatrix, new ArrayList<StatsContainer>());
+        HistogramWriter writer = new HistogramWriter(ioContext, new PassThroughDiscretizerBuilder(new
+                LinearDiscretizer(0.05), "linear"));
+
+        MatrixVolumeCompare volTask = new MatrixVolumeCompare("matrix.vol");
+        volTask.setIoContext(ioContext);
+        volTask.setHistogramWriter(writer);
+
+        MatrixDistanceCompare distTask = new MatrixDistanceCompare("matrix.dist", zones);
+        distTask.setFileIoContext(ioContext);
+
+        MatrixMarginalsCompare marTask = new MatrixMarginalsCompare("matrix");
+        marTask.setHistogramWriter(writer);
+
+        composite.addComponent(volTask);
+        composite.addComponent(distTask);
+        composite.addComponent(marTask);
+
+        AnalyzerTaskRunner.run(new ImmutablePair<>(refMatrix, simMatrix), composite, ioContext);
     }
 }

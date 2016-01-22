@@ -111,7 +111,7 @@ public class TestingPricing4SamplePopulation {
 							OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
 							OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 			controler.getConfig().controler().setCreateGraphs(true);
-            controler.setDumpDataAtEnd(false);
+			controler.getConfig().controler().setDumpDataAtEnd(false);
 
 //			controler.addControlerListener(new EmissionControlerListner());
 			Scenario scenario = ScenarioUtils.loadScenario(config);

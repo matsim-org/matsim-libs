@@ -25,7 +25,7 @@ public class CSRentalTimesFromEvents {
     
     public void run(String s, String s1){
     	MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		MatsimNetworkReader networkReader = new MatsimNetworkReader(sc);
+		MatsimNetworkReader networkReader = new MatsimNetworkReader(sc.getNetwork());
 		networkReader.readFile(s1);
     	CSEventsHandler rentalTimes = new CSEventsHandler(sc.getNetwork());
     	

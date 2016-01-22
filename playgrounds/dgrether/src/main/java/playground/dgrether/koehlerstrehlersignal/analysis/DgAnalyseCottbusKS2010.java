@@ -480,7 +480,7 @@ public class DgAnalyseCottbusKS2010 {
 
 		String signalsBBNet = DgPaths.REPOS + "shared-svn/projects/cottbus/data/optimization/cb2ks2010/2013-07-31_minflow_10_evening_peak/network_small.xml.gz";
 		Scenario scSignalsBoundingBox = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		MatsimNetworkReader netReader = new MatsimNetworkReader(scSignalsBoundingBox);
+		MatsimNetworkReader netReader = new MatsimNetworkReader(scSignalsBoundingBox.getNetwork());
 		netReader.readFile(signalsBBNet);
 
 		String signalSystemsFile = DgPaths.REPOS + "shared-svn/projects/cottbus/data/scenarios/cottbus_scenario/signal_systems_no_13.xml";
@@ -503,7 +503,7 @@ public class DgAnalyseCottbusKS2010 {
 		
 		String cityNetwork = DgPaths.REPOS  + "shared-svn/projects/cottbus/data/scenarios/cottbus_scenario/cottbus_city_network/network_city_wgs84_utm33n.xml.gz";
 		Scenario sc2 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		MatsimNetworkReader netReader2= new MatsimNetworkReader(sc2);
+		MatsimNetworkReader netReader2= new MatsimNetworkReader(sc2.getNetwork());
 		netReader2.readFile(cityNetwork);
 		e = new Extent();
 		e.name = "city";

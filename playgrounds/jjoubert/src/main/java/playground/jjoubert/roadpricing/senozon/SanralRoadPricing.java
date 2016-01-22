@@ -25,8 +25,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
-import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -56,7 +55,7 @@ public class SanralRoadPricing implements StartupListener, AfterMobsimListener, 
 
 	@Override
 	public void notifyStartup(final StartupEvent event) {
-		final Controler controler = event.getControler();
+		final MatsimServices controler = event.getServices();
 		// read the road pricing scheme from file
 		this.scheme = new RoadPricingSchemeImpl();
 		RoadPricingReaderXMLv1 rpReader = new RoadPricingReaderXMLv1(this.scheme);
@@ -94,12 +93,13 @@ public class SanralRoadPricing implements StartupListener, AfterMobsimListener, 
 				}
 
 			};
-			controler.addOverridingModule(new AbstractModule() {
-				@Override
-				public void install() {
-					bindCarTravelDisutilityFactory().toInstance(travelCostCalculatorFactory);
-				}
-			});
+			throw new RuntimeException();
+//			services.addOverridingModule(new AbstractModule() {
+//				@Override
+//				public void install() {
+//					bindCarTravelDisutilityFactory().toInstance(travelCostCalculatorFactory);
+//				}
+//			});
 		}
 
         this.cattl = new CalcAverageTolledTripLength(controler.getScenario().getNetwork(), this.scheme);
@@ -111,7 +111,7 @@ public class SanralRoadPricing implements StartupListener, AfterMobsimListener, 
 		// evaluate the final tolls paid by the agents and add them to their scores
 		this.tollCalc.sendUtilityEvents(
 				Time.MIDNIGHT, 
-				event.getControler().getEvents()
+				event.getServices().getEvents()
 				);
 	}
 

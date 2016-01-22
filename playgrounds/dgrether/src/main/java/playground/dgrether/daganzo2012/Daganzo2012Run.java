@@ -22,6 +22,7 @@ package playground.dgrether.daganzo2012;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -83,7 +84,7 @@ public class Daganzo2012Run {
 		controler.run();
 	}
 
-	private void addControlerListener(Controler c) {
+	private void addControlerListener(MatsimServices c) {
 		handler3 = new TTInOutflowEventHandler(Id.create("3", Link.class), Id.create("5", Link.class));
 		handler4 = new TTInOutflowEventHandler(Id.create("4", Link.class));
 		greenSplitHandler = new DgSignalGreenSplitHandler();
@@ -92,9 +93,9 @@ public class Daganzo2012Run {
 		c.addControlerListener(new StartupListener() {
 			@Override
 			public void notifyStartup(StartupEvent e) {
-				e.getControler().getEvents().addHandler(handler3);
-				e.getControler().getEvents().addHandler(handler4);
-				outfile = e.getControler().getControlerIO().getOutputFilename("stats.txt");
+				e.getServices().getEvents().addHandler(handler3);
+				e.getServices().getEvents().addHandler(handler4);
+				outfile = e.getServices().getControlerIO().getOutputFilename("stats.txt");
 				writer = IOUtils.getBufferedWriter(outfile);
 				String header = "Iteration \t  number_veh_link_4  \t number_veh_link_3_5";
 				try {
@@ -106,8 +107,8 @@ public class Daganzo2012Run {
 				
 				
 				//green splits
-				e.getControler().getEvents().addHandler(greenSplitHandler);
-				outfile = e.getControler().getControlerIO().getOutputFilename("splits.txt");
+				e.getServices().getEvents().addHandler(greenSplitHandler);
+				outfile = e.getServices().getControlerIO().getOutputFilename("splits.txt");
 				splitWriter = IOUtils.getBufferedWriter(outfile);
 				String splitHeader = DgGreenSplitWriter.createHeader();
 				splitHeader = "Iteration \t" + splitHeader;

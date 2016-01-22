@@ -21,7 +21,7 @@
 package playground.wrashid.parkingSearch.withindayFW.controllers;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.ReplanningEvent;
 import org.matsim.core.controler.listener.ReplanningListener;
 import org.matsim.core.gbl.Gbl;
@@ -60,7 +60,7 @@ public abstract class WithinDayParkingController extends WithinDayController imp
 		super(args);
 
 		// register this as a Controller Listener
-		super.addControlerListener(this);
+		controler.addControlerListener(this);
 		
 		throw new RuntimeException(Gbl.SET_UP_IS_NOW_FINAL ) ;
 	}
@@ -203,7 +203,7 @@ public abstract class WithinDayParkingController extends WithinDayController imp
 		
 	}
 
-	private HashMap<String, HashSet<Id>> initParkingTypes(Controler controler) {
+	private HashMap<String, HashSet<Id>> initParkingTypes(MatsimServices controler) {
 		HashMap<String, HashSet<Id>> parkingTypes = new HashMap<String, HashSet<Id>>();
 
 		HashSet<Id> streetParking=new HashSet<Id>();
@@ -237,7 +237,7 @@ public abstract class WithinDayParkingController extends WithinDayController imp
 		//	legModeChecker.run(person.getSelectedPlan());
 		//}
 		
-		ParallelPersonAlgorithmRunner.run(this.getScenario().getPopulation(), numReplanningThreads, legModeChecker);
+		ParallelPersonAlgorithmRunner.run(controler.getScenario().getPopulation(), numReplanningThreads, legModeChecker);
 	}
 
 	/*

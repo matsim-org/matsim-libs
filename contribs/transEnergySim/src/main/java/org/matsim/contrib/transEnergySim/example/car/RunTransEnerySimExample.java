@@ -60,10 +60,6 @@ public class RunTransEnerySimExample {
 	
 	
 	public void run(){
-		c.getConfig().controler().setOverwriteFileSetting(
-				true ?
-						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		c.run();
 		c.writeStatisticsToFile(ESTATS);
 		

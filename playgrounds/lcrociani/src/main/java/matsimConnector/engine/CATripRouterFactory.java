@@ -1,76 +1,46 @@
 package matsimConnector.engine;
 
-import java.util.ArrayList;
+import java.util.Map;
+
+import javax.inject.Inject;
+import javax.inject.Provider;
 
 import matsimConnector.utility.Constants;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.ControlerConfigGroup;
-import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.router.DefaultRoutingModules;
-import org.matsim.core.router.old.NetworkLegRouter;
+import org.matsim.core.router.RoutingModule;
+import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.AStarLandmarksFactory;
-import org.matsim.core.router.util.DijkstraFactory;
-import org.matsim.core.router.util.FastAStarLandmarksFactory;
-import org.matsim.core.router.util.FastDijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
-import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
+import org.matsim.core.router.util.TravelTime;
 
-import pedCA.output.Log;
-
-import javax.inject.Provider;
-
-public class CATripRouterFactory implements Provider<TripRouter>{
+public class CATripRouterFactory implements  Provider<RoutingModule>{
 	private Scenario scenario;
-	private LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
+	private Map<String, TravelTime> travelTimes;
+	private Map<String, TravelDisutilityFactory> travelDisutilities;
 
-	public CATripRouterFactory(Scenario sc) {
-		this.scenario = sc;
-		initLeastCostPathCalculatorFactory();
+	@Inject
+	CATripRouterFactory(Scenario scenario, Map<String, TravelTime> travelTimes, Map<String, TravelDisutilityFactory> travelDisutilities) {
+		this.scenario = scenario;
+		this.travelTimes = travelTimes;
+		this.travelDisutilities = travelDisutilities;
 	}
 
 	@Override
-	public TripRouter instantiateAndConfigureTripRouter(RoutingContext routingContext) {
-		
-		LeastCostPathCalculator routeAlgo = leastCostPathCalculatorFactory
-				.createPathCalculator(scenario.getNetwork(),
-						routingContext.getTravelDisutility(),
-						routingContext.getTravelTime());
-
-		TripRouter tr = new TripRouter();
-
-		ArrayList <String> modes = new ArrayList<String>();
-		modes.add(Constants.CA_LINK_MODE);
-		modes.add(Constants.CAR_LINK_MODE);
-		modes.add(Constants.WALK_LINK_MODE);
-		
-		for (String mode : modes)
-			tr.setRoutingModule(
-					mode,
-					DefaultRoutingModules.createNetworkRouter(mode, scenario.getPopulation()
-							.getFactory(), scenario
-					.getNetwork(), routeAlgo));
-		return tr;
+	public RoutingModule get() {
+		return DefaultRoutingModules.createNetworkRouter(Constants.CAR_LINK_MODE, scenario.getPopulation()
+				.getFactory(), scenario.getNetwork(), createRoutingAlgo());
 	}
 
-	private void initLeastCostPathCalculatorFactory() {
-		Config config = scenario.getConfig();
-		if (config.controler().getRoutingAlgorithmType().equals(ControlerConfigGroup.RoutingAlgorithmType.Dijkstra)) {
-			Log.debug("CATripRouter: new DijkstraFactory()");
-			leastCostPathCalculatorFactory = new DijkstraFactory();
-		} else if (config.controler().getRoutingAlgorithmType().equals(ControlerConfigGroup.RoutingAlgorithmType.AStarLandmarks)){
-			Log.debug("CATripRouter: new AStarLandmarksFactory()");
-			leastCostPathCalculatorFactory = new AStarLandmarksFactory(scenario.getNetwork(), new FreespeedTravelTimeAndDisutility(config.planCalcScore()), config.global().getNumberOfThreads());
-		} else if (config.controler().getRoutingAlgorithmType().equals(ControlerConfigGroup.RoutingAlgorithmType.FastDijkstra)) {
-			Log.debug("CATripRouter: new FastDijkstraFactory()");
-			leastCostPathCalculatorFactory = new FastDijkstraFactory();
-		} else if (config.controler().getRoutingAlgorithmType().equals(ControlerConfigGroup.RoutingAlgorithmType.FastAStarLandmarks)) {
-			Log.debug("CATripRouter: new FastAStarLandmarksFactory()");
-			leastCostPathCalculatorFactory = new FastAStarLandmarksFactory(scenario.getNetwork(), new FreespeedTravelTimeAndDisutility(config.planCalcScore()));
-		} else {
-			throw new IllegalStateException("Enumeration Type RoutingAlgorithmType was extended without adaptation of Controler!");
-		}
+	private LeastCostPathCalculator createRoutingAlgo() {
+		return new AStarLandmarksFactory(
+				scenario.getNetwork(),
+				new FreespeedTravelTimeAndDisutility(scenario.getConfig().planCalcScore()),
+				scenario.getConfig().global().getNumberOfThreads()).createPathCalculator(scenario.getNetwork(),
+				travelDisutilities.get("car").createTravelDisutility(travelTimes.get("car"), scenario.getConfig().planCalcScore()),
+				travelTimes.get("car"));
 	}
 }

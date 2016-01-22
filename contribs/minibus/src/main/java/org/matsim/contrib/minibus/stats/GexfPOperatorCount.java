@@ -116,10 +116,10 @@ final class GexfPOperatorCount extends MatsimJaxbXmlWriter implements StartupLis
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		if (this.getWriteGexfStatsInterval > 0) {
-            this.addNetworkAsLayer(event.getControler().getScenario().getNetwork(), 0);
+            this.addNetworkAsLayer(event.getServices().getScenario().getNetwork(), 0);
 			this.createAttValues();
 			this.eventsHandler = new CountPOperatorHandler(this.pIdentifier);
-			event.getControler().getEvents().addHandler(this.eventsHandler);
+			event.getServices().getEvents().addHandler(this.eventsHandler);
 			this.linkId2OperatorIdsFromLastIteration = new HashMap<>();
 		}
 	}
@@ -129,7 +129,7 @@ final class GexfPOperatorCount extends MatsimJaxbXmlWriter implements StartupLis
 		if (this.getWriteGexfStatsInterval > 0) {
 			this.addValuesToGexf(event.getIteration(), this.eventsHandler);
 			if ((event.getIteration() % this.getWriteGexfStatsInterval == 0) ) {
-				this.write(event.getControler().getControlerIO().getIterationFilename(event.getIteration(), GexfPOperatorCount.FILENAME));
+				this.write(event.getServices().getControlerIO().getIterationFilename(event.getIteration(), GexfPOperatorCount.FILENAME));
 			}			
 		}		
 	}
@@ -137,7 +137,7 @@ final class GexfPOperatorCount extends MatsimJaxbXmlWriter implements StartupLis
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {
 		if (this.getWriteGexfStatsInterval > 0) {
-			this.write(event.getControler().getControlerIO().getOutputFilename(GexfPOperatorCount.FILENAME));
+			this.write(event.getServices().getControlerIO().getOutputFilename(GexfPOperatorCount.FILENAME));
 		}		
 	}
 

@@ -263,7 +263,7 @@ class MultiRateRunResource {
                         config.qsim().setFlowCapFactor(flowCapacityFactor * sensedSampleSize);
                         config.qsim().setStorageCapFactor(storageCapacityFactor * sensedSampleSize);
                     }
-                    final String filename = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "config.xml.gz");
+                    final String filename = event.getServices().getControlerIO().getIterationFilename(event.getIteration(), "config.xml.gz");
                     new ConfigWriter(config).write(filename);
                 }
             });

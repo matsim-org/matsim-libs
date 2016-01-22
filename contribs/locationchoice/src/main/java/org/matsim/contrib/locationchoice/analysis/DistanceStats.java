@@ -56,7 +56,7 @@ public class DistanceStats implements IterationEndsListener {
 	public void notifyIterationEnds(final IterationEndsEvent event) {	
 		this.bins.clear();
 
-        for (Person p : event.getControler().getScenario().getPopulation().getPersons().values()) {
+        for (Person p : event.getServices().getScenario().getPopulation().getPersons().values()) {
 			
 			// continue if person is in the analysis population or if the id is not numeric
 			if (this.dccg.getIdExclusion() == null || !this.isLong(p.getId().toString()) ||
@@ -90,7 +90,7 @@ public class DistanceStats implements IterationEndsListener {
 		}
 		
 		// Actually, path is not the full file name - inside the plotBinnedDistribution some other stuff is added. 
-		String path = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "plan=" + this.bestOrSelected + "_");
+		String path = event.getServices().getControlerIO().getIterationFilename(event.getIteration(), "plan=" + this.bestOrSelected + "_");
 		this.bins.plotBinnedDistribution(path, "#", "m");
 	}
 	

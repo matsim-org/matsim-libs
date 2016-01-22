@@ -59,6 +59,7 @@ public class ConflictSolver {
 		ArrayList<Agent> pedsList = new ArrayList<Agent>();
 //		Lista che user� per riempire la lista di 
 		ArrayList<GridPoint> nextPosList = new ArrayList<GridPoint>();
+		//---HashSet<GridPoint> nextPosList = new HashSet<GridPoint>();
 		
 		ArrayList<Agent> listaCompletaPedoni = new ArrayList<Agent>();
 //		HashSet per ottenere le destinazioni UNIVOCHE dei pedoni
@@ -79,7 +80,7 @@ public class ConflictSolver {
 			if(oldSize == uniqueGP.size()){
 				pedsList.add(p);
 				if(!nextPosList.contains(agentNewPosition)){
-					nextPosList.add(agentNewPosition);
+				nextPosList.add(agentNewPosition);
 				}
 			}
 			else{
@@ -116,12 +117,13 @@ public class ConflictSolver {
         	}	
         }
 		
+		/* THE COURSED TEST 
 		for(int i = 0; i < listaCompletaPedoni.size(); i++){
 			for(int j = i+1; j < listaCompletaPedoni.size(); j++)
 				if(getNewAgentPosition(listaCompletaPedoni.get(i)).equals(getNewAgentPosition(listaCompletaPedoni.get(j)))){
 					Log.error("Error in Conflict Solving!!");
 			}
-		}
+		}*/
 	}
 
 	public GridPoint getNewAgentPosition(Agent p) {

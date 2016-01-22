@@ -69,7 +69,7 @@ public class NetworkAndMore2ESRI extends Links2ESRIShape{
 
 		log.info("loading network from " + netfile);
 		final Network network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario).readFile(netfile);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(netfile);
 		log.info("done.");
 
 		FeatureGeneratorBuilderImpl builder = new FeatureGeneratorBuilderImpl(network, "DHDN_GK4");

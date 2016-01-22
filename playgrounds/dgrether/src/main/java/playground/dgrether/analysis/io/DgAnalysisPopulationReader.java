@@ -67,7 +67,7 @@ public class DgAnalysisPopulationReader {
 		}
 		else {
 			sc.getConfig().network().setInputFile(networkPath);
-			new MatsimNetworkReader(sc).readFile(sc.getConfig().network().getInputFile());
+			new MatsimNetworkReader(sc.getNetwork()).readFile(sc.getConfig().network().getInputFile());
 			net = sc.getNetwork();
 			this.loadedNetworks.put(networkPath, net);
 		}

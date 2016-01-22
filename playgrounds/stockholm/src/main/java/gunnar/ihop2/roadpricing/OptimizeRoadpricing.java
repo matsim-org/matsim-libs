@@ -45,6 +45,8 @@ class OptimizeRoadpricing {
 		final Config config = ConfigUtils.loadConfig(configFileName,
 				new RoadPricingConfigGroup());
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
+		final String originalOutputDirectory = scenario.getConfig().controler()
+				.getOutputDirectory(); // gets otherwise overwritten in config
 
 		final RoadPricingConfigGroup roadPricingConfigGroup = ConfigUtils
 				.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME,
@@ -59,15 +61,15 @@ class OptimizeRoadpricing {
 		 * Create initial toll levels and their randomization.
 		 */
 		// NO TOLL
-		// final TollLevels initialTollLevels = new TollLevels(6 * 3600 + 1800,
-		// 7 * 3600, 7 * 3600 + 1800, 8 * 3600 + 1800, 9 * 3600,
-		// 15 * 3600 + 1800, 16 * 3600, 17 * 3600 + 1800, 18 * 3600,
-		// 18 * 3600 + 1800, 0.0, 0.0, 0.0, scenario);
-		// THE ORIGINAL
 		final TollLevels initialTollLevels = new TollLevels(6 * 3600 + 1800,
 				7 * 3600, 7 * 3600 + 1800, 8 * 3600 + 1800, 9 * 3600,
 				15 * 3600 + 1800, 16 * 3600, 17 * 3600 + 1800, 18 * 3600,
-				18 * 3600 + 1800, 10.0, 15.0, 20.0, scenario);
+				18 * 3600 + 1800, 0.0, 0.0, 0.0, scenario);
+		// THE ORIGINAL
+		// final TollLevels initialTollLevels = new TollLevels(6 * 3600 + 1800,
+		// 7 * 3600, 7 * 3600 + 1800, 8 * 3600 + 1800, 9 * 3600,
+		// 15 * 3600 + 1800, 16 * 3600, 17 * 3600 + 1800, 18 * 3600,
+		// 18 * 3600 + 1800, 10.0, 15.0, 20.0, scenario);
 		// OPTIMIZED
 		// final TollLevels initialTollLevels = new TollLevels(25200.0, 25200.0,
 		// 28800.0, 30600.0, 32400.0, 55800.0, 59400.0, 59400.0, 61200.0,
@@ -85,7 +87,7 @@ class OptimizeRoadpricing {
 		 * Problem specification.
 		 */
 		final TimeDiscretization timeDiscretization = new TimeDiscretization(0,
-				3600, 24);
+				1800, 48);
 		final Set<Id<Link>> relevantLinkIds = (new DistanceBasedFilter(674000,
 				6581000, 6000)).allAcceptedLinkIds(scenario.getNetwork()
 				.getLinks().values());
@@ -94,7 +96,7 @@ class OptimizeRoadpricing {
 						+ scenario.getNetwork().getLinks().size() + " links.");
 		final ObjectiveFunction objectiveFunction = new TotalScoreObjectiveFunction();
 		final ConvergenceCriterion convergenceCriterion = new FixedIterationNumberConvergenceCriterion(
-				1000, 1);
+				100, 10);
 		final MATSimSimulator<TollLevels> matsimSimulator = new MATSimSimulator<>(
 				new MATSimStateFactoryImpl<TollLevels>(), scenario,
 				timeDiscretization, relevantLinkIds, roadpricingModule);
@@ -102,21 +104,18 @@ class OptimizeRoadpricing {
 		/*
 		 * RandomSearch specification.
 		 */
-		final int maxMemorizedTrajectoryLength = 1;
-		final boolean keepBestSolution = true;
+		final int maxMemorizedTrajectoryLength = 100;
 		final boolean interpolate = true;
-		final int maxRandomSearchIterations = 1;
+		final int maxRandomSearchIterations = 1000;
 		final int maxRandomSearchTransitions = Integer.MAX_VALUE;
-		final int randomSearchPopulationSize = 1;
+		final int randomSearchPopulationSize = 14;
 		final RandomSearch<TollLevels> randomSearch = new RandomSearch<>(
-				matsimSimulator, decisionVariableRandomizer,
+				matsimSimulator, decisionVariableRandomizer, initialTollLevels,
 				convergenceCriterion, maxRandomSearchIterations,
 				maxRandomSearchTransitions, randomSearchPopulationSize,
-				MatsimRandom.getRandom(), interpolate, keepBestSolution,
-				objectiveFunction, maxMemorizedTrajectoryLength);
-		randomSearch.setLogFileName(scenario.getConfig().controler()
-				.getOutputDirectory()
-				+ "optimization.log");
+				MatsimRandom.getRandom(), interpolate, objectiveFunction,
+				maxMemorizedTrajectoryLength);
+		randomSearch.setLogFileName(originalOutputDirectory + "opdyts.log");
 
 		/*
 		 * Run it.

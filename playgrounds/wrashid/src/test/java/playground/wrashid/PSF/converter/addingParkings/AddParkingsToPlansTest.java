@@ -36,7 +36,7 @@ public class AddParkingsToPlansTest extends MatsimTestCase {
 		String networkFile = "test/scenarios/berlin/network.xml.gz";
 		
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(super.loadConfig(null));
-		new MatsimNetworkReader(scenario).readFile(networkFile);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
 		new MatsimPopulationReader(scenario).readFile(basePathOfTestData + "plans5.xml");
 		
 		// generate parking facilities

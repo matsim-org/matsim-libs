@@ -19,18 +19,6 @@ import org.matsim.core.controler.listener.StartupListener;
 import com.google.inject.Inject;
 
 import floetteroed.opdyts.DecisionVariable;
-import floetteroed.opdyts.logging.EquilibriumGap;
-import floetteroed.opdyts.logging.EquilibriumGapWeight;
-import floetteroed.opdyts.logging.FreeMemory;
-import floetteroed.opdyts.logging.LastDecisionVariable;
-import floetteroed.opdyts.logging.LastEquilibriumGap;
-import floetteroed.opdyts.logging.LastObjectiveFunctionValue;
-import floetteroed.opdyts.logging.MaxMemory;
-import floetteroed.opdyts.logging.SurrogateObjectiveFunctionValue;
-import floetteroed.opdyts.logging.TotalMemory;
-import floetteroed.opdyts.logging.TransientObjectiveFunctionValue;
-import floetteroed.opdyts.logging.UniformityGap;
-import floetteroed.opdyts.logging.UniformityGapWeight;
 import floetteroed.opdyts.trajectorysampling.TrajectorySampler;
 import floetteroed.utilities.math.Vector;
 
@@ -141,29 +129,32 @@ public class MATSimDecisionVariableSetEvaluator<U extends DecisionVariable>
 	/**
 	 * Where to write standard logging information.
 	 */
-	public void setStandardLogFileName(final String logFileName) {
-		this.trajectorySampler.addStatistic(logFileName,
-				new TransientObjectiveFunctionValue<U>());
-		this.trajectorySampler.addStatistic(logFileName,
-				new EquilibriumGapWeight<U>());
-		this.trajectorySampler.addStatistic(logFileName,
-				new EquilibriumGap<U>());
-		this.trajectorySampler.addStatistic(logFileName,
-				new UniformityGapWeight<U>());
-		this.trajectorySampler
-				.addStatistic(logFileName, new UniformityGap<U>());
-		this.trajectorySampler.addStatistic(logFileName,
-				new SurrogateObjectiveFunctionValue<U>());
-		this.trajectorySampler.addStatistic(logFileName,
-				new LastObjectiveFunctionValue<U>());
-		this.trajectorySampler.addStatistic(logFileName,
-				new LastEquilibriumGap<U>());
-		this.trajectorySampler.addStatistic(logFileName, new TotalMemory<U>());
-		this.trajectorySampler.addStatistic(logFileName, new FreeMemory<U>());
-		this.trajectorySampler.addStatistic(logFileName, new MaxMemory<U>());
-		this.trajectorySampler.addStatistic(logFileName,
-				new LastDecisionVariable<U>());
-	}
+	// public void setStandardLogFileName(final String logFileName) {
+	// this.trajectorySampler.setStandardLogFileName(logFileName);
+	// this.trajectorySampler.addStatistic(logFileName,
+	// new TransientObjectiveFunctionValue<U>());
+	// this.trajectorySampler.addStatistic(logFileName,
+	// new EquilibriumGapWeight<U>());
+	// this.trajectorySampler.addStatistic(logFileName,
+	// new EquilibriumGap<U>());
+	// this.trajectorySampler.addStatistic(logFileName,
+	// new UniformityGapWeight<U>());
+	// this.trajectorySampler
+	// .addStatistic(logFileName, new UniformityGap<U>());
+	// this.trajectorySampler.addStatistic(logFileName,
+	// new SurrogateObjectiveFunctionValue<U>());
+	// this.trajectorySampler.addStatistic(logFileName,
+	// new LastObjectiveFunctionValue<U>());
+	// this.trajectorySampler.addStatistic(logFileName,
+	// new LastEquilibriumGap<U>());
+	// this.trajectorySampler.addStatistic(logFileName, new
+	// TotalMemory<U>());
+	// this.trajectorySampler.addStatistic(logFileName, new
+	// FreeMemory<U>());
+	// this.trajectorySampler.addStatistic(logFileName, new MaxMemory<U>());
+	// this.trajectorySampler.addStatistic(logFileName,
+	// new LastDecisionVariable<U>());
+	// }
 
 	public MATSimState getFinalState() {
 		return finalState;

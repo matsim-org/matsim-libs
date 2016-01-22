@@ -50,7 +50,7 @@ public class CompareEuclideanAndLinkLengths {
 		final String outFile = args.getValue( "-o" );
 
 		final Scenario sc = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
-		new MatsimNetworkReader( sc ).readFile( networkFile );
+		new MatsimNetworkReader(sc.getNetwork()).readFile( networkFile );
 		
 		final BufferedWriter writer = IOUtils.getBufferedWriter( outFile );
 		writer.write( "linkId\tlinkLength\teuclLength" );

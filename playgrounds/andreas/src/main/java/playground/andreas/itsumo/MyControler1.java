@@ -35,6 +35,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.Mobsim;
@@ -56,13 +57,9 @@ import org.matsim.run.Events2Snapshot;
 import java.io.File;
 
 
-public class MyControler1 extends Controler {
+public class MyControler1 {
 
 	private static final Logger log = Logger.getLogger(MyControler1.class);
-
-	public MyControler1(final Scenario scenario) {
-		super(scenario);
-	}
 
 	protected int[] generateDistribution(final LinkImpl[] netLinks, final int popSize, final LinkImpl[] givenLinks, final double[] probs) {
 
@@ -291,7 +288,7 @@ public class MyControler1 extends Controler {
 	 * Conversion of events -> snapshots
 	 *
 	 */
-	protected void makeVis(){
+	protected static void makeVis(MatsimServices controler){
 
 		File driversLog = new File("./drivers.txt");
 		File visDir = new File("./output/vis");
@@ -302,10 +299,10 @@ public class MyControler1 extends Controler {
 			driversLog.renameTo(eventsFile);
 
 			Events2Snapshot events2Snapshot = new org.matsim.run.Events2Snapshot();
-            events2Snapshot.run(eventsFile, this.getConfig(), getScenario().getNetwork());
+            events2Snapshot.run(eventsFile, controler.getConfig(), controler.getScenario().getNetwork());
 
 			// Run NetVis if possible
-			if (this.getConfig().getParam("simulation", "snapshotFormat").equalsIgnoreCase("netvis")){
+			if (controler.getConfig().getParam("simulation", "snapshotFormat").equalsIgnoreCase("netvis")){
 				String[] visargs = {"./output/vis/Snapshot"};
 				// NetVis.main(visargs);
 			}
@@ -370,7 +367,7 @@ public class MyControler1 extends Controler {
 		loadNetwork(scenario);
 		loadPopulation(scenario);
 
-		final MyControler1 controler = new MyControler1(scenario);
+		final Controler controler = new Controler(scenario);
 		controler.getConfig().controler().setOverwriteFileSetting(
 				true ?
 						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
@@ -401,7 +398,7 @@ public class MyControler1 extends Controler {
 
 		controler.run();
 
-		controler.makeVis();
+		makeVis(controler);
 	}
 
 }

@@ -97,7 +97,7 @@ public class VTTSspecificRouterTest {
 
 			@Override
 			public void notifyStartup(StartupEvent event) {
-				event.getControler().getEvents().addHandler(new LinkLeaveEventHandler() {
+				event.getServices().getEvents().addHandler(new LinkLeaveEventHandler() {
 					
 					@Override
 					public void reset(int iteration) {
@@ -170,7 +170,7 @@ public class VTTSspecificRouterTest {
 //		final Builder factory = new Builder( TransportMode.car );
 //		factory.setSigma(0.0);
 //
-//		controler.addOverridingModule(new AbstractModule(){
+//		services.addOverridingModule(new AbstractModule(){
 //			@Override
 //			public void install() {
 //				this.bindCarTravelDisutilityFactory().toInstance( factory );
@@ -183,7 +183,7 @@ public class VTTSspecificRouterTest {
 
 			@Override
 			public void notifyStartup(StartupEvent event) {
-				event.getControler().getEvents().addHandler(new LinkLeaveEventHandler() {
+				event.getServices().getEvents().addHandler(new LinkLeaveEventHandler() {
 					
 					@Override
 					public void reset(int iteration) {
@@ -269,7 +269,7 @@ public class VTTSspecificRouterTest {
 
 			@Override
 			public void notifyStartup(StartupEvent event) {
-				event.getControler().getEvents().addHandler(new LinkLeaveEventHandler() {
+				event.getServices().getEvents().addHandler(new LinkLeaveEventHandler() {
 					
 					@Override
 					public void reset(int iteration) {
@@ -348,7 +348,7 @@ public class VTTSspecificRouterTest {
 
 			@Override
 			public void notifyStartup(StartupEvent event) {
-				event.getControler().getEvents().addHandler(new LinkLeaveEventHandler() {
+				event.getServices().getEvents().addHandler(new LinkLeaveEventHandler() {
 					
 					@Override
 					public void reset(int iteration) {
@@ -544,7 +544,7 @@ public class VTTSspecificRouterTest {
 
 			@Override
 			public void notifyStartup(StartupEvent event) {
-				event.getControler().getEvents().addHandler(new LinkLeaveEventHandler() {
+				event.getServices().getEvents().addHandler(new LinkLeaveEventHandler() {
 					
 					@Override
 					public void reset(int iteration) {
@@ -619,7 +619,7 @@ public class VTTSspecificRouterTest {
 
 			@Override
 			public void notifyStartup(StartupEvent event) {
-				event.getControler().getEvents().addHandler(new LinkLeaveEventHandler() {
+				event.getServices().getEvents().addHandler(new LinkLeaveEventHandler() {
 					
 					@Override
 					public void reset(int iteration) {

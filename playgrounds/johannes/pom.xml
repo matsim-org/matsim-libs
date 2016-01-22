@@ -42,7 +42,7 @@
 		</repository>
 		<!-- repeating repositories below although they are in socnetgen in attempt 
 			to repair intermittent build failures. kai, sep'15 -->
-		<repository>
+		<!--<repository>
 			<id>basex</id>
 			<name>BaseX Maven Repository</name>
 			<url>http://files.basex.org/maven</url>
@@ -51,7 +51,7 @@
 			<id>xqj</id>
 			<name>XQJ Maven Repository</name>
 			<url>http://xqj.net/maven</url>
-		</repository>
+		</repository>-->
 	</repositories>
 	<dependencies>
 
@@ -60,11 +60,7 @@
 			<artifactId>commons-lang3</artifactId>
 			<version>3.1</version>
 		</dependency>
-		<dependency>
-			<groupId>commons-httpclient</groupId>
-			<artifactId>commons-httpclient</artifactId>
-			<version>3.1-beta1</version>
-		</dependency>
+
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>cadytsIntegration</artifactId>

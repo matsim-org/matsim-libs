@@ -77,12 +77,12 @@ public static void main(String[] args) {
         // setting up PT Matrix
         PtMatrix ptMatrix = PtMatrix.createPtMatrix(plansCalcRoute, nbb, mbpcg);
 
-        //and finally setting up the controler
-        Controler controler = new Controler(config);
+        //and finally setting up the services
+        Controler services = new Controler(config);
         // setting up routing 
-        controler.setTripRouterFactory( new MatrixBasedPtRouterFactoryImpl(controler.getScenario(), ptMatrix) ); // the car and pt router
+        services.setTripRouterFactory( new MatrixBasedPtRouterFactoryImpl(services.getScenario(), ptMatrix) ); // the car and pt router
 
-        controler.run();*/
+        services.run();*/
 	}
 public static ArrayList<VehicleType> toArrayList(Iterator<VehicleType> iter){
 	ArrayList<VehicleType> arraylist = new ArrayList<VehicleType>();

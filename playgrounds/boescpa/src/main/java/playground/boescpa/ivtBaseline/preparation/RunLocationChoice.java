@@ -9,6 +9,7 @@ import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceInitializ
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.router.StageActivityTypesImpl;
@@ -73,7 +74,7 @@ public class RunLocationChoice {
         controler.run();
     }
 
-    private static void initializeLocationChoice(Controler controler) {
+    private static void initializeLocationChoice(MatsimServices controler) {
         Scenario scenario = controler.getScenario();
         DestinationChoiceBestResponseContext lcContext =
                 new DestinationChoiceBestResponseContext(scenario);

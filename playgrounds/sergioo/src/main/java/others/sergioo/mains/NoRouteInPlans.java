@@ -3,14 +3,11 @@ package others.sergioo.mains;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.ParallelPopulationReaderMatsimV4;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.MatsimFacilitiesReader;
@@ -37,7 +34,7 @@ public class NoRouteInPlans implements PersonAlgorithm {
 	 */
 	public static void main(String[] args) {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenario).readFile(args[0]);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(args[0]);
 		new MatsimFacilitiesReader((MutableScenario) scenario).readFile(args[1]);
 		((PopulationImpl)scenario.getPopulation()).setIsStreaming(true);
 		((PopulationImpl)scenario.getPopulation()).addAlgorithm(new NoRouteInPlans());

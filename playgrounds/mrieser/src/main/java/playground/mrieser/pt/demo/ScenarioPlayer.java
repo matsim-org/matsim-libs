@@ -69,7 +69,7 @@ public class ScenarioPlayer {
 		scenario.getConfig().qsim().setSnapshotPeriod(0.0);
 		scenario.getConfig().transit().setUseTransit(true);
 
-		new MatsimNetworkReader(scenario).readFile("test/scenarios/pt-tutorial/multimodalnetwork.xml");
+		new MatsimNetworkReader(scenario.getNetwork()).readFile("test/scenarios/pt-tutorial/multimodalnetwork.xml");
 
 		TransitSchedule schedule = ((MutableScenario) scenario).getTransitSchedule();
 		new TransitScheduleReaderV1(scenario).parse("test/scenarios/pt-tutorial/transitschedule.xml");

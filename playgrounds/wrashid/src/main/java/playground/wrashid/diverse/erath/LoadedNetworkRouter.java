@@ -92,7 +92,7 @@ public class LoadedNetworkRouter {
 		Config config = ConfigUtils.loadConfig(this.configfile);
 		MatsimRandom.reset(config.global().getRandomSeed());
 		Scenario scenario = ScenarioUtils.createScenario(config);
-		new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(config.network().getInputFile());
 		Network network = scenario.getNetwork();
 		this.config = scenario.getConfig();
 

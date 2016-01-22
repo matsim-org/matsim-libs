@@ -266,7 +266,7 @@ public class T2 {
 		reader.close();
 		System.out.println("TTs done");*/
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.loadConfig("./input/config-01.xml"));
-		new MatsimNetworkReader(scenario).readFile("C:/Users/sergioo/workspace2/playgrounds/sergioo/input/network/network100.xml.gz");
+		new MatsimNetworkReader(scenario.getNetwork()).readFile("C:/Users/sergioo/workspace2/playgrounds/sergioo/input/network/network100.xml.gz");
 		new TransitScheduleReader(scenario).readFile("C:/Users/sergioo/workspace2/playgrounds/sergioo/input/transit/transitSchedule.xml");
 		TransportModeNetworkFilter filter = new TransportModeNetworkFilter(scenario.getNetwork());
 		NetworkImpl net = (NetworkImpl) NetworkUtils.createNetwork();

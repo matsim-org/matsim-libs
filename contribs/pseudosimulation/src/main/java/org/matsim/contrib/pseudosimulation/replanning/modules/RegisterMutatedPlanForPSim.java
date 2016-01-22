@@ -3,7 +3,7 @@ package org.matsim.contrib.pseudosimulation.replanning.modules;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.contrib.pseudosimulation.distributed.plans.PlanGenome;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.replanning.ReplanningContext;
@@ -17,7 +17,7 @@ public class RegisterMutatedPlanForPSim implements PlanStrategyModule, Iteration
     private final boolean trackGenome;
     private int iterationNumber;
 
-    public RegisterMutatedPlanForPSim(PlanCatcher slave, char gene, boolean trackGenome, Controler controler) {
+    public RegisterMutatedPlanForPSim(PlanCatcher slave, char gene, boolean trackGenome, MatsimServices controler) {
         this.slave = slave;
         this.gene=gene;
         this.trackGenome = trackGenome;

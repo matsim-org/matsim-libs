@@ -1,10 +1,7 @@
 package org.matsim.integration.daily.accessibility;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -24,7 +21,6 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
@@ -33,8 +29,6 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
 
 class GeoserverUpdater implements FacilityDataExchangeInterface {
-
-	private static boolean lockedForAdditionalFacilityData = false;
 
 	static Logger log = Logger.getLogger(GeoserverUpdater.class);
 
@@ -47,48 +41,45 @@ class GeoserverUpdater implements FacilityDataExchangeInterface {
 		this.name = name;
 	}
 
-
 	private Map<Tuple<ActivityFacility, Double>, Map<Modes4Accessibility,Double>> accessibilitiesMap = new HashMap<>() ;
-	private Collection<ActivityFacilities> additionalFacilityData = new ArrayList<>() ;
 
-	
 	@Override
 	public void setFacilityAccessibilities(ActivityFacility measurePoint, Double timeOfDay,
 			Map<Modes4Accessibility, Double> accessibilities) {
 		accessibilitiesMap.put( new Tuple<>(measurePoint, timeOfDay), accessibilities ) ;
 	}
 
-
-	public final void setAndProcessSpatialGrids(List<Modes4Accessibility> modes ) { 
+	@Override
+	public void finish() {
 		// lockedForAdditionalFacilityData = true;
-		
+
 //		log.info("starting setAndProcessSpatialGrids ...");
 		log.info("starting setAndProcess ??? ...");
-		
+
 		GeometryFactory geometryFactory = new GeometryFactory();
 		SimpleFeatureTypeBuilder builder = new SimpleFeatureTypeBuilder();
 		builder.setName(name);
 		builder.setCRS(MGC.getCRS(TransformationFactory.WGS84));
-		
+
 		builder.add("the_geom", Point.class);
 		builder.add("x", Double.class);
 		builder.add("y", Double.class);
 		builder.add("time", Double.class); // new since 2015-12-02
-		
-		for (Modes4Accessibility mode : modes) {
+
+		for (Modes4Accessibility mode : Modes4Accessibility.values()) {
 			builder.add(mode.toString(), Double.class);
 		}
-		
+
 //		for ( ActivityFacilities facilities : additionalFacilityData ) {
 //			b.add( facilities.getName(), Double.class );
 //		}
 		// yyyyyy add population here
-		
+
 		SimpleFeatureType featureType = builder.buildFeatureType();
 		DefaultFeatureCollection collection = new DefaultFeatureCollection("internal", featureType);
 
 		SimpleFeatureBuilder featureBuilder = new SimpleFeatureBuilder(featureType);
-		
+
 //		final SpatialGrid spatialGrid = spatialGrids.get(Modes4Accessibility.freeSpeed);
 		// yy for time being, have to assume that this is always there
 		CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation(this.crs, TransformationFactory.WGS84);
@@ -104,24 +95,22 @@ class GeoserverUpdater implements FacilityDataExchangeInterface {
 			featureBuilder.add(timeOfDay);
 
 			Map<Modes4Accessibility, Double> accessibilities = entry.getValue();
-			for (Modes4Accessibility mode : modes) {
-				double accessibility = accessibilities.get(mode);
-				if (Double.isNaN(accessibility)) {
-					featureBuilder.add(null);
-				} else {
+			for (Modes4Accessibility mode : Modes4Accessibility.values()) {
+				Double accessibility = accessibilities.get(mode);
+				if (accessibility != null && !Double.isNaN(accessibility)) {
 					featureBuilder.add(accessibility);
+				} else {
+					featureBuilder.add(null);
 				}
 			}
-			
-			
+
 			// yyyyyy write population density here.  Probably not aggregated to grid.
-			
-			
+
+
 			SimpleFeature feature = featureBuilder.buildFeature(null);
 			collection.add(feature);
 		}
 
-		
 		try {
 			Map<String,Object> params = new HashMap<>();
 			params.put( "dbtype", "postgis");
@@ -163,35 +152,9 @@ class GeoserverUpdater implements FacilityDataExchangeInterface {
 //		log.info("ending setAndProcessSpatialGrids.");
 		log.info("ending setAndProcess ???.");
 
-		// re-publish layer using the REST api (of geoserver; the above is the postgis db) if we want to automatically recompute the 
+		// re-publish layer using the REST api (of geoserver; the above is the postgis db) if we want to automatically recompute the
 		// bounding box.  mz & kai, nov'15
+
 	}
 
-
-	/**
-	 * I wanted to plot something like (max(acc)-acc)*population.  For that, I needed "population" at the x/y coordinates.
-	 * This is the mechanics via which I inserted that. (The computation is then done in postprocessing.)
-	 * <p/>
-	 * You can add arbitrary ActivityFacilities containers here.  They will be aggregated to the grid points, and then written to
-	 * file as additional column.
-	 */
-	public void addAdditionalFacilityData(ActivityFacilities facilities ) {
-		log.warn("changed this data flow (by adding the _cnt_ column) but did not test.  If it works, please remove this warning. kai, mar'14") ;
-
-		if ( this.lockedForAdditionalFacilityData ) {
-			throw new RuntimeException("too late for adding additional facility data; spatial grids have already been generated.  Needs"
-					+ " to be called before generating the spatial grids.  (This design should be improved ..)") ;
-		}
-		if ( facilities.getName()==null || facilities.getName().equals("") ) {
-			throw new RuntimeException("cannot add unnamed facility containers here since we need a key to find them again") ;
-		}
-		for ( ActivityFacilities existingFacilities : this.additionalFacilityData ) {
-			if ( existingFacilities.getName().equals( facilities.getName() ) ) {
-				throw new RuntimeException("additional facilities under the name of + " + facilities.getName() + 
-						" already exist; cannot add additional facilities under the same name twice.") ;
-			}
-		}
-
-		this.additionalFacilityData.add( facilities ) ;
-	}
 }

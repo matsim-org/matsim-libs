@@ -28,6 +28,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.matsim.analysis.IterationStopWatch;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
@@ -56,6 +57,8 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
+import javax.inject.Inject;
+
 /**
  * @author nagel
  *
@@ -78,8 +81,17 @@ CadytsContextI<TransitStopFacility> {
 	private PtPlanToPlanStepBasedOnEvents<TransitStopFacility> ptStep ;
 
 	private CadytsConfigGroup cadytsConfig;
+	private EventsManager events;
+	private Scenario scenario;
+	private OutputDirectoryHierarchy controlerIO;
+	private IterationStopWatch stopWatch;
 
-	public CadytsPtContext(final Config config, EventsManager events) {
+	@Inject
+	CadytsPtContext(final Config config, EventsManager events, Scenario scenario, OutputDirectoryHierarchy controlerIO, IterationStopWatch stopWatch) {
+		this.events = events;
+		this.scenario = scenario;
+		this.controlerIO = controlerIO;
+		this.stopWatch = stopWatch;
 		cadytsConfig = (CadytsConfigGroup) config.getModule(CadytsConfigGroup.GROUP_NAME);
 
 		// === prepare the structure which extracts the measurements from the simulation:
@@ -119,18 +131,16 @@ CadytsContextI<TransitStopFacility> {
 
 	@Override
 	public void notifyStartup(StartupEvent event) {
-		Scenario scenario = event.getControler().getScenario();
-		EventsManager events = event.getControler().getEvents();
 
 		// === prepare the calibrator by giving measurements to it:
-		String occupancyCountsFilename = event.getControler().getConfig().ptCounts().getOccupancyCountsFileName();
+		String occupancyCountsFilename = scenario.getConfig().ptCounts().getOccupancyCountsFileName();
 		new MatsimCountsReader(this.occupCounts).readFile(occupancyCountsFilename);
 
 		// build the calibrator. This is a static method, and in consequence has no side effects
 		this.calibrator = CadytsBuilder.buildCalibratorAndAddMeasurements(scenario.getConfig(), this.occupCounts, new TransitStopFacilityLookUp(scenario) , TransitStopFacility.class);
 
 		// === find out which plan is contributing what to each measurement:
-		this.ptStep = new PtPlanToPlanStepBasedOnEvents<TransitStopFacility>(scenario, toTransitLineIdSet(cadytsConfig.getCalibratedItems()));
+		this.ptStep = new PtPlanToPlanStepBasedOnEvents<>(scenario, toTransitLineIdSet(cadytsConfig.getCalibratedItems()));
 		events.addHandler(ptStep);
 	}
 
@@ -147,8 +157,8 @@ CadytsContextI<TransitStopFacility> {
 	@Override
 	public void notifyBeforeMobsim(final BeforeMobsimEvent event) {
 		this.cadytsPtOccupAnalyzer.reset(event.getIteration());
-		for (Person person : event.getControler().getScenario().getPopulation().getPersons().values()) {
-			this.calibrator.addToDemand(ptStep.getPlanSteps(person.getSelectedPlan()));
+		for (Person person : scenario.getPopulation().getPersons().values()) {
+			this.calibrator.addToDemand(ptStep.getCadytsPlan(person.getSelectedPlan()));
 		}
 	}
 
@@ -160,30 +170,30 @@ CadytsContextI<TransitStopFacility> {
 		Set<Id<TransitStopFacility>> stopIds = new HashSet<>();
 		for ( String pseudoLineId : this.cadytsConfig.getCalibratedItems()) {
 			Id<TransitLine> lineId = Id.create(pseudoLineId, TransitLine.class);
-			TransitLine line = event.getControler().getScenario().getTransitSchedule().getTransitLines().get(lineId);
+			TransitLine line = scenario.getTransitSchedule().getTransitLines().get(lineId);
 			for (TransitRoute route : line.getRoutes().values()) {
 				for (TransitRouteStop stop : route.getStops()) {
 					stopIds.add(stop.getStopFacility().getId());
 				}
 			}
 		}
-		String outFile = event.getControler().getControlerIO().getIterationFilename(it, OCCUPANCYANALYSIS_FILENAME);
+		String outFile = controlerIO.getIterationFilename(it, OCCUPANCYANALYSIS_FILENAME);
 		this.cadytsPtOccupAnalyzer.writeResultsForSelectedStopIds(outFile, this.occupCounts, stopIds);
 	}
 
 	@Override
 	public void notifyIterationEnds(final IterationEndsEvent event) {
 		if (cadytsConfig.isWriteAnalysisFile()) {
-			String analysisFilepath = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), FLOWANALYSIS_FILENAME);
+			String analysisFilepath = controlerIO.getIterationFilename(event.getIteration(), FLOWANALYSIS_FILENAME);
 			this.calibrator.setFlowAnalysisFile(analysisFilepath);
 		}
 
 		this.calibrator.afterNetworkLoading(this.simResults);
 
 		// write some output
-		String filename = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), LINKOFFSET_FILENAME);
+		String filename = controlerIO.getIterationFilename(event.getIteration(), LINKOFFSET_FILENAME);
 		try {
-			new CadytsCostOffsetsXMLFileIO<TransitStopFacility>(new TransitStopFacilityLookUp(event.getControler().getScenario()), TransitStopFacility.class)
+			new CadytsCostOffsetsXMLFileIO<>(new TransitStopFacilityLookUp(scenario), TransitStopFacility.class)
 			.write(filename, this.calibrator.getLinkCostOffsets());
 		} catch (IOException e) {
 			log.error("Could not write link cost offsets!", e);
@@ -196,8 +206,6 @@ CadytsContextI<TransitStopFacility> {
 	// private methods & pure delegate methods only below this line
 
 	private void generateAndWriteCountsComparisons(final IterationEndsEvent event) {
-		Config config = event.getControler().getConfig();
-
 		if ( this.cadytsConfig.getTimeBinSize()!=3600 ) {
 			log.warn("generateAndWriteCountsComparisons() does not work when time bin size != 3600.  See comments in code. Skipping the comparison ..." ) ;
 			return ;
@@ -213,19 +221,18 @@ CadytsContextI<TransitStopFacility> {
 		}
 
 
-		PtCountsConfigGroup ptCountsConfig = config.ptCounts();
+		PtCountsConfigGroup ptCountsConfig = scenario.getConfig().ptCounts();
 		if (ptCountsConfig.getOccupancyCountsFileName() == null) { // yyyy this check should reasonably also be done in isActiveInThisIteration. kai,oct'10
 			log.warn("generateAndWriteCountsComparisons() does not work since occupancy counts file name not given ") ;
 			return ;
 		}
-		Controler controler = event.getControler();
 		int iter = event.getIteration();
 
-		event.getControler().getStopwatch().beginOperation("compare with pt counts");
+		stopWatch.beginOperation("compare with pt counts");
 
-        Network network = controler.getScenario().getNetwork();
+        Network network = scenario.getNetwork();
 		CadytsPtCountsComparisonAlgorithm ccaOccupancy = new CadytsPtCountsComparisonAlgorithm(this.cadytsPtOccupAnalyzer,
-				this.occupCounts, network, config.ptCounts().getCountsScaleFactor());
+				this.occupCounts, network, scenario.getConfig().ptCounts().getCountsScaleFactor());
 
 		Double distanceFilter = ptCountsConfig.getDistanceFilter();
 		String distanceFilterCenterNodeId  = ptCountsConfig.getDistanceFilterCenterNode();
@@ -237,10 +244,8 @@ CadytsContextI<TransitStopFacility> {
 
 		String outputFormat = ptCountsConfig.getOutputFormat();
 		if (outputFormat.contains("kml") || outputFormat.contains("all")) {
-			OutputDirectoryHierarchy ctlIO = controler.getControlerIO();
-
-			String filename = ctlIO.getIterationFilename(iter, "cadytsPtCountscompare.kmz");
-			final CoordinateTransformation coordTransform = TransformationFactory.getCoordinateTransformation(config
+			String filename = controlerIO.getIterationFilename(iter, "cadytsPtCountscompare.kmz");
+			final CoordinateTransformation coordTransform = TransformationFactory.getCoordinateTransformation(scenario.getConfig()
 					.global().getCoordinateSystem(), TransformationFactory.WGS84);
 			PtCountSimComparisonKMLWriter kmlWriter = new PtCountSimComparisonKMLWriter(null,
 					null, ccaOccupancy.getComparison(), coordTransform, null, null, 
@@ -257,11 +262,10 @@ CadytsContextI<TransitStopFacility> {
 			//  As far as I can tell, this file is written twice, the other times without the "cadyts" part.  kai, feb'13
 			//  yyyyyy As far as I can tell, the version here is wrong as soon as the time bin is different from 3600.--?? kai, feb'13
 			//  See near beginning of method.  kai, feb'13 
-			OutputDirectoryHierarchy ctlIO = controler.getControlerIO();
-			ccaOccupancy.write(ctlIO.getIterationFilename(iter, "cadytsSimCountCompareOccupancy.txt"));
+			ccaOccupancy.write(controlerIO.getIterationFilename(iter, "cadytsSimCountCompareOccupancy.txt"));
 		}
 
-		event.getControler().getStopwatch().endOperation("compare with pt counts");
+		stopWatch.endOperation("compare with pt counts");
 	}
 
 	@Override

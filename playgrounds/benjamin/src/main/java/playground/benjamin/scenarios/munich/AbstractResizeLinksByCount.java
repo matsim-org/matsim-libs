@@ -208,8 +208,8 @@ public abstract class AbstractResizeLinksByCount {
 		Scenario oldScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Scenario newScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		log.info("Reading " + this.netFile);
-		new MatsimNetworkReader(oldScenario).readFile(this.netFile);
-		new MatsimNetworkReader(newScenario).readFile(this.netFile);
+		new MatsimNetworkReader(oldScenario.getNetwork()).readFile(this.netFile);
+		new MatsimNetworkReader(newScenario.getNetwork()).readFile(this.netFile);
 		this.newNet = newScenario.getNetwork();
 		this.oldNet = oldScenario.getNetwork();
 	}

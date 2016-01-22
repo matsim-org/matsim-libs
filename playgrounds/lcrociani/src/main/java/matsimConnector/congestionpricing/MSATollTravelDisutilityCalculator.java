@@ -20,6 +20,8 @@
 
 package matsimConnector.congestionpricing;
 
+import matsimConnector.utility.Constants;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -43,7 +45,7 @@ public class MSATollTravelDisutilityCalculator implements TravelDisutility {
 	public MSATollTravelDisutilityCalculator(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup, MSATollHandler tollHandler) {
 		this.timeCalculator = timeCalculator;
 		this.marginalUtlOfMoney = cnScoringGroup.getMarginalUtilityOfMoney();
-		this.distanceCostRateCar = cnScoringGroup.getMonetaryDistanceCostRateCar();
+		this.distanceCostRateCar = cnScoringGroup.getOrCreateModeParams(Constants.CA_LINK_MODE).getMonetaryDistanceRate();
 		this.marginalUtlOfTravelTime = (-cnScoringGroup.getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() / 3600.0) + (cnScoringGroup.getPerforming_utils_hr() / 3600.0);
 		this.tollHandler = tollHandler;
 		

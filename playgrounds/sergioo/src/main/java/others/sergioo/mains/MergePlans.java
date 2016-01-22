@@ -20,7 +20,7 @@ public class MergePlans {
 	 */
 	public static void main(String[] args) {
 		Scenario base25 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(base25).readFile("./input/network/singapore7.xml");
+		new MatsimNetworkReader(base25.getNetwork()).readFile("./input/network/singapore7.xml");
 		new MatsimFacilitiesReader((MutableScenario)base25).readFile("C:\\Users\\sergioo\\Documents\\2011\\Work\\FCL\\Operations\\Data\\MATSimXMLCurrentData\\SpecialTrips\\completeFacilities.xml");
 		new MatsimPopulationReader(base25).readFile("C:\\Users\\sergioo\\Documents\\2011\\Work\\FCL\\Operations\\Data\\MATSimXMLCurrentData\\SpecialTrips\\population25.xml.gz");
 		Scenario specialTrips = ScenarioUtils.createScenario(ConfigUtils.createConfig());

@@ -11,8 +11,7 @@ import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.parking.lib.DebugLib;
-import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.facilities.ActivityFacility;
 
 import playground.wrashid.parkingChoice.events.ParkingArrivalEvent;
@@ -39,11 +38,11 @@ public class ParkingSimulation implements PersonDepartureEventHandler, ActivityS
 	LinkedList<ParkingArrivalEventHandler> parkingArrivalEventHandlers;
 	LinkedList<ParkingDepartureEventHandler> parkingDepartureEventHandlers;
 	private ParkingManager parkingManager;
-	private final Controler controler;
+	private final MatsimServices controler;
 
 	HashMap<Id, ActDurationEstimationContainer> actDurEstimationContainer;
 
-	public ParkingSimulation(ParkingManager parkingManager, Controler controler) {
+	public ParkingSimulation(ParkingManager parkingManager, MatsimServices controler) {
 		this.parkingManager = parkingManager;
 		this.controler = controler;
 		this.parkingArrivalEventHandlers = new LinkedList<ParkingArrivalEventHandler>();

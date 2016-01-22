@@ -176,7 +176,7 @@ public class IntersectionSimplifier implements NetworkRunnable {
 	public static void main(String args[]) {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		final Network network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario).readFile("/home/johannes/gsv/osm/germany-network-cat5.simplified3.xml");
+		new MatsimNetworkReader(scenario.getNetwork()).readFile("/home/johannes/gsv/osm/germany-network-cat5.simplified3.xml");
 
 		IntersectionSimplifier simplifier = new IntersectionSimplifier();
 		simplifier.run(network);

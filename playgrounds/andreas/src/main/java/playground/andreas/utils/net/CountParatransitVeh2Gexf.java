@@ -69,7 +69,7 @@ public class CountParatransitVeh2Gexf extends MatsimJaxbXmlWriter {
 		
 		Scenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		final Network network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario).readFile("F:/p/network_real.xml");
+		new MatsimNetworkReader(scenario.getNetwork()).readFile("F:/p/network_real.xml");
 //		new MatsimNetworkReader(scenario).readFile("D:/berlin_bvg3/bvg_3_bln_inputdata/rev554B-bvg00-0.1sample/network/network.final.xml.gz");
 		
 		net2Gexf.addNetworkAsLayer(network, 0);

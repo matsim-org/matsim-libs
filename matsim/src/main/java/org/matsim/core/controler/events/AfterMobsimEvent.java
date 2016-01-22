@@ -20,7 +20,7 @@
 
 package org.matsim.core.controler.events;
 
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 
 /**
  * Event class to notify observers that the mobility simulation just ended.
@@ -32,7 +32,7 @@ public final class AfterMobsimEvent extends ControlerEvent {
 	/** The iteration number */
 	private final int iteration;
 
-	public AfterMobsimEvent(final Controler controler, final int iteration) {
+	public AfterMobsimEvent(final MatsimServices controler, final int iteration) {
 		super(controler);
 		this.iteration = iteration;
 	}

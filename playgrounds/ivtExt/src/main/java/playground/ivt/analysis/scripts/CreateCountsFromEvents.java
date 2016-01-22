@@ -198,7 +198,7 @@ public class CreateCountsFromEvents {
 
 	private static Network readNetwork(final String netFile) {
 		final Scenario sc = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
-		new MatsimNetworkReader( sc ).readFile( netFile );
+		new MatsimNetworkReader(sc.getNetwork()).readFile( netFile );
 		return sc.getNetwork();
 	}
 }

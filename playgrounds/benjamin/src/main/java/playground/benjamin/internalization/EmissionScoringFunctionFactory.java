@@ -22,7 +22,7 @@ package playground.benjamin.internalization;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -38,13 +38,13 @@ import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 @Deprecated
 public class EmissionScoringFunctionFactory implements ScoringFunctionFactory {
 	
-	Controler controler;
+	MatsimServices controler;
 	PlanCalcScoreConfigGroup configGroup;
 	CharyparNagelScoringParameters params;
 	Network network;
 	ScoringFromEmissions scoringFromEmissions;
 	
-	public EmissionScoringFunctionFactory(Controler controler) {
+	public EmissionScoringFunctionFactory(MatsimServices controler) {
 		this.controler = controler;
 		this.configGroup = controler.getConfig().planCalcScore();
 		this.params = CharyparNagelScoringParameters.getBuilder(configGroup, configGroup.getScoringParameters( null ), controler.getConfig().scenario()).create();

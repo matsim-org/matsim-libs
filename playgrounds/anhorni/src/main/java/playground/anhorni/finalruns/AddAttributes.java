@@ -52,7 +52,7 @@ public class AddAttributes {
 	
 	private void init(final String plansFilePath, final String networkFilePath, final String facilitiesFilePath, final String outputFolder) {		
 		this.outdir = outputFolder;
-		new MatsimNetworkReader(scenario).readFile(networkFilePath);		
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFilePath);
 		new FacilitiesReaderMatsimV1(scenario).readFile(facilitiesFilePath);
 		MatsimPopulationReader populationReader = new MatsimPopulationReader(this.scenario);
 		populationReader.readFile(plansFilePath);

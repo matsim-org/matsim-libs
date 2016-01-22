@@ -84,7 +84,7 @@ public class SampleFromCommercialPlans {
 		Scenario sNew = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		PopulationFactory pf = sNew.getPopulation().getFactory();
 		// Network.
-		NetworkReaderMatsimV1 nr = new NetworkReaderMatsimV1(sNew);
+		NetworkReaderMatsimV1 nr = new NetworkReaderMatsimV1(sNew.getNetwork());
 		nr.parse(networkFile);
 		XY2Links xy = new XY2Links(sNew.getNetwork());
 

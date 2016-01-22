@@ -21,9 +21,8 @@ package playground.benjamin.scoring.distance;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.scoring.ScoringFunctionFactory;
 
-import playground.benjamin.BkControler;
+import org.matsim.core.gbl.Gbl;
 
 
 /**
@@ -31,19 +30,7 @@ import playground.benjamin.BkControler;
  * @author dgrether
  *
  */
-public final class BkControlerDistance extends BkControler {
-
-	public BkControlerDistance(String configFileName) {
-		super(configFileName);
-	}
-	
-	public BkControlerDistance(Config conf){
-		super(conf);
-	}
-
-	public BkControlerDistance(String[] args) {
-		super(args);
-	}
+public final class BkControlerDistance  {
 
 //	@Override
 //	protected ScoringFunctionFactory loadScoringFunctionFactory() {
@@ -57,7 +44,7 @@ public final class BkControlerDistance extends BkControler {
 			System.out.println("Usage: Controler config-file [dtd-file]");
 			System.out.println();
 		} else {
-			final Controler controler = new BkControlerDistance(args);
+			final Controler controler = new Controler(args);
 			
 			controler.setScoringFunctionFactory( new BkScoringFunctionFactory( controler.getConfig().planCalcScore() ) ) ;
 			

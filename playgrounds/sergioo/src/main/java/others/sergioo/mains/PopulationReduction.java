@@ -23,7 +23,7 @@ public class PopulationReduction {
 	 */
 	public static void main(String[] args) {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenario).readFile(args[0]);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(args[0]);
 		new MatsimFacilitiesReader((MutableScenario) scenario).readFile(args[1]);
 		new MatsimPopulationReader(scenario).readFile(args[2]);
 		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork(), new Double(args[3])).write(args[4]);

@@ -60,7 +60,7 @@ public class CreateScheduleToMatchPseudoNetwork{
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		//read network
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
-		new MatsimNetworkReader(scenario).readFile(NetworkFile);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(NetworkFile);
 		
 		//read schedule
 		TransitScheduleFactoryImpl builder = new TransitScheduleFactoryImpl();

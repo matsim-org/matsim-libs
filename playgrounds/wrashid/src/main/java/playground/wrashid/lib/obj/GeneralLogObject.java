@@ -27,7 +27,7 @@ import java.util.HashMap;
 
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.obj.list.Lists;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 
 
 public class GeneralLogObject {
@@ -35,9 +35,9 @@ public class GeneralLogObject {
 	private String outputFile;
 	private boolean fileClosed = false;
 	private HashMap<String, ArrayList<String>> logGroups = new HashMap<String, ArrayList<String>>();
-	private final Controler controler;
+	private final MatsimServices controler;
 
-	public GeneralLogObject(Controler controler, String outputFile) {
+	public GeneralLogObject(MatsimServices controler, String outputFile) {
 		this.controler = controler;
 		this.outputFile = outputFile;
 	}

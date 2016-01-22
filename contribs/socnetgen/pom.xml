@@ -9,18 +9,6 @@
 	<groupId>org.matsim.contrib</groupId>
 	<artifactId>socnetgen</artifactId>
 	<name>socnetgen</name>
-	<repositories>
-		<repository>
-			<id>basex</id>
-			<name>BaseX Maven Repository</name>
-			<url>http://files.basex.org/maven</url>
-		</repository>
-		<repository>
-			<id>xqj</id>
-			<name>XQJ Maven Repository</name>
-			<url>http://xqj.net/maven</url>
-		</repository>
-	</repositories>
 	<dependencies>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
@@ -32,7 +20,6 @@
 			<artifactId>geocoder-java</artifactId>
 			<version>0.16</version>
 		</dependency>
-
 		<dependency>
 			<groupId>commons-collections</groupId>
 			<artifactId>commons-collections</artifactId>
@@ -42,31 +29,6 @@
 			<groupId>commons-lang</groupId>
 			<artifactId>commons-lang</artifactId>
 			<version>2.3</version>
-		</dependency>
-		<dependency>
-			<groupId>org.basex</groupId>
-			<artifactId>basex</artifactId>
-			<version>7.6</version>
-		</dependency>
-		<dependency>
-			<groupId>org.basex</groupId>
-			<artifactId>basex-api</artifactId>
-			<version>7.6</version>
-		</dependency>
-		<dependency>
-			<groupId>net.xqj</groupId>
-			<artifactId>basex-xqj</artifactId>
-			<version>1.2.0</version>
-		</dependency>
-		<dependency>
-			<groupId>com.xqj2</groupId>
-			<artifactId>xqj2</artifactId>
-			<version>0.1.0</version>
-		</dependency>
-		<dependency>
-			<groupId>javax.xml.xquery</groupId>
-			<artifactId>xqj-api</artifactId>
-			<version>1.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>

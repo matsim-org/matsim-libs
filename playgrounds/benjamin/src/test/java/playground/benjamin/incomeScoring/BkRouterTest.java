@@ -122,7 +122,7 @@
 //
 //		@Override
 //		public void notifyStartup(final StartupEvent event) {
-//			event.getControler().getEvents().addHandler(handler);
+//			event.getServices().getEvents().addHandler(handler);
 //		}
 //	}
 //
@@ -135,7 +135,7 @@
 //
 //		@Override
 //		public void notifyStartup(StartupEvent event) {
-//			event.getControler().getEvents().addHandler(handler);
+//			event.getServices().getEvents().addHandler(handler);
 //		}
 //	}
 //

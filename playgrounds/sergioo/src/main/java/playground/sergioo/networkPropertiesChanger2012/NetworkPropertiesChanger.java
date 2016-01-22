@@ -70,7 +70,7 @@ public class NetworkPropertiesChanger {
 	public static void main(String[] args) throws IOException {
 		if(args.length==4) {
 			Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-			MatsimNetworkReader matsimNetworkReader = new MatsimNetworkReader(scenario);
+			MatsimNetworkReader matsimNetworkReader = new MatsimNetworkReader(scenario.getNetwork());
 			matsimNetworkReader.readFile(args[0]);
 			Network network = scenario.getNetwork();
 			

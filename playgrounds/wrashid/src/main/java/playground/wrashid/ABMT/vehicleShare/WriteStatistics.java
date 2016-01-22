@@ -1,18 +1,11 @@
 package playground.wrashid.ABMT.vehicleShare;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.LinkedList;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
-import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 
 public class WriteStatistics implements IterationEndsListener {
@@ -24,7 +17,7 @@ public class WriteStatistics implements IterationEndsListener {
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		ArrayList<String> list=new ArrayList<String>();
 		
-		String fileName = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "statistics.txt");
+		String fileName = event.getServices().getControlerIO().getIterationFilename(event.getIteration(), "statistics.txt");
 
 		list.add("Person \t hasEV \t distTrav \t toll \t tollEntry \t tollExit");
 		

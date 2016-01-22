@@ -2,11 +2,9 @@ package playground.balac.utils;
 
 
 
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
@@ -19,7 +17,7 @@ public class Create1percentPopulation {
 	public void run(String plansFilePath, String networkFilePath) {
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		PopulationReader populationReader = new MatsimPopulationReader(scenario);
-		MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario);
+		MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario.getNetwork());
 		networkReader.readFile(networkFilePath);
 	//	new FacilitiesReaderMatsimV1(scenario).readFile(facilitiesfilePath);
 		populationReader.readFile(plansFilePath);

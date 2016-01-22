@@ -63,7 +63,7 @@ public class CreateStopsAndSchedule {
 	public static void main(String[] args) {
 
 		final Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenario).readFile(
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(
 				"C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/network/versions/networkptcgt.xml");
 		new VehicleReaderV1(scenario.getTransitVehicles()).readFile(
 				"C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/input/transitvehicles.xml");

@@ -64,7 +64,7 @@ public class PotsdamAnalysis implements Runnable {
 		
 		String network = "output/output_network.xml.gz";
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenario).readFile(network);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(network);
 		
 		
 		for (Entry<Id<Link>, ? extends Link> entry : scenario.getNetwork().getLinks().entrySet()) {

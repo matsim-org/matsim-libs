@@ -4,7 +4,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -27,10 +27,10 @@ public class CarsharingListener implements StartupListener, IterationEndsListene
 	OWEventsHandler owhandler;
 	NoVehicleEventHandler noVehicleHandler;
 	NoParkingEventHandler noParkingHandler;
-	Controler controler;
+	MatsimServices controler;
 	int frequency = 0;
 	
-	public CarsharingListener(Controler controler, int frequency) {
+	public CarsharingListener(MatsimServices controler, int frequency) {
 				
 		this.controler = controler;
 		this.frequency = frequency;
@@ -142,11 +142,11 @@ public class CarsharingListener implements StartupListener, IterationEndsListene
 			e.printStackTrace();
 		}
 		
-		event.getControler().getEvents().removeHandler(this.cshandler);
-		event.getControler().getEvents().removeHandler(this.ffhandler);
-		event.getControler().getEvents().removeHandler(this.owhandler);
-		event.getControler().getEvents().removeHandler(this.noVehicleHandler);
-		event.getControler().getEvents().removeHandler(this.noParkingHandler);
+		event.getServices().getEvents().removeHandler(this.cshandler);
+		event.getServices().getEvents().removeHandler(this.ffhandler);
+		event.getServices().getEvents().removeHandler(this.owhandler);
+		event.getServices().getEvents().removeHandler(this.noVehicleHandler);
+		event.getServices().getEvents().removeHandler(this.noParkingHandler);
 		}
 		
 	}
@@ -171,11 +171,11 @@ public class CarsharingListener implements StartupListener, IterationEndsListene
 	public void notifyIterationStarts(IterationStartsEvent event) {
 		// TODO Auto-generated method stub
 		if (event.getIteration() % this.frequency == 0) {
-			event.getControler().getEvents().addHandler(this.cshandler);
-			event.getControler().getEvents().addHandler(this.ffhandler);
-			event.getControler().getEvents().addHandler(this.owhandler);
-			event.getControler().getEvents().addHandler(this.noVehicleHandler);
-			event.getControler().getEvents().addHandler(this.noParkingHandler);
+			event.getServices().getEvents().addHandler(this.cshandler);
+			event.getServices().getEvents().addHandler(this.ffhandler);
+			event.getServices().getEvents().addHandler(this.owhandler);
+			event.getServices().getEvents().addHandler(this.noVehicleHandler);
+			event.getServices().getEvents().addHandler(this.noParkingHandler);
 		}
 		
 	}

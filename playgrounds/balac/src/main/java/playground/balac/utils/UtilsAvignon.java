@@ -19,7 +19,7 @@ public class UtilsAvignon {
 	 */
 	MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 	PopulationReader populationReader = new MatsimPopulationReader(scenario);
-	MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario);
+	MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario.getNetwork());
 	double centerX = 683217.0;  //Belvue coordinates
 	double centerY = 247300.0;
 	public UtilsAvignon(String plansFilePath, String networkFilePath) {

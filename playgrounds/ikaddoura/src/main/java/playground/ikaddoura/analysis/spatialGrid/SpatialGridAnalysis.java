@@ -58,6 +58,12 @@ import playground.vsp.analysis.modules.userBenefits.WelfareMeasure;
 public class SpatialGridAnalysis {
 	private static final Logger log = Logger.getLogger(SpatialGridAnalysis.class);
 	
+	
+	// yyyy pliease try to avoid static variables except if they refer to quantities that are truly constant throughout the whole world for this
+	// version of the code.
+	// (They don't do much damage here, but imagine you are calling this writer from two
+	// places simultaneously, and expect it to write to two different locations.)  kai, jan'16
+	
 	private static String runDirectory;
 	private static double receiverPointGap;
 	private static String homeActivityType;
@@ -69,6 +75,8 @@ public class SpatialGridAnalysis {
 	// if the following variable is true, the events have to contain noise events.
 	// if the following variable is false, money events are analyzed and assumed to correspond to the caused noise costs
 	private static boolean useNoiseEvents;
+	
+	private boolean useCompression = false ;
 		
 	public static void main(String[] args) {
 		
@@ -328,8 +336,16 @@ public class SpatialGridAnalysis {
 		values.add(rp2totalCausedNoiseCost);
 		values.add(rp2totalAffectedNoiseCost);
 		
-		NoiseWriter.write(outputFilePath, 7, headers, values);
+		NoiseWriter.write(outputFilePath, 7, headers, values, useCompression);
 
+	}
+
+	public final boolean isUseCompression() {
+		return this.useCompression;
+	}
+
+	public final void setUseCompression(boolean useCompression) {
+		this.useCompression = useCompression;
 	}
 			 
 }

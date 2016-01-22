@@ -46,7 +46,7 @@ public class SubNetworkCreator
         String subNetworkFile = dir + "network/berlin.xml.gz";
 
         Scenario scenario = ScenarioUtils.createScenario(VrpConfigUtils.createConfig());
-        MatsimNetworkReader nr = new MatsimNetworkReader(scenario);
+        MatsimNetworkReader nr = new MatsimNetworkReader(scenario.getNetwork());
         nr.readFile(networkFile);
 
         Network network = scenario.getNetwork();

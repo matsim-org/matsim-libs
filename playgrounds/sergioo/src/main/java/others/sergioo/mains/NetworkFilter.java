@@ -17,7 +17,7 @@ public class NetworkFilter {
 
 	public static void main(String[] args) {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenario).readFile(args[0]);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(args[0]);
 		Set<String> modes = new HashSet<String>();
 		modes.addAll(Arrays.asList(args[1].split(";")));
 		Network modesNetwork = NetworkUtils.createNetwork();

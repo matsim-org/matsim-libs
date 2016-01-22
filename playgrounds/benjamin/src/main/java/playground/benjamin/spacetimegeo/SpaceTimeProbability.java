@@ -113,7 +113,7 @@ public class SpaceTimeProbability {
 				StartupListener startupListener = new StartupListener() {
 					@Override
 					public void notifyStartup(StartupEvent event) {
-						event.getControler().getEvents().addHandler(handler);
+						event.getServices().getEvents().addHandler(handler);
 					}
 				};
 				controler.addControlerListener(startupListener);

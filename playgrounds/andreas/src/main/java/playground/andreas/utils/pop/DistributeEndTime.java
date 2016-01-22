@@ -52,7 +52,7 @@ public class DistributeEndTime extends NewPopulation {
 		double endTime = Time.parseTime("10:00:00");
 
 		Network net = sc.getNetwork();
-		new MatsimNetworkReader(sc).readFile(networkFile);
+		new MatsimNetworkReader(sc.getNetwork()).readFile(networkFile);
 
 		Population inPop = sc.getPopulation();
 		PopulationReader popReader = new MatsimPopulationReader(sc);

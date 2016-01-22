@@ -28,7 +28,6 @@ import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility.Builder;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.DijkstraFactory;
-import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
@@ -135,7 +134,7 @@ public class IterativeAlgorithmDC {
 						persons.add(person);
 				}
 		new MatsimFacilitiesReader(scenario).readFile(args[2]);
-		new MatsimNetworkReader(scenario).readFile(args[3]);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(args[3]);
 		for(Link link:scenario.getNetwork().getLinks().values()) {
 			Set<String> modes = new HashSet<String>(link.getAllowedModes());
 			modes.add("pt");

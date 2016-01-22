@@ -71,8 +71,8 @@ public final class PAnalysisManager implements StartupListener, IterationStartsL
 		// create all analyzes
 		this.pAnalyzesList.add(new CountTripsPerMode());
 		this.pAnalyzesList.add(new CountVehPerMode());
-        this.pAnalyzesList.add(new CountVehicleMeterPerMode(event.getControler().getScenario().getNetwork()));
-        this.pAnalyzesList.add(new AverageTripDistanceMeterPerMode(event.getControler().getScenario().getNetwork()));
+        this.pAnalyzesList.add(new CountVehicleMeterPerMode(event.getServices().getScenario().getNetwork()));
+        this.pAnalyzesList.add(new AverageTripDistanceMeterPerMode(event.getServices().getScenario().getNetwork()));
 		this.pAnalyzesList.add(new AverageInVehicleTripTravelTimeSecondsPerMode());
 		this.pAnalyzesList.add(new AverageWaitingTimeSecondsPerMode());
 		this.pAnalyzesList.add(new AverageNumberOfStopsPerMode());
@@ -82,30 +82,30 @@ public final class PAnalysisManager implements StartupListener, IterationStartsL
 		this.pAnalyzesList.add(new CountDeparturesWithNoCapacityLeftPerMode());
 		this.pAnalyzesList.add(new CountDeparturesPerMode());
 
-        CountPassengerMeterPerMode countPassengerMeterPerMode = new CountPassengerMeterPerMode(event.getControler().getScenario().getNetwork());
+        CountPassengerMeterPerMode countPassengerMeterPerMode = new CountPassengerMeterPerMode(event.getServices().getScenario().getNetwork());
 		this.pAnalyzesList.add(countPassengerMeterPerMode);
-        CountCapacityMeterPerMode countCapacityMeterPerMode = new CountCapacityMeterPerMode(event.getControler().getScenario().getNetwork());
+        CountCapacityMeterPerMode countCapacityMeterPerMode = new CountCapacityMeterPerMode(event.getServices().getScenario().getNetwork());
 		this.pAnalyzesList.add(countCapacityMeterPerMode);
 		this.pAnalyzesList.add(new AverageLoadPerDistancePerMode(countPassengerMeterPerMode, countCapacityMeterPerMode));
 		
 		// register all analyzes
 		for (PAnalysisModule ana : this.pAnalyzesList) {
-			event.getControler().getEvents().addHandler(ana);
+			event.getServices().getEvents().addHandler(ana);
 		}
 	}
 
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
 		// update pt mode for each line in schedule
-		updateLineId2ptModeMap(event.getControler().getScenario().getTransitSchedule());
-		updateVehicleTypes(event.getControler().getScenario().getTransitVehicles());
+		updateLineId2ptModeMap(event.getServices().getScenario().getTransitSchedule());
+		updateVehicleTypes(event.getServices().getScenario().getTransitVehicles());
 	}
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		if (this.firstIteration) {
 			// create the output folder for this module
-			String outFilename = event.getControler().getControlerIO().getOutputPath() + PConstants.statsOutputFolder + PAnalysisManager.class.getSimpleName() + "/";
+			String outFilename = event.getServices().getControlerIO().getOutputPath() + PConstants.statsOutputFolder + PAnalysisManager.class.getSimpleName() + "/";
 			new File(outFilename).mkdir();
 			
 			// create one output stream for each analysis

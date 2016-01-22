@@ -21,8 +21,10 @@
  *
  * contact: gunnar.floetteroed@abe.kth.se
  *
- */ 
+ */
 package floetteroed.opdyts.convergencecriteria;
+
+import java.util.List;
 
 import floetteroed.opdyts.trajectorysampling.TransitionSequence;
 
@@ -56,7 +58,16 @@ public interface ConvergenceCriterion {
 	 *         function value of the most recently evaluated TransitionSequence
 	 */
 	public Double getFinalObjectiveFunctionValue();
-	
+
 	public void reset();
+
+	// TODO NEW
+	public List<Double> getFinalWeights();
+
+	// TODO NEW
+	public Double getFinalEquilbriumGap();
+
+	// TODO NEW
+	public Double getFinalUniformityGap();
 
 }

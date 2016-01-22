@@ -35,7 +35,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.replanning.ReplanningContext;
@@ -70,7 +70,7 @@ public class PRAddStrategyMod implements PlanStrategyModule {
 	 * @param gravity
 	 * @param typicalDuration 
 	 */
-	public PRAddStrategyMod(Controler controler, Map<Id<PRFacility>, PRFacility> id2prFacility, double gravity, double typicalDuration) {
+	public PRAddStrategyMod(MatsimServices controler, Map<Id<PRFacility>, PRFacility> id2prFacility, double gravity, double typicalDuration) {
 		this.sc = (MutableScenario) controler.getScenario();
 		this.net = this.sc.getNetwork();
 		this.pop = this.sc.getPopulation();

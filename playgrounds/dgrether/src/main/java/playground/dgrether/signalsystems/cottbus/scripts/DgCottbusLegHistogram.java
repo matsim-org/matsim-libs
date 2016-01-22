@@ -62,7 +62,7 @@ public class DgCottbusLegHistogram {
 		Tuple<CoordinateReferenceSystem, SimpleFeature> cottbusFeatureTuple = CottbusUtils.loadCottbusFeature(cottbusFeatureFile);
 		
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenario).readFile(networkFile);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
 		Network network = scenario.getNetwork();
 		
 		

@@ -35,7 +35,7 @@ public class ReduceNetworkSpeeds {
 	public static void main(String[] args) {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		String basedir = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/input/";
-		new MatsimNetworkReader(scenario).readFile(basedir+"network.xml");
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(basedir+"network.xml");
 		for (Link link : scenario.getNetwork().getLinks().values()){
 			double speed = link.getFreespeed();
 			if (speed<10) link.setFreespeed(0.75*speed);

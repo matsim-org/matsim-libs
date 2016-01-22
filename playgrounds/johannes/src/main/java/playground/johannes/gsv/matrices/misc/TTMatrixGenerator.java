@@ -231,7 +231,7 @@ public class TTMatrixGenerator {
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		
 		logger.info("Loading network...");
-		MatsimNetworkReader reader = new MatsimNetworkReader(scenario);
+		MatsimNetworkReader reader = new MatsimNetworkReader(scenario.getNetwork());
 		reader.parse(netFile);
 		
 		logger.info("Loading zones...");

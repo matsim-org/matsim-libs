@@ -188,8 +188,8 @@ public class XferEventsFromLoResToHiResNetwork{
 		hiRes = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		loRes.getConfig().transit().setUseTransit(true);
 		hiRes.getConfig().transit().setUseTransit(true);
-		new MatsimNetworkReader(loRes).readFile(loResNetwork);
-		new MatsimNetworkReader(hiRes).readFile(hiResNetwork);
+		new MatsimNetworkReader(loRes.getNetwork()).readFile(loResNetwork);
+		new MatsimNetworkReader(hiRes.getNetwork()).readFile(hiResNetwork);
 		new TransitScheduleReader(loRes).readFile(loResSchedule);
 		new TransitScheduleReader(hiRes).readFile(hiResSchedule);
 		outpath = new File(new File(loResEvents).getParent() + "/temp");

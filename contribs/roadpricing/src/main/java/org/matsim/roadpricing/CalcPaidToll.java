@@ -67,7 +67,7 @@ public class CalcPaidToll implements LinkEnterEventHandler, VehicleEntersTraffic
 	private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
 
     @Inject
-	public CalcPaidToll(final Network network, final RoadPricingScheme scheme) {
+	CalcPaidToll(final Network network, final RoadPricingScheme scheme) {
 		super();
 		this.network = network;
 		this.scheme = scheme;

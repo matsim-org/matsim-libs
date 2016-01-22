@@ -19,6 +19,7 @@ import org.matsim.contrib.parking.lib.obj.Matrix;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.scoring.ScoringFunction;
@@ -29,7 +30,6 @@ import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
-import org.matsim.core.scoring.functions.SubpopulationCharyparNagelScoringParameters;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
 import playground.wrashid.lib.obj.Collections;
@@ -186,7 +186,7 @@ public class ParkingScoreAccumulator implements AfterMobsimListener {
 		HashMap<Id<Person>, Double> sumOfParkingWalkDistances = new HashMap<>();
 		parkingScoreCollector.finishHandling();
 
-		Controler controler = event.getControler();
+		MatsimServices controler = event.getServices();
 
 		for (Id<Person> personId : parkingScoreCollector.getPersonIdsWhoUsedCar()) {
 
@@ -194,10 +194,10 @@ public class ParkingScoreAccumulator implements AfterMobsimListener {
 			System.err.println(" walkingTimes: " + sumOfWalkingTimes );
 
 			sumOfParkingWalkDistances.put(personId, sumOfWalkingTimes
-					* event.getControler().getConfig().plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.walk));
+					* event.getServices().getConfig().plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.walk));
 
 			//            if (!ParkingChoiceLib.isTestCaseRun) {
-			//                String parkingSelectionManager = controler.getConfig().findParam("parking", "parkingSelectionManager");
+			//                String parkingSelectionManager = services.getConfig().findParam("parking", "parkingSelectionManager");
 			//                if (parkingSelectionManager.equalsIgnoreCase("PriceAndDistance_v1")) {
 			//                    // TODO: perhaps later make the parking price based on
 			//                    // acutal parking duration instead of
@@ -205,7 +205,7 @@ public class ParkingScoreAccumulator implements AfterMobsimListener {
 			//
 			//                    // In this case we have not set a custom scoring function and just throw an event for the money
 			//                    // the agent hast to pay.
-			//                    event.getControler().getEvents().processEvent(new PersonMoneyEvent(0.0, personId, scores.get(personId)));
+			//                    event.getServices().getEvents().processEvent(new PersonMoneyEvent(0.0, personId, scores.get(personId)));
 			//
 			//
 			//                    DebugLib.emptyFunctionForSettingBreakPoint();
@@ -246,7 +246,7 @@ public class ParkingScoreAccumulator implements AfterMobsimListener {
 
 	}
 
-	private void logParkingUsed(Controler controler, int iteration) {
+	private void logParkingUsed(MatsimServices controler, int iteration) {
 		String iterationFilename = controler.getControlerIO().getIterationFilename(iteration,
 				"parkingLogInfo.txt");
 
@@ -307,7 +307,7 @@ public class ParkingScoreAccumulator implements AfterMobsimListener {
 		averageWalkingDistance = new Mean().evaluate(values);
 	}
 
-	private void writeOutGraphComparingSumOfSelectedParkingsToCounts(Controler controler, int iteration) {
+	private void writeOutGraphComparingSumOfSelectedParkingsToCounts(MatsimServices controler, int iteration) {
 		String iterationFilenamePng = controler.getControlerIO().getIterationFilename(iteration,
 				"parkingOccupancyCountsComparison.png");
 		String iterationFilenameTxt = controler.getControlerIO().getIterationFilename(iteration,
@@ -364,7 +364,7 @@ public class ParkingScoreAccumulator implements AfterMobsimListener {
 		GeneralLib.writeMatrix(matrix, iterationFilenameTxt, txtFileHeader);
 	}
 
-	private void writeOutGraphParkingTypeOccupancies(Controler controler, int iteration) {
+	private void writeOutGraphParkingTypeOccupancies(MatsimServices controler, int iteration) {
 		String iterationFilenamePng = controler.getControlerIO().getIterationFilename(iteration,
 				"parkingOccupancyByParkingTypes.png");
 		String iterationFilenameTxt = controler.getControlerIO().getIterationFilename(iteration,
@@ -421,7 +421,7 @@ public class ParkingScoreAccumulator implements AfterMobsimListener {
 		GeneralLib.writeMatrix(matrix, iterationFilenameTxt, txtFileHeader);
 	}
 
-	private void writeOutParkingOccupancies(Controler controler, int iteration) {
+	private void writeOutParkingOccupancies(MatsimServices controler, int iteration) {
 		String iterationFilename = controler.getControlerIO().getIterationFilename(iteration,
 				"parkingOccupancy.txt");
 
@@ -448,7 +448,7 @@ public class ParkingScoreAccumulator implements AfterMobsimListener {
 		GeneralLib.writeList(list, iterationFilename);
 	}
 
-	private static void printWalkingDistanceHistogramm(Controler controler, int iteration, HashMap<Id<Person>, Double> walkingDistance) {
+	private static void printWalkingDistanceHistogramm(MatsimServices controler, int iteration, HashMap<Id<Person>, Double> walkingDistance) {
 		double[] values = Collections.convertDoubleCollectionToArray(walkingDistance.values());
 
 		if (values.length == 0) {
@@ -466,7 +466,7 @@ public class ParkingScoreAccumulator implements AfterMobsimListener {
 		writeOutWalkingDistanceZHCity(controler, iteration);
 	}
 
-	private static void writeOutWalkingDistanceZHCity(Controler controler, int iteration) {
+	private static void writeOutWalkingDistanceZHCity(MatsimServices controler, int iteration) {
 		String fileName = controler.getControlerIO().getIterationFilename(iteration,
 				"walkingDistanceHistogrammZHCity.txt");
 
@@ -479,20 +479,20 @@ public class ParkingScoreAccumulator implements AfterMobsimListener {
 		GeneralLib.writeArrayToFile(walkingDistances, fileName, "parking walking distance [m]");
 	}
 
-	private static void writeOutWalkingDistanceHistogramToTxtFile(Controler controler, int iteration, double[] values) {
+	private static void writeOutWalkingDistanceHistogramToTxtFile(MatsimServices controler, int iteration, double[] values) {
 		String fileName = controler.getControlerIO().getIterationFilename(iteration,
 				"walkingDistanceHistogramm.txt");
 
 		GeneralLib.writeArrayToFile(values, fileName, "parkingWalkingDistances [m]");
 	}
 
-	private void writeWalkingDistanceStatisticsGraph(Controler controler, int iteration, HashMap<Id<Person>, Double> walkingDistance) {
+	private void writeWalkingDistanceStatisticsGraph(MatsimServices controler, int iteration, HashMap<Id<Person>, Double> walkingDistance) {
 		parkingWalkingDistanceGraph.updateStatisticsForIteration(iteration, walkingDistance);
 		String fileName = controler.getControlerIO().getOutputFilename("walkingDistanceOverIterations.png");
 		parkingWalkingDistanceGraph.writeGraphic(fileName);
 	}
 
-	public static void initializeParkingCounts(Controler controler) {
+	public static void initializeParkingCounts(MatsimServices controler) {
 		String baseFolder = null;
 		Double countsScalingFactor = Double.parseDouble(controler.getConfig().findParam("parking", "countsScalingFactor"));
 

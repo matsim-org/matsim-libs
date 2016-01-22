@@ -23,6 +23,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
@@ -70,16 +71,16 @@ public class DenverControllerStarter implements PersonStuckEventHandler {
   }
   
   
-  private void addListener(Controler c) {
+  private void addListener(MatsimServices c) {
     c.addControlerListener(new StartupListener() {
       @Override
       public void notifyStartup(StartupEvent event) {
         
         //enable live-visualization
-//        event.getControler().setMobsimFactory(new OTFVisMobsimFactoryImpl());
+//        event.getServices().setMobsimFactory(new OTFVisMobsimFactoryImpl());
         
         //output of stucked vehicles
-        event.getControler().getEvents().addHandler(DenverControllerStarter.this); 
+        event.getServices().getEvents().addHandler(DenverControllerStarter.this);
       }
       
     }

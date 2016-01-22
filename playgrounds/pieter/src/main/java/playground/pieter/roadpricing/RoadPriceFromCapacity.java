@@ -21,7 +21,7 @@ public class RoadPriceFromCapacity {
 
 	private RoadPriceFromCapacity(String networkFileName) {
 		sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		MatsimNetworkReader nwr = new MatsimNetworkReader(sc);
+		MatsimNetworkReader nwr = new MatsimNetworkReader(sc.getNetwork());
 		nwr.readFile(networkFileName);
 		rps = new RoadPricingSchemeImpl();
 		network = sc.getNetwork();

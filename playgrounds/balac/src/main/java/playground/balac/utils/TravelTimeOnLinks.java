@@ -22,7 +22,7 @@ public class TravelTimeOnLinks {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario);
+		MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario.getNetwork());
 		networkReader.readFile("C:/Users/balacm/Desktop/network.xml");
         String eventsFile = "C:/Users/balacm/Desktop/FreeSpeedFactor1.110.events.xml.gz";
         EventsManager events = (EventsManager) EventsUtils.createEventsManager();

@@ -50,7 +50,7 @@ public class DgCottbusNetworkFix {
 		String netFile = "/media/data/work/repos/shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/network_wgs84_utm33n.xml.gz";
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario).readFile(netFile);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(netFile);
 
 		BufferedReader linksReader = IOUtils.getBufferedReader("/media/data/work/repos/shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/links_no_lanes_changed.txt");
 		String line = linksReader.readLine();

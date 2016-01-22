@@ -106,7 +106,7 @@ public class GeneralLib {
 		MutableScenario scenario = (MutableScenario) ScenarioUtils
 				.createScenario(ConfigUtils.createConfig());
 
-		new MatsimNetworkReader(scenario).readFile(networkFile);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
 
 		PopulationReader popReader = new MatsimPopulationReader(scenario);
 		popReader.readFile(plansFile);

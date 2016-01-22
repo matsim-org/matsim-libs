@@ -20,27 +20,17 @@
 
 package playground.wrashid.parkingSearch.withindayFW2;
 
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.multimodal.router.util.BikeTravelTime;
-import org.matsim.contrib.multimodal.router.util.UnknownTravelTime;
-import org.matsim.contrib.multimodal.router.util.WalkTravelTime;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.ReplanningEvent;
 import org.matsim.core.controler.listener.ReplanningListener;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityFactory;
-import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.util.TravelTime;
 
 import playground.wrashid.parkingSearch.withinday.LegModeChecker;
 import playground.wrashid.parkingSearch.withinday.WithinDayController;
 import playground.wrashid.parkingSearch.withindayFW.core.InsertParkingActivities;
 import playground.wrashid.parkingSearch.withindayFW.core.ParkingInfrastructure;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class WithinDayParkingController extends WithinDayController implements ReplanningListener {
 
@@ -61,7 +51,7 @@ public class WithinDayParkingController extends WithinDayController implements R
 		super(args);
 		
 		// register this as a Controller Listener
-		super.addControlerListener(this);
+		controler.addControlerListener(this);
 		
 		throw new RuntimeException(Gbl.SET_UP_IS_NOW_FINAL ) ;
 	}
@@ -160,7 +150,7 @@ public class WithinDayParkingController extends WithinDayController implements R
 		 * might have been changed. Therefore, we have to ensure that the 
 		 * chains are still valid.
 		 */
-		for (Person person : this.getScenario().getPopulation().getPersons().values()) {
+		for (Person person : controler.getScenario().getPopulation().getPersons().values()) {
 			legModeChecker.run(person.getSelectedPlan());			
 		}
 	}
@@ -179,13 +169,13 @@ public class WithinDayParkingController extends WithinDayController implements R
 //			args=new String[]{"test/input/playground/wrashid/parkingSearch/withinday/chessboard/config.xml"};
 		}
 		final WithinDayParkingController controller = new WithinDayParkingController(args);
-		controller.getConfig().controler().setOverwriteFileSetting(
+		controller.controler.getConfig().controler().setOverwriteFileSetting(
 				true ?
 						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
 						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 
 
-		controller.run();
+		controller.controler.run();
 		
 		System.exit(0);
 	}

@@ -46,7 +46,7 @@ public class RailCountsTest {
 		config.transit().setUseTransit(true);
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		
-		MatsimNetworkReader netReader = new MatsimNetworkReader(scenario);
+		MatsimNetworkReader netReader = new MatsimNetworkReader(scenario.getNetwork());
 		netReader.readFile("/home/johannes/gsv/matsim/studies/netz2030/data/network.gk3.xml");
 		
 		TransitScheduleReader schedReader = new TransitScheduleReader(scenario);

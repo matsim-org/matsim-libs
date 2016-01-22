@@ -42,10 +42,14 @@ public class BastDirectionGeoLoc {
 	 * @throws IOException
 	 */
 	public static void main(String[] args) throws IOException {
-		googleLookup = new GoogleGeoCoder("localhost", 3128, 100);
+		String bastFile = "/home/johannes/gsv/matrix2014/counts/counts2014.csv";
+		String outFile = "/home/johannes/gsv/matrix2014/counts/counts2014-directions.csv";
 
-		String bastFile = "/home/johannes/gsv/counts/counts-modena.txt";
-		String outFile = "/home/johannes/gsv/counts/counts-modena.geo.txt";
+		String separator = ";";
+		String destinationLongPrefix = "fernziel_ri";
+		String destinationShortPrefix = "nahziel_ri";
+
+		googleLookup = new GoogleGeoCoder("localhost", 3128, 100);
 
 		logger.info("Loading bast counts...");
 		BufferedReader reader = new BufferedReader(new FileReader(bastFile));
@@ -53,31 +57,27 @@ public class BastDirectionGeoLoc {
 
 		String line = reader.readLine();
 		writer.write(line);
-		writer.write("\tFernziel_Ri1_long");
-		writer.write("\tFernziel_Ri1_lat");
-		writer.write("\tFernziel_Ri2_long");
-		writer.write("\tFernziel_Ri2_lat");
+		writer.write(separator + "Fernziel_Ri1_long");
+		writer.write(separator + "Fernziel_Ri1_lat");
+		writer.write(separator + "Fernziel_Ri2_long");
+		writer.write(separator + "Fernziel_Ri2_lat");
 		writer.newLine();
 
-		String[] header = line.split("\t");
+		String[] header = line.split(";");
 		Map<String, Integer> colIdices = new HashMap<String, Integer>();
 		for (int i = 0; i < header.length; i++) {
-			colIdices.put(header[i], i);
+			colIdices.put(header[i].toLowerCase(), i);
 		}
 
-		// NumberFormat format = NumberFormat.getInstance(Locale.GERMAN);
+		int dest1Idx = colIdices.get(destinationLongPrefix + "1");
+		int dest2Idx = colIdices.get(destinationLongPrefix + "2");
 
-		// int dest1Idx = colIdices.get("Fernziel_Ri1");
-		// int dest2Idx = colIdices.get("Fernziel_Ri2");
-		int dest1Idx = colIdices.get("FERNZIEL_RI1");
-		int dest2Idx = colIdices.get("FERNZIEL_RI2");
-
-		int dest1LocalIdx = colIdices.get("NAHZIEL_RI1");
-		int dest2LocalIdx = colIdices.get("NAHZIEL_RI2");
+		int dest1LocalIdx = colIdices.get(destinationShortPrefix + "1");
+		int dest2LocalIdx = colIdices.get(destinationShortPrefix + "2");
 
 		int cnt = 0;
 		while ((line = reader.readLine()) != null) {
-			String tokens[] = line.split("\t");
+			String tokens[] = line.split(separator);
 
 			if (tokens.length > dest2Idx) {
 				double[] coord1 = coordinates(tokens[dest1Idx]);
@@ -90,20 +90,20 @@ public class BastDirectionGeoLoc {
 				}
 				
 				writer.write(line);
-				writer.write("\t");
+				writer.write(separator);
 				if (coord1 != null) {
 					writer.write(String.valueOf(coord1[0]));
 				}
-				writer.write("\t");
+				writer.write(separator);
 				if (coord1 != null) {
 					writer.write(String.valueOf(coord1[1]));
 				}
 
-				writer.write("\t");
+				writer.write(separator);
 				if (coord2 != null) {
 					writer.write(String.valueOf(coord2[0]));
 				}
-				writer.write("\t");
+				writer.write(separator);
 				if (coord2 != null) {
 					writer.write(String.valueOf(coord2[1]));
 				}

@@ -58,7 +58,7 @@ public class MatrixBuilder {
     }
 
     public NumericMatrix build(Collection<? extends Person> persons, Predicate<Segment> predicate, boolean useWeights) {
-//        int n = 4;
+//        int n = 1;
         int n = persons.size() / 10000;
         n = Math.min(n, Executor.getFreePoolSize());
         n = Math.max(2, n);

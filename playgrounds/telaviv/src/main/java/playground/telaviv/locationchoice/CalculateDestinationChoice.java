@@ -71,7 +71,7 @@ public class CalculateDestinationChoice {
 	public static void main(String[] args) {
 		log.info("Reading Network");
 		Scenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenario).readFile(networkFile);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
 		log.info("done");
 
 		TravelTime travelTime = TravelTimeCalculator.create(scenario.getNetwork(), scenario.getConfig().travelTimeCalculator()).getLinkTravelTimes();

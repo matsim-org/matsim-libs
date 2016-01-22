@@ -50,7 +50,7 @@ public class CalcLegDistancesListenerDetailed implements StartupListener, AfterM
 	public void notifyStartup(StartupEvent event) {
 
 		try {
-			this.out = IOUtils.getBufferedWriter(event.getControler().getControlerIO().getOutputFilename(this.filename));
+			this.out = IOUtils.getBufferedWriter(event.getServices().getControlerIO().getOutputFilename(this.filename));
 			this.out.write("#iteration");
 
 			for (int i = 0; i < actTypes.length; i++) {
@@ -64,8 +64,8 @@ public class CalcLegDistancesListenerDetailed implements StartupListener, AfterM
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-        this.calcLegDistances = new CalcLegDistances(event.getControler().getScenario().getPopulation());
-		event.getControler().getEvents().addHandler(this.calcLegDistances);
+        this.calcLegDistances = new CalcLegDistances(event.getServices().getScenario().getPopulation());
+		event.getServices().getEvents().addHandler(this.calcLegDistances);
 
 	}
 

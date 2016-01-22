@@ -53,7 +53,7 @@ public class PlansAnalyzer {
 		Config config = ConfigUtils.createConfig();
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		
-		MatsimNetworkReader netReader = new MatsimNetworkReader(scenario);
+		MatsimNetworkReader netReader = new MatsimNetworkReader(scenario.getNetwork());
 		netReader.readFile("/Users/jillenberger/Work/shared-svn/studies/schweiz-ivtch/baseCase/network/ivtch.xml");
 		
 		MatsimPopulationReader reader = new MatsimPopulationReader(scenario);
