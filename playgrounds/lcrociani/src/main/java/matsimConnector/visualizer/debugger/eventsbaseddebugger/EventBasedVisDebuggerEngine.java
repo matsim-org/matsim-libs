@@ -23,9 +23,11 @@ package matsimConnector.visualizer.debugger.eventsbaseddebugger;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import matsimConnector.agents.Pedestrian;
 import matsimConnector.environment.TransitionArea;
@@ -51,6 +53,8 @@ import matsimConnector.utility.MathUtility;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 
 import pedCA.environment.grid.EnvironmentGrid;
 import pedCA.environment.grid.GridPoint;
@@ -114,6 +118,22 @@ public class EventBasedVisDebuggerEngine implements CAEventHandler, LineEventHan
 		this.vis.addAdditionalDrawer(drawer);
 		if (drawer instanceof ClockedVisDebuggerAdditionalDrawer) {
 			this.drawers.add((ClockedVisDebuggerAdditionalDrawer) drawer);
+		}
+	}
+	
+	private void drawNodesAndLinks() {
+		Map<String, Node> nodes = new HashMap<>();
+		for (Node n : sc.getNetwork().getNodes().values()) {
+			this.vis.addCircleStatic(n.getCoord().getX(),n.getCoord().getY(),.2f,0,0,0,255,0);
+		}
+		for (Link l : sc.getNetwork().getLinks().values()) {
+			
+			Node from = l.getFromNode();
+			Node to = l.getToNode();
+			
+			if (from!= null && to != null)
+				this.vis.addLineStatic(from.getCoord().getX(), from.getCoord().getY(), to.getCoord().getX(),
+					to.getCoord().getY(), 0, 0, 0, 255, 0);
 		}
 	}
 
@@ -287,6 +307,7 @@ public class EventBasedVisDebuggerEngine implements CAEventHandler, LineEventHan
 	
 	public void handleEvent(CAAgentConstructEvent event) {		
 		if (!environmentInit){
+			drawNodesAndLinks();
 			drawCAEnvironments();
 			environmentInit = true;
 		}
