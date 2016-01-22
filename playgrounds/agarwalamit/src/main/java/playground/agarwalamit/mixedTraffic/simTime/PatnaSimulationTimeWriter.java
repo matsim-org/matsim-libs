@@ -181,7 +181,7 @@ public class PatnaSimulationTimeWriter {
 		config.counts().setCountsScaleFactor(100/cloningFactor); 
 
 		config.controler().setFirstIteration(0);
-		config.controler().setLastIteration(5);
+		config.controler().setLastIteration(200);
 		//disable writing of the following data
 		config.controler().setWriteEventsInterval(200);
 		config.controler().setWritePlansInterval(200);
