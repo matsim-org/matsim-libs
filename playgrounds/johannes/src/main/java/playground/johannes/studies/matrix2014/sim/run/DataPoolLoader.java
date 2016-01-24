@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,       *
+ * copyright       : (C) 2016 by the members listed in the COPYING,       *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,32 +16,32 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.synpop.analysis;
+package playground.johannes.studies.matrix2014.sim.run;
 
-import org.matsim.contrib.common.stats.LinearDiscretizer;
-import playground.johannes.synpop.data.CommonKeys;
-import playground.johannes.synpop.data.CommonValues;
-import playground.johannes.synpop.data.Episode;
-import playground.johannes.synpop.data.Person;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigGroup;
+import playground.johannes.studies.matrix2014.gis.ValidateFacilities;
+import playground.johannes.studies.matrix2014.gis.ZoneSetLAU2Class;
+import playground.johannes.synpop.gis.*;
 
 /**
  * @author jillenberger
  */
-public class TripsPerPersonTask {
+public class DataPoolLoader {
 
-    public NumericAnalyzer build(FileIOContext ioContext) {
-        ValueProvider<Double, Episode> provider = new TripsCounter(new ModePredicate(CommonValues.LEG_MODE_CAR));
-        EpisodeCollector<Double> collector = new EpisodeCollector<>(provider);
+    public static void load(Simulator engine, Config config) {
+        DataPool dataPool = engine.getDataPool();
+        ConfigGroup configGroup = config.getModule(Simulator.MODULE_NAME);
 
-        DiscretizerBuilder builder = new PassThroughDiscretizerBuilder(new LinearDiscretizer(1.0), "linear");
-        HistogramWriter writer = new HistogramWriter(ioContext, builder);
+        dataPool.register(new FacilityDataLoader(configGroup.getValue("facilities"), engine.getRandom()), FacilityDataLoader.KEY);
+        dataPool.register(new ZoneDataLoader(configGroup), ZoneDataLoader.KEY);
 
-        ValueProvider<Double, Person> weightsProvider = new NumericAttributeProvider<>(CommonKeys.PERSON_WEIGHT);
-        EpisodePersonCollector<Double> weightsCollector = new EpisodePersonCollector<>(weightsProvider);
+        ValidateFacilities.validate(dataPool, "modena");
+        ValidateFacilities.validate(dataPool, "lau2");
+        ValidateFacilities.validate(dataPool, "nuts3");
+        ValidateFacilities.validate(dataPool, "tomtom");
 
-        NumericAnalyzer analyzer = new NumericAnalyzer(collector, weightsCollector, "nTrips", writer);
-
-        return analyzer;
+        ZoneCollection lau2Zones = ((ZoneData) dataPool.get(ZoneDataLoader.KEY)).getLayer("lau2");
+        new ZoneSetLAU2Class().apply(lau2Zones);
     }
-
 }

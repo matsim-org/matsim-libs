@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,       *
+ * copyright       : (C) 2016 by the members listed in the COPYING,       *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,32 +16,37 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.synpop.analysis;
+package playground.johannes.studies.matrix2014.sim.run;
 
-import org.matsim.contrib.common.stats.LinearDiscretizer;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigGroup;
+import playground.johannes.studies.matrix2014.config.ODCalibratorConfigurator;
+import playground.johannes.studies.matrix2014.sim.CachedModePredicate;
+import playground.johannes.studies.matrix2014.sim.DelayedHamiltonian;
+import playground.johannes.studies.matrix2014.sim.ODCalibrator;
 import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.CommonValues;
-import playground.johannes.synpop.data.Episode;
-import playground.johannes.synpop.data.Person;
 
 /**
  * @author jillenberger
  */
-public class TripsPerPersonTask {
+public class ODCalibratorHamiltonian {
 
-    public NumericAnalyzer build(FileIOContext ioContext) {
-        ValueProvider<Double, Episode> provider = new TripsCounter(new ModePredicate(CommonValues.LEG_MODE_CAR));
-        EpisodeCollector<Double> collector = new EpisodeCollector<>(provider);
+    private static final String MODULE_NAME = "odCalibratorHamiltonian";
 
-        DiscretizerBuilder builder = new PassThroughDiscretizerBuilder(new LinearDiscretizer(1.0), "linear");
-        HistogramWriter writer = new HistogramWriter(ioContext, builder);
+    public static void build(Simulator engine, Config config) {
+        ConfigGroup configGroup = config.getModule(MODULE_NAME);
+        ODCalibrator hamiltonian = new ODCalibratorConfigurator(
+                engine.getDataPool())
+                .configure(config.getModule("tomtomCalibrator"));
 
-        ValueProvider<Double, Person> weightsProvider = new NumericAttributeProvider<>(CommonKeys.PERSON_WEIGHT);
-        EpisodePersonCollector<Double> weightsCollector = new EpisodePersonCollector<>(weightsProvider);
+        hamiltonian.setUseWeights(true);
+        hamiltonian.setPredicate(new CachedModePredicate(CommonKeys.LEG_MODE, CommonValues.LEG_MODE_CAR));
 
-        NumericAnalyzer analyzer = new NumericAnalyzer(collector, weightsCollector, "nTrips", writer);
+        long delay = (long) Double.parseDouble(configGroup.getValue("delay"));
+        double theta = Double.parseDouble(configGroup.getValue("theta"));
 
-        return analyzer;
+        engine.getHamiltonian().addComponent(new DelayedHamiltonian(hamiltonian, delay), theta);
+        engine.getAttributeListeners().get(CommonKeys.ACTIVITY_FACILITY).addComponent(hamiltonian);
     }
-
 }
