@@ -26,6 +26,7 @@ import playground.johannes.synpop.analysis.Predicate;
 import playground.johannes.synpop.data.*;
 import playground.johannes.synpop.processing.TaskRunner;
 import playground.johannes.synpop.sim.BivariatMean;
+import playground.johannes.synpop.sim.HamiltonianLogger;
 import playground.johannes.synpop.sim.data.Converters;
 import playground.johannes.synpop.sim.data.DoubleConverter;
 import playground.johannes.synpop.source.mid2008.MiDKeys;
@@ -69,6 +70,14 @@ public class MeanDistanceHamiltonian {
         engine.getHamiltonian().addComponent(hamiltonian, theta);
 
         engine.getAttributeListeners().get(CommonKeys.LEG_GEO_DISTANCE).addComponent(hamiltonian);
+
+        /*
+        Add a hamiltonian logger.
+         */
+        engine.getEngineListeners().addComponent(new HamiltonianLogger(hamiltonian,
+                engine.getLoggingInterval(),
+                "meanDistanceLAU2",
+                engine.getIOContext().getRoot()));
     }
 
     private static Set<Attributable> getCarLegs(Set<? extends Person> persons, Predicate<Segment> predicate) {

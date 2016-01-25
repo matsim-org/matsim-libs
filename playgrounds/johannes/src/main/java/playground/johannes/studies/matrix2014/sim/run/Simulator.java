@@ -44,7 +44,7 @@ public class Simulator {
 
     private static final Logger logger = Logger.getLogger(Simulator.class);
 
-    static final String MODULE_NAME = "spic";
+    static final String MODULE_NAME = "synPopSim";
 
     private static final boolean USE_WEIGHTS = true;
 
@@ -80,7 +80,7 @@ public class Simulator {
     }
 
     AnalyzerTaskComposite<Collection<? extends Person>> getHamiltonianAnalyzers() {
-        return null;
+        return hamiltonianAnalyzers;
     }
 
     HamiltonianComposite getHamiltonian() {
@@ -140,9 +140,6 @@ public class Simulator {
         analyzerTasks = new AnalyzerTaskComposite<>();
         engineListeners = new MarkovEngineListenerComposite();
         attributeListeners = new HashMap<>();
-
-        hamiltonianAnalyzers = new ConcurrentAnalyzerTask<>();
-        analyzerTasks.addComponent(new AnalyzerTaskGroup<>(hamiltonianAnalyzers, getIOContext(), "hamiltonian"));
         /*
         Load parameters...
          */
@@ -194,6 +191,9 @@ public class Simulator {
             TaskRunner.run(new CopyPersonAttToLeg(CommonKeys.PERSON_WEIGHT), refPersons);
             TaskRunner.run(new CopyPersonAttToLeg(CommonKeys.PERSON_WEIGHT), simPersons);
         }
+
+        hamiltonianAnalyzers = new ConcurrentAnalyzerTask<>();
+        analyzerTasks.addComponent(new AnalyzerTaskGroup<>(hamiltonianAnalyzers, ioContext, "hamiltonian"));
 
         GeoDistanceHamiltonian.build(this, config);
         MeanDistanceHamiltonian.build(this, config);

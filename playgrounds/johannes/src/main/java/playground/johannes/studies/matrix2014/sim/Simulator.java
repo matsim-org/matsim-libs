@@ -416,7 +416,7 @@ public class Simulator {
         @Override
         public double value(double x) throws FunctionEvaluationException {
             double routDist = x / 1000.0;
-            double factor = 0.77 - Math.exp(-0.17 * Math.max(20, routDist) - 1.48);
+            double factor = 0.77 - Math.exp(-0.17 * Math.max(100, routDist) - 1.48);
             return routDist * factor * 1000;
         }
     }

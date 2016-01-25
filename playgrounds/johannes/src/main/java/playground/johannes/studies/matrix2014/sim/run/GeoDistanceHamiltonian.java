@@ -98,8 +98,10 @@ public class GeoDistanceHamiltonian {
         /*
         Add a hamiltonian logger.
          */
-        String name = String.format("hamiltonian.%s", CommonKeys.LEG_GEO_DISTANCE);
-        engine.getEngineListeners().addComponent(new HamiltonianLogger(hamiltonian, engine.getLoggingInterval(), name, engine.getIOContext().getRoot()));
+        engine.getEngineListeners().addComponent(new HamiltonianLogger(hamiltonian,
+                engine.getLoggingInterval(),
+                CommonKeys.LEG_GEO_DISTANCE,
+                engine.getIOContext().getRoot()));
     }
 
     private static Set<Attributable> getCarLegs(Set<? extends Person> persons, Predicate<Segment> predicate) {
