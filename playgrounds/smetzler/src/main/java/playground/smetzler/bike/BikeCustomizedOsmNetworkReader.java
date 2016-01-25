@@ -46,6 +46,8 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Counter;
+import org.matsim.utils.objectattributes.ObjectAttributes;
+import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 
@@ -103,7 +105,13 @@ public class BikeCustomizedOsmNetworkReader implements MatsimSomeReader {
 	private final static String TAG_JUNCTION = "junction";
     private final static String TAG_ONEWAY = "oneway";
     private final static String TAG_ACCESS = "access";
-	private final static String[] ALL_TAGS = new String[] {TAG_LANES, TAG_HIGHWAY, TAG_MAXSPEED, TAG_JUNCTION, TAG_ONEWAY, TAG_ACCESS};
+    // new
+    private final static String TAG_CYCLEWAYTYPE= "cycleway";
+    private final static String TAG_SURFACE = "surface";
+	private ObjectAttributes bikeAttributes = new ObjectAttributes();
+    //
+    
+	private final static String[] ALL_TAGS = new String[] {TAG_LANES, TAG_HIGHWAY, TAG_MAXSPEED, TAG_JUNCTION, TAG_ONEWAY, TAG_ACCESS, TAG_CYCLEWAYTYPE, TAG_SURFACE};
 
 	private final Map<Long, OsmNode> nodes = new HashMap<Long, OsmNode>();
 	private final Map<Long, OsmWay> ways = new HashMap<Long, OsmWay>();
@@ -223,6 +231,7 @@ public class BikeCustomizedOsmNetworkReader implements MatsimSomeReader {
 		log.info("osm: # ways read:        " + parser.wayCounter.getCounter());
 		log.info("MATSim: # nodes created: " + this.network.getNodes().size());
 		log.info("MATSim: # links created: " + this.network.getLinks().size());
+//		log.info("BikeObjectAttributs created: " bikeAttributes.getID.size());
 
 		if (this.unknownHighways.size() > 0) {
 			log.info("The following highway-types had no defaults set and were thus NOT converted:");
@@ -547,6 +556,24 @@ public class BikeCustomizedOsmNetworkReader implements MatsimSomeReader {
 			}
 		}
 
+		
+		////////////////////////////////////////////////////////////////////////////////////new
+		// cycleway
+		String cyclewaytypeTag = way.tags.get(TAG_CYCLEWAYTYPE);
+	//	String orgOSMId = Long.toString(way.id);
+		String matsimId = Long.toString(id);
+		
+		if (cyclewaytypeTag != null) {
+			bikeAttributes.putAttribute(matsimId, "cyclewaytype", cyclewaytypeTag);
+		};
+		
+		String surfaceTag = way.tags.get(TAG_SURFACE);
+		if (surfaceTag != null) {
+			bikeAttributes.putAttribute(matsimId, "surface", surfaceTag);
+		};
+		// new end
+		
+		
 		// create the link(s)
 		double capacity = nofLanes * laneCapacity;
 
@@ -587,7 +614,16 @@ public class BikeCustomizedOsmNetworkReader implements MatsimSomeReader {
 
 		}
 	}
+	
+	//new 
+	public ObjectAttributes getBikeAttributes() {
+		return this.bikeAttributes;
+	}
+	
 
+	
+	//new end
+	
 	private static class OsmFilter {
 		private final Coord coordNW;
 		private final Coord coordSE;

@@ -12,6 +12,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.OsmNetworkReader;
+import org.matsim.utils.objectattributes.ObjectAttributes;
+import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
 public class CreateNetwork {
 
@@ -22,7 +24,8 @@ public class CreateNetwork {
 		
 		String DHDN = "EPSG:3068";
 		String inputOSM = "C:/Users/Ettan/13.Sem - Uni WS 15-16/Masterarbeit/netzwerk/schlesi/map_schlesi.osm";
-		String outputXML = "C:/Users/Ettan/13.Sem - Uni WS 15-16/Masterarbeit/netzwerk/schlesi/out_cycletest.xml";
+		String outputXML = "C:/Users/Ettan/13.Sem - Uni WS 15-16/Masterarbeit/netzwerk/schlesi/out_cycletest2.xml";
+		String outputBikeXML = "C:/Users/Ettan/13.Sem - Uni WS 15-16/Masterarbeit/netzwerk/schlesi/out_bikeatt.xml";
 
 		Config config = ConfigUtils.createConfig();
 		Scenario sc = ScenarioUtils.createScenario(config);
@@ -35,17 +38,16 @@ public class CreateNetwork {
 		BikeCustomizedOsmNetworkReader bikeNetworkReader = new BikeCustomizedOsmNetworkReader(net, ct);
 		bikeNetworkReader.parse(inputOSM); 
 		
-		System.out.println(net.getLinks());
-		
 
-		
-//		System.out.println(onr.);
-//		System.out.print("hello");
 		//new NetworkCleaner().run(net);
 
 		new NetworkWriter(net).write(outputXML);
-		
+		//new bike attributes writer
+		new ObjectAttributesXmlWriter(bikeNetworkReader.getBikeAttributes()).writeFile(outputBikeXML);
+
+
 	}
+
 
 }
 
