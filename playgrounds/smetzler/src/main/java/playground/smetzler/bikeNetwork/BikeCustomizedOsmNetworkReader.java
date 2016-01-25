@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.smetzler.bike;
+package playground.smetzler.bikeNetwork;
 
 import java.io.InputStream;
 import java.util.ArrayList;

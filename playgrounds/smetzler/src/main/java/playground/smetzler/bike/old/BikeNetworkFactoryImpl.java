@@ -1,4 +1,4 @@
-package playground.smetzler.bike;
+package playground.smetzler.bike.old;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;

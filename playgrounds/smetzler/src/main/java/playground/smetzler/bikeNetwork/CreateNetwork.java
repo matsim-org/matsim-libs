@@ -1,4 +1,4 @@
-package playground.smetzler.bike;
+package playground.smetzler.bikeNetwork;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -23,9 +23,14 @@ public class CreateNetwork {
 	
 		
 		String DHDN = "EPSG:3068";
-		String inputOSM = "../../../../13.Sem - Uni WS 15-16/Masterarbeit/netzwerk/schlesi/map_schlesi.osm";
-		String outputXML = "../../../../13.Sem - Uni WS 15-16/Masterarbeit/netzwerk/schlesi/map_matsim_schlesi.xml";
-		String outputBikeXML = "../../../../13.Sem - Uni WS 15-16/Masterarbeit/netzwerk/schlesi/schlesi_bikeatt.xml";
+		String inputOSM = "../../../../13.Sem - Uni WS 15-16/Masterarbeit/netzwerk/skalitzer/skalitzer_OSM.xml";
+	//	String outputXML = "../../../../13.Sem - Uni WS 15-16/Masterarbeit/netzwerk/skalitzer/skalitzer_MATsim.xml";
+	//  String outputBikeXML = "../../../../13.Sem - Uni WS 15-16/Masterarbeit/netzwerk/skalitzer/skalitzer_bikeatt.xml";
+		
+		String outputXML =     "../smetzler/input/network/skalitzer_MATsim.xml";
+		String outputBikeXML = "../smetzler/input/network/skalitzer_bikeatt.xml";
+		
+		
 
 		Config config = ConfigUtils.createConfig();
 		Scenario sc = ScenarioUtils.createScenario(config);
