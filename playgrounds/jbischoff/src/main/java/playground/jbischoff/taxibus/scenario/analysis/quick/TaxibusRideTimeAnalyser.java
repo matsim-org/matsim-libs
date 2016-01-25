@@ -41,6 +41,8 @@ import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.Time;
+import org.postgresql.jdbc2.TimestampUtils;
 
 /**
  * @author  jbischoff
@@ -130,6 +132,8 @@ public class TaxibusRideTimeAnalyser implements ActivityEndEventHandler, Activit
 		
 		Locale.setDefault(Locale.US);
 		DecimalFormat df = new DecimalFormat( "##,##0.00" );
+		DecimalFormat lf = new DecimalFormat( "##,##0" );
+		
 		BufferedWriter writer = IOUtils.getBufferedWriter(hourlyStats);
 		try {
 			writer.append("hour\tDepartures\tRides\tOccupancy");
@@ -139,13 +143,13 @@ public class TaxibusRideTimeAnalyser implements ActivityEndEventHandler, Activit
 				if (hourlyTourDepartures[i]>0) occ = hourlyDepartures[i]/hourlyTourDepartures[i];
 				
 				String result = df.format(occ);
-				writer.append(i+"\t"+hourlyTourDepartures[i]+"\t"+hourlyDepartures[i]+"\t"+result);
+				writer.append(i+"\t"+lf.format(hourlyTourDepartures[i])+"\t"+lf.format(hourlyDepartures[i])+"\t"+result);
 								
 			}
 			writer.newLine();
 			double allTourDepartures = new Sum().evaluate(hourlyTourDepartures);
 			double allRides = new Sum().evaluate(hourlyDepartures);
-			writer.append("overall\t"+allTourDepartures+"\t"+allRides+"\t"+df.format(allRides/allTourDepartures));
+			writer.append("overall\t"+lf.format(allTourDepartures)+"\t"+lf.format(allRides)+"\t"+df.format(allRides/allTourDepartures));
 			writer.flush();
 			writer.close();
 			
@@ -210,8 +214,9 @@ class TaxibusTour implements Comparable<TaxibusTour>{
 
 	@Override
 	public String toString() {
-		return vid + "\t"+ firstPickup + "\t" + lastPickup + "\t" + occupancy
-				+ "\t" + pickUpDuration + "\t" + dropoffTime;
+
+		return vid + "\t"+ Time.writeTime(firstPickup) + "\t" + Time.writeTime(lastPickup) + "\t" + Time.writeTime(occupancy)
+				+ "\t" + Time.writeTime(pickUpDuration) + "\t" + Time.writeTime(dropoffTime);
 	}
 
 
