@@ -23,9 +23,9 @@ public class CreateNetwork {
 	
 		
 		String DHDN = "EPSG:3068";
-		String inputOSM = "C:/Users/Ettan/13.Sem - Uni WS 15-16/Masterarbeit/netzwerk/schlesi/map_schlesi.osm";
-		String outputXML = "C:/Users/Ettan/13.Sem - Uni WS 15-16/Masterarbeit/netzwerk/schlesi/out_cycletest2.xml";
-		String outputBikeXML = "C:/Users/Ettan/13.Sem - Uni WS 15-16/Masterarbeit/netzwerk/schlesi/out_bikeatt.xml";
+		String inputOSM = "../../../../13.Sem - Uni WS 15-16/Masterarbeit/netzwerk/schlesi/map_schlesi.osm";
+		String outputXML = "../../../../13.Sem - Uni WS 15-16/Masterarbeit/netzwerk/schlesi/map_matsim_schlesi.xml";
+		String outputBikeXML = "../../../../13.Sem - Uni WS 15-16/Masterarbeit/netzwerk/schlesi/schlesi_bikeatt.xml";
 
 		Config config = ConfigUtils.createConfig();
 		Scenario sc = ScenarioUtils.createScenario(config);

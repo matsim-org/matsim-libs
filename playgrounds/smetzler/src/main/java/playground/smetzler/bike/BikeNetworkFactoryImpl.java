@@ -15,7 +15,7 @@ import org.matsim.core.network.NetworkChangeEventFactoryImpl;
 import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NodeImpl;
-import org.matsim.core.network.TimeVariantLinkFactory;
+//import org.matsim.core.network.TimeVariantLinkFactory;
 
 public class BikeNetworkFactoryImpl implements NetworkFactory {
 	
