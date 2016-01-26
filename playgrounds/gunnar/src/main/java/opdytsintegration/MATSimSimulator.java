@@ -8,6 +8,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.TerminationCriterion;
+import org.matsim.core.scoring.ScoringFunctionFactory;
 
 import floetteroed.opdyts.DecisionVariable;
 import floetteroed.opdyts.SimulatorState;
@@ -36,6 +37,8 @@ public class MATSimSimulator<U extends DecisionVariable> implements
 
 	private int nextControlerRun = 0;
 
+	private ScoringFunctionFactory scoringFunctionFactory = null;
+
 	// -------------------- CONSTRUCTOR --------------------
 
 	public MATSimSimulator(final MATSimStateFactory<U> stateFactory,
@@ -53,6 +56,11 @@ public class MATSimSimulator<U extends DecisionVariable> implements
 				.getOutputDirectory();
 		this.scenario.getConfig().controler()
 				.setOutputDirectory(outputDirectory + "_0");
+	}
+
+	// TODO NEW
+	public void setScoringFunctionFactory(final ScoringFunctionFactory factory) {
+		this.scoringFunctionFactory = factory;
 	}
 
 	// --------------- IMPLEMENTATION OF Simulator INTERFACE ---------------
@@ -82,7 +90,7 @@ public class MATSimSimulator<U extends DecisionVariable> implements
 				trajectorySampler, this.stateFactory, this.timeDiscretization,
 				this.relevantLinkIds);
 		matsimDecisionVariableEvaluator.setMemory(1); // TODO make configurable
-//		matsimDecisionVariableEvaluator.setStandardLogFileName("./opdyts.log");
+		// matsimDecisionVariableEvaluator.setStandardLogFileName("./opdyts.log");
 
 		/*
 		 * (3) Create, configure, and run a new MATSim Controler.
@@ -122,6 +130,13 @@ public class MATSimSimulator<U extends DecisionVariable> implements
 				return (!matsimDecisionVariableEvaluator.foundSolution());
 			}
 		});
+
+		// >>>>>>>>>> TODO NEW >>>>>>>>>>
+		if (this.scoringFunctionFactory != null) {
+			controler.setScoringFunctionFactory(this.scoringFunctionFactory);
+		}
+		// <<<<<<<<<< TODO NEW <<<<<<<<<<
+
 		controler.run();
 		this.nextControlerRun++;
 		return matsimDecisionVariableEvaluator.getFinalState();

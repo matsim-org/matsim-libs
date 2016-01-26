@@ -1,4 +1,4 @@
-package floetteroed.opdyts.example;
+package floetteroed.opdyts.example.pathological;
 
 import java.io.IOException;
 import java.util.List;
@@ -59,7 +59,8 @@ public class PathologicalExample {
 		final boolean interpolate = true;
 		final int maxRandomSearchIterations = 50;
 		final int maxRandomSearchTransitions = Integer.MAX_VALUE;
-
+		final boolean includeCurrentBest = true;
+		
 		final RandomSearch<VectorDecisionVariable> randomSearch = new RandomSearch<>(
 				system, new VectorDecisionVariableRandomizer(2, 0.1,
 						MatsimRandom.getRandom(), this.system, new Vector(-0.1,
@@ -68,7 +69,7 @@ public class PathologicalExample {
 				convergenceCriterion, maxRandomSearchIterations,
 				maxRandomSearchTransitions, this.populationSize,
 				MatsimRandom.getRandom(), interpolate, objFct,
-				maxMemorizedTrajectoryLength);
+				maxMemorizedTrajectoryLength, includeCurrentBest);
 		randomSearch.setLogFileName(this.logFileName);
 
 		randomSearch.run();

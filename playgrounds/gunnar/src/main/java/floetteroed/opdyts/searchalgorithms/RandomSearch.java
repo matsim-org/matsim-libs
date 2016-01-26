@@ -24,8 +24,10 @@
  */
 package floetteroed.opdyts.searchalgorithms;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Random;
@@ -52,6 +54,8 @@ public class RandomSearch<U extends DecisionVariable> {
 
 	// -------------------- CONSTANTS --------------------
 
+	public static final String TIMESTAMP = "Timestamp";
+
 	public static final String RANDOM_SEARCH_ITERATION = "Random Search Iteration";
 
 	private final Simulator<U> simulator;
@@ -75,6 +79,8 @@ public class RandomSearch<U extends DecisionVariable> {
 	private final ObjectiveFunction objectBasedObjectiveFunction;
 
 	private final int maxMemoryLength;
+
+	private final boolean includeCurrentBest;
 
 	// -------------------- MEMBERS --------------------
 
@@ -104,7 +110,7 @@ public class RandomSearch<U extends DecisionVariable> {
 			final int populationSize, final Random rnd,
 			final boolean interpolate,
 			final ObjectiveFunction objectBasedObjectiveFunction,
-			final int maxMemoryLength) {
+			final int maxMemoryLength, final boolean includeCurrentBest) {
 		this.simulator = simulator;
 		this.randomizer = randomizer;
 		this.initialDecisionVariable = initialDecisionVariable;
@@ -116,6 +122,7 @@ public class RandomSearch<U extends DecisionVariable> {
 		this.interpolate = interpolate;
 		this.objectBasedObjectiveFunction = objectBasedObjectiveFunction;
 		this.maxMemoryLength = maxMemoryLength;
+		this.includeCurrentBest = includeCurrentBest;
 	}
 
 	// -------------------- SETTERS AND GETTERS --------------------
@@ -129,10 +136,10 @@ public class RandomSearch<U extends DecisionVariable> {
 	private int transitions = 0;
 
 	public void run() {
+		this.run(0.0, 0.0);
+	}
 
-		double equilibriumGapWeight = 0.0;
-		double uniformityGapWeight = 0.0;
-
+	public void run(double equilibriumGapWeight, double uniformityGapWeight) {
 		U bestDecisionVariable = this.initialDecisionVariable;
 		Double bestObjectiveFunctionValue = null;
 		SimulatorState newInitialState = null;
@@ -151,6 +158,9 @@ public class RandomSearch<U extends DecisionVariable> {
 			this.offsets.add(Double.NaN);
 
 			final Set<U> candidates = new LinkedHashSet<U>();
+			if (this.includeCurrentBest) {
+				candidates.add(bestDecisionVariable);
+			}
 			while (candidates.size() < this.populationSize) {
 				candidates.addAll(this.randomizer
 						.newRandomVariations(bestDecisionVariable));
@@ -169,6 +179,21 @@ public class RandomSearch<U extends DecisionVariable> {
 				sampler.setMaxMemoryLength(this.maxMemoryLength);
 
 				if (this.logFileName != null) {
+					sampler.addStatistic(this.logFileName,
+							new Statistic<SamplingStage<U>>() {
+								@Override
+								public String label() {
+									return TIMESTAMP;
+								}
+
+								@Override
+								public String value(final SamplingStage<U> data) {
+									return (new SimpleDateFormat(
+											"yyyy-MM-dd HH:mm:ss"))
+											.format(new Date(System
+													.currentTimeMillis()));
+								}
+							});
 					final int currentIt = it; // inner class requires final
 					sampler.addStatistic(this.logFileName,
 							new Statistic<SamplingStage<U>>() {

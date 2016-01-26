@@ -1,4 +1,4 @@
-package floetteroed.opdyts.example;
+package floetteroed.opdyts.example.pathological;
 
 import floetteroed.opdyts.DecisionVariable;
 import floetteroed.utilities.math.Vector;
