@@ -2,7 +2,9 @@ package playground.dziemke.feathersMatsim.ikea.CreatePlans;
 
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Random;
 
@@ -54,7 +56,7 @@ public class Case2CreateDemand {
 			// skip header
 			String line = bufferedReader.readLine();
 
-			String originTAZ="null";
+			String originTAZ=null;
 
 			// set indices
 			int index_personId = 7;
@@ -70,7 +72,16 @@ public class Case2CreateDemand {
 
 			Id previousPerson = null;
 			double departureTimeBuffer = 0.0;
+			double sum=0.0;
+			double max=0.0;
+			double maxSlowMode=0.0;
+			String stringMAX = null;
+			String stringMAXSlowMode=null;
+			int counter=0;
 			Coord coordOrigin=new Coord(0,0);
+			BufferedWriter bw=new BufferedWriter(new FileWriter("C:/Users/jeffw_000/Desktop/Dropbox/Uni/Master/Masterarbeit/MT/workspace new/ikeaStudy/output/Case2Distances.csv", true));
+			BufferedWriter bw2=new BufferedWriter(new FileWriter("C:/Users/jeffw_000/Desktop/Dropbox/Uni/Master/Masterarbeit/MT/workspace new/ikeaStudy/output/Case2DistancesCars.csv", true));
+
 
 			while((line=bufferedReader.readLine()) != null){
 				String parts[] = line.split(";");
@@ -93,7 +104,7 @@ public class Case2CreateDemand {
 				double activityDuration = (Double.parseDouble(parts[index_activityDuration]))*60;
 
 				// journey duration in [s]:
-				double journeyDuration = (Double.parseDouble(parts[index_journeyDuration]))*60;
+		//		double journeyDuration = (Double.parseDouble(parts[index_journeyDuration]))*60;
 
 				//Add first activity
 				if(!personId.equals(previousPerson)){
@@ -122,61 +133,61 @@ public class Case2CreateDemand {
 					String mode = parts[index_mode];
 					Leg leg = populationFactory.createLeg(modeStrings[Integer.parseInt(mode)]);
 					leg.setDepartureTime(departureTimeBuffer);
-					leg.setTravelTime(journeyDuration);
+			//		leg.setTravelTime(journeyDuration);
 					plan.addLeg(leg);
 
 					//Add (random or home) destination Coord
 					if (parts[index_activityType].equals("0")){
 						coordDestination = (Coord) homeLocations.getAttribute(String.valueOf(personId),"home");}
-
-					else if(parts[index_activityLocation].equals("IKEA"))
+// If agent is an IKEA visitor: set destination to IKEA-coordinates
+					else if(parts[index_personId].contains("IKEA")&&parts[index_activityLocation].equals("IKEA")&&parts[index_activityType].equals("4")&&parts[index_mode].equals("1"))
 
 					{coordDestination = new Coord(xIKEA,yIKEA);}
 
 
 					else{
-						coordDestination = coordTazManager.randomCoordinates(Integer.parseInt(parts[index_activityLocation]));
+						System.out.println("Looking for best suited  Coord...Agent: "+personId+" Activity ID: "+Integer.parseInt(parts[index_activityId])+" Distance: "+Double.parseDouble(parts[index_journeyDistance])*1000);
+
+						coordDestination=coordTazManager.findBestRandomCoordinates(Integer.parseInt(parts[index_activityLocation]), coordOrigin, Double.parseDouble(parts[index_journeyDistance])*1000, Integer.parseInt(parts[index_mode]));
 
 						double distance=Math.sqrt(
 								Math.pow(coordDestination.getX()-coordOrigin.getX(),2)
 								+Math.pow(coordDestination.getY()-coordOrigin.getY(), 2)
 								);
 
-
-						// Set allowed margin depending on travel mode and route distance
-						double margin=999999;
-						// Slow mode (bike or walking): route distance close to beeline
-						if(Integer.parseInt(parts[index_mode])==3){margin=3000;}
-						//car or Passenger
+						// Slow mode (bike or walking): route distance close to beeline;
+						// for car legs however: multiply distance with beelineFactor
 						if(Integer.parseInt(parts[index_mode])==1||Integer.parseInt(parts[index_mode])==6){
-							// set margin to 20% of travel distance with a min of 25000
 							distance=distance*beelineFactor;
-							margin=0.2*Double.parseDouble(parts[index_journeyDistance])*1000;
-							if(margin<25000){margin=25000;}
 						}
-						// if IKEA-visitor: ignore
-						if(parts[index_activityLocation].equals("IKEA")||originTAZ.equals("IKEA")){margin=99999999;}
 
+						// 	Difference between calculated OD-distance and FEATHERS-distance
 						double diff=Math.abs(distance-((Double.parseDouble(parts[index_journeyDistance])*1000)));
 
-						System.out.println("Agent: "+personId+" Activity ID: "+Integer.parseInt(parts[index_activityId])+" Distance: "+diff+" TAZ: "+parts[index_activityLocation]);
-
-
-						while (diff>=margin
-								){
-							coordDestination = coordTazManager.randomCoordinates(Integer.parseInt(parts[index_activityLocation]));
-							distance=Math.sqrt(
-									Math.pow(coordDestination.getX()-coordOrigin.getX(),2)
-									+Math.pow(coordDestination.getY()-coordOrigin.getY(), 2)
-									);
-
-							if(Integer.parseInt(parts[index_mode])==1||Integer.parseInt(parts[index_mode])==6){
-								distance=distance*beelineFactor;
-							}	
-
-							diff=Math.abs(distance-((Double.parseDouble(parts[index_journeyDistance])*1000)));	
-							System.out.println("Agent: "+personId+" Activity ID: "+Integer.parseInt(parts[index_activityId])+" Travel Mode: "+parts[index_mode]+" Distance: "+distance+" difference: "+diff+" allowed margin: "+margin+" Journey_distance: "+Double.parseDouble(parts[index_journeyDistance])+" TAZ: "+Integer.parseInt(parts[index_activityLocation])+" OriginTAZ: "+originTAZ+" CoordOrigin: "+coordOrigin+" CoordDestination: "+coordDestination);
+						// find MAX for car trips:
+						if((Integer.parseInt(parts[index_mode])==1)&&diff>max){
+							max=diff;
+							stringMAX="Agent: "+personId+" Activity ID: "+Integer.parseInt(parts[index_activityId])+" Travel Mode: "+parts[index_mode]+" Distance: "+distance+" difference: "+diff+" Journey_distance: "+Double.parseDouble(parts[index_journeyDistance])+" TAZ: "+Integer.parseInt(parts[index_activityLocation])+" OriginTAZ: "+originTAZ+" CoordOrigin: "+coordOrigin+" CoordDestination: "+coordDestination;
 						}
+						
+						// MAX for slowMode:
+						if((Integer.parseInt(parts[index_mode])==3)&&(diff>maxSlowMode)){
+							maxSlowMode=diff;
+							stringMAXSlowMode="Agent: "+personId+" Activity ID: "+Integer.parseInt(parts[index_activityId])+" Travel Mode: "+parts[index_mode]+" Distance: "+distance+" difference: "+diff+" Journey_distance: "+Double.parseDouble(parts[index_journeyDistance])+" TAZ: "+Integer.parseInt(parts[index_activityLocation])+" OriginTAZ: "+originTAZ+" CoordOrigin: "+coordOrigin+" CoordDestination: "+coordDestination;
+						}
+
+						if(Integer.parseInt(parts[index_mode])==1||Integer.parseInt(parts[index_mode])==6
+								||Integer.parseInt(parts[index_mode])==3
+								||Integer.parseInt(parts[index_mode])==4
+
+								){
+							bw.write(parts[index_activityId]+";"+(diff/distance)*100+" %; "+(int) diff+";"+distance+";"+parts[index_mode]+";");
+							sum=sum+diff;
+							counter=counter+1;
+							bw.newLine();
+						}
+						System.out.println("-------------------------------------------------- Distance: "+distance+" Difference: "+diff+" margin: "+(diff/distance)*100+"% mode: "+parts[index_mode]);
+
 
 					}
 					// Add activity
@@ -186,7 +197,6 @@ public class Case2CreateDemand {
 					departureTimeBuffer=activityStartTime+activityDuration;
 					coordOrigin=coordDestination;
 					originTAZ=parts[index_activityLocation];
-					//	System.out.println("origin: "+originTAZ);
 				}
 				previousPerson = personId;
 			}

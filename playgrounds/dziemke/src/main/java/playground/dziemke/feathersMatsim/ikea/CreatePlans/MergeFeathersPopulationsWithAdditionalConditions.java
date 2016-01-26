@@ -9,22 +9,22 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-//	Plan: Take 2,250 IKEA visitors who go by car and substitute them in original population; how? 1. Location, 2. Socioeconomic data?
-//	Auf gesamtbev�lkerung ersetzen
-//	Ersetzte plane dokumentieren und dann analysieren, insb. In hinblick darauf wie unterschiedliche die ersetzTEN plane von den ersetzENDEN pl�nen sind
+//	Plan: Take 2,250 IKEA visitors who go by car (or 'ride' and then change 'ride' to car) and substitute them in original population; how? 1. Location, 2. Socioeconomic data?
 
 public class MergeFeathersPopulationsWithAdditionalConditions {
 
-	static String inputFile1="./input/prdToAsciiRectifiedTAZ.csv";
-	static String inputFile2="./input/prdToAscii_IKEA.csv";
-	static String outputFile="./output/mergedPrdToAscii.csv";
-	static String outputFile2="./output/substitutedPlans.csv";
+	static String inputFile1="C:/Users/jeffw_000/Desktop/Dropbox/Uni/Master/Masterarbeit/MT/workspace new/ikeaStudy/input/prdToAsciiRectifiedTAZ.csv";
+	static String inputFile2="C:/Users/jeffw_000/Desktop/Dropbox/Uni/Master/Masterarbeit/MT/workspace new/ikeaStudy/input/prdToAscii_IKEA.csv";
+	static String outputFile="C:/Users/jeffw_000/Desktop/Dropbox/Uni/Master/Masterarbeit/MT/workspace new/ikeaStudy/output/mergedPrdToAscii.csv";
+	static String outputFile2="C:/Users/jeffw_000/Desktop/Dropbox/Uni/Master/Masterarbeit/MT/workspace new/ikeaStudy/output/substitutedPlans.csv";
 
 	static int index_travelMode=19;
 	static int index_homeZone=1;
 	static int index_agentID=7;
+	static int index_activityID=12;
 	static int index_activityZone=17;
 	static int index_activityType=14;
+	static int index_activityBeginningTime=15;
 
 	//socio-economic parameters:
 	static int index_gender=10;
@@ -38,9 +38,11 @@ public class MergeFeathersPopulationsWithAdditionalConditions {
 	static int index_Driver=11;
 	static int index_startTime=15;
 
+	static int ignoredAgent=0;
 
 	static int IKEAcounter=0;
 	static int IKEAvisitorID=0;
+	static int IKEAactivity=0;
 
 	static int[] congruentParameters=new int[10];
 
@@ -73,35 +75,60 @@ public class MergeFeathersPopulationsWithAdditionalConditions {
 			String parts2[]=line2.split(";");
 			int homeZoneIKEAvisitor=Integer.parseInt(parts2[index_homeZone]);
 
-			if(Integer.parseInt(parts2[index_agentID])==IKEAvisitorID){
+			if(Integer.parseInt(parts2[index_agentID])==IKEAvisitorID
+					&&Integer.parseInt(parts2[index_agentID])!=ignoredAgent){
 				// write diary of IKEA visitor to new population
-				for (int i=0;i<=20;i++){
+				// change trips to and from IKEA as Passenger to 'car'
+				if(Integer.parseInt(parts2[index_activityID])==(IKEAactivity+1)||
+						(Integer.parseInt(parts2[index_travelMode])==6	
+						&&Integer.parseInt(parts2[index_activityZone])==1955
+						&&Integer.parseInt(parts2[index_activityType])==4
+						&&Integer.parseInt(parts2[index_activityBeginningTime])>=1000))
+				{for (int i=0;i<=20;i++){
 					if(i==index_agentID){
 						parts2[i]=parts2[i]+"_IKEA";
+					}
+					if(i==index_travelMode){
+						parts2[i]="1";
 					}
 					writer.write(parts2[i]);
 					writer2.write(parts2[i]);
 					writer.write(";");
 					writer2.write(";");
-				}								
+				}	
+				if (Integer.parseInt(parts2[index_activityZone])==1955){
+					IKEAactivity=Integer.parseInt(parts2[index_activityID]);
+				}
+				}
+				else{
+					for (int i=0;i<=20;i++){
+						if(i==index_agentID){
+							parts2[i]=parts2[i]+"_IKEA";
+						}
+						writer.write(parts2[i]);
+						writer2.write(parts2[i]);
+						writer.write(";");
+						writer2.write(";");
+					}	}							
+
 				writer.newLine();
 				writer2.newLine();
 			}
 			else{
 				// if IKEA visitor considered
 				if(IKEAvisitorsList.contains(Integer.parseInt(parts2[index_agentID]))
-						&&IKEAcounter<2250){
+						&&IKEAcounter<2250
+						&&Integer.parseInt(parts2[index_agentID])!=ignoredAgent){
 					IKEAvisitorID=Integer.parseInt(parts2[index_agentID]);
-					IKEAcounter++;
 					System.out.println(IKEAcounter+" agents substituted");
 					// look for agent in order to substitute him/her
 					List<int[]> AgentList=SortedAgents.get(homeZoneIKEAvisitor);
 					int chosenAgent=0;
 					Boolean match=false;
 					while(!match){
-						for(int matchingParameters=10;matchingParameters>0;matchingParameters=matchingParameters-1){
+						for(int matchingParameters=2;matchingParameters>0;matchingParameters=matchingParameters-1){
 							switch(matchingParameters){
-							case 10: 
+							case 2: 
 								for(int index=0;index<AgentList.size();index++){
 									int[] bufferedAgent=AgentList.get(index);
 									if(bufferedAgent[2]==(Integer.parseInt(parts2[index_gender]))&&
@@ -117,202 +144,70 @@ public class MergeFeathersPopulationsWithAdditionalConditions {
 										chosenAgent=index;
 										congruentParameters[9]++;
 
-										System.out.println(congruentParameters[0]+"\t"+congruentParameters[1]+"\t"+congruentParameters[2]+"\t"+congruentParameters[3]+"\t"+congruentParameters[4]+"\t"+congruentParameters[5]+"\t"+congruentParameters[6]+"\t"+congruentParameters[7]+"\t"+congruentParameters[8]+"\t"+congruentParameters[9]);
+										System.out.println("Ignored agents:"+congruentParameters[0]+" Number of agents found with same attributes"+"\t"+congruentParameters[9]);
 
 										match=true;
 										break;
 									}
 								}
-								break;
-							case 9: 
-								for(int index=0;index<AgentList.size();index++){
-									int[] bufferedAgent=AgentList.get(index);
-									if(bufferedAgent[2]==(Integer.parseInt(parts2[index_gender]))&&
-											bufferedAgent[3]==Integer.parseInt(parts2[index_age])&&
-											bufferedAgent[4]==Integer.parseInt(parts2[index_income])&&
-											bufferedAgent[5]==Integer.parseInt(parts2[index_work])&&
-											bufferedAgent[6]==Integer.parseInt(parts2[index_children])&&
-											bufferedAgent[7]==Integer.parseInt(parts2[index_HHcomposition])&&
-											bufferedAgent[8]==Integer.parseInt(parts2[index_HHage])&&
-											bufferedAgent[9]==Integer.parseInt(parts2[index_NbrCars])
-											){
-										chosenAgent=index;
-										congruentParameters[8]++;
-										System.out.println(congruentParameters[0]+"\t"+congruentParameters[1]+"\t"+congruentParameters[2]+"\t"+congruentParameters[3]+"\t"+congruentParameters[4]+"\t"+congruentParameters[5]+"\t"+congruentParameters[6]+"\t"+congruentParameters[7]+"\t"+congruentParameters[8]+"\t"+congruentParameters[9]);
-										match=true;
-										break;
-									}
-								}
-								break;
-							case 8: 
-								for(int index=0;index<AgentList.size();index++){
-									int[] bufferedAgent=AgentList.get(index);
-									if(bufferedAgent[2]==(Integer.parseInt(parts2[index_gender]))&&
-											bufferedAgent[3]==Integer.parseInt(parts2[index_age])&&
-											bufferedAgent[4]==Integer.parseInt(parts2[index_income])&&
-											bufferedAgent[5]==Integer.parseInt(parts2[index_work])&&
-											bufferedAgent[6]==Integer.parseInt(parts2[index_children])&&
-											bufferedAgent[7]==Integer.parseInt(parts2[index_HHcomposition])&&
-											bufferedAgent[8]==Integer.parseInt(parts2[index_HHage])
-											){
-										chosenAgent=index;
-										congruentParameters[7]++;
-										System.out.println(congruentParameters[0]+"\t"+congruentParameters[1]+"\t"+congruentParameters[2]+"\t"+congruentParameters[3]+"\t"+congruentParameters[4]+"\t"+congruentParameters[5]+"\t"+congruentParameters[6]+"\t"+congruentParameters[7]+"\t"+congruentParameters[8]+"\t"+congruentParameters[9]);
-										match=true;
-										break;
-									}
-								}
-								break;
-							case 7: 
-								for(int index=0;index<AgentList.size();index++){
-									int[] bufferedAgent=AgentList.get(index);
-									if(bufferedAgent[2]==(Integer.parseInt(parts2[index_gender]))&&
-											bufferedAgent[3]==Integer.parseInt(parts2[index_age])&&
-											bufferedAgent[4]==Integer.parseInt(parts2[index_income])&&
-											bufferedAgent[5]==Integer.parseInt(parts2[index_work])&&
-											bufferedAgent[6]==Integer.parseInt(parts2[index_children])&&
-											bufferedAgent[7]==Integer.parseInt(parts2[index_HHcomposition])
-											){
-										chosenAgent=index;
-										congruentParameters[6]++;
-										System.out.println(congruentParameters[0]+"\t"+congruentParameters[1]+"\t"+congruentParameters[2]+"\t"+congruentParameters[3]+"\t"+congruentParameters[4]+"\t"+congruentParameters[5]+"\t"+congruentParameters[6]+"\t"+congruentParameters[7]+"\t"+congruentParameters[8]+"\t"+congruentParameters[9]);
-										match=true;
-										break;
-									}
-								}
-								break;
-
-							case 6: 
-								for(int index=0;index<AgentList.size();index++){
-									int[] bufferedAgent=AgentList.get(index);
-									if(bufferedAgent[2]==(Integer.parseInt(parts2[index_gender]))&&
-											bufferedAgent[3]==Integer.parseInt(parts2[index_age])&&
-											bufferedAgent[4]==Integer.parseInt(parts2[index_income])&&
-											bufferedAgent[5]==Integer.parseInt(parts2[index_work])&&
-											bufferedAgent[6]==Integer.parseInt(parts2[index_children])
-											){
-										chosenAgent=index;
-										congruentParameters[5]++;
-										System.out.println(congruentParameters[0]+"\t"+congruentParameters[1]+"\t"+congruentParameters[2]+"\t"+congruentParameters[3]+"\t"+congruentParameters[4]+"\t"+congruentParameters[5]+"\t"+congruentParameters[6]+"\t"+congruentParameters[7]+"\t"+congruentParameters[8]+"\t"+congruentParameters[9]);
-										match=true;
-										break;
-									}
-								}	
-								break;
-
-							case 5: 
-								for(int index=0;index<AgentList.size();index++){
-									int[] bufferedAgent=AgentList.get(index);
-									if(bufferedAgent[2]==(Integer.parseInt(parts2[index_gender]))&&
-											bufferedAgent[3]==Integer.parseInt(parts2[index_age])&&
-											bufferedAgent[4]==Integer.parseInt(parts2[index_income])&&
-											bufferedAgent[5]==Integer.parseInt(parts2[index_work])
-											){
-										chosenAgent=index;
-										congruentParameters[4]++;
-										System.out.println(congruentParameters[0]+"\t"+congruentParameters[1]+"\t"+congruentParameters[2]+"\t"+congruentParameters[3]+"\t"+congruentParameters[4]+"\t"+congruentParameters[5]+"\t"+congruentParameters[6]+"\t"+congruentParameters[7]+"\t"+congruentParameters[8]+"\t"+congruentParameters[9]);
-										match=true;
-										break;
-									}
-								}	
-								break;
-
-							case 4: 
-								for(int index=0;index<AgentList.size();index++){
-									int[] bufferedAgent=AgentList.get(index);
-									if(bufferedAgent[2]==(Integer.parseInt(parts2[index_gender]))&&
-											bufferedAgent[3]==Integer.parseInt(parts2[index_age])&&
-											bufferedAgent[4]==Integer.parseInt(parts2[index_income])
-											){
-										chosenAgent=index;
-										congruentParameters[3]++;
-										System.out.println(congruentParameters[0]+"\t"+congruentParameters[1]+"\t"+congruentParameters[2]+"\t"+congruentParameters[3]+"\t"+congruentParameters[4]+"\t"+congruentParameters[5]+"\t"+congruentParameters[6]+"\t"+congruentParameters[7]+"\t"+congruentParameters[8]+"\t"+congruentParameters[9]);
-										match=true;
-										break;
-									}
-								}	
-								break;
-
-							case 3: 
-								for(int index=0;index<AgentList.size();index++){
-									int[] bufferedAgent=AgentList.get(index);
-									if(bufferedAgent[2]==(Integer.parseInt(parts2[index_gender]))&&
-											bufferedAgent[3]==Integer.parseInt(parts2[index_age])
-											){
-										chosenAgent=index;
-										congruentParameters[2]++;
-										System.out.println(congruentParameters[0]+"\t"+congruentParameters[1]+"\t"+congruentParameters[2]+"\t"+congruentParameters[3]+"\t"+congruentParameters[4]+"\t"+congruentParameters[5]+"\t"+congruentParameters[6]+"\t"+congruentParameters[7]+"\t"+congruentParameters[8]+"\t"+congruentParameters[9]);
-										match=true;
-										break;
-									}
-								}
-								break;
-
-							case 2: 
-								for(int index=0;index<AgentList.size();index++){
-									int[] bufferedAgent=AgentList.get(index);
-									if(bufferedAgent[2]==(Integer.parseInt(parts2[index_gender]))
-											){
-										chosenAgent=index;
-										congruentParameters[1]++;
-										System.out.println(congruentParameters[0]+"\t"+congruentParameters[1]+"\t"+congruentParameters[2]+"\t"+congruentParameters[3]+"\t"+congruentParameters[4]+"\t"+congruentParameters[5]+"\t"+congruentParameters[6]+"\t"+congruentParameters[7]+"\t"+congruentParameters[8]+"\t"+congruentParameters[9]);
-										match=true;
-										break;
-									}
-								}	
 								break;
 
 							case 1:
 								chosenAgent=0;
 								congruentParameters[0]++;
-								System.out.println(congruentParameters[0]+"\t"+congruentParameters[1]+"\t"+congruentParameters[2]+"\t"+congruentParameters[3]+"\t"+congruentParameters[4]+"\t"+congruentParameters[5]+"\t"+congruentParameters[6]+"\t"+congruentParameters[7]+"\t"+congruentParameters[8]+"\t"+congruentParameters[9]);
+								System.out.println("ignore this agent");
 								match=true;
 								break;							
 							}	
 							if(match==true){break;}
 						}
 					}
+					////////////x2
+					if(chosenAgent==0){ignoredAgent=Integer.parseInt(parts2[index_agentID]);}
+					else{					
+						int[] SubstitutedAgent=AgentList.get(chosenAgent);
+						AgentList.remove(chosenAgent);
+						SortedAgents.put(homeZoneIKEAvisitor, AgentList);
+						SubstitutedAgentsList.add(SubstitutedAgent[0]);
+						IKEAcounter++;
 
-					int[] SubstitutedAgent=AgentList.get(chosenAgent);
-					AgentList.remove(chosenAgent);
-					SortedAgents.put(homeZoneIKEAvisitor, AgentList);
-					SubstitutedAgentsList.add(SubstitutedAgent[0]);
-
-					// document diary of substituted agent
-					BufferedReader bufferedReaderFindAgent = new BufferedReader(new FileReader(inputFile1));
-					for (int i=0;i<SubstitutedAgent[1];i++){
-						bufferedReaderFindAgent.readLine();
-					}
-					String lineFindAgent=bufferedReaderFindAgent.readLine();
-					String parts[]=lineFindAgent.split(";");
-					if(Integer.parseInt(parts[index_agentID])==SubstitutedAgent[0]){
-						int id=Integer.parseInt(parts[index_agentID]);
-						while(id==SubstitutedAgent[0]){
-							writer2.write(lineFindAgent);
-							writer2.newLine();
-							lineFindAgent=bufferedReaderFindAgent.readLine();
-							String parts3[]=lineFindAgent.split(";");
-							id=Integer.parseInt(parts3[index_agentID]);
+						// document diary of substituted agent
+						BufferedReader bufferedReaderFindAgent = new BufferedReader(new FileReader(inputFile1));
+						for (int i=0;i<SubstitutedAgent[1];i++){
+							bufferedReaderFindAgent.readLine();
 						}
-						bufferedReaderFindAgent.close();
-					}
-					else{
-						System.out.println("Error: Agent "+SubstitutedAgent[0]+" not found in this line.");
-					}
-					System.out.println("Agent "+SubstitutedAgent[0]+" substituted by agent "+parts2[index_agentID]+"_IKEA.");
-					// write diary of IKEA visitor to new population
-					for (int i=0;i<=20;i++){
-						if(i==index_agentID){
-							parts2[i]=parts2[i]+"_IKEA";
+						String lineFindAgent=bufferedReaderFindAgent.readLine();
+						String parts[]=lineFindAgent.split(";");
+						if(Integer.parseInt(parts[index_agentID])==SubstitutedAgent[0]){
+							int id=Integer.parseInt(parts[index_agentID]);
+							while(id==SubstitutedAgent[0]){
+								writer2.write(lineFindAgent);
+								writer2.newLine();
+								lineFindAgent=bufferedReaderFindAgent.readLine();
+								String parts3[]=lineFindAgent.split(";");
+								id=Integer.parseInt(parts3[index_agentID]);
+							}
+							bufferedReaderFindAgent.close();
 						}
-						writer.write(parts2[i]);
-						writer2.write(parts2[i]);
-						writer.write(";");
-						writer2.write(";");
-					}					
+						else{
+							System.out.println("Error: Agent "+SubstitutedAgent[0]+" not found in this line.");
+						}
+						System.out.println("Agent "+SubstitutedAgent[0]+" substituted by agent "+parts2[index_agentID]+"_IKEA.");
+						// write diary of IKEA visitor to new population
+						for (int i=0;i<=20;i++){
+							if(i==index_agentID){
+								parts2[i]=parts2[i]+"_IKEA";
+							}
+							writer.write(parts2[i]);
+							writer2.write(parts2[i]);
+							writer.write(";");
+							writer2.write(";");
+						}					
 
-					writer.newLine();
-					writer2.newLine();
+						writer.newLine();
+						writer2.newLine();
+					}
+					////////	
 				}
 			}
 		}
@@ -334,8 +229,10 @@ public class MergeFeathersPopulationsWithAdditionalConditions {
 		System.out.println(IKEAcounter+" agents substituted");
 		System.out.println("finito");
 	}
+
+
 	// generates a list of all IKEA visitors that are being considered
-	// = drive to TAZ 1955 for a DAILY SHOPPING activity by CAR
+	// = drive to TAZ 1955 for a DAILY SHOPPING activity AFTER 1000 by CAR or ASPASSENGER
 	private static List<Integer> generateListOfIKEAVisitors() throws IOException{
 		List<Integer> IKEAvisitors = new ArrayList<Integer>();
 		BufferedReader bufferedReader3 = new BufferedReader(new FileReader(inputFile2));
@@ -343,10 +240,11 @@ public class MergeFeathersPopulationsWithAdditionalConditions {
 		int IDBuffer=0;
 		while((line3=bufferedReader3.readLine())!=null){
 			String parts3[]=line3.split(";");
-			if(Integer.parseInt(parts3[index_travelMode])==1
+			if((Integer.parseInt(parts3[index_travelMode])==1||Integer.parseInt(parts3[index_travelMode])==6)
 					&&Integer.parseInt(parts3[index_activityZone])==1955
 					&&Integer.parseInt(parts3[index_activityType])==4
-					&&Integer.parseInt(parts3[index_agentID])!=IDBuffer){
+					&&Integer.parseInt(parts3[index_agentID])!=IDBuffer
+					&&Integer.parseInt(parts3[index_activityBeginningTime])>=1000){
 				IDBuffer=Integer.parseInt(parts3[index_agentID]);
 				IKEAvisitors.add(IDBuffer);
 			}

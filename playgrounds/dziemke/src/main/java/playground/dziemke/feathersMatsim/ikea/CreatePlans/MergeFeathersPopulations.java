@@ -10,8 +10,6 @@ import java.util.HashMap;
 import java.util.List;
 
 //	Plan: Take 2,250 IKEA visitors who go by car and substitute them in original population; how? 1. Location, 2. Socioeconomic data?
-//	Auf gesamtbev�lkerung ersetzen
-//	Ersetzte plane dokumentieren und dann analysieren, insb. In hinblick darauf wie unterschiedliche die ersetzTEN plane von den ersetzENDEN pl�nen sind
 
 public class MergeFeathersPopulations {
 

@@ -14,9 +14,8 @@ public class Case2CreatePopulationAndDemand {
 	private final static Logger Log = Logger.getLogger(Case2CreatePopulationAndDemand.class);
 	private Scenario scenario;
 
-	private String networkFile = "./input/network/merged-network_UTM31N_IKEA.xml";
-	private String dataFile ="./input/prdToAsciiOwnDemand.csv";
-
+	private String networkFile = "C:/Users/jeffw_000/Desktop/Dropbox/Uni/Master/Masterarbeit/MT/workspace new/ikeaStudy/input/Case2/merged-network_UTM31N_IKEA.xml";
+	private String dataFile ="C:/Users/jeffw_000/Desktop/Dropbox/Uni/Master/Masterarbeit/MT/workspace new/ikeaStudy/input/Case2/prdToAsciiOwnDemand.csv";
 
 	public static void main(String[] args) {
 		Case2CreatePopulationAndDemand creator = new Case2CreatePopulationAndDemand();
@@ -45,7 +44,7 @@ public class Case2CreatePopulationAndDemand {
 
 	private void write() {
 		PopulationWriter populationWriter = new PopulationWriter(this.scenario.getPopulation(), this.scenario.getNetwork());
-		populationWriter.write("./output/Case2plans.xml.gz");
+		populationWriter.write("C:/Users/jeffw_000/Desktop/Dropbox/Uni/Master/Masterarbeit/MT/workspace new/ikeaStudy/output/Case2plans.xml.gz");
 		Log.info("Number of persons: " + this.scenario.getPopulation().getPersons().size());
 	}
 
