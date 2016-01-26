@@ -42,13 +42,9 @@ public class ODCalibratorHamiltonian {
                 engine.getDataPool())
                 .configure(configGroup);
 
-        hamiltonian.setUseWeights(true);
+        hamiltonian.setUseWeights(engine.getUseWeights());
         hamiltonian.setPredicate(new CachedModePredicate(CommonKeys.LEG_MODE, CommonValues.LEG_MODE_CAR));
 
-//        long delay = (long) Double.parseDouble(configGroup.getValue("startIteration"));
-//        double theta = Double.parseDouble(configGroup.getValue("theta"));
-
-//        DelayedHamiltonian delayedHamiltonian = new DelayedHamiltonian(hamiltonian, delay);
         AnnealingHamiltonian annealingHamiltonian = AnnealingHamiltonianConfigurator.configure(hamiltonian,
                 configGroup);
         engine.getHamiltonian().addComponent(annealingHamiltonian);
@@ -57,7 +53,7 @@ public class ODCalibratorHamiltonian {
         /*
         Add a hamiltonian logger.
          */
-        engine.getEngineListeners().addComponent(new HamiltonianLogger(annealingHamiltonian,
+        engine.getEngineListeners().addComponent(new HamiltonianLogger(hamiltonian,
                 engine.getLoggingInterval(),
                 "odCalibrator",
                 engine.getIOContext().getRoot()));

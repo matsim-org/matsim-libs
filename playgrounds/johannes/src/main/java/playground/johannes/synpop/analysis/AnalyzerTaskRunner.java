@@ -42,7 +42,7 @@ public class AnalyzerTaskRunner {
     public static <T> void run(T persons, AnalyzerTask<T> task, String file) {
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-            writer.write("dimension\tmean\tmin\tmax\tsize\tmedian\tvariance\tnullValues");
+            writer.write("dimension\tmean\tmin\tmax\tsize\twsum\tmedian\tvariance\tnullValues");
             writer.newLine();
 
             ArrayList<StatsContainer> containers = new ArrayList<>();
@@ -57,7 +57,9 @@ public class AnalyzerTaskRunner {
                 writer.write(TAB);
                 writer.write(doubleToString(container.getMax()));
                 writer.write(TAB);
-                writer.write(doubleToString(container.getN()));
+                writer.write(intToString(container.getN()));
+                writer.write(TAB);
+                writer.write(doubleToString(container.getWsum()));
                 writer.write(TAB);
                 writer.write(doubleToString(container.getMedian()));
                 writer.write(TAB);

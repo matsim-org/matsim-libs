@@ -157,23 +157,9 @@ public class Simulator {
          */
         refPersons = RefPopulationBuilder.build(this, config);
         /*
-        Build default analyzer...
-         */
-        DefaultAnalyzerBuilder.build(this, config);
-
-        logger.info("Analyzing reference population...");
-        ioContext.append("ref");
-        AnalyzerTaskRunner.run(refPersons, analyzerTasks, ioContext);
-        /*
         Generate the simulation population...
          */
         simPersons = SimPopulationBuilder.build(this, config);
-        /*
-        Extend the analyzer
-         */
-        ExtendedAnalyzerBuilder.build(this, config);
-
-        engineListeners.addComponent(new AnalyzerListener(analyzerTasks, ioContext, dumpInterval));
         /*
 		Setup listeners for changes on facilities and geo distance.
 		 */
@@ -184,6 +170,10 @@ public class Simulator {
         geoDistanceUpdater.setPredicate(new CachedModePredicate(CommonKeys.LEG_MODE, CommonValues.LEG_MODE_CAR));
 
         attributeListeners.get(CommonKeys.ACTIVITY_FACILITY).addComponent(geoDistanceUpdater);
+        /*
+        Build default analyzer...
+         */
+        DefaultAnalyzerBuilder.build(this, config);
 		/*
         Build hamiltonians...
          */
@@ -195,7 +185,8 @@ public class Simulator {
         hamiltonianAnalyzers = new ConcurrentAnalyzerTask<>();
         analyzerTasks.addComponent(new AnalyzerTaskGroup<>(hamiltonianAnalyzers, ioContext, "hamiltonian"));
 
-        GeoDistanceHamiltonian.build(this, config);
+//        GeoDistanceHamiltonian.build(this, config);
+        GeoDistanceLAU2Hamiltonian.build(this, config);
         MeanDistanceHamiltonian.build(this, config);
         ODCalibratorHamiltonian.build(this, config);
 
@@ -204,6 +195,18 @@ public class Simulator {
                 "SystemTemperature",
                 ioContext.getRoot()));
         engineListeners.addComponent(new TransitionLogger(loggingInterval));
+        /*
+        Analyze reference population...
+         */
+        logger.info("Analyzing reference population...");
+        ioContext.append("ref");
+        AnalyzerTaskRunner.run(refPersons, analyzerTasks, ioContext);
+        /*
+        Extend the analyzer
+         */
+        ExtendedAnalyzerBuilder.build(this, config);
+
+        engineListeners.addComponent(new AnalyzerListener(analyzerTasks, ioContext, dumpInterval));
         /*
 		Setup the facility mutator...
 		 */

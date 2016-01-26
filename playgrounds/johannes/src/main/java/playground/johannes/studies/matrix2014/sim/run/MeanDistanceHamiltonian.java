@@ -21,6 +21,8 @@ package playground.johannes.studies.matrix2014.sim.run;
 import org.matsim.contrib.common.stats.LinearDiscretizer;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
+import playground.johannes.studies.matrix2014.sim.AnnealingHamiltonian;
+import playground.johannes.studies.matrix2014.sim.AnnealingHamiltonianConfigurator;
 import playground.johannes.studies.matrix2014.sim.CopyPersonAttToLeg;
 import playground.johannes.synpop.analysis.Predicate;
 import playground.johannes.synpop.data.*;
@@ -66,11 +68,11 @@ public class MeanDistanceHamiltonian {
                 new LinearDiscretizer(1.0),
                 engine.getUseWeights());
 
-        double theta = Double.parseDouble(configGroup.getValue("theta"));
-        engine.getHamiltonian().addComponent(hamiltonian, theta);
-
+        AnnealingHamiltonian annealingHamiltonian = AnnealingHamiltonianConfigurator.configure(
+                hamiltonian,
+                configGroup);
+        engine.getHamiltonian().addComponent(annealingHamiltonian);
         engine.getAttributeListeners().get(CommonKeys.LEG_GEO_DISTANCE).addComponent(hamiltonian);
-
         /*
         Add a hamiltonian logger.
          */

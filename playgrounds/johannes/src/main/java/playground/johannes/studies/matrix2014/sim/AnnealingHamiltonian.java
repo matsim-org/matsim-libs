@@ -44,7 +44,7 @@ public class AnnealingHamiltonian implements Hamiltonian, MarkovEngineListener {
 
     private double delta_interval = 1e7;
 
-    private double delta_threshold = 0.05;
+    private double delta_threshold = 0.005;
 
     private long startIteration = 0;
 
@@ -58,6 +58,8 @@ public class AnnealingHamiltonian implements Hamiltonian, MarkovEngineListener {
         this.delegate = delegate;
         this.theta_min = theta_min;
         this.theta_max = theta_max;
+
+        theta = theta_min;
     }
 
     public void setThetaFactor(double factor) {
@@ -91,7 +93,7 @@ public class AnnealingHamiltonian implements Hamiltonian, MarkovEngineListener {
             theta = Math.max(theta, theta_min);
             theta = Math.min(theta, theta_max);
 
-            logger.trace(String.format("New theta value: %s", theta));
+            logger.trace(String.format("Theta update triggered: %s", theta));
         }
 
         h_old = h_new;
